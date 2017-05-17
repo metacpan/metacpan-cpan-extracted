@@ -1,0 +1,134 @@
+=head1 NAME
+
+Imgur::API::Model::Conversation
+
+=head1 DESCRIPTION
+
+=over 4
+
+The base model for a conversation.
+
+=back
+
+=cut
+
+=head1 FIELDS
+ 
+=item 
+C<id I<integer>>
+
+=over 4
+
+Conversation ID
+
+=back
+
+
+=item 
+C<last_message_preview I<string>>
+
+=over 4
+
+Preview of the last message
+
+=back
+
+
+=item 
+C<datetime I<integer>>
+
+=over 4
+
+Time of last sent message, epoch time
+
+=back
+
+
+=item 
+C<with_account_id I<integer>>
+
+=over 4
+
+Account ID of the other user in conversation
+
+=back
+
+
+=item 
+C<with_account I<string>>
+
+=over 4
+
+Account username of the other user in conversation
+
+=back
+
+
+=item 
+C<message_count I<integer>>
+
+=over 4
+
+Total number of messages in the conversation
+
+=back
+
+
+=item 
+C<messages I<Array of Messages>>
+
+=over 4
+
+OPTIONAL: (only available when requesting a specific conversation) Reverse sorted such that most recent message is at the end of the array.
+
+=back
+
+
+=item 
+C<done I<boolean>>
+
+=over 4
+
+OPTIONAL: (only available when requesting a specific conversation) Flag to indicate whether you've reached the beginning of the thread.
+
+=back
+
+
+=item 
+C<page I<integer>>
+
+=over 4
+
+OPTIONAL: (only available when requesting a specific conversation) Number of the next page
+
+=back
+
+
+
+=head1 EXAMPLE
+
+
+ {
+   "success" : true,
+   "status" : 200,
+   "data" : [
+      {
+         "datetime" : 1406927327,
+         "id" : 188129,
+         "message_count" : 3,
+         "with_account_id" : 3698510,
+         "with_account" : "jasdev",
+         "last_message_preview" : "hi"
+      }
+   ]
+}
+
+
+
+=cut
+
+=head1 SEE ALSO
+
+http://api.imgur.com/models/conversation
+
+

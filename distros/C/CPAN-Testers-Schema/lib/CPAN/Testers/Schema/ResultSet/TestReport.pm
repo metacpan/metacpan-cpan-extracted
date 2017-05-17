@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::ResultSet::TestReport;
-our $VERSION = '0.008';
+our $VERSION = '0.012';
 # ABSTRACT: Query the raw test reports
 
 #pod =head1 SYNOPSIS
@@ -63,16 +63,21 @@ sub insert_metabase_fact( $self, $fact ) {
         distribution => {
             name => $fact_data{dist_name},
             version => $fact_data{dist_version},
-            grade => $fact_data{grade},
+        },
+        result => {
+            grade => lc $fact_data{grade},
             output => {
                 uncategorized => $fact_data{textreport},
             },
-        },
+        }
     );
+
+    my $format = DateTime::Format::ISO8601->new();
+    my $creation = $format->parse_datetime( $fact->creation_time );
 
     return $self->create({
         id => $fact->guid,
-        created => $fact->creation_time,
+        created => $creation,
         report => \%report,
     });
 }
@@ -89,7 +94,7 @@ CPAN::Testers::Schema::ResultSet::TestReport - Query the raw test reports
 
 =head1 VERSION
 
-version 0.008
+version 0.012
 
 =head1 SYNOPSIS
 

@@ -11,7 +11,7 @@ build_requires:
   Test::Memory::Cycle: '0'
   Test::More: '0'
   Test::Warn: '0.11'
-  YAML: '0'
+  YAML::Tiny: '0'
 configure_requires:
   Module::Build: '0.34'
 dynamic_config: 0
@@ -25,7 +25,7 @@ recommends:
   Fuse: '0'
   Term::ReadLine: '0'
   Text::Levenshtein::Damerau: '0'
-  YAML: '0'
+  YAML::Tiny: '0'
 requires:
   Carp: '0'
   Carp::Assert::More: '0'
@@ -67,5 +67,5 @@ resources:
   bugtracker: https://github.com/dod38fr/config-model/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: git://github.com/dod38fr/config-model.git
-version: '2.101'
+version: '2.102'
 x_serialization_backend: 'YAML::Tiny version 1.70'

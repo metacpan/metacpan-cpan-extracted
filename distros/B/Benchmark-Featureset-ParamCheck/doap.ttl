@@ -1,0 +1,117 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Benchmark-Featureset-ParamCheck/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [
+		doap-deps:on "namespace::autoclean"^^doap-deps:CpanId;
+	], [ doap-deps:on "Params::Check 0.38"^^doap-deps:CpanId ], [
+		doap-deps:on "Params::Validate 1.26"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Params::ValidationCompiler 0.24"^^doap-deps:CpanId;
+	], [ doap-deps:on "Ref::Util 0.203"^^doap-deps:CpanId ], [
+		doap-deps:on "Ref::Util::XS 0.116"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Specio::Declare 0.37"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Specio::Library::Builtins 0.37"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Type::Params 1.001_009"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Types::Standard 1.001_009"^^doap-deps:CpanId;
+	], [ doap-deps:on "perl 5.012"^^doap-deps:CpanId ], [
+		doap-deps:on "Type::Tiny::XS 0.012"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Data::Validator 1.07"^^doap-deps:CpanId;
+	], [ doap-deps:on "IO::String"^^doap-deps:CpanId ], [ doap-deps:on "Moose 2.2002"^^doap-deps:CpanId ], [
+		doap-deps:on "Moose::Util::TypeConstraints 2.2002"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "MooseX::Params::Validate 0.21"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Mouse::Util::TypeConstraints"^^doap-deps:CpanId;
+	], [ doap-deps:on "Mouse v2.4.7"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::Modern 0.013"^^doap-deps:CpanId ], [ doap-deps:on "Module::Runtime"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Benchmark-Featureset-ParamCheck>;
+	doap:created         "2017-05-15"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Benchmark-Featureset-ParamCheck>;
+	doap:homepage        <https://metacpan.org/release/Benchmark-Featureset-ParamCheck>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Benchmark-Featureset-ParamCheck";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Benchmark-Featureset-ParamCheck/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Benchmark-Featureset-ParamCheck/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Benchmark-Featureset-ParamCheck/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Benchmark-Featureset-ParamCheck/v_0-004>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-benchmark-featureset-paramcheck>;
+	];
+	doap:shortdesc       "compare different parameter validation modules".
+
+<http://purl.org/NET/cpan-uri/dist/Benchmark-Featureset-ParamCheck/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Benchmark-Featureset-ParamCheck-0.001"^^xsd:string;
+	dc:issued            "2017-05-15"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Benchmark-Featureset-ParamCheck-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Benchmark-Featureset-ParamCheck/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Benchmark-Featureset-ParamCheck-0.002"^^xsd:string;
+	dc:issued            "2017-05-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Support testing and benchmarking positional parameters.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Benchmark-Featureset-ParamCheck-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Benchmark-Featureset-ParamCheck/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "Benchmark-Featureset-ParamCheck-0.003"^^xsd:string;
+	dc:issued            "2017-05-17"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Test Params::Validate.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Benchmark-Featureset-ParamCheck-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Benchmark-Featureset-ParamCheck/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "Benchmark-Featureset-ParamCheck-0.004"^^xsd:string;
+	dc:issued            "2017-05-17"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Add explicit dependency on Params::Validate 1.26.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Benchmark-Featureset-ParamCheck-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

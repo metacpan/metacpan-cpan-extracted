@@ -5,7 +5,7 @@ use warnings;
 
 use base 'ObjectDB::Related';
 
-our $VERSION = '3.19';
+our $VERSION = '3.20';
 
 use Scalar::Util ();
 use ObjectDB::Util qw(merge);
@@ -39,7 +39,7 @@ sub find_related {
     my $meta = $self->meta;
     my ($from, $to) = %{$meta->map};
 
-    return unless defined $row->column($from);
+    return unless defined $row->column($from) && length $row->column($from);
 
     return $self->_related_table->find($self->_build_params($row, @_));
 }

@@ -96,7 +96,7 @@ use PPI::Exception ();
 
 use vars qw{$VERSION @ISA *_PARENT};
 BEGIN {
-	$VERSION = '1.220';
+	$VERSION = '1.224';
 	@ISA     = 'PPI::Node';
 	*_PARENT = *PPI::Element::_PARENT;
 }
@@ -186,10 +186,9 @@ sub finish { $_[0]->{finish} }
 =head2 braces
 
 The C<braces> method is a utility method which returns the brace type,
-regardless of whether has both braces defined, or just the starting
-brace, or just the ending brace.
+regardless of whether both or just one of the braces is defined.
 
-Returns on of the three strings C<'[]'>, C<'{}'>, or C<'()'>, or C<undef>
+Returns one of the three strings C<'[]'>, C<'{}'>, or C<'()'>, or C<undef>
 on error (primarily not having a start brace, as mentioned above).
 
 =cut

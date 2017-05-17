@@ -28,7 +28,7 @@ Moose::Exporter->setup_import_methods(
     as_is => [qw/get_options/],
 );
 
-our $VERSION = version->new('0.4.2');
+our $VERSION = version->new('0.4.3');
 our $EXIT    = 1;
 
 has options => (
@@ -185,7 +185,7 @@ sub BUILD {
     $conf = {
         map { %$_ }
         map { values %$_    }
-        @{ $conf }
+        reverse @{ $conf }
     };
 
     # perlcritic is confused here combining hashes is not the same as comma separated arguments
@@ -522,7 +522,7 @@ Getopt::Alt - Command line option passing with with lots of features
 
 =head1 VERSION
 
-This documentation refers to Getopt::Alt version 0.4.2.
+This documentation refers to Getopt::Alt version 0.4.3.
 
 =head1 SYNOPSIS
 
@@ -815,7 +815,7 @@ file to get auto-completion.
     }
     complete -F _eg eg
 
-B<Note>: This is different from version 0.4.2 and earlier
+B<Note>: This is different from version 0.4.3 and earlier
 
 =head1 DIAGNOSTICS
 

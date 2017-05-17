@@ -1,4 +1,7 @@
 use Test::More;
+
+use strict;
+use warnings;
 use Module::Load;
 use File::Basename;
 use File::Spec;
@@ -6,28 +9,46 @@ use Cwd 'abs_path';
 
 use_ok('Alien::MuPDF');
 
-# for dev testing, get the headers out of the build directory
-my ($built_fitz) = glob '_alien/mupdf-*-source/include/mupdf/fitz.h';
-my $built_dir = abs_path( File::Spec->rel2abs(File::Spec->catfile( dirname($built_fitz), File::Spec->updir) ) );
-my @inc_built = defined $built_fitz && -f $built_fitz ? (INC => "-I$built_dir") : ();
-
 SKIP: {
 	eval { load 'Inline::C' } or do {
 		my $error = $@;
 		skip "Inline::C not installed", 1 if $error;
 	};
 
-	Inline->import( with => qw(Alien::MuPDF) );
-	Inline->bind( C => q|
-		char* get_fitz_version() {
-			return FZ_VERSION;
-		}
-	|, ENABLE => AUTOWRAP => @inc_built);
+	skip "Build issues on Strawberry Perl for Windows."
+		." See issue at <https://github.com/project-renard/p5-Alien-MuPDF/issues/30>."
+		if $^O eq 'MSWin32';
 
-	# single digit for the major version,
-	# multiple digits for the minor version,
-	# followed by optional letter
-	like( get_fitz_version(), qr/^\d\.\d+[a-z]?$/);
+
+	Inline->import( with => qw(Alien::MuPDF) );
+
+	subtest 'Retrieve a constant' => sub {
+		Inline->bind( C => q|
+			char* get_fitz_version() {
+				return FZ_VERSION;
+			}
+		|, ENABLE => AUTOWRAP => );
+
+		# single digit for the major version,
+		# multiple digits for the minor version,
+		# followed by optional letter
+		like( get_fitz_version(), qr/^\d\.\d+[a-z]?$/);
+	};
+
+	subtest 'Call a function' => sub {
+		Inline->bind( C => q|
+			int can_create_context() {
+				fz_context* ctx = fz_new_context(NULL, NULL, FZ_STORE_UNLIMITED);
+				return NULL != ctx;
+			}
+		|, ENABLE => AUTOWRAP => );
+
+		# single digit for the major version,
+		# multiple digits for the minor version,
+		# followed by optional letter
+		ok( can_create_context(), 'fz_context* created');;
+	};
+
 }
 
 done_testing;

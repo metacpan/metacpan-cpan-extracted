@@ -2,6 +2,8 @@ package Test::Smoke::Util::Execute;
 use warnings;
 use strict;
 
+our $VERSION = '0.001';
+
 use Cwd;
 
 use Test::Smoke::LogMixin;
@@ -83,7 +85,7 @@ sub run {
         $self->{command},
         map {
             / / ? qq/"$_"/ : $_
-            } $self->arguments(@_)
+        } $self->arguments(@_)
     );
     $self->log_debug("In pwd(%s) running:", cwd());
     $self->log_info("qx[%s]\n", $command);

@@ -111,9 +111,14 @@ Profile ID (from your GA account) you want to use.
 
 Arrayref to list of desired dimensions.
 
+  $req->dimensions([qw(pagePath)]);
+
 =item metrics
 
 Arrayref to list of desired metrics.
+
+  $req->metrics([qw(visitors newVisits visits bounces timeOnSite entrances
+      pageviews uniquePageviews timeOnPage exits)]);
 
 =item segment
 
@@ -122,6 +127,8 @@ String containing desired segment.
 =item filters
 
 Arrayref to list of desired filters.
+
+  $req->filters(['browser==Firefox']);
 
 =item sort
 

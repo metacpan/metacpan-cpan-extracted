@@ -1,7 +1,7 @@
 use Renard::Curie::Setup;
 package Renard::Curie::Model::Document::Role::Pageable;
 # ABSTRACT: Role for documents that have numbered pages
-$Renard::Curie::Model::Document::Role::Pageable::VERSION = '0.001';
+$Renard::Curie::Model::Document::Role::Pageable::VERSION = '0.002';
 use Moo::Role;
 use Renard::Curie::Types qw(PageNumber);
 
@@ -32,7 +32,7 @@ Renard::Curie::Model::Document::Role::Pageable - Role for documents that have nu
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 ATTRIBUTES
 

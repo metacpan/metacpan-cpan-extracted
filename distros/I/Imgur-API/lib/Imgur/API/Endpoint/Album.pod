@@ -1,0 +1,341 @@
+=head1 NAME
+
+Imgur::API::Endpoint::Album
+
+=head1 DESCRIPTION
+
+=over 4
+
+Access to the imgur Album API Endpoint. 
+
+=back
+
+=cut
+
+=head1 METHODS
+ 
+
+=head2 get
+
+=over 2
+
+Get information about a specific album.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<album> I<required>
+
+Album
+
+
+=back
+
+
+=head2 images
+
+=over 2
+
+Return all of the images in the album
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<album> I<required>
+
+Album
+
+
+=back
+
+
+=head2 image
+
+=over 2
+
+Get information about an image in an album, any additional actions found in Image Endpoint will also work.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<album> I<required>
+
+Album
+
+=item *
+ C<image> I<required>
+
+Image
+
+
+=back
+
+
+=head2 upload
+
+=over 2
+
+Create a new album. Optional parameter of ids[] is an array of image ids to add to the album. array of image ids to add to the album. If uploading anonymous images to anonymous album please use the optional parameter of deletehashes[] rather than ids[]. Note: including the optional deletehashes[] parameter will also work for authenticated user albums. There is no need to duplicate image ids with their corresponding deletehash. This method is available without authenticating an account, and may be used merely by sending "Authorization: Client-ID {client_id}" in the request headers. Doing so will create an anonymous album which is not tied to an account.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<title> I<optional>
+
+The title of the album
+
+=item *
+ C<deletehashes[]> I<optional>
+
+The deletehashes of the images that you want to be included in the album.
+
+=item *
+ C<description> I<optional>
+
+The description of the album
+
+=item *
+ C<ids[]> I<optional>
+
+The image ids that you want to be included in the album.
+
+=item *
+ C<layout> I<optional>
+
+Sets the layout to display the album.  Values are : blog | grid | horizontal | vertical
+
+=item *
+ C<privacy> I<optional>
+
+Sets the privacy level of the album.  Values are : public | hidden | secret. Defaults to user's privacy settings for logged in users.
+
+=item *
+ C<cover> I<optional>
+
+The ID of an image that you want to be the cover of the album
+
+
+=back
+
+
+=head2 update
+
+=over 2
+
+Update the information of an album. For anonymous albums, {album} should be the deletehash that is returned at creation. If uploading anonymous images to anonymous album please use the optional parameter of deletehashes[] rather than ids[]. Note: including the optional deletehashes[] parameter will also work for authenticated user albums. There is no need to duplicate image ids with their corresponding deletehash.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<privacy> I<optional>
+
+Sets the privacy level of the album.  Values are : public | hidden | secret
+
+=item *
+ C<layout> I<optional>
+
+Sets the layout to display the album.  Values are : blog | grid | horizontal | vertical
+
+=item *
+ C<ids[]> I<optional>
+
+The image ids that you want to be included in the album.
+
+=item *
+ C<description> I<optional>
+
+The description of the album
+
+=item *
+ C<deletehashes[]> I<optional>
+
+The deletehashes of the images that you want to be included in the album.
+
+=item *
+ C<title> I<optional>
+
+The title of the album
+
+=item *
+ C<cover> I<optional>
+
+The ID of an image that you want to be the cover of the album
+
+=item *
+ C<album> I<required>
+
+Album
+
+
+=back
+
+
+=head2 delete
+
+=over 2
+
+Delete an album with a given ID. You are required to be logged in as the user to delete the album. For anonymous albums, {album} should be the deletehash that is returned at creation.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<album> I<required>
+
+Album
+
+
+=back
+
+
+=head2 favorite
+
+=over 2
+
+Favorite an album with a given ID. The user is required to be logged in to favorite the album.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<album> I<required>
+
+Album
+
+
+=back
+
+
+=head2 setTo
+
+=over 2
+
+Sets the images for an album, removes all other images and only uses the images in this request. For anonymous albums, {album} should be the deletehash that is returned at creation. If uploading anonymous images to anonymous album please use the optional parameter of deletehashes[] rather than ids[]. Note: including the optional deletehashes[] parameter will also work for authenticated user albums. There is no need to duplicate image ids with their corresponding deletehash.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<album> I<required>
+
+Album
+
+=item *
+ C<deletehashes[]> I<optional>
+
+The image deletehashes that you want to be added to the album. The [] represents the ability to use this variable as an array.
+
+=item *
+ C<ids[]> I<optional>
+
+The image ids that you want to be added to the album. The [] represents the ability to use this variable as an array.
+
+
+=back
+
+
+=head2 addTo
+
+=over 2
+
+For anonymous albums, {album} should be the deletehash that is returned at creation. If uploading anonymous images to anonymous album please use the optional parameter of deletehashes[] rather than ids[]. Note: including the optional deletehashes[] parameter will also work for authenticated user albums. There is no need to duplicate image ids with their corresponding deletehash.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<album> I<required>
+
+Album
+
+=item *
+ C<deletehashes[]> I<optional>
+
+The image deletehashes that you want to be added to the album.  The [] represents the ability to use this variable as an array.
+
+=item *
+ C<ids[]> I<optional>
+
+The image ids that you want to be added to the album.  The [] represents the ability to use this variable as an array.
+
+
+=back
+
+
+=head2 removeFrom
+
+=over 2
+
+Takes parameter, ids[], as an array of ids and removes from the album. For anonymous albums, {album} should be the deletehash that is returned at creation.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<ids[]> I<required>
+
+The image ids that you want to be removed from the album.
+
+=item *
+ C<album> I<required>
+
+Album
+
+
+=back
+
+
+=head1 SEE ALSO
+
+=over 4 
+
+https://api.imgur.com/endpoints/album
+
+=back
+
+=cut

@@ -1,12 +1,10 @@
-#!/usr/bin/perl -w
-
 # copied over from JSON::XS and modified to use JSON
 
 use strict;
 
 use Test::More;
 BEGIN { plan tests => 697 };
-BEGIN { $ENV{PERL_JSON_BACKEND} = "JSON::backportPP"; }
+BEGIN { $ENV{PERL_JSON_BACKEND} ||= "JSON::backportPP"; }
 
 
 use JSON;
@@ -77,7 +75,7 @@ splitter +JSON->new->allow_nonref, ' "5" ';
    ok ('[5]' eq $coder->encode (scalar $coder->incr_parse), "sparse3");
 }
 
-
+1
 TEST
 
 

@@ -3,7 +3,6 @@ package PGObject::Util::PseudoCSV;
 use 5.008;
 use strict;
 use warnings;
-use PGObject;
 use Carp;
 
 =head1 NAME
@@ -12,11 +11,11 @@ PGObject::Util::PseudoCSV - Tuple/Array parsing and serialization for PGObject
 
 =head1 VERSION
 
-Version 1.1.1
+Version 2
 
 =cut
 
-our $VERSION = '1.1.1';
+our $VERSION = 2.000000;
 
 
 =head1 SYNOPSIS
@@ -28,7 +27,7 @@ To parse:
 
 For a tuple, we'd typically:
 
-   my @list = pseudocsv_parse($text_representation, @typelist);
+   my @list = pseudocsv_parse($text_representation);
 
 We can then arrange the hash as:
 
@@ -37,13 +36,9 @@ We can then arrange the hash as:
 Which we can combine as:
 
    my $hashref =  pseudocsv_to_hash(
-                     pseudocsv_parse($text_representation, @typelist),
+                     pseudocsv_parse($text_representation),
                      \@col_list
    );
-
-For an array we specify a single type to the parser:
-
-   my @list = pseudocsv_parse($text_representation, $type);
 
 =head1 DESCRIPTION
 
@@ -57,9 +52,15 @@ list.
 The API's here assume you send one (and only one) pseudo-csv record to the API 
 at once.  These may be nested, so a single tuple can contain arrays of tuples 
 which can contain arrays of tuples ad infinitum but the parsing only goes one
-layer deep tuple-wise so that handlin classes have an opportunity to re-parse
+layer deep tuple-wise so that handling classes have an opportunity to re-parse
 with appropriate type information. Naturally this has performance implications,
 so depth in SQL structures passed should be reasonably limited.
+
+As of 2.0, we no longer automatically call deserialization functions from the
+parser itself.  At his point the calling classes MUST call the deserializer
+themselves but this is far easier since this has been moved to a separate
+service in PGObject 2.0.  This avoids an unecessary dependency on PGObject
+and ensures that the module is more geneally useful.
 
 =head1 EXPORT
 
@@ -106,7 +107,7 @@ sub pseudocsv_parse {
         my $in_type = $type;
         $in_type = shift @$type if ref $type eq ref [];
         $val =~ s/""/"/g if defined $val;
-        push @returnlist, PGObject::process_type($val, $type, $registry);
+        push @returnlist, $val;
     }
     return @returnlist if wantarray;
     return \@returnlist;
@@ -137,8 +138,8 @@ Takes an ordered list of columns and a hashref and returns a tuple literal
 =cut
 
 sub hash2pcsv {
-    my $hashref = shift;
-    return to_pseudocsv([map { $hashref->{$_} } @_], 1)
+    my ($hashref, @cols) = @_;
+    return to_pseudocsv([map { $hashref->{$_} } @cols], 1)
 }
 
 
@@ -260,7 +261,7 @@ L<http://search.cpan.org/dist/PGObject-Util-PseudoCSV/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2014 Chris Travers.
+Copyright 2014-2017 Chris Travers.
 
 Redistribution and use in source and binary forms, with or without modification,
 are permitted provided that the following conditions are met:

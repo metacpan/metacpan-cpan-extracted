@@ -2,6 +2,8 @@ package Test::Smoke::Syncer::Git;
 use warnings;
 use strict;
 
+our $VERSION = '0.029';
+
 use base 'Test::Smoke::Syncer::Base';
 
 =head1 Test::Smoke::Syncer::Git
@@ -32,17 +34,22 @@ Keys for C<%args>:
 
 Do the actual syncing.
 
-=over
+There are 2 repositories, they both need to be updated:
 
-=item New clone
-  git clone <gitorigin> <gitdir>
-  git clone <gitdir> --reference <gitdir> <ddir>
+The first (proxy) repository has the perl5.git.perl.org repository as its
+(origin) remote. The second repository is used to run the smoker from.
 
-=item Existing clone
-  cd <ddir>
-  git pull
+For the proxy-repository we do:
 
-=back
+    git fetch --all
+    git remote prune origin
+    git reset --hard origin/$gitbranch
+
+For the worknig-repository we do:
+
+    git clean -dfx
+    git fetch --all
+    git reset --hard origin/$gitbranch
 
 =cut
 
@@ -55,6 +62,7 @@ sub sync {
     );
     use Carp;
     my $cwd = cwd();
+    # Handle the proxy-clone
     if ( ! -d $self->{gitdir} || ! -d catdir($self->{gitdir}, '.git') ) {
         my $cloneout = $gitbin->run(
             clone => $self->{gitorigin},
@@ -70,23 +78,22 @@ sub sync {
     my $gitbranch = $self->get_git_branch;
     chdir $self->{gitdir} or croak("Cannot chdir($self->{gitdir}): $!");
 
-    # SMOKE_ME
-    my $gitout = $gitbin->run(pull => '--all');
-    $self->log_debug($gitout);
-
-    $gitout = $gitbin->run(remote => prune => 'origin');
-    $self->log_debug($gitout);
+    my $gitout = $gitbin->run(remote => 'update', '--prune', '2>&1');
+    $self->log_debug("gitorigin(update --prune): $gitout");
 
     $gitout = $gitbin->run(checkout => $gitbranch, '2>&1');
     $self->log_debug($gitout);
 
+    $gitout = $gitbin->run(reset => '--hard', "origin/$gitbranch", '2>&1');
+    $self->log_debug("gitorigin(checkout): $gitout");
+
+    # Now handle the working-clone
     chdir $cwd or croak("Cannot chdir($cwd): $!");
-    # make the smoke clone
+    # make the working-clone if it doesn't exist yet
     if ( ! -d $self->{ddir} || ! -d catdir($self->{ddir}, '.git') ) {
         # It needs to be empty ...
         my $cloneout = $gitbin->run(
             clone         => $self->{gitdir},
-            '--reference' => $self->{gitdir},
             $self->{ddir},
             '2>&1'
         );
@@ -98,25 +105,19 @@ sub sync {
 
     chdir $self->{ddir} or croak("Cannot chdir($self->{ddir}): $!");
 
-    $gitout = $gitbin->run(reset => '--hard');
+    $gitout = $gitbin->run(clean => '-dfx', '2>&1');
     $self->log_debug($gitout);
 
-    $gitout = $gitbin->run(clean => '-dfx');
+    $gitout = $gitbin->run(fetch => 'origin', '2>&1');
     $self->log_debug($gitout);
 
-    $gitout = $gitbin->run(pull => '--all');
-    $self->log_debug($gitout);
-
-    # SMOKE_ME
     $gitout = $gitbin->run(checkout => $gitbranch, '2>&1');
     $self->log_debug($gitout);
 
-    my $mk_dot_patch = Test::Smoke::Util::Execute->new(
-        command => "$^X Porting/make_dot_patch.pl > .patch",
-        verbose => $self->verbose,
-    );
-    my $perlout = $mk_dot_patch->run();
-    $self->log_debug($perlout);
+    $gitout = $gitbin->run(reset => '--hard', "origin/$gitbranch", '2>&1');
+    $self->log_debug($gitout);
+
+    $self->make_dot_patch();
 
     chdir $cwd;
 

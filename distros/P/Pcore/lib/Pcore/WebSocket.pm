@@ -53,20 +53,20 @@ sub accept_ws ( $self, $protocol, $req, $on_accept ) {
 
             $ws->@{ keys $cfg->%* } = values $cfg->%*;
 
-            my $permessage_deflate = 0;
+            my $compression = 0;
 
             # check and set extensions
             if ( $env->{HTTP_SEC_WEBSOCKET_EXTENSIONS} ) {
 
-                # set ext_permessage_deflate, only if enabled locally
-                $permessage_deflate = 1 if $ws->permessage_deflate && $env->{HTTP_SEC_WEBSOCKET_EXTENSIONS} =~ /\bpermessage-deflate\b/smi;
+                # set permessage_deflate, only if enabled locally
+                $compression = 1 if $ws->compression && $env->{HTTP_SEC_WEBSOCKET_EXTENSIONS} =~ /\bpermessage-deflate\b/smi;
             }
 
             # create response headers
             my @headers = (    #
                 'Sec-WebSocket-Accept' => $ws->get_challenge( $env->{HTTP_SEC_WEBSOCKET_KEY} ),
-                ( $protocol           ? ( 'Sec-WebSocket-Protocol'   => $protocol )            : () ),
-                ( $permessage_deflate ? ( 'Sec-WebSocket-Extensions' => 'permessage-deflate' ) : () ),
+                ( $protocol    ? ( 'Sec-WebSocket-Protocol'   => $protocol )            : () ),
+                ( $compression ? ( 'Sec-WebSocket-Extensions' => 'permessage-deflate' ) : () ),
             );
 
             # add user headers
@@ -115,13 +115,13 @@ sub accept_ws ( $self, $protocol, $req, $on_accept ) {
 
 sub connect_ws ( $self, $protocol, $uri, @ ) {
     my %args = (
-        max_message_size   => 0,
-        permessage_deflate => 0,        # use compression
-        headers            => undef,    # Maybe[ArrayRef]
-        before_connect     => undef,    # Maybe[HashRef]
-        on_error           => undef,
-        on_connect         => undef,    # mandatory
-        on_disconnect      => undef,    # passed to websocket constructor
+        max_message_size => 0,
+        compression      => 0,        # use permessage_deflate compression
+        headers          => undef,    # Maybe[ArrayRef]
+        before_connect   => undef,    # Maybe[HashRef]
+        on_error         => undef,
+        on_connect       => undef,    # mandatory
+        on_disconnect    => undef,    # passed to websocket constructor
         @_[ 3 .. $#_ ],
     );
 
@@ -208,8 +208,8 @@ sub connect_ws ( $self, $protocol, $uri, @ ) {
                 'Connection:upgrade',
                 "Sec-WebSocket-Version:$Pcore::WebSocket::Handle::WEBSOCKET_VERSION",
                 "Sec-WebSocket-Key:$sec_websocket_key",
-                ( $protocol                 ? "Sec-WebSocket-Protocol:$protocol"            : () ),
-                ( $args{permessage_deflate} ? 'Sec-WebSocket-Extensions:permessage-deflate' : () ),
+                ( $protocol          ? "Sec-WebSocket-Protocol:$protocol"            : () ),
+                ( $args{compression} ? 'Sec-WebSocket-Extensions:permessage-deflate' : () ),
             );
 
             # add user headers
@@ -277,14 +277,14 @@ sub connect_ws ( $self, $protocol, $uri, @ ) {
                         $on_error->($res);
                     }
                     else {
-                        my $permessage_deflate = 0;
+                        my $compression = 0;
 
                         # check and set extensions
                         if ( $res_headers->{SEC_WEBSOCKET_EXTENSIONS} ) {
-                            $permessage_deflate = 1 if $args{permessage_deflate} && $res_headers->{SEC_WEBSOCKET_EXTENSIONS} =~ /\bpermessage-deflate\b/smi;
+                            $compression = 1 if $args{compression} && $res_headers->{SEC_WEBSOCKET_EXTENSIONS} =~ /\bpermessage-deflate\b/smi;
                         }
 
-                        $ws->@{qw[h permessage_deflate]} = ( $h, $permessage_deflate );
+                        $ws->@{qw[h compression]} = ( $h, $compression );
 
                         # call protocol on_connect
                         $ws->on_connect;

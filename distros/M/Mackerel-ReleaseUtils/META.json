@@ -44,7 +44,6 @@
       "runtime" : {
          "requires" : {
             "File::Which" : "0",
-            "HTTP::Tinyish" : "0",
             "Path::Tiny" : "0",
             "Scope::Guard" : "0",
             "perl" : "5.014"
@@ -59,7 +58,7 @@
    "provides" : {
       "Mackerel::ReleaseUtils" : {
          "file" : "lib/Mackerel/ReleaseUtils.pm",
-         "version" : "v0.0.1"
+         "version" : "v0.1.0"
       },
       "Mackerel::ReleaseUtils::Log" : {
          "file" : "lib/Mackerel/ReleaseUtils/Log.pm"
@@ -76,11 +75,11 @@
          "web" : "https://github.com/mackerelio/Mackerel-ReleaseUtils"
       }
    },
-   "version" : "v0.0.1",
+   "version" : "v0.1.0",
    "x_authority" : "cpan:SONGMU",
    "x_contributors" : [
+      "Shoichi Kaji <skaji@cpan.org>",
       "Songmu <y.songmu@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300",
-   "x_static_install" : 1
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

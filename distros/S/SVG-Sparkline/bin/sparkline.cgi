@@ -18,6 +18,14 @@ if( !length $type )
           $q->end_html;
     exit 0;
 }
+if( $type !~ m/\A[A-Z]\w+\z/ )
+{
+    print $q->header(-status => 400 ),
+          $q->start_html( 'Input error' ),
+          $q->h2( 'Not a valid sparkline type' ),
+          $q->end_html;
+    exit 0;
+}
 if( !$q->param('values') )
 {
     print $q->header(-status => 400 ),

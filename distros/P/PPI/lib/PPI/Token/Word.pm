@@ -40,7 +40,7 @@ use PPI::Token ();
 
 use vars qw{$VERSION @ISA %OPERATOR %QUOTELIKE %KEYWORDS};
 BEGIN {
-	$VERSION = '1.220';
+	$VERSION = '1.224';
 	@ISA     = 'PPI::Token';
 
 	# Copy in OPERATOR from PPI::Token::Operator
@@ -182,21 +182,27 @@ sub __TOKENIZER__on_char {
 	}
 
 	# We might be a subroutine attribute.
-	my $tokens = $t->_previous_significant_tokens(1);
-	if ( $tokens and $tokens->[0]->{_attribute} ) {
+	if ( __current_token_is_attribute($t) ) {
 		$t->{class} = $t->{token}->set_class( 'Attribute' );
 		return $t->{class}->__TOKENIZER__commit( $t );
 	}
 
 	# Check for a quote like operator
+	my @tokens = $t->_previous_significant_tokens(1);
 	my $word = $t->{token}->{content};
-	if ( $QUOTELIKE{$word} and ! $class->__TOKENIZER__literal($t, $word, $tokens) ) {
+	if ( $QUOTELIKE{$word} and ! $class->__TOKENIZER__literal($t, $word, \@tokens) ) {
 		$t->{class} = $t->{token}->set_class( $QUOTELIKE{$word} );
 		return $t->{class}->__TOKENIZER__on_char( $t );
 	}
 
+	# Check for a Perl keyword that is forced to be a normal word instead
+	if ( $KEYWORDS{$word} and $class->__TOKENIZER__literal($t, $word, \@tokens) ) {
+		$t->{class} = $t->{token}->set_class( 'Word' );
+		return $t->{class}->__TOKENIZER__on_char( $t );
+	}
+
 	# Or one of the word operators
-	if ( $OPERATOR{$word} and ! $class->__TOKENIZER__literal($t, $word, $tokens) ) {
+	if ( $OPERATOR{$word} and ! $class->__TOKENIZER__literal($t, $word, \@tokens) ) {
 	 	$t->{class} = $t->{token}->set_class( 'Operator' );
  		return $t->_finalize_token->__TOKENIZER__on_char( $t );
 	}
@@ -251,8 +257,7 @@ sub __TOKENIZER__commit {
 	$t->{line_cursor} += length $word;
 
 	# We might be a subroutine attribute.
-	my $tokens = $t->_previous_significant_tokens(1);
-	if ( $tokens and $tokens->[0]->{_attribute} ) {
+	if ( __current_token_is_attribute($t) ) {
 		$t->_new_token( 'Attribute', $word );
 		return ($t->{line_cursor} >= $t->{line_length}) ? 0
 			: $t->{class}->__TOKENIZER__on_char($t);
@@ -308,12 +313,13 @@ sub __TOKENIZER__commit {
 		return 0;
 	}
 
+	my @tokens = $t->_previous_significant_tokens(2);
 	my $token_class;
 	if ( $word =~ /\:/ ) {
-		# Since its not a simple identifier...
+		# Since it's not a simple identifier...
 		$token_class = 'Word';
 
-	} elsif ( $class->__TOKENIZER__literal($t, $word, $tokens) ) {
+	} elsif ( $class->__TOKENIZER__literal($t, $word, \@tokens) ) {
 		$token_class = 'Word';
 
 	} elsif ( $QUOTELIKE{$word} ) {
@@ -327,11 +333,14 @@ sub __TOKENIZER__commit {
 		$token_class = 'Operator';
 
 	} else {
-		# If the next character is a ':' then its a label...
+		# Get tokens early to be sure to not disturb state set up by pos and m//gc.
+		my @tokens = $t->_previous_significant_tokens(1);
+
+		# If the next character is a ':' then it's a label...
 		pos $t->{line} = $t->{line_cursor};
 		if ( $t->{line} =~ m/\G(\s*:)(?!:)/gc ) {
-			if ( $tokens and $tokens->[0]->{content} eq 'sub' ) {
-				# ... UNLESS its after 'sub' in which
+			if ( $tokens[0] and $tokens[0]->{content} eq 'sub' ) {
+				# ... UNLESS it's after 'sub' in which
 				# case it is a sub name and an attribute
 				# operator.
 				# We COULD have checked this at the top
@@ -371,27 +380,11 @@ sub __TOKENIZER__literal {
 
 	# Is this a forced-word context?
 	# i.e. Would normally be seen as an operator.
-	unless ( $QUOTELIKE{$word} or $PPI::Token::Operator::OPERATOR{$word} ) {
-		return '';
-	}
+	return '' if !$KEYWORDS{$word};
 
 	# Check the cases when we have previous tokens
 	pos $t->{line} = $t->{line_cursor};
-	if ( $tokens ) {
-		my $token = $tokens->[0] or return '';
-
-		# We are forced if we are a method name
-		return 1 if $token->{content} eq '->';
-
-		# We are forced if we are a sub name
-		return 1 if $token->isa('PPI::Token::Word') && $token->{content} eq 'sub';
-
-		# If we are contained in a pair of curly braces,
-		# we are probably a bareword hash key
-		if ( $token->{content} eq '{' and $t->{line} =~ /\G\s*\}/gc ) {
-			return 1;
-		}
-	}
+	my $token = $tokens->[0];
 
 	# In addition, if the word is followed by => it is probably
 	# also actually a word and not a regex.
@@ -399,8 +392,43 @@ sub __TOKENIZER__literal {
 		return 1;
 	}
 
+	return '' if not $token;
+
+	# We are forced if we are a method name
+	return 1 if $token->{content} eq '->';
+
+	# We are forced if we are a sub name or a package name
+	my $prev = $tokens->[1];
+	return 1
+	  if $token->isa( 'PPI::Token::Word' )
+	  and ( $token->{content} eq 'sub' or $token->{content} eq 'package' )
+	  and ( not $prev or not( $prev->isa( "PPI::Token::Operator" ) and $prev->{content} eq '->' ) );
+
+	# If we are contained in a pair of curly braces,
+	# we are probably a bareword hash key
+	if ( $token->{content} eq '{' and $t->{line} =~ /\G\s*\}/gc ) {
+		return 1;
+	}
+
 	# Otherwise we probably aren't forced
 	'';
+}
+
+
+
+# Is the current Word really a subroutine attribute?
+sub __current_token_is_attribute {
+	my ( $t ) = @_;
+	my @tokens = $t->_previous_significant_tokens(1);
+	return (
+		$tokens[0]
+		and (
+			# hint from tokenizer
+			$tokens[0]->{_attribute}
+			# nothing between attribute and us except whitespace
+			or $tokens[0]->isa('PPI::Token::Attribute')
+		)
+	);
 }
 
 1;

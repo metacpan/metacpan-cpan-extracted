@@ -1,6 +1,6 @@
 package HTTP::Any;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 1;
 
@@ -175,6 +175,12 @@ HTTP::Any::Curl - will return the result partially, HTTP::Any::LWP - will return
 However, this state can be changed in future.
 
 When max_size options will be triggered, 'client-aborted' header will added with 'max_size' value.
+
+=item max_redirect
+
+The limit of how many times it will obey redirection responses in a given request cycle.
+
+By default, the value is 7.
 
 =item body
 

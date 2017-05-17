@@ -5,6 +5,7 @@ use Test::Fatal;
 use JSON::RPC::Spec;
 use JSON::MaybeXS qw(JSON);
 
+use lib '.';
 use t::Fake::New;
 use t::Fake::Decode;
 use t::Fake::Encode;

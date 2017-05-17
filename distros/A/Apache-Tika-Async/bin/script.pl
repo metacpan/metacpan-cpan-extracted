@@ -4,7 +4,7 @@ use Apache::Tika::Server;
 
 use Data::Dumper;
 
-my $tika_glob = 'C:/Users/Corion/Projekte/Apache-Tika/jar/tika-server-*.jar';
+my $tika_glob = 'C:/Users/Corion/Projekte/Apache-Tika-Async/jar/tika-server-*.jar';
 my $tika_path = (sort { my $ad; $a =~ /-1.(\d+)/ and $ad=$1;
                 my $bd; $b =~ /-1.(\d+)/ and $bd=$1;
                 $bd <=> $ad
@@ -22,6 +22,8 @@ $tika->launch();
 
 my $fn= shift;
 
-print "Content-Type: " . $tika->get_meta($fn)->{'Content-Type'} . "\n";
+my $meta = $tika->get_meta($fn);
+print "Content-Type: " . $meta->{'Content-Type'} . "\n";
 
 print $tika->get_text($fn)->content;
+#print Dumper $meta;

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::Release;
 # ABSTRACT: A Release data object
-$MetaCPAN::Client::Release::VERSION = '2.014000';
+$MetaCPAN::Client::Release::VERSION = '2.015000';
 use Moo;
 use Ref::Util qw< is_hashref >;
 use JSON::MaybeXS qw< decode_json >;
@@ -22,6 +22,7 @@ my %known_fields = (
         first
         id
         maturity
+        main_module
         name
         status
         version
@@ -95,7 +96,7 @@ MetaCPAN::Client::Release - A Release data object
 
 =head1 VERSION
 
-version 2.014000
+version 2.015000
 
 =head1 SYNOPSIS
 
@@ -127,6 +128,10 @@ The PAUSE ID of the author who uploaded the release.
 =head2 maturity
 
 This will be either C<released> or C<developer>.
+
+=head2 main_module
+
+The release's main module name.
 
 =head2 id
 

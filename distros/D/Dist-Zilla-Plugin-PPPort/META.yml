@@ -3,22 +3,21 @@ abstract: 'PPPort for Dist::Zilla'
 author:
   - 'Leon Timmermans <leont@cpan.org>'
 build_requires:
-  File::Spec: 0
-  IO::Handle: 0
-  IPC::Open3: 0
-  Path::Class: 0
-  Test::DZil: 0
-  Test::More: 0.88
-  strict: 0
-  warnings: 0
+  Path::Class: '0'
+  Test::DZil: '0'
+  Test::More: '0.88'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 configure_requires:
-  Module::Build::Tiny: 0.034
+  Module::Build::Tiny: '0.034'
+  perl: '5.004'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.011, CPAN::Meta::Converter version 2.132830'
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Dist-Zilla-Plugin-PPPort
 no_index:
   directory:
@@ -26,18 +25,25 @@ no_index:
 provides:
   Dist::Zilla::Plugin::PPPort:
     file: lib/Dist/Zilla/Plugin/PPPort.pm
-    version: 0.007
+    version: '0.008'
 requires:
-  Devel::PPPort: 3.23
-  Dist::Zilla::Role::FileGatherer: 0
-  Dist::Zilla::Role::PrereqSource: 0
-  File::Spec::Functions: 0
-  Moose: 0
-  Moose::Util::TypeConstraints: 0
-  MooseX::Types::Perl: 0
-  MooseX::Types::Stringlike: 0
-  perl: 5.006
+  Devel::PPPort: '3.23'
+  Dist::Zilla::File::InMemory: '0'
+  Dist::Zilla::Role::AfterBuild: '0'
+  Dist::Zilla::Role::FileGatherer: '0'
+  Dist::Zilla::Role::PrereqSource: '0'
+  File::Spec::Functions: '0'
+  File::pushd: '0'
+  Moose: '0'
+  Moose::Util::TypeConstraints: '0'
+  MooseX::Types::Perl: '0'
+  MooseX::Types::Stringlike: '0'
+  perl: '5.006'
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-PPPort
   repository: git://github.com/Leont/dist-zilla-plugin-ppport.git
-version: 0.007
+version: '0.008'
+x_contributors:
+  - 'Karen Etheridge <ether@cpan.org>'
+  - 'Leon Timmermans <fawaka@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

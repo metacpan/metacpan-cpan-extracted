@@ -23,9 +23,11 @@ t/functions.t
 t/list.t
 t/magic-readonly.t
 t/magic.t
+t/pureperl.t
 t/toomany.t
 tools/bench.pl
 xt/author/00-compile.t
 xt/author/no-tabs.t
 xt/author/pod-syntax.t
 xt/release/distmeta.t
+xt/release/minimum-version.t

@@ -1,6 +1,6 @@
 package PGObject::Type::JSON;
 
-use 5.006;
+use 5.010;
 use strict;
 use warnings;
 use PGObject;
@@ -14,11 +14,11 @@ PGObject::Type::JSON - JSON wrappers for PGObject
 
 =head1 VERSION
 
-Version 1.011.0
+Version 2
 
 =cut
 
-our $VERSION = '1.011.0';
+our $VERSION = 2.000000;
 
 
 =head1 SYNOPSIS
@@ -54,12 +54,18 @@ sub register{
     my $registry = $args{registry};
     $registry ||= 'default';
     my $types = $args{types};
-    $types = ['json'] unless defined $types and @$types;
+    $types = ['json', 'jsonb'] unless defined $types and @$types;
     for my $type (@$types){
-        my $ret = 
-            PGObject->register_type(registry => $registry, pg_type => $type,
-                                  perl_class => $self);
-        return $ret unless $ret;
+        if ($PGObject::VERSION =~ /^1./){
+            my $ret = 
+                PGObject->register_type(registry => $registry, pg_type => $type,
+                                      perl_class => $self);
+            return $ret unless $ret;
+        } else {
+           PGObject::Type::Registry->register_type(
+                registry => $registry, dbtype => $type, apptype => $self
+           );
+        }
     }
     return 1;
 }

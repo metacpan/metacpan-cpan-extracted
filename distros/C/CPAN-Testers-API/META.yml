@@ -31,22 +31,24 @@ no_index:
 provides:
   CPAN::Testers::API:
     file: lib/CPAN/Testers/API.pm
-    version: '0.008'
+    version: '0.011'
   CPAN::Testers::API::Base:
     file: lib/CPAN/Testers/API/Base.pm
-    version: '0.008'
+    version: '0.011'
   CPAN::Testers::API::Controller::Release:
     file: lib/CPAN/Testers/API/Controller/Release.pm
-    version: '0.008'
+    version: '0.011'
   CPAN::Testers::API::Controller::Report:
     file: lib/CPAN/Testers/API/Controller/Report.pm
-    version: '0.008'
+    version: '0.011'
   CPAN::Testers::API::Controller::Upload:
     file: lib/CPAN/Testers/API/Controller/Upload.pm
-    version: '0.008'
+    version: '0.011'
+recommends:
+  Data::FlexSerializer: '0'
 requires:
   Alien::SwaggerUI: '0'
-  CPAN::Testers::Schema: '0.007'
+  CPAN::Testers::Schema: '0.010'
   File::Share: '0'
   Import::Base: '0.012'
   Log::Any: '1.045'
@@ -61,7 +63,7 @@ resources:
   bugtracker: https://github.com/cpan-testers/cpantesters-api/issues
   homepage: http://api.cpantesters.org
   repository: https://github.com/cpan-testers/cpantesters-api.git
-version: '0.008'
+version: '0.011'
 x_authority: cpan:PREACTION
 x_contributors:
   - 'Breno G. de Oliveira <garu@cpan.org>'

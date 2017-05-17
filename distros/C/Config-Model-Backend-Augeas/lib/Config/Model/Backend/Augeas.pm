@@ -32,7 +32,7 @@ my $has_augeas = 1;
 eval { require Config::Augeas; };
 $has_augeas = 0 if $@;
 
-our $VERSION = '0.119';
+our $VERSION = '0.120';
 
 my $logger = get_logger('Backend::Augeas');
 
@@ -67,7 +67,7 @@ Config::Model::Backend::Augeas - Read and write config data through Augeas
 =head1 DESCRIPTION
 
 This class provides a way to load or store configuration data through
-L<Config::Augeas>. This way, the structure and commments of the
+L<Config::Augeas>. This way, the structure and comments of the
 original configuration file will preserved.
 
 To use Augeas as a backend, you must specify the following

@@ -1,6 +1,11 @@
 Revision history for Perl extension Mackerel-ReleaseUtils
 
+v0.1.0 2017-05-14T16:34:20Z
+    - adjustment
+
+v0.0.2 2017-05-14T11:57:02Z
+    - use gobump
+    - remove x_staitc_install (skaji)
+
 v0.0.1 2017-03-18T18:00:13Z
-
     - original version
-

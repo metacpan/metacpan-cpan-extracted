@@ -1,4 +1,4 @@
-use 5.008;
+use 5.010;
 use strict;
 use warnings FATAL => 'all';
 use ExtUtils::MakeMaker;
@@ -10,7 +10,7 @@ WriteMakefile(
     ABSTRACT_FROM    => 'lib/PGObject/Type/Composite.pm',
     LICENSE          => 'BSD',
     PL_FILES         => {},
-    MIN_PERL_VERSION => 5.008,
+    MIN_PERL_VERSION => 5.010,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
     },

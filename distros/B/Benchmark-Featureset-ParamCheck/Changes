@@ -1,0 +1,22 @@
+Benchmark-Featureset-ParamCheck
+===============================
+
+Created:      2017-05-15
+Home page:    <https://metacpan.org/release/Benchmark-Featureset-ParamCheck>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Benchmark-Featureset-ParamCheck>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.004	2017-05-17
+
+ [ Packaging ]
+ - Add explicit dependency on Params::Validate 1.26.
+
+0.003	2017-05-17
+
+ - Added: Test Params::Validate.
+
+0.002	2017-05-16
+
+ - Added: Support testing and benchmarking positional parameters.
+
+0.001	2017-05-15	Initial release

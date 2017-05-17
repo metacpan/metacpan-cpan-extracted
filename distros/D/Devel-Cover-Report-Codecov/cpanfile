@@ -1,4 +1,4 @@
-requires 'perl', '5.008008';
+requires 'perl', '5.010000';
 
 requires 'Devel::Cover';
 

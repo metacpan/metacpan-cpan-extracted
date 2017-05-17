@@ -1,5 +1,5 @@
 package Dist::Zooky::App::Command::dist;
-$Dist::Zooky::App::Command::dist::VERSION = '0.22';
+$Dist::Zooky::App::Command::dist::VERSION = '0.24';
 # ABSTRACT: The one command that Dist::Zooky uses
 
 use strict;
@@ -40,7 +40,7 @@ Dist::Zooky::App::Command::dist - The one command that Dist::Zooky uses
 
 =head1 VERSION
 
-version 0.22
+version 0.24
 
 =head1 DESCRIPTION
 

@@ -3,7 +3,7 @@ package Catmandu::MARC;
 use Catmandu::Sane;
 use Catmandu::Util;
 use Catmandu::Exporter::MARC::XML;
-use MARC::Spec;
+use MARC::Spec::Parser;
 use List::Util;
 use Memoize;
 use Carp;
@@ -16,7 +16,7 @@ memoize('parse_marc_spec');
 memoize('_it_subspecs');
 memoize('_get_index_range');
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 sub marc_map {
     my $self      = $_[0];
@@ -143,7 +143,7 @@ sub marc_map {
         }
     }
 
-    if ($split) {
+    if ($split && defined $vals) {
         $vals = [ $vals ];
     }
     elsif ($append) {
@@ -701,7 +701,7 @@ sub _validate_subspec {
 
 sub parse_marc_spec {
     my ( $self, $marc_spec ) = @_;
-    return MARC::Spec->parse( $marc_spec )
+    return MARC::Spec::Parser->new( $marc_spec )->marcspec
 }
 
 sub _get_index_range {

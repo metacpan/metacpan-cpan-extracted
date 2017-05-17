@@ -2,7 +2,6 @@ package Mojo::mysql::Migrations;
 use Mojo::Base -base;
 
 use Carp 'croak';
-use Encode '_utf8_off';
 use Mojo::File;
 use Mojo::Loader 'data_section';
 use Mojo::Util 'decode';
@@ -27,8 +26,6 @@ sub from_string {
   my ($version, $way);
   my ($new, $last, $delimiter) = (1, '', ';');
   my $migrations = $self->{migrations} = {up => {}, down => {}};
-
-  _utf8_off $sql;
 
   while (length($sql) > 0) {
     my $token;
@@ -147,7 +144,7 @@ sub _active {
 
   $db->query(
     'create table if not exists mojo_migrations (
-       name    varchar(255) unique not null,
+       name    varchar(128) unique not null,
        version bigint not null
      )'
   ) if $error;

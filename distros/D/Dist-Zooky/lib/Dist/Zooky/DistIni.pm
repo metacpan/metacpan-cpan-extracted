@@ -1,5 +1,5 @@
 package Dist::Zooky::DistIni;
-$Dist::Zooky::DistIni::VERSION = '0.22';
+$Dist::Zooky::DistIni::VERSION = '0.24';
 # ABSTRACT: Generates a Dist::Zilla dist.ini file
 
 use strict;
@@ -108,7 +108,7 @@ Dist::Zooky::DistIni - Generates a Dist::Zilla dist.ini file
 
 =head1 VERSION
 
-version 0.22
+version 0.24
 
 =head1 SYNOPSIS
 

@@ -5,7 +5,7 @@ use Carp qw(cluck);
 use lib "../lib";
 use Data::Dumper;
 
-use Test::More tests => 10;
+use Test::More;
 use Net::ThreeScale::Client;
 
 local $SIG{__WARN__} = sub { cluck @_; };
@@ -34,8 +34,10 @@ SKIP: {
 
 	my @reports = @{$rep};
 
-	ok(defined($reports[0]->{period_start}));
-	ok(defined($reports[0]->{period_end}));
+	is($reports[0]->{period}, "eternity");
+	is($reports[1]->{period}, "year");
+	ok(defined($reports[1]->{period_start}));
+	ok(defined($reports[1]->{period_end}));
 }
 
 SKIP: {
@@ -61,5 +63,7 @@ SKIP: {
 	ok(defined($reports[0]->{period_start}));
 	ok(defined($reports[0]->{period_end}));
 }
+
+done_testing();
 
 # vim:set ts=4 sw=4 ai noet:

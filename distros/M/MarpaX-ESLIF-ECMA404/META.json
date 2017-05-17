@@ -89,7 +89,7 @@
    "provides" : {
       "MarpaX::ESLIF::ECMA404" : {
          "file" : "lib/MarpaX/ESLIF/ECMA404.pm",
-         "version" : "0.001"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -105,11 +105,8 @@
          "web" : "https://github.com/jddurand/marpax-eslif-ecma404"
       }
    },
-   "version" : "0.001",
+   "version" : "0.003",
    "x_authority" : "cpan:JDDPAUSE",
-   "x_contributors" : [
-      "Jean-Damien Durand <Jean-Damien.Durand@fisglobal.com>"
-   ],
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
 }
 

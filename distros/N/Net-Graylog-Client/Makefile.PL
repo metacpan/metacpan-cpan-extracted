@@ -8,20 +8,15 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Send data to a Graylog server for analysis",
-  "AUTHOR" => "Kevin Mulholland <moodfarm\@cpan.org>",
+  "AUTHOR" => "Kevin Mulholland <moodfarm\@cpan.org> James Lavoy <jalavoy\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Net-Graylog-Client",
-  "EXE_FILES" => [
-    "bin/graylog"
-  ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010000",
   "NAME" => "Net::Graylog::Client",
   "PREREQ_PM" => {
-    "App::Basis" => 0,
-    "App::Basis::Config" => 0,
     "Data::Printer" => 0,
     "Data::UUID" => 0,
     "Furl" => 0,
@@ -41,7 +36,7 @@ my %WriteMakefileArgs = (
     "Data::Dumper" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.4",
+  "VERSION" => "0.7",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,8 +44,6 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "App::Basis" => 0,
-  "App::Basis::Config" => 0,
   "Data::Dumper" => 0,
   "Data::Printer" => 0,
   "Data::UUID" => 0,

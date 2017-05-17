@@ -6,62 +6,40 @@ use lib qw( ./lib );
 
 $| = 1;
 
+$ENV{PERL_JSON_BACKEND} = 'JSON::backportPP';
 eval q| require JSON |;
 
-# B module can't install? I'm not careful for such a problem.
-# Leave us alone today?
 if ($@) {
-    print "We try to look up lib/JSON.pm, but in vain. B module can't install?\n";
-    print "Set the environmental variable 'PERL_DL_NONLAZY' with 0.\n";
-    print "And see to ExtUtils::MM_Unix.\n";
+    print "Loading lib/JSON.pm failed. No B module?\n";
     print "perl says : $@";
-    print "We do not make Makefile by requiring Perl version 7.0.\n";
-    require 7.0000;
+    print "Setting environmental variable 'PERL_DL_NONLAZY' to 0 may help.\n";
+    print "No Makefile created.\n";
+    exit 0;
 }
 
 
 my $version     = JSON->VERSION;
-my $message;
-
 
 print <<EOF;
 Welcome to JSON (v.$version)
 =============================
-$message
 
- *************************** CAUTION **************************************
- *                                                                        *
- * INCOMPATIBLE CHANGE (JSON::XS version 2.90)                            *
- *                                                                        *
- * JSON.pm had patched JSON::XS::Boolean and JSON::PP::Boolean internally *
- * on loading time for making these modules inherit JSON::Boolean.        *
- * But since JSON::XS v3.0 it use Types::Serialiser as boolean class.     *
- * Then now JSON.pm breaks boolean classe overload features and           *
- * -support_by_pp if JSON::XS v3.0 or later is installed.                 *
- *                                                                        *
- * JSON::true and JSON::false returned JSON::Boolean objects.             *
- * For workaround, they return JSON::PP::Boolean objects in this version. *
- *                                                                        *
- *     isa_ok(JSON::true, 'JSON::PP::Boolean');                           *
- *                                                                        *
- * And it discards a feature:                                             *
- *                                                                        *
- *     ok(JSON::true eq 'true');                                          *
- *                                                                        *
- * In other word, JSON::PP::Boolean overload numeric only.                *
- *                                                                        *
- *     ok( JSON::true == 1 );                                             *
- *                                                                        *
- **************************************************************************
+ ** BACKWARD INCOMPATIBILITY **
 
+Since version 2.90, stringification (and string comparison) for
+JSON::true and JSON::false has not been overloaded. It shouldn't
+matter as long as you treat them as boolean values, but a code that
+expects they are stringified as "true" or "false" doesn't work as
+you have expected any more.
 
- ************************** CAUTION **************************
- * This is 'JSON version 2' and there are many differences   *
- * to version 1.xx                                           *
- * Please check your applications useing old version.        *
- *   See to 'INCOMPATIBLE CHANGES TO OLD VERSION' and 'TIPS' *
- *************************************************************
+    if (JSON::true eq 'true') {  # now fails
 
+    print "The result is $JSON::true now."; # => The result is 1 now.
+
+And now these boolean values don't inherit JSON::Boolean, either.
+When you need to test a value is a JSON boolean value or not, use
+JSON::is_bool function, instead of testing the value inherits
+a particular boolean class or not.
 
 EOF
 
@@ -69,12 +47,11 @@ EOF
 WriteMakefile(
     'NAME'          => 'JSON',
     'VERSION_FROM'  => 'lib/JSON.pm', # finds $VERSION
+    'ABSTRACT_FROM' => 'lib/JSON.pm', # retrieve abstract from module
+    'AUTHOR' => 'Makamaka Hannyaharamitu, E<lt>makamaka[at]cpan.orgE<gt>',
     'PREREQ_PM'     => {
               'Test::More'  => 0,
     },
-    ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
-      (ABSTRACT_FROM => 'lib/JSON.pm', # retrieve abstract from module
-       AUTHOR     => 'Makamaka Hannyaharamitu, E<lt>makamaka[at]cpan.orgE<gt>') : ()),
     ( $ExtUtils::MakeMaker::VERSION >= 6.3002 ? ('LICENSE' => 'perl', ) : () ),
 
     ( $ExtUtils::MakeMaker::VERSION >= 6.46 ? (

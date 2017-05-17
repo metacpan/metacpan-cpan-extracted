@@ -59,7 +59,7 @@ is_deeply(\%list, { one => 'Hello World', two => 'Goodbye World', three=>  'ahhh
 
 eval { $maybe->hash };
 my $errors = $@;
-like( $errors, qr/Undef did not pass type constraint "Str"/, "a list fails");
+like( $errors, qr/Missing required parameter/, "a list fails");
 
 my $attr = One::Two::Three::Attributes->new();
 
@@ -67,8 +67,8 @@ my %attr_list = $attr->hash( three => 'ahhhh' );
 is_deeply(\%attr_list, { one => 'Hello World', two => 'Goodbye World', three=>  'ahhhh' }, "list returns 3 key/value pairs");
 
 eval { $attr->hash };
-$errors = $@;
-like( $errors, qr/Undef did not pass type constraint "Str"/, "a list fails");
+my $errores = $@;
+like( $errors, qr/Missing required parameter/, "a list fails");
 
 done_testing();
 

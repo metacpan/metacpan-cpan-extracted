@@ -19,7 +19,7 @@ WriteMakefile(
 }
 ,
   PREREQ_PM => {
-  'DBD::mysql' => '4.019',
+  'DBD::mysql' => '4.042',
   'Mojolicious' => '7.18',
   'SQL::Abstract' => '1.81'
 }

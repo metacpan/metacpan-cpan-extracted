@@ -2,11 +2,12 @@
 abstract: 'Perl client for the Easypost web service'
 author:
   - 'Mark Allen <mrallen1@yahoo.com>, Hunter McMillen <mcmillhj@gmail.com>'
-build_requires: {}
+build_requires:
+  Test::Exception: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,5 +26,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-Easypost
   homepage: https://metacpan.org/dist/Net-Easypost
   repository: git://github.com/mcmillhj/Net-Easypost.git
-version: '0.19'
+version: '0.20'
 x_serialization_backend: 'YAML::Tiny version 1.70'

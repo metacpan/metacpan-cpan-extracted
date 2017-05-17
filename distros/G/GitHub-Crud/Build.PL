@@ -10,6 +10,7 @@ my $b = Module::Build->new
     Data::Dump=>0,
     Data::Table::Text=>2017.505,
     Digest::SHA1=>0,
+    File::Temp=>0,
     JSON=>0,
     MIME::Base64=>0,
    },

@@ -45,7 +45,7 @@
 
             <ul>
             <li>Test report summaries (releases) for <a
-            href="/docs/?url=/v3#!/Release/release_all">all of CPAN</a>,
+            href="/docs/?url=/v3#!/Release/v3_release_all">all of CPAN</a>,
             <a href="/docs/?url=/v3#!/Release/v3_release_author">by
             author</a>, or <a
             href="/docs/?url=/v3#!/Release/v3_release_dist">by

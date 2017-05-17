@@ -1,7 +1,7 @@
 use Renard::Curie::Setup;
 package Renard::Curie::Component::Outline;
 # ABSTRACT: Component that provides a list of headings for navigating
-$Renard::Curie::Component::Outline::VERSION = '0.001';
+$Renard::Curie::Component::Outline::VERSION = '0.002';
 use Moo;
 use Glib::Object::Subclass 'Gtk3::Revealer';
 use Glib 'TRUE', 'FALSE';
@@ -23,7 +23,7 @@ classmethod FOREIGNBUILDARGS(@) {
 	return ();
 }
 
-method BUILD {
+method BUILD(@) {
 	my $frame = Gtk3::Frame->new('Outline');
 	my $scrolled_window = Gtk3::ScrolledWindow->new;
 	$scrolled_window->set_vexpand(TRUE);
@@ -66,7 +66,7 @@ method _trigger_model($new_model) {
 	$self->tree_view->set_model( $new_model );
 }
 
-fun on_tree_view_row_activate_cb( $tree_view, $path, $column, $self ) {
+callback on_tree_view_row_activate_cb( $tree_view, $path, $column, $self ) {
 	# NOTE : This needs more error checking.
 
 	my $pd = $self->app->page_document_component;
@@ -100,7 +100,7 @@ Renard::Curie::Component::Outline - Component that provides a list of headings f
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 EXTENDS
 
@@ -138,6 +138,14 @@ The L<Gtk3::TreeStore> that holds tree data of heading text and page numbers.
 
 When set, triggers an update to the model for L</tree_view>.
 
+=head1 CLASS METHODS
+
+=head2 FOREIGNBUILDARGS
+
+  classmethod FOREIGNBUILDARGS(@)
+
+Builds the L<Gtk3::Revealer> super-class.
+
 =head1 METHODS
 
 =head2 BUILD
@@ -171,19 +179,11 @@ container gives an appropriate amount of width to the widget.
 Without this, the revealer widget may still expand to take up some space when
 the child is not visible.
 
-=head1 CLASS METHODS
-
-=head2 FOREIGNBUILDARGS
-
-  classmethod FOREIGNBUILDARGS(@)
-
-Builds the L<Gtk3::Revealer> super-class.
-
 =head1 CALLBACKS
 
 =head2 on_tree_view_row_activate_cb
 
-  fun on_tree_view_row_activate_cb( $tree_view, $path, $column, $self )
+  callback on_tree_view_row_activate_cb( $tree_view, $path, $column, $self )
 
 Callback that navigates the current document to the position that corresponds
 to a row of the tree that has been clicked.

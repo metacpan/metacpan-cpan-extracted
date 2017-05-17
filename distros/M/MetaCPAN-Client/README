@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 2.014000
+    version 2.015000
 
 SYNOPSIS
 
@@ -161,8 +161,8 @@ METHODS
 
         my $deps = $mcpan->reverse_dependencies('Search::Elasticsearch');
 
-    all MetaCPAN::Client::Release objects of releases that are dependent on
-    a given module, returned as MetaCPAN::Client::ResultSet.
+    all MetaCPAN::Client::Release objects of releases that are directly
+    dependent on a given module, returned as MetaCPAN::Client::ResultSet.
 
  rev_deps
 

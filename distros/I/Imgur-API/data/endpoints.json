@@ -1,0 +1,1982 @@
+{
+   "Conversation" : [
+      {
+         "name" : "Conversation List",
+         "url" : {
+            "optional" : "",
+            "required" : "",
+            "base" : "3/conversations"
+         },
+         "description" : "Get list of all conversations for the logged in user.",
+         "url_params" : {},
+         "sub" : "list",
+         "method" : "get",
+         "params" : {}
+      },
+      {
+         "method" : "get",
+         "params" : {
+            "offset" : {
+               "required" : 0,
+               "desc" : "Additional offset in current page, defaults to 0."
+            },
+            "conversation" : {
+               "required" : 1,
+               "desc" : "Conversation"
+            },
+            "page" : {
+               "desc" : "Page of message thread. Starting at 1 for the most recent 25 messages and counting upwards. Defaults to 1",
+               "required" : 0
+            }
+         },
+         "sub" : "get",
+         "description" : "Get information about a specific conversation. Includes messages.",
+         "url_params" : {},
+         "url" : {
+            "base" : "3/conversations/%s",
+            "optional" : "'page','offset'",
+            "required" : "'conversation'"
+         },
+         "name" : "Conversation"
+      }
+   ],
+   "Notification" : [
+      {
+         "description" : "Get all notifications for the user that's currently logged in",
+         "url_params" : {},
+         "params" : {
+            "new" : {
+               "required" : 0,
+               "desc" : "boolean - false for all notifications, true for only non-viewed notification. Default is true."
+            }
+         },
+         "method" : "get",
+         "sub" : "notifications",
+         "name" : "Notifications",
+         "url" : {
+            "base" : "3/notification",
+            "optional" : "",
+            "required" : ""
+         }
+      },
+      {
+         "method" : "get",
+         "params" : {
+            "notification" : {
+               "desc" : "Notification",
+               "required" : 1
+            }
+         },
+         "sub" : "get",
+         "description" : "Returns the data about a specific notification",
+         "url_params" : {},
+         "name" : "Notification",
+         "url" : {
+            "base" : "3/notification/%s",
+            "required" : "'notification'",
+            "optional" : ""
+         }
+      },
+      {
+         "url" : {
+            "base" : "3/notification/%s",
+            "optional" : "",
+            "required" : "'notification'"
+         },
+         "name" : "Notification Viewed",
+         "url_params" : {},
+         "description" : "Marks a notification as viewed, this way it no longer shows up in the basic notification request",
+         "params" : {
+            "ids" : {
+               "desc" : "To mark multiple notifications as read in one call, pass in an 'ids' parameter (omitting the 'id' parameter in the route) with the value of a comma-separated string of notification ids.",
+               "required" : 0
+            },
+            "notification" : {
+               "desc" : "Notification",
+               "required" : 1
+            }
+         },
+         "method" : "put or post or delete",
+         "sub" : "viewed"
+      }
+   ],
+   "Topic" : [
+      {
+         "description" : "Get the list of default topics.",
+         "url_params" : {},
+         "method" : "get",
+         "sub" : "defaults",
+         "params" : {},
+         "url" : {
+            "required" : "",
+            "optional" : "",
+            "base" : "3/topics/defaults"
+         },
+         "name" : "Default Topics"
+      },
+      {
+         "description" : "View gallery items for a topic",
+         "url_params" : {},
+         "method" : "get",
+         "params" : {
+            "window" : {
+               "required" : 0,
+               "desc" : "Change the date range of the request if the sort is \"top\", day | week | month | year | all, defaults to week"
+            },
+            "sort" : {
+               "required" : 0,
+               "desc" : "viral | time | top - defaults to viral"
+            },
+            "page" : {
+               "desc" : "integer - the data paging number",
+               "required" : 0
+            },
+            "topic_id" : {
+               "desc" : "The ID or URL-formatted name of the topic. If using a topic's name, replace its spaces with underscores (Mother's_Day).",
+               "required" : 1
+            }
+         },
+         "sub" : "galleryTopic",
+         "name" : "Gallery Topic",
+         "url" : {
+            "base" : "3/topics/%s",
+            "optional" : "'sort','page'",
+            "required" : "'topic_id'"
+         }
+      },
+      {
+         "params" : {
+            "item_id" : {
+               "desc" : "The ID for the gallery item.",
+               "required" : 1
+            },
+            "topic_id" : {
+               "required" : 1,
+               "desc" : "The ID or URL-formatted name of the topic. If using a topic's name, replace its spaces with underscores (Mother's_Day)."
+            }
+         },
+         "method" : "get",
+         "sub" : "galleryTopicItem",
+         "description" : "View a single item in a gallery topic",
+         "url_params" : {},
+         "name" : "Gallery Topic Item",
+         "url" : {
+            "base" : "3/topics/%s/%s",
+            "required" : "'topic_id','item_id'",
+            "optional" : ""
+         }
+      }
+   ],
+   "Account" : [
+      {
+         "method" : "get",
+         "sub" : "get",
+         "params" : {
+            "username" : {
+               "required" : 1,
+               "desc" : "Username"
+            }
+         },
+         "url_params" : {},
+         "description" : " Request standard user information. If you need the username for the account that is logged in, it is returned in the request for an access token. Note: This endpoint also supports the ability to lookup account base info by account ID. To do so, pass the query parameter account_id. ",
+         "name" : "Account Base",
+         "url" : {
+            "optional" : "",
+            "required" : "'username'",
+            "base" : "3/account/%s"
+         }
+      },
+      {
+         "name" : "Account Gallery Favorites",
+         "url" : {
+            "base" : "3/account/%s/gallery_favorites",
+            "required" : "'username'",
+            "optional" : "'page','sort'"
+         },
+         "url_params" : {},
+         "description" : "Return the images the user has favorited in the gallery.",
+         "method" : "get",
+         "sub" : "galleryFavorites",
+         "params" : {
+            "username" : {
+               "desc" : "Username",
+               "required" : 1
+            },
+            "page" : {
+               "required" : 0,
+               "desc" : "integer - allows you to set the page number so you don't have to retrieve all the data at once."
+            },
+            "sort" : {
+               "required" : 0,
+               "desc" : "'oldest', or 'newest'. Defaults to 'newest'."
+            }
+         }
+      },
+      {
+         "method" : "get",
+         "sub" : "favorites",
+         "params" : {
+            "username" : {
+               "desc" : "Username",
+               "required" : 1
+            },
+            "page" : {
+               "required" : 0,
+               "desc" : "integer - allows you to set the page number so you don't have to retrieve all the data at once."
+            },
+            "sort" : {
+               "required" : 0,
+               "desc" : "'oldest', or 'newest'. Defaults to 'newest'."
+            }
+         },
+         "url_params" : {},
+         "description" : "Returns the users favorited images, only accessible if you're logged in as the user.",
+         "name" : "Account Favorites",
+         "url" : {
+            "base" : "3/account/%s/favorites",
+            "optional" : "'page','sort'",
+            "required" : "'username'"
+         }
+      },
+      {
+         "url" : {
+            "base" : "3/account/%s/submissions/%s",
+            "optional" : "",
+            "required" : "'username','page'"
+         },
+         "name" : "Account Submissions",
+         "sub" : "submissions",
+         "method" : "get",
+         "params" : {
+            "page" : {
+               "required" : 1,
+               "desc" : "Page"
+            },
+            "username" : {
+               "required" : 1,
+               "desc" : "Username"
+            }
+         },
+         "description" : "Return the images a user has submitted to the gallery",
+         "url_params" : {}
+      },
+      {
+         "method" : "get",
+         "sub" : "settings",
+         "params" : {
+            "username" : {
+               "required" : 1,
+               "desc" : "Username"
+            }
+         },
+         "url_params" : {},
+         "description" : "Returns the account settings, only accessible if you're logged in as the user.",
+         "url" : {
+            "base" : "3/account/%s/settings",
+            "optional" : "",
+            "required" : "'username'"
+         },
+         "name" : "Account Settings"
+      },
+      {
+         "url_params" : {},
+         "description" : "Updates the account settings for a given user, the user must be logged in.",
+         "params" : {
+            "newsletter_subscribed" : {
+               "required" : 0,
+               "desc" : "true | false - Toggle subscription to email newsletter."
+            },
+            "accepted_gallery_terms" : {
+               "required" : 0,
+               "desc" : "true | false - The user agreement to the Imgur Gallery terms."
+            },
+            "bio" : {
+               "desc" : "The biography of the user, is displayed in the gallery profile page.",
+               "required" : 0
+            },
+            "album_privacy" : {
+               "required" : 0,
+               "desc" : "public | hidden | secret - Sets the default privacy level of albums the users creates"
+            },
+            "messaging_enabled" : {
+               "required" : 0,
+               "desc" : "true | false - Allows the user to enable / disable private messages"
+            },
+            "username" : {
+               "required" : 0,
+               "desc" : "A valid Imgur username (between 4 and 63 alphanumeric characters)"
+            },
+            "public_images" : {
+               "desc" : "Set the users images to private or public by default",
+               "required" : 0
+            },
+            "show_mature" : {
+               "required" : 0,
+               "desc" : "true | false - Toggle display of mature images in gallery list endpoints."
+            }
+         },
+         "method" : "put | post",
+         "sub" : "updateSettings",
+         "url" : {
+            "optional" : "",
+            "required" : "",
+            "base" : ""
+         },
+         "name" : "Change Account Settings"
+      },
+      {
+         "params" : {
+            "username" : {
+               "desc" : "Username",
+               "required" : 1
+            }
+         },
+         "method" : "get",
+         "sub" : "profile",
+         "description" : "Returns the totals for the gallery profile.",
+         "url_params" : {},
+         "name" : "Account Gallery Profile",
+         "url" : {
+            "base" : "3/account/%s/gallery_profile",
+            "required" : "'username'",
+            "optional" : ""
+         }
+      },
+      {
+         "method" : "get",
+         "params" : {
+            "username" : {
+               "desc" : "Username",
+               "required" : 1
+            }
+         },
+         "sub" : "verifyEmail",
+         "description" : "Checks to see if user has verified their email address",
+         "url_params" : {},
+         "name" : "Verify User's E-mail",
+         "url" : {
+            "base" : "3/account/%s/verifyemail",
+            "optional" : "",
+            "required" : "'username'"
+         }
+      },
+      {
+         "name" : "Send Verification E-mail",
+         "url" : {
+            "required" : "'username'",
+            "optional" : "",
+            "base" : "3/account/%s/verifyemail"
+         },
+         "url_params" : {},
+         "description" : "Sends an email to the user to verify that their email is valid to upload to gallery. Must be logged in as the user to send.",
+         "sub" : "sendVerifyEmail",
+         "method" : "post",
+         "params" : {
+            "username" : {
+               "desc" : "Username",
+               "required" : 1
+            }
+         }
+      },
+      {
+         "params" : {
+            "page" : {
+               "desc" : "integer - allows you to set the page number so you don't have to retrieve all the data at once.",
+               "required" : 0
+            },
+            "username" : {
+               "required" : 1,
+               "desc" : "Username"
+            }
+         },
+         "method" : "get",
+         "sub" : "albums",
+         "description" : " Get all the albums associated with the account. Must be logged in as the user to see secret and hidden albums. ",
+         "url_params" : {},
+         "name" : "Albums",
+         "url" : {
+            "base" : "3/account/%s/albums",
+            "required" : "'username'",
+            "optional" : "'page'"
+         }
+      },
+      {
+         "url_params" : {},
+         "description" : " Get additional information about an album, this endpoint works the same as the Album Endpoint. You can also use any of the additional routes that are used on an album in the album endpoint. ",
+         "method" : "get",
+         "params" : {
+            "username" : {
+               "desc" : "Username",
+               "required" : 1
+            },
+            "account" : {
+               "desc" : "Account",
+               "required" : 1
+            }
+         },
+         "sub" : "album",
+         "name" : "Album",
+         "url" : {
+            "base" : "3/account/%s/album/%s",
+            "optional" : "",
+            "required" : "'username','account'"
+         }
+      },
+      {
+         "name" : "Album IDs",
+         "url" : {
+            "optional" : "'page'",
+            "required" : "'username'",
+            "base" : "3/account/%s/albums/ids"
+         },
+         "method" : "get",
+         "params" : {
+            "username" : {
+               "desc" : "Username",
+               "required" : 1
+            },
+            "page" : {
+               "required" : 0,
+               "desc" : "integer - allows you to set the page number so you don't have to retrieve all the data at once."
+            }
+         },
+         "sub" : "albumIds",
+         "description" : "Return an array of all of the album IDs.",
+         "url_params" : {}
+      },
+      {
+         "url_params" : {},
+         "description" : "Return the total number of albums associated with the account.",
+         "method" : "get",
+         "params" : {
+            "username" : {
+               "desc" : "Username",
+               "required" : 1
+            }
+         },
+         "sub" : "albumCount",
+         "url" : {
+            "base" : "3/account/%s/albums/count",
+            "optional" : "",
+            "required" : "'username'"
+         },
+         "name" : "Album Count"
+      },
+      {
+         "params" : {
+            "username" : {
+               "desc" : "Username",
+               "required" : 1
+            },
+            "account" : {
+               "desc" : "Account",
+               "required" : 1
+            }
+         },
+         "method" : "delete",
+         "sub" : "albumDelete",
+         "description" : "Delete an Album with a given id.",
+         "url_params" : {},
+         "name" : "Album Deletion",
+         "url" : {
+            "base" : "3/account/%s/album/%s",
+            "required" : "'username','account'",
+            "optional" : ""
+         }
+      },
+      {
+         "url_params" : {},
+         "description" : "Return the comments the user has created.",
+         "params" : {
+            "sort" : {
+               "required" : 0,
+               "desc" : "'best', 'worst', 'oldest', or 'newest'. Defaults to 'newest'."
+            },
+            "username" : {
+               "required" : 1,
+               "desc" : "Username"
+            },
+            "page" : {
+               "desc" : "Page number (50 items per page). Defaults to 0.",
+               "required" : 0
+            }
+         },
+         "method" : "get",
+         "sub" : "comments",
+         "url" : {
+            "base" : "3/account/%s/comments",
+            "required" : "'username'",
+            "optional" : "'sort','page'"
+         },
+         "name" : "Comments"
+      },
+      {
+         "method" : "get",
+         "sub" : "comment",
+         "params" : {
+            "account" : {
+               "desc" : "Account",
+               "required" : 1
+            },
+            "username" : {
+               "desc" : "Username",
+               "required" : 1
+            }
+         },
+         "description" : " Return information about a specific comment. This endpoint works the same as the Comment Endpoint. You can use any of the additional actions that the comment endpoint allows on this end point. ",
+         "url_params" : {},
+         "url" : {
+            "optional" : "",
+            "required" : "'username','account'",
+            "base" : "3/account/%s/comment/%s"
+         },
+         "name" : "Comment"
+      },
+      {
+         "sub" : "commentIds",
+         "method" : "get",
+         "params" : {
+            "sort" : {
+               "desc" : "'best', 'worst', 'oldest', or 'newest'. Defaults to 'newest'.",
+               "required" : 0
+            },
+            "page" : {
+               "required" : 0,
+               "desc" : "Page number (50 items per page). Defaults to 0."
+            },
+            "username" : {
+               "desc" : "Username",
+               "required" : 1
+            }
+         },
+         "url_params" : {},
+         "description" : "Return an array of all of the comment IDs.",
+         "url" : {
+            "base" : "3/account/%s/comments/ids",
+            "optional" : "'sort','page'",
+            "required" : "'username'"
+         },
+         "name" : "Comment IDs"
+      },
+      {
+         "name" : "Comment Count",
+         "url" : {
+            "optional" : "",
+            "required" : "'username'",
+            "base" : "3/account/%s/comments/count"
+         },
+         "sub" : "commentCount",
+         "method" : "",
+         "params" : {
+            "username" : {
+               "required" : 1,
+               "desc" : "Username"
+            }
+         },
+         "description" : "Return a count of all of the comments associated with the account.",
+         "url_params" : {}
+      },
+      {
+         "url" : {
+            "required" : "'username','account'",
+            "optional" : "",
+            "base" : "3/account/%s/comment/%s"
+         },
+         "name" : "Comment Deletion",
+         "params" : {
+            "username" : {
+               "desc" : "Username",
+               "required" : 1
+            },
+            "account" : {
+               "required" : 1,
+               "desc" : "Account"
+            }
+         },
+         "method" : "delete",
+         "sub" : "commentDelete",
+         "description" : "Delete a comment. You are required to be logged in as the user whom created the comment.",
+         "url_params" : {}
+      },
+      {
+         "url" : {
+            "required" : "'username','page'",
+            "optional" : "",
+            "base" : "3/account/%s/images/%s"
+         },
+         "name" : "Images",
+         "method" : "get",
+         "sub" : "images",
+         "params" : {
+            "page" : {
+               "required" : 1,
+               "desc" : "Page"
+            },
+            "username" : {
+               "required" : 1,
+               "desc" : "Username"
+            }
+         },
+         "url_params" : {},
+         "description" : " Return all of the images associated with the account. You can page through the images by setting the page, this defaults to 0. "
+      },
+      {
+         "description" : " Return information about a specific image. This endpoint works the same as the Image Endpoint. You can use any of the additional actions that the image endpoint with this endpoint. ",
+         "url_params" : {},
+         "method" : "get",
+         "sub" : "image",
+         "params" : {
+            "account" : {
+               "desc" : "Account",
+               "required" : 1
+            },
+            "username" : {
+               "desc" : "Username",
+               "required" : 1
+            }
+         },
+         "url" : {
+            "optional" : "",
+            "required" : "'username','account'",
+            "base" : "3/account/%s/image/%s"
+         },
+         "name" : "Image"
+      },
+      {
+         "name" : "Image IDs",
+         "url" : {
+            "optional" : "'page'",
+            "required" : "'username'",
+            "base" : "3/account/%s/images/ids"
+         },
+         "method" : "get",
+         "params" : {
+            "username" : {
+               "required" : 1,
+               "desc" : "Username"
+            },
+            "page" : {
+               "desc" : "integer - allows you to set the page number so you don't have to retrieve all the data at once.",
+               "required" : 0
+            }
+         },
+         "sub" : "imageIds",
+         "description" : " Returns an array of Image IDs that are associated with the account. ",
+         "url_params" : {}
+      },
+      {
+         "method" : "get",
+         "sub" : "imageCount",
+         "params" : {
+            "username" : {
+               "desc" : "Username",
+               "required" : 1
+            }
+         },
+         "url_params" : {},
+         "description" : " Returns the total number of images associated with the account. ",
+         "url" : {
+            "required" : "'username'",
+            "optional" : "",
+            "base" : "3/account/%s/images/count"
+         },
+         "name" : "Image Count"
+      },
+      {
+         "description" : "Deletes an Image. This requires a delete hash rather than an ID.",
+         "url_params" : {},
+         "sub" : "imageDelete",
+         "method" : "delete",
+         "params" : {
+            "deletehash" : {
+               "required" : 1,
+               "desc" : "Deletehash"
+            },
+            "username" : {
+               "required" : 1,
+               "desc" : "Username"
+            }
+         },
+         "url" : {
+            "required" : "'username','deletehash'",
+            "optional" : "",
+            "base" : "3/account/%s/image/%s"
+         },
+         "name" : "Image Deletion"
+      },
+      {
+         "name" : "Replies",
+         "url" : {
+            "base" : "3/account/%s/notifications/replies",
+            "optional" : "",
+            "required" : "'username'"
+         },
+         "method" : "get",
+         "params" : {
+            "username" : {
+               "desc" : "Username",
+               "required" : 1
+            },
+            "new" : {
+               "required" : 0,
+               "desc" : "boolean - false for all notifications, true for only non-viewed notification. Default is true."
+            }
+         },
+         "sub" : "replies",
+         "url_params" : {},
+         "description" : "Returns all of the reply notifications for the user. Required to be logged in as that user"
+      }
+   ],
+   "Comment" : [
+      {
+         "url" : {
+            "required" : "'comment'",
+            "optional" : "",
+            "base" : "3/comment/%s"
+         },
+         "name" : "Comment",
+         "sub" : "get",
+         "method" : "get",
+         "params" : {
+            "comment" : {
+               "desc" : "Comment",
+               "required" : 1
+            }
+         },
+         "description" : "Get information about a specific comment.",
+         "url_params" : {}
+      },
+      {
+         "url" : {
+            "required" : "",
+            "optional" : "",
+            "base" : "3/comment"
+         },
+         "name" : "Comment Creation",
+         "url_params" : {},
+         "description" : " Creates a new comment, returns the ID of the comment. ",
+         "method" : "post",
+         "params" : {
+            "comment" : {
+               "desc" : "The comment text, this is what will be displayed",
+               "required" : 1
+            },
+            "parent_id" : {
+               "required" : 0,
+               "desc" : "The ID of the parent comment, this is an alternative method to create a reply."
+            },
+            "image_id" : {
+               "desc" : "The ID of the image in the gallery that you wish to comment on",
+               "required" : 1
+            }
+         },
+         "sub" : "create"
+      },
+      {
+         "name" : "Comment Deletion",
+         "url" : {
+            "optional" : "",
+            "required" : "'comment'",
+            "base" : "3/comment/%s"
+         },
+         "description" : "Delete a comment by the given id.",
+         "url_params" : {},
+         "method" : "delete",
+         "sub" : "delete",
+         "params" : {
+            "comment" : {
+               "desc" : "Comment",
+               "required" : 1
+            }
+         }
+      },
+      {
+         "name" : "Replies",
+         "url" : {
+            "required" : "'comment'",
+            "optional" : "",
+            "base" : "3/comment/%s/replies"
+         },
+         "description" : "Get the comment with all of the replies for the comment.",
+         "url_params" : {},
+         "params" : {
+            "comment" : {
+               "required" : 1,
+               "desc" : "Comment"
+            }
+         },
+         "method" : "get",
+         "sub" : "replies"
+      },
+      {
+         "params" : {
+            "image_id" : {
+               "desc" : "The ID of the image in the gallery that you wish to comment on",
+               "required" : 1
+            },
+            "comment" : {
+               "desc" : "The comment text, this is what will be displayed",
+               "required" : 1
+            }
+         },
+         "method" : "post",
+         "sub" : "replyCreate",
+         "url_params" : {},
+         "description" : "Create a reply for the given comment.",
+         "name" : "Reply Creation",
+         "url" : {
+            "optional" : "",
+            "required" : "'comment'",
+            "base" : "3/comment/%s"
+         }
+      },
+      {
+         "name" : "Vote",
+         "url" : {
+            "optional" : "",
+            "required" : "'comment','vote'",
+            "base" : "3/comment/%s/vote/%s"
+         },
+         "method" : "post",
+         "sub" : "vote",
+         "params" : {
+            "vote" : {
+               "desc" : "Vote",
+               "required" : 1
+            },
+            "comment" : {
+               "required" : 1,
+               "desc" : "Comment"
+            }
+         },
+         "description" : " Vote on a comment. The {vote} variable can only be set as \"up\" or \"down\". ",
+         "url_params" : {}
+      },
+      {
+         "url" : {
+            "required" : "'comment'",
+            "optional" : "",
+            "base" : "3/comment/%s/report"
+         },
+         "name" : "Report",
+         "method" : "post",
+         "sub" : "report",
+         "params" : {
+            "4" : {
+               "required" : 1,
+               "desc" : null
+            },
+            "5" : {
+               "required" : 1,
+               "desc" : null
+            },
+            "2" : {
+               "required" : 1,
+               "desc" : null
+            },
+            "comment" : {
+               "desc" : "Comment",
+               "required" : 1
+            },
+            "reason" : {
+               "desc" : "An integer representing the reason for the report\n                            Value\n                                    Description\n                                1\n                                    Doesn't belong on Imgur\n                                2\n                                    Spam\n                                3\n                                    Abusive\n                                4\n                                    Mature content not marked as mature\n                                5\n                                    Pornography\n                                ",
+               "required" : 0
+            },
+            "3" : {
+               "required" : 1,
+               "desc" : null
+            },
+            "1" : {
+               "required" : 1,
+               "desc" : null
+            }
+         },
+         "description" : "Report a comment for being inappropriate.",
+         "url_params" : {}
+      }
+   ],
+   "Gallery" : [
+      {
+         "description" : "Returns the images in the gallery. For example the main gallery is https://api.imgur.com/3/gallery/hot/viral/0.json",
+         "url_params" : {},
+         "method" : "get",
+         "sub" : "get",
+         "params" : {
+            "sort" : {
+               "required" : 0,
+               "desc" : "viral | top | time | rising (only available with user section) - defaults to viral"
+            },
+            "window" : {
+               "desc" : "Change the date range of the request if the section is \"top\", day | week | month | year | all, defaults to day",
+               "required" : 0
+            },
+            "showViral" : {
+               "required" : 0,
+               "desc" : "true | false - Show or hide viral images from the 'user' section. Defaults to true"
+            },
+            "page" : {
+               "desc" : "integer - the data paging number",
+               "required" : 0
+            },
+            "section" : {
+               "desc" : "hot | top | user - defaults to hot",
+               "required" : 0
+            }
+         },
+         "name" : "Gallery",
+         "url" : {
+            "base" : "3/gallery",
+            "optional" : "'section','sort','page'",
+            "required" : ""
+         }
+      },
+      {
+         "method" : "get",
+         "sub" : "memeSubgallery",
+         "params" : {
+            "page" : {
+               "required" : 0,
+               "desc" : "integer - the data paging number"
+            },
+            "window" : {
+               "desc" : "Change the date range of the request if the sort is \"top\", day | week | month | year | all, defaults to week",
+               "required" : 0
+            },
+            "sort" : {
+               "required" : 0,
+               "desc" : "viral | time | top - defaults to viral"
+            }
+         },
+         "url_params" : {},
+         "description" : "View images for memes subgallery",
+         "url" : {
+            "optional" : "'sort','page'",
+            "required" : "",
+            "base" : "3/g/memes"
+         },
+         "name" : "Memes Subgallery"
+      },
+      {
+         "method" : "get",
+         "sub" : "memeSubgalleryImage",
+         "params" : {
+            "image_id" : {
+               "desc" : "The ID for the image.",
+               "required" : 1
+            }
+         },
+         "url_params" : {},
+         "description" : "View a single image in the memes gallery",
+         "name" : "Memes Subgallery Image",
+         "url" : {
+            "optional" : "",
+            "required" : "'image_id'",
+            "base" : "3/g/memes/%s"
+         }
+      },
+      {
+         "name" : "Subreddit Galleries",
+         "url" : {
+            "optional" : "'sort','page'",
+            "required" : "'subreddit'",
+            "base" : "3/gallery/r/%s"
+         },
+         "sub" : "subreddit",
+         "method" : "get",
+         "params" : {
+            "subreddit" : {
+               "required" : 1,
+               "desc" : "pics - A valid subreddit name"
+            },
+            "window" : {
+               "required" : 0,
+               "desc" : "Change the date range of the request if the sort is \"top\", day | week | month | year | all, defaults to week"
+            },
+            "sort" : {
+               "desc" : "time | top - defaults to time",
+               "required" : 0
+            },
+            "page" : {
+               "desc" : "integer - the data paging number",
+               "required" : 0
+            }
+         },
+         "url_params" : {},
+         "description" : "View gallery images for a subreddit"
+      },
+      {
+         "name" : "Subreddit Image",
+         "url" : {
+            "required" : "'subreddit','image_id'",
+            "optional" : "",
+            "base" : "3/gallery/r/%s/%s"
+         },
+         "description" : "View a single image in the subreddit",
+         "url_params" : {},
+         "method" : "get",
+         "params" : {
+            "subreddit" : {
+               "required" : 1,
+               "desc" : "pics - A valid subreddit name"
+            },
+            "image_id" : {
+               "desc" : "The ID for the image.",
+               "required" : 1
+            }
+         },
+         "sub" : "subredditImage"
+      },
+      {
+         "params" : {
+            "t_name" : {
+               "required" : 1,
+               "desc" : "The name of the tag."
+            },
+            "sort" : {
+               "required" : 0,
+               "desc" : "viral | time | top - defaults to viral"
+            },
+            "window" : {
+               "required" : 0,
+               "desc" : "Change the date range of the request if the sort is \"top\", day | week | month | year | all, defaults to week"
+            },
+            "page" : {
+               "desc" : "integer - the data paging number",
+               "required" : 0
+            }
+         },
+         "method" : "get",
+         "sub" : "tag",
+         "url_params" : {},
+         "description" : "View images for a gallery tag",
+         "url" : {
+            "base" : "3/gallery/t/%s",
+            "required" : "'t_name'",
+            "optional" : "'sort','page'"
+         },
+         "name" : "Gallery Tag"
+      },
+      {
+         "url" : {
+            "optional" : "",
+            "required" : "'t_name','image_id'",
+            "base" : "3/gallery/t/%s/%s"
+         },
+         "name" : "Gallery Tag Image",
+         "params" : {
+            "t_name" : {
+               "required" : 1,
+               "desc" : "The name of the tag."
+            },
+            "image_id" : {
+               "desc" : "The ID for the image.",
+               "required" : 1
+            }
+         },
+         "method" : "get",
+         "sub" : "tagImage",
+         "url_params" : {},
+         "description" : "View a single image in a gallery tag"
+      },
+      {
+         "url_params" : {},
+         "description" : "View tags for a gallery item",
+         "method" : "get",
+         "params" : {
+            "id" : {
+               "desc" : "ID of the gallery item",
+               "required" : 1
+            },
+            "gallery" : {
+               "required" : 1,
+               "desc" : "Gallery"
+            }
+         },
+         "sub" : "itemTags",
+         "name" : "Gallery Item Tags",
+         "url" : {
+            "required" : "'gallery'",
+            "optional" : "",
+            "base" : "3/gallery/image/%s/tags"
+         }
+      },
+      {
+         "params" : {
+            "gallery" : {
+               "required" : 1,
+               "desc" : "Gallery"
+            },
+            "id" : {
+               "required" : 1,
+               "desc" : "ID of the gallery item"
+            },
+            "t_name" : {
+               "desc" : "Name of the tag (implicitly created, if doesn't exist)",
+               "required" : 1
+            },
+            "vote" : {
+               "required" : 1,
+               "desc" : "'up' or 'down'"
+            }
+         },
+         "method" : "post",
+         "sub" : "tagVote",
+         "description" : "Vote for a tag, 'up' or 'down' vote. Send the same value again to undo a vote.",
+         "url_params" : {},
+         "url" : {
+            "base" : "3/gallery/%s/vote/tag/%s/%s",
+            "optional" : "",
+            "required" : "'gallery','t_name','vote'"
+         },
+         "name" : "Gallery Tag Voting"
+      },
+      {
+         "description" : "Update the tags for a post in the gallery",
+         "url_params" : {},
+         "params" : {
+            "id" : {
+               "required" : 1,
+               "desc" : "ID of the gallery item"
+            },
+            "gallery" : {
+               "desc" : "Gallery",
+               "required" : 1
+            },
+            "tags" : {
+               "desc" : "The name of the tags you wish to associate with a post. Can be passed as tags[]=funny&tags[]=cat or tags=funny,cat/td>\n                    ",
+               "required" : 1
+            }
+         },
+         "method" : "post",
+         "sub" : "updateGalleryTags",
+         "url" : {
+            "optional" : "",
+            "required" : "'gallery'",
+            "base" : "3/gallery/tags/%s"
+         },
+         "name" : "Update Gallery Tags"
+      },
+      {
+         "description" : "Search the gallery with a given query string.",
+         "url_params" : {},
+         "sub" : "search",
+         "method" : "get",
+         "params" : {
+            "page" : {
+               "required" : 0,
+               "desc" : "integer - the data paging number"
+            },
+            "window" : {
+               "desc" : "Change the date range of the request if the sort is 'top', day | week | month | year | all, defaults to all.",
+               "required" : 0
+            },
+            "sort" : {
+               "desc" : "time | viral | top - defaults to time",
+               "required" : 0
+            }
+         },
+         "name" : "Gallery Search",
+         "url" : {
+            "optional" : "'sort','window','page'",
+            "required" : "",
+            "base" : "3/gallery/search"
+         }
+      },
+      {
+         "description" : "Returns a random set of gallery images.",
+         "url_params" : {},
+         "method" : "get",
+         "sub" : "random",
+         "params" : {
+            "page" : {
+               "desc" : "A page of random gallery images, from 0-50. Pages are regenerated every hour.",
+               "required" : 0
+            }
+         },
+         "url" : {
+            "base" : "3/gallery/random/random",
+            "optional" : "'page'",
+            "required" : ""
+         },
+         "name" : "Random Gallery Images"
+      },
+      {
+         "name" : "Share with community",
+         "url" : {
+            "required" : "'gallery'",
+            "optional" : "",
+            "base" : "3/gallery/%s"
+         },
+         "sub" : "toGallery",
+         "method" : "post | put",
+         "params" : {
+            "mature" : {
+               "required" : 0,
+               "desc" : "If the post is mature, set this value to 1."
+            },
+            "terms" : {
+               "desc" : "If the user has not accepted our terms yet, this endpoint will return an error. To by-pass the terms in general simply set this value to 1.",
+               "required" : 0
+            },
+            "title" : {
+               "desc" : "The title of the image. This is required.",
+               "required" : 1
+            },
+            "gallery" : {
+               "required" : 1,
+               "desc" : "Gallery"
+            },
+            "tags[]" : {
+               "desc" : "The name of the tags you wish to associate with a post. Can be passed as tags[]=funny&tags[]=cat or tags=funny,cat",
+               "required" : 0
+            },
+            "topic" : {
+               "desc" : "Topic name",
+               "required" : 0
+            }
+         },
+         "description" : "Share an Album or Image to the Gallery.",
+         "url_params" : {}
+      },
+      {
+         "url_params" : {},
+         "description" : "Remove an image from the gallery. You must be logged in as the owner of the item to do this action.",
+         "method" : "delete",
+         "sub" : "fromGallery",
+         "params" : {
+            "gallery" : {
+               "required" : 1,
+               "desc" : "Gallery"
+            }
+         },
+         "name" : "Remove from Gallery",
+         "url" : {
+            "base" : "3/gallery/%s",
+            "required" : "'gallery'",
+            "optional" : ""
+         }
+      },
+      {
+         "name" : "Album",
+         "url" : {
+            "required" : "'gallery'",
+            "optional" : "",
+            "base" : "3/gallery/album/%s"
+         },
+         "params" : {
+            "gallery" : {
+               "desc" : "Gallery",
+               "required" : 1
+            }
+         },
+         "method" : "get",
+         "sub" : "album",
+         "url_params" : {},
+         "description" : "Get additional information about an album in the gallery."
+      },
+      {
+         "name" : "Image",
+         "url" : {
+            "optional" : "",
+            "required" : "'gallery'",
+            "base" : "3/gallery/image/%s"
+         },
+         "description" : "Get additional information about an image in the gallery.",
+         "url_params" : {},
+         "sub" : "image",
+         "method" : "get",
+         "params" : {
+            "gallery" : {
+               "desc" : "Gallery",
+               "required" : 1
+            }
+         }
+      },
+      {
+         "description" : "Report an Image in the gallery",
+         "url_params" : {},
+         "sub" : "reporting",
+         "method" : "post",
+         "params" : {
+            "3" : {
+               "required" : 1,
+               "desc" : null
+            },
+            "1" : {
+               "desc" : null,
+               "required" : 1
+            },
+            "reason" : {
+               "desc" : "An integer representing the reason for the report\n                            Value\n                                    Description\n                                1\n                                    Doesn't belong on Imgur\n                                2\n                                    Spam\n                                3\n                                    Abusive\n                                4\n                                    Mature content not marked as mature\n                                5\n                                    Pornography\n                                ",
+               "required" : 0
+            },
+            "2" : {
+               "desc" : null,
+               "required" : 1
+            },
+            "5" : {
+               "desc" : null,
+               "required" : 1
+            },
+            "4" : {
+               "desc" : null,
+               "required" : 1
+            }
+         },
+         "name" : "Album / Image Reporting",
+         "url" : {
+            "base" : "",
+            "required" : "",
+            "optional" : ""
+         }
+      },
+      {
+         "method" : "get",
+         "sub" : "votes",
+         "params" : {
+            "gallery" : {
+               "desc" : "Gallery",
+               "required" : 1
+            }
+         },
+         "description" : "Get the vote information about an image",
+         "url_params" : {},
+         "url" : {
+            "base" : "3/gallery/%s/votes",
+            "optional" : "",
+            "required" : "'gallery'"
+         },
+         "name" : "Album / Image Votes"
+      },
+      {
+         "name" : "Album / Image Voting",
+         "url" : {
+            "base" : "3/gallery/%s/vote/%s",
+            "optional" : "",
+            "required" : "'gallery','vote'"
+         },
+         "method" : "post",
+         "sub" : "voting",
+         "params" : {
+            "vote" : {
+               "required" : 1,
+               "desc" : "Vote"
+            },
+            "gallery" : {
+               "desc" : "Gallery",
+               "required" : 1
+            }
+         },
+         "description" : "Vote for an image, 'up' or 'down' vote. Send 'veto' to undo a vote.",
+         "url_params" : {}
+      },
+      {
+         "method" : "get",
+         "params" : {
+            "sort" : {
+               "desc" : "best | top | new - defaults to best ",
+               "required" : 0
+            },
+            "gallery" : {
+               "desc" : "Gallery",
+               "required" : 1
+            }
+         },
+         "sub" : "comments",
+         "url_params" : {},
+         "description" : "Comment on an image in the gallery.",
+         "url" : {
+            "optional" : "'sort'",
+            "required" : "'gallery'",
+            "base" : "3/gallery/%s/comments"
+         },
+         "name" : "Album / Image Comments"
+      },
+      {
+         "url" : {
+            "optional" : "",
+            "required" : "'gallery','comment'",
+            "base" : "3/gallery/%s/comment/%s"
+         },
+         "name" : "Album / Image Comment",
+         "url_params" : {},
+         "description" : "Information about a specific comment. This action also allows any of the additional actions provided in the Comment Endpoint.",
+         "method" : "get",
+         "sub" : "comment",
+         "params" : {
+            "comment" : {
+               "desc" : "Comment",
+               "required" : 1
+            },
+            "gallery" : {
+               "desc" : "Gallery",
+               "required" : 1
+            }
+         }
+      },
+      {
+         "url" : {
+            "required" : "'gallery'",
+            "optional" : "",
+            "base" : "3/gallery/%s/comment"
+         },
+         "name" : "Album / Image Comment Creation",
+         "sub" : "commentCreation",
+         "method" : "post",
+         "params" : {
+            "comment" : {
+               "required" : 1,
+               "desc" : "The text of the comment."
+            },
+            "gallery" : {
+               "desc" : "Gallery",
+               "required" : 1
+            }
+         },
+         "url_params" : {},
+         "description" : "Create a comment for an image."
+      },
+      {
+         "params" : {
+            "comment" : {
+               "required" : 1,
+               "desc" : "The text you want to use as the reply."
+            },
+            "commentReply" : {
+               "required" : 1,
+               "desc" : "CommentReply"
+            },
+            "gallery" : {
+               "desc" : "Gallery",
+               "required" : 1
+            }
+         },
+         "method" : "post",
+         "sub" : "commentReply",
+         "description" : "Reply to a comment that has been created for an image.",
+         "url_params" : {},
+         "name" : "Album / Image Comment Reply Creation",
+         "url" : {
+            "required" : "'gallery','commentReply'",
+            "optional" : "",
+            "base" : "3/gallery/%s/comment/%s"
+         }
+      },
+      {
+         "name" : "Album / Image Comment IDs",
+         "url" : {
+            "base" : "3/gallery/%s/comments/ids",
+            "optional" : "",
+            "required" : "'gallery'"
+         },
+         "description" : "List all of the IDs for the comments on an image.",
+         "url_params" : {},
+         "method" : "get",
+         "params" : {
+            "gallery" : {
+               "desc" : "Gallery",
+               "required" : 1
+            }
+         },
+         "sub" : "commentIds"
+      },
+      {
+         "url_params" : {},
+         "description" : "The number of comments on an Image.",
+         "params" : {
+            "gallery" : {
+               "desc" : "Gallery",
+               "required" : 1
+            }
+         },
+         "method" : "get",
+         "sub" : "commentCount",
+         "name" : "Album / Image Comment Count",
+         "url" : {
+            "optional" : "",
+            "required" : "'gallery'",
+            "base" : "3/gallery/%s/comments/count"
+         }
+      }
+   ],
+   "Memegen" : [
+      {
+         "url_params" : {},
+         "description" : "Get the list of default memes.",
+         "method" : "get",
+         "params" : {},
+         "sub" : "defaults",
+         "name" : "Default Memes",
+         "url" : {
+            "required" : "",
+            "optional" : "",
+            "base" : "3/memegen/defaults"
+         }
+      }
+   ],
+   "Custom_gallery" : [
+      {
+         "method" : "get",
+         "sub" : "customGallery",
+         "params" : {
+            "sort" : {
+               "desc" : "viral | time | top - defaults to viral",
+               "required" : 0
+            },
+            "window" : {
+               "required" : 0,
+               "desc" : "Change the date range of the request if the sort is \"top\", day | week | month | year | all, defaults to week"
+            },
+            "page" : {
+               "required" : 0,
+               "desc" : "integer - the data paging number"
+            }
+         },
+         "description" : "View images for current user's custom gallery",
+         "url_params" : {},
+         "name" : "Custom Gallery",
+         "url" : {
+            "base" : "3/g/custom",
+            "optional" : "'sort','page'",
+            "required" : ""
+         }
+      },
+      {
+         "method" : "get",
+         "params" : {
+            "item_id" : {
+               "desc" : "Item_id",
+               "required" : 1
+            },
+            "image_id" : {
+               "required" : 1,
+               "desc" : "The ID for the gallery item."
+            }
+         },
+         "sub" : "customGalleryImage",
+         "description" : "View a single image in a user's custom gallery",
+         "url_params" : {},
+         "url" : {
+            "base" : "3/g/custom/%s",
+            "required" : "'item_id'",
+            "optional" : ""
+         },
+         "name" : "Custom Gallery Image"
+      },
+      {
+         "url_params" : {},
+         "description" : "Add tags to a user's custom gallery",
+         "sub" : "customGalleryAdd",
+         "method" : "put",
+         "params" : {
+            "tags" : {
+               "desc" : "Array of tags (e.g. 'cats,dogs')",
+               "required" : 1
+            }
+         },
+         "name" : "Custom Gallery Add Tags",
+         "url" : {
+            "base" : "3/g/custom/add_tags",
+            "optional" : "",
+            "required" : ""
+         }
+      },
+      {
+         "url" : {
+            "base" : "3/g/custom/remove_tags",
+            "optional" : "",
+            "required" : ""
+         },
+         "name" : "Custom Gallery Remove Tags",
+         "description" : "Remove tags from a custom gallery",
+         "url_params" : {},
+         "sub" : "customGalleryRemove",
+         "method" : "delete",
+         "params" : {
+            "tags" : {
+               "desc" : "Array of tags (e.g. 'cats,dogs')",
+               "required" : 1
+            }
+         }
+      }
+   ],
+   "Album" : [
+      {
+         "name" : "Album",
+         "url" : {
+            "base" : "3/album/%s",
+            "optional" : "",
+            "required" : "'album'"
+         },
+         "method" : "get",
+         "params" : {
+            "album" : {
+               "required" : 1,
+               "desc" : "Album"
+            }
+         },
+         "sub" : "get",
+         "description" : "Get information about a specific album.",
+         "url_params" : {}
+      },
+      {
+         "name" : "Album Images",
+         "url" : {
+            "base" : "3/album/%s/images",
+            "optional" : "",
+            "required" : "'album'"
+         },
+         "description" : "Return all of the images in the album",
+         "url_params" : {},
+         "sub" : "images",
+         "method" : "get",
+         "params" : {
+            "album" : {
+               "required" : 1,
+               "desc" : "Album"
+            }
+         }
+      },
+      {
+         "sub" : "image",
+         "method" : "get",
+         "params" : {
+            "album" : {
+               "desc" : "Album",
+               "required" : 1
+            },
+            "image" : {
+               "desc" : "Image",
+               "required" : 1
+            }
+         },
+         "url_params" : {},
+         "description" : " Get information about an image in an album, any additional actions found in Image Endpoint will also work. ",
+         "url" : {
+            "optional" : "",
+            "required" : "'album','image'",
+            "base" : "3/album/%s/image/%s"
+         },
+         "name" : "Album Image"
+      },
+      {
+         "params" : {
+            "layout" : {
+               "required" : 0,
+               "desc" : "Sets the layout to display the album.  Values are : blog | grid | horizontal | vertical"
+            },
+            "deletehashes[]" : {
+               "required" : 0,
+               "desc" : "The deletehashes of the images that you want to be included in the album."
+            },
+            "cover" : {
+               "required" : 0,
+               "desc" : "The ID of an image that you want to be the cover of the album"
+            },
+            "privacy" : {
+               "required" : 0,
+               "desc" : "Sets the privacy level of the album.  Values are : public | hidden | secret. Defaults to user's privacy settings for logged in users."
+            },
+            "ids[]" : {
+               "required" : 0,
+               "desc" : "The image ids that you want to be included in the album."
+            },
+            "title" : {
+               "desc" : "The title of the album",
+               "required" : 0
+            },
+            "description" : {
+               "required" : 0,
+               "desc" : "The description of the album"
+            }
+         },
+         "method" : "post",
+         "sub" : "upload",
+         "url_params" : {},
+         "description" : " Create a new album. Optional parameter of ids[] is an array of image ids to add to the album. array of image ids to add to the album. If uploading anonymous images to anonymous album please use the optional parameter of deletehashes[] rather than ids[]. Note: including the optional deletehashes[] parameter will also work for authenticated user albums. There is no need to duplicate image ids with their corresponding deletehash. This method is available without authenticating an account, and may be used merely by sending \"Authorization: Client-ID {client_id}\" in the request headers. Doing so will create an anonymous album which is not tied to an account. ",
+         "url" : {
+            "optional" : "",
+            "required" : "",
+            "base" : "3/album"
+         },
+         "name" : "Album Creation"
+      },
+      {
+         "method" : "post or put",
+         "params" : {
+            "deletehashes[]" : {
+               "required" : 0,
+               "desc" : "The deletehashes of the images that you want to be included in the album."
+            },
+            "album" : {
+               "desc" : "Album",
+               "required" : 1
+            },
+            "description" : {
+               "required" : 0,
+               "desc" : "The description of the album"
+            },
+            "title" : {
+               "required" : 0,
+               "desc" : "The title of the album"
+            },
+            "privacy" : {
+               "required" : 0,
+               "desc" : "Sets the privacy level of the album.  Values are : public | hidden | secret"
+            },
+            "cover" : {
+               "required" : 0,
+               "desc" : "The ID of an image that you want to be the cover of the album"
+            },
+            "layout" : {
+               "required" : 0,
+               "desc" : "Sets the layout to display the album.  Values are : blog | grid | horizontal | vertical"
+            },
+            "ids[]" : {
+               "required" : 0,
+               "desc" : "The image ids that you want to be included in the album."
+            }
+         },
+         "sub" : "update",
+         "description" : " Update the information of an album. For anonymous albums, {album} should be the deletehash that is returned at creation. If uploading anonymous images to anonymous album please use the optional parameter of deletehashes[] rather than ids[]. Note: including the optional deletehashes[] parameter will also work for authenticated user albums. There is no need to duplicate image ids with their corresponding deletehash. ",
+         "url_params" : {},
+         "name" : "Update Album",
+         "url" : {
+            "optional" : "",
+            "required" : "'album'",
+            "base" : "3/album/%s"
+         }
+      },
+      {
+         "description" : " Delete an album with a given ID. You are required to be logged in as the user to delete the album. For anonymous albums, {album} should be the deletehash that is returned at creation. ",
+         "url_params" : {},
+         "params" : {
+            "album" : {
+               "required" : 1,
+               "desc" : "Album"
+            }
+         },
+         "method" : "delete",
+         "sub" : "delete",
+         "name" : "Album Deletion",
+         "url" : {
+            "optional" : "",
+            "required" : "'album'",
+            "base" : "3/album/%s"
+         }
+      },
+      {
+         "url" : {
+            "optional" : "",
+            "required" : "'album'",
+            "base" : "3/album/%s/favorite"
+         },
+         "name" : "Favorite Album",
+         "method" : "post",
+         "params" : {
+            "album" : {
+               "required" : 1,
+               "desc" : "Album"
+            }
+         },
+         "sub" : "favorite",
+         "url_params" : {},
+         "description" : "Favorite an album with a given ID. The user is required to be logged in to favorite the album."
+      },
+      {
+         "url" : {
+            "required" : "'album'",
+            "optional" : "",
+            "base" : "3/album/%s"
+         },
+         "name" : "Set Album Images",
+         "description" : " Sets the images for an album, removes all other images and only uses the images in this request. For anonymous albums, {album} should be the deletehash that is returned at creation. If uploading anonymous images to anonymous album please use the optional parameter of deletehashes[] rather than ids[]. Note: including the optional deletehashes[] parameter will also work for authenticated user albums. There is no need to duplicate image ids with their corresponding deletehash. ",
+         "url_params" : {},
+         "method" : "post",
+         "sub" : "setTo",
+         "params" : {
+            "album" : {
+               "required" : 1,
+               "desc" : "Album"
+            },
+            "deletehashes[]" : {
+               "desc" : "The image deletehashes that you want to be added to the album. The [] represents the ability to use this variable as an array.",
+               "required" : 0
+            },
+            "ids[]" : {
+               "desc" : "The image ids that you want to be added to the album. The [] represents the ability to use this variable as an array.",
+               "required" : 0
+            }
+         }
+      },
+      {
+         "name" : "Add Images to an Album",
+         "url" : {
+            "optional" : "",
+            "required" : "'album'",
+            "base" : "3/album/%s/add"
+         },
+         "method" : "put",
+         "params" : {
+            "deletehashes[]" : {
+               "required" : 0,
+               "desc" : "The image deletehashes that you want to be added to the album.  The [] represents the ability to use this variable as an array."
+            },
+            "album" : {
+               "required" : 1,
+               "desc" : "Album"
+            },
+            "ids[]" : {
+               "desc" : "The image ids that you want to be added to the album.  The [] represents the ability to use this variable as an array.",
+               "required" : 0
+            }
+         },
+         "sub" : "addTo",
+         "url_params" : {},
+         "description" : " For anonymous albums, {album} should be the deletehash that is returned at creation. If uploading anonymous images to anonymous album please use the optional parameter of deletehashes[] rather than ids[]. Note: including the optional deletehashes[] parameter will also work for authenticated user albums. There is no need to duplicate image ids with their corresponding deletehash. "
+      },
+      {
+         "url" : {
+            "required" : "'album'",
+            "optional" : "",
+            "base" : "3/album/%s/remove_images"
+         },
+         "name" : "Remove Images from an Album",
+         "description" : " Takes parameter, ids[], as an array of ids and removes from the album. For anonymous albums, {album} should be the deletehash that is returned at creation. ",
+         "url_params" : {},
+         "method" : "delete",
+         "sub" : "removeFrom",
+         "params" : {
+            "album" : {
+               "desc" : "Album",
+               "required" : 1
+            },
+            "ids[]" : {
+               "desc" : "The image ids that you want to be removed from the album.",
+               "required" : 1
+            }
+         }
+      }
+   ],
+   "Image" : [
+      {
+         "url_params" : {},
+         "description" : "Get information about an image.",
+         "method" : "get",
+         "sub" : "get",
+         "params" : {
+            "image" : {
+               "desc" : "Image",
+               "required" : 1
+            }
+         },
+         "name" : "Image",
+         "url" : {
+            "required" : "'image'",
+            "optional" : "",
+            "base" : "3/image/%s"
+         }
+      },
+      {
+         "name" : "Image Upload",
+         "url" : {
+            "required" : "",
+            "optional" : "",
+            "base" : "3/image"
+         },
+         "url_params" : {},
+         "description" : "Upload a new image.",
+         "sub" : "upload",
+         "method" : "post",
+         "params" : {
+            "name" : {
+               "required" : 0,
+               "desc" : "The name of the file, this is automatically detected if uploading a file with a POST and multipart / form-data"
+            },
+            "album" : {
+               "required" : 0,
+               "desc" : "\n                    The id of the album you want to add the image to.\n                    For anonymous albums, {album} should be the\n                    deletehash that is returned at creation.\n                "
+            },
+            "image" : {
+               "required" : 1,
+               "desc" : "A binary file, base64 data, or a URL for an image. (up to 10MB)"
+            },
+            "type" : {
+               "desc" : "The type of the file that's being sent; file, base64 or URL",
+               "required" : 0
+            },
+            "description" : {
+               "required" : 0,
+               "desc" : "The description of the image."
+            },
+            "title" : {
+               "desc" : "The title of the image.",
+               "required" : 0
+            }
+         }
+      },
+      {
+         "name" : "Image Deletion",
+         "url" : {
+            "optional" : "",
+            "required" : "'image'",
+            "base" : "3/image/%s"
+         },
+         "url_params" : {},
+         "description" : " Deletes an image. For an anonymous image, {id} must be the image's deletehash. If the image belongs to your account then passing the ID of the image is sufficient. ",
+         "params" : {
+            "image" : {
+               "desc" : "Image",
+               "required" : 1
+            }
+         },
+         "method" : "delete",
+         "sub" : "delete"
+      },
+      {
+         "url" : {
+            "optional" : "",
+            "required" : "'image'",
+            "base" : "3/image/%s"
+         },
+         "name" : "Update Image Information",
+         "sub" : "update",
+         "method" : "post",
+         "params" : {
+            "image" : {
+               "desc" : "Image",
+               "required" : 1
+            },
+            "title" : {
+               "desc" : "The title of the image.",
+               "required" : 0
+            },
+            "description" : {
+               "desc" : "The description of the image.",
+               "required" : 0
+            }
+         },
+         "description" : " Updates the title or description of an image. You can only update an image you own and is associated with your account. For an anonymous image, {id} must be the image's deletehash. ",
+         "url_params" : {}
+      },
+      {
+         "name" : "Favorite an Image",
+         "url" : {
+            "optional" : "",
+            "required" : "'image'",
+            "base" : "3/image/%s/favorite"
+         },
+         "sub" : "favorite",
+         "method" : "post",
+         "params" : {
+            "image" : {
+               "desc" : "Image",
+               "required" : 1
+            }
+         },
+         "url_params" : {},
+         "description" : "Favorite an image with the given ID. The user is required to be logged in to favorite the image."
+      }
+   ]
+}
+

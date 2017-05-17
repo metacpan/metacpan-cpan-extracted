@@ -11,6 +11,7 @@ build_requires:
   POE::Filter::HTTP::Parser: '1.06'
   Test::More: '0.47'
   Test::POE::Server::TCP: '0.12'
+  YAML::XS: '0.64'
 configure_requires:
   Config: '0'
   ExtUtils::MakeMaker: '0'
@@ -40,5 +41,5 @@ requires:
 resources:
   homepage: https://github.com/bingos/minismokebox
   repository: https://github.com/bingos/minismokebox.git
-version: '0.66'
+version: '0.68'
 x_serialization_backend: 'YAML::Tiny version 1.70'

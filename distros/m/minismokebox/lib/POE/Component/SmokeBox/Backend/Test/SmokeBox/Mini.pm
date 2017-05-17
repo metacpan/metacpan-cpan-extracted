@@ -1,5 +1,5 @@
 package POE::Component::SmokeBox::Backend::Test::SmokeBox::Mini;
-$POE::Component::SmokeBox::Backend::Test::SmokeBox::Mini::VERSION = '0.66';
+$POE::Component::SmokeBox::Backend::Test::SmokeBox::Mini::VERSION = '0.68';
 #ABSTRACT: a backend to App::SmokeBox::Mini.
 
 use strict;
@@ -31,7 +31,7 @@ POE::Component::SmokeBox::Backend::Test::SmokeBox::Mini - a backend to App::Smok
 
 =head1 VERSION
 
-version 0.66
+version 0.68
 
 =head1 DESCRIPTION
 

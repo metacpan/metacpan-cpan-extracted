@@ -36,8 +36,9 @@
                     library_type  => $lib || "illumina",
                     file_path     => $file_path,
                     in_file       => $in_file,
-                    qual_filter   => 1200,
-                    length_filter => 80
+                    summary       => "Y",
+                    qual_filter   => 30,
+                    length_filter => 25
   );
 
   $tmp->run_fastQ_brew();
@@ -46,9 +47,9 @@
 ## Filtering Options 
  ```perl   
 #filter by read quality
-        qual_filter   => 1200
+        qual_filter   => 30
 #filter by read length       
-        length_filter => 45
+        length_filter => 25
 #remove x bases from left 
         left_trim     => 5
 #remove x bases from right
@@ -75,12 +76,12 @@
         dna_rna       => "Y"
 #reverse complement the FASTQ reads 
         rev_comp      => "Y"
-#remove temporary files generated during the run
-        cleanup       => "Y"
 ```
 
 ## Odds and Ends
  ```perl   
+#return summary statistics on unfiltered and filtered data 
+        summary       => "Y"
 #remove reads that contain non designated bases e.g. N 
         remove_n      => "Y"
 #remove temporary files generated during the run

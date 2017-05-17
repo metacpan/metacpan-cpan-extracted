@@ -2,7 +2,7 @@ package Business::OnlinePayment::Litle::ErrorCodes;
 use strict;
 use warnings;
 
-our $VERSION = '0.955'; # VERSION
+our $VERSION = '0.956'; # VERSION
 use Exporter 'import';
 use vars qw(@EXPORT_OK);
 
@@ -369,7 +369,7 @@ Business::OnlinePayment::Litle::ErrorCodes - Business::OnlinePayment::Litle::Err
 
 =head1 VERSION
 
-version 0.955
+version 0.956
 
 =head1 METHODS
 

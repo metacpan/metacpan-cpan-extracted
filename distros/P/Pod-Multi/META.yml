@@ -1,24 +1,33 @@
---- #YAML:1.0
-name:                Pod-Multi
-version:             0.09
-abstract:            pod2man, pod2text, pod2html simultaneously
-license:             ~
-generated_by:        ExtUtils::MakeMaker version 6.32
-distribution_type:   module
-requires:     
-    Carp:                          0
-    Data::Dumper:                  0
-    File::Basename:                0
-    File::Path:                    0
-    File::Save::Home:              0.03
-    File::Spec:                    0
-    IO::Capture:                   0.05
-    Pod::Html:                     0
-    Pod::Man:                      0
-    Pod::Text:                     0
-    Test::Simple:                  0.44
-meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
-    version: 1.2
+---
+abstract: 'pod2man, pod2text, pod2html simultaneously'
 author:
-    - James E Keenan (jkeenan@cpan.org)
+  - 'James E Keenan (jkeenan@cpan.org)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Multi
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  File::Basename: '0'
+  File::Path: '0'
+  File::Save::Home: '0.03'
+  File::Spec: '0'
+  IO::Capture: '0.05'
+  Pod::Html: '0'
+  Pod::Man: '0'
+  Pod::Text: '0'
+  Test::Simple: '0.44'
+version: '0.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

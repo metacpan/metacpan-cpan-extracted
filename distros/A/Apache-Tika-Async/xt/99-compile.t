@@ -28,6 +28,7 @@ sub check {
 
     if( $exit ) {
         diag $exit;
+        diag $stderr;
         fail($_);
     } elsif( $stderr ne "$_ syntax OK") {
         diag $stderr;

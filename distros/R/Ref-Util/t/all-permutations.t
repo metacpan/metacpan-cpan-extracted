@@ -3,6 +3,8 @@ use warnings;
 use Test::More 'tests' => 5;
 use Ref::Util ':all';
 
+use constant FORMAT_REFS_WORK => ("$]" >= 5.007);
+
 # FIXME: plain regular expressions, blessed regular expressions
 
 my $plain_formatref = do {
@@ -11,13 +13,13 @@ my $plain_formatref = do {
     *FH1{'FORMAT'};
 };
 
-my $blessed_formatref = bless do {
+my $blessed_formatref = !FORMAT_REFS_WORK ? undef : bless do {
     format FH2 =
 .
     *FH2{'FORMAT'};
 }, 'FormatRef';
 
-my $evil_blessed_formatref = bless do {
+my $evil_blessed_formatref = !FORMAT_REFS_WORK ? undef : bless do {
     format FH3 =
 .
     *FH3{'FORMAT'};
@@ -35,6 +37,7 @@ my %all;
 
     %all = (
         'plain_scalarref' => \$plain_scalar,
+        'plain_scalarref_vstring' => \v1.2.3,
         'plain_arrayref'  => [],
         'plain_hashref'   => +{},
         'plain_coderef'   => sub {'plain_code'},
@@ -42,8 +45,10 @@ my %all;
         'plain_globref'   => \*::var_for_globref,
         'plain_formatref' => $plain_formatref,
         'plain_refref'    => \\$plain_scalar,
+        'plain_refref_sub' =>  \sub{},
 
         'blessed_scalarref' => $blessed_scalarref,
+        'blessed_scalarref_vstring' => bless( \ do { my $x = v1.2.3 }, 'ScalarRef' ),
         'blessed_arrayref'  => bless( [], 'ArrayRef' ),
         'blessed_hashref'   => bless( +{}, 'HashRef' ),
         'blessed_coderef'   => bless( sub {'blessed_code'}, 'CodeRef' ),
@@ -51,8 +56,10 @@ my %all;
         'blessed_globref'   => bless( \*::var_for_blessed_globref, 'GlobRef' ),
         'blessed_formatref' => $blessed_formatref,
         'blessed_refref'    => bless( \\$blessed_scalarref, 'RefRef' ),
+        'blessed_refref_sub' => bless( \sub {}, 'RefRef' ),
 
         'evil_blessed_scalarref' => bless( \ do { my $x = 'evil' }, '0' ),
+        'evil_blessed_scalarref_vstring' => bless( \ do { my $x = v1.2.3 }, '0' ),
         'evil_blessed_arrayref'  => bless( [], '0' ),
         'evil_blessed_hashref'   => bless( +{}, '0' ),
         'evil_blessed_coderef'   => bless( sub {'blessed_code'}, '0' ),
@@ -65,8 +72,13 @@ my %all;
 
 my ( %plain, %blessed );
 foreach my $key ( keys %all ) {
-    $key =~ /^plain_/  and $plain{$key}   = $all{$key};
-    $key =~ /blessed_/ and $blessed{$key} = $all{$key};
+    if (!FORMAT_REFS_WORK && $key =~ /formatref/) {
+        delete $all{$key};
+    }
+    else {
+        $key =~ /^plain_/  and $plain{$key}   = $all{$key};
+        $key =~ /blessed_/ and $blessed{$key} = $all{$key};
+    }
 }
 
 my @all_keys     = sort keys %all;
@@ -79,6 +91,7 @@ subtest 'non-refs' => sub {
         my $rep = defined $value ? $value eq '' ? q{''} : $value : '(undef)';
 
         for my $name (grep /^is_/, @Ref::Util::EXPORT_OK) {
+            next if !FORMAT_REFS_WORK && $name =~ /formatref/;
             my $func = do { no strict 'refs'; \&{"Ref::Util::$name"} };
             ok( !$func->($value), "$name($rep) is false" );
         }
@@ -125,7 +138,7 @@ subtest 'plain references only work on is_plain functions' => sub {
         ok(
             !is_blessed_formatref($value),
             "is_blessed_formatref($plain_type) is false",
-        );
+        ) if FORMAT_REFS_WORK;
 
         ok(
             !is_blessed_refref($value),
@@ -161,7 +174,7 @@ subtest 'plain references' => sub {
     foreach my $plain_type (@plain_keys) {
         my $value = $plain{$plain_type};
 
-        if ( $plain_type eq 'plain_scalarref' ) {
+        if ( $plain_type =~ /plain_scalarref/ ) {
             ok(
                 is_plain_scalarref($value),
                 "is_plain_scalarref($plain_type) is true",
@@ -288,36 +301,38 @@ subtest 'plain references' => sub {
         }
     }
 
-    foreach my $plain_type (@plain_keys) {
-        my $value = $plain{$plain_type};
+    if (FORMAT_REFS_WORK) {
+        foreach my $plain_type (@plain_keys) {
+            my $value = $plain{$plain_type};
 
-        if ( $plain_type eq 'plain_formatref' ) {
-            ok(
-                is_plain_formatref($value),
-                "is_plain_formatref($plain_type) is true",
-            );
+            if ( $plain_type eq 'plain_formatref' ) {
+                ok(
+                    is_plain_formatref($value),
+                    "is_plain_formatref($plain_type) is true",
+                );
 
-            ok(
-                is_formatref($value),
-                "is_formatref($plain_type) is true",
-            );
-        } else {
-            ok(
-                !is_plain_formatref($value),
-                "is_plain_formatref($plain_type) is false",
-            );
+                ok(
+                    is_formatref($value),
+                    "is_formatref($plain_type) is true",
+                );
+            } else {
+                ok(
+                    !is_plain_formatref($value),
+                    "is_plain_formatref($plain_type) is false",
+                );
 
-            ok(
-                !is_formatref($value),
-                "is_formatref($plain_type) is false",
-            );
+                ok(
+                    !is_formatref($value),
+                    "is_formatref($plain_type) is false",
+                );
+            }
         }
     }
 
     foreach my $plain_type (@plain_keys) {
         my $value = $plain{$plain_type};
 
-        if ( $plain_type eq 'plain_refref' ) {
+        if ( $plain_type =~ /plain_refref/ ) {
             ok(
                 is_plain_refref($value),
                 "is_plain_refref($plain_type) is true",
@@ -381,7 +396,7 @@ subtest 'blessed references only work on is_blessed functions' => sub {
         ok(
             !is_plain_formatref($value),
             "is_plain_formatref($blessed_type) is false",
-        );
+        ) if FORMAT_REFS_WORK;
 
         ok(
             !is_plain_refref($value),
@@ -543,29 +558,31 @@ subtest 'blessed references' => sub {
         }
     }
 
-    foreach my $blessed_type (@blessed_keys) {
-        my $value = $blessed{$blessed_type};
+    if (FORMAT_REFS_WORK) {
+        foreach my $blessed_type (@blessed_keys) {
+            my $value = $blessed{$blessed_type};
 
-        if ( $blessed_type =~ /blessed_formatref/ ) {
-            ok(
-                is_blessed_formatref($value),
-                "is_blessed_formatref($blessed_type) is true",
-            );
+            if ( $blessed_type =~ /blessed_formatref/ ) {
+                ok(
+                    is_blessed_formatref($value),
+                    "is_blessed_formatref($blessed_type) is true",
+                );
 
-            ok(
-                is_formatref($value),
-                "is_formatref($blessed_type) is true",
-            );
-        } else {
-            ok(
-                !is_blessed_formatref($value),
-                "is_blessed_formatref($blessed_type) is false",
-            );
+                ok(
+                    is_formatref($value),
+                    "is_formatref($blessed_type) is true",
+                );
+            } else {
+                ok(
+                    !is_blessed_formatref($value),
+                    "is_blessed_formatref($blessed_type) is false",
+                );
 
-            ok(
-                !is_formatref($value),
-                "is_formatref($blessed_type) is false",
-            );
+                ok(
+                    !is_formatref($value),
+                    "is_formatref($blessed_type) is false",
+                );
+            }
         }
     }
 

@@ -9,7 +9,7 @@ use POE qw(Wheel::Run Filter::HTTP::Parser);
 use Test::POE::Server::TCP;
 use HTTP::Date qw( time2str );
 use HTTP::Response;
-use YAML::Syck;
+use YAML::XS;
 use Config;
 
 $ENV{PERL5_SMOKEBOX_DIR} = cwd();
@@ -58,7 +58,7 @@ A/AD/ADAMK/Test-NeedsDisplay-1.07.tar.gz
 A/AD/ADAMK/YAML-Tiny-1.36.tar.gz
 );
 
-my $yaml = YAML::Syck::Dump( { recent => [ map { { path => $_, type => 'new', epoch => (time() - (60*20)) } } @data ] } );
+my $yaml = YAML::XS::Dump( { recent => [ map { { path => $_, type => 'new', epoch => (time() - (60*20)) } } @data ] } );
 
 POE::Session->create(
    package_states => [

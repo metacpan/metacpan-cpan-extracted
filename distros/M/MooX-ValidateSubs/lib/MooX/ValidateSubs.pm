@@ -5,7 +5,7 @@ use warnings;
 
 use MooX::ReturnModifiers;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 sub import {
     my $target    = caller;
@@ -31,10 +31,11 @@ sub import {
                                     $name, 'params', $param_spec, @params 
                                 );
                             }
-
+   
                             @params = $self->$orig(@params);
-
-                            if ( my $param_spec = $current_spec->{returns} ) {
+							shift @params unless defined $params[0];
+							
+							if ( my $param_spec = $current_spec->{returns} ) {
                                 @params = $self->_validate_sub( 
                                     $name, 'returns', $param_spec, @params 
                                 );
@@ -68,7 +69,7 @@ MooX::ValidateSubs - Validating sub routines via Type::Tiny.
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 
@@ -154,7 +155,7 @@ to be validating either an Array or an Array Reference,
         return (shift, shift);
     }
 
-Or a hash reference with array reference values, when validating either a Hash or Hash reference.
+Or an hash reference with array reference values, when validating either a Hash or Hash reference.
 
     hash_example => {
         params => {
@@ -176,7 +177,7 @@ Or a hash reference with array reference values, when validating either a Hash o
         return %hash;
     }
 
-The array references Must always have a first index that is a code reference, you can optionally pass a second index that can 
+The array references Must always have a first index that is an code reference, you can optionally pass a second index that can 
 either be 1, which indicates *optional*, a scalar that reference a subroutine/attribute available to *self* or a code reference 
 that gets used to fill a default value if one was not passed. 
     

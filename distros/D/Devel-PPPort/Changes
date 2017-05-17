@@ -1,3 +1,7 @@
+3.36 - 2017-05-14
+
+    * Support Perl 5.26.* which no longer has '.' in @INC
+
 3.35 - 2016-06-17
 
     * Fix compilation in bleadperl by removing a bad test.

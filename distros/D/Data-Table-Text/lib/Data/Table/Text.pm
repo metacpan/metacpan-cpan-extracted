@@ -3,8 +3,7 @@
 # Write data in tabular text format
 # Philip R Brenan at gmail dot com, Appa Apps Ltd, 2016
 #-------------------------------------------------------------------------------
-# xxx - add an error qr()
-# xxx - a way of making it quiet
+
 package Data::Table::Text;
 require v5.16.0;
 use warnings FATAL => qw(all);
@@ -15,7 +14,7 @@ use File::Glob qw(:bsd_glob);
 use POSIX qw(strftime);                                                         # http://www.cplusplus.com/reference/ctime/strftime/
 use Data::Dump qw(dump);
 
-our $VERSION = '2017.505';
+our $VERSION = '2017.514';
 
 &saveToS3('DataTableText') if 0;                                                # Save code
 
@@ -125,17 +124,19 @@ sub containingFolder($)                                                         
   join '/', @w, ''
  }
 
-sub xxx(@)                                                                      # Execute a command
+sub xxx(@)                                                                      # Execute a command, possibly
  {my @cmd = @_;                                                                 # Command to execute in phrases, although last phrase ccan be an error checking regular expression to apply to confess to any errors in the output
+  @cmd or confess "No command";                                                 # Check that there is a command to execute
   $_ or confess "Missing command component\n" for @cmd;                         # Check that there are no undefined command components
-  my $error = $cmd[-1];
-  my $check = ref($error) =~ /RegExp/i;
-  pop @cmd if $check;
+  my $success = $cmd[-1];                                                       # Error check if present
+  my $check = ref($success) =~ /RegExp/i;                                       # Check for error check
+  pop @cmd if $check;                                                           # Remove check from command
   my $c = join ' ', @cmd;                                                       # Command to execute
-  say STDERR timeStamp, " ", $c;
-  my $r = qx($c 2>&1);
-  print STDERR $r;
-  confess $r if $r and $check and $r =~ m/$error/;                              # Error check if an error checking regular expression has been supplied
+  say STDERR timeStamp, " ", $c unless $check;                                  # Print the command unless there is a check in place
+  my $r = qx($c 2>&1);                                                          # Execute command
+  $r =~ s/\s+\Z//s;                                                             # Remove trailing white space from response
+  say STDERR $r if $r and !$check;                                            # Print non blank error message
+  confess $r if $r and $check and $r !~ m/$success/;                            # Error check if an error checking regular expression has been supplied
   $r
  }
 
@@ -839,7 +840,7 @@ modified under the same terms as Perl itself.
 =cut
 
 __DATA__
-use Test::More tests => 60;
+use Test::More tests => 61;
 if (1)                                                                          # File paths
  {ok filePath   (qw(/aaa bbb ccc ddd.eee)) eq "/aaa/bbb/ccc/ddd.eee";
   ok filePathDir(qw(/aaa bbb ccc ddd))     eq "/aaa/bbb/ccc/ddd/";
@@ -1037,5 +1038,7 @@ ok xxx("a=aaa;echo \$a") =~ /aaa/;
 
 if (1)
  {eval {xxx "echo aaa", qr(aaa)};
-  ok $@ =~ /aaa/;
+  ok !$@, 'aaa';
+  eval {xxx "echo aaa", qr(bbb)};
+  ok $@ =~ /aaa/, 'bbb';
  }

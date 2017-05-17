@@ -1,0 +1,34 @@
+.perltidyrc
+.ship.conf
+.travis.yml
+Changes
+cpanfile
+lib/Mojolicious/Plugin/CGI.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-basic.t
+t/bar.txt
+t/basic.t
+t/before.t
+t/encoding.t
+t/errlog.t
+t/foo.txt
+t/gh-16-loop_reset.t
+t/Helper.pm
+t/helper.t
+t/multipart.t
+t/not-found.t
+t/not-modified.t
+t/nph-borked.t
+t/nph.t
+t/post.t
+t/query-string-with-semicolon.t
+t/redirect.t
+t/remote-user.t
+t/run.t
+t/test_file_with_a_long_filename.txt
+t/zombies.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,82 @@
+NAME
+    Benchmark::Featureset::ParamCheck - compare different parameter validation
+    modules
+
+SYNOPSIS
+      use Benchmark::Featureset::ParamCheck;
+      use Module::Runtime qw(use_module);
+  
+      my @impl     = Benchmark::Featureset::ParamCheck->implementations;
+      my $testdata = Benchmark::Featureset::ParamCheck->trivial_named_data;
+  
+      for my $i (@impl) {
+        # Check the data 10,000 times.
+        use_module($i)->run_named_check(10_000, $testdata);
+      }
+
+DESCRIPTION
+    A whole bunch of implementations for sub paramater checking.
+
+    Each implementation provides a method to check a hash of the form shown in
+    the example. It should have three keys, 'integer' (value should be an
+    integer), 'hashes' (value should be an arrayref of hashrefs), and 'object'
+    (value should be an object with `print` and `close` methods).
+
+    This is intended for benchmarking.
+
+  Class Methods
+    *   `implementations`
+
+        List of implementations. Each implementation is a subclass of
+        Benchmark::Featureset::ParamCheck::Base
+
+    *   `trivial_named_data`, `trivial_positional_data`
+
+        Returns trivial test data.
+
+    *   `complex_named_data`, `complex_positional_data`
+
+        Returns complex test data.
+
+  Benchmark::Featureset::ParamCheck::Base
+    This class provides the following class methods:
+
+    *   `accept_array`
+
+    *   `accept_arrayref`
+
+    *   `accept_hash`
+
+    *   `accept_hashref`
+
+    *   `run_named_check($times, %parameters)`, `run_named_check($times,
+        \%parameters)`
+
+    *   `run_postional_check($times, @parameters)`
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Benchmark-Featureset-ParamChec
+    k>.
+
+SEE ALSO
+    Parameter validation libraries: Data::Validator, MooseX::Params::Validate,
+    Params::Check, Params::Validate, Params::ValidationCompiler,
+    Ref::Util::XS, Type::Params.
+
+    Type constraint libraries: Moose, Mouse, Specio, Type::Tiny.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2017 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

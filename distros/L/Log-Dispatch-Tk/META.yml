@@ -21,5 +21,5 @@ requires:
   Log::Dispatch: '2.00'
   Log::Dispatch::Output: '1.011'
   Tk: '0'
-version: '1.8'
+version: '1.9'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

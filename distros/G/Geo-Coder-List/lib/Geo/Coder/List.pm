@@ -9,11 +9,11 @@ Geo::Coder::List - Call many geocoders
 
 =head1 VERSION
 
-Version 0.07
+Version 0.09
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 our %locations;
 
 =head1 SYNOPSIS
@@ -53,7 +53,7 @@ Different encoders can be preferred for different locations.
 For example this code uses geocode.ca for Canada and US addresses,
 and OpenStreetMap for other places:
 
-    my $geocoderlist = new_ok('Geo::Coder::List')
+    my $geocoderlist = Geo::Coder::List->new()
         ->push({ regex => qr/(Canada|USA|United States)$/, geocoder => new_ok('Geo::Coder::CA') })
         ->push(new_ok('Geo::Coder::OSM'));
 
@@ -158,9 +158,10 @@ Accessor method to set the UserAgent object used internally by each of the geoco
 can call I<env_proxy> for example, to get the proxy information from
 environment variables:
 
+    my $geocoderlist = Geo::Coder::List->new();
     my $ua = LWP::UserAgent->new();
     $ua->env_proxy(1);
-    $geocoder->ua($ua);
+    $geocoderlist->ua($ua);
 
 Note that unlike Geo::Coders, there is no read method, since that would be pointless.
 

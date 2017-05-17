@@ -1,5 +1,5 @@
 package Dist::Zooky::DistIni::MetaNoIndex;
-$Dist::Zooky::DistIni::MetaNoIndex::VERSION = '0.22';
+$Dist::Zooky::DistIni::MetaNoIndex::VERSION = '0.24';
 # ABSTRACT: Dist::Zooky DistIni plugin for MetaNoIndex
 
 use strict;
@@ -40,7 +40,7 @@ Dist::Zooky::DistIni::MetaNoIndex - Dist::Zooky DistIni plugin for MetaNoIndex
 
 =head1 VERSION
 
-version 0.22
+version 0.24
 
 =head1 METHODS
 

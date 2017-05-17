@@ -2,6 +2,8 @@ package Test::Smoke::Mailer::MIME_Lite;
 use warnings;
 use strict;
 
+our $VERSION = '0.016';
+
 use base 'Test::Smoke::Mailer::Base';
 
 =head1 Test::Smoke::Mailer::MIME_Lite

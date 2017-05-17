@@ -7,6 +7,10 @@ all that work for you and gives you all the constants ready to use with a simple
 ```
 use Astro::Constants qw/:cosmology/;
 ```
+instead of relying on 
+[Magic Numbers](https://en.wikipedia.org/wiki/Magic_number_%28programming%29#Unnamed_numerical_constants)
+which only serve to obscure your intent from everyone, including yourself
+six months from now.  C'mon now, **make your programs _readable_**!
 
 While no-one can give bomb-proof guarantees that these values are correct (indeed, 
 some of them are liable to change in time), rest assured that these values

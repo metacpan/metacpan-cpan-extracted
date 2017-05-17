@@ -53,7 +53,7 @@ perl configurations that will be used to build and test perl.
 The file is devided into sections separated by a line that starts with
 an equals-sign (B<=>). Each line in a section is combined with all
 lines from all the other sections. The default build-configurations
-file F<perlcurrent.cfg> constist of four (4) sections:
+file F<perlcurrent.cfg> consist of four (4) sections:
 
 =over 4
 
@@ -144,8 +144,8 @@ buildconfiguration file:
 
 =item B<< Your own F<Policy.sh> >>
 
-Some people use the posibility to handle site specific build
-environments from F<< <builddir>/../Policy.sh >>. This excludes the
+Some people use this approach to handle site-specific build
+environments from F<< <builddir>/../Policy.sh >>. This precludes the
 use of the default F<Policy.sh>. You will need to add the
 B<-DPERL_COPY_ON_WRITE> flag to the C<ccflags=''> line in your
 F<Policy.sh>. After that you must add the policy-target section, as
@@ -194,7 +194,7 @@ This script copies the report and the logfile to a configurable place.
 
 =item B<smokestatus.pl>
 
-This script prints a little status report for a smoke confifuration:
+This script prints a little status report for a smoke configuration:
 
     $ ./smokestatus.pl -c smoke58x
     Checking status for configuration 'smoke58x' (5.8.x)
@@ -303,7 +303,7 @@ Yes, but some information might be missing (the compiler info).
 
     $ perl mailrpt.pl -c [configname]
 
-=head2 How can I run continues smokes?
+=head2 How can I run continuous smokes?
 
 On a unixy system you can try this shellscript if you adjust the
 C<basedir> variable (thank you Johan Vromans for helping with this).

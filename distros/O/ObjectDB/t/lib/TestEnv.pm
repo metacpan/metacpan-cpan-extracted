@@ -69,6 +69,20 @@ my %TABLES = (
      `reply_id` INTEGER
     );
 
+    'auto' => <<'',
+    CREATE TABLE `auto` (
+     `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+     `varchar_no_default` varchar(40),
+     `varchar_default_empty` varchar(40) DEFAULT '',
+     `varchar_default` varchar(40) DEFAULT 'hello',
+     `int_no_default` INTEGER,
+     `int_default_empty` INTEGER DEFAULT 0,
+     `int_default` INTEGER DEFAULT 123,
+     `bool_no_default` BOOLEAN,
+     `bool_default_false` BOOLEAN DEFAULT 0,
+     `bool_default_true` BOOLEAN DEFAULT 1
+    );
+
 );
 
 sub prepare_table {
@@ -90,6 +104,8 @@ sub prepare_table {
     } elsif ($driver =~ /Pg/i) {
         $sql =~ s{`}{"}g;
         $sql =~ s{"id" INTEGER PRIMARY KEY AUTOINCREMENT}{"id" SERIAL PRIMARY KEY}g;
+        $sql =~ s{BOOLEAN DEFAULT 0}{BOOLEAN DEFAULT 'f'}g;
+        $sql =~ s{BOOLEAN DEFAULT 1}{BOOLEAN DEFAULT 't'}g;
     }
 
     $dbh->do($sql);

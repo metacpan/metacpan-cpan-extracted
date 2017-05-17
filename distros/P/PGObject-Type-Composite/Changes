@@ -1,5 +1,9 @@
 Revision history for PGObject-Type-Composite
 
+1.00	2017-05-15
+	API stabilized
+	Working on PGObject 1 and 2
+
 0.04	2014-09-11
 	Minor packaging fixes
 

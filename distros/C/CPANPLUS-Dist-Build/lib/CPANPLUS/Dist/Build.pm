@@ -1,5 +1,5 @@
 package CPANPLUS::Dist::Build;
-$CPANPLUS::Dist::Build::VERSION = '0.86';
+$CPANPLUS::Dist::Build::VERSION = '0.88';
 #ABSTRACT: CPANPLUS plugin to install packages that use Build.PL
 
 use if $] > 5.017, 'deprecate';
@@ -56,7 +56,7 @@ sub init {
 
     $status->mk_accessors(qw[build_pl build test created installed uninstalled
                              _create_args _install_args _prepare_args
-                             _mb_object _buildflags
+                             _mb_object _buildflags _metadata
                             ]);
 
     ### just in case 'format_available' didn't get called
@@ -140,9 +140,6 @@ sub prepare {
     my $status = { };
     RUN: {
 
-        local $ENV{PERL_USE_UNSAFE_INC} = 1
-          unless exists $ENV{PERL_USE_UNSAFE_INC};
-
         # 0.85_01
         ### we resolve 'configure requires' here, so we can run the 'perl
         ### Makefile.PL' command
@@ -180,6 +177,13 @@ sub prepare {
         # Wrap the exception that may be thrown here (should likely be
         # done at a much higher level).
         my $prep_output;
+
+        my $metadata = $dist->status->_metadata;
+        my $x_use_unsafe_inc = ( defined $metadata && exists $metadata->{x_use_unsafe_inc} ? $metadata->{x_use_unsafe_inc} : undef );
+        $x_use_unsafe_inc = 1 unless defined $x_use_unsafe_inc;
+
+        local $ENV{PERL_USE_UNSAFE_INC} = $x_use_unsafe_inc
+          unless exists $ENV{PERL_USE_UNSAFE_INC};
 
         my $env = ENV_CPANPLUS_IS_EXECUTING;
         local $ENV{$env} = BUILD_PL->( $dir );
@@ -439,9 +443,6 @@ sub create {
     my $status = { };
     RUN: {
 
-        local $ENV{PERL_USE_UNSAFE_INC} = 1
-          unless exists $ENV{PERL_USE_UNSAFE_INC};
-
         my @run_perl    = $dist->_perlrun();
 
         ### this will set the directory back to the start
@@ -454,6 +455,13 @@ sub create {
                         target          => $prereq_target,
                         prereq_build    => $prereq_build,
                     );
+
+        my $metadata = $dist->status->_metadata;
+        my $x_use_unsafe_inc = ( defined $metadata && exists $metadata->{x_use_unsafe_inc} ? $metadata->{x_use_unsafe_inc} : undef );
+        $x_use_unsafe_inc = 1 unless defined $x_use_unsafe_inc;
+
+        local $ENV{PERL_USE_UNSAFE_INC} = $x_use_unsafe_inc
+          unless exists $ENV{PERL_USE_UNSAFE_INC};
 
         unless( $cb->_chdir( dir => $dir ) ) {
             error( loc( "Could not chdir to build directory '%1'", $dir ) );
@@ -624,7 +632,11 @@ sub install {
     my @buildflags = $dist->_buildflags_as_list( $buildflags );
     my @run_perl    = $dist->_perlrun();
 
-    local $ENV{PERL_USE_UNSAFE_INC} = 1
+    my $metadata = $dist->status->_metadata;
+    my $x_use_unsafe_inc = ( defined $metadata && exists $metadata->{x_use_unsafe_inc} ? $metadata->{x_use_unsafe_inc} : undef );
+    $x_use_unsafe_inc = 1 unless defined $x_use_unsafe_inc;
+
+    local $ENV{PERL_USE_UNSAFE_INC} = $x_use_unsafe_inc
       unless exists $ENV{PERL_USE_UNSAFE_INC};
 
     ### hmm, how is this going to deal with sudo?
@@ -736,7 +748,7 @@ CPANPLUS::Dist::Build - CPANPLUS plugin to install packages that use Build.PL
 
 =head1 VERSION
 
-version 0.86
+version 0.88
 
 =head1 SYNOPSIS
 

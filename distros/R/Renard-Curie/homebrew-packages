@@ -1,11 +1,4 @@
 gtk+3
-gtk-doc
 clutter-gtk
-gtk-engines
 gtk-mac-integration
-gtk-murrine-engine
-gtkextra
-gtkglext
-gtksourceview3
-gtkspell3
-webkitgtk
+gnome-icon-theme

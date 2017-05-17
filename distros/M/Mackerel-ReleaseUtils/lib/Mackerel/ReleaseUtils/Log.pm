@@ -41,4 +41,4 @@ sub errorf {
     die sprintf($fmt, @msg);
 }
 
-1
+1;

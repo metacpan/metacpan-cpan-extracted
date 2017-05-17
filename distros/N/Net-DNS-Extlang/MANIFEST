@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Net/DNS/Extlang.pm
+lib/Net/DNS/Extlang/Nsechelp.pm
+lib/Net/DNS/Extlang/Time.pm
+script/RRTYPEgen
+t/00-load.t
+t/01-pgm.t
+t/02-encode.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

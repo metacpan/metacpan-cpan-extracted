@@ -4,7 +4,7 @@
       "Masakazu Ohtsuka <o.masakazu@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.7",
+   "generated_by" : "Minilla/v3.0.10",
    "license" : [
       "perl_5"
    ],
@@ -63,7 +63,7 @@
    "provides" : {
       "App::Prove::Plugin::MySQLPool" : {
          "file" : "lib/App/Prove/Plugin/MySQLPool.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "TAP::Formatter::MySQLPool" : {
          "file" : "lib/App/Prove/Plugin/MySQLPool.pm"
@@ -78,16 +78,17 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/mash/App-Prove-Plugin-MySQLPool/issues"
+         "web" : "https://github.com/mackee/App-Prove-Plugin-MySQLPool/issues"
       },
-      "homepage" : "https://github.com/mash/App-Prove-Plugin-MySQLPool",
+      "homepage" : "https://github.com/mackee/App-Prove-Plugin-MySQLPool",
       "repository" : {
-         "url" : "git://github.com/mash/App-Prove-Plugin-MySQLPool.git",
-         "web" : "https://github.com/mash/App-Prove-Plugin-MySQLPool"
+         "url" : "git://github.com/mackee/App-Prove-Plugin-MySQLPool.git",
+         "web" : "https://github.com/mackee/App-Prove-Plugin-MySQLPool"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_contributors" : [
+      "skozawa <skozawa@hatena.ne.jp>",
       "Ichinose Shogo <shogo82148@gmail.com>",
       "mackee <macopy123@gmail.com>"
    ],

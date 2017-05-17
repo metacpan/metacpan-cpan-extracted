@@ -28,7 +28,7 @@ Unfortunately, you must ensure that the tree representation specified
 in Config::Model and Augeas lens are quite close together:
 - Config::Model element names and Augeas lens names must be identical
 - Both structures must be very close. Each Config::Model node must
-  have a corresponsing lens.
+  have a corresponding lens.
 
 See Config::Model::Backend::Augeas documentation to use Augeas with
 your configuration model.

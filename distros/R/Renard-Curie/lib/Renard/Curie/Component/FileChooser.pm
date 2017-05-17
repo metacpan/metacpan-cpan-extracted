@@ -1,7 +1,7 @@
 use Renard::Curie::Setup;
 package Renard::Curie::Component::FileChooser;
 # ABSTRACT: Component that implements a file chooser dialog
-$Renard::Curie::Component::FileChooser::VERSION = '0.001';
+$Renard::Curie::Component::FileChooser::VERSION = '0.002';
 use Moo;
 use Renard::Curie::Types qw(InstanceOf);
 use Function::Parameters;
@@ -16,7 +16,7 @@ has pdf_filter => (
 	isa => InstanceOf['Gtk3::FileFilter'],
 );
 
-method _build_all_filter :ReturnType(InstanceOf['Gtk3::FileFilter']) {
+method _build_all_filter() :ReturnType(InstanceOf['Gtk3::FileFilter']) {
 	my $filter = Gtk3::FileFilter->new;
 	$filter->set_name("All files");
 	$filter->add_pattern("*");
@@ -24,7 +24,7 @@ method _build_all_filter :ReturnType(InstanceOf['Gtk3::FileFilter']) {
 	return $filter;
 }
 
-method _build_pdf_filter :ReturnType(InstanceOf['Gtk3::FileFilter']) {
+method _build_pdf_filter() :ReturnType(InstanceOf['Gtk3::FileFilter']) {
 	my $filter = Gtk3::FileFilter->new;
 	$filter->set_name("PDF files");
 	$filter->add_mime_type("application/pdf");
@@ -71,7 +71,7 @@ Renard::Curie::Component::FileChooser - Component that implements a file chooser
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 EXTENDS
 

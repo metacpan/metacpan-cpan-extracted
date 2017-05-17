@@ -28,71 +28,71 @@ no_index:
 provides:
   ObjectDB:
     file: lib/ObjectDB.pm
-    version: '3.19'
+    version: '3.20'
   ObjectDB::DBHPool:
     file: lib/ObjectDB/DBHPool.pm
-    version: '3.19'
+    version: '3.20'
   ObjectDB::DBHPool::Connection:
     file: lib/ObjectDB/DBHPool/Connection.pm
-    version: '3.19'
+    version: '3.20'
   ObjectDB::Exception:
     file: lib/ObjectDB/Exception.pm
   ObjectDB::Factory:
     file: lib/ObjectDB/Factory.pm
-    version: '3.19'
+    version: '3.20'
   ObjectDB::Meta:
     file: lib/ObjectDB/Meta.pm
-    version: '3.19'
+    version: '3.20'
   ObjectDB::Meta::Relationship:
     file: lib/ObjectDB/Meta/Relationship.pm
-    version: '3.19'
+    version: '3.20'
   ObjectDB::Meta::Relationship::ManyToMany:
     file: lib/ObjectDB/Meta/Relationship/ManyToMany.pm
-    version: '3.19'
+    version: '3.20'
   ObjectDB::Meta::Relationship::ManyToOne:
     file: lib/ObjectDB/Meta/Relationship/ManyToOne.pm
-    version: '3.19'
+    version: '3.20'
   ObjectDB::Meta::Relationship::OneToMany:
     file: lib/ObjectDB/Meta/Relationship/OneToMany.pm
-    version: '3.19'
+    version: '3.20'
   ObjectDB::Meta::Relationship::OneToOne:
     file: lib/ObjectDB/Meta/Relationship/OneToOne.pm
-    version: '3.19'
+    version: '3.20'
   ObjectDB::Meta::RelationshipFactory:
     file: lib/ObjectDB/Meta/RelationshipFactory.pm
-    version: '3.19'
+    version: '3.20'
   ObjectDB::Quoter:
     file: lib/ObjectDB/Quoter.pm
-    version: '3.19'
+    version: '3.20'
   ObjectDB::Related:
     file: lib/ObjectDB/Related.pm
-    version: '3.19'
+    version: '3.20'
   ObjectDB::Related::ManyToMany:
     file: lib/ObjectDB/Related/ManyToMany.pm
-    version: '3.19'
+    version: '3.20'
   ObjectDB::Related::ManyToOne:
     file: lib/ObjectDB/Related/ManyToOne.pm
-    version: '3.19'
+    version: '3.20'
   ObjectDB::Related::OneToMany:
     file: lib/ObjectDB/Related/OneToMany.pm
-    version: '3.19'
+    version: '3.20'
   ObjectDB::Related::OneToOne:
     file: lib/ObjectDB/Related/OneToOne.pm
-    version: '3.19'
+    version: '3.20'
   ObjectDB::RelatedFactory:
     file: lib/ObjectDB/RelatedFactory.pm
-    version: '3.19'
+    version: '3.20'
   ObjectDB::Stmt:
     file: lib/ObjectDB/Table.pm
   ObjectDB::Table:
     file: lib/ObjectDB/Table.pm
-    version: '3.19'
+    version: '3.20'
   ObjectDB::Util:
     file: lib/ObjectDB/Util.pm
-    version: '3.19'
+    version: '3.20'
   ObjectDB::With:
     file: lib/ObjectDB/With.pm
-    version: '3.19'
+    version: '3.20'
 recommends:
   DBIx::Inspector: '0'
 requires:
@@ -106,7 +106,7 @@ resources:
   bugtracker: https://github.com/vti/object-db/issues
   homepage: https://github.com/vti/object-db
   repository: git://github.com/vti/object-db.git
-version: '3.19'
+version: '3.20'
 x_contributors:
   - 'vti <vti@clarive.com>'
   - 'vti <viacheslav.t@gmail.com>'

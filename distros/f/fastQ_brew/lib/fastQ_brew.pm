@@ -29,9 +29,10 @@ fastQ_brew - a module for preprocessing of fastQ formatted files
                     library_type  => $lib || "illumina",
                     file_path     => $file_path,
                     in_file       => $in_file,
+                    summary       => "Y",
                     de_duplex     => "Y",
-                    qual_filter   => 1200,
-                    length_filter => 80,
+                    qual_filter   => 30,
+                    length_filter => 25,
                     adapter_left  => "GTACGTGTGGTGGGGAT",
                     mismatches_l  => 1,
                     adapter_right => "TAGCGCGCGATGATT",
@@ -124,9 +125,10 @@ sub new {
                     library_type  => $lib || "illumina",
                     file_path     => $file_path,
                     in_file       => $in_file,
+                    summary       => "Y",
                     de_duplex     => "Y",
-                    qual_filter   => 1200,
-                    length_filter => 80,
+                    qual_filter   => 30,
+                    length_filter => 25,
                     adapter_left  => "GTACGTGTGGTGGGGAT",
                     mismatches_l  => 1,
                     adapter_right => "GTACGTGTGGTGGGGAT",
@@ -145,6 +147,7 @@ sub new {
  -library_type, either sanger or illumina
  -file_path, path to sequences
  -in_file, the name of the files containing the fastQ reads
+ -summary, return summary statistics for the unfiltered and filtered fastq data
  -de_duplex, remove duplicate entries
  -qual_filter, fiter reads by Q score: N=no, 200=remove reads with Quality (Q) scores below 200
  -adapter_left, remove adapter from left side
@@ -177,6 +180,7 @@ sub load_fastQ_brew {
     }
 
     # default obj attributes or user specifications
+    $self->{summary}       = $arg{summary}       || "N";
     $self->{de_duplex}     = $arg{de_duplex}     || "N";
     $self->{fasta_convert} = $arg{fasta_convert} || "N";
     $self->{adapter_left}  = $arg{adapter_left}  || "N";
@@ -191,17 +195,15 @@ sub load_fastQ_brew {
     $self->{dna_rna}       = $arg{dna_rna}       || "N";
     $self->{remove_n}      = $arg{remove_n}      || "N";
     $self->{cleanup}       = $arg{cleanup}       || "N";
-
-    $self->_io_file(%arg);
 }
 
 ##################################
 
-=head2 _io_file()
+=head2 run_fastQ_brew()
 
- Title   : _io_file()
- Usage   : $self->_io_file(%arg)
- Function: processes the input file
+ Title   : run_fastQ_brew()
+ Usage   : $self->run_fastQ_brew(%arg)
+ Function: processes the input file and start cycle
  Returns : tmp file with only phred score and sequence for each read
  Args    : fastQ file
 
@@ -209,7 +211,7 @@ sub load_fastQ_brew {
 
 ##################################
 
-sub _io_file {
+sub run_fastQ_brew {
     my ( $self, %arg ) = @_;
 
     # calculate execution time
@@ -235,15 +237,16 @@ sub _io_file {
     # close handles
     close $fh;
     close $fn;
+    $self->_summary_stats(%arg);
 }
 
 ###################################
 
-=head2 run_fastQ_brew()
+=head2 _summary_stats()
 
- Title   : run_fastQ_brew()
- Usage   : run_fastQ_brew();
- Function: starts the analysis of the fastQ file
+ Title   : _summary_stats()
+ Usage   : _summary_stats();
+ Function: runs the summary stats
  Returns : the stats
  Args    : $self, %arg
 
@@ -251,141 +254,147 @@ sub _io_file {
 
 ##################################
 
-sub run_fastQ_brew {
+sub _summary_stats {
     my ( $self, %arg ) = @_;
+    if ( $self->{summary} eq "Y" ) {
 
-    # open the newfile to read
-    open my $fn, '<', $self->{temp_file}
-      or die "Cannot open  $self->{temp_file}: $!";
-    my $counter;
+        # open the newfile to read
+        open my $fn, '<', $self->{temp_file}
+          or die "Cannot open  $self->{temp_file}: $!";
+        my $counter;
 
-    # array container for reads gc%
-    my @gc_content;
+        # array container for reads gc%
+        my @gc_content;
 
-    # array container for reads lengths
-    my @read_len;
+        # array container for reads lengths
+        my @read_len;
 
-    # array container for read phred scores
-    my @phred;
+        # array container for read phred scores
+        my @phred;
 
-    # array container for read probability
-    my @prob;
+        # array container for read probability
+        my @prob;
 
-    # the 1st line 3rd, lines etc.. (i.e. odd #'s) contain
-    # the read sequence
-    print "\ncalculating stats...\n\n\n";
-    while ( my $row = <$fn> ) {
-        chomp $row;
-        $counter++;
-        if ( $counter % 2 != 0 ) {
+        # the 1st line 3rd, lines etc.. (i.e. odd #'s) contain
+        # the read sequence
+        print "\ncalculating stats...\n\n\n";
+        while ( my $row = <$fn> ) {
+            chomp $row;
+            $counter++;
+            if ( $counter % 2 != 0 ) {
 
-            # Calculate percent GC
-            my $percent_GC = calcgc($row);
+                # Calculate percent GC
+                my $percent_GC = calcgc($row);
 
-            # round the percent GC
-            my $percentGC_rounded = sprintf( "%0.1f", $percent_GC );
+                # round the percent GC
+                my $percentGC_rounded = sprintf( "%0.1f", $percent_GC );
 
-            # push gc% and length into arrays
-            push @gc_content, $percentGC_rounded;
-            push @read_len,   length($row);
+                # push gc% and length into arrays
+                push @gc_content, $percentGC_rounded;
+                push @read_len,   length($row);
+            }
+            elsif ( $counter % 2 == 0 ) {
+
+                # Calculate phred score
+                my $calc_phred = phred_calc( $row, $self->{library_type} );
+
+                # Calculate read probability
+                my $calc_prob = prob_calc( $row, $self->{library_type} );
+
+                # push phred and prob into arrays
+                push @phred, $calc_phred;
+                push @prob,  $calc_prob;
+            }
         }
-        elsif ( $counter % 2 == 0 ) {
+        close $fn;
 
-            # Calculate phred score
-            my $calc_phred = phred_calc( $row, $self->{library_type} );
+        #add ref to phred score array into obj
+        $self->{phreds} = \@phred;
 
-            # Calculate read probability
-            my $calc_prob = prob_calc( $row, $self->{library_type} );
+        #add ref to phred score array into obj
+        $self->{read_length} = \@read_len;
 
-            # push phred and prob into arrays
-            push @phred, $calc_phred;
-            push @prob,  $calc_prob;
-        }
+        # calulate the min, max, and average
+        # for the gc% from array @gc_content
+        my $min_gc = min(@gc_content);
+        my $max_gc = max(@gc_content);
+        my $avg_gc =
+          scalar @gc_content
+          ? ( sum(@gc_content) / ( scalar @gc_content ) )
+          : 0;
+
+        # calulate the min, max, and average
+        # for the read length from array @read_len
+        my $min_len = min(@read_len);
+        my $max_len = max(@read_len);
+        my $avg_len =
+          scalar @read_len
+          ? ( sum(@read_len) / ( scalar @read_len ) )
+          : 0;
+
+        # calulate the min, max, and average
+        # for the phred scores from array @phred
+        my $min_phred = min(@phred);
+        my $max_phred = max(@phred);
+        my $avg_phred =
+          scalar @phred
+          ? ( sum(@phred) / ( scalar @phred ) )
+          : 0;
+
+        # calulate the min, max, and average
+        # for the read prob from array @prob
+        my $min_prob = min(@prob);
+        my $max_prob = max(@prob);
+        my $avg_prob =
+          scalar @prob
+          ? ( sum(@prob) / ( scalar @prob ) )
+          : 0;
+
+        # print execution time
+        my $duration = time - $self->{start};
+
+        # Results Table:
+        print "_________________________________________________________\n";
+        print "fastQ_brew PRE-FILTERED SUMMARY TABLE:\n";
+        print "_________________________________________________________\n";
+        print "*********************************************************\n";
+
+        # print total number of reads
+        print "| Total reads    \t\t => ", scalar @gc_content, "\n";
+
+        # print the min, max, and average
+        print "| largest GC% value \t\t => ",  $max_gc, "%\n";
+        print "| smallest GC% value \t\t => ", $min_gc, "%\n";
+        print "| average GC% value \t\t => ", sprintf( "%0.1f", $avg_gc ),
+          "%\n";
+
+        print "*********************************************************\n";
+
+        print "| largest read length value \t => ",  $max_len, " bases\n";
+        print "| smallest read length value \t => ", $min_len, " bases\n";
+        print "| average read length value \t => ",
+          sprintf( "%0.1f", $avg_len ),
+          " bases\n";
+
+        print "*********************************************************\n";
+
+        print "| largest read phred score \t => ",  $max_phred, "\n";
+        print "| smallest read phred score \t => ", $min_phred, "\n";
+        print "| average read phred score \t => ",
+          sprintf( "%0.1f", $avg_phred ),
+          "\n";
+
+        print "*********************************************************\n";
+
+        print "| largest read probability \t => ",  $max_prob, "\n";
+        print "| smallest read probability \t => ", $min_prob, "\n";
+        print "| average read probability \t => ",
+          sprintf( "%0.1f", $avg_prob ),
+          "\n";
+
+        print "_________________________________________________________\n";
+        print "_________________________________________________________\n";
     }
-    close $fn;
-
-    #add ref to phred score array into obj
-    $self->{phreds} = \@phred;
-
-    #add ref to phred score array into obj
-    $self->{read_length} = \@read_len;
-
-    # calulate the min, max, and average
-    # for the gc% from array @gc_content
-    my $min_gc = min(@gc_content);
-    my $max_gc = max(@gc_content);
-    my $avg_gc =
-      scalar @gc_content
-      ? ( sum(@gc_content) / ( scalar @gc_content ) )
-      : 0;
-
-    # calulate the min, max, and average
-    # for the read length from array @read_len
-    my $min_len = min(@read_len);
-    my $max_len = max(@read_len);
-    my $avg_len =
-      scalar @read_len
-      ? ( sum(@read_len) / ( scalar @read_len ) )
-      : 0;
-
-    # calulate the min, max, and average
-    # for the phred scores from array @phred
-    my $min_phred = min(@phred);
-    my $max_phred = max(@phred);
-    my $avg_phred =
-      scalar @phred
-      ? ( sum(@phred) / ( scalar @phred ) )
-      : 0;
-
-    # calulate the min, max, and average
-    # for the read prob from array @prob
-    my $min_prob = min(@prob);
-    my $max_prob = max(@prob);
-    my $avg_prob =
-      scalar @prob
-      ? ( sum(@prob) / ( scalar @prob ) )
-      : 0;
-
-    # print execution time
-    my $duration = time - $self->{start};
-
-    # Results Table:
-    print "_________________________________________________________\n";
-    print "fastQ_brew PRE-FILTERED SUMMARY TABLE:\n";
-    print "_________________________________________________________\n";
-    print "*********************************************************\n";
-
-    # print total number of reads
-    print "| Total reads    \t\t => ", scalar @gc_content, "\n";
-
-    # print the min, max, and average
-    print "| largest GC% value \t\t => ",  $max_gc, "%\n";
-    print "| smallest GC% value \t\t => ", $min_gc, "%\n";
-    print "| average GC% value \t\t => ", sprintf( "%0.1f", $avg_gc ), "%\n";
-
-    print "*********************************************************\n";
-
-    print "| largest read length value \t => ",  $max_len, " bases\n";
-    print "| smallest read length value \t => ", $min_len, " bases\n";
-    print "| average read length value \t => ", sprintf( "%0.1f", $avg_len ),
-      " bases\n";
-
-    print "*********************************************************\n";
-
-    print "| largest read phred score \t => ",  $max_phred, "\n";
-    print "| smallest read phred score \t => ", $min_phred, "\n";
-    print "| average read phred score \t => ", sprintf( "%0.1f", $avg_phred ),
-      "\n";
-
-    print "*********************************************************\n";
-
-    print "| largest read probability \t => ",  $max_prob, "\n";
-    print "| smallest read probability \t => ", $min_prob, "\n";
-    print "| average read probability \t => ", sprintf( "%0.1f", $avg_prob ),
-      "\n";
-
-    print "_________________________________________________________\n";
-    print "_________________________________________________________\n";
 
     $self->_de_duplex(%arg);
 }
@@ -415,28 +424,17 @@ sub _de_duplex {
         open my $fh, '<', $self->{in_file}
           or die "Cannot open $self->{in_file}: $!";
 
-        open my $fh_temp, '<', $self->{temp_file}
-          or die "Cannot open $self->{temp_file}: $!";
-
-        my $specificty = do { local $/; <$fh_temp> };
-        while (<$fh_temp>) {
-            $specificty .= $_;
-        }
-        close $fh_temp;
-
         open my $fh_out, '>', $no_dupes
           or die "Cannot open $no_dupes: $!";
 
+        my %seen;
         while (<$fh>) {
             chomp( $temp[0] = $_ );
             chomp( $temp[1] = <$fh> );
             chomp( $temp[2] = <$fh> );
             chomp( $temp[3] = <$fh> );
 
-            #count matches of read in file (should be 1 if no dupes)
-            my $number_counts = () = $specificty =~ /$temp[1]/g;
-
-            if ( $number_counts == 1 ) {
+            if ( !$seen{ $temp[1] }++ ) {
 
                 # Print to new de-duplicated file.
                 print $fh_out "$temp[0]\n";
@@ -1038,160 +1036,167 @@ sub _post_fastQ_brew {
     close $fqz;
     close $fqy;
 
-    # process fastq file
-    open my $fh, '<', $self->{in_file}
-      or die "Cannot open $self->{in_file}: $!";
-    print "\nprocessing output file...\n";
+    if ( $self->{summary} eq "Y" ) {
 
-    # new file will only contain the base pairs and quality scores
-    my $new_file = $self->{file_path} . "new_temp_" . $self->{in_file};
-    $self->{temp_file_post} = $new_file;
-    open my $fn, '>', $new_file or die "Cannot open $new_file: $!";
-    my $count;
-    while ( my $line = <$fh> ) {
-        $count++;
-        if ( $count % 2 == 0 ) {
-            print $fn $line;
+        # process fastq file
+        open my $fh, '<', $self->{in_file}
+          or die "Cannot open $self->{in_file}: $!";
+        print "\nprocessing output file...\n";
+
+        # new file will only contain the base pairs and quality scores
+        my $new_file = $self->{file_path} . "new_temp_" . $self->{in_file};
+        $self->{temp_file_post} = $new_file;
+        open my $fn, '>', $new_file or die "Cannot open $new_file: $!";
+        my $count;
+        while ( my $line = <$fh> ) {
+            $count++;
+            if ( $count % 2 == 0 ) {
+                print $fn $line;
+            }
         }
+
+        # close handles
+        close $fh;
+        close $fn;
+
+        # open the newfile to read
+        open my $fj, '<', $self->{temp_file_post}
+          or die "Cannot open  $self->{temp_file_post}: $!";
+        my $counter;
+
+        # array container for reads gc%
+        my @gc_content;
+
+        # array container for reads lengths
+        my @read_len;
+
+        # array container for read phred scores
+        my @phred;
+
+        # array container for read probability
+        my @prob;
+
+        # the 1st line 3rd, lines etc.. (i.e. odd #'s) contain
+        # the read sequence
+        print "\ncalculating stats...\n\n\n";
+        while ( my $row = <$fj> ) {
+            chomp $row;
+            $counter++;
+            if ( $counter % 2 != 0 ) {
+
+                # Calculate percent GC
+                my $percent_GC = calcgc($row);
+
+                # round the percent GC
+                my $percentGC_rounded = sprintf( "%0.1f", $percent_GC );
+
+                # push gc% and length into arrays
+                push @gc_content, $percentGC_rounded;
+                push @read_len,   length($row);
+            }
+            elsif ( $counter % 2 == 0 ) {
+
+                # Calculate phred score
+                my $calc_phred = phred_calc( $row, $self->{library_type} );
+
+                # Calculate read probability
+                my $calc_prob = prob_calc( $row, $self->{library_type} );
+
+                # push phred and prob into arrays
+                push @phred, $calc_phred;
+                push @prob,  $calc_prob;
+            }
+        }
+        close $fj;
+
+        #add ref to phred score array into obj
+        $self->{phreds} = \@phred;
+
+        #add ref to phred score array into obj
+        $self->{read_length} = \@read_len;
+
+        # calulate the min, max, and average
+        # for the gc% from array @gc_content
+        my $min_gc = min(@gc_content);
+        my $max_gc = max(@gc_content);
+        my $avg_gc =
+          scalar @gc_content
+          ? ( sum(@gc_content) / ( scalar @gc_content ) )
+          : 0;
+
+        # calulate the min, max, and average
+        # for the read length from array @read_len
+        my $min_len = min(@read_len);
+        my $max_len = max(@read_len);
+        my $avg_len =
+          scalar @read_len
+          ? ( sum(@read_len) / ( scalar @read_len ) )
+          : 0;
+
+        # calulate the min, max, and average
+        # for the phred scores from array @phred
+        my $min_phred = min(@phred);
+        my $max_phred = max(@phred);
+        my $avg_phred =
+          scalar @phred
+          ? ( sum(@phred) / ( scalar @phred ) )
+          : 0;
+
+        # calulate the min, max, and average
+        # for the read prob from array @prob
+        my $min_prob = min(@prob);
+        my $max_prob = max(@prob);
+        my $avg_prob =
+          scalar @prob
+          ? ( sum(@prob) / ( scalar @prob ) )
+          : 0;
+
+        # print execution time
+        my $duration = time - $self->{start};
+
+        # Results Table:
+        print "_________________________________________________________\n";
+        print "fastQ_brew POST-FILTERED SUMMARY TABLE:\n";
+        print "_________________________________________________________\n";
+        print "*********************************************************\n";
+        print "| Execution time \t\t => $duration secs\n";
+
+        # print total number of reads
+        print "| Total reads    \t\t => ", scalar @gc_content, "\n";
+
+        # print the min, max, and average
+        print "| largest GC% value \t\t => ",  $max_gc, "%\n";
+        print "| smallest GC% value \t\t => ", $min_gc, "%\n";
+        print "| average GC% value \t\t => ", sprintf( "%0.1f", $avg_gc ),
+          "%\n";
+
+        print "*********************************************************\n";
+
+        print "| largest read length value \t => ",  $max_len, " bases\n";
+        print "| smallest read length value \t => ", $min_len, " bases\n";
+        print "| average read length value \t => ",
+          sprintf( "%0.1f", $avg_len ),
+          " bases\n";
+
+        print "*********************************************************\n";
+
+        print "| largest read phred score \t => ",  $max_phred, "\n";
+        print "| smallest read phred score \t => ", $min_phred, "\n";
+        print "| average read phred score \t => ",
+          sprintf( "%0.1f", $avg_phred ),
+          "\n";
+
+        print "*********************************************************\n";
+
+        print "| largest read probability \t => ",  $max_prob, "\n";
+        print "| smallest read probability \t => ", $min_prob, "\n";
+        print "| average read probability \t => ",
+          sprintf( "%0.1f", $avg_prob ),
+          "\n";
+
+        print "_________________________________________________________\n";
+        print "_________________________________________________________\n";
     }
-
-    # close handles
-    close $fh;
-    close $fn;
-
-    # open the newfile to read
-    open my $fj, '<', $self->{temp_file_post}
-      or die "Cannot open  $self->{temp_file_post}: $!";
-    my $counter;
-
-    # array container for reads gc%
-    my @gc_content;
-
-    # array container for reads lengths
-    my @read_len;
-
-    # array container for read phred scores
-    my @phred;
-
-    # array container for read probability
-    my @prob;
-
-    # the 1st line 3rd, lines etc.. (i.e. odd #'s) contain
-    # the read sequence
-    print "\ncalculating stats...\n\n\n";
-    while ( my $row = <$fj> ) {
-        chomp $row;
-        $counter++;
-        if ( $counter % 2 != 0 ) {
-
-            # Calculate percent GC
-            my $percent_GC = calcgc($row);
-
-            # round the percent GC
-            my $percentGC_rounded = sprintf( "%0.1f", $percent_GC );
-
-            # push gc% and length into arrays
-            push @gc_content, $percentGC_rounded;
-            push @read_len,   length($row);
-        }
-        elsif ( $counter % 2 == 0 ) {
-
-            # Calculate phred score
-            my $calc_phred = phred_calc( $row, $self->{library_type} );
-
-            # Calculate read probability
-            my $calc_prob = prob_calc( $row, $self->{library_type} );
-
-            # push phred and prob into arrays
-            push @phred, $calc_phred;
-            push @prob,  $calc_prob;
-        }
-    }
-    close $fj;
-
-    #add ref to phred score array into obj
-    $self->{phreds} = \@phred;
-
-    #add ref to phred score array into obj
-    $self->{read_length} = \@read_len;
-
-    # calulate the min, max, and average
-    # for the gc% from array @gc_content
-    my $min_gc = min(@gc_content);
-    my $max_gc = max(@gc_content);
-    my $avg_gc =
-      scalar @gc_content
-      ? ( sum(@gc_content) / ( scalar @gc_content ) )
-      : 0;
-
-    # calulate the min, max, and average
-    # for the read length from array @read_len
-    my $min_len = min(@read_len);
-    my $max_len = max(@read_len);
-    my $avg_len =
-      scalar @read_len
-      ? ( sum(@read_len) / ( scalar @read_len ) )
-      : 0;
-
-    # calulate the min, max, and average
-    # for the phred scores from array @phred
-    my $min_phred = min(@phred);
-    my $max_phred = max(@phred);
-    my $avg_phred =
-      scalar @phred
-      ? ( sum(@phred) / ( scalar @phred ) )
-      : 0;
-
-    # calulate the min, max, and average
-    # for the read prob from array @prob
-    my $min_prob = min(@prob);
-    my $max_prob = max(@prob);
-    my $avg_prob =
-      scalar @prob
-      ? ( sum(@prob) / ( scalar @prob ) )
-      : 0;
-
-    # print execution time
-    my $duration = time - $self->{start};
-
-    # Results Table:
-    print "_________________________________________________________\n";
-    print "fastQ_brew POST-FILTERED SUMMARY TABLE:\n";
-    print "_________________________________________________________\n";
-    print "*********************************************************\n";
-    print "| Execution time \t\t => $duration secs\n";
-
-    # print total number of reads
-    print "| Total reads    \t\t => ", scalar @gc_content, "\n";
-
-    # print the min, max, and average
-    print "| largest GC% value \t\t => ",  $max_gc, "%\n";
-    print "| smallest GC% value \t\t => ", $min_gc, "%\n";
-    print "| average GC% value \t\t => ", sprintf( "%0.1f", $avg_gc ), "%\n";
-
-    print "*********************************************************\n";
-
-    print "| largest read length value \t => ",  $max_len, " bases\n";
-    print "| smallest read length value \t => ", $min_len, " bases\n";
-    print "| average read length value \t => ", sprintf( "%0.1f", $avg_len ),
-      " bases\n";
-
-    print "*********************************************************\n";
-
-    print "| largest read phred score \t => ",  $max_phred, "\n";
-    print "| smallest read phred score \t => ", $min_phred, "\n";
-    print "| average read phred score \t => ", sprintf( "%0.1f", $avg_phred ),
-      "\n";
-
-    print "*********************************************************\n";
-
-    print "| largest read probability \t => ",  $max_prob, "\n";
-    print "| smallest read probability \t => ", $min_prob, "\n";
-    print "| average read probability \t => ", sprintf( "%0.1f", $avg_prob ),
-      "\n";
-
-    print "_________________________________________________________\n";
-    print "_________________________________________________________\n";
 
     $self->_cleanup(%arg);
 }
@@ -1216,7 +1221,9 @@ sub _cleanup {
 
         # delete tmp file
         unlink $self->{temp_file};
-        unlink $self->{temp_file_post};
+        if ( $self->{temp_file_post} ) {
+            unlink $self->{temp_file_post};
+        }
         unlink "temp_";
         unlink "temp__";
         unlink "temp___";
@@ -1225,6 +1232,8 @@ sub _cleanup {
         unlink "temp______";
         unlink "temp_______";
         unlink "temp________";
+
+        # TODO: glob all this
     }
     print "\n\nall done....\n\n";
 }

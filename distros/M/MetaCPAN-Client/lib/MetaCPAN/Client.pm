@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client;
 # ABSTRACT: A comprehensive, DWIM-featured client to the MetaCPAN API
-$MetaCPAN::Client::VERSION = '2.014000';
+$MetaCPAN::Client::VERSION = '2.015000';
 use Moo;
 use Carp;
 use Ref::Util qw< is_arrayref is_hashref >;
@@ -390,7 +390,7 @@ MetaCPAN::Client - A comprehensive, DWIM-featured client to the MetaCPAN API
 
 =head1 VERSION
 
-version 2.014000
+version 2.015000
 
 =head1 SYNOPSIS
 
@@ -542,8 +542,8 @@ Returns a L<MetaCPAN::Client::Permission> object.
 
     my $deps = $mcpan->reverse_dependencies('Search::Elasticsearch');
 
-all L<MetaCPAN::Client::Release> objects of releases that are dependent
-on a given module, returned as L<MetaCPAN::Client::ResultSet>.
+all L<MetaCPAN::Client::Release> objects of releases that are directly
+dependent on a given module, returned as L<MetaCPAN::Client::ResultSet>.
 
 =head2 rev_deps
 

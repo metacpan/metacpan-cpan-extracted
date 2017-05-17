@@ -1,3 +1,7 @@
+2017-05-14  Dominique Dumont  <domi.dumont@free.fr> v0.120
+
+   * tweak test to cope with '.' removal from @INC
+
 2016-08-17  Dominique Dumont  <domi.dumont@free.fr> v0.119
 
    * Do not use system Perl to re-run test (RT #116750).

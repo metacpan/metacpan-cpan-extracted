@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-PPPort
 
+0.008     2017-05-14 17:42:16+02:00 Europe/Paris
+          - in the after_build phase, use the ppport.h file to print any
+            suggested changes to the local code.
+
 0.007     2014-04-26 00:13:51CEST+0200 Europe/Amsterdam
           Support Module::Build style ppport paths
           Add a develop requirement on Devel::PPPort

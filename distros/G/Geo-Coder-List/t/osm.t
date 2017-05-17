@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use Test::Most tests => 24;
 use Test::NoWarnings;
-use Test::Number::Delta within => 1e-2;
 
 eval 'use autodie qw(:all)';	# Test for open/close failures
 
@@ -14,10 +13,16 @@ BEGIN {
 
 OSM: {
 	SKIP: {
+		skip 'Test requires Internet access', 22 unless(-e 't/online.enabled');
+
 		eval {
 			require Geo::Coder::OSM;
 
 			Geo::Coder::OSM->import;
+
+			require Test::Number::Delta;
+
+			Test::Number::Delta->import();
 		};
 
 		if($@) {
@@ -35,27 +40,27 @@ OSM: {
 		my $location = $geocoderlist->geocode('Silver Spring, MD, USA');
 		ok(defined($location));
 		ok(ref($location) eq 'HASH');
-		delta_ok($location->{geometry}{location}{lat}, 38.991);
-		delta_ok($location->{geometry}{location}{lng}, -77.026);
+		delta_within($location->{geometry}{location}{lat}, 38.99, 1e-1);
+		delta_within($location->{geometry}{location}{lng}, -77.02, 1e-1);
 
 		$location = $geocoderlist->geocode('10 Downing St, London, UK');
 		ok(defined($location));
 		ok(ref($location) eq 'HASH');
-		delta_ok($location->{geometry}{location}{lat}, 51.50);
-		delta_ok($location->{geometry}{location}{lng}, -0.13);
+		delta_within($location->{geometry}{location}{lat}, 51.50, 1e-1);
+		delta_within($location->{geometry}{location}{lng}, -0.13, 1e-1);
 
 		# But putting it here succeeds!
 		$location = $geocoderlist->geocode('Rochester, Kent, England');
 		ok(defined($location));
 		ok(ref($location) eq 'HASH');
-		delta_ok($location->{geometry}{location}{lat}, 51.388);
-		delta_ok($location->{geometry}{location}{lng}, 0.50672);
+		delta_within($location->{geometry}{location}{lat}, 51.38, 1e-1);
+		delta_within($location->{geometry}{location}{lng}, 0.5067, 1e-1);
 
 		$location = $geocoderlist->geocode(location => '8600 Rockville Pike, Bethesda MD, 20894 USA');
 		ok(defined($location));
 		ok(ref($location) eq 'HASH');
-		delta_ok($location->{geometry}{location}{lat}, 39.00);
-		delta_ok($location->{geometry}{location}{lng}, -77.10);
+		delta_within($location->{geometry}{location}{lat}, 39.00, 1e-1);
+		delta_within($location->{geometry}{location}{lng}, -77.10, 1e-1);
 
 		# Check list context finds both Portland, ME and Portland, OR
 		my @locations = $geocoderlist->geocode('Portland, USA');

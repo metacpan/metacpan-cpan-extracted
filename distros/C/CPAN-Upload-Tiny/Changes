@@ -1,5 +1,8 @@
 Revision history for CPAN-Upload-Tiny
 
+0.004     2017-05-14 12:30:44+02:00 Europe/Paris
+          - Fix user attribute name
+
 0.003     2017-04-10 00:44:36+02:00 Europe/Amsterdam
           - Ignore entries other than the username or password
           - Give feedback on success

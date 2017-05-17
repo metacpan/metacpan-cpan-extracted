@@ -1,0 +1,102 @@
+=head1 NAME
+
+Imgur::API::Model::Account
+
+=head1 DESCRIPTION
+
+=over 4
+
+This model is used to represent the basic account information.
+
+=back
+
+=cut
+
+=head1 FIELDS
+ 
+=item 
+C<id I<Integer>>
+
+=over 4
+
+The account id for the username requested.
+
+=back
+
+
+=item 
+C<url I<String>>
+
+=over 4
+
+The account username, will be the same as requested in the URL
+
+=back
+
+
+=item 
+C<bio I<String>>
+
+=over 4
+
+A basic description the user has filled out
+
+=back
+
+
+=item 
+C<reputation I<Float>>
+
+=over 4
+
+The reputation for the account, in it's numerical format.
+
+=back
+
+
+=item 
+C<created I<Integer>>
+
+=over 4
+
+The epoch time of account creation
+
+=back
+
+
+=item 
+C<pro_expiration I<Integer or Boolean>>
+
+=over 4
+
+False if not a pro user, their expiration date if they are.
+
+=back
+
+
+
+=head1 EXAMPLE
+
+
+ {
+   "success" : true,
+   "status" : 200,
+   "data" : {
+      "url" : "joshTest",
+      "reputation" : 15303.84,
+      "bio" : "A real hoopy frood who really knows where his towel is at.",
+      "created" : 1376951504,
+      "pro_expiration" : false,
+      "id" : 384077
+   }
+}
+
+
+
+=cut
+
+=head1 SEE ALSO
+
+http://api.imgur.com/models/account
+
+

@@ -11,6 +11,7 @@ BEGIN {
 use File::Temp qw/tempdir/;
 use File::Which qw/which/;
 
+use lib '.';
 use t::Util;
 use Devel::Cover::Report::Codecov::Service::Git;
 sub detect { Devel::Cover::Report::Codecov::Service::Git->detect(@_) }

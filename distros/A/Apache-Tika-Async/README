@@ -1,0 +1,49 @@
+Apache::Tika::Async - connect to Apache Tika
+
+
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+
+REPOSITORY
+
+The public repository of this module is
+L<https://github.com/Corion/apache-tika>.
+
+SUPPORT
+
+The public support forum of this module is
+L<https://perlmonks.org/>.
+
+BUG TRACKER
+
+Please report bugs in this module via the RT CPAN bug queue at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Apache-Tika-Async>
+or via mail to L<apache-tika-async-Bugs@rt.cpan.org>.
+
+AUTHOR
+
+Max Maischein C<corion@cpan.org>
+
+LICENSE
+
+This module is released under the same terms as Perl itself.
+
+COPYRIGHT (c)
+
+Copyright 2014-2016 by Max Maischein C<corion@cpan.org>.

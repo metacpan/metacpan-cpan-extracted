@@ -1,0 +1,15 @@
+lib/
+lib/Perl2Package.pm
+lib/Perl2Package.pod
+lib/Distribution.pm
+lib/Distribution
+lib/Distribution/RPM.pm
+lib/MakeRPM.pm
+scripts/perl2rpm
+scripts/perl2deb
+Makefile.PL
+MANIFEST
+
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

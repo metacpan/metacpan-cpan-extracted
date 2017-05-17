@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '3.28';
+$Map::Tube::VERSION   = '3.29';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube - Core library as Role (Moo) to process map data.
 
 =head1 VERSION
 
-Version 3.28
+Version 3.29
 
 =cut
 
@@ -121,7 +121,9 @@ sub AUTOLOAD {
 sub BUILD {
     my ($self) = @_;
 
-    unless (exists $self->{xml} || exists $self->{json}) {
+    # Handle lazy attributes.
+    my @methods = $self->meta->get_method_list;
+    unless ((grep /^xml$/, @methods) || (grep /^json$/, @methods)) {
         die "ERROR: Can't apply Map::Tube role, missing 'xml' or 'json'.";
     }
 
@@ -422,25 +424,29 @@ sub get_stations {
 sub get_map_data {
     my ($self, $caller, $method) = @_;
 
-    if (defined $self->{xml}) {
-        return XML::Twig->new->parsefile($self->xml)->simplify(keyattr => 'stations', forcearray => 0);
-    }
-    elsif (defined $self->{json}) {
-        return to_perl($self->json);
+    my $xml = $self->xml;
+    if ($xml ne '') {
+        return XML::Twig->new->parsefile($xml)->simplify(keyattr => 'stations', forcearray => 0);
     }
     else {
-        if (!defined $caller) {
-            $method = __PACKAGE__.'::get_map_data';
-            my @_caller = caller(0);
-            @_caller = caller(2) if $_caller[3] eq '(eval)';
-            $caller = \@_caller;
+        my $json = $self->json;
+        if ($json ne '') {
+            return to_perl($json);
         }
+        else {
+            if (!defined $caller) {
+                $method = __PACKAGE__.'::get_map_data';
+                my @_caller = caller(0);
+                @_caller = caller(2) if $_caller[3] eq '(eval)';
+                $caller = \@_caller;
+            }
 
-        Map::Tube::Exception::MissingMapData->throw({
-            method      => $method,
-            message     => "ERROR: Missing Map Data.",
-            filename    => $caller->[1],
-            line_number => $caller->[2] });
+            Map::Tube::Exception::MissingMapData->throw({
+                method      => $method,
+                message     => "ERROR: Missing Map Data.",
+                filename    => $caller->[1],
+                line_number => $caller->[2] });
+        }
     }
 }
 

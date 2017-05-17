@@ -7,7 +7,7 @@ use utf8;
 use Encode qw/encode decode/;
 use Unicode::Normalize qw/NFC/;
 
-our $VERSION = '0.001003';
+our $VERSION = '0.001004';
 
 use List::Util qw/first/;
 
@@ -23,7 +23,7 @@ sub new {
 			   tungjatjeta parev salam namaskaar mingalarba ahoy
 			   saluton allo moin aloha namaste shalom ciào ciao servus
 			   salve ave merhaba witaj hei hola selam sawubona
-			   geodemorgen hoi καλημέρα/,
+			   goedemorgen mogge hoi καλημέρα/,
 			'what\'s up', 'que tal', 'こんにちは', '你好', 'ni hao',
 			'добро јутро', 'γεια σας', 'bom dia', 'hyvää huomenta'],
 		@_
@@ -85,7 +85,7 @@ Marius Gavrilescu, E<lt>marius@ieval.roE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2013-2015 by Marius Gavrilescu
+Copyright (C) 2013-2017 by Marius Gavrilescu
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.2 or,

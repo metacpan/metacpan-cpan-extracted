@@ -1,6 +1,22 @@
 ==================================================
-Changes from 2012-02-19 00:00:00 +0000 to present.
+Changes from 2012-05-15 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 0.24 at 2017-05-14 14:11:32 +0000
+-----------------------------------------
+
+  Change: f68daf777f6a2a282bcdf32399989ed641d42f1a
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-05-14 15:11:32 +0000
+
+    Document bundle option in dzooky 
+
+  Change: 7e9ec263d8b5c8a712eb8fb9ae9df50a62f0a439
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-05-14 15:09:03 +0000
+
+    Fix a bug introduced with the bundle support 
 
 -----------------------------------------
 version 0.22 at 2017-02-17 19:58:46 +0000
@@ -79,5 +95,5 @@ version 0.12 at 2013-11-29 00:16:10 +0000
     [RT#90933] "New Moose may break your code" 
 
 ================================================
-Plus 5 releases after 2012-02-19 00:00:00 +0000.
+Plus 5 releases after 2012-05-15 00:00:00 +0000.
 ================================================

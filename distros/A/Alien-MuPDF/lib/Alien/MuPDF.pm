@@ -1,5 +1,5 @@
 package Alien::MuPDF;
-$Alien::MuPDF::VERSION = '0.007';
+$Alien::MuPDF::VERSION = '0.009';
 use strict;
 use warnings;
 
@@ -7,8 +7,8 @@ use parent qw(Alien::Base);
 use File::Spec;
 
 sub mutool_path {
-  my ($self) = @_;
-  File::Spec->catfile( $self->dist_dir , 'bin', 'mutool' );
+	my ($self) = @_;
+	File::Spec->catfile( File::Spec->rel2abs($self->dist_dir) , 'bin', 'mutool' );
 }
 
 sub inline_auto_include {
@@ -17,12 +17,34 @@ sub inline_auto_include {
 
 sub cflags {
 	my ($self) = @_;
-	my $top_include = File::Spec->catfile( $self->dist_dir, qw(include) );
+	my $top_include = File::Spec->catfile( File::Spec->rel2abs($self->dist_dir), qw(include) );
 	# We do not include $self->SUPER::cflags() because that adds too many
 	# header files to the path. In particular, it adds -Imupdf/fitz, which
 	# leads to "mupdf/fitz/math.h" being included when trying to include
 	# the C standard "math.h" header.
 	return "-I$top_include";
+}
+
+sub libs {
+	# third party
+	"-lcrypto";
+}
+
+sub Inline {
+	my ($self, $lang) = @_;
+
+	if('C') {
+		my $params = Alien::Base::Inline(@_);
+		$params->{MYEXTLIB} .= ' ' .
+			join( " ",
+				map { File::Spec->catfile(
+					File::Spec->rel2abs(Alien::MuPDF->dist_dir),
+					'lib',  $_ ) }
+				qw(libmupdf.a libmupdfthird.a)
+			);
+
+		return $params;
+	}
 }
 
 1;
@@ -37,7 +59,7 @@ Alien::MuPDF - Alien package for the MuPDF PDF rendering library
 
 =head1 VERSION
 
-version 0.007
+version 0.009
 
 =head1 METHODS
 

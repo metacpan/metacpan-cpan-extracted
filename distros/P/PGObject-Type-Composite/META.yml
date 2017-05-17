@@ -3,25 +3,28 @@ abstract: 'Composite Type handler for PGObject'
 author:
   - 'Chris Travers <chris.travers@gmail.com>'
 build_requires:
-  Test::More: 0
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.132140'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: PGObject-Type-Composite
 no_index:
   directory:
     - t
     - inc
 requires:
-  Carp: 0
-  DBI: 0
-  PGObject::Util::Catalog::Types: 0
+  Carp: '0'
+  DBI: '0'
+  PGObject::Util::Catalog::Types: '0'
   PGObject::Util::PseudoCSV: v1.1.0
-  Scalar::Util: 0
-  perl: 5.008
+  Scalar::Util: '0'
+  perl: '5.01'
 resources:
   repository: https://github.com/ledgersmb/PGObject-Type-Composite.git
-version: 0.04
+version: 1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

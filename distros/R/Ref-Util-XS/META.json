@@ -1,5 +1,5 @@
 {
-   "abstract" : "Utility functions for checking references",
+   "abstract" : "XS implementation for Ref::Util",
    "author" : [
       "Sawyer X <xsawyerx@cpan.org>",
       "Aaron Crane <arc@cpan.org>",
@@ -30,6 +30,7 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0",
             "Test::More" : "0.88",
             "Test::NoTabs" : "0",
             "Test::Pod" : "1.41"
@@ -39,7 +40,7 @@
          "requires" : {
             "Exporter" : "5.57",
             "XSLoader" : "0",
-            "perl" : "5.008"
+            "perl" : "5.006"
          }
       },
       "test" : {
@@ -50,14 +51,14 @@
             "B::Concise" : "0",
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0.96"
          }
       }
    },
    "provides" : {
       "Ref::Util::XS" : {
          "file" : "lib/Ref/Util/XS.pm",
-         "version" : "0.115"
+         "version" : "0.116"
       }
    },
    "release_status" : "stable",
@@ -71,7 +72,7 @@
          "web" : "https://github.com/p5pclub/ref-util-xs"
       }
    },
-   "version" : "0.115",
+   "version" : "0.116",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.022001"
@@ -298,6 +299,11 @@
             "version" : "6.008"
          },
          {
+            "class" : "Dist::Zilla::Plugin::Test::MinimumVersion",
+            "name" : "Test::MinimumVersion",
+            "version" : "2.000007"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::Git::Check",
             "config" : {
                "Dist::Zilla::Plugin::Git::Check" : {
@@ -358,7 +364,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.115",
+                  "tag" : "v0.116",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },

@@ -36,7 +36,7 @@ use PPI::Token::_QuoteEngine::Simple ();
 
 use vars qw{$VERSION @ISA};
 BEGIN {
-	$VERSION = '1.220';
+	$VERSION = '1.224';
 	@ISA     = qw{
 		PPI::Token::_QuoteEngine::Simple
 		PPI::Token::Quote
@@ -79,6 +79,9 @@ The C<simplify> method will, if possible, modify a simple double-quoted
 string token in place, turning it into the equivalent single-quoted
 string. If the token is modified, it is reblessed into the
 L<PPI::Token::Quote::Single> package.
+
+Because the length of the content is not changed, there is no need
+to call the document's C<flush_locations> method.
 
 The object itself is returned as a convenience.
 

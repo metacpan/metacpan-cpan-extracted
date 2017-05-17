@@ -1,13 +1,15 @@
 use Renard::Curie::Setup;
 package Renard::Curie::Helper;
+$Renard::Curie::Helper::VERSION = '0.002';
 # ABSTRACT: Collection of helper utilities for Gtk3 and Glib
-$Renard::Curie::Helper::VERSION = '0.001';
 
+
+use Renard::Curie::Types qw(Str);
 use Class::Method::Modifiers;
 use Gtk3;
 use Function::Parameters;
 
-fun import {
+fun _scrolled_window_viewport_shim() {
 	# Note: The code below is marked as uncoverable because it only applies
 	# to a single version of GTK+ and thus is not part of the general
 	# coverage. The functionality that it adds is tested in other ways.
@@ -25,14 +27,58 @@ fun import {
 		# - <https://developer.gnome.org/gtk3/3.8/GtkScrolledWindow.html>
 		Class::Method::Modifiers::install_modifier
 			"Gtk3::ScrolledWindow",
-			around => add => fun {
+			around => add => fun(@) {
 				# uncoverable subroutine
 				my $orig = shift;             # uncoverable statement
 				my $self = shift;             # uncoverable statement
 				$self->add_with_viewport(@_); # uncoverable statement
 			};                                    # uncoverable statement
 	}
+}
 
+fun _can_set_theme() {
+	# uncoverable branch true
+	return $^O ne 'MSWin32' && Gtk3::CHECK_VERSION('3', '20', '1');
+}
+
+fun _set_theme( (Str) $theme_name ) {
+	# uncoverable subroutine
+	# uncoverable branch true
+	return unless _can_set_theme;
+
+	my $adwaita = Gtk3::CssProvider::get_named('Adawaita')->to_string;  # uncoverable statement
+	my $custom = Gtk3::CssProvider::get_named($theme_name)->to_string;  # uncoverable statement
+	if( $adwaita ne $custom ) {                                         # uncoverable statement
+		my $settings = Gtk3::Settings::get_default;                 # uncoverable statement
+		$settings->set_property('gtk-theme-name', $theme_name);     # uncoverable statement
+	} else {                                                            # uncoverable statement
+		warn "Not able to find theme ${theme_name}.\n";             # uncoverable statement
+	}                                                                   # uncoverable statement
+}
+
+
+fun _set_icon_theme( (Str) $icon_theme_name ) {
+	# uncoverable subroutine
+	# uncoverable branch true
+	return unless _can_set_theme;
+
+	my $i = Gtk3::IconTheme->new;                                       # uncoverable statement
+	$i->set_custom_theme($icon_theme_name);                             # uncoverable statement
+	my $n = $i->choose_icon_for_scale(['gtk-open'], 16, 1, 'no-svg');   # uncoverable statement
+	my $expected_path = qr,/$icon_theme_name/.*\Qgtk-open.png\E$,;      # uncoverable statement
+	if ( defined $n && $n->get_filename =~ $expected_path ) {           # uncoverable statement
+		my $settings = Gtk3::Settings::get_default;                 # uncoverable statement
+		$settings->set_property('gtk-icon-theme-name',              # uncoverable statement
+			$icon_theme_name);                                  # uncoverable statement
+	} else {                                                            # uncoverable statement
+		warn "Not able to find icon-theme ${icon_theme_name}.\n";   # uncoverable statement
+	}                                                                   # uncoverable statement
+}
+
+sub import {
+	_scrolled_window_viewport_shim;
+	_set_theme('Flat-Plat');
+	_set_icon_theme('Arc');
 	return;
 }
 
@@ -68,7 +114,7 @@ Renard::Curie::Helper - Collection of helper utilities for Gtk3 and Glib
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 CLASS METHODS
 

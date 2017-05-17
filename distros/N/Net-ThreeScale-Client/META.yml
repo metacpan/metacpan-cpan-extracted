@@ -2,6 +2,9 @@
 abstract: 'Client for 3Scale.com web API version 2.0'
 author:
   - 'Owen Cliffe <zoot@zoot.org.uk>'
+  - 'Dave Lambley <cpan@davel.me.uk>'
+  - 'Ed Freyfogle'
+  - 'Marc Metten'
 build_requires: {}
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -15,6 +18,7 @@ name: Net-ThreeScale-Client
 requires:
   HTTP::Tiny: '0'
   Try::Tiny: '0'
+  URI: '0'
   URI::Escape::XS: '0'
   XML::Parser: '0'
   XML::Simple: '0'
@@ -23,4 +27,4 @@ resources:
   bugtracker: https://github.com/3scale/3scale_ws_api_for_perl/issues
   homepage: https://support.3scale.net/docs/deployment-options/code-libraries
   repository: git://github.com/3scale/3scale_ws_api_for_perl.git
-version: 2.1.5
+version: 2.1.6

@@ -1,2 +1,8 @@
+1.0.3    16.05.2017
+    - fix default pos value for find_last_of, find_last_not_of
+1.0.2    16.05.2017
+    - bugfix for stoX group of functions in case of no pos argument
+1.0.1    15.05.2017
+    - do not bootstrap so library (no XS code inside), it will be loaded automatically because of "-l" linker flag
 1.0.0    11.05.2017
     - C++ code moved from Panda::Lib

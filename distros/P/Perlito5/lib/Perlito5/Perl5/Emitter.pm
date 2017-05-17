@@ -55,6 +55,9 @@ package Perlito5::AST::Buf;
 {
     sub emit_perl5 {
         my $self  = $_[0];
+        if ($self->{is_vstring}) {
+            return join(".", map { ord($_) } split( //, $self->{buf} ));
+        }
         Perlito5::Perl5::escape_string( $self->{buf} );
     }
 }
@@ -160,30 +163,34 @@ package Perlito5::AST::Var;
         my $self = $_[0];
 
         my $str_name = $self->{name};
-        $str_name = '\\\\' if $str_name eq '\\';   # escape $\
-        $str_name = "\\'" if $str_name eq "'";     # escape $'
+        my $c = substr($str_name, 0, 1);
+
+        if ($c lt " ") {
+            $str_name = "^" . chr( ord($c) + ord("A") - 1 ) . substr($str_name, 1);
+        }
 
         # Normalize the sigil
         my $ns = '';
         if ($self->{namespace}) {
             return $self->{namespace} . '::'
                 if $self->{sigil} eq '::';
-            if ($self->{namespace} eq 'main' && substr($self->{name}, 0, 1) eq '^') {
+            if ($self->{namespace} eq 'main' && substr($str_name, 0, 1) eq '^') {
                 # don't add the namespace to special variables
-                return $self->{sigil} . '{' . $self->{name} . '}'
+                return $self->{sigil} . '{' . $str_name . '}'
             }
             else {
                 $ns = $self->{namespace} . '::';
             }
         }
-        my $c = substr($self->{name}, 0, 1);
+
         if (  ($c ge 'a' && $c le 'z')
            || ($c ge 'A' && $c le 'Z')
            || ($c eq '_')
-           || ($self->{name} eq '/')
+           || ($str_name eq '/' || $str_name eq '&')
+           || ( (0 + $str_name) eq $str_name )  # numeric
            ) 
         {
-            return $self->{sigil} . $ns . $self->{name}
+            return $self->{sigil} . $ns . $str_name
         }
         return $self->{sigil} . "{" . Perlito5::Perl5::escape_string( $ns . $str_name ) . "}";
     }
@@ -204,17 +211,6 @@ package Perlito5::AST::Call;
         }
         my $meth = $self->{method};
         if  ($meth eq 'postcircumfix:<( )>')  {
-            if (  (  ref($self->{invocant}) eq 'Perlito5::AST::Var'
-                  && $self->{invocant}{sigil} eq '&'
-                  )
-               || (  ref($self->{invocant}) eq 'Perlito5::AST::Apply'
-                  && $self->{invocant}{code} eq 'prefix:<&>'
-                  )
-               ) 
-            {
-                #  &subr(args)
-                return [ apply => '(', $invocant, map { $_->emit_perl5() } @{$self->{arguments}} ];
-            }
             $meth = '';
         }
         if ( ref($meth) eq 'Perlito5::AST::Var' ) {
@@ -234,9 +230,56 @@ package Perlito5::AST::Apply;
         return () if !$self->{arguments};
         return map { $_->emit_perl5() } @{$self->{arguments}};
     }
+    sub emit_perl5_choose_regex_quote {
+        if (! grep { $_ =~ /\// } @_) {
+            return "/";
+        }
+        if (! grep { $_ =~ /!/ } @_) {
+            return "!";
+        }
+        if (! grep { $_ =~ /%/ } @_) {
+            return "%";
+        }
+        if (! grep { $_ =~ /:/ } @_) {
+            return ":";
+        }
+        if (! grep { $_ =~ /;/ } @_) {
+            return ";";
+        }
+        return "^";
+    }
+    sub emit_perl5_regex_expression {
+        my $ast = $_[0];
+        if ($ast->isa('Perlito5::AST::Buf')) {
+            my $replace = $ast->{buf};
+            # $replace =~ s{\\}{\\\\}g;
+            return $replace;
+        }
+        if ($ast->isa('Perlito5::AST::Apply') && $ast->{code} eq 'list:<.>') {
+            # concatenate arguments
+            my $s = "";
+            for my $a (@{$ast->{arguments}}) {
+                $s .= emit_perl5_regex_expression($a);
+            }
+            return $s;
+        }
+        # variable, lookup, index
+        my $out = [];
+        Perlito5::Perl5::PrettyPrinter::pretty_print([$ast->emit_perl5()], 0, $out);
+        my $code = join('', @{$out});
+        chomp $code;
+        return $code;
+    }
     sub emit_perl5 {
         my $self = $_[0];   
         if (ref $self->{code}) {
+
+            my $code = $self->{code};
+            if ( ref($code) eq 'Perlito5::AST::Apply' && $code->code eq "prefix:<&>") {
+                # &$c()
+                return [ apply => '(', $code->emit_perl5(), $self->emit_perl5_args() ];
+            }
+
             return [ op => 'infix:<->>', $self->{code}->emit_perl5(), $self->emit_perl5_args() ];
         }
         if ($self->{code} eq 'infix:<=>>')  { 
@@ -245,11 +288,25 @@ package Perlito5::AST::Apply;
                      $self->{arguments}[1]->emit_perl5() ]
         }
 
+        if ($self->{namespace} eq 'Perlito5') {
+            # if ($self->{code} eq 'nop') {
+            #     return ();
+            # }
+            if ($self->{code} eq 'eval_ast') {
+                $self->{namespace} = 'Perlito5::Perl5::Runtime';
+            }
+        }
+
         my $ns = '';
         if ($self->{namespace}) {
             $ns = $self->{namespace} . '::';
         }
         my $code = $ns . $self->{code};
+
+        if ($code eq 'circumfix:<{ }>' && @{ $self->{'arguments'} } == 1) {
+            # disambiguate block {1} from hash {"1"=>undef}
+            return ['op', $code, $self->{'arguments'}->[0]->emit_perl5(), "" ];
+        }
 
         if (  $code eq 'prefix:<$>'
            || $code eq 'prefix:<@>'
@@ -285,62 +342,81 @@ package Perlito5::AST::Apply;
         }
 
         if ($self->{code} eq 'p5:s') {
-            return 's!' . $self->{arguments}->[0]->{buf}   # emit_perl5() 
-                 .  '!' . $self->{arguments}->[1]->{buf}   # emit_perl5()
-                 .  '!' . $self->{arguments}->[2]->{buf};
+            my $replace0 = emit_perl5_regex_expression($self->{arguments}->[0]);
+            my $replace1 = emit_perl5_regex_expression($self->{arguments}->[1]);
+            my $q = emit_perl5_choose_regex_quote(
+                        $replace0, 
+                        $replace1,
+                        $self->{arguments}->[2]->{buf}, 
+                    );
+            return 's' . $q . $replace0                        # emit_perl5() 
+                 .       $q . $replace1                        # emit_perl5()
+                 .       $q . $self->{arguments}->[2]->{buf};
 
         }
         if ($self->{code} eq 'p5:m') {
-            my $s;
-            if ($self->{arguments}->[0]->isa('Perlito5::AST::Buf')) {
-                $s = $self->{arguments}->[0]->{buf}
-            }
-            else {
-                for my $ast (@{$self->{arguments}[0]{arguments}}) {
-                    if ($ast->isa('Perlito5::AST::Buf')) {
-                        $s .= $ast->{buf}
-                    }
-                    else {
-                        $s .= $ast->emit_perl5();  # variable name
-                    }
-                }
-            }
-
-            return 'm!' . $s . '!' . $self->{arguments}->[1]->{buf};
+            my $replace0 = emit_perl5_regex_expression($self->{arguments}->[0]);
+            my $q = emit_perl5_choose_regex_quote(
+                        $replace0,
+                        $self->{arguments}->[1]->{buf}, 
+                    );
+            return 'm' . $q . $replace0 . $q . $self->{arguments}->[1]->{buf};
         }
         if ($self->{code} eq 'p5:tr') {
-            return 'tr!' . $self->{arguments}->[0]->{buf}   # emit_perl5() 
-                 .   '!' . $self->{arguments}->[1]->{buf}   # emit_perl5()
-                 .   '!';
+            my $replace0 = emit_perl5_regex_expression($self->{arguments}->[0]);
+            my $replace1 = emit_perl5_regex_expression($self->{arguments}->[1]);
+            my $q = emit_perl5_choose_regex_quote(
+                        $replace0, 
+                        $replace1,
+                        $self->{arguments}->[2]->{buf},
+                    );
+            return 'tr' . $q . $replace0                        # emit_perl5() 
+                 .        $q . $replace1                        # emit_perl5()
+                 .        $q . $self->{arguments}->[2]->{buf};
+        }
+        if ($self->{code} eq 'p5:qr') {
+            my $replace0 = emit_perl5_regex_expression($self->{arguments}->[0]);
+            my $q = emit_perl5_choose_regex_quote(
+                        $replace0,
+                        $self->{arguments}->[1]->{buf}, 
+                    );
+            return 'qr' . $q . $replace0 . $q . $self->{arguments}->[1]->{buf};
         }
 
         if ($self->{code} eq 'package')    { return [ stmt => 'package', [ bareword => $self->{namespace} ] ] }
 
-        if ($code eq 'map' || $code eq 'grep' || $code eq 'sort') {    
+        if ( $code eq 'map'
+          || $code eq 'grep'
+          || $code eq 'sort'
+          || $code eq 'print'
+          || $code eq 'use'
+        ) {
             if ( $self->{special_arg} ) {
                 # TODO - test 'special_arg' type (scalar, block, ...)
                 return [ op => 'prefix:<' . $code . '>',
-                         [ 'block', map { $_->emit_perl5() } @{$self->{special_arg}{stmts}} ],
+                         $self->{special_arg}->emit_perl5,
                          [ 'op' => 'list:<,>',  $self->emit_perl5_args() ],
                        ];
             }
             return [ apply => '(', $code, $self->emit_perl5_args() ];
         }
 
-        if ($code eq 'eval' && $Perlito5::PHASE eq 'BEGIN') {
-            # eval-string inside BEGIN block
-            # we add some extra information to the data, to make things more "dumpable"
-            return [ apply => '(', 'eval',
-                         [ apply => '(', 'Perlito5::CompileTime::Dumper::generate_eval_string',
-                            $self->emit_perl5_args() ]];
-        }
-
         if ($code eq 'readline') {
             return [ paren => '<', $self->emit_perl5_args() ];
         }
 
+        $code = "&" . $code
+            if $self->{ignore_proto};
+
         if ( $self->{bareword} && !@{$self->{arguments}} ) {
-            return [ bareword => $code ];
+            my $effective_name = ($self->{namespace} || $Perlito5::PKG_NAME) . '::' . $self->{code};
+            if (exists $Perlito5::PROTO->{$effective_name}) {
+                $code = $effective_name;
+            }
+            else {
+                # shift / push / return
+                return ['bareword' => $code]
+            }
         }
         return [ apply => '(', $code, $self->emit_perl5_args() ];
     }
@@ -472,6 +548,7 @@ package Perlito5::AST::Decl;
 {
     sub emit_perl5 {
         my $self = $_[0];
+
         return [ op => 'prefix:<' . $self->{decl} . '>', 
                  ($self->{type} ? $self->{type} : ()),
                  $self->{var}->emit_perl5()
@@ -493,79 +570,11 @@ package Perlito5::AST::Sub;
             if defined $self->{sig};
 
         if (defined $self->{block}) {
-            # this is not a pre-declaration
-            push @parts, Perlito5::Perl5::emit_perl5_block($self->{block}{stmts});
-
-            if ($Perlito5::PHASE eq 'BEGIN') {
-                # at compile-time only:
-                #   we are compiling - maybe inside a BEGIN block
-                #   provide a way to dump this closure
-
-                # get list of captured variables, including inner blocks
-                my @captured;
-                for my $stmt (@{$self->{block}{stmts}}) {
-                    push @captured, $stmt->get_captures();
-                }
-                my %dont_capture = map { $_->{dont} ? ( $_->{dont} => 1 ) : () } @captured;
-                my %capture = map { $_->{dont} ? ()
-                                  : $dont_capture{ $_->{_id} } ? ()
-                                  : ($_->{_decl} eq 'local' || $_->{_decl} eq 'global' || $_->{_decl} eq '') ? ()
-                                  : ( $_->{_id} => $_ )
-                                  } @captured;
-                my @captures_ast  = values %capture;
-                my @captures_perl = map {
-                        ($_->{_real_sigil} || $_->{sigil}) . $_->{name}
-                    } @captures_ast;
-
-                my @extra;
-                # return a hash with { "variable name" => \"variable value" }
-                # with all captured variables
-                # 
-                #   @_ && ref($_[0]) eq "Perlito5::dump" && return "do { my \$x = $x; sub { \$_[0] + \$x;  } }" }
-                #   @_ && ref($_[0]) eq "Perlito5::dump" && return { '$x' => \$x }
-                push @extra,
-                  [
-                    'op', 'infix:<&&>',
-                    '@_',
-                    [
-                        'op', 'infix:<&&>',
-                        [
-                            'op', 'infix:<eq>',
-                            [ 'apply', '(', 'ref', [ 'apply', '[', '$_', [ 'number', 0, ], ], ],
-                            '"Perlito5::dump"',
-                        ],
-                        [
-                            'apply', '(', 'return',
-                            [
-                                'op', 'circumfix:<{ }>',
-                                map { [ 'op', 'infix:<=>>', "'$_'", [ 'op', 'prefix:<\\>', $_ ] ], }
-                                  @captures_perl
-                            ],
-                        ]
-                    ]
-                  ];
-
-                my $bl = shift @{$parts[0]};
-                unshift @{$parts[0]}, $bl, @extra;
-            }
+            push @parts, Perlito5::Perl5::emit_perl5_block( $self->{'block'}{stmts} );
         }
 
         return [ op => 'prefix:<sub>', @sig, @parts ] if !$self->{name};
         return [ stmt => [ keyword => 'sub' ], [ bareword => $self->{namespace} . "::" . $self->{name} ], @sig, @parts ];
-    }
-}
-
-package Perlito5::AST::Use;
-{
-    sub emit_perl5 {
-        my $self = shift;
-        Perlito5::Grammar::Use::emit_time_eval($self);
-        if ($Perlito5::EMIT_USE) {
-            return [ stmt => [ keyword => 'use' ], [ bareword => $self->{mod} ] ];
-        }
-        else {
-            return [ comment => "# " . $self->{code} . " " . $self->{mod} ];
-        }
     }
 }
 

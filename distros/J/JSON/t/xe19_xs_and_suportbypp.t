@@ -1,12 +1,10 @@
-#! perl
-
 # https://rt.cpan.org/Public/Bug/Display.html?id=52847
 
 use strict;
 use Test::More;
 
 BEGIN { plan tests => 2 };
-BEGIN { $ENV{PERL_JSON_BACKEND} = 1; }
+BEGIN { $ENV{PERL_JSON_BACKEND} ||= 1; }
 
 use JSON -support_by_pp;
 

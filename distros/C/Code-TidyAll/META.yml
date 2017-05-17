@@ -28,94 +28,94 @@ no_index:
 provides:
   Code::TidyAll:
     file: lib/Code/TidyAll.pm
-    version: '0.58'
+    version: '0.59'
   Code::TidyAll::Cache:
     file: lib/Code/TidyAll/Cache.pm
-    version: '0.58'
+    version: '0.59'
   Code::TidyAll::CacheModel:
     file: lib/Code/TidyAll/CacheModel.pm
-    version: '0.58'
+    version: '0.59'
   Code::TidyAll::CacheModel::Shared:
     file: lib/Code/TidyAll/CacheModel/Shared.pm
-    version: '0.58'
+    version: '0.59'
   Code::TidyAll::Config::INI::Reader:
     file: lib/Code/TidyAll/Config/INI/Reader.pm
-    version: '0.58'
+    version: '0.59'
   Code::TidyAll::Git::Precommit:
     file: lib/Code/TidyAll/Git/Precommit.pm
-    version: '0.58'
+    version: '0.59'
   Code::TidyAll::Git::Prereceive:
     file: lib/Code/TidyAll/Git/Prereceive.pm
-    version: '0.58'
+    version: '0.59'
   Code::TidyAll::Git::Util:
     file: lib/Code/TidyAll/Git/Util.pm
-    version: '0.58'
+    version: '0.59'
   Code::TidyAll::Plugin:
     file: lib/Code/TidyAll/Plugin.pm
-    version: '0.58'
+    version: '0.59'
   Code::TidyAll::Plugin::CSSUnminifier:
     file: lib/Code/TidyAll/Plugin/CSSUnminifier.pm
-    version: '0.58'
+    version: '0.59'
   Code::TidyAll::Plugin::JSBeautify:
     file: lib/Code/TidyAll/Plugin/JSBeautify.pm
-    version: '0.58'
+    version: '0.59'
   Code::TidyAll::Plugin::JSHint:
     file: lib/Code/TidyAll/Plugin/JSHint.pm
-    version: '0.58'
+    version: '0.59'
   Code::TidyAll::Plugin::JSLint:
     file: lib/Code/TidyAll/Plugin/JSLint.pm
-    version: '0.58'
+    version: '0.59'
   Code::TidyAll::Plugin::JSON:
     file: lib/Code/TidyAll/Plugin/JSON.pm
-    version: '0.58'
+    version: '0.59'
   Code::TidyAll::Plugin::MasonTidy:
     file: lib/Code/TidyAll/Plugin/MasonTidy.pm
-    version: '0.58'
+    version: '0.59'
   Code::TidyAll::Plugin::PHPCodeSniffer:
     file: lib/Code/TidyAll/Plugin/PHPCodeSniffer.pm
-    version: '0.58'
+    version: '0.59'
   Code::TidyAll::Plugin::PerlCritic:
     file: lib/Code/TidyAll/Plugin/PerlCritic.pm
-    version: '0.58'
+    version: '0.59'
   Code::TidyAll::Plugin::PerlTidy:
     file: lib/Code/TidyAll/Plugin/PerlTidy.pm
-    version: '0.58'
+    version: '0.59'
   Code::TidyAll::Plugin::PerlTidySweet:
     file: lib/Code/TidyAll/Plugin/PerlTidySweet.pm
-    version: '0.58'
+    version: '0.59'
   Code::TidyAll::Plugin::PodChecker:
     file: lib/Code/TidyAll/Plugin/PodChecker.pm
-    version: '0.58'
+    version: '0.59'
   Code::TidyAll::Plugin::PodSpell:
     file: lib/Code/TidyAll/Plugin/PodSpell.pm
-    version: '0.58'
+    version: '0.59'
   Code::TidyAll::Plugin::PodTidy:
     file: lib/Code/TidyAll/Plugin/PodTidy.pm
-    version: '0.58'
+    version: '0.59'
   Code::TidyAll::Plugin::SortLines:
     file: lib/Code/TidyAll/Plugin/SortLines.pm
-    version: '0.58'
+    version: '0.59'
   Code::TidyAll::Result:
     file: lib/Code/TidyAll/Result.pm
-    version: '0.58'
+    version: '0.59'
   Code::TidyAll::Role::HasIgnore:
     file: lib/Code/TidyAll/Role/HasIgnore.pm
-    version: '0.58'
+    version: '0.59'
   Code::TidyAll::Role::Tempdir:
     file: lib/Code/TidyAll/Role/Tempdir.pm
-    version: '0.58'
+    version: '0.59'
   Code::TidyAll::SVN::Precommit:
     file: lib/Code/TidyAll/SVN/Precommit.pm
-    version: '0.58'
+    version: '0.59'
   Code::TidyAll::SVN::Util:
     file: lib/Code/TidyAll/SVN/Util.pm
-    version: '0.58'
+    version: '0.59'
   Code::TidyAll::Util::Zglob:
     file: lib/Code/TidyAll/Util/Zglob.pm
-    version: '0.58'
+    version: '0.59'
   Test::Code::TidyAll:
     file: lib/Test/Code/TidyAll.pm
-    version: '0.58'
+    version: '0.59'
 recommends:
   Parallel::ForkManager: '0'
 requires:
@@ -164,7 +164,7 @@ resources:
   bugtracker: https://github.com/houseabsolute/perl-code-tidyall/issues
   homepage: http://metacpan.org/release/Code-TidyAll
   repository: git://github.com/houseabsolute/perl-code-tidyall.git
-version: '0.58'
+version: '0.59'
 x_Dist_Zilla:
   perl:
     version: '5.024001'
@@ -197,7 +197,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@DROLSKY/Git::GatherDir'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@DROLSKY/ManifestSkip'
@@ -249,18 +249,18 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CopyFilesFromBuild
       name: '@DROLSKY/CopyFilesFromBuild'
-      version: '0.163040'
+      version: '0.170880'
     -
       class: Dist::Zilla::Plugin::GitHub::Meta
       name: '@DROLSKY/GitHub::Meta'
-      version: '0.43'
+      version: '0.44'
     -
       class: Dist::Zilla::Plugin::GitHub::Update
       config:
         Dist::Zilla::Plugin::GitHub::Update:
           metacpan: 1
       name: '@DROLSKY/GitHub::Update'
-      version: '0.43'
+      version: '0.44'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: '@DROLSKY/MetaResources'
@@ -341,7 +341,7 @@ x_Dist_Zilla:
           run_under_travis: 0
           skip: []
       name: '@DROLSKY/Dist::Zilla::PluginBundle::DROLSKY'
-      version: '0.052'
+      version: '0.053'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -359,7 +359,7 @@ x_Dist_Zilla:
             - Dist::Zilla::Plugin::DROLSKY::WeaverConfig
             - Pod::Weaver::PluginBundle::DROLSKY
       name: '@DROLSKY/PromptIfStale'
-      version: '0.052'
+      version: '0.053'
     -
       class: Dist::Zilla::Plugin::Test::PodSpelling
       config:
@@ -484,7 +484,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@DROLSKY/Test::ReportPrereqs'
-      version: '0.025'
+      version: '0.027'
     -
       class: Dist::Zilla::Plugin::Test::Version
       name: '@DROLSKY/Test::Version'
@@ -492,18 +492,18 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::DROLSKY::Contributors
       name: '@DROLSKY/DROLSKY::Contributors'
-      version: '0.83'
+      version: '0.85'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          'git --version': 2.11.0
+          git_version: 2.11.0
           include_authors: 0
           include_releaser: 1
           order_by: name
           paths: []
       name: '@DROLSKY/Git::Contributors'
-      version: '0.029'
+      version: '0.030'
     -
       class: Dist::Zilla::Plugin::SurgicalPodWeaver
       config:
@@ -619,7 +619,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::DROLSKY::WeaverConfig
       name: '@DROLSKY/DROLSKY::WeaverConfig'
-      version: '0.83'
+      version: '0.85'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
@@ -654,7 +654,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::DROLSKY::License
       name: '@DROLSKY/DROLSKY::License'
-      version: '0.83'
+      version: '0.85'
     -
       class: Dist::Zilla::Plugin::CheckStrictVersion
       name: '@DROLSKY/CheckStrictVersion'
@@ -678,10 +678,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.11.0
+          git_version: 2.11.0
           repo_root: .
       name: '@DROLSKY/DROLSKY::Git::CheckFor::CorrectBranch'
-      version: '0.83'
+      version: '0.85'
     -
       class: Dist::Zilla::Plugin::EnsureChangesHasContent
       name: '@DROLSKY/EnsureChangesHasContent'
@@ -703,10 +703,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.11.0
+          git_version: 2.11.0
           repo_root: .
       name: '@DROLSKY/Git::Check'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -725,12 +725,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.11.0
+          git_version: 2.11.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@DROLSKY/Commit generated files'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -738,16 +738,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.58
+          tag: v0.59
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.11.0
+          git_version: 2.11.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@DROLSKY/Git::Tag'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -756,10 +756,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.11.0
+          git_version: 2.11.0
           repo_root: .
       name: '@DROLSKY/Git::Push'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease
       config:
@@ -785,12 +785,12 @@ x_Dist_Zilla:
             - (?^:.+)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.11.0
+          git_version: 2.11.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@DROLSKY/Commit version bump'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -799,10 +799,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.11.0
+          git_version: 2.11.0
           repo_root: .
       name: '@DROLSKY/Push version bump'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Prereqs::Soften
       config:
@@ -813,7 +813,7 @@ x_Dist_Zilla:
           modules_from_features: ~
           to_relationship: recommends
       name: Prereqs::Soften
-      version: '0.006002'
+      version: '0.006003'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:

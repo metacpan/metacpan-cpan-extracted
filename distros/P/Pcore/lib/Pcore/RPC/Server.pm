@@ -85,21 +85,21 @@ sub run ( $class, $RPC_BOOT_ARGS ) {
                         no strict qw[refs];
 
                         $accept->(
-                            {   max_message_size   => 1_024 * 1_024 * 100,     # 100 Mb
-                                pong_timeout       => 50,
-                                permessage_deflate => 0,
-                                on_disconnect      => sub ( $ws, $status ) {
+                            {   max_message_size => 1_024 * 1_024 * 100,     # 100 Mb
+                                pong_interval    => 50,
+                                compression      => 0,
+                                on_disconnect    => sub ( $ws, $status ) {
                                     $rpc->RPC_ON_DISCONNECT($ws) if $can_rpc_on_disconnect;
 
                                     return;
                                 },
-                                on_rpc_call => sub ( $ws, $req, $method, $args = undef ) {
-                                    my $method_name = "API_$method";
+                                on_rpc_call => sub ( $ws, $req, $tran ) {
+                                    my $method_name = "API_$tran->{method}";
 
                                     if ( $rpc->can($method_name) ) {
 
                                         # call method
-                                        eval { $rpc->$method_name( $req, $args ? $args->@* : () ) };
+                                        eval { $rpc->$method_name( $req, $tran->{data} ? $tran->{data}->@* : () ) };
 
                                         $@->sendlog if $@;
                                     }

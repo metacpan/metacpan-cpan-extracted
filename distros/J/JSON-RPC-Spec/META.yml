@@ -9,7 +9,7 @@ configure_requires:
   Module::Build::Tiny: '0.035'
   perl: 5.008_001
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,7 +28,7 @@ no_index:
 provides:
   JSON::RPC::Spec:
     file: lib/JSON/RPC/Spec.pm
-    version: v1.0.6
+    version: v1.0.7
   JSON::RPC::Spec::Client:
     file: lib/JSON/RPC/Spec/Client.pm
   JSON::RPC::Spec::Common:
@@ -49,7 +49,8 @@ resources:
   bugtracker: https://github.com/nqounet/p5-json-rpc-spec/issues
   homepage: https://github.com/nqounet/p5-json-rpc-spec
   repository: git://github.com/nqounet/p5-json-rpc-spec.git
-version: v1.0.6
+version: v1.0.7
 x_authority: cpan:NQOUNET
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

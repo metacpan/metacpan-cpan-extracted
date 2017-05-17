@@ -1,0 +1,107 @@
+=head1 NAME
+
+Imgur::API::Endpoint::Topic
+
+=head1 DESCRIPTION
+
+=over 4
+
+Access to the imgur Topic API Endpoint. 
+
+=back
+
+=cut
+
+=head1 METHODS
+ 
+
+=head2 defaults
+
+=over 2
+
+Get the list of default topics.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+
+=back
+
+
+=head2 galleryTopic
+
+=over 2
+
+View gallery items for a topic
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<window> I<optional>
+
+Change the date range of the request if the sort is "top", day | week | month | year | all, defaults to week
+
+=item *
+ C<sort> I<optional>
+
+viral | time | top - defaults to viral
+
+=item *
+ C<topic_id> I<required>
+
+The ID or URL-formatted name of the topic. If using a topic's name, replace its spaces with underscores (Mother's_Day).
+
+=item *
+ C<page> I<optional>
+
+integer - the data paging number
+
+
+=back
+
+
+=head2 galleryTopicItem
+
+=over 2
+
+View a single item in a gallery topic
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<item_id> I<required>
+
+The ID for the gallery item.
+
+=item *
+ C<topic_id> I<required>
+
+The ID or URL-formatted name of the topic. If using a topic's name, replace its spaces with underscores (Mother's_Day).
+
+
+=back
+
+
+=head1 SEE ALSO
+
+=over 4 
+
+https://api.imgur.com/endpoints/topic
+
+=back
+
+=cut

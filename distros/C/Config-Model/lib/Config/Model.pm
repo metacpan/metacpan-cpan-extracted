@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model;
-$Config::Model::VERSION = '2.101';
+$Config::Model::VERSION = '2.102';
 use strict ;
 use warnings;
 use 5.10.1;
@@ -1229,10 +1229,14 @@ sub load {
 
     $loader_logger->debug("model $model_name from file $load_file");
 
-    # no special treatment, returns an array
     my %models_by_name;
+
+    # Searches $load_file in @INC and returns an array containing the
+    # names of the loaded clases
     my @loaded_classes = $self->_load_model_in_hash( \%models_by_name, $load_file );
+
     $self->store_raw_model( $model_name, dclone( \%models_by_name ) );
+
     foreach my $name ( keys %models_by_name ) {
         my $data = $self->normalize_class_parameters( $name, $models_by_name{$name} );
         $loader_logger->debug("Store normalized model $name");
@@ -1242,7 +1246,8 @@ sub load {
     # look for additional model information
     my %model_graft_by_name;
     my %done;  # avoid loading twice the same snippet (where system version may clobber dev version)
-    foreach my $inc_str (@INC,'.') {
+
+    foreach my $inc_str (@INC) {
         foreach my $name ( keys %models_by_name ) {
             my $snippet_path = $name;
             $snippet_path =~ s/::/\//g;
@@ -1253,10 +1258,20 @@ sub load {
 
                 while ( my $snippet_file = $iter->() ) {
                     next unless $snippet_file =~ /\.pl$/;
-                    my $done_key = $name . ':' . $snippet_file;
+
+                    # $snippet_file (Path::Tiny object) was
+                    # constructed from @INC content (i.e. $inc_str)
+                    # and contains an absolute path. Since
+                    # _load_model_in_hash uses 'do' (which may search
+                    # in @INC), the file path passed to
+                    # _load_model_in_hash must be either absolute or
+                    # relative to $inc_str
+                    my $snippet_file_rel = $snippet_file->relative($inc_str);
+
+                    my $done_key = $name . ':' . $snippet_file_rel;
                     next if $done{$done_key};
-                    $loader_logger->info("Found snippet $snippet_file");
-                    $self->_load_model_in_hash( \%model_graft_by_name, $snippet_file );
+                    $loader_logger->info("Found snippet $snippet_file_rel in $inc_str dir");
+                    $self->_load_model_in_hash( \%model_graft_by_name, $snippet_file_rel);
                     $done{$done_key} = 1;
                 }
             }
@@ -1316,7 +1331,7 @@ sub _do_model_file {
     $loader_logger->info("load model $load_file");
 
     my $err_msg = '';
-    $load_file = "./$load_file" if $load_file !~ m!^/! and -e $load_file ;
+    # do searches @INC if the file path is not absolute
     my $model   = do $load_file;
 
     unless ($model) {
@@ -1757,7 +1772,7 @@ Config::Model - Create tools to validate, migrate and edit configuration files
 
 =head1 VERSION
 
-version 2.101
+version 2.102
 
 =head1 SYNOPSIS
 

@@ -5,20 +5,15 @@
 # This does an empiric test that when we try to parse something,
 # something ( anything ) comes out the other side.
 
-use strict;
-use File::Spec::Functions ':ALL';
-BEGIN {
-	no warnings 'once';
-	$| = 1;
-	$PPI::XS_DISABLE = 1;
-	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
-}
-use PPI::Lexer ();
+use lib 't/lib';
+use PPI::Test::pragmas;
+use Test::More tests => 220 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
-# Execute the tests
-use Test::More tests => 221;
-use Test::NoWarnings;
+use File::Spec::Functions ':ALL';
+use PPI;
 use Scalar::Util 'refaddr';
+use PPI::Test 'pause';
+
 
 sub is_object {
 	my ($left, $right, $message) = @_;
@@ -47,13 +42,6 @@ sub omethod_fails {
 		is( $object->$method( $args ), undef, ref($object) . "->$method fails correctly" );
 	}
 }
-
-sub pause {
-	local $@;
-	sleep 1 if !eval { require Time::HiRes; Time::HiRes::sleep(0.1); 1 };
-}
-
-
 
 
 
@@ -274,7 +262,7 @@ SCOPE: {
 	my $start = $doc->first_token;
 	isa_ok( $start, 'PPI::Token::Structure' );
 	is( $start->content, '{', 'Got start token' );
-	is( $start->previous_sibling, '', '->previous_sibling for an start opening brace returns false' );
+	is( $start->previous_sibling, '', '->previous_sibling for a start opening brace returns false' );
 	my $braces = $doc->find_first( sub {
 		$_[1]->isa('PPI::Structure') and $_[1]->braces eq '()'
 		} );

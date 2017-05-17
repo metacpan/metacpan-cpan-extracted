@@ -2,7 +2,7 @@ package App::cpm::Worker::Installer;
 use strict;
 use warnings;
 use utf8;
-our $VERSION = '0.301';
+our $VERSION = '0.302';
 
 use App::cpm::Logger::File;
 use App::cpm::Worker::Installer::Menlo;
@@ -26,7 +26,7 @@ my $CACHED_MIRROR = sub {
 sub work {
     my ($self, $job) = @_;
     my $type = $job->{type} || "(undef)";
-    local $self->menlo->{logger}->{context} = $job->distvname;
+    local $self->{logger}{context} = $job->distvname;
     if ($type eq "fetch") {
         my ($directory, $meta, $configure_requirements, $provides, $using_cache)
             = $self->fetch($job);
@@ -40,7 +40,7 @@ sub work {
                 using_cache => $using_cache,
             };
         } else {
-            $self->menlo->{logger}->log("Failed to fetch/configure distribution");
+            $self->{logger}->log("Failed to fetch/configure distribution");
         }
     } elsif ($type eq "configure") {
         my ($distdata, $requirements, $static_builder)
@@ -53,14 +53,14 @@ sub work {
                 static_builder => $static_builder,
             };
         } else {
-            $self->menlo->{logger}->log("Failed to configure distribution");
+            $self->{logger}->log("Failed to configure distribution");
         }
     } elsif ($type eq "install") {
         my $ok = $self->install($job);
         if ($ok) {
-            $self->menlo->{logger}->log("Successfully installed distribution");
+            $self->{logger}->log("Successfully installed distribution");
         } else {
-            $self->menlo->{logger}->log("Failed to install distribution");
+            $self->{logger}->log("Failed to install distribution");
         }
         return { ok => $ok, directory => $job->{directory} };
     } else {
@@ -71,14 +71,14 @@ sub work {
 
 sub new {
     my ($class, %option) = @_;
-    my $logger = $option{logger} || App::cpm::Logger::File->new;
-    my $base   = $option{base}   || "$ENV{HOME}/.perl-cpm/work";
-    my $cache  = $option{cache}  || "$ENV{HOME}/.perl-cpm/cache";
-    mkpath $_ for grep { !-d } $base, $cache;
+    $option{logger} ||= App::cpm::Logger::File->new;
+    $option{base}   ||= "$ENV{HOME}/.perl-cpm/work";
+    $option{cache}  ||= "$ENV{HOME}/.perl-cpm/cache";
+    mkpath $_ for grep !-d, $option{base}, $option{cache};
 
     my $menlo = App::cpm::Worker::Installer::Menlo->new(
-        base => $base,
-        logger => $logger,
+        base => $option{base},
+        logger => $option{logger},
         quiet => 1,
         pod2man => $option{man_pages},
         notest => $option{notest},
@@ -89,7 +89,7 @@ sub new {
         $menlo->{self_contained} = 1;
         $menlo->setup_local_lib($menlo->maybe_abs($local_lib));
     }
-    bless { %option, cache => $cache, menlo => $menlo }, $class;
+    bless { %option, menlo => $menlo }, $class;
 }
 
 sub menlo { shift->{menlo} }
@@ -139,7 +139,7 @@ sub fetch {
         }
     } elsif ($source eq "local") {
         for my $uri (@uri) {
-            $self->menlo->{logger}->log("Copying $uri");
+            $self->{logger}->log("Copying $uri");
             $uri =~ s{^file://}{};
             my $basename = basename $uri;
             if (-d $uri) {
@@ -168,7 +168,7 @@ sub fetch {
             $clean->($uri);
             my $basename = basename $uri;
             if ($uri =~ s{^file://}{}) {
-                $self->menlo->{logger}->log("Copying $uri");
+                $self->{logger}->log("Copying $uri");
                 File::Copy::copy($uri, $basename)
                     or next FETCH;
                 $dir = $self->menlo->unpack($basename)
@@ -179,7 +179,7 @@ sub fetch {
                 if ($distfile and $CACHED_MIRROR->($uri)) {
                     my $cache = File::Spec->catfile($self->{cache}, "authors/id/$distfile");
                     if (-f $cache) {
-                        $self->menlo->{logger}->log("Using cache $cache");
+                        $self->{logger}->log("Using cache $cache");
                         File::Copy::copy($cache, $basename);
                         $dir = $self->menlo->unpack($basename);
                         unless ($dir) {
@@ -221,19 +221,11 @@ sub _inject_toolchain_reqs {
         $deps{'ExtUtils::MakeMaker'} = {package => "ExtUtils::MakeMaker", version_range => '6.58'};
     }
 
-    if (    $distfile !~ m{/ExtUtils-ParseXS-[0-9v]}
-        and $distfile !~ m{/ExtUtils-MakeMaker-[0-9v]}
-        and !$deps{'ExtUtils::ParseXS'}
-    ) {
-        $deps{'ExtUtils::ParseXS'} = {package => 'ExtUtils::ParseXS', version_range => '3.16'};
-    }
-
     # copy from Menlo/cpanminus
     my $toolchain = CPAN::Meta::Requirements->from_string_hash({
         'Module::Build' => '0.38',
         'ExtUtils::MakeMaker' => '6.58',
         'ExtUtils::Install' => '1.46',
-        'ExtUtils::ParseXS' => '3.16',
     });
     my $merge = sub {
         my $dep = shift;
@@ -242,13 +234,10 @@ sub _inject_toolchain_reqs {
     };
 
     my $dep;
-    if ($dep = $deps{'ExtUtils::ParseXS'}) {
-        $dep->{version_range} = $merge->($dep);
-    }
-
     if ($dep = $deps{"ExtUtils::MakeMaker"}) {
         $dep->{version_range} = $merge->($dep);
-    } elsif ($dep = $deps{"Module::Build"}) {
+    }
+    if ($dep = $deps{"Module::Build"}) {
         $dep->{version_range} = $merge->($dep);
         $dep = $deps{"ExtUtils::Install"} ||= {package => 'ExtUtils::Install', version_range => 0};
         $dep->{version_range} = $merge->($dep);
@@ -276,7 +265,7 @@ sub _get_configure_requirements {
 
     my $requirements = [];
     if ($self->menlo->opts_in_static_install($meta)) {
-        $self->menlo->{logger}->log("Distribution opts in x_static_install: $meta->{x_static_install}");
+        $self->{logger}->log("Distribution opts in x_static_install: $meta->{x_static_install}");
     } else {
         $requirements = $self->_extract_requirements($meta, [qw(configure)]);
         if (!@$requirements and -f "Build.PL" and ($distfile || "") !~ m{/Module-Build-[0-9v]}) {
@@ -309,7 +298,7 @@ sub _retry {
     my ($self, $sub) = @_;
     return 1 if $sub->();
     return unless $self->{retry};
-    $self->{menlo}{logger}->log("! Retrying (you can turn off this behavior by --no-retry)");
+    $self->{logger}->log("! Retrying (you can turn off this behavior by --no-retry)");
     return $sub->();
 }
 
@@ -319,7 +308,7 @@ sub configure {
     my $guard = pushd $dir;
     my $menlo = $self->menlo;
 
-    $menlo->{logger}->log("Configuring distribution");
+    $self->{logger}->log("Configuring distribution");
     my ($static_builder, $configure_ok);
     {
         if ($menlo->opts_in_static_install($meta)) {
@@ -330,12 +319,14 @@ sub configure {
         }
         if (-f 'Build.PL') {
             $self->_retry(sub {
+                $self->{logger}->log("Running Build.PL");
                 $menlo->configure([ $menlo->{perl}, 'Build.PL' ], 1);
                 -f 'Build';
             }) and ++$configure_ok and last;
         }
         if (-f 'Makefile.PL') {
             $self->_retry(sub {
+                $self->{logger}->log("Running Makefile.PL");
                 $menlo->configure([ $menlo->{perl}, 'Makefile.PL' ], 1); # XXX depth == 1?
                 -f 'Makefile';
             }) and ++$configure_ok and last;
@@ -382,7 +373,7 @@ sub install {
     my $guard = pushd $dir;
     my $menlo = $self->menlo;
 
-    $menlo->{logger}->log("Building " . ($menlo->{notest} ? "" : "and testing ") . "distribution");
+    $self->{logger}->log("Building " . ($menlo->{notest} ? "" : "and testing ") . "distribution");
     my $installed;
     if ($static_builder) {
         $menlo->build(sub { $static_builder->build }, )

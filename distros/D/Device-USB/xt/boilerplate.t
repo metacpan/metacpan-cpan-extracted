@@ -1,9 +1,13 @@
 #!perl -T
 
-use Test::More tests => 3;
+use Test::More;
 use Carp;
 use strict;
 use warnings;
+
+plan( skip_all => 'Author tests not required for installation' )
+    unless ( $ENV{RELEASE_TESTING} );
+plan( tests => 3 );
 
 sub not_in_file_ok {
     my ($filename, %regex) = @_;

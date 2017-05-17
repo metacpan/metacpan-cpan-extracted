@@ -1,5 +1,5 @@
 package CPAN::Testers::Schema;
-our $VERSION = '0.008';
+our $VERSION = '0.012';
 # ABSTRACT: Schema for CPANTesters database processed from test reports
 
 #pod =head1 SYNOPSIS
@@ -104,7 +104,7 @@ CPAN::Testers::Schema - Schema for CPANTesters database processed from test repo
 
 =head1 VERSION
 
-version 0.008
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -169,11 +169,21 @@ Doug Bell <preaction@cpan.org>
 
 =back
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Breno G. de Oliveira
+=for stopwords Breno G. de Oliveira Joel Berger
+
+=over 4
+
+=item *
 
 Breno G. de Oliveira <garu@cpan.org>
+
+=item *
+
+Joel Berger <joel.a.berger@gmail.com>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

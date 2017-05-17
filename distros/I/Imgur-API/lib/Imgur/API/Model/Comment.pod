@@ -1,0 +1,199 @@
+=head1 NAME
+
+Imgur::API::Model::Comment
+
+=head1 DESCRIPTION
+
+=over 4
+
+This data model represents an images comment.
+
+=back
+
+=cut
+
+=head1 FIELDS
+ 
+=item 
+C<id I<integer>>
+
+=over 4
+
+The ID for the comment
+
+=back
+
+
+=item 
+C<image_id I<string>>
+
+=over 4
+
+The ID of the image that the comment is for
+
+=back
+
+
+=item 
+C<comment I<string>>
+
+=over 4
+
+The comment itself.
+
+=back
+
+
+=item 
+C<author I<string>>
+
+=over 4
+
+Username of the author of the comment
+
+=back
+
+
+=item 
+C<author_id I<integer>>
+
+=over 4
+
+The account ID for the author
+
+=back
+
+
+=item 
+C<on_album I<boolean>>
+
+=over 4
+
+If this comment was done to an album
+
+=back
+
+
+=item 
+C<album_cover I<string>>
+
+=over 4
+
+The ID of the album cover image, this is what should be displayed for album comments
+
+=back
+
+
+=item 
+C<ups I<integer>>
+
+=over 4
+
+Number of upvotes for the comment
+
+=back
+
+
+=item 
+C<downs I<integer>>
+
+=over 4
+
+The number of downvotes for the comment
+
+=back
+
+
+=item 
+C<points I<float>>
+
+=over 4
+
+the number of upvotes - downvotes
+
+=back
+
+
+=item 
+C<datetime I<integer>>
+
+=over 4
+
+Timestamp of creation, epoch time
+
+=back
+
+
+=item 
+C<parent_id I<integer>>
+
+=over 4
+
+If this is a reply, this will be the value of the comment_id for the caption this a reply for.
+
+=back
+
+
+=item 
+C<deleted I<boolean>>
+
+=over 4
+
+Marked true if this caption has been deleted
+
+=back
+
+
+=item 
+C<vote I<string>>
+
+=over 4
+
+The current user's vote on the comment. null if not signed in or if the user hasn't voted on it.
+
+=back
+
+
+=item 
+C<children I<Array of comments>>
+
+=over 4
+
+All of the replies for this comment. If there are no replies to the comment then this is an empty set.
+
+=back
+
+
+
+=head1 EXAMPLE
+
+
+ {
+   "success" : true,
+   "data" : {
+      "parent_id" : null,
+      "image_id" : "K84kO",
+      "points" : 5,
+      "downs" : 0,
+      "album_cover" : null,
+      "author_id" : 384077,
+      "deleted" : true,
+      "id" : 1110,
+      "ups" : 5,
+      "caption" : "This is a Test Caption sent via the API!",
+      "datetime" : 1346977487,
+      "on_album" : false,
+      "author" : "joshTest"
+   },
+   "status" : 200
+}
+
+
+
+=cut
+
+=head1 SEE ALSO
+
+http://api.imgur.com/models/comment
+
+

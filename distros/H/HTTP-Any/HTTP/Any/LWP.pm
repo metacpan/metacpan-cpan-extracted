@@ -12,6 +12,12 @@ sub do_http {
 	$ua->timeout($$opt{timeout})   if $$opt{timeout};
 	$ua->max_size($$opt{max_size}) if $$opt{max_size};
 
+	if (defined $$opt{max_redirect}) {
+		$ua->max_redirect($$opt{max_redirect});
+	} else {
+		$ua->max_redirect(7);
+	}
+
 	$ua->parse_head(0);
 
 	if ($$opt{cookie}) {

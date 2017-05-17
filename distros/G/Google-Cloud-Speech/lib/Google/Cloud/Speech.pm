@@ -8,7 +8,7 @@ use MIME::Base64;
 use Mojo::File;
 use Carp;
 
-$Google::Cloud::Speech::VERSION = '0.03';
+$Google::Cloud::Speech::VERSION = '0.05';
 
 has secret_file => sub { };
 has ua          => sub { Mojo::UserAgent->new() };

@@ -169,7 +169,7 @@ if ($json && $opt{smokedb_url}) {
     );
     $opt{v} and print "Posting to SmokeDB ($opt{smokedb_url})\n";
     my $response = eval {$ua->post($opt{smokedb_url}, {json => $json})};
-    print $@ if $@
+    print $@ if $@;
     $opt{v} and print $response->content;
 }
 

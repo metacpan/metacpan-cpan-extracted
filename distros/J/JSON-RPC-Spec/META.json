@@ -4,7 +4,7 @@
       "nqounet <mail@nqou.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.2",
+   "generated_by" : "Minilla/v3.0.10",
    "license" : [
       "perl_5"
    ],
@@ -65,7 +65,7 @@
    "provides" : {
       "JSON::RPC::Spec" : {
          "file" : "lib/JSON/RPC/Spec.pm",
-         "version" : "v1.0.6"
+         "version" : "v1.0.7"
       },
       "JSON::RPC::Spec::Client" : {
          "file" : "lib/JSON/RPC/Spec/Client.pm"
@@ -88,9 +88,10 @@
          "web" : "https://github.com/nqounet/p5-json-rpc-spec"
       }
    },
-   "version" : "v1.0.6",
+   "version" : "v1.0.7",
    "x_authority" : "cpan:NQOUNET",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

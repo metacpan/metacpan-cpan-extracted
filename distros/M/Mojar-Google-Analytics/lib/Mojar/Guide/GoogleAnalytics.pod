@@ -78,7 +78,7 @@ test with yesterday's data than today's data.  I usually set max_results to be
     # Success
   }
   else {
-    # Failure
+    # Failure: check $analytics->res->error (or ->code or ->message)
   }
 
 If you have success you will want to extract the data from the resultset within
@@ -90,9 +90,17 @@ Once you have a resultset, check its headers
 
 to ensure they are what your code expects.  Then iterate through
 
-  ${ $res->{rows} }
+  @{$res->rows}
 
 processing your data as appropriate.
+
+If you are using DBI you may find you enjoy faster inserts using columns:
+
+  my @tuple_status;
+  my $qty = $insert->execute_array(
+    {ArrayTupleStatus => \@tuple_status},
+    @{$res->columns}
+  );
 
 =head2 Update Your Cursor
 

@@ -22,7 +22,7 @@ use Log::Scrubber qw(disable $SCRUBBER scrubber :Carp scrubber_add_scrubber);
 @ISA     = qw(Business::OnlinePayment::HTTPS);
 $me      = 'Business::OnlinePayment::Litle';
 $DEBUG   = 0;
-our $VERSION = '0.955'; # VERSION
+our $VERSION = '0.956'; # VERSION
 
 # PODNAME: Business::OnlinePayment::Litle
 
@@ -1736,7 +1736,7 @@ Business::OnlinePayment::Litle - Business::OnlinePayment::Litle - Vantiv (was Li
 
 =head1 VERSION
 
-version 0.955
+version 0.956
 
 =head1 SYNOPSIS
 

@@ -3,6 +3,8 @@ use warnings;
 use strict;
 use Carp;
 
+our $VERSION = '0.001';
+
 use base 'Test::Smoke::Poster::Base';
 
 =head1 NAME

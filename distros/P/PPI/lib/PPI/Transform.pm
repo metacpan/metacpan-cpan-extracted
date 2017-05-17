@@ -23,7 +23,7 @@ use Params::Util  qw{_INSTANCE _CLASS _CODE _SCALAR0};
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.220';
+	$VERSION = '1.224';
 }
 
 
@@ -123,7 +123,7 @@ sub document {
 
 The C<apply> method is used to apply the transform to something. The
 argument must be a L<PPI::Document>, or something which can be turned
-into a one and then be written back to again.
+into one and then be written back to again.
 
 Currently, this list is limited to a C<SCALAR> reference, although a
 handler registration process is available for you to add support for

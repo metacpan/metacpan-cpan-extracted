@@ -2,6 +2,8 @@ package Test::Smoke::Poster::LWP_UserAgent;
 use warnings;
 use strict;
 
+our $VERSION = '0.001';
+
 use base 'Test::Smoke::Poster::Base';
 
 use fallback 'inc';

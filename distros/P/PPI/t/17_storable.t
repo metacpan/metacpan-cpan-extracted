@@ -2,26 +2,19 @@
 
 # Test compatibility with Storable
 
-use strict;
-BEGIN {
-	no warnings 'once';
-	$| = 1;
-	$PPI::XS_DISABLE = 1;
-	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
-}
-
+use lib 't/lib';
+use PPI::Test::pragmas;
 use Test::More;
 BEGIN {
 	# Is Storable installed?
 	if ( eval { require Storable; 1 } ) {
-		plan( tests => 10 );
+		plan( tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0) );
 	} else {
 		plan( 'skip_all' );
 		exit(0);
 	}
 }
 
-use Test::NoWarnings;
 use Scalar::Util  'refaddr';
 use PPI;
 

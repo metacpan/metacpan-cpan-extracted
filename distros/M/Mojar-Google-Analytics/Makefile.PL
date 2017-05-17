@@ -11,7 +11,7 @@ WriteMakefile(
   AUTHOR       => 'Nic Sandfield <niczero@cpan.org>',
   LICENSE      => 'artistic_2',
   META_MERGE   => {
-    requires  => {perl => 5.014001},
+    requires  => {perl => 5.014_001},
     resources => {
       homepage    => 'http://niczero.github.io/mojar',
       license     => 'http://www.opensource.org/licenses/artistic-license-2.0',

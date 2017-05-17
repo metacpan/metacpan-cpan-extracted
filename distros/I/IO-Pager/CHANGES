@@ -1,10 +1,17 @@
 Revision history for Perl extension IO::Pager.
 
-0.38	Tue May 11 2017
-	More test fixes for Perl 5.26 removal of . from @INC
+0.39	Sat May 13 2017
+	Rename t.pl to test.pl and alter behavior to address RT#120618
+	i.e; MakeMaker's "helpfulness"; alternative is explicitly list
+	all PM in module.
 
+	More bloody RT#121450
+
+0.38	Tue May 11 2017
 0.37	Tue Apr 25 2017
-	Fix tests for Perl 5.26 removal of . from @INC
+	Fix tests for Perl 5.26 removal of . from @INC RT#121450
+	(Patching for unreleased perl is a PITA)
+
 
 0.36	Mon Feb 29 2016
 	Fix Use of uninitialized value at IO/Pager.pm line 98
@@ -18,7 +25,7 @@ Revision history for Perl extension IO::Pager.
 0.35    Fri Jan 01 2016
 
 	Update test 11 for Windows; okay in CMD, PowerShell and MSYS
-	but tcsh and win-bash both fail
+	but tcsh and win-bash both fail.
 
 	Add .travis.yml
 
@@ -44,21 +51,21 @@ Revision history for Perl extension IO::Pager.
 
 	Undef $ENV{LESS} in interactive tests in case -E is set.
 
-	Robustify t/11 for Win32 (RT#79950).
+	Robustify t/11 for Win32 RT#79950
 
 0.31    Sat Apr 06 2013
 
-	Add missing IO::Handle fallback for ::Unbuffered (RT#82351)
+	Add missing IO::Handle fallback for ::Unbuffered RT#82351
 
-	Bogus fix for Windoze automatic line-ending failure of t/11 (RT#79950),
+	Bogus fix for Windoze automatic line-ending failure of t/11 RT#79950,
 	improvements welcomed.
 
 0.30	Tue Sep 04 2012
-	Implement feature request #78270 to include support say
+	Implement feature request #RT78270 to include support for say()
 
 	Preserve layers of passed hilehandle on instantiation.
 
-	Fixed tests under Win32 & cygwin, bug #75181.
+	Fixed tests under Win32 & cygwin RT#75181
 
 	Swap IO::Pager:new and ::open, alter subclass::open to
 	remove unnecessary level of subroutine calls
@@ -68,7 +75,7 @@ Revision history for Perl extension IO::Pager.
 	NOTE: This is broken, see ::less in TODO
 
 0.24	Sat Feb 18 2012 
-	Fixed bug #74691, tests fail if CPANTS folk don't have a perl in PATH!
+	Fixed RT#74691, tests fail if CPANTS folk don't have a perl in PATH!
 
 	Add PID method & token overload to access pager process identifier.
 
@@ -76,7 +83,7 @@ Revision history for Perl extension IO::Pager.
 
 0.20	Sat Feb 11 2012
 
-	Fixed bug #74691, add File::Which as dependency / skip test if missing
+	Fixed RT#74691, add File::Which as dependency / skip test if missing
 
 	Fixed non-TTY/redirection behavior and added corresponding test
 
@@ -87,7 +94,7 @@ Revision history for Perl extension IO::Pager.
 	Add OO interface
 
 	Add alternate pagers 'lv', 'pg',
-	and system default '/etc/alternatives/pager' (bug# 74519)
+	and system default '/etc/alternatives/pager' RT#74519
 
 	Add tests for initialization failure conditions (9-open.t)
 
@@ -97,11 +104,11 @@ Revision history for Perl extension IO::Pager.
 
 	Removed Perl warning 'Use of tie on a handle without * is deprecated'.
 
-	No interactive questions during 'make test' (bug# 66718)
+	No interactive questions during 'make test' RT#66718
 
 	Better handling of missing PAGER.
 
-	Look for more pagers: 'most' and 'w3m' (bug# 74519)
+	Look for more pagers: 'most' and 'w3m' RT#74519
 
 	Documentation clean-up, light refactoring, more error checks.
 
@@ -109,7 +116,7 @@ Revision history for Perl extension IO::Pager.
 
 0.10	Unreleased
 
-	Added support for encodings via binmode() (bug# 67930).
+	Added support for encodings via binmode() RT#67930
 
 	Test: encoding, handle (glob, scalar, OO), interactive...
 
@@ -132,7 +139,7 @@ Revision history for Perl extension IO::Pager.
 0.06	Wed Sep 21 2005
 
 	Fixed a stupid leftover using =~ for assignment that some perls ignored
-	(bug# 14692).
+	RT14692.
 
 	Fixed other nits in t.pl and documentation.
 

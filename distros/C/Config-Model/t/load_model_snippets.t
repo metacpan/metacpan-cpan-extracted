@@ -9,15 +9,14 @@ use Test::Memory::Cycle;
 use Test::Differences;
 use Config::Model;
 use Data::Dumper;
-use IO::File;
-use File::Path;
+use Path::Tiny;
 use Log::Log4perl qw(:easy :levels);
 
 BEGIN { plan tests => 8; }
 
 use strict;
 
-use strict;
+use lib 'wr_root';
 
 my $arg = shift || '';
 my ( $log, $show ) = (0) x 2;
@@ -41,14 +40,14 @@ Config::Model::Exception::Any->Trace(1) if $arg =~ /e/;
 ok( 1, "Compilation done" );
 
 # pseudo root where config files are written by config-model
-my $wr_root = 'wr_root';
+my $wr_root = path('wr_root');
 
 # cleanup before tests
-rmtree($wr_root);
-mkpath( $wr_root, { mode => 0755 } );
+$wr_root->remove_tree;
+$wr_root->mkpath();
 
-my $file = "$wr_root/Master.pl";
-my $fh = IO::File->new( $file, '>' ) or die "can't open write $file:$!";
+my $model_dir = $wr_root->child('Config/Model/models');
+$model_dir->mkpath;
 
 my $str = << 'EOF' ;
 [
@@ -91,12 +90,7 @@ my $str = << 'EOF' ;
 ];
 EOF
 
-$fh->print($str);
-
-$fh->close;
-
-$file = "$wr_root/Two.pl";
-$fh = IO::File->new( $file, '>' ) or die "can't open write $file:$!";
+$model_dir->child('Master.pl')->spew($str);
 
 $str = << 'EOF' ;
 [{
@@ -105,14 +99,8 @@ $str = << 'EOF' ;
 }] ;
 EOF
 
-$fh->print($str);
+$model_dir->child('Two.pl')->spew($str);
 
-$fh->close;
-
-my $snippet_dir = "$wr_root/Master.d";
-mkpath( $snippet_dir, { mode => 0755 } );
-$file = "$snippet_dir/Three.pl";
-$fh = IO::File->new( $file, '>' ) or die "can't open write $file:$!";
 
 $str = << 'EOF' ;
 {
@@ -146,12 +134,13 @@ $str = << 'EOF' ;
 };
 EOF
 
-$fh->print($str);
+my $snippet_dir = $model_dir->child('Master.d');
+$snippet_dir->mkpath();
 
-$fh->close;
+$snippet_dir->child('Three.pl')->spew($str);
 
 # minimal set up to get things working
-my $model = Config::Model->new( model_dir => $wr_root, );
+my $model = Config::Model->new();
 
 # use Tk::ObjScanner; Tk::ObjScanner::scan_object($model) ;
 

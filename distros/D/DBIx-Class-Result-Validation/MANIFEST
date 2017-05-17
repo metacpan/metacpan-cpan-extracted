@@ -12,6 +12,7 @@ t/01-validate.t
 t/02-insert_and_update.t
 t/app/Main.pm
 t/app/Main/Result/Object.pm
+t/app/Main/Result/ObjectKo.pm
 t/boilerplate.t
 t/lib/Utils.pm
 t/manifest.t

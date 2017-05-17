@@ -1,6 +1,6 @@
 #!perl
 package dzooky;
-$dzooky::VERSION = '0.22';
+$dzooky::VERSION = '0.24';
 use strict;
 use warnings;
 use Dist::Zooky::App;
@@ -19,7 +19,7 @@ dzooky - convert a dist to Dist::Zilla
 
 =head1 VERSION
 
-version 0.22
+version 0.24
 
 =head1 SYNOPSIS
 
@@ -45,6 +45,13 @@ If you do not wish to execute C<Makefile.PL> or C<Build.PL> and have C<META.json
 or C<META.yml>, you may use the C<metafile> command to merely examine those files.
 
   $ dzooky metafile
+
+dzooky also supports specifying a C<Dist::Zilla> bundle to use instead of the
+defaults.
+
+  $ dzooky dist --bundle BINGOS
+
+This will add [@BINGOS] to the generated C<dist.ini>.
 
 =head1 CAVEAT PROGRAMMER
 

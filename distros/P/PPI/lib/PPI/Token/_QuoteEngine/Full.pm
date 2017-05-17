@@ -9,7 +9,7 @@ use PPI::Token::_QuoteEngine ();
 
 use vars qw{$VERSION @ISA %quotes %sections};
 BEGIN {
-	$VERSION = '1.220';
+	$VERSION = '1.224';
 	@ISA     = 'PPI::Token::_QuoteEngine';
 
 	# Prototypes for the different braced sections
@@ -32,7 +32,7 @@ BEGIN {
 		's'   => { operator => 's',   braced => undef, separator => undef, _sections => 2, modifiers => 1 },
 		'tr'  => { operator => 'tr',  braced => undef, separator => undef, _sections => 2, modifiers => 1 },
 
-		# Y is the little used variant of tr
+		# Y is the little-used variant of tr
 		'y'   => { operator => 'y',   braced => undef, separator => undef, _sections => 2, modifiers => 1 },
 
 		'/'   => { operator => undef, braced => 0,     separator => '/',   _sections => 1, modifiers => 1 },
@@ -42,7 +42,7 @@ BEGIN {
 
 		# The final ( and kind of depreciated ) "first match only" one is not
 		# used yet, since I'm not sure on the context differences between
-		# this and the trinary operator, but its here for completeness.
+		# this and the trinary operator, but it's here for completeness.
 		'?'   => { operator => undef, braced => 0,     separator => '?',   _sections => 1, modifiers => 1 },
 	);
 }

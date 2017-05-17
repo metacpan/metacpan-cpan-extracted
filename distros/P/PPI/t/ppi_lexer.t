@@ -2,16 +2,10 @@
 
 # Unit testing for PPI::Lexer
 
-use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-	no warnings 'once';
-	$PPI::XS_DISABLE = 1;
-	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
-}
-use Test::More tests => 44;
-use Test::NoWarnings;
+use lib 't/lib';
+use PPI::Test::pragmas;
+use Test::More tests => 46 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+
 use PPI;
 
 
@@ -153,4 +147,11 @@ LEX_STRUCTURE: {
 
 	# Validate the creation of an empty statement
 	new_ok( 'PPI::Statement' => [ ] );
+}
+
+ERROR_HANDLING: {
+	my $test_lexer = PPI::Lexer->new;
+	is $test_lexer->errstr, "", "errstr is an empty string at the start";
+	is $test_lexer->lex_file( undef ), undef, "lex_file fails without a filename";
+	is( PPI::Lexer->errstr, "Did not pass a filename to PPI::Lexer::lex_file", "error can be gotten from class attribute" );
 }

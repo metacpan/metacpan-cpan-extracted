@@ -2,6 +2,8 @@ package Test::Smoke::Poster::HTTP_Tiny;
 use warnings;
 use strict;
 
+our $VERSION = '0.001';
+
 use base 'Test::Smoke::Poster::Base';
 
 use CGI::Util;                   # escape() for HTML

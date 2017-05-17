@@ -1,5 +1,5 @@
 package Net::Easypost::Address;
-$Net::Easypost::Address::VERSION = '0.19';
+$Net::Easypost::Address::VERSION = '0.20';
 use Carp qw/croak/;
 use JSON::MaybeXS;
 use Scalar::Util;
@@ -7,7 +7,7 @@ use overload
     '""'     => sub { $_[0]->as_string },
     '0+'     => sub { Scalar::Util::refaddr($_[0]) },
     fallback => 1;
-use Types::Standard qw(Bool Enum HashRef Str Undef);
+use Types::Standard qw(Bool Enum HashRef InstanceOf Str Undef);
 
 
 use Moo;
@@ -35,7 +35,7 @@ has [qw/street1
 
 has 'residential' => (
     is     => 'rw',
-    isa    => Bool,
+    isa    => Bool|InstanceOf['JSON::PP::Boolean'],
     coerce => sub { $_[0] ? JSON->true : JSON->false }
 );
 
@@ -148,7 +148,7 @@ Net::Easypost::Address
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 

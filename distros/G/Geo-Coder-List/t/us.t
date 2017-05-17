@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use Test::Most tests => 18;
 use Test::NoWarnings;
-use Test::Number::Delta within => 1e-2;
 
 eval 'use autodie qw(:all)';	# Test for open/close failures
 
@@ -14,10 +13,16 @@ BEGIN {
 
 GOOGLEPLACES: {
 	SKIP: {
+		skip 'Test requires Internet access', 16 unless(-e 't/online.enabled');
+
 		eval {
 			require Geo::Coder::US;
 
 			Geo::Coder::US->import();
+
+			require Test::Number::Delta;
+
+			Test::Number::Delta->import();
 		};
 
 		if($@) {
@@ -33,8 +38,8 @@ GOOGLEPLACES: {
 		my $location = $geocoderlist->geocode(location => '8600 Rockville Pike, Bethesda MD, 20894 USA');
 		ok(defined($location));
 		is(ref($location), 'HASH', 'geocode should return a reference to a HASH');
-		delta_ok($location->{geometry}{location}{lat}, 39.00);
-		delta_ok($location->{geometry}{location}{lng}, -77.10);
+		delta_within($location->{geometry}{location}{lat}, 39.00, 1e-1);
+		delta_within($location->{geometry}{location}{lng}, -77.10, 1e-1);
 
 		ok(!defined($geocoderlist->geocode()));
 		ok(!defined($geocoderlist->geocode('')));

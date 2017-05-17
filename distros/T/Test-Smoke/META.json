@@ -4,7 +4,7 @@
       "H.Merijn Brand <h.m.brand@xs4all.nl>, Nicholas Clark <nick@plum.flirble.org> and Abe Timmerman <abeltje@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
@@ -19,6 +19,36 @@
          "inc"
       ]
    },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI::Util" : "0",
+            "File::Spec" : "0.82",
+            "HTTP::Tiny" : "0",
+            "JSON::XS" : "0",
+            "POSIX" : "0",
+            "System::Info" : "0.05"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Daemon" : "0",
+            "HTTP::Message" : "0",
+            "Test::More" : "0.88",
+            "Test::NoWarnings" : "0"
+         }
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "homepage" : "http://perl5.test-smoke.org/",
@@ -29,6 +59,5 @@
       },
       "x_IRC" : "irc://irc.perl.org/#smoke"
    },
-   "version" : "1.70",
-   "x_serialization_backend" : "JSON::PP version 2.27200"
+   "version" : "1.71"
 }

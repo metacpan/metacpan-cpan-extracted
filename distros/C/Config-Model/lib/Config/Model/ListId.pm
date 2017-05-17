@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::ListId;
-$Config::Model::ListId::VERSION = '2.101';
+$Config::Model::ListId::VERSION = '2.102';
 use 5.10.1;
 use Mouse;
 
@@ -505,7 +505,7 @@ Config::Model::ListId - Handle list element for configuration model
 
 =head1 VERSION
 
-version 2.101
+version 2.102
 
 =head1 SYNOPSIS
 

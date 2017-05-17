@@ -1,5 +1,5 @@
 package Dist::Zooky::Core::FromMETA;
-$Dist::Zooky::Core::FromMETA::VERSION = '0.22';
+$Dist::Zooky::Core::FromMETA::VERSION = '0.24';
 # ABSTRACT: gather meta data from META files
 
 use strict;
@@ -50,7 +50,7 @@ Dist::Zooky::Core::FromMETA - gather meta data from META files
 
 =head1 VERSION
 
-version 0.22
+version 0.24
 
 =head1 AUTHOR
 

@@ -1,18 +1,17 @@
+Changes
+lib/LaTeX/Encode.pm
 Makefile.PL
 MANIFEST
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
 README
-Changes
-TODO
-MYMETA.yml
-MYMETA.json
-lib/LaTeX/Encode.pm
-lib/LaTeX/Encode/EncodingTable.pm
-scripts/README
+README.md
 scripts/build-encoding-table
+scripts/character-encodings.dvi
+scripts/character-encodings.tex
 scripts/format-encoding-reference
 scripts/latex-encode
-scripts/character-encodings.tex
-scripts/character-encodings.dvi
+scripts/README
 t/00-basic.t
 t/01-filter.t
 t/02-iquotes.t
@@ -25,10 +24,10 @@ t/08-import-specs.t
 t/09-packages-reqd.t
 t/10-typeset-document.t
 t/11-unmatched-chars.t
+t/12-common_cases.t
 t/90-kwalitee.t
 t/91-pod.t
 t/92-pod-coverage.t
 t/93-perl-critic.t
 t/perlcriticrc
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)
+TODO

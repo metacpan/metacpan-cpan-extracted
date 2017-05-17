@@ -355,8 +355,6 @@ struct marpaESLIFRecognizer {
   short                       *afterEventStatebp;   /* Lexeme after current event states for the CURRENT grammar */
   marpaESLIF_lexeme_data_t   **lastPausepp;         /* Lexeme last pause for the CURRENT grammar */
   marpaESLIF_lexeme_data_t   **lastTrypp;           /* Lexeme or :discard last try for the CURRENT grammar */
-  size_t                       minExceptionSizel;   /* Minimum total matched size before a completion event on a symbol to be checked for exception is considered */
-  size_t                       totalMatchedSizel;   /* Total matched - used only when exceptionb is set */
   short                        discardOnOffb;       /* Discard is on or off ? */
   short                        pristineb;           /* 1: pristine, i.e. can be reused, 0: have at least one thing that happened at the raw grammar level, modulo the eventual initial events */
   genericHash_t               *marpaESLIFRecognizerHashp; /* Ditto for recognizers cache */
@@ -398,7 +396,6 @@ struct marpaESLIF_readerContext {
 struct marpaESLIF_cloneContext {
   marpaESLIF_t         *marpaESLIFp;
   marpaESLIF_grammar_t *grammarp;
-  int                   forcedEndEventi;
 };
 
 /* ------------------------------------------- */

@@ -5,6 +5,7 @@ use utf8;
 use Test::MockObject;
 use Test::Mock::Guard;
 
+use lib '.';
 use t::Util;
 use Devel::Cover::Report::Codecov;
 

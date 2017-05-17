@@ -1,12 +1,10 @@
-#!/usr/bin/perl -w
-
 use strict;
 use Test::More;
 
 BEGIN { plan tests => 5 };
 
 BEGIN {
-    $ENV{PERL_JSON_BACKEND} = 1;
+    $ENV{PERL_JSON_BACKEND} ||= 1;
 }
 
 use JSON;

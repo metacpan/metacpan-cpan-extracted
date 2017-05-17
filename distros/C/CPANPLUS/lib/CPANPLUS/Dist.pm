@@ -15,7 +15,7 @@ use Module::Load::Conditional   qw[can_load check_install];
 use Locale::Maketext::Simple    Class => 'CPANPLUS', Style => 'gettext';
 
 use vars qw[$VERSION];
-$VERSION = "0.9166";
+$VERSION = "0.9168";
 
 use base 'Object::Accessor';
 
@@ -143,7 +143,7 @@ sub new {
 
         ### add minimum supported accessors
         $acc->mk_accessors( qw[prepared created installed uninstalled
-                               distdir dist] );
+                               distdir dist _metadata] );
     }
 
     ### get the conf object ###
@@ -305,6 +305,8 @@ sub find_configure_requires {
         file => { store => \$meta },
     };
 
+    $self->_stash_metadata(); # Okay hacks.
+
     check( $tmpl, \%hash ) or return;
 
     my $meth = 'configure_requires';
@@ -422,7 +424,7 @@ sub _prereqs_from_meta_file {
         ### Parse::CPAN::Meta uses exceptions for errors
         ### hash returned in list context!!!
 
-        local $ENV{PERL_JSON_BACKEND};
+        local $ENV{PERL_YAML_BACKEND};
 
         my ($doc) = eval { Parse::CPAN::Meta::LoadFile( $meta ) };
 
@@ -501,6 +503,45 @@ sub _prereqs_from_meta_json {
     ### and return a copy
     return \%{ $defaults };
 }
+
+sub _stash_metadata {
+    my $self = shift;
+    my $mod  = $self->parent;
+
+    my @possibles = do { defined $mod->status->extract
+                         ? ( META_JSON->( $mod->status->extract ),
+                             META_YML->( $mod->status->extract ) )
+                         : ()
+                    };
+
+    $self->mk_accessors( qw[_metadata] );
+    $self->status->_metadata( {} );
+
+    META: foreach my $mfile ( grep { -e } @possibles ) {
+        if ( $mfile =~ /\.json/ ) {
+            local $ENV{PERL_JSON_BACKEND};
+            my ($doc) = eval { Parse::CPAN::Meta->load_file( $mfile ) };
+            unless( $doc ) {
+              error(loc( "Could not read %1: '%2'", $mfile, $@ ));
+              return;
+            }
+            $self->status->_metadata( $doc );
+            return $doc;
+        }
+        else {
+            local $ENV{PERL_YAML_BACKEND};
+            my ($doc) = eval { Parse::CPAN::Meta->load_file( $mfile ) };
+            unless( $doc ) {
+              error(loc( "Could not read %1: '%2'", $mfile, $@ ));
+              return;
+            }
+            $self->status->_metadata( $doc );
+            return $doc;
+        }
+    }
+    return;
+}
+
 
 =head2 $bool = $dist->_resolve_prereqs( ... )
 

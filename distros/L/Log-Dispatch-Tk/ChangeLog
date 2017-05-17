@@ -1,3 +1,7 @@
+2017-05-14  Dominique Dumont  <ddumont@cpan.org> v1.9
+
+	* Fix smoke tests (Thanks to Slaven Rezic)
+
 2017-01-01  Dominique Dumont  <ddumont@cpan.org> v1.8
 
 	* Add hide_label parameter (Thanks to Tom Mc Meeki)

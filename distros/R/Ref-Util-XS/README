@@ -1,9 +1,9 @@
 
 
 This archive contains the distribution Ref-Util-XS,
-version 0.115:
+version 0.116:
 
-  Utility functions for checking references
+  XS implementation for Ref::Util
 
 This software is Copyright (c) 2017 by Sawyer X.
 

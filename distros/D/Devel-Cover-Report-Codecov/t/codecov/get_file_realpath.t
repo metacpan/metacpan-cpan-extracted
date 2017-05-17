@@ -4,6 +4,7 @@ use utf8;
 
 use Cwd::Guard qw/cwd_guard/;
 
+use lib '.';
 use t::Util;
 use Devel::Cover::Report::Codecov;
 

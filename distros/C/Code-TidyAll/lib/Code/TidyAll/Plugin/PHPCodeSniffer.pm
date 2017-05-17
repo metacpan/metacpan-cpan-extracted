@@ -9,7 +9,7 @@ use Moo;
 
 extends 'Code::TidyAll::Plugin';
 
-our $VERSION = '0.58';
+our $VERSION = '0.59';
 
 sub _build_cmd {'phpcs'}
 
@@ -20,7 +20,7 @@ sub validate_file {
     my $output;
     run3( \@cmd, \undef, \$output, \$output );
     if ( $? > 0 ) {
-        $output ||= "problem running " . $self->cmd;
+        $output ||= 'problem running ' . $self->cmd;
         die "$output\n";
     }
 }
@@ -41,7 +41,7 @@ Code::TidyAll::Plugin::PHPCodeSniffer - Use phpcs with tidyall
 
 =head1 VERSION
 
-version 0.58
+version 0.59
 
 =head1 SYNOPSIS
 

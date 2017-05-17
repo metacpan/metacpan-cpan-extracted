@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use vars    qw[@ISA $STATUS $VERSION];
 use base    'CPANPLUS::Dist::Base';
-$VERSION = "0.9166";
+$VERSION = "0.9168";
 
 use CPANPLUS::Internals::Constants;
 use CPANPLUS::Internals::Constants::Report;
@@ -171,7 +171,7 @@ sub init {
     my $status  = $dist->status;
 
     $status->mk_accessors(qw[makefile make test created installed uninstalled
-                             bin_make _prepare_args _create_args _install_args]
+                             bin_make _prepare_args _create_args _install_args _metadata]
                         );
 
     return 1;
@@ -261,9 +261,6 @@ sub prepare {
     my $fail;
     RUN: {
 
-        local $ENV{PERL_USE_UNSAFE_INC} = 1
-          unless exists $ENV{PERL_USE_UNSAFE_INC};
-
         ### we resolve 'configure requires' here, so we can run the 'perl
         ### Makefile.PL' command
         ### XXX for tests: mock f_c_r to something that *can* resolve and
@@ -294,7 +291,12 @@ sub prepare {
             ### end of prereq resolving ###
         }
 
+        my $metadata = $dist->status->_metadata;
+        my $x_use_unsafe_inc = ( defined $metadata && exists $metadata->{x_use_unsafe_inc} ? $metadata->{x_use_unsafe_inc} : undef );
+        $x_use_unsafe_inc = 1 unless defined $x_use_unsafe_inc;
 
+        local $ENV{PERL_USE_UNSAFE_INC} = $x_use_unsafe_inc
+          unless exists $ENV{PERL_USE_UNSAFE_INC};
 
         ### don't run 'perl makefile.pl' again if there's a makefile already
         if( -e MAKEFILE->() && (-M MAKEFILE->() < -M $dir) && !$force ) {
@@ -614,7 +616,11 @@ sub create {
     my $status = { };
     RUN: {
 
-        local $ENV{PERL_USE_UNSAFE_INC} = 1
+        my $metadata = $dist->status->_metadata;
+        my $x_use_unsafe_inc = ( defined $metadata && exists $metadata->{x_use_unsafe_inc} ? $metadata->{x_use_unsafe_inc} : undef );
+        $x_use_unsafe_inc = 1 unless defined $x_use_unsafe_inc;
+
+        local $ENV{PERL_USE_UNSAFE_INC} = $x_use_unsafe_inc
           unless exists $ENV{PERL_USE_UNSAFE_INC};
 
         ### this will set the directory back to the start
@@ -839,7 +845,11 @@ sub install {
 
     my $fail; my $captured;
 
-    local $ENV{PERL_USE_UNSAFE_INC} = 1
+    my $metadata = $dist->status->_metadata;
+    my $x_use_unsafe_inc = ( defined $metadata && exists $metadata->{x_use_unsafe_inc} ? $metadata->{x_use_unsafe_inc} : undef );
+    $x_use_unsafe_inc = 1 unless defined $x_use_unsafe_inc;
+
+    local $ENV{PERL_USE_UNSAFE_INC} = $x_use_unsafe_inc
       unless exists $ENV{PERL_USE_UNSAFE_INC};
 
     ### 'make install' section ###

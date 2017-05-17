@@ -1,5 +1,5 @@
 package Dist::Zooky::Role::DistIni;
-$Dist::Zooky::Role::DistIni::VERSION = '0.22';
+$Dist::Zooky::Role::DistIni::VERSION = '0.24';
 # ABSTRACT: role for DistIni plugins
 
 use strict;
@@ -38,7 +38,7 @@ Dist::Zooky::Role::DistIni - role for DistIni plugins
 
 =head1 VERSION
 
-version 0.22
+version 0.24
 
 =head1 AUTHOR
 

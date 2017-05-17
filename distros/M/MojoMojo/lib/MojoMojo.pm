@@ -12,7 +12,6 @@ use Catalyst qw/
   Session::State::Cookie
   Static::Simple
   SubRequest
-  Unicode
   I18N
   Setenv
   /;
@@ -31,7 +30,7 @@ use Module::Pluggable::Ordered
   except      => qr/^MojoMojo::Plugin::/,
   require     => 1;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 use 5.008004;
 
 MojoMojo->config->{authentication}{dbic} = {

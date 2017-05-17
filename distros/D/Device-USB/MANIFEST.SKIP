@@ -6,9 +6,10 @@ pm_to_blib
 .*\.swp
 blib/.*
 images/.*
+bin/usb-sh
 .*\.inl
 ^Makefile$
-^usb-sh$
 ^synchtest.pl$
 ^Device-USB-.*\.tar\.gz$
 \d+_local_
+.git

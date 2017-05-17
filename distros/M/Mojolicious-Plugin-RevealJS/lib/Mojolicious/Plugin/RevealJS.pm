@@ -2,7 +2,9 @@ package Mojolicious::Plugin::RevealJS;
 
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '0.10';
+use 5.12.0;
+
+our $VERSION = '0.11';
 $VERSION = eval $VERSION;
 
 use Mojo::Home;

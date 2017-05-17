@@ -1,0 +1,165 @@
+=head1 NAME
+
+Imgur::API::Model::AccountSettings
+
+=head1 DESCRIPTION
+
+=over 4
+
+The account settings, only accessible if you're logged in as the user.
+
+=back
+
+=cut
+
+=head1 FIELDS
+ 
+=item 
+C<account_url I<string>>
+
+=over 4
+
+The account username
+
+=back
+
+
+=item 
+C<email I<string>>
+
+=over 4
+
+The users email address
+
+=back
+
+
+=item 
+C<high_quality I<boolean>>
+
+=over 4
+
+The users ability to upload higher quality images, there will be less compression
+
+=back
+
+
+=item 
+C<public_images I<boolean>>
+
+=over 4
+
+Automatically allow all images to be publicly accessible
+
+=back
+
+
+=item 
+C<album_privacy I<string>>
+
+=over 4
+
+Set the album privacy to this privacy setting on creation
+
+=back
+
+
+=item 
+C<pro_expiration I<integer or boolean>>
+
+=over 4
+
+False if not a pro user, their expiration date if they are.
+
+=back
+
+
+=item 
+C<accepted_gallery_terms I<boolean>>
+
+=over 4
+
+True if the user has accepted the terms of uploading to the Imgur gallery.
+
+=back
+
+
+=item 
+C<active_emails I<Array of Strings>>
+
+=over 4
+
+The email addresses that have been activated to allow uploading
+
+=back
+
+
+=item 
+C<messaging_enabled I<boolean>>
+
+=over 4
+
+If the user is accepting incoming messages or not
+
+=back
+
+
+=item 
+C<blocked_users I<Array of objects>>
+
+=over 4
+
+An array of users that have been blocked from messaging, the object is blocked_id and blocked_url.
+
+=back
+
+
+=item 
+C<show_mature I<boolean>>
+
+=over 4
+
+True if the user has opted to have mature images displayed in gallery list endpoints.
+
+=back
+
+
+=item 
+C<first_party I<boolean>>
+
+=over 4
+
+True unless the user created their account via a third party service such as Google Plus.
+
+=back
+
+
+
+=head1 EXAMPLE
+
+
+ {
+   "success" : true,
+   "data" : {
+      "show_mature" : false,
+      "public_images" : false,
+      "high_quality" : true,
+      "album_privacy" : "secret",
+      "accepted_gallery_terms" : true,
+      "first_party" : true,
+      "pro_expiration" : false,
+      "active_emails" : [],
+      "email" : "josh@imgur.com"
+   },
+   "status" : 200
+}
+
+
+
+=cut
+
+=head1 SEE ALSO
+
+http://api.imgur.com/models/accountsettings
+
+

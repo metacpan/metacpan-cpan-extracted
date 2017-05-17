@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Utils::GenClassPod;
-$Config::Model::Utils::GenClassPod::VERSION = '2.101';
+$Config::Model::Utils::GenClassPod::VERSION = '2.102';
 # ABSTRACT: generate pod documentation from configuration models
 
 use strict;
@@ -17,12 +17,14 @@ use 5.010;
 use parent qw(Exporter);
 our @EXPORT = qw(gen_class_pod);
 
-use lib qw/lib/;
 use Path::Tiny ;
 use Config::Model ;             # to generate doc
 
 sub gen_class_pod {
-    my $cm = Config::Model -> new(model_dir => "lib/Config/Model/models") ;
+    # make sure that doc is generated from models from ./lib and not
+    # installed models
+    my $local_model_dir = path("lib/Config/Model/models") -> absolute;
+    my $cm = Config::Model -> new(model_dir => $local_model_dir->stringify ) ;
     my %done;
 
     my @models = @_ ? @_ :
@@ -55,7 +57,7 @@ Config::Model::Utils::GenClassPod - generate pod documentation from configuratio
 
 =head1 VERSION
 
-version 2.101
+version 2.102
 
 =head1 SYNOPSIS
 

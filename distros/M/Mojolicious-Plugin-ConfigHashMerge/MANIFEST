@@ -5,7 +5,9 @@ MANIFEST			This list of files
 LICENSE
 README.md
 t/basic.t
-t/myapp.conf
+t/my_app.conf
 t/negative.t
+t/lib/MyApp.pm
+t/app.t
 META.yml
 META.json

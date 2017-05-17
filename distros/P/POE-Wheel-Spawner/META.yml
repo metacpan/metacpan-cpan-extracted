@@ -22,9 +22,9 @@ requires:
   POE::Wheel::Run: '0'
   fields: '0'
   perl: '5.006'
-  version: '0'
+  version: '0.77'
 resources:
   bugtracker: https://github.com/p-alik/POE-Wheel-Spawner/issues
   repository: https://github.com/p-alik/POE-Wheel-Spawner.git
-version: v0.3.1
+version: v0.3.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

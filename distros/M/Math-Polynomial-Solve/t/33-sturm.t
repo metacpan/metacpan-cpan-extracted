@@ -2,10 +2,11 @@ use 5.010001;
 use Test::More tests => 10;
 
 use Math::Polynomial::Solve qw(:sturm :utility poly_roots ascending_order);
-use Math::Utils qw(:polynomial);
+use Math::Utils qw(:polynomial :compare);
 use strict;
 use warnings;
-require "t/coef.pl";
+
+my($eq, $ne) = generate_relational(2.5e-7);
 
 my @case = (
 	[20, 200, -4, -1],
@@ -27,11 +28,12 @@ for my $cref (@case)
 
 	my @roots = sturm_bisection_roots(\@chain, -10000, 100);
 	my @zeroes = pl_evaluate(\@rev, \@roots);
+	my @badvals = grep {&$ne($_, 0)} @zeroes;
 
-	ok(allzeroes(\@rev, @roots),
+	ok(scalar @badvals == 0,
 		"Polynomial: [" . join(", ", @polynomial) . "],\n" .
 	   " 'zeroes' are (" . join(", ", @zeroes) . ")\n" .
-	   " sturm_bisection() returns (" . join(", ", @roots) . ")\n" .
+	   " sturm_bisection_roots() returns (" . join(", ", @roots) . ")\n" .
 	   "      poly_roots() returns (" . join(", ", @plroots) . ")"
 	);
 }
@@ -45,13 +47,26 @@ for my $cref (@case)
 
 	my @roots = sturm_bisection_roots(\@chain, -10000, 100);
 	my @zeroes = pl_evaluate(\@polynomial, \@roots);
+	my @badvals = grep {&$ne($_, 0)} @zeroes;
 
-	ok(allzeroes(\@polynomial, @roots),
+	ok(scalar @badvals == 0,
 		"Polynomial (ascending): [" . join(", ", @polynomial) . "],\n" .
 	   " 'zeroes' are (" . join(", ", @zeroes) . ")\n" .
-	   " sturm_bisection() returns (" . join(", ", @roots) . ")\n" .
+	   " sturm_bisection_roots() returns (" . join(", ", @roots) . ")\n" .
 	   "      poly_roots() returns (" . join(", ", @plroots) . ")"
 	);
 }
 
 exit(0);
+
+sub rootprint
+{
+	my @fmtlist;
+	for (@_)
+	{
+		push @fmtlist, cartesian_format(undef, undef, $_);
+	}
+	return "[ " . join(", ", @fmtlist) . " ]";
+}
+
+1;

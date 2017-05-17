@@ -1,5 +1,5 @@
 package App::SmokeBox::Mini::Plugin;
-$App::SmokeBox::Mini::Plugin::VERSION = '0.66';
+$App::SmokeBox::Mini::Plugin::VERSION = '0.68';
 #ABSTRACT: minismokebox plugins
 
 use strict;
@@ -19,7 +19,7 @@ App::SmokeBox::Mini::Plugin - minismokebox plugins
 
 =head1 VERSION
 
-version 0.66
+version 0.68
 
 =head1 DESCRIPTION
 

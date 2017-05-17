@@ -21,9 +21,9 @@ t/empty-string.t
 t/example-array-of-hashes.t
 t/headers.t
 t/issue-24-booleans-in-yaml-schema.t
-t/not_implemented_hook.t
 t/path-parameters.t
 t/register.t
+t/renderer.t
 t/reply-asset.t
 t/reply-spec.t
 t/reply.t

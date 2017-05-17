@@ -3,7 +3,7 @@ package Perlito5::JSON;
 sub ast_dumper {
     my $seen  = {};
     my $level = '';
-    my $pos   = '[TODO - recursive structure in AST is not supported]';
+    my $pos   = '[TODO - recursive structure is not supported]';
     return _dumper( $_[0], $level, $seen, $pos );
 }
 
@@ -39,7 +39,7 @@ sub _dumper {
         my $here = $pos . '{' . $i . '}';
         push @out, $tab1 . qq{"$i": } . _dumper( $obj->{$i}, $tab1, $seen, $here );
     }
-    return "{ " . join( ",\n", @out ) . "\n" . $tab . "}";
+    return "{\n" . join( ",\n", @out ) . "\n" . $tab . "}";
 }
 
 sub escape_string {

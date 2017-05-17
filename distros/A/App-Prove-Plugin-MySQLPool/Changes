@@ -1,5 +1,9 @@
 Revision history for Perl extension App::Prove::Plugin::MySQLPool
 
+0.07 2017-05-13T13:47:02Z
+    - load preparer to call my_cnf method (skozawa)
+    - In perl 5.26 the dot is not anymore in `@INC` (shogo82148, eserte)
+
 0.06 2016-12-20T12:07:54Z
     - using Test::mysqld->start_mysqls in launch mysqld servers (shogo82148)
 

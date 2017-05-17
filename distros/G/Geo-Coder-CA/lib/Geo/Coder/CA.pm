@@ -1,5 +1,7 @@
 package Geo::Coder::CA;
 
+# See also https://geocoding.geo.census.gov/geocoder/Geocoding_Services_API.html for the US for the future
+
 use strict;
 use warnings;
 
@@ -16,11 +18,11 @@ Geo::Coder::CA - Provides a geocoding functionality using http:://geocoder.ca fo
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -90,7 +92,7 @@ sub geocode {
 	my $res = $self->{ua}->get($url);
 
 	if ($res->is_error) {
-		Carp::croak("Google Places API returned error: " . $res->status_line);
+		Carp::croak("geocode.ca API returned error: " . $res->status_line());
 	}
 
 	my $json = JSON->new->utf8;
@@ -146,16 +148,6 @@ sub reverse_geocode {
 	return $self->geocode(location => $latlng, reverse => 1);
 };
 
-# method below adapted from
-# http://gmaps-samples.googlecode.com/svn/trunk/urlsigning/urlsigner.pl
-sub _encode_urlsafe{
-	my ($self, $content) = @_;
-	$content =~ tr/\+/\-/;
-	$content =~ tr/\//\_/;
-
-	return $content;
-}
-
 =head1 AUTHOR
 
 Nigel Horne <njh@bandsman.co.uk>
@@ -166,6 +158,10 @@ This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 Lots of thanks to the folks at geocoder.ca.
+
+=head1 BUGS
+
+Should be called Geo::Coder::NA for North America.
 
 =head1 SEE ALSO
 

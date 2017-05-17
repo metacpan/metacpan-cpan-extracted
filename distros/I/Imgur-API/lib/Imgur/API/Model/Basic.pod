@@ -1,0 +1,65 @@
+=head1 NAME
+
+Imgur::API::Model::Basic
+
+=head1 DESCRIPTION
+
+=over 4
+
+This is the basic response for requests that do not return data. If the POST request has a Basic model it will return the id.
+
+=back
+
+=cut
+
+=head1 FIELDS
+ 
+=item 
+C<data I<mixed>>
+
+=over 4
+
+Is null, boolean, or integer value. If it's a post then this will contain an object with the all generated values, such as an ID.
+
+=back
+
+
+=item 
+C<success I<boolean>>
+
+=over 4
+
+Was the request successful
+
+=back
+
+
+=item 
+C<status I<integer>>
+
+=over 4
+
+HTTP Status Code
+
+=back
+
+
+
+=head1 EXAMPLE
+
+
+ {
+   "success" : true,
+   "data" : true,
+   "status" : 200
+}
+
+
+
+=cut
+
+=head1 SEE ALSO
+
+http://api.imgur.com/models/basic
+
+

@@ -5,21 +5,10 @@ use Exporter 'import';
 use Carp;
 use Fcntl;
 use Config;
+use Linux::NFS::BigDir::Syscalls;
 
 use constant BUF_SIZE     => 4096;
-use constant SYS_getdents => do {
-    use Inline 0.80 C => <<'...';
-#include <sys/syscall.h>
-
-int _get_syscall_num() {
-      return SYS_getdents;
-}
-...
-
-    _get_syscall_num();
-};
-
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 =pod
 

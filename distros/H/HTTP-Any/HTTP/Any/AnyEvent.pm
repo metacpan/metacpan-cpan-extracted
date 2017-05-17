@@ -24,6 +24,12 @@ sub do_http {
 	$args{headers} = \%headers      if keys %headers;
 	$args{timeout} = $$opt{timeout} if $$opt{timeout};
 
+	if (defined $$opt{max_redirect}) {
+		$args{recurse} = $$opt{max_redirect};
+	} else {
+		$args{recurse} = 7;
+	}
+
 	if (my $proxy = $$opt{proxy}) {
 		if ($proxy =~ m/^socks/) {
 			$proxy =~ s!^socks://!socks5://!;

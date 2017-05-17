@@ -15,7 +15,7 @@ ok !defined $records->[0]->{my}{no}{field}, q|fix: marc_spec('000', my.no.field)
 
 #field 666 does not exist in camel.usmarc
 #he '$append' fix creates $my->{'references'} hash key with empty array ref as value
-ok !$records->[0]->{'my'}{'references'}, q|fix: marc_map('666', my.references.$append);|;
+ok !$records->[0]->{'my'}{'references'}, q|fix: marc_spec('666', my.references.$append);|;
 
 is_deeply
     $records->[0]->{'my'}{'references2'},
@@ -23,7 +23,7 @@ is_deeply
         'first',
         'IMchF'
     ], 
-    q|fix: add_field(my.references2.$first, 'first'); marc_map('003', my.references2.$append);|;
+    q|fix: add_field(my.references2.$first, 'first'); marc_spec('003', my.references2.$append);|;
 
 is $records->[0]->{my}{title}{all}, 'Cross-platform Perl /Eric F. Johnson.', q|fix: marc_spec('245', my.title.all);|;
 

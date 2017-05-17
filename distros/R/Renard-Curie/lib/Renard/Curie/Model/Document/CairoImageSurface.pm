@@ -1,7 +1,7 @@
 use Renard::Curie::Setup;
 package Renard::Curie::Model::Document::CairoImageSurface;
 # ABSTRACT: Document made up of a collection of Cairo image surfaces
-$Renard::Curie::Model::Document::CairoImageSurface::VERSION = '0.001';
+$Renard::Curie::Model::Document::CairoImageSurface::VERSION = '0.002';
 use Renard::Curie::Model::Page::CairoImageSurface;
 use Function::Parameters;
 use Renard::Curie::Types qw(PageNumber InstanceOf ArrayRef);
@@ -14,11 +14,11 @@ has image_surfaces => (
 	required => 1
 );
 
-method _build_last_page_number :ReturnType(PageNumber) {
+method _build_last_page_number() :ReturnType(PageNumber) {
 	return scalar @{ $self->image_surfaces };
 }
 
-method get_rendered_page( (PageNumber) :$page_number ) {
+method get_rendered_page( (PageNumber) :$page_number, @) {
 	my $index = $page_number - 1;
 
 	return Renard::Curie::Model::Page::CairoImageSurface->new(
@@ -48,7 +48,7 @@ Renard::Curie::Model::Document::CairoImageSurface - Document made up of a collec
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 EXTENDS
 

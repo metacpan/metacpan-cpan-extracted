@@ -310,6 +310,7 @@ SKIP: {   ### details() test ###
 
 }
 
+
 ### test module from perl core ###
 {   isa_ok( $CoreMod, 'CPANPLUS::Module',
                                 "Core module " . $CoreName );

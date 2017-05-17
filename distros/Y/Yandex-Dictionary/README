@@ -1,0 +1,66 @@
+Yandex-Dictionary version 0.02
+==============================
+
+DESCRIPTION
+
+The API is used for getting detailed dictionary entries from the static 
+Yandex.Dictionary. Unlike conventional translation dictionaries, it is 
+compiled automatically using the technologies at the root of the Yandex 
+machine translation system. Yandex.Dictionary entries include the word’s 
+part of speech, and translations are grouped with examples. For English words, 
+the transcription is provided. The service supports a total of 17 language pairs.
+
+Note also that the “Yandex Terms of Use of API Yandex.Dictionary Service”
+at https://yandex.com/legal/translate_api/ must be observed.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module has the following modules as runtime prerequisites:
+
+    HTML::Entities (3.69 or newer recommended)
+    HTTP::Tiny (0.070 or newer recommended)
+    JSON (2.90 or newer recommended)
+    URI::Escape (3.31 or newer recommended)
+
+Additionally, the following module is a testing prerequisite:
+
+    Test::More
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Yandex::Translate
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Yandex::Dictionary
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Yandex::Dictionary
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Yandex::Dictionary
+
+    Search CPAN
+        http://search.cpan.org/dist/Yandex::Dictionary/
+
+COPYLEFT AND LICENSE
+
+Copyleft © 2017 James Axl
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

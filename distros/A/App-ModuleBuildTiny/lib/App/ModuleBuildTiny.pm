@@ -3,7 +3,7 @@ package App::ModuleBuildTiny;
 use 5.010;
 use strict;
 use warnings;
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 
 use Exporter 5.57 'import';
 our @EXPORT = qw/modulebuildtiny/;
@@ -136,8 +136,8 @@ my %actions = (
 		my @arguments = @_;
 		GetOptionsFromArray(\@arguments, 'verbose!' => \my $verbose);
 		my $dist = App::ModuleBuildTiny::Dist->new;
-		my $name = $dist->meta->name . '-' . $dist->meta->version . '.tar.gz';
-		printf "tar czf $name %s\n", join ' ', $dist->files if ($verbose || 0) > 0;
+		my $name = $dist->meta->name . '-' . $dist->meta->version;
+		printf "tar czf $name.tar.tz %s\n", join ' ', $dist->files if ($verbose || 0) > 0;
 		$dist->write_tarball($name);
 		return 0;
 	},
@@ -161,13 +161,12 @@ my %actions = (
 
 		my $dist = App::ModuleBuildTiny::Dist->new;
 		$dist->run(command => [ $Config{perlpath}, 'Build', 'test' ], build => 1) or return 1;
-		my $name = $dist->meta->name . '-' . $dist->meta->version . '.tar.gz';
-
-		$dist->write_tarball($name);
+		my $name = $dist->meta->name . '-' . $dist->meta->version;
+		my $file = $dist->write_tarball($name);
 		require CPAN::Upload::Tiny;
 		my $uploader = CPAN::Upload::Tiny->new_from_config($config_file);
-		$uploader->upload_file($name);
-		print "Successfully uploaded $name\n" if not $silent;
+		$uploader->upload_file($file);
+		print "Successfully uploaded $file\n" if not $silent;
 		return 0;
 	},
 	run => sub {
@@ -300,7 +299,7 @@ App::ModuleBuildTiny - A standalone authoring tool for Module::Build::Tiny
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 DESCRIPTION
 

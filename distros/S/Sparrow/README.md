@@ -709,12 +709,13 @@ You have to do 3 simple steps:
 
 This is the way how one can declare dependencies for sparrow plugins:
 
-    +----------+----------+
-    | Language |  File    |
-    +----------+----------+
-    | Perl     | cpanfile |
-    | Ruby     | Gemfile  |
-    +----------+----------+
+    +----------+-------------------+
+    | Language |  File             |
+    +----------+-------------------+
+    | Perl     | cpanfile          |
+    | Ruby     | Gemfile           |
+    | Python   | requirements.txt  |
+    +----------+-------------------+
 
 You should place a dependency file into a plugin root directory.
 
@@ -784,7 +785,7 @@ Pretty cool, huh? :)))
 
 A shortcut for `sparrow remote task install ... & sparrow task run` is:
 
-    $ sparrow remote task task run utils/git-setup
+    $ sparrow remote task run utils/git-setup
 
 ## Share your task
 

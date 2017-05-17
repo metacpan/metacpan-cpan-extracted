@@ -1,3 +1,16 @@
+2.010 2017-05-14
+
+  New features:
+    * add yaml_class parameter to yaml backend
+
+  Model bug fixes:
+    * app category is mandatory
+
+  Bug fixes to avoid relying on '.' in @INC:
+    * Itself.pm: call model->load with absolute path
+    * use Path::Tiny in test
+    * fix itself.t and itself-editor.t tests
+
 2.009 2017-04-29
 
   New features:

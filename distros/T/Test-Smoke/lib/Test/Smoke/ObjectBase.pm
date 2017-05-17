@@ -3,6 +3,8 @@ use warnings;
 use strict;
 use Carp;
 
+our $VERSION = '0.001';
+
 =head1 NAME
 
 Test::Smoke:ObjectBase - Base class for objects (AUTOLOADed accessors)

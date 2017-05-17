@@ -1,0 +1,711 @@
+=head1 NAME
+
+Imgur::API::Endpoint::Account
+
+=head1 DESCRIPTION
+
+=over 4
+
+Access to the imgur Account API Endpoint. 
+
+=back
+
+=cut
+
+=head1 METHODS
+ 
+
+=head2 get
+
+=over 2
+
+Request standard user information. If you need the username for the account that is logged in, it is returned in the request for an access token. Note: This endpoint also supports the ability to lookup account base info by account ID. To do so, pass the query parameter account_id.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<username> I<required>
+
+Username
+
+
+=back
+
+
+=head2 galleryFavorites
+
+=over 2
+
+Return the images the user has favorited in the gallery.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<username> I<required>
+
+Username
+
+=item *
+ C<page> I<optional>
+
+integer - allows you to set the page number so you don't have to retrieve all the data at once.
+
+=item *
+ C<sort> I<optional>
+
+'oldest', or 'newest'. Defaults to 'newest'.
+
+
+=back
+
+
+=head2 favorites
+
+=over 2
+
+Returns the users favorited images, only accessible if you're logged in as the user.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<username> I<required>
+
+Username
+
+=item *
+ C<page> I<optional>
+
+integer - allows you to set the page number so you don't have to retrieve all the data at once.
+
+=item *
+ C<sort> I<optional>
+
+'oldest', or 'newest'. Defaults to 'newest'.
+
+
+=back
+
+
+=head2 submissions
+
+=over 2
+
+Return the images a user has submitted to the gallery
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<username> I<required>
+
+Username
+
+=item *
+ C<page> I<required>
+
+Page
+
+
+=back
+
+
+=head2 settings
+
+=over 2
+
+Returns the account settings, only accessible if you're logged in as the user.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<username> I<required>
+
+Username
+
+
+=back
+
+
+=head2 updateSettings
+
+=over 2
+
+Updates the account settings for a given user, the user must be logged in.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<messaging_enabled> I<optional>
+
+true | false - Allows the user to enable / disable private messages
+
+=item *
+ C<username> I<optional>
+
+A valid Imgur username (between 4 and 63 alphanumeric characters)
+
+=item *
+ C<show_mature> I<optional>
+
+true | false - Toggle display of mature images in gallery list endpoints.
+
+=item *
+ C<album_privacy> I<optional>
+
+public | hidden | secret - Sets the default privacy level of albums the users creates
+
+=item *
+ C<accepted_gallery_terms> I<optional>
+
+true | false - The user agreement to the Imgur Gallery terms.
+
+=item *
+ C<public_images> I<optional>
+
+Set the users images to private or public by default
+
+=item *
+ C<newsletter_subscribed> I<optional>
+
+true | false - Toggle subscription to email newsletter.
+
+=item *
+ C<bio> I<optional>
+
+The biography of the user, is displayed in the gallery profile page.
+
+
+=back
+
+
+=head2 profile
+
+=over 2
+
+Returns the totals for the gallery profile.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<username> I<required>
+
+Username
+
+
+=back
+
+
+=head2 verifyEmail
+
+=over 2
+
+Checks to see if user has verified their email address
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<username> I<required>
+
+Username
+
+
+=back
+
+
+=head2 sendVerifyEmail
+
+=over 2
+
+Sends an email to the user to verify that their email is valid to upload to gallery. Must be logged in as the user to send.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<username> I<required>
+
+Username
+
+
+=back
+
+
+=head2 albums
+
+=over 2
+
+Get all the albums associated with the account. Must be logged in as the user to see secret and hidden albums.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<page> I<optional>
+
+integer - allows you to set the page number so you don't have to retrieve all the data at once.
+
+=item *
+ C<username> I<required>
+
+Username
+
+
+=back
+
+
+=head2 album
+
+=over 2
+
+Get additional information about an album, this endpoint works the same as the Album Endpoint. You can also use any of the additional routes that are used on an album in the album endpoint.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<account> I<required>
+
+Account
+
+=item *
+ C<username> I<required>
+
+Username
+
+
+=back
+
+
+=head2 albumIds
+
+=over 2
+
+Return an array of all of the album IDs.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<page> I<optional>
+
+integer - allows you to set the page number so you don't have to retrieve all the data at once.
+
+=item *
+ C<username> I<required>
+
+Username
+
+
+=back
+
+
+=head2 albumCount
+
+=over 2
+
+Return the total number of albums associated with the account.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<username> I<required>
+
+Username
+
+
+=back
+
+
+=head2 albumDelete
+
+=over 2
+
+Delete an Album with a given id.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<username> I<required>
+
+Username
+
+=item *
+ C<account> I<required>
+
+Account
+
+
+=back
+
+
+=head2 comments
+
+=over 2
+
+Return the comments the user has created.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<sort> I<optional>
+
+'best', 'worst', 'oldest', or 'newest'. Defaults to 'newest'.
+
+=item *
+ C<page> I<optional>
+
+Page number (50 items per page). Defaults to 0.
+
+=item *
+ C<username> I<required>
+
+Username
+
+
+=back
+
+
+=head2 comment
+
+=over 2
+
+Return information about a specific comment. This endpoint works the same as the Comment Endpoint. You can use any of the additional actions that the comment endpoint allows on this end point.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<account> I<required>
+
+Account
+
+=item *
+ C<username> I<required>
+
+Username
+
+
+=back
+
+
+=head2 commentIds
+
+=over 2
+
+Return an array of all of the comment IDs.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<sort> I<optional>
+
+'best', 'worst', 'oldest', or 'newest'. Defaults to 'newest'.
+
+=item *
+ C<page> I<optional>
+
+Page number (50 items per page). Defaults to 0.
+
+=item *
+ C<username> I<required>
+
+Username
+
+
+=back
+
+
+=head2 commentCount
+
+=over 2
+
+Return a count of all of the comments associated with the account.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<username> I<required>
+
+Username
+
+
+=back
+
+
+=head2 commentDelete
+
+=over 2
+
+Delete a comment. You are required to be logged in as the user whom created the comment.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<username> I<required>
+
+Username
+
+=item *
+ C<account> I<required>
+
+Account
+
+
+=back
+
+
+=head2 images
+
+=over 2
+
+Return all of the images associated with the account. You can page through the images by setting the page, this defaults to 0.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<page> I<required>
+
+Page
+
+=item *
+ C<username> I<required>
+
+Username
+
+
+=back
+
+
+=head2 image
+
+=over 2
+
+Return information about a specific image. This endpoint works the same as the Image Endpoint. You can use any of the additional actions that the image endpoint with this endpoint.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<username> I<required>
+
+Username
+
+=item *
+ C<account> I<required>
+
+Account
+
+
+=back
+
+
+=head2 imageIds
+
+=over 2
+
+Returns an array of Image IDs that are associated with the account.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<page> I<optional>
+
+integer - allows you to set the page number so you don't have to retrieve all the data at once.
+
+=item *
+ C<username> I<required>
+
+Username
+
+
+=back
+
+
+=head2 imageCount
+
+=over 2
+
+Returns the total number of images associated with the account.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<username> I<required>
+
+Username
+
+
+=back
+
+
+=head2 imageDelete
+
+=over 2
+
+Deletes an Image. This requires a delete hash rather than an ID.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<username> I<required>
+
+Username
+
+=item *
+ C<deletehash> I<required>
+
+Deletehash
+
+
+=back
+
+
+=head2 replies
+
+=over 2
+
+Returns all of the reply notifications for the user. Required to be logged in as that user
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<new> I<optional>
+
+boolean - false for all notifications, true for only non-viewed notification. Default is true.
+
+=item *
+ C<username> I<required>
+
+Username
+
+
+=back
+
+
+=head1 SEE ALSO
+
+=over 4 
+
+https://api.imgur.com/endpoints/account
+
+=back
+
+=cut

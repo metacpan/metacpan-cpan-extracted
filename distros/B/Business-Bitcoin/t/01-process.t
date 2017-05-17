@@ -17,14 +17,19 @@ ok (my $bizbtc = new Business::Bitcoin (XPUB => 'xpub6895k9BPNhE9sTBUj9nNJpDtHqE
 ok (my $req = $bizbtc->request(Amount => 4200, Confirmations => 0, Reference => 0), 'Business::Bitcoin::Request created');
 ok ($req->address eq '1HU8TWVbKbPZEQtiU3Z3jTc3tT7nitJmG4', 'Request address check');
 
-# Verify payment at 0 confirmations
+SKIP: {
+  skip "To test payment verification set environment variable BIZBTCTESTVERIFY", 2 unless $ENV{BIZBTCTESTVERIFY};
 
-ok($req->verify(), 'Payment verified at 0 confirmations');
+  # Verify payment at 0 confirmations
 
-# Try again with 5 confirmations required
+  ok($req->verify(), 'Payment verified at 0 confirmations');
 
-$req->confirmations(5);
-ok($req->verify(), 'Payment verified at 5 confirmations');
+  # Try again with 5 confirmations required
+
+  $req->confirmations(5);
+  ok($req->verify(), 'Payment verified at 5 confirmations');
+
+};
 
 # Find and load a request by Address
 

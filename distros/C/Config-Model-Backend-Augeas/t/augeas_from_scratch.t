@@ -53,7 +53,7 @@ rmtree($wr_root);
 mkpath($wr_root.'etc/ssh/', { mode => 0755 }) ;
 
 # set_up data
-do "t/test_model.pl" ;
+do "./t/test_model.pl" ;
 
 my $have_pkg_config = `pkg-config --version` || '';
 chomp $have_pkg_config ;

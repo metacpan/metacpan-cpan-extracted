@@ -1,5 +1,5 @@
 package Net::Easypost;
-$Net::Easypost::VERSION = '0.19';
+$Net::Easypost::VERSION = '0.20';
 use Carp qw(croak);
 
 use Net::Easypost::Address;
@@ -115,7 +115,7 @@ Net::Easypost - Perl client for the Easypost web service
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 

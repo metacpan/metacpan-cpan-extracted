@@ -44,9 +44,10 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "POE::Filter::HTTP::Parser" => "1.06",
     "Test::More" => "0.47",
-    "Test::POE::Server::TCP" => "0.12"
+    "Test::POE::Server::TCP" => "0.12",
+    "YAML::XS" => "0.64"
   },
-  "VERSION" => "0.66",
+  "VERSION" => "0.68",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -73,10 +74,11 @@ my %FallbackPrereqs = (
   "Test::More" => "0.47",
   "Test::POE::Server::TCP" => "0.12",
   "Time::Duration" => "1.06",
+  "YAML::XS" => "0.64",
   "unless" => "0.02"
 );
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.032
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.033
 if (can_cc()) {
 requires( 'POE::XS::Queue::Array' => 0.005 );
 if ( $^O eq 'linux' ) {
@@ -104,15 +106,15 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
 
 WriteMakefile(%WriteMakefileArgs);
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.032
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.033
 sub _add_prereq {
   my ($mm_key, $module, $version_or_range) = @_;
   $version_or_range ||= 0;
-  warn "$module already exists in $mm_key -- need to do a sane metamerge!"
+  warn "$module already exists in $mm_key (at version $WriteMakefileArgs{$mm_key}{$module}) -- need to do a sane metamerge!"
     if exists $WriteMakefileArgs{$mm_key}{$module}
       and $WriteMakefileArgs{$mm_key}{$module} ne '0'
       and $WriteMakefileArgs{$mm_key}{$module} ne $version_or_range;
-  warn "$module already exists in FallbackPrereqs -- need to do a sane metamerge!"
+  warn "$module already exists in FallbackPrereqs (at version $WriteMakefileArgs{$mm_key}{$module}) -- need to do a sane metamerge!"
     if exists $FallbackPrereqs{$module} and $FallbackPrereqs{$module} ne '0'
         and $FallbackPrereqs{$module} ne $version_or_range;
   $WriteMakefileArgs{$mm_key}{$module} = $FallbackPrereqs{$module} = $version_or_range;

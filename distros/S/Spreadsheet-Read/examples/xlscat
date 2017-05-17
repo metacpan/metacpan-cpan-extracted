@@ -2,12 +2,12 @@
 
 # xlscat:  show XLS/SXC file as Text
 # xlsgrep: grep pattern
-#	   (m)'17 [2017-02-02] Copyright H.M.Brand 2005-2017
+#	   (m)'17 [2017-04-25] Copyright H.M.Brand 2005-2017
 
 use strict;
 use warnings;
 
-our $VERSION = "3.6";
+our $VERSION = "3.8";
 
 my $is_grep = $0 =~ m/grep$/;
 
@@ -29,6 +29,7 @@ sub usage {
 	"       -e <enc>    Set encoding for input and output\n",
 	"       -b <enc>    Set encoding for input\n",
 	"       -a <enc>    Set encoding for output\n",
+	"       -U          Set encoding for output to utf-8 (short for -a utf-8)\n",
 	"    Input CSV:\n",
 	"       --in-sep=c  Set input sep_char for CSV\n",
 	"    Input XLS:\n",
@@ -75,15 +76,9 @@ sub usage {
 
 use Getopt::Long qw(:config bundling noignorecase);
 my $opt_c;		# Generate CSV
-my $opt_s;		# Text separator
-my $opt_S;		# Sheets to print
-my $opt_R;		# Rows to print
-my $opt_C;		# Columns to print
-my $dtfmt;		# Default date-format for Excel
 my $opt_F = "";		# Fields to print
 my $opt_i = 0;		# Index (cat) | ignore_case (grep)
 my $opt_L = 0;		# Auto-size/align columns
-my $opt_n;		# Prefix lines with column number
 my $opt_u = 0;		# Show unformatted values
 my $opt_f = 0;		# Show the formula instead of the value
 my $opt_v = 0;		# Verbosity for xlscat
@@ -95,7 +90,6 @@ my $opt_w = 0;		# Grep words
 my $clip  = 1;
 my $enc_i;		# Input  encoding
 my $enc_o;		# Output encoding
-my $sep;		# Input field sep for CSV
 GetOptions (
     "help|?"		=> sub { usage (0); },
 
@@ -104,11 +98,11 @@ GetOptions (
     "m|ms"		=> sub { $opt_c = ";" },
     "insepchar".
      "|in-sep".
-     "|in-sep-char=s"	=> \$sep,
+     "|in-sep-char=s"	=> \my $sep,	# Input field sep for CSV
 
     # Input XLS
     "dtfmt".
-     "|date-format=s"	=> \$dtfmt,
+     "|date-format=s"	=> \my $dtfmt,	# Default date-format for Excel
     "f|formulas!"	=> \$opt_f,
 
     # Output
@@ -117,13 +111,14 @@ GetOptions (
     "s|separator".
      "|outsepchar".
      "|out-sep".
-     "|out-sep-char=s"	=> \$opt_s,
-    "S|sheets=s"	=> \$opt_S,
-    "R|rows=s"		=> \$opt_R,
-    "C|columns=s"	=> \$opt_C,
+     "|out-sep-char=s"	=> \my $opt_s,	# Text separator
+    "S|sheets=s"	=> \my $opt_S,	# Sheets to print
+    "R|rows=s"		=> \my $opt_R,	# Rows to print
+    "C|columns=s"	=> \my $opt_C,	# Columns to print
     "F|fields=s"	=> \$opt_F,
     "L|fit|align!"	=> \$opt_L,
-    "n|number:0"	=> \$opt_n,
+    "P|pivot!"		=> \my $pivot,
+    "n|number:0"	=> \my $opt_n,	# Prefix lines with column number
     "A|ansi|color!"	=> \$opt_A,
     "u|unformatted!"	=> \$opt_u,
     "v|verbose:1"	=> \$opt_v,
@@ -137,6 +132,7 @@ GetOptions (
     "e|encoding=s"	=> sub { $enc_i = $enc_o = $_[1] },
     "b|encoding-in=s"	=> \$enc_i,
     "a|encoding-out=s"	=> \$enc_o,
+    "U|utf-8|utf8"	=> sub { $enc_o = "utf-8" },
 
     # Grep
     "w|word!"		=> \$opt_w,
@@ -224,6 +220,7 @@ $opt_A         and push @RDarg, attr  => 1;
 defined $sep   and push @RDarg, sep   => $sep, parser => "csv";
 defined $dtfmt and push @RDarg, dtfmt => $dtfmt;
 $strip         and push @RDarg, strip => $strip;
+$pivot         and push @RDarg, pivot => $pivot;
 $opt_v > 4 and warn "ReadData ($file, @RDarg);\n";
 my $xls = ReadData ($file, @RDarg) or die "cannot read $file\n";
 $opt_v > 7 and ddumper ($xls);
@@ -330,6 +327,7 @@ foreach my $si (1 .. $sc) {
     $opt_v > 1 and warn "Opening sheet $si ...\n";
     my $s = $xls->[$si] or next;
     $opt_v > 5 and ddumper ($s);
+
     my @r = (1, $s->{maxrow});
     my @c = (1, $s->{maxcol});
     my ($sn, $nr, $nc) = ($s->{label}, $r[-1], $c[-1]);
@@ -473,7 +471,7 @@ foreach my $si (1 .. $sc) {
 	    my $l = length $row[$_];
 	    my $w = $l < $w[$_] ? " " x ($w[$_] - $l) : "";
 	    if ($align[$_]) {
-		$row[$_] .= $w;
+		$_ ==  $#row or $row[$_] .= $w;
 		}
 	    else {
 		substr $row[$_], 0, 0, $w;

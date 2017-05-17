@@ -1,4 +1,5 @@
-#$Id: MANIFEST 1201 2007-10-27 01:22:17Z jimk $
+.gitignore
+.version_info.pl
 Changes
 lib/Pod/Multi.pm
 LICENSE
@@ -26,4 +27,5 @@ t/lib/s1.pod
 t/lib/s2.pod
 t/lib/s3.pm
 t/lib/s4
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

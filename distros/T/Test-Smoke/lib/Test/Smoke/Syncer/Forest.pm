@@ -2,6 +2,8 @@ package Test::Smoke::Syncer::Forest;
 use warnings;
 use strict;
 
+our $VERSION = '0.029';
+
 use base 'Test::Smoke::Syncer::Base';
 
 =head1 Test::Smoke::Syncer::Forest

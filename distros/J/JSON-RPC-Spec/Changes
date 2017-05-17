@@ -1,5 +1,15 @@
 Revision history for Perl extension JSON-RPC-Spec
 
+v1.0.7 2017-05-15T04:39:40Z
+
+    commit e0e901af4b2c2475e7f3719366df4c380b46f0f3
+    Author: nqounet <mail@nqou.net>
+    Date:   Mon May 15 13:31:44 2017 +0900
+
+        fix dot removed from @INC(master)
+
+        https://github.com/nqounet/p5-json-rpc-spec/issues/6
+
 v1.0.6 2016-06-26T09:31:10Z
 
     commit c0c8a2140412d40fac17d4409489f84e88ca91cc

@@ -117,45 +117,19 @@ sub api_call ( $self, $method_id, @ ) {
     my ( $cb, $args );
 
     # parse $args and $cb
-    if ( ref $_[-1] eq 'CODE' ) {
+    if ( ref $_[-1] eq 'CODE' or ( blessed $_[-1] && $_[-1]->can('IS_CALLBACK') ) ) {
         $cb = $_[-1];
 
-        $args = [ splice @_, 2, -1 ] if @_ > 3;
-    }
-    elsif ( blessed $_[-1] && $_[-1]->isa('Pcore::App::API::Auth::Request') ) {
-        $cb = $_[-1];
-
-        $args = [ splice @_, 2, -1 ] if @_ > 3;
+        $args = [ @_[ 2 .. $#_ - 1 ] ] if @_ > 3;
     }
     else {
-        $args = [ splice @_, 2 ] if @_ > 2;
+        $args = [ @_[ 2 .. $#_ ] ] if @_ > 2;
     }
 
-    return api_call_arrayref( $self, undef, $method_id, $args, $cb );
+    return $self->api_call_arrayref( $method_id, $args, $cb );
 }
 
-sub api_call_env ( $self, $env, $method_id, @ ) {
-    my ( $cb, $args );
-
-    # parse $args and $cb
-    if ( ref $_[-1] eq 'CODE' ) {
-        $cb = $_[-1];
-
-        $args = [ splice @_, 3, -1 ] if @_ > 4;
-    }
-    elsif ( blessed $_[-1] && $_[-1]->isa('Pcore::App::API::Auth::Request') ) {
-        $cb = $_[-1];
-
-        $args = [ splice @_, 3, -1 ] if @_ > 4;
-    }
-    else {
-        $args = [ splice @_, 3 ] if @_ > 3;
-    }
-
-    return api_call_arrayref( $self, $env, $method_id, $args, $cb );
-}
-
-sub api_call_arrayref ( $self, $env, $method_id, $args, $cb = undef ) {
+sub api_call_arrayref ( $self, $method_id, $args, $cb = undef ) {
     $self->api_can_call(
         $method_id,
         sub ($can_call) {
@@ -175,7 +149,6 @@ sub api_call_arrayref ( $self, $env, $method_id, $args, $cb = undef ) {
                 # create API request
                 my $req = bless {
                     auth => $self,
-                    env  => $env,
                     _cb  => $cb,
                   },
                   'Pcore::App::API::Auth::Request';
@@ -200,9 +173,7 @@ sub api_call_arrayref ( $self, $env, $method_id, $args, $cb = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 158                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 184                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 157                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

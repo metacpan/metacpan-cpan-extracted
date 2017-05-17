@@ -78,8 +78,8 @@ http {
 
     # for websocket proxy connection
     map $http_connection $connection_upgrade {
-        "upgrade" "upgrade";
-        default   "";
+        ~*\bupgrade\b    "upgrade";
+        default          "";
     }
 
     # vhosts

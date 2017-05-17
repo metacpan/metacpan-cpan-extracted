@@ -1,5 +1,5 @@
 ---
-abstract: 'Utility functions for checking references'
+abstract: 'XS implementation for Ref::Util'
 author:
   - 'Sawyer X <xsawyerx@cpan.org>'
   - 'Aaron Crane <arc@cpan.org>'
@@ -10,7 +10,7 @@ build_requires:
   B::Concise: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
-  Test::More: '0'
+  Test::More: '0.96'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -23,15 +23,15 @@ name: Ref-Util-XS
 provides:
   Ref::Util::XS:
     file: lib/Ref/Util/XS.pm
-    version: '0.115'
+    version: '0.116'
 requires:
   Exporter: '5.57'
   XSLoader: '0'
-  perl: '5.008'
+  perl: '5.006'
 resources:
   bugtracker: https://github.com/p5pclub/ref-util-xs/issues
   repository: git://github.com/p5pclub/ref-util-xs.git
-version: '0.115'
+version: '0.116'
 x_Dist_Zilla:
   perl:
     version: '5.022001'
@@ -207,6 +207,10 @@ x_Dist_Zilla:
       name: TestRelease
       version: '6.008'
     -
+      class: Dist::Zilla::Plugin::Test::MinimumVersion
+      name: Test::MinimumVersion
+      version: '2.000007'
+    -
       class: Dist::Zilla::Plugin::Git::Check
       config:
         Dist::Zilla::Plugin::Git::Check:
@@ -253,7 +257,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.115
+          tag: v0.116
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

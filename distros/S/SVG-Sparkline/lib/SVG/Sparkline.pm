@@ -8,7 +8,7 @@ use SVG;
 use overload  '""' => \&to_string;
 
 use 5.008000;
-our $VERSION = 1.11;
+our $VERSION = 1.12;
 
 my %valid_parms = map { $_ => 1 } qw(
         -allns color -sized
@@ -20,7 +20,8 @@ sub new
 {
     my ($class, $type, $args) = @_;
     croak "No Sparkline type specified.\n" unless defined $type;
-    # Use eval to load plugin.
+    croak "'$type' is not a valid Sparkline type.\n" unless $type =~ m/\A[A-Z]\w+\z/;
+    # Use eval to load plugin. Should be safe because of the test above.
     eval "use SVG::Sparkline::$type;";  ## no critic (ProhibitStringyEval)
     croak "Unrecognized Sparkline type '$type'.\n" if $@;
     croak "Missing arguments hash.\n" unless defined $args;

@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 # ABSTRACT: Install, upgrade and examine the CPAN Testers database schema
 # PODNAME: cpantesters-schema
-our $VERSION = '0.008';
+our $VERSION = '0.012';
 
 #pod =head1 SYNOPSIS
 #pod
@@ -10,6 +10,9 @@ our $VERSION = '0.008';
 #pod
 #pod     # install a new database
 #pod     cpantesters-schema install
+#pod
+#pod     # install a database to the given DSN
+#pod     cpantesters-schema install dbi:SQLite:local.db
 #pod
 #pod     # upgrade an existing database
 #pod     cpantesters-schema upgrade
@@ -60,8 +63,6 @@ GetOptions(
     'p|preversion:s'  => \$preversion,
 ) or pod2usage(1);
 
-my $schema = CPAN::Testers::Schema->connect_from_config;
-
 my %tasks = (
     prepare => \&prepare,
     install => \&install,
@@ -72,22 +73,35 @@ my %tasks = (
 $tasks{ shift @ARGV }->();
 
 sub prepare {
+    my $schema = CPAN::Testers::Schema->connect_from_config;
     my $sql_dir = dist_dir( 'CPAN-Testers-Schema' );
     my $version = $schema->schema_version();
     $schema->create_ddl_dir( 'MySQL', $version, $sql_dir, $preversion );
+
+    $schema = CPAN::Testers::Schema->connect( 'dbi:SQLite::memory:' );
+    $schema->create_ddl_dir( 'SQLite', $version, $sql_dir, $preversion );
 }
 
 sub check {
+    my $schema = CPAN::Testers::Schema->connect_from_config;
     say "  Current: " . $schema->get_db_version;
     say "Available: " . join ", ", $schema->ordered_schema_versions;
 }
 
 sub install {
+    my $schema;
+    if ( $ARGV[0] ) {
+        $schema = CPAN::Testers::Schema->connect( $ARGV[0] );
+    }
+    else {
+        $schema = CPAN::Testers::Schema->connect_from_config;
+    }
     $schema->install( '0.000' );
     $schema->upgrade;
 }
 
 sub upgrade {
+    my $schema = CPAN::Testers::Schema->connect_from_config;
     $schema->upgrade;
 }
 
@@ -101,7 +115,7 @@ cpantesters-schema - Install, upgrade and examine the CPAN Testers database sche
 
 =head1 VERSION
 
-version 0.008
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -110,6 +124,9 @@ version 0.008
 
     # install a new database
     cpantesters-schema install
+
+    # install a database to the given DSN
+    cpantesters-schema install dbi:SQLite:local.db
 
     # upgrade an existing database
     cpantesters-schema upgrade

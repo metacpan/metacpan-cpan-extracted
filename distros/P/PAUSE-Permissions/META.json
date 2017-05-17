@@ -4,7 +4,7 @@
       "Neil Bowers <neil@bowers.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -46,13 +46,14 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "https://github.com/neilbowers/PAUSE-Permissions",
+      "homepage" : "https://github.com/neilb/PAUSE-Permissions",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/neilbowers/PAUSE-Permissions.git",
-         "web" : "https://github.com/neilbowers/PAUSE-Permissions"
+         "url" : "https://github.com/neilb/PAUSE-Permissions.git",
+         "web" : "https://github.com/neilb/PAUSE-Permissions"
       }
    },
-   "version" : "0.16"
+   "version" : "0.17",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 

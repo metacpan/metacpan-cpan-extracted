@@ -1,3 +1,9 @@
+0.05  Tue May 15 11:47:00 2017
+    - Added Auth.pm to MANIFEST file 
+
+0.04  Tue May 15 11:47:00 2017
+    - POD cleanup and version bump
+
 0.03  Tue Apr  25 18:55:00 2017
     - Update Speech.pm to use Service Account credentials insteadd of API Key.
 

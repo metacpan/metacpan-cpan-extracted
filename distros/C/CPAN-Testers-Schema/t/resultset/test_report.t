@@ -53,6 +53,8 @@ subtest 'insert_metabase_fact' => sub {
         distribution => {
             name => 'Foo-Bar',
             version => '1.24',
+        },
+        result => {
             grade => 'pass',
             output => {
                 uncategorized => 'Test output',
@@ -67,6 +69,9 @@ subtest 'insert_metabase_fact' => sub {
 
     my $created = delete $got_report->{created};
     is $created, $given_report->core_metadata->{creation_time};
+
+    isa_ok $row->created, 'DateTime';
+    is $row->created . 'Z', $given_report->core_metadata->{creation_time};
 
     is_deeply $got_report, $expect_report, 'Metabase::Fact is converted correctly';
 };

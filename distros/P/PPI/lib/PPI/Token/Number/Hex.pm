@@ -31,7 +31,7 @@ use PPI::Token::Number ();
 
 use vars qw{$VERSION @ISA};
 BEGIN {
-	$VERSION = '1.220';
+	$VERSION = '1.224';
 	@ISA     = 'PPI::Token::Number';
 }
 
@@ -76,7 +76,7 @@ sub __TOKENIZER__on_char {
 	# Allow underscores straight through
 	return 1 if $char eq '_';
 
-	if ( $char =~ /[\da-f]/i ) {
+	if ( $char =~ /[[:xdigit:]]/ ) {
 		return 1;
 	}
 

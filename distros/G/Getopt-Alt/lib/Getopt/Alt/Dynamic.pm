@@ -10,7 +10,7 @@ use Moose;
 use version;
 use Carp;
 
-our $VERSION = version->new('0.4.2');
+our $VERSION = version->new('0.4.3');
 
 1;
 
@@ -22,7 +22,7 @@ Getopt::Alt::Dynamic - Base for creating the dynamic command line elements
 
 =head1 VERSION
 
-This documentation refers to Getopt::Alt::Dynamic version 0.4.2.
+This documentation refers to Getopt::Alt::Dynamic version 0.4.3.
 
 =head1 SYNOPSIS
 

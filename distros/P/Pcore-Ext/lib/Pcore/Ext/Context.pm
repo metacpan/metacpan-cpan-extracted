@@ -202,7 +202,7 @@ sub to_js ( $self ) {
     push $cfg->{requires}->@*, sort keys $self->{ctx}->{requires}->%*;
 
     # set alias
-    $cfg->{alias} = $self->{ctx}->{alias} if $self->{ctx}->{alias};
+    $cfg->{alias} = $self->{ctx}->{alias} if $self->{ctx}->{alias} && !exists $cfg->{alias};
 
     my $js = $self->js_call( 'Ext.define', [ $self->{ctx}->{class}, $cfg ] )->to_js;
 

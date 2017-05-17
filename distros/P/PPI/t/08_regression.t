@@ -4,34 +4,20 @@
 
 # Some other regressions tests are included here for simplicity.
 
-use strict;
-BEGIN {
-	no warnings 'once';
-	$| = 1;
-	$PPI::XS_DISABLE = 1;
-	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
-}
+use lib 't/lib';
+use PPI::Test::pragmas;
+use Test::More tests => 925 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
-# For each new item in t/data/08_regression add another 15 tests
-use Test::More tests => 932;
-use Test::NoWarnings;
-use t::lib::PPI;
 use PPI;
-
-sub pause {
-	local $@;
-	sleep 1 if !eval { require Time::HiRes; Time::HiRes::sleep(0.1); 1 };
-}
-
-
+use PPI::Test 'pause';
+use PPI::Test::Run;
 
 
 
 #####################################################################
 # Code/Dump Testing
-# ntests = 2 + 14 * nfiles
 
-t::lib::PPI->run_testdir(qw{ t data 08_regression });
+PPI::Test::Run->run_testdir(qw{ t data 08_regression });
 
 
 
@@ -215,36 +201,6 @@ SCOPE: {
 	my $doc = PPI::Document->new( \'[]' );
 	isa_ok( $doc, 'PPI::Document' );
 	isa_ok( $doc->child(0), 'PPI::Statement' );
-}
-
-
-
-
-
-#####################################################################
-# Bug 21571: PPI::Token::Symbol::symbol does not properly handle
-#            variables with adjacent braces
-
-SCOPE: {
-	my $doc = PPI::Document->new( \'$foo{bar}' );
-	my $symbol = $doc->child(0)->child(0);
-	isa_ok( $symbol, 'PPI::Token::Symbol' );
-	is( $symbol->symbol, '%foo', 'symbol() for $foo{bar}' );
-}
-
-SCOPE: {
-	my $doc = PPI::Document->new( \'$foo[0]' );
-	my $symbol = $doc->child(0)->child(0);
-	isa_ok( $symbol, 'PPI::Token::Symbol' );
-	is( $symbol->symbol, '@foo', 'symbol() for $foo[0]' );
-}
-
-
-SCOPE: {
-	my $doc = PPI::Document->new( \'@foo{bar}' );
-	my $symbol = $doc->child(0)->child(0);
-	isa_ok( $symbol, 'PPI::Token::Symbol' );
-	is( $symbol->symbol, '%foo', 'symbol() for @foo{bar}' );
 }
 
 

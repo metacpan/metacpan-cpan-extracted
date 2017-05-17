@@ -9,8 +9,9 @@ pm_to_blib*
 .lwpcookies
 cover_db
 pod2htm*.tmp
-Geo-Coder-CA-*
+Geo-Coder-XYZ-*
 .git
 *.swp
 .appveyor.yml
 .travis.yml
+t/online.enabled

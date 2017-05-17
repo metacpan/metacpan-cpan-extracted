@@ -5,27 +5,50 @@ package MarpaX::ESLIF::ECMA404::RecognizerInterface;
 
 # ABSTRACT: MarpaX::ESLIF::ECMA404 Recognizer Interface
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
+
+
 
 # -----------
 # Constructor
 # -----------
+
+
 sub new { bless \$_[1], $_[0] }
 
 # ----------------
 # Required methods
 # ----------------
+
+
 sub read                   {        1 } # First read callback will be ok
+
+
 sub isEof                  {        1 } # ../. and we will say this is EOF
+
+
 sub isCharacterStream      {        1 } # MarpaX::ESLIF will validate the input
+
+
 sub encoding               {          } # Let MarpaX::ESLIF guess
+
+
 sub data                   { ${$_[0]} } # Data itself
+
+
 sub isWithDisableThreshold {        0 } # Disable threshold warning ?
+
+
 sub isWithExhaustion       {        0 } # Exhaustion event ?
+
+
 sub isWithNewline          {        0 } # Newline count ?
+
+
 sub isWithTrack            {        0 } # Absolute position tracking ?
+
 
 1;
 
@@ -41,7 +64,65 @@ MarpaX::ESLIF::ECMA404::RecognizerInterface - MarpaX::ESLIF::ECMA404 Recognizer 
 
 =head1 VERSION
 
-version 0.001
+version 0.003
+
+=head1 SYNOPSIS
+
+    use MarpaX::ESLIF::ECMA404::RecognizerInterface;
+
+    my $recognizerInterface = MarpaX::ESLIF::ECMA404::RecognizerInterface->new();
+
+=head1 DESCRIPTION
+
+MarpaX::ESLIF::ECMA404's Recognizer Interface
+
+=head1 SUBROUTINES/METHODS
+
+=head2 new($class, $string)
+
+Instantiate a new recognizer interface object. Argument is the data.
+
+=head2 Required methods
+
+=head3 read($self)
+
+Returns a true or a false value, indicating if last read was successful. Default is a true value.
+
+=head3 isEof($self)
+
+Returns a true or a false value, indicating if end-of-data is reached. Default is a true value.
+
+=head3 isCharacterStream($self)
+
+Returns a true or a false value, indicating if last read is a stream of characters. Default is a true value.
+
+=head3 encoding($self)
+
+Returns encoding information. Default is undef.
+
+=head3 data($self)
+
+Returns last bunch of data. Default is the string passed in the constructor.
+
+=head3 isWithDisableThreshold($self)
+
+Returns a true or a false value, indicating if threshold warning is on or off, respectively. Default is a false value.
+
+=head3 isWithExhaustion($self)
+
+Returns a true or a false value, indicating if exhaustion event is on or off, respectively. Default is a false value.
+
+=head3 isWithNewline($self)
+
+Returns a true or a false value, indicating if newline count is on or off, respectively. Default is a false value.
+
+=head3 isWithTrack($self)
+
+Returns a true or a false value, indicating if absolute position tracking is on or off, respectively. Default is a false value.
+
+=head1 SEE ALSO
+
+L<MarpaX::ESLIF::ECMA404>
 
 =head1 AUTHOR
 

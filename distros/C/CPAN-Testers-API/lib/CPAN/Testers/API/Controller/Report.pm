@@ -1,5 +1,5 @@
 package CPAN::Testers::API::Controller::Report;
-our $VERSION = '0.008';
+our $VERSION = '0.011';
 # ABSTRACT: Work with raw test reports
 
 #pod =head1 DESCRIPTION
@@ -32,6 +32,7 @@ use CPAN::Testers::API::Base;
 #pod =cut
 
 sub report_post( $c ) {
+    $c->app->log->debug( 'Submitting Report: ' . $c->req->body );
     $c->openapi->valid_input or return;
     my $report = $c->validation->param( 'report' );
     my $row = $c->schema->resultset( 'TestReport' )->create( {
@@ -92,7 +93,7 @@ CPAN::Testers::API::Controller::Report - Work with raw test reports
 
 =head1 VERSION
 
-version 0.008
+version 0.011
 
 =head1 DESCRIPTION
 

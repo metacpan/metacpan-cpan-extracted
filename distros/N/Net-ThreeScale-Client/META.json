@@ -1,7 +1,10 @@
 {
    "abstract" : "Client for 3Scale.com web API version 2.0",
    "author" : [
-      "Owen Cliffe <zoot@zoot.org.uk>"
+      "Owen Cliffe <zoot@zoot.org.uk>",
+      "Dave Lambley <cpan@davel.me.uk>",
+      "Ed Freyfogle",
+      "Marc Metten"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
@@ -23,6 +26,7 @@
          "requires" : {
             "HTTP::Tiny" : "0",
             "Try::Tiny" : "0",
+            "URI" : "0",
             "URI::Escape::XS" : "0",
             "XML::Parser" : "0",
             "XML::Simple" : "0",
@@ -42,6 +46,6 @@
          "web" : "https://github.com/3scale/3scale_ws_api_for_perl"
       }
    },
-   "version" : "2.1.5"
+   "version" : "2.1.6"
 }
 

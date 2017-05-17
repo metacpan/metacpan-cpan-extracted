@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Role::HelpAsText;
-$Config::Model::Role::HelpAsText::VERSION = '2.101';
+$Config::Model::Role::HelpAsText::VERSION = '2.102';
 # ABSTRACT: Transalet element help from pod to text
 
 use Mouse::Role;
@@ -57,7 +57,7 @@ Config::Model::Role::HelpAsText - Transalet element help from pod to text
 
 =head1 VERSION
 
-version 2.101
+version 2.102
 
 =head1 SYNOPSIS
 

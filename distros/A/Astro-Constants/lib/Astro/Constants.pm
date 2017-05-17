@@ -1,10 +1,13 @@
 package Astro::Constants;
 # ABSTRACT: this library provides physical constants for use in Astronomy
-$Astro::Constants::VERSION = '0.1002';
+$Astro::Constants::VERSION = '0.1100';
 use strict;
 use warnings;
 
   'They are not constant but are changing still. - Cymbeline, Act II, Scene 5';
+
+
+1;
 
 __END__
 
@@ -18,7 +21,7 @@ Astro::Constants - this library provides physical constants for use in Astronomy
 
 =head1 VERSION
 
-version 0.1002
+version 0.1100
 
 =head1 SYNOPSIS
 
@@ -214,6 +217,23 @@ as well as these alternate names (imported using the :alternate tag): PERMEABILI
 trig constant pi
 
 This constant is also available using the short name C<$A_pi>
+
+=head2 FOUR_PI
+
+    12.5663706143592
+
+trig constant pi times 4 (shorthand for some calculations)
+
+This constant is also available using the short name C<$A_4pi>
+as well as the alternate name C<FOURPI> (imported using the :alternate tag for backwards compatibility)
+
+=head2 STERADIAN
+
+    57.2957795130823
+
+a measure of solid angle in square degrees
+
+This constant is also available using the short name C<$A_ster>
 
 =head2 EXP
 
@@ -584,56 +604,31 @@ This is a helper function that rounds a value or list of values to 5 significant
 
 =head2 precision
 
-Currently broken.  It will return in v0.11
+Give this method the string of the constant and it returns the precision or uncertainty
+listed.
+
+  $rel_precision = precision('GRAVITATIONAL');
+  $abs_precision = precision('MASS_EARTH');
+
+At the moment you need to know whether the uncertainty is relative or absolute.
+Looking to fix this in future versions.
 
 =head1 EXPORT
 
 Nothing is exported by default, so the module doesn't clobber any of your variables.  
 Select from the following tags:
 
-=over 4
-
-=item *
-
-:long		(use this one to get the most constants)
-
-=item *
-
-:short
-
-=item *
-
-:fundamental
-
-=item *
-
-:conversion
-
-=item *
-
-:mathematics
-
-=item *
-
-:cosmology
-
-=item *
-
-:planetary
-
-=item *
-
-:electromagnetic
-
-=item *
-
-:nuclear
-
-=item *
-
-:alternates
-
-=back
+-=for :list
+-* :long                (use this one to get the most constants)
+-* :short
+-* :fundamental
+-* :conversion
+-* :mathematics
+-* :cosmology
+-* :planetary
+-* :electromagnetic
+-* :nuclear
+-* :alternates
 
 =head2 Deprecated functions
 
@@ -786,7 +781,7 @@ Boyd Duffee <duffee@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Boyd Duffee.
+This software is copyright (c) 2017 by Boyd Duffee.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,7 +1,7 @@
 use Renard::Curie::Setup;
 package Renard::Curie::Model::Page::CairoImageSurface;
 # ABSTRACT: Page directly generated from a Cairo image surface
-$Renard::Curie::Model::Page::CairoImageSurface::VERSION = '0.001';
+$Renard::Curie::Model::Page::CairoImageSurface::VERSION = '0.002';
 use Moo;
 use Renard::Curie::Types qw(InstanceOf);
 
@@ -27,7 +27,7 @@ Renard::Curie::Model::Page::CairoImageSurface - Page directly generated from a C
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 EXTENDS
 

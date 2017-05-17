@@ -1,0 +1,81 @@
+#!perl
+
+our $VERSION = '0.1';
+
+=head1 NAME
+
+RRTYPEgen - Generate Net::DNS RR subtype packages
+
+=head1 SYNOPSIS
+
+RRTYPEgen RRTYPE=<version> <name>:<number <attribute> ...
+
+=head1 DESCRIPTION
+
+B<RRTYPEgen> builds a perl Net::DNS RR subtype implementation package
+from the DNS extension language specification using the code generator
+in Net::DNS::Extlang.  It prints the generated
+code to stdout.
+
+If called with no arguments, it prints "1;\n" for success, which is how
+Net::DNS tests that RRTYPEgen has been installed.
+
+=cut
+
+use strict;
+use integer;
+
+# see what we think of the arguments
+my ( $tag, $identity, @attribute ) = @ARGV;
+
+unless($tag) {				# for probe in Parameters.pm
+	print "1;\n";
+	exit;
+}
+
+exit 1 unless defined($tag) && $tag =~ /^RRTYPE=\d+$/;
+
+# include now to avoid startup recursion
+eval("require Net::DNS::Extlang") or die "Cannot load Net::DNS::Extlang from\n" . join("\n  ",@INC); 
+
+my $ext = new Net::DNS::Extlang(domain => 'invalid');
+
+my $rrr = $ext->_xlstorerecord($identity, @attribute);
+
+my $code = $ext->compilerr($rrr);
+
+if ($code) {
+	print $code;
+	exit 0;
+}
+print "0; # compile failed\n";
+exit 1;
+
+=head1 COPYRIGHT
+
+Copyright 2017 John R. Levine. 
+
+=head1 LICENSE
+
+Permission to use, copy, modify, and distribute this software and its
+documentation for any purpose and without fee is hereby granted, provided
+that the above copyright notice appear in all copies and that both that
+copyright notice and this permission notice appear in supporting
+documentation, and that the name of the author not be used in advertising
+or publicity pertaining to distribution of the software without specific
+prior written permission.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+
+=head1 SEE ALSO
+
+L<perl>, L<Net::DNS:RR>, L<Net::DNS::Parameters>, L<Net::DNS::Extlang>
+
+=cut

@@ -15,7 +15,7 @@ use URI::Escape qw{uri_escape_utf8};
 # of ExtUtils::MakeMaker->WriteMakefile() will accurately detect $VERSION.
 #
 my
-$VERSION = '1.001';
+$VERSION = '1.002';
 
 #
 # See https://tech.yandex.ru/translate/doc/dg/concepts/api-overview-docpage/
@@ -90,7 +90,6 @@ sub set_default_ui
 sub get_langs_list
 {
     my $self = shift;
-    die "You must set API key\n" if (not defined $self->{ _key_ });
     
     my $query = '/getLangs?';
     $self->{_post_} = 'key='.$self->{_key_}.'&ui='.$self->{_ui_};
@@ -127,8 +126,6 @@ sub set_hint
 sub detect_lang
 {
     my $self = shift;
-    die "You must set API key\n" if (not defined $self->{ _key_ });
-    die "You must set Text\n" if (not defined $self->{ _text_ });
 
     my $query = '/detect?';
     $self->{_post_} = 'key='.$self->{_key_}.'&text='.$self->{_text_};
@@ -173,10 +170,6 @@ sub set_options
 sub translate
 {
     my $self = shift;
-    die "You must set API key\n" if (not defined $self->{ _key_ });
-    die "You must set Text\n" if (not defined $self->{ _text_ });
-    die "You must set source lang\n" if (not defined $self->{ _from_lang_ });
-    die "You must set destination lang\n" if (not defined $self->{ _to_lang_ });
 
     my $query = '/translate?';
     my $lang = (defined $self->{_from_lang_}) ? $self->{_from_lang_}.'-'.$self->{_to_lang_} : $self->{_to_lang_};
@@ -257,7 +250,7 @@ Yandex::Translate - a simple API for Yandex.Translate
 
 =head1 VERSION
 
-version 1.001
+version 1.002
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@
       "G. Wade Johnson <gwadej@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.06, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -50,5 +50,7 @@
          "web" : "https://github.com/gwadej/svg-sparkline"
       }
    },
-   "version" : "1.11"
+   "version" : "1.12",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }
+

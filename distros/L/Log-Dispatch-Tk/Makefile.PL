@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile
   (
    'NAME'	=> 'Log-Dispatch-Tk',
-   'VERSION' => '1.8',
+   'VERSION' => '1.9',
    'dist' => {COMPRESS=>'gzip -9f', SUFFIX => 'gz'},
    'PREREQ_PM' =>
    {

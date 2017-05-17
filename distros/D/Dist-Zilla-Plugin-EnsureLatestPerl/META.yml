@@ -3,8 +3,8 @@ abstract: 'Ensure the author is releasing using the latest Perl'
 author:
   - 'Karen Etheridge <ether@cpan.org>'
 build_requires:
+  ExtUtils::MakeMaker: '0'
   File::Spec: '0'
-  Module::Metadata: '0'
   POSIX: '0'
   Path::Tiny: '0'
   Test::DZil: '0'
@@ -16,9 +16,9 @@ build_requires:
   lib: '0'
   perl: '5.006'
 configure_requires:
-  Module::Build::Tiny: '0.034'
+  ExtUtils::MakeMaker: '0'
   perl: '5.006'
-dynamic_config: 0
+dynamic_config: 1
 generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 keywords:
   - plugin
@@ -40,7 +40,7 @@ no_index:
 provides:
   Dist::Zilla::Plugin::EnsureLatestPerl:
     file: lib/Dist/Zilla/Plugin/EnsureLatestPerl.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   Dist::Zilla: '4.300039'
   Dist::Zilla::Role::BeforeRelease: '0'
@@ -57,10 +57,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-EnsureLatestPerl
   homepage: https://github.com/karenetheridge/Dist-Zilla-Plugin-EnsureLatestPerl
   repository: https://github.com/karenetheridge/Dist-Zilla-Plugin-EnsureLatestPerl.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
-    version: '5.025012'
+    version: '5.026000'
   plugins:
     -
       class: Dist::Zilla::Plugin::Bootstrap::lib
@@ -77,9 +77,9 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20170420'
+          Module::CoreList: '5.20170520'
       name: EnsureLatestPerl
-      version: '0.002'
+      version: '0.003'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -502,38 +502,12 @@ x_Dist_Zilla:
       name: '@Author::ETHER/pluginbundle_version'
       version: '6.009'
     -
-      class: Dist::Zilla::Plugin::MakeMaker::Fallback
+      class: Dist::Zilla::Plugin::MakeMaker
       config:
-        Dist::Zilla::Plugin::MakeMaker::Awesome:
-          version: '0.38'
         Dist::Zilla::Role::TestRunner:
           default_jobs: 9
-      name: '@Author::ETHER/MakeMaker::Fallback'
-      version: '0.023'
-    -
-      class: Dist::Zilla::Plugin::ModuleBuildTiny::Fallback
-      config:
-        Dist::Zilla::Plugin::ModuleBuildTiny::Fallback:
-          mb_version: '0.28'
-          plugins:
-            -
-              class: Dist::Zilla::Plugin::ModuleBuild
-              config:
-                Dist::Zilla::Role::TestRunner:
-                  default_jobs: 9
-              name: 'ModuleBuild, via ModuleBuildTiny::Fallback'
-              version: '6.009'
-            -
-              class: Dist::Zilla::Plugin::ModuleBuildTiny
-              config:
-                Dist::Zilla::Role::TestRunner:
-                  default_jobs: 9
-              name: 'ModuleBuildTiny, via ModuleBuildTiny::Fallback'
-              version: '0.015'
-        Dist::Zilla::Role::TestRunner:
-          default_jobs: 9
-      name: '@Author::ETHER/ModuleBuildTiny::Fallback'
-      version: '0.025'
+      name: '@Author::ETHER/MakeMaker'
+      version: '6.009'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
@@ -716,7 +690,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.002
+          tag: v0.003
           tag_format: v%v
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -811,6 +785,14 @@ x_Dist_Zilla:
       name: MetaResources
       version: '6.009'
     -
+      class: Dist::Zilla::Plugin::DynamicPrereqs
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000033'
+          version: '0.004'
+      name: DynamicPrereqs
+      version: '0.033'
+    -
       class: Dist::Zilla::Plugin::Prereqs
       config:
         Dist::Zilla::Plugin::Prereqs:
@@ -889,4 +871,4 @@ x_Dist_Zilla:
     version: '6.009'
 x_authority: cpan:ETHER
 x_serialization_backend: 'YAML::Tiny version 1.72'
-x_static_install: 1
+x_static_install: 0

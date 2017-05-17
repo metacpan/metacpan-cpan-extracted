@@ -14,7 +14,7 @@ use Encode qw( decode encode );
 use File::Spec::Functions;
 use JSON;
 use POSIX qw( strftime );
-use Test::Smoke::SysInfo;
+use System::Info;
 use Test::Smoke::Util qw(
     grepccmsg grepnonfatal get_smoked_Config read_logfile
     time_in_hhmm get_local_patches
@@ -810,7 +810,7 @@ sub smokedb_data {
     $rpt{applied_patches} = [$self->registered_patches];
     $rpt{sysinfo}         = do {
         my %Conf = get_smoked_Config($self->{ddir} => qw( version lfile ));
-        my $si = Test::Smoke::SysInfo->new;
+        my $si = System::Info->new;
         my ($osname, $osversion) = split m/ - / => $si->os, 2;
         (my $ncpu      = $si->ncpu          || "?") =~ s/^\s*(\d+)\s*/$1/;
         (my $user_note = $self->{user_note} || "")  =~ s/(\S)[\s\r\n]*\z/$1\n/;
@@ -1123,7 +1123,7 @@ sub preamble {
     my %Config = get_smoked_Config( $self->{ddir} => qw(
         version libc gnulibc_version
     ));
-    my $si = Test::Smoke::SysInfo->new;
+    my $si = System::Info->new;
     my $archname  = $si->cpu_type;
 
     (my $ncpu = $si->ncpu || "") =~ s/^(\d+)\s*/$1 cpu/;

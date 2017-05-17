@@ -6,7 +6,7 @@ use warnings;
 use Perl::Critic::Utils qw(:severities :classification :ppi);
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '0.019';
+our $VERSION = '0.020';
 
 use constant DESC => 'Using interpreter threads';
 use constant EXPL => 'Interpreter threads are discouraged, they are not lightweight and fast as other threads may be. Try an event loop, forks.pm, or Parallel::Prefork.';
@@ -38,7 +38,7 @@ event loop such as L<POE>, L<IO::Async>, or L<Mojo::IOLoop>. Blocking code is
 usually better parallelized by forking, which on Unix-like systems is fast and
 efficient. Modules such as L<forks> and L<Parallel::Prefork> can make forking
 easier to work with, as well as forking modules for event loops such as
-L<POE::Wheel::Run>, L<IO::Async::Process>, or L<Mojo::IOLoop::ForkCall>.
+L<POE::Wheel::Run>, L<IO::Async::Process>, or L<Mojo::IOLoop/"subprocess">.
 
 =head1 AFFILIATION
 

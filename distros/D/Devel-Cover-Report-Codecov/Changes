@@ -1,5 +1,8 @@
 Revision history for Perl extension Devel-Cover-Report-Codecov
 
+0.18 2017-05-16T15:15:30Z
+    - support perl 5.26.x & good bye perl 5.8.x
+
 0.17 2016-12-15T09:13:52Z
     - fix support CI list in the readme
 

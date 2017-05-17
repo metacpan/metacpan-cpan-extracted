@@ -14,7 +14,7 @@ my $output = IO::File->new($ARGV[1], 'w');
 
 my $xml;
 my $category = $ARGV[0] =~ s%.*?([^/]+)\.dat%$1%r;
-my $writer = XML::Writer->new( OUTPUT => $output, DATA_INDENT => 4, );
+my $writer = XML::Writer->new( OUTPUT => $output, DATA_INDENT => 4, NEWLINES => 1 );
 $writer->setDataMode(1);
 
 write_collection_header($writer);

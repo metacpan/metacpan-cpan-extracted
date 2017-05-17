@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI  for Riap function /Business/BankList/Indonesia/list_id_banks
-# and generated automatically using Perinci::CmdLine::Gen version 0.32
+# and generated automatically using Perinci::CmdLine::Gen version 0.45
 
-our $DATE = '2016-08-11'; # DATE
+our $DATE = '2017-05-16'; # DATE
 our $DIST = 'App-IndonesianBankingUtils'; # DIST
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 use 5.010001;
 use strict;
@@ -33,7 +33,7 @@ list-id-banks - Indonesian banks/financial institutions
 
 =head1 VERSION
 
-This document describes version 0.07 of list-id-banks (from Perl distribution App-IndonesianBankingUtils), released on 2016-08-11.
+This document describes version 0.09 of list-id-banks (from Perl distribution App-IndonesianBankingUtils), released on 2017-05-16.
 
 =head1 SYNOPSIS
 
@@ -193,7 +193,7 @@ Only return records where the 'id' field is in the specified values (JSON-encode
 
 See C<--id-in>.
 
-=item B<--id-in>=I<s@>
+=item B<--id-in>=I<i@>
 
 Only return records where the 'id' field is in the specified values.
 
@@ -221,7 +221,7 @@ Only return records where the 'id' field is not in the specified values (JSON-en
 
 See C<--id-not-in>.
 
-=item B<--id-not-in>=I<s@>
+=item B<--id-not-in>=I<i@>
 
 Only return records where the 'id' field is not in the specified values.
 
@@ -491,7 +491,7 @@ To activate bash completion for this script, put:
 
  complete -C list-id-banks list-id-banks
 
-in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
 recognize tab completion for the command. Or, you can also directly execute the
 line above in your shell to activate immediately.
 
@@ -499,8 +499,8 @@ It is recommended, however, that you install L<shcompgen> which allows you to
 activate completion scripts for several kinds of scripts on multiple shells.
 Some CPAN distributions (those that are built with
 L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
-completion for their included scripts (using C<shcompgen>) at installation time,
-so you can immadiately have tab completion.
+completion for their included scripts (using L<shcompgen>) at installation time,
+so you can immediately have tab completion.
 
 =head2 tcsh
 
@@ -508,15 +508,15 @@ To activate tcsh completion for this script, put:
 
  complete list-id-banks 'p/*/`list-id-banks`/'
 
-in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
 recognize tab completion for the command. Or, you can also directly execute the
 line above in your shell to activate immediately.
 
-It is also recommended to install C<shcompgen> (see above).
+It is also recommended to install L<shcompgen> (see above).
 
 =head2 other shells
 
-For fish and zsh, install C<shcompgen> as described above.
+For fish and zsh, install L<shcompgen> as described above.
 
 =head1 CONFIGURATION FILE
 
@@ -593,15 +593,15 @@ List of available configuration parameters:
 
 =head2 LIST_ID_BANKS_OPT => str
 
-Specify additional command-line options
+Specify additional command-line options.
 
 =head1 FILES
 
-~/.config/list-id-banks.conf
+F<~/.config/list-id-banks.conf>
 
-~/list-id-banks.conf
+F<~/list-id-banks.conf>
 
-/etc/list-id-banks.conf
+F</etc/list-id-banks.conf>
 
 =head1 HOMEPAGE
 
@@ -625,7 +625,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

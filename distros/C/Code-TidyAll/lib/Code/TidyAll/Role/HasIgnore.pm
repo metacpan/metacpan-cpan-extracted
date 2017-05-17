@@ -9,7 +9,7 @@ use Specio::Library::String;
 
 use Moo::Role;
 
-our $VERSION = '0.58';
+our $VERSION = '0.59';
 
 has 'ignore' => (
     is  => 'ro',
@@ -30,7 +30,7 @@ sub _build_ignores {
 sub _parse_zglob_list {
     my ( $self, $zglobs ) = @_;
     if ( my ($bad_zglob) = ( grep {m{^/}} @{$zglobs} ) ) {
-        die "zglob '$bad_zglob' should not begin with slash";
+        die qq{zglob '$bad_zglob' should not begin with slash};
     }
     return $zglobs;
 }

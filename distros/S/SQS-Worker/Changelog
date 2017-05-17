@@ -1,0 +1,15 @@
+0.05 2017-05-10
+ - Extend documentation
+ - Add DeleteAndFork process model 
+0.04 2017-02-23
+ - Add documentation (lprieto)
+ - Add controllable process model: from spawn_worker
+   you can control if the message id deleted upon arrival
+	 or if it waits to see if the process succeeds to 
+	 delete it (default behaviour) (pcervera)
+0.03
+ - CAPSiDE Internal version
+0.02
+ - CAPSiDE Internal version
+0.01
+ - CAPSiDE Internal version

@@ -1,5 +1,5 @@
 package Dist::Zooky::Core::MakeMaker;
-$Dist::Zooky::Core::MakeMaker::VERSION = '0.22';
+$Dist::Zooky::Core::MakeMaker::VERSION = '0.24';
 # ABSTRACT: gather meta data for EUMM or M::I dists
 
 use strict;
@@ -160,7 +160,7 @@ Dist::Zooky::Core::MakeMaker - gather meta data for EUMM or M::I dists
 
 =head1 VERSION
 
-version 0.22
+version 0.24
 
 =head1 AUTHOR
 

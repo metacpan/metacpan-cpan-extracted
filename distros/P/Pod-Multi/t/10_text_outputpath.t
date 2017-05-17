@@ -1,5 +1,5 @@
 # t/10_text_outputpath.t - check handling of output path  option for text
-#$Id: 10_text_outputpath.t 1201 2007-10-27 01:22:17Z jimk $
+#$Id$
 use strict;
 use warnings;
 use Test::More 

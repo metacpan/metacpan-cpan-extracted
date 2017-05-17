@@ -13,64 +13,68 @@ package    # hide from PAUSE
 
 
 # this function generates max_by, max_str_by, min_by, min_str_by
-# It takes the proper comparison operators as arguments.
-# For max_*: lt, gt
-# For min_*: gt, lt
 my $minmax_by = sub {
-    my ($lt, $gt) = @_;
-    ## no critic (ProhibitStringyEval)
-    return eval q~#line ~ . (__LINE__ + 1) . q~
-        sub (&@) {
-            my $key_func = shift;
-            return if not @_ or not defined wantarray;
-            return $_[0] if not @_ > 1;
-            if (wantarray) {
-                my $max_key = do {
-                    local *_ = \$_[0];
-                    $key_func->();
-                };
-                my @max_elems = shift;
-                for (@_) {
-                    my $key = $key_func->();
-                    next if $key ~ . $lt . q~ $max_key;
-                    $max_key = $key if $key ~ . $gt . q~ $max_key;
-                    push @max_elems, $_;
+    my ($is_less_than) = @_;
+
+    return sub (&@) {
+        my $key_func = shift;
+
+        return if not defined wantarray;  # nop in void context
+        return if not @_;
+        return $_[0] if not @_ > 1;
+
+        if (wantarray) {
+            my $max_key = do {
+                local *_ = \$_[0];
+                $key_func->();
+            };
+            my @max_elems = shift;
+            for (@_) {
+                my $key = $key_func->();
+                next if $is_less_than->($key, $max_key);
+                if ($is_less_than->($max_key, $key)) {
+                    $max_key = $key;
+                    @max_elems = ();
                 }
-                return @max_elems;
+                push @max_elems, $_;
             }
-            else {
-                my $max_elem = \shift;
-                my $max_key = do {
-                    local *_ = $max_elem;
-                    $key_func->();
-                };
-                for (@_) {
-                    my $key = $key_func->();
-                    next if $key ~ . $lt . q~ $max_key;
-                    $max_key = $key if $key ~ . $gt . q~ $max_key;
+            return @max_elems;
+        }
+        else {
+            my $max_elem = \shift;
+            my $max_key = do {
+                local *_ = $max_elem;
+                $key_func->();
+            };
+            for (@_) {
+                my $key = $key_func->();
+                if ($is_less_than->($max_key, $key)) {
+                    $max_key = $key;
                     $max_elem = \$_;
                 }
-                return $$max_elem;
             }
+            return $$max_elem;
         }
-    ~;
+    };
 };
 
-*max_by     = $minmax_by->(qw( <  >  ));
-*max_str_by = $minmax_by->(qw( lt gt ));
-*min_by     = $minmax_by->(qw( >  <  ));
-*min_str_by = $minmax_by->(qw( gt lt ));
+*max_by     = $minmax_by->(sub { $_[0] <  $_[1] });
+*max_str_by = $minmax_by->(sub { $_[0] lt $_[1] });
+*min_by     = $minmax_by->(sub { $_[1] <  $_[0] });
+*min_str_by = $minmax_by->(sub { $_[1] lt $_[0] });
 
 
 sub uniq_by (&@) {
     my $key_func = shift;
-    return if not @_;
+
     if (not defined wantarray) {
         Carp::carp "Useless use of _::uniq_by in void context";
         return;
     }
-    if (@_ == 1) {
-        return (wantarray) ? @_ : 1;
+
+    if (@_ <= 1) {
+        return @_ if wantarray;
+        return 0+@_;
     }
 
     # caller context is propagated to grep, so this does the right thing.
@@ -142,7 +146,7 @@ Util::Underscore::ListUtils - Interface to List::Util and List::MoreUtils
 
 =head1 VERSION
 
-version v1.4.1
+version v1.4.2
 
 =head1 FUNCTION REFERENCE
 
@@ -276,8 +280,6 @@ wrapper for C<List::MoreUtils::uniq>
 
 Discards duplicate values, using a key function to determine equality.
 This can e.g. be used to deduplicate a set of objects, using the result of some method call to determine whether they're equivalent.
-
-This function can only be used in list context.
 
 B<{ KEY }>:
 The function to produce an equality key.

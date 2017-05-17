@@ -44,7 +44,7 @@ use PPI::Token ();
 
 use vars qw{$VERSION @ISA %OPERATOR};
 BEGIN {
-	$VERSION = '1.220';
+	$VERSION = '1.224';
 	@ISA     = 'PPI::Token';
 
 	# Build the operator index

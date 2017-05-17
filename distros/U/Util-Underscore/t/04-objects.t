@@ -119,57 +119,63 @@ subtest '_::is_object' => sub {
 };
 
 subtest '_::class_isa' => sub {
-    plan tests => 4;
+    plan tests => 5;
 
     ok _::class_isa($class{parent}, $class{parent}), "positive parent";
     ok _::class_isa($class{child},  $class{parent}), "positive child";
     ok !_::class_isa($class{mock},      $class{parent}), "negative mock";
     ok !_::class_isa($class{unrelated}, $class{parent}), "negative unrelated";
+    ok !_::class_isa($object{parent}, $class{parent}), "arg must be a class name";
 };
 
 subtest '_::class_does' => sub {
-    plan tests => 4;
+    plan tests => 5;
 
     ok _::class_does($class{parent}, $class{parent}), "positive parent";
     ok _::class_does($class{child},  $class{parent}), "positive child";
     ok _::class_does($class{mock},   $class{parent}), "positive mock";
     ok !_::class_does($class{unrelated}, $class{parent}), "negative unrelated";
+    ok !_::class_does($object{parent}, $class{parent}), "arg must be a class name";
 };
 
 subtest '_::class_can' => sub {
-    plan tests => 4;
+    plan tests => 5;
 
     ok _::class_can($class{parent}, 'marker'), "positive parent";
     ok _::class_can($class{child},  'marker'), "positive child";
     ok !_::class_can($class{mock},      'marker'), "negative mock";
     ok !_::class_can($class{unrelated}, 'marker'), "negative unrelated";
+    ok !_::class_can($object{parent}, 'marker'), "arg must be a class name";
 };
 
 subtest '_::isa' => sub {
-    plan tests => 4;
+    plan tests => 5;
 
     ok _::isa($object{parent}, $class{parent}), "positive parent";
     ok _::isa($object{child},  $class{parent}), "positive child";
     ok !_::isa($object{mock},      $class{parent}), "negative mock";
     ok !_::isa($object{unrelated}, $class{parent}), "negative unrelated";
+    ok !_::isa($class{parent}, $class{parent}), "arg must be instance";
 };
 
 subtest '_::does' => sub {
-    plan tests => 4;
+    plan tests => 5;
 
     ok _::does($object{parent}, $class{parent}), "positive parent";
     ok _::does($object{child},  $class{parent}), "positive child";
     ok _::does($object{mock},   $class{parent}), "positive mock";
     ok !_::does($object{unrelated}, $class{parent}), "negative unrelated";
+    ok !_::does($class{parent}, $class{parent}), "arg must be instance";
 };
 
 subtest '_::can' => sub {
-    plan tests => 4;
+    plan tests => 5;
 
     ok _::can($object{parent}, 'marker'), "positive parent";
     ok _::can($object{child},  'marker'), "positive child";
     ok !_::can($object{mock},      'marker'), "negative mock";
     ok !_::can($object{unrelated}, 'marker'), "negative unrelated";
+    ok !_::can($class{parent}, 'marker'), "arg must be instance";
 };
 
 subtest '_::safecall' => sub {

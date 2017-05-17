@@ -69,6 +69,20 @@ Specify and alternate location of a configuration directory depending on the OS 
 
 specify the configuration file name. This parameter may not be applicable depending on your application. It may also be hardcoded in a custom backend. If not specified, the instance name is used as base name for your configuration file. The configuration file namecan be specified with &index keyword when a backend is associated to a node contained in a hash. See L<backend specifications|http://search.cpan.org/dist/Config-Model/lib/Config/Model/BackendMgr.pm#Backend_specification>. I< Optional. Type uniline.  > 
 
+=head2 yaml_class
+
+Specify the YAML class that is used to load and dump YAML files. Defaults to L<YAML::Tiny>. See L<yaml_class doc|Config::Model::Backend::Yaml/yaml_class> for details on  why another YAML class can suit your configuration file needs. I< Optional. Type uniline.  > 
+
+=over 4
+
+=item upstream_default value :
+
+YAML::Tiny
+
+=back
+
+
+
 =head2 file_mode - configuration file mode
 
 specify the configuration file mode. C<file_mode> parameter can be used to set the mode of the written file. C<file_mode> value can be in any form supported by L<Path::Tiny/chmod>. I< Optional. Type uniline.  > 

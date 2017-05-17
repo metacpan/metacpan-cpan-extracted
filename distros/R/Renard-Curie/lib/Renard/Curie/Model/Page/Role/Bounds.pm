@@ -1,7 +1,7 @@
 use Renard::Curie::Setup;
 package Renard::Curie::Model::Page::Role::Bounds;
 # ABSTRACT: Role for pages that have a height and width
-$Renard::Curie::Model::Page::Role::Bounds::VERSION = '0.001';
+$Renard::Curie::Model::Page::Role::Bounds::VERSION = '0.002';
 use Moo::Role;
 
 requires 'width';
@@ -22,7 +22,7 @@ Renard::Curie::Model::Page::Role::Bounds - Role for pages that have a height and
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 ATTRIBUTES
 

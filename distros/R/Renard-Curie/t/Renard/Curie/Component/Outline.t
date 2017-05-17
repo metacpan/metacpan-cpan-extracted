@@ -7,7 +7,6 @@ use CurieTestHelper;
 
 use Renard::Curie::Setup;
 use Renard::Curie::App;
-use Function::Parameters;
 
 my $pdf_ref_path = try {
 	CurieTestHelper->test_data_directory->child(qw(PDF Adobe pdf_reference_1-7.pdf));
@@ -17,7 +16,7 @@ my $pdf_ref_path = try {
 
 plan tests => 2;
 
-subtest 'Check that the outline model is set for the current document' => fun {
+subtest 'Check that the outline model is set for the current document' => sub {
 	my $app = Renard::Curie::App->new;
 	$app->open_pdf_document( $pdf_ref_path );
 	my $doc = $app->page_document_component->document;
@@ -27,7 +26,7 @@ subtest 'Check that the outline model is set for the current document' => fun {
 		"The outline component's model is set to the document's outline model");
 };
 
-subtest 'Check that clicking an outline item sets the page number' => fun {
+subtest 'Check that clicking an outline item sets the page number' => sub {
 	plan tests => 3;
 
 	my $app = Renard::Curie::App->new;

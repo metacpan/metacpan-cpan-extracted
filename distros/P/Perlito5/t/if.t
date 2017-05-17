@@ -1,14 +1,9 @@
-use feature 'say';
+#!./perl
 
-say '1..2';
+print "1..2\n";
 
-if ( 1 ) {
-	say 'ok 1 - true';	
-}
+# first test to see if we can run the tests.
 
-if ( 0 ) {
-	say 'not ok - false';		
-}
-
-say 'ok 2 - after false';
-
+$x = 'test';
+if ($x eq $x) { print "ok 1\n"; } else { print "not ok 1\n";}
+if ($x ne $x) { print "not ok 2\n"; } else { print "ok 2\n";}

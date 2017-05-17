@@ -1,5 +1,5 @@
 package CPAN::Testers::Schema::Result::TestReport;
-our $VERSION = '0.008';
+our $VERSION = '0.012';
 # ABSTRACT: Raw reports as JSON documents
 
 #pod =head1 SYNOPSIS
@@ -26,7 +26,7 @@ use Data::UUID;
 use DateTime;
 table 'test_report';
 
-__PACKAGE__->load_components('InflateColumn::Serializer', 'Core');
+__PACKAGE__->load_components('InflateColumn::Serializer', 'InflateColumn::DateTime', 'Core');
 
 #pod =attr id
 #pod
@@ -50,6 +50,7 @@ primary_column 'id', {
 column created => {
     data_type => 'datetime',
     is_nullable => 0,
+    format_datetime => 1,
 };
 
 #pod =attr report
@@ -80,7 +81,8 @@ column 'report', {
 
 sub new( $class, $attrs ) {
     $attrs->{report}{id} = $attrs->{id} ||= Data::UUID->new->create_str;
-    $attrs->{report}{created} = $attrs->{created} ||= DateTime->now( time_zone => 'UTC' )->datetime . 'Z';
+    $attrs->{created} ||= DateTime->now( time_zone => 'UTC' );
+    $attrs->{report}{created} = $attrs->{created}->datetime . 'Z';
     return $class->next::method( $attrs );
 };
 
@@ -96,7 +98,7 @@ CPAN::Testers::Schema::Result::TestReport - Raw reports as JSON documents
 
 =head1 VERSION
 
-version 0.008
+version 0.012
 
 =head1 SYNOPSIS
 

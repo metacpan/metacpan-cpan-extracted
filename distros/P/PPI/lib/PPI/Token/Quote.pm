@@ -50,7 +50,7 @@ use PPI::Token ();
 
 use vars qw{$VERSION @ISA};
 BEGIN {
-	$VERSION = '1.220';
+	$VERSION = '1.224';
 	@ISA     = 'PPI::Token';
 }
 
@@ -86,7 +86,7 @@ of the quotes.
 
 =head2 literal
 
-The C<literal> method is provided by ::Quote:Literal and
+The C<literal> method is provided by ::Quote::Literal and
 ::Quote::Single.  This returns the value of the string as Perl sees
 it: without the quote marks and with C<\\> and C<\'> resolved to C<\>
 and C<'>.

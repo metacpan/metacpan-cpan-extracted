@@ -8,8 +8,10 @@ README
 dist.ini
 examples/basic.pl
 examples/linear_regression.pl
+examples/multiple.pl
 lib/HTML/Notebook.pm
 lib/HTML/Notebook/Cell.pm
+lib/HTML/Notebook/Multiple.pm
 lib/HTML/Notebook/Style.pm
 t/author-critic.t
 t/author-pod-coverage.t

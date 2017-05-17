@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Business::OnlinePayment::Litle::UpdaterResponse
-our $VERSION = '0.955'; # VERSION
+our $VERSION = '0.956'; # VERSION
 
 
 sub new{
@@ -12,6 +12,7 @@ sub new{
 
     $self->_build_subs(
             qw( cust_id order_number invoice_number batch_date result_code
+            new_card_token old_cardnum old_type old_expdate
             error_message is_success type is_updated new_cardnum new_expdate new_type));
 
     $self->order_number( $args->{'litleTxnId'});
@@ -21,18 +22,24 @@ sub new{
     $self->error_message( $args->{'message'});
     $self->cust_id( $args->{'customerId'});
     $self->type( $args->{'originalCard'} ? 'confirm' : 'auth' );
-    if ( $self->type eq 'confirm'
-            && $args->{'updatedCard'}->{'number'}
-            && $args->{'updatedCard'}->{'number'} ne 'N/A'
-    ){
-        $self->is_updated(1);
-    } else {
-        $self->is_updated(0);
+    $self->is_updated(0);
+    if ( $args->{'originalCard'} ) {
+        $self->old_cardnum( $args->{'originalCard'}->{'number'} );
+        $self->old_type( $args->{'originalCard'}->{'type'} );
+        $self->old_expdate( $args->{'originalCard'}->{'expDate'} );
     }
-    if($self->type eq 'confirm') {
-       $self->new_cardnum( $args->{'updatedCard'}->{'number'} );
-       $self->new_type( $args->{'updatedCard'}->{'type'} );
-       $self->new_expdate( $args->{'updatedCard'}->{'expDate'} );
+    if ( $self->type eq 'confirm' ){
+        if ( $args->{'updatedToken'} ) {
+            $self->new_card_token( $args->{'updatedToken'}->{'litleToken'} );
+            $self->new_type( $args->{'updatedToken'}->{'type'} );
+            $self->new_expdate( $args->{'updatedToken'}->{'expDate'} );
+            $self->is_updated(1);
+        } elsif ( $args->{'updatedCard'}->{'number'} && $args->{'updatedCard'}->{'number'} ne 'N/A' ) {
+            $self->new_cardnum( $args->{'updatedCard'}->{'number'} );
+            $self->new_type( $args->{'updatedCard'}->{'type'} );
+            $self->new_expdate( $args->{'updatedCard'}->{'expDate'} );
+            $self->is_updated(1);
+        }
     }
 
     $self->is_success(1);
@@ -60,7 +67,7 @@ Business::OnlinePayment::Litle::UpdaterResponse - Business::OnlinePayment::Litle
 
 =head1 VERSION
 
-version 0.955
+version 0.956
 
 =head1 NAME
 

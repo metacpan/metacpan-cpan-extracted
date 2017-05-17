@@ -12,7 +12,7 @@ PPI::Statement::End - Content after the __END__ of a module
   
   __END__
   
-  This is part of an PPI::Statement::End statement
+  This is part of a PPI::Statement::End statement
   
   =pod
   
@@ -49,7 +49,7 @@ use PPI::Statement ();
 
 use vars qw{$VERSION @ISA};
 BEGIN {
-	$VERSION = '1.220';
+	$VERSION = '1.224';
 	@ISA     = 'PPI::Statement';
 }
 

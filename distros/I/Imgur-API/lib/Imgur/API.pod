@@ -1,0 +1,90 @@
+=head1 NAME
+
+Imgur::API - A minimal client for Imgur's REST api
+
+=head1 SYNOPSIS
+
+ use Imgur::API;
+
+ my $imgur = Imgur::API->new(api_key=><your api key>);
+
+ my $img_details = $imgur->image->get(image=>'pdX5DZS');
+
+ my $img = $imgur->image->upload(image=>$imgr->content("/home/user/Downloads/what.jpg",title=>"image title",album=>"dCsfeXb");
+ my $ret = $imgur->image->delete(image=>'pdX5DZSsdf54fs");
+
+=head1 DESCRIPTION
+
+C<Imgur::API> is a Perl interface to Imgur's REST API. Complete documentation can be found at https://apidocs.imgur.com/.
+
+=head1 ENDPOINTS
+
+L<Imgur::API::Endpoint::Account>
+
+L<Imgur::API::Endpoint::Album>
+
+L<Imgur::API::Endpoint::Comment>
+
+L<Imgur::API::Endpoint::Conversation>
+
+L<Imgur::API::Endpoint::Custom_gallery>
+
+L<Imgur::API::Endpoint::Gallery>
+
+L<Imgur::API::Endpoint::Image>
+
+L<Imgur::API::Endpoint::Memegen>
+
+L<Imgur::API::Endpoint::Notification>
+
+L<Imgur::API::Endpoint::Topic>
+
+L<Imgur::API::Endpoint::Misc>
+
+L<Imgur::API::Endpoint::OAuth>
+
+=head1 MODELS
+
+L<Imgur::API::Model::Account>
+
+L<Imgur::API::Model::Topic>
+
+L<Imgur::API::Model::GalleryImage>
+
+L<Imgur::API::Model::GalleryProfile>
+
+L<Imgur::API::Model::Conversation>
+
+L<Imgur::API::Model::Message>
+
+L<Imgur::API::Model::CustomGallery>
+
+L<Imgur::API::Model::Comment>
+
+L<Imgur::API::Model::TagVote>
+
+L<Imgur::API::Model::Album>
+
+L<Imgur::API::Model::Vote>
+
+L<Imgur::API::Model::Tag>
+
+L<Imgur::API::Model::Image>
+
+L<Imgur::API::Model::GalleryAlbum>
+
+L<Imgur::API::Model::Basic>
+
+L<Imgur::API::Model::Notification>
+
+L<Imgur::API::Model::MemeMetadata>
+
+L<Imgur::API::Model::AccountSettings>
+
+
+=head1 SEE ALSO
+
+https://api.imgur.com/
+
+=cut
+

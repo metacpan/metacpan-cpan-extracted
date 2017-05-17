@@ -66,8 +66,8 @@ quota has been used.
 =item $r->error_code
 
 Returns the error code  (as a string) which was genrerated by this response, these correspond 
-to constants exported by the Net::ThreeScale::Client module. see 
-Net::ThreeScale::Client for a list of available response codes. 
+to constants exported by the L<Net::ThreeScale::Client> module. See
+L<Net::ThreeScale::Client> for a list of available response codes. 
 
  
 =item $r->error_message
@@ -81,6 +81,23 @@ Returns a textual description of the error returned by the server.
 L<Net::ThreeScale::Client>
  
 =head1 AUTHOR
-  Owen Cliffe 
-  Eugene Oden
-  Collaborators: Dave Lambley, Ed Freyfogle and Marc Metten.
+
+(c) Owen Cliffe 2008, Eugene Oden 2010.
+
+=head1 CONTRIBUTORS
+
+=over
+
+=item *
+
+Dave Lambley
+
+=item *
+
+Ed Freyfogle
+
+=item *
+
+Marc Metten
+
+=back

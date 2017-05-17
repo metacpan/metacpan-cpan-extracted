@@ -1,0 +1,11 @@
+Revision history for perl distribution Mojolicious-Plugin-Mailgun
+
+0.03 2017-05-15T21:18:59+0200
+ - Documentation improvements
+ - Cleanups
+
+0.02 2017-05-15T15:48:05+0200
+ - Fix stray pod.
+
+0.01 2017-05-15T15:44:34+0200
+ - Started project

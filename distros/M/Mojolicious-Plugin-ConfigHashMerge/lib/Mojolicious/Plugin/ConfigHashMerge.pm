@@ -3,10 +3,13 @@ use Mojo::Base 'Mojolicious::Plugin::Config';
 use Hash::Merge::Simple qw( merge );
 use File::Spec::Functions 'file_name_is_absolute';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub register {
   my ($self, $app, $conf) = @_;
+
+  # Override
+  return $app->config if $app->config->{config_override};
 
   # Config file
   my $file = $conf->{file} || $ENV{MOJO_CONFIG};

@@ -7,7 +7,7 @@ use Perl::Critic::Utils qw(:severities :classification :ppi);
 use Perl::Critic::Violation;
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '0.019';
+our $VERSION = '0.020';
 
 sub supported_parameters { () }
 sub default_severity { $SEVERITY_HIGH }
@@ -34,7 +34,7 @@ my %modules = (
 		expl => 'Error.pm is overly magical and discouraged by its maintainers. Try Throwable for exception classes in Moo/Moose, or Exception::Class otherwise. Try::Tiny or Try are recommended for the try/catch syntax.',
 	},
 	'File::Slurp' => {
-		expl => 'File::Slurp gets file encodings all wrong, line endings on win32 are messed up, and it was written before layers were properly added. Use File::Slurper, Path::Tiny, Data::Munge, or Mojo::Util.',
+		expl => 'File::Slurp gets file encodings all wrong, line endings on win32 are messed up, and it was written before layers were properly added. Use File::Slurper, Path::Tiny, Data::Munge, or Mojo::File.',
 	},
 	'Getopt::Std' => {
 		expl => 'Getopt::Std was the original very simplistic command-line option processing module. It is now obsoleted by the much more complete solution Getopt::Long, which also supports short options, and is wrapped by module such as Getopt::Long::Descriptive and Getopt::Long::Modern for simpler usage.',
@@ -68,7 +68,7 @@ my %modules = (
 		expl => 'Net::IRC is an ancient module implementing the IRC protocol. Use a modern event-loop-based module instead. Choices are POE::Component::IRC (and Bot::BasicBot based on that), Net::Async::IRC, and Mojo::IRC.',
 	},
 	'Readonly' => {
-		expl => 'Readonly.pm is buggy and slow. Use Const::Fast instead, or the core pragma constant.',
+		expl => 'Readonly.pm is buggy and slow. Use Const::Fast or ReadonlyX instead, or the core pragma constant.',
 		severity => $SEVERITY_MEDIUM,
 	},
 	'Switch' => {
@@ -147,7 +147,7 @@ syntax.
 
 L<File::Slurp> gets file encodings all wrong, line endings on win32 are messed
 up, and it was written before layers were properly added. Use L<File::Slurper>,
-L<Path::Tiny/"slurp">, L<Data::Munge/"slurp">, or L<Mojo::Util/"slurp">.
+L<Path::Tiny/"slurp">, L<Data::Munge/"slurp">, or L<Mojo::File/"slurp">.
 
 =head2 Getopt::Std
 
@@ -203,8 +203,8 @@ L<Bot::BasicBot>), L<Net::Async::IRC>, and L<Mojo::IRC>.
 
 =head2 Readonly
 
-L<Readonly>.pm is buggy and slow. Use L<Const::Fast> instead, or the core
-pragma L<constant>.
+L<Readonly>.pm is buggy and slow. Use L<Const::Fast> or L<ReadonlyX> instead,
+or the core pragma L<constant>.
 
 =head2 Switch
 

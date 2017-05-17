@@ -6,7 +6,7 @@ use parent 'Menlo::CLI::Compat';
 use App::cpm::Logger::File;
 use Menlo::Builder::Static;
 
-our $VERSION = '0.301';
+our $VERSION = '0.302';
 
 use constant WIN32 => Menlo::CLI::Compat::WIN32();
 
@@ -94,6 +94,7 @@ sub run_timeout {
 
     return $self->run_command($cmd) if ref($cmd) eq 'CODE' || WIN32 || $self->{verbose} || !$timeout;
 
+    local $self->{logger}{pid} = $$;
     my $pid = fork;
     if ($pid) {
         eval {

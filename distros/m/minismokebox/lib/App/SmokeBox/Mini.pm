@@ -1,5 +1,5 @@
 package App::SmokeBox::Mini;
-$App::SmokeBox::Mini::VERSION = '0.66';
+$App::SmokeBox::Mini::VERSION = '0.68';
 #ABSTRACT: the guts of the minismokebox command
 
 use strict;
@@ -429,7 +429,7 @@ App::SmokeBox::Mini - the guts of the minismokebox command
 
 =head1 VERSION
 
-version 0.66
+version 0.68
 
 =head1 SYNOPSIS
 

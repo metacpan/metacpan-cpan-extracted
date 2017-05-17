@@ -1,0 +1,93 @@
+=head1 NAME
+
+Imgur::API::Model::CustomGallery
+
+=head1 DESCRIPTION
+
+=over 4
+
+This model represents a user's custom or filtered gallery
+
+=back
+
+=cut
+
+=head1 FIELDS
+ 
+=item 
+C<account_url I<string>>
+
+=over 4
+
+Username of the account that created the custom gallery
+
+=back
+
+
+=item 
+C<link I<string>>
+
+=over 4
+
+The URL link to the custom gallery
+
+=back
+
+
+=item 
+C<tags I<array>>
+
+=over 4
+
+An array of all the tag names in the custom gallery
+
+=back
+
+
+=item 
+C<item_count I<integer>>
+
+=over 4
+
+The total number of gallery items in the custom gallery
+
+=back
+
+
+=item 
+C<items I<Array of Gallery Images and Gallery Albums>>
+
+=over 4
+
+An array of all the gallery items in the custom gallery
+
+=back
+
+
+
+=head1 EXAMPLE
+
+
+ {
+   "data" : {
+      "items" : [],
+      "account_url" : "jasdev",
+      "tags" : [
+         "cats",
+         "dogs"
+      ],
+      "link" : "http://imgur.com/g/wRBsA"
+   },
+   "status" : 200,
+   "success" : true
+}
+
+
+
+=cut
+
+=head1 SEE ALSO
+
+http://api.imgur.com/models/customgallery
+
+

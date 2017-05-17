@@ -1,5 +1,10 @@
 Revision history for PGObject-Util-PseudoCSV
 
+2.0.0	TBD
+	Removed dependency on PGObject
+	Removed automatic deserialization
+	Added tests for legacy and current invocation
+
 1.1.1	2014-09-18
 	Corrected inconsistency between license texts
 

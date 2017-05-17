@@ -430,7 +430,7 @@ sub phred_calc {
             $score += $illumina_phred{$base};
         }
     }
-    return $score;
+    return $score/$len;
 }
 
 ####################################

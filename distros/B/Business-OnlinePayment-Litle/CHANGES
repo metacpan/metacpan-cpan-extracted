@@ -1,9 +1,46 @@
 ==================================================
-Changes from 2016-05-03 00:00:00 +0000 to present.
+Changes from 2016-05-15 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.955 at 2017-05-03 20:13:24 +0000
+version 0.956 at 2017-05-15 20:43:10 +0000
+------------------------------------------
+
+  Change: 943f37b09bfeb0655ff0c0de505fa83071d3e621
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2017-05-15 14:42:56 +0000
+
+    Version bump 
+
+  Change: 72adbfe8e20c25e99a6111381d8a71d26dc91f95
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2017-05-15 14:42:18 +0000
+
+    Merge pull request #28 from oaxlin/master
+
+    updater has old card data too... and tokens 
+
+  Change: d886a4e7b0762e9a43f186812cbac67dec16cfe4
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2017-05-03 14:05:42 +0000
+
+    updater old_* methods and basic token support 
+
+  Change: f9ac83f77948cb4d2fdb47c476b9f5a817f44c3d
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2017-05-03 10:03:56 +0000
+
+    Merge branch 'master' of
+    https://github.com/Jayceh/Business--OnlinePayment--Litle 
+
+  Change: f467a1bcc506ef14e9c55826b9ffda9201a72c04
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2015-12-17 20:57:40 +0000
+
+    travis test 
+
+------------------------------------------
+version 0.955 at 2017-05-03 20:13:11 +0000
 ------------------------------------------
 
   Change: f639ba03921b30232b5eb7e34b2cea4e4243c9d3
@@ -31,5 +68,5 @@ version 0.954 at 2017-02-01 18:30:54 +0000
     auto-installed 
 
 ================================================
-Plus 9 releases after 2016-05-03 00:00:00 +0000.
+Plus 9 releases after 2016-05-15 00:00:00 +0000.
 ================================================

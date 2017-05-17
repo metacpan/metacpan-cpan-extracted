@@ -1,5 +1,6 @@
 name = "JSON-RPC-Spec"
-badges = ["travis"]
-authority="cpan:NQOUNET"
+badges = ["travis", "codecov", "metacpan"]
+authority = "cpan:NQOUNET"
 
-module_maker="ModuleBuildTiny"
+module_maker = "ModuleBuildTiny"
+markdown_maker = "Pod::Markdown::Github"

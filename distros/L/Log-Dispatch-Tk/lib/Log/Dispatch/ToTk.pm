@@ -6,7 +6,7 @@ use vars qw($VERSION);
 use base qw(Log::Dispatch::Output);
 use fields qw/widget/ ;
 
-$VERSION = '1.8';
+$VERSION = '1.9';
 
 sub new
   {

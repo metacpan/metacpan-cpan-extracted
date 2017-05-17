@@ -74,4 +74,3 @@ eval { @with_from_lang = $translator->translate(); };
 is($@, '', 'html: @with_from_lang: translate() returned array');
 is($with_from_lang, $lang, 'html: scalar matches guessed scalar');
 is($with_from_lang[0], $lang[0], 'html: first element of array matches first element of guessed array');
-

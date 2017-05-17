@@ -6,14 +6,15 @@ use Types::Standard qw/Str ArrayRef HashRef/;
 
 validate_subs (
     [qw/hello_hash hello_hashref/] => {
-        params => {
+        returns => {
             one   => [ Str, sub { 'I Have a Default Value' } ],
             two   => [ ArrayRef ],
             three => [ HashRef ],
+			four  => [ Str ],
         },
     },
     [qw/a_list a_single_arrayref/] => {
-        params => [ [Str], [ArrayRef], [HashRef] ],
+        returns => [ [Str], [ArrayRef], [HashRef] ],
     },
 );
 
@@ -38,7 +39,7 @@ sub a_list {
 
 sub a_single_arrayref {
     my ($self, $args) = @_;    
-    return $args;
+	return $args;
 }
 
 sub okay_test {

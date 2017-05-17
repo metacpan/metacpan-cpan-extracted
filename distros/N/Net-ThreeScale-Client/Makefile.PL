@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Client for 3Scale.com web API version 2.0",
-  "AUTHOR" => "Owen Cliffe <zoot\@zoot.org.uk>",
+  "AUTHOR" => "Owen Cliffe <zoot\@zoot.org.uk>, Dave Lambley <cpan\@davel.me.uk>, Ed Freyfogle, Marc Metten",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -19,11 +19,12 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "HTTP::Tiny" => 0,
     "Try::Tiny" => 0,
+    "URI" => 0,
     "URI::Escape::XS" => 0,
     "XML::Parser" => 0,
     "XML::Simple" => 0
   },
-  "VERSION" => "2.1.5",
+  "VERSION" => "2.1.6",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -33,6 +34,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "HTTP::Tiny" => 0,
   "Try::Tiny" => 0,
+  "URI" => 0,
   "URI::Escape::XS" => 0,
   "XML::Parser" => 0,
   "XML::Simple" => 0

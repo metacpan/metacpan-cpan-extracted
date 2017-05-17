@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Value;
-$Config::Model::Value::VERSION = '2.101';
+$Config::Model::Value::VERSION = '2.102';
 use 5.10.1;
 
 use Mouse;
@@ -1290,7 +1290,7 @@ sub transform_boolean {
 
     # convert yes no to 1 or 0
     $$v_ref = 1 if ( $$v_ref =~ /^y/i or $$v_ref =~ /true/i );
-    $$v_ref = 0 if ( $$v_ref =~ /^n/i or $$v_ref =~ /false/i );
+    $$v_ref = 0 if ( $$v_ref =~ /^n/i or $$v_ref =~ /false/i or length($$v_ref) == 0);
 }
 
 # internal. return ( undef, value)
@@ -1808,7 +1808,7 @@ Config::Model::Value - Strongly typed configuration value
 
 =head1 VERSION
 
-version 2.101
+version 2.102
 
 =head1 SYNOPSIS
 
@@ -2183,8 +2183,8 @@ This modules can check several value types:
 
 =item C<boolean>
 
-Accepts values C<1> or C<0>, C<yes> or C<no>, C<true> or C<false>. The
-value read back is always C<1> or C<0>.
+Accepts values C<1> or C<0>, C<yes> or C<no>, C<true> or C<false>, and
+empty string. The value read back is always C<1> or C<0>.
 
 =item C<enum>
 

@@ -2,6 +2,8 @@ package Test::Smoke::Syncer::Rsync;
 use warnings;
 use strict;
 
+our $VERSION = '0.029';
+
 use base 'Test::Smoke::Syncer::Base';
 
 =head1 Test::Smoke::Syncer::Rsync
@@ -15,6 +17,7 @@ user-calls on this.
 use Cwd;
 use Test::Smoke::LogMixin;
 use Test::Smoke::Util::Execute;
+use Text::ParseWords;
 
 =head2 Test::Smoke::Syncer::Rsync->new( %args )
 
@@ -70,7 +73,7 @@ sub sync {
         Carp::croak( "[rsync] Cannot chdir($self->{ddir}): $!" );
     };
     my $rsyncout = $rsync->run(
-        $self->{opts},
+        shellwords($self->{opts}),
         ($self->verbose ? "-v" : ""),
         $self->{source},
         File::Spec->curdir,
@@ -81,6 +84,10 @@ sub sync {
     if (my $err = $rsync->exitcode ) {
         require Carp;
         Carp::carp( "Problem during rsync ($err)" );
+    }
+
+    if ($self->is_git_dir()) {
+        $self->make_dot_patch();
     }
 
     chdir $cwd;

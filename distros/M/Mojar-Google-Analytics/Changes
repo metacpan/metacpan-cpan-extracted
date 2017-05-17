@@ -1,6 +1,7 @@
-1.111 2017-03-31
+1.112 2017-03-31
   - Add columns (Response).
   - Change error attribute to match docn (Response).
+  - Upgrade for Mojolicious v7.15.
 
 1.101 2017-03-30
   - Fix error handling bug (Jwt).
@@ -16,7 +17,7 @@
 
 1.053 2014-10-16
   - Update error parsing (Response).
-  - Require perl v5.14 due to MIME::Base64::encode_base64url.
+  - Require Perl v5.14 due to MIME::Base64::encode_base64url.
 
 1.042 2014-10-06
   - Add timeout attribute to handle slow responses from Google (Analytics).

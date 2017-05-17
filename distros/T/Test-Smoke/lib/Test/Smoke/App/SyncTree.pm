@@ -2,6 +2,8 @@ package Test::Smoke::App::SyncTree;
 use warnings;
 use strict;
 
+our $VERSION = '0.001';
+
 use base 'Test::Smoke::App::Base';
 
 use Test::Smoke::Syncer;
@@ -24,7 +26,7 @@ The primary synchronisers are:
 =item git
 
 This method will use the L<git()> program to set up a main clone of the
-C<gitorigi> source tree.  From this local git repository yet another clone is
+C<gitorigin> source tree.  From this local git repository yet another clone is
 made into the smoke destination directory. See L<Test::Smoke::Syncer::Git> for
 details.
 
@@ -51,7 +53,7 @@ sub new {
     my $self = $class->SUPER::new(@_);
 
     $self->{_syncer} = Test::Smoke::Syncer->new(
-        $self->option('syncer'),
+        $self->option('sync_type'),
         $self->options,
         v => $self->option('verbose'),
     );

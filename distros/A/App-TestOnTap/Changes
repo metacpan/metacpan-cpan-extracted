@@ -1,5 +1,11 @@
 Revision history for App-TestOnTap
 
+0.032	2017-04-23
+
+	A recent Test::More fix changed a behavior (empty output line removed). 
+	
+	Now generates errors the other way...try for latest Test::Simple dist.    
+
 0.031	2017-04-18
 
 	A recent Test::More fix changed a behavior (empty output line removed). 

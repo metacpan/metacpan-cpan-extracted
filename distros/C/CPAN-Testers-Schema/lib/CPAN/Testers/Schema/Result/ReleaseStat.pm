@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::Result::ReleaseStat;
-our $VERSION = '0.008';
+our $VERSION = '0.012';
 # ABSTRACT: A single test report reduced to a simple pass/fail
 
 #pod =head1 SYNOPSIS
@@ -207,7 +207,7 @@ CPAN::Testers::Schema::Result::ReleaseStat - A single test report reduced to a s
 
 =head1 VERSION
 
-version 0.008
+version 0.012
 
 =head1 SYNOPSIS
 

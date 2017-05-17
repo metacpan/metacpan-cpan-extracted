@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::EnsureLatestPerl; # git description: v0.001-2-g64e7190
+package Dist::Zilla::Plugin::EnsureLatestPerl; # git description: v0.002-4-g892b77d
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Ensure the author is releasing using the latest Perl
 # KEYWORDS: plugin release develop author perl version latest
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Moose;
 with 'Dist::Zilla::Role::BeforeRelease';
@@ -43,7 +43,7 @@ sub before_release
     my @gmtime = gmtime(time() - $delta);
     my $expected_version = sprintf('5.%04d%02d%02d', $gmtime[5] + 1900, $gmtime[4] + 1, $gmtime[3]);
 
-    my $error_suffix = '(disable check with DZIL_ANY_PERL=1)';
+    my $error_suffix = 'disable check with DZIL_ANY_PERL=1';
 
     if (not eval { Module::CoreList->VERSION($expected_version); 1 })
     {
@@ -76,7 +76,7 @@ Dist::Zilla::Plugin::EnsureLatestPerl - Ensure the author is releasing using the
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

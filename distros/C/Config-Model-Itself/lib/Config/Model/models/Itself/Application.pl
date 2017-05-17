@@ -38,6 +38,7 @@
                 ],
                 type => 'leaf',
                 value_type => 'enum',
+                mandatory => 1,
                 description => 'Can be "system", "user" or "application"',
                 help => {
                     system => 'Configuration file is owned by root and usually located in C</etc>',

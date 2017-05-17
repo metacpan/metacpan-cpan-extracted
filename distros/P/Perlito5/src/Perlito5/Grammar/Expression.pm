@@ -154,6 +154,34 @@ sub reduce_postfix {
             $value->{arguments} = $param_list;
             return $value;
         }
+        if ( ref($value) eq 'Perlito5::AST::Var' && $value->sigil eq "&") {
+            # &c()
+            $v = Perlito5::AST::Apply->new(
+                ignore_proto => 1,
+                code         => $value->{name},
+                namespace    => $value->{namespace},
+                arguments    => $param_list,
+                proto        => undef,
+            );
+            return $v;
+        }
+        if ( ref($value) eq 'Perlito5::AST::Apply' && $value->code eq "prefix:<&>") {
+            # &$c()
+            $v = Perlito5::AST::Apply->new(
+                ignore_proto => 1,
+                code         => $value,
+                namespace    => '',
+                arguments    => $param_list,
+                proto        => undef,
+            );
+            return $v;
+        }
+       
+        # $c()      syntax error
+        # $c[0]()   ok
+        if ( ref($value) eq 'Perlito5::AST::Var' ) {
+            Perlito5::Compiler::error "syntax error";
+        }
         $v = Perlito5::AST::Call->new( invocant => $value, method => 'postcircumfix:<( )>', arguments => $param_list );
         return $v;
     }
@@ -173,6 +201,18 @@ sub reduce_postfix {
     }
     if ($v->[1] eq '.( )') {
         my $param_list = expand_list($v->[2]);
+
+        # if ( ref($value) eq 'Perlito5::AST::Var' && $value->sigil eq "&") {
+        #     # &c->() means: &c()->()
+        #     $value = Perlito5::AST::Apply->new(
+        #         ignore_proto => 1,
+        #         code         => $value->{name},
+        #         namespace    => $value->{namespace},
+        #         arguments    => [],
+        #         proto        => undef,
+        #     );
+        # }
+
         $v = Perlito5::AST::Call->new( invocant => $value, method => 'postcircumfix:<( )>', arguments => $param_list );
         return $v;
     }
@@ -409,6 +449,31 @@ token term_curly {
     ]
 };
 
+token term_pos {
+    'pos' <.Perlito5::Grammar::Space::opt_ws>
+    [
+        <Perlito5::Grammar::var_ident>   # pos $variable
+        {
+            $MATCH->{capture} = [ 'term',
+                Perlito5::AST::Apply->new(
+                    code      => 'pos',
+                    arguments => [ $MATCH->{"Perlito5::Grammar::var_ident"}{capture} ],
+                )
+            ];
+        }
+    |
+        <!before '(' >
+        {
+            $MATCH->{capture} = [ 'term',
+                Perlito5::AST::Apply->new(
+                    code      => 'pos',
+                    arguments => [ Perlito5::AST::Var::SCALAR_ARG() ],
+                    bareword  => 1,
+                )
+            ];
+        }
+    ]
+};
 
 token declarator {
      'my' | 'state' | 'our' 
@@ -507,7 +572,8 @@ token term_return {
                  Perlito5::AST::Apply->new(
                     code      => 'return',
                     arguments => $args eq '*undef*' ? [] : [$args],
-                    namespace => ''
+                    namespace => '',
+                    bareword  => $args eq '*undef*' ? 1 : 0,
                  )
                ]
         }
@@ -799,6 +865,7 @@ Perlito5::Grammar::Precedence::add_term( 'state' => \&term_declarator );
 Perlito5::Grammar::Precedence::add_term( 'local' => \&term_local );
 Perlito5::Grammar::Precedence::add_term( 'return' => \&term_return );
 Perlito5::Grammar::Precedence::add_term( 'not'   => \&term_not );
+Perlito5::Grammar::Precedence::add_term( 'pos'   => \&term_pos );
 
 
 1;

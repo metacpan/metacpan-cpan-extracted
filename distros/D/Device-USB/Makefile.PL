@@ -51,9 +51,17 @@ WriteMakefile(
     AUTHOR              => 'G. Wade Johnson <gwadej@cpan.org>',
     VERSION_FROM        => 'lib/Device/USB.pm',
     ABSTRACT_FROM       => 'lib/Device/USB.pm',
+    LICENSE             => 'perl',
+    EXE_FILES           => [ 'bin/dump_usb.pl' ],
     PL_FILES            => {},
-    PREREQ_PM => {
+    CONFIGURE_REQUIRES  => {
+        'ExtUtils::MakeMaker' => 0,
+        'Inline::MakeMaker' => 0,
+    },
+    BUILD_REQUIRES => {
         'Test::More' => 0,
+    },
+    PREREQ_PM => {
         'Inline' => 0,
         'Inline::C' => 0,
         'Carp' => 0,
@@ -62,9 +70,17 @@ WriteMakefile(
     clean               => {
         FILES => 'Device-USB-* USB.inl _Inline'
     },
-    CONFIGURE_REQUIRES => {
-        "ExtUtils::MakeMaker" => 0,
-        'Inline::MakeMaker' => 0,
+    META_MERGE          => {
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/gwadej/perl-device-usb.git',
+                web  => 'https://github.com/gwadej/perl-device-usb',
+            },
+        },
+    },
+    test               => {
+        TESTS => 't/*.t xt/*.t',
     },
 );
 
@@ -90,7 +106,6 @@ sub lib_found
     {
         return 1 if defined $dir && ($^O =~ /win/i ? (-e "$dir/libusb.lib" || -e "$dir/libusb.a") : -e "$dir/libusb.so") ;
     }
-
 
     return;
 }

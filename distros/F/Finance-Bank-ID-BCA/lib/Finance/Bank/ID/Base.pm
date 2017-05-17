@@ -1,13 +1,13 @@
 package Finance::Bank::ID::Base;
 
-our $DATE = '2015-09-08'; # DATE
-our $VERSION = '0.43'; # VERSION
+our $DATE = '2017-05-16'; # DATE
+our $VERSION = '0.45'; # VERSION
 
 use 5.010;
 use Moo;
 use Log::Any::IfLOG '$log';
 
-use Data::Dumper;
+use Data::Dmp;
 use Data::Rmap qw(:all);
 use DateTime;
 use Finance::BankUtils::ID::Mechanize;
@@ -41,11 +41,6 @@ sub _fmtdate {
 sub _fmtdt {
     my ($self, $dt) = @_;
     $dt->datetime;
-}
-
-sub _dmp {
-    my ($self, $var) = @_;
-    Data::Dumper->new([$var])->Indent(0)->Terse(1)->Dump;
 }
 
 # strip non-digit characters
@@ -89,7 +84,7 @@ sub _req {
     my $mech = $self->mech;
     my $c = $self->_req_counter + 1;
     $self->_req_counter($c);
-    $self->logger->debug("mech request #$c: $meth ".$self->_dmp($args)."");
+    $self->logger->debug("mech request #$c: $meth ".dmp($args)."");
     my $errmsg = "";
 
     eval {
@@ -107,7 +102,7 @@ sub _req {
 
     eval {
         $self->logger_dump->debug(
-            "<!-- result of mech request #$c ($meth ".$self->_dmp($args)."):\n".
+            "<!-- result of mech request #$c ($meth ".dmp($args)."):\n".
             $mech->response->status_line."\n".
             $mech->response->headers->as_string."\n".
             "-->\n".
@@ -244,11 +239,11 @@ sub parse_statement {
         last;
     }
 
-    $self->logger->debug("parse_statement(): Temporary result: ".$self->_dmp($stmt));
+    $self->logger->debug("parse_statement(): Temporary result: ".dmp($stmt));
     $self->logger->debug("parse_statement(): Status: $status ($error)");
 
     $stmt = undef unless $status == 200;
-    $self->logger->debug("parse_statement(): Result: ".$self->_dmp($stmt));
+    $self->logger->debug("parse_statement(): Result: ".dmp($stmt));
 
     unless ($opts{return_datetime_obj} // 1) {
         # $_[0]{seen} = {} is a trick to allow multiple places which mention the
@@ -277,7 +272,7 @@ Finance::Bank::ID::Base - Base class for Finance::Bank::ID::BCA etc
 
 =head1 VERSION
 
-This document describes version 0.43 of Finance::Bank::ID::Base (from Perl distribution Finance-Bank-ID-BCA), released on 2015-09-08.
+This document describes version 0.45 of Finance::Bank::ID::Base (from Perl distribution Finance-Bank-ID-BCA), released on 2017-05-16.
 
 =head1 SYNOPSIS
 
@@ -387,7 +382,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2013, 2012, 2011, 2010 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

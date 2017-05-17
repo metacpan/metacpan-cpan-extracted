@@ -13,7 +13,7 @@ use Devel::CheckBin;
 check_bin('git');
 check_bin('hub');
 check_bin('ghch');
-check_bin('curl');
+check_bin('gobump');
 
 Build_PL();
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use Test::More tests => 19;
+use Test::More tests => 20;
 use Test::Exception;
 use Carp;
 
@@ -9,7 +9,8 @@ use warnings;
 use SVG::Sparkline;
 
 throws_ok { SVG::Sparkline->new(); } qr/No Sparkline type specified/, 'no parameters';
-throws_ok { SVG::Sparkline->new( 'xyzzy' ); } qr/Unrecognized Sparkline type/, 'unrecognized type';
+throws_ok { SVG::Sparkline->new( 'Xyzzy' ); } qr/Unrecognized Sparkline type/, 'unrecognized type';
+throws_ok { SVG::Sparkline->new( 'Line; system("echo attempt injection")' ); } qr/not a valid Sparkline type/, 'unrecognized type';
 throws_ok { SVG::Sparkline->new( 'Whisker' ); } qr/Missing arguments hash/, 'Missing args';
 throws_ok { SVG::Sparkline->new( 'Whisker', '' ); } qr/hash reference/, 'Not a hash reference';
 

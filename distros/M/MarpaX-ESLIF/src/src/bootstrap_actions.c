@@ -3062,9 +3062,7 @@ static short _marpaESLIF_bootstrap_G1_action_single_symbol_4b(void *userDatavp, 
                                                      1, /* noEventb - no effect anway because we are in fake mode */
                                                      0, /* silentb */
                                                      NULL, /* marpaESLIFRecognizerParentp */
-                                                     1, /* fakeb */
-                                                     0, /* exceptionb */
-                                                     0 /* minExceptionSizel */);
+                                                     1 /* fakeb */);
   if (marpaESLIFRecognizerp == NULL) {
     goto err;
   }
@@ -5153,9 +5151,7 @@ static inline marpaESLIF_bootstrap_utf_string_t *_marpaESLIF_bootstrap_regex_to_
                                                      1, /* noEventb - no effect anway because we are in fake mode */
                                                      0, /* silentb */
                                                      NULL, /* marpaESLIFRecognizerParentp */
-                                                     1, /* fakeb */
-                                                     0, /* exceptionb */
-                                                     0 /* minExceptionSizel */);
+                                                     1 /* fakeb */);
   if (marpaESLIFRecognizerp == NULL) {
     goto err;
   }
@@ -5266,9 +5262,7 @@ static inline marpaESLIF_bootstrap_utf_string_t *_marpaESLIF_bootstrap_character
                                                      1, /* noEventb - no effect anway because we are in fake mode */
                                                      0, /* silentb */
                                                      NULL, /* marpaESLIFRecognizerParentp */
-                                                     1, /* fakeb */
-                                                     0, /* exceptionb */
-                                                     0 /* minExceptionSizel */);
+                                                     1 /* fakeb */);
   if (marpaESLIFRecognizerp == NULL) {
     goto err;
   }

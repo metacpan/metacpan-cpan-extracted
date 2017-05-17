@@ -7,7 +7,7 @@ use App::cpm::Job;
 use App::cpm::Logger;
 use Module::Metadata;
 use version;
-our $VERSION = '0.301';
+our $VERSION = '0.302';
 
 sub new {
     my ($class, %option) = @_;
@@ -27,6 +27,18 @@ sub new {
             die "Module::CoreList does not have target perl $self->{target_perl} entry, abort.\n";
         }
     }
+    $self;
+}
+
+sub clear {
+    my $self = shift;
+    $self->{installed_distributions} = 0;
+    $self->{jobs} = {};
+    $self->{distributions} = {};
+    $self->{_fail_resolve} = {};
+    $self->{_fail_install} = {};
+    $self->{_is_installed} = {};
+    $self->{_artifacts} = {};
     $self;
 }
 

@@ -2,7 +2,7 @@ CMAKE_MINIMUM_REQUIRED (VERSION 3.0.0 FATAL_ERROR)
 IF (NOT MYPACKAGEBOOTSTRAP_DONE)
   INCLUDE ("3rdparty/github/cmake-utils/cmake/MyPackageBootstrap.cmake")
 ENDIF ()
-MYPACKAGESTART (marpaESLIF 2 0 9)
+MYPACKAGESTART (marpaESLIF 2 0 11)
 
 ###########
 # Library #
@@ -57,6 +57,9 @@ MYPACKAGETESTEXECUTABLE(marpaESLIFTester     test/marpaESLIFTester.c)
 MYPACKAGETESTEXECUTABLE(adventTester         test/adventTester.c)
 MYPACKAGETESTEXECUTABLE(jsonTester           test/jsonTester.c)
 MYPACKAGETESTEXECUTABLE(selfTester           test/selfTester.c)
+MYPACKAGETESTEXECUTABLE(exceptionTester      test/exceptionTester.c)
+MYPACKAGETESTEXECUTABLE(exceptionTester2     test/exceptionTester2.c)
+MYPACKAGETESTEXECUTABLE(exceptionTester3     test/exceptionTester3.c)
 
 ################
 # Dependencies #
@@ -74,6 +77,9 @@ MYPACKAGECHECK(marpaESLIFTester)
 MYPACKAGECHECK(adventTester)
 MYPACKAGECHECK(jsonTester)
 MYPACKAGECHECK(selfTester)
+MYPACKAGECHECK(exceptionTester)
+MYPACKAGECHECK(exceptionTester2)
+MYPACKAGECHECK(exceptionTester3)
 
 ###########
 # Install #

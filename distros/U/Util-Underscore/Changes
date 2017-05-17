@@ -1,3 +1,22 @@
+v1.4.2        2017-05-15
+
+    [Bugfixes]
+
+    - max_by, max_str_by, min_by, min_by_str: Multiple bugs.
+
+        - In scalar context, these now return the first maximal (minimal)
+        element as is documented. Previously, they would return the last
+        maximal (minimal) element.
+
+        - In list context, they now return only the maximal (minimal) elements
+        as is documented. Previously, they would also return previous maximal
+        (minimal) elements. If all elements are ascending, they would have
+        previously returned all elements!
+
+    [Other Changes]
+
+    - avoid test failures for "_::is_tainted".
+
 v1.4.0        2017-02-27
 
     [Changed Functionality]

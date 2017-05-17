@@ -1,7 +1,9 @@
 #!/usr/bin/perl -w
+use strict;
+use warnings;
 
 use Test::More qw(no_plan);
-use Data::Dumper; 
+use Data::Dumper;
 ## grab info from the ENV
 my $login = $ENV{'BOP_USERNAME'} ? $ENV{'BOP_USERNAME'} : 'TESTMERCHANT';
 my $password = $ENV{'BOP_PASSWORD'} ? $ENV{'BOP_PASSWORD'} : 'TESTPASS';
@@ -13,7 +15,7 @@ my @opts = ('default_Origin' => 'RECURRING');
 
 my $str = do { local $/ = undef; <DATA> };
 my $data;
-eval($str);
+eval($str); ## no critic
 
 my $authed = 
     $ENV{BOP_USERNAME}
@@ -35,6 +37,30 @@ my %orig_content = (
     merchantid     => $merchantid,
     action         => 'Account Update',
 );
+
+use_ok 'Business::OnlinePayment::Litle::UpdaterResponse';
+my $update = Business::OnlinePayment::Litle::UpdaterResponse->new({
+    litleTxnId   => 'fake_txn_id',
+    orderId      => '123',
+    responseTime => '',
+    response     => '500',
+    message      => 'test',
+    customerId   => '456',
+    reportGroup  => 'BOP',
+    originalCard => {
+                number => '4111111111111111',
+                type    => 'VISA',
+                expDate => '1212',
+    },
+    updatedCard  => {
+                number  => '4007000000027',
+                type    => 'VISA',
+                expDate => '1220',
+    },
+});
+isa_ok($update, 'Business::OnlinePayment::Litle::UpdaterResponse') or die 'Cannot new Business::OnlinePayment::Litle::UpdaterResponse';
+cmp_ok($update->new_cardnum, 'eq', '4007000000027', 'new_cardnum exists');
+cmp_ok($update->old_cardnum, 'eq', '4111111111111111', 'old_cardnum exists');
 
 my $batch_id = time;
 SKIP: {

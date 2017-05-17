@@ -1,5 +1,5 @@
 package minismokebox;
-$minismokebox::VERSION = '0.66';
+$minismokebox::VERSION = '0.68';
 #ABSTRACT: a small lightweight SmokeBox
 
 use strict;
@@ -19,7 +19,7 @@ minismokebox - a small lightweight SmokeBox
 
 =head1 VERSION
 
-version 0.66
+version 0.68
 
 =head1 SYNOPSIS
 

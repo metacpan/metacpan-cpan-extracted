@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.0.9, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,12 +29,12 @@ no_index:
 provides:
   Furl:
     file: lib/Furl.pm
-    version: '3.10'
+    version: '3.11'
   Furl::ConnectionCache:
     file: lib/Furl/ConnectionCache.pm
   Furl::HTTP:
     file: lib/Furl/HTTP.pm
-    version: '3.10'
+    version: '3.11'
   Furl::Headers:
     file: lib/Furl/Headers.pm
   Furl::Request:
@@ -62,7 +62,7 @@ resources:
   bugtracker: https://github.com/tokuhirom/Furl/issues
   homepage: https://github.com/tokuhirom/Furl
   repository: git://github.com/tokuhirom/Furl.git
-version: '3.10'
+version: '3.11'
 x_contributors:
   - 'Keiji, Yoshimi <walf443@gmail.com>'
   - 'Fuji, Goro <gfuji@cpan.org>'

@@ -4,6 +4,9 @@ use Perlito5::AST;
 use Perlito5::AST::Captures;
 use Perlito5::Dumper;
 use Perlito5::Java::Apply;
+use Perlito5::Perl5::Emitter;       # TODO - cleanup the dependency on Perl5 emitter
+use Perlito5::Perl5::PrettyPrinter; # TODO - cleanup the dependency on Perl5 emitter
+
 use strict;
 
 package Perlito5::Java;
@@ -76,13 +79,13 @@ package Perlito5::Java;
         $Java_class->{Integer} = {
             java_type           => 'Integer',
             java_native_to_perl => 'PlInt',
-            perl_to_java        => 'to_long',
+            perl_to_java        => 'to_int',
             perl_package        => 'Integer',
         };
         $Java_class->{Boolean} = {
             java_type           => 'Boolean',
             java_native_to_perl => 'PlBool',
-            perl_to_java        => 'to_bool',
+            perl_to_java        => 'to_boolean',
             perl_package        => 'Boolean',
         };
         $Java_class->{Double} = {
@@ -109,17 +112,22 @@ package Perlito5::Java;
             perl_to_java        => 'to_float',
             perl_package        => 'Float',
         };
-        # TODO
-        # $Java_class->{Object} = {
-        #     java_type           => 'Object',
-        #     java_native_to_perl => 'PlObject',
-        #     perl_to_java        => 'to_object',
-        #     perl_package        => 'Object',
-        # };
+        # # $Java_class->{Object} = {
+        # #     java_type           => 'Object',
+        # #     java_native_to_perl => 'PlObject',
+        # #     perl_to_java        => 'to_object',
+        # #     perl_package        => 'Object',
+        # # };
+        #
+        #  - "java.lang.Object" can be imported using the standard import syntax:
+        #
+        #    package Java::Object { import => "java.lang.Object" }; 
+        #    my Java::Object $obj = Java::Object->new();
+        #
         $Java_class->{Character} = {
             java_type           => 'Character',
             java_native_to_perl => 'PlString',
-            perl_to_java        => 'to_character',
+            perl_to_java        => 'to_char',
             perl_package        => 'Character',
         };
         $Java_class->{long} = {
@@ -131,7 +139,7 @@ package Perlito5::Java;
         $Java_class->{int} = {
             java_type           => 'int',
             java_native_to_perl => 'PlInt',
-            perl_to_java        => 'to_long',
+            perl_to_java        => 'to_int',
             perl_package        => 'int',
         };
         $Java_class->{short} = {
@@ -145,6 +153,30 @@ package Perlito5::Java;
             java_native_to_perl => 'PlInt',
             perl_to_java        => 'to_long',
             perl_package        => 'byte',
+        };
+        $Java_class->{boolean} = {
+            java_type           => 'boolean',
+            java_native_to_perl => 'PlBool',
+            perl_to_java        => 'to_boolean',
+            perl_package        => 'boolean',
+        };
+        $Java_class->{double} = {
+            java_type           => 'double',
+            java_native_to_perl => 'PlDouble',
+            perl_to_java        => 'to_double',
+            perl_package        => 'double',
+        };
+        $Java_class->{float} = {
+            java_type           => 'float',
+            java_native_to_perl => 'PlDouble',
+            perl_to_java        => 'to_float',
+            perl_package        => 'float',
+        };
+        $Java_class->{char} = {
+            java_type           => 'char',
+            java_native_to_perl => 'PlString',
+            perl_to_java        => 'to_char',
+            perl_package        => 'char',
         };
     }
 
@@ -161,13 +193,13 @@ package Perlito5::Java;
 
     # prefix operators that take a "str" parameter
     our %op_prefix_js_str = (
-        'prefix:<-A>' => 'p5atime',
-        'prefix:<-C>' => 'p5ctime',
-        'prefix:<-M>' => 'p5mtime',
-        'prefix:<-d>' => 'p5is_directory',
-        'prefix:<-e>' => 'p5file_exists',
-        'prefix:<-f>' => 'p5is_file',
-        'prefix:<-s>' => 'p5size',
+        'prefix:<-A>' => 'PerlOp.p5atime',
+        'prefix:<-C>' => 'PerlOp.p5ctime',
+        'prefix:<-M>' => 'PerlOp.p5mtime',
+        'prefix:<-d>' => 'PerlOp.p5is_directory',
+        'prefix:<-e>' => 'PerlOp.p5file_exists',
+        'prefix:<-f>' => 'PerlOp.p5is_file',
+        'prefix:<-s>' => 'PerlOp.p5size',
     );
 
     # these operators need 2 "str" parameters
@@ -180,7 +212,7 @@ package Perlito5::Java;
         'infix:<gt>' => ' > ',
     );
     # these operators always return "bool"
-    our %op_to_bool = map +($_ => 1), qw(
+    our %op_to_boolean = map +($_ => 1), qw(
         prefix:<!>
         infix:<!=>
         infix:<==>
@@ -246,7 +278,7 @@ package Perlito5::Java;
         prefix:<-->     1 
     ); 
     # these operators will generate native Java code when possible; return "boolean"
-    our %native_op_to_bool = qw(
+    our %native_op_to_boolean = qw(
         infix:<!=>  !=
         infix:<==>  ==
         infix:<<=>  <=
@@ -258,11 +290,15 @@ package Perlito5::Java;
         print           1
         say             1
         printf          1
+        return          1
+        push            1
         infix:<=>       1
         postfix:<++>    1
         postfix:<-->    1
         prefix:<++>     1
         prefix:<-->     1
+        tie             1
+        untie           1
     ); 
 
     my %safe_char = (
@@ -302,6 +338,7 @@ package Perlito5::Java;
         my $s = shift;
         my @out;
         my $tmp = '';
+        my $has_char = 0;
         return '""' if $s eq '';
         for my $i (0 .. length($s) - 1) {
             my $c = substr($s, $i, 1);
@@ -313,14 +350,25 @@ package Perlito5::Java;
             {
                 $tmp = $tmp . $c;
             }
+            elsif (ord($c) > 65535) {
+
+                # this is necessary to support characters with code > 65535
+                # new String(Character.toChars((int)(1114109L)))
+
+                push @out, "\"$tmp\"" if $tmp ne '';
+                push @out, "new String(Character.toChars(" . ord($c) . "))";
+                $has_char = 1;
+                $tmp = '';
+            }
             else {
                 push @out, "\"$tmp\"" if $tmp ne '';
                 push @out, "(char)" . ord($c) . "";
+                $has_char = 1;
                 $tmp = '';
             }
         }
         push @out, "\"$tmp\"" if $tmp ne '';
-        unshift @out, '""' if scalar(@out) > 1;
+        unshift @out, '""' if $has_char;
         return join(' + ', @out);
     }
 
@@ -396,7 +444,7 @@ package Perlito5::Java;
             return 1;
         }
         my $is_apply = $self->isa( 'Perlito5::AST::Apply' ) && $self->{arguments} && @{$self->{arguments}};
-        if ($is_apply && exists $native_op_to_bool{ $self->{code} } && is_native_args($self->{arguments})) {
+        if ($is_apply && exists $native_op_to_boolean{ $self->{code} } && is_native_args($self->{arguments})) {
             return 1;
         }
         return 0;
@@ -512,6 +560,9 @@ package Perlito5::Java;
                 return to_native_bool( $cond->{arguments}[0], $level, $wantarray )
             }
             elsif ($cond->isa( 'Perlito5::AST::Int' )) {
+                if ($cond->{int} == 0) {
+                    return 'false';
+                }
                 return '(' . $cond->{int} . ' != 0)';
             }
             elsif ($cond->isa( 'Perlito5::AST::Num' )) {
@@ -610,7 +661,7 @@ package Perlito5::Java;
                 return 'new PlDouble(' . $cond->emit_java($level, $wantarray) . '.to_double())';
             }
     }
-    sub to_bool {
+    sub to_boolean {
             my $cond = shift;
             my $level = shift;
             my $wantarray = 'scalar';
@@ -619,7 +670,7 @@ package Perlito5::Java;
                && $cond->{arguments} && @{$cond->{arguments}}
                ) 
             {
-                return to_bool( $cond->{arguments}[0], $level )
+                return to_boolean( $cond->{arguments}[0], $level )
             }
 
             # Note: 'infix:<||>' and 'infix:<&&>' can only be optimized here because we know we want "bool"
@@ -629,8 +680,8 @@ package Perlito5::Java;
                   )
                ) 
             {
-                return '(' . to_bool($cond->{arguments}->[0], $level) . ' && '
-                           . to_bool($cond->{arguments}->[1], $level) . ')'
+                return '(' . to_boolean($cond->{arguments}->[0], $level) . ' && '
+                           . to_boolean($cond->{arguments}->[1], $level) . ')'
             }
             if (  $cond->isa( 'Perlito5::AST::Apply' ) 
                && (  $cond->code eq 'infix:<||>'
@@ -638,19 +689,43 @@ package Perlito5::Java;
                   )
                ) 
             {
-                return '(' . to_bool($cond->{arguments}->[0], $level) . ' || '
-                           . to_bool($cond->{arguments}->[1], $level) . ')'
+                return '(' . to_boolean($cond->{arguments}->[0], $level) . ' || '
+                           . to_boolean($cond->{arguments}->[1], $level) . ')'
+            }
+            if (  $cond->isa( 'Perlito5::AST::Apply' ) 
+               && (  $cond->code eq 'prefix:<!>'
+                  || $cond->code eq 'prefix:<not>'
+                  )
+               ) 
+            {
+                if (@{$cond->{arguments}} == 1) {
+                    return '!' . to_boolean($cond->{arguments}->[0], $level)
+                }
+            }
+            if (  $cond->isa( 'Perlito5::AST::Apply' ) 
+               && (  $cond->code eq 'defined' )
+               ) 
+            {
+                if (@{$cond->{arguments}} == 1) {
+                    my $arg = $cond->{arguments}[0];
+                    if (  ref( $arg ) eq 'Perlito5::AST::Var' 
+                       && $arg->{sigil} eq '$'
+                       )
+                    {
+                        return '!' . $arg->emit_java($level, 'scalar') . '.is_undef()';
+                    }
+                }
             }
 
             if  (  ($cond->isa( 'Perlito5::AST::Int' ))
                 || ($cond->isa( 'Perlito5::AST::Num' ))
-                || ($cond->isa( 'Perlito5::AST::Apply' ) && exists $op_to_bool{ $cond->code })
+                || ($cond->isa( 'Perlito5::AST::Apply' ) && exists $op_to_boolean{ $cond->code })
                 )
             {
-                return $cond->emit_java($level, $wantarray) . '.to_bool()';
+                return $cond->emit_java($level, $wantarray) . '.to_boolean()';
             }
             else {
-                return $cond->emit_java($level, $wantarray) . '.to_bool()';
+                return $cond->emit_java($level, $wantarray) . '.to_boolean()';
             }
     }
 
@@ -663,15 +738,51 @@ package Perlito5::Java;
          || ($_[0]->isa( 'Perlito5::AST::Apply' ) 
             && (  exists($op_to_str{ $_[0]->{code} })
                || exists($op_to_num{ $_[0]->{code} })
-               || exists($op_to_bool{ $_[0]->{code} })
+               || exists($op_to_boolean{ $_[0]->{code} })
                #  || $_[0]->{code} eq 'prefix:<\\>'    -- \(@a) is a list
                )
             )
     }
 
+    sub to_filehandle {
+        my ($item, $level) = @_;
+        return      'PerlOp.get_filehandle('
+             .        $item->emit_java( $level ) . ', '
+             .        Perlito5::Java::escape_string($Perlito5::PKG_NAME)
+             .      ')'
+    }
+
+    sub to_param_list {
+        my $items = to_list_preprocess( $_[0] );
+        my $level = $_[1];
+
+        if (@$items == 0) {
+            return "new PlArray()";
+        }
+
+        my $item = $items->[0];
+        if ( $item->isa('Perlito5::AST::Apply') && ( $item->code eq 'infix:<..>' ) ) {
+            return '(PlArray)(' . $item->emit_java($level, 'list') . ')';
+        }
+
+        'PlArray.construct_list_of_aliases('
+        .   join(', ', map( $_->emit_java($level, 'list', 'lvalue'), @$items ))
+        . ')';
+    }
+
     sub to_list {
         my $items = to_list_preprocess( $_[0] );
         my $level = $_[1];
+
+        if (@$items == 0) {
+            return "new PlArray()";
+        }
+
+        my $item = $items->[0];
+        if ( @$items == 1 && $item->isa('Perlito5::AST::Var') && ( $item->sigil eq '@' ) ) {
+            return $item->emit_java($level, 'list');
+        }
+
         return 'new PlArray('
              .   join(', ', map( $_->emit_java($level, 'list'), @$items ))
              . ')';
@@ -782,14 +893,14 @@ package Perlito5::Java;
             return $obj->emit_java($level, 0, $type);
         }
 
-        if ( $obj->isa( 'Perlito5::AST::Apply' ) && $obj->code eq 'prefix:<$>' ) {
-            my $arg  = $obj->{arguments}->[0];
-            return 'get_scalarref(' 
-                    . $arg->emit_java( $level ) . ', '
-                    . Perlito5::Java::escape_string($Perlito5::PKG_NAME) . ', '
-                    . Perlito5::Java::escape_string($type)      # autovivification type
-                    . ')';
-        }
+        # if ( $obj->isa( 'Perlito5::AST::Apply' ) && $obj->code eq 'prefix:<$>' ) {
+        #     my $arg  = $obj->{arguments}->[0];
+        #     return 'get_scalarref(' 
+        #             . $arg->emit_java( $level ) . ', '
+        #             . Perlito5::Java::escape_string($Perlito5::PKG_NAME) . ', '
+        #             . Perlito5::Java::escape_string($type)      # autovivification type
+        #             . ')';
+        # }
 
         $obj->emit_java($level)
     }
@@ -903,7 +1014,7 @@ package Perlito5::Java::LexicalBlock;
         if ( $has_local ) {
             push @pre, 'int ' . $local_label . ' = PerlOp.local_length();';
             if ($has_regex) {
-                push @pre, 'PerlOp.local_match();'
+                push @pre, 'PerlOp.push_local_regex_result();'
             }
         }
 
@@ -942,7 +1053,7 @@ package Perlito5::Java::LexicalBlock;
                   )
                 {
                     # workaround for "Error: not a statement"
-                    push @str, 'PerlOp.statement(' . $decl->emit_java( $level, 'void' ) . ');';
+                    push @str, 'PerlOp.statement(' . $decl->emit_java( $level+1, 'void' ) . ');';
                 }
                 elsif ( $decl->isa('Perlito5::AST::CompUnit')
                       || $decl->isa('Perlito5::AST::For' )
@@ -968,15 +1079,35 @@ package Perlito5::Java::LexicalBlock;
 
             if    (  $last_statement->isa( 'Perlito5::AST::For' )
                   || $last_statement->isa( 'Perlito5::AST::While' )
-                  || $last_statement->isa( 'Perlito5::AST::Block' )
-                  || $last_statement->isa( 'Perlito5::AST::Use' )
                   )
             {
-                push @str, $last_statement->emit_java($level, 'void') . ';';
-                push @str, emit_return($has_local, $local_label, 'PerlOp.context(want)') . ';'; 
+                push @str, $last_statement->emit_java($level, 'void');
+
+                if ( $last_statement->isa( 'Perlito5::AST::While' )
+                    && $last_statement->{cond}->isa('Perlito5::AST::Int')
+                    && $last_statement->{cond}{int} ) {
+                    # do not emit "return" after while(1){...} because "unreachable statement"
+                }
+                else {
+                    $str[-1] .= ";";
+                    push @str, emit_return($has_local, $local_label, 'PerlOp.context(want)') . ';'; 
+                }
+            }
+            elsif ( $last_statement->isa( 'Perlito5::AST::Block' ) ) {
+                # "block" returns a value
+
+                Perlito5::Macro::_insert_return_in_block({ block => $last_statement }, 'block');
+
+                push @str, $last_statement->emit_java($level, 'runtime') . '';
+
+                # workaround - this is only needed if the block has a THROW (next/redo/last)
+                if ($last_statement->{label}) {
+                    push @str, emit_return($has_local, $local_label, 'PerlOp.context(want)') . ';'; 
+                }
             }
             elsif ( $last_statement->isa( 'Perlito5::AST::If' ) ) {
                 # "if" returns a value
+                Perlito5::Macro::insert_return_in_if($last_statement);
                 push @str, $last_statement->emit_java($level, 'runtime') . '';
             }
             elsif ( Perlito5::AST::Sub::is_named_sub($last_statement) ) {
@@ -1044,12 +1175,12 @@ package Perlito5::Java::LexicalBlock;
                     [ "throw e;" ],
                 "}",
                 "catch(PlDieException e) {",
-                    [ 'PlV.set("main::v_@", e.ret);',
+                    [ 'PlV.sset("main::@", e.ret);',
                       "return PlCx.UNDEF;",
                     ],
                 "}",
                 "catch(Exception e) {",
-                    [ 'PlV.set("main::v_@", new PlString(e.getMessage()));',
+                    [ 'PlV.sset("main::@", new PlString(e.getMessage()));',
                       "return PlCx.UNDEF;",
                     ],
                 "}",
@@ -1152,7 +1283,7 @@ package Perlito5::AST::CompUnit;
             )->emit_java( $level + 1, $wantarray );
     }
     sub process_java_import_statement {
-        my ($unit_stmt) = @_;
+        my ($namespace, $annotation_ast) = @_;
 
         # Perl:
         #   package Put { import => 'java.Put' };
@@ -1184,98 +1315,83 @@ package Perlito5::AST::CompUnit;
         #   }, 'Perlito5::AST::Block'),
 
         my $str = '';
-        if ( ref($unit_stmt) eq 'Perlito5::AST::Block') {
 
-            my $stmt = $unit_stmt->{stmts} // [];
+        my $Java_class = Perlito5::Java::get_java_class_info();
+        my $class = $namespace;
+        # warn "Java class: $class\n";
+        # TODO - add more information about the class
 
-            return '' if @$stmt != 2;    # exactly 2 statements: "package" + "options"
-            return '' unless ($stmt->[0] && ref($stmt->[0]) eq 'Perlito5::AST::Apply' && $stmt->[0]->{code} eq 'package');
-            return '' unless ($stmt->[1] && ref($stmt->[1]) eq 'Perlito5::AST::Apply' && ( $stmt->[1]->{code} eq 'infix:<=>>' || $stmt->[1]->{code} eq 'list:<,>'));
+        # we need the parameter list as Perl data, so we need to evaluate the AST
+        # - wrap the "list AST into a "hashref" AST
+        my $args_ast = $annotation_ast;
+        # - transform the AST back into Perl code
+        my $out = [];
+        Perlito5::Perl5::PrettyPrinter::pretty_print( [$args_ast->emit_perl5()], 0, $out );
+        my $args_perl5 = join( '', @$out );
 
-            my $Java_class = Perlito5::Java::get_java_class_info();
-            my $class = $stmt->[0]->{namespace};
-            # warn "Java class: $class\n";
-            # TODO - add more information about the class
+        # - eval the Perl code and store the arguments to use later
+        $Java_class->{$class} = eval $args_perl5
+            or die "error in arguments to generate Java class:\n$@\n${args_perl5}";
 
-            # we need the parameter list as Perl data, so we need to evaluate the AST
-            # - wrap the "list AST into a "hashref" AST
-            my $args_ast = Perlito5::AST::Apply->new(
-                arguments => [ $stmt->[1] ],
-                code => 'circumfix:<{ }>',
+
+        if ($Java_class->{$class}->{java_path}) {
+            # package header { java_path => 'org.perlito.udfs' }
+            #  ==> $Java_class->{header}->{java_path} = 'org.perlito.udfs';
+            $str .= "package $Java_class->{$class}->{java_path};\n";
+        }
+        elsif ($Java_class->{$class}->{import}) {
+            Perlito5::Java::set_java_class_defaults(
+                $class, $Java_class->{$class}->{import},
             );
-            # - transform the AST back into Perl code
-            my $out = [];
-            Perlito5::Perl5::PrettyPrinter::pretty_print( [$args_ast->emit_perl5()], 0, $out );
-            my $args_perl5 = join( '', @$out );
+        }
+        elsif ($Java_class->{$class}->{extends}) {
+            # extends => 'JavaObject',              # Perl package name (a class imported from Java)
+            # methods => [ ... ]
 
-            # - eval the Perl code and store the arguments to use later
-            $Java_class->{$class} = eval $args_perl5
-                or die "error in arguments to generate Java class:\n$@\n${args_perl5}";
+            my $extended = $Java_class->{ $Java_class->{$class}->{extends} };
+            if ($extended) {
+                $Java_class->{$class}->{extends_java_type} = $extended->{java_type};
 
-
-            if ($Java_class->{$class}->{java_path}) {
-                # package header { java_path => 'org.perlito.udfs' }
-                #  ==> $Java_class->{header}->{java_path} = 'org.perlito.udfs';
-                $str .= "package $Java_class->{$class}->{java_path};\n";
-            }
-            elsif ($Java_class->{$class}->{import}) {
-                Perlito5::Java::set_java_class_defaults(
-                    $class, $Java_class->{$class}->{import},
-                );
-            }
-            elsif ($Java_class->{$class}->{extends}) {
-                # extends => 'JavaObject',              # Perl package name (a class imported from Java)
-                # methods => [ ... ]
-
-                my $extended = $Java_class->{ $Java_class->{$class}->{extends} };
-                if ($extended) {
-                    $Java_class->{$class}->{extends_java_type} = $extended->{java_type};
-
-                }
-                else {
-                    die "cannot extend class '" . $Java_class->{$class}->{extends} . "' because it was not declared";
-                }
-
-                my $perl_to_java = $class;
-                $perl_to_java =~ s/:://g;
-                Perlito5::Java::set_java_class_defaults(
-                    $class, $perl_to_java,
-                );
-
-                # warn Data::Dumper::Dumper $Java_class->{$class};
-                # warn "'extends' not implemented";
-            }
-            elsif ($Java_class->{$class}->{implements}) {
-                # implements => 'JavaObject',              # Perl package name (a class imported from Java)
-                # methods => [ ... ]
-
-                my $implemented = $Java_class->{ $Java_class->{$class}->{implements} };
-                if ($implemented) {
-                    $Java_class->{$class}->{implements_java_type} = $implemented->{java_type};
-
-                }
-                else {
-                    die "cannot implement class '" . $Java_class->{$class}->{implements} . "' because it was not declared";
-                }
-
-                my $perl_to_java = $class;
-                $perl_to_java =~ s/:://g;
-                Perlito5::Java::set_java_class_defaults(
-                    $class, $perl_to_java,
-                );
-
-                # warn Data::Dumper::Dumper $Java_class->{$class};
-                # warn "'implements' not implemented";
             }
             else {
-                die "missing 'import' argument to generate Java class";
+                die "cannot extend class '" . $Java_class->{$class}->{extends} . "' because it was not declared";
             }
 
+            my $perl_to_java = $class;
+            $perl_to_java =~ s/:://g;
+            Perlito5::Java::set_java_class_defaults(
+                $class, $perl_to_java,
+            );
 
-            # throw away this block - generate no Perl code
-            $unit_stmt->{stmts} = [];
-
+            # warn Data::Dumper::Dumper $Java_class->{$class};
+            # warn "'extends' not implemented";
         }
+        elsif ($Java_class->{$class}->{implements}) {
+            # implements => 'JavaObject',              # Perl package name (a class imported from Java)
+            # methods => [ ... ]
+
+            my $implemented = $Java_class->{ $Java_class->{$class}->{implements} };
+            if ($implemented) {
+                $Java_class->{$class}->{implements_java_type} = $implemented->{java_type};
+
+            }
+            else {
+                die "cannot implement class '" . $Java_class->{$class}->{implements} . "' because it was not declared";
+            }
+
+            my $perl_to_java = $class;
+            $perl_to_java =~ s/:://g;
+            Perlito5::Java::set_java_class_defaults(
+                $class, $perl_to_java,
+            );
+
+            # warn Data::Dumper::Dumper $Java_class->{$class};
+            # warn "'implements' not implemented";
+        }
+        else {
+            die "missing 'import' argument to generate Java class";
+        }
+
         return $str;
     }
     sub emit_java_program {
@@ -1290,52 +1406,82 @@ package Perlito5::AST::CompUnit;
 
         # look for special 'Java' packages
         Perlito5::Java::init_java_class();
-        for my $comp_unit ( @$comp_units ) {
-            for my $unit_stmt ( @{ $comp_unit->{body} } ) {
-                $str .= process_java_import_statement($unit_stmt);
-
-                # if ( ref($unit_stmt) eq 'Perlito5::AST::CompUnit') {
-                #     my $stmt = $unit_stmt->{stmts} // [];
-                # }
-
-            }
+        for my $ann ( @Perlito::ANNOTATION ) {
+            $str .= process_java_import_statement(@$ann);
         }
 
         my @main;
         for my $comp_unit ( @$comp_units ) {
-            push @main, $comp_unit->emit_java($level + 1, $wantarray);
+            my @str = $comp_unit->emit_java($level + 1, $wantarray);
+            $str[-1] .= ";\n" if @str && !ref($str[-1]);
+            push @main, @str;
         }
         if ($options{'expand_use'}) {
             my $Java_class = Perlito5::Java::get_java_class_info();
             $str .= Perlito5::Java::Runtime->emit_java(
                 java_classes => $Java_class,
-                java_constants => \@Perlito5::Java::Java_constants,
+                java_constants => [],  # \@Perlito5::Java::Java_constants,
             );
         }
 
+        my $main_class = "Main";
+        $main_class = "LibPerl" if $Perlito5::BOOTSTRAP_JAVA_EVAL;
+
         $str .= Perlito5::Java::emit_wrap_java(-1,
-             "class Main {",
-               [ "public static void main(String[] args) {",
-                   [ "PlEnv.init(args);",
+               "class $main_class {",
+               [ @Perlito5::Java::Java_constants,
+                 "public static void main(String[] args) {",
+                   [
+                     ( $Perlito5::JAVA_EVAL ? "org.perlito.Perlito5.LibPerl.main( new String[]{} );" : ()),
+
+                     "PlV.init(args);",
                      "int want = PlCx.VOID;",
                      "PlArray List__ = new PlArray();",
+                     "Exception ee = null;",
                      "try {",
                        [ @Perlito5::Java::Java_init,
                          @main,
                        ],
                      "}",
                      "catch(PlReturnException e) {",
-                         [ 'PlCORE.die("Can\'t return outside a subroutine");' ],
+                         # TODO - fix blocks and re-enable this error message
+                         # [ 'ee = new PlDieException(new PlString("Can\'t return outside a subroutine"));' ],
                      "}",
                      "catch(PlNextException e) {",
-                         [ 'PlCORE.die("Can\'t \\"next\\" outside a loop block");' ],
+                         [ 'ee = new PlDieException(new PlString("Can\'t \\"next\\" outside a loop block"));' ],
                      "}",
                      "catch(PlLastException e) {",
-                         [ 'PlCORE.die("Can\'t \\"last\\" outside a loop block");' ],
+                         [ 'ee = new PlDieException(new PlString("Can\'t \\"last\\" outside a loop block"));' ],
                      "}",
                      "catch(PlRedoException e) {",
-                         [ 'PlCORE.die("Can\'t \\"redo\\" outside a loop block");' ],
+                         [ 'ee = new PlDieException(new PlString("Can\'t \\"redo\\" outside a loop block"));' ],
                      "}",
+                     "catch(Exception e) {",
+                         [ 'ee = e;' ],
+                     "}",
+                     # emit error messages
+                     'if (ee != null) {',
+                         [ # 'PlCORE.warn(PlCx.VOID, new PlArray(new PlString(ee.getMessage())));'
+                           'ee.printStackTrace(System.err);',
+                         ],
+                     '}',
+                     # execute END blocks
+
+                     # TODO - catch error in END
+                     # Perlito5::set_global_phase("END");
+                     # eval {
+                     #     $_->() for @Perlito5::END_BLOCK;
+                     #     1;
+                     # }
+                     # or warn "$@\nEND failed--call queue aborted.\n"
+
+                     'for (PlObject code : PlV.array_get("Perlito5::END_BLOCK")) {',
+                         [ 'code.apply(PlCx.VOID, new PlArray());' ],
+                     '}',
+                     # return error code
+                     'if (ee != null) {',
+                         [ 'System.exit(1);' ],
+                     '}',
                    ],
                  "}",
                ],
@@ -1348,11 +1494,11 @@ package Perlito5::AST::CompUnit;
                [ "public static PlObject[] apply(String functionName, String... args) {",
                  [
                      "PlArray list = new PlArray(args);",
-                     "PlObject result = PlV.get(functionName).apply(PlCx.LIST, list);",
+                     "PlObject result = PlV.apply(functionName, PlCx.LIST, list);",
                      "PlArray res = result instanceof PlArray ? (PlArray) result : new PlArray(result);",
                      "PlObject[] out = new PlObject[res.to_int()];",
                      "int i = 0;",
-                     "for (PlObject s : res.a) {",
+                     "for (PlObject s : res) {",
                          [ "out[i++] = s;",
                          ],
                      "}",
@@ -1363,11 +1509,11 @@ package Perlito5::AST::CompUnit;
                [ "public static PlObject[] apply(String functionName, PlObject... args) {",
                  [
                      "PlArray list = new PlArray(args);",
-                     "PlObject result = PlV.get(functionName).apply(PlCx.LIST, list);",
+                     "PlObject result = PlV.apply(functionName, PlCx.LIST, list);",
                      "PlArray res = result instanceof PlArray ? (PlArray) result : new PlArray(result);",
                      "PlObject[] out = new PlObject[res.to_int()];",
                      "int i = 0;",
-                     "for (PlObject s : res.a) {",
+                     "for (PlObject s : res) {",
                          [ "out[i++] = s;",
                          ],
                      "}",
@@ -1389,8 +1535,12 @@ package Perlito5::AST::Int;
     sub emit_java {
         my ($self, $level, $wantarray) = @_;
         my $v = $self->{int};
-        if ( $v > (2**63-1) ) {
-            return "new PlDouble(" . $v . ".0)";
+        if ( length($v) > 19 || $v > 2**62 ) {
+            # max value is 2**63 - 1
+            if ( length($v) > 19 || $v >= 9223372036854775806.0 ) {
+                return "new PlDouble(" . $v . ".0d)";
+            }
+            return "new PlInt(" . $v . "L)";
         }
         if ( $v >= -2 && $v < 0) {
             return "PlCx.MIN" . abs($v);
@@ -1400,6 +1550,9 @@ package Perlito5::AST::Int;
         }
         "new PlInt(" . $v . "L)";
     }
+    sub emit_java_set {
+        die "Can't modify constant item in scalar assignment";
+    }
     sub emit_java_get_decl { () }
     sub emit_java_has_regex { () }
 }
@@ -1408,7 +1561,10 @@ package Perlito5::AST::Num;
 {
     sub emit_java {
         my ($self, $level, $wantarray) = @_;
-        "new PlDouble(" . $self->{num} . ")";
+        "new PlDouble(" . $self->{num} . "d)";
+    }
+    sub emit_java_set {
+        die "Can't modify constant item in scalar assignment";
     }
     sub emit_java_get_decl { () }
     sub emit_java_has_regex { () }
@@ -1419,6 +1575,9 @@ package Perlito5::AST::Buf;
     sub emit_java {
         my ($self, $level, $wantarray) = @_;
         "new PlString(" . Perlito5::Java::escape_string( $self->{buf} ) . ")";
+    }
+    sub emit_java_set {
+        die "Can't modify constant item in scalar assignment";
     }
     sub emit_java_get_decl { () }
     sub emit_java_has_regex { () }
@@ -1485,12 +1644,10 @@ package Perlito5::AST::Index;
            )
         {
             # @a[10, 20]
-            # @$a[0, 2] ==> @{$a}[0,2]
             # (4,5,6)[0,2]
-            return 'p5list_slice('
-                        . $self->{obj}->emit_java($level, 'list') . ', '
-                        . Perlito5::Java::to_list([$self->{index_exp}], $level) . ', '
-                        . Perlito5::Java::to_context($wantarray)
+            return $self->{obj}->emit_java($level, 'list', 'lvalue') . '.aget_list_of_aliases('
+                        . Perlito5::Java::to_context($wantarray) . ', '
+                        . Perlito5::Java::to_list([$self->{index_exp}], $level)
                    . ')'
         }
         if (  (  $self->{obj}->isa('Perlito5::AST::Apply')
@@ -1512,11 +1669,21 @@ package Perlito5::AST::Index;
             $obj->{code} = 'prefix:<@>'
                 if $obj->{code} eq 'prefix:<%>';
 
-            return 'p5hash_slice('
-                        . $self->{obj}->emit_java($level, 'list') . ', '
-                        . Perlito5::Java::to_list([$self->{index_exp}], $level) . ', '
-                        . Perlito5::Java::to_context($wantarray)
+            return $self->{obj}->emit_java($level) . '.aget_hash_list_of_aliases('
+                        . Perlito5::Java::to_context($wantarray) . ', '
+                        . Perlito5::Java::to_list([$self->{index_exp}], $level)
                    . ')';
+        }
+        if (  $self->{obj}->isa('Perlito5::AST::Apply')
+           && $self->{obj}->{code} eq 'prefix:<$>'
+           )
+        {
+            # $$a[0] ==> $a->[0]
+            return Perlito5::AST::Call->new(
+                'method' => 'postcircumfix:<[ ]>',
+                'invocant' => $self->{obj}->{arguments}[0],
+                'arguments' => $self->{index_exp},
+            )->emit_java($level, $wantarray, $autovivification_type);
         }
         my $arg = $self->{index_exp};
         my $s;
@@ -1540,20 +1707,24 @@ package Perlito5::AST::Index;
         {
             # @a[10, 20]
             # @$a[0, 2] ==> @{$a}[0,2]
-            return Perlito5::Java::emit_wrap_java($level, 
-                    'var a = [];',
-                    'var v = ' . Perlito5::Java::to_list([$self->{index_exp}], $level) . ';',
-                    'var src=' . Perlito5::Java::to_list([$arguments], $level) . ";",
-                    'var out=' . Perlito5::Java::emit_java_autovivify( $self->{obj}, $level, 'array' ) . ";",
-                    'var tmp' . ";",
-                    'for (var i=0, l=v.length; i<l; ++i) {',
-                          [ 'tmp = src.aget(i);',
-                            'out.aset(v[i], tmp);',
-                            'a.push(tmp)',
-                          ],
-                    '}',
-                    'return a',
-            )
+            return '((PlArray)' . $self->emit_java($level, 'list'). ').list_set('
+                    . Perlito5::Java::to_context($wantarray) . ', '
+                    . Perlito5::Java::to_list([$arguments], $level)
+                . ')'
+        }
+        if (  (  $self->{obj}->isa('Perlito5::AST::Apply')
+              && $self->{obj}->{code} eq 'prefix:<%>'
+              )
+           || (  $self->{obj}->isa('Perlito5::AST::Var')
+              && $self->{obj}->sigil eq '%'
+              )
+           )
+        {
+            # Perl5.20 hash slice
+            # %a[10, 20]
+            # %$a[0, 2] ==> %{$a}[0,2]
+            # TODO - move this message to parser
+            die "Can't modify index/value array slice in list assignment";
         }
         if ($localize) {
             return $self->emit_java_container($level) . '.aget_lvalue_local('
@@ -1569,49 +1740,25 @@ package Perlito5::AST::Index;
         else {
             $s = $arg->emit_java($level, 'scalar');
         }
-        return $self->emit_java_container($level) . '.aset(' 
+
+        if (  $self->{obj}->isa('Perlito5::AST::Apply')
+           && $self->{obj}->{code} eq 'prefix:<$>'
+           )
+        {
+            # ${"Exporter::Cache"}[2]
+            # $$a[0] ==> $a->[0]
+            my $obj = Perlito5::Java::emit_java_autovivify( $self->{obj}->{arguments}[0], $level+1, 'array' );
+            return $obj . '.aset('
                     . $s . ', '
                     . Perlito5::Java::to_scalar([$arguments], $level+1)
                 . ')';
-    }
-    sub emit_java_set_list {
-        my ($self, $level, $list) = @_;
-        my $wantarray = 'list';
-        if (  (  $self->{obj}->isa('Perlito5::AST::Apply')
-              && $self->{obj}->{code} eq 'prefix:<@>'
-              )
-           || (  $self->{obj}->isa('Perlito5::AST::Var')
-              && $self->{obj}->sigil eq '@'
-              )
-           )
-        {
-            # @a[10, 20]
-            # @$a[0, 2] ==> @{$a}[0,2]
-            return Perlito5::Java::emit_wrap_java($level, 
-                    'var a = [];',
-                    'var v = ' . Perlito5::Java::to_list([$self->{index_exp}], $level) . ';',
-                    'var out=' . Perlito5::Java::emit_java_autovivify( $self->{obj}, $level, 'array' ) . ";",
-                    'var tmp' . ";",
-                    'for (var i=0, l=v.length; i<l; ++i) {',
-                          [ 'tmp = ' . $list . '.shift();',
-                            'out.aset(v[i], tmp);',
-                            'a.push(tmp)',
-                          ],
-                    '}',
-                    'return a',
-            )
         }
-        my $arg = $self->{index_exp};
-        my $s;
-        if ($arg->isa('Perlito5::AST::Int')) {
-            $s = $arg->{int};
-        }
-        else {
-            $s = $arg->emit_java($level, 'scalar');
-        }
-        return $self->emit_java_container($level) . '.aset(' 
+
+        # my $obj = Perlito5::Java::emit_java_autovivify( $self, $level+1, 'array' );
+        # return $obj . '.aset(' 
+        return $self->emit_java_container($level) . '.aset('
                     . $s . ', '
-                    . $list . '.shift()'
+                    . Perlito5::Java::to_scalar([$arguments], $level+1)
                 . ')';
     }
     sub emit_java_container {
@@ -1676,7 +1823,7 @@ package Perlito5::AST::Lookup;
             $v = Perlito5::AST::Apply->new( code => 'prefix:<%>', namespace => $self->{obj}->namespace, arguments => $self->{obj}->arguments )
                 if $self->{obj}->isa('Perlito5::AST::Apply');
 
-            return $v->emit_java($level, 'list') . ".$method("
+            return '((PlHash)' . $v->emit_java($level, 'scalar') . ").hget_list_of_aliases("
                         . Perlito5::Java::to_context($wantarray) . ', '
                         . Perlito5::Java::to_list([$self->{index_exp}], $level)
                     . ')'
@@ -1699,14 +1846,25 @@ package Perlito5::AST::Lookup;
             $v = Perlito5::AST::Apply->new( code => 'prefix:<%>', namespace => $self->{obj}->namespace, arguments => $self->{obj}->arguments )
                 if $self->{obj}->isa('Perlito5::AST::Apply');
 
-            return 'p5hash_lookup_slice('
-                        . $v->emit_java($level, 'list') . ', '
-                        . Perlito5::Java::to_list([$self->{index_exp}], $level) . ', '
-                        . Perlito5::Java::to_context($wantarray)
+            return $v->emit_java($level) . '.hget_hash_list_of_aliases('
+                        . Perlito5::Java::to_context($wantarray) . ', '
+                        . Perlito5::Java::to_list([$self->{index_exp}], $level)
                    . ')'
         }
+        if (  $self->{obj}->isa('Perlito5::AST::Apply')
+           && $self->{obj}->{code} eq 'prefix:<$>'
+           )
+        {
+            # $$a{aa} ==> $a->{aa}
+            return Perlito5::AST::Call->new(
+                'method' => 'postcircumfix:<{ }>',
+                'invocant' => $self->{obj}->{arguments}[0],
+                'arguments' => $self->{index_exp},
+            )->emit_java($level, $wantarray, $autovivification_type);
+        }
+        my $index = Perlito5::AST::Lookup->autoquote($self->{index_exp});
         return $self->emit_java_container($level) . '.' . $method . '('
-                . Perlito5::Java::autoquote($self->{index_exp}, $level)
+                . Perlito5::Java::to_native_str($index, $level)
             . ')';
     }
     sub emit_java_set {
@@ -1721,16 +1879,24 @@ package Perlito5::AST::Lookup;
         {
             # @a{ 'x', 'y' }
             # @$a{ 'x', 'y' }  ==> @{$a}{ 'x', 'y' }
-            my $v;
-            $v = $self->{obj}
-                if $self->{obj}->isa('Perlito5::AST::Var');
-            $v = Perlito5::AST::Apply->new( code => 'prefix:<%>', namespace => $self->{obj}->namespace, arguments => $self->{obj}->arguments )
-                if $self->{obj}->isa('Perlito5::AST::Apply');
-            return $self->emit_java_container($level). '.hset('
+            return '((PlArray)' . $self->emit_java($level, 'list'). ').list_set('
                     . Perlito5::Java::to_context($wantarray) . ', '
-                    . Perlito5::Java::to_list([$arguments], $level) . ', '
-                    . Perlito5::Java::to_list([$self->{index_exp}], $level)
+                    . Perlito5::Java::to_list([$arguments], $level)
                 . ')'
+        }
+        if (  (  $self->{obj}->isa('Perlito5::AST::Apply')
+              && $self->{obj}->{code} eq 'prefix:<%>'
+              )
+           || (  $self->{obj}->isa('Perlito5::AST::Var')
+              && $self->{obj}->sigil eq '%'
+              )
+           )
+        {
+            # Perl5.20 hash slice
+            # %a{ 'x', 'y' }
+            # %$a{ 'x', 'y' }  ==> %{$a}{ 'x', 'y' }
+            # TODO - move this message to parser
+            die "Can't modify index/value array slice in list assignment";
         }
         if ($localize) {
             return $self->emit_java_container($level) . '.hget_lvalue_local('
@@ -1738,46 +1904,23 @@ package Perlito5::AST::Lookup;
                     . Perlito5::Java::to_scalar([$arguments], $level+1)
             . ')';
         }
-        return $self->emit_java_container($level) . '.hset('
-                    . Perlito5::Java::autoquote($self->{index_exp}, $level) . ', '
-                    . Perlito5::Java::to_scalar([$arguments], $level+1)
-            . ')';
-    }
-    sub emit_java_set_list {
-        my ($self, $level, $list) = @_;
-        my $wantarray = 'list';
-        if (  (  $self->{obj}->isa('Perlito5::AST::Apply')
-              && $self->{obj}->{code} eq 'prefix:<@>'
-              )
-           || (  $self->{obj}->isa('Perlito5::AST::Var')
-              && $self->{obj}->sigil eq '@'
-              )
+
+        if (  $self->{obj}->isa('Perlito5::AST::Apply')
+           && $self->{obj}->{code} eq 'prefix:<$>'
            )
         {
-            # @a{ 'x', 'y' }
-            # @$a{ 'x', 'y' }  ==> @{$a}{ 'x', 'y' }
-            my $v;
-            $v = $self->{obj}
-                if $self->{obj}->isa('Perlito5::AST::Var');
-            $v = Perlito5::AST::Apply->new( code => 'prefix:<%>', namespace => $self->{obj}->namespace, arguments => $self->{obj}->arguments )
-                if $self->{obj}->isa('Perlito5::AST::Apply');
-            return Perlito5::Java::emit_wrap_java($level, 
-                    'var a = [];',
-                    'var v = ' . Perlito5::Java::to_list([$self->{index_exp}], $level) . ';',
-                    'var out=' . $v->emit_java($level) . ";",
-                    'var tmp' . ";",
-                    'for (var i=0, l=v.length; i<l; ++i)' . '{',
-                          [ 'tmp = ' . $list . '.shift();',
-                            'out.hset(v[i], tmp);',
-                            'a.push(tmp)',
-                          ],
-                    '}',
-                    'return a',
-            )
-        }
-        return $self->emit_java_container($level) . '.hset('
+            # $$a{x} ==> $a->{x}
+            my $obj = Perlito5::Java::emit_java_autovivify( $self->{obj}->{arguments}[0], $level+1, 'hash' );
+            return $obj . '.hset('
                     . Perlito5::Java::autoquote($self->{index_exp}, $level) . ', '
-                    . $list . '.shift()'
+                    . Perlito5::Java::to_scalar([$arguments], $level+1)
+                . ')';
+        }
+
+        my $index = Perlito5::AST::Lookup->autoquote($self->{index_exp});
+        return $self->emit_java_container($level) . '.hset('
+                    . Perlito5::Java::to_native_str($index, $level) . ', '
+                    . Perlito5::Java::to_scalar([$arguments], $level+1)
             . ')';
     }
     sub emit_java_container {
@@ -1816,9 +1959,9 @@ package Perlito5::AST::Lookup;
 package Perlito5::AST::Var;
 {
     my $table = {
-        '$' => 'v_',
-        '@' => 'List_',
-        '%' => 'Hash_',
+        '$' => '',
+        '@' => '',
+        '%' => '',
         '&' => '',
     };
 
@@ -1840,7 +1983,7 @@ package Perlito5::AST::Var;
             if ( $wantarray eq 'runtime' ) {
                 return '(want == PlCx.LIST'
                     . ' ? ' . $s
-                    . ' : ' . $s . '.to_long()'
+                    . ' : ' . $s . '.length_of_array()'
                     . ')';
             }
             return $s;
@@ -1851,9 +1994,13 @@ package Perlito5::AST::Var;
                 # regex captures
                 return 'PerlOp.regex_var(' . (0 + $self->{name}) . ')'
             }
-            if ($self->{name} eq '&') {
+            if ($self->{name} eq '&' || $self->{name} eq '`' || $self->{name} eq "'") {
                 # regex match $&
                 return 'PerlOp.regex_var(' . Perlito5::Java::escape_string($self->{name}) . ')'
+            }
+            if ($self->{name} eq '$') {
+                # PID $$
+                return 'PerlOp.getPID()'
             }
         }
         if ( $sigil eq '::' ) {
@@ -1862,14 +2009,15 @@ package Perlito5::AST::Var;
 
         my $index = Perlito5::Java::escape_string($namespace . '::' . $table->{$sigil} . $str_name);
         if ( $sigil eq '$' ) {
-            return "PlV.get$local(" . $index . ')';
+            return "PlV.sget$local(" . $index . ')';
         }
         if ( $sigil eq '*' ) {
+            return "PlV.fget$local(" . $index . ')';
         }
         if ( $sigil eq '&' ) {
             my $namespace = $self->{namespace} || $Perlito5::PKG_NAME;
-            return 'PlV.get(' . Perlito5::Java::escape_string($namespace . '::' . $str_name ) . ')'
-                . '.apply(' . Perlito5::Java::to_context($wantarray) . ', List__)';
+            return 'PlV.apply(' . Perlito5::Java::escape_string($namespace . '::' . $str_name ) . ', '
+                . Perlito5::Java::to_context($wantarray) . ', List__)';
         }
         if ($sigil eq '@') {
             if ($self->{sigil} eq '$#') {
@@ -1924,7 +2072,7 @@ package Perlito5::AST::Var;
 
         my $index = Perlito5::Java::escape_string($namespace . '::' . $table->{$sigil} . $str_name);
         if ( $sigil eq '$' ) {
-            return "PlV.set$local(" . $index . ', ' . Perlito5::Java::to_scalar([$arguments], $level+1) . ')';
+            return "PlV.sset$local(" . $index . ', ' . Perlito5::Java::to_scalar([$arguments], $level+1) . ')';
         }
         if ( $sigil eq '@' ) {
 
@@ -1939,19 +2087,41 @@ package Perlito5::AST::Var;
             return "PlV.hash_set$local(" . $index . ', ' . Perlito5::Java::to_list([$arguments], $level+1) . ')';
         }
         if ( $sigil eq '*' ) {
-            return "PlV.glob_set$local(" . $index . ', ' . Perlito5::Java::to_list([$arguments], $level+1) . ')';
+            return "PlV.glob_set$local(" . $index . ', '
+                . Perlito5::Java::to_scalar([$arguments], $level+1) . ', '
+                . Perlito5::Java::escape_string($Perlito5::PKG_NAME)
+                . ')';
         }
         if ( $sigil eq '&' ) {
-            # return 'PlV.get(' . $index . ').apply(' . Perlito5::Java::to_context($wantarray) . ', List__)';
+            # return 'PlV.apply(' . $index . ', ' . Perlito5::Java::to_context($wantarray) . ', List__)';
         }
         die "don't know how to assign to variable ", $sigil, $self->name;
+    }
+
+    sub emit_java_global_set_alias {
+        my ($self, $arguments, $level, $wantarray, $localize) = @_;
+        die "can't localize emit_java_global_set_alias()" if $localize;
+        my $str_name = $self->{name};
+        my $sigil = $self->{_real_sigil} || $self->{sigil};
+        my $namespace = $self->{namespace} || $self->{_namespace};
+        if ($sigil eq '$' && $self->{name} > 0) {
+            # TODO - for $1 (...) {} is valid perl
+            die "not implemented emit_java_global_set_alias() for regex capture";
+        }
+        my $index = Perlito5::Java::escape_string($namespace . '::' . $table->{$sigil} . $str_name);
+        $arguments = Perlito5::Java::to_scalar([$arguments], $level+1)
+            if ref($arguments);
+        return "PlV.sset_alias(" . $index . ', ' . $arguments . ")" if $sigil eq '$';
+        return "PlV.aset_alias(" . $index . ', ' . $arguments . ")" if $sigil eq '@';
+        return "PlV.hset_alias(" . $index . ', ' . $arguments . ")" if $sigil eq '%';
+        die "can't emit_java_global_set_alias() for sigil '$sigil'";
     }
 
     sub emit_java {
         my ($self, $level, $wantarray) = @_;
         my $sigil = $self->{_real_sigil} || $self->{sigil};
         my $decl_type = $self->{_decl} || 'global';
-        if ( $decl_type ne 'my' && $decl_type ne 'state' && $decl_type ne 'our' ) {
+        if ( $decl_type ne 'my' && $decl_type ne 'state' ) {
             return $self->emit_java_global($level, $wantarray);
         }
         my $str_name = $table->{$sigil} . $self->{name} . "_" . $self->{_id};
@@ -1979,7 +2149,7 @@ package Perlito5::AST::Var;
     sub emit_java_set {
         my ($self, $arguments, $level, $wantarray) = @_;
         my $decl_type = $self->{_decl} || 'global';
-        if ( $decl_type ne 'my' && $decl_type ne 'state' && $decl_type ne 'our' ) {
+        if ( $decl_type ne 'my' && $decl_type ne 'state' ) {
             return $self->emit_java_global_set($arguments, $level, $wantarray);
         }
         my $open  = $wantarray eq 'void' ? '' : '(';
@@ -1992,21 +2162,21 @@ package Perlito5::AST::Var;
             if ($type ne 'PlLvalue') {
                 # set a typed variable - there is no .set() method
                 # the arguments are not boxed
-                return $self->emit_java() . ' = ' . Perlito5::Java::to_native_args([$arguments]);
+                return $self->emit_java($level) . ' = ' . Perlito5::Java::to_native_args([$arguments]);
             }
-            return $self->emit_java() . '.set(' . Perlito5::Java::to_scalar([$arguments], $level+1) . ')'
+            return $self->emit_java($level) . '.set(' . Perlito5::Java::to_scalar([$arguments], $level+1) . ')'
         }
         if ( $sigil eq '@' ) {
 
             if ($self->{sigil} eq '$#') {
                 $self->{sigil} = '@';
-                return $open . $self->emit_java() . '.set_end_of_array_index(' . Perlito5::Java::to_scalar([$arguments], $level+1) . ')' . $close
+                return $open . $self->emit_java($level) . '.set_end_of_array_index(' . Perlito5::Java::to_scalar([$arguments], $level+1) . ')' . $close
             }
 
-            return $self->emit_java() . '.set(' . Perlito5::Java::to_list([$arguments], $level+1) . ')'
+            return $self->emit_java($level) . '.set(' . Perlito5::Java::to_list([$arguments], $level+1) . ')'
         }
         if ( $sigil eq '%' ) {
-            return $self->emit_java() . '.set(' . Perlito5::Java::to_list([$arguments], $level+1, 'hash') . ')'
+            return $self->emit_java($level) . '.set(' . Perlito5::Java::to_list([$arguments], $level+1, 'hash') . ')'
         }
         if ( $sigil eq '*' ) {
             my $namespace = $self->{namespace} || $self->{_namespace};
@@ -2015,27 +2185,6 @@ package Perlito5::AST::Var;
             .   Perlito5::Java::escape_string($self->{name}) . ', ' 
             .   Perlito5::Java::to_scalar([$arguments], $level+1)
             . ')'
-        }
-        die "don't know how to assign to variable ", $sigil, $self->name;
-    }
-
-    sub emit_java_set_list {
-        my ($self, $level, $list) = @_;
-        my $sigil = $self->{_real_sigil} || $self->{sigil};
-        if ( $sigil eq '$' ) {
-            return $self->emit_java() . '.set(' . $list  . '.shift())'
-        }
-        if ( $sigil eq '@' ) {
-            return join( ";\n" . Perlito5::Java::tab($level),
-                $self->emit_java() . ' = ' . $list,
-                $list . ' = []'
-            );
-        }
-        if ( $sigil eq '%' ) {
-            return join( ";\n" . Perlito5::Java::tab($level),
-                $self->emit_java() . ' = new PlHash(' . $list  . ')',
-                $list . ' = []'
-            );
         }
         die "don't know how to assign to variable ", $sigil, $self->name;
     }
@@ -2070,36 +2219,27 @@ package Perlito5::AST::Decl;
             $Java_var->{ $id } = { id => $id, type => $type };
         }
 
+        if ($self->{decl} eq 'our') {
+            return '';
+        }
         if ($self->{decl} eq 'local') {
             return '';
         }
         if ($self->{decl} eq 'my' || $self->{decl} eq 'state') {
             if ($self->{var}->sigil eq '%') {
-                return 'PlHash ' . $self->{var}->emit_java() . ' = new PlHash();';
+                return 'PlHash ' . $self->{var}->emit_java($level) . ' = new PlHash();';
             }
             elsif ($self->{var}->sigil eq '@') {
-                return 'PlArray ' . $self->{var}->emit_java() . ' = new PlArray();';
+                return 'PlArray ' . $self->{var}->emit_java($level) . ' = new PlArray();';
             }
             else {
                 my $Java_class = Perlito5::Java::get_java_class_info();
                 my $java_type = $Java_class->{$type}{java_type} || 'PlLvalue';
                 if( $java_type eq 'PlLvalue' ) {
-                    return "${java_type} " . $self->{var}->emit_java() . " = new ${java_type}();";
+                    return "${java_type} " . $self->{var}->emit_java($level) . " = new ${java_type}();";
                 } else {
-                    return "${java_type} " . $self->{var}->emit_java() . ";";
+                    return "${java_type} " . $self->{var}->emit_java($level) . ";";
                 }
-            }
-        }
-        elsif ($self->{decl} eq 'our') {
-            my $v = Perlito5::AST::Var->new( %{$self->{var}}, _decl => 'my' );
-            if ($self->{var}->sigil eq '%') {
-                return 'PlHash ' . $v->emit_java() . ' = ' . Perlito5::AST::Var::emit_java_global($self->{'var'}) . ";";
-            }
-            elsif ($self->{var}->sigil eq '@') {
-                return 'PlArray ' . $v->emit_java() . ' = ' . Perlito5::AST::Var::emit_java_global($self->{'var'}) . ";";
-            }
-            else {
-                return 'PlLvalue ' . $v->emit_java() . ' = ' . Perlito5::AST::Var::emit_java_global($self->{'var'}) . ";";
             }
         }
         else {
@@ -2117,10 +2257,6 @@ package Perlito5::AST::Decl;
             }
         }
         $var->emit_java_set($arguments, $level, $wantarray, $localize);
-    }
-    sub emit_java_set_list {
-        my ($self, $level, $list) = @_;
-        $self->var->emit_java_set_list($level, $list);
     }
     sub emit_java_get_decl {
         my $self = shift;
@@ -2143,7 +2279,7 @@ package Perlito5::AST::Call;
             $method = 'aget_hashref'   if $autovivification_type eq 'hash';
             $method = 'aget_lvalue'    if $autovivification_type eq 'lvalue';
             return Perlito5::Java::emit_java_autovivify( $self->{invocant}, $level, 'array' )
-                . '.' . $method . '(' . Perlito5::Java::to_num($self->{arguments}, $level+1)
+                . '.' . $method . '(' . Perlito5::Java::to_scalar([$self->{arguments}], $level+1)
                 . ')';
         }
         if ( $meth eq 'postcircumfix:<{ }>' ) {
@@ -2157,34 +2293,10 @@ package Perlito5::AST::Call;
                 . ')';
         }
         if  ($meth eq 'postcircumfix:<( )>')  {
-            if (  ref( $self->{invocant} ) eq 'Perlito5::AST::Var'
-               && $self->{invocant}{sigil} eq '&'
-               )
-            {
-                # &x()
-                my $namespace = $self->{invocant}{namespace} || $Perlito5::PKG_NAME;
-                return 'PlV.get(' . Perlito5::Java::escape_string($namespace . '::' . $self->{invocant}{name} ) . ')'
-                    . '.apply('
-                        . Perlito5::Java::to_context($wantarray) . ', '
-                        . Perlito5::Java::to_list($self->{arguments})
-                    . ')';
-            }
             # $x->()
             my $invocant;
-            if (  ref( $self->{invocant} ) eq 'Perlito5::AST::Apply' 
-               && $self->{invocant}{code} eq 'prefix:<&>'
-               )
-            {
-                my $arg   = $self->{invocant}{arguments}->[0];
-                $invocant = 'p5code_lookup_by_name(' . Perlito5::Java::escape_string($Perlito5::PKG_NAME ) . ', ' . $arg->emit_java($level) . ')';
-            }
-            elsif (  ref( $self->{invocant} ) eq 'Perlito5::AST::Var' 
-               && $self->{invocant}{sigil} eq '&'
-               )
-            {
-                $invocant = 'p5pkg[' . Perlito5::Java::escape_string(($self->{invocant}{namespace} || $Perlito5::PKG_NAME) ) . '][' . Perlito5::Java::escape_string($self->{invocant}{name} ) . ']';
-            }
-            elsif (  ref( $self->{invocant} ) eq 'Perlito5::AST::Var' 
+
+            if (  ref( $self->{invocant} ) eq 'Perlito5::AST::Var' 
                && $self->{invocant}{sigil} eq '::'
                && $self->{invocant}{namespace} eq '__SUB__'
                )
@@ -2310,24 +2422,6 @@ package Perlito5::AST::Call;
         }
         die "don't know how to assign to method ", $self->{method};
     }
-    sub emit_java_set_list {
-        my ($self, $level, $list) = @_;
-        if ( $self->{method} eq 'postcircumfix:<[ ]>' ) {
-            return Perlito5::Java::emit_java_autovivify( $self->{invocant}, $level, 'array' )
-                    . '.aset(' 
-                        . Perlito5::Java::to_num($self->{arguments}, $level+1) . ', ' 
-                        . $list  . '.shift()'
-                    . ')';
-        }
-        if ( $self->{method} eq 'postcircumfix:<{ }>' ) {
-            return Perlito5::Java::emit_java_autovivify( $self->{invocant}, $level, 'hash' )
-                    . '.hset(' 
-                        . Perlito5::Java::autoquote($self->{arguments}, $level+1, 'list') . ', '
-                        . $list  . '.shift()'
-                    . ')';
-        }
-        die "don't know how to assign to method ", $self->{method};
-    }
     sub emit_java_get_decl { () }
     sub emit_java_has_regex { () }
 }
@@ -2367,7 +2461,7 @@ package Perlito5::AST::If;
             ? Perlito5::Java::LexicalBlock->new( block => $self->{otherwise}->stmts, not_a_loop => 1 )
             : Perlito5::Java::LexicalBlock->new( block => $self->{otherwise}->stmts, create_context => 1, not_a_loop => 1 );
  
-        push @str, 'if (' . Perlito5::Java::to_bool($cond, $level + 1) . ') {';
+        push @str, 'if (' . Perlito5::Java::to_boolean($cond, $level + 1) . ') {';
         if ($body) {
             push @str, [ $body->emit_java( $level + 1, $wantarray ) ];
         }
@@ -2414,11 +2508,7 @@ package Perlito5::AST::When;
         }
         $cond = Perlito5::AST::Apply->new(
                 'arguments' => [
-                    Perlito5::AST::Var->new(
-                        'name' => '_',
-                        'namespace' => 'main',
-                        'sigil' => '$',
-                    ),
+                    Perlito5::AST::Var::SCALAR_ARG(),
                     $cond,
                 ],
                 'code' => 'infix:<~~>',
@@ -2440,7 +2530,7 @@ package Perlito5::AST::When;
             : Perlito5::Java::LexicalBlock->new( block => $self->{body}->stmts, create_context => 1, not_a_loop => 1 );
         push @{ $body->{block} }, $next; 
 
-        push @str, 'if (' . Perlito5::Java::to_bool($cond, $level + 1) . ') {';
+        push @str, 'if (' . Perlito5::Java::to_boolean($cond, $level + 1) . ') {';
         if ($body) {
             push @str, [ $body->emit_java( $level + 1, $wantarray ) ];
         }
@@ -2475,7 +2565,11 @@ package Perlito5::AST::While;
             $expression = Perlito5::Java::to_native_bool($cond, $level + 1);
         }
         else {
-            $expression =  Perlito5::Java::to_bool($cond, $level + 1);    
+            $expression =  Perlito5::Java::to_boolean($cond, $level + 1);    
+        }
+        if ($expression eq 'false') {
+            # no-op
+            return 'PerlOp.statement();';
         }
 
         if ( ref($self->{body}) eq 'Perlito5::AST::Apply' && $self->{body}{code} eq 'do' ) {
@@ -2534,7 +2628,7 @@ package Perlito5::AST::For;
         my $cond = ref( $self->{cond} ) eq 'ARRAY'
                    ? $self->{cond}
                    : [ $self->{cond} ];
-        for my $expr ( @$cond, $self->{topic} ) {
+        for my $expr ( @$cond ) {
             if ($expr) {
                 my @var_decl = $expr->emit_java_get_decl();
                 for my $arg (@var_decl) {
@@ -2551,7 +2645,7 @@ package Perlito5::AST::For;
             push @str,
                 'for ( '
                     . ( $self->{cond}[0] ? $self->{cond}[0]->emit_java($level + 1) . '; '  : '; ' )
-                    . ( $self->{cond}[1] ? Perlito5::Java::to_bool($self->{cond}[1], $level + 1) . '; '  : '; ' )
+                    . ( $self->{cond}[1] ? Perlito5::Java::to_boolean($self->{cond}[1], $level + 1) . '; '  : '; ' )
                     . ( $self->{cond}[2] ? $self->{cond}[2]->emit_java($level + 1) . ' '   : ''  )
                   . ') {',
                       [
@@ -2561,7 +2655,18 @@ package Perlito5::AST::For;
                 '}';
         }
         else {
-            my $cond = Perlito5::Java::to_list([$self->{cond}], $level + 1);
+            my $cond = $self->{cond};
+            if ( $cond->isa( 'Perlito5::AST::Apply' ) && $cond->{code} eq 'infix:<..>' ) {
+                $cond = 'new PerlRange('
+                              . $cond->{arguments}->[0]->emit_java($level + 1) . ', '
+                              . $cond->{arguments}->[1]->emit_java($level + 1)
+                        . ')';
+            }
+            else {
+                # TODO - optimization - use to_list() when the topic doesn't need to mutate
+                $cond = Perlito5::Java::to_param_list([$cond], $level + 1);
+            }
+
             my $topic = $self->{topic};
             my $local_label = Perlito5::Java::get_label();
             my $decl = '';
@@ -2575,10 +2680,13 @@ package Perlito5::AST::For;
             }
             my $namespace = $v->{namespace} || $v->{_namespace} || $Perlito5::PKG_NAME;
             my $s;
-            if ($decl eq 'my' || $decl eq 'state') {
+            if ($decl eq 'my' || $decl eq 'state' ) {
+                # TODO - use PlObject for topic, because:
+                #   - less memory
+                #   - arguments are r/o when needed
                 push @str,
-                        'for (PlObject ' . $local_label . ' : ' . $cond . '.a) {',
-                          [ $v->emit_java($level + 1) . ".set($local_label);",
+                        'for (PlObject ' . $local_label . ' : ' . $cond . ') {',
+                          [ 'PlLvalue ' . $v->emit_java($level + 1) . " = (PlLvalue)$local_label;",
                             Perlito5::Java::LexicalBlock->new(
                                 block => $body,
                                 block_label => $self->{label},
@@ -2589,10 +2697,13 @@ package Perlito5::AST::For;
             }
             else {
                 # use global variable or $_
-                # TODO - localize variable
+                # localize variable
+                my $local_label2 = Perlito5::Java::get_label();
+                push @str, 'int ' . $local_label2 . ' = PerlOp.local_length();';
+                push @str, $v->emit_java_global($level + 1, 'scalar', 1) . ";";
                 push @str,
-                        'for (PlObject ' . $local_label . ' : ' . $cond . '.a) {',
-                          [ $v->emit_java($level + 1) . ".set($local_label);",
+                        'for (PlObject ' . $local_label . ' : ' . $cond . ') {',
+                          [ $v->emit_java_global_set_alias( "(PlLvalue)$local_label", $level + 1 ) . ";",
                             Perlito5::Java::LexicalBlock->new(
                                 block => $body,
                                 block_label => $self->{label},
@@ -2600,6 +2711,7 @@ package Perlito5::AST::For;
                             )->emit_java($level + 2, $wantarray),
                           ],
                         '}';
+                push @str, 'PerlOp.cleanup_local(' . $local_label2 . ', PlCx.UNDEF);';
             }
         }
         if ($Perlito5::THROW) {
@@ -2619,6 +2731,8 @@ package Perlito5::AST::Sub;
         if (my $node = $self->maybe_rewrite_statevars()) {
             return $node->emit_java($level, $wantarray);
         }
+        local $Perlito5::THROW;
+        local $Perlito5::THROW_RETURN if !$self->{_do_block};
         my $prototype = defined($self->{sig}) 
                         ? 'new PlString(' . Perlito5::Java::escape_string($self->{sig}) . ')'
                         : 'PlCx.UNDEF';
@@ -2626,32 +2740,55 @@ package Perlito5::AST::Sub;
         my $sub_ref = Perlito5::Java::get_label();
         local $Perlito5::AST::Sub::SUB_REF = $sub_ref;
         local $Perlito5::Java::is_inside_subroutine = 1;
-        my $block = Perlito5::Java::LexicalBlock->new( block => $self->{block}{stmts} );
+        my $block = Perlito5::Java::LexicalBlock->new( block => $self->{block}{stmts}, not_a_loop => 1 );
 
         # get list of captured variables, including inner blocks
-        my @captured;
-        for my $stmt (@{$self->{block}{stmts}}) {
-            push @captured, $stmt->get_captures();
+        my @captures_ast = @Perlito5::CAPTURES;
+
+        {
+            my @captured;
+            for my $stmt (@{$self->{block}{stmts}}) {
+                push @captured, $stmt->get_captures();
+            }
+            my %dont_capture = map { $_->{dont} ? ( $_->{dont} => 1 ) : () } @captured;
+            my %capture = map { $_->{dont} ? ()
+                              : $dont_capture{ $_->{_id} } ? ()
+                              : ($_->{_decl} eq 'local' || $_->{_decl} eq 'global' || $_->{_decl} eq '') ? ()
+                              : ( $_->{_id} => $_ )
+                              } @captured;
+            # warn Data::Dumper::Dumper(\@captured);
+            # warn Data::Dumper::Dumper(\%dont_capture);
+            # warn Data::Dumper::Dumper(\%capture);
+
+            my %seen = map { $_->{_id} => 1 } @captures_ast;
+
+            my @more = (
+                grep { ! $seen{ $_->{_id} } }
+                map  { $capture{$_} }
+                sort keys %capture );
+            push @captures_ast, @more;
         }
 
-        my %dont_capture = map { $_->{dont} ? ( $_->{dont} => 1 ) : () } @captured;
-        my %capture = map { $_->{dont} ? ()
-                          : $dont_capture{ $_->{_id} } ? ()
-                          : ($_->{_decl} eq 'local' || $_->{_decl} eq 'global' || $_->{_decl} eq '') ? ()
-                          : ( $_->{_id} => $_ )
-                          } @captured;
-        # warn Data::Dumper::Dumper(\@captured);
-        # warn Data::Dumper::Dumper(\%dont_capture);
-        # warn Data::Dumper::Dumper(\%capture);
-        my @captures_ast  = map { $capture{$_} }
-                            sort keys %capture;
+        local @Perlito5::CAPTURES = @captures_ast;
+
         my @captures_java = map { $_->emit_java( $level, 'list' ) } @captures_ast;
 
         # set the new variable names inside the closure
         local %Perlito5::Java::Java_var_name;
         my $i = 0;
         for (@captures_ast) {
-            $Perlito5::Java::Java_var_name{ $_->{_id} } = 'this.env[' . $i . ']';
+            my $capture_name = 'this.env[' . $i . ']';
+            my $sigil = $_->{_real_sigil} || $_->{sigil};
+            if ($sigil eq '$') {
+                $capture_name = "((PlLvalue)$capture_name)";
+            }
+            elsif ($sigil eq '@') {
+                $capture_name = "((PlArray)$capture_name)";
+            }
+            elsif ($sigil eq '%') {
+                $capture_name = "((PlHash)$capture_name)";
+            }
+            $Perlito5::Java::Java_var_name{ $_->{_id} } = $capture_name;
             $i++;
         }
 
@@ -2677,28 +2814,38 @@ package Perlito5::AST::Sub;
             $Perlito5::THROW_RETURN = $outer_throw;
         }
 
-        my $s = Perlito5::Java::emit_wrap_java($level,
-            "new PlClosure($prototype, new PlObject[]{ " . join(', ', @captures_java) . " } ) {",
+        if (!@js_block) {
+            push @js_block, 'return PerlOp.context(want, PerlOp.context(want));';
+        }
+
+        my @s = (
+            "new PlClosure("
+                    . "$prototype, "
+                    . "new PlObject[]{ " . join(', ', @captures_java) . " }, "
+                    . Perlito5::Java::pkg
+            . ") {",
                 [ "public PlObject apply(int want, PlArray List__) {",
-                    \@js_block,
+                    [ @js_block ],
                   "}",
                 ],
             "}",
         );
 
         if ( $self->{name} ) {
-            my $idx  = Perlito5::JavaScript2::get_label();
-            return
-                   'if (!PlV.get("main::init_' . $idx . '").to_bool()) {'
-                .       'PlV.set("main::init_' . $idx . '", (PlCx.INT1));'
-                .       'PlV.set('
-                .           Perlito5::Java::escape_string($self->{namespace} . '::' . $self->{name} ) . ", "
-                .           $s
-                .       ');'
-                . '}';
+            my $idx  = Perlito5::Java::get_label();
+            return Perlito5::Java::emit_wrap_java($level,
+                   'if (!PlV.sget("main::init_' . $idx . '").to_boolean()) {',
+                     [  'PlV.sset("main::init_' . $idx . '", (PlCx.INT1));',
+                        'PlV.cset('
+                          . Perlito5::Java::escape_string($self->{namespace} . '::' . $self->{name} ) . ", "
+                          . Perlito5::Java::emit_wrap_java($level + 1, @s)
+                      . ');',
+                     ],
+                  '}',
+            );
         }
         else {
-            return $s;
+            return "" . Perlito5::Java::emit_wrap_java($level, @s);
         }
 
         # PlClosure c = new PlClosure( "", new PlObject[]{ v1, v2, v3 } ) {
@@ -2714,22 +2861,6 @@ package Perlito5::AST::Sub;
     sub emit_java_has_regex { () }
 }
 
-package Perlito5::AST::Use;
-{
-    sub emit_java {
-        my ($self, $level, $wantarray) = @_;
-        Perlito5::Grammar::Use::emit_time_eval($self);
-        if ($wantarray ne 'void') {
-            return 'PlCx.UNDEF';
-        }
-        else {
-            return '// ' . $self->{code} . ' ' . $self->{mod} . "\n";
-        }
-    }
-    sub emit_java_get_decl { () }
-    sub emit_java_has_regex { () }
-}
-
 1;
 
 =begin
@@ -2740,7 +2871,7 @@ Perlito5::Java::Emit - Code generator for Perlito Perl5-in-Java
 
 =head1 SYNOPSIS
 
-    $program->emit_java()  # generated Perl5 code
+    $program->emit_java($level)  # generated Perl5 code
 
 =head1 DESCRIPTION
 

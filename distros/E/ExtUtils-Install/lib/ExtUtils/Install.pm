@@ -32,11 +32,11 @@ ExtUtils::Install - install files from here to there
 
 =head1 VERSION
 
-2.08
+2.10
 
 =cut
 
-our $VERSION = '2.08';  # <-- do not forget to update the POD section just above this line!
+our $VERSION = '2.10';  # <-- do not forget to update the POD section just above this line!
 $VERSION = eval $VERSION;
 
 =pod
@@ -102,6 +102,10 @@ my $Inc_uninstall_warn_handler;
 
 my $INSTALL_ROOT = $ENV{PERL_INSTALL_ROOT};
 my $INSTALL_QUIET = $ENV{PERL_INSTALL_QUIET};
+$INSTALL_QUIET = 1
+  if (!exists $ENV{PERL_INSTALL_QUIET} and
+      defined $ENV{MAKEFLAGS} and
+      $ENV{MAKEFLAGS} =~ /\b(s|silent|quiet)\b/);
 
 my $Curdir = File::Spec->curdir;
 

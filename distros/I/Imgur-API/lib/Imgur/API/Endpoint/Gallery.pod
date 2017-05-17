@@ -1,0 +1,778 @@
+=head1 NAME
+
+Imgur::API::Endpoint::Gallery
+
+=head1 DESCRIPTION
+
+=over 4
+
+Access to the imgur Gallery API Endpoint. 
+
+=back
+
+=cut
+
+=head1 METHODS
+ 
+
+=head2 get
+
+=over 2
+
+Returns the images in the gallery. For example the main gallery is https://api.imgur.com/3/gallery/hot/viral/0.json
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<sort> I<optional>
+
+viral | top | time | rising (only available with user section) - defaults to viral
+
+=item *
+ C<window> I<optional>
+
+Change the date range of the request if the section is "top", day | week | month | year | all, defaults to day
+
+=item *
+ C<section> I<optional>
+
+hot | top | user - defaults to hot
+
+=item *
+ C<showViral> I<optional>
+
+true | false - Show or hide viral images from the 'user' section. Defaults to true
+
+=item *
+ C<page> I<optional>
+
+integer - the data paging number
+
+
+=back
+
+
+=head2 memeSubgallery
+
+=over 2
+
+View images for memes subgallery
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<sort> I<optional>
+
+viral | time | top - defaults to viral
+
+=item *
+ C<window> I<optional>
+
+Change the date range of the request if the sort is "top", day | week | month | year | all, defaults to week
+
+=item *
+ C<page> I<optional>
+
+integer - the data paging number
+
+
+=back
+
+
+=head2 memeSubgalleryImage
+
+=over 2
+
+View a single image in the memes gallery
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<image_id> I<required>
+
+The ID for the image.
+
+
+=back
+
+
+=head2 subreddit
+
+=over 2
+
+View gallery images for a subreddit
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<window> I<optional>
+
+Change the date range of the request if the sort is "top", day | week | month | year | all, defaults to week
+
+=item *
+ C<sort> I<optional>
+
+time | top - defaults to time
+
+=item *
+ C<page> I<optional>
+
+integer - the data paging number
+
+=item *
+ C<subreddit> I<required>
+
+pics - A valid subreddit name
+
+
+=back
+
+
+=head2 subredditImage
+
+=over 2
+
+View a single image in the subreddit
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<image_id> I<required>
+
+The ID for the image.
+
+=item *
+ C<subreddit> I<required>
+
+pics - A valid subreddit name
+
+
+=back
+
+
+=head2 tag
+
+=over 2
+
+View images for a gallery tag
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<t_name> I<required>
+
+The name of the tag.
+
+=item *
+ C<window> I<optional>
+
+Change the date range of the request if the sort is "top", day | week | month | year | all, defaults to week
+
+=item *
+ C<sort> I<optional>
+
+viral | time | top - defaults to viral
+
+=item *
+ C<page> I<optional>
+
+integer - the data paging number
+
+
+=back
+
+
+=head2 tagImage
+
+=over 2
+
+View a single image in a gallery tag
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<t_name> I<required>
+
+The name of the tag.
+
+=item *
+ C<image_id> I<required>
+
+The ID for the image.
+
+
+=back
+
+
+=head2 itemTags
+
+=over 2
+
+View tags for a gallery item
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<gallery> I<required>
+
+Gallery
+
+=item *
+ C<id> I<required>
+
+ID of the gallery item
+
+
+=back
+
+
+=head2 tagVote
+
+=over 2
+
+Vote for a tag, 'up' or 'down' vote. Send the same value again to undo a vote.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<t_name> I<required>
+
+Name of the tag (implicitly created, if doesn't exist)
+
+=item *
+ C<vote> I<required>
+
+'up' or 'down'
+
+=item *
+ C<gallery> I<required>
+
+Gallery
+
+=item *
+ C<id> I<required>
+
+ID of the gallery item
+
+
+=back
+
+
+=head2 updateGalleryTags
+
+=over 2
+
+Update the tags for a post in the gallery
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<id> I<required>
+
+ID of the gallery item
+
+=item *
+ C<tags> I<required>
+
+The name of the tags you wish to associate with a post. Can be passed as tags[]=funny&tags[]=cat or tags=funny,cat/td>
+
+=item *
+ C<gallery> I<required>
+
+Gallery
+
+
+=back
+
+
+=head2 search
+
+=over 2
+
+Search the gallery with a given query string.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<page> I<optional>
+
+integer - the data paging number
+
+=item *
+ C<window> I<optional>
+
+Change the date range of the request if the sort is 'top', day | week | month | year | all, defaults to all.
+
+=item *
+ C<sort> I<optional>
+
+time | viral | top - defaults to time
+
+
+=back
+
+
+=head2 random
+
+=over 2
+
+Returns a random set of gallery images.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<page> I<optional>
+
+A page of random gallery images, from 0-50. Pages are regenerated every hour.
+
+
+=back
+
+
+=head2 toGallery
+
+=over 2
+
+Share an Album or Image to the Gallery.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<title> I<required>
+
+The title of the image. This is required.
+
+=item *
+ C<topic> I<optional>
+
+Topic name
+
+=item *
+ C<tags[]> I<optional>
+
+The name of the tags you wish to associate with a post. Can be passed as tags[]=funny&tags[]=cat or tags=funny,cat
+
+=item *
+ C<mature> I<optional>
+
+If the post is mature, set this value to 1.
+
+=item *
+ C<terms> I<optional>
+
+If the user has not accepted our terms yet, this endpoint will return an error. To by-pass the terms in general simply set this value to 1.
+
+=item *
+ C<gallery> I<required>
+
+Gallery
+
+
+=back
+
+
+=head2 fromGallery
+
+=over 2
+
+Remove an image from the gallery. You must be logged in as the owner of the item to do this action.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<gallery> I<required>
+
+Gallery
+
+
+=back
+
+
+=head2 album
+
+=over 2
+
+Get additional information about an album in the gallery.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<gallery> I<required>
+
+Gallery
+
+
+=back
+
+
+=head2 image
+
+=over 2
+
+Get additional information about an image in the gallery.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<gallery> I<required>
+
+Gallery
+
+
+=back
+
+
+=head2 reporting
+
+=over 2
+
+Report an Image in the gallery
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<3> I<required>
+
+
+
+=item *
+ C<4> I<required>
+
+
+
+=item *
+ C<5> I<required>
+
+
+
+=item *
+ C<1> I<required>
+
+
+
+=item *
+ C<reason> I<optional>
+
+An integer representing the reason for the report
+                            Value
+                                    Description
+                                1
+                                    Doesn't belong on Imgur
+                                2
+                                    Spam
+                                3
+                                    Abusive
+                                4
+                                    Mature content not marked as mature
+                                5
+                                    Pornography
+
+=item *
+ C<2> I<required>
+
+
+
+
+=back
+
+
+=head2 votes
+
+=over 2
+
+Get the vote information about an image
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<gallery> I<required>
+
+Gallery
+
+
+=back
+
+
+=head2 voting
+
+=over 2
+
+Vote for an image, 'up' or 'down' vote. Send 'veto' to undo a vote.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<vote> I<required>
+
+Vote
+
+=item *
+ C<gallery> I<required>
+
+Gallery
+
+
+=back
+
+
+=head2 comments
+
+=over 2
+
+Comment on an image in the gallery.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<sort> I<optional>
+
+best | top | new - defaults to best
+
+=item *
+ C<gallery> I<required>
+
+Gallery
+
+
+=back
+
+
+=head2 comment
+
+=over 2
+
+Information about a specific comment. This action also allows any of the additional actions provided in the Comment Endpoint.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<comment> I<required>
+
+Comment
+
+=item *
+ C<gallery> I<required>
+
+Gallery
+
+
+=back
+
+
+=head2 commentCreation
+
+=over 2
+
+Create a comment for an image.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<comment> I<required>
+
+The text of the comment.
+
+=item *
+ C<gallery> I<required>
+
+Gallery
+
+
+=back
+
+
+=head2 commentReply
+
+=over 2
+
+Reply to a comment that has been created for an image.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<comment> I<required>
+
+The text you want to use as the reply.
+
+=item *
+ C<gallery> I<required>
+
+Gallery
+
+=item *
+ C<commentReply> I<required>
+
+CommentReply
+
+
+=back
+
+
+=head2 commentIds
+
+=over 2
+
+List all of the IDs for the comments on an image.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<gallery> I<required>
+
+Gallery
+
+
+=back
+
+
+=head2 commentCount
+
+=over 2
+
+The number of comments on an Image.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<gallery> I<required>
+
+Gallery
+
+
+=back
+
+
+=head1 SEE ALSO
+
+=over 4 
+
+https://api.imgur.com/endpoints/gallery
+
+=back
+
+=cut

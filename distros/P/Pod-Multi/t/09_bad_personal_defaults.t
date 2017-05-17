@@ -1,5 +1,5 @@
 # t/09_bad_personal_defaults.t - check what happens with defective personal
-#$Id: 09_bad_personal_defaults.t 1201 2007-10-27 01:22:17Z jimk $
+#$Id$
 # defaults file
 use strict;
 use warnings;

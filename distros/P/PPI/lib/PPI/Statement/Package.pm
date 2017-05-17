@@ -43,9 +43,12 @@ use PPI::Statement ();
 
 use vars qw{$VERSION @ISA};
 BEGIN {
-	$VERSION = '1.220';
+	$VERSION = '1.224';
 	@ISA     = 'PPI::Statement';
 }
+
+# Lexer clues
+sub __LEXER__normal() { '' }
 
 =pod
 
@@ -69,6 +72,28 @@ sub namespace {
 	$namespace->isa('PPI::Token::Word')
 		? $namespace->content
 		: '';
+}
+
+=pod
+
+=head2 version
+
+Some package declarations may include a version:
+
+  package Foo::Bar 1.23;
+  package Baz v1.23;
+
+The C<version> method returns the stringified version as seen in the
+document (if any), otherwise the empty string.
+
+=cut
+
+sub version {
+	my $self = shift;
+	my $version = $self->schild(2) or return '';
+	$version->isa('PPI::Token::Structure')
+		? ''
+		: $version->content;
 }
 
 =pod

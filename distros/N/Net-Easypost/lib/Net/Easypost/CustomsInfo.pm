@@ -1,5 +1,5 @@
 package Net::Easypost::CustomsInfo;
-$Net::Easypost::CustomsInfo::VERSION = '0.19';
+$Net::Easypost::CustomsInfo::VERSION = '0.20';
 use JSON::MaybeXS;
 use Types::Standard qw(ArrayRef Bool Enum InstanceOf Str);
 
@@ -19,7 +19,7 @@ has 'contents_type' => (
 
 has 'customs_certify' => (
     is  => 'rw',
-    isa => Bool,
+    isa => Bool|InstanceOf['JSON::PP::Boolean'],
     coerce => sub { $_[0] ? JSON->true : JSON->false }
 );
 
@@ -112,7 +112,7 @@ Net::Easypost::CustomsInfo
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 

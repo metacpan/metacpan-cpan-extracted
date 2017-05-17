@@ -5,7 +5,8 @@ author:
 build_requires:
   Capture::Tiny: '0'
   ExtUtils::MakeMaker: '0'
-  Test::Simple: '1.302083'
+  Test::More: '1.302085'
+  Test::Simple: '1.302085'
 configure_requires:
   ExtUtils::MakeMaker: '7.12'
   Module::Build: '0.42'
@@ -52,5 +53,5 @@ requires:
   perl: '5.010001'
 resources:
   repository: https://github.com/kenneth-olwing/App-TestOnTap.git
-version: '0.032'
+version: '0.033'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,7 +1,7 @@
 use Modern::Perl;
 package Renard::Curie::Setup;
 # ABSTRACT: Packages that can be imported into every module
-$Renard::Curie::Setup::VERSION = '0.001';
+$Renard::Curie::Setup::VERSION = '0.002';
 use autodie;
 
 use Import::Into;
@@ -27,9 +27,10 @@ sub import {
 	my %type_tiny_fp_check = ( reify_type => sub { Type::Utils::dwim_type($_[0]) }, );
 	Function::Parameters->import::into( $target,
 		{
-			fun         => { defaults => 'function_strict'   , %type_tiny_fp_check },
-			classmethod => { defaults => 'classmethod_strict', %type_tiny_fp_check },
-			method      => { defaults => 'method_strict'     , %type_tiny_fp_check },
+			fun         => { defaults => 'function_lax'   , %type_tiny_fp_check },
+			classmethod => { defaults => 'classmethod_lax', %type_tiny_fp_check },
+			method      => { defaults => 'method_lax'     , %type_tiny_fp_check },
+			callback    => { defaults => 'function_lax'   , %type_tiny_fp_check, check_argument_count => 0 },
 		}
 	);
 	Return::Type->import::into( $target );
@@ -56,7 +57,7 @@ Renard::Curie::Setup - Packages that can be imported into every module
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 AUTHOR
 

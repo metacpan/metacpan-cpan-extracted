@@ -75,7 +75,7 @@
          "web" : "http://github.com/dod38fr/config-model-itself"
       }
    },
-   "version" : "2.009",
+   "version" : "2.010",
    "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

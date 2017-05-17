@@ -14,31 +14,26 @@
 
 : if $ext.overrides {
         <: $ext.overrides | raw :>
-: }
 
-        // configure loader
+: }
         Ext.Loader.setConfig({
             enabled: true,
             disableCaching: false,
             paths: <: $ext.loader_path | raw :>
         });
 
-: if $ext.api_map {
-
-        // ExtDirect API
-        Ext.direct.Manager.addProvider(<: $ext.api_map | raw :>);
-: }
-
         Ext.onReady(function() {
-
-            // disable aria warnings
             Ext.ariaWarn = Ext.emptyFn;
 
 : if $ext.static_classes {
+            // static classes
             <: $ext.static_classes | raw :>
-: }
 
-            // create ExtJS application
+: }
+: if $ext.api_map {
+            Ext.direct.Manager.addProvider(<: $ext.api_map | raw :>);
+
+: }
             Ext.application({
                 extend: 'Ext.app.Application',
                 requires: ['<: $ext.viewport_class :>'],

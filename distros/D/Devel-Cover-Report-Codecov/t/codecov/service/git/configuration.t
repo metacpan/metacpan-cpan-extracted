@@ -9,6 +9,7 @@ use File::Temp qw/tempdir/;
 use Capture::Tiny qw/capture/;
 use Test::Requires::Git;
 
+use lib '.';
 use t::Util;
 use Devel::Cover::Report::Codecov::Service::Git;
 

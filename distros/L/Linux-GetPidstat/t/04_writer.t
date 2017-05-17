@@ -126,8 +126,10 @@ subtest 'output to a file (dry_run=1)' => sub {
     $opt{dry_run} = 0;
 };
 
-$opt{mackerel_api_key}      = 'dummy_key';
-$opt{mackerel_service_name} = 'dummy_name';
+$opt{mackerel_metric_type}       = 'service';
+$opt{mackerel_api_key}           = 'dummy_key';
+$opt{mackerel_service_name}      = 'dummy_name';
+$opt{mackerel_metric_key_prefix} = 'batch_';
 
 my $output_mkr  = get_data_section('output.mkr');
 my @output_mkr_lines = split '\n', $output_mkr;

@@ -1,0 +1,41 @@
+{
+   "abstract" : "this library provides physical constants for use in Astronomy",
+   "author" : [
+      "Boyd Duffee <duffee@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Astro-Constants",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Number::Delta" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/duffee/Astro-Constants",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/duffee/Astro-Constants.git",
+         "web" : "https://github.com/duffee/Astro-Constants"
+      }
+   },
+   "version" : "0.1100"
+}
+

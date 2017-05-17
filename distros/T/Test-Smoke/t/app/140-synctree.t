@@ -13,7 +13,7 @@ my $opt = 'Test::Smoke::App::Options';
 {
     my $ddir = abs_path('t');
 
-    local @ARGV = ('--syncer' => 'git', '--ddir', $ddir, '-v' => 0);
+    local @ARGV = ('--sync_type' => 'git', '--ddir', $ddir, '-v' => 0);
     my $app = Test::Smoke::App::SyncTree->new(
         $opt->synctree_config(),
     );

@@ -1,5 +1,55 @@
 Revision history for Perl extension PPI
 
+1.224 Sun 14 May 2017
+	Summary:
+	- updating an out-of-date meta.yml caused by Module::Install
+
+1.222 Sun 14 May 2017
+	Summary:
+	- unit tests for many parts, both passing and TODO
+	- many documentation fixes
+	- add ->version method to PPI::Statement::Package (WOLFSAGE)
+	- remove unused PPI::Document->new timeout feature
+	- do not expect '.' in @INC (PLICEASE)
+	- many parsing fixes
+	- various fixes to the behaviors of methods
+	- removal of problematic dependencies
+
+	Details:
+	- Remove undocumented, non-working 'timeout' attribute to
+	  Document->new, including HAVE_ALARM and
+	  PPI::Exception::ParserTimeout.  (GitHub #140) (MOREGAN)
+	- first cut of a travis configuration
+	- do hex number matching with [[:xdigit:]]
+	- some readability improvements on the code of HereDoc.pm
+	- recognize heredoc even if they have no newline at the end (AUBERTG)
+	- parse left side of => as bareword even if it looks like a keyword or
+	  op (MOREGAN)
+	- remove source code escapes in the output of QuoteLike::Words->literal
+	  (MOREGAN)
+	- removal of Test::NoWarnings
+	- less uses of List::MoreUtils in favor of List::Util
+	- expand $'x to $::main::x in Symbol->canonical as with $::x
+	  (MOREGAN)
+	- fixed parsing of large numbers in Number::Exp on Solaris 80 (JMASLAK)
+	- make remove_child actually return undef on failure to find child to
+	  remove
+	- higher accuracy when deciding whether certain characters are operators
+	  or variable type casts (*&% etc.) (MOREGAN)
+	- parse x as the first element of code as a word, not an operator
+	  (MOREGAN)
+	- recognize the implied end of a package statement that includes a block
+	  (MOREGAN)
+	- parse package names that look like operators as strings, not ops
+	  (MOREGAN)
+	- parse package names that look like v10 as strings, not versions
+	  (MOREGAN)
+	- parse things like v49use as a single bareword, not v-string + keyword
+	  (MOREGAN)
+	- parse x64 as a word, not x operator + number (MOREGAN)
+	- parse 1.eq 1 as float + op, not concatenation
+	- parse subroutine attributes correctly (MOREGAN)
+
 1.220 Tue 11 Nov 2014
 	Summary:
 	- incompatible behavior fixes on PPI::Statement::Sub->prototype

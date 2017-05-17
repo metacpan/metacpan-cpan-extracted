@@ -1,0 +1,129 @@
+=head1 NAME
+
+Imgur::API::Endpoint::Custom_gallery
+
+=head1 DESCRIPTION
+
+=over 4
+
+Access to the imgur Custom_gallery API Endpoint. 
+
+=back
+
+=cut
+
+=head1 METHODS
+ 
+
+=head2 customGallery
+
+=over 2
+
+View images for current user's custom gallery
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<sort> I<optional>
+
+viral | time | top - defaults to viral
+
+=item *
+ C<window> I<optional>
+
+Change the date range of the request if the sort is "top", day | week | month | year | all, defaults to week
+
+=item *
+ C<page> I<optional>
+
+integer - the data paging number
+
+
+=back
+
+
+=head2 customGalleryImage
+
+=over 2
+
+View a single image in a user's custom gallery
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<image_id> I<required>
+
+The ID for the gallery item.
+
+=item *
+ C<item_id> I<required>
+
+Item_id
+
+
+=back
+
+
+=head2 customGalleryAdd
+
+=over 2
+
+Add tags to a user's custom gallery
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<tags> I<required>
+
+Array of tags (e.g. 'cats,dogs')
+
+
+=back
+
+
+=head2 customGalleryRemove
+
+=over 2
+
+Remove tags from a custom gallery
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<tags> I<required>
+
+Array of tags (e.g. 'cats,dogs')
+
+
+=back
+
+
+=head1 SEE ALSO
+
+=over 4 
+
+https://api.imgur.com/endpoints/custom_gallery
+
+=back
+
+=cut

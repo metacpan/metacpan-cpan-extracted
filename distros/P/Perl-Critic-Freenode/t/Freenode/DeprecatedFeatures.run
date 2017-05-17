@@ -31,9 +31,6 @@ foo ? bar ? 'foo' : 'bar' : 'baz';
 foo ? bar ? foo : bar : baz;
 $foo =~ m?foo?;
 $foo =~ s?foo?bar?;
-$foo =~ m/foo/x;
-$foo =~ s/foo/bar/x;
-qr/foo/x;
 "\N{FOO BAR}";
 `\N{FOO BAR}`;
 qx(\N{FOO BAR});
@@ -53,6 +50,10 @@ shift(@{$foo->{bar}[5]});
 shift $foo->{bar}[5]->@*;
 shift;
 shift();
+require Foo::Bar;
+use Foo::Bar;
+no Foo::Bar;
+require '::Foo::Bar.pm';
 
 ## name BadFeatures
 ## failures 42
@@ -84,9 +85,6 @@ defined %foo;
 defined(@foo);
 defined(%foo);
 $foo =~ ?foo?;
-$foo =~ m/foo/xx;
-$foo =~ s/foo/bar/xx;
-qr/foo/xx;
 "\N{FOO BAR}";
 `\N{FOO BAR}`;
 qq{\N{FOO BAR}};
@@ -102,14 +100,9 @@ shift($foo->[5]);
 splice $foo, $bar, $baz;
 unshift $ref, @bar;
 values $ref;
-
-## name MultipleBadFeatures
-## failures 6
-## cut
-
-qr!\N{FOO BAR}!xx;
-m,\N{FOO BAR},axbxc;
-s[\N{FOO BAR}][]xxx;
+require ::Foo::Bar;
+use ::Foo::Bar;
+no ::Foo::Bar;
 
 ## name POSIXDeprecations
 ## failures 12

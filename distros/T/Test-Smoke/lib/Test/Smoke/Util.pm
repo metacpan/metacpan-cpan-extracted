@@ -791,7 +791,7 @@ sub get_patch {
     if (open my $gvh, '<', $git_version_h) {
         while (my $line = <$gvh>) {
             if ($line =~ /^#define PERL_PATCHNUM "(.+)"$/) {
-                return $1;
+                return [$1];
             }
         }
         close $gvh;

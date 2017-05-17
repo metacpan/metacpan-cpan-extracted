@@ -14,11 +14,20 @@
    },
    "name" : "Alien-MuPDF",
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build" : "0.32",
+            "Alien::Build::MM" : "0.32",
+            "Alien::gmake" : "0.14",
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
       "configure" : {
          "requires" : {
-            "Alien::Base::ModuleBuild" : "0.020",
-            "File::ShareDir" : "1.03",
-            "Path::Class" : "0.013"
+            "Alien::Build" : "0.32",
+            "Alien::Build::MM" : "0.32",
+            "ExtUtils::MakeMaker" : "6.52",
+            "perl" : "5.006"
          }
       },
       "runtime" : {
@@ -27,11 +36,10 @@
             "Inline::C" : "0.62"
          },
          "requires" : {
-            "Alien::Base" : "0.020",
-            "File::ShareDir" : "1.03",
+            "Alien::Base" : "0.038",
             "File::Spec" : "0",
-            "Path::Class" : "0.013",
             "parent" : "0",
+            "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -43,7 +51,8 @@
             "File::Basename" : "0",
             "File::Which" : "1.21",
             "Module::Load" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "perl" : "5.006"
          }
       }
    },
@@ -56,7 +65,7 @@
          "web" : "https://github.com/project-renard/p5-Alien-MuPDF"
       }
    },
-   "version" : "0.007",
+   "version" : "0.009",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0211"
 }
 

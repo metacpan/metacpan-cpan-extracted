@@ -52,7 +52,7 @@ Util::Underscore::Numbers - Functions for dealing with numbers
 
 =head1 VERSION
 
-version v1.4.1
+version v1.4.2
 
 =head1 FUNCTION REFERENCE
 

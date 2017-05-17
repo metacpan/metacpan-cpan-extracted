@@ -1,0 +1,11 @@
+^mypp.yml
+.git
+\.old
+\.swp
+~$
+^blib/
+^Makefile$
+^MYMETA*
+^README.pod
+^Mojolicious-Plugin-CGI
+cgi-bin

@@ -132,17 +132,25 @@ around run => sub ( $orig, $self, $req ) {
     my $ext_app = $Pcore::Ext::CFG->{app}->{ $self->{ext_app} };
 
     my $api_map = {
-        id        => undef,
-        namespace => 'API.' . ref( $self->{app} ) =~ s[::][]smgr,
-        timeout   => undef,
-        url       => $self->{app}->{router}->get_host_api_path( $req->{host} ),
-        type      => 'remoting',
-        version   => undef,
-        actions   => $ext_app->{api},
+
+        # type            => 'remoting',
+        type    => 'websocket',
+        url     => $self->{app}->{router}->get_host_api_path( $req->{host} ),
+        actions => $ext_app->{api},
+
+        # not mandatory options
+        id              => 'api',
+        namespace       => 'API.' . ref( $self->{app} ) =~ s[::][]smgr,
+        timeout         => 0,                                             # milliseconds, 0 - no timeout
+        version         => undef,
+        maxRetries      => 0,                                             # number of times to re-attempt delivery on failure of a call
+        headers         => {},
+        enableBuffer    => 10,                                            # \1, \0, milliseconds
+        enableUrlEncode => undef,
     };
 
     my $data = {
-        INDEX => {    #
+        INDEX => {                                                        #
             title => $self->ext_app_title
         },
         resources => $resources,

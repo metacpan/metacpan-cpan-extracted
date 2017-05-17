@@ -4,7 +4,6 @@ use Test::More tests => 7;
 use Math::Polynomial::Solve qw(:numeric);
 use strict;
 use warnings;
-require "t/coef.pl";
 
 my @options = qw( hessenberg root_function varsubst);
 my %okeys = poly_option();

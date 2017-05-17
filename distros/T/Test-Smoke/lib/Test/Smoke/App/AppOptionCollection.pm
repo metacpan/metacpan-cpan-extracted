@@ -2,6 +2,8 @@ package Test::Smoke::App::AppOptionCollection;
 use warnings;
 use strict;
 
+our $VERSION = '0.001';
+
 use base 'Test::Smoke::ObjectBase';
 
 =head1 NAME

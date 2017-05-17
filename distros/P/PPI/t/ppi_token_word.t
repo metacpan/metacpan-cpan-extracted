@@ -2,18 +2,15 @@
 
 # Unit testing for PPI::Token::Word
 
-use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-	no warnings 'once';
-	$PPI::XS_DISABLE = 1;
-	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
-}
-use Test::More tests => 1756;
-use Test::NoWarnings;
+use lib 't/lib';
+use PPI::Test::pragmas;
+use Test::More tests => 1762 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+
 use PPI;
 
+
+use lib 't/lib';
+use Helper 'check_with';
 
 LITERAL: {
 	my @pairs = (
@@ -473,3 +470,38 @@ sub _compare_child {
 
 	return;
 }
+
+check_with "1.eqm'bar';", sub {
+	is $_->child( 0 )->child( 1 )->content, "eqm'bar",
+	  "eqm' bareword after number and concat op is not mistaken for eq";
+};
+
+check_with "__DATA__", sub {
+	is $_->child( 1 ), undef, 'DATA segment without following newline does not get one added';
+};
+
+check_with "__DATA__ a", sub {
+	is $_->child( 1 )->content, ' a',
+	  'DATA segment without following newline, but text, has text added as comment in following token';
+};
+
+check_with "__END__", sub {
+	is $_->child( 1 ), undef, 'END segment without following newline does not get one added';
+};
+
+check_with "__END__ a", sub {
+	is $_->child( 0 )->child( 1 )->content, ' a',
+	  'END segment without following newline, but text, has text added as comment in children list';
+};
+
+check_with "__END__ a\n", sub {
+	is $_->child( 0 )->child( 1 )->content, ' a',
+	  'END segment, followed by text and newline, has text added as comment in children list';
+};
+
+check_with "__DATA__ a\n", sub {
+	is $_->child( 1 )->content, ' a',
+	  'DATA segment, followed by text and newline, has text added as comment in following token';
+};
+
+1;

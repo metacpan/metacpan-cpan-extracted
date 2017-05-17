@@ -55,6 +55,6 @@
          "url" : "http://github.com/niczero/mojar-google-analytics"
       }
    },
-   "version" : 1.111,
+   "version" : 1.112,
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

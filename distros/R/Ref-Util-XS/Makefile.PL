@@ -2,19 +2,19 @@
 use strict;
 use warnings;
 
-use 5.008;
+use 5.006;
 
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Utility functions for checking references",
+  "ABSTRACT" => "XS implementation for Ref::Util",
   "AUTHOR" => "Sawyer X <xsawyerx\@cpan.org>, Aaron Crane <arc\@cpan.org>, Vikenty Fesunov <vyf\@cpan.org>, Gonzalo Diethelm <gonzus\@cpan.org>, Karen Etheridge <ether\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Ref-Util-XS",
   "LICENSE" => "mit",
-  "MIN_PERL_VERSION" => "5.008",
+  "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Ref::Util::XS",
   "PREREQ_PM" => {
     "Exporter" => "5.57",
@@ -24,9 +24,9 @@ my %WriteMakefileArgs = (
     "B::Concise" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
-    "Test::More" => 0
+    "Test::More" => "0.96"
   },
-  "VERSION" => "0.115",
+  "VERSION" => "0.116",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,7 +38,7 @@ my %FallbackPrereqs = (
   "Exporter" => "5.57",
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
-  "Test::More" => 0,
+  "Test::More" => "0.96",
   "XSLoader" => 0
 );
 

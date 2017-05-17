@@ -1,14 +1,7 @@
 package Perlito5::Grammar::Scope;
 
+use Perlito5::AST;
 use strict;
-
-our %Special_var = (
-    ARGV => 1,
-    INC  => 1,
-    ENV  => 1,
-    SIG  => 1,
-    _    => 1,
-);
 
 sub new {
     return { block => [] };
@@ -37,6 +30,21 @@ sub end_compile_time_scope {
     }
 }
 
+sub compile_time_glob_set {
+    # set a GLOB at compile-time
+    my ($glob, $value, $namespace) = @_;
+    if ( !ref($glob) ) {
+        if ( $glob !~ /::/ ) {
+            $glob = $namespace . '::' . $glob;
+        }
+        # mark the variable as "seen"
+        my @parts = split "::", $glob;
+        my $name = pop @parts;
+        Perlito5::AST::Var->new( name => $name, namespace => join("::", @parts), sigil => "*", _decl => "global" );
+    }
+    *{$glob} = $value;
+}
+
 sub lookup_variable {
     # search for a variable declaration in the compile-time scope
     my $var = shift;
@@ -48,8 +56,10 @@ sub lookup_variable {
     my $look = lookup_variable_inner($var, $scope, 0);
     return $look if $look;
 
+    return if ref($var) ne 'Perlito5::AST::Var';
+
     my $c = substr($var->{name}, 0, 1);
-    if ( $Special_var{ $var->{name} } || $c lt 'A' || ($c gt 'Z' && $c lt 'a') || $c gt 'z') {
+    if ( $var->is_special_var() ) {
         # special variable
         $var->{_decl} = 'global';
         $var->{_namespace} = 'main';
@@ -81,6 +91,27 @@ sub lookup_variable_inner {
         my $look = lookup_variable_inner($var, $block->[-1], $depth + 1);
         return $look if $look;
     }
+
+    if ( ($scope->{compacted} + 100) < @$block ) {
+        # garbage-collect the scope
+        my %seen;
+        my @out;
+        my $start = $#$block - 500;
+        $start = 1 if $start < 1;
+        for my $i ($start .. $#{$block}) {
+            my $item = $block->[$i];
+            my $s = join(':', map {;
+                $_ . '=' . $item->{$_}
+            } sort {;
+                $a cmp $b
+            } keys(%{$item}));
+            $seen{$s}++ || push(@out, $item)
+        }
+        # print STDERR:: 'block ', scalar(@{$block}), ' ', scalar(@out), ' ', $scope->{compacted}, "\n";
+        $scope->{'block'} = [ @{$block}[ 0 .. $start - 1 ], @out ];
+        $scope->{compacted} += 100;
+    }
+
     for my $item (reverse @$block) {
         if (ref($item) eq 'Perlito5::AST::Var' && $item->{_decl}
             && $item->{_decl} ne 'global'
@@ -120,23 +151,29 @@ sub check_variable_declarations {
                     # warn "look: ", Data::Dumper::Dumper(\@Perlito5::SCOPE_STMT);
                     my $sigil = $var->{_real_sigil} || $var->{sigil};
                     if ($sigil ne '*' && $sigil ne '&') {
-                        Perlito5::Compiler::error 'Global symbol "' . $sigil . $var->{name} . '"'
-                            . ' requires explicit package name';
+                        Perlito5::Compiler::error( 'Global symbol "' . $sigil . $var->{name} . '"'
+                            . ' requires explicit package name' );
                     }
                 }
                 $var->{_decl} = 'global';
                 $var->{_namespace} = $Perlito5::PKG_NAME;
             }
-
-            if ($ENV{PERLITO5DEV}) {
-                my $compiletime_name =
-                      ($var->{_real_sigil} || $var->{sigil})
-                    . ($var->{namespace} || $var->{_namespace} || "C_")
-                    . "::" . $var->{name}
-                    . ($var->{_decl} eq "global" ? "" : "_" . $var->{_id});
+            if ($var->{name} && ($var->{namespace} || $var->{_namespace})) {
+                my $compiletime_name;
+                if ($var->{'name'} lt 'A' || $var->{'name'} eq '\\') {
+                    $compiletime_name =
+                          ($var->{_real_sigil} || $var->{sigil})
+                        . $var->{name};
+                }
+                else {
+                    $compiletime_name =
+                          ($var->{_real_sigil} || $var->{sigil})
+                        . ($var->{namespace} || $var->{_namespace})
+                        . "::" . $var->{name}
+                        . ($var->{_decl} eq "global" ? "" : $var->{_id} ? "_" . $var->{_id} : "");
+                }
                 $Perlito5::GLOBAL->{$compiletime_name} = { value => undef, ast => $var };
             }
-
         }
     }
     push @{ $Perlito5::SCOPE->{block} }, @Perlito5::SCOPE_STMT;
@@ -155,7 +192,11 @@ sub get_snapshot {
         unshift @result, @{ $look->{block} };
     }
     for my $item (@$block) {
-        if (ref($item) eq 'Perlito5::AST::Var' && $item->{_decl}) {
+        if (   ref($item) eq 'Perlito5::AST::Var'
+            && $item->{_decl}
+            && $item->{_decl} ne "global"
+            && $item->{_decl} ne "local" )
+        {
             unshift @result, $item;
         }
     }

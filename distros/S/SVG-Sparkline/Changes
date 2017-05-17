@@ -1,7 +1,10 @@
 Revision history for SVG-Sparkline
 
+1.12 2017-05-14
+    - Add some validation to type parameter. Thanks to JD Lightsey for pointing
+      out the security issues.
 1.11 2015-03-03
-    - Remove --nodecl parameter from sparklines.pl that has bee deprecated for
+    - Remove --nodecl parameter from sparklines.pl that has been deprecated for
       almost five years.
     - Correct uninitialized value errors if sparklines.pl is not passed a type.
       (Thank you, Gabor Szabo).

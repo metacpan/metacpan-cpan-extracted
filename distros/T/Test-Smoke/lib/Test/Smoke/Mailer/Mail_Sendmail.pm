@@ -2,6 +2,8 @@ package Test::Smoke::Mailer::Mail_Sendmail;
 use warnings;
 use strict;
 
+our $VERSION = '0.016';
+
 use base 'Test::Smoke::Mailer::Base';
 
 use fallback 'inc';

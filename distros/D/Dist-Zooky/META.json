@@ -4,7 +4,7 @@
       "Chris Williams <chris@bingosnet.co.uk>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -64,7 +64,7 @@
          "web" : "https://github.com/bingos/dist-zooky"
       }
    },
-   "version" : "0.22",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0227"
+   "version" : "0.24",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

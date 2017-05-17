@@ -5,22 +5,17 @@
 
 # Using PPI to analyse its own code at install-time? Fuck yeah! :)
 
-use strict;
-BEGIN {
-	no warnings 'once';
-	$| = 1;
-	$PPI::XS_DISABLE = 1;
-	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
-}
-
+use lib 't/lib';
+use PPI::Test::pragmas;
 use Test::More; # Plan comes later
-use Test::NoWarnings;
+
 use Test::Object;
 use File::Spec::Functions ':ALL';
 use Params::Util qw{_CLASS _ARRAY _INSTANCE _IDENTIFIER};
 use Class::Inspector;
 use PPI;
-use t::lib::PPI;
+use PPI::Test 'find_files';
+use PPI::Test::Object;
 
 use constant CI => 'Class::Inspector';
 
@@ -34,7 +29,7 @@ use constant CI => 'Class::Inspector';
 # Find all of the files to be checked
 my %tests = map { $_ => $INC{$_} } grep { ! /\bXS\.pm/ } grep { /^PPI\b/ } keys %INC;
 unless ( %tests ) {
-	Test::More::plan( tests => 2 );
+	Test::More::plan( tests => 1 + ($ENV{AUTHOR_TESTING} ? 1 : 0) );
 	ok( undef, "Failed to find any files to test" );
 	exit();
 }
@@ -42,12 +37,12 @@ my @files = sort values %tests;
 
 # Find all the testable perl files in t/data
 foreach my $dir ( '05_lexer', '08_regression', '11_util', '13_data', '15_transform' ) {
-	my @perl = find_files( $dir );
+	my @perl = find_files( catdir('t', 'data', $dir) );
 	push @files, @perl;
 }
 
 # Declare our plan
-Test::More::plan( tests => scalar(@files) * 14 + 4 );
+Test::More::plan( tests => scalar(@files) * 14 + 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0) );
 
 
 
@@ -84,7 +79,7 @@ is_deeply( $bad, [ 'Bad::Class1', 'Bad::Class2', 'Bad::Class3', 'Bad::Class4' ],
 foreach my $file ( @files ) {
 	# MD5 the raw file
 	my $md5a = PPI::Util::md5hex_file($file);
-	like( $md5a, qr/^[0-9a-f]{32}\z/, 'md5hex_file ok' );
+	like( $md5a, qr/^[[:xdigit:]]{32}\z/, 'md5hex_file ok' );
 
 	# Load the file
 	my $Document = PPI::Document->new($file);
@@ -132,21 +127,6 @@ foreach my $file ( @files ) {
 
 #####################################################################
 # Test Functions
-
-# Find file names in named t/data dirs
-sub find_files {
-	my $dir  = shift;
-	my $testdir = catdir( 't', 'data', $dir );
-	
-	# Does the test directory exist?
-	-e $testdir and -d $testdir and -r $testdir or die "Failed to find test directory $testdir";
-	
-	# Find the .code test files
-	opendir( TESTDIR, $testdir ) or die "opendir: $!";
-	my @perl = map { catfile( $testdir, $_ ) } sort grep { /\.(?:code|pm)$/ } readdir(TESTDIR);
-	closedir( TESTDIR ) or die "closedir: $!";
-	return @perl;
-}
 
 # Check for accidental use of illegal or non-existant classes in
 # ->isa calls. This has happened at least once, presumably because

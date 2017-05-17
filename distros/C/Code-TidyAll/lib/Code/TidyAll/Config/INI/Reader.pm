@@ -5,7 +5,7 @@ use warnings;
 
 use base qw(Config::INI::Reader);
 
-our $VERSION = '0.58';
+our $VERSION = '0.59';
 
 my %multi_value = map { $_ => 1 } qw( ignore select shebang );
 
@@ -18,7 +18,7 @@ sub set_value {
         return;
     }
 
-    die "cannot list multiple config values for '$name'"
+    die qq{cannot list multiple config values for '$name'}
         if exists $self->{data}{ $self->current_section }{$name};
 
     $self->{data}{ $self->current_section }{$name} = $value;

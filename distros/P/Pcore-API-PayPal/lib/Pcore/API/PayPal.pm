@@ -1,4 +1,4 @@
-package Pcore::API::PayPal v0.1.2;
+package Pcore::API::PayPal v0.1.3;
 
 use Pcore -dist, -class, -result, -const;
 use Pcore::Util::Data qw[from_json to_json to_b64];
@@ -29,8 +29,6 @@ sub _get_access_token ( $self, $cb ) {
         body      => 'grant_type=client_credentials',
         on_finish => sub ($res) {
             $self->{_access_token} = from_json $res->body;
-
-            warn dump [ scalar $res, $self->{_access_token} ];
 
             $self->{_access_token}->{expires} = time + $self->{_access_token}->{expires_in} - 5;
 
@@ -142,7 +140,7 @@ sub exec_payment ( $self, $payment_id, $payer_id, $cb ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 93                   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 91                   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -3,7 +3,10 @@ use warnings;
 use strict;
 use Carp;
 
+our $VERSION = '0.001';
+
 use Cwd qw/cwd abs_path/;
+use Test::Smoke::Util qw/whereis/;
 
 =head1 NAME
 
@@ -195,6 +198,52 @@ sub version_from_patchlevel_h {
 
     require Test::Smoke::Util;
     return Test::Smoke::Util::version_from_patchelevel( $self->{ddir} );
+}
+
+=head2 is_git_dir()
+
+Checks, in a git way, if we are in a real git repository directory.
+
+=cut
+
+sub is_git_dir {
+    my $self = shift;
+
+    my $gitbin = whereis('git');
+    if (!$gitbin) {
+        $self->log_debug("Could not find a git-binary to run for 'is_git_dir'");
+        return 0;
+    }
+    $self->log_debug("Found '$gitbin' for 'is_git_dir'");
+
+    my $git = Test::Smoke::Util::Execute->new(
+        command => $gitbin,
+        verbose => $self->verbose,
+    );
+    my $out = $git->run(
+        'rev-parse' => '--is-inside-work-tree',
+        '2>&1'
+    );
+    $self->log_debug("git rev-parse --is-inside-work-tree: " . $out);
+    return $out eq 'true' ? 1 : 0;
+}
+
+=head2 make_dot_patch
+
+If this is a git repo, run the C<< Porting/make_dot_patch.pl >> to generate the
+.patch file
+
+=cut
+
+sub make_dot_patch {
+    my $self = shift;
+
+    my $mk_dot_patch = Test::Smoke::Util::Execute->new(
+        command => "$^X Porting/make_dot_patch.pl > .patch",
+        verbose => $self->verbose,
+    );
+    my $perlout = $mk_dot_patch->run();
+    $self->log_debug($perlout);
 }
 
 =head2 $syncer->clean_from_directory( $source_dir[, @leave_these] )

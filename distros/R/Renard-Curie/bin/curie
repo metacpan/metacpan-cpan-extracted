@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!perl
 # PODNAME: curie: a document reader
 
 use strict;
@@ -46,7 +46,7 @@ use lib "$FindBin::Bin/../lib";
 use Renard::Curie::Setup;
 use Renard::Curie::App;
 
-Renard::Curie::App::main;
+Renard::Curie::App->main;
 
 __END__
 
@@ -60,7 +60,7 @@ curie: a document reader
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 AUTHOR
 

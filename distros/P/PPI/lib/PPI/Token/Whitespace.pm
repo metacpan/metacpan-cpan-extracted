@@ -47,7 +47,7 @@ use PPI::Token ();
 
 use vars qw{$VERSION @ISA};
 BEGIN {
-	$VERSION = '1.220';
+	$VERSION = '1.224';
 	@ISA     = 'PPI::Token';
 }
 
@@ -203,7 +203,8 @@ sub __TOKENIZER__on_line_start {
 
 sub __TOKENIZER__on_char {
 	my $t    = $_[1];
-	my $char = ord substr $t->{line}, $t->{line_cursor}, 1;
+	my $c = substr $t->{line}, $t->{line_cursor}, 1;
+	my $char = ord $c;
 
 	# Do we definitely know what something is?
 	return $COMMITMAP[$char]->__TOKENIZER__commit($t) if $COMMITMAP[$char];
@@ -222,38 +223,43 @@ sub __TOKENIZER__on_char {
 		# 3. The one before that is a 'structure'
 
 		# Get the three previous significant tokens
-		my $tokens = $t->_previous_significant_tokens(3);
-		if ( $tokens ) {
-			# A normal subroutine declaration
-			my $p1 = $tokens->[1];
-			my $p2 = $tokens->[2];
-			if (
-				$tokens->[0]->isa('PPI::Token::Word')
-				and
-				$p1->isa('PPI::Token::Word')
-				and
-				$p1->content eq 'sub'
-				and (
-					$p2->isa('PPI::Token::Structure')
-					or (
-						$p2->isa('PPI::Token::Whitespace')
-						and
-						$p2->content eq ''
-					)
-				)
-			) {
-				# This is a sub prototype
-				return 'Prototype';
-			}
+		my @tokens = $t->_previous_significant_tokens(3);
 
-			# An prototyped anonymous subroutine
-			my $p0 = $tokens->[0];
-			if ( $p0->isa('PPI::Token::Word') and $p0->content eq 'sub'
-				# Maybe it's invoking a method named 'sub'
-				and not ( $p1 and $p1->isa('PPI::Token::Operator') and $p1->content eq '->')
-			) {
-				return 'Prototype';
-			}
+		# A normal subroutine declaration
+		my $p1 = $tokens[1];
+		my $p2 = $tokens[2];
+		if (
+			$tokens[0]
+			and
+			$tokens[0]->isa('PPI::Token::Word')
+			and
+			$p1
+			and
+			$p1->isa('PPI::Token::Word')
+			and
+			$p1->content eq 'sub'
+			and (
+				not $p2
+				or
+				$p2->isa('PPI::Token::Structure')
+				or (
+					$p2->isa('PPI::Token::Whitespace')
+					and
+					$p2->content eq ''
+				)
+			)
+		) {
+			# This is a sub prototype
+			return 'Prototype';
+		}
+
+		# A prototyped anonymous subroutine
+		my $p0 = $tokens[0];
+		if ( $p0 and $p0->isa('PPI::Token::Word') and $p0->content eq 'sub'
+			# Maybe it's invoking a method named 'sub'
+			and not ( $p1 and $p1->isa('PPI::Token::Operator') and $p1->content eq '->')
+		) {
+			return 'Prototype';
 		}
 
 		# This is a normal open bracket
@@ -271,16 +277,18 @@ sub __TOKENIZER__on_char {
 		# $foo < $bar
 		# 1 < $bar
 		# $#foo < $bar
-		return 'Operator' if $prev->isa('PPI::Token::Symbol');
-		return 'Operator' if $prev->isa('PPI::Token::Magic');
-		return 'Operator' if $prev->isa('PPI::Token::Number');
-		return 'Operator' if $prev->isa('PPI::Token::ArrayIndex');
+		return 'Operator' if $prev and $prev->isa('PPI::Token::Symbol');
+		return 'Operator' if $prev and $prev->isa('PPI::Token::Magic');
+		return 'Operator' if $prev and $prev->isa('PPI::Token::Number');
+		return 'Operator' if $prev and $prev->isa('PPI::Token::ArrayIndex');
 
 		# If it is <<... it's a here-doc instead
 		my $next_char = substr( $t->{line}, $t->{line_cursor} + 1, 1 );
 		if ( $next_char eq '<' ) {
 			return 'Operator';
 		}
+
+		return 'Operator' if not $prev;
 
 		# The most common group of readlines are used like
 		# while ( <...> )
@@ -322,6 +330,10 @@ sub __TOKENIZER__on_char {
 		# Do some context stuff to guess ( ack ) which.
 		# Hopefully the guess will be good enough.
 		my $prev = $t->_last_significant_token;
+
+		# Or as the very first thing in a file
+		return 'Regexp::Match' if not $prev;
+
 		my $prec = $prev->content;
 
 		# Most times following an operator, we are a regex.
@@ -364,11 +376,8 @@ sub __TOKENIZER__on_char {
 			return 'Regexp::Match';
 		}
 
-		# Or as the very first thing in a file
-		return 'Regexp::Match' if $prec eq '';
-
 		# What about the char after the slash? There's some things
-		# that would be highly illogical to see if its an operator.
+		# that would be highly illogical to see if it's an operator.
 		my $next_char = substr $t->{line}, $t->{line_cursor} + 1, 1;
 		if ( defined $next_char and length $next_char ) {
 			if ( $next_char =~ /(?:\^|\[|\\)/ ) {
@@ -381,19 +390,30 @@ sub __TOKENIZER__on_char {
 		return 'Operator';
 
 	} elsif ( $char == 120 ) { # $char eq 'x'
-		# x followed immediately by a digit can be the x
-		# operator or a word.  Disambiguate by checking
-		# whether the previous token is an operator that cannot be
-		# followed by the x operator, e.g.: +.
-		#
-		# x followed immediately by '=' is the 'x=' operator, not
-		# 'x ='. An important exception is x followed immediately by
-		# '=>', which makes the x into a bareword.
-		pos $t->{line} = $t->{line_cursor} + 1;
-		return 'Operator'
-			if $t->_current_x_is_operator and $t->{line} =~ m/\G(?:\d|(?!(=>|[\w\s])))/gc;
+		# Could be a word, the x= operator, the x operator
+		# followed by whitespace, or the x operator without any
+		# space between itself and its operand, e.g.: '$a x3',
+		# which is the same as '$a x 3'.  _current_x_is_operator
+		# assumes we have a complete 'x' token, but we don't
+		# yet.  We may need to split this x character apart from
+		# what follows it.
+		if ( $t->_current_x_is_operator ) {
+			pos $t->{line} = $t->{line_cursor} + 1;
+			return 'Operator' if $t->{line} =~ m/\G(?:
+				\d  # x op with no whitespace e.g. 'x3'
+				|
+				(?!(  # negative lookahead
+					=>  # not on left of fat comma
+					|
+					\w  # not a word like "xyzzy"
+					|
+					\s  # not x op plus whitespace
+				))
+			)/gcx;
+		}
 
-		# Otherwise, commit like a normal bareword
+		# Otherwise, commit like a normal bareword, including x
+		# operator followed by whitespace.
 		return PPI::Token::Word->__TOKENIZER__commit($t);
 
 	} elsif ( $char == 45 ) { # $char eq '-'
@@ -407,9 +427,9 @@ sub __TOKENIZER__on_char {
 		}
 
 	} elsif ( $char >= 128 ) { # Outside ASCII
-		return 'PPI::Token::Word'->__TOKENIZER__commit($t) if $t =~ /\w/;
-		return 'Whitespace' if $t =~ /\s/;
-        }
+		return 'PPI::Token::Word'->__TOKENIZER__commit($t) if $c =~ /\w/;
+		return 'Whitespace' if $c =~ /\s/;
+	}
 
 
 	# All the whitespaces are covered, so what to do

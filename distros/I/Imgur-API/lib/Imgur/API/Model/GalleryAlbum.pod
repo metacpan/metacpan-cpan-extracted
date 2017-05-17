@@ -1,0 +1,481 @@
+=head1 NAME
+
+Imgur::API::Model::GalleryAlbum
+
+=head1 DESCRIPTION
+
+=over 4
+
+The data model formatted for gallery albums.
+
+=back
+
+=cut
+
+=head1 FIELDS
+ 
+=item 
+C<id I<string>>
+
+=over 4
+
+The ID for the image
+
+=back
+
+
+=item 
+C<title I<string>>
+
+=over 4
+
+The title of the album in the gallery
+
+=back
+
+
+=item 
+C<description I<string>>
+
+=over 4
+
+The description of the album in the gallery
+
+=back
+
+
+=item 
+C<datetime I<integer>>
+
+=over 4
+
+Time inserted into the gallery, epoch time
+
+=back
+
+
+=item 
+C<cover I<string>>
+
+=over 4
+
+The ID of the album cover image
+
+=back
+
+
+=item 
+C<cover_width I<integer>>
+
+=over 4
+
+The width, in pixels, of the album cover image
+
+=back
+
+
+=item 
+C<cover_height I<integer>>
+
+=over 4
+
+The height, in pixels, of the album cover image
+
+=back
+
+
+=item 
+C<account_url I<string>>
+
+=over 4
+
+The account username or null if it's anonymous.
+
+=back
+
+
+=item 
+C<account_id I<integer>>
+
+=over 4
+
+The account ID of the account that uploaded it, or null.
+
+=back
+
+
+=item 
+C<privacy I<string>>
+
+=over 4
+
+The privacy level of the album, you can only view public if not logged in as album owner
+
+=back
+
+
+=item 
+C<layout I<string>>
+
+=over 4
+
+The view layout of the album.
+
+=back
+
+
+=item 
+C<views I<integer>>
+
+=over 4
+
+The number of image views
+
+=back
+
+
+=item 
+C<link I<string>>
+
+=over 4
+
+The URL link to the album
+
+=back
+
+
+=item 
+C<ups I<integer>>
+
+=over 4
+
+Upvotes for the image
+
+=back
+
+
+=item 
+C<downs I<integer>>
+
+=over 4
+
+Number of downvotes for the image
+
+=back
+
+
+=item 
+C<points I<integer>>
+
+=over 4
+
+Upvotes minus downvotes
+
+=back
+
+
+=item 
+C<score I<integer>>
+
+=over 4
+
+Imgur popularity score
+
+=back
+
+
+=item 
+C<is_album I<boolean>>
+
+=over 4
+
+if it's an album or not
+
+=back
+
+
+=item 
+C<vote I<string>>
+
+=over 4
+
+The current user's vote on the album. null if not signed in or if the user hasn't voted on it.
+
+=back
+
+
+=item 
+C<favorite I<boolean>>
+
+=over 4
+
+Indicates if the current user favorited the album. Defaults to false if not signed in.
+
+=back
+
+
+=item 
+C<nsfw I<boolean>>
+
+=over 4
+
+Indicates if the album has been marked as nsfw or not. Defaults to null if information is not available.
+
+=back
+
+
+=item 
+C<comment_count I<int>>
+
+=over 4
+
+Number of comments on the gallery album.
+
+=back
+
+
+=item 
+C<topic I<string>>
+
+=over 4
+
+Topic of the gallery album.
+
+=back
+
+
+=item 
+C<topic_id I<integer>>
+
+=over 4
+
+Topic ID of the gallery album.
+
+=back
+
+
+=item 
+C<images_count I<integer>>
+
+=over 4
+
+The total number of images in the album
+
+=back
+
+
+=item 
+C<images I<Array of Images>>
+
+=over 4
+
+An array of all the images in the album (only available when requesting the direct album)
+
+=back
+
+
+=item 
+C<in_most_viral I<boolean>>
+
+=over 4
+
+Indicates if the album is in the most viral gallery or not.
+
+=back
+
+
+
+=head1 EXAMPLE
+
+
+ {
+   "success" : true,
+   "status" : 200,
+   "data" : {
+      "ups" : 1602,
+      "account_url" : "Alan",
+      "privacy" : "public",
+      "comment_count" : 10,
+      "title" : "Imgur Office",
+      "images_count" : 11,
+      "points" : 1588,
+      "downs" : 14,
+      "id" : "lDRB2",
+      "description" : null,
+      "images" : [
+         {
+            "animated" : false,
+            "height" : 1944,
+            "width" : 2592,
+            "views" : 135772,
+            "type" : "image/jpeg",
+            "datetime" : 1357856352,
+            "link" : "http://i.imgur.com/24nLu.jpg",
+            "title" : null,
+            "size" : 855658,
+            "bandwidth" : 116174397976,
+            "description" : null,
+            "id" : "24nLu"
+         },
+         {
+            "views" : 135493,
+            "width" : 2592,
+            "height" : 1944,
+            "animated" : false,
+            "size" : 919391,
+            "title" : null,
+            "link" : "http://i.imgur.com/Ziz25.jpg",
+            "datetime" : 1357856394,
+            "type" : "image/jpeg",
+            "id" : "Ziz25",
+            "description" : null,
+            "bandwidth" : 124571044763
+         },
+         {
+            "bandwidth" : 88470046764,
+            "id" : "9tzW6",
+            "description" : null,
+            "title" : null,
+            "size" : 655028,
+            "datetime" : 1357856385,
+            "type" : "image/jpeg",
+            "link" : "http://i.imgur.com/9tzW6.jpg",
+            "width" : 2592,
+            "height" : 1944,
+            "views" : 135063,
+            "animated" : false
+         },
+         {
+            "views" : 134704,
+            "width" : 2592,
+            "height" : 1944,
+            "animated" : false,
+            "size" : 812738,
+            "title" : null,
+            "link" : "http://i.imgur.com/dFg5u.jpg",
+            "datetime" : 1357856378,
+            "type" : "image/jpeg",
+            "description" : null,
+            "id" : "dFg5u",
+            "bandwidth" : 109479059552
+         },
+         {
+            "bandwidth" : 23627217912,
+            "description" : null,
+            "id" : "oknLx",
+            "width" : 1749,
+            "height" : 2332,
+            "views" : 32938,
+            "animated" : false,
+            "title" : null,
+            "size" : 717324,
+            "datetime" : 1357856338,
+            "type" : "image/jpeg",
+            "link" : "http://i.imgur.com/oknLx.jpg"
+         },
+         {
+            "views" : 32346,
+            "width" : 2592,
+            "height" : 1944,
+            "animated" : false,
+            "size" : 1443262,
+            "title" : null,
+            "link" : "http://i.imgur.com/OL6tC.jpg",
+            "datetime" : 1357856321,
+            "type" : "image/jpeg",
+            "description" : null,
+            "id" : "OL6tC",
+            "bandwidth" : 46683752652
+         },
+         {
+            "description" : null,
+            "id" : "cJ9cm",
+            "bandwidth" : 17337319958,
+            "views" : 31829,
+            "width" : 2592,
+            "height" : 1944,
+            "animated" : false,
+            "size" : 544702,
+            "title" : null,
+            "link" : "http://i.imgur.com/cJ9cm.jpg",
+            "type" : "image/jpeg",
+            "datetime" : 1357856330
+         },
+         {
+            "width" : 2592,
+            "height" : 1944,
+            "views" : 31257,
+            "animated" : false,
+            "title" : null,
+            "size" : 844863,
+            "datetime" : 1357856369,
+            "type" : "image/jpeg",
+            "link" : "http://i.imgur.com/7BtPN.jpg",
+            "bandwidth" : 26407882791,
+            "description" : null,
+            "id" : "7BtPN"
+         },
+         {
+            "description" : null,
+            "id" : "42ib8",
+            "bandwidth" : 28007483985,
+            "animated" : false,
+            "views" : 30945,
+            "height" : 1944,
+            "width" : 2592,
+            "link" : "http://i.imgur.com/42ib8.jpg",
+            "datetime" : 1357856424,
+            "type" : "image/jpeg",
+            "size" : 905073,
+            "title" : null
+         },
+         {
+            "height" : 2332,
+            "width" : 1749,
+            "views" : 30107,
+            "animated" : false,
+            "title" : null,
+            "size" : 662413,
+            "type" : "image/jpeg",
+            "datetime" : 1357856360,
+            "link" : "http://i.imgur.com/BbwIx.jpg",
+            "bandwidth" : 19943268191,
+            "description" : null,
+            "id" : "BbwIx"
+         },
+         {
+            "animated" : false,
+            "views" : 29259,
+            "width" : 1944,
+            "height" : 2592,
+            "link" : "http://i.imgur.com/x7b91.jpg",
+            "datetime" : 1357856406,
+            "type" : "image/jpeg",
+            "size" : 618567,
+            "title" : null,
+            "id" : "x7b91",
+            "description" : null,
+            "bandwidth" : 18098651853
+         }
+      ],
+      "vote" : null,
+      "views" : 13780,
+      "cover" : "24nLu",
+      "link" : "http://alanbox.imgur.com/a/lDRB2",
+      "is_album" : true,
+      "datetime" : 1357856292,
+      "layout" : "blog",
+      "score" : 1917,
+      "account_id" : 4
+   }
+}
+
+
+
+=cut
+
+=head1 SEE ALSO
+
+http://api.imgur.com/models/galleryalbum
+
+

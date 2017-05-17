@@ -5,9 +5,8 @@ use Test::More ;
 use Config::Model;
 use Log::Log4perl qw(:easy) ;
 use Data::Dumper ;
-use File::Path ;
-use File::Copy ;
-use File::Find ;
+use Path::Tiny;
+
 use Config::Model::Itself ;
 use File::Copy::Recursive qw(fcopy rcopy dircopy);
 use Test::Memory::Cycle;
@@ -36,48 +35,43 @@ else {
 
 Config::Model::Exception::Any->Trace(1) if $arg =~ /e/;
 
-my $wr_test = 'wr_test' ;
-my $wr_conf1 = "$wr_test/wr_conf1";
-my $wr_model1 = "$wr_test/wr_model1";
-my $wr_model2 = "$wr_test/wr_model2";
+# do search for the models created in this test
+use lib "wr_test/lib";
 
-sub wr_cds {
-    my ($file,$cds) = @_ ;
-    open(CDS,"> $file") || die "can't open $file:$!" ;
-    print CDS $cds ;
-    close CDS ;
-}
+my $wr_test = path('wr_test') ;
+my $wr_conf1 = $wr_test->child("wr_conf1");
+my $wr_lib = $wr_test->child("lib");
+my $wr_model1 = $wr_lib->child("wr_model1");
+my $wr_model2 = $wr_lib->child("wr_model2");
 
-my $meta_model = Config::Model -> new ( ) ;# model_dir => '.' );
+my $meta_model = Config::Model -> new ( ) ;
 
 Config::Model::Exception::Any->Trace(1) if $arg =~ /e/;
 
 ok(1,"compiled");
 
-rmtree($wr_test) if -d $wr_test ;
+$wr_test->remove_tree if $wr_test->is_dir ;
 
-# "modern" API of File::Path does not work with perl 5.8.8
-mkpath( [$wr_conf1, $wr_model1, $wr_model2, "$wr_conf1/etc/ssh/"] , 0, 0755) ;
-dircopy('data',$wr_model1) || die "cannot copy model data:$!" ;
+$wr_conf1->mkpath;
+$wr_model1->mkpath;
+$wr_model2->mkpath;
+$wr_conf1->child("etc/ssh")->mkpath;
 
 # copy test model
-my $wanted = sub { 
-    return if /svn|data$|~$/ ;
-    s!data/!! ;
-    -d $File::Find::name && mkpath( ["$wr_model1/$_"], 0, 0755) ;
-    -f $File::Find::name && copy($File::Find::name,"$wr_model1/$_") ;
-};
-find ({ wanted =>$wanted, no_chdir=>1} ,'data') ;
+dircopy('data',$wr_model1->stringify) || die "cannot copy model data:$!" ;
 
-
-my $model = Config::Model->new(legacy => 'ignore',model_dir => 'data/models' ) ;
+my $model = Config::Model->new(
+    legacy => 'ignore',
+    model_dir => $wr_model1->child("models")->relative($wr_lib)->stringify
+) ;
 ok(1,"loaded Master model") ;
 
 # check that Master Model can be loaded by Config::Model
-my $inst1 = $model->instance (root_class_name   => 'MasterModel', 
-                              instance_name     => 'test_orig',
-                              root_dir          => $wr_conf1,
-                             );
+my $inst1 = $model->instance (
+    root_class_name   => 'MasterModel',
+    instance_name     => 'test_orig',
+    root_dir          => $wr_conf1->stringify,
+);
 ok($inst1,"created master_model instance") ;
 
 my $root1 = $inst1->config_root ;
@@ -94,26 +88,24 @@ ok($dump1,"dumped master instance") ;
 
 # ok now we can load test model in Itself
 
-my $meta_inst = $meta_model
-  -> instance (root_class_name   => 'Itself::Model', 
-               instance_name     => 'itself_instance',
-               root_dir          => $wr_model1,
-              );
+my $meta_inst = $meta_model -> instance (
+    root_class_name   => 'Itself::Model', 
+    instance_name     => 'itself_instance',
+    root_dir          => $wr_model1->stringify,
+);
 ok($meta_inst,"Read Itself::Model and created instance") ;
-
-
 
 my $meta_root = $meta_inst -> config_root ;
 
 my $rw_obj = Config::Model::Itself -> new(
     model_object => $meta_root,
-    cm_lib_dir => $wr_model1,
+    cm_lib_dir => $wr_model1->stringify,
 ) ;
 
-my $map = $rw_obj -> read_all( 
-                              root_model => 'MasterModel',
-                              legacy => 'ignore',
-                             ) ;
+my $map = $rw_obj -> read_all(
+    root_model => 'MasterModel',
+    legacy => 'ignore',
+) ;
 
 ok(1,"Read all models in data dir") ;
 
@@ -161,20 +153,9 @@ is_deeply($expected_map, $map, "Check file class map") ;
 print Dumper $map if $trace ;
 
 # add a new class 
-$meta_root->load("class:Master::Created element:created1 type=leaf value_type=number - element:created2 type=leaf value_type=uniline") ;
+$meta_root->load("class:Master::Created element:created1 type=leaf value_type=number"
+                     ." - element:created2 type=leaf value_type=uniline") ;
 ok(1,"added new class Master::Created") ;
-
-if (0) {
-    require Tk;
-    require Config::Model::TkUI ;
-    Tk->import ;
-
-    my $mw = MainWindow-> new ;
-    $mw->withdraw ;
-
-    my $cmu = $mw->ConfigModelUI (-root => $meta_root) ;
-    &MainLoop ; # Tk's
-}
 
 my $cds = $meta_root->dump_tree (full_dump => 1) ;
 my @cds_orig = split /\n/,$cds ;
@@ -184,18 +165,20 @@ ok($cds,"dumped full tree in cds format") ;
 
 #like($cds,qr/dumb/,"check for a peculiar warp effet") ;
 
-wr_cds("$wr_conf1/orig.cds",$cds);
+$wr_conf1->child("orig.cds")->spew($cds);
 
 #create a 2nd empty model
-my $meta_inst2 = $meta_model->instance (root_class_name   => 'Itself::Model', 
-                              instance_name     => 'itself_instance', );
+my $meta_inst2 = $meta_model->instance (
+    root_class_name   => 'Itself::Model', 
+    instance_name     => 'itself_instance'
+);
 
 my $meta_root2 = $meta_inst2 -> config_root ;
 $meta_root2 -> load ($cds) ;
 ok(1,"Created and loaded 2nd instance") ;
 
 my $cds2 = $meta_root2 ->dump_tree (full_dump => 1) ;
-wr_cds("$wr_conf1/inst2.cds",$cds2);
+$wr_conf1->child("inst2.cds")->spew($cds2);
 
 is_deeply([split /\n/,$cds2],\@cds_orig,"Compared the 2 full dumps") ; 
 
@@ -204,7 +187,7 @@ print Dumper $pdata2 if $trace ;
 
 my $rw_obj2 = Config::Model::Itself -> new(
     model_object => $meta_root2,
-    cm_lib_dir => $wr_model2,
+    cm_lib_dir => $wr_model2->stringify,
     force_write => 1,
 ) ;
 
@@ -212,15 +195,17 @@ $rw_obj2 -> write_all();
 
 # create 3rd instance 
 
-my $meta_inst3 = $meta_model->instance (root_class_name   => 'Itself::Model', 
-                              instance_name     => 'itself_instance', );
+my $meta_inst3 = $meta_model->instance (
+    root_class_name   => 'Itself::Model',
+    instance_name     => 'itself_instance'
+);
 
 my $meta_root3 = $meta_inst3 -> config_root ;
 $meta_root3 -> load_data ($pdata2) ;
 ok(1,"Created and loaded 3nd instance with perl data") ;
 
 my $cds3 = $meta_root3 ->dump_tree (full_dump => 1) ;
-wr_cds("$wr_conf1/inst3.cds",$cds3);
+$wr_conf1->child("inst3.cds")->spew($cds3);
 
 is_deeply([split /\n/,$cds3],\@cds_orig,"Compared the 3rd full dump with first one") ; 
 
@@ -232,19 +217,16 @@ ok($dump,"Checked dump of one class");
 
 $rw_obj->write_all( ) ;
 
-my $model4 = Config::Model->new(legacy => 'ignore',model_dir => "$wr_model1/models") ;
-#$model4 -> load ('X_base_class', 'wr_test/MasterModel/X_base_class.pl') ;
-#ok(1,"loaded X_base_class") ;
-#$model4 -> load ('MasterModel' , 'wr_test/MasterModel.pl') ;
-#ok(1,"loaded MasterModel") ;
-#$model4 -> load ('MasterModel::Created' , 'wr_test/Master/Created.pl') ;
-#ok(1,"loaded MasterModel::Created") ;
+my $model4 = Config::Model->new(
+    legacy => 'ignore',
+    model_dir => $wr_model1->child("models")->relative($wr_lib)->stringify
+) ;
 
-my $inst4 = $model4->instance (root_class_name   => 'MasterModel', 
-                               instance_name     => 'test_instance',
-                               'root_dir'  => $wr_conf1,
-
-                              );
+my $inst4 = $model4->instance (
+    root_class_name   => 'MasterModel',
+    instance_name     => 'test_instance',
+    root_dir  => $wr_conf1->stringify,
+);
 ok($inst4,"Read MasterModel and created instance") ;
 
 my $root4 = $inst4->config_root ;
@@ -255,6 +237,6 @@ is(scalar @elt4,scalar @elt1,"Check number of elements of root4") ;
 
 # require Tk::ObjScanner; Tk::ObjScanner::scan_object($meta_model) ;
 
-memory_cycle_ok($model);
+memory_cycle_ok($model, "Check memory cycle");
 
 done_testing;

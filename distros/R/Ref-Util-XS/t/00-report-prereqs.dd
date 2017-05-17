@@ -11,6 +11,7 @@ do { my $x = {
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',
                                       'Test::CPAN::Meta' => '0',
+                                      'Test::MinimumVersion' => '0',
                                       'Test::More' => '0.88',
                                       'Test::NoTabs' => '0',
                                       'Test::Pod' => '1.41'
@@ -20,7 +21,7 @@ do { my $x = {
                       'requires' => {
                                       'Exporter' => '5.57',
                                       'XSLoader' => '0',
-                                      'perl' => '5.008'
+                                      'perl' => '5.006'
                                     }
                     },
        'test' => {
@@ -31,7 +32,7 @@ do { my $x = {
                                    'B::Concise' => '0',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'Test::More' => '0'
+                                   'Test::More' => '0.96'
                                  }
                  }
      };

@@ -1,0 +1,280 @@
+=head1 NAME
+
+Imgur::API::Model::Image
+
+=head1 DESCRIPTION
+
+=over 4
+
+The base model for an image.
+
+=back
+
+=cut
+
+=head1 FIELDS
+ 
+=item 
+C<id I<string>>
+
+=over 4
+
+The ID for the image
+
+=back
+
+
+=item 
+C<title I<string>>
+
+=over 4
+
+The title of the image.
+
+=back
+
+
+=item 
+C<description I<string>>
+
+=over 4
+
+Description of the image.
+
+=back
+
+
+=item 
+C<datetime I<integer>>
+
+=over 4
+
+Time uploaded, epoch time
+
+=back
+
+
+=item 
+C<type I<string>>
+
+=over 4
+
+Image MIME type.
+
+=back
+
+
+=item 
+C<animated I<boolean>>
+
+=over 4
+
+is the image animated
+
+=back
+
+
+=item 
+C<width I<integer>>
+
+=over 4
+
+The width of the image in pixels
+
+=back
+
+
+=item 
+C<height I<integer>>
+
+=over 4
+
+The height of the image in pixels
+
+=back
+
+
+=item 
+C<size I<integer>>
+
+=over 4
+
+The size of the image in bytes
+
+=back
+
+
+=item 
+C<views I<integer>>
+
+=over 4
+
+The number of image views
+
+=back
+
+
+=item 
+C<bandwidth I<integer>>
+
+=over 4
+
+Bandwidth consumed by the image in bytes
+
+=back
+
+
+=item 
+C<deletehash I<string>>
+
+=over 4
+
+OPTIONAL, the deletehash, if you're logged in as the image owner
+
+=back
+
+
+=item 
+C<name I<string>>
+
+=over 4
+
+OPTIONAL, the original filename, if you're logged in as the image owner
+
+=back
+
+
+=item 
+C<section I<string>>
+
+=over 4
+
+If the image has been categorized by our backend then this will contain the section the image belongs in. (funny, cats, adviceanimals, wtf, etc)
+
+=back
+
+
+=item 
+C<link I<string>>
+
+=over 4
+
+The direct link to the the image. (Note: if fetching an animated GIF that was over 20MB in original size, a .gif thumbnail will be returned)
+
+=back
+
+
+=item 
+C<gifv I<string>>
+
+=over 4
+
+OPTIONAL, The .gifv link. Only available if the image is animated and type is 'image/gif'.
+
+=back
+
+
+=item 
+C<mp4 I<string>>
+
+=over 4
+
+OPTIONAL, The direct link to the .mp4. Only available if the image is animated and type is 'image/gif'.
+
+=back
+
+
+=item 
+C<mp4_size I<integer>>
+
+=over 4
+
+OPTIONAL, The Content-Length of the .mp4. Only available if the image is animated and type is 'image/gif'. Note that a zero value (0) is possible if the video has not yet been generated
+
+=back
+
+
+=item 
+C<looping I<boolean>>
+
+=over 4
+
+OPTIONAL, Whether the image has a looping animation. Only available if the image is animated and type is 'image/gif'.
+
+=back
+
+
+=item 
+C<favorite I<boolean>>
+
+=over 4
+
+Indicates if the current user favorited the image. Defaults to false if not signed in.
+
+=back
+
+
+=item 
+C<nsfw I<boolean>>
+
+=over 4
+
+Indicates if the image has been marked as nsfw or not. Defaults to null if information is not available.
+
+=back
+
+
+=item 
+C<vote I<string>>
+
+=over 4
+
+The current user's vote on the album. null if not signed in, if the user hasn't voted on it, or if not submitted to the gallery.
+
+=back
+
+
+=item 
+C<in_gallery I<boolean>>
+
+=over 4
+
+True if the image has been submitted to the gallery, false if otherwise.
+
+=back
+
+
+
+=head1 EXAMPLE
+
+
+ {
+   "success" : true,
+   "status" : 200,
+   "data" : {
+      "views" : 1,
+      "width" : 2559,
+      "height" : 1439,
+      "animated" : false,
+      "size" : 521916,
+      "title" : null,
+      "link" : "http://i.imgur.com/SbBGk.jpg",
+      "datetime" : 1341533193,
+      "type" : "image/jpeg",
+      "id" : "SbBGk",
+      "section" : null,
+      "description" : null,
+      "bandwidth" : 521916,
+      "deletehash" : "eYZd3NNJHsbreD1"
+   }
+}
+
+
+
+=cut
+
+=head1 SEE ALSO
+
+http://api.imgur.com/models/image
+
+

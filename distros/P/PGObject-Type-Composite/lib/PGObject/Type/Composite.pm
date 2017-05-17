@@ -1,7 +1,8 @@
 package PGObject::Type::Composite;
 
-use 5.008;
+use 5.010;
 use Scalar::Util;
+use PGObject;
 use PGObject::Util::Catalog::Types qw(get_attributes);
 use PGObject::Util::PseudoCSV;
 use Carp;
@@ -12,11 +13,11 @@ PGObject::Type::Composite - Composite Type handler for PGObject
 
 =head1 VERSION
 
-Version 0.04
+Version 1
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = 1.000000;
 
 
 =head1 SYNOPSIS
@@ -86,15 +87,28 @@ sub import {
     my $from_db = sub {
         my ($to_pkg, $string) = @_;
         my $hashref = pcsv2hash($string, map { $_->{attname}} @cols);
-        $hashref = {
-             map { $_->{attname} => PGObject::process_type(
+	if ($PGObject::VERSION =~ /^1./){
+            $hashref = {
+                 map { $_->{attname} => PGObject::process_type(
                                       $hashref->{$_->{attname}}, 
                                       $_->{atttype},
                                       (eval {$to_pkg->can('_get_registry')} ?
                                             "$to_pkg"->_get_registry        :
                                             'default'))
                   } @cols
-        };
+            };
+        } else {
+            $hashref = {
+                 map { $_->{attname} => PGObject::Type::Registry->deserialize(
+                                      dbstring => $hashref->{$_->{attname}}, 
+                                      dbtype => $_->{atttype},
+                                      registry =>
+                                      (eval {$to_pkg->can('_get_registry')} ?
+                                            "$to_pkg"->_get_registry        :
+                                            'default'))
+                  } @cols
+            };
+        }
         if ($can_has){ # moo/moose
            return "$pkg"->new(%$hashref);
         } else {
@@ -104,7 +118,7 @@ sub import {
 
     my $to_db = sub {
         my ($self) = @_;
-        my $hashref = { map { 
+            my $hashref = { map { 
                             my $att = $_->{attname};
                             my $val = eval { $self->$att } || $self->{$att};
                             $att => $val;
@@ -123,16 +137,24 @@ sub import {
         my $registry = $args{registry};
         $registry ||= 'default';
         my $types = $args{types};
-        croak 'Must supply types as a hashref'
+        croak 'Must supply types as arrayref'
            unless defined $types and @$types;
         for my $type (@$types){
-            my $ret =
-                PGObject->register_type(registry => $registry, 
-                                         pg_type => $type,
-                                      perl_class => "$self");
-            return $ret unless $ret;
-        }
+            if ($PGObject::VERSION =~ /^1./){
+                my $ret =
+                    PGObject->register_type(registry => $registry, 
+                                             pg_type => $type,
+                                          perl_class => "$self");
+                return $ret unless $ret;
+            } else {
+                my $ret =
+                    PGObject::Type::Registry->register_type(
+                                            registry => $registry,
+                                              dbtype => $type,
+                                             apptype => "$self");
+            }
         return 1;
+        }
     };
     my $_get_cols = sub {
         return @cols;

@@ -23,12 +23,17 @@
          "requires" : {
             "App::ModuleBuildTiny" : "0.018"
          }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "7.0"
+         }
       }
    },
    "provides" : {
       "Mojo::TypeModel" : {
          "file" : "lib/Mojo/TypeModel.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Mojolicious::Plugin::TypeModel" : {
          "file" : "lib/Mojolicious/Plugin/TypeModel.pm"
@@ -46,6 +51,6 @@
          "url" : "http://github.com/jberger/Mojo-TypeModel"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

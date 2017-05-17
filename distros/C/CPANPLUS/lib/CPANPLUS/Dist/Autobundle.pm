@@ -6,7 +6,7 @@ use CPANPLUS::Error             qw[error msg];
 use Params::Check               qw[check];
 use Locale::Maketext::Simple    Class => 'CPANPLUS', Style => 'gettext';
 use vars qw[$VERSION];
-$VERSION = "0.9166";
+$VERSION = "0.9168";
 
 use base qw[CPANPLUS::Dist::Base];
 
@@ -33,7 +33,7 @@ sub init {
     my $status  = $dist->status;
 
     $status->mk_accessors(
-        qw[prepared created installed _prepare_args _create_args _install_args]
+        qw[prepared created installed _prepare_args _create_args _install_args _metadata]
     );
 
     return 1;

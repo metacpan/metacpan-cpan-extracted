@@ -1,0 +1,62 @@
+#!/usr/bin/env perl
+
+use strict;
+use feature qw(say);
+use lib("./lib");
+
+use Getopt::Long;
+use File::Copy qw(copy);
+use Makefile::Parser;
+use DhMakePerl;
+use Try::Tiny;
+
+#my $conf = DhMakePerl::Config->new({build=>'1',vcs=>"none"});
+#$conf->command('make');
+#$conf->{vcs} = 'none';
+#DhMakePerl->run(cfg=>$conf);
+
+if (!-f "Makefile") {
+    die "No Makefile found. FAIL.";
+}
+if (!`which dpkg`) {
+    die "dpkg is not installed."
+}
+
+open(STDERR,">","perl2deb.log");
+
+
+my $mp = Makefile::Parser->new();
+$mp->parse("Makefile");
+my $distname = lc($mp->var("DISTNAME"));
+my $version = $mp->var("VERSION");
+my $arch = `dpkg --print-architecture`;
+chomp($arch);
+my $debname = "lib$distname-perl_$version-1_$arch.deb";
+
+try {
+	my $conf = DhMakePerl::Config->new({build=>'1',vcs=>"none"});
+	$conf->command('make');
+	$conf->{vcs} = 'none';
+	DhMakePerl->run(cfg=>$conf);
+} catch {
+	fatal(join(" ",@_));
+};
+close(STDERR);
+
+if (!-f "../$debname") {
+	fatal("Well, something has gone wrong.");
+}
+
+copy("../$debname","./$debname");
+unlink("../$debname");
+unlink("perl2deb.log");
+
+sub fatal {
+	my ($cause) = shift;
+	
+	say $cause;
+	say "check perl2deb.log for more details.";
+	exit -1;
+}
+
+

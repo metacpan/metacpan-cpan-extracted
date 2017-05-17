@@ -1,0 +1,73 @@
+#!/usr/bin/env perl
+
+use strict;
+use feature qw(say);
+use lib("./lib");
+
+use Getopt::Long;
+use File::Copy qw(copy);
+use Makefile::Parser;
+use MakeRPM;
+use Try::Tiny;
+
+my $arch = `arch`;
+chomp($arch);
+if (!-f "Makefile") {
+	die "No Makefile found. FAIL.";
+}
+if (!`which rpmbuild`) {
+	die "rpmbuild is not installed."
+}
+
+if (!-d "$ENV{HOME}/rpmbuild") {
+	say "Creating rpmbuild directories....";
+	mkdir("$ENV{HOME}/rpmbuild");
+	foreach my $dir (qw(BUILD BUILDROOT RPMS SOURCES SPECS SRPMS)) {
+		mkdir("$ENV{HOME}/rpmbuild/$dir");
+	}
+}
+
+open(STDERR,">","perl2rpm.log");
+
+
+my $mp = Makefile::Parser->new();
+$mp->parse("Makefile");
+my $distname = $mp->var("DISTVNAME");
+
+
+my $tarfile = "$distname.tar.gz";
+my $rpmfile = "perl-$distname-1.$arch.rpm";
+my $specfile = "$distname.3.spec";
+
+if (!-f $tarfile) {
+	my $ret = system("make dist >> perl2rpm.log 2>&1");
+	if ($ret!=0 || !-f $tarfile) {
+		fatal("Unable to make distfile.");
+	}
+}
+copy($tarfile,"$ENV{HOME}/rpmbuild/SOURCES/$tarfile");
+
+my $specfile = MakeRPM->go(specs=>1,source=>$tarfile,mode=>"RPM");
+
+if (-f $specfile) {
+	my $ret = system("rpmbuild -ba $specfile >> perl2rpm.log 2>&1");
+	if ($ret!=0) {
+		fatal("rpmbuild barfed");
+	}
+	copy("$ENV{HOME}/rpmbuild/RPMS/$arch/$rpmfile",$rpmfile);
+	if (!-f $rpmfile) {
+		fatal("$rpmfile not where it is supposed to be.");
+	}
+}
+close(STDERR);
+unlink("perl2rpm.log");
+
+sub fatal {
+	my ($cause) = shift;
+	
+	say $cause;
+	say "check perl2rpm.log for more details.";
+	exit -1;
+}
+
+

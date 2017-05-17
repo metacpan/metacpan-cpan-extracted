@@ -8,6 +8,8 @@ blib/
 cover_db
 MYMETA.*
 jar/
+Apache-Tika-Async-*
+Apache-Tika-Async-*/
 # Don't store the test files
 *.pdf
 *.zip

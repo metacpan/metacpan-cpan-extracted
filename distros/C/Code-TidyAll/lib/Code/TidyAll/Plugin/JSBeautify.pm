@@ -10,7 +10,7 @@ use Moo;
 
 extends 'Code::TidyAll::Plugin';
 
-our $VERSION = '0.58';
+our $VERSION = '0.59';
 
 sub _build_cmd {'js-beautify'}
 
@@ -18,7 +18,7 @@ sub transform_file {
     my ( $self, $file ) = @_;
 
     try {
-        my $cmd = join( " ", $self->cmd, $self->argv, $file );
+        my $cmd = join( ' ', $self->cmd, $self->argv, $file );
 
         my $output;
         my $exit = run3( $cmd, \undef, \$output, \$output );
@@ -49,7 +49,7 @@ Code::TidyAll::Plugin::JSBeautify - Use js-beautify with tidyall
 
 =head1 VERSION
 
-version 0.58
+version 0.59
 
 =head1 SYNOPSIS
 

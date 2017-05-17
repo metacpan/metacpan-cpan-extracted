@@ -4,7 +4,7 @@ Provides a geocoding functionality using http:://geocoder.ca for both Canada and
 
 # VERSION
 
-Version 0.02
+Version 0.03
 
 # SYNOPSIS
 
@@ -62,6 +62,10 @@ This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 Lots of thanks to the folks at geocoder.ca.
+
+# BUGS
+
+Should be called Geo::Coder::NA for North America.
 
 # SEE ALSO
 

@@ -703,7 +703,7 @@ public:
     }
 
     template <class Alloc2>
-    size_type find_last_of (const basic_string<CharT, Traits, Alloc2>& str, size_type pos = 0) const {
+    size_type find_last_of (const basic_string<CharT, Traits, Alloc2>& str, size_type pos = npos) const {
         return find_last_of(str._str, pos, str._length);
     }
 
@@ -715,25 +715,25 @@ public:
     }
 
     template<class _CharT, typename = typename std::enable_if<std::is_same<_CharT, CharT>::value>::type>
-    size_type find_last_of (const _CharT* const& s, size_type pos = 0) const {
+    size_type find_last_of (const _CharT* const& s, size_type pos = npos) const {
         return find_last_of(s, pos, traits_type::length(s));
     }
 
     template <size_type SIZE>
-    size_type find_last_of (const CharT (&s)[SIZE], size_type pos = 0) const {
+    size_type find_last_of (const CharT (&s)[SIZE], size_type pos = npos) const {
         return find_last_of(s, pos, SIZE-1);
     }
 
-    size_type find_last_of (CharT ch, size_type pos = 0) const {
+    size_type find_last_of (CharT ch, size_type pos = npos) const {
         return rfind(ch, pos);
     }
 
-    size_type find_last_of (std::basic_string_view<CharT, Traits> sv, size_type pos = 0) const {
+    size_type find_last_of (std::basic_string_view<CharT, Traits> sv, size_type pos = npos) const {
         return find_last_of(sv.data(), pos, sv.length());
     }
 
     template <class Alloc2>
-    size_type find_last_not_of (const basic_string<CharT, Traits, Alloc2>& str, size_type pos = 0) const {
+    size_type find_last_not_of (const basic_string<CharT, Traits, Alloc2>& str, size_type pos = npos) const {
         return find_last_not_of(str._str, pos, str._length);
     }
 
@@ -745,22 +745,22 @@ public:
     }
 
     template<class _CharT, typename = typename std::enable_if<std::is_same<_CharT, CharT>::value>::type>
-    size_type find_last_not_of (const _CharT* const& s, size_type pos = 0) const {
+    size_type find_last_not_of (const _CharT* const& s, size_type pos = npos) const {
         return find_last_not_of(s, pos, traits_type::length(s));
     }
 
     template <size_type SIZE>
-    size_type find_last_not_of (const CharT (&s)[SIZE], size_type pos = 0) const {
+    size_type find_last_not_of (const CharT (&s)[SIZE], size_type pos = npos) const {
         return find_last_not_of(s, pos, SIZE-1);
     }
 
-    size_type find_last_not_of (CharT ch, size_type pos = 0) const {
+    size_type find_last_not_of (CharT ch, size_type pos = npos) const {
         for (const CharT* ptr = _str + (pos >= _length ? (_length - 1) : pos); ptr >= _str; --ptr)
             if (!traits_type::eq(*ptr, ch)) return ptr - _str;
         return npos;
     }
 
-    size_type find_last_not_of (std::basic_string_view<CharT, Traits> sv, size_type pos = 0) const {
+    size_type find_last_not_of (std::basic_string_view<CharT, Traits> sv, size_type pos = npos) const {
         return find_last_not_of(sv.data(), pos, sv.length());
     }
 

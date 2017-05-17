@@ -1,7 +1,7 @@
 use Modern::Perl;
 package Renard::Curie::Error;
 # ABSTRACT: Exceptions
-$Renard::Curie::Error::VERSION = '0.001';
+$Renard::Curie::Error::VERSION = '0.002';
 use custom::failures qw/
 	IO::FileNotFound
 	/;
@@ -20,7 +20,7 @@ Renard::Curie::Error - Exceptions
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 EXTENDS
 

@@ -1,0 +1,51 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'perl' => '5.014004'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Capture::Tiny' => '0.36',
+                                      'Cwd' => '0',
+                                      'Dumbbench' => '0.10',
+                                      'File::Spec' => '0',
+                                      'File::Temp' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::Kwalitee' => '1.21',
+                                      'Test::More' => '0.88',
+                                      'Test::Pod' => '1.41',
+                                      'blib' => '1.01'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Exporter' => '0',
+                                      'Fcntl' => '0',
+                                      'Inline' => '0.80',
+                                      'Inline::C' => '0.77',
+                                      'constant' => '0',
+                                      'perl' => '5.014004'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Capture::Tiny' => '0.36',
+                                   'Cwd' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'File::Temp' => '0',
+                                   'File::Which' => '1.21',
+                                   'Test::More' => '0',
+                                   'Test::TempDir::Tiny' => '0.016',
+                                   'perl' => '5.014004'
+                                 }
+                 }
+     };
+  $x;
+ }

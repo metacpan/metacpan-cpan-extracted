@@ -2,7 +2,7 @@ package Apache::Tika::Server;
 use strict;
 use Carp qw(croak);
 # Fire up/stop a Tika instance
-use Moo;
+use Moo 2;
 use Apache::Tika::DocInfo;
 use Data::Dumper;
 use Promises;
@@ -12,23 +12,25 @@ use Promises;
     use Apache::Tika::Server;
 
     # Launch our own Apache Tika instance
-    my $tika= Apache::Tika::Server->new();
-    $tika->launch();
+    my $tika= Apache::Tika::Server->new(
+        jarfile => $tika_path,
+    );
+    $tika->launch;
 
     my $fn= shift;
 
     use Data::Dumper;
-    print Dumper $tika->get_meta($fn);
-    print Dumper $tika->get_text($fn);
-    print Dumper $tika->get_language($fn);
-
-    my $info = $tika->get_all($fn);
-    print Dumper $info->meta;
+    my $info = $tika->get_all( $fn );
+    print Dumper $info->meta($fn);
+    print $info->content($fn);
+    # <html><body>...
+    print $info->meta->{"meta:language"};
+    # en
 
 =cut
 
 use vars '$VERSION';
-$VERSION = '0.06';
+$VERSION = '0.07';
 
 extends 'Apache::Tika::Async';
 
@@ -110,7 +112,7 @@ sub url {
 };
 
 
-sub synchronous($) {
+sub await($) {
     my $promise = $_[0];
     my @res;
     if( $promise->is_unfulfilled ) {
@@ -135,14 +137,13 @@ sub fetch {
     $options{ type }||= 'text';
     my $url= $self->url( $options{ type } );
     
-    my $content= $options{ content };
-    if(! $content and $options{ filename }) {
+    if(! $options{ content } and $options{ filename }) {
         # read $options{ filename }
         open my $fh, '<', $options{ filename }
             or croak "Couldn't read '$options{ filename }': $!";
         binmode $fh;
         local $/;
-        $content = <$fh>;
+        $options{ content } = <$fh>;
     };
     
     my $method;
@@ -156,21 +157,21 @@ sub fetch {
     
     my $headers = $options{ headers } || {};
     
-    my ($code,$res) = synchronous
-        $self->ua->request( $method, $url, $content, %$headers );
+    my ($code,$res) = await
+        $self->ua->request( $method, $url, $options{ content }, %$headers );
     my $info;
     if(    'all' eq $options{ type }
         or 'text' eq $options{ type }
         or 'meta' eq $options{ type } ) {
         if( $code !~ /^2..$/ ) {
-            croak "Got HTTP error code $code";
+            croak "Got HTTP error code $code for '$options{ filename }'";
         };
         my $item = $res->[0];
         
         # Should/could this be lazy?
         my $c = delete $item->{'X-TIKA:content'};
         # Ghetto-strip HTML we don't want:
-        if( $c =~ m!<body>(.*)</body>!s ) {
+        if( $c =~ m!<body>(.*)</body>!s or $c =~ m!<body\s*/>!) {
             $c = $1;
             
             if( $item->{"Content-Type"} and $item->{"Content-Type"} =~ m!^text/plain\b!) {
@@ -178,7 +179,7 @@ sub fetch {
                 $c =~ s!\A\s*<p>(.*)\s*</p>\s*\z!$1!s;
             };
         } else {
-            warn "Couldn't find HTML body in response";
+            warn "Couldn't find HTML body in response: $c";
         };
         
         $info= Apache::Tika::DocInfo->new({

@@ -2,6 +2,9 @@
 use strict;
 $|++;
 
+# fork() and JSON::XS don't go well together on Windows
+BEGIN { $ENV{PERL_JSON_BACKEND} = 'JSON::PP' if $^O eq 'MSWin32'; }
+
 use fallback 'inc';
 
 use Test::More;
@@ -36,7 +39,7 @@ my $jsnfile = 'testsuite.jsn';
 
     $pid = fork();
     if ($pid) { # Continue
-        note("$url");
+        note("Temporary daemon at: $url");
     }
     else { # HTTP-Server for dummies
         while (my $c = $daemon->accept) {
@@ -79,6 +82,7 @@ END {
     }
 }
 
+my $sysinfo = { sysinfo => $^O };
 SKIP: {
     skip("Could not load LWP::UserAgent", 3) if !has_module('LWP::UserAgent');
 
@@ -91,7 +95,7 @@ SKIP: {
     );
     isa_ok($poster, 'Test::Smoke::Poster::LWP_UserAgent');
 
-    ok(write_json($poster->json_filename, {sysinfo => $^O}), "write_json");
+    ok(write_json($poster->json_filename, $sysinfo), "write_json");
     my $response = eval { $poster->post() };
     $response = $@ if $@;
     is($response, 42, "Got id");
@@ -101,7 +105,7 @@ SKIP: {
 
 SKIP: {
     my $curlbin = whereis('curl');
-    skip("Could find curl", 3) if !$curlbin;
+    skip("Could not find curl", 3) if !$curlbin;
 
     my $poster = Test::Smoke::Poster->new(
         'curl',
@@ -113,7 +117,7 @@ SKIP: {
     );
     isa_ok($poster, 'Test::Smoke::Poster::Curl');
 
-    ok(write_json($poster->json_filename, {sysinfo => $^O}), "write_json");
+    ok(write_json($poster->json_filename, $sysinfo), "write_json");
     my $response = eval { $poster->post() };
     $response = $@ if $@;
     is($response, 42, "Got id");
@@ -133,7 +137,7 @@ SKIP: {
     );
     isa_ok($poster, 'Test::Smoke::Poster::HTTP_Tiny');
 
-    ok(write_json($poster->json_filename, {sysinfo => $^O}), "write_json");
+    ok(write_json($poster->json_filename, $sysinfo), "write_json");
     my $response = eval { $poster->post() };
     $response = $@ if $@;
     is($response, 42, "Got id");
@@ -153,7 +157,7 @@ SKIP: {
     );
     isa_ok($poster, 'Test::Smoke::Poster::HTTP_Lite');
 
-    ok(write_json($poster->json_filename, {sysinfo => $^O}), "write_json");
+    ok(write_json($poster->json_filename, $sysinfo), "write_json");
     my $response = eval { $poster->post() };
     $response = $@ if $@;
     is($response, 42, "Got id");
@@ -167,9 +171,10 @@ done_testing();
 
 sub write_json {
     my ($file, $content) = @_;
+    my $encoded = encode_json($content);
 
     open my $fh, '>', $file or die "Cannot create($file): $!";
-    print $fh encode_json($content);
+    print $fh $encoded;
     close $fh;
     return 1;
 }

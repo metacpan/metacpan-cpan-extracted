@@ -1,5 +1,5 @@
 Changes
-dump_usb.pl
+bin/dump_usb.pl
 lib/Device/USB.pm
 lib/Device/USB/Bus.pm
 lib/Device/USB/DevConfig.pm
@@ -31,9 +31,11 @@ t/15-usb_dev_configuration.t
 t/16-usb_dev_interface.t
 t/17-usb_dev_endpoint.t
 t/18-usb_device-configurations.t
-xt/boilerplate.t
-xt/pod-coverage.t
-xt/pod.t
 t/TestTools.pm
+xt/boilerplate.t
+xt/critic.t
+xt/hasversion.t
+xt/podcoverage.t
+xt/pod.t
 USB.pm
 META.json                                Module JSON meta-data (added by MakeMaker)

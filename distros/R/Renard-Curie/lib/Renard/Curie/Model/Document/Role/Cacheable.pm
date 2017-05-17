@@ -1,7 +1,7 @@
 use Renard::Curie::Setup;
 package Renard::Curie::Model::Document::Role::Cacheable;
 # ABSTRACT: Role that caches rendered pages
-$Renard::Curie::Model::Document::Role::Cacheable::VERSION = '0.001';
+$Renard::Curie::Model::Document::Role::Cacheable::VERSION = '0.002';
 use Moo::Role;
 use Renard::Curie::Types qw(InstanceOf);
 
@@ -42,7 +42,7 @@ Renard::Curie::Model::Document::Role::Cacheable - Role that caches rendered page
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 ATTRIBUTES
 

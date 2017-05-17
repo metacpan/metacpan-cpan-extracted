@@ -1,7 +1,7 @@
 use Renard::Curie::Setup;
 package Renard::Curie;
 # ABSTRACT: A document reader written with GTK+.
-$Renard::Curie::VERSION = '0.001';
+$Renard::Curie::VERSION = '0.002';
 1;
 
 __END__
@@ -16,7 +16,7 @@ Renard::Curie - A document reader written with GTK+.
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 AUTHOR
 

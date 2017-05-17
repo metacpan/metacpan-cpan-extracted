@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'CPAN/Testers/API.pm',
@@ -17,7 +17,8 @@ my @module_files = (
 );
 
 my @scripts = (
-    'bin/cpantesters-api'
+    'bin/cpantesters-api',
+    'bin/cpantesters-legacy-metabase'
 );
 
 # no fake home requested

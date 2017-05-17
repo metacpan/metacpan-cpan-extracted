@@ -1,0 +1,22 @@
+Changes
+examples/gps.pl
+examples/output.json
+examples/output.perl
+lib/GPSD/Parse.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/05-poll.t
+t/10-time.t
+t/15-device.t
+t/20-tpv.t
+t/25-satellites.t
+t/30-sky.t
+t/data/gps.json
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

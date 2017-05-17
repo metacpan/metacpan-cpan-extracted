@@ -1,5 +1,5 @@
 # t/05_html_options.t - check that html options are working properly
-#$Id: 05_html_options.t 1202 2007-10-27 15:12:03Z jimk $
+#$Id$
 use strict;
 use warnings;
 use Test::More 

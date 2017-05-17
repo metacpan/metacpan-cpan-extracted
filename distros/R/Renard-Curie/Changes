@@ -1,3 +1,62 @@
+0.002 2017-05-16 10:33:20-0500
+  Features
+   - Zooming using the scrollwheel.
+
+     Fixes <https://github.com/project-renard/curie/issues/15>.
+     See PR <https://github.com/project-renard/curie/pull/184>.
+
+   - Drag-and-drop of file on to the page area opens the file.
+
+     Fixes <https://github.com/project-renard/curie/issues/19>.
+     See PR <https://github.com/project-renard/curie/pull/170>.
+
+   - Remove status bar from the App window.
+
+     Fixes <https://github.com/project-renard/curie/issues/40>.
+     See PR <https://github.com/project-renard/curie/pull/183>.
+
+  Bug fixes
+
+   - Update the mutool outline parsing for MuPDF v1.10a.
+
+     Fixes <https://github.com/project-renard/curie/issues/172>.
+     See PR <https://github.com/project-renard/curie/pull/173>.
+
+  Build changes
+
+   - Make the `--version` flag more verbose and add a
+     `--short-version` flag that only outputs the version.
+
+     Fixes <https://github.com/project-renard/curie/issues/174>.
+     See PR <https://github.com/project-renard/curie/pull/175>.
+
+   - Set custom theme and icon theme if available.
+
+     Fixes <https://github.com/project-renard/curie/issues/32>.
+     See PR <https://github.com/project-renard/curie/pull/178>.
+
+   - Update functions for Function::Parameters v2.000002.
+
+     See <https://github.com/project-renard/curie/issues/190>.
+     See PR <https://github.com/project-renard/curie/pull/191>.
+
+   - Change shebang of curie script so that it runs with the Perl
+     that installed Curie.
+
+     Fixes <https://github.com/project-renard/curie/issues/196>.
+     See PR <https://github.com/project-renard/curie/pull/198>.
+
+0.001_01 2016-10-24 18:01:31-0500
+  - Added menu to select zoom level.
+
+    Fixes <https://github.com/project-renard/curie/issues/14>.
+    See PR <https://github.com/project-renard/curie/pull/161>.
+
+  - Add command line option to print out version number.
+
+    Fixes <https://github.com/project-renard/curie/issues/157>.
+    See PR <https://github.com/project-renard/curie/pull/159>.
+
 0.001 2016-09-22 16:12:43-0500
   - Release notes: <http://project-renard.github.io/blog/posts/2016/09/22/curie-release-v0.001/>.
   - First release.

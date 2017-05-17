@@ -1,5 +1,8 @@
 Revision history for Perl module Mojo-TypeModel
 
+0.02 2017-05-16
+  - Fix undeclared dependency
+
 0.01 2017-04-25
   - Initial release
 

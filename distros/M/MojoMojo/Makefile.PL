@@ -28,7 +28,6 @@ requires(
     'Catalyst::Plugin::Session::Store::Cache'      => '0',
     'Catalyst::Plugin::Setenv'                     => 0,
     'Catalyst::Plugin::Static::Simple'             => '0.07',
-    'Catalyst::Plugin::Unicode'                    => '0.8',
     'Catalyst::View::TT'                           => '0.23',
     'Catalyst::View::JSON'                         => '0.26',
     'Catalyst::View::Email'                        => '0.14',
@@ -76,6 +75,7 @@ requires(
     'YAML'                                         => '0.36',
     'Term::Prompt'                                 => 0,
     'Text::Emoticon::MSN'                          => 0,
+    'File::Slurp'                                  => 0,
 );
 
 feature 'Create new database',           'SQL::Translator'                  => '0.09006';

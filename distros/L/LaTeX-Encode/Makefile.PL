@@ -39,11 +39,3 @@ WriteMakefile(
     },
 );
 
-no warnings 'redefine';
-
-sub MY::postamble {
-    return q{
-lib/LaTeX/Encode/EncodingTable.pm: scripts/build-encoding-table
-	 scripts/build-encoding-table >lib/LaTeX/Encode/EncodingTable.pm
-};
-}

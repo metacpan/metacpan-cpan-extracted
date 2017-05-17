@@ -4,7 +4,7 @@
       "Marcus Holland-Moritz <mhx@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
@@ -42,5 +42,5 @@
          "web" : "https://github.com/mhx/Devel-PPPort/"
       }
    },
-   "version" : "3.35"
+   "version" : "3.36"
 }

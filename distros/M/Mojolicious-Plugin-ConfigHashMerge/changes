@@ -1,3 +1,6 @@
+0.03 - 16-5-2017
+  - Add support for overriding config in tests (config_override).
+
 0.02 - 27-12-2015
   - Edited pod to clarify the difference between this module and the
 regular Config plugin.

@@ -1,0 +1,1119 @@
+{
+   "basic" : [
+      {
+         "fields" : [
+            {
+               "desc" : "Is null, boolean, or integer value. If it's a post then this will contain an object with the all generated values, such as an ID.",
+               "type" : "mixed",
+               "name" : "data"
+            },
+            {
+               "desc" : "Was the request successful",
+               "type" : "boolean",
+               "name" : "success"
+            },
+            {
+               "type" : "integer",
+               "desc" : "HTTP Status Code",
+               "name" : "status"
+            }
+         ],
+         "pname" : "Basic",
+         "description" : " This is the basic response for requests that do not return data. If the POST request has a Basic model it will return the id. ",
+         "example" : "{\n   \"success\" : true,\n   \"data\" : true,\n   \"status\" : 200\n}\n"
+      }
+   ],
+   "account" : [
+      {
+         "fields" : [
+            {
+               "type" : "Integer",
+               "desc" : "The account id for the username requested.",
+               "name" : "id"
+            },
+            {
+               "name" : "url",
+               "type" : "String",
+               "desc" : "The account username, will be the same as requested in the URL"
+            },
+            {
+               "name" : "bio",
+               "desc" : "A basic description the user has filled out",
+               "type" : "String"
+            },
+            {
+               "name" : "reputation",
+               "desc" : "The reputation for the account, in it's numerical format.",
+               "type" : "Float"
+            },
+            {
+               "type" : "Integer",
+               "desc" : "The epoch time of account creation",
+               "name" : "created"
+            },
+            {
+               "type" : "Integer or Boolean",
+               "desc" : "False if not a pro user, their expiration date if they are.",
+               "name" : "pro_expiration"
+            }
+         ],
+         "pname" : "Account",
+         "description" : " This model is used to represent the basic account information. ",
+         "example" : "{\n   \"success\" : true,\n   \"status\" : 200,\n   \"data\" : {\n      \"url\" : \"joshTest\",\n      \"reputation\" : 15303.84,\n      \"bio\" : \"A real hoopy frood who really knows where his towel is at.\",\n      \"created\" : 1376951504,\n      \"pro_expiration\" : false,\n      \"id\" : 384077\n   }\n}\n"
+      }
+   ],
+   "conversation" : [
+      {
+         "fields" : [
+            {
+               "name" : "id",
+               "type" : "integer",
+               "desc" : "Conversation ID"
+            },
+            {
+               "name" : "last_message_preview",
+               "desc" : "Preview of the last message",
+               "type" : "string"
+            },
+            {
+               "type" : "integer",
+               "desc" : "Time of last sent message, epoch time",
+               "name" : "datetime"
+            },
+            {
+               "name" : "with_account_id",
+               "type" : "integer",
+               "desc" : "Account ID of the other user in conversation"
+            },
+            {
+               "name" : "with_account",
+               "desc" : "Account username of the other user in conversation",
+               "type" : "string"
+            },
+            {
+               "name" : "message_count",
+               "type" : "integer",
+               "desc" : "Total number of messages in the conversation"
+            },
+            {
+               "name" : "messages",
+               "desc" : "OPTIONAL: (only available when requesting a specific conversation) Reverse sorted such that most recent message is at the end of the array.",
+               "type" : "Array of Messages"
+            },
+            {
+               "name" : "done",
+               "type" : "boolean",
+               "desc" : "OPTIONAL: (only available when requesting a specific conversation) Flag to indicate whether you've reached the beginning of the thread."
+            },
+            {
+               "name" : "page",
+               "desc" : "OPTIONAL: (only available when requesting a specific conversation) Number of the next page",
+               "type" : "integer"
+            }
+         ],
+         "pname" : "Conversation",
+         "description" : " The base model for a conversation. ",
+         "example" : "{\n   \"success\" : true,\n   \"status\" : 200,\n   \"data\" : [\n      {\n         \"datetime\" : 1406927327,\n         \"id\" : 188129,\n         \"message_count\" : 3,\n         \"with_account_id\" : 3698510,\n         \"with_account\" : \"jasdev\",\n         \"last_message_preview\" : \"hi\"\n      }\n   ]\n}\n"
+      }
+   ],
+   "custom_gallery" : [
+      {
+         "fields" : [
+            {
+               "type" : "string",
+               "desc" : "Username of the account that created the custom gallery",
+               "name" : "account_url"
+            },
+            {
+               "name" : "link",
+               "type" : "string",
+               "desc" : "The URL link to the custom gallery"
+            },
+            {
+               "desc" : "An array of all the tag names in the custom gallery",
+               "type" : "array",
+               "name" : "tags"
+            },
+            {
+               "name" : "item_count",
+               "desc" : "The total number of gallery items in the custom gallery",
+               "type" : "integer"
+            },
+            {
+               "desc" : "An array of all the gallery items in the custom gallery",
+               "type" : "Array of Gallery Images and Gallery Albums",
+               "name" : "items"
+            }
+         ],
+         "description" : " This model represents a user's custom or filtered gallery\n",
+         "example" : "{\n   \"data\" : {\n      \"items\" : [],\n      \"account_url\" : \"jasdev\",\n      \"tags\" : [\n         \"cats\",\n         \"dogs\"\n      ],\n      \"link\" : \"http://imgur.com/g/wRBsA\"\n   },\n   \"status\" : 200,\n   \"success\" : true\n}\n",
+         "pname" : "CustomGallery"
+      }
+   ],
+   "topic" : [
+      {
+         "fields" : [
+            {
+               "name" : "id",
+               "type" : "integer",
+               "desc" : "ID of the topic."
+            },
+            {
+               "name" : "name",
+               "type" : "string",
+               "desc" : "Topic name"
+            },
+            {
+               "type" : "string",
+               "desc" : "Description of the topic",
+               "name" : "description"
+            },
+            {
+               "desc" : "CSS class used on website to style the ephemeral topic",
+               "type" : "string",
+               "name" : "css"
+            },
+            {
+               "type" : "boolean",
+               "desc" : "Whether it is an ephemeral (e.g. current events) topic",
+               "name" : "ephemeral"
+            },
+            {
+               "name" : "topPost",
+               "type" : "Gallery Image OR Gallery Album",
+               "desc" : "The top image in this topic"
+            },
+            {
+               "name" : "heroImage",
+               "desc" : "The current 'hero' image chosen by the Imgur community staff",
+               "type" : "Image"
+            },
+            {
+               "name" : "isHero",
+               "type" : "boolean",
+               "desc" : "Whether the topic's heroImage should be used as the overall hero image"
+            }
+         ],
+         "example" : "{\n   \"success\" : true,\n   \"status\" : 200,\n   \"data\" : [\n      {\n         \"ephemeral\" : false,\n         \"name\" : \"jasdev jokes\",\n         \"css\" : null,\n         \"topPost\" : {},\n         \"description\" : \"\\\"We should add more functions, that's what they do in functional programming.\\\",\",\n         \"id\" : 1\n      },\n      {\n         \"topPost\" : {},\n         \"name\" : \"Super Smash Bros\",\n         \"ephemeral\" : true,\n         \"css\" : \"smashbros\",\n         \"description\" : \"Game is hard. Tag all the n00bs with this topic.\",\n         \"id\" : 6\n      }\n   ]\n}\n",
+         "description" : " The base model for a topic. ",
+         "pname" : "Topic"
+      }
+   ],
+   "account_settings" : [
+      {
+         "example" : "{\n   \"success\" : true,\n   \"data\" : {\n      \"show_mature\" : false,\n      \"public_images\" : false,\n      \"high_quality\" : true,\n      \"album_privacy\" : \"secret\",\n      \"accepted_gallery_terms\" : true,\n      \"first_party\" : true,\n      \"pro_expiration\" : false,\n      \"active_emails\" : [],\n      \"email\" : \"josh@imgur.com\"\n   },\n   \"status\" : 200\n}\n",
+         "description" : " The account settings, only accessible if you're logged in as the user. ",
+         "pname" : "AccountSettings",
+         "fields" : [
+            {
+               "type" : "string",
+               "desc" : "The account username",
+               "name" : "account_url"
+            },
+            {
+               "desc" : "The users email address",
+               "type" : "string",
+               "name" : "email"
+            },
+            {
+               "desc" : "The users ability to upload higher quality images, there will be less compression",
+               "type" : "boolean",
+               "name" : "high_quality"
+            },
+            {
+               "name" : "public_images",
+               "desc" : "Automatically allow all images to be publicly accessible",
+               "type" : "boolean"
+            },
+            {
+               "type" : "string",
+               "desc" : "Set the album privacy to this privacy setting on creation",
+               "name" : "album_privacy"
+            },
+            {
+               "desc" : "False if not a pro user, their expiration date if they are.",
+               "type" : "integer or boolean",
+               "name" : "pro_expiration"
+            },
+            {
+               "desc" : "True if the user has accepted the terms of uploading to the Imgur gallery.",
+               "type" : "boolean",
+               "name" : "accepted_gallery_terms"
+            },
+            {
+               "type" : "Array of Strings",
+               "desc" : "The email addresses that have been activated to allow uploading",
+               "name" : "active_emails"
+            },
+            {
+               "name" : "messaging_enabled",
+               "type" : "boolean",
+               "desc" : "If the user is accepting incoming messages or not"
+            },
+            {
+               "desc" : "An array of users that have been blocked from messaging, the object is blocked_id and blocked_url.",
+               "type" : "Array of objects",
+               "name" : "blocked_users"
+            },
+            {
+               "name" : "show_mature",
+               "desc" : "True if the user has opted to have mature images displayed in gallery list endpoints.",
+               "type" : "boolean"
+            },
+            {
+               "type" : "boolean",
+               "desc" : "True unless the user created their account via a third party service such as Google Plus.",
+               "name" : "first_party"
+            }
+         ]
+      }
+   ],
+   "gallery_image" : [
+      {
+         "fields" : [
+            {
+               "name" : "id",
+               "desc" : "The ID for the image",
+               "type" : "string"
+            },
+            {
+               "name" : "title",
+               "type" : "string",
+               "desc" : "The title of the image."
+            },
+            {
+               "name" : "description",
+               "type" : "string",
+               "desc" : "Description of the image."
+            },
+            {
+               "type" : "integer",
+               "desc" : "Time inserted into the gallery, epoch time",
+               "name" : "datetime"
+            },
+            {
+               "name" : "type",
+               "desc" : "Image MIME type.",
+               "type" : "string"
+            },
+            {
+               "name" : "animated",
+               "desc" : "is the image animated",
+               "type" : "boolean"
+            },
+            {
+               "name" : "width",
+               "desc" : "The width of the image in pixels",
+               "type" : "integer"
+            },
+            {
+               "type" : "integer",
+               "desc" : "The height of the image in pixels",
+               "name" : "height"
+            },
+            {
+               "desc" : "The size of the image in bytes",
+               "type" : "integer",
+               "name" : "size"
+            },
+            {
+               "type" : "integer",
+               "desc" : "The number of image views",
+               "name" : "views"
+            },
+            {
+               "desc" : "Bandwidth consumed by the image in bytes",
+               "type" : "integer",
+               "name" : "bandwidth"
+            },
+            {
+               "name" : "deletehash",
+               "type" : "string",
+               "desc" : "OPTIONAL, the deletehash, if you're logged in as the image owner"
+            },
+            {
+               "desc" : "The direct link to the the image. (Note: if fetching an animated GIF that was over 20MB in original size, a .gif thumbnail will be returned)",
+               "type" : "string",
+               "name" : "link"
+            },
+            {
+               "name" : "gifv",
+               "desc" : "OPTIONAL, The .gifv link. Only available if the image is animated and type is 'image/gif'.",
+               "type" : "string"
+            },
+            {
+               "type" : "string",
+               "desc" : "OPTIONAL, The direct link to the .mp4. Only available if the image is animated and type is 'image/gif'.",
+               "name" : "mp4"
+            },
+            {
+               "name" : "mp4_size",
+               "desc" : "OPTIONAL, The Content-Length of the .mp4. Only available if the image is animated and type is 'image/gif'. Note that a zero value (0) is possible if the video has not yet been generated",
+               "type" : "integer"
+            },
+            {
+               "name" : "looping",
+               "desc" : "OPTIONAL, Whether the image has a looping animation. Only available if the image is animated and type is 'image/gif'.",
+               "type" : "boolean"
+            },
+            {
+               "name" : "vote",
+               "type" : "string",
+               "desc" : "The current user's vote on the album. null if not signed in or if the user hasn't voted on it."
+            },
+            {
+               "desc" : "Indicates if the current user favorited the image. Defaults to false if not signed in.",
+               "type" : "boolean",
+               "name" : "favorite"
+            },
+            {
+               "name" : "nsfw",
+               "type" : "boolean",
+               "desc" : "Indicates if the image has been marked as nsfw or not. Defaults to null if information is not available."
+            },
+            {
+               "desc" : "Number of comments on the gallery image.",
+               "type" : "int",
+               "name" : "comment_count"
+            },
+            {
+               "desc" : "Topic of the gallery image.",
+               "type" : "string",
+               "name" : "topic"
+            },
+            {
+               "desc" : "Topic ID of the gallery image.",
+               "type" : "integer",
+               "name" : "topic_id"
+            },
+            {
+               "desc" : "If the image has been categorized by our backend then this will contain the section the image belongs in. (funny, cats, adviceanimals, wtf, etc)",
+               "type" : "string",
+               "name" : "section"
+            },
+            {
+               "name" : "account_url",
+               "type" : "string",
+               "desc" : "The username of the account that uploaded it, or null."
+            },
+            {
+               "desc" : "The account ID of the account that uploaded it, or null.",
+               "type" : "integer",
+               "name" : "account_id"
+            },
+            {
+               "name" : "ups",
+               "type" : "integer",
+               "desc" : "Upvotes for the image"
+            },
+            {
+               "type" : "integer",
+               "desc" : "Number of downvotes for the image",
+               "name" : "downs"
+            },
+            {
+               "desc" : "Upvotes minus downvotes",
+               "type" : "integer",
+               "name" : "points"
+            },
+            {
+               "type" : "integer",
+               "desc" : "Imgur popularity score",
+               "name" : "score"
+            },
+            {
+               "name" : "is_album",
+               "type" : "boolean",
+               "desc" : "If it's an album or not"
+            },
+            {
+               "type" : "boolean",
+               "desc" : "Indicates if the image is in the most viral gallery or not.",
+               "name" : "in_most_viral"
+            }
+         ],
+         "description" : " The data model formatted for gallery images. ",
+         "example" : "{\n   \"success\" : true,\n   \"status\" : 200,\n   \"data\" : {\n      \"views\" : 625622,\n      \"vote\" : null,\n      \"animated\" : false,\n      \"is_album\" : false,\n      \"datetime\" : 1349051625,\n      \"account_id\" : 384077,\n      \"score\" : 18935622,\n      \"width\" : 2490,\n      \"height\" : 3025,\n      \"account_url\" : \"saponifi3d\",\n      \"ups\" : 1889,\n      \"title\" : \"My most recent drawing. Spent over 100 hours. I'm pretty proud of it.\",\n      \"comment_count\" : 10,\n      \"size\" : 618969,\n      \"type\" : \"image/jpeg\",\n      \"downs\" : 58,\n      \"points\" : 1831,\n      \"bandwidth\" : 387240623718,\n      \"id\" : \"OUHDm\",\n      \"section\" : \"pics\",\n      \"description\" : null\n   }\n}\n",
+         "pname" : "GalleryImage"
+      }
+   ],
+   "gallery_profile" : [
+      {
+         "example" : "{\n   \"status\" : 200,\n   \"data\" : {\n      \"total_gallery_submissions\" : 4,\n      \"total_gallery_likes\" : 23,\n      \"trophies\" : [\n         {\n            \"image\" : \"http://s.imgur.com/images/trophies/a84ade.png\",\n            \"description\" : \"Be a member of Imgur for one year.\",\n            \"id\" : 1,\n            \"name\" : \"1 Year\",\n            \"datetime\" : 1357344455,\n            \"name_clean\" : \"1Years\",\n            \"data\" : null,\n            \"data_link\" : null\n         }\n      ],\n      \"total_gallery_comments\" : 40\n   },\n   \"success\" : true\n}\n",
+         "description" : " The totals for a users gallery information. ",
+         "pname" : "GalleryProfile",
+         "fields" : [
+            {
+               "name" : "total_gallery_comments",
+               "desc" : "Total number of comments the user has made in the gallery",
+               "type" : "integer"
+            },
+            {
+               "name" : "total_gallery_favorites",
+               "desc" : "Total number of items favorited by the user in the gallery",
+               "type" : "integer"
+            },
+            {
+               "desc" : "Total number of images submitted by the user.",
+               "type" : "integer",
+               "name" : "total_gallery_submissions"
+            },
+            {
+               "name" : "trophies",
+               "desc" : "An array of trophies that the user has.",
+               "type" : "Array"
+            }
+         ]
+      }
+   ],
+   "comment" : [
+      {
+         "fields" : [
+            {
+               "name" : "id",
+               "type" : "integer",
+               "desc" : "The ID for the comment"
+            },
+            {
+               "type" : "string",
+               "desc" : "The ID of the image that the comment is for",
+               "name" : "image_id"
+            },
+            {
+               "name" : "comment",
+               "type" : "string",
+               "desc" : "The comment itself."
+            },
+            {
+               "name" : "author",
+               "type" : "string",
+               "desc" : "Username of the author of the comment"
+            },
+            {
+               "desc" : "The account ID for the author",
+               "type" : "integer",
+               "name" : "author_id"
+            },
+            {
+               "name" : "on_album",
+               "type" : "boolean",
+               "desc" : "If this comment was done to an album"
+            },
+            {
+               "desc" : "The ID of the album cover image, this is what should be displayed for album comments",
+               "type" : "string",
+               "name" : "album_cover"
+            },
+            {
+               "name" : "ups",
+               "type" : "integer",
+               "desc" : "Number of upvotes for the comment"
+            },
+            {
+               "type" : "integer",
+               "desc" : "The number of downvotes for the comment",
+               "name" : "downs"
+            },
+            {
+               "desc" : "the number of upvotes - downvotes",
+               "type" : "float",
+               "name" : "points"
+            },
+            {
+               "type" : "integer",
+               "desc" : "Timestamp of creation, epoch time",
+               "name" : "datetime"
+            },
+            {
+               "desc" : "If this is a reply, this will be the value of the comment_id for the caption this a reply for.",
+               "type" : "integer",
+               "name" : "parent_id"
+            },
+            {
+               "name" : "deleted",
+               "desc" : "Marked true if this caption has been deleted",
+               "type" : "boolean"
+            },
+            {
+               "type" : "string",
+               "desc" : "The current user's vote on the comment. null if not signed in or if the user hasn't voted on it.",
+               "name" : "vote"
+            },
+            {
+               "name" : "children",
+               "type" : "Array of comments",
+               "desc" : "All of the replies for this comment. If there are no replies to the comment then this is an empty set."
+            }
+         ],
+         "description" : " This data model represents an images comment. ",
+         "example" : "{\n   \"success\" : true,\n   \"data\" : {\n      \"parent_id\" : null,\n      \"image_id\" : \"K84kO\",\n      \"points\" : 5,\n      \"downs\" : 0,\n      \"album_cover\" : null,\n      \"author_id\" : 384077,\n      \"deleted\" : true,\n      \"id\" : 1110,\n      \"ups\" : 5,\n      \"caption\" : \"This is a Test Caption sent via the API!\",\n      \"datetime\" : 1346977487,\n      \"on_album\" : false,\n      \"author\" : \"joshTest\"\n   },\n   \"status\" : 200\n}\n",
+         "pname" : "Comment"
+      }
+   ],
+   "tag" : [
+      {
+         "fields" : [
+            {
+               "name" : "name",
+               "type" : "string",
+               "desc" : "Name of the tag."
+            },
+            {
+               "name" : "followers",
+               "type" : "integer",
+               "desc" : "Number of followers for the tag."
+            },
+            {
+               "name" : "total_items",
+               "type" : "integer",
+               "desc" : "Total number of gallery items for the tag."
+            },
+            {
+               "name" : "following",
+               "type" : "boolean",
+               "desc" : "OPTIONAL, boolean representing whether or not the user is following the tag in their custom gallery"
+            },
+            {
+               "name" : "items",
+               "desc" : "Gallery items with current tag.",
+               "type" : "Array of Gallery Images and Gallery Albums"
+            }
+         ],
+         "pname" : "Tag",
+         "description" : " The base model for a tag. ",
+         "example" : "\n            {\n    \"data\": {\n        \"name\": \"dogs\",\n        \"followers\": 20,\n        total_items: 3,\n        following: [\n            {\n                \"id\": \"YmeHP\",\n                \"name\": \"Cute Animals\"\n            },\n            {\n                \"id\": \"UBVtN\",\n                \"name\": \"Furry Friends\"\n            }\n        ]\n        \"items\": [\n            ... Array of Gallery Images and Gallery Albums ...\n        ]\n    },\n    \"success\": true,\n    \"status\": 200\n}\n                "
+      }
+   ],
+   "notification" : [
+      {
+         "fields" : [
+            {
+               "type" : "integer",
+               "desc" : "The ID for the notification",
+               "name" : "id"
+            },
+            {
+               "name" : "account_id",
+               "type" : "integer",
+               "desc" : "The Account ID for the notification"
+            },
+            {
+               "desc" : "Has the user viewed the image yet?",
+               "type" : "boolean",
+               "name" : "viewed"
+            },
+            {
+               "name" : "content",
+               "desc" : "This can be any other model, currently only using comments and conversation metadata.",
+               "type" : "Mixed"
+            }
+         ],
+         "example" : "\n            {\n    \"data\": {\n        \"replies\": [{\n            \"id\": 4511,\n            \"account_id\": 384077,\n            \"viewed\": false,\n            \"content\": {\n                \"album_cover\": null,\n                \"author\": \"jasdev\",\n                \"author_id\": 3698510,\n                \"children\": [],\n                \"comment\": \"Reply test\",\n                \"datetime\": 1406070774,\n                \"deleted\": false,\n                \"downs\": 0,\n                \"id\": 3616,\n                \"image_id\": \"VK9VqcM\",\n                \"on_album\": false,\n                \"parent_id\": 3615,\n                \"points\": 1,\n                \"ups\": 1,\n                \"vote\": null\n            }\n        }],\n        \"messages\": [{\n            \"id\": 4523,\n            \"account_id\": 384077,\n            \"viewed\": false,\n            \"content\": {\n                \"id\": \"620\",\n                \"from\": \"jasdev\",\n                \"account_id\": \"384077\",\n                \"with_account\": \"3698510\",\n                \"last_message\": \"wow. such message.\",\n                \"message_num\": \"103\",\n                \"datetime\": 1406935917\n            }\n        }]\n    },\n    \"success\": true,\n    \"status\": 200\n}\n          ",
+         "description" : " The base model for a notification. ",
+         "pname" : "Notification"
+      }
+   ],
+   "album" : [
+      {
+         "example" : "{\n   \"status\" : 200,\n   \"data\" : {\n      \"layout\" : \"blog\",\n      \"title\" : \"Imgur Office\",\n      \"privacy\" : \"public\",\n      \"datetime\" : 1357856292,\n      \"link\" : \"http://alanbox.imgur.com/a/lDRB2\",\n      \"views\" : 13780,\n      \"cover\" : \"24nLu\",\n      \"account_url\" : \"Alan\",\n      \"images\" : [\n         {\n            \"bandwidth\" : 116174397976,\n            \"description\" : null,\n            \"id\" : \"24nLu\",\n            \"title\" : null,\n            \"size\" : 855658,\n            \"datetime\" : 1357856352,\n            \"type\" : \"image/jpeg\",\n            \"link\" : \"http://i.imgur.com/24nLu.jpg\",\n            \"width\" : 2592,\n            \"height\" : 1944,\n            \"views\" : 135772,\n            \"animated\" : false\n         },\n         {\n            \"bandwidth\" : 124571044763,\n            \"description\" : null,\n            \"id\" : \"Ziz25\",\n            \"height\" : 1944,\n            \"width\" : 2592,\n            \"views\" : 135493,\n            \"animated\" : false,\n            \"title\" : null,\n            \"size\" : 919391,\n            \"datetime\" : 1357856394,\n            \"type\" : \"image/jpeg\",\n            \"link\" : \"http://i.imgur.com/Ziz25.jpg\"\n         },\n         {\n            \"height\" : 1944,\n            \"width\" : 2592,\n            \"views\" : 135063,\n            \"animated\" : false,\n            \"title\" : null,\n            \"size\" : 655028,\n            \"datetime\" : 1357856385,\n            \"type\" : \"image/jpeg\",\n            \"link\" : \"http://i.imgur.com/9tzW6.jpg\",\n            \"bandwidth\" : 88470046764,\n            \"id\" : \"9tzW6\",\n            \"description\" : null\n         },\n         {\n            \"title\" : null,\n            \"size\" : 812738,\n            \"type\" : \"image/jpeg\",\n            \"datetime\" : 1357856378,\n            \"link\" : \"http://i.imgur.com/dFg5u.jpg\",\n            \"height\" : 1944,\n            \"width\" : 2592,\n            \"views\" : 134704,\n            \"animated\" : false,\n            \"bandwidth\" : 109479059552,\n            \"description\" : null,\n            \"id\" : \"dFg5u\"\n         },\n         {\n            \"type\" : \"image/jpeg\",\n            \"datetime\" : 1357856338,\n            \"link\" : \"http://i.imgur.com/oknLx.jpg\",\n            \"title\" : null,\n            \"size\" : 717324,\n            \"animated\" : false,\n            \"width\" : 1749,\n            \"height\" : 2332,\n            \"views\" : 32938,\n            \"bandwidth\" : 23627217912,\n            \"id\" : \"oknLx\",\n            \"description\" : null\n         },\n         {\n            \"bandwidth\" : 46683752652,\n            \"description\" : null,\n            \"id\" : \"OL6tC\",\n            \"height\" : 1944,\n            \"width\" : 2592,\n            \"views\" : 32346,\n            \"animated\" : false,\n            \"title\" : null,\n            \"size\" : 1443262,\n            \"type\" : \"image/jpeg\",\n            \"datetime\" : 1357856321,\n            \"link\" : \"http://i.imgur.com/OL6tC.jpg\"\n         },\n         {\n            \"id\" : \"cJ9cm\",\n            \"description\" : null,\n            \"bandwidth\" : 17337319958,\n            \"size\" : 544702,\n            \"title\" : null,\n            \"link\" : \"http://i.imgur.com/cJ9cm.jpg\",\n            \"type\" : \"image/jpeg\",\n            \"datetime\" : 1357856330,\n            \"views\" : 31829,\n            \"height\" : 1944,\n            \"width\" : 2592,\n            \"animated\" : false\n         },\n         {\n            \"type\" : \"image/jpeg\",\n            \"datetime\" : 1357856369,\n            \"link\" : \"http://i.imgur.com/7BtPN.jpg\",\n            \"title\" : null,\n            \"size\" : 844863,\n            \"animated\" : false,\n            \"height\" : 1944,\n            \"width\" : 2592,\n            \"views\" : 31257,\n            \"bandwidth\" : 26407882791,\n            \"description\" : null,\n            \"id\" : \"7BtPN\"\n         },\n         {\n            \"animated\" : false,\n            \"views\" : 30945,\n            \"height\" : 1944,\n            \"width\" : 2592,\n            \"link\" : \"http://i.imgur.com/42ib8.jpg\",\n            \"datetime\" : 1357856424,\n            \"type\" : \"image/jpeg\",\n            \"size\" : 905073,\n            \"title\" : null,\n            \"id\" : \"42ib8\",\n            \"description\" : null,\n            \"bandwidth\" : 28007483985\n         },\n         {\n            \"id\" : \"BbwIx\",\n            \"description\" : null,\n            \"bandwidth\" : 19943268191,\n            \"size\" : 662413,\n            \"title\" : null,\n            \"link\" : \"http://i.imgur.com/BbwIx.jpg\",\n            \"datetime\" : 1357856360,\n            \"type\" : \"image/jpeg\",\n            \"views\" : 30107,\n            \"width\" : 1749,\n            \"height\" : 2332,\n            \"animated\" : false\n         },\n         {\n            \"datetime\" : 1357856406,\n            \"type\" : \"image/jpeg\",\n            \"link\" : \"http://i.imgur.com/x7b91.jpg\",\n            \"title\" : null,\n            \"size\" : 618567,\n            \"animated\" : false,\n            \"height\" : 2592,\n            \"width\" : 1944,\n            \"views\" : 29259,\n            \"bandwidth\" : 18098651853,\n            \"description\" : null,\n            \"id\" : \"x7b91\"\n         }\n      ],\n      \"description\" : null,\n      \"id\" : \"lDRB2\",\n      \"account_id\" : 4,\n      \"images_count\" : 11\n   },\n   \"success\" : true\n}\n",
+         "description" : " This model represents the data for albums ",
+         "pname" : "Album",
+         "fields" : [
+            {
+               "type" : "string",
+               "desc" : "The ID for the album",
+               "name" : "id"
+            },
+            {
+               "desc" : "The title of the album in the gallery",
+               "type" : "string",
+               "name" : "title"
+            },
+            {
+               "desc" : "The description of the album in the gallery",
+               "type" : "string",
+               "name" : "description"
+            },
+            {
+               "desc" : "Time inserted into the gallery, epoch time",
+               "type" : "integer",
+               "name" : "datetime"
+            },
+            {
+               "type" : "string",
+               "desc" : "The ID of the album cover image",
+               "name" : "cover"
+            },
+            {
+               "name" : "cover_width",
+               "type" : "integer",
+               "desc" : "The width, in pixels, of the album cover image"
+            },
+            {
+               "name" : "cover_height",
+               "desc" : "The height, in pixels, of the album cover image",
+               "type" : "integer"
+            },
+            {
+               "type" : "string",
+               "desc" : "The account username or null if it's anonymous.",
+               "name" : "account_url"
+            },
+            {
+               "name" : "account_id",
+               "type" : "int",
+               "desc" : "The account ID  or null if it's anonymous."
+            },
+            {
+               "name" : "privacy",
+               "desc" : "The privacy level of the album, you can only view public if not logged in as album owner",
+               "type" : "string"
+            },
+            {
+               "type" : "string",
+               "desc" : "The view layout of the album.",
+               "name" : "layout"
+            },
+            {
+               "name" : "views",
+               "type" : "integer",
+               "desc" : "The number of album views"
+            },
+            {
+               "desc" : "The URL link to the album",
+               "type" : "string",
+               "name" : "link"
+            },
+            {
+               "desc" : "Indicates if the current user favorited the image. Defaults to false if not signed in.",
+               "type" : "boolean",
+               "name" : "favorite"
+            },
+            {
+               "type" : "boolean",
+               "desc" : "Indicates if the image has been marked as nsfw or not. Defaults to null if information is not available.",
+               "name" : "nsfw"
+            },
+            {
+               "type" : "string",
+               "desc" : "If the image has been categorized by our backend then this will contain the section the image belongs in. (funny, cats, adviceanimals, wtf, etc)",
+               "name" : "section"
+            },
+            {
+               "type" : "integer",
+               "desc" : "Order number of the album on the user's album page (defaults to 0 if their albums haven't been reordered)",
+               "name" : "order"
+            },
+            {
+               "name" : "deletehash",
+               "type" : "string",
+               "desc" : "OPTIONAL, the deletehash, if you're logged in as the album owner"
+            },
+            {
+               "desc" : "The total number of images in the album",
+               "type" : "integer",
+               "name" : "images_count"
+            },
+            {
+               "type" : "Array of Images",
+               "desc" : "An array of all the images in the album (only available when requesting the direct album)",
+               "name" : "images"
+            },
+            {
+               "type" : "boolean",
+               "desc" : "True if the image has been submitted to the gallery, false if otherwise.",
+               "name" : "in_gallery"
+            }
+         ]
+      }
+   ],
+   "message" : [
+      {
+         "fields" : [
+            {
+               "desc" : "The ID for the message",
+               "type" : "integer",
+               "name" : "id"
+            },
+            {
+               "desc" : "Account username of person sending the message",
+               "type" : "string",
+               "name" : "from"
+            },
+            {
+               "desc" : "The account ID of the person receiving the message",
+               "type" : "integer",
+               "name" : "account_id"
+            },
+            {
+               "type" : "integer",
+               "desc" : "The account ID of the person who sent the message",
+               "name" : "sender_id"
+            },
+            {
+               "type" : "string",
+               "desc" : "Text of the message",
+               "name" : "body"
+            },
+            {
+               "name" : "conversation_id",
+               "type" : "integer",
+               "desc" : "ID for the overall conversation"
+            },
+            {
+               "name" : "datetime",
+               "desc" : "Time message was sent, epoch time",
+               "type" : "integer"
+            }
+         ],
+         "pname" : "Message",
+         "description" : " The base model for a message. "
+      }
+   ],
+   "image" : [
+      {
+         "pname" : "Image",
+         "description" : " The base model for an image. ",
+         "example" : "{\n   \"success\" : true,\n   \"status\" : 200,\n   \"data\" : {\n      \"views\" : 1,\n      \"width\" : 2559,\n      \"height\" : 1439,\n      \"animated\" : false,\n      \"size\" : 521916,\n      \"title\" : null,\n      \"link\" : \"http://i.imgur.com/SbBGk.jpg\",\n      \"datetime\" : 1341533193,\n      \"type\" : \"image/jpeg\",\n      \"id\" : \"SbBGk\",\n      \"section\" : null,\n      \"description\" : null,\n      \"bandwidth\" : 521916,\n      \"deletehash\" : \"eYZd3NNJHsbreD1\"\n   }\n}\n",
+         "fields" : [
+            {
+               "name" : "id",
+               "type" : "string",
+               "desc" : "The ID for the image"
+            },
+            {
+               "desc" : "The title of the image.",
+               "type" : "string",
+               "name" : "title"
+            },
+            {
+               "desc" : "Description of the image.",
+               "type" : "string",
+               "name" : "description"
+            },
+            {
+               "type" : "integer",
+               "desc" : "Time uploaded, epoch time",
+               "name" : "datetime"
+            },
+            {
+               "name" : "type",
+               "desc" : "Image MIME type.",
+               "type" : "string"
+            },
+            {
+               "type" : "boolean",
+               "desc" : "is the image animated",
+               "name" : "animated"
+            },
+            {
+               "type" : "integer",
+               "desc" : "The width of the image in pixels",
+               "name" : "width"
+            },
+            {
+               "desc" : "The height of the image in pixels",
+               "type" : "integer",
+               "name" : "height"
+            },
+            {
+               "name" : "size",
+               "desc" : "The size of the image in bytes",
+               "type" : "integer"
+            },
+            {
+               "name" : "views",
+               "type" : "integer",
+               "desc" : "The number of image views"
+            },
+            {
+               "name" : "bandwidth",
+               "desc" : "Bandwidth consumed by the image in bytes",
+               "type" : "integer"
+            },
+            {
+               "name" : "deletehash",
+               "type" : "string",
+               "desc" : "OPTIONAL, the deletehash, if you're logged in as the image owner"
+            },
+            {
+               "desc" : "OPTIONAL, the original filename, if you're logged in as the image owner",
+               "type" : "string",
+               "name" : "name"
+            },
+            {
+               "type" : "string",
+               "desc" : "If the image has been categorized by our backend then this will contain the section the image belongs in. (funny, cats, adviceanimals, wtf, etc)",
+               "name" : "section"
+            },
+            {
+               "desc" : "The direct link to the the image. (Note: if fetching an animated GIF that was over 20MB in original size, a .gif thumbnail will be returned)",
+               "type" : "string",
+               "name" : "link"
+            },
+            {
+               "type" : "string",
+               "desc" : "OPTIONAL, The .gifv link. Only available if the image is animated and type is 'image/gif'.",
+               "name" : "gifv"
+            },
+            {
+               "desc" : "OPTIONAL, The direct link to the .mp4. Only available if the image is animated and type is 'image/gif'.",
+               "type" : "string",
+               "name" : "mp4"
+            },
+            {
+               "name" : "mp4_size",
+               "desc" : "OPTIONAL, The Content-Length of the .mp4. Only available if the image is animated and type is 'image/gif'. Note that a zero value (0) is possible if the video has not yet been generated",
+               "type" : "integer"
+            },
+            {
+               "name" : "looping",
+               "type" : "boolean",
+               "desc" : "OPTIONAL, Whether the image has a looping animation. Only available if the image is animated and type is 'image/gif'."
+            },
+            {
+               "type" : "boolean",
+               "desc" : "Indicates if the current user favorited the image. Defaults to false if not signed in.",
+               "name" : "favorite"
+            },
+            {
+               "name" : "nsfw",
+               "type" : "boolean",
+               "desc" : "Indicates if the image has been marked as nsfw or not. Defaults to null if information is not available."
+            },
+            {
+               "type" : "string",
+               "desc" : "The current user's vote on the album. null if not signed in, if the user hasn't voted on it, or if not submitted to the gallery.",
+               "name" : "vote"
+            },
+            {
+               "desc" : "True if the image has been submitted to the gallery, false if otherwise.",
+               "type" : "boolean",
+               "name" : "in_gallery"
+            }
+         ]
+      }
+   ],
+   "tag_vote" : [
+      {
+         "fields" : [
+            {
+               "desc" : "Number of upvotes.",
+               "type" : "integer",
+               "name" : "ups"
+            },
+            {
+               "name" : "downs",
+               "desc" : "Number of downvotes.",
+               "type" : "integer"
+            },
+            {
+               "name" : "name",
+               "type" : "string",
+               "desc" : "Name of the tag."
+            },
+            {
+               "name" : "author",
+               "type" : "string",
+               "desc" : "Author of the tag."
+            }
+         ],
+         "pname" : "TagVote",
+         "description" : " The base model for a tag vote. ",
+         "example" : "{\n   \"data\" : {\n      \"tags\" : [\n         {\n            \"downs\" : 5,\n            \"ups\" : 20,\n            \"name\" : \"funny\",\n            \"author\" : \"jasdev\"\n         },\n         {\n            \"author\" : \"gottagitgit\",\n            \"downs\" : 4,\n            \"ups\" : 10,\n            \"name\" : \"cute\"\n         }\n      ]\n   },\n   \"status\" : 200,\n   \"success\" : true\n}\n"
+      }
+   ],
+   "gallery_album" : [
+      {
+         "fields" : [
+            {
+               "desc" : "The ID for the image",
+               "type" : "string",
+               "name" : "id"
+            },
+            {
+               "name" : "title",
+               "type" : "string",
+               "desc" : "The title of the album in the gallery"
+            },
+            {
+               "name" : "description",
+               "type" : "string",
+               "desc" : "The description of the album in the gallery"
+            },
+            {
+               "name" : "datetime",
+               "desc" : "Time inserted into the gallery, epoch time",
+               "type" : "integer"
+            },
+            {
+               "desc" : "The ID of the album cover image",
+               "type" : "string",
+               "name" : "cover"
+            },
+            {
+               "type" : "integer",
+               "desc" : "The width, in pixels, of the album cover image",
+               "name" : "cover_width"
+            },
+            {
+               "type" : "integer",
+               "desc" : "The height, in pixels, of the album cover image",
+               "name" : "cover_height"
+            },
+            {
+               "name" : "account_url",
+               "type" : "string",
+               "desc" : "The account username or null if it's anonymous."
+            },
+            {
+               "desc" : "The account ID of the account that uploaded it, or null.",
+               "type" : "integer",
+               "name" : "account_id"
+            },
+            {
+               "type" : "string",
+               "desc" : "The privacy level of the album, you can only view public if not logged in as album owner",
+               "name" : "privacy"
+            },
+            {
+               "desc" : "The view layout of the album.",
+               "type" : "string",
+               "name" : "layout"
+            },
+            {
+               "desc" : "The number of image views",
+               "type" : "integer",
+               "name" : "views"
+            },
+            {
+               "name" : "link",
+               "desc" : "The URL link to the album",
+               "type" : "string"
+            },
+            {
+               "name" : "ups",
+               "desc" : "Upvotes for the image",
+               "type" : "integer"
+            },
+            {
+               "name" : "downs",
+               "desc" : "Number of downvotes for the image",
+               "type" : "integer"
+            },
+            {
+               "name" : "points",
+               "desc" : "Upvotes minus downvotes",
+               "type" : "integer"
+            },
+            {
+               "type" : "integer",
+               "desc" : "Imgur popularity score",
+               "name" : "score"
+            },
+            {
+               "desc" : "if it's an album or not",
+               "type" : "boolean",
+               "name" : "is_album"
+            },
+            {
+               "desc" : "The current user's vote on the album. null if not signed in or if the user hasn't voted on it.",
+               "type" : "string",
+               "name" : "vote"
+            },
+            {
+               "name" : "favorite",
+               "type" : "boolean",
+               "desc" : "Indicates if the current user favorited the album. Defaults to false if not signed in."
+            },
+            {
+               "name" : "nsfw",
+               "type" : "boolean",
+               "desc" : "Indicates if the album has been marked as nsfw or not. Defaults to null if information is not available."
+            },
+            {
+               "type" : "int",
+               "desc" : "Number of comments on the gallery album.",
+               "name" : "comment_count"
+            },
+            {
+               "type" : "string",
+               "desc" : "Topic of the gallery album.",
+               "name" : "topic"
+            },
+            {
+               "desc" : "Topic ID of the gallery album.",
+               "type" : "integer",
+               "name" : "topic_id"
+            },
+            {
+               "type" : "integer",
+               "desc" : "The total number of images in the album",
+               "name" : "images_count"
+            },
+            {
+               "type" : "Array of Images",
+               "desc" : "An array of all the images in the album (only available when requesting the direct album)",
+               "name" : "images"
+            },
+            {
+               "type" : "boolean",
+               "desc" : "Indicates if the album is in the most viral gallery or not.",
+               "name" : "in_most_viral"
+            }
+         ],
+         "pname" : "GalleryAlbum",
+         "description" : " The data model formatted for gallery albums. ",
+         "example" : "{\n   \"success\" : true,\n   \"status\" : 200,\n   \"data\" : {\n      \"ups\" : 1602,\n      \"account_url\" : \"Alan\",\n      \"privacy\" : \"public\",\n      \"comment_count\" : 10,\n      \"title\" : \"Imgur Office\",\n      \"images_count\" : 11,\n      \"points\" : 1588,\n      \"downs\" : 14,\n      \"id\" : \"lDRB2\",\n      \"description\" : null,\n      \"images\" : [\n         {\n            \"animated\" : false,\n            \"height\" : 1944,\n            \"width\" : 2592,\n            \"views\" : 135772,\n            \"type\" : \"image/jpeg\",\n            \"datetime\" : 1357856352,\n            \"link\" : \"http://i.imgur.com/24nLu.jpg\",\n            \"title\" : null,\n            \"size\" : 855658,\n            \"bandwidth\" : 116174397976,\n            \"description\" : null,\n            \"id\" : \"24nLu\"\n         },\n         {\n            \"views\" : 135493,\n            \"width\" : 2592,\n            \"height\" : 1944,\n            \"animated\" : false,\n            \"size\" : 919391,\n            \"title\" : null,\n            \"link\" : \"http://i.imgur.com/Ziz25.jpg\",\n            \"datetime\" : 1357856394,\n            \"type\" : \"image/jpeg\",\n            \"id\" : \"Ziz25\",\n            \"description\" : null,\n            \"bandwidth\" : 124571044763\n         },\n         {\n            \"bandwidth\" : 88470046764,\n            \"id\" : \"9tzW6\",\n            \"description\" : null,\n            \"title\" : null,\n            \"size\" : 655028,\n            \"datetime\" : 1357856385,\n            \"type\" : \"image/jpeg\",\n            \"link\" : \"http://i.imgur.com/9tzW6.jpg\",\n            \"width\" : 2592,\n            \"height\" : 1944,\n            \"views\" : 135063,\n            \"animated\" : false\n         },\n         {\n            \"views\" : 134704,\n            \"width\" : 2592,\n            \"height\" : 1944,\n            \"animated\" : false,\n            \"size\" : 812738,\n            \"title\" : null,\n            \"link\" : \"http://i.imgur.com/dFg5u.jpg\",\n            \"datetime\" : 1357856378,\n            \"type\" : \"image/jpeg\",\n            \"description\" : null,\n            \"id\" : \"dFg5u\",\n            \"bandwidth\" : 109479059552\n         },\n         {\n            \"bandwidth\" : 23627217912,\n            \"description\" : null,\n            \"id\" : \"oknLx\",\n            \"width\" : 1749,\n            \"height\" : 2332,\n            \"views\" : 32938,\n            \"animated\" : false,\n            \"title\" : null,\n            \"size\" : 717324,\n            \"datetime\" : 1357856338,\n            \"type\" : \"image/jpeg\",\n            \"link\" : \"http://i.imgur.com/oknLx.jpg\"\n         },\n         {\n            \"views\" : 32346,\n            \"width\" : 2592,\n            \"height\" : 1944,\n            \"animated\" : false,\n            \"size\" : 1443262,\n            \"title\" : null,\n            \"link\" : \"http://i.imgur.com/OL6tC.jpg\",\n            \"datetime\" : 1357856321,\n            \"type\" : \"image/jpeg\",\n            \"description\" : null,\n            \"id\" : \"OL6tC\",\n            \"bandwidth\" : 46683752652\n         },\n         {\n            \"description\" : null,\n            \"id\" : \"cJ9cm\",\n            \"bandwidth\" : 17337319958,\n            \"views\" : 31829,\n            \"width\" : 2592,\n            \"height\" : 1944,\n            \"animated\" : false,\n            \"size\" : 544702,\n            \"title\" : null,\n            \"link\" : \"http://i.imgur.com/cJ9cm.jpg\",\n            \"type\" : \"image/jpeg\",\n            \"datetime\" : 1357856330\n         },\n         {\n            \"width\" : 2592,\n            \"height\" : 1944,\n            \"views\" : 31257,\n            \"animated\" : false,\n            \"title\" : null,\n            \"size\" : 844863,\n            \"datetime\" : 1357856369,\n            \"type\" : \"image/jpeg\",\n            \"link\" : \"http://i.imgur.com/7BtPN.jpg\",\n            \"bandwidth\" : 26407882791,\n            \"description\" : null,\n            \"id\" : \"7BtPN\"\n         },\n         {\n            \"description\" : null,\n            \"id\" : \"42ib8\",\n            \"bandwidth\" : 28007483985,\n            \"animated\" : false,\n            \"views\" : 30945,\n            \"height\" : 1944,\n            \"width\" : 2592,\n            \"link\" : \"http://i.imgur.com/42ib8.jpg\",\n            \"datetime\" : 1357856424,\n            \"type\" : \"image/jpeg\",\n            \"size\" : 905073,\n            \"title\" : null\n         },\n         {\n            \"height\" : 2332,\n            \"width\" : 1749,\n            \"views\" : 30107,\n            \"animated\" : false,\n            \"title\" : null,\n            \"size\" : 662413,\n            \"type\" : \"image/jpeg\",\n            \"datetime\" : 1357856360,\n            \"link\" : \"http://i.imgur.com/BbwIx.jpg\",\n            \"bandwidth\" : 19943268191,\n            \"description\" : null,\n            \"id\" : \"BbwIx\"\n         },\n         {\n            \"animated\" : false,\n            \"views\" : 29259,\n            \"width\" : 1944,\n            \"height\" : 2592,\n            \"link\" : \"http://i.imgur.com/x7b91.jpg\",\n            \"datetime\" : 1357856406,\n            \"type\" : \"image/jpeg\",\n            \"size\" : 618567,\n            \"title\" : null,\n            \"id\" : \"x7b91\",\n            \"description\" : null,\n            \"bandwidth\" : 18098651853\n         }\n      ],\n      \"vote\" : null,\n      \"views\" : 13780,\n      \"cover\" : \"24nLu\",\n      \"link\" : \"http://alanbox.imgur.com/a/lDRB2\",\n      \"is_album\" : true,\n      \"datetime\" : 1357856292,\n      \"layout\" : \"blog\",\n      \"score\" : 1917,\n      \"account_id\" : 4\n   }\n}\n"
+      }
+   ],
+   "meme_metadata" : [
+      {
+         "example" : "{\n   \"success\" : true,\n   \"data\" : {\n      \"meme_metadata\" : {\n         \"bg_image\" : \"kH1SKhp\",\n         \"meme_name\" : \"Confession Bear\",\n         \"top_text\" : \"BEING ON IMGUR\",\n         \"bottom_text\" : \"HAS ACTUALLY IMPROVEDMY SPELLING AND GRAMMER\"\n      }\n   },\n   \"status\" : 200\n}\n",
+         "description" : " This model is used to represent the basic meme metadata. ",
+         "pname" : "MemeMetadata",
+         "fields" : [
+            {
+               "name" : "meme_name",
+               "type" : "String",
+               "desc" : "The name of the meme used."
+            },
+            {
+               "name" : "top_text",
+               "desc" : "The top text of the meme.",
+               "type" : "String"
+            },
+            {
+               "type" : "String",
+               "desc" : "The bottom text of the meme.",
+               "name" : "bottom_text"
+            },
+            {
+               "type" : "String",
+               "desc" : "The image id of the background image of the meme.",
+               "name" : "bg_image"
+            }
+         ]
+      }
+   ],
+   "vote" : [
+      {
+         "example" : "{\n   \"success\" : true,\n   \"data\" : {\n      \"ups\" : 4511,\n      \"downs\" : 12\n   },\n   \"status\" : 200\n}\n",
+         "description" : " The base model for a vote. ",
+         "pname" : "Vote",
+         "fields" : [
+            {
+               "name" : "ups",
+               "type" : "integer",
+               "desc" : "Number of upvotes"
+            },
+            {
+               "name" : "downs",
+               "type" : "integer",
+               "desc" : "Number of downvotes"
+            }
+         ]
+      }
+   ]
+}
+

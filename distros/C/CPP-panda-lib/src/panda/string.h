@@ -13,7 +13,9 @@ namespace panda {
         inline T _stox (const string& str, std::size_t* pos = 0, int base = 10) {
             T val;
             auto res = std::from_chars(str.data(), str.data() + str.length(), val, base);
-            *pos = res.ptr - str.data();
+            if (pos) {
+                *pos = res.ptr - str.data();
+            }
             if (res.ec) {
                 if (res.ec == std::errc::invalid_argument) throw std::invalid_argument("stoi");
                 else if (res.ec == std::errc::result_out_of_range) throw std::out_of_range("stoi");

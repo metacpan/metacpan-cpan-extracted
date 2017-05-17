@@ -129,7 +129,11 @@ Makefile.PL
 MANIFEST			This list of files
 META.yml
 mojomojo.conf
-README
+MYMETA.json
+MYMETA.yml
+README.md
+resources/logo/LinkedIn_logo.png
+resources/logo/logo64x64.png
 resources/logo/mmlogovector.psd
 root/base/admin/create_role.tt
 root/base/admin/edit_role.tt
@@ -227,6 +231,7 @@ root/forms/user/register.yml
 root/static/catalyst.png
 root/static/Crystal_Clear_action_stop.png
 root/static/css/jquery.autocomplete.css
+root/static/css/prism.css
 root/static/css/progress.css
 root/static/emote/47_47.gif
 root/static/emote/48_48.gif
@@ -317,6 +322,7 @@ root/static/js/jquery.editinplace.js
 root/static/js/jquery.form.js
 root/static/js/jquery.js
 root/static/js/jquery.livequery.js
+root/static/js/prism.js
 root/static/js/swfupload.js
 root/static/js/swfupload.queue.js
 root/static/js/wiki.js
@@ -446,6 +452,7 @@ script/mojomojo_update_db.pl
 script/update_po.sh
 script/util/bust_cache.pl
 script/util/dbk2xhtml.pl
+script/util/delete_inactive_users.pl
 script/util/delete_page.pl
 script/util/dir2mojomojo.pl
 script/util/dump_content.pl
@@ -520,6 +527,5 @@ t/var/files/catalyst.png
 t/var/files/test.pod
 t/var/files/test.txt
 t/var/files/test.xml
-t/var/mojomojo.yml
 t/wikispaces2markdown.t
 t/worddiff.t

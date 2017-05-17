@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use mro;
 
-our $VERSION = '3.19';
+our $VERSION = '3.20';
 
 require Storable;
 require Carp;
@@ -344,13 +344,26 @@ sub discover_schema {
 
     my $table = $inspector->table($self->table);
 
-    $self->set_columns(
-        map {
-            $_->name => defined $_->column_def
-              ? ({default => $_->column_def =~ /^'(.*?)'/ ? $1 : $_->column_def})
-              : ($_->is_nullable ? {default => undef, is_null => 1} : ())
-        } $table->columns
-    );
+    $self->{columns} = [];
+    foreach my $column ($table->columns) {
+        my $default_value = undef;
+
+        if ( defined $column->column_def ) {
+            $default_value =
+              $column->column_def =~ /^'(.*?)'/ ? $1 : $column->column_def;
+
+            if ($column->type_name =~ m/^bool/i) {
+                if ($column->column_def =~ m/^\d/) {
+                    $default_value = $column->column_def;
+                }
+                else {
+                    $default_value = $column->column_def =~ m/^t/ ? 1 == 1 : 1 == 0;
+                }
+            }
+        }
+
+        $self->add_column($column->name, { default => $default_value, is_null => $column->is_nullable });
+    }
 
     $self->set_primary_key(map { $_->name } $table->primary_key);
 

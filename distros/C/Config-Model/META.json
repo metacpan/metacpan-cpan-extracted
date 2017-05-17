@@ -17,7 +17,7 @@
       "build" : {
          "requires" : {
             "Module::Build" : "0.34",
-            "YAML" : "0"
+            "YAML::Tiny" : "0"
          }
       },
       "configure" : {
@@ -30,7 +30,7 @@
             "Fuse" : "0",
             "Term::ReadLine" : "0",
             "Text::Levenshtein::Damerau" : "0",
-            "YAML" : "0"
+            "YAML::Tiny" : "0"
          },
          "requires" : {
             "Carp" : "0",
@@ -96,7 +96,7 @@
          "web" : "http://github.com/dod38fr/config-model"
       }
    },
-   "version" : "2.101",
+   "version" : "2.102",
    "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

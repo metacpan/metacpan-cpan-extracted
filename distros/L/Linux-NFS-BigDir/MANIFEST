@@ -5,7 +5,6 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
-README
 README.md
 cpanfile
 dist.ini
@@ -14,13 +13,13 @@ inc/Devel/AssertOS/Android.pm
 inc/Devel/AssertOS/Linux.pm
 inc/Devel/CheckOS.pm
 lib/Linux/NFS/BigDir.pm
-lib/Linux/NFS/_Inline/config-x86_64-linux-5.024001
-lib/Linux/NFS/_Inline/lib/auto/Linux/NFS/BigDir_a0a4/BigDir_a0a4.inl
-lib/Linux/NFS/_Inline/lib/auto/Linux/NFS/BigDir_a0a4/BigDir_a0a4.so
-lib/Linux/NFS/_Inline/lib/auto/Linux/NFS/BigDir_a1a2/BigDir_a1a2.inl
-lib/Linux/NFS/_Inline/lib/auto/Linux/NFS/BigDir_a1a2/BigDir_a1a2.so
+lib/Linux/NFS/BigDir/Syscalls.pm
+t/00-report-prereqs.dd
+t/00-report-prereqs.t
 t/basic.t
 t/getdents.t
+xt/author/00-compile.t
+xt/author/pod-syntax.t
 xt/benchmark.t
 xt/kwalitee.t
 xt/pod-coverage.t

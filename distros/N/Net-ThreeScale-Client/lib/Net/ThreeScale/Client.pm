@@ -11,6 +11,7 @@ use HTTP::Tiny;
 use Net::ThreeScale::Response;
 use Try::Tiny;
 
+use URI;
 use URI::Escape::XS qw(uri_escape);
 use XML::Parser;
 use XML::Simple;
@@ -25,7 +26,7 @@ use constant {
 
 BEGIN {
 	@ISA         = qw(Exporter);
-	$VERSION     = "2.1.5";
+	$VERSION     = "2.1.6";
 	@EXPORT_OK   = qw();
 	%EXPORT_TAGS = (
 		'all' => \@EXPORT_OK,
@@ -194,7 +195,12 @@ sub report {
 
 	$self->_debug( "start> sending request: ", $url );
 
-	my $response = $self->{HTTPTiny}->post_form($url, { Content=>$content });
+	my $response = $self->{HTTPTiny}->request("POST", $url, {
+		content => $content,
+		headers => {
+			'Content-Type' => 'application/x-www-form-urlencoded',
+		},
+	});
 
 	$self->_debug( "start> got response : ", $response->{content} );
 
@@ -511,9 +517,13 @@ certainly monitor pull requests and consider merging any useful contributions.>
 
 =over 4
 
-=item  Net::ThreeScale::Response
+=item  L<Net::ThreeScale::Response>
 
-Contains details of response contnet and values. 
+Contains details of response content and values.
+
+=item L<https://www.3scale.net>
+
+The service with which this package integrates.
  
 =back
 
@@ -537,7 +547,11 @@ Ed Freyfogle
 
 Marc Metten
 
+=back
+
 =head1 LICENSE
 
 Released under the MIT license. Please see the LICENSE file in the root
 directory of the distribution.
+
+=cut

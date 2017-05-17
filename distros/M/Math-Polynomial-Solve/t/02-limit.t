@@ -1,10 +1,9 @@
 use 5.010001;
-use Test::More tests => 11;
+use Test::More tests => 10;
 
 use Math::Polynomial::Solve qw(:utility);
 use strict;
 use warnings;
-require "t/coef.pl";
 
 #
 # Cue the poly_iteration choices...
@@ -50,18 +49,13 @@ ok($ikeys{sturm_bisection} == 70, "sturm_bisection option is '$val' didn't get s
 #
 # Now the poly_tolerance choices.
 #
-@expected_names = qw( fltcmp laguerre newtonraphson);
+@expected_names = qw( laguerre newtonraphson);
 $expectedstr = join(" ", sort @expected_names);
 my %tkeys = poly_tolerance();
 my $tkeystr = join(" ", sort keys %tkeys);
 
 ok( $tkeystr eq $expectedstr,
 	"Mis-matched keys, expected '$expectedstr', got '$tkeystr'");
-
-poly_tolerance(fltcmp => 2.9e-10);
-%tkeys = poly_tolerance();
-$val = $tkeys{fltcmp};
-ok($val == 2.9e-10, "fltcmp option is '$val' didn't get set");
 
 poly_tolerance(laguerre => 2.9e-10);
 %tkeys = poly_tolerance();

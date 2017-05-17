@@ -4,7 +4,7 @@
       "Chris Travers <chris.travers@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.132140",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "bsd"
    ],
@@ -25,6 +25,11 @@
             "Test::More" : "0"
          }
       },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
@@ -32,7 +37,7 @@
             "PGObject::Util::Catalog::Types" : "0",
             "PGObject::Util::PseudoCSV" : "v1.1.0",
             "Scalar::Util" : "0",
-            "perl" : "5.008"
+            "perl" : "5.01"
          }
       }
    },
@@ -44,5 +49,6 @@
          "web" : "https://github.com/ledgersmb/PGObject-Type-Composite"
       }
    },
-   "version" : "0.04"
+   "version" : 1,
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

@@ -35,14 +35,15 @@ sub dbh {
 
     my @dsn;
     if (my $dsn = $ENV{TEST_OBJECTDB_DBH}) {
-        @dsn = split /,/, $dsn;
+        @dsn = split /,/, $dsn, 3;
+        push @dsn, '' while @dsn < 3;
     }
     else {
         push @dsn, 'dbi:SQLite::memory:', '', '';
     }
 
     my $dbh = DBI->connect(@dsn, {RaiseError => 1});
-    die $DBI::errorstr unless $dbh;
+    die $DBI::errstr unless $dbh;
 
     if (!$ENV{TEST_OBJECTDB_DBH}) {
         $dbh->do("PRAGMA default_synchronous = OFF");

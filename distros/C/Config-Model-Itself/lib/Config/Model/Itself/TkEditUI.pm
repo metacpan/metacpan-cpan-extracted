@@ -26,7 +26,7 @@
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 
 package Config::Model::Itself::TkEditUI ;
-$Config::Model::Itself::TkEditUI::VERSION = '2.009';
+$Config::Model::Itself::TkEditUI::VERSION = '2.010';
 use strict;
 use warnings ;
 use Carp ;

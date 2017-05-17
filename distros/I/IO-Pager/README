@@ -23,7 +23,7 @@ To install this module type the following:
    # Run non-interactive tests
    make test
    # Run interactive tests
-   perl -Mblib t.pl
+   perl -Mblib test.pl interactive
    make install
 
 DEPENDENCIES

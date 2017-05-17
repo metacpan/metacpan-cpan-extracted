@@ -1,5 +1,34 @@
 Changelog for CPAN-Testers-API
 
+0.011     2017-05-14 15:59:49+02:00 Europe/Paris
+
+    [Added]
+
+    - Added Metabase shim API for old-style CPAN Testers clients. These
+      clients will now produce new-style reports that will be processed
+      new ways.
+
+0.010     2017-05-14 10:32:18+02:00 Europe/Paris
+
+    [Fixed]
+
+    - Changed the "reporter" field which defined the reporter agent name
+      to "user_agent" to capitalize on the connotation with HTTP user
+      agents.
+
+    - Added some logging for report posts. There's a strange validation
+      error being returned that we're trying to track down, but also
+      it'd be nice just to have this for future diagnostics.
+
+0.009     2017-05-13 14:44:49+02:00 Europe/Paris
+
+    [Fixed]
+
+    - Changed test report format to move the test result into its own
+      top-level "result" object. This makes it easier to see what
+      information is about the test results and what information is
+      about the code distribution.
+
 0.008     2017-05-12 18:21:59+02:00 Europe/Paris
 
     [Added]

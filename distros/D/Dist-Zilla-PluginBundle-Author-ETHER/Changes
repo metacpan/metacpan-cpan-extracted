@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-PluginBundle-Author-ETHER
 
+0.124     2017-05-13 16:34:59Z
+          - added [EnsureLatestPerl] to before-release checks
+          - added [EnsureUnsafeInc] (with dot_in_INC=0)
+
 0.123     2017-04-27 21:04:35Z
           - bump up prereq for Test::Portability::Files (used by
             [Test::Portability]) for better compliance with ANSI filename

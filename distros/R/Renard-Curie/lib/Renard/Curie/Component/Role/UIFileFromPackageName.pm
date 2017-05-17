@@ -1,7 +1,7 @@
 use Renard::Curie::Setup;
 package Renard::Curie::Component::Role::UIFileFromPackageName;
 # ABSTRACT: Role to obtain name of Glade UI file from the name of the package
-$Renard::Curie::Component::Role::UIFileFromPackageName::VERSION = '0.001';
+$Renard::Curie::Component::Role::UIFileFromPackageName::VERSION = '0.002';
 use Moo::Role;
 
 use Renard::Curie::Types qw(File);
@@ -9,15 +9,17 @@ use File::Spec;
 use File::Basename;
 use Module::Util qw(:all);
 
-has ui_file => ( is => 'ro',
+has ui_file => (
+	is => 'ro',
 	isa => File,
 	coerce => 1,
-	default => method {
+	default => method() {
 		my $module_name = ref $self;
 		my $package_last_component = (split(/::/, $module_name))[-1];
 		my $module_file = find_installed($module_name);
 		File::Spec->catfile(dirname($module_file), "@{[ $package_last_component ]}.glade")
-	} );
+	}
+);
 
 1;
 
@@ -33,7 +35,7 @@ Renard::Curie::Component::Role::UIFileFromPackageName - Role to obtain name of G
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 DESCRIPTION
 

@@ -8,7 +8,7 @@ use Tk::ROText ;
 use Log::Dispatch::ToTk;
 use base qw(Tk::Derived Tk::ROText);
 
-$VERSION = '1.8';
+$VERSION = '1.9';
 
 Tk::Widget->Construct('LogText');
 

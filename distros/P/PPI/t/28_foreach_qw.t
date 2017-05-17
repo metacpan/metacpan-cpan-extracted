@@ -2,17 +2,11 @@
 
 # Standalone tests to check "foreach qw{foo} {}"
 
-use strict;
-BEGIN {
-	no warnings 'once';
-	$| = 1;
-	$PPI::XS_DISABLE = 1;
-	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
-}
+use lib 't/lib';
+use PPI::Test::pragmas;
+use Test::More tests => 12 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
-use Test::More tests => 13;
-use Test::NoWarnings;
-use File::Spec::Functions ':ALL';
+#use File::Spec::Functions ':ALL';
 use PPI;
 
 

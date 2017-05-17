@@ -18,12 +18,13 @@ my %module_build_args = (
     "Pablo Rodr\x{ed}guez Gonz\x{e1}lez <pablo.rodriguez.gonzalez\@gmail.com>"
   ],
   "dist_name" => "HTML-Notebook",
-  "dist_version" => "0.002",
+  "dist_version" => "0.003",
   "license" => "mit",
   "module_name" => "HTML::Notebook",
   "recursive_test_files" => 1,
   "requires" => {
     "Moose" => 0,
+    "Path::Tiny" => 0,
     "Text::Template" => 0,
     "UUID::Tiny" => 0,
     "namespace::autoclean" => 0,

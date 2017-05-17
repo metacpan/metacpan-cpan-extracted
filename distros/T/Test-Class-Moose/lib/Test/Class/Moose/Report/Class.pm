@@ -4,7 +4,7 @@ package Test::Class::Moose::Report::Class;
 
 use 5.10.0;
 
-our $VERSION = '0.83';
+our $VERSION = '0.84';
 
 use Moose;
 use Carp;
@@ -47,7 +47,7 @@ Test::Class::Moose::Report::Class - Reporting on test classes
 
 =head1 VERSION
 
-version 0.83
+version 0.84
 
 =head1 DESCRIPTION
 

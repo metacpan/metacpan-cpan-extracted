@@ -1,0 +1,113 @@
+=head1 NAME
+
+Imgur::API::Model::Notification
+
+=head1 DESCRIPTION
+
+=over 4
+
+The base model for a notification.
+
+=back
+
+=cut
+
+=head1 FIELDS
+ 
+=item 
+C<id I<integer>>
+
+=over 4
+
+The ID for the notification
+
+=back
+
+
+=item 
+C<account_id I<integer>>
+
+=over 4
+
+The Account ID for the notification
+
+=back
+
+
+=item 
+C<viewed I<boolean>>
+
+=over 4
+
+Has the user viewed the image yet?
+
+=back
+
+
+=item 
+C<content I<Mixed>>
+
+=over 4
+
+This can be any other model, currently only using comments and conversation metadata.
+
+=back
+
+
+
+=head1 EXAMPLE
+
+
+ 
+            {
+    "data": {
+        "replies": [{
+            "id": 4511,
+            "account_id": 384077,
+            "viewed": false,
+            "content": {
+                "album_cover": null,
+                "author": "jasdev",
+                "author_id": 3698510,
+                "children": [],
+                "comment": "Reply test",
+                "datetime": 1406070774,
+                "deleted": false,
+                "downs": 0,
+                "id": 3616,
+                "image_id": "VK9VqcM",
+                "on_album": false,
+                "parent_id": 3615,
+                "points": 1,
+                "ups": 1,
+                "vote": null
+            }
+        }],
+        "messages": [{
+            "id": 4523,
+            "account_id": 384077,
+            "viewed": false,
+            "content": {
+                "id": "620",
+                "from": "jasdev",
+                "account_id": "384077",
+                "with_account": "3698510",
+                "last_message": "wow. such message.",
+                "message_num": "103",
+                "datetime": 1406935917
+            }
+        }]
+    },
+    "success": true,
+    "status": 200
+}
+          
+
+
+=cut
+
+=head1 SEE ALSO
+
+http://api.imgur.com/models/notification
+
+

@@ -1,20 +1,13 @@
-	Math::Polynomial::Solve, version 2.75, 22 May 2016.
+	Math::Polynomial::Solve, version 2.80, 15 May 2017.
+-------------------------------------------------------------------------------
+
+As warned a year ago, most of the functions under the :utility tag have been
+moved to Math::Utils.
+
 -------------------------------------------------------------------------------
 Coming changes:
 
-Most of the functions under the :utility tag have been
-moved to Math::Utils. See the DEPRECATED FUNCTIONS section of the
-documentation, as well as the documentation of Math-Utils (there will
-be some parameter changes as well).
-
-You will now receive warning messages if you are using any of the
-deprecated functions in your code (politely collected and sorted for
-you at the end of the run.)
-
-The functions (and their warning messages) will be removed by version 2.80.
--------------------------------------------------------------------------------
-
-By release 3.00 (scheduled for approximately end of 2017), the default order
+By release 3.00 (scheduled for approximately end of 2018), the default order
 of the the coefficients of the polynomials will be changed to an ascending
 order, to match that of Math::Polynomial. To help with the change, the
 function ascending_order() is available.
@@ -33,6 +26,9 @@ you're also using Math::Polynomial), use ascending_order(). For example,
 
         my @cubic = (5, 11, 3, 1);
         my @roots = cubic_roots(@cubic);
+
+By version 2.85 (approximately end of 2017), you will be warned if you
+have not set the coefficient order in your programs.
 
 After version 3.00 is released, you can still maintain the old order
 by calling ascending_order():
@@ -69,8 +65,8 @@ in the web page Karl's Calculus Tutor,
 INSTALLATION:
 
 The usual way.  Unpack the archive:
-	gzip -d Math-Polynomial-Solve-2.75.tar.gz
-	tar xvf Math-Polynomial-Solve-2.75.tar
+	gzip -d Math-Polynomial-Solve-2.80.tar.gz
+	tar xvf Math-Polynomial-Solve-2.80.tar
 
 Go into the resulting directory, and type:
 	perl Build.PL

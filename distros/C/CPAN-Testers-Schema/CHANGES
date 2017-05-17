@@ -1,5 +1,41 @@
 Changelog for CPAN-Testers-Schema
 
+0.012     2017-05-14 15:56:39+02:00 Europe/Paris
+
+    [Fixed]
+
+    - Fixed upgrade for brand-new SQLite databases
+
+    [Added]
+
+    - Added a method to translate from test report JSON documents to the
+      main Stats table. Thanks @jberger!
+
+0.011     2017-05-14 15:50:18+02:00 Europe/Paris
+
+    [Added]
+
+    - Added cpantesters-schema install to custom DSN. This allows me to
+      build a custom SQLite database for local testing.
+    - Added a SQLite schema deployment strategy. This should make
+      testing a bit easier.
+
+0.010     2017-05-14 10:30:48+02:00 Europe/Paris
+
+    [Fixed]
+
+    - Fixed date/time format handling for TestReport created field. We
+      need to make sure that the date/time is formatted correctly for
+      the given database engine. The "created" date/time in the report
+      is always a full ISO8601 date/time.
+
+0.009     2017-05-13 14:42:38+02:00 Europe/Paris
+
+    [Fixed]
+
+    - Changed Metabase -> TestReport migration for new test report
+      format, which moves the test result into a top-level "result" key.
+
 0.008     2017-05-13 10:53:47+02:00 Europe/Paris
 
     [Fixed]

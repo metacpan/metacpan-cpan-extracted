@@ -6,7 +6,7 @@ package MarpaX::ESLIF::ECMA404;
 
 # ABSTRACT: JSON Data Interchange Format following ECMA-404 specification
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -62,7 +62,7 @@ MarpaX::ESLIF::ECMA404 - JSON Data Interchange Format following ECMA-404 specifi
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -103,12 +103,6 @@ L<MarpaX::ESLIF>, L<Log::Any>
 =head1 AUTHOR
 
 Jean-Damien Durand <jeandamiendurand@free.fr>
-
-=head1 CONTRIBUTOR
-
-=for stopwords Jean-Damien Durand
-
-Jean-Damien Durand <Jean-Damien.Durand@fisglobal.com>
 
 =head1 COPYRIGHT AND LICENSE
 

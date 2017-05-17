@@ -3,24 +3,25 @@ use Mojo::Base -strict;
 use Test::More;
 
 plan skip_all => 'set TEST_MORBO to enable this test (developer only!)' unless $ENV{TEST_MORBO};
-plan skip_all => 'Parallel::ForkManager is not available'               unless eval 'require Parallel::ForkManager;1';
-plan skip_all => 't/cgi-bin/slow.pl'                                    unless -x 't/cgi-bin/slow.pl';
+plan skip_all => 'Parallel::ForkManager is not available'
+  unless eval 'require Parallel::ForkManager;1';
+plan skip_all => 't/cgi-bin/slow.pl' unless -x 't/cgi-bin/slow.pl';
 
 use File::Spec::Functions 'catdir';
 use File::Temp 'tempdir';
 use IO::Socket::INET;
+use Mojo::File 'path';
 use Mojo::IOLoop::Server;
 use Mojo::Server::Daemon;
 use Mojo::Server::Morbo;
 use Mojo::UserAgent;
-use Mojo::Util 'spurt';
 
 # Prepare script
 my $n      = 5;
 my $dir    = tempdir CLEANUP => 1;
 my $script = catdir $dir, 'myapp.pl';
 my $morbo  = Mojo::Server::Morbo->new(watch => [$script]);
-spurt <<'EOF', $script;
+path($script)->spurt(<<'EOF');
 use Mojolicious::Lite;
 app->log->level('fatal');
 plugin CGI => ['/slow' => 't/cgi-bin/slow.pl'];

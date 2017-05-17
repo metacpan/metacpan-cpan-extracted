@@ -4,7 +4,7 @@
       "Tokuhiro Matsuno <tokuhirom@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.10",
+   "generated_by" : "Minilla/v3.0.9",
    "license" : [
       "perl_5"
    ],
@@ -109,14 +109,14 @@
    "provides" : {
       "Furl" : {
          "file" : "lib/Furl.pm",
-         "version" : "3.10"
+         "version" : "3.11"
       },
       "Furl::ConnectionCache" : {
          "file" : "lib/Furl/ConnectionCache.pm"
       },
       "Furl::HTTP" : {
          "file" : "lib/Furl/HTTP.pm",
-         "version" : "3.10"
+         "version" : "3.11"
       },
       "Furl::Headers" : {
          "file" : "lib/Furl/Headers.pm"
@@ -142,7 +142,7 @@
          "web" : "https://github.com/tokuhirom/Furl"
       }
    },
-   "version" : "3.10",
+   "version" : "3.11",
    "x_contributors" : [
       "Keiji, Yoshimi <walf443@gmail.com>",
       "Fuji, Goro <gfuji@cpan.org>",

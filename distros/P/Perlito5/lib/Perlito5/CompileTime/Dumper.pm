@@ -1,5 +1,6 @@
 package Perlito5::CompileTime::Dumper;
 
+use Perlito5::DumpToAST;
 use strict;
 
 sub generate_eval_string {
@@ -29,259 +30,320 @@ sub generate_eval_string {
     return $source_new;
 }
 
-sub _dumper {
-    my ($obj, $tab, $seen, $pos) = @_;
+sub _dump_AST_from_scope {
+    my ($name, $item, $vars, $dumper_seen,) = @_;
+    no strict 'refs';
 
-    return 'undef' if !defined $obj;
-
-    my $ref = ref($obj);
-    return Perlito5::Dumper::escape_string($obj) if !$ref;
-
-    my $as_string = "$obj";
-    return $seen->{$as_string} if $seen->{$as_string};
-    $seen->{$as_string} = $pos;
-        
-    my $tab1 = $tab . '    ';
-
-    if ($ref eq 'ARRAY') {
-        return '[]' unless @$obj;
-        my @out;
-        for my $i ( 0 .. $#$obj ) {
-            my $here = $pos . '->[' . $i . ']';
-            push @out, 
-                $tab1,
-                _dumper($obj->[$i], $tab1, $seen, $here), 
-                ",\n";
-        }
-        return join('', "[\n", @out, $tab, ']');
-    }
-    elsif ($ref eq 'HASH') {
-        return '{}' unless keys %$obj;
-        my @out;
-        for my $i ( sort keys %$obj ) {
-            my $here = $pos . '->{' . $i . '}';
-            push @out, 
-                $tab1,
-                "'$i' => ",
-                _dumper($obj->{$i}, $tab1, $seen, $here), 
-                ",\n";
-        }
-        return join('', "{\n", @out, $tab, '}');
-    }
-    elsif ($ref eq 'SCALAR' || $ref eq 'REF') {
-        return "\\" . _dumper($$obj, $tab1, $seen, $pos);
-    }
-    elsif ($ref eq 'CODE') {
+    my $sigil = substr($name, 0, 1);
+    if (ref($item) eq 'Perlito5::AST::Sub' && $item->{name}) {
         # TODO
+        # _dump_global($item, $seen, $dumper_seen, $vars, $tab);
+        # warn "# don't know how to initialize subroutine $name in BEGIN";
+        return;
+    }
 
-        # get the closed variables - see 'Sub' in Perl5 emitter
-        my $closure_flag = bless {}, "Perlito5::dump";
-        my $captures = $obj->($closure_flag) // {};
-
-        my @vars;
-        for my $var (keys %$captures) {
-            push @vars, 
-                'my ' . $var . ' = ' . _dumper($captures->{$var}, $tab1, $seen, $pos) . '; ';
-        }
-        return join('',
-            'do { ',
-                @vars,
-                'sub { "DUMMY" } ',
-            '}'
+    if (substr($name, 7, 1) lt 'A') {
+        # encode special variable names like $main::" to ${'main::"'}
+        $name = $sigil . '{' . Perlito5::Dumper::escape_string(substr($name,1)) . '}'
+    }
+    my $ast = $item->{ast};
+    if (ref($ast) eq 'Perlito5::AST::Var' && $ast->{_decl} eq "our") {
+        # "our" variables are lexical aliases; we want the original global variable name
+        $ast = Perlito5::AST::Var->new(
+            %$ast,
+            sigil => $ast->{'_real_sigil'} || $ast->{'sigil'},
+            namespace => $ast->{'namespace'} || $ast->{'_namespace'},
+            decl => 'global',
         );
+        $name = $ast->{sigil} . $ast->{namespace} . "::" . $ast->{name};
+        # return if $Perlito5::GLOBAL->{$name};    # skip if we've seen this before
+    }
+    my $bareword = substr($name, 1);
+    if (ref($ast) eq 'Perlito5::AST::Var' && $sigil eq '$') {
+        my $value = ${$bareword};
+        return if !defined($value);
+        push @$vars, # "$name = ", $dump;
+                Perlito5::AST::Apply->new(
+                    code => 'infix:<=>',
+                    arguments => [
+                        $ast,
+                        Perlito5::DumpToAST::dump_to_ast( $value, $dumper_seen, $ast ),  #'$name ),
+                    ],
+                );
+    }
+    elsif (ref($ast) eq 'Perlito5::AST::Var' && $sigil eq '@') {
+
+        # @{'X::ISA'}   ???
+        $bareword = substr($bareword, 2, -2) if substr($bareword,0,2) eq "{'";
+
+        my $value = \@{$bareword};
+        push @$vars, # "*$bareword = ", $dump;
+                Perlito5::AST::Apply->new(
+                    code => 'infix:<=>',
+                    arguments => [
+                        Perlito5::AST::Var->new( %$ast, sigil => '*' ),
+                        Perlito5::DumpToAST::dump_to_ast( $value, $dumper_seen, $ast ),  #''\\' . $name ),
+                    ],
+                );
+    }
+    elsif (ref($ast) eq 'Perlito5::AST::Var' && $sigil eq '%') {
+        my $value = \%{$bareword};
+        push @$vars, # "*$bareword = ", $dump;
+                Perlito5::AST::Apply->new(
+                    code => 'infix:<=>',
+                    arguments => [
+                        Perlito5::AST::Var->new( %$ast, sigil => '*' ),
+                        Perlito5::DumpToAST::dump_to_ast( $value, $dumper_seen, $ast ),  #''\\' . $name ),
+                    ],
+                );
+    }
+    elsif (ref($ast) eq 'Perlito5::AST::Var' && $sigil eq '*') {
+        # *mysub = sub {...}
+
+        # *{'strict::import'}   ???
+        $bareword = substr($bareword, 2, -2) if substr($bareword,0,2) eq "{'";
+
+        if (exists &{$bareword}) {
+            my $value = \&{$bareword};
+            push @$vars, # "*$bareword = ", $dump;
+                    Perlito5::AST::Apply->new(
+                        code => 'infix:<=>',
+                        arguments => [
+                            Perlito5::AST::Var->new( %$ast, sigil => '*' ),
+                            Perlito5::DumpToAST::dump_to_ast( $value, $dumper_seen, $ast ),  #''\\&' . $bareword ),
+                        ],
+                    );
+        }
+        if (defined ${$bareword}) {
+            my $value = \${$bareword};
+            push @$vars, # "*$bareword = ", $dump;
+                    Perlito5::AST::Apply->new(
+                        code => 'infix:<=>',
+                        arguments => [
+                            Perlito5::AST::Var->new( %$ast, sigil => '*' ),
+                            Perlito5::DumpToAST::dump_to_ast( $value, $dumper_seen, $ast ),  #''\\$' . $bareword ),
+                        ],
+                    );
+        }
+        if (@{$bareword}) {
+            my $value = \@{$bareword};
+            push @$vars, # "*$bareword = ", $dump;
+                    Perlito5::AST::Apply->new(
+                        code => 'infix:<=>',
+                        arguments => [
+                            Perlito5::AST::Var->new( %$ast, sigil => '*' ),
+                            Perlito5::DumpToAST::dump_to_ast( $value, $dumper_seen, $ast ),  #''\\@' . $bareword ),
+                        ],
+                    );
+        }
+        if (keys %{$bareword}) {
+            my $value = \%{$bareword};
+            push @$vars, # "*$bareword = ", $dump;
+                    Perlito5::AST::Apply->new(
+                        code => 'infix:<=>',
+                        arguments => [
+                            Perlito5::AST::Var->new( %$ast, sigil => '*' ),
+                            Perlito5::DumpToAST::dump_to_ast( $value, $dumper_seen, $ast ),  #'\\%' . $bareword ),
+                        ],
+                    );
+        }
+
+    }
+    else {
+        # warn "# don't know how to initialize variable $name in BEGIN";
     }
 
-    # TODO find out what kind of reference this is (ARRAY, HASH, ...)
-    # local $@;
-    # eval {
-    #     my @data = @$obj;
-    #     say "is array";
-    #     return 'bless(' . "..." . ", '$ref')";
-    # }
-    # or eval {
-    #     $@ = '';
-    #     my %data = %$obj;
-    #     say "is hash";
-    #     return 'bless(' . "..." . ", '$ref')";
-    # };
-    # $@ = '';
-    
-    # assume it's a blessed HASH
-    
-    my @out;
-    for my $i ( sort keys %$obj ) {
-        my $here = $pos . '->{' . $i . '}';
-        push @out, 
-            $tab1,
-            "'$i' => ",
-            _dumper($obj->{$i}, $tab1, $seen, $here), 
-            ",\n";
-    }
-    return join('', "bless({\n", @out, $tab, "}, '$ref')");
 }
 
-sub _dump_global {
-    my ($item, $seen, $dumper_seen, $vars, $tab) = @_;
+# TODO
+#   - move global variables from SCOPE to GLOBAL
+#   - analyze the list of captures and resolve shared lexicals
+#       - when 2 closures share code, we need to decide if the captured
+#         variables are shared or not.
+#         Closures can have un-shared variables if the closure is created
+#         in a loop inside BEGIN
+#       - shared lexicals can be obtained from the data in $Perlito5::SCOPE
 
-    if (ref($item) eq 'Perlito5::AST::Sub') {
-        my $n = $item->{namespace} . "::" . $item->{name};
-        if (!$seen->{$n}) {
-            push @$vars, $tab . "sub $n = " . _dumper( $item, "  ", $dumper_seen, $n ) . ";\n";
-            $seen->{$n} = 1;
-        }
-    }
-    elsif (ref($item) eq 'Perlito5::AST::Var') {
-        my $n = $item->{sigil} . $item->{namespace} . "::" . $item->{name};
-        if (!$seen->{$n}) {
-            if ($item->{sigil} eq '$') {
-                push @$vars, $tab . "$n = " . _dumper( eval $n, "  ", $dumper_seen, $n ) . ";\n";
-            }
-            elsif ($item->{sigil} eq '@' || $item->{sigil} eq '%') {
-                my $ref = "\\$n";
-                my $d = _dumper( eval $ref, $tab . "  ", $dumper_seen, $ref );
-                if ($d eq '[]' || $d eq '{}') {
-                    push @$vars, $tab . "$n = ();\n"
-                }
-                else {
-                    push @$vars, $tab . "$n = " . $item->{sigil} . "{" . $d . "};\n";
-                }
-            }
-            elsif ($item->{sigil} eq '*') {
-                # TODO - look for aliasing
-                #   *v1 = \$v2
-                push @$vars, $tab . "# $n\n";
-                for (qw/ $ @ % /) {
-                    local $item->{sigil} = $_;
-                    _dump_global($item, $seen, $dumper_seen, $vars, $tab);
-                }
-            }
-            $seen->{$n} = 1;
-        }
-    }
-}
+#   - this Perl warning should probably be fatal in Perlito5:
+#       Variable "$z" will not stay shared
+#     the "perl" behaviour is hard to replicate - see misc/compile-time.
+#     Example:
+#
+#       use strict; use warnings;
+#       sub z0 {
+#           my $z = shift;
+#           sub z1 { $z }
+#       }
+#
+#     alternately:
+#       sub z0 {
+#           my $z = shift;
+#           BEGIN { *z1 = sub { $z } }
+#       }
+#
+#       sub z0 {
+#           my $z = shift;
+#           BEGIN { $z }
+#       }
+#
+#     the variable '$z' will be shared only on the 'first' execution of 'z0';
+#     subsequent executions of 'z0' will create a new pad.
+#
+#     BEGIN blocks inside loops have a similar problem, but don't
+#     generate a warning in "perl".
 
-sub _emit_globals {
-    my ($scope, $seen, $dumper_seen, $vars, $tab) = @_;
-    my $block = $scope->{block};
-    for my $item (@$block) {
-        if (ref($item) eq 'Perlito5::AST::Var' && !$item->{_decl}) {
-            $item->{_decl} = 'global';
-        }
-        if (ref($item) eq 'Perlito5::AST::Var' && $item->{_decl} eq 'global') {
-            $item->{namespace} ||= $item->{_namespace};
-            next if $item->{name} eq '0' || $item->{name} > 0;  # skip regex and $0
-            _dump_global($item, $seen, $dumper_seen, $vars, $tab);
-        }
-        if (ref($item) eq 'Perlito5::AST::Var' && $item->{_decl} eq 'my') {
-            my $id = $item->{_id};
-            if (!$seen->{$id}) {
-                push @$vars, $tab . emit_compiletime_lexical($item) . "  # my " . $item->{sigil} . $item->{name} . "\n";
-            }
-            $seen->{$id} = 1;
-        }
-        if ( ref($item) eq 'HASH' && $item->{block} ) {
-            # lookup in the inner scope
-            push @$vars, $tab . "{\n";
-            _emit_globals($item, $seen, $dumper_seen, $vars, $tab . "  ");
-            push @$vars, $tab . "}\n";
-        }
-    }
-}
 
-sub emit_compiletime_lexical {
-    my $item = shift;
-    # the internal compile-time namespace is "C_"
-    return $item->{sigil} . 'C_::' . $item->{name} . "_" . $item->{_id};
-}
+# problems to look for:
+#   - closures created in loops in BEGIN blocks share variable names,
+#       but the variables belong to different "pads" / activation records"
+#   - closures created after variable redefinition don't share variables
+#   - lexical variables can be shared across closures
+#   - our variables
+#   - in order to conserve memory at compile-time,
+#       create subroutine stubs that expand into instrumented code when called
+#   - bootstrapping rewrites Perlito5::* subroutines and globals, probably breaking the compiler.
+#       special-casing the Perlito5 namespace at compile-time should work around the problem.
 
-sub emit_globals_scope {
+# Note
+#   - variables with 'undef' value don't need to be processed,
+#     because the runtime will re-create them
+
+
+sub emit_globals_after_BEGIN {
     # return a structure with the global variable declarations
     # this is used to initialize the ahead-of-time program
-    my $scope = shift() // $Perlito5::BASE_SCOPE;
-    my @vars;
-    my %seen;
-    my $dumper_seen = {};
-    my $tab = "";
-    _emit_globals($scope, \%seen, $dumper_seen, \@vars, $tab);
-    return join("", @vars);
-}
 
-sub emit_globals {
-    # return a structure with the global variable declarations
-    # this is used to initialize the ahead-of-time program
     my $scope = shift() // $Perlito5::GLOBAL;
     my $vars = [];
     my $seen = {};
     my $dumper_seen = {};
     my $tab = "";
 
-    # TODO
-    #   - move global variables from SCOPE to GLOBAL
-    #   - analyze the list of captures and resolve shared lexicals
-    #       - when 2 closures share code, we need to decide if the captured
-    #         variables are shared or not.
-    #         Closures can have un-shared variables if the closure is created
-    #         in a loop inside BEGIN
-    #       - shared lexicals can be obtained from the data in $Perlito5::SCOPE
+    # exclude %ENV, $] - these should use whatever is set at runtime
+    delete $scope->{'%main::ENV'};
+    delete $scope->{'$main::]'};
+    delete $scope->{'$main::ARGV'};
+    delete $scope->{'@main::_'};
+    local $_;   # not sure about keeping $_
 
-    #   - this Perl warning should probably be fatal in Perlito5:
-    #       Variable "$z" will not stay shared
-    #     the "perl" behaviour is hard to replicate - see misc/compile-time.
-    #     Example:
-    #
-    #       use strict; use warnings;
-    #       sub z0 {
-    #           my $z = shift;
-    #           sub z1 { $z }
-    #       }
-    #
-    #     alternately:
-    #       sub z0 {
-    #           my $z = shift;
-    #           BEGIN { *z1 = sub { $z } }
-    #       }
-    #
-    #       sub z0 {
-    #           my $z = shift;
-    #           BEGIN { $z }
-    #       }
-    #
-    #     the variable '$z' will be shared only on the 'first' execution of 'z0';
-    #     subsequent executions of 'z0' will create a new pad.
-    #
-    #     BEGIN blocks inside loops have a similar problem, but don't
-    #     generate a warning in "perl".
+    for my $v ( '$main::0', '$main::a', '$main::b', '$main::_' ) {
+        # inject special variables like $0 (script name) in the scope, if it is not there already
+        my ($sigil, $namespace, $name) = $v =~ /^([$@%])(\w+)::(.*)$/;
+        $scope->{$v} //= {
+            'ast' => Perlito5::AST::Var->new(
+                'name'      => $name,
+                'sigil'     => $sigil,
+                '_decl'     => 'global',
+                'namespace' => $namespace,
+            ),
+        };
+    }
 
-
-    # problems to look for:
-    #   - closures created in loops in BEGIN blocks share variable names,
-    #       but the variables belong to different "pads" / activation records"
-    #   - closures created after variable redefinition don't share variables
-    #   - lexical variables can be shared across closures
-    #   - our variables
-    #   - in order to conserve memory at compile-time,
-    #       create subroutine stubs that expand into instrumented code when called
-    #   - bootstrapping rewrites Perlito5::* subroutines and globals, probably breaking the compiler.
-    #       special-casing the Perlito5 namespace at compile-time should work around the problem.
-
-    # Note
-    #   - variables with 'undef' value don't need to be processed,
-    #     because the runtime will re-create them
-
-    # example of how to enable this dump:
-    #   $ PERLITO5DEV=1 perl perlito5.pl -Isrc5/lib -I. -It -C_globals -e ' use X; xxx(); sub xyz { 123 } my $z; BEGIN { $a = 3; $z = 3 } '
-
-    for my $name (keys %$scope) {
-        my $item = $scope->{$name};
-        if (ref($item) eq 'Perlito5::AST::Sub' && $item->{name}) {
-            _dump_global($item, $seen, $dumper_seen, $vars, $tab);
-        }
-        else {
-            $item->{value} = eval($name);
-            push @$vars, "$name = " . _dumper( $item, "  ", $dumper_seen, $name . "->{value}" ) . ";\n";
+    # dump @ISA
+    for my $pkg (keys %{$Perlito5::PACKAGES}) {;
+        no strict 'refs';
+        if (@{ $pkg . "::ISA" }) {
+            $scope->{ '@' . $pkg . "::ISA" } //= {
+                'ast' => Perlito5::AST::Var->new(
+                    'name'      => "ISA",
+                    'sigil'     => '@',
+                    '_decl'     => 'global',
+                    'namespace' => $pkg,
+                ),
+                value => \@{ $pkg . "::ISA" },
+            };
         }
     }
-    return join("", @$vars);
+
+    # dump __END__ blocks
+    $scope->{'@Perlito5::END_BLOCK'} //= {
+        'ast' => Perlito5::AST::Var->new(
+            'namespace' => 'Perlito5',
+            'name'      => 'END_BLOCK',
+            'sigil'     => '@',
+            '_decl'     => 'global',
+        ),
+        value => \@Perlito5::END_BLOCK,
+    };
+
+    # dump __INIT__ blocks
+    $scope->{'@Perlito5::INIT_BLOCK'} //= {
+        'ast' => Perlito5::AST::Var->new(
+            'namespace' => 'Perlito5',
+            'name'      => 'INIT_BLOCK',
+            'sigil'     => '@',
+            '_decl'     => 'global',
+        ),
+        value => \@Perlito5::INIT_BLOCK,
+    };
+
+    # dump __DATA__ contents
+    $scope->{'%Perlito5::DATA_SECTION'} //= {
+        'ast' => Perlito5::AST::Var->new(
+            'namespace' => 'Perlito5',
+            'name'      => 'DATA_SECTION',
+            'sigil'     => '%',
+            '_decl'     => 'global',
+        ),
+        value => \%Perlito5::DATA_SECTION,
+    };
+
+    for my $id (keys %Perlito5::BEGIN_SCRATCHPAD) {
+        # BEGIN side-effects
+        my $ast = $Perlito5::BEGIN_SCRATCHPAD{$id};
+        my $sigil = $ast->{_real_sigil} || $ast->{sigil};
+        if (!$ast->{namespace}) {
+            $ast->{namespace} = "Perlito5::BEGIN";
+            $ast->{name} = "_" . $id . "_" . $ast->{name};
+        }
+        my $fullname = "$ast->{namespace}::$ast->{name}";
+
+        # print STDERR "BEGIN SIDE EFECT: $sigil $fullname\n";
+
+        if ($sigil eq '$') {
+            $scope->{$sigil . $fullname} //= {
+                ast   => $ast,
+                value => \${$fullname},
+            };
+        }
+        elsif ($sigil eq '@') {
+            $scope->{$sigil . $fullname} //= {
+                ast   => $ast,
+                value => \@{$fullname},
+            };
+        }
+        elsif ($sigil eq '%') {
+            $scope->{$sigil . $fullname} //= {
+                ast   => $ast,
+                value => \%{$fullname},
+            };
+        }
+    }
+
+    # return a structure with the global variable declarations
+    my $vars = [];
+    my $dumper_seen = {};
+
+    # dump subroutine stubs (prototypes)
+    for my $fullname (sort keys %$Perlito5::PROTO) {
+        my $proto = $Perlito5::PROTO->{$fullname};
+        my @parts = split "::", $fullname;
+        my $name = pop @parts;
+        push @$vars,
+          Perlito5::AST::Sub->new(
+            'namespace'  => join( "::", @parts ),
+            'sig'        => $proto,
+            'name'       => $name,
+            'block'      => undef,
+            'attributes' => []
+          );
+    }
+
+    for my $name (sort keys %$scope) {
+        my $item = $scope->{$name};
+        _dump_AST_from_scope($name, $item, $vars, $dumper_seen);
+    }
+    return $vars;
 }
 
 1;

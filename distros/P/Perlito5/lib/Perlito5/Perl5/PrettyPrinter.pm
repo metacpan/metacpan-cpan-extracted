@@ -161,7 +161,7 @@ $op{ "prefix:<$_>" } = { fix => 'prefix', prec => 8, str => "$_ " }
     );
 $op{ "prefix:<$_>" } = { fix => 'parsed', prec => 15, str => "$_" }
     for qw( do sub my our state local
-            eval map grep sort );
+            eval map grep sort print use );
 
 my %tab;
 sub tab {
@@ -228,7 +228,13 @@ sub op {
     }
     elsif ( $spec->{fix} eq 'prefix' ) {
         push @$out, $spec->{str};
-        op_render( $data->[2], $level, $out, $spec );
+        if ($op eq 'prefix:<not>' && !$data->[2]) {
+            # not() needs parenthesis
+            push @$out, '()';
+        }
+        else {
+            op_render( $data->[2], $level, $out, $spec );
+        }
     }
     elsif ( $spec->{fix} eq 'postfix' ) {
         op_render( $data->[2], $level, $out, $spec );
@@ -389,7 +395,12 @@ sub block {
         push @$out, "{}";
         return;
     }
-    push @$out, '{', "\n";
+    if ( @$data == 2 ) {
+        push @$out, '{;', "\n";     # disambiguate { $x, $y } block vs. hash
+    }
+    else {
+        push @$out, '{', "\n";
+    }
     $level++;
     for my $line ( 1 .. $#$data ) {
         my $d = $data->[$line];

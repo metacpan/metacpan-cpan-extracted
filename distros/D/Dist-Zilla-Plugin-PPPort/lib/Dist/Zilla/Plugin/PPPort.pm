@@ -1,12 +1,14 @@
 package Dist::Zilla::Plugin::PPPort;
-$Dist::Zilla::Plugin::PPPort::VERSION = '0.007';
+# vi:noet:sts=2:sw=2:ts=2
+$Dist::Zilla::Plugin::PPPort::VERSION = '0.008';
 use Moose;
-with qw/Dist::Zilla::Role::FileGatherer Dist::Zilla::Role::PrereqSource/;
+with qw/Dist::Zilla::Role::FileGatherer Dist::Zilla::Role::PrereqSource Dist::Zilla::Role::AfterBuild/;
 use Moose::Util::TypeConstraints 'enum';
 use MooseX::Types::Perl qw(StrictVersionStr);
 use MooseX::Types::Stringlike 'Stringlike';
 use Devel::PPPort 3.23;
 use File::Spec::Functions 'catdir';
+use File::pushd 'pushd';
 
 has style => (
 	is  => 'ro',
@@ -43,6 +45,7 @@ has version => (
 sub gather_files {
 	my $self = shift;
 	Devel::PPPort->VERSION($self->version);
+	require Dist::Zilla::File::InMemory;
 	$self->add_file(Dist::Zilla::File::InMemory->new(
 		name => $self->filename,
 		content => Devel::PPPort::GetFileContents($self->filename),
@@ -51,9 +54,31 @@ sub gather_files {
 	return;
 }
 
+sub after_build {
+	my ($self, $args) = @_;
+	my $build_root = $args->{build_root};
+
+	my $wd = pushd $build_root;
+
+	my $filename = $self->filename;
+
+	my $perl_prereq = $self->zilla->prereqs->cpan_meta_prereqs
+		->merged_requirements([ qw(configure build runtime test) ], ['requires'])
+		->requirements_for_module('perl') || '5.006';
+
+	if ($self->logger->get_debug) {
+		chomp(my $out = `$^X $filename --compat-version=$perl_prereq`);
+		$self->log_debug($out) if $out;
+	}
+	else {
+		chomp(my $out = `$^X $filename --compat-version=$perl_prereq --quiet`);
+		$self->log_debug($out) if $out;
+	}
+}
+
 sub register_prereqs {
-    my $self = shift;
-    $self->zilla->register_prereqs({ phase => 'develop' }, 'Devel::PPPort' => $self->version);
+	my $self = shift;
+	$self->zilla->register_prereqs({ phase => 'develop' }, 'Devel::PPPort' => $self->version);
 	return;
 }
 
@@ -77,7 +102,7 @@ Dist::Zilla::Plugin::PPPort - PPPort for Dist::Zilla
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -106,6 +131,7 @@ This describes the minimal version of Devel::PPPort required for this module. It
 
 =for Pod::Coverage gather_files
 register_prereqs
+after_build
 =end
 
 =head1 AUTHOR

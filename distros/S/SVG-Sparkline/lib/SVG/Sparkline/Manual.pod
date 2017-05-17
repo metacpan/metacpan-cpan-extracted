@@ -6,7 +6,7 @@ SVG::Sparkline::Manual - Documentation for the SVG::Sparkline module
 
 =head1 VERSION
 
-This document describes SVG::Sparkline version 0.34
+This document describes SVG::Sparkline version 1.12
 
 =head1 SYNOPSIS
 

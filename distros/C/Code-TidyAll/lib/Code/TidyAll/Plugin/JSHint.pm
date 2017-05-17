@@ -14,7 +14,7 @@ has 'options' => ( is => 'ro', predicate => '_has_options' );
 
 with 'Code::TidyAll::Role::Tempdir';
 
-our $VERSION = '0.58';
+our $VERSION = '0.59';
 
 sub _build_cmd {'jshint'}
 
@@ -26,7 +26,7 @@ sub validate_file {
         $argv .= q{ } . $self->_config_file_argv;
     }
 
-    my $cmd = sprintf( "%s %s %s", $self->cmd, $argv, $file );
+    my $cmd = sprintf( '%s %s %s', $self->cmd, $argv, $file );
     my $output;
     run3( $cmd, \undef, \$output, \$output );
     if ( $output =~ /\S/ ) {
@@ -60,7 +60,7 @@ Code::TidyAll::Plugin::JSHint - Use jshint with tidyall
 
 =head1 VERSION
 
-version 0.58
+version 0.59
 
 =head1 SYNOPSIS
 

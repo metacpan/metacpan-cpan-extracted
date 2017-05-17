@@ -1,0 +1,59 @@
+=head1 NAME
+
+ Imgur::API::Endpoint::OAuth
+
+=head1 SYNOPSIS
+
+ OAuth2 auth for users.
+
+=cut
+
+=head1 METHODS
+ 
+=head2 auth_url
+
+ Get Redirect URL for OAuth initiation.
+
+=head3 Parameters
+
+
+=item *
+ grant_type REQUIRED
+ code, token or pin.
+
+ Determines if Imgur returns an authorization_code, a PIN code, or an opaque access_token. If you choose code, then you must immediately exchange the authorization_code for an access_token. If you chose token, then the access_token and refresh_token will be given to you in the form of query string parameters attached to your redirect URL, which the user may be able to read. If you chose pin, then the user will receive a PIN code that they will enter into your app to complete the authorization process.
+
+=item *
+ state OPTIONAL
+
+ An arbitrary string that will be passed back from imgur
+
+=cut
+
+=head2 token
+
+ Swap pin, code or auth token for access & refresh tokens
+
+=head3 Parameters
+
+
+=item *
+ C<grant_type> I<required>
+
+ code, token or pin.
+
+=item *
+ C<code>  (for code authorization)
+
+=item *
+ C<pin> (for pin authorization)
+
+=cut
+
+=head1 SEE ALSO
+
+ https://api.imgur.com/oauth2
+
+
+
+

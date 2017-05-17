@@ -39,3 +39,5 @@ $a[0] = 12;
 $a[1] = 13;
 say "ok $_ - default variable in statement modifier"
     for @a;
+
+

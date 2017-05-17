@@ -1668,7 +1668,7 @@ package Devel::PPPort;
 use strict;
 use vars qw($VERSION $data);
 
-$VERSION = '3.35';
+$VERSION = '3.36';
 
 sub _init_data
 {

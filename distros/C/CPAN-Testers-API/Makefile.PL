@@ -21,14 +21,15 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "CPAN-Testers-API",
   "EXE_FILES" => [
-    "bin/cpantesters-api"
+    "bin/cpantesters-api",
+    "bin/cpantesters-legacy-metabase"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.024",
   "NAME" => "CPAN::Testers::API",
   "PREREQ_PM" => {
     "Alien::SwaggerUI" => 0,
-    "CPAN::Testers::Schema" => "0.007",
+    "CPAN::Testers::Schema" => "0.010",
     "File::Share" => 0,
     "Import::Base" => "0.012",
     "Log::Any" => "1.045",
@@ -47,16 +48,16 @@ my %WriteMakefileArgs = (
     "Test::Lib" => 0,
     "Test::More" => "1.001005"
   },
-  "VERSION" => "0.008",
+  "VERSION" => "0.011",
   "test" => {
-    "TESTS" => "t/*.t t/controller/*.t"
+    "TESTS" => "t/*.t t/controller/*.t t/legacy/*.t"
   }
 );
 
 
 my %FallbackPrereqs = (
   "Alien::SwaggerUI" => 0,
-  "CPAN::Testers::Schema" => "0.007",
+  "CPAN::Testers::Schema" => "0.010",
   "ExtUtils::MakeMaker" => 0,
   "File::Share" => 0,
   "File::Spec" => 0,

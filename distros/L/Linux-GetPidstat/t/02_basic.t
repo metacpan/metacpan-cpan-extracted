@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test::More 0.98;
-use Test::Fatal;
+use Test::Fatal qw/exception lives_ok/;
 use Test::Mock::Guard;
 use Data::Section::Simple qw/get_data_section/;
 use Path::Tiny;
@@ -41,14 +41,6 @@ my $guard = Test::Mock::Guard->new(
 
 my $instance = Linux::GetPidstat->new;
 
-like exception {
-    $instance->run;
-}, qr/pid_dir required/, "no pid_dir is not allowed";
-
-like exception {
-    $instance->run(pid_dir => 'pid_dir');
-}, qr/res_file or mackerel_\[api_key|service_name\] required/;
-
 my $tempfile = Path::Tiny->tempfile;
 my %cli_default_opt = (
     pid_dir       => 't/assets/invalid_pid',
@@ -59,6 +51,64 @@ my %cli_default_opt = (
     count         => 60,
     dry_run       => 0
 );
+
+subtest '_validate_args' => sub {
+    subtest 'valid' => sub {
+        lives_ok {
+            $instance->_validate_args(
+                pid_dir => 'pid_dir',
+                res_file => $tempfile,
+            );
+        } 'output to a file';
+
+        lives_ok {
+            $instance->_validate_args(
+                pid_dir => 'pid_dir',
+                mackerel_metric_type => 'service',
+                mackerel_api_key => 'xxx',
+                mackerel_service_name => 'xxx',
+            );
+        } 'output to mackerel (service metric)';
+
+        lives_ok {
+            $instance->_validate_args(
+                pid_dir => 'pid_dir',
+                mackerel_metric_type => 'host',
+                mackerel_api_key => 'xxx',
+                mackerel_service_name => 'xxx',
+                mackerel_host_id => 'xxx'
+            );
+        } 'output to mackerel (host metric)';
+
+        lives_ok {
+            $instance->_validate_args(
+                pid_dir => 'pid_dir',
+                res_file => $tempfile,
+                mackerel_metric_type => 'service',
+                mackerel_api_key => 'xxx',
+                mackerel_service_name => 'xxx',
+            );
+        } 'output to a file and mackerel';
+    };
+
+    subtest 'invalid' => sub {
+        like exception {
+            $instance->_validate_args;
+        }, qr/pid_dir required/, "no pid_dir is not allowed";
+
+        like exception {
+            $instance->_validate_args(pid_dir => 'pid_dir');
+        }, qr/res_file or mackerel_metric_type required/;
+
+        like exception {
+            $instance->_validate_args(pid_dir => 'pid_dir', mackerel_metric_type => 'service');
+        }, qr/when mackerel_metric_type is 'service', mackerel_\[api_key|service_name\] are required/;
+
+        like exception {
+            $instance->_validate_args(pid_dir => 'pid_dir', mackerel_metric_type => 'host');
+        }, qr/when mackerel_metric_type is 'host', mackerel_\[api_key|service_name|host_id\] are required/;
+    };
+};
 
 like exception {
     $instance->run(%cli_default_opt);
@@ -125,8 +175,10 @@ subtest 'output to a file (dry_run=1)' => sub {
 my $output_mkr  = get_data_section('output.mkr');
 my @output_mkr_lines = split '\n', $output_mkr;
 
-$cli_default_opt{mackerel_api_key}      = 'dummy_key';
-$cli_default_opt{mackerel_service_name} = 'dummy_name';
+$cli_default_opt{mackerel_metric_type}       = 'service';
+$cli_default_opt{mackerel_api_key}           = 'dummy_key';
+$cli_default_opt{mackerel_service_name}      = 'dummy_name';
+$cli_default_opt{mackerel_metric_key_prefix} = 'batch_';
 subtest 'output to a file and mackerel' => sub {
     $instance->run(%cli_default_opt);
 

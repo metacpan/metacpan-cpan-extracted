@@ -33,6 +33,11 @@
             "warnings" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.22"
+         }
+      },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
@@ -48,7 +53,6 @@
             "Hash::Util" : "0.07",
             "Test::Fatal" : "0",
             "Test::More" : "0",
-            "Test::Pod" : "1.22",
             "constant" : "0",
             "strict" : "0",
             "utf8" : "0"
@@ -63,6 +67,6 @@
          "web" : "https://github.com/mauke/Function-Parameters"
       }
    },
-   "version" : "2.000006",
+   "version" : "2.000007",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

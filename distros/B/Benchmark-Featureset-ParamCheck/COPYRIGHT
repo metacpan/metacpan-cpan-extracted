@@ -1,0 +1,71 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Benchmark-Featureset-ParamCheck
+Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
+Source: https://metacpan.org/release/Benchmark-Featureset-ParamCheck
+
+Files: Changes
+ META.json
+ META.yml
+ dist.ini
+ doap.ttl
+ lib/Benchmark/Featureset/ParamCheck/Base.pm
+ lib/Benchmark/Featureset/ParamCheck/Base/DataValidator.pm
+ lib/Benchmark/Featureset/ParamCheck/Base/MXPV.pm
+ lib/Benchmark/Featureset/ParamCheck/Base/PV.pm
+ lib/Benchmark/Featureset/ParamCheck/Base/PVC.pm
+ lib/Benchmark/Featureset/ParamCheck/Base/ParamsCheck.pm
+ lib/Benchmark/Featureset/ParamCheck/Implementation/DataValidator/Moose.pm
+ lib/Benchmark/Featureset/ParamCheck/Implementation/DataValidator/Mouse.pm
+ lib/Benchmark/Featureset/ParamCheck/Implementation/DataValidator/TypeTiny.pm
+ lib/Benchmark/Featureset/ParamCheck/Implementation/MXPV/Moose.pm
+ lib/Benchmark/Featureset/ParamCheck/Implementation/MXPV/TypeTiny.pm
+ lib/Benchmark/Featureset/ParamCheck/Implementation/PV.pm
+ lib/Benchmark/Featureset/ParamCheck/Implementation/PV/TypeTiny.pm
+ lib/Benchmark/Featureset/ParamCheck/Implementation/PVC/Moose.pm
+ lib/Benchmark/Featureset/ParamCheck/Implementation/PVC/Specio.pm
+ lib/Benchmark/Featureset/ParamCheck/Implementation/PVC/TypeTiny.pm
+ lib/Benchmark/Featureset/ParamCheck/Implementation/ParamsCheck/Perl.pm
+ lib/Benchmark/Featureset/ParamCheck/Implementation/ParamsCheck/TypeTiny.pm
+ lib/Benchmark/Featureset/ParamCheck/Implementation/Perl.pm
+ lib/Benchmark/Featureset/ParamCheck/Implementation/RefUtilXS.pm
+ lib/Benchmark/Featureset/ParamCheck/Implementation/TypeParams.pm
+Copyright: Copyright 2017 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: README
+ lib/Benchmark/Featureset/ParamCheck.pm
+ t/01-named-correctness.t
+ t/02-named-benchmark.t
+ t/03-positional-correctness.t
+ t/04-positional-benchmark.t
+Copyright: This software is copyright (c) 2017 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: INSTALL
+ LICENSE
+Copyright: Unknown
+License: Unknown
+
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2017 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2017 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

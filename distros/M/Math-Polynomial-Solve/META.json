@@ -35,7 +35,7 @@
    "provides" : {
       "Math::Polynomial::Solve" : {
          "file" : "lib/Math/Polynomial/Solve.pm",
-         "version" : "2.75"
+         "version" : "2.80"
       }
    },
    "release_status" : "stable",
@@ -47,7 +47,7 @@
          "url" : "git://github.com/jgamble/Math-Polynomial-Solve.git"
       }
    },
-   "version" : "2.75",
+   "version" : "2.80",
    "x_keyword" : [
       "math",
       "polynomial",
@@ -63,5 +63,5 @@
       "Hessenberg",
       "Newton-Raphson"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

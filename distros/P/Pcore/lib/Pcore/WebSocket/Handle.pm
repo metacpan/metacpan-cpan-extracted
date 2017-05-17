@@ -17,9 +17,9 @@ use Pcore::Util::Digest qw[sha1];
 
 requires qw[protocol before_connect_server before_connect_client on_connect_server on_connect_client on_disconnect on_text on_binary on_pong];
 
-has max_message_size   => ( is => 'ro', isa => PositiveOrZeroInt, default => 1_024 * 1_024 * 100 );    # 0 - do not check
-has pong_timeout       => ( is => 'ro', isa => PositiveOrZeroInt, default => 0 );                      # 0 - do not pong
-has permessage_deflate => ( is => 'ro', isa => Bool,              default => 0 );                      # use compression
+has max_message_size => ( is => 'ro', isa => PositiveOrZeroInt, default => 1_024 * 1_024 * 100 );    # 0 - do not check
+has pong_interval    => ( is => 'ro', isa => PositiveOrZeroInt, default => 0 );                      # 0 - do not pong
+has compression      => ( is => 'ro', isa => Bool,              default => 0 );                      # use permessage_deflate compression
 
 has on_disconnect => ( is => 'ro', isa => CodeRef, reader => undef );
 
@@ -30,7 +30,7 @@ has is_connected => ( is => 'ro', isa => Bool, default => 0, init_arg => undef )
 # mask data on send, for websocket client only
 has _send_masked => ( is => 'ro', isa => Bool, default => 0, init_arg => undef );
 
-has _msg => ( is => 'ro', isa => ArrayRef, init_arg => undef );                                        # fragmentated message data, [$payload, $op, $rsv1]
+has _msg => ( is => 'ro', isa => ArrayRef, init_arg => undef );                                      # fragmentated message data, [$payload, $op, $rsv1]
 has _deflate => ( is => 'ro', init_arg => undef );
 has _inflate => ( is => 'ro', init_arg => undef );
 
@@ -67,13 +67,13 @@ const our $WEBSOCKET_STATUS_REASON => {
 };
 
 sub send_text ( $self, $data_ref ) {
-    $self->{h}->push_write( $self->_build_frame( 1, $self->{permessage_deflate}, 0, 0, $WEBSOCKET_OP_TEXT, \encode_utf8 $data_ref->$* ) );
+    $self->{h}->push_write( $self->_build_frame( 1, $self->{compression}, 0, 0, $WEBSOCKET_OP_TEXT, $data_ref ) );
 
     return;
 }
 
 sub send_binary ( $self, $data_ref ) {
-    $self->{h}->push_write( $self->_build_frame( 1, $self->{permessage_deflate}, 0, 0, $WEBSOCKET_OP_BINARY, $data_ref ) );
+    $self->{h}->push_write( $self->_build_frame( 1, $self->{compression}, 0, 0, $WEBSOCKET_OP_BINARY, $data_ref ) );
 
     return;
 }
@@ -146,7 +146,7 @@ sub on_connect ( $self ) {
                 # check protocol errors
                 if ( $header->{fin} ) {
 
-                    # this is the last frame of the fragmentated message
+                    # this is the last frame of the fragmented message
                     if ( $header->{op} == $WEBSOCKET_OP_CONTINUATION ) {
 
                         # message was not started, return 1002 - protocol error
@@ -160,12 +160,12 @@ sub on_connect ( $self ) {
                     else {
 
                         # set "rsv1" flag
-                        $header->{rsv1} = $self->{permessage_deflate} && $header->{rsv1} ? 1 : 0;
+                        $header->{rsv1} = $self->{compression} && $header->{rsv1} ? 1 : 0;
                     }
                 }
                 else {
 
-                    # this is the next frame of the fragmentated message
+                    # this is the next frame of the fragmented message
                     if ( $header->{op} == $WEBSOCKET_OP_CONTINUATION ) {
 
                         # message was not started, return 1002 - protocol error
@@ -175,14 +175,14 @@ sub on_connect ( $self ) {
                         $header->{rsv1} = $self->{_msg}->[2];
                     }
 
-                    # this is the first frame of the fragmentated message
+                    # this is the first frame of the fragmented message
                     else {
 
                         # store message "op"
                         $self->{_msg}->[1] = $header->{op};
 
                         # set and store "rsv1" flag
-                        $self->{_msg}->[2] = $header->{rsv1} = $self->{permessage_deflate} && $header->{rsv1} ? 1 : 0;
+                        $self->{_msg}->[2] = $header->{rsv1} = $self->{compression} && $header->{rsv1} ? 1 : 0;
                     }
                 }
 
@@ -223,7 +223,7 @@ sub on_connect ( $self ) {
     );
 
     # start autopong
-    if ( my $pong_timeout = $self->pong_timeout ) {
+    if ( my $pong_interval = $self->pong_interval ) {
         $self->{h}->on_timeout(
             sub ($h) {
                 $self->pong;
@@ -232,7 +232,7 @@ sub on_connect ( $self ) {
             }
         );
 
-        $self->{h}->timeout($pong_timeout);
+        $self->{h}->timeout($pong_interval);
     }
 
     return;
@@ -284,8 +284,6 @@ sub _on_frame ( $self, $header, $payload_ref ) {
         # TEXT message
         if ( $header->{op} == $WEBSOCKET_OP_TEXT ) {
             if ($payload_ref) {
-                eval { decode_utf8 $payload_ref->$* };
-
                 return $self->disconnect( result [ 1003, 'UTF-8 decode error', $WEBSOCKET_STATUS_REASON ] ) if $@;
 
                 $self->on_text($payload_ref);
@@ -426,12 +424,12 @@ sub _parse_frame_header ( $self, $buf_ref ) {
 
     # extended payload (64-bit with 32-bit fallback)
     elsif ( $header->{len} == 127 ) {
-        $hlen = $masked ? 10 : 14;
+        $hlen = $masked ? 14 : 10;
 
         return if length $buf_ref->$* < $hlen;
 
         # cut header
-        my $full_header = substr $buf_ref->$*, 0, 10, q[];
+        my $full_header = substr $buf_ref->$*, 0, $hlen, q[];
 
         $header->{mask} = substr $full_header, 10, 4, q[] if $masked;
 
@@ -459,19 +457,17 @@ sub _parse_frame_header ( $self, $buf_ref ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 81, 87, 332          | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 81, 87, 330          | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
 ## |      | 127                  | * Subroutine "on_connect" with high complexity score (26)                                                      |
 ## |      | 241                  | * Subroutine "_on_frame" with high complexity score (27)                                                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 287                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 393, 395             | NamingConventions::ProhibitAmbiguousNames - Ambiguously named variable "second"                                |
+## |    3 | 391, 393             | NamingConventions::ProhibitAmbiguousNames - Ambiguously named variable "second"                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 | 40, 257              | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 305                  | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |    1 | 303                  | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

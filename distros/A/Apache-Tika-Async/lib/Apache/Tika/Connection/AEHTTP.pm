@@ -6,7 +6,7 @@ use Moo;
 with 'Apache::Tika::Connection';
 
 use vars '$VERSION';
-$VERSION = '0.06';
+$VERSION = '0.07';
 
 sub request {
     my( $self, $method, $url, $content, @headers ) = @_;
@@ -26,6 +26,7 @@ sub request {
     my $p = deferred;
     http_request(
         $method => $url,
+        persistent => 1,
         headers => \%headers,
         body => $content,
         sub {

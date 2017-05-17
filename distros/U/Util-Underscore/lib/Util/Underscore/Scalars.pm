@@ -123,7 +123,7 @@ Util::Underscore::Scalars - Functions for introspecting and manipulating scalars
 
 =head1 VERSION
 
-version v1.4.1
+version v1.4.2
 
 =head1 FUNCTION REFERENCE
 

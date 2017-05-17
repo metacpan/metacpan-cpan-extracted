@@ -1,0 +1,103 @@
+=head1 NAME
+
+Imgur::API::Model::Tag
+
+=head1 DESCRIPTION
+
+=over 4
+
+The base model for a tag.
+
+=back
+
+=cut
+
+=head1 FIELDS
+ 
+=item 
+C<name I<string>>
+
+=over 4
+
+Name of the tag.
+
+=back
+
+
+=item 
+C<followers I<integer>>
+
+=over 4
+
+Number of followers for the tag.
+
+=back
+
+
+=item 
+C<total_items I<integer>>
+
+=over 4
+
+Total number of gallery items for the tag.
+
+=back
+
+
+=item 
+C<following I<boolean>>
+
+=over 4
+
+OPTIONAL, boolean representing whether or not the user is following the tag in their custom gallery
+
+=back
+
+
+=item 
+C<items I<Array of Gallery Images and Gallery Albums>>
+
+=over 4
+
+Gallery items with current tag.
+
+=back
+
+
+
+=head1 EXAMPLE
+
+
+ 
+            {
+    "data": {
+        "name": "dogs",
+        "followers": 20,
+        total_items: 3,
+        following: [
+            {
+                "id": "YmeHP",
+                "name": "Cute Animals"
+            },
+            {
+                "id": "UBVtN",
+                "name": "Furry Friends"
+            }
+        ]
+        "items": [
+            ... Array of Gallery Images and Gallery Albums ...
+        ]
+    },
+    "success": true,
+    "status": 200
+}
+                
+
+
+=cut
+
+=head1 SEE ALSO
+
+http://api.imgur.com/models/tag
+
+

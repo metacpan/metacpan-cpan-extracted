@@ -491,7 +491,7 @@ sub make_ {
 
 =head2 make_test_prep( )
 
-Run C<< I<make test-perp> >> and check if F<t/perl> exists.
+Run C<< I<make test-prep> >> and check if F<t/perl> exists.
 
 =cut
 
@@ -526,9 +526,10 @@ sub make_test {
     my @layers = ( ($config_args =~ /-Uuseperlio\b/) || $self->{defaultenv} )
                ? qw( stdio ) : qw( stdio perlio );
 
-    my @locales = split ' ', $self->{locale};
+    my @locales;
     if ( !($config_args =~ /-Uuseperlio\b/ || $self->{defaultenv}) &&
          $self->{locale} ) {
+        @locales = split ' ', $self->{locale};
         push @layers, ( 'locale' ) x @locales;
     }
 
@@ -645,7 +646,7 @@ sub extend_with_harness {
     }
 }
 
-=head2 $moker->make_test_harness
+=head2 $smoker->make_test_harness
 
 Use Test::Harness (the test_harness target) to get the failing test
 information and do not bother with TEST.
@@ -1021,7 +1022,7 @@ sub _parse_harness3_output {
     return $output;
 }
 
-=head2 $self->_trasnaform_testnames( @notok )
+=head2 $self->_transform_testnames( @notok )
 
 C<_transform_testnames()> takes a list of testnames, as found by
 C<TEST> (testname without C<.t> suffix followed by dots and a reason)
@@ -1056,7 +1057,7 @@ sub _normalize_testname {
     $test_name =~ s/\s+$//;
     $test_name =~ /\.t$/ or $test_name .= '.t';
     if ( $test_name !~ m|^\Q../| ) {
-        $test_name = $test_name =~ /^(?:ext|lib|t)\b/
+        $test_name = $test_name =~ /^(?:cpan|dist|ext|lib|t)\b/
             ? catfile( updir(), $test_name )
             : catfile( updir(), 't', $test_name );
     }

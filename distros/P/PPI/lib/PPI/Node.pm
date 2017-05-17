@@ -57,7 +57,7 @@ use PPI::Element    ();
 
 use vars qw{$VERSION @ISA *_PARENT};
 BEGIN {
-	$VERSION = '1.220';
+	$VERSION = '1.224';
 	@ISA     = 'PPI::Element';
 	*_PARENT = *PPI::Element::_PARENT;
 }
@@ -512,7 +512,7 @@ sub remove_child {
 	my $p   = List::MoreUtils::firstidx {
 		refaddr $_ == $key
 	} @{$self->{children}};
-	return undef unless defined $p;
+	return undef if $p == -1;
 
 	# Splice it out, and remove the child's parent entry
 	splice( @{$self->{children}}, $p, 1 );

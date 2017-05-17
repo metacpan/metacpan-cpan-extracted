@@ -3,6 +3,8 @@ use warnings;
 use strict;
 use Carp;
 
+our $VERSION = '0.001';
+
 use base 'Test::Smoke::App::Base';
 
 use Cwd 'cwd';
@@ -56,6 +58,12 @@ sub run {
         exit;
     };
     $Config{d_alarm} and alarm $timeout;
+
+    if ($self->option('is_win32')) {
+        require Test::Smoke::Util::Win32ErrorMode;
+        $self->log_info("Changing ErrorMode settings to prevent popups");
+        Test::Smoke::Util::Win32ErrorMode::lower_error_settings();
+    }
 
    $self->run_smoke();
    chdir $cwd;
@@ -185,7 +193,7 @@ sub check_for_harness3 {
     }
     $self->log_info("Found: Test::Harness version %s.", $version);
 
-    return $self->{_hasharness3} = $version >= 3;
+    return $self->{_hasharness3} = (eval("$version") >= 3);
 }
 
 =head2 $smoker->create_buildcfg()

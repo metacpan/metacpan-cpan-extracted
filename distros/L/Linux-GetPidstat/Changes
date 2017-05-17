@@ -1,5 +1,10 @@
 Revision history for Perl extension Linux-GetPidstat
 
+0.04 2017-05-17T06:39:55Z
+
+    - Added --mackerel_metric_key_prefix option (https://github.com/yoheimuta/Linux-GetPidstat/pull/4)
+    - Added --mackerel_[metric_type|host_id] options to post host metric (https://github.com/yoheimuta/Linux-GetPidstat/pull/5)
+
 0.03 2016-07-14T03:08:05Z
 
     - Changed flag options (https://github.com/yoheimuta/Linux-GetPidstat/pull/3)

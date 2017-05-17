@@ -25,4 +25,4 @@ no_index:
 requires:
   Panda::Install: v1.2.7
   perl: '5.010000'
-version: v1.0.0
+version: v1.0.3

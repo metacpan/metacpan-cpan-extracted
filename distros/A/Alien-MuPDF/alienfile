@@ -1,0 +1,51 @@
+use alienfile;
+
+requires 'Alien::gmake' => 0.14;
+
+# Do not probe for system libmupdf becasue we need to compile with shared
+# library flags.
+
+share {
+	plugin Download => (
+		url => 'https://mupdf.com/downloads/',
+		version => qr/mupdf-([\w\.]+)-source\.tar\.gz/,
+	);
+
+	if( exists $ENV{MSYSTEM} ) {
+		# Using CommandLine to extract rather than ArchiveTar because
+		# the extraction using ArchiveTar is not always successful on
+		# Windows.  This can happen because the mupdf tarball contains
+		# long paths that can push the entire path over the 260
+		# character path limit.
+		plugin 'Extract::CommandLine' => 'tar.gz';
+	} else {
+		plugin Extract => 'tar.gz';
+	}
+
+	plugin 'Build::MSYS' => ();
+	my $XCFLAGS;
+	if( $^O eq 'MSWin32' ) {
+		$XCFLAGS = ''; # builds on Windows are already position independent
+	} else {
+		$XCFLAGS = 'XCFLAGS=-fPIC';
+	};
+
+	my @EXTRA_MAKE_FLAGS = ();
+	if( $^O eq 'darwin' ) {
+		# See bug #697842 <https://bugs.ghostscript.com/show_bug.cgi?id=697842>
+		push @EXTRA_MAKE_FLAGS, q|'RANLIB_CMD=xcrun ranlib $@'|;
+	}
+	build [
+		"%{gmake} HAVE_GLFW=no $XCFLAGS prefix=%{.install.prefix} install"
+			. join(' ', ('', @EXTRA_MAKE_FLAGS)),
+	];
+
+	gather sub {
+		my($build) =@_;
+		my $prefix = $build->runtime_prop->{prefix};
+		$build->runtime_prop->{cflags}        = "-I$prefix/include";
+		$build->runtime_prop->{cflags_static} = "-I$prefix/include";
+		$build->runtime_prop->{libs}          = "-L$prefix/lib";
+		$build->runtime_prop->{libs_static}   = "-L$prefix/lib";
+	};
+};

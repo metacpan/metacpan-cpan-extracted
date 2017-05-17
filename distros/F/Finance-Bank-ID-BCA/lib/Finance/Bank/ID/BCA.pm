@@ -1,7 +1,7 @@
 package Finance::Bank::ID::BCA;
 
-our $DATE = '2015-09-08'; # DATE
-our $VERSION = '0.43'; # VERSION
+our $DATE = '2017-05-16'; # DATE
+our $VERSION = '0.45'; # VERSION
 
 use 5.010001;
 use Moo;
@@ -11,7 +11,6 @@ use Log::Any::IfLOG '$log';
 extends 'Finance::Bank::ID::Base';
 
 has _variant => (is => 'rw'); # bisnis or perorangan
-has skip_NEXT => (is => 'rw');
 
 sub BUILD {
     my ($self, $args) = @_;
@@ -391,9 +390,6 @@ sub _ps_get_transactions {
         $tx->{amount}  = ($e->{crdb} =~ /CR/ ? 1 : -1) * ($self->_stripD($e->{amt}) + 0.01*$e->{amtf});
         $tx->{balance} = ($self->_stripD($e->{bal}) + 0.01*$e->{balf});
 
-        if ($tx->{is_next} && $self->skip_NEXT) {
-        }
-
         if (!$last_date || DateTime->compare($last_date, $tx->{date})) {
             $seq = 1;
             $last_date = $tx->{date};
@@ -422,12 +418,7 @@ sub _ps_get_transactions {
             # month, regardless of whether it's Sat/Sun or not
         }
 
-        if ($tx->{is_next} && $self->skip_NEXT) {
-            push @skipped_tx, $tx;
-            $seq--;
-        } else {
-            push @tx, $tx;
-        }
+        push @tx, $tx;
     }
     $stmt->{transactions} = \@tx;
     $stmt->{skipped_transactions} = \@skipped_tx;
@@ -449,7 +440,7 @@ Finance::Bank::ID::BCA - Check your BCA accounts from Perl
 
 =head1 VERSION
 
-This document describes version 0.43 of Finance::Bank::ID::BCA (from Perl distribution Finance-Bank-ID-BCA), released on 2015-09-08.
+This document describes version 0.45 of Finance::Bank::ID::BCA (from Perl distribution Finance-Bank-ID-BCA), released on 2017-05-16.
 
 =head1 SYNOPSIS
 
@@ -543,10 +534,6 @@ documentation on C<new()> below and the sample script in examples/ subdirectory
 in the distribution.
 
 =head1 ATTRIBUTES
-
-=head2 skip_NEXT => BOOL
-
-If set to true, then statement with NEXT status will be skipped.
 
 =head1 METHODS
 
@@ -747,7 +734,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2013, 2012, 2011, 2010 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -8,7 +8,6 @@ use CurieTestHelper;
 use Renard::Curie::Setup;
 use Renard::Curie::Data::PDF;
 use Data::DPath qw(dpathi);
-use Function::Parameters;
 
 my $pdf_ref_path = try {
 	CurieTestHelper->test_data_directory->child(qw(PDF Adobe pdf_reference_1-7.pdf));
@@ -18,12 +17,12 @@ my $pdf_ref_path = try {
 
 plan tests => 4;
 
-subtest 'PDF page to PNG' => fun {
-	my $png_data = Renard::Curie::Data::PDF::get_mutool_pdf_page_as_png( $pdf_ref_path, 1 );
+subtest 'PDF page to PNG' => sub {
+	my $png_data = Renard::Curie::Data::PDF::get_mutool_pdf_page_as_png( $pdf_ref_path, 1, 1.0 );
 	like $png_data, qr/^\x{89}PNG/, 'data has PNG stream magic number';
 };
 
-subtest 'Get bounds of PDF page' => fun {
+subtest 'Get bounds of PDF page' => sub {
 	my $bounds = Renard::Curie::Data::PDF::get_mutool_page_info_xml( $pdf_ref_path );
 
 	my $first_page = $bounds->{page}[0];
@@ -31,7 +30,7 @@ subtest 'Get bounds of PDF page' => fun {
 	is_deeply( $first_page->{CropBox}, { b => 0, t => 666, l => 0, r => 531 }, 'has the expected CropBox' );
 };
 
-subtest 'Get characters for preface' => fun {
+subtest 'Get characters for preface' => sub {
 	my $preface_page = 23;
 
 	my $stext = Renard::Curie::Data::PDF::get_mutool_text_stext_xml( $pdf_ref_path, $preface_page );
@@ -48,7 +47,7 @@ subtest 'Get characters for preface' => fun {
 		'Page text contains expected substring' );
 };
 
-subtest 'Get outline of PDF document' => fun {
+subtest 'Get outline of PDF document' => sub {
 	my $outline_data = Renard::Curie::Data::PDF::get_mutool_outline_simple( $pdf_ref_path );
 
 	cmp_deeply $outline_data,

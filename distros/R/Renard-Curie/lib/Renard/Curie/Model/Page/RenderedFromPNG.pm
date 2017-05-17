@@ -1,7 +1,7 @@
 use Renard::Curie::Setup;
 package Renard::Curie::Model::Page::RenderedFromPNG;
 # ABSTRACT: Page generated from PNG data
-$Renard::Curie::Model::Page::RenderedFromPNG::VERSION = '0.001';
+$Renard::Curie::Model::Page::RenderedFromPNG::VERSION = '0.002';
 use Moo;
 use Cairo;
 use Function::Parameters;
@@ -17,7 +17,7 @@ has cairo_image_surface => (
 	is => 'lazy', # _build_cairo_image_surface
 );
 
-method _build_cairo_image_surface :ReturnType(InstanceOf['Cairo::ImageSurface']) {
+method _build_cairo_image_surface() :ReturnType(InstanceOf['Cairo::ImageSurface']) {
 	# read the PNG data in-memory
 	my $img = Cairo::ImageSurface->create_from_png_stream(
 		fun ((Str) $callback_data, (Int) $length) {
@@ -48,7 +48,7 @@ Renard::Curie::Model::Page::RenderedFromPNG - Page generated from PNG data
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 EXTENDS
 

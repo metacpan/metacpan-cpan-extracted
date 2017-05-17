@@ -3,16 +3,22 @@ abstract: 'Alien package for the MuPDF PDF rendering library'
 author:
   - 'Zakariyya Mughal <zmughal@cpan.org>'
 build_requires:
+  Alien::Build: '0.32'
+  Alien::Build::MM: '0.32'
+  Alien::gmake: '0.14'
   Capture::Tiny: '0'
   Cwd: '0'
+  ExtUtils::MakeMaker: '6.52'
   File::Basename: '0'
   File::Which: '1.21'
   Module::Load: '0'
   Test::More: '0'
+  perl: '5.006'
 configure_requires:
-  Alien::Base::ModuleBuild: '0.020'
-  File::ShareDir: '1.03'
-  Path::Class: '0.013'
+  Alien::Build: '0.32'
+  Alien::Build::MM: '0.32'
+  ExtUtils::MakeMaker: '6.52'
+  perl: '5.006'
 dynamic_config: 1
 generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
 license: perl
@@ -24,15 +30,14 @@ recommends:
   Inline: '0.67'
   Inline::C: '0.62'
 requires:
-  Alien::Base: '0.020'
-  File::ShareDir: '1.03'
+  Alien::Base: '0.038'
   File::Spec: '0'
-  Path::Class: '0.013'
   parent: '0'
+  perl: '5.006'
   strict: '0'
   warnings: '0'
 resources:
   homepage: https://github.com/project-renard/p5-Alien-MuPDF
   repository: https://github.com/project-renard/p5-Alien-MuPDF.git
-version: '0.007'
+version: '0.009'
 x_serialization_backend: 'YAML::Tiny version 1.69'

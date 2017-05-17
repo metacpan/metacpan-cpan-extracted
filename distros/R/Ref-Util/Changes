@@ -1,7 +1,23 @@
+0.203     2017-05-14 10:55:51+02:00 Europe/Paris
+
+        * Rename $REF_UTIL_IMPLEMENTATION environment variable to
+          $PERL_REF_UTIL_IMPLEMENTATION (suggested by ether++)
+
+0.202     2017-05-14 10:39:52+02:00 Europe/Paris
+
+        * Use of the Pure-Perl implementation can now be forced at runtime by
+          setting either $Ref::Util::IMPLEMENTATION or
+          $ENV{REF_UTIL_IMPLEMENTATION} to "XS"
+        * Fix is_*_formatref() error messages (reported by tobyink, #38)
+        * Speed enhancements for is_*_formatref() on 5.8+
+        * Restore 5.6 and 5.8 compatibility
+        * PP behaviour now matches XS for \v1.2.3 and \sub {}
+        * Updated documentation to reflect the PP/XS split
+
 0.201     2017-05-12 15:42:54+02:00 Europe/Paris
 
         * Fix space/tab issue in Makefile (srezic, ether)
-        * Don't use DynamicPrereqs for unrelated Makefile.PL snippet (ehter)
+        * Don't use DynamicPrereqs for unrelated Makefile.PL snippet (ether)
 
 0.200     2017-05-12 10:14:26+02:00 Europe/Paris
 

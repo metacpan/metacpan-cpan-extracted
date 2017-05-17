@@ -5,7 +5,7 @@ use File::Temp;
 use POSIX::AtFork;
 use Test::mysqld::Pool;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub load {
     my ($class, $prove) = @_;
@@ -18,20 +18,18 @@ sub load {
     my $pool       = Test::mysqld::Pool->new(
         jobs       => $jobs,
         share_file => $share_file->filename,
-        ($preparer ? (
-            preparer => sub {
-                my ($mysqld) = @_;
-
-                push( @INC, 'lib' )
-                    if $lib;
-
-                eval "require $preparer" ## no critic
-                    or die "$@";
-
-                $preparer->prepare( $mysqld );
-            },
-            $preparer->can('my_cnf') ? ( my_cnf => $preparer->my_cnf ) : (),
-        ) : ()),
+        ($preparer ? do {
+            push( @INC, 'lib' ) if $lib;
+            eval "require $preparer" ## no critic
+                or die "$@";
+            (
+                preparer => sub {
+                    my ($mysqld) = @_;
+                    $preparer->prepare( $mysqld );
+                },
+                $preparer->can('my_cnf') ? ( my_cnf => $preparer->my_cnf ) : (),
+            )
+        } : ()),
     );
     $pool->prepare;
 

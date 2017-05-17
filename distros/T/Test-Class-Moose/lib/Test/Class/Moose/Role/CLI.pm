@@ -4,7 +4,7 @@ package Test::Class::Moose::Role::CLI;
 
 use 5.10.0;
 
-our $VERSION = '0.83';
+our $VERSION = '0.84';
 
 use Moose::Role 2.0000;
 use Carp;
@@ -60,6 +60,12 @@ has exclude_tags => (
     handles => {
         _has_exclude_tags => 'count',
     },
+);
+
+has parallel_progress => (
+    is        => 'ro',
+    isa       => 'Bool',
+    predicate => '_has_parallel_progress',
 );
 
 has color => (
@@ -191,6 +197,7 @@ sub _after_run { }
     $attr_map{randomize_methods} = 'randomize';
     $attr_map{tags}              = 'include_tags';
     $attr_map{color}             = 'color_output';
+    $attr_map{parallel_progress} = 'show_parallel_progress';
 
     sub _build_runner {
         my $self = shift;
@@ -280,7 +287,7 @@ Test::Class::Moose::Role::CLI - Role for command line argument handling and extr
 
 =head1 VERSION
 
-version 0.83
+version 0.84
 
 =head1 SYNOPSIS
 

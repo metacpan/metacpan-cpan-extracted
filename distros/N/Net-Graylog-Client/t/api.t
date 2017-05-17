@@ -17,8 +17,6 @@ use strict;
 use warnings;
 use POSIX qw( strftime);
 use Data::Printer;
-use App::Basis;
-use App::Basis::Config;
 use Data::UUID;
 use Net::Graylog::Client qw( valid_levels);
 use Data::Dumper;
@@ -42,7 +40,7 @@ sub add_data {
     my $graylog = Net::Graylog::Client->new( url => "http://$SERVER:12201/gelf" );
 
     foreach my $lvl ( valid_levels() ) {
-        my ( $s, $c ) = $graylog->send(
+        my ( $s, $c ) = $graylog->$lvl(
             message  => "a $lvl message with key $key",
             tag      => $uuid,
             counter  => $events_created + 1,
@@ -84,7 +82,7 @@ SKIP: {
             my $events_created = add_data($ukey);
 
             # give graylog a second or so to store and process the messages
-            sleep 4;
+            sleep 10;
 
             # find events that have our key
             $resp = $api->search_absolute_search_absolute( query => $ukey, from => '2017-01-01 00:00:00', to => '2018-01-01 00:00:00' );

@@ -65,15 +65,22 @@ subtest '_::ref_type' => sub {
 
 subtest 'weak refs' => sub {
     plan tests => 9;
-    my $ref = \do { my $o };
 
     subtest 'sanity check' => sub {
         plan tests => 3;
-        ok !_::ref_is_weak $ref, "negative fixture";
+
+        my $value;
+        my $ref = \$value;
+
+        ok !_::ref_is_weak $ref, "fixture: ref is strong";
+
         _::ref_weaken $ref;
-        ok _::ref_is_weak $ref, "positive after weakening";
+
+        ok _::ref_is_weak $ref, "after weaken: ref is weak";
+
         _::ref_unweaken $ref;
-        ok !_::ref_is_weak $ref, "negative after unweakening";
+
+        ok !_::ref_is_weak $ref, "after unweaken: ref is strong";
     };
 
     # now, for checking that this is actually dealing with weak refs

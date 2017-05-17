@@ -1,0 +1,82 @@
+=head1 NAME
+
+Imgur::API::Model::MemeMetadata
+
+=head1 DESCRIPTION
+
+=over 4
+
+This model is used to represent the basic meme metadata.
+
+=back
+
+=cut
+
+=head1 FIELDS
+ 
+=item 
+C<meme_name I<String>>
+
+=over 4
+
+The name of the meme used.
+
+=back
+
+
+=item 
+C<top_text I<String>>
+
+=over 4
+
+The top text of the meme.
+
+=back
+
+
+=item 
+C<bottom_text I<String>>
+
+=over 4
+
+The bottom text of the meme.
+
+=back
+
+
+=item 
+C<bg_image I<String>>
+
+=over 4
+
+The image id of the background image of the meme.
+
+=back
+
+
+
+=head1 EXAMPLE
+
+
+ {
+   "success" : true,
+   "data" : {
+      "meme_metadata" : {
+         "bg_image" : "kH1SKhp",
+         "meme_name" : "Confession Bear",
+         "top_text" : "BEING ON IMGUR",
+         "bottom_text" : "HAS ACTUALLY IMPROVEDMY SPELLING AND GRAMMER"
+      }
+   },
+   "status" : 200
+}
+
+
+
+=cut
+
+=head1 SEE ALSO
+
+http://api.imgur.com/models/mememetadata
+
+

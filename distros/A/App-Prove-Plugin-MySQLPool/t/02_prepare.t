@@ -5,6 +5,8 @@ use strict;
 use warnings;
 use Test::Requires qw/DBI/;
 
+use FindBin;
+use lib "$FindBin::RealBin/../";
 use t::Util;
 
 my $out = run_test({

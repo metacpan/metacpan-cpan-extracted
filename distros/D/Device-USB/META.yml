@@ -1,26 +1,28 @@
 ---
-abstract: 'Use libusb to access USB devices.'
+abstract: 'Use libusb to access USB devices. (DEPRECATED)'
 author:
   - 'G. Wade Johnson <gwadej@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
-  Inline::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
+  Inline::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.112621'
-license: unknown
+generated_by: 'ExtUtils::MakeMaker version 7.06, CPAN::Meta::Converter version 2.150005'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Device-USB
 no_index:
   directory:
     - t
     - inc
 requires:
-  Carp: 0
-  Inline: 0
-  Inline::C: 0
-  Test::More: 0
-version: 0.36
+  Carp: '0'
+  Inline: '0'
+  Inline::C: '0'
+resources: {}
+version: '0.37'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
+

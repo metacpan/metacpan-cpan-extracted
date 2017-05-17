@@ -35,7 +35,7 @@ use PPI::Token ();
 
 use vars qw{$VERSION @ISA};
 BEGIN {
-	$VERSION = '1.220';
+	$VERSION = '1.224';
 	@ISA     = 'PPI::Token';
 }
 
@@ -79,7 +79,7 @@ Returns C<undef> if the attribute does not have parameters.
 
 sub parameters {
 	my $self = shift;
-	$self->{content} =~ /\((.+)\)$/ ? $1 : undef;
+	$self->{content} =~ /\((.*)\)$/ ? $1 : undef;
 }
 
 

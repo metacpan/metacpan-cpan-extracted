@@ -1,5 +1,5 @@
 package PAUSE::Permissions;
-$PAUSE::Permissions::VERSION = '0.16';
+$PAUSE::Permissions::VERSION = '0.17';
 use strict;
 use warnings;
 

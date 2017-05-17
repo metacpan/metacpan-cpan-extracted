@@ -1,5 +1,5 @@
 package CPAN::Upload::Tiny;
-$CPAN::Upload::Tiny::VERSION = '0.003';
+$CPAN::Upload::Tiny::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -11,9 +11,9 @@ use HTTP::Tiny::Multipart;
 my $UPLOAD_URI = $ENV{CPAN_UPLOADER_UPLOAD_URI} || 'https://pause.perl.org/pause/authenquery';
 
 sub new {
-	my ($class, $name, $password) = @_;
+	my ($class, $user, $password) = @_;
 	return bless {
-		name     => $name,
+		user     => $user,
 		password => $password,
 	}, $class;
 }
@@ -70,7 +70,7 @@ sub read_config_file {
 			next if not length or $_ =~ /^\s*#/;
 
 			if (my ($k, $v) = / ^ \s* (user|password) \s+ (.+?) \s* $ /x) {
-				Carp::croak "Multiple enties for $k" if $conf{$k};
+				Carp::croak "Multiple entries for $k" if $conf{$k};
 				$conf{$k} = $v;
 			}
 		}
@@ -97,13 +97,17 @@ CPAN::Upload::Tiny - A tiny CPAN uploader
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
  use CPAN::Upload::Tiny;
  my $upload = CPAN::Upload::Tiny->new_from_config($optional_file);
  $upload->upload_file($filename);
+
+=head1 DESCRIPTION
+
+This is a light-weight module for uploading files to CPAN.
 
 =head1 METHODS
 

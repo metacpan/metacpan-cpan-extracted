@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.122-7-g6a4f4e3
+package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.123-5-ga19d917
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: A plugin bundle for distributions built by ETHER
 # KEYWORDS: author bundle distribution tool
 
-our $VERSION = '0.123';
+our $VERSION = '0.124';
 
 use Moose;
 with
@@ -97,7 +97,7 @@ has licence => (
         $self->payload->{licence}
             // $self->payload->{license}
             # licenSe is US-only; known non-American authors will be treated appropriately.
-            // ((any { $authority eq "cpan:$_" } qw(ETHER ABERGMAN AVAR BINGOS BOBTFISH CHOLET FLORA GETTY ILMARI JAWNSY JQUELIN LEONT LLAP MSTROUT NUFFIN PERIGRIN PHAYLON))
+            // ((any { $authority eq "cpan:$_" } qw(ETHER ABERGMAN AVAR BINGOS BOBTFISH CHANSEN CHOLET FLORA GETTY ILMARI JAWNSY JQUELIN LEONT LLAP MSTROUT NUFFIN PERIGRIN PHAYLON))
                 ? 'LICENCE' : 'LICENSE');
     },
 );
@@ -295,6 +295,7 @@ sub configure
         [ 'MetaProvides::Package' => { ':version' => '1.15000002', finder => ':InstallModules', meta_noindex => 1, inherit_version => 0, inherit_missing => 0 } ],
         'MetaConfig',
         [ 'Keywords'            => { ':version' => '0.004' } ],
+        [ 'UseUnsafeInc'        => { dot_in_INC => 0 } ],
         # [Git::Contributors]
         # [StaticInstall]
 
@@ -336,6 +337,7 @@ sub configure
         # Before Release
         [ 'CheckStrictVersion'  => { decimal_only => 1 } ],
         'CheckMetaResources',
+        'EnsureLatestPerl',
         [ 'Git::Check'          => 'initial check' => { allow_dirty => [''] } ],
         'Git::CheckFor::MergeConflicts',
         [ 'Git::CheckFor::CorrectBranch' => { ':version' => '0.004', release_branch => 'master' } ],
@@ -481,7 +483,7 @@ Dist::Zilla::PluginBundle::Author::ETHER - A plugin bundle for distributions bui
 
 =head1 VERSION
 
-version 0.123
+version 0.124
 
 =head1 SYNOPSIS
 
@@ -671,6 +673,10 @@ following F<dist.ini> (following the preamble), minus some optimizations:
     [MetaConfig]
     [Keywords]
     :version = 0.004
+
+    [UseUnsafeInc]
+    dot_in_INC = 0
+
     ;[Git::Contributors]    ; below
     ;[StaticInstall]        ; below
 
@@ -731,6 +737,9 @@ following F<dist.ini> (following the preamble), minus some optimizations:
     ;;; Before Release
     [CheckStrictVersion]
     decimal_only = 1
+
+    [CheckMetaResources]
+    [EnsureLatestPerl]
 
     [Git::Check / initial check]
     allow_dirty =

@@ -295,11 +295,13 @@
   "definitions": {
     "NewReport": {
       "type": "object",
-      "required": [ "reporter", "environment", "distribution" ],
+      "required": [ "reporter", "environment", "distribution", "result" ],
       "properties": {
-        "reporter": { "$ref": "#/definitions/Reporter" },
-        "environment": { "$ref": "#/definitions/Environment" },
-        "distribution": { "$ref": "#/definitions/Distribution" }
+        "reporter":     { "$ref": "#/definitions/Reporter" },
+        "environment":  { "$ref": "#/definitions/Environment" },
+        "distribution": { "$ref": "#/definitions/Distribution" },
+        "result":       { "$ref": "#/definitions/Result" },
+        "comments":     {}
       }
     },
     "Report": {
@@ -330,7 +332,7 @@
       "properties": {
         "language": { "$ref": "#/definitions/Language" },
         "system": { "$ref": "#/definitions/System" },
-        "reporter": { "type": "string" },
+        "user_agent": { "type": "string" },
         "toolchain": {
           "type": "object",
           "additionalProperties": { "type": "string" }
@@ -405,15 +407,13 @@
         }
       }
     },
-    "Distribution": {
+    "Result": {
       "type": "object",
-      "required": ["name", "version", "grade", "output"],
+      "required": ["grade", "output"],
       "properties": {
-        "name":    { "type": "string" },
-        "version": { "type": "string" },
         "grade": {
           "type": "string",
-          "enum": ["PASS", "FAIL", "NA", "UNKNOWN"]
+          "enum": ["pass", "fail", "na", "unknown"]
         },
         "tests":    { "type": "integer", "minimum": 0 },
         "failures": { "type": "integer", "minimum": 0 },
@@ -428,8 +428,15 @@
         },
         "warnings": { "type": "integer", "minimum": 0 },
         "duration": { "type": "integer", "minimum": 0 },
-        "comments": { "type": "string" },
-        "output": { "$ref": "#/definitions/TestOutput" },
+        "output": { "$ref": "#/definitions/TestOutput" }
+      }
+    },
+    "Distribution": {
+      "type": "object",
+      "required": ["name", "version"],
+      "properties": {
+        "name":    { "type": "string" },
+        "version": { "type": "string" },
         "prerequisites": {
           "description": "A list of prerequisites",
           "type": "array",

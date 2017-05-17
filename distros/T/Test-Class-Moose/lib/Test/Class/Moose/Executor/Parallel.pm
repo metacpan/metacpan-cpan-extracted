@@ -4,7 +4,7 @@ package Test::Class::Moose::Executor::Parallel;
 
 use 5.10.0;
 
-our $VERSION = '0.83';
+our $VERSION = '0.84';
 
 use Moose 2.0000;
 use Carp;
@@ -31,6 +31,12 @@ has 'jobs' => (
 );
 
 has color_output => (
+    is      => 'ro',
+    isa     => 'Bool',
+    default => 1,
+);
+
+has show_parallel_progress => (
     is      => 'ro',
     isa     => 'Bool',
     default => 1,
@@ -159,6 +165,8 @@ around _run_test_method => sub {
 
     my $method_report = $self->$orig(@_);
 
+    return $method_report unless $self->show_parallel_progress;
+
     # we're running under parallel testing, so rather than having
     # the code look like it's stalled, we'll output a dot for
     # every test method.
@@ -200,7 +208,7 @@ Test::Class::Moose::Executor::Parallel - Execute tests in parallel (parallelized
 
 =head1 VERSION
 
-version 0.83
+version 0.84
 
 =for Pod::Coverage Tags Tests runtests
 

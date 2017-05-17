@@ -8,7 +8,6 @@ use CurieTestHelper;
 use Renard::Curie::Setup;
 use Renard::Curie::Model::Outline;
 use Renard::Curie::Model::Document::PDF;
-use Function::Parameters;
 
 my $pdf_ref_path = try {
 	CurieTestHelper->test_data_directory->child(qw(PDF Adobe pdf_reference_1-7.pdf));
@@ -42,7 +41,7 @@ fun walk_rows($store, $treeiter, $level, $callback) {
 	}
 }
 
-subtest 'Outline item type-checking' => fun {
+subtest 'Outline item type-checking' => sub {
 	my @valid_outlines = (
 		[
 			{ level => 0, text  => 'Chapter 1', page  => 20, },
@@ -82,7 +81,7 @@ subtest 'Outline item type-checking' => fun {
 	}
 };
 
-subtest 'Check that the tree store matches the items' => fun {
+subtest 'Check that the tree store matches the items' => sub {
 	my $doc = Renard::Curie::Model::Document::PDF
 		->new( filename => $pdf_ref_path );
 	my $outline = $doc->outline;

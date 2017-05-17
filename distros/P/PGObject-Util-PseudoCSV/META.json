@@ -4,7 +4,7 @@
       "Chris Travers <chris.travers@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.132140",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "bsd"
    ],
@@ -25,6 +25,11 @@
             "Test::More" : "0"
          }
       },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
       "runtime" : {
          "requires" : {
             "PGObject" : "1.400001"
@@ -39,5 +44,6 @@
          "web" : "https://github.com/ledgersmb/PGObject-Util-PseudoCSV"
       }
    },
-   "version" : "v1.1.1"
+   "version" : 2,
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

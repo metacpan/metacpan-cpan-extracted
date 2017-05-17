@@ -47,6 +47,6 @@
          "url" : "https://github.com/jhthorsen/mojolicious-plugin-openapi.git"
       }
    },
-   "version" : "1.14",
+   "version" : "1.15",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

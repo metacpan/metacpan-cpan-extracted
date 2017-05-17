@@ -24,3 +24,5 @@ Makefile$
 ^.releaserc
 ^Apache-Tika-Async.*.tar.gz$
 ^Apache-Tika-Async.*/
+^travis-scripts/
+^.travis.yml

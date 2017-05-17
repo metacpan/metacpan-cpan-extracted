@@ -3,7 +3,7 @@ use strict;
 use Moo::Role;
 use JSON::XS;
 use vars qw($VERSION);
-$VERSION = '0.06';
+$VERSION = '0.07';
 
 sub decode_response {
     my( $self, $body ) = @_;

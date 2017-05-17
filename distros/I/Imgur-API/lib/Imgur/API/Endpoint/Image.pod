@@ -1,0 +1,173 @@
+=head1 NAME
+
+Imgur::API::Endpoint::Image
+
+=head1 DESCRIPTION
+
+=over 4
+
+Access to the imgur Image API Endpoint. 
+
+=back
+
+=cut
+
+=head1 METHODS
+ 
+
+=head2 get
+
+=over 2
+
+Get information about an image.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<image> I<required>
+
+Image
+
+
+=back
+
+
+=head2 upload
+
+=over 2
+
+Upload a new image.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<name> I<optional>
+
+The name of the file, this is automatically detected if uploading a file with a POST and multipart / form-data
+
+=item *
+ C<type> I<optional>
+
+The type of the file that's being sent; file, base64 or URL
+
+=item *
+ C<title> I<optional>
+
+The title of the image.
+
+=item *
+ C<image> I<required>
+
+A binary file, base64 data, or a URL for an image. (up to 10MB)
+
+=item *
+ C<description> I<optional>
+
+The description of the image.
+
+=item *
+ C<album> I<optional>
+
+The id of the album you want to add the image to.
+                    For anonymous albums, {album} should be the
+                    deletehash that is returned at creation.
+
+
+=back
+
+
+=head2 delete
+
+=over 2
+
+Deletes an image. For an anonymous image, {id} must be the image's deletehash. If the image belongs to your account then passing the ID of the image is sufficient.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<image> I<required>
+
+Image
+
+
+=back
+
+
+=head2 update
+
+=over 2
+
+Updates the title or description of an image. You can only update an image you own and is associated with your account. For an anonymous image, {id} must be the image's deletehash.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<title> I<optional>
+
+The title of the image.
+
+=item *
+ C<description> I<optional>
+
+The description of the image.
+
+=item *
+ C<image> I<required>
+
+Image
+
+
+=back
+
+
+=head2 favorite
+
+=over 2
+
+Favorite an image with the given ID. The user is required to be logged in to favorite the image.
+
+=back
+
+B<Parameters>
+
+=over 4
+
+
+=item *
+ C<image> I<required>
+
+Image
+
+
+=back
+
+
+=head1 SEE ALSO
+
+=over 4 
+
+https://api.imgur.com/endpoints/image
+
+=back
+
+=cut

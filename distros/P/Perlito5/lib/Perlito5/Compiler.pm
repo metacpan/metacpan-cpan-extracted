@@ -4,11 +4,15 @@ use warnings;
 
 use Perlito5::Match;
 use Perlito5::Grammar;
+use Perlito5::Grammar::Statement;
 use Perlito5::Grammar::Control;
 use Perlito5::Grammar::Precedence;
 use Perlito5::Grammar::Expression;
 use Perlito5::Macro;
 use Perlito5::Runtime;
+use Perlito5::AST::CompileTime;
+use Perlito5::Dumper;
+use Perlito5::CompileTime::Dumper;
 
 sub compiler_name {
     "Perlito5"
@@ -20,7 +24,7 @@ sub do_not_edit {
 }
 
 sub error {
-    die join('', @_) . ' at ' . $Perlito5::FILE_NAME . ' line ' . $Perlito5::LINE_NUMBER;
+    die join('', @_) . ' at ' . $Perlito5::FILE_NAME . ' line ' . $Perlito5::LINE_NUMBER . "\n";
 }
 
 1;

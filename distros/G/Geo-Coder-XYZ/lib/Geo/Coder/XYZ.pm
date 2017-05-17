@@ -12,15 +12,15 @@ use URI;
 
 =head1 NAME
 
-Geo::Coder::XYZ - Provides a geocoding functionality using http:://geocoder.xyz
+Geo::Coder::XYZ - Provides a geocoding functionality using https://geocode.xyz
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -31,7 +31,7 @@ our $VERSION = '0.01';
 
 =head1 DESCRIPTION
 
-Geo::Coder::XYZ provides an interface to geocoder.xyz, a free geocode database covering many countries.
+Geo::Coder::XYZ provides an interface to geocode.xyz, a free geocode database covering many countries.
 
 =head1 METHODS
 
@@ -83,7 +83,6 @@ sub geocode {
 		$location = Encode::encode_utf8($location);
 	}
 
-	$ENV{'PERL_LWP_SSL_VERIFY_HOSTNAME'} = 0;
 	my $uri = URI->new("https://$self->{host}/some_location/");
 	$location =~ s/\s/+/g;
 	my %query_parameters = ('locate' => $location);
@@ -159,7 +158,7 @@ Based on L<Geo::Coder::Coder::Googleplaces>.
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
-Lots of thanks to the folks at geocoder.xyz.
+Lots of thanks to the folks at geocode.xyz.
 
 =head1 SEE ALSO
 

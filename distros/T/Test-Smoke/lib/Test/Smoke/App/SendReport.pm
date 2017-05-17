@@ -2,6 +2,8 @@ package Test::Smoke::App::SendReport;
 use warnings;
 use strict;
 
+our $VERSION = '0.001';
+
 use base 'Test::Smoke::App::Base';
 
 use File::Spec::Functions;

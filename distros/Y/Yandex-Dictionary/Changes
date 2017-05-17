@@ -1,0 +1,9 @@
+Revision history for Perl extension Yandex::Dictionary.
+
+0.02  2017-05-15T18:15:50+03:00 Europe/Moscow
+ 
+ - Corrected Doc, README and META.yml
+
+0.01  2017-05-15T17:12:45+03:00 Europe/Moscow
+
+ - Initial Yandex::Dictionary project.

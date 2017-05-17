@@ -6,9 +6,12 @@ do { my $x = {
                                       }
                       },
        'runtime' => {
+                      'recommends' => {
+                                        'Data::FlexSerializer' => '0'
+                                      },
                       'requires' => {
                                       'Alien::SwaggerUI' => '0',
-                                      'CPAN::Testers::Schema' => '0.007',
+                                      'CPAN::Testers::Schema' => '0.010',
                                       'File::Share' => '0',
                                       'Import::Base' => '0.012',
                                       'Log::Any' => '1.045',
@@ -22,7 +25,13 @@ do { my $x = {
                     },
        'test' => {
                    'recommends' => {
-                                     'CPAN::Meta' => '2.120900'
+                                     'CPAN::Meta' => '2.120900',
+                                     'CPAN::Testers::Fact::LegacyReport' => '0',
+                                     'CPAN::Testers::Fact::TestSummary' => '0',
+                                     'CPAN::Testers::Report' => '0',
+                                     'DBD::SQLite' => '0',
+                                     'Test::Reporter' => '0',
+                                     'Test::Reporter::Transport::Null' => '0'
                                    },
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',

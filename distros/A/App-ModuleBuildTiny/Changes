@@ -1,5 +1,8 @@
 Revision history for App-ModuleBuildTiny
 
+0.021
+          - Fix tarball directory name
+
 0.020
           - Added an upload command
 

@@ -4,9 +4,9 @@ use File::Spec::Functions 'catfile';
 use File::Temp 'tempdir';
 use FindBin;
 use IO::Socket::INET;
+use Mojo::File 'path';
 use Mojo::IOLoop::Server;
 use Mojo::UserAgent;
-use Mojo::Util 'spurt';
 
 plan skip_all => $@
   unless -e '.git' and eval 'require Proc::ProcessTable && require File::Which && 1';
@@ -16,7 +16,7 @@ my $dir = tempdir CLEANUP => 1;
 my $script = catfile $dir, 'myapp.pl';
 my $port = Mojo::IOLoop::Server->generate_port;
 
-spurt <<EOF, $script;
+path($script)->spurt(<<EOF);
 use lib "$FindBin::Bin/../lib";
 use Mojolicious::Lite;
 

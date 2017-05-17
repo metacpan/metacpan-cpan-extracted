@@ -23,11 +23,13 @@ Perlito5::Grammar::Precedence::add_term( $_  => \&term_digit )
 
 
 sub digit {
-    substr( $_[0], $_[1], 1 ) =~ m/\d/
+    my $str = $_[0];
+    my $pos = $_[1];
+    $str->[$pos] ge '0' && $str->[$pos] le '9'
     ? {
-        str  => $_[0],
-        from => $_[1],
-        to   => $_[1] + 1,
+        str  => $str,
+        from => $pos,
+        to   => $pos + 1,
       }
     : 0;
 }
@@ -79,6 +81,7 @@ token val_vstring {
                         @{ $MATCH->{digits_underscore} };
         return if @parts < 2;
         $MATCH->{capture} = Perlito5::AST::Buf->new(
+                    is_vstring => 1,
                     buf => join( '', map { chr($_) }
                                         $MATCH->{val_int}{capture}{int},
                                         @parts,
@@ -88,7 +91,9 @@ token val_vstring {
 };
 
 token val_version {
-    'v' <val_int> [ '.' <digits_underscore> ]*
+    'v' <val_int> 
+        <!before  <.Perlito5::Grammar::Space::opt_ws> \(  >
+        [ '.' <digits_underscore> ]*
     {
         my @parts = map { Perlito5::Match::flat($_) }
                         @{ $MATCH->{digits_underscore} };

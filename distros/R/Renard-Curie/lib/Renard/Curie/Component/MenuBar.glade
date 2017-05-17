@@ -217,6 +217,19 @@
               </object>
             </child>-->
             <child>
+              <object class="GtkMenuItem" id="menu-item-view-zoom">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">Zoom</property>
+                <child type="submenu">
+                  <object class="GtkMenu" id="menu-view-zoom">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
               <object class="GtkCheckMenuItem" id="menu-item-view-sidebar">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>

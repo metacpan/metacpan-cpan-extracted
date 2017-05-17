@@ -34,11 +34,11 @@ describe 'connection' => sub {
         isa_ok($dbh, 'DBI::db');
     };
 
-    it 'via pool' => sub {
+    it 'via dsn' => sub {
         my $self = shift;
 
         SetterConnection->init_db(
-            dsn   => 'dbi:SQLite::memory:',
+            dsn   => $ENV{TEST_OBJECTDB_DBH} || 'dbi:SQLite::memory:',
             attrs => {RaiseError => 1}
         );
         my $dbh = SetterConnection->init_db;

@@ -96,7 +96,7 @@ Util::Underscore::CallStackFrame - object-oriented wrapper for "caller" builtin
 
 =head1 VERSION
 
-version v1.4.1
+version v1.4.2
 
 =head1 SYNOPSIS
 

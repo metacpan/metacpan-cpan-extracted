@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use Test::Most tests => 18;
 use Test::NoWarnings;
-use Test::Number::Delta within => 1e-2;
 
 eval 'use autodie qw(:all)';	# Test for open/close failures
 
@@ -14,10 +13,16 @@ BEGIN {
 
 GOOGLEPLACES: {
 	SKIP: {
+		skip 'Test requires Internet access', 16 unless(-e 't/online.enabled');
+
 		eval {
 			require Geo::Coder::GooglePlaces::V3;
 
 			Geo::Coder::GooglePlaces::V3->import();
+
+			require Test::Number::Delta;
+
+			Test::Number::Delta->import();
 		};
 
 		if($@) {
@@ -35,20 +40,20 @@ GOOGLEPLACES: {
 			my $location = $geocoderlist->geocode(location => '8600 Rockville Pike, Bethesda MD, 20894 USA');
 			ok(defined($location));
 			is(ref($location), 'HASH', 'geocode should return a reference to a HASH');
-			delta_ok($location->{geometry}{location}{lat}, 39.00);
-			delta_ok($location->{geometry}{location}{lng}, -77.10);
+			delta_within($location->{geometry}{location}{lat}, 39.00, 1e-1);
+			delta_within($location->{geometry}{location}{lng}, -77.10, 1e-1);
 
 			$location = $geocoderlist->geocode('Wisdom Hospice, Rochester, England');
 			ok(defined($location));
 			ok(ref($location) eq 'HASH');
-			delta_ok($location->{geometry}{location}{lat}, 51.372);
-			delta_ok($location->{geometry}{location}{lng}, 0.50873);
+			delta_within($location->{geometry}{location}{lat}, 51.372, 1e-1);
+			delta_within($location->{geometry}{location}{lng}, 0.50873, 1e-1);
 
 			$location = $geocoderlist->geocode('St Mary The Virgin Church, Minster, Thanet, Kent, England');
 			ok(defined($location));
 			ok(ref($location) eq 'HASH');
-			delta_ok($location->{geometry}{location}{lat}, 51.330);
-			delta_ok($location->{geometry}{location}{lng}, 1.366);
+			delta_within($location->{geometry}{location}{lat}, 51.330, 1e-1);
+			delta_within($location->{geometry}{location}{lng}, 1.316, 1e-1);
 
 			ok(!defined($geocoderlist->geocode()));
 			ok(!defined($geocoderlist->geocode('')));

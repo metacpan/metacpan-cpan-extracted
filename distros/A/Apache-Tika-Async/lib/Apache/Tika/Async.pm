@@ -1,10 +1,10 @@
 package Apache::Tika::Async;
 use strict;
-use Moo;
+use Moo 2;
 use JSON::XS qw(decode_json);
 
 use vars '$VERSION';
-$VERSION = '0.06';
+$VERSION = '0.07';
 
 =head1 NAME
 
@@ -14,13 +14,17 @@ Apache::Tika::Async - connect to Apache Tika
 
     use Apache::Tika::Async;
 
-    my $tika= Apache::Tika::Server->new;
+    my $tika= Apache::Tika::Async->new;
 
     my $fn= shift;
 
     use Data::Dumper;
-    print Dumper $tika->get_meta($fn);
-    print Dumper $tika->get_text($fn);
+    my $info = $tika->get_all( $fn );
+    print Dumper $info->meta($fn);
+    print $info->content($fn);
+    # <html><body>...
+    print $info->meta->{"meta:language"};
+    # en
 
 =cut
 
@@ -46,7 +50,10 @@ has 'jarfile' => (
 has java_args => (
     is => 'rw',
     #isa => 'Array',
-    builder => sub { [] },
+    builder => sub { [
+        # So that Tika can re-read some problematic PDF files better
+        '-Dorg.apache.pdfbox.baseParser.pushBackSize=1000000'
+    ] },
 );
 
 has tika_args => (

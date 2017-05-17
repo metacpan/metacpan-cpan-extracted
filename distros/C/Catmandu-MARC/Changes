@@ -1,8 +1,13 @@
 Revision history for Catmandu-MARC
 
+1.11  2017-05-15 09:11:38 CEST
+  - Upgrading to MARC::Spec 1.0.0
+  - Fixing MARCspec Parser exception
+  - Fixing undef values when using $append and split
+  
 1.10  2017-05-02 11:48:37 CEST
   - Adding support for nested_arrays and subspecs in marc_spec
-  
+
 1.09  2017-03-27 11:29:28 CEST
   - Supporting forced arrays for $prepend, $append, $first, $last and any digits in the path
 

@@ -7,6 +7,13 @@ use Test::Deep;
 use Data::Dumper;
 use CPP::panda::lib;
 
+my $ok = eval {
+    package CPP::panda::lib;
+    require Panda::XSLoader;
+    Panda::XSLoader::bootstrap();
+    1;
+};
+
 sub import {
     my ($class, @reqs) = @_;
     if (@reqs) {
@@ -25,7 +32,7 @@ sub import {
 
 sub require_full {
     plan skip_all => 'rebuild Makefile.PL adding TEST_FULL=1 to enable all tests'
-        unless CPP::panda::lib::Test::String->can('new_empty');
+        unless $ok and CPP::panda::lib::Test::String->can('new_empty');
 }
 
 sub require_threads {

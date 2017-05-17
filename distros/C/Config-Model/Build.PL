@@ -75,7 +75,7 @@ my $build = $class->new(
     'Test::Memory::Cycle' => '0',
     'Test::More' => '0',
     'Test::Warn' => '0.11',
-    'YAML' => '0'
+    'YAML::Tiny' => '0'
   },
   'configure_requires' => {
     'Module::Build' => '0.34'
@@ -84,7 +84,7 @@ my $build = $class->new(
     'Fuse' => '0',
     'Term::ReadLine' => '0',
     'Text::Levenshtein::Damerau' => '0',
-    'YAML' => '0'
+    'YAML::Tiny' => '0'
   },
   'requires' => {
     'Carp' => '0',

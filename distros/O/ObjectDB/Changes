@@ -1,5 +1,13 @@
 Revision history for Perl extension ObjectDB
 
+3.20 2017-05-15T09:27:48Z
+
+    [FIXES]
+    - better Pg support with correct default boolean values detection
+
+    [FEATURES]
+    - testing on all databases
+
 3.19 2017-01-21T16:21:04Z
 
     [FIXES]

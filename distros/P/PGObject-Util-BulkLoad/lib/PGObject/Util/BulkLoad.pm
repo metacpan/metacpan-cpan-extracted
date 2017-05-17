@@ -13,27 +13,32 @@ use Try::Tiny;
 
 PGObject::Util::BulkLoad - Bulk load records into PostgreSQL
 
+=head1 VERSION
+
+Version 0.06
+
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
+
 
 =head1 SYNOPSIS
 
 To insert all rows into a table using COPY:
-  my ($dbh, @objects);
+
   PGObject::Util::BulkLoad->copy(
-      {table => 'mytable', insert_cols => ['col1', 'col2'], dbh => $dbh},
+      {table => 'mytable', insert_cols => ['col1', 'col2'], dbh => $dbh}, 
       @objects
   );
 
 To copy to a temp table and then upsert:
-  my ($dbh, @objects);
+
   PGObject::Util::BulkLoad->upsert(
-      {table       => 'mytable',
-       insert_cols => ['col1', 'col2'],
+      {table       => 'mytable', 
+       insert_cols => ['col1', 'col2'], 
        update_cols => ['col1'],
        key_cols    => ['col2'],
-       dbh         => $dbh},
+       dbh         => $dbh}, 
       @objects
   );
 
@@ -54,7 +59,7 @@ Or if you prefer to run the statements yourself:
       key_cols    => ['col2']
   );
 
-If you are running repetitive calls, you may be able to trade time for memory
+If you are running repetitive calls, you may be able to trade time for memory 
 using Memoize by unning the following:
 
   PGObject::Util::BulkLoad->memoize_statements;
@@ -67,13 +72,36 @@ To flush cache
 
   PGObject::Util::BulkLoad->flush_memoization;
 
+As of 0.05, an object oriented interface is included.  Note that the memoize
+calls are global but all other calls are subject to a fairly consistent
+interface. where the first series of arguments become the arguments (for 
+exceptions see below) for the rest of the actions.  This makes behavior 
+management a little easier.  Note that in this interface, the object is 
+effectively immutable (or should be), so if you want to change it, create a
+new object:
+
+  my $bulkloader = PGObject::Util::BulkLoad->new(
+       table         => 'foo',
+       tempname      => 'bar', # defaults to "pgobject_bulkload_$table"
+       insert_cols   => [qw(foo bar baz baz2)],
+       update_cols   => [qw(foo bar)],
+       key_cols      => [qw(baz baz2)],
+       dbh           => $dbh,
+  );
+  $bulkloader->copy(@objects);
+  $bulkloader->copy_temp(@objects);
+  $bulkloader->upsert(@objects);
+  $bulkloader->reset_temp;
+  $bulkloader->destroy_temp;
+       
+
 =head1 DESCRIPTION
 
 =head1 SUBROUTINES/METHODS
 
 =head2 memoize_statements
 
-This function exists to memoize statement calls, i.e. generate the exact same
+This function exists to memoize statement calls, i.e. generate the exact same 
 statements on the same argument calls.  This isn't too likely to be useful in
 most cases but it may be if you have repeated bulk loader calls in a persistent
 script (for example real-time importing of csv data from a frequent source).
@@ -81,17 +109,17 @@ script (for example real-time importing of csv data from a frequent source).
 =cut
 
 sub memoize_statements {
-    return memoize 'statement';
+    memoize 'statement';
 }
 
-=head2 unmemoize
+=head2 unmemoize 
 
 Unmemoizes the statement calls.
 
 =cut
 
 sub unmemoize {
-    return Memoize::unmemoize 'statement';
+    Memoize::unmemoize 'statement';
 }
 
 =head2 flush_memoization
@@ -103,16 +131,16 @@ simple strings.
 =cut
 
 sub flush_memoization {
-    return Memoization::flush_cache('statement');
+    Memoization::flush_cache('statement');
 }
-
+ 
 =head2 statement
 
 This takes the following arguments and returns a suitable SQL statement
 
 =over
 
-=item type
+=item type 
 
 Type of statement.  Options are:
 
@@ -165,80 +193,82 @@ Names of columns to group stats by
 =cut
 
 sub _sanitize_ident {
-    my ($string) = @_;
+    my($string) = @_;
     $string =~ s/"/""/g;
-    return qq("$string");
+    qq("$string");
 }
 
 sub _statement_stats {
     my ($args) = @_;
     croak 'Key columns must array ref' unless (ref $args->{key_cols}) =~ /ARRAY/;
-    croak 'Must supply key columns'    unless @{$args->{key_cols}};
-    croak 'Must supply table name'     unless $args->{table};
-    croak 'Must supply temp table'     unless $args->{tempname};
+    croak 'Must supply key columns' unless @{$args->{key_cols}};
+    croak 'Must supply table name' unless $args->{table};
+    croak 'Must supply temp table' unless $args->{tempname};
 
     my @groupcols;
-    @groupcols =
-        $args->{group_stats_by}
-        ? @{$args->{group_stats_by}}
-        : @{$args->{key_cols}};
+    @groupcols = $args->{group_stats_by} 
+                 ? @{$args->{group_stats_by}} 
+                 : @{$args->{key_cols}};
     my $table = _sanitize_ident($args->{table});
-    my $temp  = _sanitize_ident($args->{tempname});
-    return "SELECT " . join(', ', map { "$temp." . _sanitize_ident($_) } @groupcols) . ",
-            SUM(CASE WHEN ROW(" . join(', ', map { "$table." . _sanitize_ident($_) } @{$args->{key_cols}}) . ") IS NULL
+    my $temp = _sanitize_ident($args->{tempname});
+    "SELECT " . join(', ', map {"$temp." . _sanitize_ident($_)} @groupcols) . ",
+            SUM(CASE WHEN ROW(" . join(', ', map {"$table." . _sanitize_ident($_)
+                                      } @{$args->{key_cols}}) . ") IS NULL
                      THEN 1
                      ELSE 0
              END) AS pgobject_bulkload_inserts,
-            SUM(CASE WHEN ROW(" . join(', ', map { "$table." . _sanitize_ident($_) } @{$args->{key_cols}}) . ") IS NULL
+            SUM(CASE WHEN ROW(" . join(', ', map {"$table." . _sanitize_ident($_)
+                                      } @{$args->{key_cols}}) . ") IS NULL
                      THEN 0
                      ELSE 1
             END) AS pgobject_bulkload_updates
        FROM $temp
-  LEFT JOIN $table USING (" . join(', ', map { _sanitize_ident($_) } @{$args->{key_cols}}) . ")
-   GROUP BY " . join(', ', map { "$temp." . _sanitize_ident($_) } @groupcols);
+  LEFT JOIN $table USING (" . join(', ', map {_sanitize_ident($_)
+                                             } @{$args->{key_cols}}) . ")
+   GROUP BY " . join(', ', map {"$temp." . _sanitize_ident($_)} @groupcols);
 }
 
 sub _statement_temp {
     my ($args) = @_;
 
-    return "CREATE TEMPORARY TABLE " . _sanitize_ident($args->{tempname}) . " ( LIKE " . _sanitize_ident($args->{table}) . " )";
+    "CREATE TEMPORARY TABLE " . _sanitize_ident($args->{tempname}) .
+    " ( LIKE " . _sanitize_ident($args->{table}) . " )";
 }
 
 sub _statement_copy {
     my ($args) = @_;
     croak 'No insert cols' unless $args->{insert_cols};
 
-    return
-          "COPY "
-        . _sanitize_ident($args->{table}) . "("
-        . join(', ', map { _sanitize_ident($_) } @{$args->{insert_cols}}) . ') '
-        . "FROM STDIN WITH CSV";
+    "COPY " . _sanitize_ident($args->{table}) . "(" .
+      join(', ', map { _sanitize_ident($_) } @{$args->{insert_cols}}) . ') ' .
+      "FROM STDIN WITH CSV";
 }
 
 sub _statement_upsert {
     my ($args) = @_;
-    for (qw(insert_cols update_cols key_cols table tempname)) {
-        croak "Missing argument $_" unless $args->{$_};
+    for (qw(insert_cols update_cols key_cols table tempname)){
+       croak "Missing argument $_" unless $args->{$_};
     }
     my $table = _sanitize_ident($args->{table});
-    my $temp  = _sanitize_ident($args->{tempname});
+    my $temp = _sanitize_ident($args->{tempname});
 
-    return "WITH UP AS (
+    "WITH UP AS (
      UPDATE $table
-        SET " . join(
-        ",
-            ", map { _sanitize_ident($_) . ' = ' . "$temp." . _sanitize_ident($_) } @{$args->{update_cols}})
-        . "
+        SET " . join(",
+            ", map { _sanitize_ident($_) . ' = ' .
+                    "$temp." . _sanitize_ident($_)} @{$args->{update_cols}}) . "
        FROM $temp
       WHERE " . join("
-            AND ", map { "$table." . _sanitize_ident($_) . ' = ' . "$temp." . _sanitize_ident($_) } @{$args->{key_cols}}) . "
- RETURNING " . join(", ", map { "$table." . _sanitize_ident($_) } @{$args->{key_cols}}) . "
+            AND ", map {"$table." . _sanitize_ident($_) . ' = ' .
+                    "$temp." . _sanitize_ident($_)} @{$args->{key_cols}}) . "
+ RETURNING " . join(", ", map {"$table." . _sanitize_ident($_)} @{$args->{key_cols}}) ."
 )
-    INSERT INTO $table (" . join(", ", map { _sanitize_ident($_) } @{$args->{insert_cols}}) . ")
-    SELECT " . join(", ", map { _sanitize_ident($_) } @{$args->{insert_cols}}) . "
-      FROM $temp
-     WHERE ROW(" . join(", ", map { "$temp." . _sanitize_ident($_) } @{$args->{key_cols}}) . ")
-           NOT IN (SELECT " . join(", ", map { "UP." . _sanitize_ident($_) } @{$args->{key_cols}}) . " FROM UP)";
+    INSERT INTO $table (" . join(", ", 
+                            map {_sanitize_ident($_)} @{$args->{insert_cols}}) . ")
+    SELECT " . join(", ", map {_sanitize_ident($_)} @{$args->{insert_cols}}) . "
+      FROM $temp 
+     WHERE ROW(". join(", ", map { "$temp." . _sanitize_ident($_)} @{$args->{key_cols}}) .") 
+           NOT IN (SELECT ".join(", ", map { "UP." . _sanitize_ident($_)} @{$args->{key_cols}}) ." FROM UP)";
 
 }
 
@@ -246,14 +276,14 @@ sub statement {
     my %args = @_;
     croak "Missing argument 'type'" unless $args{type};
     no strict 'refs';
-    return &{"_statement_$args{type}"}(\%args);
+    &{"_statement_$args{type}"}(\%args);
 }
 
 =head2 upsert
 
 Creates a temporary table named "pg_object.bulkload" and copies the data there
 
-If the first argument is an object, then if there is a function by the name
+If the first argument is an object, then if there is a function by the name 
 of the object, it will provide the value.
 
 =over
@@ -277,7 +307,7 @@ Key columns (by name)
 =item group_stats_by
 
 This is an array of column names for optional stats retrieval and grouping.
-If it is set then we will grab the stats and return them.  Note this has a
+If it is set then we will grab the stats and return them.  Note this has a 
 performance penalty because it means an extra scan of the temp table and an
 extra join against the parent table.  See get_stats for the return value
 information if this is set.
@@ -288,25 +318,24 @@ information if this is set.
 
 sub _build_args {
     my ($init_args, $obj) = @_;
-    my @arglist = qw(table insert_cols update_cols key_cols dbh
-        tempname group_stats_by);
-    return {
-        map {
-            my $val;
-            for my $v ($init_args->{$_}, try { $obj->$_ }) {
-                $val = $v if defined $v;
-            }
-            $_ => $val;
-        } @arglist
-    };
+    my @arglist = qw(table insert_cols update_cols key_cols dbh 
+                     tempname group_stats_by);
+    return { 
+       map {  my $val;
+              for my $v ($init_args->{$_}, try { $obj->$_ } ){
+                  $val = $v if defined $v;
+              }
+              $_ => $val;
+       } @arglist 
+    }
 }
 
-sub upsert {    ## no critic (ArgUnpacking)
+sub upsert {
     my ($args) = shift;
     $args = shift if $args eq __PACKAGE__;
     try {
-        $args->can('foo');
-        unshift @_, $args;    # args is an object
+       $args->can('foo');
+       unshift @_, $args; # args is an object
     };
     $args = _build_args($args, $_[0]);
     my $dbh = $args->{dbh};
@@ -318,26 +347,19 @@ sub upsert {    ## no critic (ArgUnpacking)
     my $return_value;
 
     $dbh->do("DROP TABLE IF EXISTS pg_temp.pgobject_bulkloader");
-    $dbh->do(
-        statement(
-            %$args,
-            (
-                type     => 'temp',
-                tempname => 'pgobject_bulkloader'
-            )));
+    $dbh->do(statement( %$args, (type => 'temp', 
+                              tempname => 'pgobject_bulkloader')
+    ));
     copy({(%$args, (table => 'pgobject_bulkloader'))}, @_);
 
-    if ($args->{group_stats_by}) {
-        $return_value = get_stats({(%$args, (tempname => 'pgobject_bulkloader'))});
+    if ($args->{group_stats_by}){
+        $return_value = get_stats(
+                {(%$args, (tempname => 'pgobject_bulkloader'))}
+        );
     }
 
-    $dbh->do(
-        statement(
-            %$args,
-            (
-                type     => 'upsert',
-                tempname => 'pgobject_bulkloader'
-            )));
+    $dbh->do(statement( %$args, (type => 'upsert', 
+                              tempname => 'pgobject_bulkloader')));
     my $dropstatus = $dbh->do("DROP TABLE pg_temp.pgobject_bulkloader");
     return $return_value if $args->{group_stats_by};
     return $dropstatus;
@@ -365,30 +387,27 @@ sub _to_csv {
     my ($args) = shift;
 
     my $csv = Text::CSV->new();
-    return join(
-        "\n",
-        map {
-            my $obj = $_;
-            $csv->combine(map { $obj->{$_} } @{$args->{cols}});
-            $csv->string();
-        } @_
-    );
+    join("\n", map {
+       my $obj = $_;
+       $csv->combine(map { $obj->{$_} } @{$args->{cols}});
+       $csv->string();
+    } @_);
 }
 
-sub copy {    ## no critic (ArgUnpacking)
+sub copy {
     my ($args) = shift;
     $args = shift if $args eq __PACKAGE__;
     try {
-        no warnings;    ## no critic (ProhibitNoWarnings)
-        no strict;      ## no critic (ProhibitNoStrict)
-        $args->can('foo');
-        unshift @_, $args;    # args is an object
+       no warnings;
+       no strict;
+       $args->can('foo');
+       unshift @_, $args; # args is an object
     };
     $args = _build_args($args, $_[0]);
     my $dbh = $args->{dbh};
     $dbh->do(statement(%$args, (type => 'copy')));
     $dbh->pg_putcopydata(_to_csv({cols => $args->{insert_cols}}, @_));
-    return $dbh->pg_putcopyend();
+    $dbh->pg_putcopyend();
 }
 
 =head2 get_stats
@@ -397,14 +416,14 @@ Takes the same arguments as upsert plus group_stats_by
 
 Returns an array of hashrefs representing the number of inserts and updates
 that an upsert will perform.  It must be performed before the upsert statement
-actually runs.  Typically this is run via the upsert command (which
+actually runs.  Typically this is run via the upsert command (which 
 automatically runs this if group_stats_by is set in the argumements hash).
 
-There is a performance penalty here since an unindexed left join is required
+There is a performance penalty here since an unindexed left join is required 
 between the temp and the normal table.
 
 This function requires tempname, table, and group_stats_by to be set in the
-argument hashref.  The return value is a list of hashrefs with the following
+argument hashref.  The return value is a list of hashrefs with the following 
 keys:
 
 =over
@@ -421,29 +440,31 @@ Hashref for key columns and their values, by name
 
 =cut
 
-sub get_stats {    ## no critic (ArgUnpacking)
+sub get_stats {
     my ($args) = shift;
     $args = shift if $args eq __PACKAGE__;
     try {
-        no warnings;    ## no critic (ProhibitNoWarnings)
-        no strict;      ## no critic (ProhibitNoStrict)
-        $args->can('foo');
-        unshift @_, $args;    # args is an object
+       no warnings;
+       no strict;
+       $args->can('foo');
+       unshift @_, $args; # args is an object
     };
     $args = _build_args($args, $_[0]);
     my $dbh = $args->{dbh};
 
-    return [
-        map {
+    my $returnval = [
+          map { 
             my @row = @$_;
-            {
-                stats => {
-                    updates => pop @row,
-                    inserts => pop @row,
-                },
-                keys => {map { $_ => shift @row } @{$args->{group_stats_by}}},
-            }
-        } @{$dbh->selectall_arrayref(statement(%$args, (type => 'stats')))}];
+            { stats => {
+                  updates => pop @row,
+                  inserts => pop @row,
+              },
+              keys => {
+                 map { $_ => shift @row } @{$args->{group_stats_by}}
+              },
+            } 
+          } @{ $dbh->selectall_arrayref(statement(%$args, (type => 'stats'))) }
+    ];
 }
 
 =head1 AUTHOR
@@ -500,7 +521,42 @@ L<http://search.cpan.org/dist/PGObject-Util-BulkLoad/>
 =head1 ACKNOWLEDGEMENTS
 
 
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2014 Chris Travers.
+
+This program is distributed under the (Revised) BSD License:
+L<http://www.opensource.org/licenses/BSD-3-Clause>
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+* Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+
+* Neither the name of Chris Travers's Organization
+nor the names of its contributors may be used to endorse or promote
+products derived from this software without specific prior written
+permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 
 =cut
 
-1;    # End of PGObject::Util::BulkUpload
+1; # End of PGObject::Util::BulkUpload

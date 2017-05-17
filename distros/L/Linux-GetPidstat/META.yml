@@ -29,7 +29,7 @@ no_index:
 provides:
   Linux::GetPidstat:
     file: lib/Linux/GetPidstat.pm
-    version: '0.03'
+    version: '0.04'
   Linux::GetPidstat::Collector:
     file: lib/Linux/GetPidstat/Collector.pm
   Linux::GetPidstat::Collector::Parser:
@@ -55,4 +55,6 @@ resources:
   bugtracker: https://github.com/yoheimuta/Linux-GetPidstat/issues
   homepage: https://github.com/yoheimuta/Linux-GetPidstat
   repository: git://github.com/yoheimuta/Linux-GetPidstat.git
-version: '0.03'
+version: '0.04'
+x_contributors:
+  - 'Makoto Sasaki <wanigoya@gmail.com>'

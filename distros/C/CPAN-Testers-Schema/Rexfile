@@ -117,6 +117,9 @@ task upgrade_database =>
     group => 'api',
     sub {
         run 'source ~/.profile; cpantesters-schema upgrade';
+        if ( $? ) {
+            say last_command_output;
+        }
     };
 
 =head2 install_database
@@ -132,6 +135,9 @@ task install_database =>
     sub {
         run 'mysql --defaults-file=~/.cpanstats.cnf --database "" -e"create database cpanstats"';
         run 'source ~/.profile; cpantesters-schema install';
+        if ( $? ) {
+            say last_command_output;
+        }
     };
 
 

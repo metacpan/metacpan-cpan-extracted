@@ -1,3 +1,8 @@
+0.9168      Sun May 14 14:17:26 BST 2017
+
+* fix typo in YAML_BACKEND environment variable
+* Add support for meta x_use_unsafe_inc
+
 0.9166      Wed Apr 12 09:37:20 BST 2017
 
 * make Autoflush do STDOUT and STDERR

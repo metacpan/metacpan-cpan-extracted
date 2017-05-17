@@ -5,6 +5,7 @@ use warnings;
 
 use Test::More tests => 29;
 use Test::Exception;
+use Test::Warn;
 
 use Util::Underscore;
 
@@ -63,14 +64,17 @@ subtest 'max_by' => sub {
         plan tests => 5;
 
         is scalar(_::max_by { $_ } 2, 3, 1), 3, "finds maximum number";
+
         my $count = 0;
-        is scalar(_::max_by { $count++; length } qw/a ccc bb dd/), 'ccc',
-            "finds maximum string";
-        is $count, 4, "executed the expected number of times";
+        is scalar(_::max_by { $count++; length } qw/a ccc bb aaaa dd xxxx/),
+            'aaaa', "finds maximum string";
+        is $count, 6, "executed the expected number of times";
+
         lives_and {
             is scalar(_::max_by { die "never called" } ()), undef;
         }
         "returns undef when list is empty";
+
         lives_and {
             is scalar(_::max_by { die "never called" } (4)), 4;
         }
@@ -80,16 +84,19 @@ subtest 'max_by' => sub {
     subtest 'list context' => sub {
         plan tests => 5;
 
-        is_deeply [ _::max_by { $_ } 3, 1, 3, 2 ], [ 3, 3 ],
+        is_deeply [ _::max_by { $_ } 2, 3, 1, 3, 2 ], [ 3, 3 ],
             "finds maximum numbers";
+
         my $count = 0;
-        is_deeply [ _::max_by { $count++; length } qw/aaa bb ccc d/ ],
+        is_deeply [ _::max_by { $count++; length } qw/a aaa bb ccc d/ ],
             [qw/aaa ccc/], "finds maximum strings";
-        is $count, 4, "executed the expected number of times";
+        is $count, 5, "executed the expected number of times";
+
         lives_and {
             is_deeply [ _::max_by { die "never executed" } () ], [];
         }
         "returns empty list when input list is empty";
+
         lives_and {
             is_deeply [ _::max_by { die "never executed" } (4) ], [4];
         }
@@ -127,26 +134,42 @@ subtest 'min_str_by' => sub {
 };
 
 subtest 'uniq_by' => sub {
-    plan tests => 5;
+    plan tests => 8;
 
     my $count = 0;
     is_deeply [ _::uniq_by { $count++; length } qw/a b foo c bar baz/ ],
         [qw/a foo/], "correct return value";
     is $count, 6, "key function invoked the correct number of times";
+
     lives_and {
         is_deeply [ _::uniq_by { die "never invoked" } () ], [];
     }
     "handles empty list correctly";
+
     lives_and {
         is_deeply [ _::uniq_by { die "never invoked" } (42) ], [42];
     }
     "short-circuits on single element";
+
     is scalar(_::uniq_by { length } qw/a b foo c bar xy/), 3,
         "correct behavior in scalar context";
+
+    is scalar(_::uniq_by { length } qw/a/), 1,
+        "correct behavior in scalar context for single element";
+
+    is scalar(_::uniq_by { length } ()), 0,
+        "correct behavior in scalar context for empty input";
+
+    warning_is {
+        _::uniq_by { die "never invoked" } 1, 2, 3;
+        undef;
+    }
+    { carped => 'Useless use of _::uniq_by in void context' },
+    "warns when used in void context";
 };
 
 subtest 'classify' => sub {
-    plan tests => 4;
+    plan tests => 5;
 
     my $count = 0;
     is_deeply
@@ -154,12 +177,21 @@ subtest 'classify' => sub {
         +{ 1 => [qw/a b c/], 3 => [qw/foo bar baz/] },
         "correct return value in list context";
     is $count, 6, "key function invoked correct number of times";
+
     is_deeply
         scalar(_::classify { length } qw/a b foo c bar baz/),
         +{ 1 => [qw/a b c/], 3 => [qw/foo bar baz/] },
         "correct return value in scalar context";
+
     lives_and {
         is_deeply + { _::classify { die "never invoked" } () }, +{};
     }
     "handles empty list correctly";
+
+    warning_is {
+        _::classify { die "never invoked" } 1, 2, 3;
+        undef;
+    }
+    { carped => 'Useless use of _::classify in void context' },
+    "warns when used in void context";
 };

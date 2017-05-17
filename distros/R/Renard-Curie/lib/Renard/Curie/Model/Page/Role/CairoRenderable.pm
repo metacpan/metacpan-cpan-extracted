@@ -1,7 +1,7 @@
 use Renard::Curie::Setup;
 package Renard::Curie::Model::Page::Role::CairoRenderable;
 # ABSTRACT: Role for pages that represented by a Cairo image surface
-$Renard::Curie::Model::Page::Role::CairoRenderable::VERSION = '0.001';
+$Renard::Curie::Model::Page::Role::CairoRenderable::VERSION = '0.002';
 use Moo::Role;
 use Function::Parameters;
 use Renard::Curie::Types qw(PositiveOrZeroInt);
@@ -16,11 +16,11 @@ has [ qw(width height) ] => (
 	isa => PositiveOrZeroInt,
 );
 
-method _build_width :ReturnType(PositiveOrZeroInt) {
+method _build_width() :ReturnType(PositiveOrZeroInt) {
 	$self->cairo_image_surface->get_width;
 }
 
-method _build_height :ReturnType(PositiveOrZeroInt) {
+method _build_height() :ReturnType(PositiveOrZeroInt) {
 	$self->cairo_image_surface->get_height;
 }
 
@@ -38,7 +38,7 @@ Renard::Curie::Model::Page::Role::CairoRenderable - Role for pages that represen
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 CONSUMES
 

@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "DBD::mysql" : "4.019",
+            "DBD::mysql" : "4.042",
             "Mojolicious" : "7.18",
             "SQL::Abstract" : "1.81"
          }
@@ -48,6 +48,6 @@
          "url" : "https://github.com/jhthorsen/mojo-mysql.git"
       }
    },
-   "version" : "1.01",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "1.02",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

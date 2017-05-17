@@ -6,8 +6,6 @@ package Perlito5;
 use feature 'say';
 use Perlito5;
 use Perlito5::Compiler;
-use Perlito5::CompileTime::Emitter;
-use Perlito5::CompileTime::Dumper;
 use Perlito5::Grammar::Regex6;
 use Perlito5::Emitter::Token;
 use Perlito5::Dumper;
@@ -21,11 +19,11 @@ use Perlito5::JavaScript2::CORE;
 use Perlito5::JavaScript2::IO;
 use Perlito5::JavaScript2::Sprintf;
 
-use Perlito5::JavaScript3::Emitter;
-use Perlito5::JavaScript3::Runtime;
-use Perlito5::JavaScript3::CORE;
-use Perlito5::JavaScript3::IO;
-use Perlito5::JavaScript3::Sprintf;
+# use Perlito5::JavaScript3::Emitter;
+# use Perlito5::JavaScript3::Runtime;
+# use Perlito5::JavaScript3::CORE;
+# use Perlito5::JavaScript3::IO;
+# use Perlito5::JavaScript3::Sprintf;
 
 use Perlito5::Perl5::Emitter;
 use Perlito5::Perl5::PrettyPrinter;
@@ -34,9 +32,9 @@ use Perlito5::Perl5::Runtime;
 use Perlito5::Perl6::Emitter;
 use Perlito5::Perl6::PrettyPrinter;
 
-use Perlito5::XS::Emitter;      # experimental
+# use Perlito5::XS::Emitter;      # experimental
 
-use Perlito5::Java::Emitter;  # experimental
+use Perlito5::Java::Emitter;
 use Perlito5::Java::Runtime;
 use Perlito5::Java::Lib;
 
@@ -62,6 +60,8 @@ my @Use;
 my $i_switch = 0;
 my $i_switch_extension = '';
 my @e_switch;
+$Perlito5::BOOTSTRAP_JAVA_EVAL = 0;
+$Perlito5::JAVA_EVAL = 0;
 $Perlito5::FILE_NAME = '';
 
 if ($verbose) {
@@ -83,7 +83,7 @@ perlito5 [switches] [programfile]
     -V --version
     -v
     --verbose
-    -Ctarget        target backend: js, perl5, perl6, xs, java
+    -Ctarget        target backend: js, perl5, perl6, java
     -Cast-perl5     emits a dump of the abstract syntax tree as a Perl dump
     -Cast-json      emits a dump of the abstract syntax tree in JSON format
     --expand_use --noexpand_use
@@ -92,12 +92,14 @@ perlito5 [switches] [programfile]
                     emits or not boilerplate code
     --bootstrapping set this when compiling the compiler,
                     otherwise the new subroutine definitions will overwrite the current compiler
+    --java_eval     enable java eval, using perlito5-lib.jar
+    --nojava_eval   disable java eval, creates a standalone file that doesn't depend on perlito5-lib.jar
 ";
 my $copyright_message = <<"EOT";
 This is Perlito5 $_V5_COMPILER_VERSION, an implementation of the Perl language.
 
-The Perl language is Copyright 1987-2012, Larry Wall
-The Perlito5 implementation is Copyright 2011, 2012 by Flavio Soibelmann Glock and others.
+The Perl language is Copyright 1987-2017, Larry Wall
+The Perlito5 implementation is Copyright 2011-2017 by Flavio Soibelmann Glock and others.
 
 Perl may be copied only under the terms of either the Artistic License or the
 GNU General Public License, which may be found in the Perl 5 source kit.
@@ -136,7 +138,7 @@ sub get_text_from_switch {
     return $s;
 }
 
-push @Use, "no warnings";
+my $use_warnings = "";
 push @Use, "no strict";
 
 ARG_LOOP:
@@ -204,15 +206,15 @@ while (@ARGV && substr($ARGV[0], 0, 1) eq '-')
         shift @ARGV;
     }
     elsif (substr($ARGV[0], 0, 2) eq '-w') {
-        push @Use, "use warnings";
+        $use_warnings = "w";
         chomp_switch();
     }
     elsif (substr($ARGV[0], 0, 2) eq '-W') {
-        push @Use, "use warnings";
+        $use_warnings = "W";
         chomp_switch();
     }
     elsif (substr($ARGV[0], 0, 2) eq '-X') {
-        push @Use, "no warnings";
+        $use_warnings = "";
         chomp_switch();
     }
     elsif (substr($ARGV[0], 0, 2) eq '-n') {
@@ -274,6 +276,18 @@ while (@ARGV && substr($ARGV[0], 0, 1) eq '-')
         $bootstrapping = 1;
         shift @ARGV;
     }
+    elsif ($ARGV[0] eq '--bootstrap_java_eval') {
+        $Perlito5::BOOTSTRAP_JAVA_EVAL = 1;
+        shift @ARGV;
+    }
+    elsif ($ARGV[0] eq '--java_eval') {
+        $Perlito5::JAVA_EVAL = 1;
+        shift @ARGV;
+    }
+    elsif ($ARGV[0] eq '--nojava_eval') {
+        $Perlito5::JAVA_EVAL = 0;
+        shift @ARGV;
+    }
     elsif ($ARGV[0] eq '-') {
         shift @ARGV;
         last ARG_LOOP;
@@ -321,6 +335,11 @@ if ($backend) {
     $Perlito5::PROTO    = {};
     Perlito5::set_global_phase("BEGIN");
 
+    if ($source =~ /^#![^\n]+-(w|W)/) {
+        #!./perl -w
+        $use_warnings = $1;
+    }
+
     $source = "\n# line 1\n"
             . $source;
 
@@ -329,6 +348,9 @@ if ($backend) {
                     $source;
                     $wrapper_end
                   ";
+    }
+    if ($verbose) {
+        warn "// source [[[ $source ]]]\n";
     }
 
     # TODO - reset information about the current compilation process,
@@ -341,17 +363,33 @@ if ($backend) {
     Perlito5::JavaScript2::Lib::init()
         if $backend eq 'js' || $^O eq 'node.js';
 
+    # work around java code size limitation
+    $Perlito5::CODE_TOO_LARGE = 1
+        if $backend eq 'java';
+
+    $Perlito5::EXPAND_USE = 1;
+    # partially disable "use":
+    # force "use" code to be inlined instead of eval-ed
+    $Perlito5::EXPAND_USE = 0
+        if $bootstrapping;
+
     if ( $execute ) { 
-        $Perlito5::EXPAND_USE = 1;
         local $@;
         my $init = join("; ", @Use);
+        my $warnings = '';
+        $warnings = "use warnings" if $use_warnings;
         eval qq{
+            $warnings;
             Perlito5::set_global_phase("CHECK");
             \$_->() for \@Perlito5::CHECK_BLOCK;
             package main;
             $init;
             Perlito5::set_global_phase("INIT");
-            \$_->() for \@Perlito5::INIT_BLOCK;
+            eval {
+                \$_->() for \@Perlito5::INIT_BLOCK;
+                1;
+            }
+            or die "\$@\nINIT failed--call queue aborted.\n";
             Perlito5::set_global_phase("RUN");
             $source;
             \$@ = undef
@@ -372,16 +410,12 @@ if ($backend) {
             # we need to start with an empty %INC so that all modules are "used"
             %INC = ();
 
-            # partially disable "use":
-            # force "use" code to be inlined instead of eval-ed
-            $Perlito5::EXPAND_USE = 0
-                if $bootstrapping
-                || ($backend eq 'java');
-
             @Perlito5::COMP_UNIT = ();
 
             # start with no-strict
             no strict;
+
+            $source = "use warnings;\n" . $source if $use_warnings;
 
             my $m;
             my $ok;
@@ -402,33 +436,34 @@ if ($backend) {
                 exit(255);
             }
             else {
-                if ($ENV{PERLITO5DEV}) {
-                    # "new BEGIN"
-                    push @Perlito5::COMP_UNIT, Perlito5::Match::flat($m);
+                if ($expand_use) {
+                    my $ok;
+                    eval {
+                        push @Perlito5::COMP_UNIT,
+                          Perlito5::AST::CompUnit->new(
+                            name => 'main',
+                            body => Perlito5::Match::flat($m),
+                          );
+                        $ok = 1;
+                    };
+                    if ( !$ok ) {
+                        my $error = $@
+                            || "Unknown error loading a module";
+                        warn $error;
+                        exit(255);
+                    }
                 }
                 else {
-                    # "old BEGIN"
-                    if ($expand_use) {
-                        my $ok;
-                        eval {
-                            Perlito5::Grammar::Use::add_comp_unit(
-                                Perlito5::AST::CompUnit->new(
-                                    name => 'main',
-                                    body => Perlito5::Match::flat($m),
-                                ),
-                            );
-                            $ok = 1;
-                        };
-                        if ( !$ok ) {
-                            my $error = $@
-                                || "Unknown error loading a module";
-                            warn $error;
-                            exit(255);
-                        }
-                    }
-                    else {
-                        push @Perlito5::COMP_UNIT, Perlito5::Match::flat($m);
-                    }
+                    push @Perlito5::COMP_UNIT,
+                      Perlito5::AST::CompUnit->new(
+                        name => 'main',
+                        body => Perlito5::Match::flat($m),
+                      );
+                }
+
+                for (0 .. $#Perlito5::COMP_UNIT) {
+                    # use lexicals from BEGIN scratchpad
+                    $Perlito5::COMP_UNIT[$_] = $Perlito5::COMP_UNIT[$_]->emit_begin_scratchpad();
                 }
 
                 {
@@ -437,12 +472,75 @@ if ($backend) {
                     $_->() for @Perlito5::CHECK_BLOCK;
                 }
 
+                if (!$bootstrapping) {
+                    # emit BEGIN-block side-effects, INIT blocks
+                    $Perlito5::STRICT = 0;
+                    my @units;
+                    push @units,
+                        Perlito5::AST::Block->new(
+                            stmts => Perlito5::CompileTime::Dumper::emit_globals_after_BEGIN($Perlito5::GLOBAL),
+                        );
+                    if (@Perlito5::INIT_BLOCK || keys %Perlito5::DATA_SECTION) {
+                        $s = '{ ';
+                        if (keys %Perlito5::DATA_SECTION) {
+                            for my $pkg (keys %Perlito5::DATA_SECTION) {
+                                # open(main::DATA, '<', \$Perlito5::DATA_SECTION{main}{data});
+                                # seek(main::DATA, $Perlito5::DATA_SECTION{main}{pos}, 0);
+                                $s .= q%open % . $pkg . q%::DATA, '<', \$Perlito5::DATA_SECTION{% . $pkg . q%}{data}; %;
+                                $s .= q%seek(% . $pkg . q%::DATA, $Perlito5::DATA_SECTION{% . $pkg . q%}{pos}, 0); %;
+                            }
+                        }
+                        $s .=
+                            'local $@; '
+                        .   'local ${^GLOBAL_PHASE}; '
+                        .   'eval { ${^GLOBAL_PHASE} = "INIT" }; '    # GLOBAL_PHASE is r/o in perl5
+                        .   'eval { '
+                        .       '$_->() for @Perlito5::INIT_BLOCK; '  # execute INIT blocks
+                        .       '1; '
+                        .   '} '
+                        .   'or die "$@\nINIT failed--call queue aborted.\n"; '
+                        . '} ';
+                        my $m = Perlito5::Grammar::exp_stmts($s, 0);
+                        push @units, @{ Perlito5::Match::flat($m) };
+                    }
+                    unshift @Perlito5::COMP_UNIT, @units;
+
+
+                    # TODO - insert END block executor
+                    # NOTE - END blocks are currently processed by P::Java::Emitter instead
+
+                    # my $error;
+                    # eval {
+                    #   ... whole program
+                    #   1;
+                    # }
+                    # or $error = $@;
+                    # warn $error if $error;
+                    # Perlito5::set_global_phase("END");
+                    # eval {
+                    #     $_->() for @Perlito5::END_BLOCK;
+                    #     1;
+                    # }
+                    # or warn "$@\nEND failed--call queue aborted.\n"
+                    # if ( $error ) {
+                    #     exit(255);
+                    # }
+
+                }
+
                 my $comp_units = [ @Perlito5::COMP_UNIT ];
 
                 if ($compile_only) {
                     # -c switch
                     say $Perlito5::FILE_NAME . " syntax OK";
                 }
+                # elsif ($backend eq 'eval') {
+                #     my $block =
+                #         Perlito5::AST::Block->new(
+                #             stmts => [ map { @{ $_->{body} } } @$comp_units ],
+                #         );
+                #     Perlito5::eval_ast($block);
+                # }
                 elsif ($backend eq 'perl5') {
                     if ( $expand_use ) {
                         print Perlito5::Perl5::Runtime->emit_perl5();
@@ -480,16 +578,16 @@ if ($backend) {
                 elsif ($backend eq 'js') {
                     print Perlito5::AST::CompUnit::emit_javascript2_program( $comp_units, expand_use => $expand_use );
                 }
-                elsif ($backend eq 'js3') {
-                    print Perlito5::AST::CompUnit::emit_javascript3_program( $comp_units, expand_use => $expand_use );
-                }
-                elsif ($backend eq 'xs') {
-                    print Perlito5::AST::CompUnit::emit_xs_program( $comp_units );
-                }
+                # elsif ($backend eq 'js3') {
+                #     print Perlito5::AST::CompUnit::emit_javascript3_program( $comp_units, expand_use => $expand_use );
+                # }
+                # elsif ($backend eq 'xs') {
+                #     print Perlito5::AST::CompUnit::emit_xs_program( $comp_units );
+                # }
                 elsif ($backend eq 'java') {
                     print Perlito5::AST::CompUnit::emit_java_program( $comp_units, expand_use => $expand_use );
                 }
-                elsif ($backend eq 'ast-perl5') {
+                elsif ($backend eq 'ast-perl5' || $backend eq 'ast') {
                     say Perlito5::Dumper::ast_dumper( $comp_units );
                 }
                 elsif ($backend eq 'ast-json') {
@@ -501,13 +599,6 @@ if ($backend) {
                 }
                 elsif ($backend eq '_comp') {
                     say Perlito5::Dumper::ast_dumper( $Perlito5::SCOPE );
-                }
-                elsif ($backend eq '_globals') {
-                    # say Perlito5::CompileTime::Dumper::emit_globals_scope($Perlito5::SCOPE);
-                    say Perlito5::CompileTime::Dumper::emit_globals($Perlito5::GLOBAL);
-                }
-                elsif ($backend eq '_compile_time') {
-                    say Perlito5::Dumper::ast_dumper( Perlito5::AST::CompUnit::emit_compile_time_program( $comp_units ) );
                 }
                 else {
                     die "don't know what to do with backend '$backend'";

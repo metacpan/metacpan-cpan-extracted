@@ -2,18 +2,13 @@
 
 # Tests functionality relating to __DATA__ sections of files
 
-use strict;
-BEGIN {
-	no warnings 'once';
-	$| = 1;
-	$PPI::XS_DISABLE = 1;
-	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
-}
+use lib 't/lib';
+use PPI::Test::pragmas;
+use Test::More tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
-use Test::More tests => 8;
-use Test::NoWarnings;
 use File::Spec::Functions ':ALL';
 use PPI;
+
 
 my $module = catfile('t', 'data', '13_data', 'Foo.pm');
 ok( -f $module, 'Test file exists' );

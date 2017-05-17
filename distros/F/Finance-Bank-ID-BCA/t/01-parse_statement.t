@@ -4,7 +4,7 @@ use 5.010001;
 use strict;
 use Test::More 0.98;
 use DateTime;
-use File::Slurp::Tiny qw(read_file);
+use File::Slurper qw(read_text);
 use FindBin '$Bin';
 
 use Finance::Bank::ID::BCA;
@@ -17,7 +17,7 @@ for my $f (
     ["stmt1.ff35linux.txt", "personal, txt, ff35linux"],
     ["stmt1-en.opera10linux.txt", "personal (en), txt, opera10linux"],
 ) {
-    my $resp = $ibank->parse_statement(scalar read_file("$Bin/data/$f->[0]"));
+    my $resp = $ibank->parse_statement(scalar read_text("$Bin/data/$f->[0]"));
     die "status=$resp->[0], error=$resp->[1]\n" if $resp->[0] != 200;
     my $stmt = $resp->[2];
 
@@ -52,7 +52,7 @@ for my $f (
 for my $f (
     ["stmt1b.chrome4linux.txt", "personal, txt, chrome4linux"],
 ) {
-    my $resp = $ibank->parse_statement(scalar read_file("$Bin/data/$f->[0]"));
+    my $resp = $ibank->parse_statement(scalar read_text("$Bin/data/$f->[0]"));
     die "status=$resp->[0], error=$resp->[1]\n" if $resp->[0] != 200;
     my $stmt = $resp->[2];
 
@@ -86,7 +86,7 @@ for my $f (
 
 for my $f (
     ["stmt2.txt", "bisnis, txt"],) {
-    my $resp = $ibank->parse_statement(scalar read_file("$Bin/data/$f->[0]"));
+    my $resp = $ibank->parse_statement(scalar read_text("$Bin/data/$f->[0]"));
     die "status=$resp->[0], error=$resp->[1]\n" if $resp->[0] != 200;
     my $stmt = $resp->[2];
 
@@ -118,21 +118,7 @@ for my $f (
     is($stmt->{transactions}[2]{seq}, 3, "$f->[1] (seq 2)");
 }
 
-# check skip_NEXT
-for my $f (
-    ["stmt2-NEXT.txt", "bisnis, txt"],) {
-    local $ibank->{skip_NEXT} = 1;
-    my $resp = $ibank->parse_statement(scalar read_file("$Bin/data/$f->[0]"));
-    die "status=$resp->[0], error=$resp->[1]\n" if $resp->[0] != 200;
-    my $stmt = $resp->[2];
-
-    # transactions
-    is(scalar(@{ $stmt->{transactions} }), 2, "$f->[1] (num tx)");
-    is(scalar(@{ $stmt->{skipped_transactions} }), 1,
-       "$f->[1] (num skipped tx)");
-}
-
-my $res = $ibank->parse_statement(scalar(read_file("$Bin/data/stmt1.html")), return_datetime_obj=>0);
+my $res = $ibank->parse_statement(scalar(read_text("$Bin/data/stmt1.html")), return_datetime_obj=>0);
 my $stmt = $res->[2];
 ok(!ref($stmt->{start_date}), "return_datetime_obj=0 (1)");
 

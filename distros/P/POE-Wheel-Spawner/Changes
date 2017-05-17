@@ -1,5 +1,8 @@
 Revision history for POE-Wheel-Spawner
 
+0.03.2 2017-05-16
+        * requires version <= 0.77
+
 0.03.1 2017-04-26
         * rename the module to POE::Wheel::Spawner (previous Poe)
 

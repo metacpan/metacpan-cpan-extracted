@@ -4,7 +4,7 @@
       "Dotan Dimet <dotan@corky.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
@@ -51,5 +51,6 @@
          "url" : "http://github.com/dotandimet/Mojolicious-Plugin-ConfigHashMerge"
       }
    },
-   "version" : "0.02"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

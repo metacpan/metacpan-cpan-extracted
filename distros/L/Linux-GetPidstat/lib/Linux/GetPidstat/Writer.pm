@@ -25,12 +25,15 @@ sub output {
     }
 
     my $mackerel;
-    if (length $self->{mackerel_api_key} && length $self->{mackerel_service_name}) {
+    if (length $self->{mackerel_metric_type}) {
         $mackerel = Linux::GetPidstat::Writer::Mackerel->new(
-            mackerel_api_key      => $self->{mackerel_api_key},
-            mackerel_service_name => $self->{mackerel_service_name},
-            now                   => $self->{now},
-            dry_run               => $self->{dry_run},
+            mackerel_metric_type       => $self->{mackerel_metric_type},
+            mackerel_api_key           => $self->{mackerel_api_key},
+            mackerel_service_name      => $self->{mackerel_service_name},
+            mackerel_metric_key_prefix => $self->{mackerel_metric_key_prefix},
+            mackerel_host_id           => $self->{mackerel_host_id},
+            now                        => $self->{now},
+            dry_run                    => $self->{dry_run},
         );
     }
 
@@ -63,6 +66,7 @@ Linux::GetPidstat::Writer - Write pidstat's results to destinations
 
     my $instance = Linux::GetPidstat::Writer->new(
         res_file              => './res',
+        mackerel_metric_type  => 'service',
         mackerel_api_key      => '',
         mackerel_service_name => '',
         dry_run               => '0',

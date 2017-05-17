@@ -7,6 +7,8 @@ use Carp;
 
 use constant MAX_BUFFER_SIZE => 256;
 
+=encoding utf8
+
 =head1 Device::USB::Device
 
 This class encapsulates the USB device structure and the methods that may be
@@ -18,11 +20,11 @@ Device::USB::Device - Use libusb to access USB devices.
 
 =head1 VERSION
 
-Version 0.36
+Version 0.37
 
 =cut
 
-our $VERSION=0.36;
+our $VERSION=0.37;
 
 
 =head1 SYNOPSIS

@@ -1,0 +1,244 @@
+NAME
+    GPSD::Parse - Parse, extract use the JSON output from GPS units
+
+SYNOPSIS
+        use GPSD::Parse;
+
+        my $gps = GPSD::Parse->new;
+
+        # start the data flow, and poll for data
+
+        $gps->on;
+        $gps->poll;
+
+        # get all TPV data in an href
+
+        my $tpv_href = $gps->tpv;
+
+        # get individual TPV stats
+
+        print $gps->tpv('lat');
+        print $gps->tpv('lon');
+
+        # timestamp of the most recent poll
+
+        print $gps->time;
+
+        # get all satellites in an href of hrefs
+
+        my $sats = $gps->satellites;
+
+        # get an individual piece of info from a single sattelite
+
+        print $gps->satellites(16, 'ss');
+
+        # check which serial device the GPS is connected to
+
+        print $gps->device;
+
+        # stop capturing data
+
+        $gps->off;
+
+DESCRIPTION
+    Simple, lightweight distribution that polls `gpsd' for data received
+    from a UART (serial) connected GPS receiver over a TCP connection.
+
+    The data is fetched in JSON, and returned as Perl data.
+
+NOTES
+  Requirements
+    A version of gpsd that returns results in JSON format is required to
+    have been previously installed. It should be started at system startup,
+    with the following flags with system-specific serial port. See the above
+    link for information on changing the listen IP and port.
+
+        sudo gpsd -n /dev/ttyS0 -F /var/log/gpsd.sock
+
+  Available Data
+    Each of the methods that return data have a table in their respective
+    documentation within the METHODS section. Specifically, look at the
+    `tpv()', `sattelites()' and the more broad `sky()' method sections to
+    understand what available data attributes you can extract.
+
+METHODS
+  new(%args)
+    Instantiates and returns a new GPSD::Parse object instance.
+
+    Parameters:
+
+        host => 127.0.0.1
+
+    Optional, String: An IP address or fully qualified domain name of the
+    `gpsd' server. Defaults to the localhost (`127.0.0.1') if not supplied.
+
+        port => 2947
+
+    Optional, Integer: The TCP port number that the `gpsd' daemon is running
+    on. Defaults to `2947' if not sent in.
+
+  on
+    Puts `gpsd' in listening mode, ready to poll data from.
+
+    If this method is not called, a warning will be thrown when you
+    `poll()', and your dataset will be incomplete (ie. invalid).
+
+  off
+    Turns off `gpsd' listening mode.
+
+    Not necessary to call, but it will help preserve battery life if running
+    on a portable device.
+
+  poll(%args)
+    Does a poll of `gpsd' for data, and configures the object with that
+    data.
+
+    Parameters:
+
+    All parameters are sent in as a hash.
+
+        fname => $filename
+
+    Optional, String: Used for testing, you can send in the name of a JSON
+    file that contains `gpsd' JSON data and we'll work with that instead of
+    polling the GPS device directly.
+
+        return => 'json'
+
+    Optional, String: By default, after configuring the object, we will
+    return the polled raw data as a Perl hash reference. Send this param in
+    with the value of `'json'' and we'll return the data exactly as we
+    received it from `gpsd'.
+
+    Returns:
+
+    The raw poll data as either a Perl hash reference structure or as the
+    original JSON string.
+
+  tpv($stat)
+    `TPV' stands for "Time Position Velocity". This is the data that
+    represents your location and other vital statistics.
+
+    By default, we return a hash reference that is in the format `stat ='
+    'value'>.
+
+    Parameters:
+
+        $stat
+
+    Optional, String. You can extract individual statistics of the TPV data
+    by sending in the name of the stat you wish to fetch. This will then
+    return the string value if available. Returns `undef' if the statistic
+    doesn't exist.
+
+    Available statistic/info name, example value, description. This is the
+    default raw result:
+
+       time     => '2017-05-16T22:29:29.000Z'   # date/time in UTC
+       lon      => '-114.000000000'             # longitude
+       lat      => '51.000000'                  # latitude
+       alt      => '1084.9'                     # altitude (metres)
+       climb    => '0'                          # rate of ascent/decent (metres/sec)
+       speed    => '0'                          # rate of movement (metres/sec)
+       track    => '279.85'                     # heading (degrees from true north)
+       device   => '/dev/ttyS0'                 # GPS serial interface            
+       mode     => 3                            # NMEA mode
+       epx      => '3.636'                      # longitude error estimate (metres)
+       epy      => '4.676'                      # latitude error estimate (metres)
+       epc      => '8.16'                       # ascent/decent error estimate (meters)
+       ept      => '0.005'                      # timestamp error (sec) 
+       epv      => '4.082'                      # altitude error estimate (meters)
+       eps      => '9.35'                       # speed error estimate (metres/sec)
+       class    => 'TPV'                        # data type (fixed as TPV)
+       tag      => 'ZDA'                        # identifier
+
+  satellites($num, $stat)
+    This method returns a hash reference of hash references, where the key
+    is the satellite number, and the value is a hashref that contains the
+    various information related to the specific numbered satellite.
+
+    Note that the data returned by this function has been manipuated and is
+    not exactly equivalent of that returned by `gpsd'. To get the raw data,
+    see `sky()'.
+
+    Parameters:
+
+        $num
+
+    Optional, Integer: Send in the satellite number and we'll return the
+    relevant information in a hash reference for the specific satellite
+    requested, as opposed to returning data for all the satellites. Returns
+    `undef' if a satellite by that number doesn't exist.
+
+        $stat
+
+    Optional, String: Like `tpv()', you can request an individual piece of
+    information for a satellite. This parameter is only valid if you've sent
+    in the `$num' param, and the specified satellite exists.
+
+    Available statistic/information items available for each satellite,
+    including the name, an example value and a description:
+
+    NOTE: The PRN attribute will not appear unless you're using raw data.
+    The PRN can be found as the satellite hash reference key after we've
+    processed the data.
+
+        PRN     => 16   # PRN ID of the satellite 
+
+                        # 1-63 are GNSS satellites
+                        # 64-96 are GLONASS satellites
+                        # 100-164 are SBAS satellites
+
+        ss      => 20   # signal strength (dB)
+        az      => 161  # azimuth (degrees from true north)
+        used    => 1    # currently being used in calculations
+        el      => 88   # elevation in degrees
+
+  sky
+    Returns a hash reference containing all of the data that was pulled from
+    the `SKY' information returned by `gpsd'. This information contains
+    satellite info and other related statistics.
+
+    Available information, with the attribute, example value and
+    description:
+
+        satellites  => []           # array of satellite hashrefs
+        xdop        => '0.97'       # longitudinal dilution of precision
+        ydop        => '1.25'       # latitudinal dilution of precision
+        pdop        => '1.16'       # spherical dilution of precision
+        tdop        => '2.2'        # time dilution of precision
+        vdop        => '0.71'       # altitude dilution of precision
+        gdop        => '3.87'       # hyperspherical dilution of precision
+        hdop        => '0.92'       # horizontal dilution of precision
+        class       => 'SKY'        # object class, hardcoded to SKY
+        tag         => 'ZDA'        # object ID
+        device      => '/dev/ttyS0' # serial port connected to the GPS
+
+  device
+    Returns a string containing the actual device the GPS is connected to
+    (eg: `/dev/ttyS0').
+
+  time
+    Returns a string of the date and time of the most recent poll, in UTC.
+
+SEE ALSO
+    A very similar distribution is Net::GPSD3. However, it has a long line
+    of prerequisite distributions that didn't always install easily on my
+    primary target platform, the Raspberry Pi.
+
+    This distribution isn't meant to replace that one, it's just a much
+    simpler and more lightweight piece of software that pretty much does the
+    same thing.
+
+AUTHOR
+    Steve Bertrand, `<steveb at cpan.org>'
+
+LICENSE AND COPYRIGHT
+    Copyright 2017 Steve Bertrand.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

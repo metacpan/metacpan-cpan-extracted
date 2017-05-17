@@ -1,3 +1,4 @@
+use lib '.';
 use t::Helper;
 
 my $this_will_mess_up;

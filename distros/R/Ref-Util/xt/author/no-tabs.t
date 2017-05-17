@@ -20,6 +20,7 @@ my @files = (
     't/list.t',
     't/magic-readonly.t',
     't/magic.t',
+    't/pureperl.t',
     't/toomany.t'
 );
 

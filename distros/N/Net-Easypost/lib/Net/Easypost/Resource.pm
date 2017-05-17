@@ -1,5 +1,5 @@
 package Net::Easypost::Resource;
-$Net::Easypost::Resource::VERSION = '0.19';
+$Net::Easypost::Resource::VERSION = '0.20';
 use Moo::Role;
 
 use Carp qw(croak);
@@ -46,7 +46,7 @@ Net::Easypost::Resource
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 

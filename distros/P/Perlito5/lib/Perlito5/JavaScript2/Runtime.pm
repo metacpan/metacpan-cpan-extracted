@@ -12,7 +12,8 @@ sub perl5_to_js {
     local ${^GLOBAL_PHASE};
     local $Perlito5::BASE_SCOPE = $scope_js->[0];
     local @Perlito5::SCOPE_STMT;
-    local $Perlito5::SCOPE = $Perlito5::BASE_SCOPE;
+    local $Perlito5::CLOSURE_SCOPE = $Perlito5::BASE_SCOPE;
+    local $Perlito5::SCOPE         = $Perlito5::BASE_SCOPE;
     local $Perlito5::SCOPE_DEPTH = 0;
     local $Perlito5::PKG_NAME = $namespace;
     local @Perlito5::UNITCHECK_BLOCK;
@@ -36,6 +37,9 @@ sub perl5_to_js {
                          ) ],
               );
 
+    # use lexicals from BEGIN scratchpad
+    $ast = $ast->emit_begin_scratchpad();
+
     # say "ast: [" . ast . "]";
     my $js_code = $ast->emit_javascript2(0, $want);
     # say "js-source: [" . $js_code . "]";
@@ -46,6 +50,19 @@ sub perl5_to_js {
     # warn "in eval BASE_SCOPE exit: ", Data::Dumper::Dumper($Perlito5::BASE_SCOPE);
     $Perlito5::STRICT   = $strict_old;
     return $js_code;
+}
+
+sub eval_ast {
+    my ($ast) = @_;
+    my $want = 0;
+
+    my $js_code = $ast->emit_javascript2(0, $want);
+    # say STDERR "js-source: [" . $js_code . "]";
+    Perlito5::set_global_phase("UNITCHECK");
+    $_->() while $_ = shift @Perlito5::UNITCHECK_BLOCK;
+    # warn "in eval BASE_SCOPE exit: ", Data::Dumper::Dumper($Perlito5::BASE_SCOPE);
+    $_ = $js_code;
+    return JS::inline('eval("(function(){" + p5pkg.main.v__ + "})()")');
 }
 
 sub emit_javascript2 {
@@ -80,12 +97,40 @@ if (typeof p5pkg !== "object") {
     p5pkg.UNIVERSAL = new universal();
     p5pkg.UNIVERSAL._ref_ = "UNIVERSAL";
     p5pkg.UNIVERSAL.isa = function (List__) {
-        // TODO - use @ISA
-        return List__[0]._class_._ref_ == List__[1]
+        var o = List__[0];
+        var s = List__[1];
+        var clas;
+        if (typeof o === "string") {
+            clas = p5pkg[o];
+        }
+        else {
+            clas = o._class_;
+        }
+        if (!clas) {
+            return false;
+        }
+        if (clas._ref_ == s) {
+            return true;
+        }
+        var isa = clas.List_ISA;
+        if (isa) {
+            for (var i = 0; i < isa.length; i++) {
+                if (isa[i] == s) {
+                    return true;
+                }
+                if (p5pkg.UNIVERSAL.isa( isa[i], s )) {
+                    return true;
+                }
+            }
+        }
+        return false;
     };
     p5pkg.UNIVERSAL.can = function (List__) {
         var o = List__[0];
         var s = List__[1];
+        if (typeof o === "string") {
+            return p5method_lookup(s, o, {})
+        }
         if ( s.indexOf("::") == -1 ) {
             return p5method_lookup(s, o._class_._ref_, {})
         }
@@ -138,26 +183,6 @@ function p5make_package(pkg_name) {
         p5pkg[pkg_name]["v_AUTOLOAD"] = null;
     }
     return p5pkg[pkg_name];
-}
-
-function p5code_lookup_by_name(package_name, sub_name) {
-    // sub_name can be a function already
-    if (typeof sub_name === "function") {
-        return sub_name;
-    }
-    // sub_name can have an optional namespace
-    var parts = sub_name.split(/::/);
-    if (parts.length > 1) {
-        sub_name = parts.pop();
-        package_name = parts.join("::");
-    }
-    if (p5pkg.hasOwnProperty(package_name)) {
-        var c = p5pkg[package_name];
-        if ( c.hasOwnProperty(sub_name) ) {
-            return c[sub_name]
-        }
-    }
-    return null;
 }
 
 function p5get_class_for_method(method, class_name, seen) {
@@ -236,25 +261,73 @@ function p5call(invocant, method, list, p5want) {
             return p5pkg['Perlito5::IO'][method]( invocant_original, list, p5want);
         }
 
-        pkg_name = p5get_class_for_method('AUTOLOAD', invocant._class_._ref_, {}) || p5get_class_for_method('AUTOLOAD', "UNIVERSAL", {});
-        if (pkg_name) {
-            p5pkg[pkg_name]["v_AUTOLOAD"] = invocant._class_._ref_ + "::" + method;
-            return p5pkg[pkg_name]["AUTOLOAD"](list, p5want);
+        if (method.substr(0, 1) != "("
+         && method != "import"
+         && method != "unimport"
+         && method != "isa"
+         && method != "can"
+        ) {
+            pkg_name = p5get_class_for_method('AUTOLOAD', invocant._class_._ref_, {}) || p5get_class_for_method('AUTOLOAD', "UNIVERSAL", {});
+            if (pkg_name) {
+                p5pkg[pkg_name]["v_AUTOLOAD"] = invocant._class_._ref_ + "::" + method;
+                return p5pkg[pkg_name]["AUTOLOAD"](list, p5want);
+            }
         }
         p5pkg.CORE.die([p5method_not_found(method, invocant._class_._ref_)]);
     }
     p5pkg.CORE.die(["Can't call method ", method, " on unblessed reference"]);
 }
 
-function p5call_sub(namespace, name, list, p5want) {
+function p5cget(namespace, name) {
     if(p5pkg[namespace].hasOwnProperty(name)) {
-        return p5pkg[namespace][name](list, p5want)
+        return p5pkg[namespace][name]
     }
     if(p5pkg[namespace].hasOwnProperty("AUTOLOAD")) {
         p5pkg[namespace]["v_AUTOLOAD"] = namespace + "::" + name;
-        return p5pkg[namespace]["AUTOLOAD"](list, p5want)
+        return p5pkg[namespace]["AUTOLOAD"]
     }
     p5pkg.CORE.die(["Undefined subroutine &" + namespace + "::" + name]);
+}
+
+function p5cget_by_name(namespace, name) {
+    // name can be a function already
+    if (typeof name === "function") {
+        return name;
+    }
+    // name can have an optional namespace
+    var parts = name.split(/::/);
+    if (parts.length > 1) {
+        name = parts.pop();
+        namespace = parts.join("::");
+    }
+    if(p5pkg[namespace].hasOwnProperty(name)) {
+        return p5pkg[namespace][name]
+    }
+    if(p5pkg[namespace].hasOwnProperty("AUTOLOAD")) {
+        p5pkg[namespace]["v_AUTOLOAD"] = namespace + "::" + name;
+        return p5pkg[namespace]["AUTOLOAD"]
+    }
+    p5pkg.CORE.die(["Undefined subroutine &" + namespace + "::" + name]);
+}
+
+function p5code_lookup_by_name(package_name, sub_name) {
+    // sub_name can be a function already
+    if (typeof sub_name === "function") {
+        return sub_name;
+    }
+    // sub_name can have an optional namespace
+    var parts = sub_name.split(/::/);
+    if (parts.length > 1) {
+        sub_name = parts.pop();
+        package_name = parts.join("::");
+    }
+    if (p5pkg.hasOwnProperty(package_name)) {
+        var c = p5pkg[package_name];
+        if ( c.hasOwnProperty(sub_name) ) {
+            return c[sub_name]
+        }
+    }
+    return null;
 }
 
 function p5sub_exists(name, current_pkg_name) {
@@ -955,6 +1028,24 @@ var p5str_inc = function(s) {
     return p5str_inc(s.substr(0, s.length-1)) + c.substr(c.length-1, 1);
 };
 
+var p5looks_like_number = function(a) {
+    if (typeof a === "number") {
+        return 1;
+    }
+    a = a.trim();
+    var s1 = a.toUpperCase();
+    if ( s1 == "NAN" || s1 == "INF" || s1 == "-NAN" || s1 == "-INF" ) {
+        return 1
+    };
+    if (s1.match(/^[\+\-]?[0-9]+\.?(?:E[-+]?[0-9]+)?$/)) {          // 999 999.
+        return 1;
+    }
+    if (s1.match(/^[\+\-]?[0-9]*\.[0-9]+(?:E[-+]?[0-9]+)?$/)) {    // 999.999 .999
+        return 1;
+    }
+    return 0;
+}
+
 var p5range_state = {};
 var p5range = function(a, b, p5want, id, three_dots) {
     if (p5want) {
@@ -963,6 +1054,10 @@ var p5range = function(a, b, p5want, id, three_dots) {
         if (typeof a === "number" || typeof b === "number") {
             a = p5num(a);
             b = p5num(b);
+            if (isNaN(a) || isNaN(b) || a == Infinity || b == Infinity) {
+                p5pkg.CORE.die(["Range iterator outside integer range"]);
+            }
+            a = CORE.int([a]);
             while (a <= b) {
                 tmp.push(a);
                 a++;
@@ -971,23 +1066,25 @@ var p5range = function(a, b, p5want, id, three_dots) {
         else {
             a = p5str(a);
             b = p5str(b);
-            var c = a.substr(0, 1);
-            if ( c == '+' ) {
-                if (a == "+") {
-                    return [a]
+            if (a == '') {
+                return [a];
+            }
+
+            if (a.substr(0, 1) != '0' && p5looks_like_number(a) && p5looks_like_number(b)) {
+                // both sides look like number
+                return p5range(p5num(a), p5num(b), p5want, id, three_dots)
+            }
+
+            // If the initial value specified isn't part of a magical increment sequence
+            // (that is, a non-empty string matching /^[a-zA-Z]*[0-9]*\z/ ),
+            // only the initial value will be returned.
+            if (!a.match(/^[a-zA-Z]*[0-9]*$/)) {
+                if (a.length > b.length) {
+                    return []
                 }
-                a = a.substr(1)
+                return [a]
             }
-            else if ( c == '-' ) {
-                if (a == "-") {
-                    return [a]
-                }
-                return p5range(p5num(a), b, p5want, id, three_dots)
-            }
-            c = b.substr(0, 1);
-            if ( c == '+' ) {
-                b = b.substr(1)
-            }
+
             while (  (a.length < b.length)
                   || (a.length == b.length && a <= b) ) {
                 tmp.push(a);
@@ -1045,9 +1142,57 @@ var p5negative = function(o) {
     return -o;
 };
 
+function p5regex_s_modifier (s) {
+    var cc = s.split(/(\\.)|/);
+    var out = [];
+    var is_char_class = false;
+    for(var i = 0; i < cc.length; i++) {
+        var c = cc[i];
+        if (typeof c != "undefined") {
+            if (c == "[")                    { is_char_class = true }
+            if (c == "]" && is_char_class )  { is_char_class = false }
+            if (c == "." && !is_char_class ) { c = "[\\S\\s]" }
+            out.push(c);
+        }
+    }
+    return out.join("");
+}
+
+function p5regex_x_modifier (s) {
+    var cc = s.split(/(\\.)|/);
+    var out = [];
+    var is_char_class = false;
+    var is_comment = false;
+    for(var i = 0; i < cc.length; i++) {
+        var c = cc[i];
+        if (typeof c != "undefined") {
+            if (c == "[")                    { is_char_class = true }
+            if (c == "]" && is_char_class )  { is_char_class = false }
+            if (c == " " && !is_char_class ) { c = "" }
+            if (c == "#" && !is_char_class ) { c = ""; is_comment = true }
+            if (c == "\n" && is_comment )    { c = ""; is_comment = false }
+            if (is_comment)                  { c = "" }
+            out.push(c);
+        }
+    }
+    return out.join("");
+}
+
+function p5regex_compile (s, flags) {
+    if (flags.indexOf("s") != -1) {
+        flags = flags.replace("s", "");
+        s = p5regex_s_modifier(s);
+    }
+    if (flags.indexOf("x") != -1) {
+        flags = flags.replace("x", "");
+        s = p5regex_x_modifier(s);
+    }
+    return new RegExp(s, flags);
+}
+
 var p5qr = function(search, modifier) {
     // TODO - "Regex" stringification
-    var re = new RegExp(search, modifier);
+    var re = p5regex_compile(search, modifier);
     return CORE.bless([(new p5ScalarRef(re)), 'Regex']);
 };
 
@@ -1059,7 +1204,7 @@ var p5m = function(s, search, modifier, want) {
         re = search._scalar_;
     }
     else {
-        re = new RegExp(search, modifier);
+        re = p5regex_compile(search, modifier);
     }
 
     p5_regex_capture = [];
@@ -1090,7 +1235,7 @@ var p5s = function(s, search, fun_replace, modifier, want) {
         re = search._scalar_;
     }
     else {
-        re = new RegExp(search, modifier);
+        re = p5regex_compile(search, modifier);
     }
 
     p5_regex_capture = [];

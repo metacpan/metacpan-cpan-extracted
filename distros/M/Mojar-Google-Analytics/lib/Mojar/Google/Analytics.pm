@@ -1,7 +1,7 @@
 package Mojar::Google::Analytics;
 use Mojo::Base -base;
 
-our $VERSION = 1.111;
+our $VERSION = 1.112;
 
 use 5.014;  # For MIME::Base64::encode_base64url
 use Carp 'croak';
@@ -134,13 +134,15 @@ Mojar::Google::Analytics - Fetch Google Analytics reporting data
     profile_id => q{5678}
   );
   $analytics->req(
-    dimensions => [qw( pagePath )],
-    metrics => [qw( visitors pageviews )],
+    dimensions => [qw(pagePath)],
+    metrics => [qw(visitors pageviews)],
     sort => 'pagePath',
     start_index => $start,
     max_results => $max_resultset
   );
-  my $rs = $analytics->fetch;
+  if (my $res = $analytics->fetch) {
+    # Do something with $res->rows or $res->columns
+  }
 
 =head1 DESCRIPTION
 

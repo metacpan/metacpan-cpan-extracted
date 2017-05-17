@@ -1,17 +1,18 @@
 #
 # Tests of the poly_roots() function, all of polynomials of degree
 # four or less. Cases are all 0.9216 times the values of the cases
-# in poly0.t.
+# in 20-poly.t.
 #
 use 5.010001;
 use Test::More tests => 44;
 
-use Math::Polynomial::Solve qw(:numeric ascending_order);
 use Math::Complex;
-use warnings;
+use Math::Polynomial::Solve qw(:numeric ascending_order);
+use Math::Utils qw(:polynomial :compare);
 use strict;
+use warnings;
 
-require "t/coef.pl";
+my($eq, $ne) = generate_relational(2.5e-7);
 
 my @case = (
 	[1.8432, 0.9216],
@@ -39,11 +40,14 @@ for (@case)
 {
 	my @coef = @$_;
 	my @x = poly_roots(@coef);
+	my @y = pl_evaluate([reverse @coef], @x);
 
-	ok(allzeroes([reverse @coef ], @x),
-		"   [ " . join(", ", @coef) . " ]");
+	my @badvals = grep {&$ne($_, 0)} @y;
 
-	#diag(rootformat(@x), "\n\n");
+	ok(scalar @badvals == 0,
+		"   [ " . join(", ", @coef) . " ] descending order," .
+		" roots: [" . join(", ", @x) . "]"
+	);
 }
 
 #
@@ -56,11 +60,14 @@ for (@case)
 {
 	my @coef = @$_;
 	my @x = poly_roots(@coef);
+	my @y = pl_evaluate([reverse @coef], @x);
 
-	ok(allzeroes([reverse @coef ], @x),
-		"   [ " . join(", ", @coef) . " ]");
+	my @badvals = grep {&$ne($_, 0)} @y;
 
-	#diag(rootformat(@x), "\n\n");
+	ok(scalar @badvals == 0,
+		"   [ " . join(", ", @coef) . " ] descending order," .
+		" roots: [" . join(", ", @x) . "]"
+	);
 }
 
 ascending_order(1);
@@ -75,11 +82,14 @@ for (@case)
 {
 	my @coef = reverse @$_;
 	my @x = poly_roots(@coef);
+	my @y = pl_evaluate([@coef], @x);
 
-	ok(allzeroes(\@coef, @x),
-		"   [ " . join(", ", @coef) . " ], ascending order");
+	my @badvals = grep {&$ne($_, 0)} @y;
 
-	#diag(rootformat(@x), "\n\n");
+	ok(scalar @badvals == 0,
+		"   [ " . join(", ", @coef) . " ] ascending order," .
+		" roots: [" . join(", ", @x) . "]"
+	);
 }
 
 #
@@ -92,11 +102,26 @@ for (@case)
 {
 	my @coef = reverse @$_;
 	my @x = poly_roots(@coef);
+	my @y = pl_evaluate([@coef], @x);
 
-	ok(allzeroes(\@coef, @x),
-		"   [ " . join(", ", @coef) . " ], ascending order");
+	my @badvals = grep {&$ne($_, 0)} @y;
 
-	#diag(rootformat(@x), "\n\n");
+	ok(scalar @badvals == 0,
+		"   [ " . join(", ", @coef) . " ] ascending order," .
+		" roots: [" . join(", ", @x) . "]"
+	);
+}
+
+exit(0);
+
+sub rootprint
+{
+	my @fmtlist;
+	for (@_)
+	{
+		push @fmtlist, cartesian_format(undef, undef, $_);
+	}
+	return "[ " . join(", ", @fmtlist) . " ]";
 }
 
 1;

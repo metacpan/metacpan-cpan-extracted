@@ -1,14 +1,15 @@
 use Renard::Curie::Setup;
 package Renard::Curie::Data::PDF;
 # ABSTRACT: Retrieve PDF image and text data via MuPDF's mutool
-$Renard::Curie::Data::PDF::VERSION = '0.001';
-use Capture::Tiny qw(capture_stdout tee_stdout);
+$Renard::Curie::Data::PDF::VERSION = '0.002';
+use Capture::Tiny qw(capture);
 use XML::Simple;
-use Alien::MuPDF 0.005;
+use Alien::MuPDF 0.007;
 use Path::Tiny;
 use Function::Parameters;
 
 use Log::Any qw($log);
+use constant MUPDF_DEFAULT_RESOLUTION => 72; # dpi
 
 BEGIN {
 	our $MUTOOL_PATH = Alien::MuPDF->mutool_path;
@@ -54,7 +55,7 @@ fun _call_mutool( @mutool_args ) {
 		$stdout = path( $temp_fh->filename )->slurp_raw;     # uncoverable statement
 		$exit = $?;                                          # uncoverable statement
 	} else {
-		($stdout, $exit) = capture_stdout {
+		($stdout, undef, $exit) = capture {
 			$log->infof("running mutool: %s", \@args);
 			system( @args );
 		};
@@ -65,9 +66,10 @@ fun _call_mutool( @mutool_args ) {
 	return $stdout;
 }
 
-fun get_mutool_pdf_page_as_png($pdf_filename, $pdf_page_no) {
+fun get_mutool_pdf_page_as_png($pdf_filename, $pdf_page_no, $zoom_level) {
 	my $stdout = _call_mutool(
 		qw(draw),
+		qw( -r ), ($zoom_level * MUPDF_DEFAULT_RESOLUTION), # calculate the resolution
 		qw( -F png ),
 		qw( -o -),
 		$pdf_filename,
@@ -142,10 +144,12 @@ fun get_mutool_outline_simple($pdf_filename) {
 	my @outline_items = ();
 	open my $outline_fh, '<:encoding(UTF-8):crlf', \$outline_text;
 	while( defined( my $line = <$outline_fh> ) ) {
-		$line =~ /^(?<indent>\t*)(?<text>.*)\t(?<page>\d+)$/;
+		$line =~ /^(?<indent>\t*)(?<text>.*)\t#(?<page>\d+)(,(?<dx>\d+),(?<dy>\d+))?$/;
 		my %copy = %+;
 		$copy{level} = length $copy{indent};
 		delete $copy{indent};
+		# not storing the offsets yet and not every line has offsets
+		delete @copy{qw(dx dy)};
 		push @outline_items, \%copy;
 	}
 
@@ -167,7 +171,7 @@ Renard::Curie::Data::PDF - Retrieve PDF image and text data via MuPDF's mutool
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 FUNCTIONS
 

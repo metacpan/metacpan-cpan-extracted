@@ -1,5 +1,5 @@
 package Ref::Util::PP;
-$Ref::Util::PP::VERSION = '0.201';
+$Ref::Util::PP::VERSION = '0.203';
 # ABSTRACT: pure-Perl version of Ref::Util
 
 use strict;
@@ -7,6 +7,9 @@ use warnings;
 use Carp         ();
 use Scalar::Util ();
 use Exporter 5.57 'import';
+
+use constant _FORMAT_REFS_WORK => ("$]" >= 5.007);
+use constant _RX_NEEDS_MAGIC   => (Scalar::Util::reftype(qr/^/) ne 'REGEXP');
 
 our %EXPORT_TAGS = ( 'all' => [qw<
     is_ref
@@ -43,6 +46,24 @@ our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );
 
 sub _using_custom_ops () { 0 }
 
+if (_RX_NEEDS_MAGIC) {
+    require B;
+    *_is_regexp = sub {
+        no warnings 'uninitialized';
+        return 0 if ref($_[0]) eq '';
+        my $o = B::svref_2object($_[0]) or return 0;
+        return 0 if Scalar::Util::blessed($o) ne 'B::PVMG';
+
+        my $m = $o->MAGIC;
+        while ($m) {
+            return 1 if $m->TYPE eq 'r';
+            $m = $m->MOREMAGIC;
+        }
+
+        return 0;
+    };
+}
+
 # ----
 # -- is_*
 # ----
@@ -52,7 +73,9 @@ sub is_ref($) { length ref $_[0] }
 sub is_scalarref($) {
     no warnings 'uninitialized';
     Carp::croak("Too many arguments for is_scalarref") if @_ > 1;
-    Scalar::Util::reftype( $_[0] ) eq 'SCALAR';
+    my $reftype = Scalar::Util::reftype( $_[0] );
+    ( $reftype eq 'SCALAR' || $reftype eq 'VSTRING' )
+        && (!_RX_NEEDS_MAGIC || !_is_regexp($_[0]));
 }
 
 sub is_arrayref($) {
@@ -76,7 +99,8 @@ sub is_coderef($) {
 sub is_regexpref($) {
     no warnings 'uninitialized';
     Carp::croak("Too many arguments for is_regexpref") if @_ > 1;
-    Scalar::Util::reftype( $_[0] ) eq 'REGEXP';
+    _RX_NEEDS_MAGIC ? _is_regexp( $_[0] )
+        : re::is_regexp( $_[0] );
 }
 
 sub is_globref($) {
@@ -86,8 +110,8 @@ sub is_globref($) {
 }
 
 sub is_formatref($) {
-    "$]" < 5.007
-        and
+    _FORMAT_REFS_WORK
+        or
         Carp::croak("is_formatref() isn't available on Perl 5.6.x and under");
 
     no warnings 'uninitialized';
@@ -119,7 +143,7 @@ sub is_plain_ref($) {
 sub is_plain_scalarref($) {
     Carp::croak("Too many arguments for is_plain_scalarref") if @_ > 1;
     !defined Scalar::Util::blessed( $_[0] )
-        && ref( $_[0] ) eq 'SCALAR';
+        && ( ref( $_[0] ) eq 'SCALAR' || ref( $_[0] ) eq 'VSTRING' );
 }
 
 sub is_plain_arrayref($) {
@@ -147,11 +171,11 @@ sub is_plain_globref($) {
 }
 
 sub is_plain_formatref($) {
-    "$]" < 5.007
-        and
-        Carp::croak("is_formatref() isn't available on Perl 5.6.x and under");
+    _FORMAT_REFS_WORK
+        or
+        Carp::croak("is_plain_formatref() isn't available on Perl 5.6.x and under");
 
-    Carp::croak("Too many arguments for is_formatref") if @_ > 1;
+    Carp::croak("Too many arguments for is_plain_formatref") if @_ > 1;
     !defined Scalar::Util::blessed( $_[0] )
         && ref( $_[0] ) eq 'FORMAT';
 }
@@ -173,8 +197,10 @@ sub is_blessed_ref($) {
 
 sub is_blessed_scalarref($) {
     Carp::croak("Too many arguments for is_blessed_scalarref") if @_ > 1;
+    my $reftype = Scalar::Util::reftype( $_[0] );
     defined Scalar::Util::blessed( $_[0] )
-        && Scalar::Util::reftype( $_[0] ) eq 'SCALAR';
+        && ($reftype eq 'SCALAR' || $reftype eq 'VSTRING')
+        && (!_RX_NEEDS_MAGIC || !_is_regexp( $_[0] ));
 }
 
 sub is_blessed_arrayref($) {
@@ -202,11 +228,11 @@ sub is_blessed_globref($) {
 }
 
 sub is_blessed_formatref($) {
-    "$]" < 5.007
-        and
-        Carp::croak("is_formatref() isn't available on Perl 5.6.x and under");
+    _FORMAT_REFS_WORK
+        or
+        Carp::croak("is_blessed_formatref() isn't available on Perl 5.6.x and under");
 
-    Carp::croak("Too many arguments for is_formatref") if @_ > 1;
+    Carp::croak("Too many arguments for is_blessed_formatref") if @_ > 1;
     defined Scalar::Util::blessed( $_[0] )
         && Scalar::Util::reftype( $_[0] ) eq 'FORMAT';
 }
@@ -231,11 +257,21 @@ Ref::Util::PP - pure-Perl version of Ref::Util
 
 =head1 VERSION
 
-version 0.201
+version 0.203
 
 =head1 SYNOPSIS
 
+    use Ref::Util;
+
 =head1 DESCRIPTION
+
+This module provides a pure-Perl implementation of the functions in
+L<Ref::Util>.
+
+Ref::Util:PP will be used automatically if Ref::Util is installed on a
+system with no C compiler, but you can force its usage by setting either
+C<$Ref::Util::IMPLEMENTATION> or the C<PERL_REF_UTIL_IMPLEMENTATION>
+environment variable to C<PP>.
 
 =head1 AUTHORS
 

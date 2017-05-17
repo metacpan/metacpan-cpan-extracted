@@ -4,7 +4,7 @@
       "Pine Mizune"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.7",
+   "generated_by" : "Minilla/v3.0.10",
    "license" : [
       "mit"
    ],
@@ -56,7 +56,7 @@
             "JSON::XS" : "3.01",
             "Module::Find" : "0.13",
             "URI" : "1.60",
-            "perl" : "5.008008"
+            "perl" : "5.010000"
          }
       },
       "test" : {
@@ -82,7 +82,7 @@
    "provides" : {
       "Devel::Cover::Report::Codecov" : {
          "file" : "lib/Devel/Cover/Report/Codecov.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "Devel::Cover::Report::Codecov::Service::AppVeyor" : {
          "file" : "lib/Devel/Cover/Report/Codecov/Service/AppVeyor.pm"
@@ -135,12 +135,12 @@
          "web" : "https://github.com/codecov/codecov-perl"
       }
    },
-   "version" : "0.17",
+   "version" : "0.18",
    "x_authority" : "cpan:PINE",
    "x_contributors" : [
       "stevepeak <steve@stevepeak.net>",
       "Pedro Melo <melo@simplicidade.org>",
       "Pine Mizune <pinemz@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "x_serialization_backend" : "JSON::PP version 2.93"
 }

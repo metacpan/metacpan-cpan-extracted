@@ -1,5 +1,5 @@
 # t/12_make_defaults.t - check creation of personal defaults file
-#$Id: 12_make_defaults.t 1201 2007-10-27 01:22:17Z jimk $
+#$Id$
 # defaults file
 use strict;
 use warnings;

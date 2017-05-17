@@ -3,7 +3,7 @@ package HTTP::Any::Curl;
 use strict;
 use warnings;
 
-use Net::Curl::Easy qw(/^CURLOPT_/ CURLE_OK CURLINFO_EFFECTIVE_URL CURLE_WRITE_ERROR CURLE_OPERATION_TIMEDOUT);
+use Net::Curl::Easy qw(/^CURLOPT_/ CURLE_OK CURLINFO_EFFECTIVE_URL CURLE_WRITE_ERROR CURLE_OPERATION_TIMEDOUT CURLE_RECV_ERROR);
 
 
 BEGIN {
@@ -47,8 +47,11 @@ sub do_http {
 
 	$easy->setopt(CURLOPT_HTTPHEADER, \@headers) if @headers;
 
-	$easy->setopt(CURLOPT_FOLLOWLOCATION, 1);
-	$easy->setopt(CURLOPT_MAXREDIRS, 10);
+	my $max_redirect = defined $$opt{max_redirect} ? $$opt{max_redirect} : 7;
+	if ($max_redirect) {
+		$easy->setopt(CURLOPT_FOLLOWLOCATION, 1);
+		$easy->setopt(CURLOPT_MAXREDIRS, $max_redirect);
+	}
 
 
 	if ($$opt{cookie}) {
@@ -122,6 +125,10 @@ sub do_http {
 				$is_success = 0;
 				$$headers{"Status"} = 599;
 				$$headers{"Reason"} = "Timeout";
+			} elsif ($result == CURLE_RECV_ERROR) {
+				$is_success = 0;
+				$$headers{"Status"} = 599;
+				$$headers{"Reason"} = "$result";
 			}
 			$easy = undef;
 			$cb->($is_success, $body, $headers, $redirects);
@@ -161,6 +168,10 @@ sub headers {
 
 sub _parse_headers {
 	my ($url, $h) = @_;
+
+	$h =~ s/(?<!\r\n)\r\nHTTP/\r\n\r\nHTTP/g; # fix bad server headers
+	$h =~ s/(,\r*\n)\s+/, /g; # fix for old standard, multyline header
+
 	my ($status_line, @h) = split /\r?\n/, $h;
 	my ($status, $reason) = $status_line =~ m/HTTP\/\d\.\d\s+(\d+)(?:\s+(.+))?/;
 	# ToDo Когда $reason не указан, формировать на основе $status?

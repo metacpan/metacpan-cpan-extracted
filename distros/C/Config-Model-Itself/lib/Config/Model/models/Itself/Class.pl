@@ -226,6 +226,21 @@
                }
             },
 
+           yaml_class => {
+                type             => 'leaf',
+                value_type       => 'uniline',
+                level            => 'hidden',
+                description      => 'Specify the YAML class that is used to load and dump YAML files.'
+                    .' Defaults to L<YAML::Tiny>.'
+                    .' See L<yaml_class doc|Config::Model::Backend::Yaml/yaml_class> for details on '
+                    .' why another YAML class can suit your configuration file needs.',
+                upstream_default => 'YAML::Tiny',
+                warp             => {
+                    follow => '- backend',
+                    rules  => [ IniFile => { level => 'normal', } ],
+                }
+            },
+
             file_mode => {
                 type       => 'leaf',
                 value_type => 'uniline',

@@ -1,5 +1,5 @@
 ---
-abstract: "Mojolicious â\x9D¤ï¸\x8F Reveal.js"
+abstract: "Mojolicious ❤️ Reveal.js"
 author:
   - 'Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>'
 build_requires: {}
@@ -15,13 +15,14 @@ name: Mojolicious-Plugin-RevealJS
 provides:
   Mojolicious::Plugin::RevealJS:
     file: lib/Mojolicious/Plugin/RevealJS.pm
-    version: '0.10'
+    version: '0.11'
 requires:
   File::Share: '0'
   Mojolicious: '7.15'
+  perl: v5.12.0
 resources:
   bugtracker: http://github.com/jberger/Mojolicious-Plugin-RevealJS/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/jberger/Mojolicious-Plugin-RevealJS
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

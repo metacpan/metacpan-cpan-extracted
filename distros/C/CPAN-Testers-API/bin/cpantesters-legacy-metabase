@@ -1,0 +1,273 @@
+#!/usr/bin/env perl
+# ABSTRACT: An API from the legacy Metabase::Web to the local database
+
+#pod =head1 SYNOPSIS
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod =head1 SEE ALSO
+#pod
+#pod =cut
+
+package CPANTesters::Web::Legacy::Metabase;
+use v5.24;
+use Mojo::Base '-base';
+use Mojo::File 'path';
+use Mojolicious::Lite;
+use experimental 'signatures', 'postderef';
+use Metabase::Fact;
+use Metabase::User::Profile;
+use Metabase::User::Secret;
+use CPAN::Testers::Report;
+use FindBin ();
+use CPAN::Testers::Schema;
+use Mojo::Util qw( b64_decode );
+
+#pod =head1 CONFIG
+#pod
+#pod The configuration file is set by the C<MOJO_CONFIG> environment
+#pod variable, or found in the C<etc/> directory and named C<metabase.conf>
+#pod or C<metabase.$mode.conf>. The configuration is a hashref with the
+#pod following keys:
+#pod
+#pod =head2 db
+#pod
+#pod The C<db> hashref contains the C<dsn>, C<user>, and C<pass> to connect
+#pod to the database.
+#pod
+#pod To create a database for local testing (C<-m local>), install the latest
+#pod CPAN Testers schema using: C<< cpantesters-schema install dbi:SQLite:local.db >>.
+#pod
+#pod =cut
+
+app->home( path( $FindBin::Bin )->dirname ) unless $ENV{MOJO_HOME};
+app->moniker( 'metabase' );
+my $root_conf = app->home->child( sprintf 'etc/%s.conf', app->moniker );
+plugin Config => (
+    file => $ENV{MOJO_CONFIG} || $root_conf,
+);
+
+#pod =attr schema
+#pod
+#pod The schema to write reports to. Defaults to a new L<CPAN::Testers::Schema>
+#pod object.
+#pod
+#pod =cut
+
+helper schema => sub {
+    my ( $c, $new_schema ) = @_;
+    state $schema = $new_schema || CPAN::Testers::Schema->connect( $c->app->config->{db}->@{qw( dsn user pass args )} );
+    $schema = $new_schema if $new_schema;
+    return $schema;
+};
+
+#pod =route /beta/submit/CPAN-Testers-Metabase
+#pod
+#pod =route /api/v1/submit/CPAN-Testers-Metabase
+#pod
+#pod This route submits a new report into the local copy of the Metabase.
+#pod This is a shim that will remain in-place until all the CPAN Testers clients
+#pod are updated to submit reports via the new API (so, forever).
+#pod
+#pod =cut
+
+# This code was derived from CPAN::Testers::Data::Generator sub cache_report
+# Once this is working, we can force CPAN::Testers::Data::Generator to
+# ignore the Amazon SimpleDB Metabase by making the localonly flag
+# always set to true.
+
+# We are also mimicking parts of Metabase::Web and Metabase::Gateway
+
+sub handle_post {
+    my ( $c ) = @_;
+    $c->app->log->debug( "Got: " . $c->req->body );
+
+    # Validate the user
+    my ( undef, $auth ) = split / /, $c->req->headers->authorization;
+    my ( $guid, $secret ) = split /:/, b64_decode( $auth );
+    my $user = $c->schema->resultset( 'MetabaseUser' )->search( { resource => 'metabase:user:' . $guid } )->single;
+    if ( !$user ) {
+        $c->app->log->info( 'Unregistered user ' . $guid );
+        return $c->render(
+            status => 401,
+            json => {
+                error => 'User ' . $guid . ' unrecognized',
+            },
+        );
+    }
+
+    my $body = $c->req->json;
+    my $fact = Metabase::Fact->class_from_type( $body->{metadata}{core}{type} )
+        ->from_struct( $body );
+    my $row = $c->schema->resultset( 'TestReport' )->insert_metabase_fact( $fact );
+
+    my $url = $c->req->url->clone;
+    my $path = $url->path;
+    splice $path->@*, -2, 2, 'guid', $row->id;
+    $c->res->headers->location( $url );
+
+    return $c->render(
+        status => 201,
+        json => { guid => $row->id },
+    );
+};
+
+post '/api/v1/submit/CPAN-Testers-Report' => \&handle_post;
+post '/beta/submit/CPAN-Testers-Report' => \&handle_post;
+
+#pod =route /api/v1/register
+#pod
+#pod =route /beta/register
+#pod
+#pod Register a new Metabase user. This does not appear to be used by any
+#pod CPAN Testers reporter client, but if it is, we can add the user to the
+#pod C<metabase_user> table (the
+#pod L<CPAN::Testers::Schema::Result::MetabaseUser> result class).
+#pod
+#pod =cut
+
+sub handle_register( $c ) {
+    $c->app->log->debug( $c->req->body );
+    my @things = ref $c->req->json eq 'ARRAY' ? $c->req->json->@* : ( $c->req->json );
+    for my $body ( @things ) {
+        my $fact = Metabase::Fact->class_from_type( $body->{metadata}{core}{type} )
+            ->from_struct( $body );
+
+        my ( $fullname ) = grep { $_->isa( 'Metabase::User::FullName' ) } $fact->content->@*;
+        my ( $email ) = grep { $_->isa( 'Metabase::User::EmailAddress' ) } $fact->content->@*;
+
+        my $row = $c->schema->resultset( 'MetabaseUser' )->update_or_create({
+            resource => $fact->resource,
+            fullname => $fullname->content,
+            email => $email->content,
+        });
+    }
+
+    return $c->render(
+        status => 200,
+        json => { message => 'accepted' },
+    );
+}
+
+post '/api/v1/register' => \&handle_register;
+post '/beta/register' => \&handle_register;
+
+#pod =route /api/v1/guid/:guid
+#pod
+#pod =route /beta/guid/:guid
+#pod
+#pod This is necessary during the registration as a pre-flight check before
+#pod submitting the user registration, for some reason...
+#pod
+#pod =cut
+
+sub handle_guid( $c ) {
+    my $guid = $c->stash( 'guid' );
+    my $user = $c->schema->resultset( 'MetabaseUser' )->search( { resource => 'metabase:user:' . $guid } )->single;
+    if ( !$user ) {
+        $c->app->log->info( 'Unregistered user ' . $guid );
+        return $c->render(
+            status => 404,
+            json => {
+                error => $guid . ' not found',
+            },
+        );
+    }
+};
+
+get '/api/v1/guid/:guid' => \&handle_guid;
+get '/beta/guid/:guid' => \&handle_guid;
+
+#pod =route /tail/log.txt
+#pod
+#pod See a log of the last view CPAN Testers reports.
+#pod
+#pod =cut
+
+get '/tail/log.txt' => sub( $c ) {
+    # The last 1000 reports as of 2017-05-13T13:10:11Z:
+    # [2017-05-13T13:10:09Z] [Slaven Rezi&#x0107; (SREZIC)] [fail] [VOJ/Pod-Pandoc-0.4.0.tar.gz] [x86_64-linux] [perl-v5.24.1] [7db6b504-37dd-11e7-bc91-bebec21a40f2] [2017-05-13T13:10:09Z]
+};
+
+app->start;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+CPANTesters::Web::Legacy::Metabase - An API from the legacy Metabase::Web to the local database
+
+=head1 VERSION
+
+version 0.011
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 ATTRIBUTES
+
+=head2 schema
+
+The schema to write reports to. Defaults to a new L<CPAN::Testers::Schema>
+object.
+
+=head1 SEE ALSO
+
+=head1 CONFIG
+
+The configuration file is set by the C<MOJO_CONFIG> environment
+variable, or found in the C<etc/> directory and named C<metabase.conf>
+or C<metabase.$mode.conf>. The configuration is a hashref with the
+following keys:
+
+=head2 db
+
+The C<db> hashref contains the C<dsn>, C<user>, and C<pass> to connect
+to the database.
+
+To create a database for local testing (C<-m local>), install the latest
+CPAN Testers schema using: C<< cpantesters-schema install dbi:SQLite:local.db >>.
+
+=route /beta/submit/CPAN-Testers-Metabase
+
+=route /api/v1/submit/CPAN-Testers-Metabase
+
+This route submits a new report into the local copy of the Metabase.
+This is a shim that will remain in-place until all the CPAN Testers clients
+are updated to submit reports via the new API (so, forever).
+
+=route /api/v1/register
+
+=route /beta/register
+
+Register a new Metabase user. This does not appear to be used by any
+CPAN Testers reporter client, but if it is, we can add the user to the
+C<metabase_user> table (the
+L<CPAN::Testers::Schema::Result::MetabaseUser> result class).
+
+=route /api/v1/guid/:guid
+
+=route /beta/guid/:guid
+
+This is necessary during the registration as a pre-flight check before
+submitting the user registration, for some reason...
+
+=route /tail/log.txt
+
+See a log of the last view CPAN Testers reports.
+
+=head1 AUTHOR
+
+Doug Bell <preaction@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,4 +1,4 @@
-use 5.006;
+use 5.010;
 use strict;
 use warnings FATAL => 'all';
 use ExtUtils::MakeMaker;
@@ -10,7 +10,7 @@ WriteMakefile(
     ABSTRACT_FROM    => 'lib/PGObject/Util/Catalog/Types.pm',
     LICENSE          => 'BSD',
     PL_FILES         => {},
-    MIN_PERL_VERSION => 5.008,
+    MIN_PERL_VERSION => 5.010,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
     },
@@ -21,6 +21,7 @@ WriteMakefile(
         'Exporter' => 0,
         'Memoize'  => 0,
         'DBI'      => 0,
+	'DBD::Pg'  => 0,
         'Carp'     => 0
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

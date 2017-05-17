@@ -92,10 +92,6 @@ ERROR HANDLING AND DEBUGGING
 
 ATTRIBUTES
 
- skip_NEXT => BOOL
-
-    If set to true, then statement with NEXT status will be skipped.
-
 METHODS
 
  new(%args)

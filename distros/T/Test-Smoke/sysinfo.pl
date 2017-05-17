@@ -11,9 +11,9 @@ use FindBin;
 use lib File::Spec->catdir( $FindBin::Bin, 'lib' );
 use lib $FindBin::Bin;
 
-use Test::Smoke::SysInfo;
+use System::Info;
 
-my $si = Test::Smoke::SysInfo->new ();
+my $si = System::Info->new ();
 printf "Hostname             : %s\n", $si->host;
 printf "Number of CPU's      : %s\n", $si->ncpu;
 printf "Processor type       : %s\n", $si->cpu_type;   # short

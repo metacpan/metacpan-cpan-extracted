@@ -22,7 +22,8 @@ my $configure_requires =
 my $test_requires =
 	{
 		# very old ones lack "done_testing()", and recent one changes a newline behavior
-		'Test::Simple'	=>	1.302083,
+		'Test::Simple'	=>	1.302085,
+		'Test::More'	=>	1.302085,
 		'Capture::Tiny'	=>	0,			# initial dev used: 0.30
 	};
 

@@ -8,7 +8,6 @@ use Renard::Curie::App;
 use Renard::Curie::Model::Document::PDF;
 use CurieTestHelper;
 use Renard::Curie::Types qw(Int InstanceOf);
-use Function::Parameters;
 
 my $cairo_doc = CurieTestHelper->create_cairo_document;
 
@@ -18,7 +17,7 @@ fun Key_Event( (InstanceOf['Renard::Curie::App']) $app, (Int) $key) {
 	$app->page_document_component->signal_emit( key_press_event => $event );
 }
 
-subtest 'Check that Page Down moves forward a page and Page Up moves back a page' => fun {
+subtest 'Check that Page Down moves forward a page and Page Up moves back a page' => sub {
 	my ( $app, $page_comp ) = CurieTestHelper->create_app_with_document($cairo_doc);
 
 	is($page_comp->current_page_number, 1, 'Start on page 1' );
@@ -30,11 +29,11 @@ subtest 'Check that Page Down moves forward a page and Page Up moves back a page
 	is($page_comp->current_page_number, 1, 'On page 1 after hitting Page Up' );
 };
 
-subtest 'Check that up arrow scrolls up and down arrow scrolls down' => CurieTestHelper->run_app_with_document($cairo_doc, fun {
+subtest 'Check that up arrow scrolls up and down arrow scrolls down' => CurieTestHelper->run_app_with_document($cairo_doc, sub {
 	plan tests => 2;
 	my ( $app, $page_comp ) = @_;
 
-	Glib::Timeout->add(200, fun {
+	Glib::Timeout->add(200, sub {
 		my $vadj = $page_comp->scrolled_window->get_vadjustment;
 		my $current_value = $vadj->get_value;
 		Key_Event($app, Gtk3::Gdk::KEY_Down);
@@ -50,11 +49,11 @@ subtest 'Check that up arrow scrolls up and down arrow scrolls down' => CurieTes
 	});
 });
 
-subtest 'Check that right arrow scrolls right and left arrow scrolls left' => CurieTestHelper->run_app_with_document($cairo_doc, fun {
+subtest 'Check that right arrow scrolls right and left arrow scrolls left' => CurieTestHelper->run_app_with_document($cairo_doc, sub {
 	plan tests => 2;
 	my ( $app, $page_comp ) = @_;
 
-	Glib::Timeout->add(200, fun {
+	Glib::Timeout->add(200, sub {
 		my $hadj = $page_comp->scrolled_window->get_hadjustment;
 		my $current_value = $hadj->get_value;
 		Key_Event($app, Gtk3::Gdk::KEY_Right);

@@ -2,16 +2,10 @@
 
 # Testing of PPI::Document::File
 
-use strict;
-BEGIN {
-	no warnings 'once';
-	$| = 1;
-	$PPI::XS_DISABLE = 1;
-	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
-}
+use lib 't/lib';
+use PPI::Test::pragmas;
+use Test::More tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
-use Test::More tests => 5;
-use Test::NoWarnings;
 use File::Spec::Functions ':ALL';
 use PPI::Document::File;
 

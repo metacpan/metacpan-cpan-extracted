@@ -7,9 +7,8 @@ use CurieTestHelper;
 
 use Renard::Curie::Setup;
 use Renard::Curie::Model::Page::RenderedFromPNG;
-use Function::Parameters;
 
-subtest "Process arguments for PDF file" => fun {
+subtest "Process arguments for PDF file" => sub {
 	my $png_path = try {
 		CurieTestHelper->test_data_directory->child(qw(PNG libpng ccwn3p08.png));
 	} catch {

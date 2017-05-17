@@ -9,14 +9,14 @@ use Moo;
 
 extends 'Code::TidyAll::Plugin';
 
-our $VERSION = '0.58';
+our $VERSION = '0.59';
 
 sub _build_cmd {'perlcritic'}
 
 sub validate_file {
     my ( $self, $file ) = @_;
 
-    my $cmd = sprintf( "%s %s %s", $self->cmd, $self->argv, $file );
+    my $cmd = sprintf( '%s %s %s', $self->cmd, $self->argv, $file );
     my $output;
     run3( $cmd, \undef, \$output, \$output );
     die "$output\n" if $output !~ /^.* source OK\n/s;
@@ -38,7 +38,7 @@ Code::TidyAll::Plugin::PerlCritic - Use perlcritic with tidyall
 
 =head1 VERSION
 
-version 0.58
+version 0.59
 
 =head1 SYNOPSIS
 

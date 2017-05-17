@@ -134,7 +134,7 @@ describe 'table find' => sub {
 
         my $table = _build_table(class => 'Book');
 
-        my @books = $table->find(group_by => 'title', having => ['description.description' => 'foo']);
+        my @books = $table->find(group_by => ['id', 'title', 'description.id'], having => ['description.description' => 'foo']);
         is($books[0]->get_column('title'), 'Foo');
     };
 

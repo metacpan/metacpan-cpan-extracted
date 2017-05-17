@@ -1,5 +1,5 @@
 package Net::Easypost::Shipment;
-$Net::Easypost::Shipment::VERSION = '0.19';
+$Net::Easypost::Shipment::VERSION = '0.20';
 use Carp qw/croak/;
 use Types::Standard qw/ArrayRef HashRef InstanceOf Str/;
 
@@ -149,7 +149,7 @@ Net::Easypost::Shipment
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 

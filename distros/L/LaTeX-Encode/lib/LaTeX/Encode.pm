@@ -29,7 +29,7 @@ use Readonly;
 
 use base qw(Exporter);
 
-our $VERSION     = '0.091.6';
+our $VERSION     = '0.092.0';
 
 our @EXPORT      = qw(latex_encode);
 our @EXPORT_OK   = qw(add_latex_encodings remove_latex_encodings reset_latex_encodings);
@@ -340,6 +340,7 @@ sub import {
     chr(0x00fd) => '{\\\'y}',                     # LATIN SMALL LETTER Y WITH ACUTE              (&yacute;)
     chr(0x00fe) => '{\\th}',                      # LATIN SMALL LETTER THORN                     (&thorn;)
     chr(0x00ff) => '{\\"y}',                      # LATIN SMALL LETTER Y WITH DIAERESIS          (&yuml;)
+    
 
     # Latin Extended-A
 
@@ -399,6 +400,8 @@ sub import {
     chr(0x013c) => '\\c{l}',                      # LATIN SMALL LETTER L WITH CEDILLA
     chr(0x013d) => '\\v{L}',                      # LATIN CAPITAL LETTER L WITH CARON
     chr(0x013e) => '\\v{l}',                      # LATIN SMALL LETTER L WITH CARON
+    chr(0x0141) => "{\\L}",                       # 0x0141 LATIN CAPITAL LETTER L WITH STROKE
+    chr(0x0142) => "{\\l}",                       # 0x0142 LATIN SMALL LETTER L WITH STROKE
     chr(0x0143) => '\\\'{N}',                     # LATIN CAPITAL LETTER N WITH ACUTE
     chr(0x0144) => '\\\'{n}',                     # LATIN SMALL LETTER N WITH ACUTE
     chr(0x0145) => '\\c{N}',                      # LATIN CAPITAL LETTER N WITH CEDILLA
@@ -863,6 +866,8 @@ _compile_encoding_regexp;
 1;
 
 __END__
+
+=encoding utf8
 
 =head1 NAME
 

@@ -1,3 +1,8 @@
+0.020     2017-05-15 20:45:02 EDT
+  - Updates to documentation for DeprecatedFeatures and DiscouragedModules policies
+  - Add require ::Foo::Bar to DeprecatedFeatures policy
+  - Remove qr//xx from DeprecatedFeatures policy as this is now a valid regex modifier in 5.26.
+
 0.019     2017-01-29 22:13:34 EST
   - Add autoderef to DeprecatedFeatures policy
 

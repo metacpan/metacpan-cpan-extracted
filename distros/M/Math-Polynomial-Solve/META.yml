@@ -16,7 +16,7 @@ name: Math-Polynomial-Solve
 provides:
   Math::Polynomial::Solve:
     file: lib/Math/Polynomial/Solve.pm
-    version: '2.75'
+    version: '2.80'
 requires:
   Math::Complex: '1.36'
   Math::Utils: '1.06'
@@ -24,7 +24,7 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://github.com/jgamble/Math-Polynomial-Solve.git
-version: '2.75'
+version: '2.80'
 x_keyword:
   - math
   - polynomial

@@ -51,19 +51,11 @@ our %EXPORT_TAGS = (
 	) ],
 	'utility' => [ qw(
 		epsilon
-		fltcmp
-		poly_iteration
-		poly_tolerance
-		newtonraphson
 		laguerre
-		poly_antiderivative
-		poly_derivative
-		poly_constmult
-		poly_divide
-		poly_evaluate
-		poly_derivaluate
+		newtonraphson
+		poly_iteration
 		poly_nonzero_term_count
-		simplified_form
+		poly_tolerance
 	) ],
 );
 
@@ -75,22 +67,12 @@ our @EXPORT_OK = (
 
 our @EXPORT = qw( ascending_order );
 
-our $VERSION = '2.75';
+our $VERSION = '2.80';
 
 #
 # See the END block.
 #
 my $ascending_order_called = 0;
-my %depr = (
-	fltcmp => [],
-	poly_derivative => [],
-	poly_antiderivative => [],
-	simplified_form => [],
-	poly_evaluate => [],
-	poly_derivaluate => [],
-	poly_constmult => [],
-	poly_divide => [],
-);
 
 #
 # Options to set or unset to force poly_roots() to use different
@@ -133,7 +115,6 @@ my %iteration = (
 my %tolerance = (
 	newtonraphson => 1e-14,
 	laguerre => 1e-14,
-	fltcmp => 1.5e-8,
 );
 
 #
@@ -162,10 +143,6 @@ BEGIN
 # Flag to determine whether calling order is
 # ($an_1, $an_2, $an_3, ...) or if it is
 # ($a0, $a1, $a2, $a3, ...)
-#
-# The flag is only going to exist for about three
-# versions, starting with version 2.67, as the default
-# changes over a deprecation cycle.
 #
 my $ascending_flag = 0;		# default 0, in a later version it will be 1.
 
@@ -246,23 +223,11 @@ or
 
 or
 
-    use Math::Polynomial::Solve qw(:utility);
-
-    my @coefficients = (89, 23, 23, 432, 27);
-
-    # Return a version of the polynomial with no leading zeroes
-    # and the leading coefficient equal to 1.
-    my @monic_form = simplified_form(@coefficients);
-
-    # Find the y-values of the polynomial at selected x-values.
-    my @xvals = (0, 1, 2, 3, 5, 7);
-    my @yvals = poly_evaluate(\@coefficients, \@xvals);
-
-or
-
     use Math::Polynomial::Solve qw(:sturm);
 
+    #
     # Find the number of unique real roots of the polynomial.
+    #
     my $no_of_unique_roots = poly_real_root_count(@coefficients);
 
 =head1 DESCRIPTION
@@ -277,74 +242,6 @@ find the number of real roots present in a range of X values.
 
 In addition to the root-finding functions, the internal functions have
 also been exported for your use.
-
-=head2 DEPRECATED FUNCTIONS
-
-Many functions under the ':utility' tag now have equivalents in L<Math::Utils>.
-Consequently this module now uses Math::Utils itself, and will remove the
-redundant :utility functions by the version 2.80.
-
-Note that the L<polynomial functions|Math::Utils/polynomial tag> 
-in Math::Utils all take the polynomial coefficients in ascending
-order, left to right, as opposed to the current default behavior
-(until version 3.00) of right to left in this module.
-
-Scheduled to be removed are:
-
-=over 4
-
-=item *
-
-fltcmp()
-
-Use Math::Utils's generate_fltcmp() or generate_relational() to
-create comparison functions with a built-in tolerance.
-
-=item *
-
-poly_divide()
-
-Use Math::Utils's pl_div(). Note that unlike poly_divide(), checking for
-leading zeros isn't done by pl_div(), and is expected to be done by
-the caller.
-
-=item *
-
-poly_evaluate()
-
-Use Math::Utils's pl_evaluate().
-
-=item *
-
-poly_derivative()
-
-Use Math::Utils's pl_derivative().
-
-=item *
-
-poly_antiderivative()
-
-Use Math::Utils's pl_antiderivative().
-
-=item *
-
-poly_derivaluate()
-
-Use Math::Utils's pl_dxevaluate().
-
-=item *
-
-poly_constmult()
-
-Not duplicated in Math::Utils, use L<Math::VecStat>'s vecprod().
-
-=item *
-
-simplified_form()
-
-This function is simply going to be dropped.
-
-=back
 
 =cut
 
@@ -1971,11 +1868,6 @@ These are internal functions used by the other functions listed above
 that may also be useful to the user, or which affect the behavior of
 other functions. They are all exported under the tag "utility".
 
-Because many of these functions are useful outside the area of polynomials,
-they have been taken, with changes, to the module L<Math::Utils>, and
-have been deprecated for this module. See L</DEPRECATED FUNCTIONS>
-for more information, and the descriptions below for details.
-
 =head3 epsilon()
 
 Returns the machine epsilon value that was calculated when this module was
@@ -1998,50 +1890,6 @@ sub epsilon
 	$epsilon = $_[0] if (scalar @_ > 0);
 	return $eps;
 }
-
-
-=head3 fltcmp()
-
-The function is DEPRECATED. See L<Math::Utils> and the section "compare tag"
-for a replacement.
-
-Compare two floating point numbers within a degree of accuracy.
-
-Like most functions ending in "cmp", this one returns -1 if the first
-argument tests as less than the second argument, 1 if the first tests
-greater than the second, and 0 otherwise. Comparisons are made within
-a tolerance range that may be set with L</poly_tolerance()>.
-
-    #
-    # Set a very forgiving comparison tolerance.
-    #
-    poly_tolerance(fltcmp => 1e-5);
-    my @x = poly_roots(@cubic);
-    my @y = poly_evaluate(\@cubic, \@x);
-
-    if (fltcmp($y[0], 0.0) == 0 and
-        fltcmp($y[1], 0.0) == 0 and
-        fltcmp($y[2], 0.0) == 0)
-    {
-        print "Roots found: (", join(", ", @x), ")\n";
-    }
-    else
-    {
-        print "Problem root-finding for [", join(", ", @cubic), "]\n";
-    }
-
-=cut
-
-sub fltcmp
-{
-	my($a, $b) = @_;
-	push @{$depr{fltcmp}}, 
-		sprintf("    Called in %s, line # %d.\n", (caller())[1,2]);
-	return 0 if (abs($a - $b) <= $tolerance{fltcmp});
-	return -1 if ($a < $b);
-	return 1;
-}
-
 
 =head3 laguerre()
 
@@ -2325,10 +2173,11 @@ sub poly_iteration
 
 =head3 poly_tolerance()
 
-Set the degree of accuracy needed for comparisons to be equal or roots to
-be found.  Amongst the root finding functions this currently only
-affects laguerre() and newtonraphson(), as the Hessenberg matrix method determines
-how close it needs to get using a complicated formula based on L</epsilon()>.
+Set the degree of accuracy needed for comparisons to be equal or roots
+to be found.  Amongst the root finding functions this currently only
+affects laguerre() and newtonraphson(), as the Hessenberg matrix method
+determines how close it needs to get using a complicated formula based
+on L</epsilon()>.
 
     #
     # Print the tolerances.
@@ -2352,22 +2201,13 @@ Tolerances may be set for:
 =item 'laguerre'
 
 The numeric method used by laguerre(). Laguerre's method is used within
-sturm_bisection_roots() once an individual root has been found within a range,
-and of course it may be called independently.
+sturm_bisection_roots() once an individual root has been found within a
+range, and of course it may be called independently.
 
 =item 'newtonraphson'
 
-The numeric method used by newtonraphson(). Newton-Raphson is, like Laguerre's
-method, a method for finding a root near the starting X value.
-
-=item 'fltcmp'
-
-A comparison function that determines if one argument is less than, equal to,
-or greater than, the other. Comparisons are made within a range determined by
-the tolerance.
-
-Since this function is L<deprecated|/DEPRECATED FUNCTIONS>, its tolerance
-will also be removed when the function is remvoed.
+The numeric method used by newtonraphson(). Newton-Raphson is, like
+Laguerre's method, a method for finding a root near the starting X value.
 
 =back
 
@@ -2401,207 +2241,6 @@ sub poly_tolerance
 	return %old_tols;
 }
 
-=head3 poly_derivative()
-
-    @derivative = poly_derivative(@coefficients);
-
-Returns the coefficients of the first derivative of the polynomial.
-Leading zeros are removed before returning the derivative, so the length
-of the returned polynomial may be even shorter than expected from the length of the original
-polynomial. Returns an empty list if the polynomial is a simple constant.
-
-This function is L<deprecated|/DEPRECATED FUNCTIONS>, and will be
-removed by version 2.80. Use the module L<Math::Utils> and the tag
-:polynomial for a replacement.
-
-=cut
-
-sub poly_derivative
-{
-	my @coefficients = ($ascending_flag)? @_: reverse @_;
-
-	my $d_ref = pl_derivative(\@coefficients);
-
-	push @{$depr{poly_derivative}},
-		sprintf("    Called in %s, line # %d.\n", (caller())[1,2]);
-	return ($ascending_flag)? @{$d_ref}: reverse @{$d_ref};
-}
-
-
-=head3 poly_antiderivative()
-
-Returns the coefficients of the antiderivative of the polynomial. The
-constant term is set to zero; to override this use
-
-    @integral = poly_antiderivative(@coefficients);
-    $integral[$#integral] = $const_term;
-
-This function is L<deprecated|/DEPRECATED FUNCTIONS>, and will be
-removed by version 2.80. Use the module L<Math::Utils> and the tag
-:polynomial for a replacement.
-
-=cut
-
-sub poly_antiderivative
-{
-	my @coefficients = ($ascending_flag)? @_: reverse @_;
-
-	my $d_ref = pl_antiderivative(\@coefficients);
-
-	push @{$depr{poly_antiderivative}},
-		sprintf("    Called in %s, line # %d.\n", (caller())[1,2]);
-	return ($ascending_flag)? @{$d_ref}: reverse @{$d_ref};
-}
-
-=head3 simplified_form()
-
-Return the polynomial adjusted by removing any leading zero coefficients
-and placing it in a monic polynomial form (all coefficients divided by the
-coefficient of the highest power).
-
-This function is L<deprecated|/DEPRECATED FUNCTIONS>, and will be
-removed by version 2.80.
-
-=cut
-
-sub simplified_form
-{
-	my @coefficients = ($ascending_flag)? reverse @_: @_;
-
-	shift @coefficients while (scalar @coefficients and abs($coefficients[0]) < $epsilon);
-
-	if (scalar @coefficients == 0)
-	{
-		carp "All coefficients are zero\n";
-		return (0);
-	}
-
-	my $a = $coefficients[0];
-	$coefficients[$_] /= $a for (0..$#coefficients);
-
-	push @{$depr{simplified_form}},
-		sprintf("    Called in %s, line # %d.\n", (caller())[1,2]);
-	return ($ascending_flag)? reverse @coefficients: @coefficients;
-}
-
-=head3 poly_evaluate()
-
-Returns the values of the polynomial given a list of arguments. Unlike
-most of the above functions, this takes the reference of the coefficient list,
-which lets the function take a single x-value or multiple x-values passed in
-as a reference.
-
-The function may return a list...
-
-    my @coefficients = (1, -12, 0, 8, 13);
-    my @xvals = (0, 1, 2, 3, 5, 7);
-    my @yvals = poly_evaluate(\@coefficients, \@xvals);
-
-    print "Polynomial: [", join(", ", @coefficients), "]\n";
-
-    for my $j (0..$#yvals)
-    {
-        print "Evaluates at ", $xvals[$j], " to ", $yvals[$j], "\n";
-    }
-
-or return a scalar.
- 
-    my $x_median = ($xvals[0] + $xvals[$#xvals])/2.0;
-    my $y_median = poly_evaluate(\@coefficients, $x_median);
-
-This function is L<deprecated|/DEPRECATED FUNCTIONS>, and will be
-removed by version 2.80. Use the module L<Math::Utils> under the section
-"polynomial tag" for a replacement.
-
-=cut
-
-sub poly_evaluate
-{
-	my($coef_ref, $xval_ref) = @_;
-
-	my @coefficients = ($ascending_flag)? @$coef_ref: reverse @$coef_ref;
-
-	push @{$depr{poly_evaluate}},
-		sprintf("    Called in %s, line # %d.\n", (caller())[1,2]);
-	return pl_evaluate(\@coefficients, $xval_ref);
-}
-
-=head3 poly_derivaluate();
-
-Given an X value, returns the y-values of the polynomial, its first derivative,
-and its second derivative.
-
-    my($y, $dy, $ddy) = poly_derivaluate(\@coefficients, $x);
-
-Note that unlike L</poly_evaluate()>, this takes a single
-x-value.
-
-If the polynomial is a linear equation, the second derivative value will be
-zero.  Similarly, if the "equation" is a constant, the first derivative value
-will be zero.
-
-This function is L<deprecated|/DEPRECATED FUNCTIONS>, and will be
-removed by version 2.80. Use the module L<Math::Utils> under the section
-"polynomial tag" for a replacement.
-
-=cut
-
-sub poly_derivaluate
-{
-	my($coef_ref, $x) = @_;
-	my(@coefficients) = ($ascending_flag)? reverse @$coef_ref: @$coef_ref;
-	my $n = $#coefficients;
-	my $val = shift @coefficients;
-	my $d1val = $val * $n;
-	my $d2val = 0;
-
-	#
-	# Be nice and check if the user accidentally passed in
-	# a reference for the $x value.
-	### poly_derivaluate
-	#### $coef_ref
-	#### $x
-	#
-	croak "Used a reference instead of an X value in poly_derivaluate()" if (ref $x eq "ARRAY" or ref $x eq "SCALAR");
-
-	#
-	# Special case for the linear eq'n (the y = constant eq'n
-	# takes care of itself).
-	#
-	if ($n == 1)
-	{
-		$d1val = $val;
-		$val = $val * $x + $coefficients[0];
-	}
-	elsif ($n >= 2)
-	{
-		my $lastn = --$n;
-		$d2val = $d1val * $n;
-
-		#
-		# Loop through the coefficients, except for
-		# the linear and constant terms.
-		#
-		for my $c (@coefficients[0..$lastn-2])
-		{
-			$val = $val * $x + $c;
-			$d1val = $d1val * $x + ($c *= $n--);
-			$d2val = $d2val * $x + ($c * $n);
-		}
-
-		#
-		# Handle the last two coefficients.
-		#
-		$d1val = $d1val * $x + $coefficients[$lastn-1];
-		$val = ($val * $x + $coefficients[$lastn-1]) * $x + $coefficients[$lastn];
-	}
-
-	push @{$depr{poly_derivaluate}},
-		sprintf("    Called in %s, line # %d.\n", (caller())[1,2]);
-	return ($val, $d1val, $d2val);
-}
-
-
 =head3 poly_nonzero_term_count()
 
 Returns a simple count of the number of coefficients that aren't zero.
@@ -2620,123 +2259,13 @@ sub poly_nonzero_term_count
 	return $nzc;
 }
 
-
-=head3 poly_constmult()
-
-Simple function to multiply all of the coefficients by a constant. Like
-C<poly_evaluate()>, uses the reference of the coefficient list.
-
-    my @coefficients = (1, 7, 0, 12, 19);
-    my @coef3 = poly_constmult(\@coefficients, 3);
-
-This function is L<deprecated|/DEPRECATED FUNCTIONS>, and will be
-removed by version 2.80. Use the module L<Math::VecStat> for a replacement.
-
-=cut
-
-sub poly_constmult
-{
-	my($c_ref, $multiplier) = @_;
-	my @coefficients = @$c_ref;
-
-	push @{$depr{poly_constmult}},
-		sprintf("    Called in %s, line # %d.\n", (caller())[1,2]);
-	return map($_ *= $multiplier, @coefficients);
-}
-
-
-=head3 poly_divide()
-
-Divide one polynomial by another. Like C<poly_evaluate()>, the function takes
-a reference to the coefficient list. It returns a reference to both a quotient
-and a remainder.
-
-    my @coefficients = (1, -13, 59, -87);
-    my @polydiv = (3, -26, 59);
-    my($q, $r) = poly_divide(\@coefficients, \@polydiv);
-    my @quotient = @$q;
-    my @remainder = @$r;
-
-This function is L<deprecated|/DEPRECATED FUNCTIONS>, and will be
-removed by version 2.80. Use the module L<Math::Utils> under the section
-"polynomial tag" for a replacement.
-
-=cut
-
-sub poly_divide
-{
-	my $n_ref = shift;
-	my $d_ref = shift;
-
-	my @numerator = @$n_ref;
-	my @divisor = @$d_ref;
-	my @quotient;
-	my @remainder;
-
-	my $temp_ascending_flag = $ascending_flag;
-	unless ($ascending_flag)
-	{
-		@numerator = reverse @numerator;
-		@divisor = reverse @divisor;
-		$ascending_flag = 1;
-	}
-
-	#
-	# Just checking... removing any leading zeros.
-	#
-	pop @numerator while (@numerator and abs($numerator[$#numerator]) < $epsilon);
-	pop @divisor while (@divisor and abs($divisor[$#divisor]) < $epsilon);
-
-	my($quo_ref, $rem_ref) = pl_div(\@numerator, \@divisor);
-
-	@quotient = @{$quo_ref};
-	@remainder = @{$rem_ref};
-
-	#
-	# And once again, check for leading zeros in the remainder.
-	#
-	pop @remainder while (@remainder and abs($remainder[$#remainder]) < $epsilon);
-	push @remainder, 0 unless (@remainder);
-
-	unless ($temp_ascending_flag)
-	{
-		@remainder = reverse @remainder;
-		@quotient = reverse @quotient;
-	}
-
-	$ascending_flag = $temp_ascending_flag;
-	push @{$depr{poly_divide}},
-		sprintf("    Called in %s, line # %d.\n", (caller())[1,2]);
-	return (\@quotient, \@remainder);
-}
-
 END {
-	my $w = 0;
-	for my $k (sort keys %depr)
-	{
-		if (scalar @{$depr{$k}})
-		{
-			my $msg = "Warning: $k() is deprecated.\n";
-			my %uniqline;
-			for my $cr (sort @{$depr{$k}})
-			{
-				unless (exists $uniqline{$cr})
-				{
-					$uniqline{$cr} = 1;
-					$msg .= $cr;
-				}
-			}
-			warn $msg;
-			$w = 1;
-		}
-	}
-	warn "Please see Math::Polynomial::Solve documentation.\n" if ($w == 1);
-
 	#unless ($ascending_order_called)
 	#{
 	#	warn "Ascending order is in default state.\n",
 	#	"Please use ascending_order() to make sure your function\n",
 	#	"calls will be in the correct order when version 3.00 is installed.\n";
+	#warn "Please see Math::Polynomial::Solve documentation.\n" if ($w == 1);
 	#}
 }
 

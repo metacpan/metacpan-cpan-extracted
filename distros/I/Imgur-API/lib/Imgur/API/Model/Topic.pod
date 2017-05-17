@@ -1,0 +1,132 @@
+=head1 NAME
+
+Imgur::API::Model::Topic
+
+=head1 DESCRIPTION
+
+=over 4
+
+The base model for a topic.
+
+=back
+
+=cut
+
+=head1 FIELDS
+ 
+=item 
+C<id I<integer>>
+
+=over 4
+
+ID of the topic.
+
+=back
+
+
+=item 
+C<name I<string>>
+
+=over 4
+
+Topic name
+
+=back
+
+
+=item 
+C<description I<string>>
+
+=over 4
+
+Description of the topic
+
+=back
+
+
+=item 
+C<css I<string>>
+
+=over 4
+
+CSS class used on website to style the ephemeral topic
+
+=back
+
+
+=item 
+C<ephemeral I<boolean>>
+
+=over 4
+
+Whether it is an ephemeral (e.g. current events) topic
+
+=back
+
+
+=item 
+C<topPost I<Gallery Image OR Gallery Album>>
+
+=over 4
+
+The top image in this topic
+
+=back
+
+
+=item 
+C<heroImage I<Image>>
+
+=over 4
+
+The current 'hero' image chosen by the Imgur community staff
+
+=back
+
+
+=item 
+C<isHero I<boolean>>
+
+=over 4
+
+Whether the topic's heroImage should be used as the overall hero image
+
+=back
+
+
+
+=head1 EXAMPLE
+
+
+ {
+   "success" : true,
+   "status" : 200,
+   "data" : [
+      {
+         "ephemeral" : false,
+         "name" : "jasdev jokes",
+         "css" : null,
+         "topPost" : {},
+         "description" : "\"We should add more functions, that's what they do in functional programming.\",",
+         "id" : 1
+      },
+      {
+         "topPost" : {},
+         "name" : "Super Smash Bros",
+         "ephemeral" : true,
+         "css" : "smashbros",
+         "description" : "Game is hard. Tag all the n00bs with this topic.",
+         "id" : 6
+      }
+   ]
+}
+
+
+
+=cut
+
+=head1 SEE ALSO
+
+http://api.imgur.com/models/topic
+
+

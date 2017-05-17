@@ -35,6 +35,7 @@
       "runtime" : {
          "requires" : {
             "Moose" : "0",
+            "Path::Tiny" : "0",
             "Text::Template" : "0",
             "UUID::Tiny" : "0",
             "namespace::autoclean" : "0",
@@ -62,7 +63,7 @@
          "web" : "https://github.com/pablrod/p5-HTML-Notebook"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
 }
 

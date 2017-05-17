@@ -2,7 +2,7 @@ NAME
     Mojolicious::Plugin::CGI - Run CGI script from Mojolicious
 
 VERSION
-    0.36
+    0.37
 
 DESCRIPTION
     This plugin enable Mojolicious to run Perl CGI scripts. It does so by

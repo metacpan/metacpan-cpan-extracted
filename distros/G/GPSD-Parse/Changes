@@ -1,0 +1,9 @@
+Revision history for GPSD-Parse
+
+0.01    2017-05-16
+        - first version, released on an unsuspecting world.
+        - all current functionality has tests and documentation
+        - new features will be added immediately (see issues), this is simply
+          the first release to ensure all POD renders correctly on the CPAN
+        - we dynaload JSON::XS, and if it fails, fall back to JSON::PP to avoid
+          having to require non-core JSON in the Makefile.PL

@@ -57,7 +57,7 @@ is_deeply(\%list, {
 
 eval { $maybe->hash };
 my $errors = $@;
-like( $errors, qr/Undef did not pass type constraint "Str"/, "a list fails");
+like( $errors, qr/Missing required parameter/, "a list fails");
 
 done_testing();
 

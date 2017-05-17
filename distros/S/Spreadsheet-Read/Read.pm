@@ -35,7 +35,7 @@ package Spreadsheet::Read;
 use strict;
 use warnings;
 
-our $VERSION = "0.70";
+our $VERSION = "0.71";
 sub  Version { $VERSION }
 
 use Carp;
@@ -108,6 +108,7 @@ my %def_opts = (
     attr    => 0,
     clip    => undef, # $opt{cells};
     strip   => 0,
+    pivot   => 0,
     dtfmt   => "yyyy-mm-dd", # Format 14
     debug   => 0,
     parser  => undef,
@@ -293,6 +294,25 @@ sub _clipsheets {
 			}
 		    }
 		}
+	    }
+	}
+
+    if ($opt->{pivot}) {
+	foreach my $sheet (1 .. $ref->[0]{sheets}) {
+	    my $ss = $ref->[$sheet];
+	    $ss->{maxrow} || $ss->{maxcol} or next;
+	    my $mx = $ss->{maxrow} > $ss->{maxcol} ? $ss->{maxrow} : $ss->{maxcol};
+	    foreach my $row (2 .. $mx) {
+		foreach my $col (1 .. ($row - 1)) {
+		    $opt->{rc}    and
+			($ss->{cell}[$col][$row], $ss->{cell}[$row][$col]) =
+			($ss->{cell}[$row][$col], $ss->{cell}[$col][$row]);
+		    $opt->{cells} and
+		        ($ss->{cr2cell ($col, $row)}, $ss->{cr2cell ($row, $col)}) =
+		        ($ss->{cr2cell ($row, $col)}, $ss->{cr2cell ($col, $row)});
+		    }
+		}
+	    ($ss->{maxcol}, $ss->{maxrow}) = ($ss->{maxrow}, $ss->{maxcol});
 	    }
 	}
 
@@ -491,6 +511,7 @@ sub ReadData {
 		cell	=> [],
 		attr	=> [],
 		merged	=> [],
+		active  => 1,
 		},
 	    );
 
@@ -500,20 +521,20 @@ sub ReadData {
 	if ($io_fil) {
 	    unless (defined $opt{quote} && defined $opt{sep}) {
 		open $in, "<", $txt or return;
-		$_ = <$in>;
+		my $l1 = <$in>;
 
 		$quo = defined $opt{quote} ? $opt{quote} : '"';
 		$sep = # If explicitly set, use it
 		   defined $opt{sep} ? $opt{sep} :
 		       # otherwise start auto-detect with quoted strings
-		       m/["0-9];["0-9;]/	? ";"  :
-		       m/["0-9],["0-9,]/	? ","  :
-		       m/["0-9]\t["0-9,]/	? "\t" :
+		       $l1 =~ m/["0-9];["0-9;]/  ? ";"  :
+		       $l1 =~ m/["0-9],["0-9,]/  ? ","  :
+		       $l1 =~ m/["0-9]\t["0-9,]/ ? "\t" :
 		       # If neither, then for unquoted strings
-		       m/\w;[\w;]/		? ";"  :
-		       m/\w,[\w,]/		? ","  :
-		       m/\w\t[\w,]/		? "\t" :
-					      ","  ;
+		       $l1 =~ m/\w;[\w;]/        ? ";"  :
+		       $l1 =~ m/\w,[\w,]/        ? ","  :
+		       $l1 =~ m/\w\t[\w,]/       ? "\t" :
+						   ","  ;
 		close $in;
 		}
 	    open $in, "<", $txt or return;
@@ -641,7 +662,12 @@ sub ReadData {
 	    :     Spreadsheet::ParseExcel::FmtDefault->new;
 
 	$debug and print STDERR "\t$data[0]{sheets} sheets\n";
+	my $active_sheet = $oBook->get_active_sheet
+			|| $oBook->{ActiveSheet}
+			|| $oBook->{SelectedSheet};
+	my $current_sheet = 0;
 	foreach my $oWkS (@{$oBook->{Worksheet}}) {
+	    $current_sheet++;
 	    $opt{clip} and !defined $oWkS->{Cells} and next; # Skip empty sheets
 	    my %sheet = (
 		parser	=> 0,
@@ -651,6 +677,7 @@ sub ReadData {
 		cell	=> [],
 		attr	=> [],
 		merged  => [],
+		active	=> 0,
 		);
 	    # $debug and $sheet{_parser} = $oWkS;
 	    defined $sheet{label}  or  $sheet{label}  = "-- unlabeled --";
@@ -666,6 +693,10 @@ sub ReadData {
 		@{$oWkS->get_merged_areas || []}];
 	    my $sheet_idx = 1 + @data;
 	    $debug and print STDERR "\tSheet $sheet_idx '$sheet{label}' $sheet{maxrow} x $sheet{maxcol}\n";
+	    if (defined $active_sheet) {
+		my $sheet_no = $oWkS->{_SheetNo} || $current_sheet;
+		$sheet_no eq $active_sheet and $sheet{active} = 1;
+		}
 	    # Sheet keys:
 	    # _Book          FooterMargin   MinCol         RightMargin
 	    # BottomMargin   FooterMergin   MinRow         RightMergin
@@ -839,6 +870,7 @@ sub ReadData {
 		cell	=> [],
 		attr	=> [],
 		merged  => [],
+		active  => 1,
 		},
 	    );
 
@@ -922,6 +954,7 @@ sub ReadData {
 		    cell   => [],
 		    attr   => [],
 		    merged => [],
+		    active => 0,
 		    );
 		my $sheet_idx = 1 + @data;
 		$debug and print STDERR "\tSheet $sheet_idx '$sheet{label}' $sheet{maxrow} rows\n";
@@ -998,6 +1031,16 @@ sub cell {
     @id && $id[0] && exists $sheet->{$id[0]} and
 	return $sheet->{$id[0]};
     } # cell
+
+sub attr {
+    my ($sheet, @id) = @_;
+    @id == 2 && $id[0] =~ m/^[0-9]+$/ && $id[1] =~ m/^[0-9]+$/ and
+	return $sheet->{attr}[$id[0]][$id[1]];
+    if (@id && $id[0] && exists $sheet->{$id[0]}) {
+	my ($c, $r) = $sheet->cell2cr ($id[0]);
+	return $sheet->{attr}[$c][$r];
+	}
+    } # attr
 
 sub maxrow {
     my $sheet = shift;
@@ -1123,6 +1166,7 @@ The data is returned as an array reference:
           ],
         attr    => [],
         merged  => [],
+        active  => 1,
         A1      => 1,
         B5      => "Nugget",
         },
@@ -1239,6 +1283,24 @@ leading-whitespace from every field.
     1     strip     n/a
     2      n/a     strip
     3     strip    strip
+
+=item pivot
+
+Swap all rows and columns.
+
+When a sheet contains data like
+
+  A1  B1  C1      E1
+  A2      C2  D2
+  A3  B3  C3  D3  E3
+
+using C<pivot> will return the sheet data as
+
+  A1  A2  A3
+  B1      B3
+  C1  C2  C3
+      D2  D3
+  E1      E3
 
 =item sep
 
@@ -1441,6 +1503,14 @@ Return the index of the last in-use row in the sheet. This index is 1-based.
 
 Return the value for a cell. Using tags will return the formatted value,
 using column and row will return unformatted value.
+
+=head3 attr
+
+ my $cell = $sheet->attr ("A3");
+ my $cell = $sheet->attr (1, 3);
+
+Return the attributes of a cell. Only valid if attributes are enabled through
+option C<attr>.
 
 =head3 col2label
 

@@ -5,6 +5,8 @@ use warnings;
 use strict;
 use Carp;
 
+=encoding utf8
+
 =head1 Device::USB::DevEndpoint
 
 This class encapsulates a USB Device endpoint and the methods that object
@@ -16,11 +18,11 @@ Device::USB::DevEndpoint - Access a device endpoint returned by libusb.
 
 =head1 VERSION
 
-Version 0.36
+Version 0.37
 
 =cut
 
-our $VERSION=0.36;
+our $VERSION=0.37;
 
 =head1 SYNOPSIS
 

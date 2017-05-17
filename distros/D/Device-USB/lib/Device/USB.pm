@@ -14,7 +14,7 @@ use Inline (
         ),
         ($ENV{LIBUSB_INCDIR} ? ( INC => "-I\"$ENV{LIBUSB_INCDIR}\"" ) : () ),
         NAME => 'Device::USB',
-        VERSION => '0.36',
+        VERSION => '0.37',
    );
 
 Inline->init();
@@ -43,15 +43,15 @@ use constant CLASS_VENDOR_SPEC => 0xff;
 
 =head1 NAME
 
-Device::USB - Use libusb to access USB devices.
+Device::USB - Use libusb to access USB devices. (DEPRECATED)
 
 =head1 VERSION
 
-Version 0.36
+Version 0.37
 
 =cut
 
-our $VERSION=0.36;
+our $VERSION=0.37;
 
 
 =head1 SYNOPSIS
@@ -78,6 +78,10 @@ functionality is generally the same as the libusb function whose name is
 the method name prepended with "usb_".
 
 =head1 DESCRIPTION
+
+This module is deprecated as of version 0.37. I have not had the time
+or need to update the module, and no one has been willing to take it
+over.
 
 This module provides a Perl interface to the C library libusb. This library
 supports a relatively full set of functionality to access a USB device. In
@@ -450,6 +454,116 @@ sub get_busses
 
 =back
 
+=head1 LIBRARY INTERFACE
+
+The raw api of the libusb library is also :
+
+=over 4
+
+=item DeviceUSBDebugLevel()
+
+
+=item libusb_init()
+
+
+=item libusb_find_busses()
+
+
+=item libusb_find_devices()
+
+
+=item libusb_get_busses()
+
+
+=item libusb_open(void *dev)
+
+
+=item libusb_close(void *dev)
+
+
+=item libusb_set_configuration(void *dev, int configuration)
+
+
+=item libusb_set_altinterface(void *dev, int alternate)
+
+
+=item libusb_clear_halt(void *dev, unsigned int ep)
+
+
+=item libusb_reset(void *dev)
+
+
+=item libusb_get_driver_np(void *dev, int interface, char *name, unsigned int namelen)
+
+
+=item libusb_detach_kernel_driver_np(void *dev, int interface)
+
+
+=item libusb_claim_interface(void *dev, int interface)
+
+
+=item libusb_release_interface(void *dev, int interface)
+
+
+=item libusb_control_msg(void *dev, int requesttype, int request, int value, int index, char *bytes, int size, int timeout)
+
+
+=item libusb_get_string(void *dev, int index, int langid, char *buf, size_t buflen)
+
+
+=item libusb_get_string_simple(void *dev, int index, char *buf, size_t buflen)
+
+
+=item libusb_get_descriptor(void *dev, unsigned char type, unsigned char index, char *buf, int size)
+
+
+=item libusb_get_descriptor_by_endpoint(void *dev, int ep, unsigned char type, unsigned char index, char *buf, int size)
+
+
+=item libusb_bulk_write(void *dev, int ep, char *bytes, int size, int timeout)
+
+
+=item libusb_bulk_read(void *dev, int ep, char *bytes, int size, int timeout)
+
+
+=item libusb_interrupt_write(void *dev, int ep, char *bytes, int size, int timeout)
+
+
+=item libusb_interrupt_read(void *dev, int ep, char *bytes, int size, int timeout)
+
+
+=item lib_get_usb_busses()
+
+Return the complete list of information after finding busses and devices.
+
+Before calling this function, remember to call find_busses and find_devices.
+
+returns a reference to an array of busses.
+
+=item lib_list_busses()
+
+Return the complete list of information after finding busses and devices.
+
+By using this function, you do not need to do the find_* calls yourself.
+
+returns a reference to an array of busses.
+
+=item lib_find_usb_device( int vendor, int product )
+
+Find a particular device
+
+   vendor  - the vendor id
+   product - product id for that vendor
+
+returns a pointer to the device if it is found, NULL otherwise.
+
+=item lib_debug_mode( int unsafe_level )
+
+Set debugging level: 0: off, 1: some messages, 2: verbose
+Values outside range are forced into range.
+
+=back
+
 =head1 DIAGNOSTICS
 
 This is an explanation of the diagnostic and error messages this module
@@ -480,7 +594,7 @@ your bug as I make changes.
 
 =head1 FOR MORE INFORMATION
 
-The project is hosted at Google Code L<http://code.google.com/p/perl-device-usb/>.
+The project is hosted at github L<https://github.com/gwadej/perl-device-usb/>.
 More information on the project, including installation help is avaliable on the
 Wiki.
 

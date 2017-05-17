@@ -1,0 +1,50 @@
+
+[![Build Status](https://travis-ci.org/Corion/WWW-Mechanize-Chrome.svg?branch=master)](https://github.com/Corion/WWW-Mechanize-Chrome)
+
+# NAME
+
+Apache::Tika::Async - connect to Apache Tika
+
+# SYNOPSIS
+
+    use Apache::Tika::Async;
+
+    my $tika= Apache::Tika::Async->new;
+
+    my $fn= shift;
+
+    use Data::Dumper;
+    my $info = $tika->get_all( $fn );
+    print Dumper $info->meta($fn);
+    print $info->content($fn);
+    # <html><body>...
+    print $info->meta->{"meta:language"};
+    # en
+
+# REPOSITORY
+
+The public repository of this module is
+[https://github.com/Corion/apache-tika](https://github.com/Corion/apache-tika).
+
+# SUPPORT
+
+The public support forum of this module is
+[https://perlmonks.org/](https://perlmonks.org/).
+
+# BUG TRACKER
+
+Please report bugs in this module via the RT CPAN bug queue at
+[https://rt.cpan.org/Public/Dist/Display.html?Name=Apache-Tika-Async](https://rt.cpan.org/Public/Dist/Display.html?Name=Apache-Tika-Async)
+or via mail to [apache-tika-async-Bugs@rt.cpan.org](https://metacpan.org/pod/apache-tika-async-Bugs@rt.cpan.org).
+
+# AUTHOR
+
+Max Maischein `corion@cpan.org`
+
+# COPYRIGHT (c)
+
+Copyright 2014-2016 by Max Maischein `corion@cpan.org`.
+
+# LICENSE
+
+This module is released under the same terms as Perl itself.

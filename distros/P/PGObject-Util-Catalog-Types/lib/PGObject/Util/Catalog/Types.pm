@@ -1,6 +1,6 @@
 package PGObject::Util::Catalog::Types;
 
-use 5.008;
+use 5.010;
 use strict;
 use warnings FATAL => 'all';
 
@@ -16,11 +16,11 @@ PGObject::Util::Catalog::Types - Utilities for working with Composite types
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 
 
@@ -157,7 +157,7 @@ L<http://search.cpan.org/dist/PGObject-Util-Catalog-Types/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2014 Chris Travers.
+Copyright 2014-2017 Chris Travers.
 
 This program is distributed under the (Revised) BSD License:
 L<http://www.opensource.org/licenses/BSD-3-Clause>

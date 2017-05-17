@@ -68,7 +68,7 @@ copy($r_root.'etc/hosts',$wr_root.'etc/') ;
 copy($r_root.'etc/ssh/sshd_config',$wr_root.'etc/ssh/') ;
 
 # set_up data
-do "t/test_model.pl" ;
+do "./t/test_model.pl" ;
 
 my $i_hosts = $model->instance(instance_name    => 'hosts_inst',
 			       root_class_name  => 'Hosts',

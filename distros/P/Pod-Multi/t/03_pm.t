@@ -1,5 +1,5 @@
 # t/03_pm.t - input file is Perl module
-#$Id: 03_pm.t 1201 2007-10-27 01:22:17Z jimk $
+#$Id$
 use strict;
 use warnings;
 use Test::More 

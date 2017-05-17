@@ -1,5 +1,5 @@
 ---
-abstract: 'Provides a geocoding functionality using http:://geocoder.xyz'
+abstract: 'Provides a geocoding functionality using https://geocode.xyz'
 author:
   - 'Nigel Horne <njh@bandsman.co.uk>'
 build_requires:
@@ -29,5 +29,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-XYZ
   repository: git://github.com/nigelhorne/Geo-Coder-XYZ.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

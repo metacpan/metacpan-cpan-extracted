@@ -7,7 +7,17 @@ sub ast_dumper {
     return _dumper($_[0], $level, $seen, $pos);
 }
 
-# Note: this is called from Perlito5X/Dumper.pm
+sub Dumper {
+    my $seen  = {};
+    my $level = '    ';
+    my @out;
+    for my $i (0 .. $#_) {
+        my $pos   = '$VAR' . ($i + 1);
+        push @out, "$pos = " . _dumper($_[$i], $level, $seen, $pos) . ";\n";
+    }
+    return join('', @out);
+}
+
 sub _dumper {
     my ($obj, $tab, $seen, $pos) = @_;
 
@@ -55,24 +65,23 @@ sub _dumper {
         return 'sub { "DUMMY" }';
     }
 
-    # TODO find out what kind of reference this is (ARRAY, HASH, ...)
-    # local $@;
-    # eval {
-    #     my @data = @$obj;
-    #     say "is array";
-    #     return 'bless(' . "..." . ", '$ref')";
-    # }
-    # or eval {
-    #     $@ = '';
-    #     my %data = %$obj;
-    #     say "is hash";
-    #     return 'bless(' . "..." . ", '$ref')";
-    # };
-    # $@ = '';
-    
-    # assume it's a blessed HASH
     
     my @out;
+    my $res;
+    local $@;
+    $res = eval {
+        for my $i ( 0 .. $#$obj ) {
+            my $here = $pos . '->[' . $i . ']';
+            push @out, 
+                $tab1,
+                _dumper($obj->[$i], $tab1, $seen, $here), 
+                ",\n";
+        }
+        join('', "bless([\n", @out, $tab, "], '$ref')");
+    };
+    return $res if $res;
+
+    # assume it's a blessed HASH
     for my $i ( sort keys %$obj ) {
         my $here = $pos . '->{' . $i . '}';
         push @out, 
@@ -84,7 +93,7 @@ sub _dumper {
     return join('', "bless({\n", @out, $tab, "}, '$ref')");
 }
 
-my %safe_char = (
+our %safe_char = (
     ' ' => 1,
     '!' => 1,
     '"' => 1,
@@ -116,6 +125,7 @@ my %safe_char = (
     '|' => 1,
     '}' => 1,
     '~' => 1,
+    "\n" => 1,
 );
 
 sub escape_string {
@@ -124,15 +134,20 @@ sub escape_string {
     my $tmp = '';
     return "''" if $s eq '';
     return 0+$s if (0+$s) eq $s && $s =~ /[0-9]/;
-    for my $i (0 .. length($s) - 1) {
-        my $c = substr($s, $i, 1);
-        if  (  ($c ge 'a' && $c le 'z')
+    for my $c ( split "", $s ) {
+        if ( $c eq '\\' ) {
+            $tmp = $tmp . '\\' . '\\';
+        }
+        elsif  (  ($c ge 'a' && $c le 'z')
             || ($c ge 'A' && $c le 'Z')
             || ($c ge '0' && $c le '9')
             || exists( $safe_char{$c} )
             )
         {
             $tmp = $tmp . $c;
+        }
+        elsif (ord($c) > 127) {
+            $tmp = $tmp . '\x{' . sprintf("%x", ord($c)) . '}';
         }
         else {
             push @out, "'$tmp'" if $tmp ne '';

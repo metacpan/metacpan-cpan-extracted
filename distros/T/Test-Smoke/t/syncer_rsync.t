@@ -1,14 +1,13 @@
 #! /usr/bin/perl -w
 use strict;
-
-# $Id$
+use lib 't';
 
 use Data::Dumper;
 use Cwd qw/cwd abs_path/;
-use File::Path 'rmtree';
 use File::Spec;
 use File::Spec::Functions;
 use Test::More;
+use TestLib;
 
 use Test::Smoke::Syncer;
 use Test::Smoke::Util::FindHelpers 'whereis';
@@ -73,22 +72,35 @@ my %df_rsync = (
     }
 }
 
-{ # Set the line, helps predicting the error-message :-)
-#line 500
-    my $sync = eval { Test::Smoke::Syncer->new( 'nogo' ) };
-    ok( $@, "Error on unknown type" );
-    like( $@, qq|/Invalid sync_type 'nogo' at t.syncer_rsync\.t line 500/|,
-        "Error message on unknown type" );
-}
-
-SKIP: { # Let's try to test the ->sync method
+SKIP: {
     my $verbose = 0;
+    my $gitbin = whereis('git');
+    skip("No git found :(", 10) if ! $gitbin;
+
+    my $cwd = abs_path();
+    # Set up a basic git repository
+    my $git = Test::Smoke::Util::Execute->new(command => $gitbin);
+    my $repopath = 't/tsgit';
+    $git->run(init => $repopath);
+    is($git->exitcode, 0, "git init $repopath");
+
+    mkpath("$repopath/Porting");
+    chdir $repopath;
+    (my $gitversion = $git->run('--version')) =~ s/git version (\S+).+/$1/si;
+    put_file($gitversion => 'first.file');
+    $git->run(add => 'first.file');
+    put_file("#! $^X -w\nsystem q/cat first.file/" => qw/Porting make_dot_patch.pl/);
+    $git->run(add => 'Porting/make_dot_patch.pl');
+    $git->run(commit => '-m', "'We need a first file committed'");
+
     my $rsync_bin = whereis('rsync', $verbose);
     skip "No rsync binary found...", 3 if !$rsync_bin;
 
-    my $cwd = abs_path();
     my $source = catdir($cwd, 't', 'ftppub', 'perl-current');
-    my $options = '-a';
+    $source = UNCify_path($source) if $^O eq 'MSWin32';
+
+    # make sure to include a space to check this gets split into 2 arguments
+    my $options = '-az -v';
     my $ddir = catdir($cwd, 't', 'smoketest');
 
     my $rsync = Test::Smoke::Syncer->new(
@@ -107,9 +119,26 @@ SKIP: { # Let's try to test the ->sync method
     my $st = Test::Smoke::SourceTree->new($ddir, $verbose);
     my $check = $st->check_MANIFEST;
 
-   is_deeply($check, { }, "MANIFEST check for $ddir"); 
+    is_deeply($check, { }, "MANIFEST check for $ddir");
 
+    chdir $cwd;
     rmtree($ddir);
+    rmtree($repopath);
+}
+
+{ # Set the line, helps predicting the error-message :-)
+#line 500
+    my $sync = eval { Test::Smoke::Syncer->new( 'nogo' ) };
+    ok( $@, "Error on unknown type" );
+    like( $@, qq|/Invalid sync_type 'nogo' at t.syncer_rsync\.t line 500/|,
+        "Error message on unknown type" );
 }
 
 done_testing();
+
+sub UNCify_path {
+    my ($path) = @_;
+    $path =~ s{\\}{/}g;
+    $path =~ s{^([a-z]):}{//localhost/$1\$}i;
+    return $path;
+}

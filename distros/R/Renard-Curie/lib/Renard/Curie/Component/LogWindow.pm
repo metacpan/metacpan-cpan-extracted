@@ -1,7 +1,7 @@
 use Renard::Curie::Setup;
 package Renard::Curie::Component::LogWindow;
 # ABSTRACT: Component that collects log messages
-$Renard::Curie::Component::LogWindow::VERSION = '0.001';
+$Renard::Curie::Component::LogWindow::VERSION = '0.002';
 use Moo;
 use MooX::HandlesVia;
 use Glib 'TRUE', 'FALSE';
@@ -19,7 +19,13 @@ has log_messages => (
 	default => sub { [] },
 );
 
-method BUILD {
+method BUILD(@) {
+	my $log_textview = $self->builder->get_object('log-text');
+	if( $log_textview->can('set_monospace') ) {
+		$log_textview->set_monospace(TRUE);
+	} else {
+		warn('Gtk3::TextView monospace property not available for Gtk+ < v3.16.');
+	}
 	$self->builder->get_object('log-window')
 		->signal_connect(
 			'delete-event'
@@ -62,7 +68,7 @@ method _scroll_log_textview_to_end() {
 	$text_view->scroll_to_mark( $insert_mark, 0.0, TRUE, 0.0, 1.0);
 }
 
-fun on_clicked_button_clear_cb( $event, $self ) {
+callback on_clicked_button_clear_cb( $event, $self ) {
 	$self->log_messages([]);
 	my $buffer = $self->builder->get_object('log-text')->get_buffer;
 	$buffer->set_text("", 0);
@@ -87,7 +93,7 @@ Renard::Curie::Component::LogWindow - Component that collects log messages
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 EXTENDS
 
@@ -179,7 +185,7 @@ is visible.
 
 =head2 on_clicked_button_clear_cb
 
-  fun on_clicked_button_clear_cb( $event, $self )
+  callback on_clicked_button_clear_cb( $event, $self )
 
 Callback for when the Clear button is clicked. This clears the log message text
 view.

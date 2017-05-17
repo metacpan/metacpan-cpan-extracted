@@ -9,6 +9,7 @@ do { my $x = {
                                       'CHI' => '0',
                                       'Code::TidyAll' => '0.56',
                                       'Code::TidyAll::Plugin::Perl::AlignMooseAttributes' => '0',
+                                      'Code::TidyAll::Plugin::SortLines::Naturally' => '0.000003',
                                       'Code::TidyAll::Plugin::Test::Vars' => '0.02',
                                       'JSON::MaybeXS' => '0',
                                       'Mason::Tidy' => '0',

@@ -1,5 +1,5 @@
 package Dist::Zooky;
-$Dist::Zooky::VERSION = '0.22';
+$Dist::Zooky::VERSION = '0.24';
 # ABSTRACT: converts a distribution to Dist::Zilla
 
 use strict;
@@ -78,7 +78,7 @@ sub examine {
     $meta->{license} = \@licenses;
   }
 
-  my $ini = Dist::Zooky::DistIni->new( type => $type, metadata => $meta, bundle => $self->bundle );
+  my $ini = Dist::Zooky::DistIni->new( type => $type, metadata => $meta, ( $self->bundle ? ( bundle => $self->bundle ) : () ) );
   $ini->write;
 
   warn "Wrote 'dist.ini'\n";
@@ -111,7 +111,7 @@ Dist::Zooky - converts a distribution to Dist::Zilla
 
 =head1 VERSION
 
-version 0.22
+version 0.24
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package PAUSE::Permissions::EntryIterator;
-$PAUSE::Permissions::EntryIterator::VERSION = '0.16';
+$PAUSE::Permissions::EntryIterator::VERSION = '0.17';
 use strict;
 use warnings;
 

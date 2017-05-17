@@ -31,5 +31,5 @@ requires:
   Symbol: '0'
   Tie::Handle: '0'
   base: '0'
-version: '0.38'
+version: '0.39'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

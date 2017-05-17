@@ -17,11 +17,10 @@ WriteMakefile(
     },
     BUILD_REQUIRES => {
         'Test::More' => 0,
-        'Type::Tiny' => '1.000006', 
+        'Type::Tiny' => '1.001_009', 
     },
     PREREQ_PM => {
         'MooX::ReturnModifiers' => 0.03,
-        'Combine::Keys' => 0.04,
         'Moo' => 0,
         'Carp' => 0,
     },
@@ -29,7 +28,10 @@ WriteMakefile(
     clean => { FILES => 'MooX-ValidateSubs-*' },
     META_MERGE => {
         'meta-spec' => { version => 2 },
-        resources => {
+        x_contributors => [
+			"Toby Inkster (TOBYINK) <tobyink\@cpan.org>"
+		],
+		resources => {
             repository => {
                 type => 'git',
                 url  => 'https://github.com/ThisUsedToBeAnEmail/MooX-ValidateSubs.git',

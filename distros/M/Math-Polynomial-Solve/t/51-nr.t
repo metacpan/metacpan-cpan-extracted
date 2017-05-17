@@ -1,15 +1,13 @@
 use 5.010001;
 use Test::More tests => 6;
 
+use Math::Complex;
 use Math::Polynomial::Solve qw(newtonraphson ascending_order);
 use Math::Utils qw(:compare :polynomial);
-use Math::Complex;
 use strict;
 use warnings;
 
-require "t/coef.pl";
-
-my $fltcmp = generate_fltcmp();
+my($eq, $ne) = generate_relational(2.5e-7);
 
 ascending_order(1);
 
@@ -23,13 +21,11 @@ sub ok_newton
 	my @coef = @$c_ref;
 	my @x = newtonraphson($c_ref, $est_ref);
 
-	#rootprint(@x);
-
 	for my $xv (@x)
 	{
 		my $yv = pl_evaluate($c_ref, $xv);
-		ok( (&$fltcmp($yv, 0.0) == 0),
-		"   [ " . join(", ", @coef) . " ], root == $xv");
+		ok( (&$eq($yv, 0.0)),
+		"   [ " . join(", ", @coef) . " ], root == $xv, evaluates to $yv");
 	}
 }
 

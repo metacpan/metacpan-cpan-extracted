@@ -1,5 +1,5 @@
 use PGObject::Type::DateTime;
-use Test::More tests => 22;
+use Test::More tests => 26;
 
 my $test;
 
@@ -26,6 +26,12 @@ isa_ok $test, 'DateTime', 'Midnight, isa date time';
 isa_ok $test, 'PGObject::Type::DateTime', 'Midnight. is expected class';
 is $test->to_db, "2013-12-11 00:00:00.0-08", 'Midnight, expected db out';
 ok $test->is_tz, 'Midnight, timezone';
+
+$test = PGObject::Type::DateTime->from_db("2013-12-11 00:00:00.0000");
+isa_ok $test, 'DateTime', 'Midnight, no time zone, isa date time';
+isa_ok $test, 'PGObject::Type::DateTime', 'Midnight. is expected class';
+is $test->to_db, "2013-12-11 00:00:00.0", 'Midnight, expected db out';
+is $test->is_tz, 0, 'Midnight, timezone';
 
 $test = PGObject::Type::DateTime->from_db("2013-12-11 00:00:00.0000+08");
 isa_ok $test, 'DateTime', 'Midnight, positive offset, isa date time';

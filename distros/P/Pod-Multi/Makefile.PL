@@ -1,4 +1,4 @@
-#$Id: Makefile.PL 1201 2007-10-27 01:22:17Z jimk $
+#$Id$
 
 use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence

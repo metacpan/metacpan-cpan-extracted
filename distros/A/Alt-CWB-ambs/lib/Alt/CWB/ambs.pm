@@ -2,7 +2,7 @@ package Alt::CWB::ambs;
 
 use warnings;
 use strict;
-our $VERSION = '2.2.102.5';
+our $VERSION = '2.2.102.6';
 
 1;
 

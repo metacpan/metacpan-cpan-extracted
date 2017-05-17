@@ -7,6 +7,7 @@ use Test::MockObject;
 use Test::Mock::Guard;
 use Capture::Tiny qw/capture_stdout/;
 
+use lib '.';
 use t::Util;
 use Devel::Cover::Report::Codecov;
 

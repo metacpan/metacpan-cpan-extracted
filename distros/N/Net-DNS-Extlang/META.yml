@@ -1,0 +1,24 @@
+---
+abstract: 'DNS extension language'
+author:
+  - 'John Levine <extlang@m.jl.ly>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-DNS-Extlang
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Net::DNS: '1.07'
+  perl: '5.016'
+version: '0.1'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

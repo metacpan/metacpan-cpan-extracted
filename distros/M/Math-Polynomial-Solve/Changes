@@ -1,5 +1,19 @@
 Revision history for Perl extension Math::Polynomial::Solve.
 
+2.80
+     May 15 2017
+	- Removed "helper" file for tests. Math::Utils' evaluate and
+	  compare functions take over those jobs.
+	- In 21-poly.t, a (deliberately) badly-formed polynomial fed
+	  to poly_roots() was producing a root that was just outside
+	  the error margin. Decided to loosen the error margin
+	  (2.5e-7 to 3.0e-7), but do note that some polynomials will
+	  defeat some algorithm.
+     Mar 31 2017
+	- Eliminate the deprecated code, and the code that warns
+	  about using deprecated code.
+	- Remove the (deprecated) fltcmp test in 02-limit.t.
+	- Remove the POD on deprecated functions, and update README.
 2.75
      May 22 2016
 	- Updated the cubics paper by Dr. Nickalls, as I could no

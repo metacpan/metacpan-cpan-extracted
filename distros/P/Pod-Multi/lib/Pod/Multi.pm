@@ -1,11 +1,10 @@
 package Pod::Multi;
-#$Id: Multi.pm 1202 2007-10-27 15:12:03Z jimk $
 require 5.008;
 use strict;
 use warnings;
 use Exporter ();
 our ($VERSION, @ISA, @EXPORT, @EXPORT_OK);
-$VERSION     = 0.09;
+$VERSION     = '0.10';
 @ISA         = qw( Exporter );
 @EXPORT      = qw( pod2multi );
 @EXPORT_OK   = qw( make_options_defaults );
@@ -19,7 +18,6 @@ use File::Spec;
 use File::Save::Home qw(
     get_home_directory
 );
-#use Data::Dumper;
 
 sub pod2multi {
     croak "Must supply even number of arguments:  list of key-value pairs"
@@ -457,7 +455,7 @@ David H Adler and David A Golden assisted with debugging.
 
 =head1 COPYRIGHT
 
-Copyright 2006 James E Keenan.  All rights reserved.
+Copyright 2006-2017 James E Keenan.  All rights reserved.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

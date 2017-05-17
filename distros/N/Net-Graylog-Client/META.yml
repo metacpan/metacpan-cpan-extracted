@@ -1,38 +1,36 @@
 ---
 abstract: 'Send data to a Graylog server for analysis'
 author:
-  - 'Kevin Mulholland <moodfarm@cpan.org>'
+  - 'Kevin Mulholland <moodfarm@cpan.org> James Lavoy <jalavoy@cpan.org>'
 build_requires:
-  Data::Dumper: '0'
-  Test::More: '0'
+  Data::Dumper: 0
+  Test::More: 0
+  perl: v5.10.0
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: 0
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: '1.4'
+  version: 1.4
 name: Net-Graylog-Client
 requires:
-  App::Basis: '0'
-  App::Basis::Config: '0'
-  Data::Printer: '0'
-  Data::UUID: '0'
-  Furl: '0'
-  JSON: '0'
-  JSON::Tiny: '0'
-  Moo: '0'
-  POSIX: '0'
-  Sys::Hostname: '0'
-  URI::Escape::XS: '0'
-  constant: '0'
-  namespace::clean: '0'
-  perl: v5.10.0
-  strict: '0'
-  vars: '0'
-  warnings: '0'
+  Data::Printer: 0
+  Data::UUID: 0
+  Furl: 0
+  JSON: 0
+  JSON::Tiny: 0
+  Moo: 0
+  POSIX: 0
+  Sys::Hostname: 0
+  URI::Escape::XS: 0
+  constant: 0
+  namespace::clean: 0
+  strict: 0
+  vars: 0
+  warnings: 0
 resources:
   repository: git://github.com/jalavoy/Net-Graylog-Client.git
-version: '0.4'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: 0.7
+x_serialization_backend: 'YAML::Tiny version 1.51'

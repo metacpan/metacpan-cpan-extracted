@@ -18,13 +18,6 @@ t/author-pod-syntax.t
 t/dummy-CPAN/authors/01mailrc.txt.gz
 t/dummy-CPAN/modules/02packages.details.txt.gz
 t/dummy-CPAN/modules/03modlist.data.gz
-t/dummy-cpanplus/5.20.2/build/hTDwzO4RwG/Foo-Bar-0.01/Build.PL
-t/dummy-cpanplus/5.20.2/build/hTDwzO4RwG/Foo-Bar-0.01/CHANGES
-t/dummy-cpanplus/5.20.2/build/hTDwzO4RwG/Foo-Bar-0.01/MANIFEST
-t/dummy-cpanplus/5.20.2/build/hTDwzO4RwG/Foo-Bar-0.01/README
-t/dummy-cpanplus/5.20.2/build/hTDwzO4RwG/Foo-Bar-0.01/bin/foobar.pl
-t/dummy-cpanplus/5.20.2/build/hTDwzO4RwG/Foo-Bar-0.01/lib/Foo/Bar.pm
-t/dummy-cpanplus/5.20.2/build/hTDwzO4RwG/Foo-Bar-0.01/test.pl
 t/inc/conf.pl
 t/src/noxs/Foo-Bar-0.01.tar.gz
 t/src/xs/Foo-Bar-0.01.tar.gz

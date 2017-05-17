@@ -22,12 +22,8 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Geo::Coder::CA" : "0",
-            "Geo::Coder::Google::V3" : "0.1",
-            "Geo::Coder::OSM" : "0",
             "Test::Most" : "0",
-            "Test::NoWarnings" : "0",
-            "Test::Number::Delta" : "0"
+            "Test::NoWarnings" : "0"
          }
       },
       "configure" : {
@@ -54,6 +50,6 @@
          "web" : "https://github.com/nigelhorne/Geo-Coder-List"
       }
    },
-   "version" : "0.07",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

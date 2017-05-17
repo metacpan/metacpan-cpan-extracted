@@ -1,5 +1,8 @@
 Revision history for Perl module Mojolicious::Plugin::RevealJS
 
+0.11 2017-05-16
+  - Bump dependency of Perl to 5.12 for regexp \N
+
 0.10 2017-04-12
   - Add HTML comment to section handling
 

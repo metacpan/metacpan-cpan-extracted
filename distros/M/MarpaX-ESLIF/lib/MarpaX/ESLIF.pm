@@ -10,7 +10,7 @@ our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 use vars qw/$VERSION/;
 
 BEGIN {
-    our $VERSION = '2.0.10'; # VERSION
+    our $VERSION = '2.0.11'; # VERSION
 
     require XSLoader;
     XSLoader::load(__PACKAGE__, $VERSION);
@@ -31,7 +31,7 @@ MarpaX::ESLIF - ESLIF is Extended ScanLess InterFace
 
 =head1 VERSION
 
-version 2.0.10
+version 2.0.11
 
 =head1 SYNOPSIS
 

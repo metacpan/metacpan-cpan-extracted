@@ -10,11 +10,12 @@ use Carp;
 use Data::Dump qw(dump);
 use Data::Table::Text qw(:all);
 use Digest::SHA1 qw(sha1_hex);
+use File::Temp qw(tempfile);
 use MIME::Base64;
 
-our $VERSION = '2017.512';
+our $VERSION = '2017.513';
 
-my $pat = '40 chars in length personal access token';                           # A sample access token that is not valid!
+my $pat = '40 chars length access token from GitHub';                           # A sample access token that is hopefully no longer valid!
 
 Data::Table::Text::genLValueScalarMethods(
   qw(branch),                                                                   # Optional: branch name (you should create this branch manually first) or omit it for the default branch which is usually 'master'
@@ -34,7 +35,7 @@ sub GitHub::Crud::Response::new($$)                                             
 
   my ($gitHub, $request) = @_;
 
-  my $R = bless {}, "GitHub::Crud::Response";
+  my $R = bless {command=>$request}, "GitHub::Crud::Response";                  # Construct the response
   my $r = xxx $request, qr(HTTP);
 
   $r =~ s/\r//gs;                                                               # Internet line ends
@@ -137,6 +138,7 @@ if (1)
  {package GitHub::Crud::Response::Data;                                         # Response JSON from GitHubExecute a request against GitHub and decode the response
 
   Data::Table::Text::genLValueScalarMethods(
+qw(command),                                                                    # Command used to construct this response
 qw(content),
 qw(documentation_url),
 qw(download_url),
@@ -208,7 +210,13 @@ sub refOrBranch($$)
 
 sub new                                                                         # Create a new GitHub object
 
- {return bless{}
+ {
+  my $curl = qx(curl -v);                                                       # Check Curl
+  if ($curl =~ /command not found/)
+   {confess "Command 𝗰𝘂𝗿𝗹 not found"
+   }
+
+  return bless {}
  }
 
 sub readData($)                                                                 # Read data from a file on GitHub
@@ -248,15 +256,19 @@ sub writeData($$)                                                               
   my $sha  = $r->data->sha ? ', "sha": "'. $r->data->sha .'"' : '';
   my $denc = encode_base64($data) =~ s/\n//gsr;
 
+  my (undef, $tmpFile) = tempfile();                                            # Create a temporary file for the data to be written otherwise the command line invocation of 𝗰𝘂𝗿𝗹  might become too long
+
+  writeFile($tmpFile, qq({"message": "", "content": "$denc" $sha}));            # Write encoded content to temporary file
+
   my $u = filePath
    ("https://api.github.com/repos",
-    $user, $repo, qw(contents),
-    $file.$bran.qq( -d '{"message": "", "content": "$denc" $sha}')
+    $user, $repo, qw(contents), $file.$bran.qq( -d @).$tmpFile
    );
 
-  my $s = "curl -si -X PUT $pat $u";
-  my $w = GitHub::Crud::Response::new($gitHub, $s);
-  $w
+  my $s = "curl -si -X PUT $pat $u";                                            # Curl command
+  my $w = GitHub::Crud::Response::new($gitHub, $s);                             # Execute command to create response
+  unlink $tmpFile;                                                              # Cleanup
+  $w                                                                            # Return response
  }
 
 if (0)
@@ -266,7 +278,7 @@ if (0)
   $g->gitFile    = "test4.html";
   $g->personalAccessToken = $pat;
   my $d = dateTimeStamp;
-  my $w = $g->writeData("$d\n"x100);
+  my $w = $g->writeData("$d\n"x1000);
   say STDERR "Write:\n", dump($w);
  }
 
@@ -304,17 +316,17 @@ if (0)
 # Tests
 #-------------------------------------------------------------------------------
 
-if (0)
+if (0 and !caller)
  {my $g = GitHub::Crud::new();
   $g->userid     = "philiprbrenan";
   $g->repository = "horses";
-  $g->gitFile    = "test4.html";
+  $g->gitFile    = "testFromAppaApps.html";
   $g->personalAccessToken = $pat;
 
   my $d = dateTimeStamp."\n";
 
   say STDERR
-     "\n Write : \n\n", dump($g->writeData($d x 100)),
+     "\n Write : \n\n", dump($g->writeData($d x 1000)),
    "\n\n Read 1: \n\n", dump($g->readData->content),
    "\n\n Delete: \n\n", dump($g->deleteData),
    "\n\n Read 2: \n\n", dump($g->readData);

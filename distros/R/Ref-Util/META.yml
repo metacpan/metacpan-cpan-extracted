@@ -9,7 +9,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
-  Test::More: '0'
+  Test::More: '0.96'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   Text::ParseWords: '0'
@@ -23,17 +23,17 @@ name: Ref-Util
 provides:
   Ref::Util:
     file: lib/Ref/Util.pm
-    version: '0.201'
+    version: '0.203'
   Ref::Util::PP:
     file: lib/Ref/Util/PP.pm
-    version: '0.201'
+    version: '0.203'
 requires:
   Exporter: '5.57'
-  perl: '5.008'
+  perl: '5.006'
 resources:
   bugtracker: https://github.com/p5pclub/ref-util/issues
   repository: git://github.com/p5pclub/ref-util.git
-version: '0.201'
+version: '0.203'
 x_Dist_Zilla:
   perl:
     version: '5.024001'
@@ -205,6 +205,10 @@ x_Dist_Zilla:
       name: TestRelease
       version: '6.009'
     -
+      class: Dist::Zilla::Plugin::Test::MinimumVersion
+      name: Test::MinimumVersion
+      version: '2.000007'
+    -
       class: Dist::Zilla::Plugin::Git::Check
       config:
         Dist::Zilla::Plugin::Git::Check:
@@ -217,10 +221,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.12.2
+          git_version: 2.12.2
           repo_root: .
       name: '@Git/Check'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -238,12 +242,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.12.2
+          git_version: 2.12.2
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git/Commit'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -251,16 +255,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.201
+          tag: v0.203
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.12.2
+          git_version: 2.12.2
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git/Tag'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -269,10 +273,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.12.2
+          git_version: 2.12.2
           repo_root: .
       name: '@Git/Push'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::NextVersion
       config:
@@ -281,10 +285,10 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.12.2
+          git_version: 2.12.2
           repo_root: .
       name: Git::NextVersion
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Filter/PruneCruft'

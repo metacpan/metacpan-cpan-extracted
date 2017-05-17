@@ -1,17 +1,22 @@
 package Ref::Util;
 # ABSTRACT: Utility functions for checking references
-$Ref::Util::VERSION = '0.201';
+$Ref::Util::VERSION = '0.203';
 use strict;
 use warnings;
 
 use Exporter 5.57 'import';
 
-if (eval { require Ref::Util::XS; 1 }) {
-    _install_aliases('Ref::Util::XS');
-}
-else {
-    require Ref::Util::PP;
-    _install_aliases('Ref::Util::PP');
+{
+    my $impl = $ENV{PERL_REF_UTIL_IMPLEMENTATION}
+        || our $IMPLEMENTATION
+        || 'XS';
+    if ($impl ne 'PP' && eval { require Ref::Util::XS; 1 }) {
+        _install_aliases('Ref::Util::XS');
+    }
+    else {
+        require Ref::Util::PP;
+        _install_aliases('Ref::Util::PP');
+    }
 }
 
 sub _install_aliases {
@@ -37,72 +42,33 @@ Ref::Util - Utility functions for checking references
 
 =head1 VERSION
 
-version 0.201
+version 0.203
+
+=head1 SYNOPSIS
+
+    use Ref::Util qw( is_plain_arrayref is_plain_hashref );
+
+    if ( is_plain_arrayref( $something ) ) {
+        print for @{ $something };
+    } elsif ( is_plain_hashref( $something ) ) {
+        print for sort values %{ $something };
+    }
 
 =head1 DESCRIPTION
 
 Ref::Util introduces several functions to help identify references in a
-faster and B<smarter> way. In short:
+B<smarter> (and usually faster) way. In short:
 
-    ref $foo eq 'ARRAY'
+    # conventional approach             # with Ref::Util
 
-    # is now:
+    ref( $foo ) eq 'ARRAY'              is_plain_arrayref( $foo )
 
-    is_arrayref($foo)
+    use Scalar::Util qw( reftype );
+    reftype( $foo ) eq 'ARRAY'          is_arrayref( $foo )
 
 The difference:
 
 =over 4
-
-=item * Fast
-
-Here is a benchmark comparing similar checks.
-
-    my $bench = Dumbbench->new(
-        target_rel_precision => 0.005,
-        initial_runs         => 20,
-    );
-
-    my $amount = 1e7;
-    my $ref    = [];
-    $bench->add_instances(
-        Dumbbench::Instance::PerlSub->new(
-            name => 'Ref::Util::is_plain_arrayref (CustomOP)',
-            code => sub {
-                Ref::Util::is_plain_arrayref($ref) for ( 1 .. $amount )
-            },
-        ),
-
-        Dumbbench::Instance::PerlSub->new(
-            name => 'ref(), reftype(), !blessed()',
-            code => sub {
-                ref $ref
-                    && Scalar::Util::reftype($ref) eq 'ARRAY'
-                    && !Scalar::Util::blessed($ref)
-                    for ( 1 .. $amount );
-            },
-        ),
-
-        Dumbbench::Instance::PerlSub->new(
-            name => 'ref()',
-            code => sub { ref($ref) eq 'ARRAY' for ( 1 .. $amount ) },
-        ),
-
-        Dumbbench::Instance::PerlSub->new(
-            name => 'Data::Util::is_array_ref',
-            code => sub { is_array_ref($ref) for ( 1 .. $amount ) },
-        ),
-
-    );
-
-The results:
-
-    ref():                                   5.335e+00 +/- 1.8e-02 (0.3%)
-    ref(), reftype(), !blessed():            1.5545e+01 +/- 3.1e-02 (0.2%)
-    Ref::Util::is_plain_arrayref (CustomOP): 2.7951e+00 +/- 6.2e-03 (0.2%)
-    Data::Util::is_array_ref:                5.9074e+00 +/- 7.5e-03 (0.1%)
-
-(Rounded run time per iteration)
 
 =item * No comparison against a string constant
 
@@ -200,18 +166,21 @@ I couldn't find documentation for this type.
 
 Support might be added, if a good reason arises.
 
+=item * Usually fast
+
+When possible, Ref::Util uses L<Ref::Util::XS> as its implementation. (If
+you don't have a C compiler available, it uses a pure Perl fallback that has
+all the other advantages of Ref::Util, but isn't as fast.)
+
+In fact, Ref::Util::XS has two alternative implementations available
+internally, depending on the features supported by the version of Perl
+you're using. For Perls that supports custom OPs, we actually add an OP
+(which is faster); for other Perls, the implementation that simply calls an
+XS function (which is still faster than the pure-Perl equivalent).
+
+See below for L<benchmark results|/"BENCHMARKS">.
+
 =back
-
-Additionally, two implementations are available, depending on the perl
-version you have. For perls that supports Custom OPs, we actually add
-an OP (which is faster), and for perls that do not, we include
-an implementation that just calls an XS function - which is still
-faster than the Pure-Perl equivalent.
-
-We might also introduce a Pure-Perl version of everything, allowing
-to install and load the faster implementation seamlessly if possible.
-
-This will allow projects to use an optionally-Pure-Perl version.
 
 =head1 EXPORT
 
@@ -415,6 +384,61 @@ Check for a blessed reference to a reference.
 
     is_blessed_refref( bless \[], $class ); # reference to array reference
 
+=head1 BENCHMARKS
+
+Here is a benchmark comparing similar checks.
+
+    my $bench = Dumbbench->new(
+        target_rel_precision => 0.005,
+        initial_runs         => 20,
+    );
+
+    my $amount = 1e7;
+    my $ref    = [];
+    $bench->add_instances(
+        Dumbbench::Instance::PerlSub->new(
+            name => 'Ref::Util::is_plain_arrayref (CustomOP)',
+            code => sub {
+                Ref::Util::is_plain_arrayref($ref) for ( 1 .. $amount )
+            },
+        ),
+
+        Dumbbench::Instance::PerlSub->new(
+            name => 'ref(), reftype(), !blessed()',
+            code => sub {
+                ref $ref
+                    && Scalar::Util::reftype($ref) eq 'ARRAY'
+                    && !Scalar::Util::blessed($ref)
+                    for ( 1 .. $amount );
+            },
+        ),
+
+        Dumbbench::Instance::PerlSub->new(
+            name => 'ref()',
+            code => sub { ref($ref) eq 'ARRAY' for ( 1 .. $amount ) },
+        ),
+
+        Dumbbench::Instance::PerlSub->new(
+            name => 'Data::Util::is_array_ref',
+            code => sub { is_array_ref($ref) for ( 1 .. $amount ) },
+        ),
+
+    );
+
+The results:
+
+    ref():                                   5.335e+00 +/- 1.8e-02 (0.3%)
+    ref(), reftype(), !blessed():            1.5545e+01 +/- 3.1e-02 (0.2%)
+    Ref::Util::is_plain_arrayref (CustomOP): 2.7951e+00 +/- 6.2e-03 (0.2%)
+    Data::Util::is_array_ref:                5.9074e+00 +/- 7.5e-03 (0.1%)
+
+(Rounded run time per iteration)
+
+A benchmark against L<Data::Util>:
+
+    Ref::Util::is_plain_arrayref: 3.47157e-01 +/- 6.8e-05 (0.0%)
+    Data::Util::is_array_ref:     6.7562e-01 +/- 7.5e-04 (0.1%)
+
 =head1 SEE ALSO
 
 =over 4
@@ -424,11 +448,6 @@ Check for a blessed reference to a reference.
 =item * L<Scalar::Util>
 
 =item * L<Data::Util>
-
-A benchmark against L<Data::Util>.
-
-    Ref::Util::is_plain_arrayref: 3.47157e-01 +/- 6.8e-05 (0.0%)
-    Data::Util::is_array_ref:     6.7562e-01 +/- 7.5e-04 (0.1%)
 
 =back
 

@@ -2,8 +2,8 @@ package App::IndonesianBankingUtils;
 
 use 5.010001;
 
-our $DATE = '2016-08-11'; # DATE
-our $VERSION = '0.07'; # VERSION
+our $DATE = '2017-05-16'; # DATE
+our $VERSION = '0.09'; # VERSION
 
 1;
 # ABSTRACT: CLIs related to Indonesian banking
@@ -20,7 +20,7 @@ App::IndonesianBankingUtils - CLIs related to Indonesian banking
 
 =head1 VERSION
 
-This document describes version 0.07 of App::IndonesianBankingUtils (from Perl distribution App-IndonesianBankingUtils), released on 2016-08-11.
+This document describes version 0.09 of App::IndonesianBankingUtils (from Perl distribution App-IndonesianBankingUtils), released on 2017-05-16.
 
 =head1
 
@@ -84,7 +84,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

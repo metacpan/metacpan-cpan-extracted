@@ -15,12 +15,14 @@ my %params = (
     },
     CCFLAGS  => '-Wall -Wextra',
     OPTIMIZE  => '-g0 -O2',
+    XS => {},
     #CC => 'clang++',
 );
 
 if ($ENV{TEST_FULL}) {
     ($params{DEFINE}||='') .= ' -DTEST_FULL';
     push @{$params{SRC}||=[]}, 't/src';
+    $params{XS}{'lib.xs'} = 'lib.c';
 }
 
 write_makefile(%params);

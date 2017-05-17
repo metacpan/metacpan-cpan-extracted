@@ -1,5 +1,11 @@
 Revision history for Perl module PAUSE::Permissions
 
+0.17 2017-05-14 NEILB
+    - Two places were doing "return sort @foo", which can behave unpredictably
+      depending on the calling context. Thanks to OALDERS, for the PR,
+      and his incredible patience in my not merging and releasing a simple fix.
+    - Updated the live release test, to reflect changes in 06perms.txt
+
 0.16 2016-02-28 NEILB
     - Switched to using any() from List::Util (as of 1.33) instead of
       from List::MoreUtils, since LU is a core module.

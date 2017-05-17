@@ -3,6 +3,7 @@
 \bCVS\b
 ,v$
 .svn/
+.git/
 
 # ExtUtils::MakeMaker generated files and dirs.
 ^Makefile$
@@ -34,4 +35,5 @@
 ^TODO
 ^superseded/
 ^init_update.conf
+^MYMETA.*
 

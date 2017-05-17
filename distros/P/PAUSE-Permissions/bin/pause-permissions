@@ -1,7 +1,7 @@
 #!/usr/bin/env perl 
 
 package PAUSE::Permissions::pause_permissions;
-$PAUSE::Permissions::pause_permissions::VERSION = '0.16';
+$PAUSE::Permissions::pause_permissions::VERSION = '0.17';
 use strict;
 use warnings;
 

@@ -1,3 +1,21 @@
+v0.11	2017 May
+=====
+* Fixed precision() 
+
+* Added the following constants for compatability with Astro::Cosmology
+
+Added
+-----
+
+FOUR_PI 	- 4 * PI
+STERADIAN	- solid angle subtended by the radius squared in square degrees
+
+Deprecated
+----------
+
+HUBBLE_TIME	- should move to Astro::Cosmology as it's not really constant
+
+
 v0.10
 =====
 A couple of interface-breaking changes:

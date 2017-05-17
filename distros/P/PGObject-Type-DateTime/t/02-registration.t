@@ -6,6 +6,10 @@ use PGObject::Type::DateTime;
 use strict;
 use warnings;
 
+use Data::Dumper;
+no strict 'refs';
+diag Dumper(\%{"::PGObject::Type::"});
+
 # Theoretically we could grab ints as well, and this makes a nice test case.
 # The tests here are:
 # 1.  Registration with the default registry, default types
@@ -22,7 +26,12 @@ ok(PGObject::Type::DateTime->register(registry => 'test', types => ['mytime']),
                                'custom registry, mytime registration'),
 ok(PGObject::Type::DateTime->register(registry => 'test'), 
                                 'default types, custom registry');
-my $registry = PGObject::get_type_registry();
+my $registry;
+if ($PGObject::VERSION =~ /^1\./){
+    $registry = PGObject::get_type_registry();
+} else {
+    $registry = { map {$_ => PGObject::Type::Registry->inspect($_) } qw(test default) }	;
+}
 for my $reg(qw(default test)){
     for my $type (qw(date time timestamp timestamptz mytime)) {
         is($registry->{$reg}->{$type}, 'PGObject::Type::DateTime', 

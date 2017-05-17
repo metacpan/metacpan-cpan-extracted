@@ -1,5 +1,3 @@
-#! perl
-
 # copied over from JSON::PC and modified to use JSON
 # copied over from JSON::XS and modified to use JSON
 
@@ -7,7 +5,7 @@ use strict;
 use Test::More;
 BEGIN { plan tests => 9 };
 
-BEGIN { $ENV{PERL_JSON_BACKEND} = "JSON::backportPP"; }
+BEGIN { $ENV{PERL_JSON_BACKEND} ||= "JSON::backportPP"; }
 
 use JSON;
 

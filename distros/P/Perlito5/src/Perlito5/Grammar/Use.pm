@@ -11,10 +11,14 @@ my %Perlito_internal_module = (
     feature        => 'Perlito5X::feature',
     utf8           => 'Perlito5X::utf8',
     bytes          => 'Perlito5X::bytes',
+    re             => 'Perlito5X::re',
     encoding       => 'Perlito5X::encoding',
     Carp           => 'Perlito5X::Carp',
+    Config         => 'Perlito5X::Config',
     Exporter       => 'Perlito5X::Exporter',
     'Data::Dumper' => 'Perlito5X::Dumper',
+    UNIVERSAL      => 'Perlito5X::UNIVERSAL',
+    JSON           => 'Perlito5X::JSON',
     # vars     => 'Perlito5::vars',         # this is "hardcoded" in stmt_use()
     # constant => 'Perlito5::constant',
 );
@@ -71,32 +75,36 @@ token stmt_use {
         {   # "use v5", "use v5.8" - check perl version
             my $version = $MATCH->{"version_string"}{capture}{buf};
             Perlito5::test_perl_version($version);
-            $MATCH->{capture} = Perlito5::AST::Apply->new(
-                                   code => 'undef',
-                                   namespace => '',
-                                   arguments => []
-                                );
+            $MATCH->{capture} = Perlito5::Grammar::Block::ast_nop();
         }
     |
         <Perlito5::Grammar::full_ident>  [ '-' <Perlito5::Grammar::ident> ]?
-            [ <.Perlito5::Grammar::Space::ws> <version_string> <.Perlito5::Grammar::Space::opt_ws> ]?
-            <Perlito5::Grammar::Expression::list_parse>
+            [ <.Perlito5::Grammar::Space::ws> <version_string> <.Perlito5::Grammar::Space::opt_ws> <!before ',' > ]?
+            [ <Perlito5::Grammar::Expression::exp_parse> | <.Perlito5::Grammar::Space::opt_ws> ]
         {
             # TODO - test the module version
             my $version = $MATCH->{"version_string"}[0]{capture}{buf};
 
-            my $list = Perlito5::Match::flat($MATCH->{"Perlito5::Grammar::Expression::list_parse"});
-            if ($list eq '*undef*') {
-                $list = undef
+            my $list = Perlito5::Match::flat($MATCH->{"Perlito5::Grammar::Expression::exp_parse"});
+            if (ref($list) eq 'Perlito5::AST::Buf') {
+                # use feature 'say';
+                $list = $list->{buf};
+            }
+            elsif ($list) {
+                # evaluate the parameter list in a BEGIN-block context
+                Perlito5::Grammar::Scope::check_variable_declarations();
+                my $ast = Perlito5::AST::Block::->new(
+                    'stmts' => [
+                        Perlito5::AST::Apply->new(
+                            code      => 'circumfix:<[ ]>',
+                            arguments => [ $list ],
+                        )
+                    ]
+                );
+                $list = Perlito5::Grammar::Block::eval_begin_block($ast);
             }
             else {
-                my $m = $MATCH->{"Perlito5::Grammar::Expression::list_parse"};
-                my $list_code = substr( $str, $m->{from}, $m->{to} - $m->{from} );
-
-                # TODO - set the lexical context for eval
-
-                my @list = eval $list_code;  # this must be evaluated in list context
-                $list = \@list;
+                $list = undef;
             }
 
             my $full_ident = Perlito5::Match::flat($MATCH->{"Perlito5::Grammar::full_ident"});
@@ -104,65 +112,76 @@ token stmt_use {
 
             my $use_decl = Perlito5::Match::flat($MATCH->{use_decl});
 
+            if ($full_ident eq 'strict') {
+                # special case:
+                #   "strict::import()" doesn\'t work
+                #   because the effect of "strict" is localized by the compiler
+                $Perlito5::STRICT = ($use_decl eq 'no' ? 0 : 1);
+            }
+
             if ($use_decl eq 'use' && $full_ident eq 'vars' && $list) {
                 my $code = 'our (' . join(', ', @$list) . ')';
-                my $m = Perlito5::Grammar::Statement::statement_parse($code, 0);
+                my $m = Perlito5::Grammar::Statement::statement_parse( [ split "", $code ], 0);
                 Perlito5::Compiler::error "not a valid variable name: @$list"
                     if !$m;
                 $MATCH->{capture} = $m->{capture};
             }
-            elsif ($full_ident eq 'strict') {
-                $Perlito5::STRICT = ( $use_decl eq 'no' ? 0 : 1 );      # TODO - options
-                my $ast = Perlito5::AST::Use->new(
-                        code      => $use_decl,
-                        mod       => $full_ident,
-                        arguments => $list
-                    );
-                $MATCH->{capture} = $ast;
-            }
-            elsif ($use_decl eq 'use' && $full_ident eq 'constant' && $list) {
+            elsif ($use_decl eq 'use' && $full_ident eq 'constant') {
                 my @ast;
-                my $name = shift @$list;
-                if (ref($name) eq 'HASH') {
-                    for my $key (sort keys %$name ) {
-                        my $code = 'sub ' . $key . ' () { ' 
-                            .   Perlito5::Dumper::_dumper($name->{$key})
-                            . ' }';
+                if ($list) {
+                    my $name = shift @$list;
+                    if (ref($name) eq 'HASH') {
+                        for my $key (sort keys %$name ) {
+                            my $code = 'sub ' . $key . ' () { ' 
+                                .   Perlito5::Dumper::_dumper($name->{$key})
+                                . ' }';
+                            # say "will do: $code";
+                            my $m = Perlito5::Grammar::Statement::statement_parse( [ split "", $code ], 0);
+                            Perlito5::Compiler::error "not a valid constant: @$list"
+                                if !$m;
+                            # say Perlito5::Dumper::Dumper($m->{capture});
+                            push @ast, $m->{capture};
+                        }
+                    }
+                    else {
+                        my $code = 'sub ' . $name . ' () { (' 
+                            . join(', ', 
+                                map { Perlito5::Dumper::_dumper($_) }
+                                    @$list
+                              )
+                            . ') }';
                         # say "will do: $code";
-                        my $m = Perlito5::Grammar::Statement::statement_parse($code, 0);
+                        my $m = Perlito5::Grammar::Statement::statement_parse( [ split "", $code ], 0);
                         Perlito5::Compiler::error "not a valid constant: @$list"
                             if !$m;
                         # say Perlito5::Dumper::Dumper($m->{capture});
                         push @ast, $m->{capture};
                     }
                 }
-                else {
-                    my $code = 'sub ' . $name . ' () { (' 
-                        . join(', ', 
-                            map { Perlito5::Dumper::_dumper($_) }
-                                @$list
-                          )
-                        . ') }';
-                    # say "will do: $code";
-                    my $m = Perlito5::Grammar::Statement::statement_parse($code, 0);
-                    Perlito5::Compiler::error "not a valid constant: @$list"
-                        if !$m;
-                    # say Perlito5::Dumper::Dumper($m->{capture});
-                    push @ast, $m->{capture};
-                }
                 $MATCH->{capture} = Perlito5::AST::Block->new( stmts => \@ast );
             }
             else {
-                my $ast = Perlito5::AST::Use->new(
-                        code      => $use_decl,
-                        mod       => $full_ident,
-                        arguments => $list
-                    );
                 if ($Perlito5::EMIT_USE) {
-                    $MATCH->{capture} = $ast;
+                    $MATCH->{capture} = Perlito5::AST::Apply->new(
+                        code => 'use',
+                        # namespace => 'CORE',
+                        special_arg => 
+                            Perlito5::AST::Apply->new(
+                                code => $full_ident,
+                                bareword => 1,
+                                arguments => [],
+                            ),
+                        arguments => $list,
+                    );
                 }
                 else {
-                    $MATCH->{capture} = parse_time_eval($ast);
+                    $MATCH->{capture} = parse_time_eval(
+                        {
+                            mod       => $full_ident,
+                            code      => $use_decl,
+                            arguments => $list
+                        }
+                    );
                 }
             }
         }
@@ -174,8 +193,8 @@ token stmt_use {
 sub parse_time_eval {
     my $ast = shift;
 
-    my $module_name = $ast->mod;
-    my $use_or_not  = $ast->code;
+    my $module_name = $ast->{mod};
+    my $use_or_not  = $ast->{code};
     my $arguments   = $ast->{arguments};
 
     # test for "empty list" (and don't call import)
@@ -184,15 +203,10 @@ sub parse_time_eval {
     $arguments = [] unless defined $arguments;
 
     # the first time the module is seen,
-    # load the module source code
-    # and create a syntax tree
-    # TODO: the module should run in a new scope
-    #   without access to the current lexical variables
+    # load the module source code and create a syntax tree.
+    # the module runs in a new scope without access to the current lexical variables
 
-    if ( !$Perlito5::EXPAND_USE ) {
-        expand_use($ast);
-    }
-
+    local $Perlito5::STRICT = 0;
     if ( $Perlito5::EXPAND_USE ) {
         # normal "use" is not disabled, go for it:
         #   - require the module (evaluate the source code)
@@ -203,48 +217,59 @@ sub parse_time_eval {
         # "require" the module
         my $filename = modulename_to_filename($module_name);
         # warn "# require $filename\n";
-        require $filename;
+        # require $filename;
+        #   use the compiler "require" instead of native Perl
+        #   because we need to add BEGIN-block instrumentation
+        Perlito5::Grammar::Use::require($filename);
 
         if (!$skip_import) {
             # call import/unimport
             if ($use_or_not eq 'use') {
-                if (defined &{$module_name . '::import'}) {
+                my $code = $module_name->can('import');
+                if (defined($code)) {
                     # make sure that caller() points to the current module under compilation
-                    unshift @{ $Perlito5::CALLER }, [ $current_module_name ];
-                    eval "package $current_module_name;\n"
-                       . '$module_name->import(@$arguments); 1'
+                    unshift @Perlito5::CALLER, [ $current_module_name ];
+                    eval {
+                        # "package $current_module_name;\n"
+                        $module_name->import(@$arguments);
+                        1
+                    }
                     or Perlito5::Compiler::error $@;
-                    shift @{ $Perlito5::CALLER };
+                    shift @Perlito5::CALLER;
                 }
             }
             elsif ($use_or_not eq 'no') {
-                if (defined &{$module_name . '::unimport'}) {
+                my $code = $module_name->can('unimport');
+                if (defined($code)) {
                     # make sure that caller() points to the current module under compilation
-                    unshift @{ $Perlito5::CALLER }, [ $current_module_name ];
-                    eval "package $current_module_name;\n"
-                       . '$module_name->unimport(@$arguments); 1'
+                    unshift @Perlito5::CALLER, [ $current_module_name ];
+                    eval {
+                        # "package $current_module_name;\n"
+                        $module_name->unimport(@$arguments);
+                        1
+                    }
                     or Perlito5::Compiler::error $@;
-                    shift @{ $Perlito5::CALLER };
+                    shift @Perlito5::CALLER;
                 }
             }
         }
     }
+    else {
+        # force "use" code to be inlined instead of eval-ed
+        bootstrapping_use($ast);
+    }
 
-    return Perlito5::AST::Apply->new(
-        code      => 'undef',
-        namespace => '',
-        arguments => []
-    );
+    return Perlito5::Grammar::Block::ast_nop();
 }
 
 sub emit_time_eval {
     my $ast = shift;
 
-    if ($ast->mod eq 'strict') {
-        if ($ast->code eq 'use') {
+    if ($ast->{mod} eq 'strict') {
+        if ($ast->{code} eq 'use') {
             strict->import();
         }
-        elsif ($ast->code eq 'no') {
+        elsif ($ast->{code} eq 'no') {
             strict->unimport();
         }
     }
@@ -276,10 +301,11 @@ sub filename_lookup {
     Perlito5::Compiler::error "Can't locate $filename in \@INC ".'(@INC contains '.join(" ",@INC).').';
 }
 
-sub expand_use {
+sub bootstrapping_use {
+    # force "use" code to be inlined instead of eval-ed
     my $stmt = shift;
 
-    my $module_name = $stmt->mod;
+    my $module_name = $stmt->{mod};
 
     my $filename = modulename_to_filename($module_name);
 
@@ -316,45 +342,47 @@ sub expand_use {
         Perlito5::Compiler::error 'Syntax Error';
     }
 
-    if ($ENV{PERLITO5DEV}) {
-        # "new BEGIN"
-        push @Perlito5::COMP_UNIT,
-            Perlito5::AST::CompUnit->new(
-                name => 'main',
-                body => Perlito5::Match::flat($m),
-            );
-        return;
-    }
-
-    # "old BEGIN"
-    add_comp_unit(
-        Perlito5::AST::CompUnit->new(
-            name => 'main',
-            body => Perlito5::Match::flat($m),
-        ),
-    );
+    push @Perlito5::COMP_UNIT,
+      Perlito5::AST::CompUnit->new(
+        name => 'main',
+        body => Perlito5::Match::flat($m),
+      );
     return;
-}
-
-sub add_comp_unit {
-    # TODO - this subroutine is obsolete
-    my $comp_unit = shift;
-
-    # warn "parsed comp_unit: '", $comp_unit->name, "'";
-    for my $stmt (@{ $comp_unit->body }) {
-        if ($stmt->isa('Perlito5::AST::Use')) {
-            expand_use($stmt);
-        }
-    }
-    push @Perlito5::COMP_UNIT, $comp_unit;
-    # say "comp_unit done";
 }
 
 sub require {
     my $filename = shift;
+
+    my $m2 = version_string( [ split '', $filename ], 0);
+    if ($m2) {
+        # "use v5", "use v5.8" - check perl version
+        my $version = $m2->{"version_string"}{capture}{buf};
+        Perlito5::test_perl_version($version);
+        return 1;
+    }
+
     return 
         if filename_lookup($filename) eq "done";
-    my $result = do $filename;
+
+    #   use the compiler "do FILE" instead of native Perl
+    #   because we need to add BEGIN-block instrumentation
+    # my $result = do $filename;
+    my $source = do_file($filename);
+    # print STDERR "require $filename [[ $source ]]\n";
+    local $Perlito5::FILE_NAME = $filename;
+    local $Perlito5::STRICT = 0;
+    Perlito5::Grammar::Scope::check_variable_declarations();
+    Perlito5::Grammar::Scope::create_new_compile_time_scope();
+
+    my $m = Perlito5::Grammar::exp_stmts($source, 0);
+    my $ast = Perlito5::AST::Block->new( stmts => Perlito5::Match::flat($m) );
+    # use Data::Dumper;
+    # print STDERR Dumper $ast;
+    my $result = Perlito5::Grammar::Block::eval_begin_block($ast);
+    # print STDERR "result from require: ", Dumper $result;
+
+    Perlito5::Grammar::Scope::end_compile_time_scope();
+
     if ($@) {
         $INC{$filename} = undef;
         Perlito5::Compiler::error $@;

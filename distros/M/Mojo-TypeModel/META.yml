@@ -15,12 +15,14 @@ name: Mojo-TypeModel
 provides:
   Mojo::TypeModel:
     file: lib/Mojo/TypeModel.pm
-    version: '0.01'
+    version: '0.02'
   Mojolicious::Plugin::TypeModel:
     file: lib/Mojolicious/Plugin/TypeModel.pm
+requires:
+  Mojolicious: '7.0'
 resources:
   bugtracker: http://github.com/jberger/Mojo-TypeModel/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/jberger/Mojo-TypeModel
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

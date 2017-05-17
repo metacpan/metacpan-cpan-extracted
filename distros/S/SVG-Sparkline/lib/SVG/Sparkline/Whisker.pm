@@ -7,7 +7,7 @@ use SVG;
 use SVG::Sparkline::Utils;
 
 use 5.008000;
-our $VERSION = 1.11;
+our $VERSION = 1.12;
 
 # alias to make calling shorter.
 *_f = *SVG::Sparkline::Utils::format_f;

@@ -1,0 +1,21 @@
+=head1 NAME
+
+Perl2Package
+
+=head1 SYNOPSIS
+
+	cd <srcdir>
+	./perl2rpm
+	./perl2deb
+
+=head1 DESCRIPTION
+
+Currently: Wrapper scripts to automatically build .deb and .rpm packages from buildable perl packages.
+
+=head1 SEE ALSO
+
+L<DhMakePerl>
+L<makerpm>
+
+=cut
+

@@ -1,5 +1,7 @@
-#$Id: Changes 1202 2007-10-27 15:12:03Z jimk $
 Changes for Pod::Multi
+
+0.10 Tue May 16 12:32:19 EDT 2017
+    - Move into git and github.com; add one test file mistakenly omitted.
 
 0.09 Sat Oct 27 11:09:57 EDT 2007
     - Require 5.8.

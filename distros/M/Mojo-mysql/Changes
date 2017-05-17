@@ -1,5 +1,11 @@
 Revision history for perl distribution Mojo-mysql
 
+1.02 2017-05-15T20:34:01+0200
+ - Fix utf8 handling in DBD::mysql 4.042
+ - Prevent warnings when creating the mojo_migrations table #26
+ - Add proper quoting of table and column names #30
+ - Add warning when using Mojo::mysql::PubSub
+
 1.01 2017-03-25T08:24:29+0100
  - Add strict_mode() method and constructor #29
 

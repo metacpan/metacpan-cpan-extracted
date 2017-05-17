@@ -3,7 +3,7 @@ package App::ModuleBuildTiny::Dist;
 use 5.010;
 use strict;
 use warnings;
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 
 use Carp qw/croak/;
 use Config;
@@ -187,8 +187,9 @@ sub write_tarball {
 	for my $filename ($self->files) {
 		$arch->add_data($filename, $self->get_file($filename), { mode => oct '0644'} );
 	}
-	$arch->write($name, &Archive::Tar::COMPRESS_GZIP, $name);
-	return;
+	my $file = $name . ".tar.gz";
+	$arch->write($file, &Archive::Tar::COMPRESS_GZIP, $name);
+	return $file;
 }
 
 sub files {

@@ -2,6 +2,8 @@ package Test::Smoke::Mailer::Base;
 use warnings;
 use strict;
 
+our $VERSION = '0.001';
+
 use Test::Smoke::Util qw( parse_report_Config );
 
 =head1 NAME

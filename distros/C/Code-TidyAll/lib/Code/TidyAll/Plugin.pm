@@ -11,7 +11,7 @@ use Text::Diff 1.44 qw(diff);
 
 use Moo;
 
-our $VERSION = '0.58';
+our $VERSION = '0.59';
 
 # External
 has 'argv'               => ( is => 'ro', default => q{} );
@@ -45,12 +45,12 @@ around BUILDARGS => sub {
 };
 
 sub _build_cmd {
-    die "no default cmd specified";
+    die 'no default cmd specified';
 }
 
 sub _build_selects {
     my ($self) = @_;
-    die sprintf( "select is required for '%s'", $self->name ) unless defined( $self->select );
+    die sprintf( q{select is required for '%s'}, $self->name ) unless defined( $self->select );
     return $self->_parse_zglob_list( $self->select );
 }
 
@@ -91,9 +91,9 @@ sub validate_params {
     delete( $params->{except_modes} );
     if ( my @bad_params = grep { !$self->can($_) } keys(%$params) ) {
         die sprintf(
-            "unknown option%s %s for plugin '%s'",
-            @bad_params > 1 ? "s" : "",
-            join( ", ", sort map {"'$_'"} @bad_params ),
+            q{unknown option%s %s for plugin '%s'},
+            @bad_params > 1 ? 's' : q{},
+            join( ', ', sort map {qq['$_']} @bad_params ),
             $self->name
         );
     }
@@ -189,7 +189,7 @@ Code::TidyAll::Plugin - Create plugins for tidying or validating code
 
 =head1 VERSION
 
-version 0.58
+version 0.59
 
 =head1 SYNOPSIS
 
@@ -210,7 +210,7 @@ version 0.58
 
     sub validate_file {
         my ( $self, $file ) = @_;
-        die "not valid" if ...;
+        die 'not valid' if ...;
     }
 
 =head1 DESCRIPTION

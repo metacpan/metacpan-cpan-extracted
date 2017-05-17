@@ -1,7 +1,7 @@
 package Finance::BankUtils::ID::Mechanize;
 
-our $DATE = '2015-09-08'; # DATE
-our $VERSION = '0.43'; # VERSION
+our $DATE = '2017-05-16'; # DATE
+our $VERSION = '0.45'; # VERSION
 
 use 5.010;
 use strict;
@@ -21,7 +21,7 @@ sub new {
     bless $mech, $class;
 }
 
-# will be set by some other code, and will be immadiately consumed and emptied
+# will be set by some other code, and will be immediately consumed and emptied
 # by _make_request().
 our $saved_resp;
 
@@ -64,7 +64,7 @@ Finance::BankUtils::ID::Mechanize - A subclass of WWW::Mechanize
 
 =head1 VERSION
 
-This document describes version 0.43 of Finance::BankUtils::ID::Mechanize (from Perl distribution Finance-Bank-ID-BCA), released on 2015-09-08.
+This document describes version 0.45 of Finance::BankUtils::ID::Mechanize (from Perl distribution Finance-Bank-ID-BCA), released on 2017-05-16.
 
 =head1 SYNOPSIS
 
@@ -117,7 +117,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2013, 2012, 2011, 2010 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

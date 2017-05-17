@@ -5,7 +5,6 @@ use warnings;
 use LWP;
 use Test::Most tests => 11;
 use Test::NoWarnings;
-use Test::Number::Delta within => 1e-2;
 
 eval 'use autodie qw(:all)';	# Test for open/close failures
 
@@ -15,16 +14,22 @@ BEGIN {
 
 GOOGLEPLACES: {
 	SKIP: {
+		skip 'Test requires Internet access', 9 unless(-e 't/online.enabled');
+
 		eval {
 			require Geo::Coder::CA;
 
 			Geo::Coder::CA->import();
+
+			require Test::Number::Delta;
+
+			Test::Number::Delta->import();
 		};
 
 		# curl 'geocoder.ca/some_location?locate=9235+Main+St,+Richibucto,+New Brunswick,+Canada&json=1'
 		if($@) {
 			diag('Geo::Coder::CA not installed - skipping tests');
-			skip 'Geo::Coder::CA not installed', 16;
+			skip 'Geo::Coder::CA not installed', 9;
 		} else {
 			diag("Using Geo::Coder::CA $Geo::Coder::CA::VERSION");
 		}
@@ -40,8 +45,8 @@ GOOGLEPLACES: {
 		my $location = $geocoderlist->geocode(location => '9235 Main St, Richibucto, New Brunswick, Canada');
 		ok(defined($location));
 		is(ref($location), 'HASH', 'geocode should return a reference to a HASH');
-		delta_ok($location->{geometry}{location}{lat}, 46.68);
-		delta_ok($location->{geometry}{location}{lng}, -64.86);
+		delta_within($location->{geometry}{location}{lat}, 46.68, 1e-1);
+		delta_within($location->{geometry}{location}{lng}, -64.86, 1e-1);
 
 		ok(!defined($geocoderlist->geocode()));
 		ok(!defined($geocoderlist->geocode('')));

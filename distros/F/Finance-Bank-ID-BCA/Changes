@@ -1,4 +1,17 @@
-Revision history for Finance-Bank-ID-BCA
+0.45    2017-05-16 (PERLANCAR)
+
+	- Remove skip_NEXT and skip_problematic options. These options were
+	  added to ease importing to database, but turns out that since clearing
+	  transactions "SETORAN KLIRING BI" will appear at the top of the daily
+	  transactions list, the import process itself must be able to handle
+	  this out-of-order group. So these options are not so useful.
+
+
+0.44    2017-05-15 (PERLANCAR)
+
+	- Add option skip_problematic to skip problematic entries, e.g.
+	  SETORAN KLIRING BI. UPDATE 2017-05-16: removed in 0.45.
+
 
 0.43    2015-09-08 (PERLANCAR)
 
@@ -209,7 +222,7 @@ Revision history for Finance-Bank-ID-BCA
 
 0.15    2010-12-16 (SHARYANTO)
 
-        - add skip_NEXT
+        - add skip_NEXT. UPDATE 2017-05-16: removed in 0.45.
 
 
 0.14    2010-12-03 (SHARYANTO)

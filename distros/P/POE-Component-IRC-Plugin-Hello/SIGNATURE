@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.80.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,30 +14,30 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA512
 
-SHA1 088a53cb93771565d9c5a1b2a536305223f6d64c Changes
+SHA1 fbb35241dba9876ac334761a0ff6810a379252ac Changes
 SHA1 ce8ab521e1d02a0df588da6978c15eff8bedb873 MANIFEST
-SHA1 f0a0ec4248bb49f4de5029f4175365331a35e7b9 META.json
-SHA1 80f27197976dbbf8e0877aebde3dcf93481202fe META.yml
+SHA1 a4b27bdd3925ed538618923c98be114a2a36e93c META.json
+SHA1 72ec4b6291ea535ecdabe17543b5596ef8b7450b META.yml
 SHA1 4bce33c8fd0035460fdf35bbd39775e51a38d194 Makefile.PL
 SHA1 c4ebcc85d6b55b56470d2f30479dc4d770e01f25 README
-SHA1 b097cbdd9dd5657c5f5a6e12e7d2d516c6c4705d lib/POE/Component/IRC/Plugin/Hello.pm
+SHA1 6da2e53120415ff6e41bfb451cbcfd74b211a3b8 lib/POE/Component/IRC/Plugin/Hello.pm
 SHA1 c586b221e67b62d89cb92880c829a34a253780de t/POE-Component-IRC-Plugin-Hello.t
 SHA1 190939b33d26a5900164708c5b5fd550d3e853f0 t/perlcritic.t
 SHA1 5f76fcd17e6c7c5ce970ea3d200c8031b3d31d2a t/perlcriticrc
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQIcBAEBCgAGBQJU6Pd8AAoJEMoENb5ewbNilTIQAIjM4/3VEi0Pz4EnOklNYMy2
-5+TaiTf2HkV1OVaQyhrogASDFSzL82YwwKjn/yxuFh/SNsaKIJRtKVbTNz5HbvQz
-fACMhMVjpfmNzfHbHz2kGMNMWnJzW8YPsXWLfAbtO9dnyKYGX9VjpTwoPVKRM5Oc
-e99n2V6PKm7upCSmEv+VOdfFTiQZhsA3xBCYdX3IrVs6jh53E4WCiAPmJwx3UJOJ
-15ibe7Kz3ch2q89gB4QM8Yioo/KfyM2jxoYyCtmskyVus94z0tnbOAfcE6CLxIUj
-jmLOC2Z1RRdjWCMDc3BYGZk/7g2RJ8OreqKZN2w7ZR7mOmLiEsbgsBD6016uYExh
-fk00ovaGnTbWyH9CQJu+Ut1v7PDLG/Y9Dbut4kUqDr9czpUEexSZZGWA4Frzzw4Z
-OxAyZagu6nnnqd5wlxmGJHmZWxdfFqOEL523apHHTQidQmEEW8YdIViSk4XIx/Ac
-fYjl5k/eXv1BjOfy2VLDtCnKzThUu3LEO7a+2Lgb4c1zFSDAnlCg0B6Sol321dQx
-MksNBrnJv0m3TCmrD5VHfCIlFq9vZDkxTpKYiE4gYFyxQeEpOo+NbA0DKaZn4N6V
-wXxm9y1wiBkJ23y+naqqZdG3zSN/DiMAeV0EIzpG1mCWedmol0+7ETS8Zd3OEF7C
-JNXFHp1532uk/U5yXN+t
-=326Z
+iQJEBAEBCgAuFiEErVNvYICb0H7KK/jxygQ1vl7Bs2IFAlkXi2sQHG1hcml1c0Bp
+ZXZhbC5ybwAKCRDKBDW+XsGzYqKKEACVgSYhTfasWGyvx4iOZE7D1mkxgCggaGYU
+pdFzksWVVgmQaQ4YeMZk2vJhn240H/Ttjf/bHrGrThwNYzAWvoExPE4zHmBQW8Vw
+hR//LRWwbtpewVKVbQLT/9bmbG869AsMgutfyak7PkFSXkWxcbiI0KRsZ0VlOQrb
+WGIEicwd23Jai+39VNOCBR/JaVvQoU9eUj0OdGfyEp0QzEmQC6RWcubMM20GyCru
+Gfu9XP4QBiYB9yxSmVm9PCyE/j6fhvuyXNh/nDaukQhAGDyUejPCDM8nqOm322n0
+ZHPuUjaJNBtOm3H9goLOqx6F2ethE1G2uyv5zYtQI5i0f9MEEzcLONfzh7OLmxjC
+WM1i6d2a71I8cTII4g8kOi9NoiFSYNaKYypSRCYntyllu010uU2VgzO/dB71K2bB
+WR+k2k4+6GgZ8PclKyF0IMLvgINx7dUipx9IT9Zg2cIzlvOt3/WU7pcf3Kk0ZXx8
+johEOLlTgxJwtpATfnl9+6W4d85molNsU/uTPZAYzfFlRJ3sc4nBTzBQRcVf4pcA
+OQigJ7Ptv31p8JrHDQAn7Xrk6SD+Ico1v8WOBlVz1DwFGZjpaHkkowmcJNVY/BCl
+kNFXXrbsm7fpIfXfCFKPTcERSVgq6D9gfsxliBS1XLnTY2i5vHDqni5CYNRADFXs
+bDaBt/IlUQ==
+=8k2f
 -----END PGP SIGNATURE-----

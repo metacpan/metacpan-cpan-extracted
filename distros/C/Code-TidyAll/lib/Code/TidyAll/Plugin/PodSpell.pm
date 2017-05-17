@@ -13,7 +13,7 @@ use Moo;
 
 extends 'Code::TidyAll::Plugin';
 
-our $VERSION = '0.58';
+our $VERSION = '0.59';
 
 has 'ispell_argv' => ( is => 'ro', default => q{} );
 has 'ispell_cmd'  => ( is => 'ro', default => 'ispell' );
@@ -27,10 +27,10 @@ sub validate_file {
     die $error if $error;
 
     my ($output);
-    my @cmd = ( $self->ispell_cmd, shellwords( $self->ispell_argv ), "-a" );
+    my @cmd = ( $self->ispell_cmd, shellwords( $self->ispell_argv ), '-a' );
     eval { run3( \@cmd, \$text, \$output, \$error ) };
     $error = $@ if $@;
-    die "error running '" . join( " ", @cmd ) . "': " . $error if $error;
+    die q{error running '} . join( ' ', @cmd ) . q{': } . $error if $error;
 
     my ( @errors, %seen );
     foreach my $line ( split( "\n", $output ) ) {
@@ -38,7 +38,7 @@ sub validate_file {
             if ( !$seen{$original}++ ) {
                 my ($suggestions) = ( $remaining =~ /: (.*)/ );
                 if ( $suggestions && $self->suggest ) {
-                    push( @errors, sprintf( "%s (suggestions: %s)", $original, $suggestions ) );
+                    push( @errors, sprintf( '%s (suggestions: %s)', $original, $suggestions ) );
                 }
                 else {
                     push( @errors, $original );
@@ -65,7 +65,7 @@ Code::TidyAll::Plugin::PodSpell - Use Pod::Spell + ispell with tidyall
 
 =head1 VERSION
 
-version 0.58
+version 0.59
 
 =head1 SYNOPSIS
 

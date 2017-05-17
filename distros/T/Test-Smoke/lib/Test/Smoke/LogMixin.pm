@@ -2,6 +2,8 @@ package Test::Smoke::LogMixin;
 use warnings;
 use strict;
 
+our $VERSION = '0.001';
+
 use Exporter 'import';
 our @EXPORT = qw/verbosity log_warn log_info log_debug/;
 

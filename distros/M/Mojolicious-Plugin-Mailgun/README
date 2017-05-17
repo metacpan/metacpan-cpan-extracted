@@ -1,0 +1,68 @@
+NAME
+    Mojolicious::Plugin::Mailgun - Easy Email sending with mailgun
+
+SYNOPSIS
+      # Mojolicious::Lite
+      plugin 'mailgun' => { mom => {
+        api_key => '123',
+        domain => 'mom.no',
+      }};
+
+      # Mojolicious
+      $self->plugin(mailgun => { mom => {
+        site => {
+          api_key => '123',
+          domain => 'mom.no',
+      }});
+
+      # in controller named params
+      $self->mailgun->send( mom => {
+        recipient => 'pop@pop.com',
+        subject   => 'use Perl or die;'
+        html      => $html,
+        inline    => { file => 'public/file.png' },
+        sub { my $self,$res = shift },  # receives a Mojo::Transaction from mailgun.
+      );
+
+DESCRIPTION
+    Provides a quick and easy way to send email using the Mailgun API with
+    support for multiple user agents.
+
+OPTIONS
+    Mojolicious::Plugin::Mailgun can be provided a hash of mailgun sites
+    with api key and domain, or it can read them directly from
+    $c->config->{mailgun} if not provided at load time.
+
+HELPERS
+    Mojolicious::Plugin::Mailgun implements one helper.
+
+  mailgun->send <$site>, <\%post_options>, <$cb>
+    Send a mail with the mailgun API. This is just a thin wrapper around
+    Mojo::UserAgent to handle authentication settings. See the mailgun
+    sending documentation for more information about the supported arguments
+    to the post_options hash. This API can only be used non-blocking, so the
+    callback is required.
+
+    <https://documentation.mailgun.com/api-sending.html#sending>
+
+METHODS
+    Mojolicious::Plugin::Mailgun inherits all methods from
+    Mojolicious::Plugin and implements the following new ones.
+
+  "register"
+    $plugin->register;
+
+    Register plugin hooks and helpers in Mojolicious application.
+
+SEE ALSO
+    Mojolicious
+
+AUTHOR
+    Marcus Ramberg <mramberg@cpan.org>
+
+COPYRIGHT & LICENSE
+    Copyright (C) 2017 by Marcus Ramberg.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

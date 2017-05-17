@@ -4,7 +4,7 @@ SVG::Sparkline::Cookbook - Performing specific tasks with SVG::Sparklines
 
 =head1 VERSION
 
-This document describes L<SVG::Sparkline> version 0.34.
+This document describes L<SVG::Sparkline> version 1.12.
 
 =head1 INTRODUCTION
 

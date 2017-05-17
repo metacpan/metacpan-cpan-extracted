@@ -97,17 +97,42 @@ subtest '_::const' => sub {
     };
 };
 
+sub _find_tainted_hash_entries {
+    my ($tainted, $untainted, $hash) = @_;
+    for my $key (sort keys %$hash) {
+        if (_::is_tainted $hash->{$key}) {
+            push @$tainted, $key;
+        }
+        else {
+            push @$untainted, $key;
+        }
+    }
+}
+
 subtest '_::is_tainted' => sub {
-    plan tests => 4;
+    plan tests => 5;
 
-    my ($taint_key) = keys %ENV;
-    my $tainted     = $ENV{$taint_key};
     my $untainted   = 42;
+    ok !_::is_tainted $untainted, "untainted variable is untainted";
+    ok !_::is_tainted, "untainted implicit variable is untainted";
 
-    ok _::is_tainted $tainted,    "positive variable";
-    ok !_::is_tainted $untainted, "negative variable";
-    ok _::is_tainted,  "positive implicit argument" for $tainted;
-    ok !_::is_tainted, "negative implicit argument" for $untainted;
+    _find_tainted_hash_entries(
+        \my @tainted_env_keys,
+        \my @untainted_env_keys,
+        \%ENV,
+    );
+
+    ok 0+@tainted_env_keys, "environment variables are tainted"
+        or do {
+            diag("Tainted   ENV variables: [@tainted_env_keys]");
+            diag("Untainted ENV variables: [@untainted_env_keys]");
+        };
+
+    my ($taint_key) = @tainted_env_keys;
+    my $tainted     = $ENV{$taint_key};
+
+    ok _::is_tainted $tainted, "tainted variable is tainted";
+    ok _::is_tainted, "tainted implicit variable is tainted" for $tainted;
 };
 
 subtest '_::alias' => sub {

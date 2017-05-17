@@ -10,9 +10,8 @@ use Renard::Curie::Helper;
 use Renard::Curie::App;
 use Renard::Curie::Component::FileChooser;
 use Test::MockModule;
-use Function::Parameters;
 
-subtest 'Check that the open file dialog with filters is created' => fun {
+subtest 'Check that the open file dialog with filters is created' => sub {
 	my $app = Renard::Curie::App->new;
 	my $file_chooser = Renard::Curie::Component::FileChooser->new( app => $app );
 
@@ -27,7 +26,7 @@ subtest 'Check that the open file dialog with filters is created' => fun {
 		'Has expected filters' );
 };
 
-subtest "Menu: File -> Open" => fun {
+subtest "Menu: File -> Open" => sub {
 	my $pdf_ref_path = try {
 		CurieTestHelper->test_data_directory->child(qw(PDF Adobe pdf_reference_1-7.pdf));
 	} catch {
@@ -36,10 +35,10 @@ subtest "Menu: File -> Open" => fun {
 
 	my $fc = Test::MockModule->new('Gtk3::FileChooserDialog', no_auto => 1);
 	my ($got_file, $destroyed) = (0, 0);
-	$fc->mock( get_filename => fun { $got_file = 1; "$pdf_ref_path" } );
-	$fc->mock( destroy => fun { $destroyed = 1 } );
+	$fc->mock( get_filename => sub { $got_file = 1; "$pdf_ref_path" } );
+	$fc->mock( destroy => sub { $destroyed = 1 } );
 
-	subtest "Accept dialog" => fun {
+	subtest "Accept dialog" => sub {
 		($got_file, $destroyed) = (0, 0);
 		$fc->mock( run => 'accept' );
 
@@ -51,7 +50,7 @@ subtest "Menu: File -> Open" => fun {
 		ok( $destroyed, "Callback destroyed the dialog");
 	};
 
-	subtest "Cancel dialog" => fun {
+	subtest "Cancel dialog" => sub {
 		($got_file, $destroyed) = (0, 0);
 		$fc->mock( run => 'cancel' );
 

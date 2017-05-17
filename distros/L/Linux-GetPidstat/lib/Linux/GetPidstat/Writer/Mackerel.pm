@@ -16,28 +16,44 @@ sub new {
         service_name => $opt{mackerel_service_name},
     );
     $opt{mackerel} = $mackerel;
+    $opt{mackerel_metric_key_prefix} = "" unless defined $opt{mackerel_metric_key_prefix};
 
     bless \%opt, $class;
 }
 
 sub output {
     my ($self, $program_name, $metric_name, $metric) = @_;
-    my $graph_name = "custom.batch_$metric_name.$program_name";
+    my $graph_name = sprintf("custom.%s%s.%s", $self->{mackerel_metric_key_prefix}, $metric_name, $program_name);
 
+    my $metric_type = $self->{mackerel_metric_type};
     if ($self->{dry_run}) {
-        printf "(dry_run) mackerel post: name=%s, time=%s, metric=%s\n",
-            $graph_name, $self->{now}->epoch, $metric;
+        printf "(dry_run) mackerel post: type=%s, name=%s, time=%s, metric=%s\n",
+            $metric_type, $graph_name, $self->{now}->epoch, $metric;
         return;
     }
 
-    my $res = $self->{mackerel}->post_service_metrics([{
-        "name"  => $graph_name,
-        "time"  => $self->{now}->epoch,
-        "value" => $metric,
-    }]);
+    my $res = do {
+        if ($metric_type eq "service") {
+            $self->{mackerel}->post_service_metrics([{
+                "name"  => $graph_name,
+                "time"  => $self->{now}->epoch,
+                "value" => $metric,
+            }]);
+        } elsif ($metric_type eq "host") {
+            $self->{mackerel}->post_host_metrics([{
+                "hostId" => $self->{mackerel_host_id},
+                "name"   => $graph_name,
+                "time"   => $self->{now}->epoch,
+                "value"  => $metric,
+            }]);
+        } else {
+            croak "Invalid metric type of mackerel: type=$metric_type";
+        }
+    };
+
     my $content = eval { decode_json $res; };
     if (chomp $@) {
-        carp "Failed mackerel post service metrics: err=$@, res=$res";
+        carp "Failed mackerel post $metric_type metrics: err=$@, res=$res";
         return;
     }
 
@@ -46,7 +62,7 @@ sub output {
         use Data::Dumper;
         local $Data::Dumper::Terse  = 1;
         local $Data::Dumper::Indent = 0;
-        carp "Failed mackerel post service metrics: res=" . Data::Dumper::Dumper($content);
+        carp "Failed mackerel post $metric_type metrics: res=" . Data::Dumper::Dumper($content);
     }
 }
 
@@ -64,6 +80,7 @@ Linux::GetPidstat::Writer::Mackerel - Write pidstat's results to mackerel
     use Linux::GetPidstat::Writer::Mackerel;
 
     my $instance = Linux::GetPidstat::Writer::Mackerel->new(
+        mackerel_metric_type  => 'service',
         mackerel_api_key      => 'api_key',
         mackerel_service_name => 'service_name',
         now                   => $t,

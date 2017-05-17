@@ -25,7 +25,6 @@ reference/qralg/Makefile
 reference/qralg/README
 reference/qralg/test.f
 reference/qralg/qralg.f
-t/coef.pl
 t/01-option.t
 t/02-limit.t
 t/10-quadratic.t
@@ -34,8 +33,9 @@ t/12-quartic.t
 t/20-poly.t
 t/21-poly.t
 t/22-polyfp.t
-t/23-rootfunc.t
+t/23-polyfp.t
 t/24-varsubst.t
+t/25-rootfunc.t
 t/30-sturm.t
 t/31-sturm.t
 t/32-sturm.t

@@ -23,7 +23,7 @@ BEGIN {
 }
 
 sub skip_interactive {
-  skip "Run 'perl -Mblib t.pl' to perform interactive tests.", 1 if $HARNESS_ACTIVE;
+  skip "!! Run 'perl -Mblib test.pl interactive' to perform interactive tests/demonstrations of the module's abilities.", 1 if $HARNESS_ACTIVE;
 }
 
 sub skip_old_perl {

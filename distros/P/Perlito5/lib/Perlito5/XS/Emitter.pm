@@ -9,60 +9,60 @@ package Perlito5::XS;
         "    " x $level
     }
 
-	my %safe_char = (
-		' ' => 1,
-		'!' => 1,
-		'"' => 1,
-		'#' => 1,
-		'$' => 1,
-		'%' => 1,
-		'&' => 1,
-		'(' => 1,
-		')' => 1,
-		'*' => 1,
-		'+' => 1,
-		',' => 1,
-		'-' => 1,
-		'.' => 1,
-		'/' => 1,
-		':' => 1,
-		';' => 1,
-		'<' => 1,
-		'=' => 1,
-		'>' => 1,
-		'?' => 1,
-		'@' => 1,
-		'[' => 1,
-		']' => 1,
-		'^' => 1,
-		'_' => 1,
-		'`' => 1,
-		'{' => 1,
-		'|' => 1,
-		'}' => 1,
-		'~' => 1,
-	);
+    my %safe_char = (
+        ' ' => 1,
+        '!' => 1,
+        '"' => 1,
+        '#' => 1,
+        '$' => 1,
+        '%' => 1,
+        '&' => 1,
+        '(' => 1,
+        ')' => 1,
+        '*' => 1,
+        '+' => 1,
+        ',' => 1,
+        '-' => 1,
+        '.' => 1,
+        '/' => 1,
+        ':' => 1,
+        ';' => 1,
+        '<' => 1,
+        '=' => 1,
+        '>' => 1,
+        '?' => 1,
+        '@' => 1,
+        '[' => 1,
+        ']' => 1,
+        '^' => 1,
+        '_' => 1,
+        '`' => 1,
+        '{' => 1,
+        '|' => 1,
+        '}' => 1,
+        '~' => 1,
+    );
 
-	sub escape_string {
-		my $s = shift;
-		my $tmp = '';
-		return '""' if $s eq '';
-		for my $i (0 .. length($s) - 1) {
-			my $c = substr($s, $i, 1);
-			if  (  ($c ge 'a' && $c le 'z')
-				|| ($c ge 'A' && $c le 'Z')
-				|| ($c ge '0' && $c le '9')
-				|| exists( $safe_char{$c} )
-				)
-			{
-				$tmp = $tmp . $c;
-			}
-			else {
-				$tmp .= sprintf "\\x%02x", ord($c);
-			}
-		}
-		return "\"$tmp\"";
-	}
+    sub escape_string {
+        my $s = shift;
+        my $tmp = '';
+        return '""' if $s eq '';
+        for my $i (0 .. length($s) - 1) {
+            my $c = substr($s, $i, 1);
+            if  (  ($c ge 'a' && $c le 'z')
+                || ($c ge 'A' && $c le 'Z')
+                || ($c ge '0' && $c le '9')
+                || exists( $safe_char{$c} )
+                )
+            {
+                $tmp = $tmp . $c;
+            }
+            else {
+                $tmp .= sprintf "\\x%02x", ord($c);
+            }
+        }
+        return "\"$tmp\"";
+    }
 
 }
 
@@ -226,7 +226,7 @@ package Perlito5::AST::Var;
            ) 
         {
             return $self->{name};
-	    $self->{sigil} = '*';
+        $self->{sigil} = '*';
             return $self->{sigil} . $ns . $self->{name}
         }
         return $self->{sigil} . "{'" . $ns . $str_name . "'}"
@@ -646,7 +646,7 @@ package Perlito5::AST::Decl;
         my $self = $_[0];
         my $level = $_[1];
 
-	$self->{type} = 'SV *';
+    $self->{type} = 'SV *';
         
         my $decl = $self->{decl};
         my $str =
@@ -671,18 +671,6 @@ package Perlito5::AST::Sub;
           'void ' . $name . "()\n"
         . "PPCODE:\n"
         .   join(";\n", map( Perlito5::XS::tab($level+1) . $_->emit_xs( $level + 1 ), @{$self->{block}} )) . ";\n"
-    }
-}
-
-package Perlito5::AST::Use;
-{
-    sub emit_xs {
-        my $self = shift;
-        my $level = shift;
-        Perlito5::Grammar::Use::emit_time_eval($self);
-
-        return "\n"
-            . Perlito5::XS::tab($level) . "# " . $self->{code} . " " . $self->{mod} . "\n"
     }
 }
 

@@ -1,0 +1,19 @@
+=head1 NAME
+
+ Imgur::API::Endpoint::Misc
+
+=head1 SYNOPSISA
+
+ Odds and ends that are useful but otherwise wtucked into the dark recesses of the API docs
+
+=cut
+
+=head1 METHODS
+ 
+=head2 credits
+
+ Get user/client/post limits for client.
+
+=cut
+
+

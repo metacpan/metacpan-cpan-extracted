@@ -1,11 +1,13 @@
 use Renard::Curie::Setup;
 package Renard::Curie::App;
 # ABSTRACT: A document viewing application
-$Renard::Curie::App::VERSION = '0.001';
+$Renard::Curie::App::VERSION = '0.002';
 use Gtk3 -init;
 use Cairo;
 use Glib::Object::Introspection;
 use Glib 'TRUE', 'FALSE';
+
+use URI::file;
 
 use Moo 2.001001;
 
@@ -19,13 +21,20 @@ use Renard::Curie::Component::FileChooser;
 use Renard::Curie::Component::AccelMap;
 
 use Log::Any::Adapter;
+use MooX::Role::Logger ();
+use Getopt::Long::Descriptive;
 
 use Renard::Curie::Types qw(InstanceOf Path Str DocumentModel);
 use Function::Parameters;
 
+use constant {
+	DND_TARGET_URI_LIST => 0,
+	DND_TARGET_TEXT     => 1,
+};
+
 has window => ( is => 'lazy' );
 
-method _build_window :ReturnType(InstanceOf['Gtk3::Window']) {
+method _build_window() :ReturnType(InstanceOf['Gtk3::Window']) {
 	my $window = $self->builder->get_object('main-window');
 }
 
@@ -85,16 +94,29 @@ method setup_window() {
 	Renard::Curie::Component::AccelMap->new( app => $self );
 }
 
+method setup_dnd() {
+	$self->content_box->drag_dest_set('all', [], 'copy');
+	my $target_list = Gtk3::TargetList->new([
+		Gtk3::TargetEntry->new( 'text/uri-list', 0, DND_TARGET_URI_LIST ),
+		Gtk3::TargetEntry->new( 'text/plain'   , 0, DND_TARGET_TEXT     )
+	]);
+	$self->content_box->drag_dest_set_target_list($target_list);
+
+	$self->content_box->signal_connect('drag-data-received' =>
+		\&on_drag_data_received_cb, $self );
+}
+
 method run() {
 	$self->window->show_all;
 	$self->_logger->info("starting the Gtk main event loop");
 	Gtk3::main;
 }
 
-method BUILD {
+method BUILD(@) {
 	$self->setup_gtk;
 
 	$self->setup_window;
+	$self->setup_dnd;
 
 	$self->window->signal_connect(
 		destroy => \&on_application_quit_cb, $self );
@@ -102,6 +124,25 @@ method BUILD {
 }
 
 method process_arguments() {
+	my ($opt, $usage) = describe_options(
+		"%c %o <filename>",
+		[ 'version',        "print version and exit"                             ],
+		[ 'short-version',  "print just the version number (if exists) and exit" ],
+		[ 'help',           "print usage message and exit"                       ],
+	);
+
+	print($usage->text), exit if $opt->help;
+
+	if($opt->version) {
+		say("Project Renard Curie @{[ _get_version() ]}");
+		say("Distributed under the same terms as Perl 5.");
+		exit;
+	}
+
+	if($opt->short_version) {
+		say(_get_version()), exit
+	}
+
 	my $pdf_filename = shift @ARGV;
 
 	if( $pdf_filename ) {
@@ -110,8 +151,12 @@ method process_arguments() {
 	}
 }
 
-fun main() {
-	my $self = __PACKAGE__->new;
+fun _get_version() :ReturnType(Str) {
+	return $Renard::Curie::App::VERSION // 'dev'
+}
+
+method main() {
+	$self = __PACKAGE__->new unless ref $self;
 	$self->process_arguments;
 	$self->run;
 }
@@ -148,7 +193,7 @@ method open_document( (DocumentModel) $doc ) {
 }
 
 # Callbacks {{{
-fun on_open_file_dialog_cb( $event, $self ) {
+callback on_open_file_dialog_cb( $event, $self ) {
 	my $file_chooser = Renard::Curie::Component::FileChooser->new( app => $self );
 	my $dialog = $file_chooser->get_open_file_dialog_with_filters;
 
@@ -163,8 +208,16 @@ fun on_open_file_dialog_cb( $event, $self ) {
 	}
 }
 
-fun on_application_quit_cb( $event, $self ) {
+callback on_application_quit_cb( $event, $self ) {
 	Gtk3::main_quit;
+}
+
+callback on_drag_data_received_cb( $widget, $context, $x, $y, $data, $info, $time, $app ) {
+	if( $info == DND_TARGET_URI_LIST ) {
+		my @uris = @{ $data->get_uris };
+		my $pdf_filename =  URI->new($uris[0])->file;
+		$app->open_pdf_document( $pdf_filename );
+	}
 }
 # }}}
 
@@ -188,7 +241,7 @@ Renard::Curie::App - A document viewing application
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 EXTENDS
 
@@ -209,6 +262,22 @@ version 0.001
 =item * L<Renard::Curie::Component::Role::UIFileFromPackageName>
 
 =back
+
+=head1 FUNCTIONS
+
+=head2 _get_version
+
+  fun _get_version() :ReturnType(Str)
+
+Returns the version of the application if there is one.
+Otherwise returns the C<Str> C<'dev'> to indicate that this is a
+development version.
+
+=head2 main
+
+  fun main()
+
+Application entry point.
 
 =head1 ATTRIBUTES
 
@@ -253,6 +322,18 @@ two different regions.
 
 The left region contains L</outline> and the right region contains L</page_document_component>.
 
+=head1 CLASS METHODS
+
+=head2 setup_gtk
+
+  classmethod setup_gtk()
+
+Sets up any of the L<Glib::Object::Introspection>-based libraries needed for
+the application.
+
+Currently loads nothing, but will load the Gnome Docking Library (C<libgdl>) in
+the future.
+
 =head1 METHODS
 
 =head2 setup_window
@@ -277,6 +358,12 @@ L</content_box>
 L</log_window>
 
 =back
+
+=head2 setup_dnd
+
+  method setup_dnd()
+
+Setup drag and drop.
 
 =head2 run
 
@@ -308,39 +395,25 @@ Opens a PDF file stored on the disk.
 
 Sets the document for the application's L</page_document_component>.
 
-=head1 CLASS METHODS
-
-=head2 setup_gtk
-
-  classmethod setup_gtk()
-
-Sets up any of the L<Glib::Object::Introspection>-based libraries needed for
-the application.
-
-Currently loads nothing, but will load the Gnome Docking Library (C<libgdl>) in
-the future.
-
-=head1 FUNCTIONS
-
-=head2 main
-
-  fun main()
-
-Application entry point.
-
 =head1 CALLBACKS
 
 =head2 on_open_file_dialog_cb
 
-  fun on_open_file_dialog_cb( $event, $self )
+  callback on_open_file_dialog_cb( $event, $self )
 
 Callback that opens a L<Renard::Curie::Component::FileChooser> component.
 
 =head2 on_application_quit_cb
 
-  fun on_application_quit_cb( $event, $self )
+  callback on_application_quit_cb( $event, $self )
 
 Callback that stops the L<Gtk3> main loop.
+
+=head2 on_drag_data_received_cb
+
+  on_drag_data_received_cb
+
+Whenever the drag and drop data is received by the application.
 
 =for Pod::Coverage has_page_document_component clear_page_document_component
 

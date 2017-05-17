@@ -11,7 +11,7 @@ our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
 use Carp qw/croak/;
 
-our $VERSION = '2.0.10'; # VERSION
+our $VERSION = '2.0.11'; # VERSION
 
 
 # This section should be replaced on-the-fly at build time
@@ -31,7 +31,7 @@ MarpaX::ESLIF::Event::Type - ESLIF Event Types
 
 =head1 VERSION
 
-version 2.0.10
+version 2.0.11
 
 =head1 SYNOPSIS
 

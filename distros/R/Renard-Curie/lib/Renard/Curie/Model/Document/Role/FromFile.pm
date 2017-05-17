@@ -1,7 +1,7 @@
 use Renard::Curie::Setup;
 package Renard::Curie::Model::Document::Role::FromFile;
 # ABSTRACT: Role that provides a filename for a document
-$Renard::Curie::Model::Document::Role::FromFile::VERSION = '0.001';
+$Renard::Curie::Model::Document::Role::FromFile::VERSION = '0.002';
 use Moo::Role;
 use Renard::Curie::Types qw(File);
 
@@ -25,7 +25,7 @@ Renard::Curie::Model::Document::Role::FromFile - Role that provides a filename f
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 ATTRIBUTES
 

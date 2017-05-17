@@ -1,5 +1,12 @@
 Revision history for Map::Tube::CLI
 
+0.26  Tue May 16 10:15:00 2017
+      - Updated test minimum requirement Map::Tube::London v0.83.
+
+0.25  Sun May 14 07:25:00 2017
+      - Added dependency on Map::Tube v3.29 to address test failure.
+        e.g. http://www.cpantesters.org/cpan/report/55997338-100d-11e7-b84f-b08edccf8c31
+
 0.24  Thu Mar 23 13:55:00 2017
       - Tidied up test scripts and removed "-T" switch.
       - Added test for loading package Map::Tube::CLI::Option.

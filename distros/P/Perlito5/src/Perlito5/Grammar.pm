@@ -14,40 +14,51 @@ use Perlito5::Grammar::Attribute;
 use Perlito5::Grammar::Number;
 
 sub word {
-    substr( $_[0], $_[1], 1 ) =~ m/\w/
-    ? {
-        str  => $_[0],
-        from => $_[1],
-        to   => $_[1] + 1,
-      }
-    : 0;
+    my $str = $_[0];
+    my $pos = $_[1];
+    return unless
+           ($str->[$pos] ge "a" && $str->[$pos] le "z")
+        || ($str->[$pos] ge "A" && $str->[$pos] le "Z")
+        || ($str->[$pos] ge "0" && $str->[$pos] le "9")
+        || ($str->[$pos] eq "_");
+    $pos++;
+    return {'str' => $_[0], 'from' => $_[1], 'to' => $pos}
 }
 
 sub ident {
-    return 
-        if substr( $_[0], $_[1], 256 ) !~ m/^([a-zA-Z_]\w*)/;
-    die "Identifier too long"
-        if length($1) > 251;
-    return {
-         str  => $_[0],
-         from => $_[1],
-         to   => $_[1] + length($1),
-       };
+    my $str = $_[0];
+    my $pos = $_[1];
+    return unless
+           ($str->[$pos] ge "a" && $str->[$pos] le "z")
+        || ($str->[$pos] ge "A" && $str->[$pos] le "Z")
+        || ($str->[$pos] eq "_");
+    $pos++;
+    while (
+           ($str->[$pos] ge "a" && $str->[$pos] le "z")
+        || ($str->[$pos] ge "A" && $str->[$pos] le "Z")
+        || ($str->[$pos] ge "0" && $str->[$pos] le "9")
+        || ($str->[$pos] eq "_")
+    ) {
+        $pos++;
+    }
+    ($pos - $_[1]) > 251 && die('Identifier too long');
+    return {'str' => $_[0], 'from' => $_[1], 'to' => $pos}
 }
 
 sub caret_char {
-    my $c = substr( $_[0], $_[1], 1 );
+    my $str = $_[0];
     my $pos = $_[1];
+    my $c = $str->[$pos];
     if ($c eq '^') {
         $pos++;
-        $c = substr( $_[0], $pos, 1 );
+        $c = $str->[$pos];
         return 0 if $c lt 'A' || $c gt 'Z';
         $c = chr( ord($c) - ord("A") + 1 );
     }
     elsif ( Perlito5::Grammar::Space::ws($_[0], $pos) ) {
-        return 0;
+        return;
     }
-    return 0 if $c lt "\cA" || $c gt "\cZ";
+    return if $c lt "\cA" || $c gt "\cZ";
     return {
              str  => $_[0],
              from => $_[1],
@@ -121,15 +132,27 @@ sub opt_continue_block {
 my @PKG;
 sub exp_stmts {
     my $str = $_[0];
-    my $pos = $_[1];
+    my $pos = $_[1] // 0;
+
+    if (!ref($str)) {
+        # exp_stmts optionally accepts a string instead of array-of-chars
+        $str = [ split("", $str) ];
+    }
+
     push @PKG, $Perlito5::PKG_NAME;
  
+    if ($pos == 0) {
+        # possible start of POD
+        my $m = Perlito5::Grammar::Space::start_of_line($str, $pos);
+        $pos = $m->{to};
+    }
+
     my $has_semicolon;  # TODO - use this to help disambiguate: block vs. hash literal
     my @stmts;
     my $m = Perlito5::Grammar::Space::opt_ws($str, $pos);
     $pos = $m->{to};
     while ($m) {
-        if ( substr($str, $pos, 1) eq ';' ) {
+        if ( $str->[$pos] eq ';' ) {
             $has_semicolon = 1;
             $m = Perlito5::Grammar::Space::opt_ws($str, $pos + 1);
             $pos = $m->{to};
@@ -139,7 +162,8 @@ sub exp_stmts {
             if ($m) {
                 push @stmts, $m->{capture};
                 $pos = $m->{to};
-                if ( substr($str, $pos, 1) eq ';' ) {
+                # if ( substr($str, $pos, 1) eq ';' ) {
+                if ( $str->[ $pos ] eq ';' ) {
                     $has_semicolon = 1;
                     $pos = $pos + 1;
                 }

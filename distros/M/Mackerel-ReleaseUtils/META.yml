@@ -27,12 +27,11 @@ no_index:
 provides:
   Mackerel::ReleaseUtils:
     file: lib/Mackerel/ReleaseUtils.pm
-    version: v0.0.1
+    version: v0.1.0
   Mackerel::ReleaseUtils::Log:
     file: lib/Mackerel/ReleaseUtils/Log.pm
 requires:
   File::Which: '0'
-  HTTP::Tinyish: '0'
   Path::Tiny: '0'
   Scope::Guard: '0'
   perl: '5.014'
@@ -40,9 +39,9 @@ resources:
   bugtracker: https://github.com/mackerelio/Mackerel-ReleaseUtils/issues
   homepage: https://github.com/mackerelio/Mackerel-ReleaseUtils
   repository: git://github.com/mackerelio/Mackerel-ReleaseUtils.git
-version: v0.0.1
+version: v0.1.0
 x_authority: cpan:SONGMU
 x_contributors:
+  - 'Shoichi Kaji <skaji@cpan.org>'
   - 'Songmu <y.songmu@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
-x_static_install: 1

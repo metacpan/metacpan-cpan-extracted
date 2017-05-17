@@ -8,7 +8,7 @@ use parent 'Perl::Critic::Policy';
 
 use List::Util 'any';
 
-our $VERSION = '0.019';
+our $VERSION = '0.020';
 
 use constant DESC => 'Using function prototypes';
 use constant EXPL => 'Function prototypes (sub foo ($@) { ... }) will usually not do what you want. Omit the prototype, or use signatures instead.';

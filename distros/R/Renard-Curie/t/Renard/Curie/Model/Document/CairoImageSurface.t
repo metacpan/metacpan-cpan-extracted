@@ -7,9 +7,8 @@ use CurieTestHelper;
 
 use Renard::Curie::Setup;
 use Renard::Curie::Model::Document::CairoImageSurface;
-use Function::Parameters;
 
-subtest 'Cairo document model' => fun {
+subtest 'Cairo document model' => sub {
 	my $cairo_doc = CurieTestHelper->create_cairo_document;
 
 	ok( $cairo_doc, "Cairo document object created successfully" );

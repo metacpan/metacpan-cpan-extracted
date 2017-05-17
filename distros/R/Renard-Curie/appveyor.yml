@@ -19,6 +19,7 @@ install:
   # running under CI
   - set CI_TESTING=1
   - set DEVOPS_BRANCH=master
+  - cinst curl -y
   - 'cd %APPVEYOR_BUILD_FOLDER% & curl -fsS -o appveyor-ci-auto.bat https://raw.githubusercontent.com/project-renard/devops/%DEVOPS_BRANCH%/script/appveyor-ci-auto.bat & appveyor-ci-auto.bat install'
   - 'echo End intall at: & time /t'
 

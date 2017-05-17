@@ -23,7 +23,7 @@ describe 'pool' => sub {
 };
 
 sub _build_pool {
-    ObjectDB::DBHPool->new(dsn => 'dbi:SQLite:dbname=:memory:', @_);
+    ObjectDB::DBHPool->new(dsn => $ENV{TEST_OBJECTDB_DBH} || 'dbi:SQLite:dbname=:memory:', @_);
 }
 
 runtests unless caller;

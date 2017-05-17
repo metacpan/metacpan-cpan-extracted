@@ -1,0 +1,29 @@
+---
+abstract: 'A Moose Role for basic File IO'
+author:
+  - 'Michael T. Wolfinger <michael@wolfinger.eu>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: FileDirUtil
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Basename: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Moose::Util::TypeConstraints: '0'
+  Path::Class::Dir: '0'
+  Path::Class::File: '0'
+  namespace::autoclean: '0'
+version: v0.01
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

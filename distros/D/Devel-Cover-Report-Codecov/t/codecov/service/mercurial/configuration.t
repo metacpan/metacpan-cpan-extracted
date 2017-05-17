@@ -8,6 +8,7 @@ use File::Temp qw/tempdir/;
 use File::Which qw/which/;
 use Cwd::Guard qw/cwd_guard/;
 
+use lib '.';
 use t::Util;
 use Devel::Cover::Report::Codecov::Service::Mercurial;
 

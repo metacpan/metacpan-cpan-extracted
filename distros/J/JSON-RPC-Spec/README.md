@@ -1,24 +1,26 @@
-[![Build Status](https://travis-ci.org/nqounet/p5-json-rpc-spec.svg?branch=master)](https://travis-ci.org/nqounet/p5-json-rpc-spec)
+[![Build Status](https://travis-ci.org/nqounet/p5-json-rpc-spec.svg?branch=master)](https://travis-ci.org/nqounet/p5-json-rpc-spec) [![Coverage Status](http://codecov.io/github/nqounet/p5-json-rpc-spec/coverage.svg?branch=master)](https://codecov.io/github/nqounet/p5-json-rpc-spec?branch=master) [![MetaCPAN Release](https://badge.fury.io/pl/JSON-RPC-Spec.svg)](https://metacpan.org/release/JSON-RPC-Spec)
 # NAME
 
 JSON::RPC::Spec - Yet another JSON-RPC 2.0 Implementation
 
 # SYNOPSIS
 
-    use strict;
-    use JSON::RPC::Spec;
+```perl
+use strict;
+use JSON::RPC::Spec;
 
-    my $rpc = JSON::RPC::Spec->new;
+my $rpc = JSON::RPC::Spec->new;
 
-    # server
-    $rpc->register(echo => sub { $_[0] });
-    print $rpc->parse(
-        '{"jsonrpc": "2.0", "method": "echo", "params": "Hello, World!", "id": 1}'
-    );    # -> {"jsonrpc":"2.0","result":"Hello, World!","id":1}
+# server
+$rpc->register(echo => sub { $_[0] });
+print $rpc->parse(
+    '{"jsonrpc": "2.0", "method": "echo", "params": "Hello, World!", "id": 1}'
+);    # -> {"jsonrpc":"2.0","result":"Hello, World!","id":1}
 
-    # client
-    print $rpc->compose(echo => 'Hello, World!', 1);
-      # -> {"jsonrpc":"2.0","method":"echo","params":"Hello, World!","id":1}
+# client
+print $rpc->compose(echo => 'Hello, World!', 1);
+  # -> {"jsonrpc":"2.0","method":"echo","params":"Hello, World!","id":1}
+```
 
 # DESCRIPTION
 
@@ -44,32 +46,38 @@ options ["coder" in JSON::RPC::Spec::Common](https://metacpan.org/pod/JSON::RPC:
 
 ## register
 
-    # method => code refs
-    use List::Util qw(max);
-    $rpc->register(max => sub { max(@{$_[0]}) });
+```perl
+# method => code refs
+use List::Util qw(max);
+$rpc->register(max => sub { max(@{$_[0]}) });
 
-    # method matching via Router::Simple
-    $rpc->register('myapp.{action}' => sub {
-        my ($params, $match) = @_;
-        my $action = $match->{action};
-        return MyApp->new->$action($params);
-    });
+# method matching via Router::Simple
+$rpc->register('myapp.{action}' => sub {
+    my ($params, $match) = @_;
+    my $action = $match->{action};
+    return MyApp->new->$action($params);
+});
+```
 
 register method.
 
 ## parse
 
-    my $result = $rpc->parse(
-        '{"jsonrpc": "2.0", "method": "max", "params": [9,4,11,0], "id": 1}'
-    );    # returns JSON encoded string -> {"id":1,"result":11,"jsonrpc":"2.0"}
+```perl
+my $result = $rpc->parse(
+    '{"jsonrpc": "2.0", "method": "max", "params": [9,4,11,0], "id": 1}'
+);    # returns JSON encoded string -> {"id":1,"result":11,"jsonrpc":"2.0"}
+```
 
 parse JSON and triggered method. returns JSON encoded string.
 
 ## parse\_without\_encode
 
-    my $result = $rpc->parse_without_encode(
-        '{"jsonrpc": "2.0", "method": "max", "params": [9,4,11,0], "id": 1}'
-    );    # returns hash -> {id => 1, result => 11, jsonrpc => '2.0'}
+```perl
+my $result = $rpc->parse_without_encode(
+    '{"jsonrpc": "2.0", "method": "max", "params": [9,4,11,0], "id": 1}'
+);    # returns hash -> {id => 1, result => 11, jsonrpc => '2.0'}
+```
 
 parse JSON and triggered method. returns HASH.
 
@@ -85,7 +93,9 @@ similar [Router::Simple](https://metacpan.org/pod/Router::Simple).
 
 You can set the `PERL_JSON_RPC_SPEC_DEBUG` environment variable to get some advanced diagnostics information printed to `STDERR`.
 
-    PERL_JSON_RPC_SPEC_DEBUG = 1
+```
+PERL_JSON_RPC_SPEC_DEBUG = 1
+```
 
 # SEE ALSO
 

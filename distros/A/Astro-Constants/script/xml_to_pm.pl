@@ -13,6 +13,7 @@ use XML::LibXML;
 #die "Usage: $0 infile outfile" unless @ARGV == 1;
 
 my ($tagname, );
+my $dzil_methodtag = q{=method};
 
 my $xml = XML::LibXML->load_xml(location => 'data/PhysicalConstants.xml');
 
@@ -84,6 +85,11 @@ for my $constant ( $xml->getElementsByTagName('PhysicalConstant') ) {
 		push @{$tagname->{$category}}, $long_name;
 		push @{$tagname->{$category}}, $alternate if $alternate;
 	}
+
+	my $precision = $constant->getChildrenByTagName('uncertainty')->shift();
+	store_precision($long_name, 
+		$precision->textContent(), 
+		$precision->getAttribute('type'));
 }
 
 write_pod_footer($ac_fh);
@@ -115,26 +121,33 @@ HEADER
 sub write_module_footer {
 	my ($fh, $tags) = @_;
 
+	write_precision($fh);
+
 	print $fh <<FOOT;
 
 # some helper functions
 sub pretty {
 	if (\@_ > 1) {
-		return map { sprintf("\%1.5e", \$_) } \@_;
+		return map { sprintf("\%1.3e", \$_) } \@_;
 	}
-	return sprintf("\%1.5e", shift);
+	return sprintf("\%1.3e", shift);
+}
+
+sub precision {
+	my (\$name, \$type) = \@_;
+	return \$_precision{\$name}->{value};
 }
 
 our \@EXPORT_OK = qw( 
 	@{$tags->{long}}
 	@{$tags->{short}}
-	pretty
+	pretty precision
 );
 
-our \%EXPORT_TAGS = ( 
+our \%EXPORT_TAGS = (
 FOOT
 
-	for my $name (keys $tags) {
+	for my $name (sort keys %{$tags}) {
 		print $fh "\t$name => [qw/ @{$tags->{$name}} /],\n";
 	}
 
@@ -156,7 +169,7 @@ sub write_method_pod {
 
 	say $fh <<"POD";	# writing for Dist::Zilla enhanced Pod
 
-=method $long_name
+$dzil_methodtag $long_name
 
 $display
 $description
@@ -243,17 +256,17 @@ to check your work?
 Nothing is exported by default, so the module doesn't clobber any of your variables.  
 Select from the following tags:
 
-=for :list
-* :long		(use this one to get the most constants)
-* :short
-* :fundamental
-* :conversion
-* :mathematics
-* :cosmology
-* :planetary
-* :electromagnetic
-* :nuclear
-* :alternates
+-=for :list
+-* :long                (use this one to get the most constants)
+-* :short
+-* :fundamental
+-* :conversion
+-* :mathematics
+-* :cosmology
+-* :planetary
+-* :electromagnetic
+-* :nuclear
+-* :alternates
 
 POD
 }
@@ -262,13 +275,20 @@ sub write_pod_footer {
 	my ($fh, ) = @_;
 
 	say $fh <<POD;
-=method pretty
+$dzil_methodtag pretty
 
 This is a helper function that rounds a value or list of values to 5 significant figures.
 
-=method precision
+$dzil_methodtag precision
 
-Currently broken.  It will return in v0.11
+Give this method the string of the constant and it returns the precision or uncertainty
+listed.
+
+  \$rel_precision = precision('GRAVITATIONAL');
+  \$abs_precision = precision('MASS_EARTH');
+
+At the moment you need to know whether the uncertainty is relative or absolute.
+Looking to fix this in future versions.
 
 =head2 Deprecated functions
 
@@ -378,7 +398,9 @@ Doug Burke, for giving me the idea to write this module in the
 first place, tidying up Makefile.PL, testing and improving the
 documentation.
 
+=cut
 
+1;
 POD
 }
 
@@ -387,4 +409,23 @@ sub write_constant {
 
 	say $fh "use constant $long_name => $value;";
 	say $fh "\*$short_name = \\$value;" if $short_name;
+}
+
+my %precision;
+sub store_precision {
+	my ($name, $precision, $type) = @_;
+
+	$precision{$name}->{value} = $precision;
+	$precision{$name}->{type} = $type;
+}
+
+sub write_precision {
+	my ($fh) = @_;
+
+	say $fh "\n", 'my %_precision = (';
+	for my $name (sort keys %precision) {
+		my ($value, $type) = @{$precision{$name}}{qw/value type/};
+		say $fh "\t$name \t=> {value => $value, \ttype => '$type'},"; 
+	}
+	say $fh ');';
 }

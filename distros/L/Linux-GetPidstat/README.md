@@ -91,16 +91,19 @@ Display how to use.
             linux-get-pidstat - command description
               Usage: command [options]
               Options:
-                --pid_dir               A directory path for pid files
-                --res_file              A file path to be stored results
-                --interval              Interval second to be given as a pidstat argument (default:1)
-                --count                 Count number to be given as a pidstat argument (default:60)
-                --dry_run               Dry run mode. not run the side-effects operation (default:1) (--no-dry_run is also supported)
-                --datetime              Datetime (ex. '2016-06-10 00:00:00') to be recorded
-                --include_child         Flag to be enabled to include child process metrics (default:1) (--no-include_child is also suppoted)
-                --max_child_limit       Number to be used for limiting pidstat multi processes (default:30) (skip this limit if 0 is specified)
-                --mackerel_api_key      An api key to be used for posting to mackerel
-                --mackerel_service_name An mackerel service name
+                --pid_dir                     A directory path for pid files
+                --res_file                    A file path to be stored results
+                --interval                    Interval second to be given as a pidstat argument (default:1)
+                --count                       Count number to be given as a pidstat argument (default:60)
+                --dry_run                     Dry run mode. not run the side-effects operation (default:1) (--no-dry_run is also supported)
+                --datetime                    Datetime (ex. '2016-06-10 00:00:00') to be recorded
+                --include_child               Flag to be enabled to include child process metrics (default:1) (--no-include_child is also suppoted)
+                --max_child_limit             Number to be used for limiting pidstat multi processes (default:30) (skip this limit if 0 is specified)
+                --mackerel_metric_type        Metric type of mackerel (default:service) (only use one of 'service' or 'host')
+                --mackerel_api_key            An api key to be used for posting to mackerel
+                --mackerel_service_name       An mackerel service name
+                --mackerel_metric_key_prefix  Key prefix of mackerel metric name (default:batch_)
+                --mackerel_host_id            An mackerel host id
               Requirement Programs: pidstat and pstree commands
 
 # LICENSE

@@ -1,0 +1,377 @@
+=head1 NAME
+
+Imgur::API::Model::GalleryImage
+
+=head1 DESCRIPTION
+
+=over 4
+
+The data model formatted for gallery images.
+
+=back
+
+=cut
+
+=head1 FIELDS
+ 
+=item 
+C<id I<string>>
+
+=over 4
+
+The ID for the image
+
+=back
+
+
+=item 
+C<title I<string>>
+
+=over 4
+
+The title of the image.
+
+=back
+
+
+=item 
+C<description I<string>>
+
+=over 4
+
+Description of the image.
+
+=back
+
+
+=item 
+C<datetime I<integer>>
+
+=over 4
+
+Time inserted into the gallery, epoch time
+
+=back
+
+
+=item 
+C<type I<string>>
+
+=over 4
+
+Image MIME type.
+
+=back
+
+
+=item 
+C<animated I<boolean>>
+
+=over 4
+
+is the image animated
+
+=back
+
+
+=item 
+C<width I<integer>>
+
+=over 4
+
+The width of the image in pixels
+
+=back
+
+
+=item 
+C<height I<integer>>
+
+=over 4
+
+The height of the image in pixels
+
+=back
+
+
+=item 
+C<size I<integer>>
+
+=over 4
+
+The size of the image in bytes
+
+=back
+
+
+=item 
+C<views I<integer>>
+
+=over 4
+
+The number of image views
+
+=back
+
+
+=item 
+C<bandwidth I<integer>>
+
+=over 4
+
+Bandwidth consumed by the image in bytes
+
+=back
+
+
+=item 
+C<deletehash I<string>>
+
+=over 4
+
+OPTIONAL, the deletehash, if you're logged in as the image owner
+
+=back
+
+
+=item 
+C<link I<string>>
+
+=over 4
+
+The direct link to the the image. (Note: if fetching an animated GIF that was over 20MB in original size, a .gif thumbnail will be returned)
+
+=back
+
+
+=item 
+C<gifv I<string>>
+
+=over 4
+
+OPTIONAL, The .gifv link. Only available if the image is animated and type is 'image/gif'.
+
+=back
+
+
+=item 
+C<mp4 I<string>>
+
+=over 4
+
+OPTIONAL, The direct link to the .mp4. Only available if the image is animated and type is 'image/gif'.
+
+=back
+
+
+=item 
+C<mp4_size I<integer>>
+
+=over 4
+
+OPTIONAL, The Content-Length of the .mp4. Only available if the image is animated and type is 'image/gif'. Note that a zero value (0) is possible if the video has not yet been generated
+
+=back
+
+
+=item 
+C<looping I<boolean>>
+
+=over 4
+
+OPTIONAL, Whether the image has a looping animation. Only available if the image is animated and type is 'image/gif'.
+
+=back
+
+
+=item 
+C<vote I<string>>
+
+=over 4
+
+The current user's vote on the album. null if not signed in or if the user hasn't voted on it.
+
+=back
+
+
+=item 
+C<favorite I<boolean>>
+
+=over 4
+
+Indicates if the current user favorited the image. Defaults to false if not signed in.
+
+=back
+
+
+=item 
+C<nsfw I<boolean>>
+
+=over 4
+
+Indicates if the image has been marked as nsfw or not. Defaults to null if information is not available.
+
+=back
+
+
+=item 
+C<comment_count I<int>>
+
+=over 4
+
+Number of comments on the gallery image.
+
+=back
+
+
+=item 
+C<topic I<string>>
+
+=over 4
+
+Topic of the gallery image.
+
+=back
+
+
+=item 
+C<topic_id I<integer>>
+
+=over 4
+
+Topic ID of the gallery image.
+
+=back
+
+
+=item 
+C<section I<string>>
+
+=over 4
+
+If the image has been categorized by our backend then this will contain the section the image belongs in. (funny, cats, adviceanimals, wtf, etc)
+
+=back
+
+
+=item 
+C<account_url I<string>>
+
+=over 4
+
+The username of the account that uploaded it, or null.
+
+=back
+
+
+=item 
+C<account_id I<integer>>
+
+=over 4
+
+The account ID of the account that uploaded it, or null.
+
+=back
+
+
+=item 
+C<ups I<integer>>
+
+=over 4
+
+Upvotes for the image
+
+=back
+
+
+=item 
+C<downs I<integer>>
+
+=over 4
+
+Number of downvotes for the image
+
+=back
+
+
+=item 
+C<points I<integer>>
+
+=over 4
+
+Upvotes minus downvotes
+
+=back
+
+
+=item 
+C<score I<integer>>
+
+=over 4
+
+Imgur popularity score
+
+=back
+
+
+=item 
+C<is_album I<boolean>>
+
+=over 4
+
+If it's an album or not
+
+=back
+
+
+=item 
+C<in_most_viral I<boolean>>
+
+=over 4
+
+Indicates if the image is in the most viral gallery or not.
+
+=back
+
+
+
+=head1 EXAMPLE
+
+
+ {
+   "success" : true,
+   "status" : 200,
+   "data" : {
+      "views" : 625622,
+      "vote" : null,
+      "animated" : false,
+      "is_album" : false,
+      "datetime" : 1349051625,
+      "account_id" : 384077,
+      "score" : 18935622,
+      "width" : 2490,
+      "height" : 3025,
+      "account_url" : "saponifi3d",
+      "ups" : 1889,
+      "title" : "My most recent drawing. Spent over 100 hours. I'm pretty proud of it.",
+      "comment_count" : 10,
+      "size" : 618969,
+      "type" : "image/jpeg",
+      "downs" : 58,
+      "points" : 1831,
+      "bandwidth" : 387240623718,
+      "id" : "OUHDm",
+      "section" : "pics",
+      "description" : null
+   }
+}
+
+
+
+=cut
+
+=head1 SEE ALSO
+
+http://api.imgur.com/models/galleryimage
+
+

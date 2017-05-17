@@ -93,13 +93,12 @@ t/backend_ini_with_section_map.t
 t/backend_mgr.t
 t/backend_multiple.t
 t/backend_plainfile.t
-t/big_model.pm
+t/backend_yaml.t
 t/check_list.t
 t/check_list_warp.t
 t/cme-function.t
 t/describe_node.t
 t/dump_as_data.t
-t/dump_load_model.pm
 t/dump_tree.t
 t/fuse_ui.t
 t/gen-class-doc.t
@@ -110,7 +109,11 @@ t/hash_with_data_migration.t
 t/include.t
 t/instance.t
 t/iterator.t
+t/lib/Config/Model/models/Master.pl
 t/lib/DummyNode.pm
+t/lib/dump_load_model.pm
+t/lib/test_ini_backend_model.pl
+t/lib/test_yaml_model.pl
 t/load.t
 t/load_model_snippets.t
 t/model.t
@@ -126,6 +129,8 @@ t/model_tests.d/backend-plainfile-examples/with-index/debian/foo.install.list
 t/model_tests.d/backend-plainfile-test-conf.pl
 t/model_tests.d/backend-shellvar-examples/debian-719256
 t/model_tests.d/backend-shellvar-test-conf.pl
+t/model_tests.d/backend-yaml-data-examples/basic
+t/model_tests.d/backend-yaml-data-test-conf.pl
 t/model_tests.d/backend-yaml-examples/basic
 t/model_tests.d/backend-yaml-test-conf.pl
 t/model_tests.d/fstab-examples/t0
@@ -162,8 +167,6 @@ t/search_in_tree.t
 t/simple_ui.t
 t/smooth_upgrade.t
 t/term_ui.t
-t/test_ini_backend_model.pl
-t/test_yaml_model.pl
 t/value.t
 t/value_compute.t
 t/value_refer_to.t
@@ -172,5 +175,4 @@ t/warped_id.t
 t/warped_node.t
 t/warped_node_collateral.t
 t/warped_value.t
-t/yaml_backend.t
 weaver.ini

@@ -1,5 +1,6 @@
 requires "HTTP::Tiny" => "0";
 requires "Try::Tiny" => "0";
+requires "URI" => "0";
 requires "URI::Escape::XS" => "0";
 requires "XML::Parser" => "0";
 requires "XML::Simple" => "0";

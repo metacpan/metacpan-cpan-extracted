@@ -4,7 +4,7 @@
     "email": "garu@cpan.org"
   },
   "environment": {
-    "reporter": "rawsender 1.0",
+    "user_agent": "rawsender 1.0",
     "language": {
       "name": "Perl 5",
       "version": "5.24.1",
@@ -32,10 +32,9 @@
       }
     }
   },
-  "distribution": {
-    "name": "Data-Printer",
-    "version": "0.39",
-    "grade": "PASS",
+  "result": {
+    "grade": "pass",
+    "comments": "This is a static push of a valid report so we can test the new CPAN Testers API",
     "tests": 453,
     "failures": 0,
     "skipped": 2,
@@ -47,7 +46,11 @@
       "build": "cp lib/Data/Printer/Filter/DateTime.pm blib/lib/Data/Printer/Filter/DateTime.pm\n cp lib/Data/Printer/Filter/DB.pm blib/lib/Data/Printer/Filter/DB.pm\n cp lib/Data/Printer.pm blib/lib/Data/Printer.pm\n cp lib/Data/Printer/Filter/Digest.pm blib/lib/Data/Printer/Filter/Digest.pm\n cp lib/Data/Printer/Filter.pm blib/lib/Data/Printer/Filter.pm\n cp lib/DDP.pm blib/lib/DDP.pm\n Manifying 6 pod documents",
       "test": "PERL_DL_NONLAZY=1 \"/Users/garu/.plenv/versions/5.24.1/bin/perl5.24.1\" \"-MExtUtils::Command::MM\" \"-MTest::Harness\" \"-e\" \"undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')\" t/*.t t/00-load.t ................. # Beginning Data::Printer tests in darwin with Perl 5.024001, /Users/garu/.plenv/versions/5.24.1/bin/perl5.24.1\n t/00-load.t ................. 1/1 # Testing Data::Printer 0.39\n t/00-load.t ................. ok\n t/00.2-begin_load.t ......... ok\n t/01-p.t .................... ok\n t/02-colors.t ............... ok\n t/02.2-autocolor.t .......... skipped: IO::Pty::Easy required for auto-colored tests\n t/03-conf.t ................. ok\n t/03-conf_not_ref.t ......... ok\n t/04-multiline.t ............ ok\n t/04-multiline2.t ........... ok\n t/05-obj.t .................. ok\n t/06-obj2.t ................. ok\n t/07-sort.t ................. ok\n t/08-deparse.t .............. ok\n t/09-alias.t ................ ok\n t/10-filter.t ............... ok\n t/11-aliased_with_filter.t .. ok\n t/12-filter_class.t ......... ok\n t/13-filter_datetime.t ...... ok\n t/13.2-filter_db.t .......... 1/? DBIx::Class::Storage::DBI::_warn_undetermined_driver(): This version of DBIC does not yet seem to supply a driver for your particular RDBMS and/or connection method ('DBM'). While we will attempt to continue anyway, the results are likely to be underwhelming. Please upgrade DBIC, and if this message does not go away, file a bugreport including the following info:\n {\n DBD => \"DBD::DBM\",\n DBD_VER => \"0.08\",\n DBIC_DRIVER => \"DBIx::Class::Storage::DBI\",\n DBIC_DSN => \"dbi:DBM(RaiseError=1):\",\n DBIC_VER => \"0.082840\",\n DBI_VER => \"1.636\"\n }\n t/13.2-filter_db.t .......... ok\n t/13.3-filter_digest.t ...... ok\n t/14-local_conf.t ........... ok\n t/15-rc_file.t .............. ok\n t/16-rc_file2.t ............. ok\n t/16.2-rc_overwrite.t ....... ok\n t/16.3-rc_env.t ............. ok\n t/16.4-rc_env2.t ............ ok\n t/16.5-rc_env3.t ............ ok\n t/17-parallel.t ............. ok\n t/18-class_method.t ......... ok\n t/19-tied.t ................. ok\n t/20-handles.t .............. ok\n t/21-ddp.t .................. ok\n t/22-class_method.t ......... ok\n t/23-caller_info.t .......... ok\n t/24-no_prototypes.t ........ ok\n t/25-weak.t ................. ok\n t/26-tainted.t .............. ok\n t/26.2-tainted_rc.t ......... *** WARNING *** taint mode on: skipping rc file '/tmp/YU_XhWUCAT/my_home/.dataprinter'.\n t/26.2-tainted_rc.t ......... ok\n t/26.7-unicode.t ............ ok\n t/27-pass_through.t ......... ok\n t/27.2-pass_through.t ....... ok\n t/27.3-pass_through-DDP.t ... ok\n t/27.4-pass_through-DDP.t ... ok\n t/28-void_return.t .......... ok\n t/29-output.t ............... ok\n t/30-print_escapes.t ........ ok\n t/31-bad_parameters.t ....... ok\n t/32-quote_keys.t ........... ok\n t/33-end_separator.t ........ ok\n t/33-separator.t ............ ok\n t/34-show_readonly.t ........ ok\n t/35-vstrings.t ............. ok\n t/36-valign.t ............... ok\n t/37-format.t ............... ok\n t/38-lvalue.t ............... ok\n t/39-seen_override.t ........ ok\n t/40-escape_chars.t ......... ok\n t/41-yaml.t ................. skipped: YAML::Syck not found.\n t/42-alignment.t ............ ok\n t/43-_is_number.t ........... ok\n t/44-number-colors.t ........ ok\n t/45-np.t ................... ok\n All tests successful.\n Files=62, Tests=453,  8 wallclock secs ( 0.30 usr  0.20 sys +  6.20 cusr  0.87 csys =  7.57 CPU)\n Result: PASS",
       "install": "Manifying 6 pod documents\n Installing /Users/garu/.plenv/versions/5.24.1/lib/perl5/site_perl/5.24.1/Data/Printer.pm\n Installing /Users/garu/.plenv/versions/5.24.1/lib/perl5/site_perl/5.24.1/Data/Printer/Filter.pm\n Installing /Users/garu/.plenv/versions/5.24.1/man/man3/Data::Printer.3\n Installing /Users/garu/.plenv/versions/5.24.1/man/man3/Data::Printer::Filter.3\n Installing /Users/garu/.plenv/versions/5.24.1/man/man3/Data::Printer::Filter::DB.3\n Appending installation info to /Users/garu/.plenv/versions/5.24.1/lib/perl5/5.24.1/darwin-2level/perllocal.pod"
-    },
+    }
+  },
+  "distribution": {
+    "name": "Data-Printer",
+    "version": "0.39",
     "prerequisites": [
         { "phase": "test_requires", "name": "Test::More", "need": "0.88", "have": "1.302078" },
         { "phase": "requires", "name": "Term::ANSIColor", "need": "3.0",  "have": "4.04"     },
@@ -62,6 +65,5 @@
         { "phase": "requires", "name": "File::Temp",      "need": "0",    "have": "0.2304"   },
         { "phase": "requires", "name": "Fcntl",           "need": "0",    "have": "1.13"     }
     ]
-  },
-  "comments": "This is a static push of a valid report so we can test the new CPAN Testers API"
+  }
 }

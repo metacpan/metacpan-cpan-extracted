@@ -1,3 +1,7 @@
+0.001004 2017-06-13T23:34+01:00
+ - Fix greetings in Dutch
+   (patch applied in 2015, never released)
+
 0.001003 2015-02-21T23:23+02:00
  - Add more greetings
  - Add perlcritic tests and make code compliant

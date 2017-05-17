@@ -1,7 +1,7 @@
 use Renard::Curie::Setup;
 package Renard::Curie::Model::Outline;
 # ABSTRACT: Model that represents a document outline
-$Renard::Curie::Model::Outline::VERSION = '0.001';
+$Renard::Curie::Model::Outline::VERSION = '0.002';
 use Moo;
 use Renard::Curie::Types qw(
 	ArrayRef Dict
@@ -49,7 +49,7 @@ has tree_store => (
 );
 
 
-method _build_tree_store {
+method _build_tree_store() {
 	# load Gtk3 dynamically if used outside Gtk3 context
 	require Gtk3;
 	Gtk3->import(qw(-init));
@@ -104,7 +104,7 @@ Renard::Curie::Model::Outline - Model that represents a document outline
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 EXTENDS
 

@@ -64,7 +64,7 @@
    "provides" : {
       "Linux::GetPidstat" : {
          "file" : "lib/Linux/GetPidstat.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Linux::GetPidstat::Collector" : {
          "file" : "lib/Linux/GetPidstat/Collector.pm"
@@ -96,5 +96,8 @@
          "web" : "https://github.com/yoheimuta/Linux-GetPidstat"
       }
    },
-   "version" : "0.03"
+   "version" : "0.04",
+   "x_contributors" : [
+      "Makoto Sasaki <wanigoya@gmail.com>"
+   ]
 }

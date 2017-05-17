@@ -4,6 +4,8 @@ plan skip_all => 'mysql_install_db not found'
 use strict;
 use warnings;
 
+use FindBin;
+use lib "$FindBin::RealBin/../";
 use t::Util;
 
 my $out = run_test({

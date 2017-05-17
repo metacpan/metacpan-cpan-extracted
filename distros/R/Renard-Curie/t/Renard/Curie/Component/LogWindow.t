@@ -6,13 +6,12 @@ use lib 't/lib';
 use CurieTestHelper;
 
 use Renard::Curie::Setup;
-use Function::Parameters;
 use Glib 'TRUE', 'FALSE';
 use Renard::Curie::App;
 
 use Log::Any qw($log);
 
-subtest "Check log buffer" => fun {
+subtest "Check log buffer" => sub {
 	plan tests => 3;
 	my $app = Renard::Curie::App->new;
 

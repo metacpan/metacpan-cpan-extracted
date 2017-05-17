@@ -3,6 +3,8 @@ package Perlito5::Grammar::Block;
 
 use Perlito5::Grammar::Expression;
 use Perlito5::Grammar::Scope;
+use Perlito5::AST::BeginScratchpad;
+use Perlito5::AST::Captures;
 use strict;
 
 our %Named_block = (
@@ -20,7 +22,7 @@ sub block {
     my $pos = $_[1];
     my $m = Perlito5::Grammar::Space::opt_ws($str, $pos);
     $pos = $m->{to};
-    if ( substr($str, $pos, 1) ne '{' ) {
+    if ( $str->[$pos] ne '{' ) {
         return
     }
     $pos++;
@@ -38,7 +40,41 @@ sub block {
     my $capture = Perlito5::Match::flat($m);
     $m = Perlito5::Grammar::Space::opt_ws($str, $pos);
     $pos = $m->{to};
-    if ( substr($str, $pos, 1) ne '}' ) {
+    if ( $str->[$pos] ne '}' ) {
+        Perlito5::Compiler::error "syntax error";
+    }
+    $m->{to} = $pos + 1;
+    $m->{capture} = Perlito5::AST::Block->new( stmts => $capture, sig => undef );
+    # end of lexical scope
+    Perlito5::Grammar::Scope::end_compile_time_scope();
+    return $m;
+}
+
+sub closure_block {
+    my $str = $_[0];
+    my $pos = $_[1];
+    my $m = Perlito5::Grammar::Space::opt_ws($str, $pos);
+    $pos = $m->{to};
+    if ( $str->[$pos] ne '{' ) {
+        return
+    }
+    $pos++;
+
+    # when parsing a command like "for my $x ..." register the loop variable
+    # before entering the block, so that it can be seen immediately
+    Perlito5::Grammar::Scope::check_variable_declarations();
+    Perlito5::Grammar::Scope::create_new_compile_time_scope();
+    local $Perlito5::CLOSURE_SCOPE = $Perlito5::SCOPE;  # this is the only diff from plain <block>
+
+    $m = Perlito5::Grammar::exp_stmts($str, $pos);
+    if (!$m) {
+        Perlito5::Compiler::error "syntax error";
+    }
+    $pos = $m->{to};
+    my $capture = Perlito5::Match::flat($m);
+    $m = Perlito5::Grammar::Space::opt_ws($str, $pos);
+    $pos = $m->{to};
+    if ( $str->[$pos] ne '}' ) {
         Perlito5::Compiler::error "syntax error";
     }
     $m->{to} = $pos + 1;
@@ -53,18 +89,19 @@ sub eval_end_block {
     # without access to compile-time lexical variables.
     # compile-time globals are still a problem.
     my ($block, $phase) = @_;
-    local $@;
-    my @data = $block->emit_perl5();
-    my $out = [];
-    Perlito5::Perl5::PrettyPrinter::pretty_print( \@data, 0, $out );
-    my $code = "package $Perlito5::PKG_NAME;\n"
-             . "sub " . join( '', @$out ) . "\n";
-    # say "END block: $code";
 
-    # we add some extra information to the data, to make things more "dumpable"
-    eval Perlito5::CompileTime::Dumper::generate_eval_string( $code )
-    # eval "{ $code }; 1"
-    or Perlito5::Compiler::error "Error in $phase block: " . $@;
+    $block = Perlito5::AST::Block->new(
+        stmts => [
+            Perlito5::AST::Sub->new(
+                'attributes' => [],
+                'block'      => $block,
+                'name'       => undef,
+                'namespace'  => $Perlito5::PKG_NAME,
+                'sig'        => undef,
+            )
+        ]
+    );
+    return Perlito5::Grammar::Block::eval_begin_block($block, 'BEGIN');  
 }
 
 sub eval_begin_block {
@@ -72,21 +109,40 @@ sub eval_begin_block {
     # without access to compile-time lexical variables.
     # compile-time globals are still a problem.
     my $block = shift;
-    local $@;
-    my @data = $block->emit_perl5();
-    my $out = [];
-    Perlito5::Perl5::PrettyPrinter::pretty_print( \@data, 0, $out );
-    my $code = "package $Perlito5::PKG_NAME;\n"
-             . join( '', @$out ) . "; 1\n";
-    # say "BEGIN block: $code";
-
     local ${^GLOBAL_PHASE};
     Perlito5::set_global_phase("BEGIN");
-    # eval-string inside BEGIN block
-    # we add some extra information to the data, to make things more "dumpable"
-    eval Perlito5::CompileTime::Dumper::generate_eval_string( $code )
-    # eval "{ $code }; 1"
-    or Perlito5::Compiler::error "Error in BEGIN block: " . $@;
+
+    # get list of captured variables, including inner blocks
+    my @captured = $block->get_captures();
+    my %dont_capture = map { $_->{dont} ? ( $_->{dont} => 1 ) : () } @captured;
+    my %capture = map { $_->{dont} ? ()
+                      : $dont_capture{ $_->{_id} } ? ()
+                      : ($_->{_decl} eq 'local' || $_->{_decl} eq 'global' || $_->{_decl} eq 'our' || $_->{_decl} eq '') ? ()
+                      : ( $_->{_id} => $_ )
+                      } @captured;
+
+    # print STDERR "CAPTURES ", Data::Dumper::Dumper(\%capture);
+
+    # %capture == (
+    #     '100' => ...,
+    #     '101' => ...,,
+    # )
+    %Perlito5::BEGIN_SCRATCHPAD = ( %Perlito5::BEGIN_SCRATCHPAD, %capture );
+
+    # use lexicals from BEGIN scratchpad
+    $block = $block->emit_begin_scratchpad();
+
+    # emit_compile_time() adds instrumentation to inspect captured variables
+    $block = $block->emit_compile_time();
+
+    local $@;
+    my $result = Perlito5::eval_ast($block);
+    if ($@) {
+        Perlito5::Compiler::error "Error in BEGIN block: " . $@;
+    }
+
+    # "use MODULE" wants a true return value
+    return $result;
 }
 
 token opt_continue_block {
@@ -131,10 +187,10 @@ sub anon_block {
     return $m;
 }
 
-sub ast_undef {
+sub ast_nop {
     Perlito5::AST::Apply->new(
-        code => 'undef',
-        namespace => '',
+        code => 'nop',
+        namespace => 'Perlito5',
         arguments => []
     );
 }
@@ -154,7 +210,7 @@ sub special_named_block {
     $p = $ws->{to};
 
     my $block_start = $p;
-    my $m = Perlito5::Grammar::block( $str, $p );
+    my $m = Perlito5::Grammar::Block::closure_block( $str, $p );
     return if !$m;
     $p = $m->{to};
     my $block = Perlito5::Match::flat($m);
@@ -165,36 +221,44 @@ sub special_named_block {
   
     if ($block_name eq 'INIT') {
         push @Perlito5::INIT_BLOCK, eval_end_block( $block, 'INIT' );
-        $m->{capture} = ast_undef();
+        $m->{capture} = ast_nop();
     }
     elsif ($block_name eq 'END') {
         unshift @Perlito5::END_BLOCK, eval_end_block( $block, 'END' );
-        $m->{capture} = ast_undef();
+        $m->{capture} = ast_nop();
     }
     elsif ($block_name eq 'CHECK') {
         unshift @Perlito5::CHECK_BLOCK, eval_end_block( $block, 'CHECK' );
-        $m->{capture} = ast_undef();
+        $m->{capture} = ast_nop();
     }
     elsif ($block_name eq 'UNITCHECK') {
         unshift @Perlito5::UNITCHECK_BLOCK, eval_end_block( $block, 'UNITCHECK' );
-        $m->{capture} = ast_undef();
+        $m->{capture} = ast_nop();
     }
     elsif ($block_name eq 'BEGIN') {
         # say "BEGIN $block_start ", $m->{to}, "[", substr($str, $block_start, $m->{to} - $block_start), "]";
         # local $Perlito5::PKG_NAME = $Perlito5::PKG_NAME;  # BUG - this doesn't work
         local $Perlito5::PHASE = 'BEGIN';
         eval_begin_block( $block );
-        $m->{capture} = ast_undef();
+        $m->{capture} = ast_nop();
     }
     elsif ($block_name eq 'AUTOLOAD' || $block_name eq 'DESTROY') {
-        $m->{capture} = 
-            Perlito5::AST::Sub->new(
-                'attributes' => [],
-                'block' => $block,
-                'name' => $block_name,
-                'namespace' => $Perlito5::PKG_NAME,
-                'sig' => undef,
-            );
+        my $sub = Perlito5::AST::Sub->new(
+            'attributes' => [],
+            'block'      => $block,
+            'name'       => $block_name,
+            'namespace'  => $Perlito5::PKG_NAME,
+            'sig'        => undef,
+        );
+        # add named sub to SCOPE
+        my $full_name = $sub->{namespace} . "::" . $sub->{name};
+        $Perlito5::PROTO->{$full_name} = undef;
+        $Perlito5::GLOBAL->{$full_name} = $sub;
+        # evaluate the sub definition in a BEGIN block
+        $block = Perlito5::AST::Block->new( stmts => [$sub] );
+        Perlito5::Grammar::Block::eval_begin_block($block, 'BEGIN');  
+        # runtime effect of subroutine declaration is "undef"
+        $m->{capture} = ast_nop();
     }
     else {
         $m->{capture} = $block;
@@ -208,9 +272,9 @@ token named_sub_def {
     <Perlito5::Grammar::Block::prototype_> <.Perlito5::Grammar::Space::opt_ws>
     <Perlito5::Grammar::Attribute::opt_attribute> <.Perlito5::Grammar::Space::opt_ws>
     [
-        <Perlito5::Grammar::block>
+        <Perlito5::Grammar::Block::closure_block>
         {
-            $MATCH->{_tmp} = Perlito5::Match::flat($MATCH->{"Perlito5::Grammar::block"});
+            $MATCH->{_tmp} = Perlito5::Match::flat($MATCH->{"Perlito5::Grammar::Block::closure_block"});
         }
     |
         <.Perlito5::Grammar::Statement::statement_parse>
@@ -252,13 +316,6 @@ token named_sub_def {
             #     if exists $Perlito5::PROTO->{$full_name};
 
             $Perlito5::PROTO->{$full_name} = $sig;  # TODO - cleanup - replace $PROTO with prototype()
-            # if (!exists(&{$full_name})) {
-            #     # make sure the prototype exists at compile-time
-            #     my $sub = defined($sig)
-            #             ? eval "sub ($sig) { }"
-            #             : eval "sub { }";
-            #     *{$full_name} = $sub;
-            # }
 
             if ($MATCH->{_tmp}) {
                 my $block = $Perlito5::SCOPE->{block}[-1];
@@ -274,21 +331,29 @@ token named_sub_def {
             attributes => $attributes,
         );
 
-        if ($ENV{PERLITO5DEV}) {
+        if ( $Perlito5::EXPAND_USE ) {
+            # normal compiler (not "bootstrapping")
+
+            # evaluate the sub definition in a BEGIN block
+
+            my $block = Perlito5::AST::Block->new( stmts => [$sub] );
+            Perlito5::Grammar::Block::eval_begin_block($block, 'BEGIN');  
+
             if ($name) {
                 # add named sub to SCOPE
                 my $full_name = "${namespace}::$name";
                 $Perlito5::GLOBAL->{$full_name} = $sub;
                 # runtime effect of subroutine declaration is "undef"
-                $sub = Perlito5::AST::Apply->new(
-                    code      => 'undef',
-                    namespace => '',
-                    arguments => []
-                );
+                $sub = ast_nop();
             }
-        }
 
-        $MATCH->{capture} = $sub;
+            $MATCH->{capture} = $sub;
+        }
+        else {
+            # bootstrapping mode
+            # the subroutine AST is directly added to the global AST
+            $MATCH->{capture} = $sub;
+        }
     }
 };
 
@@ -297,7 +362,7 @@ sub named_sub {
     my $pos = $_[1];
 
     return
-        unless substr($str, $pos, 3) eq 'sub';
+        unless $str->[$pos] eq 's' && $str->[$pos+1] eq 'u' && $str->[$pos+2] eq 'b';
     my $ws = Perlito5::Grammar::Space::ws( $str, $pos + 3 );
     return
         unless $ws;
@@ -331,7 +396,7 @@ token term_do {
 };
 
 token args_sig {
-    [ ';' | '\\' | '[' | ']' | '*' | '+' | '@' | '%' | '$' | '&' ]*
+    [ ';' | \\ | '[' | ']' | '*' | '+' | '@' | '%' | '$' | '&' ]*
 };
 
 token prototype_ {
@@ -345,7 +410,7 @@ token prototype_ {
 token anon_sub_def {
     <prototype_> <.Perlito5::Grammar::Space::opt_ws> 
     <Perlito5::Grammar::Attribute::opt_attribute>
-    <Perlito5::Grammar::block>
+    <Perlito5::Grammar::Block::closure_block>
     {
         my $sig  = Perlito5::Match::flat($MATCH->{prototype_});
         $sig = undef if $sig eq '*undef*';
@@ -361,7 +426,7 @@ token anon_sub_def {
             name  => undef, 
             namespace => undef,
             sig   => $sig, 
-            block => Perlito5::Match::flat($MATCH->{'Perlito5::Grammar::block'}),
+            block => Perlito5::Match::flat($MATCH->{'Perlito5::Grammar::Block::closure_block'}),
             attributes => $attributes,
         ) 
     }

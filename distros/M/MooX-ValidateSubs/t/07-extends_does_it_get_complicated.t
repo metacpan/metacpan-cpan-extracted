@@ -205,12 +205,12 @@ is_deeply(\%list3, {
 my $six = One::Two::Three::Six->new();
 eval { $six->hash( three => 'ahhhh' ) };
 my $errors = $@;
-like( $errors, qr/Error in params - An illegal passed key - four -/, "four is currently not a valid param");
+like( $errors, qr/Unrecognized parameter: four/, "four is currently not a valid param");
 
 my $seven = One::Two::Three::Seven->new();
 eval { $seven->hash( three => 'ahhhh' ) };
-$errors = $@;
-like( $errors, qr/Error in params - An illegal passed key - four -/, "four is currently not a valid param");
+my $errores = $@;
+like( $errores, qr/Unrecognized parameter: four/, "four is currently not a valid param");
 
 my $eight = One::Two::Three::Eight->new();
 my %list8 = $eight->hash( three => 'ahhhh' );

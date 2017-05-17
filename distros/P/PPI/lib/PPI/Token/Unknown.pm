@@ -33,7 +33,7 @@ use PPI::Exception ();
 
 use vars qw{$VERSION @ISA $CURLY_SYMBOL};
 BEGIN {
-	$VERSION = '1.220';
+	$VERSION = '1.224';
 	@ISA     = 'PPI::Token';
 	$CURLY_SYMBOL = qr{\G\^[[:upper:]_]\w+\}};
 }
@@ -46,17 +46,23 @@ BEGIN {
 # Tokenizer Methods
 
 sub __TOKENIZER__on_char {
-	my $t    = $_[1];                                      # Tokenizer object
+	my ( $self, $t ) = @_;                                 # Self and Tokenizer
 	my $c    = $t->{token}->{content};                     # Current token
 	my $char = substr( $t->{line}, $t->{line_cursor}, 1 ); # Current character
 
 	# Now, we split on the different values of the current content
 	if ( $c eq '*' ) {
-		if ( $char =~ /(?:(?!\d)\w|\:)/ ) {
+		# Is it a number?
+		if ( $char =~ /\d/ ) {
+			# bitwise operator
+			$t->{class} = $t->{token}->set_class( 'Operator' );
+			return $t->_finalize_token->__TOKENIZER__on_char( $t );
+		}
+
+		if ( $char =~ /[\w:]/ ) {
 			# Symbol (unless the thing before it is a number
-			my $tokens = $t->_previous_significant_tokens(1);
-			my $p0     = $tokens->[0];
-			if ( $p0 and ! $p0->isa('PPI::Token::Number') ) {
+			my ( $prev ) = $t->_previous_significant_tokens(1);
+			if ( not $prev or not $prev->isa('PPI::Token::Number') ) {
 				$t->{class} = $t->{token}->set_class( 'Symbol' );
 				return 1;
 			}
@@ -69,46 +75,7 @@ sub __TOKENIZER__on_char {
 				# control-character symbol (e.g. *{^_Foo})
 				$t->{class} = $t->{token}->set_class( 'Magic' );
 				return 1;
-			} else {
-				# Obvious GLOB cast
-				$t->{class} = $t->{token}->set_class( 'Cast' );
-				return $t->_finalize_token->__TOKENIZER__on_char( $t );
 			}
-		}
-
-		if ( $char eq '$' ) {
-			# Operator/operand-sensitive, multiple or GLOB cast
-			my $_class;
-			my $tokens = $t->_previous_significant_tokens(1);
-			my $p0     = $tokens->[0];
-			if ( $p0 ) {
-				# Is it a token or a number
-				if ( $p0->isa('PPI::Token::Symbol') ) {
-					$_class = 'Operator';
-				} elsif ( $p0->isa('PPI::Token::Number') ) {
-					$_class = 'Operator';
-				} elsif (
-					$p0->isa('PPI::Token::Structure')
-					and
-					$p0->content =~ /^(?:\)|\])$/
-				) {
-					$_class = 'Operator';
-				} else {
-					### This is pretty weak, there's
-					### room for a dozen more tests
-					### before going with a default.
-					### Or even better, a proper
-					### operator/operand method :(
-					$_class = 'Cast';
-				}
-			} else {
-				# Nothing before it, must be glob cast
-				$_class = 'Cast';
-			}
-
-			# Set class and rerun
-			$t->{class} = $t->{token}->set_class( $_class );
-			return $t->_finalize_token->__TOKENIZER__on_char( $t );
 		}
 
 		if ( $char eq '*' || $char eq '=' ) {
@@ -116,6 +83,8 @@ sub __TOKENIZER__on_char {
 			$t->{class} = $t->{token}->set_class( 'Operator' );
 			return 1;
 		}
+
+		return $self->_as_cast_or_op($t) if $self->_is_cast_or_op($char);
 
 		$t->{class} = $t->{token}->set_class( 'Operator' );
 		return $t->_finalize_token->__TOKENIZER__on_char( $t );
@@ -183,7 +152,7 @@ sub __TOKENIZER__on_char {
 	} elsif ( $c eq '%' ) {
 		# Is it a number?
 		if ( $char =~ /\d/ ) {
-			# This is %2 (modulus number)
+			# bitwise operator
 			$t->{class} = $t->{token}->set_class( 'Operator' );
 			return $t->_finalize_token->__TOKENIZER__on_char( $t );
 		}
@@ -194,28 +163,26 @@ sub __TOKENIZER__on_char {
 			return 1;
 		}
 
-		# Is it a symbol?
 		if ( $char =~ /[\w:]/ ) {
-			$t->{class} = $t->{token}->set_class( 'Symbol' );
-			return 1;
+			# Symbol (unless the thing before it is a number
+			my ( $prev ) = $t->_previous_significant_tokens(1);
+			if ( not $prev or not $prev->isa('PPI::Token::Number') ) {
+				$t->{class} = $t->{token}->set_class( 'Symbol' );
+				return 1;
+			}
 		}
 
 		if ( $char eq '{' ) {
 			# Get rest of line
 			pos $t->{line} = $t->{line_cursor} + 1;
 			if ( $t->{line} =~ m/$CURLY_SYMBOL/gc ) {
-				# control-character symbol (e.g. @{^_Foo})
+				# control-character symbol (e.g. %{^_Foo})
 				$t->{class} = $t->{token}->set_class( 'Magic' );
 				return 1;
 			}
 		}
 
-		if ( $char =~ /[\$@%*{]/ ) {
-			# It's a cast
-			$t->{class} = $t->{token}->set_class( 'Cast' );
-			return $t->_finalize_token->__TOKENIZER__on_char( $t );
-
-		}
+		return $self->_as_cast_or_op($t) if $self->_is_cast_or_op($char);
 
 		# Probably the mod operator
 		$t->{class} = $t->{token}->set_class( 'Operator' );
@@ -226,22 +193,21 @@ sub __TOKENIZER__on_char {
 	} elsif ( $c eq '&' ) {
 		# Is it a number?
 		if ( $char =~ /\d/ ) {
-			# This is &2 (bitwise-and number)
+			# bitwise operator
 			$t->{class} = $t->{token}->set_class( 'Operator' );
 			return $t->_finalize_token->__TOKENIZER__on_char( $t );
 		}
 
-		# Is it a symbol
 		if ( $char =~ /[\w:]/ ) {
-			$t->{class} = $t->{token}->set_class( 'Symbol' );
-			return 1;
+			# Symbol (unless the thing before it is a number
+			my ( $prev ) = $t->_previous_significant_tokens(1);
+			if ( not $prev or not $prev->isa('PPI::Token::Number') ) {
+				$t->{class} = $t->{token}->set_class( 'Symbol' );
+				return 1;
+			}
 		}
 
-		if ( $char =~ /[\$@%{]/ ) {
-			# The ampersand is a cast
-			$t->{class} = $t->{token}->set_class( 'Cast' );
-			return $t->_finalize_token->__TOKENIZER__on_char( $t );
-		}
+		return $self->_as_cast_or_op($t) if $self->_is_cast_or_op($char);
 
 		# Probably the binary and operator
 		$t->{class} = $t->{token}->set_class( 'Operator' );
@@ -283,14 +249,14 @@ sub __TOKENIZER__on_char {
 		# Now, : acts very very differently in different contexts.
 		# Mainly, we need to find out if this is a subroutine attribute.
 		# We'll leave a hint in the token to indicate that, if it is.
-		if ( $_[0]->__TOKENIZER__is_an_attribute( $t ) ) {
+		if ( $self->__TOKENIZER__is_an_attribute( $t ) ) {
 			# This : is an attribute indicator
 			$t->{class} = $t->{token}->set_class( 'Operator' );
 			$t->{token}->{_attribute} = 1;
 			return $t->_finalize_token->__TOKENIZER__on_char( $t );
 		}
 
-		# It MIGHT be a label, but its probably the ?: trinary operator
+		# It MIGHT be a label, but it's probably the ?: trinary operator
 		$t->{class} = $t->{token}->set_class( 'Operator' );
 		return $t->{class}->__TOKENIZER__on_char( $t );
 	}
@@ -299,11 +265,103 @@ sub __TOKENIZER__on_char {
 	PPI::Exception->throw('Unknown value in PPI::Token::Unknown token');
 }
 
+sub _is_cast_or_op {
+	my ( $self, $char ) = @_;
+	return 1 if $char eq '$';
+	return 1 if $char eq '@';
+	return 1 if $char eq '%';
+	return 1 if $char eq '*';
+	return 1 if $char eq '{';
+	return;
+}
+
+sub _as_cast_or_op {
+	my ( $self, $t ) = @_;
+	my $class = _cast_or_op( $t );
+	$t->{class} = $t->{token}->set_class( $class );
+	return $t->_finalize_token->__TOKENIZER__on_char( $t );
+}
+
+sub _prev_significant_w_cursor {
+	my ( $tokens, $cursor, $extra_check ) = @_;
+	while ( $cursor >= 0 ) {
+		my $token = $tokens->[ $cursor-- ];
+		next if !$token->significant;
+		next if $extra_check and !$extra_check->($token);
+		return ( $token, $cursor );
+	}
+	return ( undef, $cursor );
+}
+
+# Operator/operand-sensitive, multiple or GLOB cast
+sub _cast_or_op {
+	my ( $t ) = @_;
+
+	my $tokens = $t->{tokens};
+	my $cursor = scalar( @$tokens ) - 1;
+	my $token;
+
+	( $token, $cursor ) = _prev_significant_w_cursor( $tokens, $cursor );
+	return 'Cast' if !$token;    # token was first in the document
+
+	if ( $token->isa( 'PPI::Token::Structure' ) and $token->content eq '}' ) {
+
+		# Scan the token stream backwards an arbitrarily long way,
+		# looking for the matching opening curly brace.
+		my $structure_depth = 1;
+		( $token, $cursor ) = _prev_significant_w_cursor(
+			$tokens, $cursor,
+			sub {
+				my ( $token ) = @_;
+				return if !$token->isa( 'PPI::Token::Structure' );
+				if ( $token eq '}' ) {
+					$structure_depth++;
+					return;
+				}
+				if ( $token eq '{' ) {
+					$structure_depth--;
+					return if $structure_depth;
+				}
+				return 1;
+			}
+		);
+		return 'Operator' if !$token;    # no matching '{', probably an unbalanced '}'
+
+		# Scan past any whitespace
+		( $token, $cursor ) = _prev_significant_w_cursor( $tokens, $cursor );
+		return 'Operator' if !$token;                             # Document began with what must be a hash constructor.
+		return 'Operator' if $token->isa( 'PPI::Token::Symbol' ); # subscript
+
+		my %meth_or_subscript_end = map { $_ => 1 } qw@ -> } ] @;
+		return 'Operator' if $meth_or_subscript_end{ $token->content };    # subscript
+
+		my $content = $token->content;
+		my $produces_or_wants_value =
+		  ( $token->isa( 'PPI::Token::Word' ) and ( $content eq 'do' or $content eq 'eval' ) );
+		return $produces_or_wants_value ? 'Operator' : 'Cast';
+	}
+
+	my %list_start_or_term_end = map { $_ => 1 } qw@ ; ( { [ @;
+	return 'Cast'
+	  if $token->isa( 'PPI::Token::Structure' ) and $list_start_or_term_end{ $token->content }
+	  or $token->isa( 'PPI::Token::Cast' )
+	  or $token->isa( 'PPI::Token::Operator' )
+	  or $token->isa( 'PPI::Token::Label' );
+
+	return 'Operator' if !$token->isa( 'PPI::Token::Word' );
+
+	( $token, $cursor ) = _prev_significant_w_cursor( $tokens, $cursor );
+	return 'Cast' if !$token || $token->content ne '->';
+
+	return 'Operator';
+}
+
 # Are we at a location where a ':' would indicate a subroutine attribute
 sub __TOKENIZER__is_an_attribute {
 	my $t      = $_[1]; # Tokenizer object
-	my $tokens = $t->_previous_significant_tokens(3);
-	my $p0     = $tokens->[0];
+	my @tokens = $t->_previous_significant_tokens(3);
+	my $p0     = $tokens[0];
+	return '' if not $p0;
 
 	# If we just had another attribute, we are also an attribute
 	return 1 if $p0->isa('PPI::Token::Attribute');
@@ -320,13 +378,17 @@ sub __TOKENIZER__is_an_attribute {
 	}
 
 	# Or, we could be a named subroutine
-	my $p1 = $tokens->[1];
-	my $p2 = $tokens->[2];
+	my $p1 = $tokens[1];
+	my $p2 = $tokens[2];
 	if (
+		$p1
+		and
 		$p1->isa('PPI::Token::Word')
 		and
 		$p1->content eq 'sub'
 		and (
+			not $p2
+			or
 			$p2->isa('PPI::Token::Structure')
 			or (
 				$p2->isa('PPI::Token::Whitespace')

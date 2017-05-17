@@ -3,19 +3,13 @@
 # Load ALL of the PPI files, lex them in, dump them
 # out, and verify that the code goes in and out cleanly.
 
-use strict;
-BEGIN {
-	no warnings 'once';
-	$| = 1;
-	$PPI::XS_DISABLE = 1;
-	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
-}
+use lib 't/lib';
+use PPI::Test::pragmas;
 use Test::More; # Plan comes later
-use Test::NoWarnings;
+
 use File::Spec::Functions ':ALL';
 use PPI;
-
-
+use PPI::Test 'find_files';
 
 
 
@@ -26,7 +20,7 @@ use PPI;
 my %tests = map { $_ => $INC{$_} } grep { ! /\bXS\.pm/ } grep { /^PPI\b/ } keys %INC;
 my @files = sort values %tests;
 unless ( @files ) {
-	Test::More::plan( tests => 2 );
+	Test::More::plan( tests => ($ENV{AUTHOR_TESTING} ? 1 : 0) + 1 );
 	ok( undef, "Failed to find any files to test" );
 	exit();
 }
@@ -48,7 +42,7 @@ foreach my $dir (
 push @files, find_files( 't' );
 
 # Declare our plan
-Test::More::plan( tests => 1 + scalar(@files) * 9 );
+Test::More::plan( tests => ($ENV{AUTHOR_TESTING} ? 1 : 0) + scalar(@files) * 9 );
 
 
 
@@ -103,18 +97,4 @@ sub roundtrip_ok {
 				"$file: Contains no PPI::Statement::Unknown elements" );
 		}
 	}	
-}
-
-# Find file names in named t/data dirs
-sub find_files {
-	my $testdir  = shift;
-	
-	# Does the test directory exist?
-	-e $testdir and -d $testdir and -r $testdir or die "Failed to find test directory $testdir";
-	
-	# Find the .code test files
-	opendir( TESTDIR, $testdir ) or die "opendir: $!";
-	my @perl = map { catfile( $testdir, $_ ) } sort grep { /\.(?:code|pm|t)$/ } readdir(TESTDIR);
-	closedir( TESTDIR ) or die "closedir: $!";
-	return @perl;
 }

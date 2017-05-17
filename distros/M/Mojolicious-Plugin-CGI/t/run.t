@@ -1,10 +1,11 @@
+use lib '.';
 use t::Helper;
 
 use Mojolicious::Lite;
 
 plugin CGI => {
   route => '/',
-  run => sub {
+  run   => sub {
     print "HTTP/1.1 200 OK\r\n";
     print "Content-Type: text/html; charset=ISO-8859-1\r\n";
     print "\r\n";

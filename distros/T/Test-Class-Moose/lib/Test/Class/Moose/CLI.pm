@@ -4,7 +4,7 @@ package Test::Class::Moose::CLI;
 
 use 5.10.0;
 
-our $VERSION = '0.83';
+our $VERSION = '0.84';
 
 use Moose 2.0000;
 use Carp;
@@ -28,7 +28,7 @@ Test::Class::Moose::CLI - Use this in your tcm.t script for a drop-in runner too
 
 =head1 VERSION
 
-version 0.83
+version 0.84
 
 =head1 SYNOPSIS
 
@@ -82,9 +82,13 @@ method matching these tags will be run.
 The name of one or more test method tags that you want to exclude. Any test
 methods matching these tags will be ignored.
 
+=head2 --parallel-progress and --no-parallel-progress
+
+Show a progress indicator when running tests in parallel. Defaults to true.
+
 =head2 --color and --no-color
 
-Enable/disable color output. Defaults to true.
+Enable/disable color for the parallel progress output. Defaults to true.
 
 =head2 --jobs
 

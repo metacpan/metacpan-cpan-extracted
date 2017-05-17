@@ -1,5 +1,5 @@
 package Dist::Zooky::DistIni::Resources;
-$Dist::Zooky::DistIni::Resources::VERSION = '0.22';
+$Dist::Zooky::DistIni::Resources::VERSION = '0.24';
 # ABSTRACT: Dist::Zooky DistIni plugin to write MetaResources
 
 use strict;
@@ -47,7 +47,7 @@ Dist::Zooky::DistIni::Resources - Dist::Zooky DistIni plugin to write MetaResour
 
 =head1 VERSION
 
-version 0.22
+version 0.24
 
 =head1 METHODS
 

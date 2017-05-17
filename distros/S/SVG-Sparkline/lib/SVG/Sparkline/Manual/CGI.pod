@@ -4,7 +4,7 @@ sparkline.cgi - CGI script for generating SVG-based sparklines
 
 =head1 VERSION
 
-This document describes sparkline.cgi version 0.34
+This document describes sparkline.cgi version 1.12
 
 =head1 SYNOPSIS
 

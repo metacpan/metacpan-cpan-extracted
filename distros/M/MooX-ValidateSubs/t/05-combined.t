@@ -59,6 +59,6 @@ is_deeply(\%over, {
 
 eval { $maybe->hash( three => 'cannot be set' ) };
 my $errors = $@;
-like( $errors, qr/Error in params - An illegal passed key - three/, "a list fails");
+like( $errors, qr/Unrecognized parameter: three/, "a list fails");
 
 done_testing();

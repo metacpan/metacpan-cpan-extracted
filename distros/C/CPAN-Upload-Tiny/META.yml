@@ -19,7 +19,7 @@ name: CPAN-Upload-Tiny
 provides:
   CPAN::Upload::Tiny:
     file: lib/CPAN/Upload/Tiny.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Carp: '0'
   File::Basename: '0'
@@ -36,7 +36,8 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Upload-Tiny
   repository: git://github.com/Leont/cpan-upload-tiny.git
-version: '0.003'
+version: '0.004'
 x_contributors:
   - 'Leon Timmermans <fawaka@gmail.com>'
+  - 'Shoichi Kaji <skaji@cpan.org>'
 x_serialization_backend: 'YAML::Tiny version 1.69'

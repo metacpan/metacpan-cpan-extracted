@@ -1,7 +1,7 @@
 use Renard::Curie::Setup;
 package Renard::Curie::Types;
 # ABSTRACT: Type library
-$Renard::Curie::Types::VERSION = '0.001';
+$Renard::Curie::Types::VERSION = '0.002';
 use Type::Library 0.008 -base,
 	-declare => [qw(
 		DocumentModel
@@ -13,7 +13,7 @@ use Type::Utils -all;
 # Listed here so that scan-perl-deps can find them
 use Types::Path::Tiny      ();
 use Types::Standard        ();
-use Types::Common::Numeric qw(PositiveInt PositiveOrZeroInt);
+use Types::Common::Numeric qw(PositiveInt PositiveOrZeroInt PositiveNum);
 
 use Type::Libraries;
 Type::Libraries->setup_class(
@@ -39,6 +39,8 @@ declare "PageNumber", parent => PositiveInt;
 
 declare "LaxPageNumber", parent => PositiveOrZeroInt;
 
+declare "ZoomLevel", parent => PositiveNum;
+
 1;
 
 __END__
@@ -53,7 +55,7 @@ Renard::Curie::Types - Type library
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 EXTENDS
 
@@ -89,6 +91,26 @@ An alias to L<PositiveInt> that can be used for document page number semantics.
 
 An alias to L<PositiveOrZeroInt> that can be used for document page number
 semantics when the source data may contain invalid pages.
+
+=head2 ZoomLevel
+
+The amount to zoom in on a page. This is a multiplier such that
+
+=over 4
+
+=item *
+
+when the value is C<1.0>, the page area is the standard area
+
+=item *
+
+when the value is C<2.0>, the page is C<4> times the standard area
+
+=item *
+
+when the value is C<0.5>, the page is C<0.25> times the standard area
+
+=back
 
 =head1 TYPE LIBRARIES
 

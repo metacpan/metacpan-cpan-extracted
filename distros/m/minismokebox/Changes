@@ -1,6 +1,21 @@
 ==================================================
-Changes from 2012-04-11 00:00:00 +0000 to present.
+Changes from 2012-05-17 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 0.68 at 2017-05-16 18:32:51 +0000
+-----------------------------------------
+
+  Change: a5d51104e28a2588ceff61ab82c69ba3f68f006c
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-05-16 19:32:51 +0000
+
+    Fix missing test dependency
+
+    YAML::Syck was a hidden test prereq that was usually pulled in by
+    CPAN::Recent::Uploads as a prereq of PoCo-Smokebox-Recent
+
+    Switch to YAML::XS and make it an explicit Test prereq 
 
 -----------------------------------------
 version 0.66 at 2017-04-10 19:35:27 +0000
@@ -63,5 +78,5 @@ version 0.56 at 2013-04-13 15:47:12 +0000
     Require unless and use it. Add minismokebox.pm and move docs to there 
 
 =================================================
-Plus 19 releases after 2012-04-11 00:00:00 +0000.
+Plus 19 releases after 2012-05-17 00:00:00 +0000.
 =================================================

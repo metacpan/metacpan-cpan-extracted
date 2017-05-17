@@ -1,6 +1,11 @@
 Changelog for MarpaX-ESLIF
 
-2.0.10 2017-05-12T18:45:56
+2.0.11 2017-05-13T22:32:00
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Fix version in CMakeLists.txt, version 2.0.11 [ci skip]
+ - Exception handling fix, version 2.0.10
+
+2.0.10 2017-05-12T18:45:56Z
  [Jean-Damien Durand <jeandamiendurand@free.fr>]
  - src/marpaESLIF.c: better traces, fixed  comment saying that // is never
    regonizeed as a valid regexp [ci skip]

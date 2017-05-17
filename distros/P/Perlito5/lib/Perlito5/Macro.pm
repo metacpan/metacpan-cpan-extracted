@@ -321,7 +321,7 @@ sub flatten {
 #
 # Find a state variable declaration in the AST subtree rooted at
 # $node.  @rules is a *list* of Perlito5::TreeGrammar rules (and not a
-# single monotlithic rule tree) required to reach $node.
+# single monolithic rule tree) required to reach $node.
 #
 # If a state variable declaration/initialization expression is found,
 # this function returns the state decl node and the rule list required
@@ -385,11 +385,7 @@ sub while_file {
                 'arguments' => [
                     bless({
                         'arguments' => [
-                            Perlito5::AST::Var->new(
-                                'name' => '_',
-                                'namespace' => '',
-                                'sigil' => '$',
-                            ),
+                            Perlito5::AST::Var::SCALAR_ARG(),
                             $cond,
                         ],
                         'code' => 'infix:<=>',
@@ -403,6 +399,107 @@ sub while_file {
         return $self;
     }
     return 0;
+}
+
+sub _insert_return_in_block {
+    my ($self, $tag) = @_;
+    my $body = $self->{$tag};
+    if (!$body) {
+        $body = Perlito5::AST::Block->new(
+                    stmts => [
+                        Perlito5::AST::Apply->new(
+                            'arguments' => [],
+                            'code' => 'return',
+                            'namespace' => '',
+                        ),
+                    ],
+                );
+    }
+    elsif (ref($body) ne 'Perlito5::AST::Block') {
+        # TODO
+    }
+    elsif (@{$body->{stmts}} == 0) {
+        push @{$body->{stmts}},
+                        Perlito5::AST::Apply->new(
+                            'arguments' => [],
+                            'code' => 'return',
+                            'namespace' => '',
+                        );
+    }
+    else {
+        my $last_statement = $body->{stmts}[-1];
+        if ($last_statement->isa('Perlito5::AST::If')) {
+            Perlito5::Macro::insert_return_in_if($last_statement);
+        }
+    }
+    $self->{$tag} = $body;
+}
+
+sub insert_return_in_if {
+    my $self = $_[0];
+    return 0
+        if ref($self) ne 'Perlito5::AST::If';
+    _insert_return_in_block($self, 'body');
+    _insert_return_in_block($self, 'otherwise');
+}
+
+# sub split_deep_if {
+#     my $stmt = $_[0];
+# 
+#     if (ref($stmt) eq 'Perlito5::AST::If' && $stmt->{otherwise} && $stmt->{otherwise}->isa('Perlito5::AST::Block')) {
+#         # if ... else if ...
+#         my $stmts = $stmt->{otherwise}{stmts};
+#         my $v = $stmts;
+#         if ($stmts && @$stmts == 1) {
+#             my $stmt = $stmts->[0];
+#             if (ref($stmt) eq 'Perlito5::AST::If' && $stmt->{otherwise} && $stmt->{otherwise}->isa('Perlito5::AST::Block')) {
+#                 # if ... else if ...
+#                 ### my $stmts = $stmt->{otherwise}{stmts};
+#                 ### if ($stmts && @$stmts == 1) {
+#                 ###     my $stmt = $stmts->[0];
+#                 ###     if (ref($stmt) eq 'Perlito5::AST::If' && $stmt->{otherwise} && $stmt->{otherwise}->isa('Perlito5::AST::Block')) {
+#                 ###         # if ... else if ...
+#                         my $stmts = $stmt->{otherwise}{stmts};
+# 
+#                         if ($stmts && @$stmts == 1) {
+#                             my $stmt = $v->[0];
+#                             $v->[0] = 
+#                                 Perlito5::AST::Apply->new(
+#                                     'arguments' => [
+#                                         Perlito5::AST::Block->new(
+#                                             'stmts' => [ $stmt ],
+#                                         ),
+#                                     ],
+#                                     'code' => 'do',
+#                                 );
+#                         }
+#                 ###     }
+#                 ### }
+#             }
+#         }
+#     }
+# }
+ 
+sub split_code_too_large {
+    # work around Java "Code too large" error
+    my @stmts = @_;
+    # for my $stmt (@stmts) {
+    #     split_deep_if($stmt);   # find deep nested ifs
+    # }
+    while (@stmts > 20) {
+        # print STDERR "Code too large, split ", scalar(@stmts), " nodes\n";
+        my @do = splice(@stmts, -15, 15);
+        push @stmts,
+            Perlito5::AST::Apply->new(
+                'arguments' => [
+                    Perlito5::AST::Block->new(
+                        'stmts' => \@do,
+                    ),
+                ],
+                'code' => 'do',
+            );
+    }
+    return @stmts;
 }
 
 1;

@@ -1,14 +1,26 @@
 package Pcore::App::Controller::API;
 
-use Pcore -role, -result;
+use Pcore -role, -result, -const;
 use Pcore::Util::Data qw[from_json to_json from_cbor to_cbor from_uri_query];
 use Pcore::WebSocket;
 
 with qw[Pcore::App::Controller];
 
-sub run ( $self, $req ) {
+const our $WS_MAX_MESSAGE_SIZE => 1_024 * 1_024 * 100;    # 100 Mb
+const our $WS_PONG_INTERVAL    => 50;
+const our $WS_COMPRESSION      => 0;
 
-    # WebSocket connect handler
+const our $TRANS_TYPE_RPC       => 'rpc';
+const our $TRANS_TYPE_EXCEPTION => 'exception';
+
+sub run ( $self, $req ) {
+    if ( $req->{path_tail} ) {
+        $req->(404)->finish;
+
+        return;
+    }
+
+    # WebSocket API request
     if ( $req->is_websocket_connect_request ) {
         Pcore::WebSocket->accept_ws(
             'pcore', $req,
@@ -18,34 +30,27 @@ sub run ( $self, $req ) {
                 $req->authenticate(
                     sub ( $auth ) {
 
-                        # token authentication error
-                        if ( !$auth ) {
-                            $reject->($auth);
-                        }
-                        else {
+                        # token authenticated successfully, store token in websocket connection object
+                        $ws->{auth} = $auth;
 
-                            # token authenticated successfully, store token in websocket connection object
-                            $ws->{auth} = $auth;
-
-                            # accept websocket connection
-                            $accept->(
-                                {   max_message_size   => 1_024 * 1_024 * 100,     # 100 Mb
-                                    pong_timeout       => 50,
-                                    permessage_deflate => 0,
-                                    on_disconnect      => sub ( $ws, $status ) {
-                                        return;
-                                    },
-                                    on_rpc_call => sub ( $ws, $req, $method, $args = undef ) {
-                                        $ws->{auth}->api_call_arrayref( undef, $method, $args, $req );
-
-                                        return;
-                                    }
+                        # accept websocket connection
+                        $accept->(
+                            {   max_message_size => $WS_MAX_MESSAGE_SIZE,
+                                pong_interval    => $WS_PONG_INTERVAL,
+                                compression      => $WS_COMPRESSION,
+                                on_disconnect    => sub ( $ws, $status ) {
+                                    return;
                                 },
-                                headers        => undef,
-                                before_connect => undef,
-                                on_connect     => undef,
-                            );
-                        }
+                                on_rpc_call => sub ( $ws, $req, $trans ) {
+                                    $ws->{auth}->api_call_arrayref( $trans->{method}, $trans->{data}, $req );
+
+                                    return;
+                                }
+                            },
+                            headers        => undef,
+                            before_connect => undef,
+                            on_connect     => undef,
+                        );
 
                         return;
                     }
@@ -54,185 +59,172 @@ sub run ( $self, $req ) {
                 return;
             },
         );
-
-        return;
     }
 
-    if ( $req->{path_tail} ) {
-        $req->(404)->finish;
-
-        return;
-    }
-
-    my $env = $req->{env};
-
-    my $msg;
-
-    my $CBOR = 0;
-
-    # decode API request
-    if ( !$env->{CONTENT_TYPE} || $env->{CONTENT_TYPE} =~ m[\bapplication/json\b]smi ) {
-        $msg = eval { from_json $req->body };
-
-        # content decode error
-        if ($@) {
-            $req->( [ 400, q[Error decoding JSON request body] ] )->finish;
-
-            return;
-        }
-    }
-
-    elsif ( $env->{CONTENT_TYPE} =~ m[\bapplication/cbor\b]smi ) {
-        $msg = eval { from_cbor $req->body };
-
-        # content decode error
-        if ($@) {
-            $req->( [ 400, q[Error decoding JSON request body] ] )->finish;
-
-            return;
-        }
-
-        $CBOR = 1;
-    }
-
-    # invalid content type
+    # HTTP API request
     else {
-        $req->(415)->finish;
+        my $env = $req->{env};
 
-        return;
-    }
+        my $msg;
 
-    # authenticate request
-    $req->authenticate(
-        sub ( $auth ) {
+        my $CBOR = 0;
 
-            # this is app connection, disabled
-            if ( $auth->{is_app} ) {
-                $req->( [ 403, q[App must connect via WebSocket interface] ] )->finish;
+        # decode API request
+        if ( !$env->{CONTENT_TYPE} || $env->{CONTENT_TYPE} =~ m[\bapplication/json\b]smi ) {
+            $msg = eval { from_json $req->body };
+
+            # content decode error
+            if ($@) {
+                $req->( [ 400, q[Error decoding JSON request body] ] )->finish;
+
+                return;
             }
-            else {
-                $msg = [$msg] if ref $msg ne 'ARRAY';
+        }
 
-                my ( $response, @headers );
+        elsif ( $env->{CONTENT_TYPE} =~ m[\bapplication/cbor\b]smi ) {
+            $msg = eval { from_cbor $req->body };
 
-                my $cv = AE::cv sub {
-                    if ($CBOR) {
+            # content decode error
+            if ($@) {
+                $req->( [ 400, q[Error decoding JSON request body] ] )->finish;
 
-                        # add Content-Type header
-                        push @headers, ( 'Content-Type' => 'application/cbor' );
+                return;
+            }
 
-                        # write HTTP response
-                        $req->( 200, \@headers, to_cbor $response )->finish;
-                    }
-                    else {
+            $CBOR = 1;
+        }
 
-                        # add Content-Type header
-                        push @headers, ( 'Content-Type' => 'application/json' );
+        # invalid content type
+        else {
+            $req->(415)->finish;
 
-                        # write HTTP response
-                        $req->( 200, \@headers, to_json $response)->finish;
-                    }
+            return;
+        }
 
-                    # free HTTP request object
-                    undef $req;
+        # authenticate request
+        $req->authenticate(
+            sub ( $auth ) {
 
-                    return;
-                };
-
-                $cv->begin;
-
-                for my $tx ( $msg->@* ) {
-
-                    # check message type
-                    # only rpc calls are enabled via HTTP interface
-                    if ( $tx->{type} && $tx->{type} ne 'rpc' ) {
-                        push $response->@*,
-                          { tid     => $tx->{tid},
-                            type    => 'exception',
-                            message => {
-                                status => 400,
-                                reason => 'Invalid API request type',
-                            },
-                          };
-
-                        next;
-                    }
-
-                    # method is not specified, this is callback, not supported in API server
-                    if ( !$tx->{method} ) {
-                        push $response->@*,
-                          { tid     => $tx->{tid},
-                            type    => 'exception',
-                            message => {
-                                status => 400,
-                                reason => 'Method is required',
-                            },
-                          };
-
-                        next;
-                    }
-
-                    $cv->begin;
-
-                    # combine method with action
-                    my $method_id = $tx->{action} ? q[/] . ( $tx->{action} =~ s[[.]][/]smgr ) . "/$tx->{method}" : $tx->{method};
-
-                    $auth->api_call_arrayref(
-                        $env,
-                        $method_id,
-                        $tx->{data},
+                # this is app connection, disabled
+                if ( $auth->{is_app} ) {
+                    $req->( [ 403, q[App must connect via WebSocket interface] ] )->finish;
+                }
+                else {
+                    $self->_http_api_router(
+                        $auth, $msg,
                         sub ($res) {
+                            if ($CBOR) {
 
-                            # process response headers
-                            if ( $res->{headers} ) {
-                                push @headers, $res->{headers}->@*;
-
-                                delete $res->{headers};
-                            }
-
-                            if ( $res->is_success ) {
-                                push $response->@*,
-                                  { tid    => $tx->{tid},
-                                    type   => 'rpc',
-                                    result => $res,
-                                  };
+                                # write HTTP response
+                                $req->( 200, [ 'Content-Type' => 'application/cbor' ], to_cbor $res )->finish;
                             }
                             else {
-                                push $response->@*,
-                                  { tid     => $tx->{tid},
-                                    type    => 'exception',
-                                    message => $res,
-                                  };
+
+                                # write HTTP response
+                                $req->( 200, [ 'Content-Type' => 'application/json' ], to_json $res)->finish;
                             }
 
-                            $cv->end;
+                            # free HTTP request object
+                            undef $req;
 
                             return;
                         }
                     );
                 }
 
-                $cv->end;
+                return;
             }
+        );
+    }
 
-            return;
+    return;
+}
+
+sub _http_api_router ( $self, $auth, $data, $cb ) {
+    $data = [$data] if ref $data ne 'ARRAY';
+
+    my $response;
+
+    my $cv = AE::cv sub {
+        $cb->($response);
+
+        return;
+    };
+
+    $cv->begin;
+
+    for my $trans ( $data->@* ) {
+
+        # TODO required only for compatibility with old clients, can be removed
+        $trans->{type} ||= $TRANS_TYPE_RPC;
+
+        # check message type, only rpc calls are enabled here
+        if ( $trans->{type} ne $TRANS_TYPE_RPC ) {
+            push $response->@*,
+              { tid     => $trans->{tid},
+                type    => $TRANS_TYPE_EXCEPTION,
+                message => {
+                    status => 400,
+                    reason => 'Invalid API request type',
+                },
+              };
+
+            next;
         }
-    );
+
+        # method is not specified, this is callback, not supported in API server
+        if ( !$trans->{method} ) {
+            push $response->@*,
+              { tid     => $trans->{tid},
+                type    => $TRANS_TYPE_EXCEPTION,
+                message => {
+                    status => 400,
+                    reason => 'Method is required',
+                },
+              };
+
+            next;
+        }
+
+        $cv->begin;
+
+        # combine method with action
+        if ( my $action = delete $trans->{action} ) {
+            $trans->{method} = q[/] . ( $action =~ s[[.]][/]smgr ) . "/$trans->{method}";
+        }
+
+        $auth->api_call_arrayref(
+            $trans->{method},
+            $trans->{data},
+            sub ($res) {
+                if ( $res->is_success ) {
+                    push $response->@*,
+                      { type   => $TRANS_TYPE_RPC,
+                        tid    => $trans->{tid},
+                        result => $res,
+                      };
+                }
+                else {
+                    push $response->@*,
+                      { type    => $TRANS_TYPE_EXCEPTION,
+                        tid     => $trans->{tid},
+                        message => $res,
+                      };
+                }
+
+                $cv->end;
+
+                return;
+            }
+        );
+    }
+
+    $cv->end;
 
     return;
 }
 
 1;
-## -----SOURCE FILTER LOG BEGIN-----
-##
-## PerlCritic profile "pcore-script" policy violations:
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-## | Sev. | Lines                | Policy                                                                                                         |
-## |======+======================+================================================================================================================|
-## |    3 | 9                    | Subroutines::ProhibitExcessComplexity - Subroutine "run" with high complexity score (24)                       |
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-##
-## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

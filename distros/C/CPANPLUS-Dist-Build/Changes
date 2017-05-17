@@ -1,6 +1,34 @@
 ==================================================
-Changes from 2012-04-13 00:00:00 +0000 to present.
+Changes from 2012-05-15 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 0.88 at 2017-05-14 15:07:07 +0000
+-----------------------------------------
+
+  Change: ab61a30e44ed79305fa76c04e246c469027ccd02
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-05-14 16:07:07 +0000
+
+    Release engineering for 0.88 
+
+  Change: b54a2cf8f0505fa734f2a169ac56943326ecf861
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2017-05-14 15:55:52 +0000
+
+    Implement x_use_unsafe_inc meta behaviour RT#121656 (#2)
+
+    Use stashed META.[yml|json] data and use it to determine whether to
+    set PERL_USE_UNSAFE_INC environment variable.
+
+    If PERL_USE_UNSAFE_INC is already set in the environment then
+    x_use_unsafe_inc is ignored. 
+
+  Change: c241454c6a2a7e469e0a5fb39ff7b1bf3f8d323c
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-05-14 14:06:07 +0000
+
+    Move prepare PERL_USE_UNSAFE_INC setter 
 
 -----------------------------------------
 version 0.86 at 2017-04-12 11:32:06 +0000
@@ -234,5 +262,5 @@ version 0.64 at 2012-10-20 22:28:51 +0000
     50811bd7-b8ce-0310-adc1-d9db26280581 
 
 =================================================
-Plus 27 releases after 2012-04-13 00:00:00 +0000.
+Plus 27 releases after 2012-05-15 00:00:00 +0000.
 =================================================

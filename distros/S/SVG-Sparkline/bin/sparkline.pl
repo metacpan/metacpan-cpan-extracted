@@ -13,6 +13,11 @@ if( !defined $type or $type eq '--help-types' )
     print "No Sparkline type specified.\n";
     help_types();
 }
+if( $type !~ m/\A[A-Z]\w+\z/ )
+{
+    print "Invalid Sparkline type specified.\n";
+    help_types();
+}
 
 pod2usage( -verbose => 2, -exitval => 0 )
     if $type eq '--help' or $type eq '--man';

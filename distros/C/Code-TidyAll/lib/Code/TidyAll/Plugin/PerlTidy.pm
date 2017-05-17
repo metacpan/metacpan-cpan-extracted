@@ -10,10 +10,17 @@ use Moo;
 
 extends 'Code::TidyAll::Plugin';
 
-our $VERSION = '0.58';
+our $VERSION = '0.59';
 
 sub transform_source {
     my ( $self, $source ) = @_;
+
+    # This bit of insanity is needed because if some other code calls
+    # Getopt::Long::Configure() to change some options, then everything can go
+    # to hell. Internally perltidy() tries to use Getopt::Long without
+    # resetting the configuration defaults, leading to very confusing
+    # errors. See https://rt.cpan.org/Ticket/Display.html?id=118558
+    Getopt::Long::ConfigDefaults();
 
     # perltidy reports errors in two different ways.
     # Argument/profile errors are output and an error_flag is returned.
@@ -54,7 +61,7 @@ Code::TidyAll::Plugin::PerlTidy - Use perltidy with tidyall
 
 =head1 VERSION
 
-version 0.58
+version 0.59
 
 =head1 SYNOPSIS
 

@@ -13,7 +13,7 @@ use lib File::Spec->catdir( $FindBin::Bin, 'lib' );
 use lib $FindBin::Bin;
 use Test::Smoke;
 use Test::Smoke::Util qw( Configure_win32 do_pod2usage );
-require Test::Smoke::SysInfo;
+require System::Info;
 
 use Getopt::Long;
 Getopt::Long::Configure( 'pass_through' );
@@ -129,7 +129,7 @@ chdir $opt{ddir} or die "Cannot chdir($opt{ddir}): $!";
 Configure_win32( "./Configure $c_args", $opt{maker}, @cfgvars );
 
 sub get_Win_version {
-    ( my $win_version = Test::Smoke::SysInfo::__get_os() ) =~ s/^[^-]*- //;
+    ( my $win_version = System::Info::__get_os() ) =~ s/^[^-]*- //;
     return $win_version;
 }
 

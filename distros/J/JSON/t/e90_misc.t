@@ -1,10 +1,8 @@
-#!/usr/bin/perl
-
 use strict;
 use Test::More tests => 4;
 
 BEGIN {
-    $ENV{ PERL_JSON_BACKEND } = $ARGV[0] || 'JSON::backportPP';
+    $ENV{ PERL_JSON_BACKEND } ||= 'JSON::backportPP';
 }
 
 use JSON;

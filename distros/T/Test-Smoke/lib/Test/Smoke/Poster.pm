@@ -3,6 +3,8 @@ use warnings;
 use strict;
 use Carp;
 
+our $VERSION = '0.001';
+
 use Cwd qw/:DEFAULT abs_path/;
 use File::Spec::Functions qw/:DEFAULT rel2abs/;
 use Test::Smoke::Poster::Curl;

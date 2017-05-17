@@ -1,5 +1,5 @@
 # t/01_load.t - check module loading and create testing directory
-#$Id: 01_load.t 1201 2007-10-27 01:22:17Z jimk $
+#$Id$
 use strict;
 use warnings;
 use Test::More 

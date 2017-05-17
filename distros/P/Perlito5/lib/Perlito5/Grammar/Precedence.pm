@@ -2,6 +2,7 @@
 package Perlito5::Grammar::Precedence;
 
 use feature 'say';
+use strict;
 
 # Perlito5::Grammar::Precedence attributes:
 #   get_token - code ref
@@ -43,6 +44,7 @@ sub is_num {
 sub is_ident_middle {
     my $c = shift;
        ($c ge 'a' && $c le 'z')
+    || ($c ge 'A' && $c le 'Z')
     || ($c ge '0' && $c le '9')
     || ($c eq '_')
 }
@@ -78,11 +80,13 @@ sub op_parse {
     my $pos  = shift;
     my $last_is_term = shift;
 
+    my $tok = join( "", @{$str}[ $pos .. $pos + 10 ] );
+
     for my $len ( @$End_token_chars ) {
-        my $term = substr($str, $pos, $len);
+        my $term = substr($tok, 0, $len);
         if (exists($End_token->{$term})) {
-            my $c1 = substr($str, $pos + $len - 1, 1);
-            my $c2 = substr($str, $pos + $len, 1);
+            my $c1 = $str->[$pos + $len - 1];
+            my $c2 = $str->[$pos + $len];
             if (  !(is_ident_middle($c1) && is_ident_middle($c2) )
                && !($c1 eq '<' && $c2 eq '<')
                )
@@ -101,10 +105,10 @@ sub op_parse {
 
     if ( !$last_is_term ) {
         for my $len ( @Term_chars ) {
-            my $term = substr($str, $pos, $len);
+            my $term = substr($tok, 0, $len);
             if (exists($Term{$term})) {
-                my $c1 = substr($str, $pos + $len - 1, 1);
-                my $c2 = substr($str, $pos + $len, 1);
+                my $c1 = $str->[$pos + $len - 1];
+                my $c2 = $str->[$pos + $len];
                 if ( is_num($c1) || !is_ident_middle($c1) || !is_ident_middle($c2) ) {
                     my $m = $Term{$term}->($str, $pos);
                     return $m if $m;
@@ -115,7 +119,7 @@ sub op_parse {
 
     # check for operators that need special parsing
     for my $len ( @Parsed_op_chars ) {
-        my $op = substr($str, $pos, $len);
+        my $op = substr($tok, 0, $len);
         if (exists($Parsed_op{$op})) {
             my $m = $Parsed_op{$op}->($str, $pos);
             return $m if $m;
@@ -123,10 +127,10 @@ sub op_parse {
     }
 
     for my $len ( @Op_chars ) {
-        my $op = substr($str, $pos, $len);
+        my $op = substr($tok, 0, $len);
         if (exists($Op{$op})) {
-            my $c1 = substr($str, $pos + $len - 1, 1);
-            my $c2 = substr($str, $pos + $len, 1);
+            my $c1 = $str->[$pos + $len - 1];
+            my $c2 = $str->[$pos + $len];
             if (   (  !(is_ident_middle($c1) && is_ident_middle($c2))   # "and" can't be followed by "_"
                    && !($c1 eq '&' && $c2 eq '&')                       # "&" can't be followed by "&"
                    ) 

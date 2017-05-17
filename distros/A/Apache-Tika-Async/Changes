@@ -1,3 +1,10 @@
+0.07 20170513
+    . Fix synopsis section
+    + Handle problematic/large PDFs better
+    + Keep persistent HTTP connections to Apache Tika
+    + Improve the error message for problematic files
+    ! "synchronous" is now "await"
+
 0.06 20160329
     . Fix versionless release
 

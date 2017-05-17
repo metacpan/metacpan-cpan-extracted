@@ -1,4 +1,4 @@
-use Test::More tests => 20;
+use Test::More tests => 22;
 
 use PGObject::Util::PseudoCSV;
 
@@ -25,7 +25,11 @@ my $hashref;
 
 # Simple tuple tests to array
 ok ($valarray = pseudocsv_parse($simpletuple, 'test'), 
-      'Parse success, simple tuple');
+      'Parse success, simple tuple, legacy format');
+is_deeply($valarray, ['a', 'b', ','], 'Parse correct, simple tuple');
+
+ok ($valarray = pseudocsv_parse($simpletuple),
+     'parse success, current format');
 is_deeply($valarray, ['a', 'b', ','], 'Parse correct, simple tuple');
 
 # Simple array parse

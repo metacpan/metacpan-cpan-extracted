@@ -2,16 +2,10 @@
 
 # Unit testing for PPI::Token::Quote::Single
 
-use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-	no warnings 'once';
-	$PPI::XS_DISABLE = 1;
-	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
-}
-use Test::More tests => 25;
-use Test::NoWarnings;
+use lib 't/lib';
+use PPI::Test::pragmas;
+use Test::More tests => 24 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+
 use PPI;
 
 

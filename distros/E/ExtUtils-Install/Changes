@@ -1,5 +1,9 @@
 Revision history for ExtUtils-Install
 
+2.10
+
+- 'make -s' support: set $INSTALL_QUIET automatically
+
 2.08
 
 - Optimisations:

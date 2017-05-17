@@ -62,8 +62,6 @@ describe 'one to many' => sub {
         is $notifications[1]->related('reply')->related('thread')->get_column('title'), 'foo';
         is $notifications[1]->related('reply')->related('parent')->get_column('content'), 'foo';
         is $notifications[1]->related('reply')->related('parent')->related('author')->get_column('name'), 'vti';
-
-        #use Data::Dumper; warn Dumper($notifications[1]->to_hash);
     };
 
 };

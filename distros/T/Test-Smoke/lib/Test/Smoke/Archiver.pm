@@ -2,6 +2,8 @@ package Test::Smoke::Archiver;
 use warnings;
 use strict;
 
+our $VERSION = '0.001';
+
 use base 'Test::Smoke::ObjectBase';
 use Test::Smoke::LogMixin;
 

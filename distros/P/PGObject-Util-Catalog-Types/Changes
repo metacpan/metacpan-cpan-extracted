@@ -1,5 +1,9 @@
 Revision history for PGObject-Util-Catalog-Types
 
+0.03	2017-05-15
+	Fixing accidental incusion of MYMETA.json in manifest
+	Removing Perl 5.8 support
+
 0.02    2014-08-31
         Build fixes
 

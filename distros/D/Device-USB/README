@@ -1,5 +1,9 @@
 Device-USB
 
+This module is deprecated as of version 0.37. I have not had the time
+or need to update the module, and no one has been willing to take it
+over.
+
 This module provides a relatively complete Perl wrapper on the libusb
 library. Using this module provides an object-oriented interface to any 
 installed USB devices.
