@@ -1,0 +1,18 @@
+NAME
+    HTML::Pictogram::MobileJp - Convert pictograms in HTML
+
+DESCRIPTION
+    ドコモの絵文字番号 or 絵文字Unicodeの実態参照でかけば、それを各キャリアでみれるように変換するというライブラリです。
+
+    詳細は HTML::Pictogram::MobileJp::EmojiNumber,
+    HTML::Pictogram::MobileJp::Unicode をそれぞれみてください。
+
+AUTHOR
+    Tokuhiro Matsuno (tokuhirom@gmail.com)
+
+LICENSE
+    Copyright (C) Tokuhiro Matsuno
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,23 @@
+#!/usr/bin/env perl
+
+my ($name, $output) = @ARGV;
+
+die "usage: $0 name output" if (not defined $name or not defined $output);
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+if (-d "$FindBin::Bin/../local") {
+  use lib "$FindBin::Bin/../local/lib/perl5";
+}
+
+
+use CCfnX::Deployment;
+
+if (not defined $ENV{CPSD_AWS_ACCOUNT}) {
+	die "You need to specify ENV CPSD_AWS_ACCOUNT for deploy to work correctly";
+}
+
+my $deployer = CCfnX::Deployment->new_with_roles({ name => $name }, 'CCfnX::PersistentDeployment');
+$deployer->get_from_mongo;
+print $deployer->output($output), "\n";

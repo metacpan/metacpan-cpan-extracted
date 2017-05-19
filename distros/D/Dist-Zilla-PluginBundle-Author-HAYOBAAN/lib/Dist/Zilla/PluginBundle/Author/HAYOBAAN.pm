@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Hayo Baan's Dist::Zilla configuration
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 #pod =head1 DESCRIPTION
 #pod
@@ -141,7 +141,7 @@ with 'Dist::Zilla::Role::PluginBundle::Easy';
 require Dist::Zilla::Plugin::OurPkgVersion;
 require Dist::Zilla::Plugin::Git::GatherDir;
 require Dist::Zilla::Plugin::PodWeaver; # And Dist::Zilla::Plugin::SurgicalPodWeaver if enabled
-require Dist::Zilla::Plugin::ReadmeAnyFromPod;
+use     Dist::Zilla::Plugin::ReadmeAnyFromPod 0.161150;
 require Dist::Zilla::Plugin::InstallGuide;
 require Dist::Zilla::Plugin::MinimumPerl;
 require Dist::Zilla::Plugin::GitHub::Meta;
@@ -919,7 +919,7 @@ Dist::Zilla::PluginBundle::Author::HAYOBAAN - Hayo Baan's Dist::Zilla configurat
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 DESCRIPTION
 

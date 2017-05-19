@@ -1,14 +1,14 @@
 NAME
 
-Data::Compare::Plugins::JSON - plugin for Data::Compare to handle JSON::PP and
-JSON::XS boolean constants.
+Data::Compare::Plugins::JSON - plugin for Data::Compare to handle JSON,
+JSON::PP, and JSON::XS boolean constants.
 
 DESCRIPTION
 
-JSON::PP and JSON::XS provides instances of JSON::PP::Boolean and
-JSON::XS::Boolean classes. It's JSON::PP::true, JSON::PP::false,
-JSON::XS::true, and JSON::XS::false. This plugin enables Data::Compare to
-compare this values.
+JSON::PP and JSON::XS provides instances of JSON::PP::Boolean,
+JSON::backportPP::Boolean, and JSON::XS::Boolean classes. It's JSON::true,
+JSON::false, JSON::PP::true, JSON::PP::false, JSON::XS::true, and
+JSON::XS::false. This plugin enables Data::Compare to compare this values.
 
 INSTALLATION
 

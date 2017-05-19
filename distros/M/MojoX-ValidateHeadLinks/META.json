@@ -1,0 +1,57 @@
+{
+   "abstract" : "Ensure CSS and JS links in web pages point to real files",
+   "author" : [
+      "Ron Savage <ron@savage.net.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MojoX-ValidateHeadLinks",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.94"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Getopt::Long" : "2.38",
+            "Hash::FieldHash" : "0.12",
+            "Log::Handler" : "0.75",
+            "Mojolicious" : "3.3",
+            "Pod::Usage" : "1.51",
+            "Try::Tiny" : "0.11",
+            "feature" : "1.2",
+            "strict" : "1.03",
+            "warnings" : "1.03"
+         }
+      }
+   },
+   "provides" : {
+      "MojoX::ValidateHeadLinks" : {
+         "file" : "lib/MojoX/ValidateHeadLinks.pm",
+         "version" : "1.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
+      "repository" : {
+         "url" : "https://github.com/ronsavage/MojoX-ValidateHeadLinks"
+      }
+   },
+   "version" : "1.05"
+}

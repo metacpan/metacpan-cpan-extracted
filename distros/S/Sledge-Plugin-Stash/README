@@ -1,0 +1,35 @@
+NAME
+    Sledge::Plugin::Stash - sledge with lvalue.
+
+SYNOPSIS
+        package Your::Pages;
+        use Sledge::Plugin::Stash;
+
+        sub dispatch_foo {
+            my ($self, ) = @_;
+            $self->stash->{foo} = 'bar';
+        }
+
+        # in your template.
+        [% foo %]
+
+DESCRIPTION
+        $self->tmpl->param('foo' => 'bar');
+
+    is not visceral.
+
+    Let's use the lvalue.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+AUTHOR
+    Tokuhiro Matsuno "<tokuhirom @at gmail.com>"
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2006, Tokuhiro Matsuno "<tokuhiro __at__
+    mobilefactory.jp>". All rights reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+

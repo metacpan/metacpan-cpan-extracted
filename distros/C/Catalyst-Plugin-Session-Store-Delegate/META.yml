@@ -1,0 +1,32 @@
+---
+abstract: 'Delegate session storage to an'
+author:
+  - 'Yuval Kogman, C<nothingmuch@woobling.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+  Test::use::ok: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Catalyst::Plugin::Session::Store::Delegate
+name: Catalyst-Plugin-Session-Store-Delegate
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst::Plugin::Session: 0.27
+  MRO::Compat: 0
+  Moose: 0
+  MooseX::Emulate::Class::Accessor::Fast: 0
+  namespace::clean: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://dev.catalyst.perl.org/repos/Catalyst/Catalyst-Plugin-Session-Store-Delegate/
+version: 0.06

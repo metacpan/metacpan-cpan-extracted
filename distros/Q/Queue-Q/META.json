@@ -1,0 +1,41 @@
+{
+   "abstract" : "Mix-and-match Queue Implementations and Backends",
+   "author" : [
+      "Steffen Mueller <smueller@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.023, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Queue-Q",
+   "prereqs" : {
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::XSAccessor" : "0.12",
+            "Digest::SHA1" : "0",
+            "File::Slurp" : "0",
+            "File::Spec" : "0",
+            "JSON::XS" : "0",
+            "List::Util" : "0",
+            "Redis" : "1.955",
+            "Redis::ScriptCache" : "0.03",
+            "Scalar::Util" : "0",
+            "Sereal::Decoder" : "0.10",
+            "Sereal::Encoder" : "0.10",
+            "Test::More" : "0.88",
+            "Time::HiRes" : "0",
+            "constant" : "0",
+            "parent" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.31"
+}
+

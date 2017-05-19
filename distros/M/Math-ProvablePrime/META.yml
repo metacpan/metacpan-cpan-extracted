@@ -1,0 +1,32 @@
+---
+abstract: 'Generate a provable prime number, in pure Perl'
+author:
+  - 'Felipe Gasper (FELIPE)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Which: '0'
+  Test::Class: '0.4'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::More: '0.01'
+  Test::NoWarnings: '0.01'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-ProvablePrime
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Bytes::Random::Secure::Tiny: '1.008'
+  Math::BigInt: '1.999806'
+resources:
+  repository: https://github.com/FGasper/p5-Math-ProvablePrime.git
+version: 0.043
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

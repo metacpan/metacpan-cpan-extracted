@@ -4,9 +4,9 @@ use warnings;
 use Test::More 0.88;
 
 BEGIN {
-    if ($ENV{NO_NETWORK_TESTING} and not $ENV{RELEASE_TESTING}
-        or (not $ENV{AUTHOR_TESTING} and not $ENV{AUTOMATED_TESTING} and not $ENV{EXTENDED_TESTING})
-    )
+    if (not $ENV{RELEASE_TESTING}
+        and ($ENV{NO_NETWORK_TESTING}
+             or (not $ENV{AUTHOR_TESTING} and not $ENV{AUTOMATED_TESTING} and not $ENV{EXTENDED_TESTING})))
     {
         plan skip_all => 'these tests use the network: unset NO_NETWORK_TESTING and set EXTENDED_TESTING, AUTHOR_TESTING or AUTOMATED_TESTING to run';
     }
@@ -14,16 +14,16 @@ BEGIN {
 
 # if tests are getting to this point and then skip due to not being able to
 # reach this site, we know they are not setting NO_NETWORK_TESTING as they should.
-use Test::RequiresInternet ( 'httpbin.org' => 80 );
+use if !$ENV{RELEASE_TESTING}, 'Test::RequiresInternet', 'httpbin.org' => 80;
 
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::LWP::UserAgent;
 use HTTP::Request::Common;
 use URI;
 
-# I use POST rather than GET everywhere so as to not process the "302
-# Redirect" response.
-my $redirect_url = 'http://httpbin.org/redirect-to?url=http%3A%2F%2Fhttpbin.org%2Fpost';
+# I mostly POST to this URL, rather than using GET, so as to not process the
+# "302 Redirect" response.
+my $redirect_url = 'http://httpbin.org/redirect-to?url=http%3A%2F%2Fhttpbin.org%2Fget';
 
 # allow LWP::UserAgent to carp about unknown constructor arguments
 $^W = 1;

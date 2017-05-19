@@ -1,0 +1,121 @@
+               Perl Module Catalyst::Model::ISBNDB Change History           
+
+		A Perl module providing Catalyst model-style    
+		access to the module WebService::ISBNDB. This   
+		is an API to communicate with the web service   
+		hosted by isbndb.com.                           
+
+0.22	Monday August 17, 2009, 07:55:00 PM -0700
+
+	* t/00_signature.t (deleted)
+	Deprecated test.                                                
+
+	* ChangeLog (deleted)
+	* MANIFEST (deleted)
+	* Makefile (deleted)
+	Deprecated files.                                               
+
+	* t/01_pod.t
+	* t/02_pod_coverage.t
+	* t/03_meta.t (added)
+	* t/04_minimumversion.t (added)
+	* t/05_critic.t (added)
+	Three new test suites added, two modified to run as             
+	developer-only tests.                                           
+
+	* lib/Catalyst/Helper/Model/ISBNDB.pm
+	* lib/Catalyst/Model/ISBNDB.pm
+	Fixed license docs, other code-cleanliness changes.             
+
+	* README (deleted)
+	* README.textile (added)
+	Replace README with README.textile and associated logic in      
+	Build.PL.                                                       
+
+0.21	Monday February 18, 2008, 10:39:34 AM -0800
+
+	* lib/Catalyst/Helper/Model/ISBNDB.pm, revision 14
+	* lib/Catalyst/Model/ISBNDB.pm, revision 14
+	* t/DUMMY.pm, revision 14
+	Updated all copyright dates and license information. All        
+	license references are now to the dual-license arrangement      
+	(Artistic 2.0 and LGPL). Added use of "warnings" pragma to any  
+	modules that didn't already have it.                            
+
+	* Build.PL, revision 15
+	Updated the package version, fixed reference to required perl   
+	version to remove use of v-string, and added some overlooked    
+	dependencies in the "requires" parameter.                       
+
+	* t/00_load.t, revision 18
+	Fixed references to modules in this test. For some reason, the  
+	tests referred to the ::XMLRPC Catalyst components, and no one  
+	caught it.                                                      
+
+0.20	Sunday October 29, 2006, 11:50:57 PM -0700
+
+	* MANIFEST, revision 7
+	* lib/Catalyst/Helper/Model/ISBNDB.pm, revision 7 (added)
+	* t/00_load.t, revision 7 (added)
+	Added a new class, Catalyst::Helper::Model::ISBNDB, to make it  
+	easier for developers to generate models for their applications 
+	based on Catalyst::Model::ISBNDB. This called for new tests and 
+	a change to MANIFEST.                                           
+
+0.10	Thursday October 12, 2006, 11:02:48 PM -0600
+
+	* Build.PL, revision 5
+	* ChangeLog, revision 5
+	* ChangeLog.xml, revision 5
+	* MANIFEST, revision 5
+	* MANIFEST.SKIP, revision 2
+	* Makefile.PL, revision 5
+	* README, revision 5
+	* etc/ChangeLogML.xsd, revision 2
+	* lib/Catalyst/Model/ISBNDB.pm, revision 5
+	* t/00_signature.t, revision 5
+	* t/01_pod.t, revision 5
+	* t/02_pod_coverage.t, revision 5
+	* t/10_basic.t, revision 5
+	* t/DUMMY.pm, revision 5
+	* t/xml/Authors-person_id=poe_edgar_allan.xml, revision 2
+	* t/xml/Books-book_id=programming_web_services_with_perl.xml, revision 2
+	* t/xml/Books-isbn=0596002068.xml, revision 2
+	* t/xml/Books-page_number=10-person_id=poe_edgar_allan.xml, revision 2
+	* t/xml/Books-page_number=11-person_id=poe_edgar_allan.xml, revision 2
+	* t/xml/Books-page_number=12-person_id=poe_edgar_allan.xml, revision 2
+	* t/xml/Books-page_number=13-person_id=poe_edgar_allan.xml, revision 2
+	* t/xml/Books-page_number=14-person_id=poe_edgar_allan.xml, revision 2
+	* t/xml/Books-page_number=15-person_id=poe_edgar_allan.xml, revision 2
+	* t/xml/Books-page_number=16-person_id=poe_edgar_allan.xml, revision 2
+	* t/xml/Books-page_number=17-person_id=poe_edgar_allan.xml, revision 2
+	* t/xml/Books-page_number=18-person_id=poe_edgar_allan.xml, revision 2
+	* t/xml/Books-page_number=19-person_id=poe_edgar_allan.xml, revision 2
+	* t/xml/Books-page_number=2-person_id=poe_edgar_allan.xml, revision 2
+	* t/xml/Books-page_number=20-person_id=poe_edgar_allan.xml, revision 2
+	* t/xml/Books-page_number=21-person_id=poe_edgar_allan.xml, revision 2
+	* t/xml/Books-page_number=22-person_id=poe_edgar_allan.xml, revision 2
+	* t/xml/Books-page_number=23-person_id=poe_edgar_allan.xml, revision 2
+	* t/xml/Books-page_number=24-person_id=poe_edgar_allan.xml, revision 2
+	* t/xml/Books-page_number=25-person_id=poe_edgar_allan.xml, revision 2
+	* t/xml/Books-page_number=26-person_id=poe_edgar_allan.xml, revision 2
+	* t/xml/Books-page_number=3-person_id=poe_edgar_allan.xml, revision 2
+	* t/xml/Books-page_number=4-person_id=poe_edgar_allan.xml, revision 2
+	* t/xml/Books-page_number=5-person_id=poe_edgar_allan.xml, revision 2
+	* t/xml/Books-page_number=6-person_id=poe_edgar_allan.xml, revision 2
+	* t/xml/Books-page_number=7-person_id=poe_edgar_allan.xml, revision 2
+	* t/xml/Books-page_number=8-person_id=poe_edgar_allan.xml, revision 2
+	* t/xml/Books-page_number=9-person_id=poe_edgar_allan.xml, revision 2
+	* t/xml/Books-person_id=poe_edgar_allan.xml, revision 2
+	* t/xml/Categories-category_id=science.xml, revision 2
+	* t/xml/Publishers-publisher_id=oreilly.xml, revision 2
+	* t/xml/Subjects-subject_id=perl_computer_program_language.xml, revision 2
+	Intial release.                                                 
+
+# Generated on Monday August 17, 2009, 07:58:39 PM -0700
+# Using changelog2x/0.11, App::Changelog2x/0.11, XML::LibXML/1.69,             
+# XML::LibXSLT/1.68, libxml/2.6.32, libxslt/1.1.24 (with exslt)                
+# XSLT sources:
+#     $Id: changelog2text.xslt 8 2009-01-19 06:46:50Z rjray $
+#     $Id: common-text.xslt 8 2009-01-19 06:46:50Z rjray $
+#     $Id: common.xslt 4 2009-01-07 13:02:06Z rjray $

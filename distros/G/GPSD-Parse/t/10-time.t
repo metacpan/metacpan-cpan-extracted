@@ -6,15 +6,16 @@ use Test::More;
 
 my $mod = 'GPSD::Parse';
 
+my $fname = 't/data/gps.json';
+
 my $gps;
 
-eval {
+my $sock = eval {
     $gps = $mod->new;
+    1;
 };
 
-plan skip_all => "no socket available" if $@;
-
-$gps->on;
+$gps = GPSD::Parse->new(file => $fname) if ! $sock;
 
 { # default return
 
@@ -25,7 +26,5 @@ $gps->on;
     is ref \$t, 'SCALAR', "time is returned as a string";
     like $t, qr/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/, "...and is ok"; 
 }
-
-$gps->off;
 
 done_testing;

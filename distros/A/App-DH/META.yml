@@ -1,0 +1,49 @@
+---
+abstract: 'Deploy your DBIx::Class Schema to DDL/Database via DBIx::Class::DeploymentHandler'
+author:
+  - 'kentnl - Kent Fredric (cpan:KENTNL) <kentnl@cpan.org>'
+  - 'mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>'
+build_requires:
+  DBI: '0'
+  DBIx::Class::Core: '0'
+  DBIx::Class::Schema: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  Test::Requires: '0'
+  Test::TempDir::Tiny: '0'
+  base: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-DH
+provides:
+  App::DH:
+    file: lib/App/DH.pm
+    version: '0.004001'
+recommends:
+  DBIx::Class::Schema::Config: '0'
+  Moose: '2.000'
+requires:
+  Carp: '0'
+  DBIx::Class::DeploymentHandler: '0'
+  Module::Runtime: '0'
+  Moose: '0'
+  MooseX::Getopt: '0.48'
+  PerlX::Maybe: '0'
+  lib: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/App-DH/issues
+  homepage: https://github.com/kentnl/App-DH
+  repository: https://github.com/kentnl/App-DH.git
+version: '0.004001'

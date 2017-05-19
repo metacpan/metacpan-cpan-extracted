@@ -1,0 +1,49 @@
+---
+abstract: 'Read an INI file and expand bundles as you go.'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  Dist::Zilla::PluginBundle::Classic: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::Differences: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '7.1101'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Util-ExpandINI
+provides:
+  Dist::Zilla::Util::ExpandINI:
+    file: lib/Dist/Zilla/Util/ExpandINI.pm
+    version: '0.003003'
+  Dist::Zilla::Util::ExpandINI::Reader:
+    file: lib/Dist/Zilla/Util/ExpandINI/Reader.pm
+    version: '0.003003'
+  Dist::Zilla::Util::ExpandINI::Writer:
+    file: lib/Dist/Zilla/Util/ExpandINI/Writer.pm
+    version: '0.003003'
+requires:
+  Carp: '0'
+  Config::INI::Reader: '0'
+  Config::INI::Writer: '0.024'
+  Dist::Zilla::Util::BundleInfo: '1.001000'
+  Mixin::Linewise: '!= 0.107'
+  Module::Runtime: '0'
+  Moo: '1.000008'
+  Scalar::Util: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-Util-ExpandINI/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-Util-ExpandINI
+  repository: https://github.com/kentnl/Dist-Zilla-Util-ExpandINI.git
+version: '0.003003'

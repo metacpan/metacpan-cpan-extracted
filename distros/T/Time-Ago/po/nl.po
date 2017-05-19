@@ -1,0 +1,97 @@
+# Dutch translations for Time-Ago package.
+# Copyright (C) 2017 Maurice Aubrey
+# This file is distributed under the same license as the Time-Ago package.
+# Automatically generated, 2017.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Time-Ago 0.09\n"
+"Report-Msgid-Bugs-To: maurice.aubrey@gmail.com\n"
+"POT-Creation-Date: 2017-04-28 23:06-0700\n"
+"PO-Revision-Date: 2017-04-28 23:06-0700\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: nl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ASCII\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: lib/Time/Ago.pm:48
+#, perl-brace-format
+msgid "about {count} hour"
+msgid_plural "about {count} hours"
+msgstr[0] "ongeveer een uur"
+msgstr[1] "ongeveer {count} uur"
+
+#: lib/Time/Ago.pm:52
+#, perl-brace-format
+msgid "about {count} month"
+msgid_plural "about {count} months"
+msgstr[0] "ongeveer een maand"
+msgstr[1] "ongeveer {count} maanden"
+
+#: lib/Time/Ago.pm:56
+#, perl-brace-format
+msgid "about {count} year"
+msgid_plural "about {count} years"
+msgstr[0] "ongeveer een jaar"
+msgstr[1] "ongeveer {count} jaar"
+
+#: lib/Time/Ago.pm:60
+#, perl-brace-format
+msgid "almost {count} year"
+msgid_plural "almost {count} years"
+msgstr[0] "bijna een jaar"
+msgstr[1] "bijna {count} jaar"
+
+#: lib/Time/Ago.pm:63
+msgid "half a minute"
+msgstr "een halve minuut"
+
+#: lib/Time/Ago.pm:66
+#, perl-brace-format
+msgid "less than a minute"
+msgid_plural "less than {count} minutes"
+msgstr[0] "minder dan een minuut"
+msgstr[1] "minder dan {count} minuten"
+
+#: lib/Time/Ago.pm:71
+#, perl-brace-format
+msgid "less than {count} second"
+msgid_plural "less than {count} seconds"
+msgstr[0] "minder dan een seconde"
+msgstr[1] "minder dan {count} seconden"
+
+#: lib/Time/Ago.pm:79
+#, perl-brace-format
+msgid "over {count} year"
+msgid_plural "over {count} years"
+msgstr[0] "meer dan een jaar"
+msgstr[1] "meer dan {count} jaar"
+
+#: lib/Time/Ago.pm:83
+#, perl-brace-format
+msgid "{count} day"
+msgid_plural "{count} days"
+msgstr[0] "1 dag"
+msgstr[1] "{count} dagen"
+
+#: lib/Time/Ago.pm:87
+#, perl-brace-format
+msgid "{count} minute"
+msgid_plural "{count} minutes"
+msgstr[0] "1 minuut"
+msgstr[1] "{count} minuten"
+
+#: lib/Time/Ago.pm:91
+#, perl-brace-format
+msgid "{count} month"
+msgid_plural "{count} months"
+msgstr[0] "1 maand"
+msgstr[1] "{count} maanden"
+
+msgid "{count} second"
+msgid_plural "{count} seconds"
+msgstr[0] "1 seconde"
+msgstr[1] "{count} seconden"

@@ -1,5 +1,9 @@
 Revision history for Perl extension Linux-GetPidstat
 
+0.05 2017-05-19T08:37:40Z
+
+    - define Writer::Mackerel#bulk_output (https://github.com/yoheimuta/Linux-GetPidstat/pull/6)
+
 0.04 2017-05-17T06:39:55Z
 
     - Added --mackerel_metric_key_prefix option (https://github.com/yoheimuta/Linux-GetPidstat/pull/4)

@@ -1,5 +1,24 @@
 Revision history for GPSD-Parse
 
+1.00    2017-05-17
+        - updated tests and modified poll()'s handling of the file param when
+          running with socket enabled
+        - POD updates/corrections and additions
+        - added example/sky.pl; Q&D satellite printout
+        - all tests pass on a machine in both sock and non-sock mode
+
+0.02    2017-05-17
+        - reworked initialization code so that a file can be sent in to replay
+          past data and for testing on systems that don't have gpsd. (closes #4)
+        - on() is now called by default in new() if in socket mode, and off() is
+          likewise called in the destructor
+        - new() now has a 'metric' option to convert to using imperial/standard
+          measurements where applicable (closes #1)
+        - added 'signed' option in new() to convert from signed lat/lon to alpha
+          (eg: from -1.23 to 1.23S) (closes #3)
+        - added direction(), converts from degree heading to compass direction
+          (eg: NNE, SW etc) (closes #2)
+
 0.01    2017-05-16
         - first version, released on an unsuspecting world.
         - all current functionality has tests and documentation

@@ -1,0 +1,67 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 577d7e9d65e9863cb69ad9749d773dd6b9b3f618 .gitignore
+SHA1 1548832959efe56bac8bfefa5449e9f690d557ae Build.PL
+SHA1 8b68cd046876bbc7c3b5453ef21d81fb0a7a81ea Changes
+SHA1 e16e3ea134108f3d582235364324e5bb205ac430 DESIGN
+SHA1 27b663c38293d77865087edb03006ccd12b6f4a7 MANIFEST
+SHA1 f27610d22c6389317e4c2730822c796b96abe77d META.json
+SHA1 a67308fad9065a5229ccbdb17aee5bc2bbdfcd77 META.yml
+SHA1 01014dbee096cf5abd3f05069cefa9c907a4aea1 Makefile.PL
+SHA1 fdf5efc21497b7e76d1c0c8d2367f4001a6cc824 README
+SHA1 9aa43664f8030ca4a0d96a956190a57dc9aabe53 lib/Hash/SharedMem.pm
+SHA1 f87c50506db162a6eabe3abc325314bd420cc9bc lib/Hash/SharedMem.xs
+SHA1 39a7f86c96974472aa3871b40187a3b3a0c49294 lib/Hash/SharedMem/Handle.pm
+SHA1 852d4366083afd883c9dc972e139622850948481 lib/Hash/features.probe
+SHA1 4ac90c7be5579dd9007e8e975352e469cadb6783 magic
+SHA1 32d46212ff3c6ac27dc3600614a84400aef34d22 t/arg_error.t
+SHA1 54f8d7ff9d095932684705346a5ca6e1fe735e82 t/bad_dir.t
+SHA1 5dce241e86219ea896cc17543d3e826af4468d3f t/bad_master.t
+SHA1 6851f9ff563c3fed5342073fb64089529cd80ed0 t/chdir.t
+SHA1 1f5ddfe58d4bb6426778141c26dfe99319d0ccd8 t/concurrent.t
+SHA1 9b1e4e3640a9cb4af685db00c6c788979f6a2ac2 t/deparse.t
+SHA1 c00104e322b527d90bdb51af1b13f880b44fdc2b t/empty.t
+SHA1 3ba5f42584e74d6d9736c2e556b34474287a3690 t/filename.t
+SHA1 84630b104b579ea4b7c193406080792e6de79637 t/fork.t
+SHA1 4eba3ebab9fcb37e630064eb92bc84b45f05ef85 t/function.t
+SHA1 62eeccdc1b4f5f465ada6fa144695fc0e8633e26 t/get_string.t
+SHA1 442c4595003937ba355bf42ba52c4be5f1cf2fb3 t/huge.t
+SHA1 1c68da91f9b597596f56f9b66e4d5dd829c0ce49 t/locale.t
+SHA1 9682d98b9c3a395d384c8cd88c7ea105d006ada9 t/long.t
+SHA1 ced682f263cc05350a3218945cf4f33d660d6307 t/magic.t
+SHA1 71bbd98b6aea56c25ba2aee72121a96ccce89e33 t/many.t
+SHA1 6db62f2d6f423219ceec366cba8ce1e8da8df70a t/method.t
+SHA1 c7a4daeda6cedf7a9772b9adfac802a046838a97 t/mode.t
+SHA1 4c8d46235980c06a7040f38035dd97aa92d9e5a6 t/octet.t
+SHA1 487070bf6c58a82e48b956abccb844aff35fb59b t/op.t
+SHA1 92d1866993c63b4574e848739081855986010534 t/perm.t
+SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
+SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
+SHA1 773a97fc7cb8a5aa4b577da712fc5fa3db5f0423 t/rename.t
+SHA1 e2755d1ce1287206536ff8fa632c4cbe33f11505 t/snapshot.t
+SHA1 496c088d4848de4bbd0d733aec8f4cf7c97a5d3d t/taint.t
+SHA1 ed32f4e502d404159de502b873fdf18c9c3fa487 t/tally.t
+SHA1 5fe5aec5c906d730c092db1a9b8ed37e85060391 t/threads.t
+SHA1 286d642b3b3ec0e6873e0c061a09c54b9dccb9ef t/tidy.t
+SHA1 e356a0660339ff712e33e01866d5dd6a530aafc5 t/tie.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iEYEARECAAYFAlTIi8AACgkQOV9mt2VyAVETOgCgjwWR4z2fZDl6U5t555rhfxyY
+o3EAnRMvD1yx4ztdert5I/81GIDmJs1V
+=J4qH
+-----END PGP SIGNATURE-----

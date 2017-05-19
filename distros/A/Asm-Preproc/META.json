@@ -1,0 +1,59 @@
+{{{}
+{   "abstract" : "Preprocessor to be called from an assembler",}
+{   "author" : [}
+{      "Paulo Custodio <pscust@cpan.org>"}
+{   ],}
+{   "dynamic_config" : 1,}
+{   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005",}
+{   "license" : [}
+{      "unknown"}
+{   ],}
+{   "meta-spec" : {{}
+{      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",}
+{      "version" : "2"}
+{   }},}
+{   "name" : "Asm-Preproc",}
+{   "no_index" : {{}
+{      "directory" : [}
+{         "t",}
+{         "inc"}
+{      ]}
+{   }},}
+{   "prereqs" : {{}
+{      "build" : {{}
+{         "requires" : {{}
+{            "ExtUtils::MakeMaker" : "0"}
+{         }}}
+{      }},}
+{      "configure" : {{}
+{         "requires" : {{}
+{            "ExtUtils::MakeMaker" : "0"}
+{         }}}
+{      }},}
+{      "runtime" : {{}
+{         "requires" : {{}
+{            "Carp" : "0",}
+{            "Class::XSAccessor" : "1.18",}
+{            "Class::XSAccessor::Array" : "1.18",}
+{            "Data::Dump" : "1.17",}
+{            "File::Find" : "0",}
+{            "File::Slurp" : "9999.13",}
+{            "File::Spec" : "0",}
+{            "Iterator::Simple::Lookahead" : "0.06",}
+{            "Test::More" : "0.96",}
+{            "Text::Template" : "1.45",}
+{            "perl" : "5.01"}
+{         }}}
+{      }}}
+{   }},}
+{   "release_status" : "stable",}
+{   "resources" : {{}
+{      "repository" : {{}
+{         "type" : "git",}
+{         "url" : "git://github.com/pauloscustodio/perl-Asm-Preproc.git",}
+{         "web" : "https://github.com/pauloscustodio/perl-Asm-Preproc"}
+{      }}}
+{   }},}
+{   "version" : "1.02",}
+{   "x_serialization_backend" : "JSON::PP version 2.27300"}
+{}}}

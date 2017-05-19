@@ -13,6 +13,8 @@ $Data::Dumper::Indent=1;
 
 my $BRREG_TIMEOUT = 60; # secs (default is 180 secs but we want shorter time).
 
+my $MAX_PAGES = 10; # max pages to fetch if no max is specified
+
 my $BRREG = "http://data.brreg.no/enhetsregisteret";
 
 my @module_methods = qw /
@@ -58,11 +60,15 @@ sub lookup_orgno {
 }
 
 sub lookup_orgname {
-    my ($self, $orgname) = @_;
+    my ($self, $orgname, $max_no_pages) = @_;
+    
+    die "mandatory parameter 'orgname' not specified" unless ($orgname);
 
+    my $max_pg_to_fetch = $max_no_pages || $MAX_PAGES;
+    
     # Use the orgname as filter in search to brreg
     # Note a limitation in the brreg API service that 
-    # that only names starting with $orgname is supported,
+    # only names starting with $orgname is supported,
     # ref. the 'startswith' filter in the URL.
     # We should've liked a 'contains' instead. 
 
@@ -75,8 +81,7 @@ sub lookup_orgname {
     $self->size(0);
     $self->next_page(1); # force the first lookup
 
-    # Fetch max 5 pages
-    while ($self->next_page && $pcnt < 5) {
+    while ($self->next_page && $pcnt < $max_pg_to_fetch) {
 	#print STDERR "Page count is: $pcnt, fetching next page...\n";
 	$self->_lookup_org_entries("$BR&page=$pcnt");
 	++$pcnt;
@@ -84,7 +89,9 @@ sub lookup_orgname {
 }
 
 sub lookup_reg_dates {
-    my ($self, $from_date, $to_date) = @_;
+    my ($self, $from_date, $to_date, $max_no_pages) = @_;
+
+    my $max_pg_to_fetch = $max_no_pages || $MAX_PAGES;
 
     # Use the from / to dates as filter for lookup on 
     # registration dates
@@ -113,7 +120,7 @@ sub lookup_reg_dates {
     $self->next_page(1); # force the first lookup
 
     # Fetch max 5 pages
-    while ($self->next_page && $pcnt < 5) {
+    while ($self->next_page && $pcnt < $max_pg_to_fetch) {
 	#print STDERR "Page count is: $pcnt, fetching next page...\n";
 	$self->_lookup_org_entries("$BR&page=$pcnt");
 	++$pcnt;
@@ -242,7 +249,7 @@ Returns 0 entries if none found.
 Returns an array of NOLookup::Brreg::Entry objects in the data 
 when matches are found.
 
-Note: A maximum of 5 pages are fetched, each of 100 entries.
+A maximum of $max_no_pages pages are fetched, each of 100 entries.
 
 =head3 lookup_reg_dates()
 
@@ -257,8 +264,7 @@ Returns 0 entries if none found.
 Returns an array of NOLookup::Brreg::Entry objects in the data 
 when matches are found.
 
-Note: A maximum of 5 pages are fetched, each of 100 entries.
-
+A maximum of $max_no_pages pages are fetched, each of 100 entries.
 
 =head3 orgno_ok()
 

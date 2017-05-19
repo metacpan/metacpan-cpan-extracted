@@ -1,0 +1,35 @@
+---
+abstract: 'stdin to your browser'
+author:
+  - 'motemen <motemen@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-htmlcat
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  AnyEvent::Handle: 0
+  Data::Section::Simple: 0
+  Encode: 0
+  HTML::Entities: 0
+  HTML::FromANSI::Tiny: 0
+  IO::Socket::INET: 0
+  Plack::Runner: 0
+  Twiggy: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/motemen/App-htmlcat.git
+version: 0.01

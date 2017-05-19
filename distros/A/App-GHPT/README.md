@@ -4,7 +4,7 @@ App::GHPT - A command line tool to simplify using Github and Pivotal Tracker for
 
 # VERSION
 
-version 1.000002
+version 1.000003
 
 # DESCRIPTION
 
@@ -87,9 +87,10 @@ Bugs may be submitted through [https://github.com/maxmind/App-GHPT/issues](https
 - Mark Fowler <mark@twoshortplanks.com>
 - Dave Rolsky <autarch@urth.org>
 
-# CONTRIBUTOR
+# CONTRIBUTORS
 
-Mark Fowler <mfowler@maxmind.com>
+- Greg Oschwald <goschwald@maxmind.com>
+- Mark Fowler <mfowler@maxmind.com>
 
 # COPYRIGHT AND LICENSE
 

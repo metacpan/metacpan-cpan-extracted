@@ -1,0 +1,25 @@
+---
+abstract: 'for App::CLI::Extension fork plugin module'
+author:
+  - 'Akira Horimoto'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.59, CPAN::Meta::Converter version 2.112600'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-CLI-Plugin-Parallel-ForkManager
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  App::CLI::Extension: 1.4
+  Class::Accessor::Grouped: 0
+  Parallel::ForkManager: 0.7
+version: 1.1

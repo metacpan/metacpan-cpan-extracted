@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Test::LWP::UserAgent; # git description: v0.031-3-gf621b26
+package Test::LWP::UserAgent; # git description: v0.032-3-g468b77d
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: A LWP::UserAgent suitable for simulating and testing network calls
 # KEYWORDS: testing useragent networking mock server client
 
-our $VERSION = '0.032';
+our $VERSION = '0.033';
 
 use parent 'LWP::UserAgent';
 use Scalar::Util qw(blessed reftype);
@@ -366,7 +366,7 @@ Test::LWP::UserAgent - A LWP::UserAgent suitable for simulating and testing netw
 
 =head1 VERSION
 
-version 0.032
+version 0.033
 
 =head1 SYNOPSIS
 

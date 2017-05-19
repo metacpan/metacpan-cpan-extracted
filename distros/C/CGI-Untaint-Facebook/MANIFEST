@@ -1,9 +1,12 @@
 Changes
-MANIFEST
-Makefile.PL
-README
 ignore.txt
 lib/CGI/Untaint/Facebook.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+README.md
 t/00-load.t
 t/apoc.t
 t/boiler.t
@@ -18,6 +21,7 @@ t/gv.t
 t/kwalitee.t
 t/manifest.t
 t/metrics.t
+t/namespaces.t
 t/noplan.t
 t/pod-cm.t
 t/pod.t
@@ -31,6 +35,4 @@ t/untaint.t
 t/unused.t
 t/used.t
 t/vars.t
-META.yml                                 Module meta-data (added by MakeMaker)
-MYMETA.json
 META.json                                Module JSON meta-data (added by MakeMaker)

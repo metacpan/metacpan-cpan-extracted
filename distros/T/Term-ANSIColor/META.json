@@ -1,0 +1,54 @@
+{
+   "abstract" : "Color output using ANSI escape sequences",
+   "author" : [
+      "Russ Allbery <rra@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Term-ANSIColor",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Term-ANSIColor@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Dist/Display.html?Name=Term-ANSIColor"
+      },
+      "homepage" : "https://www.eyrie.org/~eagle/software/ansicolor/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rra/ansicolor.git",
+         "web" : "https://github.com/rra/ansicolor"
+      }
+   },
+   "version" : "4.06",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

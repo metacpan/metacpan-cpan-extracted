@@ -1,0 +1,62 @@
+{
+   "abstract" : "A simple distributed cloud friendly cron for the masses",
+   "author" : [
+      "Jose Luis Martinez <joseluis.martinez@capside.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CloudCron",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Dist::Zilla" : "0",
+            "Dist::Zilla::Plugin::Prereqs::FromCPANfile" : "0",
+            "Dist::Zilla::Plugin::VersionFromModule" : "0",
+            "Dist::Zilla::PluginBundle::Git" : "0",
+            "Test::Output" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Spec" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CloudDeploy" : "0",
+            "JSON" : "0",
+            "Log::Log4perl" : "0",
+            "Moose" : "0",
+            "MooseX::App" : "0",
+            "MooseX::Getopt" : "0",
+            "Parse::Crontab" : "0",
+            "ParseCron" : "0",
+            "SQS::Worker" : "0.05"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/capside/CloudCron/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/capside/CloudCron.git",
+         "web" : "https://github.com/capside/CloudCron"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+}
+

@@ -1,0 +1,131 @@
+---
+abstract: 'The Canny, Microlight and Simple CMS'
+author:
+  - 'Ron Savage <ron@savage.net.au>'
+build_requires:
+  Test::Pod: 1.41
+  Test::Simple: 0.94
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Office-CMS
+provides:
+  App::Office::CMS:
+    file: lib/App/Office/CMS.pm
+    version: 0.92
+  App::Office::CMS::Controller:
+    file: lib/App/Office/CMS/Controller.pm
+    version: 0.92
+  App::Office::CMS::Controller::Backup:
+    file: lib/App/Office/CMS/Controller/Backup.pm
+    version: 0.92
+  App::Office::CMS::Controller::Content:
+    file: lib/App/Office/CMS/Controller/Content.pm
+    version: 0.92
+  App::Office::CMS::Controller::Design:
+    file: lib/App/Office/CMS/Controller/Design.pm
+    version: 0.92
+  App::Office::CMS::Controller::Initialize:
+    file: lib/App/Office/CMS/Controller/Initialize.pm
+    version: 0.92
+  App::Office::CMS::Controller::Page:
+    file: lib/App/Office/CMS/Controller/Page.pm
+    version: 0.92
+  App::Office::CMS::Controller::Search:
+    file: lib/App/Office/CMS/Controller/Search.pm
+    version: 0.92
+  App::Office::CMS::Controller::Site:
+    file: lib/App/Office/CMS/Controller/Site.pm
+    version: 0.92
+  App::Office::CMS::Database:
+    file: lib/App/Office/CMS/Database.pm
+    version: 0.92
+  App::Office::CMS::Database::Asset:
+    file: lib/App/Office/CMS/Database/Asset.pm
+    version: 0.92
+  App::Office::CMS::Database::Base:
+    file: lib/App/Office/CMS/Database/Base.pm
+    version: 0.92
+  App::Office::CMS::Database::Content:
+    file: lib/App/Office/CMS/Database/Content.pm
+    version: 0.92
+  App::Office::CMS::Database::Design:
+    file: lib/App/Office/CMS/Database/Design.pm
+    version: 0.92
+  App::Office::CMS::Database::Event:
+    file: lib/App/Office/CMS/Database/Event.pm
+    version: 0.92
+  App::Office::CMS::Database::Menu:
+    file: lib/App/Office/CMS/Database/Menu.pm
+    version: 0.92
+  App::Office::CMS::Database::Page:
+    file: lib/App/Office/CMS/Database/Page.pm
+    version: 0.92
+  App::Office::CMS::Database::Site:
+    file: lib/App/Office/CMS/Database/Site.pm
+    version: 0.92
+  App::Office::CMS::Util::Config:
+    file: lib/App/Office/CMS/Util/Config.pm
+    version: 0.92
+  App::Office::CMS::Util::Create:
+    file: lib/App/Office/CMS/Util/Create.pm
+    version: 0.92
+  App::Office::CMS::Util::Logger:
+    file: lib/App/Office/CMS/Util/Logger.pm
+    version: 0.92
+  App::Office::CMS::Util::Validator:
+    file: lib/App/Office/CMS/Util/Validator.pm
+    version: 0.92
+  App::Office::CMS::View:
+    file: lib/App/Office/CMS/View.pm
+    version: 0.92
+  App::Office::CMS::View::Base:
+    file: lib/App/Office/CMS/View/Base.pm
+    version: 0.92
+  App::Office::CMS::View::Content:
+    file: lib/App/Office/CMS/View/Content.pm
+    version: 0.92
+  App::Office::CMS::View::Page:
+    file: lib/App/Office/CMS/View/Page.pm
+    version: 0.92
+  App::Office::CMS::View::Search:
+    file: lib/App/Office/CMS/View/Search.pm
+    version: 0.92
+  App::Office::CMS::View::Site:
+    file: lib/App/Office/CMS/View/Site.pm
+    version: 0.92
+requires:
+  Any::Moose: 0.13
+  Brannigan: 0.5
+  CGI: 3.49
+  CGI::Application: 4.31
+  CGI::Application::Dispatch: 2.17
+  CGI::Untaint: 1.26
+  Capture::Tiny: 0.08
+  Config::Tiny: 2.12
+  DBD::SQLite: 1.29
+  DBI: 1.611
+  DBIx::Admin::CreateTable: 2.04
+  Data::Session: 1.01
+  Date::Format: 2.24
+  File::Path: 2.08
+  File::Slurp: 9999.13
+  File::Spec: 3.31
+  FindBin: 1.49
+  JSON::XS: 2.29
+  Log::Handler: 0.68
+  Path::Class: 0.18
+  String::Dirify: 1.01
+  Text::Xslate: 0.1051
+  Tree::DAG_Node: 1.06
+  Tree::DAG_Node::Persist: 1.03
+  Try::Tiny: 0.06
+  common::sense: 3
+  parent: 0.218
+resources:
+  license: http://www.perlfoundation.org/artistic_license_1_0
+version: 0.92

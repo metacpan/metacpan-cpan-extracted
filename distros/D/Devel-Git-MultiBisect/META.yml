@@ -1,0 +1,38 @@
+---
+abstract: 'Study test output over a range of git commits'
+author:
+  - 'James E Keenan (jkeenan@cpan.org)'
+build_requires:
+  Capture::Tiny: '0'
+  ExtUtils::MakeMaker: '0'
+  IO::CaptureOutput: '0'
+  Test::Simple: '0.44'
+configure_requires:
+  Devel::CheckBin: '0'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-Git-MultiBisect
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Cwd: '0'
+  Data::Dumper: '0'
+  Digest::MD5: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Copy: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  Getopt::Long: '0'
+  List::Util: '0'
+  strict: '0'
+  warnings: '0'
+version: '0.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

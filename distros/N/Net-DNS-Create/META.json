@@ -1,0 +1,60 @@
+{
+   "abstract" : "Create DNS configurations from a nice Perl structure based DSL.",
+   "author" : [
+      "David Caldwell <david@porkrind.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-DNS-Create",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Slurp" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Hash::Merge::Simple" : "0",
+            "LWP::Protocol::https" : "0",
+            "Net::Amazon::Route53" : "0",
+            "Net::DNS" : "0.72",
+            "perl" : "v5.10.0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::DNS::Create" : {
+         "file" : "lib/Net/DNS/Create.pm",
+         "version" : "v1.0.0"
+      },
+      "Net::DNS::Create::Bind" : {
+         "file" : "lib/Net/DNS/Create/Bind.pm"
+      },
+      "Net::DNS::Create::Route53" : {
+         "file" : "lib/Net/DNS/Create/Route53.pm"
+      },
+      "Net::DNS::Create::Tiny" : {
+         "file" : "lib/Net/DNS/Create/Tiny.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v1.0.0"
+}

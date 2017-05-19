@@ -1,0 +1,9 @@
+
+root: all
+	echo root
+all::
+	echo all_one
+all:: 3
+	echo all_two
+%:
+	sleep $*

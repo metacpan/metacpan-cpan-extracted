@@ -1,5 +1,9 @@
 Revision history for Test-LWP-UserAgent
 
+0.033     2017-05-18 00:46:41Z
+          - fix network tests that failed from 0.032, due to inadequate author
+            testing before release
+
 0.032     2017-05-03 22:57:18Z
           - convert network tests to using httpbin.org, to not rely on
             iana.org not changing their content

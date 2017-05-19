@@ -2,7 +2,7 @@ package SVG::XML;
 use strict;
 use warnings;
 
-our $VERSION = '2.76';
+our $VERSION = '2.77';
 
 =pod
 
@@ -29,9 +29,11 @@ L<SVG at the W3C|http://www.w3c.org/Graphics/SVG/>
 
 =cut
 
-use Exporter qw(import);
+use Exporter;
+use vars qw(@ISA @EXPORT);
+@ISA = ('Exporter');
 
-our @EXPORT = qw(
+@EXPORT = qw(
     xmlesc
     xmlescape
     xmlescp

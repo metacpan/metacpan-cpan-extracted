@@ -1,0 +1,58 @@
+---
+abstract: 'Write content into your source tree from your release staging'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  Dist::Zilla::App::Tester: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::DZil: '0'
+  Test::More: '0'
+  Test::Needs: '0'
+  Test::TempDir::Tiny: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-App-Command-regenerate
+provides:
+  Dist::Zilla::App::Command::regenerate:
+    file: lib/Dist/Zilla/App/Command/regenerate.pm
+    version: '0.001001'
+  Dist::Zilla::Plugin::Regenerate:
+    file: lib/Dist/Zilla/Plugin/Regenerate.pm
+    version: '0.001001'
+  Dist::Zilla::Plugin::Regenerate::AfterReleasers:
+    file: lib/Dist/Zilla/Plugin/Regenerate/AfterReleasers.pm
+    version: '0.001001'
+  Dist::Zilla::Role::Regenerator:
+    file: lib/Dist/Zilla/Role/Regenerator.pm
+    version: '0.001001'
+recommends:
+  Moose: '2.000'
+  Path::Tiny: '0.058'
+requires:
+  Beam::Emitter: '0'
+  Beam::Event: '0'
+  Carp: '0'
+  Dist::Zilla::App: '0'
+  Dist::Zilla::Role::Plugin: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Path::Tiny: '0.017'
+  Safe::Isa: '0'
+  namespace::clean: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-App-Command-regenerate/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-App-Command-regenerate
+  repository: https://github.com/kentnl/Dist-Zilla-App-Command-regenerate.git
+version: '0.001001'

@@ -1,0 +1,51 @@
+---
+abstract: '(DEPRECATED) Build Module::Install based Distributions with Dist::Zilla'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Module::Install: '0.90'
+  Path::Tiny: '0'
+  Test::DZil: '0'
+  Test::Differences: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-ModuleInstall
+provides:
+  Dist::Zilla::Plugin::ModuleInstall:
+    file: lib/Dist/Zilla/Plugin/ModuleInstall.pm
+    version: '1.001002'
+recommends:
+  Moose: '2.000'
+requires:
+  Carp: '0'
+  Dist::Zilla::File::FromCode: '0'
+  Dist::Zilla::File::InMemory: '0'
+  Dist::Zilla::Plugin::MakeMaker::Runner: '0'
+  Dist::Zilla::Role::BuildRunner: '0'
+  Dist::Zilla::Role::InstallTool: '0'
+  Dist::Zilla::Role::PrereqSource: '0'
+  Dist::Zilla::Role::Tempdir: '1.001000'
+  Dist::Zilla::Role::TestRunner: '0'
+  Dist::Zilla::Role::TextTemplate: '0'
+  Module::Install: '0.90'
+  Moose: '0.92'
+  namespace::autoclean: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-Plugin-ModuleInstall/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-Plugin-ModuleInstall
+  repository: https://github.com/kentnl/Dist-Zilla-Plugin-ModuleInstall.git
+version: '1.001002'

@@ -204,7 +204,8 @@ subtest 'output to a file and mackerel (dry_run=1)' => sub {
     };
 
     my @lines = split /\n/, $stdout;
-    is scalar @lines, 36 or diag $stdout;
+    # 18(file) + 1(mackerel)
+    is scalar @lines, 19 or diag $stdout;
     is $stderr, '' or diag $stderr;
 
     # did not write to a file

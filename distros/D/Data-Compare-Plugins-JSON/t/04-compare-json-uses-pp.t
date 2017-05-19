@@ -20,7 +20,7 @@ use Data::Compare;
 
 diag "JSON $JSON::VERSION";
 
-ok (JSON->backend eq 'JSON::PP');
+isa_ok (JSON->backend, 'JSON::PP');
 for (
 	[JSON::false, JSON::false, 1],
 	[JSON::false, JSON::true,  0],

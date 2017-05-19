@@ -1,0 +1,34 @@
+--- 
+abstract: application to serve processed templates
+author: 
+  - Jonathan Rockway C<< <jrockway@cpan.org> >>
+build_requires: 
+  Data::Dumper: 0
+  Directory::Scratch: 0
+  Test::More: 0
+  ok: 0
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: Perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: App-TemplateServer
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  HTTP::Daemon: 0
+  List::Util: 0
+  Method::Signatures: 0
+  Moose: 0.33
+  MooseX::Getopt: 0
+  MooseX::Types::Path::Class: 0
+  Package::FromData: 0
+  Scalar::Util: 0
+  Template: 0
+  URI::Escape: 0
+  YAML::Syck: 0
+  perl: 5.10.0
+version: 0.04

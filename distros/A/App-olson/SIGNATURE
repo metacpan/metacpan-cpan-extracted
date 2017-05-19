@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 8441d078f5a736fa1a5f0f2251f028b28aeb7463 .gitignore
+SHA1 4da68fba4e1fc3a6a6797c07bee69860273e25c9 Build.PL
+SHA1 04c9b3c3fc21c37f117fa98b198a16cb1372e14c Changes
+SHA1 e67c1d5cf443546f092e0e1fd3149749bd0384d7 MANIFEST
+SHA1 9489e189428019f4ebcac1d134162cc22fc70480 META.json
+SHA1 a221a6be73c3dfe9cc57c9458fb91c1ef9052bfb META.yml
+SHA1 a249be72fc0b310375871d710790dd94e08a12f0 Makefile.PL
+SHA1 43e740c718923ec3f9e2206daa7117638a592c48 README
+SHA1 0232e97123e33ed55a0706cdb98d18140977b4b0 bin/olson
+SHA1 a98199b704a3353e6cc066f973f95d8cbfd5f7bf lib/App/olson.pm
+SHA1 e5984702d5d4d1fc827e818e16a95ff6548b2261 t/attr.t
+SHA1 728823652db01b0c3b8166e6f2eb47ac0efd38f9 t/load.t
+SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
+SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
+SHA1 faf5f69af54dee856dd458c9127a983eab169adb t/version.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAk9edugACgkQOV9mt2VyAVEKAQCfRtKGvIJ/jHWfxkrSjGIc6hUI
+xv8An2twl306fZ8u2X7KtYHybjoAEwLc
+=uaZQ
+-----END PGP SIGNATURE-----

@@ -1,0 +1,33 @@
+---
+abstract: 'Comment program output to your script after execution'
+author:
+  - 'motemen <motemen@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Devel-Comment-Output
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Scalar::Util: 0
+  Symbol: 0
+  Tie::Handle: 0
+  parent: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/motemen/Devel-Comment-Output.git
+version: 0.02

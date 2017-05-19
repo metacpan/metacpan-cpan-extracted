@@ -1,0 +1,21 @@
+---
+abstract: 'A worker process for CloudCron'
+author:
+  - 'Jose Luis Martinez <joseluis.martinez@capside.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CloudCron-Worker
+requires:
+  SQS::Worker: '0'
+resources:
+  bugtracker: https://github.com/capside/CloudCron/issues
+  repository: https://github.com/capside/CloudCron.git
+version: '0.02'
+x_serialization_backend: 'YAML::Tiny version 1.70'

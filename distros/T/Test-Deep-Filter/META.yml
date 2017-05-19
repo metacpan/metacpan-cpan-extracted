@@ -1,0 +1,40 @@
+---
+abstract: 'Perform a filter on a matched element before doing sub-matching'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  Test::Tester: '0.08'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Deep-Filter
+provides:
+  Test::Deep::Filter:
+    file: lib/Test/Deep/Filter.pm
+    version: '0.001001'
+  Test::Deep::Filter::Object:
+    file: lib/Test/Deep/Filter/Object.pm
+    version: '0.001001'
+requires:
+  Exporter: '0'
+  Test::Deep: '0'
+  Test::Deep::Cmp: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Test-Deep-Filter/issues
+  homepage: https://github.com/kentnl/Test-Deep-Filter
+  repository: https://github.com/kentnl/Test-Deep-Filter.git
+version: '0.001001'

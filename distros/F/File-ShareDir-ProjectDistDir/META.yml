@@ -1,0 +1,43 @@
+---
+abstract: "Simple set-and-forget using of a '/share' directory in your projects root"
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  Class::Tiny: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  Test::More: '0'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-ShareDir-ProjectDistDir
+provides:
+  File::ShareDir::ProjectDistDir:
+    file: lib/File/ShareDir/ProjectDistDir.pm
+    version: '1.000009'
+recommends:
+  Path::Tiny: '0.058'
+requires:
+  Carp: '0'
+  File::ShareDir: '0'
+  Path::FindDev: '0'
+  Path::IsDev: '0'
+  Path::Tiny: '0'
+  Sub::Exporter: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/File-ShareDir-ProjectDistDir/issues
+  homepage: https://github.com/kentnl/File-ShareDir-ProjectDistDir
+  repository: https://github.com/kentnl/File-ShareDir-ProjectDistDir.git
+version: '1.000009'

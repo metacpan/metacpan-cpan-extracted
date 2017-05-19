@@ -1,0 +1,24 @@
+---
+abstract: 'XS version of AlignDB::IntSpan.'
+author:
+  - 'Qiang Wang <wang-q@outlook.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AlignDB-IntSpanXS
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Scalar::Util::Numeric: '0'
+version: v1.0.3
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

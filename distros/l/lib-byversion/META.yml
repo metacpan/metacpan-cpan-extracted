@@ -1,0 +1,35 @@
+---
+abstract: 'add paths to @INC depending on which version of Perl is running.'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: lib-byversion
+provides:
+  lib::byversion:
+    file: lib/lib/byversion.pm
+    version: '0.002002'
+requires:
+  String::Formatter: '0'
+  lib: '0'
+  perl: '5.006'
+  strict: '0'
+  version: '0.77'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/lib-byversion/issues
+  homepage: https://github.com/kentnl/lib-byversion
+  repository: https://github.com/kentnl/lib-byversion.git
+version: '0.002002'

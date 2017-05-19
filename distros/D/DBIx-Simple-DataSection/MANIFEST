@@ -1,0 +1,27 @@
+.gitignore
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/TestBase.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+inc/Spiffy.pm
+inc/Test/Base.pm
+inc/Test/Base/Filter.pm
+inc/Test/Builder.pm
+inc/Test/Builder/Module.pm
+inc/Test/More.pm
+lib/DBIx/Simple/DataSection.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00_load_all.t
+t/01_sqlite.t
+t/02_notfound.t
+t/03_new.t

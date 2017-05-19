@@ -1,0 +1,58 @@
+{
+   "abstract" : "Parse the templates used in pack() and unpack()",
+   "author" : [
+      "Ron Savage <ron@savage.net.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MarpaX-Languages-Perl-PackUnpack",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "1.001006"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.421"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Const::Exporter" : "v0.2.3",
+            "Marpa::R2" : "2.096",
+            "Moo" : "1.006",
+            "Tree" : "1.05",
+            "Try::Tiny" : "0.09",
+            "Types::Standard" : "1.000004",
+            "open" : "0",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "MarpaX::Languages::Perl::PackUnpack" : {
+         "file" : "lib/MarpaX/Languages/Perl/PackUnpack.pm",
+         "version" : "1.00"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
+      "repository" : {
+         "url" : "https://github.com/ronsavage/MarpaX-Languages-Perl-PackUnpack"
+      }
+   },
+   "version" : "1.00"
+}

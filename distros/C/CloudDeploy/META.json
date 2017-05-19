@@ -1,0 +1,55 @@
+{
+   "abstract" : "A toolkit for building and managing AWS CloudFormation stacks",
+   "author" : [
+      "Jose Luis Martinez <joseluis.martinez@capside.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CloudDeploy",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "0",
+            "Dist::Zilla::Plugin::Prereqs::FromCPANfile" : "0",
+            "Dist::Zilla::Plugin::VersionFromModule" : "0",
+            "Dist::Zilla::PluginBundle::Git" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AWS::CLIWrapper" : "0",
+            "Array::Compare" : "0",
+            "Data::Graph::Util" : "0",
+            "Data::Printer" : "0",
+            "Module::Runtime" : "0",
+            "MongoDB" : "0",
+            "Moose" : "0",
+            "MooseX::App" : "0",
+            "MooseX::Getopt" : "0",
+            "MooseX::SlurpyConstructor" : "0",
+            "MooseX::StrictConstructor" : "0",
+            "Paws" : "0",
+            "String::Diff" : "0",
+            "Template" : "0",
+            "Term::ANSIColor" : "0",
+            "Text::TabularDisplay" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.05",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0211"
+}
+

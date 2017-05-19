@@ -1,0 +1,26 @@
+---
+abstract: "Shorten URL using rev=\"canonical\""
+author:
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.79'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-Shorten-RevCanonical
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Filter::Util::Call: 0
+  LWP::UserAgent: 0
+  WWW::Shorten: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/miyagawa/www-shorten-revcanonical.git
+version: 0.03

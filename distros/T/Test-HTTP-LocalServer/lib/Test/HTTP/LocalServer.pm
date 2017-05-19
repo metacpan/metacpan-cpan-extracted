@@ -8,6 +8,7 @@ BEGIN {
     HTTPS_PROXY https_proxy HTTP_PROXY_ALL http_proxy_all
   )};
 }
+use 5.008; # We use "fancy" opening of lexical filehandle, see below
 use LWP::Simple;
 use FindBin;
 use File::Spec;
@@ -18,7 +19,7 @@ use Cwd;
 use File::Basename;
 
 use vars qw($VERSION);
-$VERSION = '0.57';
+$VERSION = '0.58';
 
 =head1 NAME
 

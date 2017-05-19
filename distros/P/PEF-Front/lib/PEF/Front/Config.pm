@@ -32,6 +32,7 @@ my @std_const_params = qw{
 	cfg_cache_file
 	cfg_cache_size
 	cfg_cache_method_expire
+	cfg_cache_module
 	cfg_cookie_unset_negative_expire
 	cfg_www_static_dir
 	cfg_www_static_captchas_dir
@@ -60,6 +61,7 @@ my @std_const_params = qw{
 	cfg_session_db_file
 	cfg_session_ttl
 	cfg_session_request_field
+	cfg_session_module
 	cfg_oauth_connect_timeout
 	cfg_unknown_msgid_db
 	cfg_collect_unknown_msgid
@@ -146,6 +148,7 @@ sub std_captcha_expire_sec           {300}
 sub std_cache_file                   {cfg_project_dir() . "/var/cache/shared.cache"}
 sub std_cache_size                   {"8m"}
 sub std_cache_method_expire          {60}
+sub std_cache_module                 {'Null'}
 sub std_model_rules_reload           {0}
 sub std_model_dir                    {cfg_project_dir() . "/model"}
 sub std_www_static_dir               {cfg_project_dir() . "/www-static"}
@@ -159,6 +162,7 @@ sub std_log_level_debug              {0}
 sub std_session_db_file              {cfg_project_dir() . "/var/cache/session.db"}
 sub std_session_ttl                  {86400 * 30}
 sub std_session_request_field        {'auth'}
+sub std_session_module               {'MLDBM'}
 sub std_cookie_unset_negative_expire {-3600}
 sub std_oauth_connect_timeout        {15}
 
@@ -367,6 +371,11 @@ Default is C<cfg_project_dir() . "/var/cache/shared.cache">
 Default expire time for cached responses. 
 By default it's equal to 60 [seconds].
 
+=item B<cfg_cache_module>
+
+Fully qualified module name or just simple module name inside 
+C<PEF::Front::Cache::> that provides C<PEF::Front::Cache> interface.
+
 =item B<cfg_cache_size>
 
 Cache size. Default is equal to "8m" = 8 Megabytes.
@@ -532,6 +541,11 @@ path to your startup file.
 
 Sets database file that will be used to store the user session data.
 Default is cfg_project_dir() . "/var/cache/session.db".
+
+=item B<cfg_session_module>
+
+Fully qualified module name or just simple module name inside 
+C<PEF::Front::Session::> that provides C<PEF::Front::Session> interface.
 
 =item B<cfg_session_request_field>
 

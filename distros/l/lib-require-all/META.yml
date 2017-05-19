@@ -1,0 +1,34 @@
+---
+abstract: 'A tiny pragma to load all files from a lib directory'
+author:
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.88
+  Test::Requires: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: lib::require::all
+name: lib-require-all
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+provides:
+  lib::require::all:
+    file: lib/lib/require/all.pm
+    version: 0.01
+requires:
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/miyagawa/lib-require-all.git
+version: 0.01

@@ -1,0 +1,57 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d0cbe245cab7d78e4a8c22974dc343a07f68907f .gitignore
+SHA1 29e8f11dc9cf909ba8fcb35f085697b3dd6999da Build.PL
+SHA1 8883fc7fe6746e05b03ebf45666652470d823506 Changes
+SHA1 6752e0bb538e9fbb80db765a2038a017a38ccb77 MANIFEST
+SHA1 82d6cad0406b96e96ebee6151a284a4145c6a9df META.json
+SHA1 bc97b1888b80d0f3118e4734e2f815dbd8c831ec META.yml
+SHA1 e0b2c60c229d225b74eeb35aa2814a8d0fa2df8b Makefile.PL
+SHA1 d11328e62c85253bcee406e75658847859141cdc README
+SHA1 492d0455968f6548e746742b1ff1d7285e89d431 lib/Parse/Perl.pm
+SHA1 d7ec94a97be35f535133d0a3f1d814395f87b198 lib/Parse/Perl.xs
+SHA1 01cfd0516a2361d17f264fe310b6843b16fba729 lib/Parse/Perl/CopHintsHash.pod
+SHA1 f84f4407095d0426856cf62c7844dbcf5507beed lib/Parse/Perl/Environment.pod
+SHA1 709ddd6d4b09a7ee462d99c33a1685e5a52dadfb t/args.t
+SHA1 cb328e6a573d74c74b0ea380f81c30431a4ee961 t/context.t
+SHA1 6b3de2aa072d4488f2b3b34ba95afbc1d1e133af t/curcop.t
+SHA1 f15589b431696dbbee28d4a199d0e728a28ea0f0 t/develdeclare.t
+SHA1 b38a0e0c7775325ce6c068c7ca084b0413e1c90c t/error.t
+SHA1 2b410bec67c26170e89879bc1965e544bb9ea806 t/except.t
+SHA1 ec7c41a1362cf2ed5bde041867dea3487c041090 t/lex_arybase.t
+SHA1 1ce178c2af88df89386ee90d086a796c95316beb t/lex_hinthash.t
+SHA1 9ac0bf339269e1a104e2461a1fef8e4a4b477ba8 t/lex_package.t
+SHA1 ae20b46e8a70cfbae817dbcd8f4746e71cf4d124 t/lex_strict.t
+SHA1 055eb0a5757e4fa76934e697ea935f12e0636d11 t/lex_variable.t
+SHA1 f8c514c92a272ff76d0ed39d02fc67002cbd5140 t/lex_warnings.t
+SHA1 2b69b4b8fb4cef2bd203ddfb1aa7cc75db582275 t/leximport.t
+SHA1 f1f49663556dc67cb0dac6b441a56377302fe107 t/magicblock.t
+SHA1 20319b3f5f9cd668d65b3c860574a6864e331ef7 t/name.t
+SHA1 aa678d2b5d1be7043433baa210cb3489c648dee7 t/nest_capture.t
+SHA1 9a939efd63c16bc0af0f7c6f59433fdd092d8255 t/nest_sub.t
+SHA1 4b21c1944e6378ef2cf6e3fd62acfe5b58ab3562 t/phase.t
+SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
+SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
+SHA1 079d1c5792a213e22ae3d340e07a8929769f4154 t/return.t
+SHA1 0cbf19302dd6d41af8574a2945e6c8b7b6bdab34 t/stub.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAk8vAXMACgkQOV9mt2VyAVF92QCgqrck5Kzy9ogR/2ZLLCWi9WKo
+Di8AoJQAHivqy6WW9zLA6w3KWCUniQJq
+=zJXE
+-----END PGP SIGNATURE-----

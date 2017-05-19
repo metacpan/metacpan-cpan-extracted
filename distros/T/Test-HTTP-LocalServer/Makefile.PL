@@ -15,7 +15,7 @@ my $main_file = 'lib/Test/HTTP/LocalServer.pm';
 my @tests = map { glob $_ } 't/*.t', 't/*/*.t';
 
 my %module = (
-    MIN_PERL_VERSION => '5.006',
+    MIN_PERL_VERSION => '5.008',
     META_MERGE => {
         "meta-spec" => { version => 2 },
         resources => {

@@ -1,0 +1,30 @@
+--- #YAML:1.0
+name:               App-get_flash_videos
+version:            1.24
+abstract:           ~
+author:
+    - Monsieur Video <monsieurvideo@gmail.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    Tie::IxHash:  0
+requires:
+    LWP::UserAgent:  0
+    perl:            5.008
+    Tie::IxHash:     0
+    URI:             0
+    WWW::Mechanize:  0
+resources:
+    bugtracker:  http://code.google.com/p/get-flash-videos/issues
+    license:     http://www.apache.org/licenses/LICENSE-2.0.html
+    repository:  http://github.com/monsieurvideo/get-flash-videos
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -19,7 +19,7 @@ has deps => (
     default => sub { [] },
     traits  => ['Array'],
     is      => 'rw',
-    isa           => ArrayRefOfStrs,
+    isa     => ArrayRefOfStrs,
     handles => {
         all_deps    => 'elements',
         add_deps    => 'push',
@@ -47,6 +47,28 @@ has cmds => (
         has_cmds    => 'count',
         clear_cmds  => 'clear',
         has_no_cmds => 'is_empty',
+    },
+);
+
+# use File::Temp qw/ tempfile /;
+#
+# has job_file => (
+#     is      => 'rw',
+#     default => sub {
+#         my $fh = File::Temp->new( UNLINK => 0, SUFFIX => '.dat' );
+#         return $fh;
+#     }
+# );
+
+has 'cmd_counter' => (
+    traits   => ['Counter'],
+    is       => 'rw',
+    isa      => 'Num',
+    required => 1,
+    default  => 0,
+    handles  => {
+        inc_cmd_counter   => 'inc',
+        reset_cmd_counter => 'reset',
     },
 );
 
@@ -83,9 +105,10 @@ has scheduler_ids => (
 #TODO Add object class for this
 
 has batches => (
-    traits  => ['Array'],
-    is      => 'rw',
-    isa     => 'ArrayRef[HPC::Runner::Command::submit_jobs::Utils::Scheduler::Batch]',
+    traits => ['Array'],
+    is     => 'rw',
+    isa =>
+      'ArrayRef[HPC::Runner::Command::submit_jobs::Utils::Scheduler::Batch]',
     default => sub { [] },
     handles => {
         all_batches    => 'elements',
@@ -112,12 +135,12 @@ has batch_indexes => (
 
 has 'batch_index_start' => (
     isa => 'Int',
-    is => 'rw',
+    is  => 'rw',
 );
 
 has 'batch_index_end' => (
     isa => 'Int',
-    is => 'rw',
+    is  => 'rw',
 );
 
 has 'submit_by_tags' => (
@@ -138,5 +161,4 @@ has 'submitted' => (
         is_not_submitted => 'not',
     },
 );
-
 1;

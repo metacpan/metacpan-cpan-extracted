@@ -1,0 +1,80 @@
+{
+   "abstract" : "Terrestrial Time and its realisations",
+   "author" : [
+      "Andrew Main (Zefram) <zefram@fysh.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Time-TT",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Math::BigRat" : "0.13",
+            "Module::Build" : 0,
+            "Test::More" : 0,
+            "perl" : "5.006",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : 0,
+            "perl" : "5.006",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Date::JD" : "0.005",
+            "Exporter" : 0,
+            "Math::BigRat" : "0.13",
+            "Math::Interpolator::Knot" : "0.003",
+            "Math::Interpolator::Linear" : "0.003",
+            "Math::Interpolator::Robust" : "0.003",
+            "Math::Interpolator::Source" : "0.003",
+            "Net::FTP::Tiny" : "0.001",
+            "Time::UTC" : "0.007",
+            "constant" : 0,
+            "parent" : 0,
+            "perl" : "5.006",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Time::TT" : {
+         "file" : "lib/Time/TT.pm",
+         "version" : "0.005"
+      },
+      "Time::TT::InterpolatingRealisation" : {
+         "file" : "lib/Time/TT/InterpolatingRealisation.pm",
+         "version" : "0.005"
+      },
+      "Time::TT::OffsetKnot" : {
+         "file" : "lib/Time/TT/OffsetKnot.pm",
+         "version" : "0.005"
+      },
+      "Time::TT::Realisation" : {
+         "file" : "lib/Time/TT/Realisation.pm",
+         "version" : "0.005"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.005"
+}

@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               Thrift-XS
+version:            1.04
+abstract:           Faster Thrift binary protocol encoding and decoding
+author:
+    - Andy Grundman <andy@hybridized.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Bit::Vector:       0
+    Test::BinaryData:  0
+resources:
+    license:     http://www.apache.org/licenses/LICENSE-2.0
+    repository:  https://github.com/andygrundman/thrift-xs
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

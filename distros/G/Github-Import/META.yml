@@ -1,0 +1,34 @@
+---
+abstract: 'Import your project into L<http://github.com>'
+author:
+  - 'Jonathan Rockway'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Github-Import
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  File::HomeDir: 0
+  Git: 0
+  LWP::UserAgent: 0
+  Moose: 0.64
+  MooseX::Getopt: 0
+  MooseX::Getopt::Dashes: 0
+  MooseX::Types::Path::Class: 0
+  Test::Exception: 0
+  Test::use::ok: 0
+  URI: 0
+  namespace::clean: 0
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+version: 0.07

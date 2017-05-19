@@ -1,0 +1,35 @@
+---
+abstract: 'Create DNS configurations from a nice Perl structure based DSL.'
+author:
+  - 'David Caldwell <david@porkrind.org>'
+build_requires:
+  File::Slurp: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-DNS-Create
+provides:
+  Net::DNS::Create:
+    file: lib/Net/DNS/Create.pm
+    version: v1.0.0
+  Net::DNS::Create::Bind:
+    file: lib/Net/DNS/Create/Bind.pm
+  Net::DNS::Create::Route53:
+    file: lib/Net/DNS/Create/Route53.pm
+  Net::DNS::Create::Tiny:
+    file: lib/Net/DNS/Create/Tiny.pm
+requires:
+  Hash::Merge::Simple: '0'
+  LWP::Protocol::https: '0'
+  Net::Amazon::Route53: '0'
+  Net::DNS: '0.72'
+  perl: v5.10.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v1.0.0

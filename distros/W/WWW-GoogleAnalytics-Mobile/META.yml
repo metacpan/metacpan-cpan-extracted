@@ -1,0 +1,34 @@
+---
+abstract: 'PSGI Application of Google Analytics for Mobile'
+author:
+  - 'Masahiro Nagano <kazeburo {at} gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+  Test::TCP: 1.11
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-GoogleAnalytics-Mobile
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Digest::SHA: 0
+  Furl: 0.31
+  List::Util: 0
+  Net::DNS::Lite: 0
+  Plack: 0.9963
+  URI: 0
+  parent: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/kazeburo/WWW-GoogleAnalytics-Mobile.git
+version: 0.01

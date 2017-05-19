@@ -1,0 +1,212 @@
+NAME
+
+    Dir::Project - Project Environment determination
+
+SYNOPSIS
+
+      # Perl
+      use Dir::Project;
+      Dir::Project::get_set_all();
+
+      # Makefiles
+      include $(DIRPROJECT_PREFIX)/lib/project_dir.mk
+
+      # Example script dispatching
+      cd ~/project1
+      project_dir --project
+         /path/to/project1
+      my_tool my_args....   # Executes project1/.../my_tool
+
+      cd ~/project2
+      project_dir --project
+         /path/to/project2
+      my_tool my_args....   # Executes project2/.../my_tool
+
+DESCRIPTION
+
+    Dir::Project provides a way to locate a source-controlled directory
+    (CVS, Subversion, Perforce, Git, etc) using only the current working
+    directory (cd). This prevents users from having to set other environment
+    variables when they switch between areas.
+
+    Project_bin allows a single symlink to a user script to be placed in a
+    global PATH. Project_bin then automatically finds that script inside the
+    source controlled area. Different users, or different checkouts will
+    execute the script in their areas. Thus, problems with version mismatch
+    across executing tools are eliminated.
+
+ENVIRONMENT SETUP
+
+    To use project_bin, you should make the following settings in your
+    .bashrc or equivalent group file:
+
+       export DIRPROJECT_PREFIX=/prefix     # Any global project prefix
+       export PATH=$DIRPROJECT_PREFIX/bin:$PATH
+
+    Then for each executable that lives in your source control area that you
+    wish to dispatch to, you create a simlink:
+
+       ln -s project_bin $DIRPROJECT_PREFIX/dir/my_tool
+
+    or, instead, make my_tool a script to run project_bin as described in
+    project_bin.
+
+    More details in project_bin.
+
+USAGE IN SCRIPTS
+
+    Dir::Project may be used three different ways inside scripts.
+
+    First, a script may be totally ignorant of Dir::Project. Simply by
+    placing it in a directory that is part of DIRPROJECT_PATH, and creating
+    a symlink from project_bin, it will be executed automatically based on a
+    search starting at the current directory.
+
+    Second, a script that is always executed by project_bin can get the root
+    of the checkout by using $DIRPROJECT. Generally I cache the value of
+    DIRPROJECT in a variable called simply $Project.
+
+        BEGIN {
+            $Project = $ENV{DIRPROJECT} or die "%Error: Can't determine DIRPROJECT: Call me with project_bin, stopped";
+        }
+        ....
+        my $path_to_file = "$Project/under/project/file/path...";
+
+    Third, a script may determine DIRPROJECT itself by using Dir::Project
+    directly. This does not require project_bin to be used to call the
+    program.
+
+        use Dir::Project;
+        BEGIN {
+            Dir::Project::get_set_project();
+            $Project = $ENV{DIRPROJECT} or die "%Error: Can't determine PROJECT: Call this under a project, stopped";
+        }
+        ....
+        my $path_to_file = "$Project/under/project/file/path...";
+
+USAGE IN MAKEFILES
+
+    Dir::Project may be called from inside a Makefile. The include will set
+    the DIRPROJECT variable that can then be used to replace absolute paths
+    inside the makefile.
+
+        include $(DIRPROJECT_PREFIX)/lib/project_dir.mk
+        # That include will set $(DIRPROJECT) which you can then use
+        # to find files underneath the repository checkout.
+        ....
+        PATHS = $(DIRPROJECT)/path/under/repo
+
+    Or, if you only need the DIRPROJECT variable, you can more simply:
+
+       DIRPROJECT := $(shell dir_project --project)
+
+USAGE IN EMACS / VERILOG-MODE
+
+    Dir::Project may be used with the AUTOs of Verilog-Mode for Emacs.
+
+    Install the contrib/dir-project.el file as described at the top of that
+    file. Restart Emacs.
+
+    Now in your source tree create an input.vc file similar to the
+    following:
+
+       -v project/path/to/rtl
+
+    The various Verilog module files would then end in a reference to the
+    file you just created:
+
+       // Local Variables:
+       // verilog-library-flags:("-f ../../../../input.vc")
+       // End:
+
+    When AUTOs are expanded the input.vc file will be read. The
+    dir-project.el hook will change the project/ links to an absolute file
+    and that will allow finding any submodules.
+
+    An alternative technique is to use $DIRPROJECT/path/to/rtl in the
+    input.vc and setting the DIRPROJECT environment variable. However
+    several EDA tools do not support environment variable expansion in .vc
+    files, thus the above project/ technique.
+
+METHODS
+
+    get_set_all()
+        Set all variables, including get_set_project.
+
+    get_set_project()
+        Set $Project and $ENV{DIRPROJECT}.
+
+    makefile()
+        Create a makefile with the appropriate make code to set DIRPROJECT.
+        This file is then included by make to set the variable.
+
+    makefile_cat()
+        Print the makefile with the appropriate make code to set DIRPROJECT.
+
+    program_paths(program=>*name*)
+        Return a list of paths the program may live at. Uses
+        $DIRPROJECT_PATH and $DIRPROJECT_PREFIX resolved with the current
+        project to determine the list.
+
+    program_bin(paths=>\*@list*)
+        Return the first readable file in the list of paths, or undef if
+        none found.
+
+    undefine_all()
+        Remove all environment variables.
+
+ENVIRONMENT
+
+    DIRPROJECT
+        Points to the top directory of the project source-controlled area.
+        It is created by Dir::Project::get_set_all.
+
+    DIRPROJECT_DEBUG
+        Set when project_bin is invoked with --debug.
+
+    DIRPROJECT_PATH
+        A colon-separated list of directories that program_paths() and
+        project_bin should search for executables within. Generally contains
+        a leading project/ in front of all directories, this will be
+        converted to $DIRPROJECT, though it may also be absolute directory
+        names to search for if the project is not found. Set by the user's
+        .bashrc or similar login script.
+
+    DIRPROJECT_PREFIX
+        A global directory like the --prefix passed to most configure
+        scripts. Used by program_paths() and project_bin to create the
+        default $DIRPROJECT_PREFIX/bin/{program}__not_found link. Set by the
+        user's .bashrc or similar login script.
+
+    DIRPROJECT_PROJECTDIREXE
+        Path and executable for project_dir. Used by project_dir.mk.
+        Generally can be left unset, so it will default to just project_dir
+        (without any directory prefix) so it will be found using PATH.
+
+    DIRPROJECT_EXE
+        The last executable run by project_bin. Set by project_bin.
+
+DISTRIBUTION
+
+    Dir-Project is part of the <http://www.veripool.org/> free EDA software
+    tool suite. The latest version is available from CPAN and from
+    <http://www.veripool.org/>.
+
+    Copyright 2001-2017 by Wilson Snyder. This package is free software; you
+    can redistribute it and/or modify it under the terms of either the GNU
+    Lesser General Public License Version 3 or the Perl Artistic License
+    Version 2.0.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+AUTHORS
+
+    Wilson Snyder <wsnyder@wsnyder.org>
+
+SEE ALSO
+
+    project_bin, project_dir
+

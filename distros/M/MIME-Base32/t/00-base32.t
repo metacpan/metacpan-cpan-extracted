@@ -16,15 +16,21 @@ my $encoded = 'JBQWY3DPEB3W64TMMQWCA53IMF2HGIDOMV3T6IBRGIZTINJWG44DSMBAMFRGGZDFM
 
 is(MIME::Base32::encode($string),$encoded, 'encode: got the correct response');
 is(MIME::Base32::decode($encoded),$string, 'decode: got the correct response');
+is(MIME::Base32::decode(lc($encoded)),$string, 'decode: case insensitive');
 
 is(MIME::Base32::encode_base32($string),$encoded, 'encode_base32: got the correct response');
 is(MIME::Base32::decode_base32($encoded),$string, 'decode_base32: got the correct response');
+is(MIME::Base32::decode_base32(lc($encoded)),$string, 'decode_base32: case insensitive?');
 
 is(MIME::Base32::encode_rfc3548($string),$encoded, 'encode_rfc3548: got the correct response');
 is(MIME::Base32::decode_rfc3548($encoded),$string, 'decode_rfc3548: got the correct response');
+is(MIME::Base32::decode_rfc3548(lc($encoded)),$string, 'decode_rfc3548: case insensitive');
 
 is(encode_base32(undef),'','encode_base32: undef passed');
 is(decode_base32(undef),'','decode_base32: undef passed');
+
+is(encode_base32(),'','encode_base32: empty call');
+is(decode_base32(),'','decode_base32: empty call');
 
 is(encode_base32(''),'','encode_base32: empty string passed');
 is(decode_base32(''),'','decode_base32: empty string passed');

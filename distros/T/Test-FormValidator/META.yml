@@ -1,0 +1,32 @@
+---
+name: Test-FormValidator
+version: 0.07
+author:
+  - 'Michael Graham <mgraham@cpan.org>'
+abstract: Test framework for Data::FormValidator profiles
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  CGI: 0
+  Data::Dumper: 2.03
+  Data::FormValidator: 4
+  HTML::TokeParser::Simple: 1.1
+  Test::Builder: 0
+  Test::Builder::Tester: 0
+  Test::More: 0
+  Test::Simple: 0.62
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Test::FormValidator:
+    file: lib/Test/FormValidator.pm
+    version: 0.07
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+no_index:
+  directory:
+    - misc
+    - t

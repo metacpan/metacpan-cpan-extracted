@@ -5,7 +5,6 @@ requires "IPC::System::Simple" => "0";
 requires "Import::Into" => "0";
 requires "Lingua::EN::Inflect" => "0";
 requires "List::AllUtils" => "0";
-requires "List::Gather" => "0";
 requires "List::Util" => "1.44";
 requires "Module::Pluggable::Object" => "0";
 requires "Moose" => "0";

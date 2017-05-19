@@ -1,0 +1,5 @@
+  edit VParseBison.y VParseBison_pretmp.y
+  bison -t -d -k -v --report=itemset --report=lookahead -p VParseBison -b VParseBison_pretmp -o VParseBison_pretmp.c VParseBison_pretmp.y
+  edit VParseBison_pretmp.output VParseBison.output
+  edit VParseBison_pretmp.c VParseBison.c
+  edit VParseBison_pretmp.h VParseBison.h

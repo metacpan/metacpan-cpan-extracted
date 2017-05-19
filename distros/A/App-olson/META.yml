@@ -1,0 +1,49 @@
+---
+abstract: 'query the Olson timezone database'
+author:
+  - 'Andrew Main (Zefram) <zefram@fysh.org>'
+build_requires:
+  Module::Build: 0
+  Test::More: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+configure_requires:
+  Module::Build: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-olson
+provides:
+  App::olson:
+    file: lib/App/olson.pm
+    version: 0
+  App::olson::LocalDateTime:
+    file: lib/App/olson.pm
+    version: 0
+  App::olson::UtcDateTime:
+    file: lib/App/olson.pm
+    version: 0
+requires:
+  Date::ISO8601: 0
+  DateTime::TimeZone::Olson: 0.003
+  DateTime::TimeZone::SystemV: 0.002
+  DateTime::TimeZone::Tzfile: 0.007
+  Getopt::Std: 1.02
+  Params::Classify: 0
+  Time::OlsonTZ::Data: 0.201012
+  Time::Unix: 1.02
+  integer: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://lake.fysh.org/zefram/App-olson.git
+version: 0.000

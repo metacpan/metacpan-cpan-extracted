@@ -1,0 +1,41 @@
+---
+abstract: 'Easily pack assets into Perl Modules that can be fat-packed'
+author:
+  - 'James Laver <james.laver@gmail.com>'
+build_requires:
+  Cwd: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::Differences: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  Test::TempDir::Tiny: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Asset-Pack
+provides:
+  Asset::Pack:
+    file: lib/Asset/Pack.pm
+    version: '0.000008'
+requires:
+  Data::Dumper: '0'
+  Exporter: '0'
+  Path::Tiny: '0.069'
+  Try::Tiny: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Asset-Pack/issues
+  homepage: https://github.com/kentnl/Asset-Pack
+  repository: https://github.com/kentnl/Asset-Pack.git
+version: '0.000008'

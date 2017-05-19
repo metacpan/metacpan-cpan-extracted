@@ -1,0 +1,42 @@
+---
+abstract: 'A simpler bootstrap for a more civilised world'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::DZil: '0'
+  Test::More: '0'
+  constant: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-lib
+provides:
+  Dist::Zilla::Plugin::lib:
+    file: lib/Dist/Zilla/Plugin/lib.pm
+    version: '0.001002'
+recommends:
+  Moose: '2.000'
+  Path::Tiny: '0.058'
+requires:
+  Dist::Zilla::Role::Plugin: '0'
+  Moose: '0'
+  MooseX::Types::Moose: '0'
+  Path::Tiny: '0'
+  lib: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-Plugin-lib/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-Plugin-lib
+  repository: https://github.com/kentnl/Dist-Zilla-Plugin-lib.git
+version: '0.001002'

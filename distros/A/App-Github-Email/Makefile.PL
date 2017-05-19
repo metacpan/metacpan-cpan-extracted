@@ -24,9 +24,10 @@ my %WriteMakefileArgs = (
     "Getopt::Long" => "2.49.1",
     "LWP::UserAgent" => "6.07",
     "List::MoreUtils" => "0.416",
+    "Modern::Perl" => "1.20170117",
     "Test::More" => "1.302075"
   },
-  "VERSION" => "0.0.6",
+  "VERSION" => "0.0.7",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,6 +39,7 @@ my %FallbackPrereqs = (
   "Getopt::Long" => "2.49.1",
   "LWP::UserAgent" => "6.07",
   "List::MoreUtils" => "0.416",
+  "Modern::Perl" => "1.20170117",
   "Test::More" => "1.302075"
 );
 

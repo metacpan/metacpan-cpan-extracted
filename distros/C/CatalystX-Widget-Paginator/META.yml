@@ -1,0 +1,30 @@
+---
+abstract: 'HTML widget for digg-style paginated DBIx::ResulSet'
+author:
+  - 'Oleg A. Mamontov, C<< <oleg at mamontov.net> >>'
+build_requires:
+  Catalyst::Model::DBIC::Schema: 0
+  Catalyst::Test: 0
+  DBD::SQLite: 0
+  DBI: 0
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CatalystX-Widget-Paginator
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst::Plugin::Widget: 0.03
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.07'

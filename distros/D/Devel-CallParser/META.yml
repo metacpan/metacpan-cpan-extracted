@@ -1,0 +1,48 @@
+---
+abstract: 'custom parsing attached to subroutines'
+author:
+  - 'Andrew Main (Zefram) <zefram@fysh.org>'
+build_requires:
+  Devel::CallChecker: 0.002
+  DynaLoader: 0
+  ExtUtils::CBuilder: 0.15
+  ExtUtils::ParseXS: 0
+  File::Spec: 0
+  IO::File: 1.03
+  Module::Build: 0
+  Test::More: 0
+  perl: 5.011002
+  strict: 0
+  warnings: 0
+configure_requires:
+  Module::Build: 0
+  perl: 5.011002
+  strict: 0
+  warnings: 0
+conflicts:
+  Data::Alias: '< 1.13'
+  Devel::Declare: '< 0.006004'
+  indirect: '< 0.27'
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Devel-CallParser
+provides:
+  Devel::CallParser:
+    file: lib/Devel/CallParser.pm
+    version: 0.002
+requires:
+  Devel::CallChecker: 0.002
+  DynaLoader: 0
+  DynaLoader::Functions: 0.001
+  Exporter: 0
+  parent: 0
+  perl: 5.011002
+  strict: 0
+  warnings: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.002

@@ -4,9 +4,9 @@ use warnings;
 use Test::More 0.88;
 
 BEGIN {
-    if ($ENV{NO_NETWORK_TESTING} and not $ENV{RELEASE_TESTING}
-        or (not $ENV{AUTHOR_TESTING} and not $ENV{AUTOMATED_TESTING} and not $ENV{EXTENDED_TESTING})
-    )
+    if (not $ENV{RELEASE_TESTING}
+        and ($ENV{NO_NETWORK_TESTING}
+             or (not $ENV{AUTHOR_TESTING} and not $ENV{AUTOMATED_TESTING} and not $ENV{EXTENDED_TESTING})))
     {
         plan skip_all => 'these tests use the network: unset NO_NETWORK_TESTING and set EXTENDED_TESTING, AUTHOR_TESTING or AUTOMATED_TESTING to run';
     }
@@ -14,7 +14,7 @@ BEGIN {
 
 # if tests are getting to this point and then skip due to not being able to
 # reach this site, we know they are not setting NO_NETWORK_TESTING as they should.
-use Test::RequiresInternet ( 'httpbin.org' => 80 );
+use if !$ENV{RELEASE_TESTING}, 'Test::RequiresInternet', 'httpbin.org' => 80;
 
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::Deep;
@@ -35,7 +35,7 @@ my $expected_content = $response->decoded_content;
     my $tmpfile = Path::Tiny->tempfile;
 
     my $response = $useragent->get(
-        'http://cpan.org/',
+        'http://httpbin.org/get',
         ':content_file' => $tmpfile->stringify,
     );
 
@@ -47,7 +47,7 @@ my $expected_content = $response->decoded_content;
         $response,
         methods(
             [ header => 'X-Died' ] => undef,
-            [ header => 'Content-Type' ], => re(qr{^text/html}),
+            [ header => 'Content-Type' ], => re(qr{^application/json}),
             [ header => 'Client-Date' ] => ignore,
         ),
         'response headers look ok',

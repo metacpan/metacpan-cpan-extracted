@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 67ab6441ac84593b05be87ec425194d069a51a4f .gitignore
+SHA1 22c0b8256338e7f077f6311527c006ca9acfc75b Build.PL
+SHA1 ca759dce347033b09e9ae85304e9afa352f97e6b Changes
+SHA1 739118525532c8ff18c2f9ec7a929501d610088a MANIFEST
+SHA1 c842f45a8761f35bb77ce7cff3e1bde66826d4c2 META.json
+SHA1 83ade225100dc05a2d06033c44cd317609f97efb META.yml
+SHA1 a4df8e97ccd390a42212af5a9f4d0986c85e7a5f Makefile.PL
+SHA1 6f2a34c998a573556ecc84049f01bc1deb30d860 README
+SHA1 f3398878f29a6e567c17b98caa25ffa15c857033 lib/Data/Float.pm
+SHA1 1108747d9aec62d4eadd34403fa59f1c54df153f t/class.t
+SHA1 eba7f4eeb285767f6546eebdca9cd07011b4dd51 t/const.t
+SHA1 a4ee7a6b431b6e5ee3872ff2dba90663c28148d7 t/copysign.t
+SHA1 34457366a44bf157a3ae868ac68314c1516b8b42 t/hex.t
+SHA1 cee994f9596999d49c9ec8b89c6f78afbcc16198 t/id_cmp.t
+SHA1 9230c3e8c1e76d8534092c9117c0584b80774c9b t/nextafter.t
+SHA1 01f3111f0df11ae3b7be3672c99abd0d74b9ba72 t/parts.t
+SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
+SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
+SHA1 3369ba662006149c6e5a089e6f2a440367f6df64 t/pow2.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAk8tRHMACgkQOV9mt2VyAVHh0QCfTJyr4UoKGJNnpJBYoNRMt0st
+0DsAniDJ01nBya7tjOZrcDPqJ9zv5ynU
+=rIt7
+-----END PGP SIGNATURE-----

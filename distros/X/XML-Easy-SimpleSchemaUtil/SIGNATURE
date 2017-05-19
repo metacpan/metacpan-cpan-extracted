@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 c295aae748fa7d3269505943f8f5f21f00e299c7 .gitignore
+SHA1 1adffc9373f4554de38a5273ca0b7728ac29b893 Build.PL
+SHA1 eceb79d428f2b3e50a77edb4e5b17d5bfac7009c Changes
+SHA1 87b2daa851b0ed21b8df96a04e0bda73e2221781 MANIFEST
+SHA1 9da19210f3a78ff4cf9b22888ca6408087429ee3 META.json
+SHA1 dc7f1d1ae1c380269414adbe77a986b24693f33d META.yml
+SHA1 a4df8e97ccd390a42212af5a9f4d0986c85e7a5f Makefile.PL
+SHA1 6fdb797f32cef5ab476b85c999d9aa67fdb817d3 README
+SHA1 935cb09d2edcb2b87f74d763610cad630dfe0aac lib/XML/Easy/SimpleSchemaUtil.pm
+SHA1 5286c944cf67b6bbd275f34676b383c224e98ffa t/charcanon.t
+SHA1 e6dcfb726cd5cc7b1c7c55a7e787a0c7307ca94e t/chars.t
+SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
+SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
+SHA1 8bb1536ed92dc2359d5cf36c84d3044a575b4254 t/short_names.t
+SHA1 ed8107d6de85a5a8a8567da91cad090cf63ea01a t/subelems.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAk6p0qkACgkQOV9mt2VyAVHWBQCbBI4LJxKzd9yO22xeT9qu9hiE
+rBsAnjWggvcdSqAPc8vRwOD/vHOMW4Jf
+=JQ6L
+-----END PGP SIGNATURE-----

@@ -1,0 +1,24 @@
+requires 'Moose';
+requires 'Module::Runtime';
+requires 'MongoDB';
+requires 'MooseX::StrictConstructor';
+requires 'MooseX::Getopt';
+requires 'AWS::CLIWrapper';
+requires 'Data::Graph::Util';
+requires 'Array::Compare';
+requires 'MooseX::App';
+requires 'String::Diff';
+requires 'Term::ANSIColor';
+requires 'Data::Printer';
+requires 'Text::TabularDisplay';
+# attributes dependency
+requires 'Paws';
+requires 'MooseX::SlurpyConstructor';
+requires 'Template';
+
+on develop => sub {
+  requires 'Dist::Zilla';
+  requires 'Dist::Zilla::Plugin::Prereqs::FromCPANfile';
+  requires 'Dist::Zilla::Plugin::VersionFromModule';
+  requires 'Dist::Zilla::PluginBundle::Git';
+};

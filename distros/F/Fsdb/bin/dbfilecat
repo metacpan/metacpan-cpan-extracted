@@ -1,0 +1,157 @@
+#!/usr/bin/perl -w
+
+#
+# dbfilecat.pm
+# Copyright (C) 2013-2015 by John Heidemann <johnh@isi.edu>
+# $Id: b5d7e701dd3144b94bc1eda278c8f221f9593eb7 $
+#
+# This program is distributed under terms of the GNU general
+# public license, version 2.  See the file COPYING
+# in $dblibdir for details.
+#
+
+
+=head1 NAME
+
+dbfilecat - concatenate two files with identical schema
+
+=head1 SYNOPSIS
+
+    dbfilecat --input A.fsdb [--input B.fsdb...]
+
+or
+
+    echo A.fsdb | dbfilecat --xargs
+
+
+=head1 DESCRIPTION
+
+Concatenate all provided input files,
+producing one result.
+We remove extra header lines.
+
+Inputs can both be specified with C<--input>, or one can come
+from standard input and the other from C<--input>.
+With C<--xargs>, each line of standard input is a filename for input.
+
+Inputs must have identical schemas (columns, column order,
+and field separators).
+
+Like L<dbmerge>, but no worries about sorting,
+and with no arguments we read standard input
+(although that's not very useful).
+
+
+=head1 OPTIONS
+
+General option:
+
+=over 4
+
+=item B<--xargs>
+
+Expect that input filenames are given, one-per-line, on standard input.
+(In this case, merging can start incrementally.
+
+=item B<--removeinputs>
+
+Delete the source files after they have been consumed.
+(Defaults off, leaving the inputs in place.)
+
+=for comment
+begin_standard_fsdb_options
+
+This module also supports the standard fsdb options:
+
+=item B<-d>
+
+Enable debugging output.
+
+=item B<-i> or B<--input> InputSource
+
+Read from InputSource, typically a file name, or C<-> for standard input,
+or (if in Perl) a IO::Handle, Fsdb::IO or Fsdb::BoundedQueue objects.
+
+=item B<-o> or B<--output> OutputDestination
+
+Write to OutputDestination, typically a file name, or C<-> for standard output,
+or (if in Perl) a IO::Handle, Fsdb::IO or Fsdb::BoundedQueue objects.
+
+=item B<--autorun> or B<--noautorun>
+
+By default, programs process automatically,
+but Fsdb::Filter objects in Perl do not run until you invoke
+the run() method.
+The C<--(no)autorun> option controls that behavior within Perl.
+
+=item B<--help>
+
+Show help.
+
+=item B<--man>
+
+Show full manual.
+
+=back
+
+=for comment
+end_standard_fsdb_options
+
+
+=head1 SAMPLE USAGE
+
+=head2 Input:
+
+File F<a.fsdb>:
+
+    #fsdb cid cname
+    11 numanal
+    10 pascal
+
+File F<b.fsdb>:
+
+    #fsdb cid cname
+    12 os
+    13 statistics
+
+=head2 Command:
+
+    dbfilecat --input a.fsdb --input b.fsdb
+
+
+=head2 Output:
+
+    #fsdb      cid     cname
+    11 numanal
+    10 pascal
+    12 os
+    13 statistics
+    #  | dbmerge --input a.fsdb --input b.fsdb
+
+=head1 SEE ALSO
+
+L<dbmerge(1)>,
+L<Fsdb(3)>
+
+=cut
+
+
+# WARNING: This code is derived from dbfilecat.pm; that is the master copy.
+
+use Fsdb::Filter::dbfilecat;
+my $f = new Fsdb::Filter::dbfilecat(@ARGV);
+$f->setup_run_finish;  # or could just --autorun
+exit 0;
+
+
+=head1 AUTHOR and COPYRIGHT
+
+Copyright (C) 2013-2015 by John Heidemann <johnh@isi.edu>
+
+This program is distributed under terms of the GNU general
+public license, version 2.  See the file COPYING
+with the distribution for details.
+
+=cut
+
+1;

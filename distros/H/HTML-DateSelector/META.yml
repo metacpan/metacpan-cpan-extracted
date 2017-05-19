@@ -1,0 +1,29 @@
+---
+abstract: 'Generate HTML for date selector.'
+author:
+  - 'Tokuhiro Matsuno  C<< <tokuhirom @__at__ gmail.com> >>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-DateSelector
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+provides:
+  HTML::DateSelector:
+    file: lib/HTML/DateSelector.pm
+    version: 0.05
+requires:
+  perl: 5.008001
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.05

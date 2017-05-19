@@ -1,0 +1,31 @@
+---
+abstract: 'A Module::Install extension to automatically convert POD to a README.pod'
+author:
+  - 'Kazuhiro Osawa <yappo <at> shibuya <döt> pl>'
+build_requires:
+  Capture::Tiny: 0.05
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.910'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Module-Install-ReadmePodFromPod
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Module::Install: 0.85
+  Pod::Perldoc: 0
+  perl: 5.6.0
+resources:
+  homepage: http://github.com/yappo/p5-Module-Install-ReadmePodFromPod/tree
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/yappo/p5-Module-Install-ReadmePodFromPod.git
+version: 0.01

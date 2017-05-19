@@ -1,0 +1,52 @@
+{
+   "abstract" : "SMS::Send driver for the Facilita Movel SMS service",
+   "author" : [
+      "Mario Celso Teixeira <marioct37@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SMS-Send-BR-Facilitamovel",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Carp" : "0",
+            "English" : "0",
+            "HTTP::Tiny" : "0",
+            "SMS::Send" : "0",
+            "Test::More" : "0",
+            "URI::Escape" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "SMS::Send::Driver" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/marioct/SMS-Send-BR-Facilitamovel.git"
+      }
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

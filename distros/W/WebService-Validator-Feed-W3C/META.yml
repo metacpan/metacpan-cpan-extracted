@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:                WebService-Validator-Feed-W3C
+version:             0.8
+abstract:            Interface to the W3C Feed Validation service
+license:             ~
+author:              
+    - olivier Thereaux <olivier@thereaux.net>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Carp:                          0
+    Class::Accessor:               0
+    LWP::UserAgent:                0
+    SOAP::Lite:                    0.65
+    URI:                           0
+    URI::QueryParam:               0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

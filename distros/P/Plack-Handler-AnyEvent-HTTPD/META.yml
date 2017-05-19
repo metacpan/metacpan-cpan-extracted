@@ -1,0 +1,33 @@
+---
+abstract: 'Plack handler to run PSGI apps on AnyEvent::HTTPD'
+author:
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+  Test::Requires: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Handler-AnyEvent-HTTPD
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  AnyEvent::HTTPD: 0
+  HTTP::Status: 0
+  Plack: 0.9903
+  URI: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/miyagawa/Plack-Handler-AnyEvent-HTTPD.git
+version: 0.03

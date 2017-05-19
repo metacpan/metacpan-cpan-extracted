@@ -1,0 +1,28 @@
+---
+abstract: 'Mouse port of MooseX::Object::Pluggable'
+author:
+  - 'Takatoshi Kitano <kitano.tk@gmail.com>'
+build_requires:
+  Module::Install::AuthorTests: 0
+  Module::Pluggable::Object: 0
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MouseX-Object-Pluggable
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Method::Modifiers: 1.01
+  Filter::Util::Call: 0
+  Module::Pluggable::Object: 3.6
+  Mouse: 0.17
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.022

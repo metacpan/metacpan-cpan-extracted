@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 b4127de8d0fc5e8f5aed4ba0da24b1577ab7f6ca .gitignore
+SHA1 286c2d336bd1253144b90ce17755da9d7ad3dd34 Build.PL
+SHA1 e8f644e84416b76179218ed0de3cac16e49d082a Changes
+SHA1 739da219cbda008e0060e9601f287915f5ca3150 MANIFEST
+SHA1 a180343974e28975994c7d7689b86946f8266d5e META.json
+SHA1 776696371b250a731187669ae39c1c9aa40e04b6 META.yml
+SHA1 a4df8e97ccd390a42212af5a9f4d0986c85e7a5f Makefile.PL
+SHA1 568c42750a71d185407d4abaa5b52bcad1ad73a1 README
+SHA1 9fbff5583377526a4ba962ee9ed7f17c1603b22d lib/Class/Mix.pm
+SHA1 f48777d87c382c84167a8c32d541ffe8985cb78c t/genpkg.t
+SHA1 cdcfc35677399d607fbcec9e1c55ec0d1238e824 t/mix.t
+SHA1 2f928dfd47fc5a7d29f9f3cff78a544421c51380 t/mro_no.t
+SHA1 b242f533d8e0c85541da36d765e80f227fc7a92f t/mro_yes.t
+SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
+SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAk6rDDQACgkQOV9mt2VyAVHzegCeJolVfdzejxQr3eRg0LvJgrE9
+jlcAmwZy3oTcNsyY0fgRtieBh2GInJte
+=aZCP
+-----END PGP SIGNATURE-----

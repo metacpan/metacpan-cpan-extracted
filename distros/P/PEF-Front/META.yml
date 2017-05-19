@@ -38,6 +38,7 @@ requires:
   Locale::PO: '0'
   MLDBM: '0'
   MLDBM::Sync: '0.30'
+  Math::Random::Secure: '0'
   POSIX: '0'
   Regexp::Common: '0'
   Scalar::Util: '0'
@@ -58,5 +59,5 @@ requires:
 resources:
   bugtracker: https://github.com/jef-sure/pef-front-psgi-dist/issues
   repository: https://github.com/jef-sure/pef-front-psgi-dist.git
-version: '0.20'
+version: '0.22'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

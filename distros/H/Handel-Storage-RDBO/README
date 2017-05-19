@@ -1,0 +1,429 @@
+NAME
+    Handel::Storage::RDBO - RDBO storage layer for Handel 1.x
+
+SYNOPSIS
+        use MyCustomCart;
+        use strict;
+        use warnings;
+        use base qw/Handel::Base/;
+    
+        __PACKAGE__->storage_class('Handel::Storage::RDBO');
+        __PACKAGE__->storage({
+            schema_class   => 'Handel::Schema::RDBO::Cart',
+            constraints    => {
+                id         => {'Check Id'      => \&constraint_uuid},
+                shopper    => {'Check Shopper' => \&constraint_uuid},
+                type       => {'Check Type'    => \&constraint_cart_type},
+                name       => {'Check Name'    => \&constraint_cart_name}
+            },
+            default_values => {
+                id         => __PACKAGE__->storage_class->can('new_uuid'),
+                type       => CART_TYPE_TEMP
+            }
+        });
+    
+        1;
+
+DESCRIPTION
+    Handel::Storage::RDBO is used as an intermediary between
+    Handel::Cart/Handel::Order and the RDBO schema used for reading/writing
+    to the database.
+
+CONSTRUCTOR
+  new
+    Arguments: \%options
+
+    Creates a new instance of Handel::Storage::RDBO, and passes the options
+    to "setup" on the new instance. The three examples below are the same:
+
+        my $storage = Handel::Storage::RDBO-new({
+            schema_class  => 'Handel::Schema::RDBO::Cart'
+        });
+    
+        my $storage = Handel::Storage::RDBO-new;
+        $storage->setup({
+            schema_source  => 'Handel::Schema::RDBO::Cart'
+        });
+    
+        my $storage = Handel::Storage::RDBO->new;
+        $storage->schema_source('Handel::Schema::RDBO::Cart');
+
+    The following additional options are available to new/setup, and take
+    the same data as their method counterparts:
+
+        connection_info
+        item_relationship
+        schema_class
+        schema_instance
+        table_name
+
+    See "new" in Handel::Storage a list of other possible options.
+
+METHODS
+  add_columns
+    Arguments: @columns
+
+    Adds a list of columns to the current schema_class. Be careful to always
+    use the column names, not their accessor aliases.
+
+        $storage->add_columns(qw/foo bar baz/);
+
+    You can also add columns using the Rose::DB::Object::Meta syntax:
+
+        $storage->add_columns(
+            foo => {type => 'varchar', length => 36, not_null => 1},
+            bar => {type => int, alias => 'get_bar'}
+        );
+
+    Yes, you can even mix/match the two:
+
+        $storage->add_columns(
+            'foo',
+            bar => {type => int, alias => 'get_bar'},
+            'baz'
+        );
+
+    Before schema_instance is initialized, the columns to be added are
+    stored internally, then added to the schema_instance when it is
+    initialized. If a schema_instance already exists, the columns are added
+    directly to the schema_source in the schema_instance itself.
+
+    See "add_columns" in Handel::Storage for more information about this
+    method.
+
+  add_item
+    Arguments: $result, \%data
+
+    Adds a new item to the specified result, returning a storage result
+    object.
+
+        my $storage = Handel::Storage::RDBO::Cart->new;
+        my $result = $storage->create({
+            shopper => '11111111-1111-1111-1111-111111111111'
+        });
+    
+        my $item = $storage->add_item($result, {
+            sku => 'ABC123'
+        });
+    
+        print $item->sku;
+
+    A Handel::Storage::Exception will be thrown if the specified result has
+    no item relationship, has a relationship that can't be found in the
+    schema, second parameter is not a HASH reference or no result is
+    specified.
+
+    See "add_item" in Handel::Storage for more information about this
+    method.
+
+  clone
+    Returns a clone of the current storage instance. This is the same as
+    "clone" in Handel::Storage except that it disconnects the db instance
+    before cloning as DBI hates being cloned apparently.
+
+    See "clone" in Handel::Storage for more information about this method.
+
+  column_accessors
+    Returns a hashref containing all of the columns and their accessor names
+    for the current storage object.
+
+    If a schema_instance already exists, the columns from schema_source in
+    that schema_instance will be returned. If no schema_instance exists, the
+    columns from schema_source in the current schema_class will be returned
+    plus any columns to be added from add_columns minus and columns to be
+    removed from remove_columns.
+
+    See "column_accessors" in Handel::Storage for more information about
+    this method.
+
+  columns
+    Returns a list of columns from the current schema source.
+
+    See "columns" in Handel::Storage for more information about this method.
+
+  connection_info
+    Arguments: \@info
+
+    Gets/sets the connection information used when connecting to the
+    database.
+
+        $storage->connection_info(['dbi:mysql:foo', 'user', 'pass', {PrintError=>1}]);
+
+    The info argument is an array ref that holds the following values:
+
+    $dsn
+        The DBI dsn to use to connect to.
+
+    $username
+        The username for the database you are connecting to.
+
+    $password
+        The password for the database you are connecting to.
+
+    \%attr
+        The attributes to be pass to DBI for this connection.
+
+    See DBI for more information about dsns and connection attributes.
+
+  copyable_item_columns
+    Returns a list of columns in the current item class that can be copied
+    freely. This list is usually all columns in the item class except for
+    the primary key columns and the foreign key columns that participate in
+    the specified item relationship.
+
+    A Handel::Storage::Exception will be thrown if item class or item
+    relationship are not defined.
+
+    See "copyable_item_columns" in Handel::Storage for more information
+    about this method.
+
+  count_items
+    Arguments: $result
+
+    Returns the number of items associated with the specified result.
+
+        my $storage = Handel::Storage::RDBO::Cart->new;
+        my $result = $storage->create({
+            shopper => '11111111-1111-1111-1111-111111111111'
+        });
+    
+        $result->add_item({
+            sku => 'ABC123'
+        });
+    
+        print $storage->count_items($result);
+
+    A Handel::Storage::Exception will be thrown if the specified result has
+    no item relationship or no result is specified.
+
+    See "count_items" in Handel::Storage for more information about this
+    method.
+
+  create
+    Arguments: \%data
+
+    Creates a new result in the current source in the current schema.
+
+        my $result = $storage->create({
+            col1 => 'foo',
+            col2 => 'bar'
+        });
+
+    See "create" in Handel::Storage for more information about this method.
+
+  delete
+    Arguments: \%filter
+
+    Deletes results matching the filter in the current source in the current
+    schema.
+
+        $storage->delete({
+            id => '11111111-1111-1111-1111-111111111111'
+        });
+
+    See "delete" in Handel::Storage for more information about this method.
+
+  delete_items
+    Arguments: $result, \%filter
+
+    Deletes items matching the filter from the specified result.
+
+        my $storage = Handel::Storage::RDBO::Cart->new;
+        my $result = $storage->create({
+            shopper => '11111111-1111-1111-1111-111111111111'
+        });
+    
+        $result->add_item({
+            sku => 'ABC123'
+        });
+    
+        $storage->delete_items($result, {
+            sku => 'ABC%'
+        });
+
+    A Handel::Storage::Exception will be thrown if the specified result has
+    no item relationship.
+
+    See "delete_items" in Handel::Storage for more information about this
+    method.
+
+  has_column
+    Arguments: $column
+
+    Returns true if the column exists in the current storage object. If the
+    schema is already initialized, the has_column method on the result
+    source will be used. Otherwise, has_column will calculate the existence
+    of the column based on any current add_columns/remove_columns
+    information.
+
+  item_relationship
+    Arguments: $relationship_name
+
+    Gets/sets the name of the schema relationship between carts and items.
+    The default item relationship is 'items'.
+
+        # in your schema classes
+        MySchema::CustomCart->meta->setup(
+            relationships => [
+                rel_items => {
+                    type       => 'one to many',
+                    class      => 'Handel::Schema::RDBO::Cart::Item',
+                    column_map => {id => 'cart'}
+                }
+            ]
+        );
+    
+        # in your storage
+        $storage->item_relationship('rel_items');
+
+  primary_columns
+    Arguments @columns
+
+    Gets/sets the list of primary columns for the current schema_class. When
+    the schema instance exists, the primary columns are added to and returns
+    from the current schema source on the schema instance.
+
+    When no schema instance exists, the columns are set locally like
+    "add_columns" then added to the schema instance during its
+    configuration. Primary columns are returns from the current schema
+    source in the current schema class if no primary columns have been set
+    locally.
+
+  remove_columns
+    Arguments: @columns
+
+    Removes a list of columns from the current schema_class and removes the
+    autogenerated accessors from the current class. Be careful to always use
+    the column names, not their accessor aliases.
+
+        $storage->remove_columns(qw/description/);
+
+    Before schema_instance is initialized, the columns to be removed are
+    stored internally, then removed from the schema_instance when it is
+    initialized. If a schema_instance already exists, the columns are
+    removed directly from the schema_source in the schema_instance itself.
+
+    See "remove_columns" in Handel::Storage for more information about this
+    method.
+
+  schema_class
+    Arguments: $schema_class
+
+    Gets/sets the schema class to be used for database reading/writing.
+
+        $storage->schema_class('MySchema');
+
+    A Handel::Exception::Storage exception will be thrown if the specified
+    class can not be loaded.
+
+  schema_instance
+    Arguments: $schema_instance
+
+    Gets/sets the schema instance to be used for database reading/writing.
+    If no instance exists, a new one will be created from the specified
+    schema class. When a new schema instance is created or assigned, it is
+    cloned and the clone is altered and used, leaving the original schema
+    untouched.
+
+    See Handel::Manual::Schema for more detailed information about how the
+    schema instance is configured.
+
+  search
+    Arguments: \%filter
+
+    Returns results in list context, or an iterator in scalar context from
+    the current source in the current schema matching the search filter.
+
+        my $iterator = $storage->search({
+            col1 => 'foo'
+        });
+
+        my @results = $storage->search({
+            col1 => 'foo'
+        });
+
+    See "search" in Handel::Storage for more information about this method.
+
+  search_items
+    Arguments: $result, \%filter
+
+    Returns items matching the filter associated with the specified result.
+
+        my $storage = Handel::Storage::RDBO::Cart->new;
+        my $result = $storage->search({
+            id => '11111111-1111-1111-1111-111111111111'
+        });
+    
+        my $iterator = $storage->search_items($result);
+
+    Returns results in list context, or an iterator in scalar context from
+    the current source in the current schema matching the search filter.
+
+    A Handel::Storage::Exception will be thrown if the specified result has
+    no item relationship.
+
+    See "search_items" in Handel::Storage for more information about this
+    method.
+
+  setup
+    Arguments: \%options
+
+    Configures a storage instance with the options specified. Setup accepts
+    the exact same options that "new" does.
+
+        package MyStorageClass;
+        use strict;
+        use warnings;
+        use base qw/Handel::Storage::RDBO/;
+    
+        __PACKAGE__->setup({
+            schema_class => 'MySchema::Cart'
+        });
+    
+        # or
+    
+        my $storage = Handel::Storage::RDBO-new;
+        $storage->setup({
+            schema_class => 'MySchema::Cart'
+        });
+
+    This is the same as doing:
+
+        my $storage = Handel::Storage::RDBO-new({
+            schema_class => 'MySchema::Cart'
+        });
+
+    If you call setup on a storage instance or class that has already been
+    configured, its configuration will be updated with the new options. No
+    attempt will be made to clear or reset the unspecified settings back to
+    their defaults.
+
+    If you pass in a schema_instance, it will be assigned last after all of
+    the other options have been applied.
+
+  table_name
+    Arguments: $table_name
+
+    Gets/sets the name of the table in the database to be used for this
+    schema source.
+
+  txn_begin
+    Starts a transaction on the current schema instance.
+
+  txn_commit
+    Commits the current transaction on the current schema instance.
+
+  txn_rollback
+    Rolls back the current transaction on the current schema instance.
+
+SEE ALSO
+    Handel::Storage, Handel::Storage::Result, Handel::Manual::Storage,
+    Handel::Storage::RDBO::Result, Handel::Storage::RDBO::Cart,
+    Handel::Storage::RDBO::Order
+
+AUTHOR
+        Christopher H. Laco
+        CPAN ID: CLACO
+        claco@chrislaco.com
+        http://today.icantfocus.com/blog/
+

@@ -1,0 +1,43 @@
+NAME
+
+    Test::BrewBuild::Plugin::Author - Default test run, but installs author
+    test distributions
+
+SYNOPSIS
+
+        # install various POD and MANIFEST testing distributions, then
+        # run the default tests
+    
+        brewbuild --plugin Test::BrewBuild::Plugin::Author
+
+DESCRIPTION
+
+    This distribution/module is exactly the same as the default test
+    execution plugin that is distributed with Test::BrewBuild, which is
+    Test::BrewBuild::Plugin::DefaultExec. The only difference is this one
+    will install author-related distributions that will perform the tests
+    typically run when under the environment variable RELEASE_TESTING=1.
+
+    These installed distributions are:
+
+        Pod::Coverage
+        Test::Pod::Coverage
+        Test::Manifest
+
+    We also attempt to set $ENV{RELEASE} =1. If we can't, and a log object
+    is sent in, we'll log that the environment variable isn't set so author
+    testing can't be performed.
+
+METHODS
+
+ brewbuild_exec($log)
+
+    Is called by Test::BrewBuild::exec(), executes the test commands
+    provided by this plugin's DATA section.
+
+    Optionally takes a Test::BrewBuild::log() object as a parameter.
+
+AUTHOR
+
+    Steve Bertrand, <steveb at cpan.org>
+

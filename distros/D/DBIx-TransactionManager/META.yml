@@ -1,0 +1,29 @@
+---
+abstract: 'Transaction handling for database.'
+author:
+  - 'Atsushi Kobayashi <nekokak _at_ gmail _dot_ com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0.96
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-TransactionManager
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  DBI: 0
+  Try::Tiny: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/nekokak/p5-DBIx-TransactionManager.git
+version: 1.13

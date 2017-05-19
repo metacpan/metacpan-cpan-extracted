@@ -16,4 +16,5 @@ on 'test' => sub {
 
 on 'develop' => sub {
     requires 'Test::PostgreSQL';
+    requires 'Test::mysqld';
 };

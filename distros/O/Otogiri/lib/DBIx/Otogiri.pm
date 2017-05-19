@@ -119,7 +119,7 @@ sub last_insert_id {
         my @rows = $self->search_by_sql('SELECT LASTVAL() AS lastval');
         return $rows[0]->{lastval};
     }
-    return $self->dbh->last_insert_id($catalog, $schema, $table, $field, $attr_href);
+    return $self->{dbh}->last_insert_id($catalog, $schema, $table, $field, $attr_href);
 }
 
 sub reconnect {

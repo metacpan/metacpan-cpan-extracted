@@ -1,0 +1,50 @@
+---
+abstract: 'Multiple HTTP requests with Coro'
+author:
+  - 'Fuji, Goro (gfx) <gfuji@cpan.org>'
+build_requires:
+  Test::More: 0.98
+  Test::Requires: 0.06
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+  Module::Build::Pluggable: 0
+  Module::Build::Pluggable::CPANfile: 0
+  Module::Build::Pluggable::GithubMeta: 0
+dynamic_config: 0
+generated_by: 'Minilla/v0.0.53, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: FurlX-Coro
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  FurlX::Coro:
+    file: lib/FurlX/Coro.pm
+    version: 1.02
+  FurlX::Coro::HTTP:
+    file: lib/FurlX/Coro/HTTP.pm
+    version: 0
+requires:
+  Coro: 0
+  Furl: 0
+  parent: 0
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/gfx/p5-FurlX-Coro/issues
+  homepage: https://github.com/gfx/p5-FurlX-Coro
+  repository: git://github.com/gfx/p5-FurlX-Coro.git
+version: 1.02
+x_contributors:
+  - 'tokuhirom <tokuhirom@gmail.com>'
+  - 'Fuji, Goro <g.psy.va@gmail.com>'

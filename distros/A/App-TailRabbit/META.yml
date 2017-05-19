@@ -1,0 +1,39 @@
+---
+abstract: 'Listen to a RabbitMQ exchange and emit the messages to console.'
+author:
+  - 'Tomas (t0m) Doran C<< <bobtfish@bobtfish.net> >>.'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-TailRabbit
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  AnyEvent: 0
+  AnyEvent::RabbitMQ: 1.03
+  File::HomeDir: 0
+  JSON: 0
+  Moose: 0
+  MooseX::Getopt: 0
+  MooseX::Types::Common: 0
+  MooseX::Types::LoadableClass: 0
+  MooseX::Types::Moose: 0
+  Net::RabbitFoot: 1.03
+  Path::Class: 0
+  Try::Tiny: 0
+  YAML: 0
+  namespace::autoclean: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/bobtfish/App-TailRabbit.git
+version: 0.003

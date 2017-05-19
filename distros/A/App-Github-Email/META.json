@@ -25,6 +25,7 @@
             "Getopt::Long" : "v2.49.1",
             "LWP::UserAgent" : "6.07",
             "List::MoreUtils" : "0.416",
+            "Modern::Perl" : "1.20170117",
             "Test::More" : "1.302075",
             "perl" : "5.008"
          }
@@ -42,7 +43,7 @@
          "web" : "https://github.com/faraco/App-Github-Email"
       }
    },
-   "version" : "0.0.6",
+   "version" : "0.0.7",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
 }
 

@@ -1,3 +1,10 @@
+0.22 Wed, 17 May 2017 18:40:00 GMT
+         - separate Cache interface from storage  
+         - make Null storage default for cache  
+          
+0.21 Wed, 17 May 2017 17:20:00 GMT
+         - separate Session interface from storage  
+          
 0.20 Wed, 10 May 2017 20:20:00 GMT
          - allow convert_blessed in ajax/json answer  
           

@@ -9,6 +9,7 @@ META.yml
 Makefile.PL
 README
 README.mkdn
+appveyor.yml
 dist.ini
 lib/File/Basename/Extra.pm
 t/00-compile.t

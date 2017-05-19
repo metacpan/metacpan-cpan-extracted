@@ -1,7 +1,7 @@
 ---
 abstract: 'Extension to File::Basename, adds named access to file parts and handling of filename suffixes'
 author:
-  - 'Hayo Baan <hayobaan@cpan.org>'
+  - 'Hayo Baan <info@hayobaan.com>'
 build_requires:
   File::Spec: '0'
   IO::Handle: '0'
@@ -25,7 +25,7 @@ no_index:
 provides:
   File::Basename::Extra:
     file: lib/File/Basename/Extra.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   File::Basename: '2.74'
   perl: '5.006'
@@ -35,5 +35,5 @@ resources:
   bugtracker: https://github.com/HayoBaan/File-Basename-Extra/issues
   homepage: http://metacpan.org/release/File-Basename-Extra/
   repository: git://github.com/HayoBaan/File-Basename-Extra.git
-version: '0.003'
+version: '0.004'
 x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -75,6 +75,7 @@ t/002_common/027_single_named.t
 t/002_common/028_schema_base_row_class.t
 t/002_common/029_sql_pager.t
 t/002_common/030_fast_insert.t
+t/002_common/031_apply_sql_types.t
 t/998_deprecated/001_reconnect_ping.t
 t/998_deprecated/002_reconnect_no_ping.t
 t/999_regression/bind_param.t

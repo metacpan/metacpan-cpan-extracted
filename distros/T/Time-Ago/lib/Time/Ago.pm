@@ -13,7 +13,7 @@ use Locale::Messages qw/ bind_textdomain_filter /;
 use Locale::TextDomain 'Time-Ago';
 use Scalar::Util qw/ blessed /;
 
-our $VERSION = '0.09';
+our $VERSION = '1.00';
 
 BEGIN {
   $ENV{OUTPUT_CHARSET} = 'UTF-8';
@@ -208,7 +208,7 @@ Time::Ago - Approximate duration in words
 
 =head1 VERSION
 
-version 0.09
+version 1.00
 
 =head1 SYNOPSIS
 
@@ -311,7 +311,7 @@ Passing the duration as a DateTime::Duration instance is also supported.
 
 Locale::TextDomain is used for localization.
 
-Currently Arabic, English, French, German, Italian, Japanese, Russian,
+Currently Arabic, Dutch, English, French, German, Italian, Japanese, Russian,
 and Spanish translations are available. Contact me if you need another
 language.
 
@@ -368,7 +368,7 @@ Maurice Aubrey <maurice.aubrey@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Maurice Aubrey.
+This software is copyright (c) 2017 by Maurice Aubrey.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

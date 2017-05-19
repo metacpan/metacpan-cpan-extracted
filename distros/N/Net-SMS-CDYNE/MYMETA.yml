@@ -1,0 +1,28 @@
+---
+abstract: "Perl REST client for CDYNE's SMSNotify API"
+author:
+  - 'Mischa Spiegelmock <revmischa@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '6.42'
+  Test::More: '0'
+  Test::Requires: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-SMS-CDYNE
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Any::Moose: '0'
+  MouseX::NonMoose: '0'
+  REST::Client: '0'
+  XML::Simple: '0'
+  perl: '5.008001'
+version: '0.14'

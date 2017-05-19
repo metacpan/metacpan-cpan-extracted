@@ -1,0 +1,52 @@
+{
+   "abstract" : "pod2man, pod2text, pod2html simultaneously",
+   "author" : [
+      "James E Keenan (jkeenan@cpan.org)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Pod-Multi",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "File::Basename" : "0",
+            "File::Path" : "0",
+            "File::Save::Home" : "0.03",
+            "File::Spec" : "0",
+            "IO::Capture" : "0.05",
+            "Pod::Html" : "0",
+            "Pod::Man" : "0",
+            "Pod::Text" : "0",
+            "Test::Simple" : "0.44"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

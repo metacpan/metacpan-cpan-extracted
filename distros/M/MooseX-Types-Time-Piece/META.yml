@@ -1,0 +1,33 @@
+---
+abstract: 'Time::Piece type and coercions for Moose'
+author:
+  - 'Steven Lee <stevenl@cpan.org>'
+build_requires:
+  Test::Fatal: 0.001
+  Test::More: 0.68
+configure_requires:
+  Module::Build: 0.4
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-Types-Time-Piece
+provides:
+  MooseX::Types::Time::Piece:
+    file: lib/MooseX/Types/Time/Piece.pm
+    version: 0.10
+requires:
+  MooseX::Types: 0.01
+  MooseX::Types::Moose: 0.01
+  Time::Piece: 1.2
+  Try::Tiny: 0.01
+  namespace::autoclean: 0.01
+  perl: 5.006
+resources:
+  bugtracker: http://github.com/stevenl/moosex-types-time-piece/issues
+  homepage: http://search.cpan.org/dist/MooseX-Types-Time-Piece/
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/stevenl/moosex-types-time-piece
+version: 0.10

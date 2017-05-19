@@ -1,0 +1,26 @@
+--- 
+abstract: serve Mason templates with App::TemplateServer
+author: 
+  - AND COPYRIGHT
+build_requires: 
+  Directory::Scratch: 0
+  Test::More: 0
+  ok: 0
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: unknown
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: App-TemplateServer-Provider-Mason
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  App::TemplateServer: 0.02
+  File::Find: 0
+  HTML::Mason: 0
+  Method::Signatures: 0
+  Moose: 0
+version: 0.01

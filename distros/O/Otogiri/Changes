@@ -1,5 +1,12 @@
 Revision history for Perl extension Otogiri
 
+0.18 2017-05-19T01:35:24Z
+
+    - no ping before fetch mysql_insertid [tsucchi]
+    - Bunm up the travis-ci settings for development 
+      update travis settings [tsucchi]
+      quote perl version [tsucchi]
+
 0.17 2016-02-02T05:57:36Z
 
     - INCOMPATIBLE CHANGE [tsucchi]

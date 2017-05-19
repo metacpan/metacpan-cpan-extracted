@@ -1,0 +1,26 @@
+---
+abstract: 'SAX handler to dispatch subroutines based on '
+author:
+  - 'Masayoshi Sekimura <sekimura@cpan.org>'
+build_requires:
+  Test::More: 0
+  XML::NamespaceSupport: 0
+  XML::SAX::Base: 0
+  XML::SAX::ParserFactory: 0
+  YAML: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: XML-SAX-SimpleDispatcher
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

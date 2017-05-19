@@ -1,4 +1,3 @@
-.perltidyrc
 ARTISTIC-1.0
 Changes
 GPL-1
@@ -7,6 +6,8 @@ lib/MIME/Base32.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
 t/00-base32.t
 t/01-base32hex.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

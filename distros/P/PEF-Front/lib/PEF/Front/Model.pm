@@ -24,7 +24,7 @@ sub make_model_call {
 		my $can = substr($model, rindex($model, "::") + 2);
 		eval "use $class";
 		$@ = "$class must contain $can function" if not $@ and not $class->can($can);
-		croak {
+		die {
 			result      => 'INTERR',
 			answer      => 'Validator $1 loading model error: $2',
 			answer_args => [$method, "$@"],
@@ -35,7 +35,7 @@ sub make_model_call {
 		$model ||= 'rpc_site';
 		$cfg_model_sub = eval {cfg_model_rpc($model)};
 		$@ = "cfg_model_rpc('$model') must return code reference" if ref $cfg_model_sub ne 'CODE';
-		croak {
+		die {
 			result      => 'INTERR',
 			answer      => 'Validator $1 loading model error: $2',
 			answer_args => [$method, "$@"],

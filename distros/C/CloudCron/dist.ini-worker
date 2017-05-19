@@ -1,0 +1,55 @@
+name = CloudCron-Worker
+author = Jose Luis Martinez <joseluis.martinez@capside.com>
+copyright_holder = CAPSiDE
+copyright_year = 2017
+license = Apache_2_0
+main_module = lib/CloudCron/Worker.pm
+
+[VersionFromModule]
+
+
+[ExecDir]
+dir = bin
+
+[GatherDir / BinFiles]
+root = worker-bin
+prefix = bin
+
+[GatherDir / LibFiles]
+root = worker-lib
+prefix = lib
+
+[GatherDir / WorkerTest]
+root = t/Workers
+prefix = t
+
+[MakeMaker]
+
+[@Git]
+allow_dirty = dist.ini
+allow_dirty = Changes
+allow_dirty = README
+
+[Prereqs]
+SQS::Worker = 0
+
+[MetaYAML]
+[MetaJSON]
+
+[MetaResources]
+repository.web = https://github.com/capside/CloudCron
+repository.url = https://github.com/capside/CloudCron.git
+repository.type = git
+bugtracker.web = https://github.com/capside/CloudCron/issues
+
+[License]
+
+;[RunExtraTests]
+;;[TestRelease]
+;;[PodSyntaxTests]
+;
+;;[FileFinder::ByName / Examples]
+;;dir = examples
+;
+;[Manifest]
+

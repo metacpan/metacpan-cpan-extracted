@@ -1,0 +1,52 @@
+{
+   "abstract" : "The Zonemaster project Web Frontend",
+   "author" : [
+      "Michal TOMA <toma@nic.fr>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Zonemaster-GUI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer" : "1.3095",
+            "HTML::Entities" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Plack::Builder" : "0",
+            "Starman" : "0",
+            "Template" : "0",
+            "Test::More" : "0",
+            "Text::Markdown" : "0",
+            "Time::HiRes" : "0",
+            "YAML" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v1.0.7",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

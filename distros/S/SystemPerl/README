@@ -1,0 +1,230 @@
+NAME
+
+    SystemC::Manual - SystemPerl primary documentation
+
+SUMMARY
+
+    The publicly licensed SystemPerl package provides several extensions to
+    SystemC. It provides sp_preproc, extending the language for AUTOmatic
+    connection of hierarchy like my Verilog-Mode, trace files and netlist
+    linting. Its netlist and parsing utilities are general enough for
+    writing your own tools. Two additional tools provide for speeding up GCC
+    compiles and dependency correction. You can download SystemC from the
+    link off of http://www.veripool.org/systemperl
+
+DESCRIPTION
+
+    This package provides several major sub-packages. The SystemC::Parser
+    understands how to read SystemC files, and extract tokens and such,
+    similar to Verilog::Parser.
+
+    SystemC::Netlist builds netlists out of SystemC files. This allows easy
+    scripts to determine things such as the hierarchy of SC_MODULEs. The
+    netlist database may also be extended to support other languages.
+
+    sp_preproc provides extensions to the SystemC language, called the
+    SystemPerl language. This allows most of the Tedium to be removed from
+    SystemC coding, just as the author's /*AUTO*/ comments did for the
+    Verilog language. See SystemC::SystemPerl after installation.
+
+    sp_include shows a technique for speeding up SystemC compiles using GCC.
+    sp_makecheck allows for cleaning up dependency files when dependencies
+    have been removed or changed.
+
+    Finally, the src directory contains useful C++ utilities for simulation,
+    such as changing cout to send to both the screen and a file. You may
+    point to this directory underneath the kit, or set SYSTEMPERL_INCLDUE to
+    point to these sources.
+
+  Parsing example
+
+        package Trialparser;
+        @ISA = qw(SystemC::Parser);
+
+        sub module {
+            my $self = shift;
+            my $module = shift;
+            print $self->filename.":".$self->lineno().": ";
+            print "Contains the module declaration for $module\n";
+        }
+
+        package main;
+        my $sp = Trialparser->new();
+        $sp->read ("test.sp");
+
+  Netlist example
+
+      use SystemC::Netlist;
+
+        my $nl = new SystemC::Netlist ();
+        foreach my $file ('testnetlist.sp') {
+            $nl->read_file (filename=>$file,
+                            strip_autos=>1);
+        }
+        $nl->link();
+        $nl->autos();
+        $nl->lint();
+        $nl->exit_if_error();
+
+        foreach my $mod ($nl->modules_sorted) {
+            show_hier ($mod, "  ");
+        }
+
+        sub show_hier {
+            my $mod = shift;
+            my $indent = shift;
+            print $indent,"Module ",$mod->name,"\n";
+            foreach my $cell ($mod->cells_sorted) {
+                show_hier ($cell->submod, $indent."  ".$cell->name."  ");
+            }
+        }
+
+  SystemPerl example
+
+        SC_MODULE(mod) {
+            /*AUTOSIGNAL*/
+            SC_CTOR(mod) {
+                SP_CELL (sub, submod);
+                /*AUTOINST*/
+
+    This expands into:
+
+        SC_MODULE(mod) {
+            /*AUTOSIGNAL*/
+            // Beginning of SystemPerl automatic signals
+            sc_signal<bool>             a;       // For submod
+            // End of SystemPerl automatic signals
+
+            SC_CTOR(mod) {
+                SP_CELL (sub, submod);
+                /*AUTOINST*/
+                // Beginning of SystemPerl automatic pins
+                SP_PIN (sub, a,       a);
+                // End of SystemPerl automatic pins
+
+SUPPORTED SYSTEMS
+
+    This version of SystemPerl has been built and tested on:
+
+      * i386-linux
+
+    It should run on any system with Perl, a C compiler, bison, and flex.
+
+    SystemC must be installed to get the complete function. Currently
+    1.2.1beta, 2.0.1, 2.1 and 2.2 are the versions supported for tracing,
+    other versions should work without tracing or with minor editing.
+
+INSTALLATION
+
+    *   Download the latest package from http://www.veripool.org/systemperl
+        or CPAN and decompress.
+
+          gunzip SystemPerl_version.tar.gz ; tar xvf SystemPerl_version.tar}
+
+    *   cd to the directory containing this README notice. Some files will
+        permanently live in this directory, so make sure it's in a site wide
+        area.
+
+          cd SystemPerl*
+
+    *   Make sure the "SYSTEMC" environment variable points to your SystemC
+        installed directory; or that "SYSTEMC_INCLUDE" points to the include
+        directory with systemc.h in it, and that "SYSTEMC_LIBDIR" points to
+        the directory with libsystemc.a in it. If using bash, this would
+        consist of the line
+
+            export SYSTEMC=/path/to/systemc
+            export SYSTEMC_INCLUDE=/path/to/systemc/include   # with systemc.h
+            export SYSTEMC_LIBDIR=/path/to/systemc/lib    # with libsystemc.a
+
+        in your "~/.bashrc" file.
+
+        If different than the above, make sure the "SYSTEMC_KIT" environment
+        variable points to your original SystemC source code kit.
+
+        Type "perl Makefile.PL" to configure SystemPerl for your system.
+
+        You may get a warning message about needing Verilog::Netlist, if so
+        you need to install or upgrade the "verilog-perl" package from CPAN.
+
+    *   Type "make" to compile SystemPerl.
+
+        If you get a error message ``y.tab.c: error: parse error before
+        goto,'' there is a problem between Bison and GCC. The simplest fix
+        is to edit y.tab.c to comment out ``__attribute__ ((unused))''.
+
+    *   Type "make test" to check the compilation.
+
+    *   You can see examples under the test_dir directory. The *.sp files
+        are "inline" converted, while the *.h and *.cpp files are expanded
+        from the .sp files.
+
+    *   Type "make install" to install the programs and any data files and
+        documentation.
+
+    *   Add a "SYSTEMPERL" environment variable that points to the directory
+        of this kit (the directory you typed ``make install'' inside, not
+        your site-perl directory.) If using bash, this would consist of the
+        line
+
+          export SYSTEMPERL=/path/to/systemperl
+
+        in your "~/.bashrc" file.
+
+    *   Optionally add a "SYSTEMPERL_INCLUDE" environment variable if for
+        some reason you wish to relocate the include files (the files under
+        the kit's src directory). For example distributions often want to
+        relocate the SystemPerl includes into the standard system include
+        directory. Note that these files are not installed with "make
+        install" (as Perl doesn't provide a standard way to install
+        includes), which is why SYSTEMPERL or SYSTEMPERL_INCLUDE must point
+        to them.
+
+DISTRIBUTION
+
+    SystemPerl is part of the <http://www.veripool.org/> free SystemC
+    software tool suite. The latest version is available from CPAN and from
+    <http://www.veripool.org/systemperl>.
+
+    Copyright 2001-2014 by Wilson Snyder. This package is free software; you
+    can redistribute it and/or modify it under the terms of either the GNU
+    Lesser General Public License Version 3 or the Perl Artistic License
+    Version 2.0.
+
+    This code is provided with no warranty of any kind, and is used entirely
+    at your own risk.
+
+AUTHORS
+
+    Wilson Snyder <wsnyder@wsnyder.org>.
+
+SEE ALSO
+
+  Primary Documentation:
+
+    SystemC::Manual (This document)
+
+  Language Documentation:
+
+    SystemC::SystemPerl
+
+  Programs:
+
+    sp_includer, sp_makecheck, sp_preproc
+
+  Major modules:
+
+    SystemC::Netlist, SystemC::Parser
+
+  Submodules:
+
+    SystemC::Coverage SystemC::Coverage::Item SystemC::Coverage::ItemKey
+
+    SystemC::Netlist SystemC::Netlist::AutoCover SystemC::Netlist::AutoTrace
+    SystemC::Netlist::Cell SystemC::Netlist::Class
+    SystemC::Netlist::CoverGroup SystemC::Netlist::CoverPoint
+    SystemC::Netlist::File SystemC::Netlist::Method SystemC::Netlist::Module
+    SystemC::Netlist::Net SystemC::Netlist::Pin SystemC::Netlist::Port
+
+    Verilog::Netlist
+

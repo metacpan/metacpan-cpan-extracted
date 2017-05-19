@@ -1,0 +1,58 @@
+{
+   "abstract" : "Deterministic top-down parser based on a Finite State Machine",
+   "author" : [
+      "Paulo Custodio <pscust@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Parse-FSM",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0.1",
+            "Class::XSAccessor" : "1.11",
+            "Data::Dump" : "1.19",
+            "File::Slurp" : "9999.15",
+            "File::Spec" : "3.33",
+            "File::Temp" : "0.22",
+            "Test::More" : "0.96",
+            "Text::Balanced" : "2.02",
+            "Text::Template" : "1.45",
+            "perl" : "5.01"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/pauloscustodio/perl-Parse-FSM.git",
+         "web" : "https://github.com/pauloscustodio/perl-Parse-FSM"
+      }
+   },
+   "version" : "1.13",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

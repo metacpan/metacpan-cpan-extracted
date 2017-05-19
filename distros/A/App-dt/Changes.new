@@ -1,0 +1,30 @@
+0.003   2017-05-19 (PERLANCAR)
+
+	[ENHANCEMENTS]
+
+        - Allow generating data from -e when there is no input file specified
+          and 'dt' is not piped.
+
+        - Allow user to set $DATA[0] from $DATA or $_.
+
+        [FIXES]
+
+        - Fix Getopt::Long specification.
+
+        - Fix default output for multiple inputs.
+
+        [ETC]
+
+        - Add more docs and examples.
+
+
+0.002   2017-05-19 (PERLANCAR)
+
+	- POD fixes/additions.
+
+	- Also set $DATA to the first data structure.
+
+
+0.001   2017-05-18 (PERLANCAR)
+
+        - First early release, no tests.

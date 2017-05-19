@@ -1,0 +1,55 @@
+---
+abstract: 'Iterative, recursive, FTP file finder'
+author:
+  - 'Diab Jerius <djerius@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test2::Bundle::Extended: '0'
+  Test::Mock::Net::FTP: '0.03'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-FTP-Path-Iter
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Net::FTP::Path::Iter:
+    file: lib/Net/FTP/Path/Iter.pm
+    version: '0.04'
+  Net::FTP::Path::Iter::Dir:
+    file: lib/Net/FTP/Path/Iter/Dir.pm
+    version: '0.04'
+  Net::FTP::Path::Iter::Entry:
+    file: lib/Net/FTP/Path/Iter/Entry.pm
+    version: '0.04'
+  Net::FTP::Path::Iter::File:
+    file: lib/Net/FTP/Path/Iter/File.pm
+    version: '0.04'
+requires:
+  Class::Tiny: '0'
+  File::Listing: '0'
+  Net::FTP: '0'
+  Path::Iterator::Rule: '1.012'
+  experimental: '0'
+  namespace::clean: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-FTP-Path-Iter
+  repository: git://github.com/djerius/net-ftp-path-iter.git
+version: '0.04'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,0 +1,32 @@
+---
+abstract: 'a simple, high-performance PSGI/Plack HTTP server'
+author:
+  - 'Kazuho Oku'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  LWP::UserAgent: 5.8
+  Test::More: 0.88
+  Test::TCP: 2.1
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Starlet
+name: Starlet
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Parallel::Prefork: 0.17
+  Plack: 0.992
+  Server::Starter: 0.06
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.31'

@@ -1,0 +1,29 @@
+---
+abstract: 'A Packman style game on Terminal'
+author:
+  - 'Takashi Uesugi <tksuesg@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Game-TextPacMonster
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Carp: 0
+  strict: 0
+  utf8: 0
+  warnings: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://unlearned@github.com/unlearned/Game-TextPacMonster.git
+version: 0.03

@@ -23,10 +23,12 @@ use Class::Accessor::Lite 0.05
         owner_pid
         no_ping
         fields_case
+        apply_sql_types
+        guess_sql_types
     )]
 ;
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 sub load_plugin {
     my ($class, $pkg, $opt) = @_;
@@ -63,6 +65,7 @@ sub new {
         owner_pid    => $$,
         no_ping      => 0,
         fields_case  => 'NAME_lc',
+        boolean_value => {true => 1, false => 0},
         %args,
     }, $class;
 
@@ -88,6 +91,15 @@ sub new {
     }
 
     return $self;
+}
+
+sub set_boolean_value {
+    my $self = shift;
+    if (@_) {
+        my ($true, $false) = @_;
+        $self->{boolean_value} = {true => $true, false => $false};
+    }
+    return $self->{boolean_value};
 }
 
 sub mode {
@@ -296,7 +308,7 @@ sub _last_insert_id {
 
     my $driver = $self->{driver_name};
     if ( $driver eq 'mysql' ) {
-        return $self->dbh->{mysql_insertid};
+        return $self->{dbh}->{mysql_insertid};
     } elsif ( $driver eq 'Pg' ) {
         if (defined $column) {
             return $self->dbh->last_insert_id( undef, undef, undef, undef,{ sequence => join( '_', $table_name, $column, 'seq' ) } );
@@ -346,7 +358,12 @@ sub do_insert {
 sub fast_insert {
     my ($self, $table_name, $args, $prefix) = @_;
 
-    $self->do_insert($table_name, $args, $prefix);
+    my $sth = $self->do_insert($table_name, $args, $prefix);
+
+    # XXX in MySQL 5.7.8 or later, $self->dbh->{mysql_insertid} will always return 0,
+    # so that get mysql_insertid from $sth. (https://bugs.mysql.com/bug.php?id=78778)
+    return $sth->{mysql_insertid} if defined $sth->{mysql_insertid};
+
     # XXX in Pg, _last_insert_id has potential failure when inserting to non Serial table or explicitly inserting Serrial id
     $self->_last_insert_id($table_name);
 }
@@ -354,7 +371,7 @@ sub fast_insert {
 sub insert {
     my ($self, $table_name, $args, $prefix) = @_;
 
-    $self->do_insert($table_name, $args, $prefix);
+    my $sth = $self->do_insert($table_name, $args, $prefix);
     return unless defined wantarray;
 
     my $table = $self->schema->get_table($table_name);
@@ -362,7 +379,10 @@ sub insert {
 
     my @missing_primary_keys = grep { not defined $args->{$_} } @$pk;
     if (@missing_primary_keys == 1) {
-        $args->{$missing_primary_keys[0]} = $self->_last_insert_id($table_name, $missing_primary_keys[0]);
+        # XXX in MySQL 5.7.8 or later, $self->dbh->{mysql_insertid} will always return 0,
+        # so that get mysql_insertid from $sth. (https://bugs.mysql.com/bug.php?id=78778)
+        $args->{$missing_primary_keys[0]} = defined $sth->{mysql_insertid} ? $sth->{mysql_insertid}
+                                          : $self->_last_insert_id($table_name, $missing_primary_keys[0]);
     }
 
     return $args if $self->suppress_row_objects;
@@ -611,6 +631,8 @@ sub search_by_sql {
         row_class        => $self->{schema}->get_row_class($table_name),
         table            => $self->{schema}->get_table( $table_name ),
         table_name       => $table_name,
+        apply_sql_types  => $self->{apply_sql_types} || $self->{guess_sql_types},
+        guess_sql_types  => $self->{guess_sql_types},
         suppress_object_creation => $self->{suppress_row_objects},
     );
     return wantarray ? $itr->all : $itr;
@@ -1153,6 +1175,26 @@ Disconnects from the currently connected database.
 =item C<$teng-E<gt>suppress_row_objects($flag)>
 
 set row object creation mode.
+
+=item C<$teng-E<gt>apply_sql_types($flag)>
+
+set SQL type application mode.
+
+see apply_sql_types in L<Teng::Iterator/METHODS>
+
+=item C<$teng-E<gt>guess_sql_types($flag)>
+
+set SQL type guessing mode.
+this implies apply_sql_types true.
+
+see guess_sql_types in L<Teng::Iterator/METHODS>
+
+=item C<$teng-E<gt>set_boolean_value($true, $false)>
+
+set scalar to correspond boolean.
+this is ignored when apply_sql_types is not true.
+
+  $teng->set_boolean_value(JSON::XS::true, JSON::XS::false);
 
 =item C<$teng-E<gt>load_plugin();>
 

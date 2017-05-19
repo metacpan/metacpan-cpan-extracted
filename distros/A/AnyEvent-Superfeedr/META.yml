@@ -1,0 +1,37 @@
+---
+abstract: 'XMPP interface to Superfeedr service.'
+author:
+  - 'Yann Kerherve <yannk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.95'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AnyEvent-Superfeedr
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+recommends:
+  XML::Twig: 0
+requires:
+  AnyEvent: 0
+  AnyEvent::XMPP: 0
+  Net::LibIDN: 0
+  Net::SSLeay: 0
+  Object::Tiny: 0
+  Scalar::Util: 0
+  URI::Escape: 0
+  XML::Atom: 0
+  perl: 5.8.1
+resources:
+  homepage: http://github.com/yannk/perl-anyevent-superfeedr/tree
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/yannk/perl-anyevent-superfeedr.git
+version: 0.04

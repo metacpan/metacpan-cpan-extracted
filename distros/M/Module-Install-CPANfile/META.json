@@ -1,0 +1,71 @@
+{
+   "abstract" : "Include cpanfile",
+   "author" : [
+      "Tatsuhiko Miyagawa <miyagawa@bulknews.net>"
+   ],
+   "dynamic_config" : "0",
+   "generated_by" : "Module::Install version 1.06, CPAN::Meta::Converter version 2.131490",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Module-Install-CPANfile",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "CPAN::Meta::Check" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Module::CPANfile" : "0.9034",
+            "Module::Install" : "0",
+            "perl" : "v5.8.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.90"
+         }
+      }
+   },
+   "provides" : {
+      "Module::Install::CPANfile" : {
+         "file" : "lib/Module/Install/CPANfile.pm",
+         "version" : "0.12"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/miyagawa/Module-Install-CPANfile.git"
+      }
+   },
+   "version" : "0.12",
+   "x_module_name" : "Module::Install::CPANfile"
+}

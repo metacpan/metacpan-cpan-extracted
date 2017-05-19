@@ -23,6 +23,11 @@ ok $client , 'got a client';
 
 if ($ENV{RELEASE_TESTING}) {
 	{
+		my $userID = $client->username2userID('hochstenbach');
+		is $userID , '686898', 'username2userID - got an ID';
+	}
+
+	{
 		my $data = $client->itemTypes();
 
 		is ref($data), 'ARRAY' , 'itemTypes - got an array';

@@ -1,0 +1,62 @@
+---
+abstract: 'Shell Out and collect the result in a DZ plug-in.'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  Dist::Zilla: '2.0'
+  Dist::Zilla::File::FromCode: '0'
+  Dist::Zilla::Role::FileInjector: '0'
+  Dist::Zilla::Role::InstallTool: '0'
+  Dist::Zilla::Role::Plugin: '0'
+  Dist::Zilla::Tester: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Role-Tempdir
+provides:
+  Dist::Zilla::Role::Tempdir:
+    file: lib/Dist/Zilla/Role/Tempdir.pm
+    version: '1.001003'
+  Dist::Zilla::Tempdir::Dir:
+    file: lib/Dist/Zilla/Tempdir/Dir.pm
+    version: '1.001003'
+  Dist::Zilla::Tempdir::Item:
+    file: lib/Dist/Zilla/Tempdir/Item.pm
+    version: '1.001003'
+  Dist::Zilla::Tempdir::Item::State:
+    file: lib/Dist/Zilla/Tempdir/Item/State.pm
+    version: '1.001003'
+recommends:
+  Moose: '2.000'
+  Path::Tiny: '0.058'
+requires:
+  Carp: '0'
+  Digest::SHA: '5.47'
+  Dist::Zilla: '2.0'
+  Dist::Zilla::File::InMemory: '0'
+  File::chdir: '0.1002'
+  Moose: '0.92'
+  Moose::Role: '0'
+  MooseX::LazyRequire: '0'
+  Path::Iterator::Rule: '0'
+  Path::Tiny: '0'
+  Scalar::Util: '0'
+  namespace::autoclean: '0.09'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-Role-Tempdir/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-Role-Tempdir
+  repository: https://github.com/kentnl/Dist-Zilla-Role-Tempdir.git
+version: '1.001003'

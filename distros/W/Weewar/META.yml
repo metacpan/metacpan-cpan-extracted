@@ -1,0 +1,26 @@
+--- 
+abstract: get data from the weewar.com XML API
+author: Jonathan Rockway C<< <jrockway@cpan.org> >>
+build_requires: 
+  Test::More: 0
+  Test::TableDriven: 0
+  ok: 0
+distribution_type: module
+generated_by: Module::Install version 0.67
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Weewar
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Class::Accessor: 0
+  DateTime: 0
+  DateTime::Format::RSS: 0
+  LWP::UserAgent: 0
+  Readonly: 0
+  XML::LibXML: 0
+version: 0.01

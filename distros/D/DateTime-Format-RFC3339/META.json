@@ -1,0 +1,72 @@
+{
+   "abstract" : "Parse and format RFC3339 datetime strings",
+   "author" : [
+      "Eric Brine <ikegami@adaelis.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.120351",
+   "license" : [
+      "unrestricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DateTime-Format-RFC3339",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Pod::Coverage" : "0.18",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "strict" : "0",
+            "version" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Test::Pod" : "1.22"
+         },
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-DateTime-Format-RFC3339@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DateTime-Format-RFC3339"
+      },
+      "homepage" : "http://search.cpan.org/dist/DateTime-Format-RFC3339/",
+      "license" : [
+         "http://creativecommons.org/publicdomain/zero/1.0/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ikegami/perl-DateTime-Format-RFC3339.git",
+         "web" : "https://github.com/ikegami/perl-DateTime-Format-RFC3339"
+      }
+   },
+   "version" : "v1.2.0"
+}

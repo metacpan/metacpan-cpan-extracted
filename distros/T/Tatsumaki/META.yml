@@ -1,0 +1,37 @@
+---
+abstract: 'Non-blocking web framework based on Plack and AnyEvent'
+author:
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tatsumaki
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Any::Moose: 0
+  AnyEvent: 5.2
+  AnyEvent::HTTP: 0
+  Filter::Util::Call: 0
+  JSON: 0
+  Mouse: 0.34
+  Plack: 0.9913
+  Text::MicroTemplate: 0
+  Try::Tiny: 0
+  Twiggy: 0
+  parent: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/miyagawa/Tatsumaki.git
+version: 0.1013

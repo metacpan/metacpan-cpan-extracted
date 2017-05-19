@@ -1,0 +1,31 @@
+---
+abstract: 'DBI based CouchDB like document database library'
+author:
+  - 'FUJIWARA <fujiwara.shunichiro gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.99'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-CouchLike
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Class::Accessor::Fast: 0
+  DBI: 1
+  JSON: 2
+  Math::BigInt: 1.55
+  UNIVERSAL::require: 0
+  Unicode::RecursiveDowngrade: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.16

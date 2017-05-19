@@ -1,0 +1,46 @@
+---
+abstract: "Dump all plugins that 'do' a certain role"
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  Dist::Zilla::App::Tester: '0'
+  Dist::Zilla::Plugin::AutoVersion: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::DZil: '0'
+  Test::More: '0'
+  Test::TempDir::Tiny: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-App-Command-dumpwith
+provides:
+  Dist::Zilla::App::Command::dumpwith:
+    file: lib/Dist/Zilla/App/Command/dumpwith.pm
+    version: '0.003002'
+recommends:
+  Path::Tiny: '0.058'
+requires:
+  Carp: '0'
+  Dist::Zilla::App: '0'
+  Dist::Zilla::dumpphases::Theme::basic::blue: '0'
+  Module::Runtime: '0'
+  Path::ScanINC: '0'
+  Path::Tiny: '0'
+  Scalar::Util: '0'
+  Try::Tiny: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-App-Command-dumpwith/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-App-Command-dumpwith
+  repository: https://github.com/kentnl/Dist-Zilla-App-Command-dumpwith.git
+version: '0.003002'

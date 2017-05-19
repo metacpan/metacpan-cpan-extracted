@@ -1,0 +1,42 @@
+---
+abstract: 'Downgrade listed dependencies to recommendations if present.'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Path::Tiny: '0'
+  Test::DZil: '0'
+  Test::Differences: '0'
+  Test::More: '0'
+  Test::Requires: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-Prereqs-Soften
+provides:
+  Dist::Zilla::Plugin::Prereqs::Soften:
+    file: lib/Dist/Zilla/Plugin/Prereqs/Soften.pm
+    version: '0.006003'
+recommends:
+  Moose: '2.000'
+  strict: '0'
+  warnings: '0'
+requires:
+  Dist::Zilla::Role::PrereqSource: '0'
+  Moose: '0'
+  Moose::Util::TypeConstraints: '0'
+  MooseX::Types::Moose: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-Plugin-Prereqs-Soften/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-Plugin-Prereqs-Soften
+  repository: https://github.com/kentnl/Dist-Zilla-Plugin-Prereqs-Soften.git
+version: '0.006003'

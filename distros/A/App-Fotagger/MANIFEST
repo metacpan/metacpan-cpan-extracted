@@ -1,0 +1,25 @@
+.gitignore
+bin/fotagger
+bin/fotagger_delete
+bin/fotagger_export
+bin/fotagger_stats
+bin/fotagger_tagall
+Build.PL
+Changes
+lib/App/Fotagger.pm
+lib/App/Fotagger/Deleter.pm
+lib/App/Fotagger/Display/SDL.pm
+lib/App/Fotagger/Export.pm
+lib/App/Fotagger/Image.pm
+lib/App/Fotagger/Stats.pm
+lib/App/Fotagger/TagAll.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+xt/01_podspell.t
+xt/02_perlcritic.t
+xt/03_pod.t
+xt/04_podcoverage.t
+xt/perlcriticrc

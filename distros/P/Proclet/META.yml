@@ -1,0 +1,57 @@
+---
+abstract: 'minimalistic Supervisor'
+author:
+  - 'Masahiro Nagano <kazeburo {at} gmail.com>'
+build_requires:
+  List::MoreUtils: '0'
+  Parallel::Scoreboard: '0'
+  Test::More: '0'
+  Test::Requires: '0'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v1.1.0, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Proclet
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Proclet:
+    file: lib/Proclet.pm
+    version: '0.35'
+  Proclet::Declare:
+    file: lib/Proclet/Declare.pm
+requires:
+  Data::Validator: '0'
+  File::Which: '1.09'
+  Getopt::Compact::WithCmd: '0.20'
+  Log::Minimal: '0.14'
+  Mouse: '0'
+  Parallel::Prefork: '0.13'
+  String::ShellQuote: '0'
+  Term::ANSIColor: '0'
+  Time::Crontab: '0.01'
+  YAML::XS: '0.38'
+  parent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/kazeburo/Proclet/issues
+  homepage: https://github.com/kazeburo/Proclet
+  repository: git://github.com/kazeburo/Proclet.git
+version: '0.35'
+x_contributors:
+  - 'soh335 <sugarbabe335@gmail.com>'
+  - 'Masahiro Nagano <kazeburo@gmail.com>'

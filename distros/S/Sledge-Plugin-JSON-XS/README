@@ -1,0 +1,36 @@
+NAME
+    Sledge::Plugin::JSON::XS - JSON::XS wrapper for Sledge
+
+SYNOPSIS
+      package Your::Pages;
+      use Sledge::Plugin::JSON::XS;
+
+      sub dispatch_foo {
+        my $self = shift;
+        $self->output_json_xs({foo => 'bar'});
+      }
+
+DESCRIPTION
+    Sledge::Plugin::JSON::XS is JSON::XS wrapper for Sledge.
+
+    Sledge::Plugin::JSON is wrapper for JSON::Syck. but this module uses
+    JSON::XS.
+
+CODE COVERAGE
+        ---------------------------- ------ ------ ------ ------ ------ ------ ------
+        File                           stmt   bran   cond    sub    pod   time  total
+        ---------------------------- ------ ------ ------ ------ ------ ------ ------
+        .../Sledge/Plugin/JSON/XS.pm  100.0  100.0  100.0  100.0    n/a  100.0  100.0
+        Total                         100.0  100.0  100.0  100.0    n/a  100.0  100.0
+        ---------------------------- ------ ------ ------ ------ ------ ------ ------
+
+AUTHOR
+    Tokuhiro Matsuno <tokuhirom@gmail.com>
+
+SEE ALSO
+    Sledge::Plugin::JSON
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

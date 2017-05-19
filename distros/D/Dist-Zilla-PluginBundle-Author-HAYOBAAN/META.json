@@ -71,7 +71,7 @@
             "Dist::Zilla::Plugin::MojibakeTests" : "0",
             "Dist::Zilla::Plugin::OurPkgVersion" : "0",
             "Dist::Zilla::Plugin::PodWeaver" : "0",
-            "Dist::Zilla::Plugin::ReadmeAnyFromPod" : "0",
+            "Dist::Zilla::Plugin::ReadmeAnyFromPod" : "0.161150",
             "Dist::Zilla::Plugin::Run" : "0",
             "Dist::Zilla::Plugin::RunExtraTests" : "0",
             "Dist::Zilla::Plugin::SchwartzRatio" : "0",
@@ -125,19 +125,19 @@
    "provides" : {
       "Dist::Zilla::Plugin::Author::HAYOBAAN::NextVersion" : {
          "file" : "lib/Dist/Zilla/Plugin/Author/HAYOBAAN/NextVersion.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Dist::Zilla::PluginBundle::Author::HAYOBAAN" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/HAYOBAAN.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Pod::Weaver::PluginBundle::Author::HAYOBAAN" : {
          "file" : "lib/Pod/Weaver/PluginBundle/Author/HAYOBAAN.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Pod::Weaver::Section::Author::HAYOBAAN::Bugs" : {
          "file" : "lib/Pod/Weaver/Section/Author/HAYOBAAN/Bugs.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       }
    },
    "release_status" : "stable",
@@ -152,7 +152,7 @@
          "web" : "https://github.com/HayoBaan/Dist-Zilla-PluginBundle-Author-HAYOBAAN"
       }
    },
-   "version" : "0.012",
+   "version" : "0.013",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 

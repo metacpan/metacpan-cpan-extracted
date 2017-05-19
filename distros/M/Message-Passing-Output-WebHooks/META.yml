@@ -1,0 +1,38 @@
+---
+abstract: "call 'WebHooks' with messages."
+author:
+  - 'Tomas (t0m) Doran <bobtfish@bobtfish.net>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Plack: 0
+  Twiggy: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: agpl_3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Message::Passing::Output::WebHooks
+name: Message-Passing-Output-WebHooks
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  AnyEvent: 0
+  AnyEvent::HTTP: 0
+  JSON: 2.0
+  Log::Message::Structured: 0.005
+  Message::Passing: 0.006
+  Moo: 0
+  MooX::Types::MooseLike: 0
+  Try::Tiny: 0
+  aliased: 0
+  namespace::clean: 0
+resources:
+  repository: git://github.com/suretec/Message-Passing-Output-WebHooks.git
+version: 0.008
+x_authority: cpan:GHENRY

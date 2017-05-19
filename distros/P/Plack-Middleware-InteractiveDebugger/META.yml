@@ -1,0 +1,37 @@
+---
+abstract: 'Awesome Interactive Debugger ala Werkzeug'
+author:
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.88
+  Test::Requires: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Plack::Middleware::InteractiveDebugger
+name: Plack-Middleware-InteractiveDebugger
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Data::Dump::Streamer: 0
+  Devel::StackTrace::WithLexicals: 0.08
+  Eval::WithLexicals: 0
+  File::ShareDir: 0
+  Plack: 0.9977
+  Try::Tiny: 0
+  parent: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/miyagawa/Plack-Middleware-InteractiveDebugger.git
+version: 0.01

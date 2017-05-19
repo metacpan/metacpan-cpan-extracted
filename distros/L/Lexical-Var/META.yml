@@ -1,0 +1,41 @@
+---
+abstract: 'static variables without namespace pollution'
+author:
+  - 'Andrew Main (Zefram) <zefram@fysh.org>'
+build_requires:
+  ExtUtils::CBuilder: 0.15
+  Module::Build: 0
+  Test::More: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+configure_requires:
+  Module::Build: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+conflicts:
+  B::Hooks::OP::Check: '< 0.19'
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lexical-Var
+provides:
+  Lexical::Sub:
+    file: lib/Lexical/Sub.pm
+    version: 0.009
+  Lexical::Var:
+    file: lib/Lexical/Var.pm
+    version: 0.009
+requires:
+  Lexical::SealRequireHints: 0.006
+  XSLoader: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.009

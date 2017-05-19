@@ -1,0 +1,43 @@
+---
+abstract: 'Automatically collect index metadata from MooseX::AttributeIndexes consuming models.'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  Data::Dump: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  MooseX::AttributeIndexes: '0'
+  MooseX::Types::Moose: '0'
+  Test::More: '0.96'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Search-GIN-Extract-AttributeIndexes
+provides:
+  Search::GIN::Extract::AttributeIndexes:
+    file: lib/Search/GIN/Extract/AttributeIndexes.pm
+    version: '2.000001'
+recommends:
+  Moose: '2.000'
+requires:
+  Carp: '0'
+  Moose: '0'
+  Safe::Isa: '0'
+  Scalar::Util: '0'
+  Search::GIN::Extract::Callback: '0'
+  namespace::autoclean: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Search-GIN-Extract-AttributeIndexes/issues
+  homepage: https://github.com/kentnl/Search-GIN-Extract-AttributeIndexes
+  repository: https://github.com/kentnl/Search-GIN-Extract-AttributeIndexes.git
+version: '2.000001'

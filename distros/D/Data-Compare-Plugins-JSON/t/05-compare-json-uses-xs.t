@@ -17,8 +17,7 @@ BEGIN {
 
 use Data::Compare;
 
-
-ok (JSON->backend eq 'JSON::XS');
+isa_ok (JSON->backend, 'JSON::XS');
 for (
 	[JSON::false, JSON::false, 1],
 	[JSON::false, JSON::true,  0],

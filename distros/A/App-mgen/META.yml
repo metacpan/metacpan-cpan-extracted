@@ -1,0 +1,23 @@
+---
+abstract: 'Generate the single module file'
+author:
+  - 'lapis_tw <lapis0896@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.59, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-mgen
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Time::Piece: 0
+  perl: 5.008
+version: 0.15

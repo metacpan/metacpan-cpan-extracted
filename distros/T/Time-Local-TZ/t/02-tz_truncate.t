@@ -25,11 +25,17 @@ my @TESTS = (
     [ [ "UTC",           1461670850, TM_MON  ], 1459468800 ],
     [ [ "UTC",           1461670850, TM_YEAR ], 1451606400 ],
 
-    [ [ "Europe/Moscow", 1461660050, TM_MIN  ], 1461660000 ],
-    [ [ "Europe/Moscow", 1461660050, TM_HOUR ], 1461657600 ],
-    [ [ "Europe/Moscow", 1461660050, TM_MDAY ], 1461618000 ],
-    [ [ "Europe/Moscow", 1461660050, TM_MON  ], 1459458000 ],
-    [ [ "Europe/Moscow", 1461660050, TM_YEAR ], 1451595600 ],
+    [ [ "Europe/Moscow", 1240908050, TM_MIN  ], 1240908000 ],
+    [ [ "Europe/Moscow", 1240908050, TM_HOUR ], 1240905600 ],
+    [ [ "Europe/Moscow", 1240908050, TM_MDAY ], 1240862400 ],
+    [ [ "Europe/Moscow", 1240908050, TM_MON  ], 1238529600 ],
+    [ [ "Europe/Moscow", 1240908050, TM_YEAR ], 1230753600 ],
+
+    [ [ "PST8PDT",       1297508567, TM_MIN  ], 1297508520 ],
+    [ [ "PST8PDT",       1297508567, TM_HOUR ], 1297508400 ],
+    [ [ "PST8PDT",       1297508567, TM_MDAY ], 1297497600 ],
+    [ [ "PST8PDT",       1297508567, TM_MON  ], 1296547200 ],
+    [ [ "PST8PDT",       1297508567, TM_YEAR ], 1293868800 ],
 
     [ [ "???",           1461670850, TM_MIN  ], 1461670800 ],
     [ [ "???",           1461670850, TM_HOUR ], 1461668400 ],
@@ -50,22 +56,26 @@ plan tests => @TESTS*4;
 
 foreach my $t (@TESTS) {
     my ($data, $res) = @$t;
-    {
-        local $ENV{TZ} = "Europe/Berlin";
-        if (ref $res) {
-            ok(!eval { tz_truncate(@$data); 1 }, "tz_truncate(".join(', ', @$data).")");
-        } else {
-            is(tz_truncate(@$data), $res, "tz_truncate(".join(', ', @$data).") with TZ set");
+    SKIP: {
+        skip "Olson timezone names are not available on windows", 4 if $^O =~ /MSWin32/ && @$data && $data->[0] =~ /^[a-z]+\/[a-z]+$/i;
+
+        {
+            local $ENV{TZ} = "CET-1CEST";
+            if (ref $res) {
+                ok(!eval { tz_truncate(@$data); 1 }, "tz_truncate(".join(', ', @$data).")");
+            } else {
+                is(tz_truncate(@$data), $res, "tz_truncate(".join(', ', @$data).") with TZ set");
+            }
+            is($ENV{TZ}, "CET-1CEST", "ENV{TZ} unchanged after timelocal_tz call");
         }
-        is($ENV{TZ}, "Europe/Berlin", "ENV{TZ} unchanged after timelocal_tz call");
-    }
-    {
-        delete local $ENV{TZ};
-        if (ref $res) {
-            ok(!eval { tz_truncate(@$data); 1 }, "tz_truncate(".join(', ', @$data).")");
-        } else {
-            is(tz_truncate(@$data), $res, "tz_truncate(".join(', ', @$data).") with TZ unset");
+        {
+            delete local $ENV{TZ};
+            if (ref $res) {
+                ok(!eval { tz_truncate(@$data); 1 }, "tz_truncate(".join(', ', @$data).")");
+            } else {
+                is(tz_truncate(@$data), $res, "tz_truncate(".join(', ', @$data).") with TZ unset");
+            }
+            ok(!exists $ENV{TZ}, "ENV{TZ} unchanged after timelocal_tz call");
         }
-        ok(!exists $ENV{TZ}, "ENV{TZ} unchanged after timelocal_tz call");
     }
 }

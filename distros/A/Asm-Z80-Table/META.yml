@@ -1,0 +1,32 @@
+{---}
+{abstract: 'Z80 assembly / disassembly tables'}
+{author:}
+{  - 'Paulo Custodio <pscust@cpan.org>'}
+{build_requires:}
+{  ExtUtils::MakeMaker: '0'}
+{configure_requires:}
+{  ExtUtils::MakeMaker: '0'}
+{dynamic_config: 1}
+{generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005'}
+{license: unknown}
+{meta-spec:}
+{  url: http://module-build.sourceforge.net/META-spec-v1.4.html}
+{  version: '1.4'}
+{name: Asm-Z80-Table}
+{no_index:}
+{  directory:}
+{    - t}
+{    - inc}
+{requires:}
+{  Data::Dumper: '2.128'}
+{  File::Basename: '0'}
+{  File::Slurp: '9999.13'}
+{  Iterator::Array::Jagged: '0.05'}
+{  List::MoreUtils: '0.22'}
+{  Test::More: '0.96'}
+{  Text::Template: '1.45'}
+{  perl: '5.01'}
+{resources:}
+{  repository: git://github.com/pauloscustodio/perl-Asm-Z80-Table.git}
+{version: '0.03'}
+{x_serialization_backend: 'CPAN::Meta::YAML version 0.016'}

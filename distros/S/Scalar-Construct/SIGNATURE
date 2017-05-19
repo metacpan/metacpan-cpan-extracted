@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d7e3f78a6dd69a3f10295cf5dc0bf7b00cf11f0a .gitignore
+SHA1 f463fc55e7230f5e3f75098aa50f08eeafe94bd8 Build.PL
+SHA1 28a4f368538d2fd8660b9509ecd17279c241c194 Changes
+SHA1 9ebe2cc28e6df94142f693a349ae6bc689028293 MANIFEST
+SHA1 7c6be6365ad8634950b166ec26ed9a446c4f689a META.json
+SHA1 2b880b88759a17c0de8580292934a47457ed94aa META.yml
+SHA1 a4df8e97ccd390a42212af5a9f4d0986c85e7a5f Makefile.PL
+SHA1 c4d384c7c2d0d03f1e710e5a3181de2be248895d README
+SHA1 647cf784f4e3b9d81f666c2f0d3a8a5300b5510f lib/Scalar/Construct.pm
+SHA1 dd4002a97279b2569e638be24a21704d56fcccaf lib/Scalar/Construct.xs
+SHA1 c38a18cdff7df88145f3ede05b53ca03049c5109 t/aliasobj.t
+SHA1 1c239b6d4597dda9a6870540fa79e81bdf196a7d t/aliasref.t
+SHA1 ee44f984c70ae12f5b73b9e4e965405422c80efc t/constant.t
+SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
+SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
+SHA1 f20aef8e304a0f7b8788a90fc86bdd34affe6fd3 t/short_names.t
+SHA1 8fe37aa203d5425e11e8e5baf0ed0012b89aa21b t/variable.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAk8wJfoACgkQOV9mt2VyAVFTpQCgjsLSzrSJZMotq9avUUZP75cy
+6eEAn0vpg7RNZguYkji79eddCLAbXK/o
+=LNP1
+-----END PGP SIGNATURE-----

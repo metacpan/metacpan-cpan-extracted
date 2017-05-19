@@ -117,7 +117,19 @@ sub build {
         $length += ATTR_MSG_AUTH_LEN;
         my $msg_auth = "\x0" x (ATTR_MSG_AUTH_LEN - 2);
 
-        my $used_auth = ($type == ACCESS_REQUEST) ? $authenticator : $h{authenticator};
+        my $used_auth;
+        if ($type == ACCESS_REQUEST) {
+            # random-generated
+            $used_auth = $authenticator;
+        }
+        elsif ($self->is_request($type)) {
+            # Message-Authenticator should not be present in ACCOUNTING_REQUEST
+            $used_auth = "\x00" x 16;
+        }
+        else {
+            # must be passed when composing replies
+            $used_auth = $h{authenticator};
+        }
 
         my $data = join('',
                         pack('C C n', $type, $req_id, $length),
@@ -413,7 +425,19 @@ sub parse {
 
     if($msg_auth) {
         # we already replaced msg auth value to \x0...
-        my $auth_used = $self->is_reply($type) ? $orig_auth : $auth;
+        my $auth_used;
+        if ($self->is_reply($type)) {
+            $auth_used = $orig_auth;
+        }
+        elsif ($type == ACCESS_REQUEST) {
+            $auth_used = $auth;
+        }
+        else {
+            # other type of request should use 00x16
+            # Message-Authenticator should not be present in ACCOUNTING_REQUEST
+            $auth_used = "\x00" x 16;
+        }
+
         my $data = join('',
                         pack('C C n', $type, $req_id, $length),
                         $auth_used,
@@ -519,6 +543,7 @@ C<secret> and C<dict> can be used to override values from constructor (for examp
 
 C<with_msg_auth> can be passed to append Message-Authenticator attribute.
 It also can be archived by adding this attribyte to AV list with empty value
+Note that this attribute usually must not be used for ACCOUNTING requests.
 
 C<request_id> - allow to define own it. By default internal sequence is used. Value must be in range 0-255 (1byte)
 

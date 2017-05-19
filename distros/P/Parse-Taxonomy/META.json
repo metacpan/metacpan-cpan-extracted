@@ -1,0 +1,59 @@
+{
+   "abstract" : "Validate hierarchical data stored in CSV format",
+   "author" : [
+      "James E Keenan (jkeenan@cpan.org>)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Parse-Taxonomy",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Scalar::Util" : "0",
+            "Text::CSV_XS" : "1.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Simple" : "0.1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Parse-Taxonomy"
+      },
+      "homepage" : "http://thenceforward.net/perl/modules/Parse-Taxonomy/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jkeenan/parse-taxonomy.git",
+         "web" : "https://github.com/jkeenan/parse-taxonomy"
+      }
+   },
+   "version" : "0.24"
+}

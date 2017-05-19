@@ -1,0 +1,26 @@
+---
+abstract: 'Interface to system call tracing interfaces'
+author:
+  - 'David Leadbeater <L<dgl@dgl.cx>>, 2010'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: wtfpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Sys-Trace
+no_index:
+  directory:
+    - My
+    - inc
+    - t
+requires:
+  Text::Balanced: 0
+resources:
+  bugtracker: http://github.com/dgl/perl-Sys-Trace/issues
+  repository: git://github.com/dgl/perl-Sys-Trace
+version: 0.03

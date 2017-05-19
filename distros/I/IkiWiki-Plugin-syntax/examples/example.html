@@ -1,0 +1,1222 @@
+<HTML>
+<HEAD>
+<TITLE>Examples page for IkiWiki::Plugin::syntax</TITLE>
+<LINK REL=StyleSheet HREF="../extras/syntax.css" TYPPE="text/css" MEDIA="all">
+</HEAD>
+<BODY>
+    <H1>Examples page for IkiWiki::Plugin::syntax</H1>
+
+    <P>This page contains examples of syntax highlight using the
+    IkiWiki::Plugin::syntax and several configuration and programming source
+    files. </P>
+
+    
+        <TABLE>
+<TR>
+    <TD>Source fragment.html using Simple engine</TD>
+</TR>
+<TR>
+    <TD><PRE>
+    URL from  to examples/sources/fragment.html
+<span class="syntax"><span class="synLineNumber">    1</span>  &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+<span class="synLineNumber">    2</span>  &lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Strict//EN&quot;
+<span class="synLineNumber">    3</span>   &quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd&quot;&gt;
+<span class="synLineNumber">    4</span>  &lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot; xml:lang=&quot;es&quot; lang=&quot;es&quot;&gt;
+<span class="synLineNumber">    5</span>  
+<span class="synLineNumber">    6</span>  &lt;head&gt;
+<span class="synLineNumber">    7</span>  	&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;
+<span class="synLineNumber">    8</span>      &lt;!-- &lt;base href=&quot;&quot; /&gt; --&gt;
+<span class="synLineNumber">    9</span>  	&lt;title&gt;P&amp;#xE1;gina principal&lt;/title&gt;
+<span class="synLineNumber">   10</span>  	&lt;link rel=&quot;stylesheet&quot; href=&quot;style.css&quot; type=&quot;text/css&quot;
+<span class="synLineNumber">   11</span>          media=&quot;screen&quot; /&gt;
+<span class="synLineNumber">   12</span>  	&lt;link rel=&quot;stylesheet&quot; href=&quot;print.css&quot; type=&quot;text/css&quot;
+<span class="synLineNumber">   13</span>          media=&quot;print&quot; /&gt;
+<span class="synLineNumber">   14</span>  	
+<span class="synLineNumber">   15</span>  
+<span class="synLineNumber">   16</span>  &lt;/head&gt;
+<span class="synLineNumber">   17</span>  &lt;body&gt;
+<span class="synLineNumber">   18</span>  
+<span class="synLineNumber">   19</span>  &lt;!-- Contenedor global --&gt;
+<span class="synLineNumber">   20</span>  &lt;div class=&quot;container&quot;&gt;
+<span class="synLineNumber">   21</span>  
+<span class="synLineNumber">   22</span>      &lt;!-- Columna izquierda: logotipo, men&Atilde;&ordm; global, 
+<span class="synLineNumber">   23</span>          validaciones y licencia --&gt;
+<span class="synLineNumber">   24</span>      &lt;div class=&quot;left&quot;&gt;
+<span class="synLineNumber">   25</span>              &lt;!-- Logotipo --&gt;
+<span class="synLineNumber">   26</span>              &lt;div class=&quot;logo&quot;&gt;
+<span class="synLineNumber">   27</span>                  &lt;img src=&quot;images/taquiones-logo.png&quot;
+<span class="synLineNumber">   28</span>                      alt=&quot;Logotipo de Taquiones&quot; /&gt;
+<span class="synLineNumber">   29</span>              &lt;/div&gt;</span>
+    </PRE></TD>
+</TABLE>
+
+        </BR>
+    
+        <TABLE>
+<TR>
+    <TD>Source fragment.html using Kate engine</TD>
+</TR>
+<TR>
+    <TD><PRE>
+    URL from  to examples/sources/fragment.html
+<span class="syntax"><span class="synLineNumber">    1</span>  <span class="synStatement">&lt;?xml</span>&nbsp;version="1.0"&nbsp;encoding="UTF-8"<span class="synStatement">?&gt;</span>
+<span class="synLineNumber">    2</span>  <span class="synType">&lt;!DOCTYPE&nbsp;</span>html&nbsp;PUBLIC&nbsp;"-//W3C//DTD&nbsp;XHTML&nbsp;1.0&nbsp;Strict//EN"
+<span class="synLineNumber">    3</span>  &nbsp;"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"<span class="synType">&gt;</span>
+<span class="synLineNumber">    4</span>  <span class="synStatement">&lt;html</span><span class="synPreProc">&nbsp;xmlns=</span><span class="synConstant">"http://www.w3.org/1999/xhtml"</span><span class="synPreProc">&nbsp;xml:lang=</span><span class="synConstant">"es"</span><span class="synPreProc">&nbsp;lang=</span><span class="synConstant">"es"</span><span class="synStatement">&gt;</span>
+<span class="synLineNumber">    5</span>  
+<span class="synLineNumber">    6</span>  <span class="synStatement">&lt;head&gt;</span>
+<span class="synLineNumber">    7</span>  &nbsp;&nbsp;&nbsp;&nbsp;<span class="synStatement">&lt;meta</span><span class="synPreProc">&nbsp;http-equiv=</span><span class="synConstant">"Content-Type"</span><span class="synPreProc">&nbsp;content=</span><span class="synConstant">"text/html;&nbsp;charset=utf-8"</span>&nbsp;<span class="synStatement">/&gt;</span>
+<span class="synLineNumber">    8</span>  &nbsp;&nbsp;&nbsp;&nbsp;<span class="synComment">&lt;!--&nbsp;&lt;base&nbsp;href=""&nbsp;/&gt;&nbsp;--&gt;</span>
+<span class="synLineNumber">    9</span>  &nbsp;&nbsp;&nbsp;&nbsp;<span class="synStatement">&lt;title&gt;</span>P<span class="synConstant">&amp;#xE1;</span>gina&nbsp;principal<span class="synStatement">&lt;/title&gt;</span>
+<span class="synLineNumber">   10</span>  &nbsp;&nbsp;&nbsp;&nbsp;<span class="synStatement">&lt;link</span><span class="synPreProc">&nbsp;rel=</span><span class="synConstant">"stylesheet"</span><span class="synPreProc">&nbsp;href=</span><span class="synConstant">"style.css"</span><span class="synPreProc">&nbsp;type=</span><span class="synConstant">"text/css"</span>
+<span class="synLineNumber">   11</span>  <span class="synPreProc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;media=</span><span class="synConstant">"screen"</span>&nbsp;<span class="synStatement">/&gt;</span>
+<span class="synLineNumber">   12</span>  &nbsp;&nbsp;&nbsp;&nbsp;<span class="synStatement">&lt;link</span><span class="synPreProc">&nbsp;rel=</span><span class="synConstant">"stylesheet"</span><span class="synPreProc">&nbsp;href=</span><span class="synConstant">"print.css"</span><span class="synPreProc">&nbsp;type=</span><span class="synConstant">"text/css"</span>
+<span class="synLineNumber">   13</span>  <span class="synPreProc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;media=</span><span class="synConstant">"print"</span>&nbsp;<span class="synStatement">/&gt;</span>
+<span class="synLineNumber">   14</span>  &nbsp;&nbsp;&nbsp;&nbsp;
+<span class="synLineNumber">   15</span>  
+<span class="synLineNumber">   16</span>  <span class="synStatement">&lt;/head&gt;</span>
+<span class="synLineNumber">   17</span>  <span class="synStatement">&lt;body&gt;</span>
+<span class="synLineNumber">   18</span>  
+<span class="synLineNumber">   19</span>  <span class="synComment">&lt;!--&nbsp;Contenedor&nbsp;global&nbsp;--&gt;</span>
+<span class="synLineNumber">   20</span>  <span class="synStatement">&lt;div</span><span class="synPreProc">&nbsp;class=</span><span class="synConstant">"container"</span><span class="synStatement">&gt;</span>
+<span class="synLineNumber">   21</span>  
+<span class="synLineNumber">   22</span>  &nbsp;&nbsp;&nbsp;&nbsp;<span class="synComment">&lt;!--&nbsp;Columna&nbsp;izquierda:&nbsp;logotipo,&nbsp;menú&nbsp;global,&nbsp;</span><span class="synComment">
+<span class="synLineNumber">   23</span>  </span><span class="synComment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;validaciones&nbsp;y&nbsp;licencia&nbsp;--&gt;</span>
+<span class="synLineNumber">   24</span>  &nbsp;&nbsp;&nbsp;&nbsp;<span class="synStatement">&lt;div</span><span class="synPreProc">&nbsp;class=</span><span class="synConstant">"left"</span><span class="synStatement">&gt;</span>
+<span class="synLineNumber">   25</span>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="synComment">&lt;!--&nbsp;Logotipo&nbsp;--&gt;</span>
+<span class="synLineNumber">   26</span>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="synStatement">&lt;div</span><span class="synPreProc">&nbsp;class=</span><span class="synConstant">"logo"</span><span class="synStatement">&gt;</span>
+<span class="synLineNumber">   27</span>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="synStatement">&lt;img</span><span class="synPreProc">&nbsp;src=</span><span class="synConstant">"images/taquiones-logo.png"</span>
+<span class="synLineNumber">   28</span>  <span class="synPreProc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;alt=</span><span class="synConstant">"Logotipo&nbsp;de&nbsp;Taquiones"</span>&nbsp;<span class="synStatement">/&gt;</span>
+<span class="synLineNumber">   29</span>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="synStatement">&lt;/div&gt;</span></span>
+    </PRE></TD>
+</TABLE>
+
+        </BR>
+    
+        <TABLE>
+<TR>
+    <TD>Source fragment.html using Vim engine</TD>
+</TR>
+<TR>
+    <TD><PRE>
+    URL from  to examples/sources/fragment.html
+<span class="syntax"><span class="synLineNumber">    1</span>  <span class="synIdentifier">&lt;?xml </span><span class="synType">version</span><span class="synIdentifier">=</span><span class="synConstant">&quot;1.0&quot;</span><span class="synIdentifier"> encoding=</span><span class="synConstant">&quot;UTF-8&quot;</span><span class="synIdentifier">?&gt;</span>
+<span class="synLineNumber">    2</span>  <span class="synComment">&lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Strict//EN&quot;</span>
+<span class="synLineNumber">    3</span>  <span class="synComment"> &quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd&quot;&gt;</span>
+<span class="synLineNumber">    4</span>  <span class="synIdentifier">&lt;</span><span class="synStatement">html</span><span class="synIdentifier"> xmlns=</span><span class="synConstant">&quot;http://www.w3.org/1999/xhtml&quot;</span><span class="synIdentifier"> xml:</span><span class="synType">lang</span><span class="synIdentifier">=</span><span class="synConstant">&quot;es&quot;</span><span class="synIdentifier"> </span><span class="synType">lang</span><span class="synIdentifier">=</span><span class="synConstant">&quot;es&quot;</span><span class="synIdentifier">&gt;</span>
+<span class="synLineNumber">    5</span>  
+<span class="synLineNumber">    6</span>  <span class="synIdentifier">&lt;</span><span class="synStatement">head</span><span class="synIdentifier">&gt;</span>
+<span class="synLineNumber">    7</span>  <span class="synPreProc">	</span><span class="synIdentifier">&lt;</span><span class="synStatement">meta</span><span class="synIdentifier"> </span><span class="synType">http-equiv</span><span class="synIdentifier">=</span><span class="synConstant">&quot;Content-Type&quot;</span><span class="synIdentifier"> </span><span class="synType">content</span><span class="synIdentifier">=</span><span class="synConstant">&quot;text/html; charset=utf-8&quot;</span><span class="synIdentifier"> /&gt;</span>
+<span class="synLineNumber">    8</span>  <span class="synPreProc">    </span><span class="synComment">&lt;!-- &lt;base href=&quot;&quot; /&gt; --&gt;</span>
+<span class="synLineNumber">    9</span>  <span class="synPreProc">	</span><span class="synIdentifier">&lt;</span><span class="synStatement">title</span><span class="synIdentifier">&gt;</span>P<span class="synSpecial">&amp;#xE1;</span>gina principal<span class="synIdentifier">&lt;/</span><span class="synStatement">title</span><span class="synIdentifier">&gt;</span>
+<span class="synLineNumber">   10</span>  <span class="synPreProc">	</span><span class="synIdentifier">&lt;</span><span class="synStatement">link</span><span class="synIdentifier"> </span><span class="synType">rel</span><span class="synIdentifier">=</span><span class="synConstant">&quot;stylesheet&quot;</span><span class="synIdentifier"> </span><span class="synType">href</span><span class="synIdentifier">=</span><span class="synConstant">&quot;style.css&quot;</span><span class="synIdentifier"> </span><span class="synType">type</span><span class="synIdentifier">=</span><span class="synConstant">&quot;text/css&quot;</span>
+<span class="synLineNumber">   11</span>  <span class="synIdentifier">        </span><span class="synType">media</span><span class="synIdentifier">=</span><span class="synConstant">&quot;screen&quot;</span><span class="synIdentifier"> /&gt;</span>
+<span class="synLineNumber">   12</span>  <span class="synPreProc">	</span><span class="synIdentifier">&lt;</span><span class="synStatement">link</span><span class="synIdentifier"> </span><span class="synType">rel</span><span class="synIdentifier">=</span><span class="synConstant">&quot;stylesheet&quot;</span><span class="synIdentifier"> </span><span class="synType">href</span><span class="synIdentifier">=</span><span class="synConstant">&quot;print.css&quot;</span><span class="synIdentifier"> </span><span class="synType">type</span><span class="synIdentifier">=</span><span class="synConstant">&quot;text/css&quot;</span>
+<span class="synLineNumber">   13</span>  <span class="synIdentifier">        </span><span class="synType">media</span><span class="synIdentifier">=</span><span class="synConstant">&quot;print&quot;</span><span class="synIdentifier"> /&gt;</span>
+<span class="synLineNumber">   14</span>  <span class="synPreProc">	</span>
+<span class="synLineNumber">   15</span>  
+<span class="synLineNumber">   16</span>  <span class="synIdentifier">&lt;/</span><span class="synStatement">head</span><span class="synIdentifier">&gt;</span>
+<span class="synLineNumber">   17</span>  <span class="synIdentifier">&lt;</span><span class="synStatement">body</span><span class="synIdentifier">&gt;</span>
+<span class="synLineNumber">   18</span>  
+<span class="synLineNumber">   19</span>  <span class="synComment">&lt;!-- Contenedor global --&gt;</span>
+<span class="synLineNumber">   20</span>  <span class="synIdentifier">&lt;</span><span class="synStatement">div</span><span class="synIdentifier"> </span><span class="synType">class</span><span class="synIdentifier">=</span><span class="synConstant">&quot;container&quot;</span><span class="synIdentifier">&gt;</span>
+<span class="synLineNumber">   21</span>  
+<span class="synLineNumber">   22</span>      <span class="synComment">&lt;!-- Columna izquierda: logotipo, menú global, </span>
+<span class="synLineNumber">   23</span>  <span class="synComment">        validaciones y licencia --&gt;</span>
+<span class="synLineNumber">   24</span>      <span class="synIdentifier">&lt;</span><span class="synStatement">div</span><span class="synIdentifier"> </span><span class="synType">class</span><span class="synIdentifier">=</span><span class="synConstant">&quot;left&quot;</span><span class="synIdentifier">&gt;</span>
+<span class="synLineNumber">   25</span>              <span class="synComment">&lt;!-- Logotipo --&gt;</span>
+<span class="synLineNumber">   26</span>              <span class="synIdentifier">&lt;</span><span class="synStatement">div</span><span class="synIdentifier"> </span><span class="synType">class</span><span class="synIdentifier">=</span><span class="synConstant">&quot;logo&quot;</span><span class="synIdentifier">&gt;</span>
+<span class="synLineNumber">   27</span>                  <span class="synIdentifier">&lt;</span><span class="synStatement">img</span><span class="synIdentifier"> </span><span class="synType">src</span><span class="synIdentifier">=</span><span class="synConstant">&quot;images/taquiones-logo.png&quot;</span>
+<span class="synLineNumber">   28</span>  <span class="synIdentifier">                    </span><span class="synType">alt</span><span class="synIdentifier">=</span><span class="synConstant">&quot;Logotipo de Taquiones&quot;</span><span class="synIdentifier"> /&gt;</span>
+<span class="synLineNumber">   29</span>              <span class="synIdentifier">&lt;/</span><span class="synStatement">div</span><span class="synIdentifier">&gt;</span></span>
+    </PRE></TD>
+</TABLE>
+
+        </BR>
+    
+        <TABLE>
+<TR>
+    <TD>Source function.pl using Simple engine</TD>
+</TR>
+<TR>
+    <TD><PRE>
+    URL from  to examples/sources/function.pl
+<span class="syntax"><span class="synLineNumber">    1</span>  sub connection {
+<span class="synLineNumber">    2</span>      my $class = shift;
+<span class="synLineNumber">    3</span>      my $dsn = shift;
+<span class="synLineNumber">    4</span>      my $user = shift;
+<span class="synLineNumber">    5</span>      my $passwd = shift;
+<span class="synLineNumber">    6</span>      my $attr = shift;
+<span class="synLineNumber">    7</span>  
+<span class="synLineNumber">    8</span>      if (not $dsn) {
+<span class="synLineNumber">    9</span>          my $conf = Lidia::Config->new();
+<span class="synLineNumber">   10</span>          $dsn = $conf->db->dsn();
+<span class="synLineNumber">   11</span>          $user = $conf->db->user();
+<span class="synLineNumber">   12</span>          $passwd = $conf->db->passwd();
+<span class="synLineNumber">   13</span>      }
+<span class="synLineNumber">   14</span>  
+<span class="synLineNumber">   15</span>      return $class->SUPER::connection( $dsn, $user, $passwd, $attr);
+<span class="synLineNumber">   16</span>  }</span>
+    </PRE></TD>
+</TABLE>
+
+        </BR>
+    
+        <TABLE>
+<TR>
+    <TD>Source function.pl using Kate engine</TD>
+</TR>
+<TR>
+    <TD><PRE>
+    URL from  to examples/sources/function.pl
+<span class="syntax"><span class="synLineNumber">    1</span>  <span class="synStatement">sub&nbsp;</span><span class="synSpecial">connection</span>&nbsp;{
+<span class="synLineNumber">    2</span>  &nbsp;&nbsp;&nbsp;&nbsp;<span class="synStatement">my</span>&nbsp;<span class="synType">$class</span>&nbsp;=&nbsp;<span class="synSpecial">shift</span>;
+<span class="synLineNumber">    3</span>  &nbsp;&nbsp;&nbsp;&nbsp;<span class="synStatement">my</span>&nbsp;<span class="synType">$dsn</span>&nbsp;=&nbsp;<span class="synSpecial">shift</span>;
+<span class="synLineNumber">    4</span>  &nbsp;&nbsp;&nbsp;&nbsp;<span class="synStatement">my</span>&nbsp;<span class="synType">$user</span>&nbsp;=&nbsp;<span class="synSpecial">shift</span>;
+<span class="synLineNumber">    5</span>  &nbsp;&nbsp;&nbsp;&nbsp;<span class="synStatement">my</span>&nbsp;<span class="synType">$passwd</span>&nbsp;=&nbsp;<span class="synSpecial">shift</span>;
+<span class="synLineNumber">    6</span>  &nbsp;&nbsp;&nbsp;&nbsp;<span class="synStatement">my</span>&nbsp;<span class="synType">$attr</span>&nbsp;=&nbsp;<span class="synSpecial">shift</span>;
+<span class="synLineNumber">    7</span>  
+<span class="synLineNumber">    8</span>  &nbsp;&nbsp;&nbsp;&nbsp;<span class="synStatement">if</span>&nbsp;(<span class="synConstant">not</span>&nbsp;<span class="synType">$dsn</span>)&nbsp;{
+<span class="synLineNumber">    9</span>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="synStatement">my</span>&nbsp;<span class="synType">$conf</span>&nbsp;=&nbsp;<span class="synSpecial">Lidia::Config</span>-&gt;new();
+<span class="synLineNumber">   10</span>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="synType">$dsn</span>&nbsp;=&nbsp;<span class="synType">$conf</span>-&gt;<span class="synType">db</span>-&gt;<span class="synType">dsn</span>();
+<span class="synLineNumber">   11</span>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="synType">$user</span>&nbsp;=&nbsp;<span class="synType">$conf</span>-&gt;<span class="synType">db</span>-&gt;<span class="synType">user</span>();
+<span class="synLineNumber">   12</span>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="synType">$passwd</span>&nbsp;=&nbsp;<span class="synType">$conf</span>-&gt;<span class="synType">db</span>-&gt;<span class="synType">passwd</span>();
+<span class="synLineNumber">   13</span>  &nbsp;&nbsp;&nbsp;&nbsp;}
+<span class="synLineNumber">   14</span>  
+<span class="synLineNumber">   15</span>  &nbsp;&nbsp;&nbsp;&nbsp;<span class="synStatement">return</span>&nbsp;<span class="synType">$class</span>-&gt;<span class="synType">SUPER</span>::<span class="synType">connection</span>(&nbsp;<span class="synType">$dsn</span>,&nbsp;<span class="synType">$user</span>,&nbsp;<span class="synType">$passwd</span>,&nbsp;<span class="synType">$attr</span>);
+<span class="synLineNumber">   16</span>  }</span>
+    </PRE></TD>
+</TABLE>
+
+        </BR>
+    
+        <TABLE>
+<TR>
+    <TD>Source function.pl using Vim engine</TD>
+</TR>
+<TR>
+    <TD><PRE>
+    URL from  to examples/sources/function.pl
+<span class="syntax"><span class="synLineNumber">    1</span>  <span class="synStatement">sub</span><span class="synIdentifier"> connection </span>{
+<span class="synLineNumber">    2</span>      <span class="synStatement">my</span> <span class="synIdentifier">$class</span> = <span class="synStatement">shift</span>;
+<span class="synLineNumber">    3</span>      <span class="synStatement">my</span> <span class="synIdentifier">$dsn</span> = <span class="synStatement">shift</span>;
+<span class="synLineNumber">    4</span>      <span class="synStatement">my</span> <span class="synIdentifier">$user</span> = <span class="synStatement">shift</span>;
+<span class="synLineNumber">    5</span>      <span class="synStatement">my</span> <span class="synIdentifier">$passwd</span> = <span class="synStatement">shift</span>;
+<span class="synLineNumber">    6</span>      <span class="synStatement">my</span> <span class="synIdentifier">$attr</span> = <span class="synStatement">shift</span>;
+<span class="synLineNumber">    7</span>  
+<span class="synLineNumber">    8</span>      <span class="synStatement">if</span> (<span class="synStatement">not</span> <span class="synIdentifier">$dsn</span>) {
+<span class="synLineNumber">    9</span>          <span class="synStatement">my</span> <span class="synIdentifier">$conf</span> = Lidia::Config-&gt;<span class="synStatement">new</span>();
+<span class="synLineNumber">   10</span>          <span class="synIdentifier">$dsn</span> = <span class="synIdentifier">$conf</span>-&gt;db-&gt;dsn();
+<span class="synLineNumber">   11</span>          <span class="synIdentifier">$user</span> = <span class="synIdentifier">$conf</span>-&gt;db-&gt;user();
+<span class="synLineNumber">   12</span>          <span class="synIdentifier">$passwd</span> = <span class="synIdentifier">$conf</span>-&gt;db-&gt;passwd();
+<span class="synLineNumber">   13</span>      }
+<span class="synLineNumber">   14</span>  
+<span class="synLineNumber">   15</span>      <span class="synStatement">return</span> <span class="synIdentifier">$class</span>-&gt;SUPER::connection( <span class="synIdentifier">$dsn</span>, <span class="synIdentifier">$user</span>, <span class="synIdentifier">$passwd</span>, <span class="synIdentifier">$attr</span>);
+<span class="synLineNumber">   16</span>  }</span>
+    </PRE></TD>
+</TABLE>
+
+        </BR>
+    
+        <TABLE>
+<TR>
+    <TD>Source page.tmpl using Simple engine</TD>
+</TR>
+<TR>
+    <TD><PRE>
+    URL from  to examples/sources/page.tmpl
+<span class="syntax"><span class="synLineNumber">    1</span>  &lt;HTML&gt;
+<span class="synLineNumber">    2</span>  &lt;HEAD&gt;
+<span class="synLineNumber">    3</span>  &lt;TITLE&gt;&lt;TMPL_VAR NAME=title&gt;&lt;/TITLE&gt;
+<span class="synLineNumber">    4</span>  &lt;LINK REL=StyleSheet HREF=&quot;../extras/syntax.css&quot; TYPPE=&quot;text/css&quot; MEDIA=&quot;all&quot;&gt;
+<span class="synLineNumber">    5</span>  &lt;/HEAD&gt;
+<span class="synLineNumber">    6</span>  &lt;BODY&gt;
+<span class="synLineNumber">    7</span>      &lt;H1&gt;&lt;TMPL_VAR NAME=title&gt;&lt;/H1&gt;
+<span class="synLineNumber">    8</span>  
+<span class="synLineNumber">    9</span>      &lt;P&gt;This page contains examples of syntax highlight using the
+<span class="synLineNumber">   10</span>      IkiWiki::Plugin::syntax and several configuration and programming source
+<span class="synLineNumber">   11</span>      files. &lt;/P&gt;
+<span class="synLineNumber">   12</span>  
+<span class="synLineNumber">   13</span>      &lt;TMPL_LOOP NAME=results&gt;
+<span class="synLineNumber">   14</span>          &lt;TMPL_VAR NAME=output&gt;
+<span class="synLineNumber">   15</span>          &lt;/BR&gt;
+<span class="synLineNumber">   16</span>      &lt;/TMPL_LOOP&gt;
+<span class="synLineNumber">   17</span>  &lt;/BODY&gt;    
+<span class="synLineNumber">   18</span>  &lt;/HTML&gt;</span>
+    </PRE></TD>
+</TABLE>
+
+        </BR>
+    
+        <TABLE>
+<TR>
+    <TD>Source page.tmpl using Kate engine</TD>
+</TR>
+<TR>
+    <TD><PRE>
+    URL from  to examples/sources/page.tmpl
+<span class="syntax"><span class="synLineNumber">    1</span>  <span class="synStatement">&lt;HTML&gt;</span>
+<span class="synLineNumber">    2</span>  <span class="synStatement">&lt;HEAD&gt;</span>
+<span class="synLineNumber">    3</span>  <span class="synStatement">&lt;TITLE&gt;&lt;TMPL_VAR</span><span class="synPreProc">&nbsp;NAME=</span>t<span class="synConstant">itle</span><span class="synStatement">&gt;&lt;/TITLE&gt;</span>
+<span class="synLineNumber">    4</span>  <span class="synStatement">&lt;LINK</span><span class="synPreProc">&nbsp;REL=</span><span class="synConstant">StyleSheet</span><span class="synPreProc">&nbsp;HREF=</span><span class="synConstant">"../extras/syntax.css"</span><span class="synPreProc">&nbsp;TYPPE=</span><span class="synConstant">"text/css"</span><span class="synPreProc">&nbsp;MEDIA=</span><span class="synConstant">"all"</span><span class="synStatement">&gt;</span>
+<span class="synLineNumber">    5</span>  <span class="synStatement">&lt;/HEAD&gt;</span>
+<span class="synLineNumber">    6</span>  <span class="synStatement">&lt;BODY&gt;</span>
+<span class="synLineNumber">    7</span>  &nbsp;&nbsp;&nbsp;&nbsp;<span class="synStatement">&lt;H1&gt;&lt;TMPL_VAR</span><span class="synPreProc">&nbsp;NAME=</span>t<span class="synConstant">itle</span><span class="synStatement">&gt;&lt;/H1&gt;</span>
+<span class="synLineNumber">    8</span>  
+<span class="synLineNumber">    9</span>  &nbsp;&nbsp;&nbsp;&nbsp;<span class="synStatement">&lt;P&gt;</span>This&nbsp;page&nbsp;contains&nbsp;examples&nbsp;of&nbsp;syntax&nbsp;highlight&nbsp;using&nbsp;the
+<span class="synLineNumber">   10</span>  &nbsp;&nbsp;&nbsp;&nbsp;IkiWiki::Plugin::syntax&nbsp;and&nbsp;several&nbsp;configuration&nbsp;and&nbsp;programming&nbsp;source
+<span class="synLineNumber">   11</span>  &nbsp;&nbsp;&nbsp;&nbsp;files.&nbsp;<span class="synStatement">&lt;/P&gt;</span>
+<span class="synLineNumber">   12</span>  
+<span class="synLineNumber">   13</span>  &nbsp;&nbsp;&nbsp;&nbsp;<span class="synStatement">&lt;TMPL_LOOP</span><span class="synPreProc">&nbsp;NAME=</span><span class="synConstant">results</span><span class="synStatement">&gt;</span>
+<span class="synLineNumber">   14</span>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="synStatement">&lt;TMPL_VAR</span><span class="synPreProc">&nbsp;NAME=</span><span class="synConstant">output</span><span class="synStatement">&gt;</span>
+<span class="synLineNumber">   15</span>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="synStatement">&lt;/BR&gt;</span>
+<span class="synLineNumber">   16</span>  &nbsp;&nbsp;&nbsp;&nbsp;<span class="synStatement">&lt;/TMPL_LOOP&gt;</span>
+<span class="synLineNumber">   17</span>  <span class="synStatement">&lt;/BODY&gt;</span>&nbsp;&nbsp;&nbsp;&nbsp;
+<span class="synLineNumber">   18</span>  <span class="synStatement">&lt;/HTML&gt;</span></span>
+    </PRE></TD>
+</TABLE>
+
+        </BR>
+    
+        <TABLE>
+<TR>
+    <TD>Source page.tmpl using Vim engine</TD>
+</TR>
+<TR>
+    <TD><PRE>
+    URL from  to examples/sources/page.tmpl
+<span class="syntax"><span class="synLineNumber">    1</span>  <span class="synIdentifier">&lt;</span><span class="synStatement">HTML</span><span class="synIdentifier">&gt;</span>
+<span class="synLineNumber">    2</span>  <span class="synIdentifier">&lt;</span><span class="synStatement">HEAD</span><span class="synIdentifier">&gt;</span>
+<span class="synLineNumber">    3</span>  <span class="synIdentifier">&lt;</span><span class="synStatement">TITLE</span><span class="synIdentifier">&gt;&lt;</span>TMPL<span class="synIdentifier">_VAR </span><span class="synType">NAME</span><span class="synIdentifier">=</span><span class="synConstant">title</span><span class="synIdentifier">&gt;&lt;/</span><span class="synStatement">TITLE</span><span class="synIdentifier">&gt;</span>
+<span class="synLineNumber">    4</span>  <span class="synIdentifier">&lt;</span><span class="synStatement">LINK</span><span class="synIdentifier"> </span><span class="synType">REL</span><span class="synIdentifier">=</span><span class="synConstant">StyleSheet</span><span class="synIdentifier"> </span><span class="synType">HREF</span><span class="synIdentifier">=</span><span class="synConstant">&quot;../extras/syntax.css&quot;</span><span class="synIdentifier"> TYPPE=</span><span class="synConstant">&quot;text/css&quot;</span><span class="synIdentifier"> </span><span class="synType">MEDIA</span><span class="synIdentifier">=</span><span class="synConstant">&quot;all&quot;</span><span class="synIdentifier">&gt;</span>
+<span class="synLineNumber">    5</span>  <span class="synIdentifier">&lt;/</span><span class="synStatement">HEAD</span><span class="synIdentifier">&gt;</span>
+<span class="synLineNumber">    6</span>  <span class="synIdentifier">&lt;</span><span class="synStatement">BODY</span><span class="synIdentifier">&gt;</span>
+<span class="synLineNumber">    7</span>      <span class="synIdentifier">&lt;</span><span class="synStatement">H1</span><span class="synIdentifier">&gt;&lt;</span>TMPL<span class="synIdentifier">_VAR </span><span class="synType">NAME</span><span class="synIdentifier">=</span><span class="synConstant">title</span><span class="synIdentifier">&gt;&lt;/</span><span class="synStatement">H1</span><span class="synIdentifier">&gt;</span>
+<span class="synLineNumber">    8</span>  
+<span class="synLineNumber">    9</span>      <span class="synIdentifier">&lt;</span><span class="synStatement">P</span><span class="synIdentifier">&gt;</span>This page contains examples of syntax highlight using the
+<span class="synLineNumber">   10</span>      IkiWiki::Plugin::syntax and several configuration and programming source
+<span class="synLineNumber">   11</span>      files. <span class="synIdentifier">&lt;/</span><span class="synStatement">P</span><span class="synIdentifier">&gt;</span>
+<span class="synLineNumber">   12</span>  
+<span class="synLineNumber">   13</span>      <span class="synIdentifier">&lt;</span>TMPL<span class="synIdentifier">_LOOP </span><span class="synType">NAME</span><span class="synIdentifier">=</span><span class="synConstant">results</span><span class="synIdentifier">&gt;</span>
+<span class="synLineNumber">   14</span>          <span class="synIdentifier">&lt;</span>TMPL<span class="synIdentifier">_VAR </span><span class="synType">NAME</span><span class="synIdentifier">=</span><span class="synConstant">output</span><span class="synIdentifier">&gt;</span>
+<span class="synLineNumber">   15</span>          <span class="synIdentifier">&lt;/</span><span class="synStatement">BR</span><span class="synIdentifier">&gt;</span>
+<span class="synLineNumber">   16</span>      <span class="synIdentifier">&lt;/</span>TMPL<span class="synIdentifier">_LOOP&gt;</span>
+<span class="synLineNumber">   17</span>  <span class="synIdentifier">&lt;/</span><span class="synStatement">BODY</span><span class="synIdentifier">&gt;</span>    
+<span class="synLineNumber">   18</span>  <span class="synIdentifier">&lt;/</span><span class="synStatement">HTML</span><span class="synIdentifier">&gt;</span></span>
+    </PRE></TD>
+</TABLE>
+
+        </BR>
+    
+        <TABLE>
+<TR>
+    <TD>Source sarajevo.conf using Simple engine</TD>
+</TR>
+<TR>
+    <TD><PRE>
+    URL from  to examples/sources/sarajevo.conf
+<span class="syntax"><span class="synLineNumber">    1</span>  #
+<span class="synLineNumber">    2</span>  #	Cliente: Sarajevo
+<span class="synLineNumber">    3</span>  #	
+<span class="synLineNumber">    4</span>  Catalog {
+<span class="synLineNumber">    5</span>  	Name 		= Sarajevo
+<span class="synLineNumber">    6</span>  	dbname 		= sarajevo
+<span class="synLineNumber">    7</span>  	user		= bacula
+<span class="synLineNumber">    8</span>  	password	= ""
+<span class="synLineNumber">    9</span>  }
+<span class="synLineNumber">   10</span>  
+<span class="synLineNumber">   11</span>  Client	{
+<span class="synLineNumber">   12</span>  	Name		= sarajevo-fd
+<span class="synLineNumber">   13</span>  	Address		= sarajevo.venexma.int
+<span class="synLineNumber">   14</span>  	Catalog		= Sarajevo
+<span class="synLineNumber">   15</span>  	Password	= "XXXXX"
+<span class="synLineNumber">   16</span>  }
+<span class="synLineNumber">   17</span>  
+<span class="synLineNumber">   18</span>  Job {
+<span class="synLineNumber">   19</span>  	Name	=	"Sarajevo Semanal"
+<span class="synLineNumber">   20</span>  	Enabled	=	yes
+<span class="synLineNumber">   21</span>  	Type	=	Backup
+<span class="synLineNumber">   22</span>  	Level	=	Full
+<span class="synLineNumber">   23</span>  	Client	=	sarajevo-fd
+<span class="synLineNumber">   24</span>  	FileSet	=	"Archivos de Sarajevo"
+<span class="synLineNumber">   25</span>  	Storage	=	Disco
+<span class="synLineNumber">   26</span>  	Schedule=	"Semanal"
+<span class="synLineNumber">   27</span>  	Messages=	Standard
+<span class="synLineNumber">   28</span>  	Pool	=	Workstation
+<span class="synLineNumber">   29</span>  }
+<span class="synLineNumber">   30</span>  
+<span class="synLineNumber">   31</span>  Job {
+<span class="synLineNumber">   32</span>  	Name	=	"Sarajevo restore"
+<span class="synLineNumber">   33</span>  	Type	=	Restore
+<span class="synLineNumber">   34</span>  	Client	=	sarajevo-fd
+<span class="synLineNumber">   35</span>  	FileSet	=	"Archivos de Sarajevo"
+<span class="synLineNumber">   36</span>  	Storage =	Disco
+<span class="synLineNumber">   37</span>  	Messages=	Standard
+<span class="synLineNumber">   38</span>  	Pool	=	Workstation
+<span class="synLineNumber">   39</span>  }
+<span class="synLineNumber">   40</span>  
+<span class="synLineNumber">   41</span>  FileSet {
+<span class="synLineNumber">   42</span>  	Name	=	"Archivos de Sarajevo"
+<span class="synLineNumber">   43</span>  	Include {
+<span class="synLineNumber">   44</span>  		Options	{
+<span class="synLineNumber">   45</span>  			compression	=	GZIP;
+<span class="synLineNumber">   46</span>  			signature	=	MD5;
+<span class="synLineNumber">   47</span>  			verify		=	pins5;
+<span class="synLineNumber">   48</span>  			onefs		=	yes;
+<span class="synLineNumber">   49</span>  		}
+<span class="synLineNumber">   50</span>  		File	=	/etc
+<span class="synLineNumber">   51</span>  		File	=	/root
+<span class="synLineNumber">   52</span>  		File	=	/home/victor
+<span class="synLineNumber">   53</span>  	}
+<span class="synLineNumber">   54</span>  	Exclude {
+<span class="synLineNumber">   55</span>  		File	=	/home/victor/downloads
+<span class="synLineNumber">   56</span>  		File	=	/home/victor/Videos
+<span class="synLineNumber">   57</span>  		File	=	/home/victor/mp3
+<span class="synLineNumber">   58</span>  	}		
+<span class="synLineNumber">   59</span>  }</span>
+    </PRE></TD>
+</TABLE>
+
+        </BR>
+    
+        <TABLE>
+<TR>
+    <TD>Source sarajevo.conf using Kate engine</TD>
+</TR>
+<TR>
+    <TD><PRE>
+    URL from  to examples/sources/sarajevo.conf
+<span class="syntax"><span class="synLineNumber">    1</span>  <span class="synComment">#</span><span class="synComment">
+<span class="synLineNumber">    2</span>  </span><span class="synComment">#&nbsp;&nbsp;&nbsp;&nbsp;Cliente:&nbsp;Sarajevo</span><span class="synComment">
+<span class="synLineNumber">    3</span>  </span><span class="synComment">#&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="synComment">
+<span class="synLineNumber">    4</span>  </span>Catalog&nbsp;{
+<span class="synLineNumber">    5</span>  &nbsp;&nbsp;&nbsp;&nbsp;Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;Sarajevo
+<span class="synLineNumber">    6</span>  &nbsp;&nbsp;&nbsp;&nbsp;dbname&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;sarajevo
+<span class="synLineNumber">    7</span>  &nbsp;&nbsp;&nbsp;&nbsp;user<span class="synConstant">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;bacula
+<span class="synLineNumber">    8</span>  &nbsp;&nbsp;&nbsp;&nbsp;password&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;""
+<span class="synLineNumber">    9</span>  }
+<span class="synLineNumber">   10</span>  
+<span class="synLineNumber">   11</span>  Client&nbsp;&nbsp;&nbsp;&nbsp;{
+<span class="synLineNumber">   12</span>  &nbsp;&nbsp;&nbsp;&nbsp;Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;sarajevo-fd
+<span class="synLineNumber">   13</span>  &nbsp;&nbsp;&nbsp;&nbsp;Address&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;sarajevo.venexma.int
+<span class="synLineNumber">   14</span>  &nbsp;&nbsp;&nbsp;&nbsp;Catalog&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;Sarajevo
+<span class="synLineNumber">   15</span>  &nbsp;&nbsp;&nbsp;&nbsp;Password&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;"XXXXX"
+<span class="synLineNumber">   16</span>  }
+<span class="synLineNumber">   17</span>  
+<span class="synLineNumber">   18</span>  Job&nbsp;{
+<span class="synLineNumber">   19</span>  &nbsp;&nbsp;&nbsp;&nbsp;Name&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;"Sarajevo&nbsp;Semanal"
+<span class="synLineNumber">   20</span>  &nbsp;&nbsp;&nbsp;&nbsp;Enabled&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;yes
+<span class="synLineNumber">   21</span>  &nbsp;&nbsp;&nbsp;&nbsp;Type&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;Backup
+<span class="synLineNumber">   22</span>  &nbsp;&nbsp;&nbsp;&nbsp;Level&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;Full
+<span class="synLineNumber">   23</span>  &nbsp;&nbsp;&nbsp;&nbsp;Client&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;sarajevo-fd
+<span class="synLineNumber">   24</span>  &nbsp;&nbsp;&nbsp;&nbsp;FileSet&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;"Archivos&nbsp;de&nbsp;Sarajevo"
+<span class="synLineNumber">   25</span>  &nbsp;&nbsp;&nbsp;&nbsp;Storage&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;Disco
+<span class="synLineNumber">   26</span>  &nbsp;&nbsp;&nbsp;&nbsp;Schedule=&nbsp;&nbsp;&nbsp;&nbsp;"Semanal"
+<span class="synLineNumber">   27</span>  &nbsp;&nbsp;&nbsp;&nbsp;Messages=&nbsp;&nbsp;&nbsp;&nbsp;Standard
+<span class="synLineNumber">   28</span>  &nbsp;&nbsp;&nbsp;&nbsp;Pool&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;Workstation
+<span class="synLineNumber">   29</span>  }
+<span class="synLineNumber">   30</span>  
+<span class="synLineNumber">   31</span>  Job&nbsp;{
+<span class="synLineNumber">   32</span>  &nbsp;&nbsp;&nbsp;&nbsp;Name&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;"Sarajevo&nbsp;restore"
+<span class="synLineNumber">   33</span>  &nbsp;&nbsp;&nbsp;&nbsp;Type&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;Restore
+<span class="synLineNumber">   34</span>  &nbsp;&nbsp;&nbsp;&nbsp;Client&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;sarajevo-fd
+<span class="synLineNumber">   35</span>  &nbsp;&nbsp;&nbsp;&nbsp;FileSet&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;"Archivos&nbsp;de&nbsp;Sarajevo"
+<span class="synLineNumber">   36</span>  &nbsp;&nbsp;&nbsp;&nbsp;Storage&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;Disco
+<span class="synLineNumber">   37</span>  &nbsp;&nbsp;&nbsp;&nbsp;Messages=&nbsp;&nbsp;&nbsp;&nbsp;Standard
+<span class="synLineNumber">   38</span>  &nbsp;&nbsp;&nbsp;&nbsp;Pool&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;Workstation
+<span class="synLineNumber">   39</span>  }
+<span class="synLineNumber">   40</span>  
+<span class="synLineNumber">   41</span>  FileSet&nbsp;{
+<span class="synLineNumber">   42</span>  &nbsp;&nbsp;&nbsp;&nbsp;Name&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;"Archivos&nbsp;de&nbsp;Sarajevo"
+<span class="synLineNumber">   43</span>  &nbsp;&nbsp;&nbsp;&nbsp;Include&nbsp;{
+<span class="synLineNumber">   44</span>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Options&nbsp;&nbsp;&nbsp;&nbsp;{
+<span class="synLineNumber">   45</span>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;compression&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;GZIP;
+<span class="synLineNumber">   46</span>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;signature&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;MD5;
+<span class="synLineNumber">   47</span>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;verify&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;pins5;
+<span class="synLineNumber">   48</span>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;onefs&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;yes;
+<span class="synLineNumber">   49</span>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+<span class="synLineNumber">   50</span>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;File&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;/etc
+<span class="synLineNumber">   51</span>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;File&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;/root
+<span class="synLineNumber">   52</span>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;File&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;/home/victor
+<span class="synLineNumber">   53</span>  &nbsp;&nbsp;&nbsp;&nbsp;}
+<span class="synLineNumber">   54</span>  &nbsp;&nbsp;&nbsp;&nbsp;Exclude&nbsp;{
+<span class="synLineNumber">   55</span>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;File&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;/home/victor/downloads
+<span class="synLineNumber">   56</span>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;File&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;/home/victor/Videos
+<span class="synLineNumber">   57</span>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;File&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;/home/victor/mp3
+<span class="synLineNumber">   58</span>  &nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<span class="synLineNumber">   59</span>  }
+<span class="synLineNumber">   60</span>  
+<span class="synLineNumber">   61</span>  </span></span>
+    </PRE></TD>
+</TABLE>
+
+        </BR>
+    
+        <TABLE>
+<TR>
+    <TD>Source sarajevo.conf using Vim engine</TD>
+</TR>
+<TR>
+    <TD><PRE>
+    URL from  to examples/sources/sarajevo.conf
+<span class="syntax"><span class="synLineNumber">    1</span>  <span class="synComment">#</span>
+<span class="synLineNumber">    2</span>  <span class="synComment">#	Cliente: Sarajevo</span>
+<span class="synLineNumber">    3</span>  <span class="synComment">#	</span>
+<span class="synLineNumber">    4</span>  Catalog {
+<span class="synLineNumber">    5</span>  	Name 		= Sarajevo
+<span class="synLineNumber">    6</span>  	dbname 		= sarajevo
+<span class="synLineNumber">    7</span>  	user		= bacula
+<span class="synLineNumber">    8</span>  	password	= <span class="synConstant">&quot;&quot;</span>
+<span class="synLineNumber">    9</span>  }
+<span class="synLineNumber">   10</span>  
+<span class="synLineNumber">   11</span>  Client	{
+<span class="synLineNumber">   12</span>  	Name		= sarajevo-fd
+<span class="synLineNumber">   13</span>  	Address		= sarajevo.venexma.int
+<span class="synLineNumber">   14</span>  	Catalog		= Sarajevo
+<span class="synLineNumber">   15</span>  	Password	= <span class="synConstant">&quot;XXXXX&quot;</span>
+<span class="synLineNumber">   16</span>  }
+<span class="synLineNumber">   17</span>  
+<span class="synLineNumber">   18</span>  Job {
+<span class="synLineNumber">   19</span>  	Name	=	<span class="synConstant">&quot;Sarajevo Semanal&quot;</span>
+<span class="synLineNumber">   20</span>  	Enabled	=	yes
+<span class="synLineNumber">   21</span>  	Type	=	Backup
+<span class="synLineNumber">   22</span>  	Level	=	Full
+<span class="synLineNumber">   23</span>  	Client	=	sarajevo-fd
+<span class="synLineNumber">   24</span>  	FileSet	=	<span class="synConstant">&quot;Archivos de Sarajevo&quot;</span>
+<span class="synLineNumber">   25</span>  	Storage	=	Disco
+<span class="synLineNumber">   26</span>  	Schedule=	<span class="synConstant">&quot;Semanal&quot;</span>
+<span class="synLineNumber">   27</span>  	Messages=	Standard
+<span class="synLineNumber">   28</span>  	Pool	=	Workstation
+<span class="synLineNumber">   29</span>  }
+<span class="synLineNumber">   30</span>  
+<span class="synLineNumber">   31</span>  Job {
+<span class="synLineNumber">   32</span>  	Name	=	<span class="synConstant">&quot;Sarajevo restore&quot;</span>
+<span class="synLineNumber">   33</span>  	Type	=	Restore
+<span class="synLineNumber">   34</span>  	Client	=	sarajevo-fd
+<span class="synLineNumber">   35</span>  	FileSet	=	<span class="synConstant">&quot;Archivos de Sarajevo&quot;</span>
+<span class="synLineNumber">   36</span>  	Storage =	Disco
+<span class="synLineNumber">   37</span>  	Messages=	Standard
+<span class="synLineNumber">   38</span>  	Pool	=	Workstation
+<span class="synLineNumber">   39</span>  }
+<span class="synLineNumber">   40</span>  
+<span class="synLineNumber">   41</span>  FileSet {
+<span class="synLineNumber">   42</span>  	Name	=	<span class="synConstant">&quot;Archivos de Sarajevo&quot;</span>
+<span class="synLineNumber">   43</span>  	Include {
+<span class="synLineNumber">   44</span>  		Options	{
+<span class="synLineNumber">   45</span>  			compression	=	GZIP;
+<span class="synLineNumber">   46</span>  			signature	=	MD5;
+<span class="synLineNumber">   47</span>  			verify		=	pins5;
+<span class="synLineNumber">   48</span>  			onefs		=	yes;
+<span class="synLineNumber">   49</span>  		}
+<span class="synLineNumber">   50</span>  		File	=	/etc
+<span class="synLineNumber">   51</span>  		File	=	/root
+<span class="synLineNumber">   52</span>  		File	=	/home/victor
+<span class="synLineNumber">   53</span>  	}
+<span class="synLineNumber">   54</span>  	Exclude {
+<span class="synLineNumber">   55</span>  		File	=	/home/victor/downloads
+<span class="synLineNumber">   56</span>  		File	=	/home/victor/Videos
+<span class="synLineNumber">   57</span>  		File	=	/home/victor/mp3
+<span class="synLineNumber">   58</span>  	}		
+<span class="synLineNumber">   59</span>  }</span>
+    </PRE></TD>
+</TABLE>
+
+        </BR>
+    
+        <TABLE>
+<TR>
+    <TD>Source text.pod using Simple engine</TD>
+</TR>
+<TR>
+    <TD><PRE>
+    URL from  to examples/sources/text.pod
+<span class="syntax"><span class="synLineNumber">    1</span>  =head1 NAME
+<span class="synLineNumber">    2</span>  
+<span class="synLineNumber">    3</span>  IkiWiki::Plugin::syntax - Add syntax highlighting to ikiwiki
+<span class="synLineNumber">    4</span>  
+<span class="synLineNumber">    5</span>  =head1 SYNOPSIS
+<span class="synLineNumber">    6</span>  
+<span class="synLineNumber">    7</span>  In any source page include the following:
+<span class="synLineNumber">    8</span>  
+<span class="synLineNumber">    9</span>      This is the example code 
+<span class="synLineNumber">   10</span>  
+<span class="synLineNumber">   11</span>      [[syntax language=perl text="""
+<span class="synLineNumber">   12</span>      #!/usr/bin/perl
+<span class="synLineNumber">   13</span>      
+<span class="synLineNumber">   14</span>      print "Hello, world\n";
+<span class="synLineNumber">   15</span>      """]]
+<span class="synLineNumber">   16</span>  
+<span class="synLineNumber">   17</span>      and this is my bash profile (using file type autodetection )
+<span class="synLineNumber">   18</span>  
+<span class="synLineNumber">   19</span>      [[syntax file="software/examples/mybash_profile" 
+<span class="synLineNumber">   20</span>          description="My profile" ]]
+<span class="synLineNumber">   21</span>  
+<span class="synLineNumber">   22</span>  In order to facilitate the life to the administrator the plugin could create a
+<span class="synLineNumber">   23</span>  html table with information about the engine capabilities. 
+<span class="synLineNumber">   24</span>  
+<span class="synLineNumber">   25</span>  Use the directive C<syntax> without any parameters as is:
+<span class="synLineNumber">   26</span>  
+<span class="synLineNumber">   27</span>      This is the syntax engine chart in this site:
+<span class="synLineNumber">   28</span>  
+<span class="synLineNumber">   29</span>      [[syntax ]]
+<span class="synLineNumber">   30</span>  
+<span class="synLineNumber">   31</span>  =head1 DESCRIPTION
+<span class="synLineNumber">   32</span>  
+<span class="synLineNumber">   33</span>  This plugin adds syntax highlight capabilities to Ikiwiki using third party
+<span class="synLineNumber">   34</span>  modules if they are installed. 
+<span class="synLineNumber">   35</span>  
+<span class="synLineNumber">   36</span>  Those modules can be:
+<span class="synLineNumber">   37</span>  
+<span class="synLineNumber">   38</span>  =over
+<span class="synLineNumber">   39</span>  
+<span class="synLineNumber">   40</span>  =item * L<Syntax::Highlight::Engine::Kate>
+<span class="synLineNumber">   41</span>  
+<span class="synLineNumber">   42</span>  Uses the Syntax::Highlight::Engine::Kate package, a port to Perl of the
+<span class="synLineNumber">   43</span>  syntax highlight engine of the Kate text editor.
+<span class="synLineNumber">   44</span>  
+<span class="synLineNumber">   45</span>  Copyright (c) 2006 by Hans Jeuken, all rights reserved.
+<span class="synLineNumber">   46</span>  
+<span class="synLineNumber">   47</span>  =item * L<Text::VimColor>
+<span class="synLineNumber">   48</span>  
+<span class="synLineNumber">   49</span>  This plugin uses the Text::VimColor module and the vim editor.
+<span class="synLineNumber">   50</span>  
+<span class="synLineNumber">   51</span>  Copyright 2002-2006, Geoff Richards.
+<span class="synLineNumber">   52</span>  
+<span class="synLineNumber">   53</span>  =item * L<IkiWiki::Plugin::syntax::Simple>
+<span class="synLineNumber">   54</span>  
+<span class="synLineNumber">   55</span>  This is the default engine. It's a passtrough engine with line numering capability.
+<span class="synLineNumber">   56</span>  
+<span class="synLineNumber">   57</span>  =back
+<span class="synLineNumber">   58</span>  
+<span class="synLineNumber">   59</span>  and they can be selected at runtime with the C<syntax_engine> parameter. In
+<span class="synLineNumber">   60</span>  case of fail loading the module the plugin switch to use the simple engine.
+<span class="synLineNumber">   61</span>  
+<span class="synLineNumber">   62</span>  The module register a preprocessor directive named B<syntax>.
+<span class="synLineNumber">   63</span>  
+<span class="synLineNumber">   64</span>  =head2 Parameters
+<span class="synLineNumber">   65</span>  
+<span class="synLineNumber">   66</span>  The syntax directive has the following parameters:
+<span class="synLineNumber">   67</span>  
+<span class="synLineNumber">   68</span>  =over
+<span class="synLineNumber">   69</span>  
+<span class="synLineNumber">   70</span>  =item language (optional)
+<span class="synLineNumber">   71</span>  
+<span class="synLineNumber">   72</span>  Name of the source language for select the correct plugin. If not defined the
+<span class="synLineNumber">   73</span>  module will try to determine the appropiated value.
+<span class="synLineNumber">   74</span>  
+<span class="synLineNumber">   75</span>  =item description (optional)
+<span class="synLineNumber">   76</span>  
+<span class="synLineNumber">   77</span>  Text description for the html link 
+<span class="synLineNumber">   78</span>  
+<span class="synLineNumber">   79</span>  =item text
+<span class="synLineNumber">   80</span>  
+<span class="synLineNumber">   81</span>  Source text for syntax highlighting. Mandatory if not exists the file
+<span class="synLineNumber">   82</span>  parameter.
+<span class="synLineNumber">   83</span>  
+<span class="synLineNumber">   84</span>  =item file
+<span class="synLineNumber">   85</span>  
+<span class="synLineNumber">   86</span>  Ikiwiki page name as source text for syntax highlighting. The final html
+<span class="synLineNumber">   87</span>  includes a link to it for direct download.
+<span class="synLineNumber">   88</span>  
+<span class="synLineNumber">   89</span>  =item linenumbers
+<span class="synLineNumber">   90</span>  
+<span class="synLineNumber">   91</span>  Enable the line numbers in the final html.
+<span class="synLineNumber">   92</span>  
+<span class="synLineNumber">   93</span>  =item bars
+<span class="synLineNumber">   94</span>  
+<span class="synLineNumber">   95</span>  Enable the bars feature. The final html text will be label with css tags on the
+<span class="synLineNumber">   96</span>  odd lines.
+<span class="synLineNumber">   97</span>  
+<span class="synLineNumber">   98</span>  =item force_subpage
+<span class="synLineNumber">   99</span>  
+<span class="synLineNumber">  100</span>  Parameter for inline funcion to the source page
+<span class="synLineNumber">  101</span>  
+<span class="synLineNumber">  102</span>  =back
+<span class="synLineNumber">  103</span>  
+<span class="synLineNumber">  104</span>  =head2 CSS
+<span class="synLineNumber">  105</span>  
+<span class="synLineNumber">  106</span>  The package uses the following list of css tags:
+<span class="synLineNumber">  107</span>  
+<span class="synLineNumber">  108</span>  =over
+<span class="synLineNumber">  109</span>  
+<span class="synLineNumber">  110</span>  =item
+<span class="synLineNumber">  111</span>  
+<span class="synLineNumber">  112</span>  =back
+<span class="synLineNumber">  113</span>  
+<span class="synLineNumber">  114</span>  =head1 METHODS/SUBROUTINES
+<span class="synLineNumber">  115</span>  
+<span class="synLineNumber">  116</span>  =head2 checkconfig( )
+<span class="synLineNumber">  117</span>  
+<span class="synLineNumber">  118</span>  This method is called by IkiWiki main program and the plugin uses it for load
+<span class="synLineNumber">  119</span>  global configuration values and initialize his internals.
+<span class="synLineNumber">  120</span>  
+<span class="synLineNumber">  121</span>  =head2 preprocess( )
+<span class="synLineNumber">  122</span>  
+<span class="synLineNumber">  123</span>  This method is called when the ikiwiki parser found a C<syntax> directive.
+<span class="synLineNumber">  124</span>  Without parameters the method show information about the external syntax
+<span class="synLineNumber">  125</span>  parser.
+<span class="synLineNumber">  126</span>  
+<span class="synLineNumber">  127</span>  =head1 CONFIGURATION AND ENVIRONMENT
+<span class="synLineNumber">  128</span>  
+<span class="synLineNumber">  129</span>  IkiWiki::Plugin::syntax uses the following global parameters:
+<span class="synLineNumber">  130</span>  
+<span class="synLineNumber">  131</span>  =over
+<span class="synLineNumber">  132</span>  
+<span class="synLineNumber">  133</span>  =item syntax_engine (optional)
+<span class="synLineNumber">  134</span>  
+<span class="synLineNumber">  135</span>  Set to a keyword for select the engine to use.
+<span class="synLineNumber">  136</span>  
+<span class="synLineNumber">  137</span>  =over
+<span class="synLineNumber">  138</span>  
+<span class="synLineNumber">  139</span>  =item Kate
+<span class="synLineNumber">  140</span>  
+<span class="synLineNumber">  141</span>  Uses the L<Syntax::Highlight::Engine::Kate> as backend.
+<span class="synLineNumber">  142</span>  
+<span class="synLineNumber">  143</span>  =item Vim
+<span class="synLineNumber">  144</span>  
+<span class="synLineNumber">  145</span>  Uses the L<Text::VimColor> as backend.
+<span class="synLineNumber">  146</span>  
+<span class="synLineNumber">  147</span>  =item Simple
+<span class="synLineNumber">  148</span>  
+<span class="synLineNumber">  149</span>  Uses the L<IkiWiki::Plugin::syntax::Simple> as backend.
+<span class="synLineNumber">  150</span>  
+<span class="synLineNumber">  151</span>  =back
+<span class="synLineNumber">  152</span>  
+<span class="synLineNumber">  153</span>  If this parameter is omitted or the external module fails, the plugin switch to
+<span class="synLineNumber">  154</span>  use the Simple engine.
+<span class="synLineNumber">  155</span>  
+<span class="synLineNumber">  156</span>  =item syntax_Kate (optional)
+<span class="synLineNumber">  157</span>  
+<span class="synLineNumber">  158</span>  Parameters to configure the engine (not implemented yet).
+<span class="synLineNumber">  159</span>  
+<span class="synLineNumber">  160</span>  =item syntax_Vim (optional)
+<span class="synLineNumber">  161</span>  
+<span class="synLineNumber">  162</span>  Parameters to configure the engine (not implemented yet).
+<span class="synLineNumber">  163</span>  
+<span class="synLineNumber">  164</span>  =item syntax_Simple (optional)
+<span class="synLineNumber">  165</span>  
+<span class="synLineNumber">  166</span>  Parameters to configure the engine (not implemented yet).
+<span class="synLineNumber">  167</span>  
+<span class="synLineNumber">  168</span>  =back
+<span class="synLineNumber">  169</span>  
+<span class="synLineNumber">  170</span>  =head1 DEPENDENCIES
+<span class="synLineNumber">  171</span>  
+<span class="synLineNumber">  172</span>  The module needs the following perl packages:
+<span class="synLineNumber">  173</span>  
+<span class="synLineNumber">  174</span>  =over
+<span class="synLineNumber">  175</span>  
+<span class="synLineNumber">  176</span>  =item L<Module::Build::IkiWiki>
+<span class="synLineNumber">  177</span>  
+<span class="synLineNumber">  178</span>  Extension to L<Module::Build> for build and install ikiwiki plugins.
+<span class="synLineNumber">  179</span>  
+<span class="synLineNumber">  180</span>  =item L<Class::Accessor::Fast>
+<span class="synLineNumber">  181</span>  
+<span class="synLineNumber">  182</span>  =item L<Test::More>
+<span class="synLineNumber">  183</span>  
+<span class="synLineNumber">  184</span>  =item L<Exception::Class>
+<span class="synLineNumber">  185</span>  
+<span class="synLineNumber">  186</span>  =item L<HTML::Entities>
+<span class="synLineNumber">  187</span>  
+<span class="synLineNumber">  188</span>  =item L<HTML::Template>
+<span class="synLineNumber">  189</span>  
+<span class="synLineNumber">  190</span>  =item L<URI::Escape>
+<span class="synLineNumber">  191</span>  
+<span class="synLineNumber">  192</span>  =back
+<span class="synLineNumber">  193</span>  
+<span class="synLineNumber">  194</span>  And it recommends:
+<span class="synLineNumber">  195</span>  
+<span class="synLineNumber">  196</span>  =over
+<span class="synLineNumber">  197</span>  
+<span class="synLineNumber">  198</span>  =item L<Syntax::Highlight::Engine::Kate>
+<span class="synLineNumber">  199</span>  
+<span class="synLineNumber">  200</span>  =item L<Text::VimColor>
+<span class="synLineNumber">  201</span>  
+<span class="synLineNumber">  202</span>  =back
+<span class="synLineNumber">  203</span>  
+<span class="synLineNumber">  204</span>  =head1 BUGS AND LIMITATIONS
+<span class="synLineNumber">  205</span>  
+<span class="synLineNumber">  206</span>  =over 
+<span class="synLineNumber">  207</span>  
+<span class="synLineNumber">  208</span>  =item Break the markdown indented chain. It can't be used between paragraphs
+<span class="synLineNumber">  209</span>  of one list item. Use it after the item text.
+<span class="synLineNumber">  210</span>  
+<span class="synLineNumber">  211</span>  =back
+<span class="synLineNumber">  212</span>  
+<span class="synLineNumber">  213</span>  Please report any bugs or feature requests to the author.
+<span class="synLineNumber">  214</span>  
+<span class="synLineNumber">  215</span>  =head1 AUTHOR
+<span class="synLineNumber">  216</span>  
+<span class="synLineNumber">  217</span>  "Víctor Moral"  C<< victor@taquiones.net >>
+<span class="synLineNumber">  218</span>  
+<span class="synLineNumber">  219</span>  =head1 LICENCE AND COPYRIGHT
+<span class="synLineNumber">  220</span>  
+<span class="synLineNumber">  221</span>  Copyright (c) 2008, "Víctor Moral".
+<span class="synLineNumber">  222</span>  
+<span class="synLineNumber">  223</span>  This program is free software; you can redistribute it and/or modify
+<span class="synLineNumber">  224</span>  it under the terms of the GNU General Public License as published by
+<span class="synLineNumber">  225</span>  the Free Software Foundation; either version 2 of the License, or
+<span class="synLineNumber">  226</span>  any later version.
+<span class="synLineNumber">  227</span>  
+<span class="synLineNumber">  228</span>  This program is distributed in the hope that it will be useful,
+<span class="synLineNumber">  229</span>  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="synLineNumber">  230</span>  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="synLineNumber">  231</span>  GNU General Public License for more details.
+<span class="synLineNumber">  232</span>  
+<span class="synLineNumber">  233</span>  You should have received a copy of the GNU General Public License along
+<span class="synLineNumber">  234</span>  with this program; if not, write to the Free Software Foundation, Inc.,
+<span class="synLineNumber">  235</span>  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.</span>
+    </PRE></TD>
+</TABLE>
+
+        </BR>
+    
+        <TABLE>
+<TR>
+    <TD>Source text.pod using Kate engine</TD>
+</TR>
+<TR>
+    <TD><PRE>
+    syntax (IkiWiki::Plugin::syntax::Kate) on page none: unknown exception
+    </PRE></TD>
+</TABLE>
+
+        </BR>
+    
+        <TABLE>
+<TR>
+    <TD>Source text.pod using Vim engine</TD>
+</TR>
+<TR>
+    <TD><PRE>
+    URL from  to examples/sources/text.pod
+<span class="syntax"><span class="synLineNumber">    1</span>  <span class="synStatement">=head1</span><span class="synConstant"> NAME</span>
+<span class="synLineNumber">    2</span>  
+<span class="synLineNumber">    3</span>  IkiWiki::Plugin::syntax - Add syntax highlighting to ikiwiki
+<span class="synLineNumber">    4</span>  
+<span class="synLineNumber">    5</span>  <span class="synStatement">=head1</span><span class="synConstant"> SYNOPSIS</span>
+<span class="synLineNumber">    6</span>  
+<span class="synLineNumber">    7</span>  In any source page include the following:
+<span class="synLineNumber">    8</span>  
+<span class="synLineNumber">    9</span>  <span class="synPreProc">    This is the example code </span>
+<span class="synLineNumber">   10</span>  
+<span class="synLineNumber">   11</span>  <span class="synPreProc">    [[syntax language=perl text=&quot;&quot;&quot;</span>
+<span class="synLineNumber">   12</span>  <span class="synPreProc">    #!/usr/bin/perl</span>
+<span class="synLineNumber">   13</span>  <span class="synPreProc">    </span>
+<span class="synLineNumber">   14</span>  <span class="synPreProc">    print &quot;Hello, world\n&quot;;</span>
+<span class="synLineNumber">   15</span>  <span class="synPreProc">    &quot;&quot;&quot;]]</span>
+<span class="synLineNumber">   16</span>  
+<span class="synLineNumber">   17</span>  <span class="synPreProc">    and this is my bash profile (using file type autodetection )</span>
+<span class="synLineNumber">   18</span>  
+<span class="synLineNumber">   19</span>  <span class="synPreProc">    [[syntax file=&quot;software/examples/mybash_profile&quot; </span>
+<span class="synLineNumber">   20</span>  <span class="synPreProc">        description=&quot;My profile&quot; ]]</span>
+<span class="synLineNumber">   21</span>  
+<span class="synLineNumber">   22</span>  In order to facilitate the life to the administrator the plugin could create a
+<span class="synLineNumber">   23</span>  html table with information about the engine capabilities. 
+<span class="synLineNumber">   24</span>  
+<span class="synLineNumber">   25</span>  Use the directive <span class="synIdentifier">C&lt;syntax&gt;</span> without any parameters as is:
+<span class="synLineNumber">   26</span>  
+<span class="synLineNumber">   27</span>  <span class="synPreProc">    This is the syntax engine chart in this site:</span>
+<span class="synLineNumber">   28</span>  
+<span class="synLineNumber">   29</span>  <span class="synPreProc">    [[syntax ]]</span>
+<span class="synLineNumber">   30</span>  
+<span class="synLineNumber">   31</span>  <span class="synStatement">=head1</span><span class="synConstant"> DESCRIPTION</span>
+<span class="synLineNumber">   32</span>  
+<span class="synLineNumber">   33</span>  This plugin adds syntax highlight capabilities to Ikiwiki using third party
+<span class="synLineNumber">   34</span>  modules if they are installed. 
+<span class="synLineNumber">   35</span>  
+<span class="synLineNumber">   36</span>  Those modules can be:
+<span class="synLineNumber">   37</span>  
+<span class="synLineNumber">   38</span>  <span class="synStatement">=over</span>
+<span class="synLineNumber">   39</span>  
+<span class="synLineNumber">   40</span>  <span class="synStatement">=item</span><span class="synConstant"> * </span><span class="synIdentifier">L&lt;Syntax::Highlight::Engine::Kate&gt;</span>
+<span class="synLineNumber">   41</span>  
+<span class="synLineNumber">   42</span>  Uses the Syntax::Highlight::Engine::Kate package, a port to Perl of the
+<span class="synLineNumber">   43</span>  syntax highlight engine of the Kate text editor.
+<span class="synLineNumber">   44</span>  
+<span class="synLineNumber">   45</span>  Copyright (c) 2006 by Hans Jeuken, all rights reserved.
+<span class="synLineNumber">   46</span>  
+<span class="synLineNumber">   47</span>  <span class="synStatement">=item</span><span class="synConstant"> * </span><span class="synIdentifier">L&lt;Text::VimColor&gt;</span>
+<span class="synLineNumber">   48</span>  
+<span class="synLineNumber">   49</span>  This plugin uses the Text::VimColor module and the vim editor.
+<span class="synLineNumber">   50</span>  
+<span class="synLineNumber">   51</span>  Copyright 2002-2006, Geoff Richards.
+<span class="synLineNumber">   52</span>  
+<span class="synLineNumber">   53</span>  <span class="synStatement">=item</span><span class="synConstant"> * </span><span class="synIdentifier">L&lt;IkiWiki::Plugin::syntax::Simple&gt;</span>
+<span class="synLineNumber">   54</span>  
+<span class="synLineNumber">   55</span>  This is the default engine. It's a passtrough engine with line numering capability.
+<span class="synLineNumber">   56</span>  
+<span class="synLineNumber">   57</span>  <span class="synStatement">=back</span>
+<span class="synLineNumber">   58</span>  
+<span class="synLineNumber">   59</span>  and they can be selected at runtime with the <span class="synIdentifier">C&lt;syntax_engine&gt;</span> parameter. In
+<span class="synLineNumber">   60</span>  case of fail loading the module the plugin switch to use the simple engine.
+<span class="synLineNumber">   61</span>  
+<span class="synLineNumber">   62</span>  The module register a preprocessor directive named <span class="synIdentifier">B&lt;syntax&gt;</span>.
+<span class="synLineNumber">   63</span>  
+<span class="synLineNumber">   64</span>  <span class="synStatement">=head2</span><span class="synConstant"> Parameters</span>
+<span class="synLineNumber">   65</span>  
+<span class="synLineNumber">   66</span>  The syntax directive has the following parameters:
+<span class="synLineNumber">   67</span>  
+<span class="synLineNumber">   68</span>  <span class="synStatement">=over</span>
+<span class="synLineNumber">   69</span>  
+<span class="synLineNumber">   70</span>  <span class="synStatement">=item</span><span class="synConstant"> language (optional)</span>
+<span class="synLineNumber">   71</span>  
+<span class="synLineNumber">   72</span>  Name of the source language for select the correct plugin. If not defined the
+<span class="synLineNumber">   73</span>  module will try to determine the appropiated value.
+<span class="synLineNumber">   74</span>  
+<span class="synLineNumber">   75</span>  <span class="synStatement">=item</span><span class="synConstant"> description (optional)</span>
+<span class="synLineNumber">   76</span>  
+<span class="synLineNumber">   77</span>  Text description for the html link 
+<span class="synLineNumber">   78</span>  
+<span class="synLineNumber">   79</span>  <span class="synStatement">=item</span><span class="synConstant"> text</span>
+<span class="synLineNumber">   80</span>  
+<span class="synLineNumber">   81</span>  Source text for syntax highlighting. Mandatory if not exists the file
+<span class="synLineNumber">   82</span>  parameter.
+<span class="synLineNumber">   83</span>  
+<span class="synLineNumber">   84</span>  <span class="synStatement">=item</span><span class="synConstant"> file</span>
+<span class="synLineNumber">   85</span>  
+<span class="synLineNumber">   86</span>  Ikiwiki page name as source text for syntax highlighting. The final html
+<span class="synLineNumber">   87</span>  includes a link to it for direct download.
+<span class="synLineNumber">   88</span>  
+<span class="synLineNumber">   89</span>  <span class="synStatement">=item</span><span class="synConstant"> linenumbers</span>
+<span class="synLineNumber">   90</span>  
+<span class="synLineNumber">   91</span>  Enable the line numbers in the final html.
+<span class="synLineNumber">   92</span>  
+<span class="synLineNumber">   93</span>  <span class="synStatement">=item</span><span class="synConstant"> bars</span>
+<span class="synLineNumber">   94</span>  
+<span class="synLineNumber">   95</span>  Enable the bars feature. The final html text will be label with css tags on the
+<span class="synLineNumber">   96</span>  odd lines.
+<span class="synLineNumber">   97</span>  
+<span class="synLineNumber">   98</span>  <span class="synStatement">=item</span><span class="synConstant"> force_subpage</span>
+<span class="synLineNumber">   99</span>  
+<span class="synLineNumber">  100</span>  Parameter for inline funcion to the source page
+<span class="synLineNumber">  101</span>  
+<span class="synLineNumber">  102</span>  <span class="synStatement">=back</span>
+<span class="synLineNumber">  103</span>  
+<span class="synLineNumber">  104</span>  <span class="synStatement">=head2</span><span class="synConstant"> CSS</span>
+<span class="synLineNumber">  105</span>  
+<span class="synLineNumber">  106</span>  The package uses the following list of css tags:
+<span class="synLineNumber">  107</span>  
+<span class="synLineNumber">  108</span>  <span class="synStatement">=over</span>
+<span class="synLineNumber">  109</span>  
+<span class="synLineNumber">  110</span>  <span class="synStatement">=item</span>
+<span class="synLineNumber">  111</span>  
+<span class="synLineNumber">  112</span>  <span class="synStatement">=back</span>
+<span class="synLineNumber">  113</span>  
+<span class="synLineNumber">  114</span>  <span class="synStatement">=head1</span><span class="synConstant"> METHODS/SUBROUTINES</span>
+<span class="synLineNumber">  115</span>  
+<span class="synLineNumber">  116</span>  <span class="synStatement">=head2</span><span class="synConstant"> checkconfig( )</span>
+<span class="synLineNumber">  117</span>  
+<span class="synLineNumber">  118</span>  This method is called by IkiWiki main program and the plugin uses it for load
+<span class="synLineNumber">  119</span>  global configuration values and initialize his internals.
+<span class="synLineNumber">  120</span>  
+<span class="synLineNumber">  121</span>  <span class="synStatement">=head2</span><span class="synConstant"> preprocess( )</span>
+<span class="synLineNumber">  122</span>  
+<span class="synLineNumber">  123</span>  This method is called when the ikiwiki parser found a <span class="synIdentifier">C&lt;syntax&gt;</span> directive.
+<span class="synLineNumber">  124</span>  Without parameters the method show information about the external syntax
+<span class="synLineNumber">  125</span>  parser.
+<span class="synLineNumber">  126</span>  
+<span class="synLineNumber">  127</span>  <span class="synStatement">=head1</span><span class="synConstant"> CONFIGURATION AND ENVIRONMENT</span>
+<span class="synLineNumber">  128</span>  
+<span class="synLineNumber">  129</span>  IkiWiki::Plugin::syntax uses the following global parameters:
+<span class="synLineNumber">  130</span>  
+<span class="synLineNumber">  131</span>  <span class="synStatement">=over</span>
+<span class="synLineNumber">  132</span>  
+<span class="synLineNumber">  133</span>  <span class="synStatement">=item</span><span class="synConstant"> syntax_engine (optional)</span>
+<span class="synLineNumber">  134</span>  
+<span class="synLineNumber">  135</span>  Set to a keyword for select the engine to use.
+<span class="synLineNumber">  136</span>  
+<span class="synLineNumber">  137</span>  <span class="synStatement">=over</span>
+<span class="synLineNumber">  138</span>  
+<span class="synLineNumber">  139</span>  <span class="synStatement">=item</span><span class="synConstant"> Kate</span>
+<span class="synLineNumber">  140</span>  
+<span class="synLineNumber">  141</span>  Uses the <span class="synIdentifier">L&lt;Syntax::Highlight::Engine::Kate&gt;</span> as backend.
+<span class="synLineNumber">  142</span>  
+<span class="synLineNumber">  143</span>  <span class="synStatement">=item</span><span class="synConstant"> Vim</span>
+<span class="synLineNumber">  144</span>  
+<span class="synLineNumber">  145</span>  Uses the <span class="synIdentifier">L&lt;Text::VimColor&gt;</span> as backend.
+<span class="synLineNumber">  146</span>  
+<span class="synLineNumber">  147</span>  <span class="synStatement">=item</span><span class="synConstant"> Simple</span>
+<span class="synLineNumber">  148</span>  
+<span class="synLineNumber">  149</span>  Uses the <span class="synIdentifier">L&lt;IkiWiki::Plugin::syntax::Simple&gt;</span> as backend.
+<span class="synLineNumber">  150</span>  
+<span class="synLineNumber">  151</span>  <span class="synStatement">=back</span>
+<span class="synLineNumber">  152</span>  
+<span class="synLineNumber">  153</span>  If this parameter is omitted or the external module fails, the plugin switch to
+<span class="synLineNumber">  154</span>  use the Simple engine.
+<span class="synLineNumber">  155</span>  
+<span class="synLineNumber">  156</span>  <span class="synStatement">=item</span><span class="synConstant"> syntax_Kate (optional)</span>
+<span class="synLineNumber">  157</span>  
+<span class="synLineNumber">  158</span>  Parameters to configure the engine (not implemented yet).
+<span class="synLineNumber">  159</span>  
+<span class="synLineNumber">  160</span>  <span class="synStatement">=item</span><span class="synConstant"> syntax_Vim (optional)</span>
+<span class="synLineNumber">  161</span>  
+<span class="synLineNumber">  162</span>  Parameters to configure the engine (not implemented yet).
+<span class="synLineNumber">  163</span>  
+<span class="synLineNumber">  164</span>  <span class="synStatement">=item</span><span class="synConstant"> syntax_Simple (optional)</span>
+<span class="synLineNumber">  165</span>  
+<span class="synLineNumber">  166</span>  Parameters to configure the engine (not implemented yet).
+<span class="synLineNumber">  167</span>  
+<span class="synLineNumber">  168</span>  <span class="synStatement">=back</span>
+<span class="synLineNumber">  169</span>  
+<span class="synLineNumber">  170</span>  <span class="synStatement">=head1</span><span class="synConstant"> DEPENDENCIES</span>
+<span class="synLineNumber">  171</span>  
+<span class="synLineNumber">  172</span>  The module needs the following perl packages:
+<span class="synLineNumber">  173</span>  
+<span class="synLineNumber">  174</span>  <span class="synStatement">=over</span>
+<span class="synLineNumber">  175</span>  
+<span class="synLineNumber">  176</span>  <span class="synStatement">=item</span><span class="synConstant"> </span><span class="synIdentifier">L&lt;Module::Build::IkiWiki&gt;</span>
+<span class="synLineNumber">  177</span>  
+<span class="synLineNumber">  178</span>  Extension to <span class="synIdentifier">L&lt;Module::Build&gt;</span> for build and install ikiwiki plugins.
+<span class="synLineNumber">  179</span>  
+<span class="synLineNumber">  180</span>  <span class="synStatement">=item</span><span class="synConstant"> </span><span class="synIdentifier">L&lt;Class::Accessor::Fast&gt;</span>
+<span class="synLineNumber">  181</span>  
+<span class="synLineNumber">  182</span>  <span class="synStatement">=item</span><span class="synConstant"> </span><span class="synIdentifier">L&lt;Test::More&gt;</span>
+<span class="synLineNumber">  183</span>  
+<span class="synLineNumber">  184</span>  <span class="synStatement">=item</span><span class="synConstant"> </span><span class="synIdentifier">L&lt;Exception::Class&gt;</span>
+<span class="synLineNumber">  185</span>  
+<span class="synLineNumber">  186</span>  <span class="synStatement">=item</span><span class="synConstant"> </span><span class="synIdentifier">L&lt;HTML::Entities&gt;</span>
+<span class="synLineNumber">  187</span>  
+<span class="synLineNumber">  188</span>  <span class="synStatement">=item</span><span class="synConstant"> </span><span class="synIdentifier">L&lt;HTML::Template&gt;</span>
+<span class="synLineNumber">  189</span>  
+<span class="synLineNumber">  190</span>  <span class="synStatement">=item</span><span class="synConstant"> </span><span class="synIdentifier">L&lt;URI::Escape&gt;</span>
+<span class="synLineNumber">  191</span>  
+<span class="synLineNumber">  192</span>  <span class="synStatement">=back</span>
+<span class="synLineNumber">  193</span>  
+<span class="synLineNumber">  194</span>  And it recommends:
+<span class="synLineNumber">  195</span>  
+<span class="synLineNumber">  196</span>  <span class="synStatement">=over</span>
+<span class="synLineNumber">  197</span>  
+<span class="synLineNumber">  198</span>  <span class="synStatement">=item</span><span class="synConstant"> </span><span class="synIdentifier">L&lt;Syntax::Highlight::Engine::Kate&gt;</span>
+<span class="synLineNumber">  199</span>  
+<span class="synLineNumber">  200</span>  <span class="synStatement">=item</span><span class="synConstant"> </span><span class="synIdentifier">L&lt;Text::VimColor&gt;</span>
+<span class="synLineNumber">  201</span>  
+<span class="synLineNumber">  202</span>  <span class="synStatement">=back</span>
+<span class="synLineNumber">  203</span>  
+<span class="synLineNumber">  204</span>  <span class="synStatement">=head1</span><span class="synConstant"> BUGS AND LIMITATIONS</span>
+<span class="synLineNumber">  205</span>  
+<span class="synLineNumber">  206</span>  <span class="synStatement">=over</span> 
+<span class="synLineNumber">  207</span>  
+<span class="synLineNumber">  208</span>  <span class="synStatement">=item</span><span class="synConstant"> Break the markdown indented chain. It can't be used between paragraphs</span>
+<span class="synLineNumber">  209</span>  of one list item. Use it after the item text.
+<span class="synLineNumber">  210</span>  
+<span class="synLineNumber">  211</span>  <span class="synStatement">=back</span>
+<span class="synLineNumber">  212</span>  
+<span class="synLineNumber">  213</span>  Please report any bugs or feature requests to the author.
+<span class="synLineNumber">  214</span>  
+<span class="synLineNumber">  215</span>  <span class="synStatement">=head1</span><span class="synConstant"> AUTHOR</span>
+<span class="synLineNumber">  216</span>  
+<span class="synLineNumber">  217</span>  &quot;Víctor Moral&quot;  <span class="synIdentifier">C&lt;&lt; victor@taquiones.net &gt;&gt;</span>
+<span class="synLineNumber">  218</span>  
+<span class="synLineNumber">  219</span>  <span class="synStatement">=head1</span><span class="synConstant"> LICENCE AND COPYRIGHT</span>
+<span class="synLineNumber">  220</span>  
+<span class="synLineNumber">  221</span>  Copyright (c) 2008, &quot;Víctor Moral&quot;.
+<span class="synLineNumber">  222</span>  
+<span class="synLineNumber">  223</span>  This program is free software; you can redistribute it and/or modify
+<span class="synLineNumber">  224</span>  it under the terms of the GNU General Public License as published by
+<span class="synLineNumber">  225</span>  the Free Software Foundation; either version 2 of the License, or
+<span class="synLineNumber">  226</span>  any later version.
+<span class="synLineNumber">  227</span>  
+<span class="synLineNumber">  228</span>  This program is distributed in the hope that it will be useful,
+<span class="synLineNumber">  229</span>  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="synLineNumber">  230</span>  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="synLineNumber">  231</span>  GNU General Public License for more details.
+<span class="synLineNumber">  232</span>  
+<span class="synLineNumber">  233</span>  You should have received a copy of the GNU General Public License along
+<span class="synLineNumber">  234</span>  with this program; if not, write to the Free Software Foundation, Inc.,
+<span class="synLineNumber">  235</span>  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.</span>
+    </PRE></TD>
+</TABLE>
+
+        </BR>
+    
+        <TABLE>
+<TR>
+    <TD>Source bash.sh using Simple engine</TD>
+</TR>
+<TR>
+    <TD><PRE>
+    URL from  to examples/sources/bash.sh
+<span class="syntax"><span class="synLineNumber">    1</span>  # Long term variables, which may be set in the cvsdeb config file or the
+<span class="synLineNumber">    2</span>  # environment:
+<span class="synLineNumber">    3</span>  # rootdir workdir (if all original sources are kept in one dir)
+<span class="synLineNumber">    4</span>  
+<span class="synLineNumber">    5</span>  TEMPDIR=/tmp/$$
+<span class="synLineNumber">    6</span>  mkdir $TEMPDIR || exit 1
+<span class="synLineNumber">    7</span>  TEMPFILE=$TEMPDIR/cl-tmp
+<span class="synLineNumber">    8</span>  trap "rm -f $TEMPFILE; rmdir $TEMPDIR" 0 1 2 3 7 10 13 15
+<span class="synLineNumber">    9</span>  
+<span class="synLineNumber">   10</span>  TAGOPT=
+<span class="synLineNumber">   11</span>  
+<span class="synLineNumber">   12</span>  # Command line; will bomb out if unrecognised options
+<span class="synLineNumber">   13</span>  TEMP=$(getopt -a -s bash \
+<span class="synLineNumber">   14</span>         -o hC:EH:G:M:P:R:T:U:V:W:Ff:dcnr:x:Bp:Dk:a:Sv:m:e:i:I:t: \
+<span class="synLineNumber">   15</span>         --long help,version,ctp,tC,sgpg,spgp,us,uc,op \
+<span class="synLineNumber">   16</span>         --long si,sa,sd,ap,sp,su,sk,sr,sA,sP,sU,sK,sR,ss,sn \
+<span class="synLineNumber">   17</span>         -n "$PROGNAME" -- "$@")
+<span class="synLineNumber">   18</span>  eval set -- $TEMP</span>
+    </PRE></TD>
+</TABLE>
+
+        </BR>
+    
+        <TABLE>
+<TR>
+    <TD>Source bash.sh using Kate engine</TD>
+</TR>
+<TR>
+    <TD><PRE>
+    URL from  to examples/sources/bash.sh
+<span class="syntax"><span class="synLineNumber">    1</span>  <span class="synComment">#&nbsp;Long&nbsp;term&nbsp;variables,&nbsp;which&nbsp;may&nbsp;be&nbsp;set&nbsp;in&nbsp;the&nbsp;cvsdeb&nbsp;config&nbsp;file&nbsp;or&nbsp;the</span><span class="synComment">
+<span class="synLineNumber">    2</span>  </span><span class="synComment">#&nbsp;environment:</span><span class="synComment">
+<span class="synLineNumber">    3</span>  </span><span class="synComment">#&nbsp;rootdir&nbsp;workdir&nbsp;(if&nbsp;all&nbsp;original&nbsp;sources&nbsp;are&nbsp;kept&nbsp;in&nbsp;one&nbsp;dir)</span><span class="synComment">
+<span class="synLineNumber">    4</span>  </span>
+<span class="synLineNumber">    5</span>  <span class="synPreProc">TEMPDIR=</span>/tmp/<span class="synPreProc">$$</span>
+<span class="synLineNumber">    6</span>  <span class="synConstant">mkdir</span>&nbsp;<span class="synPreProc">$TEMPDIR</span>&nbsp;<span class="synStatement">||</span>&nbsp;<span class="synSpecial">exit</span>&nbsp;1
+<span class="synLineNumber">    7</span>  <span class="synPreProc">TEMPFILE=$TEMPDIR</span>/cl-tmp
+<span class="synLineNumber">    8</span>  <span class="synSpecial">trap</span>&nbsp;<span class="synConstant">"rm&nbsp;-f&nbsp;</span><span class="synPreProc">$TEMPFILE</span><span class="synConstant">;&nbsp;rmdir&nbsp;</span><span class="synPreProc">$TEMPDIR</span><span class="synConstant">"</span>&nbsp;0&nbsp;1&nbsp;2&nbsp;3&nbsp;7&nbsp;10&nbsp;13&nbsp;15
+<span class="synLineNumber">    9</span>  
+<span class="synLineNumber">   10</span>  <span class="synPreProc">TAGOPT=</span>
+<span class="synLineNumber">   11</span>  
+<span class="synLineNumber">   12</span>  <span class="synComment">#&nbsp;Command&nbsp;line;&nbsp;will&nbsp;bomb&nbsp;out&nbsp;if&nbsp;unrecognised&nbsp;options</span><span class="synComment">
+<span class="synLineNumber">   13</span>  </span><span class="synPreProc">TEMP=$(</span><span class="synConstant">getopt</span>&nbsp;-a&nbsp;-s&nbsp;<span class="synConstant">bash</span>&nbsp;\
+<span class="synLineNumber">   14</span>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-o&nbsp;hC:EH:G:M:P:R:T:U:V:<span class="synConstant">W</span>:Ff:dcnr:x:Bp:Dk:a:Sv:m:e:i:I:t:&nbsp;\
+<span class="synLineNumber">   15</span>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--long&nbsp;<span class="synSpecial">help</span>,version,ctp,tC,sgpg,spgp,us,uc,op&nbsp;\
+<span class="synLineNumber">   16</span>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--long&nbsp;si,sa,sd,ap,sp,<span class="synConstant">su</span>,sk,sr,sA,sP,<span class="synConstant">sU</span>,sK,sR,ss,sn&nbsp;\
+<span class="synLineNumber">   17</span>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-n&nbsp;<span class="synConstant">"</span><span class="synPreProc">$PROGNAME</span><span class="synConstant">"</span>&nbsp;--&nbsp;<span class="synConstant">"</span><span class="synPreProc">$@</span><span class="synConstant">"</span><span class="synPreProc">)</span>
+<span class="synLineNumber">   18</span>  <span class="synSpecial">eval</span>&nbsp;<span class="synStatement">set</span>&nbsp;--&nbsp;<span class="synPreProc">$TEMP</span></span>
+    </PRE></TD>
+</TABLE>
+
+        </BR>
+    
+        <TABLE>
+<TR>
+    <TD>Source bash.sh using Vim engine</TD>
+</TR>
+<TR>
+    <TD><PRE>
+    URL from  to examples/sources/bash.sh
+<span class="syntax"><span class="synLineNumber">    1</span>  <span class="synSpecial">#</span> Long term variables, which may be set in the cvsdeb config file <span class="synSpecial">or</span> the
+<span class="synLineNumber">    2</span>  <span class="synSpecial">#</span> environment<span class="synSpecial">:</span>
+<span class="synLineNumber">    3</span>  <span class="synSpecial">#</span> rootdir workdir (if all original sources are kept in one dir)
+<span class="synLineNumber">    4</span>  
+<span class="synLineNumber">    5</span>  TEMPDIR=/tmp/$$
+<span class="synLineNumber">    6</span>  mkdir $TEMPDIR <span class="synSpecial">||</span> exit <span class="synConstant">1</span>
+<span class="synLineNumber">    7</span>  TEMPFILE=$TEMPDIR/cl-tmp
+<span class="synLineNumber">    8</span>  trap <span class="synConstant">&quot;rm -f $TEMPFILE; rmdir $TEMPDIR&quot;</span> <span class="synConstant">0</span> <span class="synConstant">1</span> <span class="synConstant">2</span> <span class="synConstant">3</span> <span class="synConstant">7</span> <span class="synConstant">10</span> <span class="synConstant">13</span> <span class="synConstant">15</span>
+<span class="synLineNumber">    9</span>  
+<span class="synLineNumber">   10</span>  TAGOPT=
+<span class="synLineNumber">   11</span>  
+<span class="synLineNumber">   12</span>  <span class="synSpecial">#</span> Command line; will bomb out if unrecognised options
+<span class="synLineNumber">   13</span>  TEMP=$(getopt -a -s bash \
+<span class="synLineNumber">   14</span>         -o hC<span class="synSpecial">:</span>EH<span class="synSpecial">:</span>G<span class="synSpecial">:</span>M<span class="synSpecial">:</span>P<span class="synSpecial">:</span>R<span class="synSpecial">:</span>T<span class="synSpecial">:</span>U<span class="synSpecial">:</span>V<span class="synSpecial">:</span>W<span class="synSpecial">:</span>Ff<span class="synSpecial">:</span>dcnr<span class="synSpecial">:</span>x<span class="synSpecial">:</span>Bp<span class="synSpecial">:</span>Dk<span class="synSpecial">:</span>a<span class="synSpecial">:</span>Sv<span class="synSpecial">:</span>m<span class="synSpecial">:</span>e<span class="synSpecial">:</span>i<span class="synSpecial">:</span>I<span class="synSpecial">:</span>t<span class="synSpecial">:</span> \
+<span class="synLineNumber">   15</span>         --long help,version,ctp,tC,sgpg,spgp,us,uc,op \
+<span class="synLineNumber">   16</span>         --long si,sa,sd,ap,sp,su,sk,sr,sA,sP,sU,sK,sR,ss,sn \
+<span class="synLineNumber">   17</span>         -n <span class="synConstant">&quot;$PROGNAME&quot;</span> -- <span class="synConstant">&quot;$@&quot;</span>)
+<span class="synLineNumber">   18</span>  eval set -- $TEMP</span>
+    </PRE></TD>
+</TABLE>
+
+        </BR>
+    
+        <TABLE>
+<TR>
+    <TD>Source smart_comments.pl using Simple engine</TD>
+</TR>
+<TR>
+    <TD><PRE>
+    URL from  to examples/sources/smart_comments.pl
+<span class="syntax"><span class="synLineNumber">    1</span>  #!/usr/bin/perl
+<span class="synLineNumber">    2</span>  
+<span class="synLineNumber">    3</span>  use strict;
+<span class="synLineNumber">    4</span>  use Carp;
+<span class="synLineNumber">    5</span>  
+<span class="synLineNumber">    6</span>  # use Smart::Comments;
+<span class="synLineNumber">    7</span>  
+<span class="synLineNumber">    8</span>  # Valores iniciales
+<span class="synLineNumber">    9</span>  our $text = 'Hola';
+<span class="synLineNumber">   10</span>  our $dinero = 3000.03;
+<span class="synLineNumber">   11</span>  
+<span class="synLineNumber">   12</span>  ### Texto: $text
+<span class="synLineNumber">   13</span>  ### Dinero: $dinero
+<span class="synLineNumber">   14</span>  
+<span class="synLineNumber">   15</span>  $text =~ s/Hola/Adios/;
+<span class="synLineNumber">   16</span>  $dinero /= 24;
+<span class="synLineNumber">   17</span>  
+<span class="synLineNumber">   18</span>  ### Texto: $text
+<span class="synLineNumber">   19</span>  ### Dinero: $dinero
+<span class="synLineNumber">   20</span>  
+<span class="synLineNumber">   21</span>  exit (0);</span>
+    </PRE></TD>
+</TABLE>
+
+        </BR>
+    
+        <TABLE>
+<TR>
+    <TD>Source smart_comments.pl using Kate engine</TD>
+</TR>
+<TR>
+    <TD><PRE>
+    URL from  to examples/sources/smart_comments.pl
+<span class="syntax"><span class="synLineNumber">    1</span>  <span class="synStatement">#!/usr/bin/perl</span>
+<span class="synLineNumber">    2</span>  
+<span class="synLineNumber">    3</span>  <span class="synStatement">use</span>&nbsp;<span class="synStatement">strict</span>;
+<span class="synLineNumber">    4</span>  <span class="synStatement">use</span>&nbsp;Carp;
+<span class="synLineNumber">    5</span>  
+<span class="synLineNumber">    6</span>  <span class="synComment">#&nbsp;use&nbsp;Smart::Comments;</span><span class="synComment">
+<span class="synLineNumber">    7</span>  </span>
+<span class="synLineNumber">    8</span>  <span class="synComment">#&nbsp;Valores&nbsp;iniciales</span><span class="synComment">
+<span class="synLineNumber">    9</span>  </span><span class="synStatement">our</span>&nbsp;<span class="synType">$text</span>&nbsp;=&nbsp;<span class="synConstant">'</span><span class="synConstant">Hola</span><span class="synConstant">'</span>;
+<span class="synLineNumber">   10</span>  <span class="synStatement">our</span>&nbsp;<span class="synType">$dinero</span>&nbsp;=&nbsp;<span class="synConstant">3000.03</span>;
+<span class="synLineNumber">   11</span>  
+<span class="synLineNumber">   12</span>  <span class="synComment">###&nbsp;Texto:&nbsp;$text</span><span class="synComment">
+<span class="synLineNumber">   13</span>  </span><span class="synComment">###&nbsp;Dinero:&nbsp;$dinero</span><span class="synComment">
+<span class="synLineNumber">   14</span>  </span>
+<span class="synLineNumber">   15</span>  <span class="synType">$text</span>&nbsp;=~&nbsp;<span class="synConstant">s/</span><span class="synPreProc">Hola</span><span class="synConstant">/</span><span class="synConstant">Adios</span><span class="synConstant">/</span>;
+<span class="synLineNumber">   16</span>  <span class="synType">$dinero</span>&nbsp;/=&nbsp;<span class="synConstant">24</span>;
+<span class="synLineNumber">   17</span>  
+<span class="synLineNumber">   18</span>  <span class="synComment">###&nbsp;Texto:&nbsp;$text</span><span class="synComment">
+<span class="synLineNumber">   19</span>  </span><span class="synComment">###&nbsp;Dinero:&nbsp;$dinero</span><span class="synComment">
+<span class="synLineNumber">   20</span>  </span>
+<span class="synLineNumber">   21</span>  <span class="synSpecial">exit</span>&nbsp;(0);</span>
+    </PRE></TD>
+</TABLE>
+
+        </BR>
+    
+        <TABLE>
+<TR>
+    <TD>Source smart_comments.pl using Vim engine</TD>
+</TR>
+<TR>
+    <TD><PRE>
+    URL from  to examples/sources/smart_comments.pl
+<span class="syntax"><span class="synLineNumber">    1</span>  <span class="synPreProc">#!/usr/bin/perl</span>
+<span class="synLineNumber">    2</span>  
+<span class="synLineNumber">    3</span>  <span class="synStatement">use strict</span>;
+<span class="synLineNumber">    4</span>  <span class="synStatement">use </span>Carp;
+<span class="synLineNumber">    5</span>  
+<span class="synLineNumber">    6</span>  <span class="synComment"># use Smart::Comments;</span>
+<span class="synLineNumber">    7</span>  
+<span class="synLineNumber">    8</span>  <span class="synComment"># Valores iniciales</span>
+<span class="synLineNumber">    9</span>  <span class="synStatement">our</span> <span class="synIdentifier">$text</span> = <span class="synConstant">'Hola'</span>;
+<span class="synLineNumber">   10</span>  <span class="synStatement">our</span> <span class="synIdentifier">$dinero</span> = <span class="synConstant">3000.03</span>;
+<span class="synLineNumber">   11</span>  
+<span class="synLineNumber">   12</span>  <span class="synComment">### Texto: $text</span>
+<span class="synLineNumber">   13</span>  <span class="synComment">### Dinero: $dinero</span>
+<span class="synLineNumber">   14</span>  
+<span class="synLineNumber">   15</span>  <span class="synIdentifier">$text</span> =~ <span class="synStatement">s/</span><span class="synConstant">Hola</span><span class="synStatement">/</span><span class="synConstant">Adios</span><span class="synStatement">/</span>;
+<span class="synLineNumber">   16</span>  <span class="synIdentifier">$dinero</span> /= <span class="synConstant">24</span>;
+<span class="synLineNumber">   17</span>  
+<span class="synLineNumber">   18</span>  <span class="synComment">### Texto: $text</span>
+<span class="synLineNumber">   19</span>  <span class="synComment">### Dinero: $dinero</span>
+<span class="synLineNumber">   20</span>  
+<span class="synLineNumber">   21</span>  <span class="synStatement">exit</span> (<span class="synConstant">0</span>);</span>
+    </PRE></TD>
+</TABLE>
+
+        </BR>
+    
+</BODY>    
+</HTML>

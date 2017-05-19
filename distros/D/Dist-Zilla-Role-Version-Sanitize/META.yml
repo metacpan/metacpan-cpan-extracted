@@ -1,0 +1,42 @@
+---
+abstract: 'Sanitize a version from a plugin'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  Dist::Zilla::Plugin::Bootstrap::lib: '0.04000000'
+  ExtUtils::MakeMaker: '0'
+  File::Copy::Recursive: '0'
+  File::ShareDir: '0'
+  File::Spec: '0'
+  Path::Tiny: '0'
+  Test::DZil: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Role-Version-Sanitize
+provides:
+  Dist::Zilla::Role::Version::Sanitize:
+    file: lib/Dist/Zilla/Role/Version/Sanitize.pm
+    version: '0.002003'
+requires:
+  Carp: '0'
+  Moose::Role: '0'
+  Moose::Util::TypeConstraints: '0'
+  perl: '5.006'
+  strict: '0'
+  version: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-Role-Version-Sanitize/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-Role-Version-Sanitize
+  repository: https://github.com/kentnl/Dist-Zilla-Role-Version-Sanitize.git
+version: '0.002003'

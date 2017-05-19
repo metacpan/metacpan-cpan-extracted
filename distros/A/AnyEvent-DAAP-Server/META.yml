@@ -1,0 +1,39 @@
+---
+abstract: 'DAAP Server implemented with AnyEvent'
+author:
+  - 'motemen <motemen@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AnyEvent-DAAP-Server
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Any::Moose: 0
+  AnyEvent: 0
+  AnyEvent::Handle: 0
+  AnyEvent::Socket: 0
+  File::Basename: 0
+  File::Find::Rule: 0
+  HTTP::Request: 0
+  HTTP::Response: 0
+  MP3::Info: 0
+  Net::DAAP::DMAP: 0
+  Net::Rendezvous::Publish: 0
+  Router::Simple: 0
+  URI: 0
+  URI::QueryParam: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/motemen/AnyEvent-DAAP-Server.git
+version: 0.01

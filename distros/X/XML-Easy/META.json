@@ -1,0 +1,91 @@
+{
+   "abstract" : "XML processing with a clean interface",
+   "author" : [
+      "Andrew Main (Zefram) <zefram@fysh.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XML-Easy",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Encode" : 0,
+            "IO::File" : 0,
+            "Module::Build" : 0,
+            "Params::Classify" : 0,
+            "Scalar::Util" : 0,
+            "Test::More" : 0,
+            "perl" : "5.008",
+            "strict" : 0,
+            "utf8" : 0,
+            "warnings" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : 0,
+            "perl" : "5.008",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Internals" : 0,
+            "XSLoader" : 0
+         },
+         "requires" : {
+            "Exporter" : 0,
+            "Params::Classify" : 0,
+            "parent" : 0,
+            "perl" : "5.008",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      }
+   },
+   "provides" : {
+      "XML::Easy" : {
+         "file" : "lib/XML/Easy.pm",
+         "version" : "0.009"
+      },
+      "XML::Easy::Classify" : {
+         "file" : "lib/XML/Easy/Classify.pm",
+         "version" : "0.009"
+      },
+      "XML::Easy::Content" : {
+         "file" : "lib/XML/Easy/Content.pm",
+         "version" : "0.009"
+      },
+      "XML::Easy::Element" : {
+         "file" : "lib/XML/Easy/Element.pm",
+         "version" : "0.009"
+      },
+      "XML::Easy::NodeBasics" : {
+         "file" : "lib/XML/Easy/NodeBasics.pm",
+         "version" : "0.009"
+      },
+      "XML::Easy::Syntax" : {
+         "file" : "lib/XML/Easy/Syntax.pm",
+         "version" : "0.009"
+      },
+      "XML::Easy::Text" : {
+         "file" : "lib/XML/Easy/Text.pm",
+         "version" : "0.009"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.009"
+}

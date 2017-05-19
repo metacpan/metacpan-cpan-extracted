@@ -11,9 +11,7 @@ use POSIX qw(strftime);
 
 =encoding utf8
 
-=head1 NAME
-
-Mojo::Zabbix - Mojo::Zabbix is a simple perl wrapper of Zabbix API. 
+=head1 Mojo::Zabbix - Mojo::Zabbix is a simple perl wrapper of Zabbix API. 
 
 Mojo::Zabix - 是对zabbix api函数的简单打包，以便更易于用perl脚本进行
 访问操作zabbix。目前仅支持认证和请求方法，可以用其进行create/get
@@ -22,13 +20,13 @@ Mojo::Zabix - 是对zabbix api函数的简单打包，以便更易于用perl脚�
  
 =head1 VERSION
  
-Version 0.08 
+Version 0.10 
 
-fixed some bugs and timetout
+merge Mojo-Zabbix—APP to this repos.
  
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 
 =head1 SYNOPSIS
 
@@ -38,7 +36,6 @@ our $VERSION = '0.08';
           url => "https://server/zabbix/",
           username => 'user',
           password => 'pass',
-          verify_ssl => 0,
           debug => 1,
           trace => 0,
   );
@@ -167,7 +164,6 @@ sub new {
         url        => \$required,
         trace      => 0,
         debug      => 0,
-        verify_ssl => 1,
         username   => \$required,
         password   => \$required,
         @_,
@@ -194,7 +190,6 @@ sub new {
         Trace       => $args->{trace} ? 1 : 0,
         User        => $args->{username},
         Password    => $args->{password},
-        VerifySSL   => $args->{verify_ssl},
         _call_start => 0,
     }, $class;
 

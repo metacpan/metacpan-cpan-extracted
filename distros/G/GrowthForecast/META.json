@@ -1,0 +1,100 @@
+{
+   "abstract" : "Lightning Fast Graphing/Visualization",
+   "author" : [
+      "Masahiro Nagano <kazeburo {at} gmail.com>"
+   ],
+   "dynamic_config" : "0",
+   "generated_by" : "Module::Install version 1.08, CPAN::Meta::Converter version 2.141170",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "GrowthForecast",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t"
+      ],
+      "file" : [
+         "views/add_complex.tx",
+         "views/base.tx",
+         "views/docs.tx",
+         "views/edit.tx",
+         "views/edit_complex.tx",
+         "views/index.tx",
+         "views/list.tx",
+         "views/view.tx",
+         "views/view_graph.tx",
+         "public/css/bootstrap.min.css",
+         "public/favicon.ico",
+         "public/fonts/glyphicons-halflings-regular.eot",
+         "public/fonts/glyphicons-halflings-regular.svg",
+         "public/fonts/glyphicons-halflings-regular.ttf",
+         "public/fonts/glyphicons-halflings-regular.woff",
+         "public/js/bootstrap.min.js",
+         "public/js/jquery-1.10.2.min.js",
+         "public/js/jquery-1.10.2.min.map",
+         "public/js/jquery.storageapi.min.js",
+         "public/js/site.js"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::RRDtool" : "0.05",
+            "Class::Accessor::Lite" : "0",
+            "DBD::SQLite" : "1.33",
+            "DBIx::Sunny" : "0.14",
+            "File::Zglob" : "0.09",
+            "HTTP::Date" : "0",
+            "HTTP::Parser::XS" : "0.16",
+            "JSON" : "2",
+            "JSON::XS" : "0",
+            "Kossy" : "0.37",
+            "List::MoreUtils" : "0",
+            "Log::Minimal" : "0.16",
+            "Plack::Builder::Conditionals" : "0.03",
+            "Plack::Middleware::AxsLog" : "0.13",
+            "Plack::Middleware::Scope::Container" : "0.04",
+            "Proclet" : "0.31",
+            "Scope::Container" : "0.04",
+            "Scope::Container::DBI" : "0.09",
+            "Starlet" : "0.21",
+            "Time::Piece" : "1.15",
+            "URI::Escape" : "0",
+            "perl" : "v5.8.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::Requires" : "0.06"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/kazeburo/GrowthForecast.git"
+      }
+   },
+   "version" : "0.83"
+}

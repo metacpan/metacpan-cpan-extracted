@@ -3,7 +3,7 @@ abstract: 'Benchmark Perl data serialization modules'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
-  Bencher::Backend: '1.034'
+  Bencher::Backend: '1.036'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
@@ -28,6 +28,7 @@ requires:
   JSON::Parse: '0'
   JSON::Tiny: '0'
   JSON::XS: '0'
+  MarpaX::ESLIF::ECMA404: '0'
   Pegex::JSON: '0'
   Sereal: '0'
   Storable: '0'
@@ -42,7 +43,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenario-Serializers
   homepage: https://metacpan.org/release/Bencher-Scenario-Serializers
   repository: git://github.com/perlancar/perl-Bencher-Scenario-Serializers.git
-version: '0.14'
+version: '0.15'
 x_Dist_Zilla:
   perl:
     version: '5.024000'
@@ -118,7 +119,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.54'
+      version: '0.55'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -143,6 +144,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::CheckMetaResources
       name: '@Author::PERLANCAR/CheckMetaResources'
       version: '0.001'
+    -
+      class: Dist::Zilla::Plugin::CopyrightYearFromGit
+      name: '@Author::PERLANCAR/CopyrightYearFromGit'
+      version: '0.003'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
@@ -286,7 +291,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.05'
+              version: '0.06'
             -
               class: Pod::Weaver::Plugin::Bencher::Scenario
               name: -Bencher::Scenario

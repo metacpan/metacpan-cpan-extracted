@@ -1,0 +1,28 @@
+---
+abstract: 'A named-printf-style prepared statement'
+author:
+  - 'Masahiro Nagano <kazeburo {at} gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Printf-Named
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Carp::Clan: 0
+  DBI: 0
+  Regexp::Common: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/kazeburo/DBIx-Printf-Named.git
+version: 0.01

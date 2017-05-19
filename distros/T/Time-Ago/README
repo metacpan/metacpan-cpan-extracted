@@ -2,7 +2,7 @@ NAME
     Time::Ago - Approximate duration in words
 
 VERSION
-    version 0.09
+    version 1.00
 
 SYNOPSIS
       use Time::Ago;
@@ -98,9 +98,9 @@ METHODS
 LOCALIZATION
     Locale::TextDomain is used for localization.
 
-    Currently Arabic, English, French, German, Italian, Japanese, Russian,
-    and Spanish translations are available. Contact me if you need another
-    language.
+    Currently Arabic, Dutch, English, French, German, Italian, Japanese,
+    Russian, and Spanish translations are available. Contact me if you need
+    another language.
 
     See Locale::TextDomain for how to specify a language.
 
@@ -150,7 +150,7 @@ AUTHOR
     Maurice Aubrey <maurice.aubrey@gmail.com>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2015 by Maurice Aubrey.
+    This software is copyright (c) 2017 by Maurice Aubrey.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

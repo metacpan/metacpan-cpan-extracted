@@ -26,4 +26,4 @@ requires:
   Digest::MD5: '0'
   Socket: '2.021'
   perl: v5.10.0
-version: v1.2.0
+version: v1.2.1

@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               deferred
+version:            0.01
+abstract:           Defer loading of modules until methods are called
+author:
+    - David Leadbeater <dgl@dgl.cx>
+license:            wtfpl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    perl:  5.008
+resources:
+    bugtracker:  http://rt.cpan.org/NoAuth/Bugs.html?Dist=deferred
+    license:     http://search.cpan.org/perldoc?Software::License::WTFPL_2
+    repository:  http://github.com/dgl/perl-deferred
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,145 @@
+{
+   "abstract" : "hashed passwords/passphrases as objects",
+   "author" : [
+      "Andrew Main (Zefram) <zefram@fysh.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Authen-Passphrase",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "MIME::Base64" : "2.21",
+            "Module::Build" : 0,
+            "Test::More" : 0,
+            "perl" : "5.006",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : 0,
+            "perl" : "5.006",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Authen::DecHpwd" : "2.003",
+            "Carp" : 0,
+            "Crypt::DES" : 0,
+            "Crypt::Eksblowfish::Bcrypt" : "0.008",
+            "Crypt::Eksblowfish::Uklblowfish" : "0.008",
+            "Crypt::MySQL" : "0.03",
+            "Crypt::PasswdMD5" : "1.0",
+            "Crypt::UnixCrypt_XS" : "0.08",
+            "Data::Entropy::Algorithms" : 0,
+            "Digest" : "1.00",
+            "Digest::MD4" : "1.2",
+            "Digest::MD5" : "1.9953",
+            "Digest::SHA" : 0,
+            "MIME::Base64" : "2.21",
+            "Module::Runtime" : "0.011",
+            "Params::Classify" : 0,
+            "parent" : 0,
+            "perl" : "5.006",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Authen::Passphrase" : {
+         "file" : "lib/Authen/Passphrase.pm",
+         "version" : "0.008"
+      },
+      "Authen::Passphrase::AcceptAll" : {
+         "file" : "lib/Authen/Passphrase/AcceptAll.pm",
+         "version" : "0.008"
+      },
+      "Authen::Passphrase::BigCrypt" : {
+         "file" : "lib/Authen/Passphrase/BigCrypt.pm",
+         "version" : "0.008"
+      },
+      "Authen::Passphrase::BlowfishCrypt" : {
+         "file" : "lib/Authen/Passphrase/BlowfishCrypt.pm",
+         "version" : "0.008"
+      },
+      "Authen::Passphrase::Clear" : {
+         "file" : "lib/Authen/Passphrase/Clear.pm",
+         "version" : "0.008"
+      },
+      "Authen::Passphrase::Crypt16" : {
+         "file" : "lib/Authen/Passphrase/Crypt16.pm",
+         "version" : "0.008"
+      },
+      "Authen::Passphrase::DESCrypt" : {
+         "file" : "lib/Authen/Passphrase/DESCrypt.pm",
+         "version" : "0.008"
+      },
+      "Authen::Passphrase::EggdropBlowfish" : {
+         "file" : "lib/Authen/Passphrase/EggdropBlowfish.pm",
+         "version" : "0.008"
+      },
+      "Authen::Passphrase::LANManager" : {
+         "file" : "lib/Authen/Passphrase/LANManager.pm",
+         "version" : "0.008"
+      },
+      "Authen::Passphrase::LANManagerHalf" : {
+         "file" : "lib/Authen/Passphrase/LANManagerHalf.pm",
+         "version" : "0.008"
+      },
+      "Authen::Passphrase::MD5Crypt" : {
+         "file" : "lib/Authen/Passphrase/MD5Crypt.pm",
+         "version" : "0.008"
+      },
+      "Authen::Passphrase::MySQL323" : {
+         "file" : "lib/Authen/Passphrase/MySQL323.pm",
+         "version" : "0.008"
+      },
+      "Authen::Passphrase::MySQL41" : {
+         "file" : "lib/Authen/Passphrase/MySQL41.pm",
+         "version" : "0.008"
+      },
+      "Authen::Passphrase::NTHash" : {
+         "file" : "lib/Authen/Passphrase/NTHash.pm",
+         "version" : "0.008"
+      },
+      "Authen::Passphrase::NetscapeMail" : {
+         "file" : "lib/Authen/Passphrase/NetscapeMail.pm",
+         "version" : "0.008"
+      },
+      "Authen::Passphrase::PHPass" : {
+         "file" : "lib/Authen/Passphrase/PHPass.pm",
+         "version" : "0.008"
+      },
+      "Authen::Passphrase::RejectAll" : {
+         "file" : "lib/Authen/Passphrase/RejectAll.pm",
+         "version" : "0.008"
+      },
+      "Authen::Passphrase::SaltedDigest" : {
+         "file" : "lib/Authen/Passphrase/SaltedDigest.pm",
+         "version" : "0.008"
+      },
+      "Authen::Passphrase::VMSPurdy" : {
+         "file" : "lib/Authen/Passphrase/VMSPurdy.pm",
+         "version" : "0.008"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.008"
+}

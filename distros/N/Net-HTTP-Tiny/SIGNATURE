@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 a4493cf44074a160c7bb2ef92c5b8ff3502d8c36 .gitignore
+SHA1 a84375f1d61e86ca726a2700693617338b2b786d Build.PL
+SHA1 94ea718db3470e8a3f68ca0df323ef96eef5640c Changes
+SHA1 9750764b6d36092ed64f21e5b6b771ec3cebb713 MANIFEST
+SHA1 7304ac9588e886930c5d61971cd11eba6db37527 META.json
+SHA1 bd5b43cba443145aeeda9444a2a13112f28c0121 META.yml
+SHA1 9158dcbbdf50934018f9e0a56b2ee96b0bdc037f Makefile.PL
+SHA1 a98e7f7708ed8cd5e1f535d65876e357f050aa47 README
+SHA1 5d288243576b780f3d92fcad91496fcc51fee560 lib/Net/HTTP/Tiny.pm
+SHA1 ecb861406bb84068c63ef546475354d2f8923631 t/delimitation.at
+SHA1 9dd05ab6a693c9ac6d77be438bf3410d773f66f5 t/delimitation_noip.at
+SHA1 74fec5d199276aa67f12c85c14945ca127ecdd80 t/dependency.t
+SHA1 2c98c647e9e8583d69d11cbcda6b6addae599475 t/get_cpan.at
+SHA1 39bc50959d14911338187c3fe9ca7beeadb6b54d t/get_cpan_noip.at
+SHA1 461e71e07d5a31970c9f92fb100d5fc91bcd21d0 t/parse_http_url.t
+SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
+SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
+SHA1 86da39c9cd43c353f9218a9f8ba8703df15de09c t/setup_noip.pl
+SHA1 65c0ca6e0f9ee6d13e78d74b9ee30e37e4aed224 t/upgraded.t
+SHA1 7c56f790957211f1806ab1bebd9f22aa99ed27c4 t/use.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAk9o3fsACgkQOV9mt2VyAVGFyQCfVROYR1S/UQOxv7Bn7awp0EiR
+yWAAnAh0qN0SPjUd3e9vZskutIgiw/W4
+=la2C
+-----END PGP SIGNATURE-----

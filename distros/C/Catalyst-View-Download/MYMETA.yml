@@ -1,0 +1,31 @@
+---
+abstract: unknown
+author:
+  - 'Travis Chase, C<< <gaudeon@cpan.org> >>'
+build_requires:
+  Catalyst::Runtime: 0
+  Catalyst::View: 0
+  ExtUtils::MakeMaker: 6.42
+  FindBin: 0
+  Test::More: 0
+  Test::WWW::Mechanize::Catalyst: 0
+  Text::CSV: 0
+  XML::Simple: 0
+  ok: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+dynamic_config: 0
+generated_by: 'Module::Install version 0.95, CPAN::Meta::Converter version 2.131490'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-View-Download
+no_index:
+  directory:
+    - inc
+    - t
+requires: {}
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.07

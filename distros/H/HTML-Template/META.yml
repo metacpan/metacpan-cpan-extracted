@@ -3,23 +3,25 @@ abstract: 'Perl module to use HTML-like templating language'
 author:
   - 'Michael Peters <mpeters@plusthree.com>'
 build_requires:
-  File::Temp: 0
-  Test::More: 0
+  File::Temp: '0'
+  Test::More: '0'
+  Test::Pod: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300029, CPAN::Meta::Converter version 2.120630'
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: HTML-Template
 requires:
-  Carp: 0
-  Digest::MD5: 0
-  File::Spec: 0.82
-  Scalar::Util: 0
+  CGI: '0'
+  Carp: '0'
+  Digest::MD5: '0'
+  File::Spec: '0.82'
+  Scalar::Util: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-Template
   repository: git://github.com/mpeters/html-template.git
-version: 2.95
+version: '2.97'

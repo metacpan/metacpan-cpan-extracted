@@ -1,6 +1,14 @@
 MIME-Base32
 ===========
 
+1.303	2017-05-18
+	- fixes RT 121752: Fix typos referencing wrong section of RFC 3548
+	  (John Wittkoski)
+
+1.302	2017-05-18
+	- fixes RT 107998 by making the decode methods case insensitive
+	  as encoding will always use uppercase (Chase Whitener)
+
 1.301	2016-04-14
 	- release 1.300_001 without further changes as 1.301
 

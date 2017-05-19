@@ -1,6 +1,6 @@
 package HTML::Template;
 
-$HTML::Template::VERSION = '2.95';
+$HTML::Template::VERSION = '2.97';
 
 =head1 NAME
 
@@ -126,7 +126,7 @@ The following "attributes" can also be specified in template var tags:
 
 =item * escape
 
-This allows you to escape the value before it's put into the output. Th
+This allows you to escape the value before it's put into the output.
 
 This is useful when you want to use a TMPL_VAR in a context where those characters would
 cause trouble. For example:
@@ -2187,7 +2187,7 @@ sub _parse {
                 # if a DEFAULT was provided, push a DEFAULT object on the
                 # stack before the variable.
                 if (defined $default) {
-                    push(@pstack, HTML::Template::DEFAULT->new($default));
+                    push(@pstack, HTML::Template::DEF->new($default));
                 }
 
                 # if ESCAPE was set, push an ESCAPE op on the stack before
@@ -2692,7 +2692,7 @@ C<param()> can be called in a number of ways
         ANOTHER_LOOP_PARAM => [{PARAM => VALUE_FOR_FIRST_PASS}, {PARAM => VALUE_FOR_SECOND_PASS}],
     );
 
-=item 5 - To set the value of a a number of parameters using a hash-ref :
+=item 5 - To set the value of a number of parameters using a hash-ref :
 
     $self->param(
         {
@@ -3021,7 +3021,7 @@ sub output {
             }
         } elsif ($type eq 'HTML::Template::NOOP') {
             next;
-        } elsif ($type eq 'HTML::Template::DEFAULT') {
+        } elsif ($type eq 'HTML::Template::DEF') {
             $_ = $x;    # remember default place in stack
 
             # find next VAR, there might be an ESCAPE in the way
@@ -3289,7 +3289,7 @@ sub new {
     return bless(\$value, $_[0]);
 }
 
-package HTML::Template::DEFAULT;
+package HTML::Template::DEF;
 
 sub new {
     my $value = $_[1];

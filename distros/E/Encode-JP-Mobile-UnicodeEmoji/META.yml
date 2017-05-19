@@ -1,0 +1,28 @@
+---
+abstract: 'Unicode Emoji mapping for Encode::JP::Mobile'
+author:
+  - 'Masayuki Matsuki <y.songmu@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Encode-JP-Mobile-UnicodeEmoji
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Encode::JP::Emoji: 0
+  Encode::JP::Mobile: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/Songmu/p5-Encode-JP-Mobile-UnicodeEmoji.git
+version: 0.012

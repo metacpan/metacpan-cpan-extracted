@@ -14,7 +14,7 @@ App::Github::Email - Search and print related Github user emails.
 
 =head1 VERSION
 
-version 0.0.6
+version 0.0.7
 
 =head1 SYNOPSIS
 

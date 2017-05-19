@@ -1,0 +1,33 @@
+---
+abstract: 'OO interface for process management'
+author:
+  - unknown
+build_requires: {}
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Proc-Class
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+provides:
+  Proc::Class:
+    file: lib/Proc/Class.pm
+    version: 0.05
+  Proc::Class::Status:
+    file: lib/Proc/Class/Status.pm
+    version: 0
+requires:
+  Any::Moose: 0.12
+  IPC::Open3: 1.02
+  perl: v5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.05

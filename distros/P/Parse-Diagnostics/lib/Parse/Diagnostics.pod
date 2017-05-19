@@ -1,0 +1,78 @@
+
+=encoding UTF-8
+
+=head1 NAME
+
+Parse::Diagnostics - extract diagnostic messages from Perl source code
+
+=head1 SYNOPSIS
+
+    use Parse::Diagnostics 'parse_diagnostics';
+
+=head1 VERSION
+
+This documents version 0.03 of Parse::Diagnostics
+corresponding to git commit L<120724d10ffaf6113f6f29df4a5178a0c5f71005|https://github.com/benkasminbullock/parse-diagnostics/commit/120724d10ffaf6113f6f29df4a5178a0c5f71005> released on Fri Dec 9 14:52:59 2016 +0900.
+
+=head1 DESCRIPTION
+
+This module is a helper for writing documentation by extracting the
+diagnostic messages in Perl files.
+
+=head1 FUNCTIONS
+
+=head2 parse_diagnostics
+
+    my $diagnostics = parse_diagnostics ($file);
+
+Extract a list of diagnostic messages from C<$file>. The return value
+is an array reference containing hash values.
+
+=over
+
+=item type
+
+The type of diagnostic, like "carp", "croak", etc.
+
+=item message
+
+The diagnostic message itself.
+
+=item line
+
+The line where the diagnostic begins.
+
+=back
+
+=head1 DEPENDENCIES
+
+=over
+
+=item L<Path::Tiny>
+
+Path::Tiny is used to read the input files.
+
+=item L<C::Tokenize>
+
+C::Tokenize is used for making the regular expression for searching XS
+and C files for diagnostics.
+
+=back
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2016
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

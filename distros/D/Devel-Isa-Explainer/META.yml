@@ -1,0 +1,44 @@
+---
+abstract: 'Pretty Print Hierarchies of Subs in Packages'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::Builder: '0'
+  Test::More: '0.89'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-Isa-Explainer
+provides:
+  App::Isa::Splain:
+    file: lib/App/Isa/Splain.pm
+    version: '0.002001'
+  Devel::Isa::Explainer:
+    file: lib/Devel/Isa/Explainer.pm
+    version: '0.002001'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  MRO::Compat: '0'
+  Module::Load: '0'
+  Package::Stash: '0'
+  Term::ANSIColor: '3.00'
+  constant: '1.03'
+  namespace::clean: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Devel-Isa-Explainer/issues
+  homepage: https://github.com/kentnl/Devel-Isa-Explainer
+  repository: https://github.com/kentnl/Devel-Isa-Explainer.git
+version: '0.002001'

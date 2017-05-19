@@ -1,0 +1,70 @@
+{
+   "abstract" : "manipulation of UTC in terms of TAI",
+   "author" : [
+      "Andrew Main (Zefram) <zefram@fysh.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Time-UTC",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Math::BigRat" : "0.13",
+            "Module::Build" : 0,
+            "Test::More" : 0,
+            "perl" : "5.006",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : 0,
+            "perl" : "5.006",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Digest::SHA1" : 0,
+            "Exporter" : 0,
+            "HTTP::Tiny" : "0.016",
+            "Math::BigRat" : "0.13",
+            "Net::FTP" : "1.21",
+            "Time::Unix" : "1.02",
+            "constant" : 0,
+            "integer" : 0,
+            "parent" : 0,
+            "perl" : "5.006",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Time::UTC" : {
+         "file" : "lib/Time/UTC.pm",
+         "version" : "0.008"
+      },
+      "Time::UTC::Segment" : {
+         "file" : "lib/Time/UTC/Segment.pm",
+         "version" : "0.008"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.008"
+}

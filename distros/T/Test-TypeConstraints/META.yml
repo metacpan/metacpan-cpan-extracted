@@ -1,0 +1,50 @@
+---
+abstract: 'testing whether some value is valid as (Moose|Mouse)::Meta::TypeConstraint'
+author:
+  - 'Keiji Yoshimi <walf443 at gmail dot com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  IO::Scalar: 0
+  Test::LoadAllModules: 0
+  Test::More: 0.98
+  Test::Requires: 0
+  Test::Tester: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.0.53, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-TypeConstraints
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Test::TypeConstraints:
+    file: lib/Test/TypeConstraints.pm
+    version: 0.07
+requires:
+  Data::Dumper: 0
+  Mouse::Util::TypeConstraints: 0
+  Scalar::Util: 0
+  Test::Builder: 0
+  Test::More: 0.98
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/walf443/p5-test-type_constraints/issues
+  homepage: https://github.com/walf443/p5-test-type_constraints
+  repository: git://github.com/walf443/p5-test-type_constraints.git
+version: 0.07
+x_contributors:
+  - 'Michael G. Schwern <schwern@pobox.com>'
+  - 'Keiji, Yoshimi <walf443@gmail.com>'

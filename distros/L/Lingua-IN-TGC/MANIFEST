@@ -1,0 +1,10 @@
+Changes
+lib/Lingua/IN/Ic.pm
+lib/Lingua/IN/R/TGC.pm
+lib/Lingua/IN/TGC.pm
+Makefile.PL
+MANIFEST
+README
+t/Lingua-IN-TGC.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

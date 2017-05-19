@@ -1,0 +1,68 @@
+{
+   "abstract" : "yet another CPAN mirror aka DarkPAN repository manager",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : "0",
+   "generated_by" : "Module::Install version 1.06, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "OrePAN",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "Test::More" : "0.96"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::DistnameInfo" : "0",
+            "Cwd" : "0",
+            "File::Basename" : "0",
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "File::Which" : "0",
+            "IO::Zlib" : "0",
+            "JSON" : "2.27",
+            "LWP::UserAgent" : "0",
+            "List::MoreUtils" : "0",
+            "Log::Minimal" : "0.02",
+            "Mouse" : "0",
+            "Path::Class" : "0",
+            "YAML::Tiny" : "0",
+            "perl" : "v5.8.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.08"
+}

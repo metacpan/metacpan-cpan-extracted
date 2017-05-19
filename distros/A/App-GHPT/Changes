@@ -1,3 +1,10 @@
+1.000003 2017-05-18
+
+- Removed the use List::Gather. This seems to be the most likely culprit for
+  some very odd test failures seen with threaded versions of Perl. See
+  https://rt.cpan.org/Ticket/Display.html?id=121777 for details.
+
+
 1.000002 2017-05-04
 
 - The "--project" CLI argument is now optional. By default all projects are

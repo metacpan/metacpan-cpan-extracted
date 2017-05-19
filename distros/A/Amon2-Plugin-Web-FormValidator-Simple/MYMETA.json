@@ -1,0 +1,55 @@
+{
+   "abstract" : "Amon2 plugin",
+   "author" : [
+      "JINNOUCHI Yasushi <delphinus@remora.cx>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.06, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Amon2-Plugin-Web-FormValidator-Simple",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "Test::More" : "0",
+            "Test::WWW::Mechanize::PSGI" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Amon2::Web" : "0",
+            "FormValidator::Simple" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/delphinus35/Amon2-Plugin-Web-FormValidator-Simple",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/delphinus35/Amon2-Plugin-Web-FormValidator-Simple"
+      }
+   },
+   "version" : "0.04"
+}

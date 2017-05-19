@@ -1,3 +1,10 @@
+0.58 20170518
+    ! Remove support for Perl 5.6.x
+      The module uses a fancy way of opening a lexical filehandle which
+      doesn't work on Perl 5.6.x. Instead of trying to figure out how to make
+      5.6.x open() work with an undef lexial variable for a filehandle via
+      Travis CI, I simply declare this module incompatible with 5.6.x.
+
 0.57 20170508
     . Spun off from WWW::Mechanize::PhantomJS
       (and WWW::Mechanize::Firefox, and WWW::Mechanize::Shell)

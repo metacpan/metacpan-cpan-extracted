@@ -1,3 +1,7 @@
+0.65 Thu 18 May 23:09:38 CEST 2017
+ - Prevent warning about unused variables (see issue#59)
+ - Clarify documentation about exported functions
+
 0.64 Fri  7 Apr 20:32:01 CEST 2017
  - use lib FindBin::Bin in tests, preparing for perl 5.26 where '.' gets
    removed from @INC. Fixes issue#54 TINITA++

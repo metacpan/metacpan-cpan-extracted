@@ -23,7 +23,7 @@ FACEBOOK: {
 	    url10 => '  rockvillebb ',
 	    url11 => 'https://m.facebook.com/#!/groups/6000106799?ref=bookmark&__user=764645045',
 	    url12 => 'https://www.facebook.com/Sandhurst-Silver-Band-297412250355073',
-	    url13 => 'https://www.facebook.com/groups/321667408300/',
+	    url13 => 'https://www.facebook.com/KentPolice Band',
 	};
 
 	my $untainter = new_ok('CGI::Untaint' => [ $vars ]);
@@ -57,7 +57,7 @@ FACEBOOK: {
 	is($c, undef, 'non existent page');
 
 	$c = $untainter->extract(-as_Facebook => 'url10');
-	is($c, 'https://www.facebook.com/rockvillebb', 'spaces are ignored');
+	is($c, 'https://www.facebook.com/rockvillebb', 'leading spaces are ignored');
 
 	$c = $untainter->extract(-as_Facebook => 'url11');
 	is($c, $vars->{'url11'}, 'CGI arguments are accepted');
@@ -66,5 +66,5 @@ FACEBOOK: {
 	is($c, 'https://www.facebook.com/Sandhurst-Silver-Band-297412250355073', 'Sandhurst');
 
 	$c = $untainter->extract(-as_Facebook => 'url13');
-	is($c, $vars->{'url13'}, 'Belle Vue');
+	is($c, undef, 'space in Facebook name');
 }

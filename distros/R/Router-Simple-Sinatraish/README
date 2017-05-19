@@ -1,0 +1,78 @@
+NAME
+    Router::Simple::Sinatraish - Sinatra-ish routers on Router::Simple
+
+SYNOPSIS
+        package MySinatraishFramework;
+        use Router::Simple::Sinatraish;
+    
+        sub import {
+            Router::Simple::Sinatraish->export_to_level(1);
+        }
+
+        sub to_app {
+            my ($class) = caller(0);
+            sub {
+                my $env = shift;
+                if (my $route = $class->router->match($env)) {
+                    return $route->{code}->($env);
+                } else {
+                    return [404, [], ['not found']];
+                }
+            };
+        }
+
+        package MyApp;
+        use MySinatraishFramework;
+
+        get '/' => sub {
+            [200, [], ['ok']];
+        };
+        post '/edit' => sub {
+            [200, [], ['ok']];
+        };
+        any '/any' => sub {
+            [200, [], ['ok']];
+        };
+
+        __PACKAGE__->to_app;
+
+DESCRIPTION
+    Router::Simple::Sinatraish is toolkit library for sinatra-ish WAF.
+
+EXPORTABLE METHODS
+    my $router = YourClass->router;
+        Returns this instance of Router::Simple.
+
+EXPORTABLE FUNCTIONS
+    get($path:Str, $code:CodeRef)
+            get '/' => sub { ... };
+
+        Add new route, handles GET method.
+
+    post($path:Str, $code:CodeRef)
+            post '/' => sub { ... };
+
+        Add new route, handles POST method.
+
+    any($path:Str, $code:CodeRef)
+            any '/' => sub { ...  };
+
+        Add new route, handles any HTTP method.
+
+    any($methods:ArrayRef[Str], $path:Str, $code:CodeRef)
+            any [qw/GET DELETE/] => '/' => sub { ...  };
+
+        Add new route, handles any HTTP method.
+
+AUTHOR
+    Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>
+
+SEE ALSO
+    Router::Simple
+
+LICENSE
+    Copyright (C) Tokuhiro Matsuno
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

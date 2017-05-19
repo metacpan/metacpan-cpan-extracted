@@ -11,7 +11,7 @@
 # Austin Schutz <ASchutz@users.sourceforge.net>
 #
 # This module now is maintained by
-# Roland Giersig <RGiersig@cpan.org>
+# Dave Jacoby <jacoby@cpan.org>
 #
 
 use 5.006;
@@ -36,7 +36,7 @@ use Errno;
 @Expect::EXPORT = qw(expect exp_continue exp_continue_timeout);
 
 BEGIN {
-	$Expect::VERSION = '1.33';
+	$Expect::VERSION = '1.35';
 
 	# These are defaults which may be changed per object, or set as
 	# the user wishes.
@@ -3090,7 +3090,7 @@ And then $process->expect($timeout,'____END____','other','patterns');
 
 =head1 HOMEPAGE
 
-L<http://sourceforge.net/projects/expectperl/> though the source code is now in GitHub: L<https://github.com/szabgab/expect.pm>
+L<http://sourceforge.net/projects/expectperl/> though the source code is now in GitHub: L<https://github.com/jacoby/expect.pm>
 
 
 =head1 MAILING LISTS
@@ -3119,8 +3119,7 @@ new bugs under
 
 expect() interface & functionality enhancements (c) 1999-2006 Roland Giersig.
 
-This module is now maintained by Roland Giersig E<lt>F<RGiersig@cpan.org>E<gt>
-
+This module is now maintained by Dave Jacoby E<lt>F<jacoby@cpan.org>E<gt>
 
 =head1 LICENSE
 

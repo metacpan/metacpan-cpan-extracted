@@ -3,12 +3,10 @@ NAME
 
 SYNOPSIS
         use GPSD::Parse;
-
         my $gps = GPSD::Parse->new;
 
-        # start the data flow, and poll for data
+        # poll for data
 
-        $gps->on;
         $gps->poll;
 
         # get all TPV data in an href
@@ -36,13 +34,10 @@ SYNOPSIS
 
         print $gps->device;
 
-        # stop capturing data
-
-        $gps->off;
-
 DESCRIPTION
-    Simple, lightweight distribution that polls `gpsd' for data received
-    from a UART (serial) connected GPS receiver over a TCP connection.
+    Simple, lightweight (core only) distribution that polls `gpsd' for data
+    received from a UART (serial/USB) connected GPS receiver over a TCP
+    connection.
 
     The data is fetched in JSON, and returned as Perl data.
 
@@ -53,13 +48,21 @@ NOTES
     with the following flags with system-specific serial port. See the above
     link for information on changing the listen IP and port.
 
-        sudo gpsd -n /dev/ttyS0 -F /var/log/gpsd.sock
+        sudo gpsd /dev/ttyS0 -n -F /var/log/gpsd.sock
 
   Available Data
     Each of the methods that return data have a table in their respective
     documentation within the METHODS section. Specifically, look at the
     `tpv()', `sattelites()' and the more broad `sky()' method sections to
     understand what available data attributes you can extract.
+
+  Conversions
+    All output where applicable defaults to metric (metres). See the
+    `metric' parameter in the `new()' method to change this to use
+    imperial/standard measurements.
+
+    For latitude and longitude, we default to using the signed notation. You
+    can disable this with the `signed' parameter in `new()'.
 
 METHODS
   new(%args)
@@ -77,17 +80,35 @@ METHODS
     Optional, Integer: The TCP port number that the `gpsd' daemon is running
     on. Defaults to `2947' if not sent in.
 
-  on
-    Puts `gpsd' in listening mode, ready to poll data from.
+        metric => Bool
 
-    If this method is not called, a warning will be thrown when you
-    `poll()', and your dataset will be incomplete (ie. invalid).
+    Optional, Integer: By default, we return measurements in metric
+    (metres). Send in a false value (`0') to use imperial/standard
+    measurement conversions (ie. feet). Note that if returning the raw
+    *JSON* data from the `poll()' method, the conversions will not be done.
+    The default raw Perl return will have been converted however.
 
-  off
-    Turns off `gpsd' listening mode.
+        signed => Bool
 
-    Not necessary to call, but it will help preserve battery life if running
-    on a portable device.
+    Optional, Integer: By default, we use the signed notation for latitude
+    and longitude. Send in a false value (`0') to disable this. Here's an
+    example:
+
+        enabled (default)   disabled
+        -----------------   --------
+
+        lat: 51.12345678    51.12345678N
+        lon: -114.123456    114.123456W
+
+    We add the letter notation at the end of the result if `signed' is
+    disabled.
+
+        file => 'filename.ext'
+
+    Optional, String: For testing purposes. Instead of reading from a
+    socket, send in a filename that contains legitimate JSON data saved from
+    a previous `gpsd' output and we'll operate on that. Useful also for
+    re-running previous output.
 
   poll(%args)
     Does a poll of `gpsd' for data, and configures the object with that
@@ -97,11 +118,13 @@ METHODS
 
     All parameters are sent in as a hash.
 
-        fname => $filename
+        file => $filename
 
     Optional, String: Used for testing, you can send in the name of a JSON
     file that contains `gpsd' JSON data and we'll work with that instead of
-    polling the GPS device directly.
+    polling the GPS device directly. Note that you *must* instantiate the
+    object with the `file' parameter in new for this to have any effect and
+    to bypass the socket creation.
 
         return => 'json'
 
@@ -128,8 +151,8 @@ METHODS
 
     Optional, String. You can extract individual statistics of the TPV data
     by sending in the name of the stat you wish to fetch. This will then
-    return the string value if available. Returns `undef' if the statistic
-    doesn't exist.
+    return the string value if available. Returns an empty string if the
+    statistic doesn't exist.
 
     Available statistic/info name, example value, description. This is the
     default raw result:
@@ -214,12 +237,130 @@ METHODS
         tag         => 'ZDA'        # object ID
         device      => '/dev/ttyS0' # serial port connected to the GPS
 
+  direction($degree)
+    Converts a degree from true north into a direction (eg: ESE, SW etc).
+
+    Parameters:
+
+        $degree
+
+    Mandatory, Ineger/Decimal: A decimal ranging from 0-360. Returns the
+    direction representing the degree from true north. A common example
+    would be:
+
+        my $heading = $gps->direction($gps->tpv('track'));
+
+    Degree/direction map:
+
+        N       348.75 - 11.25
+        NNE     11.25  - 33.75
+        NE      33.75  - 56.25
+        ENE     56.25  - 78.75
+
+        E       78.75  - 101.25
+        ESE     101.25 - 123.75
+        SE      123.75 - 146.25
+        SSE     146.25 - 168.75
+
+        S       168.75 - 191.25
+        SSW     191.25 - 213.75
+        SW      213.75 - 236.25
+        WSW     236.25 - 258.75
+
+        W       258.75 - 281.25
+        WNW     281.25 - 303.75
+        NW      303.75 - 326.25
+        NNW     326.25 - 348.75
+
   device
     Returns a string containing the actual device the GPS is connected to
     (eg: `/dev/ttyS0').
 
   time
     Returns a string of the date and time of the most recent poll, in UTC.
+
+  on
+    Puts `gpsd' in listening mode, ready to poll data from.
+
+    We call this method internally when the object is instantiated with
+    `new()' if we're not in file mode. Likewise, when the object is
+    destroyed (end of program run), we call the subsequent `off()' method.
+
+    If you have long periods of a program run where you don't need the GPS,
+    you can manually run the `off()' and `on()' methods to disable and
+    re-enable the GPS.
+
+  off
+    Turns off `gpsd' listening mode.
+
+    Not necessary to call, but it will help preserve battery life if running
+    on a portable device for long program runs where the GPS is used
+    infrequently. Use in conjunction with `on()'. We call `off()'
+    automatically when the object goes out of scope (program end for
+    example).
+
+EXAMPLES
+  Basic Features and Options
+    Here's a simple example using some of the basic features and options.
+    Please read through the documentation of the methods (particularly
+    `new()' and `tpv()' to get a good grasp on what can be fetched.
+
+        use warnings;
+        use strict;
+        use feature 'say';
+
+        use GPSD::Parse;
+
+        my $gps = GPSD::Parse->new(signed => 0);
+
+        $gps->poll;
+
+        my $lat = $gps->tpv('lat');
+        my $lon = $gps->tpv('lon');
+
+        my $heading = $gps->tpv('track');
+        my $direction = $gps->direction($heading);
+
+        my $altitude = $gps->tpv('alt');
+
+        my $speed = $gps->tpv('speed');
+
+        say "latitude:  $lat";
+        say "longitude: $lon\n";
+
+        say "heading:   $heading degrees";
+        say "direction: $direction\n";
+
+        say "altitude:  $altitude metres\n";
+
+        say "speed:     $speed metres/sec";
+
+    Output:
+
+        latitude:  51.1111111N
+        longitude: 114.11111111W
+
+        heading:   31.23 degrees
+        direction: NNE
+
+        altitude:  1080.9 metres
+
+        speed:     0.333 metres/sec
+
+TESTING
+    Please note that we init and disable the GPS device on construction and
+    deconstruction of the object respectively. It takes a few seconds for
+    the GPS unit to initialize itself and then lock on the satellites before
+    we can get readings. For this reason, please understand that one test
+    sweep may pass while the next fails.
+
+    I am considering adding specific checks, but considering that it's a
+    timing thing (seconds, not microseconds that everyone is in a hurry for
+    nowadays) I am going to wait until I get a chance to take the kit into
+    the field before I do anything drastic.
+
+    For now. I'll leave it as is; expect failure if you ram on things too
+    quickly.
 
 SEE ALSO
     A very similar distribution is Net::GPSD3. However, it has a long line

@@ -3,7 +3,7 @@ package Nmap::Parser;
 use strict;
 use XML::Twig;
 
-our $VERSION = 1.33;
+our $VERSION = 1.34;
 
 
 sub new {
@@ -424,6 +424,7 @@ sub __host_service_tag_hdlr {
         $service_hashref->{name}      = $service->{att}->{name} || 'unknown';
         $service_hashref->{version}   = $service->{att}->{version};
         $service_hashref->{product}   = $service->{att}->{product};
+	$service_hashref->{devicetype} = $service->{att}->{devicetype};
         $service_hashref->{extrainfo} = $service->{att}->{extrainfo};
         $service_hashref->{proto} =
              $service->{att}->{proto}

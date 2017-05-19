@@ -1,0 +1,29 @@
+---
+abstract: 'executes the sql in the __DATA__ section '
+author:
+  - 'dann <techmemo@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Simple-DataSection
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Carp: 0
+  DBIx::Simple: 0
+  Data::Section::Simple: 0
+  Filter::Util::Call: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

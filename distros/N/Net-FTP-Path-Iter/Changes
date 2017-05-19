@@ -1,0 +1,29 @@
+Revision history for Net-FTP-Path-Iter
+
+0.04      2017-05-09 12:08:30-04:00 America/New_York
+
+  [BUILD]
+
+    * require Test::Mock::Net::FTP v.0.03, remove workaround for
+      bug in v0.02
+
+0.03      2017-05-09 12:08:30-04:00 America/New_York
+
+    * promoted to full release
+    * No changes from 0.02(-TRIAL)
+
+0.02      2017-05-09 12:08:30-04:00 America/New_York (TRIAL RELEASE)
+
+  [RENAME]
+
+    * Module renamed to Net::FTP::Path::Iter
+
+  [BUG FIX]
+
+    * On some FTP servers, symlinked directories are treated as files
+      when listed, rather than as proper directories.
+
+
+0.01      2017-05-03 15:43:41-04:00 America/New_York (TRIAL RELEASE)
+
+   * Initial Public Release

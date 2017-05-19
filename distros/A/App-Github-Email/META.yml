@@ -17,11 +17,12 @@ requires:
   Getopt::Long: v2.49.1
   LWP::UserAgent: '6.07'
   List::MoreUtils: '0.416'
+  Modern::Perl: '1.20170117'
   Test::More: '1.302075'
   perl: '5.008'
 resources:
   bugtracker: https://github.com/faraco/App-Github-Email/issues
   homepage: https://github.com/faraco/App-Github-Email
   repository: https://github.com/faraco/App-Github-Email.git
-version: 0.0.6
+version: 0.0.7
 x_serialization_backend: 'YAML::Tiny version 1.69'

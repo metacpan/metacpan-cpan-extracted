@@ -1,0 +1,504 @@
+{
+   "Description" : "",
+   "Parameters" : {
+      "DBSnapshot" : {
+         "Type" : "String"
+      },
+      "AMI" : {
+         "Type" : "String"
+      },
+      "StackName" : {
+         "Type" : "String"
+      }
+   },
+   "AWSTemplateFormatVersion" : "2010-09-09",
+   "Outputs" : {
+      "testendpointaddress" : {
+         "Value" : {
+            "Ref" : "ElbRecordSet"
+         }
+      },
+      "databaseendpointaddress" : {
+         "Value" : {
+            "Fn::GetAtt" : [
+               "MySQLRDSTest",
+               "Endpoint.Address"
+            ]
+         }
+      },
+      "elasticacheendpointaddress" : {
+         "Value" : {
+            "Fn::GetAtt" : [
+               "ElastiCacheTest",
+               "ConfigurationEndpoint.Address"
+            ]
+         }
+      },
+      "elbendpointaddress" : {
+         "Value" : {
+            "Fn::GetAtt" : [
+               "ELB",
+               "DNSName"
+            ]
+         }
+      },
+      "elasticacheendpointport" : {
+         "Value" : {
+            "Fn::GetAtt" : [
+               "ElastiCacheTest",
+               "ConfigurationEndpoint.Port"
+            ]
+         }
+      },
+      "databaseendpointport" : {
+         "Value" : {
+            "Fn::GetAtt" : [
+               "MySQLRDSTest",
+               "Endpoint.Port"
+            ]
+         }
+      }
+   },
+   "Resources" : {
+      "ElbSGHTTPIngress" : {
+         "Type" : "AWS::EC2::SecurityGroupIngress",
+         "Properties" : {
+            "FromPort" : "80",
+            "ToPort" : "80",
+            "CidrIp" : "0.0.0.0/0",
+            "IpProtocol" : "tcp",
+            "GroupId" : {
+               "Ref" : "ElbSG"
+            }
+         }
+      },
+      "FrontTestSGHTTPIngress" : {
+         "Type" : "AWS::EC2::SecurityGroupIngress",
+         "Properties" : {
+            "ToPort" : "80",
+            "FromPort" : "80",
+            "IpProtocol" : "tcp",
+            "CidrIp" : "0.0.0.0/0",
+            "GroupId" : {
+               "Ref" : "FrontTestSG"
+            }
+         }
+      },
+      "FrontTestSGSSHIngress" : {
+         "Type" : "AWS::EC2::SecurityGroupIngress",
+         "Properties" : {
+            "IpProtocol" : "tcp",
+            "CidrIp" : "0.0.0.0/0",
+            "FromPort" : "22",
+            "ToPort" : "22",
+            "GroupId" : {
+               "Ref" : "FrontTestSG"
+            }
+         }
+      },
+      "FrontTestProfile" : {
+         "Properties" : {
+            "Path" : "/",
+            "Roles" : [
+               {
+                  "Ref" : "FrontTestRole"
+               }
+            ]
+         },
+         "Type" : "AWS::IAM::InstanceProfile"
+      },
+      "ElastiCacheTestSubnetGroup" : {
+         "Type" : "AWS::ElastiCache::SubnetGroup",
+         "Properties" : {
+            "SubnetIds" : [
+               "subnet-ba876ddf",
+               "subnet-a78097d3"
+            ],
+            "Description" : "Subnets available for the ElastiCacheTest Cluster"
+         }
+      },
+      "MySQLRDSTestSG" : {
+         "Type" : "AWS::EC2::SecurityGroup",
+         "Properties" : {
+            "SecurityGroupIngress" : [
+               {
+                  "ToPort" : 65535,
+                  "FromPort" : 0,
+                  "CidrIp" : "1.1.1.1/32",
+                  "IpProtocol" : "udp"
+               },
+               {
+                  "CidrIp" : "1.1.1.1/29",
+                  "IpProtocol" : "icmp",
+                  "FromPort" : -1,
+                  "ToPort" : -1
+               }
+            ],
+            "GroupDescription" : "Security Group for MySQLRDSTest",
+            "VpcId" : "vpc-e26a8f87"
+         }
+      },
+      "ElbRecordSet" : {
+         "Type" : "AWS::Route53::RecordSet",
+         "Properties" : {
+            "TTL" : "120",
+            "HostedZoneName" : "domain.com.",
+            "Type" : "CNAME",
+            "Comment" : "CNAME for test stack",
+            "ResourceRecords" : [
+               {
+                  "Fn::GetAtt" : [
+                     "ELB",
+                     "DNSName"
+                  ]
+               }
+            ],
+            "Name" : {
+               "Fn::Join" : [
+                  "",
+                  [
+                     {
+                        "Ref" : "StackName"
+                     },
+                     ".domain.com."
+                  ]
+               ]
+            }
+         }
+      },
+      "Test0" : {
+         "Type" : "AWS::EC2::Instance",
+         "Properties" : {
+            "UserData" : {
+               "Fn::Base64" : {
+                  "Fn::Join" : [
+                     "",
+                     [
+                        "#!/bin/bash\necho \"hello\"\n"
+                     ]
+                  ]
+               }
+            },
+            "ImageId" : {
+               "Ref" : "AMI"
+            },
+            "NetworkInterfaces" : [
+               {
+                  "GroupSet" : [
+                     {
+                        "Ref" : "FrontTestSG"
+                     }
+                  ],
+                  "SubnetId" : "subnet-bb876dde",
+                  "AssociatePublicIpAddress" : "true",
+                  "DeviceIndex" : "0"
+               }
+            ],
+            "Tags" : [
+               {
+                  "Value" : "Test #0",
+                  "Key" : "Name"
+               }
+            ],
+            "IamInstanceProfile" : {
+               "Ref" : "FrontTestProfile"
+            },
+            "InstanceType" : "m1.small"
+         }
+      },
+      "Test1" : {
+         "Properties" : {
+            "NetworkInterfaces" : [
+               {
+                  "GroupSet" : [
+                     {
+                        "Ref" : "FrontTestSG"
+                     }
+                  ],
+                  "DeviceIndex" : "0",
+                  "AssociatePublicIpAddress" : "true",
+                  "SubnetId" : "subnet-a08097d4"
+               }
+            ],
+            "Tags" : [
+               {
+                  "Key" : "Name",
+                  "Value" : "Test #1"
+               }
+            ],
+            "UserData" : {
+               "Fn::Base64" : {
+                  "Fn::Join" : [
+                     "",
+                     [
+                        "#!/bin/bash\necho \"code ALL=(ALL) NOPASSWD:ALL\" > /etc/sudoers.d/code\nchmod 440 /etc/sudoers.d/code\napt-get install -y git htop\n"
+                     ]
+                  ]
+               }
+            },
+            "ImageId" : {
+               "Ref" : "AMI"
+            },
+            "IamInstanceProfile" : {
+               "Ref" : "FrontTestProfile"
+            },
+            "InstanceType" : "m1.small"
+         },
+         "Type" : "AWS::EC2::Instance"
+      },
+      "MySQLRDSTestSubnetGroup" : {
+         "Properties" : {
+            "DBSubnetGroupDescription" : "Subnets available for the MySQL RDS",
+            "SubnetIds" : [
+               "subnet-bb876dde",
+               "subnet-a08097d4"
+            ]
+         },
+         "Type" : "AWS::RDS::DBSubnetGroup"
+      },
+      "ElastiCacheTestSG" : {
+         "Type" : "AWS::EC2::SecurityGroup",
+         "Properties" : {
+            "GroupDescription" : "Security Group for ElastiCacheTest",
+            "VpcId" : "vpc-e26a8f87"
+         }
+      },
+      "ELB" : {
+         "Properties" : {
+            "Subnets" : [
+               "subnet-bb876dde",
+               "subnet-a08097d4"
+            ],
+            "HealthCheck" : {
+               "Timeout" : 29,
+               "Target" : "TCP:80",
+               "HealthyThreshold" : 2,
+               "Interval" : 30,
+               "UnhealthyThreshold" : 2
+            },
+            "Listeners" : [
+               {
+                  "InstancePort" : 80,
+                  "LoadBalancerPort" : 80,
+                  "Protocol" : "HTTP"
+               },
+               {
+                  "SSLCertificateId" : {
+                     "Fn::Join" : [
+                        "",
+                        [
+                           "arn:aws:iam::",
+                           {
+                              "Ref" : "AWS::AccountId"
+                           },
+                           ":server-certificate/cert"
+                        ]
+                     ]
+                  },
+                  "Protocol" : "HTTPS",
+                  "InstancePort" : 80,
+                  "LoadBalancerPort" : 443
+               }
+            ],
+            "SecurityGroups" : [
+               {
+                  "Ref" : "ElbSG"
+               }
+            ],
+            "Instances" : [
+               {
+                  "Ref" : "Test0"
+               },
+               {
+                  "Ref" : "Test1"
+               }
+            ]
+         },
+         "Type" : "AWS::ElasticLoadBalancing::LoadBalancer"
+      },
+      "FrontTestSGElbIngress" : {
+         "Type" : "AWS::EC2::SecurityGroupIngress",
+         "Properties" : {
+            "ToPort" : "80",
+            "FromPort" : "80",
+            "IpProtocol" : "tcp",
+            "SourceSecurityGroupId" : {
+               "Ref" : "ElbSG"
+            },
+            "GroupId" : {
+               "Ref" : "FrontTestSG"
+            }
+         }
+      },
+      "ElbSG" : {
+         "Type" : "AWS::EC2::SecurityGroup",
+         "Properties" : {
+            "VpcId" : "vpc-e26a8f87",
+            "GroupDescription" : "Security Group for ELB"
+         }
+      },
+      "ElbSGHTTPSIngress" : {
+         "Type" : "AWS::EC2::SecurityGroupIngress",
+         "Properties" : {
+            "GroupId" : {
+               "Ref" : "ElbSG"
+            },
+            "FromPort" : "443",
+            "ToPort" : "443",
+            "CidrIp" : "0.0.0.0/0",
+            "IpProtocol" : "tcp"
+         }
+      },
+      "FrontTestSG" : {
+         "Type" : "AWS::EC2::SecurityGroup",
+         "Properties" : {
+            "VpcId" : "vpc-e26a8f87",
+            "GroupDescription" : "Security Group for control instance",
+            "SecurityGroupIngress" : [
+               {
+                  "FromPort" : 0,
+                  "ToPort" : 65535,
+                  "CidrIp" : "217.111.235.104/29",
+                  "IpProtocol" : "tcp"
+               },
+               {
+                  "ToPort" : 65535,
+                  "FromPort" : 0,
+                  "CidrIp" : "54.246.153.220/32",
+                  "IpProtocol" : "tcp"
+               },
+               {
+                  "FromPort" : 0,
+                  "ToPort" : 65535,
+                  "IpProtocol" : "udp",
+                  "CidrIp" : "217.111.235.104/29"
+               },
+               {
+                  "ToPort" : 65535,
+                  "FromPort" : 0,
+                  "CidrIp" : "54.246.153.220/32",
+                  "IpProtocol" : "udp"
+               },
+               {
+                  "CidrIp" : "217.111.235.104/29",
+                  "IpProtocol" : "icmp",
+                  "ToPort" : -1,
+                  "FromPort" : -1
+               },
+               {
+                  "ToPort" : -1,
+                  "FromPort" : -1,
+                  "CidrIp" : "54.246.153.220/32",
+                  "IpProtocol" : "icmp"
+               }
+            ]
+         }
+      },
+      "MySQLRDSTest" : {
+         "Type" : "AWS::RDS::DBInstance",
+         "Properties" : {
+            "AllowMajorVersionUpgrade" : "false",
+            "AllocatedStorage" : 30,
+            "PreferredBackupWindow" : "02:00-03:00",
+            "Engine" : "mysql",
+            "VPCSecurityGroups" : [
+               {
+                  "Ref" : "MySQLRDSTestSG"
+               }
+            ],
+            "Port" : "3306",
+            "DBSubnetGroupName" : {
+               "Ref" : "MySQLRDSTestSubnetGroup"
+            },
+            "MultiAZ" : "false",
+            "DBInstanceClass" : "db.m1.small",
+            "AutoMinorVersionUpgrade" : "true",
+            "DBSnapshotIdentifier" : {
+               "Ref" : "DBSnapshot"
+            },
+            "PreferredMaintenanceWindow" : "mon:05:00-mon:06:00"
+         }
+      },
+      "MySQLRDSTestSGFrontIngress" : {
+         "Properties" : {
+            "GroupId" : {
+               "Ref" : "MySQLRDSTestSG"
+            },
+            "SourceSecurityGroupId" : {
+               "Ref" : "FrontTestSG"
+            },
+            "IpProtocol" : "tcp",
+            "FromPort" : "3306",
+            "ToPort" : "3306"
+         },
+         "Type" : "AWS::EC2::SecurityGroupIngress"
+      },
+      "ElastiCacheTestSGFrontIngress" : {
+         "Properties" : {
+            "ToPort" : "65535",
+            "FromPort" : "0",
+            "IpProtocol" : "tcp",
+            "SourceSecurityGroupId" : {
+               "Ref" : "FrontTestSG"
+            },
+            "GroupId" : {
+               "Ref" : "ElastiCacheTestSG"
+            }
+         },
+         "Type" : "AWS::EC2::SecurityGroupIngress"
+      },
+      "FrontTestRole" : {
+         "Type" : "AWS::IAM::Role",
+         "Properties" : {
+            "Path" : "/",
+            "AssumeRolePolicyDocument" : {
+               "Statement" : [
+                  {
+                     "Principal" : {
+                        "Service" : [
+                           "ec2.amazonaws.com"
+                        ]
+                     },
+                     "Effect" : "Allow",
+                     "Action" : [
+                        "sts:AssumeRole"
+                     ]
+                  }
+               ]
+            },
+            "Policies" : [
+               {
+                  "PolicyName" : "S3Access",
+                  "PolicyDocument" : {
+                     "Statement" : [
+                        {
+                           "Action" : "s3:*",
+                           "Resource" : [
+                              "arn:aws:s3:::abucket/*"
+                           ],
+                           "Effect" : "Allow"
+                        }
+                     ]
+                  }
+               }
+            ]
+         }
+      },
+      "ElastiCacheTest" : {
+         "Type" : "AWS::ElastiCache::CacheCluster",
+         "Properties" : {
+            "CacheSubnetGroupName" : {
+               "Ref" : "ElastiCacheTestSubnetGroup"
+            },
+            "Engine" : "memcached",
+            "NumCacheNodes" : 1,
+            "CacheNodeType" : "cache.t1.micro",
+            "VpcSecurityGroupIds" : [
+               {
+                  "Ref" : "ElastiCacheTestSG"
+               }
+            ]
+         }
+      }
+   }
+}

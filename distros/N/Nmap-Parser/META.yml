@@ -20,4 +20,4 @@ no_index:
 requires:
   Storable: 2
   XML::Twig: 3.16
-version: 1.33
+version: 1.34

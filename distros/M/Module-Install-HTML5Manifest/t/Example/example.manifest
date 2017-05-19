@@ -1,0 +1,11 @@
+CACHE MANIFEST
+
+NETWORK:
+/api
+/foo/bar.cgi
+
+CACHE:
+/site.css
+/site.js
+
+# digest: KC22SJMksgNahFOXL97t7w

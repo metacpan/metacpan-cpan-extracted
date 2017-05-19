@@ -1,0 +1,63 @@
+NAME
+    Proc::Class - OO interface for process management
+
+SYNOPSIS
+        use Test::More tests => 4;
+        use Proc::Class;
+
+        my $script = Proc::Class->spawn(
+            cmd  => '/path/to/script/qmail/foo.pl',
+            env  => {DEFAULT => "TOKEN"},
+            argv => [qw/--dump/],
+        );
+        $script->print_stdin($mail->body);
+        $script->close_stdin();
+        is $script->slurp_stdout(), '';
+        is $script->slurp_stderr(), '';
+
+        my $status = $script->waitpid;
+        ok $status->is_exited();
+        is $status->exit_status(), 0;
+
+DESCRIPTION
+    Proc::Class is a simple OO wrapper for IPC::Open3, POSIX.pm, and more.
+
+    THIS MODULE IS IN ITS BETA QUALITY. THE API MAY CHANGE IN THE FUTURE
+
+METHODS
+    my $script = Proc::Class->new( cmd => '/path/to/script', env => \%env,
+    argv => \@args );
+        create a new script object.
+
+    $script->print_stdin($txt);
+        pass $txt to child process' STDIN
+
+    $script->close_stdin();
+        close child process' *STDIN.
+
+    my $txt = $script->slurp_stdout();
+        slurp() from child process' *STDOUT.
+
+    my $txt = $script->slurp_stderr();
+        slurp() from child process' *STDERR.
+
+    my $txt = $script->slurp_stderr();
+        slurp() from child process' *STDERR.
+
+    my $status = $script->waitpid();
+        Waits for a particular child process to terminate and returns the
+        pid of the deceased process. Returns Proc::Class::Status object.
+
+    $script->kill('TERM');
+        Send signal to the process.
+
+AUTHOR
+    Tokuhiro Matsuno <tokuhirom slkjfd gmail.com>
+
+SEE ALSO
+    Proc::Open3
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -58,7 +58,6 @@
             "Import::Into" : "0",
             "Lingua::EN::Inflect" : "0",
             "List::AllUtils" : "0",
-            "List::Gather" : "0",
             "List::Util" : "1.44",
             "Module::Pluggable::Object" : "0",
             "Moose" : "0",
@@ -114,55 +113,55 @@
    "provides" : {
       "App::GHPT" : {
          "file" : "lib/App/GHPT.pm",
-         "version" : "1.000002"
+         "version" : "1.000003"
       },
       "App::GHPT::Types" : {
          "file" : "lib/App/GHPT/Types.pm",
-         "version" : "1.000002"
+         "version" : "1.000003"
       },
       "App::GHPT::WorkSubmitter" : {
          "file" : "lib/App/GHPT/WorkSubmitter.pm",
-         "version" : "1.000002"
+         "version" : "1.000003"
       },
       "App::GHPT::WorkSubmitter::AskPullRequestQuestions" : {
          "file" : "lib/App/GHPT/WorkSubmitter/AskPullRequestQuestions.pm",
-         "version" : "1.000002"
+         "version" : "1.000003"
       },
       "App::GHPT::WorkSubmitter::ChangedFiles" : {
          "file" : "lib/App/GHPT/WorkSubmitter/ChangedFiles.pm",
-         "version" : "1.000002"
+         "version" : "1.000003"
       },
       "App::GHPT::WorkSubmitter::ChangedFilesFactory" : {
          "file" : "lib/App/GHPT/WorkSubmitter/ChangedFilesFactory.pm",
-         "version" : "1.000002"
+         "version" : "1.000003"
       },
       "App::GHPT::WorkSubmitter::Role::FileInspector" : {
          "file" : "lib/App/GHPT/WorkSubmitter/Role/FileInspector.pm",
-         "version" : "1.000002"
+         "version" : "1.000003"
       },
       "App::GHPT::WorkSubmitter::Role::Question" : {
          "file" : "lib/App/GHPT/WorkSubmitter/Role/Question.pm",
-         "version" : "1.000002"
+         "version" : "1.000003"
       },
       "App::GHPT::Wrapper::OurMoose" : {
          "file" : "lib/App/GHPT/Wrapper/OurMoose.pm",
-         "version" : "1.000002"
+         "version" : "1.000003"
       },
       "App::GHPT::Wrapper::OurMoose::Role" : {
          "file" : "lib/App/GHPT/Wrapper/OurMoose/Role.pm",
-         "version" : "1.000002"
+         "version" : "1.000003"
       },
       "App::GHPT::Wrapper::OurMooseX::Role::Parameterized" : {
          "file" : "lib/App/GHPT/Wrapper/OurMooseX/Role/Parameterized.pm",
-         "version" : "1.000002"
+         "version" : "1.000003"
       },
       "App::GHPT::Wrapper::OurMooseX::Role::Parameterized::Meta::Trait::Parameterizable::Strict" : {
          "file" : "lib/App/GHPT/Wrapper/OurMooseX/Role/Parameterized/Meta/Trait/Parameterizable/Strict.pm",
-         "version" : "1.000002"
+         "version" : "1.000003"
       },
       "App::GHPT::Wrapper::Ourperl" : {
          "file" : "lib/App/GHPT/Wrapper/Ourperl.pm",
-         "version" : "1.000002"
+         "version" : "1.000003"
       }
    },
    "release_status" : "stable",
@@ -177,10 +176,10 @@
          "web" : "https://github.com/maxmind/App-GHPT"
       }
    },
-   "version" : 1.000002,
+   "version" : 1.000003,
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.024001"
+         "version" : "5.022001"
       },
       "plugins" : [
          {
@@ -216,7 +215,7 @@
                }
             },
             "name" : "@MAXMIND/Git::GatherDir",
-            "version" : "2.041"
+            "version" : "2.042"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
@@ -281,7 +280,7 @@
          {
             "class" : "Dist::Zilla::Plugin::GitHub::Meta",
             "name" : "@MAXMIND/GitHub::Meta",
-            "version" : "0.43"
+            "version" : "0.44"
          },
          {
             "class" : "Dist::Zilla::Plugin::GitHub::Update",
@@ -291,7 +290,7 @@
                }
             },
             "name" : "@MAXMIND/GitHub::Update",
-            "version" : "0.43"
+            "version" : "0.44"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaResources",
@@ -318,7 +317,7 @@
                   "meta_noindex" : 1
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000031",
+                  "Module::Metadata" : "1.000026",
                   "version" : "0.004"
                }
             },
@@ -585,7 +584,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Test::ReportPrereqs",
             "name" : "@MAXMIND/Test::ReportPrereqs",
-            "version" : "0.025"
+            "version" : "0.027"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Version",
@@ -601,7 +600,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git --version" : "2.11.0",
+                  "git_version" : "2.13.0",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -609,7 +608,7 @@
                }
             },
             "name" : "@MAXMIND/Git::Contributors",
-            "version" : "0.029"
+            "version" : "0.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::SurgicalPodWeaver",
@@ -813,7 +812,7 @@
                   ]
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000031",
+                  "Module::Metadata" : "1.000026",
                   "version" : "0.004"
                }
             },
@@ -834,7 +833,7 @@
             "class" : "Dist::Zilla::Plugin::MAXMIND::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git --version" : "2.11.0",
+                  "git_version" : "2.13.0",
                   "repo_root" : "."
                }
             },
@@ -845,7 +844,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git --version" : "2.11.0",
+                  "git_version" : "2.13.0",
                   "repo_root" : "."
                }
             },
@@ -882,12 +881,12 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git --version" : "2.11.0",
+                  "git_version" : "2.13.0",
                   "repo_root" : "."
                }
             },
             "name" : "@MAXMIND/Git::Check",
-            "version" : "2.041"
+            "version" : "2.042"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
@@ -910,7 +909,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git --version" : "2.11.0",
+                  "git_version" : "2.13.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -918,7 +917,7 @@
                }
             },
             "name" : "@MAXMIND/Commit generated files",
-            "version" : "2.041"
+            "version" : "2.042"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -927,12 +926,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.000002",
+                  "tag" : "v1.000003",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git --version" : "2.11.0",
+                  "git_version" : "2.13.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -940,7 +939,7 @@
                }
             },
             "name" : "@MAXMIND/Git::Tag",
-            "version" : "2.041"
+            "version" : "2.042"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -952,12 +951,12 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git --version" : "2.11.0",
+                  "git_version" : "2.13.0",
                   "repo_root" : "."
                }
             },
             "name" : "@MAXMIND/Git::Push",
-            "version" : "2.041"
+            "version" : "2.042"
          },
          {
             "class" : "Dist::Zilla::Plugin::BumpVersionAfterRelease",
@@ -992,7 +991,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git --version" : "2.11.0",
+                  "git_version" : "2.13.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1000,7 +999,7 @@
                }
             },
             "name" : "@MAXMIND/Commit version bump",
-            "version" : "2.041"
+            "version" : "2.042"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -1012,12 +1011,12 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git --version" : "2.11.0",
+                  "git_version" : "2.13.0",
                   "repo_root" : "."
                }
             },
             "name" : "@MAXMIND/Push version bump",
-            "version" : "2.041"
+            "version" : "2.042"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
@@ -1085,8 +1084,9 @@
    },
    "x_authority" : "cpan:MAXMIND",
    "x_contributors" : [
+      "Greg Oschwald <goschwald@maxmind.com>",
       "Mark Fowler <mfowler@maxmind.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0226"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

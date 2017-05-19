@@ -20,7 +20,7 @@ DESCRIPTION
 
     This module exports the functions Dump, Load, DumpFile and LoadFile.
     These functions are intended to work exactly like YAML.pm's
-    corresponding functions.
+    corresponding functions. Only Load and Dump are exported by default.
 
 CONFIGURATION
 

@@ -1,0 +1,43 @@
+---
+abstract: 'Coro-friendly HTTP and HTTPS backend for LWP'
+author:
+  - 'Eric Brine <ikegami@adaelis.com>'
+build_requires:
+  AnyEvent: 0
+  CGI: 0
+  Carp: 0
+  File::Spec: 0
+  File::Temp: 0
+  FindBin: 0
+  Getopt::Long: 0
+  HTTP::Daemon: 0
+  LWP::Simple: 0
+  Test::More: 0
+  URI: 0
+  URI::URL: 0
+configure_requires:
+  Module::Build: 0.3614
+  Software::License::CC0_1_0: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.120351'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: LWP-Protocol-Coro-http
+provides:
+  LWP::Protocol::Coro::http:
+    file: lib/LWP/Protocol/Coro/http.pm
+    version: v1.8.0
+requires:
+  AnyEvent::HTTP: 2
+  Coro::Channel: 0
+  HTTP::Response: 0
+  LWP::Protocol: 0
+  LWP::Protocol::http: 0
+  LWP::Simple: 5.827
+  version: 0
+resources:
+  license: http://creativecommons.org/publicdomain/zero/1.0/
+  repository: http://github.com/ikegami/perl-LWP-Protocol-Coro-http
+version: v1.8.0

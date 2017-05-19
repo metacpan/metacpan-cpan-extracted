@@ -4,14 +4,14 @@ use strict;
 use warnings;
 use NOLookup::Brreg::DataLookup;
 use Encode;
-use vars qw($opt_o $opt_n $opt_f $opt_t $opt_v $opt_h);
+use vars qw($opt_o $opt_n $opt_f $opt_t $opt_p $opt_v $opt_h);
 use Getopt::Std;
 use Pod::Usage;
 
 use Data::Dumper;
 $Data::Dumper::Indent=1;
 
-&getopts('hvo:n:f:t:');    # o=orgno, n=name, f:from_date, t:to_date, v=verbose dump
+&getopts('hvo:n:f:p:t:');    # o=orgno, n=name, f:from_date, p:max_pages, t:to_date, v=verbose dump
 
 if ($opt_h) {
     pod2usage();
@@ -27,10 +27,9 @@ if ($opt_o) {
     $bo->lookup_orgno($opt_o);
 } elsif ($opt_n) {
     my $nm = decode('UTF-8', $opt_n);
-    $bo->lookup_orgname($nm);
+    $bo->lookup_orgname($nm, $opt_p);
 } elsif ($opt_f || $opt_t) {
-    $bo->lookup_reg_dates($opt_f, $opt_t);
-
+    $bo->lookup_reg_dates($opt_f, $opt_t, $opt_p);
 }
  
 if ($bo->error) {
@@ -84,7 +83,7 @@ no_brreg.pl -n norid
     Note that only orgs starting with -n are listed due
     to a limitation in the Brreg API service.
 
-no_brreg.pl -f 2017-04-29 -t 2017-04-30 
+no_brreg.pl -f 2017-04-29 -t 2017-04-30 -i 2 -p 1
 
 Limitation: Up to a maximum of 500 matches (5 json pages) are listed.
 
@@ -116,6 +115,10 @@ Arguments:
   -n: orgname (complete name or start of name, minimum 2 chars)
   -f: from registration date (2017-04-10)
   -t: to registration date   (2017-04-11)
+
+  When -n, -f or -t is specifed, also:
+  -p: max number of pages (1..x)
+
   -v: verbose dump of the complete JSON data structure
 
 =cut

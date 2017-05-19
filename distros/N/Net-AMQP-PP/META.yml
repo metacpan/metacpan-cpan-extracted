@@ -1,0 +1,27 @@
+---
+abstract: 'Nasty hack for when you want pure perl AnyEvent::RabbitMQ'
+author:
+  - 'Tomas Doran (t0m) C<< <bobtfish@bobtfish.net> >>.'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0.88
+  Test::Without::Module: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.05'
+license: perl5
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Net::AMQP::PP
+name: Net-AMQP-PP
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  JSON: 0
+  Net::AMQP: 0
+version: 0.01

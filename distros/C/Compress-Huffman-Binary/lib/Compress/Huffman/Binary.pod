@@ -1,0 +1,116 @@
+
+
+=encoding UTF-8
+
+=head1 NAME
+
+Compress::Huffman::Binary - Binary-only Huffman coding
+
+=head1 SYNOPSIS
+
+    
+    use FindBin '$Bin';
+    use Compress::Huffman::Binary ':all';
+    my $input = 'something or another';
+    my $output = huffman_encode ($input);
+    my $roundtrip = huffman_decode ($output);
+    if ($input eq $roundtrip) {
+        print "OK.\n";
+    }
+    else {
+        print "FAIL!\n";
+    }
+
+
+produces output
+
+    OK.
+
+
+(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/Compress-Huffman-Binary-0.01/examples/synopsis.pl> in the distribution.)
+
+
+=head1 VERSION
+
+This documents version 0.01 of Compress::Huffman::Binary
+corresponding to git commit 13dc76cb630de085d842bc162807d2f274f53453 released on Wed Feb 22 09:18:24 2017 +0900.
+
+=head1 DESCRIPTION
+
+This is a binary-only version of L<Compress::Huffman>, written in C,
+which supports encoding of input to a file. This module is
+experimental, it is in an evaluation phase, and its interface may
+change.
+
+=head1 FUNCTIONS
+
+=head2 huffman_encode
+
+    my $out = huffman_encode ($in);
+
+This converts C<$in> into a huffman-encoded form based on counts of
+the bytes.
+
+=head2 huffman_decode
+
+    my $out = huffman_decode ($in);
+
+This converts C<$out> back out of the huffman-encoded form given by
+L</huffman_encode>.
+
+=head1 EXPORTS
+
+L</huffman_encode> and L</huffman_decode> are exported on request.
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2016-2017
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+
+
+This module is based on L<https://github.com/drichardson/huffman> by
+Doug Richardson. The licence for that software is as follows:
+
+Copyright (c) 2007, Douglas Ryan Richardson, Gauss Interprise, Inc
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+* Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the
+  distribution.
+
+* Neither the name of Gauss Interprise, Inc nor the names of its
+  contributors may be used to endorse or promote products derived
+  from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

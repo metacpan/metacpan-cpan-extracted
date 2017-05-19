@@ -8,7 +8,42 @@
 #include <string.h>
 
 
+#define TIME_STRING_SIZE 26
+
+
+/* thanks to Michael Schout's Env::C module, this solves problem with FreeBSD */
+
+/* in order to work around system and perl implementation bugs/leaks, we need
+ * to sometimes force PERL_USE_SAFE_PUTENV mode.
+ */
+#ifndef PERL_USE_SAFE_PUTENV
+# if PERL_BCDVERSION >= 0x5009004 && defined(USE_ITHREADS) && defined(PERL_TRACK_MEMPOOL)
+#  define USE_SAFE_PUTENV 1
+# elif defined(__FreeBSD__)
+#  define USE_SAFE_PUTENV 1
+# endif
+#endif
+
+#ifdef USE_SAFE_PUTENV
+# define SAFE_PUTENV_ON()            PL_use_safe_putenv = 1;
+#else
+# define SAFE_PUTENV_ON()
+#endif
+
+#ifdef sun
+#define asctime_r(a, b)              asctime_r(a, b, TIME_STRING_SIZE)
+#endif
+
+#ifdef WIN32
+#define setenv(name, value, flag)    _putenv_s(name, value)
+#define unsetenv(name)               _putenv_s(name, "")
+#define localtime_r(time, tm)        localtime_s(tm, time)
+#define asctime_r(tm, time_string)   asctime_s(time_string, TIME_STRING_SIZE, tm)
+#define gmtime_r(time, tm)           gmtime_s(tm, time)
+#endif
+
 #define BACKUP_TZ()                                           \
+    SAFE_PUTENV_ON();                                         \
     char* old_tz_p = getenv("TZ");                            \
     int envsize = old_tz_p == NULL ? 1 : strlen(old_tz_p)+1;  \
     char old_tz[envsize];                                     \
@@ -23,16 +58,15 @@
     }                                                         \
 
 
-MODULE = Time::Local::TZ		PACKAGE = Time::Local::TZ
+MODULE = Time::Local::TZ               PACKAGE = Time::Local::TZ
 PROTOTYPES: DISABLE
-
 
 void
 tz_localtime(tz, time)
     char* tz
     time_t time
     PREINIT:
-        char time_string[26];
+        char time_string[TIME_STRING_SIZE];
         struct tm tm;
     PPCODE:
         BACKUP_TZ();
@@ -52,7 +86,7 @@ tz_localtime(tz, time)
             ST(6) = sv_2mortal(newSViv(tm.tm_wday));
             ST(7) = sv_2mortal(newSViv(tm.tm_yday));
             ST(8) = sv_2mortal(newSViv(tm.tm_isdst));
-            XSRETURN(9); 
+            XSRETURN(9);
         } else {
             asctime_r(&tm, time_string);
             ST(0) = sv_2mortal(newSVpv(time_string, 24));

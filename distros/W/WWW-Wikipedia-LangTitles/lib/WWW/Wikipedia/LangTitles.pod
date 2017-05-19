@@ -1,0 +1,178 @@
+
+
+
+=encoding UTF-8
+
+=head1 NAME
+
+WWW::Wikipedia::LangTitles - get interwiki links from Wikipedia.
+
+=head1 SYNOPSIS
+
+    
+    use utf8;
+    use WWW::Wikipedia::LangTitles 'get_wiki_titles';
+    my $title = 'Three-phase electric power';
+    my $links = get_wiki_titles ($title);
+    print "$title is '$links->{de}' in German.\n";
+    my $film = '東京物語';
+    my $flinks = get_wiki_titles ($film, lang => 'ja');
+    print "映画「$film」はイタリア語で'$flinks->{it}'と名付けた。\n";
+    
+
+
+produces output
+
+    Three-phase electric power is 'Dreiphasenwechselstrom' in German.
+    映画「東京物語」はイタリア語で'Viaggio a Tokyo'と名付けた。
+
+
+(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/WWW-Wikipedia-LangTitles-0.03/examples/synopsis.pl> in the distribution.)
+
+
+=head1 VERSION
+
+This documents version 0.03 of
+WWW::Wikipedia::LangTitles corresponding to L<git commit 7abf04f07649708e751600544787dfa42c2fad9f|https://github.com/benkasminbullock/www-wikipedia-langtitles/commit/7abf04f07649708e751600544787dfa42c2fad9f> released
+on Tue Dec 27 09:25:03 2016 +0900.
+
+=head1 DESCRIPTION
+
+This module retrieves the Wikipedia interwiki link titles from
+wikidata.org. It can be used, for example, to translate a term in
+English into other languages, or to get near equivalents.
+
+=head1 FUNCTIONS
+
+=head2 get_wiki_titles
+
+   my $ref = get_wiki_titles ('Helium');
+
+Returns a hash reference with all the articles in each language,
+indexed by the language. For example C<< $ref->{th} >> will be equal
+to ฮีเลียม, the Thai title of the equivalent Wikipedia article.
+
+The language of the original page can be specified like this:
+
+   use utf8;
+   my $from_th = get_wiki_titles ('ฮีเลียม', lang => 'th');
+
+The URL is encoded using L<URI::Escape/uri_escape_utf8>, so you must
+use character strings not byte strings (use "use utf8;" etc.)
+
+An option "verbose" switches on verbose messages with any true value:
+
+   my $ref = get_wiki_titles ($name, verbose => 1);
+
+The contents of these messages is not specified, and is liable to
+change without notice in future releases.
+
+As of this version, this deletes the non-Wikipedia sites like
+Wikiquote and Wikiversity from the list of returned values
+
+=head2 make_wiki_url
+
+    my $url = make_wiki_url ('helium');
+
+Make a URL for the Wikidata page. You will then need to retrieve the
+page and parse the JSON yourself. Use a second argument to specify the
+language of the page:
+
+    
+    use utf8;
+    use WWW::Wikipedia::LangTitles 'make_wiki_url';
+    print make_wiki_url ('ฮีเลียม', 'th'), "\n";
+
+
+produces output
+
+    https://www.wikidata.org/w/api.php?action=wbgetentities&sites=thwiki&titles=%E0%B8%AE%E0%B8%B5%E0%B9%80%E0%B8%A5%E0%B8%B5%E0%B8%A2%E0%B8%A1&props=sitelinks/urls|datatype&format=json
+
+
+(This example is included as L<F<thai-url.pl>|https://api.metacpan.org/source/BKB/WWW-Wikipedia-LangTitles-0.03/examples/thai-url.pl> in the distribution.)
+
+
+If no language is specified, the default is C<en> for English.
+
+This method was added in version 0.02 of the module.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Locale::Codes>
+
+You may be able to convert the language codes to and from the language
+names using this module. (I have not tested it yet.)
+
+=back
+
+=head1 DEPENDENCIES
+
+=over
+
+=item Carp
+
+L<Carp> is used to report errors
+
+=item LWP::UserAgent
+
+L<LWP::UserAgent> is used to retrieve the data from Wikidata.
+
+=item JSON::Parse
+
+L<JSON::Parse> is used to parse the JSON data from Wikidata.
+
+=item URI::Escape
+
+L<URI::Escape> is used to make the URLs for Wikidata from the input
+titles.
+
+=back
+
+=head1 EXPORTS
+
+Nothing is exported by default. The export tag ':all' exports all the
+functions of the module.
+
+    use WWW::Wikipedia::LangTitles ':all';
+
+=head1 TESTING
+
+The default tests of the module do not attempt to connect to the
+internet.  To test using an internet connection, run F<xt/scrape.t>
+like this:
+
+    prove -I lib xt/scrape.t
+
+from the top directory of the distribution.
+
+=head1 HISTORY
+
+This module was a collection of small scripts I had been using to
+scrape multilingual article names related to physics from Wikipedia. I
+made the scripts into a CPAN module because I thought it could be
+useful to other people. Specifically, I used my scripts to add some
+Japanese element names to L<Chemistry::Elements>, and I thought this
+method might be useful for someone else.
+
+Version 0.02 added the L</make_wiki_url> for people who want to
+retrieve and parse the output themselves.
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2016
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

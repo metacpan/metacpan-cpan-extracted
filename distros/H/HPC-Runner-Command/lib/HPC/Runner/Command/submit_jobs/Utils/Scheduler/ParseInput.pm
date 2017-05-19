@@ -3,6 +3,7 @@ package HPC::Runner::Command::submit_jobs::Utils::Scheduler::ParseInput;
 use Moose::Role;
 use List::MoreUtils qw(natatime);
 use Storable qw(dclone);
+use Memoize;
 use Data::Dumper;
 
 =head1 HPC::Runner::App::Scheduler::ParseInput
@@ -90,11 +91,11 @@ sub check_for_commands {
     $self->reset_batch_counter;
 
     foreach my $key (@keys) {
-        next if $self->jobs->{$key}->count_cmds;
+        # next if $self->jobs->{$key}->count_cmds;
+        next if $self->jobs->{$key}->cmd_counter;
         delete $self->jobs->{$key};
         delete $self->graph_job_deps->{$key};
     }
-
 }
 
 =head3 process_lines
@@ -173,10 +174,14 @@ sub check_lines_add_cmd {
         my $oldjob = $self->jobname;
         $self->increase_jobname();
         $self->deps($oldjob);
+        # ?
+        # return
     }
 
     push( @{ $self->jobs->{ $self->jobname }->{cmds} }, $self->cmd )
         if $self->has_cmd;
+    # $self->jobs->{$self->jobname}->job_file->print($self->cmd) if $self->has_cmd;
+    $self->jobs->{$self->jobname}->inc_cmd_counter if $self->has_cmd;
 
     $self->inc_cmd_counter;
     $self->clear_cmd;
@@ -246,7 +251,7 @@ sub process_hpc_meta {
     return unless $line =~ m/^#HPC/;
     chomp($line);
 
-    my( $t1, $t2 ) = $self->parse_meta($line);
+    my( $t1, $t2 ) = parse_meta($line);
 
     if ( !$self->can($t1) ) {
         print "Option $t1 is an invalid option!\n";
@@ -293,10 +298,20 @@ sub apply_job_directives {
     $self->jobs->{ $self->jobname }->$t1($t2);
 }
 
+# sub parse_meta {
+#     my $self = shift;
+#     my $line = shift;
+#
+#     my ( @match, $t1, $t2 );
+#
+#     @match = $line =~ m/ (\w+)=(.+)$/;
+#     ( $t1, $t2 ) = ( $match[0], $match[1] );
+#
+#     return ( $t1, $2 );
+# }
+memoize('parse_meta');
 sub parse_meta {
-    my $self = shift;
     my $line = shift;
-
     my ( @match, $t1, $t2 );
 
     @match = $line =~ m/ (\w+)=(.+)$/;

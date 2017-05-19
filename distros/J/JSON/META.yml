@@ -23,4 +23,4 @@ requires:
   Test::More: '0'
 resources:
   repository: https://github.com/makamaka/JSON
-version: '2.92'
+version: '2.93'

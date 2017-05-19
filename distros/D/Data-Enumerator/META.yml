@@ -1,0 +1,32 @@
+---
+abstract: 'some iterator utilities for perl'
+author:
+  - 'Daichi Hiroki <hirokidaichi {at} gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.04'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Enumerator
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Data::Visitor::Lite: 0
+  Exporter: 0
+  IO::File: 0
+  List::MoreUtils: 0
+  Scalar::Util: 0
+resources:
+  homepage: https://github.com/hirokidaichi/p5-Data-Enumerator/tree
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/hirokidaichi/p5-Data-Enumerator.git
+version: 0.03

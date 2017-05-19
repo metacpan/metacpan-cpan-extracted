@@ -1,0 +1,30 @@
+---
+abstract: 'Coro based PSGI web server'
+author:
+  - 'Tatsuhiko Miyagawa'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.95'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Corona
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Coro: 0
+  Net::Server::Coro: 0.5
+  Plack: 0.99
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/miyagawa/Corona.git
+version: 0.1004

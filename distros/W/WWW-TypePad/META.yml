@@ -1,0 +1,30 @@
+---
+abstract: 'Client for the TypePad Platform'
+author:
+  - 'Benjamin Trott, Tatsuhiko Miyagawa and Martin Atkins <cpan@sixapart.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-TypePad
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Any::Moose: 0
+  JSON: 0
+  Net::OAuth::Simple: 1.4
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/sixapart/perl-typepad-api.git
+version: 0.4002

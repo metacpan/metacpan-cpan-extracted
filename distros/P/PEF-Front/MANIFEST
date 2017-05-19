@@ -2,6 +2,8 @@ Changes
 lib/PEF/Front.pm
 lib/PEF/Front/Ajax.pm
 lib/PEF/Front/Cache.pm
+lib/PEF/Front/Cache/FastMmap.pm
+lib/PEF/Front/Cache/Null.pm
 lib/PEF/Front/Captcha.pm
 lib/PEF/Front/Config.pm
 lib/PEF/Front/Connector.pm
@@ -26,6 +28,7 @@ lib/PEF/Front/Response.pm
 lib/PEF/Front/Route.pm
 lib/PEF/Front/SecureCaptcha.pm
 lib/PEF/Front/Session.pm
+lib/PEF/Front/Session/MLDBM.pm
 lib/PEF/Front/Validator.pm
 LICENSE
 Makefile.PL

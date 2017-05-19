@@ -13,11 +13,11 @@ Dancer2::Plugin::Tail - Tail a file from Dancer2
 
 =head1 VERSION
 
-Version 0.011
+Version 0.012
 
 =cut
 
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 
 
 =head1 SYNOPSIS
@@ -126,13 +126,13 @@ Default = '/tail/read'
 
 List of predefined files that can be tailed.
 
-=over 
+=over 4
 
 =item I<ID>
 
 Define a unique ID for this file
 
-=over 
+=over 4
 
 =item I<heading>
 
@@ -148,6 +148,9 @@ Full path and file name to tail.
 B<Note> that you B<must> have a session provider configured to dynamically tail files using this plugin.  This plugin requires sessions in order to track information about user defined tailed files for the logged in user.
 Please see L<Dancer2::Core::Session> for information on how to configure session management within your application.
 
+=back
+
+=back
 
 =head1 display_tail 
 
@@ -433,8 +436,7 @@ sub _tail_the_file {
       $output .= $line ;
     }
 
-    my $file_end = tell($IN);   # Figure out the end 
-                                                     #  of the file
+    my $file_end = tell($IN);   # Figure out the end of the file
     close($IN);
     $plugin->app->log( debug => "Returning JSON:" );
     $plugin->app->log( debug => "new_curr_pos " . $file_end);
@@ -456,19 +458,10 @@ sub _tail_the_file {
 # setup keywords
 plugin_keywords qw( define_file_to_tail );
 
-=back
-
-=back
-
 =head1 AUTHOR
 
 Hagop "Jack" Bilemjian, C<< <jck000 at gmail.com> >>
 
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-dancer2-plugin-tail at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dancer2-Plugin-Tail>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
 
@@ -539,6 +532,8 @@ YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
 CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
 CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
 
 =head1 SEE ALSO
  

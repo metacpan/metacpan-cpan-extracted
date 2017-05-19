@@ -1,0 +1,65 @@
+{
+   "abstract" : "static variables without namespace pollution",
+   "author" : [
+      "Andrew Main (Zefram) <zefram@fysh.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Lexical-Var",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0.15",
+            "Module::Build" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "conflicts" : {
+            "B::Hooks::OP::Check" : "< 0.19"
+         },
+         "requires" : {
+            "Lexical::SealRequireHints" : "0.006",
+            "XSLoader" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Lexical::Sub" : {
+         "file" : "lib/Lexical/Sub.pm",
+         "version" : "0.009"
+      },
+      "Lexical::Var" : {
+         "file" : "lib/Lexical/Var.pm",
+         "version" : "0.009"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.009"
+}

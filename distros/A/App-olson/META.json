@@ -1,0 +1,75 @@
+{
+   "abstract" : "query the Olson timezone database",
+   "author" : [
+      "Andrew Main (Zefram) <zefram@fysh.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-olson",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : 0,
+            "Test::More" : 0,
+            "perl" : "5.006",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : 0,
+            "perl" : "5.006",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Date::ISO8601" : 0,
+            "DateTime::TimeZone::Olson" : "0.003",
+            "DateTime::TimeZone::SystemV" : "0.002",
+            "DateTime::TimeZone::Tzfile" : "0.007",
+            "Getopt::Std" : "1.02",
+            "Params::Classify" : 0,
+            "Time::OlsonTZ::Data" : "0.201012",
+            "Time::Unix" : "1.02",
+            "integer" : 0,
+            "perl" : "5.006",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      }
+   },
+   "provides" : {
+      "App::olson" : {
+         "file" : "lib/App/olson.pm",
+         "version" : 0
+      },
+      "App::olson::LocalDateTime" : {
+         "file" : "lib/App/olson.pm",
+         "version" : 0
+      },
+      "App::olson::UtcDateTime" : {
+         "file" : "lib/App/olson.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://lake.fysh.org/zefram/App-olson.git"
+      }
+   },
+   "version" : "0.000"
+}

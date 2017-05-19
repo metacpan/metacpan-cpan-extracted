@@ -1,0 +1,40 @@
+---
+abstract: 'Mutual coercions for common type constraints of Moose'
+author:
+  - 'MORIYA Masaki, alias Gardejo <moriya at cpan dot org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Exception: 0.27
+  Test::More: 0
+  Test::Requires: 0
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: MooseX::Types::Moose::MutualCoercion
+name: MooseX-Types-Moose-MutualCoercion
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+recommends:
+  Regexp::Assemble: 0
+requires:
+  Class::Load: 0
+  Moose: 0.63
+  MooseX::Types: 0.19
+  MooseX::Types::Common: 0.001000
+  namespace::clean: 0.08
+  perl: 5.8.1
+resources:
+  homepage: http://github.com/gardejo/p5-moosex-types-moose-mutualcoercion
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/gardejo/p5-moosex-types-moose-mutualcoercion.git
+version: 0.04

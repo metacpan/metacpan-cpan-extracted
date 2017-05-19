@@ -1,0 +1,42 @@
+---
+abstract: 'Hard-coded replacements for perl-core/ dependencies and dependencies with odd names in Gentoo'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::File::ShareDir::Dist: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Gentoo-Util-VirtualDepend
+provides:
+  Gentoo::Util::VirtualDepend:
+    file: lib/Gentoo/Util/VirtualDepend.pm
+    version: '0.003023'
+recommends:
+  Moo: '1.000008'
+  Path::Tiny: '0.058'
+requires:
+  File::ShareDir: '0'
+  Module::CoreList: '5.20151213'
+  Moo: '0'
+  Path::Tiny: '0'
+  perl: '5.006'
+  strict: '0'
+  version: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Gentoo-Util-VirtualDepend/issues
+  homepage: https://github.com/kentnl/Gentoo-Util-VirtualDepend
+  repository: https://github.com/kentnl/Gentoo-Util-VirtualDepend.git
+version: '0.003023'

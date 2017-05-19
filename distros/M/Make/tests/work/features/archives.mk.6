@@ -1,0 +1,6 @@
+
+DIR = artest
+vpath % $(DIR)
+default: lib(foo)
+(%): %.vhd ; @cd $(DIR) && touch $(*F) && $(AR) $(ARFLAGS) $@ $(*F) >/dev/null 2>&1 && rm $(*F)
+.PHONY: default

@@ -1,0 +1,25 @@
+.cvsignore
+.gitignore
+Build.PL
+Changes
+lib/Test/FormValidator.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+misc/debug/test-syntax.t
+misc/debug/test-tbt.t
+misc/dist
+misc/makedocs.pl
+misc/style.css
+README
+t/00.load.t
+t/01-setup-methods.t
+t/02-params.t
+t/03-diag.t
+t/04-test-methods.t
+t/05-extract-fields.t
+t/06-html-ok.t
+t/pod-coverage.t
+t/pod.t
+t/testform.html
+TODO

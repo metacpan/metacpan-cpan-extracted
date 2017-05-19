@@ -1,0 +1,33 @@
+---
+abstract: 'API wrapper of Lymbix.'
+author:
+  - 'Omid Houshyar <ohoushyar@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-Lymbix
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Encode: 0
+  HTTP::Request: 6
+  JSON: 0
+  LWP::UserAgent: 6
+  Mouse: 0
+  Test::Most: 0.25
+resources:
+  bugtracker: https://github.com/ohoushyar/webservice-lymbix/issues
+  homepage: https://github.com/ohoushyar/webservice-lymbix
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/ohoushyar/webservice-lymbix
+version: 0.02

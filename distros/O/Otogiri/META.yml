@@ -11,9 +11,9 @@ build_requires:
   Test::Requires: '0'
   Test::Time: '0'
 configure_requires:
-  Module::Build::Tiny: '0.035'
+  Module::Build: '0.38'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.0, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,7 +36,7 @@ provides:
     file: lib/DBIx/Otogiri/Iterator.pm
   Otogiri:
     file: lib/Otogiri.pm
-    version: '0.17'
+    version: '0.18'
 requires:
   Class::Accessor::Lite: '0'
   DBIx::Sunny: '0'
@@ -47,7 +47,7 @@ resources:
   bugtracker: https://github.com/ytnobody/Otogiri/issues
   homepage: https://github.com/ytnobody/Otogiri
   repository: git://github.com/ytnobody/Otogiri.git
-version: '0.17'
+version: '0.18'
 x_contributors:
   - 'papix <mail@papix.net>'
   - 'ytnobody <ytnobody@ytnobody.net>'

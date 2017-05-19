@@ -1,0 +1,52 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Travis Chase, C<< <gaudeon@cpan.org> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 0.95, CPAN::Meta::Converter version 2.131490",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-View-Download",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Catalyst::Runtime" : "0",
+            "Catalyst::View" : "0",
+            "ExtUtils::MakeMaker" : "6.42",
+            "FindBin" : "0",
+            "Test::More" : "0",
+            "Test::WWW::Mechanize::Catalyst" : "0",
+            "Text::CSV" : "0",
+            "XML::Simple" : "0",
+            "ok" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {}
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.07"
+}

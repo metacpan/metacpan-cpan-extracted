@@ -1,5 +1,8 @@
 Revision history for JSON-Schema-ToJSON
 
+0.11  2017-05-18
+        - Update generic emulator for changes in Mojolicious::Plugin::OpenAPI
+
 0.10  2017-03-08
         - Fix tests for recent version of JSON::Validator
 

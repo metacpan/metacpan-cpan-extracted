@@ -12,7 +12,7 @@ our @EXPORT_OK = qw(
     encode_base32hex decode_base32hex
 );
 
-our $VERSION = "1.301";
+our $VERSION = "1.303";
 $VERSION = eval $VERSION;
 
 sub encode         { return encode_base32(@_) }
@@ -39,8 +39,7 @@ sub decode         { return decode_base32(@_) }
 sub decode_rfc3548 { return decode_base32(@_) }
 
 sub decode_base32 {
-    my $arg = shift;
-    return '' unless defined($arg);    # mimic MIME::Base64
+    my $arg = uc(shift || '');    # mimic MIME::Base64
 
     $arg =~ tr|A-Z2-7|\0-\37|;
     $arg = unpack('B*', $arg);
@@ -73,8 +72,7 @@ sub encode_base32hex {
 sub decode_09AV { return decode_base32hex(@_) }
 
 sub decode_base32hex {
-    my $arg = shift;
-    return '' unless defined($arg);    # mimic MIME::Base64
+    my $arg = uc(shift || '');    # mimic MIME::Base64
 
     $arg =~ tr|0-9A-V|\0-\37|;
     $arg = unpack('B*', $arg);
@@ -111,7 +109,7 @@ Prior to version 1.0, L<MIME::Base32> used the C<base32hex> (or C<[0-9A-V]>) enc
 decoding methods by default. If you need to maintain that behavior, please call
 C<encode_base32hex> or C<decode_base32hex> functions directly.
 
-Now, in accordance with L<RFC-3548, Section 6|https://tools.ietf.org/html/rfc3548#section-6>,
+Now, in accordance with L<RFC-3548, Section 5|https://tools.ietf.org/html/rfc3548#section-5>,
 L<MIME::Base32> uses the C<encode_base32> and C<decode_base32> functions by default.
 
 =head1 FUNCTIONS
@@ -185,7 +183,7 @@ the issue is already reported.
 
 Please report any bugs or feature requests to
 C<bug-mime-base32 at rt.cpan.org>, or through the web interface at
-L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=MIME-Base32>. 
+L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=MIME-Base32>.
 I will be notified, and then you'll automatically be notified of progress
 on your bug as I make changes.
 
@@ -226,6 +224,6 @@ modify it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<MIME::Base64>, L<RFC-3548|https://tools.ietf.org/html/rfc3548#section-6>
+L<MIME::Base64>, L<RFC-3548|https://tools.ietf.org/html/rfc3548#section-5>
 
 =cut

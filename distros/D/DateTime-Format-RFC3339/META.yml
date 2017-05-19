@@ -1,0 +1,30 @@
+---
+abstract: 'Parse and format RFC3339 datetime strings'
+author:
+  - 'Eric Brine <ikegami@adaelis.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.52
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.120351'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DateTime-Format-RFC3339
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DateTime: 0
+  strict: 0
+  version: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DateTime-Format-RFC3339
+  homepage: http://search.cpan.org/dist/DateTime-Format-RFC3339/
+  license: http://creativecommons.org/publicdomain/zero/1.0/
+  repository: https://github.com/ikegami/perl-DateTime-Format-RFC3339.git
+version: v1.2.0

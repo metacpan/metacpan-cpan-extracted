@@ -6,7 +6,7 @@ use warnings;
 use Carp;
 use Time::Piece;
 use WebService::Mackerel;
-use JSON::XS qw/decode_json/;
+use JSON::XS qw/decode_json encode_json/;
 
 sub new {
     my ( $class, %opt ) = @_;
@@ -46,6 +46,56 @@ sub output {
                 "time"   => $self->{now}->epoch,
                 "value"  => $metric,
             }]);
+        } else {
+            croak "Invalid metric type of mackerel: type=$metric_type";
+        }
+    };
+
+    my $content = eval { decode_json $res; };
+    if (chomp $@) {
+        carp "Failed mackerel post $metric_type metrics: err=$@, res=$res";
+        return;
+    }
+
+    my $is_success = $content->{success} || 0;
+    if ($is_success != JSON::true or $content->{error}) {
+        use Data::Dumper;
+        local $Data::Dumper::Terse  = 1;
+        local $Data::Dumper::Indent = 0;
+        carp "Failed mackerel post $metric_type metrics: res=" . Data::Dumper::Dumper($content);
+    }
+}
+
+sub bulk_output {
+    my ($self, $ret_pidstats) = @_;
+
+    my $metric_type = $self->{mackerel_metric_type};
+    my @request_stuffs;
+    # ex. backup_mysql => { cpu => 21.0 }
+    while (my ($program_name, $s) = each %$ret_pidstats) {
+        while (my ($metric_name, $metric) = each %$s) {
+            my $graph_name = sprintf("custom.%s%s.%s", $self->{mackerel_metric_key_prefix}, $metric_name, $program_name);
+            my %stuff = (
+                "name"  => $graph_name,
+                "time"  => $self->{now}->epoch,
+                "value" => $metric,
+                ($metric_type eq "host" ? (hostId => $self->{mackerel_host_id}) : ()),
+            );
+            push @request_stuffs, \%stuff;
+        }
+    }
+
+    if ($self->{dry_run}) {
+        printf "(dry_run) mackerel post: type=%s, time=%s, metric=%s\n",
+            $metric_type, $self->{now}->epoch, encode_json(\@request_stuffs);
+        return;
+    }
+
+    my $res = do {
+        if ($metric_type eq "service") {
+            $self->{mackerel}->post_service_metrics(\@request_stuffs)
+        } elsif ($metric_type eq "host") {
+            $self->{mackerel}->post_host_metrics(\@request_stuffs)
         } else {
             croak "Invalid metric type of mackerel: type=$metric_type";
         }

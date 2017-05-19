@@ -1,0 +1,20 @@
+.gitignore
+Build.PL
+Changes
+lib/Moose/Policy.pm
+lib/Moose/Policy/FollowPBP.pm
+lib/Moose/Policy/JavaAccessors.pm
+lib/Moose/Policy/SingleInheritence.pm
+MANIFEST			This list of files
+README
+t/000_load.t
+t/001_basic.t
+t/002_dynamic.t
+t/003_saidso.t
+t/010_FollowPBP_test.t
+t/011_JavaAccessors_test.t
+t/020_SingleInheritence_test.t
+t/pod.t
+t/pod_coverage.t
+Makefile.PL
+META.yml

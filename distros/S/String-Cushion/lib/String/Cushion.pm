@@ -3,8 +3,9 @@ use strict;
 use warnings;
 package String::Cushion;
 
-our $VERSION = '0.0100'; # VERSION
 # ABSTRACT: Vertically pad a string
+our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
+our $VERSION = '0.0200';
 
 1;
 
@@ -49,22 +50,21 @@ String::Cushion - Vertically pad a string
 
 
 
-=begin HTML
+=begin html
 
-<p><img src="https://img.shields.io/badge/perl-5.10.1+-brightgreen.svg" alt="Requires Perl 5.10.1+" /> <a href="https://travis-ci.org/Csson/p5-String-Cushion"><img src="https://api.travis-ci.org/Csson/p5-String-Cushion.svg?branch=master" alt="Travis status" /></a></p>
+<p>
+<img src="https://img.shields.io/badge/perl-5.10.1+-blue.svg" alt="Requires Perl 5.10.1+" />
+<a href="https://travis-ci.org/Csson/p5-String-Cushion"><img src="https://api.travis-ci.org/Csson/p5-String-Cushion.svg?branch=master" alt="Travis status" /></a>
+<a href="http://cpants.cpanauthors.org/release/CSSON/String-Cushion-0.0200"><img src="http://badgedepot.code301.com/badge/kwalitee/CSSON/String-Cushion/0.0200" alt="Distribution kwalitee" /></a>
+<a href="http://matrix.cpantesters.org/?dist=String-Cushion%200.0200"><img src="http://badgedepot.code301.com/badge/cpantesters/String-Cushion/0.0200" alt="CPAN Testers result" /></a>
+<img src="https://img.shields.io/badge/coverage-89.2%-orange.svg" alt="coverage 89.2%" />
+</p>
 
-=end HTML
-
-
-=begin markdown
-
-![Requires Perl 5.10.1+](https://img.shields.io/badge/perl-5.10.1+-brightgreen.svg) [![Travis status](https://api.travis-ci.org/Csson/p5-String-Cushion.svg?branch=master)](https://travis-ci.org/Csson/p5-String-Cushion)
-
-=end markdown
+=end html
 
 =head1 VERSION
 
-Version 0.0100, released 2015-05-31.
+Version 0.0200, released 2017-05-18.
 
 =head1 SYNOPSIS
 
@@ -137,7 +137,7 @@ Erik Carlsson <info@code301.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Erik Carlsson <info@code301.com>.
+This software is copyright (c) 2016 by Erik Carlsson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

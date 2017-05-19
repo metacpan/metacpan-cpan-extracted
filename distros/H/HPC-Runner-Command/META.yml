@@ -37,6 +37,7 @@ requires:
   Cwd: '0'
   DBM::Deep: '0'
   Data::Dumper: '0'
+  Data::Structure::Util: '0'
   DateTime: '0'
   DateTime::Format::Duration: '0'
   File::Basename: '0'
@@ -58,9 +59,11 @@ requires:
   JSON::XS: '0'
   List::MoreUtils: '0'
   List::Uniq: '0'
+  List::Util: '0'
   Log::Log4perl: '0'
   MCE: '0'
   MCE::Queue: '0'
+  Memoize: '0'
   Moose: '0'
   Moose::Role: '0'
   Moose::Util::TypeConstraints: '0'
@@ -92,7 +95,7 @@ resources:
   bugtracker: https://github.com/biosails/HPC-Runner-Command/issues
   homepage: https://github.com/biosails/HPC-Runner-Command
   repository: https://github.com/biosails/HPC-Runner-Command.git
-version: 3.1.5
+version: 3.1.7
 x_contributors:
   - 'Travis CI <nobody@nobody.org>'
 x_serialization_backend: 'YAML::Tiny version 1.69'

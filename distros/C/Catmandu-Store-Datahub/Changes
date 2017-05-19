@@ -1,4 +1,10 @@
 Revision history for Catmandu-Store-Datahub
 
+0.03  2017-05-19 10:36:27 CEST
+        - API refactoring
+
+0.02  2017-01-04 14:42:29 UTC
+	- Added documentation
+
 0.01  2016-12-08 12:32:11 CET
         - Initial release

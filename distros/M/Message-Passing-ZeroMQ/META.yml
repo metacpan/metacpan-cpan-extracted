@@ -1,0 +1,38 @@
+---
+abstract: 'input and output messages to ZeroMQ.'
+author:
+  - 'Tomas (t0m) Doran <bobtfish@bobtfish.net>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: agpl_3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Message::Passing::ZeroMQ
+name: Message-Passing-ZeroMQ
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  AnyEvent: 0
+  File::pushd: 0
+  Message::Passing: '0.011'
+  Moo: '0.091011'
+  MooX::Types::MooseLike: 0
+  POSIX::AtFork: '0.02'
+  Sub::Name: 0
+  Task::Weaken: 0
+  Try::Tiny: 0
+  ZMQ::FFI: 0
+  namespace::clean: 0
+resources:
+  repository: git://github.com/suretec/Message-Passing-ZeroMQ.git
+version: '0.010'
+x_authority: cpan:GHENRY

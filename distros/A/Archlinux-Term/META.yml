@@ -1,0 +1,24 @@
+---
+abstract: 'Print messages to the terminal in Archlinux style'
+author:
+  - 'Justin Davis <juster at cpan dot org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Archlinux-Term
+provides:
+  Archlinux::Term:
+    file: lib/Archlinux/Term.pm
+    version: 0.03
+requires:
+  Term::ANSIColor: 0
+  Text::Wrap: 0
+resources:
+  repository: http://github.com/juster/perl-archlinux-term
+version: 0.03

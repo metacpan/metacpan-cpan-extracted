@@ -1,0 +1,32 @@
+---
+abstract: "Run and parse 'nm' command output with filter callbacks"
+author:
+  - 'Olivier Mengué <dolmen@cpan.org>'
+build_requires:
+  File::Spec: 0
+  Locale::Maketext: 1.17
+  Module::Build: 0.38
+  Test::More: 0.94
+  Test::NoWarnings: 1.00
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110580'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Parse-nm
+provides:
+  Parse::nm:
+    file: lib/Parse/nm.pm
+    version: 0.09
+requires:
+  Regexp::Assemble: 0.34
+  String::ShellQuote: 1.04
+  perl: 5.006
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Parse-nm
+  homepage: http://github.com/dolmen/parse-nm
+  repository: http://github.com/dolmen/parse-nm.git
+version: 0.09

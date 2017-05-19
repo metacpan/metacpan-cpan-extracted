@@ -1,0 +1,16 @@
+.gitignore
+ChangeLog
+COPYING
+lib/FCGI/ProcManager.pm
+lib/FCGI/ProcManager/Constrained.pm
+Makefile.old
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/exporter.t
+t/procmanager.t
+t/procmanager_constrained.pm
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

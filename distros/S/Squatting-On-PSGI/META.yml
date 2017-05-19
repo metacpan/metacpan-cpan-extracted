@@ -1,0 +1,29 @@
+---
+abstract: 'Run Squatting app on PSGI'
+author:
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net> (original author)'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Squatting-On-PSGI
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Filter::Util::Call: 0
+  Plack::Request: 0
+  Squatting: 0.81
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/beppu/Squatting-On-PSGI.git
+version: 0.06

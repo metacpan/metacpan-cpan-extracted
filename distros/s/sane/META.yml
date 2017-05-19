@@ -1,0 +1,24 @@
+---
+abstract: 'provide sane default pragmas'
+author:
+  - 'punytan <punytan@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.02'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: sane
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/punytan/p5-sane.git
+version: 0.99

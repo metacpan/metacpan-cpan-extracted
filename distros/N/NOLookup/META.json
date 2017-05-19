@@ -27,16 +27,30 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.008001"
+            "Data::Dumper" : "0",
+            "Encode" : "0",
+            "IO::Socket" : "0",
+            "JSON" : "0",
+            "URI::Encode" : "0",
+            "WWW::Mechanize" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.06",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "1.07",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

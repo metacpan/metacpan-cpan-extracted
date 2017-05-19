@@ -6,7 +6,7 @@ use Mojo::JSON;
 use Mojo::Util 'deprecated';
 use constant DEBUG => $ENV{MOJO_OPENAPI_DEBUG} || 0;
 
-our $VERSION = '1.15';
+our $VERSION = '1.16';
 my $X_RE = qr{^x-};
 
 has _validator => sub { JSON::Validator::OpenAPI::Mojolicious->new; };
@@ -123,6 +123,8 @@ sub _before_render {
     $args->{data}   = $self->{renderer}
       ->($c, {errors => [{message => 'Not implemented.', path => '/'}], status => 501});
   }
+
+  $args->{status} = $c->stash('status') // $args->{status};
 }
 
 sub _helper_spec {

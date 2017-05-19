@@ -11,7 +11,7 @@ Module::Install::ReadmeMarkdownFromPod - create README.mkdn from POD
 
 # DESCRIPTION
 
-[Module::Install::ReadmeMarkdownFromPod](http://search.cpan.org/search?mode=module&query=Module::Install::ReadmeMarkdownFromPod) is a [Module::Install](http://search.cpan.org/search?mode=module&query=Module::Install) extension
+[Module::Install::ReadmeMarkdownFromPod](https://metacpan.org/pod/Module::Install::ReadmeMarkdownFromPod) is a [Module::Install](https://metacpan.org/pod/Module::Install) extension
 that generates a `README.mkdn` file automatically from an indicated file
 containing POD whenever the author runs `Makefile.PL`. This file is used by
 GitHub to display nicely formatted information about a repository.
@@ -20,60 +20,60 @@ GitHub to display nicely formatted information about a repository.
 
 - `readme_markdown_from`
 
-Does nothing on the user-side. On the author-side it will generate a
-`README.mkdn` file using [Pod::Markdown](http://search.cpan.org/search?mode=module&query=Pod::Markdown) from the POD in the file passed as
-a parameter.
+    Does nothing on the user-side. On the author-side it will generate a
+    `README.mkdn` file using [Pod::Markdown](https://metacpan.org/pod/Pod::Markdown) from the POD in the file passed as
+    a parameter.
 
-    readme_markdown_from 'lib/Some/Module.pm';
+        readme_markdown_from 'lib/Some/Module.pm';
 
-If a second parameter is set to a true value then the `README.mkdn` will be
-removed at `make distclean`.
+    If a second parameter is set to a true value then the `README.mkdn` will be
+    removed at `make distclean`.
 
-    readme_markdown_from 'lib/Some/Module.pm' => 'clean';
+        readme_markdown_from 'lib/Some/Module.pm' => 'clean';
 
-It will die unless a file name is given.
+    It will die unless a file name is given.
 
 - `readme_markdown_from_pod`
 
-Like `readme_markdown_from` but assumes that `all_from` has been called
-before and uses the filename stored there to generate the `README.mkdn`. It
-then calls `readme_markdown_from` with that filename. If this function is
-given an optional boolean parameter, that will be passed to
-`readme_markdown_from` as well, indicating whether to clean up the generated
-`README.mkdn` file at `make distclean` time.
+    Like `readme_markdown_from` but assumes that `all_from` has been called
+    before and uses the filename stored there to generate the `README.mkdn`. It
+    then calls `readme_markdown_from` with that filename. If this function is
+    given an optional boolean parameter, that will be passed to
+    `readme_markdown_from` as well, indicating whether to clean up the generated
+    `README.mkdn` file at `make distclean` time.
 
 - `readme_from_pod`
 
-Like `readme_markdown_from_pod`, but affects the plain-text `README` file
-generation done in [Module::Install::ReadmeFromPod](http://search.cpan.org/search?mode=module&query=Module::Install::ReadmeFromPod). This function would be
-better placed in that module and might move there eventually. It is given here
-as a convenience because if you want to generate both `README` and
-`README.mkdn` you can do this here without repeating the filename given in
-`all_from`.
+    Like `readme_markdown_from_pod`, but affects the plain-text `README` file
+    generation done in [Module::Install::ReadmeFromPod](https://metacpan.org/pod/Module::Install::ReadmeFromPod). This function would be
+    better placed in that module and might move there eventually. It is given here
+    as a convenience because if you want to generate both `README` and
+    `README.mkdn` you can do this here without repeating the filename given in
+    `all_from`.
 
 - `reference_module`
 
-A utility function that saves you from repeatedly naming a reference module
-from which to extract information.
+    A utility function that saves you from repeatedly naming a reference module
+    from which to extract information.
 
-    reference_module 'lib/Some/Module.pm';
+        reference_module 'lib/Some/Module.pm';
 
-is equivalent to:
+    is equivalent to:
 
-    all_from 'lib/Some/Module.pm';
-    readme_from 'lib/Some/Module.pm';
-    readme_markdown_from 'lib/Some/Module.pm';
+        all_from 'lib/Some/Module.pm';
+        readme_from 'lib/Some/Module.pm';
+        readme_markdown_from 'lib/Some/Module.pm';
 
-It will die unless a file name is given. Note that `reference_module` will
-not work with [Shipit::Step::FindVersion](http://search.cpan.org/search?mode=module&query=Shipit::Step::FindVersion) because that module is looking for
-a `version_from` or `all_from` string in `Makefile.PL`
+    It will die unless a file name is given. Note that `reference_module` will
+    not work with [Shipit::Step::FindVersion](https://metacpan.org/pod/Shipit::Step::FindVersion) because that module is looking for
+    a `version_from` or `all_from` string in `Makefile.PL`
 
 # BUGS AND LIMITATIONS
 
 No bugs have been reported.
 
 Please report any bugs or feature requests through the web interface at
-<http://rt.cpan.org>.
+[http://rt.cpan.org](http://rt.cpan.org).
 
 # INSTALLATION
 
@@ -82,30 +82,30 @@ See perlmodinstall for information and options on installing Perl modules.
 # AVAILABILITY
 
 The latest version of this module is available from the Comprehensive Perl
-Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a CPAN site
+Archive Network (CPAN). Visit [http://www.perl.com/CPAN/](http://www.perl.com/CPAN/) to find a CPAN site
 near you. Or see
-<http://search.cpan.org/dist/Module-Install-ReadmeMarkdownFromPod/>.
+[http://search.cpan.org/dist/Module-Install-ReadmeMarkdownFromPod/](http://search.cpan.org/dist/Module-Install-ReadmeMarkdownFromPod/).
 
 The development version lives at
-<http://github.com/hanekomu/module-install-readmemarkdownfrompod/>.  Instead
+[http://github.com/hanekomu/module-install-readmemarkdownfrompod/](http://github.com/hanekomu/module-install-readmemarkdownfrompod/).  Instead
 of sending patches, please fork this project using the standard git and github
 infrastructure.
 
 # AUTHORS
 
-Marcel Gr&uuml;nauer, `<marcel@cpan.org>`
+Marcel Grünauer, `<marcel@cpan.org>`
 
 # COPYRIGHT AND LICENSE
 
-Copyright 2009 by Marcel Gr&uuml;nauer
+Copyright 2009 by Marcel Grünauer
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 # SEE ALSO
 
-[Pod::Markdown](http://search.cpan.org/search?mode=module&query=Pod::Markdown)
+[Pod::Markdown](https://metacpan.org/pod/Pod::Markdown)
 
-[Module::Install](http://search.cpan.org/search?mode=module&query=Module::Install)
+[Module::Install](https://metacpan.org/pod/Module::Install)
 
-[Module::Install::ReadmeFromPod](http://search.cpan.org/search?mode=module&query=Module::Install::ReadmeFromPod)
+[Module::Install::ReadmeFromPod](https://metacpan.org/pod/Module::Install::ReadmeFromPod)

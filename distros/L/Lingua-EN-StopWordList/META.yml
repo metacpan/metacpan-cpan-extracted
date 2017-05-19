@@ -1,0 +1,28 @@
+---
+abstract: 'A sorted list of English stop words'
+author:
+  - 'Ron Savage (ron@savage.net.au)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-EN-StopWordList
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: '1.001014'
+  Test::Pod: '1.48'
+  strict: '1.04'
+  warnings: '1.12'
+resources:
+  license: http://opensource.org/licenses/Artistic-2.0
+  repository: https://github.com/ronsavage/Lingua-EN-StopWordList.git
+version: '1.02'

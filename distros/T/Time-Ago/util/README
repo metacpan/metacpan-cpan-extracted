@@ -1,0 +1,12 @@
+Locale::TextDomain tutorial:
+http://justatheory.com/computers/programming/perl/modules/dist-zilla-localetextdomain.html
+
+To create translation file for German:
+> dzil msg-init de
+Created po/de.po.
+
+Edit de.po as needed
+
+If ruby yaml translation available:
+  ./util/ruby-i18n-to-gettext /tmp/de.yml po/de.po > /tmp/new-de.po
+  # take a look a new-de.po and overwrite po/de.po if it looks good

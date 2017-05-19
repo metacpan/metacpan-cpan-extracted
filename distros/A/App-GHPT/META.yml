@@ -26,43 +26,43 @@ name: App-GHPT
 provides:
   App::GHPT:
     file: lib/App/GHPT.pm
-    version: '1.000002'
+    version: '1.000003'
   App::GHPT::Types:
     file: lib/App/GHPT/Types.pm
-    version: '1.000002'
+    version: '1.000003'
   App::GHPT::WorkSubmitter:
     file: lib/App/GHPT/WorkSubmitter.pm
-    version: '1.000002'
+    version: '1.000003'
   App::GHPT::WorkSubmitter::AskPullRequestQuestions:
     file: lib/App/GHPT/WorkSubmitter/AskPullRequestQuestions.pm
-    version: '1.000002'
+    version: '1.000003'
   App::GHPT::WorkSubmitter::ChangedFiles:
     file: lib/App/GHPT/WorkSubmitter/ChangedFiles.pm
-    version: '1.000002'
+    version: '1.000003'
   App::GHPT::WorkSubmitter::ChangedFilesFactory:
     file: lib/App/GHPT/WorkSubmitter/ChangedFilesFactory.pm
-    version: '1.000002'
+    version: '1.000003'
   App::GHPT::WorkSubmitter::Role::FileInspector:
     file: lib/App/GHPT/WorkSubmitter/Role/FileInspector.pm
-    version: '1.000002'
+    version: '1.000003'
   App::GHPT::WorkSubmitter::Role::Question:
     file: lib/App/GHPT/WorkSubmitter/Role/Question.pm
-    version: '1.000002'
+    version: '1.000003'
   App::GHPT::Wrapper::OurMoose:
     file: lib/App/GHPT/Wrapper/OurMoose.pm
-    version: '1.000002'
+    version: '1.000003'
   App::GHPT::Wrapper::OurMoose::Role:
     file: lib/App/GHPT/Wrapper/OurMoose/Role.pm
-    version: '1.000002'
+    version: '1.000003'
   App::GHPT::Wrapper::OurMooseX::Role::Parameterized:
     file: lib/App/GHPT/Wrapper/OurMooseX/Role/Parameterized.pm
-    version: '1.000002'
+    version: '1.000003'
   App::GHPT::Wrapper::OurMooseX::Role::Parameterized::Meta::Trait::Parameterizable::Strict:
     file: lib/App/GHPT/Wrapper/OurMooseX/Role/Parameterized/Meta/Trait/Parameterizable/Strict.pm
-    version: '1.000002'
+    version: '1.000003'
   App::GHPT::Wrapper::Ourperl:
     file: lib/App/GHPT/Wrapper/Ourperl.pm
-    version: '1.000002'
+    version: '1.000003'
 requires:
   File::HomeDir: '0'
   FindBin: '0'
@@ -71,7 +71,6 @@ requires:
   Import::Into: '0'
   Lingua::EN::Inflect: '0'
   List::AllUtils: '0'
-  List::Gather: '0'
   List::Util: '1.44'
   Module::Pluggable::Object: '0'
   Moose: '0'
@@ -108,10 +107,10 @@ resources:
   bugtracker: https://github.com/maxmind/App-GHPT/issues
   homepage: http://metacpan.org/release/App-GHPT
   repository: git://github.com/maxmind/App-GHPT.git
-version: '1.000002'
+version: '1.000003'
 x_Dist_Zilla:
   perl:
-    version: '5.024001'
+    version: '5.022001'
   plugins:
     -
       class: Dist::Zilla::Plugin::MakeMaker
@@ -139,7 +138,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@MAXMIND/Git::GatherDir'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@MAXMIND/ManifestSkip'
@@ -191,14 +190,14 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GitHub::Meta
       name: '@MAXMIND/GitHub::Meta'
-      version: '0.43'
+      version: '0.44'
     -
       class: Dist::Zilla::Plugin::GitHub::Update
       config:
         Dist::Zilla::Plugin::GitHub::Update:
           metacpan: 1
       name: '@MAXMIND/GitHub::Update'
-      version: '0.43'
+      version: '0.44'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: '@MAXMIND/MetaResources'
@@ -219,7 +218,7 @@ x_Dist_Zilla:
           inherit_version: '1'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000031'
+          Module::Metadata: '1.000026'
           version: '0.004'
       name: '@MAXMIND/MetaProvides::Package'
       version: '2.004003'
@@ -425,7 +424,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@MAXMIND/Test::ReportPrereqs'
-      version: '0.025'
+      version: '0.027'
     -
       class: Dist::Zilla::Plugin::Test::Version
       name: '@MAXMIND/Test::Version'
@@ -438,13 +437,13 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          'git --version': 2.11.0
+          git_version: 2.13.0
           include_authors: 0
           include_releaser: 1
           order_by: name
           paths: []
       name: '@MAXMIND/Git::Contributors'
-      version: '0.029'
+      version: '0.030'
     -
       class: Dist::Zilla::Plugin::SurgicalPodWeaver
       config:
@@ -603,7 +602,7 @@ x_Dist_Zilla:
           finder:
             - ':InstallModules'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000031'
+          Module::Metadata: '1.000026'
           version: '0.004'
       name: '@MAXMIND/CheckSelfDependency'
       version: '0.011'
@@ -619,7 +618,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::MAXMIND::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.11.0
+          git_version: 2.13.0
           repo_root: .
       name: '@MAXMIND/MAXMIND::Git::CheckFor::CorrectBranch'
       version: '0.80'
@@ -627,7 +626,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.11.0
+          git_version: 2.13.0
           repo_root: .
       name: '@MAXMIND/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -656,10 +655,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.11.0
+          git_version: 2.13.0
           repo_root: .
       name: '@MAXMIND/Git::Check'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -678,12 +677,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.11.0
+          git_version: 2.13.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@MAXMIND/Commit generated files'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -691,16 +690,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.000002
+          tag: v1.000003
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.11.0
+          git_version: 2.13.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@MAXMIND/Git::Tag'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -709,10 +708,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.11.0
+          git_version: 2.13.0
           repo_root: .
       name: '@MAXMIND/Git::Push'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease
       config:
@@ -738,12 +737,12 @@ x_Dist_Zilla:
             - (?^:.+)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.11.0
+          git_version: 2.13.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@MAXMIND/Commit version bump'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -752,10 +751,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.11.0
+          git_version: 2.13.0
           repo_root: .
       name: '@MAXMIND/Push version bump'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
@@ -807,5 +806,6 @@ x_Dist_Zilla:
     version: '6.009'
 x_authority: cpan:MAXMIND
 x_contributors:
+  - 'Greg Oschwald <goschwald@maxmind.com>'
   - 'Mark Fowler <mfowler@maxmind.com>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

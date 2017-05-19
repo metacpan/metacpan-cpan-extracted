@@ -1,0 +1,54 @@
+NAME
+    HTML::DateSelector - Generate HTML for date selector.
+
+SYNOPSIS
+        use HTML::DateSelector;
+        HTML::DateSelector->ymd('start_on');
+
+DESCRIPTION
+    generate HTML for date selector.
+
+CLASS METHODS
+  ymd
+  ym
+        my $html = HTML::DateSelector->ymd('start_on');
+        my $html = HTML::DateSelector->ym('start_on');
+
+    date selector.
+
+    ymd => year, month, day. ym => year, month.
+
+  year
+        my $html = HTML::DateSelector->year('start_on');
+        my $html = HTML::DateSelector->year('start_on', {start_on => 2000, end_on => 2005});
+
+    Year selector.You can set the span of year.
+
+  month
+  day
+  hour
+  minute
+      my $html = HTML::DateSelector->hour('start_on');
+      my $html = HTML::DateSelector->minute('start_on');
+      # and...
+
+    primitive selector.month, day, hour, minute.
+
+OPTIONS
+  include_blank
+    you can select the blank.
+
+AUTHOR
+    Tokuhiro Matsuno "<tokuhirom @__at__ gmail.com>"
+
+SEE ALSO
+    <http://dev.rubyonrails.org/browser/trunk/actionpack/lib/action_view/hel
+    pers/date_helper.rb>
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2006, Tokuhiro Matsuno "<tokuhiro __at__
+    mobilefactory.jp>". All rights reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Ruby on Rails itself.
+

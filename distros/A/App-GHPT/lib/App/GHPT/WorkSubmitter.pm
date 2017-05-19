@@ -2,7 +2,7 @@ package App::GHPT::WorkSubmitter;
 
 use App::GHPT::Wrapper::OurMoose;
 
-our $VERSION = '1.000002';
+our $VERSION = '1.000003';
 
 use App::GHPT::Types qw( ArrayRef Bool PositiveInt Str );
 use App::GHPT::WorkSubmitter::AskPullRequestQuestions;

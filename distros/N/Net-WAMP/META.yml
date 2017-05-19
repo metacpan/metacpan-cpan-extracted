@@ -1,0 +1,38 @@
+---
+abstract: 'Support for Web Application Messaging Protocol (“WAMP”)'
+author:
+  - 'Felipe Gasper'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Slurp: '0'
+  File::Temp: '0'
+  Hash::Merge: '0'
+  JSON: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+  Test::Simple: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-WAMP
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Module::Load: '0'
+  Try::Tiny: '0'
+  Types::Serialiser: '0'
+  X::Tiny: '0.02'
+  autodie: '0'
+  parent: '0'
+  perl: '5.014'
+resources:
+  repository: https://github.com/FGasper/p5-Net-WAMP.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

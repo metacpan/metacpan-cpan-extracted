@@ -1,0 +1,56 @@
+{
+   "abstract" : "Render tables in manifold styles",
+   "author" : [
+      "Ron Savage <ron@savage.net.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-Table-Manifold",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "1.001006"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.421"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Const::Exporter" : "v0.2.3",
+            "HTML::Entities::Interpolate" : "1.05",
+            "List::AllUtils" : "0.08",
+            "Module::Runtime" : "0.014",
+            "Moo" : "1.006",
+            "Types::Standard" : "1.000004",
+            "Unicode::GCString" : "2013.1",
+            "open" : "0",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Text::Table::Manifold" : {
+         "file" : "lib/Text/Table/Manifold.pm",
+         "version" : "1.00"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ]
+   },
+   "version" : "1.00"
+}

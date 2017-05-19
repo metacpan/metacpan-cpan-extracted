@@ -1,0 +1,20 @@
+.gitignore
+Build.PL
+Changes
+lib/Proc/Class.pm
+lib/Proc/Class/Status.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00_compile.t
+xt/010_basic/001_corelist.t
+xt/010_basic/002_ls.t
+xt/010_basic/003_env.t
+xt/01_podspell.t
+xt/020_perl/001_signaled.t
+xt/02_perlcritic.t
+xt/03_pod.t
+xt/04_minimum_version.t
+xt/05_cpan_meta.t

@@ -1,0 +1,93 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 adc3bbca9a52e94ff1607402a258fc2724e51556 .gitignore
+SHA1 8addaffa153b31ee79b66685a0bd4daea5a512d9 Build.PL
+SHA1 b0e6ffb83e2694aed5110b47fff08b30a4d5e56a Changes
+SHA1 6505652e6bc6c477ba65b147ed592bba8147b260 MANIFEST
+SHA1 25fd41fa6c36aec741eb84d7cc523ec31eb90e36 META.json
+SHA1 70c9bbc1e656954f11a4f4880f27d2696def9bc6 META.yml
+SHA1 0bfa106a64fc680e40507c47cbf461cea3a8b374 Makefile.PL
+SHA1 16e549a21f5873dbc766cb7a7bf71bb88cf20e77 README
+SHA1 d6d227db087b2bdd2c710570c8bb3482c52ef9e7 lib/Lexical/Sub.pm
+SHA1 f7e78bd8fe2bb6da687fde09fb23d8316ed3c245 lib/Lexical/Var.pm
+SHA1 e2312189096e37c00cbca5d541f49f689277a811 lib/Lexical/Var.xs
+SHA1 64e26cf6927950fbdd693740517028d855556cf5 t/array_ident.t
+SHA1 2bde4d5fec320632bf2bd609746a7d9e37ca54c7 t/array_ops.t
+SHA1 123cb81bbfaa745b664b4e91e53479843590835a t/array_scope.t
+SHA1 1bd14737a66c5c928e3623d86df39a8d1e3a7e8d t/array_type.t
+SHA1 bec91828956addb9760482700b83bcf76721ed7e t/array_write.t
+SHA1 b77592056c0eb1627a2eadcfd14ec49e6f98609c t/code_0.pm
+SHA1 fb4de8af68a858176ba2ad1f43ac86f3af383ec0 t/code_1.pm
+SHA1 53219d481b83de70ef66cac5e21488a731a96420 t/code_2.pm
+SHA1 716352815b6196af50f29868d8cbdb9e945f697e t/code_3.pm
+SHA1 31356e0540b696cfbaca328e598e50283e0009fc t/code_4.pm
+SHA1 5ac5b6044e3d96cb4441f9028b1aaa0812d7af9d t/code_bare.t
+SHA1 0186e0cb496b2593198991b0640fe58ae0a28ac0 t/code_bare_no.t
+SHA1 053b49e5b95dcc078642659cccfd03d6b4919fc8 t/code_const.t
+SHA1 18e88d9ae7442cd50e8f54344a79040822c4cc2f t/code_ident.t
+SHA1 df56cf4ed4f1d2ec8815704b8255b1d3ac508473 t/code_ops.t
+SHA1 b0dbd755fe57b68b0f3ed8eda55011613646e17f t/code_scope.t
+SHA1 0c63e18d595ff20739d5589e300102a432d99ad9 t/code_type.t
+SHA1 2ee4ff49e19f0c4a47a08c57922c06105d6edeb4 t/error.t
+SHA1 ae53df4b2a30224eb1a9bb518b2ed0109825695f t/glob_ident.t
+SHA1 e15cbe5dbdbd9d7db8be4b805fab7d0bbb78a397 t/glob_scope.t
+SHA1 6cf0ce40972fbf190b5a8b84dc546924707d39cd t/glob_type.t
+SHA1 45627b7e9ce8ccd77decead65890c374d26e3799 t/glob_write.t
+SHA1 14647107f7690cc1652ab1b96f5ee0296bcac8b4 t/hash_ident.t
+SHA1 d586e58d750831e3be0b071d24785da18262e1f3 t/hash_ops.t
+SHA1 1a032e6cecdef1f608190da88b9c574d5a1e010d t/hash_scope.t
+SHA1 0c1bb92ef70cb600a14ffd51e126778dae26e33b t/hash_type.t
+SHA1 e546e3b033fbc3a9ea708fb99a46696bd54d4df3 t/hash_write.t
+SHA1 494afeb406508632cddd98f2af97e09efcf4b93a t/once.t
+SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
+SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
+SHA1 c683d9b6b1d4f3a207f4cbeff67e4be60c4187e5 t/scalar_0.pm
+SHA1 9c9ca0731ddb0d4278a9834c36c09548e2d945c8 t/scalar_0n.pm
+SHA1 b7906d0ece01fe3c61e30c17a6d0adcb8d39f0c3 t/scalar_1.pm
+SHA1 63baa907ce673f4a3fa116f803ff4e94614c39c3 t/scalar_2.pm
+SHA1 100db668daa0c393a5ac9dbd2d82396c612e773f t/scalar_3.pm
+SHA1 768295f751ce394aa9596c1fcb5365beaddfaf30 t/scalar_4.pm
+SHA1 c1ec53a6228ecbd90700027b0e1e4722699006c6 t/scalar_4n.pm
+SHA1 fe215249573bb2a05ff10620d53f64523e674856 t/scalar_const.t
+SHA1 960a624049e01853c386860f2c2c8d273d99ca95 t/scalar_ident.t
+SHA1 5ae0f031950c25d75d3e58e977fd8f9c8f26f66a t/scalar_scope.t
+SHA1 f69657000aaa518075c24abdbec073d02c399254 t/scalar_type.t
+SHA1 7ca93a0e42cb706524a9e21c9eec4bcd36e8c734 t/scalar_write.t
+SHA1 8ddc45ba416c6df3a7d0e3aca8650e01a7063867 t/setup_c_4.pm
+SHA1 ed80d2ffb1eb797de2b426a7bf13d86818113d53 t/setup_c_5.pm
+SHA1 5467748d279c618121b3a053369f5145c61a932a t/setup_c_6.pm
+SHA1 71ba17e14e105459dbb5b7ee58b92ce90a8d1d7a t/setup_c_7.pm
+SHA1 8e03d77b77d87f7091d646cec92777aebcc44e6b t/setup_code.t
+SHA1 fbc2feacfadd5535a8b43bd598a91cbac3d95bc4 t/setup_s_4.pm
+SHA1 739e4ba1b6fe5b32000325d9161e3a4f42a8d161 t/setup_s_5.pm
+SHA1 1986a8ff907a30ba2f4c45d9418479c48ae6ee4b t/setup_s_6.pm
+SHA1 3bc1b399ba8d2c685daf9ecf54c4d853e653a46c t/setup_s_7.pm
+SHA1 32bf0926e3b16080814b9f2848d2b05ba87fbd56 t/setup_scalar.t
+SHA1 ddbcd41204c0768c82c737d0b78d34c2de5ea571 t/sub_bare.t
+SHA1 ab806ade319bd0642d7a42f08d4111a7cdc1678b t/sub_bare_no.t
+SHA1 0e7727bc9ab76de5ba48193e8b64e1d15dc6cfd2 t/sub_const.t
+SHA1 964c030d2e3027c34aa2ec5cc2430d37b22d2ad7 t/sub_ident.t
+SHA1 56612eaff4167f446b632f19f2f850a7870878c7 t/sub_ops.t
+SHA1 895f36f916e009afdee45f51a1d39e6963c828cb t/sub_scope.t
+SHA1 aefdb2e8019f6beaa52dc49bbad30fd7d58b0be6 t/sub_type.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iEYEARECAAYFAlIaUjYACgkQOV9mt2VyAVF5dQCgqXIVngcUyhGknKz3Bgiwpu9m
+2/wAoI2JChYOrr6fsFWGafJMuqudJhCw
+=qLvX
+-----END PGP SIGNATURE-----

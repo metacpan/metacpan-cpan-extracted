@@ -27,7 +27,6 @@ my %WriteMakefileArgs = (
     "Import::Into" => 0,
     "Lingua::EN::Inflect" => 0,
     "List::AllUtils" => 0,
-    "List::Gather" => 0,
     "List::Util" => "1.44",
     "Module::Pluggable::Object" => 0,
     "Moose" => 0,
@@ -72,7 +71,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.96",
     "Test::Output" => 0
   },
-  "VERSION" => "1.000002",
+  "VERSION" => "1.000003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -90,7 +89,6 @@ my %FallbackPrereqs = (
   "Import::Into" => 0,
   "Lingua::EN::Inflect" => 0,
   "List::AllUtils" => 0,
-  "List::Gather" => 0,
   "List::Util" => "1.44",
   "Module::Pluggable::Object" => 0,
   "Moose" => 0,

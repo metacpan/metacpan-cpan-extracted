@@ -18,11 +18,11 @@ CGI::Untaint::Facebook - Validate a string is a valid Facebook URL or ID
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 =head1 SYNOPSIS
 
@@ -64,6 +64,10 @@ sub is_valid {
 	$value =~ s/^\s+//;
 
 	if(length($value) == 0) {
+		return 0;
+	}
+
+	if($value =~ /\s/) {
 		return 0;
 	}
 
@@ -118,7 +122,7 @@ sub is_valid {
 					return 1;
 				}
 			}
-			carp "redirect to from $url to $location";
+			carp "redirect from $url to $location";
 		} elsif($error_code != 404) {
 			# Probably the certs file is wrong, or there
 			# was a timeout
@@ -174,13 +178,12 @@ L<http://search.cpan.org/dist/CGI-Untaint-Facebook>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
 
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012-2015 Nigel Horne.
+Copyright 2012-2017 Nigel Horne.
 
 This program is released under the following licence: GPL
 

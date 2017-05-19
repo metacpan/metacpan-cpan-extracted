@@ -24,7 +24,7 @@ mkdir "$test_root/$unicode_dir"
 
 # Cleanup temporarily created files and directories
 END {
-    use File::Path qw(remove_tree);
+    use File::Path 2.06_06 qw(remove_tree);
     remove_tree($test_root) or die "Unable to remove $test_root" if -d $test_root;
 }
 

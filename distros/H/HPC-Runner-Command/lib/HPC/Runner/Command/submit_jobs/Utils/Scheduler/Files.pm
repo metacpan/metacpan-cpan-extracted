@@ -169,21 +169,18 @@ sub prepare_batch_files_array {
 
         #TODO counters are messed up somewhere...
         next unless $self->current_batch;
-
-        $self->batch( $self->current_batch->batch_str );
-
+        
         #Assign the counters
         my $job_counter   = sprintf( "%03d", $self->job_counter );
         my $array_counter = sprintf( "%03d", $self->array_counter );
 
-        #TODO Make this a function
         my $jobname = $self->resolve_project($job_counter);
 
         $self->cmdfile(
             $self->outdir . "/$jobname" . "_" . $array_counter . ".in" );
 
         #Write the files
-        $self->write_batch_file;
+        $self->write_batch_file($self->current_batch->batch_str);
 
         $self->inc_array_counter;
     }
@@ -191,6 +188,7 @@ sub prepare_batch_files_array {
 
 sub write_batch_file {
     my $self = shift;
+    my $command  = shift;
 
     make_path( $self->outdir ) unless -d $self->outdir;
 
@@ -199,7 +197,7 @@ sub write_batch_file {
         . $self->cmdfile . "  "
         . $! . "\n";
 
-    print $fh $self->batch if defined $fh && defined $self->batch;
+    print $fh $command if defined $fh && defined $command;
     $fh->close;
 }
 

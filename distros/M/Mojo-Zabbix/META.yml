@@ -25,4 +25,4 @@ requires:
   Time::HiRes: '0'
 resources:
   repository: https://github.com/bollwarm/Mojo-Zabbix
-version: '0.08'
+version: '0.10'

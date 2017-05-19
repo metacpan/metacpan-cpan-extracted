@@ -1,0 +1,26 @@
+#!/usr/bin/env perl
+
+{
+    package FooNoO;
+
+    use overload
+      '""' => 'stringify';
+
+    sub new {
+        my $c = shift;
+        bless {@_}, $c;
+    }
+
+    sub stringify { $_[0]->{name} }
+
+}
+
+use Data::Dumper;
+
+$x = FooNoO->new( name => 'tp-no-o' );
+
+print -f $x, "\n";
+
+print "$x\n";
+
+print Dumper( [ stat $x ] );

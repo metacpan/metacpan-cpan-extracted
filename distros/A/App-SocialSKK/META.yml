@@ -1,0 +1,36 @@
+---
+abstract: 'SKK Goes Social'
+author:
+  - 'Kentaro Kuribayashi, <kentarok@cpan.org>'
+build_requires:
+  Filter::Util::Call: 0
+  Module::Collect: 0
+  Net::Ping::External: 0
+  Test::Class: 0
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: MIT
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-SocialSKK
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Accessor::Lvalue::Fast: 0
+  Encode::JavaScript::UCS: 0
+  File::HomeDir: 0
+  Filter::Util::Call: 0
+  Jcode: 0
+  LWP::UserAgent::POE: 0
+  POE: 1.003
+  Pod::Usage: 0
+  UNIVERSAL::require: 0
+  URI: 0
+  XML::RSS: 0
+  YAML::Syck: 0
+  perl: 5.8.1
+version: 0.02

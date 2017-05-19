@@ -1,0 +1,55 @@
+{
+   "abstract" : "JSON::XS wrapper for Sledge",
+   "author" : [
+      "Tokuhiro Matsuno E<lt>tokuhirom@gmail.comE<gt>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Sledge-Plugin-JSON-XS",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Class::Accessor" : "0",
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Filter::Util::Call" : "0",
+            "JSON::XS" : "2.01",
+            "perl" : "5.00800"
+         }
+      }
+   },
+   "provides" : {
+      "Sledge::Plugin::JSON::XS" : {
+         "file" : "lib/Sledge/Plugin/JSON/XS.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.05"
+}

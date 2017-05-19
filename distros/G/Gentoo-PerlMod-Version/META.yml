@@ -1,0 +1,45 @@
+---
+abstract: "Convert arbitrary Perl Modules' versions into normalized Gentoo versions."
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Scalar::Util: '0'
+  Test::Fatal: '0'
+  Test::More: '0.96'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Gentoo-PerlMod-Version
+provides:
+  Gentoo::PerlMod::Version:
+    file: lib/Gentoo/PerlMod/Version.pm
+    version: v0.8.1
+  Gentoo::PerlMod::Version::Env:
+    file: lib/Gentoo/PerlMod/Version/Env.pm
+    version: v0.8.1
+  Gentoo::PerlMod::Version::Error:
+    file: lib/Gentoo/PerlMod/Version/Error.pm
+    version: v0.8.1
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  Sub::Exporter::Progressive: '0'
+  overload: '0'
+  perl: '5.006'
+  strict: '0'
+  version: '0.77'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Gentoo-PerlMod-Version/issues
+  homepage: https://github.com/kentnl/Gentoo-PerlMod-Version
+  repository: https://github.com/kentnl/Gentoo-PerlMod-Version.git
+version: v0.8.1

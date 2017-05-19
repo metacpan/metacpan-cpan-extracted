@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: HAYOBAAN's Pod::Weaver configuration
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 #pod =head1 DESCRIPTION
 #pod
@@ -193,7 +193,7 @@ Pod::Weaver::PluginBundle::Author::HAYOBAAN - HAYOBAAN's Pod::Weaver configurati
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 DESCRIPTION
 

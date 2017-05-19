@@ -2,10 +2,9 @@ package App::GHPT::WorkSubmitter::ChangedFilesFactory;
 
 use App::GHPT::Wrapper::OurMoose;
 
-our $VERSION = '1.000002';
+our $VERSION = '1.000003';
 
 use IPC::Run3 qw( run3 );
-use List::Gather qw( gather take );
 use App::GHPT::Types qw( ArrayRef HashRef Str );
 use App::GHPT::WorkSubmitter::ChangedFiles;
 
@@ -114,27 +113,27 @@ has _all_files => (
 );
 
 sub _build_all_files ($self) {
-    return [
-        gather {
-            my @command = (
-                'git',
-                'ls-tree',
-                '-r',
-                'HEAD:',
-            );
+    my @files;
 
-            run3 \@command, \undef, sub ($line) {
-                chomp $line;
-                my ( undef, undef, undef, $filename ) = split /\s+/, $line, 4;
-                take $filename;
-            }, \my $error;
+    my @command = (
+        'git',
+        'ls-tree',
+        '-r',
+        'HEAD:',
+    );
 
-            if ( $error || $? ) {
-                die join q{ }, 'Problem running git ls-tree:', @command,
-                    $error, $?;
-            }
-        }
-    ];
+    run3 \@command, \undef, sub ($line) {
+        chomp $line;
+        my ( undef, undef, undef, $filename ) = split /\s+/, $line, 4;
+        push @files, $filename;
+    }, \my $error;
+
+    if ( $error || $? ) {
+        die join q{ }, 'Problem running git ls-tree:', @command,
+            $error, $?;
+    }
+
+    return \@files;
 }
 
 has changed_files => (
@@ -171,7 +170,7 @@ App::GHPT::WorkSubmitter::ChangedFilesFactory - Work out what files have changed
 
 =head1 VERSION
 
-version 1.000002
+version 1.000003
 
 =head1 SYNOPSIS
 

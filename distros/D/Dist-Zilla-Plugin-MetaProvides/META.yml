@@ -1,0 +1,60 @@
+---
+abstract: "Generating and Populating 'provides' in your META.yml"
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  Dist::Zilla::Role::Plugin: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Path::Tiny: '0'
+  Scalar::Util: '0'
+  Test::DZil: '0'
+  Test::Fatal: '0'
+  Test::More: '0.96'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-MetaProvides
+no_index:
+  directory:
+    - t/lib
+provides:
+  Dist::Zilla::MetaProvides::ProvideRecord:
+    file: lib/Dist/Zilla/MetaProvides/ProvideRecord.pm
+    version: '2.002004'
+  Dist::Zilla::MetaProvides::Types:
+    file: lib/Dist/Zilla/MetaProvides/Types.pm
+    version: '2.002004'
+  Dist::Zilla::Plugin::MetaProvides:
+    file: lib/Dist/Zilla/Plugin/MetaProvides.pm
+    version: '2.002004'
+  Dist::Zilla::Role::MetaProvider::Provider:
+    file: lib/Dist/Zilla/Role/MetaProvider/Provider.pm
+    version: '2.002004'
+recommends:
+  Moose: '2.000'
+requires:
+  Carp: '0'
+  Dist::Zilla::Role::MetaProvider: '0'
+  Hash::Merge::Simple: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  MooseX::Types: '0'
+  MooseX::Types::Moose: '0'
+  namespace::autoclean: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-Plugin-MetaProvides/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-Plugin-MetaProvides
+  repository: https://github.com/kentnl/Dist-Zilla-Plugin-MetaProvides.git
+version: '2.002004'

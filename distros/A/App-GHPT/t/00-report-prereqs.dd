@@ -42,7 +42,6 @@ do { my $x = {
                                       'Import::Into' => '0',
                                       'Lingua::EN::Inflect' => '0',
                                       'List::AllUtils' => '0',
-                                      'List::Gather' => '0',
                                       'List::Util' => '1.44',
                                       'Module::Pluggable::Object' => '0',
                                       'Moose' => '0',

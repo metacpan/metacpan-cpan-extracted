@@ -1,9 +1,14 @@
 Revision history for Test-BrewBuild-Plugin-Author
 
+0.03    2017-05-18
+        - added info to POD about attempts to deploy RELEASE_TESTING env var,
+          and the log entry if not
+        - finalized and tested in production
+
 0.02    2017-04-28
         - added $ENV{RELEASE_TESTING} = 1;
         - added logging if RELEASE_TESTING somehow isn't set in the
           brewbuild_exec() call
 
 0.01    2017-04-28
-    - initial release
+        - initial release

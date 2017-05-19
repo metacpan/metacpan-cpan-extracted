@@ -1,0 +1,49 @@
+---
+abstract: 'A Plugin that can load others.'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  Dist::Zilla::Role::Plugin: '0'
+  Dist::Zilla::Util::ConfigDumper: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::DZil: '0'
+  Test::Differences: '0'
+  Test::More: '0'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Role-PluginLoader
+provides:
+  Dist::Zilla::Role::PluginLoader:
+    file: lib/Dist/Zilla/Role/PluginLoader.pm
+    version: '0.001003'
+  Dist::Zilla::Role::PluginLoader::Configurable:
+    file: lib/Dist/Zilla/Role/PluginLoader/Configurable.pm
+    version: '0.001003'
+  Dist::Zilla::Util::PluginLoader:
+    file: lib/Dist/Zilla/Util/PluginLoader.pm
+    version: '0.001003'
+recommends:
+  Moose: '2.000'
+requires:
+  Carp: '0'
+  Dist::Zilla::Role::PrereqSource: '0'
+  Dist::Zilla::Util: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-Role-PluginLoader/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-Role-PluginLoader
+  repository: https://github.com/kentnl/Dist-Zilla-Role-PluginLoader.git
+version: '0.001003'

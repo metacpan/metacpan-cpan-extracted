@@ -1,0 +1,39 @@
+---
+abstract: 'a process supervisor'
+author:
+  - 'Yann Kerherve <yannk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: ControlFreak
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+recommends:
+  DateTime: 0
+  Term::ANSIColor: 0
+requires:
+  AnyEvent: 5.202
+  EV: 0
+  Find::Lib: 0
+  JSON::XS: 0
+  Log::Log4perl: 0
+  Object::Tiny: 0
+  Params::Util: 0
+  Pod::Usage: 0
+  Try::Tiny: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/yannk/ControlFreak.git
+version: 1.0.0

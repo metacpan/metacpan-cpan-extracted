@@ -1,5 +1,8 @@
 Revision history for Perl module File-Basename-Extra
 
+0.004     2017-05-19
+  * Added Travis and AppVeyor testing
+
 0.003     2016-08-10
   * Removed Build.PL, require >= v0.009 of PluginBundle
   * Updated author e-mail address

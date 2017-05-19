@@ -1,0 +1,33 @@
+---
+abstract: 'DEPRECATED. Use Twiggy'
+author:
+  - 'Tokuhiro Matsuno'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.97'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Server-AnyEvent
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  AnyEvent: 0
+  Filter::Util::Call: 0
+  HTTP::Status: 0
+  Plack::Middleware::ContentLength: 0
+  Plack::Util: 0
+  Try::Tiny: 0
+  namespace::clean: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/miyagawa/Twiggy.git
+version: 0.04

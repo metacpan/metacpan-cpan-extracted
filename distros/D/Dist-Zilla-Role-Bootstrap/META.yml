@@ -1,0 +1,48 @@
+---
+abstract: 'Shared logic for bootstrap things.'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  Dist::Zilla::Chrome::Test: '0'
+  Dist::Zilla::Dist::Builder: '0'
+  Dist::Zilla::MVP::Assembler::Zilla: '0'
+  Dist::Zilla::MVP::Section: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Copy::Recursive: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  Moose: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Role-Bootstrap
+provides:
+  Dist::Zilla::Role::Bootstrap:
+    file: lib/Dist/Zilla/Role/Bootstrap.pm
+    version: '1.001004'
+recommends:
+  Path::Tiny: '0.058'
+requires:
+  Carp: '0'
+  Dist::Zilla::Role::Plugin: '0'
+  List::UtilsBy: '0'
+  Moose::Role: '0'
+  Path::Tiny: '0'
+  lib: '0'
+  perl: '5.006'
+  strict: '0'
+  version: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-Role-Bootstrap/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-Role-Bootstrap
+  repository: https://github.com/kentnl/Dist-Zilla-Role-Bootstrap.git
+version: '1.001004'

@@ -1,0 +1,56 @@
+{{{}
+{   "abstract" : "Z80 assembly / disassembly tables",}
+{   "author" : [}
+{      "Paulo Custodio <pscust@cpan.org>"}
+{   ],}
+{   "dynamic_config" : 1,}
+{   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005",}
+{   "license" : [}
+{      "unknown"}
+{   ],}
+{   "meta-spec" : {{}
+{      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",}
+{      "version" : "2"}
+{   }},}
+{   "name" : "Asm-Z80-Table",}
+{   "no_index" : {{}
+{      "directory" : [}
+{         "t",}
+{         "inc"}
+{      ]}
+{   }},}
+{   "prereqs" : {{}
+{      "build" : {{}
+{         "requires" : {{}
+{            "ExtUtils::MakeMaker" : "0"}
+{         }}}
+{      }},}
+{      "configure" : {{}
+{         "requires" : {{}
+{            "ExtUtils::MakeMaker" : "0"}
+{         }}}
+{      }},}
+{      "runtime" : {{}
+{         "requires" : {{}
+{            "Data::Dumper" : "2.128",}
+{            "File::Basename" : "0",}
+{            "File::Slurp" : "9999.13",}
+{            "Iterator::Array::Jagged" : "0.05",}
+{            "List::MoreUtils" : "0.22",}
+{            "Test::More" : "0.96",}
+{            "Text::Template" : "1.45",}
+{            "perl" : "5.01"}
+{         }}}
+{      }}}
+{   }},}
+{   "release_status" : "stable",}
+{   "resources" : {{}
+{      "repository" : {{}
+{         "type" : "git",}
+{         "url" : "git://github.com/pauloscustodio/perl-Asm-Z80-Table.git",}
+{         "web" : "https://github.com/pauloscustodio/perl-Asm-Z80-Table"}
+{      }}}
+{   }},}
+{   "version" : "0.03",}
+{   "x_serialization_backend" : "JSON::PP version 2.27300"}
+{}}}

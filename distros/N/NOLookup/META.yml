@@ -4,8 +4,9 @@ author:
   - unknown
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
 license: unknown
@@ -18,6 +19,15 @@ no_index:
     - t
     - inc
 requires:
+  Data::Dumper: '0'
+  Encode: '0'
+  IO::Socket: '0'
+  JSON: '0'
+  URI::Encode: '0'
+  WWW::Mechanize: '0'
   perl: '5.008001'
-version: '1.06'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+version: '1.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

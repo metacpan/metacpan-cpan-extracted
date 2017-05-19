@@ -1,0 +1,47 @@
+{
+   "abstract" : "CLD2 wrapper for Perl",
+   "author" : [
+      "Steffen Mueller, E<lt>smueller@cpan.orgE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Lingua-Identify-CLD2",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::Typemap::Basic" : "0.04",
+            "ExtUtils::Typemap::STL::String" : "0.04",
+            "ExtUtils::Typemaps::ObjectMap" : "0.01",
+            "ExtUtils::XSpp" : "0.18"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::CppGuess" : "0.09",
+            "Module::Build" : "0.42",
+            "Module::Build::WithXSpp" : "0.14"
+         }
+      }
+   },
+   "provides" : {
+      "Lingua::Identify::CLD2" : {
+         "file" : "lib/Lingua/Identify/CLD2.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

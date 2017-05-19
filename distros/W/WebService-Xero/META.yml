@@ -1,0 +1,35 @@
+---
+abstract: 'Access Xero Accounting Package Public and Private Application API'
+author:
+  - 'Peter Scott <peter@computerpros.com.au>'
+build_requires:
+  Config::Tiny: '0'
+  JSON: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Xero
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Config::Tiny: '0'
+  Crypt::OpenSSL::RSA: '0'
+  Data::Random: '0'
+  Digest::MD5: '0'
+  File::Slurp: '0'
+  HTTP::Request: '0'
+  JSON: '0'
+  Mozilla::CA: '0'
+  Net::OAuth: '0'
+  URI::Encode: '0'
+  XML::Simple: '0'
+  perl: '5.006'
+version: '0.11'

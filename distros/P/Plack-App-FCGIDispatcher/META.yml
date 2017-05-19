@@ -1,0 +1,36 @@
+---
+abstract: 'Dispatch requests to FCGI servers'
+author:
+  - 'Tokuhiro Matsuno'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.88
+  Test::Requires: 0
+  Test::TCP: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Plack::App::FCGIDispatcher
+name: Plack-App-FCGIDispatcher
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  FCGI: 0.7
+  FCGI::Client: 0.06
+  HTTP::Request::Common: 0
+  Plack: 0.997
+  Plack::Handler::FCGI: 0
+  parent: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/miyagawa/Plack-App-FCGIDispatcher.git
+version: 0.10

@@ -1,0 +1,75 @@
+1 SVN::S4
+*********
+
+This is the SVN::S4 Perl Package.
+
+1.1 Copyright
+=============
+
+This package is Copyright 2006-2017 by Bryce Denney and Wilson Snyder
+<wsnyder@wsnyder.org>.
+
+   This program is free software; you can redistribute it and/or modify
+it under the terms of either the GNU Lesser General Public License
+Version 3 or the Perl Artistic License Version 2.0.
+
+   This code is provided with no warranty of any kind, and is used
+entirely at your own risk.
+
+1.2 Description
+===============
+
+This package adds additional Subversion support commands, similar to the
+P4::C4 package.  These commands let you apply .cvsignore or .gitignore
+files, snapshot areas and cleanup ignored files.  You can also create
+views that consist of different repository areas, and deal with them as
+if it was a larger checkout.
+
+1.3 Obtaining Distribution
+==========================
+
+The latest version is available at <http://www.perl.org/CPAN/>
+
+   Download the latest package from that site, and decompress.  'gunzip
+SVN-S4_version.tar.gz ; tar xvf SVN-S4_version.tar'
+
+1.4 Known Bugs
+==============
+
+SVN::S4 viewspecs rely on some obscure features of Subversion, in that
+s4 needs to modify the .svn directory to create empty directories and
+svn externals that switch to them.  This may require patching to work
+when new versions of Subversion are released.  Other features should
+work with all versions of Subverion.
+
+1.5 Supported Systems
+=====================
+
+This version of SVN::S4 has been built and tested on:
+
+   * i386-linux
+
+   It should run on any Unix system with appropriate releases of
+Subversion (see above).  Minor porting may be required for Windows
+systems.
+
+1.6 Installation
+================
+
+  1. 
+     Before installing this module, you need the Subversion Perl
+     library, generally part of the "subversion-perl" RPM module.
+
+  2. 'cd' to the directory containing this README notice.
+
+  3. Type 'perl Makefile.PL' to configure SVN::S4 for your system.
+
+  4. Type 'make' to compile SVN::S4.
+
+  5. Type 'make test' to check the compilation.
+
+  6. Type 'make install' to install the programs and any data files and
+     documentation.
+
+  7. Type 's4 help' to see the command line interface.
+

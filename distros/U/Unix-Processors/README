@@ -1,0 +1,85 @@
+1 Unix::Processors
+******************
+
+This is the Unix::Processors Perl Package.
+
+1.1 Copyright
+=============
+
+This package is Copyright 1999-2017 by Wilson Snyder
+<wsnyder@wsnyder.org>.
+
+   This program is free software; you can redistribute it and/or modify
+it under the terms of either the GNU Lesser General Public License
+Version 3 or the Perl Artistic License Version 2.0.
+
+   This code is provided with no warranty of any kind, and is used
+entirely at your own risk.
+
+1.2 Description
+===============
+
+This package provides access to per-processor information from Perl.
+
+       my $procs = new Unix::Processors;
+       print $procs->max_online, " CPUs at ", $procs->max_clock, " MHz\n";
+       if ($procs->max_online != $procs->max_physical) {
+           print "Hyperthreading between ",$procs->max_physical," physical CPUs.\n";
+       }
+       (my $FORMAT =   "%2s  %-8s     %4s    \n") =~ s/\s\s+/ /g;
+       printf($FORMAT, "#", "STATE", "CLOCK",  "TYPE", );
+       foreach my $proc (@{$procs->processors}) {
+           printf ($FORMAT, $proc->id, $proc->state, $proc->clock, $proc->type);
+       }
+
+   See `man Unix::Processors' after installation.
+
+1.3 Obtaining Distribution
+==========================
+
+The latest version is available at `http://www.perl.org/CPAN/'
+
+   Download the latest package from that site, and decompress.  `gunzip
+Unix-Processors_version.tar.gz ; tar xvf Unix-Processors_version.tar'
+
+1.4 Supported Systems
+=====================
+
+This version of Unix::Processors has been built and tested on:
+
+   * i386-linux
+
+   * aix-4.3.3
+
+   * aix-5.1.0 (32 and 64 bit)
+
+   * alpha-osf
+
+   * freebsd (clock methods not supported before freebsd 5.4)
+
+   * hpux-11.00
+
+   * hpux-11.11
+
+   * sgi-irix
+
+   * sparc-sun-solaris2.6
+
+   * sparc-sun-solaris2.8
+
+   Porting will definately be necessary for other operating systems.
+
+1.5 Installation
+================
+
+  1. `cd' to the directory containing this README notice.
+
+  2. Type `perl Makefile.PL' to configure Unix::Processors for your
+     system.
+
+  3. Type `make' to compile Unix::Processors.
+
+  4. Type `make install' to install the programs and any data files and
+     documentation.
+
+

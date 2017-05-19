@@ -1,0 +1,54 @@
+{
+   "abstract" : "OO interface for process management",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Proc-Class",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Any::Moose" : "0.12",
+            "IPC::Open3" : "1.02",
+            "perl" : "v5.8.1"
+         }
+      }
+   },
+   "provides" : {
+      "Proc::Class" : {
+         "file" : "lib/Proc/Class.pm",
+         "version" : "0.05"
+      },
+      "Proc::Class::Status" : {
+         "file" : "lib/Proc/Class/Status.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.05"
+}

@@ -1,0 +1,59 @@
+{
+   "abstract" : "Time::Piece type and coercions for Moose",
+   "author" : [
+      "Steven Lee <stevenl@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-Types-Time-Piece",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Fatal" : "0.001",
+            "Test::More" : "0.68"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "MooseX::Types" : "0.01",
+            "MooseX::Types::Moose" : "0.01",
+            "Time::Piece" : "1.2",
+            "Try::Tiny" : "0.01",
+            "namespace::autoclean" : "0.01",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "MooseX::Types::Time::Piece" : {
+         "file" : "lib/MooseX/Types/Time/Piece.pm",
+         "version" : "0.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/stevenl/moosex-types-time-piece/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/MooseX-Types-Time-Piece/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/stevenl/moosex-types-time-piece"
+      }
+   },
+   "version" : "0.10"
+}

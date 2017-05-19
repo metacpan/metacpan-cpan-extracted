@@ -1,0 +1,60 @@
+{
+   "abstract" : "Provides the C<void> operator to force void context.",
+   "author" : [
+      "Eric Brine <ikegami@adaelis.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "unrestricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Syntax-Feature-Void",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3614",
+            "Software::License::CC0_1_0" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Devel::CallParser" : "0",
+            "Lexical::Sub" : "0",
+            "XSLoader" : "0",
+            "perl" : "5.014",
+            "syntax" : "0.004",
+            "version" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Syntax::Feature::Void" : {
+         "file" : "lib/Syntax/Feature/Void.pm",
+         "version" : "v1.0.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Syntax-Feature-Void"
+      },
+      "homepage" : "http://search.cpan.org/dist/Syntax-Feature-Void/",
+      "license" : [
+         "http://creativecommons.org/publicdomain/zero/1.0/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/ikegami/perl-Syntax-Feature-Void"
+      }
+   },
+   "version" : "v1.0.0"
+}

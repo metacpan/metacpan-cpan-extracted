@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Extension to File::Basename, adds named access to file parts and handling of filename suffixes
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 #pod =head1 SYNOPSIS
 #pod
@@ -293,7 +293,7 @@ File::Basename::Extra - Extension to File::Basename, adds named access to file p
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -468,7 +468,7 @@ L<File::Basename> for the suffix matching and platform specific details.
 
 =head1 AUTHOR
 
-Hayo Baan <hayobaan@cpan.org>
+Hayo Baan <info@hayobaan.com>
 
 =head1 COPYRIGHT AND LICENSE
 

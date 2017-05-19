@@ -1,0 +1,29 @@
+---
+abstract: 'sledge with lvalue.'
+author:
+  - 'Tokuhiro Matsuno  C<< <tokuhirom @at gmail.com> >>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Sledge-Plugin-Stash
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Sledge::Plugin::Stash:
+    file: lib/Sledge/Plugin/Stash.pm
+    version: 0.04
+requires:
+  Filter::Util::Call: 0
+  perl: 5.008001
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.04

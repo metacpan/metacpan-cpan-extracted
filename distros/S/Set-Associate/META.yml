@@ -1,0 +1,81 @@
+---
+abstract: 'Pick items from a data set associatively'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Set-Associate
+provides:
+  Set::Associate:
+    file: lib/Set/Associate.pm
+    version: '0.004001'
+  Set::Associate::NewKey:
+    file: lib/Set/Associate/NewKey.pm
+    version: '0.004001'
+  Set::Associate::NewKey::HashMD5:
+    file: lib/Set/Associate/NewKey/HashMD5.pm
+    version: '0.004001'
+  Set::Associate::NewKey::HashSHA1:
+    file: lib/Set/Associate/NewKey/HashSHA1.pm
+    version: '0.004001'
+  Set::Associate::NewKey::LinearWrap:
+    file: lib/Set/Associate/NewKey/LinearWrap.pm
+    version: '0.004001'
+  Set::Associate::NewKey::PickOffset:
+    file: lib/Set/Associate/NewKey/PickOffset.pm
+    version: '0.004001'
+  Set::Associate::NewKey::RandomPick:
+    file: lib/Set/Associate/NewKey/RandomPick.pm
+    version: '0.004001'
+  Set::Associate::RefillItems:
+    file: lib/Set/Associate/RefillItems.pm
+    version: '0.004001'
+  Set::Associate::RefillItems::Linear:
+    file: lib/Set/Associate/RefillItems/Linear.pm
+    version: '0.004001'
+  Set::Associate::RefillItems::Shuffle:
+    file: lib/Set/Associate/RefillItems/Shuffle.pm
+    version: '0.004001'
+  Set::Associate::Role::NewKey:
+    file: lib/Set/Associate/Role/NewKey.pm
+    version: '0.004001'
+  Set::Associate::Role::RefillItems:
+    file: lib/Set/Associate/Role/RefillItems.pm
+    version: '0.004001'
+  Set::Associate::Utils:
+    file: lib/Set/Associate/Utils.pm
+    version: '0.004001'
+recommends:
+  Moose: '2.000'
+requires:
+  Carp: '0'
+  Digest::MD5: '0'
+  Digest::SHA1: '0'
+  Exporter: '0'
+  List::Util: '0'
+  Moose: '0'
+  MooseX::AttributeShortcuts: '0'
+  MooseX::Role::Parameterized: '0'
+  Scalar::Util: '0'
+  bigint: '0.22'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Set-Associate/issues
+  homepage: https://github.com/kentnl/Set-Associate
+  repository: https://github.com/kentnl/Set-Associate.git
+version: '0.004001'

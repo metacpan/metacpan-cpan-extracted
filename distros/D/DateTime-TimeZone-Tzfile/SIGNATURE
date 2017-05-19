@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 39b83fb4caa81801a2a6f26e1f96241c958dafac .gitignore
+SHA1 460b8ab4cc43b228d4c6acb21d49d618283272ea Build.PL
+SHA1 d87cfa48504b069386b6cc2d2e300aec05ea6b0e Changes
+SHA1 736e052ea5be9d51b8ef33bc3386e934f1a8fbb7 MANIFEST
+SHA1 2be8960f2d8f5f9e62bb67cb88c5cbf555077030 META.json
+SHA1 bfcd35c9c73e1d387c5f8bff8a825e2f60cff469 META.yml
+SHA1 0bfa106a64fc680e40507c47cbf461cea3a8b374 Makefile.PL
+SHA1 f7bcb6666d4aec3bc580cacd1ee8d90bc7e0f8f5 README
+SHA1 3d6abc7ba38378b945dcc59012175d9eccc713b0 lib/DateTime/TimeZone/Tzfile.pm
+SHA1 aee65210dec1a21938a8f9e26eae8e74a06849c3 t/Davis.tz
+SHA1 b5265afc509c8577dfa867469e83bea9cf8c549a t/Hebron.tz
+SHA1 d297f080067251860bb860aadb42540757ccb5c1 t/Kaliningrad.tz
+SHA1 e203aaf15eecc56c069b59f482f8ae3655c249a9 t/London.tz
+SHA1 ddf6da1833c704e86c8704551224abe0d2a16923 t/Loyston.tz
+SHA1 e1933b958c714f339fecf887b43e866a51621674 t/San_Luis.tz
+SHA1 ff4fdb3434f36b3f43dbd50d62bcc706aee3145b t/construct.t
+SHA1 56ea63a619f1f383e5b0dd70bced7e4af55a7560 t/crlf.t
+SHA1 b6c8696b5675418ce8ebe5056211bbcfd504d25c t/ident.t
+SHA1 1ac7443846004c2197546ee14ed4a7fc5e37a54c t/local.t
+SHA1 60d41ae3a72e33e0f99b580130d62173d31071a9 t/offset.t
+SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
+SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iEYEARECAAYFAlI86yMACgkQOV9mt2VyAVG2FwCgk2CFBxl8vDJsgAYlzUZmR8ld
+jf4An32If0KsAVH3tNAW/P4YoP7CiREz
+=4Vux
+-----END PGP SIGNATURE-----

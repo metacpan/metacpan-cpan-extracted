@@ -1,0 +1,36 @@
+---
+abstract: 'Automatically add all plugins in a bundle as dependencies'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  Dist::Zilla::Role::PluginBundle: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Moose: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Role-BundleDeps
+provides:
+  Dist::Zilla::Role::BundleDeps:
+    file: lib/Dist/Zilla/Role/BundleDeps.pm
+    version: '0.002005'
+requires:
+  CPAN::Meta::Requirements: '0'
+  Moose::Role: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-Role-BundleDeps/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-Role-BundleDeps
+  repository: https://github.com/kentnl/Dist-Zilla-Role-BundleDeps.git
+version: '0.002005'

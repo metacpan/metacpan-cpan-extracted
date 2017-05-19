@@ -1,0 +1,32 @@
+---
+abstract: 'create PSGI app that serve filtered files'
+author:
+  - 'punytan <punytan@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.08'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PAD
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Plack::App::Directory: 0
+  Plack::App::File: 0
+  Plack::Request: 0
+  Plack::Runner: 0
+  Pod::Usage: 0
+  Text::Markdown: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/punytan/p5-PAD.git
+version: '0.04'

@@ -1,0 +1,14 @@
+*~
+Makefile
+Makefile.old
+MANIFEST.git
+META.*
+MYMETA.*
+cover_db/
+blib/
+.gitignore
+nytprof.out
+pod2htm*.tmp
+pm_to_blib
+Mock-Config-*
+Mock-Config-*.tar.gz

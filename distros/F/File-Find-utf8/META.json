@@ -59,7 +59,7 @@
       },
       "test" : {
          "requires" : {
-            "File::Path" : "0",
+            "File::Path" : "2.06_06",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
@@ -75,7 +75,7 @@
    "provides" : {
       "File::Find::utf8" : {
          "file" : "lib/File/Find/utf8.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       }
    },
    "release_status" : "stable",
@@ -90,7 +90,7 @@
          "web" : "https://github.com/HayoBaan/File-Find-utf8"
       }
    },
-   "version" : "0.012",
+   "version" : "0.013",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 

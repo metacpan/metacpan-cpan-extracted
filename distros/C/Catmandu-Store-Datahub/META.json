@@ -4,7 +4,7 @@
       "Pieter De Praetere, C<< pieter at packed.be >>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.16, Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -31,13 +31,15 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.16",
+            "Dist::Milla" : "v1.0.17",
             "Test::Pod" : "1.41"
          }
       },
       "runtime" : {
          "requires" : {
             "Catmandu" : "1.0304",
+            "JSON" : "2.90",
+            "Lido::XML" : "0.07",
             "URL::Encode" : "0.03"
          }
       },
@@ -62,12 +64,12 @@
          "web" : "https://github.com/thedatahub/Catmandu-Store-Datahub"
       }
    },
-   "version" : "0.01",
+   "version" : "0.03",
    "x_contributors" : [
       "Matthias Vandermaesen <matthias@colada.be>",
       "Pieter De Praetere <pieter.de.praetere@helptux.be>",
       "Pieter De Praetere <pieter@packed.be>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
 }
 

@@ -9,23 +9,18 @@ my $mod = 'GPSD::Parse';
 
 my $fname = 't/data/gps.json';
 
-#FIXME: add tests for using $gps->on using the socket
-
 my $gps;
 
-eval {
+my $sock = eval {
     $gps = GPSD::Parse->new;
+    1;
 };
 
-plan skip_all => "no socket available" if $@;
-
-#
-# with filename
-#
+$gps = GPSD::Parse->new(file => $fname) if ! $sock;
 
 { # default return with file
 
-    my $res = $gps->poll(fname => $fname);
+    my $res = $gps->poll;
 
     is ref $res, 'HASH', "default return is an href ok";
 
@@ -38,7 +33,7 @@ plan skip_all => "no socket available" if $@;
 
 { # json return
 
-    my $res = $gps->poll(return => 'json', fname => $fname);
+    my $res = $gps->poll(return => 'json');
 
     is ref \$res, 'SCALAR', "json returns a string";
     like $res, qr/^{/, "...and appears to be JSON data";
@@ -50,32 +45,13 @@ plan skip_all => "no socket available" if $@;
     my $res;
 
     my $ok = eval {
-        $res = $gps->poll(fname => 'invalid.file');
+        $res = $gps->poll(file => 'invalid.file');
         1;
     };
 
-    is $ok, undef, "croaks if file can't be opened with fname param";
+    is $ok, undef, "croaks if file can't be opened with file param";
     like $@, qr/invalid\.file/, "...and the error msg is sane";
     undef $@;
-}
-
-{ # on/off
-    my $w;
-    local $SIG{__WARN__} = sub {
-        $w = shift;
-    };
-
-    my $res = $gps->poll;
-    is $res->{tpv}[0], undef, "TPV empty if \$gps->on isn't called";
-    like $w, qr/'on\(\)' method/, "...with a proper warning";
-
-    $gps->on;
-    $res = $gps->poll;
-    is ref $res->{tpv}[0], 'HASH', "TPV has data if \$gps->on is called";
-
-    $gps->off;
-    $res = $gps->poll;
-    is $res->{tpv}[0], undef, "TPV undef after off() called";
 }
 
 done_testing;

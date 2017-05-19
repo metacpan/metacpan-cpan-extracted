@@ -1,0 +1,154 @@
+---
+abstract: 'Release 2 of Marpa'
+author:
+  - 'Jeffrey Kegler'
+build_requires:
+  ExtUtils::CBuilder: '0'
+configure_requires:
+  CPAN::Meta::Converter: '2.120921'
+  Carp: '1.08'
+  Config::AutoConf: '0.22'
+  Cwd: '3.2501'
+  Data::Dumper: '2.125'
+  DynaLoader: '1.08'
+  English: '1.04'
+  Exporter: '5.62'
+  ExtUtils::CBuilder: '0.27'
+  ExtUtils::MakeMaker: '6.42'
+  ExtUtils::Manifest: 1.51_01
+  ExtUtils::Mkbootstrap: '6.42'
+  Fatal: '1.05'
+  File::Copy: '2.11'
+  File::Spec: '3.2501'
+  IPC::Cmd: 0.40_1
+  List::Util: '1.21'
+  Module::Build: '0.4003'
+  PPI: '1.206'
+  Scalar::Util: '1.21'
+  Test::More: '0.94'
+  Time::Piece: '1.12'
+  XSLoader: '0.08'
+  perl: '5.010'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.143240'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Marpa-R2
+no_index:
+  directory:
+    - pperl
+    - tool
+    - libmarpa
+    - author.t
+    - html/etc
+    - html/sandbox
+    - html/script
+    - html/t
+  namespace:
+    - Marpa::R2::Recognizer
+    - Marpa::R2::Grammar
+    - Marpa::R2::HTML
+    - Marpa::R2::Value
+    - Marpa::R2::Perl
+    - Marpa::R2::Test
+    - Marpa::R2::Display
+    - Marpa::R2::Inner
+    - Marpa::R2::Internal
+    - Marpa::R2::MetaAST
+    - Marpa::R2::MetaG
+    - Marpa::R2::Stuifzand
+  package:
+    - Marpa::R2::HTML
+    - Marpa::R2::Value
+    - Marpa::R2::Perl
+    - Marpa::R2::Test
+    - Marpa::R2::Display
+    - Marpa::R2::Inner
+    - Marpa::R2::Internal
+    - Marpa::R2::MetaAST
+    - Marpa::R2::MetaG
+    - Marpa::R2::Stuifzand
+    - Marpa::R2::Thin::Trace
+provides:
+  Marpa::R2:
+    file: lib/Marpa/R2.pm
+    version: '4.000000'
+  Marpa::R2::ASF:
+    file: lib/Marpa/R2/ASF.pm
+    version: '4.000000'
+  Marpa::R2::Grammar:
+    file: lib/Marpa/R2/Grammar.pm
+    version: '4.000000'
+  Marpa::R2::HTML:
+    file: html/lib/Marpa/R2/HTML.pm
+    version: '4.000000'
+  Marpa::R2::HTML::Callback:
+    file: html/lib/Marpa/R2/HTML/Callback.pm
+    version: '4.000000'
+  Marpa::R2::HTML::Config:
+    file: html/lib/Marpa/R2/HTML/Config.pm
+    version: '4.000000'
+  Marpa::R2::HTML::Config::Compile:
+    file: html/lib/Marpa/R2/HTML/Config/Compile.pm
+    version: '4.000000'
+  Marpa::R2::MetaAST:
+    file: lib/Marpa/R2/MetaAST.pm
+    version: '4.000000'
+  Marpa::R2::MetaG:
+    file: lib/Marpa/R2/MetaG.pm
+    version: '4.000000'
+  Marpa::R2::Recognizer:
+    file: lib/Marpa/R2/Recognizer.pm
+    version: '4.000000'
+  Marpa::R2::Scanless::G:
+    file: lib/Marpa/R2/SLG.pm
+    version: '4.000000'
+  Marpa::R2::Scanless::R:
+    file: lib/Marpa/R2/SLR.pm
+    version: '4.000000'
+  Marpa::R2::Stuifzand:
+    file: lib/Marpa/R2/Stuifzand.pm
+    version: '4.000000'
+  Marpa::R2::Thin::Trace:
+    file: lib/Marpa/R2/Thin/Trace.pm
+    version: '4.000000'
+  Marpa::R2::Value:
+    file: lib/Marpa/R2/Value.pm
+    version: '4.000000'
+recommends:
+  Config::AutoConf: '0.22'
+  PPI: '1.206'
+requires:
+  Carp: '1.08'
+  Cwd: '3.2501'
+  Data::Dumper: '2.125'
+  DynaLoader: '1.08'
+  English: '1.04'
+  Exporter: '5.62'
+  ExtUtils::CBuilder: '0.27'
+  ExtUtils::MakeMaker: '6.42'
+  ExtUtils::Manifest: 1.51_01
+  ExtUtils::Mkbootstrap: '6.42'
+  Fatal: '1.05'
+  File::Copy: '2.11'
+  File::Spec: '3.2501'
+  HTML::Entities: '3.68'
+  HTML::Parser: '3.69'
+  IPC::Cmd: 0.40_1
+  List::Util: '1.21'
+  PPI: '1.206'
+  Scalar::Util: '1.21'
+  Test::More: '0.94'
+  Time::Piece: '1.12'
+  XSLoader: '0.08'
+  perl: '5.010'
+resources:
+  IRC:
+    irc: irc://irc.freenode.net/#marpa
+    web: http://webchat.freenode.net/?channels=%23marpa&uio=d4
+  homepage: http://savage.net.au/Marpa.html
+  license: http://opensource.org/licenses/lgpl-3.0.html
+  repository: git://github.com/jeffreykegler/Marpa--R2.git
+version: '4.000000'

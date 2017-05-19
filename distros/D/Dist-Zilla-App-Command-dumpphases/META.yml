@@ -1,0 +1,66 @@
+---
+abstract: "Dump a textual representation of each phase's parts."
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  Cwd: '0'
+  Dist::Zilla::App::Tester: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-App-Command-dumpphases
+provides:
+  Dist::Zilla::App::Command::dumpphases:
+    file: lib/Dist/Zilla/App/Command/dumpphases.pm
+    version: '1.000009'
+  Dist::Zilla::dumpphases::Role::Theme:
+    file: lib/Dist/Zilla/dumpphases/Role/Theme.pm
+    version: '1.000009'
+  Dist::Zilla::dumpphases::Role::Theme::SimpleColor:
+    file: lib/Dist/Zilla/dumpphases/Role/Theme/SimpleColor.pm
+    version: '1.000009'
+  Dist::Zilla::dumpphases::Theme::basic::blue:
+    file: lib/Dist/Zilla/dumpphases/Theme/basic/blue.pm
+    version: '1.000009'
+  Dist::Zilla::dumpphases::Theme::basic::green:
+    file: lib/Dist/Zilla/dumpphases/Theme/basic/green.pm
+    version: '1.000009'
+  Dist::Zilla::dumpphases::Theme::basic::plain:
+    file: lib/Dist/Zilla/dumpphases/Theme/basic/plain.pm
+    version: '1.000009'
+  Dist::Zilla::dumpphases::Theme::basic::red:
+    file: lib/Dist/Zilla/dumpphases/Theme/basic/red.pm
+    version: '1.000009'
+recommends:
+  Moo: '1.000008'
+  Path::Tiny: '0.058'
+requires:
+  Carp: '0'
+  Dist::Zilla::App: '0'
+  Dist::Zilla::Util::RoleDB: '0'
+  Module::Runtime: '0'
+  Moo: '0'
+  Path::ScanINC: '0.011'
+  Path::Tiny: '0'
+  Role::Tiny: '0'
+  Scalar::Util: '0'
+  Term::ANSIColor: '0'
+  Try::Tiny: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-App-Command-dumpphases/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-App-Command-dumpphases
+  repository: https://github.com/kentnl/Dist-Zilla-App-Command-dumpphases.git
+version: '1.000009'

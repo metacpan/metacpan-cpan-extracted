@@ -4,6 +4,12 @@
 
 ![Example](tty.gif)
 
+### Installation
+
+```
+$ cpanm App::GetClosestFile
+```
+
 ### Usage
 
 __Options:__

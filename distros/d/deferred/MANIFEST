@@ -1,0 +1,13 @@
+.gitignore
+lib/deferred.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/01.load.t
+t/02.defer.t
+t/03.disable.t
+t/04.discard.t
+t/05.inherit.t
+t/testload.pm
+t/testload2.pm
+META.yml                                 Module meta-data (added by MakeMaker)

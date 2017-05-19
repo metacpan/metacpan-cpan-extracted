@@ -1,0 +1,20 @@
+#!/usr/bin/env perl
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+if (-d "$FindBin::Bin/../local") {
+  use lib "$FindBin::Bin/../local/lib/perl5";
+}
+
+use CloudDeploy::CommandLine;
+
+
+if (not defined $ENV{CPSD_AWS_ACCOUNT}) {
+    die "You need to 'loadenv' the customer's AWS configuration";
+}
+
+my $app = CloudDeploy::CommandLine->new_with_command(app_strict => 1);
+#$app->app_strict(0);
+
+$app->run();

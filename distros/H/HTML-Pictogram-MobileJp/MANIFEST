@@ -1,0 +1,27 @@
+.gitignore
+author/mktbl.pl
+author/useful-pictograms.pl
+Build.PL
+Changes
+lib/HTML/Pictogram/MobileJp.pm
+lib/HTML/Pictogram/MobileJp/EmojiNumber.pm
+lib/HTML/Pictogram/MobileJp/EmojiNumber/Map.pm
+lib/HTML/Pictogram/MobileJp/List.pod
+lib/HTML/Pictogram/MobileJp/Unicode.pm
+lib/HTML/Pictogram/MobileJp/Unicode/Map.pm
+lib/HTML/Pictogram/MobileJp/Util.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00_compile.t
+t/01_emoji_number.t
+t/02_unicode.t
+t/03_util.t
+xt/01_podspell.t
+xt/02_perlcritic.t
+xt/03_pod.t
+xt/04_minimum_version.t
+xt/05_cpan_meta.t
+xt/06_meta_author.t
+LICENSE

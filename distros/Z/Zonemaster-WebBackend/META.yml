@@ -1,0 +1,54 @@
+---
+abstract: 'The Zonemaster project Web Backend engine'
+author:
+  - 'Michal TOMA <toma@nic.fr>'
+build_requires:
+  DBD::SQLite: 0
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.14'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Zonemaster-WebBackend
+no_index:
+  directory:
+    - CodeSnippets
+    - inc
+    - share
+    - t
+recommends:
+  DBD::Pg: 0
+  DBD::SQLite: 0
+  DBD::mysql: 0
+requires:
+  Config::IniFiles: 0
+  DBI: 1.616
+  Daemon::Control: 0
+  File::ShareDir: 0
+  File::Slurp: 0
+  HTML::Entities: 0
+  IO::CaptureOutput: 0
+  JSON::PP: 0
+  JSON::RPC::Dispatch: 0
+  LWP::UserAgent: 0
+  Locale::TextDomain: 0
+  Moose: 2.04
+  Moose::Role: 0
+  Net::IP::XS: 0.14
+  Net::LDNS: 0.72
+  Parallel::ForkManager: 1.12
+  Plack::Builder: 0
+  Plack::Middleware::Debug: 0
+  Router::Simple::Declare: 0
+  Starman: 0
+  String::ShellQuote: 0
+  Zonemaster: 0
+  perl: 5.14.2
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.1.0

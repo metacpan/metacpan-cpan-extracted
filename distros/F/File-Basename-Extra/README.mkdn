@@ -4,7 +4,7 @@ File::Basename::Extra - Extension to File::Basename, adds named access to file p
 
 # VERSION
 
-version 0.003
+version 0.004
 
 # SYNOPSIS
 
@@ -179,7 +179,7 @@ feature.
 
 # AUTHOR
 
-Hayo Baan <hayobaan@cpan.org>
+Hayo Baan <info@hayobaan.com>
 
 # COPYRIGHT AND LICENSE
 

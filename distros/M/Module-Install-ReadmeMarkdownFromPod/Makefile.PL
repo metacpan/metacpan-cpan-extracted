@@ -1,3 +1,4 @@
+use lib '.';
 use inc::Module::Install;
 include 'Module::AutoInstall';
 

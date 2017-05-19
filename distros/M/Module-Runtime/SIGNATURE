@@ -1,0 +1,52 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 846abd52ddad1c3141b395933fd10f14cb3cd7bc .gitignore
+SHA1 550af94fde243fb4333061a2a7b03f274a6fb33f Build.PL
+SHA1 132345e83b6e7293e7e011f5bb0f7fd9dcaf59ae Changes
+SHA1 0f537563bf9b875501217c236e970f78ed04788b MANIFEST
+SHA1 a8a5bf1ea3b6d09579aeb5930c721b7b817914a6 META.json
+SHA1 0f7e531061b47d38c3962ab7dd2433c1ad062b28 META.yml
+SHA1 0cfc7cc7e89b6334cf739d85244af8854a08b45d Makefile.PL
+SHA1 35948979e61ed7586ffa28049ab3043232478473 README
+SHA1 5d69c254f3af9104dcbe82c55a0260bbf81d2492 lib/Module/Runtime.pm
+SHA1 e80e49f06f99a5b5bb0faf54988df29a7aff89c5 t/Break.pm
+SHA1 c3c7b101e683f9f3d7f915763aa6d1850421bcb4 t/Context.pm
+SHA1 fbe32c46e3fe2cac40e4ab173764aec7db9b2a00 t/Eval.pm
+SHA1 d7f5ca01199b601b1a1a86127270d9ab7d1ca50b t/Hints.pm
+SHA1 ffe7d868943d2340608382f87281098e5dd7b951 t/Nest0.pm
+SHA1 e8bdcdde82209336e6c1f0123c283ec839d0efcb t/Nest1.pm
+SHA1 f8988828e7cab17800a0b5f25547f09431933480 t/Simple.pm
+SHA1 a0f9c0dfbe6472e81222a196a2f17554697d0d48 t/cmn.t
+SHA1 7324434239bc0678904a4eb406f6c3b08951b162 t/dependency.t
+SHA1 9331d0076c868209e9d3f0572d80f3e81df456df t/import_error.t
+SHA1 fa24ea0033e10712a16c71466d488cd3e69e3697 t/ivmn.t
+SHA1 84e207008efae1ed0ad21601d77205c2a8739fa5 t/ivms.t
+SHA1 8adfb7863317a2d0962a2538800cb5ad3bda1690 t/mnf.t
+SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
+SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
+SHA1 2e9638c32424e2e58100d64cb74ac50a0b964d1b t/rm.t
+SHA1 5a0ef5f7a982fbaff5d501165ae2720f465c7560 t/taint.t
+SHA1 a57c7214dbd32d1dd814b30e45ac9dc3eaeebf4d t/um.t
+SHA1 ddba26fbb70f1ac345b16b79098f96e36e812835 t/upo.t
+SHA1 58c31b3e89d117d674da19600ce8d3967ecaaa6a t/upo_overridden.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iEYEARECAAYFAlL0CBwACgkQOV9mt2VyAVGAVACeOdEFo68kefBCRGYWXBoaC+a7
+eR8AnRO4eNYgF0t/ig68L/m5syrSkzCZ
+=OmNr
+-----END PGP SIGNATURE-----

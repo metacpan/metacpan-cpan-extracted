@@ -1,0 +1,31 @@
+---
+abstract: 'Proxy app that serves selected paths from local dir.'
+author:
+  - 'zentooo <ankerasoy@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-App-Proxy-Selective
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Path::Class: 0
+  Plack::App::Directory: 0
+  Plack::App::Proxy: 0
+  Plack::Component: 0
+  Plack::Util::Accessor: 0
+  Regexp::Common: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/zentooo/p5-plack-app-proxy-selective.git
+version: 0.10

@@ -1,5 +1,9 @@
 Revision history for Perl extension SVG.
 
+2.77  2017.05.18 MANWAR
+      - Proposed fix to the following test failure:
+        http://www.cpantesters.org/cpan/report/ddc7eefc-3429-11e7-8430-9cfb106f656a
+
 2.76  2017.05.08 MANWAR
       - Added AUTHOR ONLY test scripts (meta-json.t and meta-yml.t).
 

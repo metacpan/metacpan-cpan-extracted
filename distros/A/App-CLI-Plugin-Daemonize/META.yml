@@ -1,0 +1,26 @@
+---
+abstract: 'for App::CLI::Plugin::Extension daemonize plugin module'
+author:
+  - 'Akira Horimoto'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.92'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-CLI-Plugin-Daemonize
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  App::CLI::Extension: 1.2
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.0

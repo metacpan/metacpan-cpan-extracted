@@ -1,0 +1,60 @@
+{
+   "abstract" : "Pragma to allow comments in qw()",
+   "author" : [
+      "Eric Brine <ikegami@adaelis.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "unrestricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Syntax-Feature-QwComments",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : 0,
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3614",
+            "Software::License::CC0_1_0" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Devel::CallParser" : 0,
+            "Lexical::Sub" : 0,
+            "XSLoader" : 0,
+            "perl" : "5.014",
+            "syntax" : "0.004",
+            "version" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Syntax::Feature::QwComments" : {
+         "file" : "lib/Syntax/Feature/QwComments.pm",
+         "version" : "v1.12.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Syntax-Feature-QwComments"
+      },
+      "homepage" : "http://search.cpan.org/dist/Syntax-Feature-QwComments/",
+      "license" : [
+         "http://creativecommons.org/publicdomain/zero/1.0/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/ikegami/perl-Syntax-Feature-QwComments"
+      }
+   },
+   "version" : "v1.12.0"
+}

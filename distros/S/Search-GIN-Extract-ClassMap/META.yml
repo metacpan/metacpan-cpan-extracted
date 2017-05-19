@@ -1,0 +1,58 @@
+---
+abstract: 'Delegate Extraction based on class.'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0.96'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Search-GIN-Extract-ClassMap
+provides:
+  Search::GIN::Extract::ClassMap:
+    file: lib/Search/GIN/Extract/ClassMap.pm
+    version: '1.000003'
+  Search::GIN::Extract::ClassMap::Does:
+    file: lib/Search/GIN/Extract/ClassMap/Does.pm
+    version: '1.000003'
+  Search::GIN::Extract::ClassMap::Isa:
+    file: lib/Search/GIN/Extract/ClassMap/Isa.pm
+    version: '1.000003'
+  Search::GIN::Extract::ClassMap::Like:
+    file: lib/Search/GIN/Extract/ClassMap/Like.pm
+    version: '1.000003'
+  Search::GIN::Extract::ClassMap::Role:
+    file: lib/Search/GIN/Extract/ClassMap/Role.pm
+    version: '1.000003'
+  Search::GIN::Extract::ClassMap::Types:
+    file: lib/Search/GIN/Extract/ClassMap/Types.pm
+    version: '1.000003'
+recommends:
+  Moose: '2.000'
+requires:
+  Moose: '0.90'
+  Moose::Role: '0.90'
+  MooseX::Types: '0'
+  MooseX::Types::Moose: '0'
+  Search::GIN::Extract: '0'
+  Search::GIN::Extract::Attributes: '0'
+  Search::GIN::Extract::Callback: '0'
+  aliased: '0'
+  namespace::autoclean: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Search-GIN-Extract-ClassMap/issues
+  homepage: https://github.com/kentnl/Search-GIN-Extract-ClassMap
+  repository: https://github.com/kentnl/Search-GIN-Extract-ClassMap.git
+version: '1.000003'

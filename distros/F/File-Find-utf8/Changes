@@ -1,5 +1,8 @@
 Revision history for Perl module File-Find-utf8
 
+0.013     2017-05-18
+  * Requiring File::Path 2.06_06 for remove_tree
+
 0.012     2017-04-22
   * Adpated to changes in Encode v2.89 [gh-1]
 

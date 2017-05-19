@@ -1,0 +1,58 @@
+---
+abstract: "KENTNL's DZil plugin testing tool"
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  Dist::Zilla::App::Command::authordeps: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0.96'
+  perl: '5.006'
+configure_requires:
+  CPAN::Meta::Requirements: '2.120620'
+  ExtUtils::MakeMaker: '0'
+  Module::Metadata: '0'
+  perl: '5.006'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Util-Test-KENTNL
+provides:
+  Dist::Zilla::Util::Test::KENTNL:
+    file: lib/Dist/Zilla/Util/Test/KENTNL.pm
+    version: '1.005014'
+  Dist::Zilla::Util::Test::KENTNL::dztest:
+    file: lib/Dist/Zilla/Util/Test/KENTNL/dztest.pm
+    version: '1.005014'
+recommends:
+  Moo: '1.000008'
+  Path::Tiny: '0.058'
+  Test::Differences: '0'
+  Test::More: '0.99'
+  Test::TempDir::Tiny: '0'
+requires:
+  Carp: '0'
+  Data::DPath: '0'
+  Dist::Zilla::App::Tester: '0'
+  Dist::Zilla::Tester: '0'
+  Dist::Zilla::Util: '0'
+  Module::Runtime: '0'
+  Moo: '0'
+  Path::Tiny: '0.050'
+  Sub::Exporter: '0'
+  Test::DZil: '0'
+  Test::Fatal: '0'
+  Test::More: '0.96'
+  Try::Tiny: '0'
+  perl: '5.006'
+  recommended: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-Util-Test-KENTNL/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-Util-Test-KENTNL
+  repository: https://github.com/kentnl/Dist-Zilla-Util-Test-KENTNL.git
+version: '1.005014'

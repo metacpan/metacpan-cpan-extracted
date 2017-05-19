@@ -150,7 +150,7 @@ sub test_001 : Tags(job_stats) {
     #is( scalar @files, 18, "Got the right number of files" );
 
     #diag(Dumper($test->jobs->{'blastx_scratch'}));
-    #diag(Dumper($test->jobs->{'trimmomatic'}->batches->[0]));
+    #diag(Dumper($test->jobs->{'trimmomatic'}));
     #diag(Dumper($test->jobs->{'trimmomatic_fastqc'}->deps));
     #diag(Dumper($test->jobs->{'trimmomatic_fastqc'}->all_batch_indexes));
     #diag(Dumper($test->jobs->{'trimmomatic'}->all_batch_indexes));

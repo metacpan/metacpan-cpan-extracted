@@ -1,0 +1,56 @@
+{
+   "abstract" : "Run and parse 'nm' command output with filter callbacks",
+   "author" : [
+      "Olivier Mengué <dolmen@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110580",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Parse-nm",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Spec" : 0,
+            "Locale::Maketext" : "1.17",
+            "Module::Build" : "0.38",
+            "Test::More" : "0.94",
+            "Test::NoWarnings" : "1.00"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Regexp::Assemble" : "0.34",
+            "String::ShellQuote" : "1.04",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Parse::nm" : {
+         "file" : "lib/Parse/nm.pm",
+         "version" : "0.09"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Parse-nm"
+      },
+      "homepage" : "http://github.com/dolmen/parse-nm",
+      "repository" : {
+         "url" : "http://github.com/dolmen/parse-nm.git"
+      }
+   },
+   "version" : "0.09"
+}

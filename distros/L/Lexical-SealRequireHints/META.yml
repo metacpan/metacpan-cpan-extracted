@@ -1,0 +1,35 @@
+---
+abstract: 'prevent leakage of lexical hints'
+author:
+  - 'Andrew Main (Zefram) <zefram@fysh.org>'
+build_requires:
+  Module::Build: '0'
+  Test::More: '0.41'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  Module::Build: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+conflicts:
+  B::Hooks::OP::Check: '< 0.19'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lexical-SealRequireHints
+provides:
+  Lexical::SealRequireHints:
+    file: lib/Lexical/SealRequireHints.pm
+    version: '0.010'
+recommends:
+  XSLoader: '0'
+requires:
+  perl: '5.006'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.010'

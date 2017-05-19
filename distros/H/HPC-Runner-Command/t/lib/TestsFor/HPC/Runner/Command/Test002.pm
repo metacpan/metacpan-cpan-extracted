@@ -79,7 +79,7 @@ sub construct {
 
 sub test_003 : Tags(construction) {
 
-    my $cur_dir = getcwd();
+    my $cur_dir  = getcwd();
     my $test     = construct();
     my $test_dir = getcwd();
 
@@ -143,7 +143,7 @@ EOF
 sub test_007 : Tags(check_hpc_meta) {
 
     my $cwd      = getcwd();
-    my $test = construct();
+    my $test     = construct();
     my $test_dir = getcwd();
 
     $test->jobname('job01');
@@ -165,7 +165,7 @@ sub test_008 : Tags(check_hpc_meta) {
     my $self = shift;
 
     my $cwd      = getcwd();
-    my $test = construct();
+    my $test     = construct();
     my $test_dir = getcwd();
 
     my $line = "#HPC jobname=job03\n";
@@ -186,7 +186,7 @@ sub test_009 : Tags(check_hpc_meta) {
     my $self = shift;
 
     my $cwd      = getcwd();
-    my $test = construct();
+    my $test     = construct();
     my $test_dir = getcwd();
 
     my $line = "#HPC jobname=job01\n";
@@ -202,7 +202,7 @@ sub test_010 : Tags(check_note_meta) {
     my $self = shift;
 
     my $cwd      = getcwd();
-    my $test = construct();
+    my $test     = construct();
     my $test_dir = getcwd();
 
     my $line = "#HPC jobname=job01\n";
@@ -307,8 +307,12 @@ echo "goodbye from job 3"
 ',
         'job'        => 'job02',
         'batch_tags' => ['Sample1'],
-        'array_deps' => [ [ '1235_3', '1234_1' ] ],
-        'scheduler_index' => { 'job01' => [0] },
+
+        # 'array_deps' => [ [ '1235_3', '1234_1' ] ],
+        'array_deps' => [],
+
+        # 'scheduler_index' => { 'job01' => [0] },
+        'scheduler_index' => {},
         'scheduler_id'    => '1235',
     };
 
@@ -326,10 +330,18 @@ echo "hello again from job 3" && sleep 5
 ',
         'job'        => 'job02',
         'batch_tags' => ['Sample2'],
-        'array_deps' => [ [ '1235_4', '1234_2' ] ],
-        'scheduler_index' => { 'job01' => [1] },
+
+        # 'array_deps' => [ [ '1235_4', '1234_2' ] ],
+        'array_deps' => [],
+
+        # 'scheduler_index' => { 'job01' => [1] },
+        'scheduler_index' => {},
         'scheduler_id'    => '1235',
     };
+
+    my $array_deps = [ [ '1235_3', '1234_1' ], [ '1235_4', '1234_2' ] ];
+
+    is_deeply( $test->array_deps, $array_deps, 'ArrayDeps Match' );
 
     is_deeply( $test->jobs->{job02}->batches->[1],
         $batch_job02_002, 'Job 02 Batch 002 matches' );

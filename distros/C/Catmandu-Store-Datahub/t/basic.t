@@ -1,8 +1,12 @@
 use strict;
 use Test::More;
-use Catmandu::Store::Datahub;
 
-# replace with the actual test
-ok 1;
+my @pkgs = qw(
+    Catmandu::Store::Datahub
+    Catmandu::Store::Datahub::Bag
+    Catmandu::Store::Datahub::OAuth
+);
 
-done_testing;
+require_ok $_ for @pkgs;
+
+done_testing 3;

@@ -1,0 +1,97 @@
+{
+   "abstract" : "API for Duo multifactor authentication service",
+   "author" : [
+      "Russ Allbery <rra@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Duo",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "0",
+            "LWP::UserAgent" : "6.00",
+            "Perl6::Slurp" : "0",
+            "Sub::Install" : "0",
+            "URI::Escape" : "0",
+            "perl" : "5.014"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Duo" : {
+         "file" : "lib/Net/Duo.pm",
+         "version" : "1.01"
+      },
+      "Net::Duo::Admin" : {
+         "file" : "lib/Net/Duo/Admin.pm",
+         "version" : "1.01"
+      },
+      "Net::Duo::Admin::Group" : {
+         "file" : "lib/Net/Duo/Admin/Group.pm",
+         "version" : "1.01"
+      },
+      "Net::Duo::Admin::Integration" : {
+         "file" : "lib/Net/Duo/Admin/Integration.pm",
+         "version" : "1.01"
+      },
+      "Net::Duo::Admin::Phone" : {
+         "file" : "lib/Net/Duo/Admin/Phone.pm",
+         "version" : "1.01"
+      },
+      "Net::Duo::Admin::Token" : {
+         "file" : "lib/Net/Duo/Admin/Token.pm",
+         "version" : "1.01"
+      },
+      "Net::Duo::Admin::User" : {
+         "file" : "lib/Net/Duo/Admin/User.pm",
+         "version" : "1.01"
+      },
+      "Net::Duo::Auth" : {
+         "file" : "lib/Net/Duo/Auth.pm",
+         "version" : "1.01"
+      },
+      "Net::Duo::Auth::Async" : {
+         "file" : "lib/Net/Duo/Auth/Async.pm",
+         "version" : "1.01"
+      },
+      "Net::Duo::Exception" : {
+         "file" : "lib/Net/Duo/Exception.pm",
+         "version" : "1.01"
+      },
+      "Net::Duo::Mock::Agent" : {
+         "file" : "lib/Net/Duo/Mock/Agent.pm",
+         "version" : "1.01"
+      },
+      "Net::Duo::Object" : {
+         "file" : "lib/Net/Duo/Object.pm",
+         "version" : "1.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Net-Duo"
+      },
+      "license" : [
+         "http://opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "url" : "git://git.eyrie.org/perl/duo.git"
+      }
+   },
+   "version" : "1.01",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

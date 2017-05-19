@@ -10,6 +10,9 @@ use Template;
 use DBM::Deep;
 use Storable qw(dclone);
 use Text::ASCIITable;
+use Data::Structure::Util qw(unbless);
+use Memoize;
+use List::MoreUtils qw(first_index);
 
 use MooseX::App::Role;
 
@@ -295,18 +298,26 @@ has 'scheduler_ids' => (
     isa     => 'ArrayRef',
     default => sub { [] },
     handles => {
-        all_scheduler_ids    => 'elements',
-        add_scheduler_id     => 'push',
-        map_scheduler_ids    => 'map',
-        filter_scheduler_ids => 'grep',
-        find_scheduler_id    => 'first',
-        get_scheduler_id     => 'get',
-        join_scheduler_ids   => 'join',
-        count_scheduler_ids  => 'count',
-        has_scheduler_ids    => 'count',
-        has_no_scheduler_ids => 'is_empty',
-        sorted_scheduler_ids => 'sort',
-        clear_scheduler_ids  => 'clear',
+        all_scheduler_ids   => 'elements',
+        add_scheduler_id    => 'push',
+        join_scheduler_ids  => 'join',
+        count_scheduler_ids => 'count',
+        has_scheduler_ids   => 'count',
+        clear_scheduler_ids => 'clear',
+    },
+);
+
+has 'array_deps' => (
+    traits  => ['Array'],
+    isa     => 'ArrayRef',
+    is      => 'rw',
+    default => sub { return [] },
+    handles => {
+        all_array_deps   => 'elements',
+        add_array_deps   => 'push',
+        join_array_deps  => 'join',
+        has_array_deps   => 'count',
+        clear_array_deps => 'clear',
     },
 );
 
@@ -506,10 +517,13 @@ has 'jobs' => (
     default => sub {
         my $self = shift;
         my $fh   = tempfile();
-        my $db   = DBM::Deep->new( fh => $fh );
+        my $db   = DBM::Deep->new( fh => $fh, num_txns => 2 );
         return $db;
+        # return {};
     },
 );
+
+has 'jobs_current_job' => ( is => 'rw', );
 
 =head3 graph_job_deps
 
@@ -689,6 +703,8 @@ sub iterate_schedule {
         $self->process_jobs();
     }
 
+    $self->job_scheduler_ids_by_array unless $self->use_batches;
+
     $self->summarize_jobs;
 }
 
@@ -799,7 +815,6 @@ sub pre_process_batch {
         $self->current_batch($batch);
 
         if ( $self->use_batches ) {
-
             $DB::single = 2;
             $self->batch( $batch->batch_str );
             $self->scheduler_ids_by_batch;
@@ -813,7 +828,6 @@ sub pre_process_batch {
 
         #Only need this for job_arrays
         $self->inc_batch_counter;
-
     }
 }
 
@@ -826,10 +840,13 @@ When defining job tags there is an extra level of dependency
 sub scheduler_ids_by_batch {
     my $self = shift;
 
-    my $scheduler_index = $self->current_batch->scheduler_index;
+    ##TODO UPDATE
+    # my $scheduler_index = $self->current_batch->scheduler_index;
+    my $scheduler_index = $self->process_batch_deps($self->current_batch);
 
     my @jobs = keys %{$scheduler_index};
 
+    # my @jobs          = @{ $self->graph_job_deps->{ $self->current_job } };
     my @scheduler_ids = ();
 
     foreach my $job (@jobs) {
@@ -839,7 +856,6 @@ sub scheduler_ids_by_batch {
         foreach my $index ( @{$batch_index} ) {
             push( @scheduler_ids, $dep_scheduler_ids->[$index] );
         }
-
     }
 
     $self->scheduler_ids( \@scheduler_ids ) if @scheduler_ids;
@@ -847,11 +863,86 @@ sub scheduler_ids_by_batch {
 
 =head3 scheduler_ids_by_array
 
+#TODO do this after the all batches for a single job have been passed
+
 =cut
+
+sub job_scheduler_ids_by_array {
+    my $self = shift;
+
+    foreach my $job ( $self->all_schedules ) {
+        $self->current_job($job);
+        $self->batch_scheduler_ids_by_array;
+    }
+
+    $self->update_job_deps;
+}
+
+sub batch_scheduler_ids_by_array {
+    my $self = shift;
+
+    return unless $self->jobs->{ $self->current_job }->has_deps;
+
+    $self->batch_counter(
+        $self->jobs->{ $self->current_job }->{batch_index_start} );
+    foreach my $batch ( $self->jobs->{ $self->current_job }->all_batches ) {
+        my $scheduler_index = $self->process_batch_deps($batch);
+        $self->dep_scheduler_ids_by_array($scheduler_index);
+        $self->inc_batch_counter;
+    }
+}
+
+sub dep_scheduler_ids_by_array {
+    my $self            = shift;
+    my $scheduler_index = shift;
+
+    # my $dep_jobs = $self->jobs->{ $self->current_job }->deps;
+    my @dep_jobs            = keys %{$scheduler_index};
+    my $current_batch_index = $self->batch_counter - 1;
+
+    #TODO Implement new loop
+    ##Dep Jobs
+    foreach my $dep_job (@dep_jobs) {
+
+        next unless $dep_job;
+        my $total_batches = $self->jobs->{$dep_job}->count_batches;
+
+        ## Dep batches
+        my $dep_indices = $scheduler_index->{$dep_job};
+
+        # for ( my $index = 0 ; $index < $total_batches ; $index++ ) {
+        foreach my $index (@$dep_indices) {
+
+            my $index_in_batch =
+              $self->index_in_batch( $self->current_job, $current_batch_index );
+            my $batch_scheduler_id =
+              $self->jobs->{ $self->current_job }
+              ->scheduler_ids->[$index_in_batch];
+
+            my $x = $self->index_in_batch_deps( $dep_job, $index );
+            next unless defined $x;
+            my $dep_scheduler_id = $self->jobs->{$dep_job}->scheduler_ids->[$x];
+            next unless defined $dep_scheduler_id;
+
+            #This one is the command it matches
+            #Should be the same as scheduler_ref
+            my $dep_index =
+              $self->jobs->{$dep_job}->{batch_index_start} + $index;
+
+            my $array_dep = [
+                $batch_scheduler_id . '_' . $self->batch_counter,
+                $dep_scheduler_id . '_' . $dep_index,
+            ];
+            $self->add_array_deps($array_dep);
+        }
+    }
+}
 
 sub scheduler_ids_by_array {
     my $self = shift;
 
+    #TODO we should get rid of this - and just do the processing once
+    #TODO this should be in the job
     my $scheduler_index = $self->current_batch->scheduler_index;
     return unless $scheduler_index;
 
@@ -865,7 +956,6 @@ sub scheduler_ids_by_array {
               . $self->current_job
               . " does not have an appropriate index. If you think are reaching this in error please report the issue to github.\n"
         );
-
         return;
     }
 
@@ -876,20 +966,17 @@ sub scheduler_ids_by_array {
 
     $self->current_batch->scheduler_id($batch_scheduler_id);
 
-    my @jobs = keys %{$scheduler_index};
+    # my @jobs = keys %{$scheduler_index};
+    my $jobs = $self->jobs->{ $self->current_job }->deps;
 
-    foreach my $job (@jobs) {
+    foreach my $job (@$jobs) {
 
         next unless $job;
         my $batch_index = $scheduler_index->{$job};
 
-        my $job_start = $self->jobs->{$job}->{batch_index_start};
-        my $job_end   = $self->jobs->{$job}->{batch_index_end};
-
-        my @job_array = ( $job_start .. $job_end );
-
         foreach my $index ( @{$batch_index} ) {
 
+            #Don't need to do this twice - just look at the job deps
             my $x = $self->index_in_batch_deps( $job, $index );
 
             #we should give a warning here
@@ -901,17 +988,20 @@ sub scheduler_ids_by_array {
                       . " array index $index" );
                 next;
             }
+
             my $dep_scheduler_id = $self->jobs->{$job}->scheduler_ids->[$x];
 
             next unless $dep_scheduler_id;
 
+            my $dep_index = $self->jobs->{$job}->{batch_index_start} + $index;
             my $array_dep = [
                 $batch_scheduler_id . '_' . $self->batch_counter,
-                $dep_scheduler_id . '_' . $job_array[$index]
+                $dep_scheduler_id . '_' . $dep_index,
             ];
+
+            #TODO Add change this for the whole job
             $self->current_batch->add_array_deps($array_dep);
         }
-
     }
 
     $self->update_job_deps;
@@ -936,24 +1026,17 @@ The index argument is zero indexed, and our counters (job_counter, batch_counter
 
 =cut
 
+#TODO Combine these
 sub index_in_batch {
     my $self  = shift;
     my $job   = shift;
     my $index = shift;
 
-    my $x = 0;
+    $index++;
 
-    foreach my $batch_index ( $self->jobs->{$job}->all_batch_indexes ) {
-        my $batch_start = $batch_index->{batch_index_start} - 1;
-        my $batch_end   = $batch_index->{batch_index_end} - 1;
-
-        if ( $index >= $batch_start && $index <= $batch_end ) {
-            return $x;
-        }
-        $x++;
-    }
-
-    return undef;
+    # my $batches = $self->jobs->{$job}->batch_indexes->export();
+    my $batches = $self->jobs->{$job}->batch_indexes;
+    return check_batch_index( $batches, $index );
 }
 
 sub index_in_batch_deps {
@@ -961,28 +1044,39 @@ sub index_in_batch_deps {
     my $job   = shift;
     my $index = shift;
 
-    my $x = 0;
+    my $search_index = $self->jobs->{$job}->batch_index_start + $index;
 
-    my $len =
-      $self->jobs->{$job}->batch_index_end -
-      $self->jobs->{$job}->batch_index_start;
-    my @search_indexes =
-      ( $self->jobs->{$job}->batch_index_start .. $self->jobs->{$job}
-          ->batch_index_end );
+    # my $batches = $self->jobs->{$job}->batch_indexes->export();
+    my $batches = $self->jobs->{$job}->batch_indexes;
+    return check_batch_index( $batches, $search_index );
+}
 
-    my $search_index = $search_indexes[$index];
+memoize('check_batch_index');
 
-    foreach my $batch_index ( $self->jobs->{$job}->all_batch_indexes ) {
-        my $batch_start = $batch_index->{batch_index_start};
-        my $batch_end   = $batch_index->{batch_index_end};
+sub check_batch_index {
+    my $batches      = shift;
+    my $search_index = shift;
 
-        if ( $search_index >= $batch_start && $search_index <= $batch_end ) {
-            return $x;
-        }
-
-        $x++;
+    my $x = first_index {
+        search_index( $_, $search_index );
     }
+    @{$batches};
 
+    return $x if defined $x;
+    return undef;
+}
+
+memoize('search_index');
+
+sub search_index {
+    my $batch_index  = shift;
+    my $search_index = shift;
+    my $batch_start  = $batch_index->{batch_index_start};
+    my $batch_end    = $batch_index->{batch_index_end};
+
+    if ( $search_index >= $batch_start && $search_index <= $batch_end ) {
+        return 1;
+    }
     return undef;
 }
 
@@ -1046,9 +1140,7 @@ sub process_batch {
         $count_by = $self->jobs->{ $self->current_job }->batch_indexes;
     }
 
-    foreach my $batch_indexes (
-        @{$count_by} )
-    {
+    foreach my $batch_indexes ( @{$count_by} ) {
 
         my $counter;
 

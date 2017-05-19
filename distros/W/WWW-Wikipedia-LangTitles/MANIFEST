@@ -1,0 +1,15 @@
+.gitignore
+Changes
+examples/elements.pl
+examples/synopsis.pl
+examples/thai-url.pl
+lib/WWW/Wikipedia/LangTitles.pm
+lib/WWW/Wikipedia/LangTitles.pod
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/www-wikipedia-langtitles.t
+xt/scrape.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,7 +1,6 @@
 #!perl
 
-use strict;
-use warnings;
+use Modern::Perl '2009';
 use LWP::UserAgent;
 use Getopt::Long qw(GetOptions);
 use Email::Address;
@@ -31,7 +30,7 @@ if ( $json_get->is_success )
 	{
         if ( $address ne 'git@github.com')
 		{
-            print "\t$address\n";
+            say $address;
         }
     }
 }
@@ -53,7 +52,7 @@ github-email
 
 =head1 VERSION
 
-version 0.0.6
+version 0.0.7
 
 =head1 SYNOPSIS
 

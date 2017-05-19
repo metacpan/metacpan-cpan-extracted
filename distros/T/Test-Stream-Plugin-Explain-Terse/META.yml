@@ -1,0 +1,41 @@
+---
+abstract: 'Dump anything in a single line in 80 characters or fewer'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0.89'
+  Test::Stream: '1.302025'
+  Test::Stream::Bundle::V1: '0'
+  Test::Stream::Plugin::Compare: '0'
+  Test::Stream::Plugin::Core: '0'
+  Test::Stream::Plugin::SRand: '0'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Stream-Plugin-Explain-Terse
+provides:
+  Test::Stream::Plugin::Explain::Terse:
+    file: lib/Test/Stream/Plugin/Explain/Terse.pm
+    version: '0.001001'
+requires:
+  Data::Dump: '0'
+  Test::Stream::Exporter: '0'
+  constant: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Test-Stream-Plugin-Explain-Terse/issues
+  homepage: https://github.com/kentnl/Test-Stream-Plugin-Explain-Terse
+  repository: https://github.com/kentnl/Test-Stream-Plugin-Explain-Terse.git
+version: '0.001001'

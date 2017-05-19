@@ -1,0 +1,22 @@
+---
+abstract: 'testing distribution for Module::Build::SysPath'
+author: []
+configure_requires:
+  Module::Build: 0.36
+  Module::Build::SysPath: 0.09
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-Test-SysPath
+provides:
+  Acme::Test::SysPath:
+    file: lib/Acme/Test/SysPath.pm
+    version: 0.01
+  Acme::Test::SysPath::SPc:
+    file: lib/Acme/Test/SysPath/SPc.pm
+    version: 0.001
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

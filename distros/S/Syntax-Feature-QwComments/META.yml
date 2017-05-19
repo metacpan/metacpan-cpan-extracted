@@ -1,0 +1,34 @@
+---
+abstract: 'Pragma to allow comments in qw()'
+author:
+  - 'Eric Brine <ikegami@adaelis.com>'
+build_requires:
+  ExtUtils::CBuilder: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.3614
+  Software::License::CC0_1_0: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Syntax-Feature-QwComments
+provides:
+  Syntax::Feature::QwComments:
+    file: lib/Syntax/Feature/QwComments.pm
+    version: v1.12.0
+requires:
+  Devel::CallParser: 0
+  Lexical::Sub: 0
+  XSLoader: 0
+  perl: 5.014
+  syntax: 0.004
+  version: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Syntax-Feature-QwComments
+  homepage: http://search.cpan.org/dist/Syntax-Feature-QwComments/
+  license: http://creativecommons.org/publicdomain/zero/1.0/
+  repository: http://github.com/ikegami/perl-Syntax-Feature-QwComments
+version: v1.12.0

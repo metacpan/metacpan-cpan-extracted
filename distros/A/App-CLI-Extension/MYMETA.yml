@@ -1,0 +1,32 @@
+---
+abstract: 'for App::CLI extension module'
+author:
+  - 'Akira Horimoto'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06, CPAN::Meta::Converter version 2.120351'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-CLI-Extension
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  App::CLI: 0.313
+  Class::Accessor::Grouped: 0.1
+  Error: 0.17
+  MRO::Compat: 0.11
+  UNIVERSAL::require: 0.13
+  perl: 5.008
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/holly/perl-App-CLI-Extension.git
+version: 1.42

@@ -1,0 +1,41 @@
+NAME
+    Template::Plugin::MobileJPPictogram - Japanese mobile phone's pictogram
+    operator
+
+SYNOPSIS
+      # controller
+      my $tt = Template->new;
+      $tt->process('foo.tt', {body => "\x{E001}"});
+
+      # foo.tt
+      [% USE MobileJPPictogram %]
+      [% body | pictogram_charname('***%s***') %]
+      [% body | pictogram_unicode('<img src="/img/pictogram/%X.gif" />') %]
+
+      # output
+      ***男の子***
+      <img src="/img/pictogram/E001.gif" />
+
+DESCRIPTION
+    Template::Plugin::MobileJPPictogram is Japanese mobile phone's pictogram
+    operator.
+
+FILTERS
+  pictogram_charname
+    format with charnames.
+
+        [% body | pictogram_charname('***%s***') %]
+
+  pictogram_unicode
+    format with Unicode.
+
+        [% body | pictogram_unicode('<img src="/img/pictogram/%X.gif" />') %]
+
+AUTHOR
+    Tokuhiro Matsuno <tokuhirom aaaatttt@ gmail dotottto commmmm>
+
+SEE ALSO
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

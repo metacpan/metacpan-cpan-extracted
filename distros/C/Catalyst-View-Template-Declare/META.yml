@@ -1,0 +1,25 @@
+--- 
+abstract: Use Template::Declare with Catalyst
+author: 
+  - Jonathan Rockway, C<< <jrockway at cpan.org> >>
+build_requires: 
+  Catalyst::Runtime: 5.7000
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Catalyst-View-Template-Declare
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Catalyst::View::Templated: 0
+  Class::C3: 0
+  Module::Pluggable::Object: 0
+  PadWalker: 0
+  Template::Declare: 0.26
+version: 0.04

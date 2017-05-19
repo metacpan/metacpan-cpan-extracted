@@ -1,0 +1,70 @@
+---
+abstract: ~
+author:
+  - 'Matt S Trout <mst@shadowcat.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  SQL::Translator: 0.11002
+  Test::Class: 0.31
+  Test::Memory::Cycle: 1.04
+  Test::WWW::Mechanize::Catalyst: 0.51
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Reaction
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+requires:
+  Catalyst: 5.80002
+  Catalyst::Component::ACCEPT_CONTEXT: 0.05
+  Catalyst::Component::InstancePerContext: 0.001001
+  Catalyst::Model::DBIC::Schema: 0.23
+  Catalyst::Plugin::ConfigLoader: 0.23
+  Catalyst::Plugin::I18N: 0.09
+  Catalyst::Plugin::Static::Simple: 0.21
+  Catalyst::View::TT: 0.29
+  Class::MOP: 0.81
+  Config::General: 2.42
+  Crypt::Eksblowfish::Bcrypt: 0.005
+  DBIx::Class: 0.08100
+  DBIx::Class::IntrospectableM2M: 0.001001
+  DateTime: 0.47
+  DateTime::Event::Recurrence: 0.16
+  DateTime::Span: 0
+  Devel::Declare: 0.005000
+  Email::Valid: 0.181
+  File::ShareDir: 1.00
+  File::Spec: 3.29
+  JSON: 0
+  Method::Signatures::Simple: 0.03
+  Moose: 0.74
+  MooseX::MethodAttributes: 0.18
+  MooseX::Role::Parameterized: 0.24
+  MooseX::Types: 0.10
+  MooseX::Types::Common: 0.001000
+  MooseX::Types::DateTime: 0.03
+  MooseX::Types::URI: 0.02
+  Path::Class::Dir: 0
+  Path::Class::File: 0
+  Scalar::Util: 1.19
+  Sub::Exporter: 0.982
+  Sub::Name: 0.04
+  Template: 2.20
+  Time::ParseDate: 2006.0814
+  URI: 1.37
+  aliased: 0.22
+  metaclass: 0.81
+  namespace::clean: 0.11
+  perl: 5.8.1
+  signatures: 0.05
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.002005

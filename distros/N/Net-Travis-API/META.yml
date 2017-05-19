@@ -1,0 +1,56 @@
+---
+abstract: "Low Level Plumbing for travis-ci.org's api"
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Travis-API
+provides:
+  Net::Travis::API:
+    file: lib/Net/Travis/API.pm
+    version: '0.002001'
+  Net::Travis::API::Auth::GitHub:
+    file: lib/Net/Travis/API/Auth/GitHub.pm
+    version: '0.002001'
+  Net::Travis::API::Role::Client:
+    file: lib/Net/Travis/API/Role/Client.pm
+    version: '0.002001'
+  Net::Travis::API::UA:
+    file: lib/Net/Travis/API/UA.pm
+    version: '0.002001'
+  Net::Travis::API::UA::Response:
+    file: lib/Net/Travis/API/UA/Response.pm
+    version: '0.002001'
+recommends:
+  Moo: '1.000008'
+requires:
+  Carp: '0'
+  Encode: '0'
+  HTTP::Tiny: '0'
+  HTTP::Tiny::UA::Response: '0'
+  JSON::MaybeXS: '0'
+  Moo: '1.000008'
+  Moo::Role: '0'
+  Scalar::Util: '0'
+  URI: '0'
+  mro: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Net-Travis-API/issues
+  homepage: https://github.com/kentnl/Net-Travis-API
+  repository: https://github.com/kentnl/Net-Travis-API.git
+version: '0.002001'

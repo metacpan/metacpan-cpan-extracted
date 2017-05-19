@@ -1,0 +1,24 @@
+---
+abstract: 'handle pickled data with Inline::Python'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom  slkjfd gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.50
+distribution_type: module
+generated_by: 'Module::Install version 0.81'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Python-Serialize-Pickle-InlinePython
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Inline::Python: 0.28
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

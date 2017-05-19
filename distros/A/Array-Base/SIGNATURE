@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 88381571be4d455b4266418c420a2797fb8f075a .gitignore
+SHA1 75c3bd9da9fd53c3c33c9029a3a83f085ea0bedd Build.PL
+SHA1 458d662e6304785726bf549cc4e37c65d47ff4c3 Changes
+SHA1 671eea2c5d90065eedc4743686c73c5f741e73d1 MANIFEST
+SHA1 4d8bc694acafd06e622d11235017d84967553b56 META.json
+SHA1 7c103dde42a64b4e306e168377c19644cef08a9b META.yml
+SHA1 ac10abef4842e562f11f09847244c1a1b1bcca06 Makefile.PL
+SHA1 1bef82095f1b175ed485ee4f5402bc79e04cdb20 README
+SHA1 f43e2d6600783050d39d4c1b0abf7711418ccc92 lib/Array/Base.pm
+SHA1 1df6dcfd107cd82368742fb5ac292869fd641fcb lib/Array/Base.xs
+SHA1 36ab4f2819cb9b140504246e807cb7ff111f2b60 t/aeach.t
+SHA1 8fbab418dd4b6a8017c51c2921efe47527961182 t/aelem.t
+SHA1 b409e955707327cfa594e74842512f4483f73118 t/akeys.t
+SHA1 8e1d548ee34d5309d40ab8d272190d21fd7eb693 t/aslice.t
+SHA1 8fe53d65992b6d61e926fc257669d07c5ff1da4e t/av2arylen.t
+SHA1 f5c9ffe330a2aa5acdb53921fe713f63e0c4368b t/lslice.t
+SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
+SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
+SHA1 63367a4adf84d106fd42916b70d12bdbad80a044 t/scope.t
+SHA1 596de8900bd8d930221efadf1ee8270a1448b473 t/scope_0.pm
+SHA1 ca190ca5aa1fee43bd3b9ed77dc978c1b7b1ff04 t/splice.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAk8pbfkACgkQOV9mt2VyAVH2nQCbBkSZvzFWYQ2wlDNLYBLFv86q
+pMsAoKStnkGTXWnBmUTdFc7I99Ayj/46
+=WNOO
+-----END PGP SIGNATURE-----

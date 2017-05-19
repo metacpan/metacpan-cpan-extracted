@@ -1,0 +1,25 @@
+--- 
+abstract: use Template::Declare templates with App::TemplateServer
+author: ~
+build_requires: 
+  Test::More: 0
+  ok: 0
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: unknown
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: App-TemplateServer-Provider-TD
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  App::TemplateServer: 0.02
+  Class::MOP: 0
+  Method::Signatures: 0
+  Module::Pluggable::Object: 0
+  Moose: 0
+  Template::Declare: 0
+version: 0.01

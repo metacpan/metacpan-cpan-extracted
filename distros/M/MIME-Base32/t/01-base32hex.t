@@ -15,11 +15,17 @@ my $encoded_hex = '91GMOR3F41RMUSJCCGM20TR8C5Q7683ECLRJU81H68PJ8D9M6SS3IC10C5H66
 
 is(MIME::Base32::encode_base32hex($string),$encoded_hex, 'encode_base32hex: Got the right response');
 is(MIME::Base32::decode_base32hex($encoded_hex),$string, 'decode_base32hex: Got the right response');
+is(MIME::Base32::decode_base32hex(lc($encoded_hex)),$string, 'decode_base32hex: case insensitive');
+
 is(MIME::Base32::encode_09AV($string),$encoded_hex, 'encode_09AV: Got the right response');
 is(MIME::Base32::decode_09AV($encoded_hex),$string, 'decode_09AV: Got the right response');
+is(MIME::Base32::decode_09AV(lc($encoded_hex)),$string, 'decode_09AV: case insensitive');
 
 is(MIME::Base32::encode_base32hex(undef), '', 'encode_base32hex: undef passed');
 is(MIME::Base32::decode_base32hex(undef), '', 'decode_base32hex: undef passed');
+
+is(MIME::Base32::encode_base32hex(), '', 'encode_base32hex: empty call');
+is(MIME::Base32::decode_base32hex(), '', 'decode_base32hex: empty call');
 
 is(MIME::Base32::encode_base32hex(''), '', 'encode_base32hex: empty string passed');
 is(MIME::Base32::decode_base32hex(''), '', 'decode_base32hex: empty string passed');

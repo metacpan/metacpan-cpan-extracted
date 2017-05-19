@@ -1,0 +1,74 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 4ff607a9628b3a53d1d5f493d07f80c62e05a1cc .gitignore
+SHA1 35ad1741a2e8227aa927f65735bc60253412a468 Build.PL
+SHA1 66892da20c7745991fd39ca7b1d3760d532a3a97 Changes
+SHA1 b3dbe8d80575d887abec73ceb39d52596e510571 MANIFEST
+SHA1 61126660bd129b1f4b1dc9cf2477ffa1049dc93a META.json
+SHA1 683a1207e98036d1af45f84afa1f32c68db5c7da META.yml
+SHA1 a4df8e97ccd390a42212af5a9f4d0986c85e7a5f Makefile.PL
+SHA1 4ce3500e0561cedc483673a918e6da960b169bda README
+SHA1 9e0c16edc63873594d30d569537d469ca7b21bf7 lib/Authen/Passphrase.pm
+SHA1 a023195088f0aae1a528fbb2911a606041b05b48 lib/Authen/Passphrase/AcceptAll.pm
+SHA1 46869a335237a2710ee4766fcd457b8b51b56a85 lib/Authen/Passphrase/BigCrypt.pm
+SHA1 c258c203f227b3edefeb20add41a9c3d2d5a45da lib/Authen/Passphrase/BlowfishCrypt.pm
+SHA1 8ef489ef2319e2d32208ccfc161def8692fa2fbb lib/Authen/Passphrase/Clear.pm
+SHA1 d221e22b9248ad5d25ee2b1b2a298083ab1fcbca lib/Authen/Passphrase/Crypt16.pm
+SHA1 336e4289f8dabb81dabfee444d0d0e082d2098f3 lib/Authen/Passphrase/DESCrypt.pm
+SHA1 c8115f18ecf9311fab5eaccd02692fd7fdd7be6d lib/Authen/Passphrase/EggdropBlowfish.pm
+SHA1 a02b462c3c62a34df09e3f36e2779dfc7823a50d lib/Authen/Passphrase/LANManager.pm
+SHA1 3709df52ff5709859ef14995810b1a450102f7ad lib/Authen/Passphrase/LANManagerHalf.pm
+SHA1 3ef6611b31b3c9f7f3df0720dc3366fe5f4c3f7a lib/Authen/Passphrase/MD5Crypt.pm
+SHA1 b55f6385b2a72a3c54c3a02fe80a5fadcbedff91 lib/Authen/Passphrase/MySQL323.pm
+SHA1 4e54f5b1745ddf18b353917f849c96606187d843 lib/Authen/Passphrase/MySQL41.pm
+SHA1 67c654ee5ccd3fb9e9c81bf1ce62cd76ea68631a lib/Authen/Passphrase/NTHash.pm
+SHA1 c945e262da2dbaaa560c62ec96452b87da03b6cf lib/Authen/Passphrase/NetscapeMail.pm
+SHA1 5ebc6d58d440440b0649b5eeb32c06cb9640bdf6 lib/Authen/Passphrase/PHPass.pm
+SHA1 e9435e9f46ed4b168746f2ee4a2a7770c5f391cc lib/Authen/Passphrase/RejectAll.pm
+SHA1 c681e467e3ad1dceb49ad85845ab6a0b4f4b4b35 lib/Authen/Passphrase/SaltedDigest.pm
+SHA1 c899b1dd540b115ac8274649c0ac1ed76eea72c0 lib/Authen/Passphrase/VMSPurdy.pm
+SHA1 701b95f420406bb412f27ce12bbabd4e2c388284 t/acceptall.t
+SHA1 c3888dbc795188d78a5498fed6167143d9aaed8f t/bigcrypt.t
+SHA1 a62299eeccc77e682893549122cba19558b6f5b9 t/blowfishcrypt.t
+SHA1 63691c2ef336fddaa8f9a131d8bc32539c5395b5 t/clear.t
+SHA1 022e065813caf9d462df1a52c7c48ad04feafbb0 t/crypt16.t
+SHA1 006723ca9e3d56b57444f55e4cd5c9da76f26410 t/eggdropblowfish.t
+SHA1 eb7784180618d43171420d6c72f7d64210c4c6bf t/extdescrypt.t
+SHA1 e625976a80c74e79718278ce36f50dfa40c72cad t/gendescrypt.t
+SHA1 2fd7ec5f8a364a541d161249bb8132e78846ded7 t/intdescrypt.t
+SHA1 4168299f662fa8c10f2924790fb6a7887c9c3e9d t/lanman.t
+SHA1 b45c94717b50731f513a60a3b8b792d0610c85da t/lanmanhalf.t
+SHA1 b5b993f5a8141fd3562893f69af313b70bc0a074 t/md5crypt.t
+SHA1 183801ccda7843e9a07746395618a9b4e9a5f94b t/mysql323.t
+SHA1 7b4dedc232b78764aa493216818ec5d62944d5cb t/mysql41.t
+SHA1 957e5eb52221c1ccb139984757e00774dc49a398 t/netscapemail.t
+SHA1 0334ae266aa54c7b03019b95bf156afac05ac288 t/nthash.t
+SHA1 1f09f3f17eb280eec2791d2dffdfc3936fabe173 t/phpass.t
+SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
+SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
+SHA1 e3962e176588f0498b58b16c989fa1a674ee861f t/rejectall.t
+SHA1 3a48f131cf21940c853f01690ccf19c18f6a0eac t/smd5.t
+SHA1 dec2ee0c0b163930850cf1942485877a855fe45d t/ssha.t
+SHA1 c9ef4b2237f83808e82f864775684a42c1a4f43c t/traddescrypt.t
+SHA1 66c4083e0684fdc049a1fdcff3e93f0cdf80e120 t/vmspurdy.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAk8tO34ACgkQOV9mt2VyAVHkAACeMgXakr7kFcTJWZdRKkMigwe0
+kc0AmgM9GAbozkMGecF0mB2/066nzQyy
+=k1za
+-----END PGP SIGNATURE-----

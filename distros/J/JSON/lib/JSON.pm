@@ -9,7 +9,7 @@ BEGIN { @JSON::ISA = 'Exporter' }
 @JSON::EXPORT = qw(from_json to_json jsonToObj objToJson encode_json decode_json);
 
 BEGIN {
-    $JSON::VERSION = '2.92';
+    $JSON::VERSION = '2.93';
     $JSON::DEBUG   = 0 unless (defined $JSON::DEBUG);
     $JSON::DEBUG   = $ENV{ PERL_JSON_DEBUG } if exists $ENV{ PERL_JSON_DEBUG };
 }
@@ -356,6 +356,7 @@ sub init {
 
 sub is_xs { 0 };
 sub is_pp { 1 };
+sub VERSION { $JSON::BackendModule->VERSION }
 
 #
 # To save memory, the below lines are read only when XS backend is used.
@@ -407,6 +408,7 @@ sub init {
 
 sub is_xs { 1 };
 sub is_pp { 0 };
+sub VERSION { $JSON::BackendModule->VERSION }
 
 sub support_by_pp {
     my ($class, @methods) = @_;
@@ -462,7 +464,7 @@ JSON - JSON (JavaScript Object Notation) encoder/decoder
 
 =head1 VERSION
 
-    2.91_04
+    2.93
 
 =head1 DESCRIPTION
 
@@ -1156,9 +1158,12 @@ The following methods are for this module only.
 
     $backend = $json->backend
 
-Returns the backend this module currently uses, which should be
-JSON::Backend::XS (which inherits JSON::XS or Cpanel::JSON::XS),
-or JSON::Backend::PP (which inherits JSON::PP).
+Since 2.92, C<backend> method returns an abstract backend module used currently,
+which should be JSON::Backend::XS (which inherits JSON::XS or Cpanel::JSON::XS),
+or JSON::Backend::PP (which inherits JSON::PP), not to monkey-patch the actual
+backend module globally.
+
+If you need to know what is used actually, use C<isa>, instead of string comparison.
 
 =head2 is_xs
 

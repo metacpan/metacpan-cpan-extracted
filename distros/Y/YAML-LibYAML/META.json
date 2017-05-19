@@ -50,7 +50,7 @@
          "web" : "https://github.com/ingydotnet/yaml-libyaml-pm"
       }
    },
-   "version" : "0.64",
+   "version" : "0.65",
    "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

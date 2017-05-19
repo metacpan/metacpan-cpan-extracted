@@ -1,0 +1,66 @@
+{
+   "abstract" : "Event loop friendly HTTP and HTTPS backend for LWP",
+   "author" : [
+      "Eric Brine <ikegami@adaelis.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.120351",
+   "license" : [
+      "unrestricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "LWP-Protocol-AnyEvent-http",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "CGI" : "0",
+            "Carp" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "Getopt::Long" : "0",
+            "HTTP::Daemon" : "0",
+            "LWP::Simple" : "0",
+            "Test::More" : "0",
+            "URI" : "0",
+            "URI::URL" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3614",
+            "Software::License::CC0_1_0" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "AnyEvent::HTTP" : "2",
+            "HTTP::Response" : "0",
+            "LWP::Protocol" : "0",
+            "LWP::Protocol::http" : "0",
+            "LWP::Simple" : "5.827",
+            "version" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "LWP::Protocol::AnyEvent::http" : {
+         "file" : "lib/LWP/Protocol/AnyEvent/http.pm",
+         "version" : "v1.8.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://creativecommons.org/publicdomain/zero/1.0/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/ikegami/perl-LWP-Protocol-AnyEvent-http"
+      }
+   },
+   "version" : "v1.8.0"
+}

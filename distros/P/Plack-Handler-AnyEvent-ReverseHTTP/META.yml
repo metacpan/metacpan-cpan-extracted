@@ -1,0 +1,32 @@
+---
+abstract: 'reversehttp gateway for PSGI application'
+author:
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.92'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Handler-AnyEvent-ReverseHTTP
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  AnyEvent: 0
+  AnyEvent::ReverseHTTP: 0
+  Filter::Util::Call: 0
+  HTTP::Message::PSGI: 0
+  Plack: 0.99
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/miyagawa/Plack-Handler-AnyEvent-ReverseHTTP.git
+version: 0.04

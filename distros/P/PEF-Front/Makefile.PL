@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
 	NAME             => "PEF::Front",
 	AUTHOR           => "Anton Petrusevich",
-	VERSION          => "0.20",
+	VERSION          => "0.22",
 	LICENSE          => "artistic_2",
 	INSTALLDIRS      => 'site',
 	MIN_PERL_VERSION => "5.014000",
@@ -35,6 +35,7 @@ WriteMakefile(
 		'JSON'                  => 0,
 		'Locale::PO'            => 0,
 		'LWP::UserAgent'        => 0,
+		'Math::Random::Secure'  => 0,
 		'MLDBM'                 => 0,
 		'MLDBM::Sync'           => "0.30",
 		'POSIX'                 => 0,

@@ -4,32 +4,14 @@ use strict;
 use warnings;
 use Test::Most;
 
-my $can_test = 1;
-
-if($ENV{RELEASE_TESTING}) {
-	eval {
-		use Test::Requires {
-			'warnings::unused' => 0.04
-		};
-	};
-	if($@) {
-		plan(skip_all => 'Test::Requires needed for installation');
-		$can_test = 0;
-	}
+unless($ENV{RELEASE_TESTING}) {
+	plan(skip_all => "Author tests not required for installation");
 }
 
-if($can_test) {
-	BEGIN {
-		if($ENV{RELEASE_TESTING}) {
-			use_ok('CGI::Untaint::Facebook');
-			use warnings::unused -global;
-		}
-	}
-
-	if(not $ENV{RELEASE_TESTING}) {
-		plan(skip_all => 'Author tests not required for installation');
-	} else {
-		new_ok('CGI::Untaint::Facebook');
-		plan tests => 1;
-	}
+eval 'use warnings::unused -global';
+if($@ || ($warnings::unused::VERSION < 0.04)) {
+	plan(skip_all => 'warnings::unused >= 0.04 needed for testing');
+} else {
+	use_ok('CGI::Untaint::Facebook');
+	plan tests => 1;
 }

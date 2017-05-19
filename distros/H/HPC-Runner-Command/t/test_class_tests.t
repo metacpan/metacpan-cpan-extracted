@@ -10,6 +10,7 @@ if ( !$ENV{'SCHEDULER'} ) {
         test_classes => [
 	    'TestsFor::HPC::Runner::Command::Test001',
 	    'TestsFor::HPC::Runner::Command::Test002',
+	    # 'TestsFor::HPC::Runner::Command::Test007',
         ],
     )->runtests;
 }

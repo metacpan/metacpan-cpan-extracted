@@ -1,0 +1,27 @@
+---
+abstract: 'Encode / decode strings of complex data structure with HTML entities recursively'
+author:
+  - 'punytan <punytan@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-Entities-Recursive
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  HTML::Entities: 0
+  Sub::Recursive: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/punytan/HTML-Entities-Recursive.git
+version: 0.01

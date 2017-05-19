@@ -1,0 +1,38 @@
+---
+abstract: 'A thin wrapper for Twitter API using OAuth'
+author:
+  - 'punytan <punytan@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AnyEvent-Twitter
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  AnyEvent: 5.34
+  AnyEvent::HTTP: 2.12
+  Data::Recursive::Encode: 0.04
+  Digest::SHA: 5.62
+  HTTP::Request::Common: 6.04
+  JSON: 2.53
+  Net::OAuth: 0.27
+  Net::SSLeay: 1.35
+  Time::Piece: 1.2
+  URI: 1.58
+  URI::Escape: 3.3
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/punytan/AnyEvent-Twitter.git
+version: 0.64

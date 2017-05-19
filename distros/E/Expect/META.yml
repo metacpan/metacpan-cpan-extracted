@@ -1,0 +1,36 @@
+---
+abstract: 'automate interactions with command line programs that expose a text terminal interface.'
+author:
+  - 'Austin Schutz <ASchutz@users.sourceforge.net>'
+  - 'Roland Giersig <RGiersig@cpan.org>'
+  - 'Dave Jacoby <jacoby@cpan.org>'
+build_requires:
+  File::Temp: '0'
+  Test::More: '1.00'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Expect
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Errno: '0'
+  Exporter: '0'
+  Fcntl: '0'
+  IO::Handle: '0'
+  IO::Pty: '1.11'
+  IO::Tty: '1.11'
+  POSIX: '0'
+  perl: '5.006000'
+resources:
+  repository: http://github.com/jacoby/expect.pm.git
+version: '1.35'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

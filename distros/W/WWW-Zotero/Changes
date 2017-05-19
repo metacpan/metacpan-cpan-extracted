@@ -1,11 +1,15 @@
 Revision history for WWW-Zotero
 
+0.04  2017-05-18 17:00:29 CEST
+    - Adding support to find the userID from a username
+    - Fixing last item bug (thanks François Rappaz)
+
 0.03  2015-09-24 21:23:43 CEST
 	- Fixed tests
-	- Fixed undef responses 
+	- Fixed undef responses
 
 0.02  2015-09-24 20:59:19 CEST
 	- Fix test dependencies
-	
+
 0.01  2015-09-24 14:55:28 CEST
     - Initial version

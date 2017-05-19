@@ -1,0 +1,70 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 6950821fe34951e6170552099d0de2ee22e43714 .gitignore
+SHA1 cd9729601cf687ddd61f76175d4aaae77c89be3e Build.PL
+SHA1 75d4714d71625903fb71e0bdf0106e68fb54f1a4 Changes
+SHA1 8a0fd294cf9c6c2a0aa73eb594811f6ff9d4ad2a MANIFEST
+SHA1 8e63d0b67bc8cf2febc728e5d280a1d9e1fd2b94 META.json
+SHA1 7a28f6b028fdd2f16ad91b801a81e30d86a24c6a META.yml
+SHA1 01014dbee096cf5abd3f05069cefa9c907a4aea1 Makefile.PL
+SHA1 336d8399ff7000bbdc255cec7227b4ab70809842 README
+SHA1 8f4a5de8bfb6fbca5150fee1436d700f32213fa6 lib/Lexical/SealRequireHints.pm
+SHA1 b37bc49474485b81053e6140531279187db2c1ff lib/Lexical/SealRequireHints.xs
+SHA1 85aaf18e006530f42082c756aa1040649c8b09a0 t/before_warnings.t
+SHA1 61999cf7732bd0ae59043f1718b294598366bdeb t/before_warnings_pp.t
+SHA1 3df41730d40647226f508e56d154aa432491d004 t/context.t
+SHA1 d40cabac0840b217bd9790fcf9c61f53d84561ec t/context_0.pm
+SHA1 c38cbea405a2738de1e144063993d9958934b828 t/context_1.pm
+SHA1 f13b20d1b34f6765fa222a387c022e4543aef945 t/context_2.pm
+SHA1 82657c96b6ed89ce7bdb6285dbcfbb05d68eaeb3 t/context_pp.t
+SHA1 5e04888f522d8b7fb35739b461fd11aca24112f3 t/defsv.t
+SHA1 cafd4c3b6c5ea236bc2abec70b819b730cb90c4c t/eval.t
+SHA1 e9a4397c1e339f95671c1b5e609426f624784efe t/eval_0.pm
+SHA1 b110d57bc147139e44f07d931e3d3698b404c244 t/eval_pp.t
+SHA1 bba5f7f0083a8575478ddb642d80e27d6bf111c9 t/idempotent.t
+SHA1 ef1eea9ae1774a96b0955b0da0d703de32bbcfe2 t/idempotent_pp.t
+SHA1 1c2bfdf067bb2215729fe8ff60990c875799a22a t/override.t
+SHA1 d151cfac8c90f19137177b72eb2bff07488401ea t/override_pp.t
+SHA1 b064a061f38ee4924c7100180e8e8ff877bb25d1 t/package.t
+SHA1 8f88eba8be8441c0e078f3279b9220a2fdcd7c7c t/package_0.pm
+SHA1 4b0236dd669efdacdadba6e11d9fe43364612c58 t/package_pp.t
+SHA1 ec7947b4fd26dfa4c85ce4cddf2e0d9b9f7b6fcc t/pod_cvg.t
+SHA1 3f447b1d0b8a6247c3a311087f8d66da1c3ca5db t/pod_cvg_pp.t
+SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
+SHA1 a19a2542b1e955fa78ab677edfd70a3fae8f972d t/seal.t
+SHA1 8f7a77729ec67ed32b8faa2492bb0f4ee4f35744 t/seal_0.pm
+SHA1 881d167b1d9169cef37af0d845af437e90e7869d t/seal_1.pm
+SHA1 77fb76f802a2669291950d830979738ba34ebd71 t/seal_2.pm
+SHA1 8bebdc1f1032ee7e2c3448b8c08eb68a30eaac3f t/seal_3.pm
+SHA1 e8478e388c78af43a2f3b50dd4c2d647dbd3b9ef t/seal_4.pm
+SHA1 bf9f3734c090121ff387eb85351b8abe17d6cff6 t/seal_pp.t
+SHA1 f8bd31bc8099cbb21c36cddc0508652fd092e332 t/setup_pp.pl
+SHA1 6912741c04aa7b1a080bbe9216e453e489e9c218 t/swash.t
+SHA1 c2be3b40bb344403ac14899f5dfe05196373d1f9 t/swash_pp.t
+SHA1 923e318828faaccdd2585f228535f44fae8b1842 t/threads.t
+SHA1 3dcc432bbe2d8f67f875e68d6501fd69683fab9f t/threads_pp.t
+SHA1 0ec3dd0164e1e852b1be5f78bbacebd4990f085e t/version_check.t
+SHA1 ed1cbf6ff3eed2268c517087e01814a940da658e t/version_check_pp.t
+SHA1 cbff8c2d9481b01beb691a498ae98511d0b25cbe t/version_feature.t
+SHA1 04c0a2e7e2291f9e74f8add832caa29eb2b538d4 t/version_feature_pp.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlbrjRUACgkQOV9mt2VyAVHBWwCfW7Lx+foQeOJBOrg9bNx4IaeA
+m3QAnRF0brlt0orO1DIIq3vZB0b1DCdi
+=kLC/
+-----END PGP SIGNATURE-----

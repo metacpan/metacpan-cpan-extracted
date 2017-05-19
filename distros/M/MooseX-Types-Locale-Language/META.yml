@@ -1,0 +1,39 @@
+---
+abstract: 'Locale::Language related constraints and coercions for Moose'
+author:
+  - 'MORIYA Masaki, alias Gardejo <moriya at cpan dot org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Class: 0.34
+  Test::Exception: 0.27
+  Test::More: 0
+  Test::Requires: 0
+  Test::Warn: 0
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: MooseX::Types::Locale::Language
+name: MooseX-Types-Locale-Language
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+requires:
+  Locale::Language: 3.00
+  Moose: 0.41
+  MooseX::Types: 0.19
+  namespace::clean: 0.08
+  perl: 5.8.1
+resources:
+  homepage: http://github.com/gardejo/p5-moosex-types-locale-language
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/gardejo/p5-moosex-types-locale-language.git
+version: 0.07

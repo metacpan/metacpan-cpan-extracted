@@ -43,11 +43,10 @@ sub output {
             if ($file) {
                 $file->output($program_name, $metric_name, $metric);
             }
-
-            if ($mackerel) {
-                $mackerel->output($program_name, $metric_name, $metric);
-            }
         }
+    }
+    if ($mackerel) {
+        $mackerel->bulk_output($ret_pidstats);
     }
 }
 

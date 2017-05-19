@@ -1,0 +1,51 @@
+---
+abstract: 'Execute commands with sound'
+author:
+  - 'moznion  C<< <moznion@gmail.com> >>'
+build_requires:
+  File::Spec::Functions: '3.40'
+  FindBin: '0'
+  Test::MockObject::Extends: '1.20120301'
+  Test::More: '0.98'
+  Test::Warn: '0.24'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-WithSound
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::WithSound:
+    file: lib/App/WithSound.pm
+    version: v1.2.1
+requires:
+  Carp: '0'
+  Config::Simple: '4.58'
+  File::Path::Expand: '1.02'
+  File::Which: '0.05'
+  IPC::Open3: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/moznion/App--WithSound/issues
+  homepage: https://github.com/moznion/App--WithSound
+  repository: git://github.com/moznion/App--WithSound.git
+version: 1.2.1
+x_authority: cpan:MOZNION
+x_contributors:
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'Shinpei Maruyama <shinpeim@gmail.com>'
+  - 'papix <mail@papix.net>'
+  - 'moznion <moznion@gmail.com>'

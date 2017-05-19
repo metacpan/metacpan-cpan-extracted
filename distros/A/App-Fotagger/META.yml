@@ -1,0 +1,41 @@
+---
+name: App-Fotagger
+version: 0.001.1
+author:
+  - Thomas Klausner
+abstract: tag fotos
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Fotagger
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/domm/fotagger
+requires:
+  DateTime: 0
+  File::Find::Rule: 0
+  Image::ExifTool: 7.67
+  Imager: 0
+  Moose: 0.79
+  SDL: 1.20
+  perl: 5.010
+build_requires:
+  Test::More: 0
+provides:
+  App::Fotagger:
+    file: lib/App/Fotagger.pm
+    version: 0.001.1
+  App::Fotagger::Deleter:
+    file: lib/App/Fotagger/Deleter.pm
+  App::Fotagger::Display::SDL:
+    file: lib/App/Fotagger/Display/SDL.pm
+  App::Fotagger::Export:
+    file: lib/App/Fotagger/Export.pm
+  App::Fotagger::Image:
+    file: lib/App/Fotagger/Image.pm
+  App::Fotagger::Stats:
+    file: lib/App/Fotagger/Stats.pm
+  App::Fotagger::TagAll:
+    file: lib/App/Fotagger/TagAll.pm
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

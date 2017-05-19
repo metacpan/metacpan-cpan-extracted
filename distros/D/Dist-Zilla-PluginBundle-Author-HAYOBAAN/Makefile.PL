@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Plugin::MojibakeTests" => 0,
     "Dist::Zilla::Plugin::OurPkgVersion" => 0,
     "Dist::Zilla::Plugin::PodWeaver" => 0,
-    "Dist::Zilla::Plugin::ReadmeAnyFromPod" => 0,
+    "Dist::Zilla::Plugin::ReadmeAnyFromPod" => "0.161150",
     "Dist::Zilla::Plugin::Run" => 0,
     "Dist::Zilla::Plugin::RunExtraTests" => 0,
     "Dist::Zilla::Plugin::SchwartzRatio" => 0,
@@ -85,7 +85,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.96",
     "blib" => "1.01"
   },
-  "VERSION" => "0.012",
+  "VERSION" => "0.013",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -116,7 +116,7 @@ my %FallbackPrereqs = (
   "Dist::Zilla::Plugin::MojibakeTests" => 0,
   "Dist::Zilla::Plugin::OurPkgVersion" => 0,
   "Dist::Zilla::Plugin::PodWeaver" => 0,
-  "Dist::Zilla::Plugin::ReadmeAnyFromPod" => 0,
+  "Dist::Zilla::Plugin::ReadmeAnyFromPod" => "0.161150",
   "Dist::Zilla::Plugin::Run" => 0,
   "Dist::Zilla::Plugin::RunExtraTests" => 0,
   "Dist::Zilla::Plugin::SchwartzRatio" => 0,

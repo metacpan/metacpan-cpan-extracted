@@ -1,0 +1,35 @@
+---
+abstract: 'Render any data structure as an object of type Tree::DAG_Node'
+author:
+  - 'Ron Savage (ron@savage.net.au)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-RenderAsTree
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Dumper::Concise: '2.022'
+  Moo: '2.000001'
+  Scalar::Util: '1.42'
+  Set::Array: '0.3'
+  Test::More: '1.001014'
+  Test::Pod: '1.51'
+  Text::Truncate: '1.06'
+  Tree::DAG_Node: '1.26'
+  Types::Standard: '1.000005'
+  strict: '0'
+  warnings: '0'
+resources:
+  license: http://opensource.org/licenses/Artistic-2.0
+  repository: https://github.com/ronsavage/Data-RenderAsTree.git
+version: '1.03'

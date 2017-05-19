@@ -1,0 +1,27 @@
+--- 
+abstract: ~
+author: ~
+build_requires: 
+  Directory::Scratch: 0
+  Test::Exception: 0
+  Test::More: 0
+  ok: 0
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: unknown
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Template-Refine
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  HTML::Selector::XPath: 0
+  Moose: 0
+  Moose::Util::TypeConstraints: 0
+  MooseX::Types::Path::Class: 0
+  Path::Class: 0
+  XML::LibXML: 0
+version: undef

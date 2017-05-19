@@ -1,0 +1,126 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+if (-d "$FindBin::Bin/../local") {
+  use lib "$FindBin::Bin/../local/lib/perl5";
+}
+
+
+use Data::Dumper;
+use CloudDeploy::AMIDB;
+use Paws;
+
+my $amidb = CloudDeploy::AMIDB->new;
+
+sub amis_for_region {
+  my ($region) = @_;
+
+  my $amis = Paws->service('EC2', region => $region)->DescribeImages(Owners =>  [ 
+    '099720109477', # ubuntu
+    '309956199498', # redhat
+    '379101102735'  # debian
+  ]);
+
+  foreach my $image (@{ $amis->Images }) {
+    my $image_id = $image->ImageId;
+    if ($image_id =~ m/^aki-/ or $image_id =~ m/^ari-/) {
+      print "Skipping $image_id\n";
+      next;
+    }
+    if      ($image->OwnerId eq '099720109477'){
+      ubuntu_ami($region, $image);
+    } elsif ($image->OwnerId eq '309956199498'){
+      redhat_ami($region, $image);
+    } elsif ($image->OwnerId eq '379101102735'){
+      debian_ami($region, $image);
+    }
+  }
+}
+
+sub ubuntu_ami {
+  my ($region, $ami) = @_;
+  my $name = $ami->Name;
+
+  return if ($name =~ m/^ubuntu\/images-testing/);
+  my ($version) = ($name =~ m/\/ubuntu-\w+-([0-9.]+)-\w+-server/);
+  if (not defined $version) {
+    print "Version not detected in $name " . $ami->ImageId . " ... skipping\n";
+    return;
+  }
+
+  my $type = $ami->VirtualizationType;
+  $type = 'pv' if ($type eq 'paravirtual');
+
+  my $ami_info =
+     { Name => 'Ubuntu',
+       Version => $version,
+       Arch => $ami->Architecture,
+       Root => $ami->RootDeviceType,
+       Region => $region,
+       ImageId => $ami->ImageId,
+       Type => $type,
+       Date => $ami->CreationDate,
+     };
+
+   $amidb->replace(%$ami_info);
+}
+
+sub redhat_ami {
+  my ($region, $ami) = @_;
+
+  my $name = $ami->Name;
+
+  my ($version) = ($name =~ m/RHEL-([0-9.]+)/);
+  print "Version not detected in $name\n" if (not defined $version);
+
+  my $type = $ami->VirtualizationType;
+  $type = 'pv' if ($type eq 'paravirtual');
+
+  my $ami_info = 
+     { Name => 'RHEL',
+       Version => $version,
+       Arch => $ami->Architecture,
+       Root => $ami->RootDeviceType,
+       Region => $region,
+       ImageId => $ami->ImageId,
+       Type => $type,
+       Date => $ami->CreationDate,
+     };
+
+  $amidb->replace(%$ami_info);
+}
+
+sub debian_ami {
+  my ($region, $ami) = @_;
+
+  my $name = $ami->Name;
+
+  my ($version) = ($name =~ m/debian-([\w]+)-/);
+  print "Version not detected in $name\n" if (not defined $version);
+
+  my $type = $ami->VirtualizationType;
+  $type = 'pv' if ($type eq 'paravirtual');
+
+  my $ami_info =
+     { Name => 'Debian',
+       Version => $version,
+       Arch => $ami->Architecture,
+       Root => $ami->RootDeviceType,
+       Region => $region,
+       ImageId => $ami->ImageId,
+       Type => $type,
+       Date => $ami->CreationDate,
+     };
+
+  $amidb->replace(%$ami_info);
+}
+
+foreach my $region ('eu-west-1', 'us-east-1', 'eu-central-1', 'us-west-1') {
+  amis_for_region($region);
+}
+

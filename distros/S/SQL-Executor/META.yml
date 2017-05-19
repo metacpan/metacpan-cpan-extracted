@@ -1,0 +1,35 @@
+---
+abstract: 'Thin DBI wrapper using SQL::Maker'
+author:
+  - 'Takuya Tsuchida <tsucchi {at} cpan.org>'
+build_requires:
+  DBD::SQLite: 1.27
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SQL-Executor
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Class::Accessor::Lite: 0
+  DBI: 1.608
+  DBIx::Handler: 0
+  SQL::Maker: 0
+  Try::Tiny: 0
+  parent: 0
+resources:
+  homepage: https://github.com/tsucchi/p5-SQL-Executor/tree
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tsucchi/p5-SQL-Executor.git
+version: 0.17

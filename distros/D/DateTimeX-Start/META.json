@@ -1,0 +1,78 @@
+{
+   "abstract" : "Find the time at which a day starts.",
+   "author" : [
+      "Eric Brine <ikegami@adaelis.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unrestricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DateTimeX-Start",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "DateTime::TimeZone" : "1.53",
+            "Pod::Coverage" : "0.18",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DateTime" : "0",
+            "DateTime::TimeZone" : "0",
+            "Exporter" : "0",
+            "Scalar::Util" : "0",
+            "strict" : "0",
+            "version" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "DateTime::TimeZone" : "1.53",
+            "Test::Pod" : "1.22"
+         },
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-DateTimeX-Start@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DateTimeX-Start"
+      },
+      "homepage" : "http://search.cpan.org/dist/DateTimeX-Start/",
+      "license" : [
+         "http://creativecommons.org/publicdomain/zero/1.0/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ikegami/perl-DateTimeX-Start.git",
+         "web" : "https://github.com/ikegami/perl-DateTimeX-Start"
+      }
+   },
+   "version" : "v1.6.0",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

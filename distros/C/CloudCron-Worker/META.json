@@ -1,0 +1,42 @@
+{
+   "abstract" : "A worker process for CloudCron",
+   "author" : [
+      "Jose Luis Martinez <joseluis.martinez@capside.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CloudCron-Worker",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "SQS::Worker" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/capside/CloudCron/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/capside/CloudCron.git",
+         "web" : "https://github.com/capside/CloudCron"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+}
+

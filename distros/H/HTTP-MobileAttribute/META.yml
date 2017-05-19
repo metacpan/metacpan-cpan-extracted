@@ -1,0 +1,35 @@
+---
+abstract: 'Yet Another HTTP::MobileAgent(DEPRECATRED)'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom aaaatttt gmail dotottto commmmm>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Geo::Coordinates::Converter: 0
+  Geo::Coordinates::Converter::iArea: 0
+  YAML: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTTP-MobileAttribute
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+recommends:
+  Geo::Coordinates::Converter: 0.04
+  Geo::Coordinates::Converter::iArea: 0.08
+  Net::CIDR::MobileJP: 0.11
+requires:
+  Class::Component: 0.17
+  Filter::Util::Call: 0
+  UNIVERSAL::require: 0.13
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.23

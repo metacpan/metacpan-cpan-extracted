@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 2c6138d352f88cc94fd2bb26f7f41c86bbd7258d .gitignore
+SHA1 de5bcb7c6cf13d5a9eaef0719ee4429f3f46ef02 Build.PL
+SHA1 03fac89c8713e15f190f31efb672a3c81f9d1d60 Changes
+SHA1 a1a9dc4b4580501c33ea917954820344e4c6fae4 MANIFEST
+SHA1 5a86af22d035eab293a05e3b1079108e4accab3d META.json
+SHA1 bcb6b02134e7714d04f786e1b8beb9601274669f META.yml
+SHA1 a4df8e97ccd390a42212af5a9f4d0986c85e7a5f Makefile.PL
+SHA1 a17ba6c6aed87c8a827a89a2d3fc52d93238bb8d README
+SHA1 b1b860250f513c58c909540f51d8015ef8804091 lib/Math/Interpolator.pm
+SHA1 faea2faa8a3505e97c55adfdb30e7f3f9f1829fa lib/Math/Interpolator/Knot.pm
+SHA1 41361dde9cc93374851549d9e81f8fb4f87c3cca lib/Math/Interpolator/Linear.pm
+SHA1 87960f64528b875e2ba919b0fc0d39360fb011fc lib/Math/Interpolator/Robust.pm
+SHA1 4a54cff778fcda825570a6b39451792891a94d37 lib/Math/Interpolator/Source.pm
+SHA1 d21752a69d401b824a7545d798f1189df00c2d8f t/edge.t
+SHA1 5e0578a58172f8048dcf02a642527f8bc433ae5f t/fraction.t
+SHA1 aff6ddc861cdd14427ed340b0e1287e4712ad1fd t/nhood.t
+SHA1 1592c48bc724034f4266d5c827499d0d0c449288 t/null.t
+SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
+SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
+SHA1 193ed5cedc559494595f9cce087e4df198aadb19 t/ppro.t
+SHA1 6697e03894494940fff5fd7830a9695844805cbe t/proto.t
+SHA1 8f2d7eff47ce1a4eea5cde835fdc51651556cc54 t/robust.t
+SHA1 ff2387749ed632dba285995539e0037423119ad0 t/simple.t
+SHA1 a951648123ec19c37030a40037da97b2cf44df43 t/xy.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAk88HI8ACgkQOV9mt2VyAVHYSACggAz2xHFdMSjzSD6esPmOXs27
+rzcAmQGOiQeEG0dFEQDaZgWiLrHrNIx2
+=C6Xc
+-----END PGP SIGNATURE-----

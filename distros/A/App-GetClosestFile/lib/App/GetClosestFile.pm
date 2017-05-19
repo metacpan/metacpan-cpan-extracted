@@ -7,6 +7,12 @@ use Cwd;
 
 # ABSTRACT: get full path matches for filename regexes in diretory trees
 
+our $VERSION;
+
+BEGIN {
+    $VERSION = '0.2.2';
+}
+
 my $filename;
 my @child_dirs = ();
 my $show_all_matches = 0;
@@ -45,7 +51,7 @@ sub usage {
       --depth N   recursion depth
       --help      show this message
       
-Version 0.2.0.\n\n";
+Version $VERSION.\n\n";
 
   exit;
 }

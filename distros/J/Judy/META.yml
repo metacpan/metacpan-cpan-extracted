@@ -1,0 +1,60 @@
+---
+abstract: 'Library for creating and accessing dynamic arrays'
+author:
+  - unknown
+build_requires:
+  Config: 0
+  DynaLoader: 0
+  ExtUtils::CBuilder: 0
+  File::Basename: 0
+  File::Copy: 0
+  File::Spec: 0
+  Test::Deep: 0
+  Test::More: 0
+  strict: 0
+  vars: 0
+  warnings: 0
+configure_requires:
+  File::Spec: 0
+  Module::Build: 0
+  strict: 0
+  vars: 0
+  warnings: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.3901, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Judy
+provides:
+  Judy:
+    file: lib/Judy.pm
+    version: 0.41
+  Judy::1:
+    file: lib/Judy/1.pm
+    version: 0
+  Judy::HS:
+    file: lib/Judy/HS.pm
+    version: 0
+  Judy::L:
+    file: lib/Judy/L.pm
+    version: 0
+  Judy::Mem:
+    file: lib/Judy/Mem.pm
+    version: 0
+  Judy::SL:
+    file: lib/Judy/SL.pm
+    version: 0
+requires:
+  Alien::Judy: 0.26
+  Config: 0
+  DynaLoader: 0
+  Sub::Exporter: 0
+  constant: 0
+  perl: v5.6.0
+  strict: 0
+  warnings: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.41

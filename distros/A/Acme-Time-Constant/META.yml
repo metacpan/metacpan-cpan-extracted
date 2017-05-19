@@ -1,0 +1,35 @@
+---
+abstract: 'Run any code in constant time.'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-Time-Constant
+provides:
+  Acme::Time::Constant:
+    file: lib/Acme/Time/Constant.pm
+    version: '0.001006'
+requires:
+  Sub::Exporter::Progressive: '0'
+  Time::HiRes: '0'
+  Time::Warp: '0.52'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Acme-Time-Constant/issues
+  homepage: https://github.com/kentnl/Acme-Time-Constant
+  repository: https://github.com/kentnl/Acme-Time-Constant.git
+version: '0.001006'

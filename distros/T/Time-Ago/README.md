@@ -4,7 +4,7 @@ Time::Ago - Approximate duration in words
 
 # VERSION
 
-version 0.08
+version 1.00
 
 # SYNOPSIS
 
@@ -103,7 +103,7 @@ From Rails' docs:
 
 Locale::TextDomain is used for localization.
 
-Currently Arabic, English, French, German, Italian, Japanese, Russian,
+Currently Arabic, Dutch, English, French, German, Italian, Japanese, Russian,
 and Spanish translations are available. Contact me if you need another
 language.
 
@@ -160,7 +160,7 @@ Maurice Aubrey <maurice.aubrey@gmail.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Maurice Aubrey.
+This software is copyright (c) 2017 by Maurice Aubrey.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

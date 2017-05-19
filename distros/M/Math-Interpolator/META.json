@@ -1,0 +1,74 @@
+{
+   "abstract" : "interpolate between lazily-evaluated points",
+   "author" : [
+      "Andrew Main (Zefram) <zefram@fysh.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Math-Interpolator",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : 0,
+            "Test::More" : 0,
+            "perl" : "5.006",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : 0,
+            "perl" : "5.006",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "integer" : 0,
+            "parent" : 0,
+            "perl" : "5.006",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Math::Interpolator" : {
+         "file" : "lib/Math/Interpolator.pm",
+         "version" : "0.005"
+      },
+      "Math::Interpolator::Knot" : {
+         "file" : "lib/Math/Interpolator/Knot.pm",
+         "version" : "0.005"
+      },
+      "Math::Interpolator::Linear" : {
+         "file" : "lib/Math/Interpolator/Linear.pm",
+         "version" : "0.005"
+      },
+      "Math::Interpolator::Robust" : {
+         "file" : "lib/Math/Interpolator/Robust.pm",
+         "version" : "0.005"
+      },
+      "Math::Interpolator::Source" : {
+         "file" : "lib/Math/Interpolator/Source.pm",
+         "version" : "0.005"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.005"
+}

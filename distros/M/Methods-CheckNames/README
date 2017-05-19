@@ -1,0 +1,31 @@
+NAME
+    Methods::CheckNames - Statically check for named methods
+
+SYNOPSIS
+            my Foo $object;
+
+            $object->method(); # dies at compile time unless a method can be found
+
+DESCRIPTION
+    This module enables simplistic checking of method names for typed my
+    variables.
+
+    It's not much more than a proof of concept.
+
+TODO
+    *   Use the "can" meta method instead of "gv_fetchmethod"
+
+    *   Make the checking pluggable
+
+VERSION CONTROL
+    This module is maintained using git. You can get the latest version from
+    <git://github.com/rafl/methods-checknames.git>.
+
+AUTHOR
+    Yuval Kogman <nothingmuch@woobling.org>
+
+COPYRIGHT
+            Copyright (c) 2008 Yuval Kogman. All rights reserved
+            This program is free software; you can redistribute
+            it and/or modify it under the same terms as Perl itself.
+

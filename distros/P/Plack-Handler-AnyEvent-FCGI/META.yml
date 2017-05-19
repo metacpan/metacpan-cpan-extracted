@@ -1,0 +1,32 @@
+---
+abstract: 'Asynchronous FCGI handler for PSGI using AnyEvent::FCGI'
+author:
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.88
+  Test::Requires: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Plack::Handler::AnyEvent::FCGI
+name: Plack-Handler-AnyEvent-FCGI
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  AnyEvent::FCGI: 0
+  IO::Handle::Util: 0
+  Plack: 0.997
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/miyagawa/Plack-Handler-AnyEvent-FCGI.git
+version: 0.01

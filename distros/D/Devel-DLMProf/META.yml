@@ -1,0 +1,25 @@
+---
+abstract: 'dynamid loaded modules detector'
+author:
+  - 'Takatoshi Kitano <kitano.tk@gmail.com>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Devel-DLMProf
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Filter::Util::Call: 0
+  Linux::Smaps: 0
+  Path::Class: 0
+  mod_perl2: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.05

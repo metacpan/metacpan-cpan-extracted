@@ -1,0 +1,44 @@
+---
+abstract: 'Helper functions for Taiwan Futures Exchange'
+author:
+  - 'Chia-liang Kao <clkao@clkao.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Finance-TW-TAIFEX
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+    - xt
+recommends:
+  MooseX::Traits: 0
+  MooseX::Types::DateTime: 0
+requires:
+  Any::Moose: 0.04
+  Archive::Zip: 0
+  DateTime: 0
+  DateTime::Format::Strptime: 0
+  File::ShareDir: 0
+  HTTP::Request::Common: 0
+  LWP::Simple: 0
+  List::MoreUtils: 0
+  MouseX::NativeTraits: 0
+  MouseX::Traits: 0
+  MouseX::Types::DateTime: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://git.tradroom.com/lib/Finance-TW-TAIFEX
+version: 0.38

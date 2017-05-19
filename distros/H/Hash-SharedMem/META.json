@@ -1,0 +1,75 @@
+{
+   "abstract" : "efficient shared mutable hash",
+   "author" : [
+      "Andrew Main (Zefram) <zefram@fysh.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Hash-SharedMem",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Errno" : "1.00",
+            "ExtUtils::CBuilder" : "0.15",
+            "File::Temp" : "0.22",
+            "IO::File" : "0",
+            "Module::Build" : "0",
+            "POSIX" : "0",
+            "Scalar::String" : "0",
+            "Test::Builder" : "0.03",
+            "Test::More" : "0.40",
+            "if" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Devel::CallChecker" : "0.003"
+         },
+         "requires" : {
+            "Exporter" : "0",
+            "XSLoader" : "0",
+            "parent" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Hash::SharedMem" : {
+         "file" : "lib/Hash/SharedMem.pm",
+         "version" : "0.004"
+      },
+      "Hash::SharedMem::Handle" : {
+         "file" : "lib/Hash/SharedMem/Handle.pm",
+         "version" : "0.004"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.004"
+}

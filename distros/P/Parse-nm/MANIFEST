@@ -1,0 +1,14 @@
+.gitignore
+Build.PL
+Changes
+lib/Parse/nm.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+README
+t/00-load.t
+t/10-simple.t
+t/11-run.t
+t/12-many.t
+t/t.c

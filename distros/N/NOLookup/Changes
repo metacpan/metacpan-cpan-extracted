@@ -1,5 +1,11 @@
 Revision history for Perl extension NOLookup
 
+1.0.7  2017-05-18
+        - Added argument and support to specify max number of pages in:
+          * lib/NOLookup/Brreg/DataLookup.pm
+          * bin/no_brreg.pl
+	- Added dependencies for build
+
 1.0.6  2017-05-08
        - MYMETA.json/yml removed from MANIFEST (shall never be listed)
 

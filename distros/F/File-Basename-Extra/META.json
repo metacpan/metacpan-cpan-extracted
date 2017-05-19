@@ -1,7 +1,7 @@
 {
    "abstract" : "Extension to File::Basename, adds named access to file parts and handling of filename suffixes",
    "author" : [
-      "Hayo Baan <hayobaan@cpan.org>"
+      "Hayo Baan <info@hayobaan.com>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005",
@@ -68,7 +68,7 @@
    "provides" : {
       "File::Basename::Extra" : {
          "file" : "lib/File/Basename/Extra.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -83,7 +83,7 @@
          "web" : "https://github.com/HayoBaan/File-Basename-Extra"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 

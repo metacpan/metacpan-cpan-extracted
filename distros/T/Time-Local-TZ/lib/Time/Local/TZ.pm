@@ -6,7 +6,7 @@ use warnings;
 use base 'Exporter';
 use XSLoader;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our %EXPORT_TAGS = (
     func => [ qw/
@@ -168,17 +168,20 @@ It is recommended to use them with C<tz_truncate> function:
 
 =head1 NOTES AND CAVEATS
 
-This module uses your system C<tzdata> - set of rules for all the timezones around the world. These rules are refreshed regulary (up to several times per month),
-so you should update them too (if you want to work with timezones correctly). If you don't want to do this, take a look on C<DateTime::TimeZone>, which have its
-own timezones database inside. Anyway, you should update it on a regular basis too.
+This module uses your operating system rules to convert time. They are based on environment variable C<TZ> and can differ from OS to OS. Many modern OSes
+(including Linux and FreeBSD) support Olson timezone names (like C<Europe/Berlin>, C<America/New_York> etc.), which is the only recommended way to use with
+this module. Other OSes usually know only POSIX timezone names. You can deal with them too, but the result can be inconsistent. There is no native Olson db
+support in Windows, but CYGWIN solves this.
+
+Please note that set of timezone rules is not something permanent, they are refreshed up to several times per month. So, to get correct results from this
+module you should always have fresh timezone information in your OS. If you don't want to do this, take a look on "DateTime::TimeZone", which have its own
+timezones database inside. Anyway, you should update it on a regular basis too.
 
 This module works with process environment, so it is not thread-safe.
 
 This module works with mod_perl2 (at least in non-threaded mode). mod_perl2 has problem with C<%ENV>. Unlike mod_perl1 and usual perl programs C<%ENV> under
 mod_perl2 is untied from process environment. So, even if you change C<$ENV{TZ}>, built-in functions (like C<localtime>) will know nothing about it, because
 real process environment is untouched. This module works with environment bypassing perl C<%ENV>, so in mod_perl2 prefork mode it works fine.
-
-If you have problems running this module tests, please refresh your C<tzdata>.
 
 =head1 SEE ALSO
 
@@ -187,6 +190,14 @@ To get more information about "localtime" format, see L<perlfunc/localtime> and 
 If you are interested in useful functions to work with "localtime" data, see L<POSIX/strftime> and L<POSIX::strptime>.
 
 If you want to know more on alternative modules to convert time between timezones, see L<DateTime> and L<DateTime::TimeZone>.
+
+If you want to know more about environment variable C<TZ> and it's formats, you can look at the articles below:
+L<http://www.gnu.org/software/libc/manual/html_node/TZ-Variable.html>
+L<https://www.ibm.com/developerworks/aix/library/au-aix-posix/>
+
+=head1 SOURCE
+
+The development version is on github at L<https://github.com/bambr/Time-Local-TZ>
 
 =head1 AUTHOR
 

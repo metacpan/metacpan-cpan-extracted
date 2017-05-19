@@ -1,0 +1,35 @@
+--- #YAML:1.0
+name:               Geo-Distance-Google
+version:            0.01
+abstract:           Google Maps Distance API
+author:
+    - Lee Carmichael <lcarmich@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    Digest::HMAC_SHA1:    0
+    MIME::Base64:         0
+    Test::More:           0.32
+    Test::Number::Delta:  0
+requires:
+    Encode:            0
+    HTTP::Request:     0
+    JSON:              0
+    LWP:               0
+    Params::Validate:  0
+    perl:              5.008001
+    URI:               0
+resources:
+    bugtracker:  https://github.com/lecar-red/Geo-Distance-Google/issues
+    license:     http://dev.perl.org/licenses/
+    repository:  https://github.com/lecar-red/Geo-Distance-Google
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

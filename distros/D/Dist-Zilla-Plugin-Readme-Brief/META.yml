@@ -1,0 +1,51 @@
+---
+abstract: 'Provide a short simple README with just the essentials'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Path::Tiny: '0'
+  Test::DZil: '0'
+  Test::More: '0'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-Readme-Brief
+provides:
+  Dist::Zilla::Plugin::Readme::Brief:
+    file: lib/Dist/Zilla/Plugin/Readme/Brief.pm
+    version: '0.003002'
+recommends:
+  Moose: '2.000'
+requires:
+  Dist::Zilla::File::FromCode: '0'
+  Dist::Zilla::Role::FileGatherer: '0'
+  Dist::Zilla::Role::PPI: '0'
+  Encode: '0'
+  List::Util: '0'
+  Moose: '0'
+  Moose::Util::TypeConstraints: '0'
+  MooseX::Types::Moose: '0'
+  PPI::Document: '0'
+  PPIx::DocumentName: '0'
+  Pod::Elemental: '0'
+  Pod::Elemental::Selectors: '0'
+  Pod::Elemental::Transformer::Nester: '0'
+  Pod::Elemental::Transformer::Pod5: '0'
+  Pod::Text: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/KENTNL/Dist-Zilla-Plugin-Readme-Brief/issues
+  homepage: https://github.com/KENTNL/Dist-Zilla-Plugin-Readme-Brief
+  repository: https://github.com/KENTNL/Dist-Zilla-Plugin-Readme-Brief.git
+version: '0.003002'

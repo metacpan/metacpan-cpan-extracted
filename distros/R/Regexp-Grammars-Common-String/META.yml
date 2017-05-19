@@ -1,0 +1,35 @@
+---
+abstract: 'Some basic String parsing Rules for Regexp::Grammars'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  Data::Dumper: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0.96'
+  perl: '5.010000'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010000'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Regexp-Grammars-Common-String
+provides:
+  Regexp::Grammars::Common::String:
+    file: lib/Regexp/Grammars/Common/String.pm
+    version: '1.000002'
+requires:
+  Regexp::Grammars: '0'
+  perl: '5.010000'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Regexp-Grammars-Common-String/issues
+  homepage: https://github.com/kentnl/Regexp-Grammars-Common-String
+  repository: https://github.com/kentnl/Regexp-Grammars-Common-String.git
+version: '1.000002'

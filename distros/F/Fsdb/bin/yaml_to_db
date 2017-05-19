@@ -1,0 +1,143 @@
+#!/usr/bin/perl
+
+#
+# yaml_to_db.pm
+# Copyright (C) 2011-2016 by John Heidemann <johnh@isi.edu>
+# $Id: 54d87bcf09ffd487550f0f7e05ab0a77cf2a3670 $
+#
+# This program is distributed under terms of the GNU general
+# public license, version 2.  See the file COPYING
+# in $dblib for details.
+#
+
+
+=head1 NAME
+
+yaml_to_db - convert a subset of YAML into fsdb
+
+=head1 SYNOPSIS
+
+    yaml_to_db <source.yaml
+
+=head1 DESCRIPTION
+
+Converts a I<very limited> subset of YAML into Fsdb format.
+
+The input is YAML-format (I<not> fsdb).
+The input is parsed as YAML, 
+assuming the file is an array of dictionary entries.
+We extract the dictionary names and output this as an fsdb table.
+
+The output is tab-separated fsdb.
+(Someday more general field separators should be supported.)
+
+=head1 OPTIONS
+
+
+=for comment
+begin_standard_fsdb_options
+
+This module also supports the standard fsdb options:
+
+=over 4
+
+=item B<-d>
+
+Enable debugging output.
+
+=item B<-i> or B<--input> InputSource
+
+Read from InputSource, typically a file name, or C<-> for standard input,
+or (if in Perl) a IO::Handle, Fsdb::IO or Fsdb::BoundedQueue objects.
+
+=item B<-o> or B<--output> OutputDestination
+
+Write to OutputDestination, typically a file name, or C<-> for standard output,
+or (if in Perl) a IO::Handle, Fsdb::IO or Fsdb::BoundedQueue objects.
+
+=item B<--autorun> or B<--noautorun>
+
+By default, programs process automatically,
+but Fsdb::Filter objects in Perl do not run until you invoke
+the run() method.
+The C<--(no)autorun> option controls that behavior within Perl.
+
+=item B<--help>
+
+Show help.
+
+=item B<--man>
+
+Show full manual.
+
+=back
+
+=for comment
+end_standard_fsdb_options
+
+
+=head1 SAMPLE USAGE
+
+=head2 Input:
+
+	- name: ACM
+	  role: sponsor
+	  alttext: ACM, the Association for Computing Machinery
+	  image: logos/acm-small.jpg
+	  link:  https://www.acm.org/
+	  date: 2016-01-01
+	
+	- name: SIGCOMM
+	  role: sponsor
+	  alttext: SIGCOMM, ACM'S Special Interest Group on Communication
+	  image: logos/sigcommlogo.png
+	  link:  http://sigcomm.org
+	  date: 2016-01-02
+	
+	- name: SIGMETRICS
+	  role: sponsor
+	  alttext: SIGMETRICS, ACM'S Special Interest Group on Performance Evaluation
+	  image: logos/sigmetrics-small.png
+	  link:  http://www.sigmetrics.org
+	  date: 2016-01-03
+
+
+=head2 Command:
+
+        yaml_to_db <gnupod.yaml
+
+=head2 Output:
+
+	#fsdb -F t alttext date image link name role
+	ACM, the Association for Computing Machinery	2016-01-01	logos/acm-small.jpg	https://www.acm.org/	ACM	sponsor
+	SIGCOMM, ACM'S Special Interest Group on Communication	2016-01-02	logos/sigcommlogo.png	http://sigcomm.org	SIGCOMM	sponsor
+	SIGMETRICS, ACM'S Special Interest Group on Performance Evaluation	2016-01-03	logos/sigmetrics-small.png	http://www.sigmetrics.org	SIGMETRICS	sponsor
+	#   | yaml_to_db
+
+=head1 SEE ALSO
+
+L<Fsdb>.
+
+
+=cut
+
+
+# WARNING: This code is derived from yaml_to_db.pm; that is the master copy.
+
+use Fsdb::Filter::yaml_to_db;
+my $f = new Fsdb::Filter::yaml_to_db(@ARGV);
+$f->setup_run_finish;  # or could just --autorun
+exit 0;
+
+
+=head1 AUTHOR and COPYRIGHT
+
+Copyright (C) 2011-2016 by John Heidemann <johnh@isi.edu>
+
+This program is distributed under terms of the GNU general
+public license, version 2.  See the file COPYING
+with the distribution for details.
+
+=cut
+
+1;

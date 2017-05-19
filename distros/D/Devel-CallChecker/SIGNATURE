@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 28471ed9c62bbfb12a2afac9911c6dd919b7f9f5 .gitignore
+SHA1 b858dab2430fd53a60a5895b4374c673f1dcb095 Build.PL
+SHA1 f74968a5d0f477df6f1acebfd89713f070bece09 Changes
+SHA1 74e8d30b29251efd2bf67be0d974b42a98d0f7bc MANIFEST
+SHA1 60cf6988f144940db77ff994bc9840bafe587ad7 META.json
+SHA1 bec5ea233d3a7cb1d58a88f5823ff6b2be2ebd6c META.yml
+SHA1 01014dbee096cf5abd3f05069cefa9c907a4aea1 Makefile.PL
+SHA1 60b559265b5003a0fa3954e4a09c986b10c2e4fb README
+SHA1 4ae36c4da847924c90a9a7df7d7a854be675f237 lib/Devel/CallChecker.pm
+SHA1 5f4d18b80839f76105e70d2c6028e8a439835e7c lib/Devel/CallChecker.xs
+SHA1 f02cae7124e7060dbd03f4b62113532e08b289d9 t/LoadXS.pm
+SHA1 3652419516be8528af3d5e7cb45d06f7ccbb7237 t/WriteHeader.pm
+SHA1 100b0d3535a699b416b323ed33ced33153d031a9 t/callck.t
+SHA1 adbce051c92b1e16bd5d607c902b7c0865aef63c t/callck.xs
+SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
+SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
+SHA1 fe2dc3514b3f7c123f075779da779e7e869fb00c t/rv2cvopcv.t
+SHA1 c8ddecbc62112ef846d14ebdaf91b50156d80ed5 t/rv2cvopcv.xs
+SHA1 3bab8adfd90d8e7629ec9e86d3a53dd0b5fad227 t/threads.t
+SHA1 1ad7681a845fdecc219ce5b0ced752ec084beb1d t/threads1.xs
+SHA1 30e0563165e2583c63ec573887503a8ce8e5a643 t/threads2.xs
+SHA1 80af1f40b1054da5c48fe7b3d22f1796cd24d3d8 typemap
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iEYEARECAAYFAlUNXs4ACgkQOV9mt2VyAVHtjgCeOi26ybrtTJtnmVGqJ/dC7uNK
+F2oAnAzr1sJ7Jso5XwnrCYttuPO7M1Pa
+=cN+Q
+-----END PGP SIGNATURE-----

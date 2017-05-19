@@ -26,9 +26,9 @@ log4perl.appender.Screen.layout = \
 log4perl.appender.Screen.layout.ConversionPattern = \
   [%d] %m %n
       );
-        Log::Log4perl::init(\$log_conf);
+        Log::Log4perl::init( \$log_conf );
         return Log::Log4perl->get_logger();
-        }
+      }
 
 );
 
@@ -42,27 +42,33 @@ Submit jobs to slurm queue using sbatch.
 
 =cut
 
-sub submit_jobs{
+sub submit_jobs {
     my $self = shift;
 
-    my($exitcode, $stdout, $stderr) = $self->submit_to_scheduler("sbatch");
+    my ( $exitcode, $stdout, $stderr ) = $self->submit_to_scheduler("sbatch");
 
-    if($exitcode != 0){
+    if ( $exitcode != 0 ) {
         $self->log->fatal("Job was not submitted successfully");
-        $self->log->warn("STDERR: ".$stderr) if $stderr;
-        $self->log->warn("STDOUT: ".$stdout) if $stdout;
+        $self->log->warn( "STDERR: " . $stderr ) if $stderr;
+        $self->log->warn( "STDOUT: " . $stdout ) if $stdout;
     }
 
-    my($jobid) = $stdout =~ m/(\d.*)$/ if $stdout;
+    my ($jobid) = $stdout =~ m/(\d.*)$/ if $stdout;
 
-    if(!$jobid){
-        $self->log->warn("Submit scripts will be written, but will not be submitted to the queue.");
-        $self->log->warn("Please look at your submission scripts in ".$self->outdir);
-        $self->log->warn("And your logs in ".$self->logdir."\nfor more information");
+    if ( !$jobid ) {
+        $self->log->warn(
+"Submit scripts will be written, but will not be submitted to the queue."
+        );
+        $self->log->warn(
+            "Please look at your submission scripts in " . $self->outdir );
+        $self->log->warn(
+            "And your logs in " . $self->logdir . "\nfor more information" );
         $self->no_submit_to_slurm(0);
     }
-    else{
-        $self->log->debug("Submited job ".$self->slurmfile."\n\tWith Slurm jobid $jobid");
+    else {
+        $self->log->debug( "Submited job "
+              . $self->slurmfile
+              . "\n\tWith Slurm jobid $jobid" );
     }
 
     return $jobid;
@@ -74,39 +80,47 @@ Update the job dependencies if using job_array (not batches)
 
 =cut
 
-sub update_job_deps{
+sub update_job_deps {
     my $self = shift;
 
     return if $self->use_batches;
 
-    return unless $self->current_batch->has_array_deps;
+    # return unless $self->current_batch->has_array_deps;
+    return unless $self->has_array_deps;
 
-    foreach my $array_id ($self->current_batch->all_array_deps){
+    foreach my $array_id ( $self->current_batch->all_array_deps ) {
+    # foreach my $array_id ( $self->all_array_deps ) {
         next unless $array_id;
 
         my $current_job = $array_id->[0];
-        my $dep_job = $array_id->[1];
+        my $dep_job     = $array_id->[1];
 
-        my $cmd =  "scontrol update job=$current_job Dependency=afterok:$dep_job";
-        $self->log->debug("Updating dependencies ".$cmd."\n");
-	$self->change_deps($cmd);
+        my $cmd =
+          "scontrol update job=$current_job Dependency=afterok:$dep_job";
+
+        # $self->log->debug("Updating dependencies ".$cmd."\n");
+        $self->change_deps($cmd);
     }
 
 }
 
 sub change_deps {
     my $self = shift;
-    my $cmd = shift;
+    my $cmd  = shift;
 
     my $buffer = "";
-    if( scalar IPC::Cmd::run( command => $cmd,
+    if (
+        scalar IPC::Cmd::run(
+            command => $cmd,
             verbose => 0,
-            buffer  => \$buffer )
-    ) {
-        $self->log->info($buffer) if $buffer;
+            buffer  => \$buffer
+        )
+      )
+    {
+        # $self->log->info($buffer) if $buffer;
     }
-    else{
-        $self->log->warn($buffer) if $buffer;
+    else {
+        # $self->log->warn($buffer) if $buffer;
     }
 }
 

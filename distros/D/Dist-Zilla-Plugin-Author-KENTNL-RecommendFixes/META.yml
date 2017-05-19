@@ -1,0 +1,44 @@
+---
+abstract: 'Recommend generic changes to the dist.'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::DZil: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
+provides:
+  Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes:
+    file: lib/Dist/Zilla/Plugin/Author/KENTNL/RecommendFixes.pm
+    version: '0.005004'
+recommends:
+  Moose: '2.000'
+  Path::Tiny: '0.058'
+requires:
+  Data::DPath: '0'
+  Dist::Zilla::Role::InstallTool: '0'
+  Generic::Assertions: '0'
+  MooX::Lsub: '0'
+  Moose: '0'
+  Path::Tiny: '0'
+  Term::ANSIColor: '0'
+  YAML::Tiny: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
+  repository: https://github.com/kentnl/Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes.git
+version: '0.005004'

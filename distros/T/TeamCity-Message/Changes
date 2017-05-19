@@ -1,3 +1,7 @@
+0.02     2017-05-18
+
+- Expose _timestamp as tc_timestamp
+
 0.01     2016-04-20
 
 - First release upon an unsuspecting world.

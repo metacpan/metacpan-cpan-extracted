@@ -3,23 +3,26 @@ package Catmandu::Store::Datahub::Bag;
 use Moo;
 use Scalar::Util qw(reftype);
 use LWP::UserAgent;
-use Catmandu::Bag::IdGenerator::Datahub;
-use Catmandu::Store::Datahub::Generator;
 use Catmandu::Util qw(is_string require_package);
 use Time::HiRes qw(usleep);
 use Catmandu::Sane;
-
-use Data::Dumper qw(Dumper);
+use Catmandu::Store::Datahub::API;
+use JSON;
 
 with 'Catmandu::Bag';
 
-has data_pid => (
-    is => 'ro'
-);
+has api => (is => 'lazy');
 
-sub _build_id_generator {
-    my ($self) = shift;
-    my $data_pid = Catmandu::Bag::IdGenerator::Datahub->new(data_pid => $self->data_pid);
+sub _build_api {
+    my $self = shift;
+    my $api = Catmandu::Store::Datahub::API->new(
+        url           => $self->store->url,
+        client_id     => $self->store->client_id,
+        client_secret => $self->store->client_secret,
+        username      => $self->store->username,
+        password      => $self->store->password
+    );
+    return $api;
 }
 
 ##
@@ -31,36 +34,36 @@ sub _build_id_generator {
 around add => sub {
     my $orig = shift;
     my ($self, $data) = @_;
-    if (reftype($data) eq reftype({})) {
-        if (exists($data->{$self->store->key_for('id')})) {
-            delete($data->{$self->store->key_for('id')});
-        }
-    }
+    delete $data->{'_id'};
     return $self->$orig($data);
 };
 
 around update => sub {
     my $orig = shift;
     my ($self, $id, $data) = @_;
-    if (reftype($data) eq reftype({})) {
-        if (exists($data->{$self->store->key_for('id')})) {
-            delete($data->{$self->store->key_for('id')});
-        }
-    }
-    return $self->$orig($id, $data);
+    delete $data->{'_id'};
+    return $self->$orig($data);
 };
 
 
 sub generator {
-    my ($self) = @_;
+    my $self = shift;
+    # api/v1/data -> results ; not paginated
+    my $stack = $self->api->list()->{'results'};
     return sub {
-        state $gen = do {
-            my $g = Catmandu::Store::Datahub::Generator->new(token => $self->store->access_token, url => $self->store->url);
-            $g->set_list();
-            return $g;
-        };
-        return $gen->next;
+        return pop @{$stack};
     };
+}
+
+sub each {
+    my ($self, $sub) = @_;
+    my $n = 0;
+    my $stack = $self->api->list()->{'results'};
+    while (my $item = pop @{$stack}) {
+        $sub->($item);
+        $n++;
+    }
+    return $n;
 }
 
 
@@ -68,106 +71,35 @@ sub generator {
 # Return a record identified by $id
 sub get {
     my ($self, $id) = @_;
-    my $url = sprintf('%s/api/v1/data/%s', $self->store->url, $id);
-    
-    my $token = $self->store->access_token;
-    my $response = $self->store->client->get($url, Authorization => sprintf('Bearer %s', $token));
-    if ($response->is_success) {
-        return $response->decoded_content;
-    } else {
-        Catmandu::HTTPError->throw({
-                code             => $response->code,
-                message          => $response->status_line,
-                url              => $response->request->uri,
-                method           => $response->request->method,
-                request_headers  => [],
-                request_body     => $response->request->decoded_content,
-                response_headers => [],
-                response_body    => $response->decoded_content,
-            });
-        return undef;
-    }
+    return $self->api->get($id);
 }
 
 ##
 # Create a new record
 sub add {
     my ($self, $data) = @_;
-    my $url = sprintf('%s/api/v1/data.lidoxml', $self->store->url);
-
+    my $url;
     my $lido_data = $self->store->lido->to_xml($data);
-    
-    my $token = $self->store->access_token;
-    my $response = $self->store->client->post($url, Content_Type => 'application/lido+xml', Authorization => sprintf('Bearer %s', $token), Content => $lido_data);
-    if ($response->is_success) {
-        return $response->decoded_content;
-    } else {
-        Catmandu::HTTPError->throw({
-                code             => $response->code,
-                message          => $response->status_line,
-                url              => $response->request->uri,
-                method           => $response->request->method,
-                request_headers  => [],
-                request_body     => $response->request->decoded_content,
-                response_headers => [],
-                response_body    => $response->decoded_content,
-            });
-        return undef;
-    }
+    return $self->api->add($lido_data, $data->{'lidoRecID'}->[0]->{'_'});
 }
 
 ##
 # Update a record
 sub update {
     my ($self, $id, $data) = @_;
-    my $url = sprintf('%s/api/v1/data.lidoxml/%s', $self->store->url, $id);
-
     my $lido_data = $self->store->lido->to_xml($data);
-    
-    my $token = $self->store->access_token;
-    my $response = $self->store->client->put($url, Content_Type => 'application/lido+xml', Authorization => sprintf('Bearer %s', $token), Content => $lido_data);
-    if ($response->is_success) {
-        return $response->decoded_content;
-    } else {
-        Catmandu::HTTPError->throw({
-                code             => $response->code,
-                message          => $response->status_line,
-                url              => $response->request->uri,
-                method           => $response->request->method,
-                request_headers  => [],
-                request_body     => $response->request->decoded_content,
-                response_headers => [],
-                response_body    => $response->decoded_content,
-            });
-        return undef;
-    }
+    return $self->api->update($id, $lido_data);
 }
 
 ##
 # Delete a record
 sub delete {
     my ($self, $id) = @_;
-    my $url = sprintf('%s/api/v1/data/%s', $self->store->url, $id);
-    
-    my $token = $self->store->access_token;
-    my $response = $self->store->client->delete($url, Authorization => sprintf('Bearer %s', $token));
-    if ($response->is_success) {
-        return $response->decoded_content;
-    } else {
-        Catmandu::HTTPError->throw({
-                code             => $response->code,
-                message          => $response->status_line,
-                url              => $response->request->uri,
-                method           => $response->request->method,
-                request_headers  => [],
-                request_body     => $response->request->decoded_content,
-                response_headers => [],
-                response_body    => $response->decoded_content,
-            });
-        return undef;
-    }
+    return $self->api->delete($id);
 }
 
 sub delete_all {}
+
+
 
 1;

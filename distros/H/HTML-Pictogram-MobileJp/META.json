@@ -1,0 +1,74 @@
+{
+   "abstract" : "Convert pictograms in HTML",
+   "author" : [
+      "Tokuhiro Matsuno (tokuhirom@gmail.com)"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-Pictogram-MobileJp",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::MobileAgent" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::MobileAgent" : 0,
+            "parent" : 0,
+            "perl" : "5.00800"
+         }
+      }
+   },
+   "provides" : {
+      "HTML::Pictogram::MobileJp" : {
+         "file" : "lib/HTML/Pictogram/MobileJp.pm",
+         "version" : "0.02"
+      },
+      "HTML::Pictogram::MobileJp::EmojiNumber" : {
+         "file" : "lib/HTML/Pictogram/MobileJp/EmojiNumber.pm",
+         "version" : 0
+      },
+      "HTML::Pictogram::MobileJp::EmojiNumber::Map" : {
+         "file" : "lib/HTML/Pictogram/MobileJp/EmojiNumber/Map.pm",
+         "version" : 0
+      },
+      "HTML::Pictogram::MobileJp::Unicode" : {
+         "file" : "lib/HTML/Pictogram/MobileJp/Unicode.pm",
+         "version" : 0
+      },
+      "HTML::Pictogram::MobileJp::Unicode::Map" : {
+         "file" : "lib/HTML/Pictogram/MobileJp/Unicode/Map.pm",
+         "version" : 0
+      },
+      "HTML::Pictogram::MobileJp::Util" : {
+         "file" : "lib/HTML/Pictogram/MobileJp/Util.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.02"
+}

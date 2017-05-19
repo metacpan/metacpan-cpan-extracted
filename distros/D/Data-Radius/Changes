@@ -1,3 +1,8 @@
+1.2.1 2017-05-18
+
+ - Fix Message-Authenticator value calculations for Disconnect and CoA requests
+   (Reported by Yuriy Zhilovets)
+
 1.2.0 2016-12-20
 
  - Use Net::IP to encode/decode IPv6 when inet_pton() is not supported (WinXP without IPv6 installed)

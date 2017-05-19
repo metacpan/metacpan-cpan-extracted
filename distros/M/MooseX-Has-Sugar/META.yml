@@ -1,0 +1,43 @@
+---
+abstract: "Sugar Syntax for moose 'has' fields"
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  lib: '0'
+  namespace::clean: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-Has-Sugar
+provides:
+  MooseX::Has::Sugar:
+    file: lib/MooseX/Has/Sugar.pm
+    version: '1.000006'
+  MooseX::Has::Sugar::Minimal:
+    file: lib/MooseX/Has/Sugar/Minimal.pm
+    version: '1.000006'
+  MooseX::Has::Sugar::Saccharin:
+    file: lib/MooseX/Has/Sugar/Saccharin.pm
+    version: '1.000006'
+requires:
+  Carp: '0'
+  Sub::Exporter::Progressive: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/MooseX-Has-Sugar/issues
+  homepage: https://github.com/kentnl/MooseX-Has-Sugar
+  repository: https://github.com/kentnl/MooseX-Has-Sugar.git
+version: '1.000006'

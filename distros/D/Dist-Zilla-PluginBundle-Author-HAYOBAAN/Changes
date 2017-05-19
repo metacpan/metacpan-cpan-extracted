@@ -1,5 +1,8 @@
 Revision history for Perl module Dist-Zilla-PluginBundle-Author-HAYOBAAN
 
+0.013     2017-05-19
+  * Requiring ReadmeAnyFromPod 0.161150 [GH #3]
+
 0.012     2016-11-17
   * Fixed missing files in copy files from build [GH #4]
   * Added Travis and AppVeyor testing
@@ -7,7 +10,7 @@ Revision history for Perl module Dist-Zilla-PluginBundle-Author-HAYOBAAN
     CPAN distributions
 
 0.011     2016-08-10
-  * Removed Build.PL (as should have been done as of v0.009...)
+  * Removed Build.PL (as should have been done as of v0.009...) [GH #2]
   * Updated author e-mail address
 
 0.010     2016-07-26

@@ -1,0 +1,32 @@
+---
+abstract: 'mobile ip address in Japan'
+author:
+  - 'Tokuhiro Matsuno  C<< <tokuhiro __at__ mobilefactory.jp> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+  File::ShareDir: 1
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-CIDR-MobileJP
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  File::ShareDir: 1.02
+  Net::CIDR::Lite: 0.21
+  WWW::MobileCarrierJP: 0.55
+  YAML: 0
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tokuhirom/p5-net-cidr-mobilejp.git
+version: 0.24
