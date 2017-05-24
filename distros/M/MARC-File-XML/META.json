@@ -1,0 +1,44 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Ed Summers <ehs@pobox.com>",
+      "Galen Charlton <gmcharlt@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MARC-File-XML",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Warn" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "MARC::Charset" : "0.98",
+            "MARC::Record" : "2",
+            "XML::LibXML" : "1.66"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v1.0.5"
+}

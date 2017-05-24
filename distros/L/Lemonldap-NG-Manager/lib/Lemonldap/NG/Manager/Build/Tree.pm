@@ -13,7 +13,7 @@
 
 package Lemonldap::NG::Manager::Build::Tree;
 
-our $VERSION = '1.9.6';
+our $VERSION = '1.9.10';
 
 # TODO: Missing:
 #  * activeTimer
@@ -78,7 +78,9 @@ sub tree {
                                         'portalUserAttr',
                                         'portalOpenLinkInNewWindow',
                                         'portalAntiFrame',
-                                        'portalPingInterval'
+                                        'portalPingInterval',
+                                        'portalErrorOnExpiredSession',
+                                        'portalErrorOnMailNotFound'
                                     ]
                                 }
                             ]

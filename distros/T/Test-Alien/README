@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.14
+    version 0.15
 
 SYNOPSIS
 
@@ -14,14 +14,14 @@ SYNOPSIS
      use Test::Alien;
      use Alien::patch;
      
-     plan 4;
-     
      alien_ok 'Alien::patch';
      run_ok([ 'patch', '--version' ])
        ->success
        # we only accept the version written
        # by Larry ...
        ->out_like(qr{Larry Wall}); 
+     
+     done_testing;
 
     Test that your library works with XS:
 
@@ -36,6 +36,8 @@ SYNOPSIS
        ok $module->version;
      };
      
+     done_testing;
+    
      __DATA__
      
      #include "EXTERN.h"
@@ -69,6 +71,8 @@ SYNOPSIS
        like $minor, qr{[0-9]+};
        like $patch, qr{[0-9]+};
      };
+     
+     done_testing;
 
 DESCRIPTION
 

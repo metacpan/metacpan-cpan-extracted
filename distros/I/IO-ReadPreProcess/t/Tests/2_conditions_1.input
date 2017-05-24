@@ -1,0 +1,24 @@
+.# Title: If/unless and else
+.# NewOpt: Raw 0
+.#
+.# Tests: .if .else .unless .fi
+.#
+.let num := 2
+First line
+.if num == 2
+Number has value 2
+.fi
+Another line
+.let num := num + 3
+.if num == 5
+Number has the value 5
+.else
+.echo Number has the other value of \v{num}
+.fi
+Yet another line
+.unless num == 5
+This should not be seen
+.else
+But this should as num is 5
+.fi
+END

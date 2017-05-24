@@ -11,7 +11,7 @@ use String::Random qw(random_string);
 use HTML::Template;
 use base qw(Lemonldap::NG::Portal::_OpenIDConnect);
 
-our $VERSION = '1.9.9';
+our $VERSION = '1.9.10';
 
 ## @method void issuerDBInit()
 # Get configuration data
@@ -542,6 +542,30 @@ sub issuerForUnAuthUser {
 
         if ($post_logout_redirect_uri) {
 
+            # Check redirect URI is allowed
+            my $redirect_uri_allowed = 0;
+            foreach ( keys %{ $self->{oidcRPMetaDataOptions} } ) {
+                my $logout_rp     = $_;
+                my $redirect_uris = $self->{oidcRPMetaDataOptions}->{$logout_rp}
+                  ->{oidcRPMetaDataOptionsPostLogoutRedirectUris};
+
+                foreach ( split( /\s+/, $redirect_uris ) ) {
+                    if ( $post_logout_redirect_uri eq $_ ) {
+                        $self->lmLog(
+"$post_logout_redirect_uri is an allowed logout redirect URI for RP $logout_rp",
+                            'debug'
+                        );
+                        $redirect_uri_allowed = 1;
+                    }
+                }
+            }
+
+            unless ($redirect_uri_allowed) {
+                $self->lmLog( "$post_logout_redirect_uri is not allowed",
+                    'error' );
+                return PE_BADURL;
+            }
+
             # Build Response
             my $response_url =
               $self->buildLogoutResponse( $post_logout_redirect_uri, $state );
@@ -676,33 +700,49 @@ sub issuerForAuthUser {
         }
         unless ( $oidc_request->{'scope'} ) {
             $self->lmLog( "Scope is required", 'error' );
-            $self->returnRedirectError(
-                $oidc_request->{'redirect_uri'},
-                "invalid_request",
-                "scope required",
-                undef,
-                $oidc_request->{'state'},
-                ( $flow ne "authorizationcode" )
-            );
+            return PE_ERROR;
         }
         unless ( $oidc_request->{'client_id'} ) {
             $self->lmLog( "Client ID is required", 'error' );
-            $self->returnRedirectError(
-                $oidc_request->{'redirect_uri'},
-                "invalid_request",
-                "client_id required",
-                undef,
-                $oidc_request->{'state'},
-                ( $flow ne "authorizationcode" )
-            );
+            return PE_ERROR;
         }
         if ( $flow eq "implicit" and not defined $oidc_request->{'nonce'} ) {
             $self->lmLog( "Nonce is required for implicit flow", 'error' );
-            $self->returnRedirectError(
-                $oidc_request->{'redirect_uri'},
-                "invalid_request", "nonce required",
-                undef, $oidc_request->{'state'}, 1
-            );
+            return PE_ERROR;
+        }
+
+        # Check client_id
+        my $client_id = $oidc_request->{'client_id'};
+        $self->lmLog( "Request from client id $client_id", 'debug' );
+
+        # Verify that client_id is registered in configuration
+        my $rp = $self->getRP($client_id);
+
+        unless ($rp) {
+            $self->lmLog(
+                "No registered Relying Party found with client_id $client_id",
+                'error' );
+            return PE_ERROR;
+        }
+        else {
+            $self->lmLog( "Client id $client_id match RP $rp", 'debug' );
+        }
+
+        # Check redirect_uri
+        my $redirect_uri  = $oidc_request->{'redirect_uri'};
+        my $redirect_uris = $self->{oidcRPMetaDataOptions}->{$rp}
+          ->{oidcRPMetaDataOptionsRedirectUris};
+
+        if ($redirect_uris) {
+            my $redirect_uri_allowed = 0;
+            foreach ( split( /\s+/, $redirect_uris ) ) {
+                $redirect_uri_allowed = 1 if $redirect_uri eq $_;
+            }
+            unless ($redirect_uri_allowed) {
+                $self->lmLog( "Redirect URI $redirect_uri not allowed",
+                    'error' );
+                return PE_BADURL;
+            }
         }
 
         # Check if flow is allowed
@@ -785,30 +825,6 @@ sub issuerForAuthUser {
             return PE_OK;
         }
 
-        # Check client_id
-        my $client_id = $oidc_request->{'client_id'};
-        $self->lmLog( "Request from client id $client_id", 'debug' );
-
-        # Verify that client_id is registered in configuration
-        my $rp = $self->getRP($client_id);
-
-        unless ($rp) {
-            $self->lmLog(
-                "No registered Relying Party found with client_id $client_id",
-                'error' );
-            $self->returnRedirectError(
-                $oidc_request->{'redirect_uri'},
-                "invalid_request",
-                "client_id $client_id unknown",
-                undef,
-                $oidc_request->{'state'},
-                ( $flow ne "authorizationcode" )
-            );
-        }
-        else {
-            $self->lmLog( "Client id $client_id match RP $rp", 'debug' );
-        }
-
         # Check Request JWT signature
         if ( $oidc_request->{'request'} ) {
             unless (
@@ -824,23 +840,6 @@ sub issuerForAuthUser {
             }
             else {
                 $self->lmLog( "Request JWT signature verified", 'debug' );
-            }
-        }
-
-        # Check redirect_uri
-        my $redirect_uri  = $oidc_request->{'redirect_uri'};
-        my $redirect_uris = $self->{oidcRPMetaDataOptions}->{$rp}
-          ->{oidcRPMetaDataOptionsRedirectUris};
-
-        if ($redirect_uris) {
-            my $redirect_uri_allowed = 0;
-            foreach ( split( /\s+/, $redirect_uris ) ) {
-                $redirect_uri_allowed = 1 if $redirect_uri eq $_;
-            }
-            unless ($redirect_uri_allowed) {
-                $self->lmLog( "Redirect URI $redirect_uri not allowed",
-                    'error' );
-                return PE_BADURL;
             }
         }
 
@@ -1371,6 +1370,31 @@ sub issuerForAuthUser {
             }
 
             if ($post_logout_redirect_uri) {
+
+                # Check redirect URI is allowed
+                my $redirect_uri_allowed = 0;
+                foreach ( keys %{ $self->{oidcRPMetaDataOptions} } ) {
+                    my $logout_rp = $_;
+                    my $redirect_uris =
+                      $self->{oidcRPMetaDataOptions}->{$logout_rp}
+                      ->{oidcRPMetaDataOptionsPostLogoutRedirectUris};
+
+                    foreach ( split( /\s+/, $redirect_uris ) ) {
+                        if ( $post_logout_redirect_uri eq $_ ) {
+                            $self->lmLog(
+"$post_logout_redirect_uri is an allowed logout redirect URI for RP $logout_rp",
+                                'debug'
+                            );
+                            $redirect_uri_allowed = 1;
+                        }
+                    }
+                }
+
+                unless ($redirect_uri_allowed) {
+                    $self->lmLog( "$post_logout_redirect_uri is not allowed",
+                        'error' );
+                    return PE_BADURL;
+                }
 
                 # Build Response
                 my $response_url =

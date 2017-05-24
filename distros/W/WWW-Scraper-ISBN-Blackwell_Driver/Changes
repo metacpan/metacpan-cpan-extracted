@@ -1,6 +1,9 @@
 Revision history for WWW-Scraper-ISBN-Blackwell_Driver
 ======================================================
 
+0.10    2017-05-23
+        - updated patterns following site layout changes.
+
 0.09    2014-11-03
         - extended META test suite.
         - ping fix for Cygwin (thanks to Alexandr Ciornii).

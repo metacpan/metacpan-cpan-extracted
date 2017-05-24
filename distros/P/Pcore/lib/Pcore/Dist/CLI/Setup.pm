@@ -5,7 +5,7 @@ use Pcore -class;
 with qw[Pcore::Core::CLI::Cmd];
 
 sub CLI ($self) {
-    return { abstract => 'setup pcore.perl', };
+    return { abstract => 'setup ~/.pcore/pcore.ini', };
 }
 
 sub CLI_RUN ( $self, $opt, $arg, $rest ) {
@@ -30,7 +30,7 @@ __END__
 
 =head1 NAME
 
-Pcore::Dist::CLI::Setup - setup pcore.perl
+Pcore::Dist::CLI::Setup - setup ~/.pcore/pcore.ini
 
 =head1 SYNOPSIS
 

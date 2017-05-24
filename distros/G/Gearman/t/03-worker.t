@@ -28,6 +28,7 @@ can_ok(
         reset_abilities
         send_work_complete
         send_work_data
+        send_work_exception
         send_work_fail
         send_work_status
         send_work_warning

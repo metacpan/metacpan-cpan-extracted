@@ -1,5 +1,11 @@
 Revision history for Sys::Linux::Namespaces
 
+0.015 - May 21 2017
+  * Remove a few hacks for signals inside the child that aren't needed since using Linux::Clone instead of unshare only
+
+0.014 - May 21 2017
+  * Return the exit code from waitpid so you can see the status of a process
+
 0.013 - May  7 2017
   * Force target mount option to be an absolute path
   * Do kill child subprocess on any signal by default.  This helps prevent zombie PID 1 processes.

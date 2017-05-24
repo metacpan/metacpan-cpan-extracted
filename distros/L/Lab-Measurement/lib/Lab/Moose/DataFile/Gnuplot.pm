@@ -14,7 +14,7 @@ use Scalar::Util 'looks_like_number';
 use List::Util 'any';
 use namespace::autoclean;
 
-our $VERSION = '3.542';
+our $VERSION = '3.543';
 
 extends 'Lab::Moose::DataFile';
 

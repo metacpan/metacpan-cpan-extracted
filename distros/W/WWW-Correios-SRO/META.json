@@ -4,7 +4,7 @@
       "Breno G. de Oliveira <garu@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.142060",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -32,17 +32,14 @@
       },
       "runtime" : {
          "requires" : {
-            "Class::XSAccessor" : "1.05",
             "Exporter" : "0",
-            "HTML::TreeBuilder" : "0",
             "LWP::UserAgent" : "0",
             "Test::More" : "0.88",
-            "URI::file" : "0",
-            "parent" : "0",
-            "utf8" : "0"
+            "parent" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.10"
+   "version" : "0.12",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

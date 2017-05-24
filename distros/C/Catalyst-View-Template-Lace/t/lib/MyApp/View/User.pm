@@ -3,8 +3,7 @@ package  MyApp::View::User;
 use Moo;
 use Template::Lace::Utils 'mk_component';
 extends 'Catalyst::View::Template::Lace';
-with 'Template::Lace::ModelRole',
-  'Catalyst::View::Template::Lace::Role::ArgsFromStash',
+with 'Catalyst::View::Template::Lace::Role::ArgsFromStash',
   'Template::Lace::Model::AutoTemplate',
   'Catalyst::View::Template::Lace::Role::URI';
 
@@ -24,7 +23,7 @@ sub template {q[
         <dt>Motto</dt>
         <dd id='motto'>MOTTO</dd>
       </dl>
-      <catalyst-response action='/snips/display' at='body' />
+      <catalyst-subrequest action='/snips/display' at='body' />
     </body>
   </html>
 ]}

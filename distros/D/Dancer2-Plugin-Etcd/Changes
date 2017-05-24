@@ -1,5 +1,10 @@
 Revision history for Dancer2-Plugin-Etcd
 
+0.006
+
+[Bugs]
+* Make compatible with interface changes to Etcd3 v0.006
+
 0.003
 
 [BUGS]

@@ -40,7 +40,7 @@ use Test::Most;
 
   sub does_redirect_to_noarg_action :Local {
     my ($self, $c) = @_;
-    $c->redirect_to_action('example/target_noarg');
+    $c->redirect_to_action('/example/target_noarg');
   }
 
   package MyApp;

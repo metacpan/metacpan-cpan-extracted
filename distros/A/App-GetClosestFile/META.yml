@@ -12,5 +12,5 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: App-GetClosestFile
-version: 0.2.2
+version: 0.2.3
 x_serialization_backend: 'YAML::Tiny version 1.69'

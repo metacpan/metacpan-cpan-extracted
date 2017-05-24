@@ -1,7 +1,7 @@
 package App::PPH21Utils;
 
-our $DATE = '2016-01-18'; # DATE
-our $VERSION = '0.02'; # VERSION
+our $DATE = '2017-05-24'; # DATE
+our $VERSION = '0.03'; # VERSION
 
 1;
 # ABSTRACT: CLI utilities related to Indonesian income tax article 21 ("PPH21")
@@ -18,13 +18,15 @@ App::PPH21Utils - CLI utilities related to Indonesian income tax article 21 ("PP
 
 =head1 VERSION
 
-This document describes version 0.02 of App::PPH21Utils (from Perl distribution App-PPH21Utils), released on 2016-01-18.
+This document describes version 0.03 of App::PPH21Utils (from Perl distribution App-PPH21Utils), released on 2017-05-24.
 
 =head1 DESCRIPTION
 
 This distribution includes the following CLI utilities:
 
 =over
+
+=item * L<calc-net-income-from-pph21-op>
 
 =item * L<calc-pph21-op>
 
@@ -60,7 +62,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

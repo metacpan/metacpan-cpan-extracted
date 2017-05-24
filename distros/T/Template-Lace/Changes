@@ -1,5 +1,18 @@
 The following logs changes for the CPAN distribution Template::Lace
 
+0.005   22 May 2017
+        - Fixed the AutoTemplate role
+
+0.004   22 May 2017
+        - We removed Template::Lace::ModelRole since it wasn't needed.
+        - arguments on components declared in templates can now pass complex
+          data (using JSON).
+        - shortcut on 'class' helper to make it easier to set several classes.
+        - Removed accidental warnings in code
+        - added 'value' attribute helper
+        - when using DOM->do you can use '.' as the CSS match specification
+          to indicate 'current DOM'.
+
 0.003   12 May 2017
         - More HTML attribute helpers
         - new Template::Lace::DOM method to run transforms under a context
@@ -12,5 +25,5 @@ The following logs changes for the CPAN distribution Template::Lace
         - Fixed POD errors in previous version
 
 0.001   25 April 2017
-        - First usable version, with caveats (its still earlly access)
+        - First usable version, with caveats (its still early access)
 

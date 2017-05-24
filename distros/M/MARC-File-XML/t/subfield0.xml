@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<collection xmlns="http://www.loc.gov/MARC21/slim" xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <record xmlns="">
+      <leader>-----nas-a22-----z--4500</leader>
+      <datafield tag="245" ind1="0" ind2="0">
+         <subfield code="a">19th century music</subfield>
+         <subfield code="h">[electronic resource]</subfield>
+         <subfield code="0">subfield $0 contents</subfield>
+      </datafield>
+   </record>
+</collection>

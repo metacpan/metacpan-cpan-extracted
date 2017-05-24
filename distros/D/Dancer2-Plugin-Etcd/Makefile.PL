@@ -26,7 +26,7 @@ WriteMakefile(
         'Test::More'            => 0,
     },
     PREREQ_PM => {
-        'Etcd3'                 => '0.003',
+        'Etcd3'                 => '0.006',
         'Dancer2'               => '0.200000',
         'Dancer2::Core::Types'  => 0,
         'Dancer2::Plugin'       => 0,
@@ -40,6 +40,7 @@ WriteMakefile(
         'Sys::Hostname'         => 0,
         'Getopt::Long'          => 0,
         'Path::Tiny'            => 0,
+        'Path::Class'           => 0,
         'YAML::Syck'            => 0,
     },
 
@@ -48,7 +49,7 @@ WriteMakefile(
     clean               => { FILES => 'Dancer2-Plugin-Etcd-*' },
     META_MERGE => {
         resources => {
-            repository => 'https://github.com/sbatschelet/Dancer2-Plugin-Etcd',
+            repository => 'https://github.com/hexfusion/Dancer2-Plugin-Etcd',
             bugtracker => 'https://github.com/PerlDancer/Dancer2-Plugin-Etcd/issues',
             homepage   => 'https://github.com/PerlDancer/Dancer2-Plugin-Etcd/',
             IRC        => 'irc://irc.perl.org/#dancer',

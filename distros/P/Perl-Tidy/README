@@ -48,10 +48,10 @@ WHAT NEXT
     Reading the brief tutorial should help you use perltidy effectively.
 
 FEEDBACK / BUG REPORTS
-    Bug reports, comments and suggestions are welcome. Attach the smallest
-    piece of code which demonstrates the bug or issue.
 
-     Steve Hancock
-     perltidy at users.sourceforge.net
-     http://perltidy.sourceforge.net
+    A list of current bugs and issues can be found at the CPAN site
+
+     https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Tidy
+
+    To report a new bug or problem, use the link on this page .  
 

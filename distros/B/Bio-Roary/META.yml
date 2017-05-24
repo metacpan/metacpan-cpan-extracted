@@ -50,5 +50,5 @@ requires:
 resources:
   homepage: http://www.sanger.ac.uk/
   repository: https://github.com/sanger-pathogens/Roary.git
-version: 3.8.0
+version: 3.8.2
 x_serialization_backend: 'YAML::Tiny version 1.51'

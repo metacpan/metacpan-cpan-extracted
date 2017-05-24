@@ -1,5 +1,17 @@
 Revision history for PGObject-Simple
 
+3.0.1	2017-05-20
+	Fixed a bug where package defaults are never called where they should be
+
+3.0	2017-05-19
+	Removed support for Perl 5.6 and 5.8
+	Code cleanup
+	Now provide exports for code re-use in rolls and adaptors
+	Give precedence to functions over hash elements in object mappings.
+	Added getters and setters for dbh
+	Added association interface
+	Added support for package-level reader/factories for param defaults
+	Added support for object accessors for param defaults
 
 2.0.0   2016-11-21
         Release version 2.0.0 in order to get out of the 1.9 vs 1.10 mess

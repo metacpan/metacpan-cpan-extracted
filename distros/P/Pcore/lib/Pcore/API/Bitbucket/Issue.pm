@@ -1,6 +1,6 @@
 package Pcore::API::Bitbucket::Issue;
 
-use Pcore -class, -const, -ansi;
+use Pcore -class, -const, -ansi, -result;
 
 const our $PRIORITY => {
     trivial  => 1,
@@ -108,28 +108,32 @@ sub set_milestone ( $self, $milestone, $cb ) {
     return;
 }
 
+# https://confluence.atlassian.com/bitbucket/issues-resource-296095191.html#issuesResource-Updateanexistingissue
 sub update ( $self, $args, $cb ) {
-    my $url = "https://bitbucket.org/api/1.0/repositories/@{[$self->api->id]}/issues/$self->{local_id}/";
-
     P->http->put(    #
-        $url,
+        "https://bitbucket.org/api/1.0/repositories/@{[$self->api->id]}/issues/$self->{local_id}/",
         headers => {
             AUTHORIZATION => $self->api->auth,
             CONTENT_TYPE  => 'application/x-www-form-urlencoded; charset=UTF-8',
         },
         body      => P->data->to_uri($args),
         on_finish => sub ($res) {
-            if ( $res->status != 200 ) {
-                $cb->();
+            if ( !$res ) {
+                my $data = eval { P->data->from_json( $res->body ) };
+
+                $cb->( result [ $res->status, $data->{error}->{message} || $res->reason ] );
             }
             else {
-                my $json = P->data->from_json( $res->body );
+                my $data = eval { P->data->from_json( $res->body ) };
 
-                my $issue = $self->new( { api => $self->api } );
+                if ($@) {
+                    $cb->( result [ 500, 'Error decoding respnse' ] );
+                }
+                else {
+                    $self->@{ keys $data->%* } = values $data->%*;
 
-                $issue->@{ keys $json->%* } = values $json->%*;
-
-                $cb->($issue);
+                    $cb->( result 200, $self );
+                }
             }
 
             return;

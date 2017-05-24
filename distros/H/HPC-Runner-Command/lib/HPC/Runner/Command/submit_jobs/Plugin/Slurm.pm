@@ -88,8 +88,8 @@ sub update_job_deps {
     # return unless $self->current_batch->has_array_deps;
     return unless $self->has_array_deps;
 
-    foreach my $array_id ( $self->current_batch->all_array_deps ) {
-    # foreach my $array_id ( $self->all_array_deps ) {
+    # foreach my $array_id ( $self->current_batch->all_array_deps ) {
+    foreach my $array_id ( $self->all_array_deps ) {
         next unless $array_id;
 
         my $current_job = $array_id->[0];

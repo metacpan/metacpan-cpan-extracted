@@ -5,7 +5,7 @@ use Test::More import => ['!pass'];
 #use Plack::Test;
 use  Test::WWW::Mechanize::PSGI;
 use HTTP::Request::Common;
-use JSON::WebToken;
+use Crypt::JWT qw(encode_jwt decode_jwt);
 use Data::Dumper;
 
 #plan tests => 5;
@@ -39,8 +39,5 @@ $mech->add_header("Authorization" => $authorization);
 $mech->get_ok("/");
 my $exception = $mech->content();
 $exception = eval "my $exception";
-is ref($exception), "JSON::WebToken::Exception", "Exception with correct type";
-ok exists($exception->{message}), "Exception includes a message";
-ok exists($exception->{code}), "Exception includes a code";
-
+like $exception, '/^JWT: invalid token format/', "Exception includes a message";
 done_testing();

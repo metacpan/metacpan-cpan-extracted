@@ -1,0 +1,60 @@
+.# Title: Condition that is a sub - in a sub - loops
+.#
+.# This needs to be tested several ways due to implementation subtleties:
+.# In line and in a sub
+.# .if vs .unless vs .elseif
+.# .while vs .until vs .for
+.# .sub vs the built in directives: .include .read .test
+.# Nested vs top level loops & straight ifs
+.# In various combinations.
+.#
+.# A sub that returns its first argument:
+.sub foo RetVal a2
+.echo foo returning RetVal='\v{RetVal}' ; a2='\v{a2}'
+.return RetVal
+.done
+Done foo definition
+
+.# Put all the test loops into a .sub
+
+.sub a
+
+Test top level while: false
+.while .foo 0 bar
+Unexpected output
+.done
+.#
+
+Test top level while: true
+.while .foo 1 bar
+Expected Output
+.break
+.done
+.#
+
+.# Until - should not be an issue if the above is OK
+
+Test top level until: false
+.until .foo 0 bar
+Expected output
+.break
+.done
+.#
+
+Test top level until: true
+.until .foo 1 bar
+Unexpected Output
+.done
+.#
+
+
+.# For is more complicated
+.for i := 5 ;; .foo \v{i} bar ;; i--
+.echo For i = \v{i}
+.done
+
+.done
+
+.a
+
+EOF

@@ -1,5 +1,6 @@
 package main;
 use Signals::XSIG;
+use lib '.';
 use t::SignalHandlerTest;
 use Test::More tests => 19;
 use Config;
@@ -112,5 +113,4 @@ $x=$y=$z=0;
   # this works on 5.8, fails on >= 5.10
   ok($y==1 && $z==1, '%XSIG handlers run after local %SIG');
 }
-
 

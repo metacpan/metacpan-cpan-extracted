@@ -4,7 +4,7 @@ package Fluent::Logger;
 use strict;
 use warnings;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use IO::Select;
 use IO::Socket::INET;
@@ -14,7 +14,8 @@ use Time::Piece;
 use Carp;
 use Scalar::Util qw/ refaddr /;
 use Time::HiRes qw/ time /;
-use Data::UUID ();
+use UUID::Tiny qw/ create_uuid UUID_V4 /;
+use MIME::Base64 qw/ encode_base64 /;
 
 use constant RECONNECT_WAIT           => 0.5;
 use constant RECONNECT_WAIT_INCR_RATE => 1.5;
@@ -59,8 +60,6 @@ use Class::Tiny +{
     },
     selector => sub { },
 };
-
-my $uuid = Data::UUID->new;
 
 sub BUILD {
     my $self = shift;
@@ -211,7 +210,7 @@ sub _send {
 
     my ($data, $unique_key);
     if ( $self->ack ) {
-        $unique_key = $uuid->create_b64;
+        $unique_key = encode_base64(create_uuid(UUID_V4));
         $data = join('', MP_HEADER_4ELM_ARRAY, @args, $self->{packer}->pack({ chunk => $unique_key }));
         push @{$self->{pending_acks}}, $unique_key;
     } else {

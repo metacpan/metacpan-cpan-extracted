@@ -26,13 +26,13 @@ the same terms as the Perl 5 programming language system itself.
 =cut
 
 use Test::More;
-use Scalar::Does qw( does looks_like_number );
+use Scalar::Util qw( looks_like_number );
 use MooX::Struct
 	Structure => [
 		qw( $value %dict @list ),
 		'@value2' => { isa => sub { die if ref $_[0] } },
-		'%list2'  => [ isa => sub { die unless does $_[0], 'ARRAY' } ],
-		'$dict2'  => [ isa => sub { die unless does $_[0], 'HASH' } ],
+		'%list2'  => [ isa => sub { die unless ref $_[0] eq 'ARRAY' } ],
+		'$dict2'  => [ isa => sub { die unless ref $_[0] eq 'HASH' } ],
 	],
 	OtherStructure => [qw( id! ego )],
 	Point    => ['+x', '+y' => [default => sub { 101 }]],

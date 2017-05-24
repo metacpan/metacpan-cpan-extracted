@@ -4,7 +4,10 @@ use Moose::Role;
 # ABSTRACT: NoSerialize trait for attributes
 
 package Moose::Meta::Attribute::Custom::Trait::NoSerialize {
-    sub register_implementation { 'DBIx::Class::InflateColumn::JSON2Object::Trait::NoSerialize' }
+
+    sub register_implementation {
+        'DBIx::Class::InflateColumn::JSON2Object::Trait::NoSerialize'
+    }
 }
 
 1;
@@ -21,7 +24,7 @@ DBIx::Class::InflateColumn::JSON2Object::Trait::NoSerialize - NoSerialize trait 
 
 =head1 VERSION
 
-version 0.902
+version 0.903
 
 =head1 NAME
 

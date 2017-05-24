@@ -9,9 +9,9 @@ use Pcore -const,
 use Pcore::Util::Scalar qw[blessed is_glob];
 use Pcore::AE::Handle qw[:PERSISTENT];
 use Pcore::HTTP::Util;
-use Pcore::HTTP::Message::Headers;
+use Pcore::HTTP::Headers;
 use Pcore::HTTP::Response;
-use Pcore::HTTP::CookieJar;
+use Pcore::HTTP::Cookies;
 
 # 594 - errors during proxy handshake.
 # 595 - errors during connection establishment.
@@ -49,11 +49,12 @@ our $DEFAULT = {
     recurse           => 7,                              # max. redirects
     keepalive_timeout => undef,                          # keepalive timeout for persistent connections, if false - default value will be used
     timeout           => 300,                            # timeout in seconds
+    connect_timeout   => undef,                          # handle socket connect timeout
     accept_compressed => 1,                              # add ACCEPT_ENCODIING header
     decompress        => 1,                              # automatically decompress
     persistent        => $PERSISTENT_IDENT,
     session           => undef,
-    cookie_jar        => undef,                          # 1 - create cookie jar object automatically
+    cookies           => undef,                          # 1 - create temp cookie jar object, HashRef - use as cookies storage
 
     # write body to fh if body length > this value, 0 - always store in memory, 1 - always store to file
     buf_size => 0,
@@ -127,7 +128,7 @@ for my $method ( keys $HTTP_METHODS->%* ) {
 
     eval <<"PERL";    ## no critic qw[BuiltinFunctions::ProhibitStringyEval]
         *$sub_name = sub {
-            return _request( splice( \@_, 1 ), method => '$method', url => \$_[0] );
+            return request( \@_[ 1 .. \$#_ ], method => '$method', url => \$_[0] );
         };
 PERL
 
@@ -138,12 +139,6 @@ PERL
 
     # name sub
     P->class->set_subname( 'Pcore::HTTP::' . $sub_name, \&{$sub_name} );
-}
-
-sub request {
-    state $init = !!require Pcore::HTTP::Request;
-
-    return Pcore::HTTP::Request->new(@_);
 }
 
 # mirror($target_path, $url, $params) or mirror($target_path, $method, $url, $params)
@@ -183,47 +178,38 @@ sub mirror ( $target, @ ) {
         return;
     };
 
-    return _request( %args, method => $method, url => $url );
+    return request( %args, method => $method, url => $url );
 }
 
-sub _request {
-    my %args = $DEFAULT->%*;
+sub request ( @ ) {
+    my %args = ( $DEFAULT->%*, @_ );
 
-    # create empty headers object
-    $args{headers} = Pcore::HTTP::Message::Headers->new;
+    $args{url} = P->uri( $args{url}, base => 'http://', authority => 1 ) if !ref $args{url};
 
-    while (@_) {
-        if ( blessed $_[0] ) {
-            my $obj = shift;
-
-            for my $arg ( keys $DEFAULT->%* ) {
-                next if $arg eq 'headers';
-
-                $args{$arg} = $obj->$arg;
-            }
-
-            $args{headers}->replace( $obj->headers->get_hash );
-        }
-        else {
-            my $headers = delete $args{headers};
-
-            %args = ( %args, @_ );
-
-            $headers->replace( blessed $args{headers} ? $args{headers}->get_hash : $args{headers} ) if $args{headers};
-
-            $args{headers} = $headers;
-
-            last;
-        }
+    # create headers object
+    if ( !$args{headers} ) {
+        $args{headers} = Pcore::HTTP::Headers->new;
+    }
+    elsif ( !blessed $args{headers} ) {
+        $args{headers} = Pcore::HTTP::Headers->new( $args{headers} );
     }
 
     # create empty HTTP response object
     $args{res} = Pcore::HTTP::Response->new( { status => 0 } );
 
-    # resolve cookie_jar shortcut
-    $args{cookie_jar} = Pcore::HTTP::CookieJar->new if $args{cookie_jar} && !ref $args{cookie_jar};
+    # resolve cookies shortcut
+    if ( $args{cookies} && !blessed $args{cookies} ) {
 
-    $args{url} = P->uri( $args{url}, base => 'http://', authority => 1 ) if !ref $args{url};
+        # cookies is SCALAR, create temp cookies object
+        if ( !ref $args{cookies} ) {
+            $args{cookies} = Pcore::HTTP::Cookies->new;
+        }
+
+        # cookie jar is HashRef, bless
+        else {
+            $args{cookies} = bless { cookies => $args{cookies} }, 'Pcore::HTTP::Cookies';
+        }
+    }
 
     # set HOST header
     $args{headers}->{HOST} = $args{url}->host->name if !exists $args{headers}->{HOST};
@@ -235,7 +221,7 @@ sub _request {
     $args{headers}->{ACCEPT_ENCODING} = 'gzip' if $args{accept_compressed} && !exists $args{headers}->{ACCEPT_ENCODING};
 
     # add COOKIE headers
-    if ( $args{cookie_jar} && ( my $cookies = $args{cookie_jar}->get_cookies( $args{url} ) ) ) {
+    if ( $args{cookies} && ( my $cookies = $args{cookies}->get_cookies( $args{url} ) ) ) {
         $args{headers}->add( COOKIE => join q[; ], $cookies->@* );
     }
 
@@ -426,11 +412,11 @@ sub _get_on_progress_cb (%args) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 128                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 129                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 189                  | Subroutines::ProhibitExcessComplexity - Subroutine "_request" with high complexity score (34)                  |
+## |    3 | 184                  | Subroutines::ProhibitExcessComplexity - Subroutine "request" with high complexity score (31)                   |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 175                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
+## |    2 | 170                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

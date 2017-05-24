@@ -37,7 +37,7 @@
       },
       "develop" : {
          "recommends" : {
-            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.123"
+            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.125"
          },
          "requires" : {
             "Dist::Zilla" : "5",
@@ -54,6 +54,7 @@
             "Dist::Zilla::Plugin::CheckStrictVersion" : "0",
             "Dist::Zilla::Plugin::ConfirmRelease" : "0",
             "Dist::Zilla::Plugin::CopyFilesFromRelease" : "0",
+            "Dist::Zilla::Plugin::EnsureLatestPerl" : "0",
             "Dist::Zilla::Plugin::FileFinder::ByName" : "0",
             "Dist::Zilla::Plugin::GenerateFile::FromShareDir" : "0",
             "Dist::Zilla::Plugin::Git::Check" : "0",
@@ -112,6 +113,7 @@
             "Dist::Zilla::Plugin::Test::ReportPrereqs" : "0.022",
             "Dist::Zilla::Plugin::TestRelease" : "0",
             "Dist::Zilla::Plugin::UploadToCPAN" : "0",
+            "Dist::Zilla::Plugin::UseUnsafeInc" : "0",
             "Dist::Zilla::PluginBundle::Author::ETHER" : "0.103",
             "File::Spec" : "0",
             "IO::Handle" : "0",
@@ -319,15 +321,15 @@
    "provides" : {
       "Dist::Zilla::MintingProfile::Author::ETHER" : {
          "file" : "lib/Dist/Zilla/MintingProfile/Author/ETHER.pm",
-         "version" : "0.124"
+         "version" : "0.125"
       },
       "Dist::Zilla::PluginBundle::Author::ETHER" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/ETHER.pm",
-         "version" : "0.124"
+         "version" : "0.125"
       },
       "Pod::Weaver::PluginBundle::Author::ETHER" : {
          "file" : "lib/Pod/Weaver/PluginBundle/Author/ETHER.pm",
-         "version" : "0.124"
+         "version" : "0.125"
       }
    },
    "release_status" : "stable",
@@ -345,7 +347,7 @@
       "x_IRC" : "irc://irc.perl.org/#distzilla",
       "x_MailingList" : "http://dzil.org/#mailing-list"
    },
-   "version" : "0.124",
+   "version" : "0.125",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"
@@ -1005,6 +1007,16 @@
             "version" : "0.007"
          },
          {
+            "class" : "Dist::Zilla::Plugin::UseUnsafeInc",
+            "config" : {
+               "Dist::Zilla::Plugin::UseUnsafeInc" : {
+                  "dot_in_INC" : 0
+               }
+            },
+            "name" : "@Author::ETHER/UseUnsafeInc",
+            "version" : "0.001"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",
             "name" : "@Author::ETHER/AutoPrereqs",
             "version" : "6.009"
@@ -1143,6 +1155,16 @@
             "class" : "Dist::Zilla::Plugin::CheckMetaResources",
             "name" : "@Author::ETHER/CheckMetaResources",
             "version" : "0.001"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::EnsureLatestPerl",
+            "config" : {
+               "Dist::Zilla::Plugin::EnsureLatestPerl" : {
+                  "Module::CoreList" : "5.20170520"
+               }
+            },
+            "name" : "@Author::ETHER/EnsureLatestPerl",
+            "version" : "0.004"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Check",
@@ -1295,7 +1317,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.124",
+                  "tag" : "v0.125",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v%t"
                },
@@ -1528,6 +1550,7 @@
       "\u0421\u0435\u0440\u0433\u0435\u0439 \u0420\u043e\u043c\u0430\u043d\u043e\u0432 <sromanov@cpan.org>"
    ],
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233",
-   "x_static_install" : 0
+   "x_static_install" : 0,
+   "x_use_unsafe_inc" : 0
 }
 

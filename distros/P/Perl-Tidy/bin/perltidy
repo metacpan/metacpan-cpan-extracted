@@ -2331,7 +2331,7 @@ value specified on the B<-mbl=k> flag.
 =item B<-blbp=n>,  B<--blank-lines-before-packages=n>
 
 The parameter B<-blbp=n> requests that least B<n> blank lines precede a package
-which does not follow a comment.  The default is <-blbp=1>.  
+which does not follow a comment.  The default is B<-blbp=1>.  
 
 This parameter interacts with the value B<k> of the parameter
 B<--maximum-consecutive-blank-lines=k> (B<-mbl=k>) in the same way as described
@@ -2378,6 +2378,60 @@ This is negated with B<-nbbb> or  B<--noblanks-before-blocks>.
 This controls how often perltidy is allowed to add blank lines before 
 certain block types (see previous section).  The default is 8.  Entering
 a value of B<0> is equivalent to entering a very large number.
+
+=item B<-blao=i> or B<--blank-lines-after-opening-block=i>
+
+This control places a minimum of B<i> blank lines B<after> a line which B<ends>
+with an opening block brace of a specified type.  By default, this only applies
+to the block of a named B<sub>, but this can be changed (see B<-blaol> below).
+The default is not to do this (B<i=0>).
+
+Please see the note below on using the B<-blao> and B<-blbc> options.
+
+=item B<-blbc=i> or B<--blank-lines-before-closing-block=i>
+
+This control places a minimum of B<i> blank lines B<before> a line which
+B<begins> with a closing block brace of a specified type.  By default, this
+only applies to the block of a named B<sub>, but this can be changed (see
+B<-blbcl> below).  The default is not to do this (B<i=0>).
+
+=item B<-blaol=s> or B<--blank-lines-after-opening-block-list=s>
+
+The parameter B<s> is a list of block type keywords to which the flag B<-blao>
+should apply.  The section L<"Specifying Block Types"> explains how to list
+block types.
+
+=item B<-blbcl=s> or B<--blank-lines-before-closing-block-list=s>
+
+This parameter is a list of block type keywords to which the flag B<-blbc>
+should apply.  The section L<"Specifying Block Types"> explains how to list
+block types.
+
+=item Note on using the B<-blao> and B<-blbc> options.
+
+These blank line controls introduce a certain minimum number of blank lines in
+the text, but the final number of blank lines may be greater, depending on
+values of the other blank line controls and the number of old blank lines.  A
+consequence is that introducing blank lines with these and other controls
+cannot be exactly undone, so some experimentation with these controls is
+recommended before using them.
+
+For example, suppose that for some reason we decide to introduce one blank
+space at the beginning and ending of all blocks.  We could do
+this using
+
+  perltidy -blao=2 -blbc=2 -blaol='*' -blbcl='*' filename
+
+Now suppose the script continues to be developed, but at some later date we
+decide we don't want these spaces after all. we might expect that running with
+the flags B<-blao=0> and B<-blbc=0> will undo them.  However, by default
+perltidy retains single blank lines, so the blank lines remain.  
+
+We can easily fix this by telling perltidy to ignore old blank lines by
+including the added parameter B<-kbl=0> and rerunning. Then the unwanted blank
+lines will be gone.  However, this will cause all old blank lines to be
+ignored, perhaps even some that were added by hand to improve formatting. So
+please be cautious when using these parameters.
 
 =item B<-mbl=n> B<--maximum-consecutive-blank-lines=n>   
 
@@ -3027,6 +3081,9 @@ of the keyword which introduces that block, such as B<if>, B<else>, or B<sub>.
 An exception is a labeled block, which has no keyword, and should be specified
 with just a colon.  To specify all blocks use B<'*'>.
 
+The keyword B<sub> indicates a named sub.  For anonymous subs, use the special
+keyword B<asub>.
+
 For example, the following parameter specifies C<sub>, labels, C<BEGIN>, and
 C<END> blocks:
 
@@ -3139,32 +3196,19 @@ perlstyle(1), Perl::Tidy(3)
 
 =head1 VERSION
 
-This man page documents perltidy version 20160302.
+This man page documents perltidy version 20170521.
 
-=head1 CREDITS
+=head1 BUG REPORTS
 
-Michael Cartmell supplied code for adaptation to VMS and helped with
-v-strings.
+A list of current bugs and issues can be found at the CPAN site
 
-Yves Orton supplied code for adaptation to the various versions
-of Windows. 
+     https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Tidy
 
-Axel Rose supplied a patch for MacPerl.
-
-Hugh S. Myers designed and implemented the initial Perl::Tidy module interface. 
-
-Many others have supplied key ideas, suggestions, and bug reports;
-see the CHANGES file.
-
-=head1 AUTHOR
-
-  Steve Hancock
-  email: perltidy at users.sourceforge.net
-  http://perltidy.sourceforge.net
+To report a new bug or problem, use the link on this page.  
 
 =head1 COPYRIGHT
 
-Copyright (c) 2000-2012 by Steve Hancock
+Copyright (c) 2000-2017 by Steve Hancock
 
 =head1 LICENSE
 

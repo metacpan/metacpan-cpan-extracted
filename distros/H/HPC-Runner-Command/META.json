@@ -40,6 +40,7 @@
             "Algorithm::Dependency::Ordered" : "0",
             "Algorithm::Dependency::Source::HoA" : "0",
             "Archive::Tar" : "0",
+            "Array::Compare" : "0",
             "Cwd" : "0",
             "DBM::Deep" : "0",
             "Data::Dumper" : "0",
@@ -47,6 +48,7 @@
             "DateTime" : "0",
             "DateTime::Format::Duration" : "0",
             "File::Basename" : "0",
+            "File::Copy" : "0",
             "File::Path" : "0",
             "File::Slurp" : "0",
             "File::Spec" : "0",
@@ -126,7 +128,7 @@
          "web" : "https://github.com/biosails/HPC-Runner-Command"
       }
    },
-   "version" : "3.1.7",
+   "version" : "3.2.0",
    "x_contributors" : [
       "Travis CI <nobody@nobody.org>"
    ],

@@ -4,7 +4,7 @@ use 5.010;
 use warnings;
 use strict;
 
-our $VERSION = '3.542';
+our $VERSION = '3.543';
 
 use Role::Tiny;
 

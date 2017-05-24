@@ -7,7 +7,7 @@ package App::TestOnTap::Args;
 use strict;
 use warnings;
 
-use App::TestOnTap::Util qw(slashify expandAts $IS_WINDOWS $IS_PACKED);
+use App::TestOnTap::Util qw(slashify expandAts $IS_WINDOWS $IS_PACKED $SHELL_ARG_DELIM);
 use App::TestOnTap::ExecMap;
 use App::TestOnTap::Config;
 use App::TestOnTap::WorkDirManager;
@@ -70,10 +70,7 @@ sub __parseArgv
 			# hidden
 			#
 			_help => 0,
-			_pp => 0,					# make a binary using pp
-			'_pp-variant' => undef,		# name suffix
-			'_pp-output' => undef,		# binary name
-			'_pp-force' => 0,			# overwrite existing file
+			_pp => 0,					# print basic PAR::Packer 'pp' command line
 		);
 		
 	my @specs =
@@ -99,9 +96,6 @@ sub __parseArgv
 			#
 			'_help',
 			'_pp',
-			'_pp-variant=s',
-			'_pp-output=s',
-			'_pp-force!',
 		);
 
 	my $_argsPodName = 'App/TestOnTap/_Args.pod';
@@ -133,21 +127,17 @@ sub __parseArgv
 	#
 	pod2usage(-input => $_argsPodInput, -exitval => 0, -verbose => 2, -noperldoc => 1) if $rawOpts{_help};
 
-	# for the special selection of running pp, do this first, and it will not return
+	# for the special selection of using --_pp, print command line and exit
 	#
 	if ($rawOpts{_pp})
 	{
-		$self->__createBinary
+		$self->__print_pp_cmdline
 					(
-						$rawOpts{'_pp-output'},
-						$rawOpts{'_pp-variant'},
-						$rawOpts{'_pp-force'},
-						$rawOpts{v},
 						$version,
 						$argsPodName, $argsPodInput,
 						$manualPodName, $manualPodInput
 					);
-		die("INTERNAL ERROR: didn't expect to return here!");
+		exit(0);
 	}
 
 	# if any of the doc switches made, display the pod
@@ -382,13 +372,9 @@ sub include
 # PRIVATE
 #
 
-sub __createBinary
+sub __print_pp_cmdline
 {
 	my $self = shift;
-	my $output = shift || '.';
-	my $variant = shift;
-	my $force = shift;
-	my $verbosity = shift;
 	my $version = shift;
 	my $argsPodName = shift;
 	my $argsPodInput = shift;
@@ -398,31 +384,17 @@ sub __createBinary
 	die("Sorry, you're already running a binary/packed instance\n") if $IS_PACKED;
 	
 	eval "require PAR::Packer";
-	die("Sorry, it appears PAR::Packer is not installed/working!\n") if $@;
+	warn("Sorry, it appears PAR::Packer is not installed/working!\n") if $@;
 
 	my $os = $IS_WINDOWS ? 'windows' : $^O;
 	my $arch = (POSIX::uname())[4];
-	$variant = $variant ? "-$variant" : '';  
 	my $exeSuffix = $IS_WINDOWS ? '.exe' : '';
-	if (-d $output)
-	{
-		$output = slashify(File::Spec->rel2abs("$output/$Script-$version-$os-$arch$variant$exeSuffix"));
-	}
-	else
-	{
-		$output = slashify(File::Spec->rel2abs($output));
-	}
-	
-	die("The path '$output' already exists\n") if (!$force && -e $output);
-	unlink($output);
-	die("Attempt to forcibly remove '$output' failed: $!\n") if -e $output;
-		
-	my @vs = $verbosity > 1 ? ('-' . 'v' x ($verbosity - 1)) : ();
+	my $bnScript = basename($Script);
+	my $output = "$bnScript-$version-$os-$arch$exeSuffix";
 	my @liblocs = map { $_ ne '.' ? ('-I', slashify(File::Spec->rel2abs($_))) : () } @INC;
 	my @cmd =
 		(
 			'pp',
-			@vs,
 			@liblocs,
 			'-a', "$argsPodInput;lib/$argsPodName",
 			'-a', "$manualPodInput;lib/$manualPodName",
@@ -431,18 +403,10 @@ sub __createBinary
 			slashify("$RealBin/$Script")
 		);
 
-	if ($verbosity)
-	{
-		print "Running:\n";
-		print "  $_\n" foreach (@cmd);
-	}
-	
-	my $xit = system(@cmd) >> 8;
-	die("Problems creating binary '$output': '$xit'") if ($xit || !-f $output);
-	
-	print "Created '$output'!\n";
-	
-	exit(0);
+	my $cmdline = '';
+	$cmdline .= "$SHELL_ARG_DELIM$_$SHELL_ARG_DELIM " foreach (@cmd);
+	chop($cmdline);
+	print "$cmdline\n";
 }
 
 sub __findSuiteRoot

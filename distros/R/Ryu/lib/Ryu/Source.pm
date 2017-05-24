@@ -1,9 +1,11 @@
 package Ryu::Source;
-$Ryu::Source::VERSION = '0.014';
+
 use strict;
 use warnings;
 
 use parent qw(Ryu::Node);
+
+our $VERSION = '0.015'; # VERSION
 
 =head1 NAME
 
@@ -683,6 +685,91 @@ sub apply : method {
     # Pass through the original events
     $self->each_while_source(sub {
         $src->emit($_)
+    }, $src)
+}
+
+=head2 each_as_source
+
+=cut
+
+sub each_as_source : method {
+    use Variable::Disposition qw(retain_future);
+    use namespace::clean qw(retain_future);
+    my ($self, @code) = @_;
+
+    my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
+    my @active;
+    $self->completed->on_ready(sub {
+        retain_future(
+            Future->needs_all(
+                grep $_, @active
+            )->on_ready(sub {
+                $src->finish
+            })
+        );
+    });
+
+    $self->each_while_source(sub {
+        my @pending;
+        for my $code (@code) {
+            push @pending, $code->($_);
+        }
+        push @active, map $_->completed, @pending;
+        $src->emit($_);
+    }, $src)
+}
+
+=head2 switch_str
+
+Given a condition, will select one of the alternatives based on stringified result.
+
+Example:
+
+ $src->switch_str(
+  sub { $_->name }, # our condition
+  smith => sub { $_->id }, # if this matches the condition, the code will be called with $_ set to the current item
+  jones => sub { $_->parent->id },
+  sub { undef } # and this is our default case
+ );
+
+=cut
+
+sub switch_str {
+    use Variable::Disposition qw(retain_future);
+    use Scalar::Util qw(blessed);
+    use namespace::clean qw(retain_future);
+    my ($self, $condition, @args) = @_;
+
+    my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
+    my @active;
+    $self->completed->on_ready(sub {
+        retain_future(
+            Future->needs_all(
+                grep $_, @active
+            )->on_ready(sub {
+                $src->finish
+            })
+        );
+    });
+
+    $self->each_while_source(sub {
+        my ($item) = $_;
+        my $rslt = $condition->($item);
+        retain_future(
+            (blessed($rslt) && $rslt->isa('Future') ? $rslt : Future->done($rslt))->on_done(sub {
+                my ($data) = @_;
+                my @copy = @args;
+                while(my ($k, $v) = splice @copy, 0, 2) {
+                    if(!defined $v) {
+                        # Only a single value (or undef)? That's our default, just use it as-is
+                        return $src->emit(map $k->($_), $item)
+                    } elsif($k eq $data) {
+                        # Key matches our result? Call code with the original item
+                        return $src->emit(map $v->($_), $item)
+                    }
+                }
+            })
+        )
     }, $src)
 }
 

@@ -350,7 +350,8 @@
     };
 
     /* Add host*/
-    $scope.addHost = function(cn, scope) {
+    $scope.addHost = function() {
+      var cn = $scope.currentNode;
       if (!cn.data) cn.data = [];
       cn.data.push({
         "k": "newHost",

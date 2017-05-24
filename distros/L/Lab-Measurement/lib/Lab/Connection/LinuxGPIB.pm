@@ -7,7 +7,7 @@
 # TODO: Access to GPIB attributes, device clear, ...
 
 package Lab::Connection::LinuxGPIB;
-our $VERSION = '3.542';
+our $VERSION = '3.543';
 
 use strict;
 use Scalar::Util qw(weaken);

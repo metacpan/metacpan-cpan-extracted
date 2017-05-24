@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2012 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2017 -- leonerd@leonerd.org.uk
 
 package Tickit::Widget::Scroller::Item::RichText;
 
@@ -10,7 +10,7 @@ use warnings;
 
 use base qw( Tickit::Widget::Scroller::Item::Text );
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 use Tickit::Utils qw( textwidth );
 
@@ -57,7 +57,7 @@ sub _build_chunks_for
          my ( $substr, %tags ) = @_;
          my $pen = Tickit::Pen->new_from_attrs( \%tags );
          # Don't worry if extra tags left over, they just aren't rendering attributes
-         my @lines = split m/\n/, $substr or return;
+         my @lines = split m/\n/, $substr, -1 or return;
          my $lastline = pop @lines;
          push @chunks, [ $_, textwidth( $_ ), pen => $pen, linebreak => 1 ] for @lines;
          push @chunks, [ $lastline, textwidth( $lastline ), pen => $pen ];

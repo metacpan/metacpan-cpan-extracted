@@ -1,13 +1,13 @@
 package Map::Tube::Exception::FoundMultiLinedStation;
 $Map::Tube::Exception::FoundMultiLinedStation::AUTHORITY = 'cpan:MANWAR';
-$Map::Tube::Exception::FoundMultiLinedStation::VERSION = '3.11';
+$Map::Tube::Exception::FoundMultiLinedStation::VERSION = '3.12';
 =head1 NAME
 
 Map::Tube::Exception::FoundMultiLinedStation - Represent 'multi lined station' exception.
 
 =head1 VERSION
 
-version 3.11
+version 3.12
 
 =cut
 

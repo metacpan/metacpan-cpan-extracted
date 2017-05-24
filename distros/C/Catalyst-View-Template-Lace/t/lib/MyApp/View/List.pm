@@ -2,8 +2,7 @@ package  MyApp::View::List;
 
 use Moo;
 extends 'Catalyst::View::Template::Lace';
-with 'Template::Lace::ModelRole',
-  'Catalyst::View::Template::Lace::Role::URI',
+with 'Catalyst::View::Template::Lace::Role::URI',
   'Catalyst::View::Template::Lace::Role::ArgsFromStash',
   'Template::Lace::Model::AutoTemplate';
 

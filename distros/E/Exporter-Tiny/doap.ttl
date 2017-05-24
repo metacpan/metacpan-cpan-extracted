@@ -4,6 +4,7 @@
 @prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
 @prefix doap-deps: <http://ontologi.es/doap-deps#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix nfo:   <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 
@@ -26,7 +27,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Exporter-Tiny";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-026>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-029_01>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-030>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-031_01>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-032>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-033_01>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-034>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-035_01>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-035_02>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-036>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-037_01>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-037_02>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-037_03>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-038>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-039_01>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-040>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-041_01>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-041_02>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-042>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-043_01>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-043_02>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-044>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-026>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-029_01>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-030>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-031_01>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-032>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-033_01>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-034>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-035_01>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-035_02>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-036>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-037_01>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-037_02>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-037_03>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-038>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-039_01>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-040>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-041_01>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-041_02>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-042>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-043_01>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-043_02>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-044>, <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_1-000000>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-exporter-tiny>;
@@ -366,6 +367,21 @@
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Exporter-Tiny-0.044.tar.gz>;
 	doap:revision        "0.044"^^xsd:string.
 
+<http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_1-000000>
+	a                    doap:Version;
+	dc:identifier        "Exporter-Tiny-1.000000"^^xsd:string;
+	dc:issued            "2017-05-22"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Repackage as 1.000000.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/v_0-044>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Exporter-Tiny-1.000000.tar.gz>;
+	doap:revision        "1.000000"^^xsd:string.
+
 <http://purl.org/NET/cpan-uri/dist/Type-Tiny/project>
 	a                    doap:Project;
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
@@ -393,4 +409,42 @@
 	foaf:name            "Toby Inkster";
 	foaf:nick            "TOBYINK";
 	foaf:page            <https://metacpan.org/author/TOBYINK>.
+
+[]
+	a                    nfo:FileDataObject;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	nfo:fileName         "COPYRIGHT".
+
+[]
+	a                    nfo:FileDataObject;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	nfo:fileName         "CREDITS".
+
+[]
+	a                    nfo:FileDataObject, nfo:TextDocument;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	nfo:fileName         "INSTALL".
+
+[]
+	a                    nfo:FileDataObject, nfo:TextDocument;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	nfo:fileName         "LICENSE".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	nfo:fileName         "Makefile.PL";
+	nfo:programmingLanguage "Perl".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	nfo:fileName         "examples/Example/Exporter.pm";
+	nfo:programmingLanguage "Perl".
 

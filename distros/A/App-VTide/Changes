@@ -1,5 +1,13 @@
 Revision history for App-VTide
 
+0.1.2   2017-05-21
+        Updating for release of version 0.1.2
+        Checking history file created (Ivan Wills)
+        Adding new tests (Ivan Wills)
+        Always passing in $dir so no need to default it (Ivan Wills)
+        Simplified logic for setting environment name (Ivan Wills)
+        Commenting out bad? test failure, adding extra debugging (Ivan Wills)
+
 0.1.1   2017-03-08
         Updating for release of version 0.1.1
         Updating tests for new / better paths (Ivan Wills)

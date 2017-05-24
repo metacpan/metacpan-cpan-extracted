@@ -1,5 +1,5 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "A simple perl wrapper of Zabbix API.",
    "author" : [
       "Orange <bollwarm@ijz.me>"
    ],
@@ -48,5 +48,5 @@
          "web" : "http://ijz.me"
       }
    },
-   "version" : "0.10"
+   "version" : "0.11"
 }

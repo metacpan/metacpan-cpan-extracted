@@ -8,7 +8,6 @@ use Test::More;
 use FindBin '$Bin';
 my $ts_path = "$Bin/data/typescript.js";
 
-
 subtest 'typescript compile' => sub {
     my $js = JavaScript::Duktape->new;
 
@@ -23,10 +22,10 @@ subtest 'typescript compile' => sub {
         }
     });
 
-    my $ts = $js->eval( q{
+    my $ts = $js->eval(q{
         var ts = require('ts');
         ts;
-    } );
+    });
 
     is ref( $ts->{transpile} ), 'CODE';
 };
@@ -34,7 +33,7 @@ subtest 'typescript compile' => sub {
 subtest 'typescript transpile' => sub {
     my $js = JavaScript::Duktape->new;
 
-    $js->set( load=>sub{ _load_ts(); } );
+    $js->set( load => sub { _load_ts(); } );
 
     $js->eval(q{
         var module = {};
@@ -45,11 +44,11 @@ subtest 'typescript transpile' => sub {
         }
     });
 
-    my $code = $js->eval( q{
+    my $code = $js->eval(q{
         var ts = require('ts');
         var code = ts.transpile('class Foo { bar: string; constructor(){ this.bar="baz" }; };');
         code;
-    } );
+    });
 
     like $code, qr/Foo.*function/;
 
@@ -62,6 +61,6 @@ done_testing;
 
 sub _load_ts {
     local $/;
-    open my $ff,'<', $ts_path;
+    open my $ff, '<', $ts_path;
     <$ff>;
 }

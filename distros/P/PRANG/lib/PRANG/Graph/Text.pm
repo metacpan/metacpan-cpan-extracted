@@ -1,6 +1,6 @@
 
 package PRANG::Graph::Text;
-$PRANG::Graph::Text::VERSION = '0.18';
+$PRANG::Graph::Text::VERSION = '0.20';
 use Moose;
 use MooseX::Params::Validate;
 use XML::LibXML;

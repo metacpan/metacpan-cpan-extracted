@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use 5.006;
+use 5.010;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -17,7 +17,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Test::More' => 0,
         'Moo::Role' => 0,
-        'PGObject::Simple' => '2.0.0',
+        'PGObject::Simple' => 3,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'PGObject-Simple-Role-*' },

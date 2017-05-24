@@ -1,6 +1,6 @@
-#!perl -T
+#!perl
 
-package T;
+package MTE;
 
 use Map::Tube::Exception::MissingStationId;
 use Map::Tube::Exception::MissingStationName;
@@ -250,64 +250,64 @@ use strict;
 use warnings FATAL => 'all';
 use Test::More;
 
-eval { T->new->test_missing_line_id; };
+eval { MTE->new->test_missing_line_id; };
 like($@, qr/Missing line id/);
 
-eval { T->new->test_invalid_line_id; };
+eval { MTE->new->test_invalid_line_id; };
 like($@, qr/Invalid line id/);
 
-eval { T->new->test_missing_station_id; };
+eval { MTE->new->test_missing_station_id; };
 like($@, qr/Missing Station Id/);
 
-eval { T->new->test_missing_station_name; };
+eval { MTE->new->test_missing_station_name; };
 like($@, qr/Missing Station Name/);
 
-eval { T->new->test_invalid_station_id; };
+eval { MTE->new->test_invalid_station_id; };
 like($@, qr/Invalid Station Id/);
 
-eval { T->new->test_invalid_station_name; };
+eval { MTE->new->test_invalid_station_name; };
 like($@, qr/Invalid Station Name/);
 
-eval { T->new->test_duplicate_station_id; };
+eval { MTE->new->test_duplicate_station_id; };
 like($@, qr/Duplicate Station Id/);
 
-eval { T->new->test_duplicate_station_name; };
+eval { MTE->new->test_duplicate_station_name; };
 like($@, qr/Duplicate Station Name/);
 
-eval { T->new->test_missing_line_name; };
+eval { MTE->new->test_missing_line_name; };
 like($@, qr/Missing Line Name/);
 
-eval { T->new->test_missing_node_object; };
+eval { MTE->new->test_missing_node_object; };
 like($@, qr/Missing Node Object/);
 
-eval { T->new->test_invalid_node_object; };
+eval { MTE->new->test_invalid_node_object; };
 like($@, qr/Invalid Node Object/);
 
-eval { T->new->test_missing_supported_object; };
+eval { MTE->new->test_missing_supported_object; };
 like($@, qr/Missing Supported Object/);
 
-eval { T->new->test_invalid_supported_object; };
+eval { MTE->new->test_invalid_supported_object; };
 like($@, qr/Invalid Supported Object/);
 
-eval { T->new->test_found_self_linked_station; };
+eval { MTE->new->test_found_self_linked_station; };
 like($@, qr/Found Self Linked Station/);
 
-eval { T->new->test_found_multi_linked_station; };
+eval { MTE->new->test_found_multi_linked_station; };
 like($@, qr/Found Multi Linked Station/);
 
-eval { T->new->test_found_multi_lined_station; };
+eval { MTE->new->test_found_multi_lined_station; };
 like($@, qr/Found Multi Lined Station/);
 
-eval { T->new->test_missing_plugin_graph; };
+eval { MTE->new->test_missing_plugin_graph; };
 like($@, qr/Missing Plugin Graph/);
 
-eval { T->new->test_missing_supported_map; };
+eval { MTE->new->test_missing_supported_map; };
 like($@, qr/Missing Supported Map/);
 
-eval { T->new->test_found_unsupported_map; };
+eval { MTE->new->test_found_unsupported_map; };
 like($@, qr/Found Unsupported Map/);
 
-eval { T->new->test_found_unsupported_object; };
+eval { MTE->new->test_found_unsupported_object; };
 like($@, qr/Found Unsupported Object/);
 
 done_testing();

@@ -1,15 +1,13 @@
 #!/usr/bin/env perl
 =head1 NAME
 
-sh.pl - runs Unix shell in Perl virtual environment
+sh.pl - runs shell in Perl virtual environment
 
 =head1 VERSION
 
-version 2.04
+version 2.07
 
-=head1 ABSTRACT
-
-runs Unix shell in Perl virtual environment
+=head1 SYNOPSIS
 
 =over
 
@@ -27,7 +25,7 @@ use App::Virtualenv;
 
 BEGIN
 {
-	our $VERSION     = '2.04';
+	our $VERSION     = '2.07';
 }
 
 
@@ -42,7 +40,7 @@ B<CPAN> L<https://metacpan.org/release/App-Virtualenv>
 
 =head1 AUTHOR
 
-Orkun Karaduman <orkunkaraduman@gmail.com>
+Orkun Karaduman (ORKUN) <orkun@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

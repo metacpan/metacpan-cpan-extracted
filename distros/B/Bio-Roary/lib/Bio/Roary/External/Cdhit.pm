@@ -1,5 +1,5 @@
 package Bio::Roary::External::Cdhit;
-$Bio::Roary::External::Cdhit::VERSION = '3.8.0';
+$Bio::Roary::External::Cdhit::VERSION = '3.8.2';
 # ABSTRACT: Wrapper to run cd-hit
 
 
@@ -101,7 +101,7 @@ Bio::Roary::External::Cdhit - Wrapper to run cd-hit
 
 =head1 VERSION
 
-version 3.8.0
+version 3.8.2
 
 =head1 SYNOPSIS
 

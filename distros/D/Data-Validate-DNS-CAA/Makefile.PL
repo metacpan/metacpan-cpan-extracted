@@ -28,10 +28,9 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Scalar::Util" => 0,
-    "Test::More" => 0,
-    "Test::Signature" => 0
+    "Test::More" => 0
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,7 +45,6 @@ my %FallbackPrereqs = (
   "Syntax::Keyword::Junction" => 0,
   "Taint::Util" => 0,
   "Test::More" => 0,
-  "Test::Signature" => 0,
   "base" => 0,
   "strict" => 0,
   "warnings" => 0

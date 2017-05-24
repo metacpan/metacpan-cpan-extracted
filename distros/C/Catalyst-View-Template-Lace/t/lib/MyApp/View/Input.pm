@@ -4,7 +4,6 @@ use Moo;
 use Patterns::UndefObject::maybe;
 
 extends 'Catalyst::View::Template::Lace';
-with 'Template::Lace::ModelRole';
 
 has [qw/id label name type container model/] => (is=>'ro');
 

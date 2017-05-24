@@ -1,0 +1,9 @@
+.# Loop at top level - not in function:
+Before loop
+Expecting i = 1 .. 9
+.let i := 0
+.while ++i < 10
+.echo In while i = \v{i}
+.done
+After end of Loop
+EOF

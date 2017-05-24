@@ -15,7 +15,7 @@ use File::chdir;
 use Path::Tiny;
 use YAML::Syck;
 
-our $VERSION = version->new('0.1.1');
+our $VERSION = version->new('0.1.2');
 
 has [qw/ defaults options /] => (
     is => 'rw',
@@ -46,7 +46,7 @@ sub save_session {
 
     $sessions->{sessions}{$name} = {
         time => scalar time,
-        dir  => "$dir" || $CWD,
+        dir  => "$dir",
     };
 
     DumpFile( $file, $sessions );
@@ -62,7 +62,7 @@ sub session_dir {
     #  1. Passed in directly
     #  2. Set from the environment variable VTIDE_NAME
     #  3. Found in a config file in the current directory
-    if ( !$name && !$$ENV{VTIDE_NAME} ) {
+    if ( ! $name ) {
         die "No session name found!\n" if !-f '.vtide.yml';
         my $config = LoadFile('.vtide.yml');
         $name = $config->{name};
@@ -87,7 +87,7 @@ sub session_dir {
 sub env {
     my ( $self, $name, $dir, $config ) = @_;
 
-    $dir    ||= path( $ENV{VTIDE_DIR} || '.' )->absolute;
+    $dir ||= path( $ENV{VTIDE_DIR} || '.' )->absolute;
     $dir = path($dir);
 
     $config ||= $ENV{VTIDE_CONFIG} || $dir->path( '.vtide.yml' );
@@ -150,7 +150,7 @@ App::VTide::Command - Base class for VTide sub commands
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command version 0.1.1
+This documentation refers to App::VTide::Command version 0.1.2
 
 =head1 SYNOPSIS
 

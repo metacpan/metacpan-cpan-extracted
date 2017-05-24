@@ -11,8 +11,14 @@
         <TMPL_IF ERROR403>
           <h3><lang en="You have no access authorization for this application" fr="Vous n'avez pas les droits d'acc&egrave;s &agrave; cette application" /></h3>
         </TMPL_IF>
+        <TMPL_IF ERROR404>
+          <h3><lang en="Not found: you try to access to an unavailable page" fr="Non trouv&eacute;: vous tentez d'acc&eacute;der &agrave; une page non disponible" /></h3>
+        </TMPL_IF>
         <TMPL_IF ERROR500>
           <h3><lang en="Error occurs on the server" fr="Une erreur est survenue sur le serveur" /></h3>
+        </TMPL_IF>
+        <TMPL_IF ERROR502>
+          <h3><lang en="Bad gateway: unable to join remote server" fr="Mauvaise passerelle: impossible de joindre le serveur amont" /></h3>
         </TMPL_IF>
         <TMPL_IF ERROR503>
           <h3><lang en="This application is in maintenance, please try to connect later" fr="Cette application est en maintenance, merci de r&eacute;essayer plus tard" /></h3>

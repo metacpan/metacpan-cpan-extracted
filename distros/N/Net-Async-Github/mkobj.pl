@@ -35,6 +35,8 @@ package Net::Async::[% base %]::[% package %];
 use strict;
 use warnings;
 
+# VERSION
+
 use parent qw(Net::Async::Github::Common);
 
 =head1 NAME

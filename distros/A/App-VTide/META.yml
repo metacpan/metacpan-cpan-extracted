@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,49 +17,49 @@ name: App-VTide
 provides:
   App::VTide:
     file: lib/App/VTide.pm
-    version: v0.1.1
+    version: v0.1.2
   App::VTide::Command:
     file: lib/App/VTide/Command.pm
-    version: v0.1.1
+    version: v0.1.2
   App::VTide::Command::Conf:
     file: lib/App/VTide/Command/Conf.pm
-    version: v0.1.1
+    version: v0.1.2
   App::VTide::Command::Edit:
     file: lib/App/VTide/Command/Edit.pm
-    version: v0.1.1
+    version: v0.1.2
   App::VTide::Command::Grep:
     file: lib/App/VTide/Command/Grep.pm
-    version: v0.1.1
+    version: v0.1.2
   App::VTide::Command::Help:
     file: lib/App/VTide/Command/Help.pm
-    version: v0.1.1
+    version: v0.1.2
   App::VTide::Command::Init:
     file: lib/App/VTide/Command/Init.pm
-    version: v0.1.1
+    version: v0.1.2
   App::VTide::Command::Recent:
     file: lib/App/VTide/Command/Recent.pm
-    version: v0.1.1
+    version: v0.1.2
   App::VTide::Command::Refresh:
     file: lib/App/VTide/Command/Refresh.pm
-    version: v0.1.1
+    version: v0.1.2
   App::VTide::Command::Run:
     file: lib/App/VTide/Command/Run.pm
-    version: v0.1.1
+    version: v0.1.2
   App::VTide::Command::Save:
     file: lib/App/VTide/Command/Save.pm
-    version: v0.1.1
+    version: v0.1.2
   App::VTide::Command::Split:
     file: lib/App/VTide/Command/Split.pm
-    version: v0.1.1
+    version: v0.1.2
   App::VTide::Command::Start:
     file: lib/App/VTide/Command/Start.pm
-    version: v0.1.1
+    version: v0.1.2
   App::VTide::Config:
     file: lib/App/VTide/Config.pm
-    version: v0.1.1
+    version: v0.1.2
   App::VTide::Hooks:
     file: lib/App/VTide/Hooks.pm
-    version: v0.1.1
+    version: v0.1.2
 requires:
   Array::Utils: '0'
   File::chdir: '0.1008'
@@ -79,5 +79,5 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=App::VTide
   license: http://dev.perl.org/licenses/
   repository: git://github.com/ivanwills/App-VTide.git
-version: v0.1.1
+version: v0.1.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

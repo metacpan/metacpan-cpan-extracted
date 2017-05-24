@@ -25,5 +25,5 @@ requires:
   Path::Class::Dir: '0'
   Path::Class::File: '0'
   namespace::autoclean: '0'
-version: v0.01
+version: v0.02
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -14,7 +14,7 @@ use English qw/ -no_match_vars /;
 
 extends 'App::VTide::Command::Run';
 
-our $VERSION = version->new('0.1.1');
+our $VERSION = version->new('0.1.2');
 our $NAME    = 'edit';
 our $OPTIONS = [
     'test|T!',
@@ -82,7 +82,7 @@ App::VTide::Command::Edit - Run an edit command (like Run but without a terminal
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Edit version 0.1.1
+This documentation refers to App::VTide::Command::Edit version 0.1.2
 
 =head1 SYNOPSIS
 

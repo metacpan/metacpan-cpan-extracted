@@ -2,7 +2,6 @@ use 5.012;
 use warnings;
 use Test::More;
 use lib 't/lib'; use PDTest;
-use Panda::Lib 'clone';
 
 my $rel;
 
@@ -213,13 +212,6 @@ is(YEAR, '1Y');
 #check cloning
 $rel = rdate("1Y 2M 3D 4h 5m 6s");
 my $cl = $rel->clone;
-$rel->year(2); $rel->month(3); $rel->day(4); $rel->hour(5); $rel->minute(6); $rel->second(7);
-is($rel, "2Y 3M 4D 5h 6m 7s");
-is($cl, "1Y 2M 3D 4h 5m 6s");
-
-# check Panda::Lib::clone()
-$rel = rdate("1Y 2M 3D 4h 5m 6s");
-$cl = clone($rel);
 $rel->year(2); $rel->month(3); $rel->day(4); $rel->hour(5); $rel->minute(6); $rel->second(7);
 is($rel, "2Y 3M 4D 5h 6m 7s");
 is($cl, "1Y 2M 3D 4h 5m 6s");

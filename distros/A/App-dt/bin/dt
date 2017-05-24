@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2017-05-19'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2017-05-22'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -188,6 +188,9 @@ sub run {
         push @DATA, _read_file($_);
     }
 
+    my @outputs = @{ $Opts{outputs} };
+    @outputs = (("-") x @DATA) unless @outputs;
+
     if ($Opts{code}) {
         local $_ = $DATA[0];
         local $DATA = $DATA[0];
@@ -202,18 +205,24 @@ sub run {
         }
 
         # allow user to set $DATA[0] from $DATA or $_
-        if (defined $orig_data0) {
+      SET_RESULT:
+        {
+            last unless defined $orig_data0;
             if (defined($DATA) && $DATA != $orig_data0) {
                 $DATA[0] = $DATA;
+                last;
             }
             if (defined($_) && $_ != $orig_data0) {
                 $DATA[0] = $_;
+                last;
+            }
+            if (@outputs == 1) {
+                $DATA[0] = $res;
+                last;
             }
         }
     }
 
-    my @outputs = @{ $Opts{outputs} };
-    @outputs = (("-") x @DATA) unless @outputs;
     for my $i (0..$#outputs) {
         _write_file($outputs[$i], $DATA[$i]);
     }
@@ -240,7 +249,7 @@ dt - CLI data transformer
 
 =head1 VERSION
 
-This document describes version 0.003 of dt (from Perl distribution App-dt), released on 2017-05-19.
+This document describes version 0.004 of dt (from Perl distribution App-dt), released on 2017-05-22.
 
 =head1 SYNOPSIS
 
@@ -267,7 +276,7 @@ Some examples:
  % dt -e '$n = 100; $DATA = [1..$n]' -o numbers.yaml
 
 Input files are specified as arguments. If you do not specify any argument, and
-C<dt> is at the right side of a pipeline, then you can generate data in the
+C<dt> is not at the right side of a pipeline, then you can generate data in the
 code. The last expression or C<$DATA> or C<$_> will be used.
 
 One or more C<--output> (C<-o>) options can be specified to direct output to
@@ -308,15 +317,19 @@ The default output format is JSON.
 
 =item * Get a branch of data structure
 
- % dt bookstore.json -e '$DATA = $DATA->{store}{book}' -o books.json
+ % dt bookstore.json -e '$DATA->{store}{book}' -o books.json
 
 =item * Add a field to records, output to STDOUT as JSON
 
- % dt -e 'my $now = time; for (@$DATA) { $_->{status} = $_->{mtime} >= $now-7*86400 ? "new" : "" }' < books.json
+ % dt -e 'my $now = time; for (@$DATA) { $_->{status} = $_->{mtime} >= $now-7*86400 ? "new" : "" } $DATA' < books.json
 
 =item * Merge several YAML together as array of data structures
 
- % dt 1.yaml 2.yaml 3.yaml -e '$DATA = [@DATA]' -o combined.yaml
+ % dt 1.yaml 2.yaml 3.yaml -e '[@DATA]' -o combined.yaml
+
+=item * Modify several YAML files, save as JSON
+
+ % dt 1.yaml 2.yaml 3.yaml -e 'for (@DATA) { $_->{status} = "Checked" }' -o 1.json -o 2.json -o 3.json
 
 =back
 

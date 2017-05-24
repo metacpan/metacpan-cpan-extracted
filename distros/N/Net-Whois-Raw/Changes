@@ -1,5 +1,8 @@
 Revision history for Perl module Net::Whois::Raw.
 
+2.99007  May 22 2017 Vadiml Likhota
+    - revert broken $which_whois default behavior
+
 2.99006  Feb 1 2017 Alexander Nalobin
     - pwhois script approves IDN domains (ɢoogle.com)
 

@@ -32,6 +32,7 @@ t/07-clone.t
 t/08-custom-scheme.t
 t/09-storable.t
 t/10-json.t
+t/11-panda-lib-clone.t
 t/99-leaks.t
 typemap
 URI.xs

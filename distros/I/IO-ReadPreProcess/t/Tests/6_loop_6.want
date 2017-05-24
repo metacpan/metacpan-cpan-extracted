@@ -1,0 +1,42 @@
+Before for: i = 0 .. 9
+i is 0
+Before while, continue part way through
+i is 0 j=1
+i is 0 j=2
+i is 1
+Before while, continue part way through
+i is 1 j=1
+i is 1 j=2
+i is 2
+Before while, continue part way through
+i is 2 j=1
+i is 2 j=2
+i is 3
+Before while, continue part way through
+i is 3 j=1
+i is 3 j=2
+i is 4
+Before while, continue part way through
+i is 4 j=1
+i is 4 j=2
+i is 5
+Before while, continue part way through
+i is 5 j=1
+i is 5 j=2
+i is 6
+Before while, continue part way through
+i is 6 j=1
+i is 6 j=2
+i is 7
+Before while, continue part way through
+i is 7 j=1
+i is 7 j=2
+i is 8
+Before while, continue part way through
+i is 8 j=1
+i is 8 j=2
+i is 9
+Before while, continue part way through
+i is 9 j=1
+i is 9 j=2
+After for

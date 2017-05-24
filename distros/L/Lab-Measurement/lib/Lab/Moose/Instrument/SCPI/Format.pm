@@ -5,7 +5,7 @@ use Lab::Moose::Instrument::Cache;
 use MooseX::Params::Validate;
 use Carp;
 
-our $VERSION = '3.542';
+our $VERSION = '3.543';
 
 cache format_data => ( getter => 'format_data_query' );
 

@@ -1,6 +1,9 @@
 Revision history for Template-Plugin-WikiFormat
 ===============================================
 
+0.08    2017-05-23
+        - amended prereq version for 'Template::Plugin::Filter'.
+
 0.07    2015-01-06
         - fixed license fields in META.json to be lists.
         - extended META test suite.

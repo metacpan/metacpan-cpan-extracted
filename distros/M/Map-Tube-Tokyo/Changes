@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Tokyo
 
+0.28  Fri May 19 19:10:00 2017
+      - Upgraded to use Map::Tube v3.29.
+
 0.27  Wed Mar 22 23:15:00 2017
       - Tidied up test scripts and removed "-T" switch.
 

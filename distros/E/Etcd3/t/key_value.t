@@ -6,44 +6,54 @@ use warnings;
 use Etcd3;
 use Test::More;
 use Test::Exception;
-
+use Data::Dumper;
 my ($host, $port);
 
 if ( $ENV{ETCD_TEST_HOST} and $ENV{ETCD_TEST_PORT}) {
     $host = $ENV{ETCD_TEST_HOST};
     $port = $ENV{ETCD_TEST_PORT};
-    plan tests => 3;
+    plan tests => 6;
 }
 else {
     plan skip_all => "Please set environment variable ETCD_TEST_HOST and ETCD_TEST_PORT.";
 }
 
-my $etcd = Etcd3->connect( $host, { port => $port } );
+my $etcd = Etcd3->new( { host => $host, port => $port } );
 
 my $key;
 
 # put key/value
 lives_ok(
     sub {
-        $key = $etcd->put( { key => 'foo1', value => 'bar' } )->request
+        $key = $etcd->put( { key => 'foo1', value => 'bar' } );
     },
-    "add a new key value pair"
+    "kv put"
 );
+
+cmp_ok( $key->{response}{success}, '==', 1, "kv put success" );
 
 # get range
 lives_ok(
     sub {
-        $key = $etcd->range( { key => 'foo1' } )->get_value
+        $key = $etcd->range( { key => 'foo1' } )
     },
-    "get key value"
+    "kv range"
 );
+
+cmp_ok( $key->{response}{success}, '==', 1, "kv range success" );
+
+#print STDERR Dumper($key);
 
 # delete range
 lives_ok(
     sub {
-        $key = $etcd->delete_range( { key => 'foo1' } )->request
+        $key = $etcd->range( { key => 'foo1' } )->delete
     },
-    "delete key value"
+    "kv range_delete"
 );
+
+#print STDERR Dumper($key);
+
+cmp_ok( $key->{response}{success}, '==', 1, "kv delete success" );
 
 1;

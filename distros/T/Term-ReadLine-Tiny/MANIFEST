@@ -1,5 +1,6 @@
 Changes
 COPYRIGHT
+examples/autocomplete.pl
 lib/Term/ReadLine/Tiny.pm
 lib/Term/ReadLine/Tiny/readline.pm
 LICENSE

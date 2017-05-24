@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "HPCD-SGE",
    "prereqs" : {
@@ -52,7 +52,7 @@
    "provides" : {
       "HPCD::SGE" : {
          "file" : "lib/HPCD/SGE.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "HPCD::SGE::DRMAACheck" : {
          "file" : "lib/HPCD/SGE/DRMAACheck.pm"
@@ -85,6 +85,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.47",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.48",
+   "x_serialization_backend" : "JSON::PP version 2.93"
 }

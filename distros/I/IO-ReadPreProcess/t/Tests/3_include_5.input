@@ -1,0 +1,13 @@
+.# Title: Arguments and local
+Line 1
+.let thing := 'from inc 1'; thang := 'thang from inc 1'
+.echo In 3_include_5.input thing='\v{thing}'
+.#
+.# Note arguments to the include, appear in _ARGS within the included file:
+.include 3_include_5.inc Arg_AA Arg_BB
+
+.# At the top level _ARGS should exist but be  empty
+.let na := count(_ARGS) ; a0 := na > 0 ? _ARGS[0] : 'undefined'
+.echo First file 3_include_5.input: _ARGS[0] = '\v{a0}' number of args \v{na}
+.let na := count(_ARGS) ; a0 := na > 0 ? _ARGS[0] : 'undefined'
+.echo Line end; thing='\v{thing}' thang='\v{thang}'  na = \v{na} a0='\v{a0}'

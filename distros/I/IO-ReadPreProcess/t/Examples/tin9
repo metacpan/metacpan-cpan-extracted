@@ -1,0 +1,17 @@
+.# For loop
+Before for
+.for -i0 i := 0 ;; i < 10 ;; i++
+.echo i is \v{i}
+.set j := 0
+.while ++j < 3
+.echo i is \v{i} j=\v{j}
+.if 0
+.break 2
+.else
+.continue 2
+.fi
+After break/continue
+.done
+.done
+After for
+

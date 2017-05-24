@@ -1,14 +1,16 @@
 Changes
 ignore.txt
 lib/PGObject.pm
+lib/PGObject/Type/Registry.pm
 LICENSE
 Makefile.PL
-MANIFEST                        This list of files
+MANIFEST			This list of files
 README
 README.md
 t/00-load.t
 t/01-basic_dbtests.t
 t/02-ordering.t
+t/03-legacy_registry.t
 t/03-registry.t
 t/04-registered_types.t
 t/boilerplate.t

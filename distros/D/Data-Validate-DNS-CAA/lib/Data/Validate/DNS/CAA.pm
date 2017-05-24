@@ -1,5 +1,5 @@
 package Data::Validate::DNS::CAA;
-$Data::Validate::DNS::CAA::VERSION = '0.02';
+$Data::Validate::DNS::CAA::VERSION = '0.04';
 # ABSTRACT: Validate DNS Certification Authority Authorization (CAA) values
 
 use 5.010;
@@ -145,7 +145,7 @@ Data::Validate::DNS::CAA - Validate DNS Certification Authority Authorization (C
 
 =head1 VERSION
 
-version 0.02
+version 0.04
 
 =head1 SYNOPSIS
 

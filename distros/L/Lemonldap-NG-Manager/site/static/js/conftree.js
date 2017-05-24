@@ -345,6 +345,11 @@ function templates(tpl,key) {
             "title" : "oidcRPMetaDataOptionsRedirectUris"
          },
          {
+            "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsPostLogoutRedirectUris",
+            "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsPostLogoutRedirectUris",
+            "title" : "oidcRPMetaDataOptionsPostLogoutRedirectUris"
+         },
+         {
             "default" : 0,
             "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsBypassConsent",
             "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsBypassConsent",

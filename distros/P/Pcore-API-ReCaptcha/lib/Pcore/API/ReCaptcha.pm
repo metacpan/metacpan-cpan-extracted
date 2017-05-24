@@ -1,4 +1,4 @@
-package Pcore::API::ReCaptcha v0.1.0;
+package Pcore::API::ReCaptcha v0.2.0;
 
 use Pcore -dist, -class, -result;
 use Pcore::Util::Data qw[from_json];

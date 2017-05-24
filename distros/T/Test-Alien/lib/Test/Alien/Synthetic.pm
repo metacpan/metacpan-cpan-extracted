@@ -5,7 +5,7 @@ use warnings;
 use Test2::API qw( context );
 
 # ABSTRACT: A mock alien object for testing
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.15'; # VERSION
 
 
 sub _def ($) { my($val) = @_; defined $val ? $val : '' }
@@ -50,7 +50,7 @@ Test::Alien::Synthetic - A mock alien object for testing
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 

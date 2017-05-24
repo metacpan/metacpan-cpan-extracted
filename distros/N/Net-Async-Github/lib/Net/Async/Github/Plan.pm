@@ -1,17 +1,15 @@
 package Net::Async::Github::Plan;
-$Net::Async::Github::Plan::VERSION = '0.002';
+
 use strict;
 use warnings;
+
+our $VERSION = '0.003'; # VERSION
 
 use parent qw(Net::Async::Github::Common);
 
 =head1 NAME
 
 Net::Async::Github::Plan
-
-=head1 VERSION
-
-version 0.002
 
 =head1 DESCRIPTION
 
@@ -64,3 +62,4 @@ sub collaborators {
 }
 
 1;
+

@@ -10,9 +10,9 @@ EXAMPLES
     The examples are written in JSON with Javascript-style comments (//
     comment).
 
- Simple
+ Various simple examples
 
-     # integer, optional
+     // integer, optional
      "int"
     
      // required integer
@@ -44,6 +44,32 @@ EXAMPLES
     
      // a byte that's *in*divisible by 3
      ["byte", {"!div_by": 3}]
+
+ Type: array
+
+     // minimum number of elements
+     ["array*", {"min_len": 1}]
+    
+     // maximum number of elements
+     ["array*", {"max_len": 10}]
+
+ Type: hash
+
+     // hash must only contain keys a, b, or c
+     // Valid: {}, {"a": 1}, {"a": 1, "b": "x", "c": [1]}
+     // Invalid: {"d": 1} (unknown key), {"a": 1.1} (key 'a' is not int)
+     ["hash", {"keys": {"a": "int", "b": "str*", "c": ["array", "min_len", 1]}}]
+    
+     // hash can contain a, b, c or other keys
+     // Valid: {"d": 1}, {"d": null}
+     // Invalid: {"a": 1.1} (key 'a' is not int)
+     ["hash", {"keys": {"a": "int", "b": "str*", "c": ["array", "min_len", 1]}, "keys.restrict": 0}]
+    
+     // hash must contain keys a, b; can contain also c but no other keys
+     ["hash", {"req_keys": ["a","b"], "keys": {"a": "int", "b": "str*", "c": ["array", "min_len", 1]}}]
+    
+     // hash must contain keys a, b; can contain c or other keys
+     ["hash", {"req_keys": ["a","b"], "keys": {"a": "int", "b": "str*", "c": ["array", "min_len", 1]}, "keys.restrict": 0}]
 
  Clause attribute
 

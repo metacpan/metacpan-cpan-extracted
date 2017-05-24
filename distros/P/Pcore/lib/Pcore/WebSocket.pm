@@ -6,6 +6,7 @@ use Pcore::Util::Data qw[to_b64];
 use Pcore::Util::List qw[pairs];
 use Pcore::WebSocket::Handle;
 use Pcore::AE::Handle;
+use Pcore::HTTP qw[:TLS_CTX];
 
 our $HANDLE = {};
 
@@ -115,6 +116,11 @@ sub accept_ws ( $self, $protocol, $req, $on_accept ) {
 
 sub connect_ws ( $self, $protocol, $uri, @ ) {
     my %args = (
+        connect_timeout => 30,
+        tls_ctx         => $Pcore::HTTP::TLS_CTX->{$TLS_CTX_HIGH},
+        bind_ip         => undef,
+        proxy           => undef,
+
         max_message_size => 0,
         compression      => 0,        # use permessage_deflate compression
         headers          => undef,    # Maybe[ArrayRef]
@@ -312,9 +318,9 @@ sub connect_ws ( $self, $protocol, $uri, @ ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 37, 131              | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 38, 137              | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 116                  | Subroutines::ProhibitExcessComplexity - Subroutine "connect_ws" with high complexity score (37)                |
+## |    3 | 117                  | Subroutines::ProhibitExcessComplexity - Subroutine "connect_ws" with high complexity score (37)                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

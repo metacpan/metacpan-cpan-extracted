@@ -335,7 +335,7 @@ sub t_multiword_command {
     }
   );
 
-  is_deeply( $t_reply, 'test', 'multiword command; CLIENT GETNAME' );
+  is( $t_reply, 'test', 'multiword command; CLIENT GETNAME' );
 
   return;
 }

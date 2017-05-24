@@ -1,5 +1,5 @@
 package Bio::Roary::SampleOrder;
-$Bio::Roary::SampleOrder::VERSION = '3.8.0';
+$Bio::Roary::SampleOrder::VERSION = '3.8.2';
 # ABSTRACT: Take in a tree file and return an ordering of the samples
 
 
@@ -49,7 +49,7 @@ Bio::Roary::SampleOrder - Take in a tree file and return an ordering of the samp
 
 =head1 VERSION
 
-version 3.8.0
+version 3.8.2
 
 =head1 SYNOPSIS
 

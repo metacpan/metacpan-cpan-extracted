@@ -107,14 +107,14 @@ to values smaller than serveral other attributes.
 
  package MyApp::Types;
  use MooseX::Attribute::Dependency;
- use List::MoreUtils ();
+ use List::Util 1.33 ();
  
  MooseX::Attribute::Dependency::register({
         name               => 'SmallerThan',
         message            => 'The value must be smaller than %s',
         constraint         => sub {
             my ($attr_name, $params, @related) = @_;
-            return List::MoreUtils::all { $params->{$attr_name} < $params->{$_} } @related;
+            return List::Util::all { $params->{$attr_name} < $params->{$_} } @related;
         },
     }
  );

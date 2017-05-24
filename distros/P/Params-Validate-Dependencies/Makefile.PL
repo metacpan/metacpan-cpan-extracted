@@ -1,5 +1,4 @@
 use ExtUtils::MakeMaker;
-use Config;
 WriteMakefile(
   NAME         => 'Params::Validate::Dependencies',
     META_MERGE => {
@@ -18,10 +17,9 @@ WriteMakefile(
     'Test::Differences' => 0,
     'Test::More'        => 0.88, # done_testing
     'Test::Exception'   => 0,
-    # Modern Data::Domain only works on 5.10 to 5.22
-    (($] > 5.010 && $] < 5.024) ? ('Data::Domain' => 1.02) : ())
+    # Modern Data::Domain only works on 5.10 and higher
+    (($] > 5.010) ? ('Data::Domain' => 1.02) : ()),
+    # dep of D::D, earlier versions broken on 5.24
+    'lexical::underscore' => 0.004,
   },
-  dist => {
-    PREOP => qq{$Config{perlpath} -E 'die("Can not make dist on 5.24 cos of D::D dep\\n") if($] > 5.022)'}
-  }
 );

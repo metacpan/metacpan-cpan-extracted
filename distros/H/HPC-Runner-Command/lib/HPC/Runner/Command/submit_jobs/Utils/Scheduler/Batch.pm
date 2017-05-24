@@ -16,49 +16,24 @@ use Moose::Util::TypeConstraints;
 
 #Begin Example
 #my $href = {
-    #'cmds' => [
-        #'#TASK tags=Sample1
+#'cmds' => [
+#'#TASK tags=Sample1
 ##TASK deps=Sample1
 #blastx -db  env_nr -query Sample1
 #'
-    #],
-    #'cmd_count'  => '1',
-    #'job_deps'   => ['pyfasta'],
-    #'batch_tags' => ['Sample1'],
-    #'batch_str'  => '#TASK tags=Sample1
+#],
+#'cmd_count'  => '1',
+#'job_deps'   => ['pyfasta'],
+#'batch_tags' => ['Sample1'],
+#'batch_str'  => '#TASK tags=Sample1
 ##TASK deps=Sample1
 #blastx -db  env_nr -query Sample1
 #',
-    #'job'             => 'blastx_scratch',
-    #'scheduler_index' => { 'pyfasta' => ['0'], },
-    #'array_deps'      => [ [ '1237_7', '1234_1' ], ],
+#'job'             => 'blastx_scratch',
+#'scheduler_index' => { 'pyfasta' => ['0'], },
+#'array_deps'      => [ [ '1237_7', '1234_1' ], ],
 #};
 #End Example
-
-
-has cmds => (
-    traits  => ['Array'],
-    is      => 'rw',
-    isa     => 'ArrayRef',
-    default => sub { [] },
-    handles => {
-        all_cmds   => 'elements',
-        add_cmds   => 'push',
-        join_cmds  => 'join',
-        has_cmds   => 'count',
-        clear_cmds => 'clear',
-    },
-);
-
-has cmd_count => (
-    is      => 'rw',
-    isa     => 'Int',
-    lazy    => 1,
-    default => sub {
-        my $self = shift;
-        return $self->has_cmds;
-    },
-);
 
 has batch_tags => (
     traits  => ['Array'],
@@ -74,14 +49,9 @@ has batch_tags => (
     },
 );
 
-has batch_str => (
-    isa     => 'Str',
-    is      => 'rw',
-    lazy    => 1,
-    default => sub {
-        my $self = shift;
-        return $self->join_cmds("\n");
-    }
+has 'cmd_count' => (
+    is       => 'rw',
+    required => 1,
 );
 
 has 'job' => (
@@ -100,21 +70,8 @@ has 'scheduler_index' => (
     isa     => 'HashRef',
     is      => 'rw',
     default => sub { return {} },
-    documentation => q(Get the job dependency, and the index of the job scheduler id that corresponds to that batch),
-);
-
-has 'array_deps' => (
-    traits  => ['Array'],
-    isa => 'ArrayRef',
-    is => 'rw',
-    default => sub { return [] },
-    handles => {
-        all_array_deps   => 'elements',
-        add_array_deps   => 'push',
-        join_array_deps  => 'join',
-        has_array_deps   => 'count',
-        clear_array_deps => 'clear',
-    },
+    documentation =>
+q(Get the job dependency, and the index of the job scheduler id that corresponds to that batch),
 );
 
 1;

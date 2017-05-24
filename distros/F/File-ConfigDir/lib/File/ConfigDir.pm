@@ -18,7 +18,7 @@ File::ConfigDir - Get directories of configuration files
 
 =cut
 
-$VERSION   = '0.017';
+$VERSION   = '0.018';
 @ISA       = qw(Exporter);
 @EXPORT    = ();
 @EXPORT_OK = (
@@ -26,7 +26,7 @@ $VERSION   = '0.017';
     qw(xdg_config_dirs machine_cfg_dir),
     qw(core_cfg_dir site_cfg_dir vendor_cfg_dir),
     qw(locallib_cfg_dir local_cfg_dir),
-    qw(here_cfg_dir singleapp_cfg_dir),
+    qw(here_cfg_dir singleapp_cfg_dir vendorapp_cfg_dir),
     qw(xdg_config_home user_cfg_dir)
 );
 %EXPORT_TAGS = (
@@ -92,20 +92,20 @@ place of the resulting path.
 
 sub _find_common_base_dir
 {
-    my ( $dira, $dirb ) = @_;
-    my ( $va, $da, undef ) = File::Spec->splitpath($dira);
-    my ( $vb, $db, undef ) = File::Spec->splitpath($dirb);
+    my ($dira, $dirb) = @_;
+    my ($va, $da, undef) = File::Spec->splitpath($dira);
+    my ($vb, $db, undef) = File::Spec->splitpath($dirb);
     my @dirsa = File::Spec->splitdir($da);
     my @dirsb = File::Spec->splitdir($db);
     my @commondir;
     my $max = $#dirsa < $#dirsb ? $#dirsa : $#dirsb;
-    for my $i ( 0 .. $max )
+    for my $i (0 .. $max)
     {
         $dirsa[$i] eq $dirsb[$i] or last;
-        push( @commondir, $dirsa[$i] );
+        push(@commondir, $dirsa[$i]);
     }
 
-    File::Spec->catdir( $va, @commondir );
+    File::Spec->catdir($va, @commondir);
 }
 
 =head2 system_cfg_dir
@@ -118,7 +118,7 @@ the value of the environment variable C<%windir%>.
 
 my $system_cfg_dir = sub {
     my @cfg_base = @_;
-    my @dirs = File::Spec->catdir( $^O eq "MSWin32" ? $ENV{windir} : "/etc", @cfg_base );
+    my @dirs = File::Spec->catdir($^O eq "MSWin32" ? $ENV{windir} : "/etc", @cfg_base);
     @dirs;
 };
 
@@ -126,7 +126,7 @@ sub system_cfg_dir
 {
     my @cfg_base = @_;
     1 < scalar(@cfg_base)
-      and croak "system_cfg_dir(;\$), not system_cfg_dir(" . join( ",", ("\$") x scalar(@cfg_base) ) . ")";
+      and croak "system_cfg_dir(;\$), not system_cfg_dir(" . join(",", ("\$") x scalar(@cfg_base)) . ")";
     $system_cfg_dir->(@cfg_base);
 }
 
@@ -150,22 +150,22 @@ concatenated with the basename of the environment variable C<%APPDATA%>.
 my $desktop_cfg_dir = sub {
     my @cfg_base = @_;
     my @dirs;
-    if ( $^O eq "MSWin32" )
+    if ($^O eq "MSWin32")
     {
         my $alluserprof = $ENV{ALLUSERSPROFILE};
-        my $appdatabase = File::Basename::basename( $ENV{APPDATA} );
-        @dirs = ( File::Spec->catdir( $alluserprof, $appdatabase, @cfg_base ) );
+        my $appdatabase = File::Basename::basename($ENV{APPDATA});
+        @dirs = (File::Spec->catdir($alluserprof, $appdatabase, @cfg_base));
     }
     else
     {
-        if ( $ENV{XDG_CONFIG_DIRS} )
+        if ($ENV{XDG_CONFIG_DIRS})
         {
-            @dirs = split( ":", $ENV{XDG_CONFIG_DIRS} );
-            @dirs = map { File::Spec->catdir( $_, @cfg_base ) } @dirs;
+            @dirs = split(":", $ENV{XDG_CONFIG_DIRS});
+            @dirs = map { File::Spec->catdir($_, @cfg_base) } @dirs;
         }
         else
         {
-            @dirs = ( File::Spec->catdir( "/etc", "xdg", @cfg_base ) );
+            @dirs = (File::Spec->catdir("/etc", "xdg", @cfg_base));
         }
     }
     @dirs;
@@ -175,7 +175,7 @@ sub desktop_cfg_dir
 {
     my @cfg_base = @_;
     1 < scalar(@cfg_base)
-      and croak "desktop_cfg_dir(;\$), not desktop_cfg_dir(" . join( ",", ("\$") x scalar(@cfg_base) ) . ")";
+      and croak "desktop_cfg_dir(;\$), not desktop_cfg_dir(" . join(",", ("\$") x scalar(@cfg_base)) . ")";
     $desktop_cfg_dir->(@cfg_base);
 }
 
@@ -192,7 +192,7 @@ Returns the C<etc> directory below C<$Config{prefix}>.
 
 my $core_cfg_dir = sub {
     my @cfg_base = @_;
-    my @dirs = ( File::Spec->catdir( $Config{prefix}, "etc", @cfg_base ) );
+    my @dirs = (File::Spec->catdir($Config{prefix}, "etc", @cfg_base));
     @dirs;
 };
 
@@ -200,7 +200,7 @@ sub core_cfg_dir
 {
     my @cfg_base = @_;
     1 < scalar(@cfg_base)
-      and croak "core_cfg_dir(;\$), not core_cfg_dir(" . join( ",", ("\$") x scalar(@cfg_base) ) . ")";
+      and croak "core_cfg_dir(;\$), not core_cfg_dir(" . join(",", ("\$") x scalar(@cfg_base)) . ")";
     $core_cfg_dir->(@cfg_base);
 }
 
@@ -215,14 +215,14 @@ my $site_cfg_dir = sub {
     my @cfg_base = @_;
     my @dirs;
 
-    if ( $Config{sitelib_stem} )
+    if ($Config{sitelib_stem})
     {
-        push( @dirs, File::Spec->catdir( $Config{sitelib_stem}, "etc", @cfg_base ) );
+        push(@dirs, File::Spec->catdir($Config{sitelib_stem}, "etc", @cfg_base));
     }
     else
     {
-        my $sitelib_stem = _find_common_base_dir( $Config{sitelib}, $Config{sitebin} );
-        push( @dirs, File::Spec->catdir( $sitelib_stem, "etc", @cfg_base ) );
+        my $sitelib_stem = _find_common_base_dir($Config{sitelib}, $Config{sitebin});
+        push(@dirs, File::Spec->catdir($sitelib_stem, "etc", @cfg_base));
     }
 
     @dirs;
@@ -232,7 +232,7 @@ sub site_cfg_dir
 {
     my @cfg_base = @_;
     1 < scalar(@cfg_base)
-      and croak "site_cfg_dir(;\$), not site_cfg_dir(" . join( ",", ("\$") x scalar(@cfg_base) ) . ")";
+      and croak "site_cfg_dir(;\$), not site_cfg_dir(" . join(",", ("\$") x scalar(@cfg_base)) . ")";
     $site_cfg_dir->(@cfg_base);
 }
 
@@ -247,14 +247,14 @@ my $vendor_cfg_dir = sub {
     my @cfg_base = @_;
     my @dirs;
 
-    if ( $Config{vendorlib_stem} )
+    if ($Config{vendorlib_stem})
     {
-        push( @dirs, File::Spec->catdir( $Config{vendorlib_stem}, "etc", @cfg_base ) );
+        push(@dirs, File::Spec->catdir($Config{vendorlib_stem}, "etc", @cfg_base));
     }
     else
     {
-        my $vendorlib_stem = _find_common_base_dir( $Config{vendorlib}, $Config{vendorbin} );
-        push( @dirs, File::Spec->catdir( $vendorlib_stem, "etc", @cfg_base ) );
+        my $vendorlib_stem = _find_common_base_dir($Config{vendorlib}, $Config{vendorbin});
+        push(@dirs, File::Spec->catdir($vendorlib_stem, "etc", @cfg_base));
     }
 
     @dirs;
@@ -264,7 +264,7 @@ sub vendor_cfg_dir
 {
     my @cfg_base = @_;
     1 < scalar(@cfg_base)
-      and croak "vendor_cfg_dir(;\$), not vendor_cfg_dir(" . join( ",", ("\$") x scalar(@cfg_base) ) . ")";
+      and croak "vendor_cfg_dir(;\$), not vendor_cfg_dir(" . join(",", ("\$") x scalar(@cfg_base)) . ")";
     $vendor_cfg_dir->(@cfg_base);
 }
 
@@ -276,16 +276,16 @@ a C<< /usr/local/jre-<version>/bin/java >> and going from it's directory
 name one above and into C<etc> there is the I<singleapp_cfg_dir>. For a
 Perl module it means, we're assuming that C<$FindBin::Bin> is installed as
 a standalone package somewhere, eg. into C</usr/pkg> - as recommended for
-pkgsrc ;)
+L<pkgsrc|http://www.pkgsrc.org/>.
 
 =cut
 
 my $singleapp_cfg_dir = sub {
     my @dirs = (
-        map
-        {
-            eval { Cwd::abs_path($_) } or File::Spec->canonpath($_)
-        } File::Spec->catdir( $FindBin::RealDir, "..", "etc" )
+        map {
+            eval { Cwd::abs_path($_) }
+              or File::Spec->canonpath($_)
+        } File::Spec->catdir($FindBin::RealDir, "..", "etc")
     );
     @dirs;
 };
@@ -294,8 +294,39 @@ sub singleapp_cfg_dir
 {
     my @cfg_base = @_;
     0 == scalar(@cfg_base)
-      or croak "singleapp_cfg_dir(), not singleapp_cfg_dir(" . join( ",", ("\$") x scalar(@cfg_base) ) . ")";
+      or croak "singleapp_cfg_dir(), not singleapp_cfg_dir(" . join(",", ("\$") x scalar(@cfg_base)) . ")";
     $singleapp_cfg_dir->();
+}
+
+=head2 vendorapp_cfg_dir
+
+Returns the configuration file for vendot installed applications. In Unix
+speak, installing bacula to C<< /opt/${vendor} >> means there is
+a C<< /opt/${vendor}/bin/bacula >> and going from it's directory
+name one above and into C<etc> there is the I<vendorapp_cfg_dir>. For a
+Perl module it means, we're assuming that C<$FindBin::Bin> is installed as
+a standalone package somewhere, eg. into C</usr/pkg> - as recommended for
+L<pkgsrc|http://www.pkgsrc.org/>.
+
+=cut
+
+my $vendorapp_cfg_dir = sub {
+    my @cfg_base = @_;
+    my @dirs     = (
+        map {
+            eval { Cwd::abs_path($_) }
+              or File::Spec->canonpath($_)
+        } File::Spec->catdir($FindBin::RealDir, "..", "etc", @cfg_base)
+    );
+    @dirs;
+};
+
+sub vendorapp_cfg_dir
+{
+    my @cfg_base = @_;
+    1 < scalar(@cfg_base)
+      and croak "vendorapp_cfg_dir(;\$), not vendorapp_cfg_dir(" . join(",", ("\$") x scalar(@cfg_base)) . ")";
+    $vendorapp_cfg_dir->(@cfg_base);
 }
 
 =head2 local_cfg_dir
@@ -310,9 +341,9 @@ my $local_cfg_dir = sub {
     my @cfg_base = @_;
     my @dirs;
 
-    unless ( $^O eq "MSWin32" )
+    unless ($^O eq "MSWin32")
     {
-        push( @dirs, File::Spec->catdir( "/usr", "local", "etc", @cfg_base ) );
+        push(@dirs, File::Spec->catdir("/usr", "local", "etc", @cfg_base));
     }
 
     @dirs;
@@ -322,7 +353,7 @@ sub local_cfg_dir
 {
     my @cfg_base = @_;
     1 < scalar(@cfg_base)
-      and croak "local_cfg_dir(;\$), not local_cfg_dir(" . join( ",", ("\$") x scalar(@cfg_base) ) . ")";
+      and croak "local_cfg_dir(;\$), not local_cfg_dir(" . join(",", ("\$") x scalar(@cfg_base)) . ")";
     $local_cfg_dir->(@cfg_base);
 }
 
@@ -339,10 +370,10 @@ my $locallib_cfg_dir = sub {
 
     if (   $INC{'local/lib.pm'}
         && $ENV{PERL_MM_OPT}
-        && $ENV{PERL_MM_OPT} =~ m/.*INSTALL_BASE=([^"']*)['"]?$/ )
+        && $ENV{PERL_MM_OPT} =~ m/.*INSTALL_BASE=([^"']*)['"]?$/)
     {
-        ( my $cfgdir = $ENV{PERL_MM_OPT} ) =~ s/.*INSTALL_BASE=([^"']*)['"]?$/$1/;
-        push( @dirs, File::Spec->catdir( $cfgdir, "etc", @cfg_base ) );
+        (my $cfgdir = $ENV{PERL_MM_OPT}) =~ s/.*INSTALL_BASE=([^"']*)['"]?$/$1/;
+        push(@dirs, File::Spec->catdir($cfgdir, "etc", @cfg_base));
     }
 
     @dirs;
@@ -352,7 +383,7 @@ sub locallib_cfg_dir
 {
     my @cfg_base = @_;
     1 < scalar(@cfg_base)
-      and croak "locallib_cfg_dir(;\$), not locallib_cfg_dir(" . join( ",", ("\$") x scalar(@cfg_base) ) . ")";
+      and croak "locallib_cfg_dir(;\$), not locallib_cfg_dir(" . join(",", ("\$") x scalar(@cfg_base)) . ")";
     $locallib_cfg_dir->(@cfg_base);
 }
 
@@ -364,7 +395,7 @@ Returns the path for the C<etc> directory below the current working directory.
 
 my $here_cfg_dir = sub {
     my @cfg_base = @_;
-    my @dirs = ( File::Spec->catdir( File::Spec->rel2abs( File::Spec->curdir() ), @cfg_base, "etc" ) );
+    my @dirs = (File::Spec->catdir(File::Spec->rel2abs(File::Spec->curdir()), @cfg_base, "etc"));
     @dirs;
 };
 
@@ -372,7 +403,7 @@ sub here_cfg_dir
 {
     my @cfg_base = @_;
     1 < scalar(@cfg_base)
-      and croak "here_cfg_dir(;\$), not here_cfg_dir(" . join( ",", ("\$") x scalar(@cfg_base) ) . ")";
+      and croak "here_cfg_dir(;\$), not here_cfg_dir(" . join(",", ("\$") x scalar(@cfg_base)) . ")";
     $here_cfg_dir->(@cfg_base);
 }
 
@@ -387,7 +418,7 @@ my $user_cfg_dir = sub {
     my @cfg_base = @_;
     my @dirs;
 
-    $haveFileHomeDir and @dirs = ( File::Spec->catdir( File::HomeDir->my_home(), map { "." . $_ } @cfg_base ) );
+    $haveFileHomeDir and @dirs = (File::Spec->catdir(File::HomeDir->my_home(), map { "." . $_ } @cfg_base));
 
     @dirs;
 };
@@ -396,7 +427,7 @@ sub user_cfg_dir
 {
     my @cfg_base = @_;
     1 < scalar(@cfg_base)
-      and croak "user_cfg_dir(;\$), not user_cfg_dir(" . join( ",", ("\$") x scalar(@cfg_base) ) . ")";
+      and croak "user_cfg_dir(;\$), not user_cfg_dir(" . join(",", ("\$") x scalar(@cfg_base)) . ")";
     $user_cfg_dir->(@cfg_base);
 }
 
@@ -414,18 +445,18 @@ my $xdg_config_home = sub {
     my @cfg_base = @_;
     my @dirs;
 
-    if ( $ENV{XDG_CONFIG_HOME} )
+    if ($ENV{XDG_CONFIG_HOME})
     {
-        @dirs = split( ":", $ENV{XDG_CONFIG_HOME} );
-        @dirs = map { File::Spec->catdir( $_, @cfg_base ) } @dirs;
+        @dirs = split(":", $ENV{XDG_CONFIG_HOME});
+        @dirs = map { File::Spec->catdir($_, @cfg_base) } @dirs;
     }
-    elsif ( $^O eq "MSWin32" )
+    elsif ($^O eq "MSWin32")
     {
-        @dirs = ( File::Spec->catdir( $ENV{APPDATA}, @cfg_base ) );
+        @dirs = (File::Spec->catdir($ENV{APPDATA}, @cfg_base));
     }
     else
     {
-        $haveFileHomeDir and @dirs = ( File::Spec->catdir( File::HomeDir->my_home(), ".config", @cfg_base ) );
+        $haveFileHomeDir and @dirs = (File::Spec->catdir(File::HomeDir->my_home(), ".config", @cfg_base));
     }
 
     @dirs;
@@ -435,15 +466,15 @@ sub xdg_config_home
 {
     my @cfg_base = @_;
     1 < scalar(@cfg_base)
-      and croak "xdg_config_home(;\$), not xdg_config_home(" . join( ",", ("\$") x scalar(@cfg_base) ) . ")";
+      and croak "xdg_config_home(;\$), not xdg_config_home(" . join(",", ("\$") x scalar(@cfg_base)) . ")";
     $xdg_config_home->(@cfg_base);
 }
 
-my ( @extensible_bases, @pure_bases );
-push( @extensible_bases,
-    $system_cfg_dir, $desktop_cfg_dir, $local_cfg_dir, $singleapp_cfg_dir, $core_cfg_dir,
-    $site_cfg_dir,   $vendor_cfg_dir,  $here_cfg_dir,  $user_cfg_dir,      $xdg_config_home );
-push( @pure_bases, 3 );
+my (@extensible_bases, @pure_bases);
+push(@extensible_bases,
+    $system_cfg_dir, $desktop_cfg_dir, $local_cfg_dir, $singleapp_cfg_dir, $vendorapp_cfg_dir, $core_cfg_dir,
+    $site_cfg_dir,   $vendor_cfg_dir,  $here_cfg_dir,  $user_cfg_dir,      $xdg_config_home);
+push(@pure_bases, 3);
 
 =head2 config_dirs
 
@@ -459,15 +490,15 @@ sub config_dirs
 {
     my @cfg_base = @_;
     1 < scalar(@cfg_base)
-      and croak "config_dirs(;\$), not config_dirs(" . join( ",", ("\$") x scalar(@cfg_base) ) . ")";
+      and croak "config_dirs(;\$), not config_dirs(" . join(",", ("\$") x scalar(@cfg_base)) . ")";
     my @dirs = ();
 
     my $pure_idx = 0;
-    foreach my $idx ( 0 .. $#extensible_bases )
+    foreach my $idx (0 .. $#extensible_bases)
     {
         my $pure;
         $pure_idx <= $#pure_bases and $idx == $pure_bases[$pure_idx] and $pure = ++$pure_idx;
-        push( @dirs, $extensible_bases[$idx]->( ( $pure ? () : @cfg_base ) ) );
+        push(@dirs, $extensible_bases[$idx]->(($pure ? () : @cfg_base)));
     }
 
     @dirs = grep { -d $_ && -r $_ } uniq(@dirs);
@@ -494,13 +525,13 @@ when C<$dir_src> is not a code ref.
 
 sub _plug_dir_source
 {
-    my ( $dir_source, $pure ) = @_;
+    my ($dir_source, $pure) = @_;
 
     $dir_source or return;
     "CODE" eq ref $dir_source or return;
 
-    push( @extensible_bases, $dir_source );
-    $pure and push( @pure_bases, $#extensible_bases );
+    push(@extensible_bases, $dir_source);
+    $pure and push(@pure_bases, $#extensible_bases);
     1;
 }
 
@@ -553,7 +584,7 @@ and remind about C</usr/local/etc>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2015 Jens Rehsack.
+Copyright 2010-2017 Jens Rehsack.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

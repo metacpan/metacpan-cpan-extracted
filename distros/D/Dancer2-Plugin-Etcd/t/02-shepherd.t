@@ -26,7 +26,8 @@ else {
 subtest 'shepherd put' => sub {
     my $app = cli();
     my $path = getcwd . '/t/lib';
-    $app->run("put", "--apppath", "$path", "--etcdhost", "$host", "--etcdport", "$port");
+    my $action = $app->run("put", "--apppath", "$path", "--etcdhost", "$host", "--etcdport", "$port");
+    print STDERR Dumper($action);
     cmp_ok( $app->stdout, '==', 0, "shepherd put" );
 };
 
@@ -34,6 +35,7 @@ subtest 'shepherd get' => sub {
     my $app = cli();
     my $path = getcwd . '/t/lib';
     $app->run("get", "--apppath", "$path", "--etcdhost", "$host", "--etcdport", "$port");
+    print STDERR Dumper($app);
     cmp_ok( $app->stdout, '==', 0, "shepherd get" );
 };
 

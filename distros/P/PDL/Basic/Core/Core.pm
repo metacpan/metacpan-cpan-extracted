@@ -8,7 +8,7 @@ use PDL::Exporter;
 require PDL; # for $VERSION
 use DynaLoader;
 our @ISA    = qw( PDL::Exporter DynaLoader );
-our $VERSION = '2.017';
+our $VERSION = '2.018';
 bootstrap PDL::Core $VERSION;
 use PDL::Types ':All';
 use Config;
@@ -638,7 +638,7 @@ latter will just 'fall through' if the argument is
 already a piddle. It will return a reference and I<NOT>
 a new copy.
 
-This is particulary useful if you are writing a function
+This is particularly useful if you are writing a function
 which is doing some fiddling with internals and assumes
 a piddle argument (e.g. for method calls). Using C<topdl()>
 will ensure nothing breaks if passed with '2'.
@@ -2746,7 +2746,7 @@ sub PDL::convert {
 
 =for ref
 
-byte|short|ushort|long|longlong|float|double (shorthands to convert datatypes)
+byte|short|ushort|long|indx|longlong|float|double (shorthands to convert datatypes)
 
 =for usage
 

@@ -1,0 +1,31 @@
+MARC-XML
+--------
+
+MARC-XML is an extension to the MARC-Record distribution for working with 
+XML data encoded using the MARC21slim XML schema from the Library of Congress.
+
+For more details see: http://www.loc.gov/standards/marcxml/
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+- MARC::Record
+- MARC::Charset
+- XML::SAX
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003-2009 Ed Summers <ehs@pobox.net> and contributors
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

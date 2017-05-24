@@ -18,7 +18,7 @@ plan skip_all
   if $@;
 
 pod_coverage_ok( "Signals::XSIG",
-   { also_private => [ qr/untied/, qr/spike/ ] }
+   { also_private => [ qr/untied/, qr/XLOG/ ] }
 );
 
 done_testing();

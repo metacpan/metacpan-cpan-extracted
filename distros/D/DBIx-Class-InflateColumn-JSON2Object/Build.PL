@@ -18,7 +18,7 @@ my %module_build_args = (
     "Thomas Klausner <domm\@cpan.org>"
   ],
   "dist_name" => "DBIx-Class-InflateColumn-JSON2Object",
-  "dist_version" => "0.902",
+  "dist_version" => "0.903",
   "license" => "perl",
   "module_name" => "DBIx::Class::InflateColumn::JSON2Object",
   "recommends" => {},

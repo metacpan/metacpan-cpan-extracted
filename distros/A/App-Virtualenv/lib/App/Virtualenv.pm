@@ -5,20 +5,18 @@ App::Virtualenv - Perl virtual environment
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
-=head1 ABSTRACT
-
-Perl virtual environment
+=head1 SYNOPSIS
 
 	#!/bin/sh
 	perl -MApp::Virtualenv -erun -- environment_path
 
-See also: L<virtualenv.pl|https://metacpan.org/pod/distribution/App-Virtualenv/lib/App/Virtualenv/virtualenv.pl>
-
 =head1 DESCRIPTION
 
 App::Virtualenv is a Perl package to create isolated Perl virtual environments, like Python virtual environment.
+
+See also: L<virtualenv.pl|https://metacpan.org/pod/distribution/App-Virtualenv/lib/App/Virtualenv/virtualenv.pl>
 
 =cut
 use strict;
@@ -38,16 +36,16 @@ use Lazy::Utils;
 BEGIN
 {
 	require Exporter;
-	our $VERSION     = '2.06';
+	our $VERSION     = '2.07';
 	our @ISA         = qw(Exporter);
 	our @EXPORT      = qw(main run);
 	our @EXPORT_OK   = qw();
 }
 
 
-=head2 Functions
+=head1 Functions
 
-=head3 sh(@args)
+=head2 sh(@args)
 
 runs shell program defined in SHELL environment variable, otherwise /bin/sh
 
@@ -59,10 +57,10 @@ return value: I<exit code of shell program>
 sub sh
 {
 	my (@args) = @_;
-	return _system((defined $ENV{SHELL})? $ENV{SHELL}: "/bin/sh", @args);
+	return system2((defined $ENV{SHELL})? $ENV{SHELL}: "/bin/sh", @args);
 }
 
-=head3 perl(@args)
+=head2 perl(@args)
 
 runs Perl interpreter
 
@@ -74,51 +72,51 @@ return value: I<exit code of Perl interpreter>
 sub perl
 {
 	my (@args) = @_;
-	return _system($Config{perlpath}, @args);
+	return system2($Config{perlpath}, @args);
 }
 
-=head3 activate($virtualenvPath)
+=head2 activate($virtualenv_path)
 
 activates Perl virtual environment
 
-$virtualenvPath: I<virtual environment path>
+$virtualenv_path: I<virtual environment path>
 
 return value: I<virtual environment path if success, otherwise undef>
 
 =cut
 sub activate
 {
-	my ($virtualenvPath) = @_;
-	return unless defined($virtualenvPath) and length($virtualenvPath) > 0 and -d "$virtualenvPath/lib/perl5";
-	$virtualenvPath = Cwd::realpath($virtualenvPath);
+	my ($virtualenv_path) = @_;
+	return unless defined($virtualenv_path) and length($virtualenv_path) > 0 and -d "$virtualenv_path/lib/perl5";
+	$virtualenv_path = Cwd::realpath($virtualenv_path);
 
 	deactivate(1);
 
 	$ENV{_OLD_PERL_VIRTUAL_ENV} = $ENV{PERL_VIRTUAL_ENV};
-	$ENV{PERL_VIRTUAL_ENV} = $virtualenvPath;
+	$ENV{PERL_VIRTUAL_ENV} = $virtualenv_path;
 
 	$ENV{_OLD_PERL_VIRTUAL_PATH} = $ENV{PATH};
-	$ENV{PATH} = "$virtualenvPath/bin".((defined $ENV{PATH})? ":${ENV{PATH}}": "");
+	$ENV{PATH} = "$virtualenv_path/bin".((defined $ENV{PATH})? ":${ENV{PATH}}": "");
 
 	$ENV{_OLD_PERL_VIRTUAL_PERL5LIB} = $ENV{PERL5LIB};
-	$ENV{PERL5LIB} = "$virtualenvPath/lib/perl5".((defined $ENV{PERL5LIB})? ":${ENV{PERL5LIB}}": "");
+	$ENV{PERL5LIB} = "$virtualenv_path/lib/perl5".((defined $ENV{PERL5LIB})? ":${ENV{PERL5LIB}}": "");
 
 	$ENV{_OLD_PERL_VIRTUAL_PERL_LOCAL_LIB_ROOT} = $ENV{PERL_LOCAL_LIB_ROOT};
-	$ENV{PERL_LOCAL_LIB_ROOT} = "$virtualenvPath";
+	$ENV{PERL_LOCAL_LIB_ROOT} = "$virtualenv_path";
 
 	$ENV{_OLD_PERL_VIRTUAL_PERL_MB_OPT} = $ENV{PERL_MB_OPT};
-	$ENV{PERL_MB_OPT} = "--install_base \"$virtualenvPath\"";
+	$ENV{PERL_MB_OPT} = "--install_base \"$virtualenv_path\"";
 
 	$ENV{_OLD_PERL_VIRTUAL_PERL_MM_OPT} = $ENV{PERL_MM_OPT};
-	$ENV{PERL_MM_OPT} = "INSTALL_BASE=$virtualenvPath";
+	$ENV{PERL_MM_OPT} = "INSTALL_BASE=$virtualenv_path";
 
 	$ENV{_OLD_PERL_VIRTUAL_PS1} = $ENV{PS1};
-	$ENV{PS1} = "(".basename($virtualenvPath).") ".((defined $ENV{PS1})? $ENV{PS1}: "");
+	$ENV{PS1} = "(".basename($virtualenv_path).") ".((defined $ENV{PS1})? $ENV{PS1}: "");
 
-	return $virtualenvPath;
+	return $virtualenv_path;
 }
 
-=head3 deactivate($nondestructive)
+=head2 deactivate($nondestructive)
 
 deactivates Perl virtual environment
 
@@ -157,11 +155,11 @@ sub deactivate
 	return 1;
 }
 
-=head3 create($virtualenvPath, $empty)
+=head2 create($virtualenv_path, $empty)
 
 creates Perl virtual environment
 
-$virtualenvPath: I<new virtual environment path>
+$virtualenv_path: I<new virtual environment path>
 
 $empty: I<create empty virtual environment>
 
@@ -170,10 +168,10 @@ return value: I<virtual environment path if success, otherwise undef>
 =cut
 sub create
 {
-	my ($virtualenvPath, $empty) = @_;
-	return unless defined($virtualenvPath) and length($virtualenvPath) > 0;
-	$virtualenvPath = Cwd::realpath($virtualenvPath);
-	say "Creating Perl virtual environment: $virtualenvPath";
+	my ($virtualenv_path, $empty) = @_;
+	return unless defined($virtualenv_path) and length($virtualenv_path) > 0;
+	$virtualenv_path = Cwd::realpath($virtualenv_path);
+	say "Creating Perl virtual environment: $virtualenv_path";
 
 	deactivate();
 	$ENV{PERL_MM_USE_DEFAULT} = 1;
@@ -181,107 +179,107 @@ sub create
 	$ENV{AUTOMATED_TESTING} = 1;
 
 	require local::lib;
-	local::lib->import($virtualenvPath);
+	local::lib->import($virtualenv_path);
 
-	activate($virtualenvPath);
+	activate($virtualenv_path);
 
 	perl("-MCPAN", "-e exit(defined(CPAN::Shell->force('install', 'CPAN'))? 0: 1);") unless $empty;
 
-	my $pkgPath = dirname(__FILE__);
+	my $pkg_path = dirname(__FILE__);
 
 	say "Copying... bin/activate";
-	copy("$pkgPath/Virtualenv/activate", "$virtualenvPath/bin/activate");
-	chmod(0644, "$virtualenvPath/bin/activate");
+	copy("$pkg_path/Virtualenv/activate", "$virtualenv_path/bin/activate");
+	chmod(0644, "$virtualenv_path/bin/activate");
 
 	say "Copying... bin/sh.pl";
-	copy("$pkgPath/Virtualenv/sh.pl", "$virtualenvPath/bin/sh.pl");
-	chmod(0755, "$virtualenvPath/bin/sh.pl");
+	copy("$pkg_path/Virtualenv/sh.pl", "$virtualenv_path/bin/sh.pl");
+	chmod(0755, "$virtualenv_path/bin/sh.pl");
 
 	say "Copying... bin/perl.pl";
-	file_put_contents("$virtualenvPath/bin/perl.pl", "#!".shellmeta($Config{perlpath})."\n".file_get_contents("$pkgPath/Virtualenv/perl.pl"));
-	chmod(0755, "$virtualenvPath/bin/perl.pl");
-	symlink("perl.pl", "$virtualenvPath/bin/perl");
+	file_put_contents("$virtualenv_path/bin/perl.pl", "#!".shellmeta($Config{perlpath})."\n".file_get_contents("$pkg_path/Virtualenv/perl.pl"));
+	chmod(0755, "$virtualenv_path/bin/perl.pl");
+	symlink("perl.pl", "$virtualenv_path/bin/perl");
 
 	say "Copying... bin/virtualenv.pl";
-	copy("$pkgPath/Virtualenv/virtualenv.pl", "$virtualenvPath/bin/virtualenv.pl");
-	chmod(0755, "$virtualenvPath/bin/virtualenv.pl");
-	symlink("virtualenv.pl", "$virtualenvPath/bin/virtualenv");
+	copy("$pkg_path/Virtualenv/virtualenv.pl", "$virtualenv_path/bin/virtualenv.pl");
+	chmod(0755, "$virtualenv_path/bin/virtualenv.pl");
+	symlink("virtualenv.pl", "$virtualenv_path/bin/virtualenv");
 
-	return $virtualenvPath;
+	return $virtualenv_path;
 }
 
-=head3 findVirtualenvPath($virtualenvPath)
+=head2 find_virtualenv_path($virtualenv_path)
 
-finds Perl virtual environment path by $virtualenvPath argument or activated virtual environment or running script or PERL5LIB environment variable
+finds Perl virtual environment path by $virtualenv_path argument or activated virtual environment or running script or PERL5LIB environment variable
 
-$virtualenvPath: I<virtual environment path>
+$virtualenv_path: I<virtual environment path>
 
 return value: I<best matching virtual environment path>
 
 =cut
-sub findVirtualenvPath
+sub find_virtualenv_path
 {
-	my ($virtualenvPath) = @_;
-	$virtualenvPath = $ENV{PERL_VIRTUAL_ENV} if not (defined($virtualenvPath) and length($virtualenvPath) > 0 and -d "$virtualenvPath/lib/perl5");
-	$virtualenvPath = "${FindBin::Bin}/.." if not (defined($virtualenvPath) and length($virtualenvPath) > 0 and -d "$virtualenvPath/lib/perl5") and ${FindBin::Bin} !~ qr'^(/usr/|/bin/)' and -d "${FindBin::Bin}/../lib/perl5";
+	my ($virtualenv_path) = @_;
+	$virtualenv_path = $ENV{PERL_VIRTUAL_ENV} if not (defined($virtualenv_path) and length($virtualenv_path) > 0 and -d "$virtualenv_path/lib/perl5");
+	$virtualenv_path = "${FindBin::Bin}/.." if not (defined($virtualenv_path) and length($virtualenv_path) > 0 and -d "$virtualenv_path/lib/perl5") and ${FindBin::Bin} !~ qr'^(/usr/|/bin/)' and -d "${FindBin::Bin}/../lib/perl5";
 	for (split(":", defined($ENV{PERL5LIB})? $ENV{PERL5LIB}: ""))
 	{
-		last if defined($virtualenvPath) and length($virtualenvPath) > 0 and -d "$virtualenvPath/lib/perl5";
-		$virtualenvPath = "$_/../..";
+		last if defined($virtualenv_path) and length($virtualenv_path) > 0 and -d "$virtualenv_path/lib/perl5";
+		$virtualenv_path = "$_/../..";
 	}
-	return if not (defined($virtualenvPath) and length($virtualenvPath) > 0 and -d "$virtualenvPath/lib/perl5");
-	return $virtualenvPath;
+	return if not (defined($virtualenv_path) and length($virtualenv_path) > 0 and -d "$virtualenv_path/lib/perl5");
+	return $virtualenv_path;
 }
 
-=head3 activate2($virtualenvPath, $inform)
+=head2 activate2($virtualenv_path, $inform)
 
-activates Perl virtual environment by findVirtualenvPath function
+activates Perl virtual environment by find_virtualenv_path function
 
-$virtualenvPath: I<virtual environment path>
+$virtualenv_path: I<virtual environment path>
 
-$inform: I<informs activated virtual environment path to STDERR if new activated path differs old one>
+$inform: I<informs activated virtual environment path to STDERR if new activated path differs old one, by default 0>
 
 return value: I<activated best matching virtual environment path if success, otherwise undef>
 
 =cut
 sub activate2
 {
-	my ($virtualenvPath, $inform) = @_;
-	my $oldVirtualenvPath = $ENV{PERL_VIRTUAL_ENV};
-	$virtualenvPath = activate(findVirtualenvPath($virtualenvPath));
+	my ($virtualenv_path, $inform) = @_;
+	my $old_virtualenv_path = $ENV{PERL_VIRTUAL_ENV};
+	$virtualenv_path = activate(find_virtualenv_path($virtualenv_path));
 	if ($inform)
 	{
-		if (defined($virtualenvPath))
+		if (defined($virtualenv_path))
 		{
-			say STDERR "Perl virtual environment path: $virtualenvPath" if not defined $oldVirtualenvPath or $oldVirtualenvPath ne $virtualenvPath;
+			say STDERR "Perl virtual environment path: $virtualenv_path" if not defined $old_virtualenv_path or $old_virtualenv_path ne $virtualenv_path;
 		} else
 		{
 			say STDERR "Perl virtual environment is not activated";
 		}
 	}
-	return $virtualenvPath;
+	return $virtualenv_path;
 }
 
-=head3 getInc($virtualenvPath)
+=head2 getinc($virtualenv_path)
 
 gets array ref of include paths given virtual environment path or sitelib paths
 
-$virtualenvPath: I<virtual environment path>
+$virtualenv_path: I<virtual environment path>
 
 return value: I<array ref of paths>
 
 =cut
-sub getInc
+sub getinc
 {
-	my ($virtualenvPath) = @_;
+	my ($virtualenv_path) = @_;
 	my $perl5lib;
-	$perl5lib = "$virtualenvPath/lib/perl5" if defined($virtualenvPath) and length($virtualenvPath) > 0 and -d "$virtualenvPath/lib/perl5";
+	$perl5lib = "$virtualenv_path/lib/perl5" if defined($virtualenv_path) and length($virtualenv_path) > 0 and -d "$virtualenv_path/lib/perl5";
 	my $inc = [(defined($perl5lib)? ("$perl5lib/$Config{version}/$Config{archname}", "$perl5lib/$Config{version}", "$perl5lib/$Config{archname}", "$perl5lib"): ($Config{sitearch}, $Config{sitelib}))];
 	@$inc = map(((length($_) < 1 or substr($_, -1, 1) ne "/")? "$_/": $_), @$inc);
 	return $inc;
 }
 
-=head3 list(%params)
+=head2 list(%params)
 
 lists packages or modules or files by given %params
 
@@ -291,7 +289,7 @@ lists packages or modules or files by given %params
 
 one: I<output is one-column, by default 0>
 
-detail: I<prints additional detail by given value: module or file. by default undef>
+detail: I<prints additional detail by given value('module' or 'file'), by default undef>
 
 =back
 
@@ -301,31 +299,31 @@ return value: I<always 1>
 sub list
 {
 	my %params = @_;
-	my $inc = getInc(activate2(undef, 1));
+	my $inc = getinc(activate2(undef, 1));
 	my $inst = ExtUtils::Installed->new(inc_override => $inc, extra_libs =>[]);
 	my @packages = sort({lc($a) cmp lc($b)} $inst->modules());
-	for my $packageName (grep({ my $package = $_; not defined($params{packages}) or not @{$params{packages}} or grep($_ eq $package, @{$params{packages}}) } @packages))
+	for my $package_name (grep({ my $package = $_; not defined($params{packages}) or not @{$params{packages}} or grep($_ eq $package, @{$params{packages}}) } @packages))
 	{
-		next if $packageName eq 'Perl';
-		my $version = $inst->version($packageName);
+		next if $package_name eq 'Perl';
+		my $version = $inst->version($package_name);
 		$version = "0" if not $version;
 		if ($params{detail})
 		{
-			say sprintf("%-40s %10s", $packageName, $version) unless $params{one};
-			my @files = sort({lc($a) cmp lc($b)} $inst->files($packageName, "all"));
-			my $packlist_file = $inst->packlist($packageName)->packlist_file();
+			say sprintf("%-40s %10s", $package_name, $version) unless $params{one};
+			my @files = sort({lc($a) cmp lc($b)} $inst->files($package_name, "all"));
+			my $packlist_file = $inst->packlist($package_name)->packlist_file();
 			unshift @files, $packlist_file if defined($packlist_file);
 			for my $file (@files)
 			{
-				my $incPath = (grep($file =~ /^\Q$_\E/, @$inc))[0];
-				my $relPath = ($file =~ /^\Q$incPath\E(.*)\.pm$/)[0] if defined($incPath);
+				my $inc_path = (grep($file =~ /^\Q$_\E/, @$inc))[0];
+				my $rel_path = ($file =~ /^\Q$inc_path\E(.*)\.pm$/)[0] if defined($inc_path);
 				given ($params{detail})
 				{
 					when ("module")
 					{
-						if (defined($relPath))
+						if (defined($rel_path))
 						{
-							my $module = $relPath;
+							my $module = $rel_path;
 							$module =~ s/\//::/g;
 							print "  " unless $params{one};
 							say $module;
@@ -342,15 +340,15 @@ sub list
 		}
 		if ($params{one})
 		{
-			say $packageName;
+			say $package_name;
 			next;
 		}
-		say sprintf("%-40s %10s", $packageName, $version);
+		say sprintf("%-40s %10s", $package_name, $version);
 	}
 	return 1;
 }
 
-=head3 main(@argv)
+=head2 main(@argv)
 
 App::Virtualenv main function to run on command-line
 
@@ -364,7 +362,7 @@ return value: I<exit code of program>
 sub main
 {
 	my (@argv) = @_;
-	my $args = commandArgs({ valuableArgs => 0, noCommand => 1 }, @argv);
+	my $args = cmdargs({ valuableArgs => 0, noCommand => 1 }, @argv);
 	my $cmd;
 	for my $arg (grep(/^\-/, keys %$args))
 	{
@@ -386,7 +384,9 @@ sub main
 	{
 		when (/^\-(h|\-help)$/)
 		{
-			my @lines = getPodText(dirname(__FILE__)."/Virtualenv/virtualenv.pl", "ABSTRACT");
+			my @lines;
+			@lines = get_pod_text(dirname(__FILE__)."/Virtualenv/virtualenv.pl", "SYNOPSIS");
+			@lines = get_pod_text(dirname(__FILE__)."/Virtualenv/virtualenv.pl", "ABSTRACT") unless defined($lines[0]);
 			$lines[0] = "virtualenv.pl";
 			say join("\n", @lines);
 		}
@@ -411,7 +411,7 @@ sub main
 	return 0;
 }
 
-=head3 run
+=head2 run
 
 runs App::Virtualenv by main function with command-line arguments by @ARGV
 
@@ -528,7 +528,7 @@ L<CPANPLUS|https://metacpan.org/pod/CPANPLUS>
 
 =head1 AUTHOR
 
-Orkun Karaduman <orkunkaraduman@gmail.com>
+Orkun Karaduman (ORKUN) <orkun@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

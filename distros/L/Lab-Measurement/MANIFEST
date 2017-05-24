@@ -46,6 +46,7 @@ examples/XPRESS/Example4_3d-scan.pl
 examples/XPRESS/Example5_VNA_gate_and_frequency.pl
 examples/XPRESS/Example6_temperature.pl
 examples/XPRESS/Example7_VNA_temp.pl
+examples/XPRESS/lakeshore340_sweep.pl
 lib/Lab/Bus.pm
 lib/Lab/Bus/DEBUG.pm
 lib/Lab/Bus/IsoBus.pm
@@ -86,10 +87,6 @@ lib/Lab/Connection/VISA_RS232.pm
 lib/Lab/Data/Analysis.pm
 lib/Lab/Data/Analysis/TekTDS.pm
 lib/Lab/Data/Analysis/WaveRunner.pm
-lib/Lab/Data/Meta.pm
-lib/Lab/Data/PDL.pm
-lib/Lab/Data/Plotter.pm
-lib/Lab/Data/XMLtree.pm
 lib/Lab/Exception.pm
 lib/Lab/Exception/Base.pm
 lib/Lab/Generic.pm
@@ -107,6 +104,7 @@ lib/Lab/Instrument/HP34420A.pm
 lib/Lab/Instrument/HP3458A.pm
 lib/Lab/Instrument/HP83732A.pm
 lib/Lab/Instrument/IPS.pm
+lib/Lab/Instrument/IPSWeissDilfridge.pm
 lib/Lab/Instrument/ITC.pm
 lib/Lab/Instrument/Keithley2000.pm
 lib/Lab/Instrument/Keithley2400.pm
@@ -191,7 +189,6 @@ lib/Lab/MultiChannelInstrument.pm
 lib/Lab/MultiChannelInstrument/DeviceCache.pm
 lib/Lab/SCPI.pm
 lib/Lab/XPRESS/Data/XPRESS_DataFile.pm
-lib/Lab/XPRESS/Data/XPRESS_dataset.pm
 lib/Lab/XPRESS/Data/XPRESS_logger.pm
 lib/Lab/XPRESS/Data/XPRESS_plotter.pm
 lib/Lab/XPRESS/hub.pm
@@ -211,29 +208,17 @@ lib/Lab/XPRESS/Sweep/Temperature.pm
 lib/Lab/XPRESS/Sweep/Time.pm
 lib/Lab/XPRESS/Sweep/Voltage.pm
 lib/Lab/XPRESS/Utilities/Utilities.pm
-lib/Lab/XPRESS/Xpression.pl
-lib/Lab/XPRESS/Xpression/bidirectional_gnuplot_pipe.pm
-lib/Lab/XPRESS/Xpression/bin/vieWx.pl
-lib/Lab/XPRESS/Xpression/Plotter.pm
-lib/Lab/XPRESS/Xpression/PlotterGUI.pl
-lib/Lab/XPRESS/Xpression/PlotterGUI.pm
-lib/Lab/XPRESS/Xpression/PlotterGUI_bidirectional.pm
-lib/Lab/XPRESS/Xpression/res/XRC/dialog_ExtractData.xrc
-lib/Lab/XPRESS/Xpression/res/XRC/main_frame.xrc
-lib/Lab/XPRESS/Xpression/res/XRC/panel_column.xrc
-lib/Lab/XPRESS/Xpression/res/XRC/panel_plotInstance.xrc
 MakeRPM
 MANIFEST			This list of files
 MANIFEST.SKIP
+META.json
+META.yml
 paper.bib
 paper.md
 perl-Lab-Measurement.spec
 perltidyrc
 README
 README.rpm
-scripts/lab-makefilelist.pl
-scripts/lab-makemakefile.pl
-scripts/lab-plotter.pl
 scripts/lab-update.pl
 t/00-load.t
 t/Analysis/DataAnalysis.t
@@ -287,5 +272,3 @@ xt/critic/moose.t
 xt/critic/tests.t
 xt/perltidy.pl
 xt/pre-commit.pl
-META.yml
-META.json

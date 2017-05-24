@@ -14,6 +14,8 @@ has _server_proc => ( is => 'ro', isa => InstanceOf ['Pcore::Util::PM::Proc'], i
 
 our $SERVER_PROC;
 
+# https://www.mercurial-scm.org/wiki/CommandServer
+
 sub _server ( $self, $cb ) {
     if ( exists $self->{_server_proc} ) {
         $cb->( $self->{_server_proc} );
@@ -123,17 +125,15 @@ sub scm_cmd ( $self, $root, $cb, $cmd ) {
 
                     $self->_read(__SUB__);
                 }
-                else {
-                    my $api_res;
 
+                # "r" channel - request is finished
+                else {
                     if ( exists $res->{e} ) {
-                        $api_res = result [ 500, join q[ ], $res->{e}->@* ];
+                        $cb->( result [ 500, join q[ ], $res->{e}->@* ] );
                     }
                     else {
-                        $api_res = result 200, $res->{o};
+                        $cb->( result 200, $res->{o} );
                     }
-
-                    $cb->($api_res);
                 }
 
                 return;
@@ -281,6 +281,51 @@ sub scm_set_tag ( $self, $root, $cb, $args ) {
     return;
 }
 
+sub scm_get_changesets ( $self, $root, $cb, $args ) {
+    my @cmd = $args->[0] ? ( 'log', '-r', "$args->[0]:" ) : ('log');
+
+    $self->scm_cmd(
+        $root,
+        sub ($res) {
+            if ( !$res ) {
+                $cb->($res);
+            }
+            else {
+                my $data;
+
+                for my $line ( $res->{data}->@* ) {
+                    my $changeset = {};
+
+                    for my $field ( split /\n/sm, $line ) {
+                        my ( $k, $v ) = split /:\s+/sm, $field, 2;
+
+                        if ( exists $changeset->{$k} ) {
+                            if ( ref $changeset->{$k} eq 'ARRAY' ) {
+                                push $changeset->{$k}->@*, $v;
+                            }
+                            else {
+                                $changeset->{$k} = [ $changeset->{$k}, $v ];
+                            }
+                        }
+                        else {
+                            $changeset->{$k} = $v;
+                        }
+                    }
+
+                    push $data->@*, $changeset;
+                }
+
+                $cb->( result 200, $data );
+            }
+
+            return;
+        },
+        \@cmd
+    );
+
+    return;
+}
+
 1;
 ## -----SOURCE FILTER LOG BEGIN-----
 ##
@@ -288,7 +333,7 @@ sub scm_set_tag ( $self, $root, $cb, $args ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 104, 106, 112        | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |    2 | 106, 108, 114        | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 185                  | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

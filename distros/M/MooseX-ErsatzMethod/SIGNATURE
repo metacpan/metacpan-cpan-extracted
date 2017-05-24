@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,20 +14,19 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
-SHA1 ab4109790c5b106bf965d04a12bb3a8e2ce5a88f COPYRIGHT
+SHA1 ec9dd32911e3e07d43a2271d8e4708c3a695fafc COPYRIGHT
 SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
-SHA1 bf2eec1bfaee366a7766ba80199204f2fda18962 Changes
+SHA1 1c530d004cdd7497c7be4c0c7d6a9989a7895865 Changes
 SHA1 c06f6714c3cb0fe88be80cf0961e2a6ce4b9ed13 INSTALL
-SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
-SHA1 d21f2bd1df704387db1a0b517b582edb7584d0c1 MANIFEST
-SHA1 2b749cdd99fda2a3fc73261b378e10771d1d234a META.json
-SHA1 1a936119b05a91082e3c4a298a9cb08b0f0f7a3a META.yml
-SHA1 98e51aab9187b7953beb488e6ce3071c131a9f4d Makefile.PL
+SHA1 c4c1e6c578edcfd14d13eadebc8f56dd9ca46821 LICENSE
+SHA1 ace51a09bef4ac449ac2c8aa86e09f03677de78a MANIFEST
+SHA1 bf02633a2cf92a08917db342b922942c08817ef9 META.json
+SHA1 05f82c86f58bd3114c75c9dabada4ba965066dd3 META.yml
+SHA1 f6aca862add2448703076f2b483e5c6213e58cde Makefile.PL
 SHA1 c19cb2ce3696fd5333f8dc8c9e1a03bd6304c596 README
 SHA1 6b41bf8a314ba9351135340e456fe1a5b8614293 dist.ini
-SHA1 d48b42474c8c2ae8c911dc661336c89612f867d9 doap.ttl
-SHA1 8f0064fd3c341e0536557610b57ad534d419a1b3 lib/MooseX/ErsatzMethod.pm
+SHA1 4644707b80a17e0a7838be6a80d209be4fff1a15 doap.ttl
+SHA1 9a2e8a47ccd899c23a50829fbc9dc3880c982cc4 lib/MooseX/ErsatzMethod.pm
 SHA1 7001b6b0364fc9ad7c813c03d6cefe1cb51ab992 t/01basic.t
 SHA1 51d4dc8321bb563751946f390b2473d7009ee312 t/02rolestuff.t
 SHA1 6825d0e2badc1a3f2ef9ff382d5ee6a025437ac2 t/03noconflicts.t
@@ -36,7 +35,7 @@ SHA1 34ce7587bdde280739654affe585844c31ae9610 t/05combination.t
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iEYEARECAAYFAlQLFYoACgkQzr+BKGoqfTlfCgCfd1T7P2dcLIhnFRsfL0uPubu6
-7ToAnixhE8eGZWi38l7n/FisweHnWmB3
-=hbDq
+iEYEARECAAYFAlkhnkoACgkQzr+BKGoqfTlrZwCfQQ5iEHENW5ODVdlEUXKSVi2B
+75YAoKNqLghhnnbQUActaFhZ3JqXrTOL
+=XUL9
 -----END PGP SIGNATURE-----

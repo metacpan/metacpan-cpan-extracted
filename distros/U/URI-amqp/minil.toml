@@ -1,0 +1,6 @@
+name = "URI-amqp"
+badges = ["travis"]
+authority="cpan:JASEI"
+
+module_maker="ModuleBuildTiny"
+

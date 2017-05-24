@@ -4,7 +4,7 @@ use File::chdir;
 use File::Temp qw(tempdir);
 use Capture::Tiny qw(capture);
 use IPC::System::Simple ();
-use Mojo::Util qw(slurp);
+use Mojo::File qw(path); sub slurp { path($_[0])->slurp }
 use Import::Into;
 
 my $test_cwd = $CWD;

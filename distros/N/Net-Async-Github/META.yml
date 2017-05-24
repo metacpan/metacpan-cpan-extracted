@@ -20,17 +20,17 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Net-Async-Github
-recommends:
-  IO::Async::SSL: '0.19'
-  Net::Async::HTTP: '0.41'
 requires:
   Cache::LRU: '0.04'
   Dir::Self: '0'
   File::ShareDir: '1.102'
   Future: '0.34'
   IO::Async::Notifier: '0.71'
+  IO::Async::SSL: '0.19'
   JSON::MaybeXS: '1.003008'
   Log::Any: '1.045'
+  Net::Async::HTTP: '0.41'
+  Net::Async::WebSocket: '0'
   Path::Tiny: '0.098'
   Ryu::Async: '0.002'
   Syntax::Keyword::Try: '0.04'
@@ -41,5 +41,5 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Net-Async-Github
   homepage: http://search.cpan.org/dist/Net-Async-Github/
-version: '0.002'
+version: '0.003'
 x_serialization_backend: 'YAML::Tiny version 1.70'

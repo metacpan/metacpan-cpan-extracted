@@ -1,0 +1,9 @@
+.# Title: Line Starting dot
+.# Unrecognised directives are passed through to the application
+test input
+.line that starts with dot
+more lines
+.#
+.# A .noop does nothing:
+.noop
+.# EOF

@@ -1,9 +1,15 @@
 package HPC::Runner::Command::execute_job::Base;
 
 use Moose::Role;
+# use MooseX::App::Role;
 
 with 'HPC::Runner::Command::execute_job::Utils::Log';
 use Sys::Hostname;
+
+=head2 Command Line Options
+
+=cut
+
 
 =head3 job_scheduler_id
 
@@ -61,5 +67,6 @@ has 'jobref' => (
     isa     => 'ArrayRef',
     default => sub { [ [] ] },
 );
+
 
 1;

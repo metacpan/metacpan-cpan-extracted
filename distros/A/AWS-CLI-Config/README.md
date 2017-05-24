@@ -71,11 +71,11 @@ supported in original AWS CLI.
 
 # LICENSE
 
-Copyright (C) YASUTAKE Kiyoshi.
+Copyright (C) IKEDA Kiyoshi.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
-# AUTHOR
+# AUTHORS
 
-YASUTAKE Kiyoshi <yasutake.kiyoshi@gmail.com>
+IKEDA Kiyoshi <yasutake.kiyoshi@gmail.com>

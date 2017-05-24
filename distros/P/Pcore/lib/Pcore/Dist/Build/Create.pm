@@ -46,14 +46,14 @@ sub _build_target_path ($self) {
 
 sub _build_tmpl_params ($self) {
     return {
-        dist_name         => $self->namespace =~ s/::/-/smgr,                                                                    # Package-Name
-        dist_path         => lc $self->namespace =~ s/::/-/smgr,                                                                 # package-name
-        module_name       => $self->namespace,                                                                                   # Package::Name
-        author            => $ENV->user_cfg->{'Pcore::Dist'}->{author},
-        author_email      => $ENV->user_cfg->{'Pcore::Dist'}->{email},
+        dist_name         => $self->namespace =~ s/::/-/smgr,                                            # Package-Name
+        dist_path         => lc $self->namespace =~ s/::/-/smgr,                                         # package-name
+        module_name       => $self->namespace,                                                           # Package::Name
+        author            => $ENV->user_cfg->{_}->{author},
+        author_email      => $ENV->user_cfg->{_}->{email},
         copyright_year    => P->date->now->year,
-        copyright_holder  => $ENV->user_cfg->{'Pcore::Dist'}->{copyright_holder} || $ENV->user_cfg->{'Pcore::Dist'}->{author},
-        license           => $ENV->user_cfg->{'Pcore::Dist'}->{license},
+        copyright_holder  => $ENV->user_cfg->{_}->{copyright_holder} || $ENV->user_cfg->{_}->{author},
+        license           => $ENV->user_cfg->{_}->{license},
         cpan_distribution => $self->cpan,
         pcore_version     => $ENV->pcore->version->normal,
     };
@@ -114,7 +114,7 @@ sub _create_upstream_repo ($self) {
 
         $self->{upstream_api} = Pcore::API::Bitbucket->new(
             {   repo_name => lc $self->namespace =~ s[::][-]smgr,
-                namespace => $self->upstream_namespace || $ENV->user_cfg->{'Pcore::API::Bitbucket'}->{'namespace'},
+                namespace => $self->upstream_namespace || $ENV->user_cfg->{BITBUCKET}->{namespace},
                 scm_type  => $self->scm_type,
             }
         );
@@ -124,7 +124,7 @@ sub _create_upstream_repo ($self) {
 
         $self->{upstream_api} = Pcore::API::GitHub->new(
             {   repo_name => lc $self->namespace =~ s[::][-]smgr,
-                namespace => $self->upstream_namespace || $ENV->user_cfg->{'Pcore::API::GitHub'}->{'namespace'},
+                namespace => $self->upstream_namespace || $ENV->user_cfg->{GITHUB}->{namespace},
             }
         );
     }

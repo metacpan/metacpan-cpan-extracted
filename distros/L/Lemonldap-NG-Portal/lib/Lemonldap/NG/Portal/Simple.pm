@@ -10,7 +10,7 @@ use warnings;
 
 use Exporter 'import';
 
-our $VERSION = '1.9.7';
+our $VERSION = '1.9.10';
 
 use warnings;
 use MIME::Base64;
@@ -1921,7 +1921,11 @@ sub controlExistingSession {
                 -expires => '-1d',
                 @_,
               );
-            return PE_SESSIONEXPIRED;
+            if ( $self->{portalErrorOnExpiredSession} ) {
+                return PE_SESSIONEXPIRED;
+            } else {
+                return PE_OK;
+            }
         }
     }
 

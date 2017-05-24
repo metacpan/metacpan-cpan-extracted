@@ -71,6 +71,7 @@ For more information about Redis Cluster see here:
         { host => 'localhost', port => 7001 },
         { host => 'localhost', port => 7002 },
       ],
+      password           => 'yourpass',
       connection_timeout => 5,
       read_timeout       => 5,
       refresh_interval   => 5,
@@ -248,10 +249,10 @@ callback in second argument. The error object is the instance of the class
 
 Before the command execution, the client determines the pool of nodes, on which
 the command can be executed. The pool can contain the one or more nodes
-depending on the cluster and the client configurations, and command type. The
-client will try to execute the command on random node from the pool and, if the
-command failed on selected node, the client will try to execute it on another
-random node.
+depending on the cluster and the client configurations, and the command type.
+The client will try to execute the command on random node from the pool and, if
+the command failed on selected node, the client will try to execute it on
+another random node.
 
 The command callback is optional. If it is not specified and any error
 occurred, the `on_error` callback of the client is called.

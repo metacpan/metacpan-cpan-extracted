@@ -1,7 +1,7 @@
 {
    "abstract" : "Interface to access AWS CLI configs and credentials",
    "author" : [
-      "YASUTAKE Kiyoshi <yasutake.kiyoshi@gmail.com>"
+      "IKEDA Kiyoshi <yasutake.kiyoshi@gmail.com>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Minilla/v3.0.10",
@@ -42,7 +42,6 @@
       },
       "runtime" : {
          "requires" : {
-            "Config::Tiny" : "0",
             "Object::Tiny" : "0",
             "perl" : "5.008001"
          }
@@ -57,7 +56,7 @@
    "provides" : {
       "AWS::CLI::Config" : {
          "file" : "lib/AWS/CLI/Config.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       },
       "AWS::CLI::Config::Profile" : {
          "file" : "lib/AWS/CLI/Config.pm"
@@ -74,7 +73,7 @@
          "web" : "https://github.com/key-amb/perl5-AWS-CLI-Config"
       }
    },
-   "version" : "0.02",
+   "version" : "0.04",
    "x_authority" : "cpan:KEYAMB",
    "x_contributors" : [
       "José Joaquín Atria <jjatria@gmail.com>"

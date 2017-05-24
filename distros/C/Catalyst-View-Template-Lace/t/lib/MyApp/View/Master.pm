@@ -2,7 +2,6 @@ package  MyApp::View::Master;
 
 use Moo;
 extends 'Catalyst::View::Template::Lace';
-with 'Template::Lace::ModelRole';
 
 has title => (is=>'ro', required=>1);
 has css => (is=>'ro', required=>1);

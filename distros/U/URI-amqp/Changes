@@ -1,0 +1,10 @@
+Revision history for Perl extension URI-amqp
+
+0.1.1 2017-05-23T08:57:29Z
+
+    - fix bad formated POD
+
+0.1.0 2017-05-23T08:03:25Z
+
+    - original version
+

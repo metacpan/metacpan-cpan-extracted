@@ -1,0 +1,17 @@
+.# Title: If-removes-all
+.# Ie that on a not taken .if branch that no directive is actioned
+.let num := 4; num2 := 3
+Line 1
+.if 0
+Some random line
+.#
+.# The assignments below should not happen:
+.let num := 5
+.eval .let num2 := 6
+.eval This should not appear
+.# It doesn't really matter what we try to include, it should not happen
+.include does-not-exist
+.return
+.fi
+Line 2
+.eval num has the value \v{num}; num2 is \v{num2}

@@ -7,11 +7,11 @@ protocol on 32 bit systems.
 
 =head1 VERSION
 
-This documentation refers to C<Kafka::Int64> version 1.02 .
+This documentation refers to C<Kafka::Int64> version 1.03 .
 
 =cut
 
-#-- Pragmas --------------------------------------------------------------------
+
 
 use 5.010;
 use strict;
@@ -19,9 +19,9 @@ use warnings;
 
 use bigint; # this allows integers of practially any size at the cost of significant performance drop
 
-# ENVIRONMENT ------------------------------------------------------------------
 
-our $VERSION = '1.02';
+
+our $VERSION = '1.03';
 
 use Exporter qw(
     import
@@ -33,7 +33,7 @@ our @EXPORT_OK = qw(
     unpackq
 );
 
-#-- load the modules -----------------------------------------------------------
+
 
 use Carp;
 
@@ -43,7 +43,7 @@ use Kafka qw(
 );
 use Kafka::Exceptions;
 
-#-- declarations ---------------------------------------------------------------
+
 
 =head1 SYNOPSIS
 
@@ -258,7 +258,7 @@ L<https://github.com/TrackingSoft/Kafka>
 
 =head1 AUTHOR
 
-Sergey Gladkov, E<lt>sgladkov@trackingsoft.comE<gt>
+Sergey Gladkov
 
 Please use GitHub project link above to report problems or contact authors.
 

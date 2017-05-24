@@ -1,5 +1,5 @@
 package Bio::Roary::External::GeneAlignmentFromNucleotides;
-$Bio::Roary::External::GeneAlignmentFromNucleotides::VERSION = '3.8.0';
+$Bio::Roary::External::GeneAlignmentFromNucleotides::VERSION = '3.8.2';
 # ABSTRACT: Take in multi-FASTA files of nucleotides and align each file with PRANK or MAFFT
 
 
@@ -124,7 +124,7 @@ Bio::Roary::External::GeneAlignmentFromNucleotides - Take in multi-FASTA files o
 
 =head1 VERSION
 
-version 3.8.0
+version 3.8.2
 
 =head1 SYNOPSIS
 

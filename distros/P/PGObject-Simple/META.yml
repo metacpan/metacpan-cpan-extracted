@@ -3,11 +3,12 @@ abstract: "Minimalist stored procedure mapper based on LedgerSMB's DBObject"
 author:
   - 'Chris Travers <chris.travers@gmail.com>'
 build_requires:
+  Data::Dumper: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,5 +20,5 @@ no_index:
     - inc
 requires:
   PGObject: v1.403.2
-version: v2.0.0
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: 3.000001
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

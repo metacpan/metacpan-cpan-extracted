@@ -95,7 +95,7 @@ sub http_request ($args) {
                         $args->{headers}->{HOST} = $args->{url}->host->name;
 
                         # replace COOKIE headers
-                        if ( $args->{cookie_jar} && ( my $cookies = $args->{cookie_jar}->get_cookies( $args->{url} ) ) ) {
+                        if ( $args->{cookies} && ( my $cookies = $args->{cookies}->get_cookies( $args->{url} ) ) ) {
                             $args->{headers}->{COOKIE} = join q[; ], $cookies->@*;
                         }
                         else {
@@ -202,7 +202,7 @@ sub _connect ( $args, $runtime, $cb ) {
     Pcore::AE::Handle->new(
         $args->{handle_params}->%*,
         connect                => $args->{url},
-        connect_timeout        => $args->{timeout},
+        connect_timeout        => $args->{connect_timeout} // $args->{timeout},
         timeout                => $args->{timeout},
         persistent             => $args->{persistent},
         session                => $args->{session},
@@ -331,7 +331,7 @@ sub _read_headers ( $args, $runtime, $cb ) {
                 die 'HTTP status 100, 101 are not supporteed correctly yet' if $res->{status} == 100 or $res->{status} == 101;
 
                 # parse SET_COOKIE header, add cookies
-                $args->{cookie_jar}->parse_cookies( $args->{url}, $res->{headers}->get('SET_COOKIE') ) if $args->{cookie_jar} && $res->{headers}->{SET_COOKIE};
+                $args->{cookies}->parse_cookies( $args->{url}, $res->{headers}->get('SET_COOKIE') ) if $args->{cookies} && $res->{headers}->{SET_COOKIE};
 
                 # handle redirect
                 $runtime->{redirect} = 0;

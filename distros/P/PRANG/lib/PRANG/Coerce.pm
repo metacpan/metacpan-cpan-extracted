@@ -1,5 +1,5 @@
 package PRANG::Coerce;
-$PRANG::Coerce::VERSION = '0.18';
+$PRANG::Coerce::VERSION = '0.20';
 use Moose;
 use Moose::Util::TypeConstraints;
 

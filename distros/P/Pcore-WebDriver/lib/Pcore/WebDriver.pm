@@ -1,4 +1,4 @@
-package Pcore::WebDriver v0.7.0;
+package Pcore::WebDriver v0.7.2;
 
 use Pcore -dist, -const, -role, -result,
   -export => {
@@ -271,7 +271,7 @@ sub update_all ( $self, $cb = undef ) {
 
 sub DEMOLISH ( $self, $global ) {
     if ( !$global && $self->{session_id} ) {
-        P->http->_request(
+        P->http->request(
             method  => 'DELETE',
             url     => "http://$self->{host}:$self->{port}/session/$self->{session_id}",
             timeout => 0,
@@ -355,7 +355,7 @@ sub new_firefox ( $self, %args ) {
 sub _send_command ( $self, $method, $path, $body, $cb = undef, $processing_cb = undef ) {
     my $blocking_cv = defined $cb ? undef : AE::cv;
 
-    P->http->_request(
+    P->http->request(
         method  => $method,
         url     => "http://$self->{host}:$self->{port}$path",
         timeout => 0,
@@ -1022,8 +1022,6 @@ JS
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 | 164, 203, 242        | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 274, 358             | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 355                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|

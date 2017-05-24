@@ -46,26 +46,26 @@ ok($list && $list->refPlAssocList->Prim->payload eq 'pay1',
 	'got data from associated table');
 DBC::List->update({ref => 33}, {id => 1});
 ($query, $bind) = TestConnector::query();
-ok($query eq 'update list set ref = ?  WHERE ( id = ? )' && $bind eq "'33','1'",
+ok($query eq 'update list set "ref" = ?  WHERE ( id = ? )' && $bind eq "'33','1'",
 	'table update');
 $list->ref("simple text");
 $list->update;
 ($query, $bind) = TestConnector::query();
-ok( $query eq 'update list set ref = ? where id = ?'
+ok( $query eq 'update list set "ref" = ? where id = ?'
 	  && $bind eq "'simple text','1'",
 	'table update column'
 );
 $list->ref(\"ref || 'simple text'");
 $list->update;
 ($query, $bind) = TestConnector::query();
-ok( $query eq "update list set ref = ref || 'simple text' where id = ?"
+ok( $query eq "update list set \"ref\" = ref || 'simple text' where id = ?"
 	  && $bind eq "'1'",
 	'table update column literal'
 );
 $list->ref([\"ref || ?", "simple text"]);
 $list->update;
 ($query, $bind) = TestConnector::query();
-ok( $query eq "update list set ref = ref || ? where id = ?"
+ok( $query eq "update list set \"ref\" = ref || ? where id = ?"
 	  && $bind eq "'simple text','1'",
 	'table update column literal with param'
 );
@@ -75,16 +75,16 @@ ok($query eq 'delete from list  WHERE ( id = ? )' && $bind eq "'1'",
 	'table delete');
 new_row("list", ref => 44);
 ($query, $bind) = TestConnector::query();
-ok($query eq 'insert into list (ref) values (?) returning id'
+ok($query eq 'insert into list ("ref") values (?) returning id'
 	  && $bind eq "'44'",
 	'table insert');
 new_row("list", ref => \44);
 ($query, $bind) = TestConnector::query();
-ok($query eq 'insert into list (ref) values (44) returning id' && $bind eq "''",
+ok($query eq 'insert into list ("ref") values (44) returning id' && $bind eq "''",
 	'table insert literal');
 new_row("list", ref => [\" 0 + ?", 44]);
 ($query, $bind) = TestConnector::query();
-ok( $query eq 'insert into list (ref) values ( 0 + ?) returning id'
+ok( $query eq 'insert into list ("ref") values ( 0 + ?) returning id'
 	  && $bind eq "'44'",
 	'table insert literal with param'
 );

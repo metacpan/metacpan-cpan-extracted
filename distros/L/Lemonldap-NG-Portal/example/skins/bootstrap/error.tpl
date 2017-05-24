@@ -8,9 +8,21 @@
     </div>
   </TMPL_IF>
 
+  <TMPL_IF ERROR404>
+    <div class="message message-negative alert">
+      <lang en="Not found: you try to access to an unavailable page" fr="Non trouv&eacute;: vous tentez d'acc&eacute;der &agrave; une page non disponible" />
+    </div>
+  </TMPL_IF>
+
   <TMPL_IF ERROR500>
     <div class="message message-negative alert">
       <lang en="Error occurs on the server" fr="Une erreur est survenue sur le serveur" />
+    </div>
+  </TMPL_IF>
+
+  <TMPL_IF ERROR502>
+    <div class="message message-negative alert">
+      <lang en="Bad gateway: unable to join remote server" fr="Mauvaise passerelle: impossible de joindre le serveur amont" />
     </div>
   </TMPL_IF>
 

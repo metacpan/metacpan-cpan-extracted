@@ -1,0 +1,135 @@
+.# Title: Condition that is a sub - top level
+.#
+.# This needs to be tested several ways due to implementation subtleties:
+.# In line and in a sub
+.# .if vs .unless vs .elseif
+.# .while vs .until vs .for
+.# .sub vs the built in directives: .include .read .test
+.# Nested vs top level loops & straight ifs
+.# In various combinations.
+.#
+.# A sub that returns its first argument:
+.sub foo RetVal a2
+.echo foo returning RetVal='\v{RetVal}' ; a2='\v{a2}'
+.return RetVal
+.done
+Done foo definition
+
+.#
+
+Test top level if: false
+.if .foo 0 bar
+Unexpected output
+.else
+Expected output
+.fi
+.#
+
+Test top level if: true
+.if .foo 1 bar
+Expected output
+.else
+Unexpected output
+.fi
+.#
+
+Test top level if: true
+.if .foo 12 bar
+Expected output
+.else
+Unexpected output
+.fi
+.#
+
+Test top level if: true
+.if .foo someString bar
+Expected output
+.else
+Unexpected output
+.fi
+
+The same again but .unless instead of .if
+
+Test top level unless: false
+.unless .foo 0 bar
+Expected output
+.else
+Unexpected output after .else
+.fi
+.#
+
+Test top level unless: true
+.unless .foo 1 bar
+Unexpected output after .unless
+.else
+Expected output
+.fi
+.#
+
+Test top level unless: true
+.unless .foo 12 bar
+Unexpected output after .unless
+.else
+Expected output
+.fi
+.#
+
+Test top level unless: true
+.unless .foo someString bar
+Unexpected output after .unless
+.else
+Expected output
+.fi
+
+Again, but the test in .elseif
+Test top level elseif: false
+.if 0
+Unexpected after .if 0
+.elseif .foo 0 bar
+Unexpected output after .elseif
+.else
+Expected output
+.fi
+.#
+
+Test top level elseif: true
+.if 0
+Unexpected after .if 0
+.elseif .foo 1 bar
+Expected output
+.else
+Unexpected output after .else
+.fi
+.#
+
+Test top level elseif: true
+.if 0
+Unexpected after .if 0
+.elseif .foo 12 bar
+Expected output
+.else
+Unexpected output after .else
+.fi
+.#
+
+Test top level elseif: true
+.if 0
+Unexpected after .if 0
+.elseif .foo someString bar
+Expected output
+.else
+Unexpected output after .else
+.fi
+.#
+
+Test top level elseif: false, true
+.if 0
+Unexpected after .if 0
+.elseif .foo 0 bar
+Unexpected output after .elseif .foo 0 bar
+.elseif .foo 1 bar
+Expected output
+.else
+Unexpected output after .else
+.fi
+EOF

@@ -15,7 +15,7 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw(%DEFAULT_BEHAVIOR);
 
 our %DEFAULT_BEHAVIOR;
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 my @snam = split ' ', $Config{sig_name};
 my @snum = split ' ', $Config{sig_num};
@@ -333,8 +333,10 @@ __WARN__ [] => IGNORE
 
 [aix]
 AIO	[]   => IGNORE
+IOINT   []   => IGNORE
 POLL	[]   => IGNORE
 SEGV    [11] => TERMINATE 11
+URG	[]   => URG
 
 [cygwin]
 ABRT    [6] => TERMINATE 134
@@ -384,6 +386,9 @@ EMT    [7] => TERMINATE 7
 SEGV   [11] => TERMINATE 11
 IO     [] => IGNORE
 IOT    [6] => TERMINATE 6
+TSTP    [18] => IGNORE
+TTIN    [21] => IGNORE
+TTOU    [22] => IGNORE
 
 # www.cpantesters.org/cpan/report/4b99dd2a-e60f-11df-bb29-ad544afd17af
 [dragonfly]
@@ -400,6 +405,9 @@ EMT [7] => TERMINATE 135
 SEGV [11] => TERMINATE 139
 IO [] => IGNORE
 IOT [] => TERMINATE 134
+TSTP [] => IGNORE
+TTIN [] => IGNORE
+TTOU [] => IGNORE
 
 [gnukfreebsd]
 ABRT [6] => TERMINATE 134
@@ -408,6 +416,9 @@ SEGV [11] => TERMINATE 139
 IO [23] => IGNORE
 IOT [] => TERMINATE 134
 POLL [23] => IGNORE
+TSTP [] => IGNORE
+TTIN [] => IGNORE
+TTOU [] => IGNORE
 
 # www.cpantesters.org/cpan/report/c8635a72-e5d6-11df-a833-d9c7245fd73a
 [irix]
@@ -431,6 +442,9 @@ EMT [7] => TERMINATE 135
 SEGV [11] => TERMINATE 139
 IO [] => IGNORE
 IOT [6] = TERMINATE 134
+TSTP [] => IGNORE
+TTIN [] => IGNORE
+TTOU [] => IGNORE
 
 [openbsd]
 ILL [4] => TERMINATE 132

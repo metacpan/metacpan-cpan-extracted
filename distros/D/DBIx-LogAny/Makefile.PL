@@ -28,6 +28,7 @@ $user = $opt->{user} if (exists($opt->{user}));
 $password = $opt->{password} if (exists($opt->{password}));
 $table = $opt->{table} if (exists($opt->{table}));
 
+$dsn ||= "dbi:DBM:";
 $table ||= 'drop_me_dbixl4p';
 
 open OUT, ">dbixl4p.config";
@@ -52,7 +53,8 @@ WriteMakefile(
         File::Spec => 0,
         Data::Dumper => 0,
         Test::More => 0.62,
-        Module::Loaded => 0},
+        Module::Loaded => 0,
+        Scalar::Util => 0},
     META_MERGE => {
         resources => {
             bugtracker => 'http://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-LogAny',

@@ -1,4 +1,4 @@
-package Pcore::Sphinx v0.7.1;
+package Pcore::Sphinx v0.8.0;
 
 use Pcore -dist, -class, -try;
 

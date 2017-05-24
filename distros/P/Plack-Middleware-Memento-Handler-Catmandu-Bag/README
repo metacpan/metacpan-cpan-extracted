@@ -1,0 +1,16 @@
+NAME
+
+    Plack::Middleware::Memento::Handler::Catmandu::Bag - Connect
+    Plack::App::Catmandu::Bag to Plack::Middleware::Memento
+
+SYNOPSIS
+
+        builder {
+          enable 'Memento', handler => 'Catmandu::Bag', store => 'mystore', bag => 'mybag';
+          $app
+        };
+
+AUTHOR
+
+    Nicolas Steenlant <nicolas.steenlant@ugent.be>
+

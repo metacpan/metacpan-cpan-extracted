@@ -18,17 +18,17 @@ my %tests = (
         [ 'is',     'ean13',        '9781558607019'     ],
         [ 'is',     'title',        'Higher-Order Perl' ],
         [ 'is',     'author',       'Mark Jason Dominus'],
-        [ 'is',     'publisher',    'Elsevier Science & Technology'    ],
-        [ 'is',     'pubdate',      '10 Dec 2004'       ],
+        [ 'is',     'publisher',    'Morgan Kaufmann'   ],
+        [ 'is',     'pubdate',      '31 Mar 2005'       ],
         [ 'is',     'binding',      'Paperback'         ],
-        [ 'is',     'pages',        '602'               ],
+        [ 'is',     'pages',        '600'               ],
         [ 'is',     'width',        '191'               ],
         [ 'is',     'height',       '235'               ],
-        [ 'is',     'weight',       '1021'              ],
-        [ 'is',     'image_link',   'http://bookshop.blackwell.co.uk/images/jackets/l/15/1558607013.jpg' ],
-        [ 'is',     'thumb_link',   'http://bookshop.blackwell.co.uk/images/jackets/m/15/1558607013.jpg' ],
+        [ 'is',     'weight',       '1090'              ],
+        [ 'like',   'image_link',   qr!9781558607019.jpg! ],
+        [ 'like',   'thumb_link',   qr!9781558607019.jpg! ],
         [ 'like',   'description',  qr|Most Perl programmers were originally trained as C and Unix programmers,| ],
-        [ 'is',     'book_link',    'http://bookshop.blackwell.co.uk/jsp/search_results.jsp?wcp=1&quicksearch=1&cntType=&searchType=keywords&searchData=9781558607019&x=10&y=10' ]
+        [ 'like',   'book_link',    qr!9781558607019! ]
     ],
     '9780571239566' => [
         [ 'is',     'isbn',         '9780571239566'     ],
@@ -44,10 +44,10 @@ my %tests = (
         [ 'is',     'width',        129                 ],
         [ 'is',     'height',       198                 ],
         [ 'is',     'weight',       200                 ],
-        [ 'is',     'image_link',   'http://bookshop.blackwell.co.uk/images/jackets/l/05/0571239560.jpg' ],
-        [ 'is',     'thumb_link',   'http://bookshop.blackwell.co.uk/images/jackets/m/05/0571239560.jpg' ],
+        [ 'like',   'image_link',   qr!9780571239566.jpg! ],
+        [ 'like',   'thumb_link',   qr!9780571239566.jpg! ],
         [ 'like',   'description',  qr|Ian Curtis left behind a legacy rich in artistic genius| ],
-        [ 'is',     'book_link',    'http://bookshop.blackwell.co.uk/jsp/search_results.jsp?wcp=1&quicksearch=1&cntType=&searchType=keywords&searchData=9780571239566&x=10&y=10' ]
+        [ 'like',   'book_link',    qr!9780571239566! ]
     ],
 );
 

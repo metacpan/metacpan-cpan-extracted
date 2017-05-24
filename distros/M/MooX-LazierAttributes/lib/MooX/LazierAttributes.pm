@@ -5,7 +5,7 @@ use warnings;
 use Scalar::Util qw/reftype blessed/;
 use MooX::ReturnModifiers qw/return_modifiers/;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use constant ro       => 'ro';
 use constant is_ro    => ( is => ro );
@@ -77,7 +77,7 @@ sub _clone {
 
 sub _deep_clone {
     my ($to_clone) = @_;
-    my $rt = reftype($to_clone) // reftype(\$to_clone);
+    my $rt = reftype($to_clone) || reftype(\$to_clone);
     $rt eq 'SCALAR' and return $to_clone;
     $rt eq 'HASH'   and return { map +( $_ => _clone( $to_clone->{$_} ) ), keys %$to_clone };
     $rt eq 'ARRAY'  and return [ map _clone($_), @$to_clone ];
@@ -94,7 +94,7 @@ MooX::LazierAttributes - Lazier Attributes.
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 

@@ -29,5 +29,5 @@ requires:
   Mouse: '0'
   Test::More: '0'
   URI::Escape: '0'
-version: v0.1.2
+version: v0.1.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

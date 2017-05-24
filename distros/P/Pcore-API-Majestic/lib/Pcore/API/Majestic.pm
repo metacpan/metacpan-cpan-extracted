@@ -1,4 +1,4 @@
-package Pcore::API::Majestic v0.9.1;
+package Pcore::API::Majestic v0.10.2;
 
 use Pcore -dist, -class, -const, -result, -export => { CONST => [qw[$MAJESTIC_INDEX_FRESH $MAJESTIC_INDEX_HISTORIC]] };
 
@@ -131,29 +131,26 @@ sub _request ( $self, $url_params, $cb ) {
 
     P->http->get(
         $url,
-        timeout   => 180,
-        bind_ip   => $self->bind_ip,
-        on_finish => sub ($res) {
-            my $api_res;
-
-            if ( $res->status != 200 ) {
-                $api_res = result [ $res->status, $res->reason ];
+        timeout    => 30,
+        persistent => 0,
+        bind_ip    => $self->bind_ip,
+        on_finish  => sub ($res) {
+            if ( !$res ) {
+                $cb->( result [ $res->status, $res->reason ] );
             }
             else {
                 my $json = eval { P->data->from_json( $res->body->$* ); };
 
                 if ($@) {
-                    $api_res = result [ 999, 'Invalid JSON body' ];
+                    $cb->( result [ 500, 'Error decoding response' ] );
                 }
                 elsif ( $json->{Code} ne 'OK' ) {
-                    $api_res = result [ 999, $json->{ErrorMessage} ];
+                    $cb->( result [ 400, $json->{ErrorMessage} ] );
                 }
                 else {
-                    $api_res = result 200, $json;
+                    $cb->( result 200, $json );
                 }
             }
-
-            $cb->($api_res);
 
             return;
         },

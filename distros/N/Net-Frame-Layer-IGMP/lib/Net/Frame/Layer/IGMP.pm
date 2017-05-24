@@ -4,7 +4,7 @@
 package Net::Frame::Layer::IGMP;
 use strict; use warnings;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use Net::Frame::Layer qw(:consts :subs);
 use Exporter;
@@ -62,6 +62,10 @@ sub new {
    );
 }
 
+sub v3query {
+    return new(@_)
+}
+
 sub v3report {
    shift->SUPER::new(
       type         => NF_IGMP_TYPE_REPORTv3,
@@ -72,6 +76,24 @@ sub v3report {
       @_,
    );
 }
+
+sub match {
+   my $self = shift;
+   my ($with) = @_;
+   my $sType = $self->type;
+   my $wType = $with->type;
+   if ($sType eq NF_IGMP_TYPE_QUERY
+   &&  ( ($wType eq NF_IGMP_TYPE_REPORTv1)
+      || ($wType eq NF_IGMP_TYPE_REPORTv2)
+      || ($wType eq NF_IGMP_TYPE_REPORTv3)) ) {
+      return 1;
+   }
+   0;
+}
+
+# XXX: may be better, by keying on type also
+sub getKey        { shift->layer }
+sub getKeyReverse { shift->layer }
 
 sub getLength { 8 }
 
@@ -223,7 +245,7 @@ Net::Frame::Layer::IGMP - Internet Group Management Protocol layer object
    );
 
    # v3 Report
-   my $layer = Net::Frame::Layer::IGMP->new(
+   my $layer = Net::Frame::Layer::IGMP->v3report(
       type         => NF_IGMP_TYPE_REPORTv3,
       maxResp      => 0,
       checksum     => 0,
@@ -295,25 +317,31 @@ The following are inherited attributes. See B<Net::Frame::Layer> for more inform
 
 =item B<new> (hash)
 
+=item B<v3query>
+
+=item B<v3query> (hash)
+
 Object constructor. You can pass attributes that will overwrite default ones. See B<SYNOPSIS> for default values.
 
 =item B<v3report>
 
 =item B<v3report> (hash)
 
-Object constructor. You can pass attributes that will overwrite default ones. Default values:
-
-   my $layer = Net::Frame::Layer::IGMP->new(
-      type         => NF_IGMP_TYPE_REPORTv3,
-      maxResp      => 0,
-      checksum     => 0,
-      reserved     => 0,
-      numGroupRecs => 0,
-   );
+Object constructor. You can pass attributes that will overwrite default ones. See B<SYNOPSIS> for default values.
 
 =item B<computeChecksums>
 
 Computes the IGMP checksum.
+
+=item B<getKey>
+
+=item B<getKeyReverse>
+
+These two methods are basically used to increase the speed when using B<recv> method from B<Net::Frame::Simple>. Usually, you write them when you need to write B<match> method.
+
+=item B<match> (Net::Frame::Layer::IGMP object)
+
+This method is mostly used internally. You pass a B<Net::Frame::Layer::IGMP> layer as a parameter, and it returns true if this is a response corresponding for the request, or returns false if not.
 
 =back
 

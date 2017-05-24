@@ -28,11 +28,12 @@ if (
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile(
-    NAME           => 'Image::Sane',
-    VERSION_FROM   => 'lib/Image/Sane.pm',    # finds $VERSION
-    PREREQ_PM      => {},                     # e.g., Module::Name => 1.1
-    BUILD_REQUIRES => {
+    NAME          => 'Image::Sane',
+    VERSION_FROM  => 'lib/Image/Sane.pm',    # finds $VERSION
+    PREREQ_PM     => {},                     # e.g., Module::Name => 1.1
+    TEST_REQUIRES => {
         Test::More => 0,
+        Readonly   => 0,
     },
     clean => { FILES    => '$(SOURCE_TIDY)' },
 #    dist  => { COMPRESS => 'xz -9', SUFFIX => '.xz', },

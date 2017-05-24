@@ -1,11 +1,13 @@
 use warnings;
 use strict;
+use English;
 use Test::More tests => 7;
 
 #########################
 
 my $scanimage_perl =
-  'PERL5LIB="blib:blib/arch:lib:\$PERL5LIB" perl examples/scanimage-perl';
+    'PERL5LIB="blib:blib/arch:lib:\$PERL5LIB" '
+  . "$EXECUTABLE_NAME examples/scanimage-perl";
 
 #########################
 

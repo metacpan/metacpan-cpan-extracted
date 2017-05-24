@@ -739,14 +739,13 @@ sub getKey {
     }
     elsif ( $key =~ qr/^$doubleHashKeys$/o ) {
         my @res;
-        if ( defined $value ) {
-            foreach my $host ( sort keys %$value ) {
-                my @tmp;
-                foreach my $k ( sort keys %{ $value->{$host} } ) {
-                    push @tmp, { k => $k, v => $value->{$host}->{$k} };
-                }
-                push @res, { k => $host, h => \@tmp };
+        $value ||= {};
+        foreach my $host ( sort keys %$value ) {
+            my @tmp;
+            foreach my $k ( sort keys %{ $value->{$host} } ) {
+                push @tmp, { k => $k, v => $value->{$host}->{$k} };
             }
+            push @res, { k => $host, h => \@tmp };
         }
         return $self->sendJSONresponse( $req, { value => \@res } );
     }

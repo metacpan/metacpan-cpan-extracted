@@ -75,7 +75,7 @@ METHODS
        );
 
 AUTHOR
-    Toby Corkindale, <mailto:tjc@cpan.org>
+    Toby Corkindale -- https://github.com/TJC/
 
 LICENSE
     This module is released under the Perl Artistic License 2.0:

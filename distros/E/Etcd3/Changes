@@ -1,11 +1,27 @@
 Revision history for Etcd3
+0.006
+[ ENHANCEMENTS ]
+  * Sweeping changes to usage some not backwards compatible, sorry.
+  * Restructuring of classes to consolidate and reduce redundancy, see d323feb5c0.
+  * Replaced HTTP::Tiny with AnyEvent::HTTP allowing async interaction with etcd.
+  * Simplified the internal way $etcd object is initialized.  Replacing ->connect with ->new, also moving ::Client into Etcd3 module.
+  * Renamed _client accessor to etcd.
+  * Make Etcd3::KV a Moo::Role allowing easier interaction with other KV classes.
+
+
+[ BUG FIXES ]
+  * Fixed Watch support
+
+[ DOCUMENTATION ]
+  * Consolidate POD
+  * Add Watch examples.
 
 0.005
-[new]
+[ ENHANCEMENTS ]
   * Add lease support and tests
 
 0.004
-[new]
+[ ENHANCEMENTS ]
   * travis testing added
-[bug]
+[ BUG FIXES ]
   * Fix issue with HTTP::Tiny and support for Perl version where post function was not available.

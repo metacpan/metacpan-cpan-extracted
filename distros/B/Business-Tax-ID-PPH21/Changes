@@ -1,3 +1,12 @@
+0.04    2017-05-24 (PERLANCAR)
+
+	- Add function: calc_net_income_from_pph21_op.
+
+	- [ux] Show bracket rates as percent.
+
+	- [ux] Give more helpful message about unsupported year.
+
+
 0.03    2017-02-09 (PERLANCAR)
 
 	- Update for tax year 2016.

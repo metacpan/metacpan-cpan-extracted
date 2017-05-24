@@ -15,7 +15,10 @@ Special container to show hash in hash
         <tr>
           <th width="40%" trspan="keys"></th>
           <th width="40%" trspan="values"></th>
-          <th><span class="link text-success glyphicon glyphicon-plus-sign" ng-click="n.h.push({'k':'key','v':'uid'})"/></th>
+          <th>
+            <span class="link text-success glyphicon glyphicon-plus-sign" ng-click="n.h.push({'k':'key','v':'uid'})"/>
+            <span class="link text-danger glyphicon glyphicon-minus-sign" ng-click="del(currentNode.data,$index)"/>
+          </th>
         </tr>
       </thead>
       <tbody>

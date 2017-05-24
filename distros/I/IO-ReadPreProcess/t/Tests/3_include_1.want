@@ -1,0 +1,5 @@
+Line 1
+Included: _LineNumber = 2
+Included: _FileName = t/Tests/3_include_1.inc
+Included: _IncludeDepth = 2
+Line end

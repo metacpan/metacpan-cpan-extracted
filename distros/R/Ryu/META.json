@@ -90,7 +90,7 @@
          "web" : "https://github.com/team-at-cpan/Ryu"
       }
    },
-   "version" : "0.014",
+   "version" : "0.015",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
 }
 

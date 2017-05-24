@@ -1,6 +1,6 @@
 package Gearman::Taskset;
 use version ();
-$Gearman::Taskset::VERSION = version->declare("2.004.004");
+$Gearman::Taskset::VERSION = version->declare("2.004.005");
 
 use strict;
 use warnings;
@@ -418,7 +418,7 @@ sub _fail_jshandle {
 
     $task->fail($msg || "jshandle fail");
 
-    delete $self->{waiting}{$shandle} unless @$task_list;
+    delete $self->{waiting}{$shandle} unless @{$task_list};
 } ## end sub _fail_jshandle
 
 =head2 process_packet($res, $sock)
@@ -464,14 +464,14 @@ sub process_packet {
             my $shandle = $1;
 
             my $task_list = $self->{waiting}{$shandle};
-            my $task      = shift @$task_list;
+            my $task      = shift @{$task_list};
             $assert{task}->(
                 $task,
                 "task_list is empty on work_complete for handle $shandle"
             );
 
             $task->complete(\$blob);
-            delete $self->{waiting}{$shandle} unless @$task_list;
+            delete $self->{waiting}{$shandle} unless @{$task_list};
 
             return 1;
         },
@@ -511,10 +511,9 @@ sub process_packet {
             ($blob =~ /^$qr/)
                 or Carp::croak "Bogus work_exception from server";
             $blob =~ s/^$qr//;
-            my $shandle = $1;
-
+            my $shandle   = $1;
             my $task_list = $self->{waiting}{$shandle};
-            my $task      = $task_list->[0];
+            my $task      = shift @{$task_list};
             $assert{task}->(
                 $task,
                 "task_list is empty on work_exception for handle $shandle"
@@ -524,13 +523,12 @@ sub process_packet {
             # The only reason I see to do it so, is Worker->work implementation. With Gearman::Server it uses nfreeze for exception value.
             $task->exception(\Storable::freeze(\$blob));
 
+            delete $self->{waiting}{$shandle} unless @{$task_list};
+
             return 1;
         },
         work_fail => sub {
-            my ($blob) = shift;
-            my ($shandle, $msg) = split(/\0/, $blob);
-            $shandle ||= $blob;
-            $self->_fail_jshandle($shandle, "work_fail", $msg);
+            $self->_fail_jshandle(shift, "work_fail");
             return 1;
         },
         work_status => sub {
@@ -544,7 +542,7 @@ sub process_packet {
             # interested client, even if the clients are the same, so probably need
             # to fix the server not to do that.  just put this FIXME here for now,
             # though really it's a server issue.
-            foreach my $task (@$task_list) {
+            foreach my $task (@{$task_list}) {
                 $task->status($nu, $de);
             }
 

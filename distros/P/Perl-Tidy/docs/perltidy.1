@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "PERLTIDY 1"
-.TH PERLTIDY 1 "2016-03-01" "perl v5.14.2" "User Contributed Perl Documentation"
+.TH PERLTIDY 1 "2017-05-21" "perl v5.14.2" "User Contributed Perl Documentation"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -2450,7 +2450,7 @@ value specified on the \fB\-mbl=k\fR flag.
 .IP "\fB\-blbp=n\fR,  \fB\-\-blank\-lines\-before\-packages=n\fR" 4
 .IX Item "-blbp=n,  --blank-lines-before-packages=n"
 The parameter \fB\-blbp=n\fR requests that least \fBn\fR blank lines precede a package
-which does not follow a comment.  The default is <\-blbp=1>.
+which does not follow a comment.  The default is \fB\-blbp=1\fR.
 .Sp
 This parameter interacts with the value \fBk\fR of the parameter
 \&\fB\-\-maximum\-consecutive\-blank\-lines=k\fR (\fB\-mbl=k\fR) in the same way as described
@@ -2487,6 +2487,57 @@ This is negated with \fB\-nbbb\fR or  \fB\-\-noblanks\-before\-blocks\fR.
 This controls how often perltidy is allowed to add blank lines before 
 certain block types (see previous section).  The default is 8.  Entering
 a value of \fB0\fR is equivalent to entering a very large number.
+.IP "\fB\-blao=i\fR or \fB\-\-blank\-lines\-after\-opening\-block=i\fR" 4
+.IX Item "-blao=i or --blank-lines-after-opening-block=i"
+This control places a minimum of \fBi\fR blank lines \fBafter\fR a line which \fBends\fR
+with an opening block brace of a specified type.  By default, this only applies
+to the block of a named \fBsub\fR, but this can be changed (see \fB\-blaol\fR below).
+The default is not to do this (\fBi=0\fR).
+.Sp
+Please see the note below on using the \fB\-blao\fR and \fB\-blbc\fR options.
+.IP "\fB\-blbc=i\fR or \fB\-\-blank\-lines\-before\-closing\-block=i\fR" 4
+.IX Item "-blbc=i or --blank-lines-before-closing-block=i"
+This control places a minimum of \fBi\fR blank lines \fBbefore\fR a line which
+\&\fBbegins\fR with a closing block brace of a specified type.  By default, this
+only applies to the block of a named \fBsub\fR, but this can be changed (see
+\&\fB\-blbcl\fR below).  The default is not to do this (\fBi=0\fR).
+.IP "\fB\-blaol=s\fR or \fB\-\-blank\-lines\-after\-opening\-block\-list=s\fR" 4
+.IX Item "-blaol=s or --blank-lines-after-opening-block-list=s"
+The parameter \fBs\fR is a list of block type keywords to which the flag \fB\-blao\fR
+should apply.  The section \*(L"Specifying Block Types\*(R" explains how to list
+block types.
+.IP "\fB\-blbcl=s\fR or \fB\-\-blank\-lines\-before\-closing\-block\-list=s\fR" 4
+.IX Item "-blbcl=s or --blank-lines-before-closing-block-list=s"
+This parameter is a list of block type keywords to which the flag \fB\-blbc\fR
+should apply.  The section \*(L"Specifying Block Types\*(R" explains how to list
+block types.
+.IP "Note on using the \fB\-blao\fR and \fB\-blbc\fR options." 4
+.IX Item "Note on using the -blao and -blbc options."
+These blank line controls introduce a certain minimum number of blank lines in
+the text, but the final number of blank lines may be greater, depending on
+values of the other blank line controls and the number of old blank lines.  A
+consequence is that introducing blank lines with these and other controls
+cannot be exactly undone, so some experimentation with these controls is
+recommended before using them.
+.Sp
+For example, suppose that for some reason we decide to introduce one blank
+space at the beginning and ending of all blocks.  We could do
+this using
+.Sp
+.Vb 1
+\&  perltidy \-blao=2 \-blbc=2 \-blaol=\*(Aq*\*(Aq \-blbcl=\*(Aq*\*(Aq filename
+.Ve
+.Sp
+Now suppose the script continues to be developed, but at some later date we
+decide we don't want these spaces after all. we might expect that running with
+the flags \fB\-blao=0\fR and \fB\-blbc=0\fR will undo them.  However, by default
+perltidy retains single blank lines, so the blank lines remain.
+.Sp
+We can easily fix this by telling perltidy to ignore old blank lines by
+including the added parameter \fB\-kbl=0\fR and rerunning. Then the unwanted blank
+lines will be gone.  However, this will cause all old blank lines to be
+ignored, perhaps even some that were added by hand to improve formatting. So
+please be cautious when using these parameters.
 .IP "\fB\-mbl=n\fR \fB\-\-maximum\-consecutive\-blank\-lines=n\fR" 4
 .IX Item "-mbl=n --maximum-consecutive-blank-lines=n"
 This parameter specifies the maximum number of consecutive blank lines which
@@ -3129,6 +3180,9 @@ of the keyword which introduces that block, such as \fBif\fR, \fBelse\fR, or \fB
 An exception is a labeled block, which has no keyword, and should be specified
 with just a colon.  To specify all blocks use \fB'*'\fR.
 .PP
+The keyword \fBsub\fR indicates a named sub.  For anonymous subs, use the special
+keyword \fBasub\fR.
+.PP
 For example, the following parameter specifies \f(CW\*(C`sub\*(C'\fR, labels, \f(CW\*(C`BEGIN\*(C'\fR, and
 \&\f(CW\*(C`END\*(C'\fR blocks:
 .PP
@@ -3229,31 +3283,19 @@ purpose of this rule is to prevent generating confusing filenames such as
 \&\fIperlstyle\fR\|(1), \fIPerl::Tidy\fR\|(3)
 .SH "VERSION"
 .IX Header "VERSION"
-This man page documents perltidy version 20160302.
-.SH "CREDITS"
-.IX Header "CREDITS"
-Michael Cartmell supplied code for adaptation to \s-1VMS\s0 and helped with
-v\-strings.
+This man page documents perltidy version 20170521.
+.SH "BUG REPORTS"
+.IX Header "BUG REPORTS"
+A list of current bugs and issues can be found at the \s-1CPAN\s0 site
 .PP
-Yves Orton supplied code for adaptation to the various versions
-of Windows.
-.PP
-Axel Rose supplied a patch for MacPerl.
-.PP
-Hugh S. Myers designed and implemented the initial Perl::Tidy module interface.
-.PP
-Many others have supplied key ideas, suggestions, and bug reports;
-see the \s-1CHANGES\s0 file.
-.SH "AUTHOR"
-.IX Header "AUTHOR"
-.Vb 3
-\&  Steve Hancock
-\&  email: perltidy at users.sourceforge.net
-\&  http://perltidy.sourceforge.net
+.Vb 1
+\&     https://rt.cpan.org/Public/Dist/Display.html?Name=Perl\-Tidy
 .Ve
+.PP
+To report a new bug or problem, use the link on this page.
 .SH "COPYRIGHT"
 .IX Header "COPYRIGHT"
-Copyright (c) 2000\-2012 by Steve Hancock
+Copyright (c) 2000\-2017 by Steve Hancock
 .SH "LICENSE"
 .IX Header "LICENSE"
 This package is free software; you can redistribute it and/or modify it

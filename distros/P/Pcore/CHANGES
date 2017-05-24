@@ -1,3 +1,36 @@
+v0.34.0 2017-05-23T15:46:24Z
+ - No issues on bugtracker were closed since the last release
+ - fixed invalid arguments for websocket on_pong callback
+ - websocket on_pong callback get payload as scalar instead of scalar ref
+ - Pcore::HTTP::Request removed
+ - http connect_timeout added
+ - makes http cookies support HashRef
+ - http cookie_jar renamed to cookies
+ - Pcore::HTTP::Message removed
+
+v0.33.2 2017-05-20T20:44:07Z
+ - No issues on bugtracker were closed since the last release
+ - do not block filehandle for temp CHANGES file during release
+
+v0.33.1 2017-05-20T19:49:34Z
+ - No issues on bugtracker were closed since the last release
+ - api client improved
+ - do not add . to @INC
+ - pcore.perl dist util removed
+ - pcore.perl dist mod_share removed
+ - [PAR] pack full dist share
+ - bitbucket API improved
+ - pcore.perl renamed to pcore.ini
+ - various bugs fixed
+ - ported to the new pcore.ini structure
+ - release process improved
+ - result - remove headers support
+ - scm - scm_get_changesets method added
+ - add more messages during dist release
+ - added possibility to edit changelog during release
+ - useless warnings disabled
+ - CHANGES was not updated
+
 v0.32.5 2017-05-16T15:47:19Z
  - No issues were closed since the last release
 

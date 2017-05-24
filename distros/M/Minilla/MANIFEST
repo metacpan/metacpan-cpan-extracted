@@ -61,7 +61,6 @@ t/00_compile.t
 t/01_load_all.t
 t/03_step.t
 t/05_metadata.t
-t/Util.pm
 t/bumpversion.t
 t/cli/build.t
 t/cli/clean.t
@@ -76,6 +75,7 @@ t/dist/Acme-FooXS.dat
 t/filegatherer.t
 t/filegatherer/submodules-recursive.t
 t/gitignore.t
+t/lib/Util.pm
 t/migrate/changes.t
 t/migrate/dzil.t
 t/migrate/dzil/Acme-Dzil/dist.ini

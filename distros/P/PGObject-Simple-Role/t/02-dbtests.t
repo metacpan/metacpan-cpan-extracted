@@ -37,6 +37,14 @@ sub _get_prefix {
      return 'foo';
 };
 
+package test3;
+use Moo;
+with 'PGObject::Simple::Role';
+
+sub _get_dbh {
+    return 1;
+}
+
 
 package main;
 use Test::More;
@@ -57,7 +65,7 @@ $dbh1->do('CREATE DATABASE pgobject_test_db');
 our $dbh = DBI->connect('dbi:Pg:dbname=pgobject_test_db', 'postgres');
 plan skip_all => 'No db connection' unless $dbh;
 
-plan tests => 17;
+plan tests => 27;
 
 $dbh->do('
    CREATE FUNCTION public.foobar (in_foo text, in_bar text, in_baz int, in_id int)
@@ -78,13 +86,16 @@ $dbh->do('
           SELECT char_length($1) + char_length($2) + $3 * $4;
       $$;
 ') ;
-
-my ($result) = test->call_dbmethod(
+my $result;
+lives_ok { $result = test->call_dbmethod(
               funcname => 'foobar', 
                   args => {id => 3, foo => 'test1', bar => 'test2', baz => 33},
-);
+)} 'Able to call without instantiating';
 is($result->{foobar}, 109, 'Correct Result, direct package call to call_dbmethod');
 my $obj = test->new(id => 3, foo => 'test1', bar => 'test2', baz => 33);
+
+is($obj->_dbh, $dbh, 'Got correct dbh for obj via semiprivate attribute');
+is($obj->dbh, $dbh, 'Got correct dbh for obj via public reader');
 
 ($result) = $obj->call_dbmethod(funcname => 'foobar');
 is($result->{foobar}, 109, 'Correct Result, no argument overrides');
@@ -115,6 +126,7 @@ is($result->{foobar}, 13, 'Correct result, argument overrides');
 throws_ok{$obj->call_dbmethod(funcname => 'foobar', dbh => $dbh1)} qr/No such function/, 'No such function thrown using wrong db';
 
 $obj = test2->new(id => 3, foo => 'test1', bar => 'test2', baz => 33);
+is($obj->funcprefix, 'foo', 'public printer returns correct value');
 
 ($result) = $obj->call_dbmethod(funcname => 'bar');
 
@@ -137,6 +149,17 @@ is($result->{foobar}, 26, 'Correct result, argument overrides');
 
 throws_ok{$obj->call_dbmethod(funcname => 'bar', dbh => $dbh1)} qr/No such function/, 'No such function thrown using wrong db';
 
+dies_ok { test3->new()->_dbh } 'test3 has a bad _get_dbh function, dies by default';
+
+dies_ok { test3->new()->dbh } 'test3 has a bad _get_dbh function, dies by default getting dbh';
+
+lives_ok { $obj = test3->new(_DBH => $dbh) } 'test3 has a bad _get_dbh function, but can set dbh via _DBH';
+
+is($obj->dbh, $dbh, 'Got correct dbh back from _DBH');
+
+lives_ok { $obj = test3->new(_dbh => $dbh) } 'test3 has a bad _get_dbh function, but can set via _dbh';
+
+is($obj->dbh, $dbh, 'Got correct dbh back from _dbh');
 # Teardown connections
 $dbh->disconnect;
 $dbh1->do('DROP DATABASE pgobject_test_db');

@@ -29,8 +29,7 @@ So you have to be thinking, there must be some way to tie data into this templat
 
     use Moo;
     extends 'Catalyst::View::Template::Lace';
-    with 'Template::Lace::ModelRole',
-      'Template::Lace::Model::AutoTemplate';
+    with 'Template::Lace::Model::AutoTemplate';
 
     has [qw/age name motto/] => (is=>'ro', required=>1);
 
@@ -46,7 +45,7 @@ So you have to be thinking, there must be some way to tie data into this templat
 
 When this view class gets used (for example in a Catalyst controller as given below) the method process_dom is called and is passed a  DOM version of the template.  You can then run directives on it to change the DOM and bind it to instance data associated with an instance of the view class.  In the example above we could translate the commands in process_dom to something like: "Find the first tag 'dl' that has an id of 'user', and then find the three tags with an id of 'age', 'name', and 'motto' respectively.  For each of those three tags set the content value to be the value of attributes 'age', 'name', and 'motto'."
 
-Unlike a more traditional template system like Template::Toolkit, we don't mix display logic into the template.  Instead we have a separate class that contains those instructions.  By default this class is the same as the View class, although you can set the 'model_class' attribute to point to any class that does L<Template::Lace::ModelRole>. The upside of this approach is you end up with very clean templates, and you can express your view logic in a full language like Perl instead of whatever mini language your template system supports.  The possible downsides can include an initial higher learning curve and the possibility your display logic gets complex and hard to match to the template (although good use of components I think will reduce this problem significantly; as shown below).  Lets see how you might call this view class from a controller in Catalyst:
+Unlike a more traditional template system like Template::Toolkit, we don't mix display logic into the template.  Instead we have a separate class that contains those instructions.  By default this class is the same as the View class, although you can set the 'model_class' attribute to point to any class that does the expected interface. The upside of this approach is you end up with very clean templates, and you can express your view logic in a full language like Perl instead of whatever mini language your template system supports.  The possible downsides can include an initial higher learning curve and the possibility your display logic gets complex and hard to match to the template (although good use of components I think will reduce this problem significantly; as shown below).  Lets see how you might call this view class from a controller in Catalyst:
 
     package MyApp::Controller::User;
 
@@ -132,8 +131,7 @@ The main view class for this template is just handling the bit where we layout t
 
     use Moo;
     extends 'Catalyst::View::Template::Lace';
-    with 'Template::Lace::ModelRole',
-      'Template::Lace::Model::AutoTemplate';
+    with 'Template::Lace::Model::AutoTemplate';
 
     has [qw/form items copywrite/] => (is=>'ro', required=>1);
 
@@ -156,7 +154,7 @@ So this is matching the tag 'ol' with an id of 'todos' and filling it with the l
 
 You might have noticed this view class added a new method compared to the earlier example C<prepare_dom>.  Generally when you render a response what you care about is all the things that are unique to that response.  However sometimes you want to add a few static things to your template, things that never change on a per result basis.  Or maybe you want to prerender somethign that's expensive and you don't want the overhead for each request.  In that case you can modify the base DOM using C<prepare_dom>, which gets called only once at application startup. Since each request gets a clone of the base DOM for the template, anything you change in C<prepare_dom> becomes part of all your responses for this view.  In this example we added a C<meta> tag to the template head which contains some useful debugging information.
 
-So what about the components such as 'view-master', and 'view-footer'?  There's a few different ways to declare components in L<Template::Lace> (at core a component is just an object that expects methods 'create' and 'process_dom') but for the L<Catalyst> adaptor we added the ability to use any existing view (that does L<Template::Lace::ModelRole>) as a component.  This makes organizing your components for reuse easy and takes good advantage of Catalyst features.  Lets start by looking at an simple component, C<view-footer>.  This was declared in the core template with the following line:
+So what about the components such as 'view-master', and 'view-footer'?  There's a few different ways to declare components in L<Template::Lace> (at core a component is just an object that expects methods 'create' and 'process_dom') but for the L<Catalyst> adaptor we added the ability to use any existing view as a component.  This makes organizing your components for reuse easy and takes good advantage of Catalyst features.  Lets start by looking at an simple component, C<view-footer>.  This was declared in the core template with the following line:
 
     <view-footer copydate='$.copywrite' />
 
@@ -171,7 +169,6 @@ And the View class for this looks like:
     use Moo;
 
     extends 'Catalyst::View::Template::Lace';
-    with 'Template::Lace::ModelRole';
 
     has copydate => (is=>'ro', required=>1);
 
@@ -206,7 +203,6 @@ Lets look at a somewhat more complex component, 'view-form'.  Here's the class:
 
     use Moo;
     extends 'Catalyst::View::Template::Lace';
-    with 'Template::Lace::ModelRole';
 
 
     has [qw/id fif errors content/] => (is=>'ro', required=>0);
@@ -233,7 +229,6 @@ Now, this component is different from the view-footer component since it contain
     use Patterns::UndefObject::maybe;
 
     extends 'Catalyst::View::Template::Lace';
-    with 'Template::Lace::ModelRole';
 
     has [qw/id label name type container model/] => (is=>'ro');
 
@@ -310,7 +305,6 @@ So this component declares four arguments, but how are the values for these argu
 
     use Moo;
     extends 'Catalyst::View::Template::Lace';
-    with 'Template::Lace::ModelRole';
 
     has title => (is=>'ro', required=>1);
     has css => (is=>'ro', required=>1);

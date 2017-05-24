@@ -5,7 +5,7 @@ use warnings;
 use Dancer2::Plugin;
 use Dancer2::Plugin::Cart::InlineViews;
 use JSON;
-our $VERSION = '0.0013';  #Version
+our $VERSION = '1.0000';  #Version
 
 
 BEGIN{
@@ -30,12 +30,6 @@ BEGIN{
   has 'cart_receipt_template' => (
     is => 'ro',
     from_config => 'views.receipt',
-    default => sub {}
-  );
-
-  has 'cart_checkout_template' => (
-    is => 'ro',
-    from_config => 'views.checkout',
     default => sub {}
   );
 
@@ -76,17 +70,19 @@ BEGIN{
   );
 
   plugin_keywords qw/ 
-    products
+    adjustments
+    billing
     cart
     cart_add
     cart_add_item
-    clear_cart
-    subtotal
-    billing
-    shipping
     checkout
+    clear_cart
     close_cart
-    adjustments
+    products
+    quantity
+    subtotal
+    shipping
+    total
   /;
 
   plugin_hooks qw/
@@ -96,8 +92,6 @@ BEGIN{
     validate_cart_add_params
     before_cart_add
     after_cart_add
-    before_cart_add_item
-    after_cart_add_item
     validate_shipping_params
     before_shipping
     after_shipping
@@ -105,15 +99,15 @@ BEGIN{
     before_billing
     after_billing
     validate_checkout_params
-    before_checkout
     checkout
-    after_checkout
     before_close_cart
     after_close_cart
     before_clear_cart
     after_clear_cart
     before_subtotal
     after_subtotal
+    before_total
+    after_total
     adjustments
   /;
 }
@@ -395,6 +389,22 @@ sub cart {
   return $ec_cart;
 };
 
+sub quantity {
+  my ($self, $params) = @_;
+  my $app = $self->app;
+
+  $self->execute_hook ('plugin.cart.before_quantity');
+  my $ec_cart = $app->session->read('ec_cart');
+  my $quantity = 0;
+  foreach my $item_quantity ( @{ $ec_cart->{cart}->{items} } ){
+    $quantity += $item_quantity->{ec_quantity} if $item_quantity->{ec_quantity};
+  }
+  $ec_cart->{cart}->{quantity} = $quantity;
+  $app->session->write('ec_cart',$ec_cart);
+  $self->execute_hook ('plugin.cart.after_quantity');
+  $ec_cart = $app->session->read('ec_cart');
+  $ec_cart->{cart}->{quantity};
+}
 
 sub subtotal{
   my ($self, $params) = @_;
@@ -450,14 +460,11 @@ sub cart_add {
       $self->app->redirect( $app->request->referer || $app->request->uri  );
     }
     else{
-      $app->execute_hook( 'plugin.cart.before_cart_add_item' );
       $product = $self->cart_add_item({
           ec_sku => $ec_cart->{add}->{form}->{'ec_sku'},
           ec_quantity => $ec_cart->{add}->{form}->{'ec_quantity'},
         }
       );
-      $app->execute_hook( 'plugin.cart.after_cart_add_item' );
-
       #Cart operations after adding product to the cart
       $app->execute_hook( 'plugin.cart.after_cart_add' );
       $ec_cart = $app->session->read('ec_cart');
@@ -531,10 +538,11 @@ sub checkout{
     $app->execute_hook( 'plugin.cart.checkout' ); 
     $ec_cart = $app->session->read('ec_cart');
     if ( $ec_cart->{checkout}->{error} ){
-      $app->redirect( $app->request->referer || $app->request->uri  );
+      $app->redirect( $app->request->referer || $app->request->uri );
     }
-    $self->close_cart;
-    $app->execute_hook( 'plugin.cart.after_checkout' );
+    else{
+      $self->close_cart;
+    }
   }
 }
 
@@ -577,15 +585,17 @@ sub adjustments {
 sub total {
   my ($self) = shift;
   my $app = $self->app;
-  my $total = 0;
+  $app->execute_hook('plugin.cart.before_total');
   my $ec_cart = $app->session->read('ec_cart');
+  my $total = 0;
   $total += $ec_cart->{cart}->{subtotal};
   foreach my $adjustment ( @{$ec_cart->{cart}->{adjustments}}){
     $total += $adjustment->{value};
   }
   $ec_cart->{cart}->{total} = $total;
   $app->session->write('ec_cart', $ec_cart );
-  return $total;
+  $app->execute_hook('plugin.cart.after_total');
+  return $ec_cart->{cart}->{total};
 }
 
 
@@ -641,15 +651,23 @@ The script is create_cart_views and needs to be run on the root directory of the
 =item C<Options>
 
     products_view_template
+      - Define a template to use to show the products 
     cart_view_template
+      - Define a template to use to show cart info 
     cart_receipt_template
-    cart_checkout_template
+      - Define a template to use to show receipts 
     shipping_view_template
+      - Define a template to use to show shipping form 
     billing_view_template
+      - Define a template to use to show billing form 
     review_view_template
+      - Define a template to use to show review page 
     receipt_view_template
+      - Define a template to use to show receipt page 
     default_routes
-    excluded_routes 
+      - default 1, to exclude all routes, set to 0
+    excluded_routes
+      - Array defining the routes to be excluded.
 
 =back
 
@@ -710,25 +728,45 @@ Return the list of products and fill the ec_cart->{products} session variable.
 
 Return a ec_cart Hashref with the updated info.
 
+Use: subtotal, quantity, and total keywords
+
+Call hooks: before_cart, after_cart
+
 =head2 cart_add
 
 Add product to the cart
 
+Process cart_add form and check errors on session('ec_cart')->{add}->{error}
+
+Delete session('ec_cart')->{add} after success 
+
+Call hooks: validate_cart_add_params, before_cart_add, after_cart_add
+
 =head2 cart_add_item
 
-Add an item to the cart
+Check if the product exists, adn add/sub the quantity
 
-=head2 cart_items
+Calculate ec_subtotal for each item
 
-List the cart_items
+Return product added
 
 =head2 clear_cart
 
-Clear session variable
+Delete ec_cart session variable
+
+Call hooks: before_clear_cart, after_clear_cart
 
 =head2 subtotal
 
-Calculate and return the subtotal (sum the subtotals of each product)
+Calculate and return the subtotal (sum of ec_subtotal of each product)
+
+Call hooks: before_subtotal, after_subtotal
+
+=head2 quantity
+
+Calculate and return the quantity (sum of ec_quantity of each product)
+
+Call hooks: before_quantity, after_quantity
 
 =head2 billing
 
@@ -736,27 +774,37 @@ Load the ec_cart structure and check if there is any error on ec_cart->{billing}
 
 In case of error, the user is redirected to the billing route, other wise pass to the 
 
+Call hooks: validate_billing_params, before_bililng, after_billing_
+
 =head2 shipping
 
 Load the ec_cart structure and check if there is any error on ec_cart->{shipping}->{error}
 
 In case of error, the user is redirected to the shipping route.
 
+Call hooks: validate_shipping_params, before_shipping, after_shipping
+
 =head2 checkout
 
 Load the ec_cart structure check if there is any error on ec_cart->{checkout}->{error};
+
+Call hook: checkout
 
 =head2 close_cart
 
 Add status 1 to the ec_cart structure.
 
+Call hooks: before_close_cart and after_close_cart
+
 =head2 adjustments
 
 Add default adjustments to the ec_cart structure. The default adjustments are:  Discounts, Shipping, Taxes.
+Call hook adjustments
 
 =head1 HOOKS
 
-Hooks are called before|after|as a function.
+Hooks are called before|after|as a function.  The purpose of the hooks is to manipulate the data structure 
+defined to ec_cart.
 
 =head2 before_cart
 
@@ -767,10 +815,6 @@ Hooks are called before|after|as a function.
 =head2 before_cart_add
 
 =head2 after_cart_add
-
-=head2 before_cart_add_item
-
-=head2 after_cart_add_item
 
 =head2 validate_shipping_params
 
@@ -786,13 +830,9 @@ Hooks are called before|after|as a function.
 
 =head2 validate_checkout_params
 
-=head2 before_checkout
-
 =head2 checkout
 
 To implement the checkout step.
-
-=head2 after_checkout
 
 =head2 before_close_cart
 
@@ -802,13 +842,17 @@ To implement the checkout step.
 
 =head2 after_clear_cart
 
-=head2 before_item_subtotal
-
-=head2 after_item_subtotal
-
 =head2 before_subtotal
 
 =head2 after_subtotal
+
+=head2 before_quantity
+
+=head2 after_quantity
+
+=head2 before_total
+
+=head2 after_total
 
 =head2 adjustments
 

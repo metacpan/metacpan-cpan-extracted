@@ -19,17 +19,18 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Complete::Bash" => "0.27",
     "Parse::CommandLine" => 0,
+    "Text::ParseWords" => 0,
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Bencher::Backend" => "1.034",
+    "Bencher::Backend" => "1.036",
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.06",
+  "VERSION" => "0.07",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,13 +38,14 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Bencher::Backend" => "1.034",
+  "Bencher::Backend" => "1.036",
   "Complete::Bash" => "0.27",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Parse::CommandLine" => 0,
   "Test::More" => 0,
+  "Text::ParseWords" => 0,
   "strict" => 0,
   "warnings" => 0
 );

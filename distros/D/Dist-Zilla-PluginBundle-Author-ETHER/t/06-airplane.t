@@ -23,6 +23,7 @@ use Test::Needs 'Dist::Zilla::Plugin::BlockRelease';
 use Test::File::ShareDir -share => { -dist => { 'Dist-Zilla-PluginBundle-Author-ETHER' => 'share' } };
 
 $ENV{FAKE_RELEASE} = 1;
+$ENV{DZIL_ANY_PERL} = 1;
 
 my $tzil;
 my @warnings = warnings {

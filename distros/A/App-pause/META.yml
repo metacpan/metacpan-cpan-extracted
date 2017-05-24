@@ -30,7 +30,7 @@ requires:
   Scalar::Util: '0'
   Scalar::Util::Numeric: '0'
   Time::Duration::Parse::AsHash: '0'
-  WWW::PAUSE::Simple: '0.34'
+  WWW::PAUSE::Simple: '0.38'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -38,7 +38,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-pause
   homepage: https://metacpan.org/release/App-pause
   repository: git://github.com/perlancar/perl-App-pause.git
-version: '0.59'
+version: '0.60'
 x_Dist_Zilla:
   perl:
     version: '5.024000'
@@ -110,7 +110,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.54'
+      version: '0.55'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -135,6 +135,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::CheckMetaResources
       name: '@Author::PERLANCAR/CheckMetaResources'
       version: '0.001'
+    -
+      class: Dist::Zilla::Plugin::CopyrightYearFromGit
+      name: '@Author::PERLANCAR/CopyrightYearFromGit'
+      version: '0.003'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
@@ -262,7 +266,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.75'
+              version: '0.76'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'
@@ -278,7 +282,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.05'
+              version: '0.06'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -346,6 +350,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Prereqs::CheckCircular
       name: '@Author::PERLANCAR/Prereqs::CheckCircular'
       version: '0.003'
+    -
+      class: Dist::Zilla::Plugin::PruneFiles
+      name: 'PruneFiles additional'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:

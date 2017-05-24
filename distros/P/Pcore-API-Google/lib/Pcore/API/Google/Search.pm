@@ -1,25 +1,20 @@
 package Pcore::API::Google::Search;
 
-use Pcore -class;
+use Pcore -class, -const;
 use Pcore::API::Google;
+use Pcore::HTTP qw[http_get];
 
 has max_threads => ( is => 'ro', isa => PositiveInt, default => 1 );
 has anticaptcha_key => ( is => 'ro', isa => Str );
+has cookies => ( is => 'ro', isa => HashRef, default => sub { {} } );
 
-has _ua => ( is => 'lazy', isa => InstanceOf ['Pcore::HTTP::Request'], init_arg => undef );
 has _anticaptcha => ( is => 'lazy', isa => Maybe [ InstanceOf ['Pcore::API::AntiCaptcha'] ], init_arg => undef );
 has _threads => ( is => 'ro', isa => PositiveOrZeroInt, default => 0, init_arg => undef );
 has _req_pool => ( is => 'ro', isa => ArrayRef, default => sub { [] }, init_arg => undef );
 has _captcha_in_progress => ( is => 'ro', isa => Bool, default => 0, init_arg => undef );
 
-sub _build__ua ($self) {
-    return P->http->request(
-        method     => 'GET',
-        cookie_jar => 1,
-        timeout    => 15,
-        useragent  => 'Links (2.1; Linux 2.6.18-gentoo-r6 x86_64; 80x24)',
-    );
-}
+const our $HTTP_USERAGENT => 'Links (2.1; Linux 2.6.18-gentoo-r6 x86_64; 80x24)';
+const our $HTTP_TIMEOUT   => 15;
 
 sub _build__anticaptcha ($self) {
     if ( $self->anticaptcha_key ) {
@@ -76,8 +71,11 @@ sub _request ( $self, $url, $cb ) {
 
     P->log->sendlog( 'Pcore-API-Google-Search', 'start request' );
 
-    $self->_ua->run(
-        url       => $url,
+    http_get(
+        $url,
+        timeout   => $HTTP_TIMEOUT,
+        useragent => $HTTP_USERAGENT,
+        cookies   => $self->{cookies},
         on_finish => sub ($res) {
             if ( $res->status == 503 ) {    # captcha
                 if ( !$self->_anticaptcha ) {
@@ -141,8 +139,11 @@ sub _resolve_captcha ( $self, $url, $res, $cb ) {
     my $q = P->data->from_uri_query( $image_url->query )->{'q'};
 
     # get captcha image
-    $self->_ua->run(
-        url       => $image_url,
+    http_get(
+        $image_url,
+        timeout   => $HTTP_TIMEOUT,
+        useragent => $HTTP_USERAGENT,
+        cookies   => $self->{cookies},
         on_finish => sub ($img_res) {
 
             # resolve captcha
@@ -166,8 +167,11 @@ sub _resolve_captcha ( $self, $url, $res, $cb ) {
                         }
                     );
 
-                    $self->_ua->run(
-                        url       => P->uri( '/sorry/CaptchaRedirect?' . $query, base => $base_url ),
+                    http_get(
+                        P->uri( '/sorry/CaptchaRedirect?' . $query, base => $base_url ),
+                        timeout   => $HTTP_TIMEOUT,
+                        useragent => $HTTP_USERAGENT,
+                        cookies   => $self->{cookies},
                         on_finish => sub ($res) {
 
                             # captcha recognized incorrectly

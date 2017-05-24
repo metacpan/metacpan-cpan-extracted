@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                 Template-Plugin-WikiFormat
-version:              0.07
+version:              0.08
 abstract:             TT wrapper for Text::WikiFormat
 author:
   - Barbie <barbie@cpan.org>
@@ -12,7 +12,7 @@ installdirs:          site
 requires:
   perl:                     5.006
   Template:                 2
-  Template::Plugin::Filter: 2
+  Template::Plugin::Filter: 1.38
   Text::WikiFormat:         0.75
 recommends:
   Test::CPAN::Meta:         0
@@ -27,7 +27,7 @@ build_requires:
 provides:
   Template::Plugin::WikiFormat:
     file:     lib/Template/Plugin/WikiFormat.pm
-    version:  0.07
+    version:  0.08
 no_index:
   directory:
     - t

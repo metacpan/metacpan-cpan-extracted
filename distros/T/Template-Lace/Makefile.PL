@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Template::Lace",
   "PREREQ_PM" => {
     "File::Spec" => 0,
+    "JSON::MaybeXS" => 0,
     "Module::Runtime" => 0,
     "Mojo::DOM58" => 0,
     "Moo" => "2.003000",
@@ -29,7 +30,7 @@ my %WriteMakefileArgs = (
     "Scalar::Util" => 0,
     "Test::Most" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,6 +39,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "File::Spec" => 0,
+  "JSON::MaybeXS" => 0,
   "Module::Runtime" => 0,
   "Mojo::DOM58" => 0,
   "Moo" => "2.003000",

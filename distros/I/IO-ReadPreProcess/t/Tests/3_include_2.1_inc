@@ -1,0 +1,11 @@
+.# Included by 3_include_2.inc
+.# Second level include, check that _FileName, etc, have changed
+Level 2 Inc
+.echo Included: _LineNumber = \v{_LineNumber}
+.echo Included: _FileName = \v{_FileName}
+.echo Included: _IncludeDepth = \v{_IncludeDepth}
+.#
+.# This should show the names of all the files that were opened to get to this one:
+.let allfiles := join(':', _FileNames); allnumbers := join(':', _LineNumbers)
+.echo allfiles = \v{allfiles}
+.echo allnumbers = \v{allnumbers}

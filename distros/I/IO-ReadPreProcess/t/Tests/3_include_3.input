@@ -1,0 +1,11 @@
+.# Title: Read from pipe
+.# NewOpt: PipeOK 1
+.# UnixOnly: 1
+Line 1
+.let name := 'bill'
+.include | echo Output of a shell command \v{name}
+.echo Included: _LineNumber = \v{_LineNumber}
+.echo Included: _FileName = \v{_FileName}
+.echo Included: _IncludeDepth = \v{_IncludeDepth}
+.# This differs - no space after pipe symbol
+.include |echo Output of another shell command \v{name}

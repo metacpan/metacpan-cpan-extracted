@@ -135,14 +135,12 @@ sub _send_http ( $self, $method, @ ) {
 }
 
 sub _send_ws ( $self, @args ) {
+    my $cb = ref $_[-1] eq 'CODE' || ( blessed $_[-1] && $_[-1]->can('IS_CALLBACK') ) ? $_[-1] : undef;
+
     $self->_get_ws(
         sub ( $ws, $error ) {
             if ( defined $error ) {
-
-                # detect callback
-                if ( ref $_[-1] eq 'CODE' or ( blessed $_[-1] && $_[-1]->can('IS_CALLBACK') ) ) {
-                    $args[-1]->($error);
-                }
+                $cb->($error) if $cb;
             }
             else {
                 $ws->rpc_call(@args);

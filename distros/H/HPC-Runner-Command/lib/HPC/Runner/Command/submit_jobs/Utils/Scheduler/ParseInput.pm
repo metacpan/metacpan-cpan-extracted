@@ -164,23 +164,17 @@ sub check_lines_add_cmd {
     if ( $line =~ m/\\$/ ) {
         return;
     }
+    #If we're using 'wait' its linear deps
     elsif ( $self->match_cmd(qr/^wait$/) ) {
-
-        #submit this batch and get the job id so the next can depend upon it
         $self->clear_cmd;
-
-        #If we're using 'wait' its linear deps
         $self->check_add_to_jobs;
         my $oldjob = $self->jobname;
         $self->increase_jobname();
         $self->deps($oldjob);
-        # ?
-        # return
     }
 
-    push( @{ $self->jobs->{ $self->jobname }->{cmds} }, $self->cmd )
-        if $self->has_cmd;
-    # $self->jobs->{$self->jobname}->job_file->print($self->cmd) if $self->has_cmd;
+    #TODO Get rid of this
+    $self->job_files->{$self->jobname}->print($self->cmd) if $self->has_cmd;
     $self->jobs->{$self->jobname}->inc_cmd_counter if $self->has_cmd;
 
     $self->inc_cmd_counter;
@@ -298,17 +292,6 @@ sub apply_job_directives {
     $self->jobs->{ $self->jobname }->$t1($t2);
 }
 
-# sub parse_meta {
-#     my $self = shift;
-#     my $line = shift;
-#
-#     my ( @match, $t1, $t2 );
-#
-#     @match = $line =~ m/ (\w+)=(.+)$/;
-#     ( $t1, $t2 ) = ( $match[0], $match[1] );
-#
-#     return ( $t1, $2 );
-# }
 memoize('parse_meta');
 sub parse_meta {
     my $line = shift;

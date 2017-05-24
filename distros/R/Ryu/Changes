@@ -1,5 +1,11 @@
 Revision history for Ryu
 
+0.015     2017-05-22 21:22:25+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    * ->each_as_source - similar to ->each, but treats items as sources
+    * ->switch_str - switch-like operator on stringified values
+
 0.014     2017-03-25 22:45:14+08:00 Asia/Kuala_Lumpur
     New features:
     * sprintf_methods as shorthand for ->map(sprintf '...', $_->x, $_->y, ...)

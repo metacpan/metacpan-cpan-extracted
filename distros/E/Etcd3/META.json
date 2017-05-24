@@ -4,7 +4,7 @@
       "Sam Batschelet (hexfusion) <sbatschelet@mac.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
@@ -24,7 +24,6 @@
          "requires" : {
             "File::Spec" : "0",
             "File::Temp" : "0",
-            "JSON" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0"
          }
@@ -36,7 +35,10 @@
       },
       "runtime" : {
          "requires" : {
+            "AnyEvent" : "0",
+            "AnyEvent::HTTP" : "0",
             "HTTP::Tiny" : "0",
+            "JSON" : "0",
             "Moo" : "2.000",
             "Sub::Quote" : "0",
             "Types::Standard" : "0",
@@ -55,5 +57,5 @@
          "url" : "https://github.com/hexfusion/Etcd3"
       }
    },
-   "version" : "0.005"
+   "version" : "0.006"
 }

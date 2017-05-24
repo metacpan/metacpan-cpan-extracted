@@ -1,0 +1,9 @@
+Line 1
+After readin def
+In readin
+After .include -p
+After .read line
+line='Hello World!' _EOF=0
+After next .read line
+line='' _EOF=1
+EOF

@@ -1,0 +1,8 @@
+.# Loop at top level - not in function:
+.set i := 0
+.while -i3 ++i < 10
+.eval In while i = \v{i}
+.eval End of while i = \v{i}
+.done
+After end of Look
+EOF

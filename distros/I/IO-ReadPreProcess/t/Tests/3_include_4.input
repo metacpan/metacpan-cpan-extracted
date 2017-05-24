@@ -1,0 +1,31 @@
+.# Title: Include Paths
+.# This is about testing the different first character of an include path.
+.let count := 0
+Line 1
+.#
+.# Relative to the directory that contains this file:
+.include 3_include_4.inc
+.include ./3_include_4.inc
+.#
+.# Start '#' means relative to the directory where the script is run:
+.include #t/Tests/3_include_4.inc
+.include #/t/Tests/3_include_4.inc
+.include #./t/Tests/3_include_4.inc
+.#
+.# A path that is searched
+.let open_path := '/does_not_exist:#t:#t/Tests:/more_not_there'
+.let dirs := split(':', open_path)
+.include $dirs/3_include_4.inc
+.#
+.# This will find it in the same directory as this file ('.'):
+.let open_path := '/does_not_exist:.:/more_not_there'
+.let dirs := split(':', open_path)
+.include $dirs/3_include_4.inc
+.#
+.# Absolute path.
+.# PWD starts with a '/'
+.# 2 ways of doing the same thing:
+.eval .include \v{PWD}/t/Tests/3_include_4.inc
+.include $PWD/t/Tests/3_include_4.inc
+.#
+Line end

@@ -1,6 +1,6 @@
 
 package PRANG::Graph::Class;
-$PRANG::Graph::Class::VERSION = '0.18';
+$PRANG::Graph::Class::VERSION = '0.20';
 # this role is a hangover from the pre-metarole conversion.  It should
 # not be required any more.  You should use
 # $class->meta->does_role("PRANG::Graph::Meta::Class");

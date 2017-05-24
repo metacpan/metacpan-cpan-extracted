@@ -1,5 +1,5 @@
 package Lab::Instrument::DummySource;
-our $VERSION = '3.542';
+our $VERSION = '3.543';
 
 use warnings;
 use strict;

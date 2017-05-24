@@ -1,5 +1,11 @@
 Revision history for App-TestOnTap
 
+0.033	2017-05-15
+
+	A recent Test::More fix changed a behavior (empty output line removed). 
+	
+	Well, problems to repro. Rewrite offending test slightly...
+
 0.032	2017-04-23
 
 	A recent Test::More fix changed a behavior (empty output line removed). 

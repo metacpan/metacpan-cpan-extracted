@@ -91,7 +91,7 @@ sub test_003 : Tags(construction) {
 
     my $t = "$test_dir/script/test001.1.sh";
     MooseX::App::ParsedArgv->new( argv =>
-            [ "execute_job", "--infile", $t, "--outdir", "$test_dir/logs", ]
+            [ "execute_job", "--infile", $t, "--batch_index_start", 1,  "--outdir", "$test_dir/logs", ]
     );
     my $test = HPC::Runner::Command->new_with_command();
 

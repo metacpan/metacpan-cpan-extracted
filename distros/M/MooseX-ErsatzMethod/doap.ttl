@@ -12,8 +12,8 @@
 <http://purl.org/NET/cpan-uri/dist/MooseX-ErsatzMethod/project>
 	a                    doap:Project;
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
-	doap-deps:runtime-requirement [ doap-deps:on "Moose 2.00"^^doap-deps:CpanId ], [ doap-deps:on "Module::Runtime"^^doap-deps:CpanId ];
-	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008"^^doap-deps:CpanId ], [ doap-deps:on "Moose 2.00"^^doap-deps:CpanId ], [ doap-deps:on "Module::Runtime"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ], [ doap-deps:on "thanks"^^doap-deps:CpanId ];
 	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-ErsatzMethod>;
 	doap:created         "2012-10-02"^^xsd:date;
 	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
@@ -23,7 +23,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "MooseX-ErsatzMethod";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/MooseX-ErsatzMethod/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooseX-ErsatzMethod/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooseX-ErsatzMethod/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooseX-ErsatzMethod/v_0-004>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/MooseX-ErsatzMethod/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooseX-ErsatzMethod/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooseX-ErsatzMethod/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooseX-ErsatzMethod/v_0-004>, <http://purl.org/NET/cpan-uri/dist/MooseX-ErsatzMethod/v_0-005>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-moosex-ersatzmethod>;
@@ -86,6 +86,23 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-ErsatzMethod-0.004.tar.gz>;
 	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-ErsatzMethod/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "MooseX-ErsatzMethod-0.005"^^xsd:string;
+	dc:issued            "2017-05-21"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "thanks.pm should still be a testing requirement.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Declare minimum version of Perl.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-ErsatzMethod-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

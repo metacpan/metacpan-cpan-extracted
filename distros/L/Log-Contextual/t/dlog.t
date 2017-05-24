@@ -38,9 +38,9 @@ for my $level (@levels) {
       eq_array($bar, [qw{frew bar baz}]),
       'DlogS_trace passes data through correctly'
    );
-   is(
+   like(
       $var,
-      qq([$level] Look ma, data: [\n  "frew",\n  "bar",\n  "baz"\n]\n),
+      qr(\[$level\] Look ma, data: \[),
       "Output for DlogS_$level is correct"
    );
 

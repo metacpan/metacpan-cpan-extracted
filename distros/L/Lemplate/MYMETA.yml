@@ -23,5 +23,5 @@ requires:
   Filter::Util::Call: '0'
   Template: '2.14'
   perl: '5.010001'
-version: '0.11'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -5,6 +5,7 @@ use warnings;
 
 package getclosest;
 
+use lib 'lib';
 use App::GetClosestFile;
 
 App::GetClosestFile->run;

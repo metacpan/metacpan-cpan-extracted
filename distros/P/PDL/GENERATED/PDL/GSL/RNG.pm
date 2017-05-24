@@ -53,7 +53,7 @@ in the GNU Scientific Library.
 
 The new method initializes a new instance of the RNG.
 
-The avaible RNGs are:
+The available RNGs are:
 
  coveyou cmrg fishman18 fishman20 fishman2x gfsr4 knuthran
  knuthran2 knuthran2002 lecuyer21 minstd mrg mt19937 mt19937_1999
@@ -163,7 +163,7 @@ Example:
 
 This function creates a piddle with given dimensions or accept an
 existing piddle and fills it. get() returns integer values
-beetween a minimum and a maximum specific to evry RNG.
+between a minimum and a maximum specific to every RNG.
 
 Usage: 
 
@@ -185,7 +185,7 @@ Example:
 
 This function creates a piddle with given dimensions or accept an
 existing piddle and fills it. get_int() returns integer values
-beetween 0 and $max.
+between 0 and $max.
 
 Usage: 
 

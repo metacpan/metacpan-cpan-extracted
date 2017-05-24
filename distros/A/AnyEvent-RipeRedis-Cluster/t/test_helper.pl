@@ -46,12 +46,11 @@ BEGIN {
       [ 'hget', 3, [ qw( readonly fast ) ], 1, 1, 1 ],
     ],
 
-    ping            => 'PONG',
-    readonly        => 'OK',
-    set             => 'OK',
-    get             => "some\r\nstring",
-    client_getname  => 'test',
-    command_getkeys => [qw( {key}1 {key}2 )],
+    ping           => 'PONG',
+    readonly       => 'OK',
+    set            => 'OK',
+    get            => "some\r\nstring",
+    client_getname => 'test',
   );
 
   Test::MockObject->fake_module( 'AnyEvent::RipeRedis',
@@ -61,13 +60,8 @@ BEGIN {
 
       my $mock = Test::MockObject->new({});
 
-      $mock->{host}          = $params{host};
-      $mock->{port}          = $params{port};
-      $mock->{on_connect}    = $params{on_connect};
-      $mock->{on_disconnect} = $params{on_disconnect};
-
-      $mock->{_connected}  = 0;
-      $mock->{_multi_mode} = 0;
+      $mock->{host} = $params{host};
+      $mock->{port} = $params{port};
 
       $mock->mock( 'execute',
         sub {
@@ -76,25 +70,10 @@ BEGIN {
           my $cbs      = pop;
           my @args     = @_;
 
-          unless ( $self->{_connected} ) {
-            $self->_connect;
-          }
-
           my $reply;
           my $err;
 
-          if ( $cmd_name eq 'multi' ) {
-            $self->{_multi_mode} = 1;
-            $reply = 'OK';
-          }
-          elsif ( $cmd_name eq 'exec' ) {
-            $self->{_multi_mode} = 0;
-            $reply = [qw( OK OK )];
-          }
-          elsif ( $self->{_multi_mode} ) {
-            $reply = 'QUEUED';
-          }
-          elsif ( $cmd_name eq 'hget' ) {
+          if ( $cmd_name eq 'hget' ) {
             $err = AnyEvent::RipeRedis::Error->new(
                 q{LOADING Redis is loading the dataset in memory}, 2 );
           }
@@ -108,15 +87,7 @@ BEGIN {
         }
       );
 
-      $mock->mock( 'disconnect',
-        sub {
-          my $self = shift;
-
-          if ( $self->{_connected} ) {
-            $self->{on_disconnect}->();
-          }
-        }
-      );
+      $mock->mock( 'disconnect', sub {} );
 
       foreach my $name ( qw( host port ) ) {
         $mock->mock( $name,
@@ -125,19 +96,6 @@ BEGIN {
             return $self->{$name};
           }
         );
-      }
-
-      $mock->mock( '_connect',
-        sub {
-          my $self = shift;
-
-          $self->{_connected} = 1;
-          $self->{on_connect}->();
-        }
-      );
-
-      unless ( $params{lazy} ) {
-        $mock->_connect;
       }
 
       return $mock;
@@ -152,9 +110,9 @@ sub new_cluster {
 
   return AnyEvent::RipeRedis::Cluster->new(
     startup_nodes => [
-      { host => 'localhost', port => 7000 },
-      { host => 'localhost', port => 7001 },
-      { host => 'localhost', port => 7002 },
+      { host => '127.0.0.1', port => 7000 },
+      { host => '127.0.0.1', port => 7001 },
+      { host => '127.0.0.1', port => 7002 },
     ],
     %params,
   );

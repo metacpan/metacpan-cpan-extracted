@@ -3,7 +3,7 @@
 #
 use ExtUtils::MakeMaker;
 
-require v5.6.1;
+require v5.10.1;
 
 WriteMakefile(
    NAME          => 'Net::Frame::Layer::IGMP',
@@ -12,6 +12,6 @@ WriteMakefile(
    ABSTRACT_FROM => 'lib/Net/Frame/Layer/IGMP.pm',
    AUTHOR        => 'Michael Vincent <vin at vinsworld dot com>',
    PREREQ_PM     => {
-      Net::Frame => 1.09,
+      Net::Frame => 1.17,
    },
 );

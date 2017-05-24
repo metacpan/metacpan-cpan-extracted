@@ -1,3 +1,5 @@
+0.48 - log the reason that triggered vmem retry testing
+
 0.47 - adjust memory retry increment and usage reporting when multiple cpus
        are used for one stage (assumes that the requested number were actually
 	   provided - that might not match the configured environment definition;

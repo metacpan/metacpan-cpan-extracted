@@ -40,25 +40,11 @@ has cmds => (
     handles => {
         all_cmds    => 'elements',
         add_cmds    => 'push',
-        map_cmds    => 'map',
-        get_cmds    => 'get',
         join_cmds   => 'join',
         count_cmds  => 'count',
-        has_cmds    => 'count',
         clear_cmds  => 'clear',
-        has_no_cmds => 'is_empty',
     },
 );
-
-# use File::Temp qw/ tempfile /;
-#
-# has job_file => (
-#     is      => 'rw',
-#     default => sub {
-#         my $fh = File::Temp->new( UNLINK => 0, SUFFIX => '.dat' );
-#         return $fh;
-#     }
-# );
 
 has 'cmd_counter' => (
     traits   => ['Counter'],

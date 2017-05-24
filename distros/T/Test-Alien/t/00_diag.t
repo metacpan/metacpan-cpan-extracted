@@ -23,6 +23,7 @@ $modules{$_} = $_ for qw(
   Test2
   Test2::Suite
   Test::More
+  Text::ParseWords
 );
 
 

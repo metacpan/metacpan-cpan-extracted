@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '3.542';
+our $VERSION = '3.543';
 
 use feature "switch";
 use Lab::Instrument;

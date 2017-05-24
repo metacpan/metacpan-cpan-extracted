@@ -1,0 +1,13 @@
+Line 1
+After sub1 definition
+In sub1
+Sub1 has arguments:
+_ARGS[0]=A1
+a0='A1'
+Before: a0='Joe'
+In sub1
+Sub1 has arguments:
+_ARGS[0]=Bilbo Baggins
+a0='Bilbo Baggins'
+After: a0='Joe'
+EOF

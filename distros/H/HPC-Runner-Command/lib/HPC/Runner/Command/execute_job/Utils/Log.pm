@@ -102,7 +102,7 @@ sub _log_commands {
 
     my $dt1 = DateTime->now( time_zone => 'local' );
 
-    $DB::single = 2;
+    #$DB::single = 2;
     my $ymd = $dt1->ymd();
     my $hms = $dt1->hms();
 
@@ -112,7 +112,7 @@ sub _log_commands {
     my ( $cmdpid, $exitcode ) = $self->log_job;
 
     #TODO Make table data its own class and return it
-    $self->set_table_data( cmdpid     => $cmdpid );
+    $self->set_table_data( cmdpid => $cmdpid );
 
     my $meta = $self->pop_note_meta;
     $self->set_task_tag( $cmdpid => $meta ) if $meta;
@@ -123,8 +123,9 @@ sub _log_commands {
 
     my $dt2      = DateTime->now();
     my $duration = $dt2 - $dt1;
-    my $format   = DateTime::Format::Duration->new( pattern =>
-          ' %e days, %H hours, %M minutes, %S seconds' );
+    my $format =
+      DateTime::Format::Duration->new(
+        pattern => ' %e days, %H hours, %M minutes, %S seconds' );
 
     $self->log_cmd_messages( "info",
         "Total execution time " . $format->format_duration($duration),
@@ -228,7 +229,6 @@ sub log_cmd_messages {
     }
 }
 
-
 #TODO move to execute_jobs
 sub log_job {
     my $self = shift;
@@ -256,7 +256,7 @@ sub log_job {
     # Start Command Log
     $self->start_command_log($cmdpid);
 
-    $DB::single = 2;
+    #$DB::single = 2;
 
     my $sel = new IO::Select;    # create a select object
     $sel->add( $outfh, $errfh ); # and add the fhs
@@ -309,11 +309,12 @@ Print out command info - schedulerId, taskId, cmdPID, etc.
 =cut
 
 sub start_command_log {
-  my $self = shift;
-  my $cmdpid = shift;
+    my $self   = shift;
+    my $cmdpid = shift;
 
     if ( $self->job_scheduler_id ) {
-        $self->name_log( "_SID_" . $self->job_scheduler_id . "_PID_" . $cmdpid );
+        $self->name_log(
+            "_SID_" . $self->job_scheduler_id . "_PID_" . $cmdpid );
     }
     else {
         $self->name_log( "PID_" . $cmdpid );
@@ -321,27 +322,22 @@ sub start_command_log {
 
     $self->command_log( $self->init_log );
 
-    $DB::single = 2;
-
-    $self->log_cmd_messages(
-        "info",
-        "\nStarting Job:\n\tJobID:\t"
-          . $self->job_scheduler_id
-          . " \n\tCmdPID:\t"
-          . $cmdpid
-          . "\n\n\n",
-        $cmdpid
-    );
-
+    #$DB::single = 2;
     my $log_array_msg = "";
-    if($self->can('task_id')){
-      $log_array_msg = "Array ID:\t".$self->task_id;
+    if ( $self->can('task_id') ) {
+        $log_array_msg = "\n\tArray ID:\t" . $self->task_id;
     }
 
-    $self->log_cmd_messages(
-     "info",
-     "\nHostname:\t".$self->hostname."\n"."Job Scheduler ID:\t".$self->job_scheduler_id."$log_array_msg\n\n"
-    );
+    $self->log_cmd_messages( "info",
+            "\nStarting Job:\n\tJobID:\t"
+          . $self->job_scheduler_id
+          . " \n\tCmdPID:\t"
+          . $cmdpid . "\n"
+          . "\n\tHostname:\t"
+          . $self->hostname
+          . "\n\tJob Scheduler ID:\t"
+          . $self->job_scheduler_id
+          . "$log_array_msg\n\n", $cmdpid );
 
     #TODO counter is not terribly applicable with task ids
     $self->log_cmd_messages(
@@ -371,7 +367,7 @@ sub pop_note_meta {
         @match = $line =~ m/TASK (\w+)=(.+)$/;
         ( $t1, $t2 ) = ( $match[0], $match[1] );
 
-        $DB::single = 2;
+        #$DB::single = 2;
         if ($t1) {
             if ( $t1 eq "tags" ) {
                 my @tmp = split( ",", $t2 );

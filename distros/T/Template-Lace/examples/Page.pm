@@ -2,7 +2,6 @@ package Page;
 
 use Moo;
 use Template::Lace::Factory;
-with 'Template::Lace::ModelRole';
 
 has 'list' => (is=>'ro', required=>1);
 

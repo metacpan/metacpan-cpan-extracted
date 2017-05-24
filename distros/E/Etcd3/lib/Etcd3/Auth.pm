@@ -6,13 +6,19 @@ use warnings;
 
 =encoding utf8
 
+=cut
+
+use Etcd3::Auth::Authenticate;
+use Etcd3::Auth::Enable;
+use Etcd3::Auth::Role;
+
 =head1 NAME
 
 Etcd3::Auth
 
 =cut
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 =head1 DESCRIPTION
 
@@ -29,10 +35,10 @@ Authentication
     $etcd->user_add( { name => 'samba', password =>'P@$$' });
 
     # add role
-    $etcd->role_add( { name => 'myrole' });
+    $etcd->role( { name => 'myrole' })->add;
 
     # grant role
-    $etcd->grant_role( { user => 'samba', role => 'myrole' });
+    $etcd->user_role( { user => 'samba', role => 'myrole' })->grant;
 
 =cut
 

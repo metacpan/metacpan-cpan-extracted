@@ -1,14 +1,14 @@
 ---
 abstract: 'Monitor network ports for changes'
 author:
-  - 'Jozef Reisinger <jozef.reisinger@gmail.com>'
+  - 'Jozef Reisinger <reisinge@cpan.org>'
 build_requires:
   Test::More: '0'
   perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,5 +28,5 @@ requires:
 resources:
   bugtracker: https://github.com/jreisinger/App-Monport/issues
   repository: git://github.com/jreisinger/App-Monport.git
-version: '1.10'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '1.11'
+x_serialization_backend: 'YAML::Tiny version 1.69'

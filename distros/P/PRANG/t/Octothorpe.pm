@@ -105,18 +105,20 @@ with 'InvertedQuestionMark';
 
 package Asteriks;
 use Moose;
+use Moose::Util::TypeConstraints;
+use PRANG::XMLSchema::Types;
 use PRANG::Graph;
 
 # class tests:
 #    Quant -> Choice -> Element
 #    Quant -> Choice -> Text
+
 has_element "bullet" =>
 	is => "ro",
-	isa => "ArrayRef[Str|Int]",
+	isa => "ArrayRef[Str]",
 	xml_max => 5,
 	required => 1,
 	xml_nodeName => {
-	"umlout" => "Int",
 	"guillemets" => "Str",
 	},
 	;

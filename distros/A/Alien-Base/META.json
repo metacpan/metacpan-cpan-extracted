@@ -63,6 +63,6 @@
       "x_IRC" : "irc://irc.perl.org/#native",
       "x_MailingList" : "https://groups.google.com/forum/#!forum/perl5-alien"
    },
-   "version" : "0.041",
+   "version" : "0.042",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

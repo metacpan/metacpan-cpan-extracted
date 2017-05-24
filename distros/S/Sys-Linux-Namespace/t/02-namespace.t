@@ -5,11 +5,9 @@ BEGIN {
 use Test::More;
 use Test::SharedFork;
 
-# test 1
 use Sys::Linux::Namespace;
 $Sys::Linux::Namespace::debug = 1;
 
-# test 2
 SKIP: {
   skip "Need to be root to run test", 5 unless $< == 0;
   ok(my $namespace = Sys::Linux::Namespace->new(private_tmp => 1), "Setup object");
@@ -25,7 +23,8 @@ SKIP: {
     is_deeply([grep {m|/proc/\d+/|} glob '/proc/*/'], ['/proc/1/'], "Only /proc/1/ exists");
   });
 
-  ok($ret, "run code in sandbox");
+  # namespace process exited cleanly
+  ok($ret == 0, "run code in sandbox");
 
   alarm(5);
   $pid_ns->run(code => sub {
@@ -37,7 +36,7 @@ SKIP: {
   alarm(5);
   $pid_ns->run(code => sub {
     is($$, 1, "Second alarmed init");
-    
+  
     my $pid = fork();
 
     isnt($pid, undef, "Fork succeeded");

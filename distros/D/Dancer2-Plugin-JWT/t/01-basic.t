@@ -5,7 +5,7 @@ use Test::More import => ['!pass'];
 #use Plack::Test;
 use  Test::WWW::Mechanize::PSGI;
 use HTTP::Request::Common;
-use JSON::WebToken;
+use Crypt::JWT qw(encode_jwt decode_jwt);
 
 
 #plan tests => 5;
@@ -52,7 +52,7 @@ $mech->content_is("OK", "No exceptions on defining jwt");
 my $response = $mech->res();
 my $authorization = $response->authorization;
 ok($authorization, "We have something");
-my $x = decode_jwt($authorization, "secret");
+my $x = decode_jwt(token => $authorization, key => "secret");
 is_deeply($x, {my => 'data'}, "Got correct data back");
 
 $mech->add_header("Authorization" => $authorization);
@@ -66,10 +66,8 @@ $mech->content_is("OK", "we redirected");
 $response = $mech->res();
 $authorization = $response->authorization;
 ok($authorization, "Redirect keeped jwt");
-$x = eval { decode_jwt($authorization, "secret") };
+$x = eval { decode_jwt(token => $authorization, key => "secret") };
 is_deeply($x, {my => 'redirect'}, "Got correct data back even with redirect");
-
-
 
 done_testing();
 __END__
@@ -85,7 +83,7 @@ test_psgi $app, sub {
 		is $ans->content, "OK", "No exceptions on defining jwt";
 		my $authorization = $ans->header("Authorization");
 		ok($authorization, "We have something");
-		my $x = decode_jwt($authorization, "secret");
+		my $x = decode_jwt(token => $authorization, key => "secret");
 		is_deeply($x, {my => 'data'}, "Got correct data back");
 
 		is $cb->(HTTP::Request->new(GET => '/defined/jwt',

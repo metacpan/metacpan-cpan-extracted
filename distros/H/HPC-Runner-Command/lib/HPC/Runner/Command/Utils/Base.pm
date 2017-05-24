@@ -29,8 +29,9 @@ When submitting jobs we will prepend the jobname with the project name
 option 'project' => (
     is            => 'rw',
     isa           => 'Str',
-    documentation => 'Give your jobnames an additional project name. #HPC jobname=gzip will be submitted as 001_project_gzip',
-    required      => 0,
+    documentation => 'Give your jobnames an additional project name. '
+      . '#HPC jobname=gzip will be submitted as 001_project_gzip',
+    required  => 0,
     predicate => 'has_project',
 );
 
@@ -44,7 +45,7 @@ option 'infile' => (
     is       => 'rw',
     required => 1,
     documentation =>
-        q{File of commands separated by newline. The command 'wait' indicates all previous commands should finish before starting the next one.},
+q{File of commands separated by newline. The command 'wait' indicates all previous commands should finish before starting the next one.},
     isa    => AbsFile,
     coerce => 1,
 );
@@ -69,7 +70,6 @@ option 'outdir' => (
 
 #These two should both be in execute_jobs
 
-
 =head3 procs
 
 Total number of concurrent running tasks.
@@ -84,7 +84,7 @@ option 'procs' => (
     default  => 1,
     required => 0,
     documentation =>
-        q{Total number of concurrently running jobs allowed at any time.}
+      q{Total number of concurrently running jobs allowed at any time.}
 );
 
 =head2 Attributes
@@ -121,19 +121,23 @@ sub set_outdir {
     my $outdir;
 
     if ( $self->has_version && $self->has_git ) {
-        if($self->has_project){
-            $outdir = "hpc-runner/". $self->project. "/". $self->version . "/scratch";
+        if ( $self->has_project ) {
+            $outdir =
+                "hpc-runner/"
+              . $self->project . "/"
+              . $self->version
+              . "/scratch";
         }
-        else{
+        else {
             $outdir = "hpc-runner/" . $self->version . "/scratch";
         }
     }
     else {
-        if($self->has_project){
+        if ( $self->has_project ) {
             $outdir = "hpc-runner/" . $self->project . "/scratch";
         }
-        else{
-            $outdir = "hpc-runner/". "scratch";
+        else {
+            $outdir = "hpc-runner/" . "scratch";
         }
     }
 
@@ -186,7 +190,7 @@ sub git_things {
 
     return unless $self->has_version;
 
-    if ( $self->tags  ) {
+    if ( $self->tags ) {
         push( @{ $self->tags }, "$self->{version}" ) if $self->has_version;
     }
     else {

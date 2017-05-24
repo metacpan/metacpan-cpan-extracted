@@ -21,8 +21,8 @@ sub debug {
   print STDERR @_ if $debug;
 }
 
-our $VERSION = v0.013;
-my @signames = keys %SIG; # capture before anyone has probably localized it.
+our $VERSION = v0.015;
+my @signames = grep {!/^__/} keys %SIG; # capture before anyone has probably localized it.
 
 for my $p (qw/tmp mount pid net ipc user uts sysvsem/) {
   my $pp = "private_$p";
@@ -51,7 +51,6 @@ sub _subprocess {
   debug "Forking\n";
   my $pid = Linux::Clone::clone (sub {
     local $$ = POSIX::getpid(); # try to fix up $$ if we can.
-    local %SIG = map {$_ => sub {debug "Got signal in $$, exiting"; _exit(0)}} @signames;
     debug "Inside Child $$\n";
     
     $code->(%args);
@@ -60,7 +59,6 @@ sub _subprocess {
 
   croak "Failed to fork: $!" if ($pid < 0);
 
-  my $sighandler =   
   local %SIG = map {my $q=$_; $q => sub {
       debug "got signal $q in $$\n";
       kill 'TERM', $pid;
@@ -124,12 +122,10 @@ sub run {
   croak "Run must be given a codref to run" unless ref $code eq "CODE";
 
   $self->pre_setup(%args);
-  $self->_subprocess(sub {
+  return $self->_subprocess(sub {
     $self->post_setup(%args);
     $code->(%args);
   }, %args);
-
-  return 1;
 }
 
 1;

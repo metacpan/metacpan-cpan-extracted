@@ -35,7 +35,8 @@ sub get_processed_dom {
   my $self = shift;
   my $dom = $self->dom;
   $self->process_components($dom);
-  $self->model->process_dom($dom);
+  $self->model->process_dom($dom)
+    if $self->model->can('process_dom');
   return $dom;
 } 
 

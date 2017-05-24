@@ -33,7 +33,7 @@ however in case you are reading it somewhere else, you can find the latest
 version at CPAN: http://www.cpan.org/modules/by-module/MARC/. You'll notice
 that some sections aren't filled in yet, which is a result of this document
 being a work in progress. If you have ideas for new sections please make a
-suggestion to perl4lib: http://perl4lib.perl.org/.
+suggestion to perl4lib: https://perl4lib.perl.org/.
 
 =head2 History of MARC on CPAN
 
@@ -113,9 +113,8 @@ A subclass of MARC::File for working with data encoded in the USMARC format.
 It's already been mentioned but it's worth mentioning again:
 MARC::Doc::Tutorial is a work in progress, and you are encouraged to submit
 any suggestions for additional recipes via the perl4lib mailing list at
-http://www.rice.edu/perl4lib. Also, the development group is always looking
-for additional developers with good ideas; if you are interested you can
-sign up at SourceForge: http://sourceforge.net/projects/marcpm/.
+https://perl4lib.perl.org/. Also, patches and issue reports are welcome
+at https://github.com/perl4lib/marc-perl.
 
 
 

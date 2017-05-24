@@ -1,0 +1,16 @@
+Changes
+examples/example.pl
+lib/Redis/ClusterRider.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-base.t
+t/01-accessors.t
+t/02-functions.t
+t/03-commands.t
+t/04-exceptions.t
+t/05-pod.t
+t/06-pod-coverage.t
+t/test_helper.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

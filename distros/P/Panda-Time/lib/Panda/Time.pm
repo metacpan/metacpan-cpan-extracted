@@ -1,10 +1,10 @@
 package Panda::Time;
 use parent 'Panda::Export';
 use 5.012;
-use Panda::Lib;
+use CPP::panda::lib;
 use Panda::Install::Payload;
 
-our $VERSION = '3.1.2';
+our $VERSION = '3.1.3';
 
 require Panda::XSLoader;
 Panda::XSLoader::bootstrap('Panda::Time', $VERSION);

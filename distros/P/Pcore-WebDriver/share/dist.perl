@@ -28,27 +28,8 @@
         }
     },
 
-    # Pcore utils, provided by this distribution
-    util => {
-
-        # eg.:
-        # util_accessor_name => 'Util::Package::Name'
-        # and later in the code you can use P->util_accessor_name->...
-    },
-
-    # shared resources, used by modules in this distribution
-    mod_share => {
-
-        # eg.:
-        # 'Distribution/Module/Name.pm' => ['/data/cfg.perl', '/data/cfg.ini'],
-
-        'Pcore/WebDriver/PhantomJS.pm' => ['/bin/webdriver/phantomjs.exe'],
-        'Pcore/WebDriver/Chrome.pm'    => ['/bin/webdriver/chromedriver.exe'],
-        'Pcore/WebDriver/Firefox.pm'   => ['/bin/webdriver/geckodriver.exe'],
-    },
-
     phantomjs_ver    => '2.1.1',
     chromedriver_ver => '2.29',
     geckodriver_ver  => '0.16.1',
-    ff_ver           => '53.0',
+    ff_ver           => '53.0.2',
 }

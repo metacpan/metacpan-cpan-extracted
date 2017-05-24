@@ -17,6 +17,7 @@ my $password = "{SSHA}LfvBweDp3ieVPRjAUeWikwpaF6NoiTSK";     # password is 'test
 my @sql = (
     #q/drop table if exists users/,
     qq/create table users (id INTEGER, username VARCHAR, password VARCHAR)/,
+    qq/insert into users values (0, 'nobody', 'nobodyhasaplaintextpassword!')/,
     qq/insert into users values (1, 'sukria', '$password')/,
     qq/insert into users values (2, 'bigpresh', '$password')/,
     qq/insert into users values (3, 'badger', '$password')/,
@@ -28,17 +29,27 @@ my @sql = (
 
 database->do($_) for @sql;
 
-my $custom_column = { name => 'extra', raw_column => 'id', transform => sub { "Hello, id: $_[0]" }, column_class=>"classhere" };
+my $extra_custom_column = { name => 'extra', raw_column => 'id', transform => sub { "Extra: $_[0]" }, column_class=>"classhere" };
+my $id_custom_column    = { name => 'id', raw_column => 'id', transform => sub { "Hello, id: $_[0]" }, column_class=>"classhere" };
+my $username_custom_column = { name => "username", raw_column=>"username", transform => sub { "Username: $_[0]" }, column_class=>"classhere" };
+
 # now set up our simple_crud interfaci
 simple_crud( prefix => '/users'  ,              record_title=>'A', db_table => 'users', editable => 0, );
 simple_crud( prefix => '/users_editable',       record_title=>'A', db_table => 'users', editable => 1, );
 simple_crud( prefix => '/users_editable_not_addable',       
                                                 record_title=>'A', db_table => 'users', editable => 1, addable => 0);
-simple_crud( prefix => '/users_custom_columns', record_title=>'A', db_table => 'users', editable => 0, custom_columns => [ $custom_column ] );
+
+simple_crud( prefix => '/users_custom_columns', record_title=>'A', db_table => 'users', editable => 0, custom_columns => [ $extra_custom_column, $id_custom_column ] );
 
 # override display of 'username' column
 simple_crud( prefix => '/users_customized_column', record_title=>'A', db_table => 'users', editable => 0, sortable=>1,
-                custom_columns => [ { name => "username", raw_column=>"username", transform => sub { "Username: $_[0]" }, column_class=>"classhere" } ], 
+                custom_columns => [ $username_custom_column, ], 
+            );
+simple_crud( prefix => '/users_customized_column2', record_title=>'A', db_table => 'users', editable => 0, sortable=>1,
+                custom_columns => [ $username_custom_column, $extra_custom_column, ],
+            );
+simple_crud( prefix => '/users_customized_column3', record_title=>'A', db_table => 'users', editable => 0, sortable=>1,
+                custom_columns => [ $username_custom_column, $extra_custom_column, $id_custom_column ],
             );
 
 1;

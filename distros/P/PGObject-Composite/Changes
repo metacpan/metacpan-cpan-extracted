@@ -1,5 +1,11 @@
 Revision history for PGObject-Composite
 
+1.0.1	2017-05-24
+	Better exports to support adaptors
+
+1.00	2017-05-24
+	All db tests now passing.  Verified working
+
 0.02	2014-09-08
         Minor fixes to test cases and routines, following fixes in PGObject.pm
 

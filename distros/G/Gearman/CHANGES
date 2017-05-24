@@ -1,3 +1,7 @@
+2.004.004 2017-05-19 13:11:00 Europe/Berlin
+    - new worker method send_work_exception
+    - send_work_fail does not support message parameter
+
 2.004.004 2017-05-09 07:53:00 Europe/Berlin
     - refactoring: Taskset carefully loops over loaned_sock
 

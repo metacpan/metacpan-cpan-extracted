@@ -43,7 +43,7 @@ sub has_default : Path('has_default') QueryParam(default=foobar) {
   $ctx->response->body("has_default: $d");
 }
 
-sub optional_num :Path('num') QueryParam('?num:>10') {
+sub optional_num :Path('num') QueryParam('num=:>10') {
   my ($self, $ctx) = @_;
   $ctx->response->body('optional_num');
 }

@@ -44,7 +44,9 @@ sub _cart_view{
   $page .= _cart_info({ ec_cart => $ec_cart, editable => 1 });
   $page .= "\n<p><a href='cart/clear'> Clear your cart. </a></p>";
   $page .= "<a href='products'> Continue shopping. </a>\n";
-  $page .= "\n<p><a href='cart/shipping'> Checkout. </a></p>";
+  if( @{$ec_cart->{cart}->{items}} > 0 ){
+    $page .= "\n<p><a href='cart/shipping'> Checkout. </a></p>";
+  }
   $page;
 }
 

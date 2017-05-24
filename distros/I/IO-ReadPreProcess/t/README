@@ -1,0 +1,67 @@
+You MUST not test .exit -- as that will kill the test script
+
+Alain Williams <addw@phcomp.co.uk>
+SCCS: @(#)README	1.3 05/22/17 19:27:16
+
+
+Overview of testing:
+
+Run the script test.t it looks in Tests/ and processes the *.input files,
+output is sent to ../TestOut.
+For each .input file there is a corresponding .want file that has the expected output.
+
+
+Each .input file may start with some special comments. These comment lines
+have the form (but without the leading spaces):
+
+    .# Key: value
+
+Eg:
+
+    .# Title: Line Starting dot
+
+The keys are:
+
+    Title:	Some words
+	A title that will be used for reporting
+	.# Title: A simple test
+
+    Preopen:	bool-value
+	Use to test a preopened file, ie option Fd will be set.
+	If bool-value is true (eg 1) pre-open the file
+
+    Set:	expression
+	An expression to run in the test environment before the test is run, eg:
+	.# Set: a := 12 + 3
+
+    NewOpt:	opt value
+	An option to new() when creating Text::Expression. Eg:
+	.# NewOpt: PipeOK 1
+
+    UnixOnly:	bool-value
+	If bool-value the test will only be run on a Unix machine.
+	See 'man perlport' for values of $^O
+	The ones currently understood as Unix are:
+		aix bsdos darwin dgux dynixptx freebsd haiku linux hpux irix darwin
+		machten next openbsd dec_osf svr4 unicos unicosmk sco_sv solaris sunos
+	.# UnixOnly: 1
+
+    Enable:	bool-value
+	This may be used to cause a test to not be run. A test is not run if bool-value is false.
+	Default is true, ie by default the test will be run
+	.# Enable: 0
+
+    OutOnError:	bool-value
+	Show the output generated if it differs from the wanted output.
+	.# OutOnError: 1
+
+    Require:	module
+	Modules to require before the test is done
+	This is not fully implemented.
+	Implies a fork.
+
+    Fork:	bool-value
+	To fork before doing the test
+	This is not fully implemented.
+
+

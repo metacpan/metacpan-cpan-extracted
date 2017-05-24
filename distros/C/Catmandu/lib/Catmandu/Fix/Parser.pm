@@ -2,7 +2,7 @@ package Catmandu::Fix::Parser;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0506';
+our $VERSION = '1.0507';
 
 use Catmandu::Util
     qw(check_value is_array_ref is_instance is_able require_package);
@@ -212,7 +212,7 @@ sub parse_bare_string {
 sub parse_single_quoted_string {
     my ($self) = @_;
 
-    my $str = $self->generic_token(string => qr/'(?:[^']|\\')*'/);
+    my $str = $self->generic_token(string => qr/'(?:\\?+.)*?'/);
     $str = substr($str, 1, length($str) - 2);
 
     $str =~ s{\\'}{'}gxms;
@@ -223,7 +223,7 @@ sub parse_single_quoted_string {
 sub parse_double_quoted_string {
     my ($self) = @_;
 
-    my $str = $self->generic_token(string => qr/"(?:[^"]|\\")*"/);
+    my $str = $self->generic_token(string => qr/"(?:\\?+.)*?"/);
     $str = substr($str, 1, length($str) - 2);
 
     if (index($str, '\\') != -1) {

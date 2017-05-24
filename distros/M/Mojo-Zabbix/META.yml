@@ -1,5 +1,5 @@
 ---
-abstract: unknown
+abstract: 'A simple perl wrapper of Zabbix API.'
 author:
   - 'Orange <bollwarm@ijz.me>'
 build_requires:
@@ -25,4 +25,4 @@ requires:
   Time::HiRes: '0'
 resources:
   repository: https://github.com/bollwarm/Mojo-Zabbix
-version: '0.10'
+version: '0.11'

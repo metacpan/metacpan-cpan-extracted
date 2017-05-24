@@ -15,8 +15,8 @@ WriteMakefile(
     PREREQ_PM           => {
 
         # prereqs
-        'Template'	                => '2',
-        'Template::Plugin::Filter'  => '2',
+        'Template'	            => '2',
+        'Template::Plugin::Filter'  => '1.38',
         'Text::WikiFormat'          => '0.75',
 
         # build/test prereqs

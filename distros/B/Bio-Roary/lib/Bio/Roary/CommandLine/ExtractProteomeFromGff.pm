@@ -1,6 +1,6 @@
 undef $VERSION;
 package Bio::Roary::CommandLine::ExtractProteomeFromGff;
-$Bio::Roary::CommandLine::ExtractProteomeFromGff::VERSION = '3.8.0';
+$Bio::Roary::CommandLine::ExtractProteomeFromGff::VERSION = '3.8.2';
 # ABSTRACT: Take in GFF files and output the proteome
 
 
@@ -127,7 +127,7 @@ Bio::Roary::CommandLine::ExtractProteomeFromGff - Take in GFF files and output t
 
 =head1 VERSION
 
-version 3.8.0
+version 3.8.2
 
 =head1 SYNOPSIS
 

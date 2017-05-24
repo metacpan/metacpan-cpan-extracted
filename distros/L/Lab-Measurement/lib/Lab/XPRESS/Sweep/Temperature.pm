@@ -1,6 +1,6 @@
 package Lab::XPRESS::Sweep::Temperature;
 
-our $VERSION = '3.542';
+our $VERSION = '3.543';
 
 use Lab::XPRESS::Sweep::Sweep;
 use Statistics::Descriptive;
@@ -26,8 +26,9 @@ sub new {
         pid                 => undef,
         mode                => 'continuous',
         allowed_instruments => [
-            'Lab::Instrument::ITC', 'Lab::Instrument::TCD',
-            'Lab::Instrument::OI_ITC503', 'Lab::Instrument::OI_Triton'
+            qw/Lab::Instrument::ITC Lab::Instrument::TCD
+                Lab::Instrument::OI_ITC503 Lab::Instrument::OI_Triton
+                Lab::Instrument::Lakeshore340/,
         ],
         allowed_sweep_modes => [ 'continuous', 'step', 'list' ],
 
@@ -38,7 +39,9 @@ sub new {
         std_dev_instrument             => 0.15,
         std_dev_sensor                 => 0.15,
 
-        max_stabilization_time => undef
+        max_stabilization_time => undef,
+        setter_args            => [],
+        getter_args            => [],
 
     };
 
@@ -123,7 +126,7 @@ sub exit_loop {
             $TEMPERATURE = $self->{config}->{sensor}->get_value();
         }
         else {
-            $TEMPERATURE = $self->{config}->{instrument}->get_value();
+            $TEMPERATURE = $self->get_value();
         }
         if ( $TEMPERATURE < @{ $self->{config}->{points} }[0] ) {
             return 1;
@@ -140,7 +143,8 @@ sub exit_loop {
 
 sub get_value {
     my $self = shift;
-    return $self->{config}->{instrument}->get_value();
+    return $self->{config}->{instrument}
+        ->get_value( @{ $self->{config}->{getter_args} } );
 }
 
 sub halt {
@@ -182,7 +186,8 @@ sub stabilize {
     }
 
     $self->{config}->{instrument}->set_heatercontrol('AUTO');
-    $self->{config}->{instrument}->set_T($setpoint);
+    $self->{config}->{instrument}
+        ->set_T( $setpoint, @{ $self->{config}->{setter_args} } );
 
     local $| = 1;
 
@@ -201,7 +206,7 @@ sub stabilize {
     while (1) {
 
         #----------COLLECT DATA--------------------
-        my $T_INSTR = $self->{config}->{instrument}->get_value();
+        my $T_INSTR = $self->get_value();
         push( @T_INSTR, $T_INSTR );
 
         if (
@@ -326,12 +331,13 @@ sub stabilize {
         my $elapsed_time = $self->convert_time( time() - $time0 );
 
         my $output
-            = $elapsed_time . " | "
-            . sprintf( "%3.4f", @T_INSTR[-1] ) . " | "
-#            . sprintf( "%3.3f", @T_SENSOR[-1] ) . " | "
-#            . sprintf( "%3.3f", @MEDIAN_INSTR[-1] ) . " | "
+            = $elapsed_time . " | " . sprintf( "%3.4f", @T_INSTR[-1] ) . " | "
+
+            #            . sprintf( "%3.3f", @T_SENSOR[-1] ) . " | "
+            #            . sprintf( "%3.3f", @MEDIAN_INSTR[-1] ) . " | "
             . sprintf( "%2.4f", $INSTR_STD_DEV ) . " | "
-#            . sprintf( "%2.3f", $SENSOR_STD_DEV ) . " | "
+
+            #            . sprintf( "%2.3f", $SENSOR_STD_DEV ) . " | "
             . $criterion_setpoint . " | "
             . $criterion_std_dev_INSTR . " | "
             . $criterion_std_dev_SENSOR;
@@ -543,7 +549,19 @@ Defines the time in seconds to wait after the value for the next step has been r
 
 Defines the time in seconds to wait after the sweep has been finished. This delay will be executed before an optional backsweep or optional repetitions of the sweep.
 
-.
+=head2 getter_args
+
+Setting C<getter_args => [@args]>, the C<get_value> method will be called as
+
+ $instrument->get_value(@args);
+
+=head2 setter_args
+
+Setting C<setter_args => [@args]>, the C<set_T> method will be called as
+
+ $instrument->set_T($setpoint, @args);
+
+
 
 =head1 CAVEATS/BUGS
 

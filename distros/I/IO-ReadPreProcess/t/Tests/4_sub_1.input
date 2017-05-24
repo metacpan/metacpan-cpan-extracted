@@ -1,0 +1,8 @@
+.# Title: Basic subroutine
+Line 1
+.sub sub1
+Line in sub1
+.done
+After sub definition
+.sub1
+After sub1 called

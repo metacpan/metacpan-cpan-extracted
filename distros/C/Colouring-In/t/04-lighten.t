@@ -1,6 +1,6 @@
 use Test::More;
 
-use Colouring::In;
+use Colouring::In qw/lighten/;
 
 subtest 'basics - black' => sub {
         convert_colour(

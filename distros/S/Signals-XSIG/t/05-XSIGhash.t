@@ -1,6 +1,7 @@
 package Some::Package;
 
 use Signals::XSIG;
+use lib '.';
 use t::SignalHandlerTest;
 use Test::More tests => 19;
 use Config;

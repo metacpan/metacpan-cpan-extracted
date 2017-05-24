@@ -1,4 +1,5 @@
 use Signals::XSIG;
+use lib '.';
 use t::SignalHandlerTest;
 use Test::More tests => 11;
 use strict;

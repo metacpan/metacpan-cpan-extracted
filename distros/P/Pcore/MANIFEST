@@ -122,10 +122,8 @@ lib/Pcore/Dist/CLI/Test.pm
 lib/Pcore/Dist/CLI/Update.pm
 lib/Pcore/Dist/CLI/Wiki.pm
 lib/Pcore/HTTP.pm
-lib/Pcore/HTTP/CookieJar.pm
-lib/Pcore/HTTP/Message.pm
-lib/Pcore/HTTP/Message/Headers.pm
-lib/Pcore/HTTP/Request.pm
+lib/Pcore/HTTP/Cookies.pm
+lib/Pcore/HTTP/Headers.pm
 lib/Pcore/HTTP/Response.pm
 lib/Pcore/HTTP/Server.pm
 lib/Pcore/HTTP/Server/Request.pm
@@ -249,7 +247,7 @@ share/pcore/git/.gitignore
 share/pcore/hg/.hgignore
 share/pcore/par/share/par.perl
 t/author-pod-syntax.t
-t/p-http-cookiejar.t
+t/p-http-cookies.t
 t/p-util-path.t
 t/p-util-uri-host.t
 t/p-util-uri-web2.t

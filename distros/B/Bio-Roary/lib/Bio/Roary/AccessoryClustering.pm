@@ -1,5 +1,5 @@
 package Bio::Roary::AccessoryClustering;
-$Bio::Roary::AccessoryClustering::VERSION = '3.8.0';
+$Bio::Roary::AccessoryClustering::VERSION = '3.8.2';
 # ABSTRACT: Take an a clusters file from CD-hit and the fasta file and output a fasta file without full clusters
 
 
@@ -92,7 +92,7 @@ Bio::Roary::AccessoryClustering - Take an a clusters file from CD-hit and the fa
 
 =head1 VERSION
 
-version 3.8.0
+version 3.8.2
 
 =head1 SYNOPSIS
 

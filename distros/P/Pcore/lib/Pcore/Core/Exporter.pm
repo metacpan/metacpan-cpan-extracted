@@ -81,6 +81,7 @@ sub parse_import {
 
     my $export_pragma = do {
         no strict qw[refs];
+        no warnings qw[once];
 
         ${"$caller\::EXPORT_PRAGMA"};
     };
@@ -230,10 +231,10 @@ sub _export_tags ( $self, $caller, $import ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 31, 48, 90, 102,     | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
-## |      | 142, 165, 183, 218   |                                                                                                                |
+## |    3 | 31, 48, 91, 103,     | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
+## |      | 143, 166, 184, 219   |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 130                  | Subroutines::ProhibitExcessComplexity - Subroutine "_export_tags" with high complexity score (28)              |
+## |    3 | 131                  | Subroutines::ProhibitExcessComplexity - Subroutine "_export_tags" with high complexity score (28)              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 | 1                    | Modules::RequireVersionVar - No package-scoped "$VERSION" variable found                                       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

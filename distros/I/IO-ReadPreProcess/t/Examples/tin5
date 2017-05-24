@@ -1,0 +1,11 @@
+.sub routine
+In routine
+.set i := 0
+.while ++i < 10
+In while
+.break
+.done while
+End of routine
+.done
+Calling .routine
+.routine

@@ -1,5 +1,5 @@
 package Git::Hooks::Test;
-$Git::Hooks::Test::VERSION = '1.15.1';
+$Git::Hooks::Test::VERSION = '1.16.0';
 ## no critic (RequireExplicitPackage)
 ## no critic (ErrorHandling::RequireCarping)
 use 5.010;
@@ -341,7 +341,7 @@ Git::Hooks::Test
 
 =head1 VERSION
 
-version 1.15.1
+version 1.16.0
 
 =for Pod::Coverage install_hooks new_commit new_repos newdir test_command test_nok test_nok_match test_ok test_ok_match
 

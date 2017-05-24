@@ -1,3 +1,9 @@
+1.1.5    19.05.2017
+           - fix test
+1.1.4    19.05.2017
+           - make Panda::Lib's clone test optional (is not required anymore)
+1.1.3    19.05.2017
+           - remove usage of Panda::Lib
 1.1.2    11.05.2017
            - use CPP::panda::lib
 1.1.1    13.03.2017

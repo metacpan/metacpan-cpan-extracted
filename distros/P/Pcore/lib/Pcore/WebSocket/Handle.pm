@@ -17,8 +17,8 @@ use Pcore::Util::Digest qw[sha1];
 
 requires qw[protocol before_connect_server before_connect_client on_connect_server on_connect_client on_disconnect on_text on_binary on_pong];
 
-has max_message_size => ( is => 'ro', isa => PositiveOrZeroInt, default => 1_024 * 1_024 * 100 );    # 0 - do not check
-has pong_interval    => ( is => 'ro', isa => PositiveOrZeroInt, default => 0 );                      # 0 - do not pong
+has max_message_size => ( is => 'ro', isa => PositiveOrZeroInt, default => 1_024 * 1_024 * 100 );    # 0 - do not check message size
+has pong_interval    => ( is => 'ro', isa => PositiveOrZeroInt, default => 0 );                      # 0 - do not pong automatically
 has compression      => ( is => 'ro', isa => Bool,              default => 0 );                      # use permessage_deflate compression
 
 has on_disconnect => ( is => 'ro', isa => CodeRef, reader => undef );
@@ -320,7 +320,7 @@ sub _on_frame ( $self, $header, $payload_ref ) {
 
         # PONG message
         elsif ( $header->{op} == $WEBSOCKET_OP_PONG ) {
-            $self->on_pong( $payload_ref ? $payload_ref : () );
+            $self->on_pong( $payload_ref ? $payload_ref->%* : q[] );
         }
     }
 

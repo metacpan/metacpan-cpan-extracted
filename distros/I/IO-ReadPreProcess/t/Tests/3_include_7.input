@@ -1,0 +1,7 @@
+.# Title: Read from perl from pipe
+.# Reading from a Unix command does not work under MS Windows,
+.# so create a perl script to read from.
+.# NewOpt: PipeOK 1
+About to include
+.include | perl t/Tests/3_include_7.pl
+EOF

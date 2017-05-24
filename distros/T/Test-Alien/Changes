@@ -1,5 +1,12 @@
 Revision history for Test-Alien
 
+0.15      2017-05-23 13:14:32 -0400
+  - Documentation fixes
+  - Require more recent Text::ParseWords to avoid bugs in
+    Text::ParseWords
+  - Handle situation where temp directory is mounted
+    noexec
+
 0.14      2017-03-23 22:10:24 -0400
   - Documentation fixes.
 

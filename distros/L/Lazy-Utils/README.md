@@ -4,11 +4,9 @@ Lazy::Utils - Utility functions
 
 # VERSION
 
-version 1.16
+version 1.17
 
 # SYNOPSIS
-
-Utility functions
 
         use Lazy::Utils;
          
@@ -22,18 +20,16 @@ Utility functions
         bash_readline($prompt);
         cmdargs($prefs, @argv);
         whereis($name, $path);
-        file_cache($tag, $expiry, $subref);
+        file_cache($tag, $expiry, $coderef);
         get_pod_text($file_name, $section, $exclude_section);
-        term_readline($prompt, $default, $history, $in, $out);
-        term_readkey($in);
 
 # DESCRIPTION
 
-Collection of utility functions all of exported by default
+Collection of utility functions all of exported by default.
 
-## Functions
+# Functions
 
-### trim($str)
+## trim($str)
 
 trims given string
 
@@ -41,7 +37,7 @@ $str: _string will be trimed_
 
 return value: _trimed string_
 
-### ltrim($str)
+## ltrim($str)
 
 trims left given string
 
@@ -49,7 +45,7 @@ $str: _string will be trimed_
 
 return value: _trimed string_
 
-### rtrim($str)
+## rtrim($str)
 
 trims right given string
 
@@ -57,7 +53,7 @@ $str: _string will be trimed_
 
 return value: _trimed string_
 
-### file\_get\_contents($path, $prefs)
+## file\_get\_contents($path, $prefs)
 
 gets all contents of file in string type
 
@@ -69,7 +65,7 @@ $prefs: _preferences in HashRef, by default undef_
 
 return value: _file contents in string type, otherwise undef because of errors_
 
-### file\_put\_contents($path, $contents, $prefs)
+## file\_put\_contents($path, $contents, $prefs)
 
 puts all contents of file in string type
 
@@ -83,7 +79,7 @@ $prefs: _preferences in HashRef, by default undef_
 
 return value: _success 1, otherwise undef_
 
-### shellmeta($s, $nonquoted)
+## shellmeta($s, $nonquoted)
 
 escapes metacharacters of interpolated shell string
 
@@ -93,9 +89,9 @@ $nonquoted: _also escapes whitespaces and \* character for non-quoted interpolat
 
 return value: _escaped string_
 
-### system2($cmd, @argv)
+## system2($cmd, @argv)
 
-**\_system($cmd, @argv)** _WILL BE DEPRECATED_
+**\_system($cmd, @argv)** _OBSOLETE_
 
 alternative implementation of perls core system subroutine that executes a system command
 
@@ -109,9 +105,9 @@ returned $?: _return code of wait call like on perls system call_
 
 returned $!: _system error message like on perls system call_
 
-### bash\_readline($prompt)
+## bash\_readline($prompt)
 
-**bashReadLine($prompt)** _WILL BE DEPRECATED_
+**bashReadLine($prompt)** _OBSOLETE_
 
 reads a line from STDIN using Bash
 
@@ -119,11 +115,11 @@ $prompt: _prompt, by default &#39;&#39;_
 
 return value: _line_
 
-### cmdargs(\[$prefs, \]@argv)
+## cmdargs(\[$prefs, \]@argv)
 
-**commandArgs(\[$prefs, \]@argv)** _WILL BE DEPRECATED_
+**commandArgs(\[$prefs, \]@argv)** _OBSOLETE_
 
-**cmdArgs(\[$prefs, \]@argv)** _WILL BE DEPRECATED_
+**cmdArgs(\[$prefs, \]@argv)** _OBSOLETE_
 
 resolves command line arguments
 
@@ -163,9 +159,9 @@ return value: eg;
         { -opt1 => '', -opt2 => 'val2', command => 'cmd', parameters => ['param1', 'param2', 'param3'] }
         { -opt1 => '', -opt2 => '', command => 'cmd', parameters => ['param1', 'param2', 'param3'] }
 
-### whereis($name, $path)
+## whereis($name, $path)
 
-**whereisBin($name, $path)** _WILL BE DEPRECATED_
+**whereisBin($name, $path)** _OBSOLETE_
 
 searches valid binary in search path
 
@@ -175,29 +171,29 @@ $path: _search path, by default &quot;/usr/local/sbin:/usr/local/bin:/usr/sbin:/
 
 return value: _array of binary path founded in search path_
 
-### file\_cache($tag, $expiry, $subref)
+## file\_cache($tag, $expiry, $coderef)
 
-**fileCache($tag, $expiry, $subref)** _WILL BE DEPRECATED_
+**fileCache($tag, $expiry, $coderef)** _OBSOLETE_
 
-gets most recent cached value in file cache by given tag and caller function if there is cached value in expiry period. Otherwise tries to get current value using $subref, puts value in cache and cleanups old cache values.
+gets most recent cached value in file cache by given tag and caller function if there is cached value in expiry period. Otherwise tries to get current value using $coderef, puts value in cache and cleanups old cache values.
 
 $tag: _tag for cache_
 
 $expiry: _cache expiry period_
 
-> &lt;0: _always gets most recent cached value if there is any cached value. Otherwise tries to get current value using $subref, puts and cleanups._
+> &lt;0: _always gets most recent cached value if there is any cached value. Otherwise tries to get current value using $coderef, puts and cleanups._
 >
-> &#x3d;0: _never gets cached value. Always tries to get current value using $subref, puts and cleanups._
+> &#x3d;0: _never gets cached value. Always tries to get current value using $coderef, puts and cleanups._
 >
-> &gt;0: _gets most recent cached value in cache if there is cached value in expiry period. Otherwise tries to get current value using $subref, puts and cleanups._
+> &gt;0: _gets most recent cached value in cache if there is cached value in expiry period. Otherwise tries to get current value using $coderef, puts and cleanups._
 
-$subref: _sub reference in CodeRef to get current value_
+$coderef: _code reference to get current value_
 
 return value: _cached or current value, otherwise undef if there isn&#39;t cached value and current value doesn&#39;t get_
 
-### get\_pod\_text($file\_name, $section, $exclude\_section)
+## get\_pod\_text($file\_name, $section, $exclude\_section)
 
-**getPodText($file\_name, $section, $exclude\_section)** _WILL BE DEPRECATED_
+**getPodText($file\_name, $section, $exclude\_section)** _OBSOLETE_
 
 gets a text of pod contents in given file
 
@@ -208,30 +204,6 @@ $section: _searching head1 section of pod, by default undef gets all of contents
 $exclude\_section: _excludes section name, by default undef_
 
 return value: _text of pod in string or array by line, otherwise undef if an error occurs_
-
-### term\_readline($prompt, $default, $history, $in, $out)
-
-reads a line from terminal
-
-$prompt: _prompt, by default &#39;&#39;_
-
-$default: _initial value of line, by default &#39;&#39;_
-
-$history: _lines history in ArrayRef, by default undef_
-
-$in: _terminal input file handle, by default \\\*STDIN_
-
-$out: _terminal output file handle, by default \\\*STDOUT_
-
-return value: _line_
-
-### term\_readkey($in)
-
-reads key from terminal
-
-$in: _terminal input file handle, by default \\\*STDIN_
-
-return value: _key in string type_
 
 # INSTALLATION
 
@@ -252,7 +224,6 @@ This module requires these other modules and libraries:
 
 - JSON
 - Pod::Simple::Text
-- Term::ReadKey
 
 # REPOSITORY
 
@@ -262,7 +233,7 @@ This module requires these other modules and libraries:
 
 # AUTHOR
 
-Orkun Karaduman &lt;orkunkaraduman@gmail.com&gt;
+Orkun Karaduman (ORKUN) &lt;orkun@cpan.org&gt;
 
 # COPYRIGHT AND LICENSE
 

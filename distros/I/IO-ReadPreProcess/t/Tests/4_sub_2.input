@@ -1,0 +1,14 @@
+.# Title: Basic subroutine in an if
+Line 1
+.sub sub1
+Line in sub1
+.done
+After sub definition
+.if 0
+.sub1
+.fi
+After call in .if 0
+.if 1
+.sub1
+.fi
+After sub1 called

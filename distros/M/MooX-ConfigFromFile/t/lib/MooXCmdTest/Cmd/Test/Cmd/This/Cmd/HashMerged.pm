@@ -10,9 +10,8 @@ BEGIN
     $@ and die $@;
     $moodel->import;
 }
-use MooX::ConfigFromFile
-  config_prefix               => "MooXCmdTest";
-use MooX::Cmd with_config_from_file => 1;
+use MooX::ConfigFromFile config_prefix => "MooXCmdTest";
+use MooX::Cmd with_config_from_file    => 1;
 with "MooX::ConfigFromFile::Role::HashMergeLoaded";
 
 has dedicated_setting => (

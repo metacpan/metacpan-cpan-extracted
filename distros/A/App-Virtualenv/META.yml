@@ -21,7 +21,7 @@ requires:
   CPAN: '2.00'
   Cwd: '3.47'
   ExtUtils::Installed: '2.02'
-  Lazy::Utils: '1.13'
+  Lazy::Utils: '1.17'
   local::lib: '2.000004'
   perl: '5.010001'
 resources:
@@ -29,5 +29,5 @@ resources:
   homepage: https://metacpan.org/release/App-Virtualenv
   license: https://www.gnu.org/licenses/gpl-3.0.html
   repository: git://git@github.com:orkunkaraduman/perl5-virtualenv.git
-version: '2.06'
+version: '2.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

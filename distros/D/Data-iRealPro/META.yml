@@ -27,5 +27,5 @@ requires:
   perl: '5.010000'
 resources:
   repository: git://github.com/sciurius/perl-Data-iRealPro
-version: '1.07'
+version: '1.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -28,6 +28,8 @@ sub _build_api ($self) {
 }
 
 sub get ( $self, @ ) {
+    my $blocking_cv = AE::cv;
+
     my %args = (
         id        => undef,
         active    => undef,
@@ -65,8 +67,6 @@ sub get ( $self, @ ) {
     # default
     $status->@{qw[open resolved closed]} = () if !$args{id} && !$status->%*;
 
-    my $cv = AE::cv;
-
     my @status = keys $status->%*;
 
     if ( $args{id} && @status ) {
@@ -74,44 +74,30 @@ sub get ( $self, @ ) {
         # impossible to set multiple statuses
         croak q[Can't set multiply issue statuses] if @status > 1;
 
-        my $issue;
-
         $self->api->set_issue_status(
             $args{id},
             $status[0],
             sub ($res) {
-                $issue = $res;
-
-                $cv->send;
+                $blocking_cv->($res);
 
                 return;
             }
         );
-
-        $cv->recv;
-
-        return $issue;
     }
     else {
-        my $issues;
-
-        $self->api->issues(
-            id        => $args{id},
-            status    => \@status,
-            milestone => $args{milestone},
-            sub ($res) {
-                $issues = $res;
-
-                $cv->send;
-
-                return;
-            }
-        );
-
-        $cv->recv;
-
-        return $issues;
+        if ( $args{id} ) {
+            $self->api->get_issue( $args{id}, $blocking_cv );
+        }
+        else {
+            $self->api->get_issues(
+                status    => \@status,
+                milestone => $args{milestone},
+                $blocking_cv
+            );
+        }
     }
+
+    return $blocking_cv->recv;
 }
 
 sub print_issues ( $self, $issues, $content = 1 ) {
@@ -177,7 +163,7 @@ sub create_milestone ( $self, $milestone, $cb ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    1 | 152                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
+## |    1 | 138                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

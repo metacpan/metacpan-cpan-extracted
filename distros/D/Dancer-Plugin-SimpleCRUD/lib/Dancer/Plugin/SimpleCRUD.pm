@@ -37,9 +37,9 @@ use HTML::Table::FromDatabase;
 use CGI::FormBuilder;
 use HTML::Entities;
 use URI::Escape;
-use List::MoreUtils qw( first_index );
+use List::MoreUtils qw( first_index uniq );
 
-our $VERSION = '1.11';
+our $VERSION = '1.14';
 
 =encoding utf8
 
@@ -575,7 +575,7 @@ sub simple_crud {
     if ($args{editable}) {
         _ensure_auth('edit', $handler, \%args);
         for ('/edit/:id') {
-            my $url = _construct_url($args{dancer_prefix}, $args{prefix}, $_);
+            my $url = _construct_url($args{prefix}, $_);
             Dancer::Logger::debug("Setting up route for $url");
             any ['get', 'post'] => $url => $handler;
         }
@@ -583,7 +583,7 @@ sub simple_crud {
     if ($args{addable}) {
         _ensure_auth('edit', $handler, \%args);
         for ('/add') {
-            my $url = _construct_url($args{dancer_prefix}, $args{prefix}, $_);
+            my $url = _construct_url($args{prefix}, $_);
             Dancer::Logger::debug("Setting up route for $url");
             any ['get', 'post'] => $url => $handler;
         }
@@ -597,7 +597,6 @@ sub simple_crud {
             \%args,
         );
     get _construct_url(
-        $args{dancer_prefix},
         $args{prefix},
     ) => $list_handler;
 
@@ -610,7 +609,7 @@ sub simple_crud {
         # support Javascript, otherwise the list page will have POSTed the ID
         # to us) (or they just came here directly for some reason)
         get _construct_url(
-            $args{dancer_prefix}, $args{prefix}, "/delete/:id"
+            $args{prefix}, "/delete/:id"
             ) => sub {
             return _apply_template(<<CONFIRMDELETE, $args{'template'}, $args{'record_title'});
 <p>
@@ -627,7 +626,7 @@ CONFIRMDELETE
 
         # A route for POST requests, to actually delete the record
         my $del_url_stub = _construct_url(
-            $args{dancer_prefix}, $args{prefix}, '/delete'
+            $args{prefix}, '/delete'
         );
         my $delete_handler = sub {
             my ($id) = params->{record_id} || splat;
@@ -661,7 +660,7 @@ CONFIRMDELETE
         post qr[$del_url_stub/?(.+)?$] => $delete_handler;
     }
     my $view_url_stub = _construct_url(
-        $args{dancer_prefix}, $args{prefix}, '/view'
+        $args{prefix}, '/view'
     );
     my $view_handler = _ensure_auth(
         'view',
@@ -720,11 +719,15 @@ sub _create_add_edit_route {
 
     # a hash containing the current values in the database
     my $values_from_database;
-    if ($id) {
+    if (defined $id) {
         my $where = _get_where_filter_from_args($args);
         $where->{$key_column} = $id;
         $values_from_database
             = $dbh->quick_select($table_name, $where);
+        if (!$values_from_database) {
+            send_error "$params->{title} $id not found", 404;
+
+        }
     }
 
     # Find out about table columns:
@@ -1030,6 +1033,8 @@ sub _create_list_handler {
         [ lte => { name => "Less Than or Equal To",    cmp => "<=" } ],
         [ gt  => { name => "Greater Than",             cmp => ">" } ],
         [ gte => { name => "Greater Than or Equal To", cmp => ">=" } ],
+
+        [ like => { name => "Like", cmp => "LIKE" } ],
     );
     my $searchtype_options = join( "\n",
         map { 
@@ -1190,9 +1195,9 @@ SEARCHFORM
 
             if ($column_data) {
                 my $search_value = $q;
-                if ($st eq 'c' || $st eq 'nc') {
+                if ($st eq 'c' || $st eq 'nc') {    # contains or does not contain
                     $search_value = '%' . $search_value . '%';
-                } elsif ($st eq 'b') {
+                } elsif ($st eq 'b') {              # begins with
                     $search_value = $search_value . '%';
                 }
 
@@ -1414,8 +1419,9 @@ SEARCHFORM
     my @all_column_names = ( (map { $_->{COLUMN_NAME} } @$columns), (map { $_->{name} } @{$args->{custom_columns}}) );
     for my $custom_col_spec (@{ $args->{custom_columns} || [] } ) {
         if (my $column_class = $custom_col_spec->{column_class}) {
-            my $index = 1 + (first_index { $_ eq $custom_col_spec->{name} } @all_column_names);
-            $table->setColClass( $index, $column_class );
+            my $first_index = first_index { $_ eq $custom_col_spec->{name} } uniq @all_column_names;
+            die "Cannot find index of column '$custom_col_spec->{name}'" if ($first_index == -1);
+            $table->setColClass( 1 + $first_index, $column_class );
         }
     }
 

@@ -42,8 +42,7 @@
       "test" : {
          "requires" : {
             "Scalar::Util" : "0",
-            "Test::More" : "0",
-            "Test::Signature" : "0"
+            "Test::More" : "0"
          }
       }
    },
@@ -60,7 +59,7 @@
          "web" : "https://github.com/mschout/perl-data-validate-dns-caa"
       }
    },
-   "version" : "0.02",
+   "version" : "0.04",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 

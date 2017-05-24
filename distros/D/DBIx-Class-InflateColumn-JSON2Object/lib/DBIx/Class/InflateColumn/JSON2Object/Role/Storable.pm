@@ -10,23 +10,20 @@ use String::CamelCase qw(camelize decamelize);
 
 use Moose::Util::TypeConstraints;
 
-subtype 'InflateColumnJSONBool',
-    as 'Ref';
+subtype 'InflateColumnJSONBool', as 'Ref';
 coerce 'InflateColumnJSONBool',
     from 'Str',
     via { $_ ? JSON->true : JSON->false };
 coerce 'InflateColumnJSONBool',
     from 'Int',
     via { $_ ? JSON->true : JSON->false };
-coerce 'InflateColumnJSONBool',
-    from 'Undef',
-    via { JSON->false };
+coerce 'InflateColumnJSONBool', from 'Undef', via { JSON->false };
 
 sub freeze {
     my ($self) = @_;
 
     my $payload = $self->pack;
-    my $json = JSON::MaybeXS->new->utf8->convert_blessed->encode($payload);
+    my $json    = JSON::MaybeXS->new->utf8->convert_blessed->encode($payload);
 
     # stolen from MooseX::Storage
     utf8::decode($json) if !utf8::is_utf8($json) and utf8::valid($json);
@@ -34,7 +31,7 @@ sub freeze {
 }
 
 sub thaw {
-    my ($class,$payload) = @_;
+    my ( $class, $payload ) = @_;
 
     # stolen from MooseX::Storage
     utf8::encode($payload) if utf8::is_utf8($payload);
@@ -47,11 +44,12 @@ sub pack {
     my ($self) = @_;
 
     my $payload = {};
-    foreach my $attribute ($self->meta->get_all_attributes) {
+    foreach my $attribute ( $self->meta->get_all_attributes ) {
         next
-            if $attribute->does('DBIx::Class::InflateColumn::Trait::NoSerialize');
+            if $attribute->does(
+            'DBIx::Class::InflateColumn::Trait::NoSerialize');
         my $val = $attribute->get_value($self);
-        $payload->{$attribute->name} = $val if defined $val;
+        $payload->{ $attribute->name } = $val if defined $val;
     }
     return $payload;
 }
@@ -64,8 +62,8 @@ sub moniker {
 }
 
 sub package {
-    my ($class,$moniker) = @_;
-    return $class.'::'.camelize($moniker)
+    my ( $class, $moniker ) = @_;
+    return $class . '::' . camelize($moniker);
 }
 
 sub TO_JSON {
@@ -87,7 +85,7 @@ DBIx::Class::InflateColumn::JSON2Object::Role::Storable - simplified MooseX::Sto
 
 =head1 VERSION
 
-version 0.902
+version 0.903
 
 =head1 NAME
 

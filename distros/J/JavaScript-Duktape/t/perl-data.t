@@ -5,49 +5,55 @@ use JavaScript::Duktape;
 use Data::Dumper;
 use Test::More;
 
-my $js = JavaScript::Duktape->new();
+my $js  = JavaScript::Duktape->new();
 my $duk = $js->duk;
 
-$duk->push_function(sub {
-    ok(1, "success from javascript land");
-}, 1);
+$duk->push_function(
+    sub {
+        ok( 1, "success from javascript land" );
+    },
+    1
+);
 
 $duk->put_global_string("perlok");
 
 my $data = {
-    num => 9,
+    num  => 9,
     func => sub {
-        is(1, $_[0]);
-        is("Hi", $_[1]);
-        is($_[2], true); #true
-        ok($_[2]); #true
+        is( 1,     $_[0] );
+        is( "Hi",  $_[1] );
+        is( $_[2], true );    #true
+        ok( $_[2] );          #true
 
-        is($_[3], false); #false
-        ok(!$_[3]); #false
+        is( $_[3], false );   #false
+        ok( !$_[3] );         #false
 
         #XXX : test null $_[4]
-        ok(!$_[4]);
-        is($_[4], null);
+        ok( !$_[4] );
+        is( $_[4], null );
 
         ##fifth argument passed as javascript function
-        $_[5]->(sub {
-            my $d = shift;
-            is($d, "Hi again");
-            return [1, 2, 3];
-        });
+        $_[5]->(
+            sub {
+                my $d = shift;
+                is( $d, "Hi again" );
+                return [ 1, 2, 3 ];
+            }
+        );
 
         return { h => 9999 };
     },
     str => 'Hello',
-    un => undef,
-    n => null,
-    t => true,
-    f => false
+    un  => undef,
+    n   => null,
+    t   => true,
+    f   => false
 };
 
-$js->set('perl', $data);
+$js->set( 'perl', $data );
 
-$duk->peval_string(qq~
+$duk->peval_string(
+    qq~
     //print(JSON.stringify(perl));
     if (perl.str === 'Hello') perlok();
     if (typeof perl.un === 'undefined') perlok();
@@ -64,11 +70,11 @@ $duk->peval_string(qq~
         }
     });
     if(obj.h === 9999) perlok();
-~);
+~
+);
 $duk->dump();
 
-
-if (false){
+if (false) {
     print "OK\n";
 }
 

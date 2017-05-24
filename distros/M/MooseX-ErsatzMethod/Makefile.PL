@@ -4,47 +4,50 @@ use ExtUtils::MakeMaker 6.17;
 my $EUMM = eval( $ExtUtils::MakeMaker::VERSION );
 
 my $meta = {
-  "abstract"       => "provide a method implementation that isn't as good as the real thing",
-  "author"         => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>", "unknown"],
-  "dynamic_config" => 0,
-  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640",
-  "keywords"       => [],
-  "license"        => ["perl_5"],
-  "meta-spec"      => {
-                        url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-                        version => 2,
-                      },
-  "name"           => "MooseX-ErsatzMethod",
-  "no_index"       => { directory => ["eg", "examples", "inc", "t", "xt"] },
-  "prereqs"        => {
-                        configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                        runtime => { requires => { "Module::Runtime" => 0, "Moose" => "2.00" } },
-                        test => { requires => { "Test::More" => 0.61 } },
-                      },
-  "provides"       => {
-                        "MooseX::ErsatzMethod"                               => { file => "lib/MooseX/ErsatzMethod.pm", version => 0.004 },
-                        "MooseX::ErsatzMethod::Meta::Method"                 => { file => "lib/MooseX/ErsatzMethod.pm", version => 0.004 },
-                        "MooseX::ErsatzMethod::Trait::ApplicationToClass"    => { file => "lib/MooseX/ErsatzMethod.pm", version => 0.004 },
-                        "MooseX::ErsatzMethod::Trait::ApplicationToInstance" => { file => "lib/MooseX/ErsatzMethod.pm", version => 0.004 },
-                        "MooseX::ErsatzMethod::Trait::ApplicationToRole"     => { file => "lib/MooseX/ErsatzMethod.pm", version => 0.004 },
-                        "MooseX::ErsatzMethod::Trait::Composite"             => { file => "lib/MooseX/ErsatzMethod.pm", version => 0.004 },
-                        "MooseX::ErsatzMethod::Trait::Role"                  => { file => "lib/MooseX/ErsatzMethod.pm", version => 0.004 },
-                      },
-  "release_status" => "stable",
-  "resources"      => {
-                        bugtracker   => {
-                                          web => "http://rt.cpan.org/Dist/Display.html?Queue=MooseX-ErsatzMethod",
-                                        },
-                        homepage     => "https://metacpan.org/release/MooseX-ErsatzMethod",
-                        license      => ["http://dev.perl.org/licenses/"],
-                        repository   => {
-                                          type => "git",
-                                          url  => "git://github.com/tobyink/p5-moosex-ersatzmethod.git",
-                                          web  => "https://github.com/tobyink/p5-moosex-ersatzmethod",
-                                        },
-                        X_identifier => "http://purl.org/NET/cpan-uri/dist/MooseX-ErsatzMethod/project",
-                      },
-  "version"        => 0.004,
+  "abstract"         => "provide a method implementation that isn't as good as the real thing",
+  "author"           => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
+  "dynamic_config"   => 0,
+  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150005",
+  "keywords"         => [],
+  "license"          => ["perl_5"],
+  "meta-spec"        => {
+                          url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+                          version => 2,
+                        },
+  "name"             => "MooseX-ErsatzMethod",
+  "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
+  "prereqs"          => {
+                          configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
+                          runtime => {
+                            requires => { "Module::Runtime" => 0, "Moose" => "2.00", "perl" => 5.008 },
+                          },
+                          test => { requires => { "Test::More" => 0.61, "thanks" => 0 } },
+                        },
+  "provides"         => {
+                          "MooseX::ErsatzMethod"                               => { file => "lib/MooseX/ErsatzMethod.pm", version => 0.005 },
+                          "MooseX::ErsatzMethod::Meta::Method"                 => { file => "lib/MooseX/ErsatzMethod.pm", version => 0.005 },
+                          "MooseX::ErsatzMethod::Trait::ApplicationToClass"    => { file => "lib/MooseX/ErsatzMethod.pm", version => 0.005 },
+                          "MooseX::ErsatzMethod::Trait::ApplicationToInstance" => { file => "lib/MooseX/ErsatzMethod.pm", version => 0.005 },
+                          "MooseX::ErsatzMethod::Trait::ApplicationToRole"     => { file => "lib/MooseX/ErsatzMethod.pm", version => 0.005 },
+                          "MooseX::ErsatzMethod::Trait::Composite"             => { file => "lib/MooseX/ErsatzMethod.pm", version => 0.005 },
+                          "MooseX::ErsatzMethod::Trait::Role"                  => { file => "lib/MooseX/ErsatzMethod.pm", version => 0.005 },
+                        },
+  "release_status"   => "stable",
+  "resources"        => {
+                          bugtracker   => {
+                                            web => "http://rt.cpan.org/Dist/Display.html?Queue=MooseX-ErsatzMethod",
+                                          },
+                          homepage     => "https://metacpan.org/release/MooseX-ErsatzMethod",
+                          license      => ["http://dev.perl.org/licenses/"],
+                          repository   => {
+                                            type => "git",
+                                            url  => "git://github.com/tobyink/p5-moosex-ersatzmethod.git",
+                                            web  => "https://github.com/tobyink/p5-moosex-ersatzmethod",
+                                          },
+                          x_identifier => "http://purl.org/NET/cpan-uri/dist/MooseX-ErsatzMethod/project",
+                        },
+  "version"          => 0.005,
+  "x_static_install" => 1,
 };
 
 my %dynamic_config;

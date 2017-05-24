@@ -16,7 +16,7 @@ use Tickit::Window;
 use Tickit::Utils qw( textwidth );
 use Tickit::RenderBuffer;
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 use Carp;
 

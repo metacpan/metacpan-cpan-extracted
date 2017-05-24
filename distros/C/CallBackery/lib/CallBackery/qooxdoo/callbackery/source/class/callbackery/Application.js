@@ -38,10 +38,31 @@ qx.Class.define("callbackery.Application", {
             var root = this.getRoot();
             root.set({
                 blockerColor   : '#fff',
-                blockerOpacity : 0.7
+                blockerOpacity : 0.5
             });
             var desktopContainer = new qx.ui.container.Composite(new qx.ui.layout.VBox(0));
             root.add(desktopContainer,{top: 0, left: 0, right: 0, bottom: 0});
+
+            var blocker = root.getBlocker();
+            blocker.getBlockerElement().setStyles({
+                transition: 'opacity 1s'
+            });
+            var desktopCoEl = desktopContainer.getContentElement();
+            desktopCoEl.setStyles({
+                transition: 'filter 1s'
+            });
+            blocker.addListener('blocked',function(){
+                desktopCoEl.setStyles({
+                    filter: 'blur(1px)',
+                    webkitFilter: 'blur(1px)'
+                });
+            });
+            blocker.addListener('unblocked',function(){
+                desktopCoEl.setStyles({
+                   filter: 'blur(0px)',
+                   webkitFilter: 'blur(0px)'
+                });
+            });
 
             /* give the History object a more relaxed attitude towards encoding stuff */
             qx.Class.patch(qx.bom.History,callbackery.data.MHistoryRelaxedEncoding);

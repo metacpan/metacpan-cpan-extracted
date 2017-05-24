@@ -38,7 +38,7 @@ recommends:
   LWP: '0'
   LWP::Protocol::https: '0'
   Lasso: v2.3.0
-  Lemonldap::NG::Handler: v1.9.9
+  Lemonldap::NG::Handler: v1.9.10
   MIME::Lite: '0'
   Net::Facebook::Oauth2: '0'
   Net::OAuth: '0'
@@ -56,9 +56,9 @@ requires:
   CGI: '3.08'
   Clone: '0'
   HTML::Template: '0'
-  Lemonldap::NG::Common: v1.9.9
+  Lemonldap::NG::Common: v1.9.10
   Net::LDAP: '0.38'
   Regexp::Assemble: '0'
   Unicode::String: '0'
-version: v1.9.9
+version: v1.9.10
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

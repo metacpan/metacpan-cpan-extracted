@@ -4,7 +4,7 @@ Dancer2::Plugin::Cart - ECommerce Cart Plugin for Dancer2
 
 # VERSION
 
-Version 0.0013
+Version 1.0000
 
 # DESCRIPTION
 
@@ -55,16 +55,23 @@ using "Template Toolkit" as the template engine.
 ## Configuration Options:
 
     * products_view_template
+        * Define a template to use to show the products 
     * cart_view_template
+        * Define a template to use to show cart info 
     * cart_receipt_template
-    * cart_checkout_template
+        * Define a template to use to show receipts 
     * shipping_view_template
+        * Define a template to use to show shipping form
     * billing_view_template
+        * Define a template to use to show billing form
     * review_view_template
+        * Define a template to use to show review page
     * receipt_view_template
+        * Define a template to use to show receipt page
     * default_routes
+        * default 1, to exclude all routes, set to 0
     * excluded_routes
-
+        * Array defining the routes to be excluded.
 ## Routes
     * get /products
       List of products
@@ -92,19 +99,45 @@ using "Template Toolkit" as the template engine.
 ## Keywords:
 
     * products
+        * Returns products defined on the structure session('ec_cart')->{products}
     * cart
+        * Returns the cart structure.
+        * Refers: session('ec_cart')->{cart}
+        * Use: subtotal, quantity, and total keywords
+        * Hooks: before_cart, after_cart
     * cart_add
+        * Process cart_add form and check errors on session('ec_cart')->{add}->{error}
+        * Delete session('ec_cart')->{add} after success. 
+        * Hooks: validate_cart_add_params, before_cart_add, after_cart_add
     * cart_add_item
-    * cart_items
+        * Check if the product exists, and add/sub the quantity.
+        * Calculate ec_subtotal
+        * Return product added.
     * clear_cart
+        Delete ec_cart session variable
+        * Hooks: before_clear_cart, after_clear_cart
     * subtotal
-    * billing
+        * Calculate subtotal of the cart
+        * Hooks: before_subtotal, after_subtotal
+    * quantity
+        * Calculate total items on the cart
+        * Hooks: before_quantity, after_quantity
     * shipping
+        * Process shipping form and check errors on session('ec_cart')->{shipping}->{form}
+        * Hooks: validate_shipping_params, before_shipping, after_shipping
+    * billing
+        * Process billing form and check errors on session('ec_cart')->{billing}->{form}
+        * Hooks: validate_billing_params, before_billing, after_billing
     * checkout
+        * Hooks: validate_checkout_params, checkout
     * close_cart
+        * Set status 1 to session('ec_cart')->{cart}->{status}
+        * Hooks: before_close_cart, after_close_cart 
     * adjustments
+        * Set default adjustments
+        * Hooks: adjustments
 
-##Hooks:
+## Hooks:
 
     * before_cart
     * after_cart
@@ -127,14 +160,14 @@ using "Template Toolkit" as the template engine.
     * after_close_cart
     * before_clear_cart
     * after_clear_cart
-    * before_item_subtotal
-    * after_item_subtotal
     * before_subtotal
     * after_subtotal
+    * before_quantity
+    * after_quantity
     * adjustments
 
 
-## Sesison structure:
+## Session structure:
 ```
 ec_cart => {
   products => [
@@ -169,7 +202,6 @@ ec_cart => {
     subtotal => 10,
     total => 10,
     quantity => 1,
-    
   },
   shipping => {
     form => {

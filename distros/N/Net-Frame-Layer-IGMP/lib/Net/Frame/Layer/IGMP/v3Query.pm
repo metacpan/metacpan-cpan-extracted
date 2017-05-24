@@ -49,8 +49,8 @@ sub pack {
 
    my $resv   = Bit::Vector->new_Dec(4, $self->resv);
    my $sFlag  = Bit::Vector->new_Dec(1, $self->sFlag);
-   my $qqic   = Bit::Vector->new_Dec(3, $self->qrv);
-   my $bvlist = $resv->Concat_List($sFlag, $qqic);
+   my $qrv    = Bit::Vector->new_Dec(3, $self->qrv);
+   my $bvlist = $resv->Concat_List($sFlag, $qrv);
 
    my $raw = $self->SUPER::pack('CCn',
       $bvlist->to_Dec,

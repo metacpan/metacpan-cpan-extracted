@@ -1,0 +1,4 @@
+.include -p | date
+.read    x
+some line
+.eval x=\v{x}

@@ -1,0 +1,6 @@
+Line 1
+Output of a shell command bill
+Included: _LineNumber = 7
+Included: _FileName = t/Tests/3_include_3.input
+Included: _IncludeDepth = 1
+Output of another shell command bill

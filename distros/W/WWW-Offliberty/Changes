@@ -1,5 +1,8 @@
 Revision history for Perl extension WWW::Offliberty.
 
+1.000005 2017-05-20T13:31+01:00
+ - Change test video *again* to one that's unlikely to be deleted
+
 1.000004 2017-01-27T16:34+00:00
  - Change test video as previous test video was deleted, making tests fail
 

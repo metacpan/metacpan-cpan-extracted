@@ -1,0 +1,18 @@
+.# Title: Nested If/unless
+.let name := 'Alain'
+Line 1
+.if name eq 'Alain'
+Should see line 2
+.if 0
+This is not seen
+.else
+However this is
+.# Even more nesting:
+.if 1
+Generated!
+.else
+Not at all
+.fi
+.fi
+.fi
+EOF

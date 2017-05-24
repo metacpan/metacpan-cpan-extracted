@@ -1,0 +1,13 @@
+.# Title: Subroutine
+Line 1
+.sub a
+Sub a line 1
+.set a0 := _ARGS[0]; na := count(_ARGS)
+.eval a0=\v{a0} num args=\v{na}
+done sub a
+.done
+After subroutine definition
+.a one two
+.a un deux trois quatre
+.a ein
+EOF

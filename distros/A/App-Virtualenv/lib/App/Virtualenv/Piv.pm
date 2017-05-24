@@ -5,11 +5,7 @@ App::Virtualenv::Piv - Perl in Virtual environment (deprecated)
 
 =head1 VERSION
 
-version 2.03
-
-=head1 ABSTRACT
-
-Perl in Virtual environment (deprecated)
+version 2.07
 
 =cut
 use strict;
@@ -19,7 +15,7 @@ use warnings;
 BEGIN
 {
 	require Exporter;
-	our $VERSION     = '2.03';
+	our $VERSION     = '2.07';
 	our @ISA         = qw(Exporter);
 	our @EXPORT      = qw();
 	our @EXPORT_OK   = qw();
@@ -44,7 +40,7 @@ B<CPAN> L<https://metacpan.org/release/App-Virtualenv>
 
 =head1 AUTHOR
 
-Orkun Karaduman <orkunkaraduman@gmail.com>
+Orkun Karaduman (ORKUN) <orkun@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

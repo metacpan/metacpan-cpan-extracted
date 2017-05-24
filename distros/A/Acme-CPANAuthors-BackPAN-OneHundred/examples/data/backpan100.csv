@@ -1,45 +1,45 @@
-# DATE: 2016-04-22T05:57:08
+# DATE: 2017-05-23T07:53:27
 #Pause,Count,Name
-PERLANCAR,888,perlancar
+PERLANCAR,1268,perlancar
+PSIXDISTS,549,Perl 6 Modules
 SHARYANTO,510,Steven Haryanto
-PSIXDISTS,479,Perl 6 Modules
-TOBYINK,313,Toby Inkster
-RJBS,309,Ricardo SIGNES
+TOBYINK,314,Toby Inkster
+RJBS,312,Ricardo SIGNES
 ZOFFIX,293,Zoffix Znet
 ADAMK,287,Adam Kennedy
 TOKUHIROM,251,???
-MIYAGAWA,240,Tatsuhiko Miyagawa
-ETHER,222,Karen Etheridge
-INGY,218,Ingy dot Net
-BINGOS,217,Chris Williams
+ETHER,243,Karen Etheridge
+MIYAGAWA,241,Tatsuhiko Miyagawa
+JGNI,236,John Imrie
+INGY,220,Ingy dot Net
+BINGOS,218,Chris Williams
 FLORA,210,Florian Ragwitz
-JGNI,202,John Imrie
-DAGOLDEN,195,David Golden
+DAGOLDEN,202,David Golden
 SMUELLER,192,Steffen Mueller
+KENTNL,188,Kent Fredric
 MARCEL,182,???
-KENTNL,174,Kent Fredric
 BOBTFISH,172,Tomas Doran
+DROLSKY,168,Dave Rolsky
+PEVANS,162,Paul Evans
 NUFFIN,161,Yuval Kogman
-DROLSKY,156,Dave Rolsky
-PEVANS,149,Paul Evans
-RSAVAGE,138,Ron Savage
-GUGOD,138,Liu Kang Min
-NEILB,137,Neil Bowers
-SKIM,137,Michal Spacek
+PLICEASE,151,Graham Ollis
+NEILB,144,Neil Bowers
+SKIM,142,Michal Josef Spacek
+GUGOD,141,Liu Kang Min
+RSAVAGE,141,Ron Savage
 DMAKI,137,Daisuke Maki
 BARBIE,134,Barbie
-BDFOY,133,brian d foy
-PLICEASE,126,Graham Ollis
+BDFOY,134,brian d foy
+FAYLAND,130,Fayland Lin
+SHLOMIF,129,Shlomi Fish
+MANWAR,128,Mohammad S Anwar
 AUTRIJUS,125,Audrey Tang
-SHLOMIF,125,Shlomi Fish
-FAYLAND,122,Fayland Lin
 SZABGAB,122,Gabor Szabo
 SIMON,121,Simon Cozens
-MANWAR,120,Mohammad S Anwar
+MRAMBERG,113,Marcus Ramberg
 MLEHMANN,111,???
-MRAMBERG,111,Marcus Ramberg
-SALVA,111,Salvador Fandino Garcia
 LBROCARD,111,Leon Brocard
-DMUEY,109,Daniel Muey
-GETTY,105,Torsten Raudssus
+SALVA,111,Salvador Fandino Garcia
+DMUEY,110,Daniel Muey
+GETTY,107,Torsten Raudssus
 LEOCHARRE,101,Leo Charre

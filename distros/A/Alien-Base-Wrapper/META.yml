@@ -23,5 +23,5 @@ resources:
   bugtracker: https://github.com/plicease/Alien-Base-Wrapper/issues
   homepage: https://metacpan.org/pod/Alien::Base::Wrapper
   repository: git://github.com/plicease/Alien-Base-Wrapper.git
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'YAML::Tiny version 1.70'

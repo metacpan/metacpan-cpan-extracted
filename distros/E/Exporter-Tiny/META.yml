@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
 dynamic_config: 1
-generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150005'
 keywords: []
 license: perl
 meta-spec:
@@ -25,10 +25,10 @@ optional_features: {}
 provides:
   Exporter::Shiny:
     file: lib/Exporter/Shiny.pm
-    version: '0.044'
+    version: '1.000000'
   Exporter::Tiny:
     file: lib/Exporter/Tiny.pm
-    version: '0.044'
+    version: '1.000000'
 requires:
   perl: '5.006001'
 resources:
@@ -38,5 +38,5 @@ resources:
   homepage: https://metacpan.org/release/Exporter-Tiny
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-exporter-tiny.git
-version: '0.044'
+version: '1.000000'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

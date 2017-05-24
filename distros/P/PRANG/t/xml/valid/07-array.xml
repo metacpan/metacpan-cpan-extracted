@@ -10,15 +10,15 @@
           <guillemets>eee_yow</guillemets>
         </backslash>
         <backslash>
-          <umlout>36</umlout>
-          <umlout>24</umlout>
-          <umlout>36</umlout>
+          <guillemets>36</guillemets>
+          <guillemets>24</guillemets>
+          <guillemets>36</guillemets>
         </backslash>
         <backslash>
           <guillemets>thwacke</guillemets> 
           <guillemets>swish</guillemets>
           <guillemets>blurp</guillemets>
-          <umlout>17</umlout>
+          <guillemets>17</guillemets>
         </backslash>
       </underscore>
     </fishhooks>

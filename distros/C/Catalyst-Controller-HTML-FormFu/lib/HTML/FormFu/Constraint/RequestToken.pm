@@ -2,7 +2,7 @@ package HTML::FormFu::Constraint::RequestToken;
 
 use strict;
 
-our $VERSION = '2.01'; # VERSION
+our $VERSION = '2.02'; # VERSION
 
 use Moose;
 

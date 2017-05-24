@@ -70,8 +70,9 @@ The following issues have been reported with this version of PDL:
 
 
 - The following SourceForge bugs are outstanding at time of the
-  PDL-2.017 release:
+  PDL-2.018 release:
 
+  435   PDL-LinearAlgebra-0.12 undefined reference to dggsvd_ + sggsvd_
   420   PDL-2.016 fails to build on ASperl solaris 32bit or 64bit platforms
   418   warp2d and fitwarp2d polynomial fitting doesn't work as expected
   412   16bit TIFF image IO not exact in PDL::IO::Pic

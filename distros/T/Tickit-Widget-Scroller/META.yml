@@ -6,7 +6,7 @@ build_requires:
   Test::More: '0.88'
   Tickit::Test: '0.12'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,13 +15,13 @@ name: Tickit-Widget-Scroller
 provides:
   Tickit::Widget::Scroller:
     file: lib/Tickit/Widget/Scroller.pm
-    version: '0.22'
+    version: '0.23'
   Tickit::Widget::Scroller::Item::RichText:
     file: lib/Tickit/Widget/Scroller/Item/RichText.pm
-    version: '0.22'
+    version: '0.23'
   Tickit::Widget::Scroller::Item::Text:
     file: lib/Tickit/Widget/Scroller/Item/Text.pm
-    version: '0.22'
+    version: '0.23'
 requires:
   String::Tagged: '0'
   Tickit::Pen: '0.19'
@@ -31,5 +31,5 @@ requires:
 resources:
   IRC: irc://irc.freenode.net/#tickit
   license: http://dev.perl.org/licenses/
-version: '0.22'
+version: '0.23'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

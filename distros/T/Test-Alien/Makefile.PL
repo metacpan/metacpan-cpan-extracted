@@ -37,13 +37,14 @@ my %WriteMakefileArgs = (
     "ExtUtils::ParseXS" => "3.21",
     "File::Which" => "1.10",
     "Test2" => "1.302015",
-    "Test2::Suite" => "0.000060"
+    "Test2::Suite" => "0.000060",
+    "Text::ParseWords" => "3.26"
   },
   "TEST_REQUIRES" => {
     "Test2::Suite" => "0.000060",
     "Test::More" => "0.94"
   },
-  "VERSION" => "0.14",
+  "VERSION" => "0.15",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -58,7 +59,8 @@ my %FallbackPrereqs = (
   "File::Which" => "1.10",
   "Test2" => "1.302015",
   "Test2::Suite" => "0.000060",
-  "Test::More" => "0.94"
+  "Test::More" => "0.94",
+  "Text::ParseWords" => "3.26"
 );
 
 

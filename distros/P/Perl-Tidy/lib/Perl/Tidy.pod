@@ -408,14 +408,9 @@ C<write_debug_entry> in Tidy.pm.
 
   &perltidy
 
-=head1 CREDITS
-
-Thanks to Hugh Myers who developed the initial modular interface 
-to perltidy.
-
 =head1 VERSION
 
-This man page documents Perl::Tidy version 20160302.
+This man page documents Perl::Tidy version 20170521.
 
 =head1 LICENSE
 
@@ -424,10 +419,13 @@ under the terms of the "GNU General Public License".
 
 Please refer to the file "COPYING" for details.
 
-=head1 AUTHOR
+=head1 BUG REPORTS
 
- Steve Hancock
- perltidy at users.sourceforge.net
+A list of current bugs and issues can be found at the CPAN site
+
+     https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Tidy
+
+To report a new bug or problem, use the link on this page .  
 
 =head1 SEE ALSO
 

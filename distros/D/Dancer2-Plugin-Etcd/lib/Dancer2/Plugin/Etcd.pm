@@ -11,7 +11,7 @@ Dancer2::Plugin::Etcd
 
 =cut
 
-our $VERSION = '0.003';
+our $VERSION = '0.006';
 
 use Dancer2::Core::Types qw/Bool HashRef Str/;
 use Dancer2::Plugin;
@@ -187,10 +187,9 @@ sub etcd {
     else {
         for (qw(username password port)) {
             $settings->{$_} = $plugin->{$_};
-            $host = $plugin->{host};
         }
     }
-    return Etcd3->connect( $host, $settings );
+    return Etcd3->new( $settings );
 };
 
 =head1 AUTHOR

@@ -4,7 +4,7 @@ use utf8;
 use Lemonldap::NG::Common::Regexp;
 use Lemonldap::NG::Handler::SharedConf;
 
-our $VERSION = '1.9.9';
+our $VERSION = '1.9.10';
 
 ## @method hashref tests(hashref conf)
 # Return a hash ref where keys are the names of the tests and values
@@ -304,6 +304,33 @@ sub tests {
                     next;
                 }
                 $entityIds{$eid} = $idpId;
+            }
+            return ( $res, join( ', ', @msg ) );
+        },
+        samlSPEntityIdUniqueness => sub {
+            return 1
+              unless ( $conf->{samlSPMetaDataXML}
+                and %{ $conf->{samlSPMetaDataXML} } );
+            my @msg;
+            my $res = 1;
+            my %entityIds;
+            foreach my $spId ( keys %{ $conf->{samlSPMetaDataXML} } ) {
+                unless (
+                    $conf->{samlSPMetaDataXML}->{$spId}->{samlSPMetaDataXML} =~
+                    /entityID=(['"])(.+?)\1/si )
+                {
+                    push @msg, "$spId SAML metadata has no EntityID";
+                    $res = 0;
+                    next;
+                }
+                my $eid = $2;
+                if ( defined $entityIds{$eid} ) {
+                    push @msg,
+                      "$spId and $entityIds{$eid} have the same SAML EntityID";
+                    $res = 0;
+                    next;
+                }
+                $entityIds{$eid} = $spId;
             }
             return ( $res, join( ', ', @msg ) );
         },

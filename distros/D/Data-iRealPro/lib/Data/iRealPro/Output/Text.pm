@@ -5,8 +5,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep  6 14:58:26 2016
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Oct  7 08:28:03 2016
-# Update Count    : 78
+# Last Modified On: Mon May 22 08:34:17 2017
+# Update Count    : 79
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -125,7 +125,7 @@ sub neatify1 {
     while ( $t =~ s/_ +_/__/g ) {}
     $t =~ s/([\]\}])/$1\n/g;
     $t =~ s/([\[\{])/\n$1/g;
-    $t =~ s/([\[\{])(\*[ABCDVi])/$1$2 /gi;
+    $t =~ s/([\[\{])(\*[ABCDVi]),?/$1$2 /gi;
     $t =~ s/\n\n+/\n/g;
     $t =~ s/^\n+//;
     $t =~ s/^ +_/_/mg;

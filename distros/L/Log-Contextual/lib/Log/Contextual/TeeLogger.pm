@@ -1,5 +1,5 @@
 package Log::Contextual::TeeLogger;
-$Log::Contextual::TeeLogger::VERSION = '0.007000';
+$Log::Contextual::TeeLogger::VERSION = '0.007001';
 # ABSTRACT: Output to more than one logger
 
 use strict;
@@ -54,7 +54,7 @@ Log::Contextual::TeeLogger - Output to more than one logger
 
 =head1 VERSION
 
-version 0.007000
+version 0.007001
 
 =head1 SYNOPSIS
 
@@ -144,6 +144,8 @@ All of the following six methods work the same.  The basic pattern is:
 
  $l->fatal( '1 is never equal to 0!' );
 
+B<Note:> C<fatal> does not call C<die> for you, see L<Log::Contextual/EXCEPTIONS AND ERROR HANDLING>
+
 =head2 is_$level
 
 All of the following six functions just return true if their respective
@@ -179,7 +181,7 @@ Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2017 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

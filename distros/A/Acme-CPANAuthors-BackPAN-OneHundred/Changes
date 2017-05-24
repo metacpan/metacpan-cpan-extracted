@@ -1,21 +1,27 @@
 Revision history for Acme-CPANAuthors-BackPAN-OneHundred
 ========================================================
 
+1.10    2017-05-23
+        [Updated Counts]
+        - PERLANCAR, PSIXDISTS, TOBYINK, RJBS, ETHER, MIYAGAWA, JGNI, INGY,
+        - BINGOS, DAGOLDEN, KENTNL, DROLSKY, PEVANS, PLICEASE, NEILB, SKIM, GUGOD,
+        - RSAVAGE, BDFOY, FAYLAND, SHLOMIF, MANWAR, MRAMBERG, DMUEY, GETTY
+
 1.09    2016-04-22
-        [ New Authors ]
+        [New Authors]
         - PSIXDISTS, JGNI
 
-        [ Updated Counts ]
+        [Updated Counts]
         - PERLANCAR, SHARYANTO, RJBS, ZOFFIX, MIYAGAWA, ETHER, BINGOS,
         - DAGOLDEN, KENTNL, DROLSKY, PEVANS, RSAVAGE, NEILB, SKIM, BDFOY,
         - PLICEASE, SHLOMIF, FAYLAND, SZABGAB, MANWAR, MLEHMANN, MRAMBERG,
         - SALVA, GETTY
 
 1.08    2015-08-16
-        [ New Authors ]
+        [New Authors]
         - MANWAR
 
-        [ Updated Counts ]
+        [Updated Counts]
         - PERLANCAR, RJBS, ZOFFIX, MIYAGAWA, INGY, BINGOS, FLORA, ETHER,
         - DAGOLDEN,
         - SMUELLER, KENTNL, DROLSKY, PEVANS, BARBIE, RSAVAGE, BDFOY, NEILB,
@@ -23,35 +29,35 @@ Revision history for Acme-CPANAuthors-BackPAN-OneHundred
         - SZABGAB, SHLOMIF, PLICEASE, MLEHMANN, DMUEY, GETTY
 
 1.07    2015-03-22
-        [ New Authors ]
+        [New Authors]
         - GETTY, PLICEASE
 
-        [ Updated Counts ]
+        [Updated Counts]
         - PERLANCAR, RJBS, ZOFFIX, MIYAGAWA, INGY, DAGOLDEN, ETHER, KENTNL,
         - RSAVAGE, BARBIE, BDFOY, PEVANS, FAYLAND, SKIM, SHLOMIF, NEILB, DMUEY
 
 1.06    2015-02-20
-        [ New Authors ]
+        [New Authors]
         - SKIM
 
-        [ Updated Counts ]
+        [Updated Counts]
         - PERLANCAR, DAGOLDEN, ETHER, KENTNL, DROLSKY, GUGOD, PEVANS, RSAVAGE,
         - NEILB, MLEHMANN
 
 1.05    2015-01-12
         - allow local data file in update script.
 
-        [ New Authors ]
+        [New Authors]
         - PERLANCAR
 
-        [ Updated Counts ]
+        [Updated Counts]
         - TOBYINK, RJBS, BINGOS, INGY, FLORA, SMUELLER, DAGOLDEN, ETHER,
         - KENTNL,
         - DROLSKY, GUGOD, BARBIE, BDFOY, PEVANS, RSAVAGE, FAYLAND, SZABGAB,
         - SHLOMIF, NEILB, SALVA, DMUEY
 
 1.04    2014-10-04
-        [ Updated Counts ]
+        [Updated Counts]
         - SHARYANTO, TOBYINK, RJBS, TOKUHIROM, INGY, DAGOLDEN, ETHER, KENTNL,
         - DROLSKY, BDFOY, BARBIE, PEVANS, FAYLAND, SZABGAB, NEILB
 
@@ -60,15 +66,15 @@ Revision history for Acme-CPANAuthors-BackPAN-OneHundred
         - added check100.pl script.
         - extended test suite.
 
-        [ New Authors ]
+        [New Authors]
         - NEILB
 
-        [ Updated Counts ]
+        [Updated Counts]
         - SHARYANTO, TOBYINK, TOKUHIROM, BINGOS, INGY, DAGOLDEN, ETHER, KENTNL,
         - DROLSKY, BARBIE, FAYLAND, PEVANS, SZABGAB, DMUEY
 
 1.02    2014-06-27
-        [ Updated Counts ]
+        [Updated Counts]
         - SHARYANTO, TOBYINK, INGY, ETHER, KENTNL, BARBIE, PEVANS, SALVA, DMUEY
 
 1.01    2014-06-07
@@ -76,7 +82,7 @@ Revision history for Acme-CPANAuthors-BackPAN-OneHundred
         - backup previous list (in the event we need to rerun).
         - reworked ordering of lists.
 
-        [ Updated Counts ]
+        [Updated Counts]
         - SHARYANTO, TOBYINK, DROLSKY, KENTNL, BARBIE
 
 1.00    2014-06-01

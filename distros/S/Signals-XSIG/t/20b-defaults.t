@@ -16,35 +16,35 @@ my @failed = ();
 my @signals = qw(STOP TSTP TTIN TTOU CONT);
 
 if (@ARGV > 0) {
-  my $n = @signals;
-  @signals = @ARGV;
-  unshift @signals, '#' while @signals < $n;
+    my $n = @signals;
+    @signals = @ARGV;
+    unshift @signals, '#' while @signals < $n;
 }
 
 foreach my $signal (@signals) {
 
- SKIP: {
-    if (!exists $SIG{$signal} && !sig_exists($signal)) {
-      skip "Signal $signal doesn't exist in $^O $]", 3;
-    }
+  SKIP: {
+      if (!exists $SIG{$signal} && !sig_exists($signal)) {
+          skip "Signal $signal doesn't exist in $^O $]", 3;
+      }
   
-    my ($basic, $module, @unlink) = test_default_behavior_for_signal($signal);
+      my ($basic, $module, @unlink) = test_default_behavior_for_signal($signal);
 
-    if ($basic->{xpid} != 0 && $module->{xpid} == 0
-	&& $Signals::XSIG::Default::DEFAULT_BEHAVIOR{$signal} eq 'SUSPEND') {
+      if ($basic->{xpid} != 0 && $module->{xpid} == 0
+          && $Signals::XSIG::Default::DEFAULT_BEHAVIOR{$signal} eq 'SUSPEND') {
 
-      push @failed, $signal;
-      diag "expected $^O to suspend on SIG$signal, but it didn't";
-      skip "expected $^O to suspend on SIG$signal, but it didn't", 3;
+          push @failed, $signal;
+          diag "expected $^O to suspend on SIG$signal, but it didn't";
+          skip "expected $^O to suspend on SIG$signal, but it didn't", 3;
 
+      }
+      if (!ok_test_behavior($basic, $module, $signal)) {
+          push @failed, $signal;
+      }
+      unlink @unlink if @unlink && @ARGV==0;
     }
-    if (!ok_test_behavior($basic, $module, $signal)) {
-      push @failed, $signal;
-    }
-    unlink @unlink if @unlink && @ARGV==0;
-  }
 }
 
 if (@failed && @ARGV == 0) {
-  on_failure_recommend_spike(@failed);
+    on_failure_recommend_spike(@failed);
 }

@@ -53,13 +53,13 @@ no_index:
 provides:
   Dist::Zilla::MintingProfile::Author::ETHER:
     file: lib/Dist/Zilla/MintingProfile/Author/ETHER.pm
-    version: '0.124'
+    version: '0.125'
   Dist::Zilla::PluginBundle::Author::ETHER:
     file: lib/Dist/Zilla/PluginBundle/Author/ETHER.pm
-    version: '0.124'
+    version: '0.125'
   Pod::Weaver::PluginBundle::Author::ETHER:
     file: lib/Pod/Weaver/PluginBundle/Author/ETHER.pm
-    version: '0.124'
+    version: '0.125'
 recommends:
   Dist::Zilla::Plugin::BlockRelease: '0'
   Dist::Zilla::Plugin::GitHub::Update: '0.40'
@@ -210,7 +210,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-Author-ETHER
   homepage: https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Author-ETHER
   repository: https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Author-ETHER.git
-version: '0.124'
+version: '0.125'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -716,6 +716,13 @@ x_Dist_Zilla:
       name: '@Author::ETHER/Keywords'
       version: '0.007'
     -
+      class: Dist::Zilla::Plugin::UseUnsafeInc
+      config:
+        Dist::Zilla::Plugin::UseUnsafeInc:
+          dot_in_INC: 0
+      name: '@Author::ETHER/UseUnsafeInc'
+      version: '0.001'
+    -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@Author::ETHER/AutoPrereqs'
       version: '6.009'
@@ -818,6 +825,13 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::CheckMetaResources
       name: '@Author::ETHER/CheckMetaResources'
       version: '0.001'
+    -
+      class: Dist::Zilla::Plugin::EnsureLatestPerl
+      config:
+        Dist::Zilla::Plugin::EnsureLatestPerl:
+          Module::CoreList: '5.20170520'
+      name: '@Author::ETHER/EnsureLatestPerl'
+      version: '0.004'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -933,7 +947,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.124
+          tag: v0.125
           tag_format: v%v
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -1106,3 +1120,4 @@ x_contributors:
   - 'Сергей Романов <sromanov@cpan.org>'
 x_serialization_backend: 'YAML::Tiny version 1.72'
 x_static_install: 0
+x_use_unsafe_inc: 0

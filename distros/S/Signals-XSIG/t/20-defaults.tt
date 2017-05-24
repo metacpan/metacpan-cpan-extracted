@@ -9,21 +9,21 @@ eval { require Time::HiRes };
 # same behavior as not using Signals::XSIG
 #
 # t/20a-defaults.t: signals that typically end the program somehow
-# t/20b-defaults.t: signals that typically SUSPEND
-# t/20c-defaults.t: signals that are typically ignored
+# t/20b-defaults.t: signals that typically suspend or resume the program
+# t/20c-defaults.t: signals that do not visibly affect the program
 
 # it takes a few seconds to test each signal
 # so this is the most time consuming test.
 
 $ENV{"PERL5LIB"} = join ':', @INC;
 if ($^O eq 'MSWin32') {
-  $ENV{"PERL5LIB"} = join ';', @INC;
+    $ENV{"PERL5LIB"} = join ';', @INC;
 }
 
 if (${^TAINT}) {
-  $ENV{PATH} = "";
-  ($^X) = $^X =~ /(.*)/;
-  ($ENV{PERL5LIB}) = $ENV{PERL5LIB} =~ /(.*)/s;
+    $ENV{PATH} = "";
+    ($^X) = $^X =~ /(.*)/;
+    ($ENV{PERL5LIB}) = $ENV{PERL5LIB} =~ /(.*)/s;
 }
 
 
@@ -37,7 +37,7 @@ my %sig_exists = map { $_ => 1 } @sig_names;
 # or             syswrite select(), ... 
 # ?
 
-my $program_without_SHS = <<'__PROGRAM_WITHOUT_SHS__';
+my $program_without_XSIG = <<'__PROGRAM_WITHOUT_XSIG__';
 $|=0;
 $SIG{'__SIGNAL__'} = 'DEFAULT';
 print "Hello world";
@@ -45,10 +45,10 @@ kill '__SIGNAL__', $$;
 sleep 1;
 print "\nFoo!";
 exit 0;
-__PROGRAM_WITHOUT_SHS__
+__PROGRAM_WITHOUT_XSIG__
 ;
 
-my $program_with_SHS = <<'__PROGRAM_WITH_SHS__';
+my $program_with_XSIG = <<'__PROGRAM_WITH_XSIG__';
 use Signals::XSIG;
 $|=0;
 $XSIG{'__SIGNAL__'} = [ sub { }, 'DEFAULT' ];
@@ -57,152 +57,148 @@ kill '__SIGNAL__', $$;
 sleep 1;
 print "\nFoo!";
 exit 0;
-__PROGRAM_WITH_SHS__
+__PROGRAM_WITH_XSIG__
 ;
 
 # pause time was 3s. 5s is safer if your system is loaded.
 our $PAUSE_TIME = $ENV{PAUSE_TIME} || 5;
 
 sub pause {
-  # 2.5-3 seconds is *usually* long enough to spawn a process
-  # and give it time to send itself a signal that will suspend it.
-  # If you test on a heavily loaded or old system, it might
-  # need even more time.
-  sleep $PAUSE_TIME || 1;
+    # 2.5-3 seconds is *usually* long enough to spawn a process
+    # and give it time to send itself a signal that will suspend it.
+    # If you test on a heavily loaded or old system, it might
+    # need even more time.
+    sleep $PAUSE_TIME || 1;
 }
 
 sub sig_exists {
-  return exists $sig_exists{$_[0]};
+    return exists $sig_exists{$_[0]};
 }
 
 sub test_default_behavior_for_signal {
-  my ($signal) = @_;
+    my ($signal) = @_;
 
-  my $program1 = $program_without_SHS;
-  $program1 =~ s/__SIGNAL__/$signal/g;
+    my $program1 = $program_without_XSIG;
+    $program1 =~ s/__SIGNAL__/$signal/g;
 
-  my $program2 = $program_with_SHS;
-  $program2 =~ s/__SIGNAL__/$signal/g;
+    my $program2 = $program_with_XSIG;
+    $program2 =~ s/__SIGNAL__/$signal/g;
 
-  my $PID = "$signal.$$";
-  open(PROG1, '>', "control_group.$PID.tt");
-  print PROG1 $program1;
-  close PROG1;
+    my $PID = "$signal.$$";
+    open(PROG1, '>', "control_group.$PID.tt");
+    print PROG1 $program1;
+    close PROG1;
 
-  open(PROG2, '>', "experimental_group.$PID.tt");
-  print PROG2 $program2;
-  close PROG2;
+    open(PROG2, '>', "experimental_group.$PID.tt");
+    print PROG2 $program2;
+    close PROG2;
 
-  unlink "out1.$PID","out2.$PID";
+    unlink "out1.$PID","out2.$PID";
 
-  open(OUT1, '>', "out1.$PID");
-  my $pid1 = fork();
-  if ($pid1 == 0) {
-    open(STDOUT, '>&' . fileno(*OUT1));
-    exec($^X,"control_group.$PID.tt");
-    die;
-  }
+    open(OUT1, '>', "out1.$PID");
+    my $pid1 = fork();
+    if ($pid1 == 0) {
+        open(STDOUT, '>&' . fileno(*OUT1));
+        exec($^X,"control_group.$PID.tt");
+        die;
+    }
 
-  open(OUT2, '>', "out2.$PID");
-  my $pid2 = fork();
-  if ($pid2 == 0) {
-    open(STDOUT, '>&' . fileno(*OUT2));
-    exec($^X,"experimental_group.$PID.tt");
-    die;
-  }
+    open(OUT2, '>', "out2.$PID");
+    my $pid2 = fork();
+    if ($pid2 == 0) {
+        open(STDOUT, '>&' . fileno(*OUT2));
+        exec($^X,"experimental_group.$PID.tt");
+        die;
+    }
 
-  pause();
-  my $xpid1 = my $ypid1 = waitpid $pid1, &POSIX::WNOHANG;
-  my $status1 = $?;
+    pause();
+    my $xpid1 = my $ypid1 = waitpid $pid1, &POSIX::WNOHANG;
+    my $status1 = $?;
 
-  my $xpid2 = my $ypid2 = waitpid $pid2, &POSIX::WNOHANG;
-  my $status2 = $?;
+    my $xpid2 = my $ypid2 = waitpid $pid2, &POSIX::WNOHANG;
+    my $status2 = $?;
 
-  # some signals suspend a program; we need to deliver a SIGCONT
+    # some signals suspend a program; we need to deliver a SIGCONT
 
-  kill 'CONT', $pid1, $pid2;
-  $ypid1 || $ypid2 || pause();
-  kill 'KILL', $pid1, $pid2;
-  if ($ypid1 == 0) {
-    $ypid1 = waitpid $pid1, 0;
-    $status1 = $?;
-  }
-  if ($ypid2 == 0) {
-    $ypid2 = waitpid $pid2, 0;
-    $status2 = $?;
-  }
-  close OUT1;
-  close OUT2;
+    kill 'CONT', $pid1, $pid2;
+    $ypid1 || $ypid2 || pause();
+    kill 'KILL', $pid1, $pid2;
+    if ($ypid1 == 0) {
+        $ypid1 = waitpid $pid1, 0;
+        $status1 = $?;
+    }
+    if ($ypid2 == 0) {
+        $ypid2 = waitpid $pid2, 0;
+        $status2 = $?;
+    }
+    close OUT1;
+    close OUT2;
 
-  open(IN1, '<', "out1.$PID");
-  my $in1 = join'', <IN1>;
-  close IN1;
-  open(IN2, '<', "out2.$PID");
-  my $in2 = join'', <IN2>;
-  close IN2;
+    open(IN1, '<', "out1.$PID");
+    my $in1 = join'', <IN1>;
+    close IN1;
+    open(IN2, '<', "out2.$PID");
+    my $in2 = join'', <IN2>;
+    close IN2;
 
-  if (@ARGV == 0) {
-    unlink "control_group.$PID.tt", "experimental_group.$PID.tt";
-    unlink "out1.$PID", "out2.$PID";
-  }
+    if (@ARGV == 0) {
+        unlink "control_group.$PID.tt", "experimental_group.$PID.tt";
+        unlink "out1.$PID", "out2.$PID";
+    }
 
-  return (
-    { xpid => $xpid1, ypid => $ypid1, output => $in1, status => $status1 },
-    { xpid => $xpid2, ypid => $ypid2, output => $in2, status => $status2 },
-	  "control_group.$PID.tt", "experimental_group.$PID.tt",
-	  "out1.$PID", "out2.$PID" );
+    return (
+        { xpid => $xpid1, ypid => $ypid1, output => $in1, status => $status1 },
+        { xpid => $xpid2, ypid => $ypid2, output => $in2, status => $status2 },
+	      "control_group.$PID.tt", "experimental_group.$PID.tt",
+	      "out1.$PID", "out2.$PID" );
 
 }
 
 sub ok_test_behavior {
-  my ($basic, $module, $signal) = @_;
-  my $failed = 0;
+    my ($basic, $module, $signal) = @_;
+    my $failed = 0;
 
-  ok($basic->{status} == $module->{status},
-     "SIG$signal exit status was the same "
-     . $basic->{status} . " == " . $module->{status})
-  or $failed++;
+    ok($basic->{status} == $module->{status},
+       "SIG$signal exit status was the same "
+       . $basic->{status} . " == " . $module->{status})
+        or $failed++;
 
-  my $msg = $basic->{output} eq $module->{output}
-    ? "" : "system: [$basic->{output}] ; module: [$module->{output}]";
+    my $msg = $basic->{output} eq $module->{output}
+        ? "" : "system: [$basic->{output}] ; module: [$module->{output}]";
 
-  ok($basic->{output} eq $module->{output}
-	# OpenBSD failure point on 0.09: SIGILL, SIGBUS, SIGSEGV
-	#    should produce no output, but module produces
-	#    "Hello world". This shouldn't be a deal killer.
+    ok($basic->{output} eq $module->{output}
+       # OpenBSD failure point on 0.09: SIGILL, SIGBUS, SIGSEGV
+       #    should produce no output, but module produces
+       #    "Hello world". This shouldn't be a deal killer.
 
-	|| ($^O =~ /openbsd/ && $basic->{output} eq ''),
+       || ($^O =~ /openbsd/ && $basic->{output} eq ''),
 
-	# Also an intermittent failure point on MSWin32 with 0.10-0.11
+       "program output with SIG$signal was the same $msg"
+       . length($basic->{output}) . " === " . length($module->{output}))
+        or $failed++;
 
-
-
-     "program output with SIG$signal was the same $msg"
-     . length($basic->{output}) . " === " . length($module->{output}))
-  or $failed++;
-
-  ok(!!$basic->{xpid} == !!$module->{xpid},
-     "suspend behavior was the same for SIG$signal "
-     . "($basic->{xpid} $basic->{ypid} / "
-     . "$module->{xpid} $module->{ypid})");
-  if ($failed) {
-    diag "Default behavior failures for SIG$signal";
-    return 0;
-  }
-  return 1;
+    ok(!!$basic->{xpid} == !!$module->{xpid},
+       "suspend behavior was the same for SIG$signal "
+       . "($basic->{xpid} $basic->{ypid} / "
+       . "$module->{xpid} $module->{ypid})");
+    if ($failed) {
+        diag "Default behavior failures for SIG$signal";
+        return 0;
+    }
+    return 1;
 }
 
 sub on_failure_recommend_spike {
 
-  # run  spike/analyze_default_signal_behavior.pl  on the signals that
-  # failed this test. This way, we get information about what the
-  # signals *should* do on this system in the test output, and we
-  # can incorporate this data into the next fix.
+    # run  spike/analyze_default_signal_behavior.pl  on the signals that
+    # failed this test. This way, we get information about what the
+    # signals *should* do on this system in the test output, and we
+    # can incorporate this data into the next fix.
 
-  my (@failed_sigs) = @_;
-  return if $ENV{NO_SPIKE};
-  close STDOUT; open STDOUT, '>&STDERR';
-  system($^X, "spike/analyze_default_signal_behavior.pl", 1, @failed_sigs);
+    my (@failed_sigs) = @_;
+    return if $ENV{NO_SPIKE};
+    close STDOUT; open STDOUT, '>&STDERR';
+    system($^X, "spike/analyze_default_signal_behavior.pl", 1, @failed_sigs);
 
 }
 

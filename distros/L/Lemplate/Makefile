@@ -23,7 +23,7 @@
 #     NO_META => q[1]
 #     PREREQ_PM => { ExtUtils::MakeMaker=>q[6.59], File::Find::Rule=>q[0], Filter::Util::Call=>q[0], IPC::Run3=>q[0], Template=>q[2.14] }
 #     TEST_REQUIRES => {  }
-#     VERSION => q[0.11]
+#     VERSION => q[0.12]
 #     VERSION_FROM => q[lib/Lemplate.pm]
 #     dist => { PREOP=>q[$(PERL) -I. "-MModule::Install::Admin" -e "dist_preop(q($(DISTVNAME)))"] }
 #     realclean => { FILES=>q[MYMETA.yml] }
@@ -66,11 +66,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = Lemplate
 NAME_SYM = Lemplate
-VERSION = 0.11
+VERSION = 0.12
 VERSION_MACRO = VERSION
-VERSION_SYM = 0_11
+VERSION_SYM = 0_12
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 0.11
+XS_VERSION = 0.12
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -277,7 +277,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = Lemplate
-DISTVNAME = Lemplate-0.11
+DISTVNAME = Lemplate-0.12
 
 
 # --- MakeMaker macro section:

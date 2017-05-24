@@ -6,6 +6,12 @@ Home page:    <https://metacpan.org/release/MooseX-ErsatzMethod>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-ErsatzMethod>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.005	2017-05-21
+
+ [ Packaging ]
+ - Declare minimum version of Perl.
+ - thanks.pm should still be a testing requirement.
+
 0.004	2014-09-06
 
  [ Packaging ]

@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI  for Riap function /Business/Tax/ID/PPH21/get_pph21_op_ptkp
-# and generated automatically using Perinci::CmdLine::Gen version 0.28
+# and generated automatically using Perinci::CmdLine::Gen version 0.45
 
-our $DATE = '2016-01-18'; # DATE
+our $DATE = '2017-05-24'; # DATE
 our $DIST = 'App-PPH21Utils'; # DIST
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 use 5.010001;
 use strict;
@@ -33,7 +33,7 @@ get-pph21-op-ptkp - Get PPh21 non-taxable income amount ("PTKP") for individuals
 
 =head1 VERSION
 
-This document describes version 0.02 of get-pph21-op-ptkp (from Perl distribution App-PPH21Utils), released on 2016-01-18.
+This document describes version 0.03 of get-pph21-op-ptkp (from Perl distribution App-PPH21Utils), released on 2017-05-24.
 
 =head1 SYNOPSIS
 
@@ -43,18 +43,18 @@ Usage:
 
 Examples:
 
- % get-pph21-op-ptkp 2015
+ % get-pph21-op-ptkp 2016
  +------+----------+
  | key  | value    |
  +------+----------+
- | K/0  | 39000000 |
- | K/1  | 42000000 |
- | K/2  | 45000000 |
- | K/3  | 48000000 |
- | TK/0 | 36000000 |
- | TK/1 | 39000000 |
- | TK/2 | 42000000 |
- | TK/3 | 45000000 |
+ | K/0  | 58500000 |
+ | K/1  | 63000000 |
+ | K/2  | 67500000 |
+ | K/3  | 72000000 |
+ | TK/0 | 54000000 |
+ | TK/1 | 58500000 |
+ | TK/2 | 63000000 |
+ | TK/3 | 67500000 |
  +------+----------+
 
 =head1 DESCRIPTION
@@ -66,6 +66,14 @@ does not need to pay income tax.
 =head1 OPTIONS
 
 C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--year>=I<i>*
+
+=back
 
 =head2 Configuration options
 
@@ -148,8 +156,6 @@ Display help message and exit.
 
 Display program's version and exit.
 
-=item B<--year>=I<i>*
-
 =back
 
 =head1 COMPLETION
@@ -163,7 +169,7 @@ To activate bash completion for this script, put:
 
  complete -C get-pph21-op-ptkp get-pph21-op-ptkp
 
-in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
 recognize tab completion for the command. Or, you can also directly execute the
 line above in your shell to activate immediately.
 
@@ -171,8 +177,8 @@ It is recommended, however, that you install L<shcompgen> which allows you to
 activate completion scripts for several kinds of scripts on multiple shells.
 Some CPAN distributions (those that are built with
 L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
-completion for their included scripts (using C<shcompgen>) at installation time,
-so you can immadiately have tab completion.
+completion for their included scripts (using L<shcompgen>) at installation time,
+so you can immediately have tab completion.
 
 =head2 tcsh
 
@@ -180,25 +186,31 @@ To activate tcsh completion for this script, put:
 
  complete get-pph21-op-ptkp 'p/*/`get-pph21-op-ptkp`/'
 
-in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
 recognize tab completion for the command. Or, you can also directly execute the
 line above in your shell to activate immediately.
 
-It is also recommended to install C<shcompgen> (see above).
+It is also recommended to install L<shcompgen> (see above).
 
 =head2 other shells
 
-For fish and zsh, install C<shcompgen> as described above.
+For fish and zsh, install L<shcompgen> as described above.
 
 =head1 CONFIGURATION FILE
 
-This script can read configuration file, which by default is searched at C<~/.config/get-pph21-op-ptkp.conf>, C<~/get-pph21-op-ptkp.conf> or C</etc/get-pph21-op-ptkp.conf> (can be changed by specifying C<--config-path>). All found files will be read and merged.
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/get-pph21-op-ptkp.conf>, F<~/get-pph21-op-ptkp.conf>, or F</etc/get-pph21-op-ptkp.conf>.
+
+All found files will be read and merged.
 
 To disable searching for configuration files, pass C<--no-config>.
 
-Configuration file is in the format of L<IOD>, which is basically INI with some extra features. 
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
 
-You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
 
 List of available configuration parameters:
 
@@ -210,15 +222,15 @@ List of available configuration parameters:
 
 =head2 GET_PPH21_OP_PTKP_OPT => str
 
-Specify additional command-line options
+Specify additional command-line options.
 
 =head1 FILES
 
-~/.config/get-pph21-op-ptkp.conf
+F<~/.config/get-pph21-op-ptkp.conf>
 
-~/get-pph21-op-ptkp.conf
+F<~/get-pph21-op-ptkp.conf>
 
-/etc/get-pph21-op-ptkp.conf
+F</etc/get-pph21-op-ptkp.conf>
 
 =head1 HOMEPAGE
 
@@ -242,7 +254,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

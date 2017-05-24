@@ -9,7 +9,7 @@ use Carp;
 
 use namespace::autoclean;
 
-our $VERSION = '3.542';
+our $VERSION = '3.543';
 
 =head1 NAME
 

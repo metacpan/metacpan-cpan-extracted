@@ -1,38 +1,21 @@
-package WWW::Correios::SRO::Item;
-use Class::XSAccessor::Array {
-    constructor => 'new',
-    accessors  => {
-        'data'     => 0,
-        'date'     => 0,
-        'location' => 1,
-        'local'    => 1,
-        'status'   => 2,
-        'extra'    => 3,
-    },
-};
-
 package WWW::Correios::SRO;
 
 use strict;
 use warnings;
 
-use LWP::UserAgent;
-use HTML::TreeBuilder;
-
 use parent 'Exporter';
-our @EXPORT_OK = qw( sro sro_en sro_ok sro_sigla );
+our @EXPORT_OK = qw( sro sro_en sro_ok sro_sigla status_da_entrega );
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 my $AGENT = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)';
 my $TIMEOUT = 30;
 
-# Verificado em 14 de Setembro de 2014 em  
+# Verificado em 22 de Maio de 2017
 # http://www.correios.com.br/para-voce/precisa-de-ajuda/como-rastrear-um-objeto/siglas-utilizadas-no-rastreamento-de-objeto
 #
 #
-# Sabemos que as seguintes siglas são usadas: DM, DH, JH, PE 
-# Como não existem na tabela dos correios, nao se encontra na
-# hash.
+# Sabemos que as seguintes siglas são usadas: DH
+# Como não existem na tabela dos correios, nao se encontra na hash.
 # Um código com esse prefixo funcionará ao usar a funcao sro sem
 # passar o parametro verifica_prefixo. Porém, se passar este
 # parametro, deve retornar undef como qualquer SRO
@@ -41,191 +24,241 @@ my %siglas = (
   AL => 'AGENTES DE LEITURA',
   AR => 'AVISO DE RECEBIMENTO',
   AS => 'ENCOMENDA PAC – AÇÃO SOCIAL',
-  CA => 'OBJETO INTERNACIONAL',
-  CB => 'OBJETO INTERNACIONAL',
-  CC => 'COLIS POSTAUX',
-  CD => 'OBJETO INTERNACIONAL',
-  CE => 'OBJETO INTERNACIONAL',
-  CF => 'OBJETO INTERNACIONAL',
-  CG => 'OBJETO INTERNACIONAL',
-  CH => 'OBJETO INTERNACIONAL',
-  CI => 'OBJETO INTERNACIONAL',
-  CJ => 'REGISTRADO INTERNACIONAL',
-  CK => 'OBJETO INTERNACIONAL',
-  CL => 'OBJETO INTERNACIONAL',
-  CM => 'OBJETO INTERNACIONAL',
-  CN => 'OBJETO INTERNACIONAL',
-  CO => 'OBJETO INTERNACIONAL',
-  CP => 'COLIS POSTAUX',
-  CQ => 'OBJETO INTERNACIONAL',
+  BE => 'REMESSA ECONÔMICA TALÃO/CARTÃO (SEM AR DIGITAL)',
+  CA => 'ENCOMENDA INTERNACIONAL - COLIS',
+  CB => 'ENCOMENDA INTERNACIONAL - COLIS',
+  CC => 'ENCOMENDA INTERNACIONAL - COLIS',
+  CD => 'ENCOMENDA INTERNACIONAL - COLIS',
+  CE => 'ENCOMENDA INTERNACIONAL - COLIS',
+  CF => 'ENCOMENDA INTERNACIONAL - COLIS',
+  CG => 'ENCOMENDA INTERNACIONAL - COLIS',
+  CH => 'ENCOMENDA INTERNACIONAL - COLIS',
+  CI => 'ENCOMENDA INTERNACIONAL - COLIS',
+  CJ => 'ENCOMENDA INTERNACIONAL - COLIS',
+  CK => 'ENCOMENDA INTERNACIONAL - COLIS',
+  CL => 'ENCOMENDA INTERNACIONAL - COLIS',
+  CM => 'ENCOMENDA INTERNACIONAL - COLIS',
+  CN => 'ENCOMENDA INTERNACIONAL - COLIS',
+  CO => 'ENCOMENDA INTERNACIONAL - COLIS',
+  CP => 'ENCOMENDA INTERNACIONAL - COLIS',
+  CQ => 'ENCOMENDA INTERNACIONAL - COLIS',
   CR => 'CARTA REGISTRADA SEM VALOR DECLARADO',
-  CS => 'OBJETO INTERNACIONAL',
-  CT => 'OBJETO INTERNACIONAL',
-  CU => 'OBJETO INTERNACIONAL',
-  CV => 'REGISTRADO INTERNACIONAL',
-  CW => 'OBJETO INTERNACIONAL',
-  CX => 'OBJETO INTERNACIONAL',
-  CY => 'OBJETO INTERNACIONAL',
-  CZ => 'OBJETO INTERNACIONAL',
-  DA => 'REM EXPRES COM AR DIGITAL',
-  DB => 'REM EXPRES COM AR DIGITAL BRADESCO',
-  DC => 'REM EXPRESSA CRLV/CRV/CNH e NOTIFICAÇÃO',
+  CS => 'ENCOMENDA INTERNACIONAL - COLIS',
+  CT => 'ENCOMENDA INTERNACIONAL - COLIS',
+  CU => 'ENCOMENDA INTERNACIONAL - COLIS',
+  CV => 'ENCOMENDA INTERNACIONAL - COLIS',
+  CW => 'ENCOMENDA INTERNACIONAL - COLIS',
+  CX => 'ENCOMENDA INTERNACIONAL - COLIS OU SELO LACRE PARA CAIXETAS',
+  CY => 'ENCOMENDA INTERNACIONAL - COLIS',
+  CZ => 'ENCOMENDA INTERNACIONAL - COLIS',
+  DA => 'SEDEX OU REMESSA EXPRESSA COM AR DIGITAL',
+  DB => 'SEDEX OU REMESSA EXPRESSA COM AR DIGITAL (BRADESCO)',
+  DC => 'REMESSA EXPRESSA CRLV/CRV/CNH e NOTIFICAÇÕES',
   DD => 'DEVOLUÇÃO DE DOCUMENTOS',
-  DE => 'REMESSA EXPRESSA TALÃO E CARTÃO C/ AR',
-  DF => 'E-SEDEX (LÓGICO)',
-  DI => 'REM EXPRES COM AR DIGITAL ITAU',
-  DL => 'ENCOMENDA SEDEX (LÓGICO)',
-  DP => 'REM EXPRES COM AR DIGITAL PRF',
-  DS => 'REM EXPRES COM AR DIGITAL SANTANDER',
-  DT => 'REMESSA ECON.SEG.TRANSITO C/AR DIGITAL',
-  DX => 'ENCOMENDA SEDEX 10 (LÓGICO)',
-  EA => 'OBJETO INTERNACIONAL',
-  EB => 'OBJETO INTERNACIONAL',
-  EC => 'ENCOMENDA PAC',
-  ED => 'OBJETO INTERNACIONAL',
-  EE => 'SEDEX INTERNACIONAL',
-  EF => 'OBJETO INTERNACIONAL',
-  EG => 'OBJETO INTERNACIONAL',
-  EH => 'ENCOMENDA NORMAL COM AR DIGITAL',
-  EI => 'OBJETO INTERNACIONAL',
-  EJ => 'ENCOMENDA INTERNACIONAL',
-  EK => 'OBJETO INTERNACIONAL',
-  EL => 'OBJETO INTERNACIONAL',
-  EM => 'OBJETO INTERNACIONAL',
-  EN => 'ENCOMENDA NORMAL NACIONAL',
-  EO => 'OBJETO INTERNACIONAL',
-  EP => 'OBJETO INTERNACIONAL',
-  EQ => 'ENCOMENDA SERVIÇO NÃO EXPRESSA ECT',
-  ER => 'REGISTRADO',
-  ES => 'E-SEDEX',
-  ET => 'OBJETO INTERNACIONAL',
-  EU => 'OBJETO INTERNACIONAL',
-  EV => 'OBJETO INTERNACIONAL',
-  EW => 'OBJETO INTERNACIONAL',
-  EX => 'OBJETO INTERNACIONAL',
-  EY => 'OBJETO INTERNACIONAL',
-  EZ => 'OBJETO INTERNACIONAL',
-  FA => 'FAC REGISTRATO (LÓGICO)',
+  DE => 'REMESSA EXPRESSA TALÃO/CARTÃO COM AR',
+  DF => 'E-SEDEX',
+  DG => 'SEDEX',
+  DI => 'SEDEX OU REMESSA EXPRESSA COM AR DIGITAL (ITAU)',
+  DJ => 'SEDEX',
+  DK => 'PAC EXTRA GRANDE',
+  DL => 'SEDEX',
+  DM => 'E-SEDEX',
+  DN => 'SEDEX',
+  DO => 'SEDEX OU REMESSA EXPRESSA COM AR DIGITAL (ITAU)',
+  DP => 'SEDEX PAGAMENTO NA ENTREGA',
+  DQ => 'SEDEX OU REMESSA EXPRESSA COM AR DIGITAL (BRADESCO)',
+  DR => 'REMESSA EXPRESSA COM AR DIGITAL (SANTANDER)',
+  DS => 'SEDEX OU REMESSA EXPRESSA COM AR DIGITAL (SANTANDER)',
+  DT => 'REMESSA ECONÔMICA COM AR DIGITAL (DETRAN)',
+  DU => 'E-SEDEX',
+  DV => 'SEDEX COM AR DIGITAL',
+  DW => 'ENCOMENDA SEDEX (ETIQUETA LÓGICA)',
+  DX => 'SEDEX 10',
+  EA => 'ENCOMENDA INTERNACIONAL - EMS',
+  EB => 'ENCOMENDA INTERNACIONAL - EMS',
+  EC => 'PAC',
+  ED => 'PACKET EXPRESS',
+  EE => 'ENCOMENDA INTERNACIONAL - EMS',
+  EF => 'ENCOMENDA INTERNACIONAL - EMS',
+  EG => 'ENCOMENDA INTERNACIONAL - EMS',
+  EH => 'ENCOMENDA INTERNACIONAL - EMS OU ENCOMENDA COM AR DIGITAL',
+  EI => 'ENCOMENDA INTERNACIONAL - EMS',
+  EJ => 'ENCOMENDA INTERNACIONAL - EMS',
+  EK => 'ENCOMENDA INTERNACIONAL - EMS',
+  EL => 'ENCOMENDA INTERNACIONAL - EMS',
+  EM => 'ENCOMENDA INTERNACIONAL - SEDEX MUNDI OU EMS IMPORTAÇÃO',
+  EN => 'ENCOMENDA INTERNACIONAL - EMS',
+  EO => 'ENCOMENDA INTERNACIONAL - EMS',
+  EP => 'ENCOMENDA INTERNACIONAL - EMS',
+  EQ => 'ENCOMENDA DE SERVIÇO NÃO EXPRESSA (ECT)',
+  ER => 'OBJETO REGISTRADO',
+  ES => 'E-SEDEX OU EMS',
+  ET => 'ENCOMENDA INTERNACIONAL - EMS',
+  EU => 'ENCOMENDA INTERNACIONAL - EMS',
+  EV => 'ENCOMENDA INTERNACIONAL - EMS',
+  EW => 'ENCOMENDA INTERNACIONAL - EMS',
+  EX => 'ENCOMENDA INTERNACIONAL - EMS',
+  EY => 'ENCOMENDA INTERNACIONAL - EMS',
+  EZ => 'ENCOMENDA INTERNACIONAL - EMS',
+  FA => 'FAC REGISTRADO',
   FE => 'ENCOMENDA FNDE',
-  FF => 'REGISTRADO DETRAN',
-  FH => 'REGISTRADO FAC COM AR DIGITAL',
-  FM => 'REGISTRADO - FAC MONITORADO',
-  FR => 'REGISTRADO FAC',
-  IA => 'INTEGRADA AVULSA',
-  IC => 'INTEGRADA A COBRAR',
-  ID => 'INTEGRADA DEVOLUCAO DE DOCUMENTO',
-  IE => 'INTEGRADA ESPECIAL',
+  FF => 'OBJETO REGISTRADO (DETRAN)',
+  FH => 'FAC REGISTRADO COM AR DIGITAL',
+  FM => 'FAC MONITORADO',
+  FR => 'FAC REGISTRADO',
+  IA => 'LOGÍSTICA INTEGRADA (AGENDADO/AVULSO)',
+  IC => 'LOGÍSTICA INTEGRADA (A COBRAR)',
+  ID => 'LOGÍSTICA INTEGRADA (DEVOLUCAO DE DOCUMENTO)',
+  IE => 'LOGÍSTICA INTEGRADA (ESPECIAL)',
   IF => 'CPF',
-  II => 'INTEGRADA INTERNO',
-  IK => 'INTEGRADA COM COLETA SIMULTANEA',
-  IM => 'INTEGRADA MEDICAMENTOS',
-  IN => 'OBJ DE CORRESP E EMS REC EXTERIOR',
-  IP => 'INTEGRADA PROGRAMADA',
+  II => 'LOGÍSTICA INTEGRADA (ECT)',
+  IK => 'LOGÍSTICA INTEGRADA COM COLETA SIMULTÂNEA',
+  IM => 'LOGÍSTICA INTEGRADA (MEDICAMENTOS)',
+  IN => 'CORRESPONDÊNCIA E EMS RECEBIDO DO EXTERIOR',
+  IP => 'LOGÍSTICA INTEGRADA (PROGRAMADA)',
   IR => 'IMPRESSO REGISTRADO',
-  IS => 'INTEGRADA STANDARD',
-  IT => 'INTEGRADO TERMOLÁBIL',
-  IU => 'INTEGRADA URGENTE',
-  JA => 'REMESSA ECONOMICA C/AR DIGITAL',
-  JB => 'REMESSA ECONOMICA C/AR DIGITAL',
-  JC => 'REMESSA ECONOMICA C/AR DIGITAL',
-  JD => 'REMESSA ECONOMICA C/AR DIGITAL',
-  JE => 'REMESSA ECONÔMICA C/AR DIGITAL',
-  JG => 'REGISTRATO AGÊNCIA (FÍSICO)',
-  JJ => 'REGISTRADO JUSTIÇA',
-  JL => 'OBJETO REGISTRADO (LÓGICO)',
-  JM => 'MALA DIRETA POSTAL ESPECIAL (LÓGICO)',
-  LA => 'LOGÍSTICA REVERSA SIMULTÂNEA - ENCOMENDA SEDEX (AGÊNCIA)',
-  LB => 'LOGÍSTICA REVERSA SIMULTÂNEA - ENCOMENDA E-SEDEX (AGÊNCIA)',
-  LC => 'CARTA EXPRESSA',
+  IS => 'LOGÍSTICA INTEGRADA STANDARD (MEDICAMENTOS)',
+  IT => 'REMESSA EXPRESSA MEDICAMENTOS / LOGÍSTICA INTEGRADA TERMOLÁBIL',
+  IU => 'LOGÍSTICA INTEGRADA (URGENTE)',
+  IX => 'EDEI EXPRESSO',
+  JA => 'REMESSA ECONOMICA COM AR DIGITAL',
+  JB => 'REMESSA ECONOMICA COM AR DIGITAL',
+  JC => 'REMESSA ECONOMICA COM AR DIGITAL',
+  JD => 'REMESSA ECONOMICA TALÃO/CARTÃO',
+  JE => 'REMESSA ECONÔMICA COM AR DIGITAL',
+  JF => 'REMESSA ECONÔMICA COM AR DIGITAL',
+  JG => 'OBJETO REGISTRADO URGENTE/PRIORITÁRIO',
+  JH => 'OBJETO REGISTRADO URGENTE/PRIORITÁRIO',
+  JI => 'REMESSA ECONÔMICA TALÃO/CARTÃO',
+  JJ => 'OBJETO REGISTRADO (JUSTIÇA)',
+  JK => 'REMESSA ECONÔMICA TALÃO/CARTÃO',
+  JL => 'OBJETO REGISTRADO',
+  JM => 'MALA DIRETA POSTAL ESPECIAL',
+  JN => 'OBJETO REGISTRADO ECONÔMICO',
+  JO => 'OBJETO REGISTRADO URGENTE',
+  JP => 'RECEITA FEDERAL',
+  JQ => 'REMESSA ECONÔMICA COM AR DIGITAL',
+  JR => 'OBJETO REGISTRADO URGENTE/PRIORITÁRIO',
+  JS => 'OBJETO REGISTRADO',
+  JT => 'OBJETO REGISTRADO URGENTE',
+  JV => 'REMESSA ECONÔMICA COM AR DIGITAL',
+  LA => 'SEDEX COM LOGÍSTICA REVERSA SIMULTÂNEA EM AGÊNCIA',
+  LB => 'E-SEDEX COM LOGÍSTICA REVERSA SIMULTÂNEA EM AGÊNCIA',
+  LC => 'OBJETO INTERNACIONAL (PRIME)',
   LE => 'LOGÍSTICA REVERSA ECONOMICA',
-  LP => 'LOGÍSTICA REVERSA SIMULTÂNEA - ENCOMENDA PAC (AGÊNCIA)',
-  LS => 'LOGISTICA REVERSA SEDEX',
+  LF => 'OBJETO INTERNACIONAL (PRIME)',
+  LI => 'OBJETO INTERNACIONAL (PRIME)',
+  LJ => 'OBJETO INTERNACIONAL (PRIME)',
+  LK => 'OBJETO INTERNACIONAL (PRIME)',
+  LM => 'OBJETO INTERNACIONAL (PRIME)',
+  LN => 'OBJETO INTERNACIONAL (PRIME)',
+  LP => 'PAC COM LOGÍSTICA REVERSA SIMULTÂNEA EM AGÊNCIA',
+  LS => 'SEDEX LOGISTICA REVERSA',
   LV => 'LOGISTICA REVERSA EXPRESSA',
-  LX => 'CARTA EXPRESSA',
-  LY => 'CARTA EXPRESSA',
-  MA => 'SERVIÇOS ADICIONAIS',
-  MB => 'TELEGRAMA DE BALCÃO',
-  MC => 'MALOTE CORPORATIVO',
+  LX => 'PACKET STANDARD/ECONÔMICA',
+  LZ => 'OBJETO INTERNACIONAL (PRIME)',
+  MA => 'SERVIÇOS ADICIONAIS DO TELEGRAMA',
+  MB => 'TELEGRAMA (BALCÃO)',
+  MC => 'TELEGRAMA (FONADO)',
+  MD => 'SEDEX MUNDI (DOCUMENTO INTERNO)',
   ME => 'TELEGRAMA',
   MF => 'TELEGRAMA FONADO',
-  MK => 'TELEGRAMA CORPORATIVO',
-  MM => 'TELEGRAMA GRANDES CLIENTES',
-  MP => 'TELEGRAMA PRÉ-PAGO',
+  MK => 'TELEGRAMA (CORPORATIVO)',
+  ML => 'FECHA MALAS (RABICHO)',
+  MM => 'TELEGRAMA (GRANDES CLIENTES)',
+  MP => 'TELEGRAMA (PRÉ-PAGO)',
+  MR => 'AR DIGITAL',
   MS => 'ENCOMENDA SAUDE',
-  MT => 'TELEGRAMA VIA TELEMAIL',
-  MY => 'TELEGRAMA INTERNACIONAL ENTRANTE',
-  MZ => 'TELEGRAMA VIA CORREIOS ON LINE',
+  MT => 'TELEGRAMA (TELEMAIL)',
+  MY => 'TELEGRAMA INTERNACIONAL (ENTRANTE)',
+  MZ => 'TELEGRAMA (CORREIOS ONLINE)',
   NE => 'TELE SENA RESGATADA',
+  NX => 'EDEI ECONÔMICO (NÃO URGENTE)',
+  OA => 'ENCOMENDA SEDEX',
+  OB => 'ENCOMENDA E-SEDEX',
   PA => 'PASSAPORTE',
-  PB => 'ENCOMENDA PAC - NÃO URGENTE',
-  PC => 'ENCOMENDA PAC A COBRAR',
-  PD => 'ENCOMENDA PAC - NÃO URGENTE',
+  PB => 'PAC',
+  PC => 'PAC A COBRAR',
+  PD => 'PAC',
+  PE => 'PAC',
   PF => 'PASSAPORTE',
-  PG => 'ENCOMENDA PAC (ETIQUETA FÍSICA)',
-  PH => 'ENCOMENDA PAC (ETIQUETA LÓGICA)',
-  PR => 'REEMBOLSO POSTAL - CLIENTE AVULSO',
-  RA => 'REGISTRADO PRIORITÁRIO',
+  PG => 'PAC',
+  PH => 'PAC',
+  PI => 'PAC',
+  PJ => 'PAC',
+  PK => 'PAC EXTRA GRANDE',
+  PL => 'PAC',
+  PN => 'PAC',
+  PR => 'REEMBOLSO POSTAL',
+  QQ => 'OBJETO DE TESTE (SIGEP WEB)',
+  RA => 'OBJETO REGISTRADO/PRIORITÁRIO',
   RB => 'CARTA REGISTRADA',
   RC => 'CARTA REGISTRADA COM VALOR DECLARADO',
-  RD => 'REMESSA ECONOMICA DETRAN',
-  RE => 'REGISTRADO ECONÔMICO',
-  RF => 'OBJETO DA RECEITA FEDERAL',
-  RG => 'REGISTRADO DO SISTEMA SARA',
-  RH => 'REGISTRADO COM AR DIGITAL',
-  RI => 'REGISTRADO',
-  RJ => 'REGISTRADO AGÊNCIA',
-  RK => 'REGISTRADO AGÊNCIA',
-  RL => 'REGISTRADO LÓGICO',
-  RM => 'REGISTRADO AGÊNCIA',
-  RN => 'REGISTRADO AGÊNCIA',
-  RO => 'REGISTRADO AGÊNCIA',
-  RP => 'REEMBOLSO POSTAL - CLIENTE INSCRITO',
-  RQ => 'REGISTRADO AGÊNCIA',
-  RR => 'CARTA REGISTRADA SEM VALOR DECLARADO',
-  RS => 'REGISTRADO LÓGICO',
-  RT => 'REM ECON TALAO/CARTAO SEM AR DIGITAL',
-  RU => 'REGISTRADO SERVIÇO ECT',
-  RV => 'REM ECON CRLV/CRV/CNH COM AR DIGITAL',
-  RY => 'REM ECON TALAO/CARTAO COM AR DIGITAL',
-  RZ => 'REGISTRADO',
-  SA => 'SEDEX ANOREG',
-  SB => 'SEDEX 10 AGÊNCIA (FÍSICO)',
+  RD => 'REMESSA ECONOMICA OU OBJETO REGISTRADO (DETRAN)',
+  RE => 'OBJETO REGISTRADO ECONÔMICO',
+  RF => 'RECEITA FEDERAL',
+  RG => 'OBJETO REGISTRADO',
+  RH => 'OBJETO REGISTRADO COM AR DIGITAL',
+  RI => 'OBJETO REGISTRADO INTERNACIONAL PRIORITÁRIO',
+  RJ => 'OBJETO REGISTRADO',
+  RK => 'OBJETO REGISTRADO',
+  RL => 'OBJETO REGISTRADO',
+  RM => 'OBJETO REGISTRADO URGENTE',
+  RN => 'OBJETO REGISTRADO (SIGEPWEB OU AGÊNCIA)',
+  RO => 'OBJETO REGISTRADO',
+  RP => 'REEMBOLSO POSTAL',
+  RQ => 'OBJETO REGISTRADO',
+  RR => 'OBJETO REGISTRADO',
+  RS => 'OBJETO REGISTRADO',
+  RT => 'REMESSA ECONÔMICA TALÃO/CARTAO',
+  RU => 'OBJETO REGISTRADO (ECT)',
+  RV => 'REMESSA ECONÔMICA CRLV/CRV/CNH E NOTIFICAÇÕES COM AR DIGITAL',
+  RW => 'OBJETO INTERNACIONAL',
+  RX => 'OBJETO INTERNACIONAL',
+  RY => 'REMESSA ECONÔMICA TALÃO/CARTÃO COM AR DIGITAL',
+  RZ => 'OBJETO REGISTRADO',
+  SA => 'SEDEX',
+  SB => 'SEDEX 10',
   SC => 'SEDEX A COBRAR',
-  SD => 'REMESSA EXPRESSA DETRAN',
-  SE => 'ENCOMENDA SEDEX',
-  SF => 'SEDEX AGÊNCIA',
-  SG => 'SEDEX DO SISTEMA SARA',
-  SI => 'SEDEX AGÊNCIA',
+  SD => 'SEDEX OU REMESSA EXPRESSA (DETRAN)',
+  SE => 'SEDEX',
+  SF => 'SEDEX',
+  SG => 'SEDEX',
+  SH => 'SEDEX COM AR DIGITAL / SEDEX OU AR DIGITAL',
+  SI => 'SEDEX',
   SJ => 'SEDEX HOJE',
-  SK => 'SEDEX AGÊNCIA',
-  SL => 'SEDEX LÓGICO',
-  SM => 'SEDEX MESMO DIA',
-  SN => 'SEDEX COM VALOR DECLARADO',
-  SO => 'SEDEX AGÊNCIA',
+  SK => 'SEDEX',
+  SL => 'SEDEX',
+  SM => 'SEDEX 12',
+  SN => 'SEDEX',
+  SO => 'SEDEX',
   SP => 'SEDEX PRÉ-FRANQUEADO',
   SQ => 'SEDEX',
   SR => 'SEDEX',
-  SS => 'SEDEX FÍSICO',
-  ST => 'REM EXPRES TALAO/CARTAO SEM AR DIGITAL',
-  SU => 'ENCOMENDA SERVIÇO EXPRESSA ECT',
-  SV => 'REM EXPRES CRLV/CRV/CNH COM AR DIGITAL',
+  SS => 'SEDEX',
+  ST => 'REMESSA EXPRESSA TALÃO/CARTÃO',
+  SU => 'ENCOMENDA DE SERVIÇO EXPRESSA (ECT)',
+  SV => 'REMESSA EXPRESSA CRLV/CRV/CNH E NOTIFICAÇÕES COM AR DIGITAL',
   SW => 'E-SEDEX',
   SX => 'SEDEX 10',
-  SY => 'REM EXPRES TALAO/CARTAO COM AR DIGITAL',
-  SZ => 'SEDEX AGÊNCIA',
-  TE => 'TESTE (OBJETO PARA TREINAMENTO)',
-  TS => 'TESTE (OBJETO PARA TREINAMENTO)',
+  SY => 'REMESSA EXPRESSA TALÃO/CARTÃO COM AR DIGITAL',
+  SZ => 'SEDEX',
+  TC => 'OBJETO PARA TREINAMENTO',
+  TE => 'OBJETO PARA TREINAMENTO',
+  TS => 'OBJETO PARA TREINAMENTO',
   VA => 'ENCOMENDAS COM VALOR DECLARADO',
   VC => 'ENCOMENDAS',
   VD => 'ENCOMENDAS COM VALOR DECLARADO',
   VE => 'ENCOMENDAS',
   VF => 'ENCOMENDAS COM VALOR DECLARADO',
+  VV => 'OBJETO INTERNACIONAL',
+  XA => 'AVISO DE CHEGADA (INTERNACIONAL)',
   XM => 'SEDEX MUNDI',
   XR => 'ENCOMENDA SUR POSTAL EXPRESSO',
   XX => 'ENCOMENDA SUR POSTAL 24 HORAS',
 );
 
-# http://www.correios.com.br/voce/enderecamento/Arquivos/guia_tecnico_encomendas.pdf
+# http://www.correios.com.br/para-sua-empresa/servicos-para-o-seu-contrato/guias/enderecamento/arquivos/guia_tecnico_encomendas.pdf/at_download/file
 sub sro_ok {
   if ( $_[0] =~ m/^[A-Z|a-z]{2}([0-9]{8})([0-9])BR$/i ) {
     my ( $numeros, $dv ) = ($1, $2);
@@ -252,75 +285,159 @@ sub sro_ok {
 sub sro_sigla {
   if ( sro_ok( @_ ) ) {
     $_[0] =~ m/^([A-Z|a-z]{2}).*$/i;
-    my $prefixo = $1; 
+    my $prefixo = $1;
     return $siglas{$prefixo};
   } else {
     return;
-  } 
+  }
 }
 
-sub sro    { _sro('001', @_) }
-sub sro_en { _sro('002', @_) }
+sub sro    { _sro('101', @_) }
+sub sro_en { _sro('102', @_) }
 
 sub _sro {
-    my ($LANG, $code, $_url, $verifica_prefixo) = @_;
-    return unless $code && sro_ok( $code );
+    my ($language, $code, $params) = @_;
+    return unless $code && length($code) % 13 == 0;
+    my @codes = ($code =~ /.{13}/g);
+    return if !@codes || (@codes > 1 && !$params->{multiple});
 
-    if ( defined $verifica_prefixo && $verifica_prefixo == 1 ) {
-	my $prefixo = sro_sigla( $code );
-        return unless ( defined $prefixo );
+    foreach my $code_to_check (@codes) {
+        return unless sro_ok( $code_to_check );
+
+        if ($params->{verifica_prefixo}) {
+            my $prefixo = sro_sigla( $code_to_check );
+            return unless defined $prefixo;
+        }
     }
 
-    # internal use only: we override this during testing
-    $_url = 'http://websro.correios.com.br/sro_bin/txect01$.Inexistente?P_LINGUA=' . $LANG . "&P_TIPO=002&P_COD_LIS=$code"
-        unless defined $_url;
+    my $agent = $params->{ua};
+    if (!$agent) {
+        require LWP::UserAgent;
+        $agent = LWP::UserAgent->new(
+            agent   => $AGENT,
+            timeout => (exists $params->{timeout} ? $params->{timeout} : $TIMEOUT),
+        );
+    }
 
-    my $agent = LWP::UserAgent->new(
-                       agent   => $AGENT,
-                       timeout => $TIMEOUT,
-            );
-    my $response = $agent->get($_url);
+    my $results = wantarray ? 'T' : 'U';
+    my $user    = $params->{username} || 'ECT';
+    my $pass    = $params->{password} || 'SRO';
 
+    # http://www.correios.com.br/para-voce/correios-de-a-a-z/pdf/rastreamento-de-objetos/manual_rastreamentoobjetosws.pdf
+    my $response = $agent->post(
+        'http://webservice.correios.com.br:80/service/rastro',
+        'Content-Type' => 'text/xml;charset=utf-8',
+        'SOAPAction' => 'buscaEventos',
+        'Content' => qq{<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:res="http://resource.webservice.correios.com.br/"><soapenv:Header/><soapenv:Body><res:buscaEventos><usuario>$user</usuario><senha>$pass</senha><tipo>L</tipo><resultado>$results</resultado><lingua>$language</lingua><objetos>$code</objetos></res:buscaEventos></soapenv:Body></soapenv:Envelope>}
+    );
     return unless $response->is_success;
 
-    my $html = HTML::TreeBuilder->new_from_content( $response->decoded_content );
-    
-    my $table = $html->find('table');
-    
-    return unless $table;
-    return if ( $table->as_trimmed_text eq $code);
-    
-    my @items = $table->find('tr');
-
-    shift @items; # drop the first 'tr'
-
-    my $i = 0;
-    my @result;
-    foreach my $item (@items) {
-        my @elements = $item->find('td');
-        return unless @elements;
-
-        # new entry
-        if ( @elements == 3 ) {
-            # short-circuit
-            return $result[0] unless wantarray or $i == 0;
-
-            my $item = WWW::Correios::SRO::Item->new;
-            $item->date($elements[0]->as_trimmed_text);
-            $item->location($elements[1]->as_trimmed_text);
-            utf8::encode(my $status = $elements[2]->as_trimmed_text);
-            $item->status($status);
-            $result[$i++] = $item;
+    my $data = _parse_response($response->content);
+    if (ref $data eq 'HASH') {
+        if (!$params->{multiple}) {
+            warn 'unexpected data from Correios webservice';
+            return;
         }
-        # extra info for the current entry
-        else {
-            return unless ref $result[$i - 1] and scalar @elements == 1;
-            utf8::encode(my $extra = $elements[0]->as_trimmed_text);
-            $result[$i - 1]->extra($extra);
+        if ($results eq 'U') {
+            foreach my $k (keys %$data) {
+                $data->{$k} = $data->{$k}[0];
+            }
         }
+        return $data;
     }
-    return wantarray ? @result : $result[0];
+    return $results eq 'T' ? @$data : $data->[0];
 }
+
+sub _parse_response {
+    my ($content) = @_;
+    return unless index($content, '<objeto>') >= 0;
+
+    my %data;
+    while ($content =~ m{<objeto>(.+?)</objeto>}gsi) {
+        my $object = $1;
+        my $tracking;
+        if ($object =~ m{<numero>([^>]+)</numero>}) {
+            $tracking = $1;
+        }
+        return unless $tracking;
+        my @events;
+        while ($object =~ m{<evento>(.+?)</evento>}gi) {
+            my $event = $1;
+            my $params = _parse_event($event);
+            push @events, $params;
+        }
+        $data{$tracking} = \@events;
+    }
+    return (keys %data == 1 ? (values %data)[0] : \%data);
+}
+
+sub _parse_event {
+    my ($event) = @_;
+
+    return $event if index($event, '<') < 0;
+
+    my %params;
+    while ($event =~ m{<\s*([^>]+)\s*>\s*(.+?)\s*<\s*/\s*\1\s*>}g) {
+        my ($key, $value) = ($1, $2);
+        $params{$key} = _parse_event($value);
+    }
+    return \%params;
+}
+
+sub status_da_entrega {
+    my ($data) = @_;
+    die 'entrega_concluida() takes a HASHREF or ARRAYREF'
+        unless $data && ref $data && (ref $data eq 'ARRAY' || ref $data eq 'HASH');
+
+    my $last = ref $data eq 'ARRAY' ? $data->[0] : $data;
+    return unless $last;
+
+    # objeto dos Correios tem as mesmas chaves, independente do idioma.
+    if (!ref $last || ref $last ne 'HASH' || !exists $last->{tipo} || !exists $last->{status}) {
+        warn "status_da_entrega() data looks invalid. Missing keys?";
+        return;
+    }
+    my $tipo   = $last->{tipo};
+    my $status = $last->{status};
+    if ($tipo eq 'BDR' || $tipo eq 'BDE' || $tipo eq 'BDI') {
+        # estado final. entrega efetuada!
+        return 'entregue' if $status <= 1;
+
+        # acionar correios (produto extraviado, etc).
+        return 'erro' if    $status == 9  || $status == 12 || $status == 28
+                         || $status == 37 || $status == 43 || $status == 50
+                         || $status == 51 || $status == 52 || $status == 80
+        ;
+
+        # pacote aguardando retirada pelo interessado.
+        return 'retirar' if $status == 54 || $status == 2;
+
+        # entrega incompleta, pacote retornando.
+        return 'incompleto'
+            if (  ($status != 20 && $status != 7 && $status <= 21)
+                || $status == 26 || $status == 33 || $status == 36
+                || $status == 40 || $status == 42 || $status == 48
+                || $status == 49 || $status == 56
+            );
+
+        return 'acompanhar';
+    }
+    elsif ($tipo eq 'FC' && $status == 1) {
+        return 'incompleto';
+    }
+    elsif (
+        # pacote aguardando retirada.
+           ($tipo eq 'LDI' && ($status <= 3 || $status == 14))
+        || ($tipo eq 'OEC' && $status == 0)
+    ) {
+        return 'retirar';
+    }
+    else {
+        return 'acompanhar';
+    }
+}
+
 
 42;
 __END__
@@ -348,16 +465,36 @@ API em português:
 
     return 'SRO inválido' unless sro_ok( $codigo );
 
-    my $prefixo = sro_sigla( $codigo ); # retorna "SEDEX FÍSICO";
+    my $prefixo = sro_sigla( $codigo ); # retorna "SEDEX";
 
     my @historico_completo = sro( $codigo );
 
     my $ultimo = sro( $codigo );
 
-    $ultimo->data;    # '22/05/2010 12:10'
-    $ultimo->local;   # 'CEE JACAREPAGUA - RIO DE JANEIRO/RJ'
-    $ultimo->status;  # 'Destinatário ausente'
-    $ultimo->extra;   # 'Será realizada uma nova tentativa de entrega'
+    # $ultimo terá uma estrutura como:
+    {
+        cidade    => "BELO HORIZONTE",
+        codigo    => 31276970,
+        data      => "19/05/2017",
+        descricao => "Objeto encaminhado",
+        destino   => {
+            bairro => "Parque Novo Mundo",
+            cidade => "Sao Paulo",
+            codigo => "02170975",
+            local  => "CTE VILA MARIA",
+            uf     => "SP"
+        },
+        hora   => "22:19",
+        local  => "CTE BELO HORIZONTE",
+        status => "01",
+        tipo   => "DO",
+        uf     => "MG"
+    }
+
+    if (status_da_entrega($ultimo) eq 'entregue') {
+        say "Yay! Pedido entregue!";
+    }
+
 
 English API:
 
@@ -367,16 +504,12 @@ English API:
 
     return 'invalid SRO' unless sro_ok( $code );
 
-    my $prefix = sro_sigla( $code ); # returns "SEDEX FÍSICO";
+    my $prefix = sro_sigla( $code ); # returns "SEDEX";
 
     my @full_history = sro_en( $code );
 
     my $last = sro_en( $code );
 
-    $last->date;       # '22/05/2010 12:10'
-    $last->location;   # 'CEE JACAREPAGUA - RIO DE JANEIRO/RJ'
-    $last->status;     # 'No receiver at the address'
-    $last->extra;      # 'Delivery will be retried'
 
 Note: All messages are created by the brazilian post office website. Some messages might not be translated.
 
@@ -384,6 +517,9 @@ Note #2: the sro_en() function is experimental, and could be removed in future v
 
 =head1 DESCRIPTION
 
+Este módulo oferece uma interface com o serviço de rastreamento de objetos dos Correios. Até a data de publicação deste módulo não há uma API pública dos Correios para isso, então este módulo consulta o site dos Correios diretamente e faz parsing dos resultados. Sim, isso significa que mudanças no layout do site dos Correios podem afetar o funcionamento deste módulo. Até os Correios lançarem o serviço via API, isso é o que temos.
+
+This module provides an interface to the Brazilian Postal (Correios) object tracking service. Until the date of release of this module there was no public API to achieve this, so this module queries the Correios website directly and parses its results. Yup, this means any layout changes on their website could affect the correctness of this module. Until Correios releases an API for this service, that's all we can do.
 
 =head1 EXPORTS
 
@@ -395,16 +531,87 @@ This module exports nothing by default. You have to explicitly ask for 'sro' (fo
 
 Recebe o código identificador do objeto. 
 
-Em contexto escalar, retorna retorna um objeto WWW::Correios::SRO::Item contendo a entrada mais recente no registro dos Correios. Em contexto de lista, retorna um array de objetos WWW::Correios::SRO::Item, da entrada mais recente à mais antiga. Em caso de falha, retorna I<undef>. As mensagens do objeto retornado estarão em português.
+Em contexto escalar, retorna retorna um hashref contendo a entrada mais recente no registro dos Correios. Em contexto de lista, retorna um array de hashrefs, da entrada mais recente à mais antiga. Em caso de falha, retorna I<undef>. As mensagens do objeto retornado estarão em português.
 
-Seu terceiro parâmetro, verifica_prefixo, determina se pesquisaremos apenas os códigos com prefixos apresentados pelos Correios ($verifica_prefixo = 1) ou não.
+Seu segundo parâmetro (opcional) é um hashref com dados extras:
+
+    sro( 'SS123456789BR', {
+        ua               => LWP::UserAgent->new,
+        timeout          => 5,
+        username         => 'meu_usuario',
+        password         => 'minha_senha',
+        verifica_prefixo => 1,
+        multiple         => 1,
+    });
+
+=over 4
+
+=item * ua - user agent que fará a requisição. Precisa implementar o método C<post()> com a mesma interface do LWP::UserAgent.
+
+=item * timeout - se o user agent não for especificado, esse parâmetro ajusta o timeout do user agent padrão.
+
+=item * username - usuário disponibilizado pelos Correios para o seu contrato de acesso ao webservice de SRO.
+
+=item * password - senha disponibilizada pelos Correios para o seu contrato de acesso ao webservice de SRO.
+
+=item * verifica_prefixo - se verdadeiro, pesquisará apenas códigos com prefixo disponibilizado pelos Correios.
+
+=item * multiple - permite passar vários códigos de rastreamento concatenados (e.g. 'SS123456789BRJR123456789BR').
+
+=back
+
+Se você passar mais de um código de rastreamento concatenado e o parâmetro 'multiple', o resultado será um hash onde cada chave é um dos códigos passados. O valor será o mesmo de antes, por chave (i.e. ou um hashref com os dados ou um array de hashrefs, dependendo se você chamou a função em contexto escalar ou de lista). Em outras palavras:
+
+    my $ultimos_status = sro( 'SS123456789BRJR123456789BR', { multiple => 1 } );
+    say $ultimos_status->{'SS123456789BR'}{status};
+
+    my %todos_os_status = sro( 'SS123456789BRJR123456789BR', { multiple => 1 } );
+    foreach my $entrada ( @{$todos_os_status{'SS123456789BR'}} ) {
+        say $entrada->{status};
+    }
+
 --
 
 Receives the item identification code.
 
-In scalar context, returns a WWW::Correios::SRO::Item object containing the most recent log entry in the Postal service. In list context, returns a list of WWW::Correios::SRO::Item objects, from the most recent entry to the oldest. Returns I<undef> upon failure. Messages on the returned object will be in portuguese.
+In scalar context, returns a hashref containing the most recent log entry in the Postal service. In list context, returns a list of hashrefs, from the most recent entry to the oldest. Returns I<undef> upon failure. Messages on the returned object will be in portuguese.
 
-Its thirds parameter, verifica_prefixo, determines if we shall search only the codes with prefixes shown by Brazilian Post Office ($erifica_prefixo = 1) or not.
+Its second (optional) parameter is a hashref with extra data:
+
+    sro( 'SS123456789BR', {
+        ua               => LWP::UserAgent->new,
+        timeout          => 5,
+        username         => 'my_user',
+        password         => 'my_password',
+        verifica_prefixo => 1,
+        multiple         => 1,
+    });
+
+=over 4
+
+=item * ua - user agent that will make the request. Must implement the C<post()> method with the same API as LWP::UserAgent.
+
+=item * timeout - if no user agent is specified, this parameter will adjust the timeout of the default one.
+
+=item * username - user provided by Correios for your webservice contract.
+
+=item * password - password provided by Correios for your webservice contract.
+
+=item * verifica_prefixo - if given a true value, determines whether we query just the codes with valid prefixes.
+
+=item * multiple - lets you pass several concatenated codes (e.g. 'SS123456789BRJR123456789BR').
+
+=back
+
+If you pass more than one concatenated code with the 'multiple' parameter, the result will be a hash where each key is one of the given codes. The value is the same as before, per key (i.e. either a hashref of data or an array of hashrefs, depending on scalar or list context). In other words:
+
+    my $last_statuses = sro( 'SS123456789BRJR123456789BR', { multiple => 1 } );
+    say $last_statuses->{'SS123456789BR'}{status};
+
+    my %all_statuses = sro( 'SS123456789BRJR123456789BR', { multiple => 1 } );
+    foreach my $entry ( @{$all_statuses{'SS123456789BR'}} ) {
+        say $entry->{status};
+    }
 
 =head2 sro_en
 
@@ -431,38 +638,42 @@ Retorna uma string com o significado do prefixo do código que foi passado. Reto
 
 Returns a string with the meaning of the code's prefix. Returns I<undef> if we don't know the meaning.
 
-=head1 OBJETO RETORNADO/RETURNED OBJECT
+=head2 status_da_entrega( $dados_retornados )
 
-=head2 data
+Esta função recebe os dados retornados por uma consulta via C<sro()> em formato arrayref ou hashref, e retorna uma string no seguinte formato:
 
-=head2 date (alias)
+=over 4
 
-Retorna a data/hora em que os dados de entrega foram recebidos pelo sistema, exceto no I<< 'SEDEX 10' >> e no I<< 'SEDEX Hoje' >>, em que representa o horário real da entrega. Informação sobre onde encontrar o código para rastreamento estão disponíveis (em português) no link: L<< http://www.correios.com.br/servicos/rastreamento/como_loc_objeto.cfm >>
+=item 'entregue' - entrega concluida, nada mais a ser feito.
 
-Returns the date/time in which the delivery data got into the system, except on I<< 'SEDEX 10' >> and I<< 'SEDEX Hoje' >>, where it corresponds to the actual delivery date. Information on how to find the tracking code is available in the link: L<< http://www.correios.com.br/servicos/rastreamento/como_loc_objeto.cfm >> (follow the "English version" link on that page).
+=item 'erro' - acionar Correios (objetos perdidos, extraviado, etc).
 
+=item 'retirar' - pacote na agência, aguardando retirada pelo interessado.
 
-=head2 local
+=item 'incompleto' - pacote retornado ao remetente.
 
-=head2 location (alias)
+=item 'acompanhar' - pacote em trânsito.
 
-Retorna local em que o evento ocorreu. A string retornada é prefixada por uma sigla, como B<ACF> (Agência de Correios Franqueada), B<CTE> (Centro de Tratamento de Encomendas), B<CTCE> (Centro de Tratamento de Cartas e Encomendas), B<CTCI> (Centro de Tratamento de Correio Internacional), B<CDD> (Centro de Distribuição Domiciliária), B<CEE> (Centro de Entrega de Encomendas).
-
-Returns the location where the event ocurred. The returned string is prefixed by an acronym like B<ACF> (Franchised Postal Agency), B<CTE> (Center for Item Assessment), B<CTCE> (Center for Item and Mail Assessment), B<CTCI> (Center for International Postal Assessment), B<CDD> (Center for Domiciliary Distribution), B<CEE> (Center for Item Delivery).
-
-
-=head2 status
-
-Retorna a situação registrada para o evento (postado, encaminhado, destinatário ausente, etc)
-
-Returns the registered situation for the event (no receiver at the address, etc)
+=back
 
 
-=head2 extra
+=head1 DADOS RETORNADOS/RETURNED DATA (BREAKING CHANGES)
 
-Contém informações adicionais a respeito do evento, ou I<undef>. Exemplo: 'Será realizada uma nova tentativa de entrega'.
+Em versões anteriores à 0.11, este módulo retornava um objeto (ou uma lista de objetos). A API dos Correios mudou em meados de 2016, e agora a consulta retorna dados diferentes. Para dar mais flexibilidade, optamos por um hashref livre de estrutura. 
 
-Contains additional information about the event, or I<undef>. E.g.: 'Delivery will be retried'
+Algumas informações ainda são pertinentes:
+
+=over 4
+
+=item a data/hora retornada indica o momento em que os dados de entrega foram B<recebidos pelo sistema>, exceto no I<< 'SEDEX 10' >> e no I<< 'SEDEX Hoje' >>, em que representa o horário real da entrega. Informação sobre onde encontrar o código para rastreamento estão disponíveis (em português) no link: L<< http://www.correios.com.br/servicos/rastreamento/como_loc_objeto.cfm >>
+
+=item the returned date/time refer to the moment in which the delivery data B<got into the system>, except on I<< 'SEDEX 10' >> and I<< 'SEDEX Hoje' >>, where it corresponds to the actual delivery date. Information on how to find the tracking code is available in the link: L<< http://www.correios.com.br/servicos/rastreamento/como_loc_objeto.cfm >> (follow the "English version" link on that page).
+
+=item o campo de "local" contém o local em que o evento ocorreu. A string retornada é prefixada por uma sigla, como B<ACF> (Agência de Correios Franqueada), B<CTE> (Centro de Tratamento de Encomendas), B<CTCE> (Centro de Tratamento de Cartas e Encomendas), B<CTCI> (Centro de Tratamento de Correio Internacional), B<CDD> (Centro de Distribuição Domiciliária), B<CEE> (Centro de Entrega de Encomendas).
+
+=item the "location" field contains the location where the event ocurred. The returned string is prefixed by an acronym like B<ACF> (Franchised Postal Agency), B<CTE> (Center for Item Assessment), B<CTCE> (Center for Item and Mail Assessment), B<CTCI> (Center for International Postal Assessment), B<CDD> (Center for Domiciliary Distribution), B<CEE> (Center for Item Delivery).
+
+=back
 
 
 =head1 AUTHOR
@@ -478,46 +689,16 @@ the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-Correi
 automatically be notified of progress on your bug as I make changes.
 
 
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc WWW::Correios::SRO
-
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Correios-SRO>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/WWW-Correios-SRO>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/WWW-Correios-SRO>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/WWW-Correios-SRO/>
-
-=back
-
-
 =head1 AGRADECIMENTOS/ACKNOWLEDGEMENTS
 
 Este módulo não existiria sem o serviço gratuito de rastreamento online dos Correios. 
 
 L<< http://www.correios.com.br/servicos/rastreamento/ >>
 
+
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010 Breno G. de Oliveira.
+Copyright 2010-2017 Breno G. de Oliveira.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

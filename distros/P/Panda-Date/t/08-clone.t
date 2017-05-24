@@ -2,7 +2,6 @@ use 5.012;
 use warnings;
 use Test::More;
 use lib 't/lib'; use PDTest;
-use Panda::Lib qw/clone/;
 
 my ($date, $date2, $date3);
 
@@ -53,12 +52,5 @@ is($date2->tzname, "Australia/Melbourne");
 $date2 = date($date, undef); # change timezone to local preserving YMDHMS
 ok($date2->tzlocal());
 is("$date2", "$date");
-
-# panda-lib clone check
-my $a = date(1);
-my $b = clone($a);
-$a->truncate();
-is($a, '1970-01-01 00:00:00');
-is($b, '1970-01-01 03:00:01');
 
 done_testing();

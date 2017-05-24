@@ -1,6 +1,6 @@
 undef $VERSION;
 package Bio::Roary::CommandLine::IterativeCdhit;
-$Bio::Roary::CommandLine::IterativeCdhit::VERSION = '3.8.0';
+$Bio::Roary::CommandLine::IterativeCdhit::VERSION = '3.8.2';
 # ABSTRACT: Iteratively run cdhit
 
 
@@ -127,7 +127,7 @@ Bio::Roary::CommandLine::IterativeCdhit - Iteratively run cdhit
 
 =head1 VERSION
 
-version 3.8.0
+version 3.8.2
 
 =head1 SYNOPSIS
 

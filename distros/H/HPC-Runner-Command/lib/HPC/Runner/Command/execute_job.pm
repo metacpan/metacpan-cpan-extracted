@@ -10,7 +10,18 @@ with 'HPC::Runner::Command::Utils::Git';
 with 'HPC::Runner::Command::execute_job::Utils::MCE';
 
 command_short_description 'Execute commands';
-command_long_description 'Take the parsed files from hpcrunner.pl submit_jobs and executes the code';
+command_long_description
+  'Take the parsed files from hpcrunner.pl submit_jobs and executes the code';
+
+option 'batch_index_start' => (
+    is       => 'rw',
+    isa      => 'Num',
+    required => 0,
+    predicate => 'has_batch_index_start',
+    documentation =>
+      'Counter to tell execute_array where to start reading in the infile.'
+      . ' Omit this option in order to run in single node.'
+);
 
 sub BUILD {
     my $self = shift;

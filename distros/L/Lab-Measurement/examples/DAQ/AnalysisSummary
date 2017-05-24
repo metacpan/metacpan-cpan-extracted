@@ -19,7 +19,7 @@ use Data::Dumper;
 use strict;
 
 our $DEBUG   = $Lab::Generic::CLOptions::DEBUG;
-our $VERSION = '3.542';
+our $VERSION = '3.543';
 our $VERBOSE = 1;
 
 main();

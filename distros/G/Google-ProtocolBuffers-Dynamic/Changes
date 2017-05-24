@@ -1,5 +1,10 @@
 Revision history for Google-ProtocolBuffers-Dynamic
 
+0.17      2017-05-21 15:56:01 CEST
+
+    - Fix leaking environment (thanks to Pavel Shaydo)
+    - Validate parameters to map()
+
 0.16      2017-03-11 14:30:57 CET
 
     - Compilation fix for threaded Perl

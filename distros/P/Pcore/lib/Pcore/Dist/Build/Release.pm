@@ -24,27 +24,28 @@ sub run ($self) {
     return if !$new_ver;
 
     # check for resolved issues without milestone
-    if ( $self->dist->build->issues && ( my $resolved_issues = $self->dist->build->issues->get( resolved => 1 ) ) ) {
-        say qq[Following issues are resolved and not closed:$LF];
+    if ( $self->dist->build->issues ) {
+        my $resolved_issues = $self->dist->build->issues->get( resolved => 1 );
 
-        $self->dist->build->issues->print_issues($resolved_issues);
+        if ( !$resolved_issues ) {
+            say 'Error retrieving issues from tracker';
 
-        say qq[${LF}Close or re-open this issues. Release is impossible.$LF];
+            return;
+        }
 
-        return;
+        if ( $resolved_issues->{data} ) {
+            say qq[Following issues are resolved and not closed:$LF];
+
+            $self->dist->build->issues->print_issues( $resolved_issues->{data} );
+
+            say qq[${LF}Close or re-open this issues. Release is impossible.$LF];
+
+            return;
+        }
     }
 
-    # working with issues tracker
+    # get closed issues sinse latest release
     my $closed_issues = $self->dist->build->issues && $self->dist->build->issues->get( closed => 1 );
-
-    if ($closed_issues) {
-        say qq[\nFollowing issues will be added to the release CHANGES file\n];
-
-        $self->dist->build->issues->print_issues($closed_issues);
-    }
-    else {
-        say qq[\nNo issues were closed since the last release];
-    }
 
     say qq[${LF}Current version is: $cur_ver];
 
@@ -72,8 +73,12 @@ sub run ($self) {
 
         $self->dist->build->issues->create_version(
             $new_ver,
-            sub ($id) {
-                die q[Error creating new version on issues tracker] if !$id;
+            sub ($res) {
+                if ( !$res ) {
+                    say qq[Error creating new version on issues tracker: $res];
+
+                    exit;
+                }
 
                 $cv->end;
 
@@ -86,8 +91,12 @@ sub run ($self) {
 
         $self->dist->build->issues->create_milestone(
             $new_ver,
-            sub ($id) {
-                die q[Error creating new milestone on issues tracker] if !$id;
+            sub ($res) {
+                if ( !$res ) {
+                    say qq[Error creating new milestone on issues tracker: $res];
+
+                    exit;
+                }
 
                 $cv->end;
 
@@ -100,17 +109,23 @@ sub run ($self) {
         say 'done';
 
         # get closed issues, set milestone for closed issues
-        if ($closed_issues) {
+        if ( $closed_issues->{data} ) {
             $cv = AE::cv;
 
             print q[Updating milestone for closed issues ... ];
 
-            for my $issue ( $closed_issues->@* ) {
+            for my $issue ( $closed_issues->{data}->@* ) {
                 $cv->begin;
 
                 $issue->set_milestone(
                     $new_ver,
-                    sub ($success) {
+                    sub ($res) {
+                        if ( !$res ) {
+                            say qq[Error updating milestone for issue: $res];
+
+                            exit;
+                        }
+
                         $cv->end;
 
                         return;
@@ -133,27 +148,52 @@ sub run ($self) {
 
     P->file->write_bin( $self->dist->module->path, $self->dist->module->content );
 
-    # clear cached data, important for version
+    # clear cached data
     $self->dist->clear;
 
     # update working copy
     $self->dist->build->update;
 
     # update CHANGES file
-    $self->_create_changes( $new_ver, $closed_issues );
+    $self->_create_changes( $new_ver, $closed_issues->{data} );
 
     # generate wiki
     if ( $self->dist->build->wiki ) {
         $self->dist->build->wiki->run;
     }
 
-    # addremove
-    $self->dist->scm->scm_addremove or die;
+    # add/remove
+    {
+        print 'Add/remove changes ... ';
+
+        my $res = $self->dist->scm->scm_addremove;
+
+        say $res && return if !$res;
+
+        say 'done';
+    }
 
     # commit
-    $self->dist->scm->scm_commit(qq[release $new_ver]) or die;
+    {
+        print 'Committing ... ';
 
-    $self->dist->scm->scm_set_tag( [ 'latest', $new_ver ], force => 1 ) or die;
+        my $res = $self->dist->scm->scm_commit(qq[release $new_ver]);
+
+        say $res && return if !$res;
+
+        say 'done';
+    }
+
+    # set release tags
+    {
+        print 'Setting tags ... ';
+
+        my $res = $self->dist->scm->scm_set_tag( [ 'latest', $new_ver ], force => 1 );
+
+        say $res && return if !$res;
+
+        say 'done';
+    }
 
     if ( $self->dist->scm->upstream ) {
       PUSH_UPSTREAM:
@@ -216,7 +256,7 @@ sub _can_release ($self) {
         return;
     }
 
-    if ( $self->dist->cfg->{cpan} && !$ENV->user_cfg->{'Pcore::API::PAUSE'}->{username} || !$ENV->user_cfg->{'Pcore::API::PAUSE'}->{password} ) {
+    if ( $self->dist->cfg->{cpan} && !$ENV->user_cfg->{PAUSE}->{username} || !$ENV->user_cfg->{PAUSE}->{password} ) {
         say q[You need to specify PAUSE credentials.];
 
         return;
@@ -228,7 +268,7 @@ sub _can_release ($self) {
     }
 
     if ( $self->dist->docker ) {
-        if ( !$ENV->user_cfg->{'Pcore::API::DockerHub'}->{api_username} || !$ENV->user_cfg->{'Pcore::API::DockerHub'}->{api_password} ) {
+        if ( !$ENV->user_cfg->{DOCKERHUB}->{username} || !$ENV->user_cfg->{DOCKERHUB}->{password} ) {
             say q[You need to specify DockerHub credentials.];
 
             return;
@@ -304,8 +344,8 @@ sub _upload_to_cpan ($self) {
     print 'Uploading to CPAN ... ';
 
     my $pause = Pcore::API::PAUSE->new(
-        {   username => $ENV->user_cfg->{'Pcore::API::PAUSE'}->{username},
-            password => $ENV->user_cfg->{'Pcore::API::PAUSE'}->{password},
+        {   username => $ENV->user_cfg->{PAUSE}->{username},
+            password => $ENV->user_cfg->{PAUSE}->{password},
         }
     );
 
@@ -357,8 +397,48 @@ sub _create_changes ( $self, $ver, $issues ) {
         }
     }
     else {
-        $rel->add_changes('No issues were closed since the last release');
+        $rel->add_changes('No issues on bugtracker were closed since the last release');
     }
+
+    # get changesets since latest release
+    my $tag = $ver eq 'v0.1.0' ? undef : 'latest';
+
+    my $changesets = $self->dist->scm->scm_get_changesets($tag);
+
+    my $summary_idx;
+
+    my $log = <<'TXT';
+LOG: Edit changelog.  Lines beginning with 'LOG:' are removed.
+
+TXT
+    for my $changeset ( $changesets->{data}->@* ) {
+        if ( !exists $summary_idx->{ $changeset->{summary} } ) {
+            $summary_idx->{ $changeset->{summary} } = undef;
+
+            next if $changeset->{summary} =~ /\Arelease v[\d.]+\z/sm;
+
+            next if $changeset->{summary} =~ /\AAdded tag/sm;
+
+            $log .= "- $changeset->{summary}\n";
+        }
+    }
+
+    my $tempfile = P->file->temppath;
+
+    P->file->write_text( $tempfile, $log );
+
+    system $ENV->user_cfg->{_}->{editor}, $tempfile;    ## no critic qw[InputOutput::RequireCheckedSyscalls]
+
+    for my $line ( P->file->read_lines($tempfile)->@* ) {
+        next if $line =~ /\ALOG:/sm;
+
+        $line =~ s/\A[\s-]*//sm;
+
+        $rel->add_changes($line);
+    }
+
+    say "\nCHANGES:";
+    say $rel->serialize;
 
     $changes->add_release($rel);
 
@@ -374,13 +454,13 @@ sub _create_changes ( $self, $ver, $issues ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 14                   | Subroutines::ProhibitExcessComplexity - Subroutine "run" with high complexity score (33)                       |
+## |    3 | 14                   | Subroutines::ProhibitExcessComplexity - Subroutine "run" with high complexity score (36)                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 27, 30, 38, 43, 73,  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
-## |      | 87, 128, 147, 179,   |                                                                                                                |
-## |      | 184, 189, 194        |                                                                                                                |
+## |    2 | 28, 39, 48, 74, 92,  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
+## |      | 143, 162, 219, 224,  |                                                                                                                |
+## |      | 229, 234             |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 351                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
+## |    1 | 391                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

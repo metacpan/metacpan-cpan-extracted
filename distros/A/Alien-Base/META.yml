@@ -35,5 +35,5 @@ resources:
   bugtracker: http://github.com/Perl5-Alien/Alien-Base/issues
   homepage: https://metacpan.org/pod/Alien::Base
   repository: http://github.com/Perl5-Alien/Alien-Base.git
-version: '0.041'
+version: '0.042'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

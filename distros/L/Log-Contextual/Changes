@@ -1,5 +1,12 @@
 Revision history for Log-Contextual
 
+0.007001  2017-05-21 07:49:18-07:00 America/Los_Angeles
+- Stop testing exact bytes produced by Data::Dumper::Concise
+  (Thanks for reporting Errietta Kostal)
+  (Fixes GH#11)
+- Add some documentation about exceptions
+  (Thanks Kent Fredric!)
+
 0.007000  2016-04-11 21:35:41-07:00 America/Los_Angeles
  - Add `has_logger` predicate to avoid setting logger twice
    (Thanks Wes Malone!  Thwes!)

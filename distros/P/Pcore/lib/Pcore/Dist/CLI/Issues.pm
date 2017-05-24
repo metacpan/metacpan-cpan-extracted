@@ -41,14 +41,14 @@ sub run ( $self, $opt, $arg ) {
 
             # issue status changed, show only issue header, without content
             if ($issues) {
-                $self->dist->build->issues->print_issues( $issues, 0 );
+                $self->dist->build->issues->print_issues( $issues->{data}, 0 );
             }
             else {
-                say 'Error update issue status';
+                say 'Error update issue status: ' . $issues;
             }
         }
         else {
-            $self->dist->build->issues->print_issues( $issues, 1 );
+            $self->dist->build->issues->print_issues( $issues->{data}, 1 );
         }
     }
     else {

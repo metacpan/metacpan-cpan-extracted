@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,13 +18,15 @@ no_index:
     - t
     - inc
 requires:
-  File::ConfigDir: '0.011'
+  Carp: '0'
+  File::ConfigDir: '0.018'
   Moo::Role: '1.003000'
-  namespace::clean: '0'
+  Scalar::Util: '0'
   perl: v5.8.1
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=MooX-File-ConfigDir
   homepage: https://metacpan.org/release/MooX-File-ConfigDir
   license: http://dev.perl.org/licenses/
   repository: https://github.com:perl5-utils/MooX-File-ConfigDir.git
-version: '0.005'
+version: '0.006'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

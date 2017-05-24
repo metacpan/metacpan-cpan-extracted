@@ -7,7 +7,6 @@ use_ok 'Template::Lace::Factory';
   package  Local::Template::Master;
 
   use Moo;
-  with 'Template::Lace::ModelRole';
 
   has title => (is=>'ro', required=>1);
   has body => (is=>'ro', required=>1);
@@ -49,7 +48,6 @@ use_ok 'Template::Lace::Factory';
   package Local::Template::User;
 
   use Moo;
-  with 'Template::Lace::ModelRole';
 
   has [qw(title story cites form)] => (is=>'ro', required=>1);
 
@@ -81,7 +79,7 @@ use_ok 'Template::Lace::Factory';
           <ul id="cites">
             <li>Citations</li>
           </ul>
-          <lace-form action='/postit'
+          <lace-form action='/postit' query={"q":"$.title"} args=["1","2"]
               method='POST'>
             <lace-input type='text'
                 name='user'
@@ -110,7 +108,6 @@ use_ok 'Template::Lace::Factory';
 
   use Moo;
   use DateTime;
-  with 'Template::Lace::ModelRole';
 
   has 'tz' => (is=>'ro', predicate=>'has_tz');
 
@@ -135,10 +132,9 @@ use_ok 'Template::Lace::Factory';
   package Local::Template::Form;
 
   use Moo;
-  with 'Template::Lace::ModelRole',
-    'Template::Lace::Model::HasChildren';
+  with 'Template::Lace::Model::HasChildren';
 
-  has [qw(method action content)] => (is=>'ro', required=>1);
+  has [qw(method action content query args)] => (is=>'ro', required=>1);
 
   sub template {q[
     <style id='formstyle'>sdfsdfsd</style>
@@ -147,6 +143,10 @@ use_ok 'Template::Lace::Factory';
 
   sub process_dom {
     my ($self, $dom) = @_;
+
+    Test::Most::is_deeply $self->query, +{q=>'the real story'};
+    Test::Most::is_deeply $self->args, [1,2];
+
     $dom->at('form')
       ->action($self->action)
       ->method($self->method)
@@ -156,7 +156,6 @@ use_ok 'Template::Lace::Factory';
   package Local::Template::Input;
 
   use Moo;
-  with 'Template::Lace::ModelRole';
 
   has [qw(name label type value container)] => (is=>'ro', required=>1);
 
@@ -247,6 +246,42 @@ is $dom->at('#story')->content, 'you are doomed to discover you can never recove
 is $dom->at('#ff')->content, 'fffffff';
 ok $dom->at('span.timestamp')->content;
 is $dom->at('a')->content, 'See More';
+
+{
+  package Local::Template::NoProcessDom;
+
+  use Moo;
+
+  sub template { qq{
+    <section>
+      Hello <span id="name">NAME</span>, you are <span id="age"></span> years old!
+    </section>
+  }}
+
+  sub fill_name {
+    my ($self, $dom, $name) = @_;
+    $dom->do('#name', $name);
+  }
+
+  sub fill_age {
+    my ($self, $dom, $age) = @_;
+    $dom->do('#age', $age);
+  }
+
+  my $factory = Template::Lace::Factory->new(
+    model_class=>'Local::Template::NoProcessDom');
+
+  my $renderer = $factory->create();
+
+  $renderer->call('fill_name', 'John');
+  $renderer->call('fill_age', '42');
+  
+  my $html = $renderer->render;
+  my $dom = Template::Lace::DOM->new($html);
+
+  Test::Most::is $dom->at('#name')->content, 'John';
+  Test::Most::is $dom->at('#age')->content, '42';
+}
 
 
 done_testing;

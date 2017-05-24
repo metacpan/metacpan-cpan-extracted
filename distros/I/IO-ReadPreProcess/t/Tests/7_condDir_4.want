@@ -1,0 +1,35 @@
+Done foo definition
+
+
+
+
+Test top level while: false
+foo returning RetVal='0' ; a2='bar'
+
+Test top level while: true
+foo returning RetVal='1' ; a2='bar'
+Expected Output
+
+
+Test top level until: false
+foo returning RetVal='0' ; a2='bar'
+Expected output
+
+Test top level until: true
+foo returning RetVal='1' ; a2='bar'
+
+
+foo returning RetVal='5' ; a2='bar'
+For i = 5
+foo returning RetVal='4' ; a2='bar'
+For i = 4
+foo returning RetVal='3' ; a2='bar'
+For i = 3
+foo returning RetVal='2' ; a2='bar'
+For i = 2
+foo returning RetVal='1' ; a2='bar'
+For i = 1
+foo returning RetVal='0' ; a2='bar'
+
+
+EOF

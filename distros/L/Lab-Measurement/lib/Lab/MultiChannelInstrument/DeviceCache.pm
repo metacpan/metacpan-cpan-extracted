@@ -6,7 +6,7 @@ use strict;
 require Tie::Hash;
 use List::MoreUtils qw{ any };
 
-our $VERSION = '3.542';
+our $VERSION = '3.543';
 
 our @ISA = 'Tie::ExtraHash';
 

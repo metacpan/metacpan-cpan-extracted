@@ -2,7 +2,7 @@ package Catalyst::Controller::HTML::FormFu;
 
 use strict;
 
-our $VERSION = '2.01'; # VERSION
+our $VERSION = '2.02'; # VERSION
 
 use Moose;
 
@@ -267,7 +267,7 @@ Catalyst::Controller::HTML::FormFu - Catalyst integration for HTML::FormFu
 
 =head1 VERSION
 
-version 2.01
+version 2.02
 
 =head1 SYNOPSIS
 

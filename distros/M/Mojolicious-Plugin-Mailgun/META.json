@@ -32,6 +32,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Mojolicious" : "7.0",
             "perl" : "v5.10.0"
          }
       }
@@ -46,6 +47,6 @@
          "url" : "https://github.com/marcusramberg/mojolicious-plugin-mailgun.git"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

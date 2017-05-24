@@ -1,5 +1,5 @@
 package Log::Contextual::Router;
-$Log::Contextual::Router::VERSION = '0.007000';
+$Log::Contextual::Router::VERSION = '0.007001';
 # ABSTRACT: Route messages to loggers
 
 use Moo;
@@ -160,7 +160,7 @@ Log::Contextual::Router - Route messages to loggers
 
 =head1 VERSION
 
-version 0.007000
+version 0.007001
 
 =head1 AUTHOR
 
@@ -168,7 +168,7 @@ Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2017 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

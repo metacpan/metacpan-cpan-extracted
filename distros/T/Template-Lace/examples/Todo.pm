@@ -1,7 +1,7 @@
 package Todo;
 
-use Web::Simple;
 use Page;
+use Web::Simple;
 
 my @list = ('Walk Dog');
 my $factory = Page->create_factory(\@list);

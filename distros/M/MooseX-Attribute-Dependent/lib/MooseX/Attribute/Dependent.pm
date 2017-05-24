@@ -1,14 +1,14 @@
 #
 # This file is part of MooseX-Attribute-Dependent
 #
-# This software is Copyright (c) 2016 by Moritz Onken.
+# This software is Copyright (c) 2017 by Moritz Onken.
 #
 # This is free software, licensed under:
 #
 #   The (three-clause) BSD License
 #
 package MooseX::Attribute::Dependent;
-$MooseX::Attribute::Dependent::VERSION = '1.1.3';
+$MooseX::Attribute::Dependent::VERSION = '1.1.4';
 # ABSTRACT: Restrict attributes based on values of other attributes
 
 use Moose ();
@@ -60,7 +60,7 @@ MooseX::Attribute::Dependent - Restrict attributes based on values of other attr
 
 =head1 VERSION
 
-version 1.1.3
+version 1.1.4
 
 =head1 SYNOPSIS
 
@@ -126,14 +126,14 @@ to values smaller than serveral other attributes.
 
  package MyApp::Types;
  use MooseX::Attribute::Dependency;
- use List::MoreUtils ();
+ use List::Util 1.33 ();
  
  MooseX::Attribute::Dependency::register({
         name               => 'SmallerThan',
         message            => 'The value must be smaller than %s',
         constraint         => sub {
             my ($attr_name, $params, @related) = @_;
-            return List::MoreUtils::all { $params->{$attr_name} < $params->{$_} } @related;
+            return List::Util::all { $params->{$attr_name} < $params->{$_} } @related;
         },
     }
  );
@@ -167,7 +167,7 @@ Moritz Onken
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Moritz Onken.
+This software is Copyright (c) 2017 by Moritz Onken.
 
 This is free software, licensed under:
 

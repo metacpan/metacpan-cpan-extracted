@@ -2,7 +2,7 @@
 # However it works within the XPRESS Voltage sweep for list and step mode pretty well.
 
 package Lab::Instrument::Keithley2400;
-our $VERSION = '3.542';
+our $VERSION = '3.543';
 
 use strict;
 use Lab::Instrument;

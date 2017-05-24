@@ -20,6 +20,7 @@ examples/ex_mp.pl
 examples/lextest
 examples/find_naughty.pl
 examples/perltidyrc_dump.pl
+examples/perltidy_okw.pl
 examples/perlcomment.pl
 examples/perllinetype.pl
 examples/perlmask.pl

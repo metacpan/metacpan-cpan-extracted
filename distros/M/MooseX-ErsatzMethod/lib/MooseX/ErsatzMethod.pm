@@ -6,7 +6,7 @@ package MooseX::ErsatzMethod;
 
 BEGIN {
 	$MooseX::ErsatzMethod::AUTHORITY = 'cpan:TOBYINK';
-	$MooseX::ErsatzMethod::VERSION   = '0.004';
+	$MooseX::ErsatzMethod::VERSION   = '0.005';
 }
 
 my %METAROLES;
@@ -26,7 +26,7 @@ use Moose::Exporter;
 BEGIN {
 	package MooseX::ErsatzMethod::Meta::Method;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.004';
+	our $VERSION   = '0.005';
 	use Moose;
 	has code => (
 		is         => 'ro',
@@ -55,7 +55,7 @@ BEGIN {
 BEGIN {
 	package MooseX::ErsatzMethod::Trait::Role;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.004';
+	our $VERSION   = '0.005';
 	use Moose::Role;
 	has ersatz_methods => (
 		traits     => ['Hash'],
@@ -92,7 +92,7 @@ BEGIN {
 BEGIN {
 	package MooseX::ErsatzMethod::Trait::Composite;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.004';
+	our $VERSION   = '0.005';
 	use Moose::Role;
 	with qw(MooseX::ErsatzMethod::Trait::Role);
 	around apply_params => sub
@@ -126,7 +126,7 @@ BEGIN {
 BEGIN {
 	package MooseX::ErsatzMethod::Trait::ApplicationToClass;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.004';
+	our $VERSION   = '0.005';
 	use Moose::Role;
 	before apply => sub
 	{
@@ -143,7 +143,7 @@ BEGIN {
 BEGIN {
 	package MooseX::ErsatzMethod::Trait::ApplicationToRole;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.004';
+	our $VERSION   = '0.005';
 	use Moose::Role;
 	before apply => sub
 	{
@@ -160,7 +160,7 @@ BEGIN {
 BEGIN {
 	package MooseX::ErsatzMethod::Trait::ApplicationToInstance;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.004';
+	our $VERSION   = '0.005';
 	use Moose::Role;
 	$INC{ Module::Runtime::module_notional_filename(__PACKAGE__) } ||= __FILE__;
 };

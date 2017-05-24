@@ -1,4 +1,4 @@
-use 5.006;
+use 5.010;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -15,6 +15,7 @@ WriteMakefile(
     PREREQ_PM           => { 
                            'DBD::Pg'    => 2.0,
                            'Test::More' => 0,
+                           'Try::Tiny' => 0,
                            'Test::Exception' => 0,
                            'Memoize'  => 0,
                            },

@@ -1,5 +1,5 @@
 package Bio::Roary::AssemblyStatistics;
-$Bio::Roary::AssemblyStatistics::VERSION = '3.8.0';
+$Bio::Roary::AssemblyStatistics::VERSION = '3.8.2';
 # ABSTRACT: Given a spreadsheet of gene presence and absence calculate some statistics
 
 
@@ -212,7 +212,7 @@ Bio::Roary::AssemblyStatistics - Given a spreadsheet of gene presence and absenc
 
 =head1 VERSION
 
-version 3.8.0
+version 3.8.2
 
 =head1 SYNOPSIS
 

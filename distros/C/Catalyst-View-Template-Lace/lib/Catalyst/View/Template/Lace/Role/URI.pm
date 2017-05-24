@@ -46,10 +46,8 @@ Catalyst::View::Template::Lace::Role::URI - Shortcut to create a URI on the curr
     package  MyApp::View::User;
 
     use Moo;
-    use Template::Lace::Utils 'mk_component';
     extends 'Catalyst::View::Template::Lace';
-    with 'Template::Lace::ModelRole',
-      'Catalyst::View::Template::Lace::Role::URI';
+    with 'Catalyst::View::Template::Lace::Role::URI';
 
     sub template {q[
       <html>

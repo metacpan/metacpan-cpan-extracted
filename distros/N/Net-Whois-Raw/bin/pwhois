@@ -93,8 +93,7 @@ eval {
     my ($result, $result_server);
     my $which_whois =
         $return_first ? 'QRY_FIRST' :
-        $return_all   ? 'QRY_ALL'   :
-        $return_last  ? 'QRY_LAST'  : '' ;
+        $return_all   ? 'QRY_ALL'   : 'QRY_LAST';
 
     ($result, $result_server) =
         Net::Whois::Raw::get_whois( $dom, $server, $which_whois );
@@ -241,7 +240,7 @@ phwois - Get Whois information of domains and IP addresses.
 
 =head1 VERSION
 
-version 2.99006
+version 2.99007
 
 =head1 SYNOPSIS
 

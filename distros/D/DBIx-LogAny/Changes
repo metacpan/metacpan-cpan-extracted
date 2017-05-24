@@ -1,5 +1,26 @@
 Revision history for Perl extension DBIx::LogAny.
 
+0.05 Friday May 19 2017
+
+  [BUG FIXES]
+
+  In LogAny.pm put the package definition at the start for correct imports
+  thanks to Jens Rehsack.
+
+  [ENHANCEMENTS]
+
+  When a statement handle method is called with an already prepared
+  statement handle log the SQL statement not the handle - thanks
+  to Jens Rehsack.
+
+  [DOCUMENTATION]
+
+  Various fixes to documentation thanks to Jens Rehsack.
+
+  [MISCELLANEOUS]
+
+  Add travis setup thanks to Jens Resack.
+
 0.04 Thursday December 9 2012
 
   [Bug Fixes]

@@ -17,7 +17,6 @@ WriteMakefile(
     BUILD_REQUIRES => {
         'File::Spec'            => 0,
         'File::Temp'            => 0,
-        'JSON'                  => 0,
         'Test::More'            => 0,
         'Test::Exception'       => 0,
     },
@@ -28,6 +27,9 @@ WriteMakefile(
         'URI'                   => 0,
         'HTTP::Tiny'            => 0,
         'Types::Standard'       => 0,
+        'AnyEvent'              => 0,
+        'AnyEvent::HTTP'        => 0,
+        'JSON'                  => 0,
     },
     dist => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     META_MERGE => {

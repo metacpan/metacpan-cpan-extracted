@@ -1,4 +1,4 @@
-package Pcore::API::Moz v0.8.1;
+package Pcore::API::Moz v0.9.3;
 
 use Pcore -dist, -class, -result;
 use Pcore::API::Moz::Account;

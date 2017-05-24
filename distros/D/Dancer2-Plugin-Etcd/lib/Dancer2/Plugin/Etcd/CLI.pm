@@ -10,7 +10,7 @@ Dancer2::Plugin::Etcd::CLI
 
 =cut
 
-our $VERSION = '0.003';
+our $VERSION = '0.006';
 
 use Dancer2::Core::Runner;
 use Dancer2::FileUtils qw/dirname path/;
@@ -211,7 +211,7 @@ sub cmd_get{
 
     die "This command must be run from the base dir of a dancer app.\n" unless (@$files);
 
-    my $etcd = $self->{etcd} || Etcd3->connect($etcd_host, $settings);
+    my $etcd = $self->{etcd} || Etcd3->new($settings);
 
 #    print STDERR Dumper($etcd);
 
@@ -317,8 +317,9 @@ sub cmd_put{
     $settings->{password} = $etcd_pass if $etcd_pass;
     $settings->{ssl} = $etcd_ssl if $etcd_ssl;
     $settings->{port} = $etcd_port if $etcd_port;
+    $settings->{host} = $etcd_host if $etcd_host;
 
-    my $etcd = Etcd3->connect($etcd_host, $settings);
+    my $etcd = Etcd3->new($settings);
 
 #    print STDERR Dumper($etcd);
 
@@ -387,11 +388,11 @@ sub cmd_put{
         for my $key ( keys %$data ) {
             my $value = $data->{$key} || '\n';
             #print "/$key_path/$version/$key/, $value\n";
-            $etcd->put( { key => "/$key_path/$version/$key/", value => $value })->request;
+            $etcd->put( { key => "/$key_path/$version/$key/", value => $value });
         }
     }
     print "latest version is now: /$env_path/$version\n";
-    $etcd->put({ key => "/$env_path/version", value =>  sprintf("%08d", $version) })->request;
+    $etcd->put({ key => "/$env_path/version", value =>  sprintf("%08d", $version) });
 }
 
 1;

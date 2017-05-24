@@ -1,0 +1,11 @@
+.# Title: read in sub
+Line 1
+.sub readin
+In readin
+.read line
+.eval line='\v{line}'
+.done
+After readin def
+.readin
+How now brown cow
+EOF

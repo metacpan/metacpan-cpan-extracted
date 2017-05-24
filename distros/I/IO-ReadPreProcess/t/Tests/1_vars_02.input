@@ -1,0 +1,6 @@
+.# Title: variable set from application
+.# Set: foo := 'bar baz'
+Line 1
+.echo Line 2 foo = \v{foo}
+Line 3
+

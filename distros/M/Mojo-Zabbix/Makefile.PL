@@ -4,7 +4,8 @@ use strict;
 WriteMakefile(
 	NAME			=> 'Mojo::Zabbix',
 	VERSION_FROM	        => 'lib/Mojo/Zabbix.pm',
-	AUTHOR			=> 'Orange <bollwarm@ijz.me>',
+	ABSTRACT_FROM           => 'lib/Mojo/Zabbix.pm',
+        AUTHOR			=> 'Orange <bollwarm@ijz.me>',
 	LICENSE			=> 'Perl',
 	PREREQ_PM		=> {
 		"Mojolicious"   => '6.11',

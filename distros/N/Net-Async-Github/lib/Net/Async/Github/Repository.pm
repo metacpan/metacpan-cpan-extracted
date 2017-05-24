@@ -1,17 +1,15 @@
 package Net::Async::Github::Repository;
-$Net::Async::Github::Repository::VERSION = '0.002';
+
 use strict;
 use warnings;
+
+our $VERSION = '0.003'; # VERSION
 
 use parent qw(Net::Async::Github::Common);
 
 =head1 NAME
 
 Net::Async::Github::Repository
-
-=head1 VERSION
-
-version 0.002
 
 =head1 DESCRIPTION
 
@@ -829,3 +827,4 @@ sub permissions {
 }
 
 1;
+

@@ -16,7 +16,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'List::MoreUtils' => '0',
+                                      'List::Util' => '1.33',
                                       'Moose' => '0',
                                       'Moose::Exporter' => '0',
                                       'Moose::Role' => '0',

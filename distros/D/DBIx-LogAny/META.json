@@ -1,10 +1,10 @@
 {
-   "abstract" : "Perl extension for DBI to selectively log DBI",
+   "abstract" : "Perl extension for DBI to selectively log DBI methods, SQL, parameters, result-sets, transactions etc with Log::Any.",
    "author" : [
       "Martin J. Evans <mjevans@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
@@ -38,6 +38,7 @@
             "Log::Any" : "0.14",
             "Log::Any::Adapter" : "0.1",
             "Module::Loaded" : "0",
+            "Scalar::Util" : "0",
             "Test::More" : "0.62"
          }
       }
@@ -53,5 +54,5 @@
       },
       "x_Mailinglist" : "http://dbi.perl.org/support"
    },
-   "version" : "0.04"
+   "version" : "0.06"
 }

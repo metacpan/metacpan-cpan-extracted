@@ -23,7 +23,7 @@ name: HPCD-SGE
 provides:
   HPCD::SGE:
     file: lib/HPCD/SGE.pm
-    version: '0.47'
+    version: '0.48'
   HPCD::SGE::DRMAACheck:
     file: lib/HPCD/SGE/DRMAACheck.pm
   HPCD::SGE::DRMAAJobGroup:
@@ -55,5 +55,5 @@ requires:
   namespace::autoclean: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.47'
+version: '0.48'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

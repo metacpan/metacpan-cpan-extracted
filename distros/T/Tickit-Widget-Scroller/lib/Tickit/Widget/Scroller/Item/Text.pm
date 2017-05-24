@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2017 -- leonerd@leonerd.org.uk
 
 package Tickit::Widget::Scroller::Item::Text;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 use Tickit::Utils qw( textwidth cols2chars );
 
@@ -111,7 +111,7 @@ sub _build_chunks_for
    my $self = shift;
    my ( $text ) = @_;
 
-   my @lines = split m/\n/, $text;
+   my @lines = split m/\n/, $text, -1;
    my $lastline = pop @lines;
    return ( map { [ $_, textwidth( $_ ), linebreak => 1 ] } @lines ),
             [ $lastline, textwidth( $lastline ) ];

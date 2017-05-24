@@ -3,8 +3,10 @@ abstract: 'Ensure the author is releasing using the latest Perl'
 author:
   - 'Karen Etheridge <ether@cpan.org>'
 build_requires:
+  Devel::InnerPackage: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  Module::Pluggable::Object: '0'
   POSIX: '0'
   Path::Tiny: '0'
   Test::DZil: '0'
@@ -40,7 +42,7 @@ no_index:
 provides:
   Dist::Zilla::Plugin::EnsureLatestPerl:
     file: lib/Dist/Zilla/Plugin/EnsureLatestPerl.pm
-    version: '0.003'
+    version: '0.005'
 requires:
   Dist::Zilla: '4.300039'
   Dist::Zilla::Role::BeforeRelease: '0'
@@ -57,7 +59,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-EnsureLatestPerl
   homepage: https://github.com/karenetheridge/Dist-Zilla-Plugin-EnsureLatestPerl
   repository: https://github.com/karenetheridge/Dist-Zilla-Plugin-EnsureLatestPerl.git
-version: '0.003'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -79,7 +81,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::EnsureLatestPerl:
           Module::CoreList: '5.20170520'
       name: EnsureLatestPerl
-      version: '0.003'
+      version: '0.005'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -482,6 +484,13 @@ x_Dist_Zilla:
       name: '@Author::ETHER/Keywords'
       version: '0.007'
     -
+      class: Dist::Zilla::Plugin::UseUnsafeInc
+      config:
+        Dist::Zilla::Plugin::UseUnsafeInc:
+          dot_in_INC: 0
+      name: '@Author::ETHER/UseUnsafeInc'
+      version: '0.001'
+    -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@Author::ETHER/AutoPrereqs'
       version: '6.009'
@@ -575,6 +584,13 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::CheckMetaResources
       name: '@Author::ETHER/CheckMetaResources'
       version: '0.001'
+    -
+      class: Dist::Zilla::Plugin::EnsureLatestPerl
+      config:
+        Dist::Zilla::Plugin::EnsureLatestPerl:
+          Module::CoreList: '5.20170520'
+      name: '@Author::ETHER/EnsureLatestPerl'
+      version: '0.005'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -690,7 +706,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.003
+          tag: v0.005
           tag_format: v%v
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -872,3 +888,4 @@ x_Dist_Zilla:
 x_authority: cpan:ETHER
 x_serialization_backend: 'YAML::Tiny version 1.72'
 x_static_install: 0
+x_use_unsafe_inc: 0

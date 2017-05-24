@@ -2,9 +2,7 @@ use strict;
 use warnings;
 
 use Test::More (
-    $] <= 5.010 ? (skip_all => 'Data::Domain broken on 5.8 and lower') :
-    $] >= 5.024 ? (skip_all => 'Data::Domain broken on 5.24')  :
-                  ()
+    $] <= 5.010 ? (skip_all => 'only on perl 5.10 and higher') : ()
 );
 END { done_testing(); }
 

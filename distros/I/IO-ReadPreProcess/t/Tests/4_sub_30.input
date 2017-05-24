@@ -1,0 +1,28 @@
+.# Title: Recursive sub
+Line 1
+.#
+.# Straight sub
+.sub s1
+in Sub 1
+.done
+.#
+.# Recursive sub
+.sub rec
+.let a0 := _ARGS[0]; a1 := _ARGS[1]
+.echo In rec:  a0: \v{a0}; a1: \v{a1}
+.if _ARGS[1] < 2
+.s1
+Recurse: .rec bill 9
+.# This will recurse but not again
+.rec bill 9
+DONE Recurse: .rec bill 9
+.fi
+.#
+.let a0 := _ARGS[0]; a1 := _ARGS[1]
+.eval End of rec: a0: \v{a0}; a1: \v{a1}
+.done
+.#
+.rec fred 0
+.let na := count(_ARGS)
+.eval Last .rec returned. Last a0=\v{a0} This num args=\v{na}
+EOF

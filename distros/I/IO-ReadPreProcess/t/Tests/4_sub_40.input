@@ -1,0 +1,11 @@
+.# Title: Subroutine does .include
+Line 1
+.# Define sub a
+.sub a
+Sub a line 1
+.include 4_sub_40.inc
+.done
+.#
+.a
+.#
+EOF

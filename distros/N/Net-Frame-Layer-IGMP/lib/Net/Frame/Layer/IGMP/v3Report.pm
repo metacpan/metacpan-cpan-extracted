@@ -52,7 +52,7 @@ sub new {
       numSources       => 0,
       multicastAddress => '0.0.0.0',
       sourceAddress    => [],
-      auxData          => "\0",
+      auxData          => '',
       @_,
    );
 }
@@ -78,7 +78,7 @@ sub pack {
       $raw .= inetAton($_);
    }
 
-   if ($self->auxData ne "\0") {
+   if ($self->auxData ne "") {
       $raw .= $self->SUPER::pack('a*',
          $self->auxData,
       ) or return;
@@ -108,7 +108,7 @@ sub unpack {
       }
    }
    $self->sourceAddress(\@sourceAddress);
-   $self->auxData("\0");
+   $self->auxData("");
 
    # auxDataLen is length in 32-bit words so extra math (/4, *4)
    if (($self->auxDataLen > 0) && defined($payload) && ((length($payload)/4) >= $self->auxDataLen)) {
@@ -138,7 +138,7 @@ sub computeLengths {
    my $self = shift;
 
    # Calculate auxDataLen if auxData and auxDataLen = 0
-   if (($self->auxData ne "\0") && ($self->auxDataLen == 0)) {
+   if (($self->auxData ne "") && ($self->auxDataLen == 0)) {
       # auxDataLen is number of 32-bit words
       if (my $mod = (length($self->auxData) * 8) % 32) {
           my $pad = (32 - $mod)/8;
@@ -174,7 +174,7 @@ sub print {
          $_
    }
 
-   if ($self->auxData ne "\0") {
+   if ($self->auxData ne "") {
       $buf .= sprintf
       "\n$l: auxData:%s",
          $self->auxData
@@ -197,11 +197,12 @@ Net::Frame::Layer::IGMP::v3Report - IGMP version 3 Report Message
    use Net::Frame::Layer::IGMP qw(:consts);
 
    my $layer = Net::Frame::Layer::IGMP::v3Report->new(
-      type             => NF_IGMP_REPORTv3TYPE_MODEINCLUDE,      auxDataLen       => 0,
+      type             => NF_IGMP_REPORTv3TYPE_MODEINCLUDE,
+      auxDataLen       => 0,
       numSources       => 0,
       multicastAddress => '0.0.0.0',
       sourceAddress    => [],
-      auxData          => undef,
+      auxData          => '',
    );
 
    #

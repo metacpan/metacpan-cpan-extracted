@@ -3,20 +3,21 @@ abstract: 'Internet Group Management Protocol layer object'
 author:
   - 'Michael Vincent <vin at vinsworld dot com>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: artistic
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Net-Frame-Layer-IGMP
 no_index:
   directory:
     - t
     - inc
 requires:
-  Net::Frame: 1.09
-version: 1.01
+  Net::Frame: '1.17'
+version: '1.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

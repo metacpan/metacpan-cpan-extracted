@@ -1,7 +1,7 @@
 sudo: required
 env:
   global:
-    - ETCD_VER=v3.1.5
+    - ETCD_VER=v3.2.0-rc.0
     - ETCDCTL_API=3
     - ETCD_TEST_HOST=127.0.0.1
     - ETCD_TEST_PORT=2379

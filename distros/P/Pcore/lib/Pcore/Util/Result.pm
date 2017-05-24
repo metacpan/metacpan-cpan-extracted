@@ -39,7 +39,6 @@ sub TO_DATA ($self) {
     my $dump = { $self->%* };
 
     delete $dump->{status_reason};
-    delete $dump->{headers};
 
     return $dump;
 }

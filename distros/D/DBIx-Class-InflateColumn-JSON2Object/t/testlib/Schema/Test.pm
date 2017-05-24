@@ -24,6 +24,10 @@ __PACKAGE__->add_columns(
         data_type   => 'text',
         is_nullable => 0,
     },
+    array => {
+        data_type   => 'text',
+        is_nullable => 0,
+    },
     data => {
         data_type   => 'text',
         is_nullable => 0,
@@ -45,6 +49,11 @@ DBIx::Class::InflateColumn::JSON2Object->no_class({
 DBIx::Class::InflateColumn::JSON2Object->fixed_class({
     column=>'fixed_class',
     class=>'testlib::Object::Fixed',
+});
+
+DBIx::Class::InflateColumn::JSON2Object->array_of_class({
+    column=>'array',
+    class=>'testlib::Object::Element',
 });
 
 DBIx::Class::InflateColumn::JSON2Object->class_in_column({

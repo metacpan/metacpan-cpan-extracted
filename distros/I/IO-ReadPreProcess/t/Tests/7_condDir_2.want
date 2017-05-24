@@ -1,0 +1,62 @@
+Done foo definition
+
+
+TestIt defined, now run it
+
+Test within sub if: false
+foo returning RetVal='0' ; a2='bar'
+Expected output
+
+Test within sub if: true
+foo returning RetVal='1' ; a2='bar'
+Expected output
+
+Test within sub if: true
+foo returning RetVal='12' ; a2='bar'
+Expected output
+
+Test within sub if: true
+foo returning RetVal='someString' ; a2='bar'
+Expected output
+
+The same again but .unless instead of .if
+
+Test within sub unless: false
+foo returning RetVal='0' ; a2='bar'
+Expected output
+
+Test within sub unless: true
+foo returning RetVal='1' ; a2='bar'
+Expected output
+
+Test within sub unless: true
+foo returning RetVal='12' ; a2='bar'
+Expected output
+
+Test within sub unless: true
+foo returning RetVal='someString' ; a2='bar'
+Expected output
+
+
+Again, but the test in .elseif
+Test within sub elseif: false
+foo returning RetVal='0' ; a2='bar'
+Expected output
+
+Test within sub elseif: true
+foo returning RetVal='1' ; a2='bar'
+Expected output
+
+Test within sub elseif: true
+foo returning RetVal='12' ; a2='bar'
+Expected output
+
+Test within sub elseif: true
+foo returning RetVal='someString' ; a2='bar'
+Expected output
+
+Test within sub elseif: false, true
+foo returning RetVal='0' ; a2='bar'
+foo returning RetVal='1' ; a2='baz'
+Expected output
+EOF

@@ -14,7 +14,7 @@ configure_requires:
   Module::Build: '0.28'
   Module::Build::WithXSpp: '0.14'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,5 +26,4 @@ requires:
 resources:
   homepage: https://github.com/mbarbon/google-protobuf-dynamic
   repository: https://github.com/mbarbon/google-protobuf-dynamic.git
-version: '0.16'
-x_serialization_backend: 'YAML::Tiny version 1.63'
+version: '0.17'

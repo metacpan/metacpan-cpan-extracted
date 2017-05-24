@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,9 @@ requires:
   Test::Differences: '0'
   Test::Exception: '0'
   Test::More: '0.88'
+  lexical::underscore: '0.004'
 resources:
   bugtracker: https://github.com/DrHyde/perl-modules-Params-Validate-Dependencies/issues
   repository: https://github.com/DrHyde/perl-modules-Params-Validate-Dependencies
-version: '1.31'
+version: '1.32'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

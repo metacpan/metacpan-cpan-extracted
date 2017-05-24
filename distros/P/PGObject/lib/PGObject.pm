@@ -7,20 +7,17 @@ PGObject - A toolkit integrating intelligent PostgreSQL dbs into Perl objects
 package PGObject;
 use strict;
 use warnings;
+use PGObject::Type::Registry;
 use Carp;
 use Memoize;
 
 =head1 VERSION
 
-Version 1.403.2
+Version 2.0.0
 
 =cut
 
-our $VERSION = '1.403.2';
-
-my %typeregistry = (
-    default => {},
-);
+our $VERSION = 2.000001;
 
 =head1 SYNPOSIS
 
@@ -76,6 +73,7 @@ To do the same with a running total
 sub import {
     my @directives = @_;
     memoize 'function_info' if grep { $_ eq ':cache' } @directives;
+    PGObject::Type::Registry->new_registry($_) for grep { $_ !~ /^\:/; } @directives; 
 }
 
 =head1 DESCRIPTION
@@ -170,14 +168,13 @@ The number of arguments
 =cut
 
 sub function_info {
-    my ($self) = shift @_;
-    my %args = @_;
+    my ($self, %args) = @_;
     $args{funcschema} ||= 'public';
     $args{funcprefix} ||= '';
     $args{funcname} = $args{funcprefix}.$args{funcname};
     $args{argschema} ||= 'public';
 
-    my $dbh = $args{dbh};
+    my $dbh = $args{dbh} || croak 'No dbh provided';
 
     
 
@@ -283,7 +280,6 @@ sub call_procedure {
     $args{funcname} = $args{funcprefix}.$args{funcname};
     $args{registry} ||= 'default';
 
-    my $registry = $typeregistry{$args{registry}};
     my $dbh = $args{dbh};
     croak "No database handle provided" unless $dbh;
     croak "dbh not a database handle" unless eval {$dbh->isa('DBI::db')};
@@ -366,8 +362,11 @@ sub call_procedure {
        my @names = @{$sth->{NAME_lc}};
        my $i = 0;
        for my $type (@types){
-           $row->{$names[$i]} 
-                 = process_type($row->{$names[$i]}, $type, $registry);
+           $row->{$names[$i]} =
+                 PGObject::Type::Registry->deserialize(
+                       registry => $args{registry}, 
+                       dbtype => $type, dbstring => $row->{$names[$i]}
+                 );
            ++$i;
        }
        
@@ -376,56 +375,28 @@ sub call_procedure {
     return @rows;      
 }
 
-=head2 process_type($val, $type, $registry)
-
-If $type is registered, returns "$type"->from_db($val).  Otherwise returns
-$val.  If $val is an arrayref, loops through it for every item and strips 
-trialing [] from $type.
-
-This module should generally only be used by type handlers or by this module.
-
-=cut
-
-sub process_type {
-    my ($val, $type, $registry, $dbh) = @_;
-    return unless defined $val;
-
-    $registry = $typeregistry{$registry} unless ref $registry;
-    # Array handling as we'd get this usually from DBD::Pg or equivalent
-    if (ref $val and ref($val) =~ /ARRAY/){
-       # strangely, DBD::Pg returns, as of 2.x, the types of array types 
-       # as prefixed with an underscore.  So we have to remove this. --CT
-       $type =~ s/^\_//;
-       my $newval = [];
-       push @$newval, process_type($_, $type, $registry) for @$val;
-       return $newval;
-    }
-
-    # Otherwise:
-    if (defined $registry->{$type}){
-       my $class = $registry->{$type};
-       $val = $class->from_db($val);
-    }
-    return $val;
-}
-
 =head2 new_registry($registry_name)
 
 Creates a new registry if it does not exist.  This is useful when segments of
 an application must override existing type mappings.
 
-Returns 1 on creation, 2 if already exists.
+This is deprecated and throws a warning.
+
+Use PGObject::Type::Registry->new_registry($registry_name) instead.
+
+This no longer returns anything of significance.
 
 =cut
 
 sub new_registry{
     my ($self, $registry_name) = @_;
-    return 2 if defined $typeregistry{$registry_name};
-    $typeregistry{$registry_name} = {};
-    return 1;
+    carp "Deprecated use of PGObject->new_registry()";
+    PGObject::Type::Registry->new_registry($registry_name);
 }
 
 =head2 register_type(pgtype => $tname, registry => $regname, perl_class => $pm)
+
+DEPRECATED
 
 Registers a type as a class.  This means that when an attribute of type $pg_type
 is returned, that PGObject will automatically return whatever
@@ -437,40 +408,24 @@ The registry argument is optional and defaults to 'default'
 If the registry does not exist, an error is raised.  if the pg_type is already
 registered to a different type, this returns 0.  Returns 1 on success.
 
+Use PGObject::Type::Registry->register_type() instead.
+
 =cut
 
 sub register_type{
+    carp 'Use of deprecated method register_type of PGObject module';
     my $self = shift @_;
     my %args = @_;
-    $args{registry} ||= 'default';
-    croak "Registry $args{registry} does not exist yet!" 
-              if !defined $typeregistry{$args{registry}};
-    return 0 if defined $typeregistry{$args{registry}}->{$args{pg_type}}
-             and $args{perl_class} 
-             ne $typeregistry{$args{registry}}->{$args{pg_type}};
-            
-    $typeregistry{$args{registry}}->{$args{pg_type}} = $args{perl_class};
+
+    PGObject::Type::Registry->register_type(registry => $args{registry},
+          dbtype => $args{pg_type}, apptype => $args{perl_class}
+    );
     return 1;
 }
 
-=head2 get_registered(registry => $registry, pg_type => $pg_type)
-
-This is a public interface to the registry, which can be useful for composite
-types decoding themselves from tuple data, and so forth.
-
-=cut
-
-sub get_registered {
-    my ($self) = shift @_;
-    my %args = @_;
-    $args{registry} ||= 'default';
-    croak "Registry $args{registry} does not exist yet!"
-              if !defined $typeregistry{$args{registry}};
-    return undef unless defined $typeregistry{$args{registry}}->{$args{pg_type}};
-    return $typeregistry{$args{registry}}->{$args{pg_type}};
-}
-
 =head2 unregister_type(pgtype => $tname, registry => $regname)
+
+Deprecated.
 
 Tries to unregister the type.  If the type does not exist, returns 0, otherwise
 returns 1.  This is mostly useful for when a specific type must make sure it has
@@ -480,24 +435,13 @@ instead.
 =cut
 
 sub unregister_type{
+    carp 'Use of deprecated method unregister_type of PGObject';
     my $self = shift @_;
     my %args = @_;
     $args{registry} ||= 'default';
-    croak "Registry $args{registry} does not exist yet!" 
-              if !defined $typeregistry{$args{registry}};
-    return 0 if not defined $typeregistry{$args{registry}}->{$args{pg_type}};
-    delete $typeregistry{$args{registry}}->{$args{pg_type}};
-    return 1;
-}
-
-=head2 $hashref = get_type_registry()
-
-Returns the type registry.  Mostly useful for debugging.
-
-=cut
-
-sub get_type_registry {
-    return \%typeregistry;
+    PGObject::Type::Registry->unregister_type(
+       registry => $args{registry}, dbtype =>  $args{pg_type}
+    );
 }
 
 =head1 WRITING PGOBJECT-AWARE HELPER CLASSES
@@ -532,6 +476,10 @@ Any type MAY present an $object->to_db() interface, requiring no arguments, and 
 
 =head2 UNDERSTANDING THE REGISTRY SYSTEM
 
+Note that 2.0 moves the registry to a service module which handles both
+registry and deserialization of database types.  This is intended to be both
+cleaner and more flexible than the embedded system in 1.x.
+
 The registry system allows Perl classes to "claim" PostgreSQL types within a 
 certain domain.  For example, if I want to ensure that all numeric types are
 turned into Math::BigFloat objects, I can build a wrapper class with appropriate
@@ -548,6 +496,21 @@ registries.  Each registry is fully global, but application components can
 specify non-standard registries when calling procedures, and PGObject will use
 only those components registered on the non-standard registry when checking rows
 before output.
+
+=head3 Backwards Incompatibilities from 1.x
+
+Deserialization occurs in a context which specifies a registry.  In 1.x there
+were no concerns about default mappings but now this triggers a warning.  The
+most basic and frequently used portions of this have been kept but return values
+for registering types has changed.  We no longer provide a return variable but
+throw an exception if the type cannot be safely registered.
+
+This follows a philosophy of throwing exceptions when guarantees cannot be met.
+
+We now throw warnings when the default registry is used.
+
+Longer-run, deserializers should use the PGObject::Type::Registry interface
+directly.
 
 =head1 WRITING TOP-HALF OBJECT FRAMEWORKS FOR PGOBJECT
 
@@ -677,6 +640,7 @@ not be half of what it is today.
 =head1 COPYRIGHT
 
 COPYRIGHT (C) 2013-2014 Chris Travers
+COPYRIGHT (C) 2014-2017 The LedgerSMB Core Team
 
 Redistribution and use in source and compiled forms with or without 
 modification, are permitted provided that the following conditions are met:

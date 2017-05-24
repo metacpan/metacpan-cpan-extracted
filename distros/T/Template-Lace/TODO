@@ -1,3 +1,16 @@
+--
+## Need to cope with the loop...
+## could solve with a subtemplate or dom->adopt
+
+<li class=[.listclass]>
+  ...
+</li>
+
+
+sub listclass {
+  my ($self, $li) = @_;
+  return $self->completed ? 'completed : undef;
+}
 
 -- Catalyst 'subrequest' handler example
 
@@ -10,12 +23,6 @@ $component_handler_registry
 my $user_template_factory = Template::Lace::Factory->new(
   class=>'MyApp::Template::User',
   component_handlers=>$component_handler_registry);
-
-
-my $user_template = $user_template_factory->create(%args);
-
-$user_template->add_friends(@friends);
-my $content = $user_template->render;
     
 
   my $registry = Template::Lace::Registry->new(
@@ -70,9 +77,6 @@ Ok now if we move components to the DOM we can support
 ->attach
 
 ==== END
- ----
-
--- <web-component attr_hash={a=>1,f=>4} attr_array=['$.foo','rr']
 
 === Form ideas
 -- fill and smart_content for matching input[name= same as class and id.

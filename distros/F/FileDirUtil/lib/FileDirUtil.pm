@@ -1,5 +1,5 @@
 # -*-CPerl-*-
-# Last changed Time-stamp: <2017-05-15 16:43:38 mtw>
+# Last changed Time-stamp: <2017-05-23 00:04:08 mtw>
 
 =head1 NAME
 
@@ -38,7 +38,7 @@ joined to create a single L<Path::Class::Dir> directory object.
 
 package FileDirUtil;
 
-use version; our $VERSION = qv('0.01');
+use version; our $VERSION = qv('0.02');
 use Moose::Util::TypeConstraints;
 use Moose::Role;
 use Path::Class::File;
@@ -79,13 +79,12 @@ has 'odir' => (
 	       coerce => 1,
 	      );
 
-sub BUILD {}
-after BUILD => sub {
-  my $self = shift;
-  if ($self->has_ifile){
+# This should be set automatically inside a BUILD methods, however it
+# semms this doesnt work well for Roles. Hence do it the ugly way and
+# call this method manually inside your object...
+sub set_ifilebn {
+    my $self = shift;
     $self->ifilebn(fileparse($self->ifile->basename, qr/\.[^.]*/));
-  }
- 
 };
 
 # for perl tests below

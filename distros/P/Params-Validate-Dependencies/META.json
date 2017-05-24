@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "unknown"
    ],
@@ -39,7 +39,8 @@
             "Scalar::Util" : "1.25",
             "Test::Differences" : "0",
             "Test::Exception" : "0",
-            "Test::More" : "0.88"
+            "Test::More" : "0.88",
+            "lexical::underscore" : "0.004"
          }
       }
    },
@@ -52,5 +53,6 @@
          "url" : "https://github.com/DrHyde/perl-modules-Params-Validate-Dependencies"
       }
    },
-   "version" : "1.31"
+   "version" : "1.32",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

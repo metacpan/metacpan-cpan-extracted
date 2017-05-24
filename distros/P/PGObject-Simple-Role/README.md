@@ -47,7 +47,7 @@ You can also look for information at:
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2013 Chris Travers
+Copyright (C) 2013-2017 Chris Travers
 
 Redistribution and use in source and compiled forms with or without 
 modification, are permitted provided that the following conditions are met:

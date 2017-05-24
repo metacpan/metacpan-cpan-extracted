@@ -1,5 +1,9 @@
 Revision history for Map::Tube::Exception
 
+3.12  Wed May 24 12:00:00 2017
+      - Updated copyright year info in README file.
+      - Removed "-T" switch from the test script.
+
 3.11  Sat Feb 18 11:40:00 2017
       - Added exception for Unsupported Map Data Format.
 

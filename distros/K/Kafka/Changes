@@ -1,5 +1,10 @@
 Revision history for Kafka package
 
+1.03 Mon May  22 2017
+
+    BUGFIXES:
+    - Prevent exceptions with Kafka 0.9 (where API versioning is not supported).
+
 1.02 Fri May  12 2017
 
     Special thanks to Damien Krotkine for API versioning implementation.
@@ -11,11 +16,12 @@ Revision history for Kafka package
       easier, simpler and more complete way (including support for
       version 0 and version 1 of message formats)
     - Support for array of keys in Kafka::Producer->send with array of messages.
+    - Use Gzip::Faster to improve compression speed.
 
     BUGFIXES:
     - Improved timeouts handling for big payloads in Kafka::IO.
 
-1.02 Fri Feb  24 2017
+1.001013 Fri Feb  24 2017
     CHANGES:
     - Removed support for custom CorrelationID in constructor arguments.
     - Use seconds for Consumer.MaxWaitTime to make it similar to Producer.Timeout.

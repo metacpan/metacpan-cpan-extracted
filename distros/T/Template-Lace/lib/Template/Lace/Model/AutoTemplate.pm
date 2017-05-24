@@ -24,15 +24,11 @@ sub slurp_template_from {
   return $slurped;
 }
 
-around 'template', sub {
-  my ($orig, $class, @args) = @_;
-  if(my $template = $class->$orig(@args)) {
-    return $template;
-  } else {
-    my $template_path = $class->get_path_to_template;
-    return $class->slurp_template_from($template_path);
-  }
-};
+sub template {
+  my ($class, @args) = @_;
+  my $template_path = $class->get_path_to_template;
+  return $class->slurp_template_from($template_path);
+}
 
 1;
 
@@ -47,8 +43,7 @@ Create a template class at path $HOME/lib/MyApp/Template/List.pm
     package  MyApp::Template::List;
 
     use Moo;
-    with 'Template::Lace::ModelRole',
-      'Template::Lace::Model::AutoTemplate';
+    with 'Template::Lace::Model::AutoTemplate';
 
     has 'items' => (is=>'ro', required=>1);
 

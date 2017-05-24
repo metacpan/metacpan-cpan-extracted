@@ -1,3 +1,17 @@
+0.13    2017-05-23 (PERLANCAR)
+
+	- pp-yaml: by default colorize YAML in interactive mode using
+	  YAML::Tiny::Color, add options --(no-)color, --pp, --xs.
+
+	- pp-json: by default colorize JSON in interactive mode using
+	  JSON::Color, add --(no-)color and --(no-)pretty.
+
+	- pp-dd: by default colorize dump in interactive mode using
+	  Data::Dump::Color, add --(no-)color.
+
+        - pp-dd: When Data::Undump fails, report its error message.
+
+
 0.12    2017-03-01 (PERLANCAR)
 
 	- pp-dd: Add option --undump (and --eval).

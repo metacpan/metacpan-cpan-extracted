@@ -5,24 +5,35 @@ require Exporter;
 use strict;
 use Carp;
 use File::Copy;
-use Statistics::Lite qw(mean);
 use Bio::DB::Sam;
+use Bio::ToolBox::db_helper::alignment_callbacks;
 our $parallel;
 eval {
 	# check for parallel support, when counting bam alignments
 	require Parallel::ForkManager;
 	$parallel = 1;
 };
-our $VERSION = '1.33';
+use constant {
+	CHR  => 0,  # chromosome
+	STRT => 1,  # start
+	STOP => 2,  # stop
+	STR  => 3,  # strand
+	STND => 4,  # strandedness
+	METH => 5,  # method
+	RETT => 6,  # return type
+	DB   => 7,  # database object
+	DATA => 8,  # first dataset, additional may be present
+};
+our $VERSION = '1.50';
 
 # Exported names
 our @ISA = qw(Exporter);
 our @EXPORT = qw(
 	open_bam_db
+	open_indexed_fasta
 	check_bam_index
 	write_new_bam_file
 	collect_bam_scores
-	collect_bam_position_scores
 	sum_total_bam_alignments
 );
 
@@ -41,9 +52,6 @@ our %OPENED_BAM;
 	# caching here is only for local purposes of collecting scores
 	# db_helper also provides caching of db objects but with option to force open in
 	# the case of forking processes - we don't have that here
-
-# Lookup hash for caching callback methods
-our %CALLBACKS;
 
 # The true statement
 1; 
@@ -72,8 +80,22 @@ sub open_bam_db {
 }
 
 
+### Open an indexed fasta file
+sub open_indexed_fasta {
+	my $fasta = shift;
+	if ($fasta =~ /\.gz$/) {
+		die " Bio::DB::Sam::Fai doesn't support compressed fasta files! Please decompress\n";
+	}
+	my $fai;
+	eval {$fai = Bio::DB::Sam::Fai->load($fasta)};
+		# this should automatically build the fai index if possible
+	return $fai if defined $fai;
+}
+
+
 ### Check for a bam index 
 sub check_bam_index {
+	# the old samtools always expects a .bam.bai index file
 	# I find that relying on -autoindex yields a flaky Bio::DB::Sam object that 
 	# doesn't always work as expected. Best to create the index BEFORE opening
 	
@@ -124,71 +146,24 @@ sub write_new_bam_file {
 
 
 
-### Collect Bam scores only
+### Collect Bam scores
 sub collect_bam_scores {
-	# set the do_index boolean to false
-	# return the scores
-	return _collect_bam_data(0, @_);
-}
-
-
-
-
-### Collect positioned Bam scores
-sub collect_bam_position_scores {
 	
-	# collect the raw data
-	# set the do_index boolean to true
-	my %bam_data = _collect_bam_data(1, @_);
-	
-	# grab the method from the passed arguments
-	my $method = $_[3];
-	
-	# combine multiple datapoints at the same position
-	if ($method eq 'length') {
-		# each value is an array of one or more datapoints
-		# we will take the simple mean
-		foreach my $position (keys %bam_data) {
-			$bam_data{$position} = mean( @{$bam_data{$position}} );
-		}
-	}
-	
-	# return collected data
-	return %bam_data;
-}
-
-
-
-
-### Actual collection of scores
-sub _collect_bam_data {
-	
-	# pass the required information
-	unless (scalar @_ >= 8) {
-		confess " At least eight arguments must be passed to collect Bam data!\n";
-	}
-	my (
-		$do_index, 
-		$chromo,
-		$start,
-		$stop,
-		$strand, 
-		$stranded, 
-		$value_type, 
-		@bam_features
-	) = @_;
-		# value_type can be score, count, or length
+	# passed parameters as array ref
+	# chromosome, start, stop, strand, strandedness, method, db, dataset
+	my $param = shift;
 	
 	# initialize score structures
-	# which one is used depends on the $do_index boolean variable
+	# which one is used depends on the return type variable
 	my %pos2data; # either position => count or position => [scores]
-	my @scores; # just scores
+	my $scores = []; # just scores
 	
 	# look at each bamfile
 	# usually there is only one, but there may be more than one
-	foreach my $bamfile (@bam_features) {
+	for (my $b = DATA; $b < scalar @$param; $b++) {
 	
 		## Open the Bam File
+		my $bamfile = $param->[$b];
 		my $bam = $OPENED_BAM{$bamfile} || undef;
 		unless ($bam) {
 			# open and cache the bam file
@@ -210,22 +185,35 @@ sub _collect_bam_data {
 		}
 			
 		# first check that the chromosome is present
-		$chromo = $BAM_CHROMOS{$bamfile}{$chromo} or next;
+		my $chromo = $BAM_CHROMOS{$bamfile}{$param->[CHR]} or next;
 		
 		# convert coordinates into low level coordinates
 		# consumed by the low level Bam API
-		my ($tid, $zstart, $end) = 
-			$bam->header->parse_region("$chromo:$start\-$stop");
+		my ($tid, $zstart, $end) = $bam->header->parse_region(
+			sprintf("%s:%d-%d", $chromo, $param->[STRT], $param->[STOP]) );
 	
 		
 		## Collect the data according to the requested value type
-		# we will either use simple coverage (score method) or
-		# process the actual alignments (count or length)
-		
-		## Coverage
-		if ($value_type eq 'score') {
-			# collecting scores, or in this case, basepair coverage of 
-			# alignments over the requested region
+		# we will either use simple coverage or alignments (count)
+		if ($param->[METH] =~ /count/) {
+			# Need to collect and count alignments
+			
+			## Set the callback and a callback data structure
+			my $callback = assign_callback($param);
+			my %data = (
+				'scores' => $scores,
+				'index'  => \%pos2data,
+				'start'  => $param->[STRT],
+				'stop'   => $param->[STOP],
+			);
+			
+			# get the alignments
+			# we are using the low level API to eke out performance
+			$bam->bam_index->fetch($bam->bam, $tid, $zstart, $end, $callback, \%data);
+		}
+		else {
+			## Coverage
+			# I am assuming everything else is working with read coverage
 			
 			# generate the coverage, this will ignore strand
 			my $coverage = $bam->bam_index->coverage(
@@ -238,48 +226,35 @@ sub _collect_bam_data {
 			# convert the coverage data
 			# by default, this should return the coverage at 1 bp resolution
 			if (scalar @$coverage) {
-				
 				# check whether we need to index the scores
-				if ($do_index) {
-					for (my $i = $start; $i <= $stop; $i++) {
+				if ($param->[RETT] == 2) {
+					for (my $i = $param->[STRT]; $i <= $param->[STOP]; $i++) {
 						# move the scores into the position score hash
-						$pos2data{$i} += $coverage->[ $i - $start ];
+						$pos2data{$i} += $coverage->[ $i - $param->[STRT] ];
 					}
 				}
 				else {
-					@scores = @$coverage;
+					$scores = $coverage;
 				}
 			}
 		}
-		
-		
-		## Alignments
-		else {
-			# either collecting counts or length
-			# working with actual alignments
-			
-			## Set the callback and a callback data structure
-			my $callback = _assign_callback($stranded, $strand, $value_type, $do_index);
-			my %data = (
-				'scores' => \@scores,
-				'index'  => \%pos2data,
-				'start'  => $start,
-				'stop'   => $stop,
-			);
-			
-			# get the alignments
-			# we are using the low level API to eke out performance
-			$bam->bam_index->fetch($bam->bam, $tid, $zstart, $end, $callback, \%data);
-			
+	}
+	
+	# process the ncount arrays
+	if ($param->[RETT] == 2 and $param->[METH] eq 'ncount') {
+		foreach my $position (keys %pos2data) {
+			my %name2count;
+			foreach (@{$pos2data{$position}}) { $name2count{$_} += 1 }
+			$pos2data{$position} = scalar(keys %name2count);
 		}
 	}
 	
 	## Return collected data
-	if ($do_index) {
-		return %pos2data;
+	if ($param->[RETT] == 2) {
+		return wantarray ? %pos2data : \%pos2data;
 	}
 	else {
-		return @scores;
+		return wantarray ? @$scores : $scores;
 	}
 }
 
@@ -418,591 +393,6 @@ sub sum_total_bam_alignments {
 }
 
 
-### Generate callback subroutine for walking through Bam alignments
-sub _assign_callback {
-	# generate the callback code depending on whether we want to look at 
-	# stranded data, collecting counts or length, or whether indexed data
-	# is wanted.
-	
-	# we perform a check of whether the alignment midpoint is within the 
-	# search region for indexed data only
-	
-	# these subroutines are designed to work with the low level fetch API
-	
-	# there are so many different subroutines because I want to increase 
-	# efficiency by limiting the number of conditional tests in one generic subroutine
-	
-	my ($stranded, $strand, $value_type, $do_index) = @_;
-	
-	# check the current list of calculated callbacks
-		# this process is pretty lengthy, especially to do it for every single 
-		# data collection, so we cache the calculate callback method to speed up 
-		# subsequent data collections
-		# it's likely only one method is ever employed in an execution, but just in case
-		# we will cache all that we calculate
-	if (exists $CALLBACKS{"$stranded$strand$value_type$do_index"}) {
-		return $CALLBACKS{"$stranded$strand$value_type$do_index"};
-	}
-	
-	# determine the callback method based on requested criteria
-	my $callback;
-	
-	# all reads, either strand
-	if (
-		$stranded eq 'all' and 
-		$value_type eq 'count' and 
-		$do_index
-	) {
-		$callback = \&_all_count_indexed;
-	}
-	elsif (
-		$stranded eq 'all' and 
-		$value_type eq 'pcount' and 
-		$do_index
-	) {
-		$callback = \&_all_precise_count_indexed;
-	}
-	elsif (
-		$stranded eq 'all' and 
-		$value_type eq 'count' and 
-		!$do_index
-	) {
-		$callback = \&_all_count_array;
-	}
-	elsif (
-		$stranded eq 'all' and 
-		$value_type eq 'pcount' and 
-		!$do_index
-	) {
-		$callback = \&_all_precise_count_array;
-	}
-	elsif (
-		$stranded eq 'all' and 
-		$value_type eq 'ncount' and 
-		!$do_index
-	) {
-		$callback = \&_all_name_array;
-	}
-	elsif (
-		$stranded eq 'all' and 
-		$value_type eq 'length' and 
-		$do_index
-	) {
-		$callback = \&_all_length_indexed;
-	}
-	elsif (
-		$stranded eq 'all' and 
-		$value_type eq 'length' and 
-		!$do_index
-	) {
-		$callback = \&_all_length_array;
-	}
-	
-	
-	# sense, forward strand 
-	elsif (
-		$stranded eq 'sense' and 
-		$strand >= 0 and 
-		$value_type eq 'count' and 
-		$do_index
-	) {
-		$callback = \&_forward_count_indexed;
-	}
-	elsif (
-		$stranded eq 'sense' and 
-		$strand >= 0 and 
-		$value_type eq 'pcount' and 
-		$do_index
-	) {
-		$callback = \&_forward_precise_count_indexed;
-	}
-	elsif (
-		$stranded eq 'sense' and 
-		$strand >= 0 and 
-		$value_type eq 'count' and 
-		!$do_index
-	) {
-		$callback = \&_forward_count_array;
-	}
-	elsif (
-		$stranded eq 'sense' and 
-		$strand >= 0 and 
-		$value_type eq 'pcount' and 
-		!$do_index
-	) {
-		$callback = \&_forward_precise_count_array;
-	}
-	elsif (
-		$stranded eq 'sense' and 
-		$strand >= 0 and 
-		$value_type eq 'ncount' and 
-		!$do_index
-	) {
-		$callback = \&_forward_name_array;
-	}
-	elsif (
-		$stranded eq 'sense' and 
-		$strand >= 0 and 
-		$value_type eq 'length' and 
-		$do_index
-	) {
-		$callback = \&_forward_length_indexed;
-	}
-	elsif (
-		$stranded eq 'sense' and 
-		$strand >= 0 and 
-		$value_type eq 'length' and 
-		!$do_index
-	) {
-		$callback = \&_forward_length_array;
-	}
-	
-	
-	# sense, reverse strand
-	elsif (
-		$stranded eq 'sense' and 
-		$strand == -1 and 
-		$value_type eq 'count' and 
-		$do_index
-	) {
-		$callback = \&_reverse_count_indexed;
-	}
-	elsif (
-		$stranded eq 'sense' and 
-		$strand == -1 and 
-		$value_type eq 'pcount' and 
-		$do_index
-	) {
-		$callback = \&_reverse_precise_count_indexed;
-	}
-	elsif (
-		$stranded eq 'sense' and 
-		$strand == -1 and 
-		$value_type eq 'count' and 
-		!$do_index
-	) {
-		$callback = \&_reverse_count_array;
-	}
-	elsif (
-		$stranded eq 'sense' and 
-		$strand == -1 and 
-		$value_type eq 'pcount' and 
-		!$do_index
-	) {
-		$callback = \&_reverse_precise_count_array;
-	}
-	elsif (
-		$stranded eq 'sense' and 
-		$strand == -1 and 
-		$value_type eq 'ncount' and 
-		!$do_index
-	) {
-		$callback = \&_reverse_name_array;
-	}
-	elsif (
-		$stranded eq 'sense' and 
-		$strand == -1 and 
-		$value_type eq 'length' and 
-		$do_index
-	) {
-		$callback = \&_reverse_length_indexed;
-	}
-	elsif (
-		$stranded eq 'sense' and 
-		$strand == -1 and 
-		$value_type eq 'length' and 
-		!$do_index
-	) {
-		$callback = \&_reverse_length_array;
-	}
-	
-	
-	# anti-sense, forward strand 
-	elsif (
-		$stranded eq 'antisense' and 
-		$strand >= 0 and 
-		$value_type eq 'count' and 
-		$do_index
-	) {
-		$callback = \&_reverse_count_indexed;
-	}
-	elsif (
-		$stranded eq 'antisense' and 
-		$strand >= 0 and 
-		$value_type eq 'pcount' and 
-		$do_index
-	) {
-		$callback = \&_reverse_precise_count_indexed;
-	}
-	elsif (
-		$stranded eq 'antisense' and 
-		$strand >= 0 and 
-		$value_type eq 'count' and 
-		!$do_index
-	) {
-		$callback = \&_reverse_count_array;
-	}
-	elsif (
-		$stranded eq 'antisense' and 
-		$strand >= 0 and 
-		$value_type eq 'pcount' and 
-		!$do_index
-	) {
-		$callback = \&_reverse_precise_count_array;
-	}
-	elsif (
-		$stranded eq 'antisense' and 
-		$strand >= 0 and 
-		$value_type eq 'ncount' and 
-		!$do_index
-	) {
-		$callback = \&_reverse_name_array;
-	}
-	elsif (
-		$stranded eq 'antisense' and 
-		$strand >= 0 and 
-		$value_type eq 'length' and 
-		$do_index
-	) {
-		$callback = \&_reverse_length_indexed;
-	}
-	elsif (
-		$stranded eq 'antisense' and 
-		$strand >= 0 and 
-		$value_type eq 'length' and 
-		!$do_index
-	) {
-		$callback = \&_reverse_length_array;
-	}
-	
-	
-	# anti-sense, reverse strand
-	elsif (
-		$stranded eq 'antisense' and 
-		$strand == -1 and 
-		$value_type eq 'count' and 
-		$do_index
-	) {
-		$callback = \&_forward_count_indexed;
-	}
-	elsif (
-		$stranded eq 'antisense' and 
-		$strand == -1 and 
-		$value_type eq 'pcount' and 
-		$do_index
-	) {
-		$callback = \&_forward_precise_count_indexed;
-	}
-	elsif (
-		$stranded eq 'antisense' and 
-		$strand == -1 and 
-		$value_type eq 'count' and 
-		!$do_index
-	) {
-		$callback = \&_forward_count_array;
-	}
-	elsif (
-		$stranded eq 'antisense' and 
-		$strand == -1 and 
-		$value_type eq 'pcount' and 
-		!$do_index
-	) {
-		$callback = \&_forward_precise_count_array;
-	}
-	elsif (
-		$stranded eq 'antisense' and 
-		$strand == -1 and 
-		$value_type eq 'ncount' and 
-		!$do_index
-	) {
-		$callback = \&_forward_name_array;
-	}
-	elsif (
-		$stranded eq 'antisense' and 
-		$strand == -1 and 
-		$value_type eq 'length' and 
-		$do_index
-	) {
-		$callback = \&_forward_length_indexed;
-	}
-	elsif (
-		$stranded eq 'antisense' and 
-		$strand == -1 and 
-		$value_type eq 'length' and 
-		!$do_index
-	) {
-		$callback = \&_forward_length_array ;
-	}
-	
-	# unacceptable combination
-	elsif (
-		$value_type eq 'ncount' and 
-		$do_index
-	) {
-		# I don't see any reason to collect names in an indexed fashion
-		# If there is a reason, let me know and I will figure out how to code it
-		confess "invalid combination: value_type=ncount and do_index=true!";
-	}
-	
-	# I goofed
-	else {
-		confess("Programmer error: stranded $stranded, strand $strand, value_type ". 
-				"$value_type, index $do_index\n");
-	}
-	
-	# remember next time 
-	$CALLBACKS{"$stranded$strand$value_type$do_index"} = $callback;
-	
-	return $callback;
-}
-
-
-#### Callback subroutines 
-# the following are all of the callback subroutines 
-
-sub _all_count_indexed {
-	my ($a, $data) = @_;
-	my $pos = int( ($a->pos + 1 + $a->calend) / 2);
-	$data->{'index'}{$pos}++ if 
-		( $pos >= $data->{'start'} and $pos <= $data->{'stop'} );
-}
-
-sub _all_precise_count_indexed {
-	my ($a, $data) = @_;
-	return unless ($a->pos >= $data->{start} and $a->calend <= $data->{stop} );
-	my $pos = int( ($a->pos + 1 + $a->calend) / 2);
-	$data->{'index'}{$pos}++;
-}
-
-sub _all_count_array {
-	my ($a, $data) = @_;
-	$data->{'scores'}->[0] += 1;
-}
-
-sub _all_precise_count_array {
-	my ($a, $data) = @_;
-	return unless ($a->pos >= $data->{start} and $a->calend <= $data->{stop} );
-	$data->{'scores'}->[0] += 1;
-}
-
-sub _all_name_array {
-	my ($a, $data) = @_;
-	push @{ $data->{'scores'} }, $a->qname; # query or read name
-}
-
-sub _all_length_indexed {
-	my ($a, $data) = @_;
-	my $pos = int( ($a->pos + 1 + $a->calend) / 2);
-	if ( $pos >= $data->{'start'} and $pos <= $data->{'stop'} ) {
-		push @{ $data->{'index'}{$pos} }, ($a->calend - $a->pos);
-	}
-}
-
-sub _all_length_array {
-	my ($a, $data) = @_;
-	push @{ $data->{'scores'} }, ($a->calend - $a->pos);
-}
-
-sub _forward_count_indexed {
-	my ($a, $data) = @_;
-	if ($a->paired) {
-		my $first = $a->get_tag_values('FIRST_MATE');
-		return if ($first and $a->reversed);
-		return if (not $first and not $a->reversed);
-	}
-	else {
-		return if $a->reversed;
-	}
-	my $pos = int( ($a->pos + 1 + $a->calend) / 2);
-	$data->{'index'}{$pos}++ if 
-		( $pos >= $data->{'start'} and $pos <= $data->{'stop'} );
-}
-
-sub _forward_precise_count_indexed {
-	my ($a, $data) = @_;
-	if ($a->paired) {
-		my $first = $a->get_tag_values('FIRST_MATE');
-		return if ($first and $a->reversed);
-		return if (not $first and not $a->reversed);
-	}
-	else {
-		return if $a->reversed;
-	}
-	return unless ($a->pos >= $data->{start} and $a->calend <= $data->{stop} );
-	my $pos = int( ($a->pos + 1 + $a->calend) / 2);
-	$data->{'index'}{$pos}++;
-}
-
-sub _forward_count_array {
-	my ($a, $data) = @_;
-	if ($a->paired) {
-		my $first = $a->get_tag_values('FIRST_MATE');
-		return if ($first and $a->reversed);
-		return if (not $first and not $a->reversed);
-	}
-	else {
-		return if $a->reversed;
-	}
-	$data->{'scores'}->[0] += 1;
-}
-
-sub _forward_precise_count_array {
-	my ($a, $data) = @_;
-	if ($a->paired) {
-		my $first = $a->get_tag_values('FIRST_MATE');
-		return if ($first and $a->reversed);
-		return if (not $first and not $a->reversed);
-	}
-	else {
-		return if $a->reversed;
-	}
-	return unless ($a->pos >= $data->{start} and $a->calend <= $data->{stop} );
-	$data->{'scores'}->[0] += 1;
-}
-
-sub _forward_name_array {
-	my ($a, $data) = @_;
-	if ($a->paired) {
-		my $first = $a->get_tag_values('FIRST_MATE');
-		return if ($first and $a->reversed);
-		return if (not $first and not $a->reversed);
-	}
-	else {
-		return if $a->reversed;
-	}
-	push @{ $data->{'scores'} }, $a->qname;
-}
-
-sub _forward_length_indexed {
-	my ($a, $data) = @_;
-	if ($a->paired) {
-		my $first = $a->get_tag_values('FIRST_MATE');
-		return if ($first and $a->reversed);
-		return if (not $first and not $a->reversed);
-	}
-	else {
-		return if $a->reversed;
-	}
-	my $pos = int( ($a->pos + 1 + $a->calend) / 2);
-	if ( $pos >= $data->{'start'} and $pos <= $data->{'stop'} ) {
-		push @{ $data->{'index'}{$pos} }, ($a->calend - $a->pos);
-	}
-}
-
-sub _forward_length_array {
-	my ($a, $data) = @_;
-	if ($a->paired) {
-		my $first = $a->get_tag_values('FIRST_MATE');
-		return if ($first and $a->reversed);
-		return if (not $first and not $a->reversed);
-	}
-	else {
-		return if $a->reversed;
-	}
-	push @{ $data->{'scores'} }, ($a->calend - $a->pos);
-}
-
-sub _reverse_count_indexed {
-	my ($a, $data) = @_;
-	if ($a->paired) {
-		my $first = $a->get_tag_values('FIRST_MATE');
-		return if ($first and not $a->reversed);
-		return if (not $first and $a->reversed);
-	}
-	else {
-		return unless $a->reversed;
-	}
-	my $pos = int( ($a->pos + 1 + $a->calend) / 2);
-	$data->{'index'}{$pos}++ if 
-		( $pos >= $data->{'start'} and $pos <= $data->{'stop'} );
-}
-
-sub _reverse_precise_count_indexed {
-	my ($a, $data) = @_;
-	if ($a->paired) {
-		my $first = $a->get_tag_values('FIRST_MATE');
-		return if ($first and not $a->reversed);
-		return if (not $first and $a->reversed);
-	}
-	else {
-		return unless $a->reversed;
-	}
-	return unless ($a->pos >= $data->{start} and $a->calend <= $data->{stop} );
-	my $pos = int( ($a->pos + 1 + $a->calend) / 2);
-	$data->{'index'}{$pos}++;
-}
-
-sub _reverse_count_array {
-	my ($a, $data) = @_;
-	if ($a->paired) {
-		my $first = $a->get_tag_values('FIRST_MATE');
-		return if ($first and not $a->reversed);
-		return if (not $first and $a->reversed);
-	}
-	else {
-		return unless $a->reversed;
-	}
-	$data->{'scores'}->[0] += 1;
-}
-
-sub _reverse_precise_count_array {
-	my ($a, $data) = @_;
-	if ($a->paired) {
-		my $first = $a->get_tag_values('FIRST_MATE');
-		return if ($first and not $a->reversed);
-		return if (not $first and $a->reversed);
-	}
-	else {
-		return unless $a->reversed;
-	}
-	return unless ($a->pos >= $data->{start} and $a->calend <= $data->{stop} );
-	$data->{'scores'}->[0] += 1;
-}
-
-sub _reverse_name_array {
-	my ($a, $data) = @_;
-	if ($a->paired) {
-		my $first = $a->get_tag_values('FIRST_MATE');
-		return if ($first and not $a->reversed);
-		return if (not $first and $a->reversed);
-	}
-	else {
-		return unless $a->reversed;
-	}
-	push @{ $data->{'scores'} }, $a->qname;
-}
-
-sub _reverse_length_indexed {
-	my ($a, $data) = @_;
-	if ($a->paired) {
-		my $first = $a->get_tag_values('FIRST_MATE');
-		return if ($first and not $a->reversed);
-		return if (not $first and $a->reversed);
-	}
-	else {
-		return unless $a->reversed;
-	}
-	my $pos = int( ($a->pos + 1 + $a->calend) / 2);
-	if ( $pos >= $data->{'start'} and $pos <= $data->{'stop'} ) {
-		push @{ $data->{'index'}{$pos} }, ($a->calend - $a->pos);
-	}
-}
-
-sub _reverse_length_array {
-	my ($a, $data) = @_;
-	if ($a->paired) {
-		my $first = $a->get_tag_values('FIRST_MATE');
-		return if ($first and not $a->reversed);
-		return if (not $first and $a->reversed);
-	}
-	else {
-		return unless $a->reversed;
-	}
-	push @{ $data->{'scores'} }, ($a->calend - $a->pos);
-}
-
-
-
 
 __END__
 
@@ -1012,35 +402,22 @@ Bio::ToolBox::db_helper::bam
 
 =head1 DESCRIPTION
 
-This module is used to collect the dataset scores from a binary 
-bam file (.bam) of alignments. Bam files may be local or remote, 
-and are usually prefixed with 'file:', 'http://', of 'ftp://'.
-
-Collected data values may be restricted to strand by specifying the desired 
-strandedness (sense, antisense, or all), 
-depending on the method of data collection. Collecting scores, or basepair 
-coverage of alignments over the region of interest, does not currently support 
-stranded data collection (as of this writing). However, enumerating 
-alignments (count method) and collecting alignment lengths do support 
-stranded data collection. Alignments are checked to see whether their midpoint 
-is within the search interval before counting or length collected. 
-
-As of version 1.30, paired-end bam files are properly handled with regards 
-to strand; Strand is determined by the orientation of the first mate. However, 
-pairs are still counted as two alignments, not one. To avoid this, use the 
-value_type of 'ncount' and count the number of unique alignment names. 
-(Previous versions treated all paired-end alignments as single-end alignments, 
-severely limiting usefulness.)
+This module provides support for binary bam alignment files to the 
+L<Bio::ToolBox> package through the samtools C library. 
 
 =head1 USAGE
 
-The module requires Lincoln Stein's Bio::DB::Sam to be installed. 
+The module requires L<Bio::DB::Sam> to be installed, which in turn 
+requires the samtools C library version 1.20 or less to be installed.
 
-Load the module at the beginning of your program.
+In general, this module should not be used directly. Use the methods 
+available in L<Bio::ToolBox::db_helper> or <Bio::ToolBox::Data>.  
 
-	use Bio::ToolBox::db_helper::bam;
+All subroutines are exported by default.
 
-It will automatically export the name of the subroutines. 
+=head2 Available subroutines
+
+All subroutines are exported by default.
 
 =over
 
@@ -1054,10 +431,20 @@ in the parent directory.
 
 It will return the opened database object.
 
+=item open_indexed_fasta()
+
+This will open an indexed fasta file using the L<Bio::DB::Sam::Fai> 
+module. It requires a F<.fa.fai> file to built, and one should be 
+automatically built if it is not present. This provides a very fast 
+interface to fetch genomic sequences, but no other support is 
+provided. Pass the path to an uncompressed genomic fasta file 
+(multiple sequences in one file is supported, but separate chromosome 
+sequence files are not). The fasta index object is returned.
+
 =item check_bam_index()
 
 This subroutine will check whether a bam index file is present and, 
-if not, generate one. The Bio::DB::Sam module uses the samtools 
+if not, generate one. The L<Bio::DB::Sam> module uses the samtools 
 style index extension, F<.bam.bai>, as opposed to the picard style 
 extension, F<.bai>. If a F<.bai> index is present, it will copy the 
 file as F<.bam.bai> index. Unfortunately, a F<.bai> index cannot be 
@@ -1076,67 +463,39 @@ what to do before using this method!
 
 This subroutine will collect only the data values from a binary bam file 
 for the specified database region. The positional information of the 
-scores is not retained, and the values are best further processed through 
-some statistical method (mean, median, etc.).
+scores is not retained.
 
-The subroutine is passed seven or more arguments in the following order:
+Collected data values may be restricted to strand by specifying the desired 
+strandedness (sense, antisense, or all), 
+depending on the method of data collection. Collecting scores, or basepair 
+coverage of alignments over the region of interest, does not currently support 
+stranded data collection (as of this writing). However, enumerating 
+alignments (count method) and collecting alignment lengths do support 
+stranded data collection. Alignments are checked to see whether their midpoint 
+is within the search interval before counting or length collected. 
 
-=over 4
+As of version 1.30, paired-end bam files are properly handled with regards 
+to strand; Strand is determined by the orientation of the first mate. However, 
+pairs are still counted as two alignments, not one. To avoid this, use the 
+value_type of 'ncount' and count the number of unique alignment names. 
+(Previous versions treated all paired-end alignments as single-end alignments, 
+severely limiting usefulness.)
 
-=item 1. The chromosome or seq_id
+The subroutine is passed a parameter array reference. See below for details.
 
-=item 2. The start position of the segment to collect 
-
-=item 3. The stop or end position of the segment to collect 
-
-=item 4. The strand of the segment to collect
-
-Strand values should be in BioPerl standard values, i.e. -1, 0, or 1.
-
-=item 5. The strandedness of the data to collect
-
-A scalar value representing the desired strandedness of the data 
-to be collected. Acceptable values include "sense", "antisense", 
-or "all". Only those scores which match the indicated 
-strandedness are collected.
-
-=item 6. The value type of data to collect
-
-Acceptable values include score, count, pcount, ncount, and length.
-
-   * score returns the basepair coverage of alignments over the 
-   region of interest
-   
-   * count returns the number of alignments that overlap the 
-   search region. 
-   
-   * pcount, or precise count, returns the count of alignments 
-   whose start and end fall within the region. 
-   
-   * ncount, or named count, returns an array of alignment read  
-   names. Use this to avoid double-counting paired-end reads by 
-   counting only unique names. Reads are taken if they overlap 
-   the search region.
-   
-   length returns the lengths of all overlapping alignments 
-
-=item 7. Paths to one or more Bam files
-
-=back
-
-The subroutine returns an array of the defined dataset values found within 
-the region of interest. 
+The subroutine returns an array or array reference of the requested dataset 
+values found within the region of interest. 
 
 =item collect_bam_position_scores
 
 This subroutine will collect the score values from a binary bam file 
 for the specified database region keyed by position. 
 
-The subroutine is passed the same arguments as collect_bam_scores().
+The subroutine is passed a parameter array reference. See below for details.
 
-The subroutine returns a hash of the defined dataset values found within 
-the region of interest keyed by position. The feature midpoint is used 
-as the key position. When multiple features are found at the same 
+The subroutine returns a hash or hash reference of the defined dataset values 
+found within the region of interest keyed by position. The feature midpoint 
+is used as the key position. When multiple features are found at the same 
 position, a simple mean (for length data methods) or sum 
 (for count methods) is returned. The ncount value type is not supported 
 with positioned scores.
@@ -1178,6 +537,59 @@ conservative two processes when it is installed.
 =back
        
 The subroutine will return the number of alignments.
+
+=back
+
+=head2 Data Collection Parameters Reference
+
+The data collection subroutines are passed an array reference of parameters. 
+The recommended  method for data collection is to use get_segment_score() method from 
+L<Bio::ToolBox::db_helper>. 
+
+The parameters array reference includes these items:
+
+=over 4
+
+=item 1. The chromosome or seq_id
+
+=item 1. The start position of the segment to collect 
+
+=item 3. The stop or end position of the segment to collect 
+
+=item 4. The strand of the segment to collect
+
+Should be standard BioPerl representation: -1, 0, or 1.
+
+=item 5. The strandedness of the data to collect 
+
+A scalar value representing the desired strandedness of the data 
+to be collected. Acceptable values include "sense", "antisense", 
+or "all". Only those scores which match the indicated 
+strandedness are collected.
+
+=item 6. The method for combining scores.
+
+Acceptable values include score, count, pcount, and ncount.
+
+   * score returns the basepair coverage of alignments over the 
+   region of interest
+   
+   * count returns the number of alignments that overlap the 
+   search region. 
+   
+   * pcount, or precise count, returns the count of alignments 
+   whose start and end fall within the region. 
+   
+   * ncount, or named count, returns an array of alignment read  
+   names. Use this to avoid double-counting paired-end reads by 
+   counting only unique names. Reads are taken if they overlap 
+   the search region.
+   
+=item 7. A database object.
+
+Not used here.
+
+=item 8 and higher. Paths to one or more Bam files
 
 =back
 

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION @ISA);
-$VERSION = '0.09';
+$VERSION = '0.10';
 
 #--------------------------------------------------------------------------
 
@@ -92,6 +92,7 @@ sub search {
     return $self->handler("Invalid ISBN specified")   
         if(!$ean || (length $isbn == 13 && $isbn ne $ean)
                  || (length $isbn == 10 && $isbn ne $self->convert_to_isbn10($ean)));
+    my $isbn10 = $self->convert_to_isbn10($ean);
 
 	my $mech = WWW::Mechanize->new();
     $mech->agent_alias( 'Windows IE 6' );
@@ -115,25 +116,22 @@ sub search {
 #print STDERR "\n# html=[\n$html\n]\n";
 
     my $data;
-    ($data->{isbn13})       = $html =~ m!<td width="25%"><b>ISBN13</b></td><td width="25%">([^<]+)!si;
-    ($data->{isbn10})       = $html =~ m!<td width="25%"><b>ISBN</b></td><td width="25%">([^<]+)</td>!si;
-    ($data->{title})        = $html =~ m!title="ISBN: $data->{isbn13} - ([^"]+)"!si;
-    ($data->{author})       = $html =~ m!title="Search for other titles by this author"[^>]+>([^<]+)</a>!si;
-    ($data->{binding})      = $html =~ m!<span class="product-info-label">\s*Format:\s*</span>([^<]+)<br />!si;
-    ($data->{publisher})    = $html =~ m!<span class="product-info-label">\s*Publisher:\s*</span><a [^>]+>([^<]+)</a>!si;
-    ($data->{pubdate})      = $html =~ m!<td width="25%"><b>Publication date</b></td><td width="25%">([^<]+)</td>!si;
-    ($data->{description})  = $html =~ m{<p id="product-descr">([^<]+)}si;
-    ($data->{pages})        = $html =~ m!<td width="25%"><b>Pages</b></td><td width="25%">([^<]+)</td>!si;
-    ($data->{weight})       = $html =~ m!<td width="25%"><b>Weight \(grammes\)</b></td><td width="25%">([^<]+)</td>!si;
-    ($data->{height})       = $html =~ m!<td width="25%"><b>Height \(mm\)</b></td><td width="25%">([^<]+)</td>!si;
-    ($data->{width})        = $html =~ m!<td width="25%"><b>Width \(mm\)</b></td><td width="25%">([^<]+)</td>!si;
+    ($data->{isbn13})       = $html =~ m!<meta property="book:isbn"\s+content="(\d+)"\s+/>!si;
+    ($data->{title})        = $html =~ m!<meta property="og:title"\s+content="([^"]+)"\s+/>!si;
+    ($data->{author})       = $html =~ m!<p class="product__author">\s*<a[^>]+>([^<]+)</a>!si;
+    ($data->{binding})      = $html =~ m!<p class="product__format">\s*<span itemprop="bookFormat" >([^<\(]+)!si;
+    ($data->{publisher})    = $html =~ m!<td>Publisher:</td>\s*<td itemprop="publisher">\s*<a[^>]+>([^<]+)</a>!si;
+    ($data->{pubdate})      = $html =~ m!<td>Pub date:</td>\s*<td itemprop="datePublished" content="([^"]+)">!si;
+    ($data->{description})  = $html =~ m!<meta property="og:description"\s+content="([^"]+)"\s+/>!si;
+    ($data->{pages})        = $html =~ m!<td>Number of pages:</td>\s*<td itemprop="numberOfPages">(\d+)</td>!si;
+    ($data->{weight})       = $html =~ m!<td>Weight:</td>\s*<td itemprop="weight">(\d+)g</td>!si;
+    ($data->{height})       = $html =~ m!<td>Height:</td>\s*<td>(\d+)mm</td>!si;
+    ($data->{width})        = $html =~ m!<td>Width:</td>\s*<td>(\d+)mm</td>!si;
+    ($data->{image})        = $html =~ m!<meta property="og:image"\s+content="([^"]+)"\s+/>!si;
 
-    ($data->{image},$data->{thumb})
-                            = $html =~ m!<a href="(/images/jackets/l/\d+/\d+.jpg)" data-lightbox="multi-image"><img class="jacket".*?src="(/images/jackets/m/\d+/\d+.jpg)" /></a>!si;
-
-    $data->{image} = REFERER . $data->{image}   if($data->{image});
-    $data->{thumb} = REFERER . $data->{thumb}   if($data->{thumb});
-
+    $data->{image}     =~ s!https:///!https://bookshop.blackwell.co.uk/!;
+    $data->{thumb}     = $data->{image};
+    $data->{isbn10}    = $isbn10;
     $data->{publisher} =~ s/&#0?39;/'/g;
 
 #use Data::Dumper;
@@ -216,7 +214,7 @@ be forthcoming, please feel free to (politely) remind me.
 
 =head1 COPYRIGHT & LICENSE
 
-  Copyright (C) 2010-2014 Barbie for Miss Barbell Productions
+  Copyright (C) 2010-2017 Barbie for Miss Barbell Productions
 
   This distribution is free software; you can redistribute it and/or
   modify it under the Artistic Licence v2.

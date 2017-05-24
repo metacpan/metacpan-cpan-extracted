@@ -5,8 +5,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep  6 14:58:26 2016
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Dec  6 11:23:19 2016
-# Update Count    : 71
+# Last Modified On: Mon May 22 08:35:13 2017
+# Update Count    : 78
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -128,6 +128,7 @@ sub yfitaen {
 sub yfitaen1 {
     my ( $t ) = @_;
     # Indeed, the reverse of neatify. And a bit easier.
+    $t =~ s/([[:alnum:]])\s+([[:alnum:]])/$1,$2/g;
     $t =~ s/\s+//g;
     $t =~ s/_/ /g;
     return $t;

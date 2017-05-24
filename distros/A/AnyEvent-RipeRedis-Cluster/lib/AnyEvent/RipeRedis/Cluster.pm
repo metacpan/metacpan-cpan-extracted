@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use base qw( Exporter );
 
-our $VERSION = '0.26';
+our $VERSION = '0.28';
 
 use AnyEvent::RipeRedis;
 use AnyEvent::RipeRedis::Error;
@@ -19,8 +19,9 @@ my %ERROR_CODES;
 
 BEGIN {
   %ERROR_CODES = %AnyEvent::RipeRedis::Error::ERROR_CODES;
-  our @EXPORT_OK   = ( keys %ERROR_CODES, qw( crc16 hash_slot ) );
-  our %EXPORT_TAGS = ( err_codes => \@EXPORT_OK );
+  my @err_codes  = keys %ERROR_CODES;
+  our @EXPORT_OK = ( @err_codes, qw( crc16 hash_slot ) );
+  our %EXPORT_TAGS = ( err_codes => \@err_codes );
 }
 
 use constant {
@@ -624,19 +625,19 @@ sub _route {
   }
 
   my $key;
-  my $cmd_info = $self->{_commands}{ $cmd->{kwds}[0] };
+  my $kwds = $cmd->{kwds};
+  my $args = $cmd->{args};
+  my $cmd_info = $self->{_commands}{ $kwds->[0] };
 
   if ( defined $cmd_info ) {
-    my @tokens = ( @{ $cmd->{kwds} }, @{ $cmd->{args} } );
-
     if ( $cmd_info->{key_pos} > 0 ) {
-      $key = $tokens[ $cmd_info->{key_pos} ];
+      $key = $args->[ $cmd_info->{key_pos} - scalar @{$kwds} ];
     }
     # Exception for EVAL and EVALSHA commands
     elsif ( $cmd_info->{movablekeys}
-      && $tokens[2] > 0 )
+      && $args->[1] > 0 )
     {
-      $key = $tokens[3];
+      $key = $args->[2];
     }
   }
 
@@ -783,7 +784,6 @@ sub _reset_internals {
   my $self = shift;
 
   $self->{_nodes_pool}    = undef;
-  $self->{_startup_nodes} = undef;
   $self->{_nodes}         = undef;
   $self->{_master_nodes}  = undef;
   $self->{_slots}         = undef;
@@ -961,6 +961,7 @@ L<http://redis.io/topics/cluster-spec>
       { host => 'localhost', port => 7001 },
       { host => 'localhost', port => 7002 },
     ],
+    password           => 'yourpass',
     connection_timeout => 5,
     read_timeout       => 5,
     refresh_interval   => 5,
@@ -1142,10 +1143,10 @@ L<AnyEvent::RipeRedis::Error>.
 
 Before the command execution, the client determines the pool of nodes, on which
 the command can be executed. The pool can contain the one or more nodes
-depending on the cluster and the client configurations, and command type. The
-client will try to execute the command on random node from the pool and, if the
-command failed on selected node, the client will try to execute it on another
-random node.
+depending on the cluster and the client configurations, and the command type.
+The client will try to execute the command on random node from the pool and, if
+the command failed on selected node, the client will try to execute it on
+another random node.
 
 The command callback is optional. If it is not specified and any error
 occurred, the C<on_error> callback of the client is called.

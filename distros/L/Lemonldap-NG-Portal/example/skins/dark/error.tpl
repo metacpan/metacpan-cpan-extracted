@@ -6,8 +6,16 @@
     <div class="message negative"><ul><li><lang en="You have no access authorization for this application" fr="Vous n'avez pas les droits d'acc&egrave;s &agrave; cette application" /></li></ul></div>
   </TMPL_IF>
 
+  <TMPL_IF ERROR404>
+    <div class="message negative"><ul><li><lang en="Not found: you try to access to an unavailable page" fr="Non trouv&eacute;: vous tentez d'acc&eacute;der &agrave; une page non disponible" /></li></ul></div>
+  </TMPL_IF>
+
   <TMPL_IF ERROR500>
     <div class="message negative"><ul><li><lang en="Error occurs on the server" fr="Une erreur est survenue sur le serveur" /></li></ul></div>
+  </TMPL_IF>
+
+  <TMPL_IF ERROR502>
+    <div class="message negative"><ul><li><lang en="Bad gateway: unable to join remote server" fr="Mauvaise passerelle: impossible de joindre le serveur amont" /></li></ul></div>
   </TMPL_IF>
 
   <TMPL_IF ERROR503>

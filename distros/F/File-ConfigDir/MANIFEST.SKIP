@@ -1,6 +1,7 @@
 \B\.svn\b
 \B\.git\b
 \.gitignore$
+.travis.yml
 \.[Bb][Aa][Kk]$
 \.orig$
 \.old$

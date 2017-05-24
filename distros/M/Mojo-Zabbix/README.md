@@ -111,24 +111,11 @@ The module is compatible and tested with Zabbix less version 3.0
     内存利用率 - { vm.memory.size[pused] } : 4.720467
     内存总空间 - { vm.memory.size[total] } : 270763327488
     
-## More 更多说明
-
-wo can add the program to crontab  and gain the result for mail
-or some Im tool.
-
-我们可以通过cron定时调用程序获得结果，也可以通过IM工具（qq，微信，
-目前有个webqq（https://github.com/sjdy521/Mojo-Webqq）的插件,交互
-性获取监控数据。
-
-本模块有个高级函数打包模块Mojo::Zabbix:APP 可以更方便使用:
-
 ## Mojo-Zabbix-APP
 
 The application of Mojo-Zabbix module。
 Get data from zabbix data include host，items, Triggers and warns and so on.
 
-## 中文介绍
- 
    是Mojo::Zabix模块的应用模块，对zabbix api常见模块进行打包
 可以方便的获取zabbix信息，目前包括zabbix版本，主机列表，监控列表，触发器，警告
 等，可以根据需求提供更多的操作。
@@ -193,9 +180,16 @@ Get data from zabbix data include host，items, Triggers and warns and so on.
     2016-10-19 19:12:53  : 192.168.3.* : 磁盘sda IO利用率超过95%
     2016-10-19 18:03:03  : 192.168.4.* : Too many processes on {HOST.NAME}
 
-## more,更多实例见 
 
-   example/example.pl
+## More,更多说明
+
+wo can add the program to crontab  and gain the result for mail
+or some Im tool.
+
+我们可以通过cron定时调用程序获得结果，也可以通过IM工具（qq，微信，
+目前有个webqq（https://github.com/sjdy521/Mojo-Webqq）的插件,交互
+性获取监控数据。
+
 
 ## Git repo
  

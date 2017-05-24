@@ -1,0 +1,9 @@
+.# For loop just to see how long this takes.
+.let iter := 10000
+.echo Before for loop containing one arith statement - iterations \v{iter}
+.let j := 0
+.for -i0 i := 0 ;; i < iter ;; i++
+.noop
+.let j := j + i
+.done
+.echo After for, j = \v{j}

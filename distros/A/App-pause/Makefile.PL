@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
     "Scalar::Util" => 0,
     "Scalar::Util::Numeric" => 0,
     "Time::Duration::Parse::AsHash" => 0,
-    "WWW::PAUSE::Simple" => "0.34",
+    "WWW::PAUSE::Simple" => "0.38",
     "strict" => 0,
     "warnings" => 0
   },
@@ -43,7 +43,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.59",
+  "VERSION" => "0.60",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -68,7 +68,7 @@ my %FallbackPrereqs = (
   "Scalar::Util::Numeric" => 0,
   "Test::More" => 0,
   "Time::Duration::Parse::AsHash" => 0,
-  "WWW::PAUSE::Simple" => "0.34",
+  "WWW::PAUSE::Simple" => "0.38",
   "strict" => 0,
   "warnings" => 0
 );

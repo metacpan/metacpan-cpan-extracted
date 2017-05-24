@@ -1,10 +1,18 @@
 Revision history for WWW-Correios-SRO
 
+0.12    2017-05-23
+    - support for multiple codes in the same sro() query (GARU)
+
+0.11    2017-05-23
+    - updated sro prefix list (GARU)
+    - updated code to use proper Correios Web Services (GARU)
+    - new 'status_da_entrega()' function for macro delivery status (GARU)
+
 0.10    2014-09-15
     - New sub: sro_sigla, wich discovers the meaning of a sro prefix (RLOPES)
-    - Previous existance of the SRO prefix in the 'sigla' hash is no longer 
-         needed. It will check only the numbers and the validation digit before
-         going to Correios' website to get infos about the SRO. (RLOPES)
+    - Previous existance of the SRO prefix in the 'sigla' hash is no longer
+      needed. It will check only the numbers and the validation digit before
+      going to Correios' website to get infos about the SRO. (RLOPES)
 
 0.09    2014-08-13
     - Updating the list of valid tracking code identifiers (RLOPES).

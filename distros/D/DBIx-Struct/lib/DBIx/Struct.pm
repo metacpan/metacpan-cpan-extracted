@@ -190,7 +190,7 @@ use Data::Dumper;
 use base 'Exporter';
 use v5.14;
 
-our $VERSION = '0.22';
+our $VERSION = '0.24';
 
 our @EXPORT = qw{
 	one_row
@@ -435,6 +435,8 @@ sub _not_yet_connected {
 					$connect_attrs->{pg_enable_utf8} = 1;
 				} elsif ($driver eq 'mysql') {
 					$connect_attrs->{mysql_enable_utf8} = 1;
+				} elsif ($driver eq 'SQLite') {
+					$connect_attrs->{sqlite_unicode} = 1;
 				}
 			}
 		}
@@ -627,28 +629,28 @@ NEW
 						if(CORE::ref(\$insert{\$_}) eq 'ARRAY' and CORE::ref(\$insert{\$_}[0]) eq 'SCALAR') {
 							CORE::push \@bind, \@{\$insert{\$_}}[1..\$#{\$insert{\$_}}];
 							CORE::push \@values, \${\$insert{\$_}[0]};
-							"\$_";
+							DBIx::Struct::connect->dbh->quote_identifier(\$_);
 						} elsif(CORE::ref(\$insert{\$_}) eq 'REF' and CORE::ref(\${\$insert{\$_}}) eq 'ARRAY') {
 							if(CORE::defined \${\$insert{\$_}}->[0]) {
 								CORE::push \@bind, \@{\${\$insert{\$_}}}[1..\$#{\${\$insert{\$_}}}];
 								CORE::push \@values, \${\$insert{\$_}}->[0];
-								"\$_";
+								DBIx::Struct::connect->dbh->quote_identifier(\$_);
 							} else {
 								CORE::push \@values, "null";
-								"\$_"
+								DBIx::Struct::connect->dbh->quote_identifier(\$_)
 							}
 						} elsif(CORE::ref(\$insert{\$_}) eq 'SCALAR') {
 							CORE::push \@values, \${\$insert{\$_}};
-							"\$_";
+							DBIx::Struct::connect->dbh->quote_identifier(\$_);
 						} elsif(CORE::exists (\$json_fields{\$_})
 							&& (CORE::ref(\$insert{\$_}) eq 'ARRAY' || CORE::ref(\$insert{\$_}) eq 'HASH')) {
 							CORE::push \@bind, JSON::to_json(\$insert{\$_});
 							CORE::push \@values, "?";
-							"\$_" 
+							DBIx::Struct::connect->dbh->quote_identifier(\$_);
 						} else {
 							CORE::push \@bind, \$insert{\$_};
 							CORE::push \@values, "?";
-							"\$_" 
+							DBIx::Struct::connect->dbh->quote_identifier(\$_);
 						}						
 					} CORE::keys \%insert;
 				my \$insert;
@@ -812,23 +814,23 @@ sub make_object_update {
 						CORE::map { 
 							if(CORE::ref(\$set_hash{\$_}) eq 'ARRAY' and CORE::ref(\$set_hash{\$_}[0]) eq 'SCALAR') {
 								CORE::push \@bind, \@{\$set_hash{\$_}}[1..\$#{\$set_hash{\$_}}];
-								"\$_ = " . \${\$set_hash{\$_}[0]};
+								DBIx::Struct::connect->dbh->quote_identifier(\$_) . " = " . \${\$set_hash{\$_}[0]};
 							} elsif(CORE::ref(\$set_hash{\$_}) eq 'REF' and CORE::ref(\${\$set_hash{\$_}}) eq 'ARRAY') {
 								if(CORE::defined \${\$set_hash{\$_}}->[0]) {
 									CORE::push \@bind, \@{\${\$set_hash{\$_}}}[1..\$#{\${\$set_hash{\$_}}}];
-									"\$_ = " . \${\$set_hash{\$_}}->[0];
+									DBIx::Struct::connect->dbh->quote_identifier(\$_) . " = " . \${\$set_hash{\$_}}->[0];
 								} else {
-									"\$_ = null"
+									DBIx::Struct::connect->dbh->quote_identifier(\$_) . " = null"
 								}
 							} elsif(CORE::ref(\$set_hash{\$_}) eq 'SCALAR') {
-								"\$_ = " . \${\$set_hash{\$_}};
+								DBIx::Struct::connect->dbh->quote_identifier(\$_) . " = " . \${\$set_hash{\$_}};
 							} elsif(CORE::exists(\$json_fields{\$_})
 								&& (CORE::ref(\$set_hash{\$_}) eq 'ARRAY' || CORE::ref(\$set_hash{\$_}) eq 'HASH')) {
 								CORE::push \@bind, JSON::to_json(\$set_hash{\$_});
-								"\$_ = ?" 
+								DBIx::Struct::connect->dbh->quote_identifier(\$_) . " = ?" 
 							} else {
 								CORE::push \@bind, \$set_hash{\$_};
-								"\$_ = ?" 
+								DBIx::Struct::connect->dbh->quote_identifier(\$_) . " = ?" 
 							}						
 						} CORE::keys \%set_hash;
 				}
@@ -856,23 +858,23 @@ sub make_object_update {
 							local *column_value = \\\$self->[@{[_row_data]}][\$fields{\$_}];
 							if(CORE::ref(\$column_value) eq 'ARRAY' and CORE::ref(\$column_value->[0]) eq 'SCALAR') {
 								CORE::push \@bind, \@{\$column_value}[1..\$#\$column_value];
-								"\$_ = " . \${\$column_value->[0]};
+								DBIx::Struct::connect->dbh->quote_identifier(\$_) . " = " . \${\$column_value->[0]};
 							} elsif(CORE::ref(\$column_value) eq 'REF' and CORE::ref(\${\$column_value}) eq 'ARRAY') {
 								if(CORE::defined \${\$column_value}->[0]) {
 									CORE::push \@bind, \@{\${\$column_value}}[1..\$#{\${\$column_value}}];
-									"\$_ = " . \${\$column_value}->[0];
+									DBIx::Struct::connect->dbh->quote_identifier(\$_) . " = " . \${\$column_value}->[0];
 								} else {
-									"\$_ = null"
+									DBIx::Struct::connect->dbh->quote_identifier(\$_) . " = null"
 								}
 							} elsif(CORE::ref(\$column_value) && CORE::ref(\$column_value) =~ /^DBIx::Struct::JSON/) {
 								\$column_value->revert;
 								CORE::push \@bind, \$column_value;
-								"\$_ = ?" 
+								DBIx::Struct::connect->dbh->quote_identifier(\$_) . " = ?" 
 							} elsif(CORE::ref(\$column_value) eq 'SCALAR') {
-								"\$_ = " . \$\$column_value;
+								DBIx::Struct::connect->dbh->quote_identifier(\$_) . " = " . \$\$column_value;
 							} else {
 								CORE::push \@bind, \$column_value;
-								"\$_ = ?" 
+								DBIx::Struct::connect->dbh->quote_identifier(\$_) . " = ?" 
 							}						
 						} CORE::keys \%{\$self->[@{[_row_updates]}]};
 				}

@@ -1,7 +1,7 @@
 package Bencher::Scenario::CmdLineParsingModules;
 
-our $DATE = '2017-01-25'; # DATE
-our $VERSION = '0.06'; # VERSION
+our $DATE = '2017-05-24'; # DATE
+our $VERSION = '0.07'; # VERSION
 
 use 5.010001;
 use strict;
@@ -19,6 +19,10 @@ our $scenario = {
         },
         {
             fcall_template => 'Complete::Bash::parse_cmdline(<cmdline>, 0)',
+        },
+        {
+            fcall_template => 'Text::ParseWords::shellwords(<cmdline>)',
+            result_is_list => 1,
         },
     ],
 
@@ -65,7 +69,7 @@ Bencher::Scenario::CmdLineParsingModules - Benchmark command-line parsing module
 
 =head1 VERSION
 
-This document describes version 0.06 of Bencher::Scenario::CmdLineParsingModules (from Perl distribution Bencher-Scenario-CmdLineParsingModules), released on 2017-01-25.
+This document describes version 0.07 of Bencher::Scenario::CmdLineParsingModules (from Perl distribution Bencher-Scenario-CmdLineParsingModules), released on 2017-05-24.
 
 =head1 SYNOPSIS
 
@@ -91,6 +95,8 @@ L<Complete::Bash> 0.31
 
 L<Parse::CommandLine> 0.02
 
+L<Text::ParseWords> 3.30
+
 =head1 BENCHMARK PARTICIPANTS
 
 =over
@@ -108,6 +114,14 @@ Function call template:
 Function call template:
 
  Complete::Bash::parse_cmdline(<cmdline>, 0)
+
+
+
+=item * Text::ParseWords::shellwords (perl_code)
+
+Function call template:
+
+ Text::ParseWords::shellwords(<cmdline>)
 
 
 
@@ -137,14 +151,18 @@ Benchmark with default options (C<< bencher -m CmdLineParsingModules >>):
  +----------------------------------------+--------------+-----------+-----------+------------+---------+---------+
  | participant                            | dataset      | rate (/s) | time (μs) | vs_slowest |  errors | samples |
  +----------------------------------------+--------------+-----------+-----------+------------+---------+---------+
- | Parse::CommandLine::parse_command_line | 4args        |     34000 | 29.4      |     1      | 1.2e-08 |      24 |
- | Complete::Bash::parse_cmdline          | 4args        |     38100 | 26.2      |     1.12   | 1.3e-08 |      20 |
- | Complete::Bash::parse_cmdline          | 2args-simple |     93000 | 11        |     2.7    | 1.3e-08 |      20 |
- | Parse::CommandLine::parse_command_line | 2args-simple |    137000 |  7.29     |     4.03   | 3.3e-09 |      20 |
- | Complete::Bash::parse_cmdline          | cmd-only     |    220000 |  4.5      |     6.5    | 6.5e-09 |      21 |
- | Parse::CommandLine::parse_command_line | cmd-only     |    354000 |  2.82     |    10.4    | 6.7e-10 |      31 |
- | Complete::Bash::parse_cmdline          | empty        |   1300000 |  0.8      |    37      | 1.7e-09 |      20 |
- | Parse::CommandLine::parse_command_line | empty        |   2949820 |  0.339004 |    86.6955 |   0     |      20 |
+ | Parse::CommandLine::parse_command_line | 4args        |     34000 |   29      |       1    | 5.3e-08 |      20 |
+ | Text::ParseWords::shellwords           | 4args        |     34000 |   29      |       1    | 5.3e-08 |      20 |
+ | Complete::Bash::parse_cmdline          | 4args        |     38400 |   26.1    |       1.13 | 1.3e-08 |      20 |
+ | Text::ParseWords::shellwords           | 2args-simple |     83700 |   11.9    |       2.46 |   1e-08 |      20 |
+ | Complete::Bash::parse_cmdline          | 2args-simple |     93400 |   10.7    |       2.74 | 2.9e-09 |      26 |
+ | Parse::CommandLine::parse_command_line | 2args-simple |    130000 |    7.8    |       3.8  | 2.2e-08 |      37 |
+ | Complete::Bash::parse_cmdline          | cmd-only     |    214000 |    4.67   |       6.28 | 1.7e-09 |      20 |
+ | Text::ParseWords::shellwords           | cmd-only     |    216000 |    4.62   |       6.35 | 1.7e-09 |      20 |
+ | Parse::CommandLine::parse_command_line | cmd-only     |    358000 |    2.79   |      10.5  | 7.9e-10 |      22 |
+ | Text::ParseWords::shellwords           | empty        |   1181000 |    0.8466 |      34.66 |   1e-11 |      20 |
+ | Complete::Bash::parse_cmdline          | empty        |   1276000 |    0.7839 |      37.43 | 2.9e-11 |      20 |
+ | Parse::CommandLine::parse_command_line | empty        |   3000000 |    0.34   |      87    | 6.1e-10 |      21 |
  +----------------------------------------+--------------+-----------+-----------+------------+---------+---------+
 
 
@@ -154,9 +172,10 @@ Benchmark module startup overhead (C<< bencher -m CmdLineParsingModules --module
  +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
  | participant         | proc_private_dirty_size (MB) | proc_rss_size (MB) | proc_size (MB) | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
  +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
- | Parse::CommandLine  | 1.1                          | 4.4                | 16             |       9.5 |                    4   |        1   | 3.9e-05 |      20 |
- | Complete::Bash      | 0.82                         | 4.1                | 16             |       9.4 |                    3.9 |        1   | 1.8e-05 |      20 |
- | perl -e1 (baseline) | 1                            | 4.5                | 16             |       5.5 |                    0   |        1.7 | 1.5e-05 |      20 |
+ | Complete::Bash      | 0.99                         | 4.4                | 16             |       8.2 |                    4.1 |        1   | 2.3e-05 |      20 |
+ | Parse::CommandLine  | 1.1                          | 4.4                | 16             |       8   |                    3.9 |        1   | 2.4e-05 |      20 |
+ | Text::ParseWords    | 0.82                         | 4.1                | 16             |       7.5 |                    3.4 |        1.1 | 2.2e-05 |      20 |
+ | perl -e1 (baseline) | 1                            | 4.4                | 16             |       4.1 |                    0   |        2   | 5.8e-06 |      20 |
  +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
 
 
@@ -184,7 +203,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

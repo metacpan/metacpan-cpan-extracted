@@ -3,7 +3,7 @@ package Catalyst::Helper::HTML::FormFu;
 use strict;
 use warnings;
 
-our $VERSION = '2.01'; # VERSION
+our $VERSION = '2.02'; # VERSION
 
 use File::Spec;
 use HTML::FormFu::Deploy;
@@ -38,7 +38,7 @@ Catalyst::Helper::HTML::FormFu - Helper to deploy HTML::FormFu template files.
 
 =head1 VERSION
 
-version 2.01
+version 2.02
 
 =head1 SYNOPSIS
 

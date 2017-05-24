@@ -8,7 +8,7 @@ package Lemonldap::NG::Portal::MailReset;
 use strict;
 use warnings;
 
-our $VERSION = '1.9.8';
+our $VERSION = '1.9.10';
 
 use Lemonldap::NG::Portal::Simple qw(:all);
 use base qw(Lemonldap::NG::Portal::SharedConf Exporter);
@@ -198,6 +198,13 @@ sub getMailUser {
 
     if ( $error == PE_USERNOTFOUND or $error == PE_BADCREDENTIALS ) {
         $self->_sub('userDBFinish');
+        if ( $self->{portalErrorOnMailNotFound} ) {
+            return PE_MAILNOTFOUND;
+        }
+        my $mailTimeout = $self->{mailTimeout} || $self->{timeout};
+        my $expTimestamp = time() + $mailTimeout;
+        $self->{expMailDate} = strftime( "%d/%m/%Y", localtime $expTimestamp );
+        $self->{expMailTime} = strftime( "%H:%M",    localtime $expTimestamp );
         return PE_MAILCONFIRMOK;
     }
 
@@ -378,7 +385,7 @@ sub changePassword {
 
     # Modify the password
     $self->{portalRequireOldPassword} = 0;
-    $self->{user} = $self->{mail};
+    $self->{user}                     = $self->{mail};
     my $result = $self->modifyPassword();
     $self->{user} = undef;
 

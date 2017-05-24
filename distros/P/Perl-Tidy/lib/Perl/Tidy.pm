@@ -3,7 +3,7 @@
 #
 #    perltidy - a perl script indenter and formatter
 #
-#    Copyright (c) 2000-2016 by Steve Hancock
+#    Copyright (c) 2000-2017 by Steve Hancock
 #    Distributed under the GPL license agreement; see file COPYING
 #
 #    This program is free software; you can redistribute it and/or modify
@@ -83,7 +83,7 @@ use File::Copy;
 use File::Temp qw(tempfile);
 
 BEGIN {
-    ( $VERSION = q($Id: Tidy.pm,v 1.74 2016/03/02 13:56:49 perltidy Exp $) ) =~ s/^.*\s+(\d+)\/(\d+)\/(\d+).*$/$1$2$3/; # all one line for MakeMaker
+    ( $VERSION = q($Id: Tidy.pm,v 1.74 2017/05/21 13:56:49 perltidy Exp $) ) =~ s/^.*\s+(\d+)\/(\d+)\/(\d+).*$/$1$2$3/; # all one line for MakeMaker
 }
 
 sub streamhandle {
@@ -1235,7 +1235,14 @@ EOM
             my $fout = IO::File->new("> $input_file")
               or Die
 "problem re-opening $input_file for write for -b option; check file and directory permissions: $!\n";
-            binmode $fout;
+            if ($binmode) {
+                if (   $rOpts->{'character-encoding'}
+                    && $rOpts->{'character-encoding'} eq 'utf8' )
+                {
+                    binmode $fout, ":encoding(UTF-8)";
+                }
+                else { binmode $fout }
+            }
             my $line;
             while ( $line = $output_file->getline() ) {
                 $fout->print($line);
@@ -1721,6 +1728,11 @@ sub generate_options {
     $add_option->( 'maximum-consecutive-blank-lines', 'mbl',  '=i' );
     $add_option->( 'keep-old-blank-lines',            'kbl',  '=i' );
 
+    $add_option->( 'blank-lines-after-opening-block',       'blao',  '=i' );
+    $add_option->( 'blank-lines-before-closing-block',      'blbc',  '=i' );
+    $add_option->( 'blank-lines-after-opening-block-list',  'blaol', '=s' );
+    $add_option->( 'blank-lines-before-closing-block-list', 'blbcl', '=s' );
+
     ########################################
     $category = 9;    # Other controls
     ########################################
@@ -2168,6 +2180,17 @@ sub _process_command_line {
 
     use Getopt::Long;
 
+    # Save any current Getopt::Long configuration
+    # and set to Getopt::Long defaults.  Use eval to avoid
+    # breaking old versions of Perl without these routines.
+    # Previous configuration is reset at the exit of this routine.
+    my $glc;
+    eval { $glc = Getopt::Long::Configure() };
+    unless ($@) {
+        eval { Getopt::Long::ConfigDefaults() };
+    }
+    else { $glc = undef }
+
     my (
         $roption_string,   $rdefaults, $rexpansion,
         $roption_category, $roption_range
@@ -2185,23 +2208,9 @@ sub _process_command_line {
         unless ( $dump_options_type eq 'perltidyrc' ) {
             for $i (@$rdefaults) { push @ARGV, "--" . $i }
         }
-
-        # Patch to save users Getopt::Long configuration
-        # and set to Getopt::Long defaults.  Use eval to avoid
-        # breaking old versions of Perl without these routines.
-        my $glc;
-        eval { $glc = Getopt::Long::Configure() };
-        unless ($@) {
-            eval { Getopt::Long::ConfigDefaults() };
-        }
-        else { $glc = undef }
-
         if ( !GetOptions( \%Opts, @$roption_string ) ) {
             Die "Programming Bug: error in setting default options";
         }
-
-        # Patch to put the previous Getopt::Long configuration back
-        eval { Getopt::Long::Configure($glc) } if defined $glc;
     }
 
     my $word;
@@ -2415,6 +2424,9 @@ EOM
         Die "Error on command line; for help try 'perltidy -h'\n";
     }
 
+    # reset Getopt::Long configuration back to its previous value
+    eval { Getopt::Long::Configure($glc) } if defined $glc;
+
     return ( \%Opts, $config_file, \@raw_options, $roption_string,
         $rexpansion, $roption_category, $roption_range );
 }    # end of _process_command_line
@@ -2501,27 +2513,25 @@ sub check_options {
         $rOpts->{'iterations'} = 1;
     }
 
+    my $check_blank_count = sub {
+        my ( $key, $abbrev ) = @_;
+        if ( $rOpts->{$key} ) {
+            if ( $rOpts->{$key} < 0 ) {
+                $rOpts->{$key} = 0;
+                Warn "negative value of $abbrev, setting 0\n";
+            }
+            if ( $rOpts->{$key} > 100 ) {
+                Warn "unreasonably large value of $abbrev, reducing\n";
+                $rOpts->{$key} = 100;
+            }
+        }
+    };
+
     # check for reasonable number of blank lines and fix to avoid problems
-    if ( $rOpts->{'blank-lines-before-subs'} ) {
-        if ( $rOpts->{'blank-lines-before-subs'} < 0 ) {
-            $rOpts->{'blank-lines-before-subs'} = 0;
-            Warn "negative value of -blbs, setting 0\n";
-        }
-        if ( $rOpts->{'blank-lines-before-subs'} > 100 ) {
-            Warn "unreasonably large value of -blbs, reducing\n";
-            $rOpts->{'blank-lines-before-subs'} = 100;
-        }
-    }
-    if ( $rOpts->{'blank-lines-before-packages'} ) {
-        if ( $rOpts->{'blank-lines-before-packages'} < 0 ) {
-            Warn "negative value of -blbp, setting 0\n";
-            $rOpts->{'blank-lines-before-packages'} = 0;
-        }
-        if ( $rOpts->{'blank-lines-before-packages'} > 100 ) {
-            Warn "unreasonably large value of -blbp, reducing\n";
-            $rOpts->{'blank-lines-before-packages'} = 100;
-        }
-    }
+    $check_blank_count->( 'blank-lines-before-subs',          '-blbs' );
+    $check_blank_count->( 'blank-lines-before-packages',      '-blbp' );
+    $check_blank_count->( 'blank-lines-after-block-opening',  '-blao' );
+    $check_blank_count->( 'blank-lines-before-block-closing', '-blbc' );
 
     # setting a non-negative logfile gap causes logfile to be saved
     if ( defined( $rOpts->{'logfile-gap'} ) && $rOpts->{'logfile-gap'} >= 0 ) {
@@ -3349,7 +3359,7 @@ sub show_version {
     print STDOUT <<"EOM";
 This is perltidy, v$VERSION 
 
-Copyright 2000-2016, Steve Hancock
+Copyright 2000-2017, Steve Hancock
 
 Perltidy is free software and may be copied under the terms of the GNU
 General Public License, which is included in the distribution files.
@@ -3692,7 +3702,10 @@ sub do_syntax_check {
     # now wish for luck...
     my $msg = qx/perl $flags $quoted_stream_filename $error_redirection/;
 
-    unlink $stream_filename if ($is_tmpfile);
+    if ($is_tmpfile) {
+        unlink $stream_filename
+          or Perl::Tidy::Die("couldn't unlink stream $stream_filename: $!\n");
+    }
     return $stream_filename, $msg;
 }
 
@@ -3955,15 +3968,17 @@ sub new {
         unless ($fh) { Perl::Tidy::Die "Cannot write to output stream\n"; }
         $output_file_open = 1;
         if ($binmode) {
-            if ( ref($fh) eq 'IO::File' ) {
-                if (   $rOpts->{'character-encoding'}
-                    && $rOpts->{'character-encoding'} eq 'utf8' )
-                {
-                    binmode $fh, ":encoding(UTF-8)";
+            if (   $rOpts->{'character-encoding'}
+                && $rOpts->{'character-encoding'} eq 'utf8' )
+            {
+                if ( ref($fh) eq 'IO::File' ) {
+                    $fh->binmode(":encoding(UTF-8)");
                 }
-                else { binmode $fh }
+                elsif ( $output_file eq '-' ) {
+                    binmode STDOUT, ":encoding(UTF-8)";
+                }
             }
-            if ( $output_file eq '-' ) { binmode STDOUT }
+            elsif ( $output_file eq '-' ) { binmode STDOUT }
         }
     }
 
@@ -4128,7 +4143,11 @@ sub new {
 
     # remove any old error output file if we might write a new one
     unless ( $fh_warnings || ref($warning_file) ) {
-        if ( -e $warning_file ) { unlink($warning_file) }
+        if ( -e $warning_file ) {
+            unlink($warning_file)
+              or Perl::Tidy::Die(
+                "couldn't unlink warning file $warning_file: $!\n");
+        }
     }
 
     my $logfile_gap =
@@ -5437,7 +5456,13 @@ sub pod_to_html {
 
     # note that we have to unlink tmpfile before making frames
     # because the tmpfile may be one of the names used for frames
-    unlink $tmpfile if -e $tmpfile;
+    if ( -e $tmpfile ) {
+        unless ( unlink($tmpfile) ) {
+            Perl::Tidy::Warn("couldn't unlink temporary file $tmpfile: $!\n");
+            $success_flag = 0;
+        }
+    }
+
     if ( $success_flag && $rOpts->{'frames'} ) {
         $self->make_frame( \@toc );
     }
@@ -6138,6 +6163,9 @@ use vars qw{
   $closing_side_comment_prefix_pattern
   $closing_side_comment_list_pattern
 
+  $blank_lines_after_opening_block_pattern
+  $blank_lines_before_closing_block_pattern
+
   $last_nonblank_token
   $last_nonblank_type
   $last_last_nonblank_token
@@ -6249,6 +6277,9 @@ use vars qw{
   %is_opening_type
   %is_closing_token
   %is_opening_token
+
+  $SUB_PATTERN
+  $ASUB_PATTERN
 };
 
 BEGIN {
@@ -6346,6 +6377,16 @@ BEGIN {
 
     @_ = qw" } ) ] ";
     @is_closing_token{@_} = (1) x scalar(@_);
+
+    # Patterns for standardizing matches to block types for regular subs and
+    # anonymous subs. Examples
+    #  'sub process' is a named sub
+    #  'sub ::m' is a named sub
+    #  'sub' is an anonymous sub
+    #  'sub:' is a label, not a sub
+    #  'substr' is a keyword
+    $SUB_PATTERN  = '^sub\s+(::|\w)';
+    $ASUB_PATTERN = '^sub$';
 }
 
 # whitespace codes
@@ -7620,6 +7661,7 @@ sub check_options {
 
     make_bli_pattern();
     make_block_brace_vertical_tightness_pattern();
+    make_blank_line_pattern();
 
     if ( $rOpts->{'line-up-parentheses'} ) {
 
@@ -7718,7 +7760,7 @@ EOM
     # default keywords for which space is introduced before an opening paren
     # (at present, including them messes up vertical alignment)
     @_ = qw(my local our and or err eq ne if else elsif until
-      unless while for foreach return switch case given when);
+      unless while for foreach return switch case given when catch);
     @space_after_keyword{@_} = (1) x scalar(@_);
 
     # first remove any or all of these if desired
@@ -8094,6 +8136,23 @@ sub make_block_brace_vertical_tightness_pattern {
     }
 }
 
+sub make_blank_line_pattern {
+
+    $blank_lines_before_closing_block_pattern = $SUB_PATTERN;
+    my $key = 'blank-lines-before-closing-block-list';
+    if ( defined( $rOpts->{$key} ) && $rOpts->{$key} ) {
+        $blank_lines_before_closing_block_pattern =
+          make_block_pattern( '-blbcl', $rOpts->{$key} );
+    }
+
+    $blank_lines_after_opening_block_pattern = $SUB_PATTERN;
+    $key = 'blank-lines-after-opening-block-list';
+    if ( defined( $rOpts->{$key} ) && $rOpts->{$key} ) {
+        $blank_lines_after_opening_block_pattern =
+          make_block_pattern( '-blaol', $rOpts->{$key} );
+    }
+}
+
 sub make_block_pattern {
 
     #  given a string of block-type keywords, return a regex to match them
@@ -8106,6 +8165,11 @@ sub make_block_pattern {
     #   input string: "if else elsif unless while for foreach do : sub";
     #   pattern:  '^((if|else|elsif|unless|while|for|foreach|do|\w+:)$|sub)';
 
+    #  Minor Update:
+    #
+    #  To distinguish between anonymous subs and named subs, use 'sub' to
+    #   indicate a named sub, and 'asub' to indicate an anonymous sub
+
     my ( $abbrev, $string ) = @_;
     my @list  = split_words($string);
     my @words = ();
@@ -8115,6 +8179,8 @@ sub make_block_pattern {
         next if $seen{$i};
         $seen{$i} = 1;
         if ( $i eq 'sub' ) {
+        }
+        elsif ( $i eq 'asub' ) {
         }
         elsif ( $i eq ';' ) {
             push @words, ';';
@@ -8134,8 +8200,15 @@ sub make_block_pattern {
         }
     }
     my $pattern = '(' . join( '|', @words ) . ')$';
+    my $sub_patterns = "";
     if ( $seen{'sub'} ) {
-        $pattern = '(' . $pattern . '|sub)';
+        $sub_patterns .= '|' . $SUB_PATTERN;
+    }
+    if ( $seen{'asub'} ) {
+        $sub_patterns .= '|' . $ASUB_PATTERN;
+    }
+    if ($sub_patterns) {
+        $pattern = '(' . $pattern . $sub_patterns . ')';
     }
     $pattern = '^' . $pattern;
     return $pattern;
@@ -8769,6 +8842,10 @@ sub set_white_space_flag {
 
                         # but watch out for this: [ [ ]    (misc.t)
                         && $last_token ne $token
+
+                        # double diamond is usually spaced
+                        && $token ne '<<>>'
+
                       )
                     {
 
@@ -9704,7 +9781,7 @@ sub set_white_space_flag {
                     $type                   = $type_save;
                 }
 
-                if ( $token =~ /^sub/ ) { $token =~ s/\s+/ /g }
+                if ( $token =~ /$SUB_PATTERN/ ) { $token =~ s/\s+/ /g }
 
                 # trim identifiers of trailing blanks which can occur
                 # under some unusual circumstances, such as if the
@@ -9843,11 +9920,12 @@ sub set_white_space_flag {
                 my $want_break =
 
                   # use -bl flag if not a sub block of any type
-                  $block_type !~ /^sub/
+                  #$block_type !~ /^sub/
+                  $block_type !~ /^sub\b/
                   ? $rOpts->{'opening-brace-on-new-line'}
 
                   # use -sbl flag for a named sub block
-                  : $block_type !~ /^sub\W*$/
+                  : $block_type !~ /$ASUB_PATTERN/
                   ? $rOpts->{'opening-sub-brace-on-new-line'}
 
                   # use -asbl flag for an anonymous sub block
@@ -10043,7 +10121,7 @@ sub set_white_space_flag {
                 }
 
                 # anonymous sub
-                elsif ( $block_type =~ /^sub\W*$/ ) {
+                elsif ( $block_type =~ /$ASUB_PATTERN/ ) {
 
                     if ($is_one_line_block) {
                         $rbrace_follower = \%is_anon_sub_1_brace_follower;
@@ -10130,7 +10208,7 @@ sub set_white_space_flag {
                         && (
                             $is_block_without_semicolon{
                                 $last_nonblank_block_type}
-                            || $last_nonblank_block_type =~ /^sub\s+\w/
+                            || $last_nonblank_block_type =~ /$SUB_PATTERN/
                             || $last_nonblank_block_type =~ /^\w+:$/ )
                     )
                     || $last_nonblank_type eq ';'
@@ -10387,6 +10465,20 @@ sub output_line_to_go {
                   );
             }
 
+            # Check for blank lines wanted before a closing brace
+            if ( $leading_token eq '}' ) {
+                if (   $rOpts->{'blank-lines-before-closing-block'}
+                    && $block_type_to_go[$imin]
+                    && $block_type_to_go[$imin] =~
+                    /$blank_lines_before_closing_block_pattern/ )
+                {
+                    my $nblanks = $rOpts->{'blank-lines-before-closing-block'};
+                    if ( $nblanks > $want_blank ) {
+                        $want_blank = $nblanks;
+                    }
+                }
+            }
+
             if ($want_blank) {
 
                 # future: send blank line down normal path to VerticalAligner
@@ -10502,7 +10594,30 @@ sub output_line_to_go {
             $do_not_pad = correct_lp_indentation( $ri_first, $ri_last );
         }
         send_lines_to_vertical_aligner( $ri_first, $ri_last, $do_not_pad );
+
+        # Insert any requested blank lines after an opening brace.  We have to
+        # skip back before any side comment to find the terminal token
+        my $iterm;
+        for ( $iterm = $imax ; $iterm >= $imin ; $iterm-- ) {
+            next if $types_to_go[$iterm] eq '#';
+            next if $types_to_go[$iterm] eq 'b';
+            last;
+        }
+
+        # write requested number of blank lines after an opening block brace
+        if ( $iterm >= $imin && $types_to_go[$iterm] eq '{' ) {
+            if (   $rOpts->{'blank-lines-after-opening-block'}
+                && $block_type_to_go[$iterm]
+                && $block_type_to_go[$iterm] =~
+                /$blank_lines_after_opening_block_pattern/ )
+            {
+                my $nblanks = $rOpts->{'blank-lines-after-opening-block'};
+                Perl::Tidy::VerticalAligner::flush();
+                $file_writer_object->require_blank_code_lines($nblanks);
+            }
+        }
     }
+
     prepare_for_new_input_lines();
 
     # output any new -cscw block comment
@@ -10589,36 +10704,28 @@ sub starting_one_line_block {
 
     # the previous nonblank token should start these block types
     elsif (( $last_last_nonblank_token_to_go eq $block_type )
-        || ( $block_type =~ /^sub/ )
+        || ( $block_type =~ /^sub\b/ )
         || $block_type =~ /\(\)/ )
     {
         $i_start = $last_last_nonblank_index_to_go;
 
-        # Patch for signatures and extended syntax ...
-        # if the previous token was a closing paren we should walk back up to
-        # find the keyword (sub). Otherwise, we might form a one line block,
-        # which stays intact, and cause the parenthesized expression to break
-        # open.  That looks bad.
+        # For signatures and extended syntax ...
+        # If this brace follows a parenthesized list, we should look back to
+        # find the keyword before the opening paren because otherwise we might
+        # form a one line block which stays intack, and cause the parenthesized
+        # expression to break open. That looks bad.  However, actually
+        # searching for the opening paren is slow and tedius.
+        # The actual keyword is often at the start of a line, but might not be.
+        # For example, we might have an anonymous sub with signature list
+        # following a =>.  It is safe to mark the start anywhere before the
+        # opening paren, so we just go back to the prevoious break (or start of
+        # the line) if that is before the opening paren.  The minor downside is
+        # that we may very occasionally break open a block unnecessarily.
         if ( $tokens_to_go[$i_start] eq ')' ) {
-
-            # walk back to find the first token with this level
-            # it should be the opening paren...
-            my $lev_want = $levels_to_go[$i_start];
-            for ( $i_start-- ; $i_start >= 0 ; $i_start-- ) {
-                if ( $i_start <= 0 ) { return 0 }
-                my $lev = $levels_to_go[$i_start];
-                if ( $lev <= $lev_want ) {
-
-                    # if not an opening paren then probably a syntax error
-                    if ( $tokens_to_go[$i_start] ne '(' ) { return 0 }
-
-                    # now step back to the opening keyword (sub)
-                    $i_start--;
-                    if ( $i_start > 0 && $types_to_go[$i_start] eq 'b' ) {
-                        $i_start--;
-                    }
-                }
-            }
+            $i_start = $index_max_forced_break + 1;
+            if ( $types_to_go[$i_start] eq 'b' ) { $i_start++; }
+            my $lev = $levels_to_go[$i_start];
+            if ( $lev > $level ) { return 0 }
         }
     }
 
@@ -11773,7 +11880,7 @@ sub accumulate_block_text {
         # curly.  Note: 'else' does not, but must be included to allow trailing
         # if/elsif text to be appended.
         # patch for SWITCH/CASE: added 'case' and 'when'
-        @_ = qw(if elsif else unless while until for foreach case when);
+        @_ = qw(if elsif else unless while until for foreach case when catch);
         @is_if_elsif_else_unless_while_until_for_foreach{@_} =
           (1) x scalar(@_);
     }
@@ -12660,7 +12767,8 @@ sub send_lines_to_vertical_aligner {
 
                     # remove sub names to allow one-line sub braces to align
                     # regardless of name
-                    if ( $block_type =~ /^sub / ) { $block_type = 'sub' }
+                    #if ( $block_type =~ /^sub / ) { $block_type = 'sub' }
+                    if ( $block_type =~ /$SUB_PATTERN/ ) { $block_type = 'sub' }
 
                     # allow all control-type blocks to align
                     if ( $block_type =~ /^[A-Z]+$/ ) { $block_type = 'BEGIN' }
@@ -13084,7 +13192,7 @@ sub lookup_opening_indentation {
                 # but right now we do not have that information.  For now
                 # we see if we are in a list, and this works well.
                 # See test files 'sub*.t' for good test cases.
-                if (   $block_type_to_go[$ibeg] =~ /^sub\s*\(?/
+                if (   $block_type_to_go[$ibeg] =~ /$ASUB_PATTERN/
                     && $container_environment_to_go[$i_terminal] eq 'LIST'
                     && !$rOpts->{'indent-closing-brace'} )
                 {
@@ -18781,7 +18889,7 @@ sub set_continuation_breaks {
                     # sub block breaks handled at higher level, unless
                     # it looks like the preceeding list is long and broken
                     && !(
-                        $next_nonblank_block_type =~ /^sub/
+                        $next_nonblank_block_type =~ /^sub\b/
                         && ( $nesting_depth_to_go[$i_begin] ==
                             $nesting_depth_to_go[$i_next_nonblank] )
                     )
@@ -22899,6 +23007,7 @@ use vars qw{
   %is_digraph
   %is_file_test_operator
   %is_trigraph
+  %is_tetragraph
   %is_valid_token_type
   %is_keyword
   %is_code_block_token
@@ -24307,7 +24416,7 @@ sub prepare_for_a_new_file {
                 $container_type = $want_paren;
                 $want_paren     = "";
             }
-            elsif ( $statement_type =~ /^sub/ ) {
+            elsif ( $statement_type =~ /^sub\b/ ) {
                 $container_type = $statement_type;
             }
             else {
@@ -24425,6 +24534,12 @@ sub prepare_for_a_new_file {
             }
 
             $container_type = $paren_type[$paren_depth];
+
+            # restore statement type as 'sub' at closing paren of a signature
+            # so that a subsequent ':' is identified as an attribute
+            if ( $container_type =~ /^sub\b/ ) {
+                $statement_type = $container_type;
+            }
 
             #    /^(for|foreach)$/
             if ( $is_for_foreach{ $paren_type[$paren_depth] } ) {
@@ -24794,7 +24909,7 @@ sub prepare_for_a_new_file {
 
             # ATTRS: check for a ':' which introduces an attribute list
             # (this might eventually get its own token type)
-            elsif ( $statement_type =~ /^sub/ ) {
+            elsif ( $statement_type =~ /^sub\b/ ) {
                 $type              = 'A';
                 $in_attribute_list = 1;
             }
@@ -25272,6 +25387,11 @@ sub prepare_for_a_new_file {
             $input_line =~ s/^\s*//;    # trim left end
         }
 
+        # Set a flag to indicate if we might be at an __END__ or __DATA__ line
+        # This will be used below to avoid quoting a bare word followed by
+        # a fat comma.
+        my $is_END_or_DATA = $input_line =~ /^\s*__(END|DATA)__\s*$/;
+
         # update the copy of the line for use in error messages
         # This must be exactly what we give the pre_tokenizer
         $tokenizer_self->{_line_text} = $input_line;
@@ -25583,6 +25703,17 @@ EOM
                     $tok = $test_tok;
                     $i++;
                 }
+
+                # The only current tetragraph is the double diamond operator
+                # and its first three characters are not a trigraph, so
+                # we do can do a special test for it
+                elsif ( $test_tok eq '<<>' ) {
+                    $test_tok .= $$rtokens[ $i + 2 ];
+                    if ( $is_tetragraph{$test_tok} ) {
+                        $tok = $test_tok;
+                        $i += 2;
+                    }
+                }
             }
 
             $type      = $tok;
@@ -25636,7 +25767,9 @@ EOM
                 }
 
                 # quote a word followed by => operator
-                if ( $next_nonblank_token eq '=' ) {
+                # unless the word __END__ or __DATA__ and the only word on
+                # the line.
+                if ( !$is_END_or_DATA && $next_nonblank_token eq '=' ) {
 
                     if ( $$rtokens[ $i_next + 1 ] eq '>' ) {
                         if ( $is_constant{$current_package}{$tok} ) {
@@ -26973,6 +27106,17 @@ sub operator_expected {
             && $last_nonblank_token eq ']' )
         {
             $op_expected = OPERATOR;
+        }
+
+        # Patch for RT #116344: misparse a ternary operator after an anonymous
+        # hash, like this:
+        #   return ref {} ? 1 : 0;
+        # The right brace should really be marked type 'R' in this case, and
+        # it is safest to return an UNKNOWN here. Expecting a TERM will
+        # cause the '?' to always be interpreted as a pattern delimiter
+        # rather than introducing a ternary operator.
+        elsif ( $tok eq '?' ) {
+            $op_expected = UNKNOWN;
         }
         else {
             $op_expected = TERM;
@@ -29974,6 +30118,9 @@ BEGIN {
     my @trigraphs = qw( ... **= <<= >>= &&= ||= //= <=> !~~ &.= |.= ^.=);
     @is_trigraph{@trigraphs} = (1) x scalar(@trigraphs);
 
+    my @tetragraphs = qw( <<>> );
+    @is_tetragraph{@tetragraphs} = (1) x scalar(@tetragraphs);
+
     # make a hash of all valid token types for self-checking the tokenizer
     # (adding NEW_TOKENS : select a new character and add to this list)
     my @valid_token_types = qw#
@@ -29982,6 +30129,7 @@ BEGIN {
       #;
     push( @valid_token_types, @digraphs );
     push( @valid_token_types, @trigraphs );
+    push( @valid_token_types, @tetragraphs );
     push( @valid_token_types, ( '#', ',', 'CORE::' ) );
     @is_valid_token_type{@valid_token_types} = (1) x scalar(@valid_token_types);
 
@@ -30007,7 +30155,7 @@ BEGIN {
     @_ =
       qw( BEGIN END CHECK INIT AUTOLOAD DESTROY UNITCHECK continue if elsif else
       unless do while until eval for foreach map grep sort
-      switch case given when catch);
+      switch case given when catch try finally);
     @is_code_block_token{@_} = (1) x scalar(@_);
 
     # I'll build the list of keywords incrementally
@@ -30236,6 +30384,8 @@ BEGIN {
       when
       err
       say
+
+      catch
     );
 
     # patched above for SWITCH/CASE given/when err say
@@ -30454,4 +30604,3 @@ BEGIN {
     @is_keyword{@Keywords} = (1) x scalar(@Keywords);
 }
 1;
-__END__

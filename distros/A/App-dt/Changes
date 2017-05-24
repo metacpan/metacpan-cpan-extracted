@@ -1,3 +1,9 @@
+0.004   2017-05-22 (PERLANCAR)
+
+        - [Incompatible change] When there is only a single output, set $DATA[0]
+          from last expression of -e code to allow terser code.
+
+
 0.003   2017-05-19 (PERLANCAR)
 
 	[ENHANCEMENTS]

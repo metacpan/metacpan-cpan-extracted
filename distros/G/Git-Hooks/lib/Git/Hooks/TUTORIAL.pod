@@ -13,7 +13,7 @@ TUTORIAL - Gentle tutorial for Git::Hooks users and Git administrators
 
 =head1 VERSION
 
-version 1.15.1
+version 1.16.0
 
 =head1 USER TUTORIAL
 

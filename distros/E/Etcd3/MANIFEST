@@ -8,23 +8,15 @@ lib/Etcd3.pm
 lib/Etcd3/Auth.pm
 lib/Etcd3/Auth/Authenticate.pm
 lib/Etcd3/Auth/Enable.pm
-lib/Etcd3/Auth/RoleAdd.pm
-lib/Etcd3/Auth/RoleDelete.pm
-lib/Etcd3/Auth/UserAdd.pm
-lib/Etcd3/Auth/UserDelete.pm
-lib/Etcd3/Auth/UserGrantRole.pm
-lib/Etcd3/Auth/UserRevokeRole.pm
-lib/Etcd3/Client.pm
+lib/Etcd3/Auth/Role.pm
 lib/Etcd3/Config.pm
-lib/Etcd3/DeleteRange.pm
 lib/Etcd3/Lease.pm
-lib/Etcd3/Lease/Grant.pm
-lib/Etcd3/Lease/KeepAlive.pm
-lib/Etcd3/Lease/Revoke.pm
-lib/Etcd3/Lease/TimeToLive.pm
-lib/Etcd3/Put.pm
 lib/Etcd3/Role/Actions.pm
-lib/Etcd3/Range.pm
+lib/Etcd3/KV.pm
+lib/Etcd3/KV/Put.pm
+lib/Etcd3/KV/Range.pm
+lib/Etcd3/User.pm
+lib/Etcd3/User/Role.pm
 lib/Etcd3/Watch.pm
 t/00-load.t
 t/key_value.t
@@ -34,6 +26,7 @@ t/pod-coverage.t
 t/pod-spelling.t
 t/pod.t
 t/user.t
+t/watch.t
 .travis.yml
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

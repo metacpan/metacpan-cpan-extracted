@@ -1,4 +1,4 @@
-package Pcore::Ext v0.7.3;
+package Pcore::Ext v0.8.0;
 
 use Pcore -dist, -const;
 use Pcore::Ext::Context;
@@ -151,7 +151,7 @@ sub SCAN ( $self, $app, $ext, $framework ) {
                 extend         => $ext_map->{$class},
             };
 
-            $CFG->{perl_class}->{"$namespace::$class"} = $ext_class;
+            $CFG->{perl_class}->{"$namespace\::$class"} = $ext_class;
         }
     }
 

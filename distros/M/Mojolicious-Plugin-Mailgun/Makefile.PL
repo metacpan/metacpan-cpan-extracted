@@ -19,6 +19,7 @@ WriteMakefile(
 }
 ,
   PREREQ_PM => {
+  'Mojolicious' => '7.0',
   'perl' => 'v5.10.0'
 }
 ,

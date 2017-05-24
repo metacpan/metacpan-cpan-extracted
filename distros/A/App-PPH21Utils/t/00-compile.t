@@ -2,17 +2,18 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.053
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.054
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/PPH21Utils.pm'
 );
 
 my @scripts = (
+    'bin/calc-net-income-from-pph21-op',
     'bin/calc-pph21-op',
     'bin/get-pph21-op-ptkp',
     'bin/get-pph21-op-rates'
@@ -41,7 +42,7 @@ for my $lib (@module_files)
     is($?, 0, "$lib loaded ok");
 
     shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
-        and not eval { blib->VERSION('1.01') };
+        and not eval { require blib; blib->VERSION('1.01') };
 
     if (@_warnings)
     {
@@ -67,7 +68,7 @@ foreach my $file (@scripts)
     is($?, 0, "$file compiled ok");
 
     shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
-        and not eval { blib->VERSION('1.01') };
+        and not eval { require blib; blib->VERSION('1.01') };
 
     # in older perls, -c output is simply the file portion of the path being tested
     if (@_warnings = grep { !/\bsyntax OK$/ }

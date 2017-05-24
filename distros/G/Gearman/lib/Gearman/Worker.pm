@@ -1,6 +1,6 @@
 package Gearman::Worker;
 use version;
-$Gearman::Worker::VERSION = version->declare("2.004.004");
+$Gearman::Worker::VERSION = version->declare("2.004.005");
 
 use strict;
 use warnings;
@@ -256,7 +256,6 @@ sub work {
             # to test gearmand server going away here.  (SIGPIPE on
             # send_req, etc) this testing has been done manually, at
             # least.
-
             unless (_send($jss, $grab_req)) {
                 if ($!{EPIPE} && $self->{parent_pipe}) {
 
@@ -303,7 +302,7 @@ sub work {
             } ## end if ($res->{type} eq "no_job")
 
             unless ($res->{type} eq "job_assign") {
-                my $msg = "Uh, wasn't expecting a $res->{type} packet.";
+                my $msg = "unexpected packet type: $res->{type}";
 
                 if ($res->{type} eq "error") {
                     $msg .= " [${$res->{blobref}}]\n";
@@ -313,7 +312,7 @@ sub work {
             } ## end unless ($res->{type} eq "job_assign")
 
             ${ $res->{blobref} } =~ s/^(.+?)\0(.+?)\0//
-                or die "Uh, regexp on job_assign failed";
+                or die "regexp on job_assign failed";
             my ($handle, $ability) = ($1, $2);
             my $job = Gearman::Job->new(
                 func   => $ability,
@@ -333,9 +332,6 @@ sub work {
 
             $last_update_time{$js_str} = $last_job_time = time();
             if ($err) {
-
-                #TODO should be work_exception replaced by work_fail?
-                # see 75b65e1
                 my $exception_req
                     = _rc("work_exception",
                     _join0($handle, Storable::nfreeze(\$err)));
@@ -527,26 +523,25 @@ sub send_work_warning {
     return $self->_job_request("work_warning", $job, $msg);
 }
 
-# =head2 send_work_exception($job, $exception)
+=head4 send_work_exception($job, $exception)
 
-# Use this method to notify the server (and any listening clients) that the C<job> failed with the given C<$exception>.
+Use this method to notify the server (and any listening clients) that the C<job> failed with the given C<$exception>.
 
-# =cut
+=cut
 
-# sub send_work_exception {
-#     my ($self, $job, $exc) = @_;
-#     return $self->_job_request("work_exception", $job, $exc);
-# }
+sub send_work_exception {
+    my ($self) = shift;
+    return $self->_finish_job_request("work_exception", @_);
+}
 
-=head2 send_work_fail($job, [$message])
+=head2 send_work_fail($job)
 
 Use this method to notify the server (and any listening clients) that the job failed.
 
 =cut
 
 sub send_work_fail {
-    my ($self) = shift;
-    return $self->_finish_job_request("work_fail", @_);
+    return shift->_finish_job_request("work_fail", shift);
 }
 
 =head2 send_work_status($job, $numerator, $denominator)

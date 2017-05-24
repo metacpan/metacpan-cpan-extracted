@@ -1,4 +1,7 @@
 #!/usr/bin/env perl
+use strict;
+use warnings;
+use lib "."; # See RT:121831 - this fixes install on Perl 5.26+
 use inc::Module::Install;
 
 name 'Retry';

@@ -4,24 +4,22 @@ App::Virtualenv - Perl virtual environment
 
 # VERSION
 
-version 2.06
+version 2.07
 
-# ABSTRACT
-
-Perl virtual environment
+# SYNOPSIS
 
         #!/bin/sh
         perl -MApp::Virtualenv -erun -- environment_path
-
-See also: [virtualenv.pl](https://metacpan.org/pod/distribution/App-Virtualenv/lib/App/Virtualenv/virtualenv.pl)
 
 # DESCRIPTION
 
 App::Virtualenv is a Perl package to create isolated Perl virtual environments, like Python virtual environment.
 
-## Functions
+See also: [virtualenv.pl](https://metacpan.org/pod/distribution/App-Virtualenv/lib/App/Virtualenv/virtualenv.pl)
 
-### sh(@args)
+# Functions
+
+## sh(@args)
 
 runs shell program defined in SHELL environment variable, otherwise /bin/sh
 
@@ -29,7 +27,7 @@ runs shell program defined in SHELL environment variable, otherwise /bin/sh
 
 return value: _exit code of shell program_
 
-### perl(@args)
+## perl(@args)
 
 runs Perl interpreter
 
@@ -37,15 +35,15 @@ runs Perl interpreter
 
 return value: _exit code of Perl interpreter_
 
-### activate($virtualenvPath)
+## activate($virtualenv\_path)
 
 activates Perl virtual environment
 
-$virtualenvPath: _virtual environment path_
+$virtualenv\_path: _virtual environment path_
 
 return value: _virtual environment path if success, otherwise undef_
 
-### deactivate($nondestructive)
+## deactivate($nondestructive)
 
 deactivates Perl virtual environment
 
@@ -53,43 +51,43 @@ $nondestructive: _leaves envionment variables as it is, unless there are old env
 
 return value: _always 1_
 
-### create($virtualenvPath, $empty)
+## create($virtualenv\_path, $empty)
 
 creates Perl virtual environment
 
-$virtualenvPath: _new virtual environment path_
+$virtualenv\_path: _new virtual environment path_
 
 $empty: _create empty virtual environment_
 
 return value: _virtual environment path if success, otherwise undef_
 
-### findVirtualenvPath($virtualenvPath)
+## find\_virtualenv\_path($virtualenv\_path)
 
-finds Perl virtual environment path by $virtualenvPath argument or activated virtual environment or running script or PERL5LIB environment variable
+finds Perl virtual environment path by $virtualenv\_path argument or activated virtual environment or running script or PERL5LIB environment variable
 
-$virtualenvPath: _virtual environment path_
+$virtualenv\_path: _virtual environment path_
 
 return value: _best matching virtual environment path_
 
-### activate2($virtualenvPath, $inform)
+## activate2($virtualenv\_path, $inform)
 
-activates Perl virtual environment by findVirtualenvPath function
+activates Perl virtual environment by find\_virtualenv\_path function
 
-$virtualenvPath: _virtual environment path_
+$virtualenv\_path: _virtual environment path_
 
-$inform: _informs activated virtual environment path to STDERR if new activated path differs old one_
+$inform: _informs activated virtual environment path to STDERR if new activated path differs old one, by default 0_
 
 return value: _activated best matching virtual environment path if success, otherwise undef_
 
-### getInc($virtualenvPath)
+## getinc($virtualenv\_path)
 
 gets array ref of include paths given virtual environment path or sitelib paths
 
-$virtualenvPath: _virtual environment path_
+$virtualenv\_path: _virtual environment path_
 
 return value: _array ref of paths_
 
-### list(%params)
+## list(%params)
 
 lists packages or modules or files by given %params
 
@@ -97,11 +95,11 @@ lists packages or modules or files by given %params
 
 > one: _output is one-column, by default 0_
 >
-> detail: _prints additional detail by given value: module or file. by default undef_
+> detail: _prints additional detail by given value(&#39;module&#39; or &#39;file&#39;), by default undef_
 
 return value: _always 1_
 
-### main(@argv)
+## main(@argv)
 
 App::Virtualenv main function to run on command-line
 
@@ -111,7 +109,7 @@ See also: [virtualenv.pl](https://metacpan.org/pod/distribution/App-Virtualenv/l
 
 return value: _exit code of program_
 
-### run
+## run
 
 runs App::Virtualenv by main function with command-line arguments by @ARGV
 
@@ -174,7 +172,7 @@ This module requires these other modules and libraries:
 
 # AUTHOR
 
-Orkun Karaduman &lt;orkunkaraduman@gmail.com&gt;
+Orkun Karaduman (ORKUN) &lt;orkun@cpan.org&gt;
 
 # COPYRIGHT AND LICENSE
 

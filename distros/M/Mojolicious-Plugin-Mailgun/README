@@ -30,7 +30,7 @@ DESCRIPTION
 
 OPTIONS
     Mojolicious::Plugin::Mailgun can be provided a hash of mailgun sites
-    with api key and domain, or it can read them directly from
+    with "api_key" and "domain", or it can read them directly from
     $c->config->{mailgun} if not provided at load time.
 
 HELPERS

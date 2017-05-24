@@ -1,5 +1,8 @@
 Revision history for perl distribution Mojolicious-Plugin-Mailgun
 
+0.04 2017-05-23T14:29:49+0200
+ - Fix missing dependency on Mojolicious
+
 0.03 2017-05-15T21:18:59+0200
  - Documentation improvements
  - Cleanups

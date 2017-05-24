@@ -5,7 +5,7 @@ use warnings;
 use Test2::API qw( context );
 
 # ABSTRACT: Run object
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.15'; # VERSION
 
 
 sub out    { shift->{out} }
@@ -172,7 +172,7 @@ Test::Alien::Run - Run object
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 
@@ -180,7 +180,7 @@ version 0.14
  use Test::Alien;
  
  run_ok([ $^X, -e => 'print "some output"; exit 22'])
-   ->status_is(22)
+   ->exit_is(22)
    ->out_like(qr{some});
 
 =head1 DESCRIPTION

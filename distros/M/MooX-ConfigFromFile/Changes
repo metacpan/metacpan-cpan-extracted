@@ -1,5 +1,12 @@
 Revision history for MooX-ConfigFromFile
 
+0.008	2017-05-23
+    - ensure all tests run and report instead of swallowing issues
+    - make tests passing with perl 5.26
+    - add import shortcuts config_prefixes and config_hashmergeloaded
+    - ensure reasonable code quality by adding author tests against
+      Perl::Critic and Perl::Tidy
+
 0.007	2015-04-27
     - separate loading and merging of configfile content
     - ensure order of multiple loaded config files

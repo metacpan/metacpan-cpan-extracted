@@ -21,16 +21,16 @@ my %WriteMakefileArgs = (
     "Module::Runtime" => 0,
     "Moo" => "2.003000",
     "Scalar::Util" => 0,
-    "Template::Lace" => "0.003"
+    "Template::Lace" => "0.005"
   },
   "TEST_REQUIRES" => {
     "Catalyst" => "5.90080",
     "Moo" => "2.003000",
     "Patterns::UndefObject" => 0,
-    "Template::Lace" => "0.003",
+    "Template::Lace" => "0.005",
     "Test::Most" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,7 +44,7 @@ my %FallbackPrereqs = (
   "Moo" => "2.003000",
   "Patterns::UndefObject" => 0,
   "Scalar::Util" => 0,
-  "Template::Lace" => "0.003",
+  "Template::Lace" => "0.005",
   "Test::Most" => 0
 );
 

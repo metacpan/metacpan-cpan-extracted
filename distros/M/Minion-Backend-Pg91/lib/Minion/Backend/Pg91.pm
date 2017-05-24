@@ -2,32 +2,39 @@ package Minion::Backend::Pg91;
 use Mojo::Base 'Minion::Backend';
 
 use Mojo::IOLoop;
-use Mojo::JSON qw(encode_json decode_json);
+use Mojo::JSON qw(j);
 use Mojo::Pg;
 use Sys::Hostname 'hostname';
 use Carp 'croak';
+use Mojo::Util qw(dumper);
 
-our $VERSION = '6.00'; ## copied from Minion::Backend::Pg of version 5.00
+our $VERSION = '6.05'; ## copied from Minion::Backend::Pg of version 6.05
 
 has 'pg';
 
 sub broadcast {
     my ($self, $command, $args, $ids) = (shift, shift, shift || [], shift || []);
-    my $json = encode_json [$command, @$args];
-    return !!$self->pg->db->query(
-        q{update minion_workers set inbox = inbox || $1
-        where (id = any($2) or $2 = '{}')}, $json, $ids
-    )->rows;
+    my $db = $self->pg->db;
+    my $tx = $db->begin;
+    my $array = $db->query(q{select inbox from minion_workers
+      where (id = any($1) or $1 = '{}')}, $ids)->array;
+    $array = ($array ? j($array->[0]) : []) || [];
+    push @$array, [ $command, @$args ];
+    my $ret = $db->query(q{update minion_workers set inbox = $1
+      where (id = any($2) or $2 = '{}')}, j($array), $ids)->rows;
+    $tx->commit;
+    return !!$ret;
 }
 
 sub receive {
-  my $array = shift->pg->db->query(
-    "update minion_workers as new set inbox = '[]'
-     from (select id, inbox from minion_workers where id = ? for update) as old
-     where new.id = old.id and old.inbox != '[]'
-     returning old.inbox", shift
-  )->expand->array;
-  return $array ? $array->[0] : [];
+  my ($self, $id) = @_;
+  # again taken from Minion::Backend::SQLite
+  my $db = $self->pg->db;
+  my $tx = $db->begin;
+  my $array = $db->query(q{select inbox from minion_workers where id = ?}, $id)->array;
+  $db->query(q{update minion_workers set inbox = '[]' where id = ?}, $id) if $array;
+  $tx->commit;
+  return ($array ? j($array->[0]) : []) || [];
 }
 
 sub dequeue {
@@ -51,11 +58,11 @@ sub enqueue {
 
   my $db = $self->pg->db;
   return $db->query(
-    "insert into minion_jobs (args, attempts, delayed, priority, queue, task)
-     values (?, ?, (now() + (interval '1 second' * ?)), ?, ?, ?)
-     returning id", encode_json($args), $options->{attempts} // 1,
-    $options->{delay} // 0, $options->{priority} // 0,
-    $options->{queue} // 'default', $task
+    "insert into minion_jobs (args, attempts, delayed, parents, priority, queue, task)
+     values (?, ?, (now() + (interval '1 second' * ?)), ?, ?, ?, ?)
+     returning id", { json => $args }, $options->{attempts} // 1,
+    $options->{delay} // 0, $options->{parents} // [],
+    $options->{priority} // 0, $options->{queue} // 'default', $task
   )->hash->{id};
 }
 
@@ -64,16 +71,22 @@ sub finish_job { shift->_update(0, @_) }
 
 sub job_info {
   my $h = shift->pg->db->query(
-    'select id, args, attempts, extract(epoch from created) as created,
+    'select id, args, attempts,
+       array(select id from minion_jobs where j.id = any(parents)) as children,
+       extract(epoch from created) as created,
        extract(epoch from delayed) as delayed,
-       extract(epoch from finished) as finished, priority, queue, result,
-       extract(epoch from retried) as retried, retries,
+       extract(epoch from finished) as finished, parents, priority, queue,
+       result, extract(epoch from retried) as retried, retries,
        extract(epoch from started) as started, state, task, worker
-     from minion_jobs where id = ?', shift
+     from minion_jobs as j where id = ?', shift
   )->hash;
   return undef unless $h;
-  $h->{args} = $h->{args} ? decode_json($h->{args}) : [];
-  $h->{result} = $h->{result} ? decode_json($h->{result}) : undef;
+  $h->{args} = $h->{args} ? (j($h->{args}) // $h->{args}) : [];
+  if (defined $h->{result}) {
+    $h->{result} = ($h->{result} ne 'null') ? (j($h->{result}) // $h->{result}) : undef;
+  } else {
+    $h->{result} = undef;
+  }
   return $h;
 }
 
@@ -82,9 +95,10 @@ sub list_jobs {
 
   return $self->pg->db->query(
     'select id from minion_jobs
-     where (state = $1 or $1 is null) and (task = $2 or $2 is null)
+     where (queue = $1 or $1 is null) and (state = $2 or $2 is null)
+       and (task = $3 or $3 is null)
      order by id desc
-     limit $3 offset $4', @$options{qw(state task)}, $limit, $offset
+     limit $4 offset $5', @$options{qw(queue state task)}, $limit, $offset
   )->arrays->map(sub { $self->job_info($_->[0]) })->to_array;
 }
 
@@ -106,14 +120,17 @@ sub new {
 }
 
 sub register_worker {
-  my ($self, $id) = @_;
+  my ($self, $id, $options) = (shift, shift, shift || {});
 
   my $sql
-    = 'update minion_workers set notified = now() where id = ? returning 1';
-  return $id if $id && $self->pg->db->query($sql, $id)->rows;
+    = 'update minion_workers set notified = now(), status = ? where id = ? returning 1';
+  return $id if $id && $self->pg->db->query($sql, { json => $options->{status} // {} }, $id)->rows;
 
-  $sql = 'insert into minion_workers (host, pid) values (?, ?) returning id';
-  return $self->pg->db->query($sql, hostname, $$)->hash->{id};
+  $sql = q{insert into minion_workers (id, host, pid, status) values
+    (coalesce(?, nextval('minion_workers_id_seq')), ?, ?, ?) returning id};
+  return $self->pg->db->query($sql, $id, $self->{host} //= hostname, $$,
+      { json => $options->{status} // {} }
+  )->hash->{id};
 }
 
 sub remove_job {
@@ -127,7 +144,7 @@ sub remove_job {
 sub repair {
   my $self = shift;
 
-  # Check worker registry
+  # Workers without heartbeat
   my $db     = $self->pg->db;
   my $minion = $self->minion;
   $db->query(
@@ -135,7 +152,7 @@ sub repair {
      where notified < now() - interval '1 second' * ?", $minion->missing_after
   );
 
-  # Abandoned jobs
+  # Jobs with missing worker (can be retried)
   my $fail = $db->query(
     "select id, retries from minion_jobs as j
      where state = 'active'
@@ -143,28 +160,40 @@ sub repair {
   )->hashes;
   $fail->each(sub { $self->fail_job(@$_{qw(id retries)}, 'Worker went away') });
 
-  # Old jobs
+  # Jobs with missing parents (can't be retried)
   $db->query(
-    "delete from minion_jobs
-     where state = 'finished' and finished < now() - interval '1 second' * ?",
-    $minion->remove_after
+    "update minion_jobs as j
+     set finished = now(), result = 'Parent went away'::text,
+       state = 'failed'
+     where parents <> '{}' and cardinality(parents) <> (
+       select count(*) from minion_jobs where id = any (j.parents)
+     ) and state = 'inactive'"
+  );
+
+  # Old jobs with no unresolved dependencies
+  $db->query(
+    "delete from minion_jobs as j
+     where finished <= now() - interval '1 second' * ? and not exists (
+       select 1 from minion_jobs
+       where j.id = any(parents) and state <> 'finished'
+     ) and state = 'finished'", $minion->remove_after
   );
 }
 
-sub reset { shift->pg->db->query('truncate minion_jobs, minion_workers') }
+sub reset {
+    #shift->pg->db->query('truncate minion_jobs, minion_workers') }
+  shift->pg->db->query('truncate minion_jobs, minion_workers restart identity');
+}
 
 sub retry_job {
-  my ($self, $id, $retries) = (shift, shift, shift);
-  my $options = shift // {};
-
+  my ($self, $id, $retries, $options) = (shift, shift, shift, shift || {});
   return !!$self->pg->db->query(
     "update minion_jobs
-     set priority = coalesce(?, priority), queue = coalesce(?, queue),
-       retried = now(), retries = retries + 1, state = 'inactive',
-       delayed = (now() + (interval '1 second' * ?))
+     set delayed = (now() + (interval '1 second' * ?)),
+       priority = coalesce(?, priority), queue = coalesce(?, queue),
+       retried = now(), retries = retries + 1, state = 'inactive'
      where id = ? and retries = ?
-       and state in ('inactive', 'failed', 'finished')
-     returning 1", @$options{qw(priority queue)}, $options->{delay} // 0, $id,
+     returning 1", $options->{delay} // 0, @$options{qw(priority queue)}, $id,
     $retries
   )->rows;
 }
@@ -173,7 +202,13 @@ sub stats {
   my $self = shift;
 
   my $stats = $self->pg->db->query(
-    "select state::text || '_jobs', count(state) from minion_jobs group by state
+    "select 'enqueued_jobs', case when is_called then last_value else 0 end
+     from minion_jobs_id_seq
+     union all
+     select state::text || '_jobs', count(*) from minion_jobs group by state
+     union all
+     select 'delayed_jobs', count(*) from minion_jobs
+     where (delayed > now() or parents <> '{}') and state = 'inactive'
      union all
      select 'inactive_workers', count(*) from minion_workers
      union all
@@ -186,63 +221,49 @@ sub stats {
   return $stats;
 }
 
-sub _old_stats {
-  my $self = shift;
-  my $db  = $self->pg->db;
-  my $all = $db->query('select count(*) from minion_workers')->array->[0];
-  my $sql
-    = "select count(distinct worker) from minion_jobs where state = 'active'";
-  my $active = $db->query($sql)->array->[0];
-
-  $sql = 'select state, count(state) from minion_jobs group by 1';
-  my $states
-    = $db->query($sql)->arrays->reduce(sub { $a->{$b->[0]} = $b->[1]; $a }, {});
-
-  return {
-    active_jobs => $states->{active} || 0,
-    active_workers   => $active,
-    failed_jobs      => $states->{failed} || 0,
-    finished_jobs    => $states->{finished} || 0,
-    inactive_jobs    => $states->{inactive} || 0,
-    inactive_workers => $all - $active
-  };
-}
-
 sub unregister_worker {
   shift->pg->db->query('delete from minion_workers where id = ?', shift);
 }
 
 sub worker_info {
-  shift->pg->db->query(
+  my $h = shift->pg->db->query(
     "select id, extract(epoch from notified) as notified, array(
        select id from minion_jobs
        where state = 'active' and worker = minion_workers.id
-     ) as jobs, host, pid, extract(epoch from started) as started
+     ) as jobs, host, pid, status, extract(epoch from started) as started
      from minion_workers
      where id = ?", shift
   )->hash;
+  return undef unless $h;
+  $h->{status} = $h->{status} ? (j($h->{status}) // $h->{status}) : {};
+  return $h;
 }
 
 sub _try {
-  my ($self, $id, $options) = @_;
+    my ($self, $id, $options) = @_;
 
-  my $h = $self->pg->db->query(
-    "update minion_jobs
-     set started = now(), state = 'active', worker = ?
-     where id = (
-       select id from minion_jobs
-       where delayed <= now() and queue = any (?) and state = 'inactive'
-         and task = any (?)
-       order by priority desc, created
-       limit 1
-       for update
-     )
-     returning id, args, retries, task", $id,
-    $options->{queues} || ['default'], [keys %{$self->minion->tasks}]
-  )->hash;
-  return undef unless $h;
-  $h->{args} = $h->{args} ? decode_json($h->{args}) : [];
-  return $h;
+    # to handle the missing skip locked in Pg 9.1-9.4 and copying the idea from
+    # Minion::Backend::SQLite
+    my $db = $self->pg->db;
+    my $tx = $db->begin;
+    my $res = $db->query(
+        q{select id from minion_jobs as j
+        where delayed <= now() and (parents = '{}' or cardinality(parents) = (
+        select count(*) from minion_jobs
+        where id = any(j.parents) and state = 'finished'
+        )) and queue = any(?) and state = 'inactive' and task = any(?)
+        order by priority desc, id
+        limit 1},
+        $options->{queues} || ['default'], [keys %{$self->minion->tasks}]
+    );
+    my $job_id = ($res->arrays->first // [])->[0] // return undef;
+    $db->query(q{update minion_jobs set started = now(), state = 'active', worker = ? where id = ?},
+        $id, $job_id);
+    $tx->commit;
+    my $h = $db->query(q{select id, args, retries, task from minion_jobs where id = ?}, $job_id)->hash;
+    return undef unless $h;
+    $h->{args} = $h->{args} ? (j($h->{args}) // $h->{args}) : [];
+    return $h;
 }
 
 sub _update {
@@ -252,7 +273,7 @@ sub _update {
     "update minion_jobs
      set finished = now(), result = ?, state = ?
      where id = ? and retries = ? and state = 'active'
-     returning attempts", encode_json($result), $fail ? 'failed' : 'finished',
+     returning attempts", { json => $result }, $fail ? 'failed' : 'finished',
     $id, $retries
   )->array;
 
@@ -811,3 +832,6 @@ alter table minion_workers add column inbox TEXT default '[]';
 
 -- 13 up
 create index on minion_jobs using gin (parents);
+
+-- 15 up
+alter table minion_workers add column status TEXT default '{}'; 

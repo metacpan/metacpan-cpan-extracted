@@ -33,7 +33,7 @@ subtest "wokrker process fails", sub {
     my @workers = map(new_worker(
             job_servers => [$job_server],
             func        => {
-                $func => sub {undef}
+                $func => sub {}
             }
         ),
         (0 .. int(rand(1) + 1)));

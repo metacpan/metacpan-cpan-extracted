@@ -9,6 +9,8 @@ etc/MooXCmdTest-test.json
 etc/MooXCmdTest.json
 etc/MooXCmdTest.test.this.json
 etc/MooXCmdTest.tested.json
+etc/MooXCmdTest/test-shortcut-hashmerged.json
+etc/MooXCmdTest/test-shortcut.json
 lib/MooX/ConfigFromFile.pm
 lib/MooX/ConfigFromFile/Role.pm
 lib/MooX/ConfigFromFile/Role/HashMergeLoaded.pm
@@ -21,6 +23,8 @@ t/01-moo.t
 t/02-moose.t
 t/lib/MooXCmdTest.pm
 t/lib/MooXCmdTest/Cmd/Test.pm
+t/lib/MooXCmdTest/Cmd/Test/Cmd/Shortcut.pm
+t/lib/MooXCmdTest/Cmd/Test/Cmd/Shortcut/Cmd/HashMerged.pm
 t/lib/MooXCmdTest/Cmd/Test/Cmd/This.pm
 t/lib/MooXCmdTest/Cmd/Test/Cmd/This/Cmd/HashMerged.pm
 t/lib/MooXCmdTest/Cmd/Tested.pm

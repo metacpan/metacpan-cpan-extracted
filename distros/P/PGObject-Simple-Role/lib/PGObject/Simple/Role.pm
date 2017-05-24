@@ -1,10 +1,10 @@
 package PGObject::Simple::Role;
 
-use 5.006;
+use 5.010;
 use strict;
 use warnings;
 use Moo::Role;
-use PGObject::Simple;
+use PGObject::Simple ':full', '!dbh';
 use Carp;
 
 =head1 NAME
@@ -13,12 +13,11 @@ PGObject::Simple::Role - Moo/Moose mappers for minimalist PGObject framework
 
 =head1 VERSION
 
-Version 1.13.2
+Version 2.0.2
 
 =cut
 
-our $VERSION = '1.13.2';
-
+our $VERSION = 2.000002;
 
 =head1 SYNOPSIS
 
@@ -68,11 +67,11 @@ declarative mapping.
 
 =head1 ATTRIBUTES AND LAZY GETTERS
 
+
 =cut
 
-# Private attribute for database handle, not intended to be directly set.
 
-has _DBH => ( 
+has _dbh => (  # use dbh() to get and set_dbh() to set
        is => 'lazy', 
        isa => sub { 
                     croak "Expected a database handle.  Got $_[0] instead"
@@ -80,15 +79,37 @@ has _DBH => (
        },
 );
 
-sub _build__DBH {
+has _DBH => ( # backwards compatible for 1.x. 
+	is => 'lazy',
+       isa => sub { 
+                    warn 'deprecated _DBH used.  rename to _dbh when you can';
+                    croak "Expected a database handle.  Got $_[0] instead"
+                       unless eval {$_[0]->isa('DBI::db')};
+       },
+);
+
+sub _build__dbh {
     my ($self) = @_;
+    return $self->{_DBH} if $self->{_DBH};
     return $self->_get_dbh;
 }
 
-has _Registry => (is => 'lazy');
+sub _build__DBH {
+    my ($self) = @_;
+    return $self->{_dbh} if $self->{_dbh};
+    return $self->_dbh;
+}
 
-sub _build__Registry {
-    return _get_registry();
+sub _get_dbh {
+    croak 'Invoked _get_dbh from role improperly.  Subclasses MUST set this method';
+}
+
+has _registry => (is => 'lazy');
+
+sub _build__registry {
+    my ($self) = @_;
+    return $self->_get_registry() if $self->can('_get_registry');
+    _get_registry();
 }
 
 =head2 _get_registry
@@ -128,127 +149,54 @@ stored prcedures to an object class.
 =cut
 
 sub _build__funcprefix {
-    return $_[0]->_get_prefix;
+    my ($self)  = @_;
+    return $self->_get_prefix;
 }
 
 sub _get_prefix {
     return '';
 }
 
-has _PGObject_Simple => (
-    is => 'lazy',
-);
+=head1 READ ONLY ACCESSORS (PUBLIC)
 
-sub _build__PGObject_Simple {
+=head2 dbh
+
+Wraps the PGObject::Simple method
+
+=cut
+
+sub dbh {
     my ($self) = @_;
-    return PGObject::Simple->new() unless ref $self;
-    $self->_DBH;
-    $self->_funcprefix;
-    my $obj = PGObject::Simple->new(%$self);
-    $obj->_set_registry($self->_registry);
-    return $obj;
+    if (ref $self){
+	return $self->_dbh;
+    }
+    return "$self"->_get_dbh;
 }
 
-has _registry => ( is => 'lazy' );
+=head2 funcschema
 
-sub _build__registry {
-    return _get_registry();
-}
-
-=head2 _get_dbh
-
-Subclasses or sub-roles MUST implement a function which returns a DBI database
-handle (DBD::Pg 2.0 or hgher required).  If this is not overridden an exception
-will be raised.
+Returns the schema bound to the object
 
 =cut
 
-sub _get_dbh {
-    croak 'Subclasses MUST set their own get_dbh methods!';
+sub funcschema {
+    my ($self)  = @_;
+    return $self->_funcschema if ref $self;
+    return "$self"->_get_schema();
 }
 
-=head2 call_procedure
+=head2 funcprefix
 
-Identical to PGObject::Simple::call_procedure
+Prefix for functions
 
 =cut
 
-sub call_procedure {
-    my $self = shift @_;
-    my %args = @_;
-    my $obj = _build__PGObject_Simple($self);
-    $obj->{_DBH} = $self->_DBH if ref $self and !$args{dbh};
-    $obj->{_DBH} = "$self"->_get_dbh unless ref $self or $args{dbh};
-    if (ref $self){
-        $args{funcprefix} = $self->_funcprefix 
-                  unless defined $args{funcprefix} or !ref $self;
-        $args{funcschema} = $self->_funcschema 
-                  unless defined $args{funcschema} or !ref $self;
-    } else {
-        $args{funcprefix} = "$self"->_get_prefix
-                 unless defined $args{funcprefix} or ref $self;
-        $args{funcschema} = "$self"->_get_schema
-                 unless defined $args{funcschema} or ref $self;
-    }
-    my @rows = $obj->call_procedure(%args);
-    for my $row (@rows){
-        for (keys %$row){
-            delete $row->{$_} unless defined $row->{$_};
-        }
-    }
-    return @rows if wantarray;
-    return shift @rows;
+sub funcprefix {
+    my ($self) = @_;
+    
+    return $self->_funcprefix if ref $self;
+    return "$self"->_get_prefix();
 }
-
-=head2 call_dbmethod
-
-Identical interface to PGObject::Simple->call_dbmethod
-
-This can be used on objects or on the packages themselves.  I.e.  
-mypackage->call_dbmethod() and $myobject->call_dbmethod() both work.
-
-=cut
-
-sub call_dbmethod {
-    my $self = shift @_;
-    my %args = @_;
-    croak 'No function name provided' unless $args{funcname};
-
-    $args{dbh} = $self->_DBH if ref $self and !$args{dbh};
-    $args{dbh} = "$self"->_get_dbh() unless $args{dbh};
-    if (ref $self){
-        $args{funcprefix} = $self->_funcprefix unless defined $args{funcprefix};
-        $args{funcschema} = $self->_funcschema unless $args{funcschema};
-    } else {
-        $args{funcprefix} = "$self"->_get_prefix 
-             unless defined $args{funcprefix};
-        $args{funcschema} = "$self"->_get_schema unless $args{funcschema};
-    }
-    $args{funcprefix} ||= '';
-
-    my $info = PGObject->function_info(%args);
-
-    my $dbargs = [];
-    @$dbargs = map {
-        my $argname = $_->{name};
-        my $db_arg;
-        $argname =~ s/^in_//;
-        local $@;
-        eval { $db_arg = $self->can($argname)->($self) }
-            if ref $self and $argname;
-        $db_arg = $args{args}->{$argname} if exists $args{args}->{$argname};
-        $db_arg;
-    } @{$info->{args}};
-    $args{args} = $dbargs;
-    my @rows;
-    if (ref $self){
-        @rows = $self->call_procedure(%args);
-    } else {
-        @rows = "$self"->call_procedure(%args);
-    }
-    return @rows if wantarray;
-    return shift @rows;
-}    
 
 =head1 REMOVED METHODS
 
@@ -325,7 +273,7 @@ L<http://search.cpan.org/dist/PGObject-Simple-Role/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013-2014 Chris Travers,.
+Copyright 2013-2017 Chris Travers,.
 
 Redistribution and use in source and compiled forms with or without 
 modification, are permitted provided that the following conditions are met:

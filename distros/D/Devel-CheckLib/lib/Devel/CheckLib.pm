@@ -5,7 +5,7 @@ package Devel::CheckLib;
 use 5.00405; #postfix foreach
 use strict;
 use vars qw($VERSION @ISA @EXPORT);
-$VERSION = '1.10';
+$VERSION = '1.11';
 use Config qw(%Config);
 use Text::ParseWords 'quotewords';
 
@@ -408,7 +408,7 @@ sub assert_lib {
             );
         }
         warn "# @sys_cmd\n" if $args{debug};
-        local $ENV{LD_RUN_PATH} = join(":", @libpaths).":".$ENV{LD_RUN_PATH} unless $^O eq 'MSWin32';
+        local $ENV{LD_RUN_PATH} = join(":", grep $_, @libpaths, $ENV{LD_RUN_PATH}) unless $^O eq 'MSWin32';
         local $ENV{PATH} = join(";", @libpaths).";".$ENV{PATH} if $^O eq 'MSWin32';
         my $rv = $args{debug} ? system(@sys_cmd) : _quiet_system(@sys_cmd);
         if ($rv != 0 || ! -x $exefile) {

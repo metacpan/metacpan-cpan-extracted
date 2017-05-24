@@ -8,7 +8,7 @@ use Pcore -const, -export,
 use parent qw[AnyEvent::Handle];
 use AnyEvent::Socket qw[];
 use Pcore::AE::DNS::Cache;
-use Pcore::HTTP::Message::Headers;
+use Pcore::HTTP::Headers;
 use HTTP::Parser::XS qw[HEADERS_AS_ARRAYREF HEADERS_NONE];
 use Pcore::AE::Handle::Cache;
 
@@ -729,7 +729,7 @@ sub read_http_res_headers {
                 }
                 else {
                     if ( $args{headers} ) {
-                        $res->{headers} = ref $args{headers} ? $args{headers} : Pcore::HTTP::Message::Headers->new;
+                        $res->{headers} = ref $args{headers} ? $args{headers} : Pcore::HTTP::Headers->new;
 
                         # repack received headers to the standard format
                         for ( my $i = 0; $i <= $parsed_headers->$#*; $i += 2 ) {

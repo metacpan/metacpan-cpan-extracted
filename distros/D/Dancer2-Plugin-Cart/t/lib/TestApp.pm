@@ -72,4 +72,7 @@ get '/cart/subtotal' => sub {
   subtotal;
 };
 
+get '/cart/quantity' => sub {
+  quantity;
+};
 1;

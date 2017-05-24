@@ -14,8 +14,8 @@ lib/Log/Log4perl/Layout/JSON.pm
 t/00-compile.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
+t/author-signature.t
 t/basic.t
 t/context.t
 t/max-length.t
-t/signature.t
 t/warp.t

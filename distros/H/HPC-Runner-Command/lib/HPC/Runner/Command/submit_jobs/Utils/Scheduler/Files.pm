@@ -2,9 +2,11 @@ package HPC::Runner::Command::submit_jobs::Utils::Scheduler::Files;
 
 use Moose::Role;
 use IO::File;
+
 #Travis test fails without this
 use IO::Interactive;
 use File::Path qw(make_path remove_tree);
+use File::Copy;
 use Data::Dumper;
 
 =head1 HPC::Runner::Command::submit_jobs::Utils::Scheduler::Files
@@ -50,6 +52,14 @@ has 'slurmfile' => (
     handles  => { clear_slurmfile => 'clear', },
 );
 
+has job_files => (
+    is      => 'rw',
+    isa     => 'HashRef',
+    default => sub {
+        return {};
+    }
+);
+
 =head2 Subroutines
 
 =cut
@@ -65,8 +75,7 @@ sub resolve_project {
     my $jobname;
 
     if ( $self->has_project ) {
-        $jobname
-            = $self->project . "_" . $counter . "_" . $self->current_job;
+        $jobname = $self->project . "_" . $counter . "_" . $self->current_job;
     }
     else {
         $jobname = $counter . "_" . $self->current_job;
@@ -114,7 +123,7 @@ sub prepare_counter {
 sub prepare_sched_file {
     my $self = shift;
 
-    $DB::single = 2;
+    #$DB::single = 2;
 
     my ( $batch_counter, $job_counter ) = $self->prepare_counter;
 
@@ -137,68 +146,47 @@ sub prepare_sched_file {
 
 Write out the batch files
 
+Old method
+
 For job arrays this is 1 per array element
 
 For (legacy) batches 1 file per batch
 
+New method
+
+One file per job - and we just have a counter to make sure we are on the right task
+
 =cut
 
 sub prepare_batch_files_array {
-    my $self              = shift;
-    my $batch_index_start = shift;
-    my $batch_index_end   = shift;
-
-    #Each jobtype has 1 or more batches based on max_array_size
-    $DB::single = 2;
-    my $job_start = $self->jobs->{ $self->current_job }->{batch_index_start};
-
-    #Get batch index as array
-    #BatchIndexStart 11 BatchIndexEnd 20    (size 10)
-    #Range 0, 9                             (size 10)
-
-    my @batch_indexes = ( $batch_index_start .. $batch_index_end );
-    my $len           = scalar @batch_indexes;
-
-    for ( my $x = 0; $x < $len; $x++ ) {
-
-        #Get the current batch/array element
-        my $real_batch_index = $batch_indexes[$x] - $job_start;
-        $self->current_batch(
-            $self->jobs->{ $self->current_job }->batches->[$real_batch_index]
-        );
-
-        #TODO counters are messed up somewhere...
-        next unless $self->current_batch;
-        
-        #Assign the counters
-        my $job_counter   = sprintf( "%03d", $self->job_counter );
-        my $array_counter = sprintf( "%03d", $self->array_counter );
-
-        my $jobname = $self->resolve_project($job_counter);
-
-        $self->cmdfile(
-            $self->outdir . "/$jobname" . "_" . $array_counter . ".in" );
-
-        #Write the files
-        $self->write_batch_file($self->current_batch->batch_str);
-
-        $self->inc_array_counter;
-    }
-}
-
-sub write_batch_file {
     my $self = shift;
-    my $command  = shift;
 
-    make_path( $self->outdir ) unless -d $self->outdir;
+    # my $job_counter = sprintf( "%03d", $self->job_counter );
 
-    my $fh = IO::File->new( $self->cmdfile, q{>} )
-        or die print "Error opening file  "
-        . $self->cmdfile . "  "
-        . $! . "\n";
+    my $job_counter = "000";
+    my $jobname     = $self->resolve_project($job_counter);
+    my $outfile     = File::Spec->catfile( $self->outdir, $jobname . '.in' );
 
-    print $fh $command if defined $fh && defined $command;
-    $fh->close;
+    if ( !-e $outfile ) {
+        copy( $self->job_files->{ $self->current_job }->filename, $outfile )
+          or die print "ERROR COPYING $!";
+    }
+
+    $self->cmdfile($outfile);
 }
+
+#TODO Write a file per job - not per task
+# sub write_batch_file {
+#     my $self    = shift;
+#     my $command = shift;
+#
+#     make_path( $self->outdir ) unless -d $self->outdir;
+#
+#     my $fh = IO::File->new( $self->cmdfile, q{>} )
+#       or die print "Error opening file  " . $self->cmdfile . "  " . $! . "\n";
+#
+#     print $fh $command if defined $fh && defined $command;
+#     $fh->close;
+# }
 
 1;

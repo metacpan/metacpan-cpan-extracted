@@ -1,6 +1,6 @@
 package Bio::Roary::Exceptions;
 # ABSTRACT: Exceptions for input data 
-$Bio::Roary::Exceptions::VERSION = '3.8.0';
+$Bio::Roary::Exceptions::VERSION = '3.8.2';
 
 use strict; use warnings;
 use Exception::Class (
@@ -22,7 +22,7 @@ Bio::Roary::Exceptions - Exceptions for input data
 
 =head1 VERSION
 
-version 3.8.0
+version 3.8.2
 
 =head1 SYNOPSIS
 

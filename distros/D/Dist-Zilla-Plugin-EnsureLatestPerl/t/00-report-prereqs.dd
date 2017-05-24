@@ -7,7 +7,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.123'
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.125'
                                       },
                       'requires' => {
                                       'Dist::Zilla' => '5',
@@ -82,6 +82,7 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::Test::ReportPrereqs' => '0.022',
                                       'Dist::Zilla::Plugin::TestRelease' => '0',
                                       'Dist::Zilla::Plugin::UploadToCPAN' => '0',
+                                      'Dist::Zilla::Plugin::UseUnsafeInc' => '0',
                                       'Dist::Zilla::PluginBundle::Author::ETHER' => '0.119',
                                       'File::Spec' => '0',
                                       'IO::Handle' => '0',
@@ -126,8 +127,10 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
+                                   'Devel::InnerPackage' => '0',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
+                                   'Module::Pluggable::Object' => '0',
                                    'POSIX' => '0',
                                    'Path::Tiny' => '0',
                                    'Test::DZil' => '0',

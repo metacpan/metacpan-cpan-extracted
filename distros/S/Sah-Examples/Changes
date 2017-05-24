@@ -1,3 +1,9 @@
+0.05    2017-05-22 (PERLANCAR)
+
+	- Add some array and hash examples, including the usage of
+	  keys.restrict attribute.
+
+
 0.04    2017-03-09 (PERLANCAR)
 
 	- Fix coercion example.

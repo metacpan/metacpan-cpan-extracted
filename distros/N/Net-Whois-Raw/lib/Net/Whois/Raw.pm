@@ -1,5 +1,5 @@
 package Net::Whois::Raw;
-$Net::Whois::Raw::VERSION = '2.99006';
+$Net::Whois::Raw::VERSION = '2.99007';
 # ABSTRACT: Get Whois information of domains and IP addresses.
 
 require 5.008_001;
@@ -60,10 +60,7 @@ sub whois_config_data {
 sub whois {
     my ($dom, $server, $which_whois) = @_;
 
-    unless ( $which_whois ) {
-        my ( undef, $tld ) = Net::Whois::Raw::Common::split_domain( $dom );
-        $which_whois = $Net::Whois::Raw::Data::default_last_tlds{ uc $tld } ? 'QRY_LAST' : 'QRY_FIRST' ;
-    }
+    $which_whois ||= 'QRY_LAST';
 
     my $res = Net::Whois::Raw::Common::get_from_cache( "$dom-$which_whois", $CACHE_DIR, $CACHE_TIME );
 
@@ -96,11 +93,7 @@ sub whois {
 # obtain whois
 sub get_whois {
     my ($dom, $srv, $which_whois) = @_;
-
-    unless ( $which_whois ) {
-        my ( undef, $tld ) = Net::Whois::Raw::Common::split_domain( $dom );
-        $which_whois = $Net::Whois::Raw::Data::default_last_tlds{ uc $tld } ? 'QRY_LAST' : 'QRY_FIRST' ;
-    }
+    $which_whois ||= 'QRY_LAST';
 
     my $whois = get_all_whois( $dom, $srv, $which_whois eq 'QRY_FIRST' )
         or return undef;
@@ -178,16 +171,12 @@ sub recursive_whois {
     my $lines = whois_query( $dom, $srv, $is_ns );
     my $whois = join("", @{$lines});
 
-    my ($newsrv, $registrar, $wsrv);
+    my ($newsrv, $registrar);
     foreach (@{$lines}) {
         $registrar ||= /Registrar/ || /Registered through/;
 
-        if ( !$norecurse  &&  !$wsrv  &&  /(?:Whois|WHOIS) Server:\s*([A-Za-z0-9\-_\.]+)/ ) {
-            $wsrv = lc $1;
-        }
-
-        if ( $registrar  &&  !$norecurse  &&  $wsrv  &&  !$newsrv ) {
-            $newsrv = $wsrv;
+        if ( $registrar && !$norecurse && /Whois Server:\s*([A-Za-z0-9\-_\.]+)/ ) {
+            $newsrv = lc $1;
         }
         elsif ($whois =~ /To single out one record, look it up with \"xxx\",/s) {
             return recursive_whois( "=$dom", $srv, $was_srv );
@@ -483,7 +472,7 @@ Net::Whois::Raw - Get Whois information of domains and IP addresses.
 
 =head1 VERSION
 
-version 2.99006
+version 2.99007
 
 =head1 SYNOPSIS
 

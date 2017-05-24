@@ -50,7 +50,7 @@ sub run ( $self, $args ) {
 }
 
 sub _create_dockerhub_repo ($self) {
-    my $namespace = $ENV->user_cfg->{'Pcore::API::DockerHub'}->{namespace} || $ENV->user_cfg->{'Pcore::API::DockerHub'}->{api_username};
+    my $namespace = $ENV->user_cfg->{DOCKERHUB}->{namespace} || $ENV->user_cfg->{DOCKERHUB}->{username};
 
     if ( !$namespace ) {
         say 'DockerHub namespace is not defined';

@@ -1,5 +1,9 @@
 Revision history for Perl module File::ConfigDir
 
+0.018 2017-05-22
+    - add vendorapp_cfg_dir
+    - have a .perltidyrc
+
 0.017 2015-04-27
     - add irc channel and mailing list to meta data
     - apply fix regarding "Cwd::abs_path is not portable" from jddurand

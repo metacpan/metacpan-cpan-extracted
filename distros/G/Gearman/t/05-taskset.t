@@ -8,6 +8,8 @@ use Test::Exception;
 use lib '.';
 use t::Server ();
 
+plan tests => 17;
+
 my @js;
 my ($cn, $mn) = qw/
     Gearman::Client
@@ -38,6 +40,8 @@ my $c = new_ok($cn, [job_servers => [@js]]);
 my $ts = new_ok($mn, [$c]);
 
 subtest "new", sub {
+    plan tests => 9;
+
     is($ts->client,             $c,    "client");
     is($ts->{cancelled},        0,     "cancelled");
     is($ts->{default_sockaddr}, undef, "default_sockaddr");
@@ -53,6 +57,8 @@ subtest "new", sub {
 };
 
 subtest "hook", sub {
+    plan tests => 4;
+
     my $cb = sub { 2 * shift };
     my $h = "ahook";
     ok($ts->add_hook($h, $cb), "add_hook($h, ..)");
@@ -63,6 +69,8 @@ subtest "hook", sub {
 };
 
 subtest "cancel", sub {
+    plan tests => 8;
+
     my $ts = new_ok($mn, [$cn->new(job_servers => [@js])]);
     is($ts->{cancelled}, 0);
 
@@ -81,11 +89,13 @@ subtest "cancel", sub {
 };
 
 subtest "socket", sub {
+    plan tests => 6;
+SKIP: {
     my $gts = t::Server->new();
-    $gts || plan skip_all => $t::Server::ERROR;
+    $gts || skip $t::Server::ERROR, 6;
 
     my $job_server = $gts->job_servers();
-    $job_server || plan skip_all => "couldn't start ", $gts->bin();
+    $job_server || skip join(' ', "couldn't start", $gts->bin()), 6;
 
     my $ts = new_ok($mn, [$cn->new(job_servers => [$job_server])]);
 
@@ -102,8 +112,11 @@ subtest "socket", sub {
     ok($ts->_get_default_sock(),                "_get_default_sock");
     ok($ts->_ip_port($ts->_get_default_sock()), "_ip_port");
 };
+};
 
 subtest "task", sub {
+    plan tests => 9;
+
     my $f = "foo";
     my $t = Gearman::Task->new(
         $f, undef,
@@ -151,7 +164,7 @@ subtest "process_packet(job_created)", sub {
                 on_fail => sub {
                     my ($m) = shift;
                     is($m, "jshandle fail", "on fail message");
-                }
+                    }
             }
         ),
         "task"
@@ -164,8 +177,8 @@ subtest "process_packet(job_created)", sub {
     my $r = { type => $type, blobref => \$h };
 
     # job_created
-    throws_ok { $ts->process_packet($r, $sock) }
-    qr/unexpected $type/, "$type exception";
+    throws_ok { $ts->process_packet($r, $sock) } qr/unexpected $type/,
+        "$type exception";
 
     $ts->{need_handle} = [$task];
     $ts->{waiting}{$h} = [$task];
@@ -177,6 +190,7 @@ subtest "process_packet(job_created)", sub {
 
 subtest "process_packet(work_complete)", sub {
     plan tests => 6;
+
     my $type = "work_complete";
     my $r = { type => $type, blobref => \$h };
     throws_ok { $ts->process_packet($r, $ts->_get_default_sock()) }
@@ -193,7 +207,7 @@ subtest "process_packet(work_complete)", sub {
                 on_complete => sub {
                     my ($blob) = shift;
                     is(${$blob}, "12345", "on complete");
-                }
+                    }
             }
         ),
         "task"
@@ -225,7 +239,7 @@ subtest "process_packet(work_data)", sub {
                 on_data => sub {
                     my ($blob) = shift;
                     is(${$blob}, "abc", "on data");
-                }
+                    }
             }
         ),
         "task"
@@ -252,7 +266,7 @@ subtest "process_packet(work_exception)", sub {
                 on_exception => sub {
                     my ($blob) = shift;
                     is($blob, "abc", "on exception");
-                }
+                    }
             }
         ),
         "task"
@@ -261,7 +275,7 @@ subtest "process_packet(work_exception)", sub {
 
     $ts->{waiting}{$h} = [$task];
     ok($ts->process_packet($r), "process_packet");
-    is(scalar(@{ $ts->{waiting}{$h} }), 1, "waiting{$h}");
+    is($ts->{waiting}{$h}, undef, "waiting{$h}");
 };
 
 subtest "process_packet(work_fail)", sub {
@@ -274,7 +288,7 @@ subtest "process_packet(work_fail)", sub {
                 on_fail => sub {
                     my ($m) = shift;
                     is($m, "jshandle fail", "on fail message");
-                }
+                    }
             }
         ),
         "task"
@@ -295,8 +309,8 @@ subtest "process_packet(work_status)", sub {
     my $type = "work_status";
     my $r = { type => $type, blobref => \join "\0", $h, 3, 5 };
     $ts->{waiting}{$h} = [];
-    throws_ok { $ts->process_packet($r) }
-    qr/Got $type for unknown handle/, "caught unknown handle";
+    throws_ok { $ts->process_packet($r) } qr/Got $type for unknown handle/,
+        "caught unknown handle";
 
     ok(
         my $task = $ts->client()->_get_task_from_args(
@@ -306,7 +320,7 @@ subtest "process_packet(work_status)", sub {
                     my ($nu, $de) = @_;
                     is($nu, 3);
                     is($de, 5);
-                }
+                    }
             }
         ),
         "task"
@@ -319,10 +333,11 @@ subtest "process_packet(work_status)", sub {
 
 subtest "process_packet(unimplemented type)", sub {
     plan tests => 1;
+
     my $type = $f;
     my $r = { type => $type, blobref => \"x" };
-    throws_ok { $ts->process_packet($r) }
-    qr/Unimplemented packet type: $f/, "caught unimplemented packet type";
+    throws_ok { $ts->process_packet($r) } qr/Unimplemented packet type: $f/,
+        "caught unimplemented packet type";
 };
 
 done_testing();

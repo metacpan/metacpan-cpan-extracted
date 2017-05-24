@@ -3,6 +3,31 @@ Upstream-Name: Exporter-Tiny
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Exporter-Tiny
 
+Files: README
+ lib/Exporter/Tiny.pm
+ lib/Exporter/Tiny/Manual/Etc.pod
+ lib/Exporter/Tiny/Manual/Exporting.pod
+ lib/Exporter/Tiny/Manual/Importing.pod
+ lib/Exporter/Tiny/Manual/QuickStart.pod
+ t/01basic.t
+ t/02renaming.t
+ t/03generators.t
+ t/04into.t
+Copyright: This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+ CREDITS
+ Changes
+ INSTALL
+ LICENSE
+ META.json
+ META.yml
+ Makefile.PL
+ doap.ttl
+Copyright: Copyright 2017 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: lib/Exporter/Shiny.pm
  t/05shiny.t
  t/06notwant.t
@@ -10,48 +35,17 @@ Files: lib/Exporter/Shiny.pm
  t/08tags.t
  t/09warnings.t
  t/10no.t
-Copyright: This software is copyright (c) 2014 by Toby Inkster.
+Copyright: This software is copyright (c) 2014, 2017 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
-
-Files: README
- lib/Exporter/Tiny.pm
- lib/Exporter/Tiny/Manual/Etc.pod
- lib/Exporter/Tiny/Manual/Exporting.pod
- lib/Exporter/Tiny/Manual/Importing.pod
- lib/Exporter/Tiny/Manual/QuickStart.pod
-Copyright: This software is copyright (c) 2013-2014 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: INSTALL
- LICENSE
- Makefile.PL
- examples/Example/Exporter.pm
-Copyright: Unknown
-License: Unknown
-
-Files: t/01basic.t
- t/02renaming.t
- t/03generators.t
- t/04into.t
-Copyright: This software is copyright (c) 2013 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: Changes
- META.json
- META.yml
- doap.ttl
-Copyright: Copyright 2017 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: COPYRIGHT
- CREDITS
- SIGNATURE
-Copyright: None
-License: public-domain
 
 Files: dist.ini
+ examples/Example/Exporter.pm
 Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
+
+Files: SIGNATURE
+Copyright: None
+License: public-domain
 
 License: Artistic-1.0
  This software is Copyright (c) 2017 by the copyright holder(s).

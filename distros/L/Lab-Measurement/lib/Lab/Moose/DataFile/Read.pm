@@ -8,7 +8,7 @@ use PDL::IO::Misc 'rcols';
 use Fcntl 'SEEK_SET';
 use Carp;
 use Exporter 'import';
-our $VERSION = '3.542';
+our $VERSION = '3.543';
 
 our @EXPORT_OK = qw/read_2d_gnuplot_format/;
 

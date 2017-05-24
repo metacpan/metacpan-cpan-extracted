@@ -1,5 +1,6 @@
 package PackageOne;
 use Signals::XSIG qw(untied %XSIG);
+use lib '.';
 use t::SignalHandlerTest;
 use Test::More tests => 58;
 use Config;

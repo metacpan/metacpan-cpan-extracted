@@ -14,7 +14,7 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-  Perl v5.6.1
+  Perl v5.10.1
   Net::Frame
 
 GETTING HELP

@@ -77,7 +77,7 @@ my %WriteMakefileArgs = (
     'Test::Requires::Git' => '0',
     'lib' => '0'
   },
-  'VERSION' => '1.15.1',
+  'VERSION' => '1.16.0',
   'test' => {
     'TESTS' => 't/*.t'
   },

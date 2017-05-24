@@ -1,4 +1,9 @@
-Revision history for Ledger-Examples
+0.04    2017-05-23 (PERLANCAR)
+
+	- Add sample file: timelog.dat.
+
+	- Add note about not supporting time of day (hour, minute, second).
+
 
 0.03     2016-01-11 (PERLANCAR)
 

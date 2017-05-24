@@ -1,6 +1,6 @@
 undef $VERSION;
 package Bio::Roary::CommandLine::ParallelAllAgainstAllBlastp;
-$Bio::Roary::CommandLine::ParallelAllAgainstAllBlastp::VERSION = '3.8.0';
+$Bio::Roary::CommandLine::ParallelAllAgainstAllBlastp::VERSION = '3.8.2';
 # ABSTRACT: Take in a FASTA file of proteins and blast against itself
 
 
@@ -147,7 +147,7 @@ Bio::Roary::CommandLine::ParallelAllAgainstAllBlastp - Take in a FASTA file of p
 
 =head1 VERSION
 
-version 3.8.0
+version 3.8.2
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package Net::Whois::Raw::Data;
-$Net::Whois::Raw::Data::VERSION = '2.99006';
+$Net::Whois::Raw::Data::VERSION = '2.99007';
 # ABSTRACT: Config for Net::Whois::Raw.
 
 use utf8;
@@ -1978,15 +1978,6 @@ our %servers = qw(
     WORK                    whois.nic.work
 
     YOGA                    whois.nic.yoga
-);
-
-
-our %default_last_tlds = qw(
-    COM         whois.crsnic.net
-    NET         whois.crsnic.net
-    CC          whois.nic.cc
-    TV          whois.nic.tv
-    JOBS        whois.nic.jobs
 );
 
 
@@ -4294,7 +4285,7 @@ Net::Whois::Raw::Data - Config for Net::Whois::Raw.
 
 =head1 VERSION
 
-version 2.99006
+version 2.99007
 
 =head1 AUTHOR
 

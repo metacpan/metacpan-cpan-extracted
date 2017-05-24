@@ -1,5 +1,8 @@
 Revision history for Signals-XSIG
 
+0.15    2017-05-22
+        Fix for intermittent test failure
+
 0.14    2016-11-18
         Improve detection of global destruction
         Improve handling of signals with more than one mnemonic

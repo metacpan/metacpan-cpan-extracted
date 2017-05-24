@@ -1,0 +1,143 @@
+.# Title: Condition that is a sub - from in a sub
+.#
+.# This needs to be tested several ways due to implementation subtleties:
+.# In line and in a sub
+.# .if vs .unless vs .elseif
+.# .while vs .until vs .for
+.# .sub vs the built in directives: .include .read .test
+.# Nested vs top level loops & straight ifs
+.# In various combinations.
+.#
+.# A sub that returns its first argument:
+.sub foo RetVal a2
+.echo foo returning RetVal='\v{RetVal}' ; a2='\v{a2}'
+.return RetVal
+.done
+Done foo definition
+
+.#
+.sub TestIt
+
+Test within sub if: false
+.if .foo 0 bar
+Unexpected output
+.else
+Expected output
+.fi
+.#
+
+Test within sub if: true
+.if .foo 1 bar
+Expected output
+.else
+Unexpected output
+.fi
+.#
+
+Test within sub if: true
+.if .foo 12 bar
+Expected output
+.else
+Unexpected output
+.fi
+.#
+
+Test within sub if: true
+.if .foo someString bar
+Expected output
+.else
+Unexpected output
+.fi
+
+The same again but .unless instead of .if
+
+Test within sub unless: false
+.unless .foo 0 bar
+Expected output
+.else
+Unexpected output
+.fi
+.#
+
+Test within sub unless: true
+.unless .foo 1 bar
+Unexpected output
+.else
+Expected output
+.fi
+.#
+
+Test within sub unless: true
+.unless .foo 12 bar
+Unexpected output
+.else
+Expected output
+.fi
+.#
+
+Test within sub unless: true
+.unless .foo someString bar
+Unexpected output
+.else
+Expected output
+.fi
+
+
+Again, but the test in .elseif
+Test within sub elseif: false
+.if 0
+Unexpected after .if 0
+.elseif .foo 0 bar
+Unexpected output
+.else
+Expected output
+.fi
+.#
+
+Test within sub elseif: true
+.if 0
+Unexpected after .if 0
+.elseif .foo 1 bar
+Expected output
+.else
+Unexpected output
+.fi
+.#
+
+Test within sub elseif: true
+.if 0
+Unexpected after .if 0
+.elseif .foo 12 bar
+Expected output
+.else
+Unexpected output
+.fi
+.#
+
+Test within sub elseif: true
+.if 0
+Unexpected after .if 0
+.elseif .foo someString bar
+Expected output
+.elseif .foo 1 baz
+Unexpected output .elseif .foo 1 baz
+.else
+Unexpected output .else
+.fi
+.#
+
+Test within sub elseif: false, true
+.if 0
+Unexpected after .if 0
+.elseif .foo 0 bar
+Unexpected output after .elseif .foo 0 bar
+.elseif .foo 1 baz
+Expected output
+.else
+Unexpected output after .else
+.fi
+.done sub TestIt
+
+TestIt defined, now run it
+.TestIt
+EOF

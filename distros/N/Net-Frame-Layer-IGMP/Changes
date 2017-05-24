@@ -1,5 +1,8 @@
 Revision history for Perl extension Net::Frame::Layer::IGMP.
 
+1.02 Tue May 19 17:48:36 EST 2017
+   - Edit, corrections, update min Perl version.
+
 1.01 Tue Mar 19 17:48:36 EST 2013
    - Fix faulty t\02-pod-coverage.t
    - Move length calcs to computeLengths

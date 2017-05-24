@@ -14,7 +14,7 @@ Lab::Instrument::HP33120A - HP 33120A 15MHz function/arbitrary waveform generato
 
 =cut
 
-our $VERSION = '3.542';
+our $VERSION = '3.543';
 
 our @ISA = ("Lab::Instrument");
 

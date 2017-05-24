@@ -12,7 +12,7 @@ WriteMakefile(
 		'ExtUtils::Installed' => '2.02',
 		'CPAN'			=> '2.00',
 		'Cwd'			=> '3.47',
-		'Lazy::Utils'	=> '1.13',
+		'Lazy::Utils'	=> '1.17',
 	},
 	EXE_FILES			=> [qw(
 		lib/App/Virtualenv/virtualenv.pl

@@ -43,6 +43,7 @@ t/31-Interval-operations.t
 t/40-operations.t
 t/41-storable.t
 t/42-json.t
+t/43-panda-lib-clone.t
 t/99-leaks.t
 t/lib/PDTest.pm
 typemap

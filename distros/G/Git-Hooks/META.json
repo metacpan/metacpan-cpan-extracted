@@ -69,55 +69,55 @@
    "provides" : {
       "Git::Hooks" : {
          "file" : "lib/Git/Hooks.pm",
-         "version" : "v1.15.1"
+         "version" : "v1.16.0"
       },
       "Git::Hooks::CheckAcls" : {
          "file" : "lib/Git/Hooks/CheckAcls.pm",
-         "version" : "v1.15.1"
+         "version" : "v1.16.0"
       },
       "Git::Hooks::CheckCommit" : {
          "file" : "lib/Git/Hooks/CheckCommit.pm",
-         "version" : "v1.15.1"
+         "version" : "v1.16.0"
       },
       "Git::Hooks::CheckFile" : {
          "file" : "lib/Git/Hooks/CheckFile.pm",
-         "version" : "v1.15.1"
+         "version" : "v1.16.0"
       },
       "Git::Hooks::CheckJira" : {
          "file" : "lib/Git/Hooks/CheckJira.pm",
-         "version" : "v1.15.1"
+         "version" : "v1.16.0"
       },
       "Git::Hooks::CheckLog" : {
          "file" : "lib/Git/Hooks/CheckLog.pm",
-         "version" : "v1.15.1"
+         "version" : "v1.16.0"
       },
       "Git::Hooks::CheckRewrite" : {
          "file" : "lib/Git/Hooks/CheckRewrite.pm",
-         "version" : "v1.15.1"
+         "version" : "v1.16.0"
       },
       "Git::Hooks::CheckStructure" : {
          "file" : "lib/Git/Hooks/CheckStructure.pm",
-         "version" : "v1.15.1"
+         "version" : "v1.16.0"
       },
       "Git::Hooks::CheckWhitespace" : {
          "file" : "lib/Git/Hooks/CheckWhitespace.pm",
-         "version" : "v1.15.1"
+         "version" : "v1.16.0"
       },
       "Git::Hooks::GerritChangeId" : {
          "file" : "lib/Git/Hooks/GerritChangeId.pm",
-         "version" : "v1.15.1"
+         "version" : "v1.16.0"
       },
       "Git::Hooks::Test" : {
          "file" : "lib/Git/Hooks/Test.pm",
-         "version" : "v1.15.1"
+         "version" : "v1.16.0"
       },
       "Git::More" : {
          "file" : "lib/Git/More.pm",
-         "version" : "v1.15.1"
+         "version" : "v1.16.0"
       },
       "Git::More::Message" : {
          "file" : "lib/Git/More/Message.pm",
-         "version" : "v1.15.1"
+         "version" : "v1.16.0"
       }
    },
    "release_status" : "stable",
@@ -132,6 +132,6 @@
          "web" : "https://github.com/gnustavo/Git-Hooks"
       }
    },
-   "version" : "1.15.1"
+   "version" : "1.16.0"
 }
 

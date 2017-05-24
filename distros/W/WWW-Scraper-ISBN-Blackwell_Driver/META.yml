@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                   WWW-Scraper-ISBN-Blackwell_Driver
-version:                0.09
+version:                0.10
 abstract:               Search driver for Blackwell's online book catalog
 author:
   - Barbie <barbie@cpan.org>
@@ -27,7 +27,7 @@ build_requires:
 provides:
   WWW::Scraper::ISBN::Blackwell_Driver:
     file:     lib/WWW/Scraper/ISBN/Blackwell_Driver.pm
-    version:  0.09
+    version:  0.10
 no_index:
   directory:
     - t

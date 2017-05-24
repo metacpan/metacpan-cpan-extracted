@@ -4,7 +4,7 @@ use warnings;
 
 {
     no strict "vars";
-    $VERSION = "1.11";
+    $VERSION = "1.12";
 }
 
 use Acme::CPANAuthors::Register (
@@ -12,13 +12,13 @@ use Acme::CPANAuthors::Register (
     'ADAMK'         => 'Adam Kennedy',
     'AUTRIJUS'      => 'Audrey Tang',
     'BARBIE'        => 'Barbie',
-    'BDFOY'         => 'brian d foy',
     'BINGOS'        => 'Chris Williams',
     'BOBTFISH'      => 'Tomas Doran',
     'DAGOLDEN'      => 'David Golden',
     'DMAKI'         => 'Daisuke Maki',
     'DROLSKY'       => 'Dave Rolsky',
     'ETHER'         => 'Karen Etheridge',
+    'FAYLAND'       => 'Fayland Lin',
     'FLORA'         => 'Florian Ragwitz',
     'GUGOD'         => 'Liu Kang Min',
     'INGY'          => 'Ingy dot Net',
@@ -40,7 +40,7 @@ use Acme::CPANAuthors::Register (
     'SALVA'         => 'Salvador Fandino Garcia',
     'SHLOMIF'       => 'Shlomi Fish',
     'SIMON'         => 'Simon Cozens',
-    'SKIM'          => 'Michal Spacek',
+    'SKIM'          => 'Michal Josef Spacek',
     'SMUELLER'      => 'Steffen Mueller',
     'TOBYINK'       => 'Toby Inkster',
     'TOKUHIROM'     => '???',
@@ -76,43 +76,43 @@ currently maintaining 100 or more distributions on CPAN.
 
 =head1 THE AUTHORS
 
-   1.  810  PERLANCAR     perlancar
-   2.  479  PSIXDISTS     Perl 6 Modules
-   3.  293  RJBS          Ricardo SIGNES
-   4.  266  TOBYINK       Toby Inkster
-   5.  248  ADAMK         Adam Kennedy
-   6.  234  MIYAGAWA      Tatsuhiko Miyagawa
-   7.  214  INGY          Ingy dot Net
-   8.  212  ETHER         Karen Etheridge
-   9.  211  BINGOS        Chris Williams
-  10.  210  FLORA         Florian Ragwitz
-  11.  196  JGNI          John Imrie
+   1.  1153  PERLANCAR     perlancar
+   2.  549  PSIXDISTS     Perl 6 Modules
+   3.  295  RJBS          Ricardo SIGNES
+   4.  267  TOBYINK       Toby Inkster
+   5.  247  ADAMK         Adam Kennedy
+   6.  235  MIYAGAWA      Tatsuhiko Miyagawa
+   7.  233  ETHER         Karen Etheridge
+   8.  230  JGNI          John Imrie
+   9.  216  INGY          Ingy dot Net
+  10.  212  BINGOS        Chris Williams
+  11.  209  FLORA         Florian Ragwitz
   12.  185  SMUELLER      Steffen Mueller
-  13.  181  TOKUHIROM     ???
-  14.  171  DAGOLDEN      David Golden
-  15.  170  KENTNL        Kent Fredric
+  13.  184  KENTNL        Kent Fredric
+  14.  181  TOKUHIROM     ???
+  15.  178  DAGOLDEN      David Golden
   16.  158  NUFFIN        Yuval Kogman
-  17.  152  BOBTFISH      Tomas Doran
-  18.  147  MARCEL        ???
-  19.  146  PEVANS        Paul Evans
-  20.  140  DROLSKY       Dave Rolsky
-  21.  135  SKIM          Michal Spacek
-  22.  122  DMAKI         Daisuke Maki
-  23.  122  GUGOD         Liu Kang Min
-  24.  121  NEILB         Neil Bowers
-  25.  118  SIMON         Simon Cozens
-  26.  117  BARBIE        Barbie
-  27.  117  SHLOMIF       Shlomi Fish
-  28.  113  RSAVAGE       Ron Savage
-  29.  112  AUTRIJUS      Audrey Tang
-  30.  112  PLICEASE      Graham Ollis
+  17.  154  PEVANS        Paul Evans
+  18.  152  BOBTFISH      Tomas Doran
+  19.  152  DROLSKY       Dave Rolsky
+  20.  147  MARCEL        ???
+  21.  140  SKIM          Michal Josef Spacek
+  22.  133  PLICEASE      Graham Ollis
+  23.  129  NEILB         Neil Bowers
+  24.  125  GUGOD         Liu Kang Min
+  25.  122  DMAKI         Daisuke Maki
+  26.  121  SHLOMIF       Shlomi Fish
+  27.  118  SIMON         Simon Cozens
+  28.  117  BARBIE        Barbie
+  29.  116  RSAVAGE       Ron Savage
+  30.  112  AUTRIJUS      Audrey Tang
   31.  107  SALVA         Salvador Fandino Garcia
-  32.  106  BDFOY         brian d foy
+  32.  105  FAYLAND       Fayland Lin
   33.  104  MLEHMANN      ???
-  34.  102  MRAMBERG      Marcus Ramberg
+  34.  104  MRAMBERG      Marcus Ramberg
   35.  101  LBROCARD      Leon Brocard
 
-List last updated: 2016-04-22T05:57:08
+List last updated: 2017-05-23T07:53:26
 
 =head1 MAINTENANCE
 
@@ -163,7 +163,7 @@ Thanks to Kenichi Ishigaki for writing C<Acme::CPANAuthors>.
 
 =head1 COPYRIGHT & LICENSE
 
-  Copyright 2014-2016 Barbie for Miss Barbell Productions.
+  Copyright 2014-2017 Barbie for Miss Barbell Productions.
 
   This distribution is free software; you can redistribute it and/or
   modify it under the Artistic License 2.0.

@@ -1,5 +1,12 @@
 Revision history for Dist-Zilla-Plugin-EnsureLatestPerl
 
+0.005     2017-05-24 02:00:40Z
+          - fix tests on older perls: preload some modules before $] is altered
+
+0.004     2017-05-21 01:39:40Z
+          - (hopefully) fix tests on MSWin32, by avoiding epoch times larger
+            than 32 bits
+
 0.003     2017-05-13 13:39:54Z
           - fix prereq on Module::CoreList to get the user into an initial
             working state (and ensures that tests pass)

@@ -1,5 +1,9 @@
+1.11    2017-05-23      Prevent concatenation warnings when LD_RUN_PATH is
+                        undefined.
+
+1.10    2017-04-08      Use Mock::Config.
+
 1.09    2017-04-08      Remove link options from @ldflags.
-                        Use Mock::Config.
 
 1.09    2017-03-18      Add $PATH for the libs on Windows.
 

@@ -1,0 +1,25 @@
+---
+abstract: unknown
+author:
+  - 'Ed Summers <ehs@pobox.com>'
+  - 'Galen Charlton <gmcharlt@gmail.com>'
+build_requires:
+  Test::Warn: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MARC-File-XML
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  MARC::Charset: '0.98'
+  MARC::Record: '2'
+  XML::LibXML: '1.66'
+version: v1.0.5

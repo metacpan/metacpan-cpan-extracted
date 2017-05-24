@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.0, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ no_index:
 provides:
   Variable::Expand::AnyLevel:
     file: lib/Variable/Expand/AnyLevel.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   PadWalker: '0'
   parent: '0'
@@ -35,7 +35,9 @@ resources:
   bugtracker: https://github.com/tsucchi/p5-Variable-Expand-AnyLevel/issues
   homepage: https://github.com/tsucchi/p5-Variable-Expand-AnyLevel
   repository: git://github.com/tsucchi/p5-Variable-Expand-AnyLevel.git
-version: '0.03'
+version: '0.04'
 x_authority: cpan:TSUCCHI
 x_contributors:
   - 'tsucchi <takuya.tsuchida at gmail.com>'
+  - 'Takuya Tsuchida <takuya.tsuchida@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

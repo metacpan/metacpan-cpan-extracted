@@ -1,5 +1,7 @@
 Revision history for PGObject-Type-ByteString
 
+1.2.0	2017-05-16
+	Adds support for PGObject 2.x
 1.1.2   2016-12-04
         Fix copyright attribution in LICENSE (consistency)
 

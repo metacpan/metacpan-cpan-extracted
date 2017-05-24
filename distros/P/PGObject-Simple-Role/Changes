@@ -1,5 +1,16 @@
 Revision history for PGObject-Simple-Role
 
+2.0.2	2017-05-20
+	Fixing backwards compatibility issue with _DBH in constructor
+
+2.0.1	2017-05-20
+	Fixing an issue where package accessors do not provide package defaults
+
+2.0	2017-05-19
+	Depending now on PGObject::Simple 3
+	No more code duplication
+	We share state with PGObject functions
+	New architecture.
 
 1.13.2  2016-11-21
         Fix minimum required dependency

@@ -1,7 +1,5 @@
 Makefile.PL
 MANIFEST
-MYMETA.json
-MYMETA.yml
 lib/
 lib/Imgur
 lib/Imgur/API.pm

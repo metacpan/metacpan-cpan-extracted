@@ -26,31 +26,5 @@
         bugtracker => {    #
             web => undef,
         }
-    },
-
-    # Pcore utils, provided by this distribution
-    util => {
-
-        # eg.:
-        # util_accessor_name => 'Util::Package::Name'
-        # and later in the code you can use P->util_accessor_name->...
-
-        geoip => 'Pcore::Util::GeoIP',
-    },
-
-    # shared resources, used by modules in this distribution
-    mod_share => {
-
-        # eg.:
-        # 'Distribution/Module/Name.pm' => ['/data/cfg.perl', '/data/cfg.ini'],
-
-        'Pcore/Util/GeoIP.pm' => [    #
-            '/data/geoip_country.dat',
-            '/data/geoip_country_v6.dat',
-            '/data/geoip_city.dat',
-            '/data/geoip_city_v6.dat',
-            '/data/geoip2_country.mmdb',
-            '/data/geoip2_city.mmdb',
-        ],
-    },
+    }
 }

@@ -41,3 +41,8 @@ Revision history for Dancer2-Plugin-Cart
         Fix ec_subtotal per product.
         Add product info into the cart after add a product.
         Fix receipt view template.
+
+1.0000 2017-05-20
+        Update documentation.
+        Add quanitity keywork to the dsl.
+        Update inlineviews removing link to checkout without items on cart.

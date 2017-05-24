@@ -16,6 +16,8 @@ t/10_no_class.t
 t/11_fixed_class.t
 t/12_class_in_column.t
 t/13_nested_data.t
+t/14_array.t
+t/testlib/Object/Element.pm
 t/testlib/Object/Fixed.pm
 t/testlib/Object/Nested.pm
 t/testlib/Object/Various.pm

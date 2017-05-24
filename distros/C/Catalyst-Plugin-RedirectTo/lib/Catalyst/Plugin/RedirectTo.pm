@@ -4,7 +4,7 @@ use Moose::Role;
 
 requires 'response', 'uri_for', 'uri_for_action';
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 our $DEFAULT_REDIRECT_STATUS = 303;
 
 my $normalize_status = sub {
@@ -26,10 +26,25 @@ sub redirect_to {
 
 sub redirect_to_action {
   my $c = shift;
-  my ($code, @args) = $normalize_status->(@_);
+  my ($code, $action_proto, @args) = $normalize_status->(@_);
 
-  $c->response->redirect(
-    $c->uri_for_action(@args), $code);
+  # If its already an action object just use it.
+  return $c->uri_for($action_proto, @args)
+    if Scalar::Util::blessed($action_proto); 
+
+  my $controller = $c->controller;
+  my $action;
+  if($action_proto =~/\//) {
+    my $path = $action_proto=~m/^\// ? $action_proto : $controller->action_for($action_proto)->private_path;
+    die "$action_proto is not an action for controller ${\$controller->catalyst_component_name}" unless $path;
+    die "$path is not a private path" unless $action = $c->dispatcher->get_action_by_path($path);
+  } else {
+    die "$action_proto is not an action for controller ${\$controller->catalyst_component_name}"
+      unless $action = $controller->action_for($action_proto);
+  }
+  die "Could not create a URI from '$action_proto' with the given arguments" unless $action;
+  my $url = $c->uri_for($action, @args);
+  $c->response->redirect($url, $code);
 }
 
 1;
@@ -60,7 +75,7 @@ Then you can use it in your controllers:
 
     sub does_redirect_to_action :Local {
       my ($self, $c) = @_;
-      $c->redirect_to_action( 'example/target', [100] );
+      $c->redirect_to_action( 'target', [100] );
     }
 
     sub target :Local Args(1) {

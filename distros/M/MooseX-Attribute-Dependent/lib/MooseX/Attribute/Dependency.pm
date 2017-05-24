@@ -1,14 +1,14 @@
 #
 # This file is part of MooseX-Attribute-Dependent
 #
-# This software is Copyright (c) 2016 by Moritz Onken.
+# This software is Copyright (c) 2017 by Moritz Onken.
 #
 # This is free software, licensed under:
 #
 #   The (three-clause) BSD License
 #
 package MooseX::Attribute::Dependency;
-$MooseX::Attribute::Dependency::VERSION = '1.1.3';
+$MooseX::Attribute::Dependency::VERSION = '1.1.4';
 use Moose;
 has [qw(parameters message constraint name)] => ( is => 'ro' );
 
@@ -40,17 +40,17 @@ sub register {
 __PACKAGE__->meta->make_immutable;
 
 package MooseX::Attribute::Dependencies;
-$MooseX::Attribute::Dependencies::VERSION = '1.1.3';
+$MooseX::Attribute::Dependencies::VERSION = '1.1.4';
 use strict;
 use warnings;
-use List::MoreUtils ();
+use List::Util 1.33 ();
 
 MooseX::Attribute::Dependency::register(
     {   name       => 'All',
         message    => 'The following attributes are required: %s',
         constraint => sub {
             my ( $attr_name, $params, @related ) = @_;
-            return List::MoreUtils::all { exists $params->{$_} } @related;
+            return List::Util::all { exists $params->{$_} } @related;
             }
     }
 );
@@ -60,7 +60,7 @@ MooseX::Attribute::Dependency::register(
         message => 'At least one of the following attributes is required: %s',
         constraint => sub {
             my ( $attr_name, $params, @related ) = @_;
-            return List::MoreUtils::any { exists $params->{$_} } @related;
+            return List::Util::any { exists $params->{$_} } @related;
             }
     }
 );
@@ -70,7 +70,7 @@ MooseX::Attribute::Dependency::register(
         message    => 'None of the following attributes can have a value: %s',
         constraint => sub {
             my ( $attr_name, $params, @related ) = @_;
-            return List::MoreUtils::none { exists $params->{$_} } @related;
+            return List::Util::none { exists $params->{$_} } @related;
             }
     }
 );
@@ -81,7 +81,7 @@ MooseX::Attribute::Dependency::register(
             'At least one of the following attributes cannot have a value: %s',
         constraint => sub {
             my ( $attr_name, $params, @related ) = @_;
-            return List::MoreUtils::notall { exists $params->{$_} } @related;
+            return List::Util::notall { exists $params->{$_} } @related;
             }
     }
 );
@@ -100,7 +100,7 @@ MooseX::Attribute::Dependency
 
 =head1 VERSION
 
-version 1.1.3
+version 1.1.4
 
 =head1 AUTHOR
 
@@ -108,7 +108,7 @@ Moritz Onken
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Moritz Onken.
+This software is Copyright (c) 2017 by Moritz Onken.
 
 This is free software, licensed under:
 

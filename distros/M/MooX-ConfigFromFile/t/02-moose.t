@@ -7,7 +7,8 @@ use warnings FATAL => 'all';
 
 use Test::More;
 
-BEGIN {
+BEGIN
+{
     eval "use Moose;";
     $@ and plan skip_all => "Moose test requires Moose being installed";
 }
@@ -15,9 +16,12 @@ BEGIN {
 our $OO = "Moose";
 $ENV{WHICH_MOODEL} = "Moose";
 
-eval "do 't/testerr.pm'";
-eval "do 't/testlib.pm'";
-eval "use MooX::Cmd 0.012; do 't/testmxcmd.pm'";
-eval "{package MooX::ConfigFromFile::Test::Availability::Of::MooX::Options; use $OO; use MooX::Options 4.001; }; do 't/testmxopt.pm'";
+unshift @INC, "." unless grep { "." eq $_ } @INC;
+
+do 't/testerr.pm';
+do 't/testlib.pm';
+eval "use MooX::Cmd 0.012;" and do 't/testmxcmd.pm';
+eval "{package MooX::ConfigFromFile::Test::Availability::Of::MooX::Options; use $OO; use MooX::Options 4.001; };"
+  and do 't/testmxopt.pm';
 
 done_testing;

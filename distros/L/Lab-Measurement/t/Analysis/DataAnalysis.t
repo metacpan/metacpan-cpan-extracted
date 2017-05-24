@@ -10,8 +10,15 @@ use Clone qw(clone);
 use Test::More;
 use lib 't';
 use Lab::Test import => ['skip_on_broken_printf'];
+use Config;
 
 skip_on_broken_printf();
+
+if ( $Config{nvsize} > 8 ) {
+
+    # See http://www.cpantesters.org/cpan/report/b9f8053e-1def-11e7-99c9-a3d8554a9f2d
+    plan skip_all => "Test does not work if perl uses long doubles.";
+}
 
 plan tests => 5;
 

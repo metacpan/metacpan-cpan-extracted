@@ -4,7 +4,7 @@ use warnings;
 
 {
     no strict "vars";
-    $VERSION = "1.09";
+    $VERSION = "1.10";
 }
 
 use Acme::CPANAuthors::Register (
@@ -46,7 +46,7 @@ use Acme::CPANAuthors::Register (
     'SHARYANTO'     => 'Steven Haryanto',
     'SHLOMIF'       => 'Shlomi Fish',
     'SIMON'         => 'Simon Cozens',
-    'SKIM'          => 'Michal Spacek',
+    'SKIM'          => 'Michal Josef Spacek',
     'SMUELLER'      => 'Steffen Mueller',
     'SZABGAB'       => 'Gabor Szabo',
     'TOBYINK'       => 'Toby Inkster',
@@ -92,51 +92,51 @@ See L<http://backpan.cpantesters.org>.
 
 =head1 THE AUTHORS
 
-   1.  888  PERLANCAR     perlancar
-   2.  510  SHARYANTO     Steven Haryanto
-   3.  479  PSIXDISTS     Perl 6 Modules
-   4.  313  TOBYINK       Toby Inkster
-   5.  309  RJBS          Ricardo SIGNES
+   1.  1268  PERLANCAR     perlancar
+   2.  549  PSIXDISTS     Perl 6 Modules
+   3.  510  SHARYANTO     Steven Haryanto
+   4.  314  TOBYINK       Toby Inkster
+   5.  312  RJBS          Ricardo SIGNES
    6.  293  ZOFFIX        Zoffix Znet
    7.  287  ADAMK         Adam Kennedy
    8.  251  TOKUHIROM     ???
-   9.  240  MIYAGAWA      Tatsuhiko Miyagawa
-  10.  222  ETHER         Karen Etheridge
-  11.  218  INGY          Ingy dot Net
-  12.  217  BINGOS        Chris Williams
-  13.  210  FLORA         Florian Ragwitz
-  14.  202  JGNI          John Imrie
-  15.  195  DAGOLDEN      David Golden
+   9.  243  ETHER         Karen Etheridge
+  10.  241  MIYAGAWA      Tatsuhiko Miyagawa
+  11.  236  JGNI          John Imrie
+  12.  220  INGY          Ingy dot Net
+  13.  218  BINGOS        Chris Williams
+  14.  210  FLORA         Florian Ragwitz
+  15.  202  DAGOLDEN      David Golden
   16.  192  SMUELLER      Steffen Mueller
-  17.  182  MARCEL        ???
-  18.  174  KENTNL        Kent Fredric
+  17.  188  KENTNL        Kent Fredric
+  18.  182  MARCEL        ???
   19.  172  BOBTFISH      Tomas Doran
-  20.  161  NUFFIN        Yuval Kogman
-  21.  156  DROLSKY       Dave Rolsky
-  22.  149  PEVANS        Paul Evans
-  23.  138  GUGOD         Liu Kang Min
-  24.  138  RSAVAGE       Ron Savage
-  25.  137  DMAKI         Daisuke Maki
-  26.  137  NEILB         Neil Bowers
-  27.  137  SKIM          Michal Spacek
-  28.  134  BARBIE        Barbie
-  29.  133  BDFOY         brian d foy
-  30.  126  PLICEASE      Graham Ollis
-  31.  125  AUTRIJUS      Audrey Tang
-  32.  125  SHLOMIF       Shlomi Fish
-  33.  122  FAYLAND       Fayland Lin
-  34.  122  SZABGAB       Gabor Szabo
-  35.  121  SIMON         Simon Cozens
-  36.  120  MANWAR        Mohammad S Anwar
-  37.  111  LBROCARD      Leon Brocard
-  38.  111  MLEHMANN      ???
-  39.  111  MRAMBERG      Marcus Ramberg
+  20.  168  DROLSKY       Dave Rolsky
+  21.  162  PEVANS        Paul Evans
+  22.  161  NUFFIN        Yuval Kogman
+  23.  151  PLICEASE      Graham Ollis
+  24.  144  NEILB         Neil Bowers
+  25.  142  SKIM          Michal Josef Spacek
+  26.  141  GUGOD         Liu Kang Min
+  27.  141  RSAVAGE       Ron Savage
+  28.  137  DMAKI         Daisuke Maki
+  29.  134  BARBIE        Barbie
+  30.  134  BDFOY         brian d foy
+  31.  130  FAYLAND       Fayland Lin
+  32.  129  SHLOMIF       Shlomi Fish
+  33.  128  MANWAR        Mohammad S Anwar
+  34.  125  AUTRIJUS      Audrey Tang
+  35.  122  SZABGAB       Gabor Szabo
+  36.  121  SIMON         Simon Cozens
+  37.  113  MRAMBERG      Marcus Ramberg
+  38.  111  LBROCARD      Leon Brocard
+  39.  111  MLEHMANN      ???
   40.  111  SALVA         Salvador Fandino Garcia
-  41.  109  DMUEY         Daniel Muey
-  42.  105  GETTY         Torsten Raudssus
+  41.  110  DMUEY         Daniel Muey
+  42.  107  GETTY         Torsten Raudssus
   43.  101  LEOCHARRE     Leo Charre
 
-List last updated: 2016-04-22T05:57:08
+List last updated: 2017-05-23T07:53:27
 
 =head1 MAINTENANCE
 
@@ -187,7 +187,7 @@ Thanks to Kenichi Ishigaki for writing C<Acme::CPANAuthors>.
 
 =head1 COPYRIGHT & LICENSE
 
-  Copyright 2014-2016 Barbie for Miss Barbell Productions.
+  Copyright 2014-2017 Barbie for Miss Barbell Productions.
 
   This distribution is free software; you can redistribute it and/or
   modify it under the Artistic License 2.0.

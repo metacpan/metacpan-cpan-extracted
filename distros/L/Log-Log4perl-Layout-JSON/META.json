@@ -46,9 +46,7 @@
             "Encode" : "0",
             "Log::Log4perl::MDC" : "0",
             "Test::Compile" : "0",
-            "Test::More" : "0",
             "Test::Most" : "0",
-            "Test::Signature" : "0",
             "utf8" : "0"
          }
       }
@@ -65,7 +63,7 @@
          "url" : "git://github.com/mschout/Log-Log4perl-Layout-JSON"
       }
    },
-   "version" : "0.51",
+   "version" : "0.52",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 

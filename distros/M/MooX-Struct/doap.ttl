@@ -31,7 +31,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "MooX-Struct";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-004>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-005>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-006>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-007>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-008>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-009>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-010>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-011>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-012>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-013>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-014>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-015>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-004>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-005>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-006>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-007>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-008>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-009>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-010>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-011>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-012>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-013>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-014>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-015>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-016>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-moox-struct>;
@@ -320,6 +320,20 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Struct-0.015.tar.gz>;
 	doap:revision        "0.015"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-016>
+	a                    doap:Version;
+	dc:identifier        "MooX-Struct-0.016"^^xsd:string;
+	dc:issued            "2017-05-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "Remove stray usage of Scalar::Does in test suite.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Struct-0.016.tar.gz>;
+	doap:revision        "0.016"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/haarg>
 	a                    foaf:Person;

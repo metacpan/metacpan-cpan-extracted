@@ -34,4 +34,4 @@ requires:
   warnings: '0'
 resources:
   repository: git://github.com/domm/DBIx-Class-InflateColumn-JSON2Object.git
-version: '0.902'
+version: '0.903'

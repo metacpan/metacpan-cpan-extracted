@@ -6,7 +6,7 @@ use 5.010;
 
 use Lab::Instrument;
 
-our $VERSION = '3.542';
+our $VERSION = '3.543';
 
 our @ISA = ('Lab::Instrument');
 
@@ -956,6 +956,8 @@ Lab::Instrument::Lakeshore340 - Lakeshore 340 Temperature controller
 The Lab::Instrument::Lakeshore340 class implements an interface to the
 Lakeshore 340 AC Resistance Bridge.
 
+For use in XPRESS temperature sweeps, see the example script
+F<examples/XPRESS/lakeshore340_sweep.pl>.
 
 =head1 METHODS
 

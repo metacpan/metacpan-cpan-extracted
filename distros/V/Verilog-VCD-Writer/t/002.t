@@ -1,0 +1,17 @@
+use Test::More;
+use Verilog::VCD::Writer::Symbol;
+my $writer=Verilog::VCD::Writer::Symbol->instance();
+my $writer2=Verilog::VCD::Writer::Symbol->instance();
+isa_ok($writer, "Verilog::VCD::Writer::Symbol");
+isa_ok($writer2, "Verilog::VCD::Writer::Symbol");
+is($writer->symbol,'!',"Got !");
+is($writer2->symbol,'"',"Got \"");
+is($writer->symbol,'#',"Got #");
+is($writer->symbol,'$','Got $');
+is($writer->symbol,'%',"Got %");
+is($writer2->symbol,'&',"Got &");
+$writer2->symbol foreach (0..100);
+#diag $writer2->symbol;
+is($writer2->symbol,'".',"Got \".");
+isa_ok($writer, "Verilog::VCD::Writer::Symbol");
+done_testing;

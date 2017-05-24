@@ -1,9 +1,11 @@
 package Ryu::Sink;
-$Ryu::Sink::VERSION = '0.014';
+
 use strict;
 use warnings;
 
 use parent qw(Ryu::Node);
+
+our $VERSION = '0.015'; # VERSION
 
 =head1 NAME
 

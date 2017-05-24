@@ -1,13 +1,13 @@
 package Map::Tube::Exception::InvalidStationName;
 $Map::Tube::Exception::InvalidStationName::AUTHORITY = 'cpan:MANWAR';
-$Map::Tube::Exception::InvalidStationName::VERSION = '3.11';
+$Map::Tube::Exception::InvalidStationName::VERSION = '3.12';
 =head1 NAME
 
 Map::Tube::Exception::InvalidStationName - Represent 'invalid station name' exception.
 
 =head1 VERSION
 
-version 3.11
+version 3.12
 
 =cut
 

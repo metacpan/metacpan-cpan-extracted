@@ -1,0 +1,7 @@
+Line 1
+About to: .include -p2 | echo "Hello World!"
+Opened stream
+In readin
+After .read line
+line='Hello World!'
+EOF

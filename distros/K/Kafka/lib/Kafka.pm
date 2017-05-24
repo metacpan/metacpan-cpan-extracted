@@ -9,19 +9,19 @@ Kafka - Apache Kafka interface for Perl.
 
 =head1 VERSION
 
-This documentation refers to C<Kafka> package version 1.02 .
+This documentation refers to C<Kafka> package version 1.03 .
 
 =cut
 
-#-- Pragmas --------------------------------------------------------------------
+
 
 use 5.010;
 use strict;
 use warnings;
 
-# ENVIRONMENT ------------------------------------------------------------------
 
-our $VERSION = '1.02';
+
+our $VERSION = '1.03';
 
 use Exporter qw(
     import
@@ -136,12 +136,12 @@ our @EXPORT_OK = qw(
     $WAIT_WRITTEN_TO_LOCAL_LOG
 );
 
-#-- load the modules -----------------------------------------------------------
+
 
 use Config;
 use Const::Fast;
 
-#-- declarations ---------------------------------------------------------------
+
 
 =head1 SYNOPSIS
 
@@ -1631,7 +1631,7 @@ L<https://github.com/TrackingSoft/Kafka>
 
 =head1 AUTHOR
 
-Sergey Gladkov, E<lt>sgladkov@trackingsoft.comE<gt>
+Sergey Gladkov
 
 Please use GitHub project link above to report problems or contact authors.
 

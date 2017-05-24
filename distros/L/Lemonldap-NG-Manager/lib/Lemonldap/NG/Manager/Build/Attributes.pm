@@ -6,7 +6,7 @@
 
 package Lemonldap::NG::Manager::Build::Attributes;
 
-our $VERSION = '1.9.7';
+our $VERSION = '1.9.10';
 use strict;
 use Regexp::Common qw/URI/;
 
@@ -348,7 +348,6 @@ sub attributes {
 
         # Menu
         activeTimer => {
-            default       => 0,
             type          => 'bool',
             default       => 1,
             documentation => 'Enable timers on portal pages',
@@ -361,6 +360,16 @@ sub attributes {
                 default => { catname => 'Default category', type => "category" }
             },
             documentation => 'Applications list',
+        },
+        portalErrorOnExpiredSession => {
+            type          => 'bool',
+            default       => 1,
+            documentation => 'Show error if session is expired',
+        },
+        portalErrorOnMailNotFound => {
+            type          => 'bool',
+            default       => 0,
+            documentation => 'Show error if mail is not found in password reset process',
         },
         portalOpenLinkInNewWindow => {
             type          => 'bool',
@@ -2436,6 +2445,7 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         oidcRPMetaDataOptionsExtraClaims =>
           { type => 'keyTextContainer', default => {} },
         oidcRPMetaDataOptionsBypassConsent => { type => 'bool', default => 0 },
+        oidcRPMetaDataOptionsPostLogoutRedirectUris => { type => 'text', },
 
     };
 }

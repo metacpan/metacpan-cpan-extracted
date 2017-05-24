@@ -2,8 +2,6 @@ package  MyApp::View::Form;
 
 use Moo;
 extends 'Catalyst::View::Template::Lace';
-with 'Template::Lace::ModelRole';
-
 
 has [qw/id fif errors content/] => (is=>'ro', required=>0);
 

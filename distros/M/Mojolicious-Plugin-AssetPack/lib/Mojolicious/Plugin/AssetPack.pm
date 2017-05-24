@@ -6,7 +6,7 @@ use Mojolicious::Plugin::AssetPack::Asset::Null;
 use Mojolicious::Plugin::AssetPack::Store;
 use Mojolicious::Plugin::AssetPack::Util qw(diag has_ro load_module DEBUG);
 
-our $VERSION = '1.43';
+our $VERSION = '1.44';
 
 my %TAG_TEMPLATE;
 $TAG_TEMPLATE{css} = [qw(link rel stylesheet href)];
@@ -277,7 +277,7 @@ Mojolicious::Plugin::AssetPack - Compress and convert css, less, sass, javascrip
 
 =head1 VERSION
 
-1.43
+1.44
 
 =head1 SYNOPSIS
 
@@ -333,7 +333,9 @@ L<Mojolicious> can be a struggle: You want to serve the source files directly
 while developing, but a minified version in production. This assetpack plugin
 will handle all of that automatically for you.
 
-The actual processing is delegated to "pipe objects". Please see
+Your application creates and refers to an asset by its topic (virtual asset
+name).  The process of building actual assets from their components is
+delegated to "pipe objects". Please see
 L<Mojolicious::Plugin::AssetPack::Guides::Tutorial/Pipes> for a complete list.
 
 =head1 GUIDES

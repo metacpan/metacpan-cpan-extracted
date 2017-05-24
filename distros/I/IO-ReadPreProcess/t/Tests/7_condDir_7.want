@@ -1,0 +1,42 @@
+Read line: 'The man in the moon' - EOF = 0
+After if
+
+Expected read EOF - 1
+9 1752
+Read line '   September 1752'
+Read line 'Mo Tu We Th Fr Sa Su'
+Read line '    1  2 14 15 16 17'
+Read line '18 19 20 21 22 23 24'
+Read line '25 26 27 28 29 30'
+Read line ''
+Read line ''
+Read line ''
+3 1955
+Read line '     March 1955'
+Read line 'Mo Tu We Th Fr Sa Su'
+Read line '    1  2  3  4  5  6'
+Read line ' 7  8  9 10 11 12 13'
+Read line '14 15 16 17 18 19 20'
+Read line '21 22 23 24 25 26 27'
+Read line '28 29 30 31'
+Read line ''
+Defined .a
+8 2016
+Read line '     August 2016'
+Read line 'Mo Tu We Th Fr Sa Su'
+Read line ' 1  2  3  4  5  6  7'
+Read line ' 8  9 10 11 12 13 14'
+Read line '15 16 17 18 19 20 21'
+Read line '22 23 24 25 26 27 28'
+Read line '29 30 31'
+Read line ''
+1 2000
+Read line '    January 2000'
+Read line 'Mo Tu We Th Fr Sa Su'
+Read line '                1  2'
+Read line ' 3  4  5  6  7  8  9'
+Read line '10 11 12 13 14 15 16'
+Read line '17 18 19 20 21 22 23'
+Read line '24 25 26 27 28 29 30'
+Read line '31'
+EOF

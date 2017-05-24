@@ -1,0 +1,163 @@
+0.20 - 2017-05-21
+
+- Move Changes file to the correct directory
+
+0.19 - 2017-05-21
+
+- Fixed some issues introduced by perl hash key randomisation.
+  This affected some of the tests using xml_nodeName in a somewhat
+  obscure way. Tests have been tweaked, and an exception thrown when
+  problem is hit.
+
+  (This issue occurs when xml_nodeName is used with multiple element
+  names and types that can overlap, eg. Str and Int. PRANG doesn't know 
+  what to emit in these cases, e.g is the value '42' a String or an Int?
+  For now, this is not supported, hence the exception).
+
+0.18 - 2017-05-09
+
+- Fixed failing test (rt110744) [Thanks to SREZIC for patch]
+
+0.16 - 2012-05-01
+
+- Lowered minimum versions of some dependencies
+
+0.15 - 2012-04-26
+
+- Fixed a bug that allows PRANG to work with newer Moose versions
+
+0.14 - 2011-02-10
+
+- Increased the minimum required version of Moose.
+
+0.12 - 2011-02-09
+
+- If PRANG is marshalling out a value and it finds an
+  XML::LibXML::Element there, it will now happily just throw the
+  document fragment into the document being exported.  Of course, you
+  probably had to try quite hard to do that...
+
+- Not setting 'required' or 'default' on complex element attributes (ie,
+  attributes which contain another node), and which are explicitly or
+  implicitly required - using xml_min, xml_required, etc - is now
+  considered a declaration error and produces a warning.
+
+- Removed dependency on MooseX::Method::Signatures, and replaced it with
+  MooseX::Params::Validate
+
+- Added a 'lax' parsing mode, which ignores any extra attributes or
+  elements which aren't defined in your class.
+
+- Allow PRANG classes to define the encoding of the XML document
+  emitted.
+
+0.11 - 2010-07-12
+
+- Ignore xsi:schemaLocation; it has no useful meaning.
+    
+- xsi:schemaLocation describes "hints as to the physical location of schema
+  documents which may be used for ‘assessment’" - ie, it is a hint to a local
+  validator as to which schema file contains the XML Schema definition.  On
+  XML documents which are transmitted, it is somewhere between a potential
+  security risk and totally worthless.  See
+  http://www.w3.org/TR/xmlschema-1/#schema-loc for the full story.
+
+- Fixed a bug in PRANG::Graph::Meta::Element which sorted the classes
+  badly when using inheritance.  There is still a design issue to be
+  solved, if you want to use inheritance and not put new elements on the
+  end of the sequence, or if you want to use roles.
+
+- PRANG now happily ignores XML Schema instance schemaLocation and
+  noNamespaceSchemaLocation attributes on incoming documents.  They
+  are only hints for running unconfigured XML Schema validators anyway.
+
+0.10 - 2010-06-27
+
+- Fix enum support [reported by Heiko Jansen]
+
+- Add support for libxml indenting on to_xml [Heiko Jansen]
+
+- Specifying xml_min = 0 on an element attribute is now
+  equivalent to xml_required = 0 [Sam Vilain]
+
+- New module PRANG::Coerce for creating coercion rules which are
+  convenient for typical PRANG applications [Andy Chilton]
+
+- Support YourXML::Language-E<gtparse_file and -E<gtparse_fh for
+  convenience's sake [Sam Vilain]
+
+0.09 - 2010-05-07
+
+- No changes, just a re-bundling, as an included module was not the
+  release version.
+
+0.08 - 2010-05-07
+
+- Distribution now includes all the modules required only for the tests.
+  This, along with a bugfix in Scriptalicious, should hopefully close
+  the last of the CPAN testers failures for 0.07.
+
+- An addition to PRANG::XMLSchema::Types Str subtypes: date,
+  time, and tightening of the dateTime (it was not anchored
+  before, so accepted any string containing a dateTime).
+
+0.07 - 2010-04-26
+
+- New documentation B<PRANG::XMLSchema::Guide which provides
+  information on manually converting XML Schema specifications to PRANG
+  classes.
+
+- Add a coerce rule for PRANG::XMLSchema::token types which
+  normalizes whitespace on input values if enabled.
+
+- The xmlns Class property now affects all sub-properties, but not
+  the including element.  This mirrors the default behaviour with XML
+  Schema.
+
+0.06 - 2010-04-14
+
+- Correct the handling of attributes with no prefix.  They should always
+  be considered to have no namespace, even if a default xmlns is
+  defined, apparently.
+
+0.05 - 2010-04-14
+
+- XML namespaces support is now much more complete; lots of cases,
+  including wildcarding of both the node name and the XML namespace now
+  work.  This is powerful enough to successfully round-trip crazy XML
+  Schema specifications such as any namespace="##any"
+  processContents="skip"
+
+- PRANG::Graph::Class has been deprecated / ripped out.  It was a
+  hang-over from the time before use PRANG::Graph; set up the
+  metaclass trait.
+
+- It is no longer required to specify the xmlns method, if you do not
+  wish to use namespaces.
+
+- Specifying a role as a type now works, so long as the role is used by
+  only PRANG::Graph types.
+
+0.04 - 2010-04-09
+
+- Much enhanced support for XML namespaces.  Tests and functionality
+  added; still lacking is the "Whatever" mapping, required for crazy
+  XMLSchema stuff like any namespace="##any"
+  processContents="skip" - this will be supported in the next
+  release.
+
+- Various bug fixes, more rejection of invalid input, and so on.
+
+0.03 - 2010-04-07
+
+- Some error message enhancements for from various forms of API
+  misunderstanding.
+
+- more missing dependencies added.
+
+0.02 - 2010-03-25
+
+- Back-port to work on pre-1.70 XML::LibXML
+
+- some missing dependencies added.
+

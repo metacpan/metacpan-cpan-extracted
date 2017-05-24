@@ -7,7 +7,7 @@ use Test::More;
 use Encode;
 use utf8;
 
-my $js = JavaScript::Duktape->new();
+my $js  = JavaScript::Duktape->new();
 my $duk = $js->duk;
 
 my $count = 0;
@@ -22,12 +22,14 @@ my $evalstr = <<'//JSEND';
     toPerl( uc("abc αβγ ß") ) // ascii: abc,  greek:alpha beta gamma, german:sharp-s
 //JSEND
 
-$js->set(is => sub {
-    is(shift, shift);
-});
+$js->set(
+    is => sub {
+        is( shift, shift );
+    }
+);
 
-$js->set(toPerl =>
-    sub {
+$js->set(
+    toPerl => sub {
         my $string = shift;
         is length $string, 10;
 

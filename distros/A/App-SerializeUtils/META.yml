@@ -22,13 +22,16 @@ requires:
   Data::Dump::Color: '0'
   Data::Undump: '0'
   Getopt::Long: '0'
+  JSON::Color: '0'
   JSON::MaybeXS: '0'
   JSON::PP: '0'
   PHP::Serialization: '0'
   Sereal::Decoder: '0'
   Sereal::Encoder: '0'
   Storable: '0'
+  YAML::Old: '0'
   YAML::Syck: '0'
+  YAML::Tiny::Color: '0'
   YAML::XS: '0'
   perl: '5.010001'
   strict: '0'
@@ -36,8 +39,8 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-SerializeUtils
   homepage: https://metacpan.org/release/App-SerializeUtils
-  repository: git://github.com/sharyanto/perl-App-SerializeUtils.git
-version: '0.12'
+  repository: git://github.com/perlancar/perl-App-SerializeUtils.git
+version: '0.13'
 x_Dist_Zilla:
   perl:
     version: '5.024000'

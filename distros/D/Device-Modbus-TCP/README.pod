@@ -1,4 +1,4 @@
-=head1 NAME Device-Modbus-TCP version 0.024
+=head1 NAME Device-Modbus-TCP version 0.025
 
 This distribution is a part of Device::Modbus, which aims towards implementing the Modbus protocol over TCP/IP in Perl. It should make it possible to write Modbus TCP clients and servers.
 
@@ -50,6 +50,21 @@ This module requires these other non-standard modules and libraries:
 =item * Role::Tiny
 
 =item * Try::Tiny
+
+=back
+
+=head2 CONTRIBUTORS
+
+A warm thank you to the following people, who have contributed with 
+suggestions, bug reports, and fixes:
+
+=over
+
+=item Manuel Krenzke
+
+=item Carlos Mendioroz
+
+=item Olivier Colin
 
 =back
 

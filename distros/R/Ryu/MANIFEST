@@ -55,6 +55,7 @@ t/source.t
 t/statistics.t
 t/suffix.t
 t/sum.t
+t/switch_str.t
 t/take.t
 t/with_index.t
 xt/author/mojibake.t

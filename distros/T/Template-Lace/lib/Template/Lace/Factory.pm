@@ -76,7 +76,7 @@ around BUILDARGS => sub {
     my ($class, $dom_class, $model_class) = @_;
     my $template = $model_class->template;
     my $dom = $dom_class->new($template);
-    $model_class->prepare_dom($dom);
+    $model_class->prepare_dom($dom) if $model_class->can('prepare_dom');
     return $dom;
   }
 

@@ -7,7 +7,6 @@ META.yml
 Makefile.PL
 README
 bin/pause
-devdata/pause.pod
 devscripts/gen-cli
 dist.ini
 lib/App/pause.pm

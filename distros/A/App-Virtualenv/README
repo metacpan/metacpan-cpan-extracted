@@ -2,24 +2,22 @@ NAME
     App::Virtualenv - Perl virtual environment
 
 VERSION
-    version 2.06
+    version 2.07
 
-ABSTRACT
-    Perl virtual environment
-
+SYNOPSIS
             #!/bin/sh
             perl -MApp::Virtualenv -erun -- environment_path
-
-    See also: virtualenv.pl
-    <https://metacpan.org/pod/distribution/App-Virtualenv/lib/App/Virtualenv
-    /virtualenv.pl>
 
 DESCRIPTION
     App::Virtualenv is a Perl package to create isolated Perl virtual
     environments, like Python virtual environment.
 
-  Functions
-   sh(@args)
+    See also: virtualenv.pl
+    <https://metacpan.org/pod/distribution/App-Virtualenv/lib/App/Virtualenv
+    /virtualenv.pl>
+
+Functions
+  sh(@args)
     runs shell program defined in SHELL environment variable, otherwise
     /bin/sh
 
@@ -27,21 +25,21 @@ DESCRIPTION
 
     return value: *exit code of shell program*
 
-   perl(@args)
+  perl(@args)
     runs Perl interpreter
 
     @args: *arguments of Perl interpreter*
 
     return value: *exit code of Perl interpreter*
 
-   activate($virtualenvPath)
+  activate($virtualenv_path)
     activates Perl virtual environment
 
-    $virtualenvPath: *virtual environment path*
+    $virtualenv_path: *virtual environment path*
 
     return value: *virtual environment path if success, otherwise undef*
 
-   deactivate($nondestructive)
+  deactivate($nondestructive)
     deactivates Perl virtual environment
 
     $nondestructive: *leaves envionment variables as it is, unless there are
@@ -49,56 +47,56 @@ DESCRIPTION
 
     return value: *always 1*
 
-   create($virtualenvPath, $empty)
+  create($virtualenv_path, $empty)
     creates Perl virtual environment
 
-    $virtualenvPath: *new virtual environment path*
+    $virtualenv_path: *new virtual environment path*
 
     $empty: *create empty virtual environment*
 
     return value: *virtual environment path if success, otherwise undef*
 
-   findVirtualenvPath($virtualenvPath)
-    finds Perl virtual environment path by $virtualenvPath argument or
+  find_virtualenv_path($virtualenv_path)
+    finds Perl virtual environment path by $virtualenv_path argument or
     activated virtual environment or running script or PERL5LIB environment
     variable
 
-    $virtualenvPath: *virtual environment path*
+    $virtualenv_path: *virtual environment path*
 
     return value: *best matching virtual environment path*
 
-   activate2($virtualenvPath, $inform)
-    activates Perl virtual environment by findVirtualenvPath function
+  activate2($virtualenv_path, $inform)
+    activates Perl virtual environment by find_virtualenv_path function
 
-    $virtualenvPath: *virtual environment path*
+    $virtualenv_path: *virtual environment path*
 
     $inform: *informs activated virtual environment path to STDERR if new
-    activated path differs old one*
+    activated path differs old one, by default 0*
 
     return value: *activated best matching virtual environment path if
     success, otherwise undef*
 
-   getInc($virtualenvPath)
+  getinc($virtualenv_path)
     gets array ref of include paths given virtual environment path or
     sitelib paths
 
-    $virtualenvPath: *virtual environment path*
+    $virtualenv_path: *virtual environment path*
 
     return value: *array ref of paths*
 
-   list(%params)
+  list(%params)
     lists packages or modules or files by given %params
 
     %params: *parameters of function*
 
         one: *output is one-column, by default 0*
 
-        detail: *prints additional detail by given value: module or file. by
-        default undef*
+        detail: *prints additional detail by given value('module' or
+        'file'), by default undef*
 
     return value: *always 1*
 
-   main(@argv)
+  main(@argv)
     App::Virtualenv main function to run on command-line
 
     See also: virtualenv.pl
@@ -109,7 +107,7 @@ DESCRIPTION
 
     return value: *exit code of program*
 
-   run
+  run
     runs App::Virtualenv by main function with command-line arguments by
     @ARGV
 
@@ -181,7 +179,7 @@ SEE ALSO
     *   CPANPLUS <https://metacpan.org/pod/CPANPLUS>
 
 AUTHOR
-    Orkun Karaduman <orkunkaraduman@gmail.com>
+    Orkun Karaduman (ORKUN) <orkun@cpan.org>
 
 COPYRIGHT AND LICENSE
     Copyright (C) 2017 Orkun Karaduman <orkunkaraduman@gmail.com>

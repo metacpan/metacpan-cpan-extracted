@@ -9,10 +9,10 @@ build_requires:
   Test::More: '0'
   Test::Simple: '0.96'
 configure_requires:
-  CPP::panda::lib: v1.0.0
+  CPP::panda::lib: v1.0.3
   ExtUtils::MakeMaker: '6.76'
   Panda::Install: v1.2.7
-  Panda::Time: v3.1.2
+  Panda::Time: v3.1.3
   Panda::XS: v2.1.7
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001'
@@ -26,10 +26,10 @@ no_index:
     - t
     - inc
 requires:
-  CPP::panda::lib: v1.0.0
+  CPP::panda::lib: v1.0.3
   Panda::Export: '0'
   Panda::Install: v1.2.7
   Panda::Time: v3.1.2
   Panda::XS: v2.1.7
   perl: '5.010000'
-version: v3.0.6
+version: v3.0.7

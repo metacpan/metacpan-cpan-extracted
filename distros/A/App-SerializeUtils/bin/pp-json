@@ -1,39 +1,52 @@
 #!perl
 
-use 5.010;
+our $DATE = '2017-05-23'; # DATE
+our $VERSION = '0.13'; # VERSION
+
+use 5.010001;
 use strict;
 use warnings;
 
 use Getopt::Long;
 
-our $VERSION = '0.12'; # VERSION
-
-my $json_mod = '';
+my $color = -t STDOUT;
+my $pretty = 1;
+my $mod = '';
 GetOptions(
-    'pp' => sub { $json_mod = 'pp' },
-    'xs' => sub { $json_mod = 'xs' },
+    'pretty!' => \$pretty,
+    'color!' => \$color,
+    'pp' => sub { $mod = 'pp' },
+    'xs' => sub { $mod = 'xs' },
     'help' => sub {
-        print "Usage: pp-json [--pp|--xs] <file>\n";
+        print "Usage: pp-json [OPTIONS] <file>\n";
         exit 0;
     },
 );
 
+undef $/;
+
 my $json;
-if ($json_mod eq 'pp') {
+if ($mod eq 'pp') {
     require JSON::PP; $json = JSON::PP->new;
-} elsif ($json_mod eq 'xs') {
+    $json->canonical->allow_nonref->pretty($pretty);
+    print $json->encode($json->decode(scalar <>));
+} elsif ($mod eq 'xs') {
     require Cpanel::JSON::XS; $json = Cpanel::JSON::XS->new;
+    $json->canonical->allow_nonref->pretty($pretty);
+    print $json->encode($json->decode(scalar <>));
 } else {
     require JSON::MaybeXS; $json = JSON::MaybeXS->new;
+    $json->canonical->allow_nonref->pretty($pretty);
+    if ($color) {
+        require JSON::Color;
+        print JSON::Color::encode_json($json->decode(scalar <>), {pretty=>$pretty});
+    } else {
+        print $json->encode($json->decode(scalar <>));
+    }
 }
 
-$json->canonical->allow_nonref->pretty(1);
-
-undef $/;
-print $json->encode($json->decode(scalar <>));
-
 1;
-# ABSTRACT: Pretty-print JSON
+# ABSTRACT: Pretty-print (and colorize) JSON
 # PODNAME: pp-json
 
 __END__
@@ -44,15 +57,29 @@ __END__
 
 =head1 NAME
 
-pp-json - Pretty-print JSON
+pp-json - Pretty-print (and colorize) JSON
 
 =head1 VERSION
 
-This document describes version 0.12 of pp-json (from Perl distribution App-SerializeUtils), released on 2017-03-01.
+This document describes version 0.13 of pp-json (from Perl distribution App-SerializeUtils), released on 2017-05-23.
+
+=head1 DESCRIPTION
+
+By default, when in interactive mode will pretty-print and colorize JSON using
+L<JSON::Color>, and when piped will pretty-print JSON using L<JSON::MaybeXS>.
 
 =head1 OPTIONS
 
 =over
+
+=item * --color, --no-color
+
+Force using color (JSON::Color) or no color. The default is to check whether
+STDOUT is not piped (interactive mode) to enable color.
+
+=item * --no-pretty
+
+Instead of pretty-printing, print compact JSON.
 
 =item * --pp
 
@@ -72,7 +99,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Serial
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-App-SerializeUtils>.
+Source repository is at L<https://github.com/perlancar/perl-App-SerializeUtils>.
 
 =head1 BUGS
 

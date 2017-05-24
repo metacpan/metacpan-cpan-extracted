@@ -1,6 +1,6 @@
 package Catalyst::View::Template::Lace;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Moo;
 use Module::Runtime;
@@ -38,15 +38,17 @@ sub view_components {
   my ($class, $app, $merged_args) = @_;
   return +{
     catalyst => {
-      response => Template::Lace::Utils::mk_component {
+      subrequest => Template::Lace::Utils::mk_component {
         require HTTP::Request;
         require HTTP::Message::PSGI;
 
         my @args = (delete $_{action});
+        my $method = ((delete $_{method}) || 'GET');
         push @args, delete($_{parts}) if $_{parts};
         push @args, delete($_{query}) if $_{query};
+
         my $href = $_{model}->uri_for(@args);
-        my $http_request = HTTP::Request->new('GET', $href);
+        my $http_request = HTTP::Request->new($method, $href);
         my $psgi_env = HTTP::Message::PSGI::req_to_psgi($http_request);
         my $psgi_response = $_{model}->ctx->psgi_app->($psgi_env);
         my $http_response = HTTP::Message::PSGI::res_from_psgi($psgi_response);
@@ -79,7 +81,6 @@ Define a View:
 
     use Moo;
     extends 'Catalyst::View::Template::Lace';
-    with 'Template::Lace::ModelRole';
 
     has [qw/age name motto/] => (is=>'ro', required=>1);
 

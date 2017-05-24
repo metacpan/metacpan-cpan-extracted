@@ -4,7 +4,7 @@
       "Julio Fraire <julio.fraire@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
@@ -45,6 +45,6 @@
          "web" : "https://github.com/jfraire/Device-Modbus-TCP"
       }
    },
-   "version" : "0.024",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "0.026",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

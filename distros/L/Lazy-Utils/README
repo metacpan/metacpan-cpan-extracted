@@ -2,11 +2,9 @@ NAME
     Lazy::Utils - Utility functions
 
 VERSION
-    version 1.16
+    version 1.17
 
 SYNOPSIS
-    Utility functions
-
             use Lazy::Utils;
          
             trim($str);
@@ -19,37 +17,35 @@ SYNOPSIS
             bash_readline($prompt);
             cmdargs($prefs, @argv);
             whereis($name, $path);
-            file_cache($tag, $expiry, $subref);
+            file_cache($tag, $expiry, $coderef);
             get_pod_text($file_name, $section, $exclude_section);
-            term_readline($prompt, $default, $history, $in, $out);
-            term_readkey($in);
 
 DESCRIPTION
-    Collection of utility functions all of exported by default
+    Collection of utility functions all of exported by default.
 
-  Functions
-   trim($str)
+Functions
+  trim($str)
     trims given string
 
     $str: *string will be trimed*
 
     return value: *trimed string*
 
-   ltrim($str)
+  ltrim($str)
     trims left given string
 
     $str: *string will be trimed*
 
     return value: *trimed string*
 
-   rtrim($str)
+  rtrim($str)
     trims right given string
 
     $str: *string will be trimed*
 
     return value: *trimed string*
 
-   file_get_contents($path, $prefs)
+  file_get_contents($path, $prefs)
     gets all contents of file in string type
 
     $path: *path of file*
@@ -61,7 +57,7 @@ DESCRIPTION
     return value: *file contents in string type, otherwise undef because of
     errors*
 
-   file_put_contents($path, $contents, $prefs)
+  file_put_contents($path, $contents, $prefs)
     puts all contents of file in string type
 
     $path: *path of file*
@@ -74,7 +70,7 @@ DESCRIPTION
 
     return value: *success 1, otherwise undef*
 
-   shellmeta($s, $nonquoted)
+  shellmeta($s, $nonquoted)
     escapes metacharacters of interpolated shell string
 
     $s: *interpolated shell string*
@@ -84,8 +80,8 @@ DESCRIPTION
 
     return value: *escaped string*
 
-   system2($cmd, @argv)
-    _system($cmd, @argv) *WILL BE DEPRECATED*
+  system2($cmd, @argv)
+    _system($cmd, @argv) *OBSOLETE*
 
     alternative implementation of perls core system subroutine that executes
     a system command
@@ -100,8 +96,8 @@ DESCRIPTION
 
     returned $!: *system error message like on perls system call*
 
-   bash_readline($prompt)
-    bashReadLine($prompt) *WILL BE DEPRECATED*
+  bash_readline($prompt)
+    bashReadLine($prompt) *OBSOLETE*
 
     reads a line from STDIN using Bash
 
@@ -109,10 +105,10 @@ DESCRIPTION
 
     return value: *line*
 
-   cmdargs([$prefs, ]@argv)
-    commandArgs([$prefs, ]@argv) *WILL BE DEPRECATED*
+  cmdargs([$prefs, ]@argv)
+    commandArgs([$prefs, ]@argv) *OBSOLETE*
 
-    cmdArgs([$prefs, ]@argv) *WILL BE DEPRECATED*
+    cmdArgs([$prefs, ]@argv) *OBSOLETE*
 
     resolves command line arguments
 
@@ -155,8 +151,8 @@ DESCRIPTION
             { -opt1 => '', -opt2 => 'val2', command => 'cmd', parameters => ['param1', 'param2', 'param3'] }
             { -opt1 => '', -opt2 => '', command => 'cmd', parameters => ['param1', 'param2', 'param3'] }
 
-   whereis($name, $path)
-    whereisBin($name, $path) *WILL BE DEPRECATED*
+  whereis($name, $path)
+    whereisBin($name, $path) *OBSOLETE*
 
     searches valid binary in search path
 
@@ -167,12 +163,12 @@ DESCRIPTION
 
     return value: *array of binary path founded in search path*
 
-   file_cache($tag, $expiry, $subref)
-    fileCache($tag, $expiry, $subref) *WILL BE DEPRECATED*
+  file_cache($tag, $expiry, $coderef)
+    fileCache($tag, $expiry, $coderef) *OBSOLETE*
 
     gets most recent cached value in file cache by given tag and caller
     function if there is cached value in expiry period. Otherwise tries to
-    get current value using $subref, puts value in cache and cleanups old
+    get current value using $coderef, puts value in cache and cleanups old
     cache values.
 
     $tag: *tag for cache*
@@ -180,23 +176,23 @@ DESCRIPTION
     $expiry: *cache expiry period*
 
         <0: *always gets most recent cached value if there is any cached
-        value. Otherwise tries to get current value using $subref, puts and
+        value. Otherwise tries to get current value using $coderef, puts and
         cleanups.*
 
         =0: *never gets cached value. Always tries to get current value
-        using $subref, puts and cleanups.*
+        using $coderef, puts and cleanups.*
 
         >0: *gets most recent cached value in cache if there is cached value
         in expiry period. Otherwise tries to get current value using
-        $subref, puts and cleanups.*
+        $coderef, puts and cleanups.*
 
-    $subref: *sub reference in CodeRef to get current value*
+    $coderef: *code reference to get current value*
 
     return value: *cached or current value, otherwise undef if there isn't
     cached value and current value doesn't get*
 
-   get_pod_text($file_name, $section, $exclude_section)
-    getPodText($file_name, $section, $exclude_section) *WILL BE DEPRECATED*
+  get_pod_text($file_name, $section, $exclude_section)
+    getPodText($file_name, $section, $exclude_section) *OBSOLETE*
 
     gets a text of pod contents in given file
 
@@ -209,28 +205,6 @@ DESCRIPTION
 
     return value: *text of pod in string or array by line, otherwise undef
     if an error occurs*
-
-   term_readline($prompt, $default, $history, $in, $out)
-    reads a line from terminal
-
-    $prompt: *prompt, by default ''*
-
-    $default: *initial value of line, by default ''*
-
-    $history: *lines history in ArrayRef, by default undef*
-
-    $in: *terminal input file handle, by default \*STDIN*
-
-    $out: *terminal output file handle, by default \*STDOUT*
-
-    return value: *line*
-
-   term_readkey($in)
-    reads key from terminal
-
-    $in: *terminal input file handle, by default \*STDIN*
-
-    return value: *key in string type*
 
 INSTALLATION
     To install this module type the following
@@ -251,15 +225,13 @@ DEPENDENCIES
 
     *   Pod::Simple::Text
 
-    *   Term::ReadKey
-
 REPOSITORY
     GitHub <https://github.com/orkunkaraduman/Lazy-Utils>
 
     CPAN <https://metacpan.org/release/Lazy-Utils>
 
 AUTHOR
-    Orkun Karaduman <orkunkaraduman@gmail.com>
+    Orkun Karaduman (ORKUN) <orkun@cpan.org>
 
 COPYRIGHT AND LICENSE
     Copyright (C) 2017 Orkun Karaduman <orkunkaraduman@gmail.com>

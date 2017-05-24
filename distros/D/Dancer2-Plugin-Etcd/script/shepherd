@@ -4,7 +4,7 @@ use strict;
 use 5.008001;
 use Dancer2::Plugin::Etcd::CLI;
 
-our $VERSION = '0.003';
+our $VERSION = '0.006';
 
 exit Dancer2::Plugin::Etcd::CLI->new->run(@ARGV);
 

@@ -13,7 +13,7 @@ TODO - Ideas for future versions of Git::Hooks
 
 =head1 VERSION
 
-version 1.15.1
+version 1.16.0
 
 =head1 TO-DO list of niceties for the future of Git::Hooks.
 

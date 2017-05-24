@@ -6,9 +6,10 @@ use 5.008001;
 use ExtUtils::MakeMaker;
 
 my %RUN_DEPS = (
-    'namespace::clean' => 0,
-    'Moo::Role'        => '1.003000',
-    'File::ConfigDir'  => '0.011',
+    'Carp'            => 0,
+    'File::ConfigDir' => '0.018',
+    'Moo::Role'       => '1.003000',
+    'Scalar::Util'    => 0,
 );
 my %CONFIGURE_DEPS = (
     'ExtUtils::MakeMaker' => 0,
@@ -47,6 +48,9 @@ WriteMakefile1(
                     'Test::Pod::Coverage'                 => 0,
                     'Test::Pod::Spelling::CommonMistakes' => 0,
                     'Test::Spelling'                      => 0,
+                },
+                recommends => {
+                    'MooX::ConfigFromFile' => '0.006',
                 },
             },
             configure => {

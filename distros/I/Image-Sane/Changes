@@ -1,11 +1,20 @@
 Revision history for Perl extension Image::Sane.
 
+0.08  Mon, 22 May 2017 17:30 +0200
+        - Use $EXECUTABLE_NAME to call perl in tests to fix RT 121627.
+
+0.07  Fri, 19 May 2017 17:30 +0200
+        - Replace BUILD_REQUIRES with TEST_REQUIRES, adding Readonly,
+          as used in scanimage-perl, which is used by the test suite.
+
 0.06  Mon, 13 Mar 2017 15:10 +0100
         - Run sane_exit() before sane_get_devices()
         - Fix spelling aquisition->acquisition
         - Rename module Sane -> Image::Sane
         - Don't export symbols automatically
         - Remove duplicated code from get_version_scalar()
+        - Replace package STATUS variable with Exceptions
+          to be caught by Try::Tiny
 
 Revision history for Perl extension Sane.
 

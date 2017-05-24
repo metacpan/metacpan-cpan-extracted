@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2017-03-01'; # DATE
-our $VERSION = '0.12'; # VERSION
+our $DATE = '2017-05-23'; # DATE
+our $VERSION = '0.13'; # VERSION
 
 use 5.010001;
 use strict;
@@ -84,7 +84,7 @@ storable2dd - Convert between serialization formats
 
 =head1 VERSION
 
-This document describes version 0.12 of storable2dd (from Perl distribution App-SerializeUtils), released on 2017-03-01.
+This document describes version 0.13 of storable2dd (from Perl distribution App-SerializeUtils), released on 2017-05-23.
 
 =head1 SYNOPSIS
 
@@ -142,7 +142,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Serial
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-App-SerializeUtils>.
+Source repository is at L<https://github.com/perlancar/perl-App-SerializeUtils>.
 
 =head1 BUGS
 

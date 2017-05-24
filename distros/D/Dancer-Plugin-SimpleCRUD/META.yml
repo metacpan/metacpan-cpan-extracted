@@ -32,4 +32,4 @@ resources:
   bugtracker: https://github.com/bigpresh/Dancer-Plugin-SimpleCRUD/issues
   homepage: https://github.com/bigpresh/Dancer-Plugin-SimpleCRUD/wiki/Quick-intro
   repository: https://github.com/bigpresh/Dancer-Plugin-SimpleCRUD
-version: '1.11'
+version: '1.14'

@@ -60,7 +60,6 @@ sub update_job_deps {
 
     return if $self->use_batches;
 
-    # return unless $self->current_batch->has_array_deps;
     return unless $self->has_array_deps;
 
     foreach my $array_id ( $self->all_array_deps ) {
@@ -72,7 +71,7 @@ sub update_job_deps {
         my $cmd =
           "scontrol update job=$current_job Dependency=afterok:$dep_job";
 
-        $self->app_log->warn($cmd);
+        # $self->app_log->warn($cmd);
     }
 }
 

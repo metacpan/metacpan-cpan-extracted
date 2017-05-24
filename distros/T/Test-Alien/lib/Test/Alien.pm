@@ -7,7 +7,7 @@ use Env qw( @PATH );
 use File::Which 1.10 qw( which );
 use if $^O ne 'MSWin32', 'Capture::Tiny' => 'capture_merged';
 use Capture::Tiny qw( capture );
-use File::Temp qw( tempdir );
+use File::Temp ();
 use Carp qw( croak );
 use File::Spec;
 use File::Basename qw( dirname );
@@ -33,7 +33,7 @@ BEGIN {
 our @EXPORT = qw( alien_ok run_ok xs_ok ffi_ok with_subtest synthetic );
 
 # ABSTRACT: Testing tools for Alien modules
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.15'; # VERSION
 
 
 our @aliens;
@@ -174,7 +174,7 @@ sub xs_ok
   my $verbose = $xs->{verbose};
   my $ok = 1;
   my @diag;
-  my $dir = tempdir( CLEANUP => 1 );
+  my $dir = _tempdir( CLEANUP => 1, TEMPLATE => 'testalienXXXXX' );
   my $xs_filename = File::Spec->catfile($dir, 'test.xs');
   my $c_filename  = File::Spec->catfile($dir, 'test.c');
   
@@ -449,6 +449,31 @@ sub ffi_ok
   $ok;
 }
 
+sub _tempdir
+{
+  # makes sure /tmp or whatever isn't mounted noexec,
+  # which will cause xs_ok tests to fail.
+
+  my $dir = File::Temp::tempdir(@_);
+
+  if($^O ne 'MSWin32')
+  {
+    my $filename = File::Spec->catfile($dir, 'foo.pl');
+    my $fh;
+    open $fh, '>', $filename;
+    print $fh "#!$^X";
+    close $fh;
+    chmod 0755, $filename;
+    system $filename, 'foo';
+    if($?)
+    {
+      $dir = File::Temp::tempdir( DIR => File::Spec->curdir );
+    }
+  }
+  
+  $dir;  
+}
+
 1;
 
 __END__
@@ -463,7 +488,7 @@ Test::Alien - Testing tools for Alien modules
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 
@@ -473,14 +498,14 @@ Test commands that come with your Alien:
  use Test::Alien;
  use Alien::patch;
  
- plan 4;
- 
  alien_ok 'Alien::patch';
  run_ok([ 'patch', '--version' ])
    ->success
    # we only accept the version written
    # by Larry ...
    ->out_like(qr{Larry Wall}); 
+ 
+ done_testing;
 
 Test that your library works with C<XS>:
 
@@ -495,6 +520,8 @@ Test that your library works with C<XS>:
    ok $module->version;
  };
  
+ done_testing;
+
  __DATA__
  
  #include "EXTERN.h"
@@ -528,6 +555,8 @@ Test that your library works with L<FFI::Platypus>:
    like $minor, qr{[0-9]+};
    like $patch, qr{[0-9]+};
  };
+ 
+ done_testing;
 
 =head1 DESCRIPTION
 

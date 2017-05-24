@@ -4,7 +4,7 @@ package App::opan;
 
 use strictures 2;
 
-our $VERSION = '0.002001';
+our $VERSION = '0.002002';
 
 use Dist::Metadata;
 use File::Open qw(fopen);

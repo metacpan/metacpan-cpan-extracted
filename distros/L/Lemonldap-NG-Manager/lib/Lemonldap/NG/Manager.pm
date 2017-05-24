@@ -13,7 +13,7 @@ package Lemonldap::NG::Manager;
 use 5.10.0;
 use utf8;
 use Mouse;
-our $VERSION = '1.9.9';
+our $VERSION = '1.9.10';
 use Lemonldap::NG::Common::Conf::Constants;
 use Lemonldap::NG::Common::PSGI::Constants;
 

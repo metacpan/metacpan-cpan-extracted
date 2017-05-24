@@ -1,6 +1,6 @@
 
 package PRANG::Graph::Choice;
-$PRANG::Graph::Choice::VERSION = '0.18';
+$PRANG::Graph::Choice::VERSION = '0.20';
 use 5.010;
 use Moose;
 use MooseX::Params::Validate;
@@ -58,7 +58,7 @@ has 'xmlns' =>
 	isa => "Str",
 	predicate => "has_xmlns",
 	;
-
+	
 sub node_ok {
     my $self = shift;
     my ( $node, $ctx ) = pos_validated_list(
@@ -197,18 +197,26 @@ sub output {
 	}
 	elsif ( $self->has_type_map ) {
 		my $map = $self->type_map;
+		my $nodeCount = 0;
 		for my $element ( keys %$map ) {
 			my $type = $map->{$element};
 			if ( !ref $type ) {
 				$type = $map->{$element} =
 					$REGISTRY->get_type_constraint($type);
 			}
+			
 			if ( $type->check($value) ) {
 				$name = $element;
-				last;
+				$nodeCount++;
+			}
+			
+			if ($nodeCount > 1) {
+                $ctx->exception("More than 1 node type matched for value: '$value' " .
+                    "You need a stricter type definition for your xml_nodeName map, or PRANG can't figure out which element name to emit"); 
 			}
 		}
 	}
+	
 	if ( !defined $name ) {
 		$ctx->exception(
 			"don't know what to serialize $value to for slot "

@@ -1,5 +1,9 @@
 Revision history for Mojo-Zabbix
 
+0.11    2017-05-19/18
+
+* add group info get for Mojo-Zabbix—APP.
+
 0.10    2017-05-19/18
 
 * merge Mojo-Zabbix—APP to this repos.

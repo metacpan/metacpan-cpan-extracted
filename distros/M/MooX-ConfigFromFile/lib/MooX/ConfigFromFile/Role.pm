@@ -3,7 +3,7 @@ package MooX::ConfigFromFile::Role;
 use strict;
 use warnings;
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 use FindBin qw/$Script/;
 
@@ -24,11 +24,11 @@ around BUILDARGS => sub {
 
 sub _initialize_from_config
 {
-    my ( $class, $params ) = @_;
+    my ($class, $params) = @_;
     defined $params->{loaded_config} or $params->{loaded_config} = $class->_build_loaded_config($params);
 
     # This copies stuff from loaded_config into the object's parameters
-    foreach my $cfg_key ( keys %{ $params->{loaded_config} } )
+    foreach my $cfg_key (keys %{$params->{loaded_config}})
     {
         exists $params->{$cfg_key} and next;
         $params->{$cfg_key} = $params->{loaded_config}->{$cfg_key};
@@ -37,75 +37,75 @@ sub _initialize_from_config
     return $params;
 }
 
-has 'config_prefix' => ( is => 'lazy' );
+has 'config_prefix' => (is => 'lazy');
 
 sub _build_config_prefix { $Script; }
 
-has 'config_prefixes' => ( is => 'lazy' );
+has 'config_prefixes' => (is => 'lazy');
 
 sub _build_config_prefixes
 {
-    my ( $class, $params ) = @_;
+    my ($class, $params) = @_;
     defined $params->{config_prefix} or $params->{config_prefix} = $class->_build_config_prefix($params);
-    [ $params->{config_prefix} ];
+    [$params->{config_prefix}];
 }
 
-has 'config_prefix_map_separator' => ( is => 'lazy' );
+has 'config_prefix_map_separator' => (is => 'lazy');
 
 sub _build_config_prefix_map_separator { "-" }
 
-has 'config_prefix_map' => ( is => 'lazy' );
+has 'config_prefix_map' => (is => 'lazy');
 
 sub _build_config_prefix_map
 {
-    my ( $class, $params ) = @_;
+    my ($class, $params) = @_;
 
     defined $params->{config_prefix_map_separator}
       or $params->{config_prefix_map_separator} = $class->_build_config_prefix_map_separator($params);
     defined $params->{config_prefixes} or $params->{config_prefixes} = $class->_build_config_prefixes($params);
 
-    my ( $sep, $i, @prefix_map ) = ( $params->{config_prefix_map_separator} );
-    for ( $i = 0; $i < scalar @{ $params->{config_prefixes} }; ++$i )
+    my ($sep, $i, @prefix_map) = ($params->{config_prefix_map_separator});
+    for ($i = 0; $i < scalar @{$params->{config_prefixes}}; ++$i)
     {
-        push @prefix_map, join( $sep, @{ $params->{config_prefixes} }[ 0 .. $i ] );
+        push @prefix_map, join($sep, @{$params->{config_prefixes}}[0 .. $i]);
     }
 
     \@prefix_map;
 }
 
-has 'config_extensions' => ( is => 'lazy' );
+has 'config_extensions' => (is => 'lazy');
 
-sub _build_config_extensions { [ Config::Any->extensions() ] }
+sub _build_config_extensions { [Config::Any->extensions()] }
 
-has 'config_files_pattern' => ( is => 'lazy' );
+has 'config_files_pattern' => (is => 'lazy');
 
 sub _build_config_files_pattern
 {
-    my ( $class, $params ) = @_;
+    my ($class, $params) = @_;
 
     defined $params->{config_prefix_map} or $params->{config_prefix_map} = $class->_build_config_prefix_map($params);
     defined $params->{config_extensions} or $params->{config_extensions} = $class->_build_config_extensions($params);
-    # my @cfg_pattern = map { $params->{config_prefix} . "." . $_ } @{ $params->{config_extensions} };
+    ## no critic (BuiltinFunctions::ProhibitComplexMappings)
     my @cfg_pattern = map {
         my $ext = $_;
-        map { $_ . "." . $ext } @{ $params->{config_prefix_map} }
-    } @{ $params->{config_extensions} };
+        map { $_ . "." . $ext } @{$params->{config_prefix_map}}
+    } @{$params->{config_extensions}};
 
     \@cfg_pattern;
 }
 
-has 'config_files' => ( is => 'lazy' );
+has 'config_files' => (is => 'lazy');
 
 sub _build_config_files
 {
-    my ( $class, $params ) = @_;
+    my ($class, $params) = @_;
 
     defined $params->{config_files_pattern} or $params->{config_files_pattern} = $class->_build_config_files_pattern($params);
     defined $params->{config_dirs}          or $params->{config_dirs}          = $class->_build_config_dirs($params);
     ref $params->{config_dirs} eq "ARRAY"   or $params->{config_dirs}          = ["."];
 
     my @cfg_files =
-      File::Find::Rule->file()->name( @{ $params->{config_files_pattern} } )->maxdepth(1)->in( @{ $params->{config_dirs} } );
+      File::Find::Rule->file()->name(@{$params->{config_files_pattern}})->maxdepth(1)->in(@{$params->{config_dirs}});
 
     return \@cfg_files;
 }
@@ -117,13 +117,14 @@ has raw_loaded_config => (
 
 sub _build_raw_loaded_config
 {
-    my ( $class, $params ) = @_;
+    my ($class, $params) = @_;
 
     defined $params->{config_files} or $params->{config_files} = $class->_build_config_files($params);
-    return [] if !@{ $params->{config_files} };
+    return [] if !@{$params->{config_files}};
 
     [
-        sort { my @a = %{$a}; my @b = %{$b}; $a[0] cmp $b[0]; } @{ Config::Any->load_files(
+        ## no critic (BuiltinFunctions::RequireSimpleSortBlock)
+        sort { my @a = %{$a}; my @b = %{$b}; $a[0] cmp $b[0]; } @{Config::Any->load_files(
                 {
                     files   => $params->{config_files},
                     use_ext => 1
@@ -140,14 +141,14 @@ has 'loaded_config' => (
 
 sub _build_loaded_config
 {
-    my ( $class, $params ) = @_;
+    my ($class, $params) = @_;
 
     defined $params->{raw_loaded_config} or $params->{raw_loaded_config} = $class->_build_raw_loaded_config($params);
 
     my $config_merged = {};
-    for my $c ( map { values %$_ } @{ $params->{raw_loaded_config} } )
+    for my $c (map { values %$_ } @{$params->{raw_loaded_config}})
     {
-        %$config_merged = ( %$config_merged, %$c );
+        %$config_merged = (%$config_merged, %$c);
     }
 
     $config_merged;
@@ -247,7 +248,7 @@ creation with nasty hacks. He also taught me a bit more how Moo(se) works.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013-2015 Jens Rehsack.
+Copyright 2013-2017 Jens Rehsack.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

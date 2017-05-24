@@ -8,7 +8,7 @@
 #        .
 #          .
 #
-#	SCCS: @(#)Expression.pm	1.47 07/21/16 12:48:37
+#	SCCS: @(#)Expression.pm	1.48 09/06/16 10:48:57
 #
 # This module is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself. You must preserve this entire copyright
@@ -50,7 +50,7 @@ use vars qw/
 	$Version
 );
 
-our $VERSION = "1.47";
+our $VERSION = "1.48";
 
 # Fundamental to this is a tree of nodes.
 # Nodes are hashes with members:
@@ -1149,15 +1149,23 @@ If this is not set the default is to C<printf STDERR>.
 =item VarHash
 
 The argument is a hash that will be used to store variables.
-Changing the has between runs makes it is possible to manage distinct name spaces,
+Changing the hash between runs makes it is possible to manage distinct name spaces,
 ie different computations use different sets of variables.
 
 The name C<EmptyList> should, by convention, exist and be an empty array; this may be
 used to assign an empty value to a variable.
 
+All variables are arrays, ie a single value is in an array with one element. For speed
+you can access them directly, eg:
+
+    $ArithEnv->{VarHash}->{i} = [10];    # Set i to 10
+    $i = $ArithEnv->{VarHash}->{i}->[0]; # Get the value of i
+
+If you specify one of the functions C<VarGetFun> C<VarSetFun> C<VarSetScalar> you are on your own.
+
 =item VarGetFun
 
-This specifies the that function returns the value of a variable as an array.
+This specifies the function that returns the value of a variable as an array.
 The arguments are: 0 - the value returned by C<new>; 1 - the name of the variable
 wanted.
 If no value is available you may return the empty array.
@@ -1599,7 +1607,7 @@ Alain D D Williams <addw@phcomp.co.uk>
 
 =head2 Copyright and Version
 
-Version "1.47", this is available as: $Math::Expression::Version.
+Version "1.48", this is available as: $Math::Expression::Version.
 
 Copyright (c) 2003, 2016 Parliament Hill Computers Ltd/Alain D D Williams. All rights reserved.
 This program is free software; you can redistribute it and/or modify it

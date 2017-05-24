@@ -1,5 +1,5 @@
 package Bio::Roary::Output::GroupMultifasta;
-$Bio::Roary::Output::GroupMultifasta::VERSION = '3.8.0';
+$Bio::Roary::Output::GroupMultifasta::VERSION = '3.8.2';
 # ABSTRACT:  Take in a group and create a multifasta file
 
 
@@ -66,7 +66,7 @@ Bio::Roary::Output::GroupMultifasta - Take in a group and create a multifasta fi
 
 =head1 VERSION
 
-version 3.8.0
+version 3.8.2
 
 =head1 SYNOPSIS
 

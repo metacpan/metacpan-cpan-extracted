@@ -318,7 +318,7 @@ version: $version
 		elsif ($info =~ /(\d+\.\d+)/) {
 			$version = $1;
 		}
-		elsif ($info =~ /(\d+)devel/) { ## Can be 10devel
+		elsif ($info =~ /(\d+)(?:devel|beta)/) { ## Can be 10devel
 			$version = $1;
 		}
 		else {
@@ -340,7 +340,7 @@ version: $version
 		}
 
 		## initdb and pg_ctl seems to be available, let's use them to fire up a cluster
-		warn "Please wait, creating new database for testing\n";
+        warn "Please wait, creating new database (version $version) for testing\n";
 		$info = '';
 		eval {
             my $com = "$initdb --locale=C -E UTF8 -D $testdir/data";

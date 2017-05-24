@@ -2,14 +2,21 @@
 
 use strict;
 
-use Test::Most tests => 1;
-
+use Test::Most;
 use WWW::Scrape::FindaGrave;
 
-my $args = {
-	'firstname' => 'john',
-	'lastname' => 'smith',
-	'date_of_birth' => 1912
-};
+NEW: {
+	if(-e 't/online.enabled') {
+		plan tests => 1;
 
-isa_ok(WWW::Scrape::FindaGrave->new($args), 'WWW::Scrape::FindaGrave', 'Creating WWW::Scrape::FindaGrave object');
+		my $args = {
+			'firstname' => 'john',
+			'lastname' => 'smith',
+			'date_of_birth' => 1912
+		};
+
+		isa_ok(WWW::Scrape::FindaGrave->new($args), 'WWW::Scrape::FindaGrave', 'Creating WWW::Scrape::FindaGrave object');
+	} else {
+		plan skip_all => 'On-line tests disabled';
+	}
+}

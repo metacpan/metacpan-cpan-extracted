@@ -9,6 +9,8 @@ use File::Spec;
 
 our $IS_WINDOWS = $^O eq 'MSWin32';
 our $IS_PACKED = $ENV{PAR_0} ? 1 : 0;
+our $FILE_SEP = $IS_WINDOWS ? '\\' : '/';
+our $SHELL_ARG_DELIM = $IS_WINDOWS ? '"' : "'";
 
 use Exporter qw(import);
 our @EXPORT_OK =
@@ -20,9 +22,9 @@ our @EXPORT_OK =
 			expandAts
 			$IS_WINDOWS
 			$IS_PACKED
+			$FILE_SEP
+			$SHELL_ARG_DELIM
 		);
-
-my $file_sep = $IS_WINDOWS ? '\\' : '/';
 
 # pass in a path and ensure it contains the native form of slash vs backslash
 # (or force either one)
@@ -30,7 +32,7 @@ my $file_sep = $IS_WINDOWS ? '\\' : '/';
 sub slashify
 {
 	my $s = shift;
-	my $fsep = shift || $file_sep;
+	my $fsep = shift || $FILE_SEP;
 
 	my $dblStart = $s =~ s#^[\\/]{2}##;
 	$s =~ s#[/\\]+#$fsep#g;

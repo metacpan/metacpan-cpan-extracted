@@ -22,7 +22,6 @@ has tree => ( is => 'lazy', isa => InstanceOf ['Pcore::Util::File::Tree'], init_
 has par_suffix   => ( is => 'lazy', isa => Str,     init_arg => undef );
 has exe_filename => ( is => 'lazy', isa => Str,     init_arg => undef );
 has main_mod     => ( is => 'lazy', isa => HashRef, default  => sub { {} }, init_arg => undef );    # main modules, found during deps processing
-has share        => ( is => 'ro',   isa => HashRef, default  => sub { {} }, init_arg => undef );
 
 sub _build_tree ($self) {
     return Pcore::Util::File::Tree->new;
@@ -72,9 +71,6 @@ sub run ($self) {
 
     # process found main modules
     $self->_process_main_modules;
-
-    # add shares
-    $self->_add_share;
 
     # add shlib
     $self->_add_shlib;
@@ -148,23 +144,6 @@ sub _add_shlib ($self) {
         }
         else {
             $self->_error(qq[shlib wasn't found: "$shlib"]);
-        }
-    }
-
-    return;
-}
-
-sub _add_share ($self) {
-    for my $res ( keys $self->share->%* ) {
-        my $path = $ENV->share->get($res);
-
-        if ( !$path ) {
-            $self->_error(qq[required share "$res" wasn't found]);
-        }
-        else {
-            say qq[share added: "$res"];
-
-            $self->tree->add_file( 'share/' . $res, $path );
         }
     }
 
@@ -325,31 +304,19 @@ sub _process_main_modules ($self) {
 sub _add_dist ( $self, $dist ) {
     if ( $dist->name eq $self->dist->name ) {
 
-        # add main dist dist.perl
-        $self->tree->add_file( 'share/dist.perl', $dist->share_dir . '/dist.perl' );
+        # add main dist share
+        $self->tree->add_dir( $dist->share_dir, '/share/' );
 
         # add main dist dist-id.json
         $self->tree->add_file( 'share/dist-id.json', P->data->to_json( $dist->id, readable => 1 ) );
     }
     else {
 
-        # add dist.perl
-        $self->tree->add_file( "lib/auto/share/dist/@{[ $dist->name ]}/dist.perl", $dist->share_dir . '/dist.perl' );
+        # add dist share
+        $self->tree->add_dir( $dist->share_dir, "lib/auto/share/dist/@{[ $dist->name ]}/" );
 
         # add dist-id.json
         $self->tree->add_file( "lib/auto/share/dist/@{[ $dist->name ]}/dist-id.json", P->data->to_json( $dist->id, readable => 1 ) );
-    }
-
-    # register dist share in order to find them later via $ENV->share->get interface
-    $ENV->register_dist($dist);
-
-    # process dist modules shares
-    if ( $dist->cfg->{mod_share} ) {
-
-        # register shares to add later
-        for my $mod ( grep { exists $self->mod->{$_} } keys $dist->cfg->{mod_share}->%* ) {
-            $self->share->@{ $dist->cfg->{mod_share}->{$mod}->@* } = ();
-        }
     }
 
     say 'dist added: ' . $dist->name;
@@ -501,13 +468,13 @@ sub _error ( $self, $msg ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 248                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 227                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 371                  | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
+## |    3 | 338                  | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 456, 459             | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |    2 | 423, 426             | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 388, 394             | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |    1 | 355, 361             | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -1,4 +1,72 @@
 Perltidy Change Log
+  2017 05 21
+      - Fixed debian #862667: failure to check for perltidy.ERR deletion can lead 
+        to overwriting abritrary files by symlink attack. Perltidy was continuing 
+        to write files after an unlink failure.  Thanks to Don Armstrong 
+        for a patch.
+
+      - Fixed RT #116344, perltidy fails on certain anonymous hash references:
+        in the following code snippet the '?' was misparsed as a pattern 
+        delimiter rather than a ternary operator.
+            return ref {} ? 1 : 0;
+
+      - Fixed RT #113792: misparsing of a fat comma (=>) right after 
+        the __END__ or __DATA__ tokens.  These keywords were getting
+        incorrectly quoted by the following => operator.
+
+      - Fixed RT #118558. Custom Getopt::Long configuration breaks parsing 
+        of perltidyrc.  Perltidy was resetting the users configuration too soon.
+
+      - Fixed RT #119140, failure to parse double diamond operator.  Code to
+        handle this new operator has been added.
+
+      - Fixed RT #120968.  Fixed problem where -enc=utf8 didn't work 
+        with --backup-and-modify-in-place. Thanks to Heinz Knutzen for this patch.
+
+      - Fixed minor formatting issue where one-line blocks for subs with signatures 
+        were unnecesarily broken
+
+      - RT #32905, patch to fix utf-8 error when output was STDOUT. 
+
+      - RT #79947, improved spacing of try/catch/finally blocks. Thanks to qsimpleq
+        for a patch.
+
+      - Fixed #114909, Anonymous subs with signatures and prototypes misparsed as
+        broken ternaries, in which a statement such as this was not being parsed
+        correctly:
+            return sub ( $fh, $out ) : prototype(*$) { ... }
+
+      - Implemented RT #113689, option to introduces spaces after an opening block
+        brace and before a closing block brace. Four new optional controls are
+        added. The first two define the minimum number of blank lines to be
+        inserted 
+
+         -blao=i or --blank-lines-after-opening-block=i
+         -blbc=i or --blank-lines-before-closing-block=i
+
+        where i is an integer, the number of lines (the default is 0).  
+
+        The second two define the types of blocks to which the first two apply 
+
+         -blaol=s or --blank-lines-after-opening-block-list=s
+         -blbcl=s or --blank-lines-before-closing-block-list=s
+    
+        where s is a string of possible block keywords (default is just 'sub',
+        meaning a named subroutine).
+
+        For more information please see the documentation.
+
+      - The method for specifying block types for certain input parameters has
+        been generalized to distinguish between normal named subroutines and
+        anonymous subs.  The keyword for normal subroutines remains 'sub', and
+        the new keyword for anonymous subs is 'asub'. 
+
+      - Minor documentation changes. The BUGS sections now have a link
+        to CPAN where most open bugs and issues can be reviewed and bug reports
+        can be submitted.  The information in the AUTHOR and CREDITS sections of
+        the man pages have been removed from the man pages to streamline the
+        documentation. This information is still in the source code.
+
   2016 03 02
       - RT #112534. Corrected a minor problem in which an unwanted newline
         was placed before the closing brace of an anonymous sub with 

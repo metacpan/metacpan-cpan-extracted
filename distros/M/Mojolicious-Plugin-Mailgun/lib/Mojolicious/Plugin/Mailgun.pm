@@ -3,7 +3,7 @@ package Mojolicious::Plugin::Mailgun;
 use Mojo::Base 'Mojolicious::Plugin';
 use Carp 'croak';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 has base_url => sub { Mojo::URL->new('https://api.mailgun.net/v3/'); };
 has ua       => sub { Mojo::UserAgent->new(); };
@@ -79,8 +79,9 @@ multiple user agents.
 
 =head1 OPTIONS
 
-L<Mojolicious::Plugin::Mailgun> can be provided a hash of mailgun sites with api key and domain, or
-it can read them directly from $c->config->{mailgun} if not provided at load time.
+L<Mojolicious::Plugin::Mailgun> can be provided a hash of mailgun sites with
+C<api_key> and C<domain>, or it can read them directly from
+$c->config->{mailgun} if not provided at load time.
 
 
 =head1 HELPERS
@@ -89,9 +90,11 @@ L<Mojolicious::Plugin::Mailgun> implements one helper.
 
 =head2 mailgun->send <$site>, <\%post_options>, <$cb>
 
-Send a mail with the mailgun API. This is just a thin wrapper around Mojo::UserAgent to handle authentication
-settings. See the mailgun sending documentation for more information about the supported arguments to the
-post_options hash. This API can only be used non-blocking, so the callback is required.
+Send a mail with the mailgun API. This is just a thin wrapper around
+Mojo::UserAgent to handle authentication settings. See the mailgun sending
+documentation for more information about the supported arguments to the
+post_options hash. This API can only be used non-blocking, so the callback is
+required.
 
 L<https://documentation.mailgun.com/api-sending.html#sending>
 

@@ -1,6 +1,6 @@
 package Template::Lace;
 
-our $VERSION = '0.003';
+our $VERSION = '0.005';
 
 1;
 
@@ -15,7 +15,6 @@ A Template Model:
     package MyApp::Template::User;
 
     use Moo;
-    with 'Template::Lace::ModelRole';
 
     has [qw/age name motto/] => (is=>'ro', required=>1);
 
@@ -119,8 +118,7 @@ risk and responsibility.
 =head1 DESCRIPTION
 
 L<Template::Lace> is a toolkit that makes it possible to bind HTML templates to plain old Perl
-classes as long as they provide a defined interface (provided by L<Template::Lace::ModelRole>
-but you don't have to use L<Moo> as long as you conform to the minimal interface). These
+classes as long as they provide a defined interface. These
 templates are fully HTML markup only; they contain no display logic, only valid HTML and component
 declarations.  We use L<Template::Lace::DOM> (which is a subclass of L<Mojo::DOM58>) to alter the 
 template for presentation at request time.  L<Template::Lace::DOM> provides an API to transform
@@ -128,13 +126,12 @@ the template into HTML using instance data and methods provided by the class.  S
 L<Template::Lace::DOM> and L<Mojo::DOM58> for more about how these classes allow you to inspect
 and modify a DOM.
 
-When you have a Perl class that does L<Template::Lace::ModelRole> we call that a 'Model' class
+When you have a Perl class that conform to these requirements we call that a 'Model' class
 Here's an example of a very simple Model class:
 
     package  MyApp::Template::User;
 
     use Moo;
-    with 'Template::Lace::ModelRole';
 
     has [qw/age name motto/] => (is=>'ro', required=>1);
 
@@ -168,7 +165,7 @@ Here's an example of a very simple Model class:
 
 In this example the Model class defines two methods, C<process_dom> and C<template>.  Any Perl class
 can be used as Model class as long as it provides these methods (as well as a stub for C<prepare_dom>
-which will we discuss later; or just consume L<Template::Lace::ModelRole>.)  The C<template> method
+which will we discuss later).  The C<template> method
 just needs to return a string.  It should contain your desired HTML markup.  The C<process_dom> method
 is an instance method on your class, and it gets both C<$self> and C<$dom>, where C<$dom> is a
 DOM representation of your template (via L<Template::Lace::DOM>).  Anything you want to change about
@@ -252,8 +249,7 @@ at this point will become cloned for all subsequent requests.  For example:
     package  MyApp::Template::List;
 
     use Moo;
-    with 'Template::Lace::ModelRole',
-      'Template::Lace::Model::AutoTemplate';
+    with 'Template::Lace::Model::AutoTemplate';
 
     has [qw/form items copywrite/] => (is=>'ro', required=>1);
 
@@ -281,6 +277,57 @@ templates are larger and more complex, or when you have HTML designer that prefe
 templates instead of ones mixed into Perl code, you can use this role to achieve that.  See
 the docs in L<Template::Lace::Model::AutoTemplate> for more.
 
+=head1 ADVANCED TEMPLATE MANIPULATION
+
+So far we've seen how to use C<process_dom> (and the related C<prepare_dom>) to transform your
+template.  Strickly speaking however you do not actually need to declare these methods in your
+view model.  You may instead choose to allow the renderer to 'call into' the model.  This approach
+can give the end user a bit more control over how the template is actually rendered.  Example:
+
+    package Local::Template::NoProcessDom;
+
+    use Moo;
+
+    sub template { qq{
+      <section>
+        Hello <span id="name">NAME</span>, you are <span id="age"></span> years old!
+      </section>
+    }}
+
+    sub fill_name {
+      my ($self, $dom, $name) = @_;
+      $dom->do('#name', $name);
+    }
+
+    sub fill_age {
+      my ($self, $dom, $age) = @_;
+      $dom->do('#age', $age);
+    }
+
+    my $factory = Template::Lace::Factory->new(
+      model_class=>'Local::Template::NoProcessDom');
+
+    my $renderer = $factory->create();
+
+    $renderer->call('fill_name', 'John');
+    $renderer->call('fill_age', '42');
+    
+    my $html = $renderer->render;
+    print $html;
+
+Returns:
+
+    <section>
+      Hello <span id="name">John</span>, you are <span id="age">42</span> years old!
+    </section>
+
+You might find this approach useful when you have a template where you process it differently
+depending on logic under the control of the code that gets the renderer.  For example you might
+have a form that may or may not have errors.  
+
+B<NOTE> You can combine both approachs, have a C<process_dom> and yet also call into the view
+model to handle special display conditions.
+
 =head1 COMPONENTS
 
 Most template systems have a mechanism to make it possible to divide your template into
@@ -290,9 +337,9 @@ the passing of information into the component from the Model class.  In your tem
 would declare a component like this:
 
     <prefix-name
-        attr1=>'literal value'
-        attr2=>'$.foo'
-        attr3=>\'title:content'>
+        attr1='literal value'
+        attr2='$.foo'
+        attr3=\'title:content'>
       [some additional content such as HTML markup and text]
     </prefix-name>
 
@@ -300,9 +347,9 @@ A component doesn't have to contain anything (like the <br/> or <hr/> tag) in wh
 its just:
 
     <prefix-name
-        attr1=>'literal value'
-        attr2=>'$.foo'
-        attr3=>\'title:content' />
+        attr1='literal value'
+        attr2='$.foo'
+        attr3=\'title:content' />
     
 Here's an example:
 
@@ -383,9 +430,9 @@ all components could get some of the following automatic atttributes:
 If the component has content as in the following example
 
     <prefix-name
-        attr1=>'literal value'
-        attr2=>'$.foo'
-        attr3=>\'title:content'>
+        attr1='literal value'
+        attr2='$.foo'
+        attr3=\'title:content'>
       [some addtional content such as HTML markup and text]
     </prefix-name>
 
@@ -403,6 +450,15 @@ the template in which they appear.  I would use this carefully since I think tha
 you would prefer to pass information from the model to the component via attributes.
 
 =back
+
+If you need to pass complex or structured data to your arguments you may do so using
+JSON:
+
+    <prefix-name
+        hash={"q":"The query string"}
+        array=["1","2","3"]
+      [some addtional content such as HTML markup and text]
+    </prefix-name>
 
 Components can be an instance of any class that does C<create> and C<process_dom>
 but generally you will make your components out of other L<Template::Lace> models
@@ -476,7 +532,6 @@ the user if they submit bad items).
     package MyApp::Template::List
 
     use Moo;
-    with 'Template::Lace::ModelRole';
 
     has [qw/form items copywrite/] => (is=>'ro', required=>1);
 
@@ -549,8 +604,6 @@ The 'view-footer' component is the most simple so lets look at that first:
 
     use Moo;
 
-    with 'Template::Lace::ModelRole';
-
     has copydate => (is=>'ro', required=>1);
 
     sub process_dom {
@@ -605,8 +658,6 @@ the 'view-form' component:
     package  MyApp::View::Form;
 
     use Moo;
-    with 'Template::Lace::ModelRole';
-
 
     has [qw/id fif errors content/] => (is=>'ro', required=>0);
 
@@ -661,7 +712,6 @@ how the 'view-input' component works:
     package  MyApp::View::Input;
 
     use Moo;
-    with 'Template::Lace::ModelRole';
 
     has [qw/id label name type value errors/] => (is=>'ro');
 
@@ -742,7 +792,6 @@ when building a website:
     package  MyApp::View::Master;
 
     use Moo;
-    with 'Template::Lace::ModelRole';
 
     has title => (is=>'ro', required=>1);
     has css => (is=>'ro', required=>1);
@@ -865,7 +914,7 @@ John Napiorkowski L<email:jjnapiork@cpan.org>
 =head1 SEE ALSO
 
 L<Template::Lace::Factory>, L<Template::Lace::Component>, L<Template::Lace::Renderer>,
-L<Template::Lace::DOM>, L<Template::Lace::ModelRole>, L<Template::Lace::Model::AutoTemplate>,
+L<Template::Lace::DOM>, L<Template::Lace::Model::AutoTemplate>,
 and L<Template::Lace::Factory::InferInitArgsRole>
 
 Other classes defined in this distribution

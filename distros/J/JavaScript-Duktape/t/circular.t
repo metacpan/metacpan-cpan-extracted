@@ -6,12 +6,11 @@ use JavaScript::Duktape;
 use Test::More;
 use Data::Dumper;
 
-my $js = JavaScript::Duktape->new();
-my $duk = $js->duk;
+my $js   = JavaScript::Duktape->new();
+my $duk  = $js->duk;
 my $self = $duk;
 
-
-$duk->eval_string(qq~
+$duk->eval_string(q{
     function Foo() {
         var self = this;
         this.abc = "Hello";
@@ -24,8 +23,7 @@ $duk->eval_string(qq~
 
     var foo = new Foo();
     foo;
-~);
-
+});
 
 my $t = $duk->to_perl(-1);
 is $t->{test}->{hi}->{abc}, 'Hello';

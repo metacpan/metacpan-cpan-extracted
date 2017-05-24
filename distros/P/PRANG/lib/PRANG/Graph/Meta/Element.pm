@@ -1,6 +1,6 @@
 
 package PRANG::Graph::Meta::Element;
-$PRANG::Graph::Meta::Element::VERSION = '0.18';
+$PRANG::Graph::Meta::Element::VERSION = '0.20';
 use Moose::Role;
 use PRANG::Util qw(types_of);
 use MooseX::Params::Validate;
@@ -623,7 +623,7 @@ sub build_graph_node {
 }
 
 package Moose::Meta::Attribute::Custom::Trait::PRANG::Element;
-$Moose::Meta::Attribute::Custom::Trait::PRANG::Element::VERSION = '0.18';
+$Moose::Meta::Attribute::Custom::Trait::PRANG::Element::VERSION = '0.20';
 sub register_implementation {
 	"PRANG::Graph::Meta::Element";
 }

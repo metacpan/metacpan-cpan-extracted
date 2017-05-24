@@ -7,7 +7,7 @@ use File::Copy;
 use Lab::XPRESS::Data::XPRESS_logger;
 use Lab::XPRESS::Sweep::Sweep;
 
-our $VERSION = '3.542';
+our $VERSION = '3.543';
 
 our $counter        = 0;
 our $GLOBAL_PATH    = "./";

@@ -3,17 +3,13 @@ package Net::Async::Github;
 use strict;
 use warnings;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use parent qw(IO::Async::Notifier);
 
 =head1 NAME
 
 Net::Async::Github - support for L<https://github.com>'s REST API with L<IO::Async>
-
-=head1 VERSION
-
-version 0.002
 
 =head1 SYNOPSIS
 
@@ -841,3 +837,4 @@ Tom Molesworth <TEAM@cpan.org>
 =head1 LICENSE
 
 Copyright Tom Molesworth 2014-2017. Licensed under the same terms as Perl itself.
+

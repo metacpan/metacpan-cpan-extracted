@@ -1,7 +1,7 @@
 
 
 This archive contains the distribution Log-Log4perl-Layout-JSON,
-version 0.51:
+version 0.52:
 
   Layout a log message as a JSON hash, including MDC data
 

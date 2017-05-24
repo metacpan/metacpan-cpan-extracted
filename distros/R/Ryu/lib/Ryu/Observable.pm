@@ -1,7 +1,9 @@
 package Ryu::Observable;
-$Ryu::Observable::VERSION = '0.014';
+
 use strict;
 use warnings;
+
+our $VERSION = '0.015'; # VERSION
 
 =encoding utf8
 

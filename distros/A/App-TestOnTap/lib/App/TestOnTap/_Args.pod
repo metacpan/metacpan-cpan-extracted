@@ -9,9 +9,6 @@ Commandline options and arguments understood for TestOnTap processing
  testontap
     [ --_help ]
     [ --_pp ]
-    [ --_pp-variant <value> ]
-    [ --_pp-output <path> ]
-    [ --_pp-force ]
 
 =head1 OPTIONS AND ARGUMENTS
 
@@ -23,8 +20,6 @@ sensitive. Forcibly end option parsing using '--'.
 This documents some 'hidden' flags, generally because they're somewhat particular and/or
 not ready for prime time...
 
-The regular verbose flag may be used to raise verbosity one or more levels. 
-
 =over
 
 =item B<--_help>
@@ -33,46 +28,18 @@ Displays usage and help with options/arguments. If given, nothing else will be d
 
 =item B<--_pp>
 
-Signals that it should generate a binary using PAR::Packer (must be installed first).
-If given, this option causes all other options to be ignored (apart from the accompanying '--_pp-*' flags below).
+Signals that it should print out a basic commandline to generate a binary using the 'pp' command from
+PAR::Packer (must be installed first). If given, this option causes all other options to be ignored.
+
+Print to a batch file/shellscript or similar, and run it separately, editing any flags as needed. As
+an example, a Perl was built on a host against a private openssl installation. It turned out that
+LD_LIBRARY_PATH and options '-l ssl -l crypto' was needed to properly bring the necessary flags in.  
 
 Note that this can not be used when you already run a binary.
 
-When a packed binary is run, any C<PERL5LIB> envvar is just dropped which is understandable, but as a very special
-case, you find it needed when running the tests, set the C<TESTONTAP_PERL5LIB> to the desired value and the
-C<PERL5LIB> variable will be reinstated with that value during the tests running.  
-
-=item B<--_pp-variant E<lt>valueE<gt>>
-
-This is an optional value that will be tacked on to the automatically calculated name by
-I<--_pp-output>. If given, it will be prefixed with a dash and placed at the end of the name.
-
-=item B<--_pp-output E<lt>pathE<gt>>
-
-If this option is not given, a default name of the binary will be computed and placed in the current directory.
-
-The default name is the script name, the version number, the os, the arch, the variant
-(set by I<--_pp-variant>, if any) and for Windows, the '.exe' suffix.
-
-  Examples:
-    testontap-0.123-windows-x86.exe
-    testontap-0.123-linux-x86_64
-    
-    # with I<--_pp-variant foo>:
-    testontap-0.123-windows-x86-foo.exe
-    testontap-0.123-linux-x86_64-foo
-
-If the given path doesn't exist, assume it is the actual full path and filename. Note that a given variant
-will not be present in that case as the automatical name never is computed.
-
-If the path is an existing directory, use the default name above and write it to the directory.
-
-If the ultimate name already exists, an error will be thrown. See the force flag to ignore that check in order
-to overwrite.
-
-=item B<--_pp-force>
-
-Setting this option will cause the existing file to be deleted before a new is created.
+When a packed binary is run, any C<PERL5LIB> envvar is just dropped which is understandable, but if you find it
+is needed when running the tests, set the C<TESTONTAP_PERL5LIB> to the desired value and the C<PERL5LIB> variable
+will be set with that value during the tests running.  
 
 =back
 

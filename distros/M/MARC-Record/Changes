@@ -1,5 +1,12 @@
 Revision history for Perl extension MARC::Record.
 
+2.0.7 Tue May 23 20:41:13 EDT 2017
+        [FIXES]
+        - RT#108123: clean up MANIFEST.SKIP
+        - GH#1: marcdump now prints warnings (Johann Rolschewski)
+        - remove a reference to SourceForge
+        - fix a reference to the per4lib mailing list
+
 2.0.6 Tue Oct 22 16:17:06 UTC 2013
         [ENHANCEMENTS]
         - MARC::Field->as_string() now accepts an optional second

@@ -1,3 +1,11 @@
+v0.2.1 2017-05-20T22:13:56Z
+ - No issues on bugtracker were closed since the last release
+ - logo added
+
+v0.2.0 2017-05-20T19:59:00Z
+ - No issues on bugtracker were closed since the last release
+ - util and mod_share removed from dist config
+
 v0.1.3 2017-05-15T15:29:35Z
  - No issues were closed since the last release
 

@@ -1,4 +1,4 @@
-package Pcore::DBH v0.2.1;
+package Pcore::DBH v0.3.0;
 
 use Pcore -dist, -role;
 use DBI;

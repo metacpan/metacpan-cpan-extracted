@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 package Bio::Roary::Main::AssemblyStatistics;
-$Bio::Roary::Main::AssemblyStatistics::VERSION = '3.8.0';
+$Bio::Roary::Main::AssemblyStatistics::VERSION = '3.8.2';
 # ABSTRACT: Given a spreadsheet of gene presence and absence calculate some statistics
 # PODNAME: pan_genome_assembly_statistics
 
@@ -25,7 +25,7 @@ pan_genome_assembly_statistics - Given a spreadsheet of gene presence and absenc
 
 =head1 VERSION
 
-version 3.8.0
+version 3.8.2
 
 =head1 SYNOPSIS
 

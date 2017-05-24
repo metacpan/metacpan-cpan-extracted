@@ -1,0 +1,54 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::CPAN::Meta' => '0',
+                                      'Test::EOL' => '0',
+                                      'Test::Kwalitee' => '1.21',
+                                      'Test::More' => '0.88',
+                                      'Test::PAUSE::Permissions' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Catalyst::Component::InstancePerContext' => '0',
+                                      'Catalyst::Runtime' => '5.71001',
+                                      'Config::Any' => '0',
+                                      'File::Spec' => '0',
+                                      'HTML::FormFu' => '2.00',
+                                      'Moose' => '1.00',
+                                      'Regexp::Assemble' => '0',
+                                      'Scalar::Util' => '0',
+                                      'Task::Weaken' => '0',
+                                      'namespace::autoclean' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Catalyst::Action::RenderView' => '0',
+                                   'Catalyst::Plugin::Session' => '0',
+                                   'Catalyst::Plugin::Session::State::Cookie' => '0',
+                                   'Catalyst::Plugin::Session::Store::File' => '0',
+                                   'Catalyst::View::TT' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Template' => '0',
+                                   'Test::More' => '0.92',
+                                   'Test::WWW::Mechanize' => '1.16',
+                                   'Test::WWW::Mechanize::Catalyst' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

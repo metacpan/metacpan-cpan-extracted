@@ -20,7 +20,7 @@ Etcd3:Auth::Authenticate
 
 =cut
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 =head1 DESCRIPTION
 
@@ -57,28 +57,6 @@ has password => (
     isa      => Str,
     required => 1,
 );
-
-=head2 json_args
-
-arguments that will be sent to the api
-
-=cut
-
-has json_args => (
-    is => 'lazy',
-);
-
-sub _build_json_args {
-    my ($self) = @_;
-    my $args;
-    $args->{name} = $self->{username};
-    for my $key ( keys %{ $self }) {
-        unless ( $key =~  /(?:username|ssl|_client|json_args|endpoint)$/ ) {
-            $args->{$key} = $self->{$key};
-        }
-    }
-    return to_json($args);
-}
 
 =head2 token
 

@@ -32,12 +32,10 @@ my %WriteMakefileArgs = (
     "Encode" => 0,
     "Log::Log4perl::MDC" => 0,
     "Test::Compile" => 0,
-    "Test::More" => 0,
     "Test::Most" => 0,
-    "Test::Signature" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.51",
+  "VERSION" => "0.52",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -55,9 +53,7 @@ my %FallbackPrereqs = (
   "Log::Log4perl::Level" => 0,
   "Log::Log4perl::MDC" => 0,
   "Test::Compile" => 0,
-  "Test::More" => 0,
   "Test::Most" => 0,
-  "Test::Signature" => 0,
   "parent" => 0,
   "strict" => 0,
   "utf8" => 0,

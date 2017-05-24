@@ -4,6 +4,7 @@ use warnings;
 use Test::More;
 
 use Variable::Expand::AnyLevel qw(expand_variable);
+use lib '.';
 use t::Obj;
 
 my $value = 'value';

@@ -1,0 +1,7 @@
+Line 1
+.if .test -f tam1
+.echo Stat OK size=\v{_STAT[7]} TestFile='\v{_TestFile}'
+.else
+Stat failed
+.fi
+END

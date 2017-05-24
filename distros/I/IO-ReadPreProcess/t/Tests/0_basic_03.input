@@ -1,0 +1,13 @@
+.# Title: Eval test
+.# Also tests .set
+.#
+.eval Line 1
+.# \e -> \
+.eval abc\edef
+.#
+.# Construct an Arithmetic assignment:
+.let num := 4; v  := 'num'
+.eval .let \v{v} := 3
+.#
+.# eval removes leading spaces:
+.eval   num has value \v{num}

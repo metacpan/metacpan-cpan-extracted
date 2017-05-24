@@ -1,0 +1,8 @@
+This is tin3
+.if 1
+after if
+.fi
+after fi
+.set '$?' := 10;
+.set a := $'?'
+

@@ -3,7 +3,6 @@ package Pcore::API::Moz::Account;
 use Pcore -class, -result, -const;
 use Pcore::Util::Data qw[to_b64 to_uri to_json from_json];
 use Pcore::Util::Digest qw[hmac_sha1];
-use Pcore::HTTP::CookieJar;
 
 use overload    #
   q[""] => sub {
@@ -15,7 +14,7 @@ has moz => ( is => 'ro', isa => InstanceOf ['Pcore::API::Moz'], required => 1 );
 has id  => ( is => 'ro', isa => Str, required => 1 );
 has key => ( is => 'ro', isa => Str, required => 1 );
 
-has _cookie_jar => ( is => 'ro', isa => InstanceOf ['Pcore::HTTP::CookieJar'], default => sub { Pcore::HTTP::CookieJar->new }, init_arg => undef );
+has _cookies => ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg => undef );
 
 has next_req_ts => ( is => 'ro', isa => PositiveOrZeroInt, default => 0, init_arg => undef );
 
@@ -45,12 +44,12 @@ sub get_url_metrics ( $self, $domains, $metric, $cb ) {
     my $req = sub ($proxy) {
         P->http->post(
             $url,
-            timeout    => 180,
+            timeout    => 30,
             body       => to_json($domains),
             persistent => 0,
             proxy      => $proxy,
             useragent  => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0',
-            cookie_jar => $self->{_cookie_jar},
+            cookies    => $self->{_cookies},
             on_finish  => sub ($res) {
                 my $api_res;
 

@@ -1,0 +1,5 @@
+Before for: i = 0 .. 9
+i is 0
+Before while, break 2 in first iteration
+i is 0 j=1
+After for

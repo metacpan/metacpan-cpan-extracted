@@ -66,6 +66,7 @@ t/jv-allof.t
 t/jv-anyof.t
 t/jv-array.t
 t/jv-basic.t
+t/jv-const.t
 t/jv-enum.t
 t/jv-formats.t
 t/jv-integer.t

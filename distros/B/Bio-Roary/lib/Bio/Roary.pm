@@ -1,5 +1,5 @@
 package Bio::Roary;
-$Bio::Roary::VERSION = '3.8.0';
+$Bio::Roary::VERSION = '3.8.2';
 # ABSTRACT: Create a pan genome
 
 
@@ -42,6 +42,7 @@ has 'group_limit'                 => ( is => 'rw', isa => 'Num',      default  =
 has 'core_definition'             => ( is => 'rw', isa => 'Num',      default  => 1.0 );
 has 'verbose'                     => ( is => 'rw', isa => 'Bool',     default  => 0 );
 has 'mafft'                       => ( is => 'ro', isa => 'Bool',     default  => 0 );
+has 'inflation_value'             => ( is => 'rw', isa => 'Num',      default  => 1.5 );
 
 has 'output_multifasta_files' => ( is => 'ro', isa => 'Bool', default => 0 );
 
@@ -103,6 +104,7 @@ sub run {
         mcl_exec        => $self->mcl_exec,
         job_runner      => $self->job_runner,
         cpus            => $self->cpus,
+	inflation_value => $self->inflation_value,
         output_file     => $output_mcl_filename
     );
     $mcl->run();
@@ -152,7 +154,7 @@ Bio::Roary - Create a pan genome
 
 =head1 VERSION
 
-version 3.8.0
+version 3.8.2
 
 =head1 SYNOPSIS
 

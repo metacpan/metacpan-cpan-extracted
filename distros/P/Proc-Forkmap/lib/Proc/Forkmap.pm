@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.024';
+our $VERSION = '0.025';
 
 
 sub new {
@@ -20,8 +20,7 @@ sub new {
 
 sub _init {
     my $self = shift;
-    ($self->{max_kids} //= 2) =~ /^[1-9]+$/
-        or croak "max_kids value error";
+    $self->{max_kids} //= 4;
     $self->{ipc} //= 0; #ipc off by default        
 }                          
 
@@ -29,8 +28,6 @@ sub _init {
 sub max_kids {
     my ($self,$n) = @_;
     $n // return $self->{max_kids};
-    ($n =~ /^[1-9]+$/)
-        or croak "max_kids value error";
     $self->{max_kids} = $n;
 }
 
@@ -173,7 +170,7 @@ This module supplies an easy to use map method that provides built-in forking an
 
 =item B<max_kids>
 
-Maximum number of kids allowed in the pool. The default is 2.
+Maximum number of kids allowed in the pool. The default is 4.
 
 =item B<ipc>
 

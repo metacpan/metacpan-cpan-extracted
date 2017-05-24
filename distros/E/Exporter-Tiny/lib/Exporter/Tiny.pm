@@ -5,7 +5,7 @@ use strict;
 use warnings; no warnings qw(void once uninitialized numeric redefine);
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.044';
+our $VERSION   = '1.000000';
 our @EXPORT_OK = qw< mkopt mkopt_hash _croak _carp >;
 
 sub _croak ($;@) { require Carp; my $fmt = shift; @_ = sprintf($fmt, @_); goto \&Carp::croak }
@@ -384,7 +384,7 @@ Exporter::Tiny - an exporter with the features of Sub::Exporter but only core de
 Exporter::Tiny supports many of Sub::Exporter's external-facing features
 including renaming imported functions with the C<< -as >>, C<< -prefix >> and
 C<< -suffix >> options; explicit destinations with the C<< into >> option;
-and alternative installers with the C<< installler >> option. But it's written
+and alternative installers with the C<< installer >> option. But it's written
 in only about 40% as many lines of code and with zero non-core dependencies.
 
 Its internal-facing interface is closer to Exporter.pm, with configuration
@@ -439,7 +439,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

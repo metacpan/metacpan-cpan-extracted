@@ -259,84 +259,52 @@ sub test_014 : Tags(job_stats) {
     $test->iterate_schedule();
 
     my $batch_job01_001 = {
-        'cmds' => [
-            '#TASK tags=Sample1
-echo "hello world from job 1" && sleep 5
-'
-        ],
-        'job'             => 'job01',
-        'batch_tags'      => ['Sample1'],
-        'array_deps'      => [],
+        'job'        => 'job01',
+        'batch_tags' => ['Sample1'],
+
+        # 'array_deps'      => [],
         'scheduler_index' => {},
         'scheduler_id'    => '1234',
-        'batch_str'       => '#TASK tags=Sample1
-echo "hello world from job 1" && sleep 5
-',
+        'cmd_count'       => 1,
     };
 
     is_deeply( $test->jobs->{job01}->batches->[0],
         $batch_job01_001, 'Job 01 Batch 001 matches' );
 
     my $batch_job01_002 = {
-        'cmds' => [
-            '#TASK tags=Sample2
-echo "hello again from job 2" && sleep 5
-'
-        ],
-        'batch_str' => '#TASK tags=Sample2
-echo "hello again from job 2" && sleep 5
-',
         'job'             => 'job01',
         'batch_tags'      => ['Sample2'],
-        'array_deps'      => [],
         'scheduler_index' => {},
         'scheduler_id'    => '1234',
+        'cmd_count'       => 1,
     };
 
     is_deeply( $test->jobs->{job01}->batches->[1],
         $batch_job01_002, 'Job 01 Batch 002 matches' );
 
     my $batch_job02_001 = {
-        'cmds' => [
-            '#TASK tags=Sample1
-echo "goodbye from job 3"
-'
-        ],
-        'batch_str' => '#TASK tags=Sample1
-echo "goodbye from job 3"
-',
-        'job'        => 'job02',
-        'batch_tags' => ['Sample1'],
 
         # 'array_deps' => [ [ '1235_3', '1234_1' ] ],
-        'array_deps' => [],
-
         # 'scheduler_index' => { 'job01' => [0] },
+        'job'             => 'job02',
+        'batch_tags'      => ['Sample1'],
         'scheduler_index' => {},
         'scheduler_id'    => '1235',
+        'cmd_count'       => 1,
     };
 
     is_deeply( $test->jobs->{job02}->batches->[0],
         $batch_job02_001, 'Job 02 Batch 001 matches' );
 
     my $batch_job02_002 = {
-        'cmds' => [
-            '#TASK tags=Sample2
-echo "hello again from job 3" && sleep 5
-'
-        ],
-        'batch_str' => '#TASK tags=Sample2
-echo "hello again from job 3" && sleep 5
-',
-        'job'        => 'job02',
-        'batch_tags' => ['Sample2'],
 
         # 'array_deps' => [ [ '1235_4', '1234_2' ] ],
-        'array_deps' => [],
-
         # 'scheduler_index' => { 'job01' => [1] },
+        'job'             => 'job02',
+        'batch_tags'      => ['Sample2'],
         'scheduler_index' => {},
         'scheduler_id'    => '1235',
+        'cmd_count'       => 1,
     };
 
     my $array_deps = [ [ '1235_3', '1234_1' ], [ '1235_4', '1234_2' ] ];
@@ -394,7 +362,7 @@ sub test_016 : Tags(files) {
     my @files = glob( $test->outdir . "/*" );
 
     #TODO add tests to make sure files say what they should
-    is( scalar @files, 6, 'number of files matches' );
+    is( scalar @files, 4, 'number of files matches' );
     ok(1);
 }
 

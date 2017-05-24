@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 use Config;
 
 if ($Config{"PERL_VERSION"} == 8) {
-  print <<'__END_WARNING__;';
+    print <<'__END_WARNING__;';
 
 *******************************************
 *     !!!!!!!!!! WARNING !!!!!!!!!!!!!!   *
@@ -13,13 +13,21 @@ if ($Config{"PERL_VERSION"} == 8) {
 *      $tied_hash{$key} = *value          *
 *                                         *
 * causes a fatal error. This module works *
-* by making %SIG into a tied hash, so     *
-* code that uses the somewhat esoteric    *
+* by making  %SIG  into  a tied hash,  so *
+* code  that uses the  somewhat  esoteric *
 * assignment                              *
 *                                         *
 *      $SIG{signal} = *function;          *
 *                                         *
 * will not work with this module.         *
+*                                         *
+* If  this  would  be an  issue,  try  to *
+* rewrite this assignment as              *
+*                                         *
+*      $SIG{signal} = \&function;         *
+*                                         *
+* to make  your program  compatible  with *
+* Signals::XSIG  and perl v5.8.           *
 *******************************************
 
 __END_WARNING__;

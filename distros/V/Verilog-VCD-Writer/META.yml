@@ -1,0 +1,30 @@
+---
+abstract: 'VCD waveform File creation module.'
+author:
+  - 'Vijayvithal Jahagirdar<jvs@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  Path::Tiny: '0'
+  Test::File::Contents: '0'
+  Test::More: '0'
+  Test::Output: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Verilog-VCD-Writer
+requires:
+  DateTime: '0'
+  Math::BaseCalc: '0'
+  Moose: '0'
+  MooseX::Singleton: '0'
+  namespace::clean: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+version: '0.002'
+x_serialization_backend: 'YAML::Tiny version 1.69'

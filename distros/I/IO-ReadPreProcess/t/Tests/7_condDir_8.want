@@ -1,0 +1,50 @@
+This is 7_condDir_8.inc
+_ARGS[0] = 12 na = 1  incCnt = 5
+_ = '12'
+
+Test .if .include
+This is 7_condDir_8.inc
+_ARGS[0] = 22 na = 1  incCnt = 5
+Expected: The include returned 22
+After if
+
+Test .while .include
+This is 7_condDir_8.inc
+_ARGS[0] = 0 na = 1  incCnt = 5
+In while returned 4
+This is 7_condDir_8.inc
+_ARGS[0] = 0 na = 1  incCnt = 4
+In while returned 3
+This is 7_condDir_8.inc
+_ARGS[0] = 0 na = 1  incCnt = 3
+In while returned 2
+This is 7_condDir_8.inc
+_ARGS[0] = 0 na = 1  incCnt = 2
+In while returned 1
+This is 7_condDir_8.inc
+_ARGS[0] = 0 na = 1  incCnt = 1
+
+Test .for .include
+This is 7_condDir_8.inc
+_ARGS[0] = 0 na = 1  incCnt = 5
+In for returned 4
+This is 7_condDir_8.inc
+_ARGS[0] = 0 na = 1  incCnt = 4
+In for returned 3
+This is 7_condDir_8.inc
+_ARGS[0] = 0 na = 1  incCnt = 3
+In for returned 2
+This is 7_condDir_8.inc
+_ARGS[0] = 0 na = 1  incCnt = 2
+In for returned 1
+This is 7_condDir_8.inc
+_ARGS[0] = 0 na = 1  incCnt = 1
+
+Test .if .read
+Read line: 'How now brown cow' - EOF = 0
+After if
+
+Test .if .read - expect EOF
+Expected read EOF - 1
+
+EOF

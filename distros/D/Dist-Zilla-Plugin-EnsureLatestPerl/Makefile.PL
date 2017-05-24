@@ -27,8 +27,10 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Devel::InnerPackage" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
+    "Module::Pluggable::Object" => 0,
     "POSIX" => 0,
     "Path::Tiny" => 0,
     "Test::DZil" => 0,
@@ -39,7 +41,7 @@ my %WriteMakefileArgs = (
     "if" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,12 +49,14 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Devel::InnerPackage" => 0,
   "Dist::Zilla" => "4.300039",
   "Dist::Zilla::Role::BeforeRelease" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "List::Util" => 0,
   "Module::CoreList" => 0,
+  "Module::Pluggable::Object" => 0,
   "Moose" => 0,
   "POSIX" => 0,
   "Path::Tiny" => 0,

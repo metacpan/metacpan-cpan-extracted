@@ -63,7 +63,7 @@
          "web" : "https://github.com/plicease/Alien-Base-Wrapper"
       }
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
+   "version" : "0.05",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

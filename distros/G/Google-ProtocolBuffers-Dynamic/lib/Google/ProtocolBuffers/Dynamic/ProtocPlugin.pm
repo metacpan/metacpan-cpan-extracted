@@ -51,7 +51,7 @@ Google::ProtocolBuffers::Dynamic::ProtocPlugin
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 AUTHOR
 

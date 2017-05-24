@@ -1,0 +1,61 @@
+{
+   "abstract" : "Daring Redis Cluster client",
+   "author" : [
+      "Eugene Ponizovsky <ponizovsky@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Redis-ClusterRider",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Clone" : "0.38",
+            "Test::Fatal" : "0.013",
+            "Test::MockObject" : "1.20150527",
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "List::MoreUtils" : "0.410",
+            "Redis" : "1.982",
+            "Scalar::Util" : "0",
+            "Time::HiRes" : "1.9726",
+            "perl" : "5.008000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/iph0/Redis-ClusterRider/issues"
+      },
+      "homepage" : "https://github.com/iph0/Redis-ClusterRider",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/iph0/Redis-ClusterRider"
+      }
+   },
+   "version" : "0.06"
+}

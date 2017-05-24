@@ -97,6 +97,10 @@ sub scm_set_tag ( $self, $root, $cb, $args ) {
     ...;    ## no critic qw[ControlStructures::ProhibitYadaOperator]
 }
 
+sub scm_get_changesets ( $self, $tag, $cb ) {
+    ...;    ## no critic qw[ControlStructures::ProhibitYadaOperator]
+}
+
 1;
 __END__
 =pod

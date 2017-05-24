@@ -34,7 +34,6 @@
          "requires" : {
             "JSON" : "2.90",
             "Pod::Simple::Text" : "3.26",
-            "Term::ReadKey" : "2.33",
             "perl" : "5.010001"
          }
       }
@@ -55,6 +54,6 @@
          "web" : "https://github.com/orkunkaraduman/Lazy-Utils"
       }
    },
-   "version" : "1.16",
+   "version" : "1.17",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

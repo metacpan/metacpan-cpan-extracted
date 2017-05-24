@@ -28,7 +28,7 @@ use namespace::autoclean
     -except => 'import',
     -also   => [@EXPORT_OK];
 
-our $VERSION = '3.542';
+our $VERSION = '3.543';
 
 has 'connection' => (
     is       => 'ro',

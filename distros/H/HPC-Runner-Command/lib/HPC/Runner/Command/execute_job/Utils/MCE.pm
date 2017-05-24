@@ -9,6 +9,7 @@ use MCE;
 use MCE::Queue;
 use DateTime;
 use DateTime::Format::Duration;
+use Memoize;
 
 =head1 HPC::Runner::App::MCE
 
@@ -20,6 +21,29 @@ Execute the job.
 
 =cut
 
+option 'commands' => (
+    is       => 'rw',
+    isa      => 'Num',
+    required => 0,
+    default  => 1,
+);
+
+has 'read_command' => (
+    is       => 'rw',
+    isa      => 'Num',
+    required => 0,
+    predicate => 'has_read_command',
+    lazy     => 1,
+    default  => sub {
+        my $self = shift;
+        if ( $self->can('task_id') ) {
+            return $self->task_id - $self->batch_index_start - 1;
+        }
+        else {
+            return $self->batch_index_start;
+        }
+    }
+);
 
 =head3 jobname
 
@@ -33,15 +57,17 @@ option 'jobname' => (
     required => 0,
     traits   => ['String'],
     default  => q{job},
-    default =>
-      sub { return $ENV{SLURM_JOB_NAME} || $ENV{SBATCH_JOB_NAME} || $ENV{PBS_JOBNAME} || 'job'; },
+    default  => sub {
+        return
+             $ENV{SLURM_JOB_NAME}
+          || $ENV{SBATCH_JOB_NAME}
+          || $ENV{PBS_JOBNAME}
+          || 'job';
+    },
     predicate => 'has_jobname',
     handles   => {
-        add_jobname     => 'append',
-        clear_jobname   => 'clear',
-        # replace_jobname => 'replace',
-        # prepend_jobname => 'prepend',
-        # match_jobname   => 'match',
+        add_jobname   => 'append',
+        clear_jobname => 'clear',
     },
     documentation =>
       q{Specify a job name, each job will be appended with its batch order},
@@ -113,7 +139,7 @@ sub run_mce {
     #MCE specific
     $self->parse_file_mce;
 
-    $DB::single = 2;
+    #$DB::single = 2;
 
     # MCE workers dequeue 2 elements at a time. Thus the reason for * 2.
     $self->queue->enqueue( (undef) x ( $self->procs * 2 ) );
@@ -153,26 +179,66 @@ The default method of parsing the file.
 sub parse_file_mce {
     my $self = shift;
 
-    $DB::single = 2;
-
     my $fh = IO::File->new( $self->infile, q{<} )
       or $self->log_main_messages( "fatal",
         "Error opening file  " . $self->infile . "  " . $! );
     die print "The infile does not exist!\n" unless $fh;
 
-    #die unless $fh;
+    if ( $self->has_read_command ) {
+        my $cmds = $self->parse_cmd_file($fh);
 
+        foreach my $cmd (@$cmds) {
+            map { $self->process_lines( $_ . "\n" ) } split( "\n", $cmd );
+            $self->wait(0);
+        }
+    }
+    #We are running in single node mode
+    else {
+      while(<$fh>){
+        my $line = $_;
+        $self->process_lines($line);
+      }
+
+    }
+}
+
+sub parse_cmd_file {
+    my $self = shift;
+    my $fh   = shift;
+
+    my $x         = 0;
+    my $add_cmds  = 0;
+    my $cmd_count = 0;
+
+    my @cmds = ();
+    my $cmd  = '';
     while (<$fh>) {
         my $line = $_;
         next unless $line;
-        next unless $line =~ m/\S/;
-        $self->process_lines($line);
-        $self->wait(0);
+
+        $cmd .= $line;
+        next if $line =~ m/\\$/;
+        next if $line =~ m/^#/;
+        if ( $x == $self->read_command && $cmd_count <= $self->commands ) {
+            $add_cmds = 1;
+        }
+        if ($add_cmds) {
+            push( @cmds, $cmd );
+            $cmd_count++;
+        }
+        $x++;
+
+        if ( $x >= $self->read_command && $cmd_count >= $self->commands ) {
+            last;
+        }
+        $cmd = '';
     }
 
-    $DB::single = 2;
+    close($fh);
+    return \@cmds;
 }
 
+##TODO separate out single node mode
 sub process_lines {
     my $self = shift;
     my $line = shift;
@@ -180,11 +246,17 @@ sub process_lines {
     if ( $line =~ m/^#TASK/ ) {
         $self->add_cmd($line);
     }
+    ##This should only be for single node mode
+    if($line =~ m/^#HPC procs=/){
+      my( $t1, $t2 ) = parse_meta($line);
+      $self->procs($t2);
+    }
 
     return if $line =~ m/^#/;
 
     if ( $self->has_cmd ) {
-        $DB::single = 2;
+
+        #$DB::single = 2;
         $self->add_cmd($line);
         if ( $line =~ m/\\$/ ) {
             return;
@@ -198,13 +270,15 @@ sub process_lines {
         }
     }
     else {
-        $DB::single = 2;
+        #$DB::single = 2;
         $self->cmd($line);
         if ( $line =~ m/\\$/ ) {
             return;
         }
-        elsif ( $self->match_cmd(qr/^wait$/) ) {
-            $DB::single = 2;
+        ##TODO Update for single node mode
+        elsif ( $self->match_cmd(qr/^wait$/) || $self->match_cmd(qr/^HPC jobname/) ) {
+
+            #$DB::single = 2;
             $self->log_main_messages( 'debug',
                 "Beginning command:\n\t" . $self->cmd );
             $self->log_main_messages( 'debug',
@@ -222,7 +296,8 @@ sub process_lines {
         else {
             $self->log_main_messages( 'debug',
                 "Enqueuing command:\n\t" . $self->cmd );
-            $DB::single = 2;
+
+            #$DB::single = 2;
             $self->queue->enqueue( $self->counter, $self->cmd );
             $self->clear_cmd;
             $self->inc_counter;
@@ -230,6 +305,16 @@ sub process_lines {
     }
 }
 
+memoize('parse_meta');
+sub parse_meta {
+    my $line = shift;
+    my ( @match, $t1, $t2 );
+
+    @match = $line =~ m/ (\w+)=(.+)$/;
+    ( $t1, $t2 ) = ( $match[0], $match[1] );
+
+    return ( $t1, $2 );
+}
 =head3 run_command_mce
 
 MCE knows which subcommand to use from Runner/MCE - object mce
@@ -241,7 +326,7 @@ sub run_command_mce {
 
     my $pid = $$;
 
-    $DB::single = 2;
+    #$DB::single = 2;
 
     push( @{ $self->jobref->[-1] }, $pid );
     $self->_log_commands($pid);

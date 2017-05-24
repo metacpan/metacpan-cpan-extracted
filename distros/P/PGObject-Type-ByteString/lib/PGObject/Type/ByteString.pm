@@ -17,8 +17,7 @@ Version 1.1.2
 
 =cut
 
-our $VERSION = '1.1.2';
-
+our $VERSION = '1.2.0';
 
 =head1 SYNOPSIS
 
@@ -48,10 +47,16 @@ sub register {
     my $types = $args{types};
     $types = [ DBD::Pg::PG_BYTEA, 'bytea' ] unless defined $types and @$types;
     for my $type (@$types){
-        my $ret =
-            PGObject->register_type(registry => $registry, pg_type => $type,
-                                  perl_class => $self);
-        return $ret unless $ret;
+        if ($PGObject::VERSION =~ /^1\./){
+            my $ret =
+                PGObject->register_type(registry => $registry, pg_type => $type,
+                                      perl_class => $self);
+            return $ret unless $ret;
+        } else {
+            PGObject::Type::Registry->register_type(
+                 registry => $registry, dbtype => $type, apptype => $self
+            );
+        }
     }
     return 1;
 }

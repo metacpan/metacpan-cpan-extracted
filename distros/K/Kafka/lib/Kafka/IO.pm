@@ -6,23 +6,23 @@ Kafka::IO - Interface to network communication with the Apache Kafka server.
 
 =head1 VERSION
 
-This documentation refers to C<Kafka::IO> version 1.02 .
+This documentation refers to C<Kafka::IO> version 1.03 .
 
 =cut
 
-#-- Pragmas --------------------------------------------------------------------
+
 
 use 5.010;
 use strict;
 use warnings;
 
-# ENVIRONMENT ------------------------------------------------------------------
+
 
 our $DEBUG = 0;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
-#-- load the modules -----------------------------------------------------------
+
 
 use Carp;
 use Config;
@@ -100,7 +100,7 @@ use Kafka::Internals qw(
     format_message
 );
 
-#-- declarations ---------------------------------------------------------------
+
 
 =head1 SYNOPSIS
 
@@ -872,7 +872,7 @@ sub _error {
     Kafka::Exception::IO->throw( %args );
 }
 
-#-- Closes and cleans up -------------------------------------------------------
+
 
 1;
 
@@ -976,7 +976,7 @@ L<https://github.com/TrackingSoft/Kafka>
 
 =head1 AUTHOR
 
-Sergey Gladkov, E<lt>sgladkov@trackingsoft.comE<gt>
+Sergey Gladkov
 
 Please use GitHub project link above to report problems or contact authors.
 

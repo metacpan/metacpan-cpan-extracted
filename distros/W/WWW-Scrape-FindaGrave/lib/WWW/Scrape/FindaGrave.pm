@@ -8,33 +8,33 @@ use HTML::SimpleLinkExtor;
 
 =head1 NAME
 
-WWW::Scrape::FindaGrave - Scrape the FindaGrave site
+WWW::Scrape::FindaGrave - Scrape the Find a Grave website
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
     use HTTP::Cache::Transparent;  # be nice
-    use WWW::Scape::FindaGrave;
+    use WWW::Scrape::FindaGrave;
 
     HTTP::Cache::Transparent::init({
-    	BasePath => '/var/cache/findagrave'
+	BasePath => '/var/cache/findagrave'
     });
     my $f = WWW::Scrape::FindaGrave->new({
-    	firstname => 'John',
-    	lastname => 'Smith',
-    	country => 'England',
-    	date_of_death => 1862
+	firstname => 'John',
+	lastname => 'Smith',
+	country => 'England',
+	date_of_death => 1862
     });
 
     while(my $url = $f->get_next_entry()) {
-    	print "$url\n";
+	print "$url\n";
     }
 }
 
@@ -44,7 +44,7 @@ our $VERSION = '0.02';
 
 Creates a WWW::Scrape::FindaGrave object.
 
-It takes two manadatory arguments firstname and lastname.
+It takes two mandatory arguments firstname and lastname.
 
 Also one of either date_of_birth and date_of_death must be given
 
@@ -213,20 +213,20 @@ Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 Please report any bugs or feature requests to C<bug-www-scrape-findagrave at rt.cpan.org>,
 or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-Scape-FindaGrave>.
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-Scrape-FindaGrave>.
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
 =head1 SEE ALSO
 
-L<http://https://github.com/nigelhorne/gedgrave>
+L<https://github.com/nigelhorne/gedgrave>
 L<http://www.findagrave.com>
 
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc WWW::Scape::FindaGrave
+    perldoc WWW::Scrape::FindaGrave
 
 
 You can also look for information at:
@@ -235,30 +235,29 @@ You can also look for information at:
 
 =item * RT: CPAN's request tracker
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Scape-FindaGrave>
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Scrape-FindaGrave>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
-L<http://annocpan.org/dist/WWW-Scape-FindaGrave>
+L<http://annocpan.org/dist/WWW-Scrape-FindaGrave>
 
 =item * CPAN Ratings
 
-L<http://cpanratings.perl.org/d/WWW-Scape-FindaGrave>
+L<http://cpanratings.perl.org/d/WWW-Scrape-FindaGrave>
 
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/WWW-Scape-FindaGrave/>
+L<http://search.cpan.org/dist/WWW-Scrape-FindaGrave/>
 
 =back
 
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 Nigel Horne.
+Copyright 2016-2017 Nigel Horne.
 
 This program is released under the following licence: GPL
 
-
 =cut
 
-1; # End of WWW::Scape::FindaGrave
+1; # End of WWW::Scrape::FindaGrave

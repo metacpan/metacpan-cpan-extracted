@@ -1,3 +1,19 @@
+v0.9.3 2017-05-23T15:15:10Z
+ - No issues on bugtracker were closed since the last release
+ - http cookie_jar renamed to cookies
+
+v0.9.2 2017-05-23T14:41:15Z
+ - No issues on bugtracker were closed since the last release
+ - make cookie_jar HashRef
+
+v0.9.1 2017-05-23T08:20:47Z
+ - No issues on bugtracker were closed since the last release
+ - set http timeout to 30 sec
+
+v0.9.0 2017-05-20T20:00:03Z
+ - No issues on bugtracker were closed since the last release
+ - util and mod_share removed from dist config
+
 v0.8.1 2017-04-17T10:18:28Z
  - No issues were closed since the last release
 

@@ -1,4 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst::Plugin::RedirectTo.
 
+0.002 - 2017-05-22
+  - Make 'redirect_to_action' not use the broken code around
+    'uri_for_action'.
+
 0.001 - 2015-02-25
   - initial release

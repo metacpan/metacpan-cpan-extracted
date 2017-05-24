@@ -1,7 +1,7 @@
 ---
 abstract: ~
 author:
-  - 'Toby Corkindale, L<mailto:tjc@cpan.org>'
+  - 'Toby Corkindale -- L<https://github.com/TJC/>'
 build_requires:
   ExtUtils::MakeMaker: 6.59
   Test::Exception: 0
@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.08'
+generated_by: 'Module::Install version 1.18'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,4 +27,4 @@ requires:
 resources:
   license: http://opensource.org/licenses/artistic-license-2.0.php
   repository: http://github.com/TJC/Retry
-version: '1.01'
+version: '1.03'

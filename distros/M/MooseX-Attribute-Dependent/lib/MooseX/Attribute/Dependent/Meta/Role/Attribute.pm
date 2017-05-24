@@ -1,14 +1,14 @@
 #
 # This file is part of MooseX-Attribute-Dependent
 #
-# This software is Copyright (c) 2016 by Moritz Onken.
+# This software is Copyright (c) 2017 by Moritz Onken.
 #
 # This is free software, licensed under:
 #
 #   The (three-clause) BSD License
 #
 package MooseX::Attribute::Dependent::Meta::Role::Attribute;
-$MooseX::Attribute::Dependent::Meta::Role::Attribute::VERSION = '1.1.3';
+$MooseX::Attribute::Dependent::Meta::Role::Attribute::VERSION = '1.1.4';
 use strict;
 use warnings;
 use Moose::Role;
@@ -72,7 +72,7 @@ MooseX::Attribute::Dependent::Meta::Role::Attribute
 
 =head1 VERSION
 
-version 1.1.3
+version 1.1.4
 
 =head1 AUTHOR
 
@@ -80,7 +80,7 @@ Moritz Onken
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Moritz Onken.
+This software is Copyright (c) 2017 by Moritz Onken.
 
 This is free software, licensed under:
 

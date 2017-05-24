@@ -1,10 +1,11 @@
 package PGObject::Simple;
 
-use 5.006;
+use 5.010;
 use strict;
 use warnings;
 use Carp;
 use PGObject;
+use parent 'Exporter';
 
 =head1 NAME
 
@@ -12,12 +13,11 @@ PGObject::Simple - Minimalist stored procedure mapper based on LedgerSMB's DBObj
 
 =head1 VERSION
 
-Version 2.0.0
+Version 3.0.1
 
 =cut
 
-our $VERSION = '2.0.0';
-
+our $VERSION = 3.000001;
 
 =head1 SYNOPSIS
 
@@ -59,6 +59,52 @@ To call a stored procedure with named arguments from a hashref with overrides.
       running_funcs => [{agg => 'sum(amount)', alias => 'total'}],
       args          => { id => undef }, # force to create new!
   );
+
+
+=head1 EXPORTS
+
+We now allow various calls to be exported.  We recommend using the tags.
+
+=head2 One-at-a-time Exports
+
+=over
+
+=item call_dbmethod
+
+=item call_procedure
+
+=item set_dbh
+
+=item _set_funcprefix
+
+=item _set_funcschema
+
+=item _set_registry
+
+=back
+
+=head2 Export Tags
+
+Below are the export tags listed including the leading ':' used to invoke them.
+
+=over
+
+=item :mapper
+	    call_dbmethod, call_procedure, and set_dbh
+
+=item :full
+	    All methods that can be exported at once.
+
+=back
+
+=cut
+
+our @EXPORT_OK = qw(call_dbmethod call_procedure set_dbh associate dbh
+                   _set_funcprefix
+                    _set_funcschema _set_registry);
+
+our %EXPORT_TAGS = (mapper => [qw(call_dbmethod call_procedure set_dbh dbh)],
+                    full => \@EXPORT_OK);
 
 =head1 DESCRIPTION
 
@@ -106,6 +152,7 @@ sub new {
     $ref->_set_funcprefix($ref->{_funcprefix});
     $ref->_set_funcschema($ref->{_funcschema});
     $ref->_set_registry($ref->{_registry});
+    $ref->associate($self) if ref $self;
     return $ref;
 }
 
@@ -117,7 +164,29 @@ Sets the database handle (needs DBD::Pg 2.0 or later) to $dbh
 
 sub set_dbh {
     my ($self, $dbh) = @_;
-    $self->{_DBH} = $dbh;
+    $self->{_dbh} = $dbh;
+}
+
+=head2 dbh
+
+Returns the database handle for the object.
+
+=cut
+
+sub dbh {
+    my ($self) = @_;
+    return ($self->{_dbh} or $self->{_DBH});
+}
+
+=head2 associate($pgobject)
+
+Sets the db handle to that from the $pgobject.
+
+=cut
+
+sub associate {
+    my ($self, $other) = @_;
+    $self->set_dbh($other->dbh);
 }
 
 =head2 _set_funcprefix
@@ -174,30 +243,62 @@ stored procedures should be prepared to handle these.
 As with call_procedure below, this returns a single hashref when called in a
 scalar context, and a list of hashrefs when called in a list context.
 
+NEW IN 2.0: We now give preference to functions of the same name over 
+properties.  So $obj->foo() will be used before $obj->{foo}.  This enables
+better data encapsulation.
+
 =cut
+
+sub _arg_defaults {
+    my ($self, %args) = @_;
+    local $@;
+    if (ref $self) {
+        $args{dbh} ||= eval { $self->dbh } ;
+        $args{funcprefix} //= eval { $self->funcprefix } ;
+        $args{funcschema} //= eval { $self->funcschema } ;
+        $args{funcprefix} //= $self->{_func_prefix};
+        $args{funcschema} //= $self->{_func_schema};
+        $args{funcprefix} //= eval {$self->_get_prefix() };
+    } else { 
+	# see if we have package-level reader/factories
+        $args{dbh} ||= "$self"->dbh; # if eval {"$self"->dbh};
+        $args{funcschema} //= "$self"->funcschema if eval {"$self"->funcschema};
+        $args{funcprefix} //= "$self"->funcprefix if eval {"$self"->funcprefix};
+    }
+    $args{funcprefix} //= '';
+
+    return %args
+}
+
+sub _self_to_arg { # refactored from map call, purely internal
+    my ($self, $args, $argname) = @_;
+    my $db_arg;
+    $argname =~ s/^in_//;
+    local $@;
+    if (ref $self and $argname){
+        if (eval { $self->can($argname) } ) {
+            eval { $db_arg = $self->can($argname)->($self) };
+        } else {
+            $db_arg = $self->{$argname};
+        }
+    }
+    $db_arg = $args->{args}->{$argname} if exists $args->{args}->{$argname};
+    $db_arg = $db_arg->to_db if eval {$db_arg->can('to_db')};
+    $db_arg = { type => 'bytea', value => $db_arg} if $_->{type} eq 'bytea';
+
+    return $db_arg;
+}
 
 sub call_dbmethod {
     my ($self) = shift @_;
     my %args = @_;
     croak 'No function name provided' unless $args{funcname};
-    if (eval { $self->isa(__PACKAGE__) } and ref $self){
-        $args{dbh} = $self->{_DBH} if $self->{_DBH} and !$args{dbh};
-
-        $args{funcprefix} = $self->{_func_prefix} if !defined $args{funcprefix};
-        $args{funcschema} = $self->{_func_schema} if !defined $args{funcschema};
-    }
-    $args{funcprefix} ||= '';
+    %args = _arg_defaults($self, %args);
     my $info = PGObject->function_info(%args);
 
     my $arglist = [];
-    @{$arglist} = map {
-        my $argname = $_->{name};
-        my $db_arg;
-        $argname =~ s/^in_//;
-        $db_arg = $self->{$argname} if ref $self;
-        $db_arg = $args{args}->{$argname} if exists $args{args}->{$argname};
-        $db_arg;
-    } @{$info->{args}};
+    @{$arglist} = map { _self_to_arg($self, \%args, $_->{name}) } 
+                  @{$info->{args}};
     $args{args} = $arglist;
 
     # The conditional return is necessary since the object may carry a registry
@@ -220,17 +321,8 @@ simply returns the single first row returned.
 =cut
 
 sub call_procedure {
-    my ($self) = shift @_;
-    my %args = @_;
-    if (eval { $self->isa(__PACKAGE__) } and ref $self ){
-        $args{funcprefix} = $self->{_func_prefix} if !defined $args{funcprefix};
-        $args{funcschema} = $self->{_func_schema} if !defined $args{funcschema};
-        $args{registry} = $self->{_registry} if !defined $args{registry};
-
-        $args{dbh} = $self->{_DBH} if $self->{_DBH} and !$args{dbh};
-    }
-    $args{funcprefix} ||= '';
-
+    my ($self, %args) = @_;
+    %args = _arg_defaults($self, %args);
     croak 'No DB handle provided' unless $args{dbh};
     my @rows = PGObject->call_procedure(%args);
     return shift @rows unless wantarray;
@@ -334,7 +426,7 @@ L<http://search.cpan.org/dist/PGObject-Simple/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013-2016 Chris Travers.
+Copyright 2013-2017 Chris Travers.
 
 Redistribution and use in source and compiled forms with or without 
 modification, are permitted provided that the following conditions are met:

@@ -1,7 +1,7 @@
 package Business::Tax::ID::PPH21;
 
-our $DATE = '2017-02-09'; # DATE
-our $VERSION = '0.03'; # VERSION
+our $DATE = '2017-05-24'; # DATE
+our $VERSION = '0.04'; # VERSION
 
 use 5.010001;
 use strict;
@@ -10,6 +10,8 @@ use warnings;
 use Exporter::Rinci qw(import);
 
 our %SPEC;
+
+my $latest_supported_year = 2016;
 
 our %arg_tp_status = (
     tp_status => {
@@ -39,6 +41,14 @@ our %arg_year = (
 our %arg_net_income = (
     net_income => {
         summary => 'Yearly net income',
+        schema => ['float*', min=>0],
+        req => 1,
+    },
+);
+
+our %arg_pph21_op = (
+    pph21_op => {
+        summary => 'Amount of PPh 21 op paid',
         schema => ['float*', min=>0],
         req => 1,
     },
@@ -90,11 +100,7 @@ Kata kunci: tarif pajak, lapisan pajak.
 
 _
     args => {
-        year => {
-            schema => ['int*', min=>1983],
-            req => 1,
-            pos => 0,
-        },
+        %arg_year,
     },
     examples => [
         {args=>{year=>2016}},
@@ -103,7 +109,13 @@ _
 sub get_pph21_op_rates {
     my %args = @_;
     my $year = $args{year};
-    if ($year >= 2009 && $year <= 2016) {
+    my $resmeta = {
+        'table.fields' => [qw/xmin max rate/],
+        'table.field_formats' => [
+            undef, undef, ['percent', {sprintf=>'%3.0f%%'}]
+        ],
+    };
+    if ($year >= 2009 && $year <= $latest_supported_year) {
         state $res = [
             200, "OK",
             [
@@ -112,7 +124,7 @@ sub get_pph21_op_rates {
                 {xmin=>250_000_000, max=>500_000_000, rate=>0.25},
                 {xmin=>500_000_000,                   rate=>0.30},
             ],
-            {'table.fields' => [qw/xmin max rate/]},
+            $resmeta,
         ];
         return $res;
     } elsif ($year >= 2000 && $year <= 2008) {
@@ -125,11 +137,12 @@ sub get_pph21_op_rates {
                 {xmin=>100_000_000, max=>200_000_000, rate=>0.25},
                 {xmin=>200_000_000,                   rate=>0.35},
             ],
-            {'table.fields' => [qw/xmin max rate/]},
+            $resmeta,
         ];
         return $res;
     } else {
-        return [412, "Year unknown or unsupported"];
+        return [412, "Year unknown or unsupported (latest supported year is ".
+                    "$latest_supported_year)"];
     }
 }
 
@@ -201,7 +214,8 @@ sub get_pph21_op_ptkp {
         state $res = [200, "OK", $code_make->(    960_000,   480_000)];
         return $res;
     } else {
-        return [412, "Year unknown or unsupported"];
+        return [412, "Year unknown or unsupported (latest supported year is ".
+                    "$latest_supported_year)"];
     }
 }
 
@@ -262,6 +276,74 @@ sub calc_pph21_op {
     [200, "OK", $tax];
 }
 
+$SPEC{calc_net_income_from_pph21_op} = {
+    v => 1.1,
+    summary => 'Given that someone pays a certain amount of PPh 21 op, '.
+        'calculate her yearly net income',
+    description => <<'_',
+
+If pph21_op is 0, will return the PTKP amount. Actually one can earn between
+zero and the full PTKP amount to pay zero PPh 21 op.
+
+_
+    args => {
+        %arg_year,
+        %arg_tp_status,
+        %arg_pph21_op,
+        monthly => {
+            summary => 'Instead of yearly, return monthly net income',
+            schema => ['bool*', is=>1],
+        },
+    },
+    examples => [
+        {
+            summary => "Someone who doesn't pay PPh 21 op earns at or below PTKP",
+            args => {year=>2016, tp_status=>'TK/0', pph21_op=>0},
+        },
+        {
+            args => {year=>2016, tp_status=>'K/2', pph21_op=>20_000_000},
+        },
+    ],
+};
+sub calc_net_income_from_pph21_op {
+    my %args = @_;
+
+    my $year      = $args{year};
+    my $tp_status = $args{tp_status};
+    my $pph21_op  = $args{pph21_op};
+
+    my $res;
+
+    $res = get_pph21_op_ptkp(year => $year);
+    return $res unless $res->[0] == 200;
+    my $ptkps = $res->[2];
+    my $ptkp = $ptkps->{$tp_status}
+        or die "BUG: Can't get PTKP for '$tp_status'";
+
+    $res = get_pph21_op_rates(year => $year);
+    return $res unless $res->[0] == 200;
+    my $brackets = $res->[2];
+
+    my $net_income = $ptkp;
+    for my $bracket (@$brackets) {
+        if (defined $bracket->{max}) {
+            my $range = $bracket->{max} - ($bracket->{xmin} // 0);
+            my $bracket_tax = $range * $bracket->{rate};
+            if ($pph21_op <= $bracket_tax) {
+                $net_income += $pph21_op / $bracket->{rate};
+                last;
+            } else {
+                $pph21_op -= $bracket_tax;
+                $net_income += $range;
+            }
+        } else {
+            $net_income += $pph21_op/$bracket->{rate};
+            last;
+        }
+    }
+    [200, "OK", $args{monthly} ? $net_income / 12 : $net_income];
+}
+
 1;
 # ABSTRACT: Routines to help calculate Indonesian income tax article 21 (PPh pasal 21)
 
@@ -277,7 +359,7 @@ Business::Tax::ID::PPH21 - Routines to help calculate Indonesian income tax arti
 
 =head1 VERSION
 
-This document describes version 0.03 of Business::Tax::ID::PPH21 (from Perl distribution Business-Tax-ID-PPH21), released on 2017-02-09.
+This document describes version 0.04 of Business::Tax::ID::PPH21 (from Perl distribution Business-Tax-ID-PPH21), released on 2017-05-24.
 
 =head1 SYNOPSIS
 
@@ -304,6 +386,72 @@ rules regarding work earned in Indonesia by non-citizens ("pasal 26").
 This module contains several routines to help calculate income tax article 21.
 
 =head1 FUNCTIONS
+
+
+=head2 calc_net_income_from_pph21_op
+
+Usage:
+
+ calc_net_income_from_pph21_op(%args) -> [status, msg, result, meta]
+
+Given that someone pays a certain amount of PPh 21 op, calculate her yearly net income.
+
+Examples:
+
+=over
+
+=item * Someone who doesn't pay PPh 21 op earns at or below PTKP:
+
+ calc_net_income_from_pph21_op(year => 2016, pph21_op => 0, tp_status => "TK/0"); # -> [200, "OK", 54000000, {}]
+
+=item * Example #2:
+
+ calc_net_income_from_pph21_op(year => 2016, pph21_op => 20000000, tp_status => "K/2");
+
+Result:
+
+ [200, "OK", 234166666.666667, {}]
+
+=back
+
+If pph21_op is 0, will return the PTKP amount. Actually one can earn between
+zero and the full PTKP amount to pay zero PPh 21 op.
+
+This function is not exported by default, but exportable.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<monthly> => I<bool>
+
+Instead of yearly, return monthly net income.
+
+=item * B<pph21_op>* => I<float>
+
+Amount of PPh 21 op paid.
+
+=item * B<tp_status>* => I<str>
+
+Taxypayer status.
+
+Taypayer status reflects his/her marital status and affects the amount of
+his/her non-taxable income.
+
+=item * B<year>* => I<int>
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (result) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
 
 
 =head2 calc_pph21_op
@@ -454,7 +602,10 @@ Result:
      { xmin => 250000000, max => 500000000, rate => 0.25 },
      { xmin => 500000000, rate => 0.3 },
    ],
-   { "table.fields" => ["xmin", "max", "rate"] },
+   {
+     "table.fields"        => ["xmin", "max", "rate"],
+     "table.field_formats" => [undef, undef, ["percent", { sprintf => "%3.0f%%" }]],
+   },
  ]
 
 =back

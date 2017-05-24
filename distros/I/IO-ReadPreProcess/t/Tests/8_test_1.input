@@ -1,0 +1,23 @@
+.# Title: Check .test -f
+.#
+Line 1
+.#
+.# Including '.' in dirs will also find it since that means relative to the directory
+.# that contains this test file.
+.let dirs := split(':', 'nowhere:#Tests:#t/Tests')
+.#
+.if .test -f $dirs/8_test_1.input
+Found the file
+.echo It's path is \v{_TestFile}
+.echo It's size is \v{_STAT[7]} bytes.
+.else
+Error did not find file
+.fi
+
+.let file := '8_test_1.want'
+.if .test -f $dirs/\v{file}
+Found the file - name in var
+.else
+Error did not find file
+.fi
+EOF

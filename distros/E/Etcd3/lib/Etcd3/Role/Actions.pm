@@ -5,10 +5,11 @@ use strict;
 use warnings;
 
 use Moo::Role;
+use AE;
 use JSON;
-use HTTP::Tiny;
 use MIME::Base64;
 use Types::Standard qw(InstanceOf);
+use AnyEvent::HTTP;
 use Data::Dumper;
 
 use namespace::clean;
@@ -21,18 +22,75 @@ Etcd3::Role::Actions
 
 =cut
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
-has _client => (
+has etcd => (
     is  => 'ro',
-    isa => InstanceOf ['Etcd3::Client'],
+    isa => InstanceOf ['Etcd3'],
 );
+
+=head2 json_args
+
+arguments that will be sent to the api
+
+=cut
+
+has json_args => ( is => 'lazy', );
+
+sub _build_json_args {
+    my ($self) = @_;
+    my $args;
+    for my $key ( keys %{$self} ) {
+        unless ( $key =~ /(?:etcd|cb|cv|json_args|endpoint)$/ ) {
+            $args->{$key} = $self->{$key};
+        }
+    }
+    return to_json($args);
+}
+
+=head2 cb
+
+AnyEvent callback must be a CodeRef
+
+=cut
+
+has cb => (
+    is  => 'ro',
+    isa => sub {
+        die "$_[0] is not a CodeRef!" if ( $_[0] && ref($_[0]) ne 'CODE')
+    },
+);
+
+=head2 cv
+
+=cut
+
+has cv => (
+    is  => 'ro',
+);
+
+=head2 init
+
+=cut
+
+sub init {
+    my ($self)  = @_;
+    my $init = $self->json_args;
+    $init or return;
+    return $self;
+}
 
 =head2 headers
 
 =cut
 
 has headers => ( is => 'ro' );
+
+=head2 response
+
+=cut
+
+has response => ( is => 'ro' );
 
 =head2 request
 
@@ -42,15 +100,36 @@ has request => ( is => 'lazy', );
 
 sub _build_request {
     my ($self) = @_;
-    my $request = HTTP::Tiny->new->request(
-    'POST',
-        $self->_client->api_path
-          . $self->{endpoint} => {
-            content => $self->{json_args},
-            headers => $self->headers
-          },
+    $self->init;
+    my $cb = $self->cb;
+    my $cv = $self->cv ? $self->cv : AE::cv;
+    $cv->begin;
+    http_request(
+        'POST',
+        $self->etcd->api_path . $self->{endpoint},
+        headers => $self->headers,
+        body => $self->json_args,
+        on_header => sub {
+            my($headers) = @_;
+            $self->{response}{headers} = $headers;
+        },
+        on_body   => sub {
+            my ($data, $hdr) = @_;
+            $self->{response}{content} = $data;
+            $cb->($data, $hdr) if $cb;
+            $cv->end;
+            1
+        },
+        sub {
+            my (undef, $hdr) = @_;
+            #print STDERR Dumper($hdr);
+            my $status = $hdr->{Status};
+            $self->{response}{success} = 1 if $status == 200;
+            $cv->end;
+        }
     );
-    return $request;
+    $cv->recv;
+    return $self;
 }
 
 =head2 get_value
@@ -61,9 +140,9 @@ returns single decoded value or the first.
 
 sub get_value {
     my ($self)   = @_;
-    my $response = $self->request;
+    my $response = $self->response;
     my $content  = from_json( $response->{content} );
-#    print STDERR Dumper($content);
+    #print STDERR Dumper($content);
     my $value = $content->{kvs}->[0]->{value};
     $value or return;
     return decode_base64($value);
@@ -87,7 +166,7 @@ where key and value have been decoded for your pleasure.
 
 sub all {
     my ($self)   = @_;
-    my $response = $self->request;
+    my $response = $self->response;
     my $content  = from_json( $response->{content} );
     my $kvs      = $content->{kvs};
     for my $row (@$kvs) {
@@ -106,10 +185,9 @@ returns an Etcd3::Auth::Authenticate object
 sub authenticate {
     my ( $self, $options ) = @_;
     return Etcd3::Auth::Authenticate->new(
-        _client => $self,
+        etcd => $self,
         ( $options ? %$options : () ),
     )->init;
 }
 
 1;
-

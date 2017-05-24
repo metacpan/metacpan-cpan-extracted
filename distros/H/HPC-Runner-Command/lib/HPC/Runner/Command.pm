@@ -9,7 +9,7 @@ option '+config_base' => (
     default       => '.hpcrunner',
 );
 
-our $VERSION = '3.1.7';
+our $VERSION = '3.2.0';
 
 app_strict 0;
 

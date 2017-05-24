@@ -1,5 +1,5 @@
 package Bio::Roary::External::CheckTools;
-$Bio::Roary::External::CheckTools::VERSION = '3.8.0';
+$Bio::Roary::External::CheckTools::VERSION = '3.8.2';
 # ABSTRACT: Check external executables are available and are the correct version
 
 
@@ -191,7 +191,7 @@ Bio::Roary::External::CheckTools - Check external executables are available and 
 
 =head1 VERSION
 
-version 3.8.0
+version 3.8.2
 
 =head1 SYNOPSIS
 Functionality borrowed from PROKKA by Torsten Seemann.

@@ -1,5 +1,10 @@
 Revision history for Dist-Zilla-PluginBundle-Author-ETHER
 
+0.125     2017-05-21 01:43:09Z
+          - fix tests to work on older perls (thanks, [EnsureLatestPerl])
+          - [UseUnsafeInc] (with dot_in_INC=0) is only enabled in perls
+            compiled with -DDEFAULT_INC_EXCLUDES_DOT.
+
 0.124     2017-05-13 16:34:59Z
           - added [EnsureLatestPerl] to before-release checks
           - added [EnsureUnsafeInc] (with dot_in_INC=0)

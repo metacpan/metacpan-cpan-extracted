@@ -482,7 +482,7 @@ int dbd_db_ping (SV * dbh)
 	}
 
 	/* No matter what state we are in, send an empty query to the backend */
-	result = PQexec(imp_dbh->conn, "/* DBD::Pg ping test v3.6.0 */");
+	result = PQexec(imp_dbh->conn, "/* DBD::Pg ping test v3.6.2 */");
 	if (NULL == result) {
 		/* Something very bad, usually indicating the backend is gone */
 		return -3;
@@ -3747,10 +3747,10 @@ AV * dbd_st_fetch (SV * sth, imp_sth_t * imp_sth)
 #endif
 						sv_setiv(sv, atol((char *)value));
 						break;
-                    case PG_FLOAT4:
-                    case PG_FLOAT8:
-                        sv_setnv(sv, strtod((char *)value, NULL));
-                        break;
+					case PG_FLOAT4:
+					case PG_FLOAT8:
+						sv_setnv(sv, strtod((char *)value, NULL));
+						break;
 					default:
 						sv_setpvn(sv, (char *)value, value_len);
 					}

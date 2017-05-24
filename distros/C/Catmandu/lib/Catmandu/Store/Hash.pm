@@ -2,7 +2,7 @@ package Catmandu::Store::Hash;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0506';
+our $VERSION = '1.0507';
 
 use Moo;
 use Catmandu::Util qw(:is);
@@ -47,9 +47,9 @@ Catmandu::Store::Hash - An in-memory store
 
 =head1 SYNOPSIS
 
-   use Catmandu::Store::Hash;
+   use Catmandu;
 
-   my $store = Catmandu::Store::Hash->new();
+   my $store = Catmandu->store('Hash');
 
    my $obj1 = $store->bag->add({ name => 'Patrick' });
 

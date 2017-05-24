@@ -1,5 +1,8 @@
 Revision history for Perl extension Catalyst::ActionRole::QueryParameter
 
+0.09    22 May 2017
+        - Allow 'arg=' to mean the same as '?arg'
+
 0.08    29 September 2015
         - Let a parameter be optional: "QueryParameter(?page:Int)"
         - Let a parameter define a default "QueryParameter(page=1:Int)"

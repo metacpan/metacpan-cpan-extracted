@@ -1,5 +1,5 @@
 package Log::Contextual;
-$Log::Contextual::VERSION = '0.007000';
+$Log::Contextual::VERSION = '0.007001';
 # ABSTRACT: Simple logging interface with a contextual log
 
 use strict;
@@ -228,7 +228,7 @@ Log::Contextual - Simple logging interface with a contextual log
 
 =head1 VERSION
 
-version 0.007000
+version 0.007001
 
 =head1 SYNOPSIS
 
@@ -545,6 +545,8 @@ default (no C<-levels> option passed) would export:
 
 =item log_fatal
 
+B<Note:> C<log_fatal> does not call C<die> for you, see L</EXCEPTIONS AND ERROR HANDLING>
+
 =back
 
 =head2 logS_$level
@@ -600,6 +602,8 @@ default (no C<-levels> option passed) would export:
 =item Dlog_error
 
 =item Dlog_fatal
+
+B<Note:> C<Dlog_fatal> does not call C<die> for you, see L</EXCEPTIONS AND ERROR HANDLING>
 
 =back
 
@@ -716,7 +720,76 @@ functions. The router singleton is available as the return value of the router()
 of Log::Contextual may overload router() to return instances of custom log routers that
 could for example work with loggers that use a different interface.
 
+=head1 EXCEPTIONS AND ERROR HANDLING
+
+C<Log::Contextual>, by design, does not B<intentionally> invoke C<die> on your
+behalf(L<*see footnote*|/footnote>) for C<log_fatal>.
+
+Logging events are characterized as information, not flow control, and
+conflating the two results in negative design anti-patterns.
+
+As such, C<log_fatal> would at be better used to communicate information about a
+I<future> failure, for example:
+
+  if ( condition ) {
+    log_fatal { "Bad Condition is true" };
+    die My::Exception->new();
+  }
+
+This has a number of benefits:
+
+=over 4
+
+=item *
+
+You're more likely to want to use useful Exception Objects and flow control
+instead of cheating with log messages.
+
+=item *
+
+You're less likely to run a risk of losing what the actual problem was when some
+error occurs in your creation of the Exception Object
+
+=item *
+
+You're less likely to run the risk of losing important log context due to
+exceptions occurring mid way through C<die> unwinding and C<exit> global
+destruction.
+
+=back
+
+If you're still too lazy to use exceptions, then you can do what you probably want
+as follows:
+
+  if ( ... ) {
+    log_fatal { "Bad condition is true" };
+    die "Bad condtion is true";
+  }
+
+Or for C<:dlog> style:
+
+  use Data::Dumper::Consise qw( Dumper );
+  if ( ... ) {
+    # Dlog_fatal but not
+    my $reason = "Bad condtion is true because: " . Dumper($thing);
+    log_fatal { $reason };
+    die $reason;
+  }
+
+=head2 footnote
+
+The underlying behaviour of C<log_fatal> is dependent on the backing library.
+
+All the Loggers shipping with C<Log::Contextual> behave this way, as do many of the supported
+loggers, like C<Log::Log4perl>. However, not all loggers work this way, and one must be careful.
+
+C<Log::Dispatch> doesn't support implementing C<log_fatal> L<at all|/-levels>
+
+C<Log::Dispatchouli> implements C<log_fatal> using C<die> ( via Carp )
+
 =head1 CONTRIBUTORS
+
+kentnl - Kent Fredric <kentfredric@gmail.com>
 
 triddle - Tyler Riddle <t.riddle@shadowcat.co.uk>
 
@@ -732,7 +805,7 @@ Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2017 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

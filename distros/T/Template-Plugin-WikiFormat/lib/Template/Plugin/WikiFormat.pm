@@ -2,7 +2,7 @@ package Template::Plugin::WikiFormat;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 #----------------------------------------------------------------------------
 
@@ -112,12 +112,12 @@ be forthcoming, please feel free to (politely) remind me.
 =head1 AUTHOR
 
   Original Author: Ivor Williams (RIP)          2008-2009
-  Current Maintainer: Barbie <barbie@cpan.org>  2009-2015
+  Current Maintainer: Barbie <barbie@cpan.org>  2009-2017
 
 =head1 COPYRIGHT AND LICENSE
 
   Copyright (C) 2008-2009 Ivor Williams
-  Copyright (C) 2009-2015 Barbie
+  Copyright (C) 2009-2017 Barbie
 
 This distribution is free software; you can redistribute it and/or
 modify it under the Artistic Licence v2.

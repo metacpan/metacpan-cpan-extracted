@@ -1,5 +1,13 @@
 Revision history for Perl extension AWS-CLI-Config
 
+0.04 2017-05-20T06:41:39Z
+
+    - [Trivial] Drop Config::Tiny from dependencies
+
+0.03 2017-05-20T06:37:25Z
+
+    - [Feature] Support nested values (#4) @jjatria
+
 0.02 2017-05-09T00:25:42Z
 
     - Fix handling named profiles (#2) @jjatria

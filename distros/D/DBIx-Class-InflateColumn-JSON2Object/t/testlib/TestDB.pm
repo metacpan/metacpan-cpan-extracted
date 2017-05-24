@@ -21,6 +21,7 @@ CREATE TABLE test (
     id integer primary key not null,
     no_class text,
     fixed_class text,
+    array text,
     data text,
     type text
 );

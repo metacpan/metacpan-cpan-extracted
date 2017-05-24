@@ -22,7 +22,12 @@ ok(PGObject::Type::BigFloat->register(registry => 'test', types => ['int8']),
                                'custom registry, int8 registration'),
 ok(PGObject::Type::BigFloat->register(registry => 'test'), 
                                 'default types, custom registry');
-my $registry = PGObject::get_type_registry();
+my $registry;
+if ($PGObject::VERSION =~ /^1\./){
+    $registry = PGObject::get_type_registry();
+} else {
+    $registry = {map {$_ => PGObject::Type::Registry->inspect($_)} qw(default test) };
+}
 for my $reg(qw(default test)){
     for my $type (qw(int8 float8 float4 numeric)) {
         is($registry->{$reg}->{$type}, 'PGObject::Type::BigFloat');

@@ -9,7 +9,7 @@ use strict;
 use Lemonldap::NG::Portal::Simple;
 use utf8;
 
-our $VERSION = '1.9.3';
+our $VERSION = '1.9.10';
 
 ## @method array display()
 # Call portal process and set template parameters
@@ -27,8 +27,10 @@ sub display {
         $skinfile = 'error.tpl';
 
         # Error code
-        my $error500 = 1 if ( $http_error eq "500" );
         my $error403 = 1 if ( $http_error eq "403" );
+        my $error404 = 1 if ( $http_error eq "404" );
+        my $error500 = 1 if ( $http_error eq "500" );
+        my $error502 = 1 if ( $http_error eq "502" );
         my $error503 = 1 if ( $http_error eq "503" );
 
         # Check URL
@@ -42,7 +44,9 @@ sub display {
             LOGOUT_URL => $self->{portal} . "?logout=1",
             URL        => $self->{urldc},
             ERROR403   => $error403,
+            ERROR404   => $error404,
             ERROR500   => $error500,
+            ERROR502   => $error502,
             ERROR503   => $error503,
         );
 
@@ -292,9 +296,13 @@ sub display {
             # Choose what form to display if not in a loop
             else {
 
-                my $displayType = $self->getDisplayType();
+                my $displayType;
 
-                $self->lmLog( "Display type $displayType ", 'debug' );
+                # Catch error if displayType not available
+                eval { $displayType = $self->getDisplayType(); };
+
+                $self->lmLog( "Display type $displayType ", 'debug' )
+                  if $displayType;
 
                 %templateParams = (
                     %templateParams,
@@ -306,8 +314,10 @@ sub display {
                     module => $displayType eq "logo" ? $self->get_module('auth')
                     : "",
                     AUTH_LOOP  => [],
-                    PORTAL_URL => $displayType eq "logo" ? $self->{portal} : 0,
-                    MSG        => $self->info(),
+                    PORTAL_URL => ( !$displayType or $displayType eq "logo" )
+                    ? $self->{portal}
+                    : 0,
+                    MSG => $self->info(),
                 );
 
             }

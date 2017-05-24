@@ -10,7 +10,7 @@ use Tickit::Test;
 use Tickit::Widget::Scroller;
 use Tickit::Widget::Scroller::Item::Text;
 
-my $rootwin = mk_window;
+my ( $term, $rootwin ) = mk_term_and_window;
 my $win = $rootwin->make_sub( 0, 0, 5, 40 );
 
 my $scroller = Tickit::Widget::Scroller->new(
@@ -32,7 +32,7 @@ is_display( [ "A line of content at line 4",
               "A line of content at line 8", ],
             'Display initially' );
 
-$rootwin->clear;
+$term->clear;
 $win->resize( 7, 40 );
 
 flush_tickit;
@@ -46,7 +46,7 @@ is_display( [ "A line of content at line 2",
               "A line of content at line 8", ],
             'Display after resize more lines' );
 
-$rootwin->clear;
+$term->clear;
 $win->resize( 5, 40 );
 
 flush_tickit;
@@ -58,7 +58,7 @@ is_display( [ "A line of content at line 4",
               "A line of content at line 8", ],
             'Display after resize fewer lines' );
 
-$rootwin->clear;
+$term->clear;
 $win->resize( 5, 20 );
 
 flush_tickit;
@@ -70,7 +70,7 @@ is_display( [ "line 6",
               "line 8", ],
             'Display after resize fewer columns' );
 
-$rootwin->clear;
+$term->clear;
 $win->resize( 15, 40 );
 
 flush_tickit;
@@ -87,7 +87,7 @@ is_display( [ "A line of content at line 1",
               "A line of content at line 10" ],
             'Display after resize too big' );
 
-$rootwin->clear;
+$term->clear;
 $win->resize( 5, 40 );
 
 flush_tickit;

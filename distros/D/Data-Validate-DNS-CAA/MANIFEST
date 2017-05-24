@@ -8,11 +8,10 @@ META.yml
 Makefile.PL
 README
 SIGNATURE
-dist.ini
 lib/Data/Validate/DNS/CAA.pm
 t/author-pod-coverage.t
 t/author-pod-syntax.t
+t/author-signature.t
 t/oo.t
-t/signature.t
 t/smoke.t
 t/taint.t

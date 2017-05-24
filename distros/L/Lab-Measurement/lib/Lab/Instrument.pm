@@ -3,7 +3,7 @@ package Lab::Instrument;
 use strict;
 use warnings;
 
-our $VERSION = '3.542';
+our $VERSION = '3.543';
 
 #use POSIX; # added for int() function
 use Lab::Generic;

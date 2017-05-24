@@ -1,0 +1,75 @@
+{
+   "abstract" : "Access to etcd v3 API via Dancer2",
+   "author" : [
+      "Sam Batschelet (sbatschelet) <sbatschelet@mac.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer2-Plugin-Etcd",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Class::Load" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "HTTP::Cookies" : "0",
+            "HTTP::Request::Common" : "0",
+            "JSON" : "0",
+            "Plack" : "1.0031",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer2" : "0.200000",
+            "Dancer2::Core::Types" : "0",
+            "Dancer2::Plugin" : "0",
+            "Data::Structure::Util" : "0.16",
+            "Etcd3" : "0.006",
+            "Getopt::Long" : "0",
+            "Hash::Flatten" : "0",
+            "Moo" : "2.000",
+            "Path::Class" : "0",
+            "Path::Tiny" : "0",
+            "Scalar::Util" : "0",
+            "Sub::Quote" : "0",
+            "Sys::Hostname" : "0",
+            "URI" : "0",
+            "YAML::Syck" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/PerlDancer/Dancer2-Plugin-Etcd/issues"
+      },
+      "homepage" : "https://github.com/PerlDancer/Dancer2-Plugin-Etcd/",
+      "repository" : {
+         "url" : "https://github.com/hexfusion/Dancer2-Plugin-Etcd"
+      },
+      "x_IRC" : "irc://irc.perl.org/#dancer"
+   },
+   "version" : "0.006"
+}

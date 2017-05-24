@@ -62,6 +62,7 @@ sub process_request {
             if (/Timed? out|Disconnect/i) {
                 $self->log(4, "Client timed out or disconnected: $_");
                 $self->log(2, "Error while waiting for request: $_");
+                $self->socket->close;
             }
         };
         next unless $req_adu;

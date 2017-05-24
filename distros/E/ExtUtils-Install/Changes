@@ -1,5 +1,9 @@
 Revision history for ExtUtils-Install
 
+2.12
+
+- Fix win32 check
+
 2.10
 
 - 'make -s' support: set $INSTALL_QUIET automatically

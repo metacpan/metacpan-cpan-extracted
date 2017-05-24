@@ -1,3 +1,7 @@
+v1.1.0 2017-05-20T19:57:53Z
+ - No issues on bugtracker were closed since the last release
+ - util and mod_share removed from dist config
+
 v1.0.2 2017-05-03T08:30:00Z
  - No issues were closed since the last release
 

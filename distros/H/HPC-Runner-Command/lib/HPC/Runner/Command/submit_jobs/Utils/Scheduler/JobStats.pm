@@ -89,6 +89,7 @@ sub create_meta_str {
     my $current_job   = shift;
     my $use_batches   = shift;
     my $job           = shift;
+    my $cmd_count     = shift;
 
     my $batchname = $counter . "_" . $current_job;
 
@@ -98,7 +99,7 @@ sub create_meta_str {
     $batch->{total_jobs}      = $self->keys_jobnames;
     $batch->{jobname}         = $current_job;
     $batch->{job_counter}     = $counter;
-    $batch->{job_tasks} = scalar @{$job->cmds};
+    $batch->{job_tasks}       = $job->cmd_counter;
 
     if ($use_batches) {
         $batch->{batch_index} = $batch_counter . "/" . $self->total_batches;
@@ -136,11 +137,11 @@ sub collect_stats {
 
     $self->set_batches(
         $batch_counter . "_"
-            . $current_job => {
+          . $current_job => {
             commands => $cmd_counter,
             jobname  => $current_job,
             batch    => $batch_counter,
-            }
+          }
     );
 
     my $jobhref = {};
@@ -187,8 +188,8 @@ sub do_stats {
         $self->batches->{total_processes} = $self->total_processes;
         $self->batches->{total_batches}   = $self->total_batches;
 
-        $self->batches->{batch_count}
-            = $href->{batch} . "/" . $self->total_batches;
+        $self->batches->{batch_count} =
+          $href->{batch} . "/" . $self->total_batches;
 
     }
 }

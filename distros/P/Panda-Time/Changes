@@ -1,3 +1,5 @@
+3.1.3     19.05.2017
+           - fix broken dependency
 3.1.2     11.05.2017
            - use CPP::panda::lib
 3.1.1     13.03.2017

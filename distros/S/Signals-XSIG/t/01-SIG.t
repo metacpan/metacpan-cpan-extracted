@@ -1,5 +1,6 @@
 use Signals::XSIG;
 use Test::More tests => 88;
+use lib '.';  # Perl 5.26 compatibility
 use t::SignalHandlerTest;
 use Config;
 use strict;

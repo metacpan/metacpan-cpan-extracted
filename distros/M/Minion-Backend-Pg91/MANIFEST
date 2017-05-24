@@ -1,3 +1,4 @@
+.travis.yml
 Changes
 lib/Minion/Backend/Pg91.pm
 LICENSE
@@ -6,5 +7,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README
 t/pg.t
+t/pg91.t
+t/pg_lite_app.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

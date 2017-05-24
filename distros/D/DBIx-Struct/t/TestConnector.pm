@@ -8,7 +8,7 @@ sub new {
 		data      => $data || [],
 	};
 	$self->{NAME} = $self->{data_info};
-	for (my $i = 0 ; $i < @$data_info ; ++$i) {
+	for (my $i = 0; $i < @$data_info; ++$i) {
 		$self->{NAME_hash}{$data_info->[$i]} = $i;
 	}
 	$self->{TYPE} = [0 x @$data_info];
@@ -18,12 +18,12 @@ sub new {
 sub fetchall_arrayref {
 	my ($self, $attr) = @_;
 	my $ret = [];
-	if ($attr && ref ($attr)) {
-		for (my $j = 0 ; $j < @{$self->{data}} ; ++$j) {
+	if ($attr && ref($attr)) {
+		for (my $j = 0; $j < @{$self->{data}}; ++$j) {
 			my $d = $self->{data}[$j];
 			push @$ret, {};
 			my $cr = $ret->[-1];
-			for (my $i = 0 ; $i < @{$self->{data_info}} ; ++$i) {
+			for (my $i = 0; $i < @{$self->{data_info}}; ++$i) {
 				my $f = $self->{data_info}[$i];
 				$cr->{$f} = $d->[$i];
 			}
@@ -44,9 +44,9 @@ sub fetchrow_arrayref {
 	my ($self, $attr) = @_;
 	my $ret = $self->fetch;
 	return if not $ret;
-	if ($attr && ref ($attr)) {
+	if ($attr && ref($attr)) {
 		my $hr = {};
-		for (my $i = 0 ; $i < @{$self->{data_info}} ; ++$i) {
+		for (my $i = 0; $i < @{$self->{data_info}}; ++$i) {
 			my $f = $self->{data_info}[$i];
 			$hr->{$f} = $ret->[$i];
 		}
@@ -60,7 +60,7 @@ sub fetchrow_hashref {
 	my $ar = $self->fetch;
 	return if not $ar;
 	my $ret = {};
-	for (my $i = 0 ; $i < @{$self->{data_info}} ; ++$i) {
+	for (my $i = 0; $i < @{$self->{data_info}}; ++$i) {
 		my $f = $self->{data_info}[$i];
 		$ret->{$f} = $ar->[$i];
 	}
@@ -73,7 +73,7 @@ sub finish {
 
 sub execute {
 	my ($self, @params) = @_;
-	$TestConnector::sql_bind = "'" . join ("','", @params) . "'";
+	$TestConnector::sql_bind = "'" . join("','", @params) . "'";
 	if (@params && $params[0] =~ /^\d+$/) {
 		$self->{pos} = $params[0] - 1;
 	}
@@ -100,11 +100,9 @@ our %tables = (
 our %table_infos = (
 	fkipk => {
 		data_info => [
-			'UK_TABLE_CAT',     'UK_TABLE_SCHEM', 'UK_TABLE_NAME',     'UK_COLUMN_NAME',
-			'FK_TABLE_CAT',     'FK_TABLE_SCHEM', 'FK_TABLE_NAME',     'FK_COLUMN_NAME',
-			'ORDINAL_POSITION', 'UPDATE_RULE',    'DELETE_RULE',       'FK_NAME',
-			'UK_NAME',          'DEFERABILITY',   'UNIQUE_OR_PRIMARY', 'UK_DATA_TYPE',
-			'FK_DATA_TYPE'
+			'UK_TABLE_CAT',  'UK_TABLE_SCHEM', 'UK_TABLE_NAME',     'UK_COLUMN_NAME', 'FK_TABLE_CAT', 'FK_TABLE_SCHEM',
+			'FK_TABLE_NAME', 'FK_COLUMN_NAME', 'ORDINAL_POSITION',  'UPDATE_RULE',    'DELETE_RULE',  'FK_NAME',
+			'UK_NAME',       'DEFERABILITY',   'UNIQUE_OR_PRIMARY', 'UK_DATA_TYPE',   'FK_DATA_TYPE'
 		],
 		list => [
 			[   undef, 'public', 'list', 'id', undef, 'public', 'pl_assoc', 'id_list', 2, '3',
@@ -120,11 +118,9 @@ our %table_infos = (
 	},
 	fkifk => {
 		data_info => [
-			'UK_TABLE_CAT',     'UK_TABLE_SCHEM', 'UK_TABLE_NAME',     'UK_COLUMN_NAME',
-			'FK_TABLE_CAT',     'FK_TABLE_SCHEM', 'FK_TABLE_NAME',     'FK_COLUMN_NAME',
-			'ORDINAL_POSITION', 'UPDATE_RULE',    'DELETE_RULE',       'FK_NAME',
-			'UK_NAME',          'DEFERABILITY',   'UNIQUE_OR_PRIMARY', 'UK_DATA_TYPE',
-			'FK_DATA_TYPE'
+			'UK_TABLE_CAT',  'UK_TABLE_SCHEM', 'UK_TABLE_NAME',     'UK_COLUMN_NAME', 'FK_TABLE_CAT', 'FK_TABLE_SCHEM',
+			'FK_TABLE_NAME', 'FK_COLUMN_NAME', 'ORDINAL_POSITION',  'UPDATE_RULE',    'DELETE_RULE',  'FK_NAME',
+			'UK_NAME',       'DEFERABILITY',   'UNIQUE_OR_PRIMARY', 'UK_DATA_TYPE',   'FK_DATA_TYPE'
 		],
 		pl_assoc => [
 			[   undef, 'public', 'list', 'id', undef, 'public', 'pl_assoc', 'id_list', 2, '3',
@@ -139,107 +135,64 @@ our %table_infos = (
 	},
 	pki => {
 		data_info => [
-			'TABLE_CAT',              'TABLE_SCHEM',
-			'TABLE_NAME',             'COLUMN_NAME',
-			'KEY_SEQ',                'PK_NAME',
-			'DATA_TYPE',              'pg_tablespace_name',
-			'pg_tablespace_location', 'pg_schema',
-			'pg_table',               'pg_column'
+			'TABLE_CAT',              'TABLE_SCHEM', 'TABLE_NAME', 'COLUMN_NAME',
+			'KEY_SEQ',                'PK_NAME',     'DATA_TYPE',  'pg_tablespace_name',
+			'pg_tablespace_location', 'pg_schema',   'pg_table',   'pg_column'
 		],
-		prim => [
-			[   undef,  'public', 'prim', 'id',     '1',    'prim_pkey',
-				'int4', undef,    undef,  'public', 'prim', 'prim_pkey'
-			]
-		],
-		list => [
-			[   undef,  'public', 'list', 'id',     '1',    'list_pkey',
-				'int4', undef,    undef,  'public', 'list', 'list_pkey'
-			]
-		],
+		prim     => [[undef, 'public', 'prim', 'id', '1', 'prim_pkey', 'int4', undef, undef, 'public', 'prim', 'prim_pkey']],
+		list     => [[undef, 'public', 'list', 'id', '1', 'list_pkey', 'int4', undef, undef, 'public', 'list', 'list_pkey']],
 		pl_assoc => undef,
 	},
 	ci => {
 		data_info => [
-			'TABLE_CAT',        'TABLE_SCHEM',
-			'TABLE_NAME',       'COLUMN_NAME',
-			'DATA_TYPE',        'TYPE_NAME',
-			'COLUMN_SIZE',      'BUFFER_LENGTH',
-			'DECIMAL_DIGITS',   'NUM_PREC_RADIX',
-			'NULLABLE',         'REMARKS',
-			'COLUMN_DEF',       'SQL_DATA_TYPE',
-			'SQL_DATETIME_SUB', 'CHAR_OCTET_LENGTH',
-			'ORDINAL_POSITION', 'IS_NULLABLE',
-			'pg_type',          'pg_constraint',
-			'pg_schema',        'pg_table',
-			'pg_column',        'pg_enum_values'
+			'TABLE_CAT',        'TABLE_SCHEM',    'TABLE_NAME',       'COLUMN_NAME',
+			'DATA_TYPE',        'TYPE_NAME',      'COLUMN_SIZE',      'BUFFER_LENGTH',
+			'DECIMAL_DIGITS',   'NUM_PREC_RADIX', 'NULLABLE',         'REMARKS',
+			'COLUMN_DEF',       'SQL_DATA_TYPE',  'SQL_DATETIME_SUB', 'CHAR_OCTET_LENGTH',
+			'ORDINAL_POSITION', 'IS_NULLABLE',    'pg_type',          'pg_constraint',
+			'pg_schema',        'pg_table',       'pg_column',        'pg_enum_values'
 		],
 		pl_assoc => [
-			[   undef,     'public', 'pl_assoc', 'id_prim',  4,         'integer',
-				4,         undef,    undef,      undef,      1,         undef,
-				undef,     undef,    undef,      undef,      1,         'YES',
-				'integer', undef,    'public',   'pl_assoc', 'id_prim', undef
+			[   undef, 'public', 'pl_assoc', 'id_prim', 4,        'integer',  4,         undef,
+				undef, undef,    1,          undef,     undef,    undef,      undef,     undef,
+				1,     'YES',    'integer',  undef,     'public', 'pl_assoc', 'id_prim', undef
 			],
-			[   undef,     'public', 'pl_assoc', 'id_list',  4,         'integer',
-				4,         undef,    undef,      undef,      1,         undef,
-				undef,     undef,    undef,      undef,      2,         'YES',
-				'integer', undef,    'public',   'pl_assoc', 'id_list', undef
+			[   undef, 'public', 'pl_assoc', 'id_list', 4,        'integer',  4,         undef,
+				undef, undef,    1,          undef,     undef,    undef,      undef,     undef,
+				2,     'YES',    'integer',  undef,     'public', 'pl_assoc', 'id_list', undef
 			]
 		],
 		prim => [
-			[   undef,                                'public',
-				'prim',                               'id',
-				4,                                    'integer',
-				4,                                    undef,
-				undef,                                undef,
-				0,                                    undef,
-				'nextval(\'prim_id_seq\'::regclass)', undef,
-				undef,                                undef,
-				1,                                    'NO',
-				'integer',                            undef,
-				'public',                             'prim',
-				'id',                                 undef
+			[   undef, 'public', 'prim', 'id', 4, 'integer', 4, undef, undef, undef, 0, undef,
+				'nextval(\'prim_id_seq\'::regclass)',
+				undef, undef, undef, 1, 'NO', 'integer', undef, 'public', 'prim', 'id', undef
 			],
-			[   undef,  'public', 'prim',   'payload', -1,        'text',
-				undef,  undef,    undef,    undef,     1,         undef,
-				undef,  undef,    undef,    undef,     2,         'YES',
-				'text', undef,    'public', 'prim',    'payload', undef
+			[   undef, 'public', 'prim', 'payload', -1,       'text', undef,     undef,
+				undef, undef,    1,      undef,     undef,    undef,  undef,     undef,
+				2,     'YES',    'text', undef,     'public', 'prim', 'payload', undef
 			]
 		],
 		list => [
-			[   undef,                                'public',
-				'list',                               'id',
-				4,                                    'integer',
-				4,                                    undef,
-				undef,                                undef,
-				0,                                    undef,
-				'nextval(\'list_id_seq\'::regclass)', undef,
-				undef,                                undef,
-				1,                                    'NO',
-				'integer',                            undef,
-				'public',                             'list',
-				'id',                                 undef
+			[   undef, 'public', 'list', 'id', 4, 'integer', 4, undef, undef, undef, 0, undef,
+				'nextval(\'list_id_seq\'::regclass)',
+				undef, undef, undef, 1, 'NO', 'integer', undef, 'public', 'list', 'id', undef
 			],
-			[   undef,  'public', 'list',   'ref',  -1,    'text',
-				undef,  undef,    undef,    undef,  1,     undef,
-				undef,  undef,    undef,    undef,  2,     'YES',
-				'text', undef,    'public', 'list', 'ref', undef
+			[   undef, 'public', 'list', 'ref', -1,       'text', undef, undef,
+				undef, undef,    1,      undef, undef,    undef,  undef, undef,
+				2,     'YES',    'text', undef, 'public', 'list', 'ref', undef
 			]
 		]
 	},
 	ti => {
 		data_info => [
-			'TABLE_CAT',              'TABLE_SCHEM',
-			'TABLE_NAME',             'TABLE_TYPE',
-			'REMARKS',                'pg_tablespace_name',
-			'pg_tablespace_location', 'pg_schema',
+			'TABLE_CAT', 'TABLE_SCHEM',        'TABLE_NAME',             'TABLE_TYPE',
+			'REMARKS',   'pg_tablespace_name', 'pg_tablespace_location', 'pg_schema',
 			'pg_table'
 		],
 		data => [
-			[undef, 'public', 'list', 'TABLE', undef, undef, undef, 'public', 'list'],
-			[   undef, 'public', 'pl_assoc', 'TABLE', undef, undef,
-				undef, 'public', 'pl_assoc'
-			],
-			[undef, 'public', 'prim', 'TABLE', undef, undef, undef, 'public', 'prim']
+			[undef, 'public', 'list',     'TABLE', undef, undef, undef, 'public', 'list'],
+			[undef, 'public', 'pl_assoc', 'TABLE', undef, undef, undef, 'public', 'pl_assoc'],
+			[undef, 'public', 'prim',     'TABLE', undef, undef, undef, 'public', 'prim']
 		]
 	},
 	pk => {
@@ -272,9 +225,8 @@ sub primary_key {
 
 sub foreign_key_info {
 	my ($dbh, undef, undef, $pktable, undef, undef, $fktable) = @_;
-	my $k = defined ($pktable) ? "fkipk" : "fkifk";
-	TestSth->new($table_infos{$k}{data_info},
-		$table_infos{$k}{$pktable || $fktable});
+	my $k = defined($pktable) ? "fkipk" : "fkifk";
+	TestSth->new($table_infos{$k}{data_info}, $table_infos{$k}{$pktable || $fktable});
 }
 
 sub column_info {
@@ -295,7 +247,7 @@ sub table_info {
 sub selectrow_array {
 	my ($dbh, $query, $attr, @params) = @_;
 	$TestConnector::sql_query = $query;
-	$TestConnector::sql_bind = "'" . join ("','", @params) . "'";
+	$TestConnector::sql_bind = "'" . join("','", @params) . "'";
 	return @{[1]} if $query =~ /returning /;
 	return ();
 }
@@ -303,7 +255,7 @@ sub selectrow_array {
 sub do {
 	my ($dbh, $query, $attr, @params) = @_;
 	$TestConnector::sql_query = $query;
-	$TestConnector::sql_bind = "'" . join ("','", @params) . "'";
+	$TestConnector::sql_bind = "'" . join("','", @params) . "'";
 	return "0E0";
 }
 
@@ -311,6 +263,41 @@ sub errstr {
 	my ($dbh) = @_;
 	print STDERR "error: $TestConnector::sql_query; $TestConnector::sql_bind\n";
 	return "ERROR!!!";
+}
+
+sub quote_identifier {
+	my ($dbh, @id) = @_;
+	my $attr = (@id > 3 && ref($id[-1])) ? pop @id : undef;
+
+	my $info = $dbh->{dbi_quote_identifier_cache} ||= [
+		'"',    # SQL_IDENTIFIER_QUOTE_CHAR
+		'.',    # SQL_CATALOG_NAME_SEPARATOR
+		1,      # SQL_CATALOG_LOCATION
+	];
+
+	my $quote = $info->[0];
+	foreach (@id) {    # quote the elements
+		next unless defined;
+		s/$quote/$quote$quote/g;    # escape embedded quotes
+		$_ = qq{$quote$_$quote};
+	}
+
+	# strip out catalog if present for special handling
+	my $catalog = (@id >= 3) ? shift @id : undef;
+
+	# join the dots, ignoring any null/undef elements (ie schema)
+	my $quoted_id = join '.', grep {defined} @id;
+
+	if ($catalog) {                 # add catalog correctly
+		if ($quoted_id) {
+			$quoted_id = ($info->[2] == 2)    # SQL_CL_END
+				? $quoted_id . $info->[1] . $catalog
+				: $catalog . $info->[1] . $quoted_id;
+		} else {
+			$quoted_id = $catalog;
+		}
+	}
+	return $quoted_id;
 }
 
 package TestConnector;
@@ -332,11 +319,15 @@ sub mode {
 	1;
 }
 
-sub driver { {driver => 'Pg'} }
+sub dbh {
+	TestDBH->new;
+}
+
+sub driver {{driver => 'Pg'}}
 
 sub query {
-#	print "query: $sql_query\n";
-#	print "bind: $sql_bind\n";
+	#	print "query: $sql_query\n";
+	#	print "bind: $sql_bind\n";
 	return ($sql_query, $sql_bind);
 }
 

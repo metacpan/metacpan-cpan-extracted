@@ -7,7 +7,7 @@ use Config;
 use Text::ParseWords qw( shellwords );
 
 # ABSTRACT: Compiler and linker wrapper for Alien
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 my @cflags_I;
@@ -33,7 +33,7 @@ sub _reset
 sub cc
 {
   my @command = (
-    $Config{cc},
+    shellwords($Config{cc}),
     @cflags_I,
     @cflags_other,
     @ARGV,
@@ -46,7 +46,7 @@ sub cc
 sub ld
 {
   my @command = (
-    $Config{ld},
+    shellwords($Config{ld}),
     @ldflags_L,
     @ldflags_other,
     @ARGV,
@@ -160,7 +160,7 @@ Alien::Base::Wrapper - Compiler and linker wrapper for Alien
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

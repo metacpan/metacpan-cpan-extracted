@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "mit",
   "NAME" => "App::GetClosestFile",
   "PREREQ_PM" => {},
-  "VERSION" => "0.2.2",
+  "VERSION" => "0.2.3",
   "test" => {
     "TESTS" => ""
   }

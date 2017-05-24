@@ -2,7 +2,7 @@ package Variable::Expand::AnyLevel;
 use parent qw(Exporter);
 use strict;
 use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 our @EXPORT_OK = qw(expand_variable);
 use PadWalker qw(peek_my);
 

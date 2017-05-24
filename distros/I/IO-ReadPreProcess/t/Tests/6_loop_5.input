@@ -1,0 +1,14 @@
+.# Title: For loop with break
+Before for: i = 0 .. 9
+.for i := 0 ;; i < 10 ;; i++
+.echo i is \v{i}
+.let j := 0
+Before while, break in first iteration
+.while ++j < 3
+.echo i is \v{i} j=\v{j}
+.break
+.echo After break - should not be seen
+.done
+After while
+.done
+After for

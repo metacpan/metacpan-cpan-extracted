@@ -7,7 +7,7 @@ use utf8;
 
 package Data::iRealPro::Input::MusicXML;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use XML::LibXML;
 #use DDumper;
@@ -49,7 +49,7 @@ sub encode {
     # print DDumper($data);
 
     $self = bless { %$self }, __PACKAGE__;
-
+#    $self->{debug} = 1;		# ####
     my $root = "/score-partwise";
     my $rootnode = $data->findnodes($root)->[0];
 
@@ -246,6 +246,7 @@ sub process_measure {
     }
 
     if ( my $d = $data->fn1('attributes/divisions') ) {
+	# Divisions per quarter note.
 	$ctx->{_parent}->{divisions} =
 	$ctx->{divisions} = $d->to_literal;
 	print STDERR ( " Divisions: ", $ctx->{divisions}, "\n" )
@@ -257,10 +258,7 @@ sub process_measure {
 
     my ( $lbar, $rbar, $ending, $segno, $coda, $awords, $bwords );
     if ( my $d = $data->fn1(q{barline[@location='left']/ending[@type='start']} ) ) {
-	foreach ( $d->attributes ) {
-	    next unless $_->getName eq "number";
-	    $ending = $_->getValue;
-	}
+	$ending = $d->fn1('@number');
     }
     if ( my $d = $data->fn1(q{barline[@location='right']/repeat[@direction='backward']} ) ) {
 	$rbar = 'repeat';
@@ -292,14 +290,34 @@ sub process_measure {
     my ( $n, $h );
     $ctx->{currentbeat} = 0;
     my @chords = ( "_" ) x $ctx->{beats};
-    foreach ( @{ $data->fn('note | ./harmony') } ) {
+    my @achords = ( "_" ) x $ctx->{beats};
+    foreach ( @{ $data->fn('note | harmony') } ) {
 	print STDERR ("== beat: ", $ctx->{currentbeat}, "\n" )
 	  if $self->{debug};
-	$self->process_note( ++$n, $_, $ctx )
-	  if $_->nodeName eq "note";
+	if ( $_->nodeName eq "note" ) {
+	    my $suppress = 0;
+	    if ( my $a = $_->fn1('@print-object') ) {
+		$suppress = $a->to_literal eq 'no';
+	    }
+	    my $dur = $self->process_note( ++$n, $_, $ctx );
+	    $ctx->{currentbeat} += $dur;
+	    $ctx->{currentbeat} = $ctx->{beats} - 1
+	      if $ctx->{currentbeat} > $ctx->{beats} - 1;
+	    if ( $suppress ) {
+	    }
+	}
 	if ( $_->nodeName eq "harmony" ) {
-	    $chords[$ctx->{currentbeat}] =
-	      $self->process_harmony( ++$h, $_, $ctx );
+	    my $h = $self->process_harmony( ++$h, $_, $ctx );
+	    my $a = $h->{alternate} ? \@achords : \@chords;
+	    if ( $h->{offset} ) {
+		my $offset = $h->{offset};
+		warn("Measure $measure, offset too low: $offset\n")
+		  if $offset < 0;
+		$a->[$offset] = $h;
+	    }
+	    else {
+		$a->[$ctx->{currentbeat}] = $h;
+	    }
 	}
     }
 
@@ -309,6 +327,7 @@ sub process_measure {
     push( @{ $this->{measures} },
 	  { number => $data->fn1('@number')->to_literal,
 	    chords => [ @chords ],
+	    achords => [ @achords ],
 	    $ending ? ( ending => $ending ) : (),
 	    $lbar ? ( lbar => $lbar ) : (),
 	    $rbar ? ( rbar => $rbar ) : (),
@@ -333,7 +352,7 @@ sub process_note {
 	$duration = $data->fn('duration')->[0]->to_literal
 	  / $ctx->{divisions};
     }
-    # Duration is the actual duration, dots included.
+    # Duration is the actual duration, in quarter notes, dots included.
     # $duration *= 1.5 if $data->fn('dot');
 
     my $root;
@@ -362,8 +381,7 @@ sub process_note {
 		  )
       if $self->{debug};
 
-    $ctx->{currentbeat} += $duration
-      unless $data->fn1('chord');
+    return $data->fn1('chord') ? 0 : $duration;
 }
 
 sub process_harmony {
@@ -384,21 +402,33 @@ sub process_harmony {
     }
 
     my $bass = eval { $data->fn1('bass/bass-step')->to_literal };
+    my $alt  = eval { $data->fn1('@type')->to_literal eq 'alternate' };
+    my $offset = eval { $data->fn1('offset')->to_literal };
+    $offset /= $ctx->{divisions} if $offset;
 
-    my @d;
-    foreach ( @{ $data->fn('degree') } ) {
-	push( @d, [ $_->fn1('degree-value')->to_literal,
-		    $_->fn1('degree-alter')->to_literal,
-		    $_->fn1('degree-type')->to_literal ] );
+    my @degree;
+    foreach my $d ( @{ $data->fn('degree') } ) {
+	push( @degree,
+	      [ map { $d->fn1("degree-$_")->to_literal }
+		    qw( value alter type ) ] );
     }
 
-    printf STDERR ( "Harm %3d: %s%s%s %s\n",
+    printf STDERR ( "Harm %3d: %s%s%s %s%s\n",
 		    $harmony, $root, $quality,
 		    $bass ? "/$bass" : "",
-		    $tquality )
+		    $tquality,
+		    $offset ? " \@$offset" : "",
+		  )
       if $self->{debug};
 
-    return [ $root, $quality, $tquality, $bass, @d ? \@d : () ];
+    return { root    => $root,
+	     quality => $quality,
+	     text    => $tquality,
+	     $bass   ? ( bass      => $bass )    : (),
+	     $alt    ? ( alternate => $alt )    : (),
+	     $offset ? ( offset    => $offset )  : (),
+	     @degree ? ( degree    => \@degree ) : (),
+	   };
 
 }
 
@@ -503,7 +533,9 @@ sub to_irealpro {
 		push( @{ $m->{chords} }, "_" ) while @{ $m->{chords} } < 4;
 	    }
 
-	    foreach my $c ( @{ $m->{chords} } ) {
+	    foreach my $i ( 0 .. @{ $m->{chords} } - 1 ) {
+		my $c = $m->{chords}->[$i];
+		my $a = $m->{achords}->[$i];
 		my $mapped = 'n'; # N.C.
 		if ( defined $c ) {
 		    $mapped = $self->irpchord($c);
@@ -541,7 +573,7 @@ sub to_irealpro {
 		}
 		# Small optimalisation for adjacent condensed entries.
 		$c =~ s/l,s/,/g;
-		warn(qq{"$c"\n}) if $self->{debug};
+		warn(qq{"$c"\n}) if $self->{debug} > 1;
 
 		# Append to output.
 		$irp .= "," if $irp =~ /[[:alnum:]]$/;
@@ -685,8 +717,10 @@ my %chordqual =
 
 sub irpchord {
     my ( $self, $c ) = @_;
-    return $c unless ref($c) eq 'ARRAY';
-    my ( $root, $quality, $text, $bass, $degree ) = @$c;
+    return $c unless ref($c) eq 'HASH';
+    my ( $root, $quality, $text, $bass, $offset, $degree ) =
+      @{$c}{ qw( root quality text bass offset degree ) };
+
     if ( exists $harmony_kinds{$quality} ) {
 	$text = $harmony_kinds{$quality};
     }

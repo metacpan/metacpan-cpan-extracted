@@ -17,6 +17,7 @@ t/03-manage-products-cart.t
 t/04-clear-cart.t
 t/05-test-default-routes.t
 t/06-test-hooks.t
+t/07-test-keywords.t
 t/lib/Test/Schema.pm
 t/lib/Test/Schema/Result/EcCart.pm
 t/lib/Test/Schema/Result/EcCartProduct.pm

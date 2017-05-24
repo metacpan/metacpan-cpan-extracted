@@ -4,13 +4,13 @@
       "Jens Rehsack <rehsack@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "File-ConfigDir",
    "no_index" : {
@@ -43,7 +43,8 @@
       "runtime" : {
          "recommends" : {
             "File::HomeDir" : "0.50",
-            "List::MoreUtils" : "0.22"
+            "List::MoreUtils" : "v0.0.419",
+            "List::MoreUtils::XS" : "v0.0.418"
          },
          "requires" : {
             "Carp" : "0",
@@ -74,9 +75,8 @@
          "type" : "git",
          "url" : "https://github.com:perl5-utils/File-ConfigDir.git",
          "web" : "https://github.com/perl5-utils/File-ConfigDir"
-      },
-      "x_IRC" : "irc://irc.perl.org/#toolchain",
-      "x_MailingList" : "mailto:cpan-workers@perl.org'"
+      }
    },
-   "version" : "0.017"
+   "version" : "0.018",
+   "x_serialization_backend" : "JSON::PP version 2.93"
 }

@@ -9,7 +9,7 @@ use Carp;
 
 use namespace::autoclean;
 
-our $VERSION = '3.542';
+our $VERSION = '3.543';
 
 cache sense_average_state => ( getter => 'sense_average_state_query' );
 

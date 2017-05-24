@@ -1,5 +1,11 @@
 Revision history for HPC-Runner-Command
 
+3.2.0  2017-05-24 10:26:38 GST
+	- Upgrading to minor version
+
+3.1.8  2017-05-24 09:30:51 GST
+	- Major API changes for execute_job and execute_array
+
 3.1.7  2017-05-18 10:27:10 GST
 	- Hot fix - updated SLURM for new dep array
 

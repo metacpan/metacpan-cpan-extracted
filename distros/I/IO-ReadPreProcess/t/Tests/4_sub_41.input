@@ -1,0 +1,73 @@
+.# Title: Subroutine return value
+Line 1
+.# Define sub a
+.sub a
+Sub a line 1
+.return 12
+.done
+.#
+.# Define sub b
+.sub b
+Sub b line 1
+.return 'sub b'
+.done
+.#
+.# Define sub c
+.sub c
+Sub c line 1
+.let rv := 22
+.return rv
+.done
+.#
+.# Define sub d
+.sub d
+Sub d line 1
+.let rv := 22
+.return rv + 3
+.done
+.#
+.# Define sub e
+.sub e
+Sub e line 1
+.return 2 + 3
+.done
+.#
+.# Define sub f
+.sub f
+Sub f line 1
+.let ra := ('v1', 'v2', 'v3')
+.return ra
+.done
+.#
+.# Define sub i_a
+.sub i_a
+Sub i_a line 1
+.include 4_sub_41.inc
+.echo After 4_sub_41.inc _ = '\v{_}'
+Last in i_a
+.done
+.#
+After subroutine definitions
+.#
+.# Run the sub
+.a
+.echo _ = '\v{_}'
+.#
+.b
+.echo _ = '\v{_}'
+.#
+.c
+.echo _ = '\v{_}'
+.#
+.d
+.echo _ = '\v{_}'
+.#
+.e
+.echo _ = '\v{_}'
+.#
+.f
+.echo _ = '\v{_}'
+.#
+.i_a
+.echo _ = '\v{_}'
+EOF

@@ -1,7 +1,7 @@
 
 
 This archive contains the distribution DBIx-Class-InflateColumn-JSON2Object,
-version 0.902:
+version 0.903:
 
   convert JSON columns to Perl objects
 

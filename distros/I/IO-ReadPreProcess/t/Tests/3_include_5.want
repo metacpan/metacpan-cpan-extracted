@@ -1,0 +1,14 @@
+Line 1
+In 3_include_5.input thing='from inc 1'
+Included: _LineNumber = 2
+Included: _FileName = t/Tests/3_include_5.inc
+Included: _IncludeDepth = 2
+In 3_include_5.inc thing='from inc 2' thang='thang from inc 2'
+3_include_5.inc: _ARGS[0] = 'Arg_AA' number of args 2
+In 3_include_5.1_inc: thang = 'thang from 3_include_5.1_inc'
+_ARGS[0] = 'a1' number of args '3' last arg = 'a3'
+
+Back into 3_include_5.inc: thing='from inc 2' thang='thang from inc 2' na = 2 a0='Arg_AA'
+
+First file 3_include_5.input: _ARGS[0] = 'undefined' number of args 0
+Line end; thing='from inc 1' thang='thang from inc 2'  na = 0 a0='undefined'

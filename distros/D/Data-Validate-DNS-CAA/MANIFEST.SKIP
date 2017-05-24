@@ -70,5 +70,5 @@
 ^\.git$
 ^\.build$
 ^\.travis.yml$
-^\dist.ini$
+^dist.ini$
 ^releases$

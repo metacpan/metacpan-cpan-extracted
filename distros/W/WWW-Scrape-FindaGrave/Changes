@@ -1,5 +1,10 @@
 Revision history for WWW::Scaper::FindaGrave
 
+0.03	Tue May 23 10:33:01 EDT 2017
+	Added Travis and Coveralls integration
+	Don't try tests when not on-line
+	Added LWP::Protocol::https as a prerequisite
+
 0.02	Tue Jun 14 19:48:02 EDT 2016
 	Added a few more tests
 

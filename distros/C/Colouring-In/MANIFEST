@@ -9,7 +9,10 @@ t/02-jsbasics.t
 t/03-new-colours.t
 t/04-lighten.t
 t/05-darken.t
+t/06-fade.t
 t/07-white-black.t
+t/08-fadeout.t
+t/09-fadein.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

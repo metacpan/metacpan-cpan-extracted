@@ -7,6 +7,7 @@ use warnings;
 use Moo;
 use Types::Standard qw(Str Int Bool HashRef ArrayRef);
 use MIME::Base64;
+use Data::Dumper;
 use JSON;
 
 with 'Etcd3::Role::Actions';
@@ -19,7 +20,7 @@ Etcd3::Range
 
 =cut
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 =head1 DESCRIPTION
 
@@ -27,6 +28,8 @@ Watch watches for events happening or that have happened. Both input and output 
 the input stream is for creating and canceling watchers and the output stream sends events.
 One watch RPC can watch on multiple key ranges, streaming events for several watches at once.
 The entire event history can be watched starting from the last compaction revision.
+
+=head1 ACCESSORS
 
 =head2 endpoint
 
@@ -66,11 +69,14 @@ has range_end => (
     coerce => sub { return encode_base64( $_[0], '' ) }
 );
 
-=head2 limit
+=head2 start_revision
+
+start_revision is an optional revision to watch from (inclusive). No start_revision is "now".
+int64
 
 =cut
 
-has limit => (
+has start_revision => (
     is  => 'ro',
     isa => Int,
 );
@@ -90,6 +96,20 @@ has progress_notify => (
     coerce => sub { no strict 'refs'; return $_[0] ? JSON::true : JSON::false }
 );
 
+=head2 filters
+
+filter out put event. filter out delete event. filters filter the events at server side before it sends back to the watcher.
+Options:
+- NOPUT: filter out put event. (default)
+- NODELETE: filter out delete event.
+
+=cut
+
+has filters => (
+    is     => 'ro',
+    isa    => Str,
+);
+
 =head2 prev_key
 
 If prev_kv is set, created watcher gets the previous KV before the event happens. If the previous
@@ -103,32 +123,44 @@ has prev_key => (
     coerce => sub { no strict 'refs'; return $_[0] ? JSON::true : JSON::false }
 );
 
-=head2 json_args
+=head2 watch_id
 
-arguments that will be sent to the api
+watch_id is the watcher id to cancel so that no more events are transmitted. This is only used for a
+cancel request.
+int64
 
 =cut
 
-has json_args => ( is => 'lazy', );
+has watch_id => (
+    is  => 'ro',
+    isa => Int,
+);
 
-sub _build_json_args {
-    my ($self) = @_;
-    my $args;
-    for my $key ( keys %{$self} ) {
-        unless ( $key =~ /(?:_client|json_args|endpoint)$/ ) {
-            $args->{$key} = $self->{$key};
-        }
-    }
-    return to_json( { create_request => $args } );
+=head1 PUBLIC METHODS
+
+=head2 create
+
+create watch
+
+=cut
+
+sub create {
+    my $self = shift;
+    $self->{json_args} = '{"create_request": '. $self->json_args . '}';
+    $self->request;
+    return $self;
 }
 
-=head2 init
+=head2 cancel
+
+cancel watch
 
 =cut
 
-sub init {
-    my ($self) = @_;
-    $self->json_args;
+sub cancel {
+    my $self = shift;
+    $self->{json_args} = '{"cancel_request": '. $self->json_args . '}';
+    $self->request;
     return $self;
 }
 

@@ -27,10 +27,10 @@ no_index:
 provides:
   Sys::Linux::Mount:
     file: lib/Sys/Linux/Mount.pm
-    version: '0.013'
+    version: '0.015'
   Sys::Linux::Namespace:
     file: lib/Sys/Linux/Namespace.pm
-    version: v0.13.0
+    version: v0.15.0
 requires:
   Carp: '0'
   Exporter: '0'
@@ -42,7 +42,7 @@ requires:
   constant: '0'
   strict: '0'
   warnings: '0'
-version: '0.013'
+version: '0.015'
 x_Dist_Zilla:
   perl:
     version: '5.024001'

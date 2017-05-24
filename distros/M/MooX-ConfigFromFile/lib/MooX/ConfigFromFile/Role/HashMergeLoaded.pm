@@ -3,7 +3,7 @@ package MooX::ConfigFromFile::Role::HashMergeLoaded;
 use strict;
 use warnings;
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 use Hash::Merge;
 
@@ -11,20 +11,20 @@ use Moo::Role;
 
 requires "loaded_config";
 
-has "config_merger" => ( is => "lazy" );
+has "config_merger" => (is => "lazy");
 
 sub _build_config_merger { Hash::Merge->new('LEFT_PRECEDENT') }
 
 around _build_loaded_config => sub {
-    my ( $next, $class, $params ) = @_;
+    my ($next, $class, $params) = @_;
 
     defined $params->{raw_loaded_config} or $params->{raw_loaded_config} = $class->_build_raw_loaded_config($params);
     defined $params->{config_merger}     or $params->{config_merger}     = $class->_build_config_merger($params);
 
     my $config_merged = {};
-    for my $c ( map { values %$_ } @{ $params->{raw_loaded_config} } )
+    for my $c (map { values %$_ } @{$params->{raw_loaded_config}})
     {
-        %$config_merged = %{ $params->{config_merger}->merge( $config_merged, $c ) };
+        %$config_merged = %{$params->{config_merger}->merge($config_merged, $c)};
     }
 
     $config_merged;
@@ -34,7 +34,7 @@ around _build_loaded_config => sub {
 
 =head1 NAME
 
-MooX::ConfigFromFile::Role::HashMergeLoaded - allows better merge stragegies for multiple config files
+MooX::ConfigFromFile::Role::HashMergeLoaded - allows better merge strategies for multiple config files
 
 =head1 SYNOPSIS
 
@@ -97,7 +97,7 @@ Jens Rehsack, C<< <rehsack at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2015 Jens Rehsack.
+Copyright 2015-2017 Jens Rehsack.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

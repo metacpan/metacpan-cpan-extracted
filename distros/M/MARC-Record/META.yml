@@ -1,25 +1,25 @@
---- #YAML:1.0
-name:               MARC-Record
-version:            2.0.6
-abstract:           Perl extension for handling MARC records
+---
+abstract: 'Perl extension for handling MARC records'
 author:
-    - Galen Charlton <gmcharlt@gmail.com>
-license:            perl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Galen Charlton <gmcharlt@gmail.com>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Carp:        0
-    File::Find:  0
-    File::Spec:  0
-    Test::More:  0
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.57_05
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MARC-Record
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  File::Find: '0'
+  File::Spec: '0'
+  Test::More: '0'
+version: v2.0.7

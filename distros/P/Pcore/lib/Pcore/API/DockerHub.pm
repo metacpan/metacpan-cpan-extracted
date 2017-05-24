@@ -31,11 +31,11 @@ const our $DOCKERHUB_SOURCE_NAME => {
 };
 
 sub BUILDARGS ( $self, $args = undef ) {
-    $args->{api_username} ||= $ENV->user_cfg->{'Pcore::API::DockerHub'}->{api_username} if $ENV->user_cfg->{'Pcore::API::DockerHub'}->{api_username};
+    $args->{api_username} ||= $ENV->user_cfg->{DOCKERHUB}->{username} if $ENV->user_cfg->{DOCKERHUB}->{username};
 
-    $args->{api_password} ||= $ENV->user_cfg->{'Pcore::API::DockerHub'}->{api_password} if $ENV->user_cfg->{'Pcore::API::DockerHub'}->{api_password};
+    $args->{api_password} ||= $ENV->user_cfg->{DOCKERHUB}->{password} if $ENV->user_cfg->{DOCKERHUB}->{password};
 
-    $args->{namespace} ||= $ENV->user_cfg->{'Pcore::API::DockerHub'}->{namespace} if $ENV->user_cfg->{'Pcore::API::DockerHub'}->{namespace};
+    $args->{namespace} ||= $ENV->user_cfg->{DOCKERHUB}->{namespace} if $ENV->user_cfg->{DOCKERHUB}->{namespace};
 
     return $args;
 }

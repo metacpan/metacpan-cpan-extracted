@@ -8,10 +8,11 @@ use warnings FATAL => 'all';
 use Test::More;
 use Moo;
 
-BEGIN {
-    use_ok( 'MooX::ConfigFromFile' ) || print "Bail out!\n";
+BEGIN
+{
+    use_ok('MooX::ConfigFromFile') || print "Bail out!\n";
 }
 
-diag( "Testing MooX::ConfigFromFile $MooX::ConfigFromFile::VERSION, Perl $], $^X" );
+diag("Testing MooX::ConfigFromFile $MooX::ConfigFromFile::VERSION, Perl $], $^X");
 
 done_testing();

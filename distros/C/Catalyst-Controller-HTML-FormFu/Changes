@@ -1,3 +1,6 @@
+2.02      2017-05-22 13:20:48+01:00 Europe/London
+    - Stop using Test::Aggregate::Nested for tests - RT#121792
+
 2.01 2016-06-24
 
     - Version numbering now handled in dzil
@@ -12,7 +15,7 @@
 1.00 2013-12-16
 
     - Updated for HTML-FormFu v1.00
-    
+
     - Only require MultiForm at runtime when needed
 
 0.09004 2012-09-11
@@ -40,9 +43,9 @@
 0.09000 2011-03-29
 
     - Fix mem leak
-    
+
     - Resolve Moose extends/runtime bug RT #55780
-    
+
     - fix RequestToken classes to work with new Moosified HTML-FormFu
 
 0.08002 2010-09-22
@@ -58,16 +61,16 @@
     - MultiForm actions now also always stash $multi->current_form
       to $c->stash->{form}.
       (key-name configurable via 'form_stash' config option).
-    
+
     - New method suffixes such as "_FORM_VALID", "_FORM_SUBMITTED" to allow
       blocks of code that will only be run under certain circumstances.
 
 0.05000 2009-07-06
 
     - Fix RequestToken to be a hidden field.
-    
+
     - Fix compatibility problem with moosified controllers.
-    
+
     - use tests_recursive() so all tests are run correctly.
 
 0.04003 2009-04-20
@@ -81,9 +84,9 @@
 0.04001 2009-04-15
 
     - New RequestToken feature to stop double-submissions of data.
-    
+
     - Silence "Reference is already weak" warnings.
-    
+
     - Add distribution description to pod (RT #41568)
 
 0.03007 2008-12-08
@@ -94,28 +97,28 @@
 
     - Deprecated config setting $config->{config_file_path}
       use $config->{constructor}{config_file_path} instead.
-    
+
     - Bumped HTML-FormFu prereq - need 0.03004 for load_config_filestem()
       support.
 
 0.03004 2008-09-03
 
     - 'config_file_ext' config setting has been removed.
-    
+
     - Automatically search for form config files with any extension
       supported by Config::Any.
-    
+
     - Add __config()__ callback.
-    
+
     - Support filestems (without extensions) in the FormConfig('file')
       attribute syntax.
-    
+
     - Forms returned by form() now have the query set with the Catalyst
       request object.
-    
+
     - Switched from ACCEPT_CONTEXT to using
       Catalyst::Component::InstancePerContext - recommended by mst.
-    
+
     - Changed config examples to Config::General, to match Catalyst's
       core documentation.
 
@@ -126,7 +129,7 @@
 
 0.02000 2007-12-12
 
-	- Only set INCLUDE_PATH if it's not already set, and if 'root/formfu' 
+	- Only set INCLUDE_PATH if it's not already set, and if 'root/formfu'
 	  exists.
 	- Use of $form->render_class_args() changed to tt_args()
 	- Added support for expanding __path_to()__ in config callback

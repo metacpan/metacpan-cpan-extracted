@@ -1,4 +1,3 @@
-requires 'Config::Tiny';
 requires 'Object::Tiny';
 requires 'perl', '5.008001';
 

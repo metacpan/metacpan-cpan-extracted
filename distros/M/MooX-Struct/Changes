@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/MooX-Struct>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Struct>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.016	2017-05-23
+
+ [ Test Suite ]
+ - Remove stray usage of Scalar::Does in test suite.
+
 0.015	2017-05-11
 
  - Updated: Eliminate dependency on Data::OptList.

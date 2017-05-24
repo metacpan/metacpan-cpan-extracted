@@ -16,13 +16,12 @@ command_short_description 'Execute commands';
 command_long_description
   'Take the parsed files from hpcrunner.pl submit_jobs and executes the code';
 
-option 'infile' => (
+option 'batch_index_start' => (
     is       => 'rw',
-    required => 0,
-    documentation =>
-q{File of commands separated by newline. The command 'wait' indicates all previous commands should finish before starting the next one.},
-    isa    => AbsFile,
-    coerce => 1,
+    isa      => 'Num',
+    required => 1,
+    predicate => 'has_batch_index_start',
+    documentation => 'Counter to tell execute_array where to start reading in the infile'
 );
 
 has 'task_id' => (
@@ -38,7 +37,7 @@ has 'task_id' => (
     required => 0,
 );
 
-sub BUILD {}
+sub BUILD { }
 
 after 'BUILD' => sub {
     my $self = shift;
@@ -52,7 +51,7 @@ after 'BUILD' => sub {
 
     $self->git_things;
 
-    $self->get_infile;
+    # $self->get_infile;
     $self->counter( $self->task_id );
 
     $self->gen_load_plugins;
@@ -63,26 +62,6 @@ sub execute {
     my $self = shift;
 
     $self->run_mce;
-}
-
-sub get_infile {
-    my $self = shift;
-
-    my $outdir = $self->outdir;
-    my $array_counter = sprintf( "%03d", $self->task_id );
-    my $infile;
-
-    $infile =
-      $self->outdir . "/" . $self->logname . "_" . $array_counter . ".in";
-
-    try {
-        $self->infile($infile);
-    }
-    catch {
-        $self->app_log->fatal(
-            'Infile ' . $infile . ' does not exist! Aborting mission!' );
-        exit 1;
-    }
 }
 
 1;

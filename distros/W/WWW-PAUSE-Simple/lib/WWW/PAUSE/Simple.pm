@@ -1,7 +1,7 @@
 package WWW::PAUSE::Simple;
 
-our $DATE = '2017-02-21'; # DATE
-our $VERSION = '0.37'; # VERSION
+our $DATE = '2017-05-20'; # DATE
+our $VERSION = '0.38'; # VERSION
 
 use 5.010001;
 use strict;
@@ -36,7 +36,6 @@ If unset, default value will be searched from `~/.pause`. Encrypted `.pause` is
 not yet supported.
 
 _
-        req     => 1,
         tags    => ['common'],
     },
     password => {
@@ -49,7 +48,6 @@ not yet supported.
 
 _
         is_password => 1,
-        req     => 1,
         tags    => ['common'],
     },
     # 2016-07-13 - for a few months now, PAUSE has been giving random 500 errors
@@ -165,6 +163,9 @@ sub _request {
         while (defined(my $line = <$fh>)) {
             if ($line =~ /^user\s+(.+)/) { $username //= $1 }
             elsif ($line =~ /^password\s+(.+)/) { $password //= $1 }
+        }
+        unless (defined $username && defined $password) {
+            die "Please specify username/password\n";
         }
     }
 
@@ -855,7 +856,7 @@ WWW::PAUSE::Simple - An API for PAUSE
 
 =head1 VERSION
 
-This document describes version 0.37 of WWW::PAUSE::Simple (from Perl distribution WWW-PAUSE-Simple), released on 2017-02-21.
+This document describes version 0.38 of WWW::PAUSE::Simple (from Perl distribution WWW-PAUSE-Simple), released on 2017-05-20.
 
 =head1 SYNOPSIS
 
@@ -892,7 +893,7 @@ Arguments ('*' denotes required arguments):
 
 File names/wildcard patterns.
 
-=item * B<password>* => I<str>
+=item * B<password> => I<str>
 
 PAUSE password.
 
@@ -911,7 +912,7 @@ Number of retries when received 5xx HTTP error from server.
 
 How long to wait before retrying.
 
-=item * B<username>* => I<str>
+=item * B<username> => I<str>
 
 PAUSE ID.
 
@@ -978,7 +979,7 @@ Number of new versions (including newest) to keep.
 1 means to only keep the newest version, 2 means to keep the newest and the
 second newest, and so on.
 
-=item * B<password>* => I<str>
+=item * B<password> => I<str>
 
 PAUSE password.
 
@@ -997,7 +998,7 @@ Number of retries when received 5xx HTTP error from server.
 
 How long to wait before retrying.
 
-=item * B<username>* => I<str>
+=item * B<username> => I<str>
 
 PAUSE ID.
 
@@ -1062,7 +1063,7 @@ Only show this number of newest non-dev versions.
 
 Dev versions will be skipped.
 
-=item * B<password>* => I<str>
+=item * B<password> => I<str>
 
 PAUSE password.
 
@@ -1077,7 +1078,7 @@ Number of retries when received 5xx HTTP error from server.
 
 How long to wait before retrying.
 
-=item * B<username>* => I<str>
+=item * B<username> => I<str>
 
 PAUSE ID.
 
@@ -1124,7 +1125,7 @@ Whether to return detailed records.
 
 File names/wildcard patterns.
 
-=item * B<password>* => I<str>
+=item * B<password> => I<str>
 
 PAUSE password.
 
@@ -1139,7 +1140,7 @@ Number of retries when received 5xx HTTP error from server.
 
 How long to wait before retrying.
 
-=item * B<username>* => I<str>
+=item * B<username> => I<str>
 
 PAUSE ID.
 
@@ -1182,7 +1183,7 @@ Whether to return detailed records.
 
 Module names/wildcard patterns.
 
-=item * B<password>* => I<str>
+=item * B<password> => I<str>
 
 PAUSE password.
 
@@ -1201,7 +1202,7 @@ How long to wait before retrying.
 
 Only list modules matching certain type.
 
-=item * B<username>* => I<str>
+=item * B<username> => I<str>
 
 PAUSE ID.
 
@@ -1243,7 +1244,7 @@ Arguments ('*' denotes required arguments):
 
 File names/wildcard patterns.
 
-=item * B<password>* => I<str>
+=item * B<password> => I<str>
 
 PAUSE password.
 
@@ -1258,7 +1259,7 @@ Number of retries when received 5xx HTTP error from server.
 
 How long to wait before retrying.
 
-=item * B<username>* => I<str>
+=item * B<username> => I<str>
 
 PAUSE ID.
 
@@ -1314,7 +1315,7 @@ Arguments ('*' denotes required arguments):
 
 File names/wildcard patterns.
 
-=item * B<password>* => I<str>
+=item * B<password> => I<str>
 
 PAUSE password.
 
@@ -1329,7 +1330,7 @@ Number of retries when received 5xx HTTP error from server.
 
 How long to wait before retrying.
 
-=item * B<username>* => I<str>
+=item * B<username> => I<str>
 
 PAUSE ID.
 
@@ -1390,7 +1391,7 @@ files will alleviate this problem.
 
 File names/wildcard patterns.
 
-=item * B<password>* => I<str>
+=item * B<password> => I<str>
 
 PAUSE password.
 
@@ -1409,7 +1410,7 @@ How long to wait before retrying.
 
 Subdirectory to put the file(s) into.
 
-=item * B<username>* => I<str>
+=item * B<username> => I<str>
 
 PAUSE ID.
 

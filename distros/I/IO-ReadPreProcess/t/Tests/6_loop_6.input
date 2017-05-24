@@ -1,0 +1,13 @@
+.# Title: For loop with continue
+Before for: i = 0 .. 9
+.for i := 0 ;; i < 10 ;; i++
+.echo i is \v{i}
+.let j := 0
+Before while, continue part way through
+.while ++j < 3
+.echo i is \v{i} j=\v{j}
+.continue
+.echo After continue - should not be seen
+.done
+.done
+After for

@@ -3,7 +3,6 @@ package  MyApp::View::Footer;
 use Moo;
 
 extends 'Catalyst::View::Template::Lace';
-with 'Template::Lace::ModelRole';
 
 has copydate => (is=>'ro', required=>1);
 

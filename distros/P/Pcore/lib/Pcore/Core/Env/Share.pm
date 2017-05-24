@@ -17,22 +17,15 @@ sub _build__temp ($self) {
 }
 
 sub add_lib ( $self, $name, $path, $level ) {
-    if ( $ENV->is_par ) {
+    die qq[resource lib name "$name" is reserved] if exists $RESERVED_LIB_NAME->{$name};
 
-        # under the PAR all resources libs are merged under the "dist" alias
-        $self->_lib->{dist} = [ 0, $path ] if !exists $self->_lib->{dist};
-    }
-    else {
-        die qq[resource lib name "$name" is reserved] if exists $RESERVED_LIB_NAME->{$name};
+    die qq[resource lib "$name" already exists] if exists $self->_lib->{$name};
 
-        die qq[resource lib "$name" already exists] if exists $self->_lib->{$name};
+    # register lib
+    $self->_lib->{$name} = [ $level, $path ];
 
-        # register lib
-        $self->_lib->{$name} = [ $level, $path ];
-
-        # clear cache
-        $self->_clear_storage;
-    }
+    # clear cache
+    $self->_clear_storage;
 
     return;
 }
@@ -206,11 +199,11 @@ sub store ( $self, $path, $file, $lib_name, @ ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 83, 179, 186         | ValuesAndExpressions::ProhibitMismatchedOperators - Mismatched operator                                        |
+## |    3 | 76, 172, 179         | ValuesAndExpressions::ProhibitMismatchedOperators - Mismatched operator                                        |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 153                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 146                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 99                   | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
+## |    1 | 92                   | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

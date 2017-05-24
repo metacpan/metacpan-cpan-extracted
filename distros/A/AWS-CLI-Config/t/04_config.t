@@ -17,6 +17,8 @@ aws_secret_access_key = $default_secret_access_key
 [profile tester]
 aws_access_key_id = $tester_access_key_id
 aws_secret_access_key = $tester_secret_access_key
+s3 =
+  addressing_style = path
 EOS
 
 close $fh;
@@ -33,6 +35,7 @@ subtest 'Specific profile' => sub {
     my $config = AWS::CLI::Config::config('tester');
     is($config->aws_access_key_id, $tester_access_key_id, 'access_key_id');
     is($config->aws_secret_access_key, $tester_secret_access_key, 'secret_access_key');
+    is($config->{s3}->{addressing_style}, 'path', 'nested value');
 };
 
 subtest 'Undefined profile' => sub {

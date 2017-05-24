@@ -2,9 +2,9 @@
 #!start included /usr/lib/perl5/5.10/ExtUtils/MANIFEST.SKIP
 # Avoid version control files.
 \B\.svn\b
-\B\.hg\b
 \B\.git\b
 \B\.gitignore\b
+\B\.hg\b
 \B\.travis\.yml\b
 
 # Avoid Makemaker generated and utility files.
@@ -37,6 +37,7 @@
 ^tmp
 \bTAGS$
 ^MYMETA.yml$
+^MYMETA.json$
 
 \bSu-[\d\.\_]+
 

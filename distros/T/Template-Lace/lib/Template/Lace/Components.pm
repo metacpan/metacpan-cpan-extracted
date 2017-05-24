@@ -2,6 +2,7 @@ package Template::Lace::Components;
 
 use Moo;
 use UUID::Tiny;
+use JSON::MaybeXS ();
 
 has [qw(handlers component_info ordered_component_keys)] => (is=>'ro', required=>1);
 
@@ -157,13 +158,47 @@ sub setup_component_attr {
 
 sub attr_value_handler_factory {
   my ($class, $value) = @_;
+
+
   if(my ($node, $css) = ($value=~m/^\\['"](\@?)(.+)['"]$/)) {
     return $class->setup_css_match_handler($node, $css); # CSS match to content DOM
   } elsif(my $path = ($value=~m/^\$\.(.+)$/)[0]) {
     return $class->setup_data_path_hander($path); # is path to data
+  } elsif($value=~/^\{/) {
+    return $class->setup_hashrefdata_hander($value);
+  }elsif($value=~/^\[/) {
+    return $class->setup_arrayrefdata_hander($value);
   } else {
     return $value; # is literal or 'passthru' value
   }
+}
+
+sub setup_arrayrefdata_hander {
+  my ($class, $value) = @_;
+  my $ref = JSON::MaybeXS::decode_json($value);
+  my @array = map {
+    my $v = $_; $v =~s/^\$\.//;
+    $class->attr_value_handler_factory($v);
+  } @$ref;
+  return sub {
+    my ($ctx, $dom) = @_;
+    return [ map { (ref($_)||'') eq 'CODE' ? $_->($ctx,$dom) : $_ } @array ];
+  };
+}
+
+
+sub setup_hashrefdata_hander {
+  my ($class, $value) = @_;
+  my $ref = JSON::MaybeXS::decode_json($value);
+  my %hash = map {
+    my $v = $ref->{$_};
+    $_ => $class->attr_value_handler_factory($v);
+  } keys %$ref;
+  return sub {
+    my ($ctx, $dom) = @_;
+    my %unrolled = map { $_ => $hash{$_}->($ctx,$dom) } keys(%hash);
+    return \%unrolled;
+  };
 }
 
 sub setup_css_match_handler {

@@ -9,46 +9,9 @@ use Carp;
 use Time::HiRes qw(gettimeofday tv_interval);
 use POSIX qw(strftime);
 
-=encoding utf8
 
-=head1 Mojo::Zabbix - Mojo::Zabbix is a simple perl wrapper of Zabbix API. 
+our $VERSION = '0.11';
 
-Mojo::Zabix - 是对zabbix api函数的简单打包，以便更易于用perl脚本进行
-访问操作zabbix。目前仅支持认证和请求方法，可以用其进行create/get
-/update/delete/exists方法调用，见例子。本模块基于Mojo::useragent，结果
-可以用Mojo:DOM进行处理和内容提取。
- 
-=head1 VERSION
- 
-Version 0.10 
-
-merge Mojo-Zabbix—APP to this repos.
- 
-=cut
-
-our $VERSION = '0.10';
-
-=head1 SYNOPSIS
-
-  use Mojo::Zabbix;
-  
-  my $z = Net::Zabbix->new(
-          url => "https://server/zabbix/",
-          username => 'user',
-          password => 'pass',
-          debug => 1,
-          trace => 0,
-  );
-  
-  my $r = $z->get("host", {
-          filter => undef,
-          search => {
-              host => "test",
-          },
-      }
-  );
-  
-=cut 
 
 # useful defaults Zabbix Constant list:
 
@@ -394,6 +357,48 @@ sub _dbgmsg {
       . join( ', ', @_ ) . "\n";
 }
 
+1;
+ 
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+Mojo::Zabbix - A simple perl wrapper of Zabbix API.
+
+Mojo::Zabix - 是对zabbix api函数的简单打包，以便更易于用perl脚本进行
+访问操作zabbix。目前仅支持认证和请求方法，可以用其进行create/get
+/update/delete/exists方法调用，见例子。本模块基于Mojo::UserAgent，结果
+可以用Mojo:DOM进行处理和内容提取。
+
+=head1 VERSION
+
+Version 0.11
+
+add get group info for zabbix.
+
+=head1 SYNOPSIS
+
+  use Mojo::Zabbix;
+
+  my $z = Net::Zabbix->new(
+          url => "https://server/zabbix/",
+          username => 'user',
+          password => 'pass',
+          debug => 1,
+          trace => 0,
+  );
+
+  my $r = $z->get("host", {
+          filter => undef,
+          search => {
+              host => "test",
+          },
+      }
+  );
+
+
 =head1 AUTHOR
  
 orange, C<< <bollwarm at ijz.me> >>
@@ -448,5 +453,3 @@ This is free software; you can redistribute it and/or modify
 it under the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-1;

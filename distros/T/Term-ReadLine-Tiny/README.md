@@ -4,7 +4,7 @@ Term::ReadLine::Tiny - Tiny implementation of ReadLine
 
 # VERSION
 
-version 1.08
+version 1.09
 
 # SYNOPSIS
 
@@ -168,7 +168,20 @@ Returns the old value.
 
 ## encode\_controlchar($c)
 
-encodes if argument `$c` is a control character, otherwise returns argument `c`.
+encodes if first character of argument `$c` is a control character,
+otherwise returns first character of argument `$c`.
+
+Example: &quot;\\n&quot; is ^J.
+
+## autocomplete($coderef)
+
+Sets a coderef to be used to autocompletion. If `$coderef` is undef,
+will restore default behaviour.
+
+The coderef will be called like `$coderef->($term, $line, $ix)`,
+where `$line` is the existing line, and `$ix` is the current
+location in the history. It should return the completed line, or undef
+if completion fails.
 
 # UTF-8
 
@@ -185,6 +198,10 @@ layer explicitly, if input/output file handles specified with `new()` or `newTTY
                 print "$_\n";
         }
         print "\n";
+
+# KNOWN BUGS
+
+- Cursor doesn&#39;t move to new line at end of terminal line on some native terminals.
 
 # SEE ALSO
 
@@ -219,7 +236,12 @@ This module requires these other modules and libraries:
 
 # AUTHOR
 
-Orkun Karaduman &lt;orkunkaraduman@gmail.com&gt;
+Orkun Karaduman (ORKUN) &lt;orkun@cpan.org&gt;
+
+# CONTRIBUTORS
+
+- Adriano Ferreira (FERREIRA) &lt;ferreira@cpan.org&gt;
+- Toby Inkster (TOBYINK) &lt;tobyink@cpan.org&gt;
 
 # COPYRIGHT AND LICENSE
 

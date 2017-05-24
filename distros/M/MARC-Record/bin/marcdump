@@ -84,9 +84,9 @@ for my $filename ( @files ) {
             }
         }
 
-        if ( $marc->warnings() ) {
+        if ( my @warnings = $marc->warnings() ) {
             ++$errors{$filename};
-            print join( "\n", $marc->warnings(), "" );
+            print join( "\n", @warnings, "" );
         }
     } # while
     $file->close();

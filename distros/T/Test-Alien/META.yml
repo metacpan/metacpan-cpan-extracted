@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.008001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,11 +24,12 @@ requires:
   File::Which: '1.10'
   Test2: '1.302015'
   Test2::Suite: '0.000060'
+  Text::ParseWords: '3.26'
   perl: '5.008001'
 resources:
   IRC: irc://irc.perl.org/#native
   bugtracker: https://github.com/Perl5-Alien/Test-Alien/issues
   homepage: https://metacpan.org/pod/Test::Alien
   repository: git://github.com/Perl5-Alien/Test-Alien.git
-version: '0.14'
+version: '0.15'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,7 +1,14 @@
 Revision history for Data-Validate-CAA
 
+0.04  2017-05-19
+    - Fix broken signature test in 0.03
+
+0.03  2017-05-19
+    - Skip signature test unless in RELASE or AUTHOR testing mode
+    - Make Test::Signature dependency optional
+
 0.02  2017-04-27
-    - change dist name to Data-Validate-DNS-CAA which matches what is inside
+    - Change dist name to Data-Validate-DNS-CAA which matches what is inside
 
 0.01  2017-04-27
     - Initial release

@@ -1,6 +1,6 @@
 
 package PRANG::Cookbook::Node;
-$PRANG::Cookbook::Node::VERSION = '0.18';
+$PRANG::Cookbook::Node::VERSION = '0.20';
 use Moose::Role;
 
 #sub xmlns { "" }

@@ -1,0 +1,30 @@
+bin/entity-escape-xml
+bin/marc2xml
+bin/xml2marc
+Changes
+lib/MARC/File/XML.pm
+Makefile.PL
+MANIFEST
+README
+t/batch-ns.t
+t/batch-ns.xml
+t/batch.t
+t/batch.xml
+t/empty-record-2.xml
+t/empty-record.t
+t/empty-record.xml
+t/encode.t
+t/end-of-stream.t
+t/error-handling.t
+t/escape.mrc
+t/escape.t
+t/external-entities.t
+t/invalid.xml
+t/namespace.t
+t/namespace.xml
+t/parser.t
+t/record.dat
+t/subfield0.t
+t/subfield0.xml
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -4,7 +4,7 @@ use warnings;
 use Moo;
 use MooX::Types::MooseLike::Base qw( Int CodeRef );
 
-our $VERSION = '1.01';
+our $VERSION = '1.03';
 
 =head1 NAME
 
@@ -137,7 +137,7 @@ sub retry {
 
 =head1 AUTHOR
 
-Toby Corkindale, L<mailto:tjc@cpan.org>
+Toby Corkindale -- L<https://github.com/TJC/>
 
 =head1 LICENSE
 

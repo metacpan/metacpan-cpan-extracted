@@ -5,7 +5,7 @@ Term::ReadLine::Tiny - Tiny implementation of ReadLine
 
 =head1 VERSION
 
-version 1.08
+version 1.09
 
 =head1 SYNOPSIS
 
@@ -75,7 +75,7 @@ require Term::ReadKey;
 BEGIN
 {
 	require Exporter;
-	our $VERSION     = '1.08';
+	our $VERSION     = '1.09';
 	our @ISA         = qw(Exporter);
 	our @EXPORT      = qw();
 	our @EXPORT_OK   = qw();
@@ -170,6 +170,19 @@ sub readline
 	my ($line, $index) = ("", 0);
 	my $history_index;
 	my $ins_mode = 0;
+	my ($row, $col);
+
+	my $autocomplete = $self->{autocomplete} || sub
+	{
+		for (my $i = $history_index; $i >= 0; $i--)
+		{
+			if ($history->[$i] =~ /^$line/)
+			{
+				return $history->[$i];
+			}
+		}
+		return;
+	};
 
 	my $write = sub {
 		my ($text, $ins) = @_;
@@ -178,9 +191,9 @@ sub readline
 		my $a = substr($line, $index);
 		@line = @line[0..$index-1];
 		$line = substr($line, 0, $index);
-		print $out " ";
-		print $out "\e[D";
-		print $out "\e[J";
+		#print $out " ";
+		#print $out "\e[D";
+		#print $out "\e[J";
 		for my $c (split("", $text))
 		{
 			$s = encode_controlchar($c);
@@ -201,12 +214,12 @@ sub readline
 		{
 			$s = join("", @a);
 			print $out $s;
-			print $out "\e[D" x length($s);
+			print $out "\b" x length($s);
 		} else
 		{
 			$s = join("", @a);
 			print $out $s;
-			print $out "\e[D" x (length($s) - length(join("", @a[0..length($text)-1])));
+			print $out "\b" x (length($s) - length(join("", @a[0..length($text)-1])));
 		}
 		push @line, @a;
 		$line .= $a;
@@ -223,7 +236,7 @@ sub readline
 	};
 	my $set = sub {
 		my ($text) = @_;
-		print $out "\e[D" x length(join("", @line[0..$index-1]));
+		print $out "\b" x length(join("", @line[0..$index-1]));
 		print $out "\e[J";
 		@line = ();
 		$line = "";
@@ -235,11 +248,11 @@ sub readline
 		my @a = @line[$index..$#line];
 		my $a = substr($line, $index);
 		$index--;
-		print $out "\e[D" x length($line[$index]);
+		print $out "\b" x length($line[$index]);
 		@line = @line[0..$index-1];
 		$line = substr($line, 0, $index);
 		$write->($a);
-		print $out "\e[D" x length(join("", @a));
+		print $out "\b" x length(join("", @a));
 		$index -= scalar(@a);
 	};
 	my $delete = sub {
@@ -248,11 +261,11 @@ sub readline
 		@line = @line[0..$index-1];
 		$line = substr($line, 0, $index);
 		$write->($a);
-		print $out "\e[D" x length(join("", @a));
+		print $out "\b" x length(join("", @a));
 		$index -= scalar(@a);
 	};
 	my $home = sub {
-		print $out "\e[D" x length(join("", @line[0..$index-1]));
+		print $out "\b" x length(join("", @line[0..$index-1]));
 		$index = 0;
 	};
 	my $end = sub {
@@ -264,7 +277,7 @@ sub readline
 	};
 	my $left = sub {
 		return if $index <= 0;
-		print $out "\e[D" x length($line[$index-1]);
+		print $out "\b" x length($line[$index-1]);
 		$index--;
 	};
 	my $right = sub {
@@ -273,9 +286,9 @@ sub readline
 		$index++;
 		if ($index >= length($line))
 		{
-			print $out " ";
-			print $out "\e[D";
-			print $out "\e[J";
+			#print $out " ";
+			#print $out "\e[D";
+			#print $out "\e[J";
 		} else
 		{
 			print $out $line[$index];
@@ -339,14 +352,8 @@ sub readline
 				}
 				when (/\t/)	# ^I
 				{
-					for (my $i = $history_index; $i >= 0; $i--)
-					{
-						if ($history->[$i] =~ /^$line/)
-						{
-							$set->($history->[$i]);
-							last;
-						}
-					}
+					my $newline = $autocomplete->($self, $line, $history_index);
+					$set->($newline) if defined $newline;
 				}
 				when (/\n|\r/)
 				{
@@ -372,7 +379,7 @@ sub readline
 			next;
 		}
 		$esc .= $char;
-		if ($esc =~ /^.\d?\D/)
+		if ($esc =~ /^.(\d+|\d+;\d+)?[^\d;]/)
 		{
 			given ($esc)
 			{
@@ -400,7 +407,7 @@ sub readline
 				{
 					$home->();
 				}
-				when (/^\[(\d)~/)
+				when (/^\[(\d+)~/)
 				{
 					given ($1)
 					{
@@ -441,6 +448,11 @@ sub readline
 							#$print->("\e$esc");
 						}
 					}
+				}
+				when (/^\[(\d+);(\d+)R/)
+				{
+					$row = $1;
+					$col = $2;
 				}
 				default
 				{
@@ -794,7 +806,10 @@ sub utf8
 
 =head2 encode_controlchar($c)
 
-encodes if argument C<$c> is a control character, otherwise returns argument C<c>.
+encodes if first character of argument C<$c> is a control character,
+otherwise returns first character of argument C<$c>.
+
+Example: "\n" is ^J.
 
 =cut
 sub encode_controlchar
@@ -820,6 +835,23 @@ sub encode_controlchar
 	return $s;
 }
 
+=head2 autocomplete($coderef)
+
+Sets a coderef to be used to autocompletion. If C<< $coderef >> is undef,
+will restore default behaviour.
+
+The coderef will be called like C<< $coderef->($term, $line, $ix) >>,
+where C<< $line >> is the existing line, and C<< $ix >> is the current
+location in the history. It should return the completed line, or undef
+if completion fails.
+
+=cut
+sub autocomplete
+{
+	my $self = shift;
+	$self->{autocomplete} = $_[0] if @_;
+}
+
 
 1;
 __END__
@@ -838,6 +870,16 @@ layer explicitly, if input/output file handles specified with C<new()> or C<newT
 		print "$_\n";
 	}
 	print "\n";
+
+=head1 KNOWN BUGS
+
+=over
+
+=item *
+
+Cursor doesn't move to new line at end of terminal line on some native terminals.
+
+=back
 
 =head1 SEE ALSO
 
@@ -890,7 +932,21 @@ B<CPAN> L<https://metacpan.org/release/Term-ReadLine-Tiny>
 
 =head1 AUTHOR
 
-Orkun Karaduman <orkunkaraduman@gmail.com>
+Orkun Karaduman (ORKUN) <orkun@cpan.org>
+
+=head1 CONTRIBUTORS
+
+=over
+
+=item *
+
+Adriano Ferreira (FERREIRA) <ferreira@cpan.org>
+
+=item *
+
+Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

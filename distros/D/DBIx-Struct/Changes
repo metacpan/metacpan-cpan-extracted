@@ -1,3 +1,6 @@
+0.23 Fri May 19 16:40:00 CEST 2017
+         - quote_identifier for insert and update 
+         
 0.22 Thu May 11 20:00:00 CEST 2017
          - more json support fixes 
          

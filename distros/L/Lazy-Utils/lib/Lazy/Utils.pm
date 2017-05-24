@@ -5,11 +5,9 @@ Lazy::Utils - Utility functions
 
 =head1 VERSION
 
-version 1.16
+version 1.17
 
 =head1 SYNOPSIS
-
-Utility functions
 
 	use Lazy::Utils;
 	 
@@ -23,14 +21,12 @@ Utility functions
 	bash_readline($prompt);
 	cmdargs($prefs, @argv);
 	whereis($name, $path);
-	file_cache($tag, $expiry, $subref);
+	file_cache($tag, $expiry, $coderef);
 	get_pod_text($file_name, $section, $exclude_section);
-	term_readline($prompt, $default, $history, $in, $out);
-	term_readkey($in);
 
 =head1 DESCRIPTION
 
-Collection of utility functions all of exported by default
+Collection of utility functions all of exported by default.
 
 =cut
 use strict;
@@ -47,18 +43,18 @@ use Term::ReadKey;
 BEGIN
 {
 	require Exporter;
-	our $VERSION     = '1.16';
+	our $VERSION     = '1.17';
 	our @ISA         = qw(Exporter);
 	our @EXPORT      = qw(trim ltrim rtrim file_get_contents file_put_contents shellmeta system2 _system
 		bash_readline bashReadLine cmdargs commandArgs cmdArgs whereis whereisBin file_cache fileCache
-		get_pod_text getPodText term_readline term_readkey);
+		get_pod_text getPodText);
 	our @EXPORT_OK   = qw();
 }
 
 
-=head2 Functions
+=head1 Functions
 
-=head3 trim($str)
+=head2 trim($str)
 
 trims given string
 
@@ -74,7 +70,7 @@ sub trim
 	return $s
 }
 
-=head3 ltrim($str)
+=head2 ltrim($str)
 
 trims left given string
 
@@ -90,7 +86,7 @@ sub ltrim
 	return $s
 }
 
-=head3 rtrim($str)
+=head2 rtrim($str)
 
 trims right given string
 
@@ -106,7 +102,7 @@ sub rtrim
 	return $s
 }
 
-=head3 file_get_contents($path, $prefs)
+=head2 file_get_contents($path, $prefs)
 
 gets all contents of file in string type
 
@@ -140,7 +136,7 @@ sub file_get_contents
 	return $result;
 }
 
-=head3 file_put_contents($path, $contents, $prefs)
+=head2 file_put_contents($path, $contents, $prefs)
 
 puts all contents of file in string type
 
@@ -177,7 +173,7 @@ sub file_put_contents
 	return $result;
 }
 
-=head3 shellmeta($s, $nonquoted)
+=head2 shellmeta($s, $nonquoted)
 
 escapes metacharacters of interpolated shell string
 
@@ -197,9 +193,9 @@ sub shellmeta
 	return $s;
 }
 
-=head3 system2($cmd, @argv)
+=head2 system2($cmd, @argv)
 
-B<_system($cmd, @argv)> I<WILL BE DEPRECATED>
+B<_system($cmd, @argv)> I<OBSOLETE>
 
 alternative implementation of perls core system subroutine that executes a system command
 
@@ -238,9 +234,9 @@ sub _system
 	return system2(@_);
 }
 
-=head3 bash_readline($prompt)
+=head2 bash_readline($prompt)
 
-B<bashReadLine($prompt)> I<WILL BE DEPRECATED>
+B<bashReadLine($prompt)> I<OBSOLETE>
 
 reads a line from STDIN using Bash
 
@@ -270,11 +266,11 @@ sub bashReadLine
 	return bash_readline(@_);
 }
 
-=head3 cmdargs([$prefs, ]@argv)
+=head2 cmdargs([$prefs, ]@argv)
 
-B<commandArgs([$prefs, ]@argv)> I<WILL BE DEPRECATED>
+B<commandArgs([$prefs, ]@argv)> I<OBSOLETE>
 
-B<cmdArgs([$prefs, ]@argv)> I<WILL BE DEPRECATED>
+B<cmdArgs([$prefs, ]@argv)> I<OBSOLETE>
 
 resolves command line arguments
 
@@ -399,9 +395,9 @@ sub cmdArgs
 	return cmdargs(@_);
 }
 
-=head3 whereis($name, $path)
+=head2 whereis($name, $path)
 
-B<whereisBin($name, $path)> I<WILL BE DEPRECATED>
+B<whereisBin($name, $path)> I<OBSOLETE>
 
 searches valid binary in search path
 
@@ -424,11 +420,11 @@ sub whereisBin
 	return whereis(@_);
 }
 
-=head3 file_cache($tag, $expiry, $subref)
+=head2 file_cache($tag, $expiry, $coderef)
 
-B<fileCache($tag, $expiry, $subref)> I<WILL BE DEPRECATED>
+B<fileCache($tag, $expiry, $coderef)> I<OBSOLETE>
 
-gets most recent cached value in file cache by given tag and caller function if there is cached value in expiry period. Otherwise tries to get current value using $subref, puts value in cache and cleanups old cache values.
+gets most recent cached value in file cache by given tag and caller function if there is cached value in expiry period. Otherwise tries to get current value using $coderef, puts value in cache and cleanups old cache values.
 
 $tag: I<tag for cache>
 
@@ -436,22 +432,22 @@ $expiry: I<cache expiry period>
 
 =over
 
-E<lt>0: I<always gets most recent cached value if there is any cached value. Otherwise tries to get current value using $subref, puts and cleanups.>
+E<lt>0: I<always gets most recent cached value if there is any cached value. Otherwise tries to get current value using $coderef, puts and cleanups.>
 
-=0: I<never gets cached value. Always tries to get current value using $subref, puts and cleanups.>
+=0: I<never gets cached value. Always tries to get current value using $coderef, puts and cleanups.>
 
-E<gt>0: I<gets most recent cached value in cache if there is cached value in expiry period. Otherwise tries to get current value using $subref, puts and cleanups.>
+E<gt>0: I<gets most recent cached value in cache if there is cached value in expiry period. Otherwise tries to get current value using $coderef, puts and cleanups.>
 
 =back
 
-$subref: I<sub reference in CodeRef to get current value>
+$coderef: I<code reference to get current value>
 
 return value: I<cached or current value, otherwise undef if there isn't cached value and current value doesn't get>
 
 =cut
 sub file_cache
 {
-	my ($tag, $expiry, $subref) = @_;
+	my ($tag, $expiry, $coderef) = @_;
 	my $result;
 	my $now = time();
 	my @cleanup;
@@ -500,7 +496,7 @@ sub file_cache
 	}
 	if (not defined($result))
 	{
-		$result = $subref->() if ref($subref) eq 'CODE';
+		$result = $coderef->() if ref($coderef) eq 'CODE';
 		if (defined($result))
 		{
 			my $tmp;
@@ -528,9 +524,9 @@ sub fileCache
 	return file_cache(@_);
 }
 
-=head3 get_pod_text($file_name, $section, $exclude_section)
+=head2 get_pod_text($file_name, $section, $exclude_section)
 
-B<getPodText($file_name, $section, $exclude_section)> I<WILL BE DEPRECATED>
+B<getPodText($file_name, $section, $exclude_section)> I<OBSOLETE>
 
 gets a text of pod contents in given file
 
@@ -589,364 +585,6 @@ sub getPodText
 	return get_pod_text(@_);
 }
 
-=head3 term_readline($prompt, $default, $history, $in, $out)
-
-reads a line from terminal
-
-$prompt: I<prompt, by default ''>
-
-$default: I<initial value of line, by default ''>
-
-$history: I<lines history in ArrayRef, by default undef>
-
-$in: I<terminal input file handle, by default \*STDIN>
-
-$out: I<terminal output file handle, by default \*STDOUT>
-
-return value: I<line>
-
-=cut
-sub term_readline
-{
-	my ($prompt, $default, $history, $a_in, $a_out) = @_;
-	$prompt = "" unless defined($prompt);
-	$default = "" unless defined($default);
-	my $in = $a_in if ref($a_in) eq "GLOB";
-	$in = \$a_in if ref(\$a_in) eq "GLOB";
-	$in = \*STDIN unless defined($in);
-	my $out = $a_out if ref($a_out) eq "GLOB";
-	$out = \$a_out if ref(\$a_out) eq "GLOB";
-	$out = \*STDOUT unless defined($out);
-	unless (-t $in)
-	{
-		my $line = <$in>;
-		chomp $line if defined $line;
-		return $line;
-	}
-	local $\ = undef;
-
-	my $old_sigint = $SIG{INT};
-	local $SIG{INT} = sub {
-		Term::ReadKey::ReadMode('restore', $in);
-		if (defined($old_sigint))
-		{
-			$old_sigint->();
-		} else
-		{
-			print "\n";
-			exit 130;
-		}
-	};
-	my $old_sigterm = $SIG{TERM};
-	local $SIG{TERM} = sub {
-		Term::ReadKey::ReadMode('restore', $in);
-		if (defined($old_sigterm))
-		{
-			$old_sigterm->();
-		} else
-		{
-			print "\n";
-			exit 143;
-		}
-	};
-	Term::ReadKey::ReadMode('cbreak', $in);
-
-	my ($line, $index, $history_index) = ("", 0);
-
-	my $write = sub {
-		my ($text) = @_;
-		my $s;
-		$s = "";
-		for my $c (split(/(.)/, $text))
-		{
-			given ($c)
-			{
-				when (/[\x00-\x1F]/)
-				{
-					$c = "^".chr(0x40+ord($c));
-				}
-				when ($c =~ /[\x7F]/)
-				{
-					$c = "^".chr(0x3F);
-				}
-			}
-			$s .= $c;
-		}
-		$text = $s;
-		substr($line, $index) = $text.substr($line, $index);
-		$index += length($text);
-		$s = substr($line, $index);
-		print $out "\e[J";
-		print $out $text;
-		print $out $s;
-		print $out "\e[D" x length($s);
-	};
-	my $set = sub {
-		my ($text) = @_;
-		print $out "\e[D" x $index;
-		print $out "\e[J";
-		$index = 0;
-		$line = "";
-		$write->($text);
-	};
-	my $backspace = sub {
-		my $s;
-		return if $index <= 0;
-		$index--;
-		substr($line, $index, 1) = "";
-		$s = substr($line, $index);
-		print $out "\e[D\e[J";
-		print $out $s;
-		print $out "\e[D" x length($s);
-	};
-	my $delete = sub {
-		my $s;
-		substr($line, $index, 1) = "";
-		$s = substr($line, $index);
-		print $out "\e[J";
-		print $out $s;
-		print $out "\e[D" x length($s);
-	};
-	my $home = sub {
-		print $out "\e[D" x $index;
-		$index = 0;
-	};
-	my $end = sub {
-		my $s;
-		$s = substr($line, $index);
-		$index += length($s);
-		print $out "\e[J";
-		print $out $s;
-	};
-	my $left = sub {
-		return if $index <= 0;
-		print $out "\e[D";
-		$index--;
-	};
-	my $right = sub {
-		return if $index >= length($line);
-		print $out substr($line, $index, 1);
-		$index++;
-	};
-	my $up = sub {
-		return unless ref($history) eq "ARRAY";
-		return if $history_index <= 0;
-		$history->[$history_index] = $line;
-		$history_index--;
-		$set->($history->[$history_index]);
-	};
-	my $down = sub {
-		return unless ref($history) eq "ARRAY";
-		return if $history_index >= $#$history;
-		$history->[$history_index] = $line;
-		$history_index++;
-		$set->($history->[$history_index]);
-	};
-
-	print $prompt;
-	$set->($default);
-	if (ref($history) eq "ARRAY")
-	{
-		push @$history, $line;
-		$history_index = $#$history;
-	}
-
-	my ($char, $esc) = ("", undef);
-	while (defined($char = getc($in)))
-	{
-		unless (defined($esc))
-		{
-			given ($char)
-			{
-				when (/\e/)
-				{
-					$esc = "";
-				}
-				when (/\t/)
-				{
-				}
-				when (/\n|\r/)
-				{
-					print $out $char;
-					$history->[$#$history] = $line if ref($history) eq "ARRAY";
-					last;
-				}
-				when (/[\b]|\x7F/)
-				{
-					$backspace->();
-				}
-				when (/[\x00-\x1F]|\x7F/)
-				{
-				}
-				default
-				{
-					$write->($char);
-				}
-			}
-			next;
-		}
-		$esc .= $char;
-		if ($esc =~ /^.\d?\D/)
-		{
-			given ($esc)
-			{
-				when (/^\[A/)
-				{
-					$up->();
-				}
-				when (/^\[B/)
-				{
-					$down->();
-				}
-				when (/^\[C/)
-				{
-					$right->();
-				}
-				when (/^\[D/)
-				{
-					$left->();
-				}
-				when (/^\[H/)
-				{
-					$home->();
-				}
-				when (/^\[F/)
-				{
-					$end->();
-				}
-				when (/^\[(\d)~/)
-				{
-					given ($1)
-					{
-						when (1)
-						{
-							$home->();
-						}
-						when (2)
-						{
-							#insert
-						}
-						when (3)
-						{
-							$delete->();
-						}
-						when (4)
-						{
-							$end->();
-						}
-						when (5)
-						{
-							#pageup
-						}
-						when (6)
-						{
-							#pagedown
-						}
-						when (7)
-						{
-							$home->();
-						}
-						when (8)
-						{
-							$end->();
-						}
-						default
-						{
-							#$write->("\e$esc");
-						}
-					}
-				}
-				default
-				{
-					#$write->("\e$esc");
-				}
-			}
-			$esc = undef;
-		}
-	}
-	Term::ReadKey::ReadMode('restore', $in);
-	return $line;
-}
-
-=head3 term_readkey($in)
-
-reads key from terminal
-
-$in: I<terminal input file handle, by default \*STDIN>
-
-return value: I<key in string type>
-
-=cut
-sub term_readkey
-{
-	my ($a_in) = @_;
-	my $in = $a_in if ref($a_in) eq "GLOB";
-	$in = \$a_in if ref(\$a_in) eq "GLOB";
-	$in = \*STDIN unless defined($in);
-	unless (-t $in)
-	{
-		return getc($in);
-	}
-	local $\ = undef;
-
-	my $old_sigint = $SIG{INT};
-	local $SIG{INT} = sub {
-		Term::ReadKey::ReadMode('restore', $in);
-		if (defined($old_sigint))
-		{
-			$old_sigint->();
-		} else
-		{
-			print "\n";
-			exit 130;
-		}
-	};
-	my $old_sigterm = $SIG{TERM};
-	local $SIG{TERM} = sub {
-		Term::ReadKey::ReadMode('restore', $in);
-		if (defined($old_sigterm))
-		{
-			$old_sigterm->();
-		} else
-		{
-			print "\n";
-			exit 143;
-		}
-	};
-	Term::ReadKey::ReadMode('cbreak', $in);
-
-	my $result;
-	my ($char, $esc) = ("", undef);
-	while (defined($char = getc($in)))
-	{
-		unless (defined($esc))
-		{
-			given ($char)
-			{
-				when (/\e/)
-				{
-					$esc = "";
-				}
-				default
-				{
-					$result = $char;
-					last;
-				}
-			}
-			next;
-		}
-		$esc .= $char;
-		if ($esc =~ /^.\d?\D/)
-		{
-			$result = "\e$esc";
-			$esc = undef;
-			last;
-		}
-	}
-	Term::ReadKey::ReadMode('restore', $in);
-	return $result;
-}
-
 
 1;
 __END__
@@ -977,10 +615,6 @@ JSON
 
 Pod::Simple::Text
 
-=item *
-
-Term::ReadKey
-
 =back
 
 =head1 REPOSITORY
@@ -991,7 +625,7 @@ B<CPAN> L<https://metacpan.org/release/Lazy-Utils>
 
 =head1 AUTHOR
 
-Orkun Karaduman <orkunkaraduman@gmail.com>
+Orkun Karaduman (ORKUN) <orkun@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

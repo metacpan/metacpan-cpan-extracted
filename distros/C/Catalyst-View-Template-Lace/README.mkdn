@@ -10,7 +10,6 @@ Define a View:
 
     use Moo;
     extends 'Catalyst::View::Template::Lace';
-    with 'Template::Lace::ModelRole';
 
     has [qw/age name motto/] => (is=>'ro', required=>1);
 

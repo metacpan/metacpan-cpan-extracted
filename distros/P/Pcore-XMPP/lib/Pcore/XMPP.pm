@@ -1,4 +1,4 @@
-package Pcore::XMPP v0.8.1;
+package Pcore::XMPP v0.8.2;
 
 use Pcore -dist;
 

@@ -4,13 +4,13 @@
       "Jens Rehsack <rehsack@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "MooX-File-ConfigDir",
    "no_index" : {
@@ -29,6 +29,9 @@
          }
       },
       "develop" : {
+         "recommends" : {
+            "MooX::ConfigFromFile" : "0.006"
+         },
          "requires" : {
             "Module::CPANTS::Analyse" : "0.96",
             "Test::CPAN::Changes" : "0",
@@ -42,9 +45,10 @@
       },
       "runtime" : {
          "requires" : {
-            "File::ConfigDir" : "0.011",
+            "Carp" : "0",
+            "File::ConfigDir" : "0.018",
             "Moo::Role" : "1.003000",
-            "namespace::clean" : "0",
+            "Scalar::Util" : "0",
             "perl" : "v5.8.1"
          }
       },
@@ -70,5 +74,6 @@
          "web" : "https://github.com/perl5-utils/MooX-File-ConfigDir"
       }
    },
-   "version" : "0.005"
+   "version" : "0.006",
+   "x_serialization_backend" : "JSON::PP version 2.93"
 }

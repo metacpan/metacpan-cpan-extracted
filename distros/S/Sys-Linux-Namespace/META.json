@@ -69,15 +69,15 @@
    "provides" : {
       "Sys::Linux::Mount" : {
          "file" : "lib/Sys/Linux/Mount.pm",
-         "version" : "0.013"
+         "version" : "0.015"
       },
       "Sys::Linux::Namespace" : {
          "file" : "lib/Sys/Linux/Namespace.pm",
-         "version" : "v0.13.0"
+         "version" : "v0.15.0"
       }
    },
    "release_status" : "stable",
-   "version" : "0.013",
+   "version" : "0.015",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024001"

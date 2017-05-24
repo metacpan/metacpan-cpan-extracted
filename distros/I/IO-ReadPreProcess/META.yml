@@ -1,0 +1,23 @@
+---
+abstract: 'Macro processing built into IO::File replacement'
+author:
+  - 'Alain Williams <addw@phcomp.co.uk>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.120351'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IO-ReadPreProcess
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Math::Expression: '1.47'
+  perl: '5.006'
+version: '0.8'

@@ -1,9 +1,9 @@
 package Panda::URI;
 use parent 'Panda::Export';
 use 5.012;
-use Panda::Lib;
+use CPP::panda::lib;
 
-our $VERSION = '1.1.2';
+our $VERSION = '1.1.5';
 
 use Panda::Export {
     ALLOW_LEADING_AUTHORITY => 1,

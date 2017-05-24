@@ -21,5 +21,5 @@ no_index:
 requires:
   JSON: '0'
   PGObject: '0'
-version: 2
+version: 2.000001
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

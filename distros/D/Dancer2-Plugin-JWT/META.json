@@ -4,7 +4,7 @@
       "Alberto Sim\u00f5es <ambs@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -28,9 +28,9 @@
       },
       "runtime" : {
          "requires" : {
+            "Crypt::JWT" : "0",
             "Dancer2" : "0.162000",
             "Dancer2::Plugin" : "0",
-            "JSON::WebToken" : "0",
             "URI" : "0",
             "URI::QueryParam" : "0",
             "strict" : "0",
@@ -55,6 +55,7 @@
          "web" : "https://github.com/ambs/Dancer2-Plugin-JWT"
       }
    },
-   "version" : "0.009"
+   "version" : "0.010",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

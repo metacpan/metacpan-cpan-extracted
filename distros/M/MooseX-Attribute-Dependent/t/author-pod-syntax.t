@@ -2,7 +2,7 @@
 #
 # This file is part of MooseX-Attribute-Dependent
 #
-# This software is Copyright (c) 2016 by Moritz Onken.
+# This software is Copyright (c) 2017 by Moritz Onken.
 #
 # This is free software, licensed under:
 #
@@ -11,8 +11,8 @@
 
 BEGIN {
   unless ($ENV{AUTHOR_TESTING}) {
-    require Test::More;
-    Test::More::plan(skip_all => 'these tests are for testing by the author');
+    print qq{1..0 # SKIP these tests are for testing by the author\n};
+    exit
   }
 }
 

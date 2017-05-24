@@ -1,0 +1,11 @@
+.# Included from 3_include_5.inc
+.# .local variables will have their previous value restored after this .include is closed
+.local thang not_used
+.let thang := 'thang from 3_include_5.1_inc'
+.echo In 3_include_5.1_inc: thang = '\v{thang}'
+.#
+.# _ARGS is specific to this .include, aka .local variable
+.let na := count(_ARGS) ; a0 := na > 0 ? _ARGS[0] : 'undefined'; lasta := _ARGS[na - 1]
+.echo   _ARGS[0] = '\v{a0}' number of args '\v{na}' last arg = '\v{lasta}'
+
+.# END

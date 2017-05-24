@@ -1,42 +1,54 @@
 Revision history for Acme-CPANAuthors-CPAN-OneHundred
 =====================================================
 
+1.12    2017-05-23
+        [New Authors]
+        - FAYLAND
+
+        [See You Again?]
+        - BDFOY
+
+        [Updated Counts]
+        - PERLANCAR, PSIXDISTS, RJBS, TOBYINK, ADAMK, MIYAGAWA, ETHER, JGNI, INGY,
+        - BINGOS, FLORA, KENTNL, DAGOLDEN, PEVANS, DROLSKY, SKIM, PLICEASE, NEILB,
+        - GUGOD, SHLOMIF, RSAVAGE, MRAMBERG
+
 1.11    2016-04-22
-        [ New Authors ]
+        [New Authors]
         - PSIXDISTS, JGNI, PLICEASE
 
-        [ See You Again? ]
+        [See You Again?]
         - SHARYANTO
 
-        [ Updated Counts ]
+        [Updated Counts]
         - PERLANCAR, RJBS, MIYAGAWA, ETHER, BINGOS, DAGOLDEN, KENTNL, MARCEL,
         - PEVANS, DROLSKY, SKIM, NEILB, BARBIE, SHLOMIF, RSAVAGE, SALVA, BDFOY,
         - MLEHMANN, MRAMBERG
 
 1.10    2015-08-16
-        [ Updated Counts ]
+        [Updated Counts]
         - PERLANCAR, RJBS, MIYAGAWA, INGY, FLORA, BINGOS, ETHER, SMUELLER,
         - SHARYANTO, DAGOLDEN, KENTNL, DROLSKY, PEVANS, DMAKI, SKIM, NEILB,
         - SHLOMIF, RSAVAGE, MLEHMANN
 
 1.09    2015-05-23
-        [ Updated Counts ]
+        [Updated Counts]
         - PERLANCAR, RJBS, MIYAGAWA, INGY, SHARYANTO, ETHER, DAGOLDEN, KENTNL,
         - PEVANS, BARBIE, SKIM, BDFOY, NEILB, MLEHMANN, LBROCARD
 
 1.08    2015-03-23
-        [ New Authors ]
+        [New Authors]
         - NEILB
 
-        [ Updated Counts ]
+        [Updated Counts]
         - PERLANCAR, RJBS, MIYAGAWA, INGY, SHARYANTO, DAGOLDEN, ETHER, KENTNL,
         - PEVANS, BARBIE, SKIM, SHLOMIF, RSAVAGE, BDFOY
 
 1.07    2015-02-20
-        [ New Authors ]
+        [New Authors]
         - SKIM, MLEHMANN
 
-        [ Updated Counts ]
+        [Updated Counts]
         - PERLANCAR, SHARYANTO, DAGOLDEN, ETHER, KENTNL, DROLSKY, PEVANS,
         - GUGOD,
         - RSAVAGE
@@ -44,18 +56,18 @@ Revision history for Acme-CPANAuthors-CPAN-OneHundred
 1.06    2015-01-12
         - allow local data file in update script.
 
-        [ New Authors ]
+        [New Authors]
         - PERLANCAR, RSAVAGE
 
-        [ See You Again? ]
+        [See You Again?]
         - MLEHMANN
 
-        [ Updated Counts ]
+        [Updated Counts]
         - RJBS, TOBYINK, SHARYANTO, FLORA, INGY, BINGOS, SMUELLER, DAGOLDEN,
         - ETHER, KENTNL, DROLSKY, PEVANS, GUGOD, BARBIE, SHLOMIF, SALVA, BDFOY
 
 1.05    2014-10-04
-        [ Updated Counts ]
+        [Updated Counts]
         - SHARYANTO, RJBS, TOBYINK, INGY, TOKUHIROM, DAGOLDEN, KENTNL, ETHER,
         - PEVANS, BARBIE
 
@@ -64,15 +76,15 @@ Revision history for Acme-CPANAuthors-CPAN-OneHundred
         - added check100.pl script.
         - extended test suite.
 
-        [ Updated Counts ]
+        [Updated Counts]
         - SHARYANTO, TOBYINK, BINGOS, INGY, DAGOLDEN, ETHER, KENTNL, PEVANS,
         - BARBIE
 
 1.03    2014-06-26
-        [ New Authors ]
+        [New Authors]
         - BARBIE
 
-        [ Updated Counts ]
+        [Updated Counts]
         - SHARYANTO, TOBYINK, INGY, ETHER, KENTNL, PEVANS, SALVA
 
 1.02    2014-06-07
@@ -80,7 +92,7 @@ Revision history for Acme-CPANAuthors-CPAN-OneHundred
         - backup previous list (in the event we need to rerun).
         - reworked ordering of lists.
 
-        [ Updated Counts ]
+        [Updated Counts]
         - SHARYANTO, TOBYINK, DAGOLDEN, ETHER, DROLSKY, KENTNL
 
 1.01    2014-06-01

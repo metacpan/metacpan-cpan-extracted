@@ -1,4 +1,5 @@
 # $Id$
+package DBIx::LogAny;
 require 5.008;
 
 use strict;
@@ -6,13 +7,13 @@ use warnings;
 use Carp qw(croak cluck);
 use Log::Any;
 use Data::Dumper;
+use Scalar::Util qw(blessed);
 
-package DBIx::LogAny;
 use DBIx::LogAny::Constants qw (:masks $LogMask);
 use DBIx::LogAny::db;
 use DBIx::LogAny::st;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 require Exporter;
 our @ISA = qw(Exporter DBI);		# look in DBI for anything we don't do
 
@@ -43,6 +44,10 @@ sub _dbix_la_debug {
 
     local $Data::Dumper::Indent = 0;
     local $Data::Dumper::Quotekeys = 0;
+
+    $args[0] = $args[0]->{Statement} if blessed($args[0]) and
+        blessed($args[0])->isa('DBI::st') and
+            defined ($args[0]->{Statement});
 
     if (scalar(@args) > 1) {
         $h->{logger}->debug(
@@ -231,17 +236,17 @@ Log::Any.
   # Simple log to a file - you'll need IO::File for this
   use DBIx::LogAny;
   use Log::Any::Adapter ('File', '/path/to/file.log');
-  my $dbh = DBIx::Log4perl->connect('dbi:ODBC:mydsn', $user, $pass);
+  my $dbh = DBIx::LogAny->connect('dbi:ODBC:mydsn', $user, $pass);
   $dbh->DBI_METHOD(args);
 
-  # Make DBIx::LogAny like DBIx::Log4perl i.e. use Log::Log4perl
+  # Make DBIx::LogAny like DBIx::Log4perl i.e. use Log::LogAny
   # by default sets the category to DBIx::LogAny. You can override the
   # category with the dbix_la_category attribute.
   use Log::Any::Adapter ('Log4perl');
-  use DBIx::Log4perl;
+  use Log::Log4perl;
   use DBIx::LogAny;
   Log::Log4perl->init("/etc/mylog.conf");
-  my $dbh = DBIx::Log4perl->connect('dbi:ODBC:mydsn', $user, $pass);
+  my $dbh = DBIx::LogAny->connect('dbi:ODBC:mydsn', $user, $pass);
   $dbh->DBI_METHOD(args);
 
   # use your own log handle passed to DBIx::LogAny
@@ -250,7 +255,7 @@ Log::Any.
   use DBIx::LogAny;
   my $log2 = Log::Any->get_logger();
   my $dbh = DBIx::LogAny->connect('dbi:ODBC:mydsn', $user, $pass,
-                                                                 {dbix_la_logger => $log2});
+                                  {dbix_la_logger => $log2});
   $dbh->DBI_METHOD(args);
 
 =head1 DESCRIPTION
@@ -260,7 +265,7 @@ activity via L<Log::Any>. It is based on the much older L<DBIx::Log4perl>.
 
 C<DBIx::LogAny> is almost identical to DBIx::Log4perl except:
 
-o it checks if Log::Log4perl is loaded before setting wrapper_register.
+o it checks if Log::LogAny is loaded before setting wrapper_register.
 
 o Log::Any does not support closures passed to log methods so they are
 removed and an "if $log->is_xxx" added.
@@ -819,7 +824,7 @@ L<http://wiki.cpantesters.org/wiki/CPANInstall>.
 
 =head1 REQUIREMENTS
 
-You will need at least Log::Any 0.14, Log::Log4perl 1.04 and DBI 1.50.
+You will need at least Log::Any 0.14 and DBI 1.50.
 
 DBI-1.51 contains the changes listed under L</NOTES>.
 
@@ -851,7 +856,7 @@ M. J. Evans, E<lt>mjevans@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012 by M. J. Evans
+Copyright (C) 2012-2017 by M. J. Evans
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.7 or,

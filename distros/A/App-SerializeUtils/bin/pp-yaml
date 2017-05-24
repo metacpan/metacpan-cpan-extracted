@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2017-03-01'; # DATE
-our $VERSION = '0.12'; # VERSION
+our $DATE = '2017-05-23'; # DATE
+our $VERSION = '0.13'; # VERSION
 
 use 5.010;
 use strict;
@@ -9,22 +9,40 @@ use warnings;
 
 use Getopt::Long;
 
-#my $json_mod = '';
+my $color = -t STDOUT;
+#my $pretty = 1;
+my $mod = '';
 GetOptions(
-    #'pp' => sub { $json_mod = 'pp' },
-    #'xs' => sub { $json_mod = 'xs' },
+    #'pretty!' => \$pretty,
+    'color!' => \$color,
+    'pp' => sub { $mod = 'pp' },
+    'xs' => sub { $mod = 'xs' },
     'help' => sub {
-        print "Usage: pp-yaml <file>\n";
+        print "Usage: pp-yaml [OPTIONS] <file>\n";
         exit 0;
     },
 );
 
-require YAML::XS;
 undef $/;
-print YAML::XS::Dump(YAML::XS::Load(scalar <>));
+
+if ($mod eq 'xs') {
+    require YAML::XS;
+    print YAML::XS::Dump(YAML::XS::Load(scalar <>));
+} elsif ($mod eq 'pp') {
+    require YAML::Old;
+    print YAML::Old::Dump(YAML::Old::Load(scalar <>));
+} else {
+    require YAML::XS;
+    if ($color) {
+        require YAML::Tiny::Color;
+        print YAML::Tiny::Color::Dump(YAML::XS::Load(scalar <>));
+    } else {
+        print YAML::XS::Dump(YAML::XS::Load(scalar <>));
+    }
+}
 
 1;
-# ABSTRACT: Pretty-print YAML
+# ABSTRACT: Pretty-print (and colorize) YAML
 # PODNAME: pp-yaml
 
 __END__
@@ -35,13 +53,36 @@ __END__
 
 =head1 NAME
 
-pp-yaml - Pretty-print YAML
+pp-yaml - Pretty-print (and colorize) YAML
 
 =head1 VERSION
 
-This document describes version 0.12 of pp-yaml (from Perl distribution App-SerializeUtils), released on 2017-03-01.
+This document describes version 0.13 of pp-yaml (from Perl distribution App-SerializeUtils), released on 2017-05-23.
+
+=head1 DESCRIPTION
+
+By default, when in interactive mode will pretty-print and colorize YAML using
+L<YAML::Tiny::Color>, and when piped will pretty-print YAML using L<YAML::XS>.
 
 =head1 OPTIONS
+
+=over
+
+=item * --color, --no-color
+
+Force using color (YAML::Tiny::Color) or no color. The default is to check
+whether STDOUT is not piped (interactive mode) to enable color.
+
+=item * --pp
+
+Force using a PP (pure-Perl) module (currently L<YAML::Old>) instead of the
+default L<YAML::XS>.
+
+=item * --xs
+
+Force using an XS module (currently L<YAML::XS>).
+
+=back
 
 =head1 HOMEPAGE
 
@@ -49,7 +90,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Serial
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-App-SerializeUtils>.
+Source repository is at L<https://github.com/perlancar/perl-App-SerializeUtils>.
 
 =head1 BUGS
 

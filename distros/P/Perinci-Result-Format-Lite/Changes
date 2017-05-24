@@ -1,3 +1,13 @@
+0.24    2017-05-24 (PERLANCAR)
+
+	- Allow field format to be of the form [NAME, \%OPTS] instead of
+	  just NAME.
+
+        - Recognize field format 'percent' (with option 'sprintf').
+
+        - [Bugfix] Fix applying formatting for aoaos.
+
+
 0.23    2017-01-10 (PERLANCAR)
 
 	- Remove embedding of Data::Check::Structure, Text::Table::Any,

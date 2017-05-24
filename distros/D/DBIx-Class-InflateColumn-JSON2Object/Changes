@@ -1,5 +1,9 @@
 Revision history for DBIx-Class-InflateColumn-JSON2Object
 
+0.903   2017-05-19T13:25:33
+    - add array_of_class to store a list of objects of one class
+
+
 0.902   2017-05-11T11:07:21
     - handle nested Objects (if they have proper types and coercions)
 

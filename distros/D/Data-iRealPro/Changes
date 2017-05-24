@@ -1,5 +1,11 @@
 Revision history for Data-iRealPro
 
+1.08	2017-05-22
+
+	Fix problem with text input where space separated chords did
+	not get a comma.
+	Also fixed some other comma problems with text in/output.
+
 1.07	2017-03-07
 
 	Improvements to MusicXML import.

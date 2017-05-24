@@ -25,7 +25,7 @@ use Test::More;
 my @supported_functions = (
                             qw(config_dirs system_cfg_dir desktop_cfg_dir),
                             qw(core_cfg_dir site_cfg_dir vendor_cfg_dir),
-                            qw(local_cfg_dir here_cfg_dir singleapp_cfg_dir),
+                            qw(local_cfg_dir here_cfg_dir singleapp_cfg_dir vendorapp_cfg_dir),
 			    qw(xdg_config_dirs xdg_config_home user_cfg_dir),
                           );
 

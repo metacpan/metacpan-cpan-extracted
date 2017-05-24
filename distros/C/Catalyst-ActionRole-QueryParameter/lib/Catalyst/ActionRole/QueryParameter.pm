@@ -4,7 +4,7 @@ use Moose::Role;
 use Scalar::Util ();
 requires 'attributes', 'match', 'match_captures';
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 sub _resolve_query_attrs {
   @{shift->attributes->{QueryParam} || []};
@@ -68,6 +68,7 @@ has query_constraints => (
         my $default = undef;
         if($attr_param =~m/=/) {
           ($attr_param, $default) = split('=', $attr_param);
+          $not = '?' unless $default; # allow "arg=" to mean "?arg"
         }
 
         if($default and ($not eq '?')) {
@@ -208,11 +209,14 @@ Here are some example C<QueryParam> attributes and the queries they match:
     QueryParam('page=1') ## 'page' defaults to 1
     QueryParam('!page')  ## 'page' must NOT exist
     QueryParam('?page')  ## 'page' may optionally exist
+    QueryParam('page=')  ## Same as previous
     QueryParam('page:==1')  ## 'page' must equal numeric one
     QueryParam('page:>1')  ## 'page' must be great than one
     QueryParam('!page:>1')  ## 'page' must NOT be great than one
     QueryParam(page:Int) ## 'page' matches an Int constraint (see below)
     QueryParam('?page:Int')  ## 'page' may optionally exist, but if it does must be an Int
+    QueryParam('page=:Int')  ## Same as previou
+
 
 Since as I mentioned, it is generally not awesome web development practice to
 make excessive use of query parameters for mapping your action logic, I have

@@ -1,4 +1,4 @@
-package Pcore::SMTP v0.1.1;
+package Pcore::SMTP v0.2.0;
 
 use Pcore -dist, -const, -class, -result;
 use Pcore::AE::Handle;
