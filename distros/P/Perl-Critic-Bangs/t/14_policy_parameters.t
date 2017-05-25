@@ -5,6 +5,7 @@ use warnings;
 
 use English qw(-no_match_vars);
 
+use Perl::Critic::Config ();
 use Perl::Critic::UserProfile qw();
 use Perl::Critic::PolicyFactory (-test => 1);
 use Perl::Critic::PolicyParameter qw{ $NO_DESCRIPTION_AVAILABLE };

@@ -19,7 +19,7 @@ my $build = Module::Build->new(
 		'Log::Log4perl'   =>  0,            # Devel::DebugHooks::TraceAccess.pm
 		'IO::Async::Loop' =>  0,            # bin/dclient.pl
 	},
-	test_requires      => {
+	test_requires      => {                 # Requires Module::Build 0.4004
 		'Test::More'            =>  0,
 		'Test::Output'          =>  0,
 		'Test::CheckDeps'       =>  0,
@@ -27,10 +27,10 @@ my $build = Module::Build->new(
 		'Data::Section::Simple' =>  0,
 	},
 	configure_requires => {
-		'Module::Build'         =>  0,
+		'Module::Build'         =>  0.42,   # Recomented by LEONT
 	},
 	license            => 'perl',
-	# create_makefile_pl => 'traditional',
+	create_makefile_pl => 'traditional',
 	create_license     => 1,
 	meta_merge         => {
 		resources => {

@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::BackendMgr;
-$Config::Model::BackendMgr::VERSION = '2.102';
+$Config::Model::BackendMgr::VERSION = '2.103';
 use Mouse;
 use strict;
 use warnings;
@@ -814,7 +814,7 @@ Config::Model::BackendMgr - Load configuration node on demand
 
 =head1 VERSION
 
-version 2.102
+version 2.103
 
 =head1 SYNOPSIS
 

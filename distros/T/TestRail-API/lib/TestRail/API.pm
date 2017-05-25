@@ -2,7 +2,7 @@
 # PODNAME: TestRail::API
 
 package TestRail::API;
-$TestRail::API::VERSION = '0.039';
+$TestRail::API::VERSION = '0.040';
 
 use 5.010;
 
@@ -198,7 +198,7 @@ sub getUsers {
     my $res = $self->_doRequest('index.php?/api/v2/get_users');
     return -500 if !$res || ( reftype($res) || 'undef' ) ne 'ARRAY';
     $self->{'user_cache'} = $res;
-    return $res;
+    return clone($res);
 }
 
 #I'm just using the cache for the following methods because it's more straightforward and faster past 1 call.
@@ -474,13 +474,13 @@ sub sectionNamesToIds {
 sub getCaseTypes {
     state $check = compile(Object);
     my ($self) = $check->(@_);
-    return $self->{'type_cache'} if defined( $self->{'type_cache'} );
+    return clone( $self->{'type_cache'} ) if defined( $self->{'type_cache'} );
 
     my $types = $self->_doRequest("index.php?/api/v2/get_case_types");
     return -500 if !$types || ( reftype($types) || 'undef' ) ne 'ARRAY';
     $self->{'type_cache'} = $types;
 
-    return $types;
+    return clone $types;
 }
 
 sub getCaseTypeByName {
@@ -871,8 +871,8 @@ sub deletePlan {
 }
 
 sub getPlans {
-    state $check = compile( Object, Int );
-    my ( $self, $project_id ) = $check->(@_);
+    state $check = compile( Object, Int, Optional [ Maybe [HashRef] ] );
+    my ( $self, $project_id, $filters ) = $check->(@_);
 
     my $initial_plans =
       $self->getPlansPaginated( $project_id, $self->{'global_limit'}, 0 );
@@ -885,7 +885,7 @@ sub getPlans {
         $initial_plans = $self->getPlansPaginated(
             $project_id,
             $self->{'global_limit'},
-            ( $self->{'global_limit'} * $offset )
+            ( $self->{'global_limit'} * $offset ), $filters
         );
         push( @$plans, @$initial_plans );
         $offset++;
@@ -894,9 +894,14 @@ sub getPlans {
 }
 
 sub getPlansPaginated {
-    state $check = compile( Object, Int, Optional [ Maybe [Int] ],
-        Optional [ Maybe [Int] ] );
-    my ( $self, $project_id, $limit, $offset ) = $check->(@_);
+    state $check = compile( Object,
+        Int,
+        Optional [ Maybe [Int] ],
+        Optional [ Maybe [Int] ],
+        Optional [ Maybe [HashRef] ]
+    );
+    my ( $self, $project_id, $limit, $offset, $filters ) = $check->(@_);
+    $filters //= {};
 
     confess( "Limit greater than " . $self->{'global_limit'} )
       if $limit > $self->{'global_limit'};
@@ -904,6 +909,9 @@ sub getPlansPaginated {
     $apiurl .= "&offset=$offset" if defined($offset);
     $apiurl .= "&limit=$limit"
       if $limit;    #You have problems if you want 0 results
+    foreach my $key ( keys(%$filters) ) {
+        $apiurl .= "&$key=$filters->{$key}";
+    }
     return $self->_doRequest($apiurl);
 }
 
@@ -1070,7 +1078,7 @@ sub getTests {
     $self->{tests_cache} //= {};
     $self->{tests_cache}->{$run_id} = $results;
 
-    return $results;
+    return clone($results);
 }
 
 sub getTestByName {
@@ -1138,7 +1146,7 @@ sub getPossibleTestStatuses {
 
     $self->{'status_cache'} =
       $self->_doRequest('index.php?/api/v2/get_statuses');
-    return $self->{'status_cache'};
+    return clone $self->{'status_cache'};
 }
 
 sub statusNamesToIds {
@@ -1347,7 +1355,7 @@ TestRail::API - Provides an interface to TestRail's REST api via HTTP
 
 =head1 VERSION
 
-version 0.039
+version 0.040
 
 =head1 SYNOPSIS
 
@@ -1430,6 +1438,8 @@ Returns ARRAYREF of user definition HASHREFs.
 
 Get user definition hash by ID, Name or Email.
 Returns user def HASHREF.
+
+For efficiency's sake, these methods cache the result of getUsers until you explicitly run it again.
 
 =head2 userNamesToIds(names)
 
@@ -2107,7 +2117,7 @@ Returns BOOLEAN.
 
     $tr->deletePlan(8675309);
 
-=head2 B<getPlans (project_id)>
+=head2 B<getPlans (project_id,filters)>
 
 Gets all test plans in specified project.
 Like getRuns, must make multiple HTTP requests when the number of results exceeds 250.
@@ -2115,6 +2125,8 @@ Like getRuns, must make multiple HTTP requests when the number of results exceed
 =over 4
 
 =item INTEGER C<PROJECT ID> - ID of parent project.
+
+=item HASHREF C<FILTERS> - (optional) dictionary of filters, with keys corresponding to the documented filters for get_plans (other than limit/offset).
 
 =back
 
@@ -2125,7 +2137,23 @@ Returns ARRAYREF of all plan definition HASHREFs in a project.
 Does not contain any information about child test runs.
 Use getPlanByID or getPlanByName if you want that, in particular if you are interested in using getChildRunByName.
 
-=head2 B<getPlansPaginated (project_id,limit,offset)>
+Possible filters:
+
+=over 4
+
+=item created_after (UNIX timestamp)
+
+=item created_before (UNIX timestamp)
+
+=item created_by (csv of ints) IDs of users plans were created by
+
+=item is_completed (bool)
+
+=item milestone_id (csv of ints) IDs of milestone assigned to plans
+
+=back
+
+=head2 B<getPlansPaginated (project_id,limit,offset,filters)>
 
 Get some plans for specified project.
 
@@ -2136,6 +2164,8 @@ Get some plans for specified project.
 =item INTEGER C<LIMIT> - Number of plans to return.
 
 =item INTEGER C<OFFSET> - Page of plans to return.
+
+=item HASHREF C<FILTERS> - (optional) other filters to apply to the requests.  See getPlans for more information.
 
 =back
 

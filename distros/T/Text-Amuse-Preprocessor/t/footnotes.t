@@ -4,6 +4,14 @@ use utf8;
 use strict;
 use warnings;
 
+BEGIN {
+    if (!eval q{ use Test::Differences; unified_diff; 1 }) {
+        *eq_or_diff = \&is_deeply;
+    }
+}
+
+
+
 use File::Spec::Functions qw/catfile catdir/;
 use Text::Amuse::Preprocessor;
 use Text::Amuse::Preprocessor::Footnotes;
@@ -19,10 +27,11 @@ foreach my $good (qw/good good2 good-3/) {
     my $input    = catfile(qw/t footnotes/, $good . '.in');
     my $expected = catfile(qw/t footnotes/, $good . '.out');
     diag "Testing $input => $expected";
-    $pp = Text::Amuse::Preprocessor::Footnotes->new(input => $input,
-                                                    output => $out,
-                                                    debug  => 0,
-                                                  );
+    $pp = Text::Amuse::Preprocessor->new(input => $input,
+                                         output => $out,
+                                         fix_footnotes  => 1,
+                                         debug  => 0,
+                                        );
     ok ($pp->process, "success") or diag Dumper($pp->error);
     ok (!$pp->error);
     compare_files($out, $expected);
@@ -62,7 +71,7 @@ is_deeply ($pp->error, {
 
 sub compare_files {
     my ($got, $exp) = @_;
-    is_deeply([split /\n/, Text::Amuse::Preprocessor->_read_file($got)],
+    eq_or_diff([split /\n/, Text::Amuse::Preprocessor->_read_file($got)],
               [split /\n/, Text::Amuse::Preprocessor->_read_file($exp)],
               "$got is equal to $exp") ? unlink $got : die;
 }

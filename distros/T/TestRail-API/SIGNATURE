@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,49 +14,51 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 d1c1413d02cc606be3bf006655d90f088122046b .travis.yml
-SHA1 869de6373998a5454134a5f5869052869b9d764b Changes
+SHA1 83408de0d98e01fbbe81af9493b7ac4ee9a7a1c1 .travis.yml
+SHA1 594325510a75833971ca84117e07a15c4ba11f20 Changes
 SHA1 be8286b691b1b1f0e2137e7d9857b1656c777858 LICENSE
-SHA1 5675b2b6eef3f0cb8250ee9c10ce1ae974fee005 MANIFEST
-SHA1 45f5e93bfcd2cd2c1507d426031b0a7771bae576 META.json
-SHA1 b382b40c1c1b37e757da67045fa00d5a948db593 META.yml
-SHA1 45e899b75ca1bcd36bbf70fb18d22c11c0a55b00 Makefile.PL
-SHA1 6f8690c76fb49f799d26bb72c07172aa8854f1ea README
-SHA1 d1c1413d02cc606be3bf006655d90f088122046b TestRail-API-0.039/.travis.yml
-SHA1 d1c1413d02cc606be3bf006655d90f088122046b TestRail-API-0.039/TestRail-API-0.039/.travis.yml
-SHA1 d1c1413d02cc606be3bf006655d90f088122046b TestRail-API-0.039/TestRail-API-0.039/TestRail-API-0.039/.travis.yml
-SHA1 b44d01ad13404a5063c4b10b551d4c351ff2ce15 bin/testrail-bulk-mark-results
-SHA1 f7b0d29179ca7c883fc2684286874241eb2ef9ea bin/testrail-cases
-SHA1 123532a045ee828a0474dff0865faf05a05fadc2 bin/testrail-lock
-SHA1 b72354ca6b7bff078810abf4dc68456aa7362a2b bin/testrail-report
-SHA1 5a2fe041d9ff1f27d37f080c002b1e0434687b62 bin/testrail-results
-SHA1 fdb1fbba46bb83089f809b667626e408ae1cb69b bin/testrail-runs
-SHA1 ac89b0354b378708e6b80df108edc5f4387d7979 bin/testrail-tests
-SHA1 41bb0ce240ac8bd44bb446f017f00fd152d4aa78 lib/App/Prove/Plugin/TestRail.pm
-SHA1 d08ebd55ece6b088ab6fbe2f8c82478c993dc2c6 lib/Test/Rail/Harness.pm
-SHA1 d84aed6872c85d9ef9ba821e1dcf4681944c35ca lib/Test/Rail/Parser.pm
-SHA1 9eab523875d04954c44f5bcfb408b35844e13df2 lib/TestRail/API.pm
-SHA1 834bba4fd8e3f711bd674602923a89a8598b573d lib/TestRail/Utils.pm
-SHA1 b34e7f4276885612a210a2040093ef287c459db3 lib/TestRail/Utils/Find.pm
-SHA1 0317c2ce24774593fd226df96731775b9b402a85 lib/TestRail/Utils/Lock.pm
-SHA1 26db3621feeb155e44b5f396aa8e3b6e535eada9 lib/TestRail/Utils/Results.pm
+SHA1 ebb7d1f7119f5c3fd55a6f78da9ce53b1032ab62 MANIFEST
+SHA1 f9700ba82c9bba1264242f39afd518f558919dec META.json
+SHA1 b4b844a1313fd8fd0d75bd7b971a989a2a361463 META.yml
+SHA1 bb5203181888b254fed08e94227c64b338b2cdf3 Makefile.PL
+SHA1 c9d632866d4d40f2cb63a027505a52548679d5d5 README
+SHA1 81a6cc7d54e621921c59c5e0a89ad324ae5ae94b bin/testrail-bulk-mark-results
+SHA1 eeef3d6ed2fdc36bd2dce76bcc9b2d2b92b71efb bin/testrail-cases
+SHA1 f9371f3396e3439c297be61bc90192dfc98fa20e bin/testrail-lock
+SHA1 4ed92ee6c658dd895b265efa1241fa4b31946353 bin/testrail-report
+SHA1 a10e5b7a3c967755268a1262072c7c2e5c80d7b4 bin/testrail-results
+SHA1 6b26b32041786cad454bedc144f3e82e8d43d13a bin/testrail-runs
+SHA1 712bdbb9577bc4d000abe6c8f400eea04710375c bin/testrail-tests
+SHA1 12739d2f32b3feb7f8394004246cc77f5eafc7d2 lib/App/Prove/Plugin/TestRail.pm
+SHA1 6132e2350f0b275219b01e7bccaa5cbd300b72c7 lib/Test/Rail/Harness.pm
+SHA1 23649fe0e479f75c67e3c29d8d2d7a0785a55d89 lib/Test/Rail/Parser.pm
+SHA1 33fcbf6c2d3a9d61d04ee525bd0116718db4d228 lib/TestRail/API.pm
+SHA1 e8c312bf24149f72d3a3df0e0113ca01ae953e02 lib/TestRail/Utils.pm
+SHA1 098788888e2741aafac1f55d37f02d45c96a2cc4 lib/TestRail/Utils/Find.pm
+SHA1 0ab548c5058490aa985a3abadf8f6c485883c1a3 lib/TestRail/Utils/Lock.pm
+SHA1 aa07d76f685142b8cdae9d4c63cde376b2662b77 lib/TestRail/Utils/Results.pm
 SHA1 8f3d29d1290a73ede841239d1cd6f5c542633a7e perlcriticrc
 SHA1 01a3ba2c7b8a4a3b085ad4d015a129839a04aec8 t/.testrailrc
-SHA1 9bb2250bb0569080df5685238031826a19c12a29 t/00-compile.t
+SHA1 e3198ba31d31bf64531c410648c3a9805bae7c77 t/00-compile.t
 SHA1 2bcb7f8111dde45de9911e2b734eab3ce4d7796c t/App-Prove-Plugin-Testrail.t
 SHA1 1c7ab832d5842598dfb89f78e7f690ffb301a663 t/Test-Rail-Parser.t
 SHA1 be5c235101eee6411db4ba0272639dfd014a3053 t/TestRail-API-mockOnly.t
 SHA1 07ce3b012fb24756abf16b81694c4653663dc023 t/TestRail-API-sections.t
-SHA1 dba7e12a35d76bd376f6c2df60e85039b563ef72 t/TestRail-API.t
+SHA1 0183bb81c82ddc5938152031312d734b461615d2 t/TestRail-API.t
 SHA1 155b7531647308089c5071ee977197ed43206165 t/TestRail-Utils-Find.t
-SHA1 3dbc9f9f10f35ae38d703cd4651355915db700e2 t/TestRail-Utils-Lock.t
+SHA1 0bbdf1991f8ce07b61ed263dad3969b9a3dea091 t/TestRail-Utils-Lock.t
 SHA1 526bed6b6fcba9b2279702106f2d7931afc9cb25 t/TestRail-Utils-Results.t
 SHA1 e31d0940670831d4e894f80d7520cf3c0fbffd99 t/TestRail-Utils.t
 SHA1 86910babbd6fd51d2df51bc0c695c344dc26b705 t/arg_types.t
-SHA1 8d1a03eb938a8545b0625fc472996c62a8e4be52 t/author-critic.t
-SHA1 f31901ae0381023c0a6dccedadabeb4d801eeba4 t/author-eol.t
-SHA1 4d84cbd8f79cbaa2dd20240338126d1ea7dc452f t/author-no-tabs.t
-SHA1 aee02bccb071125698266c00f99ca82292b2e711 t/author-pod-spell.t
+SHA1 d6df8e1df822a30a9dcedc22ad1cd02495bae321 t/author-critic.t
+SHA1 1468262012241303a1c17b84fb3c8c0a6ccc0d25 t/author-eol.t
+SHA1 ea89f21d866b81da4a4799f50503666e09620ac3 t/author-mojibake.t
+SHA1 ec9b65736dd1b4befb45fc058be882a98e66a13f t/author-no-tabs.t
+SHA1 545af31470c3e0784f83ee2c7714af89114f571f t/author-pod-linkcheck.t
+SHA1 02861bae626f85e8cb65cacb152bf44cd4195156 t/author-pod-spell.t
+SHA1 8efad25309730a4d501fb40fc03eda4697303372 t/author-pod-syntax.t
+SHA1 5bbd54e00858f737ecedcd84d6541205a53aad29 t/author-synopsis.t
+SHA1 60dcfab54478213041dc8be6a2ba88deb9fb6136 t/author-test-version.t
 SHA1 9ae0bff78c85ffa0766eca9c1c5e268a4b5e5711 t/data/faketest_cache.json
 SHA1 754224a7e9a657047f0c31a93aa76af4f418609b t/fake.tap
 SHA1 f4b92dd832fcddcee778fea989eb89cf679e1203 t/fake.test
@@ -68,16 +70,11 @@ SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 t/lock_data/lockmetoo.test
 SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 t/lock_data/sortalockme.test
 SHA1 e3ab5698b0519670b0f81e005dee724ee5ff9db0 t/notests.test
 SHA1 e88c39573c0cca3a3fb3bcf0d2f39b40f9536a02 t/pass.test
-SHA1 c019f763f1afade90b7f6f24628af4d8fde358fa t/release-cpan-changes.t
-SHA1 a8a3b6c291113fff0f1765ef584a08bc4498bdc0 t/release-kwalitee.t
-SHA1 1e5e41a9f043f46a7681ab44a3dd3c4a7cdb85cd t/release-meta-json.t
-SHA1 54ed25287b7e1c9ff328eaf126d438438c8a1d48 t/release-minimum-version.t
-SHA1 54b7f39e355424cbc367105b84ff02a6cb29d93b t/release-mojibake.t
-SHA1 4f2933df3566db6f337817aa885889deb213960b t/release-pod-linkcheck.t
-SHA1 dc3eefcab3399f9a70861c332bb4a81ddcbb45e4 t/release-pod-syntax.t
-SHA1 44aad671b03350a7f2d915c721dab2f1c2e068f5 t/release-synopsis.t
-SHA1 bf310945c1fee7c9fd35e1c4c5230d337f6892af t/release-test-version.t
-SHA1 17514255b5ff5f46ac8ce9e9e3c887c9a205c8ba t/release-unused-vars.t
+SHA1 4d71aa410718ac64818e0613d570afaf8e89267d t/release-cpan-changes.t
+SHA1 d527491e13186274d2947c0d9f4b7a8a8d227616 t/release-kwalitee.t
+SHA1 e3da53e86c3ac7acf8d81aed228ee28ad3482393 t/release-meta-json.t
+SHA1 da43813fce49be97f1573711728fa277e253395b t/release-minimum-version.t
+SHA1 af52a2c44bef464f8283799f023531c9dd9f020f t/release-unused-vars.t
 SHA1 4b04c788cdc78dd294a1f3f11200581cb77bfcba t/seq_multiple_files.tap
 SHA1 6f6ec47fca8a4425d360b3857b415ebe4f8baeee t/server_dead.t
 SHA1 2fa0bd412e20f8bd8dd9a9e77418c8007208f297 t/skip.test
@@ -96,11 +93,11 @@ SHA1 edaf16fa4a2e70e474bc60aa5ebe4b35933c1702 t/todo_pass_and_fail.test
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iQEcBAEBAgAGBQJYvuqBAAoJEFuXw5BFhGAyfNkH/04AymjSGUqSX5J4IkJCpqOg
-S3sV1tvHiQ/FtIaXTQ4+adjZx12kWKwdLmqOTd8bMjyO523MMbB11G30xIiGL9H7
-h63rEtpGGFu6dNBSUaa7BKvNbpjZ77xLEbVcm5WP29NW3c8kOXJ58MJoduwsX3/V
-VtF3bthQRMBH/kG8ryGxhflc27dCJK7hd2Rq5NotnHgL/exwnxJXBzzSn/th84lA
-Is50P5AVPdUQw2o/Uue/hwJ06kGVIYq6oCpfbN9rluil6py9JCeV1Hg7t5bT3kZ6
-eBWZ3hpRPDpOtJct9kTLdy6dEhdeDvQs5Jj6jjmWWX98DmfKEwXSRR+61IKkQwA=
-=j5xO
+iQEcBAEBAgAGBQJZJd6cAAoJEFuXw5BFhGAy930H/0O9zRB1p/Iqaxgpgsp4pmvz
+t5FFEPcVUVv70fM+IAuLlHzH+ALlI6+WZ9lt+1g7Z17oHC7nSGHuc/Gqk7pYUeE8
+h+KvY7uu8mCigv/QKXYIa91c1sKJbc0WApxuG7DoY7kCCYm7pCzNdAYWCmkUuWrn
+54t8Tq0vIqu4TvF9lY15K3TJW8oMBLdvH9zuVJFgyodGtDbdLLMPDnpH8inn+lzg
+0QRvHLqXRxBjOKBOxDPZ36RwhV5EtCaAjorAoGFWo4FgBdv8cf6EQkTatvFjer0k
+aJ9ixQqVBGkKxnFy5bacE24JEnifWLo4zvuV/tJyC5OcoHcXGE9v98k8O7yUlJg=
+=+7Af
 -----END PGP SIGNATURE-----

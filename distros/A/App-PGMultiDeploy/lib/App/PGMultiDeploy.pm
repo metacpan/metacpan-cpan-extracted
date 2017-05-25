@@ -16,11 +16,11 @@ App::PGMultiDeploy - OO deployment to multiple dbs for Pg
 
 =head1 VERSION
 
-Version 0.004
+Version 0.004.001
 
 =cut
 
-our $VERSION = 0.004000;
+our $VERSION = 0.004001;
 
 
 =head1 SYNOPSIS
@@ -242,7 +242,7 @@ Many thanks to Sedex Global for funding the initial version of this tool.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 Chris Travers.
+Copyright 2016-2017 Chris Travers.
 
 This program is distributed under the (Revised) BSD License:
 L<http://www.opensource.org/licenses/BSD-3-Clause>

@@ -51,39 +51,22 @@ You should consult the above link for the full text of the user
 agreement before using this software to retrieve content from the Space
 Track web site.
 
-=head1 NOTICE: DATA THROTTLING
+=head2 DEPRECATION NOTICE: IRIDIUM STATUS
 
-Space Track announced August 19 2013 that beginning September 22 they
-would limit users to less than 20 API queries per minute. Experience
-seems to say they jumped the gun - at least, server errors during
-testing were turned into success by throttling queries to one every
-three seconds.
+Mike McCants appears to get his Iridium status from Rod Sladen, and not
+to have updated it since late 2013. Therefore support of C<'mccants'> as
+a source of Iridium status is deprecated effective immediately. In 6
+months the first use of C<'mccants'> as a source of Iridium status will
+produce a warning. This will become a warning with every use in another
+6 months, and fatal 6 months after that.
 
-The throttling functionality will make use of L<Time::HiRes|Time::HiRes>
-if it is available; otherwise it will simply use the built-in C<sleep()>
-and C<time()>, with consequent loss of precision.
+Also, in 6 months' time the default status source will become C<'kelso'>.
 
-Unfortunately this makes testing slower. Sorry.
-
-=head1 DEPRECATION NOTICE: QUANTITATIVE RCS DATA
-
-On July 21 2014 Space Track announced the plan to remove quantitative
-RCS data (the C<RCSVALUE> field), replacing it with a qualitative field
-(C<RCS_SIZE>, values C<'SMALL'> (< 0.1 square meter), C<'MEDIUM'>, (>=
-0.1 square meter but < 1 square meter), C<'LARGE'> (> 1 square meter),
-and of course, null.
-
-This removal took place August 18 2014. Beginning with version 0.086_02,
-any RCS functionality specific to the Space Track web site C<RCSVALUE>
-datum (such as the C<-rcs> search option) has been removed. The C<-rcs>
-option itself will be put through a deprecation cycle, with the first
-release on or after March 1 2015 generating a warning on the first use,
-the first release six months later generating a warning on every use,
-and the warning becoming fatal six months after that.
-
-On the other hand, the C<RCSVALUE> and C<RCS_SIZE> data will continue
-to be returned in such ways and places that the Space Track web site
-itself returns them.
+Of course, with the Iridium satellites being replaced by the non-flaring
+Iridium Next, the quality of McCants' status becomes moot. When the last
+flaring Iridium is taken out of service (per either Kelso or Sladen,
+whichever I deem the best source at the time) all Iridium status
+functionality will be put through a deprecation cycle and removed.
 
 =head1 NOTICE: HASH REFERENCE ARGUMENTS NOW VALIDATED
 
@@ -143,7 +126,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.098';
+our $VERSION = '0.099';
 our @EXPORT_OK = qw{shell BODY_STATUS_IS_OPERATIONAL BODY_STATUS_IS_SPARE
     BODY_STATUS_IS_TUMBLING};
 our %EXPORT_TAGS = (
@@ -1785,6 +1768,10 @@ HTTP::Response object containing the relevant data (if all queries
 succeeded) or the status of the first failure. If the queries succeed,
 the content is a series of lines formatted by "%6d   %-15s%-8s %s\n",
 with NORAD ID, name, status, and comment substituted in.
+
+Format C<'mccants'> is B<deprecated>, and will be removed in a future
+release. This entire method will be deprecated and removed once the last
+flaring Iridium satellite is removed from service.
 
 No Space Track username and password are required to use this method.
 
@@ -6449,9 +6436,43 @@ systems, Perl versions, and Perl module versions. It is rather likely,
 for example, that the module will die horribly if run with an
 insufficiently-up-to-date version of LWP.
 
-=head1 MODIFICATIONS
+=head1 MODIFICATIONS OF HISTORICAL INTEREST
 
-See the F<Changes> file.
+=head2 Data Throttling
+
+Space Track announced August 19 2013 that beginning September 22 they
+would limit users to less than 20 API queries per minute. Experience
+seems to say they jumped the gun - at least, server errors during
+testing were turned into success by throttling queries to one every
+three seconds.
+
+The throttling functionality will make use of L<Time::HiRes|Time::HiRes>
+if it is available; otherwise it will simply use the built-in C<sleep()>
+and C<time()>, with consequent loss of precision.
+
+Unfortunately this makes testing slower. Sorry.
+
+=head2 Quantitative RCS Data
+
+On July 21 2014 Space Track announced the plan to remove quantitative
+RCS data (the C<RCSVALUE> field), replacing it with a qualitative field
+(C<RCS_SIZE>, values C<'SMALL'> (< 0.1 square meter), C<'MEDIUM'>, (>=
+0.1 square meter but < 1 square meter), C<'LARGE'> (> 1 square meter),
+and of course, null.
+
+This removal took place August 18 2014. Beginning with version 0.086_02,
+any RCS functionality specific to the Space Track web site C<RCSVALUE>
+datum (such as the C<-rcs> search option) has been removed. The C<-rcs>
+option itself will be put through a deprecation cycle, with the first
+release on or after March 1 2015 generating a warning on the first use,
+the first release six months later generating a warning on every use,
+and the warning becoming fatal six months after that.
+
+On the other hand, the C<RCSVALUE> and C<RCS_SIZE> data will continue
+to be returned in such ways and places that the Space Track web site
+itself returns them.
+
+
 
 =head1 ACKNOWLEDGMENTS
 

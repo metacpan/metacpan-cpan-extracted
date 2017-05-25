@@ -18,6 +18,7 @@ has content_length => ( is => 'rwp', isa => PositiveOrZeroInt, default => 0, ini
 
 has redirect => ( is => 'lazy', isa => ArrayRef, default => sub { [] }, init_arg => undef );
 has decoded_body => ( is => 'lazy', isa => Maybe [ScalarRef], init_arg => undef );
+has is_connect_error => ( is => 'ro', isa => Bool, default => 0, init_arg => undef );
 
 sub BUILD ( $self, $args ) {
     $self->{headers} = Pcore::HTTP::Headers->new;

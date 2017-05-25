@@ -136,7 +136,7 @@ our %EXPORT_TAGS = (
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 our $DEBUG   = 0;
 my $vc;
 

@@ -12,7 +12,7 @@ use overload    #
   fallback => undef;
 
 has _server => ( is => 'ro', isa => InstanceOf ['Pcore::HTTP::Server'], required => 1 );
-has _h      => ( is => 'ro', isa => InstanceOf ['Pcore::AE::Handle'],   required => 1 );
+has _h      => ( is => 'ro', isa => InstanceOf ['Pcore::AE::Handle2'],  required => 1 );
 has env => ( is => 'ro', isa => HashRef, required => 1 );
 
 has is_websocket_connect_request => ( is => 'lazy', isa => Bool, init_arg => undef );

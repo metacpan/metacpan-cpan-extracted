@@ -5,7 +5,7 @@ use warnings;
 use Perl::Critic::Utils;
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '1.10';
+our $VERSION = '1.12';
 
 sub supported_parameters { return ()                             }
 sub default_severity     { return $SEVERITY_LOW                  }
@@ -34,11 +34,6 @@ sub violates {
 1;
 
 __END__
-
-#---------------------------------------------------------------------------
-
-=pod
-
 =head1 NAME
 
 Perl::Critic::Policy::Bangs::ProhibitNoPlan - Know what you're going to test.
@@ -68,7 +63,7 @@ Based on App::Fluff by Andy Lester, "<andy at petdance.com>"
 
 =head1 COPYRIGHT
 
-Copyright (c) 2006-2011 Andy Lester <andy@petdance.com> and Andrew
+Copyright (c) 2006-2013 Andy Lester <andy@petdance.com> and Andrew
 Moore <amoore@mooresystems.com>
 
 This library is free software; you can redistribute it and/or modify it

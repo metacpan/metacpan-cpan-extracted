@@ -1,3 +1,8 @@
+1.80    2017-05-24      Fix bug where tests would fail if
+                          AUTOMATED_TESTING=1 on perl 5.26 and higher;
+                        For some reason that made it break on 5.8.9,
+                          but I don't really care
+
 1.79    2016-10-30      Fix another minor bug
                           (https://github.com/DrHyde/perl-modules-Devel-CheckOS/issues/17)
 

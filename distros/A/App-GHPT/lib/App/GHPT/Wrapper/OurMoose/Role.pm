@@ -2,7 +2,7 @@ package App::GHPT::Wrapper::OurMoose::Role;
 
 use App::GHPT::Wrapper::Ourperl;
 
-our $VERSION = '1.000003';
+our $VERSION = '1.000004';
 
 use Import::Into;
 use Moose::Exporter;

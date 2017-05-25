@@ -28,15 +28,21 @@ if (
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile(
-    NAME          => 'Image::Sane',
-    VERSION_FROM  => 'lib/Image/Sane.pm',    # finds $VERSION
-    PREREQ_PM     => {},                     # e.g., Module::Name => 1.1
+    NAME               => 'Image::Sane',
+    VERSION_FROM       => 'lib/Image/Sane.pm',         # finds $VERSION
+    PREREQ_PM          => { Exception::Class => 0 },
+    CONFIGURE_REQUIRES => {
+        ExtUtils::Depends   => 0,
+        ExtUtils::PkgConfig => 0
+    },
     TEST_REQUIRES => {
         Test::More => 0,
         Readonly   => 0,
     },
-    clean => { FILES    => '$(SOURCE_TIDY)' },
-#    dist  => { COMPRESS => 'xz -9', SUFFIX => '.xz', },
+    clean => { FILES => '$(SOURCE_TIDY)' },
+
+    # CPAN doesn't recognise .xz compression
+    # dist  => { COMPRESS => 'xz -9', SUFFIX => '.xz', },
     (
         $] >= 5.005
         ?    ## Add these new keywords supported since 5.005

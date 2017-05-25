@@ -1,0 +1,13 @@
+App-Git-Autofixup-0.001.tar.gz
+Changes
+git-autofixup
+lib/App/Git/Autofixup.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.pod
+t/autofixup.t
+t/pod.t
+t/precommit.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,5 +1,8 @@
 Revision history for PGObject-Composite
 
+1.0.2	2017-05-24
+	Exports sufficient for adaptors to work without reinventing
+
 1.0.1	2017-05-24
 	Better exports to support adaptors
 

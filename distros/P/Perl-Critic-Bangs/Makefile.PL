@@ -11,7 +11,7 @@ my %parms = (
     ABSTRACT            => 'Perl::Critic::Bangs - A collection of policies for Perl::Critic',
     PL_FILES            => {},
     PREREQ_PM => {
-        'Perl::Critic'                  => 1.098,
+        'Perl::Critic'                  => 1.122,
         'Perl::Critic::Policy'          => 0,
         'Perl::Critic::PolicyFactory'   => 0,
         'Perl::Critic::PolicyParameter' => 0,
@@ -25,7 +25,7 @@ my %parms = (
         'Test::More'                    => '0.96', # For subtest()
         'Test::Perl::Critic'            => 1.01,
     },
-    LICENSE             => 'perl',
+    LICENSE             => 'artistic_2',
 
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Perl-Critic-Bangs-*' },
@@ -35,6 +35,7 @@ if ( $ExtUtils::MakeMaker::VERSION ge '6.46' ) {
     $parms{META_MERGE} = {
         resources => {
             license     => 'http://dev.perl.org/licenses/',
+            bugtracker  => 'https://github.com/petdance/perl-critic-bangs',
             repository  => 'git://github.com/petdance/perl-critic-bangs.git',
         }
     };
@@ -56,7 +57,10 @@ sub MY::libscan {
 
 sub MY::postamble {
     return <<'MAKE_FRAG';
-.PHONY: tags critic
+.PHONY: tags critic nytprof
+
+#PERLCRITIC=$(which perlcritic)
+PERLCRITIC=/opt/local/libexec/perl5.12/sitebin//perlcritic
 
 tags:
 	ctags -f tags --recurse --totals \
@@ -65,8 +69,12 @@ tags:
 		--languages=Perl --langmap=Perl:+.t \
 		lib/ t/
 
+nytprof: all
+	$(PERL) -d:NYTProf $(PERLCRITIC) -profile perlcriticrc -1 -quiet lib/ t/ Makefile.PL >> /dev/null 2>&1
+	nytprofhtml
+
 critic:
-	perlcritic -profile perlcriticrc -1 -quiet lib/ t/ Makefile.PL
+	$(PERLCRITIC) -profile perlcriticrc -1 -quiet lib/ t/ Makefile.PL
 
 MAKE_FRAG
 }

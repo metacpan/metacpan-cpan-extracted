@@ -1,3 +1,7 @@
+v0.11.0 2017-05-25T07:08:55Z
+ - No issues on bugtracker were closed since the last release
+ - use persistent connections
+
 v0.10.2 2017-05-23T08:19:53Z
  - No issues on bugtracker were closed since the last release
  - set http timeout to 30 sec

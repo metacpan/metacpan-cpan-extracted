@@ -18,11 +18,11 @@ Text::Amuse::Preprocessor - Helpers for Text::Amuse document formatting.
 
 =head1 VERSION
 
-Version 0.36
+Version 0.40
 
 =cut
 
-our $VERSION = '0.36';
+our $VERSION = '0.40';
 
 
 =head1 SYNOPSIS
@@ -182,11 +182,22 @@ sub new {
         }
     }
     $self->{_error} = '';
-
+    $self->{_verbatim_pieces} = {};
+    $self->{_unique_counter} = 0;
     die "Unrecognized option: " . join(' ', keys %options) . "\n" if %options;
     die "Missing input" unless defined $self->{input};
     die "Missing output" unless defined $self->{output};
     bless $self, $class;
+}
+
+sub _get_unique_counter {
+    my $self = shift;
+    my $counter = ++$self->{_unique_counter};
+    return $counter;
+}
+
+sub _verbatim_pieces {
+    return shift->{_verbatim_pieces};
 }
 
 sub html {
@@ -264,7 +275,7 @@ sub process {
     if ($self->html) {
         $self->_process_html;
     }
-
+    $self->_exclude_verbatim($infile);
     # then try to get the language
     my ($filter, $specific_filter, $nbsp_filter);
     my $fixlinks = $self->fix_links;
@@ -353,7 +364,7 @@ sub process {
             return;
         }
     }
-
+    $self->_restore_verbatim($outfile);
     my $output = $self->output;
     if (my $ref = ref($output)) {
         if ($ref eq 'SCALAR') {
@@ -402,22 +413,82 @@ sub _read_file {
 sub _set_infile {
     my $self = shift;
     my $input = $self->input;
+    my $infile = File::Spec->catfile($self->tmpdir, 'input.txt');
     if (my $ref = ref($input)) {
         if ($ref eq 'SCALAR') {
-            my $infile = File::Spec->catfile($self->tmpdir, 'input.txt');
             open (my $fh, '>:encoding(UTF-8)', $infile) or die "$infile: $!";
             print $fh $$input;
             close $fh or die "closing $infile $!";
             $self->_infile($infile);
         }
         else {
-            die "not a scalar ref!";
+            die Dumper($ref) . " is not a scalar ref!";
         }
     }
     else {
-        $self->_infile($input);
+        File::Copy::copy($input, $infile) or die "Couldn't copy $input to $infile";
+        $self->_infile($infile);
     }
     return $self->_infile;
+}
+
+sub _store_excluded_piece {
+    my ($self, $piece) = @_;
+    my $rand = sprintf('%u', rand(1000000000))
+      . 'XXXX8808cc3f0c1868b3b8825d0febff522237810c73c5c369d94f5db95a3dba6a005a5fe1a44103d47f36889bfXXXX'
+      . $self->_get_unique_counter;
+    $self->_verbatim_pieces->{$rand} = $piece;
+    # Supplementary Private Use Area-A Unicode subset.
+    return "\x{f0003}${rand}\x{f0004}";
+}
+
+sub _restore_excluded_piece {
+    my ($self, $id) = @_;
+    my $token = delete $self->_verbatim_pieces->{$id};
+    die "Invalid $id!" . Dumper($self->_verbatim_pieces) unless defined $token;
+    return $token;
+}
+
+sub _restore_verbatim {
+    my ($self, $file) = @_;
+    my $body = $self->_read_file($file);
+    $body =~ s/(\x{f0003})([a-zA-Z0-9]+)(\x{f0004})/$self->_restore_excluded_piece($2)/gse;
+    die "Not all token were restored!" . Dumper($self->_verbatim_pieces) if %{$self->_verbatim_pieces};
+    $self->_write_file($file, $body);
+}
+
+sub _exclude_verbatim {
+    my ($self, $file) = @_;
+    open (my $fh, '<:encoding(UTF-8)', $file) or die "Couldn't open $file";
+    my $in_verbatim;
+    my @out;
+  LINE:
+    while (defined(my $line = <$fh>)) {
+        if ($in_verbatim) {
+            if ($line =~ /$in_verbatim/) {
+                $in_verbatim = 0;
+            }
+            push @out, $self->_store_excluded_piece($line);
+            next LINE;
+        }
+        else {
+            if ($line =~ m/^(\{\{\{)\s*$/) {
+                $in_verbatim = qr/^\}\}\}\s*$/;
+                push @out, $self->_store_excluded_piece($line);
+                next LINE;
+            }
+            elsif ($line =~ m/^<example>\s*$/) {
+                $in_verbatim = qr{^</example>\s*$};
+                push @out, $self->_store_excluded_piece($line);
+                next LINE;
+            }
+        }
+        push @out, $line;
+    }
+    close $fh;
+    my $body = join('', @out);
+    $body =~ s/(<verbatim>(.+?)<\/verbatim>)/$self->_store_excluded_piece($1)/gse;
+    $self->_write_file($file, $body);
 }
 
 

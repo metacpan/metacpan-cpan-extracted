@@ -35,3 +35,19 @@ require 5.8.8;
 use strict;
 require Data::Dumper;
 use Data::Dumper 1;
+
+## name Basic submodule variants - fail
+## failures 4
+## cut
+
+use v5.14;
+use warnings;
+use Data::Dumper;
+use Data::Dumper::HTML;
+use Data::Dumper::Concise::Sugar;
+#use Data::Dumper::Names;
+use Data::Dumper::Declare qw( Dumper );
+use Getopt::Long;
+
+#-----------------------------------------------------------------------------
+# ex: set ft=perl:

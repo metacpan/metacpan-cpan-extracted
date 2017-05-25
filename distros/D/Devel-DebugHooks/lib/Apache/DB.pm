@@ -1,19 +1,20 @@
-package Apache::DB;
+package # hide the package from the PAUSE indexer
+  Apache::DB;
 
 use 5.005;
 use strict;
 use DynaLoader ();
 
 BEGIN {
-	use constant MP2 => eval {
+  use constant MP2 => eval {
         exists $ENV{MOD_PERL_API_VERSION} and $ENV{MOD_PERL_API_VERSION} >= 2
     };
-	die "mod_perl is required to run this module: $@" if $@;
+  die "mod_perl is required to run this module: $@" if $@;
 
-	if (MP2) {
-		require APR::Pool;
-		require Apache2::RequestRec;
-	}
+  if (MP2) {
+    require APR::Pool;
+    require Apache2::RequestRec;
+  }
 
 }
 
@@ -55,23 +56,23 @@ sub handler {
     my $r = shift;
 
 
-	if( MP2 ) { 
-		if (ref $r) {
+  if( MP2 ) {
+    if (ref $r) {
 
     $SIG{INT} = \&DB::ApacheSIGINT();
-		$r->pool->cleanup_register(sub {
+    $r->pool->cleanup_register(sub {
       $SIG{ INT } =  undef;
-		});
+    });
    }
-	}
-	else {
-		if (ref $r) {
-		$SIG{INT} = \&DB::catch;
-		$r->register_cleanup(sub { 
-			$SIG{INT} = \&DB::ApacheSIGINT();
-		});
-		}
-	}
+  }
+  else {
+    if (ref $r) {
+    $SIG{INT} = \&DB::catch;
+    $r->register_cleanup(sub {
+      $SIG{INT} = \&DB::ApacheSIGINT();
+    });
+    }
+  }
 
   DB::state( 'stack' )->[ -2 ]{ single } =  1   unless $DB::options{ NonStop };
   return 0;

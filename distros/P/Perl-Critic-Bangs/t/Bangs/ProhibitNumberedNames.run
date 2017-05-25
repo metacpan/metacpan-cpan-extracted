@@ -45,6 +45,7 @@ my $logan7;
 my $md5;
 my $x11;
 my $UTF8;
+my $logan7;
 
 #-----------------------------------------------------------------------------
 
@@ -55,3 +56,61 @@ my $UTF8;
   my $generated_md5;
 
 #-----------------------------------------------------------------------------
+
+## name partial exceptions require underscores as separators
+## failures 1
+## cut
+
+  my $mymd5;
+
+#-----------------------------------------------------------------------------
+
+## name Underscores can confuse the partial matching.  See GitHub issue #6.
+## failures 0
+## parms { exceptions => 'av_format1 av_format2 mp3' }
+## cut
+
+  my ($av_format1,$av_format2, $mp3) = fetch_formats();
+
+  my $this_av_format1 = 'this should pass';
+
+#-----------------------------------------------------------------------------
+
+## name Only check variables we create.  RT #20854
+## failures 0
+## cut
+
+  my $foo = $bad_var2;
+
+#-----------------------------------------------------------------------------
+
+## name Don't complain about $1, $2, etc
+## failures 0
+## cut
+
+  my $foo = $1;
+
+#-----------------------------------------------------------------------------
+
+## name Check for poorly named subs, too
+## failures 1
+## cut
+
+  sub flooble {}
+  sub process2 {}
+  sub bongo {}
+
+#-----------------------------------------------------------------------------
+
+## name Only check for poorly named subs that we create.  Ignore BEGIN etc.
+## failures 0
+## cut
+
+  my $foo = process2();
+
+  BEGIN {
+      my $x = 4;
+  }
+
+#-----------------------------------------------------------------------------
+# ex: set ft=perl:

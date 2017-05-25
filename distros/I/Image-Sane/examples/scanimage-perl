@@ -10,6 +10,7 @@ use File::Basename;
 use IO::Handle;
 use English qw( -no_match_vars );    # for $PROGRAM_NAME
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
+use sigtrap qw/handler sighandler normal-signals/;
 use Readonly;
 Readonly my $BUFFER_SIZE   => ( 32 * 1024 );     # default size
 Readonly my $START_COLUMN  => 8;
@@ -835,7 +836,8 @@ sub log_frame_info {
                       . "%d bits/pixel\n",
                     $parm->{pixels_per_line},
                     $parm->{lines},
-                    $_8_BIT * $parm->{bytes_per_line} / $parm->{pixels_per_line}
+                    $parm->{depth} *
+                      ( $parm->{format} == SANE_FRAME_RGB ? $RGB_FRAMES : 1 )
                 );
             }
             else {
@@ -843,7 +845,8 @@ sub log_frame_info {
                     sprintf "$prog_name: scanning image %d pixels wide and "
                       . "variable height at %d bits/pixel\n",
                     $parm->{pixels_per_line},
-                    $_8_BIT * $parm->{bytes_per_line} / $parm->{pixels_per_line}
+                    $parm->{depth} *
+                      ( $parm->{format} == SANE_FRAME_RGB ? $RGB_FRAMES : 1 )
                 );
             }
         }
@@ -1117,12 +1120,8 @@ sub scan_pages {
           )
         {
             printstderr("cannot open $part_path\n");
-            try {
-                $device->cancel;
-            }
-            catch {
-                exit SANE_STATUS_ACCESS_DENIED;
-            };
+            $device->cancel;
+            scanimage_exit(SANE_STATUS_ACCESS_DENIED);
         }
 
         scan_it();
@@ -1215,11 +1214,13 @@ sub pass_fail {
 sub test_it {
     my ( %image, $parm, $len );
     my @format_name = qw( gray RGB red green blue );
+    $status = SANE_STATUS_GOOD;
 
     try {
         $device->start;
     }
     catch {
+        $status = $_->status;
         printstderr( "$prog_name: sane_start: " . $_->error . "\n" );
         goto CLEANUP;
     };
@@ -1228,6 +1229,7 @@ sub test_it {
         $parm = $device->get_parameters;
     }
     catch {
+        $status = $_->status;
         printstderr( "$prog_name: sane_get_parameters: " . $_->error . "\n" );
         goto CLEANUP;
     };
@@ -1238,7 +1240,8 @@ sub test_it {
               . "%d bits/pixel\n",
             $parm->{pixels_per_line},
             $parm->{lines},
-            $_8_BIT * $parm->{bytes_per_line} / $parm->{pixels_per_line}
+            $parm->{depth} *
+              ( $parm->{format} == SANE_FRAME_RGB ? $RGB_FRAMES : 1 )
         );
     }
     else {
@@ -1246,7 +1249,8 @@ sub test_it {
             sprintf "$prog_name: scanning image %d pixels wide and "
               . "variable height at %d bits/pixel\n",
             $parm->{pixels_per_line},
-            $_8_BIT * $parm->{bytes_per_line} / $parm->{pixels_per_line}
+            $parm->{depth} *
+              ( $parm->{format} == SANE_FRAME_RGB ? $RGB_FRAMES : 1 )
         );
     }
     printstderr(
@@ -1264,7 +1268,8 @@ sub test_it {
         pass_fail( $parm->{bytes_per_line}, $len, $image{data} );
     }
     catch {
-        goto CLEANUP
+        $status = $_->status;
+        goto CLEANUP;
     };
 
     printstderr("$prog_name: reading one byte...\t\t");
@@ -1273,7 +1278,8 @@ sub test_it {
         pass_fail( 1, $len, $image{data} );
     }
     catch {
-        goto CLEANUP
+        $status = $_->status;
+        goto CLEANUP;
     };
 
     my $i;
@@ -1285,7 +1291,8 @@ sub test_it {
             pass_fail( $i, $len, $image{data} );
         }
         catch {
-            goto CLEANUP
+            $status = $_->status;
+            goto CLEANUP;
         };
     }
 
@@ -1297,13 +1304,34 @@ sub test_it {
             pass_fail( $i - 1, $len, $image{data} );
         }
         catch {
-            goto CLEANUP
+            $status = $_->status;
+            goto CLEANUP;
         };
     }
 
   CLEANUP:
     $device->cancel;
-    return;
+    return $status;
+}
+
+sub scanimage_exit {
+    my ($exit_status) = @_;
+    if ($device) {
+        if ( $verbose > 1 ) {
+            printstderr("Closing device\n");
+        }
+        undef $device;
+    }
+    if ( $verbose > 1 ) {
+        printstderr("Calling sane_exit\n");
+    }
+
+    #  Image::Sane->_exit();
+
+    if ( $verbose > 1 ) {
+        printstderr("scanimage: finished\n");
+    }
+    exit $exit_status;
 }
 
 # @brief print device options to stdout
@@ -1349,7 +1377,7 @@ sub process_arguments {
         if ( $_ eq '-u' ) { $_ = '-t' }
     }
     my @argv_old = @ARGV;
-    exit 1 if ( not GetOptions(@args) );
+    if ( not GetOptions(@args) ) { scanimage_exit(1) }
 
     # As it isn't possible to get the argument order from Getopt::Long 2.37, do
     # this myself
@@ -1513,7 +1541,7 @@ sub open_device {
             undef $device;
         }
         else {
-            exit 1;
+            scanimage_exit(1);
         }
     };
     return;
@@ -1538,13 +1566,13 @@ GetOptions(@args);
 
 if ( defined $options{L} or defined $options{f} ) {
     list_devices_verbose();
-    exit 0;
+    scanimage_exit(0);
 }
 
 if ( defined $options{V} ) {
     printf "%s %s; backend version %d.%d.%d\n", $prog_name,
       $Image::Sane::VERSION, Image::Sane->get_version;
-    exit 0;
+    scanimage_exit(0);
 }
 
 if ($help) {
@@ -1600,22 +1628,17 @@ if ( defined $device ) {
     if ($all) {
         printf "\nAll options specific to device `%s':\n", $devname;
         print_options( $device, $num_dev_options, SANE_TRUE );
-        exit 0;
+        scanimage_exit(0);
     }
 }
 
 # output device list
 if ($help) {
     list_device_names();
-    exit 0;
+    scanimage_exit(0);
 }
 
-exit 0 if ($dont_scan);
-
-local $SIG{HUP}  = \&sighandler;
-local $SIG{INT}  = \&sighandler;
-local $SIG{PIPE} = \&sighandler;
-local $SIG{TERM} = \&sighandler;
+if ($dont_scan) { scanimage_exit(0) }
 
 if ($batch_double)     { $batch_increment = 2 }
 if ( defined $format ) { $batch           = 1 }
@@ -1636,7 +1659,7 @@ else {
     test_it();
 }
 
-exit $status;
+scanimage_exit($status);
 
 ## no critic (RequirePodSections)
 __END__

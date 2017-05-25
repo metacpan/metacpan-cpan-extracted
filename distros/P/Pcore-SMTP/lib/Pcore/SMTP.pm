@@ -1,7 +1,7 @@
-package Pcore::SMTP v0.2.0;
+package Pcore::SMTP v0.2.1;
 
 use Pcore -dist, -const, -class, -result;
-use Pcore::AE::Handle;
+use Pcore::AE::Handle2;
 use Pcore::Util::Data qw[from_b64 to_b64];
 use Pcore::Util::Text qw[encode_utf8];
 use Authen::SASL;
@@ -61,7 +61,7 @@ sub sendmail ( $self, @ ) {
     $args{cc}  = [ $args{cc} ]  if $args{cc}  and ref $args{cc} ne 'ARRAY';
     $args{bcc} = [ $args{bcc} ] if $args{bcc} and ref $args{bcc} ne 'ARRAY';
 
-    Pcore::AE::Handle->new(
+    Pcore::AE::Handle2->new(
         connect          => 'tcp://' . $self->host . q[:] . $self->port,
         connect_timeout  => 10,
         timeout          => 10,

@@ -4,7 +4,7 @@
       "George S. Baugh <teodesian@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -21,16 +21,20 @@
       },
       "develop" : {
          "requires" : {
+            "Code::TidyAll" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Test::CPAN::Changes" : "0.19",
             "Test::CPAN::Meta" : "0",
             "Test::CPAN::Meta::JSON" : "0.16",
             "Test::EOL" : "0",
             "Test::Kwalitee" : "1.21",
+            "Test::MinimumVersion" : "0",
+            "Test::Mojibake" : "0",
             "Test::More" : "0.88",
             "Test::NoTabs" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
             "Test::Spelling" : "0.12",
             "Test::Synopsis" : "0",
             "Test::Version" : "1"
@@ -89,42 +93,43 @@
             "Test::Deep" : "0",
             "Test::Fatal" : "0",
             "Test::LWP::UserAgent" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "blib" : "1.01"
          }
       }
    },
    "provides" : {
       "App::Prove::Plugin::TestRail" : {
          "file" : "lib/App/Prove/Plugin/TestRail.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "Test::Rail::Harness" : {
          "file" : "lib/Test/Rail/Harness.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "Test::Rail::Parser" : {
          "file" : "lib/Test/Rail/Parser.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "TestRail::API" : {
          "file" : "lib/TestRail/API.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "TestRail::Utils" : {
          "file" : "lib/TestRail/Utils.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "TestRail::Utils::Find" : {
          "file" : "lib/TestRail/Utils/Find.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "TestRail::Utils::Lock" : {
          "file" : "lib/TestRail/Utils/Lock.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       },
       "TestRail::Utils::Results" : {
          "file" : "lib/TestRail/Utils/Results.pm",
-         "version" : "0.039"
+         "version" : "0.040"
       }
    },
    "release_status" : "stable",
@@ -140,10 +145,11 @@
          "web" : "https://github.com/teodesian/TestRail-Perl"
       }
    },
-   "version" : "0.039",
+   "version" : "0.040",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Neil Bowers <neil@bowers.com>"
-   ]
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
 }
 

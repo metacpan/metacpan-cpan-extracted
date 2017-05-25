@@ -25,5 +25,5 @@ resources:
   bugtracker: https://github.com/faraco/WebService-Pixabay/issues
   homepage: https://github.com/faraco/WebService-Pixabay
   repository: https://github.com/faraco/WebService-Pixabay.git
-version: 0.0.4
+version: 0.0.6
 x_serialization_backend: 'YAML::Tiny version 1.69'

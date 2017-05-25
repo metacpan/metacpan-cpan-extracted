@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Yaml;
-$Config::Model::Backend::Yaml::VERSION = '2.102';
+$Config::Model::Backend::Yaml::VERSION = '2.103';
 use 5.10.1;
 use Carp;
 use strict;
@@ -25,7 +25,6 @@ sub load_yaml_parser {
     my $self = shift;
     my $file = my $class = shift // 'YAML::Tiny';
     $file =~ s!::!/!g;
-    say "loading $file.pm";
     require "$file.pm" || die "cannot load YAML parser $class";
     import $class;
 }
@@ -124,7 +123,7 @@ Config::Model::Backend::Yaml - Read and write config as a YAML data structure
 
 =head1 VERSION
 
-version 2.102
+version 2.103
 
 =head1 SYNOPSIS
 

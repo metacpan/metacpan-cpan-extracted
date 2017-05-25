@@ -21,6 +21,7 @@ our $SOCKADDR_CACHE = {};
 
     *AnyEvent::Socket::resolve_sockaddr = \&resolve_sockaddr;
     *AnyEvent::Socket::_tcp_bind        = \&_tcp_bind;
+    *AnyEvent::Socket::tcp_connect      = \&tcp_connect;
 }
 
 sub resolve_sockaddr ( $node, $service, $proto, $family, $type, $cb ) : prototype($$$$$$) {
@@ -113,6 +114,131 @@ sub _tcp_bind ( $host, $service, $done, $prepare = undef ) : prototype($$$;$) {
     return;
 }
 
+sub tcp_connect ( $host, $port, $connect, $prepare = undef ) : prototype($$$;$) {
+
+    # see http://cr.yp.to/docs/connect.html for some tricky aspects
+    # also http://advogato.org/article/672.html
+
+    my %state = ( fh => undef );
+
+    # name/service to type/sockaddr resolution
+    AnyEvent::Socket::resolve_sockaddr $host, $port, 0, 0, undef, sub (@target) {
+        $state{next} = sub {
+            return unless exists $state{fh};
+
+            my $errno = $!;
+
+            my $target = shift @target or return AE::postpone {
+                return unless exists $state{fh};
+
+                %state = ();
+
+                $! = $errno;    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+
+                $connect->();
+
+                return;
+            };
+
+            my ( $domain, $type, $proto, $sockaddr ) = $target->@*;
+
+            # socket creation
+            socket $state{fh}, $domain, $type, $proto or return $state{next}();
+
+            AnyEvent::fh_unblock $state{fh};
+
+            my $timeout = eval { $prepare && $prepare->( $state{fh} ) };
+
+            if ($@) {
+                $state{next}->();
+
+                return;
+            }
+
+            $timeout ||= 30 if AnyEvent::WIN32;
+
+            if ($timeout) {
+                $state{to} = AE::timer $timeout, 0, sub {
+                    $! = Errno::ETIMEDOUT;    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+
+                    $state{next}();
+
+                    return;
+                };
+            }
+
+            # now connect
+            if (connect( $state{fh}, $sockaddr )
+                || ($! == Errno::EINPROGRESS    # POSIX
+                    || $! == Errno::EWOULDBLOCK
+
+                    # WSAEINPROGRESS intentionally not checked - it means something else entirely
+                    || $! == AnyEvent::Util::WSAEINVAL    # not convinced, but doesn't hurt
+                    || $! == AnyEvent::Util::WSAEWOULDBLOCK
+                )
+              )
+            {
+                $state{ww} = AE::io $state{fh}, 1, sub {
+
+                    # we are connected, or maybe there was an error
+                    if ( my $sin = getpeername $state{fh} ) {
+                        my ( $port, $host ) = AnyEvent::Socket::unpack_sockaddr $sin;
+
+                        delete $state{ww};
+                        delete $state{to};
+
+                        my $guard = AnyEvent::Socket::guard { %state = () };
+
+                        $connect->(
+                            delete $state{fh},
+                            AnyEvent::Socket::format_address $host,
+                            $port,
+                            sub {
+                                $guard->cancel;
+
+                                $state{next}->();
+
+                                return;
+                            }
+                        );
+                    }
+                    else {
+                        if ( $! == Errno::ENOTCONN ) {
+
+                            # dummy read to fetch real error code if !cygwin
+                            sysread $state{fh}, my $buf, 1 or 1;
+
+                            # cygwin 1.5 continously reports "ready' but never delivers
+                            # an error with getpeername or sysread.
+                            # cygwin 1.7 only reports readyness *once*, but is otherwise
+                            # the same, which is actually more broken.
+                            # Work around both by using unportable SO_ERROR for cygwin.
+                            $! = ( unpack "l", getsockopt $state{fh}, Socket::SOL_SOCKET(), Socket::SO_ERROR() ) || Errno::EAGAIN if AnyEvent::CYGWIN && $! == Errno::EAGAIN;    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+                        }
+
+                        return if $! == Errno::EAGAIN;                                                                                                                           # skip spurious wake-ups
+
+                        delete $state{ww};
+
+                        delete $state{to};
+
+                        $state{next}->();
+                    }
+                };
+            }
+            else {
+                $state{next}->();
+            }
+        };
+
+        $! = Errno::ENXIO;    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+
+        $state{next}->();
+    };
+
+    return;
+}
+
 1;
 ## -----SOURCE FILTER LOG BEGIN-----
 ##
@@ -122,11 +248,15 @@ sub _tcp_bind ( $host, $service, $done, $prepare = undef ) : prototype($$$;$) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 16, 23               | Variables::ProtectPrivateVars - Private variable used                                                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 26                   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 27                   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 111                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
+## |    3 | 112                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 35, 88               | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |    3 | 117                  | Subroutines::ProhibitExcessComplexity - Subroutine "tcp_connect" with high complexity score (24)               |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    3 | 216                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    2 | 36, 89               | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

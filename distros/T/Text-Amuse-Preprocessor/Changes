@@ -1,5 +1,9 @@
 Revision history for perl module Text-Amuse-Preprocessor
 
+0.40 2017-05-25
+
+ - Exclude verbatim tokens from preprocessing
+
 0.36 2016-11-11
 
  - Bump up Text::Amuse prerequisite to avoid failing tests.

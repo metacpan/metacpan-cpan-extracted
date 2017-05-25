@@ -351,13 +351,10 @@ sub _in0 {
 	    $rq->{state} |= RQHDR_DONE; # rqhdr done
 
 	    my (%hdr,@warn);
-	    my $err = parse_reqhdr($hdr,\%hdr,\@warn);
+	    my $err = parse_reqhdr($hdr,\%hdr,0);
 	    if ($err and my $sub = $obj->can('fix_reqhdr')) {
 		$hdr = $sub->($obj,$hdr);
-		$err = parse_rsphdr($hdr,\%hdr,\@warn);
-	    }
-	    if (@warn && %TRACE) {
-		$self->xtrace($_) for @warn;
+		$err = parse_reqhdr($hdr,\%hdr,0);
 	    }
 
 	    if ($err) {

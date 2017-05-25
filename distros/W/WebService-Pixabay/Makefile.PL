@@ -25,7 +25,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "1.302075",
     "WebService::Client" => "0.0501"
   },
-  "VERSION" => "0.0.4",
+  "VERSION" => "0.0.6",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -47,6 +47,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore-api-majestic/overview"
       }
    },
-   "version" : "v0.10.2",
+   "version" : "v0.11.0",
    "x_serialization_backend" : "JSON::PP version 2.93"
 }

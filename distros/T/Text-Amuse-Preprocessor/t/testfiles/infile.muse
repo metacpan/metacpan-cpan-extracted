@@ -57,3 +57,11 @@ This is not-
  -
  -
  - -
+
+<example>
+[1] Bla "bla"
+<example>
+
+<verbatim>"[50]"</verbatim>
+
+

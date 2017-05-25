@@ -11,10 +11,14 @@ bla [31] bla [32] bla [33] bla [34] bla [35] bla [36] bla [37]
 blablbla
 blablbla inside the ààblock
 
+{{{
+ciao ciao [3]
+}}}
+
 [2] blablabla
 blablbla inside the ààblock
 
-bla [38] bla [39] bla [40] bla [41] bla [42] bla [43] bla [44]
+bla [38] bla [39] bla [40] bla [41] bla [42] bla [43] bla [44] <verbatim>[33]</verbatim>
 bla [45] bla [46] bla [47] bla [48] bla [49] bla [50] bla [51]
 bla [52] bla [53] bla [54] bla [55] bla [56] bla [57] bla [58]
 bla [59] bla [60] bla [61] bla [62] bla [63] bla [64] bla [65]
@@ -633,3 +637,8 @@ blablbla
 [200] blablabla
 blablbla
 
+<verbatim>[1]</verbatim> Blabla
+
+{{{
+[1] This is verbatim
+}}}

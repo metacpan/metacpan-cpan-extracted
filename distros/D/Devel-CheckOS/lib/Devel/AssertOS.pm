@@ -54,7 +54,7 @@ sub import {
 =head1 BUGS and FEEDBACK
 
 I welcome feedback about my code, including constructive criticism.
-Bug reports should be made using L<http://rt.cpan.org/> or by email.
+Bug reports should be made using L<https://github.com/DrHyde/perl-modules-Devel-CheckOS/issues>.
 
 You will need to include in your bug report the exact value of $^O, what
 the OS is called (eg Windows Vista 64 bit Ultimate Home Edition), and,

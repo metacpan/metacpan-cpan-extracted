@@ -1,4 +1,4 @@
-package Pcore::API::Majestic v0.10.2;
+package Pcore::API::Majestic v0.11.0;
 
 use Pcore -dist, -class, -const, -result, -export => { CONST => [qw[$MAJESTIC_INDEX_FRESH $MAJESTIC_INDEX_HISTORIC]] };
 
@@ -131,8 +131,8 @@ sub _request ( $self, $url_params, $cb ) {
 
     P->http->get(
         $url,
-        timeout    => 30,
-        persistent => 0,
+        timeout    => 60,
+        persistent => 30,
         bind_ip    => $self->bind_ip,
         on_finish  => sub ($res) {
             if ( !$res ) {

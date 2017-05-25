@@ -29,14 +29,17 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::Depends" : "0",
+            "ExtUtils::PkgConfig" : "0"
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "Exception::Class" : "0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

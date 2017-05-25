@@ -3,94 +3,96 @@ abstract: "Provides an interface to TestRail's REST api via HTTP"
 author:
   - 'George S. Baugh <teodesian@cpan.org>'
 build_requires:
-  App::Prove: 0
-  Capture::Tiny: 0
-  Class::Inspector: 0
-  File::Spec: 0
-  File::Temp: 0
-  FindBin: 0
-  HTTP::Headers: 0
-  HTTP::Response: 0
-  IO::Handle: 0
-  IPC::Open3: 0
-  Test::Deep: 0
-  Test::Fatal: 0
-  Test::LWP::UserAgent: 0
-  Test::More: 0
+  App::Prove: '0'
+  Capture::Tiny: '0'
+  Class::Inspector: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  FindBin: '0'
+  HTTP::Headers: '0'
+  HTTP::Response: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Deep: '0'
+  Test::Fatal: '0'
+  Test::LWP::UserAgent: '0'
+  Test::More: '0'
+  blib: '1.01'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: TestRail-API
 provides:
   App::Prove::Plugin::TestRail:
     file: lib/App/Prove/Plugin/TestRail.pm
-    version: 0.039
+    version: '0.040'
   Test::Rail::Harness:
     file: lib/Test/Rail/Harness.pm
-    version: 0.039
+    version: '0.040'
   Test::Rail::Parser:
     file: lib/Test/Rail/Parser.pm
-    version: 0.039
+    version: '0.040'
   TestRail::API:
     file: lib/TestRail/API.pm
-    version: 0.039
+    version: '0.040'
   TestRail::Utils:
     file: lib/TestRail/Utils.pm
-    version: 0.039
+    version: '0.040'
   TestRail::Utils::Find:
     file: lib/TestRail/Utils/Find.pm
-    version: 0.039
+    version: '0.040'
   TestRail::Utils::Lock:
     file: lib/TestRail/Utils/Lock.pm
-    version: 0.039
+    version: '0.040'
   TestRail::Utils::Results:
     file: lib/TestRail/Utils/Results.pm
-    version: 0.039
+    version: '0.040'
 requires:
-  Carp: 0
-  Clone: 0
-  Cwd: 0
-  Data::Validate::URI: 0
-  Encode: 0
-  File::Basename: 0
-  File::Find: 0
-  File::HomeDir: 0
-  Getopt::Long: 0
-  HTTP::Request: 0
-  Hash::Merge: 0
-  IO::Interactive::Tiny: 0
-  JSON::MaybeXS: 1.001000
-  LWP::UserAgent: 0
-  List::MoreUtils: 0
-  List::Util: 1.33
-  MCE::Loop: 0
-  POSIX: 0
-  Pod::Usage: 0
-  Scalar::Util: 0
-  Statistics::Descriptive: 0
-  Sys::Hostname: 0
-  TAP::Harness: 0
-  TAP::Parser: 0
-  Term::ANSIColor: 2.01
-  Try::Tiny: 0
-  Type::Params: 0
-  Types::Standard: 0
-  lib: 0
-  parent: 0
-  perl: 5.010
-  strict: 0
-  utf8: 0
-  warnings: 0
+  Carp: '0'
+  Clone: '0'
+  Cwd: '0'
+  Data::Validate::URI: '0'
+  Encode: '0'
+  File::Basename: '0'
+  File::Find: '0'
+  File::HomeDir: '0'
+  Getopt::Long: '0'
+  HTTP::Request: '0'
+  Hash::Merge: '0'
+  IO::Interactive::Tiny: '0'
+  JSON::MaybeXS: '1.001000'
+  LWP::UserAgent: '0'
+  List::MoreUtils: '0'
+  List::Util: '1.33'
+  MCE::Loop: '0'
+  POSIX: '0'
+  Pod::Usage: '0'
+  Scalar::Util: '0'
+  Statistics::Descriptive: '0'
+  Sys::Hostname: '0'
+  TAP::Harness: '0'
+  TAP::Parser: '0'
+  Term::ANSIColor: '2.01'
+  Try::Tiny: '0'
+  Type::Params: '0'
+  Types::Standard: '0'
+  lib: '0'
+  parent: '0'
+  perl: '5.010'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=TestRail-API
   homepage: https://github.com/teodesian/TestRail-Perl
   repository: git://github.com/teodesian/TestRail-Perl.git
-version: 0.039
+version: '0.040'
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Neil Bowers <neil@bowers.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

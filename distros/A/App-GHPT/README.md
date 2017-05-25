@@ -4,7 +4,12 @@ App::GHPT - A command line tool to simplify using Github and Pivotal Tracker for
 
 # VERSION
 
-version 1.000003
+version 1.000004
+
+# SYNOPSIS
+
+    # configure as per instructions below
+    $> gh-pt.pl
 
 # DESCRIPTION
 
@@ -17,7 +22,11 @@ The basic workflow is as follows:
 
 1. Start a story in Pivotal Tracker.
 2. Hack, hack, hack.
-3. Run this tool, which will do the following things for you:
+3. Run this tool while you are in a git checkout. You should have the branch for
+which you want to submit a PR currently checked out.
+
+    Running this tool will do the following things for you:
+
     - Prompt you to select one of your active Pivotal Tracker stories.
     - (Optional)
 
@@ -52,7 +61,28 @@ You'll also need to tell git about your PT account:
     git config --global submit-work.pivotaltracker.username thor
     git config --global submit-work.pivotaltracker.token ae158fa0dc6570c8403f04bd35738d81
 
-(Your actual token can be found at [https://www.pivotaltracker.com/profile](https://www.pivotaltracker.com/profile))
+Your actual username and token can be found at
+[https://www.pivotaltracker.com/profile](https://www.pivotaltracker.com/profile).
+
+# COMMAND LINE OPTIONS
+
+This tool accepts the following options:
+
+## --project Project-Name
+
+The name of the PT project in which to look for stories. By default, all
+projects are searched one at a time. If you have a lot of projects you may
+want to limit this to just one.
+
+## --base branch
+
+The branch against which the PR should be made. This default to the master
+branch.
+
+## --dry-run
+
+Doesn't create a PR, just prints out the body of the PR that would have been
+created.
 
 # TROUBLESHOOTING
 
@@ -62,13 +92,21 @@ When hub is first used to connect to GitHub/GitHub Enterprise, hub requires a
 name and password that it uses to generate an OAuth token and stores it in
 `~/.config/hub`. If you have not used hub yet, this script will exit with:
 
-    $ gh-pt.pl --project my-project
+    $ gh-pt.pl
     Error creating pull request: Unauthorized (HTTP 401)
     Bad credentials
 
 The fix is to regenerate the OAuth token. Delete the `~/.config/hub` file if
 you've got one, and then run a `hub` command manually, such as
 `hub browse`. After authenticating, you should be able to use this script.
+
+## "No started stories found"
+
+If you get this message but you definitely have stories which are in the
+"started" or "finished" states, then there's probably an error with your
+configuration. Double check your PT username and token as seen on
+[https://www.pivotaltracker.com/profile](https://www.pivotaltracker.com/profile) against what you see via `git
+config --global --get-regexp '^submit-work'`
 
 # BUGS
 

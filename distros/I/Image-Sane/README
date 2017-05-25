@@ -1,4 +1,4 @@
-Sane - Perl extension for the SANE (Scanner Access Now Easy) Project
+Image::Sane - Perl extension for the SANE (Scanner Access Now Easy) Project
 ====================================================================
 
 This module allows you to access SANE-compatible scanners in a Perlish and
@@ -22,10 +22,8 @@ This module requires these other modules and libraries:
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2008 by Jeffrey Ratcliffe
+Copyright (C) 2008-2017 by Jeffrey Ratcliffe
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.5 or,
 at your option, any later version of Perl 5 you may have available.
-
-

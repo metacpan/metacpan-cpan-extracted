@@ -1,4 +1,4 @@
-#!perl -w
+#!perl
 
 use warnings;
 use strict;
@@ -10,7 +10,7 @@ use Test::More;
 
 plan 'no_plan';
 
-my $last_version = undef;
+my $last_version;
 find({wanted => \&check_version, no_chdir => 1}, 'blib');
 if (! defined $last_version) {
     fail('Failed to find any files with $VERSION');
@@ -28,7 +28,7 @@ sub check_version {
     # Skip POD
     $content =~ s/^__END__.*//xms;
 
-    # only look at perl scripts, not sh scripts
+    # Only look at perl scripts, not sh scripts.
     return if (m{blib/script/} && $content !~ m/\A \#![^\r\n]+?perl/xms);
 
     my @version_lines = $content =~ m/ ( [^\n]* \$VERSION [^\n]* ) /gxms;

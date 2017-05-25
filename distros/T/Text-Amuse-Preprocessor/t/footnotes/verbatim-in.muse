@@ -1,0 +1,127 @@
+#title Working with footnotes
+#lang en
+#topics howto
+#author Marco Pessotto
+#teaser Some tips about working with large texts with a lot of footnotes
+
+It came to my attention that people find troublesome to edit texts [1]
+with footnotes because you have to add/remove them and keeping the
+numbering in "sync" turns "out" to be a problem. [1]
+
+[1] This footnote is real.
+
+[1] This is also real.
+
+However, the following approach "should" work for you as well.
+
+<verbatim>[50]</verbatim> This is not a footnote and will stay. This should linkify: http://amusewiki.org and this http://amusewiki.org
+
+Usually I keep the paragraph and the footnote together, and I simply number them <verbatim>[1]</verbatim>.
+
+E.g.
+
+{{{
+** Chapter
+
+My paragraph [1] and text [1] http://amusewiki.org this should not linkify.
+
+[1] Footnote
+
+[1] "Footnote" - 1
+
+Here another paragraph [1]
+
+[1] Another footnote.
+
+}}}
+
+Then in the editing window, on saving/preview I use the option:
+Rearrange the footnotes (under Filters). [1]
+
+[1] Another real "footnote" - XXX
+
+After that the text will be edited and become
+
+<example>
+
+** Chapter
+
+My paragraph [1] and text [2]
+
+[1] Footnote
+
+[2] Footnote
+
+Here another paragraph [3]
+
+[3] Another footnote.
+
+</example>
+
+Say you 10-10 - "swap" the "paragraphs":
+
+{{{
+** Chapter
+
+Here another paragraph [3]
+
+[3] Another footnote.
+
+My paragraph [1] and text [2]
+
+[1] Footnote
+
+[2] Footnote
+
+}}}
+
+After the 'preview' with the 'option' enabled: [1]
+
+[1] REAL "Footnote"
+
+{{{
+
+** Chapter
+
+Here another paragraph [1]
+
+[1] Another footnote.
+
+My paragraph [2] and text [3]
+
+[2] Footnote
+
+[3] Footnote
+
+}}}
+
+And everything will - work.
+
+This way only the order matters, and the engine takes care of the
+"(re)numbering."
+
+This way you can "move" paragraphs 'and' chapters around without caring
+about numbering, as long as you carry the footnotes with you. [1]
+
+[1] Footnote
+
+If you work locally, you may want to use the muse-preprocessor.pl
+script:
+
+<example>
+$ muse-preprocessor.pl --footnotes --inplace "file.muse" [30]
+</example>
+
+which does the same thing as the web interface. [1]
+
+  {{{
+  "hello"
+  }}}
+
+This is not "excluded"
+
+  <example>
+  "hello"
+  </example>
+
+[1] Final real footnote.

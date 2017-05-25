@@ -1,7 +1,7 @@
 package Pcore::Util::PM::Proc;
 
 use Pcore -class;
-use Pcore::AE::Handle;
+use Pcore::AE::Handle2;
 use Pcore::Util::Scalar qw[refcount weaken blessed];
 use AnyEvent::Util qw[portable_socketpair];
 use if $MSWIN, 'Win32::Process';
@@ -21,12 +21,12 @@ has pid => ( is => 'ro', isa => PositiveInt, init_arg => undef );
 has status => ( is => 'ro', isa => Maybe [Int], init_arg => undef );    # undef - process is still alive
 has reason => ( is => 'ro', isa => Str, init_arg => undef );
 
-has stdin  => ( is => 'ro', isa => InstanceOf ['Pcore::AE::Handle'], init_arg => undef );    # process STDIN, we can write
-has stdout => ( is => 'ro', isa => InstanceOf ['Pcore::AE::Handle'], init_arg => undef );    # process STDOUT, we can read
-has stderr => ( is => 'ro', isa => InstanceOf ['Pcore::AE::Handle'], init_arg => undef );    # process STDERR, we can read
+has stdin  => ( is => 'ro', isa => InstanceOf ['Pcore::AE::Handle2'], init_arg => undef );    # process STDIN, we can write
+has stdout => ( is => 'ro', isa => InstanceOf ['Pcore::AE::Handle2'], init_arg => undef );    # process STDOUT, we can read
+has stderr => ( is => 'ro', isa => InstanceOf ['Pcore::AE::Handle2'], init_arg => undef );    # process STDERR, we can read
 
-has _on_finish => ( is => 'ro', isa => Maybe [CodeRef], init_arg => undef );                 # on_finish callback
-has _win32_proc => ( is => 'ro', isa => InstanceOf ['Win32::Process'], init_arg => undef );  # MSWIN process descriptor
+has _on_finish => ( is => 'ro', isa => Maybe [CodeRef], init_arg => undef );                  # on_finish callback
+has _win32_proc => ( is => 'ro', isa => InstanceOf ['Win32::Process'], init_arg => undef );   # MSWIN process descriptor
 has _sigchild    => ( is => 'ro', isa => Object, init_arg => undef );
 has _blocking_cv => ( is => 'ro', isa => Object, init_arg => undef );
 
@@ -169,7 +169,7 @@ sub _create_handles ( $self, $hdl ) {
 
     # create STDIN handle
     if ( $hdl->{in_w} ) {
-        Pcore::AE::Handle->new(
+        Pcore::AE::Handle2->new(
             fh         => $hdl->{in_w},
             on_connect => sub ( $h, @ ) {
                 $self->{stdin} = $h;
@@ -181,7 +181,7 @@ sub _create_handles ( $self, $hdl ) {
 
     # create STDOUT handle
     if ( $hdl->{out_r} ) {
-        Pcore::AE::Handle->new(
+        Pcore::AE::Handle2->new(
             fh         => $hdl->{out_r},
             on_connect => sub ( $h, @ ) {
                 $self->{stdout} = $h;
@@ -199,7 +199,7 @@ sub _create_handles ( $self, $hdl ) {
 
     # create STDERR handle
     if ( $hdl->{err_r} ) {
-        Pcore::AE::Handle->new(
+        Pcore::AE::Handle2->new(
             fh         => $hdl->{err_r},
             on_connect => sub ( $h, @ ) {
                 $self->{stderr} = $h;

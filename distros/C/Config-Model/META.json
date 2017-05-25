@@ -17,6 +17,7 @@
       "build" : {
          "requires" : {
             "Module::Build" : "0.34",
+            "YAML" : "0",
             "YAML::Tiny" : "0"
          }
       },
@@ -96,7 +97,7 @@
          "web" : "http://github.com/dod38fr/config-model"
       }
    },
-   "version" : "2.102",
+   "version" : "2.103",
    "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

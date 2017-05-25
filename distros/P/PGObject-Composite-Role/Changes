@@ -1,5 +1,9 @@
 Revision history for PGObject-Composite-Role
 
+1.0.0	2017-05-24
+	Stable, documented API
+	Removed MYMETA from manifest
+
 0.02	2014-09-10
 	Minor fixes to packaging
 

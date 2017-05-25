@@ -36,7 +36,7 @@ if (@ARGV) {
     }
 }
 
-# count how many tests there will be
+# Count how many tests there will be.
 my $nsubtests = 0;
 for my $s (values %{$subtests}) {
     $nsubtests += @{$s}; # one [pf]critique() test per subtest

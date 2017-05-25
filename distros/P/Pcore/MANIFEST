@@ -11,6 +11,8 @@ lib/Pcore/AE/DNS/Cache.pm
 lib/Pcore/AE/Handle.pm
 lib/Pcore/AE/Handle/Cache.pm
 lib/Pcore/AE/Handle/Cache/Storage.pm
+lib/Pcore/AE/Handle/Cache2.pm
+lib/Pcore/AE/Handle2.pm
 lib/Pcore/AE/Patch.pm
 lib/Pcore/API/Bitbucket.pm
 lib/Pcore/API/Bitbucket/Issue.pm

@@ -42,3 +42,38 @@ my $data = 'bonzo';
 
 #-----------------------------------------------------------------------------
 
+## name Not responsible for variables I didn't declare.
+## failures 0
+## cut
+
+my $perfectly_valid_name = $data;
+
+#-----------------------------------------------------------------------------
+
+## name Make sure we handle all types of variable declarations and configurations
+## failures 7
+## cut
+
+my ( $data, $info, $temp );
+state ( $obj, $object );
+our @info;
+local %tmp;
+my $lumpy = $data; # Not a problem, becuase it's not ours
+my $barfy = @object; # Not a problem, becuase it's not ours
+
+#-----------------------------------------------------------------------------
+
+## name Complain about poorly-named subroutines, too.  Case-insensitive. Ignore BEGIN etc.
+## failures 3
+## cut
+
+sub info {}
+sub TEMP {}
+sub Data {}
+
+BEGIN {
+    my $x = 4;
+}
+
+#-----------------------------------------------------------------------------
+# ex: set ft=perl:

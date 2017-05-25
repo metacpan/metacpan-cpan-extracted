@@ -1,3 +1,26 @@
+v0.35.1 2017-05-25T08:25:04Z
+ - No issues on bugtracker were closed since the last release
+ - http use timeout as connect_timeout if not defined
+ - use low tls ctx if not defined
+ - tls ctx const values changed
+
+v0.35.0 2017-05-25T07:10:36Z
+ - No issues on bugtracker were closed since the last release
+ - override tcp_connect for intercept exceptions in prepare cb
+ - websocket on_pong get data ref as argument
+ - http - use Pcore::AE::Handle2 if connections is not use proxy
+ - make http connections not persistent by default
+ - AE::Handle2 set peername, required for TLS
+ - support for on_connect_error added for Handle2
+ - handle2 persistent connections
+ - api client use persistent HTTP connection by default
+ - http set is_connect_error
+ - TLS_CTX constants moved to the AE::Handle
+ - use AE::Handle2 where it is possible
+ - handle use high tls_ctx by default
+ - http use high tls_ctx by default
+ - CA use default tls ctx
+
 v0.34.0 2017-05-23T15:46:24Z
  - No issues on bugtracker were closed since the last release
  - fixed invalid arguments for websocket on_pong callback

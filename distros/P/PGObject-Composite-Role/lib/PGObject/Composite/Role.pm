@@ -1,11 +1,11 @@
 package PGObject::Composite::Role;
 
-use 5.008;
+use 5.010;
 use strict;
 use warnings FATAL => 'all';
 
 use Moo::Role;
-use PGObject::Composite;
+use PGObject::Composite ':all';
 
 =head1 NAME
 
@@ -13,11 +13,11 @@ PGObject::Composite::Role - A Moo role interface for PGObject::Composite
 
 =head1 VERSION
 
-Version 0.02
+Version 1
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = 1.000000;
 
 
 =head1 SYNOPSIS
@@ -48,10 +48,11 @@ through an intermediate role.
 
 =cut
 
-has _dbh => (is => 'lazy', builder => '_get_dbh');
+has _dbh => (is => 'lazy');
 
-sub _get_dbh {
-    die 'Must overload get_dbh!';
+sub _build__dbh {
+    my ($self) = @_;
+    return $self->SUPER::_get_dbh($self);
 }
 
 =head2 _funcschema
@@ -62,19 +63,15 @@ This is the default function schema.  Default is 'public'
 
 has _funcschema => (is => 'lazy', builder => '_get_funcschema');
 
-sub _get_funcschema { 'public' }
-
 =head2 _typeschema
 
 This is the schema under which the type is found.  Defaults to public
 
-Builer is _get_schema
+Builer is _get_typeschema
 
 =cut
 
-has _typeschema =>  (is => 'lazy', builder => '_get_schema');
-
-sub _get_schema { 'public' };
+has _typeschema =>  (is => 'lazy', builder => '_get_typeschema');
 
 =head2 _typename
 
@@ -85,8 +82,6 @@ The builder is _get_typename
 =cut
 
 has _typename =>  (is => 'lazy', builder => '_get_typename');
-
-sub _get_typename { die 'Must override _get_typename' };
 
 =head1 METHODS
 
@@ -108,25 +103,11 @@ arrayref of argument values
 
 =back
 
-=cut
-
-sub call_procedure {
-    my @rows = PGObject::Composite::call_procedure(@_);
-    return @rows if wantarray;
-    return shift @rows;
-}
-
 =head2 call_dbmethod
 
 Calls a mapped method by arguments.  Handles things as per PGObject::Composite
 
 =cut
-
-sub call_dbmethod {
-    my @rows = PGObject::Composite::call_dbmethod(@_);
-    return @rows if wantarray;
-    return shift @rows;
-}
 
 =head1 AUTHOR
 

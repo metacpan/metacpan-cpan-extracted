@@ -22,5 +22,5 @@ requires:
   PGObject: v1.402.4
   PGObject::Type::Composite: '0'
   perl: '5.01'
-version: 1.000001
+version: 1.000002
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

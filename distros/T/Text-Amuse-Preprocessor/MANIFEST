@@ -17,6 +17,7 @@ t/changes.t
 t/chars.t
 t/common.t
 t/crash_on_loop.t
+t/exclude-verbatim.t
 t/footnotes.t
 t/footnotes/bad.muse
 t/footnotes/bad2.muse
@@ -26,6 +27,8 @@ t/footnotes/good.in
 t/footnotes/good.out
 t/footnotes/good2.in
 t/footnotes/good2.out
+t/footnotes/verbatim-exp.muse
+t/footnotes/verbatim-in.muse
 t/html.t
 t/manifest.t
 t/memory-cycles.t

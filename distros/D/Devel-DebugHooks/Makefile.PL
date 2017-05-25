@@ -3,21 +3,21 @@ require 5.012000;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'VERSION_FROM' => 'lib/Devel/DebugHooks.pm',
-  'PREREQ_PM' => {
-                   'Scope::Cleanup' => 0,
-                   'B::Deparse' => 0,
-                   'Package::Stash' => 0,
-                   'Sub::Metadata' => 0,
-                   'Data::Dump' => 0,
-                   'PadWalker' => 0
-                 },
   'NAME' => 'Devel::DebugHooks',
-  'INSTALLDIRS' => 'site',
+  'PL_FILES' => {},
+  'PREREQ_PM' => {
+                   'B::Deparse' => 0,
+                   'Sub::Metadata' => 0,
+                   'PadWalker' => 0,
+                   'Scope::Cleanup' => 0,
+                   'Package::Stash' => 0,
+                   'Data::Dump' => 0
+                 },
+  'VERSION_FROM' => 'lib/Devel/DebugHooks.pm',
   'EXE_FILES' => [
                    'bin/analizer.pl',
                    'bin/dclient.pl'
                  ],
-  'PL_FILES' => {}
+  'INSTALLDIRS' => 'site'
 )
 ;

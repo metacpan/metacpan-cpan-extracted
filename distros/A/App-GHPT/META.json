@@ -43,7 +43,6 @@
             "Test::Pod::Coverage" : "1.08",
             "Test::Portability::Files" : "0",
             "Test::Spelling" : "0.12",
-            "Test::Synopsis" : "0",
             "Test::Vars" : "0.009",
             "Test::Version" : "2.05",
             "blib" : "1.01"
@@ -113,55 +112,55 @@
    "provides" : {
       "App::GHPT" : {
          "file" : "lib/App/GHPT.pm",
-         "version" : "1.000003"
+         "version" : "1.000004"
       },
       "App::GHPT::Types" : {
          "file" : "lib/App/GHPT/Types.pm",
-         "version" : "1.000003"
+         "version" : "1.000004"
       },
       "App::GHPT::WorkSubmitter" : {
          "file" : "lib/App/GHPT/WorkSubmitter.pm",
-         "version" : "1.000003"
+         "version" : "1.000004"
       },
       "App::GHPT::WorkSubmitter::AskPullRequestQuestions" : {
          "file" : "lib/App/GHPT/WorkSubmitter/AskPullRequestQuestions.pm",
-         "version" : "1.000003"
+         "version" : "1.000004"
       },
       "App::GHPT::WorkSubmitter::ChangedFiles" : {
          "file" : "lib/App/GHPT/WorkSubmitter/ChangedFiles.pm",
-         "version" : "1.000003"
+         "version" : "1.000004"
       },
       "App::GHPT::WorkSubmitter::ChangedFilesFactory" : {
          "file" : "lib/App/GHPT/WorkSubmitter/ChangedFilesFactory.pm",
-         "version" : "1.000003"
+         "version" : "1.000004"
       },
       "App::GHPT::WorkSubmitter::Role::FileInspector" : {
          "file" : "lib/App/GHPT/WorkSubmitter/Role/FileInspector.pm",
-         "version" : "1.000003"
+         "version" : "1.000004"
       },
       "App::GHPT::WorkSubmitter::Role::Question" : {
          "file" : "lib/App/GHPT/WorkSubmitter/Role/Question.pm",
-         "version" : "1.000003"
+         "version" : "1.000004"
       },
       "App::GHPT::Wrapper::OurMoose" : {
          "file" : "lib/App/GHPT/Wrapper/OurMoose.pm",
-         "version" : "1.000003"
+         "version" : "1.000004"
       },
       "App::GHPT::Wrapper::OurMoose::Role" : {
          "file" : "lib/App/GHPT/Wrapper/OurMoose/Role.pm",
-         "version" : "1.000003"
+         "version" : "1.000004"
       },
       "App::GHPT::Wrapper::OurMooseX::Role::Parameterized" : {
          "file" : "lib/App/GHPT/Wrapper/OurMooseX/Role/Parameterized.pm",
-         "version" : "1.000003"
+         "version" : "1.000004"
       },
       "App::GHPT::Wrapper::OurMooseX::Role::Parameterized::Meta::Trait::Parameterizable::Strict" : {
          "file" : "lib/App/GHPT/Wrapper/OurMooseX/Role/Parameterized/Meta/Trait/Parameterizable/Strict.pm",
-         "version" : "1.000003"
+         "version" : "1.000004"
       },
       "App::GHPT::Wrapper::Ourperl" : {
          "file" : "lib/App/GHPT/Wrapper/Ourperl.pm",
-         "version" : "1.000003"
+         "version" : "1.000004"
       }
    },
    "release_status" : "stable",
@@ -176,7 +175,7 @@
          "web" : "https://github.com/maxmind/App-GHPT"
       }
    },
-   "version" : 1.000003,
+   "version" : 1.000004,
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.022001"
@@ -547,11 +546,6 @@
             },
             "name" : "@MAXMIND/Test::Portability",
             "version" : "2.001000"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::Test::Synopsis",
-            "name" : "@MAXMIND/Test::Synopsis",
-            "version" : "2.000007"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::TidyAll",
@@ -926,7 +920,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.000003",
+                  "tag" : "v1.000004",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },

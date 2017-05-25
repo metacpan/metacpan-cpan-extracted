@@ -3,7 +3,7 @@ package Pcore::RPC::Proc;
 use Pcore -class;
 use Fcntl;
 use Config;
-use Pcore::AE::Handle;
+use Pcore::AE::Handle2;
 use AnyEvent::Util qw[portable_socketpair];
 use if $MSWIN, 'Win32API::File';
 use Pcore::Util::Data qw[:CONST];
@@ -108,7 +108,7 @@ around new => sub ( $orig, $self, @ ) {
 sub _handshake ( $self, $ctrl_fh, $cb ) {
 
     # wrap control_fh
-    Pcore::AE::Handle->new(
+    Pcore::AE::Handle2->new(
         fh         => $ctrl_fh,
         on_connect => sub ( $h, @ ) {
             $h->push_read(

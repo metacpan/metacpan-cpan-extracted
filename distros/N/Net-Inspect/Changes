@@ -1,3 +1,6 @@
+0.327 2017/05/25
+- L7::SMTP - support BDAT command
+- L7::HTTP - make it complain about missing content-length in POST again
 0.326 2016/07/06
 - initial support for SMTP 
   - implemented in L7::SMTP

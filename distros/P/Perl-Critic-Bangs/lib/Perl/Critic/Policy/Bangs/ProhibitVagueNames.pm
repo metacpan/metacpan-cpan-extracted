@@ -5,7 +5,7 @@ use warnings;
 use Perl::Critic::Utils qw( :booleans :severities );
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '1.10';
+our $VERSION = '1.12';
 
 #----------------------------------------------------------------------------
 
@@ -13,13 +13,13 @@ sub supported_parameters {
     return (
         {
             name           => 'names',
-            description    => 'Words to prohibit as variable names.',
+            description    => 'Words to prohibit as variable and subroutine names.',
             behavior       => 'string list',
             default_string => 'data info var obj object tmp temp',
         },
         {
             name           => 'add_names',
-            description    => 'Additional words to prohibit as variable names.',
+            description    => 'Additional words to prohibit as variable and subroutine names.',
             behavior       => 'string list',
         },
     );
@@ -27,13 +27,13 @@ sub supported_parameters {
 
 sub default_severity     { return $SEVERITY_MEDIUM        }
 sub default_themes       { return qw( bangs readability ) }
-sub applies_to           { return 'PPI::Token::Symbol'    }
+sub applies_to           { return 'PPI::Statement::Variable', 'PPI::Statement::Sub' }
 
 =for stopwords whitespace
 
 =head1 NAME
 
-Perl::Critic::Policy::Bangs::ProhibitVagueNames - Don't use generic variable names.
+Perl::Critic::Policy::Bangs::ProhibitVagueNames - Don't use generic variable and subroutine names.
 
 =head1 AFFILIATION
 
@@ -41,8 +41,8 @@ This Policy is part of the L<Perl::Critic::Bangs> distribution.
 
 =head1 DESCRIPTION
 
-Variables should have descriptive names. Names like C<$data> and
-C<$info> are completely vague.
+Variables and subroutines should have descriptive names. Names like
+C<$data> and C<$info> are completely vague.
 
    my $data = shift;      # not OK.
    my $userinfo = shift   # OK
@@ -50,6 +50,10 @@ C<$info> are completely vague.
 See
 L<http://www.oreillynet.com/onlamp/blog/2004/03/the_worlds_two_worst_variable.html>
 for more of my ranting on this.
+
+By default, the following names are bad: data, info, var, obj, object, tmp, temp
+
+The checking of names is case-insensitive.  C<$info> and C<$INFO> are equally bad.
 
 =head1 CONFIGURATION
 
@@ -85,24 +89,60 @@ sub initialize_if_enabled {
 sub violates {
     my ( $self, $elem, $doc ) = @_;
 
-    # make $basename be the variable name with no sigils or namespaces.
-    my $canonical = $elem->canonical();
-    my $basename = $canonical;
-    $basename =~ s/.*:://;
-    $basename =~ s/^[\$@%]//;
+    my @violations;
 
-    foreach my $naughty ( keys %{ $self->{'_names'} } ) {
-        if ( $basename eq $naughty ) {
-            my $desc = qq(Variable named "$canonical");
-            my $expl = 'Variable names should be specific, not vague';
-            return $self->violation( $desc, $expl, $elem );
+    my $type = ref($elem);
+    if ( $type eq 'PPI::Statement::Variable' ) {
+        for my $symbol ( $elem->symbols ) {
+            # Make $basename be the variable name with no sigils or namespaces.
+            my $fullname = $symbol->canonical;
+            my $basename = $fullname;
+            $basename =~ s/^[\$@%]//;
+            $basename =~ s/.*:://;
+
+            push( @violations, $self->_potential_violation( $symbol, $fullname, $basename, 'Variable' ) );
         }
     }
+    elsif ( $type eq 'PPI::Statement::Sub' ) {
+        my $fullname = $elem->name;
+        my $basename = $fullname;
+        $basename =~ s/.*:://;
+
+        push( @violations, $self->_potential_violation( $elem, $fullname, $basename, 'Subroutine' ) );
+    }
+    elsif ( $type eq 'PPI::Statement::Scheduled' ) {
+        # Ignore BEGIN, INIT, etc
+    }
+    else {
+        die "Unknown type $type";
+    }
+
+    return @violations;
+}
+
+sub _potential_violation {
+    my $self     = shift;
+    my $symbol   = shift;
+    my $fullname = shift;
+    my $basename = shift;
+    my $what     = shift;
+
+    $basename = lc $basename;
+
+    foreach my $naughty ( keys %{ $self->{'_names'} } ) {
+        if ( $basename eq lc $naughty ) {
+            my $desc = qq{$what named "$fullname"};
+            my $expl = "$what names should be specific, not vague";
+            return $self->violation( $desc, $expl, $symbol );
+        }
+    }
+
     return;
 }
 
 1;
 
+__END__
 =head1 AUTHOR
 
 Andy Lester C<< <andy at petdance.com> >> from code by
@@ -115,7 +155,7 @@ Based on App::Fluff by Andy Lester, "<andy at petdance.com>"
 
 =head1 COPYRIGHT
 
-Copyright (c) 2006-2011 Andy Lester
+Copyright (c) 2006-2013 Andy Lester
 
 This library is free software; you can redistribute it and/or modify it
 under the terms of the Artistic License 2.0.

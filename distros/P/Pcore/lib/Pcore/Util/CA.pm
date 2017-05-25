@@ -11,7 +11,6 @@ sub update ($cb = undef) {
 
     P->http->get(
         'https://curl.haxx.se/ca/cacert.pem',
-        tls_ctx   => $Pcore::HTTP::TLS_CTX_HIGH,
         on_finish => sub ($res) {
             my $status;
 

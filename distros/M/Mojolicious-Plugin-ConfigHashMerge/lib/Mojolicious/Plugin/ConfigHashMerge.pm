@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin::Config';
 use Hash::Merge::Simple qw( merge );
 use File::Spec::Functions 'file_name_is_absolute';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub register {
   my ($self, $app, $conf) = @_;
@@ -114,6 +114,9 @@ Instead of like this (with the regular Config plugin):
   { optA => 42, optB => { test => 1 }, optC => 7 }
 
 See L<Mojolicious::Plugin::Config> for more.
+
+Note that this plugin also supports the B<config_override> option in Mojolicious version 7.29+, which
+allow you to override the config in your tests.
 
 =head1 OPTIONS
 

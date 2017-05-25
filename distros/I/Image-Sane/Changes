@@ -1,5 +1,9 @@
 Revision history for Perl extension Image::Sane.
 
+0.09  Mon, 25 May 2017 17:30 +0200
+        - Use identify -format to fix spurious test failures
+        - + missing PREREQ_PM and CONFIGURE_REQUIRES to fix RT 121871.
+
 0.08  Mon, 22 May 2017 17:30 +0200
         - Use $EXECUTABLE_NAME to call perl in tests to fix RT 121627.
 

@@ -1,5 +1,6 @@
 language: perl
 perl:
+   - '5.22'
    - '5.20'
    - '5.18'
    - '5.16'
@@ -10,7 +11,7 @@ perl:
 matrix:
    fast_finish: true
    include:
-     - perl: '5.22'
+     - perl: '5.24'
        env: COVERAGE=1
 
 sudo: false
@@ -26,7 +27,7 @@ install:
   - cpan-install --deps       # installs prereqs, including recommends
   - cpan-install --coverage   # installs converage prereqs, if enabled
   - cpanm --quiet --notest Devel::Cover::Report::Coveralls #Make sure to shoot it over to coveralls
-  - cpanm --quiet --notest Test::Spelling Test::NoTabs Test::EOL Test::Version Test::Mojibake #Looks like they were missed by haarg's stuff
+  - cpanm --quiet --notest Test::Perl::Critic Test::Synopsis Test::Spelling Test::NoTabs Test::EOL Test::Version Test::Mojibake #Looks like they were missed by haarg's stuff
 
 branches:
    only:

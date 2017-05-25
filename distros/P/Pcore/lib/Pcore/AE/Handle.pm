@@ -11,6 +11,7 @@ use Pcore::AE::DNS::Cache;
 use Pcore::HTTP::Headers;
 use HTTP::Parser::XS qw[HEADERS_AS_ARRAYREF HEADERS_NONE];
 use Pcore::AE::Handle::Cache;
+use Pcore::AE::Handle2 qw[:TLS_CTX];
 
 const our $PROXY_TYPE_HTTP    => 1;
 const our $PROXY_TYPE_CONNECT => 2;
@@ -86,6 +87,14 @@ sub new ( $self, @ ) {
     # convert to AE::Handle attrs
     $args{no_delay}  = delete $args{tcp_no_delay};
     $args{keepalive} = delete $args{tcp_so_keepalive};
+
+    # resolve TLS_CTX shortcut
+    if ( !$args{tls_ctx} ) {
+        $args{tls_ctx} = $Pcore::AE::Handle2::TLS_CTX->{$TLS_CTX_LOW};
+    }
+    elsif ( !ref $args{tls_ctx} ) {
+        $args{tls_ctx} = $Pcore::AE::Handle2::TLS_CTX->{ $args{tls_ctx} };
+    }
 
     if ( $args{fh} ) {
         $args{on_connect}->( $self->SUPER::new(%args), undef, undef, undef );
@@ -1028,30 +1037,30 @@ sub get_connect ($connect) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
-## |      | 72                   | * Subroutine "new" with high complexity score (45)                                                             |
-## |      | 662                  | * Subroutine "read_http_res_headers" with high complexity score (22)                                           |
-## |      | 788                  | * Subroutine "read_http_body" with high complexity score (29)                                                  |
+## |      | 73                   | * Subroutine "new" with high complexity score (47)                                                             |
+## |      | 671                  | * Subroutine "read_http_res_headers" with high complexity score (22)                                           |
+## |      | 797                  | * Subroutine "read_http_body" with high complexity score (29)                                                  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 185                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 194                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 295, 698, 699        | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 304, 707, 708        | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 57, 482, 529, 534,   | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
-## |      | 551, 597, 600, 603   |                                                                                                                |
+## |    2 | 58, 491, 538, 543,   | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |      | 560, 606, 609, 612   |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 735                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 744                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 |                      | Documentation::RequirePodLinksIncludeText                                                                      |
-## |      | 1059                 | * Link L<AnyEvent::Handle> on line 1065 does not specify text                                                  |
-## |      | 1059                 | * Link L<AnyEvent::Handle> on line 1073 does not specify text                                                  |
-## |      | 1059                 | * Link L<AnyEvent::Handle> on line 1101 does not specify text                                                  |
-## |      | 1059                 | * Link L<AnyEvent::Handle> on line 1117 does not specify text                                                  |
-## |      | 1059                 | * Link L<AnyEvent::Socket> on line 1117 does not specify text                                                  |
-## |      | 1059, 1059           | * Link L<Pcore::Proxy> on line 1083 does not specify text                                                      |
-## |      | 1059                 | * Link L<Pcore::Proxy> on line 1117 does not specify text                                                      |
+## |      | 1068                 | * Link L<AnyEvent::Handle> on line 1074 does not specify text                                                  |
+## |      | 1068                 | * Link L<AnyEvent::Handle> on line 1082 does not specify text                                                  |
+## |      | 1068                 | * Link L<AnyEvent::Handle> on line 1110 does not specify text                                                  |
+## |      | 1068                 | * Link L<AnyEvent::Handle> on line 1126 does not specify text                                                  |
+## |      | 1068                 | * Link L<AnyEvent::Socket> on line 1126 does not specify text                                                  |
+## |      | 1068, 1068           | * Link L<Pcore::Proxy> on line 1092 does not specify text                                                      |
+## |      | 1068                 | * Link L<Pcore::Proxy> on line 1126 does not specify text                                                      |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 53, 58, 487, 597,    | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
-## |      | 600, 603, 609        |                                                                                                                |
+## |    1 | 54, 59, 496, 606,    | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |      | 609, 612, 618        |                                                                                                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

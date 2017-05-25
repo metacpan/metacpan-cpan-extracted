@@ -7,17 +7,15 @@ use Test::More;
 use Perl::Critic::TestUtils qw(bundled_policy_names);
 use English qw(-no_match_vars);
 
-#-----------------------------------------------------------------------------
-
-our $VERSION = '1.10';
-
-#-----------------------------------------------------------------------------
+our $VERSION = '1.12';
 
 Perl::Critic::TestUtils::block_perlcriticrc();
 
 my @bundled_policy_names = bundled_policy_names();
 
 plan tests => scalar @bundled_policy_names;
+
+diag( "Testing Perl::Critic::Bangs $VERSION, Perl $], $^X" );
 
 # pre-compute for version comparisons
 my $version_string = __PACKAGE__->VERSION;

@@ -7,7 +7,7 @@ use Data::Printer;
 
 with 'WebService::Client';
 # ABSTRACT: Perl 5 interface to Pixabay API.
-our $VERSION = '0.0.4'; # VERSION
+our $VERSION = '0.0.6'; # VERSION
 
 has api_key =>
 (
@@ -74,7 +74,7 @@ WebService::Pixabay - Perl 5 interface to Pixabay API.
 
 =head1 VERSION
 
-version 0.0.4
+version 0.0.6
 
 =head1 SYNOPSIS
 
@@ -120,6 +120,15 @@ version 0.0.4
 
 	$pix->show_data_structure($nis);
 	$pix->show_data_structure($nvs);
+
+	# example retrieving webformatURL from each arrays
+	my @urls = undef;
+
+	foreach my $url (@{$img_search->{hits}}) {
+		
+		# now has link of photo urls (non-preview photos)
+		push(@urls, $url->{webformatURL});		
+	}
 
 =head1 SEE ALSO
 

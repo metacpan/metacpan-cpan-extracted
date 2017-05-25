@@ -7,7 +7,8 @@ build_requires:
   Readonly: '0'
   Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::Depends: '0'
+  ExtUtils::PkgConfig: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010'
 license: unknown
@@ -19,6 +20,7 @@ no_index:
   directory:
     - t
     - inc
-requires: {}
-version: '0.08'
+requires:
+  Exception::Class: '0'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

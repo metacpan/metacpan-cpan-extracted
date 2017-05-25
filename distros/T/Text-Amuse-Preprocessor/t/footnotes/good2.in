@@ -11,10 +11,14 @@ bla [1] bla [1] bla [1] bla [1] bla [1] bla [1] bla [1]
 blablbla
 blablbla inside the ààblock
 
+{{{
+ciao ciao [3]
+}}}
+
 [1] blablabla
 blablbla inside the ààblock
 
-bla [1] bla [1] bla [1] bla [1] bla [1] bla [1] bla [1]
+bla [1] bla [1] bla [1] bla [1] bla [1] bla [1] bla [1] <verbatim>[33]</verbatim>
 bla [1] bla [1] bla [1] bla [1] bla [1] bla [1] bla [1]
 bla [1] bla [1] bla [1] bla [1] bla [1] bla [1] bla [1]
 bla [1] bla [1] bla [1] bla [1] bla [1] bla [1] bla [1]
@@ -633,3 +637,8 @@ blablbla
 [1] blablabla
 blablbla
 
+<verbatim>[1]</verbatim> Blabla
+
+{{{
+[1] This is verbatim
+}}}

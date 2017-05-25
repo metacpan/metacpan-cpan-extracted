@@ -35,7 +35,7 @@ Mojolicious::Plugin::ConfigHashMerge - Perlish Configuration, with merging of de
 
 # DESCRIPTION
 
-[Mojolicious::Plugin::ConfigHashMerge](https://metacpan.org/pod/Mojolicious::Plugin::ConfigHashMerge) behaves __exactly__ like the standard plugin
+[Mojolicious::Plugin::ConfigHashMerge](https://metacpan.org/pod/Mojolicious::Plugin::ConfigHashMerge) behaves **exactly** like the standard plugin
 [Mojolicious::Plugin::Config](https://metacpan.org/pod/Mojolicious::Plugin::Config), except that it merges the defaults with the contents
 of the config file using [Hash::Merge::Simple](https://metacpan.org/pod/Hash::Merge::Simple) instead of flattening the two hashes
 into lists. This allows merging of deeply-nested config options.
@@ -70,6 +70,9 @@ Instead of like this (with the regular Config plugin):
     { optA => 42, optB => { test => 1 }, optC => 7 }
 
 See [Mojolicious::Plugin::Config](https://metacpan.org/pod/Mojolicious::Plugin::Config) for more.
+
+Note that this plugin also supports the **config\_override** option in Mojolicious version 7.29+, which
+allow you to override the config in your tests.
 
 # OPTIONS
 

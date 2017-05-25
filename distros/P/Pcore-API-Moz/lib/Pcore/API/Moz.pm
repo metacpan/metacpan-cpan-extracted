@@ -1,10 +1,9 @@
-package Pcore::API::Moz v0.9.3;
+package Pcore::API::Moz v0.10.0;
 
 use Pcore -dist, -class, -result;
 use Pcore::API::Moz::Account;
 
 has api_expires => ( is => 'ro', isa => PositiveInt, default => 172_800 );    # in seconds, 2 days
-has proxy_pool => ( is => 'ro', isa => Maybe [ InstanceOf ['Pcore::API::ProxyPool'] ] );
 
 has has_valid_accounts => ( is => 'ro', isa => PositiveOrZeroInt, default => 0, init_arg => undef );
 has valid_accounts   => ( is => 'ro', isa => ArrayRef, init_arg => undef );

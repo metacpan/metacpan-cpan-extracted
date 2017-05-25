@@ -94,7 +94,7 @@ foreach my $file (@files) {
     my $contents = '';
     if(open(FILE, $file)) { $contents = <FILE>; close(FILE); }
     open(FILE, ">$file") || die("Can't write $file\n");
-    print FILE 'use lib inc; use Devel::AssertOS qw('.
+    print FILE 'use lib qw(inc); use Devel::AssertOS qw('.
         join(' ', @oses).
         ");\n\n";
     print FILE $contents;
@@ -145,7 +145,7 @@ will need to re-run this script whenever you have generated a new
 Makefile.PL.
 
 I welcome feedback about my code, including constructive criticism.
-Bug reports should be made using L<http://rt.cpan.org/> or by email.
+Bug reports should be made using L<https://github.com/DrHyde/perl-modules-Devel-CheckOS/issues>.
 
 =head1 SEE ALSO
 

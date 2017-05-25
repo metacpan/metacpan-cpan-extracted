@@ -2,7 +2,7 @@ package Perl::Critic::Policy::Bangs::ProhibitDebuggingModules;
 use strict;
 use warnings;
 
-our $VERSION = '1.10';
+our $VERSION = '1.12';
 
 use List::MoreUtils qw(any);
 use Readonly;
@@ -48,26 +48,36 @@ sub supported_parameters    {
             description     => 'Module names which are considered to be banned debugging modules',
             behavior        => 'string list',
             list_always_present_values => [qw(
+                B::Stats
+
+                Carp::Always.*
+                Carp::Diagnostics
+                Carp::REPL
+                Carp::Source::Always
+                Carp::Trace
+
                 Data::Dump
                 Data::Dump::Filtered
                 Data::Dump::Streamer
                 Data::Dump::Trace
 
-                Data::Dumper
-                Data::Dumper::Concise
-                Data::Dumper::Concise::Sugar
-                Data::Dumper::EasyOO
-                Data::Dumper::Names
-                Data::Dumper::Simple
+                Data::Dumper.*
 
                 Data::Printer
                 Data::PrettyPrintObjects
+                Data::Show
                 Data::Skeleton
                 Data::TreeDumper
 
                 DDP
                 DDS
+                Devel::Ditto
                 Devel::Dwarn
+                Devel::Modlist
+                Devel::Monitor
+                Devel::StackTrace
+                Devel::Trace
+                Devel::Unplug
                 ) ], # DDP and DDS are shorthand module names
         }
     );
@@ -80,11 +90,11 @@ sub violates {
     my ($self, $include, undef) = @_;
     return unless defined $include->type and ($include->type eq 'use' || $include->type eq 'require');
     my $included = $include->module or return;
-    my $EXPL = "You've loaded $included, which probably shouln't be loaded in production";
+    my $EXPL = "You've loaded $included, which probably shouldn't be loaded in production";
 
     my @banned = ( keys %{ $self->{_debugging_modules} } );
     return $self->violation($DESC, $EXPL, $include)
-        if any { $included eq $_ } @banned;
+        if (any { $included =~ m/$_/xms } @banned);
     return;
 }
 

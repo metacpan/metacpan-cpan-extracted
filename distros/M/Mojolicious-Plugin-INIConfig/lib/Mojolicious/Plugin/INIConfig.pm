@@ -4,7 +4,7 @@ use Config::Tiny;
 use File::Spec::Functions 'file_name_is_absolute';
 use Encode 'encode', 'decode';
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub parse {
   my ($self, $content, $file, $conf, $app) = @_;
@@ -23,7 +23,9 @@ sub parse {
 
 sub register {
   my ($self, $app, $conf) = @_;
-  
+
+  return $app->config if $app->config->{config_override};
+
   # Config file
   my $file = $conf->{file} || $ENV{MOJO_CONFIG};
   $file ||= $app->moniker . '.' . ($conf->{ext} || 'ini');

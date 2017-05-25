@@ -14,3 +14,4 @@ my $notname = ref $proto || $name;
 # my $name = ref $proto || $proto;
 
 #-----------------------------------------------------------------------------
+# ex: set ft=perl:

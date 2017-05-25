@@ -20,5 +20,5 @@ no_index:
 requires:
   Config::Tiny: '2.14'
   Mojolicious: '3.84'
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

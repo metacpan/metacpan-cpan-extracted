@@ -16,7 +16,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build" : "0"
+            "Module::Build" : "0.42"
          }
       },
       "runtime" : {
@@ -45,16 +45,12 @@
       }
    },
    "provides" : {
-      "Apache::DB" : {
-         "file" : "lib/Apache/DB.pm",
-         "version" : "0.14"
-      },
       "DB::Error" : {
          "file" : "lib/Devel/DebugHooks.pm"
       },
       "Devel::DebugHooks" : {
          "file" : "lib/Devel/DebugHooks.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Devel::DebugHooks::Commands" : {
          "file" : "lib/Devel/DebugHooks/Commands.pm"
@@ -91,6 +87,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#debughooks"
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

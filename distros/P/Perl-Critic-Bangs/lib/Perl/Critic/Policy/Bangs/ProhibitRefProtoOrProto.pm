@@ -5,7 +5,7 @@ use warnings;
 use Perl::Critic::Utils;
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '1.10';
+our $VERSION = '1.12';
 
 sub supported_parameters { return ()                     }
 sub default_severity     { return $SEVERITY_HIGH         }
@@ -44,14 +44,9 @@ sub violates {
 1;
 
 __END__
-
-#---------------------------------------------------------------------------
-
-=pod
-
 =head1 NAME
 
-Perl::Critic::Policy::Bangs::ProhibitRefProtoOrProto - Create a C<clone()> method if you need copies of objects.
+Perl::Critic::Policy::Bangs::ProhibitRefProtoOrProto - Create a clone() method if you need copies of objects.
 
 =head1 AFFILIATION
 
@@ -110,7 +105,7 @@ and work done by Andrew Moore <amoore@mooresystems.com>.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2006-2011 Andy Lester
+Copyright (C) 2006-2013 Andy Lester
 
 This library is free software; you can redistribute it and/or modify it
 under the terms of the Artistic License 2.0.

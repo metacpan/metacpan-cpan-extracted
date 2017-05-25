@@ -5,14 +5,15 @@ use Pcore::WebSocket;
 use Pcore::Util::Scalar qw[blessed];
 use Pcore::Util::Data qw[to_cbor from_cbor];
 use Pcore::Util::UUID qw[uuid_str];
+use Pcore::HTTP qw[:TLS_CTX];
 
 has uri => ( is => 'ro', isa => InstanceOf ['Pcore::Util::URI'], required => 1 );    # http://token@host:port/api/, ws://token@host:port/api/
 
-has token             => ( is => 'ro', isa => Str );
-has api_ver           => ( is => 'ro', isa => Str );                                 # eg: 'v1', default API version for relative methods
-has keepalive_timeout => ( is => 'ro', isa => Maybe [PositiveOrZeroInt] );
-has http_timeout      => ( is => 'ro', isa => Maybe [PositiveOrZeroInt] );
-has http_tls_ctx      => ( is => 'ro', isa => Maybe [ HashRef | Int ] );
+has token           => ( is => 'ro', isa => Str );
+has api_ver         => ( is => 'ro', isa => Str );                                         # eg: 'v1', default API version for relative methods
+has http_persistent => ( is => 'ro', isa => Maybe [PositiveOrZeroInt], default => 600 );
+has http_timeout => ( is => 'ro', isa => Maybe [PositiveOrZeroInt] );
+has tls_ctx => ( is => 'ro', isa => Maybe [ HashRef | Int ], default => $TLS_CTX_HIGH );
 
 has _is_http => ( is => 'lazy', isa => Bool, required => 1 );
 
@@ -96,9 +97,9 @@ sub _send_http ( $self, $method, @ ) {
 
     P->http->post(
         $self->uri,
-        keepalive_timeout => $self->keepalive_timeout,
-        ( $self->http_timeout ? ( timeout => $self->http_timeout ) : () ),
-        ( $self->http_tls_ctx ? ( tls_ctx => $self->http_tls_ctx ) : () ),
+        persistent => $self->{http_persistent},
+        tls_ctx    => $self->{tls_ctx},
+        ( $self->{http_timeout} ? ( timeout => $self->{http_timeout} ) : () ),
         headers => {
             REFERER       => undef,
             AUTHORIZATION => "Token $self->{token}",
@@ -165,7 +166,8 @@ sub _get_ws ( $self, $cb ) {
         Pcore::WebSocket->connect_ws(
             pcore            => $self->uri,
             max_message_size => 0,
-            compression      => 0,            # use permessage_deflate compression
+            compression      => 0,                  # use permessage_deflate compression
+            tls_ctx          => $self->{tls_ctx},
             ( $self->{token} ? ( headers => [ Authorization => "Token $self->{token}" ] ) : () ),
 
             # before_connect => {
@@ -213,7 +215,7 @@ sub _get_ws ( $self, $cb ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 63                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |    3 | 64                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

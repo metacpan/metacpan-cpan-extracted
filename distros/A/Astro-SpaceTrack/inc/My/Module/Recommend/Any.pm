@@ -8,7 +8,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.098';
+our $VERSION = '0.099';
 
 our @EXPORT_OK = qw{ __any };
 

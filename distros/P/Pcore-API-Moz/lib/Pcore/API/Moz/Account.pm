@@ -41,51 +41,38 @@ sub get_url_metrics ( $self, $domains, $metric, $cb ) {
 
     $self->{next_req_ts} = time + $REQUEST_INTERVAL;
 
-    my $req = sub ($proxy) {
-        P->http->post(
-            $url,
-            timeout    => 30,
-            body       => to_json($domains),
-            persistent => 0,
-            proxy      => $proxy,
-            useragent  => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0',
-            cookies    => $self->{_cookies},
-            on_finish  => sub ($res) {
-                my $api_res;
+    P->http->post(
+        $url,
+        persistent      => 30,
+        connect_timeout => 15,
+        timeout         => 60,
+        body            => to_json($domains),
+        useragent       => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0',
+        cookies         => $self->{_cookies},
+        on_finish       => sub ($res) {
+            if ( !$res ) {
+                $cb->( result [ $res->status, $res->reason ] );
+            }
+            else {
+                my $json = eval { from_json $res->body->$* };
 
-                if ( $res->status != 200 ) {
-                    $api_res = result [ $res->status, $res->reason ];
+                if ($@) {
+                    $cb->( result [ 500, 'Invalid JSON body' ] );
                 }
                 else {
-                    my $json = eval { from_json $res->body->$* };
+                    my $data;
 
-                    if ($@) {
-                        $api_res = result [ 999, 'Invalid JSON body' ];
+                    for my $i ( 0 .. $domains->$#* ) {
+                        $data->{ $domains->[$i] } = $json->[$i];
                     }
-                    else {
-                        $api_res = result 200;
 
-                        for my $i ( 0 .. $domains->$#* ) {
-                            $api_res->{data}->{ $domains->[$i] } = $json->[$i];
-                        }
-                    }
+                    $cb->( result 200, $data );
                 }
+            }
 
-                $cb->($api_res);
-
-                return;
-            },
-        );
-
-        return;
-    };
-
-    if ( $self->{moz}->{proxy_pool} ) {
-        $self->{moz}->{proxy_pool}->get_slot( $url, $req );
-    }
-    else {
-        $req->(undef);
-    }
+            return;
+        },
+    );
 
     return;
 }

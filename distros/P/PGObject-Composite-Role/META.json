@@ -4,7 +4,7 @@
       "Chris Travers <chris@efficito.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.132140",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "bsd"
    ],
@@ -25,13 +25,18 @@
             "Test::More" : "0"
          }
       },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
       "runtime" : {
          "requires" : {
             "Moo::Role" : "0",
             "PGObject" : "v1.402.5",
-            "PGObject::Composite" : "0",
+            "PGObject::Composite" : "1.000002",
             "PGObject::Type::Composite" : "0",
-            "perl" : "5.008"
+            "perl" : "5.01"
          }
       }
    },
@@ -43,5 +48,6 @@
          "web" : "https://github.com/ledgersmb/PGObject-Composite-Role"
       }
    },
-   "version" : "0.02"
+   "version" : 1,
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

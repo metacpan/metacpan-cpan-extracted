@@ -59,6 +59,22 @@ $a xor $b;
 
 #-----------------------------------------------------------------------------
 
+## name These function references aren't bitwise AND
+## failures 0
+## cut
+
+my $ref;
+
+$ref = \&foo;
+&$ref;
+
+# XXX This should be parsed the same as the one above, but is not.
+# See GitHub issue #9
+#$ref = \& foo;
+&$ref;
+
+#-----------------------------------------------------------------------------
+
 ## name Bitwise OR failure
 ## failures 1
 ## cut
@@ -123,3 +139,4 @@ $a >> 1;
 $a <<= 1;
 $a >>= 1;
 
+# ex: set ft=perl:

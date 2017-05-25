@@ -1,0 +1,12 @@
+LICENSE
+MANIFEST			This list of files
+Makefile.PL
+README.md
+README.pod
+XS.xs
+lib/Router/XS.pm
+ppport.h
+t/xs.t
+uthash.h
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -2,7 +2,8 @@ package Pcore::HTTP::Util;
 
 use Pcore -const;
 use Errno qw[];
-use Pcore::AE::Handle qw[:PERSISTENT :PROXY_TYPE];
+use Pcore::AE::Handle qw[:PROXY_TYPE];
+use Pcore::AE::Handle2;
 use Pcore::Util::Scalar qw[refaddr];
 use Compress::Raw::Zlib qw[WANT_GZIP_OR_ZLIB Z_OK Z_STREAM_END];
 
@@ -32,18 +33,22 @@ sub http_request ($args) {
     $runtime = {
         res    => $args->{res},
         h      => undef,
-        finish => sub ( $error_status = undef, $error_reason = undef ) {
+        finish => sub ( $error_status = undef, $error_reason = undef, $is_connect_error = undef ) {
             state $finished = 0;
 
             return if $finished;
 
             $finished = 1;
 
-            my $set_error = sub ( $error_status, $error_reason ) {
+            my $set_error = sub ( $error_status, $error_reason, $is_connect_error ) {
                 $args->{res}->set_status( $error_status, $error_reason );
+
+                $args->{res}->{is_connect_error} = 1 if $is_connect_error;
 
                 if ( refaddr( $args->{res} ) != refaddr( $runtime->{res} ) ) {
                     $runtime->{res}->set_status( $error_status, $error_reason );
+
+                    $runtime->{is_connect_error} = 1 if $is_connect_error;
                 }
 
                 return;
@@ -52,12 +57,10 @@ sub http_request ($args) {
             if ( defined $error_status ) {    # request was finished with connection / HTTP protocol error
                 $runtime->{h}->destroy if $runtime->{h};
 
-                $set_error->( $error_status, $error_reason );
+                $set_error->( $error_status, $error_reason, $is_connect_error );
             }
             else {                            # request was finished normally
-                my $persistent = $runtime->{h}->{persistent} || $args->{persistent};
-
-                $persistent = 0 if $runtime->{h}->{proxy} && $args->{persistent} == $PERSISTENT_NO_PROXY;
+                my $persistent = $args->{persistent};
 
                 if ($persistent) {
                     if ( $runtime->{res}->{version} == 1.1 ) {    # HTTP/1.1
@@ -66,15 +69,18 @@ sub http_request ($args) {
                     elsif ( $runtime->{res}->{version} == 1.0 ) {    # HTTP/1.0
                         $persistent = 0 if !$runtime->{res}->headers->{CONNECTION} || $runtime->{res}->headers->{CONNECTION} !~ /\bkeep-?alive\b/smi;
                     }
+                    else {
+                        $persistent = 0;
+                    }
                 }
 
                 # store or destroy handle
-                $persistent ? $runtime->{h}->store( $args->{keepalive_timeout} ) : $runtime->{h}->destroy;
+                $persistent ? $runtime->{h}->store($persistent) : $runtime->{h}->destroy;
 
                 # process redirect
                 if ( $runtime->{redirect} ) {
                     if ( $args->{recurse} < 1 ) {
-                        $set_error->( 599, 'Too many redirections' );
+                        $set_error->( 599, 'Too many redirections', 0 );
                     }
                     else {
                         $args->{recurse}--;
@@ -107,7 +113,7 @@ sub http_request ($args) {
 
                         undef $runtime;
 
-                        http_request($args);
+                        AE::postpone { http_request($args) };
 
                         return;
                     }
@@ -199,44 +205,72 @@ sub http_request ($args) {
 }
 
 sub _connect ( $args, $runtime, $cb ) {
-    Pcore::AE::Handle->new(
-        $args->{handle_params}->%*,
-        connect                => $args->{url},
-        connect_timeout        => $args->{connect_timeout} // $args->{timeout},
-        timeout                => $args->{timeout},
-        persistent             => $args->{persistent},
-        session                => $args->{session},
-        tls_ctx                => $args->{tls_ctx},
-        bind_ip                => $args->{bind_ip},
-        proxy                  => $args->{proxy},
-        on_proxy_connect_error => sub ( $h, $reason, $proxy_error ) {
-            $runtime->{finish}->( 594, $reason );
+    if ( $args->{proxy} ) {
+        Pcore::AE::Handle->new(
+            $args->{handle_params}->%*,
+            connect                => $args->{url},
+            connect_timeout        => $args->{connect_timeout},
+            timeout                => $args->{timeout},
+            tls_ctx                => $args->{tls_ctx},
+            bind_ip                => $args->{bind_ip},
+            proxy                  => $args->{proxy},
+            on_proxy_connect_error => sub ( $h, $reason, $proxy_error ) {
+                $runtime->{finish}->( 594, $reason );
 
-            return;
-        },
-        on_connect_error => sub ( $h, $reason ) {
-            $runtime->{finish}->( $runtime->{on_error_status}, $reason );
+                return;
+            },
+            on_connect_error => sub ( $h, $reason ) {
+                $runtime->{finish}->( $runtime->{on_error_status}, $reason );
 
-            return;
-        },
-        on_error => sub ( $h, $fatal, $reason ) {
-            $runtime->{finish}->( $runtime->{on_error_status}, $reason );
+                return;
+            },
+            on_error => sub ( $h, $fatal, $reason ) {
+                $runtime->{finish}->( $runtime->{on_error_status}, $reason );
 
-            return;
-        },
-        on_connect => sub ( $h, $host, $port, $retry ) {
-            if ( $h->{proxy} && $h->{proxy_type} && $h->{proxy_type} == $PROXY_TYPE_HTTP && $h->{proxy}->userinfo ) {
-                $args->{headers}->{PROXY_AUTHORIZATION} = 'Basic ' . $h->{proxy}->userinfo_b64;
-            }
-            else {
+                return;
+            },
+            on_connect => sub ( $h, $host, $port, $retry ) {
+                if ( $h->{proxy} && $h->{proxy_type} && $h->{proxy_type} == $PROXY_TYPE_HTTP && $h->{proxy}->userinfo ) {
+                    $args->{headers}->{PROXY_AUTHORIZATION} = 'Basic ' . $h->{proxy}->userinfo_b64;
+                }
+                else {
+                    delete $args->{headers}->{PROXY_AUTHORIZATION};
+                }
+
+                $cb->($h);
+
+                return;
+            },
+        );
+    }
+    else {
+        Pcore::AE::Handle2->new(
+            $args->{handle_params}->%*,
+            connect          => $args->{url},
+            persistent       => $args->{persistent},
+            connect_timeout  => $args->{connect_timeout},
+            timeout          => $args->{timeout},
+            tls_ctx          => $args->{tls_ctx},
+            bind_ip          => $args->{bind_ip},
+            on_connect_error => sub ( $h, $reason ) {
+                $runtime->{finish}->( $runtime->{on_error_status}, $reason, 1 );
+
+                return;
+            },
+            on_error => sub ( $h, $fatal, $reason ) {
+                $runtime->{finish}->( $runtime->{on_error_status}, $reason );
+
+                return;
+            },
+            on_connect => sub ( $h, $host, $port, $retry ) {
                 delete $args->{headers}->{PROXY_AUTHORIZATION};
-            }
 
-            $cb->($h);
+                $cb->($h);
 
-            return;
-        },
-    );
+                return;
+            },
+        );
+    }
 
     return;
 }
@@ -649,13 +683,13 @@ sub _read_body ( $args, $runtime, $cb ) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
-## |      | 25                   | * Subroutine "http_request" with high complexity score (28)                                                    |
-## |      | 244                  | * Subroutine "_write_request" with high complexity score (25)                                                  |
-## |      | 379                  | * Subroutine "_read_body" with high complexity score (67)                                                      |
+## |      | 26                   | * Subroutine "http_request" with high complexity score (28)                                                    |
+## |      | 278                  | * Subroutine "_write_request" with high complexity score (25)                                                  |
+## |      | 413                  | * Subroutine "_read_body" with high complexity score (67)                                                      |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 359                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 393                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 591                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 625                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

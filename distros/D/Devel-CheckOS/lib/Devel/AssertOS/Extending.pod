@@ -89,7 +89,7 @@ to work) then please discuss it with me first.
 =head1 BUGS and FEEDBACK
 
 I welcome feedback about my code, including constructive criticism.
-Bug reports should be made using L<http://rt.cpan.org/> or by email.
+Bug reports should be made using L<https://github.com/DrHyde/perl-modules-Devel-CheckOS/issues>.
 
 If you are feeling particularly generous you can encourage me in my
 open source endeavours by buying me something from my wishlist:

@@ -5,5 +5,13 @@ Hello [1] there [2] «hullo», ‘hullo’ [3] [1978]
 [1] ààà
 [2] čČč
 
-‘Hello’ — «there»!!!
+‘Hello’ — «there»!!! <verbatim>"Hello" [1]</verbatim>
 [3] three čČč Да поехал
+
+<example>
+[1] Bla "bla"
+<example>
+
+<verbatim>"[50]"</verbatim>
+
+

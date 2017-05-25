@@ -2,7 +2,7 @@
 # ABSTRACT: Perform batch operations on test results, and analyze the same.
 
 package TestRail::Utils::Results;
-$TestRail::Utils::Results::VERSION = '0.039';
+$TestRail::Utils::Results::VERSION = '0.040';
 use strict;
 use warnings;
 
@@ -47,7 +47,7 @@ TestRail::Utils::Results - Perform batch operations on test results, and analyze
 
 =head1 VERSION
 
-version 0.039
+version 0.040
 
 =head1 FUNCTIONS
 

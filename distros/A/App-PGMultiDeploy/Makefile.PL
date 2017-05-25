@@ -10,7 +10,7 @@ WriteMakefile(
     ABSTRACT_FROM    => 'lib/App/PGMultiDeploy.pm',
     LICENSE          => 'bsd',
     PL_FILES         => {},
-    MIN_PERL_VERSION => 5.006,
+    MIN_PERL_VERSION => 5.010,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
     },
@@ -20,6 +20,9 @@ WriteMakefile(
     PREREQ_PM => {
         'PGObject::Util::DBChange' => 0,
         'Config::IniFiles' => 0,
+        'DBI' => 0,
+        'DBD::Pg' => 0,
+        'Try::Tiny' => 0,
         'Moo' => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

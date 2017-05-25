@@ -7,7 +7,7 @@ use Readonly;
 use Perl::Critic::Utils qw{ :severities :classification :ppi };
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '1.10';
+our $VERSION = '1.12';
 
 Readonly::Scalar my $DESC => q{Prohibits adding "m" modifier to compiled regular expressions where it does nothing};
 Readonly::Scalar my $EXPL => <<'EOF';
@@ -30,7 +30,7 @@ sub violates {
     my ( $self, $elem, undef ) = @_;
 
 
-    # we throw a violation if all these conditions are true:
+    # We throw a violation if all these conditions are true:
     # 1) there's an 'm' modifier
     # 2) the *only* thing in the regex is a compiled regex from a previous qr().
     # 3) the modifiers are not the same in both places
@@ -69,7 +69,7 @@ sub _find_previous_quote_like_regexp {
 
     my $qlop = $elem;
     while ( ! $qlop->isa( 'PPI::Token::QuoteLike::Regexp' ) ) {
-        # we use previous_token instead of sprevious_sibling to get into previous statements.
+        # We use previous_token instead of sprevious_sibling to get into previous statements.
         $qlop = $qlop->previous_token() or return;
     }
     return $qlop;
@@ -84,8 +84,7 @@ sub _sorted_modifiers {
 
 1;
 
-=pod
-
+__END__
 =head1 NAME
 
 Perl::Critic::Policy::Bangs::ProhibitUselessRegexModifiers - Adding modifiers to a regular expression made up entirely of a variable created with qr() is usually not doing what you expect.
@@ -103,13 +102,13 @@ effects they are looking for.
 
 Correct:
 
-  my $regex = qr(abc)m;
-  if ( $string =~ /$regex/ ) {};
+    my $regex = qr(abc)m;
+    if ( $string =~ /$regex/ ) {};
 
 Not what you want:
 
-  my $regex = qr(abc);
-  if ( $string =~ /$regex/m ) {}; ## this triggers a violation of this policy.
+    my $regex = qr(abc);
+    if ( $string =~ /$regex/m ) {}; ## this triggers a violation of this policy.
 
 See the thread that starts at:
 L<http://www.nntp.perl.org/group/perl.perl5.porters/2007/12/msg131709.html>
@@ -134,7 +133,7 @@ Thanks to Andy Lester, "<andy at petdance.com>" for pointing out this common pro
 
 =head1 COPYRIGHT
 
-Copyright (c) 2007-2011 Andy Lester <andy@petdance.com> and Andrew
+Copyright (c) 2007-2013 Andy Lester <andy@petdance.com> and Andrew
 Moore <amoore@mooresystems.com>
 
 This library is free software; you can redistribute it and/or modify it

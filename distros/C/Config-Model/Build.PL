@@ -75,6 +75,7 @@ my $build = $class->new(
     'Test::Memory::Cycle' => '0',
     'Test::More' => '0',
     'Test::Warn' => '0.11',
+    'YAML' => '0',
     'YAML::Tiny' => '0'
   },
   'configure_requires' => {

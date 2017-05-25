@@ -1,6 +1,6 @@
 package Bot::Cobalt::Plugin::Twitter;
 # ABSTRACT: Bot::Cobalt plugin for automatic tweeting
-$Bot::Cobalt::Plugin::Twitter::VERSION = '0.001';
+$Bot::Cobalt::Plugin::Twitter::VERSION = '0.002';
 use strict;
 use warnings;
 
@@ -8,9 +8,9 @@ use Bot::Cobalt;
 use Bot::Cobalt::Common;
 
 use HTML::Entities    qw(decode_entities);
+use Mojo::UserAgent;
 use Net::Twitter;
 use Text::Unidecode   qw(unidecode);
-use URI::Title        qw(title);
 use URI::Find::Simple qw(list_uris);
 
 my $status_rx = qr/twitter\.com\/\w+\/status\/(\d+)/;
@@ -21,6 +21,7 @@ sub twitter { shift->{twitter} }
 sub tweet_topics   { shift->{tweet_topics}   }
 sub tweet_links    { shift->{tweet_links}    } 
 sub retweet_tweets { shift->{retweet_tweets} }
+sub ua             { shift->{useragent}      }
 
 sub Cobalt_register {
    my $self = shift;
@@ -30,6 +31,7 @@ sub Cobalt_register {
    $self->{tweet_topics}   = $conf->{tweet_topics} // 1;
    $self->{tweet_links}    = $conf->{tweet_links};
    $self->{retweet_tweets} = $conf->{retweet_tweets};
+   $self->{useragent}      = Mojo::UserAgent->new;
 
    eval {
       $self->{twitter} = Net::Twitter->new(
@@ -109,10 +111,8 @@ sub Bot_public_msg {
    foreach my $uri ( list_uris($msg->message) ) {
       next if not $uri;
 
-      # There's probably a less fragile way to do this...
-      if ($self->retweet_tweets and $uri =~ $status_rx ) {
+      if ($uri =~ $status_rx) {
          my $id = $1;
-
          if ($self->retweet_tweets) {
             eval { $self->twitter->retweet($id) };
             if (my $err = $@) {
@@ -121,12 +121,37 @@ sub Bot_public_msg {
                );
             }
          }
+         
+         my $tweet = $self->twitter->show_status($id);
+         my $text  = $tweet->{text};
+         my $name  = $tweet->{user}->{name};
+         my $sname = $tweet->{user}->{screen_name};
+         my $user  = sprintf '%s (@%s)', $name, $sname;
+         
+         $text = unidecode(decode_entities($text));
+         my @lines  = split /\n/, $text;
+
+         if (@lines == 1) {
+            broadcast( 'message', $context, $channel, "$user - $lines[0]" );
+         }
+         else {
+            broadcast( 'message', $context, $channel, $user );
+            broadcast( 'message', $context, $channel, " - $_" )
+               foreach @lines;
+         }
+         return PLUGIN_EAT_ALL;
       }
-      elsif ($self->tweet_links) {         
-         my $title = decode_entities(title($uri)) or next;         
+      elsif ($self->tweet_links) {
+         my $title = $self->ua->get($uri)->result->dom->at('title')->text;
          my $uni   = unidecode($title) || $title;
          my $short = substr($uni, 0, 100);
+         
+         next if not $title;
 
+         # my $title = decode_entities( 
+         #     $ua->get($uri)->result->dom->at('title')->text 
+         # ) or next;       
+         
          if (length($short) < length($uni)) {
             $short = "$short...";
          }
@@ -157,7 +182,7 @@ Bot::Cobalt::Plugin::Twitter - Bot::Cobalt plugin for automatic tweeting
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -181,7 +206,8 @@ version 0.001
 
 A L<Bot::Cobalt> plugin.
 
-This plugin does a handful of twitter-related functions.
+This plugin will display the contents of a tweet that is linked in a channel.
+Additionally, it does a handful of twitter-related functions.
 
 =over 4
 
@@ -209,7 +235,7 @@ Scott Miller <scott.j.miller@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Scott Miller.
+This software is copyright (c) 2017 by Scott Miller.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

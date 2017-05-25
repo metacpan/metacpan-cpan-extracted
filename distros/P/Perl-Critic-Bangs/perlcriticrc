@@ -1,28 +1,51 @@
 # For Perl::Critic::Bangs' own "make critic" target
 
-[-CodeLayout::ProhibitParensWithBuiltins]
+verbose = %f:%l:%c %m (%p)\n
+
 [CodeLayout::ProhibitHardTabs]
 allow_leading_tabs = 0
+[-CodeLayout::ProhibitParensWithBuiltins]
 [-CodeLayout::RequireTidyCode]
+# Never works for me.
+[Compatibility::PodMinimumVersion]
+above_version = 5.006001
+
 
 [-ControlStructures::ProhibitPostfixControls]
 
 [-Documentation::PodSpelling]
 [-Documentation::RequirePodAtEnd]
 [-Documentation::RequirePodLinksIncludeText]
-[-Documentation::RequirePodSections]
+[Documentation::RequirePodSections]
+lib_sections    = NAME|DESCRIPTION|AUTHOR|COPYRIGHT
+script_sections = NAME|DESCRIPTION|AUTHOR|COPYRIGHT
 
+[-Editor::RequireEmacsFileVariables]
+
+# We're a utility.  We're OK with die.
 [-ErrorHandling::RequireCarping]
+[-ErrorHandling::RequireUseOfExceptions]
+
+[InputOutput::RequireCheckedSyscalls]
+functions = open close
 
 [-Miscellanea::RequireRcsKeywords]
 
 [-Modules::RequireVersionVar]
 
+[RegularExpressions::ProhibitUnusualDelimiters]
+[-RegularExpressions::RequireDotMatchAnything]
 [-RegularExpressions::RequireExtendedFormatting]
 [-RegularExpressions::RequireLineBoundaryMatching]
-[-RegularExpressions::RequireDotMatchAnything]
+
+[RegularExpressions::RequireBracesForMultiline]
+
+[-Subroutines::ProhibitCallsToUndeclaredSubs]
+[-Subroutines::ProhibitCallsToUnexportedSubs]
 
 [-ValuesAndExpressions::ProhibitConstantPragma]
 [-ValuesAndExpressions::ProhibitEmptyQuotes]
+[-ValuesAndExpressions::ProhibitMagicNumbers]
+[-ValuesAndExpressions::RequireConstantOnLeftSideOfEquality]
 
 [-Variables::ProhibitPunctuationVars]

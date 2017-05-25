@@ -69,8 +69,8 @@ sub guess_protocol {
     my $connid = 0;
     sub syn { 1 }; # in case it is attached to Net::Inspect::Tcp
     sub new_connection {
-	my ($self,$meta,%args) = @_;
-	my $obj = $self->new;
+	my ($self,$meta,@args) = @_;
+	my $obj = $self->new(@args);
 	$obj->{meta} = $meta;
 	$obj->{connid} = ++$connid;
 	$obj->{offset} = [0,0];
@@ -92,7 +92,9 @@ sub in {
     my $bytes = 0;
     while (1) {
 	my $sub = $self->{handler}[$dir];
-	my $n = $sub->($self,$data,$eof,$time) or last;
+	my @arg;
+	($sub,@arg) = @$sub if ref($sub) ne 'CODE';
+	my $n = $sub->($self,@arg,$data,$eof,$time) or last;
 	$bytes += $n;
 	substr($data,0,$n,'');
 	last if $data eq '';
@@ -151,8 +153,6 @@ sub _in1_response {
 	    } elsif ($cmd eq 'AUTH' || ref($cmd) && $$cmd eq 'AUTH') {
 		unshift @{$self->{cmd}}, \'AUTH';
 		$self->{upper_flow}->response($resp,$time);
-		$resp =~s{^.{4}}{}mg;
-		$self->{upper_flow}->auth_data(1,$resp,$time);
 		$self->{handler}[0] = \&_in0_auth;
 	    } else {
 		return $self->fatal("$code response for $cmd",0,$time);
@@ -166,8 +166,7 @@ sub _in1_response {
 
 
     # TODO
-    # check response to EHLO - if we allow BINARY
-    # support BDAT,CHUNKING, 8BITMIME, BINARYMIME
+    # check response to EHLO, i.e. allowed version used features
 }
 
 
@@ -179,15 +178,19 @@ sub _in0_command {
 	return; # need more data
     };
 
-    return $self->fatal('BDAT not supported',0,$time)
-	if uc($1) eq 'BDAT';
+    my $cmd = uc($1);
+    $data = substr($data,0,pos($data));
+    $self->{offset}[1] += length($data);
 
-    my $eom = pos($data);
-    $self->{offset}[1] += $eom;
+    if ($cmd eq 'BDAT') {
+	my ($offset,$last) = $data =~m{^BDAT\s+(\d+)(\s+LAST)?\s+\z}i
+	    or return $self->fatal("invalid BDAT syntax '$data'",0,$time);
+	$self->{handler}[0] = [ \&_in0_bdat, \$offset, $last ];
+    }
+    push @{$self->{cmd}}, $cmd;
+    $self->{upper_flow}->command($data);
 
-    push @{$self->{cmd}}, uc($1);
-    $self->{upper_flow}->command(substr($data,0,$eom));
-    return $eom;
+    return length($data);
 }
 
 sub _in0_data {
@@ -216,6 +219,25 @@ sub _in0_data {
     return $len;
 }
 
+sub _in0_bdat {
+    my ($self,$roffset,$last,$data,$eof,$time) = @_;
+    my $len = length($data);
+    if ($len <= $$roffset) {
+	$$roffset -= $len;
+    } else {
+	$len -= $$roffset;
+	$$roffset = 0;
+	substr($data,0,$len,'');
+    }
+
+    $self->{upper_flow}->mail_data($data,$time) if $data ne '';
+    if ($$roffset == 0) {
+	$self->{upper_flow}->mail_data('',$time) if $last;
+	$self->{handler}[0] = \&_in0_command;
+    }
+    return $len;
+}
+
 sub _in0_auth {
     my ($self,$data,$eof,$time) = @_;
     my $pos = index($data,"\n");
@@ -223,7 +245,7 @@ sub _in0_auth {
     return $self->fatal('SMTP AUTH response too long',0,$time)
 	if length($data)>1024;
     return if $pos == -1;
-    $self->{upper_flow}->auth_data(0,$data,$time);
+    $self->{upper_flow}->auth_data($data,$time);
     return $pos+1;
 }
 
@@ -283,7 +305,7 @@ Hooks provided:
 
 =item guess_protocol($guess,$dir,$data,$eof,$time,$meta)
 
-=item new_connection($meta,%args)
+=item new_connection($meta)
 
 This returns an object for the connection.
 
@@ -324,9 +346,10 @@ Called when a chunk is read inside DATA.
 Dot-escaping will be removed before calling C<mail_data>
 End of mail data will be signaled with an empty chunk.
 
-=item $obj->auth_data($dir,$line,$time)
+=item $obj->auth_data($line,$time)
 
-Called within the AUTH handshake for challenge (dir=1) and response (dir=0).
+Called within the AUTH handshake for the data send from client to server. The
+data (challenges) from server to client are delivered through C<response>.
 
 =item $obj->fatal($dir,$reason,$time)
 

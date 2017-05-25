@@ -124,14 +124,14 @@ sub BuildPLandMakefilePLexist {
     _run_script($projectdir, qw(Linux MSWin32));
     is_deeply(
         _getfile(File::Spec->catfile($projectdir, 'Makefile.PL')),
-        'use lib inc; use Devel::AssertOS qw(Linux MSWin32);
+        'use lib qw(inc); use Devel::AssertOS qw(Linux MSWin32);
 
 makefile stuff', # mmm, significant whitespace
         'if both exist, edit Makefile.PL'
     );
     is_deeply(
         _getfile(File::Spec->catfile($projectdir, 'Build.PL')),
-        'use lib inc; use Devel::AssertOS qw(Linux MSWin32);
+        'use lib qw(inc); use Devel::AssertOS qw(Linux MSWin32);
 
 build stuff', # mmm, significant whitespace
         '... and Build.PL'
@@ -149,7 +149,7 @@ sub BuildPLexists {
         'Makefile.PL not created');
     is_deeply(
         _getfile(File::Spec->catfile($projectdir, 'Build.PL')),
-        'use lib inc; use Devel::AssertOS qw(Linux MSWin32);
+        'use lib qw(inc); use Devel::AssertOS qw(Linux MSWin32);
 
 wibblywobblywoo', # mmm, significant whitespace
         'if Build.PL exists, edit it'
@@ -177,7 +177,7 @@ sub MakefilePLexists {
         'Build.PL not created');
     is_deeply(
         _getfile(File::Spec->catfile($projectdir, 'Makefile.PL')),
-        'use lib inc; use Devel::AssertOS qw(Linux MSWin32);
+        'use lib qw(inc); use Devel::AssertOS qw(Linux MSWin32);
 
 wibblywobblywoo', # mmm, significant whitespace
         'if Makefile.PL exists, edit it'
@@ -200,7 +200,7 @@ sub emptydir {
         "create Makefile.PL if there's neither Makefile.PL nor Build.PL");
     is_deeply(
         _getfile(File::Spec->catfile($projectdir, 'Makefile.PL')),
-        'use lib inc; use Devel::AssertOS qw(Linux MSWin32);
+        'use lib qw(inc); use Devel::AssertOS qw(Linux MSWin32);
 
 ', # mmm, significant whitespace
         '... and created it correctly'

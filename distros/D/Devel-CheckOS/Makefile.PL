@@ -1,4 +1,4 @@
-require 5.005;
+require 5.010;
 use ExtUtils::MakeMaker;
 
 use File::Spec;
@@ -27,7 +27,8 @@ if($ENV{AUTOMATED_TESTING}) {
 
     if(@notOSes) { # user told us we got it wrong
         push @extrafiles, File::Spec->catfile('t', "XX-autodetected-$^O-as-".join('--', map { s/::/-/g; $_ } @notOSes).".t");
-        open(FAIL, '>'.$extrafiles[-1]);
+        open(FAIL, '>'.$extrafiles[-1]) ||
+            die("Coulsn't write ".$extrafiles[-1].": $!\n");
         print FAIL 'print "1..1\\n";print "not ok 1\\n"';
         close(FAIL);
     } elsif(!@OSes && $ENV{AUTOMATED_TESTING}) { # didn't detect anything!
@@ -87,7 +88,7 @@ sub findOSes {
         my $modname = join('::', File::Spec->splitdir($dir), $_);
         (my $classname = $modname) =~ s/^lib:://;
         (my $prompt_modname = $modname) =~ s/.*AssertOS:://;
-        eval "use $modname";
+        eval "use $classname";
         next if($@);
         my $hasexpn = $classname->can('expn') ? '/?' : '';
    ASK: my $answer = prompt(

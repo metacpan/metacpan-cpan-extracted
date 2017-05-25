@@ -13,19 +13,15 @@ Changes
 Makefile.PL
 MANIFEST
 perlcriticrc
-README
+README.md
 TODO
 
 t/00_modules.t
 t/13_bundled_policies.t
 t/14_policy_parameters.t
 t/20_policies.t
-t/40_criticize.t
-t/40_perlcriticrc
 t/93_version.t
-t/94_includes.t
-t/98_pod_syntax.t
-t/99_pod_coverage.t
+t/commentedoutcode.t
 
 t/Bangs/ProhibitBitwiseOperators.run
 t/Bangs/ProhibitCommentedOutCode.run
@@ -36,9 +32,10 @@ t/Bangs/ProhibitNumberedNames.run
 t/Bangs/ProhibitRefProtoOrProto.run
 t/Bangs/ProhibitUselessRegexModifiers.run
 t/Bangs/ProhibitVagueNames.run
-t/tlib/Perl/Critic/Policy/Test.pm
-t/tlib/Perl/Critic/TestUtilitiesWithMinimalDependencies.pm
-t/tlib/ViolationTest.pm
-t/tlib/ViolationTest2.pm
-META.yml                                 Module meta-data (added by MakeMaker)
+
+xt/criticize.t
+xt/includes.t
+xt/pod-coverage.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

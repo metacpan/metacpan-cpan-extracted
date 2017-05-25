@@ -5,8 +5,7 @@ use Pcore::Util::Scalar qw[refaddr];
 use Pcore::Util::Data qw[to_b64];
 use Pcore::Util::List qw[pairs];
 use Pcore::WebSocket::Handle;
-use Pcore::AE::Handle;
-use Pcore::HTTP qw[:TLS_CTX];
+use Pcore::AE::Handle2 qw[:TLS_CTX];
 
 our $HANDLE = {};
 
@@ -117,9 +116,8 @@ sub accept_ws ( $self, $protocol, $req, $on_accept ) {
 sub connect_ws ( $self, $protocol, $uri, @ ) {
     my %args = (
         connect_timeout => 30,
-        tls_ctx         => $Pcore::HTTP::TLS_CTX->{$TLS_CTX_HIGH},
+        tls_ctx         => $TLS_CTX_HIGH,
         bind_ip         => undef,
-        proxy           => undef,
 
         max_message_size => 0,
         compression      => 0,        # use permessage_deflate compression
@@ -173,19 +171,13 @@ sub connect_ws ( $self, $protocol, $uri, @ ) {
         $connect = $uri;
     }
 
-    Pcore::AE::Handle->new(
+    Pcore::AE::Handle2->new(
         $args{handle_params}->%*,
-        persistent             => 0,
-        connect                => $connect,
-        connect_timeout        => $args{connect_timeout},
-        tls_ctx                => $args{tls_ctx},
-        bind_ip                => $args{bind_ip},
-        proxy                  => $args{proxy},
-        on_proxy_connect_error => sub ( $h, $reason, $proxy_error ) {
-            $on_error->( result [ 594, $reason ] );
-
-            return;
-        },
+        persistent       => 0,
+        connect          => $connect,
+        connect_timeout  => $args{connect_timeout},
+        tls_ctx          => $args{tls_ctx},
+        bind_ip          => $args{bind_ip},
         on_connect_error => sub ( $h, $reason ) {
             $on_error->( result [ 595, $reason ] );
 
@@ -318,9 +310,9 @@ sub connect_ws ( $self, $protocol, $uri, @ ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 38, 137              | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 37, 135              | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 117                  | Subroutines::ProhibitExcessComplexity - Subroutine "connect_ws" with high complexity score (37)                |
+## |    3 | 116                  | Subroutines::ProhibitExcessComplexity - Subroutine "connect_ws" with high complexity score (37)                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----
