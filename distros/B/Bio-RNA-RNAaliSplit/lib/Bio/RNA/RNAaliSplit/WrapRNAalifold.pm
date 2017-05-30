@@ -1,7 +1,7 @@
 # -*-CPerl-*-
-# Last changed Time-stamp: <2017-03-09 16:16:14 michl>
+# Last changed Time-stamp: <2017-05-28 17:05:29 mtw>
 
-# Bio::RNA::RNAaliSplit::WrapRNAz.pm: A versatile object-oriented
+# Bio::RNA::RNAaliSplit::WrapRNAalifold.pm: A versatile object-oriented
 # wrapper for RNAalifold
 #
 # Requires RNAalifold executable from the ViennaRNA package available
@@ -9,32 +9,23 @@
 
 package Bio::RNA::RNAaliSplit::WrapRNAalifold;
 
-use version; our $VERSION = qv('0.04');
+use version; our $VERSION = qv('0.05');
 use Carp;
 use Data::Dumper;
 use Moose;
-use Moose::Util::TypeConstraints;
-use Path::Class::File;
-use Path::Class::Dir;
 use Path::Class;
-use File::Basename;
 use IPC::Cmd qw(can_run run);
+use File::Path qw(make_path);
+#use diagnostics;
 
 my ($rnaalifold,$oodir);
 
-has 'alnfilebasename' => (
-			  is => 'rw',
-			  isa => 'Str',
-			  predicate => 'has_alnfilebasename',
-			  init_arg => undef, # make this unsettable via constructor
-			 );
-
-has 'bn' => (
-	     is => 'rw',
-	     isa => 'Str',
-	     predicate => 'has_basename',
-	     documentation => q(Set this to override output basename),
-	    );
+has 'basename' => (
+		   is => 'rw',
+		   isa => 'Str',
+		   predicate => 'has_basename',
+		   documentation => q(Set this to override output basename),
+		  );
 
 has 'ribosum' => (
 		  is => 'rw',
@@ -84,12 +75,8 @@ has 'RNAalifold_version' => (
 			     init_arg => undef,
 			    );
 
-with 'Bio::RNA::RNAaliSplit::FileDir';
-
-#sub BUILDARGS {
-#  my $self = shift;
-#  print Dumper($self);
-#}
+with 'FileDirUtil';
+with 'Bio::RNA::RNAaliSplit::Roles';
 
 sub BUILD {
   my $self = shift;
@@ -99,14 +86,14 @@ sub BUILD {
   $rnaalifold = can_run('RNAalifold') or
     croak "ERROR [$this_function] RNAalifold not found";
   unless($self->has_odir){
-    unless($self->has_odirn){self->odirname("as")}
-    $self->odir( [$self->ifile->dir,$self->odirn] );
-    mkdir($self->odir);
+    unless($self->has_dirnam){self->dirnam("as")}
+    $self->odir( [$self->ifile->dir,$self->dirnam] );
   }
   $oodir = $self->odir->subdir("alifold");
-  mkdir($oodir);
-  $self->alnfilebasename(fileparse($self->ifile->basename, qr/\.[^.]*/));
-
+  my @created = make_path($oodir, {error => \my $err});
+  confess "ERROR [$this_function] could not create output directory $self->oodir"
+    if (@$err);
+  $self->set_ifilebn;
   $self->run_rnaalifold();
 }
 
@@ -117,19 +104,19 @@ sub run_rnaalifold {
   my ($alirnaps,$alidotps_fn,$alidotps,$alifoldstk);
   my $tag = "";
   if ($self->has_ribosum){$tag = ".risobum"}
-  if ($self->has_alnfilebasename){
-    $out_fn = $self->alnfilebasename.$tag."."."alifold.out";
-    $alnps_fn = $self->alnfilebasename.$tag."."."aln.ps";
-    $alirnaps_fn = $self->alnfilebasename.$tag."."."alirna.ps";
-    $alidotps_fn = $self->alnfilebasename.$tag."."."alidot.ps";
-    $stk_fn = $self->alnfilebasename.$tag."."."alifold.stk";
-  }
-  elsif ($self->has_basename){
+  if ($self->has_basename){
     $out_fn = $self->bn.$tag."."."alifold.out";
     $alnps_fn = $self->bn.$tag."."."aln.ps";
     $alirnaps_fn = $self->bn.$tag."."."alirna.ps";
     $alidotps_fn = $self->bn.$tag."."."alidot.ps";
     $stk_fn = $self->bn.$tag."."."alifold.stk";
+  }
+  elsif ($self->has_ifilebn){
+    $out_fn = $self->ifilebn.$tag."."."alifold.out";
+    $alnps_fn = $self->ifilebn.$tag."."."aln.ps";
+    $alirnaps_fn = $self->ifilebn.$tag."."."alirna.ps";
+    $alidotps_fn = $self->ifilebn.$tag."."."alidot.ps";
+    $stk_fn = $self->ifilebn.$tag."."."alifold.stk";
   }
   else{
     $out_fn = $tag."alifold.out";

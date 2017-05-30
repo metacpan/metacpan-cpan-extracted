@@ -10,8 +10,8 @@ const our $WS_MAX_MESSAGE_SIZE => 1_024 * 1_024 * 100;    # 100 Mb
 const our $WS_PONG_INTERVAL    => 50;
 const our $WS_COMPRESSION      => 0;
 
-const our $TRANS_TYPE_RPC       => 'rpc';
-const our $TRANS_TYPE_EXCEPTION => 'exception';
+const our $TX_TYPE_RPC       => 'rpc';
+const our $TX_TYPE_EXCEPTION => 'exception';
 
 sub run ( $self, $req ) {
     if ( $req->{path_tail} ) {
@@ -24,32 +24,33 @@ sub run ( $self, $req ) {
     if ( $req->is_websocket_connect_request ) {
         Pcore::WebSocket->accept_ws(
             'pcore', $req,
-            sub ( $ws, $req, $accept, $reject ) {
+            sub ( $req, $accept, $reject ) {
 
                 # authenticate request
                 $req->authenticate(
                     sub ( $auth ) {
 
-                        # token authenticated successfully, store token in websocket connection object
-                        $ws->{auth} = $auth;
-
                         # accept websocket connection
                         $accept->(
-                            {   max_message_size => $WS_MAX_MESSAGE_SIZE,
-                                pong_interval    => $WS_PONG_INTERVAL,
-                                compression      => $WS_COMPRESSION,
-                                on_disconnect    => sub ( $ws, $status ) {
-                                    return;
-                                },
-                                on_rpc_call => sub ( $ws, $req, $trans ) {
-                                    $ws->{auth}->api_call_arrayref( $trans->{method}, $trans->{data}, $req );
+                            max_message_size => $WS_MAX_MESSAGE_SIZE,
+                            pong_interval    => $WS_PONG_INTERVAL,
+                            compression      => $WS_COMPRESSION,              #
+                            on_listen_event  => sub ( $ws, $ev ) {return},    # events currently are disabled
+                            on_fire_event    => sub ( $ws, $ev ) {return},    # events currently are disabled
+                            before_connect   => undef,
+                            on_connect       => sub ($ws) {
 
-                                    return;
-                                }
+                                # store auth in websocket connection object
+                                $ws->{auth} = $auth;
+
+                                return;
                             },
-                            headers        => undef,
-                            before_connect => undef,
-                            on_connect     => undef,
+                            on_disconnect => undef,
+                            on_rpc        => sub ( $ws, $req, $tx ) {
+                                $ws->{auth}->api_call_arrayref( $tx->{method}, $tx->{data}, $req );
+
+                                return;
+                            },
                         );
 
                         return;
@@ -153,16 +154,16 @@ sub _http_api_router ( $self, $auth, $data, $cb ) {
 
     $cv->begin;
 
-    for my $trans ( $data->@* ) {
+    for my $tx ( $data->@* ) {
 
         # TODO required only for compatibility with old clients, can be removed
-        $trans->{type} ||= $TRANS_TYPE_RPC;
+        $tx->{type} ||= $TX_TYPE_RPC;
 
         # check message type, only rpc calls are enabled here
-        if ( $trans->{type} ne $TRANS_TYPE_RPC ) {
+        if ( $tx->{type} ne $TX_TYPE_RPC ) {
             push $response->@*,
-              { tid     => $trans->{tid},
-                type    => $TRANS_TYPE_EXCEPTION,
+              { tid     => $tx->{tid},
+                type    => $TX_TYPE_EXCEPTION,
                 message => {
                     status => 400,
                     reason => 'Invalid API request type',
@@ -173,10 +174,10 @@ sub _http_api_router ( $self, $auth, $data, $cb ) {
         }
 
         # method is not specified, this is callback, not supported in API server
-        if ( !$trans->{method} ) {
+        if ( !$tx->{method} ) {
             push $response->@*,
-              { tid     => $trans->{tid},
-                type    => $TRANS_TYPE_EXCEPTION,
+              { tid     => $tx->{tid},
+                type    => $TX_TYPE_EXCEPTION,
                 message => {
                     status => 400,
                     reason => 'Method is required',
@@ -189,25 +190,25 @@ sub _http_api_router ( $self, $auth, $data, $cb ) {
         $cv->begin;
 
         # combine method with action
-        if ( my $action = delete $trans->{action} ) {
-            $trans->{method} = q[/] . ( $action =~ s[[.]][/]smgr ) . "/$trans->{method}";
+        if ( my $action = delete $tx->{action} ) {
+            $tx->{method} = q[/] . ( $action =~ s[[.]][/]smgr ) . "/$tx->{method}";
         }
 
         $auth->api_call_arrayref(
-            $trans->{method},
-            $trans->{data},
+            $tx->{method},
+            $tx->{data},
             sub ($res) {
                 if ( $res->is_success ) {
                     push $response->@*,
-                      { type   => $TRANS_TYPE_RPC,
-                        tid    => $trans->{tid},
+                      { type   => $TX_TYPE_RPC,
+                        tid    => $tx->{tid},
                         result => $res,
                       };
                 }
                 else {
                     push $response->@*,
-                      { type    => $TRANS_TYPE_EXCEPTION,
-                        tid     => $trans->{tid},
+                      { type    => $TX_TYPE_EXCEPTION,
+                        tid     => $tx->{tid},
                         message => $res,
                       };
                 }

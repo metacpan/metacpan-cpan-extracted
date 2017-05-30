@@ -85,23 +85,14 @@ sub update_job_deps {
 
     return if $self->use_batches;
 
-    # return unless $self->current_batch->has_array_deps;
     return unless $self->has_array_deps;
 
-    # foreach my $array_id ( $self->current_batch->all_array_deps ) {
-    foreach my $array_id ( $self->all_array_deps ) {
-        next unless $array_id;
-
-        my $current_job = $array_id->[0];
-        my $dep_job     = $array_id->[1];
-
+    while(my($current_task, $v) = each %{$self->array_deps}){
+      my $dep_tasks = join(':', @$v);
         my $cmd =
-          "scontrol update job=$current_job Dependency=afterok:$dep_job";
-
-        # $self->log->debug("Updating dependencies ".$cmd."\n");
+          "scontrol update job=$current_task Dependency=afterok:$dep_tasks";
         $self->change_deps($cmd);
     }
-
 }
 
 sub change_deps {
@@ -120,7 +111,7 @@ sub change_deps {
         # $self->log->info($buffer) if $buffer;
     }
     else {
-        # $self->log->warn($buffer) if $buffer;
+        $self->log->warn( "There was a problem! " . $buffer ) if $buffer;
     }
 }
 

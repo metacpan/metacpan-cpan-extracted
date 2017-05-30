@@ -6,9 +6,8 @@ use integer;
 
 use B;
 use Carp ();
-use Time::Local qw/timelocal_nocheck timegm_nocheck/;
-use Encode qw/is_utf8 decode encode_utf8/;
-use Encode::Locale;
+use Time::Local qw/timegm timegm_nocheck/;
+use Encode qw/encode_utf8/;
 use DateTime::Locale;
 use List::MoreUtils qw/uniq/;
 use POSIX qw/strftime LC_ALL/;
@@ -16,14 +15,14 @@ use Time::Strptime::TimeZone;
 
 use constant DEBUG => exists $ENV{PERL_TIME_STRPTIME_DEBUG} && $ENV{PERL_TIME_STRPTIME_DEBUG};
 
-our $VERSION = 1.00;
+our $VERSION = 1.01;
 
 our %DEFAULT_HANDLER = (
     A   => [SKIP          => sub {
         my $self = shift;
         my $wide = $self->{locale}->day_format_wide;
         my $abbr = $self->{locale}->day_format_abbreviated;
-        return [map quotemeta, map { lc, uc, $_ } map { is_utf8($_) ? $_ : decode(locale => $_) } map { $wide->[$_], $abbr->[$_] } 0..6];
+        return [map quotemeta, uniq map { lc, uc, $_ } map { $wide->[$_], $abbr->[$_] } 0..6];
     }],
     a   => [extend        => q{%A} ],
     B   => [localed_month => sub {
@@ -36,7 +35,6 @@ our %DEFAULT_HANDLER = (
             my $abbr = $self->{locale}->month_format_abbreviated;
             for my $month (0..11) {
                 for my $key ($wide->[$month], $abbr->[$month]) {
-                    $key = decode(locale => $key) unless is_utf8 $key;
                     $format_table{$key}    = $month + 1;
                     $format_table{lc $key} = $month + 1;
                     $format_table{uc $key} = $month + 1;
@@ -70,7 +68,6 @@ our %DEFAULT_HANDLER = (
         unless (exists $self->{format_table}{localed_pm}) {
             for my $pm (0, 1) {
                 my $key = $self->{locale}->am_pm_abbreviated->[$pm];
-                $key = decode(locale => $key) unless is_utf8 $key;
                 $self->{format_table}{localed_pm}{$key} = $pm;
             }
         }
@@ -110,6 +107,7 @@ sub new {
         format    => $format,
         time_zone => Time::Strptime::TimeZone->new($options->{time_zone}),
         locale    => DateTime::Locale->load($options->{locale} || 'C'),
+        strict    => $options->{strict} || 0,
         _handler  => +{
             %DEFAULT_HANDLER,
             %{ $options->{handler} || {} },
@@ -245,6 +243,8 @@ EOD
 sub _gen_calc_epoch_src {
     my ($self, $types_table) = @_;
 
+    my $timegm = $self->{strict} ? 'timegm' : 'timegm_nocheck';
+
     # hour24&minute&second
     # year&day365 or year&month&day
     my $second        = $types_table->{second} ? '$second' : 0;
@@ -255,17 +255,17 @@ sub _gen_calc_epoch_src {
     }
     elsif ($types_table->{year} && $types_table->{month} && $types_table->{day}) {
         return <<EOD;
-    \$epoch = timegm_nocheck($second, $minute, $hour, \$day, \$month - 1, \$year);
+    \$epoch = $timegm($second, $minute, $hour, \$day, \$month - 1, \$year);
 EOD
     }
     elsif ($types_table->{year} && $types_table->{month}) {
         return <<EOD;
-    \$epoch = timegm_nocheck($second, $minute, $hour, 1, \$month - 1, \$year);
+    \$epoch = $timegm($second, $minute, $hour, 1, \$month - 1, \$year);
 EOD
     }
     elsif ($types_table->{year} && $types_table->{day365}) {
         return <<EOD;
-    \$epoch = timegm_nocheck($second, $minute, $hour, 1, 0, \$year) + (\$day365 - 1) * 60 * 60 * 24;
+    \$epoch = $timegm($second, $minute, $hour, 1, 0, \$year) + (\$day365 - 1) * 60 * 60 * 24;
 EOD
     }
 
@@ -371,6 +371,12 @@ The default time zone to use for objects returned from parsing.
 =item * locale
 
 The locale to use for objects returned from parsing.
+
+=item * strict
+
+Strict range check for date and time.
+
+Example. C<"2016-02-31"> is wrong date string, but Time::Strptime parses as C<2016-02-31> in default.
 
 =back
 

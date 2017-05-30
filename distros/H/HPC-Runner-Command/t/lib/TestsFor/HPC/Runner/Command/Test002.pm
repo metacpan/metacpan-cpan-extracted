@@ -307,7 +307,7 @@ sub test_014 : Tags(job_stats) {
         'cmd_count'       => 1,
     };
 
-    my $array_deps = [ [ '1235_3', '1234_1' ], [ '1235_4', '1234_2' ] ];
+    my $array_deps = { '1235_3' => ['1234_1' ] , '1235_4' => [ '1234_2' ] };
 
     is_deeply( $test->array_deps, $array_deps, 'ArrayDeps Match' );
 

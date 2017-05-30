@@ -19,10 +19,12 @@ SKIP: {
     if (!$sshd) {
         diag "Tests t/49* require access to a remote or mock-remote ssh server.";
         diag "See t/remote.pl to see how to satisfy this requirement.";
-        skip "requires Test::SSH", $ntests;
+        ok(1, "skipping all test");
+        skip "requires Test::SSH", $ntests-1;
     }
     diag "--------------- got test ssh object \$\$=$$ ------------\n\n\n\n";
     my $cwd = Cwd::cwd();
+    ($cwd) = $cwd =~ /(.*)/;
 
     my $xcmd = "$cwd/t/external-command.pl";
     my $xxcmd = "$cwd/t/external command.pl";

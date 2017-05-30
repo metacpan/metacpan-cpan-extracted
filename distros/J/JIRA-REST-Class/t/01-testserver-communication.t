@@ -34,10 +34,10 @@ try {
         "client->url returns JIRA url $url");
 
     is( $client->username, $user,
-        "client->username returns JIRA username");
+        "client->username returns JIRA username when passed in via constructor");
 
     is( $client->password, $pass,
-        "client->password returns JIRA password");
+        "client->password returns JIRA password when passed in via constructor");
 
     my $pid = TestServer_pid();
 

@@ -9,9 +9,9 @@ build_requires:
   Test::Differences: '0.61'
   Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,4 +23,5 @@ resources:
   bugtracker: https://github.com/hoelzro/devel-trace-syscall/issues
   homepage: https://github.com/hoelzro/devel-trace-syscall
   repository: https://github.com/hoelzro/devel-trace-syscall.git
-version: '0.02'
+version: '0.03'
+x_serialization_backend: 'YAML::Tiny version 1.69'

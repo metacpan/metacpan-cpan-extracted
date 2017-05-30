@@ -23,11 +23,10 @@ use IO::Handle;
 use strict;
 use warnings;
 
-
 our @ISA = qw(Exporter);
 our @EXPORT = qw(@ALL_JOBS %ALL_JOBS PREFORK POSTFORK 
                  POSTFORK_PARENT POSTFORK_CHILD);
-our $VERSION = '0.89';
+our $VERSION = '0.90';
 
 our (@ALL_JOBS, %ALL_JOBS, @ARCHIVED_JOBS, $WIN32_PROC, $WIN32_PROC_PID);
 our $OVERLOAD_ENABLED = 0;
@@ -693,6 +692,7 @@ sub _postlaunch_daemon_parent {
         $new_pid = __read_from_pipe( $job->{daemon_ipc_pipe}[0] );
         close $job->{daemon_ipc_pipe}[0];
         close $job->{daemon_ipc_pipe}[1];
+        ($new_pid) = $new_pid =~ /([-\d]*)/;
     } else {
         for (my $try=1; defined($job->{daemon_ipc}) && $try<=50; $try++) {
             if (-f $job->{daemon_ipc} . '.ready') {
@@ -1125,6 +1125,9 @@ sub _postlaunch_child_to_remote_cmd {
                                       forward_X11 port)) {
                 $opts{$remoteopt} = $remote->{$remoteopt};
             }
+            if (ref($opts{key_path})) {
+                delete $opts{key_path};
+            }
 
             my $ssh = Net::OpenSSH->new($host,%opts);
             croak $ssh->error if $ssh->error;
@@ -1227,6 +1230,9 @@ sub __build_ssh_command {
 
     push @cmd, shquote($host);
 
+    # with shquote applied, the previous input should be taint-safe
+    ($_) = /(.*)/ for @cmd;
+    
     # command must immediately follow $host
     # command to remote host must be shell quoted twice!
     # once for the local shell running ssh, and
@@ -1276,9 +1282,6 @@ sub __build_ssh_command {
     } else {
         push @cmd, "2>/dev/null";
     }
-
-#    push @cmd, '>/tmp/ssh.stdout';
-#    push @cmd, '2>/tmp/ssh.stderr';
 
     return "@cmd";
 }
@@ -1388,7 +1391,7 @@ sub set_signal_pid {
 
 sub signal_pids {
     # if a background job has spawned yet another process,
-    # then sometimes we want to send a signal to both of those processes ...
+    # then sometimes we want to send a signal to both of those processes?
 
     my $job = shift;
     my $signal_pid = $job->signal_pid;
@@ -1451,6 +1454,7 @@ sub _read_signal_pid {
 
     if (defined $job->{signal_ipc_pipe}) {
         my $pid = __read_from_pipe( $job->{signal_ipc_pipe}[0] );
+        ($pid) = $pid =~ /([-\d]+)/;
         if ($pid) {
             $job->{signal_pid} = $pid;
             if ($^O eq 'MSWin32') {
@@ -2571,7 +2575,7 @@ Forks::Super::Job - object representing a background task
 
 =head1 VERSION
 
-0.89
+0.90
 
 =head1 SYNOPSIS
 

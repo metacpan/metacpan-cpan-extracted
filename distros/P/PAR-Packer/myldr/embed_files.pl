@@ -12,9 +12,10 @@ use lib "$FindBin::Bin/../lib";
 use File::Basename;
 use File::Glob;
 use File::Spec::Functions ':ALL';
-use Cwd 'realpath';
+use Cwd 'abs_path';
 use Getopt::Long;
 use IO::Compress::Gzip qw(gzip $GzipError);
+use DynaLoader;
 use Config;
 
 my $chunk_size = 32768;
@@ -78,10 +79,10 @@ for ($^O)
     if (/mswin32/i && (qx(objdump --version), $? == 0))
     {
         print STDERR qq[# using "objdump" recusrively to find DLLs needed by $par\n];
-        my $system_root = realpath($ENV{SystemRoot});
-        *is_system_lib = sub { realpath(shift) =~ m{^\Q$system_root\E/}i };
+        my $system_root = abs_path($ENV{SystemRoot});
+        *is_system_lib = sub { abs_path(shift) =~ m{^\Q$system_root\E/}i };
 
-        $dlls = objdump($par);
+        $dlls = objdump_win32($par, dirname($^X));
         last;
     }
 
@@ -161,12 +162,42 @@ sub otool
     return { map { basename($_) => $_ } $out =~ /^ \s+ (\S+) /gmx };
 }
 
-sub objdump
+sub objdump_win32
 {
-    my ($path) = @_;
+    my ($path, @search_first_in) = @_;
 
-    my %dlls;;
-    _objdump($path, "", { lc realpath($path) => 1 }, \%dlls);
+    # NOTE: Looks like Perl on Windows (e.g. Strawberry) doesn't set 
+    # $Config{ldlibpthname} - one could argue that its value should be "PATH".
+    # But even where it is defined (e.g. "LD_LIBRARY_PATH" on Linux)
+    # DynaLoader *appends* (an appropriately split)
+    # $ENV{$Config{ldlibpthname}} to its search path, @dl_library_path, 
+    # which is wrong in our context as we want it to be searched first.
+    # Hence, provide our own value for @dl_library_path.
+    local @DynaLoader::dl_library_path = (@search_first_in, path());
+
+    my %dlls;
+    my %seen;
+    my $walker;
+    $walker = sub 
+    {
+        my ($obj) = @_;
+        return if $seen{lc $obj}++;
+
+        my $out = qx(objdump -ax "$obj");
+        die "objdump failed: $!\n" unless $? == 0;
+
+        foreach my $dll ($out =~ /^\s*DLL Name:\s*(\S+)/gm)
+        {
+            next if $dlls{lc $dll};             # already found
+
+            my ($file) = DynaLoader::dl_findfile($dll) or next;
+            $dlls{lc $dll} = $file;
+
+            next if is_system_lib($file);       # no need to recurse on a system library
+            $walker->($file);                   # recurse
+        }
+    };
+    $walker->(abs_path($path));
 
     # weed out system libraries
     while (my ($name, $path) = each %dlls)
@@ -175,39 +206,6 @@ sub objdump
     }
         
     return \%dlls;
-}
-
-sub _objdump
-{
-    my ($path, $level, $seen, $dlls) = @_;
-
-    my $out = qx(objdump -ax "$path");
-    die "objdump failed: $!\n" unless $? == 0;
-    
-    foreach my $dll ($out =~ /^\s*DLL Name:\s*(\S+)/gm)
-    {
-        next if $dlls->{$dll};
-
-        my $path = _find_dll($dll) or next;
-        $dlls->{$dll} = $path;
-
-        next if $seen->{$path};
-        _objdump($path, "$level  ", $seen, $dlls) 
-            unless is_system_lib($path);
-        $seen->{lc $path} = 1;
-    }
-}
-
-sub _find_dll
-{
-    my ($name) = @_;
-
-    foreach (path())
-    {
-        my $path = catfile($_, $name);
-        return realpath($path) if -r $path;
-    }
-    return;
 }
 
 sub file2c

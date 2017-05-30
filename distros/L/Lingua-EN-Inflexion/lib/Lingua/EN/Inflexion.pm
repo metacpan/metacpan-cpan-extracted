@@ -2,7 +2,7 @@ package Lingua::EN::Inflexion;
 use 5.010; use warnings;
 use Carp;
 
-our $VERSION = '0.000007';
+our $VERSION = '0.001001';
 
 # Import noun, verb, and adj classes...
 use Lingua::EN::Inflexion::Term;
@@ -11,7 +11,7 @@ sub import {
     my (undef, @exports) = @_;
 
     # Export interface...
-    @exports = qw< noun verb adj inflect >  if !@exports;
+    @exports = qw< noun verb adj inflect wordlist >  if !@exports;
 
     # Handle renames...
     my %export_name;
@@ -42,6 +42,40 @@ sub verb ($) {
 sub adj ($) {
     my ($adj) = @_;
     return Lingua::EN::Inflexion::Adjective->new($adj);
+}
+
+
+# Convert a list of words to...a list of words in a single string...
+sub wordlist {
+    my (@words, %opt);
+
+    # Unpack the argument list...
+    my $sep    = ',';
+    my $conj   = 'and';
+    for my $arg (@_) {
+        my $argtype = ref($arg);
+
+           if ($argtype eq q{})     { push @words, $arg; $sep = ';' if $arg =~ /,/; } 
+        elsif ($argtype eq q{HASH}) { @opt{keys %$arg} = values %$arg }
+        else                        { croak 'Invalid $argtype argument to wordlist' }
+    }
+
+    # Fill in defaults...
+    $conj = $opt{conj}   // $conj;
+    $sep  = $opt{sep}    // $sep;
+
+    # Set the Oxford comma...
+    my $oxford = $opt{final_sep} // $sep;
+
+    # Construct the list phrase...
+    my $list = @words < 3
+                    ? join(" $conj ", @words)
+                    : join("$sep ", @words[0..$#words-1]) . "$oxford $conj $words[-1]";
+
+    # Condense any extra whitespace...
+    $list =~ s/(\s)\s+/$1/g;
+
+    return $list;
 }
 
 
@@ -91,7 +125,7 @@ sub inflect($) {
                     my ($count, $opts) = @_;
                     $opts =~ s{e}{asw}g;
                     carp "Unknown '$_' option to <#:...> command"
-                        for $opts =~ /([^adefinsw])/;
+                        for $opts =~ /([^acdefinosw\d])/;
 
                     # Increment count if requested...
                     if ($opts =~ /i/i) {
@@ -100,20 +134,27 @@ sub inflect($) {
 
                     # Decide which inflexion the count requires...
                     $inflexion
-                        = $count == 1 || $opts =~ /s/i && $count == 0 ? 'singular'
-                        :                                               'plural';
+                        = $count == 1 || $opts =~ /s/i && $count == 0 || $opts =~ /o/i ? 'singular'
+                        :                                                                'plural';
 
                     # Defer handling of A/AN...
                     if ($count == 1 && $opts =~ /a/i) {
                         return "<#a:>";
                     }
 
+                    my $count_word = $opts =~ /w|o/i ? noun($count) : undef;
+                       $count_word = $count_word->classical if $count_word && $opts =~ /c/i;
+
+                    my $count_thresh = $opts =~ /w(\d+)/i ? $1 : 11;
+
                     # Otherwise, interpolate count or its equivalent (deferring fuzzies)...
-                    return $opts =~ /n|s/i && $count == 0 ?  'no'
-                         : $opts =~ /f/i                  ?  "<#f:$count>"
-                         : $opts =~ /w/i                  ?  $word_for_number{$count} // $count
-                         : $opts =~ /d/                   ?  q{}
-                         :                                   $count;
+                    return $opts =~ /n|s/i && $count == 0  ?  'no'
+                         : $opts =~ /w/i && $opts =~ /o/i  ?  $count_word->ordinal($count_thresh)
+                         : $opts =~ /w/i                   ?  $count_word->cardinal($count_thresh)
+                         : $opts =~ /o/i                   ?  $count_word->ordinal(0)
+                         : $opts =~ /f/i                   ?  "<#f:$count>"
+                         : $opts =~ /d/                    ?  q{}
+                         :                                    $count;
                },
     };
 
@@ -134,8 +175,8 @@ sub inflect($) {
                 }gexmsi;
 
     # Inflect consequent A/AN's...
-    $string =~ s{ <\#a:> \s*+ (?<next_word> \S++) }{ noun($+{next_word})->indefinite }gxe;
-    $string =~ s{ <\#a:> \s*+ \Z }{ "a" }xe;
+    $string =~ s{ <[#]a:> \s*+ (?<next_word> \S++) }{ noun($+{next_word})->indefinite }gxe;
+    $string =~ s{ <[#]a:> \s*+ \Z }{ "a" }xe;
 
     # Inflect fuzzies...
     state $fuzzy = sub {
@@ -170,12 +211,12 @@ Lingua::EN::Inflexion - Inflect English nouns, verbs, adjectives, and articles
 
 =head1 VERSION
 
-This document describes Lingua::EN::Inflexion version 0.000007
+This document describes Lingua::EN::Inflexion version 0.001001
 
 
 =head1 SYNOPSIS
 
-    use Lingua::EN::Inflexion qw< noun inflect >;
+    use Lingua::EN::Inflexion qw< noun inflect wordlist >;
 
     # Request a search term, and treat it as a noun object...
     my $search_term   = prompt("Enter something to search for");
@@ -197,6 +238,9 @@ This document describes Lingua::EN::Inflexion version 0.000007
     #    "99 indices were found"
     my $search_outcome
         = inflect("<#wnci:$#matches> <Nc:index> <V:was> found");
+
+    # Generate properly formatted lists of words and phrases...
+    my $list = wordlist(@words);
 
 
 =head1 DESCRIPTION
@@ -227,19 +271,23 @@ These guesses can be changed by rearranging the source tables
 
 =head1 INTERFACE
 
-By default, the module exports four subroutines: C<noun()>, C<verb()>,
-C<adj()>, and C<inflect()>.
+By default, the module exports five subroutines: C<noun()>, C<verb()>,
+C<adj()>, C<wordlist()>, and C<inflect()>.
 
 The first three are constructors for objects representing nouns, verbs,
 or adjectives respectively. These I<"inflexion objects"> then provide a
 selection of methods allowing each term to be appropriately inflected.
 
-The fourth subroutine is a general tool for constructing correctly
+The C<wordlist()> subroutine takes a list of words or phrases, and some
+optional configuration arguments, and formats the list into a single
+English phrase, with commas between the elements and a conjunction
+before the last.
+
+The C<inflect()> subroutine is a general tool for constructing correctly
 inflected sentences from uninflected components, using string
 interpolation and a simple mark-up language.
 
-As usual, you can also explicitly import a subset of these subroutines
-in the usual way:
+As usual, you can also explicitly import a subset of these subroutines:
 
     use Lingua::EN::Inflexion qw( noun verb );
 
@@ -431,7 +479,7 @@ which you can call directly if you prefer:
 
     my $noun_obj = Lingua::EN::Inflexion::Noun->new($string);
 
-Noun objects provide two extra methods in addition to the common methods
+Noun objects provide six extra methods in addition to the common methods
 described above...
 
 =head3 C<< indef_article() >>
@@ -468,6 +516,82 @@ Thus:
     noun("union")->indefinite($N);  # "0 unions",  "a union", "2 unions"
     noun("house")->indefinite($N);  # "0 houses",  "a house", "2 houses"
     noun("hours")->indefinite($N);  # "0 hours",  "an hour",  "2 hours"
+
+
+=head3 C<< cardinal($threshold = 10) >>
+
+Convert the word into the English word for a cardinal number, using the
+Lingua::EN::Nums2Words module (which must be installed or an exception
+is thrown). If the word represents a number greater than C<$threshold>
+(which is set to 10 if no explicit argument is provided), then word is
+converted to digits instead.
+
+For example:
+
+    noun( 1)->cardinal;      # "one"
+    noun(10)->cardinal;      # "ten"
+    noun(11)->cardinal;      # "11"
+    noun(11)->cardinal(20);  # "eleven"
+    noun(21)->cardinal(20);  # "21"
+
+The word is also converted if it is an English phrase representing 
+a valid number (via the Lingua::EN::Words2Nums module, which must
+be installed or an exception is thrown):
+
+    noun("one")->cardinal;                             # "one"
+    noun("ten")->cardinal;                             # "ten"
+    noun("eleven")->cardinal;                          # "11"
+    noun("eleven")->cardinal(20);                      # "eleven"
+    noun("one hundred and twenty-one")->cardinal(20);  # "121"
+
+Words that are ordinal numbers are also correctly converted:
+
+    noun("first")->cardinal;  # "one"
+    noun("142nd")->cardinal;  # "one hundred and forty-two"
+
+Words that cannot be interpreted as numbers are treated as zero:
+
+    noun("eon")->cardinal;                             # "zero"
+    noun("elven")->cardinal;                           # "zero"
+
+
+=head3 C<< ordinal($threshold = 10) >>
+
+Convert the word into the English word for an ordinal number, using the
+Lingua::EN::Nums2Words module (which must be installed or an exception
+is thrown). If the word represents a number greater than C<$threshold>
+(which is set to 10 if no explicit argument is provided), then word is
+converted to digits instead.
+
+For example:
+
+    noun( 1)->ordinal;      # "first"
+    noun(10)->ordinal;      # "tenth"
+    noun(11)->ordinal;      # "11th"
+    noun(11)->ordinal(20);  # "eleventh"
+    noun(21)->ordinal(20);  # "21st"
+
+The word is also converted if it is an English phrase representing 
+a valid number (via the Lingua::EN::Words2Nums module, which must
+be installed or an exception is thrown):
+
+    noun("one")->ordinal;                             # "first"
+    noun("ten")->ordinal;                             # "tenth"
+    noun("eleven")->ordinal;                          # "11th"
+    noun("eleven")->ordinal(20);                      # "eleventh"
+    noun("one hundred and twenty-one")->ordinal(20);  # "121st"
+
+Words that are ordinal numbers are also correctly converted:
+
+    noun("first")->ordinal;     # "first"
+    noun("142nd")->ordinal;     # "one hundred and forty-second"
+    noun("first")->ordinal(0);  # "1st"
+    noun("142nd")->ordinal(0);  # "142nd"
+
+Words that cannot be interpreted as numbers are treated as zero:
+
+    noun("eon")->ordinal;                             # "zeroth"
+    noun("elven")->ordinal;                           # "zeroth"
 
 
 =head2 The C<< verb() >> constructor and associated methods
@@ -649,11 +773,11 @@ I<Mnemonic:> C<s> for "singular" or "sophisticated" or "snooty".
 If the count equals one, interpolate "a" or "an" into the string instead
 of the actual count. For example:
 
-    say inflect "<#a:count> <N:results>";
+    say inflect "<#a:$count> <N:results>";
               # "a result"    if $count == 1
               # "3 results"   if $count == 3
 
-    say inflect "<#a:count> <N:outcomes>";
+    say inflect "<#a:$count> <N:outcomes>";
               # "an outcome"  if $count == 1
               # "3 outcomes"  if $count == 3
 
@@ -665,14 +789,56 @@ I<Mnemonic:> C<a> for "a" and "an", or "article".
 If the count is small (between zero and ten), interpolate the
 appropriate English word instead of the number:
 
-    say inflect "<#w:count> <N:results>";
+    say inflect "<#w:$count> <N:results>";
               # "six results"  if $count == 6
+              # "ten results"  if $count == 10
               # "11 results"   if $count == 11
 
 Note that this option is overridden by the special case behaviours of
 both the C<n> and C<a> options, if either is also specified.
 
 I<Mnemonic:> C<w> for "wordy" or "written-out".
+
+
+=item C<w>I<N>
+
+The C<w> option can also be followed by one or more digits, in
+which case if the count is less than or equal to that number,
+the appropriate English word is interpolated instead of the number:
+
+    say inflect "<#w20:$count> <N:results>";
+              # "six results"     if $count == 6
+              # "twenty results"  if $count == 20
+              # "21 results"      if $count == 21
+
+In all other respects this variant behaves exactly like a regular C<w>
+option, as described in the previous item.
+
+
+=item C<o>
+
+Display the count as an ordinal:
+
+    say inflect "<#o:$count> <N:results>";
+              # "1st result"   if $count == 6
+              # "11th result"  if $count == 11
+              # "22nd result"  if $count == 22
+
+Note that, in keeping with English usage, under the C<o> option, the
+effective count is set to 1, rather than the actual number provided.
+
+When this option is combined with the C<w> option, the ordinal is
+converted to words:
+
+    say inflect "<#ow:$count> <N:results>";
+              # "first result"  if $count == 6
+              # "tenth result"  if $count == 10
+              # "11th result"   if $count == 11
+
+Note that this option is overridden by the special case behaviours of
+both the C<n> and C<a> options, if either is also specified.
+
+I<Mnemonic:> C<o> for "ordinal" or "ordered".
 
 
 =item C<f>
@@ -872,6 +1038,40 @@ most recent preceding C<< <#:...> >> markup.
 This command has no options.
 
 
+=head2 Converting lists of words to phrases
+
+When creating a list of words, commas are used between adjacent items,
+except if the items contain commas, in which case semicolons are used.
+But if there are less than three items, the commas/semicolons are omitted
+entirely. The final item also has a conjunction (usually "and" or "or")
+before it. And although it's often misleading , some people prefer to
+omit the comma before that final conjunction, even when there are more
+than two items.
+
+That's complicated enough to warrant its own subroutine: C<wordlist()>.
+This subroutine expects a list of words, possibly with one or more hash
+references containing options. It returns a string that joins the list
+together in the normal English usage. For example:
+
+    print "You chose ", wordlist(@selected_items), "\n";
+    # You chose barley soup, roast beef, and Yorkshire pudding
+
+    print "You chose ", wordlist(@selected_items, {final_sep=>""}), "\n";
+    # You chose barley soup, roast beef and Yorkshire pudding
+
+    print "Please chose ", wordlist(@side_orders, {conj=>"or"}), "\n";
+    # Please chose salad, vegetables, or ice-cream
+
+The available options are:
+
+    Option named    Specifies                Default value
+
+    conj            Final conjunction        "and"
+    sep             Inter-item separator     "," or ";"
+    final_sep       Final separator          value of 'sep' option
+
+
+
 =head3 Long-form markup notation
 
 Every command in the C<inflect()> markup language is a single
@@ -907,6 +1107,60 @@ then removes the lowercase letters from the options:
 and finally converts what's left to lowercase:
 
     say inflect "<#a n w    :$count> <N   c        :$target> <V   :were> found";
+
+
+=head1 CONVERTING FROM LINGUA::EN::INFLECT
+
+This module is the successor to the original Lingua::EN::Inflect module.
+The following tables summarize how to convert code from the old interface
+to the new.
+
+    Lingua::EN::Inflect subroutines         Lingua::EN::Inflexion code
+    ====================================================================
+    PL($word)                               # No equivalent
+    --------------------------------------------------------------------
+    PL_N($word)                             noun($word)->plural
+    PL_V($word)                             verb($word)->plural
+    PL_ADJ($word)                           adj($word)->plural
+    --------------------------------------------------------------------
+    NO($word)                               # No equivalent
+    NUM($word)                              # No equivalent
+    --------------------------------------------------------------------
+    A($word)                                noun($word)->indefinite
+    AN($word)                               noun($word)->indefinite
+    --------------------------------------------------------------------
+    PL_eq($word1, $word2)                   # No equivalent
+    --------------------------------------------------------------------
+    PL_N_eq($word1, $word2)                 noun($word1) ~~ noun($word2)
+    PL_V_eq($word1, $word2)                 verb($word1) ~~ verb($word2)
+    PL_ADJ_eq($word1, $word2)               adj($word1) ~~ adj($word2)
+    --------------------------------------------------------------------
+    PART_PRES($word)                        verb( $word )->pres_part
+    --------------------------------------------------------------------
+    ORD($word)                              noun( $word )->ordinal
+    NUMWORDS($word)                         noun( $word )->cardinal
+    --------------------------------------------------------------------
+    WORDLIST(@words, \%opts)                wordlist( @words, \%opts)
+
+
+    Lingua::EN::Inflect::inflect()          Lingua::EN::Inflexion::inflect()
+    ========================================================================
+    "PL($word)"                             # No equivalent
+    ------------------------------------------------------------------------
+    "PL_N($word)"                           "<N:$word>"
+    "PL_V($word)"                           "<V:$word>"
+    "PL_ADJ($word)"                         "<A:$word>"
+    ------------------------------------------------------------------------
+    "NUM($num)"                             "<#:$num>"
+    "NO($word)"                             "<#n:$num>"
+    ------------------------------------------------------------------------
+    "A($word)"                              "<#a:$num> N<$word>"
+    "AN($word)"                             "<#a:$num> N<$word>"
+    ------------------------------------------------------------------------
+    "PART_PRES($word)"                      # No equivalent
+    ------------------------------------------------------------------------
+    "ORD($word)"                            "<No:$word>"
+    "NUMWORDS($word)"                       "<Nw:$word>"
 
 
 =head1 LINGUISTIC ABYSSES

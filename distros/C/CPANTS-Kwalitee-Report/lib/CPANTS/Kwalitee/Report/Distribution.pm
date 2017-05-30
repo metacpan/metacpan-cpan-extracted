@@ -1,6 +1,6 @@
 package CPANTS::Kwalitee::Report::Distribution;
 
-$CPANTS::Kwalitee::Report::Distribution::VERSION   = '0.09';
+$CPANTS::Kwalitee::Report::Distribution::VERSION   = '0.10';
 $CPANTS::Kwalitee::Report::Distribution::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ CPANTS::Kwalitee::Report::Distribution - CPANTS Kwalitee Report Distribution.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
@@ -21,10 +21,8 @@ use namespace::clean;
 
 use overload q{""} => 'as_string', fallback => 1;
 
-has 'name'   => (is => 'ro', required => 1);
-has 'path'   => (is => 'ro', required => 1);
-has 'link'   => (is => 'rw');
-has 'scores' => (is => 'rw');
+has [qw(name path)]   => (is => 'ro', required => 1);
+has [qw(link scores)] => (is => 'rw');
 
 =head1 DESCRIPTION
 

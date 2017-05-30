@@ -1,0 +1,45 @@
+=head1 CHANGELOG FOR JSON::Assert
+
+=head2 VERSION 0.04, 06 DECEMBER 2016
+
+=over
+
+=item *
+
+Added does_jpath_contains method to Test::JSON::Assert, 
+fixed does_jpath_contains in JSON::Assert
+
+=back
+
+=head2 VERSION 0.03, 15 MAY 2015
+
+=over
+
+=item *
+
+Replaced smartmatches with matches
+
+=back
+
+=head2 VERSION 0.02, 14 MAY 2015
+
+=over
+
+=item *
+
+Fixed unit tests, updated copyright info
+
+=back
+
+=head2 VERSION 0.01, 22 JANUARY 2014
+
+=over
+
+=item *
+
+Cloned from XML::Assert, with XML specific features removed.
+
+=back
+
+=cut
+

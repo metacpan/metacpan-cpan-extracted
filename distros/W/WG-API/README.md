@@ -5,7 +5,7 @@ WG::API - Module for work with Wargaming.net Public API
 
 # VERSION
 
-Version v0.8.1
+Version v0.8.3
 
 # SYNOPSIS
 
@@ -13,63 +13,37 @@ Wargaming.net Public API is a set of API methods that provide access to Wargamin
 
 This module provide access to WG Public API
 
-    use WG::API::NET;
+    use WG::API;
 
-    my $wg = WG::API::NET->new( application_id => 'demo' );
+    my $wg = WG::API->new( application_id => 'demo' );
     ...
-    my $player = $wg->account_info( account_id => '1' );
+    my $player = $wg->net( language => 'en' )->account_info( account_id => '1' );
 
 # ATTRIBUTES
 
 - _application\_id\*_
 
-    Rerquired application id: http://ru.wargaming.net/developers/documentation/guide/getting-started/
+    Rerquired application id: [https://developers.wargaming.net/documentation/guide/getting-started/](https://developers.wargaming.net/documentation/guide/getting-started/)
 
-- _ua_
+- _wot_
 
-    User agent, default - LWP::UserAgent.
+    Returns a WoT instance
 
-- _language_
+- _wowp_
 
-    Localization language. Default - 'ru', Valid values:
+    Returns A WoWp instance
 
-    - "en" — English
-    - "ru" — Русский (by default)
-    - "pl" — Polski
-    - "de" — Deutsch
-    - "fr" — Français
-    - "es" — Español
-    - "zh-cn" — 简体中文
-    - "tr" — Türkçe
-    - "cs" — Čeština
-    - "th" — ไทย
-    - "vi" — Tiếng Việt
-    - "ko" — 한국어
+- _wows_
 
-- _api\_uri_
+    Returns a WoWs instance
 
-    URL for which a request is sent.
+- _net_
 
-- _status_
+    Returns a NET instance
 
-    Request status - 'ok', 'error' or undef, if request not finished.
+- _auth_
 
-- _response_
-
-    Response from WG API
-
-- _meta_
-
-    Meta from response
-
-- _error_
-
-    Once an error occurred, the following values are returned:
-
-    - code
-    - message
-    - field
-    - value
+    Return a Auth instance
 
 # BUGS
 
@@ -105,7 +79,7 @@ You can also look for information at:
 
 # SEE ALSO
 
-WG API Reference [http://ru.wargaming.net/developers/](http://ru.wargaming.net/developers/)
+WG API Reference [https://developers.wargaming.net/](https://developers.wargaming.net/)
 
 # AUTHOR
 

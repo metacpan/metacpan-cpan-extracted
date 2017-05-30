@@ -4,7 +4,7 @@
       "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150005",
    "keywords" : [],
    "license" : [
       "perl_5"
@@ -66,12 +66,11 @@
    "provides" : {
       "MooseX::MungeHas" : {
          "file" : "lib/MooseX/MungeHas.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/project",
       "bugtracker" : {
          "web" : "http://rt.cpan.org/Dist/Display.html?Queue=MooseX-MungeHas"
       },
@@ -83,10 +82,12 @@
          "type" : "git",
          "url" : "git://github.com/tobyink/p5-moosex-mungehas.git",
          "web" : "https://github.com/tobyink/p5-moosex-mungehas"
-      }
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/project"
    },
-   "version" : "0.007",
+   "version" : "0.008",
    "x_contributors" : [
       "Andrew Rodland (ARODLAND) <arodland@cpan.org>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

@@ -2,7 +2,7 @@ NAME
     Lazy::Utils - Utility functions
 
 VERSION
-    version 1.17
+    version 1.20
 
 SYNOPSIS
             use Lazy::Utils;
@@ -23,27 +23,27 @@ SYNOPSIS
 DESCRIPTION
     Collection of utility functions all of exported by default.
 
-Functions
+FUNCTIONS
   trim($str)
     trims given string
 
-    $str: *string will be trimed*
+    $str: *string will be trimmed*
 
-    return value: *trimed string*
+    return value: *trimmed string*
 
   ltrim($str)
     trims left given string
 
-    $str: *string will be trimed*
+    $str: *string will be trimmed*
 
-    return value: *trimed string*
+    return value: *trimmed string*
 
   rtrim($str)
     trims right given string
 
-    $str: *string will be trimed*
+    $str: *string will be trimmed*
 
-    return value: *trimed string*
+    return value: *trimmed string*
 
   file_get_contents($path, $prefs)
     gets all contents of file in string type
@@ -90,7 +90,7 @@ Functions
 
     @argv: *command line arguments*
 
-    return value: *exit code of command. 511 if fatal error occurs*
+    return value: *exit code of command. -1 if fatal error occurs*
 
     returned $?: *return code of wait call like on perls system call*
 
@@ -112,26 +112,6 @@ Functions
 
     resolves command line arguments
 
-    valuableArgs is off, eg;
-
-            --opt1 --opt2=val2 cmd param1 param2 param3
-            -opt1 -opt2=val2 cmd param1 param2 param3
-            -opt1 -opt2=val2 cmd param1 -- param2 param3
-            -opt1 cmd param1 -opt2=val2 param2 param3
-            -opt1 cmd param1 -opt2=val2 -- param2 param3
-            cmd -opt1 param1 -opt2=val2 param2 param3
-            cmd -opt1 param1 -opt2=val2 -- param2 param3
-
-    valuableArgs is on, eg;
-
-            -opt1 -opt2=val2 cmd param1 param2 param3
-            -opt1 -opt2 val2 cmd param1 param2 param3
-            -opt1 -opt2 -- cmd param1 param2 param3
-            cmd -opt1 -opt2 val2 param1 param2 param3
-            cmd -opt1 -opt2 -- param1 param2 param3
-            cmd param1 -opt1 -opt2 val2 param2 param3
-            cmd param1 -opt1 -opt2 -- param2 param3
-
     $prefs: *preferences in HashRef, optional*
 
         valuableArgs: *accepts option value after option if next argument is
@@ -139,17 +119,28 @@ Functions
 
         noCommand: *use first parameter instead of command, by default 0*
 
-        optionAtAll: *DEPRECATED: now, it is always on. accepts options
-        after command or first parameter otherwise evaluates as parameter,
-        by default 0*
+        optionAtAll: *accepts options after command or first parameter
+        otherwise evaluates as parameter, by default 1*
 
     @argv: *command line arguments*
 
-    return value: eg;
+            -a -b=c -d e --f g --h --i=j k l -- m n
 
-            { --opt1 => '', --opt2 => 'val2', command => 'cmd', parameters => ['param1', 'param2', 'param3'] }
-            { -opt1 => '', -opt2 => 'val2', command => 'cmd', parameters => ['param1', 'param2', 'param3'] }
-            { -opt1 => '', -opt2 => '', command => 'cmd', parameters => ['param1', 'param2', 'param3'] }
+    by default, return value:
+
+            { -a => '', -b => 'c', -d => '', --f => '', --h => '', --i => 'j', command => 'e', parameters => ['g', 'k', 'l'], late_parameters => ['m', 'n'] }
+
+    if valuableArgs is on, return value;
+
+            { -a => '', -b => 'c', -d => 'e', --f => 'g', --h => '', --i => 'j', command => 'k', parameters => ['l'], late_parameters => ['m', 'n'] }
+
+    if noCommand is on, return value:
+
+            { -a => '', -b => 'c', -d => '', --f => '', --h => '', --i => 'j', command => undef, parameters => ['e', 'g', 'k', 'l'], late_parameters => ['m', 'n'] }
+
+    if optionAtAll is off, return value:
+
+            { -a => '', -b => 'c', -d => '', command => 'e', parameters => ['--f', 'g', '--h', '--i=j', 'k', 'l', '--','m', 'n'], late_parameters => [] }
 
   whereis($name, $path)
     whereisBin($name, $path) *OBSOLETE*

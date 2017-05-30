@@ -1,5 +1,8 @@
 Revision history for Devel-Jemallctl
 
-0.01    Date/time
+0.02    2017-05-26
+        Performance improvements and a fix in the tests
+
+0.01    2017-05-23
         First version, released on an unsuspecting world.
 

@@ -118,11 +118,6 @@ Possible TODOs:
 
     _o_ setuid =>  option to fork
 
-    _o_ Make forked_harness.pl an application that gets installed
-        with Forks::Super
-        _o_ or maybe not, people already use prove
-        _X_ put pod in t/forked_harness.pl
-
     _x_ daemon support depends on file-based IPC?
         make a socket-based alternative. Let $job->{signal_ipc}, {daemon_ipc}
 	be sockets?
@@ -184,17 +179,9 @@ Possible TODOs:
 
     ___ FS::Config::enable_signal_config not being tested?
 
-    _X_ Improve global destruction like I did in Devel::DumpTrace
-
     ___ Pool, Queue objects to share data between parent and children (workers)
         ___ Are there existing modules for this? To add and subtract from a
             queue or stack from separate processes?
         _X_ rename Forks::Super::Queue so this package name is available later
 
     ___ determine in system-limits.PL if alternate alarm is needed
-
-    ___ run Test::SSH inside forked-harness.pl, let our remote tests use a
-        common test server
-
-    _X_ Signal ipc pipes must be closed (bug report from Jari Turkia)
-

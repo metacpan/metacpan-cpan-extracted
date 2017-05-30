@@ -49,23 +49,23 @@
    "provides" : {
       "CPANTS::Kwalitee::Report" : {
          "file" : "lib/CPANTS/Kwalitee/Report.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "CPANTS::Kwalitee::Report::Distribution" : {
          "file" : "lib/CPANTS/Kwalitee/Report/Distribution.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "CPANTS::Kwalitee::Report::Generator" : {
          "file" : "lib/CPANTS/Kwalitee/Report/Generator.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "CPANTS::Kwalitee::Report::Indicator" : {
          "file" : "lib/CPANTS/Kwalitee/Report/Indicator.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "CPANTS::Kwalitee::Report::Score" : {
          "file" : "lib/CPANTS/Kwalitee/Report/Score.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -76,6 +76,6 @@
          "web" : "https://github.com/manwar/CPANTS-Kwalitee-Report"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

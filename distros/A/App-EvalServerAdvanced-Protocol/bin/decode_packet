@@ -1,0 +1,25 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Data::Dumper;
+use FindBin;
+use lib $FindBin::Bin . "/../lib";
+
+use App::EvalServerAdvanced::Protocol;
+use Time::HiRes qw/sleep/;
+
+$|++;
+my $tbuf;
+my $buf;
+
+# Slow and inefficient, but it works
+while(read(STDIN, $tbuf, 4) >= 0) {
+    $buf .= $tbuf;
+    my ($res, $message, $nbuf) = decode_message($buf);
+    if ($res) {
+      print Dumper($message);
+      $buf = $nbuf;
+    }
+#    sleep 0.1;
+}

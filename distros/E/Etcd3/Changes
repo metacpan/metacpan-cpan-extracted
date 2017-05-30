@@ -1,4 +1,9 @@
 Revision history for Etcd3
+0.007
+
+[ ANNOUNCEMENT ]
+  * This module has been superceded by Net::Etcd and will be removed from CPAN.
+
 0.006
 [ ENHANCEMENTS ]
   * Sweeping changes to usage some not backwards compatible, sorry.

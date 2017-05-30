@@ -2,23 +2,45 @@ package Pcore::API::Client;
 
 use Pcore -class, -result;
 use Pcore::WebSocket;
-use Pcore::Util::Scalar qw[blessed];
+use Pcore::Util::Scalar qw[blessed weaken];
 use Pcore::Util::Data qw[to_cbor from_cbor];
 use Pcore::Util::UUID qw[uuid_str];
 use Pcore::HTTP qw[:TLS_CTX];
 
 has uri => ( is => 'ro', isa => InstanceOf ['Pcore::Util::URI'], required => 1 );    # http://token@host:port/api/, ws://token@host:port/api/
 
-has token           => ( is => 'ro', isa => Str );
-has api_ver         => ( is => 'ro', isa => Str );                                         # eg: 'v1', default API version for relative methods
-has http_persistent => ( is => 'ro', isa => Maybe [PositiveOrZeroInt], default => 600 );
-has http_timeout => ( is => 'ro', isa => Maybe [PositiveOrZeroInt] );
-has tls_ctx => ( is => 'ro', isa => Maybe [ HashRef | Int ], default => $TLS_CTX_HIGH );
+has token   => ( is => 'ro', isa => Str );
+has api_ver => ( is => 'ro', isa => Str );                                           # eg: 'v1', default API version for relative methods
+
+has tls_ctx => ( is => 'ro', isa => Maybe [ HashRef | Enum [ $TLS_CTX_LOW, $TLS_CTX_HIGH ] ], default => $TLS_CTX_HIGH );
+has connect_timeout => ( is => 'ro', isa => PositiveOrZeroInt, default => 10 );
+
+# HTTP options
+has persistent => ( is => 'ro', isa => Maybe [PositiveOrZeroInt], default => 600 );
+has timeout => ( is => 'ro', isa => Maybe [PositiveOrZeroInt] );
+
+# WebSocket options
+has compression => ( is => 'ro', isa => Bool, default => 0 );
+has listen_events  => ( is => 'ro', isa => ArrayRef );
+has forward_events => ( is => 'ro', isa => ArrayRef );
+has on_connect     => ( is => 'ro', isa => Maybe [CodeRef] );
+has on_disconnect  => ( is => 'ro', isa => Maybe [CodeRef] );
+has on_rpc         => ( is => 'ro', isa => Maybe [CodeRef] );
+has on_ping        => ( is => 'ro', isa => Maybe [CodeRef] );
+has on_pong        => ( is => 'ro', isa => Maybe [CodeRef] );
 
 has _is_http => ( is => 'lazy', isa => Bool, required => 1 );
 
 has _get_ws_cb => ( is => 'ro', isa => ArrayRef, init_arg => undef );
 has _ws => ( is => 'ro', isa => InstanceOf ['Pcore::HTTP::WebSocket'], init_arg => undef );
+
+sub DEMOLISH ( $self, $global ) {
+    if ( !$global ) {
+        $self->{_ws}->disconnect if $self->{_ws};
+    }
+
+    return;
+}
 
 around BUILDARGS => sub ( $orig, $self, $uri, @ ) {
     my %args = ( splice @_, 3 );
@@ -43,11 +65,7 @@ sub set_token ( $self, $token = undef ) {
 }
 
 sub disconnect ($self) {
-    if ( $self->{_ws} ) {
-        $self->{_ws}->disconnect;
-
-        $self->{_ws} = undef;
-    }
+    undef $self->{_ws};
 
     return;
 }
@@ -97,9 +115,10 @@ sub _send_http ( $self, $method, @ ) {
 
     P->http->post(
         $self->uri,
-        persistent => $self->{http_persistent},
-        tls_ctx    => $self->{tls_ctx},
-        ( $self->{http_timeout} ? ( timeout => $self->{http_timeout} ) : () ),
+        connect_timeout => $self->{connect_timeout},
+        persistent      => $self->{persistent},
+        tls_ctx         => $self->{tls_ctx},
+        ( $self->{timeout} ? ( timeout => $self->{timeout} ) : () ),
         headers => {
             REFERER       => undef,
             AUTHORIZATION => "Token $self->{token}",
@@ -117,13 +136,13 @@ sub _send_http ( $self, $method, @ ) {
                     $cb->( result [ 500, 'Error decoding response' ] ) if $cb;
                 }
                 elsif ($cb) {
-                    my $trans = ref $msg eq 'ARRAY' ? $msg->[0] : $msg;
+                    my $tx = ref $msg eq 'ARRAY' ? $msg->[0] : $msg;
 
-                    if ( $trans->{type} eq 'exception' ) {
-                        $cb->( bless $trans->{message}, 'Pcore::Util::Result' );
+                    if ( $tx->{type} eq 'exception' ) {
+                        $cb->( bless $tx->{message}, 'Pcore::Util::Result' );
                     }
-                    elsif ( $trans->{type} eq 'rpc' ) {
-                        $cb->( bless $trans->{result}, 'Pcore::Util::Result' );
+                    elsif ( $tx->{type} eq 'rpc' ) {
+                        $cb->( bless $tx->{result}, 'Pcore::Util::Result' );
                     }
                 }
             }
@@ -155,26 +174,28 @@ sub _send_ws ( $self, @args ) {
 }
 
 sub _get_ws ( $self, $cb ) {
-    if ( $self->{ws} ) {
-        $cb->( $self->{ws}, undef );
+    if ( $self->{_ws} ) {
+        $cb->( $self->{_ws}, undef );
     }
     else {
         push $self->{_get_ws_cb}->@*, $cb;
 
         return if $self->{_get_ws_cb}->@* > 1;
 
+        weaken $self;
+
         Pcore::WebSocket->connect_ws(
             pcore            => $self->uri,
             max_message_size => 0,
-            compression      => 0,                  # use permessage_deflate compression
+            compression      => $self->{compression},
+            connect_timeout  => $self->{connect_timeout},
             tls_ctx          => $self->{tls_ctx},
-            ( $self->{token} ? ( headers => [ Authorization => "Token $self->{token}" ] ) : () ),
-
-            # before_connect => {
-            #     listen_events  => $args{listen_events},
-            #     forward_events => $args{forward_events},
-            # },
-            on_error => sub ($res) {
+            before_connect   => {
+                token          => $self->{token},
+                listen_events  => $self->{listen_events},
+                forward_events => $self->{forward_events},
+            },
+            on_connect_error => sub ($res) {
                 while ( my $cb = shift $self->{_get_ws_cb}->@* ) {
                     $cb->( undef, $res );
                 }
@@ -184,24 +205,48 @@ sub _get_ws ( $self, $cb ) {
             on_connect => sub ( $ws, $headers ) {
                 $self->{_ws} = $ws;
 
+                $self->{on_connect}->( $self, $headers ) if $self->{on_connect};
+
                 while ( my $cb = shift $self->{_get_ws_cb}->@* ) {
                     $cb->( $ws, undef );
                 }
 
                 return;
             },
+            on_disconnect => sub ( $ws, $status ) {
+                undef $self->{_ws};
 
-            # on_disconnect => sub ( $ws, $status ) {
-            #     $self->{_ws} = undef;
-            #
-            #     for my $tid ( keys $self->{_sent_requests}->%* ) {
-            #         if ( my $cb = delete $self->{_sent_requests}->{$tid} ) {
-            #             $cb->($status);
-            #         }
-            #     }
-            #
-            #     return;
-            # }
+                $self->{on_disconnect}->( $self, $status ) if $self && $self->{on_disconnect};
+
+                return;
+            },
+            on_ping => do {
+                if ( $self->{on_ping} ) {
+                    sub ( $ws, $payload_ref ) {
+                        $self->{on_ping}->( $self, $payload_ref ) if $self && $self->{on_ping};
+
+                        return;
+                    };
+                }
+            },
+            on_pong => do {
+                if ( $self->{on_pong} ) {
+                    sub ( $ws, $payload_ref ) {
+                        $self->{on_pong}->( $self, $payload_ref ) if $self && $self->{on_pong};
+
+                        return;
+                    };
+                }
+            },
+            on_rpc => do {
+                if ( $self->{on_rpc} ) {
+                    sub ( $ws, $req, $tx ) {
+                        $self->{on_rpc}->( $self, $req, $tx ) if $self && $self->{on_rpc};
+
+                        return;
+                    };
+                }
+            },
         );
     }
 
@@ -215,7 +260,7 @@ sub _get_ws ( $self, $cb ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 64                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |    3 | 82                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

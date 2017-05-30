@@ -131,6 +131,15 @@ SYNOPSIS
         my $temp      = $env->temp; # celcius
         my $farenheit = $env->temp('f');
     
+        # GPS (requires gpsd to be installed and running
+    
+        my $gps = $pi->gps;
+    
+        print $gps->tpv('lat')   . "\n";
+        print $gps->tpv('lon')   . "\n";
+        print $gps->tpv('speed') . "\n";
+        print $gps->direction    . "\n";
+    
         #
         # LCD
         #
@@ -206,25 +215,20 @@ METHODS
 
  pin($pin_num)
 
-    Returns a RPi::WiringPi::Pin object, mapped to a specified GPIO pin,
-    which you can then perform operations on.
+    Returns a RPi::Pin object, mapped to a specified GPIO pin, which you
+    can then perform operations on. See that documentation for full usage
+    details.
 
     Parameters:
 
         $pin_num
 
-    Mandatory: The pin number to attach to.
+    Mandatory, Integer: The pin number to attach to.
 
  lcd()
 
-    Returns a RPi::WiringPi::LCD object, which allows you to fully
-    manipulate LCD displays connected to your Raspberry Pi.
-
- interrupt($pin, $edge, $callback)
-
-    Returns a RPi::WiringPi::Interrupt object, which allows you to act when
-    certain events occur (eg: a button press). This functionality is better
-    used through the RPi::WiringPi::Pin object you created with pin().
+    Returns a RPi::LCD object, which allows you to fully manipulate LCD
+    displays connected to your Raspberry Pi.
 
  spi($channel, $speed);
 
@@ -242,6 +246,14 @@ METHODS
 
     See the linked documentation for full documentation on usage, or the
     RPi::WiringPi::FAQ-Tutorial for usage examples.
+
+ gps
+
+    Returns a GPSD::Parse object, allowing you to track your location.
+
+    The GPS distribution requires gpsd to be installed and running. All
+    parameters for the GPS can be sent in here and we'll pass them along.
+    Please see the link above for the full documentation on that module.
 
  shift_register($base, $num_pins, $data, $clk, $latch)
 
@@ -314,7 +326,7 @@ METHODS
     pin for the CS pin, and we'll do the bit-banging of the SPI bus
     automatically.
 
-    Parameters: =head2 dac()
+ dac()
 
     Returns a RPi::DAC::MCP4922 object (supports all 49x2 series DACs).
     These chips provide analog output signals from the Pi's digital output.

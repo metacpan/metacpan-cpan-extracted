@@ -77,27 +77,4 @@ if (! $ENV{NO_BOARD}){
 
 $pi->cleanup;
 
-# interrupt via main module
-
-if (! $ENV{NO_BOARD}){
-
-    my $int = RPi::WiringPi->interrupt(18, EDGE_RISING, 'handler');
-
-    my $pin = $pi->pin(18);
-    $pin->pull(PUD_DOWN);
-
-    $pin->pull(PUD_UP);
-    $pin->pull(PUD_DOWN);
-    
-    is $ENV{PI_INTERRUPT}, 4, "4th interrupt ok, using interrupt object";
-
-    $pin->pull(PUD_UP);
-    $pin->pull(PUD_DOWN);
-    
-    is $ENV{PI_INTERRUPT}, 5, "5th interrupt ok, using interrupt object";
-
-}
-
-$pi->cleanup;
-
 done_testing();

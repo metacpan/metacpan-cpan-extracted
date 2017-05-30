@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2007, 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2017 Kevin Ryde
 
 # This file is part of Gtk2-Ex-NumAxis.
 #
@@ -33,10 +33,10 @@ require Gtk2;
 Gtk2->disable_setlocale;  # leave LC_NUMERIC alone for version nums
 Gtk2->init_check
   or plan skip_all => 'due to no DISPLAY available';
-plan tests => 31;
+plan tests => 39;
 
 {
-  my $want_version = 5;
+  my $want_version = 6;
   is ($Gtk2::Ex::NumAxis::VERSION, $want_version, 'VERSION variable');
   is (Gtk2::Ex::NumAxis->VERSION,  $want_version, 'VERSION class method');
 
@@ -64,16 +64,17 @@ plan tests => 31;
 }
 
 #------------------------------------------------------------------------------
-{
-  my @values;
-  @values = Gtk2::Ex::NumAxis::round_up_2_5_pow_10(0.0099);
-  is_deeply (\@values, [0.01, 2]);
-  @values = Gtk2::Ex::NumAxis::round_up_2_5_pow_10(0.15);
-  is_deeply (\@values, [0.2, 1]);
-  @values = Gtk2::Ex::NumAxis::round_up_2_5_pow_10(3.5);
-  is_deeply (\@values, [5, 0]);
-  @values = Gtk2::Ex::NumAxis::round_up_2_5_pow_10(60);
-  is_deeply (\@values, [100, 0]);
+
+foreach my $elem ([ 0.0099,  0.01, 2],
+                  [ 0.15,    0.2, 1 ],
+                  [ 3.5,     5, 0   ],
+                  [60,     100, 0   ],
+                 ) {
+  my ($x, $want, $pow) = @$elem;
+  my @values = Gtk2::Ex::NumAxis::round_up_2_5_pow_10($x);
+  is (scalar(@values), 2);
+  ok (abs($values[0] - $want) < 1e-6);  # allow for round-off
+  is ($values[1], $pow);
 }
 
 #------------------------------------------------------------------------------

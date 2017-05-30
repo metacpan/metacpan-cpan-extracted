@@ -65,23 +65,9 @@ desc "Deploy the CPAN Testers API from CPAN";
 task deploy =>
     group => 'api',
     sub {
-        run 'source ~/.profile; cpanm CPAN::Testers::API DBD::mysql';
-        file '~/service/api/log/main',
-            ensure => 'directory';
-        file '~/service/api/run',
-            source => 'etc/runit/api/run';
-        file '~/service/api/api.conf',
-            source => 'etc/runit/api/api.conf';
-        file '~/service/api/log/run',
-            source => 'etc/runit/api/log/run';
-        file '~/service/broker/log/main',
-            ensure => 'directory';
-        file '~/service/broker/run',
-            source => 'etc/runit/broker/run';
-        file '~/service/broker/log/run',
-            source => 'etc/runit/broker/log/run';
-        run 'sv restart ~/service/api';
-        run 'sv restart ~/service/broker';
+        run 'source ~/.profile; cpanm --with-recommends CPAN::Testers::API DBD::mysql';
+        run_task 'deploy_service', on => connection->server;
+        run_task 'restart', on => connection->server;
     };
 
 =head2 deploy_dev
@@ -112,7 +98,26 @@ task deploy_dev =>
             source => $dist;
 
         Rex::Logger::info( 'Installing ' . $dist );
-        run 'source ~/.profile; cpanm ~/dist/' . $dist;
+        run 'source ~/.profile; cpanm -v --with-recommends ~/dist/' . $dist;
+        if ( $? ) {
+            say last_command_output;
+        }
+        run_task 'deploy_service', on => connection->server;
+        run_task 'restart', on => connection->server;
+    };
+
+=head2 deploy_service
+
+    rex deploy_service
+
+Deploy the service files that run the daemons.
+
+=cut
+
+desc "Deploy service files";
+task deploy_service =>
+    group => 'api',
+    sub {
         file '~/service/api/log/main',
             ensure => 'directory';
         file '~/service/api/run',
@@ -127,9 +132,36 @@ task deploy_dev =>
             source => 'etc/runit/broker/run';
         file '~/service/broker/log/run',
             source => 'etc/runit/broker/log/run';
+
+        file '~/service/legacy-metabase/log/main',
+            ensure => 'directory';
+        file '~/service/legacy-metabase/run',
+            source => 'etc/runit/legacy-metabase/run';
+        file '~/service/legacy-metabase/etc',
+            ensure => 'directory';
+        file '~/service/legacy-metabase/etc/metabase.conf',
+            source => 'etc/runit/legacy-metabase/etc/metabase.conf';
+        file '~/service/legacy-metabase/log/run',
+            source => 'etc/runit/legacy-metabase/log/run';
+    };
+
+=head2 restart
+
+    rex restart
+
+Restart all the services.
+
+=cut
+
+desc "Restart services";
+task restart =>
+    group => 'api',
+    sub {
         run 'sv restart ~/service/api';
         run 'sv restart ~/service/broker';
+        run 'sv restart ~/service/legacy-metabase';
     };
+
 
 #######################################################################
 

@@ -45,23 +45,23 @@
    "provides" : {
       "Games::TicTacToe" : {
          "file" : "lib/Games/TicTacToe.pm",
-         "version" : "0.24"
+         "version" : "0.25"
       },
       "Games::TicTacToe::Board" : {
          "file" : "lib/Games/TicTacToe/Board.pm",
-         "version" : "0.24"
+         "version" : "0.25"
       },
       "Games::TicTacToe::Move" : {
          "file" : "lib/Games/TicTacToe/Move.pm",
-         "version" : "0.24"
+         "version" : "0.25"
       },
       "Games::TicTacToe::Params" : {
          "file" : "lib/Games/TicTacToe/Params.pm",
-         "version" : "0.24"
+         "version" : "0.25"
       },
       "Games::TicTacToe::Player" : {
          "file" : "lib/Games/TicTacToe/Player.pm",
-         "version" : "0.24"
+         "version" : "0.25"
       }
    },
    "release_status" : "stable",
@@ -72,6 +72,6 @@
          "web" : "https://github.com/manwar/Games-TicTacToe"
       }
    },
-   "version" : "0.24",
+   "version" : "0.25",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

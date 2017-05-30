@@ -47,6 +47,61 @@ Binmode of the output stream C<fh>. Set to "C<:utf8>" by default.
 See L<Catmandu::Exporter>, L<Catmandu::Addable>, L<Catmandu::Fixable>,
 L<Catmandu::Counter>, and L<Catmandu::Logger> for a full list of methods.
 
+=head1 FORMAT
+
+The MARC-in-JSON record format contains two fields:
+
+   * 'leader' - the MARC leader
+   * 'fields' - an array of MARC fields
+
+Each item in the MARC fields array contains the MARC tag and as value a hash
+containing three fields:
+
+   * 'subfields' - an array of MARC subfields
+   * 'ind1' - the first indicator of the MARC tag
+   * 'ind2' - the second indicator of the MARC tag
+
+Each subfield item is an hash containing the MARC subfield tag and its value.
+
+An example of one MARC record in the MiJ serialization format is given below:
+
+    {
+      "leader": "0000cam  2200000   4500",
+      "fields": [
+        {
+          "100": {
+            "subfields": [
+              {
+                "a": "Huberman, Leo,"
+              },
+              {
+                "d": "1903-1968."
+              }
+            ],
+            "ind1": "1",
+            "ind2": " "
+          }
+        },
+        {
+          "700": {
+            "subfields": [
+              {
+                "a": "Sweezy, Paul M."
+              },
+              {
+                "q": "(Paul Marlor),"
+              },
+              {
+                "d": "1910-2004."
+              }
+            ],
+            "ind1": "1",
+            "ind2": " "
+          }
+        },
+        ...
+    }
+
 =head1 SEE ALSO
 
 L<Catmandu::Exporter>
@@ -60,7 +115,7 @@ use MARC::Record;
 use MARC::Field;
 use MARC::File::MiJ;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 with 'Catmandu::Exporter', 'Catmandu::Exporter::MARC::Base';
 

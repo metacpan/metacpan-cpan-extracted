@@ -29,9 +29,12 @@
       "develop" : {
          "requires" : {
             "Test::CPAN::Meta" : "0",
+            "Test::EOF" : "0",
             "Test::EOL" : "0",
             "Test::Kwalitee" : "1.21",
             "Test::More" : "0.88",
+            "Test::NoBreakpoints" : "0.15",
+            "Test::NoTabs" : "0",
             "Test::Pod" : "1.41",
             "Test::Portability::Files" : "0"
          }
@@ -42,9 +45,11 @@
             "DateTime::Format::Strptime" : "0",
             "DateTime::TimeZone" : "0",
             "Encode" : "0",
+            "File::Basename" : "0",
             "File::Spec" : "0",
             "HTTP::CookieJar" : "0",
             "HTTP::Tiny" : "0",
+            "MIME::Base64" : "0",
             "URI" : "0",
             "XML::Parser" : "0",
             "XML::Writer" : "0",
@@ -55,10 +60,15 @@
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
             "Clone" : "0",
             "Data::Dumper" : "0",
             "DateTime" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
             "IO::Socket::SSL" : "0",
             "Test::More" : "0",
             "Test::RequiresInternet" : "0",
@@ -75,7 +85,7 @@
          "web" : "https://github.com/djzort/BZ-Client"
       }
    },
-   "version" : "4.4001",
+   "version" : "4.4002",
    "x_author_pledge" : {
       "version" : 1
    },

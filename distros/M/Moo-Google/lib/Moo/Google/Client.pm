@@ -1,5 +1,5 @@
 package Moo::Google::Client;
-$Moo::Google::Client::VERSION = '0.01';
+$Moo::Google::Client::VERSION = '0.02';
 
 # ABSTRACT: User Agent wrapper for working with Google APIs
 
@@ -209,7 +209,7 @@ Moo::Google::Client - User Agent wrapper for working with Google APIs
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 METHODS
 

@@ -1,5 +1,10 @@
 Revision history for Perl module utf8-all
 
+0.023     2017-05-29
+  * Global effects (e.g. adding UTF-8 to STD* layers) now only enabled when
+    utf8::all is used from the main package. Options exist to override this
+    default behaviour                                         [gh-47; HayoBaan]
+
 0.022     2017-04-22
   * Adpated to changes in Encode v2.89                               [HayoBaan]
 

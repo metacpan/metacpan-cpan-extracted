@@ -16,6 +16,7 @@ has on_finish => ( is => 'rw', isa => Maybe [CodeRef] );
 around new => sub ( $orig, $self, @ ) {
     my %args = (
         listen    => undef,                                     # RPC server listen
+        token     => undef,
         class     => undef,                                     # mandatory
         buildargs => undef,                                     # class constructor arguments
         on_ready  => undef,
@@ -43,6 +44,7 @@ around new => sub ( $orig, $self, @ ) {
         version     => $main::VERSION->normal,
         scandeps    => $ENV->{SCAN_DEPS} ? 1 : undef,
         listen      => $args{listen},
+        token       => $args{token},
         buildargs   => $args{buildargs},
     };
 
@@ -71,6 +73,7 @@ around new => sub ( $orig, $self, @ ) {
     local $ENV{PERL5LIB} = join $Config{path_sep}, grep { !ref } @INC;
 
     my $weaken_self = $self;
+
     weaken $weaken_self;
 
     # create proc
@@ -145,7 +148,7 @@ sub _handshake ( $self, $ctrl_fh, $cb ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 115                  | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |    2 | 118                  | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

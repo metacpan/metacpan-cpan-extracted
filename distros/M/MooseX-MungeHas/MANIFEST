@@ -1,4 +1,3 @@
-CONTRIBUTING
 COPYRIGHT
 CREDITS
 Changes
@@ -19,3 +18,4 @@ t/02moose.t
 t/03moo.t
 t/04mouse.t
 t/05multihas.t
+t/06multiattr.t

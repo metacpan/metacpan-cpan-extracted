@@ -1,6 +1,6 @@
 package Gearman::Client;
 use version ();
-$Gearman::Client::VERSION = version->declare("2.004.005");
+$Gearman::Client::VERSION = version->declare("2.004.007");
 
 use strict;
 use warnings;
@@ -234,7 +234,7 @@ sub _job_server_status_command {
         my @lines = Gearman::Util::read_text_status($sock, \$err);
         if ($err) {
 
-            #TODO warn
+            $self->debug() && warn $err;
             next;
         }
 
@@ -248,7 +248,7 @@ sub _job_server_status_command {
 
 =head2 get_job_server_status()
 
-B<return> {job => {capable, queued, running}}
+B<return> C<< {job_server => {job => {capable, queued, running}}} >>
 
 =cut
 
@@ -259,14 +259,13 @@ sub get_job_server_status {
     $self->_job_server_status_command(
         "status\n",
         sub {
-            my ($hostport, $line) = @_;
-
+            my ($js, $line) = @_;
             unless ($line =~ /^(\S+)\s+(\d+)\s+(\d+)\s+(\d+)$/) {
                 return;
             }
 
             my ($job, $queued, $running, $capable) = ($1, $2, $3, $4);
-            $js_status->{$hostport}->{$job} = {
+            $js_status->{ $self->_js_str($js) }->{$job} = {
                 queued  => $queued,
                 running => $running,
                 capable => $capable,
@@ -281,7 +280,7 @@ sub get_job_server_status {
 
 supported only by L<Gearman::Server>
 
-B<return> {job => {address, listeners, key}}
+B<return> C<< {job-server => {job => {address, listeners, key}}} >>
 
 =cut
 
@@ -291,13 +290,13 @@ sub get_job_server_jobs {
     $self->_job_server_status_command(
         "jobs\n",
         sub {
-            my ($hostport, $line) = @_;
+            my ($js, $line) = @_;
 
             # Yes, the unique key is sometimes omitted.
             return unless $line =~ /^(\S+)\s+(\S*)\s+(\S+)\s+(\d+)$/;
 
             my ($job, $key, $address, $listeners) = ($1, $2, $3, $4);
-            $js_jobs->{$hostport}->{$job} = {
+            $js_jobs->{ $self->_js_str($js) }->{$job} = {
                 key       => $key,
                 address   => $address,
                 listeners => $listeners,
@@ -322,15 +321,15 @@ sub get_job_server_clients {
     $self->_job_server_status_command(
         "clients\n",
         sub {
-            my ($hostport, $line) = @_;
-
+            my ($js, $line) = @_;
+            my $js_str = $self->_js_str($js);
             if ($line =~ /^(\S+)$/) {
                 $client = $1;
-                $js_clients->{$hostport}->{$client} ||= {};
+                $js_clients->{$js_str}->{$client} ||= {};
             }
             elsif ($client && $line =~ /^\s+(\S+)\s+(\S*)\s+(\S+)$/) {
                 my ($job, $key, $address) = ($1, $2, $3);
-                $js_clients->{$hostport}->{$client}->{$job} = {
+                $js_clients->{$js_str}->{$client}->{$job} = {
                     key     => $key,
                     address => $address,
                 };
@@ -380,7 +379,7 @@ B<return> scalarref of WORK_COMPLETE result
 sub do_task {
     my $self = shift;
     my $task = $self->_get_task_from_args(@_);
-    my $ret     = undef;
+    my $ret  = undef;
 
     $task->{on_complete} = sub {
         $ret = shift;

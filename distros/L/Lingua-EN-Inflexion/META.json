@@ -32,11 +32,13 @@
       },
       "runtime" : {
          "requires" : {
+            "Lingua::EN::Nums2Words" : "1.16",
+            "Lingua::EN::Words2Nums" : "0",
             "Test::More" : "0",
             "perl" : "5.01"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.000007"
+   "version" : "0.001001"
 }

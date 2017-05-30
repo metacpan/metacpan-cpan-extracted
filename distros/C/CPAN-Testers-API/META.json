@@ -32,11 +32,11 @@
       },
       "runtime" : {
          "recommends" : {
-            "Data::FlexSerializer" : "0"
+            "DateTime" : "0"
          },
          "requires" : {
             "Alien::SwaggerUI" : "0",
-            "CPAN::Testers::Schema" : "0.010",
+            "CPAN::Testers::Schema" : "0.013",
             "File::Share" : "0",
             "Import::Base" : "0.012",
             "Log::Any" : "1.045",
@@ -56,7 +56,8 @@
             "CPAN::Testers::Report" : "0",
             "DBD::SQLite" : "0",
             "Test::Reporter" : "0",
-            "Test::Reporter::Transport::Null" : "0"
+            "Test::Reporter::Transport::Null" : "0",
+            "Test::mysqld" : "0"
          },
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
@@ -72,23 +73,23 @@
    "provides" : {
       "CPAN::Testers::API" : {
          "file" : "lib/CPAN/Testers/API.pm",
-         "version" : "0.011"
+         "version" : "0.014"
       },
       "CPAN::Testers::API::Base" : {
          "file" : "lib/CPAN/Testers/API/Base.pm",
-         "version" : "0.011"
+         "version" : "0.014"
       },
       "CPAN::Testers::API::Controller::Release" : {
          "file" : "lib/CPAN/Testers/API/Controller/Release.pm",
-         "version" : "0.011"
+         "version" : "0.014"
       },
       "CPAN::Testers::API::Controller::Report" : {
          "file" : "lib/CPAN/Testers/API/Controller/Report.pm",
-         "version" : "0.011"
+         "version" : "0.014"
       },
       "CPAN::Testers::API::Controller::Upload" : {
          "file" : "lib/CPAN/Testers/API/Controller/Upload.pm",
-         "version" : "0.011"
+         "version" : "0.014"
       }
    },
    "release_status" : "stable",
@@ -104,7 +105,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#cpantesters-discuss"
    },
-   "version" : "0.011",
+   "version" : "0.014",
    "x_authority" : "cpan:PREACTION",
    "x_contributors" : [
       "Breno G. de Oliveira <garu@cpan.org>"

@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!perl
 
 use utf8;
 package Main;

@@ -4,7 +4,7 @@
       "Andy Lester <andy@petdance.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112621",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -22,22 +22,24 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : 0
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : 0
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "Carp" : 0,
-            "Exporter" : 0,
-            "Test::Builder" : 0,
+            "Carp" : "0",
+            "Encode" : "0",
+            "Exporter" : "0",
+            "Getopt::Long" : "0",
+            "Test::Builder" : "0",
             "Test::More" : "0.98",
-            "constant" : 0,
-            "overload" : 0,
+            "constant" : "0",
+            "overload" : "0",
             "perl" : "5.008"
          }
       }
@@ -55,5 +57,6 @@
          "url" : "http://github.com/petdance/html-tidy"
       }
    },
-   "version" : "1.56"
+   "version" : "1.58",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

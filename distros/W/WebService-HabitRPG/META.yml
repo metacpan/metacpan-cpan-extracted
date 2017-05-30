@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.040, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,7 +21,7 @@ requires:
   DateTime::Format::ISO8601: '0'
   File::Spec: '0'
   IO::Handle: '0'
-  JSON::Any: '0'
+  JSON::MaybeXS: '0'
   LWP::Protocol::https: '0'
   Method::Signatures: '20121201'
   Moo: '0'
@@ -38,4 +38,5 @@ requires:
   warnings: '0'
 resources:
   repository: git://github.com/pjf/WebService-HabitRPG.git
-version: '0.28'
+version: '0.29'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -3,7 +3,7 @@ package Prty::ClassConfig;
 use strict;
 use warnings;
 
-our $VERSION = 1.106;
+our $VERSION = 1.107;
 
 use Prty::Perl;
 
@@ -361,7 +361,7 @@ sub defCumulate {
 
 =head1 VERSION
 
-1.106
+1.107
 
 =head1 AUTHOR
 

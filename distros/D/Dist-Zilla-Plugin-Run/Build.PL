@@ -85,7 +85,7 @@ EOW
         "Torsten Raudssus <torsten\@raudss.us> L<https://raudss.us/>"
       ],
       "dist_name" => "Dist-Zilla-Plugin-Run",
-      "dist_version" => "0.044",
+      "dist_version" => "0.045",
       "license" => "perl",
       "module_name" => "Dist::Zilla::Plugin::Run",
       "recursive_test_files" => 1,
@@ -124,6 +124,7 @@ EOW
         "Test::File::ShareDir" => 0,
         "Test::More" => "0.88",
         "if" => 0,
+        "lib" => 0,
         "perl" => "5.006"
       }
     );
@@ -142,6 +143,7 @@ EOW
       "Test::File::ShareDir" => 0,
       "Test::More" => "0.88",
       "if" => 0,
+      "lib" => 0,
       "perl" => "5.006"
     );
 

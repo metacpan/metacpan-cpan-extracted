@@ -1,3 +1,22 @@
+0.012 2017-05-28
+
+    [Documentation]
+
+        Fix the version number in the documentation, and fix the tabs in
+        this file.    
+
+0.011 2017-05-28
+
+    [Bug fix]
+	
+        LWP::UserAgent::JSON->rebless_maybe now works even if nobody during
+        the life of the Perl process has called HTTP::Message->content_type
+        yet. This could be the case if you're getting JSON back from a
+        GET route, for instance.
+        This was https://github.com/skington/lwp-json-tiny/issues/2
+        - thanks for reporting this, g0ga!
+		
+
 0.010 2016-11-18
 
     [Bug fix]

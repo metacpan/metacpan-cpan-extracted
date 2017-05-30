@@ -11,11 +11,13 @@ add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 Abstract
+Alexandr
 Alexey
 Anderson
 Category
 Change
 Changelog
+Ciornii
 Class
 Comment
 Component
@@ -41,6 +43,7 @@ Type
 User
 Version
 Worklog
+alexchorny
 lib
 melezhik
 packy

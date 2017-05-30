@@ -1,7 +1,7 @@
 
 
 This archive contains the distribution Plack-Middleware-PrettyException,
-version 1.002:
+version 1.003:
 
   Capture exceptions and present them as HTML or JSON
 

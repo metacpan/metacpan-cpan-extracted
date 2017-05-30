@@ -60,7 +60,17 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pavelsr/moo-google/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/pavelsr/moo-google.git",
+         "web" : "https://github.com/pavelsr/moo-google"
+      }
+   },
+   "version" : "0.02",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

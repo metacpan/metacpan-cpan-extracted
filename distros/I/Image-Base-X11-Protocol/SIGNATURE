@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -15,58 +15,69 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
-SHA1 f4e94423c1bdf3d8f1acc96702cc621002003be1 Changes
-SHA1 dbb401bf4dcd5242e727baa30a3e2ce3bdc2ffcf MANIFEST
-SHA1 b758f740af57256154bbf4e1f8a760a1b9f9dfe1 MANIFEST.SKIP
-SHA1 dd03397ddb56b062914b87ce71ae8abe738b6f4b META.yml
-SHA1 f47b3aeb46e2145de8cb02110776d6713dcfccfa Makefile.PL
-SHA1 6af93856f0400f4cb08f1f69bc1b4fd149f7fb20 debian/changelog
-SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
-SHA1 01007ccc2a9be761ba69a416ebd70e73a7b2023a debian/control
-SHA1 1134a4b25db13aeaadc5792902bb4c603aa79a76 debian/copyright
-SHA1 475fe9ee247bb0a6a157e9ec55acdf7e8f002f5b debian/rules
+SHA1 80868c5283db9d264edf26ad8872e23ae5d9c82c Changes
+SHA1 9f79e9ee7f26f8898daafeabbdcabcef0a67c070 MANIFEST
+SHA1 9b875407d60f086714a3ca39de8ef195c106d889 MANIFEST.SKIP
+SHA1 9a738ad4f1f6074a37adcb3080194ac7a98ef2e7 META.json
+SHA1 82e8aaf06e7a0c2751122887169a2b0020dc44b9 META.yml
+SHA1 6d4f6222d67a8df16b94e23e5053ad2fd06182e1 Makefile.PL
+SHA1 014db9f4cb5b1fd10d6a7c246171360de68f144d debian/changelog
+SHA1 b6abd567fa79cbe0196d093a067271361dc6ca8b debian/compat
+SHA1 18f993f5015cc8f890b1664fe8d12c2126b251aa debian/control
+SHA1 51adf7b125147ee25044a886c7a810bb7d76a330 debian/copyright
+SHA1 7f7c3445a940c224a9b3b416d574b38b22afc9c0 debian/rules
 SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
 SHA1 91270a1ffdd38a263f93722d343f937091b62c8e debian/watch
-SHA1 cf710bb23fb2b03bab0253ba04761f9b3c4b24c9 devel/Picture.pm
+SHA1 62e0fbea84ac327c73b0f52cde7550201aeba681 devel/Picture.pm
 SHA1 a6672b933c58231a04ed33fa7cb191db7fb3cfd0 devel/line-clip.pl
 SHA1 a45222b732998f2f1c2aabaa7e3373b43f2e52cc devel/seq-wrap.pl
 SHA1 0d7a5af9e965a247cc12ed327cc0566e7905d08a devel/x11-protocol.pl
 SHA1 381dbddfd3128f0962f4e7590e1a2a40dbbe6078 devel/xwd.pl
 SHA1 0ac705d06d01f37e7fb8d20334cad0b862018df7 examples/view-xbm.pl
-SHA1 0f2ede06a29a7a46af16d8841bf50ba729eedfc8 lib/Image/Base/X11/Protocol/Drawable.pm
-SHA1 64d2c4a3ab430ee833aaf2443e08fbc2786648bf lib/Image/Base/X11/Protocol/Pixmap.pm
-SHA1 b35e59e3942784398d9e7de2e2f967ae11ef1383 lib/Image/Base/X11/Protocol/Window.pm
+SHA1 63349500e4bb969a097172f44b0921c053673e98 lib/Image/Base/X11/Protocol/Drawable.pm
+SHA1 856058429d7e828d6ade1e513472d8673a887693 lib/Image/Base/X11/Protocol/Pixmap.pm
+SHA1 a7728b6b0ad2c68ea394a879006a9066ea183cda lib/Image/Base/X11/Protocol/Window.pm
 SHA1 9c35ff31c7aad10dc821546ef53247086f3ce12e t/Drawable-use.t
-SHA1 50fc28c5fccfc5cca8a951a8b2d0465a60eb1129 t/Drawable.t
-SHA1 3855de075da37f5bc4e6a5534b2f00cc14872a98 t/MyTestHelpers.pm
-SHA1 d176409a7bac83bd32e3c50b1d994ecafb771c90 t/MyTestImageBase.pm
-SHA1 eabc6537f683e828e864a0ffaf6d6b672ce3f63f t/Pixmap.t
+SHA1 d08ede2bf06ec4df428010f4cb4f20979fe4c55e t/Drawable.t
+SHA1 06c940e7638c14b6f72bc3c1345978ff1f8671cb t/MyTestHelpers.pm
+SHA1 d11cadd787f3581aeff4f60521d795d4b242aed9 t/MyTestImageBase.pm
+SHA1 83d0505421bccff4006cad776c487c74691c8c5c t/Pixmap.t
 SHA1 0209aad325c7f2bda9915ddabad5f31ada8d17e6 t/Window-use.t
 SHA1 910e6779e71ab105a5786ee51f8941a290eb51f3 t/Window-visible.t
-SHA1 18dd6283ab1277db799842343a56a9b86adfc377 t/Window.t
+SHA1 04956804db9cb0c8b57763fe8b178fd86fb392ee t/Window.t
 SHA1 f605155bfff96f2b7b71067fe236e28001f7005c t/clip.t
 SHA1 f2ceb7bb4bf68bd24728b90918e63d251fd06183 xt/0-META-read.t
 SHA1 c9e7a47e1f397eb5f46d7e4ef21754d9df76e36e xt/0-Test-ConsistentVersion.t
 SHA1 d9e7f38a8dcfdb76c56951e4214be8eeda2e2289 xt/0-Test-DistManifest.t
 SHA1 9496e4a2a2734c7093ab6961900dd7a55800976e xt/0-Test-Pod.t
 SHA1 083242d959c1a9242c874982e4585872a95bec93 xt/0-Test-Synopsis.t
-SHA1 ec454b1b524d2d0b35e5a7d8292ad13d82becab5 xt/0-Test-YAML-Meta.t
-SHA1 7bc810750906ae91a13b16c7bd833dd6e1c9741b xt/0-file-is-part-of.t
+SHA1 aeeab05c346c11824a2bb2cc3f3bdb0c522604e2 xt/0-Test-YAML-Meta.t
+SHA1 4a897c9b09f37290f507d151e84b6a3c8defd496 xt/0-file-is-part-of.t
 SHA1 aeb6f41dfae96d04459448f6c3e3dee44691e722 xt/0-no-debug-left-on.t
-SHA1 84a47c1d71fd58797a2754030998dfb673b62811 xtools/my-check-copyright-years.sh
+SHA1 51069b694ce78fde7d42ed539322fae579948d40 xtools/my-check-copyright-years.sh
 SHA1 bfb75ffb7a834c345288e01f561b12695f191d12 xtools/my-check-file-part-of.sh
-SHA1 1f28ea8151b0f8554e5ab4e5bbcf1c5371f788eb xtools/my-check-spelling.sh
-SHA1 f3e50b961e575e060e35ddc4d94c7b3e6101d660 xtools/my-deb.sh
+SHA1 e9aa27fd220d39ef0054cfcf32516f8a033f75f1 xtools/my-check-spelling.sh
+SHA1 f8eada68e38ca3f44a69afa32c090e7ac343f0bb xtools/my-deb.sh
 SHA1 2db0a23176de55a8ee8f1643f239aeaa2bcf4fa1 xtools/my-diff-prev.sh
 SHA1 6c48137d49c3619eca39796d49f26332eea55d4a xtools/my-kwalitee.sh
 SHA1 e4a15f9b4bcf1d087de2d9ed8e87bf92b0469a6c xtools/my-manifest.sh
-SHA1 4db9c30b1fc96b04a794218ca19561b368f59679 xtools/my-pc.sh
+SHA1 eec6a78c6ed57242d151597b048df6ea5efc5cc4 xtools/my-pc.sh
 SHA1 7b1e948c88915689b3782d872ef9b92a2912c593 xtools/my-tags.sh
-SHA1 f90084e1d6f95abb12eea896cd1cc850402d7726 xtools/my-wunused.sh
+SHA1 5c86dd9ca3d2ecf3ee9d90da1537b71e56c8b321 xtools/my-wunused.sh
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
+Version: GnuPG v1
 
-iD8DBQFSCA6eLFMCIV9q3ToRAkmGAKCrULMDwopXU9EV5lg8Qlt1AaxzmwCgkU1E
-laV83939A3x5mdisUgGVzG4=
-=9bCU
+iQIcBAEBAgAGBQJZJVG0AAoJEPjQtOfS0hGRd8oP/1xSpTKSfeKiipGJSmwKLkcR
+oZZWLJTakLfHHHmLkVcaEMejoBsWP0PIzP04z8oU3E4nwUeGLRRFyUXgxm0JyoaS
+zElQvIPSE97iuFTkp7EYTYeWiMaP0fVeiupoi4hIfTCJeZJtU+VOXu7vUMBYKsxl
+ztfgkQU6BzquYumytwy/JTK0dhldlxXounLBOXQfvXm3qxs0V1PtFMmyQMurVfdZ
+sqGtxO3xWaKXkpGdJ9S/yiIJ0amcNiohuAaHDeRp7Mfrx5FFVOg5kwbu9FcCN+7e
+daABDhSkcX8ywmi49/y6R40MVHU/gASBTq4+C/AaZLUS0hcd56NytQEQ6Q4SNh3X
+UHTwMfUqQkUNqb5e6Sgz7i+SM4p+dgD4iH1xh0i56Z2Brg5zGPtxO/TT1UdmBZJr
+9y+SB7sZ6IQa20bwYiDGcZOB4M9AmHk5O0eTgNJz7kDjjSg0zMWkXyBYD/Sr6pO1
+LQyKclV1Xh7Ugr6xOAbE6UOtFks4CLtjGfBHpbIfTcRB918xWJOrwDulJ4z3ItwK
+7IokUqC0xikEzl1URWp5Cw4EeUl+9potPSxvA6QUHL1sb9f/t7/Lq9GtSFTUmCUv
+9pVxw/qb4pYPa3Lc7e+N1Cx4pZeomCXMkqMj01EngGtrimZpYjGUQrZxMEt/RoQo
+PKk1EXfFirOlVqx0LLUM
+=2ebc
 -----END PGP SIGNATURE-----

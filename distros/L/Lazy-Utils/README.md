@@ -4,7 +4,7 @@ Lazy::Utils - Utility functions
 
 # VERSION
 
-version 1.17
+version 1.20
 
 # SYNOPSIS
 
@@ -27,31 +27,31 @@ version 1.17
 
 Collection of utility functions all of exported by default.
 
-# Functions
+# FUNCTIONS
 
 ## trim($str)
 
 trims given string
 
-$str: _string will be trimed_
+$str: _string will be trimmed_
 
-return value: _trimed string_
+return value: _trimmed string_
 
 ## ltrim($str)
 
 trims left given string
 
-$str: _string will be trimed_
+$str: _string will be trimmed_
 
-return value: _trimed string_
+return value: _trimmed string_
 
 ## rtrim($str)
 
 trims right given string
 
-$str: _string will be trimed_
+$str: _string will be trimmed_
 
-return value: _trimed string_
+return value: _trimmed string_
 
 ## file\_get\_contents($path, $prefs)
 
@@ -99,7 +99,7 @@ $cmd: _command_
 
 @argv: _command line arguments_
 
-return value: _exit code of command. 511 if fatal error occurs_
+return value: _exit code of command. -1 if fatal error occurs_
 
 returned $?: _return code of wait call like on perls system call_
 
@@ -123,41 +123,33 @@ return value: _line_
 
 resolves command line arguments
 
-valuableArgs is off, eg;
-
-        --opt1 --opt2=val2 cmd param1 param2 param3
-        -opt1 -opt2=val2 cmd param1 param2 param3
-        -opt1 -opt2=val2 cmd param1 -- param2 param3
-        -opt1 cmd param1 -opt2=val2 param2 param3
-        -opt1 cmd param1 -opt2=val2 -- param2 param3
-        cmd -opt1 param1 -opt2=val2 param2 param3
-        cmd -opt1 param1 -opt2=val2 -- param2 param3
-
-valuableArgs is on, eg;
-
-        -opt1 -opt2=val2 cmd param1 param2 param3
-        -opt1 -opt2 val2 cmd param1 param2 param3
-        -opt1 -opt2 -- cmd param1 param2 param3
-        cmd -opt1 -opt2 val2 param1 param2 param3
-        cmd -opt1 -opt2 -- param1 param2 param3
-        cmd param1 -opt1 -opt2 val2 param2 param3
-        cmd param1 -opt1 -opt2 -- param2 param3
-
 $prefs: _preferences in HashRef, optional_
 
 > valuableArgs: _accepts option value after option if next argument is not an option, by default 0_
 >
 > noCommand: _use first parameter instead of command, by default 0_
 >
-> optionAtAll: _DEPRECATED: now, it is always on. accepts options after command or first parameter otherwise evaluates as parameter, by default 0_
+> optionAtAll: _accepts options after command or first parameter otherwise evaluates as parameter, by default 1_
 
 @argv: _command line arguments_
 
-return value: eg;
+        -a -b=c -d e --f g --h --i=j k l -- m n
 
-        { --opt1 => '', --opt2 => 'val2', command => 'cmd', parameters => ['param1', 'param2', 'param3'] }
-        { -opt1 => '', -opt2 => 'val2', command => 'cmd', parameters => ['param1', 'param2', 'param3'] }
-        { -opt1 => '', -opt2 => '', command => 'cmd', parameters => ['param1', 'param2', 'param3'] }
+by default, return value:
+
+        { -a => '', -b => 'c', -d => '', --f => '', --h => '', --i => 'j', command => 'e', parameters => ['g', 'k', 'l'], late_parameters => ['m', 'n'] }
+
+if valuableArgs is on, return value;
+
+        { -a => '', -b => 'c', -d => 'e', --f => 'g', --h => '', --i => 'j', command => 'k', parameters => ['l'], late_parameters => ['m', 'n'] }
+
+if noCommand is on, return value:
+
+        { -a => '', -b => 'c', -d => '', --f => '', --h => '', --i => 'j', command => undef, parameters => ['e', 'g', 'k', 'l'], late_parameters => ['m', 'n'] }
+
+if optionAtAll is off, return value:
+
+        { -a => '', -b => 'c', -d => '', command => 'e', parameters => ['--f', 'g', '--h', '--i=j', 'k', 'l', '--','m', 'n'], late_parameters => [] }
 
 ## whereis($name, $path)
 

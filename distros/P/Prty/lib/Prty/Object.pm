@@ -3,7 +3,7 @@ package Prty::Object;
 use strict;
 use warnings;
 
-our $VERSION = 1.106;
+our $VERSION = 1.107;
 
 use Scalar::Util ();
 use Hash::Util ();
@@ -414,7 +414,7 @@ sub this {
 
 =head1 VERSION
 
-1.106
+1.107
 
 =head1 AUTHOR
 

@@ -1,71 +1,88 @@
 NAME
+
     GPSD::Parse - Parse, extract use the JSON output from GPS units
 
 SYNOPSIS
+
         use GPSD::Parse;
         my $gps = GPSD::Parse->new;
-
+    
         # poll for data
-
+    
         $gps->poll;
-
+    
         # get all TPV data in an href
-
+    
         my $tpv_href = $gps->tpv;
-
+    
         # get individual TPV stats
-
+    
         print $gps->tpv('lat');
         print $gps->tpv('lon');
-
+    
         # timestamp of the most recent poll
-
+    
         print $gps->time;
-
+    
         # get all satellites in an href of hrefs
-
+    
         my $sats = $gps->satellites;
-
+    
         # get an individual piece of info from a single sattelite
-
+    
         print $gps->satellites(16, 'ss');
-
+    
         # check which serial device the GPS is connected to
-
+    
         print $gps->device;
+    
+        # toggle between metres and feet (metres by default)
+    
+        $gps->feet;
+        $gps->metres;
 
 DESCRIPTION
-    Simple, lightweight (core only) distribution that polls `gpsd' for data
+
+    Simple, lightweight (core only) distribution that polls gpsd for data
     received from a UART (serial/USB) connected GPS receiver over a TCP
     connection.
 
     The data is fetched in JSON, and returned as Perl data.
 
 NOTES
-  Requirements
-    A version of gpsd that returns results in JSON format is required to
-    have been previously installed. It should be started at system startup,
-    with the following flags with system-specific serial port. See the above
-    link for information on changing the listen IP and port.
+
+ Requirements
+
+    A version of gpsd <http://catb.org/gpsd/gpsd.html> that returns results
+    in JSON format is required to have been previously installed. It should
+    be started at system startup, with the following flags with
+    system-specific serial port. See the above link for information on
+    changing the listen IP and port.
 
         sudo gpsd /dev/ttyS0 -n -F /var/log/gpsd.sock
 
-  Available Data
+ Available Data
+
     Each of the methods that return data have a table in their respective
-    documentation within the METHODS section. Specifically, look at the
-    `tpv()', `sattelites()' and the more broad `sky()' method sections to
+    documentation within the "METHODS" section. Specifically, look at the
+    tpv(), sattelites() and the more broad sky() method sections to
     understand what available data attributes you can extract.
 
-  Conversions
-    All output where applicable defaults to metric (metres). See the
-    `metric' parameter in the `new()' method to change this to use
-    imperial/standard measurements.
+ Conversions
 
-    For latitude and longitude, we default to using the signed notation. You
-    can disable this with the `signed' parameter in `new()'.
+    All output where applicable defaults to metric (metres). See the metric
+    parameter in the new() method to change this to use imperial/standard
+    measurements. You can also toggle this at runtime with the feet() and
+    metres() methods.
+
+    For latitude and longitude, we default to using the signed notation.
+    You can disable this with the signed parameter in new(), along with the
+    signed() and unsigned() methods to toggle this conversion at runtime.
 
 METHODS
-  new(%args)
+
+ new(%args)
+
     Instantiates and returns a new GPSD::Parse object instance.
 
     Parameters:
@@ -73,46 +90,50 @@ METHODS
         host => 127.0.0.1
 
     Optional, String: An IP address or fully qualified domain name of the
-    `gpsd' server. Defaults to the localhost (`127.0.0.1') if not supplied.
+    gpsd server. Defaults to the localhost (127.0.0.1) if not supplied.
 
         port => 2947
 
-    Optional, Integer: The TCP port number that the `gpsd' daemon is running
-    on. Defaults to `2947' if not sent in.
+    Optional, Integer: The TCP port number that the gpsd daemon is running
+    on. Defaults to 2947 if not sent in.
 
         metric => Bool
 
     Optional, Integer: By default, we return measurements in metric
-    (metres). Send in a false value (`0') to use imperial/standard
+    (metres). Send in a false value (0) to use imperial/standard
     measurement conversions (ie. feet). Note that if returning the raw
-    *JSON* data from the `poll()' method, the conversions will not be done.
+    *JSON* data from the poll() method, the conversions will not be done.
     The default raw Perl return will have been converted however.
 
         signed => Bool
 
     Optional, Integer: By default, we use the signed notation for latitude
-    and longitude. Send in a false value (`0') to disable this. Here's an
+    and longitude. Send in a false value (0) to disable this. Here's an
     example:
 
         enabled (default)   disabled
         -----------------   --------
-
+    
         lat: 51.12345678    51.12345678N
         lon: -114.123456    114.123456W
 
-    We add the letter notation at the end of the result if `signed' is
+    We add the letter notation at the end of the result if signed is
     disabled.
+
+    NOTE: You can toggle this at runtime by calling the signed() and
+    unsigned() methods. The data returned at the next poll will reflect any
+    change.
 
         file => 'filename.ext'
 
     Optional, String: For testing purposes. Instead of reading from a
-    socket, send in a filename that contains legitimate JSON data saved from
-    a previous `gpsd' output and we'll operate on that. Useful also for
+    socket, send in a filename that contains legitimate JSON data saved
+    from a previous gpsd output and we'll operate on that. Useful also for
     re-running previous output.
 
-  poll(%args)
-    Does a poll of `gpsd' for data, and configures the object with that
-    data.
+ poll(%args)
+
+    Does a poll of gpsd for data, and configures the object with that data.
 
     Parameters:
 
@@ -121,29 +142,30 @@ METHODS
         file => $filename
 
     Optional, String: Used for testing, you can send in the name of a JSON
-    file that contains `gpsd' JSON data and we'll work with that instead of
+    file that contains gpsd JSON data and we'll work with that instead of
     polling the GPS device directly. Note that you *must* instantiate the
-    object with the `file' parameter in new for this to have any effect and
+    object with the file parameter in new for this to have any effect and
     to bypass the socket creation.
 
         return => 'json'
 
     Optional, String: By default, after configuring the object, we will
     return the polled raw data as a Perl hash reference. Send this param in
-    with the value of `'json'' and we'll return the data exactly as we
-    received it from `gpsd'.
+    with the value of 'json' and we'll return the data exactly as we
+    received it from gpsd.
 
     Returns:
 
     The raw poll data as either a Perl hash reference structure or as the
     original JSON string.
 
-  tpv($stat)
-    `TPV' stands for "Time Position Velocity". This is the data that
+ tpv($stat)
+
+    TPV stands for "Time Position Velocity". This is the data that
     represents your location and other vital statistics.
 
-    By default, we return a hash reference that is in the format `stat ='
-    'value'>.
+    By default, we return a hash reference. The format of the hash is
+    depicted below.
 
     Parameters:
 
@@ -175,14 +197,15 @@ METHODS
        class    => 'TPV'                        # data type (fixed as TPV)
        tag      => 'ZDA'                        # identifier
 
-  satellites($num, $stat)
+ satellites($num, $stat)
+
     This method returns a hash reference of hash references, where the key
     is the satellite number, and the value is a hashref that contains the
     various information related to the specific numbered satellite.
 
     Note that the data returned by this function has been manipuated and is
-    not exactly equivalent of that returned by `gpsd'. To get the raw data,
-    see `sky()'.
+    not exactly equivalent of that returned by gpsd. To get the raw data,
+    see sky().
 
     Parameters:
 
@@ -191,13 +214,13 @@ METHODS
     Optional, Integer: Send in the satellite number and we'll return the
     relevant information in a hash reference for the specific satellite
     requested, as opposed to returning data for all the satellites. Returns
-    `undef' if a satellite by that number doesn't exist.
+    undef if a satellite by that number doesn't exist.
 
         $stat
 
-    Optional, String: Like `tpv()', you can request an individual piece of
-    information for a satellite. This parameter is only valid if you've sent
-    in the `$num' param, and the specified satellite exists.
+    Optional, String: Like tpv(), you can request an individual piece of
+    information for a satellite. This parameter is only valid if you've
+    sent in the $num param, and the specified satellite exists.
 
     Available statistic/information items available for each satellite,
     including the name, an example value and a description:
@@ -207,19 +230,20 @@ METHODS
     processed the data.
 
         PRN     => 16   # PRN ID of the satellite 
-
+    
                         # 1-63 are GNSS satellites
                         # 64-96 are GLONASS satellites
                         # 100-164 are SBAS satellites
-
+    
         ss      => 20   # signal strength (dB)
         az      => 161  # azimuth (degrees from true north)
         used    => 1    # currently being used in calculations
         el      => 88   # elevation in degrees
 
-  sky
-    Returns a hash reference containing all of the data that was pulled from
-    the `SKY' information returned by `gpsd'. This information contains
+ sky
+
+    Returns a hash reference containing all of the data that was pulled
+    from the SKY information returned by gpsd. This information contains
     satellite info and other related statistics.
 
     Available information, with the attribute, example value and
@@ -237,7 +261,8 @@ METHODS
         tag         => 'ZDA'        # object ID
         device      => '/dev/ttyS0' # serial port connected to the GPS
 
-  direction($degree)
+ direction($degree)
+
     Converts a degree from true north into a direction (eg: ESE, SW etc).
 
     Parameters:
@@ -256,103 +281,229 @@ METHODS
         NNE     11.25  - 33.75
         NE      33.75  - 56.25
         ENE     56.25  - 78.75
-
+    
         E       78.75  - 101.25
         ESE     101.25 - 123.75
         SE      123.75 - 146.25
         SSE     146.25 - 168.75
-
+    
         S       168.75 - 191.25
         SSW     191.25 - 213.75
         SW      213.75 - 236.25
         WSW     236.25 - 258.75
-
+    
         W       258.75 - 281.25
         WNW     281.25 - 303.75
         NW      303.75 - 326.25
         NNW     326.25 - 348.75
 
-  device
-    Returns a string containing the actual device the GPS is connected to
-    (eg: `/dev/ttyS0').
+ device
 
-  time
+    Returns a string containing the actual device the GPS is connected to
+    (eg: /dev/ttyS0).
+
+ time
+
     Returns a string of the date and time of the most recent poll, in UTC.
 
-  on
-    Puts `gpsd' in listening mode, ready to poll data from.
+ signed
+
+    This method works on the latitude and longitude output view. By
+    default, we use signed notation, eg:
+
+        -114.1111111111 # lon
+        51.111111111111 # lat
+
+    If you've switched to unsigned(), calling this method will toggle it
+    back, and the results will be visible after the next poll().
+
+    You can optionally use this method to convert values in a manual way.
+    Simply send in the latitude and longitude in that order as parameters,
+    and we'll return a list containing them both after modification, if it
+    was necessary.
+
+ unsigned
+
+    This method works on the latitude and longitude output view. By
+    default, we use signed notation, eg:
+
+        -114.1111111111 # lon
+        51.111111111111 # lat
+
+    Calling this method will convert those to:
+
+        114.1111111111W # lon
+        51.11111111111N # lat
+
+    If you've switched to signed(), calling this method will toggle it
+    back, and the results will be visible after the next poll().
+
+    You can optionally use this method to convert values in a manual way.
+    Simply send in the latitude and longitude in that order as parameters,
+    and we'll return a list containing them both after modification, if it
+    was necessary.
+
+ feet
+
+    By default, we use metres as the measurement for any attribute that is
+    measured in distance. Call this method to have all attributes converted
+    into feet commencing at the next call to poll(). Use metres() to revert
+    back.
+
+ metres
+
+    We measure in metres by default. If you've switched to using feet as
+    the measurement unit, a call to this method will revert back to the
+    default.
+
+ on
+
+    Puts gpsd in listening mode, ready to poll data from.
 
     We call this method internally when the object is instantiated with
-    `new()' if we're not in file mode. Likewise, when the object is
-    destroyed (end of program run), we call the subsequent `off()' method.
+    new() if we're not in file mode. Likewise, when the object is destroyed
+    (end of program run), we call the subsequent off() method.
 
     If you have long periods of a program run where you don't need the GPS,
-    you can manually run the `off()' and `on()' methods to disable and
+    you can manually run the off() and on() methods to disable and
     re-enable the GPS.
 
-  off
-    Turns off `gpsd' listening mode.
+ off
 
-    Not necessary to call, but it will help preserve battery life if running
-    on a portable device for long program runs where the GPS is used
-    infrequently. Use in conjunction with `on()'. We call `off()'
+    Turns off gpsd listening mode.
+
+    Not necessary to call, but it will help preserve battery life if
+    running on a portable device for long program runs where the GPS is
+    used infrequently. Use in conjunction with on(). We call off()
     automatically when the object goes out of scope (program end for
     example).
 
 EXAMPLES
-  Basic Features and Options
+
+ Basic Features and Options
+
     Here's a simple example using some of the basic features and options.
     Please read through the documentation of the methods (particularly
-    `new()' and `tpv()' to get a good grasp on what can be fetched.
+    new() and tpv() to get a good grasp on what can be fetched.
 
         use warnings;
         use strict;
         use feature 'say';
-
+    
         use GPSD::Parse;
-
+    
         my $gps = GPSD::Parse->new(signed => 0);
-
+    
         $gps->poll;
-
+    
         my $lat = $gps->tpv('lat');
         my $lon = $gps->tpv('lon');
-
+    
         my $heading = $gps->tpv('track');
         my $direction = $gps->direction($heading);
-
+    
         my $altitude = $gps->tpv('alt');
-
+    
         my $speed = $gps->tpv('speed');
-
+    
         say "latitude:  $lat";
         say "longitude: $lon\n";
-
+    
         say "heading:   $heading degrees";
         say "direction: $direction\n";
-
+    
         say "altitude:  $altitude metres\n";
-
+    
         say "speed:     $speed metres/sec";
 
     Output:
 
         latitude:  51.1111111N
         longitude: 114.11111111W
-
+    
         heading:   31.23 degrees
         direction: NNE
-
+    
         altitude:  1080.9 metres
-
+    
         speed:     0.333 metres/sec
 
+ Displaying Satellite Information
+
+    Here's a rough example that displays the status of tracked satellites,
+    along with the information on the one's we're currently using.
+
+        use warnings;
+        use strict;
+    
+        use GPSD::Parse;
+    
+        my $gps = GPSD::Parse->new;
+    
+        while (1){
+            $gps->poll;
+            my $sats = $gps->satellites;
+    
+            for my $sat (keys %$sats){
+                if (! $gps->satellites($sat, 'used')){
+                    print "$sat: unused\n";
+                }
+                else {
+                    print "$sat: used\n";
+                    for (keys %{ $sats->{$sat} }){
+                        print "\t$_: $sats->{$sat}{$_}\n";
+                    }
+                }
+            }
+            sleep 3;
+        }
+
+    Output:
+
+        7: used
+            ss: 20
+            used: 1
+            az: 244
+            el: 20
+        29: unused
+        31: used
+            el: 12
+            az: 64
+            used: 1
+            ss: 17
+        6: unused
+        138: unused
+        16: used
+            ss: 17
+            el: 53
+            used: 1
+            az: 119
+        26: used
+            az: 71
+            used: 1
+            el: 46
+            ss: 27
+        22: used
+            ss: 28
+            el: 17
+            used: 1
+            az: 175
+        3: used
+            ss: 24
+            az: 192
+            used: 1
+            el: 40
+        9: unused
+        23: unused
+        2: unused
+
 TESTING
+
     Please note that we init and disable the GPS device on construction and
     deconstruction of the object respectively. It takes a few seconds for
-    the GPS unit to initialize itself and then lock on the satellites before
-    we can get readings. For this reason, please understand that one test
-    sweep may pass while the next fails.
+    the GPS unit to initialize itself and then lock on the satellites
+    before we can get readings. For this reason, please understand that one
+    test sweep may pass while the next fails.
 
     I am considering adding specific checks, but considering that it's a
     timing thing (seconds, not microseconds that everyone is in a hurry for
@@ -363,18 +514,21 @@ TESTING
     quickly.
 
 SEE ALSO
+
     A very similar distribution is Net::GPSD3. However, it has a long line
     of prerequisite distributions that didn't always install easily on my
     primary target platform, the Raspberry Pi.
 
     This distribution isn't meant to replace that one, it's just a much
-    simpler and more lightweight piece of software that pretty much does the
-    same thing.
+    simpler and more lightweight piece of software that pretty much does
+    the same thing.
 
 AUTHOR
-    Steve Bertrand, `<steveb at cpan.org>'
+
+    Steve Bertrand, <steveb at cpan.org>
 
 LICENSE AND COPYRIGHT
+
     Copyright 2017 Steve Bertrand.
 
     This program is free software; you can redistribute it and/or modify it

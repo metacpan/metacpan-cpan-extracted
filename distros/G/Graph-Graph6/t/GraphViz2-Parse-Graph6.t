@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015 Kevin Ryde
+# Copyright 2015, 2016, 2017 Kevin Ryde
 #
 # This file is part of Graph-Graph6.
 #
@@ -24,7 +24,7 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-my $test_count = (tests => 21)[1];
+my $test_count = (tests => 26)[1];
 plan tests => $test_count;
 
 # uncomment this to run the ### lines
@@ -43,7 +43,7 @@ $ENV{PATH} = $1;
   my $have_graphviz2 = eval { require GraphViz2; 1 };
   my $have_graphviz2_error = $@;
   if (! $have_graphviz2) {
-    MyTestHelpers::diag ('Skip due to no GraphViz2 available: ',
+    MyTestHelpers::diag ('skip due to no GraphViz2 available: ',
                          $have_graphviz2_error);
     foreach (1 .. $test_count) {
       skip ('no GraphViz2', 1, 1);
@@ -69,6 +69,9 @@ sub graphviz2_vertices_str {
   if (! defined $graphviz2) {
     return 'undef';
   }
+  if (! ref $graphviz2) {
+    return 'notref';
+  }
   my $node_hash = $graphviz2->node_hash;
   return join(',', sort keys %$node_hash);
 }
@@ -76,6 +79,9 @@ sub graphviz2_edges_str {
   my ($graphviz2) = @_;
   if (! defined $graphviz2) {
     return 'undef';
+  }
+  if (! ref $graphviz2) {
+    return 'notref';
   }
   my $edge_hash = $graphviz2->edge_hash;
   my @edge_names = map { my $from = $_;
@@ -86,7 +92,7 @@ sub graphviz2_edges_str {
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 6;
+  my $want_version = 7;
   ok ($GraphViz2::Parse::Graph6::VERSION, $want_version, 'VERSION variable');
   ok (GraphViz2::Parse::Graph6->VERSION,  $want_version, 'VERSION class method');
   ok (eval { GraphViz2::Parse::Graph6->VERSION($want_version); 1 }, 1,
@@ -98,14 +104,6 @@ sub graphviz2_edges_str {
 
 #------------------------------------------------------------------------------
 # graph parameter
-
-{
-  # default to a newly created GraphViz2
-  my $parse = GraphViz2::Parse::Graph6->new;
-  my $graphviz2 = $parse->graph;
-  ok (defined $graphviz2 && ref $graphviz2 && $graphviz2->isa('GraphViz2'),
-     1);
-}
 
 {
   my $graphviz2 = GraphViz2->new (global => { name => 'Foo' });
@@ -153,6 +151,20 @@ sub graphviz2_edges_str {
   ok ($err =~ /Unrecognised character: !/, 1);
 }
 
+{
+  ### create(str) formats.txt digraph6 example ...
+
+  my $parse = GraphViz2::Parse::Graph6->new;
+  my $ret = $parse->create(str => "&DI?AO?\n");
+  ok (defined $ret && $ret == $parse, 1);
+
+  my $graphviz2 = $parse->graph;
+  ok (graphviz2_vertices_str($graphviz2),
+      '0,1,2,3,4');  # 5 vertices
+  ok (graphviz2_edges_str($graphviz2),
+      '0=2,0=4,3=1,3=4');
+}
+
 #------------------------------------------------------------------------------
 # create(file_name)
 
@@ -167,8 +179,8 @@ sub graphviz2_edges_str {
     ) or die "Cannot write $filename: $!";
   }
   my $parse = GraphViz2::Parse::Graph6->new;
-  my $graphviz2 = $parse->graph;
   my $ret = $parse->create(file_name => $filename);
+  my $graphviz2 = $parse->graph;
   ok (defined $ret && $ret == $parse, 1);
 
   ok (graphviz2_vertices_str($graphviz2), '0,1,2,3,4');  # 5 vertices
@@ -189,13 +201,28 @@ sub graphviz2_edges_str {
 
   open my $fh, '<', $filename or die or die "Cannot open $filename: $!";
   my $parse = GraphViz2::Parse::Graph6->new;
-  my $graphviz2 = $parse->graph;
   my $ret = $parse->create(fh => $fh);
+  my $graphviz2 = $parse->graph;
   ok (defined $ret && $ret == $parse, 1);
 
   ok (graphviz2_vertices_str($graphviz2), '0,1');  # 2 vertices
   ok (graphviz2_edges_str($graphviz2), '0=1');
 }
+
+#------------------------------------------------------------------------------
+
+{
+  # chained example in the POD
+
+  my $graphviz2 = GraphViz2::Parse::Graph6->new
+    ->create(str => ":Bf\n")
+    ->graph;  # GraphViz2 object
+
+  ok (isa_graphviz2_object($graphviz2), 1);
+  ok (graphviz2_vertices_str($graphviz2), '0,1,2');  # 2 vertices
+  ok (graphviz2_edges_str($graphviz2), '0=1');
+}
+
 
 #------------------------------------------------------------------------------
 unlink $filename;

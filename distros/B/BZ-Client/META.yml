@@ -7,6 +7,8 @@ build_requires:
   Clone: '0'
   Data::Dumper: '0'
   DateTime: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
   IO::Socket::SSL: '0'
   Module::Build: '0.28'
   Test::More: '0'
@@ -27,9 +29,11 @@ requires:
   DateTime::Format::Strptime: '0'
   DateTime::TimeZone: '0'
   Encode: '0'
+  File::Basename: '0'
   File::Spec: '0'
   HTTP::CookieJar: '0'
   HTTP::Tiny: '0'
+  MIME::Base64: '0'
   URI: '0'
   XML::Parser: '0'
   XML::Writer: '0'
@@ -40,7 +44,7 @@ requires:
 resources:
   homepage: https://github.com/djzort/BZ-Client
   repository: https://github.com/djzort/BZ-Client.git
-version: '4.4001'
+version: '4.4002'
 x_author_pledge:
   version: 1
 x_serialization_backend: 'YAML::Tiny version 1.69'

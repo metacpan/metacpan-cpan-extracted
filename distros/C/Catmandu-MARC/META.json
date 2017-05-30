@@ -48,7 +48,7 @@
             "List::Util" : "0",
             "MARC::File::MARCMaker" : "0.05",
             "MARC::File::MiJ" : "0.04",
-            "MARC::File::XML" : "v1.0.3",
+            "MARC::File::XML" : "v1.0.5",
             "MARC::Lint" : "0",
             "MARC::Parser::RAW" : "0",
             "MARC::Record" : "v2.0.6",
@@ -84,7 +84,7 @@
          "web" : "https://github.com/LibreCat/Catmandu-MARC"
       }
    },
-   "version" : "1.11",
+   "version" : "1.12",
    "x_contributors" : [
       "Carsten Klee <carsten.klee@sbb.spk-berlin.de>",
       "Carsten Klee <cKlee@users.noreply.github.com>",

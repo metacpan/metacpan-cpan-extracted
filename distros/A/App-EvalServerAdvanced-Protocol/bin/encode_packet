@@ -1,0 +1,23 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Data::Dumper;
+use FindBin;
+use lib $FindBin::Bin . "/../lib";
+
+use App::EvalServerAdvanced::Protocol;
+
+$|++;
+
+for (1..10) {
+my $message = encode_message(
+    "eval",
+    {sequence => 1+rand()*256, 
+    files => [{filename=>"__code", contents=>"print 'hello world'"}],
+    prio => {pr_realtime => {}},
+    language=>"perl"}
+    );
+  print $message;
+  sleep 1;
+}

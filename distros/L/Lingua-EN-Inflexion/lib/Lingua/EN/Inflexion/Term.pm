@@ -154,6 +154,92 @@ sub indefinite {
     }
 }
 
+
+# Conversions to ordinal and cardinal numbers (with module loaded on demand)...
+my $num2word = sub {
+    state $load = require Lingua::EN::Nums2Words && Lingua::EN::Nums2Words::set_case('lower');
+    Lingua::EN::Nums2Words::num2word(@_);
+};
+
+my $num2word_short_ordinal = sub {
+    state $load = require Lingua::EN::Nums2Words && Lingua::EN::Nums2Words::set_case('lower');
+    Lingua::EN::Nums2Words::num2word_short_ordinal(@_);
+};
+
+my $num2word_ordinal = sub {
+    state $load = require Lingua::EN::Nums2Words && Lingua::EN::Nums2Words::set_case('lower');
+    Lingua::EN::Nums2Words::num2word_ordinal(@_);
+};
+
+# These words may need an "and" before them...
+my $LAST_WORD = qr{
+       one    | two    | three | four | five | six | seven  | eight | nine | ten
+     | eleven | twelve | teen  | ty
+     | first  | second | third | [rfxnhe]th
+}x;
+
+# These words may need an "and" after them...
+my $POWER_WORD = qr{
+    hundred | thousand | \S+illion
+}x;
+
+sub cardinal {
+    my $value = $term_of{ shift() };
+    my $max_trans = shift();
+
+    # Load the necessary module, and compensate for its persnicketiness...
+    state $load = require Lingua::EN::Words2Nums;
+    local $SIG{__WARN__} = sub{};
+
+    # Make sure we have a number...
+    $value = Lingua::EN::Words2Nums::words2nums($value) // $value;
+
+    # If it's above threshold, return it as a number...
+    return $value
+        if defined $max_trans && $value >= $max_trans;
+
+    # Otherwise, convert it to words...
+    my $words = $num2word->($value);
+
+    # Correct for proper English pronunciation...
+    if ($value > 100) {
+        $words =~ s{ ($POWER_WORD) \s+ (\S*$LAST_WORD) \b } {$1 and $2}gx;
+        $words =~ s{    (?<! and ) \s+ (\S*$LAST_WORD) $  } { and $1}gx;
+        $words =~ s{ ^ ([^,]+),([^,]+) $ }                  {$1$2}x;
+    }
+
+    return $words;
+}
+
+sub ordinal {
+    my $value = $term_of{ shift() };
+    my $max_trans = shift();
+
+    # Load the necessary module, and compensate for its persnicketiness...
+    state $load = require Lingua::EN::Words2Nums;
+    local $SIG{__WARN__} = sub{};
+
+    # Make sure we have a number...
+    $value = Lingua::EN::Words2Nums::words2nums($value) // $value;
+
+    # If it's above threshold, return it as a number...
+    return $num2word_short_ordinal->($value)
+        if defined $max_trans && $value >= $max_trans;
+
+    # Otherwise, convert it to words...
+    my $words = $num2word_ordinal->( $value );
+
+    # Correct for proper English pronunciation...
+    if ($value > 100) {
+        $words =~ s{ ($POWER_WORD) \s+ (\S*$LAST_WORD) \b } {$1 and $2}gx;
+        $words =~ s{    (?<! and ) \s+ (\S*$LAST_WORD) $  } { and $1}gx;
+        $words =~ s{ ^ ([^,]+),([^,]+) $ }                  {$1$2}x;
+    }
+
+    return $words;
+}
+
+
 # Return a classical version of the term...
 sub classical  { Lingua::EN::Inflexion::Noun::Classical->new(shift) }
 
@@ -183,7 +269,6 @@ sub plural {
         Lingua::EN::Inflexion::Nouns::convert_to_classical_plural($term_of{$self})
     );
 }
-
 
 package Lingua::EN::Inflexion::Verb;
 our @ISA = 'Lingua::EN::Inflexion::Term';

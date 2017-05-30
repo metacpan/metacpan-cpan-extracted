@@ -1,0 +1,6 @@
+name = "Reply-Plugin-Autocomplete-ExportedSymbols"
+# badges = ["travis"]
+authority="cpan:AKIYM"
+
+module_maker="ModuleBuildTiny"
+

@@ -1,0 +1,7 @@
+Revision history for RPi-Pin
+
+2.3601  2017-05-27
+        - separated this distribution from RPi::WiringPi::Pin
+        - added set_interrupt(), deprecated interrupt_set()
+        - added setup() routine in new() if not called elsewhere
+        - hacked tests to conform to being a stand-alone distribution

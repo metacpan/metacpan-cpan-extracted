@@ -1,5 +1,10 @@
 Revision history for Plack::Middleware::PrettyException
 
+1.003   2017-05-26T12:59:36
+    - pass exception object to render_html_error, so we can also render the error
+      based on $e->ident (Thomas Klausner)
+
+
 1.002   2017-03-02T23:05:04
     - handle 30x redirects (Thomas Klausner)
 

@@ -5,7 +5,7 @@ push our @ISA,qw/SOAP::Server::Parameters/;
 use strict;
 use warnings;
 
-our $VERSION = 1.106;
+our $VERSION = 1.107;
 
 use Pod::WSDL ();
 use SOAP::Transport::HTTP ();
@@ -216,7 +216,7 @@ sub run {
 
 =head1 VERSION
 
-1.106
+1.107
 
 =head1 AUTHOR
 

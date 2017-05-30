@@ -1,0 +1,58 @@
+{
+   "abstract" : "runs immortal processes",
+   "author" : [
+      "Orkun Karaduman <orkunkaraduman@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-nodie",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Lazy::Utils" : "1.20",
+            "Scalar::Util" : "1.47",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-App-nodie@rt.cpan.org",
+         "web" : "https://github.com/orkunkaraduman/App-nodie/issues"
+      },
+      "homepage" : "https://github.com/orkunkaraduman/App-nodie/tree/master",
+      "license" : [
+         "https://www.gnu.org/licenses/gpl-3.0.html"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git@github.com:orkunkaraduman/App-nodie.git",
+         "web" : "https://github.com/orkunkaraduman/App-nodie"
+      }
+   },
+   "version" : "1.00"
+}

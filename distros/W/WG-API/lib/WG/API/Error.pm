@@ -9,11 +9,11 @@ WG::API::Error - module for work with API error
 
 =head1 VERSION
 
-Version v0.8.1
+Version v0.8.3
 
 =cut
 
-our $VERSION = 'v0.8.1';
+our $VERSION = 'v0.8.3';
 
 
 =head1 SYNOPSIS
@@ -152,7 +152,7 @@ L<http://search.cpan.org/dist/WG-API/>
 
 =head1 SEE ALSO
 
-WG API Reference L<http://ru.wargaming.net/developers/>
+WG API Reference L<https://developers.wargaming.net/>
 
 =head1 AUTHOR
 

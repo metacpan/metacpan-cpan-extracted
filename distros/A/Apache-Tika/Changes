@@ -1,3 +1,6 @@
+2017-05-16  Gerard Ribugent <ribugent@cpan.org>
+	* Allow select format on rmeta call
+
 2015-10-26  Gerard Ribugent <ribugent@cpan.org>
 	* Remove unnecessary Makefile from distribution
 

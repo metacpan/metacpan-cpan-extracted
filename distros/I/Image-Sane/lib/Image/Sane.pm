@@ -136,7 +136,7 @@ our %EXPORT_TAGS = (
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 our $DEBUG   = 0;
 my $vc;
 
@@ -200,7 +200,7 @@ Project
 
 =head1 VERSION
 
-0.07
+0.10
 
 =head1 SYNOPSIS
 

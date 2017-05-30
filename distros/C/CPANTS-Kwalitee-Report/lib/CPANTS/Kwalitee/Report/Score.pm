@@ -1,6 +1,6 @@
 package CPANTS::Kwalitee::Report::Score;
 
-$CPANTS::Kwalitee::Report::Score::VERSION   = '0.09';
+$CPANTS::Kwalitee::Report::Score::VERSION   = '0.10';
 $CPANTS::Kwalitee::Report::Score::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ CPANTS::Kwalitee::Report::Score - Interface to Kwalitee Score.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
@@ -21,8 +21,7 @@ use namespace::clean;
 
 use overload q{""} => 'as_string', fallback => 1;
 
-has 'indicator' => (is => 'ro');
-has 'value'     => (is => 'ro');
+has [qw(indicator value)] => (is => 'ro');
 
 =head1 DESCRIPTION
 

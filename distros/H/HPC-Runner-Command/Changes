@@ -1,5 +1,11 @@
 Revision history for HPC-Runner-Command
 
+3.2.2  2017-05-29 14:50:37 GST
+	- Bug fix for array task dependencies
+
+3.2.1  2017-05-28 15:37:39 GST
+	- Bug fix with counting 0th command and single-node mode
+
 3.2.0  2017-05-24 10:26:38 GST
 	- Upgrading to minor version
 

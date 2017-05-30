@@ -125,7 +125,7 @@ Net::Objwrap::Proxy - handle for proxy access to remote Perl object
 
 =head1 VERSION
 
-0.08
+0.09
 
 
 

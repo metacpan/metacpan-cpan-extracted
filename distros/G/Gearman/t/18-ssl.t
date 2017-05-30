@@ -7,6 +7,7 @@ use Storable qw/
     thaw
     /;
 use Test::More;
+use Test::Timer;
 
 use lib '.';
 use t::Worker qw/ new_worker /;
@@ -38,7 +39,7 @@ BEGIN {
         plan skip_all => sprintf 'without $ENV{%s}', $skip;
     }
     else {
-        plan tests => 5;
+        plan tests => 7;
     }
 }
 
@@ -124,6 +125,63 @@ subtest "sum", sub {
         }
     );
     is($$out, $sum, "do_task returned $sum for sum");
+};
+
+subtest "large work result", sub {
+    plan tests => 3;
+
+    # work result > 16k
+    my $length = 1024 * int(rand(5) + 17);
+    my $func   = "doit";
+    my $worker = new_worker(
+        job_servers => [$job_server],
+        debug       => $ENV{DEBUG} || 0,
+        func        => {
+            $func,
+            sub { return 'x' x $length }
+        }
+    );
+
+    my $client = _client();
+    ok(
+        my $v = $client->do_task(
+            $func => undef,
+            {
+                on_fail => sub { fail(explain(@_)) },
+            }
+        ),
+        "$func"
+    );
+    is length(${$v}), $length;
+};
+
+subtest "large task data", sub {
+    plan tests => 3;
+
+    # task data > 16k
+    my $length = 1024 * int(rand(5) + 17);
+    my $func   = "doit";
+    my $worker = new_worker(
+        job_servers => [$job_server],
+        debug       => $ENV{DEBUG} || 0,
+        func        => {
+            $func,
+            sub { return length(shift->arg) }
+        }
+    );
+
+    my $v      = 'x' x $length;
+    my $client = _client();
+    ok(
+        my $r = $client->do_task(
+            $func => $v,
+            {
+                on_fail => sub { fail(explain(@_)) },
+            }
+        ),
+        "$func"
+    );
+    is ${$r}, length($v);
 };
 
 done_testing();

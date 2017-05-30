@@ -4,7 +4,7 @@
       "Ed J <etj@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.14, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "artistic_2"
    ],
@@ -22,7 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -30,12 +30,35 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Test::CheckManifest" : "0.9",
+            "Test::Pod" : "1.22",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
       "runtime" : {
          "requires" : {
-            "perl" : "5.006"
+            "Function::Parameters" : "0",
+            "Moo" : "0",
+            "Pegex" : "0",
+            "Return::Type" : "0",
+            "Type::Tiny" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.02"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mohawk2/graphql-perl"
+      }
+   },
+   "version" : "0.03"
 }

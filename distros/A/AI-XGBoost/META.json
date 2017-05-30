@@ -1,0 +1,69 @@
+{
+   "abstract" : "Perl wrapper for XGBoost library https://github.com/dmlc/xgboost",
+   "author" : [
+      "Pablo Rodr\u00edguez Gonz\u00e1lez <pablo.rodriguez.gonzalez@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "AI-XGBoost",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Pod::Weaver" : "0",
+            "Pod::Weaver::Section::Contributors" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Synopsis" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "NativeCall" : "0",
+            "parent" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Most" : "0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pablrod/p5-AI-XGBoost/issues"
+      },
+      "homepage" : "https://github.com/pablrod/p5-AI-XGBoost",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/pablrod/p5-AI-XGBoost.git",
+         "web" : "https://github.com/pablrod/p5-AI-XGBoost"
+      }
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
+}
+

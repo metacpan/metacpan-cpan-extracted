@@ -33,7 +33,7 @@ $| = 1;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(close_fh);
-our $VERSION = '0.89';
+our $VERSION = '0.90';
 our $NO_README = 0;
 
 our (%FILENO, %SIG_OLD, $IPC_COUNT, $IPC_DIR_DEDICATED,
@@ -1003,7 +1003,8 @@ sub _identify_shared_fh_dir {
 	    'E:/Windows/Temp', 'E:/Winnt/Temp', '.';
     } else {
 	my ($cwd) = Forks::Super::Util::abs_path('.') =~ /(.*)/;
-	unshift @search_dirs, '/dev/shm', $cwd;
+        unshift @search_dirs, $cwd;
+        unshift @search_dirs, '/dev/shm';
 	push @search_dirs, '/tmp', '/var/tmp', '/usr/tmp';
     }
 
@@ -3385,7 +3386,7 @@ Forks::Super::Job::Ipc - interprocess communication routines for Forks::Super
 
 =head1 VERSION
 
-0.89
+0.90
 
 =head1 DESCRIPTION
 

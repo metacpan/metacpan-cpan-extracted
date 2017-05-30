@@ -1,4 +1,4 @@
-# Copyright 2015, 2016 Kevin Ryde
+# Copyright 2015, 2016, 2017 Kevin Ryde
 
 # This file is part of Graph-Graph6.
 
@@ -32,10 +32,10 @@ Bugs: mailto:user42_kevin@yahoo.com.au
 Package: libgraph-graph6-perl
 Architecture: all
 Depends: perl (>= 5.006), libscalar-list-utils-perl | perl (>= 5.8), libio-string-perl, ${perl:Depends}, ${misc:Depends}
-Suggests: libgraph-perl, libgraph-easy-perl, libgraphviz2-perl, libmoo-perl
-Description: Read and write graph6 and sparse6 file formats
- These file formats represent undirected graphs (the graph theory type
- of graph with vertices and edges).
+Suggests: libgraph-readwrite-perl, libgraph-easy-perl, libgraphviz2-perl, libmoo-perl
+Description: Read and write graph6, sparse6 and digraph6 file formats
+ These file formats represent directed or undirected graphs (the graph
+ theory graph with vertices and edges).
  .
  The formats can be read and written natively and there are tie-ins
  for Graph.pm, Graph::Easy, and GraphViz2.pm graph objects.

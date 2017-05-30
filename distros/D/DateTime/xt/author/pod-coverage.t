@@ -26,9 +26,6 @@ plan skip_all => 'All the modules we found were excluded from POD coverage test.
 plan tests => scalar @modules;
 
 my %trustme = (
-             'DateTime::Duration' => [
-                                     qr/^[A-Z_]+$/
-                                   ],
              'DateTime' => [
                            qr/^[A-Z_]+$/,
                            qr/0$/,
@@ -50,6 +47,9 @@ my %trustme = (
                            qr/^era$/,
                            qr/^language$/
                          ],
+             'DateTime::Duration' => [
+                                     qr/^[A-Z_]+$/
+                                   ],
              'DateTime::Infinite' => [
                                      qr/^.+$/
                                    ]

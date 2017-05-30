@@ -9,7 +9,7 @@ use Chart::Plotly::Trace::Scatter;
 
 extends 'Chart::Plotly::Adapter';
 
-our $VERSION = '0.012';    # VERSION
+our $VERSION = '0.013';    # VERSION
 
 has options => ( is  => 'ro',
                  isa => 'HashRef' );
@@ -41,7 +41,7 @@ Chart::Plotly::Adapter::Data::Table
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 
@@ -98,7 +98,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Pablo Rodríguez González.
+Copyright (c) 2017 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

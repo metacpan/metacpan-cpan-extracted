@@ -1,4 +1,4 @@
-# Copyright 2015, 2016 Kevin Ryde
+# Copyright 2015, 2016, 2017 Kevin Ryde
 #
 # This file is part of Graph-Graph6.
 #
@@ -22,7 +22,7 @@ use warnings;
 use Graph::Graph6;
 use Graph::Easy::Parser;
 
-our $VERSION = 6;
+our $VERSION = 7;
 our @ISA = ('Graph::Easy::Parser');
 
 # uncomment this to run the ### lines
@@ -35,8 +35,11 @@ sub _default_vertex_name_func {
 }
 sub _init {
   my ($self, $args) = @_;
+
+  # this undocumented yet ...
   $self->{'vertex_name_func'} = delete $args->{'vertex_name_func'}
     || \&_default_vertex_name_func;
+
   return $self->SUPER::_init($args);
 }
 
@@ -59,13 +62,17 @@ sub _read_graph6 {
   $self->reset;
 
   my $graph = $self->{'_graph'};
-  $graph->set_attribute (type => 'undirected');
-
   my $num_vertices;
   my $vertex_name_func = $self->{'vertex_name_func'};
 
   my $ret = Graph::Graph6::read_graph
     (@options,
+     format_func => sub {
+       my ($format) = @_;
+       unless ($format eq 'digraph6') {
+         $graph->set_attribute (type => 'undirected');
+       }
+     },
      num_vertices_func => sub {
        my ($n) = @_;
        ### num_vertices_func(): $n
@@ -124,8 +131,8 @@ C<Graph::Easy::Parser::Graph6> is a subclass of C<Graph::Easy::Parser>.
 
 =head1 DESCRIPTION
 
-C<Graph::Easy::Parser::Graph6> reads a graph6 or sparse6 format file to
-create a C<Graph::Easy> graph object.  These file formats are per
+C<Graph::Easy::Parser::Graph6> reads a graph6, sparse6 or digraph6 format
+file to create a C<Graph::Easy> graph object.  These file formats are per
 
 =over 4
 
@@ -133,18 +140,17 @@ L<http://cs.anu.edu.au/~bdm/data/formats.txt>
 
 =back
 
-Both formats represent an undirected graph with vertices numbered 0 to n-1.
-They are made into C<Graph::Easy> vertex names as strings like "000" to
-"999" with however many decimal digits are needed for the number of
-vertices.  These names are designed to be round-trip clean to an
-alphabetical re-write.
+The formats represent a graph with vertices numbered 0 to n-1.  These are
+made into C<Graph::Easy> vertex names as strings like "000" to "999" with
+however many decimal digits are needed for the number of vertices.  These
+names are designed to be round-trip clean to an alphabetical re-write.
 
-Sparse6 can have multi-edges and self loops.  They are added to the graph
-with multiple C<add_edge()> in the usual way.
+graph6 and sparse6 are undirected, so C<$graph> is set undirected.  sparse6
+can have multi-edges and self loops.  They are added to the graph with
+multiple C<add_edge()> in the usual way.  digraph6 is directed.
 
 See L<Graph::Graph6> for further notes on the formats.  See
-F<examples/graph-easy-print.pl> in the Graph-Graph6 sources for a complete
-sample program.
+F<examples/graph-easy-print.pl> for a complete sample program.
 
 =head1 FUNCTIONS
 
@@ -164,8 +170,8 @@ C<Graph::Easy::Parser>.
 Read the given filename or string and return a new C<Graph::Easy> graph.
 
 For compatibility with C<Graph::Easy::Parser>, if C<$filename> is a
-reference then it's assumed to be a file handle, though this is not a
-documented in C<Graph::Easy::Parser> as of its version 0.75.  The suggestion
+reference then it's assumed to be a file handle, though this is not
+documented in C<Graph::Easy::Parser> as of its version 0.76.  The suggestion
 is to pass only a plain string for a filename.
 
 =cut
@@ -201,7 +207,7 @@ L<http://user42.tuxfamily.org/graph-graph6/index.html>
 
 =head1 LICENSE
 
-Copyright 2015, 2016 Kevin Ryde
+Copyright 2015, 2016, 2017 Kevin Ryde
 
 Graph-Graph6 is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

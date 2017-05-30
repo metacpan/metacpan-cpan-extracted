@@ -1,7 +1,7 @@
 
 
 This archive contains the distribution Dist-Zilla-Plugin-Run,
-version 0.044:
+version 0.045:
 
   Run external commands and code at specific phases of Dist::Zilla
 

@@ -19,7 +19,8 @@ is exception {
 my $guard = Test::Mock::Guard->new(
     'Linux::GetPidstat::Collector' => {
         _command_get_pidstat => sub {
-            return "cat t/assets/source/metric.txt";
+            my ($pid) = shift;
+            return "cat t/assets/source/metric_$pid.txt";
         },
     },
 );
@@ -28,8 +29,8 @@ my $instance = Linux::GetPidstat::Collector->new(%opt);
 
 {
     my $ret = $instance->get_pidstats_results([
-        { program_name => 'backup_mysql' , pid => '14423' },
-        { program_name => 'summarize_log', pid => '14530' },
+        { program_name => 'backup_mysql' , pids => ['14423'] },
+        { program_name => 'summarize_log', pids => ['14530'] },
     ]);
     is_deeply $ret, {
         'backup_mysql' => {
@@ -59,10 +60,8 @@ my $instance = Linux::GetPidstat::Collector->new(%opt);
 
 {
     my $ret = $instance->get_pidstats_results([
-        { program_name => 'backup_mysql' , pid => '14423' },
-        { program_name => 'summarize_log', pid => '14530' },
-        { program_name => 'summarize_log', pid => '14533' }, # child process
-        { program_name => 'summarize_log', pid => '14534' }, # child process
+        { program_name => 'backup_mysql' , pids => ['14423'] },
+        { program_name => 'summarize_log', pids => ['14530','14533','14534'] },
     ]);
     is_deeply $ret, {
         'backup_mysql' => {
@@ -102,10 +101,8 @@ local $ENV{GETPIDSTAT_DEBUG} = 1;
     );
     my ($stdout, $stderr, $ret) = capture {
         $instance->get_pidstats_results([
-            { program_name => 'backup_mysql' , pid => '14423' },
-            { program_name => 'summarize_log', pid => '14530' },
-            { program_name => 'summarize_log', pid => '14533' }, # child process
-            { program_name => 'summarize_log', pid => '14534' }, # child process
+            { program_name => 'backup_mysql' , pids => ['14423'] },
+            { program_name => 'summarize_log', pids => ['14530','14533','14534'] },
         ]);
     };
     ok !%$ret or diag explain $ret;
@@ -120,10 +117,10 @@ local $ENV{GETPIDSTAT_DEBUG} = 1;
         $failed_command++
             if /Failed a command: cat t\/assets\/not_found_source\/metric.txt/;
     }
-    is $failed_collect, 4 or diag $stderr;
-    is $failed_get    , 4 or diag $stderr;
-    is $failed_command, 4 or diag $stderr;
-    is scalar @stderr_lines, 12 or diag $stderr;
+    is $failed_collect, 2 or diag $stderr;
+    is $failed_get    , 2 or diag $stderr;
+    is $failed_command, 2 or diag $stderr;
+    is scalar @stderr_lines, 6 or diag $stderr;
 }
 
 {
@@ -136,10 +133,8 @@ local $ENV{GETPIDSTAT_DEBUG} = 1;
     );
     my ($stdout, $stderr, $ret) = capture {
         $instance->get_pidstats_results([
-            { program_name => 'backup_mysql' , pid => '14423' },
-            { program_name => 'summarize_log', pid => '14530' },
-            { program_name => 'summarize_log', pid => '14533' }, # child process
-            { program_name => 'summarize_log', pid => '14534' }, # child process
+            { program_name => 'backup_mysql' , pids => ['14423'] },
+            { program_name => 'summarize_log', pids => ['14530','14533','14534'] },
         ]);
     };
     ok !%$ret or diag explain $ret;
@@ -156,11 +151,11 @@ local $ENV{GETPIDSTAT_DEBUG} = 1;
         $empty_metric++
             if /Empty metric: name=/;
     }
-    is $failed_collect, 4 or diag $stderr;
-    is $failed_get    , 4 or diag $stderr;
+    is $failed_collect, 2 or diag $stderr;
+    is $failed_get    , 2 or diag $stderr;
     ok !$failed_command or diag $stderr;
-    is $empty_metric  , 4 or diag $stderr;
-    is scalar @stderr_lines, 12 or diag $stderr;
+    is $empty_metric  , 2 or diag $stderr;
+    is scalar @stderr_lines, 6 or diag $stderr;
 }
 
 done_testing;

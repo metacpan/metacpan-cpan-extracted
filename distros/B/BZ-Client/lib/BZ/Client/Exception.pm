@@ -6,7 +6,7 @@ use strict;
 use warnings 'all';
 
 package BZ::Client::Exception;
-$BZ::Client::Exception::VERSION = '4.4001';
+$BZ::Client::Exception::VERSION = '4.4002';
 
 sub throw {
     my $class = shift;
@@ -49,7 +49,7 @@ BZ::Client::Exception - Exception class thrown by BZ::Client in case of errors.
 
 =head1 VERSION
 
-version 4.4001
+version 4.4002
 
 =head1 SYNOPSIS
 

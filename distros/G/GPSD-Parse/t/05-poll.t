@@ -42,6 +42,8 @@ $gps = GPSD::Parse->new(file => $fname) if ! $sock;
 
 { # invalid filename
 
+    my $gps = GPSD::Parse->new(file => 'invalid.file');
+
     my $res;
 
     my $ok = eval {

@@ -41,21 +41,21 @@ sub get_pidstats_results {
     METHODS:
     for my $info (@$program_pid_mapping) {
         my $program_name = $info->{program_name};
-        my $pid          = $info->{pid};
+        my $pids         = join(",", @{$info->{pids}});
 
         if (my $child_pid = $pm->start) {
-            printf "child_pid=%d, program_name=%s, target_pid=%d\n",
-                $child_pid, $program_name, $pid if $GETPIDSTAT_DEBUG->();
+            printf "child_pid=%d, program_name=%s, target_pids=%s\n",
+                $child_pid, $program_name, $pids if $GETPIDSTAT_DEBUG->();
             next METHODS;
         }
 
         my $ret_pidstat;
         my ($stdout, $stderr) = capture {
-            $ret_pidstat = $self->get_pidstat($pid);
+            $ret_pidstat = $self->get_pidstat($pids);
             unless ($ret_pidstat && %$ret_pidstat) {
                 warn sprintf
-                    "Failed getting pidstat: pid=%d, target_pid=%d, program_name=%s\n",
-                    $$, $pid, $program_name;
+                    "Failed getting pidstat: pid=%d, target_pids=%s, program_name=%s\n",
+                    $$, $pids, $program_name;
             }
         };
 
@@ -67,8 +67,8 @@ sub get_pidstats_results {
 }
 
 sub get_pidstat {
-    my ($self, $pid) = @_;
-    my $command = _command_get_pidstat($pid, $self->{interval}, $self->{count});
+    my ($self, $pids) = @_;
+    my $command = _command_get_pidstat($pids, $self->{interval}, $self->{count});
     my ($stdout, $stderr, $exit) = capture { system $command };
 
     if (!$stdout or $stderr or $exit != 0) {
@@ -85,8 +85,8 @@ sub get_pidstat {
 
 # for mock in tests
 sub _command_get_pidstat {
-    my ($pid, $interval, $count) = @_;
-    return "pidstat -h -u -r -s -d -w -p $pid $interval $count";
+    my ($pids, $interval, $count) = @_;
+    return "pidstat -h -u -r -s -d -w -p $pids $interval $count";
 }
 
 sub summarize($) {

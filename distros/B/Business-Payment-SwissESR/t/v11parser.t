@@ -2,7 +2,7 @@ use FindBin;
 use lib $FindBin::Bin.'/../thirdparty/lib/perl5';
 use lib $FindBin::Bin.'/../lib';
 use utf8;
-use Mojo::Util qw(slurp);
+use Mojo::File;
 use Data::Dumper;
 
 unshift @INC, sub {
@@ -40,13 +40,13 @@ my $p = Business::Payment::SwissESR::V11Parser->new();
 
 is (ref $p,'Business::Payment::SwissESR::V11Parser', 'Instanciation');
 
-my $data3 =  $p->parse(slurp $FindBin::Bin.'/test3.v11');
+my $data3 =  $p->parse(Mojo::File->new($FindBin::Bin.'/test3.v11')->slurp);
 is (ref $data3, 'ARRAY', 'Parse Output type');
 is (scalar @$data3, 155, 'Record Count');
 is ($data3->[0]{transactionCost}, '1.75', 'transaction cost test');
 is (sum(map { $_->{amount} } @$data3),'15438.7','v11 total');
 
-my $data4 = $p->parse(slurp $FindBin::Bin.'/test4.v11');
+my $data4 = $p->parse(Mojo::File->new($FindBin::Bin.'/test4.v11')->slurp);
 
 is (ref $data4, 'ARRAY', 'Parse Output type');
 is (scalar @$data4, 1, 'Record Count');

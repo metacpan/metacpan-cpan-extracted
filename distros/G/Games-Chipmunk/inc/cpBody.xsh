@@ -104,6 +104,11 @@ cpVect
 cpBodyGetVelocity( body )
     cpBody *body
 
+void
+cpBodySetVelocity( body, velocity )
+    cpBody *body
+    cpVect velocity
+
 cpVect
 cpBodyGetForce( body )
     cpBody *body

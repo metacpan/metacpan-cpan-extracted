@@ -104,9 +104,10 @@ my %WriteMakefileArgs = (
     "Test::Fatal" => 0,
     "Test::File::ShareDir" => 0,
     "Test::More" => "0.88",
-    "if" => 0
+    "if" => 0,
+    "lib" => 0
   },
-  "VERSION" => "0.044",
+  "VERSION" => "0.045",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -140,6 +141,7 @@ my %FallbackPrereqs = (
   "Test::File::ShareDir" => 0,
   "Test::More" => "0.88",
   "if" => 0,
+  "lib" => 0,
   "namespace::autoclean" => 0,
   "strict" => 0,
   "warnings" => 0

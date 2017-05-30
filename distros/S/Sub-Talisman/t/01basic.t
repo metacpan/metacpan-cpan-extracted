@@ -8,7 +8,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2012 by Toby Inkster.
+This software is copyright (c) 2012, 2017 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -16,6 +16,12 @@ the same terms as the Perl 5 programming language system itself.
 =cut
 
 use Test::More;
+
+BEGIN {
+	plan skip_all => "Test case fails with App::ForkProve"
+		if exists $INC{"App/ForkProve.pm"};
+};
+
 use attributes ();
 
 my $x;
@@ -73,19 +79,19 @@ is_deeply(
 );
 
 is_deeply(
-	Sub::Talisman->get_attribute_parameters($pkg->can('foo'), "$pkg\::XXX"),
+	scalar Sub::Talisman->get_attribute_parameters($pkg->can('foo'), "$pkg\::XXX"),
 	[ 1 .. 3 ],
 	'correct parameters for foo :XXX',
 );
 
 is_deeply(
-	Sub::Talisman->get_attribute_parameters($pkg->can('bar'), "$pkg\::XXX"),
+	scalar Sub::Talisman->get_attribute_parameters($pkg->can('bar'), "$pkg\::XXX"),
 	[ 1 ],
 	'correct parameters for bar :XXX',
 );
 
 is(
-	Sub::Talisman->get_attribute_parameters($pkg->can('baz'), "$pkg\::XXX"),
+	scalar Sub::Talisman->get_attribute_parameters($pkg->can('baz'), "$pkg\::XXX"),
 	undef,
 	'correct parameters for baz :XXX',
 );

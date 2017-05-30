@@ -1,23 +1,23 @@
 # -*-CPerl-*-
-# Last changed Time-stamp: <2017-03-09 20:50:15 michl>
+# Last changed Time-stamp: <2017-05-28 17:03:14 mtw>
 
 # Bio::RNA::RNAaliSplit.pm: Handler for horizontally splitting alignments
 
 package Bio::RNA::RNAaliSplit;
 
-use version; our $VERSION = qv('0.04');
+use version; our $VERSION = qv('0.05');
 use Carp;
 use Data::Dumper;
 use Moose;
 use Moose::Util::TypeConstraints;
-use Path::Class::File;
-use Path::Class::Dir;
 use Path::Class;
 use File::Basename;
 use IPC::Cmd qw(can_run run);
 use Bio::AlignIO;
 use Storable 'dclone';
 use File::Path qw(make_path);
+use FileDirUtil;
+#use diagnostics;
 
 subtype 'MyAln' => as class_type('Bio::AlignIO');
 
@@ -32,13 +32,6 @@ has 'format' => (
 		 default => 'ClustalW',
 		 required => 1,
 		);
-
-has 'infilebasename' => (
-			 is => 'rw',
-			 isa => 'Str',
-			 predicate => 'has_basename',
-			 init_arg => undef,
-			);
 
 has 'alignment' => (
 		    is => 'rw',
@@ -76,7 +69,8 @@ has 'hammingdistX' => (
 		       init_arg => undef,
 		      );
 
-with 'Bio::RNA::RNAaliSplit::FileDir';
+with 'FileDirUtil';
+with 'Bio::RNA::RNAaliSplit::Roles';
 
 sub BUILD {
     my $self = shift;
@@ -87,18 +81,20 @@ sub BUILD {
 		      -format => $self->format,
 		      -displayname_flat => 1} ); # discard position in sequence IDs
     $self->next_aln($self->alignment->next_aln);
-    $self->odir( [$self->ifile->dir,$self->odirn] );
-    my @created = make_path($self->odir, {error => \my $err});
-    if (@$err) {
-      confess "ERROR [$this_function] could not create output directory $self->odir";
+    unless($self->has_odir){
+      unless($self->has_dirnam){$self->dirnam("as")}
+      $self->odir( [$self->ifile->dir,$self->dirnam] );
     }
-    $self->infilebasename(fileparse($self->ifile->basename, qr/\.[^.]*/));
+    my @created = make_path($self->odir, {error => \my $err});
+    confess "ERROR [$this_function] could not create output directory $self->odir"
+      if (@$err);
+    $self->set_ifilebn;
 
     if ($self->has_dump_flag){
       # dump ifile as aln in ClustalW format to odir/input
       my $iodir = $self->odir->subdir('input');
       mkdir($iodir);
-      my $ialnfile = file($iodir,$self->infilebasename.".aln");
+      my $ialnfile = file($iodir,$self->ifilebn.".aln");
       my $alnio = Bio::AlignIO->new(-file   => ">$ialnfile",
 				    -format => "ClustalW",
 				    -flush  => 0,
@@ -192,7 +188,7 @@ sub _hamming {
   my $hammingN = ($seq1 ^ $seq2) =~ tr/\001-\255//;
   $self->hammingdistN($hammingN);
 
-#  print $self->infilebasename,":\n";
+#  print $self->ifilebn,":\n";
 #  print ">>s1: $seq1\n";
 #  print ">>s2: $seq2\n";
 #  print "** dhN = ".$self->hammingdistN."\n";
@@ -210,7 +206,7 @@ sequence alignments
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 

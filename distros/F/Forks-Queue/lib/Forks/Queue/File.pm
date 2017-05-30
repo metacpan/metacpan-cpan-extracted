@@ -8,7 +8,7 @@ use Time::HiRes;
 use base 'Forks::Queue';
 use 5.010;    #  using  // //=  operators
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 our $DEBUG;
 *DEBUG = \$Forks::Queue::DEBUG;
 
@@ -152,7 +152,7 @@ sub new {
 
 
 sub DESTROY {
-    my $self = CORE::shift;
+    my $self = shift;
     $self->{_DESTROY}++;
     eval {
     _SYNC {
@@ -251,7 +251,7 @@ sub _write_header {
 sub _notify {
     return unless $Forks::Queue::NOTIFY_OK;
 
-    my $self = CORE::shift;
+    my $self = shift;
     _SYNC { $self->_read_header } $self;
     my @ids = keys %{$self->{_pids}};
     my (@pids,@tids);
@@ -297,7 +297,7 @@ sub _notify {
 }
 
 sub clear {
-    my $self = CORE::shift;
+    my $self = shift;
     $self->_check_pid;
     _SYNC {
         $self->_read_header;
@@ -504,7 +504,7 @@ sub _wait_for_capacity {
 }
 
 sub dequeue {
-    my $self = CORE::shift;
+    my $self = shift;
     Forks::Queue::_validate_input($_[0],'count',1) if @_;
     if ($self->{style} ne 'lifo') {
         return @_ ? $self->_dequeue_front(@_) : $self->_dequeue_front;
@@ -514,7 +514,7 @@ sub dequeue {
 }
 
 sub _dequeue_back {
-    my $self = CORE::shift;
+    my $self = shift;
     my $count = @_ ? $_[0] // 1 : 1;
     $self->_check_pid;
     my @return;
@@ -545,7 +545,7 @@ sub _dequeue_back {
 }
 
 sub _dequeue_front {
-    my $self = CORE::shift;
+    my $self = shift;
     my $count = @_ ? $_[0] // 1 : 1;
     $self->_check_pid;
     my @return;
@@ -590,7 +590,7 @@ sub _dequeue_front {
     return @_ ? @return : $return[0] // ();
 }
 
-sub shift {
+sub shift :method {
     my ($self,$count) = @_;
     $count ||= 1;
     $self->_check_pid;
@@ -744,13 +744,13 @@ sub peek_back {
 }
 
 sub extract {
-    my $self = CORE::shift;
+    my $self = shift;
     Forks::Queue::_validate_input( $_[0], 'index' ) if @_;
-    my $index = CORE::shift || 0;
+    my $index = shift || 0;
     Forks::Queue::_validate_input( $_[0], 'count', 1) if @_;
     
     my $count = $_[0] // 1;
-#   my $count = @_ ? CORE::shift : 1;
+#   my $count = @_ ? shift : 1;
     if ($self->{style} eq 'lifo') {
         $index = -1 - $index;
         $index -= $count - 1;
@@ -999,19 +999,19 @@ sub Forks::Queue::File::MagicLimit::STORE {
 }
 
 sub limit :lvalue {
-    my $self = CORE::shift;
+    my $self = shift;
     if (!$self->{_limit_magic}) {
         tie $self->{_limit_magic},'Forks::Queue::File::MagicLimit', $self;
     }
     _SYNC { $self->_read_header } $self;
     if (@_) {
-        $self->{limit} = CORE::shift @_;
+        $self->{limit} = shift @_;
         if (@_) {
-            $self->{on_limit} = CORE::shift @_;
+            $self->{on_limit} = shift @_;
         }
         _SYNC { $self->_write_header } $self;
     }
-    $self->{_limit_magic};
+    return $self->{_limit_magic};
 }
 
 sub _DUMP {
@@ -1054,7 +1054,8 @@ sub _impute_file {
     }
 
     # try hard to avoid using an NFS drive
-    for my $candidate ($ENV{FORKS_QUEUE_DIR}, $ENV{TMPDIR}, $ENV{TEMP},
+    for my $candidate ($ENV{FORKS_QUEUE_DIR},
+                       $ENV{TMPDIR}, $ENV{TEMP},
                        $ENV{TMP}, @candidates,
                        $ENV{HOME}, ".") {
         next if !defined($candidate);
@@ -1077,7 +1078,7 @@ Forks::Queue::File - file-based implementation of Forks::Queue
 
 =head1 VERSION
 
-0.08
+0.09
 
 =head1 SYNOPSIS
 

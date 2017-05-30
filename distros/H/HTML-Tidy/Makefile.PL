@@ -29,14 +29,14 @@ else {
         print <<'EOF';
 
 It seems that you don't have tidyp installed.  HTML::Tidy does no
-real work on its own.  It's just a wrapper aound tidyp.
+real work on its own.  It's just a wrapper around tidyp.
 
-Please read the README.markdown file for details on how to install.
+Please read the README.markdown file for details on how to install tidyp.
 
 If you do have tidyp installed, but Makefile.PL can't detect it,
 go ahead and try building.  If HTML::Tidy builds and tests correctly,
 please file a ticket at Github at
-http://github.com/petdance/html-tidy/issues.  so we can fix the
+http://github.com/petdance/html-tidy/issues, so we can fix the
 library detection code.
 
 EOF
@@ -60,7 +60,9 @@ my $parms = {
     VERSION_FROM        => 'lib/HTML/Tidy.pm',
     ABSTRACT_FROM       => 'lib/HTML/Tidy.pm',
     PREREQ_PM           => {
+        'Encode'        => 0,   # for tests
         'Exporter'      => 0,
+        'Getopt::Long'  => 0,   # in webtidy
         'Test::More'    => '0.98', # For subtest()
         'Test::Builder' => 0,
         'Carp'          => 0,

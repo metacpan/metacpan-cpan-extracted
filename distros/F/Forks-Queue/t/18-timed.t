@@ -54,7 +54,7 @@ for my $impl (IMPL()) {
     my $t = $q1->get_timed(4.0);
     $ts1 = Time::HiRes::time;
     is($t,1, 'get_timed  got first item off queue');
-    ok($ts1-$ts0 < 4, 'get_timed did not time out') or do {
+    ok($ts1-$ts0 < 4.75, 'get_timed did not time out') or do {
         diag "get_timed call ran ",$ts1-$ts0,"sec, queue contains:";
         $q1->_DUMP;
     };
@@ -85,7 +85,7 @@ for my $impl (IMPL()) {
     # q1: [8,9,10]
     $ts1 = Time::HiRes::time;
     is_deeply(\@t, [6,7], 'timed: got two items from queue');
-    ok($ts1-$ts0 >= 3 && $ts1-$ts0 < 5.05, 'timed: ... in about 3 seconds')
+    ok($ts1-$ts0 >= 2.5 && $ts1-$ts0 < 6, 'timed: ... in about 3 seconds')
         or diag $ts1-$ts0,"sec";
     ok($q1->pending > 0, 'queue not emptied');
 
@@ -98,7 +98,7 @@ for my $impl (IMPL()) {
     # q1: [13,14,15]
     $ts1 = Time::HiRes::time;
     is_deeply(\@t, [8,9,10,11,12], 'timed: got five items from queue');
-    ok($ts1-$ts0>1.99 && $ts1-$ts0 <4.5, 'timed: ... after about 3 seconds')
+    ok($ts1-$ts0>1.85 && $ts1-$ts0 <4.5, 'timed: ... after about 3 seconds')
         or diag $ts1-$ts0,"sec";
     ok($q1->pending == 3, 'timed: 3 items remain');
 }

@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 
-# Copyright 2010 Kevin Ryde
+# Copyright 2010, 2014, 2017 Kevin Ryde
 
 # This file is part of Image-Base-X11-Protocol.
 #
@@ -19,4 +19,6 @@
 
 
 include /usr/share/cdbs/1/rules/debhelper.mk
-include /usr/share/cdbs/1/class/perlmodule.mk
+include /usr/share/cdbs/1/class/perl-makemaker.mk
+
+DEB_INSTALL_EXAMPLES_libimage-base-x11-protocol-perl = examples/*

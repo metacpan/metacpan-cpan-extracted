@@ -2,10 +2,11 @@ package DBIx::Class::InflateColumn::JSON2Object;
 
 # ABSTRACT: convert JSON columns to Perl objects
 
-our $VERSION = '0.903';
+our $VERSION = '0.904';
 
 use strict;
 use warnings;
+use 5.014;
 use JSON::MaybeXS qw(encode_json decode_json );
 use Encode qw(encode_utf8 decode_utf8);
 use Module::Runtime 'use_module';
@@ -183,7 +184,7 @@ DBIx::Class::InflateColumn::JSON2Object - convert JSON columns to Perl objects
 
 =head1 VERSION
 
-version 0.903
+version 0.904
 
 =head1 SYNOPSIS
 
@@ -272,15 +273,40 @@ have them serialized to JSON. Not only can you now add some custom
 methods to the objects, but you can (ab)use the object initalisation
 and all features Moose provides to define your objects.
 
- TODO ->fixed_class(..)
+  # Define a class
+  package YourApp::Sweets;
+  use Moose;
+  with 'DBIx::Class::InflateColumn::JSON2Object::Role::Storable';
 
-Just pass an object to the row and it will be stored as JSON:
+  has 'name'  => ( is=>'ro', isa=>'Str');
+  has 'amount => ( is=>'ro', isa=>'Int');
 
-  TODO
+  __PACKAGE__->meta->make_immutable;
 
-And you get back the initated object:
 
-  TODO
+  # In your Result class, map the class to a column
+  package YourApp::Schema::Result::Thing;
+  __PACKAGE__->add_columns(
+    "sweets",
+    { data_type => "jsonb", is_nullable => 1 }
+  );
+  use DBIx::Class::InflateColumn::JSON2Object;
+
+  DBIx::Class::InflateColumn::JSON2Object->fixed_class({
+      column=>'sweets',
+      class=>'YourApp::Sweets',
+  });
+
+Now you can pass a plain hash, a raw JSON string, or an initiated
+object to the row, and always get back the object:
+
+  my $thing = $schema->resultset('Thing')->create({
+    sweets => {
+        name   => 'Manner Schnitten',
+        amount => 10,
+    }
+  });
+  ref($thing->sweets); # 'YourApp::Sweets'
 
 =head3 class_in_column
 

@@ -1,5 +1,5 @@
 package Selenium::Remote::Commands;
-$Selenium::Remote::Commands::VERSION = '1.12';
+$Selenium::Remote::Commands::VERSION = '1.20';
 # ABSTRACT: Implement commands for Selenium::Remote::Driver
 
 use Moo;
@@ -406,6 +406,18 @@ has '_cmds' => (
                 'no_content_success' => 0
             },
 
+            # geckodriver workarounds
+            'executeScriptGecko' => {
+                'method'             => 'POST',
+                'url'                => 'session/:sessionId/execute/sync',
+                'no_content_success' => 0
+            },
+            'executeAsyncScriptGecko' => {
+                'method'             => 'POST',
+                'url'                => 'session/:sessionId/execute/async',
+                'no_content_success' => 0
+            },
+
             # /session/:sessionId/local_storage
             # /session/:sessionId/local_storage/key/:key
             # /session/:sessionId/local_storage/size
@@ -472,7 +484,7 @@ Selenium::Remote::Commands - Implement commands for Selenium::Remote::Driver
 
 =head1 VERSION
 
-version 1.12
+version 1.20
 
 =head1 SEE ALSO
 

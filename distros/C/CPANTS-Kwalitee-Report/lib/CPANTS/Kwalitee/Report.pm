@@ -1,6 +1,6 @@
 package CPANTS::Kwalitee::Report;
 
-$CPANTS::Kwalitee::Report::VERSION   = '0.09';
+$CPANTS::Kwalitee::Report::VERSION   = '0.10';
 $CPANTS::Kwalitee::Report::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ CPANTS::Kwalitee::Report - CPANTS Kwalitee Report.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
@@ -33,16 +33,17 @@ use namespace::clean;
 
 our $PAUSE_INDEX = 'http://www.cpan.org/modules/02packages.details.txt.gz';
 our $RECENT_MODS = 'https://metacpan.org/feed/recent';
+our $MIN_COUNT   = 5;
+our $MAX_COUNT   = 100;
 
-has 'index'        => (is => 'rw', default => sub { get($PAUSE_INDEX)             }, lazy => 1);
-has 'recent'       => (is => 'ro', default => sub { get($RECENT_MODS)             }, lazy => 1);
-has 'rss'          => (is => 'ro', default => sub { XML::RSS::Parser->new         }, lazy => 1);
-has 'kwalitee'     => (is => 'ro', default => sub { Module::CPANTS::Kwalitee->new }, lazy => 1);
-has 'verbose'      => (is => 'rw', default => sub { 0 });
-has 'parser'       => (is => 'rw');
-has 'generators'   => (is => 'rw');
-has 'indicators'   => (is => 'rw');
-has 'recent_dists' => (is => 'rw');
+has [ qw(parser generators indicators recent_dists verbose) ] => (is => 'rw');
+has [ qw(index recent rss kwalitee) ] => (is => 'lazy');
+
+sub _build_index    { get($PAUSE_INDEX)             }
+sub _build_recent   { get($RECENT_MODS)             }
+sub _build_rss      { XML::RSS::Parser->new         }
+sub _build_kwalitee { Module::CPANTS::Kwalitee->new }
+sub _build_verbose  { 0                             }
 
 =head1 DESCRIPTION
 
@@ -174,10 +175,10 @@ sub recently_uploaded_distributions {
 
     if (defined $count) {
         if ($count < 0) {
-            $count = 5;
+            $count = $MIN_COUNT;
         }
-        elsif ($count > 100) {
-            $count = 100;
+        elsif ($count > $MAX_COUNT) {
+            $count = $MAX_COUNT;
         }
     }
 

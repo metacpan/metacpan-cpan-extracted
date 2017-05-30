@@ -18,11 +18,11 @@ App::Countdown - wait some specified time while displaying the remaining time.
 
 =head1 VERSION
 
-Version 0.4.3
+Version 0.4.4
 
 =cut
 
-our $VERSION = '0.4.3';
+our $VERSION = '0.4.4';
 
 
 =head1 SYNOPSIS
@@ -190,10 +190,8 @@ Shlomi Fish, L<http://www.shlomifish.org/>, C<< <shlomif at cpan.org> >> .
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-app-countdown at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-Countdown>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
+Please report any bugs or feature requests to
+L<https://github.com/shlomif/App-Countdown/issues> .
 
 =head1 SUPPORT
 

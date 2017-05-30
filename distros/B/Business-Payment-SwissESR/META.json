@@ -4,7 +4,7 @@
       "Tobias Oetiker <tobi@oetiker.ch>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "gpl_3"
    ],
@@ -25,7 +25,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "CPAN::Uploader" : "0"
          }
       },
       "configure" : {
@@ -35,7 +35,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojolicious" : "3.0",
+            "Mojolicious" : "7.15",
             "perl" : "5.010001"
          }
       }
@@ -52,5 +52,5 @@
          "url" : "https://github.com/oetiker/business-payment-swissesr"
       }
    },
-   "version" : "v0.13.3"
+   "version" : "v0.13.5"
 }

@@ -7,11 +7,11 @@ do { my $x = {
                       },
        'runtime' => {
                       'recommends' => {
-                                        'Data::FlexSerializer' => '0'
+                                        'DateTime' => '0'
                                       },
                       'requires' => {
                                       'Alien::SwaggerUI' => '0',
-                                      'CPAN::Testers::Schema' => '0.010',
+                                      'CPAN::Testers::Schema' => '0.013',
                                       'File::Share' => '0',
                                       'Import::Base' => '0.012',
                                       'Log::Any' => '1.045',
@@ -31,7 +31,8 @@ do { my $x = {
                                      'CPAN::Testers::Report' => '0',
                                      'DBD::SQLite' => '0',
                                      'Test::Reporter' => '0',
-                                     'Test::Reporter::Transport::Null' => '0'
+                                     'Test::Reporter::Transport::Null' => '0',
+                                     'Test::mysqld' => '0'
                                    },
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',

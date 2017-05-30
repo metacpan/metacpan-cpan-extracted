@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015 Kevin Ryde
+# Copyright 2015, 2016, 2017 Kevin Ryde
 #
 # This file is part of Graph-Graph6.
 #
@@ -33,7 +33,7 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-my $test_count = (tests => 8)[1];
+my $test_count = (tests => 20)[1];
 plan tests => $test_count;
 
 if (! $have_graph) {
@@ -62,9 +62,18 @@ require Graph::Reader::Graph6;
 
 my $filename = 'Graph-Reader-Graph6-t.tmp';
 
+sub write_file {
+  my $fh;
+  (open $fh, '>', $filename
+   and print $fh @_
+   and close $fh
+  ) or die "Cannot write $filename: $!";
+}
+
+
 #------------------------------------------------------------------------------
 {
-  my $want_version = 6;
+  my $want_version = 7;
   ok ($Graph::Reader::Graph6::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Reader::Graph6->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Reader::Graph6->VERSION($want_version); 1 }, 1,
@@ -78,16 +87,9 @@ my $filename = 'Graph-Reader-Graph6-t.tmp';
 
 {
   # formats.txt graph6 example, from filename
-
-  {
-    my $fh;
-    (open $fh, '>', $filename
-     and print $fh chr(68),chr(81),chr(99),"\n"
-     and close $fh)
-      or die "Cannot write $filename; $!";
-  }
-  my $parser = Graph::Reader::Graph6->new;
-  my $graph = $parser->read_graph($filename);
+  write_file(chr(68),chr(81),chr(99),"\n");
+  my $reader = Graph::Reader::Graph6->new;
+  my $graph = $reader->read_graph($filename);
   ok (join(',', sort $graph->vertices), '0,1,2,3,4');  # 5 vertices
 
   my @edges = $graph->edges; # [$name1,$name2]
@@ -107,8 +109,8 @@ my $filename = 'Graph-Reader-Graph6-t.tmp';
   }
 
   open my $fh, '<', $filename or die "Cannot open $filename: $!";
-  my $parser = Graph::Reader::Graph6->new;
-  my $graph = $parser->read_graph($fh);
+  my $reader = Graph::Reader::Graph6->new;
+  my $graph = $reader->read_graph($fh);
   ok (join(',', sort $graph->vertices),
       '0,1,2,3,4,5,6');  # 7 vertices
 
@@ -117,6 +119,26 @@ my $filename = 'Graph-Reader-Graph6-t.tmp';
   ok (join(',',sort @edge_names),
       '0=1,0=2,1=2,5=6');
 }
+
+#------------------------------------------------------------------------------
+
+{
+  # multi-edge sparse6
+  my $reader = Graph::Reader::Graph6->new;
+  foreach my $elem ([":A\n",0],
+                    [":An\n",1],
+                    [":Ab\n",2],
+                    [":A_\n",3],
+                   ) {
+    my ($str,$want_num_edges) = @$elem;
+    write_file($str);
+    my $graph = $reader->read_graph($filename);
+    ok (!! $graph->is_undirected, 1);
+    ok (!! $graph->is_countedged, $want_num_edges>=2);
+    ok (scalar($graph->edges), $want_num_edges);
+  }
+}
+
 
 #------------------------------------------------------------------------------
 unlink $filename;

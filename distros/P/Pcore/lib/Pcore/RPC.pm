@@ -5,11 +5,15 @@ use Pcore::Util::Scalar qw[blessed weaken];
 use Pcore::RPC::Proc;
 use Pcore::WebSocket;
 
+has token => ( is => 'ro', isa => Maybe [Str], init_arg => undef );
 has workers     => ( is => 'ro', isa => ArrayRef, default => sub { [] }, init_arg => undef );
 has connections => ( is => 'ro', isa => ArrayRef, default => sub { [] }, init_arg => undef );
 
 sub TO_DATA ( $self, ) {
-    return $self->get_connect;
+    return {
+        connect => $self->get_connect,
+        token   => $self->{token},
+    };
 }
 
 sub run_rpc ( $self, $class, @ ) {
@@ -18,6 +22,7 @@ sub run_rpc ( $self, $class, @ ) {
     my %args = (
         workers   => undef,    # FALSE - max. CPUs, -n - CPUs - n || 1
         listen    => undef,
+        token     => undef,
         buildargs => undef,    # Maybe[HashRef], RPC object constructor arguments
         on_ready  => undef,    # Maybe[CodeRef]
         @_[ 2 .. $#_ ],
@@ -33,7 +38,7 @@ sub run_rpc ( $self, $class, @ ) {
         $args{workers} = 1 if $args{workers} <= 0;
     }
 
-    my $rpc = bless {}, $self;
+    my $rpc = bless { token => $args{token} }, $self;
 
     my $cv = AE::cv sub {
         $args{on_ready}->($rpc) if $args{on_ready};
@@ -46,6 +51,7 @@ sub run_rpc ( $self, $class, @ ) {
     $cv->begin;
 
     my $weaken_rpc = $rpc;
+
     weaken $weaken_rpc;
 
     # create workers
@@ -54,6 +60,7 @@ sub run_rpc ( $self, $class, @ ) {
 
         Pcore::RPC::Proc->new(
             listen    => $args{listen},
+            token     => $args{token},
             class     => $class,
             buildargs => $args{buildargs},
             on_ready  => sub ($proc) {
@@ -89,19 +96,28 @@ sub connect_rpc ( $self, % ) {
 
     my %args = (
         connect        => undef,
+        token          => undef,
         listen_events  => undef,
         forward_events => undef,
         on_connect     => undef,
         @_[ 1 .. $#_ ],
     );
 
-    $self = bless {}, $self if !blessed $self;
-
     # parse connect
-    if ( !$args{connect} ) {
+    if ( blessed $self ) {
         $args{connect} = $self->get_connect;
+
+        $args{token} = $self->token;
     }
     else {
+        $self = bless {}, $self;
+
+        if ( ref $args{connect} eq 'HASH' ) {
+            $args{token} = $args{connect}->{token} if exists $args{connect}->{token};
+
+            $args{connect} = $args{connect}->{connect};
+        }
+
         $args{connect} = [ $args{connect} ] if ref $args{connect} ne 'ARRAY';
     }
 
@@ -117,8 +133,9 @@ sub connect_rpc ( $self, % ) {
 
     $cv->begin;
 
-    my $weaken_rpc = $self;
-    weaken $weaken_rpc;
+    my $self_weak = $self;
+
+    weaken $self_weak;
 
     for my $addr ( $args{connect}->@* ) {
         $cv->begin;
@@ -126,11 +143,12 @@ sub connect_rpc ( $self, % ) {
         Pcore::WebSocket->connect_ws(
             pcore          => "ws://$addr/",
             before_connect => {
+                token          => $args{token},
                 listen_events  => $args{listen_events},
                 forward_events => $args{forward_events},
             },
-            on_error => sub ($res) {
-                die $res;
+            on_connect_error => sub ($status) {
+                die "$status";
             },
             on_connect => sub ( $ws, $headers ) {
                 push $self->{connections}->@*, $ws;
@@ -140,10 +158,12 @@ sub connect_rpc ( $self, % ) {
                 return;
             },
             on_disconnect => sub ( $ws, $status ) {
-                if ($weaken_rpc) {
-                    for ( my $i = 0; $i <= $weaken_rpc->{connections}->$#*; $i++ ) {
-                        if ( $weaken_rpc->{connections}->[$i] eq $ws ) {
-                            splice $weaken_rpc->{connections}->@*, $i, 1, ();
+                if ($self_weak) {
+
+                    # remove destroyed connection from cache
+                    for ( my $i = 0; $i <= $self_weak->{connections}->$#*; $i++ ) {
+                        if ( $self_weak->{connections}->[$i] eq $ws ) {
+                            splice $self_weak->{connections}->@*, $i, 1, ();
 
                             last;
                         }
@@ -181,7 +201,7 @@ sub rpc_call ( $self, $method, @ ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 68, 144              | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 75, 164              | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

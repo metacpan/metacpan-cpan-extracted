@@ -1533,18 +1533,21 @@ SWIG_Perl_SetModule(swig_module_info *module) {
 #define SWIGTYPE_p_char swig_types[0]
 #define SWIGTYPE_p_cppjieba__DictTrie swig_types[1]
 #define SWIGTYPE_p_cppjieba__HMMModel swig_types[2]
-#define SWIGTYPE_p_pairT_std__string_double_t swig_types[3]
-#define SWIGTYPE_p_pairT_std__string_std__string_t swig_types[4]
-#define SWIGTYPE_p_perljieba__Jieba swig_types[5]
-#define SWIGTYPE_p_perljieba__KeywordExtractor swig_types[6]
-#define SWIGTYPE_p_size_type swig_types[7]
-#define SWIGTYPE_p_std__out_of_range swig_types[8]
-#define SWIGTYPE_p_std__vectorT_pairT_std__string_double_t_t swig_types[9]
-#define SWIGTYPE_p_std__vectorT_pairT_std__string_std__string_t_t swig_types[10]
-#define SWIGTYPE_p_std__vectorT_std__string_t swig_types[11]
-#define SWIGTYPE_p_value_type swig_types[12]
-static swig_type_info *swig_types[14];
-static swig_module_info swig_module = {swig_types, 13, 0, 0, 0, 0};
+#define SWIGTYPE_p_cppjieba__Word swig_types[3]
+#define SWIGTYPE_p_pairT_std__string_double_t swig_types[4]
+#define SWIGTYPE_p_pairT_std__string_std__string_t swig_types[5]
+#define SWIGTYPE_p_perljieba__Jieba swig_types[6]
+#define SWIGTYPE_p_perljieba__KeywordExtractor swig_types[7]
+#define SWIGTYPE_p_perljieba__Word swig_types[8]
+#define SWIGTYPE_p_size_type swig_types[9]
+#define SWIGTYPE_p_std__out_of_range swig_types[10]
+#define SWIGTYPE_p_std__vectorT_pairT_std__string_double_t_t swig_types[11]
+#define SWIGTYPE_p_std__vectorT_pairT_std__string_std__string_t_t swig_types[12]
+#define SWIGTYPE_p_std__vectorT_perljieba__Word_t swig_types[13]
+#define SWIGTYPE_p_std__vectorT_std__string_t swig_types[14]
+#define SWIGTYPE_p_value_type swig_types[15]
+static swig_type_info *swig_types[17];
+static swig_module_info swig_module = {swig_types, 16, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -2020,6 +2023,27 @@ SWIGINTERN void std_vector_Sl_pair_Sl_std_string_Sc_double_Sg__Sg__set(std::vect
                 else
                     throw std::out_of_range("vector index out of range");
             }
+SWIGINTERN perljieba::Word std_vector_Sl_perljieba_Word_Sg__pop(std::vector< perljieba::Word > *self){
+                if (self->size() == 0)
+                    throw std::out_of_range("pop from empty vector");
+                perljieba::Word x = self->back();
+                self->pop_back();
+                return x;
+            }
+SWIGINTERN perljieba::Word &std_vector_Sl_perljieba_Word_Sg__get(std::vector< perljieba::Word > *self,int i){
+                int size = int(self->size());
+                if (i>=0 && i<size)
+                    return (*self)[i];
+                else
+                    throw std::out_of_range("vector index out of range");
+            }
+SWIGINTERN void std_vector_Sl_perljieba_Word_Sg__set(std::vector< perljieba::Word > *self,int i,perljieba::Word const &x){
+                int size = int(self->size());
+                if (i>=0 && i<size)
+                    (*self)[i] = x;
+                else
+                    throw std::out_of_range("vector index out of range");
+            }
 
 
 void SwigSvFromStringPair(SV* sv, const std::pair<std::string, std::string>& p) {
@@ -2055,6 +2079,23 @@ void SwigSvFromStringDoublePair(SV* sv, const std::pair<std::string, double>& p)
 
     sv_setsv(sv, newRV_noinc((SV*) myav));
 }
+
+void SwigSvFromWord(SV* sv, const perljieba::Word& w) {
+    SV **svs = new SV*[3];
+
+    svs[0] = sv_newmortal();
+    SwigSvFromString(svs[0], w.word);
+    svs[1] = sv_newmortal();
+    sv_setnv(svs[1], w.offset);
+    svs[2] = sv_newmortal();
+    sv_setnv(svs[2], w.length);
+
+    AV *myav = av_make(3, svs);
+    delete[] svs; 
+
+    sv_setsv(sv, newRV_noinc((SV*) myav));
+}
+
 
 
 
@@ -2131,6 +2172,48 @@ SWIG_AsVal_size_t SWIG_PERL_DECL_ARGS_2(SV * obj, size_t *val)
   }
 #endif
   return res;
+}
+
+
+#include <stdio.h>
+#if defined(_MSC_VER) || defined(__BORLANDC__) || defined(_WATCOM)
+# ifndef snprintf
+#  define snprintf _snprintf
+# endif
+#endif
+
+
+#ifdef SWIG_LONG_LONG_AVAILABLE
+SWIGINTERNINLINE SV *
+SWIG_From_unsigned_SS_long_SS_long  SWIG_PERL_DECL_ARGS_1(unsigned long long value)
+{
+  SV *sv;
+  if (UVSIZE >= sizeof(value) || value <= UV_MAX)
+    sv = newSVuv((UV)(value));
+  else {
+    //sv = newSVpvf("%llu", value); doesn't work in non 64bit Perl
+    char temp[256];
+    sprintf(temp, "%llu", value);
+    sv = newSVpv(temp, 0);
+  }
+  return sv_2mortal(sv);
+}
+#endif
+
+
+SWIGINTERNINLINE SV *
+SWIG_From_size_t  SWIG_PERL_DECL_ARGS_1(size_t value)
+{    
+#ifdef SWIG_LONG_LONG_AVAILABLE
+  if (sizeof(size_t) <= sizeof(unsigned long)) {
+#endif
+    return SWIG_From_unsigned_SS_long  SWIG_PERL_CALL_ARGS_1(static_cast< unsigned long >(value));
+#ifdef SWIG_LONG_LONG_AVAILABLE
+  } else {
+    /* assume sizeof(size_t) <= sizeof(unsigned long long) */
+    return SWIG_From_unsigned_SS_long_SS_long  SWIG_PERL_CALL_ARGS_1(static_cast< unsigned long long >(value));
+  }
+#endif
 }
 
 
@@ -3981,6 +4064,936 @@ XS(_wrap_delete_vector_keyword) {
 }
 
 
+XS(_wrap_new_vector_word__SWIG_0) {
+  {
+    unsigned int arg1 ;
+    unsigned int val1 ;
+    int ecode1 = 0 ;
+    int argvi = 0;
+    std::vector< perljieba::Word > *result = 0 ;
+    dXSARGS;
+    
+    if ((items < 1) || (items > 1)) {
+      SWIG_croak("Usage: new_vector_word(size);");
+    }
+    ecode1 = SWIG_AsVal_unsigned_SS_int SWIG_PERL_CALL_ARGS_2(ST(0), &val1);
+    if (!SWIG_IsOK(ecode1)) {
+      SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_vector_word" "', argument " "1"" of type '" "unsigned int""'");
+    } 
+    arg1 = static_cast< unsigned int >(val1);
+    result = (std::vector< perljieba::Word > *)new std::vector< perljieba::Word >(arg1);
+    ST(argvi) = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_std__vectorT_perljieba__Word_t, SWIG_OWNER | SWIG_SHADOW); argvi++ ;
+    
+    XSRETURN(argvi);
+  fail:
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_new_vector_word__SWIG_1) {
+  {
+    int argvi = 0;
+    std::vector< perljieba::Word > *result = 0 ;
+    dXSARGS;
+    
+    if ((items < 0) || (items > 0)) {
+      SWIG_croak("Usage: new_vector_word();");
+    }
+    result = (std::vector< perljieba::Word > *)new std::vector< perljieba::Word >();
+    ST(argvi) = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_std__vectorT_perljieba__Word_t, SWIG_OWNER | SWIG_SHADOW); argvi++ ;
+    XSRETURN(argvi);
+  fail:
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_new_vector_word__SWIG_2) {
+  {
+    unsigned int arg1 ;
+    perljieba::Word *arg2 = 0 ;
+    unsigned int val1 ;
+    int ecode1 = 0 ;
+    void *argp2 ;
+    int res2 = 0 ;
+    int argvi = 0;
+    std::vector< perljieba::Word > *result = 0 ;
+    dXSARGS;
+    
+    if ((items < 2) || (items > 2)) {
+      SWIG_croak("Usage: new_vector_word(size,value);");
+    }
+    ecode1 = SWIG_AsVal_unsigned_SS_int SWIG_PERL_CALL_ARGS_2(ST(0), &val1);
+    if (!SWIG_IsOK(ecode1)) {
+      SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_vector_word" "', argument " "1"" of type '" "unsigned int""'");
+    } 
+    arg1 = static_cast< unsigned int >(val1);
+    res2 = SWIG_ConvertPtr(ST(1), &argp2, SWIGTYPE_p_perljieba__Word,  0 );
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "new_vector_word" "', argument " "2"" of type '" "perljieba::Word const &""'"); 
+    }
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_vector_word" "', argument " "2"" of type '" "perljieba::Word const &""'"); 
+    }
+    arg2 = reinterpret_cast< perljieba::Word * >(argp2);
+    result = (std::vector< perljieba::Word > *)new std::vector< perljieba::Word >(arg1,(perljieba::Word const &)*arg2);
+    ST(argvi) = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_std__vectorT_perljieba__Word_t, SWIG_OWNER | SWIG_SHADOW); argvi++ ;
+    
+    
+    XSRETURN(argvi);
+  fail:
+    
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_new_vector_word__SWIG_3) {
+  {
+    std::vector< perljieba::Word > *arg1 = 0 ;
+    std::vector< perljieba::Word > temp1 ;
+    std::vector< perljieba::Word > *v1 ;
+    int argvi = 0;
+    std::vector< perljieba::Word > *result = 0 ;
+    dXSARGS;
+    
+    if ((items < 1) || (items > 1)) {
+      SWIG_croak("Usage: new_vector_word(std::vector< perljieba::Word > const &);");
+    }
+    {
+      if (SWIG_ConvertPtr(ST(0),(void **) &v1, 
+          SWIGTYPE_p_std__vectorT_perljieba__Word_t,1) != -1) {
+        arg1 = v1;
+      } else if (SvROK(ST(0))) {
+        AV *av = (AV *)SvRV(ST(0));
+        if (SvTYPE(av) != SVt_PVAV)
+        SWIG_croak("Type error in argument 1 of new_vector_word. "
+          "Expected an array of " "perljieba::Word");
+        SV **tv;
+        I32 len = av_len(av) + 1;
+        perljieba::Word* obj;
+        for (int i=0; i<len; i++) {
+          tv = av_fetch(av, i, 0);
+          if (SWIG_ConvertPtr(*tv, (void **)&obj, 
+              SWIGTYPE_p_perljieba__Word,0) != -1) {
+            temp1.push_back(*obj);
+          } else {
+            SWIG_croak("Type error in argument 1 of "
+              "new_vector_word. "
+              "Expected an array of " "perljieba::Word");
+          }
+        }
+        arg1 = &temp1;
+      } else {
+        SWIG_croak("Type error in argument 1 of new_vector_word. "
+          "Expected an array of " "perljieba::Word");
+      }
+    }
+    result = (std::vector< perljieba::Word > *)new std::vector< perljieba::Word >((std::vector< perljieba::Word > const &)*arg1);
+    ST(argvi) = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_std__vectorT_perljieba__Word_t, SWIG_OWNER | SWIG_SHADOW); argvi++ ;
+    
+    XSRETURN(argvi);
+  fail:
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_new_vector_word) {
+  dXSARGS;
+  
+  {
+    unsigned long _index = 0;
+    SWIG_TypeRank _rank = 0; 
+    if (items == 0) {
+      SWIG_TypeRank _ranki = 0;
+      SWIG_TypeRank _rankm = 0;
+      if (!_index || (_ranki < _rank)) {
+        _rank = _ranki; _index = 1;
+        if (_rank == _rankm) goto dispatch;
+      }
+    }
+    if (items == 1) {
+      SWIG_TypeRank _ranki = 0;
+      SWIG_TypeRank _rankm = 0;
+      SWIG_TypeRank _pi = 1;
+      int _v = 0;
+      {
+        {
+          int res = SWIG_AsVal_unsigned_SS_int SWIG_PERL_CALL_ARGS_2(ST(0), NULL);
+          _v = SWIG_CheckState(res);
+        }
+      }
+      if (!_v) goto check_2;
+      _ranki += _v*_pi;
+      _rankm += _pi;
+      _pi *= SWIG_MAXCASTRANK;
+      if (!_index || (_ranki < _rank)) {
+        _rank = _ranki; _index = 2;
+        if (_rank == _rankm) goto dispatch;
+      }
+    }
+  check_2:
+    
+    if (items == 1) {
+      SWIG_TypeRank _ranki = 0;
+      SWIG_TypeRank _rankm = 0;
+      SWIG_TypeRank _pi = 1;
+      int _v = 0;
+      {
+        {
+          {
+            /* wrapped vector? */
+            std::vector< perljieba::Word >* v;
+            if (SWIG_ConvertPtr(ST(0),(void **) &v, 
+                SWIGTYPE_p_std__vectorT_perljieba__Word_t,0) != -1) {
+              _v = 1;
+            } else if (SvROK(ST(0))) {
+              /* native sequence? */
+              AV *av = (AV *)SvRV(ST(0));
+              if (SvTYPE(av) == SVt_PVAV) {
+                I32 len = av_len(av) + 1;
+                if (len == 0) {
+                  /* an empty sequence can be of any type */
+                  _v = 1;
+                } else {
+                  /* check the first element only */
+                  perljieba::Word* obj;
+                  SV **tv = av_fetch(av, 0, 0);
+                  if (SWIG_ConvertPtr(*tv, (void **)&obj, 
+                      SWIGTYPE_p_perljieba__Word,0) != -1)
+                  _v = 1;
+                  else
+                  _v = 0;
+                }
+              }
+            } else {
+              _v = 0;
+            }
+          }
+        }
+      }
+      if (!_v) goto check_3;
+      _ranki += _v*_pi;
+      _rankm += _pi;
+      _pi *= SWIG_MAXCASTRANK;
+      if (!_index || (_ranki < _rank)) {
+        _rank = _ranki; _index = 3;
+        if (_rank == _rankm) goto dispatch;
+      }
+    }
+  check_3:
+    
+    if (items == 2) {
+      SWIG_TypeRank _ranki = 0;
+      SWIG_TypeRank _rankm = 0;
+      SWIG_TypeRank _pi = 1;
+      int _v = 0;
+      {
+        {
+          int res = SWIG_AsVal_unsigned_SS_int SWIG_PERL_CALL_ARGS_2(ST(0), NULL);
+          _v = SWIG_CheckState(res);
+        }
+      }
+      if (!_v) goto check_4;
+      _ranki += _v*_pi;
+      _rankm += _pi;
+      _pi *= SWIG_MAXCASTRANK;
+      {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(ST(1), &vptr, SWIGTYPE_p_perljieba__Word, 0);
+        _v = SWIG_CheckState(res);
+      }
+      if (!_v) goto check_4;
+      _ranki += _v*_pi;
+      _rankm += _pi;
+      _pi *= SWIG_MAXCASTRANK;
+      if (!_index || (_ranki < _rank)) {
+        _rank = _ranki; _index = 4;
+        if (_rank == _rankm) goto dispatch;
+      }
+    }
+  check_4:
+    
+  dispatch:
+    switch(_index) {
+    case 1:
+      PUSHMARK(MARK); SWIG_CALLXS(_wrap_new_vector_word__SWIG_1); return;
+    case 2:
+      PUSHMARK(MARK); SWIG_CALLXS(_wrap_new_vector_word__SWIG_0); return;
+    case 3:
+      PUSHMARK(MARK); SWIG_CALLXS(_wrap_new_vector_word__SWIG_3); return;
+    case 4:
+      PUSHMARK(MARK); SWIG_CALLXS(_wrap_new_vector_word__SWIG_2); return;
+    }
+  }
+  
+  croak("No matching function for overloaded 'new_vector_word'");
+  XSRETURN(0);
+}
+
+
+XS(_wrap_vector_word_size) {
+  {
+    std::vector< perljieba::Word > *arg1 = (std::vector< perljieba::Word > *) 0 ;
+    std::vector< perljieba::Word > temp1 ;
+    std::vector< perljieba::Word > *v1 ;
+    int argvi = 0;
+    unsigned int result;
+    dXSARGS;
+    
+    if ((items < 1) || (items > 1)) {
+      SWIG_croak("Usage: vector_word_size(self);");
+    }
+    {
+      if (SWIG_ConvertPtr(ST(0),(void **) &v1, 
+          SWIGTYPE_p_std__vectorT_perljieba__Word_t,1) != -1) {
+        arg1 = v1;
+      } else if (SvROK(ST(0))) {
+        AV *av = (AV *)SvRV(ST(0));
+        if (SvTYPE(av) != SVt_PVAV)
+        SWIG_croak("Type error in argument 1 of vector_word_size. "
+          "Expected an array of " "perljieba::Word");
+        SV **tv;
+        I32 len = av_len(av) + 1;
+        perljieba::Word* obj;
+        for (int i=0; i<len; i++) {
+          tv = av_fetch(av, i, 0);
+          if (SWIG_ConvertPtr(*tv, (void **)&obj, 
+              SWIGTYPE_p_perljieba__Word,0) != -1) {
+            temp1.push_back(*obj);
+          } else {
+            SWIG_croak("Type error in argument 1 of "
+              "vector_word_size. "
+              "Expected an array of " "perljieba::Word");
+          }
+        }
+        arg1 = &temp1;
+      } else {
+        SWIG_croak("Type error in argument 1 of vector_word_size. "
+          "Expected an array of " "perljieba::Word");
+      }
+    }
+    result = (unsigned int)((std::vector< perljieba::Word > const *)arg1)->size();
+    ST(argvi) = SWIG_From_unsigned_SS_int  SWIG_PERL_CALL_ARGS_1(static_cast< unsigned int >(result)); argvi++ ;
+    
+    XSRETURN(argvi);
+  fail:
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_vector_word_empty) {
+  {
+    std::vector< perljieba::Word > *arg1 = (std::vector< perljieba::Word > *) 0 ;
+    std::vector< perljieba::Word > temp1 ;
+    std::vector< perljieba::Word > *v1 ;
+    int argvi = 0;
+    bool result;
+    dXSARGS;
+    
+    if ((items < 1) || (items > 1)) {
+      SWIG_croak("Usage: vector_word_empty(self);");
+    }
+    {
+      if (SWIG_ConvertPtr(ST(0),(void **) &v1, 
+          SWIGTYPE_p_std__vectorT_perljieba__Word_t,1) != -1) {
+        arg1 = v1;
+      } else if (SvROK(ST(0))) {
+        AV *av = (AV *)SvRV(ST(0));
+        if (SvTYPE(av) != SVt_PVAV)
+        SWIG_croak("Type error in argument 1 of vector_word_empty. "
+          "Expected an array of " "perljieba::Word");
+        SV **tv;
+        I32 len = av_len(av) + 1;
+        perljieba::Word* obj;
+        for (int i=0; i<len; i++) {
+          tv = av_fetch(av, i, 0);
+          if (SWIG_ConvertPtr(*tv, (void **)&obj, 
+              SWIGTYPE_p_perljieba__Word,0) != -1) {
+            temp1.push_back(*obj);
+          } else {
+            SWIG_croak("Type error in argument 1 of "
+              "vector_word_empty. "
+              "Expected an array of " "perljieba::Word");
+          }
+        }
+        arg1 = &temp1;
+      } else {
+        SWIG_croak("Type error in argument 1 of vector_word_empty. "
+          "Expected an array of " "perljieba::Word");
+      }
+    }
+    result = (bool)((std::vector< perljieba::Word > const *)arg1)->empty();
+    ST(argvi) = SWIG_From_bool  SWIG_PERL_CALL_ARGS_1(static_cast< bool >(result)); argvi++ ;
+    
+    XSRETURN(argvi);
+  fail:
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_vector_word_clear) {
+  {
+    std::vector< perljieba::Word > *arg1 = (std::vector< perljieba::Word > *) 0 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    int argvi = 0;
+    dXSARGS;
+    
+    if ((items < 1) || (items > 1)) {
+      SWIG_croak("Usage: vector_word_clear(self);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_std__vectorT_perljieba__Word_t, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "vector_word_clear" "', argument " "1"" of type '" "std::vector< perljieba::Word > *""'"); 
+    }
+    arg1 = reinterpret_cast< std::vector< perljieba::Word > * >(argp1);
+    (arg1)->clear();
+    ST(argvi) = sv_newmortal();
+    
+    XSRETURN(argvi);
+  fail:
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_vector_word_push) {
+  {
+    std::vector< perljieba::Word > *arg1 = (std::vector< perljieba::Word > *) 0 ;
+    perljieba::Word *arg2 = 0 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    void *argp2 ;
+    int res2 = 0 ;
+    int argvi = 0;
+    dXSARGS;
+    
+    if ((items < 2) || (items > 2)) {
+      SWIG_croak("Usage: vector_word_push(self,x);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_std__vectorT_perljieba__Word_t, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "vector_word_push" "', argument " "1"" of type '" "std::vector< perljieba::Word > *""'"); 
+    }
+    arg1 = reinterpret_cast< std::vector< perljieba::Word > * >(argp1);
+    res2 = SWIG_ConvertPtr(ST(1), &argp2, SWIGTYPE_p_perljieba__Word,  0 );
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "vector_word_push" "', argument " "2"" of type '" "perljieba::Word const &""'"); 
+    }
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "vector_word_push" "', argument " "2"" of type '" "perljieba::Word const &""'"); 
+    }
+    arg2 = reinterpret_cast< perljieba::Word * >(argp2);
+    (arg1)->push_back((perljieba::Word const &)*arg2);
+    ST(argvi) = sv_newmortal();
+    
+    
+    XSRETURN(argvi);
+  fail:
+    
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_vector_word_pop) {
+  {
+    std::vector< perljieba::Word > *arg1 = (std::vector< perljieba::Word > *) 0 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    int argvi = 0;
+    perljieba::Word result;
+    dXSARGS;
+    
+    if ((items < 1) || (items > 1)) {
+      SWIG_croak("Usage: vector_word_pop(self);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_std__vectorT_perljieba__Word_t, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "vector_word_pop" "', argument " "1"" of type '" "std::vector< perljieba::Word > *""'"); 
+    }
+    arg1 = reinterpret_cast< std::vector< perljieba::Word > * >(argp1);
+    try {
+      result = std_vector_Sl_perljieba_Word_Sg__pop(arg1);
+    }
+    catch(std::out_of_range &_e) {
+      sv_setsv(get_sv("@", GV_ADD), SWIG_NewPointerObj((new std::out_of_range(static_cast< const std::out_of_range& >(_e))),SWIGTYPE_p_std__out_of_range,SWIG_POINTER_OWN)); SWIG_fail ;
+    }
+    
+    ST(argvi) = SWIG_NewPointerObj((new perljieba::Word(static_cast< const perljieba::Word& >(result))), SWIGTYPE_p_perljieba__Word, SWIG_POINTER_OWN | SWIG_SHADOW); argvi++ ;
+    
+    XSRETURN(argvi);
+  fail:
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_vector_word_get) {
+  {
+    std::vector< perljieba::Word > *arg1 = (std::vector< perljieba::Word > *) 0 ;
+    int arg2 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    int val2 ;
+    int ecode2 = 0 ;
+    int argvi = 0;
+    perljieba::Word *result = 0 ;
+    dXSARGS;
+    
+    if ((items < 2) || (items > 2)) {
+      SWIG_croak("Usage: vector_word_get(self,i);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_std__vectorT_perljieba__Word_t, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "vector_word_get" "', argument " "1"" of type '" "std::vector< perljieba::Word > *""'"); 
+    }
+    arg1 = reinterpret_cast< std::vector< perljieba::Word > * >(argp1);
+    ecode2 = SWIG_AsVal_int SWIG_PERL_CALL_ARGS_2(ST(1), &val2);
+    if (!SWIG_IsOK(ecode2)) {
+      SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "vector_word_get" "', argument " "2"" of type '" "int""'");
+    } 
+    arg2 = static_cast< int >(val2);
+    try {
+      result = (perljieba::Word *) &std_vector_Sl_perljieba_Word_Sg__get(arg1,arg2);
+    }
+    catch(std::out_of_range &_e) {
+      sv_setsv(get_sv("@", GV_ADD), SWIG_NewPointerObj((new std::out_of_range(static_cast< const std::out_of_range& >(_e))),SWIGTYPE_p_std__out_of_range,SWIG_POINTER_OWN)); SWIG_fail ;
+    }
+    
+    ST(argvi) = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_perljieba__Word, 0 | SWIG_SHADOW); argvi++ ;
+    
+    
+    XSRETURN(argvi);
+  fail:
+    
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_vector_word_set) {
+  {
+    std::vector< perljieba::Word > *arg1 = (std::vector< perljieba::Word > *) 0 ;
+    int arg2 ;
+    perljieba::Word *arg3 = 0 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    int val2 ;
+    int ecode2 = 0 ;
+    void *argp3 ;
+    int res3 = 0 ;
+    int argvi = 0;
+    dXSARGS;
+    
+    if ((items < 3) || (items > 3)) {
+      SWIG_croak("Usage: vector_word_set(self,i,x);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_std__vectorT_perljieba__Word_t, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "vector_word_set" "', argument " "1"" of type '" "std::vector< perljieba::Word > *""'"); 
+    }
+    arg1 = reinterpret_cast< std::vector< perljieba::Word > * >(argp1);
+    ecode2 = SWIG_AsVal_int SWIG_PERL_CALL_ARGS_2(ST(1), &val2);
+    if (!SWIG_IsOK(ecode2)) {
+      SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "vector_word_set" "', argument " "2"" of type '" "int""'");
+    } 
+    arg2 = static_cast< int >(val2);
+    res3 = SWIG_ConvertPtr(ST(2), &argp3, SWIGTYPE_p_perljieba__Word,  0 );
+    if (!SWIG_IsOK(res3)) {
+      SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "vector_word_set" "', argument " "3"" of type '" "perljieba::Word const &""'"); 
+    }
+    if (!argp3) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "vector_word_set" "', argument " "3"" of type '" "perljieba::Word const &""'"); 
+    }
+    arg3 = reinterpret_cast< perljieba::Word * >(argp3);
+    try {
+      std_vector_Sl_perljieba_Word_Sg__set(arg1,arg2,(perljieba::Word const &)*arg3);
+    }
+    catch(std::out_of_range &_e) {
+      sv_setsv(get_sv("@", GV_ADD), SWIG_NewPointerObj((new std::out_of_range(static_cast< const std::out_of_range& >(_e))),SWIGTYPE_p_std__out_of_range,SWIG_POINTER_OWN)); SWIG_fail ;
+    }
+    
+    ST(argvi) = sv_newmortal();
+    
+    
+    
+    XSRETURN(argvi);
+  fail:
+    
+    
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_delete_vector_word) {
+  {
+    std::vector< perljieba::Word > *arg1 = (std::vector< perljieba::Word > *) 0 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    int argvi = 0;
+    dXSARGS;
+    
+    if ((items < 1) || (items > 1)) {
+      SWIG_croak("Usage: delete_vector_word(self);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_std__vectorT_perljieba__Word_t, SWIG_POINTER_DISOWN |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_vector_word" "', argument " "1"" of type '" "std::vector< perljieba::Word > *""'"); 
+    }
+    arg1 = reinterpret_cast< std::vector< perljieba::Word > * >(argp1);
+    delete arg1;
+    ST(argvi) = sv_newmortal();
+    
+    XSRETURN(argvi);
+  fail:
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_Word_word_set) {
+  {
+    perljieba::Word *arg1 = (perljieba::Word *) 0 ;
+    std::string *arg2 = 0 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    int res2 = SWIG_OLDOBJ ;
+    int argvi = 0;
+    dXSARGS;
+    
+    if ((items < 2) || (items > 2)) {
+      SWIG_croak("Usage: Word_word_set(self,word);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_perljieba__Word, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Word_word_set" "', argument " "1"" of type '" "perljieba::Word *""'"); 
+    }
+    arg1 = reinterpret_cast< perljieba::Word * >(argp1);
+    {
+      std::string *ptr = (std::string *)0;
+      res2 = SWIG_AsPtr_std_string SWIG_PERL_CALL_ARGS_2(ST(1), &ptr);
+      if (!SWIG_IsOK(res2)) {
+        SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "Word_word_set" "', argument " "2"" of type '" "std::string const &""'"); 
+      }
+      if (!ptr) {
+        SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Word_word_set" "', argument " "2"" of type '" "std::string const &""'"); 
+      }
+      arg2 = ptr;
+    }
+    if (arg1) (arg1)->word = *arg2;
+    ST(argvi) = sv_newmortal();
+    
+    if (SWIG_IsNewObj(res2)) delete arg2;
+    XSRETURN(argvi);
+  fail:
+    
+    if (SWIG_IsNewObj(res2)) delete arg2;
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_Word_word_get) {
+  {
+    perljieba::Word *arg1 = (perljieba::Word *) 0 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    int argvi = 0;
+    std::string *result = 0 ;
+    dXSARGS;
+    
+    if ((items < 1) || (items > 1)) {
+      SWIG_croak("Usage: Word_word_get(self);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_perljieba__Word, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Word_word_get" "', argument " "1"" of type '" "perljieba::Word *""'"); 
+    }
+    arg1 = reinterpret_cast< perljieba::Word * >(argp1);
+    result = (std::string *) & ((arg1)->word);
+    ST(argvi) = SWIG_From_std_string  SWIG_PERL_CALL_ARGS_1(static_cast< std::string >(*result)); argvi++ ;
+    
+    XSRETURN(argvi);
+  fail:
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_Word_offset_set) {
+  {
+    perljieba::Word *arg1 = (perljieba::Word *) 0 ;
+    size_t arg2 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    size_t val2 ;
+    int ecode2 = 0 ;
+    int argvi = 0;
+    dXSARGS;
+    
+    if ((items < 2) || (items > 2)) {
+      SWIG_croak("Usage: Word_offset_set(self,offset);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_perljieba__Word, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Word_offset_set" "', argument " "1"" of type '" "perljieba::Word *""'"); 
+    }
+    arg1 = reinterpret_cast< perljieba::Word * >(argp1);
+    ecode2 = SWIG_AsVal_size_t SWIG_PERL_CALL_ARGS_2(ST(1), &val2);
+    if (!SWIG_IsOK(ecode2)) {
+      SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "Word_offset_set" "', argument " "2"" of type '" "size_t""'");
+    } 
+    arg2 = static_cast< size_t >(val2);
+    if (arg1) (arg1)->offset = arg2;
+    ST(argvi) = sv_newmortal();
+    
+    
+    XSRETURN(argvi);
+  fail:
+    
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_Word_offset_get) {
+  {
+    perljieba::Word *arg1 = (perljieba::Word *) 0 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    int argvi = 0;
+    size_t result;
+    dXSARGS;
+    
+    if ((items < 1) || (items > 1)) {
+      SWIG_croak("Usage: Word_offset_get(self);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_perljieba__Word, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Word_offset_get" "', argument " "1"" of type '" "perljieba::Word *""'"); 
+    }
+    arg1 = reinterpret_cast< perljieba::Word * >(argp1);
+    result =  ((arg1)->offset);
+    ST(argvi) = SWIG_From_size_t  SWIG_PERL_CALL_ARGS_1(static_cast< size_t >(result)); argvi++ ;
+    
+    XSRETURN(argvi);
+  fail:
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_Word_length_set) {
+  {
+    perljieba::Word *arg1 = (perljieba::Word *) 0 ;
+    size_t arg2 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    size_t val2 ;
+    int ecode2 = 0 ;
+    int argvi = 0;
+    dXSARGS;
+    
+    if ((items < 2) || (items > 2)) {
+      SWIG_croak("Usage: Word_length_set(self,length);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_perljieba__Word, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Word_length_set" "', argument " "1"" of type '" "perljieba::Word *""'"); 
+    }
+    arg1 = reinterpret_cast< perljieba::Word * >(argp1);
+    ecode2 = SWIG_AsVal_size_t SWIG_PERL_CALL_ARGS_2(ST(1), &val2);
+    if (!SWIG_IsOK(ecode2)) {
+      SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "Word_length_set" "', argument " "2"" of type '" "size_t""'");
+    } 
+    arg2 = static_cast< size_t >(val2);
+    if (arg1) (arg1)->length = arg2;
+    ST(argvi) = sv_newmortal();
+    
+    
+    XSRETURN(argvi);
+  fail:
+    
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_Word_length_get) {
+  {
+    perljieba::Word *arg1 = (perljieba::Word *) 0 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    int argvi = 0;
+    size_t result;
+    dXSARGS;
+    
+    if ((items < 1) || (items > 1)) {
+      SWIG_croak("Usage: Word_length_get(self);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_perljieba__Word, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Word_length_get" "', argument " "1"" of type '" "perljieba::Word *""'"); 
+    }
+    arg1 = reinterpret_cast< perljieba::Word * >(argp1);
+    result =  ((arg1)->length);
+    ST(argvi) = SWIG_From_size_t  SWIG_PERL_CALL_ARGS_1(static_cast< size_t >(result)); argvi++ ;
+    
+    XSRETURN(argvi);
+  fail:
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_new_Word__SWIG_0) {
+  {
+    int argvi = 0;
+    perljieba::Word *result = 0 ;
+    dXSARGS;
+    
+    if ((items < 0) || (items > 0)) {
+      SWIG_croak("Usage: new_Word();");
+    }
+    result = (perljieba::Word *)new perljieba::Word();
+    ST(argvi) = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_perljieba__Word, SWIG_OWNER | SWIG_SHADOW); argvi++ ;
+    XSRETURN(argvi);
+  fail:
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_new_Word__SWIG_1) {
+  {
+    cppjieba::Word *arg1 = 0 ;
+    void *argp1 ;
+    int res1 = 0 ;
+    int argvi = 0;
+    perljieba::Word *result = 0 ;
+    dXSARGS;
+    
+    if ((items < 1) || (items > 1)) {
+      SWIG_croak("Usage: new_Word(w);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1, SWIGTYPE_p_cppjieba__Word,  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_Word" "', argument " "1"" of type '" "cppjieba::Word const &""'"); 
+    }
+    if (!argp1) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_Word" "', argument " "1"" of type '" "cppjieba::Word const &""'"); 
+    }
+    arg1 = reinterpret_cast< cppjieba::Word * >(argp1);
+    result = (perljieba::Word *)new perljieba::Word((cppjieba::Word const &)*arg1);
+    ST(argvi) = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_perljieba__Word, SWIG_OWNER | SWIG_SHADOW); argvi++ ;
+    
+    XSRETURN(argvi);
+  fail:
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_new_Word) {
+  dXSARGS;
+  
+  {
+    unsigned long _index = 0;
+    SWIG_TypeRank _rank = 0; 
+    if (items == 0) {
+      SWIG_TypeRank _ranki = 0;
+      SWIG_TypeRank _rankm = 0;
+      if (!_index || (_ranki < _rank)) {
+        _rank = _ranki; _index = 1;
+        if (_rank == _rankm) goto dispatch;
+      }
+    }
+    if (items == 1) {
+      SWIG_TypeRank _ranki = 0;
+      SWIG_TypeRank _rankm = 0;
+      SWIG_TypeRank _pi = 1;
+      int _v = 0;
+      {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(ST(0), &vptr, SWIGTYPE_p_cppjieba__Word, 0);
+        _v = SWIG_CheckState(res);
+      }
+      if (!_v) goto check_2;
+      _ranki += _v*_pi;
+      _rankm += _pi;
+      _pi *= SWIG_MAXCASTRANK;
+      if (!_index || (_ranki < _rank)) {
+        _rank = _ranki; _index = 2;
+        if (_rank == _rankm) goto dispatch;
+      }
+    }
+  check_2:
+    
+  dispatch:
+    switch(_index) {
+    case 1:
+      PUSHMARK(MARK); SWIG_CALLXS(_wrap_new_Word__SWIG_0); return;
+    case 2:
+      PUSHMARK(MARK); SWIG_CALLXS(_wrap_new_Word__SWIG_1); return;
+    }
+  }
+  
+  croak("No matching function for overloaded 'new_Word'");
+  XSRETURN(0);
+}
+
+
+XS(_wrap_delete_Word) {
+  {
+    perljieba::Word *arg1 = (perljieba::Word *) 0 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    int argvi = 0;
+    dXSARGS;
+    
+    if ((items < 1) || (items > 1)) {
+      SWIG_croak("Usage: delete_Word(self);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_perljieba__Word, SWIG_POINTER_DISOWN |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_Word" "', argument " "1"" of type '" "perljieba::Word *""'"); 
+    }
+    arg1 = reinterpret_cast< perljieba::Word * >(argp1);
+    delete arg1;
+    ST(argvi) = sv_newmortal();
+    
+    XSRETURN(argvi);
+  fail:
+    
+    SWIG_croak_null();
+  }
+}
+
+
 XS(_wrap_new_KeywordExtractor) {
   {
     cppjieba::DictTrie *arg1 = (cppjieba::DictTrie *) 0 ;
@@ -4442,6 +5455,214 @@ XS(_wrap_Jieba__cut) {
 }
 
 
+XS(_wrap_Jieba__cut_ex__SWIG_0) {
+  {
+    perljieba::Jieba *arg1 = (perljieba::Jieba *) 0 ;
+    std::string *arg2 = 0 ;
+    bool arg3 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    int res2 = SWIG_OLDOBJ ;
+    bool val3 ;
+    int ecode3 = 0 ;
+    int argvi = 0;
+    std::vector< perljieba::Word > result;
+    dXSARGS;
+    
+    if ((items < 3) || (items > 3)) {
+      SWIG_croak("Usage: Jieba__cut_ex(self,sentence,hmm);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_perljieba__Jieba, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Jieba__cut_ex" "', argument " "1"" of type '" "perljieba::Jieba *""'"); 
+    }
+    arg1 = reinterpret_cast< perljieba::Jieba * >(argp1);
+    {
+      std::string *ptr = (std::string *)0;
+      res2 = SWIG_AsPtr_std_string SWIG_PERL_CALL_ARGS_2(ST(1), &ptr);
+      if (!SWIG_IsOK(res2)) {
+        SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "Jieba__cut_ex" "', argument " "2"" of type '" "std::string const &""'"); 
+      }
+      if (!ptr) {
+        SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Jieba__cut_ex" "', argument " "2"" of type '" "std::string const &""'"); 
+      }
+      arg2 = ptr;
+    }
+    ecode3 = SWIG_AsVal_bool SWIG_PERL_CALL_ARGS_2(ST(2), &val3);
+    if (!SWIG_IsOK(ecode3)) {
+      SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "Jieba__cut_ex" "', argument " "3"" of type '" "bool""'");
+    } 
+    arg3 = static_cast< bool >(val3);
+    result = (arg1)->_cut_ex((std::string const &)*arg2,arg3);
+    {
+      size_t len = (&result)->size();
+      SV **svs = new SV*[len];
+      for (size_t i=0; i<len; i++) {
+        svs[i] = sv_newmortal();
+        SwigSvFromWord(svs[i], result[i]);
+      }
+      AV *myav = av_make(len, svs);
+      delete[] svs;
+      ST(argvi) = newRV_noinc((SV*) myav);
+      sv_2mortal(ST(argvi));
+      argvi++;
+    }
+    
+    if (SWIG_IsNewObj(res2)) delete arg2;
+    
+    XSRETURN(argvi);
+  fail:
+    
+    if (SWIG_IsNewObj(res2)) delete arg2;
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_Jieba__cut_ex__SWIG_1) {
+  {
+    perljieba::Jieba *arg1 = (perljieba::Jieba *) 0 ;
+    std::string *arg2 = 0 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    int res2 = SWIG_OLDOBJ ;
+    int argvi = 0;
+    std::vector< perljieba::Word > result;
+    dXSARGS;
+    
+    if ((items < 2) || (items > 2)) {
+      SWIG_croak("Usage: Jieba__cut_ex(self,sentence);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_perljieba__Jieba, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Jieba__cut_ex" "', argument " "1"" of type '" "perljieba::Jieba *""'"); 
+    }
+    arg1 = reinterpret_cast< perljieba::Jieba * >(argp1);
+    {
+      std::string *ptr = (std::string *)0;
+      res2 = SWIG_AsPtr_std_string SWIG_PERL_CALL_ARGS_2(ST(1), &ptr);
+      if (!SWIG_IsOK(res2)) {
+        SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "Jieba__cut_ex" "', argument " "2"" of type '" "std::string const &""'"); 
+      }
+      if (!ptr) {
+        SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Jieba__cut_ex" "', argument " "2"" of type '" "std::string const &""'"); 
+      }
+      arg2 = ptr;
+    }
+    result = (arg1)->_cut_ex((std::string const &)*arg2);
+    {
+      size_t len = (&result)->size();
+      SV **svs = new SV*[len];
+      for (size_t i=0; i<len; i++) {
+        svs[i] = sv_newmortal();
+        SwigSvFromWord(svs[i], result[i]);
+      }
+      AV *myav = av_make(len, svs);
+      delete[] svs;
+      ST(argvi) = newRV_noinc((SV*) myav);
+      sv_2mortal(ST(argvi));
+      argvi++;
+    }
+    
+    if (SWIG_IsNewObj(res2)) delete arg2;
+    XSRETURN(argvi);
+  fail:
+    
+    if (SWIG_IsNewObj(res2)) delete arg2;
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_Jieba__cut_ex) {
+  dXSARGS;
+  
+  {
+    unsigned long _index = 0;
+    SWIG_TypeRank _rank = 0; 
+    if (items == 2) {
+      SWIG_TypeRank _ranki = 0;
+      SWIG_TypeRank _rankm = 0;
+      SWIG_TypeRank _pi = 1;
+      int _v = 0;
+      {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(ST(0), &vptr, SWIGTYPE_p_perljieba__Jieba, 0);
+        _v = SWIG_CheckState(res);
+      }
+      if (!_v) goto check_1;
+      _ranki += _v*_pi;
+      _rankm += _pi;
+      _pi *= SWIG_MAXCASTRANK;
+      {
+        int res = SWIG_AsPtr_std_string SWIG_PERL_CALL_ARGS_2(ST(1), (std::string**)(0));
+        _v = SWIG_CheckState(res);
+      }
+      if (!_v) goto check_1;
+      _ranki += _v*_pi;
+      _rankm += _pi;
+      _pi *= SWIG_MAXCASTRANK;
+      if (!_index || (_ranki < _rank)) {
+        _rank = _ranki; _index = 1;
+        if (_rank == _rankm) goto dispatch;
+      }
+    }
+  check_1:
+    
+    if (items == 3) {
+      SWIG_TypeRank _ranki = 0;
+      SWIG_TypeRank _rankm = 0;
+      SWIG_TypeRank _pi = 1;
+      int _v = 0;
+      {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(ST(0), &vptr, SWIGTYPE_p_perljieba__Jieba, 0);
+        _v = SWIG_CheckState(res);
+      }
+      if (!_v) goto check_2;
+      _ranki += _v*_pi;
+      _rankm += _pi;
+      _pi *= SWIG_MAXCASTRANK;
+      {
+        int res = SWIG_AsPtr_std_string SWIG_PERL_CALL_ARGS_2(ST(1), (std::string**)(0));
+        _v = SWIG_CheckState(res);
+      }
+      if (!_v) goto check_2;
+      _ranki += _v*_pi;
+      _rankm += _pi;
+      _pi *= SWIG_MAXCASTRANK;
+      {
+        {
+          int res = SWIG_AsVal_bool SWIG_PERL_CALL_ARGS_2(ST(2), NULL);
+          _v = SWIG_CheckState(res);
+        }
+      }
+      if (!_v) goto check_2;
+      _ranki += _v*_pi;
+      _rankm += _pi;
+      _pi *= SWIG_MAXCASTRANK;
+      if (!_index || (_ranki < _rank)) {
+        _rank = _ranki; _index = 2;
+        if (_rank == _rankm) goto dispatch;
+      }
+    }
+  check_2:
+    
+  dispatch:
+    switch(_index) {
+    case 1:
+      PUSHMARK(MARK); SWIG_CALLXS(_wrap_Jieba__cut_ex__SWIG_1); return;
+    case 2:
+      PUSHMARK(MARK); SWIG_CALLXS(_wrap_Jieba__cut_ex__SWIG_0); return;
+    }
+  }
+  
+  croak("No matching function for overloaded 'Jieba__cut_ex'");
+  XSRETURN(0);
+}
+
+
 XS(_wrap_Jieba__cut_all) {
   {
     perljieba::Jieba *arg1 = (perljieba::Jieba *) 0 ;
@@ -4479,6 +5700,61 @@ XS(_wrap_Jieba__cut_all) {
       for (size_t i=0; i<len; i++) {
         svs[i] = sv_newmortal();
         SwigSvFromString(svs[i], result[i]);
+      }
+      AV *myav = av_make(len, svs);
+      delete[] svs;
+      ST(argvi) = newRV_noinc((SV*) myav);
+      sv_2mortal(ST(argvi));
+      argvi++;
+    }
+    
+    if (SWIG_IsNewObj(res2)) delete arg2;
+    XSRETURN(argvi);
+  fail:
+    
+    if (SWIG_IsNewObj(res2)) delete arg2;
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_Jieba__cut_all_ex) {
+  {
+    perljieba::Jieba *arg1 = (perljieba::Jieba *) 0 ;
+    std::string *arg2 = 0 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    int res2 = SWIG_OLDOBJ ;
+    int argvi = 0;
+    std::vector< perljieba::Word > result;
+    dXSARGS;
+    
+    if ((items < 2) || (items > 2)) {
+      SWIG_croak("Usage: Jieba__cut_all_ex(self,sentence);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_perljieba__Jieba, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Jieba__cut_all_ex" "', argument " "1"" of type '" "perljieba::Jieba *""'"); 
+    }
+    arg1 = reinterpret_cast< perljieba::Jieba * >(argp1);
+    {
+      std::string *ptr = (std::string *)0;
+      res2 = SWIG_AsPtr_std_string SWIG_PERL_CALL_ARGS_2(ST(1), &ptr);
+      if (!SWIG_IsOK(res2)) {
+        SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "Jieba__cut_all_ex" "', argument " "2"" of type '" "std::string const &""'"); 
+      }
+      if (!ptr) {
+        SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Jieba__cut_all_ex" "', argument " "2"" of type '" "std::string const &""'"); 
+      }
+      arg2 = ptr;
+    }
+    result = (arg1)->_cut_all_ex((std::string const &)*arg2);
+    {
+      size_t len = (&result)->size();
+      SV **svs = new SV*[len];
+      for (size_t i=0; i<len; i++) {
+        svs[i] = sv_newmortal();
+        SwigSvFromWord(svs[i], result[i]);
       }
       AV *myav = av_make(len, svs);
       delete[] svs;
@@ -4701,6 +5977,214 @@ XS(_wrap_Jieba__cut_for_search) {
   }
   
   croak("No matching function for overloaded 'Jieba__cut_for_search'");
+  XSRETURN(0);
+}
+
+
+XS(_wrap_Jieba__cut_for_search_ex__SWIG_0) {
+  {
+    perljieba::Jieba *arg1 = (perljieba::Jieba *) 0 ;
+    std::string *arg2 = 0 ;
+    bool arg3 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    int res2 = SWIG_OLDOBJ ;
+    bool val3 ;
+    int ecode3 = 0 ;
+    int argvi = 0;
+    std::vector< perljieba::Word > result;
+    dXSARGS;
+    
+    if ((items < 3) || (items > 3)) {
+      SWIG_croak("Usage: Jieba__cut_for_search_ex(self,sentence,hmm);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_perljieba__Jieba, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Jieba__cut_for_search_ex" "', argument " "1"" of type '" "perljieba::Jieba *""'"); 
+    }
+    arg1 = reinterpret_cast< perljieba::Jieba * >(argp1);
+    {
+      std::string *ptr = (std::string *)0;
+      res2 = SWIG_AsPtr_std_string SWIG_PERL_CALL_ARGS_2(ST(1), &ptr);
+      if (!SWIG_IsOK(res2)) {
+        SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "Jieba__cut_for_search_ex" "', argument " "2"" of type '" "std::string const &""'"); 
+      }
+      if (!ptr) {
+        SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Jieba__cut_for_search_ex" "', argument " "2"" of type '" "std::string const &""'"); 
+      }
+      arg2 = ptr;
+    }
+    ecode3 = SWIG_AsVal_bool SWIG_PERL_CALL_ARGS_2(ST(2), &val3);
+    if (!SWIG_IsOK(ecode3)) {
+      SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "Jieba__cut_for_search_ex" "', argument " "3"" of type '" "bool""'");
+    } 
+    arg3 = static_cast< bool >(val3);
+    result = (arg1)->_cut_for_search_ex((std::string const &)*arg2,arg3);
+    {
+      size_t len = (&result)->size();
+      SV **svs = new SV*[len];
+      for (size_t i=0; i<len; i++) {
+        svs[i] = sv_newmortal();
+        SwigSvFromWord(svs[i], result[i]);
+      }
+      AV *myav = av_make(len, svs);
+      delete[] svs;
+      ST(argvi) = newRV_noinc((SV*) myav);
+      sv_2mortal(ST(argvi));
+      argvi++;
+    }
+    
+    if (SWIG_IsNewObj(res2)) delete arg2;
+    
+    XSRETURN(argvi);
+  fail:
+    
+    if (SWIG_IsNewObj(res2)) delete arg2;
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_Jieba__cut_for_search_ex__SWIG_1) {
+  {
+    perljieba::Jieba *arg1 = (perljieba::Jieba *) 0 ;
+    std::string *arg2 = 0 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    int res2 = SWIG_OLDOBJ ;
+    int argvi = 0;
+    std::vector< perljieba::Word > result;
+    dXSARGS;
+    
+    if ((items < 2) || (items > 2)) {
+      SWIG_croak("Usage: Jieba__cut_for_search_ex(self,sentence);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_perljieba__Jieba, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Jieba__cut_for_search_ex" "', argument " "1"" of type '" "perljieba::Jieba *""'"); 
+    }
+    arg1 = reinterpret_cast< perljieba::Jieba * >(argp1);
+    {
+      std::string *ptr = (std::string *)0;
+      res2 = SWIG_AsPtr_std_string SWIG_PERL_CALL_ARGS_2(ST(1), &ptr);
+      if (!SWIG_IsOK(res2)) {
+        SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "Jieba__cut_for_search_ex" "', argument " "2"" of type '" "std::string const &""'"); 
+      }
+      if (!ptr) {
+        SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Jieba__cut_for_search_ex" "', argument " "2"" of type '" "std::string const &""'"); 
+      }
+      arg2 = ptr;
+    }
+    result = (arg1)->_cut_for_search_ex((std::string const &)*arg2);
+    {
+      size_t len = (&result)->size();
+      SV **svs = new SV*[len];
+      for (size_t i=0; i<len; i++) {
+        svs[i] = sv_newmortal();
+        SwigSvFromWord(svs[i], result[i]);
+      }
+      AV *myav = av_make(len, svs);
+      delete[] svs;
+      ST(argvi) = newRV_noinc((SV*) myav);
+      sv_2mortal(ST(argvi));
+      argvi++;
+    }
+    
+    if (SWIG_IsNewObj(res2)) delete arg2;
+    XSRETURN(argvi);
+  fail:
+    
+    if (SWIG_IsNewObj(res2)) delete arg2;
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_Jieba__cut_for_search_ex) {
+  dXSARGS;
+  
+  {
+    unsigned long _index = 0;
+    SWIG_TypeRank _rank = 0; 
+    if (items == 2) {
+      SWIG_TypeRank _ranki = 0;
+      SWIG_TypeRank _rankm = 0;
+      SWIG_TypeRank _pi = 1;
+      int _v = 0;
+      {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(ST(0), &vptr, SWIGTYPE_p_perljieba__Jieba, 0);
+        _v = SWIG_CheckState(res);
+      }
+      if (!_v) goto check_1;
+      _ranki += _v*_pi;
+      _rankm += _pi;
+      _pi *= SWIG_MAXCASTRANK;
+      {
+        int res = SWIG_AsPtr_std_string SWIG_PERL_CALL_ARGS_2(ST(1), (std::string**)(0));
+        _v = SWIG_CheckState(res);
+      }
+      if (!_v) goto check_1;
+      _ranki += _v*_pi;
+      _rankm += _pi;
+      _pi *= SWIG_MAXCASTRANK;
+      if (!_index || (_ranki < _rank)) {
+        _rank = _ranki; _index = 1;
+        if (_rank == _rankm) goto dispatch;
+      }
+    }
+  check_1:
+    
+    if (items == 3) {
+      SWIG_TypeRank _ranki = 0;
+      SWIG_TypeRank _rankm = 0;
+      SWIG_TypeRank _pi = 1;
+      int _v = 0;
+      {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(ST(0), &vptr, SWIGTYPE_p_perljieba__Jieba, 0);
+        _v = SWIG_CheckState(res);
+      }
+      if (!_v) goto check_2;
+      _ranki += _v*_pi;
+      _rankm += _pi;
+      _pi *= SWIG_MAXCASTRANK;
+      {
+        int res = SWIG_AsPtr_std_string SWIG_PERL_CALL_ARGS_2(ST(1), (std::string**)(0));
+        _v = SWIG_CheckState(res);
+      }
+      if (!_v) goto check_2;
+      _ranki += _v*_pi;
+      _rankm += _pi;
+      _pi *= SWIG_MAXCASTRANK;
+      {
+        {
+          int res = SWIG_AsVal_bool SWIG_PERL_CALL_ARGS_2(ST(2), NULL);
+          _v = SWIG_CheckState(res);
+        }
+      }
+      if (!_v) goto check_2;
+      _ranki += _v*_pi;
+      _rankm += _pi;
+      _pi *= SWIG_MAXCASTRANK;
+      if (!_index || (_ranki < _rank)) {
+        _rank = _ranki; _index = 2;
+        if (_rank == _rankm) goto dispatch;
+      }
+    }
+  check_2:
+    
+  dispatch:
+    switch(_index) {
+    case 1:
+      PUSHMARK(MARK); SWIG_CALLXS(_wrap_Jieba__cut_for_search_ex__SWIG_1); return;
+    case 2:
+      PUSHMARK(MARK); SWIG_CALLXS(_wrap_Jieba__cut_for_search_ex__SWIG_0); return;
+    }
+  }
+  
+  croak("No matching function for overloaded 'Jieba__cut_for_search_ex'");
   XSRETURN(0);
 }
 
@@ -5008,14 +6492,17 @@ XS(_wrap_delete_Jieba) {
 static swig_type_info _swigt__p_char = {"_p_char", "char *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_cppjieba__DictTrie = {"_p_cppjieba__DictTrie", "cppjieba::DictTrie *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_cppjieba__HMMModel = {"_p_cppjieba__HMMModel", "cppjieba::HMMModel *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_cppjieba__Word = {"_p_cppjieba__Word", "cppjieba::Word *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_pairT_std__string_double_t = {"_p_pairT_std__string_double_t", "pair< std::string,double > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_pairT_std__string_std__string_t = {"_p_pairT_std__string_std__string_t", "pair< std::string,std::string > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_perljieba__Jieba = {"_p_perljieba__Jieba", "perljieba::Jieba *", 0, 0, (void*)"Lingua::ZH::Jieba::Jieba", 0};
 static swig_type_info _swigt__p_perljieba__KeywordExtractor = {"_p_perljieba__KeywordExtractor", "perljieba::KeywordExtractor *", 0, 0, (void*)"Lingua::ZH::Jieba::KeywordExtractor", 0};
+static swig_type_info _swigt__p_perljieba__Word = {"_p_perljieba__Word", "perljieba::Word *", 0, 0, (void*)"Lingua::ZH::Jieba::Word", 0};
 static swig_type_info _swigt__p_size_type = {"_p_size_type", "size_type *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__out_of_range = {"_p_std__out_of_range", "std::out_of_range *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__vectorT_pairT_std__string_double_t_t = {"_p_std__vectorT_pairT_std__string_double_t_t", "std::vector< pair< std::string,double > > *", 0, 0, (void*)"Lingua::ZH::Jieba::vector_keyword", 0};
 static swig_type_info _swigt__p_std__vectorT_pairT_std__string_std__string_t_t = {"_p_std__vectorT_pairT_std__string_std__string_t_t", "std::vector< pair< std::string,std::string > > *", 0, 0, (void*)"Lingua::ZH::Jieba::vector_wordpos", 0};
+static swig_type_info _swigt__p_std__vectorT_perljieba__Word_t = {"_p_std__vectorT_perljieba__Word_t", "std::vector< perljieba::Word > *", 0, 0, (void*)"Lingua::ZH::Jieba::vector_word", 0};
 static swig_type_info _swigt__p_std__vectorT_std__string_t = {"_p_std__vectorT_std__string_t", "std::vector< std::string > *", 0, 0, (void*)"Lingua::ZH::Jieba::vector_s", 0};
 static swig_type_info _swigt__p_value_type = {"_p_value_type", "value_type *", 0, 0, (void*)0, 0};
 
@@ -5023,14 +6510,17 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_char,
   &_swigt__p_cppjieba__DictTrie,
   &_swigt__p_cppjieba__HMMModel,
+  &_swigt__p_cppjieba__Word,
   &_swigt__p_pairT_std__string_double_t,
   &_swigt__p_pairT_std__string_std__string_t,
   &_swigt__p_perljieba__Jieba,
   &_swigt__p_perljieba__KeywordExtractor,
+  &_swigt__p_perljieba__Word,
   &_swigt__p_size_type,
   &_swigt__p_std__out_of_range,
   &_swigt__p_std__vectorT_pairT_std__string_double_t_t,
   &_swigt__p_std__vectorT_pairT_std__string_std__string_t_t,
+  &_swigt__p_std__vectorT_perljieba__Word_t,
   &_swigt__p_std__vectorT_std__string_t,
   &_swigt__p_value_type,
 };
@@ -5038,14 +6528,17 @@ static swig_type_info *swig_type_initial[] = {
 static swig_cast_info _swigc__p_char[] = {  {&_swigt__p_char, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_cppjieba__DictTrie[] = {  {&_swigt__p_cppjieba__DictTrie, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_cppjieba__HMMModel[] = {  {&_swigt__p_cppjieba__HMMModel, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_cppjieba__Word[] = {  {&_swigt__p_cppjieba__Word, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_pairT_std__string_double_t[] = {  {&_swigt__p_pairT_std__string_double_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_pairT_std__string_std__string_t[] = {  {&_swigt__p_pairT_std__string_std__string_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_perljieba__Jieba[] = {  {&_swigt__p_perljieba__Jieba, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_perljieba__KeywordExtractor[] = {  {&_swigt__p_perljieba__KeywordExtractor, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_perljieba__Word[] = {  {&_swigt__p_perljieba__Word, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_size_type[] = {  {&_swigt__p_size_type, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__out_of_range[] = {  {&_swigt__p_std__out_of_range, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__vectorT_pairT_std__string_double_t_t[] = {  {&_swigt__p_std__vectorT_pairT_std__string_double_t_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__vectorT_pairT_std__string_std__string_t_t[] = {  {&_swigt__p_std__vectorT_pairT_std__string_std__string_t_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_std__vectorT_perljieba__Word_t[] = {  {&_swigt__p_std__vectorT_perljieba__Word_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__vectorT_std__string_t[] = {  {&_swigt__p_std__vectorT_std__string_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_value_type[] = {  {&_swigt__p_value_type, 0, 0, 0},{0, 0, 0, 0}};
 
@@ -5053,14 +6546,17 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_char,
   _swigc__p_cppjieba__DictTrie,
   _swigc__p_cppjieba__HMMModel,
+  _swigc__p_cppjieba__Word,
   _swigc__p_pairT_std__string_double_t,
   _swigc__p_pairT_std__string_std__string_t,
   _swigc__p_perljieba__Jieba,
   _swigc__p_perljieba__KeywordExtractor,
+  _swigc__p_perljieba__Word,
   _swigc__p_size_type,
   _swigc__p_std__out_of_range,
   _swigc__p_std__vectorT_pairT_std__string_double_t_t,
   _swigc__p_std__vectorT_pairT_std__string_std__string_t_t,
+  _swigc__p_std__vectorT_perljieba__Word_t,
   _swigc__p_std__vectorT_std__string_t,
   _swigc__p_value_type,
 };
@@ -5105,13 +6601,33 @@ static swig_command_info swig_commands[] = {
 {"Lingua::ZH::Jiebac::vector_keyword_get", _wrap_vector_keyword_get},
 {"Lingua::ZH::Jiebac::vector_keyword_set", _wrap_vector_keyword_set},
 {"Lingua::ZH::Jiebac::delete_vector_keyword", _wrap_delete_vector_keyword},
+{"Lingua::ZH::Jiebac::new_vector_word", _wrap_new_vector_word},
+{"Lingua::ZH::Jiebac::vector_word_size", _wrap_vector_word_size},
+{"Lingua::ZH::Jiebac::vector_word_empty", _wrap_vector_word_empty},
+{"Lingua::ZH::Jiebac::vector_word_clear", _wrap_vector_word_clear},
+{"Lingua::ZH::Jiebac::vector_word_push", _wrap_vector_word_push},
+{"Lingua::ZH::Jiebac::vector_word_pop", _wrap_vector_word_pop},
+{"Lingua::ZH::Jiebac::vector_word_get", _wrap_vector_word_get},
+{"Lingua::ZH::Jiebac::vector_word_set", _wrap_vector_word_set},
+{"Lingua::ZH::Jiebac::delete_vector_word", _wrap_delete_vector_word},
+{"Lingua::ZH::Jiebac::Word_word_set", _wrap_Word_word_set},
+{"Lingua::ZH::Jiebac::Word_word_get", _wrap_Word_word_get},
+{"Lingua::ZH::Jiebac::Word_offset_set", _wrap_Word_offset_set},
+{"Lingua::ZH::Jiebac::Word_offset_get", _wrap_Word_offset_get},
+{"Lingua::ZH::Jiebac::Word_length_set", _wrap_Word_length_set},
+{"Lingua::ZH::Jiebac::Word_length_get", _wrap_Word_length_get},
+{"Lingua::ZH::Jiebac::new_Word", _wrap_new_Word},
+{"Lingua::ZH::Jiebac::delete_Word", _wrap_delete_Word},
 {"Lingua::ZH::Jiebac::new_KeywordExtractor", _wrap_new_KeywordExtractor},
 {"Lingua::ZH::Jiebac::KeywordExtractor__extract", _wrap_KeywordExtractor__extract},
 {"Lingua::ZH::Jiebac::delete_KeywordExtractor", _wrap_delete_KeywordExtractor},
 {"Lingua::ZH::Jiebac::new_Jieba", _wrap_new_Jieba},
 {"Lingua::ZH::Jiebac::Jieba__cut", _wrap_Jieba__cut},
+{"Lingua::ZH::Jiebac::Jieba__cut_ex", _wrap_Jieba__cut_ex},
 {"Lingua::ZH::Jiebac::Jieba__cut_all", _wrap_Jieba__cut_all},
+{"Lingua::ZH::Jiebac::Jieba__cut_all_ex", _wrap_Jieba__cut_all_ex},
 {"Lingua::ZH::Jiebac::Jieba__cut_for_search", _wrap_Jieba__cut_for_search},
+{"Lingua::ZH::Jiebac::Jieba__cut_for_search_ex", _wrap_Jieba__cut_for_search_ex},
 {"Lingua::ZH::Jiebac::Jieba_insert_user_word", _wrap_Jieba_insert_user_word},
 {"Lingua::ZH::Jiebac::Jieba__tag", _wrap_Jieba__tag},
 {"Lingua::ZH::Jiebac::Jieba_extractor", _wrap_Jieba_extractor},
@@ -5413,6 +6929,8 @@ XS(SWIG_init) {
   SWIG_TypeClientData(SWIGTYPE_p_std__vectorT_std__string_t, (void*) "Lingua::ZH::Jieba::vector_s");
   SWIG_TypeClientData(SWIGTYPE_p_std__vectorT_pairT_std__string_std__string_t_t, (void*) "Lingua::ZH::Jieba::vector_wordpos");
   SWIG_TypeClientData(SWIGTYPE_p_std__vectorT_pairT_std__string_double_t_t, (void*) "Lingua::ZH::Jieba::vector_keyword");
+  SWIG_TypeClientData(SWIGTYPE_p_std__vectorT_perljieba__Word_t, (void*) "Lingua::ZH::Jieba::vector_word");
+  SWIG_TypeClientData(SWIGTYPE_p_perljieba__Word, (void*) "Lingua::ZH::Jieba::Word");
   SWIG_TypeClientData(SWIGTYPE_p_perljieba__KeywordExtractor, (void*) "Lingua::ZH::Jieba::KeywordExtractor");
   SWIG_TypeClientData(SWIGTYPE_p_perljieba__Jieba, (void*) "Lingua::ZH::Jieba::Jieba");
   ST(0) = &PL_sv_yes;

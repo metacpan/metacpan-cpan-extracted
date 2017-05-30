@@ -1,5 +1,8 @@
 Revision history for Net-DNS-SPF-Expander
 
+0.019   2017-05-29
+    - Fix tests again, not specific IPs, but just regexes 
+
 0.018   2016-07-05
     - Repair file content tests,
     - Stricter record length treatment

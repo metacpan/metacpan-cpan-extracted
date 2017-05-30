@@ -1,4 +1,4 @@
-# Copyright 2015, 2016 Kevin Ryde
+# Copyright 2015, 2016, 2017 Kevin Ryde
 #
 # This file is part of Graph-Graph6.
 #
@@ -24,35 +24,44 @@ use Carp 'croak';
 
 use Exporter;
 our @ISA = ('Exporter');
-our @EXPORT_OK = ('read_graph','write_graph');
+our @EXPORT_OK = ('read_graph','write_graph',
+                  'HEADER_GRAPH6','HEADER_SPARSE6','HEADER_DIGRAPH6');
 
-our $VERSION = 6;
+our $VERSION = 7;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
 
-use constant 1.02 _HEADER_GRAPH6  => '>>graph6<<';
-use constant      _HEADER_SPARSE6 => '>>sparse6<<';
+use constant HEADER_GRAPH6   => '>>graph6<<';
+use constant HEADER_SPARSE6  => '>>sparse6<<';
+use constant HEADER_DIGRAPH6 => '>>digraph6<<';
 
 sub _read_header {
-  my ($fh) = @_;
-  my $str = '>';
+  my ($fh, $str) = @_;
   for (;;) {
     my $s2 = getc $fh;
     if (! defined $str) { return; }
 
     $str .= $s2;
-    if ($str eq substr(_HEADER_GRAPH6, 0, length($str))) {
-      if (length($str) == length(_HEADER_GRAPH6)) {
+    if ($str eq substr(HEADER_GRAPH6, 0, length($str))) {
+      if (length($str) == length(HEADER_GRAPH6)) {
         ### header: $str
+        # $format = 'graph6';
         return;
       }
 
-    } elsif ($str eq substr(_HEADER_SPARSE6, 0, length($str))) {
-      if (length($str) == length(_HEADER_SPARSE6)) {
+    } elsif ($str eq substr(HEADER_SPARSE6, 0, length($str))) {
+      if (length($str) == length(HEADER_SPARSE6)) {
         ### header: $str
-        # $sparse = 1;
+        # $format = 'sparse6';
+        return;
+      }
+
+    } elsif ($str eq substr(HEADER_DIGRAPH6, 0, length($str))) {
+      if (length($str) == length(HEADER_DIGRAPH6)) {
+        ### header: $str
+        # $format = 'digraph6';
         return;
       }
     } else {
@@ -64,8 +73,6 @@ sub _read_header {
 sub read_graph {
   my %options = @_;
 
-  my $error;
-
   my $fh = $options{'fh'};
   if (defined $options{'str'}) {
     require IO::String;
@@ -74,7 +81,9 @@ sub read_graph {
 
   my $skip_newlines = 1;
   my $allow_header = 1;
-  my $sparse;
+  my $format = 'graph6';
+  my $initial = 1;
+  my $error;
 
   # Return: byte 0 to 63
   #      or -1 and $error=undef if end of file
@@ -98,7 +107,7 @@ sub read_graph {
       $skip_newlines = 0;
 
       if ($allow_header && $str eq '>') {
-        $str = _read_header($fh);
+        $str = _read_header($fh, $str);
         if (defined $str) {
           $error = "Incomplete header: $str";
           return -1;
@@ -118,8 +127,16 @@ sub read_graph {
         return -1;
       }
 
-      if ($str eq ':') {
-        $sparse = 1;
+      if ($initial && $str eq '&') {
+        $format = 'digraph6';
+        ### $format
+        $initial = 0;
+        next;
+      }
+      if ($initial && $str eq ':') {
+        $format = 'sparse6';
+        ### $format
+        $initial = 0;
         next;
       }
       if ($str eq "\r") {
@@ -137,6 +154,7 @@ sub read_graph {
   #         -1 and $error if something bad, including partial number
   my $read_number = sub {
     my $n = $read_byte->();
+    $initial = 0;
     if ($n <= 62) {
       return $n;
     }
@@ -163,9 +181,9 @@ sub read_graph {
     return $n;
   };
 
-  # Return 1 if good.
-  # Return empty list and $error=string if something bad.
-  # Return empty list and $error=undef if EOF.
+  # Return true if good.
+  # Return false and $error=string if something bad.
+  # Return false and $error=undef if EOF.
   my $read = sub {
 
     if (! defined $fh) {
@@ -180,24 +198,30 @@ sub read_graph {
 
     my $num_vertices = $read_number->();
     ### $num_vertices
+
+    if (my $format_func = $options{'format_func'}) {
+      $format_func->($format);
+    }
+    if (my $format_ref = $options{'format_ref'}) {
+      $$format_ref = $format;
+    }
+
     if ($num_vertices < 0) {
       return;  # eof or possible error
     }
-
     if (my $num_vertices_func = $options{'num_vertices_func'}) {
       $num_vertices_func->($num_vertices);
     }
     if (my $num_vertices_ref = $options{'num_vertices_ref'}) {
       $$num_vertices_ref = $num_vertices;
     }
-    ### $num_vertices
-    ### $sparse
 
     my $edge_func = $options{'edge_func'};
     my $edge_aref = $options{'edge_aref'};
     if ($edge_aref) { @$edge_aref = (); }
 
-    if ($sparse) {
+    ### $format
+    if ($format eq 'sparse6') {
       ### sparse6 ...
       my $v = 0;
 
@@ -213,22 +237,24 @@ sub read_graph {
         if ($bits < 1) {
           $n = $read_byte->();
           if ($n < 0) {
-            ### end of line or end of file ok ...
-            return 1;
+            ### end n ...
+            ### $error
+            return ! defined $error;
           }
           $bits = 6;
         }
         $bits--;
-        my $b = ($n >> $bits) & 1;
-        $v += ($b != 0);   # propagate possible taintedness from $b
+        my $b = ($n >> $bits) & 1;   # first bit from $n
+        $v += $b;   # propagate possible taintedness of $n,$b to $v
         ### $b
         ### to v: $v
 
         while ($bits < $width) {
           my $n2 = $read_byte->();
           if ($n2 < 0) {
-            ### end of line or end of file ok ...
-            return 1;
+            ### end n2 ...
+            ### $error
+            return ! defined $error;
           }
           $bits += 6;
           $n <<= 6;
@@ -250,34 +276,63 @@ sub read_graph {
       ### end ...
 
     } else {
-      ### graph6 ...
-
-      my $from = 0;
-      my $to   = 1;
-      while ($to < $num_vertices) {
-        my $n = $read_byte->();
-        if ($n < 0) {
-          $error ||= "Unexpected EOF";  # end of file is not ok
-          return;
+      ### graph6 or digraph6 ...
+      my $n;
+      my $mask;
+      my $from;
+      my $to;
+      my $output_edge = sub {
+        if ($n & $mask) {
+          my $taint0 = $n & 0;
+          my $from_taint = $from + $taint0;
+          my $to_taint   = $to   + $taint0;
+          if ($edge_func) { $edge_func->(      $from_taint, $to_taint); }
+          if ($edge_aref) { push @$edge_aref, [$from_taint, $to_taint]; }
         }
-        my $taint = $n & 0;
-        for (my $mask = 1 << 5; $mask != 0; $mask >>= 1) {
-          if ($n & $mask) {
-            my $from_taint = $from + $taint;
-            my $to_taint   = $to   + $taint;
-            if ($edge_func) { $edge_func->(      $from_taint, $to_taint); }
-            if ($edge_aref) { push @$edge_aref, [$from_taint, $to_taint]; }
+      };
+
+      if ($format eq 'graph6') {
+        # graph6 goes by columns of "to" within which "from" runs 0 though to-1
+        # first column is to=1
+        $from = 0;
+        $to = 1;
+        while ($to < $num_vertices) {
+          if (($n = $read_byte->()) < 0) {
+            $error ||= "Unexpected EOF";  # end of file is not ok
+            return;
           }
-          $from++;
-          if ($from >= $to) {
+          for ($mask = 1 << 5; $mask != 0; $mask >>= 1) {
+            $output_edge->();
+            $from++;
+            if ($from >= $to) {
+              $to++;
+              last unless $to < $num_vertices;
+              $from = 0;
+            }
+          }
+        }
+      } else {
+        # graph6 goes by rows of "from", within which "to" runs 0 to n-1
+        $from = 0;
+        $to = 0;
+        while ($from < $num_vertices) {
+          if (($n = $read_byte->()) < 0) {
+            $error ||= "Unexpected EOF";  # end of file is not ok
+            return;
+          }
+          for ($mask = 1 << 5; $mask != 0; $mask >>= 1) {
+            $output_edge->();
             $to++;
-            last unless $to < $num_vertices;
-            $from = 0;
+            if ($to >= $num_vertices) {
+              $from++;
+              last unless $from < $num_vertices;
+              $to = 0;
+            }
           }
         }
       }
 
-      # read \n or \r\n, so can take successive graphs from handle
+      # read \n or \r\n, so can take successive graphs from file handle
       for (;;) {
         my $str;
         my $len = read($fh, $str, 1);
@@ -312,19 +367,24 @@ sub read_graph {
 
 #------------------------------------------------------------------------------
 
-# not documented yet
+# For internal use.
+# Biggest shift is by (6-1)*6 = 30 bits, so ok in 32-bit Perls circa 5.8 and
+# earlier (where counts were taken modulo 32, not full value).
 sub _number_to_string {
   my ($n) = @_;
-  my $str = '';
-  my $bitpos = 0;
+  my $str;
+  my $bitpos;
   if ($n > 258047) {  # binary 0b_111110_111111_111111 octal 0767777
     $str = '~~';
     $bitpos = (6-1)*6;
   } elsif ($n > 62) {
     $str = '~';
     $bitpos = (3-1)*6;
+  } else {
+    $str = '';
+    $bitpos = 0;
   }
-  for ( ; $bitpos >= 0; $bitpos -= 6) {
+  for ( ; $bitpos >= 0; $bitpos -= 6) {     # big endian, high to low
     $str .= chr( (($n >> $bitpos) & 0x3F) + 63 );
   }
   return $str;
@@ -355,8 +415,9 @@ sub write_graph {
       or return 0;
   }
 
-  my $sparse = (defined $options{'format'}
-                && $options{'format'} eq 'sparse6');
+  my $format = $options{'format'};
+  if (! defined $format) { $format = 'graph6'; }
+
   my $num_vertices = $options{'num_vertices'};
   if (! defined $num_vertices
       && (my $edge_aref = $options{'edge_aref'})) {
@@ -373,10 +434,10 @@ sub write_graph {
   ### $num_vertices
 
   print $fh
-    ($options{'header'}
-     ? ($sparse ? _HEADER_SPARSE6 : _HEADER_GRAPH6)
+    ($options{'header'} ? ">>$format<<" : ()),
+    ($format eq 'sparse6' ? ':'
+     : $format eq 'digraph6' ? '&'
      : ()),
-       ($sparse ? ':' : ()),
        _number_to_string($num_vertices)
        or return 0;
 
@@ -395,7 +456,7 @@ sub write_graph {
     return 1;
   };
 
-  if ($sparse) {
+  if ($format eq 'sparse6') {
     my $edge_iterator;
 
     if (my $edge_aref = $options{'edge_aref'}) {
@@ -436,7 +497,7 @@ sub write_graph {
 
     $edge_iterator ||= \&_edges_iterator_none;
 
-    # number of bits required to represent $num_vertices - 1
+    # $width = number of bits required to represent $num_vertices - 1
     my $width = 0;
     if ($num_vertices > 0) {
       while (($num_vertices-1) >> $width) { $width++; }
@@ -508,7 +569,7 @@ sub write_graph {
       my %edge_hash;
       foreach my $edge (@$edge_aref) {
         my ($from, $to) = @$edge;
-        if ($from > $to) { ($from,$to) = ($to,$from); }
+        if ($from > $to && $format eq 'graph6') { ($from,$to) = ($to,$from); }
         $edge_hash{$from}->{$to} = undef;
       }
       $edge_predicate = sub {
@@ -519,11 +580,22 @@ sub write_graph {
 
     $edge_predicate ||= \&_edge_predicate_none;
 
-    foreach my $to (1 .. $num_vertices-1) {
-      foreach my $from (0 .. $to-1) {
-        $put_bit->($edge_predicate->($from,$to) ? 1 : 0) or return 0;
+    if ($format eq 'graph6') {
+      foreach my $to (1 .. $num_vertices-1) {
+        foreach my $from (0 .. $to-1) {
+          $put_bit->($edge_predicate->($from,$to) ? 1 : 0) or return 0;
+        }
       }
+    } elsif ($format eq 'digraph6') {
+      foreach my $from (0 .. $num_vertices-1) {
+        foreach my $to (0 .. $num_vertices-1) {
+          $put_bit->($edge_predicate->($from,$to) ? 1 : 0) or return 0;
+        }
+      }
+    } else {
+      croak 'Unrecognised format: ',$format;
     }
+
     until ($bitpos == 5) {
       $put_bit->(0) or return 0;
     }
@@ -548,7 +620,7 @@ __END__
 
 =head1 NAME
 
-Graph::Graph6 - read and write graph6 or sparse6 format graphs
+Graph::Graph6 - read and write graph6, sparse6, digraph6 format graphs
 
 =head1 SYNOPSIS
 
@@ -565,8 +637,8 @@ Graph::Graph6 - read and write graph6 or sparse6 format graphs
 
 =head1 DESCRIPTION
 
-This module reads and writes graph6 or sparse6 files.  These file formats
-are per
+This module reads and writes graph6, sparse6 and digraph6 files.  These file
+formats are per
 
 =over 4
 
@@ -574,38 +646,50 @@ L<http://cs.anu.edu.au/~bdm/data/formats.txt>
 
 =back
 
-Both formats represent an undirected graph with vertices numbered 0 to n-1
-encoded into printable ASCII characters in the range C<?> to C<~>.
+These formats represent a graph (a graph theory graph) with vertices
+numbered 0 to n-1 encoded into printable ASCII characters in the range C<?>
+to C<~>.  The maximum number of vertices is 2^36-1.
 
-The maximum number of vertices is 2^36-1.  sparse6 lists edges as pairs of
-vertices i,j and is good for large graphs with relatively few edges.  graph6
-is an upper triangle adjacency matrix of bits.  Its encoding is 6 bits per
-character so N vertices is a file size roughly N^2/12 bytes.  sparse6 can
-have multi-edges and self loops.  graph6 cannot.
+graph6 and sparse6 represent an undirected graph.  graph6 is an upper
+triangle adjacency matrix of bits.  Its encoding is 6 bits per character so
+N vertices is a file size roughly N^2/12 bytes.  sparse6 lists edges as
+pairs of vertices i,j and is good for graphs with relatively few edges.
+sparse6 can have multi-edges and self loops.  graph6 cannot.
+
+digraph6 represents a directed graph as an NxN adjacency matrix encoded 6
+bits per character so a file size roughly N^2/6 bytes.  It can include self
+loops.
 
 =cut
 
-=for GP-DEFINE  size_bits(n) = sum(j=1,n-1, sum(i=0, j-1, 1));
+# GP-DEFINE  graph6_size_bits_by_sum(n) = sum(j=1,n-1, sum(i=0, j-1, 1));
+# GP-DEFINE  graph6_size_bits_formula(n) = n*(n-1)/2;
+# GP-Test  vector(100,n, graph6_size_bits_formula(n)) == \
+# GP-Test  vector(100,n, graph6_size_bits_by_sum(n))
 
-=for GP-DEFINE  size_bits_formula(n) = n*(n-1)/2;
-
-=for GP-Test  vector(100,n, size_bits_formula(n)) == vector(100,n, size_bits(n))
-
-=for GP-DEFINE  size_bits_formula(n) = n^2/2 - n/2;
-
-=for GP-Test  vector(100,n, size_bits_formula(n)) == vector(100,n, size_bits(n))
+# GP-DEFINE  graph6_size_bits_formula(n) = n^2/2 - n/2;
+# GP-Test  vector(100,n, graph6_size_bits_formula(n)) == \
+# GP-Test  vector(100,n, graph6_size_bits_by_sum(n))
 
 =pod
 
-This module reads and writes graph6 and sparse6 in a "native" way as integer
-vertex numbers.  See L</SEE ALSO> below for C<Graph.pm>, C<Graph::Easy> and
+This module reads and writes in a "native" way as integer vertex numbers 0
+to n-1.  See L</SEE ALSO> below for C<Graph.pm>, C<Graph::Easy> and
 C<GraphViz2> interfaces.
 
-Graph6 and sparse6 are used by the Nauty tools
-L<http://pallini.di.uniroma1.it> as output for generated graphs and input
-for calculations of automorphism groups, canonicalizing, and more.  The
-House of Graphs L<http://hog.grinvin.org> takes graph6 for searches and
-uploads and includes it among various download formats.
+These formats are used by the Nauty tools
+
+=over
+
+L<http://cs.anu.edu.au/~bdm/nauty> and 
+L<http://pallini.di.uniroma1.it>
+
+=back
+
+as output for generated graphs and input for calculations of automorphism
+groups, canonicalizing, and more.  The House of Graphs
+L<http://hog.grinvin.org> takes graph6 for searches and uploads and includes
+it among download formats.
 
 =head1 FUNCTIONS
 
@@ -615,7 +699,7 @@ uploads and includes it among various download formats.
 
 =item C<$success = Graph::Graph6::read_graph(key =E<gt> value, ...)>
 
-Read graph6 or sparse6.  The key/value options are
+Read graph6, sparse6 or digraph6.  The key/value options are
 
     filename           => filename (string)
     fh                 => filehandle (glob ref)
@@ -644,9 +728,9 @@ C<num_vertices_func>, or both.
 
 Each edge is stored into C<edge_aref> or call to C<edge_func>, or both.  Any
 existing contents of C<edge_aref> array are deleted.  C<$from> and C<$to>
-are integers in the range 0 to n-1 with C<$from E<lt>= $to> (or C<$from
-E<lt> $to> for graph6).  For sparse6, multi-edges give multiple elements
-stored and multiple calls made.
+are integers in the range 0 to n-1.  graph6 has C<$from E<lt> $to>.  sparse6
+has C<$from E<lt>= $to>.  digraph6 has any values.  For sparse6, multi-edges
+give multiple elements stored and multiple calls made.
 
     push @$edge_aref, [ $from, $to ];   # (and emptied first)
     $edge_func->($from, $to);
@@ -659,16 +743,16 @@ The default C<error_func> is C<croak()>.  If C<error_func> returns then the
 return from C<read_graph()> is C<undef>.
 
 An immediate end of file gives the end of file return 0.  It's common to
-have multiple graph6 or sparse6 in a file, one per line and possibly an
-empty file if no graphs of some kind.  They can be read successively with
-C<read_graph()> until 0 at end of file.
+have multiple graphs in a file, one per line and possibly an empty file if
+no graphs of some kind.  They can be read successively with C<read_graph()>
+until 0 at end of file.
 
 End of file is usually only of interest when reading an C<fh> handle.  But
 empty file or empty input string give the end of file return too.  This is
-designed to make the three input forms equivalent (C<filename> is the same
-as open and C<fh>, and either the same as slurp and pass C<str>).
+designed to make the input sources equivalent (C<filename> is the same as
+open and C<fh>, and either the same as slurp and pass C<str>).
 
-For C<num_vertices_ref> and C<edge_aref> a C<my> can be included in the
+For C<num_vertices_ref> and C<edge_aref>, a C<my> can be included in the
 ref-taking in the usual way if desired,
 
     # "my" included in refs
@@ -679,14 +763,15 @@ ref-taking in the usual way if desired,
 This is compact and is similar to the common C<open my $fh, ...> declaring
 an output variable in the call which is its first use.
 
-The file formats have edges ordered by increasing C<$to> and within that
-increasing C<$from>, though for sparse6 C<$from> can potentially jump
-around.  But the suggestion is not to rely on edge order (only on C<$from
-E<lt>= $to> noted above).
+graph6 has edges ordered by increasing C<$to> and within that increasing
+C<$from>.  sparse6 normally likewise, but the format potentially allows
+C<$from> to jump around.  digraph6 has edges ordered by increasing C<$from>
+and within that increasing C<$to>.  But the suggestion is not to rely on
+edge order (only on C<$from E<lt>= $to> for graph6 and sparse6 noted above).
 
 In C<perl -T> taint mode, C<$num_vertices> and edge C<$from,$to> outputs are
 tainted in the usual way for reading from a file, a tainted C<str>, or an
-C<fh> handle of a file or a tie of something tainted.
+C<fh> handle of a file or tie of something tainted.
 
 =back
 
@@ -701,7 +786,7 @@ Write graph6 or sparse6.  The key/value options are
     filename           => filename (string)
     fh                 => filehandle (glob ref)
     str_ref            => output string (string ref)
-    format             => "graph6" or "sparse6"
+    format             => "graph6", "sparse6", "digraph6"
                              (string, default "graph6")
     header             => boolean (default false)
     num_vertices       => integer
@@ -722,41 +807,62 @@ scalar ref to store to, so for example
     # or
     write_graph(str_ref => \my $str, ...)
 
-C<format> defaults to the dense C<"graph6">, or can be C<"sparse6">
+C<format> defaults to the dense C<"graph6">, or can be C<"sparse6"> or
+C<"digraph6">
 
     write_graph(format => "sparse6", ...)
 
-C<header> flag writes an initial C<"E<gt>E<gt>graph6E<lt>E<lt>"> or
-C<"E<gt>E<gt>sparse6E<lt>E<lt>">.  This is optional for the nauty programs
-and for C<read_graph()> above, but may help a human reader distinguish a
-graph from tty line noise.
+C<header> flag writes an initial C<"E<gt>E<gt>graph6E<lt>E<lt>">,
+C<"E<gt>E<gt>sparse6E<lt>E<lt>"> or C<"E<gt>E<gt>digraph6E<lt>E<lt>"> as
+appropriate.  This is optional for the nauty programs and for
+C<read_graph()> above, but may help a human reader distinguish a graph from
+tty line noise.
 
-C<num_vertices> is mandatory, or if C<edge_aref> is given then the default
-is from the maximum vertex number there (which is convenient as long as the
-maximum vertex has at least one edge).
+C<num_vertices> is mandatory, except if C<edge_aref> is given then the
+default is from the maximum vertex number there (which is convenient as long
+as the maximum vertex has at least one edge).  Must have C<num_vertices <
+2**36>.
 
 C<edge_aref> is an arrayref of edges which are in turn arrayref pairs of
-integers C<[$from,$to]>.  The edges and the C<$from,$to> values can be in
-any order but all must be integers in the range 0 to <$num_vertices-1>
-inclusive.  sparse6 can have self-loops and repeated entries for
-multi-edges.  graph6 ignores self-loops and writes duplicates just once
-each.
+integers C<[$from,$to]>.  They can be in any order but all must be integers
+in the range 0 to <$num_vertices-1> inclusive.  For graph6 and sparse6
+(being undirected) the C<$from,$to> pairs can be either way around.  graph6
+ignores self-loops and writes duplicates just once each.  sparse6 can have
+self-loops and repeated entries for multi-edges.  digraph6 can have
+self-loops but writes all duplicates just once each.
 
-    edge_aref => [ [0,1], [5,6], [5,4] ]      # any order
+    edge_aref => [ [5,6], [0,1] ]    # edges in any order
+    edge_aref => [ [5,4] ]      # pairs either way for undirected
 
 C<edge_predicate> is another way to specify edges.  It is called with
-integers C<$from,$to> to test whether such an edge exists.  Each call has
-C<$from E<lt> $to> for graph6, or C<$from E<lt>= $to> for sparse6.  sparse6
-self-loops can be written this way, but not multi-edges.
+integers C<$from,$to> to test whether such an edge exists.  graph6 has
+C<$from E<lt> $to>.  sparse6 has C<$from E<lt>= $to>.  digraph6 has any.
+digraph6 and sparse6 self-loops can be written this way, but not sparse6
+multi-edges.
 
     $bool = $edge_predicate->($from, $to);    # $from <= $to
 
-C<edge_predicate> is preferred for writing graph6 and C<edge_aref> is
-preferred for writing sparse6, but whichever you give is used for either
-output.
+C<edge_predicate> is preferred for writing graph6 and digraph6.
+C<edge_aref> is preferred for writing sparse6.  But whichever you give is
+used for any format.
 
 The output includes a final newline C<"\n"> so graphs can be written to a
 file handle one after the other.
+
+=back
+
+=head2 Other
+
+=over
+
+=item C<$str = Graph::Graph6::HEADER_GRAPH6 ()>
+
+=item C<$str = Graph::Graph6::HEADER_SPARSE6 ()>
+
+=item C<$str = Graph::Graph6::HEADER_DIGRAPH6 ()>
+
+Return the header strings C<E<gt>E<gt>graph6E<lt>E<lt>>,
+C<E<gt>E<gt>sparse6E<lt>E<lt>> or C<E<gt>E<gt>digraph6E<lt>E<lt>>.
 
 =back
 
@@ -789,7 +895,7 @@ L<http://user42.tuxfamily.org/graph-graph6/index.html>
 
 =head1 LICENSE
 
-Copyright 2015, 2016 Kevin Ryde
+Copyright 2015, 2016, 2017 Kevin Ryde
 
 Graph-Graph6 is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

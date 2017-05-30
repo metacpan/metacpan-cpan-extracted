@@ -18,7 +18,7 @@ use File::Path ();
 use Cwd ();
 use Config;
 
-our $VERSION = '0.302';
+our $VERSION = '0.304';
 
 use constant WIN32 => $^O eq 'MSWin32';
 
@@ -31,7 +31,7 @@ sub new {
         cpanfile => "cpanfile",
         local_lib => "local",
         cpanmetadb => "http://cpanmetadb.plackperl.org/v1.0/",
-        mirror => ["http://www.cpan.org/", "http://backpan.perl.org/"],
+        mirror => ["https://cpan.metacpan.org/"],
         retry => 1,
         %option
     }, $class;
@@ -66,6 +66,7 @@ sub parse_options {
     or exit 1;
 
     $self->{local_lib} = $self->maybe_abs($self->{local_lib}) unless $self->{global};
+    $self->{home} = $self->maybe_abs($self->{home});
     $self->{resolver} = \@resolver;
     $self->{mirror} = \@mirror if @mirror;
     for my $mirror (@{$self->{mirror}}) {
@@ -471,6 +472,10 @@ sub generate_resolver {
         mirror => $self->{mirror},
     );
     $cascade->add($resolver);
+    if (!$self->{dev}) {
+        $resolver = App::cpm::Resolver::MetaCPAN->new;
+        $cascade->add($resolver);
+    }
 
     $cascade;
 }

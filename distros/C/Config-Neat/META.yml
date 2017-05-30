@@ -16,26 +16,26 @@ name: Config-Neat
 provides:
   Config::Neat:
     file: lib/Config/Neat.pm
-    version: 1.301
+    version: 1.302
   Config::Neat::Array:
     file: lib/Config/Neat/Array.pm
-    version: 1.301
+    version: 1.302
   Config::Neat::Inheritable:
     file: lib/Config/Neat/Inheritable.pm
-    version: 1.301
+    version: 1.302
   Config::Neat::Render:
     file: lib/Config/Neat/Render.pm
-    version: 1.301
+    version: 1.302
   Config::Neat::Schema:
     file: lib/Config/Neat/Schema.pm
-    version: 1.301
+    version: 1.302
   Config::Neat::Util:
     file: lib/Config/Neat/Util.pm
-    version: 1.301
+    version: 1.302
 requires:
   JSON: 0
   Tie::IxHash: 1.22
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/iafan/Config-Neat
-version: 1.301
+version: 1.302

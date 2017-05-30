@@ -1,0 +1,45 @@
+---
+abstract: 'A non-blocking interface to MPD'
+author:
+  - 'José Joaquín Atria <jjatria@cpan.org>'
+build_requires:
+  Array::Utils: '0'
+  Data::Printer: '0'
+  List::Util: '0'
+  PerlX::Maybe: '0'
+  Term::ReadLine: '0'
+  Test::More: '1.302078'
+  Test::Warnings: '0.026'
+  Try::Tiny: '0.28'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-Net-MPD
+provides:
+  AnyEvent::Net::MPD:
+    file: lib/AnyEvent/Net/MPD.pm
+    version: '0.001'
+requires:
+  AnyEvent: '7.13'
+  AnyEvent::Emitter: '0.02'
+  AnyEvent::Handle: '0'
+  AnyEvent::Socket: '0'
+  Log::Any: '1.049'
+  Moo: '2.003002'
+  MooX::HandlesVia: '0.001008'
+  Types::Standard: '1.000006'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://gitlab.com/jjatria/AnyEvent-Net-MPD/issues
+  repository: git://gitlab.com/jjatria/AnyEvent-Net-MPD.git
+version: '0.001'
+x_serialization_backend: 'YAML::Tiny version 1.70'

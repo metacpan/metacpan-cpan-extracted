@@ -9,7 +9,14 @@ use JSON;
 sub import {
     my $class = __PACKAGE__;
     $class->register_dispatch(
+        '/rest/api/latest/myself' =>
+            sub { $class->myself(@_) },
     );
+}
+
+sub myself {
+    my ( $class, $server, $cgi ) = @_;
+    return $class->response($server, $class->user($server, $cgi, 'packy'));
 }
 
 sub user {

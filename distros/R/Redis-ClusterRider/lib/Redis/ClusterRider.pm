@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use base qw( Exporter );
 
-our $VERSION = '0.06';
+our $VERSION = '0.10';
 
 use Redis;
 use List::MoreUtils qw( bsearch );
@@ -343,10 +343,10 @@ sub _new_node {
 
   return Redis->new(
     %{ $self->{_node_params} },
-    server                 => $hostport,
-    reconnect              => 0.001,       # reconnect only once
-    every                  => 1000,
-    no_auto_connect_on_new => 1,
+    server    => $hostport,
+    reconnect => 0.001,       # reconnect only once
+    every     => 1000,
+
     on_connect => $self->_create_on_node_connect($hostport),
   );
 }
@@ -526,6 +526,8 @@ sub AUTOLOAD {
   goto &{$sub};
 }
 
+sub DESTROY { }
+
 1;
 __END__
 
@@ -672,9 +674,9 @@ Not set by default.
 
 See documentation on L<Redis> for more options.
 
-Attention, following L<Redis> options: C<reconnect>, C<every>
-and C<no_auto_connect_on_new> are redefined inside the L<Redis::ClusterRider>
-for own purproses. User defined values for this options will be ignored.
+Attention, L<Redis> options C<reconnect> and C<every> are redefined inside the
+L<Redis::ClusterRider> for own purproses. User defined values for this options
+will be ignored.
 
 =head1 COMMAND EXECUTION
 

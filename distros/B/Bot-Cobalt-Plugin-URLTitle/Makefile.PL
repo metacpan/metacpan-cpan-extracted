@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
     "Bot::Cobalt" => 0,
     "Bot::Cobalt::Common" => 0,
     "HTML::Entities" => 0,
+    "List::AllUtils" => 0,
     "Mojo::UserAgent" => 0,
     "Text::Unidecode" => 0,
     "URI::Find::Simple" => 0,
@@ -28,7 +29,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,6 +40,7 @@ my %FallbackPrereqs = (
   "Bot::Cobalt" => 0,
   "Bot::Cobalt::Common" => 0,
   "HTML::Entities" => 0,
+  "List::AllUtils" => 0,
   "Mojo::UserAgent" => 0,
   "Test::More" => 0,
   "Text::Unidecode" => 0,

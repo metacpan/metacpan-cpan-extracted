@@ -21,9 +21,12 @@ SKIP: {
     require "t/remote.pl";
     my $sshd = get_test_sshd();
     if (!$sshd) {
-        skip "test ssh server not available", $ntests;
+        ok(1, "no ssh server available, skipping all tests")
+            for 1..$ntests;
+        exit;
     }
     my $cwd = Cwd::cwd();
+    ($cwd) = $cwd =~ /(.*)/;
 
     my $xcmd = "$cwd/t/external-command.pl";
     my $xxcmd = "$cwd/t/external command.pl";
@@ -34,7 +37,10 @@ SKIP: {
     my $rhost = $sshd->host;
     my $ruser = $sshd->user;
     my $rport = $sshd->port;
-    my $rhostx = $ruser . '@' . $rhost . ":" . $rport;;
+    my $rhostx = $ruser . '@' . $rhost;
+    if ($rport) {
+        $rhostx .= ":" . $rport;
+    }
     my $rpwd = $sshd->password;
     my $ids = $sshd->key_path;
 

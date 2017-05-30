@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = '1.036';
+our $VERSION = '1.037';
 
 =head1 NAME
 
@@ -27,11 +27,11 @@ have a C compiler.
 use Config;
 use Archive::Zip ();
 use ExtUtils::MakeMaker (); # just for maybe_command()
-use Cwd ();
-use File::Basename ();
+use Cwd qw( abs_path );
+use File::Basename;
 use File::Find ();
-use File::Spec ();
-use File::Temp ();
+use File::Spec::Functions qw( :ALL );
+use File::Temp qw( tempfile );
 use Module::ScanDeps ();
 use PAR ();
 use PAR::Filter ();
@@ -306,7 +306,7 @@ sub _parse_opts {
         $self->_warn("Using -e 'code' as input file, ignoring @$args\n")
           if (@$args and !$opt->{r});
 
-        my ($fh, $fake_input) = File::Temp::tempfile(
+        my ($fh, $fake_input) = tempfile(
 	    "ppXXXXX", SUFFIX => ".pl", TMPDIR => 1, UNLINK => 1);
 
         print $fh $opt->{e};
@@ -436,8 +436,8 @@ sub run_pack {
     my $output = $self->{output};
     my $args   = $self->{args};
 
-    if (!File::Spec->file_name_is_absolute($output)) {
-	$output = File::Spec->catfile(".", $output);
+    if (!file_name_is_absolute($output)) {
+	$output = catfile(".", $output);
     }
 
     my @loader = ();
@@ -631,7 +631,7 @@ sub get_par_file {
         # Don't need to keep it, be safe with a tempfile.
 
         $self->{pack_attrib}{lose} = 1;
-        ($cfh, $par_file) = File::Temp::tempfile(
+        ($cfh, $par_file) = tempfile(
 	    "ppXXXXX", SUFFIX => ".par", TMPDIR => 1, UNLINK => 1);
         close $cfh;    # See comment just below
     }
@@ -726,12 +726,13 @@ sub pack_manifest_hash {
     unshift(@INC, @{ $opt->{I} || [] });
     unshift(@SharedLibs, map $self->_find_shlib($_), @{ $opt->{l} || [] });
 
-    my %skip = map { Module::ScanDeps::_find_in_inc($_), 1 } @exclude;
+    # Note: _find_in_inc() may return ()
+    my %skip = map { $_ => 1 } grep { defined } map { Module::ScanDeps::_find_in_inc($_) } @exclude;
     if ($^O eq 'MSWin32') {
-        %skip = (%skip, map { s{\\}{/}g; lc($_), 1 } @SharedLibs);
+        %skip = (%skip, map { s{\\}{/}g; lc($_) => 1 } @SharedLibs);
     }
     else {
-        %skip = (%skip, map { $_, 1 } @SharedLibs);
+        %skip = (%skip, map { $_ => 1 } @SharedLibs);
     }
 
     my $add_deps = $self->_obj_function($fe, 'add_deps');
@@ -780,8 +781,9 @@ sub pack_manifest_hash {
         ),
     );
 
-    %skip = map { Module::ScanDeps::_find_in_inc($_), 1 } @exclude;
-    %skip = (%skip, map { $_, 1 } @SharedLibs);
+    # Note: _find_in_inc() may return ()
+    %skip = map { $_ => 1 } grep { defined } map { Module::ScanDeps::_find_in_inc($_) } @exclude;
+    %skip = (%skip, map { $_ => 1 } @SharedLibs);
 
     $add_deps->(
         rv      => \%map,
@@ -852,7 +854,7 @@ sub pack_manifest_hash {
 
     my $in;
     foreach my $in (@$input) {
-        my $name = File::Basename::basename($in);
+        my $name = basename($in);
 
         if ($script_filter) {
             my $string = $script_filter->apply($in, $name);
@@ -873,7 +875,33 @@ sub pack_manifest_hash {
 
     foreach my $in (@SharedLibs) {
         next unless -e $in;
-        my $name = File::Basename::basename($in);
+
+        my $name;
+
+        # try to find the name the runtime loader will be looking for
+        if ($^O =~ /linux|solaris|freebsd|openbsd/i) {
+            # try "objdump" to extract SONAME
+            my $od = qx( objdump -p $in );
+            if ($? == 0 && $od =~ /^\s* SONAME \s+ (\S+)/mx) {
+                $name = $1;
+                $self->_vprint(1, "... objdump: library $in has SONAME $name");
+            }
+        }
+        elsif ($^O eq 'darwin') {
+            # try "otool -D $file", expect output like "$file:\nname\n"
+            chomp(my @ot = qx( otool -D $in ));
+            if ($? == 0) {
+                $name = $ot[1];
+                $self->_vprint(1, "... otool: library $in has install name $name");
+            }
+            else {
+                # fallback to old "chasing symlinks" method
+                $name = basename($self->_chase_lib_darwin($in));
+            }
+        }
+
+        # fallback to old "chasing symlinks" method if nothing else worked
+        $name = basename($self->_chase_lib($in)) unless defined $name;
 
         $dep_manifest->{"$shlib/$name"}  = [ file => $in ];
         $full_manifest->{"$shlib/$name"} = [ file => $in ];
@@ -891,7 +919,7 @@ sub pack_manifest_hash {
     if (@$input and (@$input == 1 or !$opt->{p})) {
         my $string =
           (@$input == 1)
-          ? $self->_main_pl_single("script/" . File::Basename::basename($input->[0]))
+          ? $self->_main_pl_single("script/" . basename($input->[0]))
           : $self->_main_pl_multi();
 
         $full_manifest->{"script/main.pl"} = [ string => $string ];
@@ -1289,7 +1317,7 @@ sub _extract_parl {
       if not $class->can('write_parl');
 
     $self->_vprint(0, "Generating a fresh 'parl'.");
-    my ($fh, $filename) = File::Temp::tempfile(
+    my ($fh, $filename) = tempfile(
         "parlXXXXXXX", SUFFIX => $Config{_exe}, TMPDIR => 1, UNLINK => 1);
     close $fh;
     
@@ -1310,7 +1338,7 @@ sub _move_parl {
 
     my $cfh;
     my $fh = $self->_open($self->{parl});
-    ($cfh, $self->{parl}) = File::Temp::tempfile(
+    ($cfh, $self->{parl}) = tempfile(
         "parlXXXX", SUFFIX => ".exe", TMPDIR => 1, UNLINK => 1);
     binmode($cfh);
 
@@ -1347,9 +1375,9 @@ sub _generate_output {
 
     # Make sure the parl is callable. Prepend ./ if it's just a file name.
     my $parl = $self->{parl};
-    my ($volume, $path, $file) = File::Spec->splitpath($parl);
+    my ($volume, $path, $file) = splitpath($parl);
     if (not defined $path or $path eq '') {
-        $parl = File::Spec->catfile(File::Spec->curdir(), $parl);
+        $parl = catfile(curdir(), $parl);
     }
 
     system($parl, @args);
@@ -1455,7 +1483,7 @@ sub _check_par {
 sub _chase_lib {
    my ($self, $file) = @_;
 
-   return $self->_chase_lib_darwin($file) if $^O eq q/darwin/;
+   $file = abs_path($file);
 
    while ($Config::Config{d_symlink} and -l $file) {
        if ($file =~ /^(.*?\.\Q$Config{dlext}\E\.\d+)\..*/) {
@@ -1464,11 +1492,11 @@ sub _chase_lib {
 
        return $file if $file =~ /\.\Q$Config{dlext}\E\.\d+$/;
 
-       my $dir = File::Basename::dirname($file);
+       my $dir = dirname($file);
        $file = readlink($file);
 
-       unless (File::Spec->file_name_is_absolute($file)) {
-           $file = File::Spec->rel2abs($file, $dir);
+       unless (file_name_is_absolute($file)) {
+           $file = rel2abs($file, $dir);
        }
    }
 
@@ -1482,6 +1510,8 @@ sub _chase_lib {
 sub _chase_lib_darwin {
    my ($self, $file) = @_;
 
+   $file = abs_path($file);
+
    while (-l $file) {
        if ($file =~ /^(.*?\.\d+)(\.\d+)*\.dylib$/) {
            my $name = $1 . q/.dylib/;
@@ -1490,11 +1520,11 @@ sub _chase_lib_darwin {
 
        return $file if $file =~ /\D\.\d+\.dylib$/;
 
-       my $dir = File::Basename::dirname($file);
+       my $dir = dirname($file);
        $file = readlink($file);
 
-       unless (File::Spec->file_name_is_absolute($file)) {
-           $file = File::Spec->rel2abs($file, $dir);
+       unless (file_name_is_absolute($file)) {
+           $file = rel2abs($file, $dir);
        }
    }
 
@@ -1510,44 +1540,44 @@ sub _chase_lib_darwin {
 sub _find_shlib {
     my ($self, $file) = @_;
 
-    if ($^O eq 'MSWin32') {
-        if ($file !~ /^[a-z]:/i) {
-            my $cwd = Cwd::cwd().'/';
-            $cwd =~ s{/.*}{} if $file =~ m{^[\\/]};
-            $file = $cwd.$file;
-        }
+    if (-e $file) {
+        my $abs_file = abs_path($file);
+        $self->_vprint(1, "... found library $file: $abs_file");
+        return $abs_file;
     }
 
-    return $self->_chase_lib($file) if -e $file;
+    $self->_die("Shared library (option -l) doesn't exist: $file")
+        if $file =~ /[\/\\]/;
 
-    my $libpthname;
+    my @libpath;
     if ($^O eq 'MSWin32') {
-        $libpthname = exists $ENV{PATH} ? $ENV{PATH} : undef;
+        @libpath = (path(), '.');       # cwd() is always implicitly searched
     }
     else {
-        $libpthname = exists $ENV{ $Config{ldlibpthname} }
-                           ? $ENV{ $Config{ldlibpthname} } : undef;
-    }
-    if (not defined $libpthname) {
-        $self->_die(sprintf(
-                "Don't know how to find shared library (option -l) %s: ".
-                "environment variable %s is not set.",
-                $file, $^O eq 'MSWin32' ? 'PATH' : $Config{ldlibpthname}));
-        return;
+        # NOTE: libpth is actually supposed to be the path searched
+        # by the linker (ld) and *not* the path searched by the runtime
+        # loader (ld.so). But it's the best guess we've got.
+        @libpath = split(' ', $Config{libpth});
+
+        # add $ENV{LD_LIBRARY_PATH} (or equivalent) if defined 
+        my $ldlibpath = $ENV{ $Config{ldlibpthname} };
+        unshift @libpath, split(/\Q$Config{path_sep}\E/, $ldlibpath)
+            if defined $ldlibpath;
     }
 
-    $file = File::Basename::basename($file);
-    my @path = (File::Basename::dirname($0), split(/\Q$Config{path_sep}\E/, $libpthname));
-
-    my $lib = $self->_find_shlib_in_path($file, @path);
-    return $lib if $lib;
+    if (my $lib = $self->_find_shlib_in_path($file, @libpath)) {
+        $self->_vprint(1, "... found library $file: $lib");
+        return $lib;
+    }
 
     $self->_die("Can't find shared library (option -l): $file")
         if $^O eq 'MSWin32' || $file =~ /^lib/;
 
     # be extra magical and prepend "lib" to the filename
-    $lib = $self->_find_shlib_in_path("lib$file", @path);
-    return $lib if $lib;
+    if (my $lib = $self->_find_shlib_in_path("lib$file", @libpath)) {
+        $self->_vprint(1, "... found library $file: $lib");
+        return $lib;
+    }
 
     $self->_die("Can't find shared library (option -l): $file (also tried lib$file)");
 }
@@ -1559,9 +1589,11 @@ sub _find_shlib_in_path
     my $dlext = $^O eq 'darwin' ? 'dylib' : $Config{dlext};
     for my $dir (@path)
     {
-        my $abs = File::Spec->catfile($dir, $file);
-        $abs = File::Spec->catfile($dir, "$file.$dlext") unless -e $abs;
-        return $self->_chase_lib($abs) if -e $abs;
+        $dir = '.' if $dir eq '';      
+        foreach my $p (catfile($dir, $file), catfile($dir, "$file.$dlext"))
+        {
+            return abs_path($p) if -e $p;
+        }
     }
     return;
 }
@@ -1569,10 +1601,10 @@ sub _find_shlib_in_path
 sub _can_run {
     my ($self, $command, $no_exec) = @_;
 
-    for my $dir (File::Basename::dirname($0),
+    for my $dir (dirname($0),
         split(/\Q$Config{path_sep}\E/, $ENV{PATH}))
     {
-        my $abs = File::Spec->catfile($dir, $command);
+        my $abs = catfile($dir, $command);
         return $abs if $no_exec or $abs = MM->maybe_command($abs);
     }
     return;

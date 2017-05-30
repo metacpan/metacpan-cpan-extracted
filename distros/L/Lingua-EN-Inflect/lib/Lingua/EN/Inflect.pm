@@ -7,7 +7,7 @@ use Env;
 require Exporter;
 @ISA = qw(Exporter);
 
-our $VERSION = '1.901';
+our $VERSION = '1.902';
 
 %EXPORT_TAGS =
 (
@@ -1831,7 +1831,7 @@ Lingua::EN::Inflect - Convert singular to plural. Select "a" or "an".
 
 =head1 VERSION
 
-This document describes version 1.901 of Lingua::EN::Inflect
+This document describes version 1.902 of Lingua::EN::Inflect
 
 =head1 SYNOPSIS
 
@@ -2002,11 +2002,12 @@ This document describes version 1.901 of Lingua::EN::Inflect
 
 =head1 DESCRIPTION
 
-B<< [I<Note:> This module is strictly in maintenance mode now. If you're
-mostly interested in singular/plural and a/an inflections, take a look
-at the newer Lingua::EN::Inflexion module, which offers a cleaner and
-more convenient interface, has many more features (including
-plural->singular inflexions), and is also much better tested.] >>
+B<< [I<Note:> This module is strictly in maintenance mode now.
+Take a look at the newer L<Lingua::EN::Inflexion> module, which offers a
+cleaner and more convenient interface, has many more features (including
+plural->singular inflexions), and is also much better tested.
+If you have existing code that relies on Lingua::EN::Inflect, see the
+section of the documentation entitled "CONVERTING FROM LINGUA::EN::INFLECT". ] >>
 
 The exportable subroutines of Lingua::EN::Inflect provide plural
 inflections, "a"/"an" selection for English words, and manipulation

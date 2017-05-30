@@ -267,10 +267,12 @@ is( Test::Builder->new->current_test - $::__tc, 17,
 
 
 
-# =begin testing parameter_accessors 7
+# =begin testing parameter_accessors 15
 $::__tc = Test::Builder->new->current_test;
 {
-try{
+try {
+    print "#\n# Checking parameter accessors\n#\n";
+
     my $test = get_test_client();
     my $url  = TestServer_url();
 
@@ -315,10 +317,21 @@ try{
 
     is($test->maxResults, 10,
        q{maxResults() was successfully set by previous call});
+
+    print "# testing user_object() accessor\n";
+    my $userobj = $test->user_object();
+
+    validate_expected_fields( $userobj, {
+        key => 'packy',
+        name => 'packy',
+        displayName => "Packy Anderson",
+        emailAddress => 'packy\@cpan.org',
+    });
+
 };
 }
-is( Test::Builder->new->current_test - $::__tc, 7,
-	'7 tests were run in the section' );
+is( Test::Builder->new->current_test - $::__tc, 15,
+	'15 tests were run in the section' );
 
 
 

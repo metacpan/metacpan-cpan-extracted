@@ -1,7 +1,8 @@
 Changes
 inc/File/ShareDir/Install.pm
+inc/Version/Compare.pm
 lib/Bio/RNA/RNAaliSplit.pm
-lib/Bio/RNA/RNAaliSplit/FileDir.pm
+lib/Bio/RNA/RNAaliSplit/Roles.pm
 lib/Bio/RNA/RNAaliSplit/WrapAnalyseDists.pm
 lib/Bio/RNA/RNAaliSplit/WrapRNAalifold.pm
 lib/Bio/RNA/RNAaliSplit/WrapRNAz.pm
@@ -14,6 +15,7 @@ share/aln/all.SL.SPOVG.aln
 share/aln/all.SL.YFVG.aln
 t/00-load.t
 t/01-prereq.t
+t/02-version.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

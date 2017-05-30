@@ -36,7 +36,7 @@ no_index:
 provides:
   utf8::all:
     file: lib/utf8/all.pm
-    version: '0.022'
+    version: '0.023'
 requires:
   Carp: '0'
   Encode: '0'
@@ -55,5 +55,5 @@ resources:
   bugtracker: https://github.com/doherty/utf8-all/issues
   homepage: http://metacpan.org/release/utf8-all/
   repository: git://github.com/doherty/utf8-all.git
-version: '0.022'
+version: '0.023'
 x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -33,8 +33,8 @@ subtest 'include_child 0' => sub {
     my $got;
     for my $info (@$mapping) {
         my $program_name = $info->{program_name};
-        my $pid          = $info->{pid};
-        push @{$got->{$program_name}}, $pid;
+        my $pids         = $info->{pids};
+        $got->{$program_name} = $pids;
     }
     is_deeply [sort { $a <=> $b } @{$got->{target_script}}] , [1] or diag explain $got;
     is_deeply [sort { $a <=> $b } @{$got->{target_script2}}], [2] or diag explain $got;
@@ -44,13 +44,13 @@ $opt{include_child} = 1;
 subtest 'include_child 1' => sub {
     my $instance = Linux::GetPidstat::Reader->new(%opt);
     my $mapping  = $instance->get_program_pid_mapping;
-    is scalar @$mapping, 7 or diag explain $mapping;
+    is scalar @$mapping, 2 or diag explain $mapping;
 
     my $got;
     for my $info (@$mapping) {
         my $program_name = $info->{program_name};
-        my $pid          = $info->{pid};
-        push @{$got->{$program_name}}, $pid;
+        my $pids         = $info->{pids};
+        $got->{$program_name} = $pids;
     }
 
     is_deeply [sort { $a <=> $b } @{$got->{target_script}}] , [1] or diag explain $got;
@@ -64,15 +64,15 @@ subtest 'limit a number of child' => sub {
     my ($stdout, $stderr, $mapping) = capture {
         $instance->get_program_pid_mapping;
     };
-    is scalar @$mapping, 5 or diag explain $mapping;
+    is scalar @$mapping, 2 or diag explain $mapping;
     like $stderr, qr/Stop searching child pids. max_child_limit is too little. pid=2/
         or diag $stderr;
 
     my $got;
     for my $info (@$mapping) {
         my $program_name = $info->{program_name};
-        my $pid          = $info->{pid};
-        push @{$got->{$program_name}}, $pid;
+        my $pids         = $info->{pids};
+        $got->{$program_name} = $pids;
     }
 
     is_deeply [sort { $a <=> $b } @{$got->{target_script}}] , [1] or diag explain $got;

@@ -6,6 +6,13 @@ Home page:    <https://metacpan.org/release/MooseX-MungeHas>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-MungeHas>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.008	2017-05-27
+
+ [ Bug Fixes ]
+ - Make sure that has(\@attr, %spec) works.
+   Fixes RT#121895.
+   <https://rt.cpan.org/Ticket/Display.html?id=121895>
+
 0.007	2014-09-09
 
  - Allow exporting of more than one `has` function.

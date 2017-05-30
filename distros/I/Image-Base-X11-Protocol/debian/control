@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2016 Kevin Ryde
 #
 # This file is part of Image-Base-X11-Protocol.
 #
@@ -19,10 +19,10 @@ Source: libimage-base-x11-protocol-perl
 Section: perl
 Priority: optional
 Build-Depends: libtest-perl | perl (>= 5.004.05), cdbs, debhelper (>= 5)
-Maintainer: Kevin Ryde <user42@zip.com.au>
-Standards-Version: 3.9.4
+Maintainer: Kevin Ryde <user42_kevin@yahoo.com.au>
+Standards-Version: 3.9.8
 Homepage: http://user42.tuxfamily.org/image-base-x11-protocol/index.html
-Bugs: mailto:user42@zip.com.au
+Bugs: mailto:user42_kevin@yahoo.com.au
 
 Package: libimage-base-x11-protocol-perl
 Architecture: all

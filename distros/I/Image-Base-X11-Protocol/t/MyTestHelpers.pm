@@ -1,6 +1,6 @@
 # MyTestHelpers.pm -- my shared test script helpers
 
-# Copyright 2008, 2009, 2010, 2011, 2012 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2012, 2015, 2017 Kevin Ryde
 
 # MyTestHelpers.pm is shared by several distributions.
 #
@@ -20,20 +20,22 @@
 BEGIN { require 5 }
 package MyTestHelpers;
 use strict;
-use Exporter;
-use vars qw(@ISA @EXPORT_OK %EXPORT_TAGS);
 
-# uncomment this to run the ### lines
-#use Smart::Comments;
 
-@ISA = ('Exporter');
-@EXPORT_OK = qw(findrefs
-                main_iterations
-                warn_suppress_gtk_icon
-                glib_gtk_versions
-                any_signal_connections
-                nowarnings);
-%EXPORT_TAGS = (all => \@EXPORT_OK);
+# Don't want to load Exporter here since that could hide a problem of a
+# module missing a "use Exporter".  Though Test.pm and Test::More (via
+# Test::Builder::Module) both use it anyway.
+#
+# use Exporter;
+# use vars qw(@ISA @EXPORT_OK %EXPORT_TAGS);
+# @ISA = ('Exporter');
+# @EXPORT_OK = qw(findrefs
+#                 main_iterations
+#                 warn_suppress_gtk_icon
+#                 glib_gtk_versions
+#                 any_signal_connections
+#                 nowarnings);
+# %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 sub DEBUG { 0 }
 

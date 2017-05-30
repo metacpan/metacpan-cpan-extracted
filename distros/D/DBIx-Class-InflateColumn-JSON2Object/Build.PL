@@ -18,7 +18,7 @@ my %module_build_args = (
     "Thomas Klausner <domm\@cpan.org>"
   ],
   "dist_name" => "DBIx-Class-InflateColumn-JSON2Object",
-  "dist_version" => "0.903",
+  "dist_version" => "0.904",
   "license" => "perl",
   "module_name" => "DBIx::Class::InflateColumn::JSON2Object",
   "recommends" => {},
@@ -31,6 +31,7 @@ my %module_build_args = (
     "Moose::Util::TypeConstraints" => 0,
     "Scalar::Util" => 0,
     "String::CamelCase" => 0,
+    "perl" => "5.014",
     "strict" => 0,
     "warnings" => 0
   },
@@ -43,7 +44,6 @@ my %module_build_args = (
     "Test::More" => 0,
     "base" => 0,
     "lib" => 0,
-    "perl" => "5.010",
     "utf8" => 0
   }
 );
@@ -58,7 +58,6 @@ my %fallback_build_requires = (
   "Test::More" => 0,
   "base" => 0,
   "lib" => 0,
-  "perl" => "5.010",
   "utf8" => 0
 );
 

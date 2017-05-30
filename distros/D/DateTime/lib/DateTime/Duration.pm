@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '1.42';
+our $VERSION = '1.43';
 
 use Carp ();
 use DateTime;
@@ -356,7 +356,7 @@ DateTime::Duration - Duration objects for date math
 
 =head1 VERSION
 
-version 1.42
+version 1.43
 
 =head1 SYNOPSIS
 
@@ -633,12 +633,16 @@ http://datetime.perl.org/
 Support for this module is provided via the datetime@perl.org email
 list. See http://lists.perl.org/ for more details.
 
-Bugs may be submitted through L<https://github.com/houseabsolute/DateTime.pm/issues>.
+Bugs may be submitted at L<https://github.com/houseabsolute/DateTime.pm/issues>.
 
 There is a mailing list available for users of this distribution,
 L<mailto:datetime@perl.org>.
 
 I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for DateTime can be found at L<https://github.com/houseabsolute/DateTime.pm>.
 
 =head1 AUTHOR
 
@@ -646,10 +650,13 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Dave Rolsky.
+This software is Copyright (c) 2003 - 2017 by Dave Rolsky.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

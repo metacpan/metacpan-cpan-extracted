@@ -6,7 +6,7 @@ use strict;
 use warnings 'all';
 
 package BZ::Client::Bugzilla;
-$BZ::Client::Bugzilla::VERSION = '4.4001';
+$BZ::Client::Bugzilla::VERSION = '4.4002';
 
 use parent qw( BZ::Client::API );
 
@@ -96,7 +96,7 @@ BZ::Client::Bugzilla - Information about the Bugzilla server, i.e. the Bugzilla:
 
 =head1 VERSION
 
-version 4.4001
+version 4.4002
 
 =head1 SYNOPSIS
 

@@ -1,14 +1,17 @@
 package Chart::Plotly::Trace::Pie;
 use Moose;
+use MooseX::ExtraArgs;
 
 use Chart::Plotly::Trace::Attribute::Domain;
 use Chart::Plotly::Trace::Attribute::Marker;
 
-our $VERSION = '0.012';    # VERSION
+our $VERSION = '0.013';    # VERSION
 
 sub TO_JSON {
-    my $self = shift;
-    my %hash = %$self;
+    my $self       = shift;
+    my $extra_args = $self->extra_args // {};
+    my %hash       = ( %$self, %$extra_args );
+    delete $hash{'extra_args'};
     if ( $self->can('type') && ( !defined $hash{'type'} ) ) {
         $hash{type} = $self->type();
     }
@@ -120,7 +123,7 @@ Chart::Plotly::Trace::Pie
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 
@@ -248,7 +251,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Pablo Rodríguez González.
+Copyright (c) 2017 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

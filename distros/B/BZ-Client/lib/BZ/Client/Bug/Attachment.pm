@@ -1,18 +1,29 @@
 #!/bin/false
 # PODNAME: BZ::Client::Bug::Attachment
 # ABSTRACT: Client side representation of an Attachment to a Bug in Bugzilla
+# vim: softtabstop=4 tabstop=4 shiftwidth=4 ft=perl expandtab smarttab
 
 use strict;
 use warnings 'all';
 
 package BZ::Client::Bug::Attachment;
-$BZ::Client::Bug::Attachment::VERSION = '4.4001';
+$BZ::Client::Bug::Attachment::VERSION = '4.4002';
 use parent qw( BZ::Client::API );
+
+use File::Basename qw/ basename /;
 
 # See https://www.bugzilla.org/docs/tip/en/html/api/Bugzilla/WebService/Bug.html
 # These are in order as per the above
 
 ## functions
+
+sub new {
+    my $class = shift;
+    my $self = $class->SUPER::new(@_);
+    $self->data($self->{data}) # This will make it a ::base64 object
+        if $self->{data};
+    return $self
+}
 
 sub get {
     my($class, $client, $params) = @_;
@@ -20,24 +31,26 @@ sub get {
     my $result = $class->api_call($client, 'Bug.attachments', $params);
 
     if (my $attachments = $result->{attachments}) {
-        if (!$attachments || 'HASH' ne ref($attachments)) {
-            $class->error($client,
-                'Invalid reply by server, expected hash of attachments.');
-        }
+        $class->error($client,
+            'Invalid reply by server, expected hash of attachments.')
+                unless ($attachments and 'HASH' eq ref($attachments));
         for my $id (keys %$attachments) {
+            $attachments->{$id}->{data} =
+                BZ::Client::XMLRPC::base64->new64($attachments->{$id}->{data});
             $attachments->{$id} = __PACKAGE__
                                     ->new( %{$attachments->{$id}} );
         }
     }
 
     if (my $bugs = $result->{bugs}) {
-        if (!$bugs || 'HASH' ne ref($bugs)) {
-            $class->error($client,
-                'Invalid reply by server, expected array of bugs.');
-        }
+        $class->error($client,
+            'Invalid reply by server, expected array of bugs.')
+                unless ($bugs and 'HASH' eq ref($bugs));
         for my $id (keys %$bugs) {
             $bugs->{$id} = [
-                map { __PACKAGE__->new( %$_  ) } @{$bugs->{$id}} ];
+                map { __PACKAGE__->new( %$_  ) }
+                map { $_->{data} = BZ::Client::XMLRPC::base64->new64($_->{data}) if $_->{data}; $_ }
+                @{$bugs->{$id}} ];
         }
     }
 
@@ -48,13 +61,29 @@ sub get {
 
 sub add {
     my($class, $client, $params) = @_;
-    $client->log('debug', 'BZ::Client::Bug::add: Creating');
-    my $result = $class->api_call($client, 'Bug.add_attachment', $params);
-    my $id = $result->{'id'};
-    if (!$id) {
-        $class->error($client, 'Invalid reply by server, expected attachment ID.');
+    # $params = { ids => [], file_name => basename($file), content_type => '?', summary=> $filename, data => \$content
+    $client->log('debug', __PACKAGE__ . '::add: Attaching a file');
+    if ( ref $params eq 'HASH' ) {
+        my $filename;
+        if ( ! $params->{data}
+            and $filename = $params->{file_name}
+            and -f $filename ) {
+            $params->{data} = do {
+                local $/;
+                open( my $fh, '<', $filename );
+                binmode $fh;
+                <$fh>
+            };
+            $params->{file_name} = basename($params->{file_name});
+        }
+        $params->{data} = BZ::Client::XMLRPC::base64->new($params->{data})
+            if (exists $params->{data} and ref $params->{data} eq '');
     }
-    return $id
+    my $result = $class->api_call($client, 'Bug.add_attachment', $params);
+    my $ids = $result->{'ids'};
+    $class->error($client, 'Invalid reply by server, expected attachment ID.')
+        unless $ids;
+    return wantarray ? @$ids : $ids
 }
 
 sub update {
@@ -78,7 +107,9 @@ sub id {
 sub data {
     my $self = shift;
     if (@_) {
-        $self->{'data'} = shift;
+        my $data = shift;
+        $self->{'data'} = ref $data ?
+                  $data : BZ::Client::XMLRPC::base64->new($data);
     }
     else {
         return $self->{'data'}
@@ -187,17 +218,19 @@ BZ::Client::Bug::Attachment - Client side representation of an Attachment to a B
 
 =head1 VERSION
 
-version 4.4001
+version 4.4002
 
 =head1 SYNOPSIS
 
 This class provides methods for accessing and managing attachments in Bugzilla. Instances of this class are returned by L<BZ::Client::Bug::Attachment::get>.
 
-  my $client = BZ::Client->new( url       => $url,
-                                user      => $user,
-                                password  => $password );
+ my $client = BZ::Client->new(
+                        url       => $url,
+                        user      => $user,
+                        password  => $password
+                    );
 
-  my $comments = BZ::Client::Bug::Attachment->get( $client, $ids );
+ my $comments = BZ::Client::Bug::Attachment->get( $client, $ids );
 
 =head1 CLASS METHODS
 
@@ -315,19 +348,31 @@ An instance of this package or a hash containing:
 
 =item ids
 
-I<ids> (array) Required - An array of ints and/or strings--the ID's or aliases of bugs that you want to add this attachment to. The same attachment and comment will be added to all these bugs.
+I<ids> (array) Required - An array of ints and/or strings - the ID's or aliases of bugs that you want to add this attachment to. The same attachment and comment will be added to all these bugs.
 
 =item data
 
-I<data> (string or base64) Required - The content of the attachment. If the content of the attachment is not ASCII text, you must encode it in base64 and declare it as the C<base64> type.
+I<data> (string or base64) Mostly Required - The content of the attachment.
+
+The content will be base64 encoded. Of you can do it yourself by providing this option as a L<BZ::Client::XMPRPC::base64> object.
+
+What is I<"Mostly Required"> you ask? If you provide L</file_name> only, this module will attempt to slurp it to provide this I<data> parameter. See L</file_name> options for more details.
 
 =item file_name
 
 I<file_name> (string) Required - The "file name" that will be displayed in the UI for this attachment.
 
+If no I</data> parameter is provided, this module will attempt to open, slurp the contents of a file with path I<file_name>, base64 encod that data,  placed it into the I</data> parameter, then I<file_name> is truncted to just the files basename.
+
+Failures to open the file (for anyreason) will be silently ignored and the I<file_name> parameter will not be touched.
+
 =item summary
 
 I<summary> (string) Required - A short string describing the attachment.
+
+=item content_type
+
+I<content_type> (string) Required - The MIME type of the attachment, like I<text/plain> or I<image/png>.
 
 =item comment
 
@@ -687,7 +732,13 @@ I<bug_id> (int or string) - The ID or alias of the bug to append a attachment to
 
 I<data> (base64 or string) The content of the attachment.
 
-When writing, if the content of the attachment is not ASCII text, you must encode it in base64 and declare it as the C<base64> type.
+When writing, either provide a string (which will be C<base46> encoded for you) or a L<BZ::Client::XMLRPC::base64> object if you'd like to DIY.
+
+When reading, a L<BZ::Client::XMLRPC::base64> object will be returned. To save you the trip, this object has a C<raw()> and a C<base64()> method. Here is an example.
+
+ my $data = $attachment->data();
+ my $file_content_base64_encoded = $data->base64();
+ my $original_file_content = $data->raw();
 
 B<Required>, Read and Write.
 

@@ -1,5 +1,5 @@
 {
-   "abstract" : "Mojolicious Plugin to create routes automatically",
+   "abstract" : "Mojolicious plugin to load INI format config file",
    "author" : [
       "Yuki Kimoto <kimoto.yuki@gmail.com>"
    ],
@@ -38,6 +38,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 2.27203"
 }

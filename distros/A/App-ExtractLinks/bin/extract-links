@@ -1,0 +1,26 @@
+#!/usr/bin/env perl 
+
+use strict;
+use warnings;
+
+use lib 'lib';
+use App::ExtractLinks;
+
+sub usage {
+  print "\ncurl -s http://some-domain.com/page.html | extract-links\n"
+}
+
+foreach (@ARGV) {
+    if ($_ eq '--help') {
+        usage;
+        exit;
+    }
+
+    if ($_ eq '-h') {
+        usage;
+        exit;
+    }
+}
+
+App::ExtractLinks->run;
+

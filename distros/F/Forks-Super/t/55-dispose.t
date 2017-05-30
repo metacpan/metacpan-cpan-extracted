@@ -43,8 +43,7 @@ ok(exists $Forks::Super::Job::ALL_JOBS{$j->{real_pid}},
 waitpid $j, 0;
 ok(4 << 8 == $j->{status}, "job finished");
 
-#my $q = $j->read_stdout();
-my $q = <$j>;
+my $q = $] >= 5.008008 ? <$j> : $j->read_stdout;
 ok($q eq "foo fee\n", "stdout accessible before dispose")
     or diag("\$q = $q");
 

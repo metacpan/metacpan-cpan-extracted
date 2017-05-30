@@ -13,3 +13,4 @@ Geo-Coder-List-*
 .git
 *.swp
 *.BAK
+t/online.enabled

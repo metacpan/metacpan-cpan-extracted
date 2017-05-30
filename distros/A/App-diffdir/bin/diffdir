@@ -14,12 +14,13 @@ use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
 use FindBin qw/$Bin/;
 use Path::Tiny;
+use App::diffdir;
 
-our $VERSION = 0.5;
+our $VERSION = 0.6;
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 my %option = (
-    exclude => '(?:[.]bzr|[.]svn|CVS|RCS|,v|[~-]$|[.]rpmnew|[.]git|[.]sw[op]$|[.]netrwhist$)|/(?:blib|_build)/|/(?:tags|Build|MYMETA.yml|Debian_CPANTS.txt|[.]vimtagsdisplay)$',
+    exclude => ['(?:[.]bzr|[.]svn|CVS|RCS|,v|[~-]$|[.]rpmnew|[.]git|[.]sw[op]$|[.]netrwhist$)|/(?:blib|_build)/|/(?:tags|Build|MYMETA.yml|Debian_CPANTS.txt|[.]vimtagsdisplay)$'],
     cmd     => 'diff',
     cp      => 0,
     rm      => 0,
@@ -53,8 +54,8 @@ sub main {
         'join|j',
         'follow|f!',
         'fast|F!',
-        'ignore-space-change|b',
-        'ignore-all-space|w',
+        'ignore_all_space|ignore-space-change|b',
+        'ignore_space_change|ignore-all-space|w',
         'missing_dirs|missing-dirs|d!',
         'size_diff|size-diff|D',
         'exec|E!',
@@ -77,211 +78,18 @@ sub main {
     }
 
     # do stuff here
-    my %files;
-    for my $dir (@dirs) {
-        # remove any trailing slashes
-        $dir =~ s{/$}{}xms;
-        $dir = path($dir);
+    my $dd = App::diffdir->new( %option );
+    my %files = $dd->differences(@ARGV);
+    my $sep = @ARGV > 2 ? "\n\t" : "\t";
 
-        # get the list of all files in the dir
-        $files{$dir} = { get_files($dir) };
-    }
-
-    my %uniq;
-    for my $dir ( keys %files ) {
-        for my $file ( keys %{$files{$dir}} ) {
-            $uniq{$file}++;
+    for my $file ( sort keys %files ) {
+        print "$file\n";
+        for my $dir ( @ARGV[ 1 .. $#ARGV ] ) {
+            print "\t$files{$file}{$dir}{diff}\n";
         }
-    }
-
-    my @messages;
-    my @diffs;
-    for my $file ( sort keys %uniq ) {
-        warn "diff $dirs[0]/$file $dirs[1]/$file\n" if $option{verbose};
-        my $ok = 1;
-        my $lengths = 0;
-        my @mesg;
-        my @found;
-        for my $dir ( @dirs ) {
-            if ( !exists $files{$dir}{$file} ) {
-                if ( $option{'script'} || $option{'cp'} ) {
-                    my $cmd
-                        = $option{'rm'} ? 'rm'
-                        : $option{'cp'} ? 'cp'
-                        :                 $option{'cmd'};
-                    if (!@found) {
-                        for my $found (keys %files) {
-                            next if !-e "$found/$file";
-                            push @found, $found;
-                        }
-                    }
-                    for my $found (@found) {
-                        path($dir,$file)->parent->mkpath if $option{missing_dirs};
-                        next if "$found/$file" eq "$dir/$file";
-                        my $msg
-                            = $option{'rm'} ? "$cmd " . shell_quote("$found/$file")
-                            :                 "$cmd " . shell_quote("$found/$file") . ' ' . shell_quote("$dir/$file");
-                        push @mesg, $msg;
-                    }
-                }
-                else {
-                    push @mesg, "$dir missing";
-                }
-                $ok = 0;
-            }
-            else {
-                for my $found (@found) {
-                    my ($length, $diff) = diff("$found/$file", "$dir/$file");
-
-                    if ($diff) {
-                        $lengths += $length;
-                        push @mesg, $diff;
-                        push @diffs, $diff;
-                        if ($option{join}) {
-                            my $file1 = $file;
-                            $file1 =~ s/([.]\w+)$/.1$1/xms;
-                            my $file2 = $file;
-                            $file2 =~ s/([.]\w+)$/.2$1/xms;
-
-                            if ($file1 ne $file2) {
-                                my ($dir_start, $dir_end);
-                                my ($found_start, $found_end);
-
-                                if ($dir =~ m{/}) {
-                                    ($dir_start, $dir_end) = $dir =~ m{^(.*)/([^/]+)/?$};
-                                }
-                                else {
-                                    $dir_end = $dir;
-                                }
-                                if ($dir =~ m{/}) {
-                                    ($found_start, $found_end) = $found =~ m{^(.*)/([^/]+)/?$};
-                                }
-                                else {
-                                    $found_end = $found;
-                                }
-
-                                my $dest = $dir_start ? "$dir_start/$dir_end\_$found_end" : "$dir_end\_$found_end";
-
-                                system "mkdir $dest" if !-d $dest;
-                                if ( $option{rm} ) {
-                                }
-                                else {
-                                    system "cp $dir/$file   $dest/$file1" if -d $dest;
-                                    system "cp $found/$file $dest/$file2" if -d $dest;
-                                }
-                            }
-                        }
-                        $ok = 0;
-                    }
-                    elsif ($option{same}) {
-                        print "$file\n";
-                    }
-                }
-
-                push @found, $dir;
-            }
-        }
-
-        if ( !$ok ) {
-            push @messages, { file => $file, messages => \@mesg, lengths => $lengths };
-        }
-    }
-
-    return if $option{same};
-
-    if ( $option{'script'} ) {
-        for my $msg ( @messages ) {
-            print join "\n", @{$msg->{messages}};
-            print "\n";
-        }
-        return;
-    }
-
-    my $length = 8;
-    for my $msg ( @messages ) {
-        if ( length $msg->{file} > $length ) {
-            $length = length $msg->{file};
-        }
-    }
-    $length++;
-
-    for my $msg ( @messages ) {
-        print $msg->{file} . ' ' x ($length - length $msg->{file});
-        printf "(%5d) ", $msg->{lengths} if $option{size_diff};
-        print join "\n" . (' ' x $length), @{ $msg->{'messages'} };
-        print "\n";
-    }
-
-    if ($option{exec}) {
-        #sleep 1;
-        print join '; ', @diffs;
-        print "\n";
     }
 
     return;
-}
-
-sub diff {
-    my ($file1, $file2) = @_;
-
-    return if !$option{follow} && (-l $file1 || -l $file2);
-
-    my $file1_q = shell_quote($file1);
-    my $file2_q = shell_quote($file2);
-
-    my $cmd  = '/usr/bin/diff';
-    if ( $option{'ignore-space-change'} ) {
-        $cmd .= ' --ignore-space-change';
-    }
-    if ( $option{'ignore-all-space'} ) {
-        $cmd .= ' --ignore-all-space';
-    }
-    $cmd  .= " $file1_q $file2_q";
-    my $diff
-        = -s $file1 != -s $file2 ? abs( (-s $file1) - (-s $file2) )
-        : $option{fast}          ? 0
-        :                          length ''.`$cmd`;
-
-    if ($diff) {
-        warn "$option{cmd} $file1_q $file2_q\n" if $option{verbose};
-        return ( $diff, "$option{cmd} $file1_q $file2_q" );
-    }
-
-    return;
-}
-
-sub get_files {
-    my ($dir, $skip_missing) = @_;
-    my %found;
-
-    die "The directory '$dir' does not exist!\n" if !$skip_missing && !-d $dir;
-    warn "$dir\n" if $option{verbose};
-
-    FILE:
-    for my $file ( $dir->children ) {
-        next FILE if $file =~ /^[.].*[.]sw[n-z]$|^[.](?:svn|bzr|git)$|CVS|RCS$/;
-        next FILE if $option{exclude} && $file =~ /$option{exclude}/;
-
-        if ( -d $file && ($option{follow} || !-l $file) ) {
-            %found = ( %found, get_files($file, 1) );
-        }
-        elsif ( !-d $file ) {
-            $found{$file} = 1;
-        }
-    }
-
-    return %found;
-}
-
-sub shell_quote {
-    my ($text) = @_;
-
-    if ($text =~ /[\s$|><;#]/xms) {
-        $text =~ s/'/'\\''/gxms;
-        $text = "'$text'";
-    }
-
-    return $text;
 }
 
 __DATA__
@@ -292,7 +100,7 @@ diffdir - Compares two or more directories for files that differ
 
 =head1 VERSION
 
-This documentation refers to diffdir version 0.5.
+This documentation refers to diffdir version 0.6.
 
 =head1 SYNOPSIS
 

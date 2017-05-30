@@ -70,6 +70,26 @@ my %expected = (
                        11 => "11 $CLASSIC were found",
                      },
            },
+    '#w100' => {
+             'N'  => { 
+                        0 => "zero $PLURAL were found",
+                        1 => "one $SINGULAR was found",
+                        2 => "two $PLURAL were found",
+                       10 => "ten $PLURAL were found",
+                       11 => "eleven $PLURAL were found",
+                       99 => "ninety-nine $PLURAL were found",
+                      100 => "100 $PLURAL were found",
+                     },
+             'Nc' => {
+                        0 => "zero $CLASSIC were found",
+                        1 => "one $SINGULAR was found",
+                        2 => "two $CLASSIC were found",
+                       10 => "ten $CLASSIC were found",
+                       11 => "eleven $CLASSIC were found",
+                       99 => "ninety-nine $CLASSIC were found",
+                      100 => "100 $CLASSIC were found",
+                     },
+           },
     '#s' => {
              'N'  => { 
                         0 => "no $SINGULAR was found",

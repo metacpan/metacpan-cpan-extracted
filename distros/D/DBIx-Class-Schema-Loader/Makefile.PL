@@ -2,6 +2,7 @@ use warnings;
 use strict;
 
 use 5.008001;
+use lib '.';
 use inc::Module::Install 1.00;
 
 use Getopt::Long();

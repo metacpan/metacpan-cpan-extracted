@@ -4,6 +4,7 @@ author:
   - 'Stephan Loyd <stephanloyd9@gmail.com>'
 build_requires:
   Data::Dumper: '0'
+  List::Util: '0'
   Path::Tiny: '0'
   Test::Deep: '0'
   Test::More: '0'
@@ -20,25 +21,31 @@ name: Lingua-ZH-Jieba
 provides:
   Lingua::ZH::Jieba:
     file: lib/Lingua/ZH/Jieba.pm
-    version: '0.003'
+    version: '0.004'
   Lingua::ZH::Jieba::Jieba:
     file: lib/Lingua/ZH/Jieba.pm
-    version: '0.003'
+    version: '0.004'
   Lingua::ZH::Jieba::KeywordExtractor:
     file: lib/Lingua/ZH/Jieba.pm
-    version: '0.003'
+    version: '0.004'
+  Lingua::ZH::Jieba::Word:
+    file: lib/Lingua/ZH/Jieba.pm
+    version: '0.004'
   Lingua::ZH::Jieba::vector_keyword:
     file: lib/Lingua/ZH/Jieba.pm
-    version: '0.003'
+    version: '0.004'
   Lingua::ZH::Jieba::vector_s:
     file: lib/Lingua/ZH/Jieba.pm
-    version: '0.003'
+    version: '0.004'
+  Lingua::ZH::Jieba::vector_word:
+    file: lib/Lingua/ZH/Jieba.pm
+    version: '0.004'
   Lingua::ZH::Jieba::vector_wordpos:
     file: lib/Lingua/ZH/Jieba.pm
-    version: '0.003'
+    version: '0.004'
   Lingua::ZH::Jiebac:
     file: lib/Lingua/ZH/Jieba.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   DynaLoader: '0'
   Exporter: '0'
@@ -51,5 +58,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/stphnlyd/perl5-jieba.git
-version: '0.003'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '0.004'
+x_serialization_backend: 'YAML::Tiny version 1.70'

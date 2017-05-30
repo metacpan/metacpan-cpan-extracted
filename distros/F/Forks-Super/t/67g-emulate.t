@@ -34,7 +34,7 @@ ok($z eq "wORLD\n",
 okl($t <= 1, "fast return [2] ${t}s expected <= 1s");
 
 $t = Time::HiRes::time();
-$z = <$pid>;
+$z = $] >= 5.008008 ? <$pid> : $pid->read_stdout;
 $t = Time::HiRes::time() - $t;
 ok($z ne '', "<\$obj> not waiting, not empty");
 okl($t <= 1, "fast return [3] ${t}s expected <= 1s");

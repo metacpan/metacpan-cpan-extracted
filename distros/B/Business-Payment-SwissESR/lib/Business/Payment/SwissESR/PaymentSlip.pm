@@ -50,7 +50,7 @@ The SwissESR objects have the following properties:
 =cut
 
 use vars qw($VERSION);
-use Mojo::Util qw(slurp);
+use Mojo::File;
 use Mojo::Base -base;
 use Cwd;
 
@@ -208,7 +208,7 @@ my $runLaTeX = sub {
     if (not -e $tmpdir.'/esr.pdf' or -z $tmpdir.'/esr.pdf'){
         die $latexOut;
     }
-    my $pdf = slurp $tmpdir.'/esr.pdf';
+    my $pdf = Mojo::File->new($tmpdir.'/esr.pdf')->slurp;
     return $pdf;
 };
 

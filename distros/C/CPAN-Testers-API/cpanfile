@@ -1,5 +1,5 @@
 requires "Alien::SwaggerUI" => "0";
-requires "CPAN::Testers::Schema" => "0.010";
+requires "CPAN::Testers::Schema" => "0.013";
 requires "File::Share" => "0";
 requires "Import::Base" => "0.012";
 requires "Log::Any" => "1.045";
@@ -9,7 +9,7 @@ requires "Mojolicious" => "7.24";
 requires "Mojolicious::Plugin::Config" => "0";
 requires "Mojolicious::Plugin::OpenAPI" => "1.13";
 requires "perl" => "5.024";
-recommends "Data::FlexSerializer" => "0";
+recommends "DateTime" => "0";
 
 on 'test' => sub {
   requires "ExtUtils::MakeMaker" => "0";
@@ -29,6 +29,7 @@ on 'test' => sub {
   recommends "DBD::SQLite" => "0";
   recommends "Test::Reporter" => "0";
   recommends "Test::Reporter::Transport::Null" => "0";
+  recommends "Test::mysqld" => "0";
 };
 
 on 'configure' => sub {

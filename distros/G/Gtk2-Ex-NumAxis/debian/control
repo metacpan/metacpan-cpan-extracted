@@ -1,4 +1,4 @@
-# Copyright 2010, 2011 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2016 Kevin Ryde
 # 
 # This file is part of Gtk2-Ex-NumAxis.
 # 
@@ -24,10 +24,10 @@ Source: libgtk2-ex-numaxis-perl
 Section: perl
 Priority: optional
 Build-Depends: cdbs, debhelper (>= 5)
-Maintainer: Kevin Ryde <user42@zip.com.au>
-Standards-Version: 3.9.2
+Maintainer: Kevin Ryde <user42_kevin@yahoo.com.au>
+Standards-Version: 3.9.8
 Homepage: http://user42.tuxfamily.org/gtk2-ex-numaxis/index.html
-Bugs: mailto:user42@zip.com.au
+Bugs: mailto:user42_kevin@yahoo.com.au
 
 Package: libgtk2-ex-numaxis-perl
 Architecture: all

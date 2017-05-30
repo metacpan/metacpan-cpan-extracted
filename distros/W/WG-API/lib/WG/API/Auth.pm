@@ -3,7 +3,12 @@ package WG::API::Auth;
 use 5.014;
 use Moo;
 
-extends 'WG::API';
+has api_uri => (
+    is      => 'ro',
+    default => sub{ 'api.worldoftanks.ru/wot' },
+);
+
+with 'WG::API::Base';
 
 =head1 NAME
 
@@ -11,11 +16,11 @@ WG::API::Auth  - Auth-module with using OpenID for work with WG PAPI
 
 =head1 VERSION
 
-Version v0.8.1
+Version v0.8.3
 
 =cut
 
-our $VERSION = 'v0.8.1';
+our $VERSION = 'v0.8.3';
 
 =head1 SYNOPSIS
 
@@ -42,9 +47,8 @@ Information on authorization status is sent to URL specified in redirect_uri par
 
 sub login { 
     my $self = shift;
-    $self->_request( 'get', 'auth/login', ['expires_at', 'redirect_uri', 'display', 'nofollow'], undef, @_ );
 
-    return $self->status eq 'ok' ? $self->response : undef;
+    return $self->_request( 'get', 'auth/login', ['expires_at', 'redirect_uri', 'display', 'nofollow'], undef, @_ );
 }  
 
 =head3 prolongate
@@ -55,7 +59,11 @@ This method is used when the player is still using the application but the curre
 
 =cut
 
-sub prolongate { shift->_request( 'get', 'auth/prolongate', ['access_token', 'expires_at'], ['access_token'], @_ ) }
+sub prolongate { 
+    my $self = shift;
+
+    return $self->_request( 'post', 'auth/prolongate', ['access_token', 'expires_at'], ['access_token'], @_ );
+}
 
 =head3 logout
 
@@ -65,12 +73,11 @@ After this method is called, access_token becomes invalid.
 
 =cut
 
-sub logout { shift->_request( 'get', 'auth/logout', ['access_token'], ['access_token'], @_ ) }
+sub logout {
+    my $self = shift;
 
-has api_uri => (
-    is      => 'ro',
-    default => 'api.worldoftanks.ru/wot',
-);
+    return $self->_request( 'post', 'auth/logout', ['access_token'], ['access_token'], @_ );
+}
 
 =head1 BUGS
 
@@ -111,7 +118,7 @@ L<http://search.cpan.org/dist/WG-API/>
 
 =head1 SEE ALSO
 
-WG API Reference L<http://ru.wargaming.net/developers/>
+WG API Reference L<https://developers.wargaming.net/>
 
 =head1 AUTHOR
 

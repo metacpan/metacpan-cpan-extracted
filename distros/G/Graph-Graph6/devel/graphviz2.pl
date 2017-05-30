@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015 Kevin Ryde
+# Copyright 2015, 2017 Kevin Ryde
 #
 # This file is part of Graph-Graph6.
 #
@@ -30,6 +30,110 @@ use Smart::Comments;
 
 
 {
+  # digraph6
+  require GraphViz2::Parse::Graph6;
+  require IPC::Run;
+  my $genspecialg_program = 'nauty-genspecialg';
+
+  # open OUT as a pipe filehandle to read the output of "geng"
+  IPC::Run::start([$genspecialg_program,
+                   '-z',    # directed
+                   '-c6',   # cycle-6
+                  ],
+                  '>pipe', \*OUT);
+
+  my $graphviz2 = GraphViz2->new(global => {directed => 1});
+  my $parse = GraphViz2::Parse::Graph6->new(graph=>$graphviz2)
+    ->create(fh=>\*OUT);
+  $graphviz2->run(format => 'xlib');
+  exit 0;
+}
+
+{
+  # output formats  file:///usr/share/doc/graphviz/html/info/output.html
+  require GraphViz2::Parse::Graph6;
+  my $parse = GraphViz2::Parse::Graph6->new;
+  my $graphviz2 = $parse->graph;
+  $graphviz2->default_node(shape=>'triangle');
+
+  $parse->create(file_name => "$ENV{HOME}/HOG/trees10.g6");
+
+  # $graphviz2->run(format => 'dot', output_file => '/tmp/x.dot');
+  $graphviz2->run(format => 'xlib');
+  # print $graphviz2->dot_input;
+  exit 0;
+}
+
+{
+  my $graphviz2 = GraphViz2->new(edge   => {},
+                                 global => {directed => 0},
+                                 graph  => {},
+                                 node   => {},
+                                 verbose => 1,
+                                );
+  # $graphviz2->default_graph(directed => 'graph');
+  # $graphviz2->default_graph(global => { directed => 1 });
+
+  ### global: $graphviz2->global
+  # $graphviz2->global->{directed=>'digraph'};
+  ### global: $graphviz2->global
+
+  $graphviz2->add_edge(from => 'one', to => 'two');
+  $graphviz2->run(format => 'x11', output_file => '/dev/stdout');
+  exit 0;
+}
+{
+  require GraphViz2::Parse::Regexp;
+  my $parse = GraphViz2::Parse::Regexp->new;
+  my $graphviz2 = $parse->graph;
+  ### after new: ref $graphviz2
+
+  $parse->create(regexp => '(([abcd0-9])|(foo))');
+  ### after create: ref $graphviz2
+
+  my $ps_filename = '/tmp/x.ps';
+  $graphviz2->run(format => 'ps', output_file => $ps_filename);
+  MyGraphs::postscript_view_file($ps_filename);
+  exit 0;
+}
+
+{
+  require GraphViz2::Parse::Regexp;
+  my $graphviz2 = GraphViz2->new(edge   => {},
+                                 global => {directed => 1},
+                                 graph  => {concentrate => 1, rankdir => 'TB'},
+                                 node   => {},
+                                 verbose => 1,
+                                );
+  my $parse = GraphViz2::Parse::Regexp->new;
+  $graphviz2 = $parse->graph;
+  $parse->create(regexp => '(([abcd0-9])|(foo))');
+  my $ps_filename = '/tmp/x.ps';
+  $graphviz2->run(format => 'ps', output_file => $ps_filename);
+  MyGraphs::postscript_view_file($ps_filename);
+  exit 0;
+}
+
+{
+  # ISA graph
+  print GraphViz2->VERSION,"\n";
+  require GraphViz2::Parse::ISA;
+  my $i = GraphViz2::Parse::ISA->UNIVERSAL::isa('GraphViz2::Parse::ISA');
+  # my $i = GraphViz2::Parse::ISA->isa('GraphViz2::Parse::ISA');
+  ### $i
+
+  my $parse = GraphViz2::Parse::ISA->new;
+  my $graph = $parse->graph;
+  ### after create: ref $graph
+
+  $parse->add(class => 'GraphViz2::Parse');
+  $graph = $parse->graph;
+  ### after add: ref $graph
+
+  exit 0;
+}
+
+{
   # ->log(error=>"...") is a die, doesn't go through logger
 
   use GraphViz2;
@@ -48,30 +152,8 @@ use Smart::Comments;
   exit 0;
 }
 
-{
-  # output formats  file:///usr/share/doc/graphviz/html/info/output.html
-  require GraphViz2::Parse::Graph6;
-  my $parse = GraphViz2::Parse::Graph6->new;
-  my $graphviz2 = $parse->graph;
-  $graphviz2->default_node(shape=>'triangle');
 
-  $parse->create(file_name => "$ENV{HOME}/HOG/trees10.g6");
 
-  # $graphviz2->run(format => 'dot', output_file => '/tmp/x.dot');
-  $graphviz2->run(format => 'xlib');
-  # print $graphviz2->dot_input;
-  exit 0;
-}
-{
-  # ISA graph
-  print GraphViz2->VERSION,"\n";
-  require GraphViz2::Parse::ISA;
-  my $i = GraphViz2::Parse::ISA->UNIVERSAL::isa('GraphViz2::Parse::ISA');
-  # my $i = GraphViz2::Parse::ISA->isa('GraphViz2::Parse::ISA');
-
-  ### $i
-  exit 0;
-}
 
 {
   # ISA graph
@@ -99,22 +181,7 @@ use Smart::Comments;
   exit 0;
 }
 
-{
-  require GraphViz2::Parse::Regexp;
-  my $graphviz2 = GraphViz2->new(edge   => {},
-                                 global => {directed => 1},
-                                 graph  => {concentrate => 1, rankdir => 'TB'},
-                                 node   => {},
-                                 verbose => 1,
-                                );
-  my $parse = GraphViz2::Parse::Regexp->new;
-  $graphviz2 = $parse->graph;
-  $parse->create(regexp => '(([abcd0-9])|(foo))');
-  my $ps_filename = '/tmp/x.ps';
-  $graphviz2->run(format => 'ps', output_file => $ps_filename);
-  postscript_view($ps_filename);
-  exit 0;
-}
+
 
 
 {

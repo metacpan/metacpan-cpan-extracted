@@ -4,7 +4,7 @@ use base qw/Prty::Database::Row::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.106;
+our $VERSION = 1.107;
 
 use Prty::Hash;
 
@@ -259,7 +259,7 @@ sub cast {
 
 =head1 VERSION
 
-1.106
+1.107
 
 =head1 AUTHOR
 

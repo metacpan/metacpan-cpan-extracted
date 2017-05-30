@@ -52,17 +52,15 @@ for my $impl (IMPL()) {
     $q->clear;
     ok($q->pending == 0, 'clear respected');
 
-    $q->limit = 6;
-    is($q->limit, 6, "limit lvalue in $impl") or do {
-        no warnings 'once';
-        local $Forks::Queue::XDEBUG = 1;
-        diag "limit lvalue failure: re-running with diagnostics";
-        diag "initial limit is ",$q->limit;
+    # $queue->limit as an lvalue may not work in Perl <v5.14
+    if (!tied($q->limit)) {
+        diag "\$q->limit as an lvalue will not work for impl=$impl, v$]";
+    } else {
         $q->limit = 6;
-        diag "final limit is ",$q->limit;
-    };
-    $c = $q->put(1..40);
-    is($c, 6, 'limit from lvalue respected') or diag $c;
+        is($q->{limit}, 6, "limit lvalue in $impl");
+        $c = $q->put(1..40);
+        is($c, 6, 'limit from lvalue respected') or diag $c;
+    }
 
     $q->clear;
     ok($q->pending == 0, 'queue cleared');
@@ -81,7 +79,12 @@ for my $impl (IMPL()) {
 
     $pid = fork();
     if ($pid == 0) {
-        $q->limit = 17;
+        if (tied($q->limit)) {
+            $q->limit = 17;
+        } else {
+            $q->limit(17);
+        }
+        $q->put(5);
         exit;
     }
     waitpid $pid,0;

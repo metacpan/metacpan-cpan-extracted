@@ -1,5 +1,5 @@
 # -*-CPerl-*-
-# Last changed Time-stamp: <2017-03-09 16:16:26 michl>
+# Last changed Time-stamp: <2017-05-28 17:05:51 mtw>
 
 # Bio::RNA::RNAaliSplit::WrapRNAz.pm: A versatile object-oriented
 # wrapper for RNAz
@@ -9,32 +9,23 @@
 
 package Bio::RNA::RNAaliSplit::WrapRNAz;
 
-use version; our $VERSION = qv('0.04');
+use version; our $VERSION = qv('0.05');
 use Carp;
 use Data::Dumper;
 use Moose;
-use Moose::Util::TypeConstraints;
-use Path::Class::File;
-use Path::Class::Dir;
 use Path::Class;
-use File::Basename;
 use IPC::Cmd qw(can_run run);
+use File::Path qw(make_path);
+#use diagnostics;
 
 my ($rnaz,$oodir);
 
-has 'alnfilebasename' => (
-			  is => 'rw',
-			  isa => 'Str',
-			  predicate => 'has_alnfilebasename',
-			  init_arg => undef, # make this unsettable via constructor
-			 );
-
-has 'bn' => (
-	     is => 'rw',
-	     isa => 'Str',
-	     predicate => 'has_basename',
-	     documentation => q(Set this to override output basename),
-	    );
+has 'basename' => (
+		   is => 'rw',
+		   isa => 'Str',
+		   predicate => 'has_basename',
+		   documentation => q(Set this to override output basename),
+		  );
 
 has 'P' => (
 	    is => 'rw',
@@ -57,7 +48,8 @@ has 'sci' => (
 	      documentation => q(Structure conservation index),
 	     );
 
-with 'Bio::RNA::RNAaliSplit::FileDir';
+with 'FileDirUtil';
+with 'Bio::RNA::RNAaliSplit::Roles';
 
 sub BUILD {
   my $self = shift;
@@ -67,14 +59,14 @@ sub BUILD {
    $rnaz = can_run('RNAz') or
      croak "ERROR [$this_function] RNAz not found";
   unless($self->has_odir){
-    unless($self->has_odirn){self->odirname("as")}
-    $self->odir( [$self->ifile->dir,$self->odirn] );
-    mkdir($self->odir);
+    unless($self->has_dirnam){self->dirnam("as")}
+    $self->odir( [$self->ifile->dir,$self->dirnam] );
   }
   $oodir = $self->odir->subdir("rnaz");
-  mkdir($oodir);
-  $self->alnfilebasename(fileparse($self->ifile->basename, qr/\.[^.]*/));
-
+  my @created = make_path($oodir, {error => \my $err});
+  confess "ERROR [$this_function] could not create output directory $self->oodir"
+    if (@$err);
+  $self->set_ifilebn;
   $self->run_rnaz();
 }
 
@@ -82,8 +74,8 @@ sub run_rnaz {
   my $self = shift;
   my $this_function = (caller(0))[3];
   my ($rnaz_outfilename,$rnaz_out);
-  if ($self->has_alnfilebasename){$rnaz_outfilename = $self->alnfilebasename.".rnaz.out"}
-  elsif ($self->has_basename){$rnaz_outfilename = $self->bn.".rnaz.out"}
+  if ($self->has_basename){$rnaz_outfilename = $self->basename.".rnaz.out"}
+  elsif ($self->has_ifilebn){$rnaz_outfilename = $self->ifilebn.".rnaz.out"}
   else{$rnaz_outfilename = "rnaz.out"}
   $rnaz_out = file($oodir,$rnaz_outfilename);
   open my $fh, ">", $rnaz_out;
@@ -100,7 +92,6 @@ sub run_rnaz {
   my @out = split /\n/, $stdout_buffer;
   foreach my $line( @out){print $fh $line,"\n"}
   close($fh);
-
   $self->_parse_rnaz($stdout_buffer);
 }
 

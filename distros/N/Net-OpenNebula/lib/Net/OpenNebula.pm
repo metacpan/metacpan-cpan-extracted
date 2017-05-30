@@ -29,7 +29,7 @@ With this module you can access the OpenNebula XML-RPC service.
 =cut
 
 package Net::OpenNebula;
-$Net::OpenNebula::VERSION = '0.310.0';
+$Net::OpenNebula::VERSION = '0.311.0';
 use Net::OpenNebula::RPCClient;
 push our @ISA , qw(Net::OpenNebula::RPCClient);
 

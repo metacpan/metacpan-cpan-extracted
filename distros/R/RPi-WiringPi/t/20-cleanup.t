@@ -25,7 +25,7 @@ my $pi = $mod->new;
 
     my $c = 1;
     for ($pin1, $pin2, $pin3){
-        isa_ok $_, 'RPi::WiringPi::Pin';
+        isa_ok $_, 'RPi::Pin';
         is $_->num, $c, "pin $c has correct num";
         $c++;
     }

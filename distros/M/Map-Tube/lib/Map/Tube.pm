@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '3.29';
+$Map::Tube::VERSION   = '3.30';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube - Core library as Role (Moo) to process map data.
 
 =head1 VERSION
 
-Version 3.29
+Version 3.30
 
 =cut
 
@@ -78,23 +78,17 @@ This role has been taken by the following modules (and many more):
 
 =back
 
-If you are new to L<Map::Tube> then I would recommend to read L<Map::Tube::Cookbook>
-first. It tries to explain the nitty gritty of L<Map::Tube>.
+If you are keen to know the internals of L<Map::Tube> then please follow the note
+documented in L<Map::Tube::Cookbook>.
 
 =cut
 
-has name           => (is => 'rw');
-has nodes          => (is => 'rw', isa => NodeMap);
-has lines          => (is => 'rw', isa => Lines  );
-has tables         => (is => 'rw', isa => Tables );
-has routes         => (is => 'rw', isa => Routes );
-has name_to_id     => (is => 'rw');
-has plugins        => (is => 'rw');
-
-has _active_links  => (is => 'rw');
-has _other_links   => (is => 'rw');
-has _lines         => (is => 'rw', isa => LineMap);
-has _line_stations => (is => 'rw');
+has [qw(name name_to_id plugins _active_link _other_links _line_stations)] => (is => 'rw');
+has nodes  => (is => 'rw', isa => NodeMap);
+has lines  => (is => 'rw', isa => Lines  );
+has tables => (is => 'rw', isa => Tables );
+has routes => (is => 'rw', isa => Routes );
+has _lines => (is => 'rw', isa => LineMap);
 
 our $AUTOLOAD;
 
@@ -122,8 +116,8 @@ sub BUILD {
     my ($self) = @_;
 
     # Handle lazy attributes.
-    my @methods = $self->meta->get_method_list;
-    unless ((grep /^xml$/, @methods) || (grep /^json$/, @methods)) {
+    my @attributes = (keys %{Moo->_constructor_maker_for(ref($self))->all_attribute_specs});
+    unless ((grep /^xml$/, @attributes) || (grep /^json$/, @attributes)) {
         die "ERROR: Can't apply Map::Tube role, missing 'xml' or 'json'.";
     }
 

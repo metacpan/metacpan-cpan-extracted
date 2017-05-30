@@ -1,5 +1,6 @@
 license="artistic_2"
 badges = ['travis', 'coveralls', 'gitter']
 abstract_from="lib/WG/API.pm"
+authors_from="lib/WG/API.pm"
 [release]
 pause_config = "/home/cynovg/.pause"

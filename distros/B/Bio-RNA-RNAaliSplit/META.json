@@ -4,7 +4,7 @@
       "Michael T. Wolfinger <michael@wolfinger.eu>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "agpl_3"
    ],
@@ -22,7 +22,8 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "Test::Prereq" : "0"
          }
       },
       "configure" : {
@@ -41,6 +42,7 @@
             "File::Basename" : "0",
             "File::Path" : "0",
             "File::Spec" : "0",
+            "FileDirUtil" : "0",
             "Getopt::Long" : "2.0",
             "IO::Dir" : "0",
             "IPC::Cmd" : "0",
@@ -49,10 +51,11 @@
             "Moose::Util::TypeConstraints" : "0",
             "Path::Class" : "0",
             "Path::Class::Dir" : "0",
-            "Path::Class::File" : "0",
             "Pod::Usage" : "0",
             "RNA" : "v2.3.4",
             "Storable" : "0",
+            "lib" : "0",
+            "namespace::autoclean" : "0",
             "perl" : "5.01",
             "strict" : "0",
             "version" : "0",
@@ -61,6 +64,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.4.0",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "v0.05",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

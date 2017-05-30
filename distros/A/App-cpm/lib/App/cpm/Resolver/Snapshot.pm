@@ -4,13 +4,13 @@ use warnings;
 use App::cpm::version;
 use App::cpm::Logger;
 use Carton::Snapshot;
-our $VERSION = '0.302';
+our $VERSION = '0.304';
 
 sub new {
     my ($class, %option) = @_;
     my $snapshot = Carton::Snapshot->new(path => $option{path} || "cpanfile.snapshot");
     $snapshot->load;
-    my $mirror = $option{mirror} || ["http://www.cpan.org", "http://backpan.perl.org"];
+    my $mirror = $option{mirror} || ["https://cpan.metacpan.org/"];
     s{/*$}{/} for @$mirror;
     bless {
         %option,

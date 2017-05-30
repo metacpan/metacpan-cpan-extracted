@@ -14,7 +14,7 @@ use Scalar::Util qw(weaken blessed);
 use List::Util qw(min max);
 use Carp qw(carp);
 
-our $VERSION = '5.62';
+our $VERSION = '5.63';
 our $events  = $Evented::Object::events;
 our $props   = $Evented::Object::props;
 

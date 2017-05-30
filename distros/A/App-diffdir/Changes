@@ -1,5 +1,33 @@
 Revision history for App-diffdir
 
+0.6   2017-05-28
+        Updating for release of version 0.6
+        Outputting more info (Ivan Wills)
+        Removed diagnostic message (Ivan Wills)
+        Using new lib (Ivan Wills)
+        Fixing test for new exclude parameter (Ivan Wills)
+        Making "options" individual atteributes (Ivan Wills)
+        Added missing negation (Ivan Wills)
+        Setting minimum supported version to perl 5.10 (Ivan Wills)
+        Added dodiff to switch between Text::Diff and the diff command (Ivan Wills)
+        Removed "version" from used modules (Ivan Wills)
+        Restarting (Ivan Wills)
+        Adding Text::Diff to dependencies (Ivan Wills)
+        Updated license (Ivan Wills)
+        Adding generating differences (Ivan Wills)
+        Saving Path::Tiny object (Ivan Wills)
+        Starting testing tests (Ivan Wills)
+        Making data structure more comple (Ivan Wills)
+        Testing get_file opperation (Ivan Wills)
+        Cleaning up full path (Ivan Wills)
+        Fixing tests (Ivan Wills)
+        Testing "exclude" functionality (Ivan Wills)
+        default editing of tests (Ivan Wills)
+        Adding get_files fn to find all possible files for all directories (Ivan Wills)
+        New tests for diffdir internals re-write (Ivan Wills)
+        Helper lib to create directory structures for testing (Ivan Wills)
+        Added perl 5.24 to travis build (Ivan Wills)
+
 0.5   2016-06-19
         Updating for release of version 0.5
         Added Moo dependency (Ivan Wills)

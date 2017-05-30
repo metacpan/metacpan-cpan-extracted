@@ -1,10 +1,10 @@
 package Prty::ContentProcessor::Type;
-use base qw/Prty::Section::Object Prty::ClassConfig/;
+use base qw/Prty::ContentProcessor::BaseType/;
 
 use strict;
 use warnings;
 
-our $VERSION = 1.106;
+our $VERSION = 1.107;
 
 # -----------------------------------------------------------------------------
 
@@ -14,19 +14,9 @@ our $VERSION = 1.106;
 
 Prty::ContentProcessor::Type - Basisklasse für Entitäts-Typen
 
-=head1 BASE CLASSES
+=head1 BASE CLASS
 
-=over 2
-
-=item *
-
-L<Prty::Section::Object>
-
-=item *
-
-L<Prty::ClassConfig>
-
-=back
+L<Prty::ContentProcessor::BaseType>
 
 =head1 DESCRIPTION
 
@@ -99,6 +89,11 @@ Zugriff auf alle anderen Entitäten.
 Referenz auf die Plugin-Definition. Diese wird von der Methode
 entityId() herangezogen um die Entity-Id zu generieren.
 
+=item fileSource
+
+Der gesamte Quelltext der Entität, wenn es sich um eine
+Datei-Entität [] handelt. Bei Sub-Entitäten () ein Leerstring.
+
 =item testable
 
 Attribut, das anzeigt, ob die Entität Programmcode repräsentiert
@@ -132,12 +127,6 @@ wenn der Name anders hergeleitet werden soll.
 oder überschrieben werden müssen
 
 =over 4
-
-=item addSubSection()
-
-Ergänze die Entität um einen (Sub-)Abschnitt. Die
-Basisklassenmethode verarbeitet das Abschnitts-Objekt nicht.
-Die Methode wird überschrieben.
 
 =item files()
 
@@ -215,6 +204,7 @@ sub create {
     $sec->set(
         processor=>$cop,
         plugin=>$plg,
+        fileSource=>'',
         testable=>0,
         # memoize
         name=>undef,
@@ -352,7 +342,7 @@ sub entityType {
 
 # -----------------------------------------------------------------------------
 
-=head3 files() - Liste der Ausgebadateien
+=head3 files() - Liste der Ausgabedateien
 
 =head4 Synopsis
 
@@ -370,6 +360,83 @@ in Subklassen überschrieben.
 
 sub files {
     my $self = shift;
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 fileSource() - Gesamter Quelltext
+
+=head4 Synopsis
+
+    $source = $ent->fileSource;
+
+=head4 Description
+
+Liefere den gesamten Quelltext der Entität, wie er in der
+Enttitätsdatei steht, einschließlich des Quelltexts der
+Sub-Entitäten.
+
+=head4 Returns
+
+Quelltext (String)
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub fileSource {
+    return shift->get('fileSource');
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 fileSourceRef() - Referenz auf gesamten Quelltext
+
+=head4 Synopsis
+
+    $sourceR = $ent->fileSourceRef;
+
+=head4 Description
+
+Wie $ent->L</fileSource>(), nur dass eine Referenz auf den
+Quelltext geliefert wird.
+
+=head4 Returns
+
+Referenz auf Quelltext
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub fileSourceRef {
+    return shift->getRef('fileSource');
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 appendFileSource() - Ergänze Quelltext
+
+=head4 Synopsis
+
+    $ent->appendFileSource($sec);
+
+=head4 Description
+
+Ergänze Attribut fileSource um den Quelltext des Abschnitts $sec.
+
+=head4 Returns
+
+nichts
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub appendFileSource {
+    my ($self,$sec) = @_;
+    $self->append(fileSource=>$sec->source);
     return;
 }
 
@@ -586,78 +653,9 @@ sub needsUpdate {
 
 # -----------------------------------------------------------------------------
 
-=head2 Intern
-
-=head3 attributes() - Liste der zulässigen Abschnitts-Attribute
-
-=head4 Synopsis
-
-    @attributes | $attributeA = $class->attributes;
-
-=head4 Description
-
-Ermittele die Liste der Namen der zulässigen Abschnitts-Attribute
-entlang der Klassenhierarchie und liefere diese zurück. Die
-Liste ist alphabetisch sortiert.
-
-=head4 Returns
-
-Liste der Namen der Abschnitts-Attribute. Im Skalar-Kontext wird
-eine Referenz auf die Liste geliefert.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub attributes {
-    my $class = shift;
-
-    my $a = $class->defMemoize('attributes',sub {
-        my ($class,$key) = @_;
-
-        my $a = $class->defCumulate('Attributes');
-        @$a = sort @$a;
-        return $a;
-    });
-
-    return wantarray? @$a: $a;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 contentAllowed() - Inhalt im Abschnitt erlaubt?
-
-=head4 Synopsis
-
-    $bool = $class->contentAllowed;
-
-=head4 Description
-
-Ermittele, ob Abschnitte des Entitätstyps einen Inhalt haben dürfen.
-Wenn ja, liefert die Methode 1, andernfalls 0.
-
-=head4 Returns
-
-Boolscher Wert
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub contentAllowed {
-    my $class = shift;
-
-    return $class->defMemoize('contentAllowed',sub {
-        my ($class,$key) = @_;
-        return $class->defSearch('ContentAllowed');
-    });
-}
-
-# -----------------------------------------------------------------------------
-
 =head1 VERSION
 
-1.106
+1.107
 
 =head1 AUTHOR
 

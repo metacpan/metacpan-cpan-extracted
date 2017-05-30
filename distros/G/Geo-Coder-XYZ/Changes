@@ -1,5 +1,8 @@
 Revision history for Geo-Coder-XYZ
 
+0.03
+	Fix list context
+
 0.02	Sat 13 May 09:41:13 EDT 2017
 	Only run on-line tests when wanted
 

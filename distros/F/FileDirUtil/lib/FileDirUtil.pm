@@ -1,5 +1,5 @@
 # -*-CPerl-*-
-# Last changed Time-stamp: <2017-05-23 00:04:08 mtw>
+# Last changed Time-stamp: <2017-05-28 13:54:04 mtw>
 
 =head1 NAME
 
@@ -11,6 +11,11 @@ FileDirUtil - A Moose Role for basic File IO
   use Moose;
 
   with 'FileDirUtil';
+
+  sub BUILD {
+     my $self = shift;
+     $self->set_ifilebn;
+  }
 
 =head1 DESCRIPTION
 
@@ -29,8 +34,9 @@ L<Path::Class::File> object.
 
 =item odir
 
-An ArrayRef specifying path segments of directories which will be
-joined to create a single L<Path::Class::Dir> directory object.
+A L<Path::Class::Dir> object or an ArrayRef specifying path segments
+of directories which will be joined to create a single
+L<Path::Class::Dir> directory object.
 
 =back
 
@@ -38,12 +44,13 @@ joined to create a single L<Path::Class::Dir> directory object.
 
 package FileDirUtil;
 
-use version; our $VERSION = qv('0.02');
+use version; our $VERSION = qv('0.03');
 use Moose::Util::TypeConstraints;
 use Moose::Role;
 use Path::Class::File;
 use Path::Class::Dir;
 use File::Basename;
+use Params::Coerce ();
 use namespace::autoclean;
 
 subtype 'MyFile' => as class_type('Path::Class::File');
@@ -55,6 +62,8 @@ coerce 'MyFile'
 subtype 'MyDir' => as class_type('Path::Class::Dir');
 
 coerce 'MyDir'
+  => from 'Object'
+  => via {$_ -> isa('Path::Class::Dir') ? $_ : Params::Coerce::coerce ('Path::Class::Dir', $_); }
   => from 'ArrayRef'
   => via { Path::Class::Dir->new( @{ $_ } ) };
 

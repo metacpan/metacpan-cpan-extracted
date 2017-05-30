@@ -3,70 +3,48 @@ abstract: 'PAR Packager'
 author:
   - 'Audrey Tang <cpan@audreyt.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.59
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::Embed: 0
-  ExtUtils::MakeMaker: 6.59
-distribution_type: module
+  DynaLoader: '0'
+  ExtUtils::CBuilder: '0'
+  ExtUtils::Embed: '0'
+  File::Basename: '0'
+  File::Glob: '0'
+  File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'Module::Install version 1.17'
-license: perl_5
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: PAR-Packer
 no_index:
   directory:
-    - contrib
-    - inc
     - t
-provides:
-  App::Packer::PAR:
-    file: lib/App/Packer/PAR.pm
-    version: '0.91'
-  PAR::Filter:
-    file: lib/PAR/Filter.pm
-    version: '0.03'
-  PAR::Filter::Bleach:
-    file: lib/PAR/Filter/Bleach.pm
-  PAR::Filter::Bytecode:
-    file: lib/PAR/Filter/Bytecode.pm
-  PAR::Filter::Obfuscate:
-    file: lib/PAR/Filter/Obfuscate.pm
-  PAR::Filter::PatchContent:
-    file: lib/PAR/Filter/PatchContent.pm
-  PAR::Filter::PodStrip:
-    file: lib/PAR/Filter/PodStrip.pm
-  PAR::Packer:
-    file: lib/PAR/Packer.pm
-    version: '1.036'
-  PAR::StrippedPARL::Base:
-    file: lib/PAR/StrippedPARL/Base.pm
-    version: '0.975'
-  pp:
-    file: lib/pp.pm
-    version: '0.992'
+    - inc
+    - contrib
 recommends:
-  Digest: 0
-  Digest::SHA: 0
-  Module::Signature: 0
-  Tk: 0
-  Tk::ColoredButton: 0
-  Tk::EntryCheck: 0
-  Tk::Getopt: 0
+  Digest: '0'
+  Digest::SHA: '0'
+  Module::Signature: '0'
+  Tk: '0'
+  Tk::ColoredButton: '0'
+  Tk::EntryCheck: '0'
+  Tk::Getopt: '0'
 requires:
   Archive::Zip: '1.02'
   Compress::Zlib: '1.30'
   File::Temp: '0.05'
   Getopt::ArgvFile: '1.07'
-  IO::Compress::Gzip: 0
+  IO::Compress::Gzip: '0'
   Module::ScanDeps: '1.21'
   PAR: '1.014'
   PAR::Dist: '0.22'
-  Text::ParseWords: 0
-  perl: 5.8.1
+  Text::ParseWords: '0'
+  perl: '5.008009'
 resources:
   MailingList: par@perl.org
-  license: http://dev.perl.org/licenses/
-  repository: https://github.com/rschupp/PAR-Packer
-version: '1.036'
+  repository: git://github.com/rschupp/PAR-Packer.git
+version: '1.037'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

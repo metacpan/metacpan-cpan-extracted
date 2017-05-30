@@ -18,9 +18,17 @@ if($ENV{RELEASE_TESTING}) {
 	}
 }
 
+my $build_requires = {
+	'Test::Most' => 0,
+	'Test::NoWarnings' => 0,
+};
+
 if($online_tests) {
 	open(my $enabled, '>', 't/online.enabled') || die "Can't touch t/online.enabled $!";
 	close($enabled) || die "Can't touch t/online.enabled $!";
+	$build_requires->{'Test::LWP::UserAgent'} = 0;
+	$build_requires->{'Test::Number::Delta'} = 0;
+	$build_requires->{'Test::Carp'} = 0;
 } else {
 	unlink('t/online.enabled');
 }
@@ -35,10 +43,7 @@ WriteMakefile(
       ? ('LICENSE'=> 'GPL')
       : ()),
     PL_FILES	=> {},
-    BUILD_REQUIRES => {
-	'Test::Most' => 0,
-	'Test::Number::Delta' => 0,
-    },
+    BUILD_REQUIRES => $build_requires,
     PREREQ_PM => {
 	'Encode' => 0,
 	'JSON' => 0,

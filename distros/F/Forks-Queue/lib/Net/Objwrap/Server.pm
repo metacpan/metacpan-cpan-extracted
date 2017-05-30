@@ -10,7 +10,7 @@ use Carp;
 require overload;
 use File::Temp;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 our %DEFAULT = (idle_timeout => 30, keep_alive => 30, alarm_freq => 5);
 
 END {
@@ -26,9 +26,11 @@ sub xdiag { goto &Net::Objwrap::xdiag }
 sub new {
     my ($pkg, $opts, $file, @obj) = @_;
 
-    my $host = $INC{'Sys/HostAddr.pm'}
-        ? Sys::HostAddr->new->main_ip
-        : $ENV{HOSTNAME} // qx(hostname) // "localhost";
+    my $host = $ENV{HOSTNAME} // qx(hostname) // "localhost";
+    if (eval "require Sys::HostAddr ; 1") {
+        my $host2 = Sys::HostAddr->new->main_ip;
+        $host = $host2 if $host2;
+    }
     chomp($host);
     socket(my $socket, Socket::PF_INET(), Socket::SOCK_STREAM(),
            getprotobyname("tcp")) || croak "socket: $!";
@@ -550,7 +552,7 @@ Net::Objwrap::Server - provide server for proxy access to Perl object
 
 =head1 VERSION
 
-0.08
+0.09
 
 
 

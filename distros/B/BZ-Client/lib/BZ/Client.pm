@@ -6,7 +6,7 @@ use strict;
 use warnings 'all';
 
 package BZ::Client;
-$BZ::Client::VERSION = '4.4001';
+$BZ::Client::VERSION = '4.4002';
 
 use BZ::Client::XMLRPC;
 use BZ::Client::Exception;
@@ -294,7 +294,7 @@ BZ::Client - A client for the Bugzilla web services API.
 
 =head1 VERSION
 
-version 4.4001
+version 4.4002
 
 =head1 SYNOPSIS
 

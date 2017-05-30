@@ -1,0 +1,2 @@
+App::CISetup::Role::ConfigFileFinder = $pushed
+App::CISetup::Travis::ConfigFile = $pushed

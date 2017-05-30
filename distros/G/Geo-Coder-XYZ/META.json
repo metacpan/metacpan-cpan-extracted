@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -22,7 +22,10 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Test::Carp" : "0",
+            "Test::LWP::UserAgent" : "0",
             "Test::Most" : "0",
+            "Test::NoWarnings" : "0",
             "Test::Number::Delta" : "0"
          }
       },
@@ -55,6 +58,6 @@
          "web" : "https://github.com/nigelhorne/Geo-Coder-XYZ"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

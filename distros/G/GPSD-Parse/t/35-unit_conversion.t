@@ -22,9 +22,9 @@ my $fname = 't/data/gps.json';
     my $gps = GPSD::Parse->new(file => $fname, metric => 0);
     $gps->poll;
 
-    is $gps->tpv('alt'), 3546.259, "metric alt ok";
-    is $gps->tpv('climb'), 6.925, "metric climb ok";
-    is $gps->tpv('speed'), 1.092, "metric speed ok";
+    is $gps->tpv('alt'), 3546.259, "feet alt ok";
+    is $gps->tpv('climb'), 6.925, "feet climb ok";
+    is $gps->tpv('speed'), 1.092, "feet speed ok";
 }
 
 done_testing;

@@ -50,6 +50,7 @@ Glock
 Gregory
 Hansen
 Hant
+Hauke
 Helpers
 Hill
 Hoblitt
@@ -83,6 +84,7 @@ PP
 PPExtra
 PayPal
 Philippe
+Precious
 QQQ
 QQQQ
 Rata
@@ -123,6 +125,7 @@ datetime
 datetime's
 datetimes
 david
+davidp
 deceased
 decrement
 dian
@@ -138,6 +141,7 @@ fglock
 fiji
 formatter
 github
+haukex
 hh
 iCal
 jhoblitt

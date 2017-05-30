@@ -1,6 +1,6 @@
 use utf8;
 package Etcd3;
-# ABSTRACT: Provide access to the etcd v3 API.
+# ABSTRACT: [depricated] Please see Net::Etcd.
 
 use strict;
 use warnings;
@@ -27,7 +27,7 @@ Etcd3
 
 =cut
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 =head1 SYNOPSIS
 
@@ -66,7 +66,8 @@ our $VERSION = '0.006';
 
 =head1 DESCRIPTION
 
-C<Etcd3> An object oriented interface to the v3 REST API provided by the etcd grpc gateway.
+This module has been superseded by L<Net::Etcd> and will be removed from CPAN on June 29th 2017
+
 
 =head1 ACCESSORS
 
@@ -94,7 +95,7 @@ has port => (
 
 =cut
 
-has username => (
+has name => (
     is  => 'ro',
     isa => Str
 );
@@ -116,21 +117,6 @@ has ssl => (
     is  => 'ro',
     isa => Bool,
 );
-
-=head2 auth
-
-=cut
-
-has auth => (
-    is  => 'lazy',
-    isa => Bool,
-);
-
-sub _build_auth {
-    my ($self) = @_;
-    return 1 if ( $self->username and $self->password );
-    return;
-}
 
 =head2 api_root
 
@@ -239,18 +225,21 @@ sub user_role {
     );
 }
 
-=head2 auth_enable
+=head2 auth
 
-Currently not available.
+Returns a L<Etcd3::Auth> object.
 
 =cut
 
-sub auth_enable {
+sub auth {
     my ( $self, $options ) = @_;
-    my $auth = Etcd3::Auth::Enable->new( etcd => $self )->init;
-    return $auth->request;
+    my $cb = pop if ref $_[-1] eq 'CODE';
+    return Etcd3::Auth->new(
+        etcd => $self,
+        cb   => $cb,
+        ( $options ? %$options : () ),
+    );
 }
-
 
 =head2 lease
 

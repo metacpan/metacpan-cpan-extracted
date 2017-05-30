@@ -1,5 +1,8 @@
 Revision history for Lingua::ZH::Jieba
 
+0.004 - 2017-05-27
+    - Support returning word offset and length from the cut methods.
+
 0.003 - 2017-04-16
     - Support keyword extractor.
 

@@ -16,13 +16,14 @@ build_requires:
 configure_requires:
   Module::Build: '0.3601'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Mojolicious-Plugin-Foil
 requires:
+  Config::Context: '0'
   File::Serialize: '0'
   File::ShareDir: '0'
   File::Slurper: '0'
@@ -34,5 +35,5 @@ requires:
 resources:
   homepage: https://github.com/rubykat/mojolicious-plugin-foil
   repository: https://github.com/rubykat/mojolicious-plugin-foil.git
-version: '0.002'
+version: '0.005'
 x_serialization_backend: 'YAML::Tiny version 1.70'

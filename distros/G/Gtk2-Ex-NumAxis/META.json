@@ -1,0 +1,81 @@
+{
+   "abstract" : "Widget drawing a numbered axis.",
+   "author" : [
+      "Kevin Ryde <user42_kevin@yahoo.com.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Gtk2-Ex-NumAxis",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "devel",
+         "xt"
+      ]
+   },
+   "optional_features" : {
+      "maximum_interoperation" : {
+         "description" : "Have maximum inter-operation with other modules (optional other stuff).",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Locale::Messages" : "0"
+               }
+            }
+         }
+      }
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Math::Round" : "0.07"
+         },
+         "requires" : {
+            "Glib::Ex::SignalBits" : "9",
+            "Glib::Ex::SignalIds" : "1",
+            "Glib::Object::Subclass" : "0",
+            "Gtk2" : "1.220",
+            "Gtk2::Ex::AdjustmentBits" : "40",
+            "Math::Round" : "0",
+            "perl" : "5.008"
+         },
+         "suggests" : {
+            "Locale::Messages" : "0.07"
+         }
+      },
+      "test" : {
+         "requires" : {},
+         "suggests" : {
+            "Test::Weaken" : "3",
+            "Test::Weaken::Gtk2" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://user42.tuxfamily.org/gtk2-ex-numaxis/index.html",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl.html"
+      ]
+   },
+   "version" : "6",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

@@ -22,7 +22,7 @@ Etcd3::Role::Actions
 
 =cut
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 has etcd => (
     is  => 'ro',
@@ -174,20 +174,6 @@ sub all {
         $row->{key}   = decode_base64( $row->{key} );
     }
     return $kvs;
-}
-
-=head2 authenticate
-
-returns an Etcd3::Auth::Authenticate object
-
-=cut
-
-sub authenticate {
-    my ( $self, $options ) = @_;
-    return Etcd3::Auth::Authenticate->new(
-        etcd => $self,
-        ( $options ? %$options : () ),
-    )->init;
 }
 
 1;

@@ -11,9 +11,10 @@ BEGIN {
 	use_ok('Geo::Coder::List');
 }
 
-GOOGLEPLACES: {
+US: {
 	SKIP: {
-		skip 'Test requires Internet access', 16 unless(-e 't/online.enabled');
+		# skip 'Test requires Internet access', 16 unless(-e 't/online.enabled');
+		skip 'Skip test pending RT99502', 16;
 
 		eval {
 			require Geo::Coder::US;

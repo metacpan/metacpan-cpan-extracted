@@ -23,7 +23,6 @@ inc/Module/Install/Can.pm
 inc/Module/Install/Fetch.pm
 inc/Module/Install/Makefile.pm
 inc/Module/Install/Metadata.pm
-inc/Module/Install/PAR.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 lib/App/Packer/PAR.pm
@@ -85,3 +84,4 @@ t/Double/Colon/Barnie.pm
 t/Double/Colon/Foo/Bar/Quux.pm
 t/Double/Colon/Fred.pm
 t/test-proc
+META.json                                Module JSON meta-data (added by MakeMaker)

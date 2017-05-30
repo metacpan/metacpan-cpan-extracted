@@ -1,5 +1,8 @@
 Revision history for Games::TicTacToe
 
+0.25    Sun May 28 10:20:00 2017
+        - Updated pod document with regard to the game script.
+
 0.24    Sat Apr 29 10:25:00 2017
         - Updated game script to be more user friendly.
 

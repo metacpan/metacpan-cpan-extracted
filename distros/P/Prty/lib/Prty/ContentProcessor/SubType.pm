@@ -1,10 +1,10 @@
 package Prty::ContentProcessor::SubType;
-use base qw/Prty::Section::Object Prty::ClassConfig/;
+use base qw/Prty::ContentProcessor::BaseType/;
 
 use strict;
 use warnings;
 
-our $VERSION = 1.106;
+our $VERSION = 1.107;
 
 # -----------------------------------------------------------------------------
 
@@ -14,19 +14,9 @@ our $VERSION = 1.106;
 
 Prty::ContentProcessor::SubType - Basisklasse für Sub-Typen
 
-=head1 BASE CLASSES
+=head1 BASE CLASS
 
-=over 2
-
-=item *
-
-L<Prty::Section::Object>
-
-=item *
-
-L<Prty::ClassConfig>
-
-=back
+L<Prty::ContentProcessor::BaseType>
 
 =head1 METHODS
 
@@ -73,6 +63,8 @@ sub create {
         
     $sec->set(
         parent=>$parent,
+        # memoize
+        name=>undef,
         # Subklassen-Attribute
         @_,
     );
@@ -85,68 +77,42 @@ sub create {
 
 =head2 Intern
 
-=head3 attributes() - Liste der zulässigen Abschnitts-Attribute
+=head3 name() - Name der Sub-Entitt
 
 =head4 Synopsis
 
-    @attributes | $attributeA = $class->attributes;
+    $name = $sty->name;
 
 =head4 Description
 
-Ermittele die Liste der Namen der zulässigen Abschnitts-Attribute
-entlang der Klassenhierarchie und liefere diese zurück. Die
-Liste ist alphabetisch sortiert.
+Liefere den Namen der Sub-Entität. Dies ist der Wert
+des Attributs C<Name:>, bereinigt um Besonderheiten:
 
-=head4 Returns
+=over 2
 
-Liste der Namen der Abschnitts-Attribute. Im Skalar-Kontext wird
-eine Referenz auf die Liste geliefert.
+=item *
+
+ein Sigil am Namensanfang (z.B. C<°°>) wird entfernt
+
+=back
 
 =cut
 
 # -----------------------------------------------------------------------------
 
-sub attributes {
-    my $class = shift;
+sub name {
+    my $self = shift;
 
-    my $a = $class->defMemoize('attributes',sub {
-        my ($class,$key) = @_;
+    return $self->memoize('name',sub {
+        my ($self,$key) = @_;
+        
+        my ($name) = $self->get('Name');
+        if (!$name) {
+            $self->throw;
+        }
+        $name =~ s/^\W+//; # Sigil entfernen
 
-        my $a = $class->defCumulate('Attributes');
-        @$a = sort @$a;
-        return $a;
-    });
-
-    return wantarray? @$a: $a;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 contentAllowed() - Inhalt im Abschnitt erlaubt?
-
-=head4 Synopsis
-
-    $bool = $class->contentAllowed;
-
-=head4 Description
-
-Ermittele, ob Abschnitte des Entitätstyps einen Inhalt haben dürfen.
-Wenn ja, liefert die Methode 1, andernfalls 0.
-
-=head4 Returns
-
-Boolscher Wert
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub contentAllowed {
-    my $class = shift;
-
-    return $class->defMemoize('contentAllowed',sub {
-        my ($class,$key) = @_;
-        return $class->defSearch('ContentAllowed');
+        return $name;
     });
 }
 
@@ -154,7 +120,7 @@ sub contentAllowed {
 
 =head1 VERSION
 
-1.106
+1.107
 
 =head1 AUTHOR
 

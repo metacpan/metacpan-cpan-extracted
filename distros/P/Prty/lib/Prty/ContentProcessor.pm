@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.106;
+our $VERSION = 1.107;
 
 use Prty::Path;
 use Prty::Option;
@@ -202,11 +202,36 @@ sub new {
 
 =head2 Sub-Abschnitte
 
-=head3 processSubSection()
+=head3 processSubSection() - Verarbeite Sub-Abschnitt einer Entität
 
 =head4 Synopsis
 
-    $cop->processSubSection($mainEntity,$mainSection,$sec);
+    $cop->processSubSection($fileEnt,$ent,$mainSec,$sec);
+
+=head4 Arguments
+
+=over 4
+
+=item $fileEnt
+
+Entität, die Träger des gesamten Quelltextes ist. Diese ist im
+Quelltext mit [] gekennzeichnet.
+
+=item $ent
+
+Die aktuelle Entität. Kann identisch zu $fileEnt oder eine
+Sub-Entität (z.B. (File) oder (ProgramClass)) sein.
+
+=item $mainSec
+
+Die Entität oder Sub-Entität, der die mit <> gekennzeichneten
+Abschnitte zugeordnet werden.
+
+=item $sec
+
+Der aktuelle Abschnitt.
+
+=back
 
 =head4 Returns
 
@@ -217,7 +242,7 @@ nichts
 # -----------------------------------------------------------------------------
 
 sub processSubSection {
-    my ($self,$mainEntity,$mainSection,$sec) = @_;
+    my ($self,$fileEnt,$ent,$mainSec,$sec) = @_;
     return;
 }
 
@@ -275,7 +300,7 @@ Abschnitts-Bezeichner ohne Klammerung, z.B. 'Program'.
 =item @keyVal
 
 Abschnitts-Attribute, die über den Abschnitts-Bezeichner hinaus
-den Dateityp kennzeichnen, z.B. Language=>'Shell'.
+den Dateityp kennzeichnen, z.B. Language=>'Perl'.
 
 =back
 
@@ -346,20 +371,13 @@ sub commit {
     for my $ent (@{$self->entities}) {
         # Schreibe Entity-Quelltext-Datei ins def-Verzeichnis,
         # falls sie differiert oder nicht existiert
-    
-        $dt->addFile($ent->entityFile($defDir),$ent->fullSourceRef,
+
+        $dt->addFile($ent->entityFile($defDir),$ent->fileSourceRef,
             -encoding=>'utf-8',
             -skipEmptyFiles=>1, # Sub-Entities übergehen
             -onUpdate=>sub {
-                # Entität und alle Entitäten in der gleichen Datei
-                # als geändert markieren
-
+                # Entität als geändert markieren
                 $ent->needsUpdate(1);
-                for my $sec ($ent->subSections) {
-                    if ($sec->brackets eq '[]') {
-                        $sec->needsUpdate(1);
-                    }
-                }
             },
         );
     }
@@ -605,7 +623,7 @@ sub load {
 
         # Parse Dateien zu Entitäten
 
-        my (@entities,$mainEntity,$mainSection);
+        my (@entities,$fileEnt,$mainSec);
         for my $file (@files) {
             $par->parse($file,sub {
                 my $sec = Prty::Section::Object->new(@_);
@@ -613,10 +631,10 @@ sub load {
 
                 my $brackets = $sec->brackets;
                 if ($brackets eq '[]') {
-                    $mainEntity = $mainSection = $sec;
+                    $fileEnt = $mainSec = $sec;
                 }
                 elsif ($brackets eq '()') {
-                    $mainSection = $sec;
+                    $mainSec = $sec;
                 }
     
                 while (1) {
@@ -630,7 +648,7 @@ sub load {
 
                             $sec->error(
                                 q{COP-00001: Missing plugin for section},
-                                 Section=>$sec->fullType,
+                                Section=>$sec->fullType,
                             );
                         }
                         push @entities,$plg->class->create($sec,$self,$plg);
@@ -638,9 +656,8 @@ sub load {
                     elsif (@entities) {
                         # Verarbeite nächsten Sub-Abschnitt
 
-                        $mainEntity->addSubSection($sec);
-                        $self->processSubSection($mainEntity,
-                            $mainSection,$sec);
+                        $self->processSubSection($fileEnt,$entities[-1],
+                            $mainSec,$sec);
                         if ($sec->brackets eq '[]') {
                             # Sub-Abschnitt als Entität verarbeiten
                             # (Beispiel: ProgramClass => Class)
@@ -657,6 +674,9 @@ sub load {
                     }
                     last;
                 }
+
+                # Datei-Entity um Abschnitts-Quelltext ergänzen
+                $fileEnt->appendFileSource($sec);
     
                 # Abschnittsobjekt gegen unabsichtliche Erweiterungen sperren
                 $sec->lockKeys;
@@ -812,7 +832,7 @@ sub fetchFiles {
 
     my @files;
     for my $ent (@{$self->entities}) {
-        push @files,[$ent->entityFile,$ent->fullSourceRef];
+        push @files,[$ent->entityFile,$ent->fileSourceRef];
     }
     
     return @files;
@@ -1248,7 +1268,7 @@ sub storage {
 
 =head1 VERSION
 
-1.106
+1.107
 
 =head1 AUTHOR
 

@@ -5,11 +5,11 @@
 # the SWIG interface file instead.
 
 package Lingua::ZH::Jieba;
-$Lingua::ZH::Jieba::VERSION = '0.003';
+$Lingua::ZH::Jieba::VERSION = '0.004';
 use base qw(Exporter);
 use base qw(DynaLoader);
 package Lingua::ZH::Jiebac;
-$Lingua::ZH::Jiebac::VERSION = '0.003';
+$Lingua::ZH::Jiebac::VERSION = '0.004';
 bootstrap Lingua::ZH::Jieba;
 package Lingua::ZH::Jieba;
 @EXPORT = qw();
@@ -55,7 +55,7 @@ package Lingua::ZH::Jieba;
 ############# Class : Lingua::ZH::Jieba::vector_s ##############
 
 package Lingua::ZH::Jieba::vector_s;
-$Lingua::ZH::Jieba::vector_s::VERSION = '0.003';
+$Lingua::ZH::Jieba::vector_s::VERSION = '0.004';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Lingua::ZH::Jieba );
 %OWNER = ();
@@ -100,7 +100,7 @@ sub ACQUIRE {
 ############# Class : Lingua::ZH::Jieba::vector_wordpos ##############
 
 package Lingua::ZH::Jieba::vector_wordpos;
-$Lingua::ZH::Jieba::vector_wordpos::VERSION = '0.003';
+$Lingua::ZH::Jieba::vector_wordpos::VERSION = '0.004';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Lingua::ZH::Jieba );
 %OWNER = ();
@@ -145,7 +145,7 @@ sub ACQUIRE {
 ############# Class : Lingua::ZH::Jieba::vector_keyword ##############
 
 package Lingua::ZH::Jieba::vector_keyword;
-$Lingua::ZH::Jieba::vector_keyword::VERSION = '0.003';
+$Lingua::ZH::Jieba::vector_keyword::VERSION = '0.004';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Lingua::ZH::Jieba );
 %OWNER = ();
@@ -187,10 +187,99 @@ sub ACQUIRE {
 }
 
 
+############# Class : Lingua::ZH::Jieba::vector_word ##############
+
+package Lingua::ZH::Jieba::vector_word;
+$Lingua::ZH::Jieba::vector_word::VERSION = '0.004';
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( Lingua::ZH::Jieba );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = Lingua::ZH::Jiebac::new_vector_word(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*size = *Lingua::ZH::Jiebac::vector_word_size;
+*empty = *Lingua::ZH::Jiebac::vector_word_empty;
+*clear = *Lingua::ZH::Jiebac::vector_word_clear;
+*push = *Lingua::ZH::Jiebac::vector_word_push;
+*pop = *Lingua::ZH::Jiebac::vector_word_pop;
+*get = *Lingua::ZH::Jiebac::vector_word_get;
+*set = *Lingua::ZH::Jiebac::vector_word_set;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        Lingua::ZH::Jiebac::delete_vector_word($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : Lingua::ZH::Jieba::Word ##############
+
+package Lingua::ZH::Jieba::Word;
+$Lingua::ZH::Jieba::Word::VERSION = '0.004';
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( Lingua::ZH::Jieba );
+%OWNER = ();
+%ITERATORS = ();
+*swig_word_get = *Lingua::ZH::Jiebac::Word_word_get;
+*swig_word_set = *Lingua::ZH::Jiebac::Word_word_set;
+*swig_offset_get = *Lingua::ZH::Jiebac::Word_offset_get;
+*swig_offset_set = *Lingua::ZH::Jiebac::Word_offset_set;
+*swig_length_get = *Lingua::ZH::Jiebac::Word_length_get;
+*swig_length_set = *Lingua::ZH::Jiebac::Word_length_set;
+sub new {
+    my $pkg = shift;
+    my $self = Lingua::ZH::Jiebac::new_Word(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        Lingua::ZH::Jiebac::delete_Word($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : Lingua::ZH::Jieba::KeywordExtractor ##############
 
 package Lingua::ZH::Jieba::KeywordExtractor;
-$Lingua::ZH::Jieba::KeywordExtractor::VERSION = '0.003';
+$Lingua::ZH::Jieba::KeywordExtractor::VERSION = '0.004';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Lingua::ZH::Jieba );
 %OWNER = ();
@@ -229,7 +318,7 @@ sub ACQUIRE {
 ############# Class : Lingua::ZH::Jieba::Jieba ##############
 
 package Lingua::ZH::Jieba::Jieba;
-$Lingua::ZH::Jieba::Jieba::VERSION = '0.003';
+$Lingua::ZH::Jieba::Jieba::VERSION = '0.004';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Lingua::ZH::Jieba );
 %OWNER = ();
@@ -241,8 +330,11 @@ sub new {
 }
 
 *_cut = *Lingua::ZH::Jiebac::Jieba__cut;
+*_cut_ex = *Lingua::ZH::Jiebac::Jieba__cut_ex;
 *_cut_all = *Lingua::ZH::Jiebac::Jieba__cut_all;
+*_cut_all_ex = *Lingua::ZH::Jiebac::Jieba__cut_all_ex;
 *_cut_for_search = *Lingua::ZH::Jiebac::Jieba__cut_for_search;
+*_cut_for_search_ex = *Lingua::ZH::Jiebac::Jieba__cut_for_search_ex;
 *insert_user_word = *Lingua::ZH::Jiebac::Jieba_insert_user_word;
 *_tag = *Lingua::ZH::Jiebac::Jieba__tag;
 *extractor = *Lingua::ZH::Jiebac::Jieba_extractor;
@@ -298,38 +390,73 @@ use strict;
 use warnings;
 use utf8;
 
-sub cut {
-    my ($self, $sentence, $opts) = @_;
+sub _make_cut {
+    my $want_position = shift;
+
+    return sub {
+        my ($self, $sentence, $opts) = @_;
+        
+        $opts ||= {};
+        my $no_hmm = $opts->{no_hmm};
+        my $cut_all = $opts->{cut_all};
+        
+        my $words;
+        
+        if ($want_position) {
+            if ($cut_all) {
+                $words = $self->_cut_all_ex($sentence);
+            } else {
+                $words = $self->_cut_ex($sentence, !$no_hmm);
+            }
+            for (@$words) {
+                utf8::decode($_->[0]);
+            }
+        } else {
+            if ($cut_all) {
+                $words = $self->_cut_all($sentence);
+            } else {
+                $words = $self->_cut($sentence, !$no_hmm);
+            }
+            for (@$words) {
+                utf8::decode($_);
+            }
+        }
     
-    $opts ||= {};
-    my $no_hmm = $opts->{no_hmm};
-    my $cut_all = $opts->{cut_all};
-    
-    my $words;
-    if ($cut_all) {
-        $words = $self->_cut_all($sentence);
-    } else {
-        $words = $self->_cut($sentence, !$no_hmm);
-    }
-    
-    for (@$words) {
-        utf8::decode($_);
-    }
-    return $words;
+        return $words;
+    };
 }
 
-sub cut_for_search {
-    my ($self, $sentence, $opts) = @_;
+sub _make_cut_for_search {
+    my $want_position = shift;
 
-    $opts ||= {};
-    my $no_hmm = $opts->{no_hmm};
-    
-    my $words = $self->_cut_for_search($sentence, !$no_hmm);
-    
-    for (@$words) {
-        utf8::decode($_);
-    }
-    return $words;
+    return sub {
+        my ($self, $sentence, $opts) = @_;
+
+        $opts ||= {};
+        my $no_hmm = $opts->{no_hmm};
+        
+        my $words;
+        if ($want_position) {
+            $words = $self->_cut_for_search_ex($sentence, !$no_hmm);
+            for (@$words) {
+                utf8::decode($_->[0]);
+            }
+        } else {
+            $words = $self->_cut_for_search($sentence, !$no_hmm);
+            for (@$words) {
+                utf8::decode($_);
+            }
+        }
+        return $words;
+    };
+}
+
+{
+    no strict 'refs';
+    *cut = _make_cut(0);
+    *cut_ex = _make_cut(1);
+    *cut_for_search = _make_cut_for_search(0);
+    *cut_for_search_ex = _make_cut_for_search(1);
 }
 
 sub tag {

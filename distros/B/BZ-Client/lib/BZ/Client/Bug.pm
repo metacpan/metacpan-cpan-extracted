@@ -6,7 +6,7 @@ use strict;
 use warnings 'all';
 
 package BZ::Client::Bug;
-$BZ::Client::Bug::VERSION = '4.4001';
+$BZ::Client::Bug::VERSION = '4.4002';
 
 use parent qw( BZ::Client::API );
 
@@ -28,8 +28,16 @@ sub legal_values {
 
 sub get {
     my($class, $client, $params) = @_;
-    $params->{'permissive'} = BZ::Client::XMLRPC::boolean::TRUE()
-        if $params->{'permissive'};
+    unless (ref $params) {
+        $params = [ $params ]
+    }
+    if (ref $params eq 'ARRAY') {
+        $params = { ids => $params }
+    }
+    elsif (ref $params eq 'HASH') {
+        $params->{'permissive'} = BZ::Client::XMLRPC::boolean::TRUE()
+            if $params->{'permissive'};
+    }
     my $bugs = $class->_returns_array($client, 'Bug.get', $params, 'bugs');
     my @result;
     for my $bug (@$bugs) {
@@ -287,7 +295,7 @@ BZ::Client::Bug - Client side representation of a bug in Bugzilla
 
 =head1 VERSION
 
-version 4.4001
+version 4.4002
 
 =head1 SYNOPSIS
 
@@ -297,7 +305,7 @@ This class provides methods for accessing and managing bugs in Bugzilla.
                                 user     => $user,
                                 password => $password );
 
-  my $bugs = BZ::Client::Bug->get( $client, $ids );
+  my $bugs = BZ::Client::Bug->get( $client, \%params );
 
 =head1 COMMON PARAMETERS
 
@@ -323,7 +331,7 @@ Invalid field names are ignored.
 
 Example:
 
- BZ::Client::User->get( $client,
+ BZ::Client::Bug->get( $client,
     { ids => [1], include_fields => ['id', 'name'] })
 
 would return something like:
@@ -344,7 +352,7 @@ Specifying fields here overrides L</include_fields>, so if you specify a field i
 
 Example:
 
- BZ::Client::User->get( $client,
+ BZ::Client::Bug->get( $client,
     { ids => [1], exclude_fields => ['name'] })
 
 would return something like:
@@ -377,7 +385,7 @@ Only custom fields are returned if C<_custom> is specified in L</include_fields>
 
 Example:
 
- BZ::Client::User->get( $client,
+ BZ::Client::Bug->get( $client,
     { ids => [1], include_fields => ['_all'] })
 
 =head1 EXCEPTION HANDLING
@@ -622,12 +630,18 @@ Listed here in order of what you most likely want to do... maybe?
 
 =head2 get
 
+ @bugs = BZ::Client::Bug->get( $client, $id );
+ $bugs = BZ::Client::Bug->get( $client, $id );
+ @bugs = BZ::Client::Bug->get( $client, \@ids );
+ $bugs = BZ::Client::Bug->get( $client, \@ids );
  @bugs = BZ::Client::Bug->get( $client, \%params );
  $bugs = BZ::Client::Bug->get( $client, \%params );
 
 Gets information about particular bugs in the database.
 
 =head3 Parameters
+
+A single I<$id> or array ref of I<@ids> may be provided, otherwise a hash ref with the following:
 
 =over 4
 

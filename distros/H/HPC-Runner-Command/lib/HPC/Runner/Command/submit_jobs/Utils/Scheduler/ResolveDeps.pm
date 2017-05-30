@@ -48,7 +48,7 @@ has 'schedule' => (
     },
 );
 
-has batch_tags => (
+has 'batch_tags' => (
     is      => 'rw',
     isa     => 'HashRef',
     default => sub {

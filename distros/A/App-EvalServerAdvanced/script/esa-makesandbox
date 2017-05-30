@@ -1,0 +1,26 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use File::ShareDir qw/module_dir/;
+use Path::Tiny;
+use File::Copy::Recursive qw/dircopy/;
+use App::EvalServerAdvanced::Sandbox;
+
+print "Making a sandbox environment for you ";
+$File::Copy::Recursive::KeepMode = 0;
+
+my $skel_dir = path(module_dir("App::EvalServerAdvanced::Sandbox"))->realpath;
+my $sandbox_dir = path("./sandbox")->realpath;
+
+print ".";
+$sandbox_dir->mkpath;
+
+print ".";
+dircopy($skel_dir, $sandbox_dir);
+print ".\n";
+
+$sandbox_dir->child("gensystem.sh")->chmod("a+x");
+
+print "Sandbox environment made, you must edit sandbox/etc/config.toml and run sandbox/gensystem.sh\n";

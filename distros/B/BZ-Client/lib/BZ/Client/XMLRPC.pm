@@ -1,15 +1,16 @@
 #!/bin/false
 # PODNAME: BZ::Client::XMLRPC
 # ABSTRACT: Performs XML-RPC calls on behalf of the client.
+# vim: softtabstop=4 tabstop=4 shiftwidth=4 ft=perl expandtab smarttab
 
 use strict;
 use warnings 'all';
 
 package BZ::Client::XMLRPC;
-$BZ::Client::XMLRPC::VERSION = '4.4001';
+$BZ::Client::XMLRPC::VERSION = '4.4002';
 
 use URI;
-use Encode;
+use Encode qw/ encode_utf8 /;
 use XML::Writer;
 use HTTP::Tiny;
 use File::Spec;
@@ -17,6 +18,7 @@ use BZ::Client::Exception;
 use BZ::Client::XMLRPC::Parser;
 use DateTime::Format::Strptime;
 use DateTime::TimeZone;
+
 
 
 my $counter;
@@ -56,7 +58,8 @@ sub web_agent {
         if (!defined($wa)) {
             $wa = HTTP::Tiny->new(
                 %$connect,
-                agent => sprintf('BZ::Client::XMLRPC %s (perl %s; %s)', $BZ::Client::XMLRPC::VERSION, $^V, $^O)
+                agent => sprintf('BZ::Client::XMLRPC %s (perl %s; %s)',
+                                 $BZ::Client::XMLRPC::VERSION, $^V, $^O)
             );
             $self->web_agent($wa);
         }
@@ -108,8 +111,17 @@ my %actions = (
         my($self, $writer, $value) = @_;
         $writer->startTag('value');
         $writer->startTag('i4');
-        $writer->characters($$value);
+        $writer->characters( $value->stringify() );
         $writer->endTag('i4');
+        $writer->endTag('value');
+    },
+
+    'BZ::Client::XMLRPC::base64' => sub {
+        my($self, $writer, $value) = @_;
+        $writer->startTag('value');
+        $writer->startTag('base64');
+        $writer->characters( $value->base64() );
+        $writer->endTag('base64');
         $writer->endTag('value');
     },
 
@@ -117,7 +129,7 @@ my %actions = (
         my($self, $writer, $value) = @_;
         $writer->startTag('value');
         $writer->startTag('boolean');
-        $writer->characters($$value ? '1' : '0');
+        $writer->characters( $value->stringify() );
         $writer->endTag('boolean');
         $writer->endTag('value');
     },
@@ -126,7 +138,7 @@ my %actions = (
         my($self, $writer, $value) = @_;
         $writer->startTag('value');
         $writer->startTag('double');
-        $writer->characters($$value);
+        $writer->characters( $value->stringify() );
         $writer->endTag('double');
         $writer->endTag('value');
     },
@@ -179,15 +191,19 @@ sub create_request {
     $writer->endTag('params');
     $writer->endTag('methodCall');
     $writer->end();
-    return encode('utf8', $contents)
+    return encode_utf8($contents)
 }
 
 sub get_response {
     my($self, $contents) = @_;
-    return _get_response($self,
-                        { 'url' => $self->url() . '/xmlrpc.cgi',
-                          'contentType' => 'text/xml',
-                          'contents' => encode_utf8($contents) })
+    return _get_response(
+            $self,
+            {
+                'url'         => $self->url() . '/xmlrpc.cgi',
+                'contentType' => 'text/xml',
+                'contents'    => encode_utf8($contents)
+            }
+    )
 }
 
 sub _get_response {
@@ -244,9 +260,7 @@ sub _get_response {
                 }
             }
             print $fh "\n";
-            if ($res->{success}) {
-                print $fh $response;
-            }
+            print $fh $res->{content} if $res->{content};
             close($fh);
         }
     }
@@ -278,10 +292,13 @@ sub request {
     my $self = shift;
     my %args = @_;
     my $methodName = $args{'methodName'};
-    $self->error('Missing argument: methodName') unless defined($methodName);
+    $self->error('Missing argument: methodName')
+        unless defined($methodName);
     my $params = $args{'params'};
-    $self->error('Missing argument: params') unless defined($params);
-    $self->error('Invalid argument: params (Expected array)') unless ref($params) eq 'ARRAY';
+    $self->error('Missing argument: params')
+        unless defined($params);
+    $self->error('Invalid argument: params (Expected array)')
+        unless ref($params) eq 'ARRAY';
     my $contents = $self->create_request($methodName, $params);
     $self->log('debug', "BZ::Client::XMLRPC::request: Sending method $methodName to " . $self->url());
     my $response = $self->get_response($contents);
@@ -317,18 +334,64 @@ sub logDirectory {
     }
 }
 
+### Objects to represent data types
+
 package BZ::Client::XMLRPC::int;
-$BZ::Client::XMLRPC::int::VERSION = '4.4001';
+$BZ::Client::XMLRPC::int::VERSION = '4.4002';
 sub new {
     my($class, $value) = @_;
     return bless(\$value, (ref($class) || $class))
 }
 
+sub stringify {
+    my $self = shift;
+    return $$self
+}
+
+package BZ::Client::XMLRPC::base64;
+$BZ::Client::XMLRPC::base64::VERSION = '4.4002';
+use MIME::Base64 qw( encode_base64 decode_base64 );
+
+sub new {
+    my($class, $value) = @_;
+    return bless(
+        {
+            raw    => $value,
+            base64 => encode_base64($value, '')
+        },
+        (ref($class) || $class))
+}
+
+sub new64 {
+    my($class, $value) = @_;
+    return bless(
+        {
+            raw    => decode_base64($value),
+            base64 => $value
+        },
+        (ref($class) || $class))
+}
+
+sub base64 {
+    my $self = shift;
+    return $self->{base64}
+}
+
+sub raw {
+    my $self = shift;
+    return $self->{raw}
+}
+
 package BZ::Client::XMLRPC::boolean;
-$BZ::Client::XMLRPC::boolean::VERSION = '4.4001';
+$BZ::Client::XMLRPC::boolean::VERSION = '4.4002';
 sub new {
     my($class, $value) = @_;
     return bless(\$value, (ref($class) || $class))
+}
+
+sub stringify {
+    my $self = shift;
+    return $$self ? '1' : '0';
 }
 
 {
@@ -342,10 +405,15 @@ sub FALSE { $false }
 }
 
 package BZ::Client::XMLRPC::double;
-$BZ::Client::XMLRPC::double::VERSION = '4.4001';
+$BZ::Client::XMLRPC::double::VERSION = '4.4002';
 sub new {
     my($class, $value) = @_;
     return bless(\$value, (ref($class) || $class))
+}
+
+sub stringify {
+    my $self = shift;
+    return $$self
 }
 
 1;
@@ -362,7 +430,7 @@ BZ::Client::XMLRPC - Performs XML-RPC calls on behalf of the client.
 
 =head1 VERSION
 
-version 4.4001
+version 4.4002
 
 =head1 SYNOPSIS
 

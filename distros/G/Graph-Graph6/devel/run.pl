@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015 Kevin Ryde
+# Copyright 2015, 2017 Kevin Ryde
 #
 # This file is part of Graph-Graph6.
 #
@@ -25,6 +25,18 @@ use MyGraphs;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
+
+{
+  # Graph::Reader::Graph6 multi-edge
+  require Graph::Reader::Graph6;
+  my $s6_str = ':A'.chr(0x20+63)."\n";
+  open my $fh, '<', \$s6_str or die;
+  my $reader = Graph::Reader::Graph6->new;
+  my $graph = $reader->read_graph($fh);
+  # MyGraphs::Graph_view($graph);
+  print "$graph\n";
+  exit 0;
+}
 
 {
   # Graph::Writer:::Graph6 not particularly fast, maybe due to has_edge(),

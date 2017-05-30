@@ -1,5 +1,5 @@
 package CPAN::Testers::API;
-our $VERSION = '0.011';
+our $VERSION = '0.014';
 # ABSTRACT: REST API for CPAN Testers data
 
 #pod =head1 SYNOPSIS
@@ -81,6 +81,15 @@ sub startup ( $app ) {
     $app->moniker( 'api' );
     $app->plugin( Config => {
         default => { }, # Allow living without config file
+    } );
+
+    # Allow CORS for everyone
+    $app->hook( after_build_tx => sub {
+        my ( $tx, $app ) = @_;
+        $tx->res->headers->header( 'Access-Control-Allow-Origin' => '*' );
+        $tx->res->headers->header( 'Access-Control-Allow-Methods' => 'GET, POST, PUT, PATCH, DELETE, OPTIONS' );
+        $tx->res->headers->header( 'Access-Control-Max-Age' => 3600 );
+        $tx->res->headers->header( 'Access-Control-Allow-Headers' => 'Content-Type, X-Requested-With' );
     } );
 
     my $r = $app->routes;
@@ -174,7 +183,7 @@ CPAN::Testers::API - REST API for CPAN Testers data
 
 =head1 VERSION
 
-version 0.011
+version 0.014
 
 =head1 SYNOPSIS
 

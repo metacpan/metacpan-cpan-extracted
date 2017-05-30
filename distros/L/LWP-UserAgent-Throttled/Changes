@@ -1,0 +1,16 @@
+Revision history for LWP-UserAgent-Throttled
+
+0.04	Sat 27 May 14:43:36 EDT 2017
+	Important code tidy - forgot some hashrefs now hash
+
+0.03	Sat 27 May 14:04:14 EDT 2017
+	Throttle each site independantly
+	Changed 'load' method to 'throttle'
+
+0.02	Fri May 26 14:18:13 EDT 2017
+	Support load times which include fractions of a second
+	Only sleep on 2nd and subsequent calls
+	Renamed from LWP::Throttle
+
+0.01	Fri May 26 12:39:55 EDT 2017
+        First draft

@@ -4,41 +4,49 @@ use ExtUtils::MakeMaker 6.17;
 my $EUMM = eval( $ExtUtils::MakeMaker::VERSION );
 
 my $meta = {
-  "abstract"       => "the spawn of MooX-Struct and Sub-Talisman",
-  "author"         => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
-  "dynamic_config" => 0,
-  "generated_by"   => "Moose::Meta::Class::__ANON__::SERIAL::8 version , CPAN::Meta::Converter version 2.140640",
-  "keywords"       => [],
-  "license"        => ["perl_5"],
-  "meta-spec"      => {
-                        url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-                        version => 2,
-                      },
-  "name"           => "Sub-Talisman-Struct",
-  "no_index"       => { directory => ["eg", "examples", "inc", "t", "xt"] },
-  "prereqs"        => {
-                        configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                        runtime => { requires => { "MooX::Struct" => 0.006, "Sub::Talisman" => 0 } },
-                        test => { requires => { "Test::More" => 0.61, "Test::NoWarnings" => 0 } },
-                      },
-  "provides"       => {
-                        "Sub::Talisman::Struct" => { file => "lib/Sub/Talisman/Struct.pm", version => 0.005 },
-                      },
-  "release_status" => "stable",
-  "resources"      => {
-                        bugtracker   => {
-                                          web => "http://rt.cpan.org/Dist/Display.html?Queue=Sub-Talisman-Struct",
-                                        },
-                        homepage     => "https://metacpan.org/release/Sub-Talisman-Struct",
-                        license      => ["http://dev.perl.org/licenses/"],
-                        repository   => {
-                                          type => "git",
-                                          url  => "git://github.com/tobyink/p5-sub-talisman-struct.git",
-                                          web  => "https://github.com/tobyink/p5-sub-talisman-struct",
-                                        },
-                        X_identifier => "http://purl.org/NET/cpan-uri/dist/Sub-Talisman-Struct/project",
-                      },
-  "version"        => 0.005,
+  "abstract"         => "the spawn of MooX-Struct and Sub-Talisman",
+  "author"           => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
+  "dynamic_config"   => 0,
+  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150005",
+  "keywords"         => [],
+  "license"          => ["perl_5"],
+  "meta-spec"        => {
+                          url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+                          version => 2,
+                        },
+  "name"             => "Sub-Talisman-Struct",
+  "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
+  "prereqs"          => {
+                          configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
+                          runtime => {
+                            requires => {
+                              "Exporter::Tiny" => "1.000000",
+                              "MooX::Struct" => 0.016,
+                              "perl" => 5.012,
+                              "Sub::Talisman" => 0.006,
+                            },
+                          },
+                          test => { requires => { "Test::More" => 0.61, "Test::NoWarnings" => 0 } },
+                        },
+  "provides"         => {
+                          "Sub::Talisman::Struct" => { file => "lib/Sub/Talisman/Struct.pm", version => 0.006 },
+                        },
+  "release_status"   => "stable",
+  "resources"        => {
+                          bugtracker   => {
+                                            web => "http://rt.cpan.org/Dist/Display.html?Queue=Sub-Talisman-Struct",
+                                          },
+                          homepage     => "https://metacpan.org/release/Sub-Talisman-Struct",
+                          license      => ["http://dev.perl.org/licenses/"],
+                          repository   => {
+                                            type => "git",
+                                            url  => "git://github.com/tobyink/p5-sub-talisman-struct.git",
+                                            web  => "https://github.com/tobyink/p5-sub-talisman-struct",
+                                          },
+                          x_identifier => "http://purl.org/NET/cpan-uri/dist/Sub-Talisman-Struct/project",
+                        },
+  "version"          => 0.006,
+  "x_static_install" => 1,
 };
 
 my %dynamic_config;

@@ -18,7 +18,8 @@ sub parse {
         my $msg;
         if (ref($@) eq 'BZ::Client::Exception') {
             $msg = $@->message();
-        } else {
+        }
+        else {
             $msg = $@;
         }
         diag $msg;

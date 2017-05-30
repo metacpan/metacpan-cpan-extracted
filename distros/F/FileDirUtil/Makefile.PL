@@ -13,6 +13,7 @@ WriteMakefile(
 				    "Path::Class::File" => '0',
 				    "Path::Class::Dir" => '0',
 				    "namespace::autoclean" => '0',
+				    "Params::Coerce" => '0',
 				   },
 	      AUTHOR            => 'Michael T. Wolfinger <michael@wolfinger.eu>',
 	      LICENSE           => 'agpl_3',

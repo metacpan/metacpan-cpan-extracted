@@ -1,5 +1,8 @@
 Revision history for Perl extension Games::Chipmunk.
 
+0.6 2017-05-27
+    - Add cpBodySetVelocity(), which was mistakenly left out
+
 0.5 2017-05-01
     - Implemented pachinko example
 

@@ -1,6 +1,12 @@
 Revision history for Map::Tube
 
-3.29  2017-03-13T12:40:00+00:00
+3.30  2017-05-26T09:35:00+00:00
+      - Finally nailed the error "Can't locate Moose.pm" when there was no direct pre-reqs.
+        http://www.cpantesters.org/cpan/report/585fd1e6-3b5c-11e7-a074-e1beba07c9dd
+      - Tidied up attributes definition slightly.
+      - Added dependency on Map::Tube::Exceptions v3.12.
+
+3.29  2017-05-13T12:40:00+00:00
       - Handle lazy attribute correctly as reported below:
         http://www.cpantesters.org/cpan/report/55997338-100d-11e7-b84f-b08edccf8c31
 

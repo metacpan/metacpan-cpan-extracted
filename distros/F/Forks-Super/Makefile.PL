@@ -9,7 +9,7 @@ our %RECOMMENDED
        'Sys::CpuLoadX' => '0.02',
        'DateTime::Format::Natural' => '0.89',
        'Net::OpenSSH' => '0.64',
-       'Test::SSH' => 0,
+#      'Test::SSH' => 0,
        'PerlIO::gzip' => 0 );
 
 if ($^O eq 'MSWin32') {
@@ -49,7 +49,8 @@ our $FILES_TO_CLEAN
 		   t/out/sigchld.debug t/out/test* t/out/.lock-*
 		   t/out/48b.* t/out/debug1-* t/poorsort.pl .fhfork*
 		   t/out/ipc* t/out/new-ipc* t/out/66* t/dir* t/out/24*
-		   t/out/daemon* lib/_Inline *.stackdump t/out/.sync*),
+		   t/out/daemon* lib/_Inline *.stackdump t/out/.sync*
+                   t/out/keys-*),
             '"t/external[^-]command.pl"';
 
 our %META_MERGE
@@ -250,7 +251,8 @@ sub MY::postamble {
     }
     # $(PERLRUN) not avail in 5.6.1, ExtUtils::MakeMaker 5.45
     my $PERLEXE = '$(FULLPERL)';
-    my $TEST_SSH = 1;
+    my $TEST_SSH = $^O eq 'MSWin32' ? "" : "TEST_SSH=1 ";
+
     my $postamble = <<"__END_POSTAMBLE__";
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
@@ -262,12 +264,12 @@ sub MY::postamble {
 # ------ fasttest: use Forks::Super to run Forks::Super tests in parallel
 
 fasttest :: pure_all
-	TEST_SSH=$TEST_SSH $PERLEXE t/forked_harness.pl \$(TEST_FILES) -h -q -t 150
+	$TEST_SSH$PERLEXE t/forked_harness.pl \$(TEST_FILES) -h -q -t 150
 
 # ------ stresstest: run all tests in parallel 100 times
 
 stresstest :: pure_all
-	TEST_SSH=$TEST_SSH $PERLEXE t/forked_harness.pl \$(TEST_FILES) $stresstestargs
+	$TEST_SSH$PERLEXE t/forked_harness.pl \$(TEST_FILES) $stresstestargs
 
 __END_POSTAMBLE__
 

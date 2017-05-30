@@ -18,10 +18,10 @@ if($ENV{RELEASE_TESTING}) {
 	}
 }
 
-
 my $build_requires = {
 	'Test::Most' => 0,
 	'Test::NoWarnings' => 0,
+	'Carp' => 0,
 };
 
 if($online_tests) {
@@ -32,6 +32,9 @@ if($online_tests) {
 	$build_requires->{'Geo::Coder::CA'} = 0;
 	$build_requires->{'Geo::Coder::XYZ'} = 0;
 	$build_requires->{'Test::Number::Delta'} = 0;
+	$build_requires->{'Test::LWP::UserAgent'} = 0;
+	$build_requires->{'Test::Carp'} = 0;
+	$build_requires->{'LWP::UserAgent::Throttled'} = 0.04;
 } else {
 	unlink('t/online.enabled');
 }

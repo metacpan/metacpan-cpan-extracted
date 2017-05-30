@@ -1,0 +1,10 @@
+name: JSON-Assert
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  perl: 5.008005
+resources:
+  license: http://opensource.org/licenses/artistic-license.php
+version: 0.04

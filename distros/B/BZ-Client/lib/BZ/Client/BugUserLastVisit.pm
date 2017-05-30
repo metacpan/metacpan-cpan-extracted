@@ -6,7 +6,7 @@ use strict;
 use warnings 'all';
 
 package BZ::Client::BugUserLastVisit;
-$BZ::Client::BugUserLastVisit::VERSION = '4.4001';
+$BZ::Client::BugUserLastVisit::VERSION = '4.4002';
 
 use parent qw( BZ::Client::API );
 
@@ -40,7 +40,7 @@ BZ::Client::BugUserLastVisit - Find and Store the last time a user visited a Bug
 
 =head1 VERSION
 
-version 4.4001
+version 4.4002
 
 =head1 SYNOPSIS
 

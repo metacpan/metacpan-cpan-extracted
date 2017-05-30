@@ -5,18 +5,18 @@ use warnings;
 
 use parent 'RPi::WiringPi::Util';
 
+use GPSD::Parse;
 use RPi::ADC::ADS;
 use RPi::ADC::MCP3008;
 use RPi::BMP180;
 use RPi::DAC::MCP4922;
 use RPi::DigiPot::MCP4XXXX;
 use RPi::LCD;
+use RPi::Pin;
 use RPi::SPI;
 use RPi::WiringPi::Constant qw(:all);
-use RPi::WiringPi::Interrupt;
-use RPi::WiringPi::Pin;
 
-our $VERSION = '2.3613';
+our $VERSION = '2.3614';
 
 my $fatal_exit = 1;
 
@@ -106,6 +106,11 @@ sub dpot {
     my $dpot = RPi::DigiPot::MCP4XXXX->new($cs, $channel);
     return $dpot;
 }
+sub gps {
+    my ($self, %args) = @_;
+    my $gps = GPSD::Parse->new(%args);
+    return $gps;
+}
 sub pin {
     my ($self, $pin_num) = @_;
 
@@ -116,7 +121,7 @@ sub pin {
         die "\npin $pin_num is already in use... can't create second object\n";
     }
 
-    my $pin = RPi::WiringPi::Pin->new($pin_num);
+    my $pin = RPi::Pin->new($pin_num);
     $self->register_pin($pin);
     return $pin;
 }
@@ -133,11 +138,6 @@ sub hygrometer {
     my ($self, $pin) = @_;
     my $sensor = RPi::DHT11->new($pin);
     return $sensor;
-}
-sub interrupt {
-    my $self = shift;
-    my $interrupt = RPi::WiringPi::Interrupt->new;
-    return $interrupt;
 }
 sub spi {
     my ($self, $chan, $speed) = @_;
@@ -297,6 +297,15 @@ various items
     my $temp      = $env->temp; # celcius
     my $farenheit = $env->temp('f');
 
+    # GPS (requires gpsd to be installed and running
+
+    my $gps = $pi->gps;
+
+    print $gps->tpv('lat')   . "\n";
+    print $gps->tpv('lon')   . "\n";
+    print $gps->tpv('speed') . "\n";
+    print $gps->direction    . "\n";
+
     #
     # LCD
     #
@@ -372,25 +381,20 @@ your script. This is for unit testing purposes only.
 
 =head2 pin($pin_num)
 
-Returns a L<RPi::WiringPi::Pin> object, mapped to a specified GPIO pin, which
-you can then perform operations on.
+Returns a L<RPi::Pin> object, mapped to a specified GPIO pin, which
+you can then perform operations on. See that documentation for full usage
+details.
 
 Parameters:
 
     $pin_num
 
-Mandatory: The pin number to attach to.
+Mandatory, Integer: The pin number to attach to.
 
 =head2 lcd()
 
 Returns a L<RPi::LCD> object, which allows you to fully manipulate
 LCD displays connected to your Raspberry Pi.
-
-=head2 interrupt($pin, $edge, $callback)
-
-Returns a L<RPi::WiringPi::Interrupt> object, which allows you to act when
-certain events occur (eg: a button press). This functionality is better used
-through the L<RPi::WiringPi::Pin> object you created with C<pin()>.
 
 =head2 spi($channel, $speed);
 
@@ -407,6 +411,14 @@ digital potentiometer (only the MCP4XXXX versions are currently supported).
 
 See the linked documentation for full documentation on usage, or the
 L<RPi::WiringPi::FAQ-Tutorial> for usage examples.
+
+=head2 gps
+
+Returns a L<GPSD::Parse> object, allowing you to track your location.
+
+The GPS distribution requires C<gpsd> to be installed and running. All
+parameters for the GPS can be sent in here and we'll pass them along. Please see
+the link above for the full documentation on that module.
 
 =head2 shift_register($base, $num_pins, $data, $clk, $latch)
 

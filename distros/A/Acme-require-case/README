@@ -2,7 +2,7 @@ NAME
     Acme::require::case - Make Perl's require case-sensitive
 
 VERSION
-    version 0.012
+    version 0.013
 
 SYNOPSIS
       use Acme::require::case;
@@ -21,6 +21,8 @@ DESCRIPTION
     possible, perhaps on the command line:
 
         perl -MAcme::require::case myprogram.pl
+
+    It does not support hooks in @INC and will croak if any are found.
 
     You certainly don't want to run this in production, but it might be good
     for your editor's compile command, or in "PERL5OPT" during testing.

@@ -9,6 +9,7 @@ build_requires:
   File::Spec: '0'
   File::Spec::Functions: '0'
   Getopt::Long: '0'
+  HTTP::Server::Simple: '0.51'
   HTTP::Server::Simple::CGI: '0'
   IO::Socket::INET: '0'
   JSON: '0'
@@ -23,7 +24,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,85 +33,85 @@ name: JIRA-REST-Class
 provides:
   JIRA::REST::Class:
     file: lib/JIRA/REST/Class.pm
-    version: '0.10'
+    version: '0.11'
   JIRA::REST::Class::Abstract:
     file: lib/JIRA/REST/Class/Abstract.pm
-    version: '0.10'
+    version: '0.11'
   JIRA::REST::Class::Factory:
     file: lib/JIRA/REST/Class/Factory.pm
-    version: '0.10'
+    version: '0.11'
   JIRA::REST::Class::FactoryTypes:
     file: lib/JIRA/REST/Class/FactoryTypes.pm
-    version: '0.10'
+    version: '0.11'
   JIRA::REST::Class::Issue:
     file: lib/JIRA/REST/Class/Issue.pm
-    version: '0.10'
+    version: '0.11'
   JIRA::REST::Class::Issue::Changelog:
     file: lib/JIRA/REST/Class/Issue/Changelog.pm
-    version: '0.10'
+    version: '0.11'
   JIRA::REST::Class::Issue::Changelog::Change:
     file: lib/JIRA/REST/Class/Issue/Changelog/Change.pm
-    version: '0.10'
+    version: '0.11'
   JIRA::REST::Class::Issue::Changelog::Change::Item:
     file: lib/JIRA/REST/Class/Issue/Changelog/Change/Item.pm
-    version: '0.10'
+    version: '0.11'
   JIRA::REST::Class::Issue::Comment:
     file: lib/JIRA/REST/Class/Issue/Comment.pm
-    version: '0.10'
+    version: '0.11'
   JIRA::REST::Class::Issue::LinkType:
     file: lib/JIRA/REST/Class/Issue/LinkType.pm
-    version: '0.10'
+    version: '0.11'
   JIRA::REST::Class::Issue::Status:
     file: lib/JIRA/REST/Class/Issue/Status.pm
-    version: '0.10'
+    version: '0.11'
   JIRA::REST::Class::Issue::Status::Category:
     file: lib/JIRA/REST/Class/Issue/Status/Category.pm
-    version: '0.10'
+    version: '0.11'
   JIRA::REST::Class::Issue::TimeTracking:
     file: lib/JIRA/REST/Class/Issue/TimeTracking.pm
-    version: '0.10'
+    version: '0.11'
   JIRA::REST::Class::Issue::Transitions:
     file: lib/JIRA/REST/Class/Issue/Transitions.pm
-    version: '0.10'
+    version: '0.11'
   JIRA::REST::Class::Issue::Transitions::Transition:
     file: lib/JIRA/REST/Class/Issue/Transitions/Transition.pm
-    version: '0.10'
+    version: '0.11'
   JIRA::REST::Class::Issue::Type:
     file: lib/JIRA/REST/Class/Issue/Type.pm
-    version: '0.10'
+    version: '0.11'
   JIRA::REST::Class::Issue::Worklog:
     file: lib/JIRA/REST/Class/Issue/Worklog.pm
-    version: '0.10'
+    version: '0.11'
   JIRA::REST::Class::Issue::Worklog::Item:
     file: lib/JIRA/REST/Class/Issue/Worklog/Item.pm
-    version: '0.10'
+    version: '0.11'
   JIRA::REST::Class::Iterator:
     file: lib/JIRA/REST/Class/Iterator.pm
-    version: '0.10'
+    version: '0.11'
   JIRA::REST::Class::Mixins:
     file: lib/JIRA/REST/Class/Mixins.pm
-    version: '0.10'
+    version: '0.11'
   JIRA::REST::Class::Project:
     file: lib/JIRA/REST/Class/Project.pm
-    version: '0.10'
+    version: '0.11'
   JIRA::REST::Class::Project::Category:
     file: lib/JIRA/REST/Class/Project/Category.pm
-    version: '0.10'
+    version: '0.11'
   JIRA::REST::Class::Project::Component:
     file: lib/JIRA/REST/Class/Project/Component.pm
-    version: '0.10'
+    version: '0.11'
   JIRA::REST::Class::Project::Version:
     file: lib/JIRA/REST/Class/Project/Version.pm
-    version: '0.10'
+    version: '0.11'
   JIRA::REST::Class::Query:
     file: lib/JIRA/REST/Class/Query.pm
-    version: '0.10'
+    version: '0.11'
   JIRA::REST::Class::Sprint:
     file: lib/JIRA/REST/Class/Sprint.pm
-    version: '0.10'
+    version: '0.11'
   JIRA::REST::Class::User:
     file: lib/JIRA/REST/Class/User.pm
-    version: '0.10'
+    version: '0.11'
 requires:
   Carp: '0'
   Class::Accessor::Fast: '0'
@@ -132,7 +133,8 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=JIRA-REST-Class
   homepage: http://blogs.perl.org/users/packy_anderson/2016/12/jira-rest-class.html
   repository: https://github.com/packy/JIRA-REST-Class.git
-version: '0.10'
+version: '0.11'
 x_contributors:
+  - 'Alexandr Ciornii <alexchorny@gmail.com>'
   - 'Alexey Melezhik <melezhik@gmail.com>'
 x_serialization_backend: 'YAML::Tiny version 1.69'

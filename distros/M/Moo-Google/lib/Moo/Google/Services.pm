@@ -1,5 +1,5 @@
 package Moo::Google::Services;
-$Moo::Google::Services::VERSION = '0.01';
+$Moo::Google::Services::VERSION = '0.02';
 
 # ABSTRACT: generate classes, attributes and methods for appropriate API methods using Moose::Meta::Class
 
@@ -206,7 +206,7 @@ Moo::Google::Services - generate classes, attributes and methods for appropriate
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 METHODS
 

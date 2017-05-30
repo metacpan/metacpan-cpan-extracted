@@ -49,7 +49,7 @@ resources:
   bugtracker: https://github.com/skaji/cpm/issues
   homepage: https://github.com/skaji/cpm
   repository: https://github.com/skaji/cpm.git
-version: '0.302'
+version: '0.304'
 x_contributors:
   - 'Olaf Alders <olaf@wundersolutions.com>'
   - 'Shoichi Kaji <skaji@outlook.com>'

@@ -1,11 +1,11 @@
 use strict;
 use warnings;
 
-package Dist::Zilla::Plugin::Run; # git description: 0.043-10-ga61808a
+package Dist::Zilla::Plugin::Run; # git description: 0.044-5-g4ef1978
 # ABSTRACT: Run external commands and code at specific phases of Dist::Zilla
 # KEYWORDS: plugin tool distribution build release run command shell execute
 
-our $VERSION = '0.044';
+our $VERSION = '0.045';
 
 1;
 
@@ -21,7 +21,7 @@ Dist::Zilla::Plugin::Run - Run external commands and code at specific phases of 
 
 =head1 VERSION
 
-version 0.044
+version 0.045
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,6 @@
 package WG::API::NET;
 
 use Moo;
-extends 'WG::API';
 with 'WG::API::NET::Clans';
 with 'WG::API::NET::Accounts';
 with 'WG::API::NET::Servers';
@@ -12,11 +11,11 @@ WG::API::NET - Modules to work with Wargaming.net Public API
 
 =head1 VERSION
 
-Version v0.8.1
+Version v0.8.3
 
 =cut
 
-our $VERSION = 'v0.8.1';
+our $VERSION = 'v0.8.3';
 
 =head1 SYNOPSIS
 
@@ -36,7 +35,7 @@ This module provide access to WG Public API
 
 =head2 new
 
-Create new object with params. Rerquired application id: http://ru.wargaming.net/developers/documentation/guide/getting-started/
+Create new object with params. Rerquired application id: L<https://developers.wargaming.net/documentation/guide/getting-started/> 
 
 Params:
 
@@ -80,6 +79,15 @@ Method returns information on clan entities.
 
 Method returns the number of online players on the servers.
 
+=cut
+
+has api_uri => (
+    is  => 'ro',
+    default => sub{ 'api.worldoftanks.ru/wgn' },
+);
+
+with 'WG::API::Base';
+
 =head1 BUGS
 
 Please report any bugs or feature requests to C<cynovg at cpan.org>, or through the web interface at L<https://github.com/cynovg/WG-API/issues>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
@@ -119,7 +127,7 @@ L<http://search.cpan.org/dist/WG-API/>
 
 =head1 SEE ALSO
 
-WG API Reference L<http://ru.wargaming.net/developers/>
+WG API Reference L<https://developers.wargaming.net/>
 
 =head1 AUTHOR
 

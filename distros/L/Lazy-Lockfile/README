@@ -114,7 +114,12 @@ METHODS
     otherwise.
 
 CHANGES
-  2014-10-30, 1,22 - jeagle
+  2017-05-29, 1.23 - jeagle
+    Detect and bail out on errors when writing to the lockfile (RT#121894).
+
+    Thanks MRDVT.
+
+  2014-10-30, 1.22 - jeagle
     Add missing dependency.
 
   2014-09-14, 1.21 - jeagle

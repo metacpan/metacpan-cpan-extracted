@@ -20,7 +20,7 @@ Etcd3::Lease
 
 =cut
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 =head1 DESCRIPTION
 

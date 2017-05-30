@@ -1,12 +1,6 @@
-# Copyright (c) 2016, Mitchell Cooper
+# Copyright (c) 2017, Mitchell Cooper
 #
 # Evented::Configuration:
-#
-# a configuration file parser and event-driven configuration class.
-# Evented::Configuration is based on UICd::Configuration, the class of the UIC daemon.
-# UICd's parser was based on juno5's parser, which evolved from juno4, juno3, and juno2.
-# Early versions of Evented::Configuration were also found in several IRC bots, including
-# foxy-java. Evented::Configuration provides several convenience fetching methods.
 #
 # Events:
 #
@@ -34,7 +28,7 @@
 #     ...
 # });
 #
-# You can also add additional hash arguments for ->register_event() to the end.
+# You can also add additional hash arguments for ->register_callback() to the end.
 #
 
 package Evented::Configuration;
@@ -42,22 +36,23 @@ package Evented::Configuration;
 use warnings;
 use strict;
 use utf8;
+use 5.010;
 use parent 'Evented::Object';
+use Scalar::Util qw(blessed);
+use File::Basename qw(dirname);
 
-our $VERSION = '3.93';      # now incrementing by 0.01
+our $VERSION = '4.01';
 
-sub on  () { 1 }
-sub off () { undef }
+my ($true, $false) = (1, 0);
+sub on  () { state $on  = bless \$true,  'Evented::Configuration::Boolean' }
+sub off () { state $off = bless \$false, 'Evented::Configuration::Boolean' }
 
 # create a new configuration instance.
 sub new {
     my ($class, %opts) = (shift, @_);
 
-    # if we still have no defined conffile, we must give up now.
-    if (!defined $opts{conffile}) {
-        $@ = 'no configuration file (conffile) option specified.';
-        return;
-    }
+    # if we have no defined conffile, we must give up now.
+    return if !defined $opts{conffile};
 
     # if 'hashref' is provided, use it.
     $opts{conf} = $opts{hashref} || $opts{conf} || {};
@@ -69,72 +64,118 @@ sub new {
 
 # parse the configuration file.
 sub parse_config {
-    my ($conf, $i, $block, $name, $config) = shift;
-    open $config, '<', $conf->{conffile} or return;
+    my ($conf) = @_;
+    my $file = $conf->{conffile};
 
-    while (my $line = <$config>) {
-        $i++;
-        $line = trim($line);
-        next unless length $line;
-        next if $line =~ m/^#/;
+    # open for reading
+    my $fh;
+    if (not open $fh, '<', $file) {
+        my $msg = "$file: Failed to open for reading: $!";
+        return (undef, $msg);
+    }
+
+    my ($block, $name, @new_conf);
+    my $err = sub {
+        my ($i, $msg) = @_;
+        $msg = "$file:$i: $msg; parsing aborted";
+        close $fh;
+        return wantarray ? (undef, $msg) : undef;
+    };
+
+    while (<$fh>) {
         my ($key, $val, $val_changed_maybe);
 
+        # remove comments and excess whitespace.
+        chomp;
+        s/^\s*//;
+        s/\s*(#.*)$//;
+        next unless length;
+
         # a block with a name.
-        if ($line =~ m/^\[(.*?):(.*)\]$/) {
+        if (m/^\[(.+?):(.+)\]$/) {
             $block = trim($1);
             $name  = trim($2);
+            
+            # include
+            if ($block eq 'include') {
+                my $sfile = dirname($file)."/$name";
+                my $sconf = __PACKAGE__->new(conffile => $sfile);
+                
+                # error?
+                my ($ok, $err) = $sconf->parse_config;
+                return $err->($., "include error: $err") if !$ok;
+                
+                # inject
+                for my $sblock (keys %{ $sconf->{conf} }) {
+                for my $sname  (keys %{ $sconf->{conf}{$sblock} }) {
+                for my $skey   (keys %{ $sconf->{conf}{$sblock}{$sname} }) {
+                    my $old =  $conf->{conf}{$sblock}{$sname}{$skey};
+                    my $val = $sconf->{conf}{$sblock}{$sname}{$skey};
+                    push @new_conf, $sblock, $sname, $skey, $old, $val;
+                }}}
+            }
         }
 
         # a nameless block.
-        elsif ($line =~ m/^\[(.*)\]$/) {
+        elsif (m/^\[(.+)\]$/) {
             $block = 'section';
             $name  = trim($1);
         }
 
         # a boolean key.
-        elsif ($line =~ m/^\s*([\w:]+)\s*(#.*)*$/ && defined $block) {
+        elsif (m/^([\w:]+)$/) {
             $key = trim($1);
-            $val++;
+            $val = on;
             $val_changed_maybe++;
+
+            # no block is set
+            return $err->($., "Stray key '$key'")
+                if !length $block;
         }
 
         # a key and value.
-        elsif ($line =~ m/^\s*([\w:]+)\s*[:=]+(.+)$/ && defined $block) {
+        elsif (m/^([\w:]+)\s*[:=]+(.+)$/) {
             $key = trim($1);
-            $val = eval trim($2);
+            my $val_str = trim($2);
             $val_changed_maybe++;
-            if ($@) {
-                warn "Invalid value in $$conf{conffile} line $i: $@; parsing aborted";
-                return;
-            }
+
+            # no block is set
+            return $err->($., "Stray pair '$key = $val_str'")
+                if !length $block;
+
+            $val = eval $val_str;
+
+            # error occured in eval
+            return $err->($., "Invalid value '$val_str': $@")
+                if $@;
         }
 
         # I don't know how to handle this.
         else {
-            warn "Invalid line $i of $$conf{conffile}; parsing aborted";
-            return;
+            return $err->($., "Syntax error: '$_'");
         }
 
-        # something changed.
-        if ($val_changed_maybe) {
+        # something may have changed.
+        next unless $val_changed_maybe;
 
-            # determine the name of the event.
-            my $eblock = $block eq 'section' ? $name : $block.q(/).$name;
+        # fetch the old value and set the new value.
+        my $old = $conf->{conf}{$block}{$name}{$key};
 
-            # fetch the old value and set the new value.
-            my $old = $conf->{conf}{$block}{$name}{$key};
-            $conf->{conf}{$block}{$name}{$key} = $val;
-
-            # fire the events.
-            $conf->fire_events_together(
-                [ change                => [ $block, $name ], $key, $old, $val ],
-                [ "change:$eblock"      =>                    $key, $old, $val ],
-                [ "change:$eblock:$key" =>                          $old, $val ]
-            );
-
-        }
-
+        # push the events.
+        push @new_conf, $block, $name, $key, $old, $val;
     }
+
+    # we parsed the entire file successfully, so commit the changes.
+    my @new_events;
+    while (my @set = splice @new_conf, 0, 5) {
+        push @new_events, $conf->_get_events(@set);
+        $conf->{conf}{ $set[0] }{ $set[1] }{ $set[2] } = $set[4];
+    }
+
+    # now fire change events.
+    $conf->fire_events_together(@new_events) if @new_events;
+
+    close $fh;
     return 1;
 }
 
@@ -182,7 +223,7 @@ sub values_of_block {
         return;
     }
 
-    return values %$hashref;
+    return map _value_to_perl($_), values %$hashref;
 }
 
 # returns the key:value hash of a block.
@@ -197,16 +238,18 @@ sub hash_of_block {
         return;
     }
 
-    return %$hashref;
+    return map { $_ => _value_to_perl($hashref->{$_}) } keys %$hashref;
 }
 
 # get a configuration value.
 # supports unnamed blocks by get(block, key)
 # supports   named blocks by get([block type, block name], key)
-sub get {
-    my ($conf, $block, $key) = @_;
+sub  get { _get(shift, 0, @_) }
+sub _get {
+    my ($conf, $bool_objs, $block, $key) = @_;
     my ($block_type, $block_name) = _block_parts($block);
-    return $conf->{conf}{$block_type}{$block_name}{$key};
+    my $res = $conf->{conf}{$block_type}{$block_name}{$key};
+    return $bool_objs ? $res : _value_to_perl($res);
 }
 
 # remove leading and trailing whitespace.
@@ -217,6 +260,15 @@ sub trim {
     return $string;
 }
 
+# convert stored value to Perl representation.
+sub _value_to_perl {
+    my ($val) = @_;
+    if (blessed $val && $val->isa('Evented::Configuration::Boolean')) {
+        return $$val ? 1 : undef;
+    }
+    return $val;
+}
+
 # attach a configuration change listener.
 # see notes at top of file for usage.
 sub on_change {
@@ -225,11 +277,38 @@ sub on_change {
 
     # determine the name of the event.
     $block = $block_type eq 'section' ? $block_name : $block_type.q(/).$block_name;
-    my $event_name = "eventedConfiguration.change:$block:$key";
+    my $event_name = "change:$block:$key";
 
     # register the event.
     return $conf->register_event($event_name => $code, %opts);
+}
 
+# get events for a change.
+sub _get_events {
+    my ($conf, $block, $name, $key, $old, $val) = @_;
+    $old = _value_to_perl($old);
+    $val = _value_to_perl($val);
+
+    # determine the name of the event.
+    my $eblock = $block eq 'section' ? $name : $block.q(/).$name;
+
+    # return the events.
+    return (
+
+        # change                        => sub { my ($blockref, $key, $old, $new) }
+        # change:namelessblock          => sub { my            ($key, $old, $new) }
+        # change:named/theName          => sub { my            ($key, $old, $new) }
+        # change:section:__ANY__        => sub { my ($the_type, $key, $old, $new) }
+        # change:named:__ANY__          => sub { my ($the_name, $key, $old, $new) }
+        # change:namelessblock:someKey  => sub { my                  ($old, $new) }
+        # change:named/theName:someKey  => sub { my                  ($old, $new) }
+
+        [ change                  => [ $block, $name ], $key, $old, $val ],
+        [ "change:$eblock"        =>                    $key, $old, $val ],
+        [ "change:$block:__ANY__" =>           $name,   $key, $old, $val ],
+        [ "change:$eblock:$key"   =>                          $old, $val ]
+
+    );
 }
 
 # handle 'unamed block' or [ 'block type', 'named block' ]
@@ -483,11 +562,11 @@ In any case, events are fired with arguments C<(old value, new value)>.
 
 Say you have an unnamed block of type C<myBlock>. If you changed the key C<myKey> in
 C<myBlock>, Evented::Configuration would fire the event
-C<eventedConfiguration.change:myBlock:myKey>.
+C<change:myBlock:myKey>.
 
 Now assume you have a named block of type C<myBlock> with name C<myName>. If you changed
 the key C<myKey> in C<myBlock:myName>, Evented::Configuration would fire event
-C<eventedConfiguration.change:myBlock/myName:myKey>.
+C<change:myBlock/myName:myKey>.
 
 However, it is recommended that you use the C<-E<gt>on_change()> method rather than
 directly attaching event callbacks. This will insure compatibility for later versions that

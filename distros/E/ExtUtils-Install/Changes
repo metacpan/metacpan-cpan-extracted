@@ -1,5 +1,9 @@
 Revision history for ExtUtils-Install
 
+2.14
+
+- Fix tests for when perl path contains a space
+
 2.12
 
 - Fix win32 check

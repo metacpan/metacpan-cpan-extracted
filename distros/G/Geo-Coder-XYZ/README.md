@@ -1,10 +1,10 @@
-# Geo::Coder::XIZ
+# Geo::Coder::XYZ
 
 Provides a geocoding functionality using https://geocode.xyz
 
 # VERSION
 
-Version 0.02
+Version 0.03
 
 # SYNOPSIS
 
@@ -29,10 +29,13 @@ Geo::Coder::XYZ provides an interface to geocode.xyz, a free geocode database co
 ## geocode
 
     $location = $geocoder->geocode(location => $location);
-    # @location = $geocoder->geocode(location => $location);
 
     print 'Latitude: ', $location->{'latt'}, "\n";
     print 'Longitude: ', $location->{'longt'}, "\n";
+
+    @locations = $geocoder->geocode('Portland, USA');
+    diag 'There are Portlands in ', join (', ', map { $_->{'state'} } @locations);
+        
 
 ## ua
 

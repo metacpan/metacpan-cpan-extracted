@@ -21,6 +21,7 @@ sub match {
         |address[ ]unknown
         |archived[ ]recipient
         |BAD[-_ \t]RECIPIENT
+        |can[']t[ ]accept[ ]user
         |destination[ ]addresses[ ]were[ ]unknown
         |destination[ ]server[ ]rejected[ ]recipients
         |email[ ]address[ ]does[ ]not[ ]exist
@@ -61,8 +62,7 @@ sub match {
         |recipient[ ](?:
              .+[ ]was[ ]not[ ]found[ ]in
             |address[ ]rejected:[ ](?:
-                 access[ ]denied
-                |invalid[ ]user
+                 invalid[ ]user
                 |user[ ].+[ ]does[ ]not[ ]exist
                 |user[ ]unknown[ ]in[ ].+[ ]table
                 |unknown[ ]user
@@ -82,7 +82,8 @@ sub match {
             |no[ ]mailbox[ ]here[ ]by[ ]that[ ]name
             )
         |the[ ](?:
-             following[ ]recipients[ ]was[ ]undeliverable
+             email[ ]account[ ]that[ ]you[ ]tried[ ]to[ ]reach[ ]does[ ]not[ ]exist
+            |following[ ]recipients[ ]was[ ]undeliverable
             |user[']s[ ]email[ ]name[ ]is[ ]not[ ]found
             )
         |this[ ](?:
@@ -91,8 +92,7 @@ sub match {
             |user[ ]doesn[']?t[ ]have[ ]a[ ].+[ ]account
             )
         |unknown[ ](?:
-             address
-            |e[-]?mail[ ]address
+             e[-]?mail[ ]address
             |local[- ]part
             |mailbox
             |recipient
@@ -228,7 +228,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2016 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

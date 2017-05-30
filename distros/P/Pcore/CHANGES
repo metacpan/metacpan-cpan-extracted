@@ -1,3 +1,18 @@
+v0.36.0 2017-05-27T09:49:39Z
+ - No issues on bugtracker were closed since the last release
+ - connect_ws on_error -> on_connect_error
+ - websocket mem leaks removed
+ - api client connect_timeout added
+ - websocket server mem leak
+ - api client undef socket on disconnect
+ - websocket on_rpc_call -> on_rpc
+ - websocket return exception if rpc is not supported
+ - websocket use 1001 status on destroy handle
+ - websocket improvements
+ - RPC authentication
+ - mem leak in rpc connect
+ - websocket disconnect reason fixed
+
 v0.35.1 2017-05-25T08:25:04Z
  - No issues on bugtracker were closed since the last release
  - http use timeout as connect_timeout if not defined

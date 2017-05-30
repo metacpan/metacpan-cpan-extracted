@@ -39,7 +39,7 @@ our %EXPORT_TAGS =
       'filehandles'  => [ @export_ok_vars, @EXPORT ],
       'vars'         => [ @export_ok_vars, @EXPORT ],
       'all'          => [ @EXPORT_OK, @EXPORT ] );
-our $VERSION = '0.89';
+our $VERSION = '0.90';
 
 our $SOCKET_READ_TIMEOUT = 0.05;  # seconds
 our $MAIN_PID;
@@ -86,6 +86,7 @@ sub import {
                     $ENV{PATH} = "";
                     delete $ENV{ENV};
                     use Config;
+                    push @INC, ".";
                     $^X = $Config::Config{perlpath};
 
                     # since v0.53 (daemon code) we call Cwd::abs_path or 
@@ -95,6 +96,7 @@ sub import {
                     if (! eval {$ipc_dir = Cwd::abs_path($ipc_dir)}) {
                         $ipc_dir = Cwd::getcwd() . "/" . $ipc_dir;
                     }
+                    $ipc_dir =~ s{(.*)/.*$}{$1};
                     ($ipc_dir) = $ipc_dir =~ /(.*)/;
                     Forks::Super::Job::Ipc::set_ipc_dir($ipc_dir);
                 }
@@ -684,7 +686,7 @@ Forks::Super - extensions and convenience methods to manage background processes
 
 =head1 VERSION
 
-Version 0.89
+Version 0.90
 
 =head1 SYNOPSIS
 
@@ -1846,9 +1848,9 @@ on a remote host, so a different scheme to decide when
 a job can be started is used for remote jobs.
 See L<"%MAX_PROC" in MODULE VARIABLES|"MAX_PROC">.
 
--back
+=back
 
-------------------------------------------------------------
+
 
 =head3 can_launch
 
@@ -3041,11 +3043,11 @@ between 9:00am and 5:00pm:
         $hour >= 9 && $hour < 17 ? 4 : 16;
     }
 
-=cut
+=back
 
 =head3 %MAX_PROC
 
-=over4
+=over 4
 
 =item C<%Forks::Super::MAX_PROC>
 

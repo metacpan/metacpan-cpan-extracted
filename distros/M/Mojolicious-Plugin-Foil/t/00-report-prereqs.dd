@@ -19,6 +19,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
+                                      'Config::Context' => '0',
                                       'File::Serialize' => '0',
                                       'File::ShareDir' => '0',
                                       'File::Slurper' => '0',

@@ -7,7 +7,7 @@
 use lib qw(lib);
 use strict;
 use warnings;
-our $VERSION = '0.89';
+our $VERSION = '0.90';
 
 my $limits_file = "t/out/limits.$^O.$]";
 my $limits_file2 = "t/out/limits.$^O";
@@ -96,6 +96,12 @@ my $sync = $info{sync_options};
 $sync =~ s{/}{ }g;
 print F "\n";
 print F "our \@SYNC_IMPLS = qw($sync);\n";
+
+if (length($info{test_ssh_target})) {
+    print F "\n";
+    print F "# indicates if we can safely run remote tests (t/49*.t)\n";
+    print F "our \$TEST_SSH_TEMPLATE = q~$info{test_ssh_target}~;\n";
+}
 
 
 # See what core and core module functionality is available

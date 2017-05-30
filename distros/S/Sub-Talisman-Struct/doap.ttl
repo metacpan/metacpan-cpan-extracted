@@ -12,7 +12,11 @@
 <http://purl.org/NET/cpan-uri/dist/Sub-Talisman-Struct/project>
 	a                    doap:Project;
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
-	doap-deps:runtime-requirement [ doap-deps:on "MooX::Struct 0.006"^^doap-deps:CpanId ], [ doap-deps:on "Sub::Talisman"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.012"^^doap-deps:CpanId ], [ doap-deps:on "MooX::Struct 0.016"^^doap-deps:CpanId ], [
+		doap-deps:on "Sub::Talisman 0.006"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Exporter::Tiny 1.000000"^^doap-deps:CpanId;
+	];
 	doap-deps:test-requirement [ doap-deps:on "Test::NoWarnings"^^doap-deps:CpanId ], [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
 	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Sub-Talisman-Struct>;
 	doap:created         "2012-10-19"^^xsd:date;
@@ -23,7 +27,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Sub-Talisman-Struct";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Sub-Talisman-Struct/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Sub-Talisman-Struct/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Sub-Talisman-Struct/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Sub-Talisman-Struct/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Sub-Talisman-Struct/v_0-005>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Sub-Talisman-Struct/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Sub-Talisman-Struct/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Sub-Talisman-Struct/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Sub-Talisman-Struct/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Sub-Talisman-Struct/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Sub-Talisman-Struct/v_0-006>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-sub-talisman-struct>;
@@ -97,6 +101,20 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-Talisman-Struct-0.005.tar.gz>;
 	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Sub-Talisman-Struct/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "Sub-Talisman-Struct-0.006"^^xsd:string;
+	dc:issued            "2017-05-27"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Keep up with changes to MooX::Struct.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-Talisman-Struct-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

@@ -1,4 +1,4 @@
-Bio-RNA-RNAaliSplit 0.04
+Bio-RNA-RNAaliSplit 0.05
 
 Bio::RNA::RNAaliSplit is a distribution of Perl modules for splitting and
 deconvoluting structural RNA multiple sequence alignments (MSA). Its

@@ -1,5 +1,5 @@
 package Moo::Google::Discovery;
-$Moo::Google::Discovery::VERSION = '0.01';
+$Moo::Google::Discovery::VERSION = '0.02';
 
 # ABSTRACT: Methods for working with Google API discovery service
 
@@ -35,8 +35,10 @@ sub availableAPIs {
     my $self = shift;
     my $all  = $self->discover_all()->{items};
     for my $i (@$all) {
-        $i = { map { $_ => $i->{$_} }
-              grep { exists $i->{$_} } qw/name version documentationLink/ };
+        $i = {
+            map { $_ => $i->{$_} }
+            grep { exists $i->{$_} } qw/name version documentationLink/
+        };
     }
     my @subset = uniq map { $_->{name} } @$all;    ## unique names
                                                    # warn scalar @$all;
@@ -209,7 +211,7 @@ Moo::Google::Discovery - Methods for working with Google API discovery service
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 METHODS
 

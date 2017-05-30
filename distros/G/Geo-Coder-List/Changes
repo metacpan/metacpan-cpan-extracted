@@ -1,5 +1,13 @@
 Revision history for Geo-Coder-List
 
+0.11	Sat 27 May 14:55:23 EDT 2017
+	Test with the new L:U:Throttled
+
+0.10	Fri May 26 17:29:04 EDT 2017
+	If a geocoder returns error go to the next one
+	If regex wasn't matched it tried it anyway
+	Carp when a coder fails
+
 0.09	Sat 13 May 10:15:44 EDT 2017
 	Fix travis breakage that could also break cpan_testers
 

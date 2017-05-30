@@ -4,13 +4,14 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.106;
+our $VERSION = 1.107;
 
 use Prty::Object;
 use Time::HiRes ();
 use Prty::Option;
 use Prty::FileHandle;
 use Prty::ColumnFormat;
+use Prty::Duration;
 
 # -----------------------------------------------------------------------------
 
@@ -503,6 +504,23 @@ sub saveToFile {
 
 =head2 Miscellaneous
 
+=head3 elapsed() - Dauer seit Beginn der SQL_Ausführung
+
+=head4 Synopsis
+
+    $duration = $tab->elapsed;
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub elapsed {
+    my $self = shift;
+    return Time::HiRes::gettimeofday-$self->startTime;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 formats() - Liefere Kolumnenformate
 
 =head4 Synopsis
@@ -694,7 +712,25 @@ sub count {
 
 # -----------------------------------------------------------------------------
 
-=head3 push() - Füge Datensatz am Ende der Liste hinzu
+=head3 pop() - Entferne Datensatz am Ende
+
+=head4 Synopsis
+
+    $tab->pop;
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub pop {
+    my ($self,$row) = @_;
+    CORE::pop @{$self->{'rows'}};
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 push() - Füge Datensatz am Ende hinzu
 
 =head4 Synopsis
 
@@ -782,11 +818,53 @@ sub asString {
 
 =head4 Synopsis
 
-    $str = $tab->asTable(@opts);
+    $str = $tab->asTable(@opt);
 
 =head4 Description
 
 Liefere eine einfache Tabellen-Repräsentation der Tabellendaten.
+
+=head4 Options
+
+=over 4
+
+=item -msg => $msg
+
+Füge $msg zur Statistik-Zeile hinzu.
+
+=back
+
+=head4 Example
+
+Beispiel-Ausgabe:
+
+    SELECT
+        *
+    FROM
+        did.mandant
+    WHERE
+        ROWNUM <= 10+1
+    ORDER BY
+        1
+    
+    1 id
+    2 id_person
+    3 bezeichnung
+    4 id_verknuepfungsgruppe
+    
+    1   2          3                         4
+    | 0 | 14485923 | unbekannter Mandant     | 0 |
+    | 1 | 14485924 | Otto                    | 0 |
+    | 2 |  7834646 | Otto  - TZ (HB)         | 0 |
+    | 3 | 14485928 | Schwab Versand GmbH     | 0 |
+    | 4 |  5423454 | Schwab - TZ (HB)        | 0 |
+    | 5 | 14913536 | Hanseatic Bank          | 0 |
+    | 6 | 14485937 | 3-Pagen Versand         | 0 |
+    | 7 |  8371420 | Fegro Markt G. M. B. H. | 0 |
+    | 8 | 14485941 | Heinrich Heine Versand  | 0 |
+    | 9 | 14485942 | Hermes T. Kundendienst  | 0 |
+    
+    0.093s, 10 rows - *MORE ROWS EXIST*
 
 =cut
 
@@ -794,16 +872,49 @@ Liefere eine einfache Tabellen-Repräsentation der Tabellendaten.
 
 sub asTable {
     my $self = shift;
-    # @_: @opts
+    # @_: @opt
 
     # Optionen
 
-    Prty::Option->extract(\@_,
-    );
+    my $msg = '';
 
-    my @fmt = $self->formats;
+    if (@_) {
+        Prty::Option->extract(\@_,
+            -msg=>\$msg,
+        );
+        if ($msg) {
+            $msg = " - $msg";
+        }
+    }
 
     my $str = '';
+
+    # Statement
+
+    $str .= $self->stmt;
+    $str .= "\n\n";
+
+    # Kolumnenbezeichnungen
+
+    my @titles = $self->titles;
+    my $l = length scalar @titles;
+    for (my $i = 0; $i < @titles; $i++) {
+        $str .= sprintf "%*d %s\n",$l,$i+1,$titles[$i];
+    }
+    $str .= "\n";
+
+    # Kolumnenzeile
+
+    my @fmt = $self->formats;
+    for (my $i = 0; $i < @fmt; $i++) {
+        my $numWidth = length $i+1;
+        my $width = $fmt[$i]->width+3;
+        $str .= sprintf '%d%s',$i+1,(' ' x ($width-$numWidth));
+    }
+    $str .= "\n";
+
+    # Tabelle
+
     for my $row ($self->rows) {
         my @arr = $row->asArray;
         $str .= '| ';
@@ -813,10 +924,15 @@ sub asTable {
             }
             $str .= $fmt[$i]->asFixedWidthString($arr[$i]);
         }
-        # $str =~ s/\s+$//; # Whitespace am Ende entfernen
-        # $str .= "\n";
         $str .= " |\n";
     }
+
+    # Statistik
+
+    my $duration = $self->execTime + $self->fetchTime;
+    $str .= sprintf "\n%s, %s rows%s\n",
+        Prty::Duration->new($duration)->asShortString(-precision=>3),
+        $self->count,$msg;
 
     return $str;
 }
@@ -896,7 +1012,7 @@ sub diffReport {
 
 =head1 VERSION
 
-1.106
+1.107
 
 =head1 AUTHOR
 

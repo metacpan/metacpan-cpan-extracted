@@ -1,16 +1,19 @@
 package Chart::Plotly::Trace::Mesh3d;
 use Moose;
+use MooseX::ExtraArgs;
 
 use Chart::Plotly::Trace::Attribute::Colorbar;
 use Chart::Plotly::Trace::Attribute::Contour;
 use Chart::Plotly::Trace::Attribute::Lighting;
 use Chart::Plotly::Trace::Attribute::Lightposition;
 
-our $VERSION = '0.012';    # VERSION
+our $VERSION = '0.013';    # VERSION
 
 sub TO_JSON {
-    my $self = shift;
-    my %hash = %$self;
+    my $self       = shift;
+    my $extra_args = $self->extra_args // {};
+    my %hash       = ( %$self, %$extra_args );
+    delete $hash{'extra_args'};
     if ( $self->can('type') && ( !defined $hash{'type'} ) ) {
         $hash{type} = $self->type();
     }
@@ -143,7 +146,7 @@ Chart::Plotly::Trace::Mesh3d
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 
@@ -283,7 +286,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Pablo Rodríguez González.
+Copyright (c) 2017 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

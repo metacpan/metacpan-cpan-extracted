@@ -78,6 +78,21 @@ will need to substitute your own location where indicated.
 	$flare->{magnitude};
  }
 
+=head1 NOTICE -- IRIDIUM SUPPORT
+
+As of early 2017 the flaring Iridium satellites are being taken out of
+service, to be replaced by non-flaring Iridium Next satellites. Once the
+flaring Iridium satellites are out of service, I plan to deprecate and
+remove all functionality relating to the acquisition of Iridium status.
+
+I have not yet decided on the disposition of
+L<Astro::Coord::ECI::TLE::Iridium|Astro::Coord::ECI::TLE::Iridium>. My
+thought at the moment is that it will be moved to its own package rather
+than deleted, because the flare functionality may be of historical
+interest. By the same reasoning, the TLE parsing logic in
+L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> will remain able to
+rebless satellites as Iridium, but the canned status will be 'tumbling'.
+
 =head1 DESCRIPTION
 
 This class is a subclass of
@@ -122,7 +137,7 @@ use warnings;
 
 use base qw{Astro::Coord::ECI::TLE};
 
-our $VERSION = '0.079';
+our $VERSION = '0.081';
 
 use Astro::Coord::ECI::Sun;
 use Astro::Coord::ECI::Utils qw{:all};
@@ -1752,6 +1767,12 @@ strings are accepted. That is:
 Technically, the default is 0. But if the object is manufactured by
 Astro::Coord::ECI::TLE->parse(), the status will be set based on the
 internal status table in Astro::Coord::ECI::TLE.
+
+B<Note> that Mike McCants' Iridium statuses are no longer maintained, so
+his status codes (C<''> and C<'?'>) are being put through a deprecation
+cycle. In 6 months they will warn on the first use; 6 months after that
+they will warn on every use, and 6 months after that they will become
+fatal.
 
 =item zone (number or string)
 

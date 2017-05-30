@@ -7,6 +7,7 @@ use utf8;
 use Data::Dumper;
 use File::ShareDir qw(dist_file);
 use Lingua::ZH::Jieba;
+use List::Util qw(reduce);
 use Path::Tiny;
 
 use Test::More;
@@ -17,50 +18,82 @@ binmode $builder->output,         ":encoding(utf8)";
 binmode $builder->failure_output, ":encoding(utf8)";
 binmode $builder->todo_output,    ":encoding(utf8)";
 
-sub cut_ok {
-    my ( $words, $expected, $msg ) = @_;
-
-    is( join( '/', @$words ), $expected, $msg );
-}
-
 my $jieba = Lingua::ZH::Jieba->new();
 ok( ( defined $jieba ), "Lingua::ZH::Jieba->new()" );
 
+sub cut_ok {
+    my ( $sentence, $opts, $expected, $msg ) = @_;
+
+    my $words = $jieba->cut( $sentence, $opts );
+    is( join( '/', @$words ), $expected, "cut() " . $msg );
+
+    my $words_ex = $jieba->cut_ex( $sentence, $opts );
+    is( join( '/', map { $_->[0] } @$words_ex ), $expected,
+        "cut_ex() " . $msg );
+    ok(
+        (
+            reduce { $a and $b } 1,
+            map {
+                my ( $word, $offset, $length ) = @$_;
+                substr( $sentence, $offset, $length ) eq $word;
+            } @$words_ex
+        ),
+        "cut_ex() offset and length correct"
+    );
+}
+
+sub cut_for_search_ok {
+    my ( $sentence, $opts, $expected, $msg ) = @_;
+
+    my $words = $jieba->cut_for_search( $sentence, $opts );
+    is( join( '/', @$words ), $expected, "cut_for_search() " . $msg );
+
+    my $words_ex = $jieba->cut_for_search_ex( $sentence, $opts );
+    is( join( '/', map { $_->[0] } @$words_ex ),
+        $expected, "cut_for_search_ex() " . $msg );
+
+    ok(
+        (
+            reduce { $a and $b } 1,
+            map {
+                my ( $word, $offset, $length ) = @$_;
+                substr( $sentence, $offset, $length ) eq $word;
+            } @$words_ex
+        ),
+        "cut_for_search_ex() offset and length correct"
+    );
+}
+
 cut_ok(
-    $jieba->cut("他来到了网易杭研大厦"),
-    "他/来到/了/网易/杭研/大厦",
-    "cut with HMM"
+    "他来到了网易杭研大厦", {},
+    "他/来到/了/网易/杭研/大厦", "with HMM"
 );
 
 cut_ok(
-    $jieba->cut( "他来到了网易杭研大厦", { no_hmm => 1 } ),
-    "他/来到/了/网易/杭/研/大厦",
-    "cut without HMM"
+    "他来到了网易杭研大厦", { no_hmm => 1 },
+    "他/来到/了/网易/杭/研/大厦", "without HMM"
 );
 
 cut_ok(
-    $jieba->cut( "我来到北京清华大学", { cut_all => 1 } ),
-    "我/来到/北京/清华/清华大学/华大/大学",
-    "cut all"
+    "我来到北京清华大学",
+    { cut_all => 1 },
+    "我/来到/北京/清华/清华大学/华大/大学", "all"
 );
 
-cut_ok(
-    $jieba->cut_for_search(
-"小明硕士毕业于中国科学院计算所，后在日本京都大学深造"
-    ),
+cut_for_search_ok(
+"小明硕士毕业于中国科学院计算所，后在日本京都大学深造",
+    {},
 "小明/硕士/毕业/于/中国/科学/学院/科学院/中国科学院/计算/计算所/，/后/在/日本/京都/大学/日本京都大学/深造",
-    "cut for search"
+    ""
 );
 
 # insert user word
 {
-    cut_ok( $jieba->cut("男默女泪"),
-        "男默/女泪", "before insert 男默女泪" );
+    cut_ok( "男默女泪", {}, "男默/女泪", "before insert 男默女泪" );
 
     $jieba->insert_user_word("男默女泪");
 
-    cut_ok( $jieba->cut("男默女泪"),
-        "男默女泪", "after insert 男默女泪" );
+    cut_ok( "男默女泪", {}, "男默女泪", "after insert 男默女泪" );
 }
 
 # part-of-speech tagging
@@ -124,7 +157,7 @@ cut_ok(
     my $jieba_custom =
       Lingua::ZH::Jieba->new( { user_dict_path => $tempfile . "" } );
     ok( defined($jieba_custom), "custom user_dict_path" );
-    cut_ok( $jieba_custom->cut("男默女泪"),
+    cut_ok( "男默女泪", {},
         "男默女泪", "custom user_dict_path: cut with HMM" );
 }
 

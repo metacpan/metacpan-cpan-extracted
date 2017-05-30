@@ -1,0 +1,16 @@
+Changes
+lib/LWP/UserAgent/Throttled.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+t/00-load.t
+t/coverage.t
+t/cv.t
+t/pod-cm.t
+t/pod.t
+t/request.t
+t/spelling.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

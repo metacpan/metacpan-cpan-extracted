@@ -1,3 +1,44 @@
+7.26  Sat May 27 21:01:47 BST 2017
+
+    No changes since 7.25_06
+
+7.25_06 Tue May 23 20:18:01 BST 2017
+
+    Bug fixes:
+    - Fix regression with XS tests on MSWin32 with MS toolchain
+
+7.25_05 Mon May 15 10:18:01 BST 2017
+
+    Bug fixes:
+    - Make MakeMaker pass compilation tests on AIX again
+    - Test, fix test dep on SKIPped linktype
+
+7.25_04 Fri May 12 12:24:09 BST 2017
+
+    Enhancements:
+    - Add os_unsupported() function
+
+7.25_03 Thu May 11 17:51:23 BST 2017
+
+    Bug fixes:
+    - processPL now depends on 'pure_all' instead of 'all'
+
+7.25_02 Thu May 11 11:54:42 BST 2017
+
+    Bug fixes:
+    - Only add staticlibs that are installed under auto/
+    - Correct the order of tests of chmod()
+
+    Doc fixes:
+    - Fixed typo in MakeMaker.pm
+
+7.25_01 Fri Feb  3 13:36:25 GMT 2017
+
+    Bug fixes:
+    - Make perllocal.pod files reproducible
+    - META_ADD/MERGE default meta version based on each other
+    - Eliminate an ancient, unneeded, dangerous call to Carp::longmess
+
 7.24  Sat Aug 20 13:22:28 BST 2016
 
     No changes since 7.23_01

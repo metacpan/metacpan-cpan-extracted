@@ -33,7 +33,7 @@ use Image::Base::X11::Protocol::Drawable;
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-$VERSION = 14;
+$VERSION = 15;
 
 
 sub new {

@@ -23,18 +23,19 @@ no_index:
     - t
     - xt
 requires:
-  Catmandu: '0.8014'
+  Catmandu: '1.0'
   Catmandu::Exporter::Template: '0.03'
   Clone: '0.36'
   Dancer: '1.3123'
   DateTime: '1.08'
+  DateTime::Format::ISO8601: '0'
   DateTime::Format::Strptime: '0'
   perl: v5.10.1
 resources:
   bugtracker: https://github.com/LibreCat/Dancer-Plugin-Catmandu-OAI/issues
   homepage: https://github.com/LibreCat/Dancer-Plugin-Catmandu-OAI
   repository: https://github.com/LibreCat/Dancer-Plugin-Catmandu-OAI.git
-version: '0.0401'
+version: '0.0403'
 x_contributors:
   - 'Nicolas Franck <Nicolas.Franck@ugent.be>'
   - 'Nicolas Franck <njfranck@ca20c533.ugent.be>'

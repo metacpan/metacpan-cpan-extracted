@@ -22,7 +22,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
 package Game::Asset::SDLSound::Manager;
-$Game::Asset::SDLSound::Manager::VERSION = '0.1';
+$Game::Asset::SDLSound::Manager::VERSION = '0.2';
 use strict;
 use warnings;
 use Moose;

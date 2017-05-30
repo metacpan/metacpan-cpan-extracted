@@ -1,3 +1,6 @@
+0.06 2017-05-25
+  Mojolicious::Plugin::INIConfig become stable.
+  Add config_override description.
 0.05 2017-05-25
   Support config_override option. This is same as config_override option of Mojolicious::Plugin::Config.
 0.04 2017-04-28

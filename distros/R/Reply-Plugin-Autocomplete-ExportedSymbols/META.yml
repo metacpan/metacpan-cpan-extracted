@@ -1,0 +1,43 @@
+---
+abstract: 'Tab completion for exported symbol names'
+author:
+  - 'Takumi Akiyama <t.akiym@gmail.com>'
+build_requires:
+  FindBin: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.11, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Reply-Plugin-Autocomplete-ExportedSymbols
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Reply::Plugin::Autocomplete::ExportedSymbols:
+    file: lib/Reply/Plugin/Autocomplete/ExportedSymbols.pm
+    version: '0.01'
+requires:
+  List::MoreUtils: '0'
+  Module::Runtime: '0'
+  Package::Stash: '0'
+  Reply: '0'
+  parent: '0'
+resources:
+  bugtracker: https://github.com/akiym/Reply-Plugin-Autocomplete-ExportedSymbols/issues
+  homepage: https://github.com/akiym/Reply-Plugin-Autocomplete-ExportedSymbols
+  repository: git://github.com/akiym/Reply-Plugin-Autocomplete-ExportedSymbols.git
+version: '0.01'
+x_authority: cpan:AKIYM
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

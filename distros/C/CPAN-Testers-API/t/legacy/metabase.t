@@ -1,6 +1,7 @@
 
 use Mojo::Base '-strict';
 use experimental 'signatures', 'postderef';
+no warnings 'once';
 use Test::More;
 use Test::Mojo;
 use FindBin qw( $Bin );
@@ -12,6 +13,13 @@ use CPAN::Testers::Fact::TestSummary;
 use CPAN::Testers::Fact::LegacyReport;
 use Metabase::User::Profile;
 use Mojo::Util qw( b64_encode );
+eval { require Test::mysqld } or plan skip_all => 'Requires Test::mysqld';
+
+my $mysqld = Test::mysqld->new(
+    my_cnf => {
+        'skip-networking' => '', # no TCP socket
+    },
+) or plan skip_all => $Test::mysqld::errstr;
 
 use Mojo::JSON qw( to_json );
 
@@ -20,9 +28,11 @@ my $bin_path = path( $Bin, '..', '..', 'bin', 'cpantesters-legacy-metabase' );
 require $bin_path;
 my $t = Test::Mojo->new;
 
-# App is hooked to an in-memory database by config
-# (t/etc/metabase.conf), so we must deploy a tablespace
-my $schema = $t->app->schema;
+my $schema = $t->app->schema(
+    CPAN::Testers::Schema->connect(
+        $mysqld->dsn(dbname => 'test')
+    )
+);
 $schema->deploy;
 
 subtest 'post report' => sub {
@@ -103,6 +113,80 @@ subtest 'post report' => sub {
             'language version is correct';
         is $row->report->{environment}{language}{archname}, 'x86_64-linux',
             'language arch is correct';
+    };
+
+    subtest 'tail/log.txt' => sub {
+
+        my $upload = $schema->resultset( 'Upload' )->create({
+            type => 'cpan',
+            dist => 'CPAN-Testers-Schema',
+            version => '1.001',
+            author => 'PREACTION',
+            filename => 'CPAN-Testers-Schema-1.001.tar.gz',
+            released => time,
+        });
+
+        my %date = (
+            year => 2017,
+            month => 1,
+            day => 1,
+            hour => 0,
+            minute => 0,
+            second => 0
+        );
+        my $row = $schema->resultset( 'TestReport' )->create({
+            created => DateTime->new( %date ),
+            report => {
+                reporter => {
+                    name => 'Doug Bell',
+                },
+                environment => {
+                    language => {
+                        name => 'Perl 5',
+                        version => 'v5.24.0',
+                        archname => 'x86_64-linux',
+                    },
+                },
+                distribution => {
+                    name => 'CPAN-Testers-Schema',
+                    version => '1.001',
+                },
+                result => {
+                    grade => 'pass',
+                },
+            },
+        });
+        my $guid = $row->id;
+
+        # Add some extra rows to ignore for now
+        $schema->resultset( 'TestReport' )->create({
+            created => DateTime->new( %date ),
+            report => {
+                reporter => {
+                    name => 'Doug Bell',
+                },
+                environment => {
+                    language => {
+                        name => 'Perl 6',
+                        version => '2017.05',
+                        archname => 'x86_64-darwin',
+                    },
+                },
+                distribution => {
+                    name => 'Perl6-Derp',
+                    version => '1.001',
+                },
+                result => {
+                    grade => 'pass',
+                },
+            },
+        });
+
+        $t->get_ok( '/tail/log.txt' )
+          ->content_like( qr{The last \d+ reports as of \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z:} )
+          ->content_like( qr{\Q[2017-01-01T00:00:00Z] [Doug Bell] [pass] [PREACTION/CPAN-Testers-Schema-1.001.tar.gz] [x86_64-linux] [perl-v5.24.0] [$guid] [2017-01-01T00:00:00Z]} )
+          ->content_unlike( qr{\Q[perl-v2017.05]}, 'does not read Perl 6 reports' )
+          ;
     };
 };
 

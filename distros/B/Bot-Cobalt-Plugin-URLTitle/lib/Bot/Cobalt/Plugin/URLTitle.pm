@@ -1,6 +1,6 @@
 package Bot::Cobalt::Plugin::URLTitle;
 # ABSTRACT: Bot::Cobalt plugin for printing the title of a URL
-$Bot::Cobalt::Plugin::URLTitle::VERSION = '0.003';
+$Bot::Cobalt::Plugin::URLTitle::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -9,6 +9,7 @@ use Bot::Cobalt::Common;
 
 use Mojo::UserAgent;
 use HTML::Entities    qw(decode_entities);
+use List::AllUtils    qw(first);
 use Text::Unidecode   qw(unidecode);
 use URI::Find::Simple qw(list_uris);
 
@@ -48,9 +49,16 @@ sub Bot_public_msg {
    foreach my $uri ( list_uris($msg->message) ) {
       next if not $uri;
 
-      my $title = $self->ua->get($uri)->result->dom->at('title')->text or next;
-      my $uni   = unidecode($title);
-      my $resp  = sprintf('[ %s ]', $uni ? $uni : $title);
+      my $text = $self->ua->get($uri)->result->dom->at('title')->text or next;
+
+      my @split = split /\n/, unidecode($text); # Remove unicode characters and split on newlines
+      my $title = first { /\S/ } @split;         # Grab first element with non-space characters
+
+      # Remove leading and trailing whitespace
+      $title =~ s/^\s+(.+)/$1/;
+      $title =~ s/(.+)\s+$/$1/;     
+
+      my $resp  = sprintf('[ %s ]', $title);
       broadcast( 'message', $context, $channel, $resp );
    }
 
@@ -71,7 +79,7 @@ Bot::Cobalt::Plugin::URLTitle - Bot::Cobalt plugin for printing the title of a U
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

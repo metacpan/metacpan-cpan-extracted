@@ -15,7 +15,7 @@ requires 'Catmandu', '>=1.0201';
 requires 'JSON::XS', '2.3';
 requires 'YAML::XS', '0.34';
 requires 'List::Util', '0';
-requires 'MARC::File::XML', '1.0.3';
+requires 'MARC::File::XML', '1.0.5';
 requires 'MARC::File::MARCMaker', '0.05';
 requires 'MARC::File::MiJ' , '0.04';
 requires 'MARC::Record', '2.0.6';

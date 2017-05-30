@@ -1,4 +1,4 @@
-package Pcore::PDF v0.2.1;
+package Pcore::PDF v0.3.7;
 
 use Pcore -dist, -class, -const, -result;
 use Config;
@@ -37,15 +37,13 @@ const our $PAGE_SIZE => {
     Tabloid   => '279.4 x 431.8 mm',
 };
 
+has prince => ( is => 'lazy', isa => Str );
+has max_threads => ( is => 'ro', isa => PositiveInt, default => ( $MSWIN ? 1 : 4 ) );
 has page_size => ( is => 'ro', isa => Enum [ keys $PAGE_SIZE->%* ], default => 'A4' );
 
-has threads => ( is => 'ro', isa => Int, default => 0, init_arg => undef );
-
-has _proc => ( is => 'ro', isa => InstanceOf ['Pcore:PM::Proc'], init_arg => undef );
+has _threads => ( is => 'ro', isa => Int, default => 0, init_arg => undef );
+has _proc  => ( is => 'ro', isa => ArrayRef, default => sub { [] }, init_arg => undef );
 has _queue => ( is => 'ro', isa => ArrayRef, default => sub { [] }, init_arg => undef );
-
-our $PRINCEXML_PATH = '/bin/princexml' . ( $MSWIN ? '-win' : '-linux' ) . ( $Config{archname} =~ /x64|x86_64/sm ? '-x64' : q[] ) . '-v11/';
-our $PRINCEXML_BIN = $ENV->share->get( $PRINCEXML_PATH . ( $MSWIN ? 'bin/prince.exe' : 'bin/prince' ) );
 
 # NOTE job config example
 # {   input => {
@@ -96,25 +94,20 @@ our $PRINCEXML_BIN = $ENV->share->get( $PRINCEXML_PATH . ( $MSWIN ? 'bin/prince.
 #     'job-resource-count' => 1,
 # };
 
-sub generate_pdf ( $self, $src, $cb ) {
-    my ( $job, $resources );
+sub _build_prince ($self) {
+    my $path = '/bin/princexml' . ( $MSWIN ? '-win' : '-linux' ) . ( $Config{archname} =~ /x64|x86_64/sm ? '-x64' : q[] ) . "-v@{[$ENV->dist('Pcore-PDF')->cfg->{princexml_ver}]}/" . ( $MSWIN ? 'bin/prince.exe' : 'bin/prince' );
 
-    if ( ref $src ) {
-        $job->{input}->{src} = 'job-resource:0';
+    return $ENV->share->get($path);
+}
 
-        push $resources->@*, $src;
+sub generate_pdf ( $self, $html, $cb ) {
+    push $self->{_queue}->@*, [ $html, $cb ];
+
+    if ($MSWIN) {
+        $self->_generate_mswin;
     }
     else {
-        $job->{input}->{src} = $src;
-    }
-
-    $job->{'job-resource-count'} = $resources ? scalar $resources->@* : 0;
-
-    if ( $self->{threads} ) {
-        push $self->{_queue}->@*, [ to_json($job), $resources, $cb ];
-    }
-    else {
-        $self->_run_job( to_json($job), $resources, $cb );
+        $self->_generate_linux;
     }
 
     return;
@@ -143,47 +136,92 @@ sub remove_logo ( $self, $pdf_ref ) {
     return;
 }
 
-sub _run_job ( $self, $job, $resources, $cb ) {
-    return if $self->{threads};
+sub _generate_mswin ( $self ) {
+    return if $self->{_threads} >= 1;             # $self->{max_threads};
 
-    $self->{threads}++;
+    return unless my $task = shift $self->{_queue}->@*;
+
+    my $cb = $task->[1];
+
+    $self->{_threads}++;
+
+    P->pm->run_proc(
+        [ $self->prince, '-' ],
+        stdin    => 1,
+        stdout   => 1,
+        on_ready => sub ($proc) {
+            $proc->{stdin}->push_write( $task->[0]->$* );
+
+            $proc->{stdin}->push_shutdown;
+
+            return;
+        },
+        on_finish => sub ($proc) {
+            $cb->( result 200, { pdf => \$proc->{stdout} } );
+
+            $self->{_threads}--;
+
+            AE::postpone { $self->_generate_mswin };
+
+            return;
+        }
+    );
+
+    return;
+}
+
+sub _generate_linux ( $self ) {
+    return unless $self->{_queue}->@*;
+
+    return if !$self->{_proc}->@* && $self->{_threads} >= $self->{max_threads};
 
     $self->_get_proc(
-        sub ($proc) {
-            $proc->stdin->push_write( 'job ' . length( $job->$* ) . $LF . $job->$* . $LF );
+        sub($proc) {
+            return if !$proc;
 
-            if ($resources) {
-                for my $resource ( $resources->@* ) {
-                    $proc->stdin->push_write( 'dat ' . length( $resource->$* ) . $LF . $resource->$* . $LF );
-                }
+            my $task = shift $self->{_queue}->@*;
+
+            if ( !$task ) {
+                push $self->{_proc}->@*, $proc;
+            }
+            else {
+                $self->_run_task( $proc, $task );
             }
 
-            my $on_finish = sub ( $status, $reason, $pdf_ref = undef, $log_ref = undef ) {
-                $self->{threads}--;
+            return;
+        }
+    );
 
-                $proc->stdout->on_read(undef);
+    return;
+}
 
-                my $res = result [ $status, $reason ], { pdf => $pdf_ref, log => $log_ref };
+sub _get_proc ( $self, $cb ) {
+    if ( my $proc = shift $self->{_proc}->@* ) {
+        $cb->($proc);
+    }
 
-                $cb->($res);
+    if ( $self->{_threads} >= $self->{max_threads} ) {
+        $cb->(undef);
 
-                if ( my $job = shift $self->{_queue}->@* ) {
-                    $self->_run_job( $job->@* );
-                }
+        return;
+    }
 
-                return;
-            };
+    $self->{_threads}++;
 
+    P->pm->run_proc(
+        [ $self->prince, '--control' ],
+        stdin    => 1,
+        stdout   => 1,
+        stderr   => 1,
+        on_ready => sub ($proc) {
             $proc->stdout->on_read(
                 sub ($h) {
-
-                    # read pdf
                     $h->unshift_read(
                         line => sub ( $h, $line, $eol ) {
                             my ( $tag, $len ) = split /\s/sm, $line, 2;
 
                             if ( !$len ) {
-                                $on_finish->( 500, q[princexml protocol error: no version] );
+                                die q[princexml protocol error: no version];
                             }
                             else {
                                 $h->unshift_read(
@@ -191,39 +229,9 @@ sub _run_job ( $self, $job, $resources, $cb ) {
                                     sub ( $h, $data ) {
                                         chop $data;
 
-                                        # protocol error
-                                        if ( $tag eq 'err' ) {
-                                            $on_finish->( 500, $data );
-                                        }
+                                        $h->on_read(undef);
 
-                                        # read log
-                                        else {
-                                            my $pdf_ref = \$data;
-
-                                            $h->unshift_read(
-                                                line => sub ( $h, $line, $eol ) {
-                                                    my ( $tag1, $len1 ) = split /\s/sm, $line, 2;
-
-                                                    if ( !$len1 ) {
-                                                        $on_finish->( 500, q[princexml protocol error: no version] );
-                                                    }
-                                                    else {
-                                                        $h->unshift_read(
-                                                            chunk => $len1 + 1,
-                                                            sub ( $h, $data ) {
-                                                                chop $data;
-
-                                                                $on_finish->( 200, 'OK', $pdf_ref, [ split /\n/sm, $data ] );
-
-                                                                return;
-                                                            }
-                                                        );
-                                                    }
-
-                                                    return;
-                                                }
-                                            );
-                                        }
+                                        $cb->($proc);
 
                                         return;
                                     }
@@ -239,43 +247,103 @@ sub _run_job ( $self, $job, $resources, $cb ) {
             );
 
             return;
+        },
+        on_finish => sub ($proc) {
+            $self->{_threads}++;
+
+            return;
         }
     );
 
     return;
 }
 
-sub _get_proc ( $self, $cb ) {
-    if ( $self->{_proc} ) {
-        $cb->( $self->{_proc} );
+sub _run_task ( $self, $proc, $task ) {
+    my $cb = $task->[1];
+
+    my ( $job, $resources );
+
+    if ( ref $task->[0] ) {
+        $job->{input}->{src} = 'job-resource:0';
+
+        push $resources->@*, $task->[0];
     }
     else {
-        P->pm->run_proc(
-            [ 'prince', '--no-network', '--control' ],
-            stdin    => 1,
-            stdout   => 1,
-            stderr   => 1,
-            on_ready => sub ($proc) {
-                $self->{_proc} = $proc;
+        $job->{input}->{src} = $task->[0];
+    }
 
-                $proc->stdout->on_read(
-                    sub ($h) {
+    $job->{'job-resource-count'} = $resources ? scalar $resources->@* : 0;
+
+    # write job
+    my $json = to_json($job)->$*;
+
+    $proc->stdin->push_write( 'job ' . length($json) . $LF . $json . $LF );
+
+    if ($resources) {
+        for my $resource ( $resources->@* ) {
+            $proc->stdin->push_write( 'dat ' . length( $resource->$* ) . $LF . $resource->$* . $LF );
+        }
+    }
+
+    my $on_finish = sub ( $status, $reason, $pdf_ref = undef, $log_ref = undef ) {
+        $proc->stdout->on_read(undef);
+
+        my $res = result [ $status, $reason ], { pdf => $pdf_ref, log => $log_ref };
+
+        $cb->($res);
+
+        push $self->{_proc}->@*, $proc;
+
+        AE::postpone { $self->_generate_linux };
+
+        return;
+    };
+
+    $proc->stdout->on_read(
+        sub ($h) {
+
+            # read pdf
+            $h->unshift_read(
+                line => sub ( $h, $line, $eol ) {
+                    my ( $tag, $len ) = split /\s/sm, $line, 2;
+
+                    if ( !$len ) {
+                        $on_finish->( 500, q[princexml protocol error: no version] );
+                    }
+                    else {
                         $h->unshift_read(
-                            line => sub ( $h, $line, $eol ) {
-                                my ( $tag, $len ) = split /\s/sm, $line, 2;
+                            chunk => $len + 1,
+                            sub ( $h, $data ) {
+                                chop $data;
 
-                                if ( !$len ) {
-                                    die q[princexml protocol error: no version];
+                                # protocol error
+                                if ( $tag eq 'err' ) {
+                                    $on_finish->( 500, $data );
                                 }
+
+                                # read log
                                 else {
+                                    my $pdf_ref = \$data;
+
                                     $h->unshift_read(
-                                        chunk => $len + 1,
-                                        sub ( $h, $data ) {
-                                            chop $data;
+                                        line => sub ( $h, $line, $eol ) {
+                                            my ( $tag1, $len1 ) = split /\s/sm, $line, 2;
 
-                                            $h->on_read(undef);
+                                            if ( !$len1 ) {
+                                                $on_finish->( 500, q[princexml protocol error: no version] );
+                                            }
+                                            else {
+                                                $h->unshift_read(
+                                                    chunk => $len1 + 1,
+                                                    sub ( $h, $data ) {
+                                                        chop $data;
 
-                                            $cb->( $self->{_proc} );
+                                                        $on_finish->( 200, 'OK', $pdf_ref, [ split /\n/sm, $data ] );
+
+                                                        return;
+                                                    }
+                                                );
+                                            }
 
                                             return;
                                         }
@@ -285,25 +353,33 @@ sub _get_proc ( $self, $cb ) {
                                 return;
                             }
                         );
-
-                        return;
                     }
-                );
 
-                return;
-            },
-            on_finish => sub ($proc) {
-                delete $self->{_proc};
+                    return;
+                }
+            );
 
-                return;
-            }
-        );
-    }
+            return;
+        }
+    );
 
     return;
 }
 
 1;
+## -----SOURCE FILTER LOG BEGIN-----
+##
+## PerlCritic profile "pcore-script" policy violations:
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+## | Sev. | Lines                | Policy                                                                                                         |
+## |======+======================+================================================================================================================|
+## |    2 |                      | Documentation::RequirePodLinksIncludeText                                                                      |
+## |      | 384                  | * Link L<Pcore::Util::Result> on line 441 does not specify text                                                |
+## |      | 384                  | * Link L<Pcore::Util::Result> on line 451 does not specify text                                                |
+## |      | 384                  | * Link L<Pcore> on line 449 does not specify text                                                              |
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+##
+## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 
@@ -311,17 +387,72 @@ __END__
 
 =head1 NAME
 
-Pcore::PDF - HTML to PDF convertor
+Pcore::PDF - non-blocking HTML to PDF converter
 
 =head1 SYNOPSIS
 
+    use Pcore::PDF;
+
+    my $pdf = Pcore::PDF->new({
+        prince      => 'path-to-princexml-executable',
+        max_threads => 4,
+    });
+
+    my $cv = AE::cv;
+
+    $pdf->generate_pdf($html, sub ($res) {
+        if (!$res) {
+            say $res;
+        }
+        else {
+
+            # $res->{data}->{pdf} contains ScalarRef to generated PDF content
+        }
+
+        return;
+    });
+
+    $cv->recv;
+
 =head1 DESCRIPTION
+
+Generate PDF from HTML templates, using princexml.
 
 =head1 ATTRIBUTES
 
+=over
+
+=item prince
+
+Path to F<princexml> executable. Mandatory attribute.
+
+=item max_threads
+
+Maximum number of princexml processes. Under Windows this value is always C<< 1 >>, under linux default value is C<< 4 >>.
+
+=back
+
 =head1 METHODS
 
+=over
+
+=item generate_pdf( $self, $html, $cb )
+
+Generates PDF from C<< $html >> template. Call C<< $cb->($result) >> on finish, where C<< $result >> is a standard Pcore API result object, see L<Pcore::Util::Result> documentation for details.
+
+=back
+
 =head1 SEE ALSO
+
+=over
+
+=item L<Pcore>
+
+=item L<Pcore::Util::Result>
+
+=item L<https://www.princexml.com/|https://www.princexml.com/>
+
+=back
 
 =head1 AUTHOR
 

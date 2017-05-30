@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use XSLoader;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 XSLoader::load("Devel::Jemallctl", $VERSION);
 
 
@@ -21,7 +21,7 @@ Basically, C<Devel::MallInfo> for Jemalloc.
 
     my $stats = Devel::Jemallctl::refresh_and_get_stats;
     printf "Current allocated/active/metadata/resident/mapped: %d/%d/%d/%d/%d",
-        @$stats{qw/allocated active metadata resident mapped/};
+        @$stats{qw/stats.allocated stats.active stats.metadata stats.resident stats.mapped/};
 
 Requires a jemalloc compiled with C<--enable-stats>.
 

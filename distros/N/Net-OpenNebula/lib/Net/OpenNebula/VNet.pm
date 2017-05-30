@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Net::OpenNebula::VNet;
-$Net::OpenNebula::VNet::VERSION = '0.310.0';
+$Net::OpenNebula::VNet::VERSION = '0.311.0';
 use version;
 
 use Net::OpenNebula::RPC;

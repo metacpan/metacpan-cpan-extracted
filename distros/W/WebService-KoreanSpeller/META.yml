@@ -6,9 +6,9 @@ build_requires:
   Test::More: '0'
   strict: '0'
 configure_requires:
-  Module::Build::Tiny: '0.039'
+  Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.8, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,12 +16,12 @@ meta-spec:
 name: WebService-KoreanSpeller
 no_index:
   directory:
-    - t
-    - xt
-    - inc
-    - share
     - eg
     - examples
+    - inc
+    - share
+    - t
+    - xt
 requires:
   Encode: '0'
   LWP::UserAgent: '0'
@@ -33,6 +33,5 @@ resources:
   bugtracker: https://github.com/aero/WebService-KoreanSpeller/issues
   homepage: https://github.com/aero/WebService-KoreanSpeller
   repository: https://github.com/aero/WebService-KoreanSpeller.git
-version: '0.012'
-x_contributors:
-  - 'aero <chahkang@gmail.com>'
+version: '0.014'
+x_serialization_backend: 'YAML::Tiny version 1.70'

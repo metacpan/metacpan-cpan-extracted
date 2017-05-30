@@ -3,16 +3,23 @@ lib/GraphQL.pm
 lib/GraphQL/Error.pm
 lib/GraphQL/Execution.pm
 lib/GraphQL/Language.pm
+lib/GraphQL/Schema.pm
 lib/GraphQL/Subscription.pm
 lib/GraphQL/Type.pm
+lib/GraphQL/Type/Interface.pm
 lib/GraphQL/Utilities.pm
 lib/GraphQL/Validation.pm
 Makefile.PL
 MANIFEST			This list of files
 README
 t/00-load.t
-t/manifest.t
-t/pod-coverage.t
-t/pod.t
+t/kitchen-sink.graphql
+t/language-parser.t
+t/schema-kitchen-sink.graphql
+t/type-interface.t
+t/type-schema.t
+xt/manifest.t
+xt/pod-coverage.t
+xt/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

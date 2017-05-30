@@ -8,14 +8,21 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2012 by Toby Inkster.
+This software is copyright (c) 2012, 2017 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
 
-use Test::More tests => 4;
+use Test::More;
+
+BEGIN {
+	plan skip_all => "Test case fails with App::ForkProve"
+		if exists $INC{"App/ForkProve.pm"};
+	plan tests => 4;
+};
+
 use Test::NoWarnings;
 use strict;
 use warnings;
@@ -30,7 +37,7 @@ subtest 'isa checks' => sub {
 	::ok eval q{ sub foo1 :XXX(123) { 1 }; 1 }, 'valid value';
 	::ok eval q{ sub foo2 :XXX { 1 }; 1 }, 'no value';
 	::ok !eval q{ sub foo3 :XXX("Hello") { 1 }; 1 }, 'invalid value';
-	::like $@, qr{isa check for "number" failed}, 'error msg';
+	::like $@, qr{did not pass type constraint "Num"}, 'error msg';
 };
 
 subtest 'required attribute checks' => sub {
@@ -44,7 +51,7 @@ subtest 'required attribute checks' => sub {
 	::ok !eval q{ sub foo2 :XXX { 1 }; 1 }, 'no value';
 	::like $@, qr{Missing required arguments: number}, 'error msg - missing';
 	::ok !eval q{ sub foo3 :XXX("Hello") { 1 }; 1 }, 'invalid value';
-	::like $@, qr{isa check for "number" failed}, 'error msg - invalid';
+	::like $@, qr{did not pass type constraint "Num"}, 'error msg - invalid';
 };
 
 subtest 'too many args' => sub {

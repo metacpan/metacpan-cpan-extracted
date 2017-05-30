@@ -1,0 +1,61 @@
+{
+   "abstract" : "Provide access to the etcd v3 API.",
+   "author" : [
+      "Sam Batschelet (hexfusion) <sbatschelet@mac.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Etcd",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "AnyEvent::HTTP" : "0",
+            "HTTP::Tiny" : "0",
+            "JSON" : "0",
+            "Moo" : "2.000",
+            "Sub::Quote" : "0",
+            "Types::Standard" : "0",
+            "URI" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hexfusion/perl-net-etcd/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/hexfusion/perl-net-etcd.git"
+      }
+   },
+   "version" : "0.008"
+}

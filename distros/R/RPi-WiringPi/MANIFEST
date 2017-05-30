@@ -12,8 +12,6 @@ docs/schematic/adc_basic_example_schem.jpg
 docs/schematic/dpot_adc_schem.jpg
 FAQ-Tutorial.pod
 lib/RPi/WiringPi.pm
-lib/RPi/WiringPi/Interrupt.pm
-lib/RPi/WiringPi/Pin.pm
 lib/RPi/WiringPi/Util.pm
 Makefile.PL
 MANIFEST			This list of files

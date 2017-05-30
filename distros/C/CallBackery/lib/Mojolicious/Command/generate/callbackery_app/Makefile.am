@@ -11,7 +11,7 @@ BIN = bin/$(MJ_SCRIPT).pl
 PUB := $(shell find public -type d -name ".??*" -prune -o -not -name ".*" -a -not -name "*~" -a -not -name "*.tmp"  -a -type f -print )
 
 TEMPL := $(shell test -d templates && find templates -type f -name "*.ep")
-SHARE := $(shell test -d share && find share -type f -name "*.po") $(SHARE)
+SHARE := $(shell test -d share && find share -type f -name "*.po")
 
 PERLTESTS := $(shell find t -name "*.t")
 

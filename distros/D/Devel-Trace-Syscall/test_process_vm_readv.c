@@ -1,3 +1,5 @@
+#define _GNU_SOURCE
+
 #include <errno.h>
 #include <signal.h>
 #include <stdint.h>
@@ -6,6 +8,7 @@
 #include <string.h>
 #include <sys/ptrace.h>
 #include <sys/uio.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 #define die(fmt, args...)\

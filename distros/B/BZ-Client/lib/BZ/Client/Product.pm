@@ -7,7 +7,7 @@ use strict;
 use warnings 'all';
 
 package BZ::Client::Product;
-$BZ::Client::Product::VERSION = '4.4001';
+$BZ::Client::Product::VERSION = '4.4002';
 
 use parent qw( BZ::Client::API );
 
@@ -221,7 +221,7 @@ BZ::Client::Product - Client side representation of a product in Bugzilla
 
 =head1 VERSION
 
-version 4.4001
+version 4.4002
 
 =head1 SYNOPSIS
 

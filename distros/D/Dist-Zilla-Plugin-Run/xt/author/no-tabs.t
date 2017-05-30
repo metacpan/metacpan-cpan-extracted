@@ -33,6 +33,7 @@ my @files = (
     't/91-release-status.t',
     't/92-quiet.t',
     't/93-eval-scopes.t',
+    't/lib/TestHelper.pm',
     't/zzz-check-breaks.t',
     'xt/author/00-compile.t',
     'xt/author/clean-namespaces.t',

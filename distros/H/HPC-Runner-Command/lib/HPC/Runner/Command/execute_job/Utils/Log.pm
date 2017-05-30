@@ -38,24 +38,6 @@ has 'task_tags' => (
     },
 );
 
-#TODO This should be changed to execute_jobs Logging
-#We also have task_tags as an ArrayRef for JobDeps
-
-# has 'task_deps' => (
-#     traits  => ['Hash'],
-#     is      => 'rw',
-#     isa     => 'HashRef',
-#     default => sub { {} },
-#     handles => {
-#         set_task_dep     => 'set',
-#         get_task_dep     => 'get',
-#         has_no_task_deps => 'is_empty',
-#         num_task_deps    => 'count',
-#         delete_task_dep  => 'delete',
-#         task_dep_pairs   => 'kv',
-#     },
-# );
-
 =head3 table_data
 
 Each time we make an update to the table throw it in here
@@ -240,8 +222,9 @@ sub log_job {
     eval { $cmdpid = open3( $infh, $outfh, $errfh, $self->cmd ); };
 
     if ($@) {
-        die $self->app_log->fatal(
+      $self->app_log->warn(
             "There was an error running the command $@\n");
+      die;
     }
 
     if ( !$cmdpid ) {

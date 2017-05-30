@@ -6,7 +6,7 @@ use base 'DBIx::Class::Schema::Loader::DBI::Component::QuotedDefault';
 use mro 'c3';
 use DBIx::Class::Schema::Loader::Table ();
 
-our $VERSION = '0.07046';
+our $VERSION = '0.07047';
 
 =head1 NAME
 

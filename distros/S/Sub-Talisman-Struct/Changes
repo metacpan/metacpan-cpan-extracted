@@ -6,6 +6,10 @@ Home page:    <https://metacpan.org/release/Sub-Talisman-Struct>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Sub-Talisman-Struct>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.006	2017-05-27
+
+ - Updated: Keep up with changes to MooX::Struct.
+
 0.005	2014-09-10
 
  [ Packaging ]

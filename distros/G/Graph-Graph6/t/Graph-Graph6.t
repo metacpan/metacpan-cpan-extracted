@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015 Kevin Ryde
+# Copyright 2015, 2016, 2017 Kevin Ryde
 #
 # This file is part of Graph-Graph6.
 #
@@ -27,14 +27,14 @@ BEGIN { MyTestHelpers::nowarnings() }
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-plan tests => 82;
+plan tests => 105;
 
 require Graph::Graph6;
 my $filename = 'Graph-Graph6-t.tmp';
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 6;
+  my $want_version = 7;
   ok ($Graph::Graph6::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Graph6->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Graph6->VERSION($want_version); 1 }, 1,
@@ -62,6 +62,17 @@ ok (Graph::Graph6::_number_to_string(12345),
       $want);
   require Math::BigInt;
   ok (Graph::Graph6::_number_to_string(Math::BigInt->new('460175067')),
+      $want);
+}
+
+{
+  # 2147483647 = 2^31 - 1
+  my $want = chr(126).chr(126)
+    . chr(63+1).chr(126).chr(126) . chr(126).chr(126).chr(126);
+  ok (Graph::Graph6::_number_to_string(2147483647),
+      $want);
+  require Math::BigInt;
+  ok (Graph::Graph6::_number_to_string(Math::BigInt->new('2147483647')),
       $want);
 }
 
@@ -107,6 +118,22 @@ sub aref_stringize {
 }
 
 {
+  # formats.txt digraph6 example
+  my $str = chr(38).chr(68).chr(73).chr(63).chr(65).chr(79).chr(63)."\n";
+  my @edges;
+  my $num_vertices;
+  my $ret = Graph::Graph6::read_graph(str  => $str,
+                                      num_vertices_func => sub {
+                                        $num_vertices = $_[0];
+                                      },
+                                      edge_func => sub {
+                                        push @edges, [@_];
+                                      });
+  ok ($ret, 1);
+  ok ($num_vertices, 5);
+  ok (aref_stringize(\@edges), '[[0,2],[0,4],[3,1],[3,4]]');
+}
+{
   # formats.txt graph6 example
   my @edges;
   my $num_vertices;
@@ -142,19 +169,27 @@ sub aref_stringize {
   };
   ok ($returned, 0);
 }
-{
-  # bad, with error_func returning
+
+# bad, with error_func returning
+foreach my $elem (['0', '0'],
+                  ['&&', '&'],          # doubled digraph6 "&"
+                  ['&&DI?AO?', '&'],    # doubled digraph6 "&" otherwise valid
+                  [':&Fa@x^', '&'],     # bad digraph6 "&" after sparse6
+                  [':Fa&@x^', '&'],     # bad digraph6 "&" in middle of sparse6
+                 ) {
+  my ($str, $bad_char) = @$elem;
   my $error_func_called = 0;
   my $error_message = '';
-  my $ret = Graph::Graph6::read_graph(str => '0',
+  my $ret = Graph::Graph6::read_graph(str => $str,
                                       error_func => sub {
                                         $error_message = join('',@_);
                                         $error_func_called = 1;
-                                       });
-  ok ($ret, undef);
+                                      });
+  ok ($ret, undef, "str \"$str\"");
   ok ($error_func_called, 1);
-  ok ($error_message, "Unrecognised character: 0");
+  ok ($error_message, "Unrecognised character: $bad_char");
 }
+
 {
   # no such filename
   my $error_func_called = 0;
@@ -163,7 +198,7 @@ sub aref_stringize {
                                       error_func => sub {
                                         $error_message = join('',@_);
                                         $error_func_called = 1;
-                                       });
+                                      });
   ok ($ret, undef);
   ok ($error_func_called, 1);
   ok ($error_message =~ /^Cannot open/, 1);
@@ -436,7 +471,7 @@ sub aref_stringize {
 
 
 #------------------------------------------------------------------------------
-# write_graph() provoke some padding stuff
+# write_graph() provoke some sparse6 padding stuff
 
 {
   my $num_vertices;
@@ -499,6 +534,45 @@ sub aref_stringize {
   }
 
 }
+
+#------------------------------------------------------------------------------
+# write_graph() -- digraph6
+
+{
+  # formats.txt digraph6 example
+  my $str;
+  my $ret = Graph::Graph6::write_graph
+    (format       => 'digraph6',
+     str_ref      => \$str,
+     num_vertices => 5,
+     edge_aref    => [[0,2], [0,4], [3,1],[3,4]]);
+  ok ($ret, 1);
+  ok ($str, "&DI?AO?\n");
+}
+
+{
+  # edge both ways
+  my $str;
+  my $ret = Graph::Graph6::write_graph
+    (format       => 'digraph6',
+     str_ref      => \$str,
+     num_vertices => 3,
+     edge_aref    => [[0,2], [2,0]]);
+  ok ($ret, 1);
+  ok ($str, "&BG_\n");
+}
+{
+  # edge back only
+  my $str;
+  my $ret = Graph::Graph6::write_graph
+    (format       => 'digraph6',
+     str_ref      => \$str,
+     num_vertices => 3,
+     edge_aref    => [ [2,0]]);
+  ok ($ret, 1);
+  ok ($str, "&B?_\n");
+}
+
 
 #------------------------------------------------------------------------------
 unlink $filename;

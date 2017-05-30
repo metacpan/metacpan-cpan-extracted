@@ -1,5 +1,5 @@
 package Moo::Google::AuthStorage::ConfigJSON;
-$Moo::Google::AuthStorage::ConfigJSON::VERSION = '0.01';
+$Moo::Google::AuthStorage::ConfigJSON::VERSION = '0.02';
 
 # ABSTRACT: Specific methods to fetch tokens from JSON data sources
 
@@ -65,7 +65,7 @@ Moo::Google::AuthStorage::ConfigJSON - Specific methods to fetch tokens from JSO
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 AUTHOR
 

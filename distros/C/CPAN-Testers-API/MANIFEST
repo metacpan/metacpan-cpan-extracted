@@ -14,13 +14,15 @@ cpanfile
 dist.ini
 eg/feed.pl
 eg/legacy/tail-recent-reports.pl
-etc/metabase.conf
 etc/metabase.local.conf
 etc/runit/api/api.conf
 etc/runit/api/log/run
 etc/runit/api/run
 etc/runit/broker/log/run
 etc/runit/broker/run
+etc/runit/legacy-metabase/etc/metabase.conf
+etc/runit/legacy-metabase/log/run
+etc/runit/legacy-metabase/run
 lib/CPAN/Testers/API.pm
 lib/CPAN/Testers/API/Base.pm
 lib/CPAN/Testers/API/Controller/Release.pm

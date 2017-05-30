@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::CheckBreaks 0.017
+# this test was generated with Dist::Zilla::Plugin::Test::CheckBreaks 0.018
 
-use Test::More tests => 1;
+use Test::More tests => 2;
 
 SKIP: {
     eval 'require DateTime::Conflicts; DateTime::Conflicts->check_conflicts';
@@ -32,3 +32,5 @@ if (my @breaks = grep { defined $result->{$_} } keys %$result)
     diag "$result->{$_}" for sort @breaks;
     diag "\n", 'You should now update these modules!';
 }
+
+pass 'checked x_breaks data';

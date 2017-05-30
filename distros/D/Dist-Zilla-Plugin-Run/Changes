@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-Run
 
+0.045     2017-05-30 00:04:46Z
+  - fix MSWin32 test failures where path separators do not come out as
+    expected
+
 0.044     2017-03-29 00:14:00Z
   - once again streaming command output as each line is produced, rather than
     buffering until the process ends (this behaviour was changed in 0.040)

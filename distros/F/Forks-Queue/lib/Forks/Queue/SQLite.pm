@@ -9,9 +9,10 @@ use Time::HiRes 'time';
 use base 'Forks::Queue';
 use 5.010;    #  using  // //=  operators
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 our ($DEBUG,$XDEBUG);
 *DEBUG = \$Forks::Queue::DEBUG;
+*XDEBUG = \$Forks::Queue::XDEBUG;
 
 $SIG{IO} = sub { } if $Forks::Queue::NOTIFY_OK;
 
@@ -72,8 +73,28 @@ sub new {
     return $self;
 }
 
+# wrapper for database operations I expect to succeed, but may fail with
+# intermittent synchronization issues ("attempt to write to a readonly 
+# database...") on perl v5.10 and v5.12. Pausing and retrying the operation
+# generally fixes these issues.
+sub _try {
+    my ($count, $code) = @_;
+    $count = 1 if $] >= 5.014;
+    my $z = $code->();
+    my ($f0,$f1) = (1,1);
+    while (!$z) {
+        last if --$count <= 0;
+        ($f0,$f1)=($f1,$f0+$f1);
+        my (undef,undef,$lcaller) = caller(0);
+        $DEBUG && print STDERR "retry after ${f0}s: $lcaller\a\n";
+        sleep $f0;
+        $z = $code->();
+    }
+    return $z;
+}
+
 sub _init {
-    my $self = CORE::shift;
+    my $self = shift;
     my $dbh = $self->{_dbh};
 
     my $z1 = $dbh->do("CREATE TABLE the_queue (
@@ -114,7 +135,7 @@ sub _init {
 sub TID { $INC{'threads.pm'} ? threads->tid : 0 }
 
 sub _dbh {
-    my $self = CORE::shift;
+    my $self = shift;
     my $tid = TID();
     if ($self->{_dbh} && $$ == $self->{_pid}[0] && $tid == $self->{_pid}[1]) {
         return $self->{_dbh};
@@ -124,51 +145,73 @@ sub _dbh {
     $self->{_dbh} =
         DBI->connect("dbi:SQLite:dbname=".$self->{db_file},"","");
     $self->{_dbh}{AutoCommit} = 1;
-
-    $self->{_dbh}->begin_work;
-    eval { $self->{_dbh}->do("DELETE FROM pids WHERE pid=$$ AND tid=$tid");
-           $self->{_dbh}->do("INSERT INTO pids VALUES ($$,$tid)"); };
-    $self->{_dbh}->commit;
-    $self->{style} = $self->_status("style");
-    $self->{limit} = $self->_status("limit");
-    $self->{on_limit} = $self->_status("on_limit");
+    if (!$self->{_DESTROY}) {
+        $self->{_dbh}->begin_work;
+        $self->{_dbh}->do("DELETE FROM pids WHERE pid=$$ AND tid=$tid");
+        $self->{_dbh}->do("INSERT INTO pids VALUES ($$,$tid)");
+        $self->{_dbh}->commit;
+        $self->{style} = $self->_status("style");
+        $self->{limit} = $self->_status("limit");
+        $self->{on_limit} = $self->_status("on_limit");
+    }
     return $self->{_dbh};
 }
 
 sub DESTROY {
-    my $self = CORE::shift;
+    my $self = shift;
+    $self->{_DESTROY}++;
     my $dbh = $self->_dbh;
     my $tid = $self->{_pid} ? $self->{_pid}[1] : TID();
-    my $t = [[0]];
+    my $t = [[-1]];
     my $pid_rm = $dbh && eval {
+        $dbh->{PrintWarn} =            # suppress "attempt to write ..."
+            $dbh->{PrintError} = 0;    # warnings, particularly on 5.010, 5.012
         $dbh->begin_work;
-        $dbh->do("DELETE FROM pids WHERE pid=$$ AND tid=$tid");
-        my $sth = $dbh->prepare("SELECT COUNT(*) FROM pids");
-        my $z = $sth->execute;
-        $t = $sth->fetchall_arrayref;
+
+        my $z1 = _try(3, sub {
+            $dbh->do("DELETE FROM pids WHERE pid=$$ AND tid=$tid") } );
+
+        if ($z1) {
+            my $sth = $dbh->prepare("SELECT COUNT(*) FROM pids");
+            my $z2 = $sth->execute;
+            $t = $sth->fetchall_arrayref;
+        } else {
+            $DEBUG && print STDERR "$$ DESTROY: DELETE FROM pids failed\n";
+            $t = [[-2]];
+        }
         $dbh->commit;
         $DEBUG and print STDERR "$$ DESTROY npids=$t->[0][0]\n";
 	1;
     };
     $dbh && eval { $dbh->disconnect };
-    if ($t->[0][0] == 0) {
+    if ($t && $t->[0] && $t->[0][0] == 0) {
         $DEBUG and print STDERR "$$ Unlinking files from here\n";
         if (!$self->{persist}) {
             sleep 1;
             unlink $self->{db_file};
         }
+    } else {
     }
 }
 
 sub _status {
     # if transactions are desired, they must be provided by the caller
-    my $self = CORE::shift;
+    my $self = shift;
     my $dbh = $self->_dbh;
+    return if !$dbh && $self->{_DESTROY};
     if (@_ == 1) {
         my $sth = $dbh->prepare("SELECT value FROM status WHERE key=?");
-        my $z = $sth->execute($_[0]);
+        if (!$sth && $self->{_DESTROY}) {
+            warn "prepare failed in global destruction: $$";
+            return;
+        }
+
+        my $key = $_[0];
+        my $z = _try( 3, sub { $sth->execute($key) } );
+
         if (!$z) {
-            carp "Forks::Queue::SQLite: lookup on status key '$_[0]' failed";
+            carp "Forks::Queue::SQLite: ",
+                 "lookup on status key '$_[0]' failed";
             return;
         }
         my $t = $sth->fetchall_arrayref;
@@ -180,8 +223,10 @@ sub _status {
         my ($key,$value) = @_;
         my $sth1 = $dbh->prepare("DELETE FROM status WHERE key=?");
         my $sth2 = $dbh->prepare("INSERT INTO status VALUES(?,?)");
-        my $z1 = $sth1->execute($key);
-        my $z2 = $sth2->execute($key,$value);
+
+        my $z1 = _try( 3, sub { $sth1->execute($key) } );
+        my $z2 = $z1 && _try( 5, sub { $sth2->execute($key,$value) } );
+
         return $z1 && $z2;
     } else {
         croak "Forks::Queue::SQLite: wrong number of args to _status call";
@@ -190,15 +235,16 @@ sub _status {
 }
 
 sub end {
-    my $self = CORE::shift;
+    my $self = shift;
     my $dbh = $self->_dbh;
 
     my $end = $self->_end;
     if ($end) {
         carp "Forks::Queue: end() called from $$, ",
-        "previously called from $end";
+            "previously called from $end";
     }
-    if (!$end || $end != $$) {
+
+    if (!$end) {
         $dbh->begin_work;
         $self->_status("end",$$);
         $dbh->commit;
@@ -208,7 +254,7 @@ sub end {
 }
 
 sub _end {
-    my $self = CORE::shift;
+    my $self = shift;
     return $self->{_end} ||= $self->_status("end");
     # XXX - can  end  condition be cleared? Not yet, but when it can,
     #       this code will have to change
@@ -242,21 +288,20 @@ sub Forks::Queue::SQLite::MagicLimit::STORE {
 }
 
 sub limit :lvalue {
-    my $self = CORE::shift;
+    my $self = shift;
     if (!$self->{_limit_magic}) {
         tie $self->{_limit_magic}, 'Forks::Queue::SQLite::MagicLimit', $self;
         $XDEBUG && print STDERR "tied \$self->\{_limit_magic\}\n";
     }
-
     if (@_) {
+        $self->_dbh->begin_work;
         $XDEBUG && print STDERR "setting _limit_magic to $_[0]\n";
-        $self->{_limit_magic} = CORE::shift(@_);
+        $self->_status("limit", shift);
         if (@_) {
             $XDEBUG && print STDERR "setting on_limit to $_[0]\n";
-            $self->_dbh->begin_work;
             $self->_status("on_limit", $self->{on_limit} = $_[0]);
-            $self->_dbh->commit;
         }
+        $self->_dbh->commit;
     } else {
         $self->{limit} = $self->_status("limit");
         $XDEBUG && print STDERR "updating {limit} to $self->{limit}\n";
@@ -265,7 +310,7 @@ sub limit :lvalue {
 }
 
 sub status {
-    my $self = CORE::shift;
+    my $self = shift;
     my $dbh = $self->_dbh;
     my $status = {};
     my $sth = $dbh->prepare("SELECT key,value FROM status");
@@ -283,7 +328,9 @@ sub _avail {
     # if transactions are needed, set them up in the caller
     my ($self,$dbh) = @_;
     $dbh ||= $self->_dbh;
+    return unless $dbh;
     my $sth = $dbh->prepare("SELECT COUNT(*) FROM the_queue");
+    return unless $sth;
     my $z = $sth->execute;
     my $tt = $sth->fetchall_arrayref;
     return $self->{avail} = $tt->[0][0];
@@ -311,7 +358,9 @@ sub _add {
     my $jitem = $jsonizer->encode($item);
     my $dbh = $self->_dbh;
     my $sth = $dbh->prepare("INSERT INTO the_queue VALUES(?,?,?)");
-    my $z = $sth->execute($timestamp, $id, $jitem);
+
+    my $z = _try(3, sub { $sth->execute($timestamp, $id, $jitem) } );
+    
     return $z;
 }
 
@@ -337,7 +386,7 @@ sub _push {
     my $stamp = Time::HiRes::time;
     my $id = $self->_batch_id($stamp,$dbh);
     while (@items && $self->_avail < $limit) {
-        my $item = CORE::shift @items;
+        my $item = shift @items;
         $self->_add($item, $stamp, $id++);
         $pushed++;
     }
@@ -364,7 +413,7 @@ sub _push {
 }
 
 sub _wait_for_item {
-    my $self = CORE::shift;
+    my $self = shift;
     my $ready = 0;
     do {
         $ready = $self->_avail || $self->_end || $self->_expired;
@@ -374,7 +423,7 @@ sub _wait_for_item {
 }
 
 sub _wait_for_capacity {
-    my $self = CORE::shift;
+    my $self = shift;
     if ($self->{limit} <= 0) {
         return 9E9;
     }
@@ -401,7 +450,7 @@ sub _batch_id {
 }
 
 sub dequeue {
-    my $self = CORE::shift;
+    my $self = shift;
     Forks::Queue::_validate_input($_[0], 'count', 1) if @_;
     if ($self->{style} ne 'lifo') {
         return @_ ? $self->_retrieve(-1,1,2,0,$_[0]) 
@@ -412,14 +461,14 @@ sub dequeue {
     }
 }
 
-sub shift {
-    my $self = CORE::shift;
+sub shift :method {
+    my $self = shift;
     # purge, block
     return @_ ? $self->_retrieve(-1,1,1,0,$_[0]) : $self->_retrieve(-1,1,1,0);
 }
 
 sub pop {
-    my $self = CORE::shift;
+    my $self = shift;
     Forks::Queue::_validate_input($_[0], 'index', 1) if @_;
     # purge, block
     my @popped = $self->_retrieve(+1,1,1,0,$_[0] // 1);
@@ -427,13 +476,13 @@ sub pop {
 }
 
 sub shift_nb {
-    my $self = CORE::shift;
+    my $self = shift;
     # purge, no block
     return @_ ? $self->_retrieve(-1,1,0,0,$_[0]) : $self->_retrieve(-1,1,0,0);
 }
 
 sub pop_nb {
-    my $self = CORE::shift;
+    my $self = shift;
     # purge, no block
     my @popped = @_
         ? $self->_retrieve(+1,1,0,0,$_[0]) : $self->_retrieve(+1,1,0,0);
@@ -442,9 +491,9 @@ sub pop_nb {
 }
 
 sub extract {
-    my $self = CORE::shift;
+    my $self = shift;
     Forks::Queue::_validate_input( $_[0], 'index' ) if @_;
-    my $index = CORE::shift || 0;
+    my $index = shift || 0;
     Forks::Queue::_validate_input( $_[0], 'count', 1) if @_;
     my $count = $_[0] // 1;
     my $reverse = 0;
@@ -539,7 +588,8 @@ sub insert {
 
     my ($t3,$b3);
     if ($t1 == $t2) {
-        my $sthr = $dbh->prepare("UPDATE the_queue SET batchid=batchid+? WHERE timestamp=? AND batchid>=?");
+        my $sthr = $dbh->prepare("UPDATE the_queue SET batchid=batchid+? 
+                                  WHERE timestamp=? AND batchid>=?");
         $sthr->execute(0+@items,$t1,$b2);
         $t3 = $t1;
         $b3 = $b1+1;
@@ -551,8 +601,8 @@ sub insert {
         }
     }
     while (@items && $self->_avail < $limit) {
-        my $item = CORE::shift @items;
-        $self->_add($item, $t3, $b3);
+        my $item = shift @items;
+        _try(3, sub { $self->_add($item,$t3,$b3) });
         $inserted++;
         $b3++;
     }
@@ -577,18 +627,18 @@ sub insert {
 }
 
 sub _retrieve {
-    my $self = CORE::shift;
-    my $tfactor = CORE::shift;
+    my $self = shift;
+    my $tfactor = shift;
         # tfactor = -1: select newest items first
         # tfactor = +1: select oldest items first
-    my $purge = CORE::shift;
+    my $purge = shift;
         # purge = 0: do not delete items that we retrieve
         # purge = 1: delete items that we retrieve
-    my $block = CORE::shift;
+    my $block = shift;
         # block = 0: no block if queue is empty
         # block = 1: block only if queue is empty
         # block = 2: block if full request can not be fulfilled
-    my $lo = CORE::shift;
+    my $lo = shift;
     my $hi = @_ ? $_[0] : $lo+1;
     return if $hi <= $lo;
 
@@ -614,17 +664,20 @@ sub _retrieve {
     my $sthd = $purge && $dbh->prepare(
         "DELETE FROM the_queue WHERE item=? AND timestamp=? AND batchid=?");
     my @return;
+    if (!$sths) {
+        warn "prepare queue SELECT statement failed: $dbh->errstr";
+    }
 
     while (@return <= 0) {
         my $limit = $hi - @return + ($lo < 0 ? $lo : 0);
         $dbh->begin_work;
-        my $z = $sths->execute($limit);
-        my $tt = $sths->fetchall_arrayref;
+        my $z = $sths && $sths->execute($limit);
+        my $tt = $sths && $sths->fetchall_arrayref;
         if ($lo < 0 && -$lo > @$tt) {
             $hi += (@$tt - $lo);
             $lo += (@$tt - $lo);
         }
-        if (@$tt == 0) {
+        if (!$tt || @$tt == 0) {
             $dbh->rollback;
             if ($block) {
                 $self->_wait_for_item;
@@ -650,10 +703,11 @@ sub _retrieve {
             my ($item,$bid,$timestamp) = @{$tt->[$itt]};
             CORE::push @return, $jsonizer->decode($item);
             if ($purge) {
-                my $zd = $sthd->execute($item,$timestamp,$bid);
+
+                my $zd = _try(4, sub { $sthd->execute($item,$timestamp,$bid)} );
                 if (!$zd) {
-                    warn "Forks::Queue::SQLite: ",
-                         "purge failed: $item,$timestamp,$bid";
+                        warn "Forks::Queue::SQLite: ",
+                             "purge failed: $item,$timestamp,$bid";
                 }
             }
         }
@@ -671,11 +725,11 @@ sub _retrieve {
 
 
 sub _pop {
-    my $self = CORE::shift;
-    my $tfactor = CORE::shift;
-    my $purge = CORE::shift;
-    my $block = CORE::shift;
-    my $wantarray = CORE::shift;
+    my $self = shift;
+    my $tfactor = shift;
+    my $purge = shift;
+    my $block = shift;
+    my $wantarray = shift;
     my ($count) = @_;
     $count ||= 1;
 
@@ -717,7 +771,7 @@ sub _pop {
 }
 
 sub clear {
-    my $self = CORE::shift;
+    my $self = shift;
     my $dbh = $self->_dbh;
     $dbh->begin_work;
     $dbh->do("DELETE FROM the_queue");
@@ -725,7 +779,7 @@ sub clear {
 }
 
 sub peek_front {
-    my $self = CORE::shift;
+    my $self = shift;
     my ($index) = @_;
     $index ||= 0;
     if ($index < 0) {
@@ -736,7 +790,7 @@ sub peek_front {
 }
 
 sub peek_back {
-    my $self = CORE::shift;
+    my $self = shift;
     my ($index) = @_;
     $index ||= 0;
     if ($index < 0) {
@@ -749,7 +803,7 @@ sub peek_back {
 sub _notify {
     return unless $Forks::Queue::NOTIFY_OK;
 
-    my $self = CORE::shift;
+    my $self = shift;
     my $dbh = $self->_dbh;
     my $sth = $dbh->prepare("SELECT pid,tid FROM pids");
     my $z = $sth->execute;
@@ -780,7 +834,8 @@ sub _impute_file {
     } else {
         @candidates = qw(/tmp /var/tmp);
     }
-    for my $candidate ($ENV{FORKS_QUEUE_DIR}, $ENV{TMPDIR}, $ENV{TEMP},
+    for my $candidate ($ENV{FORKS_QUEUE_DIR},
+                       $ENV{TMPDIR}, $ENV{TEMP},
                        $ENV{TMP}, @candidates,
                        $ENV{HOME}, ".") {
         if (defined($candidate) && $candidate ne '' &&
@@ -829,7 +884,7 @@ Forks::Queue::SQLite - SQLite-based implementation of Forks::Queue
 
 =head1 VERSION
 
-0.08
+0.09
 
 =head1 SYNOPSIS
 

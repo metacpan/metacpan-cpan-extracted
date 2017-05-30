@@ -16,11 +16,11 @@ Geo::Coder::XYZ - Provides a geocoding functionality using https://geocode.xyz
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -59,11 +59,13 @@ sub new {
 =head2 geocode
 
     $location = $geocoder->geocode(location => $location);
-    # @location = $geocoder->geocode(location => $location);
 
     print 'Latitude: ', $location->{'latt'}, "\n";
     print 'Longitude: ', $location->{'longt'}, "\n";
 
+    @locations = $geocoder->geocode('Portland, USA');
+    diag 'There are Portlands in ', join (', ', map { $_->{'state'} } @locations);
+    	
 =cut
 
 sub geocode {
@@ -85,8 +87,7 @@ sub geocode {
 
 	my $uri = URI->new("https://$self->{host}/some_location/");
 	$location =~ s/\s/+/g;
-	my %query_parameters = ('locate' => $location);
-	$query_parameters{json} = 1;
+	my %query_parameters = ('locate' => $location, 'json' => 1, 'moreinfo' => 1);
 	$uri->query_form(%query_parameters);
 	my $url = $uri->as_string;
 
@@ -97,7 +98,15 @@ sub geocode {
 	}
 
 	my $json = JSON->new->utf8;
-	return $json->decode($res->content);	# No support for list context, yet
+	my $rc = $json->decode($res->content);
+
+	if(wantarray && $rc->{'otherlocations'} && $rc->{'otherlocations'}->{'loc'}) {
+		my @rc = @{$rc->{'otherlocations'}->{'loc'}};
+		if(scalar(@rc)) {
+			return @rc;
+		}
+	}
+	return $rc;
 
 	# my @results = @{ $data || [] };
 	# wantarray ? @results : $results[0];

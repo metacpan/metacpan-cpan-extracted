@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use WebService::HabitRPG::Task;
-use JSON::Any;
+use JSON::MaybeXS;
 use DateTime;
 
 sub active_repeat_for_today {
@@ -14,15 +14,15 @@ sub active_repeat_for_today {
 
     my @repeat_map = WebService::HabitRPG::Task::HRPG_REPEAT_MAP;
 
-    my $repeat = { map { $_ => JSON::Any::false } @repeat_map };
+    my $repeat = { map { $_ => JSON->false } @repeat_map };
 
-    $repeat->{$repeat_map[$day_of_week - 1]} = JSON::Any::true;
+    $repeat->{$repeat_map[$day_of_week - 1]} = JSON->true;
 
     return $repeat;
 }
 
 sub inactive_repeat_for_today {
-    return { map { $_ => JSON::Any::false } WebService::HabitRPG::Task::HRPG_REPEAT_MAP };
+    return { map { $_ => JSON->false } WebService::HabitRPG::Task::HRPG_REPEAT_MAP };
 }
 
 my %template = (

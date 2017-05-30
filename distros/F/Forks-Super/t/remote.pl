@@ -6,28 +6,14 @@ use warnings;
 # we must connect to a server (which may be the current host) through ssh
 # and run some remote test commands
 #
-# options are, in order of preference:
+# this script used to be complicated, seeing if various modules were
+# available and environment variables were set and how to make use
+# of them. Now all we will do is see if we can easily make a basic,
+# passwordless ssh connection to the current host, and if we can't,
+# we will punt.
 #
-#    1. $ENV{TEST_SSH_TARGET} = <uri>
-#       URI to specify a server in an environment variable. Expects to use
-#       passwordless, pubic key authentication, and expects to find the same
-#       filesystem on the remote host that exists on the local host to build
-#       this module.  t/forked_harness.pl , which is run if you 
-#       'make fasttest', may set this variable.
-#
-#    2. Test::SSH module
-#       constructs a local, temporary ssh server for the tests.
-#       May require Net::OpenSSH
-#
-#    3. $ENV{TEST_SSH} = user@hostname
-#       $ENV{TEST_SSH} = user:password@hostname
-#       $ENV{TEST_SSH} = 1
-#       Try to connect to host with user specified in environment variable.
-#       When the variable value is '1', treat it as $ENV{USER} @ $ENV{HOSTNAME}
-#
-#    4. if local machines is running sshd and user has an .ssh dir,
-#       try to connect to local server with default publickey credentials
-#
+
+use Forks::Super::SysInfo;
 
 Forks::Super::POSTFORK_CHILD {
     # RT#117025 for Test::SSH workaround. Otherwise, the server
@@ -40,139 +26,46 @@ if ($ENV{CRIPPLE_TEST_SSH}) {
     $Forks::Super::Config::CONFIG{"Net::OpenSSH"} = 0;
 }
 
-
 # returns an object (Test::SSH or a mock) that
 # describes an ssh server that our tests can access.
 sub get_test_sshd {
 
     print STDERR "Identifying ssh connection\n";
 
-    if ($ENV{TEST_SSH_TARGET}) {
-        if (eval "use URI; 1") {
-            my $uri = URI->new($ENV{TEST_SSH_TARGET});
-            my $sshd = { host => $uri->host, uri => "$uri" };
-            $sshd->{port} = $uri->port if $uri->port;
-            if ($uri->password) {
-                $sshd->{password} = $uri->password;
-                $sshd->{auth_method} = 'password';
-            } else {
-                $sshd->{auth_method} = 'publickey';
-            }
+    my $template = $Forks::Super::SysInfo::TEST_SSH_TEMPLATE;
+    return if !$template;
 
-            my @u = split /;/, $uri->user;
-            $sshd->{user} = shift @u;
-            foreach my $u (@u) {
-                my ($k,$v) = split /=/, $u, 2;
-                $sshd->{$k} = $v;
-            }
-            bless $sshd, 'Mock::Test::SSH';
-            return $sshd;
-        }
-        return;
-    }
+    my $sshd = bless {}, 'Mock::Test::SSH';
 
-    if (Forks::Super::Config::CONFIG_module('Test::SSH')) {
-        my %opts = (
-            logger => sub { warn "Test::SSH > @_\n" if "@_"=~/connection uri/; }
-            );
-        my $sshd = eval 'use Test::SSH; Test::SSH->new(%opts);';
-        if ($sshd) {
-            print STDERR " ... Test::SSH available\n";
-            return $sshd;
-        }
-    }
-    print STDERR " ... Test::SSH not available\n";
-    if ($ENV{NO_SSHD}) {
-        print STDERR " ... requested not to look for local ssh server\n";
-        return;
-    }
+    my $env_host = $ENV{HOSTNAME};
+    chomp(my $hostname = qx(hostname));
+    my $ip = eval "use Sys::HostAddr;1" ? Sys::HostAddr->new->main_ip : "";
+    my $env_user = $ENV{USER};
 
-    my $sshd = {
-        host => $ENV{HOSTNAME},
-        user => $ENV{USER},
-        password => '',
-        auth_method => 'publickey',
-    };
-    bless $sshd, 'Mock::Test::SSH';
-    if (!$sshd->{host}) {
-        chomp($sshd->{host} = `hostname`);
-    }
-
-    if ($ENV{TEST_SSH}) {
-        if ($ENV{TEST_SSH} eq '1') {
-            $ENV{TEST_SSH} = join '@', $ENV{USER}, $ENV{HOSTNAME};
-        }
-        $Forks::Super::Config::CONFIG{"Net::OpenSSH"} = 0;
-        my @uph = split /\@/, $ENV{TEST_SSH};
-        $sshd->{host} = pop @uph;
-        my $user = join '@', @uph;
-        if ($user =~ /:/) {
-            my @up = split /:/, $user;
-            $sshd->{password} = pop @up;
-            $sshd->{auth_method} = 'password';
-            $user = join ':', @up;
-        }
-        $sshd->{user} = $user;
-        print STDERR "... extracted credentials from ENV{TEST_SSH}\n";
+    if ($template =~ /\$ENV_HOST/) {
+        $sshd->{host} = $env_host || $hostname || $ip || "localhost";
+    } elsif ($template =~ /\$ip/) {
+        $sshd->{host} = $ip || $env_host || $hostname || "localhost";
+    } elsif ($template =~ /\$hostname/) {
+        $sshd->{host} = $hostname || $env_host || $ip || "localhost";
+    } elsif ($template =~ /localhost/) {
+        $sshd->{host} = "localhost";
     } else {
-        # try passwordless authentication on current host. Only proceed
-        # if we can detect a local ssh server
-        my @ps = grep /\bsshd\b/, `ps -ef`;
-        if (@ps == 0) {
-            print STDERR "... no sshd found in process table\n";
-            return;
-        }
-    }
-
-    # if publickey authentication is requested, only proceed if we
-    # can determine identity and set key_path
-    if ($sshd->{auth_method} eq 'publickey') {
-        my $sshdir = $ENV{HOME} . "/.ssh";
-        if (! -d $sshdir) {
-            print STDERR " ... no user .ssh dir found\n";
-            return;
-        }
-        my (@cfg,@syscfg);
-        if (-f "$sshdir/config") {
-            open my $fh, '<', "$sshdir/config";
-            @cfg = <$fh>;
-            close $fh;
-        }
-        if (-f "/etc/ssh/ssh_config") {
-            open my $fh, '<', "/etc/ssh/ssh_config";
-            @syscfg = <$fh>;
-            close $fh;
-        }
-        my @id = grep /IdentityFile/, @cfg;
-        if (!@id) {
-            @id = grep /IdentityFile/, @syscfg;
-        }
-        if (!@id) {
-            print STDERR " ... no identity files for publickey auth found\n";
-        }
-        s/^\s*IdentityFile\s*//, s/\s+$//, s/~\/.ssh/$sshdir/ for @id;
-        @id = grep { -f $_ } @id;
-        if (@id) {
-            $sshd->{key_path} = [ @id ];
-        } else {
-            print STDERR " ... identity files for publickey auth not found\n";
-        }
-    }
-
-    # try a test command.
-    my $host = $sshd->{host};
-    my $job = { cmd => ["true"] };
-    my $test_cmd = Forks::Super::Job::__build_ssh_command($host, $sshd, $job);
-    print STDERR " ... test command is  '$test_cmd'\n";
-
-    my $c1 = system($test_cmd);
-    if ($c1) {
-        print STDERR " ... test command failed: rc=$c1\n";
+        warn "No hostname specification in ",
+             "\$Forks::Super::SysInfo::TEST_SSH_TEMPLATE";
         return;
     }
-    print STDERR
-        " ... test command ok. We have a valid ssh server for testing\n";
-    return $sshd;
+    $sshd->{port} = 22;
+
+    if ($template =~ /\$ENV_USER/) {
+        $sshd->{user} = $env_user;  # || some other way to get userid
+    }
+    $sshd->{auth_method} = "publickey";
+    bless $sshd, 'Mock::Test::SSH';
+    if ($sshd->test("echo foo", "foo", 0)) {
+        return $sshd;
+    }
+    return;
 }
 
 sub Mock::Test::SSH::AUTOLOAD {
@@ -183,5 +76,42 @@ sub Mock::Test::SSH::AUTOLOAD {
     return $self->{$key};
 }
 
-1;
+sub Mock::Test::SSH::test {
+    my ($sshd, $cmd, $xp_output, $xp_status) = @_;
+    my $sshx = qx(which ssh) || "ssh";
+    chomp($sshx);
+    if (!$sshx || ! -x $sshx) {
+        warn "could not find ssh executable for test";
+        return;
+    }
+    my $sshcmd = "\"$sshx\"";
+    if ($sshd->{user}) {
+        $sshcmd .= " -l \"$sshd->{user}\"";
+    }
+    if ($sshd->{host}) {
+        $sshcmd .= " \"$sshd->{host}\"";
+    }
+    $sshcmd .= " $cmd";
+    if ($^O eq 'MSWin32') {
+        $sshcmd .= " < nul 2> nul";
+    } else {
+        $sshcmd .= " < /dev/null 2> /dev/null";
+    }
+    my $ssh_output = qx($sshcmd);
+    my $ssh_status = $?;
+    chomp($ssh_output);
 
+    if ($ssh_output ne $xp_output) {
+        warn "test output '$ssh_output' did not match expected output ",
+             "'$xp_output'";
+        return;
+    }
+    if ($ssh_status != $xp_status) {
+        warn "test status '$ssh_status' did not match expected status ",
+             "'$xp_status'";
+        return;
+    }
+    return 1;
+}
+
+1;

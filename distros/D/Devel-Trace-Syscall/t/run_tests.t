@@ -5,21 +5,11 @@ use warnings;
 use autodie;
 use feature qw(say);
 
+use Carp::Always;
+
 use FindBin;
 use Test::More;
-BEGIN {
-    my $pkg;
-
-    eval {
-        $pkg = 'Test::Differences::Color';
-        require Test::Differences::Color;
-    } or do {
-        $pkg = 'Test::Differences';
-        require Test::Differences;
-    };
-
-    $pkg->import;
-}
+use Test::Differences;
 
 my $INDENT         = qr/\s+/;
 my $SYSCALL_NAME   = qr/[a-zA-Z_:]+/;

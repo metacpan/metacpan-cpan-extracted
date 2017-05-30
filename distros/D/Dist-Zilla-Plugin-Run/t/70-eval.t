@@ -8,6 +8,9 @@ use Test::Fatal;
 use Test::Deep;
 use Path::Tiny;
 
+use lib 't/lib';
+use TestHelper;
+
 # protect from external environment
 local $ENV{TRIAL};
 local $ENV{RELEASE_STATUS};
@@ -52,9 +55,9 @@ my $source_dir = path($tzil->tempdir)->child('source');
 my %f = (
     a => 'DZT-Sample-0.001.tar.gz',
     n => 'DZT-Sample',
-    d => path($tzil->tempdir)->child('build')->canonpath, # use OS-specific path separators
+    d => path($tzil->tempdir)->child('build'),
     v => '0.001',
-    x => Dist::Zilla::Plugin::Run::Role::Runner->current_perl_path,
+    x => do { my $path = Dist::Zilla::Plugin::Run::Role::Runner->current_perl_path; $path =~ s{\\}{/}g; $path },
 );
 
 # test constant conversions as well as positional %s for backward compatibility
@@ -67,7 +70,7 @@ release for [Run::Release], $f{a} $f{n} $f{v} $f{d}/a $f{d}/b $f{a} $f{x}
 after_release for [Run::AfterRelease], $f{d} $f{v} $f{a} $f{v} $f{n} $f{a} $f{x}
 OUTPUT
 
-is(
+is_path(
     $source_dir->child('eval_out.txt')->slurp_raw,
     $expected,
     'all phases evaluate their code directly',

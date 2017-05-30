@@ -1,5 +1,8 @@
 Revision history for Perl extension NOLookup
 
+1.0.8  2017-05-29
+        - Require perl version at least 5.18
+
 1.0.7  2017-05-18
         - Added argument and support to specify max number of pages in:
           * lib/NOLookup/Brreg/DataLookup.pm

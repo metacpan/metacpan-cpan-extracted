@@ -1,19 +1,16 @@
 #!/usr/bin/env perl
-#
-#
-
 use v5.014;
 use strict;
 use warnings;
 use lib ( 'lib' );
+
+use WG::API;
+
 use Test::More;
 
-BEGIN {
-    use_ok( 'WG::API::WoT' || say "WG::API::WoT loaded");
-}
-
-my $wot = WG::API::WoT->new( application_id => 'demo' );
+my $wot = WG::API->new( application_id => $ENV{ 'WG_KEY' } || 'demo' )->wot;
 ok( $wot && ref $wot, 'create class' );
+isa_ok( $wot, 'WG::API::WoT');
 
 can_ok( $wot, qw/account_list account_info account_tanks account_achievements/ );
 can_ok( $wot, qw/ratings_types ratings_dates ratings_accounts ratings_neighbors ratings_top/ );

@@ -4,7 +4,7 @@
       "Ivan Wills <ivan.wills@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4216",
+   "generated_by" : "Module::Build version 0.422",
    "license" : [
       "perl_5"
    ],
@@ -29,14 +29,15 @@
          "requires" : {
             "Moo" : "2.000000",
             "Path::Tiny" : "0",
-            "perl" : "5.006"
+            "Text::Diff" : "0",
+            "perl" : "5.010"
          }
       }
    },
    "provides" : {
       "App::diffdir" : {
          "file" : "lib/App/diffdir.pm",
-         "version" : "0.5"
+         "version" : "0.6"
       }
    },
    "release_status" : "stable",
@@ -51,6 +52,6 @@
          "url" : "git://github.com/ivanwills/App-diffdir.git"
       }
    },
-   "version" : "0.5",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.6",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

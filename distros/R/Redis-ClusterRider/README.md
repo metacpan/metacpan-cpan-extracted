@@ -128,9 +128,9 @@ For more information about Redis Cluster see here:
 
 See documentation on [Redis](https://metacpan.org/pod/Redis) for more options.
 
-Attention, following [Redis](https://metacpan.org/pod/Redis) options: `reconnect`, `every`
-and `no_auto_connect_on_new` are redefined inside the [Redis::ClusterRider](https://metacpan.org/pod/Redis::ClusterRider)
-for own purproses. User defined values for this options will be ignored.
+Attention, [Redis](https://metacpan.org/pod/Redis) options `reconnect` and `every` are redefined inside the
+[Redis::ClusterRider](https://metacpan.org/pod/Redis::ClusterRider) for own purproses. User defined values for this options
+will be ignored.
 
 # COMMAND EXECUTION
 

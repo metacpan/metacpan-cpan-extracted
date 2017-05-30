@@ -1,4 +1,4 @@
-# Copyright 2015, 2016 Kevin Ryde
+# Copyright 2015, 2016, 2017 Kevin Ryde
 #
 # This file is part of Graph-Graph6.
 #
@@ -19,9 +19,9 @@ package Graph::Easy::As_sparse6;
 use 5.006;  # Graph::Easy is 5.008 anyway
 use strict;
 use warnings;
-use Graph::Graph6;
+use Graph::Easy::As_graph6;
 
-our $VERSION = 6;
+our $VERSION = 7;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
@@ -29,26 +29,8 @@ our $VERSION = 6;
 
 package Graph::Easy;
 sub as_sparse6 {
-  my ($graph, %options) = @_;
-
-  my $num_vertices = scalar($graph->nodes);
-  ### $num_vertices
-
-  my @edges = $graph->edges; # Graph::Easy::Edge objects
-  {
-    my @vertices = $graph->sorted_nodes('name');
-    my %name_to_num = map { $vertices[$_]->name => $_ } 0 .. $#vertices;
-    @edges = map { [map{$name_to_num{$_->name}} $_->nodes] } @edges;
-  }
-  ### @edges
-
-  Graph::Graph6::write_graph(format       => 'sparse6',
-                             header       => $options{'header'},
-                             str_ref      => \my $str,
-                             num_vertices => $num_vertices,
-                             edge_aref    => \@edges);
-  ### $str
-  return $str;
+  my $graph = shift;
+  return $graph->as_graph6 (format => 'sparse6', @_);
 }
 
 1;
@@ -72,44 +54,11 @@ Graph::Easy::As_sparse6 - stringize Graph::Easy to sparse6 format
 =head1 DESCRIPTION
 
 C<Graph::Easy::As_sparse6> adds an C<as_sparse6()> method to C<Graph::Easy>
-to give a graph as a string of sparse6.  This format is per
+to give a graph as a string of sparse6.  This is the same as
 
-=over 4
+    $graph->as_graph6 (format => 'sparse6');
 
-L<http://cs.anu.edu.au/~bdm/data/formats.txt>
-
-=back
-
-The format represents an undirected graph possibly with multi-edges and self
-loops.  If C<$graph> is directed then an edge in either direction is
-written.  If there's edges both ways then a multi-edge is written.
-
-The format has no vertex names and no attributes.  In the current
-implementation nodes are sorted alphabetically
-(C<$graph-E<gt>sorted_nodes('name')>) to give a consistent (though slightly
-arbitrary) vertex numbering.
-
-See L<Graph::Graph6> for some notes on the format.
-
-=head1 FUNCTIONS
-
-The following new method is added to C<Graph::Easy>.
-
-=over
-
-=item C<$str = $graph-E<gt>as_sparse6 ()>
-
-Return a string which is the sparse6 representation of C<$graph>.
-
-The string returned is printable ASCII.  It includes a final newline C<"\n">
-so is suitable for writing directly to a file or similar.  The only
-key/value option is
-
-    header   => boolean (default false)
-
-If C<header> is true then include a header C<E<gt>E<gt>sparse6E<lt>E<lt>>.
-
-=back
+See L<Graph::Easy::As_graph6> for details.
 
 =head1 SEE ALSO
 
@@ -125,7 +74,7 @@ L<http://user42.tuxfamily.org/graph-graph6/index.html>
 
 =head1 LICENSE
 
-Copyright 2015, 2016 Kevin Ryde
+Copyright 2015, 2016, 2017 Kevin Ryde
 
 Graph-Graph6 is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

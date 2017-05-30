@@ -4,7 +4,7 @@
       "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Moose::Meta::Class::__ANON__::SERIAL::8 version , CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150005",
    "keywords" : [],
    "license" : [
       "perl_5"
@@ -33,10 +33,9 @@
       "runtime" : {
          "requires" : {
             "Attribute::Handlers" : "0.79",
-            "Scalar::Does" : "0.002",
-            "Sub::Identify" : "0",
-            "Sub::Name" : "0",
-            "namespace::clean" : "0"
+            "Sub::Util" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.008"
          }
       },
       "test" : {
@@ -48,12 +47,11 @@
    "provides" : {
       "Sub::Talisman" : {
          "file" : "lib/Sub/Talisman.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/Sub-Talisman/project",
       "bugtracker" : {
          "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Sub-Talisman"
       },
@@ -65,7 +63,10 @@
          "type" : "git",
          "url" : "git://github.com/tobyink/p5-sub-talisman.git",
          "web" : "https://github.com/tobyink/p5-sub-talisman"
-      }
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Sub-Talisman/project"
    },
-   "version" : "0.005"
+   "version" : "0.006",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01",
+   "x_static_install" : 1
 }

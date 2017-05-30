@@ -1,7 +1,7 @@
 package WG::API::WoWp;
 
 use Moo;
-extends 'WG::API';
+
 with 'WG::API::WoWp::Account';
 with 'WG::API::WoWp::Ratings';
 
@@ -11,11 +11,11 @@ WG::API::WoWp - Modules to work with Wargaming.net Public API for World of Warpl
 
 =head1 VERSION
 
-Version v0.8.1
+Version v0.8.3
 
 =cut
 
-our $VERSION = 'v0.8.1';
+our $VERSION = 'v0.8.3';
 
 =head1 SYNOPSIS
 
@@ -34,7 +34,7 @@ This module provide access to WG Public API
 
 =head2 new
 
-Create new object with params. Rerquired application id: http://ru.wargaming.net/developers/documentation/guide/getting-started/
+Create new object with params. Rerquired application id: L<https://developers.wargaming.net/documentation/guide/getting-started/>
 
 Params:
 
@@ -48,6 +48,8 @@ has api_uri => (
     is  => 'ro',
     default => sub{ 'api.worldofwarplanes.ru/wowp' },
 );
+
+with 'WG::API::Base';
 
 =head1 METHODS
 
@@ -142,7 +144,7 @@ L<http://search.cpan.org/dist/WG-API/>
 
 =head1 SEE ALSO
 
-WG API Reference L<http://ru.wargaming.net/developers/>
+WG API Reference L<https://developers.wargaming.net/>
 
 =head1 AUTHOR
 

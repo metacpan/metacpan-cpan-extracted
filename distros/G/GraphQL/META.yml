@@ -3,11 +3,12 @@ abstract: 'Perl implementation'
 author:
   - 'Ed J <etj@cpan.org>'
 build_requires:
-  Test::More: '0'
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.14, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,5 +19,12 @@ no_index:
     - t
     - inc
 requires:
-  perl: '5.006'
-version: '0.02'
+  Function::Parameters: '0'
+  Moo: '0'
+  Pegex: '0'
+  Return::Type: '0'
+  Type::Tiny: '0'
+  perl: '5.014'
+resources:
+  repository: https://github.com/mohawk2/graphql-perl
+version: '0.03'

@@ -35,10 +35,19 @@ option 'logdir' => (
     coerce   => 1,
     lazy     => 1,
     required => 1,
-    default  => \&set_logdir,
+
+    # default  => \&set_logdir,
+    default => sub {
+        my $self = shift;
+        $self->set_logdir;
+    },
     documentation =>
 q{Directory where logfiles are written. Defaults to current_working_directory/prunner_current_date_time/log1 .. log2 .. log3'},
-    trigger => \&_make_the_dirs,
+    trigger => sub {
+        my $self = shift;
+        my $val = shift;
+        $self->_make_the_dirs($val);
+    },
 );
 
 =head3 show_process_id
@@ -138,11 +147,11 @@ has 'dt' => (
 ##Application log
 has 'app_log' => (
     is      => 'rw',
-    lazy => 1,
+    lazy    => 1,
     default => sub {
-        my $self = shift;
-        my $file_name = $self->logdir.'/main.log';
-        $self->_make_the_dirs($self->logdir);
+        my $self      = shift;
+        my $file_name = $self->logdir . '/main.log';
+        $self->_make_the_dirs( $self->logdir );
         my $log_conf = q(
 log4perl.category = DEBUG, FILELOG, Screen
 log4perl.appender.Screen = \
@@ -156,11 +165,11 @@ log4perl.appender.FILELOG.mode      = append
 log4perl.appender.FILELOG.layout    = Log::Log4perl::Layout::PatternLayout
 log4perl.appender.FILELOG.layout.ConversionPattern = %d %p %m %n
         );
-    $log_conf .= "log4perl.appender.FILELOG.filename  = $file_name";
+        $log_conf .= "log4perl.appender.FILELOG.filename  = $file_name";
 
-        Log::Log4perl->init( \$log_conf);
+        Log::Log4perl->init( \$log_conf );
         return get_logger();
-      }
+    }
 );
 
 ##Submit Log

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 our $SOURCE = 'CPAN';
 ## $SOURCE = 'GitHub';  # COMMENT
 # the line above will be commented out by Dist::Zilla
@@ -26,7 +26,7 @@ sub init {
     $self->SUPER::init( @_ );
 
     my $data = $self->data;
-    $data =~ s{ $GREENHOPPER_SPRINT [ ^ \[ ]+ \[ }{}x;
+    $data =~ s{ $GREENHOPPER_SPRINT [^ \[ ]+ \[ }{}x;
     $data =~ s{\]$}{}x;
     my @fields = split /,/, $data;
     foreach my $field ( @fields ) {
@@ -48,16 +48,17 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Packy Anderson Alexey Melezhik Atlassian GreenHopper JRC ScriptRunner TODO
-aggregateprogress aggregatetimeestimate aggregatetimeoriginalestimate
-assigneeType avatar avatarUrls completeDate displayName duedate
-emailAddress endDate fieldtype fixVersions fromString genericized iconUrl
-isAssigneeTypeValid issueTypes issuekeys issuelinks issuetype jira jql
-lastViewed maxResults originalEstimate originalEstimateSeconds parentkey
-projectId rapidViewId remainingEstimate remainingEstimateSeconds
-resolutiondate sprintlist startDate subtaskIssueTypes timeSpent
-timeSpentSeconds timeestimate timeoriginalestimate timespent timetracking
-toString updateAuthor worklog workratio
+=for :stopwords Packy Anderson Alexandr Alexey Ciornii Melezhik Atlassian GreenHopper JRC
+ScriptRunner TODO aggregateprogress aggregatetimeestimate
+aggregatetimeoriginalestimate assigneeType avatar avatarUrls completeDate
+displayName duedate emailAddress endDate fieldtype fixVersions fromString
+genericized iconUrl isAssigneeTypeValid issueTypes issuekeys issuelinks
+issuetype jira jql lastViewed maxResults originalEstimate
+originalEstimateSeconds parentkey projectId rapidViewId remainingEstimate
+remainingEstimateSeconds resolutiondate sprintlist startDate
+subtaskIssueTypes timeSpent timeSpentSeconds timeestimate
+timeoriginalestimate timespent timetracking toString updateAuthor worklog
+workratio
 
 =head1 NAME
 
@@ -65,7 +66,7 @@ JIRA::REST::Class::Sprint - A helper class for L<JIRA::REST::Class|JIRA::REST::C
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 READ-ONLY ACCESSORS
 

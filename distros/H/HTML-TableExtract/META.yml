@@ -20,4 +20,4 @@ no_index:
 requires:
   HTML::ElementTable: 1.16
   HTML::Parser: 0
-version: 2.13
+version: 2.15

@@ -6,7 +6,7 @@ use strict;
 use warnings 'all';
 
 package BZ::Client::Component;
-$BZ::Client::Component::VERSION = '4.4001';
+$BZ::Client::Component::VERSION = '4.4002';
 
 use parent qw( BZ::Client::API );
 
@@ -44,7 +44,7 @@ BZ::Client::Component - Client side representation of Product Components in Bugz
 
 =head1 VERSION
 
-version 4.4001
+version 4.4002
 
 =head1 SYNOPSIS
 

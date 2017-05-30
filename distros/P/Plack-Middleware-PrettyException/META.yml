@@ -35,5 +35,5 @@ requires:
   warnings: '0'
 resources:
   repository: git://github.com/domm/Plack-Middleware-PrettyException.git
-version: '1.002'
+version: '1.003'
 x_serialization_backend: 'YAML::Tiny version 1.69'

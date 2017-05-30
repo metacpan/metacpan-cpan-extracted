@@ -1,0 +1,144 @@
+# NAME
+
+Catalyst::Model::Data::MuForm - Proxy a directory of Data::MuFormr forms
+
+# SYNOPSIS
+
+       package MyApp::Model::Form;
+    
+       use Moo; # Or Moose, etc.
+       extends 'Catalyst::Model::Data::MuForm';
+    
+       __PACKAGE__->config( form_namespace=>'MyApp::Form' ); # This is the default BTW
+    
+
+And then using it in a controller:
+
+       my $form = $c->model("Form::Email");  # Maps to MyApp::Email via MyApp:Model::Email
+    
+       # If the request is a POST, we process parameters automatically
+       if($form->validated) {
+         ...
+       } else {
+         ...
+       }
+    
+
+# DESCRIPTION
+
+Assuming a project namespace 'MyApp::Form' with [HTML::Formhandler](https://metacpan.org/pod/HTML::Formhandler) forms. like
+the following example:
+
+     package MyApp::Form::Email;
+    
+     use HTML::FormHandler::Moose;
+    
+     extends 'HTML::FormHandler';
+
+     has 'invalid_domains' => (is=>'ro', required=>1);
+     
+     has_field 'email' => (
+       type=>'Email',
+       size => 96,
+       required => 1);
+    
+
+You create a single [Catalyst](https://metacpan.org/pod/Catalyst) model like this:
+
+       package MyApp::Model::Form;
+    
+       use Moo; # Or Moose, etc.
+       extends 'Catalyst::Model::Data::MuForm';
+    
+       __PACKAGE__->config( form_namespace=>'MyApp::Form' );
+    
+
+(Setting 'form\_namespace' is optional, it defaults to the application
+namespace plus "::Form" (in this example case that would be "MyApp::Form").
+
+When you start your application it will register one model for each form
+in the declared namespace.  So in the above example you should see a model
+'MyApp::Model::Form::Email'.
+
+You can set model configuration in the normal way, in your application general
+configuration:
+
+       package MyApp;
+       use Catalyst;
+    
+       MyApp->config(
+         'Model::Form::Email' => {
+           invalid_domains => [qw(foo.com wack.org)],
+         },
+       );
+        
+       MyApp->setup;
+    
+
+And you can pass additional args to the 'process' call of the form when you request
+the form model:
+
+       my $email_form = $c->model('Form::Email',
+         model => $user_model,
+         params => $c->req->body_parameters);
+    
+
+Basically you can pass anything you'd pass to 'process' in [Data::MuForm](https://metacpan.org/pod/Data::MuForm).
+
+The generated proxy will also add the ctx argument based on the current value of
+$c, although using this may not be a good way to build well, decoupled applications.
+
+By default if the request is a POST, we will process the request arguments and
+return a form object that you can test for validity.  So you don't need to set
+the 'params' if the parameters are just the existing [Catalyst](https://metacpan.org/pod/Catalyst) body\_parameters.
+If you don't want this behavior you can disable it by passing 'no\_auto\_process'.
+For example:
+
+       my $form = $c->model("Form::XXX", no_auto_process=>1);
+    
+
+# ATTRIBUTES
+
+This class defines the following attributes you may set via
+standard [Catalyst](https://metacpan.org/pod/Catalyst) configuration.
+
+## form\_namespace
+
+This is the target namespace that [Module::Pluggable](https://metacpan.org/pod/Module::Pluggable) uses to look for forms.
+It defaults to 'MyApp::Form' (where 'MyApp' is you application namespace).
+
+## body\_method
+
+This is the name of the method called on [Catalyst::Request](https://metacpan.org/pod/Catalyst::Request) used to access any
+POSTed data.  Required field, the options are 'body\_data' and 'body\_parameters.
+The default is 'body\_data'.
+
+## no\_auto\_process
+
+By default when createing the perrequest form if the request is a POST we
+just go ahead and process those args.  Setting this to true will disable
+this behavior globally if you prefer more control.
+
+# SPECIAL ARGUMENTS
+
+You may pass the following special arguments to $c->model("Form::XXX") to
+influence how the form object is setup.
+
+## no\_auto\_process
+
+Turns off the call to ->process when the request is a POST.
+
+# AUTHOR
+
+John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+# SEE ALSO
+
+[Catalyst](https://metacpan.org/pod/Catalyst), [Catalyst::Model](https://metacpan.org/pod/Catalyst::Model), [Data::MuForm](https://metacpan.org/pod/Data::MuForm)
+
+# COPYRIGHT & LICENSE
+
+Copyright 2017, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

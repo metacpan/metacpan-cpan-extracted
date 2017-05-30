@@ -1,0 +1,130 @@
+package Prty::ContentProcessor::BaseType;
+use base qw/Prty::Section::Object Prty::ClassConfig/;
+
+use strict;
+use warnings;
+
+our $VERSION = 1.107;
+
+# -----------------------------------------------------------------------------
+
+=encoding utf8
+
+=head1 NAME
+
+Prty::ContentProcessor::BaseType - Basisklasse für ContentProcessor-Typen
+
+=head1 BASE CLASSES
+
+=over 2
+
+=item *
+
+L<Prty::Section::Object>
+
+=item *
+
+L<Prty::ClassConfig>
+
+=back
+
+=head1 DESCRIPTION
+
+Diese abstrakte Basisklasse enthält die gemeinsame Funktionalität
+ihrer Subklassen.
+
+=head1 METHODS
+
+=head2 Intern
+
+=head3 attributes() - Liste der zulässigen Abschnitts-Attribute
+
+=head4 Synopsis
+
+    @attributes | $attributeA = $class->attributes;
+
+=head4 Description
+
+Ermittele die Liste der Namen der zulässigen Abschnitts-Attribute
+entlang der Klassenhierarchie und liefere diese zurück. Die
+Liste ist alphabetisch sortiert.
+
+=head4 Returns
+
+Liste der Namen der Abschnitts-Attribute. Im Skalar-Kontext wird
+eine Referenz auf die Liste geliefert.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub attributes {
+    my $class = shift;
+
+    my $a = $class->defMemoize('attributes',sub {
+        my ($class,$key) = @_;
+
+        my $a = $class->defCumulate('Attributes');
+        @$a = sort @$a;
+        return $a;
+    });
+
+    return wantarray? @$a: $a;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 contentAllowed() - Inhalt im Abschnitt erlaubt?
+
+=head4 Synopsis
+
+    $bool = $class->contentAllowed;
+
+=head4 Description
+
+Ermittele, ob Abschnitte des Entitätstyps einen Inhalt haben dürfen.
+Wenn ja, liefert die Methode 1, andernfalls 0.
+
+=head4 Returns
+
+Boolscher Wert
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub contentAllowed {
+    my $class = shift;
+
+    return $class->defMemoize('contentAllowed',sub {
+        my ($class,$key) = @_;
+        return $class->defSearch('ContentAllowed');
+    });
+}
+
+# -----------------------------------------------------------------------------
+
+=head1 VERSION
+
+1.107
+
+=head1 AUTHOR
+
+Frank Seitz, L<http://fseitz.de/>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2017 Frank Seitz
+
+=head1 LICENSE
+
+This code is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+1;
+
+# eof

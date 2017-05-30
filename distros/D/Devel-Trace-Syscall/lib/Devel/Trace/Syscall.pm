@@ -11,7 +11,7 @@ use XSLoader;
 my $parent_pid = $$;
 
 BEGIN { # must happen at BEGIN time so that flush_events is available to DB::sub
-    our $VERSION = '0.02'; # VERSION
+    our $VERSION = '0.03'; # VERSION
     XSLoader::load(__PACKAGE__, $Devel::Trace::Syscall::VERSION);
 }
 
@@ -76,7 +76,7 @@ Devel::Trace::Syscall - Print a stack trace whenever a system call is made
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -203,7 +203,7 @@ the same terms as the Perl 5 programming language system itself.
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-https://github.com/hoelzro/devel-trace-syscall/issues
+L<https://github.com/hoelzro/devel-trace-syscall/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

@@ -1,0 +1,10 @@
+SYNOPSIS
+
+    See the included script dump-chrome-history.
+
+SEE ALSO
+
+    App::DumpFirefoxHistory
+
+    App::DumpOperaHistory
+

@@ -1,11 +1,17 @@
 Revision History for Mojolicious-Plugin-Foil
 ============================================
 
-v0.002 2017-03-20
+v0.005 2017-05-26
 -----------------
 
-* 2017-03-20 12:24:45 +1100
-  some git ignoring
+* 2017-05-26 18:48:30 +1000
+  Fixing a bug with the @print CSS styles.
+* 2017-03-29 22:04:37 +1100
+  Added "context" config.
+* 2017-03-29 21:28:43 +1100
+  Fixed bug with "default" config.
+* 2017-03-29 21:06:30 +1100
+  allow a default-host config
 
 ===================================
 End of changes in the last 365 days

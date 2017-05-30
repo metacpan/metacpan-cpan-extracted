@@ -2,6 +2,7 @@ package Geo::Coder::List;
 
 use warnings;
 use strict;
+use Carp;
 
 =head1 NAME
 
@@ -9,11 +10,11 @@ Geo::Coder::List - Call many geocoders
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 our %locations;
 
 =head1 SYNOPSIS
@@ -60,7 +61,11 @@ and OpenStreetMap for other places:
     # Uses Geo::Coder::CA, and if that fails uses Geo::Coder::OSM
     my $location = $geocoderlist->geocode(location => '1600 Pennsylvania Ave NW, Washington DC, USA');
     # Only uses Geo::Coder::OSM
-    $location = $geocoderlist->geocode('10 Downing St, London, UK');
+    if($location = $geocoderlist->geocode('10 Downing St, London, UK')) {
+        print 'The prime minister lives at co-ordinates ', 
+            $location->{geometry}{location}{lat}, ',',
+            $location->{geometry}{location}{lng}, "\n";
+    }
 
 =cut
 
@@ -106,6 +111,8 @@ sub geocode {
 			my $regex = $g->{'regex'};
 			if($location =~ $regex) {
 				$geocoder = $g->{'geocoder'};
+			} else {
+				next;
 			}
 		}
 		my @rc;
@@ -114,9 +121,16 @@ sub geocode {
 			# TODO: remove from the list of geocoders
 			@rc = $geocoder->geocode(%params);
 		};
-		next if $@;
+		if($@) {
+			Carp::carp(ref($geocoder) . ": $@");
+			next;
+		}
 		foreach my $location(@rc) {
-			# Add HTML::GoogleMaps::V3 compatability
+			if($location->{'error'}) {
+				@rc = ();
+				last;
+			}
+			# Try to create a common interface, helps with HTML::GoogleMaps::V3
 			unless($location->{geometry}{location}{lat}) {
 				if($location->{lat}) {
 					# OSM
@@ -134,6 +148,11 @@ sub geocode {
 					# geocoder.ca
 					$location->{geometry}{location}{lat} = $location->{latt};
 					$location->{geometry}{location}{lng} = $location->{longt};
+				}
+
+				if($location->{'standard'}{'countryname'}) {
+					# XYZ
+					$location->{'address'}{'country'} = $location->{'standard'}{'countryname'};
 				}
 			}
 			$location->{geocoder} = $geocoder;
@@ -192,6 +211,8 @@ or through the web interface at
 L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Geo-Coder-List>.
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
+
+There is no reverse_geocode() yet.
 
 =head1 SEE ALSO
 

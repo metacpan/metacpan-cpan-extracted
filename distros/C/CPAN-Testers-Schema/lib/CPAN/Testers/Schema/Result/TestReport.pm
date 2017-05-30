@@ -1,5 +1,5 @@
 package CPAN::Testers::Schema::Result::TestReport;
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 # ABSTRACT: Raw reports as JSON documents
 
 #pod =head1 SYNOPSIS
@@ -86,6 +86,21 @@ sub new( $class, $attrs ) {
     return $class->next::method( $attrs );
 };
 
+#pod =method upload
+#pod
+#pod     my $upload = $row->upload;
+#pod
+#pod Get the associated L<CPAN::Testers::Schema::Result::Upload> object for
+#pod the distribution tested by this test report.
+#pod
+#pod =cut
+
+sub upload( $self ) {
+    my ( $dist, $vers ) = $self->report->{distribution}->@{qw( name version )};
+    return $self->result_source->schema->resultset( 'Upload' )
+        ->search({ dist => $dist, version => $vers })->single;
+}
+
 1;
 
 __END__
@@ -98,7 +113,7 @@ CPAN::Testers::Schema::Result::TestReport - Raw reports as JSON documents
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 
@@ -140,6 +155,13 @@ object and should not be called directly.
 
 This is overridden to provide sane defaults for the C<id> and C<created>
 fields.
+
+=head2 upload
+
+    my $upload = $row->upload;
+
+Get the associated L<CPAN::Testers::Schema::Result::Upload> object for
+the distribution tested by this test report.
 
 =head1 SEE ALSO
 

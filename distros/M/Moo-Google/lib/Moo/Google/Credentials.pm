@@ -1,5 +1,5 @@
 package Moo::Google::Credentials;
-$Moo::Google::Credentials::VERSION = '0.01';
+$Moo::Google::Credentials::VERSION = '0.02';
 
 # ABSTRACT: Credentials for particular Client instance. You can use this module as singleton also if you need to share credentials between two or more modules
 
@@ -40,7 +40,7 @@ Moo::Google::Credentials - Credentials for particular Client instance. You can u
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 METHODS
 

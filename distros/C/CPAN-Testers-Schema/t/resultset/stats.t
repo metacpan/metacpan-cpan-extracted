@@ -49,7 +49,7 @@ subtest 'insert_test_report' => sub {
                 name => 'Sorauta-SVN-AutoCommit',
                 version => '0.02',
             },
-            results => {
+            result => {
                 grade => 'FAIL',
             },
         },

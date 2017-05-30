@@ -232,11 +232,11 @@ In any case, events are fired with arguments `(old value, new value)`.
 
 Say you have an unnamed block of type `myBlock`. If you changed the key `myKey` in
 `myBlock`, Evented::Configuration would fire the event
-`eventedConfiguration.change:myBlock:myKey`.
+`change:myBlock:myKey`.
 
 Now assume you have a named block of type `myBlock` with name `myName`. If you changed
 the key `myKey` in `myBlock:myName`, Evented::Configuration would fire event
-`eventedConfiguration.change:myBlock/myName:myKey`.
+`change:myBlock/myName:myKey`.
 
 However, it is recommended that you use the `->on_change()` method rather than
 directly attaching event callbacks. This will insure compatibility for later versions that

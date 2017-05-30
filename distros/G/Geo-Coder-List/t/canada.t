@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 use LWP;
-use Test::Most tests => 11;
-use Test::NoWarnings;
+use Test::Most tests => 14;
+use Test::NoWarnings
 
 eval 'use autodie qw(:all)';	# Test for open/close failures
 
@@ -12,9 +12,9 @@ BEGIN {
 	use_ok('Geo::Coder::List');
 }
 
-GOOGLEPLACES: {
+CANADA: {
 	SKIP: {
-		skip 'Test requires Internet access', 9 unless(-e 't/online.enabled');
+		skip 'Test requires Internet access', 12 unless(-e 't/online.enabled');
 
 		eval {
 			require Geo::Coder::CA;
@@ -24,12 +24,16 @@ GOOGLEPLACES: {
 			require Test::Number::Delta;
 
 			Test::Number::Delta->import();
+
+			require Test::LWP::UserAgent;
+
+			Test::LWP::UserAgent->import();
 		};
 
 		# curl 'geocoder.ca/some_location?locate=9235+Main+St,+Richibucto,+New Brunswick,+Canada&json=1'
 		if($@) {
 			diag('Geo::Coder::CA not installed - skipping tests');
-			skip 'Geo::Coder::CA not installed', 9;
+			skip 'Geo::Coder::CA not installed', 12;
 		} else {
 			diag("Using Geo::Coder::CA $Geo::Coder::CA::VERSION");
 		}
@@ -48,7 +52,17 @@ GOOGLEPLACES: {
 		delta_within($location->{geometry}{location}{lat}, 46.68, 1e-1);
 		delta_within($location->{geometry}{location}{lng}, -64.86, 1e-1);
 
+		$location = $geocoderlist->geocode(location => 'Allen, Indiana, USA');
+		ok(!defined($location));
+
+		$ua = new_ok('Test::LWP::UserAgent');
+		$ua->map_response('geocoder.ca', new_ok('HTTP::Response' => [ '500' ]));
+		$geocoderlist->ua($ua);
+
+		$location = $geocoderlist->geocode(location => '9235 Main St, Richibucto, New Brunswick, Canada');
+
 		ok(!defined($geocoderlist->geocode()));
 		ok(!defined($geocoderlist->geocode('')));
+
 	}
 }

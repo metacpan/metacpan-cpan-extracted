@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 our $DEV_SHM = "/dev/shm";
 our $DEBUG;
 *DEBUG = \$Forks::Queue::DEBUG;
@@ -46,7 +46,9 @@ sub new {
     # sizes small and large values to improve performance
     $opts{_maintenance_freq} //= 32;
 
-    open $fh, '>>', $opts{lock} or die;
+    open $fh, '>>', $opts{lock}
+        or die "Forks::Queue::Shmem: ",
+               "failed to create lock file '$opts{lock}': $!";
     close $fh or die;
 
     my $self = bless { %opts }, $class;
@@ -122,7 +124,7 @@ Forks::Queue::Shmem - Forks::Queue implementation using shared memory
 
 =head1 VERSION
 
-0.08
+0.09
 
 =head1 DESCRIPTION
 

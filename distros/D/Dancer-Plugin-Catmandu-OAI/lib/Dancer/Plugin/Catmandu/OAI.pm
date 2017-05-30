@@ -6,7 +6,7 @@ Dancer::Plugin::Catmandu::OAI - OAI-PMH provider backed by a searchable Catmandu
 
 =cut
 
-our $VERSION = '0.0401';
+our $VERSION = '0.0403';
 
 use Catmandu::Sane;
 use Catmandu::Util qw(is_string is_array_ref);
@@ -16,6 +16,7 @@ use Catmandu::Exporter::Template;
 use Dancer::Plugin;
 use Dancer qw(:syntax);
 use DateTime;
+use DateTime::Format::ISO8601;
 use DateTime::Format::Strptime;
 use Clone qw(clone);
 
@@ -48,20 +49,6 @@ my $VERBS = {
     },
 };
 
-sub parse_oai_datestamp {
-    my ($date) = @_;
-    my @d = $date =~ /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z$/;
-    DateTime->new(
-        year      => $d[0],
-        month     => $d[1],
-        day       => $d[2],
-        hour      => $d[3],
-        minute    => $d[4],
-        second    => $d[5],
-        time_zone => 'UTC',
-    );
-}
-
 sub render {
     my ($tmpl, $data) = @_;
     content_type 'xml';
@@ -77,8 +64,9 @@ sub oai_provider {
 
     my $setting = clone(plugin_setting);
 
+    my $bag = Catmandu->store($opts{store} || $setting->{store})->bag($opts{bag} || $setting->{bag});
+
     $setting->{granularity} //= "YYYY-MM-DDThh:mm:ssZ";
-    $setting->{get_record_cql_pattern} //= '_id exact "%s"';
 
     # TODO this was for backwards compatibility. Remove?
     if ($setting->{filter}) {
@@ -100,6 +88,8 @@ sub oai_provider {
     } : sub {
         $_[0];
     };
+
+    $setting->{get_record_cql_pattern} ||= $bag->id_key.' exact "%s"';
 
     my $metadata_formats = do {
         my $list = $setting->{metadata_formats};
@@ -226,7 +216,7 @@ $template_header
 <baseURL>[% uri_base %]</baseURL>
 <protocolVersion>2.0</protocolVersion>
 $admin_email
-<earliestDatestamp>$setting->{earliestDatestamp}</earliestDatestamp>
+<earliestDatestamp>[% earliest_datestamp %]</earliestDatestamp>
 <deletedRecord>$setting->{deletedRecord}</deletedRecord>
 <granularity>$setting->{granularity}</granularity>
 <description>
@@ -332,8 +322,6 @@ TT
     my $sub_deleted = $opts{deleted} || sub { 0 };
     my $sub_set_specs_for = $opts{set_specs_for} || sub { [] };
 
-    my $bag = Catmandu->store($opts{store} || $setting->{store})->bag($opts{bag} || $setting->{bag});
-
     any ['get', 'post'] => $path => sub {
         my $uri_base = $setting->{uri_base} // request->uri_base;
         my $response_date = DateTime->now->iso8601.'Z';
@@ -431,7 +419,6 @@ TT
                 cql_query => sprintf($setting->{get_record_cql_pattern}, $id),
                 start     => 0,
                 limit     => 1,
-
             )->first;
 
             if (defined $rec) {
@@ -462,6 +449,19 @@ TT
             return render(\$template_error, $vars);
 
         } elsif ($verb eq 'Identify') {
+            $vars->{earliest_datestamp} = $setting->{earliestDatestamp} || do {
+                my $hits = $bag->search(
+                    %{ $setting->{default_search_params} },
+                    cql_query    => $setting->{cql_filter} || 'cql.allRecords',
+                    limit        => 1,
+                    sru_sortkeys => $setting->{datestamp_field},
+                );
+                if (my $rec = $hits->first) {
+                    $format_datestamp->($rec->{$setting->{datestamp_field}});
+                } else {
+                    '1970-01-01T00:00:01Z';
+                }
+            };
             return render(\$template_identify, $vars);
 
         } elsif ($verb eq 'ListIdentifiers' || $verb eq 'ListRecords') {
@@ -499,8 +499,8 @@ TT
             my $cql_from  = $from;
             my $cql_until = $until;
             if (my $pattern = $setting->{datestamp_pattern}) {
-                $cql_from  = DateTime::Format::Strptime::strftime($pattern, parse_oai_datestamp($cql_from))  if $cql_from;
-                $cql_until = DateTime::Format::Strptime::strftime($pattern, parse_oai_datestamp($cql_until)) if $cql_until;
+                $cql_from = DateTime::Format::ISO8601->parse_datetime($from)->strftime($pattern) if $cql_from;
+                $cql_until = DateTime::Format::ISO8601->parse_datetime($until)->strftime($pattern) if $cql_until;
             }
 
             push @cql, qq|($setting->{cql_filter})| if $setting->{cql_filter};
@@ -538,11 +538,14 @@ TT
             if ($verb eq 'ListIdentifiers') {
                 $vars->{records} = [map {
                     my $rec = $_;
+                    my $id  = $rec->{$bag->id_key};
+
                     if ($fix) {
                         $rec = $fix->fix($rec);
                     }
+
                     {
-                        id        => $rec->{_id},
+                        id        => $id,
                         datestamp => $format_datestamp->($rec->{$setting->{datestamp_field}}),
                         deleted   => $sub_deleted->($rec),
                         setSpec   => $sub_set_specs_for->($rec),
@@ -552,14 +555,16 @@ TT
             } else {
                 $vars->{records} = [map {
                     my $rec = $_;
+                    my $id  = $rec->{$bag->id_key};
 
                     if ($fix) {
                         $rec = $fix->fix($rec);
                     }
 
                     my $deleted = $sub_deleted->($rec);
+
                     my $rec_vars = {
-                        id        => $rec->{_id},
+                        id        => $id,
                         datestamp => $format_datestamp->($rec->{$setting->{datestamp_field}}),
                         deleted   => $deleted,
                         setSpec   => $sub_set_specs_for->($rec),
@@ -720,7 +725,7 @@ The Dancer configuration file 'config.yml' contains basic information for the OA
     * adminEmail - An administrative email. Can be string or array of strings. This will be included in the Identify response.
     * compression - a compression encoding supported by the repository. Can be string or array of strings. This will be included in the Identify response.
     * description - XML container that describes your repository. Can be string or array of strings. This will be included in the Identify response. Note that this module will try to validate the XML data.
-    * earliestDatestamp - The earliest datestamp available in the dataset an YYYY-MM-DDTHH:MM:SSZ
+    * earliestDatestamp - The earliest datestamp available in the dataset as YYYY-MM-DDTHH:MM:SSZ. This will be determined dynamically if no static value is given.
     * deletedRecord - The policy for deleted records. See also: L<https://www.openarchives.org/OAI/openarchivesprotocol.html#DeletedRecords>
     * repositoryIdentifier - A prefix to use in OAI-PMH identifiers
     * cql_filter -  A CQL query to find all records in the database that should be made available to OAI-PMH

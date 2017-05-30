@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.106;
+our $VERSION = 1.107;
 
 # -----------------------------------------------------------------------------
 
@@ -72,9 +72,27 @@ Darstellung. Maskiert werden die Zeichen \n, \r, \t, \0, \\.
 # -----------------------------------------------------------------------------
 
 sub new {
-    my ($class,$type,$length,$scale,$null,$mask) = @_;
+    my ($class,$type,$width,$scale,$null,$mask) = @_;
     #             0     1       2      3     4
-    return bless [$type,$length,$scale,$null,$mask],$class;
+    return bless [$type,$width,$scale,$null,$mask],$class;
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Akzessoren
+
+=head3 width() - Breite des längsten Werts
+
+=head4 Synopsis
+
+    $width = $fmt->width;
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub width {
+    return shift->[1];
 }
 
 # -----------------------------------------------------------------------------
@@ -191,7 +209,7 @@ sub htmlAlign {
 
 =head1 VERSION
 
-1.106
+1.107
 
 =head1 AUTHOR
 

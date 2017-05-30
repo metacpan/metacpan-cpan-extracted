@@ -34,11 +34,12 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Data::Dumper" => 0,
+    "List::Util" => 0,
     "Path::Tiny" => 0,
     "Test::Deep" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -56,6 +57,7 @@ my %FallbackPrereqs = (
   "DynaLoader" => 0,
   "Exporter" => 0,
   "File::ShareDir" => 0,
+  "List::Util" => 0,
   "Path::Tiny" => 0,
   "Test::Deep" => 0,
   "Test::More" => 0,

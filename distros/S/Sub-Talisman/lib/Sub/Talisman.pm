@@ -6,21 +6,19 @@ use warnings;
 
 BEGIN {
 	$Sub::Talisman::AUTHORITY = 'cpan:TOBYINK';
-	$Sub::Talisman::VERSION   = '0.005';
+	$Sub::Talisman::VERSION   = '0.006';
 }
 
 use Attribute::Handlers;
-use Sub::Identify qw( get_code_info );
-use Sub::Name     qw( subname );
-use Scalar::Does  qw( does -constants );
-use Scalar::Util  qw( refaddr );
+use Scalar::Util    qw( refaddr );
+use Sub::Util       qw( subname set_subname );
 
 sub _identify
 {
 	my $sub = shift;
-	if (does $sub, CODE)
+	if (ref $sub)
 	{
-		my ($p, $n) = get_code_info($sub);
+		my ($p, $n) = subname($sub) =~ m/\A(.*)::([^:]+)\z/;
 		$n .= sprintf('(%d)', refaddr($sub)) if $n eq '__ANON__';
 		return ($p, $n);
 	}
@@ -60,7 +58,7 @@ sub setup_for
 	{
 		no strict 'refs';
 		my $subname = "$caller\::FETCH_CODE_ATTRIBUTES";
-		*$subname = subname $subname, sub {
+		*$subname = set_subname $subname => sub {
 			my ($class, $sub) = @_;
 			return map { /(\w+)$/ ? $1 : () }
 				__PACKAGE__->get_attributes($sub);
@@ -264,7 +262,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2012 by Toby Inkster.
+This software is copyright (c) 2012, 2017 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

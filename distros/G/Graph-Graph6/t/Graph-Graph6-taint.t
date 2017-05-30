@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015 Kevin Ryde
+# Copyright 2015, 2017 Kevin Ryde
 #
 # This file is part of Graph-Graph6.
 #
@@ -24,7 +24,7 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-my $test_count = (tests => 24)[1];
+my $test_count = (tests => 36)[1];
 plan tests => $test_count;
 
 # uncomment this to run the ### lines
@@ -64,9 +64,11 @@ require Graph::Graph6;
 
 my $graph6_filename  = 'Graph-Graph6-taint-graph6.tmp';
 my $sparse6_filename = 'Graph-Graph6-taint-sparse6.tmp';
+my $digraph6_filename = 'Graph-Graph6-taint-digraph6.tmp';
 
 my $graph6_str  = chr(68).chr(81).chr(99)."\n";
 my $sparse6_str = ':Fa@x^';
+my $digraph6_str = chr(38).chr(68).chr(73).chr(63).chr(65).chr(79).chr(63)."\n";
 {
   open my $fh, '>', $graph6_filename or die;
   print $fh $graph6_str or die;
@@ -77,21 +79,31 @@ my $sparse6_str = ':Fa@x^';
   print $fh $sparse6_str or die;
   close $fh or die;
 }
+{
+  open my $fh, '>', $digraph6_filename or die;
+  print $fh $digraph6_str or die;
+  close $fh or die;
+}
 Taint::Util::taint($graph6_str);
 Taint::Util::taint($sparse6_str);
+Taint::Util::taint($digraph6_str);
 
 open my $graph6_fh, '<', $graph6_filename or die;
 open my $sparse6_fh, '<', $sparse6_filename or die;
+open my $digraph6_fh, '<', $digraph6_filename or die;
 
 foreach my $elem (
-                  [ filename => $graph6_filename ],
-                  [ filename => $sparse6_filename ],
-                  [ fh => $graph6_fh ],
-                  [ fh => $sparse6_fh ],
-                  [ str => $graph6_str ],
-                  [ str => $sparse6_str ],
+                  ["filename graph6",   filename => $graph6_filename ],
+                  ["filename sparse6",  filename => $sparse6_filename ],
+                  ["filename digraph6", filename => $digraph6_filename ],
+                  ["fh graph6",         fh => $graph6_fh ],
+                  ["fh sparse6",        fh => $sparse6_fh ],
+                  ["fh digraph6",       fh => $digraph6_fh ],
+                  ["str graph6",        str => $graph6_str ],
+                  ["str sparse6",       str => $sparse6_str ],
+                  ["str digraph6",      str => $digraph6_str ],
                  ) {
-  my (@options) = @$elem;
+  my ($name, @options) = @$elem;
 
   my @edges;
   my @edges_func;
@@ -109,16 +121,20 @@ foreach my $elem (
      },
      edge_aref => \@edges,
     );
-  ok (!! Taint::Util::tainted($num_vertices),      1, 'num_vertices');
-  ok (!! Taint::Util::tainted($num_vertices_func), 1, 'num_vertices_func');
+  ok (!! Taint::Util::tainted($num_vertices),      1, "$name: num_vertices tainted");
+  ok (!! Taint::Util::tainted($num_vertices_func), 1, "$name: num_vertices_func tainted");
 
   foreach my $edge_aref (\@edges, \@edges_func) {
     my $edges_tainted = 1;
     foreach my $edge (@edges) {
-      $edges_tainted &&= Taint::Util::tainted($edge->[0]);
-      $edges_tainted &&= Taint::Util::tainted($edge->[1]);
+      foreach my $v (@$edge) {
+        if (! Taint::Util::tainted($v)) {
+          MyTestHelpers::diag("edge vertex $v untained");
+          $edges_tainted = 0;
+        }
+      }
     }
-    ok (!! $edges_tainted, 1, 'edges');
+    ok (!! $edges_tainted, 1, "$name: all edge numbers tainted");
   }
 }
 

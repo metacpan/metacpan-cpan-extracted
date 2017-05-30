@@ -1,5 +1,5 @@
 package Net::DNS::SPF::Expander;
-$Net::DNS::SPF::Expander::VERSION = '0.018';
+$Net::DNS::SPF::Expander::VERSION = '0.019';
 use Moose;
 use IO::All -utf8;
 use Net::DNS::ZoneFile;

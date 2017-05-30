@@ -1,59 +1,41 @@
---- #YAML:1.0
-name:               Gtk2-Ex-NumAxis
-version:            5
-abstract:           Widget drawing a numbered axis.
+---
+abstract: 'Widget drawing a numbered axis.'
 author:
-    - Kevin Ryde <user42@zip.com.au>
-license:            gpl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Kevin Ryde <user42_kevin@yahoo.com.au>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Glib::Ex::SignalBits:  9
-    Glib::Ex::SignalIds:  1
-    Glib::Object::Subclass:  0
-    Gtk2:                 1.220
-    Gtk2::Ex::AdjustmentBits:  40
-    Math::Round:          0
-    perl:                 5.008
-resources:
-    homepage:  http://user42.tuxfamily.org/gtk2-ex-numaxis/index.html
-    license:   http://www.gnu.org/licenses/gpl.html
-no_index:
-    directory:
-        - t
-        - inc
-        - xt
-        - devel
-        - examples
-generated_by:       ExtUtils::MakeMaker version 6.56
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010'
+license: gpl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Gtk2-Ex-NumAxis
+no_index:
+  directory:
+    - t
+    - inc
+    - devel
+    - xt
 optional_features:
-    maximum_devel:
-        description:  Stuff used variously for development.
-        requires:
-            Pod::Simple::HTML:  0
-            Smart::Comments:    0
-            warnings::unused:   0
-    maximum_interoperation:
-        description:  Have maximum inter-operation with other modules (optional other stuff).
-        requires:
-            Locale::Messages:  0
-    maximum_tests:
-        description:  Have "make test" do as much as possible.
-        requires:
-            Parse::CPAN::Meta:   0
-            Test::DistManifest:  0
-            Test::Pod:           1.00
-            Test::Synopsis:      0
-            Test::Weaken:        3
-            Test::Weaken::Gtk2:  0
-            Test::YAML::Meta:    0.15
-            YAML:                0
-            YAML::Syck:          0
-            YAML::Tiny:          0
-            YAML::XS:            0
+  maximum_interoperation:
+    description: 'Have maximum inter-operation with other modules (optional other stuff).'
+    requires:
+      Locale::Messages: '0'
+recommends:
+  Math::Round: '0.07'
+requires:
+  Glib::Ex::SignalBits: '9'
+  Glib::Ex::SignalIds: '1'
+  Glib::Object::Subclass: '0'
+  Gtk2: '1.220'
+  Gtk2::Ex::AdjustmentBits: '40'
+  Math::Round: '0'
+  perl: '5.008'
+resources:
+  homepage: http://user42.tuxfamily.org/gtk2-ex-numaxis/index.html
+  license: http://www.gnu.org/licenses/gpl.html
+version: '6'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

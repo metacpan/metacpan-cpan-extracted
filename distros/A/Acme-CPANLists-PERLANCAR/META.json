@@ -50,7 +50,7 @@
          "web" : "https://github.com/perlancar/perl-Acme-CPANLists-PERLANCAR"
       }
    },
-   "version" : "0.19",
+   "version" : "0.20",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024000"
@@ -145,7 +145,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.54"
+            "version" : "0.55"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -176,6 +176,11 @@
             "class" : "Dist::Zilla::Plugin::CheckMetaResources",
             "name" : "@Author::PERLANCAR/CheckMetaResources",
             "version" : "0.001"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CopyrightYearFromGit",
+            "name" : "@Author::PERLANCAR/CopyrightYearFromGit",
+            "version" : "0.003"
          },
          {
             "class" : "Dist::Zilla::Plugin::IfBuilt",
@@ -297,19 +302,14 @@
                         "version" : "0.08"
                      },
                      {
-                        "class" : "Pod::Weaver::Section::Completion::GetoptLongMore",
-                        "name" : "@Author::PERLANCAR/Completion::GetoptLongMore",
-                        "version" : "0.001"
-                     },
-                     {
                         "class" : "Pod::Weaver::Section::Completion::GetoptLongSubcommand",
                         "name" : "@Author::PERLANCAR/Completion::GetoptLongSubcommand",
                         "version" : "0.04"
                      },
                      {
-                        "class" : "Pod::Weaver::Section::Completion::PerinciCmdLine",
-                        "name" : "@Author::PERLANCAR/Completion::PerinciCmdLine",
-                        "version" : "0.14"
+                        "class" : "Pod::Weaver::Section::Completion::GetoptLongMore",
+                        "name" : "@Author::PERLANCAR/Completion::GetoptLongMore",
+                        "version" : "0.001"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Homepage::DefaultCPAN",
@@ -339,7 +339,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Rinci",
                         "name" : "@Author::PERLANCAR/Rinci",
-                        "version" : "0.72"
+                        "version" : "0.76"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",
@@ -359,7 +359,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
                         "name" : "@Author::PERLANCAR/PERLANCAR::SortSections",
-                        "version" : "0.04"
+                        "version" : "0.06"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::Acme::CPANLists",
@@ -432,7 +432,7 @@
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple",
             "name" : "@Author::PERLANCAR/UploadToCPAN::WWWPAUSESimple",
-            "version" : "0.03"
+            "version" : "0.04"
          },
          {
             "class" : "Dist::Zilla::Plugin::EnsureSQLSchemaVersionedTest",
@@ -536,6 +536,6 @@
       }
    },
    "x_authority" : "cpan:PERLANCAR",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
 }
 

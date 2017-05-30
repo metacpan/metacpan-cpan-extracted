@@ -6,7 +6,7 @@ use strict;
 use warnings 'all';
 
 package BZ::Client::Classification;
-$BZ::Client::Classification::VERSION = '4.4001';
+$BZ::Client::Classification::VERSION = '4.4002';
 
 use parent qw( BZ::Client::API );
 
@@ -35,7 +35,7 @@ BZ::Client::Classification - Client side representation of Classifications in Bu
 
 =head1 VERSION
 
-version 4.4001
+version 4.4002
 
 =head1 SYNOPSIS
 

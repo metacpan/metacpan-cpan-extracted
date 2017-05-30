@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 18 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 19 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Acme/CPANLists/PERLANCAR.pm',
@@ -26,6 +26,7 @@ my @module_files = (
     'Acme/CPANLists/PERLANCAR/Task/PickingRandomLinesFromFile.pm',
     'Acme/CPANLists/PERLANCAR/Task/WorkingWithTree.pm',
     'Acme/CPANLists/PERLANCAR/Unbless.pm',
+    'Acme/CPANLists/PERLANCAR/UpsideDownTextWithUnicode.pm',
     'Acme/CPANLists/PERLANCAR/Weird.pm'
 );
 

@@ -59,13 +59,26 @@ our @EXPORT = ( @TestServerSubs,
 
 my $pid;
 my $quit = 0;
+my $win32_processobj;
 
 sub TestServer_setup {
 
-    try {
-        # start the server
-        $pid = TestServer->new($port)->background();
-    };
+    if ($^O eq 'MSWin32') {
+        require Win32::Process;
+        require Win32;
+        Win32::Process::Create($win32_processobj,
+            "$^X",
+            "$^X t/testserver.pl $port",
+            0,
+            32 + 134217728, #NORMAL_PRIORITY_CLASS + CREATE_NO_WINDOW
+            ".") || die $^E;
+        $pid = $win32_processobj->GetProcessID();
+    } else {
+        try {
+            # start the server
+            $pid = TestServer->new($port)->background();
+        };
+    }
     unless ($pid) { exit } # error or child fell through
     say "# started server on PID $pid";
 }

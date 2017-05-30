@@ -15,7 +15,7 @@ use Path::Tiny qw/path/;
 use POSIX qw(setlocale LC_TIME);
 use Scope::Guard qw/guard/;
 use Time::Piece qw/localtime/;
-use version; our $VERSION = version->declare("v0.1.0");
+use version; our $VERSION = version->declare("v0.2.0");
 
 use parent 'Exporter';
 
@@ -40,14 +40,15 @@ sub hub {
 
 # file utils
 sub replace {
-    my ($file, $code) = @_;
-    if (! -f -r $file) {
-        warnf "file: $file doesn't exists\n";
-        return
+    my ($glob, $code) = @_;
+    for my $file (glob $glob) {
+        my $content = $code->(path($file)->slurp_utf8, $file);
+        $content .= "\n" if $content !~ /\n\z/ms;
+
+        my $f = path($file);
+        # for keeping permission
+        $f->append_utf8({truncate => 1}, $content);
     }
-    my $content = $code->(path($file)->slurp_utf8, $file);
-    $content .= "\n" if $content !~ /\n\z/ms;
-    path($file)->spew_utf8($content);
 }
 
 ## version utils
@@ -120,12 +121,19 @@ sub update_versions {
     my $cur_ver_reg = quotemeta $current_version;
 
     # update rpm spec
-    replace sprintf('packaging/rpm/%s.spec', $package_name) => sub {
+    replace sprintf('packaging/rpm/%s*.spec', $package_name) => sub {
         my $content = shift;
         $content =~ s/^(Version:\s+)$cur_ver_reg/$1$next_version/ms;
         $content;
     };
     command qw/gobump set/, $next_version, '-w';
+}
+
+sub _detect_debian_revision {
+    my ($packagen_name, $content) = @_;
+    my $p = quotemeta $packagen_name;
+    my ($debian_revision) = $content =~ /^$p \([0-9]+(?:\.[0-9]+){2}-([^)]+)\) stable;/ms;
+    $debian_revision;
 }
 
 sub update_changelog {
@@ -142,10 +150,13 @@ sub update_changelog {
 
     my $now = localtime;
 
-    replace 'packaging/deb/debian/changelog' => sub {
+    replace 'packaging/deb*/debian/changelog' => sub {
         my $content = shift;
 
-        my $update = sprintf "%s (%s-1) stable; urgency=low\n\n", $package_name, $next_version;
+        my $debian_revision = _detect_debian_revision($package_name, $content);
+
+        my $update = sprintf "%s (%s-%s) stable; urgency=low\n\n",
+            $package_name, $next_version, $debian_revision;
         for my $rel (@releases) {
             $update .= sprintf "  * %s (by %s)\n    <%s>\n", $rel->{title}, $rel->{user}{login}, $rel->{html_url};
         }
@@ -153,7 +164,7 @@ sub update_changelog {
         $update . $content;
     };
 
-    replace sprintf('packaging/rpm/%s.spec', $package_name) => sub {
+    replace sprintf('packaging/rpm/%s*.spec', $package_name) => sub {
         my $content = shift;
 
         my $update = sprintf "* %s <%s> - %s\n", $now->strftime('%a %b %d %Y'), $email, $next_version;
@@ -172,6 +183,15 @@ sub update_changelog {
             $update .= sprintf "* %s #%d (%s)\n", $rel->{title}, $rel->{number}, $rel->{user}{login};
         }
         $content =~ s/\A# Changelog/# Changelog$update/;
+        $content;
+    };
+}
+
+sub update_makefile {
+    my $next_version = shift;
+    replace 'Makefile' => sub {
+        my $content = shift;
+        $content =~ s/^VERSION = .*?\n/VERSION = $next_version\n/ms;
         $content;
     };
 }
@@ -206,6 +226,7 @@ sub create_release_pull_request {
     infof "bump versions and update documents\n";
     update_versions $package_name, $current_version, $next_version;
     update_changelog $package_name, $next_version, @releases;
+    update_makefile $next_version;
     # main process
     $code->($current_version, $next_version, [@releases]) if $code;
     git qw/add ./;

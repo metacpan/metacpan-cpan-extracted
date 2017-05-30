@@ -6,7 +6,7 @@ use strict;
 use warnings 'all';
 
 package BZ::Client::Bug::Comment;
-$BZ::Client::Bug::Comment::VERSION = '4.4001';
+$BZ::Client::Bug::Comment::VERSION = '4.4002';
 use parent qw( BZ::Client::API );
 
 # See https://www.bugzilla.org/docs/tip/en/html/api/Bugzilla/WebService/Bug.html
@@ -145,7 +145,7 @@ BZ::Client::Bug::Comment - Client side representation of an Comment on a Bug in 
 
 =head1 VERSION
 
-version 4.4001
+version 4.4002
 
 =head1 SYNOPSIS
 

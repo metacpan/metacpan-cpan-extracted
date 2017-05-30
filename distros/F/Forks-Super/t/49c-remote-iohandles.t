@@ -17,9 +17,11 @@ SKIP: {
     require "t/remote.pl";
     my $sshd = get_test_sshd();
     if (!$sshd) {
-        skip "test ssh server not available", $ntests;
+        ok(1, "no ssh server available, skipping all test");
+        skip "test ssh server not available", $ntests-1;
     }
     my $cwd = Cwd::cwd();
+    ($cwd) = $cwd =~ /(.*)/;
 
     if (!Forks::Super::Config::CONFIG_module('Net::OpenSSH')) {
         skip "remote with socket requires Net::OpenSSH", $ntests;

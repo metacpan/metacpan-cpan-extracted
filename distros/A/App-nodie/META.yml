@@ -1,0 +1,29 @@
+---
+abstract: 'runs immortal processes'
+author:
+  - 'Orkun Karaduman <orkunkaraduman@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-nodie
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Lazy::Utils: '1.20'
+  Scalar::Util: '1.47'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/orkunkaraduman/App-nodie/issues
+  homepage: https://github.com/orkunkaraduman/App-nodie/tree/master
+  license: https://www.gnu.org/licenses/gpl-3.0.html
+  repository: git://git@github.com:orkunkaraduman/App-nodie.git
+version: '1.00'

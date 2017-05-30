@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015 Kevin Ryde
+# Copyright 2015, 2017 Kevin Ryde
 #
 # This file is part of Graph-Graph6.
 #
@@ -21,7 +21,8 @@
 # Create a random Graph.pm graph and print it to stdout in graph6 format.
 #
 # The "header" option is included for human readability, so you don't think
-# the output is line noise :-).  That header is not needed between programs.
+# the output is tty line noise :).  That header is not needed for reading
+# and writing between programs.
 
 use 5.006;
 use strict;

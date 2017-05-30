@@ -1,4 +1,4 @@
-# Copyright 2015, 2016 Kevin Ryde
+# Copyright 2015, 2016, 2017 Kevin Ryde
 #
 # This file is part of Graph-Graph6.
 #
@@ -23,16 +23,15 @@ use Graph::Writer;
 
 use vars '@ISA','$VERSION';
 @ISA = ('Graph::Writer');
-$VERSION = 6;
-
-# uncomment this to run the ### lines
-# use Smart::Comments;
+$VERSION = 7;
 
 
 sub _init  {
   my ($self,%param) = @_;
   $self->SUPER::_init();
-  %$self = (%param, %$self);
+  %$self = (format => 'graph6',
+            %$self,
+            %param);
 }
 
 # $graph is a Graph.pm object
@@ -46,19 +45,38 @@ sub _write_graph {
   my ($self, $graph, $fh) = @_;
 
   my @vertices = sort $graph->vertices;
-  my $has_edge_either = ($graph->is_directed
-                         ? \&_has_edge_either_directed
-                         : 'has_edge');
+  my @edge_options;
+  my $format = $self->{'format'};
+  if ($format eq 'sparse6') {
+    my @edges = $graph->edges;  # [ $from_name, $to_name ]
+    ### @edges
+
+    # as [$from,$to] numbers
+    my %vertex_to_num = map { $vertices[$_] => $_ } 0 .. $#vertices;
+    @edges = map { my $from = $vertex_to_num{$_->[0]};
+                   my $to   = $vertex_to_num{$_->[1]};
+                   [$from, $to]
+                 } @edges;
+    @edge_options = (edge_aref => \@edges);
+  } else {
+    my $has_edge_either = ($graph->is_directed && $format ne 'digraph6'
+                           ? \&_has_edge_either_directed
+
+                           # graph undirected, or directed and format digraph
+                           : 'has_edge');
+    @edge_options
+      = (edge_predicate => sub {
+           my ($from, $to) = @_;
+           return $graph->$has_edge_either($vertices[$from], $vertices[$to]);
+         });
+  }
 
   Graph::Graph6::write_graph
-      (format => 'graph6',
+      (format => $format,
        header => $self->{'header'},
        fh     => $fh,
        num_vertices => scalar(@vertices),
-       edge_predicate => sub {
-         my ($from, $to) = @_;
-         return $graph->$has_edge_either($vertices[$from], $vertices[$to]);
-       });
+       @edge_options);
   return 1;
 }
 
@@ -69,7 +87,7 @@ __END__
 
 =head1 NAME
 
-Graph::Writer::Graph6 - write Graph.pm in graph6 format
+Graph::Writer::Graph6 - write Graph.pm in graph6, sparse6 or digraph6 format
 
 =for test_synopsis my ($graph, $filehandle)
 
@@ -89,8 +107,8 @@ C<Graph::Writer::Graph6> is a subclass of C<Graph::Writer>.
 
 =head1 DESCRIPTION
 
-C<Graph::Writer::Graph6> writes a C<Graph.pm> graph to a file in graph6
-format.  This file format is per
+C<Graph::Writer::Graph6> writes a C<Graph.pm> graph to a file in graph6,
+sparse6 or digraph6 format.  These formats are per
 
 =over 4
 
@@ -98,17 +116,25 @@ L<http://cs.anu.edu.au/~bdm/data/formats.txt>
 
 =back
 
-The format represents an undirected graph with no self-loops or multi-edges.
+graph6 represents an undirected graph with no self-loops or multi-edges.
 Any self-loops in C<$graph> are ignored.  Multi-edges are written just once,
 and if C<$graph> is directed then an edge of either direction is written.
 
-The format has no vertex names and no attributes.  In the current
+sparse6 represents an undirected graph possibly with multi-edges and
+self-loops.  If C<$graph> is directed then an edge in either direction is
+written.  If there's edges both ways then a multi-edge is written.
+
+digraph6 represents a directed graph, possibly with self-loops but no
+multi-edges.  Any multi-edges in C<$graph> are written just once.  If
+C<$graph> is undirected then an edge in written in both directions (though
+usually graph6 or sparse6 would be preferred in that case).
+
+The formats have no vertex names and no attributes.  In the current
 implementation C<$graph-E<gt>vertices()> is sorted alphabetically (C<sort>)
 to give a consistent (though slightly arbitrary) vertex numbering.
 
 See L<Graph::Graph6> for further notes on the formats.  See
-F<examples/graph-random.pl> in the Graph-Graph6 sources for a complete
-sample program.
+F<examples/graph-random.pl> for a complete sample program.
 
 =head1 FUNCTIONS
 
@@ -116,11 +142,15 @@ sample program.
 
 =item C<$writer = Graph::Writer::Graph6-E<gt>new (key =E<gt> value, ...)>
 
-Create and return a new writer object.  The only key/value option is
+Create and return a new writer object.  The key/value options are
 
-    header   => boolean (default false)
+    format   => "graph6", "sparse6" or "digraph6",
+                  string, default "graph6"
+    header   => boolean, default false
 
-If C<header> is true then include a header C<E<gt>E<gt>graph6E<lt>E<lt>>.
+If C<header> is true then write a header C<E<gt>E<gt>graph6E<lt>E<lt>>,
+C<E<gt>E<gt>sparse6E<lt>E<lt>> or C<E<gt>E<gt>digraph6E<lt>E<lt>> as
+appropriate.
 
 =item C<$writer-E<gt>write_graph($graph, $filename_or_fh)>
 
@@ -131,19 +161,24 @@ one after the other.
 C<$graph> is either a C<Graph.pm> object or something sufficiently
 compatible.  There's no check on the actual class of C<$graph>.  (Don't
 mistakenly pass a C<Graph::Easy> here.  It's close enough that it runs, but
-doesn't give a consistent vertex order and may miss edges on undirected
+doesn't give a consistent vertex order and might miss edges on undirected
 graphs.)
 
 =back
 
 =head1 BUGS
 
-The current implementation uses C<Graph.pm> method C<has_edge()> and makes
-O(N^2) calls to it for a graph of N vertices.  The overhead of this means
-writing a graph of many vertices is a touch on the slow side.  For a graph
-of relatively few edges getting all C<edges()> at once would be faster, but
-in that case sparse6 would be both smaller and faster, provided that format
-was suitable for a given application.
+For graph6 and digraph6, the current implementation uses C<Graph.pm> method
+C<has_edge()> and makes O(N^2) calls to it for a graph of N vertices.  The
+overhead of this means writing a graph of many vertices is not particularly
+fast.  For a graph of relatively few edges getting all C<edges()> at once
+would be faster, but in that case writing sparse6 would be both smaller and
+faster, provided that format is suitable for a given application.
+
+C<Graph.pm> 0.96 had a bug on undirected multiedged graphs where its
+C<edges()> method sometimes did not return all the edges of the graph,
+causing sparse6 output to miss some edges.  This likely affects other things
+too so use version 0.97 for such a graph (or countedged undirected was ok).
 
 =head1 SEE ALSO
 
@@ -161,7 +196,7 @@ L<http://user42.tuxfamily.org/graph-graph6/index.html>
 
 =head1 LICENSE
 
-Copyright 2015, 2016 Kevin Ryde
+Copyright 2015, 2016, 2017 Kevin Ryde
 
 Graph-Graph6 is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

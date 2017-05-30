@@ -1,5 +1,5 @@
 package Moo::Google::AuthStorage::MongoDB;
-$Moo::Google::AuthStorage::MongoDB::VERSION = '0.01';
+$Moo::Google::AuthStorage::MongoDB::VERSION = '0.02';
 
 # ABSTRACT: Specific methods to fetch tokens from MongoDB data source (not written yet)
 
@@ -17,7 +17,7 @@ Moo::Google::AuthStorage::MongoDB - Specific methods to fetch tokens from MongoD
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 AUTHOR
 

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015 Kevin Ryde
+# Copyright 2015, 2017 Kevin Ryde
 #
 # This file is part of Graph-Graph6.
 #
@@ -20,7 +20,7 @@
 
 # Usage: perl graph-easy-print.pl filename.g6
 #
-# Read a file of graph6 or sparse6 graphs and print them using the
+# Read a file of graph6, sparse6 or digraph6 graphs and print them using the
 # Graph::Easy ascii box layout.
 #
 # For example a file of all 6-vertex trees can be found at the House of
@@ -28,6 +28,14 @@
 #
 #     https://hog.grinvin.org/Trees
 #     https://hog.grinvin.org/data/trees/trees06.g6
+#     ./graph-easy-print.pl trees06.g6
+#
+# The nauty tools genspecialg (which on Debian is program name
+# nauty-genspecialg) can make directed graphs.  For example 2,3 bipartite
+# then print with the program here
+#
+#     nauty-genspecialg -z -b2,3 >/tmp/foo.d6
+#     ./graph-easy-print.pl /tmp/foo.d6
 #
 
 use 5.006;

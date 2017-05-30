@@ -2,8 +2,8 @@
 # Author          : Johan Vromans
 # Created On      : Sat Mar 16 11:43:21 1996
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Jun 17 16:34:16 2016
-# Update Count    : 117
+# Last Modified On: Sat May 27 12:13:51 2017
+# Update Count    : 118
 # Status          : Unknown, Use with caution!
 
 use Config;
@@ -11,7 +11,7 @@ use ExtUtils::MakeMaker 5.0;
 
 use lib "./lib";
 use Getopt::Long;
-my $version = "2.49.1";
+my $version = "2.50";
 
 my $mm_version = $ExtUtils::MakeMaker::VERSION;
 if ($mm_version =~ /_/) {

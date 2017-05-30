@@ -1,0 +1,23 @@
+==================================================
+Changes from 2016-05-25 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.02 at 2017-05-25 23:19:06 +0000
+-----------------------------------------
+
+  Change: 6ce87e3b7076c140702ded052415ebe1c8064069
+  Author: Pavel Serikov <pavel.p.serikov@gmail.com>
+  Date : 2017-05-26 02:15:13 +0000
+
+    Perltidy 
+
+  Change: a519b675484954cf6cd63bd538ab18bd00d3bc46
+  Author: Pavel Serikov <pavel.p.serikov@gmail.com>
+  Date : 2017-05-26 02:08:34 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2007, 2008, 2009, 2010 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011 Kevin Ryde
 
 # This file is part of Gtk2-Ex-NumAxis.
 #
@@ -75,6 +75,6 @@ Scalar::Util::weaken ($axis);
 Scalar::Util::weaken ($adj);
 # is ($builder,  undef, 'builder weakened');
 is ($axis, undef, 'axis from builder weakened');
-is ($adj,  undef, 'adjustement from builder weakened');
+is ($adj,  undef, 'adjustment from builder weakened');
 
 exit 0;

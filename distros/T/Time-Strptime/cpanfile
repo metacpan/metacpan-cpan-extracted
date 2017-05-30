@@ -1,7 +1,6 @@
 requires 'DateTime::Locale';
 requires 'DateTime::TimeZone';
 requires 'Encode';
-requires 'Encode::Locale';
 requires 'List::MoreUtils';
 requires 'Scalar::Util';
 requires 'Time::Local';

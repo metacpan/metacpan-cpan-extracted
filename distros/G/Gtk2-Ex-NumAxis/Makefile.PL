@@ -1,6 +1,6 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 
-# Copyright 2010, 2011 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2014, 2015, 2017 Kevin Ryde
 
 # This file is part of Gtk2-Ex-NumAxis.
 #
@@ -21,15 +21,13 @@ use 5.008;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
-use lib 'inc';
-use MyMakeMakerExtras;
 
-MyMakeMakerExtras::WriteMakefile
-  (NAME         => 'Gtk2-Ex-NumAxis',
+WriteMakefile
+  (NAME         => 'Gtk2::Ex::NumAxis',
    ABSTRACT     => 'Widget drawing a numbered axis.',
    VERSION_FROM => 'lib/Gtk2/Ex/NumAxis.pm',
-   AUTHOR       => 'Kevin Ryde <user42@zip.com.au>',
-   LICENSE      => 'gpl',
+   AUTHOR       => 'Kevin Ryde <user42_kevin@yahoo.com.au>',
+   LICENSE      => 'gpl_3',
    SIGN         => 1,
    MIN_PERL_VERSION => '5.008',
 
@@ -49,21 +47,50 @@ MyMakeMakerExtras::WriteMakefile
                     'Math::Round' => 0,
                    },
 
+
    META_MERGE =>
-   { resources =>
-     { homepage => 'http://user42.tuxfamily.org/gtk2-ex-numaxis/index.html' },
+   { 'meta-spec' => { version => 2 },
+     no_index    => { directory=>['devel','xt'] },
+     resources =>
+     { homepage => 'http://user42.tuxfamily.org/gtk2-ex-numaxis/index.html',
+       license  => 'http://www.gnu.org/licenses/gpl.html',
+     },
+     prereqs =>
+     { runtime =>
+       { suggests =>
+         {
+          # Locale::Messages gets a translated "nick" for the "inverted"
+          # property the same as 'GtkScrollbar'.  Should have no effect on
+          # normal operation as such.
+          'Locale::Messages' => '0.07',
+         },
+         recommends =>
+         {
+          # Math::Round 0.07 has fix for POSIX.pm exporting a round()
+          'Math::Round' => '0.07',
+         },
+       },
+       test =>
+       { suggests =>
+         { 'Test::Weaken'       => 3,
+           'Test::Weaken::Gtk2' => 0,
+         },
+         # Module::Mask::Deps 0.07 didn't like an absent requires, but empty ok
+         requires =>
+         {
+         },
+       },
+     },
+
      optional_features =>
-     {
-      maximum_interoperation =>
-      { description => 'Have maximum inter-operation with other modules (optional other stuff).',
-        requires => { 'Locale::Messages' => 0 },
-      },
-      maximum_tests =>
-      { description => 'Have "make test" do as much as possible.',
-        requires => { 'Test::Weaken' => 3,
-                      'Test::Weaken::Gtk2' => 0,
-                    },
-      },
+     { maximum_interoperation =>
+       { description => 'Have maximum inter-operation with other modules (optional other stuff).',
+         prereqs =>
+         { runtime =>
+           { requires => { 'Locale::Messages' => 0 },
+           }
+         }
+       },
      },
    },
   );

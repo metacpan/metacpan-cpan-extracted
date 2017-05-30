@@ -11,7 +11,9 @@ WriteMakefile(
     LICENSE             => 'artistic2',
     MIN_PERL_VERSION    => 5.010,
     PREREQ_PM => {
-        'Test::More' => 0,
+        'Test::More'             => 0,
+        'Lingua::EN::Nums2Words' => 1.16,
+        'Lingua::EN::Words2Nums' => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Lingua-EN-Inflexion-*' },

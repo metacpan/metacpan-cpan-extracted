@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Lingua-ZH-Jieba",
    "prereqs" : {
@@ -43,6 +43,7 @@
       "test" : {
          "requires" : {
             "Data::Dumper" : "0",
+            "List::Util" : "0",
             "Path::Tiny" : "0",
             "Test::Deep" : "0",
             "Test::More" : "0"
@@ -52,31 +53,39 @@
    "provides" : {
       "Lingua::ZH::Jieba" : {
          "file" : "lib/Lingua/ZH/Jieba.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Lingua::ZH::Jieba::Jieba" : {
          "file" : "lib/Lingua/ZH/Jieba.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Lingua::ZH::Jieba::KeywordExtractor" : {
          "file" : "lib/Lingua/ZH/Jieba.pm",
-         "version" : "0.003"
+         "version" : "0.004"
+      },
+      "Lingua::ZH::Jieba::Word" : {
+         "file" : "lib/Lingua/ZH/Jieba.pm",
+         "version" : "0.004"
       },
       "Lingua::ZH::Jieba::vector_keyword" : {
          "file" : "lib/Lingua/ZH/Jieba.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Lingua::ZH::Jieba::vector_s" : {
          "file" : "lib/Lingua/ZH/Jieba.pm",
-         "version" : "0.003"
+         "version" : "0.004"
+      },
+      "Lingua::ZH::Jieba::vector_word" : {
+         "file" : "lib/Lingua/ZH/Jieba.pm",
+         "version" : "0.004"
       },
       "Lingua::ZH::Jieba::vector_wordpos" : {
          "file" : "lib/Lingua/ZH/Jieba.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Lingua::ZH::Jiebac" : {
          "file" : "lib/Lingua/ZH/Jieba.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -85,7 +94,7 @@
          "url" : "https://github.com/stphnlyd/perl5-jieba.git"
       }
    },
-   "version" : "0.003",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.004",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

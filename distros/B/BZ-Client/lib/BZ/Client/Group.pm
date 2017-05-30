@@ -6,7 +6,7 @@ use strict;
 use warnings 'all';
 
 package BZ::Client::Group;
-$BZ::Client::Group::VERSION = '4.4001';
+$BZ::Client::Group::VERSION = '4.4002';
 
 use parent qw( BZ::Client::API );
 
@@ -44,7 +44,7 @@ BZ::Client::Group - The API for creating, changing, and getting info on Groups
 
 =head1 VERSION
 
-version 4.4001
+version 4.4002
 
 =head1 SYNOPSIS
 

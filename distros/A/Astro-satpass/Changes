@@ -1,3 +1,14 @@
+0.081		2017-05-26	T. R. Wyant
+    Update canned magnitude table.
+
+    Deprecate McCants' status. His web page notes itself as no longer
+    maintained.
+
+    Document impending changes in Iridium support.
+
+    Kelso reports Iridiums 43 & 82 tumbling. Canned status changed in
+    Astro::Coord::ECI::TLE to reflect this.
+
 0.079		2017-04-26	T. R. Wyant
     Move satpass script from bin/ to script/
 

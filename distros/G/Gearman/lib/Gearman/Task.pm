@@ -1,6 +1,6 @@
 package Gearman::Task;
 use version;
-$Gearman::Task::VERSION = version->declare("2.004.005");
+$Gearman::Task::VERSION = version->declare("2.004.007");
 
 use strict;
 use warnings;
@@ -328,7 +328,7 @@ sub hash {
     }
 } ## end sub hash
 
-=head2 pack_submit_packet($client)
+=head2 pack_submit_packet([$client])
 
 B<return> Gearman::Util::pack_req_command(mode, func, uniq, argref)
 
@@ -336,9 +336,10 @@ B<return> Gearman::Util::pack_req_command(mode, func, uniq, argref)
 
 sub pack_submit_packet {
     my ($self, $client) = @_;
+
     # $client should be optional for sake of Gearman::Client::Async
     # see https://github.com/p-alik/perl-Gearman/issues/10
-    my $func = $client ? $client->func($self->{func}) : $self->{func};
+    my $func = $client ? $client->func($self->func) : $self->func;
 
     return Gearman::Util::pack_req_command(
         $self->mode,

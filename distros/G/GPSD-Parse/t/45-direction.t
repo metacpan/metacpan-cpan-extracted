@@ -11,7 +11,7 @@ my $m = 'GPSD::Parse';
     is $m->direction(349), 'N', "349 is N ok";
     is $m->direction(11),  'N', "11 is N ok";
 
-    is $m->direction(12),  'NNE', "349 is NNE ok";
+    is $m->direction(12),  'NNE', "12 is NNE ok";
     is $m->direction(33),  'NNE', "33 is NNE ok";
 
     is $m->direction(34),  'NE', "34 is NE ok";

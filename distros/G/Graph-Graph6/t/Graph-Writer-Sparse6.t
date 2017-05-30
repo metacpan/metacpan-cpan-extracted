@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015 Kevin Ryde
+# Copyright 2015, 2016 Kevin Ryde
 #
 # This file is part of Graph-Graph6.
 #
@@ -66,7 +66,7 @@ my $filename = 'Graph-Writer-Sparse6-t.tmp';
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 6;
+  my $want_version = 7;
   ok ($Graph::Writer::Sparse6::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Writer::Sparse6->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Writer::Sparse6->VERSION($want_version); 1 }, 1,

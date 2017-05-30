@@ -1,5 +1,5 @@
 {
-   "abstract" : "HTML to PDF convertor",
+   "abstract" : "non-blocking HTML to PDF converter",
    "author" : [
       "zdm <zdm@softvisio.net>"
    ],
@@ -48,6 +48,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore-pdf/overview"
       }
    },
-   "version" : "v0.2.1",
+   "version" : "v0.3.7",
    "x_serialization_backend" : "JSON::PP version 2.93"
 }

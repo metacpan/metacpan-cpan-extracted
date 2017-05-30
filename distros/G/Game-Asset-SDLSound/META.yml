@@ -16,10 +16,10 @@ name: Game-Asset-SDLSound
 provides:
   Game::Asset::SDLSound:
     file: lib/Game/Asset/SDLSound.pm
-    version: '0.1'
+    version: '0.2'
   Game::Asset::SDLSound::Manager:
     file: lib/Game/Asset/SDLSound/Manager.pm
-    version: '0.1'
+    version: '0.2'
 requires:
   Game::Asset: '0.1'
   Moose: '2.1806'
@@ -29,4 +29,4 @@ requires:
 resources:
   homepage: http://www.wumpus-cave.net
   repository: https://github.com/frezik/Game-Asset-SDLSound
-version: '0.1'
+version: '0.2'

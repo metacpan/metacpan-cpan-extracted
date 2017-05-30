@@ -121,7 +121,7 @@ Forks::Super::Util::pause(6);
 
 ok($d1 && $d2, "daemon procs launched") or diag("d1=$d1, d2=$d2");
 ok($d1->{start} > $t + 2, "daemon1 launch was delayed");
-ok($d2->{start} >= ($n1->{end}||0),                            ### 10 ###
+ok($d2->{start} >= ($n1->{end} || 0),                          ### 10 ###
    "daemon2 launch waited for daemon1")
     or diag("expected d2 start $d2->{start} >= $n1->{end} d1 monitor end");
 

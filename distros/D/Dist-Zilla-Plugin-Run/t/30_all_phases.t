@@ -4,6 +4,9 @@ use Test::More 0.88;
 use Test::DZil;
 use Path::Tiny;
 
+use lib 't/lib';
+use TestHelper;
+
 # protect from external environment
 local $ENV{TRIAL};
 local $ENV{RELEASE_STATUS};
@@ -47,9 +50,9 @@ SCRIPT
     my %f = (
         a => 'DZT-Sample-0.001.tar.gz',
         n => 'DZT-Sample',
-        d => path($tzil->tempdir)->child('build')->canonpath, # use OS-specific path separators
+        d => path($tzil->tempdir)->child('build'),
         v => '0.001',
-        x => Dist::Zilla::Plugin::Run::Role::Runner->current_perl_path,
+        x => do { my $path = Dist::Zilla::Plugin::Run::Role::Runner->current_perl_path; $path =~ s{\\}{/}g; $path },
     );
 
     # test constant conversions as well as positional %s for backward compatibility
@@ -62,7 +65,7 @@ release $f{a} $f{n} $f{v} $f{d}/a $f{d}/b $f{a} x:$f{x}
 after_release $f{d} $f{v} $f{a} $f{v} $f{n} $f{a} x:$f{x}
 OUTPUT
 
-    is(
+    is_path(
         path($tzil->tempdir)->child(qw(source phases.txt))->slurp_raw,
         $expected,
         'got expected output for all five phases',

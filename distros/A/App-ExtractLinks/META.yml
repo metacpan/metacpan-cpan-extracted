@@ -1,0 +1,23 @@
+---
+abstract: "extract href's in HTML docs to stdout"
+author:
+  - 'Rory Bradford <rory@dysfunctionalprogramming.com>'
+build_requires:
+  Test::Cmd: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-ExtractLinks
+requires:
+  HTML::Parser: '0'
+  lib: '0'
+  strict: '0'
+  warnings: '0'
+version: 0.0.2
+x_serialization_backend: 'YAML::Tiny version 1.69'

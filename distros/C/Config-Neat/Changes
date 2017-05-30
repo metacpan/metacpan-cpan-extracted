@@ -1,5 +1,9 @@
 Revision history for Config-Neat
 
+1.302   May 25, 2017
+        - Fix rendering of '0'
+        - Properly render empty default values as ``
+
 1.301   March 2, 2017
         - Fix test data initialization code and update test data itself
           to reflect changes introduced in 1.3

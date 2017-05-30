@@ -1,11 +1,12 @@
 package WebService::KoreanSpeller;
 
-our $VERSION = '0.012';
+our $VERSION = '0.014';
 $VERSION = eval $VERSION;
 
 use Moose;
 use Moose::Util::TypeConstraints;
 use namespace::autoclean;
+use HTTP::Request::Common qw/POST/;
 use LWP::UserAgent;
 use utf8;
 use Encode qw/encode decode/;
@@ -19,17 +20,17 @@ has 'text' => ( is => 'ro', isa => 'UTF8FlagOnString', required => 1 );
 sub spellcheck {
     my ($self) = @_;
     my $ua = LWP::UserAgent->new;
-    my $req = HTTP::Request->new(POST => 'http://164.125.36.75/PnuSpellerISAPI_201107/lib/PnuSpellerISAPI_201107.dll?Check');
-    $req->content_type('application/x-www-form-urlencoded');
     my $text = $self->text;
-    $req->content('text1='. encode('utf8', $text));
+    my $text1 = encode('utf8', $text);
+    my $req = POST 'http://speller.cs.pusan.ac.kr/PnuWebSpeller/lib/check.asp', [ text1 => $text1 ];
     my $res = $ua->request($req);
+
     die unless $res->is_success;
     my $content = decode('utf8', $res->as_string);
-    #print $content; exit;
+    #print "$content"; exit;
 
     my @items;
-    my @tables = $content =~ m{<table border='1'.*?>(.*?)</table>}sg;
+    my @tables = $content =~ m{<table id='tableErr_\d+'.*?>(.*?)</TABLE>}sg;
     return @items unless @tables; # No error
     foreach my $table (@tables) {
         my %item;
@@ -39,9 +40,10 @@ sub spellcheck {
                         $_ =~s/<.*?br\/>/\n/g;
                         $_ =~s/^\s+//s;
                         $_ =~s/\s+$//s;
+                        $_ =~s/&nbsp;/ /gs;
                         $_
-                    } $table =~ m{<td.*?>(.*?)</td>}sg
-             )[1,3,5];
+                    } $table =~ m{<TD id='td(?:ErrorWord|ReplaceWord|Help)_\d+'.*?>(.*?)</TD>}sg
+             )[0,1,2];
         $text =~ m/\Q$item{incorrect}\E/g;
         $item{position} = pos($text) - length($item{incorrect});
         push @items, \%item;
@@ -109,7 +111,7 @@ Returns results as array of hashes(if there is no error in the text, this method
 
 =head1 CAUTION
 
-I'm afraid we don't have a good open source korean spell checker. but there is a decent proprietary service that runs on the online website( 온라인 한국어 맞춤법/문법 검사기 - http://speller.cs.pusan.ac.kr ). So I made this module with web-scrapping approach, this is easy to mess up if they change layout of the website. Let me know if this does not work. *This module follows the same terms of the original service agreement.*
+I'm afraid we don't have a good open source korean spell checker. but there is a decent proprietary service that runs on the online website( 온라인 한국어 맞춤법/문법 검사기 - http://speller.cs.pusan.ac.kr ). So I made this module with web-scrapping approach, this is easy to mess up if they change layout of the website and has same limitation(checking only 300 synatic words at once). Let me know if this does not work. *This module follows the same terms of the original service agreement.*
 
 =head1 AUTHOR
 
@@ -117,7 +119,7 @@ C.H. Kang <chahkang@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by C.H. Kang.
+This software is copyright (c) 2017 by C.H. Kang.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

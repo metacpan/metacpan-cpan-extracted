@@ -3,7 +3,7 @@ BZ::Client
 
 A Perl client for the Bugzilla web services API.
 
-This software is copyright (c) 2016 by Dean Hamstad.
+This software is copyright (c) 2017 by Dean Hamstad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

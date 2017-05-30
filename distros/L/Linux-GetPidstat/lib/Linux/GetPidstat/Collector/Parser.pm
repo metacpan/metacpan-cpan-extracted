@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Exporter qw(import);
-use List::Util qw(sum);
+use List::Util qw(sum reduce);
 
 our @EXPORT = qw(parse_pidstat_output);
 
@@ -14,8 +14,9 @@ sub parse ($) {
     my $ret;
 
     my $mapping = _get_metric_rule_mapping();
-    while (my ($name, $rule) = each %$mapping) {
-        my $metric = _get_metric_mean($rule, $lines);
+    my $pid_rule = delete $mapping->{pid};
+    while (my ($name, $metric_rule) = each %$mapping) {
+        my $metric = _get_metric_mean($metric_rule, $pid_rule, $lines);
         unless (defined $metric) {
             warn (sprintf "Empty metric: name=%s, lines=%s\n",
                 $name, join ',', @$lines);
@@ -33,6 +34,9 @@ sub _get_metric_rule_mapping() {
     my $convert_from_kilobytes = sub { my $raw = shift; return $raw * 1000 };
 
     return {
+        pid => {
+            column_num   => 2,
+        },
         cpu => {
             column_num   => 6,
         },
@@ -69,22 +73,27 @@ sub _get_metric_rule_mapping() {
 }
 
 sub _get_metric_mean($$) {
-    my ($rule, $lines) = @_;
+    my ($metric_rule, $pid_rule, $lines) = @_;
 
-    my @metrics;
-
+    my %metrics;
     for (@$lines) {
-        my $metric = (split " ")[$rule->{column_num}];
-        next unless defined $metric && $metric =~ /^[-+]?[0-9.]+$/;
+        my @fields = split " ";
 
-        if (my $cf = $rule->{convert_func}) {
+        my $pid = $fields[$pid_rule->{column_num}];
+        next unless defined $pid && $pid =~ /^\d+$/;
+
+        my $metric = $fields[$metric_rule->{column_num}];
+        next unless defined $metric && $metric =~ /^[-+]?[0-9.]+$/;
+        if (my $cf = $metric_rule->{convert_func}) {
             $metric = $cf->($metric);
         }
-        push @metrics, $metric;
+
+        $metrics{$pid} = [] unless exists $metrics{$pid};
+        push @{ $metrics{$pid} }, $metric;
     }
 
-    return unless @metrics;
-    return _mean(@metrics);
+    return unless %metrics;
+    return reduce { $a + _mean(@$b) } (0, values %metrics);
 }
 
 sub _mean(@) {

@@ -1,5 +1,5 @@
 # -*-CPerl-*-
-# Last changed Time-stamp: <2017-03-09 16:16:41 michl>
+# Last changed Time-stamp: <2017-05-28 17:05:11 mtw>
 
 # Bio::RNA::RNAaliSplit::WrapAnalyseDists.pm: Wrapper for computing
 # split decompositions
@@ -9,17 +9,16 @@
 
 package Bio::RNA::RNAaliSplit::WrapAnalyseDists;
 
-use version; our $VERSION = qv('0.04');
+use version; our $VERSION = qv('0.05');
 use Carp;
 use Data::Dumper;
 use Moose;
-use Moose::Util::TypeConstraints;
-use Path::Class::File;
-use Path::Class::Dir;
-use Path::Class;
 use IPC::Cmd qw(can_run run);
 use Array::Set qw(set_diff);
 use Digest::MD5 qw(md5_base64);
+use Path::Class;
+use File::Path qw(make_path);
+#use diagnostics;
 
 my ($analysedists,$oodir);
 my %sets = ();
@@ -56,7 +55,8 @@ has 'dim' => (
 	      predicate => 'has_dim',
 	     );
 
-with 'Bio::RNA::RNAaliSplit::FileDir';
+with 'FileDirUtil';
+with 'Bio::RNA::RNAaliSplit::Roles';
 
 sub BUILD {
   my $self = shift;
@@ -66,12 +66,13 @@ sub BUILD {
    $analysedists = can_run('AnalyseDists') or
     croak "ERROR [$this_function] AnalyseDists not found";
   unless($self->has_odir){
-    unless($self->has_odirn){self->odirname("as")}
-    $self->odir( [$self->ifile->dir,$self->odirn] );
-    mkdir($self->odir);
+    unless($self->has_dirnam){self->dirnam("as")}
+    $self->odir( [$self->ifile->dir,$self->dirnam] );
   }
   $oodir = $self->odir->subdir("analysedists");
-  mkdir($oodir);
+  my @created = make_path($oodir, {error => \my $err});
+  confess "ERROR [$this_function] could not create output directory $self->oodir"
+      if (@$err);
   $self->dim( $self->_get_dim() );
 
   # do computation

@@ -1,9 +1,17 @@
 use warnings;
 use strict;
 use English;
-use Test::More tests => 6;
+use Test::More;
 
 #########################
+
+if ( system("which scanimage > /dev/null 2> /dev/null") == 0 ) {
+    plan tests => 6;
+}
+else {
+    plan skip_all => 'scanimage not installed';
+    exit;
+}
 
 my $scanimage_perl =
     'PERL5LIB="blib:blib/arch:lib:\$PERL5LIB" '

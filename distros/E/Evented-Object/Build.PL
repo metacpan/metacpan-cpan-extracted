@@ -12,12 +12,14 @@ my $class = Module::Build->subclass(
             if (eval { require Pod::Markdown; 1 }) {
 
                 $self->log_info("Creating README.md using Pod::Markdown\n");
-                open my $fh, '>', 'README.md' or return $self->SUPER::ACTION_distmeta(@_);
+                open my $fh, '>', 'README.md'
+                    or return $self->SUPER::ACTION_distmeta(@_);
 
                 my $p = Pod::Markdown->new;
                 my $markdown;
                 $p->output_string(\$markdown);
-                $p->parse_file('lib/Evented/Object.pm') or return $self->SUPER::ACTION_distmeta(@_);
+                $p->parse_file('lib/Evented/Object.pm')
+                    or return $self->SUPER::ACTION_distmeta(@_);
 
                 my (@lines, $in_block);
                 foreach my $line (split "\n", $markdown) {
@@ -30,7 +32,7 @@ my $class = Module::Build->subclass(
                             next;
                         }
 
-                        push @lines, '````perl', $code;
+                        push @lines, '```perl', $code;
                         $in_block = 1;
                         next;
                     }

@@ -28,7 +28,7 @@ use IO::Socket;
 use IO::Handle;
 
 our @ISA = qw(IO::Socket IO::Handle);
-our $VERSION = '0.89';
+our $VERSION = '0.90';
 
 # XXX Windows hack. To get smoothly running sockets on Windows it
 #     seems we have to do a slight pause after each write op.

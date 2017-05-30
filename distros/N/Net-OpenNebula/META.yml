@@ -24,5 +24,5 @@ requires:
   strict: '0'
   version: '0'
   warnings: '0'
-version: 0.310.0
+version: 0.311.0
 x_serialization_backend: 'YAML::Tiny version 1.69'

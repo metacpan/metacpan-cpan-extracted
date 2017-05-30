@@ -44,7 +44,7 @@ require Graph::Easy::As_sparse6;
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 6;
+  my $want_version = 7;
   ok ($Graph::Easy::As_sparse6::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Easy::As_sparse6->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Easy::As_sparse6->VERSION($want_version); 1 }, 1,

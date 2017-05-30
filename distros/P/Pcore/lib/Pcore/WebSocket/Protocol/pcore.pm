@@ -6,21 +6,23 @@ use CBOR::XS qw[];
 use Pcore::Util::UUID qw[uuid_str];
 use Pcore::WebSocket::Protocol::pcore::Request;
 use Pcore::Util::Text qw[trim];
-use Pcore::Util::Scalar qw[blessed];
+use Pcore::Util::Scalar qw[blessed weaken];
 
 has protocol => ( is => 'ro', isa => Str, default => 'pcore', init_arg => undef );
 
-has on_rpc_call => ( is => 'ro', isa => CodeRef );    # ($h, $req, $method, $data)
+has on_rpc          => ( is => 'ro', isa => Maybe [CodeRef] );    # ($ws, $req, $tx)
+has on_listen_event => ( is => 'ro', isa => Maybe [CodeRef] );    # ($ws, $ev), should return true if operation is allowed
+has on_fire_event   => ( is => 'ro', isa => Maybe [CodeRef] );    # ($ws, $ev), should return true if operation is allowed
 
 has _listeners => ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg => undef );
 has _callbacks => ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg => undef );
 
 with qw[Pcore::WebSocket::Handle];
 
-const our $TRANS_TYPE_LISTEN    => 'listen';
-const our $TRANS_TYPE_EVENT     => 'event';
-const our $TRANS_TYPE_RPC       => 'rpc';
-const our $TRANS_TYPE_EXCEPTION => 'exception';
+const our $TX_TYPE_LISTEN    => 'listen';
+const our $TX_TYPE_EVENT     => 'event';
+const our $TX_TYPE_RPC       => 'rpc';
+const our $TX_TYPE_EXCEPTION => 'exception';
 
 my $CBOR = do {
     my $cbor = CBOR::XS->new;
@@ -76,7 +78,7 @@ my $JSON = do {
 
 sub rpc_call ( $self, $method, @ ) {
     my $msg = {
-        type   => $TRANS_TYPE_RPC,
+        type   => $TX_TYPE_RPC,
         method => $method,
     };
 
@@ -105,7 +107,7 @@ sub forward_events ( $self, $events ) {
 
 sub listen_events ( $self, $events ) {
     my $msg = {
-        type   => $TRANS_TYPE_LISTEN,
+        type   => $TX_TYPE_LISTEN,
         events => $events,
     };
 
@@ -116,7 +118,7 @@ sub listen_events ( $self, $events ) {
 
 sub fire_remote_event ( $self, $event, $data = undef ) {
     my $msg = {
-        type  => $TRANS_TYPE_EVENT,
+        type  => $TX_TYPE_EVENT,
         event => $event,
         data  => $data,
     };
@@ -139,6 +141,10 @@ sub before_connect_server ( $self, $env, $args ) {
 
     my $headers;
 
+    if ( $args->{headers} ) {
+        push $headers->@*, $args->{headers}->@*;
+    }
+
     if ( $args->{listen_events} ) {
         my $events = ref $args->{listen_events} eq 'ARRAY' ? $args->{listen_events} : [ $args->{listen_events} ];
 
@@ -155,10 +161,18 @@ sub before_connect_client ( $self, $args ) {
 
     my $headers;
 
+    if ( $args->{headers} ) {
+        push $headers->@*, $args->{headers}->@*;
+    }
+
     if ( $args->{listen_events} ) {
         my $events = ref $args->{listen_events} eq 'ARRAY' ? $args->{listen_events} : [ $args->{listen_events} ];
 
         push $headers->@*, 'Pcore-Listen-Events:' . join ',', $events->@*;
+    }
+
+    if ( $args->{token} ) {
+        push $headers->@*, "Authorization:Token $args->{token}";
     }
 
     return $headers;
@@ -217,20 +231,21 @@ sub on_binary ( $self, $data_ref ) {
     return;
 }
 
-sub on_pong ( $self, $data_ref ) {
-    return;
-}
-
 sub _set_listeners ( $self, $events ) {
     $events = [$events] if ref $events ne 'ARRAY';
+
+    weaken $self;
 
     for my $event ( $events->@* ) {
         next if exists $self->{_listeners}->{$event};
 
+        # do not set event listener, if not authorized
+        next if $self->{on_listen_event} && !$self->{on_listen_event}->( $self, $event );
+
         $self->{_listeners}->{$event} = P->listen_events(
             $event,
             sub ( $event, $data ) {
-                $self->fire_remote_event( $event, $data );
+                $self->fire_remote_event( $event, $data ) if $self;
 
                 return;
             }
@@ -243,65 +258,95 @@ sub _set_listeners ( $self, $events ) {
 sub _on_message ( $self, $msg, $is_json ) {
     $msg = [$msg] if ref $msg ne 'ARRAY';
 
-    for my $trans ( $msg->@* ) {
-        next if !$trans->{type};
+    for my $tx ( $msg->@* ) {
+        next if !$tx->{type};
 
-        if ( $trans->{type} eq $TRANS_TYPE_LISTEN ) {
-            $self->_set_listeners( $trans->{events} );
-
-            next;
-        }
-
-        if ( $trans->{type} eq $TRANS_TYPE_EVENT ) {
-            P->fire_event( $trans->{event}, $trans->{data} );
+        # forward local events to remote peer
+        if ( $tx->{type} eq $TX_TYPE_LISTEN ) {
+            $self->_set_listeners( $tx->{events} );
 
             next;
         }
 
-        if ( $trans->{type} eq $TRANS_TYPE_EXCEPTION ) {
-            if ( $trans->{tid} ) {
-                if ( my $cb = delete $self->{_callbacks}->{ $trans->{tid} } ) {
+        # fire local event from remote call
+        if ( $tx->{type} eq $TX_TYPE_EVENT ) {
+
+            # ignore event, if not authorized
+            next if $self->{on_fire_event} && !$self->{on_fire_event}->( $self, $tx->{event} );
+
+            P->fire_event( $tx->{event}, $tx->{data} );
+
+            next;
+        }
+
+        # exception
+        if ( $tx->{type} eq $TX_TYPE_EXCEPTION ) {
+            if ( $tx->{tid} ) {
+                if ( my $cb = delete $self->{_callbacks}->{ $tx->{tid} } ) {
 
                     # convert result to response object
-                    $cb->( bless $trans->{message}, 'Pcore::Util::Result' );
+                    $cb->( bless $tx->{message}, 'Pcore::Util::Result' );
                 }
             }
 
             next;
         }
 
-        if ( $trans->{type} eq $TRANS_TYPE_RPC ) {
+        # RPC
+        if ( $tx->{type} eq $TX_TYPE_RPC ) {
 
             # method is specified, this is rpc call
-            if ( $trans->{method} ) {
-                if ( $self->{on_rpc_call} ) {
+            if ( $tx->{method} ) {
+                if ( !$self->{on_rpc} ) {
+                    if ( $tx->{tid} ) {
+                        my $result = {
+                            type    => $TX_TYPE_EXCEPTION,
+                            tid     => $tx->{tid},
+                            message => result [ 500, 'RPC is not supported' ],
+                        };
+
+                        if ($is_json) {
+                            $self->send_text( \$JSON->encode($result) );
+                        }
+                        else {
+                            $self->send_binary( \$CBOR->encode($result) );
+                        }
+                    }
+                }
+                else {
                     my $req = bless {}, 'Pcore::WebSocket::Protocol::pcore::Request';
 
                     # callback is required
-                    if ( $trans->{tid} ) {
+                    if ( $tx->{tid} ) {
+                        my $weak_self = $self;
+
+                        weaken $weak_self;
+
                         $req->{_cb} = sub ($res) {
+                            return if !$weak_self;
+
                             my $result;
 
                             if ( $res->is_success ) {
                                 $result = {
-                                    type   => $TRANS_TYPE_RPC,
-                                    tid    => $trans->{tid},
+                                    type   => $TX_TYPE_RPC,
+                                    tid    => $tx->{tid},
                                     result => $res,
                                 };
                             }
                             else {
                                 $result = {
-                                    type    => $TRANS_TYPE_EXCEPTION,
-                                    tid     => $trans->{tid},
+                                    type    => $TX_TYPE_EXCEPTION,
+                                    tid     => $tx->{tid},
                                     message => $res,
                                 };
                             }
 
                             if ($is_json) {
-                                $self->send_text( \$JSON->encode($result) );
+                                $weak_self->send_text( \$JSON->encode($result) );
                             }
                             else {
-                                $self->send_binary( \$CBOR->encode($result) );
+                                $weak_self->send_binary( \$CBOR->encode($result) );
                             }
 
                             return;
@@ -309,20 +354,20 @@ sub _on_message ( $self, $msg, $is_json ) {
                     }
 
                     # combine method with action
-                    if ( my $action = delete $trans->{action} ) {
-                        $trans->{method} = q[/] . ( $action =~ s[[.]][/]smgr ) . "/$trans->{method}";
+                    if ( my $action = delete $tx->{action} ) {
+                        $tx->{method} = q[/] . ( $action =~ s[[.]][/]smgr ) . "/$tx->{method}";
                     }
 
-                    $self->{on_rpc_call}->( $self, $req, $trans );
+                    $self->{on_rpc}->( $self, $req, $tx );
                 }
             }
 
             # method is not specified, this is callback, tid is required
-            elsif ( $trans->{tid} ) {
-                if ( my $cb = delete $self->{_callbacks}->{ $trans->{tid} } ) {
+            elsif ( $tx->{tid} ) {
+                if ( my $cb = delete $self->{_callbacks}->{ $tx->{tid} } ) {
 
                     # convert result to response object
-                    $cb->( bless $trans->{result}, 'Pcore::Util::Result' );
+                    $cb->( bless $tx->{result}, 'Pcore::Util::Result' );
                 }
             }
         }
@@ -338,7 +383,9 @@ sub _on_message ( $self, $msg, $is_json ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 285, 300             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 258                  | Subroutines::ProhibitExcessComplexity - Subroutine "_on_message" with high complexity score (27)               |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    3 | 308, 330, 345        | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -1,6 +1,6 @@
 package GraphQL;
 
-use 5.006;
+use 5.014;
 use strict;
 use warnings;
 
@@ -8,14 +8,9 @@ use warnings;
 
 GraphQL - Perl implementation
 
-=head1 VERSION
-
-Version 0.02
-
 =cut
 
-our $VERSION = '0.02';
-
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -50,6 +45,9 @@ sub function2 {
 =head1 AUTHOR
 
 Ed J, C<< <etj at cpan.org> >>
+
+The creation of this work has been sponsored by Perl Careers:
+L<https://perl.careers/>.
 
 =head1 BUGS
 

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015 Kevin Ryde
+# Copyright 2015, 2017 Kevin Ryde
 
 # This file is part of Graph-Graph6.
 #
@@ -42,7 +42,7 @@ unless (eval { ExtUtils::MakeMaker->VERSION(6.64) }) {
 
 WriteMakefile
   (NAME             => 'Graph::Graph6',
-   ABSTRACT         => 'Read and write graph6 and sparse6.',
+   ABSTRACT         => 'Read and write graph6, sparse6 and digraph6.',
    VERSION_FROM     => 'lib/Graph/Graph6.pm',
    MIN_PERL_VERSION => '5.006',
    PREREQ_PM        => \%PREREQ_PM,
@@ -68,6 +68,7 @@ WriteMakefile
          { 'Graph::Writer'       => 0,
            'Graph::Reader'       => 0,
            'Graph::Easy::Parser' => 0,
+           'GraphViz2'           => 0,
          },
        },
        test =>

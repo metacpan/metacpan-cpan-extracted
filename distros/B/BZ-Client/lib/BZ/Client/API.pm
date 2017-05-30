@@ -6,7 +6,7 @@ use strict;
 use warnings 'all';
 
 package BZ::Client::API;
-$BZ::Client::API::VERSION = '4.4001';
+$BZ::Client::API::VERSION = '4.4002';
 
 sub api_call {
     my(undef, $client, $methodName, $params, $options) = @_;
@@ -34,9 +34,8 @@ sub _create {
     $client->log('debug', $sub . ': Running');
     my $result = __PACKAGE__->api_call($client, $methodName, $params);
     my $id = $result->{$key};
-    if (!$id) {
-        __PACKAGE__->error($client, "Invalid reply by server, expected $methodName $key.");
-    }
+     __PACKAGE__->error($client, "Invalid reply by server, expected $methodName $key.")
+        unless $id;
     $client->log('debug', "$sub: Returned $id");
     return $id
 }
@@ -47,9 +46,8 @@ sub _returns_array {
     $client->log('debug',$sub . ': Running');
     my $result = __PACKAGE__->api_call($client, $methodName, $params);
     my $foo = $result->{$key};
-    if (!$foo || 'ARRAY' ne ref($foo)) {
-        __PACKAGE__->error($client, "Invalid reply by server, expected array of $methodName details");
-    }
+    __PACKAGE__->error($client, "Invalid reply by server, expected array of $methodName details")
+        unless ($foo and 'ARRAY' eq ref $foo);
     $client->log('debug', "$sub: Recieved results");
     return wantarray ? @$foo : $foo
 }
@@ -70,7 +68,7 @@ BZ::Client::API - Abstract base class for the clients of the Bugzilla API.
 
 =head1 VERSION
 
-version 4.4001
+version 4.4002
 
 =head1 SYNOPSIS
 

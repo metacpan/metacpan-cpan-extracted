@@ -7,7 +7,7 @@ use Catmandu::Fix::Has;
 
 with 'Catmandu::Fix::Inlineable';
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 has reverse => (fix_opt => 1);
 

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016 Kevin Ryde
+# Copyright 2015, 2016, 2017 Kevin Ryde
 #
 # This file is part of Graph-Graph6.
 #
@@ -36,6 +36,34 @@ use MyGraphs;
 
 BEGIN { unshift @INC, '../gmaker/lib'; }
 
+
+{
+  # exact sparse6 depends how many increment v vs bigger jumps
+
+  # could start sparse6 encoding and stop if bigger than graph6 ...
+
+  # sub output_size {
+  #   my %options = @_;
+  #   my $size = 0;
+  #   if ($options{'header'}) {
+  #     $size += length($format) + 4;
+  #   }
+  #   if ($format eq 'sparse6') {
+  #   }
+  # }
+  exit 0;
+}
+
+{
+  use Graph::Easy;
+  my $graph = Graph::Easy->new (undirected => 1);
+  $graph->add_edge('one', 'two');
+  print $graph->is_undirected ? 1 : 0, "\n";
+  print $graph->is_directed ? 1 : 0, "\n";
+  print $graph->has_edge('one', 'two') ? 1 : 0, "\n";
+  print $graph->has_edge('two', 'one') ? 1 : 0, "\n";
+  exit 0;
+}
 
 {
   # Biregular a,b all degrees either a or b and bipartite so edges between

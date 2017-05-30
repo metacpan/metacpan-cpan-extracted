@@ -23,4 +23,30 @@ subtest 'column defaults' => sub {
     is $row->report->{created}, $row->created . 'Z', 'created field added to report';
 };
 
+subtest 'upload' => sub {
+    my $expect_upload = $schema->resultset( 'Upload' )->create({
+        type => 'cpan',
+        dist => 'CPAN-Testers-Schema',
+        version => '1.001',
+        author => 'PREACTION',
+        filename => 'CPAN-Testers-Schema-1.001.tar.gz',
+        released => time,
+    });
+
+    my $row = $schema->resultset( 'TestReport' )->create({
+        report => {
+            distribution => {
+                name => 'CPAN-Testers-Schema',
+                version => '1.001',
+            },
+        },
+    });
+
+    my $got_upload = $row->upload;
+    isa_ok $got_upload, 'CPAN::Testers::Schema::Result::Upload';
+    is $got_upload->id, $expect_upload->id, 'upload object id is correct';
+    is $got_upload->dist, $expect_upload->dist, 'upload object dist is correct';
+    is $got_upload->filename, $expect_upload->filename, 'upload object filename is correct';
+};
+
 done_testing;

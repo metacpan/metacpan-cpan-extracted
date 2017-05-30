@@ -142,18 +142,40 @@ object or not.
 sub rebless_maybe {
     my ($object) = pop;
 
-    if (   Scalar::Util::blessed($object)
-        && $object->can('content_type')
-        && $object->content_type eq 'application/json')
-    {
-        if ($object->isa('HTTP::Response')) {
-            bless $object => 'HTTP::Response::JSON';
-            return 1;
-        } elsif ($object->isa('HTTP::Request')) {
-            bless $object => 'HTTP::Request::JSON';
-            return 1;
+    # Obviously, if the object isn't blessed yet, it doesn't make sense
+    # to rebless it.
+    return 0 if !Scalar::Util::blessed($object);
+
+    # If the object doesn't have a content_type method, maybe that's because
+    # it doesn't have one *yet*?
+    # HTTP::Message is known to build methods like this via an AUTOLOAD,
+    # on demand, so if e.g. this was the response to a GET request where
+    # there was no explicit content type set in the request, and we hadn't
+    # done any content-type stuff in the same process previously, this will
+    # be the first time anyone has even tried to call this method.
+    # So see if we can trigger the creation of this method.
+    if (!$object->can('content_type')) {
+        if ($object->isa('HTTP::Message')) {
+            eval {
+                $object->content_type;
+            }
         }
     }
+    return 0 if !$object->can('content_type');
+
+    # And if this isn't JSON, leave it as it is.
+    return 0 if $object->content_type ne 'application/json';
+
+    # OK, time to rebless it into one of our objects instead.
+    if ($object->isa('HTTP::Response')) {
+        bless $object => 'HTTP::Response::JSON';
+        return 1;
+    } elsif ($object->isa('HTTP::Request')) {
+        bless $object => 'HTTP::Request::JSON';
+        return 1;
+    }
+
+    # Huh. What the hell did we have, then? Oh well.
     return 0;
 }
 

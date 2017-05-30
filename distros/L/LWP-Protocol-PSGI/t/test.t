@@ -2,6 +2,7 @@ use strict;
 use Test::More;
 use LWP::UserAgent;
 use LWP::Protocol::PSGI;
+use File::Temp ();
 
 my $psgi_app = sub {
     my $env = shift;
@@ -56,6 +57,17 @@ my $psgi_app = sub {
     is $res->content, "query=q=bar";
 }
 
+{
+    my $g = LWP::Protocol::PSGI->register($psgi_app, host => 'www.google.com');
+    my $ua  = LWP::UserAgent->new;
+    my (undef, $tempfile) = File::Temp::tempfile( 'lwp-psgi-mirror-XXXXX', TMPDIR => 1, OPEN => 0, UNLINK => 1 );
+    my $res = eval { $ua->mirror("http://www.google.com/search?q=bar", $tempfile) };
+    open my $fh, '<:raw', $tempfile
+      or do { fail "mirror call works"; last; };
+    my $content = do { local $/; <$fh> };
+    close $fh;
+    is $content, "query=q=bar";
+}
 
 
 sub test_match {

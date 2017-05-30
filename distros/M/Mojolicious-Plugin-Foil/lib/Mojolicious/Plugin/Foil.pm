@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Foil;
-$Mojolicious::Plugin::Foil::VERSION = '0.002';
+$Mojolicious::Plugin::Foil::VERSION = '0.005';
 # ABSTRACT: Mojolicious Plugin for CSS theming
 
 use Mojo::Base 'Mojolicious::Plugin';
@@ -10,6 +10,7 @@ use File::ShareDir;
 use File::Slurper 'read_binary';
 use Image::Size;
 use HTML::LinkList;
+use Config::Context;
 
 
 sub register {
@@ -46,6 +47,7 @@ sub register {
     $self->{foilshared} = $foilshared;
 
     $self->_get_themes($app);
+    $self->_setup_concon($app,$conf);
 
     $app->helper( 'foil_navbar' => sub {
         my $c        = shift;
@@ -137,6 +139,48 @@ sub _get_themes {
     }
 } # _get_themes
 
+sub _setup_concon {
+    my $self = shift;
+    my $app = shift;
+
+    if (!exists $app->config->{foil}->{context})
+    {
+        return;
+    }
+
+    my %cc_opts = (
+	driver => 'ConfigGeneral',
+	match_sections => [
+	    {
+		name          => 'Page',
+		section_type  => 'page',
+		match_type    => 'path',
+	    },
+	    {
+		name          => 'PageMatch',
+		section_type  => 'page',
+		match_type    => 'regex',
+	    },
+	    {
+		name          => 'File',
+		section_type  => 'file',
+		match_type    => 'path',
+	    },
+	    {
+		name          => 'FileMatch',
+		section_type  => 'file',
+		match_type    => 'regex',
+	    },
+	],
+
+    );
+    $self->{concon} = Config::Context->new
+    (
+        string => $app->config->{foil}->{context},
+        %cc_opts
+    );
+} # _setup_concon
+
 
 sub _get_prefix {
     my $self = shift;
@@ -212,19 +256,20 @@ sub _make_navbar {
     my %args = @_;
 
     my $rhost = $c->req->headers->host;
+    my $foilconf = $self->_get_foilconf($c);
     my $nb_host = $rhost;
-    if (exists $c->config->{foil}->{$rhost}->{navbar_host})
+    if (exists $foilconf->{navbar_host})
     {
-        $nb_host = $c->config->{foil}->{$rhost}->{navbar_host};
+        $nb_host = $foilconf->{navbar_host};
     }
     my @out = ();
     push @out, '<nav>';
     push @out, '<ul>';
     # we start always with Home
     push @out, "<li><a href='http://$nb_host/'>Home</a></li>";
-    if (exists $c->config->{foil}->{$rhost}->{navbar_links})
+    if (exists $foilconf->{navbar_links})
     {
-        foreach my $link (@{$c->config->{foil}->{$rhost}->{navbar_links}})
+        foreach my $link (@{$foilconf->{navbar_links}})
         {
             my $name = $link;
             if ($link =~ m{(\w+)/?$})
@@ -264,11 +309,12 @@ sub _make_breadcrumb {
     else
     {
         my $rhost = $c->req->headers->host;
+        my $foilconf = $self->_get_foilconf($c);
 
         my $hostname = $rhost;
-        if (exists $c->config->{foil}->{$rhost})
+        if (exists $foilconf->{name})
         {
-            $hostname = $c->config->{foil}->{$rhost}->{name};
+            $hostname = $foilconf->{name};
         }
 
         $breadcrumb = "<b>$hostname</b> <a href='/'>Home</a>";
@@ -284,9 +330,10 @@ sub _make_referrer {
 
     my $rhost = $c->req->headers->host;
     my $hostname = $rhost;
-    if (exists $c->config->{foil}->{$rhost})
+    my $foilconf = $self->_get_foilconf($c);
+    if (exists $foilconf->{name})
     {
-        $hostname = $c->config->{foil}->{$rhost}->{name};
+        $hostname = $foilconf->{name};
     }
     my $referrer = "<b>$hostname</b>";
     my $url = $c->req->headers->referrer;
@@ -305,14 +352,13 @@ sub _make_logo_css {
 
     my $curr_theme = $self->_get_theme_id($c,%args);
     my $logo_type = $self->{themes}->{themes}->{$curr_theme};
-##    my $logo_prefix = '';
 
     my $logo_url = $c->url_for("/styles/themes/foil_${logo_type}.png");
     my $rhost = $c->req->headers->host;
-    if (exists $c->config->{foil}->{$rhost}
-            and $c->config->{foil}->{$rhost}->{"${logo_type}_url"})
+    my $foilconf = $self->_get_foilconf($c);
+    if ($foilconf->{"${logo_type}_url"})
     {
-        $logo_url = $c->config->{foil}->{$rhost}->{"${logo_type}_url"};
+        $logo_url = $foilconf->{"${logo_type}_url"};
     }
     my $logo_css =<<"EOT";
 <div class="logo"><a href="/"><img src="$logo_url" alt="Home"/></a></div>
@@ -328,13 +374,22 @@ sub _get_theme_id {
 
     my $rhost = $c->req->headers->host;
     my $theme = $c->session("theme_${rhost}");
+    my $path = $c->req->url->to_abs->path;
+    if (!$theme and defined $self->{concon}) # try context theme
+    {
+        my $cc = $self->{concon}->context(page=>$path);
+        if (exists $cc->{theme})
+        {
+            $theme = $cc->{theme};
+        }
+    }
     if (!$theme) # try default theme
     {
         my $rhost = $c->req->headers->host;
-        if (exists $c->config->{foil}->{$rhost}
-                and $c->config->{foil}->{$rhost}->{default_theme})
+        my $foilconf = $self->_get_foilconf($c);
+        if ($foilconf->{default_theme})
         {
-            $theme = $c->config->{foil}->{$rhost}->{default_theme};
+            $theme = $foilconf->{default_theme};
         }
     }
     $theme = 'silver' if !$theme; # fall back on silver
@@ -362,6 +417,23 @@ EOT
         foil_settings=>$out);
 } # _set_theme
 
+sub _get_foilconf {
+    my $self = shift;
+    my $c = shift;
+
+    my $rhost = $c->req->headers->host;
+    my $foilconf;
+    if (exists $c->config->{foil}->{$rhost})
+    {
+        $foilconf = $c->config->{foil}->{$rhost};
+    }
+    else
+    {
+        $foilconf = $c->config->{foil}->{default};
+    }
+    return $foilconf;
+} # _get_foilconf
+
 1; # End of Mojolicious::Plugin::Foil
 
 =pod
@@ -374,7 +446,7 @@ Mojolicious::Plugin::Foil - Mojolicious Plugin for CSS theming
 
 =head1 VERSION
 
-version 0.002
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -392,7 +464,7 @@ Mojolicious::Plugin::Foil - looks for app
 
 =head1 VERSION
 
-version 0.002
+version 0.005
 
 =head1 REGISTER
 
@@ -403,6 +475,10 @@ These are functions which are NOT exported by this plugin.
 =head2 _get_themes
 
 Get the list of themes from the themes.json file.
+
+=head2 _setup_concon
+
+Set up the Config::Context stuff.
 
 =head2 _get_prefix
 
@@ -439,6 +515,10 @@ Get the ID of the current theme.
 =head2 _set_theme
 
 For remembering themes.
+
+=head2 _get_foilconf
+
+Get the appropriate config for this rhost.
 
 =head1 AUTHOR
 

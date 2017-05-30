@@ -6,7 +6,7 @@ use warnings;
 use Carp qw(croak);
 use IO::Socket::INET;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 BEGIN {
 
@@ -29,23 +29,24 @@ sub new {
     my $self = bless {}, $class;
 
     $self->_file($args{file});
-    $self->_metric($args{metric});
-    $self->_signed($args{signed});
+    $self->_is_metric($args{metric});
+    $self->_is_signed($args{signed});
 
     if (! $self->_file) {
         $self->_port($args{port});
         $self->_host($args{host});
         $self->_socket;
+        $self->_is_socket(1);
         $self->on;
     }
 
     return $self;
 }
 sub on {
-    $_[0]->_socket()->send('?WATCH={"enable": true}' . "\n");
+    $_[0]->_socket->send('?WATCH={"enable": true}' . "\n");
 }
 sub off {
-    $_[0]->_socket()->send('?WATCH={"enable": false}' . "\n");
+    $_[0]->_socket->send('?WATCH={"enable": false}' . "\n");
 }
 sub poll {
     my ($self, %args) = @_;
@@ -83,8 +84,7 @@ sub poll {
     my $gps_perl_data = decode_json $gps_json_data;
 
     if (! defined $gps_perl_data->{tpv}[0]){
-        warn "\n\nincomplete dataset returned from GPS; Did you call the " . 
-             "'on()' method against the main object?\n\n";
+        warn "\n\nincomplete or empty dataset returned from GPS...\n\n";
     }
 
     $self->_parse($gps_perl_data);
@@ -136,80 +136,51 @@ sub satellites {
     }
     return $self->{satellites};
 }
-sub _file {
-    my ($self, $file) = @_;
-    $self->{file} = $file if defined $file;
-    return $self->{file};
+sub feet {
+    return $_[0]->_is_metric(0);
 }
-sub _host {
-    my ($self, $host) = @_;
-    $self->{host} = $host if defined $host;
-    $self->{host} = '127.0.0.1' if ! defined $self->{host};
-    return $self->{host};
+sub metres {
+    return $_[0]->_is_metric(1);
 }
-sub _metric {
-    my ($self, $metric) = @_;
-    $self->{metric} = $metric if defined $metric;
-    $self->{metric} = 1 if ! defined $self->{metric};
-    return $self->{metric};
-}
-sub _port {
-    my ($self, $port) = @_;
-    $self->{port} = $port if defined $port;
-    $self->{port} = 2947 if ! defined $self->{port};
-    return $self->{port};
-}
-sub _parse {
-    # parse the GPS data and populate the object
-    my ($self, $data) = @_;
+sub signed {
+    my $self = shift;
 
-    $self->{tpv}  = $data->{tpv}[0];
-    $self->{time} = $self->{tpv}{time};
-    $self->{device} = $self->{tpv}{device};
-    $self->{sky} = $data->{sky}[0];
-
-    if (! $self->_metric) {
-        # convert to imperial; feet
-        my @convertable_stats = qw(alt climb speed);
-
-        for (@convertable_stats){
-            my $num = $self->{tpv}{$_};
-            $num = $num * 3.28084;
-            $self->{tpv}{$_} = substr($num, 0, index($num, '.') + 1 + 3);
-        }
+    if (! @_){
+        # caller just wants to set is_signed
+        return $self->_is_signed(1);
     }
-
-    if (! $self->_signed){
-        # switch between signed lat/long
-
-        ($self->{tpv}{lat}, $self->{tpv}{lon})
-            = $self->_signed_convert($self->{tpv}{lat}, $self->{tpv}{lon});
-    }
-
-    my %sats;
-
-    for my $sat (@{ $self->{sky}{satellites} }){
-        my $prn = $sat->{PRN};
-        delete $sat->{PRN};
-        $sat->{used} = $sat->{used} ? 1 : 0;
-        $sats{$prn} = $sat;
-    }
-    $self->{satellites} = \%sats;
-}
-sub _signed {
-    # convert between signed location and alpha
-    my ($self, $signed) = @_;
-    $self->{signed} = $signed if defined $signed;
-    $self->{signed} = 1 if ! defined $self->{signed};
-    return $self->{signed};
-}
-sub _signed_convert {
-    # perform the actual lat/long conversion
-    # we do it here for testing purposes
-
-    shift if @_ == 3;
 
     my ($lat, $lon) = @_;
+
+    return ($lat, $lon) if $lat !~ /[NESW]$/;
+    return ($lat, $lon) if $lon !~ /[NESW]$/;
+
+    my %directions = (
+        W => '-',
+        E => '',
+        N => '',
+        S => '-',
+    );
+
+    for ($lat, $lon){
+        my ($dir) = $_ =~ /([NESW])$/;
+        s/([NESW])$//;
+        $_ = $directions{$dir} . $_;
+    }
+
+    return ($lat, $lon);
+}
+sub unsigned {
+    my $self = shift;
+
+    if (! @_){
+        # caller just wants to set unsigned
+        return $self->_is_signed(0);
+    }
+    my ($lat, $lon) = @_;
+
+    return ($lat, $lon) if $lat =~ /[NESW]$/;
+    return ($lat, $lon) if $lon =~ /[NESW]$/;
 
     if ($lat =~ /^-/) {
         $lat =~ s/-(.*)/${1}S/;
@@ -226,6 +197,81 @@ sub _signed_convert {
     }
 
     return ($lat, $lon);
+}
+sub _convert {
+    my $self = shift;
+
+    my @convertable_stats = qw(alt climb speed);
+
+    if (! $self->_is_metric){
+        for (@convertable_stats) {
+            my $num = $self->{tpv}{$_};
+            $num = $num * 3.28084;
+            $self->{tpv}{$_} = substr($num, 0, index($num, '.') + 1 + 3);
+        }
+    }
+}
+sub _file {
+    my ($self, $file) = @_;
+    $self->{file} = $file if defined $file;
+    return $self->{file};
+}
+sub _host {
+    my ($self, $host) = @_;
+    $self->{host} = $host if defined $host;
+    $self->{host} = '127.0.0.1' if ! defined $self->{host};
+    return $self->{host};
+}
+sub _is_metric {
+    # whether we're in feet or metres mode
+    my ($self, $metric) = @_;
+    $self->{metric} = $metric if defined $metric;
+    $self->{metric} = 1 if ! defined $self->{metric};
+    return $self->{metric};
+}
+sub _is_signed {
+    # set whether we're in signed or unsigned mode
+    my ($self, $signed) = @_;
+    $self->{signed} = $signed if defined $signed;
+    $self->{signed} = 1 if ! defined $self->{signed};
+    return $self->{signed};
+}
+sub _port {
+    my ($self, $port) = @_;
+    $self->{port} = $port if defined $port;
+    $self->{port} = 2947 if ! defined $self->{port};
+    return $self->{port};
+}
+sub _parse {
+    # parse the GPS data and populate the object
+    my ($self, $data) = @_;
+
+    $self->{tpv}  = $data->{tpv}[0];
+    $self->{time} = $self->{tpv}{time};
+    $self->{device} = $self->{tpv}{device};
+    $self->{sky} = $data->{sky}[0];
+
+    # perform conversions on metric/standard if necessary
+
+    $self->_convert;
+
+    # perform conversions on the lat/long if necessary
+
+    my ($lat, $lon) = ($self->{tpv}{lat}, $self->{tpv}{lon});
+
+    ($self->{tpv}{lat}, $self->{tpv}{lon}) = $self->_is_signed
+        ? $self->signed($lat, $lon)
+        : $self->unsigned($lat, $lon);
+
+    my %sats;
+
+    for my $sat (@{ $self->{sky}{satellites} }){
+        my $prn = $sat->{PRN};
+        delete $sat->{PRN};
+        $sat->{used} = $sat->{used} ? 1 : 0;
+        $sats{$prn} = $sat;
+    }
+    $self->{satellites} = \%sats;
 }
 sub _is_socket {
     # check if we're in socket mode
@@ -301,6 +347,11 @@ GPSD::Parse - Parse, extract use the JSON output from GPS units
 
     print $gps->device;
 
+    # toggle between metres and feet (metres by default)
+
+    $gps->feet;
+    $gps->metres;
+
 =head1 DESCRIPTION
 
 Simple, lightweight (core only) distribution that polls C<gpsd> for data
@@ -330,10 +381,12 @@ understand what available data attributes you can extract.
 
 All output where applicable defaults to metric (metres). See the C<metric>
 parameter in the C<new()> method to change this to use imperial/standard
-measurements.
+measurements. You can also toggle this at runtime with the C<feet()> and
+C<metres()> methods.
 
 For latitude and longitude, we default to using the signed notation. You can
-disable this with the C<signed> parameter in C<new()>.
+disable this with the C<signed> parameter in C<new()>, along with the
+C<signed()> and C<unsigned()> methods to toggle this conversion at runtime.
 
 =head1 METHODS
 
@@ -374,6 +427,10 @@ longitude. Send in a false value (C<0>) to disable this. Here's an example:
 
 We add the letter notation at the end of the result if C<signed> is disabled.
 
+NOTE: You can toggle this at runtime by calling the C<signed()> and
+C<unsigned()> methods. The data returned at the next poll will reflect any
+change.
+
     file => 'filename.ext'
 
 Optional, String: For testing purposes. Instead of reading from a socket, send
@@ -412,7 +469,8 @@ original JSON string.
 C<TPV> stands for "Time Position Velocity". This is the data that represents
 your location and other vital statistics.
 
-By default, we return a hash reference that is in the format C<stat => 'value'>.
+By default, we return a hash reference. The format of the hash is depicted
+below.
 
 Parameters:
 
@@ -551,6 +609,52 @@ Returns a string containing the actual device the GPS is connected to
 
 Returns a string of the date and time of the most recent poll, in UTC.
 
+=head2 signed
+
+This method works on the latitude and longitude output view. By default, we use
+signed notation, eg:
+
+    -114.1111111111 # lon
+    51.111111111111 # lat
+
+If you've switched to C<unsigned()>, calling this method will toggle it back,
+and the results will be visible after the next C<poll()>.
+
+You can optionally use this method to convert values in a manual way. Simply
+send in the latitude and longitude in that order as parameters, and we'll return
+a list containing them both after modification, if it was necessary.
+
+=head2 unsigned
+
+This method works on the latitude and longitude output view. By default, we use
+signed notation, eg:
+
+    -114.1111111111 # lon
+    51.111111111111 # lat
+
+Calling this method will convert those to:
+
+    114.1111111111W # lon
+    51.11111111111N # lat
+
+If you've switched to C<signed()>, calling this method will toggle it back,
+and the results will be visible after the next C<poll()>.
+
+You can optionally use this method to convert values in a manual way. Simply
+send in the latitude and longitude in that order as parameters, and we'll return
+a list containing them both after modification, if it was necessary.
+
+=head2 feet
+
+By default, we use metres as the measurement for any attribute that is measured
+in distance. Call this method to have all attributes converted into feet
+commencing at the next call to C<poll()>. Use C<metres()> to revert back.
+
+=head2 metres
+
+We measure in metres by default. If you've switched to using feet as the
+measurement unit, a call to this method will revert back to the default.
+
 =head2 on
 
 Puts C<gpsd> in listening mode, ready to poll data from.
@@ -621,6 +725,74 @@ Output:
 
     speed:     0.333 metres/sec
 
+=head2 Displaying Satellite Information
+
+Here's a rough example that displays the status of tracked satellites, along
+with the information on the one's we're currently using.
+
+    use warnings;
+    use strict;
+
+    use GPSD::Parse;
+
+    my $gps = GPSD::Parse->new;
+
+    while (1){
+        $gps->poll;
+        my $sats = $gps->satellites;
+
+        for my $sat (keys %$sats){
+            if (! $gps->satellites($sat, 'used')){
+                print "$sat: unused\n";
+            }
+            else {
+                print "$sat: used\n";
+                for (keys %{ $sats->{$sat} }){
+                    print "\t$_: $sats->{$sat}{$_}\n";
+                }
+            }
+        }
+        sleep 3;
+    }
+
+Output:
+
+    7: used
+        ss: 20
+        used: 1
+        az: 244
+        el: 20
+    29: unused
+    31: used
+        el: 12
+        az: 64
+        used: 1
+        ss: 17
+    6: unused
+    138: unused
+    16: used
+        ss: 17
+        el: 53
+        used: 1
+        az: 119
+    26: used
+        az: 71
+        used: 1
+        el: 46
+        ss: 27
+    22: used
+        ss: 28
+        el: 17
+        used: 1
+        az: 175
+    3: used
+        ss: 24
+        az: 192
+        used: 1
+        el: 40
+    9: unused
+    23: unused
+    2: unused
 
 =head1 TESTING
 

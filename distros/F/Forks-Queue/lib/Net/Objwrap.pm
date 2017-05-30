@@ -11,7 +11,7 @@ use base 'Exporter';
 
 our @EXPORT_OK = qw(wrap unwrap);
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 our $XDEBUG = $ENV{XDEBUG} || 0;
 if ($XDEBUG && $XDEBUG != 1) {
     close STDERR;
@@ -98,7 +98,7 @@ Net::Objwrap - allow arbitrary access to Perl object over network
 
 =head1 VERSION
 
-0.08
+0.09
 
 
 =head1 SYNOPSIS

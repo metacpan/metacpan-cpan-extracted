@@ -6,7 +6,7 @@ use Carp;
 use Forks::Super::Debug ':all';
 use Forks::Super::Util ':all';
 
-our $VERSION = '0.89';
+our $VERSION = '0.90';
 
 my $emulate_id = 0;
 
@@ -140,7 +140,7 @@ Forks::Super::Job::Emulate - support emulation mode for Job object
 
 =head1 VERSION
 
-0.89
+0.90
 
 =head1 DESCRIPTION
 
@@ -148,7 +148,9 @@ In I<emulation> mode (when a non-zero C<emulate> argument is passed
 to L<fork|Forks::Super/"fork">), no background process is created.
 Rather, the C<fork> call performs the background task in the main
 process and returns a L<Forks::Super::Job|Forks::Super::Job> object
-that resembles a completed background job.
+that resembles a completed background job. See 
+L<< the "emulate" option to C<fork>|Forks::Super/"emulate"> for
+more information.
 
 This package is part of the L<Forks::Super|Forks::Super>
 distribution. Most users will have little reason to directly

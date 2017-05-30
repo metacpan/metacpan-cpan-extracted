@@ -6,6 +6,7 @@ use 5.010;
 
 use Carp;
 use Data::Dumper::Concise;
+use HTTP::Server::Simple 0.51; # require the latest H-S-S
 use JSON;
 
 # load some TestServer::Plugin modules

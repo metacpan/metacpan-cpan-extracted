@@ -3,7 +3,7 @@ package Prty;
 use strict;
 use warnings;
 
-our $VERSION = 1.106;
+our $VERSION = 1.107;
 
 =encoding utf8
 
@@ -13,10 +13,10 @@ Prty - Class library in Perl
 
 =head1 DESCRIPTION
 
-Diese Klassenbibliothek enthält anwendungsunabhängige Klassen,
-die nach einheitlichen Prinzipien konzipiert sind.
-Die Bibliothek befindet sich unter kontinuierlicher
-Weiterentwicklung.
+Diese Klassenbibliothek enthält meine persönlichen
+anwendungsunabhängigen Klassen. Sie sind nach einheitlichen
+Prinzipien konzipiert. Die Bibliothek befindet sich unter
+kontinuierlicher Weiterentwicklung.
 
 =head1 CLASSES
 
@@ -61,6 +61,10 @@ L<Prty::Confluence::Page> - Confluence-Wiki Seite
 =item *
 
 L<Prty::ContentProcessor> - Prozessor für Abschnitts-Dateien
+
+=item *
+
+L<Prty::ContentProcessor::BaseType> - Basisklasse für ContentProcessor-Typen
 
 =item *
 
@@ -598,11 +602,15 @@ L<Prty::Unindent> - Entferne Einrückung von "Here Document" oder String-Literal
 
 L<Prty::Url> - URL Klasse
 
+=item *
+
+L<Prty::XTerm> - XTerminal Fenster
+
 =back
 
 =head1 VERSION
 
-1.106
+1.107
 
 =head1 AUTHOR
 

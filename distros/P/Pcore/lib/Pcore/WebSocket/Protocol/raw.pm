@@ -4,18 +4,29 @@ use Pcore -class;
 
 has protocol => ( is => 'ro', isa => Str, default => q[], init_arg => undef );
 
-has on_text   => ( is => 'ro', isa => CodeRef, reader => undef );
-has on_binary => ( is => 'ro', isa => CodeRef, reader => undef );
-has on_pong   => ( is => 'ro', isa => CodeRef, reader => undef );
+has on_text   => ( is => 'ro', isa => Maybe [CodeRef], reader => undef );
+has on_binary => ( is => 'ro', isa => Maybe [CodeRef], reader => undef );
 
 with qw[Pcore::WebSocket::Handle];
 
 sub before_connect_server ( $self, $env, $args ) {
-    return;
+    my $headers;
+
+    if ( $args->{headers} ) {
+        push $headers->@*, $args->{headers}->@*;
+    }
+
+    return $headers;
 }
 
 sub before_connect_client ( $self, $args ) {
-    return;
+    my $headers;
+
+    if ( $args->{headers} ) {
+        push $headers->@*, $args->{headers}->@*;
+    }
+
+    return $headers;
 }
 
 sub on_connect_server ( $self ) {
@@ -38,12 +49,6 @@ sub on_text ( $self, $data_ref ) {
 
 sub on_binary ( $self, $data_ref ) {
     $self->{on_binary}->($data_ref) if $self->{on_binary};
-
-    return;
-}
-
-sub on_pong ( $self, $data_ref ) {
-    $self->{on_pong}->($data_ref) if $self->{on_pong};
 
     return;
 }

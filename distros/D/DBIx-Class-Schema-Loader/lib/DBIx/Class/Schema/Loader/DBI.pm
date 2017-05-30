@@ -10,7 +10,7 @@ use Carp::Clan qw/^DBIx::Class/;
 use namespace::clean;
 use DBIx::Class::Schema::Loader::Table ();
 
-our $VERSION = '0.07046';
+our $VERSION = '0.07047';
 
 __PACKAGE__->mk_group_accessors('simple', qw/
     _disable_pk_detection
@@ -273,7 +273,7 @@ sub _sth_for {
     my ($self, $table, $fields, $where) = @_;
 
     my $sth = $self->dbh->prepare($self->schema->storage->sql_maker
-        ->select(\$table->sql_name, $fields, $where));
+        ->select(\$table->sql_name, $fields || \'*', $where));
 
     return $sth;
 }

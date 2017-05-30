@@ -1,7 +1,7 @@
 package ExtUtils::MM_Any;
 
 use strict;
-our $VERSION = '7.24';
+our $VERSION = '7.26';
 $VERSION = eval $VERSION;
 
 use Carp;
@@ -910,6 +910,17 @@ MAKE_FRAG
 }
 
 
+=head3 xs_dlsyms_arg
+
+Returns command-line arg(s) to linker for file listing dlsyms to export.
+Defaults to returning empty string, can be overridden by e.g. AIX.
+
+=cut
+
+sub xs_dlsyms_arg {
+    return '';
+}
+
 =head3 xs_dlsyms_ext
 
 Returns file-extension for C<xs_make_dlsyms> method's output file,
@@ -1319,7 +1330,8 @@ sub metafile_data {
     my $v1_add = _metaspec_version($meta_add) !~ /^2/;
 
     for my $frag ($meta_add, $meta_merge) {
-        $frag = CPAN::Meta::Converter->new($frag, default_version => "1.4")->upgrade_fragment;
+        my $def_v = _metaspec_version($frag == $meta_add ? $meta_merge : $meta_add);
+        $frag = CPAN::Meta::Converter->new($frag, default_version => $def_v)->upgrade_fragment;
     }
 
     # if we upgraded a 1.x _ADD fragment, we gave it a prereqs key that

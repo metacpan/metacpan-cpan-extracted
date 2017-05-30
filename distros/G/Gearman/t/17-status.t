@@ -37,11 +37,12 @@ subtest "job server status", sub {
     sleep 1;
     my $js_status = $client->get_job_server_status();
     foreach (@{ $client->job_servers() }) {
-        isnt($js_status->{$_}->{$func}->{capable},
+        my $js_str = $client->_js_str($_);
+        isnt($js_status->{$js_str}->{$func}->{capable},
             0, "Correct capable jobs for $func");
-        is($js_status->{$_}->{$func}->{running},
+        is($js_status->{$js_str}->{$func}->{running},
             0, "Correct running jobs for $func");
-        is($js_status->{$_}->{$func}->{queued},
+        is($js_status->{$js_str}->{$func}->{queued},
             0, "Correct queued jobs for $func");
     } ## end foreach (@{ $client->job_servers...})
 };

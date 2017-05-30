@@ -9,7 +9,7 @@ Call many geocoders
 
 # VERSION
 
-Version 0.09
+Version 0.11
 
 # SYNOPSIS
 
@@ -42,7 +42,11 @@ and OpenStreetMap for other places:
     # Uses Geo::Coder::CA, and if that fails uses Geo::Coder::OSM
     my $location = $geocoderlist->geocode(location => '1600 Pennsylvania Ave NW, Washington DC, USA');
     # Only uses Geo::Coder::OSM
-    $location = $geocoderlist->geocode('10 Downing St, London, UK');
+    if($location = $geocoderlist->geocode('10 Downing St, London, UK')) {
+        print 'The prime minister lives at co-ordinates ', 
+            $location->{geometry}{location}{lat}, ',',
+            $location->{geometry}{location}{lng}, "\n";
+    }
 
 ## geocode
 
@@ -73,6 +77,8 @@ or through the web interface at
 [http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Geo-Coder-List](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Geo-Coder-List).
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
+
+There is no reverse\_geocode() yet.
 
 # SEE ALSO
 

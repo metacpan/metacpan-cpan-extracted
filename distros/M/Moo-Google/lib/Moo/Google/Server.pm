@@ -1,6 +1,6 @@
 #!perl
-package API::Google::Server;
-$API::Google::Server::VERSION = '0.01';
+package Moo::Google::Server;
+$Moo::Google::Server::VERSION = '0.02';
 
 # ABSTRACT: Mojolicious::Lite web server for getting Google Mojo tokens via Oauth 2.0
 
@@ -131,11 +131,11 @@ app->start;
 
 =head1 NAME
 
-API::Google::Server - Mojolicious::Lite web server for getting Google Mojo tokens via Oauth 2.0
+Moo::Google::Server - Mojolicious::Lite web server for getting Google Mojo tokens via Oauth 2.0
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 METHODS
 
@@ -165,8 +165,8 @@ __DATA__
 @@ oauth.html.ep
 
 <%= link_to "Click here to get Mojo tokens", $c->oauth2->auth_url("google",
-		scope => "email profile https://www.googleapis.com/auth/plus.profile.emails.read https://www.googleapis.com/auth/calendar", 
-		authorize_query => { access_type => 'offline'} ) 
+		scope => "email profile https://www.googleapis.com/auth/plus.profile.emails.read https://www.googleapis.com/auth/calendar",
+		authorize_query => { access_type => 'offline'} )
 %>
 
 <br><br>

@@ -62,16 +62,11 @@ sub update_job_deps {
 
     return unless $self->has_array_deps;
 
-    foreach my $array_id ( $self->all_array_deps ) {
-        next unless $array_id;
-
-        my $current_job = $array_id->[0];
-        my $dep_job     = $array_id->[1];
-
+    while(my($current_task, $v) = each %{$self->array_deps}){
+      my $dep_tasks = join(':', @$v);
         my $cmd =
-          "scontrol update job=$current_job Dependency=afterok:$dep_job";
-
-        # $self->app_log->warn($cmd);
+          "scontrol update job=$current_task Dependency=afterok:$dep_tasks";
+    #     # $self->app_log->warn($cmd);
     }
 }
 

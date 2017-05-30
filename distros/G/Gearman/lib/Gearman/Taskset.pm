@@ -1,6 +1,6 @@
 package Gearman::Taskset;
 use version ();
-$Gearman::Taskset::VERSION = version->declare("2.004.005");
+$Gearman::Taskset::VERSION = version->declare("2.004.007");
 
 use strict;
 use warnings;
@@ -272,10 +272,8 @@ sub add_task {
     return $task->fail("undefined jssock") unless ($jssock);
 
     my $req = $task->pack_submit_packet($self->client);
-    my $len = length($req);
-    my $rv  = $jssock->syswrite($req, $len);
-    $rv ||= 0;
-    Carp::croak "Wrote $rv but expected to write $len" unless $rv == $len;
+    Gearman::Util::send_req($jssock, \$req)
+        || Carp::croak "Error sending data to job server";
 
     push @{ $self->{need_handle} }, $task;
     while (@{ $self->{need_handle} }) {

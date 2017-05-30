@@ -1,0 +1,75 @@
+JSON-Assert
+Test-JSON-Assert
+================
+
+These two modules help you check that what you expect to be in an JSON document
+is actually there. You can do this via
+
+The JSON::Assert module exports the assert() function. This ...
+
+* json_match( jpath, count wanted, msg );
+* jpath_is( jpath, value, msg );
+
+Examples:
+
+* json_matches( '$.NZSRSResponse.Response.Domain', 1, "Response contains one domain record" );
+* jpath_is( '$.NZSRSResponse.Response.Domain', '{ DomainName => "foo.co.te"}', "Response DomainName is foo.co.te" );
+
+EXAMPLE JSON ASSERTIONS
+=======================
+
+For example, in the following document, you can assert a number of things, for
+example, that you expect one <content> hash in the document, and that it's
+value is "Hello, World!":
+
+    use JSON;
+
+    my $json = <<'EOF';
+    NZSRSResponse:
+      Response:
+        Domain: foo.co.te
+        Status: Available
+    EOF
+
+    my $data = decode_json $json;
+   
+    my $json_assert = JSON::Assert->new();
+
+    $json_assert->is_jpath_count($data, '$.NZSRSResponse.Response.Domain', 1);
+    $json_assert->does_jpath_value_match($doc, '$.NZSRSResponse.Response.Domain', 'Hello, World!')
+
+INSTALLATION
+============
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+============
+
+This module requires these other modules and libraries:
+
+Test::Simple (Test::More/Test::Builder -- core)
+
+AUTHOR, COPYRIGHT AND LICENCE
+=============================
+
+Written by Andrew Ruthven:
+
+* andrew@etc.gen.nz
+* puck@catalyst.net.nz
+
+Based on XML::Assert by Andrew Chilton.
+
+This software development is sponsored and directed by NZRS Limited, http://www.nzrs.net.nz/
+
+Part of work was carried out by Catalyst IT, http://www.catalyst.net.nz/
+
+Copyright (c) 2014-2015, NZRS.  All Rights Reserved.  This software
+may be used under the terms of the Artistic License 2.0.  Note that this
+license is compatible with both the GNU GPL and Artistic licenses.  A copy of
+this license is supplied with the distribution in the file COPYING.txt.

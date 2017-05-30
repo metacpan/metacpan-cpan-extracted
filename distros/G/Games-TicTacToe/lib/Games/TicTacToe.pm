@@ -1,6 +1,6 @@
 package Games::TicTacToe;
 
-$Games::TicTacToe::VERSION = '0.24';
+$Games::TicTacToe::VERSION = '0.25';
 $Games::TicTacToe::AUTHOR  = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Games::TicTacToe - Interface to the TicTacToe (nxn) game.
 
 =head1 VERSION
 
-Version 0.24
+Version 0.25
 
 =cut
 
@@ -49,87 +49,19 @@ nxn, where n>=3. Default size is 3,For example 5x5 would be something like below
     | 21 | 22 | 23 | 24 | 25 |
     +----+----+----+----+----+
 
-=head1 SYNOPSIS
+The game script C<play-tictactoe> is supplied with the distribution and on install
+is available to play with.
 
-Below is the working code  for  the  TicTacToe game using the L<Games::TicTacToe>
-package. The game script C<play-tictactoe> is supplied with the distribution  and
-on install is available to play with.
+  USAGE: play-tictactoe [-h] [long options...]
 
-    use strict; use warnings;
-    use Games::TicTacToe;
+    --size=Int       TicTacToe board size. Default is 3.
+    --symbol=String  User preferred symbol. Default is X. The other possible
+                     value is O.
 
-    $|=1;
-
-    $SIG{'INT'} = sub { print {*STDOUT} "\n\nCaught Interrupt (^C), Aborting\n"; exit(1); };
-
-    my $tictactoe = Games::TicTacToe->new;
-
-    my ($size);
-    do {
-        print {*STDOUT} "Please enter game board size (type 3 if you want 3x3): ";
-        $size = <STDIN>;
-        chomp($size);
-    } until ($tictactoe->isValidGameBoardSize($size));
-
-    $tictactoe->setGameBoard($size);
-
-    my ($symbol);
-    do {
-        print {*STDOUT} "Please select the symbol [X / O]: ";
-        $symbol = <STDIN>;
-        chomp($symbol);
-    } until ($tictactoe->isValidSymbol($symbol));
-
-    $tictactoe->setPlayers($symbol);
-
-    my ($response);
-    do {
-        print {*STDOUT} $tictactoe->getGameBoard;
-        my $index = 1;
-        my $board = $tictactoe->board;
-        do {
-            my $move = undef;
-            if ($tictactoe->needNextMove) {
-                my $available = $board->availableIndex;
-                if ($tictactoe->isLastMove) {
-                    $move = $available;
-                }
-                else {
-                    do {
-                        print {*STDOUT} "What is your next move [$available] ? ";
-                        $move = <STDIN>;
-                        chomp($move);
-                    } until ($tictactoe->isValidMove($move));
-                }
-            }
-
-            $tictactoe->play($move);
-
-            print {*STDOUT} $tictactoe->getGameBoard
-                unless (($index % 2 == 1) || $tictactoe->isGameOver);
-
-            $index++;
-
-        } until ($tictactoe->isGameOver);
-
-        print {*STDOUT} $tictactoe->getGameBoard;
-        print {*STDOUT} $tictactoe->getResult;
-
-        $board->reset;
-
-        do {
-            print {*STDOUT} "Do you wish to continue (Y/N)? ";
-            $response = <STDIN>;
-            chomp($response);
-        } until (defined $response && ($response =~ /^[Y|N]$/i));
-
-    } until ($response =~ /^N$/i);
-
-    print {*STDOUT} "Thank you.\n";
-
-Once it is installed, it can be played on a terminal/command window  as below:
-
-    $ play-tictactoe
+    --usage          show a short help message
+    -h               show a compact help message
+    --help           show a long help message
+    --man            show the manual
 
 =cut
 

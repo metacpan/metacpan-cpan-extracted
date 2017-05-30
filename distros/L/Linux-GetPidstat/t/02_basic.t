@@ -23,7 +23,8 @@ my $guard = Test::Mock::Guard->new(
     },
     'Linux::GetPidstat::Collector' => {
         _command_get_pidstat => sub {
-            return "cat t/assets/source/metric.txt";
+            my ($pid) = shift;
+            return "cat t/assets/source/metric_$pid.txt";
         },
     },
     'WebService::Mackerel' => {

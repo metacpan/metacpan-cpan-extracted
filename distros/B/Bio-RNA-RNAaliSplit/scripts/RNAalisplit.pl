@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# Last changed Time-stamp: <2017-03-09 16:15:41 michl>
+# Last changed Time-stamp: <2017-05-28 17:03:26 mtw>
 # -*-CPerl-*-
 #
 # usage: RNAalisplit.pl -a myfile.aln
@@ -7,7 +7,7 @@
 # NB: Display ID handling in Bio::AlignIO is broken for Stockholm
 # format. Use ClustalW format instead !!!
 
-use version; our $VERSION = qv('0.04');
+use version; our $VERSION = qv('0.05');
 use strict;
 use warnings;
 use Bio::RNA::RNAaliSplit;
@@ -20,6 +20,7 @@ use Pod::Usage;
 use Path::Class;
 use Carp;
 use RNA;
+#use diagnostics;
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
 #^^^^^^^^^^ Variables ^^^^^^^^^^^#
@@ -82,10 +83,9 @@ while ($done != 1){
 
 sub alisplit {
   my ($alnfile,$odirn) = @_;
-
   my $AlignSplitObject = Bio::RNA::RNAaliSplit->new(ifile => $alnfile,
 						    format => $format,
-						    odirn => $odirn,
+						    odir => $odirn,
 						    dump => 1);
   #print Dumper($AlignSplitObject);
   #print Dumper(${$AlignSplitObject->next_aln}{_order});
@@ -97,19 +97,20 @@ sub alisplit {
   # compute Neighbor Joining tree and do split decomposition
   print STDERR "Perform Split Decomposition ...\n";
   my $sd = Bio::RNA::RNAaliSplit::WrapAnalyseDists->new(ifile => $dmfile,
-							odir => $AlignSplitObject->odir,
-							basename => $AlignSplitObject->infilebasename);
+							odir => $AlignSplitObject->odir);
+						#	basename => $AlignSplitObject->ifilebn);
   print STDERR "Identified ".$sd->count." splits\n";
-
   # run RNAalifold for the input alignment
   my $alifold = Bio::RNA::RNAaliSplit::WrapRNAalifold->new(ifile => $alnfile,
 							   odir => $AlignSplitObject->odir);
   my $alifold_ribosum = Bio::RNA::RNAaliSplit::WrapRNAalifold->new(ifile => $alnfile,
 								   odir => $AlignSplitObject->odir,
 								   ribosum => 1);
+  # print Dumper($alifold);die;
   # run RNAz for the input alignment
   my $rnaz = Bio::RNA::RNAaliSplit::WrapRNAz->new(ifile => $alnfile,
 						  odir => $AlignSplitObject->odir);
+  # print Dumper($rnaz);die;
   print join "\t", "#hit","RNAz prob","z-score","SCI","seqs","consensus structure","alignment\n";
   print join "\t", "-",$rnaz->P,$rnaz->z,$alifold->sci,$dim,$alifold_ribosum->consensus_struc,$alnfile."\n";
 
@@ -191,8 +192,8 @@ sub make_distance_matrix {
   foreach my $ali (@pw_alns){
     my $pw_aso = Bio::RNA::RNAaliSplit->new(ifile => $ali,
 					    format => "ClustalW",
-					    odirn => $od);
-    my ($i,$j) = sort split /_/, $pw_aso->infilebasename;
+					    odir => $od);
+    my ($i,$j) = sort split /_/, $pw_aso->ifilebn;
 
     $dHn = $pw_aso->hammingdistN;
     $dHx = $pw_aso->hammingdistX;

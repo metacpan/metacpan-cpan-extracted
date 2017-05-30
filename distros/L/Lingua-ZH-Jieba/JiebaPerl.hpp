@@ -1,10 +1,23 @@
 #include <cppjieba/Jieba.hpp> 
 #include <cppjieba/KeywordExtractor.hpp> 
+#include <iostream>
 
 using namespace std;
 
 // a wrapper on Jieba
 namespace perljieba {
+
+    class Word {
+        public:
+            string word;
+            size_t offset;
+            size_t length;
+
+            Word() {};
+            Word(const cppjieba::Word& w)
+                : word(w.word), offset(w.unicode_offset), length(w.unicode_length) {
+            }
+    };
 
     class KeywordExtractor {
         public:
@@ -56,16 +69,45 @@ namespace perljieba {
                 return words;
             }
 
+            vector<perljieba::Word> _cut_ex(const string& sentence, bool hmm = true) {
+                vector<cppjieba::Word> words;
+                jieba_.Cut(sentence, words, hmm);
+
+                std::cout << "HELLO" << std::endl;
+            
+                vector<perljieba::Word> rslt(words.size());
+                _convert_word(words, rslt);
+                return rslt;
+            }
+
             vector<string> _cut_all(const string& sentence) {
                 vector<string> words;
                 jieba_.CutAll(sentence, words);
                 return words;
             }
 
+            vector<perljieba::Word> _cut_all_ex(const string& sentence) {
+                vector<cppjieba::Word> words;
+                jieba_.CutAll(sentence, words);
+
+                vector<perljieba::Word> rslt(words.size());
+                _convert_word(words, rslt);
+                return rslt;
+            }
+
             vector<string> _cut_for_search(const string& sentence, bool hmm = true) {
                 vector<string> words;
                 jieba_.CutForSearch(sentence, words, hmm);
                 return words;
+            }
+
+            vector<perljieba::Word> _cut_for_search_ex(const string& sentence, bool hmm = true) {
+                vector<cppjieba::Word> words;
+                jieba_.CutForSearch(sentence, words, hmm);
+
+                vector<perljieba::Word> rslt(words.size());
+                _convert_word(words, rslt);
+                return rslt;
             }
             
             bool insert_user_word(const string& word, const string& tag = "") {
@@ -83,6 +125,13 @@ namespace perljieba {
                                         jieba_.GetHMMModel(),
                                         idf_path_,
                                         stop_word_path_);
+            }
+
+        private:
+            void _convert_word(const vector<cppjieba::Word>& from, vector<perljieba::Word>& to) {
+                for (size_t i = 0; i < from.size(); i++) {
+                    to[i] = perljieba::Word(from[i]);
+                }
             }
             
         private:

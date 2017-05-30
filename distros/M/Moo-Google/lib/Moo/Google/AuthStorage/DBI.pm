@@ -1,5 +1,5 @@
 package Moo::Google::AuthStorage::DBI;
-$Moo::Google::AuthStorage::DBI::VERSION = '0.01';
+$Moo::Google::AuthStorage::DBI::VERSION = '0.02';
 
 # ABSTRACT: Specific methods to fetch tokens from DBI data source (not written yet)
 
@@ -17,7 +17,7 @@ Moo::Google::AuthStorage::DBI - Specific methods to fetch tokens from DBI data s
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 AUTHOR
 

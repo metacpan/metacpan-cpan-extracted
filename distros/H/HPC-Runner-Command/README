@@ -22,7 +22,11 @@ DESCRIPTION
     analysis projects, submitting and executing jobs on an HPC cluster or
     workstation, and obsessively logging results.
 
-    Please see the complete documentation at HPC::Runner::Command GitBooks 
+    Get help by heading on over to github and raising an issue
+    https://github.com/biosails/HPC-Runner-Command/issues.
+
+    Please see the complete documentation at HPC::Runner::Command GitBooks
+    .
 
 Quick Start - Create a New Project
 

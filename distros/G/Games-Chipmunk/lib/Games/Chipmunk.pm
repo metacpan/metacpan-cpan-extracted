@@ -449,7 +449,7 @@ our @EXPORT =  qw(
 our @EXPORT_OK = @EXPORT;
 
 
-our $VERSION = '0.5';
+our $VERSION = '0.6';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()

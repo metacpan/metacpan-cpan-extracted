@@ -17,10 +17,13 @@ SKIP: {
     require "t/remote.pl";
     my $sshd = get_test_sshd();
     if (!$sshd) {
-        skip "requires test ssh server", $ntests;
+        ok(1, "no ssh server available, skipping all test");
+        skip "requires test ssh server", $ntests-1;
     }
     diag "--------------- got test ssh object \$\$=$$ ------------\n\n\n\n";
+    print STDERR Data::Dumper::Dumper($sshd);
     my $cwd = Cwd::cwd();
+    ($cwd) = $cwd =~ /(.*)/;
 
     my $xcmd = "$cwd/t/external-command.pl";
     if (! -r $xcmd) {

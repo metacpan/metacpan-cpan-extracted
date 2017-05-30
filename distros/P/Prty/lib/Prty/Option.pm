@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.106;
+our $VERSION = 1.107;
 
 use Prty::Hash;
 use Scalar::Util ();
@@ -256,6 +256,7 @@ sub extract {
 
             if ($key eq '') {
                 # Ende der Optionsliste, Option '--'
+                splice @$argA,$i,1;
                 last;
             }
             ($key,$val) = split /=/,$key,2;
@@ -505,7 +506,7 @@ sub extractMulti {
 
 =head1 VERSION
 
-1.106
+1.107
 
 =head1 AUTHOR
 

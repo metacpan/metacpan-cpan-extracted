@@ -10,19 +10,21 @@
     cpan_manifest_skip => [
 
         # eg.:
-        # qr[\Ashare/data/.+[.]dat\z]smi,
-        qr[\Abin/]smi,    # ignore "/bin/" directory
+        qr[\Ashare/bin/princexml-.+\z]smi,           # ignore prinsexml binaries
+        qr[\Abin/]smi,                               # ignore "/bin/" directory
     ],
 
     meta => {
-        homepage   => undef,    # project homepage url
+        homepage   => undef,                         # project homepage url
         repository => {
-            web  => undef,      # repository web url
-            url  => undef,      # repository clone url
-            type => undef,      # hg, git
+            web  => undef,                           # repository web url
+            url  => undef,                           # repository clone url
+            type => undef,                           # hg, git
         },
         bugtracker => {
-            web => undef,       # bugtracker url
+            web => undef,                            # bugtracker url
         }
-    }
+    },
+
+    princexml_ver => '11.1',
 }

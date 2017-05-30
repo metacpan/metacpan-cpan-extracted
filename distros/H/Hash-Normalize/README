@@ -1,0 +1,126 @@
+NAME
+    Hash::Normalize - Automatically normalize Unicode hash keys.
+
+VERSION
+    Version 0.01
+
+SYNOPSIS
+        use Hash::Normalize qw<normalize>;
+
+        normalize my %hash, 'NFC';
+
+        $hash{café} = 'coffee'; # NFD, "cafe\x{301}"
+
+        print $hash{café};      # NFD, "cafe\x{301}"
+        # 'coffee' is printed
+
+        print $hash{café};      # NFC, "caf\x{e9}"
+        # 'coffee' is also printed
+
+DESCRIPTION
+    This module provides an utility routine that augments a given Perl hash
+    table so that its keys are automatically normalized following one of the
+    Unicode normalization schemes. All the following actions on this hash
+    will be made regardless of how the key used for the action is
+    normalized.
+
+    Since this module does not use the "tie" mechanism, normalized hashes
+    are indistinguishable from regular hashes as far as Perl is concerned,
+    but this module also provides "get_normalization" to identify them if
+    necessary.
+
+FUNCTIONS
+  "normalize"
+        normalize %hash;
+        normalize %hash, $mode;
+
+    Applies the Unicode normalization scheme $mode onto %hash. $mode
+    defaults to 'NFC' if omitted, and should match
+    "/^(?:(?:nf)?k?|fc)[cd]$/i" otherwise.
+
+    "normalize" will first try to forcefully normalize the existing keys in
+    %hash to the new mode, but it will throw an exception if there are
+    distinct keys that have the same normalization. All the keys
+    subsequently used for fetches, stores, exists, deletes and list
+    assignments are then first passed through the according normalization
+    procedure. "keys %hash" will also return the list of normalized keys.
+
+  "get_normalization"
+        my $mode = get_normalization %hash;
+        normalize %hash, $mode;
+
+    Returns the current Unicode normalization scheme in use for %hash, or
+    "undef" if it is a plain hash.
+
+NORMALIZED SYMBOL LOOKUPS
+    Stashes (Perl symbol tables) are implemented as plain hashes, therefore
+    one can use "normalize %Pkg::" on them to make sure that Unicode symbol
+    lookups are made regardless of normalization.
+
+        package Foo;
+
+        BEGIN {
+         require Hash::Normalize;
+         # Enforce NFC normalization
+         Hash::Normalize::normalize(%Foo::, 'NFC')
+        }
+
+        sub café { # NFD, "cafe\x{301}"
+         return 'coffee'
+        }
+
+        sub coffee_nfc {
+         café() # NFC, "cafe\x{e9}"
+        }
+
+        sub coffee_nfd {
+         café() # NFD, "cafe\x{301}"
+        }
+
+        # Both coffee_nfc() and coffee_nfd() return 'coffee'
+
+CAVEATS
+    Using a normalized hash is slightly slower than a plain hash, due to the
+    normalization procedure and the overhead of magic.
+
+    If a hash is initialized from a normalized hash by list assignment
+    ("%new = %normalized"), then the normalization scheme will not be
+    carried over to the new hash, although its keys will initially be
+    normalized like the ones from the original hash.
+
+EXPORT
+    The functions "normalize" and "get_normalization" are only exported on
+    request by specifying their names in the module import list.
+
+DEPENDENCIES
+    perl 5.10.
+
+    Carp, Exporter (core since perl 5).
+
+    Unicode::Normalize (core since perl 5.8).
+
+    Variable::Magic 0.51.
+
+AUTHOR
+    Vincent Pit, "<perl at profvince.com>", <http://www.profvince.com>.
+
+    You can contact me by mail or on "irc.perl.org" (vincent).
+
+BUGS
+    Please report any bugs or feature requests to "bug-hash-normalize at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Hash-Normalize>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Hash::Normalize
+
+COPYRIGHT & LICENSE
+    Copyright 2017 Vincent Pit, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -127,7 +127,7 @@ DANCER CONFIGURATION
         * adminEmail - An administrative email. Can be string or array of strings. This will be included in the Identify response.
         * compression - a compression encoding supported by the repository. Can be string or array of strings. This will be included in the Identify response.
         * description - XML container that describes your repository. Can be string or array of strings. This will be included in the Identify response. Note that this module will try to validate the XML data.
-        * earliestDatestamp - The earliest datestamp available in the dataset an YYYY-MM-DDTHH:MM:SSZ
+        * earliestDatestamp - The earliest datestamp available in the dataset as YYYY-MM-DDTHH:MM:SSZ. This will be determined dynamically if no static value is given.
         * deletedRecord - The policy for deleted records. See also: L<https://www.openarchives.org/OAI/openarchivesprotocol.html#DeletedRecords>
         * repositoryIdentifier - A prefix to use in OAI-PMH identifiers
         * cql_filter -  A CQL query to find all records in the database that should be made available to OAI-PMH

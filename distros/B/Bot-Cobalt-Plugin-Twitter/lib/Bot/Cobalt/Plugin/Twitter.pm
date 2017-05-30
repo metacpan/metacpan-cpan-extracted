@@ -1,6 +1,6 @@
 package Bot::Cobalt::Plugin::Twitter;
 # ABSTRACT: Bot::Cobalt plugin for automatic tweeting
-$Bot::Cobalt::Plugin::Twitter::VERSION = '0.002';
+$Bot::Cobalt::Plugin::Twitter::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ use Bot::Cobalt::Common;
 
 use HTML::Entities    qw(decode_entities);
 use Mojo::UserAgent;
-use Net::Twitter;
+use Twitter::API;
 use Text::Unidecode   qw(unidecode);
 use URI::Find::Simple qw(list_uris);
 
@@ -18,6 +18,7 @@ my $status_rx = qr/twitter\.com\/\w+\/status\/(\d+)/;
 sub new     { bless {}, shift  }
 sub twitter { shift->{twitter} }
 
+sub display_tweets { shift->{display_tweets} }
 sub tweet_topics   { shift->{tweet_topics}   }
 sub tweet_links    { shift->{tweet_links}    } 
 sub retweet_tweets { shift->{retweet_tweets} }
@@ -28,24 +29,24 @@ sub Cobalt_register {
    my $core = shift;
    my $conf = $core->get_plugin_cfg($self);
 
-   $self->{tweet_topics}   = $conf->{tweet_topics} // 1;
+   $self->{display_tweets} = $conf->{display_tweets} // 1;
+   $self->{tweet_topics}   = $conf->{tweet_topics}   // 1;
    $self->{tweet_links}    = $conf->{tweet_links};
    $self->{retweet_tweets} = $conf->{retweet_tweets};
    $self->{useragent}      = Mojo::UserAgent->new;
 
    eval {
-      $self->{twitter} = Net::Twitter->new(
-         traits              => [ qw(API::RESTv1_1 RetryOnError) ],
+      $self->{twitter} = Twitter::API->new_with_traits(
+         traits              => 'Enchilada',
          consumer_key        => $conf->{consumer_key},
          consumer_secret     => $conf->{consumer_secret},
          access_token        => $conf->{access_token},
          access_token_secret => $conf->{access_token_secret},
-         ssl                 => 1,
       );      
    };
 
    if (my $err = $@) {
-      logger->warn("Unable to create Net::Twitter object: $err");
+      logger->warn("Unable to create Twitter::API object: $err");
    }
 
    register( $self, 'SERVER', qw(public_msg public_cmd_tweet topic_changed) );
@@ -103,7 +104,8 @@ sub Bot_public_msg {
    my $core = shift;
    my $msg  = ${ shift() };
 
-   return PLUGIN_EAT_NONE unless $self->tweet_links or $self->retweet_tweets;
+   return PLUGIN_EAT_NONE 
+	unless $self->display_tweets or $self->tweet_links or $self->retweet_tweets;
 
    my $context = $msg->context;
    my $channel = $msg->target;
@@ -122,24 +124,26 @@ sub Bot_public_msg {
             }
          }
          
-         my $tweet = $self->twitter->show_status($id);
-         my $text  = $tweet->{text};
-         my $name  = $tweet->{user}->{name};
-         my $sname = $tweet->{user}->{screen_name};
-         my $user  = sprintf '%s (@%s)', $name, $sname;
+         if ($self->display_tweets) {   
+            my $tweet = $self->twitter->show_status($id, { tweet_mode => 'extended' });
+            my $text  = $tweet->{truncated} ? $tweet->{text} : $tweet->{full_text};
+            my $name  = $tweet->{user}->{name};
+            my $sname = $tweet->{user}->{screen_name};
+            my $user  = sprintf '%s (@%s)', $name, $sname;
          
-         $text = unidecode(decode_entities($text));
-         my @lines  = split /\n/, $text;
+            $text = unidecode(decode_entities($text));
+            my @lines  = split /\n/, $text;
 
-         if (@lines == 1) {
-            broadcast( 'message', $context, $channel, "$user - $lines[0]" );
+            if (@lines == 1) {
+               broadcast( 'message', $context, $channel, "$user - $lines[0]" );
+            }
+            else {
+               broadcast( 'message', $context, $channel, $user );
+               broadcast( 'message', $context, $channel, " - $_" )
+                  foreach @lines;
+            }
+            return PLUGIN_EAT_ALL;
          }
-         else {
-            broadcast( 'message', $context, $channel, $user );
-            broadcast( 'message', $context, $channel, " - $_" )
-               foreach @lines;
-         }
-         return PLUGIN_EAT_ALL;
       }
       elsif ($self->tweet_links) {
          my $title = $self->ua->get($uri)->result->dom->at('title')->text;
@@ -148,10 +152,6 @@ sub Bot_public_msg {
          
          next if not $title;
 
-         # my $title = decode_entities( 
-         #     $ua->get($uri)->result->dom->at('title')->text 
-         # ) or next;       
-         
          if (length($short) < length($uni)) {
             $short = "$short...";
          }
@@ -182,7 +182,7 @@ Bot::Cobalt::Plugin::Twitter - Bot::Cobalt plugin for automatic tweeting
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -191,6 +191,7 @@ version 0.002
       Module: Bot::Cobalt::Plugin::Twitter
       Config: plugins/twitter.conf
       Opts:
+         display_tweets: 1
          retweet_tweets: 0
          tweet_links: 0
          tweet_topics: 1
@@ -210,6 +211,10 @@ This plugin will display the contents of a tweet that is linked in a channel.
 Additionally, it does a handful of twitter-related functions.
 
 =over 4
+
+=item display_tweets (default: on)
+
+Whenever a twitter status link is said in chat, look it up and display it.
 
 =item tweet_links (default: off)
 

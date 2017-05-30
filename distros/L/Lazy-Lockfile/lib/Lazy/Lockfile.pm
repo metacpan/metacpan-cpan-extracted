@@ -6,7 +6,7 @@ use POSIX qw/ :errno_h /;
 use File::Basename;
 
 use vars qw( $VERSION );
-( $VERSION ) = '1.22';
+( $VERSION ) = '1.23';
 
 =head1 NAME
 
@@ -172,13 +172,26 @@ sub new {
         return;
     }
 
-    seek( $lock, 0, 0 );
-    truncate( $lock, 0 );
+    my $lockfile_contents;
     if ( $params->{'no_pid'} ) {
-        print $lock "0\n";
+        $lockfile_contents = "0\n";
     } else {
-        print $lock "$$\n";
+        $lockfile_contents = "$$\n";
     }
+
+    seek( $lock, 0, 0 );
+    truncate( $lock, length( $lockfile_contents ) );
+    my $r = syswrite( $lock, $lockfile_contents );
+
+    # If there's a filesystem problem (full? corrupt?) and we can't write
+    # a PID, bail and error.
+    if ( !defined $r || $r != length( $lockfile_contents ) ) {
+        unlink( $lockfile_location );
+        flock( $lock, LOCK_UN );
+        close( $lock );
+        return;
+    }
+
     flock( $lock, LOCK_UN );
     close( $lock );
     bless $self, $class;
@@ -277,6 +290,12 @@ sub DESTROY {
 }
 
 =head1 CHANGES
+
+=head2 2017-05-29, 1.23 - jeagle
+
+Detect and bail out on errors when writing to the lockfile (RT#121894).
+
+Thanks MRDVT.
 
 =head2 2014-10-30, 1.22 - jeagle
 

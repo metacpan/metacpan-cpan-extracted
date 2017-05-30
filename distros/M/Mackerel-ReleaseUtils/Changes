@@ -1,5 +1,12 @@
 Revision history for Perl extension Mackerel-ReleaseUtils
 
+v0.2.0 2017-05-28T11:12:10Z
+    - use truncate && append, instead of using spew in replace
+    - detect debian revision from debian changelog
+    - define update_makefile task
+    - find packaging related files by glob
+    - support glob in replace
+
 v0.1.0 2017-05-14T16:34:20Z
     - adjustment
 

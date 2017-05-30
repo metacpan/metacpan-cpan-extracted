@@ -2,10 +2,10 @@ package CallBackery::Controller::RpcService;
 
 use Mojo::Base qw(Mojolicious::Plugin::Qooxdoo::JsonRpcController);
 use CallBackery::Exception qw(mkerror);
-use CallBackery::User;
 # use Data::Dumper;
 use Scalar::Util qw(blessed weaken);
 use Mojo::JSON qw(encode_json decode_json);
+use Encode;
 
 =head1 NAME
 
@@ -325,7 +325,7 @@ sub handleUpload {
     if (not $upload){
         return $self->render(text=>encode_json({exception=>{message=>'Upload Missing',code=>9384}}));
     }
-    my $obj = $self->config->instanciatePlugin($name,CallBackery::User->new(controller=>$self));
+    my $obj = $self->config->instanciatePlugin($name,$self->user);
 
     my $form;
     if (my $formData = $self->req->param('formData')){
@@ -395,11 +395,11 @@ sub handleDownload {
         return $self->render(text=>encode_json({exception=>{message=>'Plugin Name missing',code=>3923}}));
     }
 
-    my $obj = $self->config->instanciatePlugin($name,CallBackery::User->new(controller=>$self));
+    my $obj = $self->config->instanciatePlugin($name,$self->user);
 
     my $form;
     if (my $formData = $self->req->param('formData')){
-        $form = eval { decode_json($formData) };
+        $form = eval { decode_json(encode('UTF-8',$formData)) };
         if ($@){
             return $self->render(text=>encode_json({exception=>{message=>'Data Decoding Problem '.$@,code=>3923}}));
         }

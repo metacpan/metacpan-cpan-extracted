@@ -2,7 +2,7 @@ package Plack::Middleware::PrettyException;
 
 # ABSTRACT: Capture exceptions and present them as HTML or JSON
 
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 
 use 5.010;
 use strict;
@@ -22,6 +22,7 @@ sub call {
 
     my $r;
     my $error;
+    my $exception;
     my $died = 0;
     eval {
         $r = $self->app->($env);
@@ -30,6 +31,7 @@ sub call {
         my $e = $@;
         $died = 1;
         if ( blessed($e) ) {
+            $exception = $e;
             if ( $e->can('message') ) {
                 $error = $e->message;
             }
@@ -104,7 +106,7 @@ sub call {
             else {
                 $err_headers->set(
                     'content-type' => 'text/html;charset=utf-8' );
-                $err_body = $self->render_html_error( $r->[0], $error );
+                $err_body = $self->render_html_error( $r->[0], $error, $exception );
             }
             $r->[1] = $err_headers->headers;
             $r->[2] = [$err_body];
@@ -114,7 +116,7 @@ sub call {
 }
 
 sub render_html_error {
-    my ( $self, $status, $error ) = @_;
+    my ( $self, $status, $error, $exception ) = @_;
 
     $status ||= 'unknown HTTP status code';
     $error  ||= 'unknown error';
@@ -143,7 +145,7 @@ Plack::Middleware::PrettyException - Capture exceptions and present them as HTML
 
 =head1 VERSION
 
-version 1.002
+version 1.003
 
 =head1 SYNOPSIS
 
@@ -300,8 +302,9 @@ negitiation and a new C<default_response_encoding> field.
 The default HTML is rather basic^wugly. To finetune this, just
 subclass C<Plack::Middleware::PrettyException> and implement a method
 called C<render_html_error>. This method will be called with the HTTP
-status code and the error message, and you can then render it as fancy
-as you (or your graphic designer) wants.
+status code, the stringified error message and the original exception
+object (if there was one!), and you can then render it as fancy as you
+(or your graphic designer) wants.
 
 Here's an example:
 
@@ -314,7 +317,7 @@ Here's an example:
   use Plack::Util::Accessor qw(html_page_model renderer);
   
   sub render_html_error {
-      my ( $self, $status, $message ) = @_;
+      my ( $self, $status, $message, $exception ) = @_;
   
       my %data = (base=>'/',title=>'Error '.$status, error => $message, code => $status );
       eval {

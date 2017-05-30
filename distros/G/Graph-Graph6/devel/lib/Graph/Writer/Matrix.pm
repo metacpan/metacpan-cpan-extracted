@@ -1,4 +1,4 @@
-# Copyright 2015, 2016 Kevin Ryde
+# Copyright 2015, 2016, 2017 Kevin Ryde
 #
 # This file is part of Graph-Graph6.
 #
@@ -23,7 +23,7 @@ use Graph::Writer;
 
 use vars '@ISA','$VERSION';
 @ISA = ('Graph::Writer');
-$VERSION = 6;
+$VERSION = 7;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
@@ -39,7 +39,7 @@ sub _write_graph {
 
   my @vertices = sort $graph->vertices;
 
-  my $format = $self->{'format'} || 'plain';
+  my $format = $self->{'format'} || 'amtog';
   my $matrix_type = $self->{'matrix_type'} || 'adjacency';
 
   ### $matrix_type
@@ -194,7 +194,7 @@ adjacency matrix described above.  If there are self-loops then they
 subtract from the diagonal entries.
 
 The eigenvalues of the Laplacian have various properties.  For a tree of n
-vertices the Weiner index = n * sum 1/eigenvalue[i], where the sum excludes
+vertices the Wiener index = n * sum 1/eigenvalue[i], where the sum excludes
 the zero eigenvalue.
 
 =head2 Matrix Type C<Seidel>
@@ -243,7 +243,7 @@ L<http://user42.tuxfamily.org/graph-graph6/index.html>
 
 =head1 LICENSE
 
-Copyright 2015, 2016 Kevin Ryde
+Copyright 2015, 2016, 2017 Kevin Ryde
 
 Graph-Graph6 is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

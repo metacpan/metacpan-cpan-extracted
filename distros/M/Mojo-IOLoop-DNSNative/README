@@ -1,0 +1,97 @@
+NAME
+
+    Mojo::IOLoop::DNSNative - Async native DNS lookup
+
+VERSION
+
+    version 0.001
+
+SYNOPSIS
+
+      use feature 'say';
+      use Mojo::IOLoop;
+      use Mojo::IOLoop::DNSNative;
+    
+      my $loop = Mojo::IOLoop->new;
+      my $dns = Mojo::IOLoop::DNSNative->new(reactor => $loop->reactor);
+    
+      $dns->lookup(
+        'google.com',
+        sub {
+          my ($err, @ips) = @_;
+          die "Could not look up google.com: $err" if $err;
+    
+          say for @ips;
+        }
+      );
+    
+      $loop->start;
+
+DESCRIPTION
+
+    Look up hostnames using Net::DNS::Native in a Mojo::IOLoop without
+    blocking.
+
+ATTRIBUTES
+
+    Mojo::IOLoop::DNSNative implements the following attributes.
+
+ NDN
+
+      my $ndn = $dns->NDN;
+      $dns    = $dns->NDN(Net::DNS::Native->new(pool => 5, extra_thread => 1));
+
+    The underlying Net::DNS::Native object used to perform lookups.
+
+ reactor
+
+      my $reactor = $dns->reactor;
+      $dns        = $dns->reactor(Mojo::Reactor::Poll->new);
+
+    Low-level event reactor, defaults to the reactor attribute of the
+    global Mojo::IOLoop singleton.
+
+ timeout
+
+      my $timeout = $dns->timeout;
+      $dns        = $dns->timeout(10);
+
+    Sets the timeout for lookups. Use 0 to disable timeouts.
+
+METHODS
+
+    Mojo::IOLoop::DNSNative implements the following methods.
+
+ lookup
+
+      $dns->lookup(
+        $host,
+        sub {
+          my ($err, @ips) = @_;
+          die "Could not lookup $host: $err" if $err;
+    
+          say "$host resolves to @ips";
+        }
+      );
+
+    Look up a hostname using Net::DNS::Native and get all the IPs it
+    resolves to.
+
+SEE ALSO
+
+    Mojo::IOLoop
+
+    Net::DNS::Native
+
+AUTHOR
+
+    Andreas Guldstrand <andreas.guldstrand@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2017 by Andreas Guldstrand.
+
+    This is free software, licensed under:
+
+      The MIT (X11) License
+

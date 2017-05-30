@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 24;
+use Test::Most tests => 27;
 use Test::NoWarnings;
 
 eval 'use autodie qw(:all)';	# Test for open/close failures
@@ -13,7 +13,7 @@ BEGIN {
 
 LIST: {
 	SKIP: {
-		skip 'Test requires Internet access', 22 unless(-e 't/online.enabled');
+		skip 'Test requires Internet access', 25 unless(-e 't/online.enabled');
 
 		eval {
 			require Test::Number::Delta;
@@ -52,7 +52,7 @@ LIST: {
 		if($@) {
 			diag($@);
 			diag('Not enough geocoders installed - skipping tests');
-			skip 'Not enough geocoders installed', 19;
+			skip 'Not enough geocoders installed', 25;
 		}
 		my $geocoderlist = new_ok('Geo::Coder::List')
 			->push({ regex => qr/(Canada|USA|United States)$/, geocoder => new_ok('Geo::Coder::CA') })
@@ -73,6 +73,12 @@ LIST: {
 		delta_within($location->{geometry}{location}{lat}, 38.99, 1e-2);
 		delta_within($location->{geometry}{location}{lng}, -77.03, 1e-2);
 		is(ref($location->{'geocoder'}), 'Geo::Coder::CA', 'Verify CA encoder is used');
+		sleep(1);	# play nicely
+
+		$location = $geocoderlist->geocode('Wokingham, Berkshire, England');
+		delta_within($location->{geometry}{location}{lat}, 51.41, 1e-2);
+		delta_within($location->{geometry}{location}{lng}, -0.83, 1e-2);
+		sleep(1);	# play nicely
 
 		$location = $geocoderlist->geocode(location => '8600 Rockville Pike, Bethesda MD, 20894 USA');
 		ok(defined($location));
@@ -80,6 +86,7 @@ LIST: {
 		delta_within($location->{geometry}{location}{lat}, 38.99, 1e-1);
 		delta_within($location->{geometry}{location}{lng}, -77.03, 1e-1);
 		is(ref($location->{'geocoder'}), 'Geo::Coder::CA', 'Verify CA encoder is used');
+		sleep(1);	# play nicely
 
 		$location = $geocoderlist->geocode({ location => 'Rochester, Kent, England' });
 		ok(defined($location));
@@ -87,6 +94,8 @@ LIST: {
 		delta_within($location->{geometry}{location}{lat}, 51.38, 1e-2);
 		delta_within($location->{geometry}{location}{lng}, 0.54, 1e-2);
 		is(ref($location->{'geocoder'}), 'Geo::Coder::XYZ', 'Verify XYZ encoder is used');
+		ok($location->{state} eq 'UK');
+		sleep(1);	# play nicely
 
 		ok(!defined($geocoderlist->geocode()));
 		ok(!defined($geocoderlist->geocode('')));

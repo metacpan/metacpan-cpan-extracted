@@ -1,6 +1,6 @@
 package Map::Tube::Plugin::Formatter::Utils;
 
-$Map::Tube::Plugin::Formatter::Utils::VERSION   = '0.12';
+$Map::Tube::Plugin::Formatter::Utils::VERSION   = '0.13';
 $Map::Tube::Plugin::Formatter::Utils::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Plugin::Formatter::Utils - Helper package for Map::Tube::Plugin::Form
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 

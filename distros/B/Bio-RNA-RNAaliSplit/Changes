@@ -9,3 +9,9 @@ Revision history for Bio::RNA::RNAaliSplit
 	  shipped with the distribution
 	- strict depencency on ViennaRNA >=v2.3.4 
 	- use Test::Prereq for dependency testing
+
+0.05	Sun May 28 2017
+	- ship with Version::Control for checking versions of third party
+	  modules 
+	- remove obsolete symbols
+	- use FileDirUtil consistently instead of custom FileDir.pm 

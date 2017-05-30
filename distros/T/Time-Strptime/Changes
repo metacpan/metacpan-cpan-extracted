@@ -1,5 +1,10 @@
 Revision history for Perl extension Time-Strptime
 
+1.01 2017-05-28T09:29:29Z
+
+    - win32 uses double quote characters to quote shell args (thanks charsbar)
+    - enables x_statis_install
+
 1.00 2016-03-19T10:21:00Z
 
     - bump up version

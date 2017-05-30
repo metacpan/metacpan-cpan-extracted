@@ -35,7 +35,7 @@ package Spreadsheet::Read;
 use strict;
 use warnings;
 
-our $VERSION = "0.71";
+our $VERSION = "0.72";
 sub  Version { $VERSION }
 
 use Carp;
@@ -73,16 +73,17 @@ my %can = map {
 	else { # forcing a parser should still check the version
 	    for (grep { $_->[1] eq $preset and $_->[2] } @parsers) {
 		my $ok;
+		my $has = $preset->VERSION;
+		$has =~ s/_[0-9]+$//;			# Remove beta-part
 		if ($_->[2] =~ m/^v([0-9.]+)/) {	# clumsy versions
 		    my @min = split m/\./ => $1;
-		    my $has = $preset->VERSION;
 		    $has =~ s/^v//;
 		    my @has = split m/\./ => $has;
 		    $ok = (($has[0] * 1000 + $has[1]) * 1000 + $has[2]) >=
 			  (($min[0] * 1000 + $min[1]) * 1000 + $min[2]);
 		    }
 		else {	# normal versions
-		    $ok = $preset->VERSION >= $_->[2];
+		    $ok = $has >= $_->[2];
 		    }
 		$ok or $preset = "!$preset";
 		}
@@ -98,8 +99,10 @@ for (@parsers) {
     }
 $can{sc} = __PACKAGE__;	# SquirelCalc is built-in
 
-$can{xlsx} =~ m/LibXML/ && $] < 5.012 and
+$can{xlsx} =~ m/LibXML/     && $] < 5.012 and
     substr $can{xlsx}, 0, 0, "!"; # This parser requires perl 5.12 or newer
+defined $Spreadsheet::ParseExcel::VERSION && $Spreadsheet::ParseExcel::VERSION < 0.61 and
+    *Spreadsheet::ParseExcel::Workbook::get_active_sheet = sub { undef; };
 
 my $debug = 0;
 my %def_opts = (
@@ -111,6 +114,7 @@ my %def_opts = (
     pivot   => 0,
     dtfmt   => "yyyy-mm-dd", # Format 14
     debug   => 0,
+    passwd  => undef,
     parser  => undef,
     sep     => undef,
     quote   => undef,
@@ -603,6 +607,7 @@ sub ReadData {
 	    croak "Parser for $parse_type is not installed";
 	my $xlsx_libxml = $parser =~ m/LibXML$/;
 	$debug and print STDERR "Opening $parse_type $txt using $parser-", $can{lc $parse_type}->VERSION, "\n";
+	$opt{passwd} and $parser_opts{Password} = $opt{passwd};
 	my $oBook = eval {
 	    $io_ref
 	      ? $parse_type eq "XLSX"
@@ -694,7 +699,8 @@ sub ReadData {
 	    my $sheet_idx = 1 + @data;
 	    $debug and print STDERR "\tSheet $sheet_idx '$sheet{label}' $sheet{maxrow} x $sheet{maxcol}\n";
 	    if (defined $active_sheet) {
-		my $sheet_no = $oWkS->{_SheetNo} || $current_sheet;
+		# _SheetNo is 0-based
+		my $sheet_no = defined $oWkS->{_SheetNo} ? $oWkS->{_SheetNo} : $current_sheet - 1;
 		$sheet_no eq $active_sheet and $sheet{active} = 1;
 		}
 	    # Sheet keys:
@@ -1073,6 +1079,11 @@ sub label {
     return $sheet->{label};
     } # label
 
+sub active {
+    my $sheet = shift;
+    return $sheet->{active};
+    } # label
+
 # my @row = $sheet->cellrow (1);
 sub cellrow {
     my ($sheet, $row) = @_;
@@ -1330,6 +1341,12 @@ Enable some diagnostic messages to STDERR.
 The value determines how much diagnostics are dumped (using
 L<Data::Peek|https://metacpan.org/release/Data-Peek>).  A value of C<9>
 and higher will dump the entire structure from the back-end parser.
+
+=item passwd
+
+Use this password to decrypt password protected spreadsheet.
+
+Currently only supports Excel.
 
 =back
 
@@ -1590,6 +1607,14 @@ index in the C<{cell}> entry is 1-based.
 
 Set a new label to a sheet. Note that the index in the control structure will
 I<NOT> be updated.
+
+=head3 active
+
+ my $sheet_is_active = $sheet->active;
+
+Returns 1 if the selected sheet is active, otherwise returns 0.
+
+Currently only works on XLS. CSV is always active.
 
 =head2 Using CSV
 

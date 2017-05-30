@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 our $SOURCE = 'CPAN';
 ## $SOURCE = 'GitHub';  # COMMENT
 # the line above will be commented out by Dist::Zilla
@@ -38,6 +38,7 @@ sub new {
         jira_rest => $class->JIRA_REST( clone( $args ) ),
         factory   => $class->factory( clone( $args ) ),
         args      => clone( $args ),
+        userobj   => undef,
     }, $class;
 }
 
@@ -154,7 +155,7 @@ sub new {
 sub issues {
     my ( $self, @args ) = @_;
     if ( @args == 1 && ref $args[0] eq 'HASH' ) {
-        return $self->query( shift )->issues;
+        return $self->query( $args[0] )->issues;
     }
     else {
         my $jql = sprintf 'key in (%s)', join q{,} => @args;
@@ -727,13 +728,42 @@ sub url { return shift->args->{url} }
 #pod
 #pod =cut
 
-sub username { return shift->args->{username} }
+sub username {
+    my $self = shift;
+
+    unless ( defined $self->args->{username} ) {
+        $self->args->{username} = $self->user_object->name;
+    }
+
+    return $self->args->{username};
+}
+
+#pod =accessor B<user_object>
+#pod
+#pod An accessor that returns the user used to connect to the JIRA server as a
+#pod L<JIRA::REST::Class::User|JIRA::REST::Class::User> object, even if the username
+#pod was read from a C<.netrc> or L<Config::Identity|Config::Identity> file.  Works
+#pod by calling C</rest/api/latest/myself>.
+#pod
+#pod =cut
+
+sub user_object {
+    my $self = shift;
+
+    unless ( defined $self->{userobj} ) {
+        my $data = $self->get( '/myself' );
+        $self->{userobj} = $self->make_object( 'user', { data => $data } );
+    }
+
+    return $self->{userobj};
+}
 
 #pod =accessor B<password>
 #pod
-#pod An accessor that returns the password used to connect to the JIRA server,
-#pod even if the password was read from a C<.netrc> or
-#pod L<Config::Identity|Config::Identity> file.
+#pod An accessor that returns the password used to connect to the JIRA server.
+#pod Currently only works if the password was passed into the class constructor.
+#pod Work is being done to return the password when the password was read from a
+#pod C<.netrc> or L<Config::Identity|Config::Identity> file.
 #pod
 #pod =cut
 
@@ -766,9 +796,11 @@ sub proxy { return shift->args->{proxy} }
 
 #---------------------------------------------------------------------------
 
-#pod =begin testing parameter_accessors 7
+#pod =begin testing parameter_accessors 15
 #pod
-#pod try{
+#pod try {
+#pod     print "#\n# Checking parameter accessors\n#\n";
+#pod
 #pod     my $test = get_test_client();
 #pod     my $url  = TestServer_url();
 #pod
@@ -813,6 +845,17 @@ sub proxy { return shift->args->{proxy} }
 #pod
 #pod     is($test->maxResults, 10,
 #pod        q{maxResults() was successfully set by previous call});
+#pod
+#pod     print "# testing user_object() accessor\n";
+#pod     my $userobj = $test->user_object();
+#pod
+#pod     validate_expected_fields( $userobj, {
+#pod         key => 'packy',
+#pod         name => 'packy',
+#pod         displayName => "Packy Anderson",
+#pod         emailAddress => 'packy\@cpan.org',
+#pod     });
+#pod
 #pod };
 #pod
 #pod =end testing
@@ -829,17 +872,17 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Packy Anderson Alexey Melezhik gnustavo jira JRC Gustavo Leite de Mendonça
-Chaves Atlassian GreenHopper ScriptRunner TODO aggregateprogress
-aggregatetimeestimate aggregatetimeoriginalestimate assigneeType avatar
-avatarUrls completeDate displayName duedate emailAddress endDate fieldtype
-fixVersions fromString genericized iconUrl isAssigneeTypeValid issueTypes
-issuekeys issuelinks issuetype jql lastViewed maxResults originalEstimate
-originalEstimateSeconds parentkey projectId rapidViewId remainingEstimate
-remainingEstimateSeconds resolutiondate sprintlist startDate
-subtaskIssueTypes timeSpent timeSpentSeconds timeestimate
-timeoriginalestimate timespent timetracking toString updateAuthor worklog
-workratio
+=for :stopwords Packy Anderson Alexandr Alexey Ciornii Melezhik gnustavo jira JRC Gustavo
+Leite de Mendonça Chaves Atlassian GreenHopper ScriptRunner TODO
+aggregateprogress aggregatetimeestimate aggregatetimeoriginalestimate
+assigneeType avatar avatarUrls completeDate displayName duedate
+emailAddress endDate fieldtype fixVersions fromString genericized iconUrl
+isAssigneeTypeValid issueTypes issuekeys issuelinks issuetype jql
+lastViewed maxResults originalEstimate originalEstimateSeconds parentkey
+projectId rapidViewId remainingEstimate remainingEstimateSeconds
+resolutiondate sprintlist startDate subtaskIssueTypes timeSpent
+timeSpentSeconds timeestimate timeoriginalestimate timespent timetracking
+toString updateAuthor worklog workratio
 
 =head1 NAME
 
@@ -847,7 +890,7 @@ JIRA::REST::Class - An OO Class module built atop L<JIRA::REST|JIRA::REST> for d
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -1111,11 +1154,19 @@ An accessor that returns the username used to connect to the JIRA server,
 even if the username was read from a C<.netrc> or
 L<Config::Identity|Config::Identity> file.
 
+=head2 B<user_object>
+
+An accessor that returns the user used to connect to the JIRA server as a
+L<JIRA::REST::Class::User|JIRA::REST::Class::User> object, even if the username
+was read from a C<.netrc> or L<Config::Identity|Config::Identity> file.  Works
+by calling C</rest/api/latest/myself>.
+
 =head2 B<password>
 
-An accessor that returns the password used to connect to the JIRA server,
-even if the password was read from a C<.netrc> or
-L<Config::Identity|Config::Identity> file.
+An accessor that returns the password used to connect to the JIRA server.
+Currently only works if the password was passed into the class constructor.
+Work is being done to return the password when the password was read from a
+C<.netrc> or L<Config::Identity|Config::Identity> file.
 
 =head2 B<rest_client_config>
 
@@ -1257,6 +1308,8 @@ EVERYTHING.
 =item * L<JIRA::REST::Class::Project|JIRA::REST::Class::Project>
 
 =item * L<JIRA::REST::Class::Query|JIRA::REST::Class::Query>
+
+=item * L<JIRA::REST::Class::User|JIRA::REST::Class::User>
 
 =back
 
@@ -1502,9 +1555,11 @@ try {
 
 =end testing
 
-=begin testing parameter_accessors 7
+=begin testing parameter_accessors 15
 
-try{
+try {
+    print "#\n# Checking parameter accessors\n#\n";
+
     my $test = get_test_client();
     my $url  = TestServer_url();
 
@@ -1549,6 +1604,17 @@ try{
 
     is($test->maxResults, 10,
        q{maxResults() was successfully set by previous call});
+
+    print "# testing user_object() accessor\n";
+    my $userobj = $test->user_object();
+
+    validate_expected_fields( $userobj, {
+        key => 'packy',
+        name => 'packy',
+        displayName => "Packy Anderson",
+        emailAddress => 'packy\@cpan.org',
+    });
+
 };
 
 =end testing
@@ -1591,11 +1657,21 @@ the summer of 2016, and without which I would have had a LOT of work to do.
 
 Packy Anderson <packy@cpan.org>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Alexey Melezhik
+=for stopwords Alexandr Ciornii Alexey Melezhik
+
+=over 4
+
+=item *
+
+Alexandr Ciornii <alexchorny@gmail.com>
+
+=item *
 
 Alexey Melezhik <melezhik@gmail.com>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

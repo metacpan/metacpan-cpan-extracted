@@ -1,5 +1,8 @@
 Revision history for CPANTS::Kwalitee::Report
 
+0.10  Mon May 29 08:25:00 2017
+      - Tidied up attributes definition using 'lazy' and 'builder'.
+
 0.09  Wed May 10 10:30:00 2017
       - Added test scripts (t/meta-json.t and t/meta-yml.t).
 

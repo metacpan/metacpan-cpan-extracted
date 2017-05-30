@@ -1,5 +1,12 @@
 Revision history for Perl extension Redis::ClusterRider.
 
+0.10 Mon May 29 16:13:41 MSK 2017
+  - Prevented DESTROY to fall back into AUTOLOAD.
+
+0.08 Mon May 29 15:00:25 MSK 2017
+  - Removed using of "no_auto_connect_on_new" option to avoid limits in
+    transactions.
+
 0.06 Sat May 22 11:35:36 MSK 2017
   - Fixed typo in POD.
 

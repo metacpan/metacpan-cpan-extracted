@@ -4,7 +4,7 @@ Moo::Google - Server-side client library for any Google App API. Based on Moose
 
 # VERSION
 
-version 0.01
+version 0.02
 
 # SYNOPSIS
 

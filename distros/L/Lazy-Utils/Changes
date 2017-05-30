@@ -1,3 +1,14 @@
+1.20	2017-05-29
+		- system2() dies internally
+
+1.19	2017-05-29
+		- optionAtAll come back in cmdargs()
+		- Improved system2()
+
+1.18	2017-05-28
+		- POD changes
+		- Bug fix: 'Depends on Term::ReadKey but does not declare it'
+
 1.17	2017-05-19
 		- Removed term_readline() and term_readkey()
 

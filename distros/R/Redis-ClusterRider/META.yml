@@ -32,4 +32,4 @@ resources:
   homepage: https://github.com/iph0/Redis-ClusterRider
   license: http://dev.perl.org/licenses/
   repository: https://github.com/iph0/Redis-ClusterRider
-version: '0.06'
+version: '0.10'

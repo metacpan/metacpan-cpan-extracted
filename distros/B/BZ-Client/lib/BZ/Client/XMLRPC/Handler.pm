@@ -5,7 +5,7 @@ use strict;
 use warnings 'all';
 
 package BZ::Client::XMLRPC::Handler;
-$BZ::Client::XMLRPC::Handler::VERSION = '4.4001';
+$BZ::Client::XMLRPC::Handler::VERSION = '4.4002';
 sub new {
     my $class = shift;
     my $self = { @_ };
@@ -23,7 +23,8 @@ sub parser {
     my $self = shift;
     if (@_) {
         $self->{'parser'} = shift;
-    } else {
+    }
+    else {
         return $self->{'parser'};
     }
 }
@@ -32,7 +33,8 @@ sub level {
     my $self = shift;
     if (@_) {
         $self->{'level'} = shift;
-    } else {
+    }
+    else {
         return $self->{'level'};
     }
 }
@@ -56,7 +58,7 @@ sub error {
 
 sub characters {
     my($self, $text) = @_;
-    if ($text !~ /^\s*$/s) {
+    if ($text !~ m/^\s*$/s) {
         $self->error("Unexpected non-whitespace: $text");
     }
 }
@@ -85,7 +87,7 @@ BZ::Client::XMLRPC::Handler - Abstract event handler for parsing an XML-RPC resp
 
 =head1 VERSION
 
-version 4.4001
+version 4.4002
 
 =head1 AUTHORS
 

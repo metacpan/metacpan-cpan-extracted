@@ -1,0 +1,7 @@
+0.012 - May 28th 2017
+  * Fix some syntax errors I didn't catch
+  * Actually tested from an installed version
+  * Fix the config to use shadowsystem relative lib paths
+
+0.011 - May 27th 2017
+  * First potentially usable release

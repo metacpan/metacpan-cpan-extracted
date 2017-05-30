@@ -1,6 +1,6 @@
 package CPANTS::Kwalitee::Report::Indicator;
 
-$CPANTS::Kwalitee::Report::Indicator::VERSION   = '0.09';
+$CPANTS::Kwalitee::Report::Indicator::VERSION   = '0.10';
 $CPANTS::Kwalitee::Report::Indicator::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ CPANTS::Kwalitee::Report::Indicator - Interface to Kwalitee Indicator.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
@@ -22,11 +22,11 @@ use namespace::clean;
 
 use overload q{""} => 'as_string', fallback => 1;
 
+has [qw(types error remedy)] => (is => 'ro');
 has 'name'    => (is => 'ro', required => 1);
-has 'types'   => (is => 'ro');
-has 'error'   => (is => 'ro');
-has 'remedy'  => (is => 'ro');
-has 'verbose' => (is => 'rw', default => sub { 0 });
+has 'verbose' => (is => 'lazy');
+
+sub _build_verbose { 0 }
 
 =head1 DESCRIPTION
 

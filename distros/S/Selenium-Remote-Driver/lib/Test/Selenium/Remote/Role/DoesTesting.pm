@@ -1,12 +1,12 @@
 package Test::Selenium::Remote::Role::DoesTesting;
 # ABSTRACT: Role to cope with everything that is related to testing (could
 # be reused in both testing classes)
-$Test::Selenium::Remote::Role::DoesTesting::VERSION = '1.12';
+$Test::Selenium::Remote::Role::DoesTesting::VERSION = '1.20';
 use Moo::Role;
 use Test::Builder;
 use Try::Tiny;
 use Scalar::Util 'blessed';
-use List::MoreUtils qw/any/;
+use List::Util qw/any/;
 use namespace::clean;
 
 requires qw(func_list has_args);

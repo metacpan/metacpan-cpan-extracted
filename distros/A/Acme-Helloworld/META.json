@@ -1,0 +1,74 @@
+{
+   "abstract" : "output 'Hello, world'",
+   "author" : [
+      "tomcha <tomcha@tomcha.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.11",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-Helloworld",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::Helloworld" : {
+         "file" : "lib/Acme/Helloworld.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tomcha/Acme-Helloworld/issues"
+      },
+      "homepage" : "https://github.com/tomcha/Acme-Helloworld",
+      "repository" : {
+         "url" : "git://github.com/tomcha/Acme-Helloworld.git",
+         "web" : "https://github.com/tomcha/Acme-Helloworld"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:TOMCHA",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

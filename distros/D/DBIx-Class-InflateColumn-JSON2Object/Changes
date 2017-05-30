@@ -1,5 +1,9 @@
 Revision history for DBIx-Class-InflateColumn-JSON2Object
 
+0.904   2017-05-29T09:12:17
+    - specify 5.14 as minimum Perl version
+
+
 0.903   2017-05-19T13:25:33
     - add array_of_class to store a list of objects of one class
 

@@ -30,7 +30,7 @@ use List::Util qw/all any none/;
 use File::Temp 'tempfile';
 use namespace::clean;
 
-our $VERSION = '0.07046';
+our $VERSION = '0.07047';
 
 __PACKAGE__->mk_group_ro_accessors('simple', qw/
                                 schema
@@ -412,15 +412,15 @@ L<might_have|DBIx::Class::Relationship/might_have> relationships, they default
 to off.
 
 Can also be a coderef, for more precise control, in which case the coderef gets
-this hash of parameters (as a list:)
+this hash of parameters (as a list):
 
     rel_name        # the name of the relationship
     rel_type        # the type of the relationship: 'belongs_to', 'has_many' or 'might_have'
     local_source    # the DBIx::Class::ResultSource object for the source the rel is *from*
     remote_source   # the DBIx::Class::ResultSource object for the source the rel is *to*
-    local_table     # a DBIx::Class::Schema::Loader::Table object for the table of the source the rel is from
+    local_table     # the DBIx::Class::Schema::Loader::Table object for the table of the source the rel is from
     local_cols      # an arrayref of column names of columns used in the rel in the source it is from
-    remote_table    # a DBIx::Class::Schema::Loader::Table object for the table of the source the rel is to
+    remote_table    # the DBIx::Class::Schema::Loader::Table object for the table of the source the rel is to
     remote_cols     # an arrayref of column names of columns used in the rel in the source it is to
     attrs           # the attributes that would be set
 
@@ -561,10 +561,6 @@ database and/or schema.
 
 Only load matching tables.
 
-=head2 exclude
-
-Exclude matching tables.
-
 These can be specified either as a regex (preferably on the C<qr//>
 form), or as an arrayref of arrayrefs.  Regexes are matched against
 the (unqualified) table name, while arrayrefs are matched according to
@@ -581,6 +577,13 @@ For example:
 
 In this case only the tables C<foo> and C<bar> in C<some_schema> and
 C<baz> in C<other_schema> will be dumped.
+
+=head2 exclude
+
+Exclude matching tables.
+
+The tables to exclude are specified in the same way as for the
+L</constraint> option.
 
 =head2 moniker_map
 
@@ -610,14 +613,27 @@ a hashref of unqualified table name keys and moniker values
 
 =item *
 
-a coderef for a translator function taking a L<table
-object|DBIx::Class::Schema::Loader::Table> argument (which stringifies to the
-unqualified table name) and returning a scalar moniker
+a coderef that returns the moniker, which is called with the following
+arguments:
 
-The function is also passed a coderef that can be called with either
-of the hashref forms to get the moniker mapped accordingly.  This is
-useful if you need to handle some monikers specially, but want to use
-the hashref form for the rest.
+=over
+
+=item *
+
+the L<DBIx::Class::Schema::Loader::Table> object for the table
+
+=item *
+
+the default moniker that DBIC would ordinarily give this table
+
+=item *
+
+a coderef that can be called with either of the hashref forms to get
+the moniker mapped accordingly.  This is useful if you need to handle
+some monikers specially, but want to use the hashref form for the
+rest.
+
+=back
 
 =back
 
@@ -640,7 +656,7 @@ together. Examples:
 
 Map for overriding the monikerization of individual L</moniker_parts>.
 The keys are the moniker part to override, the value is either a
-hashref of coderef for mapping the corresponding part of the
+hashref or coderef for mapping the corresponding part of the
 moniker. If a coderef is used, it gets called with the moniker part
 and the hash key the code ref was found under.
 
@@ -661,23 +677,36 @@ L</moniker_map> takes precedence over this.
 Same as moniker_map, but for column accessor names.  The nested
 hashref form is traversed according to L</moniker_parts>, with an
 extra level at the bottom for the column name.  If a coderef is
-passed, the code is called with arguments of
+passed, the code is called with the following arguments:
 
-    the DBIx::Class::Schema::Loader::Column object for the column,
-    default accessor name that DBICSL would ordinarily give this column,
+=over
+
+=item *
+
+the L<DBIx::Class::Schema::Loader::Column> object for the column
+
+=item *
+
+the default accessor name that DBICSL would ordinarily give this column
+
+=item *
+
+a hashref of this form:
+
     {
         table_class     => name of the DBIC class we are building,
         table_moniker   => calculated moniker for this table (after moniker_map if present),
-        table           => table object of interface DBIx::Class::Schema::Loader::Table,
+        table           => the DBIx::Class::Schema::Loader::Table object for the table,
         full_table_name => schema-qualified name of the database table (RDBMS specific),
         schema_class    => name of the schema class we are building,
         column_info     => hashref of column info (data_type, is_nullable, etc),
     }
-    coderef ref that can be called with a hashref map
 
-The L<column|DBIx::Class::Schema::Loader::Column> and
-L<table|DBIx::Class::Schema::Loader::Table> objects stringify to their
-unqualified names.
+=item *
+
+a coderef that can be called with a hashref map
+
+=back
 
 =head2 rel_name_map
 
@@ -713,9 +742,9 @@ If it is a coderef, it will be passed a hashref of this form:
         remote_moniker => moniker of the DBIC class we are related to,
         remote_columns => columns in the other table in the relationship,
         # for type => "many_to_many" only:
-        link_class     => name of the DBIC class for the link table
-        link_moniker   => moniker of the DBIC class for the link table
-        link_rel_name  => name of the relationship to the link table
+        link_class     => name of the DBIC class for the link table,
+        link_moniker   => moniker of the DBIC class for the link table,
+        link_rel_name  => name of the relationship to the link table,
     }
 
 In addition it is passed a coderef that can be called with a hashref map.
@@ -882,8 +911,8 @@ L<column_info|DBIx::Class::ResultSource/column_info> for a column.
 
 Must be a coderef that returns a hashref with the extra attributes.
 
-Receives the L<table object|DBIx::Class::Schema::Loader::Table> (which
-stringifies to the unqualified table name), column name and column_info.
+Receives the L<DBIx::Class::Schema::Loader::Table> object, column name
+and column_info.
 
 For example:
 

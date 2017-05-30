@@ -36,6 +36,7 @@ $t = Time::HiRes::time();
 while (<$pid>) {
     last;
 }
+
 $t = Time::HiRes::time() - $t;
 ok($_ eq "abc\n", "while (<\$obj>) auto-assign to \$_");
 okl($t < 2.0, "no blocking read[2] in emulation mode");

@@ -1,5 +1,5 @@
 package Moo::Google::AuthStorage;
-$Moo::Google::AuthStorage::VERSION = '0.01';
+$Moo::Google::AuthStorage::VERSION = '0.02';
 
 # ABSTRACT: Provide universal methods to fetch tokens from different types of data sources. Default is jsonfile
 
@@ -82,7 +82,7 @@ Moo::Google::AuthStorage - Provide universal methods to fetch tokens from differ
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 METHODS
 

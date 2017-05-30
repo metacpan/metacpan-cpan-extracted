@@ -36,6 +36,17 @@ Lingua::ZH::Jieba - Perl wrapper for CppJieba (Chinese text segmentation)
     print join('/', @$words_cut4search), "\n";
     # 小明/硕士/毕业/于/中国/科学/学院/科学院/中国科学院/计算/计算所/，/后/在/日本/京都/大学/日本京都大学/深造
 
+    # get word offset and length with cut_ex() or cut_for_search_ex()
+    my $words_ex = $jieba->cut_ex("他来到了网易杭研大厦");
+    # [
+    #   [ "他",     0, 1 ],
+    #   [ "来到",   1, 2 ],
+    #   [ "了",     3, 1 ],
+    #   [ "网易",   4, 2 ],
+    #   [ "杭研",   6, 2 ],
+    #   [ "大厦",   8, 2 ],
+    # ]
+
     # part-of-speech tagging (词性标注)
     my $word_pos_tags = $jieba->tag("我是蓝翔技工拖拉机学院手扶拖拉机专业的。");
     for my $pair (@$word_pos_tags) {
@@ -130,10 +141,24 @@ Cut without HMM mode.
 
 Cut all possible words in dictionary.
 
+=head2 cut_ex
+
+    my $words_ex = $jieba->cut_ex($sentence);
+
+Similar to C<cut()>, but returns an arrayref of complex data.
+Each element in the result arrayref is C<[ word, offset, length ]>.
+
 =head2 cut_for_search
 
     my $words = $jieba->cut_for_search($sentence);
     my $words_nohmm = $jieba->cut_for_search($sentence, { no_hmm => 1 });
+
+=head2 cut_for_search_ex
+
+    my $words_ex = $jieba->cut_for_search_ex($sentence);
+
+Similar to C<cut_for_search()>, but returns an arrayref of complex data.
+Each element in the result arrayref is C<[ word, offset, length ]>.
 
 =head2 tag
 
@@ -143,7 +168,7 @@ Cut all possible words in dictionary.
         ...
     }
 
-part-of-speech tagging. Returns an arrayref of which each element is in
+POS (part-of-speech) tagging. Returns an arrayref of which each element is in
 the form of C<[ $word, $part_of_speech ]>.
 
 =head2 insert_user_word

@@ -147,15 +147,17 @@ sub test_001 : Tags(job_stats) {
     #     [ [ '1239_11', '1236_5' ] ] );
     # is_deeply( $test->jobs->{'blastx_scratch'}->batches->[5]->array_deps,
     #     [ [ '1239_12', '1236_6' ] ] );
-    my $array_deps = [
-        [ '1237_7',  '1236_1' ],
-        [ '1237_8',  '1236_2' ],
-        [ '1238_9',  '1236_3' ],
-        [ '1238_10', '1236_4' ],
-        [ '1239_11', '1236_5' ],
-        [ '1239_12', '1236_6' ]
-    ];
-    is_deeply($test->array_deps, $array_deps);
+
+    my $array_deps = {
+        '1237_7'  => [ '1234_1' ],
+        '1237_8'  => [ '1234_2' ],
+        '1238_9'  => [ '1235_3' ],
+        '1238_10' => [ '1235_4' ],
+        '1239_11' => [ '1236_5' ],
+        '1239_12' => [ '1236_6' ],
+    };
+
+    is_deeply( $test->array_deps, $array_deps );
 
     is_deeply(
         $test->jobs->{'blastx_scratch'}->batch_indexes->[0],

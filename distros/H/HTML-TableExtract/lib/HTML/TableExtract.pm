@@ -12,7 +12,7 @@ use Carp;
 
 use vars qw($VERSION @ISA);
 
-$VERSION = '2.13';
+$VERSION = '2.15';
 
 use HTML::Parser;
 @ISA = qw(HTML::Parser);
@@ -438,6 +438,7 @@ sub _reset_state {
   $self->{_counts}        = [];
   $self->{_in_a_table}    = 0;
   $self->{_parsing}       = 0;
+  $self->tree->delete_content() if TREE();
 }
 
 sub _emsg {
@@ -1278,20 +1279,20 @@ HTML::TableExtract - Perl module for extracting the content contained in tables 
  # you specified the headers since 'automap' is enabled by default.
 
  use HTML::TableExtract;
- $te = HTML::TableExtract->new( headers => [qw(Date Price Cost)] );
+ my $te = HTML::TableExtract->new( headers => [qw(Date Price Cost)] );
  $te->parse($html_string);
 
  # Examine all matching tables
- foreach $ts ($te->tables) {
+ foreach my $ts ($te->tables) {
    print "Table (", join(',', $ts->coords), "):\n";
-   foreach $row ($ts->rows) {
+   foreach my $row ($ts->rows) {
       print join(',', @$row), "\n";
    }
  }
 
  # Shorthand...top level rows() method assumes the first table found in
  # the document if no arguments are supplied.
- foreach $row ($te->rows) {
+ foreach my $row ($te->rows) {
     print join(',', @$row), "\n";
  }
 
@@ -1303,11 +1304,11 @@ HTML::TableExtract - Perl module for extracting the content contained in tables 
  # level HTML document). In addition, it must be the third (count 2)
  # such instance of a table at that depth.
 
- $te = HTML::TableExtract->new( depth => 2, count => 2 );
+ my $te = HTML::TableExtract->new( depth => 2, count => 2 );
  $te->parse_file($html_file);
- foreach $ts ($te->tables) {
+ foreach my $ts ($te->tables) {
     print "Table found at ", join(',', $ts->coords), ":\n";
-    foreach $row ($ts->rows) {
+    foreach my $row ($ts->rows) {
        print "   ", join(',', @$row), "\n";
     }
  }
@@ -1316,11 +1317,11 @@ HTML::TableExtract - Perl module for extracting the content contained in tables 
  # If multiple attributes are specified, all must be present and equal
  # for match to occur.
 
- $te = HTML::TableExtract->new( attribs => { border => 1 } );
+ my $te = HTML::TableExtract->new( attribs => { border => 1 } );
  $te->parse($html_string);
- foreach $ts ($te->tables) {
+ foreach my $ts ($te->tables) {
    print "Table with border=1 found at ", join(',', $ts->coords), ":\n";
-   foreach $row ($ts->rows) {
+   foreach my $row ($ts->rows) {
       print "   ", join(',', @$row), "\n";
    }
  }
@@ -1333,15 +1334,15 @@ HTML::TableExtract - Perl module for extracting the content contained in tables 
  # be edited in-place.
 
  use HTML::TableExtract qw(tree);
- $te = HTML::TableExtract->new( headers => qw(Fee Fie Foe Fum) );
+ my $te = HTML::TableExtract->new( headers => qw(Fee Fie Foe Fum) );
  $te->parse_file($html_file);
- $table = $te->first_table_found;
- $table_tree = $table->tree;
+ my $table = $te->first_table_found;
+ my $table_tree = $table->tree;
  $table_tree->cell(4,4)->replace_content('Golden Goose');
- $table_html = $table_tree->as_HTML;
- $table_text = $table_tree->as_text;
- $document_tree = $te->tree;
- $document_html = $document_tree->as_HTML;
+ my $table_html = $table_tree->as_HTML;
+ my $table_text = $table_tree->as_text;
+ my $document_tree = $te->tree;
+ my $document_html = $document_tree->as_HTML;
 
 =head1 DESCRIPTION
 
@@ -1820,7 +1821,7 @@ Matthew P. Sisk, E<lt>F<sisk@mojotoad.com>E<gt>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2000-2015 Matthew P. Sisk.
+Copyright (c) 2000-2017 Matthew P. Sisk.
 All rights reserved. All wrongs revenged. This program is free
 software; you can redistribute it and/or modify it under the same terms
 as Perl itself.

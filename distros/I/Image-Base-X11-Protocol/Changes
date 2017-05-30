@@ -1,4 +1,4 @@
-Copyright 2010, 2011, 2012, 2013 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2017 Kevin Ryde
 
 This file is part of Image-Base-X11-Protocol.
 
@@ -16,6 +16,9 @@ You can get a copy of the GNU General Public License online at
 <http://www.gnu.org/licenses/>.
 
 
+
+Version 15, May 2017
+    - example program in the deb
 
 Version 14, August 2013
     - Drawable line() clip to 2^16 rather than the Image::Base default code

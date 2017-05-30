@@ -1,3 +1,13 @@
+1.43   2017-05-29
+
+- Added a small optimization for boolification overloading. Rather than
+  relying on a fallback to stringification, we now return true directly, which
+  is a little faster in cases like "if ($might_be_dt) { ... }".
+
+- The datetime() method now accepts a single argument to use as the separate
+  between the date and time portion. This defaults to "T".
+
+
 1.42   2016-12-25
 
 - The DateTime::Duration->add and ->subtract methods now accept

@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.68.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -15,16 +15,17 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
-SHA1 1ff2e47457f9eef4eaf90df1cbeaef2afd4318e4 Changes
-SHA1 e3653ca86ddecd3772d7ef824e7962732781bbac MANIFEST
-SHA1 d6f9595a0ae02220d6781c9460782ae32c0d4aaf MANIFEST.SKIP
-SHA1 11db115ae6efe4a8adff1029984b476e84e06ff3 META.yml
-SHA1 dde725e23e0b194fae8ab6e0e7b02a8c9d4444cc Makefile.PL
-SHA1 c4d3bc57ae9167dfa2da90cde2472cadf4a0a5df debian/changelog
-SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
-SHA1 4ba2b706d69bff78cf0b9411997385d6ece29929 debian/control
-SHA1 60fd54adf3b32b451bce04578bd9341c1fd8654a debian/copyright
-SHA1 1a7c155a471bd803baa79a5ed89e2724d6d40bf7 debian/rules
+SHA1 38db060e0f85be17b60ac6046819aa8b18aa8588 Changes
+SHA1 70eea95dff9e874e98854ea4b662be7e4b6fa284 MANIFEST
+SHA1 9b875407d60f086714a3ca39de8ef195c106d889 MANIFEST.SKIP
+SHA1 c5e00dd7772fac80acf86039c0f70934f5de537d META.json
+SHA1 4e8fef29efd5893892101e63ff3a078879ef0984 META.yml
+SHA1 e9acfb9e90fd73c5de08b3dc333e57fb94fd764b Makefile.PL
+SHA1 00af875b2c405948fdf113ecc1b16462c2ccdc17 debian/changelog
+SHA1 b6abd567fa79cbe0196d093a067271361dc6ca8b debian/compat
+SHA1 c9081a71f3ab74dd3df4aa78a5df8ff27d59265f debian/control
+SHA1 c0e9c7d1967a81b471e3fc2fd8804cf8ca64e32e debian/copyright
+SHA1 23f321f0e5b34beb414c7e548561f916528cc85a debian/rules
 SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
 SHA1 52766c7702bb1e0178cc41cdc203f60164a68a0a debian/watch
 SHA1 fc9dfb7730ee6ea10207ea23949deb53afc63c92 devel/horizontal.pl
@@ -36,25 +37,39 @@ SHA1 19ef230278c646e08bbb39f24a55d47446e70b0a devel/screenshot.pl
 SHA1 8087a6ed81419f03764b50a61bff2ec2c98266ef examples/builder.pl
 SHA1 c9ac979376f3abbf7d7f9b3a6599a03ac0261600 examples/currency-format.pl
 SHA1 96a0d7302382b877cdd0723d7f88c85175e4aae0 examples/settings.pl
-SHA1 7aa92b5074cf12916763acbfc1c440575679a07e inc/MyMakeMakerExtras.pm
-SHA1 7a988b2aa7ed09f1cb9029a1ef3f0e2139dca0cf inc/my_pod2html
-SHA1 156ca03036a11a12c5adb87c37c44de11b6c6649 lib/Gtk2/Ex/NumAxis.pm
-SHA1 4dc04c5401c223a0beedf001b5d8fb71afbdabfd t/MyTestHelpers.pm
-SHA1 836dc8aaa7c1f096c1d31dc2944aab942266ed18 t/NumAxis-buildable.t
+SHA1 1bd36d3dace9c03f2609418991329da468c16641 inc/my_pod2html
+SHA1 f380e648083c37d4cf0eddcf6108f142a8d65fb4 lib/Gtk2/Ex/NumAxis.pm
+SHA1 06c940e7638c14b6f72bc3c1345978ff1f8671cb t/MyTestHelpers.pm
+SHA1 f3b915af8cb9ac42f202e918090b0697309f3bb1 t/NumAxis-buildable.t
 SHA1 18c10aa25ce78dccb3046fe05f420638a888c445 t/NumAxis-load.t
 SHA1 28a0b0aec3e88dc64a09cd1f13ec4643ba5606ac t/NumAxis-weaken.t
-SHA1 9a2428789448f1ba864b14b2b01b737cc1f05a3f t/NumAxis.t
-SHA1 0279c9310ec528d10a2a14e602bf98f1c776cce1 xt/0-META-read.t
-SHA1 219395eb91b03829e6f14db4ebd57d88ea972e61 xt/0-Test-ConsistentVersion.t
-SHA1 8a5e0f34131de34e584fbb1939c191a152566155 xt/0-Test-DistManifest.t
-SHA1 cc04a5fe5d8b8b38bfd56453d5d2686c8ea58783 xt/0-Test-Pod.t
-SHA1 8cc52e23427a82cfef5802bf512b13c65de2687a xt/0-Test-Synopsis.t
-SHA1 4c14845872d6eb4280e12f862d6ba2c343358c60 xt/0-Test-YAML-Meta.t
-SHA1 439687ac1489fcb62c3cf200fedf9ebf210e7bf7 xt/0-no-debug-left-on.t
+SHA1 07de6f2711ecd8d001ddc2916b35490e406fcfc5 t/NumAxis.t
+SHA1 f2ceb7bb4bf68bd24728b90918e63d251fd06183 xt/0-META-read.t
+SHA1 c9e7a47e1f397eb5f46d7e4ef21754d9df76e36e xt/0-Test-ConsistentVersion.t
+SHA1 d9e7f38a8dcfdb76c56951e4214be8eeda2e2289 xt/0-Test-DistManifest.t
+SHA1 9496e4a2a2734c7093ab6961900dd7a55800976e xt/0-Test-Pod.t
+SHA1 083242d959c1a9242c874982e4585872a95bec93 xt/0-Test-Synopsis.t
+SHA1 aeeab05c346c11824a2bb2cc3f3bdb0c522604e2 xt/0-Test-YAML-Meta.t
+SHA1 1cafa4e23b7a691e09161c0927e6920dd663e2ce xt/0-examples-xrefs.t
+SHA1 4a897c9b09f37290f507d151e84b6a3c8defd496 xt/0-file-is-part-of.t
+SHA1 aeb6f41dfae96d04459448f6c3e3dee44691e722 xt/0-no-debug-left-on.t
+SHA1 51069b694ce78fde7d42ed539322fae579948d40 xtools/my-check-copyright-years.sh
+SHA1 e9aa27fd220d39ef0054cfcf32516f8a033f75f1 xtools/my-check-spelling.sh
+SHA1 08e714180d7a04dd4b461aa2b60b36fbe4683937 xtools/my-deb.sh
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
+Version: GnuPG v1
 
-iD8DBQFN1arILFMCIV9q3ToRAtZfAKCSWfZgqpgiMi3VfrAli+13dU8uDgCeK+3r
-3v1iIFIXLMdX4ZS0OdPsIBg=
-=Fdsq
+iQIcBAEBAgAGBQJZHVYFAAoJEPjQtOfS0hGRni0P/i+tZka4sMMziB0BJUOBidLJ
+Sjk5DlVRuDhOuZ/KoCGqzrHe87uTBphkd/HbKLoruh9bLdJb2ko6VhxvKPLCC2YG
+Eh7bdWIXuAMIGGsHCcuuSk/9VW7Q2MlT917VkxuY/0JCpEz0aOcv0QYZSLCfkqZ+
+eltBed44HfHnOhnQfH0hPpVjX6/X652ODFatcf64g1BPKP7E9xnL2Ao5ljhMqDN2
+dZOvh/O+NDmO3CuBKhSh3oZwszDi+NHhDBjCOlwc5QSH8EHHWx5PkcrnVCMQ/PJM
+lX50bu+abLoilqFgmdf5O5hWePbHwUHudYBz/4XDlpC1/2mdh2qkWbavYqGvWenR
+WrDB2NcwcseFPlexDHs2ll4MB+1aaDb4ju8+BZk0vvZbYoUe8+opM9gS8npaI/+r
+CDeFAs4aHV/RMlPZ1I+oT56MRP6jKCf19ji19gkADTSHI5ExJZfXtmfPtZWVFOrT
+65FXEGHJRoezlKi7YtoyFKHe4pblPTM4+29TJDbuItNXpqNPqVzE9r+mqznQ1oV0
+p1lkE/cpNRloFe1HmJ8qUjX1Fj3fgIgrGdpKD/veva17DZ1x4LTqomNgP588wFJN
+Sn1Uzr+IyNy7oQSepxwcWgaLKrIOdx0SH59fChi7+DPH3N8YIHBKr+du4Hu5tPQ7
+PYMuehzMObkLKnwXfdPe
+=I1Yu
 -----END PGP SIGNATURE-----

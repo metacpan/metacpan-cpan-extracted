@@ -1,0 +1,66 @@
+{
+   "abstract" : "Automatically normalize Unicode hash keys.",
+   "author" : [
+      "Vincent Pit <perl@profvince.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Hash-Normalize",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "Test::More" : "0",
+            "Unicode::Normalize" : "0",
+            "Variable::Magic" : "0.51",
+            "base" : "0",
+            "lib" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "Unicode::Normalize" : "0",
+            "Variable::Magic" : "0.51",
+            "base" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Name=Hash-Normalize"
+      },
+      "homepage" : "http://search.cpan.org/dist/Hash-Normalize/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://git.profvince.com/?p=perl%2Fmodules%2FHash-Normalize.git"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 2.93"
+}

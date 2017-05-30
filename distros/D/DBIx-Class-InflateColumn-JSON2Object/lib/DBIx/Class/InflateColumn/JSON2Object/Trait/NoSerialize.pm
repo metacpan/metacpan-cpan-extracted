@@ -1,5 +1,6 @@
 package DBIx::Class::InflateColumn::JSON2Object::Trait::NoSerialize;
 use Moose::Role;
+use 5.014;
 
 # ABSTRACT: NoSerialize trait for attributes
 
@@ -24,7 +25,7 @@ DBIx::Class::InflateColumn::JSON2Object::Trait::NoSerialize - NoSerialize trait 
 
 =head1 VERSION
 
-version 0.903
+version 0.904
 
 =head1 NAME
 

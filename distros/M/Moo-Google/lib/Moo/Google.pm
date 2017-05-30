@@ -1,5 +1,5 @@
 package Moo::Google;
-$Moo::Google::VERSION = '0.01';
+$Moo::Google::VERSION = '0.02';
 
 # ABSTRACT: Server-side client library for any Google App API. Based on Moose
 
@@ -86,7 +86,7 @@ Moo::Google - Server-side client library for any Google App API. Based on Moose
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

@@ -1,4 +1,4 @@
-Copyright 2015, 2016 Kevin Ryde
+Copyright 2015, 2016, 2017 Kevin Ryde
 
 This file is part of Graph-Graph6.
 
@@ -16,6 +16,11 @@ You should have received a copy of the GNU General Public License
 along with Graph-Graph6.  If not, see <http://www.gnu.org/licenses/>.
 
 
+
+Version 7, May 2017
+    - digraph6 everywhere
+    - Graph::Reader::Graph6 of sparse6 create countedged if necessary
+    - Graph::Graph6 constants HEADER_GRAPH6, HEADER_SPARSE6, HEADER_DIGRAPH6
 
 Version 6, August 2016
     - Graph::Writer::Sparse6, Graph::Easy::As_graph6,

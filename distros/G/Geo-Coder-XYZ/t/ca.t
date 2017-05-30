@@ -3,7 +3,8 @@
 use warnings;
 use strict;
 use Test::Number::Delta within => 1e-2;
-use Test::Most tests => 7;
+use Test::Most tests => 9;
+use Test::NoWarnings;
 
 BEGIN {
 	use_ok('Geo::Coder::XYZ');
@@ -11,7 +12,7 @@ BEGIN {
 
 CA: {
 	SKIP: {
-		skip 'Test requires Internet access', 6 unless(-e 't/online.enabled');
+		skip 'Test requires Internet access', 7 unless(-e 't/online.enabled');
 
 		my $geocoder = new_ok('Geo::Coder::XYZ');
 		my $location = $geocoder->geocode('9235 Main St, Richibucto, New Brunswick, Canada');
@@ -24,5 +25,8 @@ CA: {
 
 		my $address = $geocoder->reverse_geocode(latlng => '46.67,-64.87');
 		like($address->{'city'}, qr/Richibucto/i, 'test reverse');
+
+		$address = $geocoder->reverse_geocode('46.67,-64.87');
+		like($address->{'city'}, qr/Richibucto/i, 'test reverse, latng implied');
 	}
 }

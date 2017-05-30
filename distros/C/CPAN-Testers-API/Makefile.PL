@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
   "NAME" => "CPAN::Testers::API",
   "PREREQ_PM" => {
     "Alien::SwaggerUI" => 0,
-    "CPAN::Testers::Schema" => "0.010",
+    "CPAN::Testers::Schema" => "0.013",
     "File::Share" => 0,
     "Import::Base" => "0.012",
     "Log::Any" => "1.045",
@@ -48,7 +48,7 @@ my %WriteMakefileArgs = (
     "Test::Lib" => 0,
     "Test::More" => "1.001005"
   },
-  "VERSION" => "0.011",
+  "VERSION" => "0.014",
   "test" => {
     "TESTS" => "t/*.t t/controller/*.t t/legacy/*.t"
   }
@@ -57,7 +57,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Alien::SwaggerUI" => 0,
-  "CPAN::Testers::Schema" => "0.010",
+  "CPAN::Testers::Schema" => "0.013",
   "ExtUtils::MakeMaker" => 0,
   "File::Share" => 0,
   "File::Spec" => 0,

@@ -37,11 +37,11 @@
    "provides" : {
       "Game::Asset::SDLSound" : {
          "file" : "lib/Game/Asset/SDLSound.pm",
-         "version" : "0.1"
+         "version" : "0.2"
       },
       "Game::Asset::SDLSound::Manager" : {
          "file" : "lib/Game/Asset/SDLSound/Manager.pm",
-         "version" : "0.1"
+         "version" : "0.2"
       }
    },
    "release_status" : "stable",
@@ -52,6 +52,6 @@
          "web" : "https://github.com/frezik/Game-Asset-SDLSound"
       }
    },
-   "version" : "0.1"
+   "version" : "0.2"
 }
 

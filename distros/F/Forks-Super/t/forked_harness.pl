@@ -251,6 +251,7 @@ sub main {
                     $ENV{TEST_SSH_TARGET} = "ssh://$userathost";
                     print STDERR
                         "... publickey on current user,host works!\n";
+                    alarm 0;
                     last;
                 }
                 alarm 0;
@@ -867,7 +868,7 @@ forked_harness.pl - run tests in parallel with Forks::Super
 
 =head1 VERSION
 
-0.89
+0.90
 
 =head1 SYNOPSIS
 

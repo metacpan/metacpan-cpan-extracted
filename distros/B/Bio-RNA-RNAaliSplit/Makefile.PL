@@ -22,8 +22,10 @@ WriteMakefile(
 				    },
 	      BUILD_REQUIRES     => {
 				     'Test::More' => 0,
+				     'Test::Prereq' => 0,
 				    },
 	      PREREQ_PM          => {
+				     "lib" => "0",
 				     "strict" => "0",
 				     "warnings" => "0",
 				     "version" => "0",
@@ -44,10 +46,11 @@ WriteMakefile(
 				     "Moose::Util::TypeConstraints" => '0',
 				     "Path::Class" => '0',
 				     "Path::Class::Dir" => '0',
-				     "Path::Class::File" => '0',
 				     "Pod::Usage" => '0',
 				     "RNA" => "2.3.4",
 				     "Storable" => '0',
+				     "FileDirUtil" => '0',
+				     "namespace::autoclean" => '0',
 				    },
 	      'EXE_FILES'        => [ map { "scripts/$_" } @scripts ],
 	      dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

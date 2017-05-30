@@ -8,7 +8,7 @@ use warnings;
 use warnings::register;
 use namespace::autoclean 0.19;
 
-our $VERSION = '1.42';
+our $VERSION = '1.43';
 
 use Carp;
 use DateTime::Duration;
@@ -62,14 +62,15 @@ our $IsPurePerl;
 # see: "Calling conventions for binary operations" in overload docs.
 #
 use overload (
-    'fallback' => 1,
-    '<=>'      => '_compare_overload',
-    'cmp'      => '_string_compare_overload',
-    '""'       => '_stringify',
-    '-'        => '_subtract_overload',
-    '+'        => '_add_overload',
-    'eq'       => '_string_equals_overload',
-    'ne'       => '_string_not_equals_overload',
+    fallback => 1,
+    '<=>'    => '_compare_overload',
+    'cmp'    => '_string_compare_overload',
+    q{""}    => '_stringify',
+    bool     => sub {1},
+    '-'      => '_subtract_overload',
+    '+'      => '_add_overload',
+    'eq'     => '_string_equals_overload',
+    'ne'     => '_string_not_equals_overload',
 );
 
 # Have to load this after overloading is defined, after BEGIN blocks
@@ -942,8 +943,13 @@ sub hms {
 # don't want to override CORE::time()
 *DateTime::time = sub { shift->hms(@_) };
 
-sub iso8601 { join 'T', $_[0]->ymd('-'), $_[0]->hms(':') }
-*datetime = sub { $_[0]->iso8601 };
+sub iso8601 { $_[0]->datetime('T') }
+
+sub datetime {
+    my ( $self, $sep ) = @_;
+    $sep = 'T' unless defined $sep;
+    return join $sep, $self->ymd('-'), $self->hms(':');
+}
 
 sub is_leap_year { $_[0]->_is_leap_year( $_[0]->year ) }
 
@@ -2301,7 +2307,7 @@ DateTime - A date and time object for Perl
 
 =head1 VERSION
 
-version 1.42
+version 1.43
 
 =head1 SYNOPSIS
 
@@ -2936,14 +2942,19 @@ If no separator is specified, a colon (:) is used by default.
 
 Also available as C<< $dt->time() >>.
 
-=head3 $dt->datetime()
+=head3 $dt->datetime( $optional_separator )
 
 This method is equivalent to:
 
   $dt->ymd('-') . 'T' . $dt->hms(':')
 
+The C<$optional_separator> parameter allows you to override the separator
+between the date and time, for e.g. C<< $dt->datetime(q{ }) >>.
+
 This method is also available as C<< $dt->iso8601() >>, but it's not really a
-very good ISO8601 format, as it lacks a time zone.
+very good ISO8601 format, as it lacks a time zone.  If called as
+C<< $dt->iso8601() >> you cannot change the separator, as ISO8601 specifies
+that "T" must be used to separate them.
 
 =head3 $dt->is_leap_year()
 
@@ -3042,21 +3053,14 @@ text.
 
 =head3 $dt->epoch()
 
-Return the UTC epoch value for the datetime object. Internally, this
-is implemented using C<Time::Local>, which uses the Unix epoch even on
-machines with a different epoch (such as MacOS). Datetimes before the
-start of the epoch will be returned as a negative number.
+Return the UTC epoch value for the datetime object. Datetimes before the start
+of the epoch will be returned as a negative number.
 
 The return value from this method is always an integer.
 
 Since the epoch does not account for leap seconds, the epoch time for
 1972-12-31T23:59:60 (UTC) is exactly the same as that for
 1973-01-01T00:00:00.
-
-This module uses C<Time::Local> to calculate the epoch, which may or
-may not handle epochs before 1904 or after 2038 (depending on the size
-of your system's integers, and whether or not Perl was compiled with
-64-bit int support).
 
 =head3 $dt->hires_epoch()
 
@@ -4496,12 +4500,16 @@ L<http://datetime.perl.org/>
 
 =head1 SUPPORT
 
-Bugs may be submitted through L<https://github.com/houseabsolute/DateTime.pm/issues>.
+Bugs may be submitted at L<https://github.com/houseabsolute/DateTime.pm/issues>.
 
 There is a mailing list available for users of this distribution,
 L<mailto:datetime@perl.org>.
 
 I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for DateTime can be found at L<https://github.com/houseabsolute/DateTime.pm>.
 
 =head1 DONATIONS
 
@@ -4526,7 +4534,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Ben Bennett Christian Hansen Daisuke Maki David E. Wheeler Doug Bell Flávio Soibelmann Glock Gregory Oschwald Iain Truskett Jason McIntosh Joshua Hoblitt Karen Etheridge Michael Conrad R. Davis Nick Tonkin Olaf Alders Ovid Philippe Bruhat (BooK) Ricardo Signes Richard Bowen Ron Hill Sam Kington viviparous
+=for stopwords Ben Bennett Christian Hansen Daisuke Maki David E. Wheeler Precious Doug Bell Flávio Soibelmann Glock Gregory Oschwald Hauke D Iain Truskett Jason McIntosh Joshua Hoblitt Karen Etheridge Michael Conrad R. Davis Nick Tonkin Olaf Alders Ovid Philippe Bruhat (BooK) Ricardo Signes Richard Bowen Ron Hill Sam Kington viviparous
 
 =over 4
 
@@ -4548,6 +4556,10 @@ David E. Wheeler <david@justatheory.com>
 
 =item *
 
+David Precious <davidp@preshweb.co.uk>
+
+=item *
+
 Doug Bell <madcityzen@gmail.com>
 
 =item *
@@ -4557,6 +4569,10 @@ Flávio Soibelmann Glock <fglock@gmail.com>
 =item *
 
 Gregory Oschwald <oschwald@gmail.com>
+
+=item *
+
+Hauke D <haukex@zero-g.net>
 
 =item *
 
@@ -4622,10 +4638,13 @@ viviparous <viviparous@prc>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Dave Rolsky.
+This software is Copyright (c) 2003 - 2017 by Dave Rolsky.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

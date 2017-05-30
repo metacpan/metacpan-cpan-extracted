@@ -16,7 +16,7 @@ memoize('parse_marc_spec');
 memoize('_it_subspecs');
 memoize('_get_index_range');
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 sub marc_map {
     my $self      = $_[0];

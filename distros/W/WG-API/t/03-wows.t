@@ -1,19 +1,15 @@
 #!/usr/bin/env perl
-#
-#
-
 use 5.014;
 use warnings;
 use lib ( 'lib' );
+
+use WG::API;
+
 use Test::More;
 
-BEGIN {
-    use_ok( 'WG::API::WoWs' || say 'WG::API::WoWs loaded' );
-}
-
-#my $wows = WG::API::WoWs->new( application_id => 'demo' );
-my $wows = WG::API::WoWs->new( application_id => 'd7b121cb9253f4e609b6ef258e8203f6' );
+my $wows = WG::API->new( application_id => $ENV{ 'WG_KEY' } || 'demo' )->wows;
 ok( $wows && ref $wows, 'create class' );
+isa_ok( $wows, 'WG::API::WoWs');
 
 can_ok( $wows, qw/account_list account_info account_achievements/ );
 can_ok( $wows, qw/ships_stats/ );
@@ -21,15 +17,18 @@ can_ok( $wows, qw/ships_stats/ );
 SKIP: {
     skip 'developers only', 8 unless $ENV{ 'WGMODE' } && $ENV{ 'WGMODE' } eq 'dev';
     my $accounts;
-    ok( ! $wows->account_list, 'account list without params' );
-    ok(   $accounts = $wows->account_list( search => 'test' ), 'account list with params' );
-    ok( ! $wows->account_info, 'account info without params' );
-    ok( ! $wows->account_info( account_id => 'xxx' ), 'account info with invalid params' );
-    ok(   $wows->account_info( account_id => $accounts->[ 0 ]->{ 'account_id' } ), 'account info with valid params' );
+    is($wows->account_list, undef, 'account list without params' );
+    ok($accounts = $wows->account_list( search => 'test' ), 'account list with params' );
+    is($wows->account_info, undef, 'account info without params' );
+    is($wows->account_info( account_id => 'xxx' ), undef, 'account info with invalid params' );
+    ok($wows->account_info( account_id => $accounts->[ 0 ]->{ 'account_id' } ), 'account info with valid params' );
 
-    ok( ! $wows->account_achievements, 'account achievements without params' );
-    ok( ! $wows->account_achievements( account_id => 'xxx' ), 'account achievements with invalid params' );
-    ok(   $wows->account_achievements( account_id => $accounts->[ 0 ]->{ 'account_id' } ), 'account achievements with valid params' );
+    is($wows->account_achievements, undef, 'account achievements without params' );
+    is($wows->account_achievements( account_id => 'xxx' ), undef, 'account achievements with invalid params' );
+    ok($wows->account_achievements( account_id => $accounts->[ 0 ]->{ 'account_id' } ), 'account achievements with valid params' );
+
+    ok($wows->ships_stats( account_id => $accounts->[0]->{ account_id } ), 'Get ships info for valid account_id' );
+    is($wows->ships_stats( account_id => 'xxx' ), undef, 'Get ships info for invalid account_id' );
 };
 
 done_testing();

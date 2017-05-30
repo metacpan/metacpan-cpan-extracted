@@ -8,6 +8,10 @@ lib/Mackerel/ReleaseUtils.pm
 lib/Mackerel/ReleaseUtils/Log.pm
 minil.toml
 t/00_compile.t
+t/01_replace.t
 t/mcutil.t
+t/testdata/dir1/file1
+t/testdata/dir1/file2
+t/testdata/dir2/file1
 META.yml
 MANIFEST

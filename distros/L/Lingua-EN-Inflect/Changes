@@ -258,3 +258,9 @@ Revision history for Perl extension Lingua::EN::Inflect.
 1.901  Sun Jan  1 06:16:25 2017
 
     - Removed Build.PL (thanks SKAJI)
+
+
+1.902  Sat May 27 22:23:21 2017
+
+    - Noted the new conversion documentation in Lingua::EN::Inflexion
+      (thanks Lady Aleena)

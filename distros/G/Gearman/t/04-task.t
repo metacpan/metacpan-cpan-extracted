@@ -5,8 +5,11 @@ use Storable;
 use Test::More;
 use Test::Exception;
 
+plan tests => 33;
+
 use_ok("Gearman::Client");
 use_ok("Gearman::Taskset");
+use_ok("Gearman::Util");
 
 my $mn = "Gearman::Task";
 use_ok($mn);
@@ -19,9 +22,7 @@ can_ok(
         exception
         fail
         final_fail
-        func
-        handle
-        hash
+        func handle hash
         is_finished
         mode
         pack_submit_packet
@@ -118,6 +119,7 @@ my @h = qw/
     /;
 
 subtest "wipe", sub {
+    plan tests => scalar(@h);
 
     $t->{$_} = 1 for @h;
 
@@ -127,6 +129,8 @@ subtest "wipe", sub {
 };
 
 subtest "hook", sub {
+    plan tests => 4;
+
     my $cb = sub { 2 * shift };
     ok($t->add_hook($f, $cb));
     is($t->{hooks}->{$f}, $cb);
@@ -136,6 +140,8 @@ subtest "hook", sub {
 };
 
 subtest "taskset", sub {
+    plan tests => 9;
+
     is($t->taskset, undef, "taskset");
     throws_ok { $t->taskset($f) } qr/not an instance of Gearman::Taskset/,
         "caught taskset($f) exception";
@@ -152,6 +158,8 @@ subtest "taskset", sub {
 };
 
 subtest "fail", sub {
+    plan tests => 2 * scalar(@h) - 1;
+
     $t->{is_finished} = 1;
     is($t->fail(), undef);
 
@@ -171,12 +179,16 @@ subtest "fail", sub {
 };
 
 subtest "exception", sub {
+    plan tests => 2;
+
     my $exc = Storable::freeze(\$f);
     $t->{on_exception} = sub { is(shift, $f) };
     is($t->exception(\$exc), undef);
 };
 
 subtest "complete", sub {
+    plan tests => 2;
+
     $t->{is_finished} = undef;
     $t->{on_complete} = sub { is(shift, $f) };
     $t->complete($f);
@@ -184,26 +196,54 @@ subtest "complete", sub {
 };
 
 subtest "status", sub {
+    plan tests => 3;
+
     $t->{is_finished} = undef;
-    $t->{on_status} = sub { is(shift, $f), is(shift, $arg) };
-    $t->status($f, $arg);
+    $t->{on_status}   = sub {
+        is(shift, $f,   "func");
+        is(shift, $arg, "arg");
+    };
+    ok $t->status($f, $arg), "status";
 };
 
 subtest "data", sub {
+    plan tests => 2;
+
     $t->{is_finished} = undef;
-    $t->{on_data} = sub { is(shift, $f) };
-    $t->data($f);
+    $t->{on_data} = sub { is(shift, $f, "func") };
+    ok $t->data($f), "data";
 };
 
 subtest "warning", sub {
+    plan tests => 2;
+
     $t->{is_finished} = undef;
-    $t->{on_warning} = sub { is(shift, $f) };
-    $t->warning($f);
+    $t->{on_warning} = sub { is(shift, $f, "func") };
+    ok $t->warning($f), "warning";
 };
 
 subtest "handle", sub {
+    plan tests => 2;
+
     ok($t->handle($f));
     is($t->{handle}, $f);
+};
+
+subtest "pack_submit_packet", sub {
+    plan tests => 5;
+    my $c = new_ok("Gearman::Client");
+    my $v = Gearman::Util::pack_req_command($t->mode,
+        join("\0", $t->func, $t->{uniq}, ${ $t->{argref} }));
+
+    is $t->pack_submit_packet($c), $v;
+    is $t->pack_submit_packet(), $v;
+
+    my $v = Gearman::Util::pack_req_command($t->mode,
+        join("\0", $t->func, '', ''));
+    ${ $t->{argref} } = undef;
+    $t->{uniq} = undef;
+    is $t->pack_submit_packet($c), $v;
+    is $t->pack_submit_packet(), $v;
 };
 
 done_testing();

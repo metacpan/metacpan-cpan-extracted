@@ -1,9 +1,19 @@
 Revision history for Perl extension BZ::Client.
 
-4.4001 Monday January 30 17:49 2016
+4.4002 Friday May 25 07:53 2017
+    - Major enhancements to BZ::Client::Bug::Attachment's add() method
+    - If you just provide a file_name, add() will try to slurp the file (silently failing)
+    - BZ::Client::XMLRPC now properly encodes and decodes base64 (i.e. attachments)
+    - Base64 stuff is inspired by Raphael Crochet via RT#121581
+    - Some other adjustments inside BZ::Client::XMLRPC which make me happier with it
+    - Similarly, some style changes in BZ::Client::API
+    - If you are using logDirectory, the content of error response will now be dumped out rather than just headers
+    - Pod is now being spell checked (which resulted in lots of spelling fixes in pod)
+
+4.4001 Monday January 30 17:49 2017
     - No changes, just release
 
-4.4001_003 Sundary January 29 16:44 2016
+4.4001_003 Sundary January 29 16:44 2017
     - Adjustments to test suite per RT119718
 
 4.4001_002 Friday January 1 13:42 2017

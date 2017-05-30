@@ -21,7 +21,7 @@ WriteMakefile(
 			version		=> 2,
 		},
 		resources		=> {
-			homepage	=> 'https://metacpan.org/release/Lazy-Utils',
+			homepage	=> 'https://github.com/orkunkaraduman/Lazy-Utils/tree/master',
 			license		=> 'https://www.gnu.org/licenses/gpl-3.0.html',
 			repository	=> {
 				type	=> 'git',

@@ -24,15 +24,15 @@ WriteMakefile(
         'XML::Twig'            => '3.48',
         'Moo::Role'            => '2.000000',
         'namespace::clean'     => '0.24',
-        'Map::Tube::Exception' => '3.04',
+        'Map::Tube::Exception' => '3.12',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Map-Tube-Plugin-Formatter-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Map::Tube::Plugin::Formatter'        => { file => 'lib/Map/Tube/Plugin/Formatter.pm',       version => '0.12' },
-            'Map::Tube::Plugin::Formatter::Utils' => { file => 'lib/Map/Tube/Plugin/Formatter/Utils.pm', version => '0.12' },
+            'Map::Tube::Plugin::Formatter'        => { file => 'lib/Map/Tube/Plugin/Formatter.pm',       version => '0.13' },
+            'Map::Tube::Plugin::Formatter::Utils' => { file => 'lib/Map/Tube/Plugin/Formatter/Utils.pm', version => '0.13' },
         },
         resources => {
             repository => {

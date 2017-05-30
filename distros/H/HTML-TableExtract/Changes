@@ -1,6 +1,12 @@
 Revision history for HTML::TableExtract
 
-2.14  Thu May 21 12:20:46 EDT 2015
+2.15  Thu May 25 09:42:59 EDT 2017
+        - documentation fixes
+
+2.14  Thu May 25 09:03:05 EDT 2017
+        - purge trees on re-parse when in tree mode
+
+2.13  Thu May 21 12:20:46 EDT 2015
         - bundled examples html page
 
 2.12  Fri Jan  9 11:29:08 EST 2015

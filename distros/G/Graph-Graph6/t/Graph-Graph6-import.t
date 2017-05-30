@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015 Kevin Ryde
+# Copyright 2015, 2017 Kevin Ryde
 #
 # This file is part of Graph-Graph6.
 #
@@ -22,9 +22,10 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-use Graph::Graph6 'read_graph', 'write_graph';
+use Graph::Graph6 'read_graph', 'write_graph',
+  'HEADER_GRAPH6','HEADER_SPARSE6','HEADER_DIGRAPH6';
 use Test;
-plan tests => 4;
+plan tests => 7;
 
 #------------------------------------------------------------------------------
 # read_graph()
@@ -48,6 +49,13 @@ plan tests => 4;
   ok ($ret, 1);
   ok ($str, chr(68).chr(81).chr(99)."\n");
 }
+
+#------------------------------------------------------------------------------
+# headers
+
+ok (HEADER_GRAPH6(), '>>graph6<<');
+ok (HEADER_SPARSE6(), '>>sparse6<<');
+ok (HEADER_DIGRAPH6(), '>>digraph6<<');
 
 #------------------------------------------------------------------------------
 exit 0;

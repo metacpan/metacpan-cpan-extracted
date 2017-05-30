@@ -1,0 +1,14 @@
+Changes
+COPYRIGHT
+lib/App/nodie.pm
+lib/App/nodie/nodie
+lib/App/nodie/nodie.pl
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+README.md
+t/00-load.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

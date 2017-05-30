@@ -124,7 +124,6 @@ int main ( int argc, char **argv, char **env )
     char *my_file;
     char *my_perl;
     char *my_prog;
-    char buf[20];	/* must be large enough to hold "PAR_ARGV_###" */
 #ifdef WIN32
 typedef BOOL (WINAPI *pALLOW)(DWORD);
     HINSTANCE hinstLib;
@@ -202,16 +201,8 @@ typedef BOOL (WINAPI *pALLOW)(DWORD);
         emb_file++;
     }
 
-    /* save original argv[] into environment variables PAR_ARGV_# */
-    sprintf(buf, "%i", argc);
-    par_setenv("PAR_ARGC", buf);
-    for (i = 0; i < argc; i++) {
-        sprintf(buf, "PAR_ARGV_%i", i);
-        par_unsetenv(buf);
-        par_setenv(buf, argv[i]);
-    }
-
     /* finally spawn the custom Perl interpreter */
+    argv[0] = my_perl;
 #ifdef WIN32
     hinstLib = LoadLibrary("user32");
     if (hinstLib != NULL) {
@@ -223,7 +214,7 @@ typedef BOOL (WINAPI *pALLOW)(DWORD);
     }
 
     par_setenv("PAR_SPAWNED", "1");
-    rc = spawnvpe(P_WAIT, my_perl, (char* const*)argv, (char* const*)environ);
+    rc = spawnvp(P_WAIT, my_perl, (char* const*)argv);
 
     par_cleanup(stmpdir);
     exit(rc);

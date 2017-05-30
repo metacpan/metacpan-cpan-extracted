@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015 Kevin Ryde
+# Copyright 2015, 2017 Kevin Ryde
 #
 # This file is part of Graph-Graph6.
 #
@@ -16,6 +16,9 @@
 #
 # You should have received a copy of the GNU General Public License along
 # with Graph-Graph6.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# Some random graph reads and writes.
 
 use 5.005;
 use strict;
@@ -56,7 +59,7 @@ for (;;) {
   {
     my $nauty_g6_str;
     {
-      my $writer = Graph::Writer::NautyMatrix->new;
+      my $writer = Graph::Writer::Matrix->new;
       $writer->write_graph($graph, '/tmp/random.matrix');
       IPC::Run::run(['nauty-amtog','-g', '/tmp/random.matrix'],
                     '>', \$nauty_g6_str,
@@ -81,7 +84,7 @@ for (;;) {
   {
     my $nauty_s6_str;
     {
-      my $writer = Graph::Writer::NautyMatrix->new;
+      my $writer = Graph::Writer::Matrix->new;
       $writer->write_graph($graph, '/tmp/random.matrix');
       IPC::Run::run(['nauty-amtog','-s', '/tmp/random.matrix'],
                     '>', \$nauty_s6_str,

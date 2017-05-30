@@ -59,6 +59,9 @@ Now, you can do everything with the normal user account, using their personal
 installation of Perl, and you just need C<sudo> to run your scripts, leaving
 your default system installation intact.
 
+NOTE: Only when using PWM features do you need to use C<sudo>. All other aspects
+of this software work properly with a non-privileged user account.
+
 =head1 PI 
 
 =head2 Create a Raspberry Pi object
@@ -79,9 +82,10 @@ The board revision is the same as the GPIO pin layout on the board:
 
 =head2 Creating and using a GPIO pin object
 
-The L<RPi::WiringPi::Pin> class provides you with objects that directly map to
-the Raspberry Pi's onboard GPIO pins. You generate a pin object through the
-main C<$pi> object we created above.
+The L<RPi::Pin> class provides you with objects that directly map to the
+Raspberry Pi's onboard GPIO pins. You generate a pin object through the main
+C<$pi> object we created above. See that documentation for full usage
+information.
 
     my $pin = $pi->pin(27);
 
@@ -175,30 +179,6 @@ obviously want to be doing other things while waiting for that button press.
 
 NOTE: If you receive errors about the handler callback not being found, simply
 specify the callback with the full package (eg. C<'main::handler'>).
-
-=head1 INTERRUPTS
-
-Although we've already used interrupts from within a pin object, you can use
-them separately as well.
-
-=head2 Configuring
-
-    my $interrupt = $pi->interrupt;
-
-    # set an EDGE_RISING interrupt on pin 27
-
-    # callback is the string name of your handler
-    # subroutine that'll be called when an interrupt
-    # has occurred
-
-    $interrupt->set(27, EDGE_RISING, 'callback');
-
-    sub callback {
-        ...
-    }
-
-NOTE: If you receive errors about the handler callback not being found, simply
-specify the callback with the full package (eg. C<'main::callback'>).
 
 =head1 SERIAL PERIPHERAL INTERFACE (SPI) BUS
 
@@ -351,6 +331,21 @@ We'll get right into the code:
         my $pin = $pi->pin($_);
         $pin->write(HIGH);
     }
+
+=head1 GPS
+
+Allows you to track your current position and various other information. C<gpsd>
+library must be installed and running. See the L<GPSD::Parse> documentation for
+full usage instructions.
+
+=head2 Usage
+
+    my gps = $pi->gps;
+
+    print $gps->tpv('lat')   ."\n"; # latitude
+    print $gps->tpv('lon')   ."\n"; # longitude
+    print $gps->tpv('speed') ."\n"; # current speed
+    print $gps->direction    ."\n"; # current heading
 
 =head1 LCD TOUCH SCREENS
 

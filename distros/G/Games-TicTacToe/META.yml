@@ -21,19 +21,19 @@ no_index:
 provides:
   Games::TicTacToe:
     file: lib/Games/TicTacToe.pm
-    version: '0.24'
+    version: '0.25'
   Games::TicTacToe::Board:
     file: lib/Games/TicTacToe/Board.pm
-    version: '0.24'
+    version: '0.25'
   Games::TicTacToe::Move:
     file: lib/Games/TicTacToe/Move.pm
-    version: '0.24'
+    version: '0.25'
   Games::TicTacToe::Params:
     file: lib/Games/TicTacToe/Params.pm
-    version: '0.24'
+    version: '0.25'
   Games::TicTacToe::Player:
     file: lib/Games/TicTacToe/Player.pm
-    version: '0.24'
+    version: '0.25'
 requires:
   Moo: '2.000000'
   MooX::Options: '4.023'
@@ -43,5 +43,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Games-TicTacToe.git
-version: '0.24'
+version: '0.25'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016 Kevin Ryde
+# Copyright 2015, 2016, 2017 Kevin Ryde
 #
 # This file is part of Graph-Graph6.
 #
@@ -24,7 +24,7 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-my $test_count = (tests => 11)[1];
+my $test_count = (tests => 26)[1];
 plan tests => $test_count;
 
 {
@@ -44,7 +44,7 @@ require Graph::Easy::As_graph6;
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 6;
+  my $want_version = 7;
   ok ($Graph::Easy::As_graph6::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Easy::As_graph6->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Easy::As_graph6->VERSION($want_version); 1 }, 1,
@@ -55,6 +55,7 @@ require Graph::Easy::As_graph6;
 }
 
 #------------------------------------------------------------------------------
+# format => "graph6"
 
 {
   # no edges
@@ -98,6 +99,135 @@ require Graph::Easy::As_graph6;
       ok ($str, 'B'.chr(32+63)."\n",
           "undirected=$undirected swapped=$swapped");
     }
+  }
+}
+
+#------------------------------------------------------------------------------
+# format => "digraph6"
+
+{
+  # formats.txt digraph6 example
+  my $easy = Graph::Easy->new;      # directed
+  $easy->add_vertices(0,1,2,3,4);
+  $easy->add_edge(0,2);
+  $easy->add_edge(0,4);
+  $easy->add_edge(3,1);
+  $easy->add_edge(3,4);
+  ok ($easy->as_graph6(format=>'digraph6'),
+      "&DI?AO?\n");
+  ok ($easy->as_graph6(format=>'digraph6',header=>1),
+      ">>digraph6<<&DI?AO?\n");
+}
+{
+  # no edges
+  my $easy = Graph::Easy->new;
+  $easy->add_vertices(0,1,2);
+  ok ($easy->as_graph6(format=>'digraph6'), "&B??\n");
+}
+{
+  # self-loop
+  my $easy = Graph::Easy->new;
+  $easy->add_vertices(0,1,2);
+  $easy->add_edge(0,0);
+
+  # 100000
+  my $str = $easy->as_graph6(format=>'digraph6');
+  ok ($str, '&B'.chr(32+63)."?\n");
+}
+
+{
+  # undirected graph either way around
+  foreach my $dir (0,1) {
+    my $easy = Graph::Easy->new (undirected => 1);
+    $easy->add_vertices(0,1,2);
+    if ($dir) {
+      $easy->add_edge(1,0);
+    } else {
+      $easy->add_edge(0,1);
+    }
+
+    my $str = $easy->as_graph6(format=>'digraph6');
+    ok ($str, "&BS?\n",
+        "dir=$dir");
+  }
+}
+
+#------------------------------------------------------------------------------
+# format => "sparse6"
+
+{
+  # formats.txt sparse6 example
+  my $easy = Graph::Easy->new;
+  $easy->add_vertices(0,1,2,3,4);
+  $easy->add_edge(0,1);
+  $easy->add_edge(0,2);
+  $easy->add_edge(1,2);
+  $easy->add_edge(5,6);
+
+  my $str = $easy->as_graph6 (format=>'sparse6');
+  ok ($str, ':Fa@x^'."\n");
+}
+{
+  # with header=>1
+  my $easy = Graph::Easy->new;
+  $easy->add_vertices(0,1,2,3,4);
+  $easy->add_edge(0,1);
+  $easy->add_edge(0,2);
+  $easy->add_edge(1,2);
+  $easy->add_edge(5,6);
+
+  my $str = $easy->as_graph6 (format=>'sparse6', header=>1);
+  ok ($str, '>>sparse6<<:Fa@x^'."\n");
+}
+{
+  # no edges
+  my $easy = Graph::Easy->new;
+  $easy->add_vertices(0,1,2);
+
+  my $str = $easy->as_graph6 (format=>'sparse6');
+  ok ($str, ':B'."\n");
+}
+{
+  # self-loop
+  my $easy = Graph::Easy->new;
+  $easy->add_vertices(0,1,2);
+  $easy->add_edge(0,0);
+
+  # 000111 with padding
+  my $str = $easy->as_graph6 (format=>'sparse6');
+  ok ($str, ':B'.chr(7+63)."\n");
+}
+{
+  # multi-edge
+  my $easy = Graph::Easy->new;
+  $easy->add_vertices(0,1);
+  $easy->add_edge(0,1);
+  my $str = $easy->as_graph6 (format=>'sparse6');
+  ok ($str, ':A'.chr(0x2F+63)."\n"); # 101111 with padding
+
+  $easy->add_edge(0,1);
+  $str = $easy->as_graph6 (format=>'sparse6');
+  ok ($str, ':A'.chr(0x23+63)."\n"); # 100011 with padding
+
+  $easy->add_edge(0,1);
+  $str = $easy->as_graph6 (format=>'sparse6');
+  ok ($str, ':A'.chr(0x20+63)."\n"); # 100000 with padding
+}
+
+{
+  # directed graph either way around
+  foreach my $dir (0,1) {
+    my $easy = Graph::Easy->new;
+    $easy->add_vertices(0,1,2);
+    if ($dir) {
+      $easy->add_edge(1,0);
+    } else {
+      $easy->add_edge(0,1);
+    }
+
+    my $str = $easy->as_graph6 (format=>'sparse6');
+    ok ($str, ":Bf\n",
+        "dir=$dir");
   }
 }
 

@@ -6,7 +6,7 @@ use strict;
 use warnings 'all';
 
 package BZ::Client::XMLRPC::Array;
-$BZ::Client::XMLRPC::Array::VERSION = '4.4001';
+$BZ::Client::XMLRPC::Array::VERSION = '4.4002';
 use parent qw(BZ::Client::XMLRPC::Handler);
 
 sub init {
@@ -22,11 +22,13 @@ sub start {
         if ('array' ne $name) {
             $self->error("Expected array element, got $name");
         }
-    } elsif ($l == 1) {
+    }
+    elsif ($l == 1) {
         if ('data' ne $name) {
             $self->error("Expected array/data element, got $name");
         }
-    } elsif ($l == 2) {
+    }
+    elsif ($l == 2) {
         if ('value' eq $name) {
             my $handler = BZ::Client::XMLRPC::Value->new();
             $self->parser()->register($self, $handler, sub {
@@ -35,10 +37,12 @@ sub start {
                 $array;
             });
             $handler->start($name);
-        } else {
+        }
+        else {
             $self->error("Expected array/data/value, got $name");
         }
-    } else {
+    }
+    else {
         $self->error("Unexpected level $l with element $name");
     }
     return $l
@@ -63,7 +67,7 @@ BZ::Client::XMLRPC::Array - Event handler for parsing a single XML-RPC array.
 
 =head1 VERSION
 
-version 4.4001
+version 4.4002
 
 =head1 AUTHORS
 

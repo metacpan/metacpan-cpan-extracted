@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2017 Kevin Ryde
 
 # This file is part of Image-Base-X11-Protocol.
 #
@@ -31,7 +31,7 @@ use vars '@ISA', '$VERSION';
 use Image::Base;
 @ISA = ('Image::Base');
 
-$VERSION = 14;
+$VERSION = 15;
 
 # uncomment this to run the ### lines
 # use Smart::Comments '###';
@@ -1043,7 +1043,7 @@ window.  Drawable is the common parts.
 Native X drawing does much more than C<Image::Base> but if you have some
 generic pixel twiddling code for C<Image::Base> then this module lets you
 point it at an X window, pixmap, etc.  Drawing directly into a window is a
-good way to show slow drawing progressing, rather than drawing a pixmap or
+good way to show slow drawing progressively, rather than drawing a pixmap or
 image file and only displaying when complete.  Or see
 C<Image::Base::Multiplex> for a way to do both simultaneously.
 
@@ -1128,8 +1128,8 @@ drawing operations nor C<add_colours>).
 
 All colours, both named and hex, are sent to the server for interpretation.
 On a static visual like TrueColor a hex RGB might be turned into a pixel
-just on the client side, but the X spec allows non-linear weirdness in the
-colour ramps so only the server can do it properly.
+just on the client side, but the X spec allows non-linear colour ramps so
+only the server can do it properly.
 
 =back
 
@@ -1205,7 +1205,7 @@ C<ellipse()> unfilled uses the X C<PolyArc> line centred on the boundary
 pixels, being the midpoints of the C<$y1> row, C<$y2> row, C<$x1> column,
 etc.  The way the pixel "centre within the shape" rule works should mean
 that circles are symmetric, but the X protocol spec allows the server some
-implementation dependent latitude for ellipses width!=height.
+implementation-dependent latitude for ellipses width!=height.
 
 C<ellipse()> filled uses the X C<FillArc>, but that means the area inside an
 ellipse centred on the boundary pixels, which is effectively 1/2 pixel in
@@ -1259,7 +1259,7 @@ http://user42.tuxfamily.org/image-base-x11-protocol/index.html
 
 =head1 LICENSE
 
-Image-Base-X11-Protocol is Copyright 2010, 2011, 2012, 2013 Kevin Ryde
+Image-Base-X11-Protocol is Copyright 2010, 2011, 2012, 2013, 2017 Kevin Ryde
 
 Image-Base-X11-Protocol is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published by

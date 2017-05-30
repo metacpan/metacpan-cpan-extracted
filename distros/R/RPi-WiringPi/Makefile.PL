@@ -30,6 +30,7 @@ WriteMakefile(
     },
     PREREQ_PM         => {
         parent                      => 0,
+        'GPSD::Parse'               => 1.01,
         'RPi::ADC::ADS'             => 1.01,
         'RPi::ADC::MCP3008'         => 2.3603,
         'RPi::BMP180'               => 2.3603,
@@ -37,6 +38,7 @@ WriteMakefile(
         'RPi::DigiPot::MCP4XXXX'    => 2.3603,
         'RPi::DHT11'                => 1.02,
         'RPi::LCD'                  => 2.3601,
+        'RPi::Pin'                  => 2.3601,
         'RPi::SPI'                  => 2.3606,
         'RPi::WiringPi::Constant'   => 0.02,
         'WiringPi::API'             => 2.3609,

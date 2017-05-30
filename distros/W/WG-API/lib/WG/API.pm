@@ -2,10 +2,13 @@ package WG::API;
 
 use 5.014;
 use Moo;
-use WG::API::Error;
-use LWP;
-use JSON;
-use Data::Dumper;
+use LWP::UserAgent;
+
+use WG::API::NET;
+use WG::API::WoT;
+use WG::API::WoWs;
+use WG::API::WoWp;
+use WG::API::Auth;
 
 =encoding utf8
 
@@ -15,11 +18,11 @@ WG::API - Module for work with Wargaming.net Public API
 
 =head1 VERSION
 
-Version v0.8.1
+Version v0.8.3
 
 =cut
 
-our $VERSION = 'v0.8.1';
+our $VERSION = 'v0.8.3';
 
 =head1 SYNOPSIS
 
@@ -27,11 +30,11 @@ Wargaming.net Public API is a set of API methods that provide access to Wargamin
 
 This module provide access to WG Public API
 
-    use WG::API::NET;
+    use WG::API;
 
-    my $wg = WG::API::NET->new( application_id => 'demo' );
+    my $wg = WG::API->new( application_id => 'demo' );
     ...
-    my $player = $wg->account_info( account_id => '1' );
+    my $player = $wg->net( language => 'en' )->account_info( account_id => '1' );
 
 =head1 ATTRIBUTES
 
@@ -39,7 +42,7 @@ This module provide access to WG Public API
 
 =item I<application_id*>
 
-Rerquired application id: http://ru.wargaming.net/developers/documentation/guide/getting-started/
+Rerquired application id: L<https://developers.wargaming.net/documentation/guide/getting-started/>
 
 =back
 
@@ -52,268 +55,96 @@ has application_id => (
 
 =over 1
 
-=item I<ua>
+=item I<wot>
 
-User agent, default - LWP::UserAgent.
-
-=back
-
-=cut 
-
-has ua => ( 
-    is  => 'ro',
-    default => sub{ LWP::UserAgent->new() },
-);
-
-=over 1
-
-=item I<language>
-
-Localization language. Default - 'ru', Valid values:
-
-=over 4
-
-=item "en" — English
-
-=item "ru" — Русский (by default)
-
-=item "pl" — Polski
-
-=item "de" — Deutsch
-
-=item "fr" — Français
-
-=item "es" — Español
-
-=item "zh-cn" — 简体中文
-
-=item "tr" — Türkçe
-
-=item "cs" — Čeština
-
-=item "th" — ไทย
-
-=item "vi" — Tiếng Việt
-
-=item "ko" — 한국어
-
-=back
-
-=back
-
-=cut 
-
-has language => (
-    is  => 'ro',
-    default => sub{ 'ru' },
-);
-
-=over 1
-
-=item I<api_uri>
-
-URL for which a request is sent.
-
-=back
-
-=cut 
-
-has api_uri => (
-    is  => 'ro',
-    default => sub{ 'api.worldoftanks.ru/wgn' },
-);
-
-=over 1 
-
-=item I<status>
-
-Request status - 'ok', 'error' or undef, if request not finished.
-
-=back 
-
-=cut
-
-has status => (
-    is  => 'rw',
-);
-
-=over 1
-
-=item I<response>
-
-Response from WG API
+Returns a WoT instance
 
 =back
 
 =cut
 
-has response => (
-    is  => 'rw',
-);
+sub wot {
+    my $self = shift;
+
+    return WG::API::WoT->new(
+        application_id  => $self->application_id,
+        @_
+    );
+}
 
 =over 1
 
-=item I<meta>
+=item I<wowp>
 
-Meta from response
+Returns A WoWp instance
 
 =back
 
 =cut
 
-has meta => (
-    is  => 'rw',
-);
+sub wowp {
+    my $self = shift;
+
+    return WG::API::WoWp->new(
+        application_id => $self->application_id,
+        @_
+    );
+}
 
 =over 1
 
-=item I<error>
+=item I<wows>
 
-Once an error occurred, the following values are returned:
-
-=over 4
-
-=item code
-
-=item message
-
-=item field
-
-=item value
-
-=back
+Returns a WoWs instance
 
 =back
 
 =cut
 
-has error => (
-    is  => 'rw',
-);
+sub wows {
+    my $self = shift;
 
-sub _request {
-    my ( $self, $method, $uri, $params, $required_params, %passed_params ) = @_;
-
-    $self->status( undef );
-
-    unless ( $self->_validate_params( $required_params, %passed_params ) ) {    #check required params
-            $self->status( 'error' );
-            $self->error( WG::API::Error->new(
-                code    => '997',
-                message => 'missing a required field',
-                field   => 'xxx',
-                value   => 'xxx',
-                raw     => 'xxx',
-            ) );
-    }
-
-    unless ( $method =~ /^(?:get|post)$/ ) {
-            $self->status( 'error' );
-            $self->error( WG::API::Error->new(
-                code    => '996',
-                message => 'unknow method',
-                field   => 'xxx',
-                value   => 'xxx',
-                raw     => 'xxx',
-            ) );
-    }
-
-    $method = "_".$method;                                                              # add prefix for private methods
-
-    $self->$method( $uri, $params, %passed_params );
-
-    return 1;
+    return WG::API::WoWs->new(
+        application_id  => $self->application_id,
+        @_
+    );
 }
 
-sub _validate_params {
-    my ( $self, $required_params, %passed_params ) = @_;
+=over 1
 
-    return undef if $required_params && ! keys %passed_params;                               #without params when they are needed
+=item I<net>
 
-    for ( @$required_params ) {
-        return undef unless defined $passed_params{ $_ };
-    }
+Returns a NET instance
 
-    return 'passed';
+=back
+
+=cut
+
+sub net {
+    my $self = shift;
+
+    return WG::API::NET->new(
+        application_id  => $self->application_id,
+        @_
+    );
 }
 
-sub _get {
-    my ( $self, $uri, $params, %passed_params ) = @_;
+=over 1
 
-    my $url = sprintf 'https://%s/%s/?application_id=%s',
-            $passed_params{ 'api_uri' } ? $passed_params{ 'api_uri' } : $self->api_uri,
-            $uri ? $uri : '',
-            $self->application_id,
-    ;
-    for ( @$params ) {
-        $url .= sprintf "&%s=%s", $_, $passed_params{ $_ } if defined $passed_params{ $_ }; 
-    }
+=item I<auth>
 
-    my $response = $self->ua->get( $url ); 
-    $self->_parse( $response->is_success ? decode_json $response->decoded_content : undef );
-    return;
-}
+Return a Auth instance
 
-sub _post {
-    my ( $self, $uri, $params, %passed_params ) = @_;
+=back
 
-    my $url = sprintf 'https://%s/%s/', 
-        $passed_params{ 'api_uri' } ? $passed_params{ 'api_uri' } : $self->api_uri,
-        $uri ? $uri : '';
+=cut
 
-    #remove unused fields
-    if ( $params && %passed_params ) {
-        my %params;
-        @params{ keys %passed_params } = ();
-        delete @params{ @$params };
-        delete $passed_params{ $_ } for keys %params;
-    }
-
-    $passed_params{ 'application_id' } = $self->application_id;
-
-    my $response = $self->{ 'ua' }->post( $url, %passed_params ); 
-    $self->_parse( $response->is_success ? decode_json $response->decoded_content : undef );
-    return;
-}
-
-sub _parse {
-    my ( $self, $response ) = @_;
-
-    if ( ! $response ) { 
-        $response = {
-            status => 'error',
-            error  => {
-                code    => '999',
-                message => 'invalid api_uri',
-                field   => 'xxx',
-                value   => 'xxx',
-                raw     => Dumper $response,
-            },
-        };
-    } elsif ( ! $response->{ 'status' } ) {
-        $response = {
-            status => 'error',
-            error  => {
-                code    => '998',
-                message => 'unknown status',
-                field   => 'xxx',
-                value   => 'xxx',
-                raw     => Dumper $response,
-            },
-        };
-    }
-
-    $self->status( delete $response->{ 'status' } );
-
-    if ( $self->status eq 'error' ) {
-        $self->error( WG::API::Error->new( $response->{ 'error' } ) );
-    } else {
-        $self->error( undef );
-        $self->meta( $response->{ 'meta' } );
-        $self->response( $response->{ 'data' } );
-    }
-
-    return;
+sub auth {
+    my $self = shift;
+    return WG::API::Auth->new(
+        application_id => $self->application_id,
+        @_
+    );
 }
 
 =head1 BUGS
@@ -355,7 +186,7 @@ L<http://search.cpan.org/dist/WG-API/>
 
 =head1 SEE ALSO
 
-WG API Reference L<http://ru.wargaming.net/developers/>
+WG API Reference L<https://developers.wargaming.net/>
 
 =head1 AUTHOR
 

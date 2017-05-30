@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Games::Chipmunk;
 
-use constant DEBUG => 0;
+use constant DEBUG => 1;
 
 # cpVect is a 2D vector and cpv() is a shortcut for initializing them.
 my $gravity = cpv(0, -100);

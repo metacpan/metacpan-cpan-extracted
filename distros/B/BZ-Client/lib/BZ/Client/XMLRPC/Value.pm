@@ -6,7 +6,7 @@ use strict;
 use warnings 'all';
 
 package BZ::Client::XMLRPC::Value;
-$BZ::Client::XMLRPC::Value::VERSION = '4.4001';
+$BZ::Client::XMLRPC::Value::VERSION = '4.4002';
 use parent qw( BZ::Client::XMLRPC::Handler );
 use BZ::Client::XMLRPC::Struct;
 use BZ::Client::XMLRPC::Array;
@@ -43,12 +43,12 @@ sub start {
             $handler->start($name);
         }
         elsif ('i4'               eq $name
-            || 'int'              eq $name
-            || 'string'           eq $name
-            || 'double'           eq $name
-            || 'dateTime.iso8601' eq $name
-            || 'base64'           eq $name
-            || 'boolean'          eq $name )
+            or 'int'              eq $name
+            or 'string'           eq $name
+            or 'double'           eq $name
+            or 'dateTime.iso8601' eq $name
+            or 'base64'           eq $name
+            or 'boolean'          eq $name )
         {
             $self->{'level1_elem'}    = $name;
             $self->{'level1_content'} = q();
@@ -136,7 +136,7 @@ BZ::Client::XMLRPC::Value - Event handler for parsing a single XML-RPC value.
 
 =head1 VERSION
 
-version 4.4001
+version 4.4002
 
 =head1 AUTHORS
 

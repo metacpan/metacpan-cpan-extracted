@@ -1,5 +1,6 @@
 ANALYTICAL-PRECISION
 Build.PL
+ChangeLog.md
 Changes
 Developers.mk
 KNOWNBUGS
@@ -187,6 +188,8 @@ set-of-emails/maildir/bsd/msp-ru-mailru-01.eml
 set-of-emails/maildir/bsd/msp-ru-mailru-02.eml
 set-of-emails/maildir/bsd/msp-ru-mailru-03.eml
 set-of-emails/maildir/bsd/msp-ru-mailru-04.eml
+set-of-emails/maildir/bsd/msp-ru-mailru-05.eml
+set-of-emails/maildir/bsd/msp-ru-mailru-06.eml
 set-of-emails/maildir/bsd/msp-ru-yandex-01.eml
 set-of-emails/maildir/bsd/msp-ru-yandex-02.eml
 set-of-emails/maildir/bsd/msp-ru-yandex-03.eml
@@ -210,6 +213,8 @@ set-of-emails/maildir/bsd/msp-us-aol-01.eml
 set-of-emails/maildir/bsd/msp-us-aol-02.eml
 set-of-emails/maildir/bsd/msp-us-aol-03.eml
 set-of-emails/maildir/bsd/msp-us-aol-04.eml
+set-of-emails/maildir/bsd/msp-us-aol-05.eml
+set-of-emails/maildir/bsd/msp-us-aol-06.eml
 set-of-emails/maildir/bsd/msp-us-bigfoot-01.eml
 set-of-emails/maildir/bsd/msp-us-facebook-01.eml
 set-of-emails/maildir/bsd/msp-us-facebook-02.eml
@@ -232,6 +237,11 @@ set-of-emails/maildir/bsd/msp-us-google-16.eml
 set-of-emails/maildir/bsd/msp-us-google-17.eml
 set-of-emails/maildir/bsd/msp-us-gsuite-01.eml
 set-of-emails/maildir/bsd/msp-us-gsuite-02.eml
+set-of-emails/maildir/bsd/msp-us-gsuite-03.eml
+set-of-emails/maildir/bsd/msp-us-gsuite-04.eml
+set-of-emails/maildir/bsd/msp-us-gsuite-05.eml
+set-of-emails/maildir/bsd/msp-us-gsuite-06.eml
+set-of-emails/maildir/bsd/msp-us-gsuite-07.eml
 set-of-emails/maildir/bsd/msp-us-office365-01.eml
 set-of-emails/maildir/bsd/msp-us-office365-02.eml
 set-of-emails/maildir/bsd/msp-us-outlook-01.eml
@@ -310,6 +320,7 @@ set-of-emails/maildir/bsd/mta-exim-26.eml
 set-of-emails/maildir/bsd/mta-exim-27.eml
 set-of-emails/maildir/bsd/mta-exim-28.eml
 set-of-emails/maildir/bsd/mta-exim-29.eml
+set-of-emails/maildir/bsd/mta-exim-30.eml
 set-of-emails/maildir/bsd/mta-imailserver-01.eml
 set-of-emails/maildir/bsd/mta-imailserver-02.eml
 set-of-emails/maildir/bsd/mta-imailserver-03.eml
@@ -374,6 +385,8 @@ set-of-emails/maildir/bsd/mta-postfix-24.eml
 set-of-emails/maildir/bsd/mta-postfix-25.eml
 set-of-emails/maildir/bsd/mta-postfix-26.eml
 set-of-emails/maildir/bsd/mta-postfix-27.eml
+set-of-emails/maildir/bsd/mta-postfix-28.eml
+set-of-emails/maildir/bsd/mta-postfix-29.eml
 set-of-emails/maildir/bsd/mta-qmail-01.eml
 set-of-emails/maildir/bsd/mta-qmail-02.eml
 set-of-emails/maildir/bsd/mta-qmail-03.eml
@@ -428,6 +441,7 @@ set-of-emails/maildir/bsd/mta-sendmail-39.eml
 set-of-emails/maildir/bsd/mta-sendmail-40.eml
 set-of-emails/maildir/bsd/mta-sendmail-41.eml
 set-of-emails/maildir/bsd/mta-sendmail-42.eml
+set-of-emails/maildir/bsd/mta-sendmail-43.eml
 set-of-emails/maildir/bsd/mta-surfcontrol-01.eml
 set-of-emails/maildir/bsd/mta-surfcontrol-02.eml
 set-of-emails/maildir/bsd/mta-surfcontrol-03.eml

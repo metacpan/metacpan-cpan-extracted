@@ -51,7 +51,7 @@ subtest "count_id_workdays (observe_joint_leaves=0)" => sub {
 test_year_has_num_of_holidays(2014, 17, 4);
 test_year_has_num_of_holidays(2015, 16, 4);
 test_year_has_num_of_holidays(2016, 15, 4);
-test_year_has_num_of_holidays(2017, 15, 4);
+test_year_has_num_of_holidays(2017, 16, 4);
 
 DONE_TESTING:
 done_testing;

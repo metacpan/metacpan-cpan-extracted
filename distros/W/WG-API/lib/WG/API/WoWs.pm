@@ -1,7 +1,7 @@
 package WG::API::WoWs;
 
 use Moo;
-extends 'WG::API';
+
 with 'WG::API::WoWs::Account';
 with 'WG::API::WoWs::Warships';
 
@@ -11,11 +11,11 @@ WG::API::WoWs - Moduled for work with Wargaming.net Public API for Worlf of Wars
 
 =head1 VERSION
 
-Version v0.8.1
+Version v0.8.3
 
 =cut
 
-our $VERSION = 'v0.8.1';
+our $VERSION = 'v0.8.3';
 
 =head1 SYNOPSIS
 
@@ -33,7 +33,7 @@ This module provide access to WG Public API
 
 =head2 new 
 
-Create new object with params. Rerquired application id: http://ru.wargaming.net/developers/documentation/guide/getting-started/
+Create new object with params. Rerquired application id: L<https://developers.wargaming.net/documentation/guide/getting-started/> 
 
 Params:
 
@@ -47,6 +47,8 @@ has api_uri => (
     is      => 'ro',
     default => sub{ 'api.worldofwarships.ru/wows' },
 );
+
+with 'WG::API::Base';
 
 =head1 METHODS
 
@@ -109,7 +111,7 @@ L<http://search.cpan.org/dist/WG-API/>
 
 =head1 SEE ALSO
 
-WG API Reference L<http://ru.wargaming.net/developers/>
+WG API Reference L<https://developers.wargaming.net/>
 
 =head1 AUTHOR
 

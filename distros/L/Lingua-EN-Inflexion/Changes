@@ -43,3 +43,21 @@ Revision history for Lingua-EN-Inflexion
 
     * Completed name change of module
       (thanks, Smylers and NeilB!)
+
+
+0.001000  Sat May 27 22:22:54 2017
+
+    [All of the following are due to Lady Aleena (to whom, my sincere thanks)]
+    * Added noun(...)->cardinal to convert numbers to words and vice-versa
+    * Added noun(...)->ordinal to convert ordinals to words and vice-versa
+    * Added 'w'   option to <#...> to inflect numbers as words
+    * Added 'w99' option to <#...> to inflect numbers as words (above threshold)
+    * Added 'o'   option to <#...> to inflect numbers as ordinals
+    * Various documentation improvements
+    * Added a documentation section describing equivalences with Lingua::EN::Inflect
+
+
+0.001001  Sun May 28 13:04:53 2017
+
+    * Added dependencies on Lingua::EN::Nums2Words and Lingua::EN::Words2Nums
+      (thanks Slaven!)

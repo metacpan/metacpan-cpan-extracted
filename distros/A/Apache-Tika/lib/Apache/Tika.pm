@@ -7,7 +7,7 @@ use Encode qw/decode_utf8/;
 use LWP::UserAgent;
 use JSON::MaybeXS();
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub new {
 	my ($this, %pars) = @_;
@@ -52,10 +52,10 @@ sub meta {
 }
 
 sub rmeta {
-	my ($self, $bytes, $contentType) = @_;
+	my ($self, $bytes, $contentType, $format) = @_;
 	my $meta = $self->_request(
 		'put',
-		'rmeta',
+		'rmeta' . ($format? "/$format" : ''),
 		{
 			'Accept' => 'application/json',
 			$contentType? ('Content-type' => $contentType) : ()

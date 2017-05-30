@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "IO::Uncompress::Unzip" => "2.030",
     "JSON" => 0,
     "LWP::UserAgent" => 0,
-    "List::MoreUtils" => 0,
+    "List::Util" => "1.33",
     "MIME::Base64" => 0,
     "Moo" => "1.005",
     "Moo::Role" => 0,
@@ -64,7 +64,7 @@ my %WriteMakefileArgs = (
     "Test::Warn" => 0,
     "lib" => 0
   },
-  "VERSION" => "1.12",
+  "VERSION" => "1.20",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -94,7 +94,7 @@ my %FallbackPrereqs = (
   "IO::Uncompress::Unzip" => "2.030",
   "JSON" => 0,
   "LWP::UserAgent" => 0,
-  "List::MoreUtils" => 0,
+  "List::Util" => "1.33",
   "MIME::Base64" => 0,
   "Moo" => "1.005",
   "Moo::Role" => 0,

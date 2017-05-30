@@ -1,0 +1,5 @@
+Revision history for LWP::CurlLog
+
+0.01 Mon May 29 16:43:01 CDT 2017
+    - LWP::CurlLog a way of logging LWP requests as curl command options
+

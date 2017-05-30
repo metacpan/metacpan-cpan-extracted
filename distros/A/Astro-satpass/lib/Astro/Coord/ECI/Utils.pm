@@ -104,7 +104,7 @@ package Astro::Coord::ECI::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '0.079';
+our $VERSION = '0.081';
 our @ISA = qw{Exporter};
 
 use Carp;

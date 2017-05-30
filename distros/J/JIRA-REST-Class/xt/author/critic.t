@@ -3,10 +3,5 @@
 use strict;
 use warnings;
 
-use Test::More;
-use English qw(-no_match_vars);
-
-eval "use Test::Perl::Critic";
-plan skip_all => 'Test::Perl::Critic required to criticise code' if $@;
-Test::Perl::Critic->import( -profile => "testcritic.rc" ) if -e "testcritic.rc";
+use Test::Perl::Critic (-profile => "testcritic.rc") x!! -e "testcritic.rc";
 all_critic_ok();

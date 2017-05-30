@@ -32,12 +32,10 @@ sub get_program_pid_mapping {
             push @pids, @$child_pids;
         }
 
-        for (@pids) {
-            push @program_pid_mapping, {
-                program_name => $pid_file->basename,
-                pid          => $_+0,
-            };
-        }
+        push @program_pid_mapping, {
+            program_name => $pid_file->basename,
+            pids         => \@pids,
+        };
     }
 
     return \@program_pid_mapping;

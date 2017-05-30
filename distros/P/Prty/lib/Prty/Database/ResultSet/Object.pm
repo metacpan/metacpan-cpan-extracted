@@ -4,7 +4,7 @@ use base qw/Prty::Database::ResultSet/;
 use strict;
 use warnings;
 
-our $VERSION = 1.106;
+our $VERSION = 1.107;
 
 use Prty::Option;
 use Prty::Hash;
@@ -775,7 +775,7 @@ sub selectParentRows {
 
 =head1 VERSION
 
-1.106
+1.107
 
 =head1 AUTHOR
 

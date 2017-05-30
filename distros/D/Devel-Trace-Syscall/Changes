@@ -1,5 +1,9 @@
 Revision history for Devel-Trace-Syscall
 
+0.03 May 28 2017
+        - Remove usage of Test::Differences::Color until that module has been fixed (GH #17, thanks Slaven Rezić for the report!)
+        - Fixed compilation warnings
+
 0.02 June 23 2014
         - Fix some POD problems
         - Fix a compiler error on GCC 4.7 (thanks sharyanto!)

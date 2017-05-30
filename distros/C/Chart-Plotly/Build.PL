@@ -23,7 +23,7 @@ my %module_build_args = (
     "Pablo Rodr\x{ed}guez Gonz\x{e1}lez <pablo.rodriguez.gonzalez\@gmail.com>"
   ],
   "dist_name" => "Chart-Plotly",
-  "dist_version" => "0.012",
+  "dist_version" => "0.013",
   "license" => "mit",
   "module_name" => "Chart::Plotly",
   "recursive_test_files" => 1,
@@ -33,6 +33,7 @@ my %module_build_args = (
     "JSON" => 0,
     "Module::Load" => 0,
     "Moose" => 0,
+    "MooseX::ExtraArgs" => 0,
     "Params::Validate" => 0,
     "Ref::Util" => 0,
     "Text::Template" => 0,

@@ -4,7 +4,7 @@
       "Orkun Karaduman <orkunkaraduman@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "gpl_3"
    ],
@@ -44,7 +44,7 @@
          "mailto" : "bug-Lazy-Utils@rt.cpan.org",
          "web" : "https://github.com/orkunkaraduman/Lazy-Utils/issues"
       },
-      "homepage" : "https://metacpan.org/release/Lazy-Utils",
+      "homepage" : "https://github.com/orkunkaraduman/Lazy-Utils/tree/master",
       "license" : [
          "https://www.gnu.org/licenses/gpl-3.0.html"
       ],
@@ -54,6 +54,5 @@
          "web" : "https://github.com/orkunkaraduman/Lazy-Utils"
       }
    },
-   "version" : "1.17",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "1.20"
 }

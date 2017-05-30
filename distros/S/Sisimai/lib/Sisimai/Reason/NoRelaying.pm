@@ -14,7 +14,8 @@ sub match {
     my $class = shift;
     my $argv1 = shift // return undef;
     my $regex = qr{(?> 
-         Insecure[ ]Mail[ ]Relay
+         as[ ]a[ ]relay
+        |Insecure[ ]Mail[ ]Relay
         |mail[ ]server[ ]requires[ ]authentication[ ]when[ ]attempting[ ]to[ ]
             send[ ]to[ ]a[ ]non-local[ ]e-mail[ ]address    # MailEnable 
         |not[ ]allowed[ ]to[ ]relay[ ]through[ ]this[ ]machine
@@ -111,7 +112,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2016 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

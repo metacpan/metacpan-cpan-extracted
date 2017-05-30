@@ -1,5 +1,8 @@
 Revision history for Perl extension LWP::Protocol::PSGI
 
+0.10  2017-05-29 12:30:35 PDT
+        - Fix mirror() (haarg) #9
+
 0.09  2016-03-03 08:58:44 PST
         - Update documentation
         - Remove Guard dependency

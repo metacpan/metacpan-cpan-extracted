@@ -28,7 +28,11 @@ t/assets/invalid_pid/one
 t/assets/pid/target_script
 t/assets/pid/target_script2
 t/assets/source/invalid_metric.txt
-t/assets/source/metric.txt
+t/assets/source/metric_1.txt
+t/assets/source/metric_14423.txt
+t/assets/source/metric_14530,14533,14534.txt
+t/assets/source/metric_14530.txt
+t/assets/source/metric_2,18352,18353,18360,18366,28264.txt
 t/assets/source/pstree_1.txt
 t/assets/source/pstree_2.txt
 t/assets/valid_invalid_pid/dummy

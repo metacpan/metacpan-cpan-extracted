@@ -100,7 +100,7 @@ $res:
     # Embed the manifest file for VC 2005 (aka VC8) or higher, but not for the
     # 64-bit Platform SDK compiler.
     if( $Config{ptrsize} == 4 and $Config{ccversion} =~ /^(\d+)/ and $1 >= 14 ) {
-        $mt_cmd = 'mt -nologo -manifest $@.manifest -outputresource:$@;1';
+        $mt_cmd = 'if exist $@.manifest mt -nologo -manifest $@.manifest -outputresource:$@;1';
     } else {
         $mt_cmd = '-$(NOOP)';
     }
@@ -300,7 +300,7 @@ sub MY::postamble
     my $make_frag = <<"EOT";
 LD=$ld
 CC=$cc
-CFLAGS=$cflags -DPARL_EXE=\\"parl$exe\\" -DPAR_PACKER_VERSION=\\"\$(VERSION)\\"
+CFLAGS=$cflags -DLDLIBPTHNAME=\\"$Config{ldlibpthname}\\" -DPARL_EXE=\\"parl$exe\\" -DPAR_PACKER_VERSION=\\"\$(VERSION)\\"
 OPTIMIZE=$optimize
 LDFLAGS=$Config{ldflags}
 PERL_LDFLAGS=$ldflags

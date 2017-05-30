@@ -1,21 +1,15 @@
-###############################################################
+################################################################
 # system-limits.PL
 #
 # probe the limitations of this system including the maximum
 # number of simultaneous child processes and the maximum number
 # of open filehandles.
 #
-# this information is used in t/32-stress-test.t and to create
-# the  Forks/Super/SysInfo.pm  file
+# this information is used to create the  Forks/Super/SysInfo.pm  
+# file which will inform certain settings in your Forks::Super 
+# installation.
 #
-# v0.77: use a second limits file to store capabilities that
-#        probably do not depend on your version of perl. Read from
-#        this file so that SysInfo.pm.PL will run faster the
-#        second time (if say, you install Forks::Super for different
-#        versions of perl on your system).
-#        [see https://rt.cpan.org/Public/Bug/Display.html?id=105454]
-#
-###############################################################
+################################################################
 
 use lib q(lib);
 use strict;
@@ -23,13 +17,14 @@ use warnings;
 use Config;
 use POSIX;
 
-our $VERSION = '0.89';
+our $VERSION = '0.90';
 
 my $limits_file = $ARGV[0] || "t/out/limits.$^O.$]";
 my $limits2 = $ARGV[1] || "t/out/limits.$^O";
 my %LIMITS;
 if (-f $limits2) {
     open my $fh, '<', $limits2;
+    # sys| values are independent of your perl installation
     while (<$fh>) {
         s/\s+$//;
         my ($key,$val) = split /:/, $_, 2;
@@ -127,6 +122,7 @@ write_limits();
 &explore_sync_options;
 &explore_alternate_alarm;
 &check_proc_process_table;
+&probe_ssh_test_env;
 
 
 # gnukfreebsd/midnightbsd can see "Maximal count of pending signals 
@@ -198,7 +194,7 @@ sub get_Time_HiRes_tolerance {
     } else {
         print STDOUT "No timing anomalies observed on this system.\n";
     }
-    write_limits('sys|TimeHiRes_tol' => $max * 1.1);
+    write_limits('TimeHiRes_tol' => $max * 1.1);
 }
 
 
@@ -555,6 +551,48 @@ sub count_number_of_cpus {
     }
 }
 
+# does this host have a simple way to conduct the remote tests (t/49*.t)?
+sub probe_ssh_test_env {
+    return if $LIMITS{'sys|test_ssh_target'};
+    write_limits( 'sys|test_ssh_target', '0');
+
+    my $ENV_USER = $ENV{USER} || 'xxxxx';
+    my $ENV_HOST = $ENV{HOSTNAME} || 'xhxhxhxh';
+    chomp(my $hostname = qx(hostname));
+    $hostname ||= 'knknknknknk';
+    my $ip = eval "use Sys::HostAddr;1" ? Sys::HostAddr->new->main_ip : "299.1.1.1";
+
+    foreach my $host ('$ENV_HOST', '$ip', 'localhost', '$hostname') {
+        foreach my $user ('$ENV_USER','') {
+
+            my $cmdtmp = "ssh ";
+            if ($user) {
+                $cmdtmp .= " -l $user";
+            }
+            $cmdtmp .= " $host";
+
+            my $cmd = $cmdtmp;
+            $cmd =~ s/\$ENV_USER/$ENV_USER/;
+            $cmd =~ s/\$ENV_HOST/$ENV_HOST/;
+            $cmd =~ s/\$hostname/$hostname/;
+            $cmd =~ s/\$ip/$ip/;
+            my $token = sprintf "%06X", rand() * 0xFFFFFF;
+
+            my $null = $^O eq 'MSWin32' ? 'nul' : '/dev/null';
+            my $ssh_output = qx($cmd echo $token < $null 2> $null);
+            my $ssh_status = $?;
+            chomp($ssh_output);
+
+            if ($ssh_output eq $token && $ssh_status == 0) {
+                print STDERR "Suitable ssh test configuration: $cmdtmp\n";
+                write_limits('test_ssh_target', $cmdtmp);
+                return;
+            }
+        }
+    }
+    print STDERR "No suitable ssh test configuration!\n";
+}
+
 sub find_socket_capacity {
     return if $LIMITS{'sys|socket_capacity'};
     my $socket_capacity = 
@@ -686,6 +724,8 @@ t/out/limits.$^O file:
    maxfork
    system
 
+
 RT#118474 - report that all tests about timeouts fail on darwin.
     Would darwin benefit from the "alternate alarm" that we
     started using on bsd?
+

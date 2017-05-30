@@ -8,7 +8,7 @@ use IPC::SysV qw(IPC_PRIVATE S_IRUSR S_IWUSR IPC_CREAT IPC_NOWAIT);
 use IPC::Semaphore;
 use Forks::Super::Util qw(DEVNULL DEVTTY Ctime);
 our @ISA = qw(Forks::Super::Sync);
-our $VERSION = '0.89';
+our $VERSION = '0.90';
 
 our $NOWAIT_YIELD_DURATION = 0.05;
 

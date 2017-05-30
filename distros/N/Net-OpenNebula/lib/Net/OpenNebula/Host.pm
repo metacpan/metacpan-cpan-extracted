@@ -30,7 +30,7 @@ Query the Hoststatus of an OpenNebula host.
 =cut
 
 package Net::OpenNebula::Host;
-$Net::OpenNebula::Host::VERSION = '0.310.0';
+$Net::OpenNebula::Host::VERSION = '0.311.0';
 use version;
 
 use Net::OpenNebula::RPC;
@@ -56,7 +56,7 @@ sub vms {
 sub used {
     my ($self) = @_;
     my $hs = $self->_get_info_extended('HOST_SHARE');
-    if (defined($hs->[0]->{RUNNING_VMS}->[0])) {
+    if ($hs->[0]->{RUNNING_VMS}->[0]) {
         return 1;
     }
 };

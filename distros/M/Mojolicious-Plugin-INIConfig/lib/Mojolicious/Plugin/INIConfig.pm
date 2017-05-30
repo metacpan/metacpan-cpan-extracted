@@ -4,7 +4,7 @@ use Config::Tiny;
 use File::Spec::Functions 'file_name_is_absolute';
 use Encode 'encode', 'decode';
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 sub parse {
   my ($self, $content, $file, $conf, $app) = @_;
@@ -89,11 +89,7 @@ sub render {
 
 =head1 NAME
 
-Mojolicious::Plugin::INIConfig - Mojolicious Plugin to create routes automatically
-
-=head1 CAUTION
-
-B<This module is alpha release. the feature will be changed without warnings.>
+Mojolicious::Plugin::INIConfig - Mojolicious plugin to load INI format config file
 
 =head1 SYNOPSIS
 
@@ -129,6 +125,8 @@ from the value of L<Mojolicious/"moniker">.
 
 The code of this plugin is a good example for learning to build new plugins,
 you're welcome to fork it.
+
+If the configuration value C<config_override> has been set in "config" in Mojo when this plugin is loaded, it will not do anything.
 
 =head1 OPTIONS
 
@@ -188,18 +186,7 @@ Process configuration file with L<Mojo::Template>.
     return $content;
   }
 
-=head1 BACKWARDS COMPATIBILITY POLICY
-
-If a feature is DEPRECATED, you can know it by DEPRECATED warnings.
-DEPRECATED feature is removed after C<five years>,
-but if at least one person use the feature and tell me that thing
-I extend one year each time he tell me it.
-
-DEPRECATION warnings can be suppressed
-by C<MOJOLICIOUS_PLUGIN_INICONFIG_SUPPRESS_DEPRECATION>
-environment variable.
-
-EXPERIMENTAL features will be changed without warnings.
+=head2 OP
 
 =head1 BUGS
 
@@ -211,7 +198,7 @@ L<http://github.com/yuki-kimoto/Mojolicious-Plugin-INIConfig>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2013-2013 Yuki Kimoto, all rights reserved.
+Copyright 2013-2017 Yuki Kimoto, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

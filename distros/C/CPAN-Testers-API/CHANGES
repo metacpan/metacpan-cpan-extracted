@@ -1,5 +1,36 @@
 Changelog for CPAN-Testers-API
 
+0.014     2017-05-27 01:43:31-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed test failing if missing optional prerequisite
+
+0.013     2017-05-27 01:32:28-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed Perl 6 reports showing up in the legacy metabase API log
+    - Fixed an additional "v" showing up in the Perl version in the
+      legacy metabase API log
+
+0.012     2017-05-26 23:54:48-05:00 America/Chicago
+
+    [Added]
+
+    - Added deploy script for legacy metabase API
+    - Added explanatory website for legacy metabae API
+    - Added /tail/log.txt for legacy metabase API. This is used by some
+      users to get pre-release information for incoming test reports.
+
+    [Fixed]
+
+    - Property set the executable bit on the legacy Metabase API
+    - Refactored deploy script to have less duplication
+    - Allow cross-origin requests from any domain so you can build your
+      own API consumers using simple JavaScript in the browser
+    - Reduced body margin on API website
+
 0.011     2017-05-14 15:59:49+02:00 Europe/Paris
 
     [Added]

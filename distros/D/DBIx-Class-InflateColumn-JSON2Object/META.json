@@ -33,6 +33,7 @@
             "Moose::Util::TypeConstraints" : "0",
             "Scalar::Util" : "0",
             "String::CamelCase" : "0",
+            "perl" : "5.014",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -46,7 +47,6 @@
             "Test::More" : "0",
             "base" : "0",
             "lib" : "0",
-            "perl" : "5.010",
             "utf8" : "0"
          }
       }
@@ -59,6 +59,6 @@
          "web" : "https://github.com/domm/DBIx-Class-InflateColumn-JSON2Object"
       }
    },
-   "version" : "0.903"
+   "version" : "0.904"
 }
 

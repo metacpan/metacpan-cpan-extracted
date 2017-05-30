@@ -29,11 +29,10 @@ recommends:
   PerlIO::gzip: '0'
   Sys::CpuAffinity: '1.00'
   Sys::CpuLoadX: '0.02'
-  Test::SSH: '0'
   YAML: '0.62'
 requires:
   Test::More: '0'
   Time::HiRes: '1.30'
   URI: '0'
-version: '0.89'
+version: '0.90'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015 Kevin Ryde
+# Copyright 2015, 2016, 2017 Kevin Ryde
 #
 # This file is part of Graph-Graph6.
 #
@@ -33,7 +33,7 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-my $test_count = (tests => 11)[1];
+my $test_count = (tests => 15)[1];
 plan tests => $test_count;
 
 if (! $have_graph) {
@@ -64,7 +64,7 @@ my $filename = 'Graph-Writer-Graph6-t.tmp';
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 6;
+  my $want_version = 7;
   ok ($Graph::Writer::Graph6::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Writer::Graph6->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Writer::Graph6->VERSION($want_version); 1 }, 1,
@@ -164,6 +164,40 @@ sub try_write {
   unlink $filename;
   ok ($str, chr(63+2).chr(63+32)."\n");
 }
+
+#------------------------------------------------------------------------------
+# digraph6
+
+{
+  # formats.txt digraph6 example
+  my $graph = Graph->new;
+  $graph->add_edges(0,2, 0,4, 3,1, 3,4);
+  # print "$graph\n";
+  ok (try_write($graph, format=>'digraph6'),
+      "&DI?AO?\n");
+}
+
+{
+  # edge back only
+  my $graph = Graph->new;
+  $graph->add_vertex(1);
+  $graph->add_edge(2,0);
+  # print "$graph\n";
+  ok (try_write($graph, format=>'digraph6'),
+      "&B?_\n");
+}
+
+{
+  # edge both ways from undirected
+  my $graph = Graph->new (undirected => 1);
+  ok (!! $graph->is_undirected, 1);
+  $graph->add_vertex(1);
+  $graph->add_edge(2,0);
+  # print "$graph\n";
+  ok (try_write($graph, format=>'digraph6'),
+      "&BG_\n");
+}
+
 
 #------------------------------------------------------------------------------
 unlink $filename;

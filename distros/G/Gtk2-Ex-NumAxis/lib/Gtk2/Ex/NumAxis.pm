@@ -1,4 +1,4 @@
-# Copyright 2007, 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2014, 2017 Kevin Ryde
 
 # This file is part of Gtk2-Ex-NumAxis.
 #
@@ -21,14 +21,14 @@ use strict;
 use warnings;
 use Gtk2 1.220;
 use List::Util qw(min max);
-use Math::Round;
+use Math::Round ();
 use POSIX qw(floor ceil);
 use Gtk2::Ex::AdjustmentBits;
 
 # uncomment this to run the ### lines
 #use Smart::Comments;
 
-our $VERSION = 5;
+our $VERSION = 6;
 
 use Glib::Ex::SignalBits;
 use Glib::Ex::SignalIds;
@@ -680,8 +680,8 @@ Gtk2::Ex::NumAxis -- numeric axis display widget
 =head1 SYNOPSIS
 
  use Gtk2::Ex::NumAxis;
- my $axis = Gtk2::Ex::NumAxis->new (adjustment => $adj,
-                                    orientation => 'vertical');
+ my $numaxis = Gtk2::Ex::NumAxis->new (adjustment => $adj,
+                                       orientation => 'vertical');
 
 =head1 WIDGET HIERARCHY
 
@@ -695,7 +695,8 @@ widget.
 
 =head1 DESCRIPTION
 
-A C<Gtk2::Ex::NumAxis> widget displays a vertical axis of values like
+A C<Gtk2::Ex::NumAxis> widget displays a vertical or horizontal axis of
+values like
 
     +---------+
     |         |
@@ -711,9 +712,10 @@ A C<Gtk2::Ex::NumAxis> widget displays a vertical axis of values like
     |         |
     +---------+
 
-The numbers are the "page" portion of a C<Gtk2::Adjustment> and update with
-changes in that Adjustment.  A unit step is chosen automatically according
-to what fits in the window, by either 1, 2 or 5.
+The number range is the "page" portion of a C<Gtk2::Adjustment> and the
+numbers shown update with changes in that Adjustment.  A unit step is chosen
+automatically according to what fits in the window, by steps either 1, 2
+or 5.
 
 Decimal places are shown as necessary and the C<min-decimals> property can
 force a certain minimum decimals for example to show dollars and cents.  The
@@ -721,11 +723,14 @@ C<number-to-text> signal allows formatting like a thousands separator or
 different decimal point.
 
 Pixel x=0 or y=0 is the "value" from the adjustment and the window width or
-height is the "page" amount.  The C<inverted> property swaps that to the
-"value" at the bottom or right of the display.  (This is the same sense as
+height is the "page" amount.  The C<inverted> property swaps that to "value"
+at the bottom or right of the display.  (This is the same sense as
 "inverted" on C<Gtk2::Scrollbar>.)
 
-=head2 Scrolling
+See F<examples/settings.pl> for a complete program displaying a sample
+NumAxis with controls to try its options and settings.
+
+=head2 Mouse Scrolling
 
 A C<scroll-event> handler moves the Adjustment for mouse wheel and similar
 events arriving on the NumAxis.  If the control key is held down then it's
@@ -733,8 +738,8 @@ moved by C<page-increment>, otherwise C<step-increment>.
 
 In a horizontal NumAxis an C<up> and C<down> scroll is applied as well as
 C<right> and C<left>.  Conversely a vertical takes C<right> and C<left> too.
-This is a bit experimental but allows a mouse with only a vertical wheel to
-move a horizontal NumAxis.
+This is slightly experimental but allows a mouse with only a vertical wheel
+to move a horizontal NumAxis.
 
 =head2 Size Request
 
@@ -753,15 +758,15 @@ disconcerting size increase while scrolling, but at least ensures values are
 not truncated.  Of course a size request is only ever a request, the parent
 container determines how much space its children get.
 
-A C<Gtk2::Ex::NoShrink> container can help keep a lid on resizing if for
-instance changes to the Adjustment range would often cause a different
-width.
+A C<Gtk2::Ex::NoShrink> container can help keep a lid on resizing (by not
+reducing in size) if for instance changes to the Adjustment range would
+often cause a different width.
 
 =head1 FUNCTIONS
 
 =over 4
 
-=item C<< $axis = Gtk2::Ex::NumAxis->new (key=>value,...) >>
+=item C<< $numaxis = Gtk2::Ex::NumAxis->new (key=>value,...) >>
 
 Create and return a new NumAxis widget.  Optional key/value pairs set
 initial properties per C<< Glib::Object->new >>.
@@ -770,7 +775,7 @@ initial properties per C<< Glib::Object->new >>.
     Gtk2::Ex::NumAxis->new (adjustment => $adj,
                             min_decimals => 1);
 
-=item C<< $axis->set_scroll_adjustments ($hadj, $vadj) >>
+=item C<< $numaxis->set_scroll_adjustments ($hadj, $vadj) >>
 
 This is the usual C<Gtk2::Widget> method setting the C<adjustment> property
 to C<$hadj> when horizontal or C<$vadj> when vertical.
@@ -807,7 +812,7 @@ left and numbers increasing rightwards.  If C<inverted> is true then instead
 C<value> at the right and numbers increasing to the left.
 
 This sense of C<inverted> is the same as C<Gtk2::HScrollbar> or
-C<Gtk2::VScrollbar>.  If using an NumAxis and a scrollbar together then
+C<Gtk2::VScrollbar>.  If using a NumAxis and a scrollbar together then
 generally the C<inverted> setting should be the same in the two.
 
 =item C<min-decimals> (integer, default 0)
@@ -832,12 +837,12 @@ C<Number::Format>,
     my $nf = Number::Format->new (-thousands_sep => ' ',
                                   -decimal_point => ',');
     sub my_number_to_text_handler {
-      my ($axis, $number, $decimals) = @_;
+      my ($numaxis, $number, $decimals) = @_;
       return $nf->format_number ($number, $decimals,
                                  1); # include trailing zeros
     }
-    $axis->signal_connect (number_to_text =>
-                           \&my_number_to_text_handler);
+    $numaxis->signal_connect (number_to_text =>
+                              \&my_number_to_text_handler);
 
 The C<$decimals> parameter is how many decimals are being shown.  This is
 either C<min-decimals> or more if a higher resolution fits in the axis
@@ -849,6 +854,9 @@ established just from some representative values based on the adjustment
 C<upper> and C<lower> (but not necessarily those particular values).  Things
 like +/- sign or leading and trailing zeros are fine.
 
+See F<examples/currency-format.pl> for a complete program displaying
+formatted numbers.
+
 =back
 
 =head1 BUILDABLE
@@ -856,13 +864,14 @@ like +/- sign or leading and trailing zeros are fine.
 C<Gtk2::Ex::NumAxis> inherits the usual widget C<Gtk2::Buildable> interface
 in Gtk 2.12 and up, so C<Gtk2::Builder> can construct a NumAxis.  The class
 name is C<Gtk2__Ex__NumAxis> and properties and signal handlers can be set
-in the usual way.  Here's a sample fragment, or see F<examples/builder.pl>
-in the NumAxis sources for a complete program.
+in the usual way.
 
     <object class="Gtk2__Ex__NumAxis" id="my_axis">
       <property name="adjustment">my_adj</property>
       <signal name="number-to-text" handler="my_number_to_text"/>
     </object>
+
+See F<examples/builder.pl> for a complete builder program.
 
 =head1 SEE ALSO
 
@@ -878,7 +887,7 @@ L<http://user42.tuxfamily.org/gtk2-ex-numaxis/index.html>
 
 =head1 COPYRIGHT
 
-Copyright 2007, 2008, 2009, 2010, 2011 Kevin Ryde
+Copyright 2007, 2008, 2009, 2010, 2011, 2014, 2017 Kevin Ryde
 
 Gtk2-Ex-NumAxis is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

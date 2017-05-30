@@ -1,4 +1,7 @@
-Revision history for Acme-CPANLists-PERLANCAR
+0.20    2017-05-30 (PERLANCAR)
+
+	- Add module list: PERLANCAR::UpsideDownTextWithUnicode.
+
 
 0.19    2016-12-28 (PERLANCAR)
 
@@ -75,13 +78,11 @@ Revision history for Acme-CPANLists-PERLANCAR
 0.10    2016-02-20 (PERLANCAR)
 
         - Split each list into a separate module (POD) to help 'lcpan
-          related-mods' result.
-
-          When a POD document mentions unrelated modules together (which is when
-          several unrelated lists are put together in a single POD), it gives a
-          false positive for the 'lcpan related-mods' result which thinks that
-          such modules are related. To help 'lcpan related-mods', I now put each
-          list into a separate POD.
+          related-mods' result. When a POD document mentions unrelated modules
+          together (which is when several unrelated lists are put together in a
+          single POD), it gives a false positive for the 'lcpan related-mods'
+          result which thinks that such modules are related. To help 'lcpan
+          related-mods', I now put each list into a separate POD.
 
         - Add module list: Getting system-wide temporary directory in a portable
           way.

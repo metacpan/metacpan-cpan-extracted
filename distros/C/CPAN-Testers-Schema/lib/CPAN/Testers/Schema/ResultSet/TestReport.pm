@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::ResultSet::TestReport;
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 # ABSTRACT: Query the raw test reports
 
 #pod =head1 SYNOPSIS
@@ -94,7 +94,7 @@ CPAN::Testers::Schema::ResultSet::TestReport - Query the raw test reports
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 

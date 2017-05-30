@@ -1,4 +1,4 @@
-Copyright 2010, 2011 Kevin Ryde
+Copyright 2010, 2011, 2017 Kevin Ryde
 
 This file is part of Gtk2-Ex-NumAxis.
 
@@ -16,6 +16,9 @@ You should have received a copy of the GNU General Public License along
 with Gtk2-Ex-NumAxis.  If not, see <http://www.gnu.org/licenses/>.
 
 
+
+Version 6, May 2017
+    - tests allow for round-off
 
 Version 5, May 2011
     - use Gtk2::Ex::AdjustmentBits

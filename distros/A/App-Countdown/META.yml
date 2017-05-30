@@ -3,11 +3,11 @@ abstract: 'wait some specified time while displaying the remaining time.'
 author:
   - 'Shlomi Fish <shlomif@cpan.org>'
 build_requires:
-  Test::More: 0
+  Test::More: '0'
 configure_requires:
-  Module::Build: 0
+  Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830'
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150001'
 keywords:
   - app
   - application
@@ -20,23 +20,23 @@ keywords:
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: App-Countdown
 provides:
   App::Countdown:
     file: lib/App/Countdown.pm
-    version: v0.4.3
+    version: v0.4.4
 requires:
-  Carp: 0
-  Getopt::Long: 2.36
-  IO::Handle: 0
-  POSIX: 0
-  Time::HiRes: 0
-  perl: 5.010
-  strict: 0
-  warnings: 0
+  Carp: '0'
+  Getopt::Long: '2.36'
+  IO::Handle: '0'
+  POSIX: '0'
+  Time::HiRes: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
 resources:
   homepage: http://www.shlomifish.org/open-source/projects/countdown/
   license: http://www.opensource.org/licenses/mit-license.php
-  repository: https://bitbucket.org/shlomif/perl-app-countdown
-version: v0.4.3
+  repository: https://github.com/shlomif/App-Countdown
+version: v0.4.4

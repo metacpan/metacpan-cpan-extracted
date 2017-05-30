@@ -7,6 +7,7 @@ cpanfile
 ignore.txt
 lib/WG/API.pm
 lib/WG/API/Auth.pm
+lib/WG/API/Base.pm
 lib/WG/API/Error.pm
 lib/WG/API/NET.pm
 lib/WG/API/NET/Accounts.pm

@@ -6,7 +6,7 @@ use Carp;
 use Time::HiRes;
 use Config;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 our $DEBUG = $ENV{FORKS_QUEUE_DEBUG} || 0;
 
 our $NOTIFY_OK = $ENV{FORKS_QUEUE_NOTIFY} // do {
@@ -201,7 +201,7 @@ Forks::Queue - queue that can be shared across processes
 
 =head1 VERSION
 
-0.08
+0.09
 
 =head1 SYNOPSIS
 
@@ -248,7 +248,7 @@ but will generally preclude data with blessed references and code references
 
 =head2 new
 
-=head2 $queue = Forks::Queue->new( %opts )
+    $queue = Forks::Queue->new( %opts )
 
 Instantiates a new queue object with the given configuration.
 
@@ -358,7 +358,7 @@ server to make the queue available remotely, writing the details
 about how to connect to the server into the file.
 
 Remote access to queues is provided through the L<Net::Objwrap>
-distribution, which is bundled with C<Forks::Queue> v0.08.
+distribution, which is bundled with C<Forks::Queue> v0.09.
 
 =back
 
@@ -369,7 +369,8 @@ default values for many of these settings.
 
 =head2 enqueue
 
-=head2 $count = $queue->put(@items); $count = $queue->enqueue(@items)
+    $count = $queue->put(@items);
+    $count = $queue->enqueue(@items)
 
 Place one or more "items" on the queue, and returns the number of
 items successfully added to the queue.
@@ -386,7 +387,7 @@ when adding items would cause the queue to exceed its maximum size.
 
 =head2 push
 
-=head2 $count = $queue->push(@items)
+    $count = $queue->push(@items)
 
 Equivalent to L<"put">, adding items to the end of the queue and
 returning the number of items successfully added. The most recent
@@ -405,7 +406,7 @@ L<"on_limit"|Forks::Queue/"new">.
 
 =head2 unshift
 
-=head2 $count = $queue->unshift(@items)
+    $count = $queue->unshift(@items)
 
 Equivalent to C<insert(0,@items)>, adding items to the front
 of the queue, and returning the number of items successfully
@@ -418,7 +419,7 @@ This method is inefficient for some queue implementations.
 
 =head2 end
 
-=head2 $queue->end
+    $queue->end
 
 Indicates that no more items are to be put on the queue,
 so that when a process tries to retrieve an item from an empty queue,
@@ -427,14 +428,20 @@ processes blocking on a L<"get">/L<"dequeue">/L<"shift">/L<"pop">
 call to become unblocked and return C<undef>.
 This method may be called from any process that has access to the queue.
 
+Calling C<end> on a queue more than once will generate a warning
+message, even if the caller is not the same process/thread that
+made the original C<end> call.
+
 
 =head2 get
 
 =head2 dequeue
 
-=head2 $item = $queue->get; $item = $queue->dequeue;
+    $item = $queue->get;
+    $item = $queue->dequeue;
 
-=head2 @items = $queue->get($count); @items = $queue->dequeue($count);
+    @items = $queue->get($count);
+    @items = $queue->dequeue($count);
 
 Attempt to retrieve one or more "items" on the queue. If the
 queue is empty, and if L<"end"> has not been called on the queue,
@@ -452,9 +459,9 @@ function when a C<$count> argument is supplied is always a list,
 so if you evaluate it in scalar context you will get the number of items
 retrieved from the queue, not the items themselves.
 
-  $job = $q->get;         # $job is an item from the queue
-  $job = $q->get(1);      # returns # of items retrieved, not an actual item!
-  ($job) = $q->get(1);    # $job is an item from the queue
+    $job = $q->get;         # $job is an item from the queue
+    $job = $q->get(1);      # returns # of items retrieved, not an actual item!
+    ($job) = $q->get(1);    # $job is an item from the queue
 
 The only important difference between C<get> and C<dequeue> is what
 happens when there is a C<$count> argument, and the queue currently has
@@ -468,9 +475,8 @@ L<"dequeue" method in Thread::Queue|Thread::Queue/"dequeue">.
 
 =head2 pop
 
-=head2 $item = $queue->pop
-
-=head2 @items = $queue->pop($count)
+    $item = $queue->pop
+    @items = $queue->pop($count)
 
 Retrieves one or more items from the "back" of the queue.
 For LIFO style queues, the L<"get"> method is equivalent to this method.
@@ -486,9 +492,8 @@ if you provide a C<$count> argument).
 
 =head2 shift
 
-=head2 $item = $queue->shift
-
-=head2 @items = $queue->shift($count)
+    $item = $queue->shift
+    @items = $queue->shift($count)
 
 Retrieves one or more items from the "front" of the queue.
 For FIFO style queues, the L<"get"> method is equivalent to this method.
@@ -511,9 +516,8 @@ if you provide a C<$count> argument).
 
 =head2 shift_nb
 
-=head2 $item = $queue->XXX_nb
-
-=head2 @items = $queue->XXX_nb($count)
+    $item = $queue->XXX_nb
+    @items = $queue->XXX_nb($count)
 
 Non-blocking versions of the L<"get">, L<"dequeue">, L<"pop">,
 and L<"shift"> methods. These functions return immediately if
@@ -529,9 +533,8 @@ C<$count> argument is supplied.
 
 =head2 pop_timed
 
-=head2 $item = $queue->XXX_timed($timeout)
-
-=head2 @item = $queue->XXX_timed($timeout,$count)
+    $item = $queue->XXX_timed($timeout)
+    @item = $queue->XXX_timed($timeout,$count)
 
 Timed versions of L<"get">, L<"dequeue">, L<"shift">, and L<"pop">
 that take a C<$timeout> argument and will stop blocking after
@@ -549,13 +552,10 @@ will return all available items without blocking.
 
 =head2 peek
 
-=head2 $item = $queue->peek
-
-=head2 $item = $queue->peek($index)
-
-=head2 $item = $queue->peek_front
-
-=head2 $item = $queue->peek_back
+    $item = $queue->peek
+    $item = $queue->peek($index)
+    $item = $queue->peek_front
+    $item = $queue->peek_back
 
 Returns an item from the queue without removing it. The C<peek_front>
 and C<peek_back> methods inspect the item at the front and the back of
@@ -578,11 +578,9 @@ affect the item on the queue.
 
 =head2 extract
 
-=head2 $item = $queue->extract
-
-=head2 $item = $queue->extract($index)
-
-=head2 @items = $queue->extract($index,$count)
+    $item = $queue->extract
+    $item = $queue->extract($index)
+    @items = $queue->extract($index,$count)
 
 Removes and returns the specified number of items from the queue
 at the specified index position, to provide random access to the
@@ -606,7 +604,7 @@ when it is.
 
 =head2 insert
 
-=head2 $count = $queue->insert($index, @list)
+    $count = $queue->insert($index, @list)
 
 Provides random access to the queue, inserting the items specified
 in C<@list> into the queue after index position C<$index>.
@@ -627,7 +625,7 @@ This method is inefficient for some queue implementations.
 
 =head2 pending
 
-=head2 $num_items_avail = $queue->pending
+    $num_items_avail = $queue->pending
 
 Returns the total number of items available on the queue. There is no
 guarentee that the number of available items will not change between a
@@ -635,14 +633,14 @@ call to C<pending> and a subsequent call to L<"get">
 
 =head2 clear
 
-=head2 $queue->clear
+    $queue->clear
 
 Removes all items from the queue.
 
 
 =head2 status
 
-=head2 $status = $queue->status
+    $status = $queue->status
 
 Returns a hash reference with meta information about the queue.
 The information should at least include the number of items remaining in
@@ -652,20 +650,19 @@ in this return value.
 
 =head2 limit
 
-=head2 $max = $queue->limit
-
-=head2 $queue->limit( $new_limit )
-
-=head2 $queue->limit( $new_limit, $on_limit )
-
-=head2 $queue->limit = $new_limit
+    $max = $queue->limit
+    $queue->limit($new_limit)
+    $queue->limit($new_limit,$on_limit)
+    $queue->limit = $new_limit    # may not work on some configurations
 
 Returns or updates the maximum size of the queue. With no args, returns
 the existing maximum queue size, with a non-positive value indicating
-that the queue does not have a maximum size. The return value also acts
-as an lvalue through which the maximum queue size can be set, and
-allows the C<limit> method to be used in the same way as 
-L<Thread::Queue/"limit">.
+that the queue does not have a maximum size. 
+
+The return value also acts as an lvalue through which the maximum
+queue size can be set, and allows the C<limit> method to be used 
+in the same way as L<Thread::Queue/"limit">. I<< Note: lvalue feature
+may not work with Perl v<5.14. >>
 
 If arguments are provided, the first argument is used to set the
 maximum queue size. A non-positive queue size can be specified to
@@ -792,7 +789,4 @@ See http://dev.perl.org/licenses/ for more information.
 #
 #     priorities
 #     Directory implementation (see Queue::Dir)
-# _X_ network implementation with simple client-server
-#     even better thread support, 2nd signal from main to threads?
 #
-

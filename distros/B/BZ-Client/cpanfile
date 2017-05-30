@@ -2,9 +2,11 @@ requires "DateTime::Format::ISO8601" => "0";
 requires "DateTime::Format::Strptime" => "0";
 requires "DateTime::TimeZone" => "0";
 requires "Encode" => "0";
+requires "File::Basename" => "0";
 requires "File::Spec" => "0";
 requires "HTTP::CookieJar" => "0";
 requires "HTTP::Tiny" => "0";
+requires "MIME::Base64" => "0";
 requires "URI" => "0";
 requires "XML::Parser" => "0";
 requires "XML::Writer" => "0";
@@ -21,10 +23,16 @@ on 'test' => sub {
   requires "Clone" => "0";
   requires "Data::Dumper" => "0";
   requires "DateTime" => "0";
+  requires "ExtUtils::MakeMaker" => "0";
+  requires "File::Spec" => "0";
   requires "IO::Socket::SSL" => "0";
   requires "Test::More" => "0";
   requires "Test::RequiresInternet" => "0";
   requires "Text::Password::Pronounceable" => "0";
+};
+
+on 'test' => sub {
+  recommends "CPAN::Meta" => "2.120900";
 };
 
 on 'configure' => sub {
@@ -34,9 +42,12 @@ on 'configure' => sub {
 
 on 'develop' => sub {
   requires "Test::CPAN::Meta" => "0";
+  requires "Test::EOF" => "0";
   requires "Test::EOL" => "0";
   requires "Test::Kwalitee" => "1.21";
   requires "Test::More" => "0.88";
+  requires "Test::NoBreakpoints" => "0.15";
+  requires "Test::NoTabs" => "0";
   requires "Test::Pod" => "1.41";
   requires "Test::Portability::Files" => "0";
 };

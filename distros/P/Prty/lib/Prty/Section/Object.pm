@@ -5,10 +5,9 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.106;
+our $VERSION = 1.107;
 
 use Prty::Path;
-use Scalar::Util ();
 
 # -----------------------------------------------------------------------------
 
@@ -69,21 +68,6 @@ Name der Quelldatei.
 =item [7] line
 
 Zeilennummer in Quelldatei.
-
-=item [8] parentSection
-
-Verweis auf den übergeordneten Abschnitt, wird von L</addSubSection>()
-gesetzt.
-
-=item [9] subSectionA
-
-Liste der untergeordneten Abschnitte, wird von L</addSubSection>()
-ergänzt.
-
-=item [10] fullSource
-
-Quelltext einschließlich der Quelltexte der Sub-Abschnitte, wird
-von L</fullSource>() und L</fullSourceRef>() berechnet.
 
 =back
 
@@ -187,9 +171,6 @@ sub new {
         $source,   # [5]
         $file,     # [6]
         $line,     # [7]
-        undef,     # [8] parentSection
-        [],        # [9] subSectionA
-        undef,     # [10] fullSource
     ],$class;
 }
 
@@ -492,177 +473,6 @@ sub fileInfo {
 
 # -----------------------------------------------------------------------------
 
-=head2 Sub-Abschnitte
-
-=head3 addSubSection() - Füge Abschnitt als Sub-Abschnitt hinzu
-
-=head4 Synopsis
-
-    $sec1->addSubSection($sec2);
-
-=head4 Description
-
-Füge Abschnitt $sec2 als Sub-Abschnitt zu Abschnitt $sec1 hinzu.
-
-=head4 Arguments
-
-=over 4
-
-=item $sec2
-
-Abschnitts-Objekt
-
-=back
-
-=head4 Returns
-
-nichts
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub addSubSection {
-    my ($self,$sec) = @_;
-
-    push @{$self->[9]},$sec;
-    $sec->parentSection($self);
-
-    return;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 subSections() - Liefere Liste der Sub-Abschnitte
-
-=head4 Synopsis
-
-    @sections | $sectionA = $sec->subSections;
-
-=head4 Returns
-
-Liste von Abschnitten. Im Sklarkontext eine Referenz auf die Liste.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub subSections {
-    my $self = shift;
-    return wantarray? @{$self->[9]}: $self->[9];
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 parentSection() - Liefere/Setze Eltern-Abschnitt
-
-=head4 Synopsis
-
-    $parentSec = $sec->parentSection;
-    $parentSec = $sec->parentSection($parentSec);
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub parentSection {
-    my $self = shift;
-    # @_: $parentSec
-
-    if (@_) {
-        $self->[8] = shift;
-        Scalar::Util::weaken($self->[8]);
-    }
-    
-    return $self->[8];
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 fullSource() - Quelltext plus Quelltext der Sub-Abschnitte
-
-=head4 Synopsis
-
-    $source = $sec->fullSource;
-
-=head4 Description
-
-Liefere den Gesamt-Quelltext eines Parent-Abschnitts, also
-einschließlich des Quelltexts aller Sub-Abschnitte.  Ein
-Parent-Abschnitt ist ein Abschnitt, der nicht als Sub-Abschnitt
-eines anderen Abschnitts auftritt. Sub-Abschnitte werden mit
-$sec->L</addSubsection>() registriert. Für Sub-Abschnitte liefert
-die Methode einen Leerstring ('').
-
-Diese Methode wird genutzt, um den Quelltext einer Entity-Datei zu
-generieren.
-
-=head4 Returns
-
-Quelltext oder undef
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub fullSource {
-    my $self = shift;
-    my $srcRef = $self->fullSourceRef;    
-    return $$srcRef;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 fullSourceRef() - Referenz auf "Full Source" Quelltext
-
-=head4 Synopsis
-
-    $sourceRef = $sec->fullSourceRef;
-
-=head4 Description
-
-Wie $sec->L</fullSource>(), nur dass eine Referenz auf den
-Quelltext geliefert wird.
-
-=head4 Returns
-
-Referenz auf Quelltext
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub fullSourceRef {
-    my $self = shift;
-    my $parentTest = shift // 1;
-
-    # Test, damit bei einem "äußeren" Aufruf für Sub-Abschnitte
-    # garantiert ist, dass kein Quelltext geliefert wird. Ein "innerer" Aufruf
-    # (s.u.) muss hingegen den Quelltext des Sub-Abschnitts liefern.
-    # Durch diese Unterscheidung ist sicher gestellt, dass der
-    # die Quelltext-Ermittlung unabhängig von der Reihenfolge der
-    
-    if ($parentTest && $self->[8]) { # Sub-Abschnitt
-        return \'';
-    }
-    
-    if (!$self->[10]) {
-        $self->[10] = $self->[5];
-        for my $sec (@{$self->[9]}) {
-            $self->[10] .= ${$sec->fullSourceRef(0)}; # "innerer" Aufruf
-            # Aggregierten Quelltext von Sub-Abschnitten müssen wir
-            # nicht aufheben. Dieser wird nur einmal bestimmt und
-            # dann nie wieder, da er auf den Parent-Abschnitt
-            # übergeht, welcher höchstens einmal bestimmt wird.
-            $sec->[10] = '';
-        }
-    }
-    
-    return \$self->[10];
-}
-
-# -----------------------------------------------------------------------------
-
 =head2 Quelltext
 
 =head3 source() - Liefere Quelltext
@@ -790,6 +600,44 @@ sub removeEofMarker {
 # -----------------------------------------------------------------------------
 
 =head2 Attribute
+
+=head3 append() - Füge Zeichenkette zu Wert hinzu
+
+=head4 Synopsis
+
+    $val = $sec->append($key=>$str);
+
+=head4 Description
+
+Füge Zeichenkette $str zum Wert des Schlüssels $key hinzu
+und liefere den resultierenden Wert zurück.
+
+=head4 Arguments
+
+=over 4
+
+=item $key
+
+Schlüssel, dessen Wert ergänzt wird.
+
+=back
+
+=head4 Returns
+
+Wert (String)
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub append {
+    my ($self,$key,$str) = @_;
+    my $ref = $self->getRef($key);
+    $$ref .= $str;
+    return $$ref;
+}
+
+# -----------------------------------------------------------------------------
 
 =head3 get() - Liefere Wert zu Schlüssel
 
@@ -1550,7 +1398,7 @@ sub AUTOLOAD {
 
 =head1 VERSION
 
-1.106
+1.107
 
 =head1 AUTHOR
 

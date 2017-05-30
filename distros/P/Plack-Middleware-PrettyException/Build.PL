@@ -18,7 +18,7 @@ my %module_build_args = (
     "Thomas Klausner <domm\@cpan.org>"
   ],
   "dist_name" => "Plack-Middleware-PrettyException",
-  "dist_version" => "1.002",
+  "dist_version" => "1.003",
   "license" => "perl",
   "module_name" => "Plack::Middleware::PrettyException",
   "recursive_test_files" => 1,

@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.106;
+our $VERSION = 1.107;
 
 use Time::HiRes ();
 
@@ -59,7 +59,7 @@ sub insertDurationBytes {
 
 =head1 VERSION
 
-1.106
+1.107
 
 =head1 AUTHOR
 

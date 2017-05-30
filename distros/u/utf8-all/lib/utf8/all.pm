@@ -4,7 +4,7 @@ use warnings;
 use 5.010; # state
 
 # ABSTRACT: turn on Unicode - all of it
-our $VERSION = '0.022'; # VERSION
+our $VERSION = '0.023'; # VERSION
 
 #pod =head1 SYNOPSIS
 #pod
@@ -43,7 +43,8 @@ our $VERSION = '0.022'; # VERSION
 #pod =item *
 #pod
 #pod Filehandles are opened with UTF-8 encoding turned on by default
-#pod (including STDIN, STDOUT, STDERR). Meaning that they automatically
+#pod (including C<STDIN>, C<STDOUT>, and C<STDERR> when C<utf8::all> is
+#pod used from the C<main> package). Meaning that they automatically
 #pod convert UTF-8 octets to characters and vice versa. If you I<don't>
 #pod want UTF-8 for a particular filehandle, you'll have to set C<binmode
 #pod $filehandle>.
@@ -51,15 +52,16 @@ our $VERSION = '0.022'; # VERSION
 #pod =item *
 #pod
 #pod C<@ARGV> gets converted from UTF-8 octets to Unicode characters (when
-#pod C<utf8::all> is used from the main package). This is similar to the
+#pod C<utf8::all> is used from the C<main> package). This is similar to the
 #pod behaviour of the C<-CA> perl command-line switch (see L<perlrun>).
 #pod
 #pod =item *
 #pod
 #pod C<readdir>, C<readlink>, C<readpipe> (including the C<qx//> and
-#pod backtick operators), and L<C<glob>|perlfunc/glob> (including the C<< <>
-#pod >> operator) now all work with and return Unicode characters instead
-#pod of (UTF-8) octets.
+#pod backtick operators), and L<C<glob>|perlfunc/glob> (including the C<<
+#pod <> >> operator) now all work with and return Unicode characters
+#pod instead of (UTF-8) octets (again only when C<utf8::all> is used from
+#pod the C<main> package).
 #pod
 #pod =back
 #pod
@@ -83,7 +85,27 @@ our $VERSION = '0.022'; # VERSION
 #pod off the effects.
 #pod
 #pod Note that the effect on C<@ARGV> and the C<STDIN>, C<STDOUT>, and
-#pod C<STDERR> file handles is always global!
+#pod C<STDERR> file handles is always global and can not be undone!
+#pod
+#pod =head2 Enabling/Disabling Global Features
+#pod
+#pod As described above, the default behaviour of C<utf8::all> is to
+#pod convert C<@ARGV> and to open the C<STDIN>, C<STDOUT>, and C<STDERR>
+#pod file handles with UTF-8 encoding, and override the C<readlink> and
+#pod C<readdir> functions and C<glob> operators when C<utf8::all> is used
+#pod from the C<main> package.
+#pod
+#pod If you want to disable these features even when C<utf8::all> is used
+#pod from the C<main> package, add the option C<NO-GLOBAL> (or
+#pod C<LEXICAL-ONLY>) to the use line. E.g.:
+#pod
+#pod     use utf8::all 'NO-GLOBAL';
+#pod
+#pod If on the other hand you want to enable these global effects even when
+#pod C<utf8::all> was used from another package than C<main>, use the
+#pod option C<GLOBAL> on the use line:
+#pod
+#pod     use utf8::all 'GLOBAL';
 #pod
 #pod =head2 UTF-8 Errors
 #pod
@@ -155,12 +177,21 @@ sub import {
     # Enable features/pragmas in calling package
     my $target = caller;
 
+    # Enable global effects be default only when imported from main package
+    my $no_global = $target ne 'main';
+
+    # Override global?
+    if (defined $_[1] && $_[1] =~ /^(?:(NO-)?GLOBAL|LEXICAL-ONLY)$/i) {
+        $no_global = $_[1] !~ /^GLOBAL$/i;
+        splice(@_, 1, 1); # Remove option from import's arguments
+    }
+
     'utf8'->import::into($target);
     'open'->import::into($target, 'IO' => ':utf8_strict');
 
     # use open ':std' only works with some encodings.
     state $have_encoded_std = 0;
-    if (!$have_encoded_std++) {
+    unless ($no_global || $have_encoded_std++) {
         binmode STDERR, ':utf8_strict';
         binmode STDOUT, ':utf8_strict';
         binmode STDIN,  ':utf8_strict';
@@ -171,7 +202,7 @@ sub import {
     'feature'->import::into($target, qw{unicode_strings}) if $^V >= v5.11.0;
     'feature'->import::into($target, qw{unicode_eval fc}) if $^V >= v5.16.0;
 
-    unless ($^O =~ /MSWin32|cygwin|dos|os2/) {
+    unless ($no_global || $^O =~ /MSWin32|cygwin|dos|os2/) {
         no strict qw(refs); ## no critic (TestingAndDebugging::ProhibitNoStrict)
         no warnings qw(redefine);
 
@@ -188,13 +219,14 @@ sub import {
         $^H{'utf8::all'} = 1;
     }
 
-    # Make @ARGV utf-8 when called from the main package, unless perl was launched
-    # with the -CA flag as this already has @ARGV decoded automatically.
-    # -CA is active if the the fifth bit (32) of the ${^UNICODE} variable is set.
-    # (see perlrun on the -C command switch for details about ${^UNICODE})
-    if (!(${^UNICODE} & 32)) {
+    # Make @ARGV utf-8 when, unless perl was launched with the -CA
+    # flag as this already has @ARGV decoded automatically.  -CA is
+    # active if the the fifth bit (32) of the ${^UNICODE} variable is
+    # set.  (see perlrun on the -C command switch for details about
+    # ${^UNICODE})
+    unless ($no_global || (${^UNICODE} & 32)) {
         state $have_encoded_argv = 0;
-        if ($target eq 'main' && !$have_encoded_argv++) {
+        if (!$have_encoded_argv++) {
             $UTF8_CHECK |= Encode::LEAVE_SRC if $UTF8_CHECK; # Enforce LEAVE_SRC
             $_ = ($_ ? $_UTF8->decode($_, $UTF8_CHECK) : $_) for @ARGV;
         }
@@ -213,7 +245,9 @@ sub unimport { ## no critic (Subroutines::ProhibitBuiltinHomonyms)
     'utf8'->unimport::out_of($target);
     'open'->import::into($target, qw{IO :bytes});
 
-    $^H{'utf8::all'} = 0; # Reset compiler hint
+    unless ($^O =~ /MSWin32|cygwin|dos|os2/) {
+        $^H{'utf8::all'} = 0; # Reset compiler hint
+    }
 
     return;
 }
@@ -291,7 +325,7 @@ utf8::all - turn on Unicode - all of it
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 
@@ -330,7 +364,8 @@ C<5.16.0> and higher.
 =item *
 
 Filehandles are opened with UTF-8 encoding turned on by default
-(including STDIN, STDOUT, STDERR). Meaning that they automatically
+(including C<STDIN>, C<STDOUT>, and C<STDERR> when C<utf8::all> is
+used from the C<main> package). Meaning that they automatically
 convert UTF-8 octets to characters and vice versa. If you I<don't>
 want UTF-8 for a particular filehandle, you'll have to set C<binmode
 $filehandle>.
@@ -338,15 +373,16 @@ $filehandle>.
 =item *
 
 C<@ARGV> gets converted from UTF-8 octets to Unicode characters (when
-C<utf8::all> is used from the main package). This is similar to the
+C<utf8::all> is used from the C<main> package). This is similar to the
 behaviour of the C<-CA> perl command-line switch (see L<perlrun>).
 
 =item *
 
 C<readdir>, C<readlink>, C<readpipe> (including the C<qx//> and
-backtick operators), and L<C<glob>|perlfunc/glob> (including the C<< <>
->> operator) now all work with and return Unicode characters instead
-of (UTF-8) octets.
+backtick operators), and L<C<glob>|perlfunc/glob> (including the C<<
+<> >> operator) now all work with and return Unicode characters
+instead of (UTF-8) octets (again only when C<utf8::all> is used from
+the C<main> package).
 
 =back
 
@@ -370,7 +406,27 @@ Instead of lexical scoping, you can also use C<no utf8::all> to turn
 off the effects.
 
 Note that the effect on C<@ARGV> and the C<STDIN>, C<STDOUT>, and
-C<STDERR> file handles is always global!
+C<STDERR> file handles is always global and can not be undone!
+
+=head2 Enabling/Disabling Global Features
+
+As described above, the default behaviour of C<utf8::all> is to
+convert C<@ARGV> and to open the C<STDIN>, C<STDOUT>, and C<STDERR>
+file handles with UTF-8 encoding, and override the C<readlink> and
+C<readdir> functions and C<glob> operators when C<utf8::all> is used
+from the C<main> package.
+
+If you want to disable these features even when C<utf8::all> is used
+from the C<main> package, add the option C<NO-GLOBAL> (or
+C<LEXICAL-ONLY>) to the use line. E.g.:
+
+    use utf8::all 'NO-GLOBAL';
+
+If on the other hand you want to enable these global effects even when
+C<utf8::all> was used from another package than C<main>, use the
+option C<GLOBAL> on the use line:
+
+    use utf8::all 'GLOBAL';
 
 =head2 UTF-8 Errors
 

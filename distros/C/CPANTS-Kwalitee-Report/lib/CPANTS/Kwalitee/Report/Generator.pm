@@ -1,6 +1,6 @@
 package CPANTS::Kwalitee::Report::Generator;
 
-$CPANTS::Kwalitee::Report::Generator::VERSION   = '0.09';
+$CPANTS::Kwalitee::Report::Generator::VERSION   = '0.10';
 $CPANTS::Kwalitee::Report::Generator::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ CPANTS::Kwalitee::Report::Generator - Interface to Kwalitee Generator.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
@@ -21,10 +21,10 @@ use namespace::clean;
 
 use overload q{""} => 'as_string', fallback => 1;
 
-has 'name'       => (is => 'ro', required => 1);
-has 'version'    => (is => 'ro', required => 1);
-has 'indicators' => (is => 'ro', required => 1);
-has 'verbose'    => (is => 'rw', default => sub { 0 });
+has [qw(name version indicators)] => (is => 'ro', required => 1);
+has 'verbose' => (is => 'lazy');
+
+sub _build_verbose { 0 }
 
 =head1 DESCRIPTION
 

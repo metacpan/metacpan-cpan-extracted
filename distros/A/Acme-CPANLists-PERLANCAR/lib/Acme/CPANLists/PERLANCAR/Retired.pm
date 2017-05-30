@@ -1,7 +1,7 @@
 package Acme::CPANLists::PERLANCAR::Retired;
 
-our $DATE = '2016-12-28'; # DATE
-our $VERSION = '0.19'; # VERSION
+our $DATE = '2017-05-30'; # DATE
+our $VERSION = '0.20'; # VERSION
 
 our @Module_Lists = (
     # list: Retired modules
@@ -83,7 +83,7 @@ Acme::CPANLists::PERLANCAR::Retired - Retired modules
 
 =head1 VERSION
 
-This document describes version 0.19 of Acme::CPANLists::PERLANCAR::Retired (from Perl distribution Acme-CPANLists-PERLANCAR), released on 2016-12-28.
+This document describes version 0.20 of Acme::CPANLists::PERLANCAR::Retired (from Perl distribution Acme-CPANLists-PERLANCAR), released on 2017-05-30.
 
 =head1 MODULE LISTS
 
@@ -167,7 +167,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -36,9 +36,10 @@ for my $tz (keys %EXPECT) {
 plan skip_all => 'Missing tzdata on this system' unless %found;
 plan tests => 1 + keys %found;
 
+my $shell_quote = $^O eq 'MSWin32' ? '"' : "'";
 subtest 'detect offset from date time string' => sub {
-    is `$^X $inc $dir/strptime.pl '%Y-%m-%d %H:%M:%S %z' '2014-01-01 01:23:45 -0900'`, "1388571825 -32400";
-    is `$^X $inc $dir/strptime.pl '%Y-%m-%d %H:%M:%S %z' '2014-01-01 01:23:45 +0900'`, "1388507025 32400";
+    is `$^X $inc $dir/strptime.pl ${shell_quote}%Y-%m-%d %H:%M:%S %z${shell_quote} ${shell_quote}2014-01-01 01:23:45 -0900${shell_quote}`, "1388571825 -32400";
+    is `$^X $inc $dir/strptime.pl ${shell_quote}%Y-%m-%d %H:%M:%S %z${shell_quote} ${shell_quote}2014-01-01 01:23:45 +0900${shell_quote}`, "1388507025 32400";
 };
 
 for my $tz (keys %found) {
@@ -53,14 +54,14 @@ for my $tz (keys %found) {
 
                 subtest 'detect time_zone from env' => sub {
                     local $ENV{TZ} = $tz;
-                    is `$^X $inc $dir/strptime.pl '%Y-%m-%d %H:%M:%S' '$dt'`, $expected;
+                    is `$^X $inc $dir/strptime.pl ${shell_quote}%Y-%m-%d %H:%M:%S${shell_quote} ${shell_quote}$dt${shell_quote}`, $expected;
                 };
 
                 subtest 'detect time_zone from date time string' => sub {
                     local $ENV{TZ} = 'GMT';
                     my ($result) = join ' ', Time::Strptime::Format->new('%Y-%m-%d %H:%M:%S %Z', { time_zone => 'GMT' })->parse("$dt $tz");
                     is $result, $expected;
-                    is `$^X $inc $dir/strptime.pl '%Y-%m-%d %H:%M:%S %Z' '$dt $tz'`, $expected;
+                    is `$^X $inc $dir/strptime.pl ${shell_quote}%Y-%m-%d %H:%M:%S %Z${shell_quote} ${shell_quote}$dt $tz${shell_quote}`, $expected;
                 };
             };
         }

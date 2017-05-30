@@ -5,7 +5,7 @@ use Forks::Queue;
 use Time::HiRes;
 require "t/exercises.tt";
 
-if (! eval "use Net::Objwrap qw(:test);1") {
+if (! eval "use t::NetObjwrapOK;use Net::Objwrap qw(:test);1") {
     SKIP: {
         skip("Net::Objwrap required for this test", 1);
     }
@@ -17,24 +17,26 @@ Net::Objwrap::Server->TEST_MODE;
 my $r_id = 0;
 for my $impl (IMPL()) {
 
+    my $tmp = TEMP_DIR();
+
     $r_id++;
-    unlink "t/rq.$r_id", "t/cfg.$r_id";
-    ok(! -f "t/rq.$r_id", "queue file does not exist");
-    ok(! -f "t/cfg.$r_id", "remote config file does not exist");
+    unlink "$tmp/rq.$r_id", "$tmp/cfg.$r_id";
+    ok(! -f "$tmp/rq.$r_id", "queue file does not exist");
+    ok(! -f "$tmp/cfg.$r_id", "remote config file does not exist");
     
-    my $q1 = Forks::Queue->new( impl => $impl, file => "t/rq.$r_id",
-                                db_file => "t/rq.$r_id",
-                                remote => "t/cfg.$r_id",
+    my $q1 = Forks::Queue->new( impl => $impl, file => "$tmp/rq.$r_id",
+                                db_file => "$tmp/rq.$r_id",
+                                remote => "$tmp/cfg.$r_id",
                                 list => [ 1 .. 10 ] );
 
     ok(ref($q1) =~ /Forks::Queue/, 'created remote queue');
     ok($q1->pending == 10, 'queue is populated');
     if ($impl ne 'Shmem') {
-        ok(-f "t/rq.$r_id", "queue file t/rq.$r_id created impl=$impl");
+        ok(-f "$tmp/rq.$r_id", "queue file $tmp/rq.$r_id created impl=$impl");
     }
-    ok(-f "t/cfg.$r_id", 'remote queue config created');
+    ok(-f "$tmp/cfg.$r_id", 'remote queue config created');
 
-    my $q2 = Forks::Queue->new( remote => "t/cfg.$r_id" );
+    my $q2 = Forks::Queue->new( remote => "$tmp/cfg.$r_id" );
     ok(ref($q2) eq 'Net::Objwrap::Proxy', 'proxy queue created');
     ok(Net::Objwrap::ref($q2) eq ref($q1), 'correct remote ref');
     ok($q2->pending == 10, 'proxy queue is populated');
@@ -47,8 +49,15 @@ for my $impl (IMPL()) {
     is(2, $q2->put(12,13), 'put from proxy queue');
     is($q1->pending, $q2->pending, 'queue sizes are consistent');
 
-    $q1->limit = 25;
-    is(25, $q2->limit, 'limit lvalue on remote queue affects proxy queue');
+    if (tied($q1->limit)) {
+        $q1->limit = 25;
+        is(25, $q2->limit,
+           'limit lvalue on remote queue affects proxy queue');
+    } else {
+        $q1->limit(25);
+        is(25, $q2->limit,
+           'limit on remote queue affects proxy queue');
+    }
 
     # $q2->limit = 39    doesn't work
     # $q2->{limit} = 39  also doesn't work

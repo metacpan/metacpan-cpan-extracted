@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.106;
+our $VERSION = 1.107;
 
 use Cwd ();
 use Prty::System;
@@ -153,9 +153,45 @@ sub user {
 
 # -----------------------------------------------------------------------------
 
+=head3 homeDir() - Home-Verzeichnis des Benutzers
+
+=head4 Synopsis
+
+    $path = $class->homeDir;
+    $path = $class->homeDir($subPath);
+
+=head4 Description
+
+Liefere das Home-Verzeichnis des Benutzers, der den Prozess
+ausführt.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub homeDir {
+    my $class = shift;
+    # @_: $subPath
+
+    if (!exists $ENV{'HOME'}) {
+        $class->throw(
+            q{PROCESS-00001: Environment-Variable HOME existiert nicht},
+        );
+    }
+
+    my $path = $ENV{'HOME'};
+    if (@_) {
+        $path .= "/$_[0]";
+    }
+
+    return $path;
+}
+
+# -----------------------------------------------------------------------------
+
 =head1 VERSION
 
-1.106
+1.107
 
 =head1 AUTHOR
 

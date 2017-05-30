@@ -58,7 +58,7 @@ use Catmandu::Util qw(xml_escape is_different :array :is);
 use List::Util;
 use Moo;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 with 'Catmandu::Exporter', 'Catmandu::Exporter::MARC::Base';
 
@@ -89,13 +89,18 @@ sub add {
         next if $#data == -1;
 
         # Joins are faster than perl string concatenation
-        if (index($tag,'FMT') == 0 || index($tag,'00') == 0) {
-            push @lines , join('', $_id , ' ' , $tag , $ind1 , $ind2 , ' L ', $data[1] );
-        }
-        elsif (index($tag,'LDR') == 0) {
+        if (index($tag,'LDR') == 0) {
             my $ldr = $data[1];
             $ldr =~ s/ /^/og;
             push @lines , join('', $_id , ' ' , $tag , $ind1 , $ind2 , ' L ', $ldr );
+        }
+        elsif (index($tag,'008') == 0) {
+            my $f008 = $data[1];
+            $f008 =~ s/ /^/og;
+            push @lines , join('', $_id , ' ' , $tag , $ind1 , $ind2 , ' L ', $f008 );
+        }
+        elsif (index($tag,'FMT') == 0 || index($tag,'00') == 0) {
+            push @lines , join('', $_id , ' ' , $tag , $ind1 , $ind2 , ' L ', $data[1] );
         }
         else {
              my @line = ('', $_id , ' ' , $tag , $ind1 , $ind2 , ' L ');

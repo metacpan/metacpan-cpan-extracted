@@ -1,4 +1,5 @@
 #!/usr/bin/env perl
+our $VERSION = '0.014';
 # ABSTRACT: An API from the legacy Metabase::Web to the local database
 
 #pod =head1 SYNOPSIS
@@ -46,6 +47,8 @@ my $root_conf = app->home->child( sprintf 'etc/%s.conf', app->moniker );
 plugin Config => (
     file => $ENV{MOJO_CONFIG} || $root_conf,
 );
+
+get '/' => 'index';
 
 #pod =attr schema
 #pod
@@ -184,14 +187,15 @@ get '/beta/guid/:guid' => \&handle_guid;
 #pod
 #pod =cut
 
-get '/tail/log.txt' => sub( $c ) {
-    # The last 1000 reports as of 2017-05-13T13:10:11Z:
-    # [2017-05-13T13:10:09Z] [Slaven Rezi&#x0107; (SREZIC)] [fail] [VOJ/Pod-Pandoc-0.4.0.tar.gz] [x86_64-linux] [perl-v5.24.1] [7db6b504-37dd-11e7-bc91-bebec21a40f2] [2017-05-13T13:10:09Z]
+get '/tail/log' => sub( $c ) {
+    my $rs = $c->schema->resultset( 'TestReport' )->search(
+        { 'report' => \'->>"$.environment.language.name" = "Perl 5"' },
+        { order_by => { -desc => 'created' }, rows => 1000 },
+    );
+    return $c->render( 'tail/log', format => 'txt', rs => $rs );
 };
 
 app->start;
-
-__END__
 
 =pod
 
@@ -201,7 +205,7 @@ CPANTesters::Web::Legacy::Metabase - An API from the legacy Metabase::Web to the
 
 =head1 VERSION
 
-version 0.011
+version 0.014
 
 =head1 SYNOPSIS
 
@@ -271,3 +275,64 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
+
+__DATA__
+@@ index.html.ep
+<!DOCTYPE html>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<style>body { margin-top: 40px }</style>
+<title>Metabase - CPAN Testers</title>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <div class="navbar-brand">
+                <a href="http://api.cpantesters.org">
+                    <strong>CPAN Testers API</strong>
+                </a>
+            </div>
+        </div>
+
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-left">
+                <li><a href="http://cpantesters.org">Reports</a></li>
+                <li><a href="http://api.cpantesters.org">API</a></li>
+                <li><a href="http://blog.cpantesters.org">Blog</a></li>
+                <li><a href="http://github.com/cpan-testers">Github</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<div class="container">
+    <h1>CPAN Testers Metabase</h1>
+    <p>The <strong>Metabase</strong> was the main repository of CPAN Testers reports. It has been replaced
+    with a <a href="http://api.cpantesters.org/docs/?url=/v3#!/Report/v3_report_post">new test report API</a>
+    being stored in the local <a href="http://mysql.org">MySQL database</a>.</p>
+
+    <p>This site is a shim API to support legacy Metabase clients and translate their reports
+    to the new test report format. Metabase clients will continue to work, but will not gain the
+    benefit of the new test report's additional data fields.</p>
+</div>
+
+@@ tail/log.txt.ep
+% use DateTime;
+% my $rs = stash 'rs';
+The last <%= $rs->count %> reports as of <%= DateTime->now %>Z:
+% for my $row ( $rs->all ) {
+% my $report = $row->report;
+% my $grade = $report->{result}{grade};
+% my $name = $report->{reporter}{name};
+% my $upload = $row->upload;
+% my $file = $upload ? join "/", $upload->author, $upload->filename : '';
+% my ( $arch, $perl_version ) = $report->{environment}{language}->@{qw(archname version )};
+[<%= $row->created %>Z] [<%= $name %>] [<%= $grade %>] [<%= $file %>] [<%= $arch %>] [perl-<%= $perl_version %>] [<%= $row->id %>] [<%= $row->created %>Z]
+% }

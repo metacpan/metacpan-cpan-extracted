@@ -6,21 +6,23 @@ use warnings;
 
 BEGIN {
 	$Sub::Talisman::Struct::AUTHORITY = 'cpan:TOBYINK';
-	$Sub::Talisman::Struct::VERSION   = '0.005';
+	$Sub::Talisman::Struct::VERSION   = '0.006';
 }
 
-use base qw( Sub::Talisman );
-use MooX::Struct ();
+use Sub::Talisman ();
+use MooX::Struct 0.016 ();
 use Carp qw( confess );
-use Data::OptList ();
+use Exporter::Tiny qw( mkopt );
 use namespace::clean;
-	
+
+our @ISA = qw( Sub::Talisman );
+
 sub import
 {
 	my $class  = shift;
 	my $caller = caller;
 	
-	foreach my $arg (@{ Data::OptList::mkopt(\@_) })
+	foreach my $arg (@{ mkopt \@_ })
 	{
 		my ($atr, $str) = @$arg;
 		$class->setup_for($caller => {
@@ -128,7 +130,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2012 by Toby Inkster.
+This software is copyright (c) 2012, 2017 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

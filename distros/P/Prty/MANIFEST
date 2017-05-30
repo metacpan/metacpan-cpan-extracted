@@ -9,6 +9,7 @@ lib/Prty/Confluence/Client.pm
 lib/Prty/Confluence/Markup.pm
 lib/Prty/Confluence/Page.pm
 lib/Prty/ContentProcessor.pm
+lib/Prty/ContentProcessor/BaseType.pm
 lib/Prty/ContentProcessor/File.pm
 lib/Prty/ContentProcessor/SubType.pm
 lib/Prty/ContentProcessor/Type.pm
@@ -143,6 +144,7 @@ lib/Prty/Timeseries/Synchronizer.pm
 lib/Prty/Udl.pm
 lib/Prty/Unindent.pm
 lib/Prty/Url.pm
+lib/Prty/XTerm.pm
 Makefile.PL
 MANIFEST			This list of files
 README

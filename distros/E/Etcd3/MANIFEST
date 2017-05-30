@@ -6,8 +6,6 @@ README
 README.md
 lib/Etcd3.pm
 lib/Etcd3/Auth.pm
-lib/Etcd3/Auth/Authenticate.pm
-lib/Etcd3/Auth/Enable.pm
 lib/Etcd3/Auth/Role.pm
 lib/Etcd3/Config.pm
 lib/Etcd3/Lease.pm

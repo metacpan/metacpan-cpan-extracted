@@ -1,7 +1,7 @@
 package Calendar::Indonesia::Holiday;
 
-our $DATE = '2016-04-23'; # DATE
-our $VERSION = '0.28'; # VERSION
+our $DATE = '2017-05-29'; # DATE
+our $VERSION = '0.29'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,7 @@ my @fixed_holidays = (
         day        => 17, month =>  8,
         ind_name   => "Proklamasi",
         eng_name   => "Declaration Of Independence",
-        tags       => [],
+        tags       => [qw/national/],
     },
     my $christmas = {
         day        => 25, month => 12,
@@ -57,6 +57,17 @@ my @fixed_holidays = (
         decree_date => "2013-04-29",
         decree_note => "Labor day becomes national holiday since 2014, ".
             "decreed by president",
+    },
+    my $pancasilad = {
+        day         => 1, month => 6,
+        year_start  => 2017,
+        ind_name    => "Hari Lahir Pancasila",
+        eng_name    => "Pancasila Day",
+        tags       => [qw/national/],
+        decree_date => "2016-06-01",
+        decree_note => "Pancasila day becomes national holiday since 2017, ".
+            "decreed by president (Keppres 24/2016)",
+        # ref: http://www.kemendagri.go.id/media/documents/2016/08/03/k/e/keppres_no.24_th_2016.pdf
     },
 );
 
@@ -1038,7 +1049,7 @@ Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 =head1 VERSION
 
-This document describes version 0.28 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2016-04-23.
+This document describes version 0.29 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2017-05-29.
 
 =head1 SYNOPSIS
 
@@ -1048,11 +1059,13 @@ This document describes version 0.28 of Calendar::Indonesia::Holiday (from Perl 
      count_id_workdays
  );
 
- # list Indonesian holidays for the year 2011, without the joint leave days
- # ("cuti bersama"), show only the dates
+This lists Indonesian holidays for the year 2011, without the joint leave days
+("cuti bersama"), showing only the dates:
 
  my $res = list_id_holidays(year => 2011, is_joint_leave=>0);
- # sample result
+
+Sample result:
+
  [200, "OK", [
    '2011-01-01',
    '2011-02-03',
@@ -1070,11 +1083,13 @@ This document describes version 0.28 of Calendar::Indonesia::Holiday (from Perl 
    '2011-12-25',
  ]];
 
- # list religious Indonesian holidays, show full details
+This lists religious Indonesian holidays, showing full details:
+
  my $res = list_id_holidays(year => 2011,
                             "tags.has" => ['religious'], detail=>1);
 
- # sample result
+Sample result:
+
  [200, "OK", [
    {date        => '2011-02-16',
     day         => 16,
@@ -1090,15 +1105,18 @@ This document describes version 0.28 of Calendar::Indonesia::Holiday (from Perl 
    ...
  ]];
 
- # check whether 2011-02-16 is a holiday
+This checks whether 2011-02-16 is a holiday:
+
  my $res = list_id_holidays(date => '2011-02-16');
  print "2011-02-16 is a holiday\n" if @{$res->[2]};
 
- # enumerate working days for a certain period
+This enumerate working days for a certain period:
+
  my $res = enum_id_workdays(year=>2011, month=>7);
 
- # idem, but returns a number instead. year/month defaults to current
- # year/month.
+Idem, but returns a number instead. year/month defaults to current
+year/month:
+
  my $res = count_id_workdays();
 
 =head1 DESCRIPTION
@@ -1110,7 +1128,11 @@ There is a command-line script interface for this module: L<list-id-holidays>.
 =head1 FUNCTIONS
 
 
-=head2 count_id_workdays(%args) -> [status, msg, result, meta]
+=head2 count_id_workdays
+
+Usage:
+
+ count_id_workdays(%args) -> [status, msg, result, meta]
 
 Count working days for a certain period.
 
@@ -1164,7 +1186,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 enum_id_workdays(%args) -> [status, msg, result, meta]
+=head2 enum_id_workdays
+
+Usage:
+
+ enum_id_workdays(%args) -> [status, msg, result, meta]
 
 Enumerate working days for a certain period.
 
@@ -1218,7 +1244,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 list_id_holidays(%args) -> [status, msg, result, meta]
+=head2 list_id_holidays
+
+Usage:
+
+ list_id_holidays(%args) -> [status, msg, result, meta]
 
 List Indonesian holidays in calendar.
 
@@ -1644,7 +1674,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 list_id_workdays(%args) -> [status, msg, result, meta]
+=head2 list_id_workdays
+
+Usage:
+
+ list_id_workdays(%args) -> [status, msg, result, meta]
 
 This function is not exported.
 
@@ -1702,7 +1736,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Calendar-I
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Calendar-Indonesia-Holiday>.
+Source repository is at L<https://github.com/perlancar/perl-Calendar-Indonesia-Holiday>.
 
 =head1 BUGS
 
@@ -1725,7 +1759,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

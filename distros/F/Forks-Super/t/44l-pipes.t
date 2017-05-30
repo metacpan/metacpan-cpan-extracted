@@ -39,7 +39,7 @@ my $err = Forks::Super::read_stderr($pid);
 ok($err =~ /^foo/, "read stderr")
     or diag("expected 'foo', got $err");
 
-my $out = <$pid>;
+my $out = $] >= 5.008008 ? <$pid> : $pid->read_stdout();
 if ($] < 5.008) {
     # read with :crlf layer doesn't work the same in 5.6
     $unicode_phrase =~ s/\n/\r\n/g;

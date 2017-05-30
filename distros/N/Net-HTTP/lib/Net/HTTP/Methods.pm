@@ -1,5 +1,5 @@
 package Net::HTTP::Methods;
-$Net::HTTP::Methods::VERSION = '6.15';
+$Net::HTTP::Methods::VERSION = '6.16';
 use strict;
 use warnings;
 use URI;
@@ -639,19 +639,17 @@ sub inflate_ok {
 
 1;
 
-__END__
-
 =pod
 
 =encoding UTF-8
 
 =head1 NAME
 
-Net::HTTP::Methods
+Net::HTTP::Methods - Methods shared by Net::HTTP and Net::HTTPS
 
 =head1 VERSION
 
-version 6.15
+version 6.16
 
 =head1 AUTHOR
 
@@ -665,3 +663,7 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
+
+__END__
+
+# ABSTRACT: Methods shared by Net::HTTP and Net::HTTPS
