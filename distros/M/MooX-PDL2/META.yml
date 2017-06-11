@@ -1,0 +1,55 @@
+---
+abstract: 'A Moo based PDL 2.X object'
+author:
+  - 'Diab Jerius <djerius@cpan.org>'
+build_requires:
+  Class::Method::Modifiers: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Safe::Isa: '0'
+  Test2::Bundle::Extended: '0'
+  Test2::Bundle::More: '0'
+  Test::API: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooX-PDL2
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  MooX::PDL2:
+    file: lib/MooX/PDL2.pm
+    version: '0.01'
+requires:
+  Carp: '0'
+  Moo: '0'
+  Moo::Object: '0'
+  MooX::ProtectedAttributes: '0'
+  PDL: '2.000'
+  PDL::Lite: '0'
+  PDLx::DetachedObject: '0'
+  Scalar::Util: '0'
+  namespace::clean: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-PDL2
+  repository: git://github.com/djerius/moox-pdl2.git
+version: '0.01'
+x_serialization_backend: 'YAML::Tiny version 1.69'

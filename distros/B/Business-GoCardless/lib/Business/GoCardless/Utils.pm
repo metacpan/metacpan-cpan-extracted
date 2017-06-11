@@ -48,15 +48,19 @@ Checks the signature is valid for the given params hash with the app secret
 =cut
 
 sub signature_valid {
-    my ( $self,$params,$app_secret ) = @_;
+    my ( $self,$params,$app_secret,$sig ) = @_;
 
     # for testing, use live at your own risk
     return 1 if $ENV{GOCARDLESS_SKIP_SIG_CHECK};
 
-    # delete local is 5.12+ only so need to copy hash here
-    my $params_copy = { %{ $params } };
-    my $sig = delete( $params_copy->{signature} );
-    return $sig eq $self->sign_params( $params_copy,$app_secret );
+    if ( $sig ) { # version > 1 (since we don't have access to ->client here)
+        return $sig eq hmac_sha256_hex( $params,$app_secret );
+    } else {
+        # delete local is 5.12+ only so need to copy hash here
+        my $params_copy = { %{ $params } };
+        $sig = delete( $params_copy->{signature} );
+        return $sig eq $self->sign_params( $params_copy,$app_secret );
+    }
 }
 
 =head2 generate_nonce

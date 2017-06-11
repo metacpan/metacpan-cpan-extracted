@@ -350,10 +350,11 @@ PerlIO_debug(const char *fmt, ...)
 {
     va_list ap;
     dSYS;
-    va_start(ap, fmt);
 
     if (!DEBUG_i_TEST)
         return;
+
+    va_start(ap, fmt);
 
     if (!PL_perlio_debug_fd) {
 	if (!TAINTING_get &&
@@ -546,11 +547,12 @@ PerlIO_list_push(pTHX_ PerlIO_list_t *list, PerlIO_funcs *funcs, SV *arg)
     PERL_UNUSED_CONTEXT;
 
     if (list->cur >= list->len) {
-	list->len += 8;
+        const IV new_len = list->len + 8;
 	if (list->array)
-	    Renew(list->array, list->len, PerlIO_pair_t);
+	    Renew(list->array, new_len, PerlIO_pair_t);
 	else
-	    Newx(list->array, list->len, PerlIO_pair_t);
+	    Newx(list->array, new_len, PerlIO_pair_t);
+	list->len = new_len;
     }
     p = &(list->array[list->cur++]);
     p->funcs = funcs;
@@ -847,7 +849,7 @@ XS(XS_PerlIO__Layer__NoWarnings)
        during loading of layers.
      */
     dXSARGS;
-    PERL_UNUSED_ARG(cv);
+    PERL_UNUSED_VAR(items);
     DEBUG_i(
         if (items)
             PerlIO_debug("warning:%s\n",SvPV_nolen_const(ST(0))) );
@@ -858,7 +860,6 @@ XS(XS_PerlIO__Layer__find); /* prototype to pass -Wmissing-prototypes */
 XS(XS_PerlIO__Layer__find)
 {
     dXSARGS;
-    PERL_UNUSED_ARG(cv);
     if (items < 2)
 	Perl_croak(aTHX_ "Usage class->find(name[,load])");
     else {
@@ -1128,7 +1129,7 @@ PerlIO_push(pTHX_ PerlIO *f, PERLIO_FUNCS_DECL(*tab), const char *mode, SV *arg)
     VERIFY_HEAD(f);
     if (tab->fsize != sizeof(PerlIO_funcs)) {
 	Perl_croak( aTHX_
-	    "%s (%"UVuf") does not match %s (%"UVuf")",
+	    "%s (%" UVuf ") does not match %s (%" UVuf ")",
 	    "PerlIO layer function table size", (UV)tab->fsize,
 	    "size expected by this perl", (UV)sizeof(PerlIO_funcs) );
     }
@@ -1136,7 +1137,7 @@ PerlIO_push(pTHX_ PerlIO *f, PERLIO_FUNCS_DECL(*tab), const char *mode, SV *arg)
 	PerlIOl *l;
 	if (tab->size < sizeof(PerlIOl)) {
 	    Perl_croak( aTHX_
-		"%s (%"UVuf") smaller than %s (%"UVuf")",
+		"%s (%" UVuf ") smaller than %s (%" UVuf ")",
 		"PerlIO layer instance size", (UV)tab->size,
 		"size expected by this perl", (UV)sizeof(PerlIOl) );
 	}
@@ -1299,6 +1300,9 @@ PerlIO_apply_layers(pTHX_ PerlIO *f, const char *mode, const char *names)
 int
 PerlIO_binmode(pTHX_ PerlIO *f, int iotype, int mode, const char *names)
 {
+    PERL_UNUSED_ARG(iotype);
+    PERL_UNUSED_ARG(mode);
+
     DEBUG_i(
         PerlIO_debug("PerlIO_binmode f=%p %s %c %x %s\n", (void*)f,
                      (PerlIOBase(f) && PerlIOBase(f)->tab) ?
@@ -1311,7 +1315,7 @@ PerlIO_binmode(pTHX_ PerlIO *f, int iotype, int mode, const char *names)
 	   (for example :unix which is never going to call them)
 	   it can do the flush when it is pushed.
 	 */
-	return PerlIO_apply_layers(aTHX_ f, NULL, names) == 0 ? TRUE : FALSE;
+	return cBOOL(PerlIO_apply_layers(aTHX_ f, NULL, names) == 0);
     }
     else {
 	/* Fake 5.6 legacy of using this call to turn ON O_TEXT */
@@ -1352,7 +1356,7 @@ PerlIO_binmode(pTHX_ PerlIO *f, int iotype, int mode, const char *names)
 	/* Legacy binmode is now _defined_ as being equivalent to pushing :raw
 	   So code that used to be here is now in PerlIORaw_pushed().
 	 */
-	return PerlIO_push(aTHX_ f, PERLIO_FUNCS_CAST(&PerlIO_raw), NULL, NULL) ? TRUE : FALSE;
+	return cBOOL(PerlIO_push(aTHX_ f, PERLIO_FUNCS_CAST(&PerlIO_raw), NULL, NULL));
     }
 }
 
@@ -1982,6 +1986,37 @@ PerlIOBase_pushed(pTHX_ PerlIO *f, const char *mode, SV *arg, PerlIO_funcs *tab)
 	    SETERRNO(EINVAL, LIB_INVARG);
 	    return -1;
 	}
+#ifdef EBCDIC
+	{
+        /* The mode variable contains one positional parameter followed by
+         * optional keyword parameters.  The positional parameters must be
+         * passed as lowercase characters.  The keyword parameters can be
+         * passed in mixed case. They must be separated by commas. Only one
+         * instance of a keyword can be specified.  */
+	int comma = 0;
+	while (*mode) {
+	    switch (*mode++) {
+	    case '+':
+		if(!comma)
+		  l->flags |= PERLIO_F_CANREAD | PERLIO_F_CANWRITE;
+		break;
+	    case 'b':
+		if(!comma)
+		  l->flags &= ~PERLIO_F_CRLF;
+		break;
+	    case 't':
+		if(!comma)
+		  l->flags |= PERLIO_F_CRLF;
+		break;
+	    case ',':
+		comma = 1;
+		break;
+	    default:
+		break;
+	    }
+	}
+	}
+#else
 	while (*mode) {
 	    switch (*mode++) {
 	    case '+':
@@ -1998,6 +2033,7 @@ PerlIOBase_pushed(pTHX_ PerlIO *f, const char *mode, SV *arg, PerlIO_funcs *tab)
 		return -1;
 	    }
 	}
+#endif
     }
     else {
 	if (l->next) {
@@ -3196,7 +3232,7 @@ PerlIOStdio_invalidate_fileno(pTHX_ FILE *f)
        structure at all
      */
 #    else
-    f->_file = -1;
+    PERLIO_FILE_file(f) = -1;
 #    endif
     return 1;
 #  else
@@ -3522,6 +3558,7 @@ STDCHAR *
 PerlIOStdio_get_base(pTHX_ PerlIO *f)
 {
     FILE * const stdio = PerlIOSelf(f, PerlIOStdio)->stdio;
+    PERL_UNUSED_CONTEXT;
     return (STDCHAR*)PerlSIO_get_base(stdio);
 }
 
@@ -3529,6 +3566,7 @@ Size_t
 PerlIOStdio_get_bufsiz(pTHX_ PerlIO *f)
 {
     FILE * const stdio = PerlIOSelf(f, PerlIOStdio)->stdio;
+    PERL_UNUSED_CONTEXT;
     return PerlSIO_get_bufsiz(stdio);
 }
 #endif
@@ -3538,6 +3576,7 @@ STDCHAR *
 PerlIOStdio_get_ptr(pTHX_ PerlIO *f)
 {
     FILE * const stdio = PerlIOSelf(f, PerlIOStdio)->stdio;
+    PERL_UNUSED_CONTEXT;
     return (STDCHAR*)PerlSIO_get_ptr(stdio);
 }
 
@@ -3545,6 +3584,7 @@ SSize_t
 PerlIOStdio_get_cnt(pTHX_ PerlIO *f)
 {
     FILE * const stdio = PerlIOSelf(f, PerlIOStdio)->stdio;
+    PERL_UNUSED_CONTEXT;
     return PerlSIO_get_cnt(stdio);
 }
 
@@ -3552,6 +3592,7 @@ void
 PerlIOStdio_set_ptrcnt(pTHX_ PerlIO *f, STDCHAR * ptr, SSize_t cnt)
 {
     FILE * const stdio = PerlIOSelf(f, PerlIOStdio)->stdio;
+    PERL_UNUSED_CONTEXT;
     if (ptr != NULL) {
 #ifdef STDIO_PTR_LVALUE
         /* This is a long-standing infamous mess.  The root of the
@@ -5067,6 +5108,7 @@ PerlIO_tmpfile(void)
 void
 Perl_PerlIO_save_errno(pTHX_ PerlIO *f)
 {
+    PERL_UNUSED_CONTEXT;
     if (!PerlIOValid(f))
 	return;
     PerlIOBase(f)->err = errno;
@@ -5082,6 +5124,7 @@ Perl_PerlIO_save_errno(pTHX_ PerlIO *f)
 void
 Perl_PerlIO_restore_errno(pTHX_ PerlIO *f)
 {
+    PERL_UNUSED_CONTEXT;
     if (!PerlIOValid(f))
 	return;
     SETERRNO(PerlIOBase(f)->err, PerlIOBase(f)->os_err);

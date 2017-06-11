@@ -88,7 +88,7 @@ sub changes {
 }
 
 sub request {
-    my $url = "http://api.metacpan.org/v0/"
+    my $url = "http://fastapi.metacpan.org/v1/"
             . join "/", map uri_escape($_), @_;
 
     my $ua = LWP::UserAgent->new(

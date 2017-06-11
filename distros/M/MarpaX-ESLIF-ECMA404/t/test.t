@@ -2,32 +2,36 @@
 use strict;
 use warnings FATAL => 'all';
 use Data::Section 0.200006 -setup;
+use FindBin qw /$Bin/;
+use File::Spec;
 use Test::More;
 use Test::More::UTF8;
-use Log::Log4perl qw/:easy/;
-use Log::Any qw/$log/;
-use Log::Any::Adapter;
-use Log::Any::Adapter::Log4perl;  # Just to make sure dzil catches it
+# use Log::Any qw/$log/;
+#use Log::Log4perl qw/:easy/;
+#use Log::Any::Adapter;
+#use Log::Any::Adapter::Log4perl;  # Just to make sure dzil catches it
 
 #
 # Init log
 #
-our $defaultLog4perlConf = '
-log4perl.rootLogger              = TRACE, Screen
-log4perl.appender.Screen         = Log::Log4perl::Appender::Screen
-log4perl.appender.Screen.stderr  = 0
-log4perl.appender.Screen.layout  = PatternLayout
-log4perl.appender.Screen.layout.ConversionPattern = %d %-5p %6P %m{chomp}%n
-';
-Log::Log4perl::init(\$defaultLog4perlConf);
-Log::Any::Adapter->set('Log4perl');
+#our $defaultLog4perlConf = '
+#log4perl.rootLogger              = TRACE, Screen
+#log4perl.appender.Screen         = Log::Log4perl::Appender::Screen
+#log4perl.appender.Screen.stderr  = 0
+#log4perl.appender.Screen.layout  = PatternLayout
+#log4perl.appender.Screen.layout.ConversionPattern = %d %-5p %6P %m{chomp}%n
+#';
+#Log::Log4perl::init(\$defaultLog4perlConf);
+#Log::Any::Adapter->set('Log4perl');
 
 BEGIN { require_ok('MarpaX::ESLIF::ECMA404') };
 
-my $ecma404 = MarpaX::ESLIF::ECMA404->new(logger => $log);
+my $ecma404 = MarpaX::ESLIF::ECMA404->new(
+                                          # logger => $log
+                                         );
 isa_ok($ecma404, 'MarpaX::ESLIF::ECMA404');
 
-foreach (__PACKAGE__->section_data_names) {
+foreach (sort __PACKAGE__->section_data_names) {
     my $want_ok = ($_ =~ /^ok/);
     my $want_ko = ($_ =~ /^ko/);
     #
@@ -39,14 +43,68 @@ foreach (__PACKAGE__->section_data_names) {
     #
     my $input = __PACKAGE__->section_data($_);
     if ($want_ok) {
-        ok($ecma404->decode($$input), $_);
+        # Left commented to compare with a good and working parser -;
+        # use JSON::XS ();
+        # is_deeply($ecma404->decode($$input), JSON::XS::decode_json($$input), $_);
+        ok(defined($ecma404->decode($$input)), $_);
+        #use Data::Dumper;
+        #print STDERR Dumper($ecma404->decode($$input));
     } else {
-        ok(!$ecma404->decode($$input), $_);
+        ok(!defined($ecma404->decode($$input)), $_);
     }
 }
 
+#
+# From https://github.com/nst/JSONTestSuite/tree/master/test_parsing
+#
+my $test_parsing_dir = File::Spec->catdir($Bin, 'test_parsing');
+opendir(my $d, $test_parsing_dir) || die "Failed to open $test_parsing_dir, $!";
+my @files = sort grep { /\.json$/ } readdir($d);
+closedir($d) || warn "Failed to close $test_parsing_dir, $!";
+foreach my $basename (@files) {
+    my $file_path = File::Spec->catfile($test_parsing_dir, $basename);
+
+    open(my $f, '<', $file_path) || die "Cannot open $file_path, $!";
+    binmode($f);
+    my $data = do { local $/; <$f> };
+    close($f) || warn "Failed to close $_, $!";
+
+    #
+    # Encoding - letting MarpaX::ESLIF guess is proned to errors
+    #
+    my $encoding;
+    if ($basename =~ /utf16be/i) {
+        $encoding = 'UTF-16BE';
+    } elsif ($basename =~ /utf16le/i) {
+        $encoding = 'UTF-16LE';
+    } elsif ($basename =~ /utf\-?8/i) {
+        $encoding = 'UTF-8';
+    } elsif (! ($basename =~ /bom/i)) {
+        #
+        # Just to please OLD versions of perl, 5.10 for example.
+        # In general this is not needed.
+        #
+        $encoding = 'UTF-8';
+    }
+
+    my $want_ko = ($basename =~ /^n/);
+    if ($want_ko) {
+      ok(!defined($ecma404->decode($data, $encoding)), $basename);
+    } else {
+      ok(defined($ecma404->decode($data, $encoding)), $basename);
+    }
+}
+
+#
+# Done
+#
 done_testing();
+
 __DATA__
+__[ ok / from https://en.wikipedia.org/wiki/JSON#Data_portability_issues ]__
+{ "face1": "😂", "face2": "\u849c\uD83D\uDE02\u849c\u8089" }
+__[ ok / from https://stackoverflow.com/questions/7460645/how-to-convert-json-string-that-contains-encoded-unicode ]__
+{"records":[{"description":"\u849c\u8089","id":282}]}
 __[ ok / from http://www.json-generator.com/ compact ]__
 [{"_id":"5916ab741f6f6ce5f930c58d","index":0,"guid":"fd2873ca-a571-4872-a0e6-174f08436373","isActive":true,"balance":"$2,595.35","picture":"http://placehold.it/32x32","age":25,"eyeColor":"blue","name":"Roy Melton","gender":"male","company":"LUXURIA","email":"roymelton@luxuria.com","phone":"+1 (855) 543-2902","address":"390 Chester Court, Bangor, Indiana, 2520","about":"Aliqua id ullamco minim dolore cillum consectetur. Veniam veniam est ut duis labore ex consequat excepteur deserunt magna exercitation consectetur. Culpa elit et minim pariatur quis velit occaecat in dolore consectetur incididunt Lorem aute.\r\n","registered":"2014-09-03T07:41:45 -02:00","latitude":27.588587,"longitude":-49.485137,"tags":["ea","nisi","irure","dolor","sunt","eu","eiusmod"],"friends":[{"id":0,"name":"Patricia Hunt"},{"id":1,"name":"Mccarty Diaz"},{"id":2,"name":"Douglas Richmond"}],"greeting":"Hello, Roy Melton! You have 2 unread messages.","favoriteFruit":"apple"},{"_id":"5916ab74f9f4176196755b7b","index":1,"guid":"81b26539-4d77-4943-826a-08cfa7ebb834","isActive":false,"balance":"$1,975.64","picture":"http://placehold.it/32x32","age":30,"eyeColor":"blue","name":"Edith Little","gender":"female","company":"JAMNATION","email":"edithlittle@jamnation.com","phone":"+1 (849) 552-2583","address":"991 Powers Street, Waterloo, Maine, 7454","about":"Adipisicing culpa deserunt enim excepteur Lorem aliqua eu. Officia occaecat occaecat officia sunt cupidatat sunt consequat eu excepteur duis. Et excepteur cillum qui mollit enim excepteur sint voluptate ullamco in consectetur irure cillum. Voluptate mollit mollit laborum velit aliqua consectetur nulla anim velit. Minim do proident culpa non proident irure ullamco velit enim consectetur. Et excepteur nostrud minim sit cupidatat ex ut. Do incididunt laborum anim in duis reprehenderit aute reprehenderit ad veniam nostrud duis quis dolor.\r\n","registered":"2015-06-30T10:58:03 -02:00","latitude":60.958765,"longitude":-118.104883,"tags":["eu","elit","laborum","et","Lorem","Lorem","laborum"],"friends":[{"id":0,"name":"Simone Walton"},{"id":1,"name":"Price Velazquez"},{"id":2,"name":"Claudette Phillips"}],"greeting":"Hello, Edith Little! You have 1 unread messages.","favoriteFruit":"strawberry"},{"_id":"5916ab747c07b0865fb01fc9","index":2,"guid":"5ad03e7e-5d3f-45e3-aa74-c3c888e2e4b8","isActive":false,"balance":"$2,262.69","picture":"http://placehold.it/32x32","age":37,"eyeColor":"green","name":"Minnie Goodwin","gender":"female","company":"MAROPTIC","email":"minniegoodwin@maroptic.com","phone":"+1 (938) 419-3863","address":"352 Claver Place, Hillsboro, Arkansas, 7845","about":"Laboris ut pariatur cillum exercitation exercitation labore in nostrud quis consectetur magna. Sunt consectetur dolore non fugiat ullamco sint proident commodo ex eu voluptate aute. Aute aliquip nostrud laborum eu reprehenderit consectetur id sit quis ullamco est. Excepteur ipsum enim pariatur enim officia veniam officia consectetur aliquip dolore. Consectetur veniam magna ex velit deserunt cillum duis est ipsum aliquip nostrud.\r\n","registered":"2016-06-03T03:41:45 -02:00","latitude":62.067073,"longitude":115.363007,"tags":["do","laboris","laborum","deserunt","eu","fugiat","non"],"friends":[{"id":0,"name":"Oconnor Fisher"},{"id":1,"name":"Robbins Davis"},{"id":2,"name":"Rollins Brooks"}],"greeting":"Hello, Minnie Goodwin! You have 10 unread messages.","favoriteFruit":"banana"},{"_id":"5916ab747863a79d58240d44","index":3,"guid":"ae93261d-55be-4bb9-8a69-9b8f545a02e2","isActive":false,"balance":"$2,098.44","picture":"http://placehold.it/32x32","age":28,"eyeColor":"green","name":"Maxwell Flynn","gender":"male","company":"MYOPIUM","email":"maxwellflynn@myopium.com","phone":"+1 (804) 510-2371","address":"774 Rockaway Avenue, Roy, Kansas, 174","about":"Duis ex sunt ullamco sunt deserunt adipisicing irure quis labore ex occaecat laborum. Aliqua dolor nisi pariatur elit. Mollit eiusmod proident cupidatat aliquip ut dolore esse.\r\n","registered":"2015-12-03T11:49:42 -01:00","latitude":-78.593105,"longitude":-128.314445,"tags":["aliqua","consequat","quis","minim","adipisicing","nisi","deserunt"],"friends":[{"id":0,"name":"Roach Downs"},{"id":1,"name":"Evangeline Woodward"},{"id":2,"name":"Mia Aguirre"}],"greeting":"Hello, Maxwell Flynn! You have 1 unread messages.","favoriteFruit":"banana"},{"_id":"5916ab7462aaf97f64876644","index":4,"guid":"6f1e7bc6-2370-47d2-8287-f2d6106a56e3","isActive":false,"balance":"$1,198.72","picture":"http://placehold.it/32x32","age":21,"eyeColor":"green","name":"Sims Sykes","gender":"male","company":"ZAGGLES","email":"simssykes@zaggles.com","phone":"+1 (895) 512-3678","address":"941 Luquer Street, Winfred, Rhode Island, 2640","about":"Voluptate duis minim aute culpa in id dolor dolore laborum voluptate non. Enim ea adipisicing sint labore excepteur et aute laborum in eu culpa et aute consequat. Veniam labore labore elit quis id deserunt proident dolore nisi do non.\r\n","registered":"2017-02-02T01:35:15 -01:00","latitude":-61.994374,"longitude":-90.596461,"tags":["occaecat","adipisicing","voluptate","cupidatat","irure","ut","ut"],"friends":[{"id":0,"name":"Copeland Zimmerman"},{"id":1,"name":"Mack Blake"},{"id":2,"name":"Mae Terry"}],"greeting":"Hello, Sims Sykes! You have 1 unread messages.","favoriteFruit":"banana"}]
 __[ ok / from http://www.json-generator.com/ 2 space tab ]__

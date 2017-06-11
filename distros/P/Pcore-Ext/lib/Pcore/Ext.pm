@@ -1,4 +1,4 @@
-package Pcore::Ext v0.8.0;
+package Pcore::Ext v0.9.0;
 
 use Pcore -dist, -const;
 use Pcore::Ext::Context;
@@ -267,7 +267,7 @@ sub _get_ctx ( $self, $class, $app, $framework ) {
 
     return if !$ctx;
 
-    return bless { ctx => $ctx, framework => $framework, app => $app }, 'Pcore::Ext::Context';
+    return Pcore::Ext::Context->new( { ctx => $ctx, framework => $framework, app => $app } );
 }
 
 1;

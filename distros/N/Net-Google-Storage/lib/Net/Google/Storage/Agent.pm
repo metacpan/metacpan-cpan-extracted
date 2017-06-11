@@ -1,10 +1,7 @@
 use strict;
 use warnings;
 package Net::Google::Storage::Agent;
-{
-  $Net::Google::Storage::Agent::VERSION = '0.1.2';
-}
-
+$Net::Google::Storage::Agent::VERSION = '0.2.0';
 # ABSTRACT: Access the Google Storage JSON API (currently experimental).
 # https://developers.google.com/storage/docs/json_api/
 
@@ -100,7 +97,7 @@ sub refresh_access_token
 		grant_type => 'refresh_token',
 	});
 	
-	die 'Failed to refresh the access token' unless $res->is_success;
+	die 'Failed to refresh the access token' . $res->content unless $res->is_success;
 	
 	my $response = decode_json($res->decoded_content);
 	$self->access_token($response->{access_token});
@@ -189,7 +186,10 @@ sub _form_url
 1;
 
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -197,7 +197,7 @@ Net::Google::Storage::Agent - Access the Google Storage JSON API (currently expe
 
 =head1 VERSION
 
-version 0.1.2
+version 0.2.0
 
 =head1 DESCRIPTION
 
@@ -269,4 +269,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

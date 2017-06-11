@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 83627396d0f723ee0afa243e38799b9dc9ba0bbd Changes
+SHA1 0ff62babcf9f625e319ec3656a2680e295121506 MANIFEST
+SHA1 efbd00de7e85d0227218d911d8dc841903e7c6fc META.json
+SHA1 6484bb4d390ad83b7eca7ea4c2e5e2bc51b53bb7 META.yml
+SHA1 19b830ad80c6cac9e8a1550de1e5b960cb4bccec Makefile.PL
+SHA1 f82eb1d4fc619a769a87df2986fa372274a23c4c README
+SHA1 0eceb22a9dd8a80861da313e1e5672d03534db43 lib/Data/Faker/Colour.pm
+SHA1 3a916441b58779013d8dc0595c72f0a0e0d13bfa t/Data-Faker-Colour.t
+-----BEGIN PGP SIGNATURE-----
+
+iQJEBAEBCgAuFiEErVNvYICb0H7KK/jxygQ1vl7Bs2IFAlku3L0QHG1hcml1c0Bp
+ZXZhbC5ybwAKCRDKBDW+XsGzYhtuD/90rCOW/y6S5hGKGV9e9/xqPa6EVTLCfBFc
+wbnqDr1TcNoepILOHOb2ccihmNCgi3O21W5qc9OgxeCKlFHl2druCoFTQBkiZCaI
+MvFbjak45lliNYKh5YXUhcCmGRQmRL28dZdlLv8ud2yWYUng26KsPnkJZt64yZ4E
+/t/WB16ytKa5Tth0jUp7KkSek3cDBh4B1WkLRS3wAYXrpKBYipqQu4+jvq1ShD2L
+i8r+WYhEyOfk5plRY1olIf1URNuinmSSag4Ytt8trJuVGIkPjZWfJJNHj6H8F1V6
+5zQrhUOn3VfXjlT8YpondWsw6PFq2GMr6rNqMaeJxdk1eHGfDhUXg6L8blo5VIFU
+IfBdtHvazTyaod6Pma/bPkmhJBedFRKp4W10KXMxey9P1e3pHrZqQEjlCGXMFWFv
+ThDXBSm2JGOq+so/PduSftbEG5EjmZDqrew+ZRP/cRpDpF9+PPNWD/Y/PmqbSc+E
+qN1xxZ6e5nSzKSybLqsoqQZ3hmpv250mMtBzrMCfJpySPIJZp9pwRnrkXN2DpDC7
+qJDVMbMHsX9AbiG8fSG4ZEoYxFr80HDXSTfuylH9A5ka7P02PFGFk7KNIA6o06aS
+VscfUJ4OYlV4aNM37B6eQdktvlO8j9FNk+9iW1UpPhDi55XSsAn0lmkRMt/487sa
+lRFGLvqSQg==
+=bBUR
+-----END PGP SIGNATURE-----

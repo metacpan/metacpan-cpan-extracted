@@ -34,6 +34,7 @@ lib/Net/FullAuto/ISets/Amazon/Chef_is.pm
 lib/Net/FullAuto/ISets/Amazon/Chaining_is.pm
 lib/Net/FullAuto/ISets/Amazon/ClipBucket_is.pm
 lib/Net/FullAuto/ISets/Amazon/GNUSocial_is.pm
+lib/Net/FullAuto/ISets/Amazon/Jenkins_is.pm
 lib/Net/FullAuto/ISets/Amazon/KaliLinux_is.pm
 lib/Net/FullAuto/ISets/Amazon/OpenLDAP_is.pm
 lib/Net/FullAuto/ISets/Amazon/Hadoop_is.pm

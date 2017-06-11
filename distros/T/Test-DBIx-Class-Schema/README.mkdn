@@ -4,7 +4,7 @@ Test::DBIx::Class::Schema - DBIx::Class schema sanity checking tests
 
 # VERSION
 
-version 1.0.10
+version 1.0.11
 
 # SYNOPSIS
 
@@ -133,15 +133,15 @@ Chisel Wright <chisel@chizography.net>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Chisel Wright.
+This software is copyright (c) 2017 by Chisel Wright.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 # CONTRIBUTORS
 
-- Chisel Wright <chisel@cleavag.es>
 - Darius Jokilehto <darius.jokilehto@net-a-porter.com>
 - Dave Cross <davidc@broadbean.com>
 - Jason Tang <tang.jason.ch@gmail.com>
 - Rupert Lane <rupert@rupert-lane.org>
+- simbabque <simbabque@cpan.org>

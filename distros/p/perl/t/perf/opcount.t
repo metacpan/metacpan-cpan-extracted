@@ -20,7 +20,7 @@ BEGIN {
 use warnings;
 use strict;
 
-plan 2249;
+plan 2261;
 
 use B ();
 
@@ -260,3 +260,93 @@ test_opcount(0, 'multideref exists',
                     multideref => 1,
                 },
             );
+
+test_opcount(0, 'barewords can be constant-folded',
+             sub { no strict 'subs'; FOO . BAR },
+             {
+                 concat => 0,
+             });
+
+{
+    no warnings 'experimental::signatures';
+    use feature 'signatures';
+
+    my @a;
+    test_opcount(0, 'signature default expressions get optimised',
+                 sub ($s = $a[0]) {},
+                 {
+                     aelem         => 0,
+                     aelemfast_lex => 1,
+                 });
+}
+
+# in-place sorting
+
+{
+    local our @global = (3,2,1);
+    my @lex = qw(a b c);
+
+    test_opcount(0, 'in-place sort of global',
+                 sub { @global = sort @global; 1 },
+                 {
+                     rv2av   => 1,
+                     aassign => 0,
+                 });
+
+    test_opcount(0, 'in-place sort of lexical',
+                 sub { @lex = sort @lex; 1 },
+                 {
+                     padav   => 1,
+                     aassign => 0,
+                 });
+
+    test_opcount(0, 'in-place reversed sort of global',
+                 sub { @global = sort { $b <=> $a } @global; 1 },
+                 {
+                     rv2av   => 1,
+                     aassign => 0,
+                 });
+
+
+    test_opcount(0, 'in-place custom sort of global',
+                 sub { @global = sort {  $a<$b?1:$a>$b?-1:0 } @global; 1 },
+                 {
+                     rv2av   => 1,
+                     aassign => 0,
+                 });
+
+    sub mysort { $b cmp $a };
+    test_opcount(0, 'in-place sort with function of lexical',
+                 sub { @lex = sort mysort @lex; 1 },
+                 {
+                     padav   => 1,
+                     aassign => 0,
+                 });
+
+
+}
+
+# in-place assign optimisation for @a = split
+
+{
+    local our @pkg;
+    my @lex;
+
+    for (['@pkg',       0, ],
+         ['local @pkg', 0, ],
+         ['@lex',       0, ],
+         ['my @a',      0, ],
+         ['@{[]}',      1, ],
+    ){
+        # partial implies that the aassign has been optimised away, but
+        # not the rv2av
+        my ($code, $partial) = @$_;
+        test_opcount(0, "in-place assignment for split: $code",
+                eval qq{sub { $code = split }},
+                {
+                    padav   => 0,
+                    rv2av   => $partial,
+                    aassign => 0,
+                });
+    }
+}

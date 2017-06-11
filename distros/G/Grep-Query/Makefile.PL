@@ -86,7 +86,7 @@ sub postamble
 .PHONY : test_v
 
 test_v : dynamic pure_all
-	$(NOECHO) prove -lvr t
+	$(NOECHO) prove -lvr $(TEST_FILES)
 
 # make xtest: runs all 'xt' tests
 # make xtest_v: runs all 'xt' tests verbose

@@ -33,7 +33,7 @@ resources:
   bugtracker: https://github.com/LibreCat/Plack-Middleware-Memento/issues
   homepage: https://github.com/LibreCat/Plack-Middleware-Memento
   repository: https://github.com/LibreCat/Plack-Middleware-Memento.git
-version: '0.0101'
+version: '0.0102'
 x_contributors:
   - 'vpeil <vitali.peil@uni-bielefeld.de>'
 x_serialization_backend: 'YAML::Tiny version 1.69'

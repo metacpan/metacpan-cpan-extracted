@@ -1,7 +1,7 @@
 package HTTP::Tiny::Patch::LogAny;
 
-our $DATE = '2015-08-17'; # DATE
-our $VERSION = '0.03'; # VERSION
+our $DATE = '2017-05-31'; # DATE
+our $VERSION = '0.04'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,6 +11,15 @@ use Module::Patch 0.12 qw();
 use base qw(Module::Patch);
 
 our %config;
+
+sub _render_headers {
+    my $headers = shift;
+    join("", map {
+        my $k = $_;
+        my $v = $headers->{$_};
+        join("", map { "$k: $_\n"} ref($v) eq 'ARRAY' ? @$v : ($v))
+    } sort keys %$headers);
+}
 
 my $p_request = sub {
     require Log::Any::IfLOG;
@@ -31,7 +40,7 @@ my $p_request = sub {
         my $hh = $args->{headers} // {};
         $log->tracef("HTTP::Tiny request (not raw):\n%s %s\n%s\ncontent: %s",
                      $method, $url,
-                     join("", map {"$_: $hh->{$_}\n"} sort keys %$hh),
+                     _render_headers($hh),
                      $args->{content});
     }
 
@@ -46,7 +55,8 @@ my $p_request = sub {
         my $hh = $res->{headers} // {};
         $log->tracef("HTTP::Tiny response (not raw):\n%s %s %s\n%s\n",
                      $res->{status}, $res->{reason}, $res->{protocol},
-                     join("", map {"$_: $hh->{$_}\n"} sort keys %$hh));
+                     _render_headers($hh),
+                 );
     }
 
     if ($config{-log_response_content} && $log->is_trace) {
@@ -105,7 +115,7 @@ HTTP::Tiny::Patch::LogAny - Log HTTP::Tiny with Log::Any
 
 =head1 VERSION
 
-This document describes version 0.03 of HTTP::Tiny::Patch::LogAny (from Perl distribution HTTP-Tiny-Patch-LogAny), released on 2015-08-17.
+This document describes version 0.04 of HTTP::Tiny::Patch::LogAny (from Perl distribution HTTP-Tiny-Patch-LogAny), released on 2017-05-31.
 
 =head1 SYNOPSIS
 
@@ -146,17 +156,13 @@ Content will not be logged though, enable C<-log_response_content> for that.
 
 =head1 FAQ
 
-=head1 SEE ALSO
-
-L<Log::Any::For::LWP>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/HTTP-Tiny-Patch-LogAny>.
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-HTTP-Tiny-Patch-LogAny>.
+Source repository is at L<https://github.com/perlancar/perl-HTTP-Tiny-Patch-LogAny>.
 
 =head1 BUGS
 
@@ -166,13 +172,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Log::Any::For::LWP>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

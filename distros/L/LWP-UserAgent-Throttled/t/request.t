@@ -28,7 +28,8 @@ THROTTLE: {
 	time_atmost(sub { $response = $ua->get('http://search.cpan.org/'); }, 8, 'should not be throttled');
 	ok($response->is_success());
 
-	time_atmost(sub { $response = $ua->get('http://www.perl.org/'); }, 8, 'should not be throttled');
+	$ua->ssl_opts(verify_hostname => 0);
+	time_atmost(sub { $response = $ua->get('https://www.perl.org/'); }, 8, 'should not be throttled');
 	ok($response->is_success());
 	sleep(8);
 

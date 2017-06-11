@@ -6,7 +6,7 @@ use Pcore -const,
     TLS_CTX => [qw[$TLS_CTX_HIGH $TLS_CTX_LOW]],
   };
 use Pcore::Util::Scalar qw[blessed is_glob];
-use Pcore::AE::Handle2 qw[:TLS_CTX];
+use Pcore::AE::Handle qw[:TLS_CTX];
 use Pcore::HTTP::Util;
 use Pcore::HTTP::Headers;
 use Pcore::HTTP::Response;

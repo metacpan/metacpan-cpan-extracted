@@ -1,3 +1,8 @@
+v0.9.0 2017-05-30T15:32:34Z
+ - No issues on bugtracker were closed since the last release
+ - migrate to ANSI colors vars
+ - try/catch removed
+
 v0.8.0 2017-05-20T19:51:04Z
  - No issues on bugtracker were closed since the last release
  - util and mod_share removed from dist config

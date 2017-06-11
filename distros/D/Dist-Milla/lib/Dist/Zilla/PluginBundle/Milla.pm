@@ -1,7 +1,7 @@
 package Dist::Zilla::PluginBundle::Milla;
 
 use strict;
-use version; our $VERSION = version->declare('v1.0.17');
+use version; our $VERSION = version->declare('v1.0.18');
 
 use Dist::Milla;
 use Moose;
@@ -47,7 +47,7 @@ sub configure {
 
         # should be after GatherDir
         # Equivalent to Module::Install's version_from, license_from and author_from
-        [ 'VersionFromModule' ],
+        [ 'VersionFromMainModule' ],
         [ 'LicenseFromModule', { override_author => 1 } ],
 
         [ 'ReversionOnRelease', { prompt => 1 } ],

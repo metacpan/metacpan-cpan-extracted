@@ -1,6 +1,8 @@
 use PDL::Core::Dev;
 use ExtUtils::MakeMaker;
 PDL::Core::Dev->import();
+
+use lib '.'; ##-- fix RT bug #121661?
 require "pdlmaker.plm";
 
 $package  = ["HMM.pd",HMM,PDL::HMM];

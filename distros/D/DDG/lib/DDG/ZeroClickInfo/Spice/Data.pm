@@ -1,7 +1,7 @@
 package DDG::ZeroClickInfo::Spice::Data;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Data that gets delivered additional to the spice call into the Javascript of the HTML
-$DDG::ZeroClickInfo::Spice::Data::VERSION = '1016';
+$DDG::ZeroClickInfo::Spice::Data::VERSION = '1017';
 use Moo;
 
 
@@ -29,7 +29,7 @@ DDG::ZeroClickInfo::Spice::Data - Data that gets delivered additional to the spi
 
 =head1 VERSION
 
-version 1016
+version 1017
 
 =head1 SYNOPSIS
 

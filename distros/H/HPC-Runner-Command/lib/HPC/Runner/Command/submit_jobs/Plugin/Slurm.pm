@@ -56,14 +56,7 @@ sub submit_jobs {
     my ($jobid) = $stdout =~ m/(\d.*)$/ if $stdout;
 
     if ( !$jobid ) {
-        $self->log->warn(
-"Submit scripts will be written, but will not be submitted to the queue."
-        );
-        $self->log->warn(
-            "Please look at your submission scripts in " . $self->outdir );
-        $self->log->warn(
-            "And your logs in " . $self->logdir . "\nfor more information" );
-        $self->no_submit_to_slurm(0);
+      $self->job_failure;
     }
     else {
         $self->log->debug( "Submited job "
@@ -83,12 +76,10 @@ Update the job dependencies if using job_array (not batches)
 sub update_job_deps {
     my $self = shift;
 
-    return if $self->use_batches;
-
     return unless $self->has_array_deps;
 
-    while(my($current_task, $v) = each %{$self->array_deps}){
-      my $dep_tasks = join(':', @$v);
+    while ( my ( $current_task, $v ) = each %{ $self->array_deps } ) {
+        my $dep_tasks = join( ':', @$v );
         my $cmd =
           "scontrol update job=$current_task Dependency=afterok:$dep_tasks";
         $self->change_deps($cmd);

@@ -71,6 +71,12 @@ t/perl-data.t
 t/pointer.t
 t/prop.t
 t/safe-call.t
+t/sandbox/00-memory.t
+t/sandbox/01-memory.t
+t/sandbox/02-memory.t
+t/sandbox/bubble-timeout.t
+t/sandbox/check.t
+t/sandbox/timeout.t
 t/trycatch.t
 t/typescript.t
 t/uncaught.t

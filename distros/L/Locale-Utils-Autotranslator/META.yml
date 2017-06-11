@@ -20,7 +20,7 @@ name: Locale-Utils-Autotranslator
 provides:
   Locale::Utils::Autotranslator:
     file: lib/Locale/Utils/Autotranslator.pm
-    version: '1.002'
+    version: '1.004'
   Locale::Utils::Autotranslator::ApiMymemoryTranslatedNet:
     file: lib/Locale/Utils/Autotranslator/ApiMymemoryTranslatedNet.pm
     version: '1.002'
@@ -41,11 +41,12 @@ requires:
   MooX::StrictConstructor: '0'
   MooX::Types::MooseLike: '0'
   MooX::Types::MooseLike::Base: '0'
+  MooX::Types::MooseLike::Numeric: '0'
   Try::Tiny: '0'
   URI: '0'
   namespace::autoclean: '0'
   perl: '5.008'
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.002'
+version: '1.004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

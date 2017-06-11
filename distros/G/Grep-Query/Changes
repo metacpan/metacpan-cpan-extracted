@@ -1,5 +1,10 @@
 Revision history for Grep-Query
 
+1.005	20170605
+		Comments can be used in query using a begin/end style of '/* some comment */'.
+		The operators true/false (case indifferent) can be used for both non-fielded
+		and fielded queries.
+
 1.004	20170111
 		Added a trivial getter to retrieve the original query text.
 

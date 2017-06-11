@@ -1,9 +1,10 @@
 package CracTools::Interval::Query::File;
+
 {
   $CracTools::Interval::Query::File::DIST = 'CracTools';
 }
 # ABSTRACT: Acts like CracTools::Interval::Query but read interval from files and return lines of the file matching the query.
-$CracTools::Interval::Query::File::VERSION = '1.25';
+$CracTools::Interval::Query::File::VERSION = '1.251';
 use strict;
 use warnings;
 
@@ -207,7 +208,7 @@ CracTools::Interval::Query::File - Acts like CracTools::Interval::Query but read
 
 =head1 VERSION
 
-version 1.25
+version 1.251
 
 =head1 TODO
 

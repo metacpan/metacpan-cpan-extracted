@@ -28,5 +28,5 @@ resources:
   bugtracker: https://github.com/dod38fr/config-model-tester/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: git://github.com/dod38fr/config-model-tester.git
-version: '2.060'
+version: '3.001'
 x_serialization_backend: 'YAML::Tiny version 1.70'

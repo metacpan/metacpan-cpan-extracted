@@ -77,7 +77,7 @@ Google::Ads::AdWords::v201702::AdGroupCriterionOperation
 Perl data type class for the XML Schema defined complexType
 AdGroupCriterionOperation from the namespace https://adwords.google.com/api/adwords/cm/v201702.
 
-Operation (add, remove and set) on adgroup criteria. 
+Operation (add, remove and set) on adgroup criteria. <p>If you try to ADD a criterion that already exists, it will be treated as a SET operation on the existing criterion. 
 
 
 

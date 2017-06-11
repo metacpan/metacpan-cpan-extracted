@@ -44,4 +44,4 @@ requires:
   XML::LibXML: '1.70'
   perl: '5.01'
 resources: {}
-version: v0.12.004
+version: v0.12.005

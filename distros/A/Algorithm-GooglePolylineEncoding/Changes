@@ -1,5 +1,8 @@
 Revision history for Perl extension Algorithm::GooglePolylineEncoding.
 
+0.05	2017-06-10
+	- fix link in documentation
+
 0.04	2016-07-21
 	- no code changes, just distribution care
 	  (GH Pull #1, .travis.yml, appveyor.yml)

@@ -1,6 +1,6 @@
 package WWW::Google::UserAgent::Exception;
 
-$WWW::Google::UserAgent::Exception::VERSION   = '0.20';
+$WWW::Google::UserAgent::Exception::VERSION   = '0.21';
 $WWW::Google::UserAgent::Exception::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WWW::Google::UserAgent::Exception - Interface to exception class for Google API.
 
 =head1 VERSION
 
-Version 0.20
+Version 0.21
 
 =cut
 
@@ -44,7 +44,7 @@ Mohammad S Anwar, C<< <mohammad.anwar at yahoo.com> >>
 
 =head1 REPOSITORY
 
-L<https://github.com/Manwar/WWW-Google-UserAgent>
+L<https://github.com/manwar/WWW-Google-UserAgent>
 
 =head1 BUGS
 

@@ -1,7 +1,7 @@
 package DDG::Longtail;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Longtail package for easy keywords
-$DDG::Longtail::VERSION = '1016';
+$DDG::Longtail::VERSION = '1017';
 use strict;
 use warnings;
 use DDG::Meta;
@@ -27,7 +27,7 @@ DDG::Longtail - Longtail package for easy keywords
 
 =head1 VERSION
 
-version 1016
+version 1017
 
 =head1 SYNOPSIS
 

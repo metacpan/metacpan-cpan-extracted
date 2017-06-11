@@ -1,5 +1,8 @@
 Revision history for Plack-Middleware-Memento
 
+0.0102  2017-05-30 14:32:28 CEST
+        - Only examine GET and HEAD requests
+
 0.0101  2017-05-19 12:18:38 CEST
         - Fix pod
 

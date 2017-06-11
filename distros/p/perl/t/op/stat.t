@@ -2,8 +2,8 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = '../lib';
     require './test.pl';	# for which_perl() etc
+    set_up_inc('../lib');
 }
 
 use Config;
@@ -43,10 +43,11 @@ $Is_Solaris = $^O eq 'solaris';
 $Is_VMS     = $^O eq 'VMS';
 $Is_MPRAS   = $^O =~ /svr4/ && -f '/etc/.relid';
 $Is_Android = $^O =~ /android/;
+$Is_Dfly    = $^O eq 'dragonfly';
 
 $Is_Dosish  = $Is_Dos || $Is_OS2 || $Is_MSWin32 || $Is_NetWare;
 
-$Is_UFS     = $Is_Darwin && (() = `df -t ufs . 2>/dev/null`) == 2;
+$ufs_no_ctime = ($Is_Dfly || $Is_Darwin) && (() = `df -t ufs . 2>/dev/null`) == 2;
 
 if ($Is_Cygwin && !is_miniperl) {
   require Win32;
@@ -141,8 +142,7 @@ SKIP: {
         # no ctime concept $ctime is ALWAYS == $mtime
         # expect netware to be the same ...
         skip "No ctime concept on this OS", 2
-                                     if $Is_MSWin32 || 
-                                        ($Is_Darwin && $Is_UFS);
+                                     if $Is_MSWin32 || $ufs_no_ctime;
 
         if( !ok($mtime, 'hard link mtime') ||
             !isnt($mtime, $ctime, 'hard link ctime != mtime') ) {
@@ -151,8 +151,8 @@ SKIP: {
 # has this problem.  Building on the ClearCase VOBS filesystem may also
 # cause this failure.
 #
-# Darwin's UFS doesn't have a ctime concept, and thus is expected to fail
-# this test.
+# Some UFS implementations don't have a ctime concept, and thus are
+# expected to fail this test.
 DIAG
         }
     }
@@ -443,7 +443,7 @@ ok(-f(),    '     -f() "');
 
 unlink $tmpfile or print "# unlink failed: $!\n";
 
-# bug id 20011101.069
+# bug id 20011101.069 (#7861)
 my @r = \stat($Curdir);
 is(scalar @r, 13,   'stat returns full 13 elements');
 
@@ -489,7 +489,7 @@ like $@, qr/^The stat preceding lstat\(\) wasn't an lstat at /,
 SKIP: {
     skip "No lstat", 2 unless $Config{d_lstat};
 
-    # bug id 20020124.004
+    # bug id 20020124.004 (#8334)
     # If we have d_lstat, we should have symlink()
     my $linkname = 'stat-' . rand =~ y/.//dr;
     my $target = $Perl;
@@ -637,14 +637,16 @@ is join("-", 1,2,3,(stat stat stat),4,5,6), "1-2-3-4-5-6",
   'stat inside stat gets scalar context';
 
 # [perl #126162] stat an array should not work
-my $Errno_loaded = eval { require Errno };
-my $statfile = './op/stat.t';
-my @statarg = ($statfile, $statfile);
-ok !stat(@statarg),
-  'stat on an array of valid paths should warn and should not return any data';
-my $error = 0+$!;
+# skip if -e '2'.
 SKIP:
 {
+    skip "There is a file named '2', which invalidates this test", 2 if -e '2';
+
+    my $Errno_loaded = eval { require Errno };
+    my @statarg = ($statfile, $statfile);
+    ok !stat(@statarg),
+    'stat on an array of valid paths should warn and should not return any data';
+    my $error = 0+$!;
     skip "Errno not available", 1
       unless $Errno_loaded;
     is $error, &Errno::ENOENT,

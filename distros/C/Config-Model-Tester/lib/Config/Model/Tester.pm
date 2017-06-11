@@ -9,7 +9,7 @@
 #
 package Config::Model::Tester;
 # ABSTRACT: Test framework for Config::Model
-$Config::Model::Tester::VERSION = '2.060';
+$Config::Model::Tester::VERSION = '3.001';
 use warnings;
 use strict;
 use locale;
@@ -96,8 +96,8 @@ sub setup_test {
     }
     elsif ( $ex_data->exists ) {
         # either one if true if $conf_file is undef
-        die "test data is missing \$conf_dir" unless defined $conf_dir;
-        die "test data is missing \$conf_file" unless defined $conf_file;
+        die "test data is missing global \$conf_dir" unless defined $conf_dir;
+        die "test data is missing global \$conf_file_name" unless defined $conf_file;
 
         # just copy file
         say "file copy ". $ex_data->stringify . '->'. $conf_file->stringify
@@ -165,8 +165,17 @@ sub run_update {
 
     local $Config::Model::Value::nowarning = $args{no_warnings} || $t->{no_warnings} || 0;
 
-    note("updating config with ". join(' ',%args));
-    my $res = $inst->update( from_dir => $dir, %args ) ;
+    my $res ;
+    if (my $uw = delete $args{update_warnings}) {
+        note("updating config with warning check and args: ". join(' ',%args));
+        warnings_like { $res = $inst->update( from_dir => $dir, %args ); } $uw,
+            "Updated configuration with warning check ";
+    }
+    else {
+        note("updating config with no warning check and args: ". join(' ',%args));
+        $res = $inst->update( from_dir => $dir, %args ) ;
+    }
+
     if (defined $ret) {
         is($res,$ret,"updated configuration, got expected return value");
     }
@@ -315,6 +324,11 @@ sub write_data_back {
 sub check_file_mode {
     my ($wr_dir, $t) = @_;
 
+    if ($^O eq 'MSWin32' and my $fm = $t->{file_mode}) {
+        note("skipping file mode tests on Windows");
+        return;
+    }
+
     if (my $fm = $t->{file_mode}) {
         foreach my $f (keys %$fm) {
             my $expected_mode = $fm->{$f} ;
@@ -385,6 +399,9 @@ sub create_second_instance {
     dircopy( $wr_dir->stringify, $wr_dir2->stringify )
         or die "can't copy from $wr_dir to $wr_dir2: $!";
 
+    my @options;
+    push @options, backend_arg => $t->{backend_arg} if $t->{backend_arg};
+
     my $i2_test = $model->instance(
         root_class_name => $model_to_test,
         root_dir        => $wr_dir2->stringify,
@@ -393,6 +410,7 @@ sub create_second_instance {
         application     => $app_to_test,
         check           => $t->{load_check2} || 'yes',
         config_dir      => $config_dir_override,
+        @options
     );
 
     ok( $i2_test, "Created instance $app_to_test-test-$t_name-w" );
@@ -466,6 +484,9 @@ sub run_model_test {
         die "Duplicated test name $t_name for app $app_to_test\n"
             if $model->has_instance ($inst_name);
 
+        my @options;
+        push @options, backend_arg => $t->{backend_arg} if $t->{backend_arg};
+
         my $inst = $model->instance(
             root_class_name => $model_to_test,
             root_dir        => $wr_dir->stringify,
@@ -474,6 +495,7 @@ sub run_model_test {
             config_file     => $t->{config_file} ,
             check           => $t->{load_check} || 'yes',
             config_dir      => $config_dir_override,
+            @options
         );
 
         my $root = $inst->config_root;
@@ -604,7 +626,7 @@ Config::Model::Tester - Test framework for Config::Model
 
 =head1 VERSION
 
-version 2.060
+version 3.001
 
 =head1 SYNOPSIS
 
@@ -628,6 +650,20 @@ This class was designed to tests several models and several tests
 cases per model.
 
 A specific layout for test files must be followed.
+
+=head2 Test specification
+
+Each set of test is defined in a file like:
+
+ t/model_tests.d/<app-name>-test-conf.pl
+
+This file specifies that C<app-name> (which is defined in
+C<lib/Config/Model/*.d> directory) will be used for the test cases
+defined in the C<*-test-conf.pl> file.
+
+This file contains a list of test case (explained below) and expects a
+set of files used as test data. The layout of these test data files is
+explained in next section.
 
 =head2 Simple test file layout
 
@@ -653,14 +689,14 @@ C<lib/Config/Model/system.d/lcdproc>
 Test specification is written in C<lcdproc-test-conf.pl> file (i.e. this
 modules looks for files named  like C<< <app-name>-test-conf.pl> >>).
 
-Subtests are specified in files in directory C<lcdproc-examples> (
-i.e. this modules looks for subtests in directory
-C<< <model-name>-examples.pl> >>. C<lcdproc-test-conf.pl> contains
+Subtests data is proviced in files in directory C<lcdproc-examples> (
+i.e. this modules looks for test data in directory
+C<< <model-name>-examples> >>. C<lcdproc-test-conf.pl> contains
 instructions so that each file will be used as a C</etc/LCDd.conf>
 file during each test case.
 
 C<lcdproc-test-conf.pl> can contain specifications for more test
-cases. Each test case will require a new file in C<lcdproc-examples>
+cases. Each test case requires a new file in C<lcdproc-examples>
 directory.
 
 See L</Examples> for a link to the actual LCDproc model tests
@@ -800,6 +836,7 @@ In some models like C<Multistrap>, the config file is chosen by the
 user. In this case, the file name must be specified for each tests
 case:
 
+ # not needed if test file is named multistrap-test-conf.pl
  $model_to_test = "Multistrap";
 
  @tests = (
@@ -811,6 +848,12 @@ case:
  );
 
 See the actual L<multistrap test|https://github.com/dod38fr/config-model/blob/master/t/model_tests.d/multistrap-test-conf.pl>.
+
+=head2 Backend argument
+
+Some application like systemd requires a backend argument specified by
+User (e.g. a service name for systemd). The parameter C<backend_arg>
+can be specified to emulate this behavior.
 
 =head2 Re-use test data
 
@@ -866,11 +909,40 @@ Use an empty array_ref to mask load warnings.
 
 Optionally run L<update|App::Cme::Command::update> command:
 
-    update => { in => 'some-test-data.txt', returns => 'foo' , no_warnings => [ 0 | 1 ] }
+    update => {
+         [ returns => 'foo' , ]
+         no_warnings => [ 0 | 1 ], # default 0
+         quiet => [ 0 | 1], # default 0, passed to update method
+         update_warnings => [ qr/.../, ]
+ }
 
-C<returns> is the expected return value (optional). All other
-arguments are passed to C<update> method. Note that C<< quiet => 1 >>
-may be useful for less verbose test.
+Where:
+
+=over
+
+=item *
+
+C<returns> is the expected return value (optional).
+
+=item *
+
+C<no_warnings> to suppress the warnings coming from
+L<Config::Model::Value>. Note that C<< no_warnings => 1 >> may be
+useful for less verbose test.
+
+=item *
+
+C<quiet> to suppress progress messages during update.
+
+=item *
+
+C<update_warnings> is an array ref of quoted regexp (See qr operator)
+to check the warnings produced during update. use C<< update => [] >>
+to check that no warnings are issued during update.
+
+=back
+
+All other arguments are passed to C<update> method.
 
 =item *
 
@@ -1028,6 +1100,8 @@ Check the mode of the written files:
 
 Only the last four octets of the mode are tested. I.e. the test is done with
 C< $file_mode & 07777 >
+
+Note: this test is skipped on Windows
 
 =item *
 

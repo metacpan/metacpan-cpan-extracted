@@ -27,4 +27,5 @@ xt/pod_coverage.t
 xt/portability_filenames.t
 xt/valgrind.t
 xt/vars.t
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

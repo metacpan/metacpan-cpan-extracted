@@ -4,13 +4,18 @@ use strict;
 use warnings;
 
 our $IS_WINDOWS = $^O eq 'MSWin32'; 
+our $IS_PACKED = $ENV{PAR_0} ? 1 : 0;
+our $SHELL_ARG_DELIM = $IS_WINDOWS ? '"' : "'";
 
 use Exporter qw(import);
 our @EXPORT_OK =
 	qw
 		(
 			$IS_WINDOWS
+			$IS_PACKED
+			$SHELL_ARG_DELIM
 			slashify
+			trim
 			readData
 			writeData
 			createSpinner
@@ -20,6 +25,7 @@ our @EXPORT_OK =
 		);
 
 use JSON;
+use File::Basename;
 
 my $FILE_SEP = $IS_WINDOWS ? '\\' : '/';
 my $DATAFILE = '.pods2site';
@@ -38,6 +44,17 @@ sub slashify
 	$s =~ s#[/\\]+#$fsep#g;
 
 	return $dblStart ? "$fsep$fsep$s" : $s;
+}
+
+# trim off any ws at front/end of a string
+#
+sub trim
+{
+    my $s = shift;
+
+    $s =~ s/^\s+|\s+$//g if defined($s);
+
+    return $s;
 }
 
 sub writeData
@@ -88,7 +105,8 @@ sub createSpinner
 		my $pos = 0;
 		$spinner = sub
 			{
-				print ".$SPINNERPOSITIONS[$pos++].\r";
+				my $v = shift || '';
+				print " $SPINNERPOSITIONS[$pos++] $v\r";
 				$pos = 0 if $pos > $#SPINNERPOSITIONS;
 			};
 	}

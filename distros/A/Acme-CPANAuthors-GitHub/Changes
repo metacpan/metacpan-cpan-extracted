@@ -1,5 +1,9 @@
 Revision history for Acme-CPANAuthors-GitHub
 
+0.09  Wed Jun  7 06:31:42 UTC 2017
+    - Updated authors.
+    - Updated generator script to use MetaCPAN::Client.
+
 0.08  Fri Jun  5 00:20:10 UTC 2015
     - Updated authors.
     - Updated generator script to use the new Elasticsearch module and api.

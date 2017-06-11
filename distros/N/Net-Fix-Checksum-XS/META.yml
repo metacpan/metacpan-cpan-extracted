@@ -22,4 +22,4 @@ requires:
   XSLoader: '0'
 resources:
   repository: https://github.com/dermoth/Net-Fix-Checksum-XS.git
-version: '0.02'
+version: '0.03'

@@ -73,7 +73,7 @@ Google::Ads::AdWords::v201609::AdwordsUserListService::mutateMembers
 Perl data type class for the XML Schema defined element
 mutateMembers from the namespace https://adwords.google.com/api/adwords/rm/v201609.
 
-Mutate members of user lists by either adding or removing their lists of members. The following {@link Operator}s are supported: ADD and REMOVE. <p>Note that operations cannot have same user list id but different operators. @param operations the mutate members operations to apply @return a list of UserList objects @throws ApiException when there are one or more errors with the request 
+Mutate members of user lists by either adding or removing their lists of members. The following {@link Operator}s are supported: ADD and REMOVE. The SET operator is not supported. <p>Note that operations cannot have same user list id but different operators. @param operations the mutate members operations to apply @return a list of UserList objects @throws ApiException when there are one or more errors with the request 
 
 
 

@@ -74,7 +74,7 @@ for my $Class ( qw[
 
     subtest $Class => sub {
 
-	my @args = ( PDL => pdl( 0, 1 ) );
+        my @args = ( PDL => pdl( 0, 1 ) );
 
         my $mpdl = $Class->new( $Class->requires_hash ? { @args } : @args  );
 
@@ -110,6 +110,13 @@ for my $Class ( qw[
             isa_ok( $mpdl, 'PDL' );
 
             cmp_deeply( $mpdl->unpdl, [ 0, 2 ], 'mpdl * 2' );
+        }
+
+        {
+            my $pdl = $mpdl->sequence(10);
+            isa_ok( $pdl, 'PDL' );
+            ok ( ! $pdl->isa( $Class ),"new pdl is not a $Class" );
+            cmp_deeply( $pdl->unpdl, [0..9], "result of sequence call" );
         }
 
     };

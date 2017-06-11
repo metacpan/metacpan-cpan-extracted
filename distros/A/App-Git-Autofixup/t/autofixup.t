@@ -2,22 +2,36 @@
 use strict;
 use warnings FATAL => 'all';
 
-use Test::More;
-use File::Temp;
 use Carp qw(croak);
+use Cwd;
+use English qw(-no_match_vars);
+use File::Temp qw(tempdir);
 
-use File::pushd;
+use Test::More;
+if ($OSNAME eq 'MSWin32') {
+    plan skip_all => 'Run from Cygwin or Git Bash on Windows'
+} elsif (!has_git()) {
+    plan skip_all => 'git required'
+} else {
+    plan tests => 31;
+}
 
-require 'git-autofixup';
+require './git-autofixup';
 
-use Data::Dumper;
-$Data::Dumper::Terse = 1;
+$ENV{GIT_AUTHOR_NAME} = 'Au Thor';
+$ENV{GIT_AUTHOR_EMAIL} = 'au@th.or';
+
+
+sub has_git {
+    qx{git --version};
+    return $? != -1;
+}
 
 sub test_autofixup_strict {
     my $params = shift;
-    my $strict_levels = $params->{strict} || croak "strictness levels not given";
+    my $strict_levels = $params->{strict} or croak "strictness levels not given";
     delete $params->{strict};
-    my $autofixup_opts = $params->{autofixup_opts} // [];
+    my $autofixup_opts = $params->{autofixup_opts} || [];
     if (grep /^(--strict|-s)/, @{$autofixup_opts}) {
         croak "strict option already given";
     }
@@ -45,24 +59,31 @@ sub test_autofixup_strict {
 # log_want: expected log output
 # autofixup_opts: command-line options to pass thru to autofixup
 sub test_autofixup {
-    my ($params) = @_;
-    my $name = $params->{name} || croak "no test name given";
-    my $upstream_commits = $params->{upstream_commits} // [];
-    my $topic_commits = $params->{topic_commits} // [];
-    my $unstaged = $params->{unstaged} // croak "no unstaged changes given";
-    my $log_want = $params->{log_want} // croak "wanted log output not given";
-    my $autofixup_opts = $params->{autofixup_opts} // [];
+    my ($args) = shift;
+    my $name = defined($args->{name}) ? $args->{name}
+             : croak "no test name given";
+    my $upstream_commits = $args->{upstream_commits} || [];
+    my $topic_commits = $args->{topic_commits} || [];
+    my $unstaged = defined($args->{unstaged}) ? $args->{unstaged}
+                 : croak "no unstaged changes given";
+    my $log_want = defined($args->{log_want}) ? $args->{log_want}
+                 : croak "wanted log output not given";
+    my $autofixup_opts = $args->{autofixup_opts} || [];
     if (!$upstream_commits && !$topic_commits) {
         croak "no upstream or topic commits given";
     }
-    if (exists $params->{strict}) {
+    if (exists $args->{strict}) {
         croak "strict key given; use test_autofixup_strict instead";
     }
 
     my $log_got;
+    my $orig_dir = getcwd();
+    my $dir = File::Temp::tempdir(CLEANUP => 1);
+    chdir $dir or die "$!";
     eval {
-        my $dir = pushd(File::Temp::tempdir());
+
         init_repo();
+
         my $i = 0;
 
         for my $commit (@{$upstream_commits}) {
@@ -85,8 +106,10 @@ sub test_autofixup {
         autofixup(@{$autofixup_opts}, $upstream_rev);
         $log_got = get_git_log($pre_fixup_rev);
     };
-    if ($@) {
-        diag($@);
+    my $err = $@;
+    chdir $orig_dir or die "$!";
+    if ($err) {
+        diag($err);
         fail($name);
         return;
     }
@@ -154,8 +177,9 @@ sub get_revision_sha {
 }
 
 sub autofixup {
+    local @ARGV = @_;
     print "# git-autofixup\n";
-    main(@_) == 0 or die "git-autofixup: nonzero exit";
+    main() == 0 or die "git-autofixup: nonzero exit";
 }
 
 
@@ -386,4 +410,21 @@ test_autofixup({
     log_want => q{},
 });
 
-done_testing();
+test_autofixup({
+    name => "ADJACENCY assignment is used as a fallback for multiple context targets",
+    topic_commits => [
+        {a => "a1\n"},
+        {a => "a1\na2\n"},
+    ],
+    unstaged => {a => "a1\na2a\n"},
+    log_want => q{fixup! commit1
+
+diff --git a/a b/a
+index 0016606..a0ef52c 100644
+--- a/a
++++ b/a
+@@ -1,2 +1,2 @@
+ a1
+-a2
++a2a
+}});

@@ -1,5 +1,5 @@
 ---
-abstract: 'runs immortal processes'
+abstract: 'runs command again when its dead'
 author:
   - 'Orkun Karaduman <orkunkaraduman@gmail.com>'
 build_requires:
@@ -18,7 +18,7 @@ no_index:
     - t
     - inc
 requires:
-  Lazy::Utils: '1.20'
+  Lazy::Utils: '1.21'
   Scalar::Util: '1.47'
   perl: '5.010001'
 resources:
@@ -26,4 +26,4 @@ resources:
   homepage: https://github.com/orkunkaraduman/App-nodie/tree/master
   license: https://www.gnu.org/licenses/gpl-3.0.html
   repository: git://git@github.com:orkunkaraduman/App-nodie.git
-version: '1.00'
+version: '1.03'

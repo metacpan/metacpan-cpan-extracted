@@ -3,15 +3,9 @@
 # Kmer.pm: a kmer counting module
 # Author: Lee Katz <lkatz@cdc.gov>
 
-=pod SCRIPT CATEGORIES
-
-CPAN
-
-=cut
-
-
-package Bio::Kmer 0.07;
-require 5.12.0;
+package Bio::Kmer;
+require 5.10.0;
+our $VERSION=0.14;
 
 use strict;
 use warnings;
@@ -73,7 +67,7 @@ A module for helping with kmer analysis. The basic methods help count kmers and 
 
 =over
 
-=item new
+=item Bio::Kmer->new($filename, \%options)
 
 Create a new instance of the kmer counter.  One object per file. 
 
@@ -170,7 +164,7 @@ sub count{
 
 =over
 
-=item query
+=item $kmer->query($queryString)
 
 Query the set of kmers with your own query
 
@@ -210,7 +204,7 @@ sub query{
 
 =over
 
-=item histogram
+=item $kmer->histogram()
 
 Count the frequency of kmers.
 
@@ -224,13 +218,43 @@ Count the frequency of kmers.
 
 sub histogram{
   my($self)=@_;
+
+  if($self->{kmercounter} eq "jellyfish"){
+    return $self->histogramJellyfish();
+  } else {
+    return $self->histogramPerl();
+  }
+}
+
+sub histogramJellyfish{
+  my($self)=@_;
+  
+  close $self->{histfileFh};
+
+  # Run jellyfish histo
+  my $jellyfishXopts = join(" ","-t", $self->{numcpus}, "-o", $self->{histfile}, $self->{jellyfishdb});
+  system("jellyfish histo $jellyfishXopts");
+  die "ERROR with jellyfish histo" if $?;
+  
+  # Read the output file
+  my @hist=(0);
+  open(my $fh, $self->{histfile}) or die "ERROR: reading $self->{histfile}: $!";
+  while(<$fh>){
+    s/^\s+|\s+$//g;
+    my($count, $countOfCounts)=split /\s+/;
+    $hist[$count]=$countOfCounts;
+  }
+  close $fh;
+
+  return \@hist;
+}
+
+sub histogramPerl{
+  my($self)=@_;
   my %hist=();
+
   my @hist=(0); # initialize the histogram with a count of zero kmers happening zero times
   #$hist[0]=4**$self->{kmerlength}; # or maybe it should be initialized to the total number of possibilities.
-
-  #if(!values(%{ $self->{_kmers} } )){
-  #  die "ERROR: kmers have not been counted yet. Run Kmer->count before running Kmer->histogram";
-  #}
 
   for my $kmercount(values(%{ $self->kmers() } )){
     $hist{$kmercount}++;
@@ -340,6 +364,117 @@ sub kmers{
   $self->{_kmers}=\%kmer;
 
   return \%kmer;
+}
+
+=pod
+
+=over
+
+=item $kmer->union($kmer2)
+
+Finds the union between two sets of kmers
+
+  Arguments: Another Bio::Kmer object
+  Returns:   List of kmers
+
+=back
+
+=cut
+
+sub union{
+  my($self,$other)=@_;
+  
+  if(!$self->_checkCompatibility($other,{verbose=>1})){
+    die;
+  }
+
+  # See what kmers are in common using hashes
+  my %union;
+  my $kmer1 = $self->kmers;
+  my $kmer2 = $other->kmers;
+  for my $kmer(keys(%{ $self->kmers }), keys(%{ $other->kmers })){
+    $union{$kmer}=1;
+  }
+
+  return [keys(%union)];
+}
+
+=pod
+
+=over
+
+=item $kmer->intersection($kmer2)
+
+Finds the intersection between two sets of kmers
+
+  Arguments: Another Bio::Kmer object
+  Returns:   List of kmers
+
+=back
+
+=cut
+
+sub intersection{
+  my($self,$other)=@_;
+
+  if(!$self->_checkCompatibility($other,{verbose=>1})){
+    die;
+  }
+
+  my @intersection;
+  my $kmer2 = $other->kmers;
+  for my $kmer(keys(%{ $self->kmers })){
+    if($$kmer2{$kmer}){
+      push(@intersection, $kmer);
+    }
+  }
+
+  return \@intersection;
+}
+
+=pod
+
+=over
+
+=item $kmer->subtract($kmer2)
+
+Finds the set of kmers unique to this Bio::Kmer object.
+
+  Arguments: Another Bio::Kmer object
+  Returns:   List of kmers
+
+=back
+
+=cut
+
+sub subtract{
+  my($self,$other)=@_;
+
+  if(!$self->_checkCompatibility($other,{verbose=>1})){
+    die;
+  }
+
+  my %subtractKmers = %{ $self->kmers };
+  for my $kmer(keys(%{ $other->kmers })){
+    delete($subtractKmers{$kmer});
+  }
+  
+  return [keys(%subtractKmers)];
+}
+      
+  
+
+# See if another Bio::Kmer is the same kind as this one.
+# Return Boolean
+sub _checkCompatibility{
+  my($self,$other,$settings)=@_;
+
+  if($self->{kmerlength} != $other->{kmerlength}){
+    warn "WARNING: kmer lengths do not match\n" if($$settings{verbose});
+    return 0;
+  }
+
+  return 1;
 }
 
 sub _countKmersPurePerlWorker{
@@ -472,6 +607,10 @@ MIT license.  Go nuts.
 Author: Lee Katz <lkatz@cdc.gov>
 
 For additional help, go to https://github.com/lskatz/Bio--Kmer
+
+CPAN module at http://search.cpan.org/~lskatz/Bio-Kmer/
+
+=for html <a href="https://travis-ci.org/lskatz/Bio--Kmer"><img src="https://travis-ci.org/lskatz/Bio--Kmer.svg?branch=master"></a>
 
 =cut
 

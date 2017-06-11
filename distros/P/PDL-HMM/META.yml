@@ -22,4 +22,4 @@ no_index:
 requires:
   PDL: '0'
   Test::More: '0'
-version: '0.06004'
+version: '0.06005'

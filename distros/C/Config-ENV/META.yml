@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.141520'
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,15 +29,17 @@ no_index:
 provides:
   Config::ENV:
     file: lib/Config/ENV.pm
-    version: '0.14'
+    version: '0.15'
 requires:
   Exporter::Lite: '0'
 resources:
   bugtracker: https://github.com/cho45/Config-ENV/issues
   homepage: https://github.com/cho45/Config-ENV
   repository: git://github.com/cho45/Config-ENV.git
-version: '0.14'
+version: '0.15'
 x_contributors:
   - 'Masayuki Matsuki <y.songmu@gmail.com>'
   - 'ysasaki <aloelight@gmail.com>'
   - 'issm <issmxx@gmail.com>'
+  - 'karupanerura <karupa@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -5,7 +5,7 @@ use warnings;
 use Carp;
 use 5.008; # at least Perl 5.8 please
 
-our $VERSION = '2.16';
+our $VERSION = '2.17';
 
 our %EXPORT_TAGS = (all => [qw( 
         ll_to_grid 
@@ -450,7 +450,10 @@ Great Britain.
 
 =head1 VERSION
 
-2.16
+2.17
+
+=for HTML <a href="https://travis-ci.org/thruston/perl-geo-coordinates-osgb">
+<img src="https://travis-ci.org/thruston/perl-geo-coordinates-osgb.svg?branch=master"></a>
 
 =head1 SYNOPSIS
 
@@ -523,31 +526,32 @@ If you have trouble remembering the order of the arguments, or the
 returned values, note that latitude comes before longitude in the
 alphabet too, as easting comes before northing.  
 
-However since reasonable latitudes for the OSGB are in the range 49 to
+However, since reasonable latitudes for the OSGB are in the range 49 to
 61, and reasonable longitudes in the range -9 to +2, C<ll_to_grid>
-accepts argument in either order.  If your longitude is larger than your
+accepts the arguments in either order; if your longitude is larger than your
 latitude, then the values of the arguments will be silently swapped.  
 
 You can also supply the arguments as named keywords (but be sure to use
 the curly braces so that you pass them as a reference):
 
-    my ($e,$n) = ll_to_grid( { lat => 51.5, lon => 2.1 } );
+    my ($e,$n) = ll_to_grid( { lat => 51.5, lon => -2.1 } );
 
-The easting and northing will be returned as the distance in metres from
-the `false point of origin' of the British Grid (which is a point some
-way to the south-west of the Scilly Isles).  
+The easting and northing will be returned as the orthogonal distances in metres
+from the `false point of origin' of the British Grid (which is a point some way
+to the south-west of the Scilly Isles).  The returned pair refers to a point on 
+the usual OSGB grid, which extends from the Scilly Isles in the south west to 
+the Shetlands in the north.  
 
     my ($e,$n) = ll_to_grid(51.5, -2.1); # (393154.801, 177900.605)
     my $s      = ll_to_grid(51.5, -2.1); # "393154.801 177900.605"
 
 If the coordinates you supply are in the area covered by the OSTN02
-transformation data, then the results will be rounded to 3 decimal
-places, which corresponds to the nearest millimetre.  If they are
-outside the coverage (which normally means more than a few km off shore)
-then the conversion is automagically done using a Helmert transformation
-instead of the OSTN02 data.  The results will be rounded to the nearest
-metre in this case, although you probably should not rely on the results
-being more accurate than about 5m.
+transformation data, then the results will be rounded to 3 decimal places,
+which corresponds to the nearest millimetre.  If they are outside the coverage
+(which normally means more than a few km off shore) then the conversion is
+automagically done using a Helmert transformation instead of the OSTN02 data.
+The results will be rounded to the nearest metre in this case, although you
+probably should not rely on the results being more accurate than about 5m.
 
    # A point in the sea, to the north-west of Coll
    my $s = ll_to_grid(56.75,-7); # returns "94471 773206" 
@@ -560,15 +564,16 @@ If you want the result presented in a more traditional grid reference
 format you should pass the results to one of the grid formatting
 routines from L<Grid.pm|Geo::Coordinates::OSGB::Grid>.  Like this.
 
-    $gridref = format_grid(ll_to_grid(51.5,-0.0833)); 
-    $gridref = format_grid_GPS(ll_to_grid(51.5,-0.0833)); 
-    $gridref = format_grid_map(ll_to_grid(51.5,-0.0833));
+    my $s = ll_to_grid(51.5, -2.1);              # "393154.801 177900.605"
+    $s = format_grid(ll_to_grid(51.5,-2.1));     # "ST 931 779"
+    $s = format_grid_GPS(ll_to_grid(51.5,-2.1)); # "ST 93154 77900"
+    $s = format_grid_map(ll_to_grid(51.5,-2.1)); # "ST 931 779 on A:173, B:156, C:157"
 
 C<ll_to_grid()> also takes an optional argument that sets the ellipsoid
 model to use.  This defaults to `WGS84', the name of the normal model
 for working with normal GPS coordinates, but if you want to work with
-the traditional latitude and longitude values printed on OS maps then
-you should add an optional shape parameter like this:
+the traditional latitude and longitude values printed around the edges of
+OS maps before 2015 then you should add an optional shape parameter like this:
 
     my ($e, $n) = ll_to_grid(49,-2, {shape => 'OSGB36'});
 
@@ -577,7 +582,7 @@ Incidentally, if you make this call above you will get back
 of the British grid.  You should get back an easting of 400000 for any
 point with longitude 2W since this is the central meridian used for the
 OSGB projection.  However you will get a slightly different value unless
-you specify C<< {shape => 'OSGB36'} >> since the WGS84 meridians are not
+you specify C<< {shape => 'OSGB36'} >> because the WGS84 meridians are not
 quite the same as OSGB36.
 
 =head3 C<grid_to_ll(e,n)>
@@ -638,7 +643,7 @@ longitude is `WGS84' as used in the international GPS system.  This
 default it set every time that  you load the module.  If you want to
 process or produce a large number latitude and longitude coordinates in
 the British Ordnance Survey system (as printed round the edges of OS
-Landranger maps).  you can use C<< set_default_shape('OSGB36'); >> to
+Landranger and Explorer maps before 2015) you can use C<< set_default_shape('OSGB36'); >> to
 set the default shape to OSGB36.  This saves you having to add C<< {
 shape => 'OSGB36' } >> to every call of C<ll_to_grid> or C<grid_to_ll>.
 
@@ -698,6 +703,12 @@ and the output will be either true or false.  If you get a true value you can
 expect an accurate result from C<grid_to_ll>, if false then it's likely that
 C<grid_to_ll> will fall back on using the approximate Helmert transformation. 
 This function is used by C<random_grid> from L<Geo::Coordinates::OSGB::Grid.pm>.
+
+=head3 Importing all the functions
+
+You can import all the functions defined in C<OSGB.pm> with an C<:all> tag.
+
+    use Geo::Coordinates::OSGB ':all';
 
 =head1 EXAMPLES
 

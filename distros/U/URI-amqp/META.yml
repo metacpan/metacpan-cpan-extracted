@@ -26,16 +26,17 @@ no_index:
 provides:
   URI::amqp:
     file: lib/URI/amqp.pm
-    version: v0.1.1
+    version: v0.1.3
   URI::amqps:
     file: lib/URI/amqps.pm
 requires:
+  URI: '0'
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/avast/URI-amqp/issues
   homepage: https://github.com/avast/URI-amqp
   repository: git://github.com/avast/URI-amqp.git
-version: 0.1.1
+version: 0.1.3
 x_authority: cpan:JASEI
 x_contributors:
   - 'Jan Seidl <janseidl@volny.cz>'

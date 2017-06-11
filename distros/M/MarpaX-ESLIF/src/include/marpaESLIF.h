@@ -135,17 +135,78 @@ typedef struct marpaESLIFRecognizerProgress {
   int positioni;
 } marpaESLIFRecognizerProgress_t;
 
+typedef enum marpaESLIFActionType {
+  MARPAESLIF_ACTION_TYPE_NAME = 0,
+  MARPAESLIF_ACTION_TYPE_STRING
+} marpaESLIFActionType_t;
+
+typedef struct marpaESLIFAction {
+  marpaESLIFActionType_t type;
+  union {
+    char               *names;
+    marpaESLIFString_t *stringp;
+  } u;
+} marpaESLIFAction_t;
+
 typedef struct marpaESLIFGrammarDefaults {
-  char *defaultRuleActions;   /* Default action for rules */
-  char *defaultSymbolActions; /* Default action for symbols */
-  char *defaultFreeActions;   /* Default action for free */
+  marpaESLIFAction_t *defaultRuleActionp;   /* Default action for rules */
+  marpaESLIFAction_t *defaultSymbolActionp; /* Default action for symbols */
+  marpaESLIFAction_t *defaultFreeActionp;   /* Default action for free - if not NULL, type can never be MARPAESLIF_ACION_TYPE_STRING */
 } marpaESLIFGrammarDefaults_t;
+
+/* Rule property */
+
+typedef enum marpaESLIFRulePropertyBit {
+  MARPAESLIF_RULE_IS_ACCESSIBLE = 0x01,
+  MARPAESLIF_RULE_IS_NULLABLE   = 0x02,
+  MARPAESLIF_RULE_IS_NULLING    = 0x04,
+  MARPAESLIF_RULE_IS_LOOP       = 0x08,
+  MARPAESLIF_RULE_IS_PRODUCTIVE = 0x10
+} marpaESLIFRulePropertyBit_t;
+
+typedef struct marpaESLIFGrammarProperty {
+  int                    leveli;                       /* Grammar level */
+  marpaESLIFString_t    *descp;                        /* Grammar description (auto-generated if none) */
+  short                  latmb;                        /* LATM ? */
+  marpaESLIFAction_t    *defaultSymbolActionp;         /* Default action for symbols - never NULL */
+  marpaESLIFAction_t    *defaultRuleActionp;           /* Default action for rules - never NULL */
+  marpaESLIFAction_t    *defaultFreeActionp;           /* Default action for free - can be NULL */
+  int                    starti;                       /* Start symbol Id - always >= 0 */
+  int                    discardi;                     /* Discard symbol Id (-1 if none) */
+  size_t                 nsymboll;                     /* Number of symbols - always > 0*/
+  int                   *symbolip;                     /* Array of symbols Ids - never NULL */
+  size_t                 nrulel;                       /* Number of rules - always > 0*/
+  int                   *ruleip;                       /* Array of rule Ids - never NULL */
+} marpaESLIFGrammarProperty_t;
+
+typedef struct marpaESLIFRuleProperty {
+  int                    idi;                          /* Rule Id */
+  marpaESLIFString_t    *descp;                        /* Rule alternative name (auto-generated if none) */
+  char                  *asciishows;                   /* Rule show (ASCII) */
+  int                    lhsi;                         /* LHS symbol Id */
+  int                    separatori;                   /* Eventual separator symbol Id (-1 if none) */
+  size_t                 nrhsl;                        /* Number of RHS, 0 in case of a nullable */
+  int                   *rhsip;                        /* Array of RHS Ids, NULL in case of a nullable */
+  int                    exceptioni;                   /* Exception symbol Id (-1 if none) */
+  marpaESLIFAction_t    *actionp;                      /* Action */
+  char                  *discardEvents;                /* Discard event name - shallowed with its RHS */
+  short                  discardEventb;                /* Discard event initial state: 0: off, 1: on */
+  int                    ranki;                        /* Rank */
+  short                  nullRanksHighb;               /* Null ranks high ? */
+  short                  sequenceb;                    /* Sequence ? */
+  short                  properb;                      /* Proper ? */
+  int                    minimumi;                     /* minimum in case of sequence ? */
+  short                  internalb;                    /* This rule is internal */
+  int                    propertyBitSet;               /* C.f. marpaESLIFRulePropertyBit_t */
+  short                  hideseparatorb;               /* Separator hiden from arguments ? */
+} marpaESLIFRuleProperty_t;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
   marpaESLIF_EXPORT const char             *marpaESLIF_versions();
   marpaESLIF_EXPORT marpaESLIF_t           *marpaESLIF_newp(marpaESLIFOption_t *marpaESLIFOptionp);
+  marpaESLIF_EXPORT short                   marpaESLIF_extend_builtin_actionb(marpaESLIF_t *marpaESLIFp, char **actionsArrayp, size_t actionsArrayl);
   marpaESLIF_EXPORT marpaESLIFGrammar_t    *marpaESLIF_grammarp(marpaESLIF_t *marpaESLIFp);
 
   marpaESLIF_EXPORT marpaESLIFGrammar_t    *marpaESLIFGrammar_newp(marpaESLIF_t *marpaESLIFp, marpaESLIFGrammarOption_t *marpaESLIFGrammarOptionp);
@@ -157,8 +218,12 @@ extern "C" {
   marpaESLIF_EXPORT short                   marpaESLIFGrammar_defaults_by_level_setb(marpaESLIFGrammar_t *marpaESLIFGrammarp, marpaESLIFGrammarDefaults_t *marpaESLIFGrammarDefaultsp, int leveli, marpaESLIFString_t *descp);
   marpaESLIF_EXPORT short                   marpaESLIFGrammar_grammar_currentb(marpaESLIFGrammar_t *marpaESLIFGrammarp, int *levelip, marpaESLIFString_t **descpp);
   marpaESLIF_EXPORT short                   marpaESLIFGrammar_grammar_by_levelb(marpaESLIFGrammar_t *marpaESLIFGrammarp, int leveli, marpaESLIFString_t *descp, int *levelip, marpaESLIFString_t **descpp);
+  marpaESLIF_EXPORT short                   marpaESLIFGrammar_grammarproperty_currentb(marpaESLIFGrammar_t *marpaESLIFGrammarp, marpaESLIFGrammarProperty_t *grammarPropertyp);
+  marpaESLIF_EXPORT short                   marpaESLIFGrammar_grammarproperty_by_levelb(marpaESLIFGrammar_t *marpaESLIFGrammarp, marpaESLIFGrammarProperty_t *grammarPropertyp, int leveli, marpaESLIFString_t *descp);
   marpaESLIF_EXPORT short                   marpaESLIFGrammar_rulearray_currentb(marpaESLIFGrammar_t *marpaESLIFGrammarp, int **ruleipp, size_t *rulelp);
   marpaESLIF_EXPORT short                   marpaESLIFGrammar_rulearray_by_levelb(marpaESLIFGrammar_t *marpaESLIFGrammarp, int **ruleipp, size_t *rulelp, int leveli, marpaESLIFString_t *descp);
+  marpaESLIF_EXPORT short                   marpaESLIFGrammar_ruleproperty_currentb(marpaESLIFGrammar_t *marpaESLIFGrammarp, int rulei, marpaESLIFRuleProperty_t *rulePropertyp);
+  marpaESLIF_EXPORT short                   marpaESLIFGrammar_ruleproperty_by_levelb(marpaESLIFGrammar_t *marpaESLIFGrammarp, int rulei, marpaESLIFRuleProperty_t *rulePropertyp, int leveli, marpaESLIFString_t *descp);
   marpaESLIF_EXPORT short                   marpaESLIFGrammar_ruledisplayform_currentb(marpaESLIFGrammar_t *marpaESLIFGrammarp, int rulei, char **ruledisplaysp);
   marpaESLIF_EXPORT short                   marpaESLIFGrammar_ruledisplayform_by_levelb(marpaESLIFGrammar_t *marpaESLIFGrammarp, int rulei, char **ruledisplaysp, int leveli, marpaESLIFString_t *descp);
   marpaESLIF_EXPORT short                   marpaESLIFGrammar_symboldisplayform_currentb(marpaESLIFGrammar_t *marpaESLIFGrammarp, int symboli, char **symboldisplaysp);
@@ -200,7 +265,7 @@ extern "C" {
   marpaESLIF_EXPORT short                   marpaESLIFValue_valueb(marpaESLIFValue_t *marpaESLIFValuep, marpaESLIFValueResult_t *marpaESLIFValueResultp);
   marpaESLIF_EXPORT short                   marpaESLIFValue_value_startb(marpaESLIFValue_t *marpaESLIFValuep, int *startip);
   marpaESLIF_EXPORT short                   marpaESLIFValue_value_lengthb(marpaESLIFValue_t *marpaESLIFValuep, int *lengthip);
-  marpaESLIF_EXPORT short                   marpaESLIFValue_contextb(marpaESLIFValue_t *marpaESLIFValuep, char **symbolsp, char **rulesp);
+  marpaESLIF_EXPORT short                   marpaESLIFValue_contextb(marpaESLIFValue_t *marpaESLIFValuep, char **symbolsp, int *symbolip, char **rulesp, int *ruleip);
   marpaESLIF_EXPORT void                    marpaESLIFValue_freev(marpaESLIFValue_t *marpaESLIFValuep);
 
   /* Stack management when doing valuation */

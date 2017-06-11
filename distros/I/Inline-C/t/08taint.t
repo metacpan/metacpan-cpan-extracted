@@ -12,7 +12,15 @@ BEGIN {
 }
 
 use warnings; use strict;
-my $t; use lib ($t = -e 't' ? 't' : 'test');
+use FindBin '$Bin';
+my $bin;
+BEGIN {
+    # untaint
+    ($bin) = $Bin =~ m/(.*)/;
+}
+my $t = $bin;
+use lib $bin;
+
 use Test::More tests => 10;
 use Test::Warn;
 use TestInlineSetup;
@@ -30,15 +38,13 @@ warnings_like {require_taint_2()} [qr/$w1/, qr/$w2/, qr/$w1/, qr/$w3/], 'warn_te
 warnings_like {require_taint_3()} [qr/$w1/, qr/$w2/, qr/$w1/, qr/$w3/, qr/$w1/, qr/$w2/, qr/$w1/, qr/$w3/], 'warn_test 3';
 
 sub require_taint_1 {
-    require "./$t/08taint_1.p";
+    require "$t/08taint_1.p";
 }
 
 sub require_taint_2 {
-    my $t = -d 'test' ? 'test' : 't';
-    require "./$t/08taint_2.p";
+    require "$t/08taint_2.p";
 }
 
 sub require_taint_3 {
-    my $t = -d 'test' ? 'test' : 't';
-    require "./$t/08taint_3.p";
+    require "$t/08taint_3.p";
 }

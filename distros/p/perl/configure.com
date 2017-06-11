@@ -66,8 +66,6 @@ $ dynamic_ext = ""
 $ nonxs_ext = ""
 $ nonxs_ext2 = ""
 $ vms_default_directory_name = F$ENVIRONMENT("DEFAULT")
-$ max_allowed_dir_depth = 3  ! e.g. [A.B.PERLxxx] not [A.B.C.PERLxxx]
-$! max_allowed_dir_depth = 2 ! e.g. [A.PERLxxx] not [A.B.PERLxxx]
 $!
 $! Sebastian Bazley's request: close the CONFIG handle with /NOLOG
 $! qualifier "just in case" (configure.com is re @ed in a bad state).
@@ -447,28 +445,27 @@ $     GOTO Beyond_manifest
 $   ENDIF
 $ ELSE
 $! MANIFEST. has been found and we have set def'ed there.
-$! Time to bail out before it's too late, i.e. too deep.
-$! Depth check is unnecessary on Alpha VMS V7.2++ (even for ODS-2).
-$   tmp = f$extract(1,3,f$edit(f$getsyi("VERSION"),"TRIM,COLLAPSE"))
-$   IF (tmp .GES. "7.2") .AND. (F$GETSYI("HW_MODEL") .GE. 1024) THEN GOTO Beyond_depth_check
-$! Depth check also unnecessary on ODS 5 (or later) file systems.
-$   tmp = F$INTEGER(F$GETDVI(F$ENVIRONMENT("DEFAULT"),"ACPTYPE") - "F11V")
-$   IF (tmp .GE. 5) THEN GOTO Beyond_depth_check
-$   IF (F$ELEMENT(max_allowed_dir_depth,".",F$ENVIRONMENT("DEFAULT")).nes.".")
-$   THEN
-$     TYPE SYS$INPUT:
-$     DECK
-%Config-E-VMS, ERROR:
- Sorry! It apears as though your perl build sub-directory is already too
- deep into the VMS file system. Please try moving stuff into a shallower 
- directory (or altering the "max_allowed_dir_depth" parameter).
-$     EOD
-$     echo4 "ABORTING..."
-$     SET DEFAULT 'vms_default_directory_name' !be kind rewind
-$     STOP
-$     EXIT !2 !$STATUS = "%X00000002" (error)
-$   ENDIF
-$Beyond_depth_check:
+$!
+$ escape_extended_chars: subroutine
+$   string = 'p1' ! It's the name of the symbol
+$   chars_to_escape = p2
+$   sindex = 0
+$   slength = f$length(string)
+$   loop_over_chars:
+$     if sindex .eq. slength then goto end_loop_over_chars
+$     char = f$extract(sindex, 1, string)
+$     if f$locate(char, chars_to_escape) .lt. f$length(chars_to_escape)
+$     then
+$       string = f$extract(0, sindex, string) + "^" + f$extract(sindex, slength, string)
+$       slength = slength + 1 ! we've increased overall length by 1
+$       sindex = sindex + 1   ! don't check the char we just escaped again
+$     endif
+$     sindex = sindex + 1
+$     goto loop_over_chars
+$ end_loop_over_chars:
+$ 'p1' == string
+$!
+$ endsubroutine
 $!
 $! after finding MANIFEST let's create (but not yet enter) the UU subdirectory
 $!
@@ -511,6 +508,9 @@ $       line = F$EDIT(line,"TRIM, COMPRESS")
 $       file_2_find = F$EXTRACT(0,F$LOCATE(" ",line),line) 
 $       IF F$LOCATE("/",file_2_find) .NE. F$LENGTH(file_2_find) 
 $       THEN 
+$         escaped_fname == file_2_find
+$         call escape_extended_chars escaped_fname "~!#&\'`()+@{},;[]%^=\"
+$         file_2_find = escaped_fname
 $Re_strip_line_manifest:
 $         loca = F$LOCATE("/",file_2_find)
 $         ante = F$EXTRACT(0,loca,file_2_find)
@@ -927,7 +927,7 @@ $   config_symbols1 ="|installprivlib|installscript|installsitearch|installsitel
 $   config_symbols2 ="|prefix|privlib|privlibexp|scriptdir|sitearch|sitearchexp|sitebin|sitelib|sitelib_stem|sitelibexp|usecxx|use64bitall|use64bitint|"
 $   config_symbols3 ="|usecasesensitive|usedefaulttypes|usedevel|useieee|useithreads|uselongdouble|usemultiplicity|usemymalloc|usedebugging_perl|"
 $   config_symbols4 ="|usesecurelog|usethreads|usevmsdebug|usefaststdio|usemallocwrap|unlink_all_versions|uselargefiles|usesitecustomize|"
-$   config_symbols5 ="|buildmake|builder|usethreadupcalls|usekernelthreads|useshortenedsymbols|useversionedarchname"
+$   config_symbols5 ="|buildmake|builder|usethreadupcalls|usekernelthreads|useshortenedsymbols|useversionedarchname|default_inc_excludes_dot"
 $!  
 $   open/read CONFIG 'config_sh'
 $   rd_conf_loop:
@@ -1331,34 +1331,12 @@ $!
 $ GOSUB List_Parse
 $ IF .NOT.silent THEN echo ""
 $ echo "Default ""cc"" is ''line' ''archsufx' ''F$GETSYI("VERSION")'" 
-$ IF F$LOCATE("VAX",line).NE.F$LENGTH(line) 
+$ IF (F$LOCATE("VSI",line).NE.F$LENGTH(line)) -
+  .or.(F$LOCATE("HP",F$EDIT(line,"UPCASE")).NE.F$LENGTH(line)) -
+  .or.(F$LOCATE("Compaq",line).NE.F$LENGTH(line))
 $ THEN 
-$   IF .NOT.silent
-$   THEN 
-$     echo "Will try cc/decc..."
-$   ENDIF
-$   SET NOON
-$   DEFINE/USER_MODE SYS$ERROR NL:
-$   DEFINE/USER_MODE SYS$OUTPUT NL:
-$   cc/decc/NoObj/list=ccvms.lis ccvms.c
-$   tmp = $status
-$   SET ON
-$   IF (silent) THEN GOSUB Shut_up
-$   IF tmp.NE.%X10B90001
-$   THEN
-$     echo "Apparently you don't have that one."
-$   ELSE
-$     GOSUB List_parse
-$     echo "You also have: ''line' ''archsufx' ''F$GETSYI("VERSION")'"
-$     vms_cc_available = vms_cc_available + "cc/decc "
-$   ENDIF
-$ ELSE
-$   IF (F$LOCATE("DEC",line).NE.F$LENGTH(line)).or.(F$LOCATE("Compaq",line).NE.F$LENGTH(line)) -
-    .or.(F$LOCATE("HP",F$EDIT(line,"UPCASE")).NE.F$LENGTH(line))
-$   THEN 
-$     vms_cc_dflt = "/decc"
-$     vms_cc_available = vms_cc_available + "cc/decc "
-$   ENDIF
+$   vms_cc_dflt = "/decc"
+$   vms_cc_available = vms_cc_available + "cc/decc "
 $ ENDIF
 $!
 $Gcc_initial_check:
@@ -1491,7 +1469,8 @@ $ THEN
 $   ans = F$EDIT(ans,"TRIM, COMPRESS, LOWERCASE")
 $   Mcc = ans
 $   IF (F$LOCATE("dec",ans).NE.F$LENGTH(ans)).or.(F$LOCATE("compaq",ans).NE.F$LENGTH(ans)) -
-    .or.(F$LOCATE("hp",ans).NE.F$LENGTH(ans))
+    .or.(F$LOCATE("hp",ans).NE.F$LENGTH(ans)) -
+    .or.(F$LOCATE("vsi",ans).NE.F$LENGTH(ans))
 $   THEN
 $     Mcc = "cc/decc"
 $! CPQ ?
@@ -1508,7 +1487,8 @@ $   ELSE ! Not_cxx
 $     IF Mcc.NES.dflt
 $     THEN
 $       IF F$LOCATE("dec",dflt) .NE. F$LENGTH(dflt) .or. -
-           F$LOCATE("compaq",dflt) .NE. F$LENGTH(dflt)
+           F$LOCATE("compaq",dflt) .NE. F$LENGTH(dflt) -
+          .or.(F$LOCATE("vsi",dflt).NE.F$LENGTH(dflt))
 $       THEN 
 $         C_COMPILER_Replace = "CC=cc=''Mcc'"
 $       ELSE
@@ -1892,7 +1872,7 @@ $   DECK
 If you or somebody else will be maintaining perl at your site, please
 fill in the correct e-mail address here so that they may be contacted
 if necessary. Currently, the "perlbug" program included with perl
-will send mail to this address in addition to perlbug@perl.com. You may
+will send mail to this address in addition to perlbug@perl.org. You may
 enter "none" for no administrator.
 $   EOD
 $ ENDIF
@@ -2077,6 +2057,8 @@ $     ENDIF
 $   ELSE
 $     usethreads = "undef"
 $   ENDIF
+$ ELSE
+$   usethreads = "undef"
 $ ENDIF
 $ IF F$TYPE(usethreadupcalls) .EQS. "" THEN usethreadupcalls = "undef"
 $ IF F$TYPE(usekernelthreads) .EQS. "" THEN usekernelthreads = "undef"
@@ -2498,7 +2480,7 @@ $     EOD
 $   ENDIF
 $   IF F$TYPE(privlib) .NES. ""
 $   THEN dflt = privlib
-$   ELSE dflt = "''vms_prefix':[lib]"
+$   ELSE dflt = "/''vms_prefix'/lib"
 $   ENDIF
 $   rp = "Pathname where the private library files will reside? " 
 $   rp = F$FAO("!AS!/!AS",rp,"[ ''dflt' ] ")
@@ -2567,7 +2549,7 @@ $     EOD
 $   ENDIF
 $   IF F$TYPE(archlib) .NES. ""
 $   THEN dflt = archlib
-$   ELSE dflt = privlib - "]" + "." + archname + "." + version + "]"
+$   ELSE dflt = privlib + "/" + archname + "/" + version
 $   ENDIF
 $   rp = "Where do you want to put the public architecture-dependent libraries? "
 $   rp = F$FAO("!AS!/!AS",rp,"[ ''dflt' ] ")
@@ -2596,7 +2578,7 @@ $     EOD
 $   ENDIF
 $   IF F$TYPE(sitelib) .NES. ""
 $   THEN dflt = sitelib
-$   ELSE dflt = privlib - "]" + ".SITE_PERL]"
+$   ELSE dflt = privlib + "/site_perl"
 $   ENDIF
 $   rp = "Pathname for the site-specific library files? "
 $   rp = F$FAO("!AS!/!AS",rp,"[ ''dflt' ] ")
@@ -2614,7 +2596,7 @@ $     EOD
 $   ENDIF
 $   IF F$TYPE(sitearch) .NES. ""
 $   THEN dflt = sitearch
-$   ELSE dflt = sitelib - "]" + "." + archname + "]"
+$   ELSE dflt = sitelib + "/" + archname
 $   ENDIF
 $   rp = "Pathname for the site-specific architecture-dependent library files? "
 $   rp = F$FAO("!AS!/!AS",rp,"[ ''dflt' ] ")
@@ -2626,7 +2608,6 @@ $!
 $!: determine where public executables go
 $   IF F$TYPE(bin) .NES. ""
 $   THEN dflt = bin
-$!   ELSE dflt = prefix - ".]" + ".BIN]"
 $   ELSE dflt = "/''vms_prefix'"
 $   ENDIF
 $   rp = "Pathname where the public executables will reside? "
@@ -2637,7 +2618,7 @@ $!
 $!: determine where add-on public executables go
 $   IF F$TYPE(sitebin) .NES. ""
 $   THEN dflt = sitebin
-$   ELSE dflt = "''vms_prefix':[bin.''archname']"
+$   ELSE dflt = "/''vms_prefix'/bin/''archname'"
 $   ENDIF
 $   rp = "Pathname where the add-on public executables should be installed? "
 $   rp = F$FAO("!AS!/!AS",rp,"[ ''dflt' ] ")
@@ -2653,58 +2634,58 @@ $!: see what memory models we can support
 $!
 $ ELSE ! skipping "where install" questions, we must set some symbols
 $   IF F$TYPE(archlib).EQS."" THEN -
-      archlib="''vms_prefix':[lib.''archname'.''version']"
+      archlib="/''vms_prefix'/lib/''archname'/''version'"
 $   IF F$TYPE(bin) .EQS. "" THEN -
       bin="/''vms_prefix'"
 $   IF F$TYPE(privlib) .EQS. "" THEN -
-      privlib ="''vms_prefix':[lib]"
+      privlib ="/''vms_prefix'/lib"
 $   IF F$TYPE(sitearch) .EQS. "" THEN -
-      sitearch="''vms_prefix':[lib.site_perl.''archname']"
+      sitearch="/''vms_prefix'/lib/site_perl/''archname'"
 $   IF F$TYPE(sitelib) .EQS. "" THEN -
-      sitelib ="''vms_prefix':[lib.site_perl]"
+      sitelib ="/''vms_prefix'/lib/site_perl"
 $   IF F$TYPE(sitebin) .EQS. "" THEN -
-      sitebin="''vms_prefix':[bin.''archname']"
+      sitebin="/''vms_prefix'/bin/''archname'"
 $ ENDIF !%Config-I-VMS, skip "where install" questions
 $!
 $! These derived locations can be set whether we've opted to
 $! skip the where install questions or not.
 $!
 $ IF F$TYPE(archlibexp) .EQS. "" THEN -
-    archlibexp="''vms_prefix':[lib.''archname'.''version']"
+    archlibexp="/''vms_prefix'/lib/''archname'/''version'"
 $ IF F$TYPE(binexp) .EQS. "" THEN -
-    binexp ="''vms_prefix':[000000]"
+    binexp ="/''vms_prefix'"
 $ IF F$TYPE(builddir) .EQS. "" THEN -
-    builddir ="''vms_prefix':[000000]"
+    builddir ="/''vms_prefix'"
 $ IF F$TYPE(installarchlib) .EQS. "" THEN -
-    installarchlib="''vms_prefix':[lib.''archname'.''version']"
+    installarchlib="/''vms_prefix'/lib/''archname'/''version'"
 $ IF F$TYPE(installbin) .EQS. "" THEN -
-    installbin ="''vms_prefix':[000000]"
+    installbin ="/''vms_prefix'"
 $ IF F$TYPE(installscript) .EQS. "" THEN -
-    installscript ="''vms_prefix':[utils]"
+    installscript ="/''vms_prefix'/utils"
 $ IF F$TYPE(installman1dir) .EQS. "" THEN -
-    installman1dir ="''vms_prefix':[man.man1]"
+    installman1dir ="/''vms_prefix'/man/man1"
 $ IF F$TYPE(installman3dir) .EQS. "" THEN -
-    installman3dir ="''vms_prefix':[man.man3]"
+    installman3dir ="/''vms_prefix'/man/man3"
 $ IF F$TYPE(installprivlib) .EQS. "" THEN -
-    installprivlib ="''vms_prefix':[lib]"
+    installprivlib ="/''vms_prefix'/lib"
 $ IF F$TYPE(installsitearch) .EQS. "" THEN -
-    installsitearch="''vms_prefix':[lib.site_perl.''archname']"
+    installsitearch="/''vms_prefix'/lib/site_perl/''archname'"
 $ IF F$TYPE(installsitelib) .EQS. "" THEN -
-    installsitelib ="''vms_prefix':[lib.site_perl]"
+    installsitelib ="/''vms_prefix'/lib/site_perl"
 $ IF F$TYPE(oldarchlib) .EQS. "" THEN -
-    oldarchlib="''vms_prefix':[lib.''archname']"
+    oldarchlib="/''vms_prefix'/lib/''archname'"
 $ IF F$TYPE(oldarchlibexp) .EQS. "" THEN -
-    oldarchlibexp="''vms_prefix':[lib.''archname']"
+    oldarchlibexp="/''vms_prefix'/lib/''archname'"
 $ IF F$TYPE(privlibexp) .EQS. "" THEN -
-    privlibexp ="''vms_prefix':[lib]"
+    privlibexp ="/''vms_prefix'/lib"
 $ IF F$TYPE(scriptdir) .EQS. "" THEN -
-    scriptdir ="''vms_prefix':[utils]"
+    scriptdir ="/''vms_prefix'/utils"
 $ IF F$TYPE(sitearchexp) .EQS. "" THEN -
-    sitearchexp ="''vms_prefix':[lib.site_perl.''archname']"
+    sitearchexp ="/''vms_prefix'/lib/site_perl/''archname'"
 $ IF F$TYPE(sitelib_stem) .EQS. "" THEN -
-    sitelib_stem ="''vms_prefix':[lib.site_perl]"
+    sitelib_stem ="/''vms_prefix'/lib/site_perl"
 $ IF F$TYPE(sitelibexp) .EQS. "" THEN -
-    sitelibexp ="''vms_prefix':[lib.site_perl]"
+    sitelibexp ="/''vms_prefix'/lib/site_perl"
 $!
 $! determine whether to use malloc wrapping
 $ echo ""
@@ -3038,6 +3019,27 @@ $ rp="What pager is used on your system? [''dflt'] "
 $ GOSUB myread
 $ pager = ans
 $!
+$ bool_dflt = "y"
+$ IF F$TYPE(default_inc_excludes_dot) .NES. ""
+$ THEN
+$   IF .not. default_inc_excludes_dot .or. default_inc_excludes_dot .eqs. "undef" THEN bool_dflt = "n"
+$ ENDIF
+$ echo ""
+$ echo "Historically Perl has provided a final fallback of the current working"
+$ echo "directory '.' when searching for a library. This, however, can lead to"
+$ echo "problems when a Perl program which loads optional modules is called from"
+$ echo "a shared directory. This can lead to executing unexpected code."
+$ echo ""
+$ rp = "Exclude '.' from @INC by default? [''bool_dflt'] "
+$ GOSUB myread
+$ default_inc_excludes_dot = ans
+$ IF default_inc_excludes_dot
+$ THEN
+$   default_inc_excludes_dot = "define"
+$ ELSE
+$   default_inc_excludes_dot = "undef"
+$ ENDIF
+$!
 $! update makefile here
 $! echo4 "Updating makefile..."
 $!
@@ -3329,8 +3331,31 @@ $ d_ldexpl = "define"
 $ d_modfl = "define"
 $ d_modflproto = "define"
 $!
+$ d_double_has_inf = "undef"
+$ d_double_has_nan = "undef"
+$ d_double_has_negative_zero = "undef"
+$ d_double_has_subnormals = "undef"
+$ d_double_style_cray = "undef"
+$ d_double_style_ibm = "undef"
+$ d_double_style_ieee = "undef"
+$ d_double_style_vax = "undef"
+$ d_long_double_style_ieee = "undef"
+$ d_long_double_style_ieee_extended = "undef"
+$ d_long_double_style_ieee_std = "undef"
+$ d_long_double_style_vax = "undef"
 $ IF useieee .OR. useieee .EQS. "define"
 $ THEN
+$   d_double_has_inf = "define"
+$   d_double_has_nan = "define"
+$   d_double_has_negative_zero = "define"
+$   d_double_has_subnormals = "define"
+$   d_double_style_ieee = "define"
+$   IF uselongdouble .OR. uselongdouble .EQS. "define"
+$   THEN
+$       d_long_double_style_ieee = "define"
+$! TODO: will the Intel port have ieee_extended for long doubles?
+$       d_long_double_style_ieee_std = "define"
+$   ENDIF
 $   d_acosh = "define"
 $   d_asinh = "define"
 $   d_atanh = "define"
@@ -3369,6 +3394,12 @@ $   d_tgamma = "define"
 $   d_trunc = "define"
 $   d_truncl = "define"
 $ ELSE
+$   d_double_style_vax = "define"
+$   IF uselongdouble .OR. uselongdouble .EQS. "define"
+$   THEN
+$	d_long_double_style_vax = "undef" ! VAX format H unlikely
+$   ENDIF
+$   d_acosh = "undef"
 $   d_acosh = "undef"
 $   d_asinh = "undef"
 $   d_atanh = "undef"
@@ -5523,10 +5554,9 @@ $ IF use64bitint .OR. use64bitint .EQS. "define"
 $ THEN
 $   ivtype = "''i64type'"
 $   uvtype = "''u64type'"
-$ ELSE
-$   i64size="undef"
-$   u64size="undef"
 $ ENDIF
+$ i64size="8"
+$ u64size="8"
 $!
 $ doublemantbits = "52"
 $ IF uselongdouble .OR. uselongdouble .EQS. "define"
@@ -5540,7 +5570,6 @@ $!
 $ tmp = "''ivtype'"
 $ GOSUB type_size_check
 $ ivsize = tmp
-$ IF use64bitint .OR. use64bitint .EQS. "define" THEN i64size = tmp
 $ IF ivtype .eqs. "long"
 $ THEN longsize = tmp
 $ ELSE
@@ -5552,7 +5581,6 @@ $!
 $ tmp = "''uvtype'"
 $ GOSUB type_size_check
 $ uvsize = tmp
-$ IF use64bitint .OR. use64bitint .EQS. "define" THEN u64size = tmp
 $!
 $ tmp = "''i8type'"
 $ GOSUB type_size_check
@@ -5988,6 +6016,14 @@ $ ENDIF
 $ WC "d_dlsymun='undef'"
 $ WC "d_backtrace='undef'"
 $ WC "d_dosuid='undef'"
+$ WC "d_double_has_inf='" + d_double_has_inf + "'"
+$ WC "d_double_has_nan='" + d_double_has_nan + "'"
+$ WC "d_double_has_negative_zero='" + d_double_has_negative_zero + "'"
+$ WC "d_double_has_subnormals='" + d_double_has_subnormals + "'"
+$ WC "d_double_style_cray='undef'"
+$ WC "d_double_style_ibm='undef'"
+$ WC "d_double_style_ieee='" + d_double_style_ieee + "'"
+$ WC "d_double_style_vax='" + d_double_style_vax + "'"
 $ WC "d_drand48proto='" + d_drand48proto + "'"
 $ WC "d_dup2='define'"
 $ WC "d_eaccess='undef'"
@@ -6139,6 +6175,11 @@ $ WC "d_lockf='undef'"
 $ WC "d_log1p='" + d_log1p + "'"
 $ WC "d_log2='" + d_log2 + "'"
 $ WC "d_logb='" + d_logb + "'"
+$ WC "d_long_double_style_ieee='" + d_long_double_style_ieee + "'"
+$ WC "d_long_double_style_ieee_doubledouble='undef'"
+$ WC "d_long_double_style_ieee_extended='" + d_long_double_style_ieee_extended + "'"
+$ WC "d_long_double_style_ieee_std='" + d_long_double_style_ieee_std + "'"
+$ WC "d_long_double_style_vax='" + d_long_double_style_vax + "'"
 $ WC "d_longdbl='" + d_longdbl + "'"
 $ WC "d_longlong='" + d_longlong + "'"
 $ WC "d_lrint='" + d_lrint + "'"
@@ -6429,6 +6470,7 @@ $ WC "db_version_minor='" + "'"
 $ WC "db_version_patch='" + "'"
 $ WC "dbgprefix='" + dbgprefix + "'"
 $ WC "devtype='" + devtype + "'"
+$ WC "default_inc_excludes_dot='" + default_inc_excludes_dot + "'"
 $ WC "direntrytype='struct dirent'"
 $ WC "dlext='" + dlext + "'"
 $ WC "dlobj='" + dlobj + "'"
@@ -6577,6 +6619,7 @@ $ WC "i_values='undef'"
 $ WC "i_varargs='undef'"
 $ WC "i_varhdr='stdarg.h'"
 $ WC "i_vfork='undef'"
+$ WC "i_xlocale='undef'"
 $ WC "inc_version_list='0'"
 $ WC "inc_version_list_init='0'"
 $ WC "installarchlib='" + installarchlib + "'"
@@ -6584,7 +6627,7 @@ $ WC "installbin='" + installbin + "'"
 $ WC "installman1dir='" + installman1dir + "'"
 $ WC "installman3dir='" + installman3dir + "'"
 $ WC "installprefix='" + vms_prefix + "'"
-$ WC "installprefixexp='" + vms_prefix + ":'"
+$ WC "installprefixexp='/" + vms_prefix + "'"
 $ WC "installprivlib='" + installprivlib + "'"
 $ WC "installscript='" + installscript + "'"
 $ WC "installsitearch='" + installsitearch + "'"
@@ -6677,7 +6720,7 @@ $ WC "perl_verb='" + perl_verb + "'"      ! VMS specific
 $ WC "pgflquota='" + pgflquota + "'"
 $ WC "pidtype='" + pidtype + "'"
 $ WC "prefix='" + vms_prefix + "'"
-$ WC "prefixexp='" + vms_prefix + ":'"
+$ WC "prefixexp='/" + vms_prefix + "'"
 $ WC "privlib='" + privlib + "'"
 $ WC "privlibexp='" + privlibexp + "'"
 $ WC "procselfexe=' '"
@@ -6747,7 +6790,7 @@ $ WC "sitelib='" + sitelib + "'"
 $ WC "sitelib_stem='" + sitelib_stem + "'"
 $ WC "sitelibexp='" + sitelibexp + "'"
 $ WC "siteprefix='" + vms_prefix + "'"
-$ WC "siteprefixexp='" + vms_prefix + ":'"
+$ WC "siteprefixexp='/" + vms_prefix + "'"
 $ WC "sizesize='" + sizesize + "'"
 $ WC "sizetype='size_t'"
 $ WC "so='" + so + "'"
@@ -6868,6 +6911,7 @@ $ WC "d_endprotoent_r='undef'"
 $ WC "d_endpwent_r='undef'"
 $ WC "d_endservent_r='undef'"
 $ WC "d_freelocale='undef'"
+$ WC "d_gai_strerror='undef'"
 $ WC "d_getgrent_r='undef'"
 $ WC "d_getgrgid_r='" + d_getgrgid_r + "'"
 $ WC "d_getgrnam_r='" + d_getgrnam_r + "'"
@@ -6893,6 +6937,7 @@ $ WC "d_lgamma_r='undef'"
 $ WC "d_localtime_r='undef'"   ! leave undef'd; we use my_localtime
 $ WC "d_localtime_r_needs_tzset='undef'"
 $ WC "d_newlocale='undef'"
+$ WC "d_querylocale='undef'"
 $ WC "d_random_r='undef'"
 $ WC "d_readdir_r='define'"	! always defined; we roll our own
 $ WC "d_readdir64_r='undef'"
@@ -6906,6 +6951,7 @@ $ WC "d_setservent_r='undef'"
 $ WC "d_snprintf='" + d_snprintf + "'"
 $ WC "d_srand48_r='undef'"
 $ WC "d_srandom_r='undef'"
+$ WC "d_strerror_l='undef'"
 $ WC "d_strerror_r='undef'"
 $ WC "d_tmpnam_r='undef'"
 $ WC "d_ttyname_r='" + d_ttyname_r + "'"
@@ -7382,7 +7428,6 @@ $ ENDIF
 $ WRITE CONFIG "$!"
 $ WRITE CONFIG "$! Symbols for Perl-based utility programs:"
 $ WRITE CONFIG "$!"
-$ WRITE CONFIG "$ c2ph       == """ + perl_setup_perl + " ''vms_prefix':[utils]c2ph.com"""
 $ WRITE CONFIG "$ corelist   == """ + perl_setup_perl + " ''vms_prefix':[utils]corelist.com"""
 $ WRITE CONFIG "$ cpan       == """ + perl_setup_perl + " ''vms_prefix':[utils]cpan.com"""
 $ WRITE CONFIG "$ enc2xs     == """ + perl_setup_perl + " ''vms_prefix':[utils]enc2xs.com"""
@@ -7405,7 +7450,6 @@ $ WRITE CONFIG "$ pod2usage  == """ + perl_setup_perl + " ''vms_prefix':[utils]p
 $ WRITE CONFIG "$ podchecker == """ + perl_setup_perl + " ''vms_prefix':[utils]podchecker.com"""
 $ WRITE CONFIG "$ podselect  == """ + perl_setup_perl + " ''vms_prefix':[utils]podselect.com"""
 $ WRITE CONFIG "$ prove      == """ + perl_setup_perl + " ''vms_prefix':[utils]prove.com"""
-$ WRITE CONFIG "$ pstruct    == """ + perl_setup_perl + " ''vms_prefix':[utils]pstruct.com"""
 $ WRITE CONFIG "$ ptar       == """ + perl_setup_perl + " ''vms_prefix':[utils]ptar.com"""
 $ WRITE CONFIG "$ ptardiff   == """ + perl_setup_perl + " ''vms_prefix':[utils]ptardiff.com"""
 $ WRITE CONFIG "$ ptargrep   == """ + perl_setup_perl + " ''vms_prefix':[utils]ptargrep.com"""

@@ -69,3 +69,5 @@ Revision history for Perl module Gtk2::Ex::DbLinker
 0.111 Corrections in pod. example: Dumper in log msg, Log4Perl init_easy 
       ./lib: logcroak, logconfess ... instead of croak, confess
       Improved readme file
+0.112 Log::Any used in Datasheet.pm and Form.pm
+      Since Log4perl is used in the examples, Log::Any::Adapter and Log::Any::Adapter::Log4perl are required to have these working...

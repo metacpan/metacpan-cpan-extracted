@@ -3,6 +3,7 @@ abstract: 'A base role for quickly and easily creating web service clients'
 author:
   - 'Naveed Massjouni <naveed@vt.edu>'
 build_requires:
+  ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
@@ -33,5 +34,5 @@ requires:
 resources:
   bugtracker: https://github.com/ironcamel/WebService-Client/issues
   repository: git://github.com/ironcamel/WebService-Client.git
-version: '0.0502'
+version: '0.0601'
 x_serialization_backend: 'YAML::Tiny version 1.70'

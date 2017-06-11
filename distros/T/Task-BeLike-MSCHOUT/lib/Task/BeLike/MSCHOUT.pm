@@ -1,5 +1,5 @@
 package Task::BeLike::MSCHOUT;
-$Task::BeLike::MSCHOUT::VERSION = '1.162770';
+$Task::BeLike::MSCHOUT::VERSION = '1.171510';
 use strict;
 use warnings;
 
@@ -17,7 +17,7 @@ Task::BeLike::MSCHOUT - be more like MSCHOUT -- use the modules he does!
 
 =head1 VERSION
 
-version 1.162770
+version 1.171510
 
 =head1 TASK CONTENTS
 
@@ -69,6 +69,8 @@ Version 0.28 required because: Gist support via Gist API
 
 =head3 L<File::Find::Rule>
 
+=head3 L<Function::Parameters>
+
 =head3 L<Git::CPAN::Patch>
 
 =head3 L<Gravatar::URL>
@@ -99,13 +101,13 @@ Version 0.28 required because: Gist support via Gist API
 
 =head3 L<MooseX::App>
 
-=head3 L<MooseX::Method::Signatures>
-
 =head3 L<Mouse>
 
 =head3 L<Perl6::Junction>
 
 =head3 L<Pod::Coverage::TrustPod>
+
+=head3 L<Syntax::Feature::Try>
 
 =head3 L<SQL::Beautify>
 
@@ -114,8 +116,6 @@ Version 0.28 required because: Gist support via Gist API
 =head3 L<Template::Test>
 
 =head3 L<Test::Pod::Coverage>
-
-=head3 L<TryCatch>
 
 =head3 L<URI>
 
@@ -127,7 +127,7 @@ Michael Schout <mschout@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Michael Schout.
+This software is copyright (c) 2017 by Michael Schout.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,7 +1,7 @@
 package DDG::Meta::RequestHandler;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Functions for a request handler
-$DDG::Meta::RequestHandler::VERSION = '1016';
+$DDG::Meta::RequestHandler::VERSION = '1017';
 use strict;
 use warnings;
 use Carp;
@@ -197,7 +197,7 @@ DDG::Meta::RequestHandler - Functions for a request handler
 
 =head1 VERSION
 
-version 1016
+version 1017
 
 =head1 DESCRIPTION
 

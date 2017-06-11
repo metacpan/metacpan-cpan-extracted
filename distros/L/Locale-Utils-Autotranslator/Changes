@@ -1,5 +1,13 @@
 Revision history for Perl extension Locale::Utils::Autotranslator.
 
+1.004  Mon Jun  5 09:22:38 2017
+- handle bytes_max errors
+- handle errors on translate_any_msgid
+ 
+1.003  Sat Jun  3 22:06:03 2017
+- handle paragraphs ans multiline
+- new method tanslate_any_mesid to translate text instead of po files.
+
 1.002  Sun Feb 26 07:50:57 2017
 - better pod coverage
 

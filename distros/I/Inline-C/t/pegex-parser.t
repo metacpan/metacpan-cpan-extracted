@@ -5,11 +5,18 @@ plan skip_all => '$ENV{PERL_INLINE_DEVELOPER_TEST} not set'
 plan tests => 2;
 }
 
-use IO::All;
 use YAML::XS;
+use File::Path qw/ rmtree /;
 
-BEGIN { system "rm -fr _Inline*" }
-END { system "rm -fr _Inline*" }
+sub remove_inline_dirs {
+    for $dir (glob "_Inline*") {
+        rmtree $dir;
+    }
+}
+
+BEGIN { remove_inline_dirs() }
+END { remove_inline_dirs() }
+
 
 use Inline C => <<'END', USING => '::Parser::Pegex';
 SV* JAxH(char* x) {

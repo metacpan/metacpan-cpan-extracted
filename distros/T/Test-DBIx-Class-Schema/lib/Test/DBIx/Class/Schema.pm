@@ -1,8 +1,9 @@
 package Test::DBIx::Class::Schema;
+
 {
   $Test::DBIx::Class::Schema::DIST = 'Test-DBIx-Class-Schema';
 }
-$Test::DBIx::Class::Schema::VERSION = '1.0.10';
+$Test::DBIx::Class::Schema::VERSION = '1.0.11';
 # vim: ts=8 sts=4 et sw=4 sr sta
 use strict;
 use warnings;
@@ -305,7 +306,7 @@ Test::DBIx::Class::Schema - DBIx::Class schema sanity checking tests
 
 =head1 VERSION
 
-version 1.0.10
+version 1.0.11
 
 =head1 SYNOPSIS
 
@@ -438,20 +439,16 @@ Chisel Wright <chisel@chizography.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Chisel Wright.
+This software is copyright (c) 2017 by Chisel Wright.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =head1 CONTRIBUTORS
 
-=for stopwords Chisel Wright Darius Jokilehto Dave Cross Jason Tang Rupert Lane
+=for stopwords Darius Jokilehto Dave Cross Jason Tang Rupert Lane simbabque
 
 =over 4
-
-=item *
-
-Chisel Wright <chisel@cleavag.es>
 
 =item *
 
@@ -468,6 +465,10 @@ Jason Tang <tang.jason.ch@gmail.com>
 =item *
 
 Rupert Lane <rupert@rupert-lane.org>
+
+=item *
+
+simbabque <simbabque@cpan.org>
 
 =back
 

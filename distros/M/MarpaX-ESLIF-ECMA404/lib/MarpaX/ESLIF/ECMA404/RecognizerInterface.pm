@@ -5,7 +5,7 @@ package MarpaX::ESLIF::ECMA404::RecognizerInterface;
 
 # ABSTRACT: MarpaX::ESLIF::ECMA404 Recognizer Interface
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -16,7 +16,10 @@ our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 # -----------
 
 
-sub new { bless \$_[1], $_[0] }
+sub new {
+    my ($pkg, %options) = @_;
+    bless \%options, $pkg
+}
 
 # ----------------
 # Required methods
@@ -32,10 +35,10 @@ sub isEof                  {        1 } # ../. and we will say this is EOF
 sub isCharacterStream      {        1 } # MarpaX::ESLIF will validate the input
 
 
-sub encoding               {          } # Let MarpaX::ESLIF guess
+sub encoding               { $_[0]->{encoding} } # Let MarpaX::ESLIF guess eventually
 
 
-sub data                   { ${$_[0]} } # Data itself
+sub data                   { $_[0]->{data} } # Data itself
 
 
 sub isWithDisableThreshold {        0 } # Disable threshold warning ?
@@ -64,7 +67,7 @@ MarpaX::ESLIF::ECMA404::RecognizerInterface - MarpaX::ESLIF::ECMA404 Recognizer 
 
 =head1 VERSION
 
-version 0.003
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -78,9 +81,9 @@ MarpaX::ESLIF::ECMA404's Recognizer Interface
 
 =head1 SUBROUTINES/METHODS
 
-=head2 new($class, $string)
+=head2 new($class, $string, $encoding)
 
-Instantiate a new recognizer interface object. Argument is the data.
+Instantiate a new recognizer interface object. Argument is the data, following eventually by encoding.
 
 =head2 Required methods
 

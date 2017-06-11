@@ -1,0 +1,60 @@
+=encoding utf-8
+
+=head1 NAME
+
+Text::CaboCha::Chunk - CaboCha Chunk Object
+
+=head1 SYNOPSIS
+
+    use Text::CaboCha;
+    my $cabocha = Text::CaboCha->new();
+    my $tree = $cabocha->parse($text);
+
+    my $token_size = $tree->token_size;
+    for (my $i = 0; $i < $token_size; $i++) {
+        my $token = $tree->token($i);
+        if ($token->chunk) {
+            my $chunk = $token->chunk;
+            # do something
+        }
+    }
+
+    my $chunk_size = $tree->chunk_size;
+    for (my $i = 0; $i < $chunk_size; $i++) {
+        my $chunk = $tree->chunk($i);
+        # do something
+    }
+
+    # You can get the chunk value from chunk object using below methods
+    $chunk->link;
+    $chunk->head_pos;
+    $chunk->func_pos;
+    $chunk->token_size;
+    $chunk->token_pos;
+    $chunk->score;
+    $chunk->feature_list; # array reference
+    $chunk->additional_info;
+    $chunk->feature_list_size;
+
+=head1 DESCRIPTION
+
+Text::CaboCha::Chunk encapsulates the cabocha chunk object.
+
+=head1 SEE ALSO
+
+L<Text::CaboCha|Text::CaboCha>
+
+=head1 LICENSE
+
+Copyright (C) Kei Kamikawa.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See http://www.perl.com/perl/misc/Artistic.html
+
+=head1 AUTHOR
+
+Kei Kamikawa E<lt>x00.x7f@gmail.comE<gt>  
+L<@codehex|https://twitter.com/CodeHex>
+
+=cut

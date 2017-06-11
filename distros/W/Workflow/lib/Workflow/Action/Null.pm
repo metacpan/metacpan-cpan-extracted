@@ -1,12 +1,10 @@
 package Workflow::Action::Null;
 
-# $Id$
-
 use warnings;
 use strict;
 use base qw( Workflow::Action );
 
-$Workflow::Action::Null::VERSION = '1.42';
+$Workflow::Action::Null::VERSION = '1.43';
 
 sub execute {
     my ($self) = @_;
@@ -31,7 +29,7 @@ This documentation describes version 1.03 of this package
  <state name="some state">
    <action name="null" />
    ...
- 
+
  # in workflow_action.xml...
  <action name="null" class="Workflow::Action::Null" />
 

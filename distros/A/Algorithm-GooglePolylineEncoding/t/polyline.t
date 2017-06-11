@@ -22,7 +22,7 @@ my $forever;
 GetOptions("forever" => \$forever)
     or die "usage?";
 
-plan tests => 7;
+plan tests => 8;
 
 use_ok 'Algorithm::GooglePolylineEncoding';
 
@@ -35,6 +35,7 @@ use_ok 'Algorithm::GooglePolylineEncoding';
 }
 
 is(Algorithm::GooglePolylineEncoding::encode_level(174), 'mD');
+is(Algorithm::GooglePolylineEncoding::encode_level(2**39), '_______O'); # number does not need padding
 
 is(Algorithm::GooglePolylineEncoding::encode_number(0), '?');
 is(Algorithm::GooglePolylineEncoding::encode_number(-9.99999997475243e-07), '?');

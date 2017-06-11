@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
     "Moose" => 0,
     "Moose::Autobox" => 0,
     "Path::Class" => 0,
+    "Path::Tiny" => 0,
     "Text::Template" => 0,
     "namespace::autoclean" => 0
   },
@@ -34,7 +35,7 @@ my %WriteMakefileArgs = (
     "Test::Differences" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "0.014",
+  "VERSION" => "0.015",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,6 +52,7 @@ my %FallbackPrereqs = (
   "Moose" => 0,
   "Moose::Autobox" => 0,
   "Path::Class" => 0,
+  "Path::Tiny" => 0,
   "Test::DZil" => 0,
   "Test::Differences" => 0,
   "Test::More" => "0.88",

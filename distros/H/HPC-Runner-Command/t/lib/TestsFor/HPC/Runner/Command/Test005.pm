@@ -161,15 +161,15 @@ sub test_001 : Tags(job_stats) {
 
     is_deeply(
         $test->jobs->{'blastx_scratch'}->batch_indexes->[0],
-        { 'batch_index_start' => 7, 'batch_index_end' => 8 }
+        { 'batch_index_start' => 1, 'batch_index_end' => 2 }
     );
     is_deeply(
         $test->jobs->{'blastx_scratch'}->batch_indexes->[1],
-        { 'batch_index_start' => 9, 'batch_index_end' => 10 }
+        { 'batch_index_start' => 3, 'batch_index_end' => 4 }
     );
     is_deeply(
         $test->jobs->{'blastx_scratch'}->batch_indexes->[2],
-        { 'batch_index_start' => 11, 'batch_index_end' => 12 }
+        { 'batch_index_start' => 5, 'batch_index_end' => 6 }
     );
     is( $test->jobs->{'blastx_scratch'}->batch_indexes->[3], undef );
 

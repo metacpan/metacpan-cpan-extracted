@@ -12,11 +12,10 @@ use Perl::Critic::PolicyListing;
 
 use Test::More;
 
-#-----------------------------------------------------------------------------
+our $VERSION = '1.128';
 
-our $VERSION = '1.126';
-
-#-----------------------------------------------------------------------------
+use Perl::Critic::TestUtils;
+Perl::Critic::TestUtils::assert_version( $VERSION );
 
 my $profile = Perl::Critic::UserProfile->new( -profile => 'NONE' );
 my @policy_names = Perl::Critic::PolicyFactory::site_policy_names();
@@ -42,12 +41,6 @@ my $listing_pattern = qr< \A \d [ ] [\w:]+ [ ] \[ [\w\s]+ \] \z >xms;
 for my $line ( @listing_lines ) {
     like($line, $listing_pattern, 'Listing format matches expected pattern');
 }
-
-#-----------------------------------------------------------------------------
-
-# ensure we return true if this test is loaded by
-# t/12_policylisting.t_without_optional_dependencies.t
-1;
 
 #-----------------------------------------------------------------------------
 # Local Variables:

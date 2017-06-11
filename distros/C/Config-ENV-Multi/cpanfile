@@ -1,9 +1,12 @@
-requires 'perl', '5.008001';
-requires 'Carp';
 requires 'List::MoreUtils';
+requires 'perl', '5.008001';
 
-on 'test' => sub {
-    requires 'Test::More', '0.98';
-    requires 'Test::Clear';
+on configure => sub {
+    requires 'Module::Build::Tiny', '0.035';
 };
 
+on test => sub {
+    requires 'Test::Clear';
+    requires 'Test::Deep';
+    requires 'Test::More', '0.98';
+};

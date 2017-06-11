@@ -4,7 +4,7 @@ use 5.014;
 use strict;
 use warnings;
 
-no warnings qw(numeric);
+no warnings qw(numeric uninitialized);
 
 use Math::MPFR qw();
 use Math::GMPq qw();
@@ -15,7 +15,7 @@ use POSIX qw(ULONG_MAX LONG_MIN);
 
 use Class::Multimethods qw();
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 our ($ROUND, $PREC);
 
 BEGIN {
@@ -151,8 +151,8 @@ use overload
                    exp      => sub (_)   { goto &exp },        # built-in keyword
                    ln       => sub ($)   { goto &ln },
                    log      => sub (_;$) { goto &log },        # built-in keyword
-                   log10    => sub ($)   { goto &log10 },
                    log2     => sub ($)   { goto &log2 },
+                   log10    => sub ($)   { goto &log10 },
                    mod      => sub ($$)  { goto &mod },
                    abs      => sub (_)   { goto &abs },        # built-in keyword
                    erf      => sub ($)   { goto &erf },
@@ -208,12 +208,13 @@ use overload
         is_power   => sub ($;$) { goto &is_power },
         is_square  => sub ($)   { goto &is_square },
         is_prime   => sub ($;$) { goto &is_prime },
+        is_coprime => sub ($$)  { goto &is_coprime },
         next_prime => sub ($)   { goto &next_prime },
                   );
 
     my %misc = (
         rand => sub (;$;$) {
-            @_ ? (goto &rand) : do { (@_) = (1); goto &rand }
+            @_ ? (goto &rand) : do { (@_) = one(); goto &rand }
         },
         irand => sub ($;$) { goto &irand },
 
@@ -360,25 +361,18 @@ use overload
 sub _str2obj {
     my ($s) = @_;
 
-    $s
-      || return Math::GMPz::Rmpz_init_set_ui(0);
+    $s || goto &_zero;
 
     $s = lc($s);
 
     if ($s eq 'inf' or $s eq '+inf') {
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_set_inf($r, 1);
-        return $r;
+        goto &_inf;
     }
     elsif ($s eq '-inf') {
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_set_inf($r, -1);
-        return $r;
+        goto &_ninf;
     }
     elsif ($s eq 'nan') {
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_set_nan($r);
-        return $r;
+        goto &_nan;
     }
 
     # Remove underscores
@@ -474,11 +468,77 @@ sub _str2obj {
 
     $s =~ s/^\+//;
 
-    eval { Math::GMPz::Rmpz_init_set_str($s, 10) } // do {
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_set_nan($r);
-        $r;
-    };
+    eval { Math::GMPz::Rmpz_init_set_str($s, 10) } // goto &_nan;
+}
+
+# Parse a base-10 string as a base-10 fraction
+sub _str2frac {
+    my ($str) = @_;
+
+    my $sign = substr($str, 0, 1);
+    if ($sign eq '-') {
+        substr($str, 0, 1, '');
+        $sign = '-';
+    }
+    else {
+        substr($str, 0, 1, '') if ($sign eq '+');
+        $sign = '';
+    }
+
+    my $i;
+    if (($i = index($str, 'e')) != -1) {
+
+        my $exp = substr($str, $i + 1);
+
+        # Handle specially numbers with very big exponents
+        # (not a very good solution, but this will happen very rarely, if ever)
+        if (CORE::abs($exp) >= 1000000) {
+            Math::MPFR::Rmpfr_set_str((my $mpfr = Math::MPFR::Rmpfr_init2($PREC)), "$sign$str", 10, $ROUND);
+            Math::MPFR::Rmpfr_get_q((my $mpq = Math::GMPq::Rmpq_init()), $mpfr);
+            return Math::GMPq::Rmpq_get_str($mpq, 10);
+        }
+
+        my ($before, $after) = split(/\./, substr($str, 0, $i));
+
+        if (!defined($after)) {    # return faster for numbers like "13e2"
+            if ($exp >= 0) {
+                return ("$sign$before" . ('0' x $exp));
+            }
+            else {
+                $after = '';
+            }
+        }
+
+        my $numerator   = "$before$after";
+        my $denominator = "1";
+
+        if ($exp < 1) {
+            $denominator .= '0' x (CORE::abs($exp) + CORE::length($after));
+        }
+        else {
+            my $diff = ($exp - CORE::length($after));
+            if ($diff >= 0) {
+                $numerator .= '0' x $diff;
+            }
+            else {
+                my $s = "$before$after";
+                substr($s, $exp + CORE::length($before), 0, '.');
+                return _str2frac("$sign$s");
+            }
+        }
+
+        "$sign$numerator/$denominator";
+    }
+    elsif (($i = index($str, '.')) != -1) {
+        my ($before, $after) = (substr($str, 0, $i), substr($str, $i + 1));
+        if (($after =~ tr/0//) == CORE::length($after)) {
+            return "$sign$before";
+        }
+        $sign . ("$before$after/1" =~ s/^0+//r) . ('0' x CORE::length($after));
+    }
+    else {
+        "$sign$str";
+    }
 }
 
 #
@@ -780,19 +840,12 @@ sub new {
 
         if (index($num, '/') != -1) {
             my $r = Math::GMPq::Rmpq_init();
-            eval {
-                Math::GMPq::Rmpq_set_str($r, $num, $int_base);
-                1;
-              } // do {
-                my $r = Math::MPFR::Rmpfr_init2($PREC);
-                Math::MPFR::Rmpfr_set_nan($r);
-                return bless \$r, $class;
-              };
+            eval { Math::GMPq::Rmpq_set_str($r, $num, $int_base); 1 } // goto &nan;
+
             if (Math::GMPq::Rmpq_get_str($r, 10) !~ m{^\s*[-+]?[0-9]+\s*/\s*[-+]?[1-9]+[0-9]*\s*\z}) {
-                my $r = Math::MPFR::Rmpfr_init2($PREC);
-                Math::MPFR::Rmpfr_set_nan($r);
-                return bless \$r, $class;
+                goto &nan;
             }
+
             Math::GMPq::Rmpq_canonicalize($r);
             return bless \$r, $class;
         }
@@ -804,12 +857,7 @@ sub new {
             return bless \$r, $class;
         }
         else {
-            my $r = eval { Math::GMPz::Rmpz_init_set_str($num, $int_base) } // do {
-                my $r = Math::MPFR::Rmpfr_init2($PREC);
-                Math::MPFR::Rmpfr_set_nan($r);
-                $r;
-            };
-            return bless \$r, $class;
+            return bless \(eval { Math::GMPz::Rmpz_init_set_str($num, $int_base) } // goto &nan), $class;
         }
     }
 
@@ -1285,8 +1333,18 @@ sub rat {
         bless \(_any2mpq($$x) // (goto &nan));
     }
     else {
+
+        # Parse a decimal number as an exact fraction
+        if ("$x" =~ /^([+-]?+(?=\.?[0-9])[0-9_]*+(?:\.[0-9_]++)?(?:[Ee](?:[+-]?+[0-9_]+))?)\z/) {
+            my $frac = _str2frac(lc($1));
+            my $q    = Math::GMPq::Rmpq_init();
+            Math::GMPq::Rmpq_set_str($q, $frac, 10);
+            Math::GMPq::Rmpq_canonicalize($q) if (index($frac, '/') != -1);
+            return bless \$q;
+        }
+
         my $r = __PACKAGE__->new($x);
-        $$r = _any2mpq($$r) // goto(&nan);
+        $$r = _any2mpq($$r) // goto &nan;
         $r;
     }
 }
@@ -1649,8 +1707,8 @@ Class::Multimethods::multimethod imul => qw(* $) => sub {
     my ($x, $y) = @_;
 
     if (CORE::int($y) eq $y and CORE::int($y) and CORE::abs($y) <= ULONG_MAX) {
-        my $r = Math::GMPz::Rmpz_init_set(_star2mpz($x) // goto &nan);
-        Math::GMPz::Rmpz_mul_ui($r, $r, CORE::abs($y));
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mul_ui($r, (_star2mpz($x) // goto &nan), CORE::abs($y));
         Math::GMPz::Rmpz_neg($r, $r) if $y < 0;
         bless \$r;
     }
@@ -1686,8 +1744,8 @@ Class::Multimethods::multimethod idiv => qw(* $) => sub {
     my ($x, $y) = @_;
 
     if (CORE::int($y) eq $y and CORE::int($y) and CORE::abs($y) <= ULONG_MAX) {
-        my $r = Math::GMPz::Rmpz_init_set(_star2mpz($x) // goto &nan);
-        Math::GMPz::Rmpz_tdiv_q_ui($r, $r, CORE::abs($y));
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_tdiv_q_ui($r, (_star2mpz($x) // goto &nan), CORE::abs($y));
         Math::GMPz::Rmpz_neg($r, $r) if $y < 0;
         bless \$r;
     }
@@ -2077,37 +2135,21 @@ Class::Multimethods::multimethod log => qw(*) => \&ln;
 #
 
 sub ilog2 {
-    require Math::AnyNum::log;
-    bless \(_any2mpz(__log2__(_star2mpfr_mpc($_[0]))) // goto &nan);
+    require Math::AnyNum::ilog;
+    state $two = Math::GMPz::Rmpz_init_set_ui(2);
+    bless \__ilog__((_star2mpz($_[0]) // goto &nan), $two);
 }
 
 sub ilog10 {
-    require Math::AnyNum::log;
-    bless \(_any2mpz(__log10__(_star2mpfr_mpc($_[0]))) // goto &nan);
+    require Math::AnyNum::ilog;
+    state $ten = Math::GMPz::Rmpz_init_set_ui(10);
+    bless \__ilog__((_star2mpz($_[0]) // goto &nan), $ten);
 }
 
 Class::Multimethods::multimethod ilog => qw(* *) => sub {
-    require Math::AnyNum::log;
-    require Math::AnyNum::div;
-    require Math::AnyNum::mul;
-    require Math::AnyNum::cmp;
-
+    require Math::AnyNum::ilog;
     my ($x, $y) = @_;
-
-    my $logx = __log__(_star2mpfr_mpc($x));
-    my $logy = __log__(_star2mpfr_mpc($y));
-    my $log  = __div__($logx, $logy);
-
-    $log = _any2mpfr($log)
-      if ref($log) eq 'Math::MPC';
-
-    Math::MPFR::Rmpfr_number_p($log) || goto &nan;
-    Math::MPFR::Rmpfr_get_z((my $z = Math::GMPz::Rmpz_init()), $log, Math::MPFR::MPFR_RNDN);
-
-    __cmp__(__mul__($logy, $z), $logx) <= 0
-      and return bless \$z;
-
-    bless \(_any2mpz($log) // goto &nan);
+    bless \__ilog__((_star2mpz($x) // goto &nan), (_star2mpz($y) // goto &nan));
 };
 
 Class::Multimethods::multimethod ilog => qw(*) => sub {
@@ -2772,8 +2814,7 @@ sub bernfrac {
 
     if (ref($x) ne __PACKAGE__) {    # called as a function
         if (CORE::int($x) eq $x and $x >= 0 and $x <= ULONG_MAX) {
-            my $q = __bernfrac__(CORE::int($x));
-            return bless \$q;
+            return bless \__bernfrac__(CORE::int($x));
         }
         $x = __PACKAGE__->new($x);
     }
@@ -2792,8 +2833,7 @@ sub harmfrac {
 
     if (ref($x) ne __PACKAGE__) {    # called as a function
         if (CORE::int($x) eq $x and $x >= 0 and $x <= ULONG_MAX) {
-            my $q = __harmfrac__(CORE::int($x));
-            return bless \$q;
+            return bless \__harmfrac__(CORE::int($x));
         }
         $x = __PACKAGE__->new($x);
     }
@@ -2812,8 +2852,7 @@ sub bernreal {
 
     if (ref($x) ne __PACKAGE__) {    # called as a function
         if (CORE::int($x) eq $x and $x >= 0 and $x <= ULONG_MAX) {
-            my $f = __bernreal__(CORE::int($x));
-            return bless \$f;
+            return bless \__bernreal__(CORE::int($x));
         }
         $x = __PACKAGE__->new($x);
     }
@@ -3025,6 +3064,42 @@ sub is_prime {
     $y = defined($y) ? (CORE::abs(CORE::int($y)) || 20) : 20;
 
     Math::GMPz::Rmpz_probab_prime_p(_any2mpz($$x) // (return 0), $y);
+}
+
+sub is_coprime {
+    my ($x, $y) = @_;
+
+    if (ref($x) ne __PACKAGE__) {
+        $x = __PACKAGE__->new($x);
+    }
+
+    $x->is_int() || return 0;
+    $x = _any2mpz($$x) // return 0;
+
+    if (ref($y) ne __PACKAGE__) {
+        if (    ref($y) eq ''
+            and CORE::int($y) eq $y
+            and $y >= 0
+            and $y <= ULONG_MAX) {
+            ## is a native integer
+        }
+        else {
+            $y = __PACKAGE__->new($y);
+        }
+    }
+
+    if (ref($y)) {
+        $y->is_int() || return 0;
+        $y = _any2mpz($$y) // return 0;
+    }
+
+    state $t = Math::GMPz::Rmpz_init_nobless();
+
+    ref($y)
+      ? Math::GMPz::Rmpz_gcd($t, $x, $y)
+      : Math::GMPz::Rmpz_gcd_ui($t, $x, $y);
+
+    Math::GMPz::Rmpz_cmp_ui($t, 1) == 0;
 }
 
 sub is_int {

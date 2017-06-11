@@ -5,10 +5,14 @@ use lib qw(lib ../lib/ ../../hg_Gtk2-Ex-DbLinker-DbTools/lib/);
 use Dbc::Schema;
 use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($DEBUG);
+use Log::Any::Adapter;
 #Log::Log4perl->init("log.conf");
 use Forms::Langues;
 use DataAccess::Dbc::Service;
 #use Devel::Cycle;
+
+Log::Any::Adapter->set('Log::Log4perl');
+
 
 sub get_schema {
     my $file = shift;

@@ -7,7 +7,7 @@ print "1..15\n";
 
 my $x = Math::Decimal64->new();
 my $badarg1 = 17;
-my $badarg2 = Math::BigInt->new();
+my $badarg2 = Math::BigInt->new(0);
 
 if(is_NaND64($x) && !$x && $x != $x) {print "ok 1\n"}
 else {

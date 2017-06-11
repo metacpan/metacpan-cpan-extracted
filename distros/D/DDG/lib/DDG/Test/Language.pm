@@ -1,7 +1,7 @@
 package DDG::Test::Language;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Gives functions for getting test L<DDG::Language> objects.
-$DDG::Test::Language::VERSION = '1016';
+$DDG::Test::Language::VERSION = '1017';
 use strict;
 use warnings;
 use DDG::Language;
@@ -71,7 +71,7 @@ DDG::Test::Language - Gives functions for getting test L<DDG::Language> objects.
 
 =head1 VERSION
 
-version 1016
+version 1017
 
 =head1 DESCRIPTION
 

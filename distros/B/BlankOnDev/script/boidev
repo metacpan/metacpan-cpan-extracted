@@ -1,0 +1,132 @@
+#!perl
+use strict;
+use warnings FATAL => 'all';
+
+# Import module :
+use Data::Dumper;
+use BlankOnDev;
+use BlankOnDev::config;
+use BlankOnDev::Repo;
+use BlankOnDev::Migration::bazaar2GitHub;
+
+# Version :
+use BlankOnDev::Version;
+my $version = $BlankOnDev::Version::boidev_ver;
+
+# ------------------------------------------------------------------------
+# Check IF $check_homedir :
+# ------------------------------------------------------------------------
+my $check_home = BlankOnDev::check_homedir();
+unless ($check_home) {
+    print "\n";
+    print "Aplikasi ini tidak bisa digunakan di User Root";
+    print "\n";
+    exit 0;
+}
+# ------------------------------------------------------------------------
+# Check IF $check_homedir is true :
+# ------------------------------------------------------------------------
+else {
+    # Check IF Directory Packages is true :
+    my $dir_packages = BlankOnDev::check_dir_boidev();
+    unless ($dir_packages) {
+        # Install support packages :
+        BlankOnDev::Repo->pkg_build();
+    }
+
+    # Read Config :
+    BlankOnDev::config->read_config();
+
+    # For used module :
+    my $mod_use = {
+        'parent' => 'BlankOnDev',
+        'config' => 'BlankOnDev::config',
+        'repo' => 'BlankOnDev::Repo',
+        'bzr2git' => 'BlankOnDev::Migration::bazaar2GitHub',
+    };
+
+    # For Arguments :
+    my $arg_list = {
+        'prepare' => {
+            'mod' => 'config',
+            'sub' => '_prepare',
+            'input' => 'no-param',
+        },
+        'gpg-genkey' => {
+            'mod' => 'config',
+            'sub' => '_gpg_genkey',
+            'input' => 'no-param',
+        },
+        'gpg-auth' => {
+            'mod' => 'config',
+            'sub' => '_gpg_auth',
+            'input' => 'no-param',
+        },
+        'gpg-auth-dec' => {
+            'mod' => 'config',
+            'sub' => '_gpg_auth_dec',
+            'input' => 'no-param',
+        },
+        'install-pkg' => {
+            'mod' => 'repo',
+            'sub' => 'pkg_build',
+            'input' => 'no-param',
+        },
+        'bzr2git' => {
+            'mod' => 'bzr2git',
+            'sub' => '_bzr2git',
+            'input' => 'param',
+        },
+        'list-cfg' => {
+            'mod' => 'config',
+            'sub' => '_list_cfg',
+            'input' => 'no-param',
+        },
+        'list-file' => {
+            'mod' => 'config',
+            'sub' => '_list_file',
+            'input' => 'no-param',
+        },
+        'help' => {
+            'mod' => 'parent',
+            'sub' => 'usage',
+            'input' => 'no-param',
+        },
+        'version' => {
+            'mod' => 'parent',
+            'sub' => 'version_apps',
+            'input' => 'no-param',
+        }
+    };
+    $arg_list->{'--version'} = $arg_list->{'version'};
+    $arg_list->{'-v'} = $arg_list->{'version'};
+
+    # Check Arguments :
+    my $arg_len = scalar @ARGV;
+    if ($arg_len > 0) {
+        if (exists $arg_list->{$ARGV[0]}) {
+            my $mod = $arg_list->{$ARGV[0]}->{'mod'};
+            my $sub = $arg_list->{$ARGV[0]}->{'sub'};
+            my $input = $arg_list->{$ARGV[0]}->{'input'};
+            if (exists $mod_use->{$mod}) {
+                my $module_use = $mod_use->{$mod};
+                if ($input eq 'param') {
+                    $module_use->$sub($BlankOnDev::config::allconfig);
+                } else {
+                    $module_use->$sub();
+                }
+            } else {
+                BlankOnDev::usage();
+            }
+        } else {
+            # For Usage Info
+            BlankOnDev::usage();
+        }
+    } else {
+        # For Usage Info
+        BlankOnDev::usage();
+    }
+}
+# ------------------------------------------------------------------------
+# End of check IF $check_homedir is true.
+# ========================================================================

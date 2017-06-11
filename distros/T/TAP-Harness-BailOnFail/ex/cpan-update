@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# Requires App::cpanoutdated
+list=$(cpan-outdated -p)
+[ -z "$list" ] && exit
+
+# Requires App::cpanlistchanges
+cpan-listchanges "$list"
+
+export HARNESS_OPTIONS=j4
+export HARNESS_SUBCLASS=TAP::Harness::BailOnFail
+nice -n 20 cpanm "$list"

@@ -1,26 +1,26 @@
---- #YAML:1.0
-name:               Digest-Shabal
-version:            0.04
-abstract:           Perl interface to the Shabal digest algorithm
+---
+abstract: 'Perl interface to the Shabal digest algorithm'
 author:
-    - gray <gray@cpan.org>
-license:            perl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'gray <gray@cpan.org>'
 build_requires:
-    Test::More:  0.82
-requires:
-    Digest:        0
-    MIME::Base64:  0
-    parent:        0
-resources:
-    repository:  http://github.com/gray/digest-shabal
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.56
+  Test::More: '0.82'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Digest-Shabal
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Digest: '0'
+  parent: '0'
+resources:
+  repository: http://github.com/gray/digest-shabal
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

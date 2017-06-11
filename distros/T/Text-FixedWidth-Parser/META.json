@@ -22,18 +22,23 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.48"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.48"
          }
       },
       "runtime" : {
          "requires" : {
+            "DateTime::Format::Strptime" : "1.68",
             "Math::Expression" : "1.47",
-            "Moose" : "2.1804",
+            "Moose" : "2.1804"
+         }
+      },
+      "test" : {
+         "requires" : {
             "Test::Class" : "0.5",
             "Test::Most" : "0.34"
          }
@@ -47,6 +52,6 @@
          "web" : "https://github.com/VenkatesanNarayanan/Text-FixedWidth-Parser"
       }
    },
-   "version" : "0.3",
+   "version" : "0.4",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

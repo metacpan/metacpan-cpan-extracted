@@ -1,8 +1,18 @@
 Revision history for Net::Etcd
+
+0.009
+[ ENHANCEMENTS ]
+ * Add intial support for Txn
+ * Add changepw support for users to change password.
+
+0.008
+[ ANNOUNCEMENT ]
+ * Namespace change Etcd3 is now Net::Etcd
+
 0.007
 
 [ ANNOUNCEMENT ]
-  * This module has been superceded by Net::Etcd and will be removed from CPAN.
+  * Etcd3 has been superceded by Net::Etcd and will be removed from CPAN.
 
 0.006
 [ ENHANCEMENTS ]

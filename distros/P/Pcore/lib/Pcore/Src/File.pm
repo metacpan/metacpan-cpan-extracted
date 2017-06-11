@@ -1,6 +1,6 @@
 package Pcore::Src::File;
 
-use Pcore -class, -ansi, -try;
+use Pcore -class;
 use Pcore::Util::Text qw[encode_utf8 decode_eol lcut_all rcut_all rtrim_multi remove_bom];
 
 require Pcore::Src;
@@ -95,18 +95,19 @@ sub _build_dist_cfg ($self) {
 sub _build_in_buffer ($self) {
     my $res;
 
-    try {
+    eval {
         $res = P->file->read_bin( $self->path );
 
         $self->_can_write(1);
-    }
-    catch {
+    };
+
+    if ($@) {
         $self->severity( Pcore::Src::File->cfg->{SEVERITY}->{OPEN} );
 
         $self->_can_write(0);
 
         $res = \q[];
-    };
+    }
 
     return $res;
 }
@@ -177,16 +178,13 @@ sub _build_out_buffer ($self) {
         }
 
         # try to decode buffer
-        try {
-            $buffer = $decoder->decode( $buffer, Encode::FB_CROAK );
-        }
-        catch {
-            my $e = shift;
+        eval { $buffer = $decoder->decode( $buffer, Encode::FB_CROAK ) };
 
+        if ($@) {
             $self->severity( Pcore::Src::File->cfg->{SEVERITY}->{ENCODING} );
-        };
 
-        return $self->in_buffer if $@;
+            return $self->in_buffer;
+        }
 
         remove_bom $buffer;
 
@@ -253,6 +251,16 @@ sub run ($self) {
 }
 
 1;
+## -----SOURCE FILTER LOG BEGIN-----
+##
+## PerlCritic profile "pcore-script" policy violations:
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+## | Sev. | Lines                | Policy                                                                                                         |
+## |======+======================+================================================================================================================|
+## |    3 | 98, 181              | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+##
+## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

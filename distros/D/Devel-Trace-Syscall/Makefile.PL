@@ -46,12 +46,18 @@ END_CONFIG_H
 
 generate_config_header();
 
+my $ccflags = '-Wall -Wextra -Werror';
+
+if($^V =~ /5[.]20/) {
+    $ccflags .= ' -Wno-unused-function';
+}
+
 WriteMakefile(
     NAME           => 'Devel::Trace::Syscall',
       'ABSTRACT' => 'Print a stack trace whenever a system call is made',
   'AUTHOR' => 'Rob Hoelz <rob@hoelz.ro>',
   'LICENSE' => 'perl',
-  'VERSION' => '0.03',
+  'VERSION' => '0.04',
       'CONFIGURE_REQUIRES' => {
     'ExtUtils::MakeMaker' => '0'
   },
@@ -66,7 +72,7 @@ WriteMakefile(
     DEFINE         => '',
     INC            => '-I.',
     OBJECT         => '$(BASEEXT)$(OBJ_EXT) syscall-info-x86-64.o',
-    CCFLAGS        => '-Wall -Wextra -Werror',
+    CCFLAGS        => $ccflags,
     depend         => {
         'Syscall.o' => 'syscall-lookup.h',
     },

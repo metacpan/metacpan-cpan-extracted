@@ -15,33 +15,33 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 83408de0d98e01fbbe81af9493b7ac4ee9a7a1c1 .travis.yml
-SHA1 594325510a75833971ca84117e07a15c4ba11f20 Changes
+SHA1 819c4638f743ceade8a02ab5b2e077894618d8dc Changes
 SHA1 be8286b691b1b1f0e2137e7d9857b1656c777858 LICENSE
 SHA1 ebb7d1f7119f5c3fd55a6f78da9ce53b1032ab62 MANIFEST
-SHA1 f9700ba82c9bba1264242f39afd518f558919dec META.json
-SHA1 b4b844a1313fd8fd0d75bd7b971a989a2a361463 META.yml
-SHA1 bb5203181888b254fed08e94227c64b338b2cdf3 Makefile.PL
-SHA1 c9d632866d4d40f2cb63a027505a52548679d5d5 README
-SHA1 81a6cc7d54e621921c59c5e0a89ad324ae5ae94b bin/testrail-bulk-mark-results
-SHA1 eeef3d6ed2fdc36bd2dce76bcc9b2d2b92b71efb bin/testrail-cases
-SHA1 f9371f3396e3439c297be61bc90192dfc98fa20e bin/testrail-lock
-SHA1 4ed92ee6c658dd895b265efa1241fa4b31946353 bin/testrail-report
-SHA1 a10e5b7a3c967755268a1262072c7c2e5c80d7b4 bin/testrail-results
-SHA1 6b26b32041786cad454bedc144f3e82e8d43d13a bin/testrail-runs
-SHA1 712bdbb9577bc4d000abe6c8f400eea04710375c bin/testrail-tests
-SHA1 12739d2f32b3feb7f8394004246cc77f5eafc7d2 lib/App/Prove/Plugin/TestRail.pm
-SHA1 6132e2350f0b275219b01e7bccaa5cbd300b72c7 lib/Test/Rail/Harness.pm
-SHA1 23649fe0e479f75c67e3c29d8d2d7a0785a55d89 lib/Test/Rail/Parser.pm
-SHA1 33fcbf6c2d3a9d61d04ee525bd0116718db4d228 lib/TestRail/API.pm
-SHA1 e8c312bf24149f72d3a3df0e0113ca01ae953e02 lib/TestRail/Utils.pm
-SHA1 098788888e2741aafac1f55d37f02d45c96a2cc4 lib/TestRail/Utils/Find.pm
-SHA1 0ab548c5058490aa985a3abadf8f6c485883c1a3 lib/TestRail/Utils/Lock.pm
-SHA1 aa07d76f685142b8cdae9d4c63cde376b2662b77 lib/TestRail/Utils/Results.pm
+SHA1 f248d076a60164cd95627e2b17da493b9bc69f07 META.json
+SHA1 a6c4332949877d66ba8c8a3d33bf8c4f977acb75 META.yml
+SHA1 231f87dc0ce9c8c671287eac166ac5c58bdeda61 Makefile.PL
+SHA1 7117c4a26a407d3deb7a75b69fc74db66119b1b2 README
+SHA1 365f547ec29367144dffe317d4e2778f015a581e bin/testrail-bulk-mark-results
+SHA1 d0cc49524b443c2d633dfb0bf784a46ed11bb78c bin/testrail-cases
+SHA1 782b6892cc4d232986168d90b2234fb51c6f8ee1 bin/testrail-lock
+SHA1 e9c1e6d68411686dd0c4ae15d1bf1dd2fa2b310f bin/testrail-report
+SHA1 8992a4b5a7ce7bc9348334478ba92f41c2fa43f2 bin/testrail-results
+SHA1 7f0cdc032f996a90020228882cac811ad497c0c0 bin/testrail-runs
+SHA1 6d8cc9d832d58e7ad5db2f3fd953e6da34ef1407 bin/testrail-tests
+SHA1 cbb8202c7bbdd5886129bac56af1a71be48829d3 lib/App/Prove/Plugin/TestRail.pm
+SHA1 3e06d576c2014b357a91b2a7fa15d83b118d351d lib/Test/Rail/Harness.pm
+SHA1 07c85c39bea7eca054d7bc37d1c14f04ba38b636 lib/Test/Rail/Parser.pm
+SHA1 7087ac19ade191c53fc5fea21028aa1be9b873a3 lib/TestRail/API.pm
+SHA1 80cfd36ab1337ed1c46367eb742e8e494c69875a lib/TestRail/Utils.pm
+SHA1 04ce88cd2756691c1d52ff890346c24c441b241a lib/TestRail/Utils/Find.pm
+SHA1 9aa22987d588130bc7dc01b122a3d229be8b06b6 lib/TestRail/Utils/Lock.pm
+SHA1 5158f41acd74fa369e1c089c8b423a50f968216a lib/TestRail/Utils/Results.pm
 SHA1 8f3d29d1290a73ede841239d1cd6f5c542633a7e perlcriticrc
 SHA1 01a3ba2c7b8a4a3b085ad4d015a129839a04aec8 t/.testrailrc
 SHA1 e3198ba31d31bf64531c410648c3a9805bae7c77 t/00-compile.t
-SHA1 2bcb7f8111dde45de9911e2b734eab3ce4d7796c t/App-Prove-Plugin-Testrail.t
-SHA1 1c7ab832d5842598dfb89f78e7f690ffb301a663 t/Test-Rail-Parser.t
+SHA1 11a6e09fb925fc5c36a80b4c9326386ed19cb21a t/App-Prove-Plugin-Testrail.t
+SHA1 c89f09a1164931777bb66e1ef6525681a921f81c t/Test-Rail-Parser.t
 SHA1 be5c235101eee6411db4ba0272639dfd014a3053 t/TestRail-API-mockOnly.t
 SHA1 07ce3b012fb24756abf16b81694c4653663dc023 t/TestRail-API-sections.t
 SHA1 0183bb81c82ddc5938152031312d734b461615d2 t/TestRail-API.t
@@ -55,7 +55,7 @@ SHA1 1468262012241303a1c17b84fb3c8c0a6ccc0d25 t/author-eol.t
 SHA1 ea89f21d866b81da4a4799f50503666e09620ac3 t/author-mojibake.t
 SHA1 ec9b65736dd1b4befb45fc058be882a98e66a13f t/author-no-tabs.t
 SHA1 545af31470c3e0784f83ee2c7714af89114f571f t/author-pod-linkcheck.t
-SHA1 02861bae626f85e8cb65cacb152bf44cd4195156 t/author-pod-spell.t
+SHA1 6645ca7a3184122dc8b165d90fb8c52351f8c3d7 t/author-pod-spell.t
 SHA1 8efad25309730a4d501fb40fc03eda4697303372 t/author-pod-syntax.t
 SHA1 5bbd54e00858f737ecedcd84d6541205a53aad29 t/author-synopsis.t
 SHA1 60dcfab54478213041dc8be6a2ba88deb9fb6136 t/author-test-version.t
@@ -93,11 +93,11 @@ SHA1 edaf16fa4a2e70e474bc60aa5ebe4b35933c1702 t/todo_pass_and_fail.test
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iQEcBAEBAgAGBQJZJd6cAAoJEFuXw5BFhGAy930H/0O9zRB1p/Iqaxgpgsp4pmvz
-t5FFEPcVUVv70fM+IAuLlHzH+ALlI6+WZ9lt+1g7Z17oHC7nSGHuc/Gqk7pYUeE8
-h+KvY7uu8mCigv/QKXYIa91c1sKJbc0WApxuG7DoY7kCCYm7pCzNdAYWCmkUuWrn
-54t8Tq0vIqu4TvF9lY15K3TJW8oMBLdvH9zuVJFgyodGtDbdLLMPDnpH8inn+lzg
-0QRvHLqXRxBjOKBOxDPZ36RwhV5EtCaAjorAoGFWo4FgBdv8cf6EQkTatvFjer0k
-aJ9ixQqVBGkKxnFy5bacE24JEnifWLo4zvuV/tJyC5OcoHcXGE9v98k8O7yUlJg=
-=+7Af
+iQEcBAEBAgAGBQJZN22DAAoJEFuXw5BFhGAy1ywH/1AKsXK13GHO16qaagIU55w8
+PBFVvKfQeBvxUxbgxuzxXmJgmt1kjqCp7RUPIHmYMYP6cTPr5HUZq3aIvniTOscH
+H3jlGfjyWAmwPew3LSDGi7uCPM3VsdaOdrBuLzN5VLtkxEpMFoXPrGpXGrSVmUha
+dg+eigV2b8ZHKAcYzwI1I7CkoGuDk87WvFgsNgFY6cQhFXn8peQwLYKZklDeOE6Z
+2btzXMzx6u60O9p1Stl/6NvlEUv5zq4JnX9Wmym1oBWH0uhH3iCw6XsTyKSLUCbk
+gd30UEYWu4sd938xv1Njv1/fqa/Y2WBTRq2Fc+Dz4/+2ceU9FhdxhefhQQr+BBk=
+=I5hC
 -----END PGP SIGNATURE-----

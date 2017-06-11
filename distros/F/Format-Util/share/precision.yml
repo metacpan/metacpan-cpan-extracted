@@ -1,0 +1,20 @@
+price:
+  USD: 2
+  EUR: 2
+  AUD: 2
+  GBP: 2
+  JPY: 0
+  BTC: 8
+  LTC: 8
+  ETH: 8
+  ETC: 8
+amount:
+  USD: 2
+  EUR: 2
+  AUD: 2
+  GBP: 2
+  JPY: 2
+  BTC: 8
+  LTC: 8
+  ETH: 8
+  ETC: 8

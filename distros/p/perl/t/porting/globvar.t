@@ -4,7 +4,7 @@ use TestInit qw(T);
 use strict;
 use Config;
 
-require 't/test.pl';
+require './t/test.pl';
 
 skip_all("Code to read symbols not ported to $^O")
     if $^O eq 'VMS' or $^O eq 'MSWin32';
@@ -59,6 +59,13 @@ foreach my $file (map {$_ . $Config{_o}} qw(globals regcomp)) {
 	++$unexported{$1};
     }
     close $fh or die "Problem running nm $file";
+}
+
+unless ($Config{d_double_has_inf}) {
+    $skip{PL_inf}++;
+}
+unless ($Config{d_double_has_nan}) {
+    $skip{PL_nan}++;
 }
 
 foreach (sort keys %exported) {

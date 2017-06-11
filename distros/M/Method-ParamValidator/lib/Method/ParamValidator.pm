@@ -1,6 +1,6 @@
 package Method::ParamValidator;
 
-$Method::ParamValidator::VERSION   = '0.10';
+$Method::ParamValidator::VERSION   = '0.11';
 $Method::ParamValidator::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Method::ParamValidator - Configurable method parameter validator.
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
@@ -31,9 +31,8 @@ use Method::ParamValidator::Exception::FailedParameterCheckConstraint;
 use Moo;
 use namespace::clean;
 
-has 'fields'  => (is => 'rw');
-has 'methods' => (is => 'rw');
-has 'config'  => (is => 'ro', predicate => 1);
+has [ qw(fields methods) ] => (is => 'rw');
+has 'config' => (is => 'ro', predicate => 1);
 
 =head1 DESCRIPTION
 

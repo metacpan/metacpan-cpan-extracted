@@ -4,7 +4,7 @@
       "tokubass <tokubass {at} cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v1.1.0",
+   "generated_by" : "Minilla/v3.0.12",
    "license" : [
       "perl_5"
    ],
@@ -43,7 +43,8 @@
       "runtime" : {
          "requires" : {
             "Class::Method::Modifiers" : "0",
-            "Pod::Cpandoc" : "0",
+            "HTTP::Tiny" : "0.054",
+            "Pod::Cpandoc" : "0.16",
             "Time::Piece" : "1.16",
             "parent" : "0",
             "perl" : "5.008005"
@@ -60,7 +61,7 @@
    "provides" : {
       "Pod::Cpandoc::Cache" : {
          "file" : "lib/Pod/Cpandoc/Cache.pm",
-         "version" : "0.03"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -74,9 +75,10 @@
          "web" : "https://github.com/tokubass/p5-Pod-Cpandoc-Cache"
       }
    },
-   "version" : "0.03",
+   "version" : "0.06",
    "x_authority" : "cpan:TOKUBASS",
    "x_contributors" : [
       "tokubass <tokubass@cpan.org>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

@@ -11,9 +11,12 @@ address-formatting/README.md
 address-formatting/bin/coverage.pl
 address-formatting/bin/run_tests.t
 address-formatting/conf/abbreviations/ca.yaml
+address-formatting/conf/abbreviations/de.yaml
+address-formatting/conf/abbreviations/dk.yaml
 address-formatting/conf/abbreviations/en.yaml
 address-formatting/conf/abbreviations/es.yaml
 address-formatting/conf/abbreviations/fr.yaml
+address-formatting/conf/abbreviations/pt.yaml
 address-formatting/conf/components.yaml
 address-formatting/conf/countries/worldwide.yaml
 address-formatting/conf/country2lang.yaml

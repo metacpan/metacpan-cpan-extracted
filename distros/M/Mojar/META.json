@@ -4,7 +4,7 @@
       "Nic Sandfield <niczero@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
    "license" : [
       "artistic_2"
    ],
@@ -52,6 +52,5 @@
       },
       "x_IRC" : "irc://irc.perl.org/#mojo"
    },
-   "version" : 2.101,
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : 2.201
 }

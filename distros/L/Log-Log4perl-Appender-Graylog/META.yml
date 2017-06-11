@@ -1,0 +1,44 @@
+---
+abstract: 'Log dispatcher writing to udp Graylog server'
+author:
+  - 'Brandon "Dimentox Travanti" Husbands <xotmid@gmail.com>'
+build_requires:
+  Data::Faker: '0'
+  Data::Printer: '0'
+  Data::Random::String: '0'
+  Log::Log4perl: '0'
+  Log::Log4perl::Layout::NoopLayout: '0'
+  Test::MockModule: '0'
+  Test::Moose::More: '0'
+  Test::More: '0.98'
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Log4perl-Appender-Graylog
+requires:
+  Data::UUID: '0'
+  IO::Socket: '0'
+  JSON: '0'
+  JSON::Tiny: '0'
+  Moose: '0'
+  MooseX::Types: '0'
+  MooseX::Types::Moose: '0'
+  POSIX: '0'
+  Readonly: '0'
+  Sys::Hostname: '0'
+  namespace::autoclean: '0'
+  perl: v5.16.3
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dimentox/log-log4perl-appender-graylog/issues
+  homepage: https://metacpan.org/release/Log-Log4perl-Appender-Graylog
+  repository: git://github.com/dimentox/log-log4perl-appender-graylog.git
+version: '1.3'
+x_serialization_backend: 'YAML::Tiny version 1.70'

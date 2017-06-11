@@ -1,0 +1,65 @@
+{
+   "abstract" : "Access the Google Storage JSON API (currently experimental).",
+   "author" : [
+      "Glenn Fowler <cebjyre@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Google-Storage",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Status" : "0",
+            "JSON" : "0",
+            "LWP::MediaTypes" : "0",
+            "LWP::UserAgent" : "6.04",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "URI::Escape" : "3.29",
+            "autodie" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Digest::MD5" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0",
+            "base" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/cebjyre/Net-Google-Storage.git",
+         "web" : "https://github.com/cebjyre/Net-Google-Storage"
+      }
+   },
+   "version" : "0.2.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
+}
+

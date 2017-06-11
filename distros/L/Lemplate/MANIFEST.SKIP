@@ -8,3 +8,7 @@
 ^\.travis\.yml$
 ^tmp.*
 \.gitignore$
+blib/
+^Makefile$
+^MYMETA\.
+update-ver

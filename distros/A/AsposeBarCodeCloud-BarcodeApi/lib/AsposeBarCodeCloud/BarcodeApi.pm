@@ -13,8 +13,8 @@ use URI::Escape;
 use AsposeBarCodeCloud::ApiClient;
 use AsposeBarCodeCloud::Configuration;
 
-my $VERSION = '1.02';
-
+# my $VERSION = '1.03';
+our $VERSION = '1.03';
 sub new {
     my $class   = shift;
     my $default_api_client = $AsposeBarCodeCloud::Configuration::api_client ? $AsposeBarCodeCloud::Configuration::api_client  :
@@ -293,6 +293,101 @@ sub PostBarcodeRecognizeFromUrlorContent {
 		$_body_data = read_file( $args{'file'} , binmode => ':raw' );
         
         
+    }
+    
+    
+
+    # authentication setting, if any
+    my $auth_settings = [];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+
+	if($AsposeBarCodeCloud::Configuration::debug){
+		print "\nResponse Content: ".$response->content;
+	}    
+	
+	my $_response_object = $self->{api_client}->pre_deserialize($response->content, 'BarcodeResponseList', $response->header('content-type'));
+    return $_response_object;
+    
+}
+#
+# PostBarcodeRecognizeFromRequestBody
+#
+# Recognize barcode from request body.
+# 
+# @param String $type Barcode type (required). 
+# @param String $checksumValidation Checksum validation parameter. (optional)
+# @param Boolean $stripFnc Allows to strip FNC symbol in recognition results. (optional)
+# @param String $rotationAngle Recognition of rotated barcode. Possible angles are 90, 180, 270, default is 0 (optional)
+# @param String $body (required)
+# @return BarcodeResponseList
+#
+sub PostBarcodeRecognizeFromRequestBody{
+    my ($self, %args) = @_;
+
+    
+    # verify the required parameter 'type' is set
+    unless (exists $args{'type'}) {
+      croak("Missing the required parameter 'type' when calling PostBarcodeRecognizeFromRequestBody");
+    }
+
+   unless (exists $args{'body'}) {
+      croak("Missing the required parameter 'body' when calling PostBarcodeRecognizeFromRequestBody");
+    }
+    
+
+    # parse inputs
+    my $_resource_path = '/barcode/recognize/?appSid={appSid}&amp;type={type}&amp;checksumValidation={checksumValidation}&amp;stripFnc={stripFnc}&amp;rotationAngle={rotationAngle}';
+    
+	$_resource_path =~ s/\Q&amp;\E/&/g;
+    $_resource_path =~ s/\Q\/?\E/?/g;
+    $_resource_path =~ s/\QtoFormat={toFormat}\E/format={format}/g;
+	$_resource_path =~ s/\Q{path}\E/{Path}/g;
+    
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/xml', 'application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if ( exists $args{'type'}) {        		
+		$_resource_path =~ s/\Q{type}\E/$args{'type'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]type.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'checksumValidation'}) {        		
+		$_resource_path =~ s/\Q{checksumValidation}\E/$args{'checksumValidation'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]checksumValidation.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'stripFnc'}) {        		
+		$_resource_path =~ s/\Q{stripFnc}\E/$args{'stripFnc'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]stripFnc.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'rotationAngle'}) {        		
+		$_resource_path =~ s/\Q{rotationAngle}\E/$args{'rotationAngle'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]rotationAngle.*?(?=&|\?|$)//g;
+	}
+    
+    my $_body_data;
+    # body params
+    if ( exists $args{'body'}) {
+        $_body_data = $args{'body'};
     }
     
     

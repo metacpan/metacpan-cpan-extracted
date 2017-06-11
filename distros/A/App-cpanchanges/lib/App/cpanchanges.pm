@@ -2,7 +2,7 @@ package App::cpanchanges;
 
 use strict;
 use 5.008_005;
-our $VERSION = '20140125.0';
+our $VERSION = '20170606.0';
 
 1;
 __END__

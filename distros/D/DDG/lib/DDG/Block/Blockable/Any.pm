@@ -1,7 +1,7 @@
 package DDG::Block::Blockable::Any;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Role for something blockable that has no triggers
-$DDG::Block::Blockable::Any::VERSION = '1016';
+$DDG::Block::Blockable::Any::VERSION = '1017';
 use Moo::Role;
 
 with 'DDG::Block::Blockable';
@@ -25,7 +25,7 @@ DDG::Block::Blockable::Any - Role for something blockable that has no triggers
 
 =head1 VERSION
 
-version 1016
+version 1017
 
 =head1 DESCRIPTION
 

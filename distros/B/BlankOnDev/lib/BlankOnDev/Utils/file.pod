@@ -1,0 +1,40 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+BlankOnDev::Utils::file - File Handling for BlankOnDev Module.
+
+=head1 SYNOPSIS
+
+    use BlankOnDev::Utils::file;
+
+    # For Read Files :
+    my $file_location = '/your/dir/path/filename.extension';
+    my $read_file = BlankOnDev::Utils::file->read($file_location);
+
+    # For Create Files :
+    my $file_contains = 'file contains';
+    my $file_name = 'yourfilename.extension';
+    my $dir_file = '/your/dir/path/';
+    my $create_file = BlankOnDev::Utils::file->create($file_name, $dir_file, $file_contains);
+
+
+=head1 DESCRIPTION
+
+This module only to "read" and "create" files.
+and This module is fork from Module CellBash::Utils::File.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2017 by Achmad Yusri Afandi and BlankOn Developer Team.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Achmad Yusri Afandi, E<lt>yusrideb@cpan.orgE<gt>
+
+=cut

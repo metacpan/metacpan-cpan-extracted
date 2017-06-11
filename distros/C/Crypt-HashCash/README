@@ -1,0 +1,44 @@
+Crypt-HashCash
+
+HashCash Digital Cash
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Crypt::HashCash
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Crypt-HashCash
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Crypt-HashCash
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Crypt-HashCash
+
+    Search CPAN
+        http://search.cpan.org/dist/Crypt-HashCash/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (c) 2017 Ashish Gulhati.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+See L<http://www.perlfoundation.org/artistic_license_2_0> for the full
+license terms.

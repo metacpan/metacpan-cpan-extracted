@@ -23,6 +23,7 @@ my $tickit = Tickit::Async->new(
 
 $loop->add( $tickit );
 
+# timer
 {
    my $tick;
    $tickit->timer( after => 0.1, sub { $tick++ } );
@@ -34,6 +35,21 @@ $loop->add( $tickit );
 
    wait_for { $tick == 2 };
    is( $tick, 2, '$tick 2 after "at" timer' );
+}
+
+# cancel_timer
+{
+   my $now = time;
+
+   my $done;
+   $tickit->timer( at => $now + 0.2, sub { $done++ } );
+
+   my $called;
+   my $id = $tickit->timer( at => $now + 0.1, sub { $called++ } );
+   $tickit->cancel_timer( $id );
+
+   wait_for { $done };
+   ok( !$called, '->cancel_timer removes pending timer' );
 }
 
 done_testing;

@@ -1,0 +1,77 @@
+NAME
+    Test::Compiles - tests if perl can compile a string of code
+
+SYNOPSIS
+     use Test::More;
+     use Test::Compiles;
+ 
+     compiles_ok    q{ print "hello world" };
+     doesnt_compile q{ print "hello world  };   # missing end of quote
+ 
+     done_testing;
+
+DESCRIPTION
+    Test::Compiles exports two functions to allow you to check whether a
+    string of code can be compiled by perl without errors. It doesn't check
+    whether it can be *executed*.
+
+    Note that Perl code can execute arbitrary instructions as part of its
+    compilation (e.g. in a `BEGIN { ... }` block), so don't pass untrusted
+    strings to these test functions.
+
+    `compiles $code, $message, %options`
+    `compiles $code, %options`
+    `compiles $code, $message`
+    `compiles $code`
+        This test passes if $code can be compiled.
+
+        Valid options are:
+
+        *   `strict`: boolean to indicate whether code should be compiled with
+            `use strict`. Enabled by default.
+
+        *   `warnings`: boolean to indicate whether code should be compiled
+            with `use warnings FATAL => 'all'`. Disabled by default.
+
+        *   `package`: package that the code should be compiled in. Defaults
+            to the caller.
+
+        *   `prelude`: a string of Perl code to prepend to $code. Defaults to
+            $Test::Compiles::PRELUDE, which is (by default) an empty string.
+
+        *   `message`: an alternative to specifying $message.
+
+    `doesnt_compile $code, $message, %options`
+    `doesnt_compile $code, %options`
+    `doesnt_compile $code, $message`
+    `doesnt_compile $code`
+        This test passes if $code cannot be compiled. It accepts the same
+        options.
+
+    This module defines a package variable $Test::Compiles::PRELUDE which can
+    be used to, for example, load pragmata like indirect or
+    bareword::filehandles.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Test-Compiles>.
+
+SEE ALSO
+    Test::Fatal — checks for runtime errors.
+
+    Test::More — the test framework.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2017 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

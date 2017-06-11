@@ -1,5 +1,8 @@
 Revision history for App-af
 
+0.10      2017-06-05 11:12:26 -0400
+  - Correctly detect patch directory at the same level as the alienfile (fix for gh#3)
+
 0.09      2017-03-23 12:34:15 -0400
   - Update for more recent Alien::Base / Alien::Build
 

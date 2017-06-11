@@ -145,6 +145,7 @@ has file_header => (is => 'lazy', isa => Object);
 has cover => (is => 'lazy', isa => Str);
 has coverwidth => (is => 'lazy', isa => Str);
 has nocoverpage => (is => 'lazy', isa => Bool);
+has nofinalpage => (is => 'lazy', isa => Bool);
 has notoc => (is => 'lazy', isa => Bool);
 has fonts => (is => 'ro', isa => InstanceOf['Text::Amuse::Compile::Fonts::Selected']);
 has epub_embed_fonts => (is => 'ro', isa => Bool, default => sub { 1 });
@@ -199,7 +200,8 @@ sub _build_full_options {
     # print "Building full options\n" if DEBUG;
     my %options = %{ $self->options };
     # these values are picked from the file, if not provided by the compiler
-    foreach my $override (qw/cover coverwidth nocoverpage notoc/) {
+    foreach my $override (qw/cover coverwidth nocoverpage notoc
+                             nofinalpage/) {
         $options{$override} = $self->$override;
     }
     return \%options;
@@ -258,6 +260,19 @@ sub _build_notoc {
         return 1;
     }
     elsif ($self->options->{notoc}) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
+
+sub _build_nofinalpage {
+    my $self = shift;
+    if ($self->file_header->nofinalpage) {
+        return 1;
+    }
+    elsif ($self->options->{nofinalpage}) {
         return 1;
     }
     else {

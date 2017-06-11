@@ -167,7 +167,13 @@ designed to be used with it and are being developed under the same umbrella.
 
 A tiny wrapper around L<DBD::Pg> that makes
 L<PostgreSQL|http://www.postgresql.org> a lot of fun to use with
-L<Mojolicious>. And it comes with two great
+L<Mojolicious>. Perform queries blocking and non-blocking, use all
+L<SQL features|https://www.postgresql.org/docs/current/static/sql.html>
+PostgreSQL has to offer, generate CRUD queries from data structures, manage your
+database schema with migrations and build scalable real-time web applications
+with the publish/subscribe pattern.
+
+And it comes with two great
 L<example applications|https://github.com/kraih/mojo-pg/tree/master/examples/>
 you can use for inspiration. The minimal
 L<chat|https://github.com/kraih/mojo-pg/tree/master/examples/chat.pl>
@@ -184,6 +190,11 @@ process time and/or computationally intensive tasks in background processes,
 outside of the request/response lifecycle. Among those tasks you'll commonly
 find image resizing, spam filtering, HTTP downloads, building tarballs, warming
 caches and basically everything else you can imagine that's not super fast.
+
+And it comes with a great example application you can use for inspiration. The
+L<link checker|https://github.com/kraih/minion/tree/master/examples/linkcheck>
+will show you how to integrate background jobs into well-structured
+L<Mojolicious> applications.
 
 =back
 

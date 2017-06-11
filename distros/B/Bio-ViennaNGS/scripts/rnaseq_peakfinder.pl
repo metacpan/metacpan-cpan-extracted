@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 # -*-CPerl-*-
-# Last changed Time-stamp: <2015-10-23 12:53:38 mtw>
+# Last changed Time-stamp: <2016-10-11 15:55:03 mtw>
 #
 # Find peaks/enriched regions of certain size in RNA-seq data
 #
@@ -37,6 +37,7 @@ use Cwd;
 use Path::Class;
 use Bio::ViennaNGS::FeatureIO;
 use Bio::ViennaNGS::Peak;
+use Bio::ViennaNGS::Util  qw(mkdircheck);
 
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
@@ -83,20 +84,19 @@ unless(-f $infile2){
 my $cwd = getcwd();
 unless ($infile1 =~ /^\// || $infile1 =~ /^\.\//){$infile1 = file($cwd,$infile1);}
 unless ($infile2 =~ /^\// || $infile2 =~ /^\.\//){$infile2 = file($cwd,$infile2);}
-unless ($dest =~ /\/$/){$dest .= "/";}
-unless (-d $dest){mkdir $dest;}
+unless (-d $dest){mkdircheck($dest);}
 
 $lf = file($dest,$logname);
 
 # parse input files
 my $io_pos = Bio::ViennaNGS::FeatureIO->new(file => "$infile1", # [+] strand
 					    filetype => "BedGraph",
-					    objecttype => "BedGraph",
+					    instanceOf => "BedGraphEntry",
 					   );
 
 my $io_neg = Bio::ViennaNGS::FeatureIO->new(file => "$infile2", # [-] strand
 					    filetype => "BedGraph",
-					    objecttype => "BedGraph",
+					    instanceOf => "BedGraphEntry",
 					   );
 
 # get an instance of Bio::ViennaNGS::Peak

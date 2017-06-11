@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More;
 
-plan skip_all => 'feature check irrelevant on v5.8'
+plan skip_all => 'feature check irrelevant on Perl v5.10 and below'
     if $] <= 5.010;
 
 {

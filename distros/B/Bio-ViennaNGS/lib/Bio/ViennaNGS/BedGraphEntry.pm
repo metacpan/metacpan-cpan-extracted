@@ -1,11 +1,12 @@
 # -*-CPerl-*-
-# Last changed Time-stamp: <2015-10-27 14:45:14 mtw>
+# Last changed Time-stamp: <2017-06-10 18:21:46 michl>
 
 package Bio::ViennaNGS::BedGraphEntry;
 
-use version; our $VERSION = qv('0.16');
-
+use Bio::ViennaNGS;
 use Moose;
+use version; our $VERSION = version->declare("$Bio::ViennaNGS::VERSION");
+
 
 extends 'Bio::ViennaNGS::FeatureInterval';
 

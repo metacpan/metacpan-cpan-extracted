@@ -13,7 +13,7 @@ use Business::UPS::Tracking::Utils;
 =head1 NAME
 
 Business::UPS::Tracking::Element::Code - Generic container for parameters
-  
+
 =head1 DESCRIPTION
 
 This is a generic container class used to store information constisting
@@ -65,18 +65,18 @@ sub _build_code {
 
 sub serialize {
     my ($self) = @_;
-    
+
     if ($self->Description) {
         return $self->Description.' ('.$self->Code.')';
     } else {
         return $self->Code;
     }
-    
+
 }
 
 =head1 METHODS
 
-=head2 printall 
+=head2 printall
 
 Returns the serialized object content
 

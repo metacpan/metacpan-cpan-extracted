@@ -1,13 +1,13 @@
-package Pcore v0.36.0;
+package Pcore v0.40.3;
 
-use v5.24.1;
+use v5.26.0;
 use common::header;
 use Pcore::Core::Exporter qw[];
 use Pcore::Core::Const qw[:CORE];
 
 # define %EXPORT_PRAGMA for exporter
 our $EXPORT_PRAGMA = {
-    ansi     => 0,    # re-export Term::ANSIColor qw[:constants]
+    ansi     => 0,    # export ANSI color variables
     autoload => 0,    # export AUTOLOAD
     class    => 0,    # package is a Moo class
     config   => 0,    # mark package as perl config, used automatically during .perl config evaluation, do not use directly!!!
@@ -20,7 +20,6 @@ our $EXPORT_PRAGMA = {
     result   => 0,    # export Pcore::Util::Result qw[result]
     role     => 0,    # package is a Moo role
     rpc      => 0,    # run class as RPC server
-    try      => 0,    # export Pcore::Core::Exception qw[:DEFAULT try catch]
     types    => 0,    # export types
 };
 
@@ -75,28 +74,6 @@ sub import {
 
         # store -embedded pragma
         $EMBEDDED = 1 if $import->{pragma}->{embedded};
-
-        # initialize Net::SSLeay, effective only for MSWin and if Pcore is not -embedded
-        if ( $^O =~ /MSWin/sm && !$EMBEDDED ) {
-            require Net::SSLeay;
-
-            Net::SSLeay::initialize();
-
-            {
-                no warnings qw[redefine prototype];
-
-                # we don't need to call Net::SSLeay::randomize several times
-                *Net::SSLeay::randomize = sub { };
-            }
-
-            # initialize OpenSSL internal rand. num. generator, RAND_poll() is called automatically on first RAND_bytes() call
-            Net::SSLeay::RAND_bytes( my $buf, 1 );    ## no critic qw[Variables::ProhibitUnusedVariables]
-        }
-
-        # TODO remove, when following issues will be resolved
-        # https://github.com/steve-m-hay/Filter-Crypto/issues/1
-        # https://rt.cpan.org/Public/Bug/Display.html?id=102788
-        require Filter::Crypto::Decrypt if !$EMBEDDED;
 
         require Import::Into;
         require B::Hooks::AtRuntime;
@@ -178,18 +155,11 @@ sub import {
 
         # process -ansi pragma
         if ( $import->{pragma}->{ansi} ) {
-            state $ANSI_INIT = !!require Term::ANSIColor;
-
-            Term::ANSIColor->export_to_level( 1, undef, ':constants' );
+            Pcore::Core::Const->import( -caller => $caller, qw[:ANSI] );
         }
 
-        # process -try pragma
-        if ( $import->{pragma}->{try} ) {
-            Pcore::Core::Exception->import( -caller => $caller, qw[:DEFAULT try catch] );
-        }
-        else {
-            Pcore::Core::Exception->import( -caller => $caller );
-        }
+        # import exceptions
+        Pcore::Core::Exception->import( -caller => $caller );
 
         # process -result pragma
         if ( $import->{pragma}->{result} ) {
@@ -554,33 +524,6 @@ PERL
     goto &{$util};
 }
 
-# LOG
-sub log {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
-    state $log = do {
-        require Pcore::Core::Log;
-
-        my $obj = Pcore::Core::Log->new;
-
-        # set default log channels
-        if ( $ENV->dist ) {
-            $obj->add( 'fatal', 'stderr:', 'file:fatal.log' );
-            $obj->add( 'error', 'stderr:', 'file:error.log' );
-            $obj->add( 'warn',  'stderr:', 'file:warn.log' );
-        }
-
-        # file logs are disabled by default for scripts, that are not part of the distribution
-        else {
-            $obj->add( 'fatal', 'stderr:' );
-            $obj->add( 'error', 'stderr:' );
-            $obj->add( 'warn',  'stderr:' );
-        }
-
-        $obj;
-    };
-
-    return $log;
-}
-
 # I18N
 sub i18n {
     state $init = !!require Pcore::Core::I18N;
@@ -614,34 +557,76 @@ sub init_demolish ( $self, $class ) {
 }
 
 # EVENT
-our $EV;
+sub _init_ev {
+    state $broker = do {
+        require Pcore::Core::Event;
 
-sub listen_events ( $self, $events, $cb ) {
-    state $ev = do {
-        if ( !$EV ) {
-            require Pcore::Core::Event;
+        my $_broker = Pcore::Core::Event->new;
 
-            $EV = Pcore::Core::Event->new;
+        # set default log channels
+        $_broker->listen_events( 'LOG.EXCEPTION.*', 'stderr:' );
+
+        # file logs are disabled by default for scripts, that are not part of the distribution
+        if ( $ENV->dist ) {
+            $_broker->listen_events( 'LOG.EXCEPTION.FATAL', 'file:fatal.log' );
+            $_broker->listen_events( 'LOG.EXCEPTION.ERROR', 'file:error.log' );
+            $_broker->listen_events( 'LOG.EXCEPTION.WARN',  'file:warn.log' );
         }
 
-        $EV;
+        $_broker;
     };
 
-    return $ev->listen_events( $events, $cb );
+    return $broker;
 }
 
-sub fire_event ( $self, $event, $data = undef ) {
-    state $ev = do {
-        if ( !$EV ) {
-            require Pcore::Core::Event;
+sub listen_events ( $self, $masks, @listeners ) {
+    state $broker = _init_ev();
 
-            $EV = Pcore::Core::Event->new;
-        }
+    return $broker->listen_events( $masks, @listeners );
+}
 
-        $EV;
+sub has_listeners ( $self, $key ) {
+    state $broker = _init_ev();
+
+    return $broker->has_listeners($key);
+}
+
+sub forward_event ( $self, $ev ) {
+    state $broker = _init_ev();
+
+    return $broker->forward_event($ev);
+}
+
+sub fire_event ( $self, $key, $data = undef ) {
+    state $broker = _init_ev();
+
+    my $ev = {
+        key  => $key,
+        data => $data,
     };
 
-    return $ev->fire_event( $event, $data );
+    return $broker->forward_event($ev);
+}
+
+sub sendlog ( $self, $key, $title, $data = undef ) {
+    state $broker = _init_ev();
+
+    return if !$broker->has_listeners("LOG.$key");
+
+    my $ev;
+
+    ( $ev->{channel}, $ev->{level} ) = split /[.]/sm, $key, 2;
+
+    die q[Log level must be specified] unless $ev->{level};
+
+    $ev->{key}       = "LOG.$key";
+    $ev->{timestamp} = Time::HiRes::time();
+    \$ev->{title} = \$title;
+    \$ev->{data}  = \$data;
+
+    $broker->forward_event($ev);
+
+    return;
 }
 
 1;
@@ -651,25 +636,25 @@ sub fire_event ( $self, $event, $data = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 65                   | Subroutines::ProhibitExcessComplexity - Subroutine "import" with high complexity score (26)                    |
+## |    3 | 64                   | Subroutines::ProhibitExcessComplexity - Subroutine "import" with high complexity score (21)                    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 108                  | Variables::ProtectPrivateVars - Private variable used                                                          |
+## |    3 | 85                   | Variables::ProtectPrivateVars - Private variable used                                                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 275                  | BuiltinFunctions::ProhibitComplexMappings - Map blocks should have a single statement                          |
+## |    3 | 245                  | BuiltinFunctions::ProhibitComplexMappings - Map blocks should have a single statement                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
-## |      | 350                  | * Private subroutine/method '_apply_roles' declared but not used                                               |
-## |      | 470                  | * Private subroutine/method '_CORE_RUN' declared but not used                                                  |
+## |      | 320                  | * Private subroutine/method '_apply_roles' declared but not used                                               |
+## |      | 440                  | * Private subroutine/method '_CORE_RUN' declared but not used                                                  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 382, 411, 414, 418,  | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
-## |      | 452, 455, 460, 463,  |                                                                                                                |
-## |      | 488, 507             |                                                                                                                |
+## |    3 | 352, 381, 384, 388,  | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
+## |      | 422, 425, 430, 433,  |                                                                                                                |
+## |      | 458, 477, 620        |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 603                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
+## |    3 | 546                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 285                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
+## |    2 | 255                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 386                  | InputOutput::RequireCheckedSyscalls - Return value of flagged function ignored - say                           |
+## |    1 | 356                  | InputOutput::RequireCheckedSyscalls - Return value of flagged function ignored - say                           |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

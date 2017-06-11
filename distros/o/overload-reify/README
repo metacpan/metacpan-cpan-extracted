@@ -1,0 +1,100 @@
+overload::reify
+
+This pragma creates named methods for inherited operator overloads. The
+child may then modify them using such packages as Moo, Moose, or
+Class::Method::Modifers.
+
+  Background
+
+When a package overloads an operator it provides either a method name or
+a code reference, e.g.
+
+  overload
+    '++' => 'plus_plus',
+    '--' => sub { ..., }
+
+In the latter case, the overloaded subroutine cannot be modified via
+e.g., the around subroutine in Class::Method::Modifiers (or Moo or
+Moose) as it has no named symbol table entry.
+
+overload::reify installs named methods for overloaded operators into a
+package's symbol table. The method names are constructed by
+concatenating a prefix (provided by the "-prefix" option) and a
+standardized operator name (see "method_names"). An existing method with
+the same name will be quietly replaced, unless the "-redefine" option is
+true.
+
+For operators overloaded with a method name which is different from the
+new method name, a wrapper which calls the original method by its name
+is installed. If the original and new method names are the same, nothing
+is installed.
+
+For operators overloaded with a code reference, an alias to the code
+reference is installed.
+
+By default named methods are constructed for *all* overloaded operators,
+regardless of how they are implemented (providing the child class a
+uniform naming scheme). If this is not desired, set the "-methods"
+option to false.
+
+  Usage
+
+The pragma is invoked with the following template:
+
+  use overload::reify @operators, ?\%options;
+
+where @operators is a list of strings, each of which may contain:
+
+*   an operator to be considered, e.g. '++';
+
+*   a tag (in the form ":"*class*) representing a class of operators. A
+    class may be any of the keys accepted by the overload pragma, as
+    well as the special class "all", which consists of all operators.
+
+*   the token "-not", indicating that the next operator is to be
+    excluded from consideration. If "-not" is the first element in the
+    list of operators, the list is pre-seeded with all of the operators.
+
+and %options is a hash with one or more of the following keys:
+
+"-into"
+    The package into which the methods will be installed. This defaults
+    to the calling package.
+
+"-redefine"
+    A boolean which if true will cause an exception to be thrown if
+    installing the new method would replace an existing one of the same
+    name in the package specified by "-into". Defaults to false.
+
+"-methods"
+    A boolean indicating whether or not wrappers will be generated for
+    overloaded operators with named methods. This defaults to *true*.
+
+"-prefix"
+    The prefix for the names of the generated method names. It defaults
+    to "operator_".
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Smithsonian Astrophysical
+Observatory.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

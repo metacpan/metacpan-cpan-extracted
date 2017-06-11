@@ -1,9 +1,36 @@
 ==================================================
-Changes from 2016-05-15 00:00:00 +0000 to present.
+Changes from 2016-06-06 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.003 at 2017-05-15 19:51:13 +0000
+version 0.004 at 2017-06-06 13:37:01 +0000
+------------------------------------------
+
+  Change: 895ff2cd03b27c0b3589eae353b85db816f157ec
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-06-06 10:33:47 +0000
+
+    Fixed dynamic module generation
+
+    Renamed the script to a better name Now working on the file generated
+    on blib directory, after pm_to_blib phase of Makefile.PL Using chmod
+    to add write permissions and change it back to original after editing
+    the module 
+
+  Change: 48fe96111bc7b4130989bcbaa5e9c15447b3fd3f
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-05-26 22:01:15 +0000
+
+    Moving Syscalls.pm generation outside Makefile.PL
+
+    Generating the code from Makefile.PL is generating problems when
+    Inline dependency is not yet installed Created build_my_module.PL to
+    generate the module AFTER the Makefile.PL is executed, during "make"
+    execution Still need to figure out how to make build_my_module.PL to
+    be executed before the Syscalls.pm is copied from lib to blib 
+
+------------------------------------------
+version 0.004 at 2017-05-15 19:44:08 +0000
 ------------------------------------------
 
   Change: fbbc717e85617485b77ae4bc4c3217ce76d76553

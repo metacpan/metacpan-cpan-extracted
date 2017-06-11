@@ -7,7 +7,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME             => 'Business::Fixflo',
-    VERSION_FROM     => 'lib/Business/Fixflo/Version.pm',
+    VERSION_FROM     => 'lib/Business/Fixflo.pm',
     AUTHOR           => 'Lee Johnson <leejo@cpan.org>',
     LICENSE          => 'perl',
     MIN_PERL_VERSION => '5.10.1',

@@ -16,9 +16,7 @@ use Try::Tiny;
 use Memoize;
 use Array::Compare;
 
-#TODO This should be split into separate modules
-#ScheduleJobs
-#ResolveArray
+with 'HPC::Runner::Command::submit_jobs::Utils::Scheduler::ResolveDeps::BuildTaskDeps';
 
 =head1 HPC::Runner::Command::submit_jobs::Utils::Scheduler::ResolveDeps;
 
@@ -143,8 +141,6 @@ sub sanity_check_schedule {
                         "No potential matches were found for dependency $r");
                 }
             }
-            else {
-            }
 
             $y++;
         }
@@ -159,26 +155,20 @@ sub sanity_check_schedule {
         $x++;
     }
 
-    #Format the table
-    if ( !$search ) {
-        $t->setCols( [ "JobName", "Deps", "Suggested" ] );
-        map { $t->addRow($_) } @rows;
-        $self->app_log->fatal(
-            'There were one or more problems with your job schedule.');
-        $self->app_log->warn(
-            "Here is your tabular dependency list in alphabetical order");
-    }
-    else {
-        $t->setCols( [ "JobName", "Deps", "Task Count" ] );
-        map { $t->addRow($_) } @rows;
-        $self->app_log->info(
-            "Here is your tabular dependency list in alphabetical order");
-    }
+    #IF there are no broken dependencies - return
+    return $search if $search;
 
+    $t->setCols( [ "JobName", "Deps", "Suggested" ] );
+    map { $t->addRow($_) } @rows;
+    $self->app_log->fatal(
+        'There were one or more problems with your job schedule.');
+    $self->app_log->warn(
+        "Here is your tabular dependency list in alphabetical order");
     $self->app_log->info( "\n\n" . $t );
 
     return $search;
 }
+
 
 =head3 chunk_commands
 
@@ -191,13 +181,23 @@ Chunk commands per job into batches
 sub chunk_commands {
     my $self = shift;
 
-    #$DB::single = 2;
     $self->reset_cmd_counter;
     $self->reset_batch_counter;
 
     return if $self->has_no_schedules;
 
     $self->clear_scheduler_ids();
+
+    $self->chunk_commands_jobs;
+
+    $self->reset_job_counter;
+    $self->reset_cmd_counter;
+    $self->reset_batch_counter;
+
+}
+
+sub chunk_commands_jobs {
+    my $self = shift;
 
     foreach my $job ( $self->all_schedules ) {
 
@@ -206,66 +206,64 @@ sub chunk_commands {
         next unless $self->jobs->{ $self->current_job };
 
         $self->reset_cmd_counter;
+        $self->reset_batch_counter;
+
+        # $self->jobs->{ $self->current_job }->{batch_index_start} =
+        #   $self->batch_counter;
+
+        $self->chunk_commands_jobs_check;
+        next unless $self->jobs->{ $self->current_job }->cmd_counter;
 
         my $commands_per_node =
           $self->jobs->{ $self->current_job }->commands_per_node;
 
         my @cmds = @{ $self->parse_cmd_file };
 
-        $self->jobs->{ $self->current_job }->{batch_index_start} =
-          $self->batch_counter;
-
-        if ( !$self->jobs->{ $self->current_job }->can('count_cmds') ) {
-            warn
-"You seem to be mixing and matching job dependency declaration types! Here there be dragons! We are dying now.\n";
-            exit 1;
-        }
-        next unless $self->jobs->{ $self->current_job }->cmd_counter;
-
-        #Replace this with function that will get cmds from our tmp file
         my $iter = natatime $commands_per_node, @cmds;
 
         $self->assign_batches($iter);
-        $self->assign_batch_stats(scalar @cmds);
+        $self->assign_batch_stats( scalar @cmds );
 
-        $self->jobs->{ $self->current_job }->{batch_index_end} =
-          $self->batch_counter - 1;
         $self->inc_job_counter;
 
         my $batch_index_start =
           $self->jobs->{ $self->current_job }->{batch_index_start};
+
         my $batch_index_end =
              $self->jobs->{ $self->current_job }->{batch_index_end}
           || $self->jobs->{ $self->current_job }->{batch_index_start};
 
-        # TODO Update this - they should both use the same method
-        my $number_of_batches;
-        if ( !$self->use_batches ) {
-
-            $number_of_batches =
-              resolve_max_array_size( $self->max_array_size, $commands_per_node,
-                $self->jobs->{ $self->current_job }->cmd_counter );
-        }
-        else {
-
-            $self->max_array_size($commands_per_node);
-
-            $number_of_batches =
-              resolve_max_array_size( $self->max_array_size,
-                $self->jobs->{ $self->current_job }->cmd_counter,
-                $commands_per_node );
-        }
-        $self->jobs->{ $self->current_job }->{num_job_arrays} =
-          $number_of_batches;
+        my $number_of_batches =
+          $self->jobs->{ $self->current_job }->{num_job_arrays};
 
         $self->return_ranges( $batch_index_start, $batch_index_end,
             $number_of_batches );
-
     }
+}
 
-    $self->reset_job_counter;
-    $self->reset_cmd_counter;
-    $self->reset_batch_counter;
+sub chunk_commands_jobs_check {
+    my $self = shift;
+
+    if ( !$self->jobs->{ $self->current_job }->can('count_cmds') ) {
+        warn
+"You seem to be mixing and matching job dependency declaration types! Here there be dragons! We are dying now.\n";
+        exit 1;
+    }
+}
+
+sub assign_num_max_array {
+    my $self = shift;
+    my $job  = shift;
+
+    my $commands_per_node = $self->jobs->{$job}->commands_per_node;
+
+    $self->max_array_size(1) if $self->use_batches;
+
+    my $number_of_batches =
+      resolve_max_array_size( $self->max_array_size, $commands_per_node,
+        $self->jobs->{$job}->cmd_counter );
+
+    $self->jobs->{$job}->{num_job_arrays} = $number_of_batches;
 }
 
 sub parse_cmd_file {
@@ -306,28 +304,27 @@ memoize('resolve_max_array_size');
 
 sub resolve_max_array_size {
     my $max_array_size    = shift;
-    my $number_of_batches = shift;
+    my $commands_per_node = shift;
     my $cmd_size          = shift;
 
-    if ( ( $cmd_size / $number_of_batches ) <= ( $max_array_size + 1 ) ) {
-        return $number_of_batches;
-    }
+    my $num_arrays = $cmd_size / $max_array_size;
+    $num_arrays = $num_arrays / $commands_per_node;
 
-    $number_of_batches = $cmd_size / ( $max_array_size + 1 );
+    my $ceil = POSIX::ceil($num_arrays);
 
-    return POSIX::ceil($number_of_batches);
+    return POSIX::ceil($num_arrays);
 }
 
+#TODO get rid of this
 sub return_ranges {
     my $self        = shift;
+
     my $batch_start = shift;
     my $batch_end   = shift;
-
-    #walk is the ret value from resolve_max_array_size
-    my $walk = shift;
+    my $num_arrays = shift;
 
     my $new_array;
-    if ( $walk == 1 ) {
+    if ( $num_arrays == 1 ) {
         $new_array = {
             'batch_index_start' => $batch_start,
             'batch_index_end'   => $batch_end
@@ -367,13 +364,21 @@ Iterate through the batches to assign stats (number of batches per job, number o
 =cut
 
 sub assign_batch_stats {
-    my $self = shift;
+    my $self      = shift;
     my $cmd_count = shift;
 
+    $self->jobs->{ $self->current_job }->{cmd_start} =
+      $self->total_cmd_counter;
     foreach my $batch ( @{ $self->jobs->{ $self->current_job }->batches } ) {
         $self->current_batch($batch);
-        #How does this work?
-        $self->inc_cmd_counter( $self->commands_per_node );
+
+        #Counter per job
+        $self->inc_cmd_counter(
+            $self->jobs->{ $self->current_job }->commands_per_node );
+
+        #Total counter
+        $self->inc_total_cmd_counter(
+            $self->jobs->{ $self->current_job }->commands_per_node );
 
         $self->job_stats->collect_stats( $self->batch_counter,
             $self->cmd_counter, $self->current_job );
@@ -388,6 +393,11 @@ sub assign_batch_stats {
 Each jobtype has one or more batches
 iterate over the the batches to get some data and assign s
 
+For batches - each HPC::Runner::Command::submit_jobs::Utils::Scheduler::Batch
+
+is an element in the array
+Each element could has commands_per_node tasks
+
 =cut
 
 sub assign_batches {
@@ -395,6 +405,8 @@ sub assign_batches {
     my $iter = shift;
 
     my $x = 0;
+    my $y = 1;
+    $self->jobs->{$self->current_job}->{batch_index_start} = 1;
     while ( my @vals = $iter->() ) {
 
         my $batch_cmds = \@vals;
@@ -409,7 +421,8 @@ sub assign_batches {
           HPC::Runner::Command::submit_jobs::Utils::Scheduler::Batch->new(
             batch_tags => $batch_tags,
             job        => $self->current_job,
-            cmd_count => scalar @vals,
+            cmd_count  => scalar @vals,
+            cmd_start  => $y,
           );
 
         $self->jobs->{ $self->current_job }->add_batches($batch_ref);
@@ -417,9 +430,10 @@ sub assign_batches {
           if @{$batch_tags};
 
         $x++;
+        $y = $y + $self->jobs->{ $self->current_job }->commands_per_node;
     }
 
-    $self->jobs->{ $self->current_job }->{batch_count} = $x;
+    $self->jobs->{$self->current_job}->{batch_index_end} = $x;
 }
 
 =head3 assign_batch_tags
@@ -476,225 +490,5 @@ sub parse_meta {
     return ( $t1, $2 );
 }
 
-=head3 process_all_batch_deps
-
-=cut
-
-sub process_all_batch_deps {
-    my $self = shift;
-
-    return unless $self->jobs->{ $self->current_job }->submit_by_tags;
-    return unless $self->jobs->{ $self->current_job }->has_deps;
-
-    my $batch_tags      = $self->batch_tags->{ $self->current_job };
-    my $scheduler_index = {};
-
-    foreach my $dep ( @{ $self->jobs->{ $self->current_job }->deps } ) {
-        next unless $self->jobs->{$dep}->submit_by_tags;
-        my $dep_tags = $self->batch_tags->{$dep};
-
-#If they are the same - and they probably are - each element of the array depends upon the same index in the dep array
-        if ( check_equal_batch_tags( $batch_tags, $dep_tags ) ) {
-            my $sched_array = build_equal_batch_tags( scalar @{$batch_tags} );
-            $scheduler_index->{$dep} = $sched_array;
-        }
-        else {
-            my $sched_array =
-              build_unequal_batch_tags( $batch_tags, $dep_tags );
-            $scheduler_index->{$dep} = $sched_array;
-        }
-    }
-
-    return $scheduler_index;
-}
-
-=head3 build_unequal_batch_tags
-
-When they are not the same we have to search
-
-=cut
-
-sub build_unequal_batch_tags {
-    my $batch_tags = shift;
-    my $dep_tags   = shift;
-
-    my @sched_array = ();
-
-    for ( my $x = 0 ; $x < scalar @{$batch_tags} ; $x++ ) {
-        my $batch_tag = $batch_tags->[$x];
-        my @tarray    = ();
-        for ( my $y = 0 ; $y < scalar @{$dep_tags} ; $y++ ) {
-            my $dep_tag = $dep_tags->[$y];
-            push( @tarray, $y ) if search_tags( $batch_tag, $dep_tag );
-        }
-        push( @sched_array, \@tarray );
-    }
-
-    return \@sched_array;
-}
-
-=head3 build_equal_batch_tags
-
-If the arrays are equal, each element depends upon the same element previously
-
-=cut
-
-memoize('build_equal_batch_tags');
-
-sub build_equal_batch_tags {
-    my $len = shift;
-
-    $len = $len - 1;
-    my @array = map { [$_] } ( 0 .. $len );
-    return \@array;
-}
-
-=head3 check_equal_batch_tags
-
-If they are the same each element depends upon the same element from the other array
-
-This will probably be true most of the time
-
-=cut
-
-memoize('check_equal_batch_tags');
-
-sub check_equal_batch_tags {
-    my $batch_tags = shift;
-    my $dep_tags   = shift;
-
-    if ( scalar @{$batch_tags} != scalar @{$dep_tags} ) {
-        return 0;
-    }
-    my $comp = Array::Compare->new;
-    for ( my $x = 0 ; $x < scalar @{$batch_tags} ; $x++ ) {
-        my $tbatch_tags = $batch_tags->[$x];
-        my $tdep_tags   = $dep_tags->[$x];
-        if ( !$comp->compare( $tbatch_tags, $tdep_tags ) ) {
-            return 0;
-        }
-    }
-    return 1;
-}
-
-=head3 process_batch_deps
-
-If a job has one or more job tags it is possible to fine tune dependencies
-
-#HPC jobname=job01
-#HPC commands_per_node=1
-#TASK tags=Sample1
-gzip Sample1
-#TASK tags=Sample2
-gzip Sample2
-
-#HPC jobname=job02
-#HPC jobdeps=job01
-#HPC commands_per_node=1
-#TASK tags=Sample1
-fastqc Sample1
-#TASK tags=Sample2
-fastqc Sample2
-
-job01 - Sample1 would be submitted as schedulerid 1234
-job01 - Sample2 would be submitted as schedulerid 1235
-
-job02 - Sample1 would be submitted as schedulerid 1236 - with dep on 1234 (with no job tags this would be 1234, 1235)
-job02 - Sample2 would be submitted as schedulerid 1237 - with dep on 1235 (with no job tags this would be 1234, 1235)
-
-=cut
-
-sub process_batch_deps {
-    my $self  = shift;
-    my $batch = shift;
-
-    return unless $self->jobs->{ $self->current_job }->submit_by_tags;
-    return unless $self->jobs->{ $self->current_job }->has_deps;
-
-    my $tags = $batch->batch_tags;
-
-    return $self->search_batches( $self->jobs->{ $self->current_job }->deps,
-        $tags );
-}
-
-=head3 search_batches
-
-search the batches for a particular scheduler id
-
-#TODO update this to search across all batches - they are usually the same
-instead of per batch, create an array of array for all batches
-
-
-[['Sample01'], ['Sample03']]
-
-=cut
-
-sub search_batches {
-    my $self     = shift;
-    my $job_deps = shift;
-    my $tags     = shift;
-
-    my $scheduler_ref = {};
-
-    foreach my $dep ( @{$job_deps} ) {
-        next unless $self->jobs->{$dep}->submit_by_tags;
-        my $dep_batches = $self->jobs->{$dep}->batches;
-        $scheduler_ref->{$dep} = search_dep_batch_tags( $dep_batches, $tags );
-    }
-
-    return $scheduler_ref;
-}
-
-=head3 search_dep_batch_tags
-
-=cut
-
-memoize('search_dep_batch_tags');
-
-sub search_dep_batch_tags {
-    my $dep_batches = shift;
-    my $tags        = shift;
-
-    my @scheduler_index = ();
-    my $x               = 0;
-    foreach my $dep_batch ( @{$dep_batches} ) {
-        push( @scheduler_index, $x )
-          if  search_tags( $dep_batch->batch_tags, $tags );
-        $x++;
-    }
-
-    return \@scheduler_index;
-}
-
-=head3 search_tags
-
-#TODO Update this - we shouldn't check for searches and search separately
-Check for matching tags. We match against any
-
-job02 depends on job01
-
-job01 batch01 has tags Sample1,Sample2
-job01 batch02 has tags Sample3
-
-job02 batch01 has tags Sample1
-
-job02 batch01 depends upon job01 batch01 - because it has an overlap
-But not job01 batch02
-
-=cut
-
-memoize('search_tags');
-
-sub search_tags {
-    my $batch_tags  = shift;
-    my $search_tags = shift;
-
-    foreach my $batch_tag ( @{$batch_tags} ) {
-        my $s = first { "$_" eq $batch_tag } @{$search_tags};
-        return $s if $s;
-    }
-
-    return 0;
-}
 
 1;

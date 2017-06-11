@@ -1,5 +1,9 @@
 Revision history for File::DataClass
 
+0.73.1    2017-06-02 01:02:52
+          - More efficient IO::stat
+          - Added more broken smokers
+
 0.72.1    2017-04-02 09:19:50
           - Toolchain update CVE-2016-1238
           - Better error message in cache set

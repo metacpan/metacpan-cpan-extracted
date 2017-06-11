@@ -3,45 +3,133 @@ package Pcore::Core::Event;
 use Pcore -class;
 use Pcore::Util::Scalar qw[weaken];
 use Pcore::Core::Event::Listener;
+use Time::HiRes qw[];
 
 has listeners => ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg => undef );
+has senders   => ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg => undef );
+has mask_re   => ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg => undef );
 
-sub listen_events ( $self, $events, $cb ) {
-    $events = [$events] if ref $events ne 'ARRAY';
+sub listen_events ( $self, $masks, @listeners ) {
+    my $guard = defined wantarray ? [] : ();
 
-    my $listener = Pcore::Core::Event::Listener->new(
-        {   broker => $self,
-            events => $events,
-            cb     => $cb,
+    $masks = [$masks] if ref $masks ne 'ARRAY';
+
+    for my $mask ( $masks->@* ) {
+
+        # get matched senders
+        my $senders = [ grep { $self->_compare( $_, $mask ) } keys $self->{senders}->%* ];
+
+        # create listeners
+        for my $listen (@listeners) {
+            my $cb;
+
+            if ( !ref $listen ) {
+                my $uri = Pcore->uri($listen);
+
+                my $class = Pcore->class->load( $uri->scheme, ns => 'Pcore::Core::Event::Listener::Pipe' );
+
+                $cb = $class->new( { uri => $uri } );
+            }
+            elsif ( ref $listen eq 'ARRAY' ) {
+                my ( $uri, %args ) = $listen->@*;
+
+                $args{uri} = Pcore->uri($uri);
+
+                my $class = Pcore->class->load( $args{uri}->scheme, ns => 'Pcore::Core::Event::Listener::Pipe' );
+
+                $cb = $class->new( \%args );
+            }
+            elsif ( ref $listen eq 'CODE' ) {
+                $cb = $listen;
+            }
+            else {
+                die q[Invalid listener type];
+            }
+
+            my $listener = Pcore::Core::Event::Listener->new(
+                {   broker => $self,
+                    masks  => $masks,
+                    cb     => $cb,
+                }
+            );
+
+            $self->{listeners}->{$mask}->{ $listener->{id} } = $listener;
+
+            if ($guard) {
+                push $guard->@*, $listener;
+
+                weaken $self->{listeners}->{$mask}->{ $listener->{id} };
+            }
+
+            # add listener to matched senders
+            for my $key ( $senders->@* ) {
+                $self->{senders}->{$key}->{ $listener->{id} } = $listener;
+
+                weaken $self->{senders}->{$key}->{ $listener->{id} };
+            }
         }
-    );
-
-    my $wantarray = defined wantarray;
-
-    for my $event ( $events->@* ) {
-        push $self->{listeners}->{$event}->@*, $listener;
-
-        weaken $self->{listeners}->{$event}->[-1] if $wantarray;
     }
 
-    return $wantarray ? $listener : ();
+    return $guard;
 }
 
-sub has_listeners ( $self, $events ) {
-    $events = [$events] if ref $events ne 'ARRAY';
+sub has_listeners ( $self, $key ) {
+    $self->_register_sender($key) if !exists $self->{senders}->{$key};
 
-    for my $event ( $events->@* ) {
-        return 1 if exists $self->{listeners}->{$event};
+    return $self->{senders}->{$key}->%* ? 1 : 0;
+}
+
+sub _register_sender ( $self, $key ) {
+    return if exists $self->{senders}->{$key};
+
+    my $sender = $self->{senders}->{$key} = {};
+
+    for my $mask ( keys $self->{listeners}->%* ) {
+        if ( $self->_compare( $key, $mask ) ) {
+            for my $listener ( values $self->{listeners}->{$mask}->%* ) {
+                if ( !exists $sender->{ $listener->{id} } ) {
+                    $sender->{ $listener->{id} } = $listener;
+
+                    weaken $sender->{ $listener->{id} };
+                }
+            }
+        }
     }
 
-    return 0;
+    return;
 }
 
-sub fire_event ( $self, $event, $data = undef ) {
-    if ( my $listeners = $self->{listeners}->{$event} ) {
-        for my $listener ( $listeners->@* ) {
-            $listener->{cb}->( $event, $data );
+# key always without wildcards
+# mask could contain wildcards:
+# * (star) can substitute for exactly one word
+# # (hash) can substitute for zero or more words
+# word = [^.]
+sub _compare ( $self, $key, $mask ) {
+    if ( index( $mask, '*' ) != -1 || index( $mask, '#' ) != -1 ) {
+        if ( !exists $self->{mask_re}->{$mask} ) {
+            my $re = quotemeta $mask;
+
+            $re =~ s/\\[#]/.*?/smg;
+
+            $re =~ s/\\[*]/[^.]+/smg;
+
+            $self->{mask_re}->{$mask} = qr/\A$re\z/sm;
         }
+
+        return $key =~ $self->{mask_re}->{$mask};
+    }
+    else {
+        return $mask eq $key;
+    }
+
+    return;
+}
+
+sub forward_event ( $self, $ev ) {
+    $self->_register_sender( $ev->{key} ) if !exists $self->{senders}->{ $ev->{key} };
+
+    for my $listener ( values $self->{senders}->{ $ev->{key} }->%* ) {
+        $listener->{cb}->($ev);
     }
 
     return;

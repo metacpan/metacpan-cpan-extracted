@@ -1,3 +1,11 @@
+1.30	- 2017-06-08, H.Merijn Brand
+    * Add csv (..., out => ...) syntax examples (issue 7)
+    * Disable escape_null for undefined escape_char
+    * Fix ->say for bound columns (RT#121576)
+    * Update to Devel::PPPort 3.36
+    * Tested under 5.26.0 and 5.27.0
+    * Doc changes and additions
+
 1.29	- 2017-04-25, H.Merijn Brand
     * More docs for bind_colmns (RT#121350)
     * New attribute "strict" (also addresses RT#121350)

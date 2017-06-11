@@ -65,7 +65,7 @@ __END__
 
 Locale::Utils::Autotranslator::ApiMymemoryTranslatedNet - Interface for translated.net
 
-$Id: ApiMymemoryTranslatedNet.pm 614 2015-08-17 10:28:48Z steffenw $
+$Id: ApiMymemoryTranslatedNet.pm 649 2017-02-26 06:56:35Z steffenw $
 
 $HeadURL: $
 

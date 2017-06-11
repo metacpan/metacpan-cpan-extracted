@@ -9,7 +9,7 @@ use warnings;
 use Carp;
 use 5.008; # At least Perl 5.8 please
 
-our $VERSION = '2.16';
+our $VERSION = '2.17';
 
 our %EXPORT_TAGS = (all => [qw( 
         parse_grid 
@@ -250,24 +250,29 @@ sub parse_grid {
     }
 
     # sheet id instead of grid sq
-    if (my ($sheet, $numbers) = $s =~ m{\A ([A-Z0-9:./]+)\D+(\d+\D*\d+) \Z }xsmio ) {
+    my $sheet_ref_pattern = qr'\A([A-Z]:)?([0-9NEWSOL/]+?)(\.[a-z]+)?(?:[ -/.]([ 0-9]+))?\Z'msxio;
+    my ($prefix, $sheet, $suffix, $numbers) = $s =~ m/$sheet_ref_pattern/;
 
-        # allow Landranger sheets with no prefix
-        $sheet = "A:$sheet" if exists $maps{"A:$sheet"};
+    if (defined $sheet) {
 
-        if ( exists $maps{$sheet} ) { 
-            my @ll_corner = @{$maps{$sheet}->{bbox}[0]};  # NB we need the bbox corner so that it is left and below all points on the map
+        $prefix //= "A:";
+        $suffix //= "";
+        $sheet = $prefix . $sheet . $suffix;
 
-            my ($e, $n) = _get_eastnorthings($numbers);
+        if (exists $maps{$sheet}) { 
+            my ($E, $N)  = @{$maps{$sheet}->{bbox}[0]};  # NB we need the bbox corner so that it is left and below all points on the map
 
-            $e = $ll_corner[0] + ($e-$ll_corner[0]) % MINOR_GRID_SQ_SIZE;
-            $n = $ll_corner[1] + ($n-$ll_corner[1]) % MINOR_GRID_SQ_SIZE;
+            if (defined $numbers) {
+                my ($e, $n) = _get_eastnorthings($numbers);
+                $E = $E + ($e-$E) % MINOR_GRID_SQ_SIZE;
+                $N = $N + ($n-$N) % MINOR_GRID_SQ_SIZE;
 
-            my $w = _winding_number($e, $n, $maps{$sheet}->{polygon});
-            if ($w == 0) {
-                croak sprintf "Grid reference %s = (%d, %d) is not on sheet %s", scalar format_grid($e,$n), $e, $n, $sheet;
+                my $w = _winding_number($E, $N, $maps{$sheet}->{polygon});
+                if ($w == 0) {
+                    croak sprintf "Grid reference %s = (%d, %d) is not on sheet %s", scalar format_grid($E,$N), $e, $n, $sheet;
+                }
             }
-            return wantarray ? ($e, $n) : "$e $n";
+            return wantarray ? ($E, $N) : "$E $N";
         }
     }
 
@@ -321,7 +326,7 @@ Geo::Coordinates::OSGB::Grid - Format and parse British National Grid references
 
 =head1 VERSION
 
-2.16
+2.17
 
 =head1 SYNOPSIS
 
@@ -544,17 +549,19 @@ wanted a Landranger map;
      parse_grid('176/224711')  ->  (522400, 171100) 
      parse_grid(164,513,62)    ->  (451300, 206200) 
 
-The routine will croak of you pass it a sheet identifier that is not
+C<parse_grid> will croak of you pass it a sheet identifier that is not
 defined in L<Geo::Coordinates::OSGB::Maps>.  It will also croak if the
 supplied easting and northing are not actually on the sheet.
 
-In earlier versions, the easting and northing arguments were optional,
-and you could leave them out to get just the SW corner of the sheet.
-This functionality has been removed in this version, because it's not
-always obvious where the SW corner of a sheet is (for an example look at
-the inset on Landranger sheet 107).
+If you just want the corner of a particular map, just pass the sheet name:
 
-If you need access to the position of the sheets in this version, you
+     parse_grid('A:82')        -> (195000, 530000)
+     parse_grid(161)           -> (309000, 205000)
+
+Again, it's assumed that you want a Landranger map.  The grid reference returned
+is the SW corner of the particular sheet.  This is usually obvious, but less so
+for some of the oddly shaped 1:25000 sheets, or Harvey's maps.  What you actually get
+is the first point defined in the maps polygon, as defined in Maps.  If in doubt you
 should work directly with the data in L<Geo::Coordinates::OSGB::Maps>.
 
 =back  
@@ -650,11 +657,14 @@ For more examples of parsing and formatting look at the test files.
 =head1 BUGS AND LIMITATIONS
 
 The useful area of these routines is confined to the British Isles, not
-including Ireland or the Channel Islands.  But very little range
-checking is done, so you can generate pseudo grid references for points
-that are some way outside this useful area.  The corners of this larger
-area run from 64.75N 32.33W (Iceland) to 65.8N 22.65E (Norway) to 44.5N
-11.8E (Venice) to 44N 19.5W (the Western Approaches). 
+including Ireland or the Channel Islands.  But very little range checking is
+done, so you can generate pseudo grid references for points that are some way
+outside this useful area.  For example we have St Peter Port in Guernsey at
+C<XD 611 506> and Rockall at C<MC 035 165>.  The working area runs from square
+C<AA> in the far north west to C<ZZ> in the far south east.  In WGS84 terms the
+corners run from 64.75N 32.33W (Iceland) to 65.8N 22.65E (Norway) to 44.5N
+11.8E (Venice) to 44N 19.5W (the Western Approaches).  This is something of a 
+geodesy toy rather than a useful function.
 
 =head1 DIAGNOSTICS
 
@@ -724,7 +734,7 @@ your input.
 
 =back
 
-If you get an expected result from any of these subroutines, please
+If you get an unexpected result from any of these subroutines, please
 generate a test case to reproduce your result and get in touch to ask me
 about it.
 

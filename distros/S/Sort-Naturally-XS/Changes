@@ -45,3 +45,6 @@ Revision history for Perl extension Sort::Naturally::XS.
 
 0.7.6 Fri Feb 17 23:01:00 2017
     - improve portability, fix NetBSD support
+
+0.7.7 Fri Jun 09 08:35:00 2017
+    - update according to META CPAN

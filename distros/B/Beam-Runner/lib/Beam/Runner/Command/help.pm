@@ -1,5 +1,5 @@
 package Beam::Runner::Command::help;
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 # ABSTRACT: Get help for the given service(s)
 
 #pod =head1 SYNOPSIS
@@ -47,6 +47,9 @@ sub run {
     my %service_conf = %{ $wire->normalize_config( $service_conf ) };
     %service_conf = $wire->merge_config( %service_conf );
     my $pod_path = pod_where( { -inc => 1 }, $service_conf{class} );
+    if ( !$pod_path ) {
+        die "Could not find documentation for class '$service_conf{class}'\n";
+    }
     pod2usage(
         -input => $pod_path,
         -verbose => 2,
@@ -66,7 +69,7 @@ Beam::Runner::Command::help - Get help for the given service(s)
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

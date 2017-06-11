@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 =head1 NAME
 
@@ -1050,6 +1050,27 @@ sub take {
     }, $src);
 }
 
+=head2 first
+
+Returns a source which provides the first item from the stream.
+
+=cut
+
+sub first {
+    my ($self) = @_;
+
+    my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
+    $self->completed->on_ready(sub {
+        return if $src->is_ready;
+        shift->on_ready($src->completed);
+    });
+
+    $self->each_while_source(sub {
+        $src->emit($_);
+        $src->finish
+    }, $src);
+}
+
 =head2 some
 
 =cut
@@ -1292,6 +1313,29 @@ sub filter {
             my $item = shift;
             $src->emit($item) if $code->($item);
         }
+    }, $src);
+}
+
+=head2 filter_isa
+
+Emits only the items which C<< ->isa >> one of the given parameters.
+
+=cut
+
+sub filter_isa {
+    use Scalar::Util qw(blessed);
+    use namespace::clean qw(blessed);
+    my ($self, @isa) = @_;
+
+    my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
+    $self->completed->on_ready(sub {
+        return if $src->is_ready;
+        shift->on_ready($src->completed);
+    });
+    $self->each_while_source(sub {
+        my ($item) = @_;
+        return unless blessed $item;
+        $src->emit($_) if grep $item->isa($_), @isa;
     }, $src);
 }
 

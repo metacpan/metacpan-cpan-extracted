@@ -9,6 +9,7 @@ use File::Spec::Functions qw(catfile rel2abs);
 use ExtUtils::Command;
 use LWP::Simple qw(getstore head);
 use File::Find;
+use File::Glob qw(bsd_glob);
 use File::Path qw();
 use File::ShareDir;
 use File::Temp qw(tempdir tempfile);
@@ -127,7 +128,7 @@ sub ACTION_code {
 
       ### XXX hack for handling github tarballs
       unless (-d "$build_src/cd" && -d "$build_src/im" && -d "$build_src/iup") {
-        for my $f (glob("$build_src/*")) {
+        for my $f (bsd_glob("$build_src/*")) {
           if ($f =~ m!^\Q$build_src\E/.*?(im|cd|iup).*$!) {
             print "renaming: $f $build_src/$1\n";
             rename ($f, "$build_src/$1");

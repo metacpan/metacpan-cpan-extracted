@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 
+use lib '.';
 use inc::Module::Install;
 
 name           'App-Wax';
@@ -17,12 +18,12 @@ requires 'File::BaseDir'              => '0.07';
 requires 'File::Slurp'                => '9999.19';
 requires 'HTTP::Message'              => '6.11';
 requires 'IPC::System::Simple'        => '1.25';
-requires 'LWP'                        => '6.15';
+requires 'LWP'                        => '6.26';
 requires 'Method::Signatures::Simple' => '1.07';
 requires 'MIME::Types'                => '2.13';
-requires 'Mouse'                      => 'v2.4.5';
+requires 'Mouse'                      => 'v2.4.9';
 requires 'Parallel::parallel_map'     => '0.02';
-requires 'Try::Tiny'                  => '0.27';
+requires 'Try::Tiny'                  => '0.28';
 requires 'URI'                        => '1.71';
 
 recommends 'Sereal' => '3.015';

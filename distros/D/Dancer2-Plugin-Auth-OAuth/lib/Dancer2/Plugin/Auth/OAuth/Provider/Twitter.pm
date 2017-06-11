@@ -8,9 +8,9 @@ use HTTP::Request::Common;
 sub config { {
     version => '1.001', # 1.0a
     urls    => {
-        access_token_url  => 'https://api.twitter.com/oauth/access_token',
-        authorize_url     => 'https://api.twitter.com/oauth/authenticate',
-        request_token_url => 'https://api.twitter.com/oauth/request_token',
+        access_token_url  => 'https://twitter.com/oauth/access_token',
+        authorize_url     => 'https://twitter.com/oauth/authorize',
+        request_token_url => 'https://twitter.com/oauth/request_token',
     }
 } }
 

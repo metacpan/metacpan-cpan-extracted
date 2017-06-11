@@ -14,6 +14,7 @@ lib/Role/REST/Client/Response.pm
 lib/Role/REST/Client/Serializer.pm
 t/boilerplate.t
 t/compile.t
+t/conditional_deserialization.t
 t/pod.t
 t/response.t
 t/rest.t

@@ -42,5 +42,5 @@ resources:
   bugtracker: https://github.com/plicease/App-af/issues
   homepage: https://metacpan.org/pod/App::af
   repository: git://github.com/plicease/App-af.git
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'YAML::Tiny version 1.70'

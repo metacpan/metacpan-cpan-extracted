@@ -1,0 +1,42 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Devel::CheckOS' => '0',
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::Kwalitee' => '1.21',
+                                      'Test::More' => '0.88',
+                                      'Test::Pod' => '1.41',
+                                      'blib' => '1.01',
+                                      'lib' => '0',
+                                      'perl' => '5.006'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Getopt::Std' => '0',
+                                      'HTML::Form' => '6.03',
+                                      'HTTP::Cookies' => '6.01',
+                                      'LWP::UserAgent' => '6.05',
+                                      'YAML::XS' => '0.62'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

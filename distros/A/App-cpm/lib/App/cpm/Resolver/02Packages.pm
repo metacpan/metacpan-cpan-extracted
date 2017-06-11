@@ -4,18 +4,27 @@ use warnings;
 use App::cpm::version;
 use Cwd ();
 use File::Path ();
-our $VERSION = '0.304';
+our $VERSION = '0.306';
 
 {
     package
         App::cpm::Resolver::02Packages::Impl;
     use parent 'CPAN::Common::Index::Mirror';
     use Class::Tiny qw(path);
-    use IO::Uncompress::Gunzip ();
     use File::Spec;
     use File::Basename ();
     use File::Copy ();
     use HTTP::Tinyish;
+
+    our $HAS_IO_UNCOMPRESS_GUNZIP = eval { require IO::Uncompress::Gunzip };
+
+    sub BUILD {
+        my $self = shift;
+        if ($self->path =~ /\.gz$/ and !$HAS_IO_UNCOMPRESS_GUNZIP) {
+            die "Can't load gz index file without IO::Uncompress::Gunzip";
+        }
+        return;
+    }
 
     sub cached_package { shift->{cached_package} }
 
@@ -40,6 +49,7 @@ our $VERSION = '0.304';
             ( my $uncompressed = File::Basename::basename($dest) ) =~ s/\.gz$//;
             $uncompressed = File::Spec->catfile( $self->cache, $uncompressed );
             if ( !-f $uncompressed or (stat $uncompressed)[9] < (stat $dest)[9] ) {
+                no warnings 'once';
                 IO::Uncompress::Gunzip::gunzip($dest, $uncompressed)
                     or die "Gunzip $dest: $IO::Uncompress::Gunzip::GunzipError";
             }

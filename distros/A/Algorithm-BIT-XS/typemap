@@ -1,1 +1,2 @@
 Algorithm::BIT::XS T_PTROBJ
+Algorithm::BIT2D::XS T_PTROBJ

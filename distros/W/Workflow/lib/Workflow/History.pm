@@ -1,13 +1,11 @@
 package Workflow::History;
 
-# $Id$
-
 use warnings;
 use strict;
 use base qw( Class::Accessor );
 use DateTime;
 
-$Workflow::History::VERSION = '1.42';
+$Workflow::History::VERSION = '1.43';
 
 my @FIELDS
     = qw( id workflow_id action description date user state time_zone );

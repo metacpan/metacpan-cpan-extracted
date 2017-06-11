@@ -33,7 +33,7 @@ SYNOPSIS
           }
           default {
             say 'SOME ERROR:'.$e;
-          }        
+          }
         }
       }
 
@@ -43,7 +43,7 @@ DESCRIPTION
                        |     Business::UPS::Tracking       |
                        '-----------------------------------'
                                        ^
-                                    HAS ONE 
+                                    HAS ONE
                                        |
                        .-----------------------------------.
                        |         B::U::T::Request          |

@@ -2,7 +2,7 @@ package App::cpm::Worker;
 use strict;
 use warnings;
 use utf8;
-our $VERSION = '0.304';
+our $VERSION = '0.306';
 
 use App::cpm::Worker::Installer;
 use App::cpm::Worker::Resolver;
@@ -17,7 +17,7 @@ sub new {
     %option = (
         %option,
         logger => $logger,
-        base => "$home/work",
+        base => "$home/work/" . time . ".$$",
         cache => "$home/cache",
     );
     my $installer = App::cpm::Worker::Installer->new(%option);

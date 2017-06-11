@@ -73,7 +73,7 @@ Google::Ads::AdWords::v201609::TargetingIdeaService::get
 Perl data type class for the XML Schema defined element
 get from the namespace https://adwords.google.com/api/adwords/o/v201609.
 
-Returns a page of ideas that match the query described by the specified {@link TargetingIdeaSelector}. <p>The selector must specify a {@code paging} value, with {@code numberResults} set to 800 or less. Large result sets must be composed through multiple calls to this method, advancing the paging {@code startIndex} value by {@code numberResults} with each call.</p> @param selector Query describing the types of results to return when finding matches (similar keyword ideas). @return A {@link TargetingIdeaPage} of results, that is a subset of the list of possible ideas meeting the criteria of the {@link TargetingIdeaSelector}. @throws ApiException If problems occurred while querying for ideas. 
+Returns a page of ideas that match the query described by the specified {@link TargetingIdeaSelector}. <p>The selector must specify a {@code paging} value, with {@code numberResults} set to 700 or less. Large result sets must be composed through multiple calls to this method, advancing the paging {@code startIndex} value by {@code numberResults} with each call.</p> @param selector Query describing the types of results to return when finding matches (similar keyword ideas). @return A {@link TargetingIdeaPage} of results, that is a subset of the list of possible ideas meeting the criteria of the {@link TargetingIdeaSelector}. @throws ApiException If problems occurred while querying for ideas. 
 
 
 

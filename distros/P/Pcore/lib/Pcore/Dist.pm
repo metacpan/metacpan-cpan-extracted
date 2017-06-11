@@ -11,7 +11,7 @@ has module => ( is => 'lazy', isa => InstanceOf ['Pcore::Util::Perl::Module'], p
 
 has cfg => ( is => 'lazy', isa => HashRef, clearer => 1, init_arg => undef );    # dist.perl
 has docker_cfg => ( is => 'lazy', isa => Maybe [HashRef], clearer => 1, init_arg => undef );    # docker.json
-has par_cfg => ( is => 'lazy', isa => Maybe [HashRef], init_arg => undef );                     # par.perl
+has par_cfg => ( is => 'lazy', isa => Maybe [HashRef], init_arg => undef );                     # par.ini
 has name     => ( is => 'lazy', isa => Str,  init_arg => undef );                               # Dist-Name
 has is_pcore => ( is => 'lazy', isa => Bool, init_arg => undef );
 has is_main  => ( is => 'ro',   isa => Bool, default  => 0, init_arg => undef );                # main process dist
@@ -200,8 +200,8 @@ sub _build_docker_cfg ($self) {
 }
 
 sub _build_par_cfg ($self) {
-    if ( -f $self->share_dir . 'par.perl' ) {
-        return P->cfg->load( $self->share_dir . 'par.perl' );
+    if ( -f $self->share_dir . 'par.ini' ) {
+        return P->cfg->load( $self->share_dir . 'par.ini' );
     }
 
     return;

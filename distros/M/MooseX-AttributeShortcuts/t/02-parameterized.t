@@ -29,7 +29,8 @@ use warnings;
 use Test::More;
 use Test::Moose;
 
-require 't/funcs.pm' unless eval { require funcs };
+use lib 't';
+require funcs;
 
 with_immutable { test_class('TestClass::WriterPrefix', '_') } 'TestClass::WriterPrefix';
 with_immutable { test_class('TestClass::BuilderPrefix', undef, '_silly_') } 'TestClass::BuilderPrefix';

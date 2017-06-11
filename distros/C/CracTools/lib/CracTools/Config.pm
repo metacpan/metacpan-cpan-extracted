@@ -1,9 +1,10 @@
 package CracTools::Config;
+
 {
   $CracTools::Config::DIST = 'CracTools';
 }
 # ABSTRACT: Manage and access CracTools configuration file
-$CracTools::Config::VERSION = '1.25';
+$CracTools::Config::VERSION = '1.251';
 use strict;
 use warnings;
 use POSIX;
@@ -94,7 +95,7 @@ CracTools::Config - Manage and access CracTools configuration file
 
 =head1 VERSION
 
-version 1.25
+version 1.251
 
 =head1 SYNOPSIS
 

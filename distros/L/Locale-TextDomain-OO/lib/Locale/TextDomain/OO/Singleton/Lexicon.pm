@@ -85,7 +85,7 @@ __END__
 
 Locale::TextDomain::OO::Singleton::Lexicon - Provides singleton lexicon access
 
-$Id: Lexicon.pm 617 2015-08-22 05:39:27Z steffenw $
+$Id: Lexicon.pm 647 2017-02-25 08:22:10Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/module/trunk/lib/Locale/TextDomain/OO/Singleton/Lexicon.pm $
 

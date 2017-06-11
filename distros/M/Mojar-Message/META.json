@@ -35,10 +35,10 @@
       "runtime" : {
          "requires" : {
             "MIME::Entity" : "5.5",
-            "Mojar" : "2",
+            "Mojar" : "2.05",
             "Mojar::Cron" : "0.2",
-            "Mojolicious" : "5",
-            "perl" : "5.010001"
+            "Mojolicious" : "7.15",
+            "perl" : "5.014001"
          }
       }
    },
@@ -55,6 +55,6 @@
          "url" : "http://github.com/niczero/mojar-message"
       }
    },
-   "version" : 1.061,
+   "version" : 1.102,
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

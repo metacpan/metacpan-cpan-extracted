@@ -1,4 +1,7 @@
-Revision history for HTTP-Tiny-Patch-LogAny
+0.04    2017-05-31 (PERLANCAR)
+
+	- [Bugfix] Render multiple-value headers properly.
+
 
 0.03    2015-08-17 (PERLANCAR)
 

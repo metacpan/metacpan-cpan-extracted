@@ -25,5 +25,5 @@ requires:
   Template: 2.14
   perl: 5.10.1
 resources:
-  repository: https://github.com/openresty/test-nginx
-version: '0.12'
+  repository: https://github.com/openresty/lemplate
+version: '0.14'

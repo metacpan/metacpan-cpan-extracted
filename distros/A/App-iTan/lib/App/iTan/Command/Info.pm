@@ -46,7 +46,7 @@ sub execute {
     print $tb->title;
     print $tb->rule( '-', '+' );
     print $tb->body;
-    
+
     return;
 }
 

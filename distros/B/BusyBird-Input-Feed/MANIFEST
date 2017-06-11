@@ -10,9 +10,11 @@ README
 t/00-load.t
 t/images.t
 t/invalid.t
+t/missing.t
 t/samples.t
 t/samples/googlejp.atom
 t/samples/img_paths.rss
+t/samples/missing_fields.atom
 t/samples/nick.rss
 t/samples/pukiwiki_rss09.rss
 t/samples/rtcpan.rdf

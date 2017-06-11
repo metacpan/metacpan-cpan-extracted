@@ -20,11 +20,10 @@ use Perl::Critic::Utils;
 
 use Test::More tests => 153;
 
-#-----------------------------------------------------------------------------
+our $VERSION = '1.128';
 
-our $VERSION = '1.126';
-
-#-----------------------------------------------------------------------------
+use Perl::Critic::TestUtils;
+Perl::Critic::TestUtils::assert_version( $VERSION );
 
 test_export();
 test_find_keywords();
@@ -548,12 +547,6 @@ sub test_is_unchecked_call {
 
     return;
 }
-
-#-----------------------------------------------------------------------------
-
-# ensure we return true if this test is loaded by
-# t/05_utils.t_without_optional_dependencies.t
-1;
 
 # Local Variables:
 #   mode: cperl

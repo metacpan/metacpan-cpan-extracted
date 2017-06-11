@@ -1,0 +1,43 @@
+WebService-BR-Vindi version 0.01
+================================
+
+WebService::BR::Vindi module is a straight brindge to vindi.com.br brazilian payment gateway.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+LWP::UserAgent
+JSON::XS
+MIME::Base64
+HTTP::Request::Common
+IO::Socket::SSL
+
+AUTHOR
+
+Diego de Lima
+
+SPACIAL THANKS
+
+This module was kindly made available by the https://modeloinicial.com.br/ team.
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2017 by root
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

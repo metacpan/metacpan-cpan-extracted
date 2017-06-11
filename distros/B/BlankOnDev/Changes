@@ -1,0 +1,32 @@
+Revision history for Perl extension BlankOnDev.
+
+0.1000  Wed May 31 01:43:34 2017
+	- original version
+0.1001  Thu Jun 01 11:45:06 2017
+    - fix BlankOnDev/config.pm
+    - add file script/boidev
+0.1002  Sat Jun 03 17:17:44 2017
+    - fix file BlankOnDev/config.pm
+    - add and fix file lib/BlankOnDev/DataDev.pm
+    - add and fix file lib/BlankOnDev/HTTP/request.pm
+    - add and fix file lib/BlankOnDev/config/save.pm
+    - fix file script/boidev
+0.1003  Sat Jun 07 19:56:35 2017
+    - fix Version
+    - revision and fix file lib/BlankOnDev.pm
+    - revision and fix file BlankOnDev/config.pm
+    - revision and fix file lib/BlankOnDev/Migration/bazaar2GitHub.pm
+    - revision PDO lib/BlankOnDev/Migration/bazaar2GitHub.pod
+    - revision PDO lib/BlankOnDev.pdo
+    - add file lib/BlankOnDev/Migration/bazaar2GitHub/tmp_cfg.pm
+    - add and fix file lib/BlankOnDev/Migration/bazaar2GitHub/bazaar.pm
+    - add and fix file lib/BlankOnDev/Migration/bazaar2GitHub/github.pm
+    - add and fix file lib/BlankOnDev/DateTime.pm
+    - add and fix file lib/BlankOnDev/DateTime/lang.pm
+    - add POD file lib/BlankOnDev/Migration/bazaar2GitHub/bazaar.pod
+    - add PDO file lib/BlankOnDev/Migration/bazaar2GitHub/github.pod
+    - add POD file lib/BlankOnDev/Tutorial/en.pod
+    - add POD file lib/BlankOnDev/Tutorial/id.pod
+    - add POD file lib/BlankOnDev/DateTime.pod
+    - add POD file lib/BlankOnDev/DateTime/lang.pod
+    - enable script/boidev

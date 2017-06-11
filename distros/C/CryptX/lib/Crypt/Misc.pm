@@ -2,11 +2,16 @@ package Crypt::Misc;
 
 use strict;
 use warnings;
-our $VERSION = '0.047';
+our $VERSION = '0.048';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 5.57 'import';
 use Carp 'croak';
-our %EXPORT_TAGS = ( all => [qw(encode_b64 decode_b64 encode_b64u decode_b64u pem_to_der der_to_pem read_rawfile write_rawfile slow_eq is_v4uuid random_v4uuid)] );
+our %EXPORT_TAGS = ( all => [qw(encode_b64 decode_b64 encode_b64u decode_b64u 
+                                pem_to_der der_to_pem 
+                                read_rawfile write_rawfile 
+                                slow_eq is_v4uuid random_v4uuid
+                                increment_octets_be increment_octets_le
+                               )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
@@ -34,6 +39,16 @@ sub encode_b64u {
 
 sub decode_b64u {
   CryptX::_decode_base64url(@_);
+}
+
+sub increment_octets_be {
+  CryptX::_increment_octets_be(@_);
+  #$_[0] = CryptX::_increment_octets_be($_[0]);
+}
+
+sub increment_octets_le {
+  CryptX::_increment_octets_le(@_);
+  #$_[0] = CryptX::_increment_octets_le($_[0]);
 }
 
 sub pem_to_der {
@@ -320,6 +335,22 @@ I<Since: CryptX-0.031>
   }
 
 Checks the given C<$uuid> string whether it matches V4 UUID format and returns C<0> (mismatch) or C<1> (match).
+
+=head2 increment_octets_le
+
+I<Since: CryptX-0.048>
+
+ $octects = increment_octets_le($octets);
+
+Take input C<$octets> as a little-endian big number and return an increment.
+
+=head2 increment_octets_be
+
+I<Since: CryptX-0.048>
+
+ $octects = increment_octets_be($octets);
+
+Take input C<$octets> as a big-endian big number and return an increment.
 
 =head1 SEE ALSO
 

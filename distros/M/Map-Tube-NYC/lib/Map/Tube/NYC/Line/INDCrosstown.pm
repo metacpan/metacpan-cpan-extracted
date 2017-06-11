@@ -1,6 +1,6 @@
 package Map::Tube::NYC::Line::INDCrosstown;
 
-$Map::Tube::NYC::Line::INDCrosstown::VERSION   = '0.39';
+$Map::Tube::NYC::Line::INDCrosstown::VERSION   = '0.40';
 $Map::Tube::NYC::Line::INDCrosstown::AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;

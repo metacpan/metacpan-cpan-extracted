@@ -1,7 +1,11 @@
 Revision history for Perl module Geo::Address::Formatter.
 
+1.61   2017-06-01
+       - speed up to some internals, better matching for state codes
+       - newest address-formatting templates
+
 1.60   2017-04-06
-       - 'abbreviate' is now based on langauage
+       - 'abbreviate' is now based on language
          - requires country2lang conf in newest address-formatting templates
        - newest address-formatting templates
 

@@ -7,7 +7,6 @@ t/00-load.t
 t/01-invalid.t
 t/02-constructs.t
 t/03-hooks.t
-t/04-extra.t
 t/05-functions.t
 t/changes.t
 t/completness.t

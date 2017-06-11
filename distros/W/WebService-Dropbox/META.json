@@ -43,30 +43,30 @@
       },
       "runtime" : {
          "recommends" : {
-            "Furl" : "2.19",
-            "IO::Socket::SSL" : "1.954",
-            "JSON::XS" : "3.02",
+            "Furl" : "3.11",
+            "IO::Socket::SSL" : "2.048",
+            "JSON::XS" : "3.03",
             "Software::License" : "0"
          },
          "requires" : {
-            "HTTP::Message" : "6.06",
-            "JSON" : "2.59",
-            "LWP::Protocol::https" : "6.04",
-            "LWP::UserAgent" : "6.05",
-            "URI" : "1.60",
+            "HTTP::Message" : "6.11",
+            "JSON" : "2.94",
+            "LWP::Protocol::https" : "6.07",
+            "LWP::UserAgent" : "6.26",
+            "URI" : "1.71",
             "perl" : "5.008001"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.98"
+            "Test::More" : "1.302085"
          }
       }
    },
    "provides" : {
       "WebService::Dropbox" : {
          "file" : "lib/WebService/Dropbox.pm",
-         "version" : "2.05"
+         "version" : "2.07"
       },
       "WebService::Dropbox::Auth" : {
          "file" : "lib/WebService/Dropbox/Auth.pm"
@@ -101,12 +101,13 @@
          "web" : "https://github.com/s-aska/p5-WebService-Dropbox"
       }
    },
-   "version" : "2.05",
+   "version" : "2.07",
    "x_authority" : "cpan:ASKADNA",
    "x_contributors" : [
       "Fuji, Goro <g.psy.va@gmail.com>",
       "Rostislav Georgiev <pisaro@mail.bg>",
       "aska <aska@linecorp.com>",
+      "Dondi Michael Stroma <dstroma@gmail.com>",
       "Shinichiro Aska <s.aska.org@gmail.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.27300"

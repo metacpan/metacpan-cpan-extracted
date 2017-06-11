@@ -15,7 +15,7 @@ use List::Compare;
 use List::MoreUtils qw(none uniq firstval);
 use Scalar::Util qw(weaken);
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
 my %translation = (
 	2  => 'Polizeiliche Ermittlung',
@@ -99,13 +99,54 @@ my %translation = (
 );
 
 Travel::Status::DE::IRIS::Result->mk_ro_accessors(
-	qw(arrival date datetime delay departure is_cancelled is_transfer
-	  is_unscheduled is_wing line_no old_train_id old_train_no platform raw_id
+	qw(arrival arrival_is_additional arrival_is_cancelled
+	  date datetime delay
+	  departure departure_is_additional departure_is_cancelled
+	  is_transfer is_unscheduled is_wing
+	  line_no old_train_id old_train_no platform raw_id
 	  realtime_xml route_start route_end
 	  sched_arrival sched_departure sched_platform sched_route_start
 	  sched_route_end start stop_no time train_id train_no transfer type
 	  unknown_t unknown_o wing_id)
 );
+
+sub is_additional {
+	my ($self) = @_;
+
+	if ( $self->{arrival_is_additional} and $self->{departure_is_additional} ) {
+		return 1;
+	}
+	if ( $self->{arrival_is_additional}
+		and not defined $self->{departure_is_additional} )
+	{
+		return 1;
+	}
+	if ( not defined $self->{arrival_is_additional}
+		and $self->{departure_is_additional} )
+	{
+		return 1;
+	}
+	return 0;
+}
+
+sub is_cancelled {
+	my ($self) = @_;
+
+	if ( $self->{arrival_is_cancelled} and $self->{departure_is_cancelled} ) {
+		return 1;
+	}
+	if ( $self->{arrival_is_cancelled}
+		and not defined $self->{departure_is_cancelled} )
+	{
+		return 1;
+	}
+	if ( not defined $self->{arrival_is_cancelled}
+		and $self->{departure_is_cancelled} )
+	{
+		return 1;
+	}
+	return 0;
+}
 
 sub new {
 	my ( $obj, %opt ) = @_;
@@ -153,8 +194,9 @@ sub new {
 
 	my $dt = $ref->{datetime} = $dp // $ar;
 
-	$ref->{date} = $dt->strftime('%d.%m.%Y');
-	$ref->{time} = $dt->strftime('%H:%M');
+	$ref->{date}  = $dt->strftime('%d.%m.%Y');
+	$ref->{time}  = $dt->strftime('%H:%M');
+	$ref->{epoch} = $dt->epoch;
 
 	$ref->{route_pre} = $ref->{sched_route_pre}
 	  = [ split( qr{[|]}, $ref->{route_pre} // q{} ) ];
@@ -175,8 +217,6 @@ sub new {
 	  = $ref->{route_start}
 	  || $ref->{route_pre}[0]
 	  || $ref->{station};
-
-	$ref->{is_cancelled} = 0;
 
 	return bless( $ref, $obj );
 }
@@ -235,10 +275,14 @@ sub set_ar {
 	}
 
 	if ( $attrib{status} and $attrib{status} eq 'c' ) {
-		$self->{is_cancelled} = 1;
+		$self->{arrival_is_cancelled} = 1;
+	}
+	elsif ( $attrib{status} and $attrib{status} eq 'a' ) {
+		$self->{arrival_is_additional} = 1;
 	}
 	else {
-		$self->{is_cancelled} = 0;
+		$self->{arrival_is_additional} = 0;
+		$self->{arrival_is_cancelled}  = 0;
 	}
 
 	return $self;
@@ -289,10 +333,14 @@ sub set_dp {
 	}
 
 	if ( $attrib{status} and $attrib{status} eq 'c' ) {
-		$self->{is_cancelled} = 1;
+		$self->{departure_is_cancelled} = 1;
+	}
+	elsif ( $attrib{status} and $attrib{status} eq 'a' ) {
+		$self->{departure_is_additional} = 1;
 	}
 	else {
-		$self->{is_cancelled} = 0;
+		$self->{departure_is_additional} = 0;
+		$self->{departure_is_cancelled}  = 0;
 	}
 
 	return $self;
@@ -432,6 +480,7 @@ sub merge_with_departure {
 	# departure is preferred over arrival, so overwrite default values
 	$self->{date}     = $result->{date};
 	$self->{time}     = $result->{time};
+	$self->{epoch}    = $result->{epoch};
 	$self->{datetime} = $result->{datetime};
 	$self->{train_id} = $result->{train_id};
 	$self->{train_no} = $result->{train_no};
@@ -745,7 +794,7 @@ arrival/departure received by Travel::Status::DE::IRIS
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 DESCRIPTION
 
@@ -769,6 +818,15 @@ set of actual stops (B<route_post>) minus the set of scheduled stops
 
 DateTime(3pm) object for the arrival date and time. undef if the
 train starts here. Contains realtime data if available.
+
+=item $result->arrival_is_additional
+
+True if the arrival at this stop is an additional (unscheduled) event, i.e.,
+if the train started its journey earlier than planned.
+
+=item $result->arrival_is_cancelled
+
+True if the arrival at this stop has been cancelled.
 
 =item $result->arrival_wings
 
@@ -823,6 +881,16 @@ most recent record will be returned.
 DateTime(3pm) object for the departure date and time. undef if the train ends
 here. Contains realtime data if available.
 
+=item $result->departure_is_additional
+
+True if the train's departure at this stop is unscheduled (additional), i.e.,
+the route has been extended past its scheduled terminal stop.
+
+=item $result->departure_is_cancelled
+
+True if the train's departure at this stop has been cancelled, i.e., the train
+terminates here and does not continue its scheduled journey.
+
 =item $result->departure_wings
 
 Returns a list of references to Travel::Status::DE::IRIS::Result(3pm) objects
@@ -838,6 +906,11 @@ Alias for route_end.
 List of information strings. Contains both reasons for delays (which may or
 may not be up-to-date) and generic information such as missing carriages or
 broken toilets.
+
+=item $result->is_additional
+
+True if the train's arrival and departure at the stop are unscheduled
+additional stops, false otherwise.
 
 =item $result->is_cancelled
 

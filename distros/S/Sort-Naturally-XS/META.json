@@ -4,7 +4,7 @@
       "Sergey Yurzin <jurzin.s@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -19,22 +19,18 @@
          "inc"
       ]
    },
-   "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "jurzin.s@gmail.com",
+         "web" : "https://github.com/CaballerosTeam/Sort-Naturally-XS/issues"
       },
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
-      "runtime" : {
-         "requires" : {}
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/CaballerosTeam/Sort-Naturally-XS.git",
+         "web" : "https://github.com/CaballerosTeam/Sort-Naturally-XS"
       }
    },
-   "release_status" : "stable",
-   "version" : "v0.7.6",
+   "version" : "v0.7.7",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

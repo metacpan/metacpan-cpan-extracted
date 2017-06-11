@@ -1,25 +1,34 @@
 {
+   "meta-spec" : {
+      "version" : 2,
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
+   },
    "name" : "Text-CSV_XS",
-   "version" : "1.29",
-   "abstract" : "Comma-Separated Values manipulation routines",
-   "author" : [
-      "H.Merijn Brand <h.m.brand@xs4all.nl>"
-   ],
    "license" : [
       "perl_5"
    ],
-   "release_status" : "stable",
-   "dynamic_config" : 1,
    "generated_by" : "Author",
+   "author" : [
+      "H.Merijn Brand <h.m.brand@xs4all.nl>"
+   ],
+   "version" : "1.30",
+   "dynamic_config" : 1,
+   "release_status" : "stable",
    "prereqs" : {
+      "test" : {
+         "requires" : {
+            "Tie::Scalar" : "0",
+            "Test::More" : "0"
+         }
+      },
       "runtime" : {
-         "recommends" : {
-            "Encode" : "2.89"
-         },
          "requires" : {
             "DynaLoader" : "0",
             "IO::Handle" : "0",
             "perl" : "5.006001"
+         },
+         "recommends" : {
+            "Encode" : "2.89"
          }
       },
       "build" : {
@@ -31,34 +40,25 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
-      },
-      "test" : {
-         "requires" : {
-            "Tie::Scalar" : "0",
-            "Test::More" : "0"
-         }
       }
-   },
-   "provides" : {
-      "Text::CSV_XS" : {
-         "file" : "CSV_XS.pm",
-         "version" : "1.29"
-      }
-   },
-   "meta-spec" : {
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
    },
    "resources" : {
+      "homepage" : "https://metacpan.org/pod/Text::CSV_XS",
+      "repository" : {
+         "web" : "https://github.com/Tux/Text-CSV_XS",
+         "type" : "git",
+         "url" : "https://github.com/Tux/Text-CSV_XS"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
-      "homepage" : "https://metacpan.org/pod/Text::CSV_XS",
-      "repository" : {
-         "url" : "https://github.com/Tux/Text-CSV_XS",
-         "type" : "git",
-         "web" : "https://github.com/Tux/Text-CSV_XS"
-      },
       "x_IRC" : "irc://irc.perl.org/#csv"
+   },
+   "abstract" : "Comma-Separated Values manipulation routines",
+   "provides" : {
+      "Text::CSV_XS" : {
+         "file" : "CSV_XS.pm",
+         "version" : "1.30"
+      }
    }
 }

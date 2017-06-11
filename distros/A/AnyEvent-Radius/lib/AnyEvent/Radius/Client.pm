@@ -194,6 +194,20 @@ sub init {
     $self->auth_cache({});
 }
 
+# close open socket, object is unusable after it was called
+sub destroy {
+    my $self = shift;
+    $self->handler()->destroy();
+    $self->handler(undef);
+}
+
+sub DESTROY {
+    my $self = shift;
+    return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
+    return if (! $self->handler());
+    $self->handler()->destroy();
+}
+
 # group wait
 # cv is AnyEvent condition var passed outside
 #
@@ -282,7 +296,7 @@ AnyEvent::Radius::Client - module to implement AnyEvent based RADIUS client
     use AnyEvent::Radius::Client;
 
     my $dict = AnyEvent::Radius::Client->load_dictionary('path-to-radius-dictionary');
-    
+
     sub read_reply_callback {
         # $h is HASH-REF {type, request_id, av_list, from, authenticator}
         my ($self, $h) = @_;
@@ -300,7 +314,8 @@ AnyEvent::Radius::Client - module to implement AnyEvent based RADIUS client
     $client->send_auth(AV_LIST2);
     ...
     $client->wait;
-
+    ...
+    $client->destroy;
 
 =head1 DESCRIPTION
 
@@ -390,6 +405,10 @@ Example:
 
 Will be blocked until all clients finish their queue.
 
+=item destroy()
+
+Destroy the internal socket handle. Must be called when object is no longer required.
+When called from callback, it is recommended to wrap this call into AnyEvent::postpone { ... } block.
 
 =back
 

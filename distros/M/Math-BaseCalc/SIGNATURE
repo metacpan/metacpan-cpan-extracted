@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.68.
+signed via the Module::Signature module, version 0.73.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,27 +14,27 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 554c51105bdab281db5a40496daac4300a50b08f Build.PL
-SHA1 3278f3eee16867bbee3002fb8da56fe273e3510e Changes
-SHA1 8cb63de1ae4c54a120beb97cacc1fe2efe4d266b LICENSE
-SHA1 dd550724f7e6ef36eb727d552f88620c62e422b8 MANIFEST
-SHA1 c03d218325abd5bd9194643903e4d8b304ba8f7e META.yml
-SHA1 af48d2e28fb392868ea4cd8f50c1de981547c214 Makefile.PL
-SHA1 82d72d7c39ac146f7cfb0a4f83c4c30c00230e6c README
-SHA1 d8c12a9c67c535688b66bade5780582456397c5b dist.ini
-SHA1 9d5dcc617a35a2f6d3aa3913322f84af7a9df45a lib/Math/BaseCalc.pm
+SHA1 76735ffd2797316bdf0bd1c9f203a506bf25e1e7 Build.PL
+SHA1 8bda63d28b8b2f625962657611b2a0aae6ac78c2 Changes
+SHA1 87d1d7d8be19f13b0ee779177fa03fcca3e2b628 LICENSE
+SHA1 9fbd92ccf8e8ea39bec02b95a58616d4c5458912 MANIFEST
+SHA1 1b34f5c78e498e911b8727a8f46f30071b1c0315 META.yml
+SHA1 907a5985cad91dabbe6548f2950b049df274daf8 Makefile.PL
+SHA1 a0c58e90668262815dda0876269f416dda015f06 README
+SHA1 12e59f63ee3b5ef1cbdf8c7612f9d6d5896c6157 dist.ini
+SHA1 c7b46aa12d3a46c7f0bb39c9b5074b4654218209 lib/Math/BaseCalc.pm
 SHA1 a52b1831709cb6285f42ae5c644129080d5adec2 t/01_basic_tests.t
 SHA1 d555c130952881de5faacbe7f0def8a5bdb36354 t/02_digit_dash.t
 SHA1 c1d920f2be7b2de4b422b11c4c93dfbb99fe381e t/03_large_int.t
 SHA1 77fb597fc70384d0688b72003457a567b0bd84b9 t/04-bigint.t
 SHA1 3f74c39bb9c8b903b962282f1fccc06daa89d877 t/05-trans.t
+SHA1 7f5b34ec98977e2eae7ab0cd530a16f726fc33a2 t/06_digit_dot.t
 SHA1 19e797985fada8c25f13ce5f0fb873999c3cbe44 t/99_podcoverage.t
 SHA1 fa45d6e6ab1cd421349dea4ef527bfd5cdc8a09e t/author-critic.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG/MacGPG2 v2.0.17 (Darwin)
 Comment: GPGTools - http://gpgtools.org
 
-iEYEARECAAYFAlGyn0sACgkQgrvMBLfvlHZsaQCdGg2N+S1Jbzrg5hcff7UsVjft
-rh4AoJ0gHByXX5fWgaU5OrmjvOQRa1tB
-=BSbj
+iF0EARECAB0WIQSty9sFtA6yoqVVVGKCu8wEt++UdgUCWTjgQAAKCRCCu8wEt++U
+dvQ7AJ9RNWjwwDc3W6AcEjd4czwCvYKKeQCcCCYaV9O4XnQR/RCYmebPHBbU4O4=
+=4ZyA
 -----END PGP SIGNATURE-----

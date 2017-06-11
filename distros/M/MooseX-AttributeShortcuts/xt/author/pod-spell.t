@@ -13,6 +13,7 @@ __DATA__
 ABEND
 AFAICT
 Alders
+Attribute
 AttributeShortcuts
 Chris
 David
@@ -20,6 +21,7 @@ Etheridge
 Formattable
 Graham
 Gratipay
+HasAnonBuilder
 Karen
 Knop
 MooseX
@@ -27,7 +29,9 @@ Olaf
 PayPal
 RSRCHBOY
 RSRCHBOY's
+Role
 Steinbrunner
+Trait
 Weyl
 codebase
 coderef

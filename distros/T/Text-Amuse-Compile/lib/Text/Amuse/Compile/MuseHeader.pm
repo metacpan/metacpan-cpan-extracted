@@ -229,6 +229,13 @@ sub _build_notoc {
     return !!$self->header->{notoc};
 }
 
+has nofinalpage => (is => 'lazy', isa => Bool);
+
+sub _build_nofinalpage {
+    my $self = shift;
+    return !!$self->header->{nofinalpage};
+}
+
 
 
 has topics => (is => 'lazy', isa => ArrayRef);

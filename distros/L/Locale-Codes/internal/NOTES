@@ -80,17 +80,22 @@ To create a patch for perl:
    git branch sbeck
    git checkout sbeck
 
-Update Porting/Maintainers.pl
-
-Copy in the modified files.
-
-   # Watch for problem in lib/Local/Script.pod
+   # Determine old/new versions
 
    cd cpan/Locale-Codes
    lcdir=`find ~/perl-modules -type d -name Locale-Codes\*`
 
    new=`echo $lcdir | sed -e 's,^.*-,,'`
    old=`grep 'VERSION=' lib/Locale/Codes.pm | sed -e "s,';,," -e "s,^.*',,"`
+
+   # Update Porting/Maintainers.pl
+
+   f=../../Porting/Maintainers.pl
+   sed -e "s,Locale-Codes-$old,Locale-Codes-$new," $f > $f.new
+   cat $f.new > $f
+   rm -f $f.new
+
+   # Remove old files
 
    for i in `find . -type f` ;do
       if [ ! -e $lcdir/$i ]; then
@@ -100,6 +105,8 @@ Copy in the modified files.
          cp -p $lcdir/$i $i
       fi
    done
+
+   # Copy in new files
 
    for file in `cd $lcdir; find . -type f` ;do
       tmp=`echo $file | sed -e 's,\(examples\|internal\|.git\)/,,'`

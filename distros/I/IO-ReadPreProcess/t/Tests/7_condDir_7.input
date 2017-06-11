@@ -3,6 +3,12 @@
 .# UnixOnly: 1
 .# OutOnError: 1
 .#
+.# Can't use this test (even on *nix) since different versions of cal show
+.# Sunday or Monday as the first day of week. Some, but not all, have a
+.# flag to control this.
+.# This also generates different output depending on $LANG - so just disable.
+.# Enable: 0
+.#
 .# This needs to be tested several ways due to implementation subtleties:
 .# In line and in a sub
 .# .if vs .unless vs .elseif

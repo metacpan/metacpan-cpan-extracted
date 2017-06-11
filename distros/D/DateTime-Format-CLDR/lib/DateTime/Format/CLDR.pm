@@ -18,7 +18,7 @@ our @EXPORT_OK = qw( cldr_format cldr_parse );
 
 # CPAN data
 our $AUTHORITY = 'cpan:MAROS';
-our $VERSION = '1.18';
+our $VERSION = '1.19';
 
 # Default format if none is set
 our $DEFAULT_FORMAT = 'date_format_medium';
@@ -42,7 +42,7 @@ our %PARTS = (
     week_month  => qr/(\d)/o,
     #timezone    => qr/[+-](1[0-4]|0?\d)(00|15|30|45)/o,
     number      => qr/(\d+)/o,
-    timezone2   => qr/([A-Z1-9a-z]+)([+-](?:1[0-4]|0\d)(?:00|15|30|45))/o,
+    timezone2   => qr/([+-]?[A-Z0-9a-z]+)([+-](?:1[0-4]|0\d)(?:00|15|30|45))/o,
 );
 
 # Table for mapping abbreviated timezone names to offsets
@@ -128,7 +128,7 @@ our %ZONEMAP = (
    'SWT' => '+0100',          'T' => '-0700',        'TFT' => '+0500',
    'THA' => '+0700',       'THAT' => '-1000',        'TJT' => '+0500',
    'TKT' => '-1000',        'TMT' => '+0500',        'TOT' => '+1300',
-  'TRUT' => '+1000',        'TST' => '+0300',       'TUC ' => '+0000',
+  'TRUT' => '+1000',        'TST' => '+0300',        'TUC' => '+0000',
    'TVT' => '+1200',          'U' => '-0800',      'ULAST' => '+0900',
   'ULAT' => '+0800',       'USZ1' => '+0200',      'USZ1S' => '+0300',
   'USZ3' => '+0400',      'USZ3S' => '+0500',       'USZ4' => '+0500',
@@ -210,7 +210,8 @@ our %PARSER = (
     S1      => $PARTS{number}, #!
     Z1      => [ grep { $_ ne 'Ambiguous' } values %ZONEMAP ],
     Z4      => $PARTS{timezone2},
-    z1      => [ keys %ZONEMAP ],
+    Z5      => qr/([+-]\d\d:\d\d)/o,
+    z1      => [ qr/[+-][0-9]{2,4}/, keys %ZONEMAP ],
     z4      => [ DateTime::TimeZone->all_names ],
 );
 $PARSER{v1} = $PARSER{V1} = $PARSER{z1};
@@ -654,17 +655,21 @@ sub parse_datetime { ## no perlcritic(RequireArgUnpacking)
             } elsif ($command eq 'S' ) {
                 $datetime{nanosecond} = int("0.$capture" * 1000000000);
             } elsif ($command eq 'Z') {
-                if ($index >= 4) {
+                if ($index == 4) {
                     $capture = $2;
                 }
                 $datetime{time_zone} = DateTime::TimeZone->new( name => $capture );
             } elsif (($command eq 'z' || $command eq 'v' || $command eq 'V') && $index == 1) {
-                if (! defined $ZONEMAP{$capture}
+                if ($capture =~ m/^[+-]\d\d(\d\d)?/) {
+                    $capture .= '00'
+                        if ! defined $1;
+                    $datetime{time_zone} = DateTime::TimeZone->new(name => $capture);
+                } elsif (! defined $ZONEMAP{$capture}
                     || $ZONEMAP{$capture} eq 'Ambiguous') {
                     $self->_local_carp("Ambiguous timezone: $capture $command");
-                    next;
+                } else {
+                    $datetime{time_zone} = DateTime::TimeZone->new(name => $ZONEMAP{$capture});
                 }
-                $datetime{time_zone} = DateTime::TimeZone->new(name => $ZONEMAP{$capture});
             } elsif ($command eq 'z' || $command eq 'v' || $command eq 'V') {
                 $datetime{time_zone} = DateTime::TimeZone->new(name => $capture);
             } else {
@@ -924,6 +929,9 @@ sub _build_pattern {
         }
     }
 
+    #use Data::Dumper;
+    #print STDERR Data::Dumper::Dumper($self->{_built_pattern})."\n";
+
     return $self->{_built_pattern};
 }
 
@@ -946,6 +954,8 @@ sub _quoteslist {
 
 sub _quotestring {
     my ($quote) = @_;
+    return $quote
+        if ref($quote) eq 'Regexp';
 
     $quote =~ s/([^[:alnum:][:space:]])/\\$1/g;
     $quote =~ s/\s+/\\s+/g;

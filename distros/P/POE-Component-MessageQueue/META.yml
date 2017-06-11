@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -35,6 +35,7 @@ requires:
   IO::String: '0'
   Moose: '2.0201'
   MooseX::MultiInitArg: '0'
+  Net::EmptyPort: '0'
   Net::Stomp: '0'
   POE: '0.38'
   POE::Component::Generic: '0.1001'
@@ -49,4 +50,5 @@ requires:
 resources:
   bugtracker: http://github.com/ironcamel/POE-Component-MessageQueue/issues
   repository: git://github.com/ironcamel/POE-Component-MessageQueue.git
-version: '0.3003'
+version: '0.3004'
+x_serialization_backend: 'YAML::Tiny version 1.70'

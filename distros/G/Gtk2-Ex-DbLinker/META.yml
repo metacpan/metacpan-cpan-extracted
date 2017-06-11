@@ -18,16 +18,20 @@ no_index:
     - t
     - inc
 requires:
+  Carp: '1.17'
   Class::InsideOut: '1.13'
   DBD::SQLite: '1.46'
   Data::Dumper: '2.154'
   DateTime::Format::Strptime: '1.5'
   Gtk2: '1.24'
-  Gtk2::Ex::DbLinker::DbTools: '0.11'
+  Gtk2::Ex::DbLinker::DbTools: '0.112'
+  Log::Any: '1.049'
+  Log::Any::Adapter: '1.049'
+  Log::Any::Adapter::Log4perl: '0.08'
   Log::Log4perl: '1.41'
   Scalar::Util: '1.45'
   Test::More: '1'
 resources:
   repository: https://sourceforge.net/projects/gtk2-ex-dblinker/
-version: '0.111'
+version: '0.112'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

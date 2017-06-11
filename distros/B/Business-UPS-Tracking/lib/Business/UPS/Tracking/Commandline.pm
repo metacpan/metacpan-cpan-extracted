@@ -18,7 +18,7 @@ Business::UPS::Tracking::Commandline - Commandline interface to UPS tracking
 
   my $commandline = Business::UPS::Tracking::Commandline->new_with_options;
   # Params are taken from @ARGV
-  $commandline->execute; 
+  $commandline->execute;
 
 =head1 DESCRIPTION
 
@@ -95,11 +95,11 @@ __PACKAGE__->meta->make_immutable;
 
 sub execute {
     my $self = shift;
-    
+
     my $response = $self->run();
-    
+
     my $count = 1;
-    
+
     foreach my $shipment (@{$response->shipment}) {
         say ".============================================================================.";
         say "| Shipment $count                                                                 |";
@@ -110,13 +110,13 @@ sub execute {
         }
         $count ++;
     }
-    
+
     return;
 }
 
 sub _build_tracking {
     my ($self) = @_;
-    
+
     my %params = ();
     foreach my $field (qw(AccessLicenseNumber UserId Password)) {
         my $predicate = '_has_'.$field;
@@ -124,7 +124,7 @@ sub _build_tracking {
             $params{$field} = $self->$field;
         }
     }
-    
+
     return Business::UPS::Tracking->new(\%params);
 }
 

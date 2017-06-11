@@ -1,0 +1,6 @@
+name = "Hash-Unique"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+
+[Metadata]
+x_static_install = 1

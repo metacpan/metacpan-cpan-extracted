@@ -1,5 +1,5 @@
 {
-   "abstract" : "Perl wrapper for XGBoost library https://github.com/dmlc/xgboost",
+   "abstract" : "Perl wrapper for XGBoost library L<https://github.com/dmlc/xgboost>",
    "author" : [
       "Pablo Rodr\u00edguez Gonz\u00e1lez <pablo.rodriguez.gonzalez@gmail.com>"
    ],
@@ -36,9 +36,12 @@
       },
       "runtime" : {
          "requires" : {
+            "Exception::Class" : "0",
+            "Exporter::Easy" : "0",
+            "FFI::Platypus" : "0",
             "NativeCall" : "0",
             "parent" : "0",
-            "perl" : "5.008",
+            "perl" : "5.010",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -63,7 +66,7 @@
          "web" : "https://github.com/pablrod/p5-AI-XGBoost"
       }
    },
-   "version" : "0.001",
+   "version" : "0.004",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
 }
 

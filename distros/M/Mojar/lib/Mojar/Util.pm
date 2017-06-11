@@ -1,7 +1,7 @@
 package Mojar::Util;
 use Mojo::Base -strict;
 
-our $VERSION = 0.361;
+our $VERSION = 0.371;
 
 use B;
 use Carp 'croak';
@@ -46,7 +46,11 @@ sub lc_keys {
   return $hr;
 }
 
-sub slurp_chomped { my $t = Mojo::File->new(shift)->slurp; ()while chomp $t; $t}
+sub slurp_chomped {
+  my $t = Mojo::File->new(@_)->slurp;
+  () while chomp $t;
+  $t
+}
 
 sub snakecase {
   my ($string, $syllable_sep) = @_;

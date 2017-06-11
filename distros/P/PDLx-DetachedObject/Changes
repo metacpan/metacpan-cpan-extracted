@@ -1,5 +1,13 @@
 Revision history for PDLx-DetachedObject
 
+0.02      2017-05-30 23:02:13-04:00 America/New_York
+
+  [BUILD]
+
+    * switch to Dist::Zilla
+    * compatible with no '.' in @INC for Perl 5.26
+    * more distribution tests
+
 0.01   2016-10-21T17:04:06-0400
 
      * Initial release.

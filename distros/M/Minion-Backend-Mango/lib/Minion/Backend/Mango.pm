@@ -1,7 +1,7 @@
 package Minion::Backend::Mango;
 use Mojo::Base 'Minion::Backend';
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use Mango;
 use Mango::BSON qw(bson_oid bson_time bson_doc);
@@ -14,8 +14,12 @@ has notifications => sub { $_[0]->mango->db->collection($_[0]->prefix . '.notifi
 has prefix        => 'minion';
 has workers       => sub { $_[0]->mango->db->collection($_[0]->prefix . '.workers') };
 
-sub broadcast {}
-sub receive { [] }
+sub broadcast {
+  my ($self, $command, $args, $ids) = (shift, shift, shift || [], shift || []);
+
+  my $opts = @$ids ? {_id => {'$in' => $ids}} : {};
+  return !!$self->workers->update($opts, {'$push' => {inbox => [$command, @$args]}}, {multi => 1})->{n};
+}
 
 sub dequeue {
   my ($self, $wid, $wait, $options) = @_;
@@ -84,16 +88,25 @@ sub list_workers {
 
 sub new { shift->SUPER::new(mango => Mango->new(@_)) }
 
-sub register_worker {
+sub receive {
   my ($self, $id) = @_;
 
+  my $doc = $self->workers->find_and_modify({query => {_id => $id}, update => {'$set' => {inbox => []}}});
+  return $doc->{inbox} // [];
+}
+
+sub register_worker {
+  my ($self, $id, $options) = (shift, shift, shift || {});
+
+  my $status = $options->{status} // {};
   return $id
     if $id
     && $self->workers->find_and_modify(
-    {query => {_id => $id}, update => {'$set' => {notified => bson_time}}});
+    {query => {_id => $id}, update => {'$set' => {notified => bson_time, status => $status}}});
 
   $self->jobs->ensure_index(bson_doc(state => 1, delayed => 1, task => 1, queue => 1));
-  $self->workers->insert({host => hostname, pid => $$, started => bson_time, notified => bson_time});
+  return $self->workers->insert(
+    {host => hostname, pid => $$, started => bson_time, notified => bson_time, status => $status});
 }
 
 sub remove_job {

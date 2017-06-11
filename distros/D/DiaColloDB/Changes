@@ -2,6 +2,9 @@
 ##
 ## Change log for perl distribution DiaColloDB
 
+v0.12.005 Wed, 31 May 2017 12:29:58 +0200 moocow
+	* Document/DDCTabs.pm fix for ddc_dump v2.1.x (updated DDC:BREAK format)
+
 v0.12.004 Wed, 15 Mar 2017 16:04:39 +0100 moocow
 	* fix for extend() on list-URLs where all target attributes are missing from DB
 	* removed some painful global debug code in Profile::Multi::trim()

@@ -2,7 +2,7 @@
 #
 # This file is part of Reindeer
 #
-# This software is Copyright (c) 2011 by Chris Weyl.
+# This software is Copyright (c) 2017, 2015, 2014, 2012, 2011 by Chris Weyl.
 #
 # This is free software, licensed under:
 #

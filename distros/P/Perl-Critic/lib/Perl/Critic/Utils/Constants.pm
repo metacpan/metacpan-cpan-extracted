@@ -9,7 +9,7 @@ use Perl::Critic::Utils qw{ $EMPTY hashify };
 
 use Exporter 'import';
 
-our $VERSION = '1.126';
+our $VERSION = '1.128';
 
 #-----------------------------------------------------------------------------
 
@@ -115,6 +115,10 @@ Readonly::Array our @STRICT_EQUIVALENT_MODULES => qw(
 
     Mojolicious::Lite
     Mojo::Base
+
+    Object::Simple
+
+    Role::Tiny
 
     sane
     shit

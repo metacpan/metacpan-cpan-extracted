@@ -94,7 +94,7 @@ Google::Ads::AdWords::v201609::BudgetOrderRequest
 Perl data type class for the XML Schema defined complexType
 BudgetOrderRequest from the namespace https://adwords.google.com/api/adwords/billing/v201609.
 
-Holds fields that provide information on the last set of values that were passed in through the parent BudgetOrder for mutate.add and mutate.set. <span class="constraint Billing">This element only applies if manager account is whitelisted for new billing backend.</span> 
+Holds fields that provide information on the last set of values that were passed in through the parent BudgetOrder for mutate.add and mutate.set. 
 
 
 

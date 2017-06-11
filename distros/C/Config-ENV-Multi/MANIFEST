@@ -12,6 +12,7 @@ t/function/__clip_rule.t
 t/function/__envs2key.t
 t/function/__parse_rule.t
 t/issues/001_multi_env_more_than_two_args.t
+t/local.t
 t/multi_env.t
 t/multi_env_wildcard.t
 t/parent.t

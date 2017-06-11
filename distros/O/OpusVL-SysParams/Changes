@@ -1,5 +1,10 @@
 Revision history for OpusVL-SysParams
 
+0.20      2017-06-07 15:52:39+01:00 Europe/London
+
+    - get_or_set now accepts the type you want it to be
+    - type detection now understands ref-to-0 and ref-to-1 as booleans
+
 0.19      2017-01-03 12:17:38+00:00 Europe/London
 
         Updated version of MooseX::NonMoose to prevent spurious failures

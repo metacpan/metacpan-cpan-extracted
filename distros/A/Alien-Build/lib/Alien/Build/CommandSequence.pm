@@ -5,7 +5,7 @@ use warnings;
 use Capture::Tiny qw( capture );
 
 # ABSTRACT: Alien::Build command sequence
-our $VERSION = '0.36'; # VERSION
+our $VERSION = '0.41'; # VERSION
 
 
 sub new
@@ -148,7 +148,7 @@ Alien::Build::CommandSequence - Alien::Build command sequence
 
 =head1 VERSION
 
-version 0.36
+version 0.41
 
 =head1 CONSTRUCTOR
 
@@ -168,7 +168,11 @@ version 0.36
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Diab Jerius (DJERIUS)
 
 =head1 COPYRIGHT AND LICENSE
 

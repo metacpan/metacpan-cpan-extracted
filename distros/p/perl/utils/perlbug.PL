@@ -20,7 +20,7 @@ chdir dirname($0);
 $file = basename($0, '.PL');
 $file .= '.com' if $^O eq 'VMS';
 
-open OUT, ">$file" or die "Can't create $file: $!";
+open OUT, ">", $file or die "Can't create $file: $!";
 
 # get patchlevel.h timestamp
 
@@ -77,6 +77,8 @@ BEGIN {
     $::HaveTemp = ($@ eq "");
     eval { require Module::CoreList; };
     $::HaveCoreList = ($@ eq "");
+    eval { require Text::Wrap; };
+    $::HaveWrap = ($@ eq "");
 };
 
 my $Version = "1.40";
@@ -94,6 +96,8 @@ my( $file, $usefile, $cc, $address, $bugaddress, $testaddress, $thanksaddress,
     %opt, $have_attachment, $attachments, $has_patch, $mime_boundary
 );
 
+my $running_noninteractively = !-t STDIN;
+
 my $perl_version = $^V ? sprintf("%vd", $^V) : $];
 
 my $config_tag2 = "$perl_version - $Config{cf_time}";
@@ -102,7 +106,7 @@ Init();
 
 if ($opt{h}) { Help(); exit; }
 if ($opt{d}) { Dump(*STDOUT); exit; }
-if (!-t STDIN && !($ok and not $opt{n})) {
+if ($running_noninteractively && !$opt{t} && !($ok and not $opt{n})) {
     paraprint <<"EOF";
 Please use $progname interactively. If you want to
 include a file, you can use the -f switch.
@@ -752,7 +756,7 @@ sub Edit {
 	$ed = $entry unless $entry eq '';
     }
 
-    _edit_file($ed);
+    _edit_file($ed) unless $running_noninteractively;
 }
 
 sub _edit_file {
@@ -829,16 +833,14 @@ a few options. You can:
 EOF
       retry:
         print $menu;
-	    my $action =  _prompt('', "Action (Send/Display/Edit/Subject/Save to File)");;
+	    my $action =  _prompt('', "Action (Send/Display/Edit/Subject/Save to File)",
+	        $opt{t} ? 'q' : '');
         print "\n";
 	    if ($action =~ /^(f|sa)/i) { # <F>ile/<Sa>ve
             if ( SaveMessage() ) { exit }
 	    } elsif ($action =~ /^(d|l|sh)/i ) { # <D>isplay, <L>ist, <Sh>ow
 		# Display the message
-		open(REP, '<:raw', $filename) or die "Couldn't open file '$filename': $!\n";
-		binmode(REP, ':raw :crlf') if $Is_MSWin32;
-		while (<REP>) { print $_ }
-		close(REP) or die "Error closing report file '$filename': $!";
+		print _read_report($filename);
 		if ($have_attachment) {
 		    print "\n\n---\nAttachment(s):\n";
 		    for my $att (split /\s*,\s*/, $attachments) { print "    $att\n"; }
@@ -880,7 +882,7 @@ sub TrivialSubject {
     if ($subject =~
 	/^(y(es)?|no?|help|perl( (bug|problem))?|bug|problem)$/i ||
 	length($subject) < 4 ||
-	$subject !~ /\s/) {
+	($subject !~ /\s/ && ! $opt{t})) { # non-whitespace is accepted in test mode
 	print "\nThe subject you entered wasn't very descriptive. Please try again.\n\n";
         return 1;
     } else {
@@ -1015,6 +1017,7 @@ sub _prompt {
     }
     print $prompt. ($default ? " [$default]" :''). ": ";
 	my $result = scalar(<>);
+    return $default if !defined $result; # got eof
     chomp($result);
 	$result =~ s/^\s*(.*?)\s*$/$1/s;
     if ($default && $result eq '') {
@@ -1081,13 +1084,29 @@ ATTACHMENT
     return $attach;
 }
 
+sub _read_report {
+    my $fname = shift;
+    my $content;
+    open( REP, "<:raw", $fname ) or die "Couldn't open file '$fname': $!\n";
+    binmode(REP, ':raw :crlf') if $Is_MSWin32;
+    # wrap long lines to make sure the report gets delivered
+    local $Text::Wrap::columns = 900;
+    local $Text::Wrap::huge = 'overflow';
+    while (<REP>) {
+        if ($::HaveWrap && /\S/) { # wrap() would remove empty lines
+            $content .= Text::Wrap::wrap(undef, undef, $_);
+        } else {
+            $content .= $_;
+        }
+    }
+    close(REP) or die "Error closing report file '$fname': $!";
+    return $content;
+}
+
 sub build_complete_message {
     my $content = _build_header(%{_message_headers()}) . "\n\n";
     $content .= _add_body_start() if $have_attachment;
-    open( REP, "<:raw", $filename ) or die "Couldn't open file '$filename': $!\n";
-    binmode(REP, ':raw :crlf') if $Is_MSWin32;
-    while (<REP>) { $content .= $_; }
-    close(REP) or die "Error closing report file '$filename': $!";
+    $content .= _read_report($filename);
     $content .= _add_attachments() if $have_attachment;
     return $content;
 }
@@ -1138,10 +1157,7 @@ sub _send_message_mailsend {
     $fh = $msg->open;
     binmode($fh, ':raw');
     print $fh _add_body_start() if $have_attachment;
-    open(REP, "<:raw", $filename) or die "Couldn't open '$filename': $!\n";
-    binmode(REP, ':raw :crlf') if $Is_MSWin32;
-    while (<REP>) { print $fh $_ }
-    close(REP) or die "Error closing $filename: $!";
+    print $fh _read_report($filename);
     print $fh _add_attachments() if $have_attachment;
     $fh->close or die "Error sending mail: $!";
 
@@ -1527,6 +1543,8 @@ supply one on the command line.
 =item B<-t>
 
 Test mode.  The target address defaults to B<perlbug-test@perl.org>.
+Also makes it possible to command perlbug from a pipe or file, for
+testing purposes.
 
 =item B<-T>
 

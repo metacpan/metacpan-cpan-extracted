@@ -12,6 +12,7 @@ MapReduce::Framework::Simple - Simple Framework for MapReduce
 
     my $mfs = MapReduce::Framework::Simple->new;
 
+    ## Generate data for MapReduce manually.
     my $data_map_reduce;
     for(0 .. 2){
         my $tmp_data;
@@ -23,6 +24,23 @@ MapReduce::Framework::Simple - Simple Framework for MapReduce
         # If you want to use standalone, Record should be [<data>] as below
         # push(@$data_map_reduce,$tmp_data);
     }
+
+
+    ## OR, Generate good balanced data for MapReduce automatically.
+    my $remote_servers = [
+        'http://remote1.local:5000/eval_secret_url',
+        'http://remote2.local:5000/eval_secret_url',
+        'http://remote3.local:5000/eval_secret_url'
+       ];
+    my $tmp_data_2;
+    for(0 .. 100000){
+        push(@$tmp_data_2,rand(10000));
+    }
+    my $data_auto_assign = $mfs->create_assigned_data(
+        $tmp_data_2,
+        $remote_servers,
+        { chunk_num => 10, method => 'volume_uniform' }
+       );
 
     # mapper code
     my $mapper = sub {
@@ -93,6 +111,27 @@ _new_ creates object.
         force_plackup => 0 # force to use plackup when starting worker server.
         );
 
+## _create\_assigned\_data_
+
+This method creates MapReduce ready data from data and remote worker server list.
+You can set the number of data chunk and balancing method ('volume\_uniform','element\_shuffle','element\_sequential').
+
+    my $tmp_data = [1 .. 1_000_000];
+    my $server_list = [
+        'http://s1.local:5000/eval',
+        'http://s2.local:5000/eval',
+        'http://s3.local:5000/eval',
+       ];
+
+    my $data = $mfs->create_assigned_data(
+        $tmp_data,
+        $server_list,
+        {
+            chunk_num => 10, # number of data chunk.
+            method => 'volume_uniform', # balancing method.
+           }
+       );
+
 ## _map\_reduce_
 
 _map\_reduce_ method starts MapReduce processing using Parallel::ForkManager.
@@ -157,4 +196,4 @@ it under the same terms as Perl itself.
 
 # AUTHOR
 
-Toshiaki Yokoda &lt;adokoy001@gmail.com>
+Toshiaki Yokoda <adokoy001@gmail.com>

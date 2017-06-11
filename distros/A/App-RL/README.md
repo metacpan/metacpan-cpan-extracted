@@ -29,7 +29,7 @@ See `runlist commands` for usage information.
 
 # AUTHOR
 
-Qiang Wang &lt;wang-q@outlook.com>
+Qiang Wang <wang-q@outlook.com>
 
 # COPYRIGHT AND LICENSE
 

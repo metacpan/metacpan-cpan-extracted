@@ -1,7 +1,10 @@
 # Before "make install", this script should be runnable with "make test".
 # After "make install" it should work as "perl t/XMP.t".
 
-BEGIN { $| = 1; print "1..45\n"; $Image::ExifTool::configFile = ''; }
+BEGIN {
+    $| = 1; print "1..45\n"; $Image::ExifTool::configFile = '';
+    require './t/TestLib.pm'; t::TestLib->import();
+}
 END {print "not ok 1\n" unless $loaded;}
 
 # definitions for user-defined tag test (#26)
@@ -36,8 +39,6 @@ use Image::ExifTool::XMP;
 $loaded = 1;
 print "ok 1\n";
 
-use t::TestLib;
-
 my $testname = 'XMP';
 my $testnum = 1;
 
@@ -54,7 +55,7 @@ my $testnum = 1;
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    $exifTool->Options(Duplicates => 1, Binary => 1, List => 1);
+    $exifTool->Options(Duplicates => 1, Binary => 1, ListJoin => undef);
     my $info = $exifTool->ImageInfo('t/images/XMP.jpg');
     my $tag;
     foreach $tag (keys %$info) {

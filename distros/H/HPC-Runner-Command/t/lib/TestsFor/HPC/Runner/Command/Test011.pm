@@ -106,9 +106,9 @@ sub construct {
     my $t = "$test_dir/script/test002.1.sh";
     MooseX::App::ParsedArgv->new(
         argv => [
-            "submit_jobs",    "--infile",
-            $t,               "--max_array_size",
-            2,                "--hpc_plugins",
+            "submit_jobs", "--infile",
+            $t,            "--max_array_size",
+            2,             "--hpc_plugins",
             "Dummy",
         ]
     );
@@ -131,31 +131,48 @@ sub test_001 : Tags(execute_array) {
     $test->iterate_schedule();
 
     my $array_deps = {
-          '1238_9' => [
-                        '1234_1'
-                      ],
-          '1238_10' => [
-                         '1234_2'
-                       ],
-          '1239_11' => [
-                         '1235_3'
-                       ],
-          '1239_12' => [
-                         '1235_4',
-                         '1237_8'
-                       ],
-          '1240_13' => [
-                         '1236_5'
-                       ],
-          '1240_14' => [
-                         '1236_6',
-                         '1237_7'
-                       ],
-        };
+        '1238_9'  => ['1234_1'],
+        '1238_10' => ['1234_2'],
+        '1239_11' => ['1235_3'],
+        '1239_12' => [ '1235_4', '1237_8' ],
+        '1240_13' => ['1236_5'],
+        '1240_14' => [ '1236_6', '1237_7' ],
+    };
 
     is_deeply( $test->array_deps, $array_deps );
+    is( $test->jobs->{'fastqc'}->{num_job_arrays}, 4 );
 
-    ok(1);
+    my $rows = $test->summarize_jobs;
+
+    ##TODO add in another one of these with commands_per_node
+    my $expect_rows = [
+        [ 'fastqc',     '1234', '1-2',   2 ],
+        [ 'fastqc',     '1235', '3-4',   2 ],
+        [ 'fastqc',     '1236', '5-6',   2 ],
+        [ 'fastqc',     '1237', '7-8',   2 ],
+        [ 'remove_tmp', '1238', '9-10',  2 ],
+        [ 'remove_tmp', '1239', '11-12', 2 ],
+        [ 'remove_tmp', '1240', '13-14', 2 ]
+    ];
+    is_deeply( $rows, $expect_rows, 'Summarize jobs passes pass' );
+
+    $test->current_job('fastqc');
+    is( $test->gen_array_str( $test->jobs->{fastqc}->batch_indexes->[0] ),
+        '1-2:1', 'Array string passes' );
+    is( $test->gen_array_str( $test->jobs->{fastqc}->batch_indexes->[1] ),
+        '3-4:1', 'Array string passes' );
+    is( $test->gen_array_str( $test->jobs->{fastqc}->batch_indexes->[2] ),
+        '5-6:1', 'Array string passes' );
+    is( $test->gen_array_str( $test->jobs->{fastqc}->batch_indexes->[3] ),
+        '7-8:1', 'Array string passes' );
+
+    $test->current_job('remove_tmp');
+    is( $test->gen_array_str( $test->jobs->{remove_tmp}->batch_indexes->[0] ),
+        '9-10:1', 'Array string passes' );
+    is( $test->gen_array_str( $test->jobs->{remove_tmp}->batch_indexes->[1] ),
+        '11-12:1', 'Array string passes' );
+    is( $test->gen_array_str( $test->jobs->{remove_tmp}->batch_indexes->[2] ),
+        '13-14:1', 'Array string passes' );
 
     chdir($cwd);
     remove_tree($test_dir);

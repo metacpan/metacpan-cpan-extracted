@@ -1,5 +1,10 @@
 Revision history for Perl extension URI::UTF8::Punycode.
 
+1.05  Sun Jun 04 08:00:00 2017
+	feature: add command line tools for test.
+	changes: add domain string checking & through errors but it do nothing when not encoded(unneeded).
+	         only critical failure return value is undef.
+
 1.00  Fri May 24 00:00:00 2013
 	add features: +processing to all level of domains.
 

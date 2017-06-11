@@ -4,9 +4,8 @@ use strict;
 use warnings;
 use Moo::Role;
 use MooX::Types::MooseLike::Base qw(CodeRef);
-use namespace::autoclean;
 
-our $VERSION = '1.006';
+our $VERSION = '1.027';
 
 has logger => (
     is  => 'rw',
@@ -21,13 +20,13 @@ __END__
 
 Locale::TextDomain::OO::Role::Logger - Provides a logger method
 
-$Id: Logger.pm 461 2014-01-09 07:57:37Z steffenw $
+$Id: Logger.pm 651 2017-05-31 18:10:43Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/module/trunk/lib/Locale/TextDomain/OO/Role/Logger.pm $
 
 =head1 VERSION
 
-1.006
+1.027
 
 =head1 DESCRIPTION
 
@@ -36,6 +35,8 @@ for L<Locale::TextDomain:OO|Locale::TextDomain:OO>.
 
 =head1 SYNOPSIS
 
+    use Log::Any qw($log);
+    
     with qw(
         Locale::TextDomain::OO::Role::Logger
     );
@@ -52,7 +53,7 @@ or why the translation process is using a fallback.
         sub {
             my ($message, $arg_ref) = @_;
             my $type = $arg_ref->{type};
-            Log::Log4perl->get_logger(...)->$type($message);
+            $log->$type($message);
             return;
         },
     );
@@ -86,8 +87,6 @@ L<Moo::Role|Moo::Role>
 
 L<MooX::Types::MooseLike::Base|MooX::Types::MooseLike::Base>
 
-L<namespace::autoclean|namespace::autoclean>
-
 =head1 INCOMPATIBILITIES
 
 not known
@@ -106,7 +105,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2013 - 2014,
+Copyright (c) 2013 - 2017,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

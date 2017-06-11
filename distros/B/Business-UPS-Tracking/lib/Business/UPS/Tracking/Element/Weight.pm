@@ -14,11 +14,11 @@ use Business::UPS::Tracking::Element::Code;
 =head1 NAME
 
 Business::UPS::Tracking::Element::Weight - A shipment or package weight
-  
+
 =head1 DESCRIPTION
 
-This class represents a declaration of weight. Usually it is created 
-automatically from a L<Business::UPS::Tracking::Shipment> object. 
+This class represents a declaration of weight. Usually it is created
+automatically from a L<Business::UPS::Tracking::Shipment> object.
 
 This module uses overload for stringification if called in string context.
 
@@ -30,7 +30,7 @@ Original L<XML::LibXML::Node> node.
 
 =head2 UnitOfMeasurement
 
-Unit of measurement. 
+Unit of measurement.
 Returns a L<Business::UPS::Tracking::Element::Code> object.
 
 =head2 Weight
@@ -57,20 +57,20 @@ has 'Weight'=> (
 
 sub _build_weight {
     my ($self,$xml) = @_;
-    
+
     my $unit = Business::UPS::Tracking::Element::Code->new(
         xml => $xml->findnodes('UnitOfMeasurement')->get_node(1)
     );
 
     $self->UnitOfMeasurement($unit);
     $self->Weight($xml->findvalue('Weight'));
-    
+
     return;
 }
 
 sub serialize {
     my ($self) = @_;
-    
+
     return $self->printall;
 }
 

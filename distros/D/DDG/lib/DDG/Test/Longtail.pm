@@ -1,7 +1,7 @@
 package DDG::Test::Longtail;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Adds keywords to easily test Longtail plugins.
-$DDG::Test::Longtail::VERSION = '1016';
+$DDG::Test::Longtail::VERSION = '1017';
 use strict;
 use warnings;
 use Carp;
@@ -29,7 +29,7 @@ DDG::Test::Longtail - Adds keywords to easily test Longtail plugins.
 
 =head1 VERSION
 
-version 1016
+version 1017
 
 =head1 DESCRIPTION
 

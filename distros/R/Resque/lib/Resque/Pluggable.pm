@@ -1,6 +1,6 @@
 package Resque::Pluggable;
 # ABSTRACT: Role to load Resque plugin's and and apply roles.
-$Resque::Pluggable::VERSION = '0.31';
+$Resque::Pluggable::VERSION = '0.34';
 use Moose::Role;
 
 use namespace::autoclean;
@@ -37,7 +37,7 @@ after BUILD => sub {
     $self->meta->make_immutable;
 };
 
-# Build anon class based on the given one with optional roles applied 
+# Build anon class based on the given one with optional roles applied
 sub _class_with_roles {
     my ( $self, $class, $kind ) = @_;
     my @roles = $self->_roles_for($kind);
@@ -46,7 +46,7 @@ sub _class_with_roles {
 
     my $meta = Moose::Meta::Class->create_anon_class(
         superclasses => [$class],
-        roles        => [@roles] 
+        roles        => [@roles]
     );
 
     # ensure anon doesn't goes out of scope!
@@ -102,24 +102,28 @@ Resque::Pluggable - Role to load Resque plugin's and and apply roles.
 
 =head1 VERSION
 
-version 0.31
+version 0.34
 
 =head1 ATTRIBUTES
 
 =head2 plugins
-List of plugins to be loaded into this L<Resque> system.
+
+List of plugins to be loaded into this L<Resque> system. See L<Resque::Plugin>.
 
 =head2 worker_class
+
 Worker class to be used for worker attribute.
 This is L<Resque::Worker> with all plugin/roles applied to it.
 
 =head2 job_class
+
 Job class to be used by L<Resque::new_job>.
 This is L<Resque::Job> with all plugin/roles applied to it.
 
 =head1 METHODS
 
 =head2 BUILD
+
 Apply pluggable roles after BUILD.
 
 =head1 AUTHOR

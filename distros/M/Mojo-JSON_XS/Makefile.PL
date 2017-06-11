@@ -1,4 +1,4 @@
-use 5.010001;
+use 5.010_001;
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ WriteMakefile(
   AUTHOR       => 'Nic Sandfield <niczero@cpan.org>',
   LICENSE      => 'artistic_2',
   META_MERGE   => {
-    requires  => {perl => 5.010001},
+    requires  => {perl => 5.010_001},
     resources => {
       homepage    => 'http://niczero.github.io/mojo-jsonxs',
       license     => 'http://www.opensource.org/licenses/artistic-license-2.0',

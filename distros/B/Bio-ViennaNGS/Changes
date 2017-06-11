@@ -146,7 +146,41 @@ Revision history for Perl extension Bio::ViennaNGS.
 	- added Bio::ViennaNGS::FeatureInterval
 	- added Bio::ViennaNGS::BedGraphLine
 	- added Bio::ViennaNGS::Peak
-	- make Bio::ViennaNGS::MinimalFeature subclass of Bio::ViennaNGS::FeatureInterval
+	- make Bio::ViennaNGS::MinimalFeature subclass of
+	  Bio::ViennaNGS::FeatureInterval
 	- added scripts/rnaseq_peakfinder.pl
 	- added scripts/bed2nt2aa.pl
 	- updated POD and README
+
+0.17 Fri Jun 09 2017
+	- added Bio::ViennaNGS::FeatureIO
+	- added Bio::ViennaNGS::Subtypes
+	- refactored Bio::ViennaNGS::Fasta to transparently coerce input
+	  data into a Bio::DB::Fasta object
+	- refactored executables in scripts/ folder to new
+	  Bio::ViennaNGS::Fasta interface
+	- changed output format in scripts/bed2nt2aa.pl to csv
+	- removed parse_bed6() and extend_chain() from Bio::ViennaNGS::Util
+	  (bed I/O is now available in Bio::ViennaNGS::FeatureIO and chain
+	   extension is available in bedtools)
+	- added uniquify_bam2() in Bio::ViennaNGS::Bam
+	- implemented correct handling of unmapped reads in
+	  Bio::ViennaNGS::Bam
+	- replace '~' with $HOME in mkdircheck() within
+          Bio::ViennaNGS::Util
+	- fixed output path creation in rnaseq_peakfinder.pl,
+	  splice_site_summary.pl
+	- refactored scripts/bam_uniq.pl
+	- refactored scripts/bed2nt2aa.pl
+	- added scripts/fasta_subgrep.pl
+	- added scripts/fasta_multigrep.pl
+	- migrated scripts/MEME_xml_motif_extractor.pl to
+	  Bio-ViennaNGS-scripts-extra package on github
+	- updated POD
+	- removed Tutorial_pipeline{0,1,2}
+	- added unit tests
+
+0.17.1 Sat Jun 10 2017
+	- version is now declared at a unique location within ViennaNGS.pm
+	- updated README
+	- updated POD

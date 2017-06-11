@@ -13,7 +13,7 @@ use DynaLoader;
 
 
 
-   $PDL::EditDistance::VERSION = 0.08;
+   $PDL::EditDistance::VERSION = 0.09;
    @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::EditDistance $VERSION;

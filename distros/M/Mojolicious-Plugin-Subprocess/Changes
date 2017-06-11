@@ -1,2 +1,8 @@
+0.003     2017-06-08 02:27:13 EDT
+  - Include Sereal::Encoder and Sereal::Decoder versions in tests for debugging purposes
+
+0.002     2017-06-04 16:55:27 EDT
+  - Add use_sereal option to simplify using Sereal for data serialization
+
 0.001     2016-12-28 22:11:44 EST
   - First release

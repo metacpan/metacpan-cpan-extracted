@@ -3,9 +3,14 @@ package App::Pods2Site::SiteBuilderFactory;
 use strict;
 use warnings;
 
+require App::Pods2Site::SiteBuilder::None;
+require App::Pods2Site::SiteBuilder::BasicFramesSimpleTOC;
+require App::Pods2Site::SiteBuilder::BasicFramesTreeTOC;
+
 my $STDSTYLE = 'basicframes-simple-toc';
 my %VALIDSTYLES =
 	(
+		'none' => 'App::Pods2Site::SiteBuilder::None',
 		'basicframes-simple-toc' => 'App::Pods2Site::SiteBuilder::BasicFramesSimpleTOC',
 		'basicframes-tree-toc' => 'App::Pods2Site::SiteBuilder::BasicFramesTreeTOC',
 	);
@@ -42,8 +47,6 @@ sub createSiteBuilder
 {
 	my $self = shift;
 	
-	eval "require $self->{sitebuilderclass}";
-	 
 	$self->{sitebuilderclass}->new($self->getRealStyle());
 }
 

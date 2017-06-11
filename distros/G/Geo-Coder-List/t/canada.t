@@ -52,7 +52,7 @@ CANADA: {
 		delta_within($location->{geometry}{location}{lat}, 46.68, 1e-1);
 		delta_within($location->{geometry}{location}{lng}, -64.86, 1e-1);
 
-		$location = $geocoderlist->geocode(location => 'Allen, Indiana, USA');
+		$location = $geocoderlist->geocode(location => 'Allen, Maryland, USA');
 		ok(!defined($location));
 
 		$ua = new_ok('Test::LWP::UserAgent');

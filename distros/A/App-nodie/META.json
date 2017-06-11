@@ -1,5 +1,5 @@
 {
-   "abstract" : "runs immortal processes",
+   "abstract" : "runs command again when its dead",
    "author" : [
       "Orkun Karaduman <orkunkaraduman@gmail.com>"
    ],
@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Lazy::Utils" : "1.20",
+            "Lazy::Utils" : "1.21",
             "Scalar::Util" : "1.47",
             "perl" : "5.010001"
          }
@@ -54,5 +54,5 @@
          "web" : "https://github.com/orkunkaraduman/App-nodie"
       }
    },
-   "version" : "1.00"
+   "version" : "1.03"
 }

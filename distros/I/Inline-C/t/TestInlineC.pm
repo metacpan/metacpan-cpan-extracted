@@ -7,7 +7,6 @@ BEGIN {
 
 use Test::More();
 use YAML::XS;
-use IO::All;
 
 use Parse::RecDescent;
 use Inline::C::Parser::RecDescent;
@@ -39,16 +38,7 @@ sub test {
       ${ caller . '::TODO' };
     };
 
-    if ($pegex_dump eq $prd_dump) {
-        Test::More::pass $label;
-    }
-    else {
-        Test::More::fail $label;
-        io->file('got')->print($pegex_dump);
-        io->file('want')->print($prd_dump);
-        Test::More::diag(`diff -u want got`);
-        unlink('want', 'got');
-    }
+    Test::More::cmp_ok($pegex_dump, 'eq', $prd_dump, $label);
 
     ($prd_data, $pegex_data);
 }

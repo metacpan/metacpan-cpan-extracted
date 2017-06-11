@@ -3,7 +3,7 @@
 # PODNAME: TestRail::Bin::Tests
 
 package TestRail::Bin::Tests;
-$TestRail::Bin::Tests::VERSION = '0.040';
+$TestRail::Bin::Tests::VERSION = '0.041';
 use strict;
 use warnings;
 use utf8;
@@ -82,7 +82,7 @@ TestRail::Bin::Tests - List tests in a TestRail run matching the provided filter
 
 =head1 VERSION
 
-version 0.040
+version 0.041
 
 =head1 SYNOPSIS
 

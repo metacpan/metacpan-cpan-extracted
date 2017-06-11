@@ -77,11 +77,11 @@ sub svdtest {
 ## builtin
 
 ##-- test 1..2 : builtin svd, d=min{m,n}
-($u,$s,$v) = svdreduce(svd($a),$d);
+($v,$s,$u) = svdreduce(svd($a->xchg(0,1)),$d);
 svdtest("PDL::svd - d=$d=min{m,n}", $u,$s,$v, .01);
 
 ##-- test 3..4 : builtin svd, d<min{m,n}
-($u,$s,$v) = svdreduce(svd($a),$d1);
+($v,$s,$u) = svdreduce(svd($a->xchg(0,1)),$d1);
 svdtest("PDL::svd - d=$d1<min{m,n}", $u,$s,$v, .01,.5);
 
 ##----------------------------------------------------------------------

@@ -246,6 +246,14 @@ my $tests =
 		numbers =>
 			[
 				{
+					q => 'true',
+					e => $data->{numbers},
+				}, 
+				{
+					q => 'false',
+					e => [ ],
+				}, 
+				{
 					q => '>(-6)',
 					e => $data->{numbers},
 					dbq => q/number > -6/,
@@ -279,6 +287,14 @@ my $tests =
 			
 		strings =>
 			[
+				{
+					q => 'TRUE',
+					e => $data->{strings},
+				}, 
+				{
+					q => 'FALSE',
+					e => [ ],
+				}, 
 				{
 					q => 'NE(*%&)',
 					e => $data->{strings},
@@ -505,6 +521,14 @@ my $tests =
 					dbq => q/name REGEXP '.*'/,
 				},
 				{
+					q => 'name.true',
+					e => [ map { $data->{records}->{$_} } ('a' .. 'z') ],
+				},
+				{
+					q => 'name.FALSE',
+					e => [ ],
+				},
+				{
 					q => 'name.REGEXP/(?i)a/',
 					e => [ map { $data->{records}->{$_} } split('', 'adfghijlmopqrsuvwxy') ],
 					dbq => q/name REGEXP '(?i)a'/,
@@ -553,6 +577,39 @@ my $tests =
 QRY
 					e => [ map { $data->{records}->{$_} } split('', 'afmps') ],
 					dbq => q/name REGEXP '(?i)a' AND siblings > 1 AND byear < 1960 AND ( ( sex REGEXP 'M' AND city REGEXP 'z' ) OR ( sex REGEXP 'F' AND city REGEXP 'l' ) )/,
+				},
+				{
+					q => <<'QRY',
+						/* lots of comments */
+						
+						/* first check that the name contains an 'a' or 'A' 
+						name.REGEXP/(?i)a/
+							AND
+						/* and then:
+						     check that siblings are > 1
+						*/
+						siblings.>(1)
+							AND
+						/*
+							and, that birth year is less than 1960 */
+						byear.<(1960)
+							AND
+						(
+							/* while also determining things about sex/city */
+							(
+								sex.REGEXP(M)
+									AND
+								city.REGEXP(z)
+							)
+								OR /**/
+							(
+								sex.REGEXP(F)
+									AND
+								city.REGEXP(l)
+							)
+						)
+QRY
+					e => [ map { $data->{records}->{$_} } split('', 'afmps') ],
 				},
 			],
 		

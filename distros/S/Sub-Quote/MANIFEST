@@ -5,8 +5,12 @@ maint/Makefile.PL.include
 Makefile.PL
 MANIFEST			This list of files
 t/croak-locations.t
+t/hints.t
+t/inline.t
+t/leaks.t
 t/lib/ErrorLocation.pm
 t/lib/InlineModule.pm
+t/quotify.t
 t/sub-defer-no-subname.t
 t/sub-defer-threads.t
 t/sub-defer.t

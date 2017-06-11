@@ -1,5 +1,8 @@
 Revision history for Perl module App::iTan
 
+1.07 Fri Jun 2 2017
+    - Fix Makefile.PL for perl 5.26
+
 1.06 Sat Apr 2 2016
     - Dist housekeeping
 

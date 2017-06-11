@@ -2,7 +2,7 @@ package WebService::ILS;
 
 use Modern::Perl;
 
-our $VERSION = "0.12";
+our $VERSION = "0.14";
 
 =encoding utf-8
 
@@ -603,7 +603,8 @@ sub error_message {
     my $self = shift;
     my $die_string = shift or return;
     $die_string =~ m/(.*?)\n/o;
-    return $1 || $die_string;
+    (my $msg = $1 || $die_string) =~ s! at /.* line \d+\.$!!;
+    return $msg;
 }
 
 sub is_access_token_error {

@@ -72,7 +72,7 @@ Google::Ads::AdWords::v201609::MutateMembersOperation
 Perl data type class for the XML Schema defined complexType
 MutateMembersOperation from the namespace https://adwords.google.com/api/adwords/rm/v201609.
 
-Operation representing a request to add or remove members from a user list. 
+Operation representing a request to add or remove members from a user list. The following {@link Operator}s are supported: ADD and REMOVE. The SET operator is not supported. 
 
 
 

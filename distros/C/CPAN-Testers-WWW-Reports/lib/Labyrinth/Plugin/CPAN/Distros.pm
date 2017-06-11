@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION);
-$VERSION = '3.57';
+$VERSION = '3.59';
 
 =head1 NAME
 
@@ -78,10 +78,10 @@ sub Reports {
     # get author summary
     my @summary = $dbi->GetQuery('hash','GetDistroSummary',$cgiparams{name});
     unless(@summary) {
-        #unless($settings{crawler}) {
+        unless($settings{crawler}) {
             $dbi->DoQuery('PushDistro',$cgiparams{name});
             $tvars{update} = 1;
-        #}
+        }
         $tvars{perlvers}    = $cpan->mklist_perls;
         $tvars{osnames}     = $cpan->osnames;
         return;
@@ -90,10 +90,10 @@ sub Reports {
     # if existing page requests, add another to improve rebuild time
     @rows = $dbi->GetQuery('array','GetDistroRequests',$cgiparams{name});
     if(@rows && $rows[0]->[0] > 0) {
-        #unless($settings{crawler}) {
+        unless($settings{crawler}) {
             $dbi->DoQuery('PushDistro',$cgiparams{name});
             $tvars{update} = 1;
-        #}
+        }
     }
 
     # decode from JSON string
@@ -117,7 +117,7 @@ Miss Barbell Productions, L<http://www.missbarbell.co.uk/>
 
 =head1 COPYRIGHT & LICENSE
 
-  Copyright (C) 2008-2015 Barbie for Miss Barbell Productions
+  Copyright (C) 2008-2017 Barbie for Miss Barbell Productions
   All Rights Reserved.
 
   This module is free software; you can redistribute it and/or

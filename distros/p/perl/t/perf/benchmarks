@@ -33,6 +33,7 @@
 #
 #     call::     subroutine and method handling
 #     expr::     expressions: e.g. $x=1, $foo{bar}[0]
+#     func::     perl functions, e.g. func::sort::...
 #     loop::     structural code like for, while(), etc
 #     regex::    regular expressions
 #     string::   string handling
@@ -50,6 +51,39 @@
 #
 # Currently the only tool that uses this file is Porting/bench.pl;
 # try C<perl Porting/bench.pl --help> for more info
+#
+# ------
+#
+# Note: for the cachegrind variant, an entry like
+#    'foo::bar' => {
+#     setup   => 'SETUP',
+#     code    => 'CODE',
+#   }
+# creates two temporary perl sources looking like:
+#
+#        package foo::bar;
+#        BEGIN { srand(0) }
+#        SETUP;
+#        for my $__loop__ (1..$ARGV[0]) {
+#            1;
+#        }
+#
+# and as above, but with the '1;' in the loop  body replaced with:
+#
+#            CODE;
+#
+# It then pipes each of the two sources into
+#
+#     PERL_HASH_SEED=0 valgrind [options] someperl [options] - N
+#
+# where N is set to 10 and then 20.
+#
+# It then uses the result of those four cachegrind runs to subtract out
+# the perl startup and loop overheads. So only what's in SETUP and CODE
+# can affect the benchmark, and if the loop happens to leave some state
+# changed (such as storing a value in a hash), then the final benchmark
+# timing is the result of running CODE with the hash entry populated
+# rather than empty.
 
 
 [
@@ -198,34 +232,6 @@
         code    => '$h{$k1}[$i]{$k2}',
     },
 
-
-    'expr::assign::scalar_lex_int' => {
-        desc    => 'lexical $x = 1',
-        setup   => 'my $x',
-        code    => '$x = 1',
-    },
-    'expr::assign::scalar_lex_str' => {
-        desc    => 'lexical $x = "abc"',
-        setup   => 'my $x',
-        code    => '$x = "abc"',
-    },
-    'expr::assign::scalar_lex_strint' => {
-        desc    => 'lexical $x = 1 where $x was previously a string',
-        setup   => 'my $x = "abc"',
-        code    => '$x = 1',
-    },
-    'expr::assign::scalar_lex_intstr' => {
-        desc    => 'lexical $x = "abc" where $x was previously an int',
-        setup   => 'my $x = 1;',
-        code    => '$x = "abc"',
-    },
-    'expr::assign::2list_lex' => {
-        desc    => 'lexical ($x, $y) = (1, 2)',
-        setup   => 'my ($x, $y)',
-        code    => '($x, $y) = (1, 2)',
-    },
-
-
     'expr::hash::lex_1const' => {
         desc    => 'lexical $hash{const}',
         setup   => 'my %h = ("foo" => 1)',
@@ -256,7 +262,6 @@
         setup   => 'my $r = {foo => { bar => { baz => 1 }}}',
         code    => '($r||0)->{foo}{bar}{baz}',
     },
-
 
     'expr::hash::pkg_1const' => {
         desc    => 'package $hash{const}',
@@ -295,105 +300,54 @@
         setup   => 'my ($k1,$k2) = qw(foo bar); my %h = ($k1 => { $k2 => 1 });',
         code    => 'exists $h{$k1}{$k2}',
     },
+
+    'expr::hash::bool_empty' => {
+        desc    => 'empty lexical hash in boolean context',
+        setup   => 'my %h;',
+        code    => '!%h',
+    },
+    'expr::hash::bool_full' => {
+        desc    => 'non-empty lexical hash in boolean context',
+        setup   => 'my %h = 1..10;',
+        code    => '!%h',
+    },
+
+
+    (
+        map {
+            sprintf('expr::hash::notexists_lex_keylen%04d',$_) => {
+                desc    => 'exists on non-key of length '. $_,
+                setup   => 'my %h; my $key = "A" x ' . $_ . '; $h{$key."x"} = 1;',
+                code    => 'exists $h{$key}',
+            },
+        } (
+            1 .. 24,
+            # 1,2,3,7,8,9,14,15,16,20,24,
+            50,
+            100,
+            1000,
+        )
+    ),
+    (
+        map {
+            sprintf('expr::hash::exists_lex_keylen%04d',$_) => {
+                desc    => 'exists on existing key of length '. $_,
+                setup   => 'my %h; my $key = "A" x ' . $_ . '; $h{$key} = 1;',
+                code    => 'exists $h{$key}',
+            },
+        } (
+            1 .. 24,
+            # 1,2,3,7,8,9,14,15,16,20,24,
+            50,
+            100,
+            1000,
+        )
+    ),
+
     'expr::hash::delete_lex_2var' => {
         desc    => 'lexical delete $hash{$k1}{$k2}',
         setup   => 'my ($k1,$k2) = qw(foo bar); my %h = ($k1 => { $k2 => 1 });',
         code    => 'delete $h{$k1}{$k2}',
-    },
-
-
-    # using a const string as second arg to index triggers using FBM.
-    # the FBM matcher special-cases 1,2-byte strings.
-    #
-    'expr::index::short_const1' => {
-        desc    => 'index of a short string against a 1 char const substr',
-        setup   => 'my $x = "aaaab"',
-        code    => 'index $x, "b"',
-    },
-    'expr::index::long_const1' => {
-        desc    => 'index of a long string against a 1 char const substr',
-        setup   => 'my $x = "a" x 1000 . "b"',
-        code    => 'index $x, "b"',
-    },
-    'expr::index::short_const2aabc_bc' => {
-        desc    => 'index of a short string against a 2 char const substr',
-        setup   => 'my $x = "aaaabc"',
-        code    => 'index $x, "bc"',
-    },
-    'expr::index::long_const2aabc_bc' => {
-        desc    => 'index of a long string against a 2 char const substr',
-        setup   => 'my $x = "a" x 1000 . "bc"',
-        code    => 'index $x, "bc"',
-    },
-    'expr::index::long_const2aa_ab' => {
-        desc    => 'index of a long string aaa.. against const substr "ab"',
-        setup   => 'my $x = "a" x 1000',
-        code    => 'index $x, "ab"',
-    },
-    'expr::index::long_const2bb_ab' => {
-        desc    => 'index of a long string bbb.. against const substr "ab"',
-        setup   => 'my $x = "b" x 1000',
-        code    => 'index $x, "ab"',
-    },
-    'expr::index::long_const2aa_bb' => {
-        desc    => 'index of a long string aaa.. against const substr "bb"',
-        setup   => 'my $x = "a" x 1000',
-        code    => 'index $x, "bb"',
-    },
-    # this one is designed to be pathological
-    'expr::index::long_const2ab_aa' => {
-        desc    => 'index of a long string abab.. against const substr "aa"',
-        setup   => 'my $x = "ab" x 500',
-        code    => 'index $x, "aa"',
-    },
-    # near misses with gaps, 1st letter
-    'expr::index::long_const2aaxx_xy' => {
-        desc    => 'index of a long string with "xx"s against const substr "xy"',
-        setup   => 'my $x = "aaaaaaaaxx" x 100',
-        code    => 'index $x, "xy"',
-    },
-    # near misses with gaps, 2nd letter
-    'expr::index::long_const2aayy_xy' => {
-        desc    => 'index of a long string with "yy"s against const substr "xy"',
-        setup   => 'my $x = "aaaaaaaayy" x 100',
-        code    => 'index $x, "xy"',
-    },
-    # near misses with gaps, duplicate letter
-    'expr::index::long_const2aaxy_xx' => {
-        desc    => 'index of a long string with "xy"s against const substr "xx"',
-        setup   => 'my $x = "aaaaaaaaxy" x 100',
-        code    => 'index $x, "xx"',
-    },
-    # alternating near misses with gaps
-    'expr::index::long_const2aaxxaayy_xy' => {
-        desc    => 'index of a long string with "xx/yy"s against const substr "xy"',
-        setup   => 'my $x = "aaaaaaaaxxbbbbbbbbyy" x 50',
-        code    => 'index $x, "xy"',
-    },
-    'expr::index::short_const3aabcd_bcd' => {
-        desc    => 'index of a short string against a 3 char const substr',
-        setup   => 'my $x = "aaaabcd"',
-        code    => 'index $x, "bcd"',
-    },
-    'expr::index::long_const3aabcd_bcd' => {
-        desc    => 'index of a long string against a 3 char const substr',
-        setup   => 'my $x = "a" x 1000 . "bcd"',
-        code    => 'index $x, "bcd"',
-    },
-    'expr::index::long_const3ab_abc' => {
-        desc    => 'index of a long string of "ab"s against a 3 char const substr "abc"',
-        setup   => 'my $x = "ab" x 500',
-        code    => 'index $x, "abc"',
-    },
-    'expr::index::long_const3bc_abc' => {
-        desc    => 'index of a long string of "bc"s against a 3 char const substr "abc"',
-        setup   => 'my $x = "bc" x 500',
-        code    => 'index $x, "abc"',
-    },
-    'expr::index::utf8_position_1' => {
-        desc    => 'index of a utf8 string, matching at position 1',
-        setup   => 'my $x = "abc". chr(0x100); chop $x',
-        code    => 'index $x, "b"',
     },
 
 
@@ -417,6 +371,21 @@
         setup   => 'my ($x, @a) = 1..4;',
         code    => '($x, @a) = ()',
     },
+    'expr::aassign::mh_empty' => {
+        desc    => 'my hash assigned empty',
+        setup   => '',
+        code    => 'my %h = ()',
+    },
+    'expr::aassign::lhx_empty' => {
+        desc    => 'non-empty lexical hash assigned empty',
+        setup   => 'my %h = 1..4;',
+        code    => '%h = ()',
+    },
+    'expr::aassign::llhx_empty' => {
+        desc    => 'non-empty lexical var and hash assigned empty',
+        setup   => 'my ($x, %h) = 1..5;',
+        code    => '($x, %h) = ()',
+    },
     'expr::aassign::3m_empty' => {
         desc    => 'three my vars assigned empty',
         setup   => '',
@@ -426,6 +395,11 @@
         desc    => 'three lexical vars assigned empty',
         setup   => 'my ($x,$y,$z)',
         code    => '($x,$y,$z) = ()',
+    },
+    'expr::aassign::3lref_empty' => {
+        desc    => 'three lexical ref vars assigned empty',
+        setup   => 'my ($x,$y,$z); my $r = []; ',
+        code    => '($x,$y,$z) = ($r,$r,$r); ($x,$y,$z) = ()',
     },
     'expr::aassign::pa_empty' => {
         desc    => 'package array assigned empty',
@@ -459,6 +433,21 @@
         desc    => 'non-empty lexical var and array assigned 3 consts',
         setup   => 'my ($x, @a) = 1..4;',
         code    => '($x, @a) = (1,2,3)',
+    },
+    'expr::aassign::mh_4c' => {
+        desc    => 'my hash assigned 4 consts',
+        setup   => '',
+        code    => 'my %h = qw(a 1 b 2)',
+    },
+    'expr::aassign::lhx_4c' => {
+        desc    => 'non-empty lexical hash assigned 4 consts',
+        setup   => 'my %h = qw(a 1 b 2);',
+        code    => '%h = qw(c 3 d 4)',
+    },
+    'expr::aassign::llhx_5c' => {
+        desc    => 'non-empty lexical var and array assigned 5 consts',
+        setup   => 'my ($x, %h) = (1, qw(a 1 b 2));',
+        code    => '($x, %h) = (10, qw(c 3 d 4))',
     },
     'expr::aassign::3m_3c' => {
         desc    => 'three my vars assigned 3 consts',
@@ -780,6 +769,71 @@
         code    => '($x,$x) = (undef, $x)',
     },
 
+    'expr::aassign::2list_lex' => {
+        desc    => 'lexical ($x, $y) = (1, 2)',
+        setup   => 'my ($x, $y)',
+        code    => '($x, $y) = (1, 2)',
+    },
+
+    'expr::aassign::lex_rv' => {
+        desc    => 'lexical ($ref1, $ref2) = ($ref3, $ref4)',
+        setup   => 'my ($r1, $r2, $r3, $r4);
+                    ($r1, $r2) = (($r3, $r4) = ([],  []));',
+        code    => '($r1, $r2) = ($r3, $r4)',
+    },
+
+    'expr::aassign::lex_rv1' => {
+        desc    => 'lexical ($ref1, $ref2) = ($ref3, $ref4) where ref1,2 are freed',
+        setup   => 'my ($r1, $r2);',
+        code    => '($r1, $r2) = ([], []);',
+    },
+
+    # array assign of strings
+
+    'expr::aassign::la_3s' => {
+        desc    => 'assign 3 strings to empty lexical array',
+        setup   => 'my @a',
+        code    => '@a = (); @a = qw(abc defg hijkl);',
+    },
+    'expr::aassign::la_3ts' => {
+        desc    => 'assign 3 temp strings to empty lexical array',
+        setup   => 'my @a',
+        code    => '@a = (); @a = map $_, qw(abc defg hijkl);',
+    },
+    'expr::aassign::lan_3s' => {
+        desc    => 'assign 3 strings to non-empty lexical array',
+        setup   => 'my @a = qw(abc defg hijkl)',
+        code    => '@a = qw(abc defg hijkl);',
+    },
+    'expr::aassign::lan_3ts' => {
+        desc    => 'assign 3 temp strings to non-empty lexical array',
+        setup   => 'my @a = qw(abc defg hijkl)',
+        code    => '@a = map $_, qw(abc defg hijkl);',
+    },
+
+    # hash assign of strings
+
+    'expr::aassign::lh_2s' => {
+        desc    => 'assign 2 strings to empty lexical hash',
+        setup   => 'my %h',
+        code    => '%h = (); %h = qw(k1 abc k2 defg);',
+    },
+    'expr::aassign::lh_2ts' => {
+        desc    => 'assign 2 temp strings to empty lexical hash',
+        setup   => 'my %h',
+        code    => '%h = (); %h = map $_, qw(k1 abc k2 defg);',
+    },
+    'expr::aassign::lhn_2s' => {
+        desc    => 'assign 2 strings to non-empty lexical hash',
+        setup   => 'my %h = qw(k1 abc k2 defg);',
+        code    => '%h = qw(k1 abc k2 defg);',
+    },
+    'expr::aassign::lhn_2ts' => {
+        desc    => 'assign 2 temp strings to non-empty lexical hash',
+        setup   => 'my %h = qw(k1 abc k2 defg);',
+        code    => '%h = map $_, qw(k1 abc k2 defg);',
+    },
+
 
     'expr::arith::add_lex_ii' => {
         desc    => 'add two integers and assign to a lexical var',
@@ -810,6 +864,17 @@
         desc    => 'add an int and an NV and assign to a package var',
         setup   => 'my ($x,$y); ($x,$y,$z) = (1, 2.2, 3.3);',
         code    => '$z = $x + $y',
+    },
+    'expr::arith::add_lex_ss' => {
+        desc    => 'add two short strings and assign to a lexical var',
+        setup   => 'my ($x,$y,$z) = ("1", "2", 1);',
+        code    => '$z = $x + $y; $x = "1"; ',
+    },
+
+    'expr::arith::add_lex_ll' => {
+        desc    => 'add two long strings and assign to a lexical var',
+        setup   => 'my ($x,$y,$z) = ("12345", "23456", 1);',
+        code    => '$z = $x + $y; $x = "12345"; ',
     },
 
     'expr::arith::sub_lex_ii' => {
@@ -895,9 +960,234 @@
         code    => '$y = $x--', # scalar context so not optimised to --$x
     },
 
+
+
+    # scalar assign, OP_SASSIGN
+   
+
+    'expr::sassign::scalar_lex_int' => {
+        desc    => 'lexical $x = 1',
+        setup   => 'my $x',
+        code    => '$x = 1',
+    },
+    'expr::sassign::scalar_lex_str' => {
+        desc    => 'lexical $x = "abc"',
+        setup   => 'my $x',
+        code    => '$x = "abc"',
+    },
+    'expr::sassign::scalar_lex_strint' => {
+        desc    => 'lexical $x = 1 where $x was previously a string',
+        setup   => 'my $x = "abc"',
+        code    => '$x = 1',
+    },
+    'expr::sassign::scalar_lex_intstr' => {
+        desc    => 'lexical $x = "abc" where $x was previously an int',
+        setup   => 'my $x = 1;',
+        code    => '$x = "abc"',
+    },
+    'expr::sassign::lex_rv' => {
+        desc    => 'lexical $ref1 = $ref2;',
+        setup   => 'my $r1 = []; my $r = $r1;',
+        code    => '$r = $r1;',
+    },
+    'expr::sassign::lex_rv1' => {
+        desc    => 'lexical $ref1 = $ref2; where $$ref1 gets freed',
+        setup   => 'my $r1 = []; my $r',
+        code    => '$r = []; $r = $r1;',
+    },
+
+
+
+    # using a const string as second arg to index triggers using FBM.
+    # the FBM matcher special-cases 1,2-byte strings.
+    #
+    'func::index::short_const1' => {
+        desc    => 'index of a short string against a 1 char const substr',
+        setup   => 'my $x = "aaaab"',
+        code    => 'index $x, "b"',
+    },
+    'func::index::long_const1' => {
+        desc    => 'index of a long string against a 1 char const substr',
+        setup   => 'my $x = "a" x 1000 . "b"',
+        code    => 'index $x, "b"',
+    },
+    'func::index::short_const2aabc_bc' => {
+        desc    => 'index of a short string against a 2 char const substr',
+        setup   => 'my $x = "aaaabc"',
+        code    => 'index $x, "bc"',
+    },
+    'func::index::long_const2aabc_bc' => {
+        desc    => 'index of a long string against a 2 char const substr',
+        setup   => 'my $x = "a" x 1000 . "bc"',
+        code    => 'index $x, "bc"',
+    },
+    'func::index::long_const2aa_ab' => {
+        desc    => 'index of a long string aaa.. against const substr "ab"',
+        setup   => 'my $x = "a" x 1000',
+        code    => 'index $x, "ab"',
+    },
+    'func::index::long_const2bb_ab' => {
+        desc    => 'index of a long string bbb.. against const substr "ab"',
+        setup   => 'my $x = "b" x 1000',
+        code    => 'index $x, "ab"',
+    },
+    'func::index::long_const2aa_bb' => {
+        desc    => 'index of a long string aaa.. against const substr "bb"',
+        setup   => 'my $x = "a" x 1000',
+        code    => 'index $x, "bb"',
+    },
+    # this one is designed to be pathological
+    'func::index::long_const2ab_aa' => {
+        desc    => 'index of a long string abab.. against const substr "aa"',
+        setup   => 'my $x = "ab" x 500',
+        code    => 'index $x, "aa"',
+    },
+    # near misses with gaps, 1st letter
+    'func::index::long_const2aaxx_xy' => {
+        desc    => 'index of a long string with "xx"s against const substr "xy"',
+        setup   => 'my $x = "aaaaaaaaxx" x 100',
+        code    => 'index $x, "xy"',
+    },
+    # near misses with gaps, 2nd letter
+    'func::index::long_const2aayy_xy' => {
+        desc    => 'index of a long string with "yy"s against const substr "xy"',
+        setup   => 'my $x = "aaaaaaaayy" x 100',
+        code    => 'index $x, "xy"',
+    },
+    # near misses with gaps, duplicate letter
+    'func::index::long_const2aaxy_xx' => {
+        desc    => 'index of a long string with "xy"s against const substr "xx"',
+        setup   => 'my $x = "aaaaaaaaxy" x 100',
+        code    => 'index $x, "xx"',
+    },
+    # alternating near misses with gaps
+    'func::index::long_const2aaxxaayy_xy' => {
+        desc    => 'index of a long string with "xx/yy"s against const substr "xy"',
+        setup   => 'my $x = "aaaaaaaaxxbbbbbbbbyy" x 50',
+        code    => 'index $x, "xy"',
+    },
+    'func::index::short_const3aabcd_bcd' => {
+        desc    => 'index of a short string against a 3 char const substr',
+        setup   => 'my $x = "aaaabcd"',
+        code    => 'index $x, "bcd"',
+    },
+    'func::index::long_const3aabcd_bcd' => {
+        desc    => 'index of a long string against a 3 char const substr',
+        setup   => 'my $x = "a" x 1000 . "bcd"',
+        code    => 'index $x, "bcd"',
+    },
+    'func::index::long_const3ab_abc' => {
+        desc    => 'index of a long string of "ab"s against a 3 char const substr "abc"',
+        setup   => 'my $x = "ab" x 500',
+        code    => 'index $x, "abc"',
+    },
+    'func::index::long_const3bc_abc' => {
+        desc    => 'index of a long string of "bc"s against a 3 char const substr "abc"',
+        setup   => 'my $x = "bc" x 500',
+        code    => 'index $x, "abc"',
+    },
+    'func::index::utf8_position_1' => {
+        desc    => 'index of a utf8 string, matching at position 1',
+        setup   => 'my $x = "abc". chr(0x100); chop $x',
+        code    => 'index $x, "b"',
+    },
+
+
+
+    'func::sort::num' => {
+        desc    => 'plain numeric sort',
+        setup   => 'my (@a, @b); @a = reverse 1..10;',
+        code    => '@b = sort { $a <=> $b } @a',
+    },
+    'func::sort::num_block' => {
+        desc    => 'codeblock numeric sort',
+        setup   => 'my (@a, @b); @a = reverse 1..10;',
+        code    => '@b = sort { $a + 1 <=> $b + 1 } @a',
+    },
+    'func::sort::num_fn' => {
+        desc    => 'function numeric sort',
+        setup   => 'sub f { $a + 1 <=> $b + 1 } my (@a, @b); @a = reverse 1..10;',
+        code    => '@b = sort f @a',
+    },
+    'func::sort::str' => {
+        desc    => 'plain string sort',
+        setup   => 'my (@a, @b); @a = reverse "a".."j";',
+        code    => '@b = sort { $a cmp $b } @a',
+    },
+    'func::sort::str_block' => {
+        desc    => 'codeblock string sort',
+        setup   => 'my (@a, @b); @a = reverse "a".."j";',
+        code    => '@b = sort { ($a . "") cmp ($b . "") } @a',
+    },
+    'func::sort::str_fn' => {
+        desc    => 'function string sort',
+        setup   => 'sub f { ($a . "") cmp ($b . "") } my (@a, @b); @a = reverse  "a".."j";',
+        code    => '@b = sort f @a',
+    },
+
+    'func::sort::num_inplace' => {
+        desc    => 'plain numeric sort in-place',
+        setup   => 'my @a = reverse 1..10;',
+        code    => '@a = sort { $a <=> $b } @a',
+    },
+    'func::sort::num_block_inplace' => {
+        desc    => 'codeblock numeric sort in-place',
+        setup   => 'my @a = reverse 1..10;',
+        code    => '@a = sort { $a + 1 <=> $b + 1 } @a',
+    },
+    'func::sort::num_fn_inplace' => {
+        desc    => 'function numeric sort in-place',
+        setup   => 'sub f { $a + 1 <=> $b + 1 } my @a = reverse 1..10;',
+        code    => '@a = sort f @a',
+    },
+    'func::sort::str_inplace' => {
+        desc    => 'plain string sort in-place',
+        setup   => 'my @a = reverse "a".."j";',
+        code    => '@a = sort { $a cmp $b } @a',
+    },
+    'func::sort::str_block_inplace' => {
+        desc    => 'codeblock string sort in-place',
+        setup   => 'my @a = reverse "a".."j";',
+        code    => '@a = sort { ($a . "") cmp ($b . "") } @a',
+    },
+    'func::sort::str_fn_inplace' => {
+        desc    => 'function string sort in-place',
+        setup   => 'sub f { ($a . "") cmp ($b . "") } my @a = reverse  "a".."j";',
+        code    => '@a = sort f @a',
+    },
+
+
+    'func::split::vars' => {
+        desc    => 'split into two lexical vars',
+        setup   => 'my $s = "abc:def";',
+        code    => 'my ($x, $y) = split /:/, $s, 2;',
+    },
+
+    'func::split::array' => {
+        desc    => 'split into a lexical array',
+        setup   => 'my @a; my $s = "abc:def";',
+        code    => '@a = split /:/, $s, 2;',
+    },
+    'func::split::myarray' => {
+        desc    => 'split into a lexical array declared in the assign',
+        setup   => 'my $s = "abc:def";',
+        code    => 'my @a = split /:/, $s, 2;',
+    },
+    'func::split::arrayexpr' => {
+        desc    => 'split into an @{$expr} ',
+        setup   => 'my $s = "abc:def"; my $r = []',
+        code    => '@$r = split /:/, $s, 2;',
+    },
+    'func::split::arraylist' => {
+        desc    => 'split into an array with extra arg',
+        setup   => 'my @a; my $s = "abc:def";',
+        code    => '@a = (split(/:/, $s, 2), 1);',
+    },
+
+
     'loop::block' => {
         desc    => 'empty basic loop',
-        setup   => ';',
+        setup   => '',
         code    => '{1;}',
     },
 
@@ -1071,4 +1361,31 @@
         code    => 'while (++$i % 4) {}',
     },
 
+
+    'regex::anyof_plus::anchored' => {
+        desc    => '/^[acgt]+/',
+        setup   => '$_ = "a" x 100;',
+        code    => '/^[acgt]+/',
+    },
+    'regex::anyof_plus::floating' => {
+        desc    => '/[acgt]+where match starts at position 0 for 100 chars/',
+        setup   => '$_ = "a" x 100;',
+        code    => '/[acgt]+/',
+    },
+    'regex::anyof_plus::floating_away' => {
+        desc    => '/[acgt]+/ where match starts at position 100 for 100 chars',
+        setup   => '$_ = ("0" x 100) . ("a" x 100);',
+        code    => '/[acgt]+/',
+    },
+
+    'regex::whilem::min_captures_fail' => {
+        desc    => '/WHILEM with anon-greedy match and captures that fails',
+        setup   => '$_ = ("a" x 20)',
+        code    => '/^(?:(.)(.))*?[XY]/',
+    },
+    'regex::whilem::max_captures_fail' => {
+        desc    => '/WHILEM with a greedy match and captures that fails',
+        setup   => '$_ = ("a" x 20)',
+        code    => '/^(?:(.)(.))*[XY]/',
+    },
 ];

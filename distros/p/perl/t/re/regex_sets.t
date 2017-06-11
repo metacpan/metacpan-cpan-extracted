@@ -7,12 +7,13 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = ('../lib','.','../ext/re');
     require './test.pl';
     require './charset_tools.pl';
     require './loc_tools.pl';
-    skip_all_without_unicode_tables();
+    set_up_inc( '../lib','.','../ext/re' );
 }
+
+skip_all_without_unicode_tables();
 
 use strict;
 use warnings;
@@ -175,11 +176,32 @@ for my $char ("٠", "٥", "٩") {
     fresh_perl_like('no warnings "experimental::regex_sets"; qr/(?[ ! ! (\w])/',
                     qr/^Unmatched \(/, {},
                     'qr/(?[ ! ! (\w])/ doesnt panic');
+
     # The following didn't panic before, but easy to add this here with a
     # paren between the !!
     fresh_perl_like('no warnings "experimental::regex_sets";qr/(?[ ! ( ! (\w)])/',
                     qr/^Unmatched \(/, {},
                     'qr/qr/(?[ ! ( ! (\w)])/');
+}
+
+{   # RT #129122
+    my $pat = '(?[ ( [ABC] - [B] ) + ( [abc] - [b] ) + [def] ])';
+    like("A", qr/$pat/, "'A' matches /$pat/");
+    unlike("B", qr/$pat/, "'B' doesn't match /$pat/");
+    like("C", qr/$pat/, "'C' matches /$pat/");
+    unlike("D", qr/$pat/, "'D' doesn't match /$pat/");
+    like("a", qr/$pat/, "'a' matches /$pat/");
+    unlike("b", qr/$pat/, "'b' doesn't match /$pat/");
+    like("c", qr/$pat/, "'c' matches /$pat/");
+    like("d", qr/$pat/, "'d' matches /$pat/");
+    like("e", qr/$pat/, "'e' matches /$pat/");
+    like("f", qr/$pat/, "'f' matches /$pat/");
+    unlike("g", qr/$pat/, "'g' doesn't match /$pat/");
+}
+
+{   # [perl #129322 ]  This crashed perl, so keep after the ones that don't
+    my $pat = '(?[[!]&[0]^[!]&[0]+[a]])';
+    like("a", qr/$pat/, "/$pat/ compiles and matches 'a'");
 }
 
 done_testing();

@@ -13,7 +13,9 @@ dist.ini
 lib/YAML/PP.pm
 lib/YAML/PP/Loader.pm
 lib/YAML/PP/Parser.pm
+lib/YAML/PP/Reader.pm
 lib/YAML/PP/Render.pm
+numbers.pl
 t/00.compile.t
 t/10.parse.t
 t/11.invalid.t
@@ -172,4 +174,7 @@ t/valid/v014/test.event
 t/valid/v015/===
 t/valid/v015/in.yaml
 t/valid/v015/test.event
+t/valid/v016/===
+t/valid/v016/in.yaml
+t/valid/v016/test.event
 xt/02.pod-cover.t

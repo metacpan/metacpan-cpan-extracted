@@ -36,8 +36,8 @@ SYNOPSIS
         $etcd->put( { key => 'foo2', value => 'bar2', lease => 7587821338341002662 } );
 
 DESCRIPTION
-    "Net::Etcd" An object oriented interface to the v3 REST API provided by the
-    etcd grpc gateway.
+    This module has been superseded by Net::Etcd and will be removed from
+    CPAN on June 29th 2017
 
 ACCESSORS
   host
@@ -45,7 +45,6 @@ ACCESSORS
   username
   password
   ssl
-  auth
   api_root
   api_prefix
     defaults to /v3alpha
@@ -68,8 +67,8 @@ PUBLIC METHODS
 
         $etcd->user_role({ name => 'samba', role => 'foo' });
 
-  auth_enable
-    Currently not available.
+  auth
+    Returns a Net::Etcd::Auth object.
 
   lease
     Returns a Net::Etcd::Lease object.
@@ -82,6 +81,9 @@ PUBLIC METHODS
 
   range
     Returns a Net::Etcd::KV::Range object.
+
+  txn
+    Returns a Net::Etcd::KV::Txn object.
 
   configuration
     Initialize configuration checks to see it etcd is installed locally.

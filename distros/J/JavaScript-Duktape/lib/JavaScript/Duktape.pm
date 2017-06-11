@@ -4,7 +4,7 @@ use warnings;
 use Carp;
 use Data::Dumper;
 use Scalar::Util qw( weaken );
-our $VERSION = '2.1.5';
+our $VERSION = '2.2.0';
 
 my $GlobalRef = {};
 
@@ -131,9 +131,26 @@ use constant {
 
 sub new {
     my $class = shift;
+    my %options = @_;
+
+    my $max_memory = $options{max_memory} || 0;
+    my $timeout    = $options{timeout} || 0;
+
+    if ($timeout){
+        croak "timeout option must be a number" if !JavaScript::Duktape::Vm::duk_sv_is_number( $timeout );
+    }
+
+    if ( $max_memory ){
+        croak "max_memory option must be a number" if !JavaScript::Duktape::Vm::duk_sv_is_number( $max_memory );
+        croak "max_memory must be at least 256k (256 * 1024)" if $max_memory < 256 * 1024;
+    }
+
     my $self  = bless {}, $class;
-    my $duk   = $self->{duk} = JavaScript::Duktape::Vm->perl_duk_new();
+
+    my $duk   = $self->{duk} = JavaScript::Duktape::Vm->perl_duk_new( $max_memory, $timeout );
+
     $self->{pid} = $$;
+    $self->{max_memory} = $max_memory;
 
     # Initialize global stash 'PerlGlobalStash'
     # this will be used to store some perl refs
@@ -240,17 +257,28 @@ sub eval {
 sub vm  { shift->{duk}; }
 sub duk { shift->{duk}; }
 
+sub set_timeout {
+    my $self = shift;
+    $self->duk->set_timeout( shift );
+}
+
+sub resize_memory {
+    my $self = shift;
+    $self->duk->resize_memory( shift );
+}
+
 sub destroy {
     local $@;
     my $self = shift;
     my $duk  = delete $self->{duk};
     return if !$duk;
+    $duk->free_perl_duk();
     $duk->destroy_heap();
 }
 
 sub DESTROY {
     my $self = shift;
-    if ( $self->{pid} == $$ ) {
+    if ( $self->{pid} && $self->{pid} == $$ ) {
         $self->destroy();
     }
 }
@@ -278,11 +306,11 @@ BEGIN {
       : _get_path('duktape.so');
 }
 
-use Inline C => config => typemaps => _get_path('typemap'),
-  INC        => '-I' . _get_path('../C') . ' -I' . _get_path('../C/lib');
-
-# myextlib => $Duklib,
-# LIBS     => '-L'. JavaScript::Duktape::C::libPath::getPath('../C') . ' -lduktape';
+use Inline C => config =>
+    typemaps => _get_path('typemap'),
+    INC      => '-I' . _get_path('../C') . ' -I' .  _get_path('../C/lib');
+    # myextlib => $Duklib,
+    # LIBS     => '-L'. _get_path('../C/lib') . ' -lduktape';
 
 use Inline C => _get_path('duk_perl.c');
 
@@ -608,6 +636,24 @@ sub safe_call {
 
     eval { $ret = $self->perl_duk_safe_call( $safe, @_ ) };
     return defined $ret ? $ret : 1;
+}
+
+sub set_timeout {
+    my $self = shift;
+    my $timeout = shift;
+
+    croak "timeout must be a number" if !duk_sv_is_number($timeout);
+    $self->perl_duk_set_timeout($timeout);
+}
+
+sub resize_memory {
+    my $self = shift;
+    my $max_memory = shift || 0;
+
+    croak "max_memory should be a number" if !duk_sv_is_number( $max_memory );
+    croak "max_memory must be at least 256k (256 * 1024)" if $max_memory < 256 * 1024;
+
+    $self->perl_duk_resize_memory($max_memory);
 }
 
 ##############################################
@@ -945,27 +991,66 @@ JavaScript::Duktape - Perl interface to Duktape embeddable javascript engine
 
     use JavaScript::Duktape;
 
-    ##create new js context
+    ## create new js context
     my $js = JavaScript::Duktape->new();
 
-    #set function to be used from javascript land
+    # set function to be used from javascript land
     $js->set('write' => sub {
         print $_[0], "\n";
     });
 
-    $js->eval(qq~
+    $js->eval(qq{
         (function(){
             for (var i = 0; i < 100; i++){
                 write(i);
             }
         })();
-    ~);
+    });
 
 =head1 DESCRIPTION
 
 JavaScript::Duktape implements almost all duktape javascript engine api, the c code is just
 a thin layer that maps duktape api to perl, and all other functions implemented in perl
 it self, so maintaing and contributing to the base code should be easy.
+
+=head1 JavaScript::Duktape->new(%options)
+
+initiate JavaScript::Duktape with options
+
+=head2 options
+
+=over 4
+
+=item max_memory
+
+Set maximum memory allowed for the excuted javascript code to consume, not setting
+this option is the default, which means no restricts on the maximum memory that can
+be consumed.
+
+Minumum value to set for the C<max_memory> option is 256 * 1024 = (256k)
+setting number below 256k will croak.
+
+    max_memory => 256 * 1024 * 2
+
+You can resize the memory allowed to consume on different executions by calling
+C<resize_memory> method, see L<Sandboxing> section below.
+
+=item timout
+
+Set maximum time javascript code can run, this value represented in seconds and is not 100% guranteed
+that the javascript code will fail after the exact value passed, but it will eventually fail on first tick checking.
+
+Not setting this option is the default, which means no timeout checking at all
+
+    timeout => 5
+
+You can override this value later on another code evaluation by calling C<set_timeout> method
+
+    $js->set_timeout(25);
+
+See L<Sandboxing> section below
+
+=back
 
 =head1 methods
 
@@ -1032,6 +1117,93 @@ For more on how you can use C<JavaScript::Duktape::Object> please see
 examples provided with this distribution
 
 =back
+
+=head1 Sandboxing
+
+As of version C<2.2.0> C<JavaScript::Duktape> integrated some of
+Duktape Engine Sandboxing methods, this will allow developers to restrict
+the running javascript code by restricting memory consumption and running time
+
+C<DUK_USE_EXEC_TIMEOUT_CHECK> flag is set by default to enable
+L<< Bytecode execution timeout|https://github.com/svaarala/duktape/blob/master/doc/sandboxing.rst#bytecode-execution-timeout-details >>
+
+    # prevent javascript code to consume memory more
+    # than max_memory option
+
+    my $js = JavaScript::Duktape->new( max_memory => 256 * 1024 );
+
+    # this will fail with "Error: alloc failed" message
+    # when running, because it will consume more memory
+    # than the allowed max_memory
+    $js->eval(q{
+        var str = '';
+        while(1){ str += 'XXXX' }
+    });
+
+=head2 C<set_timout(t)>
+
+Enable/Disable timeout checking, to disable set the value to 0
+this value is in seconds
+
+    my $js = JavaScript::Duktape->new();
+
+    # throw 'time out' Error if executed
+    # js code does not finish after 5 seconds
+    $js->set_timeout(5);
+
+    eval {
+        $js->eval(q{
+            while(1){}
+        });
+    };
+
+    print $@, "\n"; #RangeError: execution timeout
+
+    # disable timeout checking
+    $js->set_timeout(0);
+
+    # now will run infinitely
+    $js->eval(q{
+        while(1){}
+    });
+
+This method can be used with duktape VM instance too
+
+    my $js = JavaScript::Duktape->new();
+    my $duk = $js->duk();
+
+    $duk->set_timeout(3);
+    $duk->peva_stringl(q{
+        while (1){}
+    });
+
+    print $duk->safe_to_string(-1); # Error: execution 'time out'
+
+=head2 C<resize_memory(m)>
+
+This method will have effect only if you intiated with max_memory option
+
+    my $js = JavaScript::Duktape->new( max_memory => 1024 * 256 );
+
+
+    eval {
+        $js->eval(q{
+            var buf = Buffer(( 1024 * 256 ) + 1000 );
+            print('does not reach');
+        });
+    };
+
+    print $@, "\n"; # Error: 'alloc failed'
+
+    $js->resize_memory( 1024 * 256 * 2 );
+
+    # now it will not throw
+    $js->eval(q{
+        var buf = Buffer(( 1024 * 256 ) + 1000 );
+        print('ok');
+    });
+
+
 
 =head1 VM API
 
@@ -1263,7 +1435,8 @@ Mamod Mehyar C<< <mamod.mehyar@gmail.com> >>
 
 =head1 CONTRIBUTORS
 
-Big thanks for the much appreciated contributors
+Thanks for everyone who contributed to this module, either by code, bug reports, API design
+or suggestions
 
 =over 4
 
@@ -1271,7 +1444,15 @@ Big thanks for the much appreciated contributors
 
 =item * jomo666 L<@jomo666|https://github.com/jomo666>
 
+=item * Viacheslav Tykhanovskyi L<@vti|https://github.com/vti>
+
+=item * Slaven Rezić L<@eserte|https://github.com/eserte>
+
 =back
+
+=head1 APPRECIATION
+
+Credits should go to L<< Duktape Javascript embeddable engine|http://duktape.org >> and it's creator L<< Sami Vaarala|https://github.com/svaarala >>
 
 =head1 LICENSE
 

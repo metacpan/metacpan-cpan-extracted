@@ -1,7 +1,7 @@
 package CPAN::Release::FromURL;
 
-our $DATE = '2016-11-07'; # DATE
-our $VERSION = '0.07'; # VERSION
+our $DATE = '2017-06-09'; # DATE
+our $VERSION = '0.08'; # VERSION
 
 use 5.010001;
 use strict;
@@ -76,12 +76,16 @@ CPAN::Release::FromURL - Extract CPAN release (tarball) name from a URL
 
 =head1 VERSION
 
-This document describes version 0.07 of CPAN::Release::FromURL (from Perl distribution CPAN-Info-FromURL), released on 2016-11-07.
+This document describes version 0.08 of CPAN::Release::FromURL (from Perl distribution CPAN-Info-FromURL), released on 2017-06-09.
 
 =head1 FUNCTIONS
 
 
-=head2 extract_cpan_release_from_url($url) -> str
+=head2 extract_cpan_release_from_url
+
+Usage:
+
+ extract_cpan_release_from_url($url) -> str
 
 Extract CPAN release (tarball) name from a URL.
 
@@ -155,7 +159,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

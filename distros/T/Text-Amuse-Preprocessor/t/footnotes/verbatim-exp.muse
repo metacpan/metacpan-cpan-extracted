@@ -8,6 +8,10 @@ It came to my attention that people find troublesome to edit texts [1]
 with footnotes because you have to add/remove them and keeping the
 numbering in “sync” turns “out” to be a problem. [2]
 
+This is a    tab and another    tab
+
+Some zero and zero
+
 [1] This footnote is real.
 
 [2] This is also real.

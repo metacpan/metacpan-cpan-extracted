@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:creativeCommons="http://backend.userland.com/creativeCommonsRssModule" xmlns:re="http://purl.org/atompub/rank/1.0">
+    <title type="text">Recent Questions - Stack Overflow</title>
+    <link rel="self" href="http://stackoverflow.com/feeds" type="application/atom+xml" />
+    <link rel="alternate" href="http://stackoverflow.com/questions" type="text/html" />
+    <subtitle>most recent 30 from stackoverflow.com</subtitle>
+    <updated>2014-07-06T05:33:58Z</updated>
+    <id>http://stackoverflow.com/feeds</id>
+    <creativeCommons:license>http://www.creativecommons.org/licenses/by-sa/3.0/rdf</creativeCommons:license> 
+    <entry>
+        <id>http://stackoverflow.com/q/24593005</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text"></title>
+            <category scheme="http://stackoverflow.com/tags" term="asp.net-mvc-4" />
+            <category scheme="http://stackoverflow.com/tags" term="unit-testing" />
+        <author>
+            <name>Nps</name>
+            <uri>http://stackoverflow.com/users/276970</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/24593005/how-to-write-unit-test-for-ivalidatableobject-model" />
+        <published>2014-07-06T05:33:05Z</published>
+        <updated>2014-07-06T05:33:05Z</updated>
+        <summary type="html">
+          hoge hoge
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/24593002</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">hide softkeyboard when it is called from menuitem</title>
+            <category scheme="http://stackoverflow.com/tags" term="menuitem" />
+            <category scheme="http://stackoverflow.com/tags" term="android-softkeyboard" />
+            <category scheme="http://stackoverflow.com/tags" term="android-menu" />
+        <author>
+            <name>JoeCoolman</name>
+            <uri>http://stackoverflow.com/users/1576546</uri>
+        </author>
+        <!-- <link rel="alternate" href="http://stackoverflow.com/questions/24593002/hide-softkeyboard-when-it-is-called-from-menuitem" /> -->
+        <published>2014-07-06T05:31:56Z</published>
+        <updated>2014-07-06T05:31:56Z</updated>
+        <summary type="html">
+foo bar
+        </summary>
+    </entry>
+</feed>

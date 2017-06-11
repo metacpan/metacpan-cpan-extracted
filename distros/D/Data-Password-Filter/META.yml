@@ -21,10 +21,10 @@ no_index:
 provides:
   Data::Password::Filter:
     file: lib/Data/Password/Filter.pm
-    version: '0.16'
+    version: '0.17'
   Data::Password::Filter::Params:
     file: lib/Data/Password/Filter/Params.pm
-    version: '0.16'
+    version: '0.17'
 requires:
   File::Share: '0.25'
   Moo: '2.000000'
@@ -34,5 +34,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Data-Password-Filter.git
-version: '0.16'
+version: '0.17'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

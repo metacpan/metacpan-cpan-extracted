@@ -138,10 +138,12 @@ sub new {
     }
 
     if (defined(my $limit = $params{limit})) {
+        $limit = 0 unless $limit =~ m/^[0-9]+$/;
         $sql .= ' LIMIT ' . $limit;
     }
 
     if (defined(my $offset = $params{offset})) {
+        $offset = 0 unless $offset =~ m/^[0-9]+$/;
         $sql .= ' OFFSET ' . $offset;
     }
 

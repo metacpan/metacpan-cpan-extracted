@@ -1,3 +1,3 @@
-requires 'Pcore',          v0.22.2;
-requires 'AnyEvent::XMPP', v0.0.0;
-requires 'Net::XMPP',      v0.0.0;
+requires 'Pcore',                     v0.22.2;
+requires 'AnyEvent::XMPP',            v0.55.0;
+requires 'AnyEvent::XMPP::Ext::HTML', v0.2.0;

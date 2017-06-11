@@ -17,15 +17,17 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.008",
   "NAME" => "WebService::Pixabay",
   "PREREQ_PM" => {
-    "Data::Printer" => "0.39",
+    "Data::Dumper" => 0,
     "Function::Parameters" => "2.000006",
     "LWP::Online" => "1.08",
     "Modern::Perl" => "1.20170117",
     "Moo" => "2.003000",
-    "Test::More" => "1.302075",
-    "WebService::Client" => "0.0501"
+    "WebService::Client" => "0.0601"
   },
-  "VERSION" => "0.0.6",
+  "TEST_REQUIRES" => {
+    "Test::More" => 0
+  },
+  "VERSION" => "2.0.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -33,13 +35,13 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Data::Printer" => "0.39",
+  "Data::Dumper" => 0,
   "Function::Parameters" => "2.000006",
   "LWP::Online" => "1.08",
   "Modern::Perl" => "1.20170117",
   "Moo" => "2.003000",
-  "Test::More" => "1.302075",
-  "WebService::Client" => "0.0501"
+  "Test::More" => 0,
+  "WebService::Client" => "0.0601"
 );
 
 

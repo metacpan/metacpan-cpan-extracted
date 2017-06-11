@@ -56,21 +56,21 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
             push @row, $dist->name;
 
             if ( $dist->id->{release} eq 'v0.0.0' ) {
-                push @row, WHITE . ON_RED . ' unreleased ' . RESET;
+                push @row, $WHITE . $ON_RED . ' unreleased ' . $RESET;
             }
             else {
                 push @row, $dist->id->{release};
             }
 
             if ( $dist->id->{release_distance} ) {
-                push @row, WHITE . ON_RED . sprintf( ' %3s ', $dist->id->{release_distance} ) . RESET;
+                push @row, $WHITE . $ON_RED . sprintf( ' %3s ', $dist->id->{release_distance} ) . $RESET;
             }
             else {
                 push @row, q[ - ];
             }
 
             if ( !$dist->is_commited ) {
-                push @row, WHITE . ON_RED . ' uncommited ' . RESET;
+                push @row, $WHITE . $ON_RED . ' uncommited ' . $RESET;
             }
             else {
                 push @row, q[ - ];
@@ -81,7 +81,7 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
                     push @row, q[ - ];
                 }
                 else {
-                    push @row, WHITE . ON_RED . q[ ] . $dist->id->{phase} . q[ ] . RESET;
+                    push @row, $WHITE . $ON_RED . q[ ] . $dist->id->{phase} . q[ ] . $RESET;
                 }
             }
             else {

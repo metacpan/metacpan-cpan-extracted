@@ -1,0 +1,154 @@
+==================================================
+Changes from 2016-06-10 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.002 at 2017-06-10 15:07:42 +0000
+------------------------------------------
+
+  Change: d96caddea86281e7133e06d36c4d544333894750
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-06-10 15:36:53 +0000
+
+    Share plugin namespace with prove siblings via environment variable 
+
+  Change: 965e10ae955f8d5d21d1f4b163d8e5fbfd3ac853
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-06-10 15:12:49 +0000
+
+    Tear down plugin instance when the code is unloaded 
+
+  Change: c979ba8323a9d5372a5178300d199f8872e25c70
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-06-09 12:23:03 +0000
+
+    Travis dont need postgresql for now 
+
+  Change: 55e793b74f5f3d2875b1a31e037ebac099e0a411
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-06-09 12:22:40 +0000
+
+    Force scalar read_file 
+
+  Change: 50aa8cadcb793a3bb394a2258cbf497a8c72282b
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-06-09 12:06:08 +0000
+
+    Added prove plugin 
+
+  Change: 123f76ab145d781834b3ba4e3ea7f8b03a455c57
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-06-09 09:36:11 +0000
+
+    Use the mysql instance in _holds_mysqld 
+
+------------------------------------------
+version 0.001 at 2017-06-08 15:17:53 +0000
+------------------------------------------
+
+  Change: 1fa88f05de0442518de64d1612bfba7371518427
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-06-08 16:17:53 +0000
+
+    Added doc 
+
+  Change: 3ead4275a3c7810299f6234ec7881952359bd26b
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-06-08 15:18:50 +0000
+
+    Note instead of warn 
+
+  Change: 24f5fd07ccd9ede677f4346553760d53b4e19db8
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-06-08 15:01:18 +0000
+
+    Warn about the main feature 
+
+  Change: d16994bdf48838c59d269811fef4932986af5f30
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-06-08 14:54:30 +0000
+
+    Allow multiple instances of Test DBs per process 
+
+  Change: 5bdb6906eecbffd8c660f61b6785858dbba3cdfd
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-06-08 14:40:16 +0000
+
+    Lowered required versions 
+
+  Change: 06575b751f3be22e93e1bb65aa9924bbcc629212
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-06-08 10:44:01 +0000
+
+    Protect against re-entrant monitor 
+
+  Change: 10561dd4d322e7839b0e07b7201423020e42c69b
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-06-08 10:16:46 +0000
+
+    Old scholl selectall_arrayref 
+
+  Change: 4b28d16cadf7ccc0a0531531e49a7b8c4b00c7e7
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-06-08 10:10:12 +0000
+
+    Real test 
+
+  Change: decbb3e18a47becae605576877e01e00fd0d2d4d
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-06-08 09:55:32 +0000
+
+    Namespacing 
+
+  Change: 3f0d19299ec4c4314f447e8555339562e29c43f4
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-06-08 09:43:59 +0000
+
+    The process holding mysqld will wait for its termination 
+
+  Change: e097338900673e51846de1d067b73d50e7ef7f28
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-06-07 17:41:16 +0000
+
+    Works with 3 parrallel DBs 
+
+  Change: daac13f2063687031a6b4406ef548b465fdc8236
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-06-07 14:36:53 +0000
+
+    Do not run the tests in parrallel, as it would defeat the purpose of
+    the tests 
+
+  Change: dcf3e2bddc16c73f4d4a4082243eecf237a86f22
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-06-07 14:32:31 +0000
+
+    Only kill the DB cluster if the registry is empty 
+
+  Change: 28ff16dbc66fd485f8f0714de4813595bf7a198b
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-06-07 12:52:56 +0000
+
+    First travis 
+
+  Change: fb7d42314aaa85da90e34a4218ee7499dca06041
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-06-07 12:51:38 +0000
+
+    dzil test passes 
+
+  Change: b6dc0d089f26023079ec82c9c3b2ff898e4fa216
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-06-07 12:46:42 +0000
+
+    Ok dropin replacement for test mysqld 
+
+  Change: a60d6a4e0c6814cb57aa8704b590d3b8e0db7794
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-06-07 11:13:21 +0000
+
+    First commit 
+
+================
+End of releases.
+================

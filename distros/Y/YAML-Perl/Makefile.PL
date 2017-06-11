@@ -1,15 +1,49 @@
-use inc::Module::Install;
+use strict;
+use warnings;
 
-name 'YAML-Perl';
+use 5.008001;
 
-all_from 'lib/YAML/Perl.pm';
+use ExtUtils::MakeMaker;
 
-requires 'Error'                => 0;
+my %FallbackPrereqs = (
+  "Test::More" => "0.88",
+);
 
-use_test_base;
+my %WriteMakefileArgs = (
+  "ABSTRACT_FROM" => "lib/YAML/Perl.pm",
+  "AUTHOR" => [
+    "Ingy döt Net <ingy\@cpan.org>",
+    "Tina Müller <tinita\@cpan.org>",
+  ],
+  "CONFIGURE_REQUIRES" => {
+    "ExtUtils::MakeMaker" => 0,
+  },
+  "DISTNAME" => "YAML-Perl",
+  "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.008001",
+  "NAME" => "YAML::Perl",
+  "PREREQ_PM" => {
+    "YAML::PP::Parser" => '0.003',
+  },
+  "TEST_REQUIRES" => {
+    %FallbackPrereqs,
+  },
+  "VERSION_FROM" => "lib/YAML/Perl.pm",
 
-clean_files 'pyyaml/lib/yaml/*.pyc';
+  "test" => {
+    "RECURSIVE_TEST_FILES" => 1,
+  },
+);
 
-auto_install;
 
-WriteAll;
+
+unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
+  delete $WriteMakefileArgs{TEST_REQUIRES};
+  delete $WriteMakefileArgs{BUILD_REQUIRES};
+  $WriteMakefileArgs{PREREQ_PM} = \%FallbackPrereqs;
+}
+
+delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
+  unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
+
+WriteMakefile(%WriteMakefileArgs);

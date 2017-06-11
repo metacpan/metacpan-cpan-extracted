@@ -1,4 +1,7 @@
-Revision history for Finance-Bank-ID-Mandiri
+0.34    2017-05-31 (PERLANCAR)
+
+	- Update regexes to allow semicolon in description.
+
 
 0.33    2016-01-07 (PERLANCAR)
 

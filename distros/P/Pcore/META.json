@@ -135,7 +135,7 @@
             "XML::Hash::XS" : "0",
             "YAML::XS" : "0",
             "multidimensional" : "0",
-            "perl" : "v5.24.1"
+            "perl" : "v5.26.0"
          }
       },
       "test" : {
@@ -156,6 +156,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore/overview"
       }
    },
-   "version" : "v0.36.0",
-   "x_serialization_backend" : "JSON::PP version 2.93"
+   "version" : "v0.40.3",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

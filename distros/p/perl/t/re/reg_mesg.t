@@ -4,28 +4,38 @@ $|=1;   # outherwise things get mixed up in output
 
 BEGIN {
 	chdir 't' if -d 't';
-	@INC = qw '../lib ../ext/re';
 	require './test.pl';
-	skip_all_without_unicode_tables();
+    set_up_inc( qw '../lib ../ext/re' );
 	eval 'require Config'; # assume defaults if this fails
 }
+
+skip_all_without_unicode_tables();
 
 use strict;
 use open qw(:utf8 :std);
 
-##
+# Kind of a kludge to mark warnings to be expected only if we are testing
+# under "use re 'strict'"
+my $only_strict_marker = ':expected_only_under_strict';
+
 ## If the markers used are changed (search for "MARKER1" in regcomp.c),
 ## update only these two regexs, and leave the {#} in the @death/@warning
 ## arrays below. The {#} is a meta-marker -- it marks where the marker should
 ## go.
-##
-## Returns empty string if that is what is expected.  Otherwise, handles
-## either a scalar, turning it into a single element array; or a ref to an
-## array, adjusting each element.  If called in array context, returns an
-## array, otherwise the join of all elements
 
-sub fixup_expect {
-    my $expect_ref = shift;
+sub fixup_expect ($$) {
+
+    # Fixes up the expected results by inserting the boiler plate text.
+    # Returns empty string if that is what is expected.  Otherwise, handles
+    # either a scalar, turning it into a single element array; or a ref to an
+    # array, adjusting each element.  If called in array context, returns an
+    # array, otherwise the join of all elements.
+
+    # The string $only_strict_marker will be removed from any expect line it
+    # begins, and if $strict is not true, that expect line will be removed
+    # from the output (hence won't be expected)
+
+    my ($expect_ref, $strict) = @_;
     return "" if $expect_ref eq "";
 
     my @expect;
@@ -36,12 +46,15 @@ sub fixup_expect {
         @expect = $expect_ref;
     }
 
+    my @new_expect;
     foreach my $element (@expect) {
-        $element =~ s/{\#}/in regex; marked by <-- HERE in/;
-        $element =~ s/{\#}/ <-- HERE /;
+        $element =~ s/\{\#\}/in regex; marked by <-- HERE in/;
+        $element =~ s/\{\#\}/ <-- HERE /;
         $element .= " at ";
+        next if $element =~ s/ ^ $only_strict_marker \s* //x && ! $strict;
+        push @new_expect, $element;
     }
-    return wantarray ? @expect : join "", @expect;
+    return wantarray ? @new_expect : join "", @new_expect;
 }
 
 ## Because we don't "use utf8" in this file, we need to do some extra legwork
@@ -220,8 +233,8 @@ my @death =
  '/(?[ \x{} ])/' => 'Number with no digits {#} m/(?[ \x{}{#} ])/',
  '/(?[ \cK + ) ])/' => 'Unexpected \')\' {#} m/(?[ \cK + ){#} ])/',
  '/(?[ \cK + ])/' => 'Incomplete expression within \'(?[ ])\' {#} m/(?[ \cK + {#}])/',
- '/(?[ ( ) ])/' => 'Incomplete expression within \'(?[ ])\' {#} m/(?[ ( ) {#}])/',
- '/(?[[0]+()+])/' => 'Incomplete expression within \'(?[ ])\' {#} m/(?[[0]+()+{#}])/',
+ '/(?[ ( ) ])/' => 'Incomplete expression within \'(?[ ])\' {#} m/(?[ ( ){#} ])/',
+ '/(?[[0]+()+])/' => 'Incomplete expression within \'(?[ ])\' {#} m/(?[[0]+(){#}+])/',
  '/(?[ \p{foo} ])/' => 'Can\'t find Unicode property definition "foo" {#} m/(?[ \p{foo}{#} ])/',
  '/(?[ \p{ foo = bar } ])/' => 'Can\'t find Unicode property definition "foo = bar" {#} m/(?[ \p{ foo = bar }{#} ])/',
  '/(?[ \8 ])/' => 'Unrecognized escape \8 in character class {#} m/(?[ \8{#} ])/',
@@ -266,8 +279,19 @@ my @death =
  '/(?[\ -!])/' => 'Incomplete expression within \'(?[ ])\' {#} m/(?[\ -!{#}])/',    # [perl #126180]
  '/(?[\ ^!])/' => 'Incomplete expression within \'(?[ ])\' {#} m/(?[\ ^!{#}])/',    # [perl #126180]
  '/(?[\ |!])/' => 'Incomplete expression within \'(?[ ])\' {#} m/(?[\ |!{#}])/',    # [perl #126180]
- '/(?[()-!])/' => 'Incomplete expression within \'(?[ ])\' {#} m/(?[()-!{#}])/',    # [perl #126204]
+ '/(?[()-!])/' => 'Incomplete expression within \'(?[ ])\' {#} m/(?[(){#}-!])/',    # [perl #126204]
  '/(?[!()])/' => 'Incomplete expression within \'(?[ ])\' {#} m/(?[!(){#}])/',      # [perl #126404]
+ '/\w{/' => 'Unescaped left brace in regex is illegal here {#} m/\w{{#}/',
+ '/\q{/' => 'Unescaped left brace in regex is illegal here {#} m/\q{{#}/',
+ '/\A{/' => 'Unescaped left brace in regex is illegal here {#} m/\A{{#}/',
+ '/:{4,a}/' => 'Unescaped left brace in regex is illegal here {#} m/:{{#}4,a}/',
+ '/xa{3\,4}y/' => 'Unescaped left brace in regex is illegal here {#} m/xa{{#}3\,4}y/',
+ '/abc/xix' => "",
+ '/(?xmsixp:abc)/' => "",
+ '/(?xmsixp)abc/' => "",
+ '/(?xxxx:abc)/' => "",
+ '/(?<=/' => 'Sequence (?... not terminated {#} m/(?<={#}/',                        # [perl #128170]
+
 );
 
 # These are messages that are warnings when not strict; death under 'use re
@@ -544,6 +568,7 @@ my @warning = (
                                                'Assuming NOT a POSIX class since no blanks are allowed in one {#} m/[[   ^   {#}:   x d i g i t   :   ]   ]\x{100}/',
                                                'Assuming NOT a POSIX class since no blanks are allowed in one {#} m/[[   ^   :   {#}x d i g i t   :   ]   ]\x{100}/',
                                                'Assuming NOT a POSIX class since no blanks are allowed in one {#} m/[[   ^   :   x d i g i t   :   ]{#}   ]\x{100}/',
+                                               $only_strict_marker . 'Unescaped literal \']\' {#} m/[[   ^   :   x d i g i t   :   ]   ]{#}\x{100}/',
                             ],
     '/[foo:lower:]]\x{100}/' => 'Assuming NOT a POSIX class since it doesn\'t start with a \'[\' {#} m/[foo{#}:lower:]]\x{100}/',
     '/[[;upper;]]\x{100}/' => [ 'Assuming NOT a POSIX class since a semi-colon was found instead of a colon {#} m/[[;{#}upper;]]\x{100}/',
@@ -594,6 +619,8 @@ my @warning_only_under_strict = (
     "/[A-$B_hex]/" => "Ranges of ASCII printables should be some subset of \"0-9\", \"A-Z\", or \"a-z\" {#} m/[A-$B_hex\{#}]/",
     "/[$low_mixed_alpha-$high_mixed_alpha]/" => "Ranges of ASCII printables should be some subset of \"0-9\", \"A-Z\", or \"a-z\" {#} m/[$low_mixed_alpha-$high_mixed_alpha\{#}]/",
     "/[$low_mixed_digit-$high_mixed_digit]/" => "Ranges of ASCII printables should be some subset of \"0-9\", \"A-Z\", or \"a-z\" {#} m/[$low_mixed_digit-$high_mixed_digit\{#}]/",
+    '/\b<GCB}/' => 'Unescaped literal \'}\' {#} m/\b<GCB}{#}/',
+    '/[ ]def]/' => 'Unescaped literal \']\' {#} m/[ ]def]{#}/',
 );
 
 my @warning_utf8_only_under_strict = mark_as_utf8(
@@ -601,6 +628,9 @@ my @warning_utf8_only_under_strict = mark_as_utf8(
  '/ネ(?[ [ ᪉ - ᪐ ] ])/; #no latin1' => "Ranges of digits should be from the same group of 10 {#} m/ネ(?[ [ ᪉ - ᪐ {#}] ])/",
  '/ネ[᧙-᧚]/; #no latin1' => "Ranges of digits should be from the same group of 10 {#} m/ネ[᧙-᧚{#}]/",
  '/ネ(?[ [ ᧙ - ᧚ ] ])/; #no latin1' => "Ranges of digits should be from the same group of 10 {#} m/ネ(?[ [ ᧙ - ᧚ {#}] ])/",
+ '/ネ(?[ [ 𝟘 - 𝟡 ] ])/; #no latin1' => "",
+ '/ネ(?[ [ 𝟧 - 𝟱 ] ])/; #no latin1' => "Ranges of digits should be from the same group of 10 {#} m/ネ(?[ [ 𝟧 - 𝟱 {#}] ])/",
+ '/ネ(?[ [ 𝟧 - 𝟰 ] ])/; #no latin1' => "Ranges of digits should be from the same group of 10 {#} m/ネ(?[ [ 𝟧 - 𝟰 {#}] ])/",
 );
 
 push @warning_only_under_strict, @warning_utf8_only_under_strict;
@@ -612,16 +642,17 @@ my @experimental_regex_sets = (
 );
 
 my @deprecated = (
-    '/\w{/' => 'Unescaped left brace in regex is deprecated, passed through {#} m/\w{{#}/',
-    '/\q{/' => [
-                 'Unrecognized escape \q{ passed through {#} m/\q{{#}/',
-                 'Unescaped left brace in regex is deprecated, passed through {#} m/\q{{#}/'
-               ],
-    '/:{4,a}/' => 'Unescaped left brace in regex is deprecated, passed through {#} m/:{{#}4,a}/',
-    '/abc/xix' => 'Having more than one /x regexp modifier is deprecated',
-    '/(?xmsixp:abc)/' => 'Having more than one /x regexp modifier is deprecated',
-    '/(?xmsixp)abc/' => 'Having more than one /x regexp modifier is deprecated',
-    '/(?xxxx:abc)/' => 'Having more than one /x regexp modifier is deprecated',
+ '/^{/'          => "",
+ '/foo|{/'       => "",
+ '/foo|^{/'      => "",
+ '/foo({bar)/'   => "",
+ '/foo(:?{bar)/' => "",
+ '/\s*{/'        => "",
+ '/a{3,4}{/'     => "",
+ '/.{/'         => 'Unescaped left brace in regex is deprecated here (and will be fatal in Perl 5.30), passed through {#} m/.{{#}/',
+ '/[x]{/'       => 'Unescaped left brace in regex is deprecated here (and will be fatal in Perl 5.30), passed through {#} m/[x]{{#}/',
+ '/\p{Latin}{/' => 'Unescaped left brace in regex is deprecated here (and will be fatal in Perl 5.30), passed through {#} m/\p{Latin}{{#}/',
+ '/\\${[^\\}]*}/' => 'Unescaped left brace in regex is deprecated here (and will be fatal in Perl 5.30), passed through {#} m/\\${{#}[^\\}]*}/',
 );
 
 for my $strict ("", "use re 'strict';") {
@@ -643,7 +674,7 @@ for my $strict ("", "use re 'strict';") {
     }
     for (my $i = 0; $i < @death; $i += 2) {
         my $regex = $death[$i];
-        my $expect = fixup_expect($death[$i+1]);
+        my $expect = fixup_expect($death[$i+1], $strict);
         no warnings 'experimental::regex_sets';
         no warnings 'experimental::re_strict';
 
@@ -666,6 +697,8 @@ for my $strict ("",  "no warnings 'experimental::re_strict'; use re 'strict';") 
     }
     else {
         for (my $i = 0; $i < @warning_only_under_strict; $i += 2) {
+
+            # (?[ ]) are always under strict
             if ($warning_only_under_strict[$i] =~ /\Q(?[/) {
                 push @warning_tests, $warning_only_under_strict[$i],  # The regex
                                     $warning_only_under_strict[$i+1];
@@ -704,7 +737,7 @@ for my $strict ("",  "no warnings 'experimental::re_strict'; use re 'strict';") 
         }
         for (my $i = 0; $i < @$ref; $i += 2) {
             my $regex = $ref->[$i];
-            my @expect = fixup_expect($ref->[$i+1]);
+            my @expect = fixup_expect($ref->[$i+1], $strict);
 
             # A length-1 array with an empty warning means no warning gets
             # generated at all.

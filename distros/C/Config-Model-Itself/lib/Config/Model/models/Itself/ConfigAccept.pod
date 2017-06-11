@@ -69,7 +69,7 @@ points to an array or hash element in the configuration tree using the path synt
 
 =head2 computed_refer_to
 
-points to an array or hash element in the configuration tree using a path computed with value from several other elements in the configuration tree. The available choice of this reference value (or check list) is made from the available keys of the pointed hash element or the values of the pointed array element. I< Optional. Type warped_node.  > 
+points to an array or hash element in the configuration tree using a path computed with value from several other elements in the configuration tree. The available choice of this reference value (or check list) is made from the available keys of the pointed hash element or the values of the pointed array element. The keys of several hashes (or lists) can be combined by using the '+' operator in the formula. For instance, '! host: lan + ! host:foobar lan'. See L<Config::Model::IdElementReference> for more details. I< Optional. Type warped_node.  > 
 
 =head2 replace_follow
 
@@ -119,7 +119,7 @@ I< Optional. Type reference.  >
 
 =head2 choice
 
-Specify the possible values. I< Optional. Type list of uniline.  > 
+Specify the possible values of an enum. This can also be used in a reference element so the possible enum value will be the combination of the specified choice and the refered to values. I< Optional. Type list of uniline.  > 
 
 =head2 min
 

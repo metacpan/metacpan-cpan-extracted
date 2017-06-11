@@ -68,6 +68,12 @@ sub temporary_table {
     my ($self, $csv_location, $id_column) = @_;
     my $store_table = fileparse($csv_location, '.csv');
 
+    unless (-e $store_table) {
+        Catmandu::BadArg->throw(
+            message => sprintf('The CSV file %s is missing.', $store_table)
+        );
+    }
+
     my $importer = Catmandu->importer(
         'CSV',
         file => $csv_location

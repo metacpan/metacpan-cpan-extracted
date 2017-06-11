@@ -18,16 +18,20 @@ message Priority {
 
 message Eval {
     message File {
-        string filename = 1;
-        string contents = 2;
+        string filename = 1; // special filename of __code gets a randomly assigned one, and used as the main() for the eval.
+        bytes  contents = 2;
+	    string encoding = 3; // When writing to a file, this doesn't get used.  When being passed to a coderef in Sandbox::Internal this gets used
+        bool   run      = 4; // future use, this file should be run
+        string language = 5; // future use, what language this file should be run as        
     }
 
-    string language = 1;
+    string language = 1; // default language of the Eval
 
     Priority prio = 7;
 
     int64 sequence = 5; // used to accept multiple jobs
     repeated File files = 6;
+    string encoding = 2; // The encoding we want our response in, if applicable
 }
 
 // Cancel an inflight eval on your session
@@ -39,14 +43,52 @@ message CancelEval {
 
 message EvalResponse {
     int64 sequence = 1;
-    string contents = 2;
+    bytes contents = 2;
     bool canceled = 3;
+    string encoding = 4;
+    string mime = 5; // mimetype of the data coming back.
 }
 
 message Warning {
     int64 sequence = 3;
     int64 type = 1;
     string message = 2;
+}
+
+message FileHandleData {
+    int64 sequence = 1; // sequence identifier for the container/eval
+    int64 fileno = 2; // filehandle identifier
+    bytes contents = 3; // no encoding handled at the protocol level
+}
+
+message SocketAction {
+    message SocketOpen {
+        message Stream  {}; // TCP
+        message Datagram {}; // UDP
+
+        int64 sequence = 1; // sequence identifier for the container/eval
+        int64 socket_sequence = 5; // sequencer for socket actions
+
+        oneof protocol {
+            Stream stream = 2;
+            Datagram datagram = 3;
+        }
+        fixed32 port = 4; // port to connect to
+    }
+}
+
+message SocketActionResponse {
+    message Error {
+        string message = 1;
+        int64 errno = 2;
+    }
+    message Handle {
+        int64 fileno = 1;
+    }
+    message Ack {}
+
+    int64 sequence = 1;
+    int64 socket_sequence = 2;
 }
 
 message Packet {

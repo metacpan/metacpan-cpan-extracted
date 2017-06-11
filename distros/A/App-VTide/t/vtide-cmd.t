@@ -13,9 +13,9 @@ use_ok( $module );
 
 my $vtide = App::VTide->new;
 
-env();
-save_session();
-session_dir();
+#env();
+#save_session();
+#session_dir();
 
 done_testing();
 

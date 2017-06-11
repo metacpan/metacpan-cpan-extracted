@@ -1,5 +1,10 @@
 Revision history for Geo-Coder-List
 
+0.12	Tue May 30 13:31:44 EDT 2017
+	Bump minimum version of G:C:XYZ - RT121919
+	Stash array values
+	When a geocoder errors, Carp the location
+
 0.11	Sat 27 May 14:55:23 EDT 2017
 	Test with the new L:U:Throttled
 

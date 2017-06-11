@@ -240,7 +240,7 @@ phwois - Get Whois information of domains and IP addresses.
 
 =head1 VERSION
 
-version 2.99007
+version 2.99008
 
 =head1 SYNOPSIS
 

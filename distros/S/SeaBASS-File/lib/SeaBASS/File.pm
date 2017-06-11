@@ -9,11 +9,11 @@ SeaBASS::File - Object-oriented interface for reading/writing SeaBASS files
 
 =head1 VERSION
 
-version 0.170480
+version 0.171600
 
 =cut
 
-our $VERSION = '0.170480'; # VERSION
+our $VERSION = '0.171600'; # VERSION
 
 =head1 SYNOPSIS
 
@@ -340,10 +340,10 @@ my %ANCILLARY = (
 	'lon'       => [ { 'east_longitude'    => qr/^(.*?)$/ }, { 'west_longitude' => qr/^(.*?)$/ } ],
 	'depth'     => [ { 'measurement_depth' => qr/^(.*?)$/ }, ],
 	'date_time' => [ '$date $time', ],
-	'date' => [ [ \&julian_to_greg, '$year$julian' ], [ \&julian_to_greg, '$year$jd' ], '$year$month$day', ],
+	'date' => [ [ \&julian_to_greg, '$year$julian' ], [ \&julian_to_greg, '$year$jd' ], [ \&julian_to_greg, '$year$sdy' ], '$year$month$day', ],
 	'year' => [ { '$date' => qr/^(\d{4})/ }, { 'start_date' => qr/^(\d{4})/ }, ],
-	'month' => [ { '$date' => qr/^\d{4}(\d{2})/ }, [ \&julian_to_greg, qr/^\d{4}(\d{2})\d{2}$/, '$year$julian' ], [ \&julian_to_greg, qr/^\d{4}(\d{2})\d{2}$/, '$year$jd' ], { 'start_date' => qr/^\d{4}(\d{2})/ }, ],
-	'day'   => [ { '$date' => qr/^\d{6}(\d{2})/ }, [ \&julian_to_greg, qr/^\d{4}\d{2}(\d{2})$/, '$year$julian' ], [ \&julian_to_greg, qr/^\d{4}\d{2}(\d{2})$/, '$year$jd' ], { 'start_date' => qr/^\d{6}(\d{2})/ }, ],
+	'month' => [ { '$date' => qr/^\d{4}(\d{2})/ }, [ \&julian_to_greg, qr/^\d{4}(\d{2})\d{2}$/, '$year$julian' ], [ \&julian_to_greg, qr/^\d{4}(\d{2})\d{2}$/, '$year$jd' ], [ \&julian_to_greg, qr/^\d{4}(\d{2})\d{2}$/, '$year$sdy' ], { 'start_date' => qr/^\d{4}(\d{2})/ }, ],
+	'day'   => [ { '$date' => qr/^\d{6}(\d{2})/ }, [ \&julian_to_greg, qr/^\d{4}\d{2}(\d{2})$/, '$year$julian' ], [ \&julian_to_greg, qr/^\d{4}\d{2}(\d{2})$/, '$year$jd' ], [ \&julian_to_greg, qr/^\d{4}\d{2}(\d{2})$/, '$year$sdy' ], { 'start_date' => qr/^\d{6}(\d{2})/ }, ],
 	'time'  => [ '$hour:$minute:$second', ],
 	'hour'    => [ { '$time'   => qr/^(\d+):/ },            { 'start_time' => qr/^(\d+):/ }, ],
 	'minute'  => [ { '$time'   => qr/:(\d+):/ },            { 'start_time' => qr/:(\d+):/ }, ],
@@ -360,6 +360,7 @@ my %FIELD_FORMATTING = (
 	'month'  => '%02d',
 	'day'    => '%02d',
 	'julian' => '%03d',
+	'sdy'    => '%03d',
 	'hour'   => '%02d',
 	'minute' => '%02d',
 	'second' => '%02d',

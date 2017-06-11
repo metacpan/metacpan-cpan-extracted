@@ -3,15 +3,12 @@
 Mojolicious::Plugin::OAuth2::Server - Easier implementation of an OAuth2
 Authorization Server / Resource Server with Mojolicious
 
-<div>
-
-    <a href='https://travis-ci.org/Humanstate/mojolicious-plugin-oauth2-server?branch=master'><img src='https://travis-ci.org/Humanstate/mojolicious-plugin-oauth2-server.svg?branch=master' alt='Build Status' /></a>
-    <a href='https://coveralls.io/r/Humanstate/mojolicious-plugin-oauth2-server?branch=master'><img src='https://coveralls.io/repos/Humanstate/mojolicious-plugin-oauth2-server/badge.png?branch=master' alt='Coverage Status' /></a>
-</div>
+[![Build Status](https://travis-ci.org/Humanstate/mojolicious-plugin-oauth2-server.svg)](https://travis-ci.org/Humanstate/mojolicious-plugin-oauth2-server)
+[![Coverage Status](https://coveralls.io/repos/github/Humanstate/mojolicious-plugin-oauth2-server/badge.svg?branch=master)](https://coveralls.io/github/Humanstate/mojolicious-plugin-oauth2-server?branch=master)
 
 # VERSION
 
-0.37
+0.38
 
 # SYNOPSIS
 

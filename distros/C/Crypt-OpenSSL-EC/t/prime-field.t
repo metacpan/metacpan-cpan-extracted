@@ -7,7 +7,10 @@ use Crypt::OpenSSL::Bignum::CTX;
 
 BEGIN { use_ok('Crypt::OpenSSL::EC') };
 
-&prime_field_tests();
+SKIP: { 
+    skip('OpenSSL does not support EC2M', 262) unless exists &Crypt::OpenSSL::EC::EC_GROUP::set_curve_GF2m;
+    &prime_field_tests();
+};
 
 sub prime_field_tests()
 {
@@ -34,7 +37,7 @@ sub prime_field_tests()
 
     # Caution: this fails on some OpenSSLs, eg on Fedora 13 where EC2M are not available
     ok($group->set_curve_GFp($p, $a, $b, $ctx));
-
+    
     my $tmp = Crypt::OpenSSL::EC::EC_GROUP::new($group->method_of());
     ok($tmp);
 

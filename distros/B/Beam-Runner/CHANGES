@@ -1,5 +1,20 @@
 Changelog for Beam-Runner
 
+0.011     2017-06-09 01:48:33-05:00 America/Chicago
+
+    [Added]
+
+    - Beam::Runnable::Timeout::Alarm role allows easily adding timeouts
+      to runnable modules.
+
+    - Added quickstart tutorial for getting started using Beam::Runner.
+
+    [Fixed]
+
+    - Fixed `beam help` command showing the `beam` command documentation
+      if the given task has no documentation. Now it correctly shows an
+      error message instead.
+
 0.010     2017-05-13 10:34:53+02:00 Europe/Paris
 
     [Fixed]

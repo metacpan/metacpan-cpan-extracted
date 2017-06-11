@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '1.004';
+our $VERSION = '1.005';
 $VERSION = eval $VERSION;
 
 use Grep::Query::Parser;
@@ -187,7 +187,7 @@ Grep::Query - Query logic for lists of scalars/objects
 
 =head1 VERSION
 
-Version 1.004
+Version 1.005
 
 =head1 SYNOPSIS
 
@@ -400,6 +400,10 @@ equal to 'And' and so on.
 
 =over
 
+=item Comments
+
+Comments can be used in the query using the begin/end style like '/* some comment */'.
+
 =item Logical connectors
 
 In this category we find the basic logic operators used to tie comparisons
@@ -449,6 +453,10 @@ space, and the same character again after the value, e.g. I</>.
 The I<operator>s are:
 
 =over
+
+=item * B<TRUE> or B<FALSE>
+
+These operators always evaluate to true and false respectively.
 
 =item * B<REGEXP> or B<=~>
 

@@ -1,7 +1,7 @@
 package DDG::IsControllable;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Role for data managed inside the DuckDuckGo infrastructure
-$DDG::IsControllable::VERSION = '1016';
+$DDG::IsControllable::VERSION = '1017';
 use Moo::Role;
 
 
@@ -41,7 +41,7 @@ DDG::IsControllable - Role for data managed inside the DuckDuckGo infrastructure
 
 =head1 VERSION
 
-version 1016
+version 1017
 
 =head1 DESCRIPTION
 

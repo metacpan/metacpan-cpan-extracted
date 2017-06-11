@@ -32,7 +32,7 @@ Path to the database as a L<Path::Class::File> object.
 
 Active database handle
 
-=head3 cipher 
+=head3 cipher
 
 L<Crypt::Twofish> cipher object
 
@@ -107,41 +107,41 @@ sub _build_dbh {
 
 
     my @list;
-    my $sth = $dbh->prepare('SELECT name 
-        FROM sqlite_master 
-        WHERE type=? 
+    my $sth = $dbh->prepare('SELECT name
+        FROM sqlite_master
+        WHERE type=?
         ORDER BY name');
     $sth->execute('table');
     while (my $name = $sth->fetchrow_array) {
         push @list,$name;
     }
     $sth->finish();
-    
+
     unless ( grep { $_ eq 'itan' } @list ) {
         say "Initializing iTAN database ...";
 
         my $password = $self->_get_password();
         $self->cipher(Crypt::Twofish->new($password));
         my $crypted  = $self->crypt_string($password);
-        
+
         $dbh->do(
             q[CREATE TABLE itan (
-                tindex INTEGER NOT NULL, 
-                itan VARCHAR NOT NULL, 
-                imported VARCHAR NOT NULL, 
-                used VARCHAR, 
-                valid VARCHAR, 
+                tindex INTEGER NOT NULL,
+                itan VARCHAR NOT NULL,
+                imported VARCHAR NOT NULL,
+                used VARCHAR,
+                valid VARCHAR,
                 memo VARCHAR
             )]
         ) or die "ERROR: Cannot execute: " . $dbh->errstr();
-        
+
         $dbh->do(
             q[CREATE TABLE system (
-                name VARCHAR NOT NULL, 
+                name VARCHAR NOT NULL,
                 value VARCHAR NOT NULL
             )]
         ) or die "ERROR: Cannot execute: " . $dbh->errstr();
-        
+
         my $sth = $dbh->prepare(q[INSERT INTO system (name,value) VALUES (?,?)]);
         $sth->execute('password',$crypted);
         $sth->execute('version',$App::iTan::VERSION);
@@ -161,18 +161,18 @@ sub _build_cipher {
     my ($self) = @_;
 
     my $password = $self->_get_password();
-    
+
     my $cipher = Crypt::Twofish->new($password);
-    
+
     $self->cipher($cipher);
-    
-    my $stored_password = $self->dbh->selectrow_array("SELECT value FROM system WHERE name = 'password'")   
+
+    my $stored_password = $self->dbh->selectrow_array("SELECT value FROM system WHERE name = 'password'")
         or die "ERROR: Cannot query: " . $self->dbh->errstr();
-    
+
     unless ( $self->decrypt_string($stored_password) eq $password) {
         die "ERROR: Invalid password";
     }
-    
+
     return $cipher;
 }
 
@@ -241,7 +241,7 @@ sub _get_password {
         use bytes;
         $length = length $password;
     }
-    
+
     if ($length == 16) {
         # ok
     } elsif ($length < 4) {
@@ -251,55 +251,55 @@ sub _get_password {
     } else {
         while (1) {
             $password .= '0';
-            last 
+            last
                 if length $password == 16;
         }
     }
-    
+
     return $password;
 }
 
 sub get {
     my ($self,$index) = @_;
-    
-    my $sth = $self->dbh->prepare('SELECT 
+
+    my $sth = $self->dbh->prepare('SELECT
             tindex,
             itan,
             imported,
             used,
-            memo 
-        FROM itan 
-        WHERE tindex = ? 
+            memo
+        FROM itan
+        WHERE tindex = ?
         AND valid = 1')
         or die "ERROR: Cannot prepare: " . $self->dbh->errstr();
     $sth->execute($index)
         or die "ERROR: Cannot execute: " . $sth->errstr();
-    
+
     my $data = $sth->fetchrow_hashref();
-    
+
     unless (defined $data) {
         die "ERROR: Could not find iTAN  ".$index;
     }
 
     $data->{imported} = $self->_parse_date($data->{imported});
     $data->{used} = $self->_parse_date($data->{used});
-    #$data->{itan} = $self->decrypt_tan($data->{itan}); 
-    
+    #$data->{itan} = $self->decrypt_tan($data->{itan});
+
     return $data;
 }
 
 sub mark {
     my ($self,$index,$memo) = @_;
-    
+
     my $sth = $self->dbh->prepare(
         q[UPDATE itan SET used = ?,memo = ?, valid = 0 WHERE tindex = ?]
     ) or die "ERROR: Cannot prepare: " . $self->dbh->errstr();
-    
+
     $sth->execute($self->_date,$memo,$index)
-       or die "ERROR: Cannot execute: " . $sth->errstr(); 
-    
+       or die "ERROR: Cannot execute: " . $sth->errstr();
+
     $sth->finish();
-    
+
     return 1;
 }
 

@@ -11,7 +11,7 @@ use MooX::StrictConstructor;
 use MooX::Types::MooseLike::Base qw(Str);
 use namespace::autoclean;
 
-our $VERSION = '1.026';
+our $VERSION = '1.027';
 
 with qw(
     Locale::TextDomain::OO::Role::Logger
@@ -58,13 +58,7 @@ has language => (
     default => 'i-default',
 );
 
-has category => (
-    is      => 'rw',
-    isa     => Str,
-    default => q{},
-);
-
-has domain => (
+has [ qw( category domain ) ] => (
     is      => 'rw',
     isa     => Str,
     default => q{},
@@ -271,13 +265,13 @@ __END__
 
 Locale::TextDomain::OO::Translator - Translator class
 
-$Id: Translator.pm 637 2017-02-23 16:21:35Z steffenw $
+$Id: Translator.pm 651 2017-05-31 18:10:43Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/module/trunk/lib/Locale/TextDomain/OO/Translator.pm $
 
 =head1 VERSION
 
-1.026
+1.027
 
 =head1 DESCRIPTION
 
@@ -330,12 +324,6 @@ none
 
 =head1 DEPENDENCIES
 
-L<Moo|Moo>
-
-L<MooX::StrictConstructor|MooX::StrictConstructor>
-
-L<MooX::Types::MooseLike::Base|MooX::Types::MooseLike::Base>
-
 L<Carp|Carp>
 
 L<Class::Load|Class::Load>
@@ -344,7 +332,15 @@ L<Locale::TextDomain::OO::Singleton::Lexicon|Locale::TextDomain::OO::Singleton::
 
 L<Locale::TextDomain::OO::Util::JoinSplitLexiconKeys|Locale::TextDomain::OO::Util::JoinSplitLexiconKeys>
 
+L<Moo|Moo>
+
+L<MooX::StrictConstructor|MooX::StrictConstructor>
+
+L<MooX::Types::MooseLike::Base|MooX::Types::MooseLike::Base>
+
 L<namespace::autoclean|namespace::autoclean>
+
+L<Locale::TextDomain::OO::Role::Logger|Locale::TextDomain::OO::Role::Logger>
 
 =head1 INCOMPATIBILITIES
 

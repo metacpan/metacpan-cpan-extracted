@@ -24,7 +24,9 @@ lib/App/Pods2Site/PodCopier.pm
 lib/App/Pods2Site/PodFinder.pm
 lib/App/Pods2Site/SiteBuilderFactory.pm
 lib/App/Pods2Site/Util.pm
+lib/App/Pods2Site/_Args.pod
 lib/App/Pods2Site/Args.pod
+lib/App/Pods2Site/SiteBuilder/None.pm
 lib/App/Pods2Site/SiteBuilder/AbstractBasicFrames.pm
 lib/App/Pods2Site/SiteBuilder/BasicFramesSimpleTOC.pm
 lib/App/Pods2Site/SiteBuilder/BasicFramesTreeTOC.pm

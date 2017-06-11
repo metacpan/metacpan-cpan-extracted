@@ -13,7 +13,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.0.11, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,7 +32,7 @@ no_index:
 provides:
   Fluent::Logger:
     file: lib/Fluent/Logger.pm
-    version: '0.24'
+    version: '0.25'
   Fluent::Logger::UDP:
     file: lib/Fluent/Logger/UDP.pm
 requires:
@@ -45,7 +45,7 @@ resources:
   bugtracker: https://github.com/fluent/fluent-logger-perl/issues
   homepage: https://github.com/fluent/fluent-logger-perl
   repository: git://github.com/fluent/fluent-logger-perl.git
-version: '0.24'
+version: '0.25'
 x_contributors:
   - 'HIROSE Masaaki <hirose31@gmail.com>'
   - 'Shinichiro Sei <sei@kayac.com>'

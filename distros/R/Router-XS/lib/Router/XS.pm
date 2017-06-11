@@ -6,7 +6,7 @@ my @REST = qw(get post put patch del head conn options any);
 our @EXPORT_OK = (@STD, @REST);
 our %EXPORT_TAGS = (std => \@STD, rest => \@REST, all => [@STD, @REST]);
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 require XSLoader;
 XSLoader::load();
@@ -47,14 +47,6 @@ sub any ($&) {
   add_route("*/$_[0]", $_[1]);
 }
 
-sub route ($) {
-  my ($sub, @args) = check_route(join '/', $_[0]->request->path, $_[0]->request->method);
-  if ($sub) {
-    return $sub->($_[0], @args);
-  }
-  return undef;
-}
-
 1;
 
 =encoding utf8
@@ -93,6 +85,8 @@ Checks a URI path against the added routes and returns C<undef> if no match is
 found, otherwise returning the associated subroutine reference and any captures
 from wildcards:
 
+  my ($sub, @captures) = check_route('POST/some/path');
+
 =head2 get/post/put/patch/del/head/conn/options/any
 
 Sugar for C<add_route>: adds a route using C<$path> for the associated HTTP
@@ -124,7 +118,7 @@ path '/interstitial/track':
 
 =head2 DEPENDENCIES
 
-This module uses C<uthash|http://troydhanson.github.com/uthash/> to build a
+This module uses L<uthash|http://troydhanson.github.com/uthash/> to build a
 n-ary tree of paths. C<uthash> is a single C header file, included in this
 distribution. uthash is copyright (c) 2003-2017, Troy D. Hanson.
 

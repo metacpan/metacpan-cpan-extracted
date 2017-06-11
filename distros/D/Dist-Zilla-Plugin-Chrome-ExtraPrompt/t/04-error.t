@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More 0.88;
 use Test::Warnings 0.009 ':no_end_test', ':all';
 use Test::DZil;
 use Test::Fatal;
@@ -48,7 +48,7 @@ require Dist::Zilla::MVP::Reader::Finder;
 Dist::Zilla::MVP::Reader::Finder->new->read_config($tempdir->child('config'), { assembler => $assembler });
 
 my $tzil = Builder->from_config(
-    { dist_root => 't/does_not_exist' },
+    { dist_root => 'does-not-exist' },
     {
         add_files => {
             path(qw(source dist.ini)) => simple_ini(

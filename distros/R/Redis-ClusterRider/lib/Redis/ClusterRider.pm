@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use base qw( Exporter );
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 use Redis;
 use List::MoreUtils qw( bsearch );
@@ -458,9 +458,7 @@ sub _execute {
         my ($fwd_hostport) = ( split( m/\s+/, $err ) )[3];
         $fwd_hostport =~ s/,$//;
 
-        $self->_execute( $cmd_name, $args, [ $fwd_hostport ] );
-
-        return;
+        return $self->_execute( $cmd_name, $args, [ $fwd_hostport ] );
       }
 
       if ( defined $self->{on_node_error} ) {
@@ -607,7 +605,7 @@ L<http://redis.io/topics/cluster-spec>
 =item startup_nodes => \@nodes
 
 Specifies the list of startup nodes. Parameter should contain the array of
-addresses of some nodes in the cluster. . The client will try to connect to
+addresses of some nodes in the cluster. The client will try to connect to
 random node from the list to retrieve information about all cluster nodes and
 slots mapping. If the client could not connect to first selected node, it will
 try to connect to another random node from the list.

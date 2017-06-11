@@ -3,13 +3,14 @@ package Dist::Zilla::Plugin::Author::Plicease::Thanks;
 use 5.008001;
 use Moose;
 
+with 'Dist::Zilla::Role::MetaProvider';
 with 'Dist::Zilla::Role::FileMunger';
 with 'Dist::Zilla::Role::FileFinderUser' => {
   default_finders => [ ':InstallModules', ':ExecFiles' ],
 };
 
 # ABSTRACT: munge the AUTHOR section
-our $VERSION = '2.12'; # VERSION
+our $VERSION = '2.14'; # VERSION
 
 
 has original => (
@@ -86,6 +87,17 @@ sub munge_file
   return;
 }
 
+sub metadata
+{
+  my ($self) = @_;
+
+  my @contributors = @{$self->contributor};
+  unshift @contributors, $self->current  if $self->current;
+  unshift @contributors, $self->original if $self->original;
+
+  return +{ x_contributors => \@contributors };
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -102,7 +114,7 @@ Dist::Zilla::Plugin::Author::Plicease::Thanks - munge the AUTHOR section
 
 =head1 VERSION
 
-version 2.12
+version 2.14
 
 =head1 SYNOPSIS
 

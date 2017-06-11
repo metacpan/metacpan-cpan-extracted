@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,7 +21,8 @@ requires:
   Dist::Zilla::Plugin::MetaNoIndex: '0'
   Dist::Zilla::Plugin::ModuleBuildTiny: '0'
   Dist::Zilla::Plugin::OurPkgVersion: '0'
-  Dist::Zilla::Plugin::ReadmeFromPod: '0'
+  Dist::Zilla::Plugin::Prereqs::FromCPANfile: '0'
+  Dist::Zilla::Plugin::ReadmeAnyFromPod: '0'
   Dist::Zilla::PluginBundle::Basic: '0'
   Dist::Zilla::PluginBundle::Git: '0'
   Dist::Zilla::Role::PluginBundle: '0'
@@ -33,6 +34,6 @@ resources:
   homepage: http://metacpan.org/release/Dist-Zilla-PluginBundle-ARODLAND
   license: http://dev.perl.org/licenses/
   repository: git://github.com/arodland/Dist-Zilla-PluginBundle-ARODLAND.git
-version: '0.09'
+version: '0.12'
 x_authority: cpan:ARODLAND
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_serialization_backend: 'YAML::Tiny version 1.70'

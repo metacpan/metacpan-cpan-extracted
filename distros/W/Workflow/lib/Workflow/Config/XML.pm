@@ -1,7 +1,5 @@
 package Workflow::Config::XML;
 
-# $Id$
-
 use warnings;
 use strict;
 use base qw( Workflow::Config );
@@ -10,7 +8,7 @@ use Workflow::Exception qw( configuration_error );
 use Carp qw(croak);
 use English qw( -no_match_vars );
 
-$Workflow::Config::XML::VERSION = '1.42';
+$Workflow::Config::XML::VERSION = '1.43';
 
 my ($log);
 

@@ -1,4 +1,4 @@
-# Bio::ViennaNGS 0.16
+# Bio::ViennaNGS 0.17.1
 
 Bio::ViennaNGS is a distribution of Perl modules and utilities for
 building efficient Next-Generation Sequencing (NGS) analysis
@@ -6,7 +6,8 @@ pipelines. It covers various aspects of NGS data analysis, including
 (but not limited to) conversion of sequence annotation, evaluation of
 mapped data, expression quantification and visualization.
 
-Bio::ViennaNGS is shipped with a complementary set of modules/classes:
+Bio::ViennaNGS is shipped with a complementary set of modules, classes and
+roles:
 
 - Bio::ViennaNGS::AnnoC
   A Moose interface for storage and conversion of sequence annotation
@@ -14,13 +15,6 @@ Bio::ViennaNGS is shipped with a complementary set of modules/classes:
 
 - Bio::ViennaNGS::Bam
   Routines for high-level manipulation of BAM files.
-
-- Bio::ViennaNGS::BamStat
-  A Moose-based class for collecting mapping statistics.
-
-- Bio::ViennaNGS::BamStatSummary
-  A Moose interface for processing Bio::ViennaNGS::BamStat objects on
-  a set of BAM files.
 
 - Bio::ViennaNGS::Bed 
   A Moose interface for manipulation of genomic interval data in BED
@@ -51,6 +45,10 @@ Bio::ViennaNGS is shipped with a complementary set of modules/classes:
   A Moose interface for handling elementary genomic intervals,
   corresponding to BED3.
 
+- Bio::ViennaNGS::FeatureIO
+  A Moose interface for easy input/output operations on common feature
+  annotation file formats.
+
 - Bio::ViennaNGS::FeatureLine
   An abstract Moose class for combining several
   Bio::ViennaNGS::FeatureChain objects.
@@ -60,11 +58,14 @@ Bio::ViennaNGS is shipped with a complementary set of modules/classes:
   to BED4.
 
 - Bio::ViennaNGS::Peak
-  A Moose interface for identification and characterization of peaks in
-  RNA-seq data.
+  A Moose interface for identification and characterization of (coverage /
+  expression) peaks in RNA-seq data.
 
 - Bio::ViennaNGS::SpliceJunc
-  A collection of routines for alternative splicing analysis.  
+  A collection of routines for alternative splicing analysis.
+
+- Bio::ViennaNGS::Subtypes
+  Moose subtypes for internal usage.
 
 - Bio::ViennaNGS::Tutorial
   A comprehensive tutorial of the Bio::ViennaNGS core routines with
@@ -92,10 +93,6 @@ organism (including organisms that are not included in the standard
 UCSC browser bundle) through hso called 'Assembly Hubs'. This script
 constructs Assembly Hubs from genomic sequence and annotation data.
 
-bam_quality_stat.pl:
-Compute sophisticated quality/mapping statistics for a set of BAM
-alignment files and produce publication-ready graphics.
-
 bam_split.pl: 
 Split (paired-end and single-end) BAM alignment files by strand and compute
 statistics. Optionally create BED output, as well as normalized bedGraph
@@ -118,11 +115,17 @@ additional annotation and automatic generation of bedGraph files which can
 easily be converted to big-type files for easy UCSC visualization.
 
 bed2nt2aa.pl:
-Provide nucleotide and amino acid sequences for BED6 intervals.
+Extract sequence intervals from Fasta files, provided as BED6
+records. Optionally translate nucleotide into amino acid sequences.
 
-extend_bed.pl:
-Extend genomic features in BED files by a certain number of nucleotides,
-either on both sides or specifically at the 5' or 3' end, respectively.
+bed62bed12.pl:
+A simple BED6 -> BED12 converter
+
+fasta_multigrep.pl
+Extract individual (whole) sequences from a multi Fasta file
+
+fasta_subgrep.pl:
+Extract subsequences from (multi) Fasta files.
 
 gff2bed.pl:
 Convert RefSeq GFF3 annotation files to BED12 format. Individual BED12
@@ -131,11 +134,6 @@ RefSeq bacterial GFF3 annotation.
 
 kmer_analysis.pl:
 Count k-mers of predefined length in FastQ and Fasta files
-
-MEME_xml_motif_extractor.pl:
-Compute simple statistics from MEME XML output and return a list of found
-motifs with the number of sequences containing those motifs as well as nice
-ggplot graphs.
 
 newUCSCdb.pl:
 Create a new genome database to a locally installed instance of the UCSC
@@ -197,6 +195,28 @@ with all Perl dependencies and install the suite automatically (provided
 you have samtools <= 0.1.19 installed, see the HOWTO link above).
 
 
+## SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Bio::ViennaNGS
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bio-ViennaNGS
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Bio-ViennaNGS
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Bio-ViennaNGS
+
+    Search CPAN
+        http://search.cpan.org/dist/Bio-ViennaNGS
+
+
 ## DEPENDENCIES
 
 Bio::ViennaNGS depends on a set of third-party tools and libraries which
@@ -213,33 +233,9 @@ well as for building internally used Perl modules:
 Please ensure that all third-party utilities are available on your system
 and accessible to the Perl interpreter.
 
-Moreover, Bio::ViennaNGS requires the following Perl packages that are not
-shipped with the Perl core distribution:
-
-* Bio::Perl >= 1.00690001
-* Bio::DB::Sam >= 1.37
-* Bio::DB::Fasta
-* Bio::Tools::GFF
-* File::Share
-* File::Slurp	
-* File::Path
-* List::Util
-* Template
-* Moose
-* Moose::Util::TypeConstraints
-* MooseX::Clone
-* MooseX::InstanceTracking
-* Path::Class
-* namespace::autoclean
-* Tie::Hash::Indexed
-* Statistics::R
-* PerlIO::gzip
-* Math::Round
-* XML::Simple
-* Template
-* Test::Deep
-* Test::Files
-* Test::File::Contents
+Moreover, Bio::ViennaNGS depends on a ste of Perl packages that are not
+shipped with the Perl core distribution, most notably Bio::Perl >=
+1.00690001 and Bio::DB::Sam >= 1.37.
 
 
 ## SOURCE AVAILABILITY
@@ -248,10 +244,10 @@ This source is available on Github:
               https://github.com/mtw/Bio-ViennaNGS
 
 
-## ViennaNGS PAPER
+## VIENNANGS PAPER
 
 If the Bio::ViennaNGS suite is useful for your work or if you use any
-component of ViennaNGS in a custom pipeline, please cite the following
+component of Bio::ViennaNGS in a custom pipeline, please cite the following
 publication:
 
 "ViennaNGS - A toolbox for building efficient next-generation sequencing
@@ -267,8 +263,7 @@ The Bio::ViennaNGS suite is actively developed and tested on different
 flavours of Linux and Mac OS X. We have taken care of writing
 platform-independent code that should run out of the box on most UNIX-based
 systems, however we do not have access to machines running Microsoft
-Windows. As such, we have not tested and will not test Windows
-compatibility.
+Windows. As such Microsoft Windows compatibility is not tested.
 
 
 ## BUGS
@@ -287,7 +282,7 @@ Fabian Amman <fabian@tbi.univie.ac.at>
 
 ## COPYRIGHT AND LICENCE
 
-Copyright (C) 2014-2015 Michael T. Wolfinger <michael@wolfinger.eu>
+Copyright (C) 2014-2017 Michael T. Wolfinger <michael@wolfinger.eu>
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself, either Perl version 5.10.0 or, at your
@@ -297,4 +292,3 @@ This program is distributed in the hope that it will be useful, but WITHOUT
 ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
 FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
 more details.
-

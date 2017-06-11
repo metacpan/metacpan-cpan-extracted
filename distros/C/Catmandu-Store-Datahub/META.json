@@ -4,7 +4,7 @@
       "Pieter De Praetere, C<< pieter at packed.be >>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -64,7 +64,7 @@
          "web" : "https://github.com/thedatahub/Catmandu-Store-Datahub"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_contributors" : [
       "Matthias Vandermaesen <matthias@colada.be>",
       "Pieter De Praetere <pieter.de.praetere@helptux.be>",

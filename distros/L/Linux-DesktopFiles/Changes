@@ -1,5 +1,8 @@
 Revision history for Perl extension Linux::DesktopFiles.
 
+0.13  2017-06-03
+    - Fixed a potential infinite loop for circular inherited icon directories.
+
 0.12  2016-10-17
     - Removed the no-op `keep_empty_categories` option.
     - Documentation improvements.
@@ -9,7 +12,7 @@ Revision history for Perl extension Linux::DesktopFiles.
 
 0.10  2016-06-04
     - When a file does not have a `Name`, use the name of the file.
-    - Added the Github repository URL.
+    - Added the GitHub repository URL.
 
 0.09  2015-01-29
     - More performance improvements.
@@ -27,7 +30,7 @@ Revision history for Perl extension Linux::DesktopFiles.
 
 0.07  2013-03-15
     - Added a new option: use_current_theme_icons
-    - Added support to look in index.theme for inhertited icon themes.
+    - Added support to look in index.theme for inherited icon themes.
 
 0.06  2012-07-26
     - Fixed a critical (_clean_categories) bug.

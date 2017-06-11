@@ -1,7 +1,7 @@
 package DDG::HasAttribution;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Role for a plugin that is able to give attribution informations
-$DDG::HasAttribution::VERSION = '1016';
+$DDG::HasAttribution::VERSION = '1017';
 use Moo::Role;
 
 requires qw(
@@ -21,7 +21,7 @@ DDG::HasAttribution - Role for a plugin that is able to give attribution informa
 
 =head1 VERSION
 
-version 1016
+version 1017
 
 =head1 DESCRIPTION
 

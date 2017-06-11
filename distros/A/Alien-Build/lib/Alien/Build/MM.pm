@@ -8,7 +8,7 @@ use Capture::Tiny qw( capture );
 use Carp ();
 
 # ABSTRACT: Alien::Build installer code for ExtUtils::MakeMaker
-our $VERSION = '0.36'; # VERSION
+our $VERSION = '0.41'; # VERSION
 
 
 sub new
@@ -226,13 +226,31 @@ sub import
         
         $build->build;
 
+        my $distname = $build->install_prop->{mm}->{distname};
+
         if($build->meta_prop->{arch})
         {
-          my $distname = $build->install_prop->{mm}->{distname};
           my $archdir = Path::Tiny->new("blib/arch/auto/@{[ join '/', split /-/, $distname ]}");
           $archdir->mkpath;
           my $archfile = $archdir->child($archdir->basename . '.txt');
           $archfile->spew('Alien based distribution with architecture specific file in share');
+        }
+        
+        my $cflags = $build->runtime_prop->{cflags};
+        my $libs   = $build->runtime_prop->{libs};
+        
+        if($cflags && $cflags !~ /^\s*$/
+        && $libs   && $libs   !~ /^\s*$/)
+        {
+          my $mod = join '::', split /-/, $distname;
+          my $install_files_pm = Path::Tiny->new("blib/lib/@{[ join '/', split /-/, $distname ]}/Install/Files.pm");
+          $install_files_pm->parent->mkpath;
+          $install_files_pm->spew(
+            "package ${mod}::Install::Files;\n",
+            "require ${mod};\n",
+            "sub Inline { shift; ${mod}->Inline(\@_) }\n",
+            "1;"
+          );
         }
         
         $build->checkpoint;
@@ -256,7 +274,7 @@ Alien::Build::MM - Alien::Build installer code for ExtUtils::MakeMaker
 
 =head1 VERSION
 
-version 0.36
+version 0.41
 
 =head1 SYNOPSIS
 
@@ -348,7 +366,11 @@ L<Alien::Build>, L<Alien::Base>, L<Alien>
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Diab Jerius (DJERIUS)
 
 =head1 COPYRIGHT AND LICENSE
 

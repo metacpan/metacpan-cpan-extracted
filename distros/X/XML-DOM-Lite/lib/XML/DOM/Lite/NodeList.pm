@@ -1,4 +1,6 @@
 package XML::DOM::Lite::NodeList;
+use warnings;
+use strict;
 
 =head1 NAME
 

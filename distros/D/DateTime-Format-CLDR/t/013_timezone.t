@@ -6,7 +6,7 @@ use strict;
 use warnings;
 no warnings qw(once);
 
-use Test::More tests => 1 + (5 * 4 * 24) + (24 * 5);
+use Test::More tests => 1 + (5 * 5 * 24) + (24 * 5);
 use Test::NoWarnings;
 
 use lib qw(t/lib);
@@ -16,8 +16,8 @@ use DateTime;
 use DateTime::Format::CLDR;
 
 my @timezones = qw(
-    Africa/Casablanca
     America/Argentina/Buenos_Aires
+    Africa/Casablanca
     America/Vancouver
     Asia/Kabul
     Europe/Vienna
@@ -26,6 +26,7 @@ my @timezones = qw(
 my @patterns = qw(
     Z
     ZZZZ
+    ZZZZZ
     z
     zzzz
 );

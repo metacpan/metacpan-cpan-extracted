@@ -4,11 +4,10 @@ use HTML::TreeBuilder::XPath;
 use Encode qw|is_utf8 encode decode|;
 use utf8;
 
-
 BEGIN {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION     = '0.01';
+    $VERSION     = '0.02';
     @ISA         = qw(Exporter);
     @EXPORT      = qw();
     @EXPORT_OK   = qw();
@@ -42,18 +41,24 @@ sub parseList{
   $tree->parse_content($str);
 
   my $links = [];
+  my $links_text = [];
   foreach(@{$tree->findnodes($this->{'item:link'})}){
     push(@$links, $_->attr('href'));
+    push(@$links_text, $_->as_text());    
   }
 
-  my $np = $tree->findnodes($this->{'nextpage:link'})->[0];
+  my $np = undef;
+  if($this->{'nextpage:link'}){
+    $np = $tree->findnodes($this->{'nextpage:link'})->[0];
 
-  if($np){
-    $np = $np->attr('href');
+    if($np){
+      $np = $np->attr('href');
+    }
   }
 
   return {
     'links' => $links,
+    'links_text' => $links_text,
     'next_page' => $np
   }
 }
@@ -195,6 +200,7 @@ Also it extracts required data from given HTML using rules defined upon object c
 =over 4
 
 =item new($rules)
+
 $rules is a hashref with following keys:
 
 =over 4
@@ -276,12 +282,13 @@ Coderef. Parser runs filter callback passing extracted value and field definitio
 returns list-page links as a hashref:
 
   {
-    links => [...] # URL's array
+    links => [...], # URL's array
+    links_text => [...], # Text inside corresponding 'a' tags
     next_page => "/page/N" # next page URL
   }
 
 
-=item parseList($html_string)
+=item parse($html_string)
 
 returns hashref with data extracted from page using 'fields' section from rules
 

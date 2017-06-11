@@ -1,7 +1,9 @@
 do { my $x = {
        'davidlou-d20' => '7d05f746-6cb1-1014-afba-1d3088877a71',
+       'digitalis' => 'fb0a9caa-19b5-11e7-9f00-c7435a6769f2',
        'microcenter' => '9ee01d3a-55a5-11e6-9fc5-14bfbd15da07',
-       'virtua.com.br' => '95b807aa-2fde-11e6-bda7-b7692eab5396'
+       'virtua.com.br' => '95b807aa-2fde-11e6-bda7-b7692eab5396',
+       'vm-debian-001' => 'abc3c33a-2c96-11e7-bf1c-62188544c514'
      };
   $x;
  }

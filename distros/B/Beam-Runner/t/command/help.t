@@ -103,6 +103,17 @@ subtest 'errors' => sub {
         is $@, qq{Could not find service "NOT_FOUND" in container "$c"\n},
             'error message is correct';
     };
+
+    subtest 'no documentation found' => sub {
+        my $mock = Mock::MonkeyPatch->patch(
+            'Beam::Runner::Command::help::pod2usage',
+            sub { },
+        );
+        my $container = $SHARE_DIR->child( 'undocumented.yml' );
+        eval { $class->run( $container => 'foo' ); };
+        ok $@, 'exception thrown';
+        like $@, qr{^Could not find documentation for class 'Local::Undocumented'$}, 'error on stderr' or diag $@;
+    };
 };
 
 done_testing;

@@ -1,5 +1,54 @@
 Revision history for Perl module Perl::Critic
 
+1.128    Sat Jun 10 22:31:28 CDT 2017
+
+    Official release.  No changes since 1.127_02.
+
+1.127_02 Tue May 23 18:31:59 CDT 2017
+
+Developer release leading up to 1.128.
+
+    [Bug Fixes]
+    * PPI misparsing a module caused an incorrect "Must end with a
+      recognizable true value."  This is fixed by upgrading to PPI
+      1.224. (GH #696, GH #607)
+    * A test would fail under the upcoming Perl 5.26 that omits the current
+      directory from @INC.  Thanks, Kent Fredric.
+    * Fixed an invalid test in the RequireBarewordsIncludes test.  Thanks,
+      Christian Walde. (GH #751)
+    * If an element contained blank lines then the source "%r" displayed
+      for a violation was wrong. Thanks, Sawyer X. (GH #702, #734)
+
+    [Dependencies]
+    Perl::Critic now requires PPI 1.224.  PPI is the underlying Perl parser
+    on which Perl::Critic is built, and 1.224 introduces many parsing fixes
+    such as:
+    * Fixes for dot-in-@INC.
+    * Parse left side of => as bareword even if it looks like a keyword or op.
+    * $::x now works.
+    * Higher accuracy when deciding whether certain characters are operators or
+      variable type casts (*&% etc.).
+    * Subroutine attributes parsed correctly.
+
+    [Performance Enhancements]
+    * Sped up BuiltinFunctions::ProhibitUselessTopic ~7%.  Thanks, James
+      Raspass. (GH #656)
+
+    [Documentation]
+    * Fixed incorrect explanation of capture variables in
+      ProhibitCaptureWithoutTest.  Thanks, Felipe Gasper.
+    * Fixed incorrect links. Thanks, Glenn Fowler.
+    * Fixed incorrect example for returning a sorted list.  Thanks, @daviding58.
+    * Fixed invalid POD.  Thanks, Jakub Wilk. (GH #735)
+    * Updated docs on ProhibitYadaOperator.  Thanks, Stuart A Johnston. (GH #662)
+    * Removed all the references to the old mailing list and code repository
+      at tigris.org.  (GH #757)
+
+
+1.127_01 Sun May 21 21:57:16 CDT 2017
+
+    Removed from CPAN because it did not get indexed correctly.
+
 1.126 2015-08-10
 
     [New Policies]
@@ -48,7 +97,7 @@ Revision history for Perl module Perl::Critic
 1.123 2014-11-11
 
     [Dependencies]
-    * Now requires PPI-1.220 which has numerous bug fixes. This may 
+    * Now requires PPI-1.220 which has numerous bug fixes. This may
       eliminate the need for some "## no critic" markers you inserted to
       work around those bugs. The "ProhibitUselessNoCritic" policy should
       help you find them.

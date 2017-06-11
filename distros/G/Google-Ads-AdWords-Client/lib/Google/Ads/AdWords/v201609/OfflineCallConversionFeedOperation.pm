@@ -72,7 +72,7 @@ Google::Ads::AdWords::v201609::OfflineCallConversionFeedOperation
 Perl data type class for the XML Schema defined complexType
 OfflineCallConversionFeedOperation from the namespace https://adwords.google.com/api/adwords/cm/v201609.
 
-Operation for uploading {@link OfflineCallConversionFeed}. 
+Operation for uploading {@link OfflineCallConversionFeed}. See {@link OfflineCallConversionFeedService#mutate}. <p><b>Note:</b> Only the {@code ADD} operator is supported. 
 
 
 

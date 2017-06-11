@@ -7,9 +7,8 @@ use Hash::Util qw(lock_keys);
 use Locale::Utils::PlaceholderNamed;
 use Moo::Role;
 use Try::Tiny;
-use namespace::autoclean;
 
-our $VERSION = '1.016';
+our $VERSION = '1.027';
 
 requires qw(
     translate
@@ -149,13 +148,13 @@ __END__
 
 Locale::TextDomain::OO::Plugin::Expand::Gettext::Named - Additional gettext methods locn, Nlocn
 
-$Id: Named.pm 545 2014-10-30 13:23:00Z steffenw $
+$Id: Named.pm 651 2017-05-31 18:10:43Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/module/trunk/lib/Locale/TextDomain/OO/Plugin/Expand/Gettext/Named.pm $
 
 =head1 VERSION
 
-1.016
+1.027
 
 =head1 DESCRIPTION
 
@@ -357,8 +356,6 @@ L<Moo::Role|Moo::Role>
 
 L<Try::Tiny|Try::Tiny>
 
-L<namespace::autoclean|namespace::autoclean>
-
 =head1 INCOMPATIBILITIES
 
 not known
@@ -377,7 +374,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2009 - 2014,
+Copyright (c) 2009 - 2017,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

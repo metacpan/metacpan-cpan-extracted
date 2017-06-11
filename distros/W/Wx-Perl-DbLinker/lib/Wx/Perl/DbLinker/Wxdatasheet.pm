@@ -9,8 +9,9 @@ use warnings;
 package Wx::Perl::DbLinker::Wxdatasheet;
 use Wx::Perl::DbLinker;
 our $VERSION = $Wx::Perl::DbLinker::VERSION;
-#use Carp qw(croak confess carp);
+use Carp qw(croak confess carp);
 # use Data::Dumper;
+use Log::Any;
 use Wx qw(:everything);
 use base qw(Wx::Grid);
 use Gtk2::Ex::DbLinker::DatasheetHelper;
@@ -62,7 +63,8 @@ sub new {
 #$self->{borders_size} = $$req{borders_size} || [22, 20]; #array ref of row1 height and col1 width
     $self->{borders_size} = $arg{borders_size};
 
-    $self->{log} = Log::Log4perl->get_logger(__PACKAGE__);
+    #$self->{log} = Log::Log4perl->get_logger(__PACKAGE__);
+    $self->{log} = Log::Any->get_logger;
     my @cols = $self->{dman}->get_field_names;
 
     # cols holds the field names from the table. Nothing else !
@@ -205,7 +207,7 @@ sub _setup_grid {
                 );
                 $self->{log}->debug( "col: ", $col, " label: ", $label );
                 $self->{log}->debug( "cell editor: " . ref $field->{editor} );
-                $self->{log}->logcroak("\$col undef") unless defined $col;
+                croak($self->{log}->error("\$col undef")) unless defined $col;
                 $self->SetColLabelValue( $col, $label );
                 if ( defined $field->{size} ) {
                     $self->SetColSize( $col, $field->{size} );    #if ($r==0);
@@ -676,7 +678,8 @@ use base qw(Wx::PlGridTable);
 sub new {
     my ( $class, $args ) = @_;
     my $self = $class->SUPER::new;
-    $self->{log} = Log::Log4perl->get_logger(__PACKAGE__);
+    #$self->{log} = Log::Log4perl->get_logger(__PACKAGE__);
+    $self->{log} = Log::Any->get_logger;
     $self->{log}->debug("new called");
     $self->{dman}   = $args->{dman};
     $self->{fields} = $args->{fields};
@@ -739,7 +742,7 @@ sub GetValue {
             $result = $$self{array}->[$row][$col];
         }
         else {
-            $self->{log}->logconfess("array undef");
+           confess( $self->{log}->error("array undef"));
         }
 
         my $fname = $self->{fields}[$col]->{name};
@@ -748,7 +751,7 @@ sub GetValue {
 
     }
     else {
-        $self->{log}->logcarp( "Index out of bound in DBGridTable: " . $row . " : " . $col );
+        carp($self->{log}->warn( "Index out of bound in DBGridTable: " . $row . " : " . $col ));
     }
 
     $result = '' unless defined $result;
@@ -761,9 +764,9 @@ sub SetValue {
     my ( $self, $row, $col, $value ) = @_;
 
 #$self->{log}->debug ("SetValue GNR: " . $self->GetNumberRows . " pos to add to is " . $row) ;
-    $self->{log}->logconfess("Array out of bounds too much rows")
+    confess($self->{log}->error("Array out of bounds too much rows"))
         unless ( $row < $self->GetNumberRows );
-    $self->{log}->logconfess("Array out of bounds too much cols")
+     confess($self->{log}->error("Array out of bounds too much cols"))
         unless ( $col < $self->GetNumberCols );
 
     my $fname = $self->{fields}->[$col]->{name};

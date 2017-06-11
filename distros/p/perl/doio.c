@@ -110,7 +110,8 @@ S_openn_setup(pTHX_ GV *gv, char *mode, PerlIO **saveifp, PerlIO **saveofp,
                 if (result == EOF && old_fd > PL_maxsysfd) {
                     /* Why is this not Perl_warn*() call ? */
                     PerlIO_printf(Perl_error_log,
-                                  "Warning: unable to close filehandle %"HEKf" properly.\n",
+                                  "Warning: unable to close filehandle %" HEKf
+                                  " properly.\n",
                                   HEKfARG(GvENAME_HEK(gv))
                         );
                 }
@@ -636,14 +637,14 @@ S_openn_cleanup(pTHX_ GV *gv, IO *io, PerlIO *fp, char *mode, const char *oname,
 	if ((IoTYPE(io) == IoTYPE_RDONLY) &&
 	    (fp == PerlIO_stdout() || fp == PerlIO_stderr())) {
 		Perl_warner(aTHX_ packWARN(WARN_IO),
-			    "Filehandle STD%s reopened as %"HEKf
+			    "Filehandle STD%s reopened as %" HEKf
 			    " only for input",
 			    ((fp == PerlIO_stdout()) ? "OUT" : "ERR"),
 			    HEKfARG(GvENAME_HEK(gv)));
 	}
 	else if ((IoTYPE(io) == IoTYPE_WRONLY) && fp == PerlIO_stdin()) {
 		Perl_warner(aTHX_ packWARN(WARN_IO),
-		    "Filehandle STDIN reopened as %"HEKf" only for output",
+		    "Filehandle STDIN reopened as %" HEKf " only for output",
 		     HEKfARG(GvENAME_HEK(gv))
 		);
 	}
@@ -760,7 +761,11 @@ S_openn_cleanup(pTHX_ GV *gv, IO *io, PerlIO *fp, char *mode, const char *oname,
 #if defined(HAS_FCNTL) && defined(F_SETFD)
 		/* The dup trick has lost close-on-exec on ofd,
                  * and possibly any other flags, so restore them. */
-		fcntl(ofd,F_SETFD, fd_flags);
+		if (fcntl(ofd,F_SETFD, fd_flags) < 0) {
+                    if (dupfd >= 0)
+                        PerlLIO_close(dupfd);
+                    goto say_false;
+                }
 #endif
                 PerlLIO_close(dupfd);
 	    }
@@ -859,8 +864,8 @@ Perl_nextargv(pTHX_ GV *gv, bool nomagicopen)
             {
                 IO * const io = GvIOp(PL_argvoutgv);
                 if (io && IoIFP(io) && old_out_name && !io_close(io, PL_argvoutgv, FALSE, FALSE)) {
-                    Perl_croak(aTHX_ "Failed to close in-place edit file %"SVf": %s\n",
-                               old_out_name, Strerror(errno));
+                    Perl_croak(aTHX_ "Failed to close in-place edit file %"
+                               SVf ": %s\n", old_out_name, Strerror(errno));
                 }
             }
             /* This very long block ends with return IoIFP(GvIOp(gv));
@@ -899,7 +904,7 @@ Perl_nextargv(pTHX_ GV *gv, bool nomagicopen)
 		    const char *star = strchr(PL_inplace, '*');
 		    if (star) {
 			const char *begin = PL_inplace;
-			sv_setpvs(sv, "");
+                        SvPVCLEAR(sv);
 			do {
 			    sv_catpvn(sv, begin, star - begin);
 			    sv_catpvn(sv, PL_oldname, oldlen);
@@ -921,7 +926,8 @@ Perl_nextargv(pTHX_ GV *gv, bool nomagicopen)
                       )
 		    {
 			Perl_ck_warner_d(aTHX_ packWARN(WARN_INPLACE),
-					 "Can't do inplace edit: %"SVf" would not be unique",
+					 "Can't do inplace edit: %"
+                                         SVf " would not be unique",
 					 SVfARG(sv));
 			do_close(gv,FALSE);
 			continue;
@@ -931,8 +937,10 @@ Perl_nextargv(pTHX_ GV *gv, bool nomagicopen)
 #if !defined(DOSISH) && !defined(__CYGWIN__)
 		    if (PerlLIO_rename(PL_oldname,SvPVX_const(sv)) < 0) {
 			Perl_ck_warner_d(aTHX_ packWARN(WARN_INPLACE),
-					 "Can't rename %s to %"SVf": %s, skipping file",
-					 PL_oldname, SVfARG(sv), Strerror(errno));
+					 "Can't rename %s to %" SVf
+                                         ": %s, skipping file",
+					 PL_oldname, SVfARG(sv),
+                                         Strerror(errno));
 			do_close(gv,FALSE);
 			continue;
 		    }
@@ -946,7 +954,7 @@ Perl_nextargv(pTHX_ GV *gv, bool nomagicopen)
 		    (void)UNLINK(SvPVX_const(sv));
 		    if (link(PL_oldname,SvPVX_const(sv)) < 0) {
 			Perl_ck_warner_d(aTHX_ packWARN(WARN_INPLACE),
-					 "Can't rename %s to %"SVf": %s, skipping file",
+					 "Can't rename %s to %" SVf ": %s, skipping file",
 					 PL_oldname, SVfARG(sv), Strerror(errno) );
 			do_close(gv,FALSE);
 			continue;
@@ -1029,7 +1037,7 @@ Perl_nextargv(pTHX_ GV *gv, bool nomagicopen)
         if (old_out_name) {
             IO * const io = GvIOp(PL_argvoutgv);
             if (io && IoIFP(io) && !io_close(io, PL_argvoutgv, FALSE, FALSE)) {
-                Perl_croak(aTHX_ "Failed to close in-place edit file %"SVf": %s\n",
+                Perl_croak(aTHX_ "Failed to close in-place edit file %" SVf ": %s\n",
                            old_out_name, Strerror(errno));
             }
         }
@@ -1127,13 +1135,13 @@ Perl_io_close(pTHX_ IO *io, GV *gv, bool not_implicit, bool warn_on_fail)
 	    if (gv)
 		Perl_ck_warner_d(aTHX_ packWARN(WARN_IO),
 				"Warning: unable to close filehandle %"
-				 HEKf" properly: %"SVf,
+				 HEKf " properly: %" SVf,
 				 HEKfARG(GvNAME_HEK(gv)),
                                  SVfARG(get_sv("!",GV_ADD)));
 	    else
 		Perl_ck_warner_d(aTHX_ packWARN(WARN_IO),
 				"Warning: unable to close filehandle "
-				"properly: %"SVf,
+				"properly: %" SVf,
 				 SVfARG(get_sv("!",GV_ADD)));
 	}
     }
@@ -1359,9 +1367,9 @@ Perl_do_print(pTHX_ SV *sv, PerlIO *fp)
     if (SvTYPE(sv) == SVt_IV && SvIOK(sv)) {
 	assert(!SvGMAGICAL(sv));
 	if (SvIsUV(sv))
-	    PerlIO_printf(fp, "%"UVuf, (UV)SvUVX(sv));
+	    PerlIO_printf(fp, "%" UVuf, (UV)SvUVX(sv));
 	else
-	    PerlIO_printf(fp, "%"IVdf, (IV)SvIVX(sv));
+	    PerlIO_printf(fp, "%" IVdf, (IV)SvIVX(sv));
 	return !PerlIO_error(fp);
     }
     else {
@@ -1435,7 +1443,7 @@ Perl_my_stat_flags(pTHX_ const U32 flags)
         do_fstat_have_io:
         PL_laststype = OP_STAT;
         PL_statgv = gv ? gv : (GV *)io;
-        sv_setpvs(PL_statname, "");
+        SvPVCLEAR(PL_statname);
         if (io) {
 	    if (IoIFP(io)) {
                 int fd = PerlIO_fileno(IoIFP(io));
@@ -1503,7 +1511,7 @@ Perl_my_lstat_flags(pTHX_ const U32 flags)
 	if (ckWARN(WARN_IO)) {
 	    /* diag_listed_as: Use of -l on filehandle%s */
 	    Perl_warner(aTHX_ packWARN(WARN_IO),
-		 	     "Use of -l on filehandle %"HEKf,
+		              "Use of -l on filehandle %" HEKf,
 			      HEKfARG(GvENAME_HEK(cGVOP_gv)));
 	}
 	return -1;
@@ -1530,7 +1538,7 @@ Perl_my_lstat_flags(pTHX_ const U32 flags)
         else
 	    /* diag_listed_as: Use of -l on filehandle%s */
             Perl_warner(aTHX_ packWARN(WARN_IO),
-                             "Use of -l on filehandle %"HEKf,
+                             "Use of -l on filehandle %" HEKf,
                               HEKfARG(GvENAME_HEK((const GV *)
                                           (SvROK(sv) ? SvRV(sv) : sv))));
     }
@@ -1639,7 +1647,7 @@ Perl_do_exec3(pTHX_ const char *incmd, int fd, int do_report)
     {
         char flags[PERL_FLAGS_MAX];
 	if (strnEQ(cmd,PL_cshname,PL_cshlen) &&
-	    strnEQ(cmd+PL_cshlen," -c",3)) {
+	    strEQs(cmd+PL_cshlen," -c")) {
           my_strlcpy(flags, "-c", PERL_FLAGS_MAX);
 	  s = cmd+PL_cshlen+3;
 	  if (*s == 'f') {
@@ -1675,7 +1683,7 @@ Perl_do_exec3(pTHX_ const char *incmd, int fd, int do_report)
     if (*cmd == '.' && isSPACE(cmd[1]))
 	goto doshell;
 
-    if (strnEQ(cmd,"exec",4) && isSPACE(cmd[4]))
+    if (strEQs(cmd,"exec") && isSPACE(cmd[4]))
 	goto doshell;
 
     s = cmd;
@@ -1845,18 +1853,8 @@ Perl_apply(pTHX_ I32 type, SV **mark, SV **sp)
                         int fd = PerlIO_fileno(IoIFP(GvIOn(gv)));
 			APPLY_TAINT_PROPER();
                         if (fd < 0) {
-			    SETERRNO(EBADF,RMS_IFI);
+                            SETERRNO(EBADF,RMS_IFI);
 			    tot--;
-#if Uid_t_sign == 1
-			} else if (val < 0) {
-			    SETERRNO(EINVAL,LIB_INVARG);
-			    tot--;
-#endif
-#if Gid_t_sign == 1
-			} else if (val2 < 0) {
-			    SETERRNO(EINVAL,LIB_INVARG);
-			    tot--;
-#endif
                         } else if (fchown(fd, val, val2))
 			    tot--;
 #else
@@ -1904,7 +1902,8 @@ nothing in the core.
                 len -= 3;
             }
            if ((val = whichsig_pvn(s, len)) < 0)
-               Perl_croak(aTHX_ "Unrecognized signal name \"%"SVf"\"", SVfARG(*mark));
+               Perl_croak(aTHX_ "Unrecognized signal name \"%" SVf "\"",
+                                SVfARG(*mark));
 	}
 	else
 	{
@@ -2085,7 +2084,7 @@ nothing in the core.
 #undef APPLY_TAINT_PROPER
 }
 
-/* Do the permissions allow some operation?  Assumes statcache already set. */
+/* Do the permissions in *statbufp allow some operation? */
 #ifndef VMS /* VMS' cando is in vms.c */
 bool
 Perl_cando(pTHX_ Mode_t mode, bool effective, const Stat_t *statbufp)
@@ -2118,7 +2117,7 @@ Perl_cando(pTHX_ Mode_t mode, bool effective, const Stat_t *statbufp)
      /* Atari stat() does pretty much the same thing. we set x_bit_set_in_stat
       * too so it will actually look into the files for magic numbers
       */
-     return (mode & statbufp->st_mode) ? TRUE : FALSE;
+    return cBOOL(mode & statbufp->st_mode);
 
 #else /* ! DOSISH */
 # ifdef __CYGWIN__
@@ -2399,7 +2398,7 @@ Perl_do_msgrcv(pTHX_ SV **mark, SV **sp)
 
     /* suppress warning when reading into undef var --jhi */
     if (! SvOK(mstr))
-	sv_setpvs(mstr, "");
+        SvPVCLEAR(mstr);
     msize = SvIVx(*++mark);
     mtype = (long)SvIVx(*++mark);
     flags = SvIVx(*++mark);
@@ -2510,7 +2509,7 @@ Perl_do_shmio(pTHX_ I32 optype, SV **mark, SV **sp)
 	SvGETMAGIC(mstr);
 	SvUPGRADE(mstr, SVt_PV);
 	if (! SvOK(mstr))
-	    sv_setpvs(mstr, "");
+            SvPVCLEAR(mstr);
 	SvPOK_only(mstr);
 	mbuf = SvGROW(mstr, (STRLEN)msize+1);
 
@@ -2608,14 +2607,11 @@ Perl_vms_start_glob
 #endif /* !CSH */
 #endif /* !DOSISH */
     {
-	GV * const envgv = gv_fetchpvs("ENV", 0, SVt_PVHV);
-	SV ** const home = hv_fetchs(GvHV(envgv), "HOME", 0);
-	SV ** const path = hv_fetchs(GvHV(envgv), "PATH", 0);
-	if (home && *home) SvGETMAGIC(*home);
-	if (path && *path) SvGETMAGIC(*path);
-	save_hash(gv_fetchpvs("ENV", 0, SVt_PVHV));
-	if (home && *home) SvSETMAGIC(*home);
-	if (path && *path) SvSETMAGIC(*path);
+        SV ** const svp = hv_fetchs(GvHVn(PL_envgv), "LS_COLORS", 0);
+        if (svp && *svp)
+            save_helem_flags(GvHV(PL_envgv),
+                             newSVpvs_flags("LS_COLORS", SVs_TEMP), svp,
+                             SAVEf_SETMAGIC);
     }
     (void)do_open6(PL_last_in_gv, SvPVX_const(tmpcmd), SvCUR(tmpcmd),
                    NULL, NULL, 0);

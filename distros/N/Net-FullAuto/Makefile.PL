@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000386';
+our $VERSION='1.0000390';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -249,6 +249,7 @@ END
 
 my $c=($^O ne 'MSWin32' && $^O ne 'MSWin64')?'©':'(C)';
 my $fa_banner=<<END;
+
 
 
 
@@ -6923,5 +6924,9 @@ sub max_exec_len {
 package OS2;
 
 sub DLLname {}
+
+package ExtUtils::MM_Any;
+
+sub xs_dlsyms_ext {}
 
 1;

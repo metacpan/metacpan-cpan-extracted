@@ -4,9 +4,8 @@ use strict;
 use warnings;
 use Locale::Utils::PlaceholderMaketext;
 use Moo::Role;
-use namespace::autoclean;
 
-our $VERSION = '1.009';
+our $VERSION = '1.027';
 
 requires qw(
     translate
@@ -69,13 +68,13 @@ __END__
 
 Locale::TextDomain::OO::Plugin::Expand::Maketext - Additional maketext methods
 
-$Id: Maketext.pm 487 2014-02-03 14:31:43Z steffenw $
+$Id: Maketext.pm 651 2017-05-31 18:10:43Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/module/trunk/lib/Locale/TextDomain/OO/Plugin/Expand/Maketext.pm $
 
 =head1 VERSION
 
-1.009
+1.027
 
 =head1 DESCRIPTION
 
@@ -188,8 +187,6 @@ L<Locale::Utils::PlaceholderMaketext|Locale::Utils::PlaceholderMaketext>
 
 L<Moo::Role|Moo::Role>
 
-L<namespace::autoclean|namespace::autoclean>
-
 =head1 INCOMPATIBILITIES
 
 not known
@@ -208,7 +205,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2009 - 2014,
+Copyright (c) 2009 - 2017,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

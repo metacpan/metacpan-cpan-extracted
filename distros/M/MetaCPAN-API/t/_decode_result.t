@@ -1,11 +1,10 @@
-#!perl
-
 use strict;
 use warnings;
 
+use lib 't/lib';
 use Test::More tests => 8;
 use Test::Fatal;
-use t::lib::Functions;
+use TestFunctions;
 
 my $mcpan = mcpan();
 isa_ok( $mcpan, 'MetaCPAN::API' );

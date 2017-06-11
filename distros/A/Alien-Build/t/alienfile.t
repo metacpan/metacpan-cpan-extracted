@@ -233,15 +233,17 @@ subtest 'download' => sub {
 
 };
 
-foreach my $hook (qw( fetch decode prefer extract build ))
+foreach my $hook (qw( fetch decode prefer extract build build_ffi ))
 {
 
   subtest "$hook" => sub {
   
-    my $build = alienfile qq{
-      use alienfile;
-      share {
-        $hook sub { };
+    my(undef, $build) = capture_merged {
+      alienfile qq{
+        use alienfile;
+        share {
+          $hook sub { };
+        };
       };
     };
     
@@ -304,6 +306,29 @@ subtest 'gather' => sub {
   
   };
 
+  subtest 'share + gather_ffi' => sub {
+  
+    my(undef,$build) = capture_merged {
+      alienfile q{
+        use alienfile;
+        share { gather_ffi sub {} };
+      };
+    };
+  
+    is( $build->meta->has_hook('gather_ffi'), T() );
+  };
+  
+
+  subtest 'share + ffi gather' => sub {
+  
+    my $build = alienfile q{
+      use alienfile;
+      share { ffi { gather sub {} } };
+    };
+  
+    is( $build->meta->has_hook('gather_ffi'), T() );
+  };
+  
   subtest 'nada' => sub {
   
     my $build = alienfile q{
@@ -336,6 +361,30 @@ subtest 'patch' => sub {
   };
   
   is( $build->meta->has_hook('patch'), T() );
+
+};
+
+subtest 'patch_ffi' => sub {
+
+  my(undef,$build) = capture_merged {
+    alienfile q{
+      use alienfile;
+      share { patch_ffi sub { } };
+    };
+  };
+  
+  is( $build->meta->has_hook('patch_ffi'), T() );
+
+};
+
+subtest 'ffi patch' => sub {
+
+  my $build = alienfile q{
+    use alienfile;
+    share { ffi { patch sub { } } };
+  };
+  
+  is( $build->meta->has_hook('patch_ffi'), T() );
 
 };
 

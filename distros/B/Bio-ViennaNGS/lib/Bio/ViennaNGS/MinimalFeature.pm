@@ -1,26 +1,19 @@
 # -*-CPerl-*-
-# Last changed Time-stamp: <2015-10-27 14:44:03 mtw>
+# Last changed Time-stamp: <2017-06-10 19:07:52 michl>
 
 package Bio::ViennaNGS::MinimalFeature;
 
-use version; our $VERSION = qv('0.16');
+use Bio::ViennaNGS;
 use namespace::autoclean;
-
-use Moose::Util::TypeConstraints;
-subtype 'PlusOrMinus',
-  as 'Str',
-  where { /[\+\-\.]/ },
-  message { "$_ is neither +/- nor ."};
-no Moose::Util::TypeConstraints;
-
 use Moose;
-with 'MooseX::Clone';
+use Bio::ViennaNGS::Subtypes;
+use version; our $VERSION = version->declare("$Bio::ViennaNGS::VERSION");
 
 extends 'Bio::ViennaNGS::FeatureInterval';
 
 has 'strand' => (
 		 is      => 'rw',
-		 isa     => 'PlusOrMinus',
+		 isa     => 'Bio::ViennaNGS::PlusOrMinus',
 		 default => '.',
 		 predicate => 'has_strand',
 		);
@@ -41,11 +34,11 @@ intervals.
 
   use Bio::ViennaNGS::MinimalFeature;
 
-  my $expression = Bio::ViennaNGS::MinimalFeature->new(chromosome => "chr1",
-                                                       start => "1200",
-                                                       end => "4300",
-                                                       strand => "+",
-                                                      );
+  my $feat = Bio::ViennaNGS::MinimalFeature->new(chromosome => "chr1",
+                                                 start => "1200",
+                                                 end => "4300",
+                                                 strand => "+",
+                                                );
 =head1 DESCRIPTION
 
 This module provides an object-oriented interface for storing
@@ -74,7 +67,7 @@ Michael T. Wolfinger E<lt>michael@wolfinger.euE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2015 Michael T. Wolfinger E<lt>michael@wolfinger.euE<gt>
+Copyright (C) 2014-2017 Michael T. Wolfinger E<lt>michael@wolfinger.euE<gt>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

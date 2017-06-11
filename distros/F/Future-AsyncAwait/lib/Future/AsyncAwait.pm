@@ -8,7 +8,7 @@ package Future::AsyncAwait;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Carp;
 
@@ -104,20 +104,6 @@ sub import_into
 =head1 TODO
 
 =over 4
-
-=item *
-
-Save and resume the PAD of the calling function, so that local variables are
-preserved:
-
- async sub with_pad
- {
-    my $x = func();
-
-    await $F;
-
-    print "I still have X: $x\n";
- }
 
 =item *
 

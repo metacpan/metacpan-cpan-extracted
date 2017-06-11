@@ -10,8 +10,8 @@ lib/Pcore.pm
 lib/Pcore/AE/DNS/Cache.pm
 lib/Pcore/AE/Handle.pm
 lib/Pcore/AE/Handle/Cache.pm
-lib/Pcore/AE/Handle/Cache/Storage.pm
 lib/Pcore/AE/Handle/Cache2.pm
+lib/Pcore/AE/Handle/Cache2/Storage.pm
 lib/Pcore/AE/Handle2.pm
 lib/Pcore/AE/Patch.pm
 lib/Pcore/API/Bitbucket.pm
@@ -82,17 +82,15 @@ lib/Pcore/Core/Env.pm
 lib/Pcore/Core/Env/Share.pm
 lib/Pcore/Core/Event.pm
 lib/Pcore/Core/Event/Listener.pm
+lib/Pcore/Core/Event/Listener/Pipe.pm
+lib/Pcore/Core/Event/Listener/Pipe/file.pm
+lib/Pcore/Core/Event/Listener/Pipe/stderr.pm
 lib/Pcore/Core/Exception.pm
 lib/Pcore/Core/Exception/Object.pm
 lib/Pcore/Core/Exporter.pm
 lib/Pcore/Core/Guard.pm
 lib/Pcore/Core/I18N.pm
 lib/Pcore/Core/Inline.pm
-lib/Pcore/Core/Log.pm
-lib/Pcore/Core/Log/Channel.pm
-lib/Pcore/Core/Log/Pipe.pm
-lib/Pcore/Core/Log/Pipe/file.pm
-lib/Pcore/Core/Log/Pipe/stderr.pm
 lib/Pcore/Core/PerlIOviaWinUniCon.pm
 lib/Pcore/Core/Types.pm
 lib/Pcore/Dist.pm
@@ -160,7 +158,7 @@ lib/Pcore/Util/File/Tree.pm
 lib/Pcore/Util/File/Tree/File.pm
 lib/Pcore/Util/File/UmaskGuard.pm
 lib/Pcore/Util/Hash.pm
-lib/Pcore/Util/Hash/Limited.pm
+lib/Pcore/Util/Hash/LRU.pm
 lib/Pcore/Util/Hash/Multivalue.pm
 lib/Pcore/Util/Hash/RandKey.pm
 lib/Pcore/Util/IDN.pm
@@ -216,7 +214,6 @@ share/bin/nssm_x64.exe
 share/data/ca_file.pem
 share/data/mime.json
 share/data/par.ico
-share/data/pcore.perl
 share/data/src.perl
 share/data/web2.ini
 share/dist-id.json
@@ -247,7 +244,7 @@ share/pcore/docker/Dockerfile
 share/pcore/docker/share/docker.json
 share/pcore/git/.gitignore
 share/pcore/hg/.hgignore
-share/pcore/par/share/par.perl
+share/pcore/par/share/par.ini
 t/author-pod-syntax.t
 t/p-http-cookies.t
 t/p-util-path.t

@@ -1,4 +1,4 @@
-#!/home/ben/software/install/bin/perl
+#!/usr/bin/env perl
 use warnings;
 use strict;
 use lib '/home/ben/projects/json-create/blib/lib';

@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2013 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2017 -- leonerd@leonerd.org.uk
 
 package Tickit::Async;
 
@@ -11,7 +11,7 @@ use base qw( Tickit IO::Async::Notifier );
 Tickit->VERSION( '0.17' );
 IO::Async::Notifier->VERSION( '0.43' ); # Need support for being a nonprinciple mixin
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 use IO::Async::Loop 0.47; # ->run and ->stop methods
 use IO::Async::Signal;
@@ -139,7 +139,15 @@ sub timer
    my $self = shift;
    my ( $mode, $amount, $code ) = @_;
 
-   $self->get_loop->watch_time( $mode => $amount, code => $code );
+   return $self->get_loop->watch_time( $mode => $amount, code => $code );
+}
+
+sub cancel_timer
+{
+   my $self = shift;
+   my ( $id ) = @_;
+
+   $self->get_loop->unwatch_time( $id );
 }
 
 sub tick
@@ -183,6 +191,9 @@ sub run
 
       $self->teardown_term;
       $loop->remove( $sigint_notifier );
+
+      # Restore STDIN's blocking mode
+      $self->term->get_input_handle->blocking( 1 );
    }
 
    die $@ if $@;

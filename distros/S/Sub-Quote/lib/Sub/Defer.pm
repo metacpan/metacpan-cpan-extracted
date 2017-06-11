@@ -5,7 +5,7 @@ use Exporter qw(import);
 use Scalar::Util qw(weaken);
 use Carp qw(croak);
 
-our $VERSION = '2.003001';
+our $VERSION = '2.004000';
 $VERSION = eval $VERSION;
 
 our @EXPORT = qw(defer_sub undefer_sub undefer_all);
@@ -99,6 +99,10 @@ sub defer_sub {
     if $target;
   $package ||= $options && $options->{package} || caller;
   my @attributes = @{$options && $options->{attributes} || []};
+  if (@attributes) {
+    /\A\w+(?:\(.*\))?\z/s || croak "invalid attribute $_"
+      for @attributes;
+  }
   my $deferred;
   my $undeferred;
   my $deferred_info = [ $target, $maker, \$undeferred ];
@@ -106,7 +110,7 @@ sub defer_sub {
     my $code
       =  q[#line ].(__LINE__+2).q[ "].__FILE__.qq["\n]
       . qq[package $package;\n]
-      . ($target ? "sub $subname" : '+sub') . join(' ', map ":$_", @attributes)
+      . ($target ? "sub $subname" : '+sub') . join('', map " :$_", @attributes)
       . q[ {
         package Sub::Defer;
         # uncoverable subroutine
@@ -151,7 +155,7 @@ __END__
 
 =head1 NAME
 
-Sub::Defer - defer generation of subroutines until they are first called
+Sub::Defer - Defer generation of subroutines until they are first called
 
 =head1 SYNOPSIS
 

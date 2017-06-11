@@ -32,6 +32,8 @@ Checks a URI path against the added routes and returns `undef` if no match is
 found, otherwise returning the associated subroutine reference and any captures
 from wildcards:
 
+    my ($sub, @captures) = check_route('POST/some/path');
+
 ## get/post/put/patch/del/head/conn/options/any
 
 Sugar for `add_route`: adds a route using `$path` for the associated HTTP
@@ -63,7 +65,7 @@ path '/interstitial/track':
 
 ## DEPENDENCIES
 
-This module uses `uthash|http://troydhanson.github.com/uthash/` to build a
+This module uses [uthash](http://troydhanson.github.com/uthash/) to build a
 n-ary tree of paths. `uthash` is a single C header file, included in this
 distribution. uthash is copyright (c) 2003-2017, Troy D. Hanson.
 

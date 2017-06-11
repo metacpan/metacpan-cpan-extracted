@@ -22,7 +22,7 @@ recommends:
   Tk: '0'
 requires:
   App::Cmd::Setup: '0'
-  Config::Model: '2.101'
+  Config::Model: '2.103'
   Config::Model::FuseUI: '0'
   Config::Model::Lister: '0'
   Config::Model::ObjTreeScanner: '0'
@@ -33,6 +33,7 @@ requires:
   Encode: '0'
   File::HomeDir: '0'
   JSON: '0'
+  Log::Log4perl: '0'
   Path::Tiny: '0'
   Pod::POM: '0'
   Pod::POM::View::Text: '0'
@@ -44,5 +45,5 @@ resources:
   bugtracker: https://github.com/dod38fr/cme-perl/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: https://github.com/dod38fr/cme-perl.git
-version: '1.019'
+version: '1.020'
 x_serialization_backend: 'YAML::Tiny version 1.70'

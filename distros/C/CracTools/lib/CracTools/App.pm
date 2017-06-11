@@ -1,11 +1,12 @@
 use strict;
 use warnings;
 package CracTools::App;
+
 {
   $CracTools::App::DIST = 'CracTools';
 }
 # ABSTRACT: CracTools App::Cmd
-$CracTools::App::VERSION = '1.25';
+$CracTools::App::VERSION = '1.251';
 use App::Cmd::Setup -app;
 
 sub global_opt_spec {
@@ -28,7 +29,7 @@ CracTools::App - CracTools App::Cmd
 
 =head1 VERSION
 
-version 1.25
+version 1.251
 
 =head1 AUTHORS
 

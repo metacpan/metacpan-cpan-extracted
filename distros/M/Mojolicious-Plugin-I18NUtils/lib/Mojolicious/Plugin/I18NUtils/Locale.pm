@@ -77,7 +77,7 @@ Mojolicious::Plugin::I18NUtils::Locale - class that represents a locale string
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 AUTHOR
 
@@ -85,7 +85,7 @@ Renee Baecker <reneeb@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015 by Renee Baecker.
+This software is Copyright (c) 2017 by Renee Baecker.
 
 This is free software, licensed under:
 

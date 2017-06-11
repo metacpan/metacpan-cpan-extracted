@@ -1,6 +1,12 @@
 Revision history for Geo-Coder-XYZ
 
-0.03
+0.05	Mon Jun  5 13:24:52 EDT 2017
+	Removed usage of T:N:D when not used
+
+0.04	Tue May 30 09:37:58 EDT 2017
+	Fix "Not an ARRAY reference"
+
+0.03	Fri May 26 12:30:37 EDT 2017
 	Fix list context
 
 0.02	Sat 13 May 09:41:13 EDT 2017

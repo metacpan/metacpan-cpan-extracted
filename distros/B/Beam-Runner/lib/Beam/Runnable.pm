@@ -1,5 +1,5 @@
 package Beam::Runnable;
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 # ABSTRACT: Role for runnable objects
 
 #pod =head1 SYNOPSIS
@@ -36,6 +36,21 @@ our $VERSION = '0.010';
 #pod The C<beam list> command, when listing runnable objects, will display
 #pod either the C<summary> attribute or the C<NAME> POD section (abstract)
 #pod next to the service name.
+#pod
+#pod =head2 Additional Roles
+#pod
+#pod Additional roles can add common functionality to your runnable script.
+#pod Some of these are included in the C<Beam::Runner> distribution:
+#pod
+#pod =over
+#pod
+#pod =item L<Beam::Runnable::Timeout::Alarm>
+#pod
+#pod This role will add a timeout using Perl's built-in
+#pod L<alarm()|perlfunc/alarm> function. Once the timeout is reached, the
+#pod program will print a warning and exit with an error code.
+#pod
+#pod =back
 #pod
 #pod =head1 SEE ALSO
 #pod
@@ -86,7 +101,7 @@ Beam::Runnable - Role for runnable objects
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -122,6 +137,21 @@ L<Pod::Usage> produces by default.
 The C<beam list> command, when listing runnable objects, will display
 either the C<summary> attribute or the C<NAME> POD section (abstract)
 next to the service name.
+
+=head2 Additional Roles
+
+Additional roles can add common functionality to your runnable script.
+Some of these are included in the C<Beam::Runner> distribution:
+
+=over
+
+=item L<Beam::Runnable::Timeout::Alarm>
+
+This role will add a timeout using Perl's built-in
+L<alarm()|perlfunc/alarm> function. Once the timeout is reached, the
+program will print a warning and exit with an error code.
+
+=back
 
 =head1 ATTRIBUTES
 

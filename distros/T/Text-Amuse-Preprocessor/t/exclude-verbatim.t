@@ -18,6 +18,10 @@ BEGIN {
 }
 my $wd = File::Temp->newdir(CLEANUP => 1);
 my $infile = catfile(qw/t footnotes verbatim-in.muse/);
+my $body = _read_file($infile);
+$body =~ s/\n/\r\n/sg;
+$infile = catfile($wd, 'input.muse');
+_write_file($infile, $body);
 my $expected = catfile(qw/t footnotes verbatim-exp.muse/);
 my $outfile = catfile($wd, 'verbatim-in.muse');
   
@@ -44,4 +48,10 @@ sub _read_file {
     }
     close $fh;
     return join('', @in);
+}
+sub _write_file {
+    my ($file, $body) = @_;
+    open (my $fh, '>:encoding(utf-8)', $file) or die "Couldn't open $file";
+    print $fh $body;
+    close $fh;
 }

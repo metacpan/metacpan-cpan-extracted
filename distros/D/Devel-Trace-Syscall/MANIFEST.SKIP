@@ -1,4 +1,5 @@
 ^Syscall.c$
+^Syscall.bs$
 ^syscall-lookup.h$
 ^pm_to_blib$
 ^MYMETA.*

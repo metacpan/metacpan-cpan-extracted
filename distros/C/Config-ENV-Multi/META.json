@@ -4,7 +4,7 @@
       "Hiroyoshi Houchi <git@hixi-hyi.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v1.0.0",
+   "generated_by" : "Minilla/v3.0.11",
    "license" : [
       "perl_5"
    ],
@@ -42,7 +42,6 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "0",
             "List::MoreUtils" : "0",
             "perl" : "5.008001"
          }
@@ -50,6 +49,7 @@
       "test" : {
          "requires" : {
             "Test::Clear" : "0",
+            "Test::Deep" : "0",
             "Test::More" : "0.98"
          }
       }
@@ -57,7 +57,7 @@
    "provides" : {
       "Config::ENV::Multi" : {
          "file" : "lib/Config/ENV/Multi.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Config::ENV::Multi::ConfigInstance" : {
          "file" : "lib/Config/ENV/Multi.pm"
@@ -74,9 +74,12 @@
          "web" : "https://github.com/hixi-hyi/p5-Config-ENV-Multi"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_authority" : "cpan:HIXI",
    "x_contributors" : [
-      "Tanaka Tatsuya <ta.ts.yt@gmail.com>"
-   ]
+      "Tanaka Tatsuya <ta.ts.yt@gmail.com>",
+      "Tatsuya Tanaka <tanaka.tatsuya@dena.jp>",
+      "karupanerura <karupa@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.2901, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,4 +22,5 @@ requires:
   Acme::CPANAuthors: '0.14'
 resources:
   repository: http://github.com/gray/acme-cpanauthors-github
-version: '0.08'
+version: '0.09'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

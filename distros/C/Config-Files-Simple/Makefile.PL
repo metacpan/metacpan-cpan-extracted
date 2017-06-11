@@ -1,24 +1,20 @@
-use 5.006;
+#!/usr/bin/env perl
+
+use 5.6.0;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
-WriteMakefile(
-    NAME               => 'Config::Files::Simple',
+my (%params) = (
     AUTHOR             => q{Mario Zieschang <mziescha@cpan.org>},
+    DISTNAME           => 'Config-Files-Simple',
+    NAME               => 'Config::Files::Simple',
+    MIN_PERL_VERSION   => 5.6.0,
     VERSION_FROM       => 'lib/Config/Files/Simple.pm',
     ABSTRACT_FROM      => 'lib/Config/Files/Simple.pm',
-    LICENSE            => 'artistic_2',
     PL_FILES           => {},
-    MIN_PERL_VERSION   => 5.006,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
-    },
-    BUILD_REQUIRES => {
-        'Test::More'      => 1.302031,
-        'Hash::MD5'       => 0.08,
-        'Path::Tiny'      => 0,
-        'Test::Exception' => 0.43,
     },
     PREREQ_PM => {
         'Carp'                    => 0,
@@ -29,6 +25,35 @@ WriteMakefile(
         'Ref::Util'               => 0,
         'YAML'                    => 0,
     },
-    dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES    => 'Config-Files-Simple-*' },
+    TEST_REQUIRES => {
+        'Test::More'      => 1.302031,
+        'Hash::MD5'       => 0.08,
+        'Path::Tiny'      => 0,
+        'Test::Exception' => 0.43,
+    },
+    clean => { FILES    => 'blib/* Makefile Config-Files-Simple-*' },
+    dist  => { COMPRESS => 'gzip', SUFFIX => 'gz' },
+
 );
+
+if ( ( $ExtUtils::MakeMaker::VERSION =~ /^\d\.\d\d$/ ) && ( $ExtUtils::MakeMaker::VERSION > 6.30 ) )
+{
+    $params{LICENSE} = 'artistic_2';
+}
+
+if ( $ExtUtils::MakeMaker::VERSION ge '6.46' ) {
+    $params{META_MERGE} = {
+        'meta-spec' => { version => 2, },
+        resources   => {
+            bugtracker => { web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Config-Files-Simple', },
+            license    => 'http://dev.perl.org/licenses/',
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/rsavage/Config-Files-Simple.git',
+                web  => 'https://github.com/mziescha/Config-Files-Simple',
+            },
+        },
+    };
+}
+
+WriteMakefile(%params);

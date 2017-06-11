@@ -1,14 +1,6 @@
 # PODNAME: GettingStarted
 # ABSTRACT: Quickly get up and running with CharmKit
 
-__END__
-
-=pod
-
-=head1 NAME
-
-GettingStarted - Quickly get up and running with CharmKit
-
 =head1 Getting Started
 
 Follow the same guidelines as normal for creating a Juju charm.
@@ -43,10 +35,11 @@ A requirement for all charms using this library is to make sure to "bootstrap" t
 B<install> hook. For example, edit B<hooks/install>
 
    #!/usr/bin/env perl
-   BEGIN {
-       # Install charmkit
-       system "curl -L http://charmkit.pl/setup.sh | sh";
-   }
+
+   # Setup correct paths
+
+   use FindBin;
+   use lib "$Bin/../lib";
 
    use charm;
 
@@ -58,34 +51,5 @@ B<install> hook. For example, edit B<hooks/install>
    on_change => sub { say "All latest packages installed."; };
 
    my $hook_path = $ENV{JUJU_CHARM_DIR};
-
-The B<BEGIN> block is the important bit here where we make sure that
-L<App::CharmKit> is installed prior to use.
-
-Now all other charms can simply B<use charm> and continue the hook processing.
-
-A typical hook starts with
-
-   #!/usr/bin/env perl
-
-   use charm;
-
-   pkg ['mysql-server', 'nginx', 'php5-fpm'];
-
-   my $dbhost = run 'relation-get dbhost';
-   my $dbuser = run 'relation-get dbuser';
-
-   service 'nginx' => 'restart';
-
-=head1 AUTHOR
-
-Adam Stokes <adamjs@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2016 by Adam Stokes.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

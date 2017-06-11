@@ -4,7 +4,7 @@
       "Chris Williams <chris@bingosnet.co.uk>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -28,7 +28,7 @@
       },
       "runtime" : {
          "requires" : {
-            "App::SmokeBrew" : "0.28",
+            "App::SmokeBrew" : "0.50",
             "Moose" : "1.03",
             "perl" : "v5.6.0"
          }
@@ -51,6 +51,7 @@
          "web" : "https://github.com/bingos/app-smokebrew-plugin-bingos"
       }
    },
-   "version" : "0.12"
+   "version" : "0.16",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

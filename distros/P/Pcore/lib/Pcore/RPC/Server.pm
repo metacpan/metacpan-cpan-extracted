@@ -38,7 +38,7 @@ sub run ( $class, $rpc_boot_args ) {
 
         # for linux use abstract UDS
         else {
-            $listen = "unix:pcore-rpc-$$";
+            $listen = "unix:\x00pcore-rpc-$$";
         }
     }
     else {
@@ -54,10 +54,10 @@ sub run ( $class, $rpc_boot_args ) {
         }
     }
 
-    # create RPC_TERM message listener
+    # create RPC.TERM event listener
     P->listen_events(
-        'RPC_TERM',
-        sub ( $event, @ ) {
+        'RPC.TERM',
+        sub ( $ev ) {
             $rpc->RPC_ON_TERM if $rpc->can('RPC_ON_TERM');
 
             exit;
@@ -65,7 +65,7 @@ sub run ( $class, $rpc_boot_args ) {
     );
 
     # compose listen events
-    my $listen_events = ['RPC_TERM'];
+    my $listen_events = ['RPC.TERM'];
 
     {
         no strict qw[refs];
@@ -93,11 +93,11 @@ sub run ( $class, $rpc_boot_args ) {
                         no strict qw[refs];
 
                         $accept->(
-                            max_message_size => 1_024 * 1_024 * 100,              # 100 Mb
+                            max_message_size => 1_024 * 1_024 * 100,                # 100 Mb
                             pong_interval    => 50,
-                            compression      => 0,                                #
-                            on_listen_event  => sub ( $ws, $ev ) { return 1 },    # events currently are enabled
-                            on_fire_event    => sub ( $ws, $ev ) { return 1 },    # events currently are enabled
+                            compression      => 0,                                  #
+                            on_listen_event  => sub ( $ws, $mask ) { return 1 },    # RPC client can listen server events
+                            on_fire_event    => sub ( $ws, $key ) { return 1 },     # RPC client can fire server events
                             before_connect   => {
                                 listen_events  => $listen_events,
                                 forward_events => ${"$class\::RPC_FORWARD_EVENTS"},
@@ -136,10 +136,12 @@ sub run ( $class, $rpc_boot_args ) {
         Win32API::File::OsFHandleOpen( *FH, $rpc_boot_args->{ctrl_fh}, 'w' ) or die $!;
     }
     else {
-        open *FH, '>&=', $rpc_boot_args->{ctrl_fh} or die $!;    ## no critic qw[InputOutput::RequireBriefOpen]
+        open *FH, '>&=', $rpc_boot_args->{ctrl_fh} or die $!;
     }
 
-    print {*FH} "LISTEN:$listen\x00";
+    binmode *FH or die;
+
+    print {*FH} "LISTEN:$listen\n";
 
     close *FH or die;
 
@@ -155,11 +157,11 @@ sub run ( $class, $rpc_boot_args ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 8                    | Subroutines::ProhibitExcessComplexity - Subroutine "run" with high complexity score (26)                       |
+## |    3 | 8                    | Subroutines::ProhibitExcessComplexity - Subroutine "run" with high complexity score (27)                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 113                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 142                  | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |    2 | 41                   | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

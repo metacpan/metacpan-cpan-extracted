@@ -3,7 +3,7 @@ abstract: 'Create tools to validate, migrate and edit configuration files'
 author:
   - 'Dominique Dumont'
 build_requires:
-  Config::Model::Tester: '2.059'
+  Config::Model::Tester: '2.062'
   Module::Build: '0.34'
   Test::Differences: '0'
   Test::Exception: '0'
@@ -68,5 +68,5 @@ resources:
   bugtracker: https://github.com/dod38fr/config-model/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: git://github.com/dod38fr/config-model.git
-version: '2.103'
+version: '2.105'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -47,7 +47,7 @@
 
 %token <ival> '{' '}' '[' ']' '-' '+' '@' '%' '&' '=' '.'
 
-%token <opval> WORD METHOD FUNCMETH THING PMFUNC PRIVATEREF QWLIST
+%token <opval> BAREWORD METHOD FUNCMETH THING PMFUNC PRIVATEREF QWLIST
 %token <opval> FUNC0OP FUNC0SUB UNIOPSUB LSTOPSUB
 %token <opval> PLUGEXPR PLUGSTMT
 %token <pval> LABEL
@@ -74,7 +74,10 @@
 %type <opval> formname subname proto optsubbody cont my_scalar my_var
 %type <opval> refgen_topic formblock
 %type <opval> subattrlist myattrlist myattrterm myterm
-%type <opval> subsignature termbinop termunop anonymous termdo
+%type <opval> termbinop termunop anonymous termdo
+%type <ival>  sigslurpsigil
+%type <opval> sigvarname sigdefault sigscalarelem sigslurpelem
+%type <opval> sigelem siglist siglistornull subsignature 
 %type <opval> formstmtseq formline formarg
 
 %nonassoc <ival> PREC_LOW
@@ -140,7 +143,7 @@ grammar	:	GRAMPROG
 			  PL_eval_root = $3;
 			  $$ = 0;
 			  yyunlex();
-			  parser->yychar = YYEOF;
+			  parser->yychar = yytoken = YYEOF;
 			}
 	|	GRAMBARESTMT
 			{
@@ -152,7 +155,7 @@ grammar	:	GRAMPROG
 			  PL_eval_root = $3;
 			  $$ = 0;
 			  yyunlex();
-			  parser->yychar = YYEOF;
+			  parser->yychar = yytoken = YYEOF;
 			}
 	|	GRAMFULLSTMT
 			{
@@ -164,7 +167,7 @@ grammar	:	GRAMPROG
 			  PL_eval_root = $3;
 			  $$ = 0;
 			  yyunlex();
-			  parser->yychar = YYEOF;
+			  parser->yychar = yytoken = YYEOF;
 			}
 	|	GRAMSTMTSEQ
 			{
@@ -212,7 +215,7 @@ mremember:	/* NULL */	/* start a partial lexical scope */
 
 /* A sequence of statements in the program */
 stmtseq	:	/* NULL */
-			{ $$ = (OP*)NULL; }
+			{ $$ = NULL; }
 	|	stmtseq fullstmt
 			{   $$ = op_append_list(OP_LINESEQ, $1, $2);
 			    PL_pad_reset_pending = TRUE;
@@ -223,7 +226,7 @@ stmtseq	:	/* NULL */
 
 /* A sequence of format lines */
 formstmtseq:	/* NULL */
-			{ $$ = (OP*)NULL; }
+			{ $$ = NULL; }
 	|	formstmtseq formline
 			{   $$ = op_append_list(OP_LINESEQ, $1, $2);
 			    PL_pad_reset_pending = TRUE;
@@ -258,7 +261,7 @@ barestmt:	PLUGSTMT
 			{
 			  CV *fmtcv = PL_compcv;
 			  newFORM($2, $3, $4);
-			  $$ = (OP*)NULL;
+			  $$ = NULL;
 			  if (CvOUTSIDE(fmtcv) && !CvEVAL(CvOUTSIDE(fmtcv))) {
 			      pad_add_weakref(fmtcv);
 			  }
@@ -293,7 +296,7 @@ barestmt:	PLUGSTMT
 			      ? newATTRSUB($3, $2, $5, $6, $7)
 			      : newMYSUB($3, $2, $5, $6, $7)
 			  ;
-			  $$ = (OP*)NULL;
+			  $$ = NULL;
 			  intro_my();
 			  parser->parsed_sub = 1;
 			}
@@ -332,25 +335,25 @@ barestmt:	PLUGSTMT
 			      ? newATTRSUB($3, $2, NULL, $7, body)
 			      : newMYSUB($3, $2, NULL, $7, body)
 			  ;
-			  $$ = (OP*)NULL;
+			  $$ = NULL;
 			  intro_my();
 			  parser->parsed_sub = 1;
 			}
-	|	PACKAGE WORD WORD ';'
+	|	PACKAGE BAREWORD BAREWORD ';'
 			{
 			  package($3);
 			  if ($2)
 			      package_version($2);
-			  $$ = (OP*)NULL;
+			  $$ = NULL;
 			}
 	|	USE startsub
 			{ CvSPECIAL_on(PL_compcv); /* It's a BEGIN {} */ }
-		WORD WORD optlistexpr ';'
+		BAREWORD BAREWORD optlistexpr ';'
 			{
 			  SvREFCNT_inc_simple_void(PL_compcv);
 			  utilize($1, $2, $4, $5, $6);
 			  parser->parsed_sub = 1;
-			  $$ = (OP*)NULL;
+			  $$ = NULL;
 			}
 	|	IF '(' remember mexpr ')' mblock else
 			{
@@ -376,14 +379,14 @@ barestmt:	PLUGSTMT
 	|	WHILE '(' remember texpr ')' mintro mblock cont
 			{
 			  $$ = block_end($3,
-				  newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
+				  newWHILEOP(0, 1, NULL,
 				      $4, $7, $8, $6));
 			  parser->copline = (line_t)$1;
 			}
 	|	UNTIL '(' remember iexpr ')' mintro mblock cont
 			{
 			  $$ = block_end($3,
-				  newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
+				  newWHILEOP(0, 1, NULL,
 				      $4, $7, $8, $6));
 			  parser->copline = (line_t)$1;
 			}
@@ -395,7 +398,7 @@ barestmt:	PLUGSTMT
 		mblock
 			{
 			  OP *initop = $4;
-			  OP *forop = newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
+			  OP *forop = newWHILEOP(0, 1, NULL,
 				      scalar($7), $13, $11, $10);
 			  if (initop) {
 			      forop = op_prepend_elem(OP_LINESEQ, initop,
@@ -418,18 +421,18 @@ barestmt:	PLUGSTMT
 				      op_lvalue($2, OP_ENTERLOOP), $5, $7, $8));
 			  parser->copline = (line_t)$1;
 			}
-	|	FOR REFGEN MY remember my_var
-			{ parser->in_my = 0; $<opval>$ = my($5); }
+	|	FOR my_refgen remember my_var
+			{ parser->in_my = 0; $<opval>$ = my($4); }
 		'(' mexpr ')' mblock cont
 			{
 			  $$ = block_end(
-				$4,
+				$3,
 				newFOROP(0,
 					 op_lvalue(
 					    newUNOP(OP_REFGEN, 0,
-						    $<opval>6),
+						    $<opval>5),
 					    OP_ENTERLOOP),
-					 $8, $10, $11)
+					 $7, $9, $10)
 			  );
 			  parser->copline = (line_t)$1;
 			}
@@ -444,16 +447,16 @@ barestmt:	PLUGSTMT
 	|	FOR '(' remember mexpr ')' mblock cont
 			{
 			  $$ = block_end($3,
-				  newFOROP(0, (OP*)NULL, $4, $6, $7));
+				  newFOROP(0, NULL, $4, $6, $7));
 			  parser->copline = (line_t)$1;
 			}
 	|	block cont
 			{
 			  /* a block is a loop that happens once */
-			  $$ = newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
-				  (OP*)NULL, $1, $2, 0);
+			  $$ = newWHILEOP(0, 1, NULL,
+				  NULL, $1, $2, 0);
 			}
-	|	PACKAGE WORD WORD '{' remember
+	|	PACKAGE BAREWORD BAREWORD '{' remember
 			{
 			  package($3);
 			  if ($2) {
@@ -463,8 +466,8 @@ barestmt:	PLUGSTMT
 		stmtseq '}'
 			{
 			  /* a block is a loop that happens once */
-			  $$ = newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
-				  (OP*)NULL, block_end($5, $7), (OP*)NULL, 0);
+			  $$ = newWHILEOP(0, 1, NULL,
+				  NULL, block_end($5, $7), NULL, 0);
 			  if (parser->copline > (line_t)$4)
 			      parser->copline = (line_t)$4;
 			}
@@ -474,7 +477,7 @@ barestmt:	PLUGSTMT
 			}
 	|	';'
 			{
-			  $$ = (OP*)NULL;
+			  $$ = NULL;
 			  parser->copline = NOLINE;
 			}
 	;
@@ -505,7 +508,7 @@ formarg	:	/* NULL */
 
 /* An expression which may have a side-effect */
 sideff	:	error
-			{ $$ = (OP*)NULL; }
+			{ $$ = NULL; }
 	|	expr
 			{ $$ = $1; }
 	|	expr IF expr
@@ -517,7 +520,7 @@ sideff	:	error
 	|	expr UNTIL iexpr
 			{ $$ = newLOOPOP(OPf_PARENS, 1, $3, $1); }
 	|	expr FOR expr
-			{ $$ = newFOROP(0, (OP*)NULL, $3, $1, (OP*)NULL);
+			{ $$ = newFOROP(0, NULL, $3, $1, NULL);
 			  parser->copline = (line_t)$2; }
 	|	expr WHEN expr
 			{ $$ = newWHENOP($3, op_scope($1)); }
@@ -525,7 +528,7 @@ sideff	:	error
 
 /* else and elsif blocks */
 else	:	/* NULL */
-			{ $$ = (OP*)NULL; }
+			{ $$ = NULL; }
 	|	ELSE mblock
 			{
 			  ($2)->op_flags |= OPf_PARENS;
@@ -542,7 +545,7 @@ else	:	/* NULL */
 
 /* Continue blocks */
 cont	:	/* NULL */
-			{ $$ = (OP*)NULL; }
+			{ $$ = NULL; }
 	|	CONTINUE block
 			{ $$ = op_scope($2); }
 	;
@@ -555,7 +558,7 @@ mintro	:	/* NULL */
 
 /* Normal expression */
 nexpr	:	/* NULL */
-			{ $$ = (OP*)NULL; }
+			{ $$ = NULL; }
 	|	sideff
 	;
 
@@ -581,8 +584,8 @@ mnexpr	:	nexpr
 			{ $$ = $1; intro_my(); }
 	;
 
-formname:	WORD		{ $$ = $1; }
-	|	/* NULL */	{ $$ = (OP*)NULL; }
+formname:	BAREWORD	{ $$ = $1; }
+	|	/* NULL */	{ $$ = NULL; }
 	;
 
 startsub:	/* NULL */	/* start a regular subroutine scope */
@@ -602,54 +605,225 @@ startformsub:	/* NULL */	/* start a format subroutine scope */
 	;
 
 /* Name of a subroutine - must be a bareword, could be special */
-subname	:	WORD
+subname	:	BAREWORD
 	|	PRIVATEREF
 	;
 
 /* Subroutine prototype */
 proto	:	/* NULL */
-			{ $$ = (OP*)NULL; }
+			{ $$ = NULL; }
 	|	THING
 	;
 
 /* Optional list of subroutine attributes */
 subattrlist:	/* NULL */
-			{ $$ = (OP*)NULL; }
+			{ $$ = NULL; }
 	|	COLONATTR THING
 			{ $$ = $2; }
 	|	COLONATTR
-			{ $$ = (OP*)NULL; }
+			{ $$ = NULL; }
 	;
 
 /* List of attributes for a "my" variable declaration */
 myattrlist:	COLONATTR THING
 			{ $$ = $2; }
 	|	COLONATTR
-			{ $$ = (OP*)NULL; }
+			{ $$ = NULL; }
 	;
+
+
+
+/* --------------------------------------
+ * subroutine signature parsing
+ */
+
+/* the '' or 'foo' part of a '$' or '@foo' etc signature variable  */
+sigvarname:     /* NULL */
+			{ parser->in_my = 0; $$ = NULL; }
+        |       PRIVATEREF
+                        { parser->in_my = 0; $$ = $1; }
+	;
+
+sigslurpsigil:
+                '@'
+                        { $$ = '@'; }
+        |       '%'
+                        { $$ = '%'; }
+
+/* @, %, @foo, %foo */
+sigslurpelem: sigslurpsigil sigvarname sigdefault/* def only to catch errors */ 
+                        {
+                            I32 sigil   = $1;
+                            OP *var     = $2;
+                            OP *defexpr = $3;
+
+                            if (parser->sig_slurpy)
+                                yyerror("Multiple slurpy parameters not allowed");
+                            parser->sig_slurpy = (char)sigil;
+
+                            if (defexpr)
+                                yyerror("A slurpy parameter may not have "
+                                        "a default value");
+
+                            $$ = var ? newSTATEOP(0, NULL, var) : NULL;
+                        }
+	;
+
+/* default part of sub signature scalar element: i.e. '= default_expr' */
+sigdefault:	/* NULL */
+			{ $$ = NULL; }
+        |       ASSIGNOP
+                        { $$ = newOP(OP_NULL, 0); }
+        |       ASSIGNOP term
+                        { $$ = $2; }
+
+
+/* subroutine signature scalar element: e.g. '$x', '$=', '$x = $default' */
+sigscalarelem:
+                '$' sigvarname sigdefault
+                        {
+                            OP *var     = $2;
+                            OP *defexpr = $3;
+
+                            if (parser->sig_slurpy)
+                                yyerror("Slurpy parameter not last");
+
+                            parser->sig_elems++;
+
+                            if (defexpr) {
+                                parser->sig_optelems++;
+
+                                if (   defexpr->op_type == OP_NULL
+                                    && !(defexpr->op_flags & OPf_KIDS))
+                                {
+                                    /* handle '$=' special case */
+                                    if (var)
+                                        yyerror("Optional parameter "
+                                                    "lacks default expression");
+                                    op_free(defexpr);
+                                }
+                                else { 
+                                    /* a normal '=default' expression */ 
+                                    OP *defop = (OP*)alloc_LOGOP(OP_ARGDEFELEM,
+                                                        defexpr,
+                                                        LINKLIST(defexpr));
+                                    /* re-purpose op_targ to hold @_ index */
+                                    defop->op_targ =
+                                        (PADOFFSET)(parser->sig_elems - 1);
+
+                                    if (var) {
+                                        var->op_flags |= OPf_STACKED;
+                                        (void)op_sibling_splice(var,
+                                                        NULL, 0, defop);
+                                        scalar(defop);
+                                    }
+                                    else
+                                        var = newUNOP(OP_NULL, 0, defop);
+
+                                    LINKLIST(var);
+                                    /* NB: normally the first child of a
+                                     * logop is executed before the logop,
+                                     * and it pushes a boolean result
+                                     * ready for the logop. For ARGDEFELEM,
+                                     * the op itself does the boolean
+                                     * calculation, so set the first op to
+                                     * it instead.
+                                     */
+                                    var->op_next = defop;
+                                    defexpr->op_next = var;
+                                }
+                            }
+                            else {
+                                if (parser->sig_optelems)
+                                    yyerror("Mandatory parameter "
+                                            "follows optional parameter");
+                            }
+
+                            $$ = var ? newSTATEOP(0, NULL, var) : NULL;
+                        }
+	;
+
+
+/* subroutine signature element: e.g. '$x = $default' or '%h' */
+sigelem:        sigscalarelem
+                        { parser->in_my = KEY_sigvar; $$ = $1; }
+        |       sigslurpelem
+                        { parser->in_my = KEY_sigvar; $$ = $1; }
+	;
+
+/* list of subroutine signature elements */
+siglist:
+	 	siglist ','
+			{ $$ = $1; }
+	|	siglist ',' sigelem
+			{
+			  $$ = op_append_list(OP_LINESEQ, $1, $3);
+			}
+        |	sigelem  %prec PREC_LOW
+			{ $$ = $1; }
+	;
+
+/* () or (....) */
+siglistornull:		/* NULL */
+			{ $$ = NULL; }
+	|	siglist
+			{ $$ = $1; }
 
 /* Subroutine signature */
 subsignature:	'('
+                        {
+                            ENTER;
+                            SAVEIV(parser->sig_elems);
+                            SAVEIV(parser->sig_optelems);
+                            SAVEI8(parser->sig_slurpy);
+                            parser->sig_elems    = 0;
+                            parser->sig_optelems = 0;
+                            parser->sig_slurpy   = 0;
+                            parser->in_my        = KEY_sigvar;
+                        }
+                siglistornull
+                ')'
 			{
-			  /* We shouldn't get here otherwise */
-			  assert(FEATURE_SIGNATURES_IS_ENABLED);
+                            OP            *sigops = $3;
+                            UNOP_AUX_item *aux;
+                            OP            *check;
 
-			  Perl_ck_warner_d(aTHX_
-				packWARN(WARN_EXPERIMENTAL__SIGNATURES),
-				"The signatures feature is experimental");
-			  $<opval>$ = parse_subsignature();
-			}
-		')'
-			{
-			  $$ = op_append_list(OP_LINESEQ, $<opval>2,
-				newSTATEOP(0, NULL, sawparens(newNULLLIST())));
-			  parser->expect = XATTRBLOCK;
+                            if (!parser->error_count) {
+                                assert(FEATURE_SIGNATURES_IS_ENABLED);
+                            }
+
+                            /* We shouldn't get here otherwise */
+                            Perl_ck_warner_d(aTHX_
+                                packWARN(WARN_EXPERIMENTAL__SIGNATURES),
+                                "The signatures feature is experimental");
+
+                            aux = (UNOP_AUX_item*)PerlMemShared_malloc(
+                                sizeof(UNOP_AUX_item) * 3);
+                            aux[0].iv = parser->sig_elems;
+                            aux[1].iv = parser->sig_optelems;
+                            aux[2].iv = parser->sig_slurpy;
+                            check = newUNOP_AUX(OP_ARGCHECK, 0, NULL, aux);
+                            sigops = op_prepend_elem(OP_LINESEQ, check, sigops);
+                            sigops = op_prepend_elem(OP_LINESEQ,
+                                                newSTATEOP(0, NULL, NULL),
+                                                sigops);
+                            /* a nextstate at the end handles context
+                             * correctly for an empty sub body */
+                            $$ = op_append_elem(OP_LINESEQ,
+                                                sigops,
+                                                newSTATEOP(0, NULL, NULL));
+
+                            parser->in_my = 0;
+                            parser->expect = XATTRBLOCK;
+                            LEAVE;
 			}
 	;
 
+
+
 /* Optional subroutine body, for named subroutine declaration */
 optsubbody:	block
-	|	';'	{ $$ = (OP*)NULL; }
+	|	';'	{ $$ = NULL; }
 	;
 
 /* Ordinary expressions; logical combinations */
@@ -711,7 +885,7 @@ listop	:	LSTOP indirob listexpr /* map {...} @args or print $fh @args */
 			{ $$ = op_convert_list($1, 0, $3); }
 	|	LSTOPSUB startanonsub block /* sub f(&@);   f { foo } ... */
 			{ SvREFCNT_inc_simple_void(PL_compcv);
-			  $<opval>$ = newANONATTRSUB($2, 0, (OP*)NULL, $3); }
+			  $<opval>$ = newANONATTRSUB($2, 0, NULL, $3); }
 		    optlistexpr		%prec LSTOP  /* ... @bar */
 			{ $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
 				 op_append_elem(OP_LIST,
@@ -773,7 +947,7 @@ subscripted:    gelem '{' expr ';' '}'        /* *main::{something} */
 	|	QWLIST '[' expr ']'            /* list literal slice */
 			{ $$ = newSLICEOP(0, $3, $1); }
 	|	'(' ')' '[' expr ']'                 /* empty list slice! */
-			{ $$ = newSLICEOP(0, $4, (OP*)NULL); }
+			{ $$ = newSLICEOP(0, $4, NULL); }
     ;
 
 /* Binary operators between terms */
@@ -850,11 +1024,11 @@ termunop : '-' term %prec UMINUS                       /* -$x */
 anonymous:	'[' expr ']'
 			{ $$ = newANONLIST($2); }
 	|	'[' ']'
-			{ $$ = newANONLIST((OP*)NULL);}
+			{ $$ = newANONLIST(NULL);}
 	|	HASHBRACK expr ';' '}'	%prec '(' /* { foo => "Bar" } */
 			{ $$ = newANONHASH($2); }
 	|	HASHBRACK ';' '}'	%prec '(' /* { } (';' by tokener) */
-			{ $$ = newANONHASH((OP*)NULL); }
+			{ $$ = newANONHASH(NULL); }
 	|	ANONSUB startanonsub proto subattrlist block		%prec '('
 			{ SvREFCNT_inc_simple_void(PL_compcv);
 			  $$ = newANONATTRSUB($2, $3, $4, $5); }
@@ -886,10 +1060,12 @@ term	:	termbinop
 			{ $$ = newCONDOP(0, $1, $3, $5); }
 	|	REFGEN term                          /* \$x, \@y, \%z */
 			{ $$ = newUNOP(OP_REFGEN, 0, $2); }
+	|	MY REFGEN term
+			{ $$ = newUNOP(OP_REFGEN, 0, localize($3,1)); }
 	|	myattrterm	%prec UNIOP
 			{ $$ = $1; }
 	|	LOCAL term	%prec UNIOP
-			{ $$ = localize($2,$1); }
+			{ $$ = localize($2,0); }
 	|	'(' expr ')'
 			{ $$ = sawparens($2); }
 	|	QWLIST
@@ -1026,7 +1202,7 @@ term	:	termbinop
 			}
 		    '(' listexpr optrepl ')'
 			{ $$ = pmruntime($1, $4, $5, 1, $<ival>2); }
-	|	WORD
+	|	BAREWORD
 	|	listop
 	|	YADAYADA
 			{
@@ -1040,7 +1216,9 @@ term	:	termbinop
 myattrterm:	MY myterm myattrlist
 			{ $$ = my_attrs($2,$3); }
 	|	MY myterm
-			{ $$ = localize($2,$1); }
+			{ $$ = localize($2,1); }
+	|	MY REFGEN myterm myattrlist
+			{ $$ = newUNOP(OP_REFGEN, 0, my_attrs($3,$4)); }
 	;
 
 /* Things that can be "my"'d */
@@ -1059,19 +1237,19 @@ myterm	:	'(' expr ')'
 
 /* Basic list expressions */
 optlistexpr:	/* NULL */ %prec PREC_LOW
-			{ $$ = (OP*)NULL; }
+			{ $$ = NULL; }
 	|	listexpr    %prec PREC_LOW
 			{ $$ = $1; }
 	;
 
 optexpr:	/* NULL */
-			{ $$ = (OP*)NULL; }
+			{ $$ = NULL; }
 	|	expr
 			{ $$ = $1; }
 	;
 
 optrepl:	/* NULL */
-			{ $$ = (OP*)NULL; }
+			{ $$ = NULL; }
 	|	'/' expr
 			{ $$ = $2; }
 	;
@@ -1089,6 +1267,10 @@ my_var	:	scalar
 
 refgen_topic:	my_var
 	|	amper
+	;
+
+my_refgen:	MY REFGEN
+	|	REFGEN MY
 	;
 
 amper	:	'&' indirob
@@ -1137,7 +1319,7 @@ gelem	:	star
 	;
 
 /* Indirect objects */
-indirob	:	WORD
+indirob	:	BAREWORD
 			{ $$ = scalar($1); }
 	|	scalar %prec PREC_LOW
 			{ $$ = scalar($1); }

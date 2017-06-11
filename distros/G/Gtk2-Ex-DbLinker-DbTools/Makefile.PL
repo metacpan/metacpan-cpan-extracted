@@ -14,7 +14,7 @@ WriteMakefile(
 		      'Try::Tiny' => 0.22,
 		      'DBI' => 1.631,
 		      'Carp' => 1.17,
-		      'Log::Log4perl' => 1.41,
+		      'Log::Any' => 1.049,
 		     'Data::Dumper' => 2.154,
              'Scalar::Util' => 1.45, 
              'Class::InsideOut' => 1.13,

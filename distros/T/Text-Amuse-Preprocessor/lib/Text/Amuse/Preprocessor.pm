@@ -18,11 +18,11 @@ Text::Amuse::Preprocessor - Helpers for Text::Amuse document formatting.
 
 =head1 VERSION
 
-Version 0.40
+Version 0.41
 
 =cut
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 
 =head1 SYNOPSIS
@@ -437,6 +437,10 @@ sub _store_excluded_piece {
     my $rand = sprintf('%u', rand(1000000000))
       . 'XXXX8808cc3f0c1868b3b8825d0febff522237810c73c5c369d94f5db95a3dba6a005a5fe1a44103d47f36889bfXXXX'
       . $self->_get_unique_counter;
+    $piece =~ s/\0//g;
+    # carriage returns and tabs
+    $piece =~ s/\r//g;
+    $piece =~ s/\t/    /g;
     $self->_verbatim_pieces->{$rand} = $piece;
     # Supplementary Private Use Area-A Unicode subset.
     return "\x{f0003}${rand}\x{f0004}";

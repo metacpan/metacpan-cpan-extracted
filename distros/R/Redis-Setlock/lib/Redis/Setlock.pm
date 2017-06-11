@@ -11,7 +11,7 @@ use Time::HiRes qw/ sleep /;
 use Carp;
 use Guard ();
 
-our $VERSION         = "0.07";
+our $VERSION         = "0.08";
 our $DEFAULT_EXPIRES = 86400;
 our $RETRY_INTERVAL  = 0.5;
 

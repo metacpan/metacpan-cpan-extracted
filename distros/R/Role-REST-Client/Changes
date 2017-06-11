@@ -1,5 +1,13 @@
 Revision history for Role-REST-Client
 
+0.22    2017-06-11 07:54:35 Europe/Copenhagen
+
+0.21    2017-06-07 09:12:43 Europe/Copenhagen
+ - Add a little info when dying
+
+0.20    2017-06-02 10:29:15 Europe/Copenhagen
+ - Allow for conditional serializers (José Joaquín Atria)
+
 0.19    2016-11-08 08:08:16 Europe/Copenhagen
  - The standard is not clear on this, and some servers don't allow them, but it seems that DELETE can take a request body.
  - Added serializer_options so it's possible to instantiate the serializer w/ parameters

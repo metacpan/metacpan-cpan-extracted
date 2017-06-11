@@ -9,7 +9,7 @@ use JSON::PP qw( encode_json );
 use Encode qw( encode_utf8 );
 
 # ABSTRACT: Dist::Zilla initialization tasks for Plicease
-our $VERSION = '2.12'; # VERSION
+our $VERSION = '2.14'; # VERSION
 
 
 with 'Dist::Zilla::Role::AfterMint';
@@ -92,6 +92,7 @@ sub gather_file_travis_yml
                           q{},
                           q{install:},
                           q{  - perlbrew list},
+                          q{  - cpanm -n Dist::Zilla},
                           q{  - dzil authordeps --missing | cpanm -n},
                           q{  - dzil listdeps   --missing | cpanm -n},
                           q{},
@@ -343,7 +344,7 @@ Dist::Zilla::Plugin::Author::Plicease::Init2 - Dist::Zilla initialization tasks 
 
 =head1 VERSION
 
-version 2.12
+version 2.14
 
 =head1 DESCRIPTION
 

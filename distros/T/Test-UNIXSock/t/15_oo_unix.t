@@ -1,6 +1,9 @@
 use warnings;
 use strict;
 
+use FindBin;
+use lib "$FindBin::Bin/../";
+
 BEGIN {
     if ($^O =~ m/^(?:qnx|nto|vos|MSWin32)$/ ) {
         print "1..0 # Skip: UNIX domain sockets not implemented on $^O\n";

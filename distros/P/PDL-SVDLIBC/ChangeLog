@@ -1,5 +1,9 @@
 ChangeLog for perl/PDL module PDL::SVDLIBC
 
+v0.18 Tue, 06 Jun 2017 11:12:21 +0200 moocow
+	+ Makefile.PL: explicit "./pdlmaker.plm" (RT bug #121661)
+	+ fixed new errors `svd requires input piddles to have m >= n (you have m=6 and n=7). Try inputting the transpose.' with PDL-2.018
+
 v0.17 Thu, 17 Dec 2015 16:24:33 +0100 moocow
 	+ fixed wrongly succeeding bogus tests with unary ok()
 	  - tests now use Test::More and re-factored common test subroutines

@@ -1,11 +1,16 @@
 use strict; use warnings; use diagnostics;
-my $t; use lib ($t = -e 't' ? 't' : 'test');
+use FindBin '$Bin';
+use lib $Bin;
+my $t;
+BEGIN {
+    $t = $Bin;
+}
 use Test::More;
 use TestInlineSetup;
 use Inline Config => DIRECTORY => $TestInlineSetup::DIR;
 
 use Inline C => DATA =>
-  TYPEMAPS => File::Spec->catfile(File::Spec->curdir(), $t, 'typemap');
+  TYPEMAPS => File::Spec->catfile($t, 'typemap');
 
 is(int((add_em_up(1.2, 3.4) + 0.001) * 10), 46);
 

@@ -4,32 +4,54 @@ NAME
 
 VERSION
 
-    version 0.04
+    version 0.05
 
 SYNOPSIS
 
-    From a Perl script
+    In your Build.PL:
+
+     use Module::Build;
+     use Alien::xz;
+     my $builder = Module::Build->new(
+       ...
+       configure_requires => {
+         'Alien::xz' => '0',
+         ...
+       },
+       extra_compiler_flags => Alien::xz->cflags,
+       extra_linker_flags   => Alien::xz->libs,
+       ...
+     );
+     
+     $build->create_build_script;
+
+    In your Makefile.PL:
+
+     use ExtUtils::MakeMaker;
+     use Config;
+     use Alien::xz;
+     
+     WriteMakefile(
+       ...
+       CONFIGURE_REQUIRES => {
+         'Alien::xz' => '0',
+       },
+       CCFLAGS => Alien::xz->cflags . " $Config{ccflags}",
+       LIBS    => [ Alien::xz->libs ],
+       ...
+     );
+
+    In your script or module:
 
      use Alien::xz;
      use Env qw( @PATH );
-     unshift @PATH, Alien::xz->bin_dir;  # xz is now in your path
-
-    From Alien::Base Build.PL
-
-     use Alien:Base::ModuleBuild;
-     my $builder = Module::Build->new(
-       ...
-       alien_bin_requires => {
-         'Alien::xz' => '0.02',
-       }
-       ...
-     );
-     $builder->create_build_script;
+     
+     unshift @ENV, Alien::xz->bin_dir;
 
 DESCRIPTION
 
     This package can be used by other CPAN modules that require xz, the
-    compression utility.
+    compression utility, or liblzma, which comes with it.
 
 HELPERS
 
@@ -38,6 +60,10 @@ HELPERS
      %{xz}
 
     Returns the name of the xz command. Usually just xz.
+
+SEE ALSO
+
+    Alien, Alien::Base, Alien::Build::Manual::AlienUser
 
 AUTHOR
 

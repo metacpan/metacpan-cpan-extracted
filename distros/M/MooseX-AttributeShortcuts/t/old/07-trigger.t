@@ -27,7 +27,8 @@ my $trigger_called = 0;
 use Test::More;
 use Test::Moose;
 
-require 't/funcs.pm' unless eval { require funcs };
+use lib 't';
+require funcs;
 
 with_immutable {
 

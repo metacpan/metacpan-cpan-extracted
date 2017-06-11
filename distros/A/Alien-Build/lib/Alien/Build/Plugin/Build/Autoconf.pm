@@ -7,11 +7,12 @@ use constant _win => $^O eq 'MSWin32';
 use Path::Tiny ();
 
 # ABSTRACT: Autoconf plugin for Alien::Build
-our $VERSION = '0.36'; # VERSION
+our $VERSION = '0.41'; # VERSION
 
 
 has with_pic       => 1;
 #has dynamic        => 0; # TODO
+has ffi            => 0;
 
 sub init
 {
@@ -25,18 +26,39 @@ sub init
   
   my $intr = $meta->interpolator;
 
+  $meta->before_hook(
+    $_ => sub {
+    my($build) = @_;
+    my $prefix = $build->install_prop->{prefix};
+    if(_win)
+    {
+      $prefix = Path::Tiny->new($prefix)->stringify;
+      $prefix =~ s!^([a-z]):!/$1!i if _win;
+    }
+    $build->install_prop->{autoconf_prefix} = $prefix;
+    },
+  ) for qw( build build_ffi );
+
+  # FFI mode undocumented for now...
+
+  if($self->ffi)
+  {
+    $meta->add_requires('configure', 'Alien::Build::Plugin::Build::Autoconf' => '0.41');
+    $meta->default_hook(
+      build_ffi => [
+        '%{configure} --enable-shared --disable-static --libdir=%{.install.autoconf_prefix}/dynamic',
+        '%{make}',
+        '%{make} install',
+      ]
+    );
+  }
+
   $meta->around_hook(
     build => sub {
       my $orig = shift;
       my $build = shift;
 
       my $prefix = $build->install_prop->{prefix};
-      if(_win)
-      {
-        $prefix = Path::Tiny->new($prefix)->stringify;
-        $prefix =~ s!^([a-z]):!/$1!i if _win;
-      }
-      $build->install_prop->{autoconf_prefix} = $prefix;
       
       $intr->replace_helper(
         configure => sub {
@@ -103,7 +125,7 @@ Alien::Build::Plugin::Build::Autoconf - Autoconf plugin for Alien::Build
 
 =head1 VERSION
 
-version 0.36
+version 0.41
 
 =head1 SYNOPSIS
 
@@ -160,7 +182,11 @@ L<https://www.gnu.org/prep/standards/html_node/DESTDIR.html>
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Diab Jerius (DJERIUS)
 
 =head1 COPYRIGHT AND LICENSE
 

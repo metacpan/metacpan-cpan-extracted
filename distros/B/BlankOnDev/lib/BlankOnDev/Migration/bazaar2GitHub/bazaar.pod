@@ -1,0 +1,36 @@
+=head1 NAME
+
+L<BlankOnDev::Migration::bazaar2GitHub>::bazaar - Module for handling Bazaar Branch and Migration repositories to git.
+
+=head1 DESCRIPTION
+
+The purpose of this module to handling specific command for migration from bazaar repositories to git repositories.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2017 by Achmad Yusri Afandi and BlankOn Developer Team.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHORS
+
+=over
+
+=item * Achmad Yusri Afandi, E<lt>yusrideb@cpan.orgE<gt>
+
+=item * BlankOn Developer Team.
+
+=back
+
+=head1 THANKS
+
+=over
+
+=item * The BlankOn Uluwatu Release team has the opportunity to create modules.
+
+=item * perl in IRC to give several information.
+
+=back
+
+=cut

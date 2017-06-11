@@ -2,6 +2,7 @@ use 5.008;
 use ExtUtils::MakeMaker;
 use ExtUtils::Depends;
 use ExtUtils::PkgConfig;
+use English;
 
 # minimum required version of dependancies we need to build
 our %build_reqs = ( 'libsane' => '1.0.19', );
@@ -28,16 +29,16 @@ if (
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile(
-    NAME               => 'Image::Sane',
-    VERSION_FROM       => 'lib/Image/Sane.pm',         # finds $VERSION
-    PREREQ_PM          => { Exception::Class => 0 },
+    NAME         => 'Image::Sane',
+    VERSION_FROM => 'lib/Image/Sane.pm',                        # finds $VERSION
+    PREREQ_PM    => { Readonly => 0, Exception::Class => 0 },
     CONFIGURE_REQUIRES => {
         ExtUtils::Depends   => 0,
         ExtUtils::PkgConfig => 0
     },
     TEST_REQUIRES => {
-        Test::More => 0,
-        Readonly   => 0,
+        Test::More     => 0,
+        Test::Requires => 0,
     },
     clean => { FILES => '$(SOURCE_TIDY)' },
 
@@ -61,7 +62,11 @@ WriteMakefile(
 );
 
 sub MY::postamble {
-    my $postamble = <<'END';
+
+    # GNU Make extensions that BSD make doesn't like.
+    # Author-only stuff, so comment out for non-Linux.
+    if ( $OSNAME ne 'linux' ) { return }
+    return <<'END';
 SHELL = bash
 MANIFEST = $(shell cat MANIFEST)
 SOURCE = $(filter bin/% examples/% %.pm %.PL %.pl %.t,$(MANIFEST))
@@ -75,5 +80,4 @@ tidy : MANIFEST $(SOURCE_TIDY)
 %.tdy : %
 	perltidy $* && if ! diff -q $@ $* > /dev/null; then cp $@ $*; fi
 END
-    $postamble;
 }

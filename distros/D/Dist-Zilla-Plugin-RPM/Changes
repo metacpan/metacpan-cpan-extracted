@@ -1,3 +1,7 @@
+0.015     Sat Jun 3 2017 01:29:16 PM CEST
+- Add Path::Tiny as a dependency
+- Use ReadmeAnyFromPod so the README.md file is built from POD
+
 0.014     Sat Apr 29 2017 08:07:38 PM CEST
 - convert deprecated path call to Path::Tiny
 

@@ -1,0 +1,63 @@
+{
+   "abstract" : "HashCash Digital Cash",
+   "author" : [
+      "Ashish Gulhati <crypt-hashcash at hash.neo.tc>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Crypt-HashCash",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Authen::TuringImage" : "0",
+            "Business::Bitcoin" : "0",
+            "Crypt::Diceware" : "0",
+            "GD::Barcode::QRcode" : "0",
+            "IO::Socket::INET" : "0",
+            "IPC::Queue::Duplex" : "0",
+            "Wx" : "0"
+         },
+         "requires" : {
+            "Compress::Zlib" : "0",
+            "Crypt::ECDSA::Blind" : "0",
+            "Crypt::EECDH" : "0",
+            "Crypt::RSA::Blind" : "0",
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "Math::BaseCnv" : "1.14",
+            "Persistence::Object::Simple" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.118",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

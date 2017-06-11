@@ -1,10 +1,15 @@
+[![Linux Build Status](https://travis-ci.org/nigelhorne/Geo-Coder-XYZ.svg?branch=master)](https://travis-ci.org/nigelhorne/Geo-Coder-XYZ)
+[![Windows Build status](https://ci.appveyor.com/api/projects/status/81c3r325x8ytd7sn?svg=true)](https://ci.appveyor.com/project/nigelhorne/geo-coder-xyz)
+[![Coverage Status](https://coveralls.io/repos/github/nigelhorne/Geo-Coder-XYZ/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/Geo-Coder-XYZ?branch=master)
+[![Dependency Status](https://dependencyci.com/github/nigelhorne/Geo-Coder-XYZ/badge)](https://dependencyci.com/github/nigelhorne/Geo-Coder-XYZ)
+
 # Geo::Coder::XYZ
 
 Provides a geocoding functionality using https://geocode.xyz
 
 # VERSION
 
-Version 0.03
+Version 0.04
 
 # SYNOPSIS
 
@@ -47,7 +52,7 @@ environment variables:
 
 You can also set your own User-Agent object:
 
-    $geocoder->ua(LWPx::ParanoidAgent->new());
+    $geocoder->ua(LWP::UserAgent::Throttled->new());
 
 ## reverse\_geocode
 

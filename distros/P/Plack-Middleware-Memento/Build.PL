@@ -18,7 +18,7 @@ my %module_build_args = (
     "Nicolas Steenlant <nicolas.steenlant\@ugent.be>"
   ],
   "dist_name" => "Plack-Middleware-Memento",
-  "dist_version" => "0.0101",
+  "dist_version" => "0.0102",
   "license" => "perl",
   "module_name" => "Plack::Middleware::Memento",
   "recursive_test_files" => 1,

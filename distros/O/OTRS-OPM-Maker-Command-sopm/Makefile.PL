@@ -32,9 +32,9 @@ my %WriteMakefileArgs = (
     "XML::LibXML" => 0,
     "XML::LibXML::PrettyPrint" => 0
   },
-  "VERSION" => "1.37",
+  "VERSION" => "1.39",
   "test" => {
-    "TESTS" => "t/base/*.t t/bugs/table_drop/*.t t/changes/*.t t/changes_file/*.t t/column_drop/*.t t/exclude/*.t t/foreign_key_drop/*.t t/framework/*.t t/kix/*.t t/otrs3/*.t t/otrs4/*.t t/otrs5/*.t t/unique_add/*.t t/unique_drop/*.t t/warnings/*.t"
+    "TESTS" => "t/base/*.t t/bugs/table_drop/*.t t/changes/*.t t/changes_file/*.t t/code_packagesetup/*.t t/column_drop/*.t t/exclude/*.t t/foreign_key_drop/*.t t/framework/*.t t/kix/*.t t/otrs3/*.t t/otrs4/*.t t/otrs5/*.t t/simple_code/*.t t/unique_add/*.t t/unique_drop/*.t t/warnings/*.t"
   }
 );
 

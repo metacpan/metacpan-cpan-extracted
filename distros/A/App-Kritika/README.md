@@ -5,6 +5,7 @@ kritika - integrate with kritika.io
 # SYNOPSIS
 
     kritika lib/MyFile.pm
+    kritika --head master lib/OtherFile.pm
 
 # DESCRIPTION
 
@@ -12,11 +13,44 @@ This command allows you to quickly analyze file using [https://kritika.io](https
 your repository after the push, but of course sometimes you would like to know if something's wrong before doing
 a commit.
 
+## Git Hook Example
+
+This is based on the shipped with `git` pre-push hook example.
+
+    #!/bin/sh
+
+    remote="$1"
+    url="$2"
+
+    z40=0000000000000000000000000000000000000000
+
+    while read local_ref local_sha remote_ref remote_sha
+    do
+        if [ "$local_sha" = $z40 ]
+        then
+            :
+        else
+            if [ "$remote_sha" = $z40 ]
+            then
+                range="$local_sha"
+            else
+                range="$remote_sha..$local_sha"
+            fi
+
+            branch="$(git rev-parse --abbrev-ref HEAD)"
+
+            git diff --name-only $range | kritika --head "$branch" || exit 1
+        fi
+    done
+
+    exit 0
+
 This command easily integrates with text editors.
 
 # CONFIGURATION
 
-A special file `.kritikarc` has to be placed in the root directory of the project with the following configuration:
+A special file `.kritikarc` (or `_kritikarc` on Windows) has to be placed in the root directory of the project with
+the following configuration:
 
     # This is the default, if you're using public Kritika service this option is not needed
     base_url=https://kritika.io

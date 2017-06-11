@@ -2,7 +2,9 @@ use strict;
 use warnings;
 package MetaCPAN::API::File;
 # ABSTRACT: File information for MetaCPAN::API
-$MetaCPAN::API::File::VERSION = '0.50';
+
+our $VERSION = '0.51';
+
 use Carp;
 use Moo::Role;
 use namespace::autoclean;
@@ -54,7 +56,7 @@ MetaCPAN::API::File - File information for MetaCPAN::API
 
 =head1 VERSION
 
-version 0.50
+version 0.51
 
 =head1 DESCRIPTION
 
@@ -63,7 +65,7 @@ and distribution releases.
 
 =head1 METHODS
 
-=head2 pod
+=head2 file
 
     my $result = $mcpan->file(
         author  => 'DOY',

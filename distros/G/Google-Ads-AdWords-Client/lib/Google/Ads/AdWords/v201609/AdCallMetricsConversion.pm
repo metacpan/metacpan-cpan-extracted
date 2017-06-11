@@ -152,7 +152,7 @@ Google::Ads::AdWords::v201609::AdCallMetricsConversion
 Perl data type class for the XML Schema defined complexType
 AdCallMetricsConversion from the namespace https://adwords.google.com/api/adwords/cm/v201609.
 
-A ConversionTracker for phone calls from conversion-tracked call extensions. A call made from the call extension is reported as a conversion if it lasts longer than N seconds. This duration is 60 seconds by default. Each call extension can specify the desired conversion configuration. 
+A ConversionTracker for phone calls from conversion-tracked call extensions and call-only ads. <p>A call made from the call extension is reported as a conversion if it lasts longer than N seconds. This duration is 60 seconds by default. Each call extension can specify the desired conversion configuration.</p> 
 
 
 

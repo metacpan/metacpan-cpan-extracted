@@ -1,5 +1,8 @@
 Revision history for Data::Password::Filter
 
+0.17  2017-06-09T11:25:00+01:00
+      - Tidied up attribute definitions.
+
 0.16  2017-04-15T13:00:00+01:00
       - Improved type handling.
 

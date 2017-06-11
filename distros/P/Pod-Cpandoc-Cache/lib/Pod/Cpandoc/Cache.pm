@@ -12,7 +12,7 @@ use File::Copy;
 use Class::Method::Modifiers;
 use Time::Piece 1.16;
 
-our $VERSION = "0.03";
+our $VERSION = "0.06";
 use constant DEBUG => $ENV{POD_CPANDOC_CACHE_DEBUG};
 use constant TTL => 3600*24;
 
@@ -22,7 +22,7 @@ sub live_cpan_url {
     if ($self->opt_c) {
         return $self->SUPER::live_cpan_url($module);
     }
-    "http://api.metacpan.org/v0/source/$module";
+    "https://fastapi.metacpan.org/v1/source/$module";
 }
 
 around 'grand_search_init' => sub {

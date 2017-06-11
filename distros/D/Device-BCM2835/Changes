@@ -1,5 +1,11 @@
 Revision history for Perl extension Device::BCM2835.
 
+1.93 2017-06-05
+     Fixed a number of compile and run time errors.
+     
+1.91 2017-06-01
+     Added more symbolic pin numbers from BCM2835 version 1.52
+     
 1.9 Thu Jun 13 15:50:08 EST 2013
     Removed 2 tests that could hang forever when run as an ordinary user on
     RPi.

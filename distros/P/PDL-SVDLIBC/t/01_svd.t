@@ -111,8 +111,8 @@ pdlapprox("svdlas2aw,d<n:s",    $s, $s1_want);
 pdlapprox("svdlas2aw,d<n:data", svdcomposet($ut,$s,$vt), $a,0.5);
 
 ##-- test 13..14 : svdlas2aw, d=n, transpsosed whichND
-my $whichi = $a->whichND->qsortvec;
-my $whichv = $a->indexND($whichi);
+$whichi = $a->whichND->qsortvec;
+$whichv = $a->indexND($whichi);
 ($ut,$s,$vt) = svdlas2aw($whichi,$whichv);
 pdlapprox("svdlas2aw,whichT,d=n:s",    $s, $s_want);
 pdlapprox("svdlas2aw,whichT,d=n:data", svdcomposet($ut,$s,$vt), $a);
@@ -139,7 +139,7 @@ pdlapprox("svdlas2a,d<n:s",    $s, $s1_want);
 pdlapprox("svdlas2a,d<n:data", svdcomposet($ut,$s,$vt), $a, 0.5);
 
 ##-- test 21..24: decode+error (PDL::MatrixOps::svd(), full)
-($u,$s,$v) = svd($a);
+($v,$s,$u) = svd($a->xchg(0,1));
 pdlapprox("svdindexND,d=n", svdindexND($u,$s,$v, $whichi), $whichv, 1e-5);
 pdlapprox("svdindexNDt,d=n", svdindexNDt($u->xchg(0,1),$s,$v->xchg(0,1), $whichi), $whichv, 1e-5);
 pdlapprox("svdindexccs,d=n", svdindexccs($u,$s,$v, $ptr,$rowids), $whichv, 1e-5);

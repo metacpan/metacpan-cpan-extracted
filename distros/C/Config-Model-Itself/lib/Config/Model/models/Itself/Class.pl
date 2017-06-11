@@ -237,7 +237,7 @@
                 upstream_default => 'YAML::Tiny',
                 warp             => {
                     follow => '- backend',
-                    rules  => [ IniFile => { level => 'normal', } ],
+                    rules  => [ Yaml => { level => 'normal', } ],
                 }
             },
 

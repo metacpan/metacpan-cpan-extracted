@@ -1,7 +1,7 @@
 package DDG::Goodie;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Goodie package for easy keywords
-$DDG::Goodie::VERSION = '1016';
+$DDG::Goodie::VERSION = '1017';
 use strict;
 use warnings;
 use Carp;
@@ -38,7 +38,7 @@ DDG::Goodie - Goodie package for easy keywords
 
 =head1 VERSION
 
-version 1016
+version 1017
 
 =head1 DESCRIPTION
 

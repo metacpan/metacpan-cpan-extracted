@@ -1,0 +1,82 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Net::Async::Slack::RTM
+at lib/Net/Async/Slack/RTM.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Net::Async::Slack::RTM - realtime messaging support for L<https://slack.com>
+
+=head1 DESCRIPTION
+
+This is a basic wrapper for Slack's RTM features.
+
+The realtime messaging API is mostly useful as an event stream. Although it is
+possible to send messages through this API as well - see L</send_message> - the
+main HTTP API offers more features.
+
+For a full list of events, see L<https://api.slack.com/events>.
+
+=head1 METHODS
+
+=head2 events
+
+This is the stream of events, as a L<Ryu::Source>.
+
+Example usage:
+
+ $rtm->events
+     ->filter(type => 'message')
+     ->sprintf_methods('> %s', $_->text)
+     ->say
+     ->await;
+
+=head2 send_message
+
+Sends a message to a user or channel.
+
+This is limited (by the Slack API) to the L<default message formatting mode|https://api.slack.com/docs/formatting>,
+so it's only useful for simple messages.
+
+Takes the following named parameters:
+
+=over 4
+
+=item * id - custom message ID (optional)
+
+=item * channel - either a L<Net::Async::Slack::Channel> instance, or a channel ID
+
+=back
+
+=head1 METHODS - Internal
+
+You may not need to call these directly. If I'm wrong and you find yourself having
+to do that, please complain via the usual channels.
+
+=head2 connect
+
+Establishes the connection. Called by the top-level L<Net::Async::Slack> instance.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2016-2017. Licensed under the same terms as Perl itself.
+

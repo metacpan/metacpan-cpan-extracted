@@ -1,7 +1,8 @@
 use strict;
 use warnings;
 use diagnostics;
-use lib -e 't' ? 't' : 'test';
+use FindBin '$Bin';
+use lib $Bin;
 use TestInlineSetup;
 use Config;
 use Inline Config => DIRECTORY => $TestInlineSetup::DIR;

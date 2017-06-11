@@ -22,8 +22,8 @@ $mock_ua->map(qr{^https://graph.facebook.com/me},                 HTTP::Response
 $mock_ua->map(qr{^https://accounts.google.com/o/oauth2/token},    HTTP::Response->parse($http_responses{'google-access_token'}));
 $mock_ua->map(qr{^https://www.googleapis.com/oauth2/v2/userinfo}, HTTP::Response->parse($http_responses{'google-user_info'}));
 
-$mock_ua->map(qr{^https://api.twitter.com/oauth/request_token},   HTTP::Response->parse($http_responses{'twitter-request_token'}));
-$mock_ua->map(qr{^https://api.twitter.com/oauth/access_token},    HTTP::Response->parse($http_responses{'twitter-access_token'}));
+$mock_ua->map(qr{^https://twitter.com/oauth/request_token},       HTTP::Response->parse($http_responses{'twitter-request_token'}));
+$mock_ua->map(qr{^https://twitter.com/oauth/access_token},        HTTP::Response->parse($http_responses{'twitter-access_token'}));
 $mock_ua->map(qr{^https://api.twitter.com/1.1/account/verify},    HTTP::Response->parse($http_responses{'twitter-user_info'}));
 
 $mock_ua->map(qr{^https://github.com/login/oauth/access_token},   HTTP::Response->parse($http_responses{'github-access_token'}));
@@ -67,7 +67,7 @@ test_psgi
 
             my %wanted_q = (
                 twitter => {
-                    callback => "http://localhost/auth_test/$provider/callback",
+                    oauth_callback => "http://localhost/auth_test/$provider/callback",
                     oauth_token => 'some_dummy_token',
                 },
                 facebook => {
@@ -154,6 +154,7 @@ test_psgi
                 github => {
                     access_token => 'jhj5j4j44jh29dn',
                     token_type => 'bearer',
+                    scope => 'user,gist',
                     user_info => {
                         login => "octocat",
                         id => 1,

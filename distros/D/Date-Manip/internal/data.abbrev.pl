@@ -111,7 +111,7 @@
    'MDT'         => 'America/Denver',
    'MEST'        => 'MET',
    'MET'         => 'MET',
-   'MMT'         => 'Indian/Maldives',
+   'MMT'         => 'Africa/Monrovia',
    'MPT'         => [ 'America/Denver' => 'America/Boise' ],
    'MSD'         => 'Europe/Moscow',
    'MSK'         => 'Europe/Moscow',

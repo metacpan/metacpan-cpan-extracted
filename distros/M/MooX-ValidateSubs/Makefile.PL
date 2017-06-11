@@ -17,11 +17,11 @@ WriteMakefile(
     },
     BUILD_REQUIRES => {
         'Test::More' => 0,
-        'Type::Tiny' => '1.001_009', 
     },
     PREREQ_PM => {
-        'MooX::ReturnModifiers' => 0.03,
-        'Moo' => 0,
+        'MooX::ReturnModifiers' => '0.09',
+		'Type::Tiny' => '1.002000', 
+		'Moo' => 0,
         'Carp' => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

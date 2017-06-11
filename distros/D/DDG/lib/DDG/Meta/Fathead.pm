@@ -1,7 +1,7 @@
 package DDG::Meta::Fathead;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Functions for generating a L<DDG::ZeroClickInfo::Fathead> factory 
-$DDG::Meta::Fathead::VERSION = '1016';
+$DDG::Meta::Fathead::VERSION = '1017';
 use strict;
 use warnings;
 use Package::Stash;
@@ -70,7 +70,7 @@ DDG::Meta::Fathead - Functions for generating a L<DDG::ZeroClickInfo::Fathead> f
 
 =head1 VERSION
 
-version 1016
+version 1017
 
 =head1 DESCRIPTION
 

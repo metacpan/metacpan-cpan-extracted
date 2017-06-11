@@ -1,5 +1,15 @@
-v0.9.0 2017-03-18T21:40:58Z
- - No issues were closed since the last release
+v0.10.0 2017-06-02T07:19:33Z
+ - No issues on bugtracker were closed since the last release
+ - log pipes attrs changed to private
+ - do not use handle interface anymore
+ - log pipes serialize event data manually
+ - event log pipe improved
+ - event roouting key packed to event hash
+ - event listener get single $ev argument
+
+v0.9.0 2017-05-30T15:30:20Z
+ - No issues on bugtracker were closed since the last release
+ - switched to AnyEvent::XMPP
 
 v0.8.1 2017-03-18T21:43:31Z
  - No issues were closed since the last release

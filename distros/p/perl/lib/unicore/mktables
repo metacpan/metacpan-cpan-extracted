@@ -36,6 +36,17 @@ my $debugging_build = $Config{"ccflags"} =~ /-DDEBUGGING/;
 
 sub NON_ASCII_PLATFORM { ord("A") != 65 }
 
+# When a new version of Unicode is published, unfortunately the algorithms for
+# dealing with various bounds, like \b{gcb}, \b{lb} may have to be updated
+# manually.  The changes may or may not be backward compatible with older
+# releases.  The code is in regen/mk_invlist.pl and regexec.c.  Make the
+# changes, then come back here and set the variable below to what version the
+# code is expecting.  If a newer version of Unicode is being compiled than
+# expected, a warning will be generated.  If an older version is being
+# compiled, any bounds tests that fail in the generated test file (-maketest
+# option) will be marked as TODO.
+my $version_of_mk_invlist_bounds = v9.0.0;
+
 ##########################################################################
 #
 # mktables -- create the runtime Perl Unicode files (lib/unicore/.../*.pl),
@@ -352,6 +363,8 @@ my $unicode_reference_url = 'http://www.unicode.org/reports/tr44/';
 #
 # trace ... if main::DEBUG && $to_trace;
 #
+# main::stack_trace() will display what its name implies
+#
 # If there is just one or a few files that you're debugging, you can easily
 # cause most everything else to be skipped.  Change the line
 #
@@ -409,7 +422,7 @@ my $unicode_reference_url = 'http://www.unicode.org/reports/tr44/';
 #
 # A NOTE ON UNIHAN
 #
-# This program can generate tables from the Unihan database.  But that db
+# This program can generate tables from the Unihan database.  But that DB
 # isn't normally available, so it is marked as optional.  Prior to version
 # 5.2, this database was in a single file, Unihan.txt.  In 5.2 the database
 # was split into 8 different files, all beginning with the letters 'Unihan'.
@@ -477,8 +490,8 @@ my $unicode_reference_url = 'http://www.unicode.org/reports/tr44/';
 # handled by Unicode::Normalize, nor will it compile when presented a version
 # that has them.  However, you can trivially get it to compile by simply
 # ignoring those decompositions, by changing the croak to a carp.  At the time
-# of this writing, the line (in cpan/Unicode-Normalize/Normalize.pm or
-# cpan/Unicode-Normalize/mkheader) reads
+# of this writing, the line (in dist/Unicode-Normalize/Normalize.pm or
+# dist/Unicode-Normalize/mkheader) reads
 #
 #   croak("Weird Canonical Decomposition of U+$h");
 #
@@ -617,12 +630,28 @@ our $to_trace = 0;
     }
 }
 
+sub stack_trace() {
+    local $to_trace = 1 if main::DEBUG;
+    my $line = (caller(0))[2];
+    my $i = 1;
+
+    # Accumulate the stack trace
+    while (1) {
+        my ($pkg, $file, $caller_line, $caller) = caller $i++;
+
+        last unless defined $caller;
+
+        trace "called from $caller() at line $line";
+        $line = $caller_line;
+    }
+}
+
 # This is for a rarely used development feature that allows you to compare two
 # versions of the Unicode standard without having to deal with changes caused
 # by the code points introduced in the later version.  You probably also want
 # to use the -annotate option when using this.  Run this program on a unicore
 # containing the starting release you want to compare.  Save that output
-# structrue.  Then, switching to a unicore with the ending release, change the
+# structure.  Then, switching to a unicore with the ending release, change the
 # 0 in the $string_compare_versions definition just below to a string
 # containing a SINGLE dotted Unicode release number (e.g. "2.1") corresponding
 # to the starting release.  This program will then compile, but throw away all
@@ -702,7 +731,8 @@ while (@ARGV) {
         $verbosity = 0;
     }
     elsif ($arg eq '-w') {
-        $write_unchanged_files = 1; # update the files even if havent changed
+        # update the files even if they haven't changed
+        $write_unchanged_files = 1;
     }
     elsif ($arg eq '-check') {
         my $this = shift @ARGV;
@@ -1132,7 +1162,7 @@ my $run_on_code_point_re =
             qr/ (?: 10[0-9A-F]{4} | [1-9A-F][0-9A-F]{4} | [0-9A-F]{4} ) \b/x;
 my $code_point_re = qr/\b$run_on_code_point_re/;
 
-# This matches the beginning of the line in the Unicode db files that give the
+# This matches the beginning of the line in the Unicode DB files that give the
 # defaults for code points not listed (i.e., missing) in the file.  The code
 # depends on this ending with a semi-colon, so it can assume it is a valid
 # field when the line is split() by semi-colons
@@ -2075,7 +2105,7 @@ package Input_file;
 #   1) call before the first line is read, for pre processing
 #   2) call to adjust each line of the input before the main handler gets
 #      them.  This can be automatically generated, if appropriately simple
-#      enough, by specifiying a Properties parameter in the constructor.
+#      enough, by specifying a Properties parameter in the constructor.
 #   3) call upon EOF before the main handler exits its loop
 #   4) call at the end, for post processing
 #
@@ -2083,7 +2113,7 @@ package Input_file;
 # each_line_handler()s.  So, if the format of the line is not in the desired
 # format for the main handler, these are used to do that adjusting.  They can
 # be stacked (by enclosing them in an [ anonymous array ] in the constructor,
-# so the $_ output of one is used as the input to the next.  The eof handler
+# so the $_ output of one is used as the input to the next.  The EOF handler
 # is also stackable, but none of the others are, but could easily be changed
 # to be so.
 #
@@ -2167,7 +2197,7 @@ sub trace { return main::trace(@_); }
     # not otherwise be processed, and to not raise a warning about not being
     # handled.  In the constructor call, any value that evaluates to a numeric
     # 0 or undef means don't skip.  Any other value is a string giving the
-    # reason it is being skippped, and this will appear in generated pod.
+    # reason it is being skipped, and this will appear in generated pod.
     # However, an empty string reason will suppress the pod entry.
     # Internally, calls that evaluate to numeric 0 are changed into undef to
     # distinguish them from an empty string call.
@@ -2180,11 +2210,20 @@ sub trace { return main::trace(@_); }
     # 'handler'
     main::set_access('each_line_handler', \%each_line_handler, 'c');
 
+    my %retain_trailing_comments;
+    # This is used to not discard the comments that end data lines.  This
+    # would be used only for files with non-typical syntax, and most code here
+    # assumes that comments have been stripped, so special handlers would have
+    # to be written.  It is assumed that the code will use these in
+    # single-quoted contexts, and so any "'" marks in the comment will be
+    # prefixed by a backslash.
+    main::set_access('retain_trailing_comments', \%retain_trailing_comments, 'c');
+
     my %properties; # Optional ordered list of the properties that occur in each
     # meaningful line of the input file.  If present, an appropriate
     # each_line_handler() is automatically generated and pushed onto the stack
     # of such handlers.  This is useful when a file contains multiple
-    # proerties per line, but no other special considerations are necessary.
+    # properties per line, but no other special considerations are necessary.
     # The special value "<ignored>" means to discard the corresponding input
     # field.
     # Any @missing lines in the file should also match this syntax; no such
@@ -2337,6 +2376,7 @@ sub trace { return main::trace(@_); }
 
         # Set defaults
         $handler{$addr} = \&main::process_generic_property_file;
+        $retain_trailing_comments{$addr} = 0;
         $non_skip{$addr} = 0;
         $skip{$addr} = undef;
         $has_missings_defaults{$addr} = $NO_DEFAULTS;
@@ -3002,9 +3042,21 @@ END
                 next;
             }
 
-            # Remove comments and trailing space, and skip this line if the
-            # result is empty
-            s/#.*//;
+            # Unless to keep, remove comments.  If to keep, ignore
+            # comment-only lines
+            if ($retain_trailing_comments{$addr}) {
+                next if / ^ \s* \# /x;
+
+                # But escape any single quotes (done in both the comment and
+                # non-comment portion; this could be a bug someday, but not
+                # likely)
+                s/'/\\'/g;
+            }
+            else {
+                s/#.*//;
+            }
+
+            # Remove trailing space, and skip this line if the result is empty
             s/\s+$//;
             next if /^$/;
 
@@ -5412,6 +5464,15 @@ sub trace { return main::trace(@_); }
     # used to override calculations.
     main::set_access('format', \%format, 'r', 'p_s');
 
+    my %has_dependency;
+    # A boolean that gives whether some other table in this property is
+    # defined as the complement of this table.  This is a crude, but currently
+    # sufficient, mechanism to make this table not get destroyed before what
+    # is dependent on it is.  Other dependencies could be added, so the name
+    # was chosen to reflect a more general situation than actually is
+    # currently the case.
+    main::set_access('has_dependency', \%has_dependency, 'r', 's');
+
     sub new {
         # All arguments are key => value pairs, which you can see below, most
         # of which match fields documented above.  Otherwise: Re_Pod_Entry,
@@ -5467,6 +5528,7 @@ sub trace { return main::trace(@_); }
         $note{$addr} = [ ];
         $file_path{$addr} = [ ];
         $locked{$addr} = "";
+        $has_dependency{$addr} = 0;
 
         push @{$description{$addr}}, $description if $description;
         push @{$note{$addr}}, $note if $note;
@@ -6290,6 +6352,22 @@ END
                     }
 
                     if ($write_as_invlist) {
+                        if (   $previous_end > 0
+                            && $output_range_counts{$addr})
+                        {
+                            my $complement_count = $start - $previous_end - 1;
+                            if ($complement_count > 1) {
+                                $OUT[-1] = merge_single_annotation_line(
+                                    $OUT[-1],
+                                       "#"
+                                     . (" " x 17)
+                                     . "["
+                                     .  main::clarify_code_point_count(
+                                                            $complement_count)
+                                      . "] in complement\n",
+                                    $comment_indent);
+                            }
+                        }
 
                         # Inversion list format has a single number per line,
                         # the starting code point of a range that matches the
@@ -8134,6 +8212,15 @@ sub trace { return main::trace(@_); }
         }
         my $addr = do { no overloading; pack 'J', $self; };
         $complement{$addr} = $other;
+
+        # Be sure the other property knows we are depending on them; or the
+        # other table if it is one in the current property.
+        if ($self->property != $other->property) {
+            $other->property->set_has_dependency(1);
+        }
+        else {
+            $other->set_has_dependency(1);
+        }
         $self->lock;
         return;
     }
@@ -8720,6 +8807,15 @@ sub trace { return main::trace(@_) if main::DEBUG && $to_trace }
     main::set_access('pre_declared_maps',
                                     \%pre_declared_maps, 'r', 's');
 
+    my %has_dependency;
+    # A boolean that gives whether some table somewhere is defined as the
+    # complement of a table in this property.  This is a crude, but currently
+    # sufficient, mechanism to make this property not get destroyed before
+    # what is dependent on it is.  Other dependencies could be added, so the
+    # name was chosen to reflect a more general situation than actually is
+    # currently the case.
+    main::set_access('has_dependency', \%has_dependency, 'r', 's');
+
     sub new {
         # The only required parameter is the positionally first, name.  All
         # other parameters are key => value pairs.  See the documentation just
@@ -8758,6 +8854,7 @@ sub trace { return main::trace(@_) if main::DEBUG && $to_trace }
         $has_only_code_point_maps{$addr} = 1;
         $table_ref{$addr} = { };
         $unique_maps{$addr} = { };
+        $has_dependency{$addr} = 0;
 
         $map{$addr} = Map_Table->new($name,
                                     Full_Name => $full_name{$addr},
@@ -11645,7 +11742,16 @@ END
                                           . $CMD_DELIM
                                           . $fields[$CHARNAME];
             }
-            elsif ($fields[$CHARNAME] =~ /^CJK/) {
+            elsif ($fields[$CATEGORY] eq 'Lo') {    # Is a letter
+
+                # All the CJK ranges like this have the name given as a
+                # special case in the next code line.  And for the others, we
+                # hope that Unicode continues to use the correct name in
+                # future releases, so we don't have to make further special
+                # cases.
+                my $name = ($fields[$CHARNAME] =~ /^CJK/)
+                           ? 'CJK UNIFIED IDEOGRAPH'
+                           : uc $fields[$CHARNAME];
 
                 # The name for these contains the code point itself, and all
                 # are defined to have the same base name, regardless of what
@@ -11657,7 +11763,7 @@ END
                                            . '='
                                            . $CP_IN_NAME
                                            . $CMD_DELIM
-                                           . 'CJK UNIFIED IDEOGRAPH';
+                                           . $name;
 
             }
             elsif ($fields[$CATEGORY] eq 'Co'
@@ -13593,6 +13699,18 @@ numerals.
 END
     ));
 
+    # Make sure this assumption in perl core code is valid in this Unicode
+    # release, with known exceptions
+    foreach my $range (property_ref('Numeric-Type')->table('Decimal')->ranges) {
+        next if $range->end - $range->start == 9;
+        next if $range->start == 0x1D7CE;   # This whole range was added in 3.1
+        next if $range->end == 0x19DA && $v_version eq v5.2.0;
+        next if $range->end - $range->start < 9 && $v_version le 4.0.0;
+        Carp::my_carp("Range $range unexpectedly doesn't contain 10"
+                    . " decimal digits.  Code in regcomp.c assumes it does,"
+                    . " and will have to be fixed.  Proceeding anyway.");
+    }
+
     Property->new('Legacy_Case_Folding',
                     File => "Fold",
                     Directory => $map_directory,
@@ -14802,7 +14920,6 @@ sub compile_perl() {
                                     + ord("(")
                                     + ord(")")
                                     + ord("-")
-                                    + utf8::unicode_to_native(0xA0) # NBSP
                         );
 
     my @composition = ('Name', 'Unicode_1_Name', '_Perl_Name_Alias');
@@ -15231,7 +15348,7 @@ sub add_perl_synonyms() {
     # the single-form, \p{name}.  These are:
     #   All the binary property Y tables, so that \p{Name=Y} gets \p{Name} and
     #       \p{Is_Name} as synonyms
-    #   \p{Script=Value} gets \p{Value}, \p{Is_Value} as synonyms
+    #   \p{Script_Extensions=Value} gets \p{Value}, \p{Is_Value} as synonyms
     #   \p{General_Category=Value} gets \p{Value}, \p{Is_Value} as synonyms
     #   \p{Block=Value} gets \p{In_Value} as a synonym, and, if there is no
     #       conflict, \p{Value} and \p{Is_Value} as well
@@ -15245,8 +15362,15 @@ sub add_perl_synonyms() {
                                                             property_ref('*');
     push @tables, $gc->tables;
 
-    # If the version of Unicode includes the Script property, add its tables
-    push @tables, $script->tables if defined $script;
+    # If the version of Unicode includes the Script Extensions (preferably),
+    # or Script property, add its tables
+    my $scx = property_ref("Script_Extensions");
+    if (defined $scx) {
+        push @tables, $scx->tables;
+    }
+    else {
+        push @tables, $script->tables if defined $script;
+    }
 
     # The Block tables are kept separate because they are treated differently.
     # And the earliest versions of Unicode didn't include them, so add only if
@@ -15309,7 +15433,7 @@ sub add_perl_synonyms() {
 
                 if (! defined $pre_existing) {
 
-                    # No name collision, so ok to add the perl synonym.
+                    # No name collision, so OK to add the perl synonym.
 
                     my $make_re_pod_entry;
                     my $ok_as_filename;
@@ -15404,7 +15528,7 @@ sub add_perl_synonyms() {
                     next;
                 }
 
-                # Here, there is a name collision, but it still could be ok if
+                # Here, there is a name collision, but it still could be OK if
                 # the tables match the identical set of code points, in which
                 # case, we can combine the names.  Compare each table's code
                 # point list to see if they are identical.
@@ -16370,7 +16494,7 @@ sub make_ucd_table_pod_entries {
                     Carp::my_carp("Bad news.  $property and $ucd_pod{$standard}->{'property'} have unexpected output status and perl-extension combinations.  Proceeding anyway.");
                 }
 
-                # We modifiy the info column of the one being output to
+                # We modify the info column of the one being output to
                 # indicate the ambiguity.  Set $which to point to that one's
                 # info.
                 my $which;
@@ -16625,7 +16749,7 @@ END
         push @bad_re_properties, "\n=back\n";
     }
 
-    # Similiarly, generate a list of files that we don't use, grouped by the
+    # Similarly, generate a list of files that we don't use, grouped by the
     # reasons why (Don't output if the reason is empty).  First, create a hash
     # whose keys are the reasons, and whose values are anonymous arrays of all
     # the files that share that reason.
@@ -16913,34 +17037,20 @@ B<Legend summary:>
 
 =over 4
 
-=item *
+=item Z<>B<*> is a wild-card
 
-B<*> is a wild-card
-
-=item *
-
-B<(\\d+)> in the info column gives the number of Unicode code points matched
+=item B<(\\d+)> in the info column gives the number of Unicode code points matched
 by this property.
 
-=item *
+=item B<$DEPRECATED> means this is deprecated.
 
-B<$DEPRECATED> means this is deprecated.
+=item B<$OBSOLETE> means this is obsolete.
 
-=item *
+=item B<$STABILIZED> means this is stabilized.
 
-B<$OBSOLETE> means this is obsolete.
+=item B<$STRICTER> means tighter (stricter) name matching applies.
 
-=item *
-
-B<$STABILIZED> means this is stabilized.
-
-=item *
-
-B<$STRICTER> means tighter (stricter) name matching applies.
-
-=item *
-
-B<$DISCOURAGED> means use of this form is discouraged, and may not be
+=item B<$DISCOURAGED> means use of this form is discouraged, and may not be
 stable.
 
 =back
@@ -17550,7 +17660,7 @@ sub make_UCD () {
             foreach my $prop_alias ($property->aliases) {
                 my $prop_alias_name = standardize($prop_alias->name);
 
-                # If no =value, there's just one combination possibe for this
+                # If no =value, there's just one combination possible for this
                 if (! $value_name) {
 
                     # The property may be suppressed, but there may be a proxy
@@ -17942,7 +18052,7 @@ sub write_all_tables() {
                     # the children.
                     make_re_pod_entries($table) if defined $pod_directory;
 
-                    # See if the the table matches identical code points with
+                    # See if the table matches identical code points with
                     # something that has already been output.  In that case,
                     # no need to have two files with the same code points in
                     # them.  We use the table's hash() method to store these
@@ -18105,7 +18215,7 @@ sub write_all_tables() {
                         # the table.  That is, all the property-values given
                         # by this table.  By agreement with Unicode::UCD,
                         # if the name and full name are identical, and there
-                        # are no other names, drop the duplcate entry to save
+                        # are no other names, drop the duplicate entry to save
                         # memory.
                         if (@values_list == 2
                             && $values_list[0] eq $values_list[1])
@@ -18269,14 +18379,14 @@ sub generate_separator($) {
 
 sub generate_tests($$$$$) {
     # This used only for making the test script.  It generates test cases that
-    # are expected to compile successfully in perl.  Note that the lhs and
-    # rhs are assumed to already be as randomized as the caller wants.
+    # are expected to compile successfully in perl.  Note that the LHS and
+    # RHS are assumed to already be as randomized as the caller wants.
 
     my $lhs = shift;           # The property: what's to the left of the colon
                                #  or equals separator
     my $rhs = shift;           # The property value; what's to the right
     my $valid_code = shift;    # A code point that's known to be in the
-                               # table given by lhs=rhs; undef if table is
+                               # table given by LHS=RHS; undef if table is
                                # empty
     my $invalid_code = shift;  # A code point known to not be in the table;
                                # undef if the table is all code points
@@ -18317,13 +18427,13 @@ sub generate_error($$$) {
                                     # colon or equals separator
     my $rhs = shift;                # The property value; what's to the right
     my $already_in_error = shift;   # Boolean; if true it's known that the
-                                # unmodified lhs and rhs will cause an error.
+                                # unmodified LHS and RHS will cause an error.
                                 # This routine should not force another one
     # Get the colon or equal
     my $separator = generate_separator($lhs);
 
     # Since this is an error only, don't bother to randomly decide whether to
-    # put the error on the left or right side; and assume that the rhs is
+    # put the error on the left or right side; and assume that the RHS is
     # loosely matched, again for convenience rather than rigor.
     $rhs = randomize_loose_name($rhs, 'ERROR') unless $already_in_error;
 
@@ -18522,10 +18632,33 @@ sub make_property_test_script() {
     # or multiple lines. main::write doesn't count the lines.
     my @output;
 
+    push @output, <<'EOF_CODE';
+Error('\p{Script=InGreek}');    # Bug #69018
+Test_GCB("1100 $nobreak 1161");  # Bug #70940
+Expect(0, 0x2028, '\p{Print}', ""); # Bug # 71722
+Expect(0, 0x2029, '\p{Print}', ""); # Bug # 71722
+Expect(1, 0xFF10, '\p{XDigit}', ""); # Bug # 71726
+
+# Make sure this gets tested; it was not part of the official test suite at
+# the time this was added.  Note that this is as it would appear in the
+# official suite, and gets modified to check for the perl tailoring by
+# Test_WB()
+Test_WB("$breakable 0020 $breakable 0020 $breakable 0308 $breakable");
+Test_LB("$nobreak 200B $nobreak 0020 $nobreak 0020 $breakable 2060 $breakable");
+EOF_CODE
+
     # Sort these so get results in same order on different runs of this
     # program
-    foreach my $property (sort { $a->name cmp $b->name } property_ref('*')) {
-        foreach my $table (sort { $a->name cmp $b->name } $property->tables) {
+    foreach my $property (sort { $a->has_dependency <=> $b->has_dependency
+                                    or
+                                 lc $a->name cmp lc $b->name
+                               } property_ref('*'))
+    {
+        foreach my $table (sort { $a->has_dependency <=> $b->has_dependency
+                                    or
+                                  lc $a->name cmp lc $b->name
+                                } $property->tables)
+        {
 
             # Find code points that match, and don't match this table.
             my $valid = $table->get_valid_code_point;
@@ -18696,16 +18829,69 @@ sub make_property_test_script() {
         $property->DESTROY();
     }
 
+    # Make any test of the boundary (break) properties TODO if the code
+    # doesn't match the version being compiled
+    my $TODO_FAILING_BREAKS = ($version_of_mk_invlist_bounds ne $v_version)
+                             ? "\nsub TODO_FAILING_BREAKS { 1 }\n"
+                             : "\nsub TODO_FAILING_BREAKS { 0 }\n";
+
+    @output= map {
+        map s/^/    /mgr,
+        map "$_;\n",
+        split /;\n/, $_
+    } @output;
+
+    # Cause there to be 'if' statements to only execute a portion of this
+    # long-running test each time, so that we can have a bunch of .t's running
+    # in parallel
+    my $chunks = 10     # Number of test files
+               - 1      # For GCB & SB
+               - 1      # For WB
+               - 4;     # LB split into this many files
+    my @output_chunked;
+    my $chunk_count=0;
+    my $chunk_size= int(@output / $chunks) + 1;
+    while (@output) {
+        $chunk_count++;
+        my @chunk= splice @output, 0, $chunk_size;
+        push @output_chunked,
+            "if (!\$::TESTCHUNK or \$::TESTCHUNK == $chunk_count) {\n",
+                @chunk,
+            "}\n";
+    }
+
+    $chunk_count++;
+    push @output_chunked,
+        "if (!\$::TESTCHUNK or \$::TESTCHUNK == $chunk_count) {\n",
+            (map {"    Test_GCB('$_');\n"} @backslash_X_tests),
+            (map {"    Test_SB('$_');\n"} @SB_tests),
+        "}\n";
+
+
+    $chunk_size= int(@LB_tests / 4) + 1;
+    @LB_tests = map {"    Test_LB('$_');\n"} @LB_tests;
+    while (@LB_tests) {
+        $chunk_count++;
+        my @chunk= splice @LB_tests, 0, $chunk_size;
+        push @output_chunked,
+            "if (!\$::TESTCHUNK or \$::TESTCHUNK == $chunk_count) {\n",
+                @chunk,
+            "}\n";
+    }
+
+    $chunk_count++;
+    push @output_chunked,
+        "if (!\$::TESTCHUNK or \$::TESTCHUNK == $chunk_count) {\n",
+            (map {"    Test_WB('$_');\n"} @WB_tests),
+        "}\n";
+
     &write($t_path,
            0,           # Not utf8;
            [$HEADER,
+            $TODO_FAILING_BREAKS,
             <DATA>,
-            @output,
-            (map {"Test_GCB('$_');\n"} @backslash_X_tests),
-            (map {"Test_LB('$_');\n"} @LB_tests),
-            (map {"Test_SB('$_');\n"} @SB_tests),
-            (map {"Test_WB('$_');\n"} @WB_tests),
-            "Finished();\n"
+            @output_chunked,
+            "Finished();\n",
            ]);
 
     return;
@@ -19077,13 +19263,14 @@ my @input_file_objects = (
                      # for the release it is.  To get it to actually mean
                      # something useful, someone would have to be using an
                      # earlier Unicode release, and copy it into the directory
-                     # for that release and recomplile.  So far there has been
+                     # for that release and recompile.  So far there has been
                      # no demand to do that, so this hasn't been implemented.
                     Skip => 'Documentation of corrections already '
                           . 'incorporated into the Unicode data base',
                    ),
     Input_file->new('StandardizedVariants.html', v3.2.0,
-                    Skip => 'Provides a visual display of the standard '
+                    Skip => 'Obsoleted as of Unicode 9.0, but previously '
+                          . 'provided a visual display of the standard '
                           . 'variant sequences derived from '
                           . 'F<StandardizedVariants.txt>.',
                         # I don't know why the html came earlier than the
@@ -19118,18 +19305,21 @@ my @input_file_objects = (
                    ),
     Input_file->new("$AUXILIARY/GCBTest.txt", v4.1.0,
                     Handler => \&process_GCB_test,
+                    retain_trailing_comments => 1,
                    ),
     Input_file->new("$AUXILIARY/GraphemeBreakTest.html", v4.1.0,
                     Skip => $Validation_Documentation,
                    ),
     Input_file->new("$AUXILIARY/SBTest.txt", v4.1.0,
                     Handler => \&process_SB_test,
+                    retain_trailing_comments => 1,
                    ),
     Input_file->new("$AUXILIARY/SentenceBreakTest.html", v4.1.0,
                     Skip => $Validation_Documentation,
                    ),
     Input_file->new("$AUXILIARY/WBTest.txt", v4.1.0,
                     Handler => \&process_WB_test,
+                    retain_trailing_comments => 1,
                    ),
     Input_file->new("$AUXILIARY/WordBreakTest.html", v4.1.0,
                     Skip => $Validation_Documentation,
@@ -19180,6 +19370,7 @@ my @input_file_objects = (
                    ),
     Input_file->new("$AUXILIARY/LBTest.txt", v5.1.0,
                     Handler => \&process_LB_test,
+                    retain_trailing_comments => 1,
                    ),
     Input_file->new("$AUXILIARY/LineBreakTest.html", v5.1.0,
                     Skip => $Validation_Documentation,
@@ -19292,6 +19483,12 @@ my @input_file_objects = (
     Input_file->new('IndicPositionalCategory.txt', v8.0.0,
                     Property => 'Indic_Positional_Category',
                     Has_Missings_Defaults => $NOT_IGNORED,
+                   ),
+    Input_file->new('TangutSources.txt', v9.0.0,
+                    Skip => 'Specifies source mappings for Tangut ideographs'
+                          . ' and components. This data file also includes'
+                          . ' informative radical-stroke values that are used'
+                          . ' internally by Unicode',
                    ),
 );
 
@@ -19625,6 +19822,13 @@ if ($verbosity >= $NORMAL_VERBOSITY && ! $debug_skip) {
     }
     print "\nAll done\n" if $verbosity >= $VERBOSE;
 }
+
+if ($version_of_mk_invlist_bounds lt $v_version) {
+    Carp::my_carp("WARNING: \\b{} algorithms (regen/mk_invlist.pl) need"
+                . " to be checked and possibly updated to Unicode"
+                . " $string_version");
+}
+
 exit(0);
 
 # TRAILING CODE IS USED BY make_property_test_script()
@@ -19682,7 +19886,7 @@ sub Expect($$$$) {
         $Tests++;
 
         # A string eval is needed because of the 'no warnings'.
-        # Assumes no parens in the regular expression
+        # Assumes no parentheses in the regular expression
         my $result = eval "$no_warnings
                             my \$RegObj = qr($regex);
                             $string =~ \$RegObj ? 1 : 0";
@@ -19750,7 +19954,10 @@ if (defined &locales_enabled) {
 }
 
 # Eval'd so can run on versions earlier than the property is available in
-my $WB_Extend_or_Format_re = eval 'qr/[\p{WB=Extend}\p{WB=Format}]/';
+my $WB_Extend_or_Format_re = eval 'qr/[\p{WB=Extend}\p{WB=Format}\p{WB=ZWJ}]/';
+if (! defined $WB_Extend_or_Format_re) {
+    $WB_Extend_or_Format_re = eval 'qr/[\p{WB=Extend}\p{WB=Format}]/';
+}
 
 sub _test_break($$) {
     # Test various break property matches.  The 2nd parameter gives the
@@ -19772,6 +19979,15 @@ sub _test_break($$) {
     my $break_type = shift;
 
     my $line   = (caller 1)[2];   # Line number
+    my $comment = "";
+
+    if ($template =~ / ( .*? ) \s* \# (.*) /x) {
+        $template = $1;
+        $comment = $2;
+
+        # Replace leading spaces with a single one.
+        $comment =~ s/ ^ \s* / # /x;
+    }
 
     # The line contains characters above the ASCII range, but in Latin1.  It
     # may or may not be in utf8, and if it is, it may or may not know it.  So,
@@ -19910,12 +20126,24 @@ sub _test_break($$) {
             my $pattern = "(?$modifier:$break_pattern)";
 
             # Actually do the test
+            my $matched_text;
             my $matched = $string =~ qr/$pattern/;
-            print "not " unless $matched;
+            if ($matched) {
+                $matched_text = "matched";
+            }
+            else {
+                $matched_text = "failed to match";
+                print "not ";
 
-            # Fancy display of test results
-            $matched = ($matched) ? "matched" : "failed to match";
-            print "ok ", ++$Tests, " - \"$display_string\" $matched /$pattern/$display_upgrade; line $line $display_locale\n";
+                if (TODO_FAILING_BREAKS) {
+                    $comment = " # $comment" unless $comment =~ / ^ \s* \# /x;
+                    $comment =~ s/#/# TODO/;
+                }
+            }
+            print "ok ", ++$Tests, " - \"$display_string\" $matched_text /$pattern/$display_upgrade; line $line $display_locale$comment\n";
+
+            # Only print the comment on the first use of this line
+            $comment = "";
 
             # Repeat with the first \B{} in the pattern.  This makes sure the
             # code in regexec.c:find_byclass() for \B gets executed
@@ -19923,8 +20151,10 @@ sub _test_break($$) {
                 my $B_pattern = "$1$2";
                 $matched = $string =~ qr/$B_pattern/;
                 print "not " unless $matched;
-                $matched = ($matched) ? "matched" : "failed to match";
-                print "ok ", ++$Tests, " - \"$display_string\" $matched /$B_pattern/$display_upgrade; line $line $display_locale\n";
+                $matched_text = ($matched) ? "matched" : "failed to match";
+                print "ok ", ++$Tests, " - \"$display_string\" $matched_text /$B_pattern/$display_upgrade; line $line $display_locale";
+                print " # TODO" if TODO_FAILING_BREAKS && ! $matched;
+                print "\n";
             }
         }
 
@@ -19949,7 +20179,9 @@ sub _test_break($$) {
             } else {
                 $matches[$i] = join("", map { sprintf "\\x{%04X}", ord $_ }
                                                     split "", $matches[$i]);
-                print "not ok $Tests - In \"$display_string\" =~ /(\\X)/g, \\X #",
+                print "not ok $Tests -";
+                print " # TODO" if TODO_FAILING_BREAKS;
+                print " In \"$display_string\" =~ /(\\X)/g, \\X #",
                     $i + 1,
                     " should have matched $should_display[$i]",
                     " but instead matched $matches[$i]",
@@ -19963,7 +20195,9 @@ sub _test_break($$) {
         if (@matches == @should_match) {
             print "ok $Tests - Nothing was left over; line $line\n";
         } else {
-            print "not ok $Tests - There were ", scalar @should_match, " \\X matches expected, but got ", scalar @matches, " instead; line $line\n";
+            print "not ok $Tests - There were ", scalar @should_match, " \\X matches expected, but got ", scalar @matches, " instead; line $line";
+            print " # TODO" if TODO_FAILING_BREAKS;
+            print "\n";
         }
     }
 
@@ -19991,15 +20225,3 @@ sub Finished() {
     exit($Fails ? -1 : 0);
 }
 
-Error('\p{Script=InGreek}');    # Bug #69018
-Test_GCB("1100 $nobreak 1161");  # Bug #70940
-Expect(0, 0x2028, '\p{Print}', ""); # Bug # 71722
-Expect(0, 0x2029, '\p{Print}', ""); # Bug # 71722
-Expect(1, 0xFF10, '\p{XDigit}', ""); # Bug # 71726
-
-# Make sure this gets tested; it was not part of the official test suite at
-# the time this was addded.  Note that this is as it would appear in the
-# official suite, and gets modified to check for the perl tailoring by
-# Test_WB()
-Test_WB("$breakable 0020 $breakable 0020 $breakable 0308 $breakable");
-Test_LB("$nobreak 200B $nobreak 0020 $nobreak 0020 $breakable 2060 $breakable");

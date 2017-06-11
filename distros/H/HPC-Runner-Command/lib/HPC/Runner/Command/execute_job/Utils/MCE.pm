@@ -28,6 +28,13 @@ option 'commands' => (
     default  => 1,
 );
 
+=head2 read_command
+
+Commands in the command file are 0 indexed
+The first command is 0
+
+=cut
+
 has 'read_command' => (
     is        => 'rw',
     isa       => 'Num|Undef',
@@ -37,10 +44,10 @@ has 'read_command' => (
     default   => sub {
         my $self = shift;
         if ( $self->can('task_id') && $self->can('batch_index_start') ) {
-            return $self->task_id - $self->batch_index_start - 1;
+            return $self->task_id - $self->batch_index_start;
         }
         elsif ( $self->can('batch_index_start') ) {
-            return $self->batch_index_start;
+            return $self->batch_index_start - 1;
         }
         else {
             $self->log->fatal(
@@ -196,7 +203,7 @@ sub parse_file_mce {
     my $self = shift;
 
     $self->process_table;
-    
+
     my $fh = IO::File->new( $self->infile, q{<} )
       or $self->log_main_messages( "fatal",
         "Error opening file  " . $self->infile . "  " . $! );
@@ -225,6 +232,13 @@ sub parse_file_mce {
     }
 }
 
+=head3 parse_cmd_file
+
+Parse the command file for the read_command
+Commands are 0 indexed
+
+=cut
+
 sub parse_cmd_file {
     my $self = shift;
     my $fh   = shift;
@@ -235,14 +249,16 @@ sub parse_cmd_file {
 
     my @cmds = ();
     my $cmd  = '';
+
     while (<$fh>) {
         my $line = $_;
         next unless $line;
+        next unless $line =~ m/\S/;
 
         $cmd .= $line;
         next if $line =~ m/\\$/;
         next if $line =~ m/^#/;
-        if ( $x == $self->read_command && $cmd_count <= $self->commands ) {
+        if ( $x == $self->read_command && $cmd_count < $self->commands ) {
             $add_cmds = 1;
         }
         if ($add_cmds) {

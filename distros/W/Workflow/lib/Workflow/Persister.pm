@@ -1,7 +1,5 @@
 package Workflow::Persister;
 
-# $Id$
-
 use warnings;
 use strict;
 use base qw( Workflow::Base );
@@ -10,7 +8,7 @@ use Workflow::Exception qw( persist_error );
 
 use constant DEFAULT_ID_LENGTH => 8;
 
-$Workflow::Persister::VERSION = '1.42';
+$Workflow::Persister::VERSION = '1.43';
 
 my @FIELDS = qw( name class
     use_random use_uuid
@@ -159,7 +157,7 @@ This documentation describes version 1.09 of this package
  <workflow type="Ticket"
            persister="MainDatabase">
  ...
- 
+
  # Declare a persister
  <persister name="MainDatabase"
             class="Workflow::Persister::DBI"
@@ -167,7 +165,7 @@ This documentation describes version 1.09 of this package
             dsn="DBI:mysql:database=workflows"
             user="wf"
             password="mypass"/>
- 
+
  # Declare a separate persister
  <persister name="FileSystem"
             class="Workflow::Persister::File"
@@ -248,7 +246,7 @@ the return value of this method is used for the value of the "action" field.
 Override this method to change the value from the default, "Create workflow".
 
 
-=head3 assign_generators( \%params ) 
+=head3 assign_generators( \%params )
 
 Assigns proper generators based on intialization, see L</init>
 

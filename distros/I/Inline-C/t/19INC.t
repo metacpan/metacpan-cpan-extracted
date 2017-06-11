@@ -1,13 +1,17 @@
 use strict; use warnings; use diagnostics;
-my $t; use lib ($t = -e 't' ? 't' : 'test');
+use FindBin '$Bin';
+use lib $Bin;
+my $t;
+BEGIN {
+    $t = $Bin;
+}
 use Cwd;
 use TestInlineSetup;
 use Inline Config => DIRECTORY => $TestInlineSetup::DIR;
 
 BEGIN {
-  my $cwd = Cwd::getcwd();
-  my $incdir1 = $cwd . "/$t/foo/";
-  my $incdir2 = $cwd . "/$t/bar/";
+  my $incdir1 = "$t/foo/";
+  my $incdir2 = "$t/bar/";
   $main::includes = "-I$incdir1  -I$incdir2";
 };
 

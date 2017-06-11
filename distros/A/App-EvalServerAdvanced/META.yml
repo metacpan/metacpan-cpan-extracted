@@ -27,25 +27,25 @@ no_index:
 provides:
   App::EvalServerAdvanced:
     file: lib/App/EvalServerAdvanced.pm
-    version: '0.012'
+    version: '0.017'
   App::EvalServerAdvanced::Config:
     file: lib/App/EvalServerAdvanced/Config.pm
-    version: '0.012'
+    version: '0.017'
   App::EvalServerAdvanced::JobManager:
     file: lib/App/EvalServerAdvanced/JobManager.pm
-    version: '0.012'
+    version: '0.017'
   App::EvalServerAdvanced::Log:
     file: lib/App/EvalServerAdvanced/Log.pm
-    version: '0.012'
+    version: '0.017'
   App::EvalServerAdvanced::Sandbox:
     file: lib/App/EvalServerAdvanced/Sandbox.pm
-    version: '0.012'
+    version: '0.017'
   App::EvalServerAdvanced::Sandbox::Internal:
     file: lib/App/EvalServerAdvanced/Sandbox/Internal.pm
-    version: '0.012'
+    version: '0.017'
   App::EvalServerAdvanced::Seccomp:
     file: lib/App/EvalServerAdvanced/Seccomp.pm
-    version: '0.012'
+    version: '0.017'
 requires:
   App::EvalServerAdvanced::Protocol: '0'
   B::Deparse: '0'
@@ -68,7 +68,9 @@ requires:
   POSIX: '0'
   Path::Tiny: '0'
   Perl::Tidy: '0'
+  PerlIO: '0'
   Permute::Named::Iter: '0'
+  Syntax::Keyword::Try: '0'
   Sys::Linux::Mount: '0'
   Sys::Linux::Namespace: '0'
   TOML: '0'
@@ -79,7 +81,10 @@ requires:
   perl: v5.24.0
   strict: '0'
   warnings: '0'
-version: '0.012'
+resources:
+  bugtracker: https://github.com/perlbot/evalserver-async/issues
+  repository: git://github.com/perlbot/evalserver-async.git
+version: '0.017'
 x_Dist_Zilla:
   perl:
     version: '5.024000'
@@ -218,7 +223,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.012
+          tag: v0.017
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -229,21 +234,48 @@ x_Dist_Zilla:
       name: Git::Tag
       version: '2.042'
     -
+      class: Dist::Zilla::Plugin::GitHub::Meta
+      name: GitHub::Meta
+      version: '0.44'
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      config:
+        Dist::Zilla::Plugin::Git::Push:
+          push_to:
+            - origin
+          remotes_must_exist: 1
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.11.0
+          repo_root: .
+      name: Git::Push
+      version: '2.042'
+    -
       class: Dist::Zilla::Plugin::Readme::Brief
       name: Readme::Brief
       version: '0.003002'
     -
-      class: Dist::Zilla::Plugin::Git::NextVersion
+      class: Dist::Zilla::Plugin::RewriteVersion
       config:
-        Dist::Zilla::Plugin::Git::NextVersion:
-          first_version: '0.001'
-          version_by_branch: 0
-          version_regexp: (?^:^v(.+)$)
-        Dist::Zilla::Role::Git::Repo:
-          git_version: 2.11.0
-          repo_root: .
-      name: Git::NextVersion
-      version: '2.042'
+        Dist::Zilla::Plugin::RewriteVersion:
+          add_tarball_name: 0
+          finders:
+            - ':ExecFiles'
+            - ':InstallModules'
+          global: 0
+          skip_version_provider: 0
+      name: RewriteVersion
+      version: '0.015'
+    -
+      class: Dist::Zilla::Plugin::BumpVersionAfterRelease
+      config:
+        Dist::Zilla::Plugin::BumpVersionAfterRelease:
+          finders:
+            - ':ExecFiles'
+            - ':InstallModules'
+          global: 0
+          munge_makefile_pl: 1
+      name: BumpVersionAfterRelease
+      version: '0.015'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: AutoPrereqs
@@ -252,6 +284,14 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::ModuleShareDirs
       name: ModuleShareDirs
       version: '6.009'
+    -
+      class: Dist::Zilla::Plugin::Test::Perl::Critic
+      name: Test::Perl::Critic
+      version: '3.001'
+    -
+      class: Dist::Zilla::Plugin::CheckChangesHasContent
+      name: CheckChangesHasContent
+      version: '0.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'

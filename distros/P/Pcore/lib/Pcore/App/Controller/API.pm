@@ -34,14 +34,20 @@ sub run ( $self, $req ) {
                         $accept->(
                             max_message_size => $WS_MAX_MESSAGE_SIZE,
                             pong_interval    => $WS_PONG_INTERVAL,
-                            compression      => $WS_COMPRESSION,              #
-                            on_listen_event  => sub ( $ws, $ev ) {return},    # events currently are disabled
-                            on_fire_event    => sub ( $ws, $ev ) {return},    # events currently are disabled
-                            before_connect   => undef,
-                            on_connect       => sub ($ws) {
+                            compression      => $WS_COMPRESSION,
+                            on_listen_event  => sub ( $ws, $mask ) {
+                                return $self->on_listen_event( $ws, $mask );
+                            },
+                            on_fire_event => sub ( $ws, $key ) {
+                                return $self->on_fire_event( $ws, $key );
+                            },
+                            before_connect => undef,
+                            on_connect     => sub ($ws) {
 
                                 # store auth in websocket connection object
                                 $ws->{auth} = $auth;
+
+                                $self->on_connect($ws);
 
                                 return;
                             },
@@ -222,6 +228,18 @@ sub _http_api_router ( $self, $auth, $data, $cb ) {
 
     $cv->end;
 
+    return;
+}
+
+sub on_connect ( $self, $ws ) {
+    return;
+}
+
+sub on_listen_event ( $self, $ws, $mask ) {
+    return;
+}
+
+sub on_fire_event ( $self, $ws, $key ) {
     return;
 }
 

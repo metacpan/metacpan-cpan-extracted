@@ -2,7 +2,7 @@ package Test::UNIXSock;
 use strict;
 use warnings;
 use 5.00800;
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 use base qw/Exporter/;
 use IO::Socket::UNIX;
 use Test::SharedFork 0.12;

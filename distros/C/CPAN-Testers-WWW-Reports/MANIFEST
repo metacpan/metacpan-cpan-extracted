@@ -37,6 +37,7 @@ vhost/cgi-bin/config/requests/req.ini
 vhost/cgi-bin/config/requests/user.ini
 vhost/cgi-bin/config/settings.ini
 vhost/cgi-bin/db/cpanreps-base.sql
+vhost/cgi-bin/db/cpanreps-cpanstats.sql
 vhost/cgi-bin/pages.cgi
 vhost/cgi-bin/release-summary.cgi
 vhost/cgi-bin/reports-metadata.cgi

@@ -3,7 +3,7 @@
 # PODNAME: TestRail::Bin::Cases
 
 package TestRail::Bin::Cases;
-$TestRail::Bin::Cases::VERSION = '0.040';
+$TestRail::Bin::Cases::VERSION = '0.041';
 use strict;
 use warnings;
 use utf8;
@@ -99,7 +99,7 @@ TestRail::Bin::Cases - get information about cases inside various testsuites/sec
 
 =head1 VERSION
 
-version 0.040
+version 0.041
 
 =head1 SYNOPSIS
 

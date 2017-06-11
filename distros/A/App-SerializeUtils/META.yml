@@ -39,8 +39,8 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-SerializeUtils
   homepage: https://metacpan.org/release/App-SerializeUtils
-  repository: git://github.com/perlancar/perl-App-SerializeUtils.git
-version: '0.13'
+  repository: git://github.com/sharyanto/perl-App-SerializeUtils.git
+version: '0.14'
 x_Dist_Zilla:
   perl:
     version: '5.024000'

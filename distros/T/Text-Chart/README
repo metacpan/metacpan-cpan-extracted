@@ -105,3 +105,5 @@ SEE ALSO
     interface, colors, Unicode, resampling, more chart types like
     sparkline, animation and some interactivity (perhaps).
 
+    App::tchart, a CLI for Text::Chart.
+

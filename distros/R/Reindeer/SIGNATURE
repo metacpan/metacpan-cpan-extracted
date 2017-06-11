@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,62 +12,61 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA512
 
-SHA1 55ac697642a18dd7d974736a3d06fd531aa82382 .travis.yml
-SHA1 905059b4b609392f578aabc9532838c48eb4be5c Changes
-SHA1 62c6886b1f14e9e9a39f6bf00f5490057d3c2885 LICENSE
-SHA1 c7d7019b11ec51b3abdf0e88f323c1d77de81ddd MANIFEST
-SHA1 22456acb8ca66d5c3a736eb5db6ff2f719585571 META.json
-SHA1 437a936aa2a2af2b4fe258283c107ddebab349d5 META.yml
-SHA1 e9c6f46509f496fdb37af21a550738d642df56c9 Makefile.PL
-SHA1 df8723f2a380ff51c687292ae5032edddf8ccecb README
-SHA1 c2abf0f44de51ff9b1c1ca3b60481f9703533219 cpanfile
-SHA1 23d58477795ad0867b64ddacbf0790994e67f930 dist.ini
-SHA1 e8792d672f3bae97657d449c26d8cfd1953758d3 lib/Reindeer.pm
-SHA1 4f1c357ae6dbf7a32765406631e194929af029be lib/Reindeer/Builder.pm
-SHA1 89a07eec2f0eef19891391fae0918bdb436adfd3 lib/Reindeer/Role.pm
-SHA1 cf647c64d668404646837fb1d09868506725f99a lib/Reindeer/Types.pm
-SHA1 42e97071dec5630545a257df46918f23d1f89724 lib/Reindeer/Util.pm
-SHA1 c522c3928158e64bd97d34d20cbfe0b5305a7eb2 t/00-check-deps.t
-SHA1 80dbc0ab6f72419ed15e58507606bf1b17e797aa t/00-compile.t
-SHA1 02a63df0e2de221262f5d078b413e774a958a012 t/000-report-versions-tiny.t
-SHA1 3e348ed80b868b9a0416a6560602f4b7680bd6b2 t/basic_load.t
-SHA1 2353915bac7c7a6465336e2f90fc78bc6a880a9b t/builder/basic.t
-SHA1 d20d40639205c1b513db9551f90e5695df6cffd0 t/feature.t
+SHA1 007d9eadef38d89600c372861a631e950cadab7e .travis.yml
+SHA1 25d20408dd73e4b2a073997760deee1d86a1c0c1 Changes
+SHA1 f2f9418469081bc480ac10d66a24d74df885021a LICENSE
+SHA1 e1b14ef7bdd1e22de27b5648aea167a21aada45b MANIFEST
+SHA1 0a35d462fe731490f0a311447e26427a7f35d64e META.json
+SHA1 5862831bb68cab063a7e96970b5ef0de33160153 META.yml
+SHA1 98d060797f9c2d2dd1234734b2c130ec4c73b04f Makefile.PL
+SHA1 e6ff49d4e0a9284caab429a31d1e7dafe03e66c5 README
+SHA1 1fe89438c2ff942c61cb00e588cfeba3ef27a917 cpanfile
+SHA1 460884111d9b9e4295499230aa62b25ec6cd2fb6 dist.ini
+SHA1 4247351437153bf6e9fadb33372b30ed9218e66e lib/Reindeer.pm
+SHA1 e27f3adfe7173973566d1b9a17a335ae1a4fb7cb lib/Reindeer/Builder.pm
+SHA1 7af6e535c980ef1dbe25d836c355cb92260cc165 lib/Reindeer/Role.pm
+SHA1 0a2a044465f93925325113e6fcc771bff03fd0f7 lib/Reindeer/Types.pm
+SHA1 2393f25a0123783fb6910210d56e98652f787690 lib/Reindeer/Util.pm
+SHA1 4bdb7637c377a4563e26e887313ef118c1d1a22d t/00-check-deps.t
+SHA1 25439553924254c60e2348dec431b0ee0df71471 t/00-compile.t
+SHA1 27b12f82d0eb97c1cf708b7a17ba7ccf94d30102 t/00-report-prereqs.t
+SHA1 bfdf85b88502b1fdd2159ea82fd5fda421289d5d t/basic_load.t
+SHA1 fd7442475a73e185488d08837ac4bff85e75239d t/builder/basic.t
+SHA1 de3d48edcd0818a95e779c7ef982b3db7f6cf27b t/feature.t
 SHA1 2bc2c82c29f9a194842c6a4dffb4e309d802728b t/imports.t
-SHA1 2c1c7633c38330cb42069c0242a77cd4833a39c8 t/moosex-abstract/basic.t
-SHA1 b4fb06c47d6358edf31080c65d8344c9b9f065cb t/moosex-currieddelegation/basic.t
-SHA1 023f4f481ec818c680c97ce8776e8a2f011cdf72 t/moosex-markasmethods/basic.t
-SHA1 44e58d1e22f81d02bdecfadf0e25e2be0b7fb51d t/moosex-newdefaults/basic.t
-SHA1 2614949b2857dc5e2ae54eef7788dae3e311990c t/moosex-strictconstructor/basic.t
-SHA1 8b2f510696d02e25d73d41d7a990e524910dab2e t/moosex-traitor/basic.t
-SHA1 b3806bc38f7e31d85350b23500986932cba4fb57 t/optional-traits/autodestruct.t
-SHA1 b864cda3f7fb18567f9d988b5afdc94f36447fc4 t/optional-traits/env.t
-SHA1 40a6c44594d3305401c3267df9ee69f67b3c2983 t/optional-traits/undeftolerant.t
+SHA1 833606b87641f2f44cb86450ef725a4f60aa1a49 t/moosex-abstract/basic.t
+SHA1 4530d101fb4a1d0bb0c19db95103faabfcfee0c4 t/moosex-currieddelegation/basic.t
+SHA1 ca083551500828a4c6eee67611d29c41be10e574 t/moosex-markasmethods/basic.t
+SHA1 042d555fc6036e78b3d36e6f413df41443050c6f t/moosex-newdefaults/basic.t
+SHA1 33ce291cd8ad149cf4d03613414bb8e20b132a2c t/moosex-strictconstructor/basic.t
+SHA1 6657e9e287fc0d43a98e829053405655d137a8e0 t/moosex-traitor/basic.t
+SHA1 20456e6441b5f41f810b0dc1210ceffaaf9c9599 t/optional-traits/autodestruct.t
+SHA1 1ba4799d37763cad0e8c62c94b3aa521befdc63c t/optional-traits/env.t
+SHA1 adc3101c371c83e0226478f9b0e83085771585b9 t/optional-traits/undeftolerant.t
 SHA1 c7c81296979671d82ddca9651ea4ef9ad0e7ccae t/types.t
 SHA1 6b69fc6c25cbe8bbf6b7552689bd0619b30ec56d weaver.ini
-SHA1 a99237bd1c1ec52aea636b434200da72cdfce96f xt/author/no-tabs.t
-SHA1 1deb5cd9a647b4909cb53728e244dd658b00ebfe xt/release/has-version.t
-SHA1 d433c57cccbbe91759c76b4a2ad33466f3f0d74a xt/release/minimum-version.t
-SHA1 6fb4d97bdf99c184ef2dddc4e5debccd429a0be8 xt/release/no-smart-comments.t
-SHA1 5c5da473dd07f0ce48007a0a8e35f2911899636c xt/release/pod-coverage.t
-SHA1 ac3ba171eceedc9fae6890ccba2790901b860c1b xt/release/pod-linkcheck.t
-SHA1 720ae2774adc87053dc3c7e0a79fd512d92e4057 xt/release/pod-syntax.t
+SHA1 29f7c69c1e0bcabb4719390b8e3272462c7e0355 xt/author/no-tabs.t
+SHA1 b92147c82bcb84c651e6c931fbdfb963433e5aad xt/author/pod-coverage.t
+SHA1 6dad806f0dcc7ba4e69bc81deae667d3329fd366 xt/author/pod-linkcheck.t
+SHA1 e99568bdef280fa12f9dc185452f9d2e77271d52 xt/author/pod-syntax.t
+SHA1 f8377beca3688025d0ff9fb0534d69a3c1bb7566 xt/release/has-version.t
+SHA1 394ffbe39e5cb99002eb399896566fdaf03642b9 xt/release/minimum-version.t
+SHA1 ebd78a80022595ec4680623158edf2a608d6375a xt/release/no-smart-comments.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQIcBAEBAgAGBQJVF3uJAAoJEJ/Rlq0N/NXWaEQP/1P8sjLZjZVrOQXBj7mM74tL
-vnB80sS4Nq90FCOFoB5PUBBLhZ2/WWPNRr12KmsfIOKXepPJ92WIlNU/bM9J3ElC
-7tdXABW0wyGIUkfQAUh/27ghxPFzmq/sVE86m7HAFs761lIhqFepxvCQsm49zycR
-iBfGx09QTRAH3aRYjlWCRCzc9JIFpqoH2huOB3IZlcXnbe+Bh68M4CdOKGIUSH61
-PTScxmD4mJr69taWJFqD41NEwutvX2FL7KsEnU2TlUFU9jB/O+JWd+ZpwoMKMoQJ
-Dd54LF3oKVWjIqdjTnp59EV1PrtMfTQzisfdmuhb70kWIUSY19YeVrhdAa3AGIPx
-hBG5NcPRIsegk8HXIjtl3ZRSIQ1M5BjlrlsbJkbweLqJcd4u+xYT6vqFZ+kGCFGj
-BQ6VUi4ao6+KCnYZKDJuNjE8Ep6Lz8PYTPvgSFC23AZjUfIJwzFmKGh+HF5BVpWz
-Z+LrbeE65s0554NdKdC/NcFbBMJp2bY7pnhft3wTJ/hSAs4vJA2/40o2r/Pa2zJC
-WyF5opvALTWDDMJCyWJokAGAPGggFq5TC4w30z1HQLwmTkghQI15u4KmEnCzy4IM
-3z2tYqpO7aLWlKGCF/bQ3BgY9cZ20ioBzjXjUjWksK3MCGnZ+HiaGW+Uk1yygtfa
-wL3nZ7Y00HnwPeirpj7N
-=QEZa
+iQIzBAEBCgAdFiEEqvAjTK4OlkLFh465K77AqDC8C58FAlk7aBUACgkQK77AqDC8
+C5+uIg/+N0l/1B6QuuzhYoUFdt1nJcQOyMgqbBK+5PHxlVKVa7Q2udrhIJRWsUw3
+S0vleLv3140r9KijRR/CW43qNc2+XerVvfPHBYip5sQ4XDFgJiS0vk0Ut51uffXb
+oZe1Cvez9h9k3pVsaAkDPYaFvy4aO8SsZ3/1aWwhNvTeA1oXSe9zRfM27VV/aKVd
+vbyNn6ruerUIXA80ryaypVhO7DROp96PgI7HSG0MXSx1CSIrptAAhCIEWxuvgZu4
+Ic0rd47P2gD5hiTMOxwjtYacWlkllwT2GvfuDrPCUU0JKVbStZV7pA8RZvtvWXpu
+YXtOAik3Mbkn0Anmjwk8QKz0WdU0kps5CeC8OlR/LK4k4IAnj8M5vyDsERUTwo5I
+qAmM8JmaVnvIo9ZPCjUjDNeiLutMpxKf5WLDukQ4HVPQ/hmvMqf1wgjPej+CWc+N
+UhIbG4LRRoSOrpaHXdNOMyaQgswXD8uo+/qkotF1UtxXgGFVUI5azcXUrH2hVvUR
+L2KYdTCab6AxccWDynlKPYPsphP/AqTtnqjQ5c+0SL+167pHtbS1iNNH7GAjdhQp
+SL9mRAYZ5uPa04emIuXRrSd9Hl7svAlezn7D1aHNVyBDe6xoYLyZFfOHYA0G+/02
+qVH59Q2T/AXVXa2gMhKAKBo3gbHsWCYtUuftJq4WgyJb3WjFnLY=
+=ct4a
 -----END PGP SIGNATURE-----

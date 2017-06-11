@@ -7,6 +7,7 @@ cpanfile
 lib/App/RL.pm
 lib/App/RL/Command/combine.pm
 lib/App/RL/Command/compare.pm
+lib/App/RL/Command/convert.pm
 lib/App/RL/Command/cover.pm
 lib/App/RL/Command/coverage.pm
 lib/App/RL/Command/genome.pm
@@ -34,6 +35,7 @@ t/11-stat.t
 t/12-stat2.t
 t/13-position.t
 t/14-coverage.t
+t/15-convert.t
 t/90-decode-encode.t
 t/Atha.chr.sizes
 t/Atha.list

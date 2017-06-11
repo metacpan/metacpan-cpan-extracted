@@ -4,7 +4,7 @@ package Text::Shirasu::Node;
 
 =head1 NAME
 
-Text::Shirasu::Node - Shirasu Node Object
+Text::Shirasu::Node - Shirasu Node Object for Text::MeCab
 
 =head1 SYNOPSIS
 

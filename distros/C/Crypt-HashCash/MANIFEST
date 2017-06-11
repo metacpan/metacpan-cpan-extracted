@@ -1,0 +1,19 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Crypt/HashCash.pm
+lib/Crypt/HashCash/Mint.pm
+lib/Crypt/HashCash/Client.pm
+lib/Crypt/HashCash/Stash.pm
+lib/Crypt/HashCash/Coin.pm
+lib/Crypt/HashCash/Coin/Blinded.pm
+lib/Crypt/HashCash/CoinRequest.pm
+lib/Crypt/HashCash/Vault/Bitcoin.pm
+bin/vault.pl
+bin/hashcash.pl
+t/00-load.t
+t/01-hashcash.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

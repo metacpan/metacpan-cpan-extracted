@@ -1,0 +1,28 @@
+TAP-Harness-BailOnFail
+======================
+
+This module allows tools using Test::Harness to bail after encountering the
+first failure.
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    TAP::Harness::Restricted
+    Test::More
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2017 by gray <gray@cpan.org>
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

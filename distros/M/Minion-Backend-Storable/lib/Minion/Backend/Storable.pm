@@ -1,7 +1,7 @@
 package Minion::Backend::Storable;
 use Minion::Backend -base;
 
-our $VERSION = 5.083;
+our $VERSION = 5.084;
 
 use IO::Compress::Gzip 'gzip';
 use IO::Uncompress::Gunzip 'gunzip';

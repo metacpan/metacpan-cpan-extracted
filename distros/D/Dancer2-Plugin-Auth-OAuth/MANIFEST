@@ -14,6 +14,7 @@ lib/Dancer2/Plugin/Auth/OAuth/Provider/Facebook.pm
 lib/Dancer2/Plugin/Auth/OAuth/Provider/Github.pm
 lib/Dancer2/Plugin/Auth/OAuth/Provider/Google.pm
 lib/Dancer2/Plugin/Auth/OAuth/Provider/Linkedin.pm
+lib/Dancer2/Plugin/Auth/OAuth/Provider/Salesforce.pm
 lib/Dancer2/Plugin/Auth/OAuth/Provider/Stackexchange.pm
 lib/Dancer2/Plugin/Auth/OAuth/Provider/Twitter.pm
 t/01-dancer.t

@@ -13,6 +13,7 @@ patches/cd-dragonfly.diff
 patches/ft-missing-makefile.diff
 patches/im-3.11-cygwin.diff
 patches/im-dragonfly.diff
+patches/im-tiff.diff
 patches/iup-3.19.1-cygwin.diff
 patches/iup-cygwin.diff
 patches/iup-gtk-hack.diff

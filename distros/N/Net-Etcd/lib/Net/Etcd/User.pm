@@ -20,7 +20,7 @@ Net::Etcd::User
 
 =cut
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 =head1 DESCRIPTION
 
@@ -64,7 +64,7 @@ has password => (
 
 =head2 add
 
-$etcd->user({ name =>'foo' password => 'bar' })->add
+    $etcd->user({ name =>'foo' password => 'bar' })->add
 
 =cut
 
@@ -79,13 +79,27 @@ sub add {
 
 =head2 delete
 
-$etcd->user({ name =>'foo' })->delete
+    $etcd->user({ name =>'foo' })->delete
 
 =cut
 
 sub delete {
     my $self = shift;
     $self->{endpoint} = '/auth/user/delete';
+    $self->request;
+    return $self;
+}
+
+
+=head2 changepw
+
+    $etcd->user({ name =>'foo' password => 'bar' })->changepw
+
+=cut
+
+sub changepw {
+    my $self = shift;
+    $self->{endpoint} = '/auth/user/changepw';
     $self->request;
     return $self;
 }

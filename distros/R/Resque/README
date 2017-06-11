@@ -1,7 +1,7 @@
 
 
 This archive contains the distribution Resque,
-version 0.31:
+version 0.34:
 
   Redis-backed library for creating background jobs, placing them on multiple queues, and processing them later.
 

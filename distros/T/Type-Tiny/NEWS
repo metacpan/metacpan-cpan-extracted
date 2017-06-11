@@ -4,23 +4,6 @@
    changes in development releases, see the "Changes" file instead.
 =======================================================================
 
-2014-03-17 Type-Tiny version 0.040 released!
-
- - Deprecated module Exporter::TypeTiny is now gone.
- - Restructure and expand test suite.
- - Coercion bugfixes.
- - Improvements to overloaded operations on parameterized types.
- - Fix problems with threaded Perl 5.18.x.
-
-2014-04-02 Type-Tiny version 0.042 released!
-
- - One year since Type-Tiny 0.000_01 was uploaded to CPAN.
- - No more overloaded addition operator on Type::Tiny/Type::Coercion.
-
-2014-06-03 Type-Tiny version 0.044 released!
-
- - Lots of bugfixes, tests, and documentation improvements.
-
 2014-07-18 Type-Tiny version 0.046 released!
 
  - Support for Type::Tiny::XS.
@@ -35,3 +18,15 @@
  - Better behaviour of non-frozen coercions.
    (For example, they are no longer considered to be inlineable.)
  - Better integration between Type::Library and Type::Registry.
+
+2017-06-01 Type-Tiny version 1.002000 released!
+
+ - Type::Params now has `compile_named` and `validate_named`.
+ - Type::Tiny's `constraint` parameter may be a string of code.
+ - Types::Standard::CycleTuple added.
+ - Types::Standard::RegexpRef now accepts blessed objects where
+   $object->isa('Regexp'). This plays better with re::engine::*
+   pragmas.
+ - Fixed bug where Types::Standard::Int would *sometimes* accept
+   an overloaded object. (It never should.)
+ - Various performance enhancements and bug fixes.

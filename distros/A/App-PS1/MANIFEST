@@ -1,4 +1,3 @@
-.travis.yml
 bin/app-ps1
 Build.PL
 Changes
@@ -7,6 +6,7 @@ lib/App/PS1/Daemon.pm
 lib/App/PS1/Plugin/Branch.pm
 lib/App/PS1/Plugin/Date.pm
 lib/App/PS1/Plugin/Directory.pm
+lib/App/PS1/Plugin/Env.pm
 lib/App/PS1/Plugin/Face.pm
 lib/App/PS1/Plugin/Node.pm
 lib/App/PS1/Plugin/Perl.pm

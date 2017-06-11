@@ -92,8 +92,9 @@ DESCRIPTION
     All I/O and queries are performed synchronously. However, the
     "Write-Ahead Log" journal is enabled for all connections, allowing
     multiple processes to read and write concurrently to the same database
-    file (but only one can write at a time). See http://sqlite.org/wal.html
-    for more information.
+    file (but only one can write at a time). You can prevent this mode from
+    being enabled by passing the option no_wal. See
+    http://sqlite.org/wal.html for more information.
 
       # Performed concurrently
       my $pid = fork || die $!;
@@ -281,6 +282,9 @@ METHODS
     
       # Additional options
       $sql->from_filename($filename, { PrintError => 1 });
+      
+      # Readonly connection without WAL mode
+      $sql->from_filename($filename, { ReadOnly => 1, no_wal => 1 });
 
  from_string
 
@@ -330,6 +334,9 @@ METHODS
       $sql->from_string('data.db?PrintError=1&sqlite_allow_multiple_statements=1');
       $sql->from_string(Mojo::URL->new->scheme('sqlite')->path($filename)->query(sqlite_see_if_its_a_number => 1));
       $sql->from_string(URI::file->new($filename)->Mojo::Base::tap(query_form => {PrintError => 1}));
+    
+      # Readonly connection without WAL mode
+      $sql->from_string('data.db?ReadOnly=1&no_wal=1');
 
 DEBUGGING
 

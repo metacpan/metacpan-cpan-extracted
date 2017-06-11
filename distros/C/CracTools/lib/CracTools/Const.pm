@@ -1,9 +1,10 @@
 package CracTools::Const;
+
 {
   $CracTools::Const::DIST = 'CracTools';
 }
 # ABSTRACT: Constants for the CracTools-core
-$CracTools::Const::VERSION = '1.25';
+$CracTools::Const::VERSION = '1.251';
 use strict;
 use warnings;
 use Exporter qw(import);
@@ -35,7 +36,7 @@ CracTools::Const - Constants for the CracTools-core
 
 =head1 VERSION
 
-version 1.25
+version 1.251
 
 =head1 SYNOPSIS
 

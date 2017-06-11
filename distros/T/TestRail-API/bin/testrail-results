@@ -3,7 +3,7 @@
 # PODNAME: TestRail::Bin::Results
 
 package TestRail::Bin::Results;
-$TestRail::Bin::Results::VERSION = '0.040';
+$TestRail::Bin::Results::VERSION = '0.041';
 use strict;
 use warnings;
 use utf8;
@@ -343,7 +343,7 @@ TestRail::Bin::Results - List results for specified test(s).
 
 =head1 VERSION
 
-version 0.040
+version 0.041
 
 =head1 SYNOPSIS
 

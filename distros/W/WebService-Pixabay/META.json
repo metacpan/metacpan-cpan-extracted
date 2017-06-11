@@ -21,14 +21,18 @@
       },
       "runtime" : {
          "requires" : {
-            "Data::Printer" : "0.39",
+            "Data::Dumper" : "0",
             "Function::Parameters" : "2.000006",
             "LWP::Online" : "1.08",
             "Modern::Perl" : "1.20170117",
             "Moo" : "2.003000",
-            "Test::More" : "1.302075",
-            "WebService::Client" : "0.0501",
+            "WebService::Client" : "0.0601",
             "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
          }
       }
    },
@@ -44,7 +48,7 @@
          "web" : "https://github.com/faraco/WebService-Pixabay"
       }
    },
-   "version" : "0.0.6",
+   "version" : "2.0.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
 }
 

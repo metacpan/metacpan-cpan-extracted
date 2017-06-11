@@ -1,0 +1,117 @@
+NAME
+
+    Geo::Compass::Variation - Accurately calculate magnetic declination and
+    inclination
+
+SYNOPSIS
+
+        use Geo::Compass::Variation qw(mag_dec mag_inc);
+    
+        my $lat = 53.1234567;
+        my $lon = -114.1234567;
+        my $alt = 1098;
+    
+        my $declination = mag_dec($lat, $lon, $alt);
+        my $inclination = mag_inc($lat, $lon, $alt);
+
+DESCRIPTION
+
+    This module calculates and returns the Magnetic declination and
+    inclination (dip) calculations based on WMM earth magnetism model for a
+    specified latitude and longitude pair.
+
+    See NOAA <https://www.ngdc.noaa.gov/geomag/WMM/DoDWMM.shtml> for
+    details.
+
+EXPORT_OK
+
+    All functions must be imported explicitly:
+
+        use Geo::Compass::Variation qw(mag_dec mag_inc);
+    
+        # or
+    
+        use Geo::Compass::Variation qw(:all);
+
+    Note: The mag_dec function has an alias of mag_var which can be
+    imported explicitly, or with the :all tag.
+
+FUNCTIONS
+
+ mag_dec
+
+    Calculates and returns the magnetic declination of a pair of GPS
+    coordinates.
+
+    Parameters:
+
+        $lat
+
+    Mandatory, Float: Latitude, in signed notation (eg: 53.1111111.
+    Negative is South and positive is North of the Equator.
+
+        $lon
+
+    Mandatory, Float: Longitude, in signed notiation (eg: -114.11111.
+    Negative is West and positive is East of the Prime Meridian.
+
+        $alt
+
+    Optional, Integer: Altitude above sea level, in metres. Defaults to 0.
+
+        $year
+
+    Optional, Integer|Float: The year to base the calculation from.
+    Defaults to 2017.5.
+
+    Return: A floating point number representing the magnetic declination.
+
+ mag_var
+
+    Simply an alias for "mag_dec".
+
+ mag_inc
+
+    Calculates and returns the magnetic inclination of a pair of GPS
+    coordinates.
+
+    Parameters:
+
+    Parameters are exactly the same as for the "mag_dec" function. Please
+    review that documentation section for full details.
+
+    Return: A floating point number representing the magnetic inclination.
+
+ mag_field
+
+    Core function that calcluates the raw magnetic field north component
+    ($X), the east component ($Y) and the vertical component ($Z).
+
+    Takes the same parameters as "mag_dec". Please see that function's
+    documentation for full details.
+
+AUTHOR
+
+    Steve Bertrand, <steveb at cpan.org>
+
+ACKNOWLEDGEMENTS
+
+    All the thanks goes out to no_slogan
+    <http://perlmonks.org/?node_id=78006> of Perlmonks for all of the core
+    functionality.
+
+    It was presented here <http://perlmonks.org/?node_id=1191907>, in
+    response to this thread <http://perlmonks.org/?node_id=1191753> I had
+    started regarding a code review of some prototype code I wrote to
+    calculate the direction between two pairs of GPS coordinates.
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2017 Steve Bertrand.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

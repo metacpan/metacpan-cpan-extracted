@@ -11,7 +11,7 @@ use File::chdir;
 # VERSION
 
 
-package App::af::download 0.09 {
+package App::af::download 0.10 {
   use Moose;
   use namespace::autoclean;
   use MooseX::Types::Path::Tiny qw( AbsPath );
@@ -82,7 +82,7 @@ package App::af::download 0.09 {
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::install {
+package App::af::install 0.10 {
   use Moose;
   use namespace::autoclean;
   use File::Temp qw( tempdir );
@@ -326,7 +326,7 @@ package App::af::install {
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::requires {
+package App::af::requires 0.10 {
   use Moose;
   use namespace::autoclean;
   use YAML qw( Dump );
@@ -361,7 +361,7 @@ package App::af::requires {
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::missing {
+package App::af::missing 0.10 {
   use Moose;
   use namespace::autoclean;
   use Capture::Tiny qw( capture );
@@ -420,7 +420,7 @@ package App::af::missing {
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::prop {
+package App::af::prop 0.10 {
   use Moose;
   use namespace::autoclean;
 
@@ -522,7 +522,7 @@ package App::af::prop {
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::list {
+package App::af::list 0.10 {
   use Moose;
   use namespace::autoclean;
   use Path::Tiny qw( path );
@@ -616,7 +616,7 @@ af - Command line tool for alienfile
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 

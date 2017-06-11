@@ -127,10 +127,22 @@ sub validate_hash {
   my ($desc, $h) = @_;
   local $::Level = $::Level + 1;
 
-  my $scalar = %$h;
+  # test that scalar(%hash) works as expected, which as of perl 5.25 is
+  # the same as 0+keys %hash;
+  my $scalar= scalar %$h;
+  my $count= 0+keys %$h;
+
+  is($scalar, $count, "$desc scalar() should be the same as 0+keys() as of perl 5.25");
+
+  require Hash::Util;
+  sub Hash::Util::bucket_ratio (\%);
+
+  # back compat tests, via Hash::Util::bucket_ratio();
+  my $ratio = Hash::Util::bucket_ratio(%$h);
   my $expect = qr!\A(\d+)/(\d+)\z!;
-  like($scalar, $expect, "$desc in scalar context matches pattern");
-  my ($used, $total) = $scalar =~ $expect;
+  like($ratio, $expect, "$desc bucket_ratio matches pattern");
+  my ($used, $total)= (0,0);
+  ($used, $total)= ($1,$2) if $ratio =~ /$expect/;
   cmp_ok($total, '>', 0, "$desc has >0 array size ($total)");
   cmp_ok($used, '>', 0, "$desc uses >0 heads ($used)");
   cmp_ok($used, '<=', $total,
@@ -203,9 +215,13 @@ sub torture_hash {
   is(scalar %$h1, scalar %$h, "scalar keys is identical on copy and original");
 }
 
-torture_hash('a .. zz', 'a' .. 'zz');
-torture_hash('0 .. 9', 0 .. 9);
-torture_hash("'Perl'", 'Rules');
+if (is_miniperl) {
+    print "# skipping torture_hash tests on miniperl because no Hash::Util\n";
+} else {
+    torture_hash('a .. zz', 'a' .. 'zz');
+    torture_hash('0 .. 9', 0 .. 9);
+    torture_hash("'Perl'", 'Rules');
+}
 
 {
     my %h = qw(a x b y c z);
@@ -213,5 +229,26 @@ torture_hash("'Perl'", 'Rules');
     %h = $h{a};
     is(join(':', %h), 'x:', 'hash self-assign');
 }
+
+# magic keys and values should be evaluated before the hash on the LHS is
+# cleared
+
+package Magic {
+    my %inner;
+    sub TIEHASH { bless [] }
+    sub FETCH { $inner{$_[1]} }
+    sub STORE { $inner{$_[1]} = $_[2]; }
+    sub CLEAR { %inner = () }
+
+    my (%t1, %t2);
+    tie %t1, 'Magic';
+    tie %t2, 'Magic';
+
+    %inner = qw(a x b y);
+    %t1 = (@t2{'a','b'});
+    ::is(join( ':', %inner), "x:y", "magic keys");
+}
+
+
 
 done_testing();

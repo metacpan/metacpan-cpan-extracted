@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Test::More;
 use DateTime;
-use File::Slurp::Tiny qw(read_file);
+use File::Slurper qw(read_text);
 use FindBin '$Bin';
 use Finance::Bank::ID::Mandiri;
 
@@ -14,7 +14,7 @@ for my $f (
     ["stmt1.html", "ib, html"],
     ["stmt1.opera10linux.txt", "ib, txt, opera10linux"],
     ["stmt1.ff35linux.txt", "ib, txt, ff35linux"]) {
-    my $resp = $ibank->parse_statement(scalar read_file("$Bin/data/$f->[0]"));
+    my $resp = $ibank->parse_statement(read_text("$Bin/data/$f->[0]"));
     die "status=$resp->[0], error=$resp->[1]\n" if $resp->[0] != 200;
     my $stmt = $resp->[2];
 
@@ -42,7 +42,7 @@ for my $f (
 
 for my $f (
     ["stmt-cms.txt", "cms, txt"],) {
-    my $resp = $ibank->parse_statement(scalar read_file("$Bin/data/$f->[0]"));
+    my $resp = $ibank->parse_statement(read_text("$Bin/data/$f->[0]"));
     die "status=$resp->[0], error=$resp->[1]\n" if $resp->[0] != 200;
     my $stmt = $resp->[2];
 
@@ -73,7 +73,7 @@ for my $f (
 
 for my $f (
     ["stmt-mcm-v201103.csv", "mcm v201103, semicolon"],) {
-    my $resp = $ibank->parse_statement(scalar read_file("$Bin/data/$f->[0]"));
+    my $resp = $ibank->parse_statement(read_text("$Bin/data/$f->[0]"));
     die "status=$resp->[0], error=$resp->[1]\n" if $resp->[0] != 200;
     my $stmt = $resp->[2];
 
@@ -104,7 +104,7 @@ for my $f (
 
 for my $f (
     ["stmt-mcm-v201107.csv", "mcm v201107, semicolon"],) {
-    my $resp = $ibank->parse_statement(scalar read_file("$Bin/data/$f->[0]"));
+    my $resp = $ibank->parse_statement(read_text("$Bin/data/$f->[0]"));
     die "status=$resp->[0], error=$resp->[1]\n" if $resp->[0] != 200;
     my $stmt = $resp->[2];
 

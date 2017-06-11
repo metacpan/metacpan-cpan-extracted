@@ -37,6 +37,7 @@
          },
          "requires" : {
             "Carp" : "0",
+            "Data::Dumper" : "0",
             "Data::Serializer::Raw" : "0",
             "HTTP::Headers" : "0",
             "HTTP::Message" : "0",
@@ -64,10 +65,17 @@
             "HTTP::Thin" : "0",
             "JSON" : "2.00",
             "Moose" : "0",
+            "Plack::Component" : "0",
+            "Plack::Request" : "0",
+            "Plack::Runner" : "0",
             "Test::Deep" : "0",
+            "Test::Exception" : "0",
             "Test::More" : "0.88",
+            "Test::TCP" : "0",
+            "Test::Warnings" : "0",
             "XML::Simple" : "0",
             "YAML" : "0",
+            "parent" : "0",
             "strict" : "0",
             "utf8" : "0",
             "warnings" : "0"
@@ -82,6 +90,6 @@
          "web" : "http://github.com/kaare/Role-REST-Client"
       }
    },
-   "version" : "0.19"
+   "version" : "0.22"
 }
 

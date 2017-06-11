@@ -1,21 +1,38 @@
 #!/usr/bin/env perl
 =head1 NAME
 
-nodie.pl - runs immortal processes
+nodie.pl - runs command again when its dead
 
 =head1 VERSION
 
-version 1.00
+version 1.02
 
 =head1 SYNOPSIS
 
 =over
 
-B<nodie.pl> [ -e|--exitcodes=0,2 ] command arg1 arg2 ...
+B<nodie.pl> [ -e|--exitcodes=0,2 ] [ -l|--log='&STDERR' ] command arg1 arg2 ...
 
 B<nodie.pl> -h|--help
 
 =back
+
+=head1 DESCRIPTION
+
+B<nodie.pl> is a part of App::nodie package that runs command again when its dead.
+
+=head2 Arguments
+
+=head3 --exitcodes
+
+B<--exitcodes> or B<-e> specifies that expected exit codes for graceful termination of command in comma separated string.
+By default '0,2'.
+
+=head3 --log
+
+B<--log> or B<-l> enables printing logs and specifies log file name/descriptor.
+If log file name/descriptor isn't specified in argument, default is '&STDERR'.
+'-' is synonym with '&STDOUT'. File descriptors must start with '&', eg '&2'.
 
 =cut
 use strict;
@@ -25,9 +42,8 @@ use v5.10.1;
 use App::nodie;
 
 
-BEGIN
-{
-	our $VERSION     = '1.00';
+BEGIN {
+	our $VERSION     = '1.02';
 }
 
 

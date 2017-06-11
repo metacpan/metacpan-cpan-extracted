@@ -1,5 +1,8 @@
 Revision history for dropbox-api
 
+2.13 2017-05-31T11:33:47Z
+        - Update module version
+
 2.12 2017-02-07T09:23:46Z
         - fix typo
         - use upload_session

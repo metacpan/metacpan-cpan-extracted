@@ -1,9 +1,9 @@
 package Module::CheckVersion;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2016-03-16'; # DATE
+our $DATE = '2017-06-09'; # DATE
 our $DIST = 'Module-CheckVersion'; # DIST
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 use 5.010001;
 use strict;
@@ -132,7 +132,7 @@ Module::CheckVersion - Check module (e.g. check latest version) with CPAN (or eq
 
 =head1 VERSION
 
-This document describes version 0.07 of Module::CheckVersion (from Perl distribution Module-CheckVersion), released on 2016-03-16.
+This document describes version 0.08 of Module::CheckVersion (from Perl distribution Module-CheckVersion), released on 2017-06-09.
 
 =head1 SYNOPSIS
 
@@ -149,7 +149,11 @@ Check latest version of modules:
 =head1 FUNCTIONS
 
 
-=head2 check_module_version(%args) -> [status, msg, result, meta]
+=head2 check_module_version
+
+Usage:
+
+ check_module_version(%args) -> [status, msg, result, meta]
 
 Check module (e.g. check latest version) with CPAN (or equivalent repo).
 
@@ -223,7 +227,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

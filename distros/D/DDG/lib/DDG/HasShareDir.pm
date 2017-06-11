@@ -1,7 +1,7 @@
 package DDG::HasShareDir;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Role for a plugin that has a share directory
-$DDG::HasShareDir::VERSION = '1016';
+$DDG::HasShareDir::VERSION = '1017';
 use Moo::Role;
 
 requires qw(
@@ -22,7 +22,7 @@ DDG::HasShareDir - Role for a plugin that has a share directory
 
 =head1 VERSION
 
-version 1016
+version 1017
 
 =head1 DESCRIPTION
 

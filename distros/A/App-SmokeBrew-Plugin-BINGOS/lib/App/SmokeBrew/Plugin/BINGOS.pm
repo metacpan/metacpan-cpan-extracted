@@ -1,5 +1,5 @@
 package App::SmokeBrew::Plugin::BINGOS;
-$App::SmokeBrew::Plugin::BINGOS::VERSION = '0.12';
+$App::SmokeBrew::Plugin::BINGOS::VERSION = '0.16';
 #ABSTRACT: a smokebrew plugin to configure things like BINGOS does
 
 use strict;
@@ -46,7 +46,7 @@ BEGIN {
 
     $ENV{'PERL5LIB'} = join $Config{'path_sep'}, grep { defined }
                         $PRIV_LIB,              # to find the boxed config
-                        #$LIB_DIR,               # the CPANPLUS libs
+                        $LIB_DIR,               # the CPANPLUS libs
                         $ENV{'PERL5LIB'};       # original PERL5LIB
 
 }
@@ -122,6 +122,7 @@ my $ConfigFile  = $ConfObj->_config_pm_to_file( $Config => $PRIV_LIB );
     my $su = $cb->selfupdate_object;
 
     $cb->module_tree( 'Test::More' )->install() if $] == 5.010000; # need this because 'version'
+    $cb->module_tree( 'parent' )->install() if $] < 5.010001; # need this because 'version'
     $cb->module_tree( 'version' )->install(); # Move this here too because EUMM icky is icky :S
     $cb->module_tree( 'ExtUtils::MakeMaker' )->install(); # Move this here because icky is icky >:)
     $cb->module_tree( 'Module::Build' )->install(); # Move this here because perl-5.10.0 is icky
@@ -203,7 +204,7 @@ App::SmokeBrew::Plugin::BINGOS - a smokebrew plugin to configure things like BIN
 
 =head1 VERSION
 
-version 0.12
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -268,7 +269,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Chris Williams.
+This software is copyright (c) 2017 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -2,26 +2,29 @@ use strict;
 use warnings FATAL => 'all';
 
 package MarpaX::ESLIF::ECMA404::ValueInterface;
+use Math::BigInt;
+use Math::BigFloat;
+use Carp qw/croak/;
+
+our $FFFD = chr(0xFFFD);
 
 # ABSTRACT: MarpaX::ESLIF::ECMA404 Value Interface
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-
-my $_BACKSPACE = chr(0x0008);
-my $_FORMFEED  = chr(0x000C);
-my $_NEWLINE   = chr(0x000A);
-my $_RETURN    = chr(0x000D);
-my $_TAB       = chr(0x0009);
 
 # -----------
 # Constructor
 # -----------
 
 
-sub new                { bless [], $_[0] }
+sub new {
+    my ($pkg, %options) = @_;
+
+    bless { result => undef, %options }, $pkg
+}
 
 # ----------------
 # Required methods
@@ -43,72 +46,133 @@ sub isWithNull         { 0 }  # Allow null parse ?
 sub maxParses          { 0 }  # Maximum number of parse tree values
 
 
-sub getResult { $_[0]->[0] }
+sub getResult { $_[0]->{result} }
 
 
-sub setResult { $_[0]->[0] = $_[1] }
+sub setResult { $_[0]->{result} = $_[1] }
 
 # ----------------
 # Specific actions
 # ----------------
 
 
-sub empty_string            { ''               } # chars ::=
-
-
-sub hex2codepoint_character { chr(hex($_[3]))  } # char  ::= '\\' 'u' /[[:xdigit:]]{4}/
-
-
-sub pairs                   { [ $_[1], $_[3] ] } # pairs ::= string ':' value
-
-
-sub backspace_character     { $_BACKSPACE      } # char  ::= '\\' 'b'
-
-
-sub formfeed_character      { $_FORMFEED       } # char  ::= '\\' 'f'
-
-
-sub newline_character       { $_NEWLINE        } # char  ::= '\\' 'n'
-
-
-sub return_character        { $_RETURN         } # char  ::= '\\' 'r'
-
-
-sub tabulation_character    { $_TAB            } # char  ::= '\\' 't'
-#
-# Methods that need some hacking -;
-#
-# Separator is PART of the arguments i.e.:
-# ($self, $value1, $separator, $value2, $separator, etc...)
-#
-# C.f. http://www.perlmonks.org/?node_id=566543 for explanation of the method
-#
-
-
-sub array_ref {                                 # elements ::= value*
-    #
-    # elements ::= value+ separator => ','
-    #
-    # i.e. arguments are: ($self, $value1, $separator, $value2, $separator, etc..., $valuen)
-    # Where value is always a token
-    #
-    [ map { $_[$_*2+1] } 0..int(@_/2)-1 ]
+sub empty_string {
+  ''
 }
 
 
-sub members {                                   # members  ::= pairs*
+sub unicode {
+  my ($self, $u) = @_;
+
+  my @hex;
+  while ($u =~ m/\\u([[:xdigit:]]{4})/g) {
+    push(@hex, hex($1))
+  }
+
+  my $result;
+  while (@hex) {
+    if ($#hex > 0) {
+      my ($high, $low) = @hex;
+      #
+      # An UTF-16 surrogate pair ?
+      #
+      if (($high >= 0xD800) && ($high <= 0xDBFF) && ($low >= 0xDC00) && ($low <= 0xDFFF)) {
+        #
+        # Yes.
+        # This is evaled for one reason only: some old versions of perl may croak with special characters like
+        # "Unicode character 0x10ffff is illegal"
+        #
+        $result .= eval {chr((($high - 0xD800) * 0x400) + ($low - 0xDC00) + 0x10000)} // $FFFD;
+        splice(@hex, 0, 2)
+      } else {
+        #
+        # No. Take first \uhhhh as a code point. Fallback to replacement character 0xFFFD if invalid.
+        # Eval returns undef in scalar context if there is a failure.
+        #
+        $result .= eval {chr(shift @hex) } // $FFFD
+      }
+    } else {
+      #
+      # \uhhhh taken as a code point. Fallback to replacement character 0xFFFD if invalid.
+      # Eval returns undef in scalar context if there is a failure.
+      #
+      $result .= eval {chr(shift @hex) } // $FFFD
+    }
+  }
+
+  $result
+}
+
+
+sub members {
+    my ($self, @pairs) = @_;
     #
-    # members  ::= pairs+ separator => ','
-    #
-    # i.e. arguments are: ($self, $pair1, $separator, $pair2, $separator, etc..., $pairn)
+    # Arguments are: ($self, $pair1, $pair2, etc..., $pairn)
     #
     my %hash;
-    # Where pairs is always an array ref [string,value]
-    #
-    foreach (map { $_[$_*2+1] } 0..int(@_/2)-1) {
-        $hash{$_->[0]} = $_->[1]
+    foreach (@pairs) {
+      my ($key, $value) = @{$_};
+      if (exists $hash{$key}) {
+        if ($self->{disallow_dupkeys}) {
+          #
+          # Just make sure the key printed out contains only printable things
+          #
+          my $ascii = $key;
+          $ascii =~ s/[^[:print:]]/ /g;
+          $ascii .= " (printable characters only)" unless $ascii eq $key;
+          $self->{logger}->errorf('Duplicate key %s', $ascii) if $self->{logger};
+          croak "Duplicate key $ascii"
+        } else {
+          $self->{logger}->warnf('Duplicate key %s', $key) if $self->{logger}
+        }
+      }
+      $hash{$key} = $value
     }
     \%hash
+}
+
+
+sub number {
+  my ($self, $number) = @_;
+  #
+  # We are sure this is a float if there is the dot '.' or the exponent [eE]
+  #
+  ($number =~ /[\.eE]/) ? Math::BigFloat->new($number) : Math::BigInt->new($number)
+}
+
+
+sub nan {
+    Math::BigInt->bnan()
+}
+
+
+sub negative_infinity {
+    Math::BigInt->binf('-')
+}
+
+
+sub positive_infinity {
+    Math::BigInt->binf()
+}
+
+
+sub true {
+    1
+}
+
+
+sub false {
+    0
+}
+
+
+sub pairs {
+    [ $_[1], $_[3] ]
+}
+
+
+sub elements {
+    @_ ? \@_ : []
 }
 
 
@@ -126,7 +190,7 @@ MarpaX::ESLIF::ECMA404::ValueInterface - MarpaX::ESLIF::ECMA404 Value Interface
 
 =head1 VERSION
 
-version 0.003
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -146,75 +210,79 @@ Instantiate a new value interface object.
 
 =head2 Required methods
 
-=head3 isWithHighRankOnly($self)
+=head3 isWithHighRankOnly
 
 Returns a true or a false value, indicating if valuation should use highest ranked rules or not, respectively. Default is a true value.
 
-=head3 isWithOrderByRank($self)
+=head3 isWithOrderByRank
 
 Returns a true or a false value, indicating if valuation should order by rule rank or not, respectively. Default is a true value.
 
-=head3 isWithAmbiguous($self)
+=head3 isWithAmbiguous
 
 Returns a true or a false value, indicating if valuation should allow ambiguous parse tree or not, respectively. Default is a false value.
 
-=head3 isWithNull($self)
+=head3 isWithNull
 
 Returns a true or a false value, indicating if valuation should allow a null parse tree or not, respectively. Default is a false value.
 
-=head3 maxParses($self)
+=head3 maxParses
 
 Returns the number of maximum parse tree valuations. Default is unlimited (i.e. a false value).
 
-=head3 getResult($self)
+=head3 getResult
 
 Returns the current parse tree value.
 
-=head3 setResult($self)
+=head3 setResult
 
 Sets the current parse tree value.
 
 =head2 Specific actions
 
-=head3 empty_string($self)
+=head3 empty_string
 
-Action for rule C<chars ::=>.
+Action for rule C<chars ::=>
 
-=head3 hex2codepoint_character($self)
+=head3 unicode
 
-Action for rule C<char ::= '\\' 'u' /[[:xdigit:]]{4}/>.
+Action for rule C<char ::= /(?:\\u[[:xdigit:]]{4})+/
 
-=head3 pairs($self)
+=head3 members
 
-Action for rule C<cpairs ::= string ':' value>.
+Action for rule C<members  ::= pairs* separator => ','> hide-separator => 1
 
-=head3 backspace_character($self)
+=head3 number
 
-Action for rule C<char ::= '\\' 'b'>.
+Action for rule C<number ::= /\-?(?:(?:[1-9]?[0-9]*)|[0-9])(?:\.[0-9]*)?(?:[eE](?:[+-])?[0-9]+)?/>
 
-=head3 formfeed_character($self)
+=head3 nan
 
-Action for rule C<char ::= '\\' 'f'>.
+Action for rules C<number ::= '-' 'NaN'> and C<number ::= 'NaN'>
 
-=head3 newline_character($self)
+=head3 negative_infinity
 
-Action for rule C<char ::= '\\' 'n'>.
+Action for rule C<number ::= '-' 'Infinity'>
 
-=head3 return_character($self)
+=head3 positive_infinity
 
-Action for rule C<char ::= '\\' 'r'>.
+Action for rule C<number ::= 'Infinity'>
 
-=head3 tabulation_character($self)
+=head3 true
 
-Action for rule C<char ::= '\\' 't'>.
+Action for rule C<value ::= 'true'>
 
-=head3 array_ref($self)
+=head3 false
 
-Action for rule C<elements ::= value* separator => ','>.
+Action for rule C<value ::= 'false'>
 
-=head3 members($self)
+=head3 pairs
 
-Action for rule C<members  ::= pairs* separator => ','>.
+Action for rule C<pairs ::= string ':' value'>
+
+=head3 elements
+
+Action for rule C<elements ::= value*'>
 
 =head1 SEE ALSO
 

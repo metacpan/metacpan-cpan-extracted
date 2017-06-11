@@ -34,8 +34,8 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Data::Password::Filter'         => { file => 'lib/Data/Password/Filter.pm'       , version => '0.16' },
-            'Data::Password::Filter::Params' => { file => 'lib/Data/Password/Filter/Params.pm', version => '0.16' },
+            'Data::Password::Filter'         => { file => 'lib/Data/Password/Filter.pm'       , version => '0.17' },
+            'Data::Password::Filter::Params' => { file => 'lib/Data/Password/Filter/Params.pm', version => '0.17' },
         },
         resources => {
             repository => {

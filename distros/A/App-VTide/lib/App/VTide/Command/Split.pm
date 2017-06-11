@@ -15,7 +15,7 @@ use YAML::Syck;
 
 extends 'App::VTide::Command::Start';
 
-our $VERSION = version->new('0.1.2');
+our $VERSION = version->new('0.1.3');
 our $NAME    = 'split';
 our $OPTIONS = [
     'test|t!',
@@ -56,7 +56,7 @@ App::VTide::Command::Split - Split tmux terminal helper
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Split version 0.1.2
+This documentation refers to App::VTide::Command::Split version 0.1.3
 
 =head1 SYNOPSIS
 
@@ -68,6 +68,12 @@ This documentation refers to App::VTide::Command::Split version 0.1.2
      -v --verbose   Show environment as well as config
         --help      Show this help
         --man       Show the full man page
+
+    Examples
+      # split the screen horizontally (keep cursor on initial screen)
+      vtide split h
+      # split the screen horizontally (move cursor to new screen)
+      vtide split H
 
 =head1 DESCRIPTION
 

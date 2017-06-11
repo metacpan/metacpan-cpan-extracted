@@ -713,7 +713,7 @@ sub latex {
 \PassOptionsToPackage{hyphens}{url}\usepackage[hyperfootnotes=false,hidelinks,breaklinks=true]{hyperref}
 \usepackage{bookmark}
 \usepackage[stable]{footmisc}
-\usepackage{enumerate}
+\usepackage[shortlabels]{enumitem}
 \usepackage{tabularx}
 \usepackage[normalem]{ulem}
 \def\hsout{\bgroup \ULdepth=-.55ex \ULset}
@@ -851,6 +851,9 @@ pdfkeywords={[% tex_metadata.keywords %]}%
 
 [% doc.as_latex %]
 
+[% UNLESS safe_options.nofinalpage %]
+% begin final page
+
 \clearpage
 
 [% IF safe_options.twoside %]
@@ -917,6 +920,9 @@ pdfkeywords={[% tex_metadata.keywords %]}%
 
 \end{center}
 
+% end final page with colophon
+[% END %]
+
 \end{document}
 
 EOF
@@ -946,7 +952,7 @@ sub slides {
 \usepackage{alltt}
 \usepackage{verbatim}
 \usepackage[stable]{footmisc}
-\usepackage{enumerate}
+\usepackage[shortlabels]{enumitem}
 \usepackage{tabularx}
 \usepackage[normalem]{ulem}
 \def\hsout{\bgroup \ULdepth=-.55ex \ULset}

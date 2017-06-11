@@ -16,6 +16,37 @@ int ex_strlen(void *ptr)
   return strlen(chr);
 }
 
+int is_domain_name(char *chk)
+{
+  int i;
+  int l = strlen(chk);
+  char t;
+  for(i=0;i<l;i++){
+    t = chk[i];
+    if(! isalnum(t) && t != '-'){
+      return 0;
+    }
+  }
+  return 1;
+}
+
+/* fake carp */
+void ex_mycarp(pTHX_ const char *msg)
+{
+  //Perl_croak(aTHX_ "%s",  msg);
+  Perl_warn(aTHX_ "%s",  msg);
+}
+
+char *ex_u8pny_realloc(char *all, char *set, int len, const char *msg)
+{
+  if((all = (char*)realloc(all, (len + 1))) == NULL){
+    free(set); free(all);
+    ex_mycarp(aTHX_ msg);
+    return NULL;
+  }
+  return all;
+}
+
 char *_puny_enc(pTHX_ char *i)
 {
   size_t lu, lp;
@@ -71,38 +102,42 @@ puny_enc(str)
   char *str;
   CODE:
     char *set;
-     int  lpc;
     char *tok;
     char *all;
      int  len = 1;
     char *tmp;
       SV *u8n;
     if((set = (char*)malloc(strlen(str)+1)) == NULL){
-      Perl_croak(aTHX_ "failure malloc in puny_enc()");
+      ex_mycarp(aTHX_ "failure malloc in puny_enc()");
+      XSRETURN_UNDEF;
     }
     if((all = (char*)malloc(1)) == NULL){
       free(set);
-      Perl_croak(aTHX_ "failure malloc in puny_enc()");
+      ex_mycarp(aTHX_ "failure malloc in puny_enc()");
+      XSRETURN_UNDEF;
     }
     all[0] = '\0';
     strcpy(set, str);
-    for(lpc=0;;) {
-      tok = strtok((lpc++==0)? set : NULL, ".");
-      if(tok != NULL){
+    tok = strtok(set, ".");
+    while(tok != NULL){
+      if(! is_domain_name(tok)){
         if((tmp = _puny_enc(aTHX_ tok)) != NULL){
           len += strlen(tmp) + 1;
-          if((all = (char*)realloc(all, (len + 1))) == NULL){
-            free(set); free(all);
-            Perl_croak(aTHX_ "failure realloc in puny_enc()");
-          }
+          if((all = ex_u8pny_realloc(all, set, len, "failure realloc in puny_enc()")) == NULL) XSRETURN_UNDEF;
           strcat(all, tmp);
           free(tmp);
-          strcat(all, ".");
         } else{
           free(set); free(all);
-          Perl_croak(aTHX_ "subroutine puny_enc()");
+          ex_mycarp(aTHX_ "failure encode in puny_enc()");
+          XSRETURN_UNDEF;
         }
-      } else{ break; }
+      } else{
+        len += strlen(tok) + 1;
+        if((all = ex_u8pny_realloc(all, set, len, "failure realloc in puny_enc()")) == NULL) XSRETURN_UNDEF;
+        strcat(all, tok);
+      }
+      strcat(all, ".");
+      tok = strtok(NULL, ".");
     }
     free(set);
     all[(len - 2)] = '\0';
@@ -119,39 +154,43 @@ puny_dec(str)
   char *str;
   CODE:
     char *set;
-     int  lpc;
     char *tok;
     char *all;
      int  len = 1;
+    char *cpy;
     char *tmp;
       SV *u8s;
     if((set = (char*)malloc(strlen(str)+1)) == NULL){
-      Perl_croak(aTHX_ "failure malloc in puny_enc()");
+      ex_mycarp(aTHX_ "failure malloc in puny_dec()");
+      XSRETURN_UNDEF;
     }
     if((all = (char*)malloc(1)) == NULL){
       free(set);
-      Perl_croak(aTHX_ "failure malloc in puny_enc()");
+      ex_mycarp(aTHX_ "failure malloc in puny_dec()");
+      XSRETURN_UNDEF;
     }
     all[0] = '\0';
     strcpy(set, str);
-    for(lpc=0;;) {
-      tok = strtok((lpc++==0)? set : NULL, ".");
-      if(tok != NULL){
-        if(strncmp(tok, "xn--", 4) == 0){ tok += 4; }
-        if((tmp = _puny_dec(aTHX_ tok)) != NULL){
+    tok = strtok(set, ".");
+    while(tok != NULL){
+      if(is_domain_name(tok) && strncmp(tok, "xn--", 4) == 0){
+        if((tmp = _puny_dec(aTHX_ tok + 4)) != NULL){
           len += strlen(tmp) + 1;
-          if((all = (char*)realloc(all, (len + 1))) == NULL){
-            free(set); free(all);
-            Perl_croak(aTHX_ "failure realloc in puny_enc()");
-          }
+          if((all = ex_u8pny_realloc(all, set, len, "failure realloc in puny_dec()")) == NULL) XSRETURN_UNDEF;
           strcat(all, tmp);
           free(tmp);
-          strcat(all, ".");
         } else{
           free(set); free(all);
-          Perl_croak(aTHX_ "subroutine puny_enc()");
+          ex_mycarp(aTHX_ "failure decode in puny_dec()");
+          XSRETURN_UNDEF;
         }
-      } else{ break; }
+      } else{
+        len += strlen(tok) + 1;
+        if((all = ex_u8pny_realloc(all, set, len, "failure realloc in puny_dec()")) == NULL) XSRETURN_UNDEF;
+        strcat(all, tok);
+      }
+      strcat(all, ".");
+      tok = strtok(NULL, ".");
     }
     free(set);
     all[(len - 2)] = '\0';

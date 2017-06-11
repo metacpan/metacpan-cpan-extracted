@@ -3,7 +3,7 @@ package RPerl::DataType::String;
 use strict;
 use warnings;
 use RPerl::AfterSubclass;
-our $VERSION = 0.008_000;
+our $VERSION = 0.010_000;
 
 # [[[ OO INHERITANCE ]]]
 use parent qw(RPerl::DataType::Scalar);
@@ -40,9 +40,15 @@ use warnings;
 
 # [[[ INCLUDES ]]]
 use POSIX qw(floor);
+
 # DEV NOTE: do not put inside INIT{} block, because it will be "too late to run INIT block" in some cases, such as inside Catalyst
-use RPerl::HelperFunctions_cpp;  # main::RPerl_SvPOKp
-RPerl::HelperFunctions_cpp::cpp_load();
+# DEV NOTE, CORRELATION #rp040: fix recursive dependencies of String.pm & HelperFunctions_cpp.pm, as triggered by ingy's Inline::create_config_file() system() call
+# NEED REMOVE: this code no longer appears to be necessary?
+#if (not ((exists $ARGV[0]) and (defined $ARGV[0]) and ((substr $ARGV[0], -7, 7) eq '_Inline'))) {
+#if (0) {
+#    use RPerl::HelperFunctions_cpp;  # main::RPerl_SvPOKp
+#    RPerl::HelperFunctions_cpp::cpp_load();
+#}
 
 # [[[ EXPORTS ]]]
 use Exporter 'import';

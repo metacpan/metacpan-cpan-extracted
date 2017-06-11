@@ -1,10 +1,15 @@
+/*  You may distribute under the terms of either the GNU General Public License
+ *  or the Artistic License (the same terms as Perl itself)
+ *
+ *  (C) Paul Evans, 2016-2017 -- leonerd@leonerd.org.uk
+ */
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
 
 /* Before perl 5.22 these were not visible */
 
-#ifndef clone_cv
+#ifndef cv_clone
 #define cv_clone(a)            Perl_cv_clone(aTHX_ a)
 #endif
 
@@ -145,6 +150,11 @@ static void rethread_op(OP *op, OP *old, OP *new)
       if(cLOGOPx(op)->op_other == old)
         cLOGOPx(op)->op_other = new;
       break;
+
+    case OA_LISTOP:
+      if(cLISTOPx(op)->op_last == old)
+        cLISTOPx(op)->op_last = new;
+      break;
   }
 
   if(op->op_flags & OPf_KIDS) {
@@ -219,6 +229,7 @@ static int try_keyword(pTHX_ OP **op)
 {
   OP *try = NULL, *catch = NULL;
   CV *finally = NULL;
+  OP *ret = NULL;
 
   lex_read_space(0);
 
@@ -235,13 +246,16 @@ static int try_keyword(pTHX_ OP **op)
   }
 
   if(lex_consume("finally")) {
+    I32 floor_ix, save_ix;
+    OP *body;
+
     lex_read_space(0);
 
-    I32 floor_ix = start_subparse(FALSE, CVf_ANON);
+    floor_ix = start_subparse(FALSE, CVf_ANON);
     SAVEFREESV(PL_compcv);
 
-    I32 save_ix = block_start(0);
-    OP *body = parse_block(0);
+    save_ix = block_start(0);
+    body = parse_block(0);
     SvREFCNT_inc(PL_compcv);
     body = block_end(save_ix, body);
 
@@ -255,7 +269,7 @@ static int try_keyword(pTHX_ OP **op)
     croak("Expected try {} to be followed by either catch {} or finally {}");
   }
 
-  OP *ret = try;
+  ret = try;
 
   /* If there's a catch block, make
    *   $RET = eval { $TRY; 1 } or do { $CATCH }
@@ -306,10 +320,10 @@ static int (*next_keyword_plugin)(pTHX_ char *, STRLEN, OP **);
 
 static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op)
 {
+  HV *hints;
   if(PL_parser && PL_parser->error_count)
     return (*next_keyword_plugin)(aTHX_ kw, kwlen, op);
 
-  HV *hints;
   if(!(hints = GvHV(PL_hintgv)))
     return (*next_keyword_plugin)(aTHX_ kw, kwlen, op);
 

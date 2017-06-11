@@ -23,37 +23,37 @@ option 'sort' => (
 
 sub execute {
     my ( $self, $opts, $args ) = @_;
-    
+
     my $tb = $self->get_table();
-    
+
     print $tb->title;
     print $tb->rule('-','+');
     print $tb->body;
-    
+
     return;
 }
 
 sub get_table {
     my ($self) = @_;
-    
+
     my $sort = $self->sort;
     $sort .= ','.$SORTFIELDS[0]
         unless $SORTFIELDS[0] eq $sort;
-    my $sth = $self->dbh->prepare("SELECT tindex,imported,used,memo 
-        FROM itan 
-        WHERE valid = 1 OR used IS NOT NULL 
+    my $sth = $self->dbh->prepare("SELECT tindex,imported,used,memo
+        FROM itan
+        WHERE valid = 1 OR used IS NOT NULL
         ORDER BY $sort")
         or die "ERROR: Cannot prepare: " . $self->dbh->errstr();
     $sth->execute();
-        
+
     my $tb = Text::Table->new(
         "Index",\"|","Imported",\"|","Used",\"|","Memo"
     );
-  
+
     while (my @line = $sth->fetchrow_array) {
         $tb->add(@line);
     }
-    
+
     return $tb;
 }
 

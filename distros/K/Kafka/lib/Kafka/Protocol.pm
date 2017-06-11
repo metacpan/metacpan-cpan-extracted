@@ -6,19 +6,15 @@ Kafka::Protocol - Functions to process messages in the Apache Kafka protocol.
 
 =head1 VERSION
 
-This documentation refers to C<Kafka::Protocol> version 1.03 .
+This documentation refers to C<Kafka::Protocol> version 1.04 .
 
 =cut
-
-
 
 use 5.010;
 use strict;
 use warnings;
 
-
-
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 use Exporter qw(
     import
@@ -28,12 +24,16 @@ our @EXPORT_OK = qw(
     decode_metadata_response
     decode_offset_response
     decode_produce_response
+    decode_offsetcommit_response
+    decode_offsetfetch_response
     encode_fetch_request
     encode_metadata_request
     encode_offset_request
     encode_produce_request
     encode_api_versions_request
     decode_api_versions_response
+    encode_offsetcommit_request
+    encode_offsetfetch_request
     _decode_MessageSet_template
     _decode_MessageSet_array
     _encode_MessageSet_array
@@ -49,8 +49,6 @@ our @EXPORT_OK = qw(
     $NULL_BYTES_LENGTH
     $_int64_template
 );
-
-
 
 use Compress::Snappy;
 use Const::Fast;
@@ -89,10 +87,11 @@ use Kafka::Internals qw(
     $APIKEY_OFFSET
     $APIKEY_PRODUCE
     $APIKEY_APIVERSIONS
+    $APIKEY_OFFSETCOMMIT
+    $APIKEY_OFFSETFETCH
     $PRODUCER_ANY_OFFSET
     format_message
 );
-
 
 
 =head1 SYNOPSIS
@@ -512,7 +511,7 @@ The following functions are available for C<Kafka::MockProtocol> module.
 Encodes the argument and returns a reference to the encoded binary string
 representing a Request buffer.
 
-This function take arguments. The following argument is currently recognized:
+This function takes the following arguments:
 
 =over 3
 
@@ -564,7 +563,7 @@ my $_decode_api_version_response_template = q{x[l]l>s>l>X[l]l>/(s>s>s>)};
 Decodes the argument and returns a reference to the hash representing
 the structure of the APIVERSIONS Response.
 
-This function take argument. The following argument is currently recognized:
+This function takes the following arguments:
 
 =over 3
 
@@ -609,7 +608,7 @@ sub decode_api_versions_response {
 Encodes the argument and returns a reference to the encoded binary string
 representing a Request buffer.
 
-This function take arguments. The following arguments are currently recognized:
+This function takes the following arguments:
 
 =over 3
 
@@ -746,7 +745,7 @@ my $_decode_produce_response_template_v2 = qq{x[l]l>l>X[l]l>/(s>/al>X[l]l>/(l>s>
 Decodes the argument and returns a reference to the hash representing
 the structure of the PRODUCE Response (examples see C<t/*_decode_encode.t>).
 
-This function take argument. The following argument is currently recognized:
+This function takes the following arguments:
 
 =over 3
 
@@ -809,7 +808,7 @@ sub decode_produce_response {
 Encodes the argument and returns a reference to the encoded binary string
 representing a Request buffer.
 
-This function take argument. The following argument is currently recognized:
+This function takes the following arguments:
 
 =over 3
 
@@ -887,7 +886,7 @@ sub encode_fetch_request {
 Decodes the argument and returns a reference to the hash representing
 the structure of the FETCH Response (examples see C<t/*_decode_encode.t>).
 
-This function take argument. The following argument is currently recognized:
+This function takes the following arguments:
 
 =over 3
 
@@ -970,7 +969,7 @@ sub decode_fetch_response {
 Encodes the argument and returns a reference to the encoded binary string
 representing a Request buffer.
 
-This function take argument. The following argument is currently recognized:
+This function takes the following arguments:
 
 =over 3
 
@@ -1085,7 +1084,7 @@ my $_decode_offset_response_template_v1 = qq{x[l]l>l>X[l]l>/(s>/al>X[l]l>/(l>s>$
 Decodes the argument and returns a reference to the hash representing
 the structure of the OFFSET Response (examples see C<t/*_decode_encode.t>).
 
-This function take argument. The following argument is currently recognized:
+This function takes the following arguments:
 
 =over 3
 
@@ -1154,7 +1153,7 @@ sub decode_offset_response {
 Encodes the argument and returns a reference to the encoded binary string
 representing a Request buffer.
 
-This function take argument. The following argument is currently recognized:
+This function takes the following arguments:
 
 =over 3
 
@@ -1244,7 +1243,7 @@ my $_decode_metadata_response_template = q{x[l]l>l>X[l]l>/(l>s>/al>)l>X[l]l>/(s>
 Decodes the argument and returns a reference to the hash representing
 the structure of the METADATA Response (examples see C<t/*_decode_encode.t>).
 
-This function take argument. The following argument is currently recognized:
+This function takes the following arguments:
 
 =over 3
 
@@ -1313,6 +1312,279 @@ sub decode_metadata_response {
     }
 
     return $Metadata_Response;
+}
+
+# OffsetCommit Request -------------------------------------------------------------
+
+=head3 C<encode_offsetcommit_request( $OffsetCommit_Request )>
+
+Encodes the argument and returns a reference to the encoded binary string
+representing a Request buffer.
+
+This function takes the following arguments:
+
+=over 3
+
+=item C<$OffsetCommit_Request>
+
+C<$OffsetCommit_Request> is a reference to the hash representing
+the structure of the OffsetCommit Request (examples see C<t/*_decode_encode.t>).
+
+=back
+
+=cut
+$IMPLEMENTED_APIVERSIONS->{$APIKEY_OFFSETCOMMIT} = 0;
+sub encode_offsetcommit_request {
+    my ( $OffsetCommit_Request ) = @_;
+
+    my @data;
+    my $request = {
+                                                # template    => '...',
+                                                # len         => ...,
+        data        => \@data,
+    };
+
+    _encode_request_header( $request, $APIKEY_OFFSETCOMMIT, $OffsetCommit_Request );
+                                                                            # Size
+                                                                            # ApiKey
+                                                                            # ApiVersion
+                                                                            # CorrelationId
+                                                                            # ClientId
+
+    $request->{template}    .= q{s>};
+    $request->{len}         += 2;
+    _encode_string( $request, $OffsetCommit_Request->{GroupId} );           # GroupId
+
+    my $topics_array = $OffsetCommit_Request->{topics};
+    push( @data, scalar( @$topics_array ) );                                # topics array size
+    $request->{template}    .= q{l>};
+    $request->{len}         += 4;
+
+    foreach my $topic ( @$topics_array ) {
+        $request->{template}    .= q{s>};
+        $request->{len}         += 2;
+        _encode_string( $request, $topic->{TopicName} );                    # TopicName
+
+        my $partitions_array = $topic->{partitions};
+        push( @data, scalar( @$partitions_array ) );                        # partitions array size
+        $request->{template}    .= q{l>};
+        $request->{len}         += 4;
+
+        foreach my $partition ( @$partitions_array ){
+            push( @data,
+                $partition->{Partition},                                    # Partition
+                $partition->{Offset},                                       # Offset
+            );
+            $request->{template}    .= qq{l>${_int64_template}};
+            $request->{len}         += 12;
+
+            $request->{template}    .= q{s>};
+            $request->{len}         += 2;
+            _encode_string( $request, $partition->{Metadata} ),             # Metadata
+        }
+    }
+    return pack( $request->{template}, $request->{len}, @data );
+}
+
+# OFFSETCOMMIT Response --------------------------------------------------------------
+
+my $_decode_offsetcommit_response_template = qq{x[l]l>l>X[l]l>/(s>/al>X[l]l>/(l>s>))};
+                                             # x[l]                          # Size (skip)
+                                             # l>                            # CorrelationId
+                                             # l>                            # topics array size
+                                             # X[l]
+                                             # l>/(                          # topics array
+                                             #    s>/a                       # TopicName
+                                             #    l>                         # partitions array size
+                                             #    X[l]
+                                             #    l>/(                       # partitions array
+                                             #       l>                      # Partition
+                                             #       s>                      # ErrorCode
+                                             #    )
+                                             # )
+
+=head3 C<decode_offsetcommit_response( $bin_stream_ref )>
+
+Decodes the argument and returns a reference to the hash representing
+the structure of the OFFSETCOMMIT Response (examples see C<t/*_decode_encode.t>).
+
+This function takes the following arguments:
+
+=over 3
+
+=item C<$bin_stream_ref>
+
+C<$bin_stream_ref> is a reference to the encoded Response buffer. The buffer
+must be a non-empty binary string.
+
+=back
+
+=cut
+sub decode_offsetcommit_response {
+    my ( $bin_stream_ref ) = @_;
+
+    my @data = unpack( $_decode_offsetcommit_response_template, $$bin_stream_ref );
+
+    my $i = 0;
+    my $OffsetCommit_Response = {};
+
+    $OffsetCommit_Response->{CorrelationId}                     =  $data[ $i++ ];   #CorrelationId
+
+    my $topics_array = $OffsetCommit_Response->{topics}         =  [];
+    my $topics_array_size                                       =  $data[ $i++ ];   # topics array size
+    while ( $topics_array_size-- ) {
+        my $topic = {
+            TopicName                                           => $data[ $i++ ],   # TopicName
+        };
+
+        my $Partition_array = $topic->{partitions} =  [];
+        my $Partition_array_size                                =  $data[ $i++ ];   # Partitions array size
+        while ( $Partition_array_size-- ) {
+            my $Partition = {
+                Partition                                       => $data[ $i++ ],   # Partition
+                ErrorCode                                       => $data[ $i++ ],   # ErrorCode
+            };
+            push( @$Partition_array, $Partition);
+        }
+        push( @$topics_array, $topic);
+    }
+    return $OffsetCommit_Response;
+}
+
+# OffsetFetch Request -------------------------------------------------------------
+
+=head3 C<encode_offsetfetch_request( $OffsetFetch_Request )>
+
+Encodes the argument and returns a reference to the encoded binary string
+representing a Request buffer.
+
+This function takes the following arguments:
+
+=over 3
+
+=item C<$OffsetFetch_Request>
+
+C<$OffsetFetch_Request> is a reference to the hash representing
+the structure of the OffsetFetch Request (examples see C<t/*_decode_encode.t>).
+
+=back
+
+=cut
+$IMPLEMENTED_APIVERSIONS->{$APIKEY_OFFSETFETCH} = 1;
+sub encode_offsetfetch_request {
+    my ( $OffsetFetch_Request ) = @_;
+
+    my @data;
+    my $request = {
+                                                # template    => '...',
+                                                # len         => ...,
+        data        => \@data,
+    };
+
+    _encode_request_header( $request, $APIKEY_OFFSETFETCH, $OffsetFetch_Request );
+                                                                            # Size
+                                                                            # ApiKey
+                                                                            # ApiVersion
+                                                                            # CorrelationId
+                                                                            # ClientId
+
+    $request->{template}    .= q{s>};
+    $request->{len}         += 2;
+    _encode_string( $request, $OffsetFetch_Request->{GroupId} );            # GroupId
+
+    my $topics_array = $OffsetFetch_Request->{topics};
+    push( @data, scalar( @$topics_array ) );                                # topics array size
+    $request->{template}    .= q{l>};
+    $request->{len}         += 4;
+
+    foreach my $topic ( @$topics_array ) {
+        $request->{template}    .= q{s>};
+        $request->{len}         += 2;
+        _encode_string( $request, $topic->{TopicName} );                    # TopicName
+
+        my $partitions_array = $topic->{partitions};
+        push( @data, scalar( @$partitions_array ) );                        # partitions array size
+        $request->{template}    .= q{l>};
+        $request->{len}         += 4;
+
+        foreach my $partition ( @$partitions_array ){
+            push( @data,
+                $partition->{Partition},                                    # Partition
+            );
+            $request->{template}    .= qq{l>};
+            $request->{len}         += 4;
+        }
+    }
+    return pack( $request->{template}, $request->{len}, @data );
+}
+
+# OFFSETFETCH Response --------------------------------------------------------------
+
+my $_decode_offsetfetch_response_template = qq{x[l]l>l>X[l]l>/(s>/al>X[l]l>/(l>${_int64_template}s>/as>))};
+                                             # x[l]                          # Size (skip)
+                                             # l>                            # CorrelationId
+                                             # l>                            # topics array size
+                                             # X[l]
+                                             # l>/(                          # topics array
+                                             #    s>/a                       # TopicName
+                                             #    l>                         # partitions array size
+                                             #    X[l]
+                                             #    l>/(                       # partitions array
+                                             #       l>                      # Partition
+                                             #       $_int64_template        # Offset
+                                             #       s>/a                    # Metadata
+                                             #       s>                      # ErrorCode
+                                             #    )
+                                             # )
+
+=head3 C<decode_offsetfetch_response( $bin_stream_ref )>
+
+Decodes the argument and returns a reference to the hash representing
+the structure of the OFFSETFETCH Response (examples see C<t/*_decode_encode.t>).
+
+This function takes the following arguments:
+
+=over 3
+
+=item C<$bin_stream_ref>
+
+C<$bin_stream_ref> is a reference to the encoded Response buffer. The buffer
+must be a non-empty binary string.
+
+=back
+
+=cut
+sub decode_offsetfetch_response {
+    my ( $bin_stream_ref ) = @_;
+
+    my @data = unpack( $_decode_offsetfetch_response_template, $$bin_stream_ref );
+
+    my $i = 0;
+    my $OffsetFetch_Response = {};
+
+    $OffsetFetch_Response->{CorrelationId}                      =  $data[ $i++ ];   #CorrelationId
+
+    my $topics_array = $OffsetFetch_Response->{topics}          =  [];
+    my $topics_array_size                                       =  $data[ $i++ ];   # topics array size
+    while ( $topics_array_size-- ) {
+        my $topic = {
+            TopicName                                           => $data[ $i++ ],   # TopicName
+        };
+
+        my $Partition_array = $topic->{partitions} =  [];
+        my $Partition_array_size                                =  $data[ $i++ ];   # Partitions array size
+        while ( $Partition_array_size-- ) {
+            my $Partition = {
+                Partition                                       => $data[ $i++ ],   # Partition
+                Offset                                          => $data[ $i++ ],   # Partition
+                Metadata                                        => $data[ $i++ ],   # Partition
+                ErrorCode                                       => $data[ $i++ ],   # ErrorCode
+            };
+            push( @$Partition_array, $Partition);
+        }
+        push( @$topics_array, $topic);
+    }
+    return $OffsetFetch_Response;
 }
 
 #-- private functions ----------------------------------------------------------
@@ -1639,7 +1911,10 @@ sub _decode_MessageSet_sized_template {
     CREATE_TEMPLATE:
     while ( $MessageSetSize ) {
 # Not the full MessageSet
-        last CREATE_TEMPLATE if $MessageSetSize < 22; # 22 is the minimal size of a v0 message format
+# 22 is the minimal size of a v0 message format until (and including) the Key
+# Length. If the message version is v1, then it's 22 + 8. We'll check later
+        last CREATE_TEMPLATE if $MessageSetSize < 22;
+
                 # [q] Offset
                 # [l] MessageSize
                 # [l] Crc
@@ -1663,6 +1938,11 @@ sub _decode_MessageSet_sized_template {
             );
 
             my $is_v1_msg_format = $MagicByte == 1;
+            if ($is_v1_msg_format && $MessageSetSize < (22+8)) {
+                # Not the full MessageSet
+                $local_template = q{};
+                last MESSAGE_SET;
+            }
             $local_template .= ( $is_v1_msg_format ? $_Message_template_with_timestamp : $_Message_template );
 
             $response->{stream_offset} += ($is_v1_msg_format ? 18: 10);
@@ -1810,6 +2090,8 @@ Sergiy Zuban
 Vlad Marchenko
 
 Damien Krotkine
+
+Greg Franklin
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -2,7 +2,8 @@
 # Tests 4 onwards are not expected to pass - so we make them TODO.
 
 use strict; use warnings; use diagnostics;
-use lib -e 't' ? 't' : 'test';
+use FindBin '$Bin';
+use lib $Bin;
 use Test::More;
 use TestInlineSetup;
 use Inline Config => DIRECTORY => $TestInlineSetup::DIR;

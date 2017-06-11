@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Dumper;
-$Config::Model::Dumper::VERSION = '2.103';
+$Config::Model::Dumper::VERSION = '2.105';
 use Carp;
 use strict;
 use warnings;
@@ -25,7 +25,7 @@ sub quote {
 }
 
 sub id_quote {
-    _quote( qr/[\s"*<>.=#]/, @_ );
+    _quote( qr/[\s"@*<>.=#]/, @_ );
 }
 
 sub _quote {
@@ -59,7 +59,7 @@ sub dump_tree {
     my $auto_v  = delete $args{auto_vivify} || 0;
     my $mode    = delete $args{mode} || '';
 
-    if ( $mode and $mode !~ /full|preset|custom/ ) {
+    if ( $mode and $mode !~ /full|preset|custom|non_upstream_default/ ) {
         croak "dump_tree: unexpected 'mode' value: $mode";
     }
 
@@ -259,7 +259,7 @@ Config::Model::Dumper - Serialize data of config tree
 
 =head1 VERSION
 
-version 2.103
+version 2.105
 
 =head1 SYNOPSIS
 
@@ -342,7 +342,7 @@ Parameters are:
 
 =over
 
-=item mode ( full | preset | custom )
+=item mode ( full | preset | custom | non_upstream_default )
 
 C<full> dumps all configuration data including default
 values.

@@ -6,6 +6,7 @@ requires 'File::HomeDir';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';
+    requires 'Test::Fatal';
     requires 'Test::MonkeyMock';
     requires 'Test::TempDir::Tiny';
 };

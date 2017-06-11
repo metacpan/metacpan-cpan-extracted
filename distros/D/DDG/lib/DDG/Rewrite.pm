@@ -1,7 +1,7 @@
 package DDG::Rewrite;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: A (mostly spice related) Rewrite definition in our system
-$DDG::Rewrite::VERSION = '1016';
+$DDG::Rewrite::VERSION = '1017';
 use Moo;
 use Carp qw( croak );
 use URI;
@@ -256,7 +256,7 @@ DDG::Rewrite - A (mostly spice related) Rewrite definition in our system
 
 =head1 VERSION
 
-version 1016
+version 1017
 
 =head1 SYNOPSIS
 

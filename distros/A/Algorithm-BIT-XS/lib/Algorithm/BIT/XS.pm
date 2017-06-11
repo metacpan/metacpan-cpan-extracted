@@ -4,7 +4,7 @@ use 5.014000;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 require XSLoader;
 XSLoader::load('Algorithm::BIT::XS', $VERSION);
@@ -21,7 +21,7 @@ sub get {
 
 sub set {
 	my ($b, $idx, $value) = @_;
-	$b->update($idx, $value - $b->get($idx, $value))
+	$b->update($idx, $value - $b->get($idx))
 }
 
 1;
@@ -93,7 +93,7 @@ Sets I<$bit>[I<$idx>] to I<$value>.
 
 =head1 SEE ALSO
 
-L<Algorithm::BIT>, L<https://en.wikipedia.org/wiki/Fenwick_tree>
+L<Algorithm::BIT>, L<Algorithm::BIT2D::XS>, L<https://en.wikipedia.org/wiki/Fenwick_tree>
 
 =head1 AUTHOR
 

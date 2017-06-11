@@ -3,7 +3,7 @@ abstract: 'Benchmark human date parsing modules e.g. DF:Natural, DF:Alami, etc.'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
-  Bencher::Backend: '1.034'
+  Bencher::Backend: '1.036'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
@@ -32,7 +32,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenarios-HumanDateParsingModules
   homepage: https://metacpan.org/release/Bencher-Scenarios-HumanDateParsingModules
   repository: git://github.com/perlancar/perl-Bencher-Scenarios-DateTimeFormatAlami.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.024000'
@@ -108,7 +108,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.54'
+      version: '0.55'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -133,6 +133,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::CheckMetaResources
       name: '@Author::PERLANCAR/CheckMetaResources'
       version: '0.001'
+    -
+      class: Dist::Zilla::Plugin::CopyrightYearFromGit
+      name: '@Author::PERLANCAR/CopyrightYearFromGit'
+      version: '0.003'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
@@ -276,7 +280,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.05'
+              version: '0.06'
             -
               class: Pod::Weaver::Plugin::Bencher::Scenario
               name: -Bencher::Scenario
@@ -351,7 +355,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::InsertDistImage
       name: InsertDistImage
-      version: '0.004'
+      version: '0.005'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:

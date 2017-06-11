@@ -4,7 +4,8 @@ our $VERSION = $Gtk2::Ex::DbLinker::DbTools::VERSION;
 use strict;
 use warnings;
 use interface qw(Gtk2::Ex::DbLinker::AbDataManager);
-# use Carp qw(carp croak confess cluck);
+use Carp qw(carp croak confess cluck);
+use Log::Any;
 # use Data::Dumper;
 use SQL::Abstract::More;
 use Try::Tiny;
@@ -58,24 +59,25 @@ sub new {
      #$$self{aperture	=> $$req{aperture} || 1, #batch size : how many records are read by fetch_new_slice
     $$self{before_query} = $arg{before_query};
     $$self{defaults}     = $arg{defaults};
-
+    $self->{log} = Log::Any->get_logger;
+    # $self->{log} = Log::Log4perl->get_logger(__PACKAGE__);
     # $self->{rs} = Gtk2::Ex::DbLinker::Recordset->new( $self->{aperture} );
-    $self->{log}->logconfess( __PACKAGE__ . ": select_param required" )
+    confess($self->{log}->error("select_param required"))
       unless ( $self->{select_param} );
     $self->{ai_primary_key} = $arg{ai_primary_key}
       if ( exists( $arg{ai_primary_key} ) )
       ;    # an array of auto incremented primary keys
            #bless $self, $class;
-    $self->{log} = Log::Log4perl->get_logger(__PACKAGE__);
+   
 
     #$self->{auto_incrementing} = ( defined ($self->{ai_primary_key}) ? 1 : 0);
 
-    $self->{log}->logconfess(
-        __PACKAGE__ . ": use ai_primary_key or primary_keys but not both..." )
+    confess($self->{log}->error(
+        "Use ai_primary_key or primary_keys but not both..." ))
       if ( defined $self->{ai_primary_key} && defined $self->{primary_keys} );
 
     if ( !$self->{dbh} ) {
-        $self->{log}->logconfess( __PACKAGE__ . ": constructor missing a dbh!\n" );
+        confess($self->{log}->error("Constructor missing a dbh!\n" ));
     }
 
     #$self->{cols} = {};
@@ -97,7 +99,7 @@ sub new {
             $sth->execute;
         }
         catch {
-            $self->{log}->logconfess( $self->{log}->error( $self->{dbh}->errstr ) );
+            confess($self->{log}->error(  $self->{dbh}->errstr ) );
         };
 
         $self->_use_sth_info($sth);
@@ -210,9 +212,8 @@ sub query {
 
 # $self->{log}->debug("query : " . $primary_key . " value : " . $row[$key_no] );
 # if $row[$key_no] is 0 the test failed but a pk could have this value...
-             $self->{log}->logcroak( __PACKAGE__
-                  . ": no value found for primary key $pk .. check the sql command"
-            ) unless ( defined $row[$key_no] );
+            croak( $self->{log}->error("No value found for primary key $pk .. check the sql command"
+                )) unless ( defined $row[$key_no] );
 
             #push @keys, $row[$key_no];
             push @key_vals, $row[$key_no];

@@ -1,15 +1,16 @@
 # Before "make install", this script should be runnable with "make test".
 # After "make install" it should work as "perl t/ExifTool.t".
 
-BEGIN { $| = 1; print "1..31\n"; $Image::ExifTool::configFile = ''; }
+BEGIN {
+    $| = 1; print "1..31\n"; $Image::ExifTool::configFile = '';
+    require './t/TestLib.pm'; t::TestLib->import();
+}
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load the module(s)
 use Image::ExifTool 'ImageInfo';
 $loaded = 1;
 print "ok 1\n";
-
-use t::TestLib;
 
 my $testname = 'ExifTool';
 my $testnum = 1;
@@ -230,7 +231,7 @@ my $testnum = 1;
     my $exifTool = new Image::ExifTool;
     my @foundTags;
     $exifTool->ImageInfo('t/images/ExifTool.jpg', \@foundTags);
-    my $str = $exifTool->InsertTagValues(\@foundTags, '$ifd0:model - $1ciff:3main:model');
+    my $str = $exifTool->InsertTagValues(\@foundTags, '${ifd0:model;tr/i/_/} - $1ciff:3main:model');
     my $testfile = "t/ExifTool_$testnum";
     open(TESTFILE,">$testfile.failed");
     my $oldSep = $/;   

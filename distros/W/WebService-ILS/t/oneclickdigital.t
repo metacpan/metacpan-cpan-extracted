@@ -2,7 +2,7 @@
 
 use Modern::Perl;
 
-use Test::More tests => 22;
+use Test::More tests => 15;
 use HTTP::Request::Common;
 use Data::Dumper;
 
@@ -16,12 +16,11 @@ use_ok('WebService::ILS::OneClickDigital::PartnerPatron');
 use_ok('WebService::ILS::OneClickDigital::Patron');
 
 SKIP: {
-    skip "Not testing OneClickDigital Patron API, WEBSERVICE_ILS_TEST_ONECLICKDIGITAL or WEBSERVICE_ILS_TEST_ONECLICKDIGITAL_PATRON not set", 8
+    skip "Not testing OneClickDigital Patron API, WEBSERVICE_ILS_TEST_ONECLICKDIGITAL or WEBSERVICE_ILS_TEST_ONECLICKDIGITAL_PATRON not set", 4
       unless $ENV{WEBSERVICE_ILS_TEST_ONECLICKDIGITAL} || $ENV{WEBSERVICE_ILS_TEST_ONECLICKDIGITAL_PATRON};
 
-    my $default_domain = WebService::ILS::OneClickDigital::Patron->DEFAULT_DOMAIN;
     my $ocd_domain = $ENV{ONECLICKDIGITAL_TEST_DOMAIN}
-        or BAIL_OUT("Env ONECLICKDIGITAL_TEST_DOMAIN not set. Defaulf domain $default_domain is the production.\nIf you want to test with it you need to set it explicitly. Otherwise use .us or some other testing env.");
+        or BAIL_OUT("Env ONECLICKDIGITAL_TEST_DOMAIN not set");
     my $ocd_secret = $ENV{ONECLICKDIGITAL_TEST_CLIENT_SECRET}
         or BAIL_OUT("Env ONECLICKDIGITAL_TEST_CLIENT_SECRET not set");
     my $ocd_library_id = $ENV{ONECLICKDIGITAL_TEST_LIBRARY_ID}
@@ -36,61 +35,27 @@ SKIP: {
         library_id => $ocd_library_id,
         user_id => $ocd_user_id,
         password => $ocd_password,
+        domain => $ocd_domain,
     });
-    my $api_base_url = $ocd->_api_base_url;
-    ok($api_base_url =~ m/$default_domain/, "API base url")
-      or diag ("$default_domain => $api_base_url");
 
 #   $ocd->user_agent->add_handler( response_done => sub {
 #       my($response, $ua, $h) = @_;
 #       diag(join "\n", $response->request->as_string, $response->as_string);
 #   } );
 
-    SKIP: {
-        skip "Not using OneClickDigital testing env, production env requested in WEBSERVICE_ILS_TEST_DOMAIN", 1
-          if $ocd_domain eq $default_domain;
-
-        $ocd = WebService::ILS::OneClickDigital::Patron->new({
-            client_secret => $ocd_secret,
-            library_id => $ocd_library_id,
-            user_id => $ocd_user_id,
-            password => $ocd_password,
-            domain => $ocd_domain,
-        });
-        $api_base_url = $ocd->_api_base_url;
-        ok($api_base_url =~ m/$ocd_domain/, "API base url (testing)")
-          or BAIL_OUT ("Testing API url not set properly $ocd_domain => $api_base_url");
-    }
-
     clear($ocd) if $ENV{ONECLICKDIGITAL_TEST_CLEAR};
 
     test_search("Patron", $ocd);
 
     test_circ("Patron", $ocd);
-
-    SKIP: {
-        skip "Endpoint search stopped working", 1;
-
-        my $ocd_gb = WebService::ILS::OneClickDigital::Patron->new({
-            client_secret => $ocd_secret,
-            library_id => $ocd_library_id,
-            user_id => $ocd_user_id,
-            password => $ocd_password,
-            country => 'GB'
-        });
-        my $api_base_url_gb = $ocd_gb->_api_base_url;
-        ok($api_base_url_gb && $api_base_url_gb ne $api_base_url, "API base url GB")
-          or diag ("$api_base_url_gb != $api_base_url");
-    }
 }
 
 SKIP: {
-    skip "Not testing OneClickDigital Partner API, WEBSERVICE_ILS_TEST_ONECLICKDIGITAL or WEBSERVICE_ILS_TEST_ONECLICKDIGITAL_PARTNER not set", 11
+    skip "Not testing OneClickDigital Partner API, WEBSERVICE_ILS_TEST_ONECLICKDIGITAL or WEBSERVICE_ILS_TEST_ONECLICKDIGITAL_PARTNER not set", 8
       unless $ENV{WEBSERVICE_ILS_TEST_ONECLICKDIGITAL} || $ENV{WEBSERVICE_ILS_TEST_ONECLICKDIGITAL_PARTNER};
 
-    my $default_domain = WebService::ILS::OneClickDigital::Partner->DEFAULT_DOMAIN;
     my $ocd_domain = $ENV{ONECLICKDIGITAL_TEST_DOMAIN}
-        or BAIL_OUT("Env ONECLICKDIGITAL_TEST_DOMAIN not set. Defaulf domain $default_domain is the production.\nIf you want to test with it you need to set it explicitly. Otherwise use .us or some other testing env.");
+        or BAIL_OUT("Env ONECLICKDIGITAL_TEST_DOMAIN not set");
     my $ocd_secret = $ENV{ONECLICKDIGITAL_TEST_CLIENT_SECRET}
         or BAIL_OUT("Env ONECLICKDIGITAL_TEST_CLIENT_SECRET not set");
     my $ocd_library_id = $ENV{ONECLICKDIGITAL_TEST_LIBRARY_ID}
@@ -101,29 +66,13 @@ SKIP: {
     my $ocd = WebService::ILS::OneClickDigital::Partner->new({
         client_secret => $ocd_secret,
         library_id => $ocd_library_id,
+        domain => $ocd_domain,
     });
-    my $api_base_url = $ocd->_api_base_url;
-    ok($api_base_url =~ m/$default_domain/, "API base url")
-      or diag ("$default_domain => $api_base_url");
 
 #   $ocd->user_agent->add_handler( response_done => sub {
 #       my($response, $ua, $h) = @_;
 #       diag(join "\n", $response->request->as_string, $response->as_string);
 #   } );
-
-    SKIP: {
-        skip "Not using OneClickDigital testing env, production env requested in WEBSERVICE_ILS_TEST_DOMAIN", 1
-          if $ocd_domain eq $default_domain;
-
-        $ocd = WebService::ILS::OneClickDigital::Partner->new({
-            client_secret => $ocd_secret,
-            library_id => $ocd_library_id,
-            domain => $ocd_domain,
-        });
-        $api_base_url = $ocd->_api_base_url;
-        ok($api_base_url =~ m/$ocd_domain/, "API base url (testing)")
-          or BAIL_OUT ("Testing API url not set properly $ocd_domain => $api_base_url");
-    }
 
     my $patron_id = $ocd->patron_id( $ocd_user_id );
     ok( $patron_id, "patron_id()");
@@ -141,23 +90,10 @@ SKIP: {
         client_secret => $ocd_secret,
         library_id => $ocd_library_id,
         user_id => $ocd_user_id,
+        domain => $ocd_domain,
     });
 
     test_circ("PartnerPatron", $ocd);
-
-    SKIP: {
-        skip "Endpoint search stopped working", 1;
-
-        my $ocd_gb = WebService::ILS::OneClickDigital::PartnerPatron->new({
-            client_secret => $ocd_secret,
-            library_id => $ocd_library_id,
-            user_id => $ocd_user_id,
-            country => 'GB'
-        });
-        my $api_base_url_gb = $ocd_gb->_api_base_url;
-        ok($api_base_url_gb && $api_base_url_gb ne $api_base_url, "API base url GB")
-          or diag ("$api_base_url_gb != $api_base_url");
-    }
 }
 
 sub test_circ {
@@ -296,7 +232,8 @@ sub test_download_url  {
         my $filename = $_->{filename} || "aa.whatever";
         my $req = HTTP::Request::Common::GET($download_url);
         my $resp = $ocd->user_agent->request($req, $filename);
-        ok($resp->code == 200, "Download url");
+        ok($resp->code == 200, "Download url")
+          or diag("$download_url\n".$resp->as_string);;
     }
 }
 
@@ -333,9 +270,19 @@ sub test_search {
         my $item = $res && $res->{items} ? $res->{items}[0] : undef;
         ok($item, "named_query_search()");
         SKIP: {
-            skip "No search results", 1 unless $item;
+            skip "No search results", 3 unless $item;
+            ok($item->{url}, "item url")
+              or diag(Dumper($item));
+            SKIP: {
+                skip "No item url", 1 unless $item->{url};
+                my $req = HTTP::Request::Common::GET($item->{url});
+                my $resp = $ocd->user_agent->request($req);
+                ok($resp->code == 200, "Item url")
+                  or diag("$item->{url}\n".$resp->as_string);
+            }
             my $metadata = $ocd->item_metadata($item->{isbn});
-            ok($metadata, "item_metadata()");
+            ok($metadata && $metadata->{title}, "item_metadata()")
+              or diag(Dumper($metadata));
         }
     };
 

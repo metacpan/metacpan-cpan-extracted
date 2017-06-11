@@ -5,7 +5,7 @@ use 5.010_001;
 use strict;
 use warnings;
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 my $version = $VERSION;
 $VERSION = eval $VERSION;
 
@@ -23,7 +23,7 @@ use File::Copy;
 #
 sub main
 {
-	my $args = App::Pods2Site::Args->new(@_);
+	my $args = App::Pods2Site::Args->new($version, @_);
 
 	my $cwd = slashify(getcwd());
 	
@@ -37,7 +37,15 @@ sub main
 	}
 	
 	my $podFinder = App::Pods2Site::PodFinder->new($args);
-	print "Found ", $podFinder->getCount(), " pods\n" if $args->isVerboseLevel(0);
+	my ($sum, $partCounts) = $podFinder->getCounts(); 
+	die("No pods found!\n") unless $sum;
+	my $counts = '';
+	foreach my $groupDef (@{$args->getGroupDefs()})
+	{
+		$counts .= ', ' if $counts;
+		$counts .= "$groupDef->{name}=$partCounts->{$groupDef->{name}}";
+	}
+	print "Found $sum pods ($counts).\n" if $args->isVerboseLevel(0);
 
 	print "Preparing pod work tree\n" if $args->isVerboseLevel(0);
 	my $podCopier = App::Pods2Site::PodCopier->new($args, $podFinder);
@@ -48,11 +56,15 @@ sub main
 	$sitebuilder->prepareCss($args);
 
 	print "Generating HTML from pods\n" if $args->isVerboseLevel(0);
-	my $pod2html = App::Pods2Site::Pod2HTML->new($args, $podCopier);
+	my $pod2html = App::Pods2Site::Pod2HTML->new($args, $podCopier->getPodRoot(), $podCopier->getWorkGroups());
+
 	print "Generated ", $pod2html->getGenerated(), " documents (", $pod2html->getUptodate(), " up to date)\n" if $args->isVerboseLevel(0);
 
-	$sitebuilder->makeSite($args, $pod2html);
-	print "Completed site in ", $args->getSiteDir(), "\n" if $args->isVerboseLevel(0);
+	$sitebuilder->makeSite($args, $podCopier->getWorkGroups(), $partCounts);
+	
+	my $siteDir = $args->getSiteDir();
+	my $style = $args->getStyle();
+	print "Site created in '$siteDir' using style '$style'.\n" if $args->isVerboseLevel(0);
 
 	chdir($cwd);
 	

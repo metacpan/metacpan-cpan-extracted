@@ -16,10 +16,10 @@ use Business::UPS::Tracking::Element::Activity;
 =head1 NAME
 
 Business::UPS::Tracking::Element::Package - A small freight package
-  
+
 =head1 DESCRIPTION
 
-This class represents an small freight package. Usually it is created 
+This class represents an small freight package. Usually it is created
 automatically from a L<Business::UPS::Tracking::Shipment> object.
 
 =head1 ACCESSORS
@@ -28,11 +28,11 @@ automatically from a L<Business::UPS::Tracking::Shipment> object.
 
 Original L<XML::LibXML::Node> node.
 
-=head2 Activity 
+=head2 Activity
 
 Arrayref of L<Business::UPS::Tracking::Element::Activity> objects
 ordered by activity date and time. Check the first element in the list for the
-most recent status. 
+most recent status.
 
 =head2 RescheduledDelivery
 
@@ -46,7 +46,7 @@ Returns a L<Business::UPS::Tracking::Element::Address> object.
 
 =head2 SignatureRequired
 
-Returns 'A' (adult signature), 'S' (signature) or undef (no signature 
+Returns 'A' (adult signature), 'S' (signature) or undef (no signature
 required).
 
 =head2 PackageWeight
@@ -177,7 +177,7 @@ sub _build_Activity {
     my @nodes = $self->xml->findnodes('Activity');
     my $return = [];
     my @temp;
-    
+
     foreach my $node (@nodes) {
         push @temp,Business::UPS::Tracking::Element::Activity->new(
             xml => $node,
@@ -196,13 +196,13 @@ sub _build_SignatureRequired {
 
 sub _build_ProductType {
     my ($self) = @_;
-    
+
     return $self->build_code('ProductType');
 }
 
 sub _build_ReferenceNumber {
     my ($self) = @_;
-    
+
     my @nodes = $self->xml->findnodes('ReferenceNumber');
     my $return = [];
     foreach my $node (@nodes) {
@@ -265,10 +265,10 @@ C<$pakcage-E<gt>Activity-E<gt>[0]-<gt>DateTime>.
 
 sub CurrentStatus {
     my ($self) = @_;
-    
+
     my $activities = $self->Activity;
-  
-    if (defined $activities 
+
+    if (defined $activities
         && ref $activities eq 'ARRAY') {
         return $activities->[0]->Status;
     } else {

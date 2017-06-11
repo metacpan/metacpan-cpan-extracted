@@ -16,7 +16,7 @@ use Pod::Usage qw(pod2usage);
 use Try::Tiny qw(try catch);
 use URI::Split qw(uri_split);
 
-our $VERSION = '1.1.0';
+our $VERSION = '1.1.1';
 
 # defaults
 use constant {

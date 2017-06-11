@@ -1,9 +1,10 @@
 ---
-abstract: 'Perl implementation'
+abstract: 'A reference implementation of the GraphQL spec in Perl.'
 author:
   - 'Ed J <etj@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::Exception: '0'
   Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -26,5 +27,5 @@ requires:
   Type::Tiny: '0'
   perl: '5.014'
 resources:
-  repository: https://github.com/mohawk2/graphql-perl
-version: '0.03'
+  repository: https://github.com/graphql-perl/graphql-perl
+version: '0.04'

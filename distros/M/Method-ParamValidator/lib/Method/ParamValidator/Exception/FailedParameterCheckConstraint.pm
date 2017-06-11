@@ -1,6 +1,6 @@
 package Method::ParamValidator::Exception::FailedParameterCheckConstraint;
 
-$Method::ParamValidator::Exception::FailedParameterCheckConstraint::VERSION   = '0.10';
+$Method::ParamValidator::Exception::FailedParameterCheckConstraint::VERSION   = '0.11';
 $Method::ParamValidator::Exception::FailedParameterCheckConstraint::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Method::ParamValidator::Exception::FailedParameterCheckConstraint - Handles 'fai
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 

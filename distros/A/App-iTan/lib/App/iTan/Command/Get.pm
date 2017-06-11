@@ -34,16 +34,16 @@ option 'memo' => (
 
 sub execute {
     my ( $self, $opts, $args ) = @_;
-    
+
     my $index;
     if ($self->next) {
-        ($index) = $self->dbh->selectrow_array("SELECT tindex 
-            FROM itan 
-            WHERE used IS NULL 
-            AND valid = 1 
-            ORDER BY tindex 
+        ($index) = $self->dbh->selectrow_array("SELECT tindex
+            FROM itan
+            WHERE used IS NULL
+            AND valid = 1
+            ORDER BY tindex
             LIMIT 1");
-       
+
         unless (defined $index) {
             say 'No more iTANs left';
             return;
@@ -51,7 +51,7 @@ sub execute {
     } else {
         $index = $self->index;
     }
-    
+
     unless (defined $index) {
         say 'Option --index or --next must be set';
     } else {
@@ -59,7 +59,7 @@ sub execute {
         my $itan = $self->decrypt_string($tan_data->{itan});
         say 'iTAN '.$index.' marked as used';
         say 'iTAN '.$itan;
-        
+
         eval {
             if ($^O eq 'darwin') {
                 Class::Load::load_class('Mac::Pasteboard');
@@ -72,14 +72,14 @@ sub execute {
             }
             say 'iTan has been coppied to the clipboard';
         };
-        
+
         $self->mark($index,$self->memo);
         if ($self->lowerinvalid) {
             $self->dbh->do('UPDATE itan SET valid = 0 WHERE tindex < '.$index)
                  or die "ERROR: Cannot execute: " . $self->dbh->errstr();
         }
     }
-    
+
     return;
 }
 
@@ -117,7 +117,7 @@ iTAN index number that should be fetched
 
 =head2 lowerinvalid
 
-Mark all iTANs with a lower index as invalid (only in combination with 
+Mark all iTANs with a lower index as invalid (only in combination with
 --index)
 
 =head2 memo

@@ -1,18 +1,17 @@
 # -*-CPerl-*-
-# Last changed Time-stamp: <2015-10-27 14:45:04 mtw>
+# Last changed Time-stamp: <2017-06-10 18:59:03 michl>
 
 package Bio::ViennaNGS::Expression;
 
-use version; our $VERSION = qv('0.16');
+use Bio::ViennaNGS;
 use Moose;
 use Carp;
 use Data::Dumper;
 use Path::Class;
 use Bio::ViennaNGS::Bed;
 use Bio::ViennaNGS::Util qw(sortbed);
-
 use namespace::autoclean;
-
+use version; our $VERSION = version->declare("$Bio::ViennaNGS::VERSION");
 
 has 'readcountfile' => (
 			is => 'rw',
@@ -85,7 +84,8 @@ sub parse_readcounts_bed12 {
 				 length    => $len,
 				 count     => $mcData[eval(12+$i)],
 				};
-      # print Dumper(${$self->data}[$i]);
+     # print "sample $i:\n";
+     # print Dumper(${$self->data}[$i]);
     }
   }
   $self->nr_features($n);
@@ -176,8 +176,8 @@ sub computeTPM {
 
   $meanTPM = $totalTPM/$self->nr_features;
 
- # print Dumper(${$self->data}[$sample]);
- # print "totalTPM=$totalTPM | meanTPM=$meanTPM\n";
+  #print Dumper(${$self->data}[$sample]);
+  #print "totalTPM=$totalTPM | meanTPM=$meanTPM\n";
 
   return $meanTPM;
 }
@@ -394,7 +394,7 @@ Michael T. Wolfinger, E<lt>michael@wolfinger.euE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2015 by Michael T. Wolfinger
+Copyright (C) 2015-2017 by Michael T. Wolfinger
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

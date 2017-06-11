@@ -6,11 +6,11 @@
                                                                 
 
 
-This is the README for JSON::Create version 0.22.
+This is the README for JSON::Create version 0.23.
 
 JSON::Create is a "module" for the Perl computer programming language, a
-library of computer code to install on a computer.  This document contains four
-sections:
+library of computer code to install on a computer.  This document contains
+four sections:
 
 1. About - what the module does
 
@@ -52,15 +52,16 @@ Perl.
 
 2. DOCUMENTATION
 
-You can read the documentation for the module online at the following websites:
+You can read the documentation for the module online at the following
+websites:
 
     * http://search.cpan.org/perldoc?JSON::Create
     * http://metacpan.org/release/JSON-Create
 
 (These links go to the latest version of the module.)
 
-After installing the module, you can read the documentation on your computer
-using
+After installing the module, you can read the documentation on your
+computer using
 
     perldoc JSON::Create
 
@@ -78,11 +79,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm JSON::Create
 
-To install the module from the source file, JSON-Create-0.22.tar.gz, follow
+To install the module from the source file, JSON-Create-0.23.tar.gz, follow
 this sequence of commands:
 
-    tar xfz JSON-Create-0.22.tar.gz
-    cd JSON-Create-0.22
+    tar xfz JSON-Create-0.23.tar.gz
+    cd JSON-Create-0.23
     perl Makefile.PL
     make
     make install
@@ -95,8 +96,8 @@ If you want to test the module before installing it, use "make test" after
 4. HELP
 
 To get help with the module, you can email the author, Ben Bullock, at
-<bkb@cpan.org>. If you think there is a problem in the module, you can report a
-bug at 
+<bkb@cpan.org>. If you think there is a problem in the module, you can
+report a bug at 
 
 <https://github.com/benkasminbullock/json-create/issues>,
 
@@ -107,6 +108,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Fri Jul 15 20:01:08 2016.
+This README was written on Tue Jun  6 11:21:03 2017.
 
 -----------------------------------------------------------------------------

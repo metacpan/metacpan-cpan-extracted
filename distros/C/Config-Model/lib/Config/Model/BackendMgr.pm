@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::BackendMgr;
-$Config::Model::BackendMgr::VERSION = '2.103';
+$Config::Model::BackendMgr::VERSION = '2.105';
 use Mouse;
 use strict;
 use warnings;
@@ -128,7 +128,7 @@ sub get_cfg_file_path {
     Config::Model::Exception::Model->throw(
         error  => "backend error: empty 'config_dir' parameter (and no config_file override)",
         object => $self->node
-    ) unless $args{config_dir} or $self->config_dir;
+    ) unless defined $args{config_dir} or defined $self->config_dir;
 
     my ( $dir_ok, $dir ) = $self->get_cfg_dir_path(%args);
 
@@ -383,6 +383,7 @@ sub try_read_backend {
     my ( $res, $file_path, $error );
 
     if ( $backend eq 'custom' ) {
+        #$logger->warn("custom read/write backend is deprecated. Please replace with a backend inheriting Config::Model::Backend::Any");
         my $c = my $file = delete $read->{class};
         $file =~ s!::!/!g;
         my $f = delete $read->{function} || 'read';
@@ -758,6 +759,7 @@ sub read_cds_file {
     return 1;
 }
 
+# TODO: replace with class based on Config::Model::Backend::Any
 sub write_cds_file {
     my $self      = shift;
     my %args      = @_;
@@ -769,6 +771,7 @@ sub write_cds_file {
     return 1;
 }
 
+# TODO: replace with class based on Config::Model::Backend::Any
 sub read_perl {
     my $self = shift;
     my %args = @_;
@@ -814,7 +817,7 @@ Config::Model::BackendMgr - Load configuration node on demand
 
 =head1 VERSION
 
-version 2.103
+version 2.105
 
 =head1 SYNOPSIS
 

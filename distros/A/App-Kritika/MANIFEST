@@ -9,5 +9,6 @@ lib/App/Kritika/Settings.pm
 minil.toml
 script/kritika
 t/kritika.t
+t/kritika/settings.t
 META.yml
 MANIFEST

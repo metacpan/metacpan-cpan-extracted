@@ -4,7 +4,7 @@
 ## Header Administrivia
 ##======================================================================
 
-our $VERSION = "0.17";
+our $VERSION = "0.18";
 pp_setversion($VERSION);
 
 do "./Config.cache";

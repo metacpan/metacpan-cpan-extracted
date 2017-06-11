@@ -91,13 +91,13 @@ sub BUILD ( $self, $args ) {
 
 # REPORT
 sub report_fatal ( $self, $msg ) {
-    say BOLD . RED . q[[ FATAL ] ] . RESET . $msg;
+    say $BOLD . $RED . q[[ FATAL ] ] . $RESET . $msg;
 
     exit 255;
 }
 
 sub report_warn ( $self, $msg ) {
-    say BOLD . YELLOW . q[[ WARN ]  ] . RESET . $msg;
+    say $BOLD . $YELLOW . q[[ WARN ]  ] . $RESET . $msg;
 
     return;
 }

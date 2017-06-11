@@ -2,14 +2,15 @@
 use warnings;
 use strict;
 
+my $plan; BEGIN { $plan = 5 * 65 + 0 }; # Constructs + old
+
 use FindBin;
-use Test::More;
+use Test::More tests => $plan;
 use Syntax::Construct ();
 
-
-unless ( $ENV{RELEASE_TESTING} ) {
-    plan( skip_all => "Author tests not required for installation" );
-}
+SKIP: {
+    skip 'Author tests not required for installation', $plan
+        unless $ENV{RELEASE_TESTING};
 
 my %constructs;
 
@@ -68,4 +69,4 @@ for my $constr (keys %constructs) {
 
 }
 
-done_testing($count_old + 5 * keys %constructs);
+}

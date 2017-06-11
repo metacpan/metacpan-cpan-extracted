@@ -19,7 +19,7 @@ use strict;
 use warnings;
 use Glib;
 
-our $VERSION = '0.042';
+our $VERSION = '0.043';
 
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
@@ -688,17 +688,22 @@ For example:
   $box->child_get_property ($label, 'expand', $gvalue);
   my $value = $gvalue->get_value
 
-=head2 Handling extendable enumerations
+=head2 Handling raw enumerations and flags
 
-If you need to handle extendable enumerations for which more than the
-pre-defined values might be valid, then use C<<
-Glib::Object::Introspection->convert_enum_to_sv >> and C<<
-Glib::Object::Introspection->convert_sv_to_enum >>.  They will raise an
+If you need to handle raw enumerations/flags or extendable enumerations for
+which more than the pre-defined values might be valid, then use C<<
+Glib::Object::Introspection->convert_enum_to_sv >>, C<<
+Glib::Object::Introspection->convert_sv_to_enum >>, C<<
+Glib::Object::Introspection->convert_flags_to_sv >> and C<<
+Glib::Object::Introspection->convert_sv_to_flags >>.  They will raise an
 exception on unknown values; catching it then allows you to implement fallback
 behavior.
 
   Glib::Object::Introspection->convert_enum_to_sv (package, enum_value)
   Glib::Object::Introspection->convert_sv_to_enum (package, sv)
+
+  Glib::Object::Introspection->convert_flags_to_sv (package, flags_value)
+  Glib::Object::Introspection->convert_sv_to_flags (package, sv)
 
 =head1 SEE ALSO
 

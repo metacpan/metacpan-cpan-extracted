@@ -1,0 +1,34 @@
+=encoding utf8
+
+=head1 NAME
+
+CHI::Driver::Reddit - use Reddit as a cache!
+
+=head1 SYNOPSIS
+
+    use CHI;
+    my $cache = CHI->new(
+      subreddit => 'somesubreddit', # the subreddit to post to
+      username  => 'foo',           # reddit username
+      password  => 'barbarbar',     # reddit password
+      driver    => 'Reddit',
+    );
+    ...
+
+=head1 DESCRIPTION
+
+See L<Cache::Reddit> and L<CHI> for details.
+
+=head1 AUTHOR
+
+David Farrell
+
+=head1 LICENSE
+
+Two Clause FreeBSD, see LICENSE
+
+E<copy> 2017, David Farrell
+
+
+=cut
+

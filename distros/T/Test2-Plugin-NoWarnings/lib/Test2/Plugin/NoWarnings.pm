@@ -3,7 +3,7 @@ package Test2::Plugin::NoWarnings;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Test2::API qw( context_do );
 use Test2::Event::Warning;
@@ -20,11 +20,14 @@ sub import {
 my $_orig_warn_handler = $SIG{__WARN__};
 ## no critic (Variables::RequireLocalizedPunctuationVars)
 $SIG{__WARN__} = sub {
+    my $w = $_[0];
+    $w =~ s/\n+$//g;
+
     context_do {
         my $ctx = shift;
         $ctx->send_event(
-            'Warning',
-            warning => 'Unexpected warning: ' . $_[0]
+            'Ok',
+            name => "Unexpected warning: $w",
         );
     }
     $_[0];
@@ -70,7 +73,7 @@ Test2::Plugin::NoWarnings - Fail if tests warn
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -98,10 +101,13 @@ you can ask for this with the C<echo> import argument:
 
 =head1 SUPPORT
 
-Bugs may be submitted through L<the RT bug tracker|http://rt.cpan.org/Public/Dist/Display.html?Name=Test2-Plugin-NoWarnings>
-(or L<bug-test2-plugin-nowarnings@rt.cpan.org|mailto:bug-test2-plugin-nowarnings@rt.cpan.org>).
+Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Test2-Plugin-NoWarnings> or via email to L<bug-test2-plugin-nowarnings@rt.cpan.org|mailto:bug-test2-plugin-nowarnings@rt.cpan.org>.
 
-I am also usually active on IRC as 'drolsky' on C<irc://irc.perl.org>.
+I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for Test2-Plugin-NoWarnings can be found at L<https://github.com/houseabsolute/Test2-Plugin-NoWarnings>.
 
 =head1 DONATIONS
 
@@ -126,10 +132,13 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Dave Rolsky.
+This software is Copyright (c) 2017 by Dave Rolsky.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.3601'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.16, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -51,7 +51,7 @@ requires:
   Dist::Zilla::Plugin::Test::Compile: '0'
   Dist::Zilla::Plugin::TestRelease: '0'
   Dist::Zilla::Plugin::UploadToCPAN: '0'
-  Dist::Zilla::Plugin::VersionFromModule: '0'
+  Dist::Zilla::Plugin::VersionFromMainModule: '0'
   Dist::Zilla::PluginBundle::Git: '0'
   Dist::Zilla::Role::PluginBundle::Config::Slicer: '0'
   Dist::Zilla::Role::PluginBundle::PluginRemover: '0'
@@ -61,10 +61,11 @@ resources:
   bugtracker: https://github.com/miyagawa/Dist-Milla/issues
   homepage: https://github.com/miyagawa/Dist-Milla
   repository: https://github.com/miyagawa/Dist-Milla.git
-version: v1.0.17
+version: v1.0.18
 x_contributors:
   - 'Alex Efros <powerman@powerman.name>'
   - 'Curtis Brandt <curtis@cpan.org>'
+  - 'Dan Book <grinnz@grinnz.com>'
   - 'Flavio Poletti <flavio@polettix.it>'
   - 'Helmut Wollmersdorfer <helmut@wollmersdorfer.at>'
   - 'Karen Etheridge <ether@cpan.org>'
@@ -72,4 +73,4 @@ x_contributors:
   - 'Olivier Mengué <dolmen@cpan.org>'
   - 'Shawn M Moore <code@sartak.org>'
   - 'Tatsuhiko Miyagawa <miyagawa@gmail.com>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_serialization_backend: 'YAML::Tiny version 1.70'

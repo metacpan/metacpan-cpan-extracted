@@ -4,7 +4,7 @@ use strict;
 $|++;
 
 use vars qw($VERSION);
-$VERSION = '3.44';
+$VERSION = '3.59';
 
 =head1 NAME
 
@@ -47,9 +47,9 @@ use Getopt::Long;
 # Code
 
 my %options;
-usage() if(!GetOptions( \%options, 'create|c', 'update|u', 'fix|f', 'rebuild|r', 'dist=s', 'vers=s'));
+usage() if(!GetOptions( \%options, 'create|c', 'update|u', 'fix|f', 'rebuild|r', 'dist=s', 'version=s'));
 if($options{rebuild}) {
-    usage() unless($options{dist} && $options{vers});
+    usage() unless($options{dist} && $options{version});
 }
 
 Labyrinth::Variables::init();   # initial standard variable values
@@ -68,10 +68,11 @@ $content->GetVersion();
 _log("Start");
 
 my $builder = Labyrinth::Plugin::CPAN::Release->new();
-$builder->Create(\&_log)    if($options{create});
-$builder->Update(\&_log)    if($options{update});
-$builder->Fix(\&_log)       if($options{fix});
-$builder->Rebuild(\&_log,$options{dist},$options{vers}) if($options{rebuild});
+$builder->Create( \&_log)    if($options{create});
+$builder->Update( \&_log)    if($options{update});
+$builder->Fix(    \&_log)    if($options{fix});
+$builder->Rebuild(\&_log,$options{dist},$options{version}) 
+                             if($options{rebuild});
 
 _log("Finish");
 
@@ -82,7 +83,7 @@ sub _log {
 }
 
 sub usage {
-    print STDERR "$0 ( --create | --update | --fix | --rebuild --dist=<dist> --vers=<vers>)\n";
+    print STDERR "$0 ( --create | --update | --fix | --rebuild --dist=<dist> --version=<vers>) [--verbose]\n";
     exit;
 }
 
@@ -90,7 +91,7 @@ __END__
 
 =head1 AUTHOR
 
-  Copyright (c) 2009 Barbie <barbie@cpan.org> Miss Barbell Productions.
+  Copyright (c) 2009-2017 Barbie <barbie@cpan.org> Miss Barbell Productions.
 
 =head1 LICENSE
 

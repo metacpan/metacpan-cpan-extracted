@@ -1,0 +1,45 @@
+=head1 NAME
+
+App::Pods2Site::_Args - hidden flags
+
+Commandline options and arguments understood for TestOnTap processing
+
+=head1 SYNOPSIS
+
+ pods2site
+    [ --_help ]
+    [ --_pp ]
+
+=head1 OPTIONS AND ARGUMENTS
+
+All options can be abbreviated, as long as they are unambiguous. Option matching is case
+sensitive. Forcibly end option parsing using '--'.
+
+=head2
+
+This documents some 'hidden' flags, generally because they're somewhat particular and/or
+not ready for prime time...
+
+=over
+
+=item B<--_help>
+
+Displays usage and help with options/arguments. If given, nothing else will be done.
+
+=item B<--_pp>
+
+Signals that it should print out a basic commandline to generate a binary using the 'pp' command from
+PAR::Packer (must be installed first). If given, this option causes all other options to be ignored.
+
+Print to a batch file/shellscript or similar, and run it separately, editing any flags as needed.  
+
+Note that this can not be used when you already run a binary.
+
+=back
+
+=head1 MORE HELP
+
+For full information on Pods2Site, see the L<manual|App::Pods2Site>, or use I<--manual>
+or run I<perldoc App::Pods2Site> to see the manual page.
+
+=cut

@@ -1,10 +1,7 @@
 package Pcore::AE::Handle::Cache;
 
 use Pcore -class;
-use Pcore::AE::Handle::Cache::Storage;
 use Pcore::Util::Scalar qw[refaddr];
-
-has default_keepalive_timeout => ( is => 'ro', isa => PositiveInt, default => 4 );
 
 has handle     => ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg => undef );
 has connection => ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg => undef );
@@ -17,12 +14,12 @@ sub clear ($self) {
     return;
 }
 
-sub store ( $self, $h, $keepalive_timeout = undef ) {
+sub store ( $self, $h, $timeout ) {
 
     # do not cache destroyed handles
     return if $h->destroyed;
 
-    return if !$h->{persistent_id};
+    return unless my $persistent = $h->{persistent};
 
     my $id = refaddr $h;
 
@@ -33,22 +30,20 @@ sub store ( $self, $h, $keepalive_timeout = undef ) {
     $self->{handle}->{$id} = $h;
 
     # cache handle connections
-    for my $key ( $h->{persistent_id}->@* ) {
-        $self->{connection}->{$key} //= Pcore::AE::Handle::Cache::Storage->new;
-
-        $self->{connection}->{$key}->push($id);
-    }
+    push $self->{connection}->{$persistent}->@*, $id;
 
     my $destroy = sub ( $h, @ ) {
         delete $self->{handle}->{$id};
 
-        for my $key ( $h->{persistent_id}->@* ) {
-            if ( exists $self->{connection}->{$key} ) {
-                $self->{connection}->{$key}->delete($id);
+        for ( my $i = $self->{connection}->{$persistent}->$#*; $i >= 0; $i-- ) {
+            if ( $self->{connection}->{$persistent}->[$i] == $id ) {
+                splice $self->{connection}->{$persistent}->@*, $i, 1;
 
-                delete $self->{connection}->{$key} if !$self->{connection}->{$key}->has_items;
+                last;
             }
         }
+
+        delete $self->{connection}->{$persistent} if !$self->{connection}->{$persistent}->@*;
 
         # destroy handle
         $h->destroy;
@@ -63,41 +58,50 @@ sub store ( $self, $h, $keepalive_timeout = undef ) {
     $h->on_timeout(undef);
 
     $h->timeout_reset;
-    $h->timeout( $keepalive_timeout || $self->default_keepalive_timeout );
+    $h->timeout($timeout);
 
     return;
 }
 
-# TODO detect, if $h is not closed
 sub fetch ( $self, $key ) {
     return if !exists $self->{connection}->{$key};
 
-    my $id = $self->{connection}->{$key}->shift;
+    while (1) {
+        my $id = shift $self->{connection}->{$key}->@*;
 
-    return if !$id;
+        if ( !$id ) {
+            delete $self->{connection}->{$key};
 
-    my $h = delete $self->{handle}->{$id};
-
-    for ( $h->{persistent_id}->@* ) {
-        if ( exists $self->{connection}->{$_} ) {
-            $self->{connection}->{$_}->delete($id);
-
-            delete $self->{connection}->{$_} if !$self->{connection}->{$_}->has_items;
+            return;
         }
+
+        my $h = delete $self->{handle}->{$id};
+
+        next if $h->destroyed;
+
+        $h->on_error(undef);
+        $h->on_eof(undef);
+        $h->on_read(undef);
+        $h->timeout_reset;
+        $h->timeout(0);
+
+        return $h;
     }
 
-    # return if $h->destroyed;
-
-    $h->on_error(undef);
-    $h->on_eof(undef);
-    $h->on_read(undef);
-    $h->timeout_reset;
-    $h->timeout(0);
-
-    return $h;
+    return;
 }
 
 1;
+## -----SOURCE FILTER LOG BEGIN-----
+##
+## PerlCritic profile "pcore-script" policy violations:
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+## | Sev. | Lines                | Policy                                                                                                         |
+## |======+======================+================================================================================================================|
+## |    2 | 38                   | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+##
+## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

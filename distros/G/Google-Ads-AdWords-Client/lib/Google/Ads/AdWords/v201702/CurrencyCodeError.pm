@@ -5,7 +5,7 @@ use warnings;
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'https://adwords.google.com/api/adwords/mcm/v201702' };
+sub get_xmlns { 'https://adwords.google.com/api/adwords/o/v201702' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -85,7 +85,7 @@ Google::Ads::AdWords::v201702::CurrencyCodeError
 =head1 DESCRIPTION
 
 Perl data type class for the XML Schema defined complexType
-CurrencyCodeError from the namespace https://adwords.google.com/api/adwords/mcm/v201702.
+CurrencyCodeError from the namespace https://adwords.google.com/api/adwords/o/v201702.
 
 Errors for currency codes. 
 

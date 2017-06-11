@@ -30,7 +30,6 @@ my $statuses = $input->parse_url('https://metacpan.org/feed/recent?f=');
 cmp_ok scalar(@$statuses), '>', 0, 'at least 1 statuses loaded';
 cmp_ok scalar(@request_log), '>', 0, 'communication logged.';
 cmp_ok scalar(grep { $_->uri eq 'https://metacpan.org/feed/recent?f=' } @request_log), '>', 0, 'logged fetching feed URL';
-cmp_ok scalar(grep { $_->uri eq 'https://metacpan.org/' } @request_log), '>', 0, 'logged fetching main URL';
 cmp_ok scalar(grep { $_->uri =~ qr/favicon\.ico/ } @request_log), '>', 0, 'logged fetching favicon';
 
 is scalar(@agents), scalar(@request_log), 'same number of User-Agent logs as that requests';

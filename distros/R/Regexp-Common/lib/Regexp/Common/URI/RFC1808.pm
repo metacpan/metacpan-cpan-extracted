@@ -14,7 +14,7 @@ use strict;
 use warnings;
 
 use vars qw /$VERSION/;
-$VERSION = '2017040401';
+$VERSION = '2017060201';
 
 use vars qw /@EXPORT @EXPORT_OK %EXPORT_TAGS @ISA/;
 
@@ -142,7 +142,7 @@ Bound to be plenty.
 
 =head1 LICENSE and COPYRIGHT
 
-This software is Copyright (c) 2001 - 2016, Damian Conway and Abigail.
+This software is Copyright (c) 2001 - 2017, Damian Conway and Abigail.
 
 This module is free software, and maybe used under any of the following
 licenses:

@@ -3,14 +3,16 @@ package Text::Shirasu;
 use strict;
 use warnings;
 use utf8;
+
 use Exporter 'import';
 use Text::MeCab;
 use Carp 'croak';
 use Text::Shirasu::Node;
+use Text::Shirasu::Tree;
 use Lingua::JA::NormalizeText;
 use Encode qw/encode_utf8 decode_utf8/;
 
-our $VERSION   = "0.0.3";
+our $VERSION   = "0.0.4";
 our @EXPORT_OK = (@Lingua::JA::NormalizeText::EXPORT_OK, qw/normalize_hyphen normalize_symbols/);
 
 *nfkc                 = \&Lingua::JA::NormalizeText::nfkc;
@@ -69,7 +71,7 @@ Text::Shirasu - Text::MeCab wrapped for natural language processing
     use utf8;
     use feature ':5.10';
     use Text::Shirasu;
-    my $ts = Text::Shirasu->new; # this parameter same as Text::MeCab
+    my $ts = Text::Shirasu->new(cabocha => 1); # you can use Text::CaboCha
     my $normalize = $ts->normalize("昨日の晩御飯は「鮭のふりかけ」と「味噌汁」だけでした。");
     $ts->parse($normalize);
 
@@ -82,17 +84,81 @@ Text::Shirasu - Text::MeCab wrapped for natural language processing
     my $filter = $ts->filter(type => [qw/名詞 助動詞/], 記号 => [qw/括弧開 括弧閉/]);
     say $filter->join_surface;
 
+    for my $tree (@{ $ts->trees }) {
+        say $tree->surface;
+    }
+
 =head1 DESCRIPTION
 
 Text::Shirasu is wrapped L<Text::MeCab>.  
-This module is easy to normalize text and filter part of speech.
+This module is easy to normalize text and filter part of speech.  
+Also to use L<Text::CaboCha> by setting the cabocha option to true.
+
+=cut
+
+=head1 METHODS
+=cut
+=head2 new
+
+    Text::Shirasu->new(
+        # If you want to use cabocha
+        cabocha => 1,
+        # Text::MeCab arguments
+        rcfile             => $rcfile,             # Also it will be ailias as mecabrc for Text::CaboCha
+        dicdir             => $dicdir,             # Also it will be ailias as mecab_dicdir for Text::CaboCha
+        userdic            => $userdic,            # Also it will be ailias as mecab_userdic for Text::CaboCha
+        lattice_level      => $lattice_level,
+        all_morphs         => $all_morphs,
+        output_format_type => $output_format_type,
+        partial            => $partial,
+        node_format        => $node_format,
+        unk_format         => $unk_format,
+        bos_format         => $bos_format,
+        eos_format         => $eos_format,
+        input_buffer_size  => $input_buffer_size,
+        allocate_sentence  => $allocate_sentence,
+        nbest              => $nbest,
+        theta              => $theta,
+        
+        # Text::CaboCha arguments
+        ne            => $ne,
+        parser_model  => $parser_model_file,
+        chunker_model => $chunker_model_file,
+        ne_model      => $ne_tagger_model_file,
+    );
 
 =cut
 
 sub new {
     my $class = shift;
     my %args = ref $_[0] eq 'HASH' ? %{ $_[0] } : @_;
-    return bless {
+    my %cabocha_opts;
+    my $use_cabocha = delete $args{cabocha};
+    if ($use_cabocha) {
+        local $@;
+        eval { require Text::CaboCha };
+        if ($@ || $Text::CaboCha::VERSION < "0.04") {
+            croak("If you want to use some functions of Text::CaboCha, you need to install Text::CaboCha >= 0.04");
+        }
+        # Arguments for Text::Cabocha
+        for my $opt (qw/ne parser_model chunker_model ne_model/) {
+            if (exists $args{$opt}) {
+                $cabocha_opts{$opt} = delete $args{$opt};
+            }
+        }
+        # Get from arguments of Text::MeCab
+        for my $opt (qw/rcfile dicdir userdic/) {
+            if (exists $args{$opt}) {
+                if ($opt eq 'rcfile') {
+                    $cabocha_opts{mecabrc} = $args{$opt};
+                } else {
+                    $cabocha_opts{"mecab_${opt}"} = $args{$opt};
+                }
+            }
+        }
+    }
+
+    my $self = bless {
         mecab     => Text::MeCab->new(%args),
         nodes     => +[],
         normalize => +[qw/
@@ -119,15 +185,21 @@ sub new {
             /, \&normalize_hyphen, \&normalize_symbols
         ],
     } => $class;
-}
+    
+    if ($use_cabocha) {
+        $self->{trees}   = +[];
+        $self->{cabocha} = Text::CaboCha->new(%cabocha_opts);
+    }
 
-=head1 METHODS
-=cut
+    return $self;
+}
 
 =head2 parse
 
-This method wraps the parse method of Text::MeCab.  
-The analysis result is saved as Text::Shirasu::Node instance in the Text::Shirasu instance. So, It will return Text::Shirasu instance.  
+This method wraps the parse method of Text::MeCab.
+The analysis result is saved as array reference of Text::Shirasu::Node instance in the Text::Shirasu instance.
+Also, If you used cabocha mode, it save as array reference of Text::Shirasu::Tree instance in the Text::Shirasu instance when used this method.
+It return Text::Shirasu instance. 
 
     $ts->parse("このおにぎりは「母」が握ってくれたものです。");
 
@@ -143,15 +215,37 @@ sub parse {
 
     # initialize
     $self->{nodes} = [];
+    my $node = $mt->parse($sentence);
 
-    for (my $node = $mt->parse($sentence); $node && $node->surface; $node = $node->next) {
+    # when cabocha mode
+    if (exists $self->{cabocha}) {
+        my $ct   = $self->{cabocha};
+        my $tree = $ct->parse_from_node($node);
+        my $cid = 0;
+        for my $token (@{ $tree->tokens }) {
+            if ($token->chunk) {
+                push @{ $self->{trees} }, bless {
+                    cid      => $cid++,
+                    link     => $token->chunk->link,
+                    head_pos => $token->chunk->head_pos,
+                    func_pos => $token->chunk->func_pos,
+                    score    => $token->chunk->score,
+                    surface  => $token->surface,
+                    feature  => [ split /,/, $token->feature ],
+                    ne       => $token->ne,
+                }, 'Text::Shirasu::Tree';
+            }
+        }
+    }
+
+    for (; $node && $node->surface; $node = $node->next) {
         push @{ $self->{nodes} }, bless {
             id      => $node->id,
             surface => $node->surface,
             feature => [ split /,/, $node->feature ],
             length  => $node->length,
             rlength => $node->rlength,
-            rcattr => $node->rcattr,
+            rcattr  => $node->rcattr,
             lcattr  => $node->lcattr,
             stat    => $node->stat,
             isbest  => $node->isbest,
@@ -201,8 +295,17 @@ Please use after parse method execution.
 Filter the surface based on the features stored in the Text::Shirasu instance.
 Passing subtype to value with part of speech name as key allows you to more filter the string.
 
+    # filtering nodes only
     $ts->filter(type => [qw/名詞/]);
     $ts->filter(type => [qw/名詞 記号/], 記号 => [qw/括弧開 括弧閉/]);
+
+    # filtering trees only
+    $ts->filter(tree => 1, node => 0, type => [qw/名詞/]);
+    $ts->filter(tree => 1, node => 0, type => [qw/名詞 記号/], 記号 => [qw/括弧開 括弧閉/]);
+
+    # filtering nodes and trees
+    $ts->filter(tree => 1, type => [qw/名詞/]);
+    $ts->filter(tree => 1, type => [qw/名詞 記号/], 記号 => [qw/括弧開 括弧閉/]);
 
 =cut
 
@@ -217,15 +320,29 @@ sub filter {
     # create parameter as /名詞|動詞/ or /名詞/
     my $query = encode_utf8 join '|', map { $_ } @type;
 
-    $self->{nodes} = [
-        grep {
-            $_->{feature}->[0] =~ /($query)/
-                and _sub_query( $_->{feature}->[1],  $params{decode_utf8($1)} )
-        } @{ $self->{nodes} }
-    ];
+    # filtering trees
+    if (delete $params{tree}) {
+        $self->{trees} = [
+            grep {
+                $_->{feature}->[0] =~ /($query)/
+                    and _sub_query( $_->{feature}->[1],  $params{decode_utf8($1)} )
+            } @{ $self->{trees} }
+        ];
+    }
+
+    # filtering nodes if unset "node" argument or "node => true value"
+    if (!exists $params{node} || delete $params{node}) {
+        $self->{nodes} = [
+            grep {
+                $_->{feature}->[0] =~ /($query)/
+                    and _sub_query( $_->{feature}->[1],  $params{decode_utf8($1)} )
+            } @{ $self->{nodes} }
+        ];
+    }
 
     return $self;
 }
+
 
 =head2 join_surface
 
@@ -251,6 +368,16 @@ Return the array reference of the Text::Shirasu::Node instance.
 
 sub nodes { $_[0]->{nodes} }
 
+=head2 trees
+
+Return the array reference of the Text::Shirasu::Tree instance.
+
+    $ts->trees
+
+=cut
+
+sub trees { $_[0]->{trees} }
+
 =head2 mecab
 
 Return the Text::MeCab instance.
@@ -260,6 +387,16 @@ Return the Text::MeCab instance.
 =cut
 
 sub mecab { $_[0]->{mecab} }
+
+=head2 cabocha
+
+Return the Text::CaboCha instance.
+    
+    $ts->cabocha
+
+=cut
+
+sub cabocha { $_[0]->{cabocha} }
 
 # private
 sub _sub_query {

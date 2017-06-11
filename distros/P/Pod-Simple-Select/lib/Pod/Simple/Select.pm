@@ -8,18 +8,18 @@ Pod::Simple::Select - Select parts in a file using pod directives
 
 =head1 VERSION
 
-Version 0.001
+Version 0.002
 
 =cut
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use base qw(Pod::Simple);
 use Fcntl 'O_RDONLY';
 use Tie::File;
 
-#use Carp qw/confess/;
-use Log::Log4perl;
+use Carp qw/confess/;
+use Log::Any;
 use Data::Dumper;
 
 my $end_line;
@@ -29,7 +29,7 @@ my $h_value;
 my $token;
 
 #my $last_end;
-
+=for comment
 my $conf = q(
     log4perl.rootLogger=ERROR, LOGFILE1, Screen
    #log4perl.rootLogger=DEBUG, LOGFILE1, Screen
@@ -50,6 +50,7 @@ my $conf = q(
     log4perl.appender.Screen.layout.ConversionPattern=%c{1}-%M{1} %m%n
  );
 Log::Log4perl->init( \$conf );
+=cut
 
 =head1 SYNOPSIS
 
@@ -180,8 +181,8 @@ The order in the hash has no meaning. A pod directive or a key given in the hash
 sub new {
     my $self = shift;
     my $new  = $self->SUPER::new(@_);
-    $new->{log} = Log::Log4perl->get_logger(__PACKAGE__);
-
+    #$new->{log} = Log::Log4perl->get_logger(__PACKAGE__);
+    $new->{log} = Log::Any->get_logger;
     #$new->cut_handler( \&cut_seen );
     $new->{output_as_hash} = 0;
     return $new;
@@ -349,7 +350,7 @@ sub output_hash {
     my $self = shift;
     my $out;
     open( $out, ">", \$h_value )
-        or $self->{log}->logdie("Can't set a scalar ref as a file handle $!");
+        or confess($self->{log}->error("Can't set a scalar ref as a file handle $!"));
     $self->SUPER::output_fh($out);
     $self->{output_as_hash} = 1;
 }
@@ -367,7 +368,7 @@ sub output_file {
     my $fh;
     if ($file) {
         open $fh, ">", $file
-            or $self->{log}->logdie("Can't open $file for writing $!");
+            or confess($self->{log}->error("Can't open $file for writing $!"));
     }
     else {
         $fh = *STDOUT{IO};
@@ -387,9 +388,9 @@ This method run the parsing. It as to be called after C<$p->select(...)> and C>$
 sub parse_file {
     my ( $self, $file ) = @_;
     tie my @array, 'Tie::File', $file, mode => O_RDONLY;
-    $self->{log}->logconfess(
+    confess($self->{log}->error(
         "$file is seen as one line long by Tie::File\nPlease set the line ending according to your OS"
-    ) if ( scalar(@array) == 1 );
+    )) if ( scalar(@array) == 1 );
 
     #$token_match = $self->{doc};
     $token       = $self->{doc}->next;
@@ -428,7 +429,7 @@ sub parse_file {
             $h_value = undef;
             close $out;
             open $out, ">", \$h_value
-                or $self->{log}->logdie("Can't open string for writing $!");
+                or confess($self->{log}->error("Can't open string for writing $!"));
         }
         $token = $token->next;
     }
@@ -733,7 +734,8 @@ sub new {
     $self->{line_pos} = [ 0, 0 ];
     $self->set_pod_pattern($pod_dir);
     $self->{children} = [];
-    $self->{log}      = Log::Log4perl::get_logger(__PACKAGE__);
+    #$self->{log}      = Log::Log4perl::get_logger(__PACKAGE__);
+    $self->{log} = Log::Any->get_logger;
     return $self;
 }
 
@@ -819,7 +821,7 @@ sub next {
 #
 sub child_at {
     my ( $self, $index ) = @_;
-    $self->{log}->logconfess("called on an empty list")
+    confess($self->{log}->error("called on an empty list"))
         unless $self->children_count;
     $self->{log}
         ->debug( "searching ", $index, " in 0-", @{ $self->{children} } - 1,
@@ -875,7 +877,7 @@ sub get_level {
 
 sub is_pod_matching {
     my ( $self, $el ) = @_;
-    $self->{log}->logconfess("can't treat undef") unless ($el);
+    confess($self->{log}->error("can't treat undef")) unless ($el);
 
     if ( $self->{pod_pat} ) {
         my $i = 0;
@@ -897,7 +899,7 @@ sub is_pod_matching {
 
 sub is_key_matching {
     my ( $self, $el ) = @_;
-    $self->{log}->logconfess("can't treat undef") unless ($el);
+    confess($self->{log}->error("can't treat undef")) unless ($el);
     my $key_r = $self->{key_pat}->[ $self->{pod_index} ];
     $self->{log}->debug("is_key_matching index:", $self->{pod_index});
     $self->{key_needed} = 0;
@@ -951,8 +953,8 @@ Any questions or problems can be posted to me (rappazf) on my gmail account.
 
 =head1 AUTHOR
 
-    FranE<ccedil>ois Rappaz
-    CPAN ID: RAPPAZF
+FranE<ccedil>ois Rappaz
+CPAN ID: RAPPAZF
 
 =head1 COPYRIGHT
 

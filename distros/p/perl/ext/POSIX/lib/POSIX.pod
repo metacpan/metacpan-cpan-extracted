@@ -1013,7 +1013,7 @@ See also L</ceil>, L</floor>, L</trunc>.
 
 Owing to an oversight, this is not currently exported by default, or as part of
 the C<:math_h_c99> export tag; importing it must therefore be done by explicit
-name. This will be changed in Perl 5.26.
+name.
 
 =item C<malloc>
 
@@ -1671,6 +1671,10 @@ for collating (comparing) strings transformed using
 the C<strxfrm()> function.  Not really needed since
 Perl can do this transparently, see L<perllocale>.
 
+Beware that in a UTF-8 locale, anything you pass to this function must
+be in UTF-8; and when not in a UTF-8 locale, anything passed must not be
+UTF-8 encoded.
+
 =item C<strcpy>
 
 Not implemented.  C<strcpy()> is C-specific, use C<=> instead, see L<perlop>.
@@ -1843,6 +1847,10 @@ Used in conjunction with the C<strcoll()> function, see L</strcoll>.
 Not really needed since Perl can do this transparently, see
 L<perllocale>.
 
+Beware that in a UTF-8 locale, anything you pass to this function must
+be in UTF-8; and when not in a UTF-8 locale, anything passed must not be
+UTF-8 encoded.
+
 =item C<sysconf>
 
 Retrieves values of system configurable variables.
@@ -1941,13 +1949,9 @@ Not implemented.  Use method C<IO::File::new_tmpfile()> instead, or see L<File::
 
 =item C<tmpnam>
 
-Returns a name for a temporary file.
-
-	$tmpfile = POSIX::tmpnam();
-
 For security reasons, which are probably detailed in your system's
 documentation for the C library C<tmpnam()> function, this interface
-should not be used; instead see L<File::Temp>.
+is no longer available; instead use L<File::Temp>.
 
 =item C<tolower>
 
@@ -2589,7 +2593,7 @@ C<EXIT_FAILURE> C<EXIT_SUCCESS> C<MB_CUR_MAX> C<RAND_MAX>
 
 =item Constants
 
-C<BUFSIZ> C<EOF> C<FILENAME_MAX> C<L_ctermid> C<L_cuserid> C<L_tmpname> C<TMP_MAX>
+C<BUFSIZ> C<EOF> C<FILENAME_MAX> C<L_ctermid> C<L_cuserid> C<TMP_MAX>
 
 =back
 

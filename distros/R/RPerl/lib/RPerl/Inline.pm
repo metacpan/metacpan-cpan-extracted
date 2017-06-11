@@ -62,4 +62,5 @@ our %ARGS = (
     ],
     classes => sub { join('::', split('__', shift)); }
 );
+
 1;

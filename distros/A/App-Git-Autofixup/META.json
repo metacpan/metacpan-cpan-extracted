@@ -34,11 +34,6 @@
          "requires" : {
             "perl" : "5.008004"
          }
-      },
-      "test" : {
-         "requires" : {
-            "File::pushd" : "1"
-         }
       }
    },
    "release_status" : "stable",
@@ -49,6 +44,6 @@
          "web" : "https://github.com/torbiak/git-autofixup"
       }
    },
-   "version" : 0.001001,
+   "version" : 0.002001,
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

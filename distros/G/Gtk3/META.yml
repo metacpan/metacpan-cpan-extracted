@@ -2,35 +2,27 @@
 abstract: 'Perl interface to the 3.x series of the gtk+ toolkit'
 author:
   - 'Torsten Schoenfeld <kaffeetisch@gmx.de>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
-license:
-  - lgpl_2_1
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+license: lgpl
 meta-spec:
-  url: http://search.cpan.org/perldoc?CPAN::Meta::Spec
-  version: '2'
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
 name: Gtk3
-prereqs:
-  configure:
-    requires:
-      ExtUtils::MakeMaker: '0'
-  runtime:
-    requires:
-      Cairo::GObject: '1.000'
-      Carp: '0'
-      Exporter: '0'
-      Glib::Object::Introspection: '0.016'
-      Test::Simple: '0.96'
-release_status: stable
+requires:
+  Cairo::GObject: '1.000'
+  Carp: '0'
+  Exporter: '0'
+  Glib::Object::Introspection: '0.016'
+  Test::Simple: '0.96'
 resources:
-  bugtracker:
-    mailto: 'bug-Gtk3 [at] rt.cpan.org'
-    web: http://rt.cpan.org/Public/Dist/Display.html?Name=Gtk3
+  IRC: irc://irc.gimp.org/#gtk-perl
+  Twitter: https://twitter.com/GTKPerl
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Gtk3
   homepage: http://gtk2-perl.sourceforge.net
-  repository:
-    type: git
-    url: git://git.gnome.org/perl-Gtk3
-    web: http://git.gnome.org/browse/perl-Gtk3
-  x_IRC: irc://irc.gimp.org/#gtk-perl
-  x_twitter: https://twitter.com/GTKPerl
-version: '0.031'
+  repository: git://git.gnome.org/perl-Gtk3
+version: '0.032'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,5 +1,12 @@
 Revision history for Task-Digest
 
+0.07  Tue Jun  6 06:26:01 UTC 2017
+    - Added new digests as prereqs.
+
+0.06  Mon Jun  5 17:09:11 UTC 2017
+    - Added Digest::SHA3, Digest::BLAKE2 and CryptX toolkit.
+    - Updated benchmarks.
+
 0.05  Sat Feb 12 09:29:55 UTC 2011
     - Digest::CubeHash module was renamed.
 

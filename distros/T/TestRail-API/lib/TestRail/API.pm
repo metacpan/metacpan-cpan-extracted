@@ -2,7 +2,7 @@
 # PODNAME: TestRail::API
 
 package TestRail::API;
-$TestRail::API::VERSION = '0.040';
+$TestRail::API::VERSION = '0.041';
 
 use 5.010;
 
@@ -1355,7 +1355,7 @@ TestRail::API - Provides an interface to TestRail's REST api via HTTP
 
 =head1 VERSION
 
-version 0.040
+version 0.041
 
 =head1 SYNOPSIS
 

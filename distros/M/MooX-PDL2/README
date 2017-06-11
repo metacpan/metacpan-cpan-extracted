@@ -1,0 +1,64 @@
+MooX::PDL2
+
+This class provides the thinnest possible layer required to create a Moo
+object which is recognized by PDL.
+
+PDL will treat a non-PDL blessed hash as a PDL object if it has a hash
+element with a key of "PDL". That element may be a "PDL" piddle or a
+*subroutine* which returns a piddle.
+
+This class provides a "PDL" method (which must not be overridden!) which
+returns the contents of the "_PDL" attribute. That attribute is yours to
+manipulate.
+
+  Classes without required constructor parameters
+
+PDL does not pass any parameters to a class' initialize method when
+constructing a new object. Because of this, the default implementation
+of MooX::PDL2::initialize() returns a bare piddle, not an instance of
+MooX::PDL2, as it cannot know whether your class requires parameters
+during construction.
+
+If your class does *not* require parameters be passed to the
+constructor, it is safe to overload the "initialize" method to return a
+fully fledged instance of your class:
+
+ sub initialize { shift->new() }
+
+  Overloaded operators
+
+PDL overloads a number of the standard Perl operators. For the most part
+it does this using subroutines rather than methods, which makes it
+difficult to manipulate them. Consider using overload::reify to wrap the
+overloads in methods, e.g.:
+
+  package MyPDL;
+  use Moo;
+  extends 'MooX::PDL2';
+  use overload::reify;
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Smithsonian Astrophysical
+Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007

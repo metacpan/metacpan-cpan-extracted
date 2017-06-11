@@ -21,7 +21,7 @@ Net::Etcd::KV
 
 =cut
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 =head1 DESCRIPTION
 
@@ -41,12 +41,11 @@ Range gets the keys in the range from the key-value store.
 
 sub range {
     my ( $self, $options ) = @_;
-	my $cb = pop if ref $_[-1] eq 'CODE';
+    my $cb = pop if ref $_[-1] eq 'CODE';
     my $range = Net::Etcd::KV::Range->new(
-        %$self,
         endpoint => '/kv/range',
         etcd     => $self,
-		cb       => $cb,
+        cb       => $cb,
         ( $options ? %$options : () ),
     );
     $range->request;
@@ -65,16 +64,38 @@ history.
 
 sub put {
     my ( $self, $options ) = @_;
-	my $cb = pop if ref $_[-1] eq 'CODE';
-    my $range = Net::Etcd::KV::Put->new(
-        %$self,
+    my $cb = pop if ref $_[-1] eq 'CODE';
+    my $put = Net::Etcd::KV::Put->new(
         endpoint => '/kv/put',
         etcd     => $self,
-		cb       => $cb,
+        cb       => $cb,
         ( $options ? %$options : () ),
     );
-    $range->request;
-    return $range;
+    $put->request;
+    return $put;
+}
+
+=head2 txn
+
+Txn processes multiple requests in a single transaction. A txn request increments
+the revision of the key-value store and generates events with the same revision for
+every completed request. It is not allowed to modify the same key several times
+within one txn.
+
+=cut
+
+sub txn {
+    my ( $self, $options ) = @_;
+    my $cb = pop if ref $_[-1] eq 'CODE';
+    my $txn = Net::Etcd::KV::Txn->new(
+        %$self,
+        endpoint => '/kv/txn',
+        etcd     => $self,
+        cb       => $cb,
+        ( $options ? %$options : () ),
+    );
+    $txn->request;
+    return $txn;
 }
 
 1;

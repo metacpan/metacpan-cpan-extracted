@@ -2,7 +2,7 @@
 # ABSTRACT: Find runs and tests according to user specifications.
 
 package TestRail::Utils::Find;
-$TestRail::Utils::Find::VERSION = '0.040';
+$TestRail::Utils::Find::VERSION = '0.041';
 use strict;
 use warnings;
 
@@ -416,7 +416,7 @@ sub getResults {
                 }
                 return MCE->gather( MCE->chunk_id, $res );
             }
-            @$runs
+            $runs
         );
 
     }
@@ -480,7 +480,7 @@ TestRail::Utils::Find - Find runs and tests according to user specifications.
 
 =head1 VERSION
 
-version 0.040
+version 0.041
 
 =head1 DESCRIPTION
 

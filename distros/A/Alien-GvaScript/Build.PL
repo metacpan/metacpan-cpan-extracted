@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use lib '.';
 use GvaScript_Builder;
 
 my $builder = GvaScript_Builder->new(

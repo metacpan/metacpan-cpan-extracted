@@ -45,6 +45,88 @@ sub cmd_install {
   CPAN->import;
   CPAN::Config->load;
 
+  if ($CPAN::VERSION < 1.94_54) {
+    # CPAN can't download into a directory with spaces.  it shells out to
+    # wget/curl, but doesn't quote the arguments.  Change directories beforehand
+    # and use a relative filename so the command doesn't need quoting.
+    require Cwd;
+    require File::Basename;
+    require File::Path;
+    my $hosthard = defined &CPAN::FTP::hostdlhard ? 'hostdlhard' : 'hosthard';
+    no strict 'refs';
+    no warnings 'redefine';
+    my $hosthardsub = \&{"CPAN::FTP::$hosthard"};
+    *{"CPAN::FTP::$hosthard"} = sub {
+      my($self,$host_seq,$file,$aslocal,@rest) = @_;
+      if ($aslocal !~ m{[^a-zA-Z0-9+=_:,./-]}) {
+        $hosthardsub->(@_);
+      }
+      my $cwd = Cwd::cwd();
+      my $local_dir = File::Basename::dirname($aslocal);
+      my $local_file = File::Basename::basename($aslocal);
+      File::Path::mkpath($local_dir);
+      my $out;
+      eval {
+        chdir $local_dir;
+        $out = $hosthardsub->($self, $host_seq, $file, $local_file, @rest);
+        1;
+      } or do {
+        chdir $cwd;
+        die $@;
+      };
+      chdir $cwd;
+      if (defined $out && $out eq $local_file) {
+        return $aslocal;
+      }
+      return;
+    };
+  }
+
+  if ($CPAN::VERSION < 1.87_51) {
+    if (!$CPAN::META->has_inst("Compress::Zlib")) {
+      # gzip and tar commands shell out without quoting arguments.  Wrap them in
+      # a quoting routine.
+      no warnings 'redefine';
+      my $quote = sub {
+        map +(
+            /^"/                    ? $_
+          : m{[^a-zA-Z0-9+=_:,./-]} ? qq["$_"]
+                                    : $_
+        ), @_;
+      };
+
+      my $gzip = \&CPAN::Tarzip::gzip;
+      *CPAN::Tarzip::gzip = sub {
+        $gzip->($_[0], $quote->(@_[1,2]));
+      };
+      my $gunzip = \&CPAN::Tarzip::gunzip;
+      *CPAN::Tarzip::gunzip = sub {
+        $gunzip->($_[0], $quote->(@_[1,2]));
+      };
+      my $gtest = \&CPAN::Tarzip::gtest;
+      *CPAN::Tarzip::gtest = sub {
+        $gtest->($_[0], $quote->($_[1]));
+      };
+      my $TIEHANDLE = \&CPAN::Tarzip::TIEHANDLE;
+      *CPAN::Tarzip::TIEHANDLE = sub {
+        $TIEHANDLE->($_[0], $quote->($_[1]));
+      };
+    }
+    if (MM->maybe_command($CPAN::Config->{gzip})
+        &&
+        MM->maybe_command($CPAN::Config->{tar})) {
+      my $untar = \&CPAN::Tarzip::untar;
+      *CPAN::Tarzip::untar = sub {
+        my ($class, $file) = @_;
+        # the original untar checks for .gz at the end, so quote it like
+        # "file.tar".gz
+        my $gz = $file =~ s/\.gz$//;
+        $file = qq["$file"] . ($gz ? '.gz' : '');
+        $untar->($class, $file);
+      };
+    }
+  }
+
   # ExtUtils::ParseXS is a prerequisite of Module::Build.  Previously,
   # it included a Build.PL file.  If CPAN.pm is configured to prefer
   # Module::Build (the default), it would see the Build.PL file and assume
@@ -53,7 +135,12 @@ sub cmd_install {
   # Build.PL anymore, but continue to prefer EUMM as a precaution.
   $CPAN::Config->{prefer_installer} = "EUMM";
 
-  force('install', @modules);
+  if (defined &notest) {
+    notest('install', @modules);
+  }
+  else {
+    force('install', @modules);
+  }
 }
 
 sub cmd_disable_manpages {

@@ -3,22 +3,57 @@
 use strict;
 use warnings;
 
+use Getopt::Long;
 use App::Kritika;
 use App::Kritika::Settings;
 
-my ($file) = @ARGV;
-die "Usage: <file>\n" unless $file && -f $file;
+my $opt_head;
+my $opt_changes;
+GetOptions(
+    'head=s'  => \$opt_head,
+    'changes' => \$opt_changes
+) or die("Error in command line arguments\n");
 
-my $settings = App::Kritika::Settings->new(file => $file)->settings;
+my @files;
 
-my $kritika = App::Kritika->new(%$settings);
-
-my $report = $kritika->validate($file);
-
-foreach my $issue (@$report) {
-    $issue->{col_no} //= 1;
-    print "$file:$issue->{line_no}:$issue->{col_no}: [$issue->{profile}/$issue->{rule}] $issue->{message}\n";
+if ( !-t STDIN ) {
+    @files = map { chomp $_; $_ } <>;
 }
+else {
+    @files = @ARGV;
+}
+
+@files = grep { -f $_ } @files;
+
+die "Usage: [--head=<head>] [--changes] <file>...\n" unless @files;
+
+my $settings = App::Kritika::Settings->new( file => $files[0] )->settings;
+
+my $kritika =
+  App::Kritika->new( %$settings, head => $opt_head, changes => $opt_changes );
+
+my $issues_found = 0;
+foreach my $file (@files) {
+    my $report = eval { $kritika->validate($file) } or do {
+        print "Error: $file:$@";
+        $issues_found++;
+        next;
+    };
+
+    foreach my $issue (@$report) {
+        $issue->{col_no} //= 1;
+        print "$file:$issue->{line_no}:$issue->{col_no}: "
+          . "[$issue->{profile}/$issue->{rule}] $issue->{message}\n";
+
+        $issues_found++;
+    }
+
+    if ( !@$report ) {
+        print "$file:OK\n";
+    }
+}
+
+exit($issues_found);
 
 __END__
 
@@ -29,6 +64,7 @@ kritika - integrate with kritika.io
 =head1 SYNOPSIS
 
     kritika lib/MyFile.pm
+    kritika --head master lib/OtherFile.pm
 
 =head1 DESCRIPTION
 
@@ -36,11 +72,44 @@ This command allows you to quickly analyze file using L<https://kritika.io> serv
 your repository after the push, but of course sometimes you would like to know if something's wrong before doing
 a commit.
 
+=head2 Git Hook Example
+
+This is based on the shipped with C<git> pre-push hook example.
+
+    #!/bin/sh
+
+    remote="$1"
+    url="$2"
+
+    z40=0000000000000000000000000000000000000000
+
+    while read local_ref local_sha remote_ref remote_sha
+    do
+        if [ "$local_sha" = $z40 ]
+        then
+            :
+        else
+            if [ "$remote_sha" = $z40 ]
+            then
+                range="$local_sha"
+            else
+                range="$remote_sha..$local_sha"
+            fi
+
+            branch="$(git rev-parse --abbrev-ref HEAD)"
+
+            git diff --name-only $range | kritika --head "$branch" || exit 1
+        fi
+    done
+
+    exit 0
+
 This command easily integrates with text editors.
 
 =head1 CONFIGURATION
 
-A special file C<.kritikarc> has to be placed in the root directory of the project with the following configuration:
+A special file C<.kritikarc> (or C<_kritikarc> on Windows) has to be placed in the root directory of the project with
+the following configuration:
 
     # This is the default, if you're using public Kritika service this option is not needed
     base_url=https://kritika.io

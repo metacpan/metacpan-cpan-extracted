@@ -1,6 +1,6 @@
-package Pcore::Sphinx v0.8.0;
+package Pcore::Sphinx v0.9.0;
 
-use Pcore -dist, -class, -try;
+use Pcore -dist, -class;
 
 extends qw[Pcore::App::Alien];
 
@@ -176,7 +176,7 @@ around app_build => sub ( $orig, $self ) {
         $self->report_warn( q["] . $self->alien_dir . q[" already exists. Remove it manually to rebuild] );
     }
     else {
-        my $res = try {
+        eval {
 
             # sphinx
             P->pm->run_proc( q[wget -O - http://sphinxsearch.com/files/sphinx-] . $self->sphinx_ver . qq[-release.tar.gz | tar -C $ENV->{TEMP_DIR} -xzvf -] ) or die;
@@ -192,17 +192,10 @@ around app_build => sub ( $orig, $self ) {
                 P->pm->run_proc( [ 'make', '-j' . P->sys->cpus_num ] ) or die;
 
                 P->pm->run_proc( [ 'make', 'install' ] ) or die;
-
-                return 1;
             }
-        }
-        catch {
-            my $e = shift;
-
-            return 0;
         };
 
-        unless ($res) {
+        if ($@) {
             P->file->rmtree( $self->alien_dir );
 
             $self->report_fatal(qq[Error building application. Maybe you need to manually install dependencies, try: "sudo yum -y install expat-devel re2"]);
@@ -267,7 +260,9 @@ sub alien_proc ($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 208                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |    3 | 179                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    3 | 201                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

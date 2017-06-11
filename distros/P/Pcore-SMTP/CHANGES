@@ -1,3 +1,22 @@
+v0.4.0 2017-06-02T07:20:53Z
+ - No issues on bugtracker were closed since the last release
+ - Pcore::AE::Handle <-> Pcore::AE::Handle2
+ - tls_ctx attr added
+ - smtp log pipe params changed
+ - log pipes serialize event data manually
+ - event log pipe improved
+ - event roouting key packed to event hash
+ - event listener get single $ev argument
+ - POD updated
+
+v0.3.1 2017-05-31T17:25:10Z
+ - No issues on bugtracker were closed since the last release
+ - do not verify peername
+
+v0.3.0 2017-05-30T15:27:38Z
+ - No issues on bugtracker were closed since the last release
+ - event listener pipe added
+
 v0.2.1 2017-05-25T07:06:16Z
  - No issues on bugtracker were closed since the last release
  - use Pcore::AE::Handle2

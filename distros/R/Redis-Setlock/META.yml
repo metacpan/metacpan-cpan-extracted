@@ -3,20 +3,18 @@ abstract: 'Like the setlock command using Redis.'
 author:
   - 'FUJIWARA Shunichiro <fujiwara.shunichiro@gmail.com>'
 build_requires:
-  Test::More: 0.98
-  Test::RedisServer: 0
-  Test::SharedFork: 0
-  Test::TCP: 2.00
+  Test::More: '0.98'
+  Test::RedisServer: '0'
+  Test::SharedFork: '0'
+  Test::TCP: '2.00'
 configure_requires:
-  CPAN::Meta: 0
-  CPAN::Meta::Prereqs: 0
-  Module::Build: 0.38
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v0.14.1, CPAN::Meta::Converter version 2.133380'
+generated_by: 'Minilla/v3.0.11, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Redis-Setlock
 no_index:
   directory:
@@ -31,18 +29,19 @@ no_index:
 provides:
   Redis::Setlock:
     file: lib/Redis/Setlock.pm
-    version: 0.07
+    version: '0.08'
 requires:
-  Getopt::Long: 2.42
-  Guard: 0
-  Log::Minimal: 0
-  Pod::Usage: 0
-  Redis: 1.952
-  Time::HiRes: 0
-  Try::Tiny: 0
-  perl: 5.008001
+  Getopt::Long: '2.42'
+  Guard: '0'
+  Log::Minimal: '0'
+  Pod::Usage: '0'
+  Redis: '1.952'
+  Time::HiRes: '0'
+  Try::Tiny: '0'
+  perl: '5.008001'
 resources:
   bugtracker: https://github.com/fujiwara/Redis-Setlock/issues
   homepage: https://github.com/fujiwara/Redis-Setlock
   repository: git://github.com/fujiwara/Redis-Setlock.git
-version: 0.07
+version: '0.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

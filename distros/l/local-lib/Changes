@@ -1,5 +1,31 @@
 Revision history for local::lib
 
+2.000023 - 2017-06-07
+ - fix use of 'note' in test for compatibilty with old Test::More
+
+2.000022 - 2017-06-07
+ - releasing as stable
+
+2.000_021 - 2017-04-23
+ - account for an empty SHELL variable when detecting shell
+ - author test cleanups
+ - bootstrapping option --no-manpages now affects bootstrapping process, not
+   just later module installs
+ - cope with home directories with spaces when bootstrapping with old CPAN.pm
+
+2.000_020 - 2016-10-18
+ - fix handling of inc_version_list
+ - don't load strict or warnings outside author mode
+ - load and use Cwd when we're printing and exiting
+ - use loaded Cwd/Win32::Cwd if it's available
+ - handle relative paths in current executable
+ - don't try to run current executable in embedded perl
+ - handle relative directories better
+ - fix shell test for powershell 1 and group policy restricted environments
+ - avoid user init files in shell test
+ - use safer format to check environment in shell test
+ - many test cleanups
+
 2.000019 - 2016-04-19
  - fix bootstrapping into directory with spaces (PR#4)
  - fix variable interpolation to work when used with sh -u (RT#112711)

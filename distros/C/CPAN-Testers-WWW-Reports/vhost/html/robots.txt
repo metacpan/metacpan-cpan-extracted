@@ -4,12 +4,14 @@ Disallow: /private/
 Disallow: /*.yaml$
 Disallow: /*.rss$
 Disallow: /*.json$
+Disallow: /cpan/report
 
 User-agent: msnbot
 Disallow: /private/
 Disallow: /*.yaml$
 Disallow: /*.rss$
 Disallow: /*.json$
+Disallow: /cpan/report
 
 User-agent: DotBot
 Crawl-delay: 600
@@ -17,6 +19,12 @@ Disallow: /private/
 Disallow: /*.yaml$
 Disallow: /*.rss$
 Disallow: /*.json$
+Disallow: /cpan/report
+
+User-agent: SemrushBot-SA
+Disallow: /
+User-agent: SemrushBot
+Disallow: /
 
 User-agent: *
 Crawl-delay: 600
@@ -24,3 +32,4 @@ Disallow: /private/
 Disallow: /*.yaml$
 Disallow: /*.rss$
 Disallow: /*.json$
+Disallow: /cpan/report

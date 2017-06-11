@@ -1,16 +1,13 @@
-.shipit
-.travis.yml
 Build.PL
 Changes
-cpanfile
-lib/SQL/Concat.pm
-lib/SQL/Concat.pod
 LICENSE
-MANIFEST			This list of files
+MANIFEST
 META.json
 META.yml
-minil.toml
 README.md
+cpanfile
+lib/SQL/Concat.pm
+minil.toml
 t/00_compile.t
 t/10_oop.t
 t/20_fp.t

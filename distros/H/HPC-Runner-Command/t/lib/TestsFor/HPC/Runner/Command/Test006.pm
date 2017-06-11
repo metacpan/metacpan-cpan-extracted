@@ -28,7 +28,7 @@ sub write_test_file {
 #HPC procs=1
 EOF
 
-    for(my $x=1; $x<=13; $x++){
+    for(my $x=1; $x<=12; $x++){
         print $fh "pyfasta split -n 20 Sample$x.fasta\n";
     }
 
@@ -71,7 +71,7 @@ sub test_001 : Tags(job_stats) {
     is($test->jobs->{'pyfasta'}->{num_job_arrays}, 4);
 
     ok(1);
-    
+
     chdir($cwd);
     remove_tree($test_dir);
 }

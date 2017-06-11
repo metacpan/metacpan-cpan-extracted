@@ -4,7 +4,7 @@
       "Fujiwara Shunichiro <fujiwara.shunichiro@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.5.0",
+   "generated_by" : "Minilla/v3.0.4",
    "license" : [
       "perl_5"
    ],
@@ -58,7 +58,7 @@
    "provides" : {
       "Test::UNIXSock" : {
          "file" : "lib/Test/UNIXSock.pm",
-         "version" : "0.1"
+         "version" : "0.2"
       }
    },
    "release_status" : "stable",
@@ -72,5 +72,9 @@
          "web" : "https://github.com/fujiwara/Test-UNIXSock"
       }
    },
-   "version" : "0.1"
+   "version" : "0.2",
+   "x_contributors" : [
+      "Christopher Hoskin <christopher.hoskin@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

@@ -1,5 +1,10 @@
 Revision history for Mojolicious-Plugin-OAuth2-Server
 
+0.38     2017-06-01
+        - Fix combination of verify_client and jwt_secret causing tokens
+          to be generated when verify_client return 0 for client_credentials
+          grant
+
 0.37     2017-05-12
         - Add support for jwt_claims callback in config
           (see jwt_claims_cb in Net::OAuth2::AuthorizationServer)

@@ -1,6 +1,6 @@
-package Pcore::Nginx v1.5.0;
+package Pcore::Nginx v1.6.0;
 
-use Pcore -dist, -class, -try;
+use Pcore -dist, -class;
 
 has data_dir     => ( is => 'ro',   isa => Str, default => "$ENV->{DATA_DIR}" );
 has nginx_bin    => ( is => 'lazy', isa => Str, default => 'nginx' );

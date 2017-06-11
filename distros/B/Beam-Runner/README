@@ -6,6 +6,24 @@ configuration files and then execute them. This also allows easy
 discovery of configuration files and objects, and allows you to document
 your objects for your users.
 
+  Create a Task
+
+A task is an object that consumes the Beam::Runnable role. This role
+requires only a "run()" method be implemented in the class. This "run()"
+method should accept all the arguments given on the command line. It can
+parse GNU-style options out of this array using "GetOptionsFromArray" in
+Getopt::Long.
+
+Task modules can compose additional roles to easily add more features,
+like adding a timeout with Beam::Runnable::Timeout::Alarm.
+
+Task modules are expected to have documentation that will be displayed
+by the "beam list" and "beam help" commands. The "beam list" command
+will display the "NAME" section of the documentation, and the "beam
+help" command will display the "NAME", "SYNOPSIS", "DESCRIPTION",
+"ARGUMENTS", "OPTIONS", "ENVIRONMENT", and "SEE ALSO" sections of the
+documentation.
+
   Configuration Files
 
 The configuration file is a Beam::Wire container file that describes
@@ -34,19 +52,6 @@ CPAN::Testers::Schema), and configures a runnable task called
             $ref: _schema
 
 For more information about container files, see the Beam::Wire
-documentation.
-
-  Tasks
-
-A task is an object configured in the container file that consumes the
-Beam::Runnable role. This role requires only a "run()" method be
-implemented in the class.
-
-Task modules are expected to have documentation that will be displayed
-by the "beam list" and "beam help" commands. The "beam list" command
-will display the "NAME" section of the documentation, and the "beam
-help" command will display the "NAME", "SYNOPSIS", "DESCRIPTION",
-"ARGUMENTS", "OPTIONS", "ENVIRONMENT", and "SEE ALSO" sections of the
 documentation.
 
 INSTALLATION

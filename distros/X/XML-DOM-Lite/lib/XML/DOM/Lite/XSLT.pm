@@ -1,4 +1,6 @@
 package XML::DOM::Lite::XSLT;
+use warnings;
+use strict;
 
 use XML::DOM::Lite::XPath;
 use XML::DOM::Lite::Constants qw(:all);

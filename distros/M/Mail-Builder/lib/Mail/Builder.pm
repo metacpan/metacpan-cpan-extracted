@@ -5,7 +5,7 @@ package Mail::Builder;
 use namespace::autoclean;
 use Moose;
 
-our $VERSION = '2.12';
+our $VERSION = '2.13';
 our $AUTHORITY = 'cpan:MAROS';
 
 use Mail::Builder::TypeConstraints;

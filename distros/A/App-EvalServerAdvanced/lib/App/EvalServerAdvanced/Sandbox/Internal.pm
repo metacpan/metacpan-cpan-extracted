@@ -1,4 +1,5 @@
 package App::EvalServerAdvanced::Sandbox::Internal;
+our $VERSION = '0.017';
 
 use strict;
 use warnings;
@@ -6,6 +7,8 @@ use warnings;
 use Data::Dumper;
 use B::Deparse;
 use Perl::Tidy;
+use PerlIO;
+do {my $temp; open(my $fh, ">", \$temp); close($fh)};
 
 # Easter eggs
 # Just a bad joke from family guy, use this module and it'll just die on you
@@ -17,7 +20,7 @@ do {
     package 
     Zathras; 
     our $AUTOLOAD; 
-    use overload '""' => sub {
+    use overload '""' => sub { ## no critic
         my $data = @{$_[0]{args}}? qq{$_[0]{data}(}.join(', ', map {"".$_} @{$_[0]{args}}).qq{)} : qq{$_[0]{data}};
         my $old = $_[0]{old};
 
@@ -52,6 +55,7 @@ sub deparse_perl_code {
     my %methods = (map {$_ => botdeparse->can($_)} grep {botdeparse->can($_)} keys {%botdeparse::}->%*);
 
     my $dp = B::Deparse->new("-p", "-q", "-x7", "-d");
+    no warnings;
     local *B::Deparse::declare_hints = sub { '' };
     my @out;
 
@@ -140,6 +144,7 @@ sub run_perl {
     local $Data::Dumper::Useqq = 1;
     local $Data::Dumper::Freezer = "dd_freeze";
 
+    no warnings;
     my $out = ref($ret) ? Dumper( $ret ) : "" . $ret;
 
     print $out unless $outbuffer;

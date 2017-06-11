@@ -2,7 +2,7 @@
 # -*-cperl-*-
 #
 # 01-process.t - Test a Bitcoin Payment
-# Copyright (c) 2016-2017 Ashish Gulhati <biz-btc at hash dot neomailbox.ch>
+# Copyright (c) 2016-2017 Ashish Gulhati <biz-btc at hash.neo.tc>
 
 use Test::More tests => 10;
 use Business::Bitcoin;

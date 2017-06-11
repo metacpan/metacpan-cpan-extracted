@@ -6,14 +6,13 @@ Makefile.PL
 MANIFEST
 ppport.h
 README
-XPosixAlnum.20
 XPosixAlnum.22
 XPosixAlnum.24
-XPosixAlpha.20
+XPosixAlnum.26
+XPosixAlpha.22
 XPosixAlpha.24
-XPosixDigit.20
+XPosixAlpha.26
 XPosixDigit.22
-XPosixWord.20
 XPosixWord.22
 t/Regexp-Compare.t
 lib/Regexp/Compare.pm

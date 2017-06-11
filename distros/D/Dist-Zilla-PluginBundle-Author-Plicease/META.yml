@@ -17,7 +17,7 @@ configure_requires:
   Module::Build: '0.28'
   perl: '5.008001'
 dynamic_config: '1'
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,7 +29,7 @@ requires:
   Dist::Zilla: '6.00'
   Dist::Zilla::App::Command::aliendeps: '0.01'
   Dist::Zilla::Plugin::Alien: '0.023'
-  Dist::Zilla::Plugin::Author::Plicease: '2.12'
+  Dist::Zilla::Plugin::Author::Plicease: '2.14'
   Dist::Zilla::Plugin::AutoMetaResources: '1.20'
   Dist::Zilla::Plugin::CopyFilesFromBuild: '0.150250'
   Dist::Zilla::Plugin::InsertExample: '0.04'
@@ -57,5 +57,5 @@ resources:
   bugtracker: https://github.com/plicease/Dist-Zilla-PluginBundle-Author-Plicease/issues
   homepage: https://metacpan.org/pod/Dist::Zilla::PluginBundle::Author::Plicease
   repository: git://github.com/plicease/Dist-Zilla-PluginBundle-Author-Plicease.git
-version: '2.12'
+version: '2.14'
 x_serialization_backend: 'YAML::Tiny version 1.70'

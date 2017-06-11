@@ -1,0 +1,17 @@
+Changes
+ignore.txt
+xt/boilerplate.t
+lib/brew_driver.pl
+lib/fastQ_brew.pm
+lib/fastQ_brew_Utilities.pm
+LICENSE
+Makefile.PL
+MANIFEST			
+README
+README.md
+META.json
+sample_input/sample_sanger.fastq
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

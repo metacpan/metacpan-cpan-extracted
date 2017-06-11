@@ -81,10 +81,10 @@ sub report ( $self, $dockerhub_repo ) {
                 align  => 1,
                 format => sub ( $val, $id, $row ) {
                     if ( !$val ) {
-                        return BOLD WHITE ON_RED . ' no ' . RESET;
+                        return $BOLD . $WHITE . $ON_RED . ' no ' . $RESET;
                     }
                     else {
-                        return BLACK ON_GREEN . q[ yes ] . RESET;
+                        return $BLACK . $ON_GREEN . q[ yes ] . $RESET;
                     }
                 }
             },
@@ -163,16 +163,16 @@ sub report ( $self, $dockerhub_repo ) {
     for my $build ( $build_history->{data}->@* ) {
         if ( !exists $report->{ $build->dockertag_name }->{build_status} ) {
             if ( $build->build_status_name eq 'Error' ) {
-                $report->{ $build->dockertag_name }->{build_status} = BOLD WHITE ON_RED;
+                $report->{ $build->dockertag_name }->{build_status} = $BOLD . $WHITE . $ON_RED;
             }
             elsif ( $build->build_status_name eq 'Success' ) {
-                $report->{ $build->dockertag_name }->{build_status} = BLACK ON_GREEN;
+                $report->{ $build->dockertag_name }->{build_status} = $BLACK . $ON_GREEN;
             }
             else {
-                $report->{ $build->dockertag_name }->{build_status} = BLACK ON_WHITE;
+                $report->{ $build->dockertag_name }->{build_status} = $BLACK . $ON_WHITE;
             }
 
-            $report->{ $build->dockertag_name }->{build_status} .= q[ ] . $build->build_status_name . q[ ] . RESET;
+            $report->{ $build->dockertag_name }->{build_status} .= q[ ] . $build->build_status_name . q[ ] . $RESET;
 
             $report->{ $build->dockertag_name }->{build_status_updated} = $build->last_updated;
         }
@@ -211,11 +211,14 @@ sub update_from_tag ( $self, $tag ) {
         else {
             P->file->write_bin( $self->dist->root . 'Dockerfile', $dockerfile );
 
-            # TODO cd to repo root
+            {
+                # cd to repo root
+                my $chdir_guard = P->file->chdir( $self->dist->root );
 
-            my $res = $self->dist->scm->scm_commit( qq[Docker base image changed from "$1$2" to "$1:$tag"], 'Dockerfile' );
+                my $res = $self->dist->scm->scm_commit( qq[Docker base image changed from "$1$2" to "$1:$tag"], 'Dockerfile' );
 
-            die "$res" if !$res;
+                die "$res" if !$res;
+            }
 
             $self->dist->clear_docker;
 

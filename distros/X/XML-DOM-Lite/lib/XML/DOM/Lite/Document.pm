@@ -1,4 +1,6 @@
 package XML::DOM::Lite::Document;
+use warnings;
+use strict;
 
 use strict;
 use warnings;

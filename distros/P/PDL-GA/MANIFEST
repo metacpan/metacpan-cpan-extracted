@@ -6,7 +6,8 @@ pdlmaker.plm
 GA.pd		# GA.pm
 GA.pm
 README.txt
-t/common.plt
 t/00_basic.t
 
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+GENERATED/PDL/GA.pm                      mod=PDL::GA pd=GA.pd (added by pdlpp_mkgen)

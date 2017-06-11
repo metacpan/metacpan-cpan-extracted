@@ -1,15 +1,19 @@
 # tr.t
 $|=1;
 
-use utf8;
-
 BEGIN {
     chdir 't' if -d 't';
     require './test.pl';
     set_up_inc('../lib');
+    if (is_miniperl()) {
+	eval 'require utf8';
+        if ($@) { skip_all("miniperl, no 'utf8'") }
+    }
 }
 
-plan tests => 164;
+use utf8;
+
+plan tests => 216;
 
 # Test this first before we extend the stack with other operations.
 # This caused an asan failure due to a bad write past the end of the stack.
@@ -28,14 +32,17 @@ is($_, "abcdefghijklmnopqrstuvwxyz",    'lc');
 tr/b-y/B-Y/;
 is($_, "aBCDEFGHIJKLMNOPQRSTUVWXYz",    'partial uc');
 
+tr/a-a/AB/;
+is($_, "ABCDEFGHIJKLMNOPQRSTUVWXYz",    'single char range a-a');
+
 eval 'tr/a/\N{KATAKANA LETTER AINU P}/;';
 like $@,
-     qr/\\N\{KATAKANA LETTER AINU P} must not be a named sequence in transliteration operator/,
+     qr/\\N\{KATAKANA LETTER AINU P\} must not be a named sequence in transliteration operator/,
      "Illegal to tr/// named sequence";
 
 eval 'tr/\x{101}-\x{100}//;';
 like $@,
-     qr/Invalid range "\\x\{0101}-\\x\{0100}" in transliteration operator/,
+     qr/Invalid range "\\x\{0101\}-\\x\{0100\}" in transliteration operator/,
      "UTF-8 range with min > max";
 
 SKIP: {   # Test literal range end point special handling
@@ -166,7 +173,7 @@ like $@, qr\^Using !~ with tr///r doesn't make sense\,
   is $wc, 1, '/r warns just once';
 }
 
-# perlbug [ID 20000511.005]
+# perlbug [ID 20000511.005 (#3237)]
 $_ = 'fred';
 /([a-z]{2})/;
 $1 =~ tr/A-Z//;
@@ -498,7 +505,7 @@ is( ref $x, 'SCALAR', "    doesn't stringify its argument" );
 
 # rt.perl.org 36622.  Perl didn't like a y/// at end of file.  No trailing
 # newline allowed.
-fresh_perl_is(q[$_ = "foo"; y/A-Z/a-z/], '');
+fresh_perl_is(q[$_ = "foo"; y/A-Z/a-z/], '', {}, 'RT #36622 y/// at end of file');
 
 
 { # [perl #38293] chr(65535) should be allowed in regexes
@@ -641,6 +648,69 @@ for ("", nullrocow) {
 	ok(1, "tr///s on PL_Yes does not assert");
 	eval q{ *x =~ tr///d };
 	ok(1, "tr///d on glob does not assert");
+}
+
+{ # [perl #128734
+    my $string = chr utf8::unicode_to_native(0x00e0);
+    $string =~ tr/\N{U+00e0}/A/;
+    is($string, "A", 'tr// of \N{U+...} works for upper-Latin1');
+    my $string = chr utf8::unicode_to_native(0x00e1);
+    $string =~ tr/\N{LATIN SMALL LETTER A WITH ACUTE}/A/;
+    is($string, "A", 'tr// of \N{name} works for upper-Latin1');
+}
+
+# RT #130198
+# a tr/// that is cho(m)ped, possibly with an array as arg
+
+{
+    use warnings;
+
+    my ($s, @a);
+
+    my $warn;
+    local $SIG{__WARN__ } = sub { $warn .= "@_" };
+
+    for my $c (qw(chop chomp)) {
+        for my $bind ('', '$s =~ ', '@a =~ ') {
+            for my $arg2 (qw(a b)) {
+                for my $r ('', 'r') {
+                    $warn = '';
+                    # tr/a/b/ modifies its LHS, so if the LHS is an
+                    # array, this should die. The special cases of tr/a/a/
+                    # and tr/a/b/r don't modify their LHS, so instead
+                    # we croak because cho(m)p is trying to modify it.
+                    #
+                    my $exp =
+                        ($r eq '' && $arg2 eq 'b' && $bind =~ /\@a/)
+                            ? qr/Can't modify private array in transliteration/
+                            : qr{Can't modify transliteration \(tr///\) in $c};
+
+                    my $expr = "$c(${bind}tr/a/$arg2/$r);";
+                    eval $expr;
+                    like $@, $exp, "RT #130198 eval: $expr";
+
+                    $exp =
+                        $bind =~ /\@a/
+                         ? qr{^Applying transliteration \(tr///\) to \@a will act on scalar\(\@a\)}
+                         : qr/^$/;
+                    like $warn, $exp, "RT #130198 warn: $expr";
+                }
+            }
+        }
+    }
+
+
+}
+
+{   # [perl #130656] This bug happens when the tr is split across lines, so
+    # that the first line causes it to go into UTF-8, and the 2nd is only
+    # things like \x
+    my $x = "\x{E235}";
+    $x =~ tr
+    [\x{E234}-\x{E342}\x{E5B5}-\x{E5DF}]
+    [\x{E5CD}-\x{E5DF}\x{EA80}-\x{EAFA}\x{EB0E}-\x{EB8E}\x{EAFB}-\x{EB0D}\x{E5B5}-\x{E5CC}];
+
+    is $x, "\x{E5CE}", '[perl #130656]';
 }
 
 1;

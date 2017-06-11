@@ -21,11 +21,14 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "App::EvalServerAdvanced::Protocol" => 0,
     "Data::Dumper" => 0,
+    "Encode" => 0,
     "Exporter" => 0,
     "IO::Async::Loop" => 0,
     "IO::Async::Stream" => 0,
     "Term::ReadLine" => 0,
+    "open" => 0,
     "strict" => 0,
+    "utf8" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
@@ -33,7 +36,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,6 +46,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "App::EvalServerAdvanced::Protocol" => 0,
   "Data::Dumper" => 0,
+  "Encode" => 0,
   "Exporter" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
@@ -50,7 +54,9 @@ my %FallbackPrereqs = (
   "IO::Async::Stream" => 0,
   "Term::ReadLine" => 0,
   "Test::More" => 0,
+  "open" => 0,
   "strict" => 0,
+  "utf8" => 0,
   "warnings" => 0
 );
 

@@ -1,0 +1,19 @@
+=head1 NAME
+
+L<BlankOnDev::DateTime>::lang - Module for language Date and Time on Module L<BlankOnDev::DateTime>
+
+=head1 DESCRIPTION
+
+This module only for date time handling, and module fork from CellBash::DateTime::lang
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2017 by Achmad Yusri Afandi.
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Achmad Yusri Afandi, (linuxer08@gmail.com)
+
+=cut

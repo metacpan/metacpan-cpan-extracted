@@ -22,6 +22,7 @@ no_index:
     - xt
 recommends:
   Carton::Snapshot: '0'
+  IO::Uncompress::Gunzip: '0'
 requires:
   CPAN::Common::Index::Mirror: '0'
   CPAN::DistnameInfo: '0'
@@ -34,7 +35,6 @@ requires:
   File::pushd: '0'
   HTTP::Tiny: '0.055'
   HTTP::Tinyish: '0.12'
-  IO::Uncompress::Gunzip: '0'
   JSON::PP: '2.27300'
   Menlo::CLI::Compat: '0'
   Module::CPANfile: '0'
@@ -49,7 +49,7 @@ resources:
   bugtracker: https://github.com/skaji/cpm/issues
   homepage: https://github.com/skaji/cpm
   repository: https://github.com/skaji/cpm.git
-version: '0.304'
+version: '0.306'
 x_contributors:
   - 'Olaf Alders <olaf@wundersolutions.com>'
   - 'Shoichi Kaji <skaji@outlook.com>'

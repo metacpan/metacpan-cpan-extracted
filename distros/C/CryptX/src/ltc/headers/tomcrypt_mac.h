@@ -96,6 +96,50 @@ void pmac_shift_xor(pmac_state *pmac);
 
 #endif /* PMAC */
 
+#ifdef LTC_POLY1305
+typedef struct {
+   ulong32 r[5];
+   ulong32 h[5];
+   ulong32 pad[4];
+   unsigned long leftover;
+   unsigned char buffer[16];
+   int final;
+} poly1305_state;
+
+int poly1305_init(poly1305_state *st, const unsigned char *key, unsigned long keylen);
+int poly1305_process(poly1305_state *st, const unsigned char *in, unsigned long inlen);
+int poly1305_done(poly1305_state *st, unsigned char *mac, unsigned long *maclen);
+int poly1305_test(void);
+int poly1305_memory(const unsigned char *key, unsigned long keylen, const unsigned char *in, unsigned long inlen, unsigned char *mac, unsigned long *maclen);
+int poly1305_memory_multi(const unsigned char *key, unsigned long keylen, unsigned char *mac, unsigned long *maclen, const unsigned char *in,  unsigned long inlen, ...);
+int poly1305_file(const char *fname, const unsigned char *key, unsigned long keylen, unsigned char *mac, unsigned long *maclen);
+int poly1305_test(void);
+#endif /* LTC_POLY1305 */
+
+#ifdef LTC_BLAKE2SMAC
+typedef hash_state blake2smac_state;
+int blake2smac_init(blake2smac_state *st, unsigned long outlen, const unsigned char *key, unsigned long keylen);
+int blake2smac_process(blake2smac_state *st, const unsigned char *in, unsigned long inlen);
+int blake2smac_done(blake2smac_state *st, unsigned char *mac, unsigned long *maclen);
+int blake2smac_test(void);
+int blake2smac_memory(const unsigned char *key, unsigned long keylen, const unsigned char *in, unsigned long inlen, unsigned char *mac, unsigned long *maclen);
+int blake2smac_memory_multi(const unsigned char *key, unsigned long keylen, unsigned char *mac, unsigned long *maclen, const unsigned char *in,  unsigned long inlen, ...);
+int blake2smac_file(const char *fname, const unsigned char *key, unsigned long keylen, unsigned char *mac, unsigned long *maclen);
+int blake2smac_test(void);
+#endif /* LTC_BLAKE2SMAC */
+
+#ifdef LTC_BLAKE2BMAC
+typedef hash_state blake2bmac_state;
+int blake2bmac_init(blake2bmac_state *st, unsigned long outlen, const unsigned char *key, unsigned long keylen);
+int blake2bmac_process(blake2bmac_state *st, const unsigned char *in, unsigned long inlen);
+int blake2bmac_done(blake2bmac_state *st, unsigned char *mac, unsigned long *maclen);
+int blake2bmac_test(void);
+int blake2bmac_memory(const unsigned char *key, unsigned long keylen, const unsigned char *in, unsigned long inlen, unsigned char *mac, unsigned long *maclen);
+int blake2bmac_memory_multi(const unsigned char *key, unsigned long keylen, unsigned char *mac, unsigned long *maclen, const unsigned char *in,  unsigned long inlen, ...);
+int blake2bmac_file(const char *fname, const unsigned char *key, unsigned long keylen, unsigned char *mac, unsigned long *maclen);
+int blake2bmac_test(void);
+#endif /* LTC_BLAKE2BMAC */
+
 #ifdef LTC_EAX_MODE
 
 #if !(defined(LTC_OMAC) && defined(LTC_CTR_MODE))
@@ -307,19 +351,6 @@ int ccm_memory(int cipher,
           unsigned char *tag,    unsigned long *taglen,
                     int  direction);
 
-int ccm_memory_ex(int cipher,
-    const unsigned char *key,    unsigned long keylen,
-    symmetric_key       *uskey,
-    const unsigned char *nonce,  unsigned long noncelen,
-    const unsigned char *header, unsigned long headerlen,
-          unsigned char *pt,     unsigned long ptlen,
-          unsigned char *ct,
-          unsigned char *tag,    unsigned long *taglen,
-                    int  direction,
-    const unsigned char *B_0,
-    const unsigned char *CTR,
-                    int  ctrwidth);
-
 int ccm_test(void);
 
 #endif /* LTC_CCM_MODE */
@@ -490,6 +521,36 @@ int f9_test(void);
 
 #endif
 
+#ifdef LTC_CHACHA20POLY1305_MODE
+
+typedef struct {
+   poly1305_state poly;
+   chacha_state chacha;
+   ulong64 aadlen;
+   ulong64 ctlen;
+   int aadflg;
+} chacha20poly1305_state;
+
+#define CHCHA20POLY1305_ENCRYPT 0
+#define CHCHA20POLY1305_DECRYPT 1
+
+int chacha20poly1305_init(chacha20poly1305_state *st, const unsigned char *key, unsigned long keylen);
+int chacha20poly1305_setiv(chacha20poly1305_state *st, const unsigned char *iv, unsigned long ivlen);
+int chacha20poly1305_setiv_rfc7905(chacha20poly1305_state *st, const unsigned char *iv, unsigned long ivlen, ulong64 sequence_number);
+int chacha20poly1305_add_aad(chacha20poly1305_state *st, const unsigned char *in, unsigned long inlen);
+int chacha20poly1305_encrypt(chacha20poly1305_state *st, const unsigned char *in, unsigned long inlen, unsigned char *out);
+int chacha20poly1305_decrypt(chacha20poly1305_state *st, const unsigned char *in, unsigned long inlen, unsigned char *out);
+int chacha20poly1305_done(chacha20poly1305_state *st, unsigned char *tag, unsigned long *taglen);
+int chacha20poly1305_memory(const unsigned char *key, unsigned long keylen,
+                            const unsigned char *iv,  unsigned long ivlen,
+                            const unsigned char *aad, unsigned long aadlen,
+                            const unsigned char *in,  unsigned long inlen,
+                                  unsigned char *out,
+                                  unsigned char *tag, unsigned long *taglen,
+                            int direction);
+int chacha20poly1305_test(void);
+
+#endif /* LTC_CHACHA20POLY1305_MODE */
 
 /* $Source$ */
 /* $Revision$ */

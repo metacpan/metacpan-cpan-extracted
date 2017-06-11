@@ -1,10 +1,11 @@
 package CracTools::App::Command::Extract;
+
 {
   $CracTools::App::Command::Extract::DIST = 'CracTools';
 }
 # ABSTRACT: Extract events identified by CRAC.
 # PODNAME: cractools extract
-$CracTools::App::Command::Extract::VERSION = '1.25';
+$CracTools::App::Command::Extract::VERSION = '1.251';
 use CracTools::App -command;
 
 use strict;
@@ -577,7 +578,7 @@ cractools extract - Extract events identified by CRAC.
 
 =head1 VERSION
 
-version 1.25
+version 1.251
 
 =head2 extractSplicesFromSAMline
 

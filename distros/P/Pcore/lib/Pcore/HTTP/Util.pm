@@ -2,8 +2,8 @@ package Pcore::HTTP::Util;
 
 use Pcore -const;
 use Errno qw[];
-use Pcore::AE::Handle qw[:PROXY_TYPE];
-use Pcore::AE::Handle2;
+use Pcore::AE::Handle2 qw[:PROXY_TYPE];
+use Pcore::AE::Handle;
 use Pcore::Util::Scalar qw[refaddr];
 use Compress::Raw::Zlib qw[WANT_GZIP_OR_ZLIB Z_OK Z_STREAM_END];
 
@@ -206,7 +206,7 @@ sub http_request ($args) {
 
 sub _connect ( $args, $runtime, $cb ) {
     if ( $args->{proxy} ) {
-        Pcore::AE::Handle->new(
+        Pcore::AE::Handle2->new(
             $args->{handle_params}->%*,
             connect                => $args->{url},
             connect_timeout        => $args->{connect_timeout},
@@ -244,7 +244,7 @@ sub _connect ( $args, $runtime, $cb ) {
         );
     }
     else {
-        Pcore::AE::Handle2->new(
+        Pcore::AE::Handle->new(
             $args->{handle_params}->%*,
             connect          => $args->{url},
             persistent       => $args->{persistent},

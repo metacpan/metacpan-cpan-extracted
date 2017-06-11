@@ -1,52 +1,66 @@
-#!perl
+#!/usr/bin/perl
 
-use strict; use warnings;
+package App::Games::Cards::Pair;
+
 use Games::Cards::Pair;
 
-$|=1;
+use Moo;
+use namespace::clean;
+use Types::Standard -all;
+use MooX::Options;
 
-$SIG{'INT'} = sub { print {*STDOUT} "\n\nCaught Interrupt (^C), Aborting\n"; exit(1); };
+option 'cards'   => (is => 'ro', order => 1, isa => Int, format => 'i', default => sub { 12 }, doc => 'Cards count (min:12, max:54).');
+option 'verbose' => (is => 'ro', order => 2, default => sub { 0  }, doc => 'Play the game in verbose mode.');
 
-my $game = Games::Cards::Pair->new({debug => 1});
+sub run {
+    my ($self) = @_;
 
-my ($count);
-do {
-    print {*STDOUT} "How many cards do you want to play with? (min:12, max:54): ";
-    $count = <STDIN>;
-    chomp($count);
-} until ($game->is_valid_card_count($count));
+    select(STDOUT);
+    $|=1;
 
-$game->cards($count);
+    $SIG{'INT'} = sub { print {*STDOUT} "\n\nCaught Interrupt (^C), Aborting\n"; exit(1); };
 
-my ($response);
-do {
-    $game->init;
-    print {*STDOUT} $game->get_board, "\n";
-    print {*STDOUT} "You have 30 seconds to memorise the card positions.\n";
-    sleep 30;
-    $game->screen->clear;
+    my $game  = Games::Cards::Pair->new({ debug => $self->{verbose} });
+    my $cards = $self->{cards};
+    die "ERROR: Invalid cards count [$cards].\n" unless $game->is_valid_card_count($cards);
+    $game->cards($cards);
 
+    my ($response);
     do {
-        my ($cards);
-        print {*STDOUT} $game->as_string(1);
+        $game->init;
+        print {*STDOUT} $game->get_board, "\n";
+        print {*STDOUT} "You have 30 seconds to memorise the card positions.\n";
+        sleep 30;
+        $game->screen->clear;
+
         do {
-            print {*STDOUT} "Pick pair of cards: ";
-            $cards = <STDIN>;
-            chomp($cards);
-        } until ($cards =~ /^\d+\,\d+$/);
+            my ($picked_cards);
+            print {*STDOUT} $game->as_string(1);
+            do {
+                print {*STDOUT} "Pick pair of cards: ";
+                $picked_cards = <STDIN>;
+                chomp($picked_cards);
+            } until ($picked_cards =~ /^\d+\,\d+$/);
 
-        $game->play($cards);
+            $game->play($picked_cards);
 
-    } until ($game->is_over);
+        } until ($game->is_over);
 
-    print "\nTotal moves: " . $game->count . "\n";
+        print "\nTotal moves: " . $game->count . "\n";
 
-    do {
-        print {*STDOUT} "Do you wish to continue (Y/N)? ";
-        $response = <STDIN>;
-        chomp($response);
-    } until (defined $response && ($response =~ /^[Y|N]$/i));
+        do {
+            print {*STDOUT} "Do you wish to continue (Y/N)? ";
+            $response = <STDIN>;
+            chomp($response);
+        } until (defined $response && ($response =~ /^[Y|N]$/i));
 
-} until ($response =~ /^N$/i);
+    } until ($response =~ /^N$/i);
 
-print {*STDOUT} "Thank you.\n";
+    print {*STDOUT} "Thank you.\n";
+}
+
+package main;
+
+use strict; use warnings;
+
+App::Games::Cards::Pair->new_with_options->run;

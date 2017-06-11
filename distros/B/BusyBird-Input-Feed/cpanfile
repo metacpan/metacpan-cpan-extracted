@@ -15,6 +15,7 @@ on 'test' => sub {
     requires 'Test::Deep' => '0.084';
     requires 'File::Spec' => '0';
     requires 'Test::Exception' => '0';
+    requires 'Test::Warnings' => '0';
 };
 
 on 'develop' => sub {

@@ -59,8 +59,15 @@ sub decompress ( $self, % ) {
     elsif ( my $perl_critic_profile_name = $self->_get_perlcritic_profile_name( $args{perl_critic} ) ) {    # run perlcritic ONLY if no perltidy errors detected
         state $init1 = !!require Perl::Critic;
 
+        my @violations = eval { $self->_get_perlcritic_object($perl_critic_profile_name)->critique( $self->buffer ) };
+
+        # perlcritic exception
+        if ($@) {
+            $severity = $self->src_cfg->{SEVERITY}->{BRUTAL};
+        }
+
         # index violations
-        if ( my @violations = $self->_get_perlcritic_object($perl_critic_profile_name)->critique( $self->buffer ) ) {
+        elsif (@violations) {
             my $violations;
 
             for my $v (@violations) {
@@ -347,11 +354,11 @@ sub cut_log ($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 9                    | Subroutines::ProhibitExcessComplexity - Subroutine "decompress" with high complexity score (26)                |
+## |    3 | 9                    | Subroutines::ProhibitExcessComplexity - Subroutine "decompress" with high complexity score (27)                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 188                  | Miscellanea::ProhibitTies - Tied variable used                                                                 |
+## |    2 | 195                  | Miscellanea::ProhibitTies - Tied variable used                                                                 |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 132                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
+## |    1 | 139                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

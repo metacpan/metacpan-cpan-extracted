@@ -2,7 +2,9 @@ use strict;
 use warnings;
 package MetaCPAN::API::Rating;
 # ABSTRACT: Rating information for MetaCPAN::API
-$MetaCPAN::API::Rating::VERSION = '0.50';
+
+our $VERSION = '0.51';
+
 use Carp;
 use Moo::Role;
 use namespace::autoclean;
@@ -53,7 +55,7 @@ MetaCPAN::API::Rating - Rating information for MetaCPAN::API
 
 =head1 VERSION
 
-version 0.50
+version 0.51
 
 =head1 DESCRIPTION
 
@@ -66,7 +68,7 @@ ratings.
 
     my $result = $mcpan->rating( id => 'UC6tqabqR-y3xxZk0tgVXQ' );
 
-Searches MetaCPAN for CPAN ratings.  
+Searches MetaCPAN for CPAN ratings.
 
 You can do complex searches using 'search' parameter:
 

@@ -9,8 +9,10 @@ WriteMakefile(
     AUTHOR       => 'FranE<ccedil>ois Rappaz (rappazf@gmail.com)',
     ABSTRACT     => 'Select parts in a file using pod directives',
     PREREQ_PM    => {
-                     'Test::Simple' => 0.44,
-                     'Log::Log4perl' => 1.47,
+                     'Test::More' => 1.001014,
+                     'Log::Any' => 1.049,
+                     'Carp' => 1.40,
+                     'Data::Dumper' => 2.160,
                      'Tie::File' => 1.02,
                      'Pod::Simple' => 3.32,
                     },

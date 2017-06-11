@@ -1,7 +1,7 @@
 package Mojar::Message;
 use Mojo::Base -strict;
 
-our $VERSION = 1.061;
+our $VERSION = 1.102;
 
 1;
 __END__
@@ -41,7 +41,7 @@ L<https://github.com/niczero/mojar-message/wiki>
 
 =head1 COPYRIGHT AND LICENCE
 
-Copyright (C) 2012--2016, Nic Sandfield.
+Copyright (C) 2012--2017, Nic Sandfield.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.

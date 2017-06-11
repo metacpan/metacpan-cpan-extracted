@@ -11,14 +11,14 @@ use XSLoader;
 my $parent_pid = $$;
 
 BEGIN { # must happen at BEGIN time so that flush_events is available to DB::sub
-    our $VERSION = '0.03'; # VERSION
+    our $VERSION = '0.04'; # VERSION
     XSLoader::load(__PACKAGE__, $Devel::Trace::Syscall::VERSION);
 }
 
 package
 DB;
 
-no strict qw(vars);
+no strict qw(vars); ## no critic (TestingAndDebugging::ProhibitNoStrict)
 
 our $previous_trace = " (BEGIN)\n";
 my $grabbing_traceback;
@@ -32,7 +32,7 @@ sub DB {
 
 $deep = 100;
 sub sub {
-    no strict qw(refs);
+    no strict qw(refs); ## no critic (TestingAndDebugging::ProhibitNoStrict)
 
     if($grabbing_traceback) {
         return &$sub;
@@ -76,7 +76,7 @@ Devel::Trace::Syscall - Print a stack trace whenever a system call is made
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -195,7 +195,7 @@ Rob Hoelz <rob@hoelz.ro>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Rob Hoelz.
+This software is copyright (c) 2017 by Rob Hoelz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -328,7 +328,7 @@ sub create_automated_build ( $self, $repo_name, $provider, $vcs_repo_name, $desc
         {   name                => $repo_name,
             namespace           => $args{namespace},
             is_private          => $args{private},
-            active              => $args{active} ? $TRUE : $FALSE,
+            active              => $args{active} ? \1 : \0,
             dockerhub_repo_name => "$args{namespace}/$repo_name",
             provider            => $DOCKERHUB_PROVIDER_NAME->{$provider},
             vcs_repo_name       => $vcs_repo_name,

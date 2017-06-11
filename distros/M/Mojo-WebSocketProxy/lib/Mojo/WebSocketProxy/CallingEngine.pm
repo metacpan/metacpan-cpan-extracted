@@ -7,7 +7,7 @@ use MojoX::JSON::RPC::Client;
 use Guard;
 use JSON;
 
-our $VERSION = '0.05';    ## VERSION
+our $VERSION = '0.06';    ## VERSION
 
 sub make_call_params {
     my ($c, $req_storage) = @_;

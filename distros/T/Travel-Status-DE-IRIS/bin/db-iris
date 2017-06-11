@@ -6,7 +6,7 @@ use utf8;
 
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
 use DateTime;
 use DateTime::Format::Strptime;
@@ -252,6 +252,9 @@ sub format_delay {
 	}
 	if ( $d->is_cancelled ) {
 		$delay = ' CANCELED';
+	}
+	elsif ( $d->departure_is_cancelled ) {
+		$delay .= ' ⊖';
 	}
 
 	return $delay;
@@ -527,7 +530,7 @@ I<station>
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,8 @@
 Revision history for Perl extension Net::Fix::Checksum::XS.
 
+0.03  Fri Jun  9 09:54:52 EDT 2017
+    - Fix tests under Perl 5.8
+
 0.02  Wed Jul 23 07:42:34 2015
 	- Documentation fixes
 

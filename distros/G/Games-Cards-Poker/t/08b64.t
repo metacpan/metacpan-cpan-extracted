@@ -1,0 +1,33 @@
+#!/usr/bin/perl
+use warnings;use Test::More;
+BEGIN { plan tests => 15 }
+use     Games::Cards::Poker qw(:all);
+use_ok('Games::Cards::Poker');
+my $b64c = CardB64('As');
+ok($b64c eq 'A'          , "CardB64(As) to $b64c");
+   $card = B64Card($b64c);
+ok($card eq 'As'         , "B64Card(A ) to $card");
+   $b64c = CardB64('Kh');
+ok($b64c eq 'F'          , "CardB64(Kh) to $b64c");
+   $card = B64Card($b64c);
+ok($card eq 'Kh'         , "B64Card(F ) to $card");
+   $b64c = CardB64('2c');
+ok($b64c eq 'z'          , "CardB64(2c) to $b64c");
+   $card = B64Card($b64c);
+ok($card eq '2c'         , "B64Card(z ) to $card");
+   $card = B64Card('N');
+ok($card eq 'Jh'         , "B64Card(N ) to $card");
+   $card = B64Card('T');
+ok($card eq 'Tc'         , "B64Card(T ) to $card");
+   $card = join('', B64Hand('N'));
+ok($card eq 'Jh'         , "B64Hand(N ) to $card");
+my $b64h = HandB64(['Tc']);
+ok($b64h eq 'T'          , "HandB64(Tc) to $b64h");
+my $hand = join(' ', B64Hand('BADC'));
+ok($hand eq 'Ah As Ac Ad', "B64Hand(BADC) to $hand");
+   $b64h = HandB64(qw(Ah As Ac Ad));
+ok($b64h eq 'BADC'       , "HandB64(Ah As Ac Ad) to $b64h");
+   $hand = join(' ', B64Hand('ACme'));
+ok($hand eq 'As Ad 5d 7d', "B64Hand(ACme) to $hand");
+   $b64h = HandB64(qw(As Ad 5d 7d));
+ok($b64h eq 'ACme'       , "HandB64(As Ad 5d 7d) to $b64h");

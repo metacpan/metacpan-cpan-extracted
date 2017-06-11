@@ -1,9 +1,10 @@
 package CracTools::GenomeMask;
+
 {
   $CracTools::GenomeMask::DIST = 'CracTools';
 }
 # ABSTRACT: A bit vector mask over the whole genome
-$CracTools::GenomeMask::VERSION = '1.25';
+$CracTools::GenomeMask::VERSION = '1.251';
 use strict;
 use warnings;
 
@@ -190,7 +191,7 @@ CracTools::GenomeMask - A bit vector mask over the whole genome
 
 =head1 VERSION
 
-version 1.25
+version 1.251
 
 =head1 SYNOPSIS
 

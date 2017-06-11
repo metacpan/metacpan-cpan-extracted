@@ -1,10 +1,60 @@
 ==================================================
-Changes from 2007-04-29 00:00:00 +0000 to present.
+Changes from 2007-06-11 00:00:00 +0000 to present.
 ==================================================
 
 -------------------------------------------
-version 0.0502 at 2017-04-26 14:17:19 +0000
+version 0.0601 at 2017-06-08 19:41:46 +0000
 -------------------------------------------
+
+  Change: 0702964927fbd2eca02ed81d8c869f9fcb4791ee
+  Author: Naveed Massjouni <nmassjouni@harmonia.com>
+  Date : 2017-06-08 15:41:46 +0000
+
+    v0.0601 
+
+  Change: a86219e52830ddddad430beecca5dea4a8599d3e
+  Author: Naveed Massjouni <nmassjouni@harmonia.com>
+  Date : 2017-06-08 15:39:18 +0000
+
+    Fix #13, a json bug. 
+
+-------------------------------------------
+version 0.0600 at 2017-06-02 17:49:44 +0000
+-------------------------------------------
+
+  Change: abead5f53270b3c68d7c35688075ed20ce319058
+  Author: Naveed Massjouni <nmassjouni@harmonia.com>
+  Date : 2017-06-02 13:49:44 +0000
+
+    v0.0600 
+
+  Change: 680e0cbcd6b8647dede2ec51c735d657d1ab52c3
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2017-06-01 10:05:15 +0000
+
+    Merge pull request #12 from djzort/json_object
+
+    Use a JSON object 
+
+  Change: 99adcec2638b7dde6ab46354d9682d848781f1b0
+  Author: Dean Hamstead <dean@fragfest.com.au>
+  Date : 2017-06-01 21:13:27 +0000
+
+    Use a json object, so it can be tweaked.
+
+    Inspired by https://github.com/ironcamel/WebService-Client/pull/1 
+
+  Change: 515233834f2cb257b4eda7c6eedb47ae8e29f47a
+  Author: Dean Hamstead <dean@fragfest.com.au>
+  Date : 2017-06-01 21:12:35 +0000
+
+    Some suggestions only 
+
+  Change: 270b4e77cda0ee03898143c6edfa2ec0e91b0d15
+  Author: Dean Hamstead <dean@fragfest.com.au>
+  Date : 2017-06-01 20:44:40 +0000
+
+    Bump year 
 
   Change: 4c896c03328f2e43edff98a716cd794550d8f5a0
   Author: Naveed Massjouni <nmassjouni@harmonia.com>

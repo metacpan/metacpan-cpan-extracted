@@ -6,6 +6,10 @@ use Gtk2 -init;
 use DBI;
 use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($DEBUG);
+
+use Log::Any::Adapter;
+Log::Any::Adapter->set('Log::Log4perl');
+
 use Forms::Langues2;
 use DataAccess::Dbi::Service;
 

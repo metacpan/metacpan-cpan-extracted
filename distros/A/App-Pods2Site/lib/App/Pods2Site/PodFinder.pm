@@ -21,39 +21,28 @@ sub new
 	return $self;
 }
 
-sub getCount
+sub getCounts
 {
 	my $self = shift;
 	
-	return $self->{count};
+	my $sum = 0;
+	my %partCounts;
+	foreach my $group (@{$self->{groups}})
+	{
+		my $name = $group->{name};
+		my $count = scalar(@{$group->{pods}});
+		$partCounts{$name} = $count; 
+		$sum += $count;
+	}
+	
+	return ($sum, \%partCounts);
 }
 
-sub getScriptN2P
+sub getGroups
 {
 	my $self = shift;
 	
-	return $self->{n2p}->{script}; 	
-}
-
-sub getCoreN2P
-{
-	my $self = shift;
-	
-	return $self->{n2p}->{core}; 	
-}
-
-sub getPragmaN2P
-{
-	my $self = shift;
-	
-	return $self->{n2p}->{pragma}; 	
-}
-
-sub getModuleN2P
-{
-	my $self = shift;
-	
-	return $self->{n2p}->{module}; 	
+	return $self->{groups}; 	
 }
 
 sub __scan
@@ -85,66 +74,43 @@ sub __scan
 	$verbosity++ if $args->isVerboseLevel(4);
 	$verbosity++ if $args->isVerboseLevel(5);
 
+	# array to use for queries later, holds hash records
+	#
+	my @podRecords;
+	
 	# get all script pods - be 'laborious' since they typically don't fit '.pm' or '.pod' naming
 	#
 	my $binSearch = Pod::Simple::Search->new()->inc(0)->laborious(1)->callback($cb)->verbose($verbosity);
 	$binSearch->survey($args->getBinDirs());
 	my $bin_n2p = $binSearch->name2path;
-	my @scriptNames = keys(%$bin_n2p); 
-		
+	foreach my $name (keys(%$bin_n2p))
+	{
+		push(@podRecords, { type => 'bin', name => $name, path => $bin_n2p->{$name} });
+	}
+	
 	# get all other pods - specifically turn off automatic 'inc', since that's part of
 	# our own setup
 	#
 	my $libSearch = Pod::Simple::Search->new()->inc(0)->callback($cb)->verbose($verbosity);
 	$libSearch->survey($args->getLibDirs());
 	my $lib_n2p = $libSearch->name2path();
-
-	# now separate the pod names up into the remaining categories
-	#
-	my (@coreNames, @pragmaNames, @moduleNames);
 	foreach my $name (keys(%$lib_n2p))
 	{
-		if (($name =~ /^(?:pods::)?perl/ && $lib_n2p->{$name} =~ /\.pod$/)|| $name =~ /^README$/)
-		{
-			# observational:
-			# - they sometimes live in the pods namespace, other times in the top
-			# - I just happened to find a README in the top in an AP distro
-			#
-			push(@coreNames, $name);
-		}
-		elsif ($name =~ /^[a-z]/ && $lib_n2p->{$name} =~ /\.pm$/)
-		{
-			# well, assume every bona fide pm with a lowercase start of the name == pragma
-			#
-			push(@pragmaNames, $name);
-		}
-		else
-		{
-			push(@moduleNames, $name);
-		}
+		push(@podRecords, { type => 'lib', name => $name, path => $lib_n2p->{$name} });
 	}
 
-	# now apply the users filter (if any) on the names, and store the resulting name2path
+	# use the group queries to separate them
 	#
-	my (%scriptn2p, %coren2p, %pragman2p, %modulen2p);
-	my %h =
-		(
-			script => [ \@scriptNames, \%scriptn2p, $bin_n2p ],
-			core => [ \@coreNames, \%coren2p, $lib_n2p ],
-			pragma => [ \@pragmaNames, \%pragman2p, $lib_n2p ],
-			module => [ \@moduleNames, \%modulen2p, $lib_n2p ],
-		);
-	$self->{n2p} = {};
-	while (my ($sec, $vars) = each(%h))
+	my @groups;
+	foreach my $groupDef (@{$args->getGroupDefs()})
 	{
-		my ($names, $n2p, $fulln2p) = @$vars;
-		my $filter = $args->getFilter($sec);
-		@$names = qgrep("NOT ( $filter )", @$names) if $filter;
-		$n2p->{$_} = $fulln2p->{$_} foreach (@$names);
-		$self->{n2p}->{$sec} = $n2p;
+		# remember to pass a file accessor since queries use fields (at least they should!)
+		# but we can pass in undef to get the query to manufacture one for us as it's simple hash values
+		#
+		my @pods = $groupDef->{query}->qgrep(undef, @podRecords);
+		push(@groups, { name => $groupDef->{name}, pods => \@pods }); 
 	}
-
-	$self->{count} = scalar(@scriptNames) + scalar(@coreNames) + scalar(@pragmaNames) + scalar(@moduleNames);
+	$self->{groups} = \@groups;
 }
 
 1;

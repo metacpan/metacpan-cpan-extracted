@@ -1,5 +1,11 @@
 Revision history for Perl extension WebService-ILS
 
+0.14 2017-06-07T01:19:26Z
+    - OneClickDigital bugfix: item_metadata() and item description
+
+0.13 2017-05-31T00:40:58Z
+    - OneClickDigital: removed country param, domain is oneclickdigital.com subdomain
+
 0.12 2017-05-12T03:43:00Z
     - OneClickDigital: Moved products search url from PartnerBase to top module
 

@@ -14,11 +14,11 @@ use Text::SimpleTable;
 =head1 NAME
 
 Business::UPS::Tracking::Role::Serialize - Serialize objects
-  
+
 =head1 DESCRIPTION
 
 This role provides methods to serialize objects into a L<Text::SimpleTable>
-object. 
+object.
 
 =head1 METHODS
 
@@ -33,26 +33,26 @@ Serialize an object into a table.
 
 sub printall {
     my ($self,$table) = @_;
-    
+
     $table ||= Text::SimpleTable->new(27,44);
-    
+
     foreach my $attribute ($self->meta->get_all_attributes) {
-        next 
+        next
             unless $attribute->does('Printable');
-        
+
         my $value = $attribute->get_value($self);
-        
-        next 
+
+        next
             unless defined $value;
-        
-        my $name =  $attribute->has_documentation ? 
+
+        my $name =  $attribute->has_documentation ?
             $attribute->documentation() :
             $attribute->name;
-        
+
 #        if ($attribute->has_printer) {
 #            $value = $attribute->printer->($self);
 #        }
-        
+
         $self->_print_value(
             table   => $table,
             value   => $value,
@@ -64,17 +64,17 @@ sub printall {
 
 sub _print_value {
     my ($self,%params) = @_;
-    
-    
+
+
     my $table = $params{table};
     my $value = $params{value};
     my $name = $params{name};
-    
+
     return unless $value;
 
     $name = $params{index}.'. '.$name
         if $params{index};
-    
+
     given (ref $value) {
         when('') {
             $table->row($name,$value);
@@ -98,15 +98,15 @@ sub _print_value {
             warn('Cannot print $_');
         }
         when('DateTime') {
-            if ($value->hour == 0 
-                && $value->minute == 0 
+            if ($value->hour == 0
+                && $value->minute == 0
                 && $value->second == 0) {
                 $table->row($name,$value->ymd('.'));
             } else {
                 $table->row($name,$value->ymd('.').' '.$value->hms(':'));
             }
         }
-        # Some object 
+        # Some object
         default {
             if ($value->can('meta')
                 && $value->meta->does_role('Business::UPS::Tracking::Role::Print')
@@ -124,8 +124,8 @@ sub _print_value {
                 $table->row($name,$value);
             }
         }
-    } 
-    return;  
+    }
+    return;
 }
 
 no Moose::Role;

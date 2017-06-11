@@ -19,6 +19,37 @@
 #
 #######################################################################
 
+
+2017-06-10  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000390 released
+
+        * Updated ClipBucket_is.pm to latest nasm.
+
+
+2017-06-10  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000389 released
+
+	* Updated Hadoop_is.pm and ClipBucket_is.pm.
+
+
+2017-06-09  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000388 released
+
+        * Updated Makefile.PL to exclude sub in ExtUtils::MM_Any
+
+
+2017-06-09  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000387 released
+
+        * Updated Makefile.PL to exclude sub in MM_Any
+
+	* New Jenkins Instruction Set.
+
+
 2017-04-24  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000386 released

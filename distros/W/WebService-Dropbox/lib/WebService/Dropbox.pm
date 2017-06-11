@@ -14,7 +14,7 @@ use WebService::Dropbox::Files::UploadSession;
 # use WebService::Dropbox::Sharing; comming soon...
 use WebService::Dropbox::Users;
 
-our $VERSION = '2.05';
+our $VERSION = '2.07';
 
 __PACKAGE__->mk_accessors(qw/
     timeout
@@ -171,7 +171,7 @@ ${color}%s %s\e[0m
                 $level,
                 $req->uri,
                 $req->method,
-                $req->uri->path,
+                $req->uri,
                 $req->protocol || '',
                 $req->headers->as_string,
                 ( ref $args->{content} ? '' : $args->{content} && $params ? $JSON_PRETTY->encode($params) : '' ),
@@ -807,7 +807,7 @@ Check the status of a save_url job.
 
 L<https://www.dropbox.com/developers/documentation/http/documentation#files-save_url-check_job_status>
 
-=head3 search($path [, \%optional_params])
+=head3 search($path, $query, [, \%optional_params])
 
 Searches for files and folders.
 
@@ -815,8 +815,7 @@ Note: Recent changes may not immediately be reflected in search results due to a
 
     my $result = $dropbox->search($path);
 
-    my $result = $dropbox->search($path, {
-        query => 'prime numbers',
+    my $result = $dropbox->search($path, 'prime numbers', {
         start => 0,
         max_results => 100,
         mode => 'filename'
@@ -850,9 +849,9 @@ Uploads large files by upload_session API
     # File Handle
     my $content = IO::File->new('./mysql.dump', '<');
 
-    my $result = $dropbox->upload($path, $content);
+    my $result = $dropbox->upload_session($path, $content);
 
-    my $result = $dropbox->upload($path, $content, {
+    my $result = $dropbox->upload_session($path, $content, {
         mode => 'add',
         autorename => JSON::true,
         mute => JSON::false

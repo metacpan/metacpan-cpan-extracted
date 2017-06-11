@@ -3,3 +3,13 @@ Revision history for Text-ReadConditionally
 0.72    Fri 19 May 2017 09:31
         First version, released on an unsuspecting world.
 
+0.80    Mon 22 May 2017 18:42
+        IO::ReadPreProcess from Text::ReadConditionally
+        Improve documentation
+        Improve testing process to allow exclusion of MS Windows (well, UnixOnly flag)
+
+0.81    Tue 30 May 2017 16:06
+        Tests to not rely on the cal program - not portable
+        More tests.
+        More documentation.
+        Improve testing process have Enabled flag

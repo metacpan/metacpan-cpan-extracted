@@ -5,58 +5,57 @@ use warnings;
 
 use MooX::ReturnModifiers;
 
-our $VERSION = '1.01';
+our $VERSION = '1.012000';
 
 sub import {
-    my $target    = caller;
-    my %modifiers = return_modifiers($target);
+	my $target	= caller;
+	my %modifiers = return_modifiers($target);
 
-    my $validate_subs = sub {
-        my @attr = @_;
-        while (@attr) {
-            my @names = ref $attr[0] eq 'ARRAY' ? @{ shift @attr } : shift @attr;
-            my $spec = shift @attr;
-            for my $name (@names) {
-                my $store_spec = sprintf '%s_spec', $name;
-                $modifiers{has}->( $store_spec => ( is => 'ro', default => sub { $spec } ) );
-                unless ( $name =~ m/^\+/ ) {
-                    $modifiers{around}->(
-                        $name, 
-                        sub {
-                            my ( $orig, $self, @params ) = @_;
-                            my $current_spec = $self->$store_spec;
-                            
-                            if ( my $param_spec = $current_spec->{params} ) {
-                                @params = $self->_validate_sub( 
-                                    $name, 'params', $param_spec, @params 
-                                );
-                            }
-   
-                            @params = $self->$orig(@params);
-							shift @params unless defined $params[0];
-							
+	my $validate_subs = sub {
+		my @attr = @_;
+		while (@attr) {
+			my @names = ref $attr[0] eq 'ARRAY' ? @{ shift @attr } : shift @attr;
+			my $spec = shift @attr;
+			for my $name (@names) {
+				my $store_spec = sprintf '%s_spec', $name;
+				$modifiers{has}->( $store_spec => ( is => 'ro', default => sub { $spec } ) );
+				unless ( $name =~ m/^\+/ ) {
+					$modifiers{around}->(
+						$name,
+						sub {
+							my ( $orig, $self, @params ) = @_;
+							my $current_spec = $self->$store_spec;
+
+							if ( my $param_spec = $current_spec->{params} ) {
+								@params = $self->_validate_sub(
+									$name, 'params', $param_spec, @params
+								);
+							}
+
+							@params = $self->$orig(@params);
+
 							if ( my $param_spec = $current_spec->{returns} ) {
-                                @params = $self->_validate_sub( 
-                                    $name, 'returns', $param_spec, @params 
-                                );
-                            }
+								@params = $self->_validate_sub(
+									$name, 'returns', $param_spec, @params
+								);
+							}
 
-                            return wantarray ? @params : shift @params;
-                        }
-                    );
-                }
-            }
-        }
-    };
+							return wantarray ? @params : shift @params;
+						}
+					);
+				}
+			}
+		}
+	};
 
-    $target->can('_validate_sub') or $modifiers{with}->('MooX::ValidateSubs::Role');
+	$target->can('_validate_sub') or $modifiers{with}->('MooX::ValidateSubs::Role');
 
-    {
-        no strict 'refs';
-        *{"${target}::validate_subs"} = $validate_subs;
-    }
+	{
+		no strict 'refs';
+		*{"${target}::validate_subs"} = $validate_subs;
+	}
 
-    return 1;
+	return 1;
 }
 
 1;
@@ -69,147 +68,147 @@ MooX::ValidateSubs - Validating sub routines via Type::Tiny.
 
 =head1 VERSION
 
-Version 1.01
+Version 1.012000
 
 =cut
 
 =head1 SYNOPSIS
-    
-    package Welcome::To::A::World::Of::Types;
 
-    use Moo;
-    use MooX::ValidateSubs;
-    use Types::Standard qw/Str ArrayRef HashRef/;
+	package Welcome::To::A::World::Of::Types;
 
-    validate_subs (
-        hello_world => {
-            params => { 
-                one   => [ Str, 1 ], # 1 means I'm optional
-                two   => [ ArrayRef ],
-                three => [ HashRef, 'before_add_me' ],
-            },
-            returns => {
-                one   => [ Str, 1 ], # 1 means I'm optional
-                two   => [ ArrayRef ],
-                three => [ HashRef ],
-                four  => [ Str, 'add_on' ],
-            },
-        },
-        goodbye_world => { params => [ [Str], [ArrayRef], [HashRef] ] },
-    );
+	use Moo;
+	use MooX::ValidateSubs;
+	use Types::Standard qw/Str ArrayRef HashRef/;
 
-    sub before_add_me {
-        return {
-            okay => 'fine',
-        };
-    }
+	validate_subs (
+		hello_world => {
+			params => {
+				one   => [ Str, 1 ], # 1 means I'm optional
+				two   => [ ArrayRef ],
+				three => [ HashRef, 'before_add_me' ],
+			},
+			returns => {
+				one   => [ Str, 1 ], # 1 means I'm optional
+				two   => [ ArrayRef ],
+				three => [ HashRef ],
+				four  => [ Str, 'add_on' ],
+			},
+		},
+		goodbye_world => { params => [ [Str], [ArrayRef], [HashRef] ] },
+	);
 
-    sub add_on {
-        return 'sad face';
-    }
+	sub before_add_me {
+		return {
+			okay => 'fine',
+		};
+	}
 
-    sub hello_world { 
-        my ($self, %args) = @_;
-        
-        # $args{one}    # optional string 
-        # $args{two}    # valid arrayref 
-        # $args{three}  # valid hashref
+	sub add_on {
+		return 'sad face';
+	}
 
-        if ( ... # some condition ... ) {
-            $args{four} = 'may or may not get set here';
-        }
+	sub hello_world {
+		my ($self, %args) = @_;
 
-        return %args;
-    }
+		# $args{one}	# optional string
+		# $args{two}	# valid arrayref
+		# $args{three}  # valid hashref
+
+		if ( ... # some condition ... ) {
+			$args{four} = 'may or may not get set here';
+		}
+
+		return %args;
+	}
 
 =head1 Exports
 
-=head2 validate_subs 
+=head2 validate_subs
 
-I'm a key/value list, my keys should reference a sub routine, My value must now be a hash reference that 
-can contain two *optional* keys (params and returns). 
+I'm a key/value list, my keys should reference a sub routine, My value must now be a hash reference that
+can contain two *optional* keys (params and returns).
 
-    validate_subs (
-        hash_example => {
-            params => { ... },
-            returns => { ... },
-        },
-        array_example => {
-            params => [ ... ],
-            returns => [ ... ],
-        }
-    );
+	validate_subs (
+		hash_example => {
+			params => { ... },
+			returns => { ... },
+		},
+		array_example => {
+			params => [ ... ],
+			returns => [ ... ],
+		}
+	);
 
 Both params and returns value can either be an array reference of array references, that indicates we are going
-to be validating either an Array or an Array Reference, 
+to be validating either an Array or an Array Reference,
 
-    array_example => {
-        params => [ [Str], [HashRef], [Str] ],
-        returns => [ [Str], [HashRef] ],
-    },
+	array_example => {
+		params => [ [Str], [HashRef], [Str] ],
+		returns => [ [Str], [HashRef] ],
+	},
 
-    ...
+	...
 
-    sub array_example {
-        my ($self) = shift;
-        return (shift, shift);
-    }
+	sub array_example {
+		my ($self) = shift;
+		return (shift, shift);
+	}
 
-Or an hash reference with array reference values, when validating either a Hash or Hash reference.
+Or a hash reference with array reference values, when validating either a Hash or Hash reference.
 
-    hash_example => {
-        params => {
-            one => [ Str ],
-            two => [ HashRef ],    
-        },
-        returns => {  
-            one => [ Str ],
-            two => [ HashRef ],
-            three => [ Str ],
-        },
-    },
+	hash_example => {
+		params => {
+			one => [ Str ],
+			two => [ HashRef ],
+		},
+		returns => {
+			one => [ Str ],
+			two => [ HashRef ],
+			three => [ Str ],
+		},
+	},
 
-    ...
+	...
 
-    sub hash_example {
-        my ($self, %hash) = @_;
-        $hash{three} = 'add a key';
-        return %hash;
-    }
+	sub hash_example {
+		my ($self, %hash) = @_;
+		$hash{three} = 'add a key';
+		return %hash;
+	}
 
-The array references Must always have a first index that is an code reference, you can optionally pass a second index that can 
-either be 1, which indicates *optional*, a scalar that reference a subroutine/attribute available to *self* or a code reference 
-that gets used to fill a default value if one was not passed. 
-    
-    params => {
-        one => [ Str, sub { 'Hello World' } ],
-        two => [ Str, 'basics' ],
-    },    
-    returns => [ [Str], [Str], [Str, 'say_goodbye'],
+The array references must always have a first index that is a code reference, you can optionally pass a second index that can
+either be 1, which indicates *optional*, a scalar that reference a subroutine/attribute available to *self* or a code reference
+that gets used to fill a default value if one was not passed.
 
-    ....
+	params => {
+		one => [ Str, sub { 'Hello World' } ],
+		two => [ Str, 'basics' ],
+	},
+	returns => [ [Str], [Str], [Str, 'say_goodbye'],
 
-    has basics => (
-        is => 'ro',
-        default => sub { "How are you" },
-    );
+	....
 
-    sub say_goodbye {
-        my ($self) = shift;
-        return 'In a rush, goodbye.';
-    } 
+	has basics => (
+		is => 'ro',
+		default => sub { "How are you" },
+	);
 
-    sub example {
-        my ($self, %hash) = @_;
-        return values %hash;
-    }
+	sub say_goodbye {
+		my ($self) = shift;
+		return 'In a rush, goodbye.';
+	}
+
+	sub example {
+		my ($self, %hash) = @_;
+		return values %hash;
+	}
 
 ...
 
 =head1 Breaking things
 
-I decided to make some breaking changes so 0.07++ syntax is not compatible with 0.06--. I also changed from 
-*before* to *around* as I want to modify $args. If you prefer the *before* approach it can currently be found here - 
+I decided to make some breaking changes so 0.07++ syntax is not compatible with 0.06--. I also changed from
+*before* to *around* as I want to modify $args. If you prefer the *before* approach it can currently be found here -
 L<https://github.com/ThisUsedToBeAnEmail/MooX-TypeParams>.
 
 =head1 AUTHOR
@@ -226,7 +225,7 @@ automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc MooX::ValidateSubs
+	perldoc MooX::ValidateSubs
 
 You can also look for information at:
 

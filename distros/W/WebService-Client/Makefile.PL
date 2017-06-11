@@ -28,6 +28,7 @@ my %WriteMakefileArgs = (
     "Moo::Role" => 0
   },
   "TEST_REQUIRES" => {
+    "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
@@ -36,7 +37,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0502",
+  "VERSION" => "0.0601",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,6 +46,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "HTTP::Message" => "6.06",
   "HTTP::Request" => 0,

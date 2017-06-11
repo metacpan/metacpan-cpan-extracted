@@ -206,6 +206,7 @@ is_deeply($html_options, {
                           prova => 'hello <em>there</em> &amp; \stuff',
                           ciao => 1,
                           test => "Another great thing!",
+                          nofinalpage => 0,
                           nocoverpage => 0,
                           notoc => 0,
                           coverwidth => 1,
@@ -216,6 +217,7 @@ is_deeply($latex_options, {
                            ciao => 1,
                            test => "Another great thing!",
                            notoc => 0,
+                           nofinalpage => 0,
                            nocoverpage => 0,
                            coverwidth => 1,
                           }, "latex escaped and interpreted ok");

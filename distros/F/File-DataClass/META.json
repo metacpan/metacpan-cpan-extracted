@@ -78,63 +78,63 @@
    "provides" : {
       "File::DataClass" : {
          "file" : "lib/File/DataClass.pm",
-         "version" : "v0.72.1"
+         "version" : "v0.73.1"
       },
       "File::DataClass::Cache" : {
          "file" : "lib/File/DataClass/Cache.pm",
-         "version" : "v0.72.1"
+         "version" : "v0.73.1"
       },
       "File::DataClass::Constants" : {
          "file" : "lib/File/DataClass/Constants.pm",
-         "version" : "v0.72.1"
+         "version" : "v0.73.1"
       },
       "File::DataClass::Exception" : {
          "file" : "lib/File/DataClass/Exception.pm",
-         "version" : "v0.72.1"
+         "version" : "v0.73.1"
       },
       "File::DataClass::Functions" : {
          "file" : "lib/File/DataClass/Functions.pm",
-         "version" : "v0.72.1"
+         "version" : "v0.73.1"
       },
       "File::DataClass::IO" : {
          "file" : "lib/File/DataClass/IO.pm",
-         "version" : "v0.72.1"
+         "version" : "v0.73.1"
       },
       "File::DataClass::List" : {
          "file" : "lib/File/DataClass/List.pm",
-         "version" : "v0.72.1"
+         "version" : "v0.73.1"
       },
       "File::DataClass::Result" : {
          "file" : "lib/File/DataClass/Result.pm",
-         "version" : "v0.72.1"
+         "version" : "v0.73.1"
       },
       "File::DataClass::ResultSet" : {
          "file" : "lib/File/DataClass/ResultSet.pm",
-         "version" : "v0.72.1"
+         "version" : "v0.73.1"
       },
       "File::DataClass::ResultSource" : {
          "file" : "lib/File/DataClass/ResultSource.pm",
-         "version" : "v0.72.1"
+         "version" : "v0.73.1"
       },
       "File::DataClass::Schema" : {
          "file" : "lib/File/DataClass/Schema.pm",
-         "version" : "v0.72.1"
+         "version" : "v0.73.1"
       },
       "File::DataClass::Storage" : {
          "file" : "lib/File/DataClass/Storage.pm",
-         "version" : "v0.72.1"
+         "version" : "v0.73.1"
       },
       "File::DataClass::Storage::Any" : {
          "file" : "lib/File/DataClass/Storage/Any.pm",
-         "version" : "v0.72.1"
+         "version" : "v0.73.1"
       },
       "File::DataClass::Storage::JSON" : {
          "file" : "lib/File/DataClass/Storage/JSON.pm",
-         "version" : "v0.72.1"
+         "version" : "v0.73.1"
       },
       "File::DataClass::Types" : {
          "file" : "lib/File/DataClass/Types.pm",
-         "version" : "v0.72.1"
+         "version" : "v0.73.1"
       }
    },
    "release_status" : "stable",
@@ -153,7 +153,7 @@
          "web" : "http://github.com/pjfl/p5-file-dataclass"
       }
    },
-   "version" : "0.72.1",
+   "version" : "0.73.1",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.014004"

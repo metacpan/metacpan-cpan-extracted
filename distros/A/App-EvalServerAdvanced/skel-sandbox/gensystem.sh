@@ -17,7 +17,8 @@ cat > system/install.sh <<'EOF'
 #!/bin/bash
 set -e
 set -u
-apt-get install build-essential perlbrew
+apt-get install -y build-essential perlbrew locales
+localedef -i en_US -f UTF-8 en_US.UTF-8
 export PERLBREW_ROOT=/opt/perlbrew
 mkdir -p $PERLBREW_ROOT
 perlbrew init

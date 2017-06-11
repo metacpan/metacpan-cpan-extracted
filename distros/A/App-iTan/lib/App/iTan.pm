@@ -9,14 +9,14 @@ use MooseX::App qw(Color);
 
 app_namespace 'App::iTan::Command';
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 our $AUTHORITY = 'cpan:MAROS';
 
 __PACKAGE__->meta->make_immutable;
 
 =encoding utf8
 
-=head1 NAME 
+=head1 NAME
 
 App::iTan - Secure management of iTANs for online banking
 
@@ -24,42 +24,42 @@ App::iTan - Secure management of iTANs for online banking
 
  # Import a list of itans
  console$ itan import --file itanlist.txt
- 
+
  # Fetch an itan and mark it as used (after password prompt)
  console$ itan get --index 15 --memo "paid rent 06/2012"
- 
+
  # List all itans
  console$ itan list
 
 =head1 DESCRIPTION
 
-This command line application facilitates the secure handling of iTANs 
-(indexed Transaction Numbers) as used by various online banking tools. 
+This command line application facilitates the secure handling of iTANs
+(indexed Transaction Numbers) as used by various online banking tools.
 
-iTANs are encrypted using L<Crypt::Twofish> and are by default stored 
+iTANs are encrypted using L<Crypt::Twofish> and are by default stored
 in a SQLite database located at ~/.itan. (Patches for other database
 vendors welcome)
 
 =head1 COMMANDS
 
-=over 
+=over
 
-=item * delete  
+=item * delete
 
 Delete all invalid iTANs
 L<App::iTan::Command::Delete>
 
-=item * get     
+=item * get
 
 Fetches selected iTAN
 L<App::iTan::Command::Get>
 
-=item * help    
+=item * help
 
 Prints this usage information
 L<App::iTan::Command::Help>
 
-=item * import  
+=item * import
 
 Imports a list of iTans into the database
 L<App::iTan::Command::Import>
@@ -74,7 +74,7 @@ L<App::iTan::Command::info>
 List of all iTANs
 L<App::iTan::Command::List>
 
-=item * reset   
+=item * reset
 
 Reset unused iTANs
 L<App::iTan::Command::Reset>
@@ -83,10 +83,10 @@ L<App::iTan::Command::Reset>
 
 =head1 SUPPORT
 
-Please report any bugs or feature requests to 
+Please report any bugs or feature requests to
 C<app-itan@rt.cpan.org>, or through the web interface at
 L<http://rt.cpan.org/Public/Bug/Report.html?Queue=App::iTan>.
-I will be notified and then you'll automatically be notified of the progress 
+I will be notified and then you'll automatically be notified of the progress
 on your report as I make changes.
 
 =head1 AUTHOR
@@ -94,12 +94,12 @@ on your report as I make changes.
     Maroš Kollár
     CPAN ID: MAROS
     maros [at] k-1.com
-    
+
     http://www.k-1.com
 
 =head1 COPYRIGHT
 
-App::iTan is Copyright (c) 2012 Maroš Kollár 
+App::iTan is Copyright (c) 2012 Maroš Kollár
 - L<http://www.k-1.com>
 
 =head1 LICENCE

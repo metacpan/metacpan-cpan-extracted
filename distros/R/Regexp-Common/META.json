@@ -4,12 +4,13 @@
       "Abigail <regexp-common@abigail.be>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "regular expression",
       "pattern"
    ],
    "license" : [
+      "mit",
       "mit",
       "bsd",
       "artistic_1",
@@ -30,8 +31,6 @@
       "build" : {
          "requires" : {
             "Config" : "0",
-            "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.01",
             "strict" : "0",
             "vars" : "0",
             "warnings" : "0"
@@ -41,7 +40,6 @@
          "requires" : {
             "Config" : "0",
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.01",
             "strict" : "0",
             "vars" : "0",
             "warnings" : "0"
@@ -50,7 +48,6 @@
       "runtime" : {
          "requires" : {
             "Config" : "0",
-            "ExtUtils::MakeMaker" : "0",
             "perl" : "5.01",
             "strict" : "0",
             "vars" : "0",
@@ -72,6 +69,6 @@
    },
    "release_status" : "stable",
    "resources" : {},
-   "version" : "2017040401",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "2017060201",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

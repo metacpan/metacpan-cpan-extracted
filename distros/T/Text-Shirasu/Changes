@@ -1,5 +1,10 @@
 Revision history for Perl extension Text-Shirasu
 
+0.0.4 2017-06-08T11:18:46Z
+
+    - Added wrapper functions for Text::CaboCha
+    - Thanks for @adokoy001
+
 0.0.3 2016-12-22T08:21:15Z
     - fixed filtering issue
 

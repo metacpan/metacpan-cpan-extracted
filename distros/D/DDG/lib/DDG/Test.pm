@@ -1,7 +1,7 @@
 package DDG::Test;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: TODO
-$DDG::Test::VERSION = '1016';
+$DDG::Test::VERSION = '1017';
 use strict;
 use warnings;
 use Carp;
@@ -25,7 +25,7 @@ DDG::Test - TODO
 
 =head1 VERSION
 
-version 1016
+version 1017
 
 =head1 AUTHOR
 

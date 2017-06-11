@@ -1,5 +1,8 @@
 Revision history for App-cpangitify
 
+0.14      2017-06-05 13:55:19 -0400
+  - Use v1 metacpan API (GH#9)
+
 0.12      2014-12-20 05:27:19 -0500
   - added --trace option
   - added --output | -o option

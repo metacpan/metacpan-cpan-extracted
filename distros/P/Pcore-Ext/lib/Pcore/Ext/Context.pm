@@ -1,6 +1,7 @@
 package Pcore::Ext::Context;
 
 use Pcore -class;
+use Pcore::Util::Scalar qw[weaken];
 use Pcore::Ext::Context::Raw;
 use Pcore::Ext::Context::Call;
 use Pcore::Ext::Context::Func;
@@ -11,6 +12,20 @@ has ctx => ( is => 'ro', isa => HashRef, required => 1 );
 has framework => ( is => 'ro', isa => Enum [ 'classic', 'modern' ], default => 'classic' );
 
 has js_gen_cache => ( is => 'ro', isa => HashRef, init_arg => undef );    # cache for JS functions strings
+
+has api   => ( is => 'ro', isa => HashRef, init_arg => undef );           # tied to $self->_ext_api_method
+has class => ( is => 'ro', isa => HashRef, init_arg => undef );           # tied to $self->_ext_class
+has type  => ( is => 'ro', isa => HashRef, init_arg => undef );           # tied to $self->_ext_type
+
+sub BUILD ( $self, $args ) {
+    weaken $self;
+
+    tie $self->{api}->%*,   'Pcore::Ext::Context::_TiedAttr', $self, '_ext_api_method';
+    tie $self->{class}->%*, 'Pcore::Ext::Context::_TiedAttr', $self, '_ext_class';
+    tie $self->{type}->%*,  'Pcore::Ext::Context::_TiedAttr', $self, '_ext_type';
+
+    return;
+}
 
 # JS GENERATORS
 sub js_raw ( $self, $js ) {
@@ -63,7 +78,7 @@ sub js_func ( $self, @ ) {
 }
 
 # Ext resolvers
-sub ext_class ( $self, $name ) {
+sub _ext_class ( $self, $name ) {
     if ( my $class = $self->get_class($name) ) {
 
         # register requires
@@ -76,7 +91,7 @@ sub ext_class ( $self, $name ) {
     }
 }
 
-sub ext_type ( $self, $name ) {
+sub _ext_type ( $self, $name ) {
     if ( my $class = $self->get_class($name) ) {
 
         # register requires
@@ -89,7 +104,7 @@ sub ext_type ( $self, $name ) {
     }
 }
 
-sub ext_api_method ( $self, $method_id ) {
+sub _ext_api_method ( $self, $method_id ) {
     my $map = $self->{app}->{api}->{map};
 
     # add version to relative method id
@@ -192,7 +207,7 @@ sub to_js ( $self ) {
 
     # resolve and add "extend" property
     if ( $self->{ctx}->{extend} ) {
-        $cfg->{extend} = $self->ext_class( $self->{ctx}->{extend} );
+        $cfg->{extend} = $self->_ext_class( $self->{ctx}->{extend} );
 
         # add extend to requires
         $self->{ctx}->{requires}->{ $cfg->{extend} } = undef;
@@ -215,7 +230,34 @@ sub to_js ( $self ) {
     return $js;
 }
 
+package Pcore::Ext::Context::_TiedAttr {
+
+    sub TIEHASH ( $self, @args ) {
+        return bless [ {}, @args ], $self;
+    }
+
+    sub FETCH {
+        my $method = $_[0]->[2];
+
+        return $_[0]->[1]->$method( $_[1] );
+    }
+}
+
 1;
+## -----SOURCE FILTER LOG BEGIN-----
+##
+## PerlCritic profile "pcore-script" policy violations:
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+## | Sev. | Lines                | Policy                                                                                                         |
+## |======+======================+================================================================================================================|
+## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
+## |      | 94                   | * Private subroutine/method '_ext_type' declared but not used                                                  |
+## |      | 107                  | * Private subroutine/method '_ext_api_method' declared but not used                                            |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    2 | 23, 24, 25           | Miscellanea::ProhibitTies - Tied variable used                                                                 |
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+##
+## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

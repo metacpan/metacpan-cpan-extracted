@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2017-05-23'; # DATE
-our $VERSION = '0.13'; # VERSION
+our $DATE = '2017-06-01'; # DATE
+our $VERSION = '0.14'; # VERSION
 
 use 5.010;
 use strict;
@@ -25,21 +25,24 @@ GetOptions(
 
 undef $/;
 
+my $res;
 if ($mod eq 'xs') {
     require YAML::XS;
-    print YAML::XS::Dump(YAML::XS::Load(scalar <>));
+    $res = YAML::XS::Dump(YAML::XS::Load(scalar <>));
 } elsif ($mod eq 'pp') {
     require YAML::Old;
-    print YAML::Old::Dump(YAML::Old::Load(scalar <>));
+    $res = YAML::Old::Dump(YAML::Old::Load(scalar <>));
 } else {
     require YAML::XS;
     if ($color) {
         require YAML::Tiny::Color;
-        print YAML::Tiny::Color::Dump(YAML::XS::Load(scalar <>));
+        $res = YAML::Tiny::Color::Dump(YAML::XS::Load(scalar <>));
     } else {
-        print YAML::XS::Dump(YAML::XS::Load(scalar <>));
+        $res = YAML::XS::Dump(YAML::XS::Load(scalar <>));
     }
 }
+print $res;
+print "\n" if (-t STDOUT) && $res !~ /\R\z/;
 
 1;
 # ABSTRACT: Pretty-print (and colorize) YAML
@@ -57,7 +60,7 @@ pp-yaml - Pretty-print (and colorize) YAML
 
 =head1 VERSION
 
-This document describes version 0.13 of pp-yaml (from Perl distribution App-SerializeUtils), released on 2017-05-23.
+This document describes version 0.14 of pp-yaml (from Perl distribution App-SerializeUtils), released on 2017-06-01.
 
 =head1 DESCRIPTION
 
@@ -90,7 +93,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Serial
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-App-SerializeUtils>.
+Source repository is at L<https://github.com/sharyanto/perl-App-SerializeUtils>.
 
 =head1 BUGS
 

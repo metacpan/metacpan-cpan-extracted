@@ -680,7 +680,7 @@ Perl_do_join(pTHX_ SV *sv, SV *delim, SV **mark, SV **sp)
 	++mark;
     }
 
-    sv_setpvs(sv, "");
+    SvPVCLEAR(sv);
     /* sv_setpv retains old UTF8ness [perl #24846] */
     SvUTF8_off(sv);
 
@@ -744,9 +744,9 @@ Perl_do_sprintf(pTHX_ SV *sv, I32 len, SV **sarg)
 
 /* currently converts input to bytes if possible, but doesn't sweat failure */
 UV
-Perl_do_vecget(pTHX_ SV *sv, SSize_t offset, int size)
+Perl_do_vecget(pTHX_ SV *sv, STRLEN offset, int size)
 {
-    STRLEN srclen, len, uoffset, bitoffs = 0;
+    STRLEN srclen, len, avail, uoffset, bitoffs = 0;
     const I32 svpv_flags = ((PL_op->op_flags & OPf_MOD || LVRET)
                                           ? SV_UNDEF_RETURNS_NULL : 0);
     unsigned char *s = (unsigned char *)
@@ -759,8 +759,6 @@ Perl_do_vecget(pTHX_ SV *sv, SSize_t offset, int size)
     
     PERL_ARGS_ASSERT_DO_VECGET;
 
-    if (offset < 0)
-	return 0;
     if (size < 1 || (size & (size-1))) /* size < 1 or not a power of two */
 	Perl_croak(aTHX_ "Illegal number of bits in vec");
 
@@ -774,29 +772,37 @@ Perl_do_vecget(pTHX_ SV *sv, SSize_t offset, int size)
 	bitoffs = ((offset%8)*size)%8;
 	uoffset = offset/(8/size);
     }
-    else if (size > 8)
-	uoffset = offset*(size/8);
+    else if (size > 8) {
+	int n = size/8;
+        if (offset > Size_t_MAX / n - 1) /* would overflow */
+            return 0;
+	uoffset = offset*n;
+    }
     else
 	uoffset = offset;
 
-    len = uoffset + (bitoffs + size + 7)/8;	/* required number of bytes */
-    if (len > srclen) {
+    if (uoffset >= srclen)
+        return 0;
+
+    len   = (bitoffs + size + 7)/8; /* required number of bytes */
+    avail = srclen - uoffset;       /* available number of bytes */
+
+    /* Does the byte range overlap the end of the string? If so,
+     * handle specially. */
+    if (avail < len) {
 	if (size <= 8)
 	    retnum = 0;
 	else {
 	    if (size == 16) {
-		if (uoffset >= srclen)
-		    retnum = 0;
-		else
-		    retnum = (UV) s[uoffset] <<  8;
+                assert(avail == 1);
+                retnum = (UV) s[uoffset] <<  8;
 	    }
 	    else if (size == 32) {
-		if (uoffset >= srclen)
-		    retnum = 0;
-		else if (uoffset + 1 >= srclen)
+                assert(avail >= 1 && avail <= 3);
+		if (avail == 1)
 		    retnum =
 			((UV) s[uoffset    ] << 24);
-		else if (uoffset + 2 >= srclen)
+		else if (avail == 2)
 		    retnum =
 			((UV) s[uoffset    ] << 24) +
 			((UV) s[uoffset + 1] << 16);
@@ -810,34 +816,33 @@ Perl_do_vecget(pTHX_ SV *sv, SSize_t offset, int size)
 	    else if (size == 64) {
 		Perl_ck_warner(aTHX_ packWARN(WARN_PORTABLE),
 			       "Bit vector size > 32 non-portable");
-		if (uoffset >= srclen)
-		    retnum = 0;
-		else if (uoffset + 1 >= srclen)
+                assert(avail >= 1 && avail <= 7);
+		if (avail == 1)
 		    retnum =
 			(UV) s[uoffset     ] << 56;
-		else if (uoffset + 2 >= srclen)
+		else if (avail == 2)
 		    retnum =
 			((UV) s[uoffset    ] << 56) +
 			((UV) s[uoffset + 1] << 48);
-		else if (uoffset + 3 >= srclen)
+		else if (avail == 3)
 		    retnum =
 			((UV) s[uoffset    ] << 56) +
 			((UV) s[uoffset + 1] << 48) +
 			((UV) s[uoffset + 2] << 40);
-		else if (uoffset + 4 >= srclen)
+		else if (avail == 4)
 		    retnum =
 			((UV) s[uoffset    ] << 56) +
 			((UV) s[uoffset + 1] << 48) +
 			((UV) s[uoffset + 2] << 40) +
 			((UV) s[uoffset + 3] << 32);
-		else if (uoffset + 5 >= srclen)
+		else if (avail == 5)
 		    retnum =
 			((UV) s[uoffset    ] << 56) +
 			((UV) s[uoffset + 1] << 48) +
 			((UV) s[uoffset + 2] << 40) +
 			((UV) s[uoffset + 3] << 32) +
 			((UV) s[uoffset + 4] << 24);
-		else if (uoffset + 6 >= srclen)
+		else if (avail == 6)
 		    retnum =
 			((UV) s[uoffset    ] << 56) +
 			((UV) s[uoffset + 1] << 48) +
@@ -900,7 +905,7 @@ Perl_do_vecget(pTHX_ SV *sv, SSize_t offset, int size)
 void
 Perl_do_vecset(pTHX_ SV *sv)
 {
-    SSize_t offset, bitoffs = 0;
+    STRLEN offset, bitoffs = 0;
     int size;
     unsigned char *s;
     UV lval;
@@ -908,8 +913,18 @@ Perl_do_vecset(pTHX_ SV *sv)
     STRLEN targlen;
     STRLEN len;
     SV * const targ = LvTARG(sv);
+    char errflags = LvFLAGS(sv);
 
     PERL_ARGS_ASSERT_DO_VECSET;
+
+    /* some out-of-range errors have been deferred if/until the LV is
+     * actually written to: f(vec($s,-1,8)) is not always fatal */
+    if (errflags) {
+        assert(!(errflags & ~(1|4)));
+        if (errflags & 1)
+            Perl_croak_nocontext("Negative offset to vec in lvalue context");
+        Perl_croak_nocontext("Out of memory!");
+    }
 
     if (!targ)
 	return;
@@ -926,9 +941,8 @@ Perl_do_vecset(pTHX_ SV *sv)
     (void)SvPOK_only(targ);
     lval = SvUV(sv);
     offset = LvTARGOFF(sv);
-    if (offset < 0)
-	Perl_croak(aTHX_ "Negative offset to vec in lvalue context");
     size = LvTARGLEN(sv);
+
     if (size < 1 || (size & (size-1))) /* size < 1 or not a power of two */
 	Perl_croak(aTHX_ "Illegal number of bits in vec");
 
@@ -936,14 +950,20 @@ Perl_do_vecset(pTHX_ SV *sv)
 	bitoffs = ((offset%8)*size)%8;
 	offset /= 8/size;
     }
-    else if (size > 8)
-	offset *= size/8;
+    else if (size > 8) {
+	int n = size/8;
+        if (offset > Size_t_MAX / n - 1) /* would overflow */
+            Perl_croak_nocontext("Out of memory!");
+	offset *= n;
+    }
 
-    len = offset + (bitoffs + size + 7)/8;	/* required number of bytes */
-    if (len > targlen) {
-	s = (unsigned char*)SvGROW(targ, len + 1);
-	(void)memzero((char *)(s + targlen), len - targlen + 1);
-	SvCUR_set(targ, len);
+    len = (bitoffs + size + 7)/8;	/* required number of bytes */
+    if (targlen < offset || targlen - offset < len) {
+        STRLEN newlen = offset > Size_t_MAX - len - 1 ? /* avoid overflow */
+                                        Size_t_MAX : offset + len + 1;
+	s = (unsigned char*)SvGROW(targ, newlen);
+	(void)memzero((char *)(s + targlen), newlen - targlen);
+	SvCUR_set(targ, newlen - 1);
     }
 
     if (size < 8) {
@@ -1008,7 +1028,7 @@ Perl_do_vop(pTHX_ I32 optype, SV *sv, SV *left, SV *right)
     PERL_ARGS_ASSERT_DO_VOP;
 
     if (sv != left || (optype != OP_BIT_AND && !SvOK(sv)))
-	sv_setpvs(sv, "");	/* avoid undef warning on |= and ^= */
+        SvPVCLEAR(sv);        /* avoid undef warning on |= and ^= */
     if (sv == left) {
 	lsave = lc = SvPV_force_nomg(left, leftlen);
     }
@@ -1065,16 +1085,16 @@ Perl_do_vop(pTHX_ I32 optype, SV *sv, SV *left, SV *right)
 	dc = SvPVX(sv);		/* sv_usepvn() calls Renew() */
     }
     if (left_utf || right_utf) {
-	UV duc, luc, ruc;
 	char *dcorig = dc;
 	char *dcsave = NULL;
 	STRLEN lulen = leftlen;
 	STRLEN rulen = rightlen;
-	STRLEN ulen;
 
 	switch (optype) {
 	case OP_BIT_AND:
 	    while (lulen && rulen) {
+                UV duc, luc, ruc;
+                STRLEN ulen;
 		luc = utf8n_to_uvchr((U8*)lc, lulen, &ulen, UTF8_ALLOW_ANYUV);
 		lc += ulen;
 		lulen -= ulen;
@@ -1093,9 +1113,12 @@ Perl_do_vop(pTHX_ I32 optype, SV *sv, SV *left, SV *right)
 	    if (sv == left || sv == right)
 		(void)sv_usepvn(sv, dcorig, needlen);
 	    SvCUR_set(sv, dc - dcorig);
+	    *SvEND(sv) = 0;
 	    break;
 	case OP_BIT_XOR:
 	    while (lulen && rulen) {
+                UV duc, luc, ruc;
+                STRLEN ulen;
 		luc = utf8n_to_uvchr((U8*)lc, lulen, &ulen, UTF8_ALLOW_ANYUV);
 		lc += ulen;
 		lulen -= ulen;
@@ -1113,6 +1136,8 @@ Perl_do_vop(pTHX_ I32 optype, SV *sv, SV *left, SV *right)
 	    goto mop_up_utf;
 	case OP_BIT_OR:
 	    while (lulen && rulen) {
+                UV duc, luc, ruc;
+                STRLEN ulen;
 		luc = utf8n_to_uvchr((U8*)lc, lulen, &ulen, UTF8_ALLOW_ANYUV);
 		lc += ulen;
 		lulen -= ulen;
@@ -1215,12 +1240,20 @@ Perl_do_vop(pTHX_ I32 optype, SV *sv, SV *left, SV *right)
 		*dc++ = *lc++ | *rc++;
 	  mop_up:
 	    len = lensave;
-	    if (rightlen > len)
-		sv_catpvn_nomg(sv, rsave + len, rightlen - len);
-	    else if (leftlen > (STRLEN)len)
-		sv_catpvn_nomg(sv, lsave + len, leftlen - len);
-	    else
-		*SvEND(sv) = '\0';
+	    if (rightlen > len) {
+                if (dc == rc)
+                    SvCUR(sv) = rightlen;
+                else
+                    sv_catpvn_nomg(sv, rsave + len, rightlen - len);
+            }
+            else if (leftlen > len) {
+                if (dc == lc)
+                    SvCUR(sv) = leftlen;
+                else
+                    sv_catpvn_nomg(sv, lsave + len, leftlen - len);
+            }
+            *SvEND(sv) = '\0';
+
 	    break;
 	}
     }
@@ -1241,8 +1274,12 @@ Perl_do_kv(pTHX)
     const U8 gimme = GIMME_V;
     const I32 dokv =     (PL_op->op_type == OP_RV2HV || PL_op->op_type == OP_PADHV);
     /* op_type is OP_RKEYS/OP_RVALUES if pp_rkeys delegated to here */
-    const I32 dokeys =   dokv || (PL_op->op_type == OP_KEYS);
-    const I32 dovalues = dokv || (PL_op->op_type == OP_VALUES);
+    const I32 dokeys =   dokv || (PL_op->op_type == OP_KEYS)
+	|| (  PL_op->op_type == OP_AVHVSWITCH
+	   && (PL_op->op_private & 3) + OP_EACH == OP_KEYS  );
+    const I32 dovalues = dokv || (PL_op->op_type == OP_VALUES)
+	|| (  PL_op->op_type == OP_AVHVSWITCH
+	   && (PL_op->op_private & 3) + OP_EACH == OP_VALUES  );
 
     (void)hv_iterinit(keys);	/* always reset iterator regardless */
 
@@ -1271,6 +1308,13 @@ Perl_do_kv(pTHX)
 	    PUSHi( i );
 	}
 	RETURN;
+    }
+
+    if (UNLIKELY(PL_op->op_private & OPpMAYBE_LVSUB)) {
+	const I32 flags = is_lvalue_sub();
+	if (flags && !(flags & OPpENTERSUB_INARGS))
+	    /* diag_listed_as: Can't modify %s in %s */
+	    Perl_croak(aTHX_ "Can't modify keys in list assignment");
     }
 
     /* 2*HvUSEDKEYS() should never be big enough to truncate or wrap */

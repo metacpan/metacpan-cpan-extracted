@@ -81,6 +81,10 @@ test_out(
     q{ok 18 - test survives with missing method in config},
 );
 
+test_err(
+    q{# 'relations' method defined in Artist but untested: cds_90s}
+);
+
 # run the tests
 lives_ok {
     $schematest->run_tests();

@@ -95,11 +95,11 @@
       "homepage" : "https://metacpan.org/release/App-PMUtils",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/sharyanto/perl-App-PMUtils.git",
-         "web" : "https://github.com/sharyanto/perl-App-PMUtils"
+         "url" : "git://github.com/perlancar/perl-App-PMUtils.git",
+         "web" : "https://github.com/perlancar/perl-App-PMUtils"
       }
    },
-   "version" : "0.67",
+   "version" : "0.68",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024000"
@@ -199,7 +199,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.54"
+            "version" : "0.55"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -230,6 +230,11 @@
             "class" : "Dist::Zilla::Plugin::CheckMetaResources",
             "name" : "@Author::PERLANCAR/CheckMetaResources",
             "version" : "0.001"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CopyrightYearFromGit",
+            "name" : "@Author::PERLANCAR/CopyrightYearFromGit",
+            "version" : "0.003"
          },
          {
             "class" : "Dist::Zilla::Plugin::IfBuilt",
@@ -408,7 +413,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
                         "name" : "@Author::PERLANCAR/PERLANCAR::SortSections",
-                        "version" : "0.05"
+                        "version" : "0.06"
                      }
                   ]
                }
@@ -591,6 +596,6 @@
       }
    },
    "x_authority" : "cpan:PERLANCAR",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
 }
 

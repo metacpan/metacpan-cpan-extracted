@@ -121,7 +121,15 @@ int _is_neg_zero(D128 d128) {
   int n = sizeof(D128);
   void * p = &d128;
 
-  if(d128 != 0.0DL) return 0;
+  /*****************************************************
+   We perform the following oddness because of gcc's
+   buggy optimization of signed zero _Decimal128.
+   See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80692
+  ******************************************************/
+  if(d128 != 0.0DL) {
+    if(d128 * -1.0DL == 0.0DL) return 1; /* it's a -0 */
+    return 0; /* it's not zero */
+  }
 
 #ifdef WE_HAVE_BENDIAN /* Big Endian architecture */
   if(((unsigned char*)p)[0] >= 128) return 1;

@@ -1,5 +1,8 @@
 Revision history for Perl extension Net-Azure-NotificationHubs
 
+0.02 2017-06-06T08:41:16Z
+    - use fastapi.metacpan.org/v1 in t/31_response_as_hashref.t because v0 is shutdown
+
 0.01 2016-11-29T09:33:34Z
 
     - original version

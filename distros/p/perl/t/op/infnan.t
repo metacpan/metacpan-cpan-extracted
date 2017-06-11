@@ -2,8 +2,8 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = '../lib';
     require './test.pl';
+    set_up_inc('../lib');
 }
 
 use strict;
@@ -15,6 +15,9 @@ BEGIN {
         # FWIW: NaN actually seems to be working decently,
         # but Inf is completely broken (e.g. Inf + 0 -> NaN).
         skip_all "$^O with long doubles does not have sane inf/nan";
+    }
+    unless ($Config{d_double_has_inf} && $Config{d_double_has_nan}) {
+        skip_all "the doublekind $Config{doublekind} does not have inf/nan";
     }
 }
 

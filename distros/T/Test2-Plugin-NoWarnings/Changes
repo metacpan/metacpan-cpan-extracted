@@ -1,3 +1,11 @@
+0.06     2017-06-04
+
+- Warnings inside a subtest were not emitted as TAP events, breaking the TAP
+  and making for great confusion. This is because of a bug in the core TAP
+  formatter - see https://github.com/Test-More/test-more/issues/776 for
+  details. Warnings are now emitted as Ok events instead of Warning events.
+
+
 0.05     2016-11-07
 
 - Skip compile.t on Windows. This test uses IPC::Run3 which doesn't seem to

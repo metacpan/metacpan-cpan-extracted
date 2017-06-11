@@ -10,19 +10,20 @@ use HTML::Parser;
 our $VERSION;
 
 BEGIN {
-    $VERSION = '0.0.2';
+    $VERSION = '0.0.3';
 }
 
 my $parser = HTML::Parser->new(api_version => 3);
 
 sub handler {
-    my $attr = shift;
+    my ($attr) = @_;
 
-    foreach my $key (keys %$attr) {
-        my $val = %$attr{$key};
+    foreach my $key (keys %{$attr}) {
+        my $val = ${$attr}{$key};
 
-        if ($key eq 'href') {
-            print "$val\n";
+        if ($key eq 'href' || $key eq 'src') {
+            chomp $val;
+            $val ne '' && print "$val\n";
         }
     }
 }
@@ -31,7 +32,7 @@ sub run {
     $parser->handler(start => \&handler, 'attr');
 
     while (<>) {
-       $parser->parse($_); 
+        $parser->parse($_); 
     }
 
     $parser->eof;

@@ -11,11 +11,11 @@ use warnings;
 
 =head1 VERSION
 
-version  0.111 
+version  0.112
 
 =cut
 
-our $VERSION     = '0.111';
+our $VERSION     = '0.112';
 $VERSION = eval $VERSION;
 
 1;

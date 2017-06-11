@@ -32,4 +32,4 @@ resources:
   bugtracker: http://github.com/reneeb/OTRS-OPM-Maker-Command-sopm/issues
   homepage: http://github.com/reneeb/OTRS-OPM-Maker-Command-sopm
   repository: http://github.com/reneeb/OTRS-OPM-Maker-Command-sopm.git
-version: '1.37'
+version: '1.39'

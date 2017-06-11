@@ -1,0 +1,22 @@
+=head1 NAME
+
+BlankOnDev::Tutorial::en - User Guide for BlankOnDev Module. [Coming Soon]
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2017 by Achmad Yusri Afandi and BlankOn Developer Team.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHORS
+
+=over
+
+=item * Achmad Yusri Afandi, E<lt>yusrideb@cpan.orgE<gt>
+
+=item * BlankOn Developer Team.
+
+=back
+
+=cut

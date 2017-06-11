@@ -1,3 +1,17 @@
+7.28  Tue May 30 22:01:08 BST 2017
+
+    No changes since v7.27_02
+
+7.27_02 Tue May 30 09:27:56 BST 2017
+
+    Bug fixes:
+    - Prune auto/share from search paths RT#121918
+
+7.27_01 Sun May 28 11:35:46 BST 2017
+
+    Bug fixes:
+    - Fix regression with metadata RT#121913
+
 7.26  Sat May 27 21:01:47 BST 2017
 
     No changes since 7.25_06

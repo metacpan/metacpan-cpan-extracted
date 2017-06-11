@@ -2,7 +2,7 @@ package URI::amqp;
 use strict;
 use warnings;
 
-our $VERSION = '0.1.1';
+our $VERSION = '0.1.3';
 
 use URI::QueryParam;
 use URI::Escape qw(uri_unescape);
@@ -78,22 +78,22 @@ return tuplet of C<($host, $options)> which works with L<Net::AMQP::RabbitMQ> C<
 sub as_net_amqp_rabbitmq {
     my ($self) = @_;
 
-    return (
-        $self->host,
-        {
-            user            => $self->user,
-            password        => $self->password,
-            port            => $self->port,
-            vhost           => $self->vhost,
-            channel_max     => scalar $self->query_param('channel_max'),
-            frame_max       => scalar $self->query_param('frame_max'),
-            heartbeat       => scalar $self->query_param('heartbeat'),
-            timeout         => scalar $self->query_param('connection_timeout'),
-            ssl             => $self->secure,
-            ssl_verify_host => scalar $self->query_param('verify'),
-            ssl_cacert      => scalar $self->query_param('cacertfile'),
-        }
-    );
+    my $options = {};
+
+    $options->{user}        = $self->user                              if defined $self->user;
+    $options->{password}    = $self->password                          if defined $self->password;
+    $options->{port}        = $self->port                              if defined $self->port;
+    $options->{vhost}       = $self->vhost                             if defined $self->vhost;
+    $options->{channel_max} = scalar $self->query_param('channel_max') if defined $self->query_param('channel_max');
+    $options->{frame_max}   = scalar $self->query_param('frame_max')   if defined $self->query_param('frame_max');
+    $options->{heartbeat}   = scalar $self->query_param('heartbeat')   if defined $self->query_param('heartbeat');
+    $options->{timeout} = scalar $self->query_param('connection_timeout')
+      if scalar $self->query_param('connection_timeout');
+    $options->{ssl}             = $self->secure                           if $self->secure;
+    $options->{ssl_verify_host} = scalar $self->query_param('verify')     if defined $self->query_param('verify');
+    $options->{ssl_cacert}      = scalar $self->query_param('cacertfile') if defined $self->query_param('cacertfile');
+
+    return ($self->host, $options);
 }
 
 =head2 as_anyevent_rabbitmq
@@ -102,7 +102,7 @@ return options which works with L<AnyEvent::RabbitMQ> C<connect> method
 
     use URI;
     use AnyEvent::RabbitMQ;
-     
+
     my $cv = AnyEvent->condvar;
     my $uri = URI->new('amqp://user:pass@host.domain:1234/');
     my $ar = AnyEvent::RabbitMQ->new->load_xml_spec()->connect(
@@ -118,20 +118,22 @@ return options which works with L<AnyEvent::RabbitMQ> C<connect> method
 sub as_anyevent_rabbitmq {
     my ($self) = @_;
 
-    return {
-        host    => $self->host,
-        port    => $self->port,
-        user    => $self->user,
-        pass    => $self->password,
-        vhost   => $self->vhost,
-        timeout => scalar $self->query_param('connection_timeout'),
-        tls     => $self->secure,
-        tune    => {
-            heartbeat   => scalar $self->query_param('heartbeat'),
-            channel_max => scalar $self->query_param('channel_max'),
-            frame_max   => scalar $self->query_param('frame_max'),
-        },
-    };
+    my $options = {};
+
+    $options->{host}  = $self->host     if defined $self->host;
+    $options->{port}  = $self->port     if defined $self->port;
+    $options->{user}  = $self->user     if defined $self->user;
+    $options->{pass}  = $self->password if defined $self->password;
+    $options->{vhost} = $self->vhost    if defined $self->vhost;
+    $options->{timeout} = scalar $self->query_param('connection_timeout')
+      if defined $self->query_param('connection_timeout');
+    $options->{tls} = $self->secure if $self->secure;
+    $options->{tune}{heartbeat} = scalar $self->query_param('heartbeat') if defined $self->query_param('heartbeat');
+    $options->{tune}{channel_max} = scalar $self->query_param('channel_max')
+      if defined $self->query_param('channel_max');
+    $options->{tune}{frame_max} = scalar $self->query_param('frame_max') if defined $self->query_param('frame_max');
+
+    return $options;
 }
 
 =head1 LIMITATIONS

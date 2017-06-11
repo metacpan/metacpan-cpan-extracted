@@ -10,14 +10,15 @@ do { my $x = {
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',
                                       'Test::More' => '0',
+                                      'Test::Perl::Critic' => '0',
                                       'Test::Pod' => '1.41',
-                                      'blib' => '1.01',
-                                      'perl' => '5.006'
+                                      'blib' => '1.01'
                                     }
                     },
        'runtime' => {
                       'requires' => {
                                       'Data::Dumper' => '0',
+                                      'Encode' => '0',
                                       'Exporter' => '0',
                                       'FindBin' => '0',
                                       'Function::Parameters' => '0',
@@ -25,6 +26,7 @@ do { my $x = {
                                       'Path::Tiny' => '0',
                                       'Time::HiRes' => '0',
                                       'lib' => '0',
+                                      'perl' => 'v5.24.0',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }
@@ -36,7 +38,8 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'Test::More' => '0'
+                                   'Test::More' => '0',
+                                   'utf8' => '0'
                                  }
                  }
      };

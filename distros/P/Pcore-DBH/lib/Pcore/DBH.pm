@@ -1,4 +1,4 @@
-package Pcore::DBH v0.3.0;
+package Pcore::DBH v0.4.0;
 
 use Pcore -dist, -role;
 use DBI;
@@ -78,7 +78,7 @@ sub default_dbi_attr($self) {
         AutoCommit         => 1,
         Callbacks          => {
             connected => sub {
-                P->log->sendlog( 'Pcore-DBH', 'Connected to: ' . $_[1] );
+                P->sendlog( 'Pcore-DBH.DEBUG', 'Connected to: ' . $_[1] ) if $ENV{PCORE_DBH_DEBUG};
 
                 return;
             },
@@ -86,13 +86,13 @@ sub default_dbi_attr($self) {
                 return;
             },
             do => sub {
-                P->log->sendlog( 'Pcore-DBH', 'Do: ' . $_[1] );
+                P->sendlog( 'Pcore-DBH.DEBUG', 'Do: ' . $_[1] ) if $ENV{PCORE_DBH_DEBUG};
 
                 return;
             },
             ChildCallbacks => {
                 execute => sub {
-                    P->log->sendlog( 'Pcore-DBH', 'Execute: ' . $_[0]->{Statement} );
+                    P->sendlog( 'Pcore-DBH.DEBUG', 'Execute: ' . $_[0]->{Statement} ) if $ENV{PCORE_DBH_DEBUG};
 
                     return;
                 }

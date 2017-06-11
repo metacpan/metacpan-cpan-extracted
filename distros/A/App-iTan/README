@@ -4,10 +4,10 @@ NAME
 SYNOPSIS
      # Import a list of itans
      console$ itan import --file itanlist.txt
- 
+
      # Fetch an itan and mark it as used (after password prompt)
      console$ itan get --index 15 --memo "paid rent 06/2012"
- 
+
      # List all itans
      console$ itan list
 
@@ -59,7 +59,7 @@ AUTHOR
         Maroš Kollár
         CPAN ID: MAROS
         maros [at] k-1.com
-    
+
         http://www.k-1.com
 
 COPYRIGHT

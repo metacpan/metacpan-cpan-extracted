@@ -2,7 +2,6 @@
 
 use warnings;
 use strict;
-use Test::Number::Delta within => 1e-2;
 use Test::Most tests => 11;
 
 BEGIN {
@@ -19,19 +18,30 @@ UK: {
 		require Test::Carp;
 		Test::Carp->import();;
 
+		eval {
+			require Test::Number::Delta;
+
+			Test::Number::Delta->import();
+		};
+
+		if($@) {
+			diag('Test::Number::Delta not installed - skipping tests');
+			skip 'Test::Number::Delta not installed', 10;
+		}
+
 		my $geocoder = new_ok('Geo::Coder::XYZ');
 
 		my $location = $geocoder->geocode('10 Downing St., London, UK');
-		delta_ok($location->{latt}, 51.50);
-		delta_ok($location->{longt}, -0.13);
+		delta_within($location->{latt}, 51.50, 1e-2);
+		delta_within($location->{longt}, -0.13, 1e-2);
 
 		$location = $geocoder->geocode('Wokingham, Berkshire, England');
-		delta_ok($location->{latt}, 51.41);
-		delta_ok($location->{longt}, -0.83);
+		delta_within($location->{latt}, 51.41, 1e-2);
+		delta_within($location->{longt}, -0.83, 1e-2);
 
 		$location = $geocoder->geocode(location => '10 Downing St., London, UK');
-		delta_ok($location->{latt}, 51.50);
-		delta_ok($location->{longt}, -0.13);
+		delta_within($location->{latt}, 51.50, 1e-2);
+		delta_within($location->{longt}, -0.13, 1e-2);
 
 		my $address = $geocoder->reverse_geocode(latlng => '51.50,-0.13');
 		like($address->{'city'}, qr/^London$/i, 'test reverse');

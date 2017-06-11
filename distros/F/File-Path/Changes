@@ -1,5 +1,57 @@
 Revision history for Perl extension File::Path.
 
+2.14 2017-06-07
+    - When creating subdirectories for testing underneath
+      File::Spec::Functions::tmpdir(), use randomly generated strings.
+    - No change in functionality from 2.13.
+
+2.13 2017-05-31
+    - Document security vulnerability reported as CVE-2017-6512.
+
+2.12_008 2017-05-07
+    - Patch from John Lightsey.
+
+2.12_007 2017-04-22
+    - Skip tests where filesystem doesn't support permissions (RT 121248).
+    - Add AppVeyor configuration; thanks to Charlie Gonzalez and Hayo Baan.
+
+2.12_006 2017-04-21
+    - Modernize README, Makefile.PL, updating of version number
+      and release date in documentation.
+
+2.12_005 2017-04-21
+    - Recommend use of 'safe => 1' in remove_tree() and rmtree().
+    - Warn if mkpath() or make_path() is passed implausible options on
+      Windows.
+    - Corrections to errors in previous release.
+
+2.12_004 2017-04-18
+    - Certain functions used in tests are not available on Windows;
+      skip them.
+    - Move certain functions used in testing to t/FilePathTest.pm. 
+
+2.12_003 2017-04-07
+    - Add tests to improve coverage ratios as measured by Devel::Cover
+    - No functional changes.
+
+2.12_002 2017-03-12
+    - GH#41 RT 117019 Fixed File::Path::remove_tree option hash is auto
+                      populated and cannot be reused
+    - GH#40 Unskip in path root t
+    - GH#39 Remove superfluous assignment to $arg{perm}
+    - GH#38 Minor grammatical doc fixes.
+    - GH#37 Minor grammatical doc fixes.
+
+2.12_001 2016-09-18
+    - RT 94209  document that the thread safety issue will not change and
+      communicate alternative.
+    - RT 85878  be more generous with error check regex given we could be
+      dealing with a pre-1.25 Carp.
+    - GH #33    Be more precise in documentation example for make_path
+      error checking.
+    - GH #34 Skip Windows 2000 and earlier unit tests (test change).
+    - GH #36 Do not hardcode ENOENT (test change).
+
 2.12     2015-10-09
     - RT 105935 Change ERROR HANDLING doc section to be very clear about the
       error handling mechanism for root nodes.

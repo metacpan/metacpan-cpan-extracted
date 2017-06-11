@@ -7,7 +7,7 @@ use Path::Tiny ();
 use IPC::Cmd ();
 
 # ABSTRACT: Plugin to extract an archive using command line tools
-our $VERSION = '0.36'; # VERSION
+our $VERSION = '0.41'; # VERSION
 
 
 has '+format' => 'tar';
@@ -189,7 +189,7 @@ Alien::Build::Plugin::Extract::CommandLine - Plugin to extract an archive using 
 
 =head1 VERSION
 
-version 0.36
+version 0.41
 
 =head1 SYNOPSIS
 
@@ -248,7 +248,11 @@ L<Alien::Build::Plugin::Extract::Negotiate>, L<Alien::Build>, L<alienfile>, L<Al
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Diab Jerius (DJERIUS)
 
 =head1 COPYRIGHT AND LICENSE
 

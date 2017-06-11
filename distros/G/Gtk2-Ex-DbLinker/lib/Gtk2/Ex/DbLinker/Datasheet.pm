@@ -4,7 +4,7 @@ our $VERSION = $Gtk2::Ex::DbLinker::VERSION;
 
 use strict;
 use warnings;
-
+use Log::Any;
 use Gtk2::Ex::DbLinker::DatasheetHelper;
 #use Carp;
 use Glib qw/TRUE FALSE/;
@@ -78,7 +78,8 @@ sub new {
     @$self{ keys %arg } = values(%arg);
     bless $self, $class;
 
-    $self->{log} = Log::Log4perl->get_logger("Gtk2::Ex::DbLinker::Datasheet");
+    #$self->{log} = Log::Log4perl->get_logger("Gtk2::Ex::DbLinker::Datasheet");
+    $self->{log} = Log::Any->get_logger;
     my @cols = $self->{dman}->get_field_names;
 
     # cols holds the field names from the table. Nothing else !

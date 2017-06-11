@@ -1,3 +1,7 @@
+1.21	2017-06-10
+		- Bug fix: exiting for system2() sub-process
+		- Added array_to_hash()
+
 1.20	2017-05-29
 		- system2() dies internally
 

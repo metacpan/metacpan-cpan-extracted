@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2017 -- leonerd@leonerd.org.uk
 
 package Syntax::Keyword::Try;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 use Carp;
 
@@ -82,6 +82,12 @@ associated C<catch> and C<finally>) are such that they are parsed as a self-
 contained statement. Because of this, there is no need to end with a
 terminating semicolon.
 
+Note (especially to users of L<Try::Tiny> and similar) that the C<try {}>
+block itself does not necessarily stop exceptions thrown inside it from
+propagating outside. It is the presence of a later C<catch {}> block which
+causes this to happen. A C<try> with only a C<finally> and no C<catch> will
+still propagate exceptions up to callers as normal.
+
 =head2 catch
 
    ...
@@ -152,6 +158,8 @@ anonymous function which is then immediately executed:
     try { attempt(); return "success" }
     catch { return "failure" }
  }->();
+
+See also L<https://rt.cpan.org/Ticket/Display.html?id=121267>.
 
 =back
 
@@ -234,6 +242,19 @@ this value. See above for a workaround involving an anonymous sub however.
 In comparison, the behaviour implemented by L<Try::Tiny> can be used as a
 valued expression, such as assigned to a variable or returned to the caller of
 its containing function.
+
+=head2 C<try> without C<catch>
+
+Like L<Syntax::Feature::Try>, the syntax provided by this module allows a
+C<try> block to be followed by only a C<finally> block, with no C<catch>. In
+this case, exceptions thrown by code contained by the C<try> are not
+suppressed, instead they propagate as normal to callers. This matches the
+behaviour familiar to Java or C++ programmers.
+
+In comparison, the code provided by L<Try> and L<Try::Tiny> always suppress
+exception propagation even without an actual C<catch> block.
+
+The L<TryCatch> module does not allow a C<try> block not followed by C<catch>.
 
 =head2 Typed C<catch>
 

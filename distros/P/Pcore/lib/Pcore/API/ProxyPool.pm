@@ -105,7 +105,7 @@ sub get_slot ( $self, $connect, @ ) {
     );
 
     # parse connect attribute
-    $connect = Pcore::AE::Handle::get_connect($connect);
+    $connect = Pcore::AE::Handle2::get_connect($connect);
 
     my $proxy;
 

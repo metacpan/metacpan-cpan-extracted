@@ -1,6 +1,6 @@
 #! /usr/bin/perl -w
 
-# Toby Thurston -- 20 Jan 2016 
+# Toby Thurston -- 09 Jun 2017 
 # Parse a National Grid ref and show it as LL coordinates
 
 use strict;
@@ -13,7 +13,7 @@ use Browser::Open qw(open_browser);
 use Getopt::Long;
 use Pod::Usage;
 
-our $VERSION = '2.16';
+our $VERSION = '2.17';
 
 sub format_grid_streetmap {
     my $e = shift;

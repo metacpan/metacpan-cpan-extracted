@@ -2,8 +2,7 @@ package Pcore::RPC::Proc;
 
 use Pcore -class;
 use Fcntl;
-use Config;
-use Pcore::AE::Handle2;
+use Pcore::AE::Handle;
 use AnyEvent::Util qw[portable_socketpair];
 use if $MSWIN, 'Win32API::File';
 use Pcore::Util::Data qw[:CONST];
@@ -69,9 +68,6 @@ around new => sub ( $orig, $self, @ ) {
         push $cmd->@*, $perl, "-M$args{class}";
     }
 
-    # needed for PAR, pass current @INC libs to child process via $ENV{PERL5LIB}
-    local $ENV{PERL5LIB} = join $Config{path_sep}, grep { !ref } @INC;
-
     my $weaken_self = $self;
 
     weaken $weaken_self;
@@ -111,11 +107,11 @@ around new => sub ( $orig, $self, @ ) {
 sub _handshake ( $self, $ctrl_fh, $cb ) {
 
     # wrap control_fh
-    Pcore::AE::Handle2->new(
+    Pcore::AE::Handle->new(
         fh         => $ctrl_fh,
         on_connect => sub ( $h, @ ) {
             $h->push_read(
-                line => "\x00",
+                line => "\n",
                 sub ( $h1, $line, $eol ) {
 
                     # destroy control fh
@@ -142,16 +138,6 @@ sub _handshake ( $self, $ctrl_fh, $cb ) {
 }
 
 1;
-## -----SOURCE FILTER LOG BEGIN-----
-##
-## PerlCritic profile "pcore-script" policy violations:
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-## | Sev. | Lines                | Policy                                                                                                         |
-## |======+======================+================================================================================================================|
-## |    2 | 118                  | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-##
-## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

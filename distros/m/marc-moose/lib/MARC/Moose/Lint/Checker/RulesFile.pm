@@ -1,6 +1,6 @@
 package MARC::Moose::Lint::Checker::RulesFile;
 # ABSTRACT: A class to 'lint' biblio record based on a rules file
-$MARC::Moose::Lint::Checker::RulesFile::VERSION = '1.0.33';
+$MARC::Moose::Lint::Checker::RulesFile::VERSION = '1.0.34';
 use Moose;
 use Modern::Perl;
 
@@ -29,16 +29,7 @@ sub _set_file {
     my @parts;
     my $linenumber = 0;
     my %rules;
-    while (<$fh>) {
-        $linenumber++;
-        chop;
-        s/ *$//;
-        last if /^====/;
-
-        if ( length($_) ) {
-            push @parts, $_;
-            next;
-        }
+    my $analyze = sub {
         #say;
         my $tag = shift @parts;
         if ( $tag !~ /^([0-9]{3})[_|\+]*/ ) {
@@ -82,7 +73,20 @@ sub _set_file {
         $rules{$tag_digit} = \@rule;
 
         @parts = ();
+    };
+    while (<$fh>) {
+        $linenumber++;
+        chop;
+        s/ *$//;
+        last if /^====/;
+
+        if ( length($_) ) {
+            push @parts, $_;
+            next;
+        }
+        $analyze->();
     }
+    $analyze->() if @parts;
     $self->rules( \%rules );
 
     my $code;
@@ -294,7 +298,7 @@ MARC::Moose::Lint::Checker::RulesFile - A class to 'lint' biblio record based on
 
 =head1 VERSION
 
-version 1.0.33
+version 1.0.34
 
 =head1 DESCRIPTION
 
@@ -515,7 +519,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Frédéric Demians.
+This software is copyright (c) 2017 by Frédéric Demians.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -6,13 +6,13 @@
 use strict;
 use warnings;
 
-use Geo::Coordinates::OSGB qw/grid_to_ll/;
+use Geo::Coordinates::OSGB qw/grid_to_ll grid_to_ll_helmert/;
 use Geo::Coordinates::OSGB::Grid qw/parse_grid format_grid_landranger/;
 
 use Getopt::Long;
 use Pod::Usage;
 
-our $VERSION = '2.16';
+our $VERSION = '2.17';
 
 =pod
 
@@ -133,8 +133,10 @@ if ($want_filter) {
 }
 else {
     my ($olat, $olon) = grid_to_ll($e, $n, { shape => 'OSGB36' } );
+    my ($hlat, $hlon) = grid_to_ll_helmert($e, $n);
     printf "Your input: $gr == $e $n == %s\n", scalar format_grid_landranger($e, $n);
-    print format_ll_nicely('OSGB36', $olat, $olon), "\n";
     print format_ll_nicely(' WGS84', $lat, $lon), "\n";
+    print format_ll_nicely('~WGS84', $hlat, $hlon), "\n";
+    print format_ll_nicely('OSGB36', $olat, $olon), "\n";
 }
 exit 0;

@@ -7,6 +7,7 @@ typemap
 XS.xs
 t/Algorithm-BIT-XS.t
 lib/Algorithm/BIT/XS.pm
+lib/Algorithm/BIT2D/XS.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 SIGNATURE                                Public-key signature (added by MakeMaker)

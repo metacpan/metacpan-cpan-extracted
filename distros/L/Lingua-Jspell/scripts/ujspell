@@ -28,10 +28,13 @@ binmode(STDOUT,":utf8");
 
 my ($DW,$DR,$DE);
 my $exe = Lingua::Jspell::ConfigData->config('jspell');
-open3($DW,$DR,$DE,$exe,"-W 0", @ARGV);
 
-binmode($DW,":encoding(iso-8859-1)");
-binmode($DR,":encoding(iso-8859-1)");
+use Symbol 'gensym'; $DE = gensym;
+
+open3($DW, $DR, $DE, $exe, "-W 0", @ARGV);
+
+binmode($DW, ":encoding(iso-8859-1)");
+binmode($DR, ":encoding(iso-8859-1)");
 
 if ($encontrei_l) {
     while (<STDIN>) {
@@ -43,11 +46,16 @@ if ($encontrei_l) {
     }
 }
 else {
-    my $x = <$DR>;
-    print $x;
-    while(<STDIN>) {
-        print $DW $_;
-        print_lines($DR);
+    if (!$DR->eof) {
+        my $x = <$DR>;
+	print $x;
+	while(<STDIN>) {
+	    print $DW $_;
+	    print_lines($DR);
+	}
+    } else {
+	my $x = <$DE>;
+	print STDERR $x;
     }
     for ($DW, $DR, $DE) { $_ and close $_ };	
 }

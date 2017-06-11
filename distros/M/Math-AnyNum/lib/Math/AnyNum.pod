@@ -6,7 +6,7 @@ Math::AnyNum - Arbitrary size precision for integers, rationals, floating-points
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =head1 SYNOPSIS
 
@@ -570,10 +570,9 @@ Example:
 
     bernfrac(n)                                   #=> Rat | NaN
 
-Returns the nth-Bernoulli number C<B_n> as an exact fraction, computed with
-an optimized version of Seidel's algorithm, starting with C<bernfrac(0) = 1>.
+Returns the nth-Bernoulli number C<B_n> as an exact fraction, starting with C<bernfrac(0) = 1>.
 
-For n >= 50, a more efficient algorithm is used, based on zeta(n).
+Algorithm due to Kevin J. McGown (December 8, 2005). Described in his paper: "Computing Bernoulli Numbers Quickly".
 
 Returns NaN for negatives values of C<n>.
 
@@ -889,7 +888,7 @@ Returns C<(NaN,NaN)> when a real root does not exists.
 
 The integer part of the logarithm of C<n> to base C<m> or base I<e> when C<m> is not specified.
 
-Return NaN when C<n> is negative.
+C<n> must be greater than 0 and C<m> must greater than 1. Returns NaN otherwise.
 
 =head2 ilog2 / ilog10
 
@@ -907,7 +906,7 @@ The integer part of the logarithm of C<n> to base C<2> or base C<10>, respective
     x << y                                        #=> Int
     x >> y                                        #=> Int
 
-The integer-logical operations.
+The bitwise integer operations.
 
 =head2 gcd
 
@@ -1023,6 +1022,12 @@ See also:
 =item * L<https://gmplib.org/manual/Number-Theoretic-Functions.html>
 
 =back
+
+=head2 is_coprime
+
+    is_coprime(n, k)                              #=> Bool
+
+Returns a true value when C<n> and C<k> are relatively prime to each other. That is, when C<gcd(n, k) == 1>.
 
 =head2 is_power
 
@@ -1152,7 +1157,7 @@ When C<x> is a complex number, it computes the sign using the identity:
 
 =head2 length
 
-    length(x)                                     #=> Scalar
+    $x->length                                    #=> Scalar
 
 Returns the number of digits in the integer part of C<x>.
 Returns C<-1> when C<x> cannot be truncated to an integer.
@@ -1310,14 +1315,16 @@ Returns a true value when C<x> holds the Not-a-Number special value.
 
     int(x)                                        #=> Int | NaN
 
-Returns the integer part of C<x>. Returns C<NaN> when it's not possible to truncate the number to an integer.
+Returns the integer part of C<x>. Returns C<NaN> when C<x> cannot be truncated to an integer.
 
 =head2 rat
 
     rat(x)                                        #=> Rat | NaN
     rat(str)                                      #=> Rat | NaN
 
-Convert C<x> to a rational number. Returns C<NaN> when this conversion is not possible.
+Converts C<x> to a rational number. Returns C<NaN> when this conversion is not possible.
+
+When the given argument is a decimal expansion string, it will be specially parsed as a fraction.
 
 Example:
 
@@ -1351,8 +1358,7 @@ Example:
 
     "$x"                                          #=> Scalar
 
-Returns a string representing the value of C<x>, either as a base-10 integer,
-or a decimal expansion.
+Returns a string representing the value of C<x>, in base 10.
 
 =head2 boolify
 
@@ -1444,8 +1450,8 @@ Example:
 
     numerator(x)                                  #=> Int | NaN
 
-Returns the numerator as a signed C<Math::AnyNum> object. When C<x> is not a rational number,
-it tries to convert it to a rational. Returns NaN when this is not possible.
+Returns the numerator of C<x> as a signed C<Math::AnyNum> object. When C<x> is not a rational number,
+it tries to convert it to a rational. Returns C<NaN> when this conversion is not possible.
 
 Example:
 
@@ -1456,8 +1462,8 @@ Example:
 
     denominator(x)                                #=> Int | NaN
 
-Returns the numerator as an unsigned C<Math::AnyNum> object. When C<x> is not a rational number,
-it tries to convert it to a rational. Returns NaN when this is not possible.
+Returns the denominator of C<x> as an unsigned C<Math::AnyNum> object. When C<x> is not a rational number,
+it tries to convert it to a rational. Returns C<NaN> when this conversion is not possible.
 
 Example:
 

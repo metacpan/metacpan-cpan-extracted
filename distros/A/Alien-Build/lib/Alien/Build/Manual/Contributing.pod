@@ -14,7 +14,7 @@ Alien::Build::Manual::Contributing - Over-detailed contributing guide
 
 =head1 VERSION
 
-version 0.36
+version 0.41
 
 =head1 SYNOPSIS
 
@@ -148,7 +148,11 @@ L<alienfile>, L<Alien::Build::MM>, L<Alien::Build::Plugin>, L<Alien::Base>, L<Al
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Diab Jerius (DJERIUS)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -4,7 +4,7 @@ List::SomeUtils::XS - XS implementation for List::SomeUtils
 
 # VERSION
 
-version 0.52
+version 0.53
 
 # DESCRIPTION
 
@@ -34,10 +34,13 @@ Copyright 2013 - 2015 by Jens Rehsack
 
 # SUPPORT
 
-Bugs may be submitted through [the RT bug tracker](http://rt.cpan.org/Public/Dist/Display.html?Name=List-SomeUtils-XS)
-(or [bug-list-someutils-xs@rt.cpan.org](mailto:bug-list-someutils-xs@rt.cpan.org)).
+Bugs may be submitted at [https://github.com/houseabsolute/List-SomeUtils-XS/issues](https://github.com/houseabsolute/List-SomeUtils-XS/issues).
 
-I am also usually active on IRC as 'drolsky' on `irc://irc.perl.org`.
+I am also usually active on IRC as 'autarch' on `irc://irc.perl.org`.
+
+# SOURCE
+
+The source code repository for List-SomeUtils-XS can be found at [https://github.com/houseabsolute/List-SomeUtils-XS](https://github.com/houseabsolute/List-SomeUtils-XS).
 
 # DONATIONS
 
@@ -58,12 +61,15 @@ button at [http://www.urth.org/~autarch/fs-donation.html](http://www.urth.org/~a
 
 # AUTHOR
 
-Dave Rolsky &lt;autarch@urth.org>
+Dave Rolsky <autarch@urth.org>
 
-# COPYRIGHT AND LICENCE
+# COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Dave Rolsky.
+This software is Copyright (c) 2017 by Dave Rolsky.
 
 This is free software, licensed under:
 
     The Artistic License 2.0 (GPL Compatible)
+
+The full text of the license can be found in the
+`LICENSE` file included with this distribution.

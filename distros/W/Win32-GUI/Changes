@@ -1,9 +1,14 @@
 Revision history for Perl module Win32::GUI
 
-1.13 2017-07-26
+1.14 2017-06-01
+
+    * fixes related to perl 5.26.0
+    * fixes related to gmake used by strawberry perl 5.26.0.1
+
+1.13 2016-07-26
 
     * fix for SF#85 Win32::GUI test fail on Win 7 Strawberry Perl 5.24.0.1 and 5.22.2.1
-    * fix for SF#84 Win32::GUI does not build on Cygwin if caseinsensitive=0 
+    * fix for SF#84 Win32::GUI does not build on Cygwin if caseinsensitive=0
 
 1.12 2015-06-03
 

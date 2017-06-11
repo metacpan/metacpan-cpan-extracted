@@ -8,8 +8,9 @@ use Data::MessagePack;
 use Parallel::ForkManager;
 use Plack::Request;
 use WWW::Mechanize;
+use List::Util qw(shuffle);
 
-our $VERSION = "0.04";
+our $VERSION = "0.06";
 
 has 'verify_hostname' => (is => 'rw', isa => 'Int', default => 1);
 has 'skip_undef_result' => (is => 'rw', isa => 'Int', default => 1);
@@ -17,6 +18,54 @@ has 'warn_discarded_data' => (is => 'rw', isa => 'Int', default => 1);
 has 'die_discarded_data' => (is => 'rw', isa => 'Int', default => 0);
 has 'worker_log' => (is => 'rw', isa => 'Int', default => 0);
 has 'force_plackup' => (is => 'rw', isa => 'Int', default => 0);
+
+# To make load balanced data.
+sub create_assigned_data {
+    my $self = shift;
+    my $data = shift;
+    my $servers = shift;
+    my $options = shift;
+    my $chunk_num = 10;
+    my $method = 'volume_uniform';
+    if(defined($options)){
+	if(defined($options->{chunk_num})){
+	    $chunk_num = $options->{chunk_num};
+	}
+	if(defined($options->{method})){
+	    $method = $options->{method};
+	}
+    }
+    my $output;
+    if($method eq 'element_shuffle'){
+
+	@$data = shuffle(@$data);
+	for(0 .. $#$data){
+	    push(@{$output->[$_ % $chunk_num]->[0]},$data->[$_]);
+	}
+	for(0 .. $#$output){
+	    $output->[$_]->[1] = $servers->[$_ % scalar(@$servers)];
+	}
+    }elsif($method eq 'element_sequential'){
+	for(0 .. $#$data){
+	    push(@{$output->[$_ % $chunk_num]->[0]},$data->[$_]);
+	}
+	for(0 .. $#$output){
+	    $output->[$_]->[1] = $servers->[$_ % scalar(@$servers)];
+	}
+    }else{
+	my $mp = Data::MessagePack->new();
+	@$data = map $_->[0],
+	    sort {$a->[1] <=> $b->[1]} map [$_, bytes::length $mp->pack($_)],
+	    @$data;
+	for(0 .. $#$data){
+	    push(@{$output->[$_ % $chunk_num]->[0]},$data->[$_]);
+	}
+	for(0 .. $#$output){
+	    $output->[$_]->[1] = $servers->[$_ % scalar(@$servers)];
+	}
+    }
+    return($output);
+}
 
 # MapReduce client(Master)
 sub map_reduce {
@@ -179,7 +228,7 @@ sub worker {
 	print "Path: $path\nPort: $port\n";
 	my $app = $self->load_worker_plack_app($path);
 	my $handler = Plack::Handler::Starlet->new(
-	    max_worker => $worker,
+	    max_workers => $worker,
 	    port => $port
 	   );
 	$handler->run($app);
@@ -298,6 +347,7 @@ MapReduce::Framework::Simple - Simple Framework for MapReduce
 
     my $mfs = MapReduce::Framework::Simple->new;
 
+    ## Generate data for MapReduce manually.
     my $data_map_reduce;
     for(0 .. 2){
         my $tmp_data;
@@ -309,6 +359,23 @@ MapReduce::Framework::Simple - Simple Framework for MapReduce
         # If you want to use standalone, Record should be [<data>] as below
         # push(@$data_map_reduce,$tmp_data);
     }
+
+
+    ## OR, Generate good balanced data for MapReduce automatically.
+    my $remote_servers = [
+        'http://remote1.local:5000/eval_secret_url',
+        'http://remote2.local:5000/eval_secret_url',
+        'http://remote3.local:5000/eval_secret_url'
+       ];
+    my $tmp_data_2;
+    for(0 .. 100000){
+        push(@$tmp_data_2,rand(10000));
+    }
+    my $data_auto_assign = $mfs->create_assigned_data(
+        $tmp_data_2,
+        $remote_servers,
+        { chunk_num => 10, method => 'volume_uniform' }
+       );
 
     # mapper code
     my $mapper = sub {
@@ -378,6 +445,27 @@ I<new> creates object.
         worker_log => 0 # print worker log when remote client accesses.
         force_plackup => 0 # force to use plackup when starting worker server.
         );
+
+=head2 I<create_assigned_data>
+
+This method creates MapReduce ready data from data and remote worker server list.
+You can set the number of data chunk and balancing method ('volume_uniform','element_shuffle','element_sequential').
+
+    my $tmp_data = [1 .. 1_000_000];
+    my $server_list = [
+        'http://s1.local:5000/eval',
+        'http://s2.local:5000/eval',
+        'http://s3.local:5000/eval',
+       ];
+
+    my $data = $mfs->create_assigned_data(
+        $tmp_data,
+        $server_list,
+        {
+            chunk_num => 10, # number of data chunk.
+            method => 'volume_uniform', # balancing method.
+           }
+       );
 
 =head2 I<map_reduce>
 

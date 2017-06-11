@@ -1,17 +1,18 @@
 package Net::Google::Storage::Types;
-{
-  $Net::Google::Storage::Types::VERSION = '0.1.2';
-}
-
+$Net::Google::Storage::Types::VERSION = '0.2.0';
 # ABSTRACT: Types library for L<Net::Google::Storage>. Pretty boring really.
 
 use Moose::Util::TypeConstraints;
 
-enum 'Net::Google::Storage::Types::BucketLocation' => ['US', 'EU'];
+subtype 'Net::Google::Storage::Types::BucketLocation', as 'Str';
 
 1;
+
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -19,7 +20,7 @@ Net::Google::Storage::Types - Types library for L<Net::Google::Storage>. Pretty 
 
 =head1 VERSION
 
-version 0.1.2
+version 0.2.0
 
 =head1 AUTHOR
 
@@ -33,4 +34,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

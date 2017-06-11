@@ -1,4 +1,5 @@
 requires "Browser::Open" => "0";
+requires "Capture::Tiny" => "0";
 requires "Carp" => "0";
 requires "File::pushd" => "0";
 requires "Getopt::Long" => "0";

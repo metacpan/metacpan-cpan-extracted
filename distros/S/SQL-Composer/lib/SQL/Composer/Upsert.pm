@@ -3,32 +3,33 @@ package SQL::Composer::Upsert;
 use strict;
 use warnings;
 
-use SQL::Composer::Insert;
+use base 'SQL::Composer::Insert';
 
-our @ISA; BEGIN { @ISA = ('SQL::Composer::Insert') };
+use SQL::Composer::Insert;
 
 sub new {
     my $class = shift;
     my (%params) = @_;
 
     my $driver = $params{driver}
-        || die 'Cannot create an Upsert object without specifying a `driver`';
+      || die 'Cannot create an Upsert object without specifying a `driver`';
 
-    my $self = $class->SUPER::new( %params );
+    my $self = $class->SUPER::new(%params);
     my $sql  = $self->{sql};
 
     if ($driver =~ m/sqlite/i) {
         $sql =~ s/^INSERT /INSERT OR REPLACE /;
     }
     elsif ($driver =~ m/mysql/i) {
-        $sql .= ' ON DUPLICATE KEY UPDATE '
-             . (join ', ' => map {
-                    my $c = $self->_quote($_);
-                    ($c.' = VALUES('.$c.')')
-                }  @{ $self->{columns} });
+        $sql .= ' ON DUPLICATE KEY UPDATE ' . (
+            join ', ' => map {
+                my $c = $self->_quote($_);
+                ($c . ' = VALUES(' . $c . ')')
+            } @{$self->{columns}}
+        );
     }
     elsif ($driver =~ m/pg/i) {
-        $sql .= ' ON CONFLICT DO UPDATE'
+        $sql .= ' ON CONFLICT DO UPDATE';
     }
     else {
         die 'The Upsert `driver` (' . $driver . ') is not supported';

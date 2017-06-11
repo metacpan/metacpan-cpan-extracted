@@ -14,7 +14,14 @@ ok($tmpdir, "Created tempdir '$tmpdir'\n");
 
 my $site1 = "$tmpdir/site1";
 
-my $ret = App::Pods2Site::main('--bindir', "$Bin/tdata/bin", '--libdir', "$Bin/tdata/lib", '--module-skip', 'eq(Bad)', $site1);
+my $ret = App::Pods2Site::main
+			(
+				'--bindir', "$Bin/tdata/bin",
+				'--libdir', "$Bin/tdata/lib",
+				'--group', '4-script=type.eq(bin)',
+				'--group', '3-module=type.eq(lib) AND NOT name.eq(Bad)',
+				$site1
+			);
 is($ret, 0, "Created $site1");
 
 my @expectedSite1 =
@@ -32,7 +39,14 @@ ok(!-e $_, "Not expected '$_'") foreach (@notExpectedSite1);
 
 my $site2 = "$tmpdir/site2";
 
-$ret = App::Pods2Site::main('--bindir', "$Bin/tdata/bin", '--libdir', "$Bin/tdata/lib", '--module-skip', 'not eq(Bad)', $site2);
+$ret = App::Pods2Site::main
+			(
+				'--bindir', "$Bin/tdata/bin",
+				'--libdir', "$Bin/tdata/lib",
+				'--group', '4-script=type.eq(bin)',
+				'--group', '3-module=type.eq(lib) AND name.eq(Bad)',
+				$site2
+			);
 is($ret, 0, "Created $site2");
 
 my @expectedSite2 =

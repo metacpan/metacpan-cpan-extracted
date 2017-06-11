@@ -1,3 +1,12 @@
+4.14.0
+- Added support and examples for v201705.
+- Updated add_shopping_campaign.pl to include an option of creating an
+optional default partition.
+- Updated add_crm_based_user_list.pl to include an example of uploading
+address info and uploading members.
+- Added add_campaign_groups_and_performance_targets.pl to show how
+to use the new CamapignGroup and CampaignGroupPerformanceTarget services.
+
 4.13.0
 - Removed examples and support for v201605. For future sunset dates, see
 https://developers.google.com/adwords/api/docs/sunset-dates

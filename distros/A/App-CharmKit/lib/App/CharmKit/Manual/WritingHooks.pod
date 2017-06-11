@@ -1,14 +1,6 @@
 # PODNAME: WritingHooks
 # ABSTRACT: How to write a Juju charm hook
 
-__END__
-
-=pod
-
-=head1 NAME
-
-WritingHooks - How to write a Juju charm hook
-
 =head1 Writing a hook
 
 We'll start with an example of a F<config-changed> hook and break down the
@@ -78,6 +70,7 @@ The structure your project should look similar to:
     LICENSE
     README.md
 
+
 Now in your hook file you can just call:
 
   #!/usr/bin/env perl
@@ -85,16 +78,5 @@ Now in your hook file you can just call:
 
   plugin 'bitlbee';
   $bb->syntax_check_config;
-
-=head1 AUTHOR
-
-Adam Stokes <adamjs@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2016 by Adam Stokes.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

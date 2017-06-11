@@ -11,7 +11,3 @@ Revision history for MooX-ValidateSubs
 0.09    16/03/2017
         - Fix a couple of typos in the pod.
         - Add some extra tests for around.
-
-1.01    14/05/2017
-		- Type::Params allows you to compile type checks for a whole bunch of parameters into a single coderef, making them faster. Running the following benchmark script shows an approximate 100% speed-up. That is, it doubles the speed at which you can call $object->hello_world(%args). https://gist.github.com/tobyink/1b7a0b4a8556af5222c6e81ed341cf0d (Toby Inkster).
-		- Fix *returns* tests

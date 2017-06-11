@@ -325,6 +325,11 @@ present, consider them aliases for a section.
 Do not generate a table of contents, even if the document requires
 one.
 
+=item * nofinalpage
+
+Do not produce the last page on the PDF with the
+author/title/notes/source/site name.
+
 =item * headings
 
 Generate the running headings in the document. Beware that this will
@@ -390,6 +395,7 @@ has coverwidth => (is => 'rw',
 
 has nocoverpage => (is => 'rw', isa => Bool, default => sub { 0 });
 has notoc       => (is => 'rw', isa => Bool, default => sub { 0 });
+has nofinalpage => (is => 'rw', isa => Bool, default => sub { 0 });
 
 sub all_headings {
     my @headings = (
@@ -570,6 +576,7 @@ sub config_setters {
                sitename siteslogan site logo
                headings
                cover coverwidth nocoverpage notoc
+               nofinalpage
                opening beamertheme beamercolortheme/);
 }
 

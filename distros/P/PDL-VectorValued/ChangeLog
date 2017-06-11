@@ -1,3 +1,6 @@
+v1.0.7 Tue, 06 Jun 2017 10:21:58 +0200 moocow
+	* added 'use lib "."' to Makefile.PL (RT bug #121661)
+
 v1.0.6 Mon, 06 Jun 2016 11:29:23 +0200 moocow
 	* win32/NaN fixes for tests (RT bug #115076)
 

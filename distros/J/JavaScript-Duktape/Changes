@@ -1,5 +1,10 @@
 Revision history for Perl module JavaScript::Duktape
 
+2.2.0 2017 2017-06-02
+	- add sandboxing options and methods, timeout and max_memory
+	- update docs
+	- make dll.t test optional
+
 2.1.5 2017 2017-05-26
 	- update duktape engine to version 2.1.0
 

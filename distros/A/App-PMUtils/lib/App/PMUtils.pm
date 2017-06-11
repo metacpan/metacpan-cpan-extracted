@@ -1,7 +1,7 @@
 package App::PMUtils;
 
-our $DATE = '2017-02-01'; # DATE
-our $VERSION = '0.67'; # VERSION
+our $DATE = '2017-06-09'; # DATE
+our $VERSION = '0.68'; # VERSION
 
 use 5.010001;
 
@@ -188,7 +188,7 @@ App::PMUtils - Command-line utilities related to Perl modules
 
 =head1 VERSION
 
-This document describes version 0.67 of App::PMUtils (from Perl distribution App-PMUtils), released on 2017-02-01.
+This document describes version 0.68 of App::PMUtils (from Perl distribution App-PMUtils), released on 2017-06-09.
 
 =head1 SYNOPSIS
 
@@ -254,7 +254,11 @@ The main purpose of these utilities is tab completion.
 =head1 FUNCTIONS
 
 
-=head2 pmdir(%args) -> [status, msg, result, meta]
+=head2 pmdir
+
+Usage:
+
+ pmdir(%args) -> [status, msg, result, meta]
 
 Get directory of locally installed Perl module/prefix.
 
@@ -297,7 +301,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 pmpath(%args) -> [status, msg, result, meta]
+=head2 pmpath
+
+Usage:
+
+ pmpath(%args) -> [status, msg, result, meta]
 
 Get path to locally installed Perl module.
 
@@ -350,7 +358,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 rel2mod(%args) -> any
+=head2 rel2mod
+
+Usage:
+
+ rel2mod(%args) -> any
 
 Convert release name (e.g. Foo-Bar-1.23.tar.gz) to module name (Foo::Bar).
 
@@ -387,7 +399,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-PMUtil
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-App-PMUtils>.
+Source repository is at L<https://github.com/perlancar/perl-App-PMUtils>.
 
 =head1 BUGS
 
@@ -430,7 +442,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

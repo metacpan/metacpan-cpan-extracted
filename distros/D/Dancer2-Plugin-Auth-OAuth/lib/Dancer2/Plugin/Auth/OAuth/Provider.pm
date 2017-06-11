@@ -116,7 +116,7 @@ sub authentication_url {
         if ($res->is_success) {
             my $response = Net::OAuth->response('request token')->from_post_body($res->content);
             my $uri = URI->new( $self->provider_settings->{urls}{authorize_url} );
-               $uri->query_form( callback => $self->_callback_url, oauth_token => $response->token );
+               $uri->query_form( oauth_callback => $self->_callback_url, oauth_token => $response->token );
 
             return $uri->as_string;
         } else {
@@ -188,7 +188,7 @@ sub callback {
                 $params = URI::Query->new( $response->content )->hash;
             }
 
-            for my $key (qw/access_token expires expires_in id_token token_type/) {
+            for my $key (qw/access_token expires expires_in id_token token_type id issued_at scope instance_url refresh_token signature/) {
                 $session_data->{$provider}{$key} = $params->{$key}
                     if $params->{$key};
             }

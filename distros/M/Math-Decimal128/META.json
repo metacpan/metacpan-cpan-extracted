@@ -39,6 +39,6 @@
          "web" : "https://github.com/sisyphus/math-decimal128"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 2.27203"
 }

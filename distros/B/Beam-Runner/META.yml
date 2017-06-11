@@ -32,25 +32,28 @@ no_index:
 provides:
   Beam::Runnable:
     file: lib/Beam/Runnable.pm
-    version: '0.010'
+    version: '0.011'
+  Beam::Runnable::Timeout::Alarm:
+    file: lib/Beam/Runnable/Timeout/Alarm.pm
+    version: '0.011'
   Beam::Runner:
     file: lib/Beam/Runner.pm
-    version: '0.010'
+    version: '0.011'
   Beam::Runner::Command:
     file: lib/Beam/Runner/Command.pm
-    version: '0.010'
+    version: '0.011'
   Beam::Runner::Command::help:
     file: lib/Beam/Runner/Command/help.pm
-    version: '0.010'
+    version: '0.011'
   Beam::Runner::Command::list:
     file: lib/Beam/Runner/Command/list.pm
-    version: '0.010'
+    version: '0.011'
   Beam::Runner::Command::run:
     file: lib/Beam/Runner/Command/run.pm
-    version: '0.010'
+    version: '0.011'
   Beam::Runner::Util:
     file: lib/Beam/Runner/Util.pm
-    version: '0.010'
+    version: '0.011'
 requires:
   Beam::Service: '0'
   Beam::Wire: '1.019'
@@ -67,6 +70,6 @@ resources:
   bugtracker: https://github.com/preaction/Beam-Runner/issues
   homepage: https://github.com/preaction/Beam-Runner
   repository: https://github.com/preaction/Beam-Runner.git
-version: '0.010'
+version: '0.011'
 x_authority: cpan:PREACTION
 x_serialization_backend: 'YAML::Tiny version 1.69'

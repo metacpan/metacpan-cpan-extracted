@@ -10,7 +10,10 @@ README
 bin/beam
 cpanfile
 dist.ini
+eg/quickstart/etc/greet.yml
+eg/quickstart/lib/My/Runnable/Greeting.pm
 lib/Beam/Runnable.pm
+lib/Beam/Runnable/Timeout/Alarm.pm
 lib/Beam/Runner.pm
 lib/Beam/Runner/Command.pm
 lib/Beam/Runner/Command/help.pm
@@ -31,4 +34,5 @@ t/lib/Local/Undocumented.pm
 t/share/container.yml
 t/share/empty.yml
 t/share/undocumented.yml
+t/timeout/alarm.t
 weaver.ini

@@ -5,11 +5,12 @@
 #include "XSUB.h"
 #include "ppport.h"
 
+#undef B0
 #include "src/sha3nist.c"
 #include "src/simd.c"
 
 static int
-hex_encode (char *dest, const char *src, int len) {
+hex_encode (char *dest, const unsigned char *src, int len) {
     static const char hex[] = "0123456789abcdef";
     char *p = dest;
     const unsigned char *s = src;
@@ -21,12 +22,12 @@ hex_encode (char *dest, const char *src, int len) {
 }
 
 static int
-base64_encode (char *dest, const char *src, int len) {
+base64_encode (char *dest, const unsigned char *src, int len) {
     static const char b64[] =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     char *p = dest;
     const unsigned char *s = src;
-    const unsigned char *end = (const unsigned char *)src + len - 2;
+    const unsigned char *end = src + len - 2;
 
     for (; s < end; s += 3) {
         *p++ = b64[s[0] >> 2];

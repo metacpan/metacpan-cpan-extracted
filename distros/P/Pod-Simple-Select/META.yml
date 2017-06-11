@@ -18,11 +18,13 @@ no_index:
     - t
     - inc
 requires:
-  Log::Log4perl: '1.47'
+  Carp: '1.4'
+  Data::Dumper: '2.16'
+  Log::Any: '1.049'
   Pod::Simple: '3.32'
-  Test::Simple: '0.44'
+  Test::More: '1.001014'
   Tie::File: '1.02'
 resources:
   repository: https://sourceforge.net/projects/pod-simple-select/
-version: '0.001'
+version: '0.002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

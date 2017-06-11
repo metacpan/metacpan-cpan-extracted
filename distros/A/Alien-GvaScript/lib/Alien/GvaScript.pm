@@ -5,7 +5,7 @@ use warnings;
 use File::Copy qw(copy);
 use File::Path qw(mkpath);
 
-our $VERSION = '1.44';
+our $VERSION = '1.45';
 
 sub path {
   (my $path = __FILE__) =~ s[\.pm$][/lib];

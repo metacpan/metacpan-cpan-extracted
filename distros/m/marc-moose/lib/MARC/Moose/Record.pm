@@ -1,6 +1,6 @@
 package MARC::Moose::Record;
 # ABSTRACT: MARC::Moose bibliographic record
-$MARC::Moose::Record::VERSION = '1.0.33';
+$MARC::Moose::Record::VERSION = '1.0.34';
 use Moose;
 
 use Modern::Perl;
@@ -208,7 +208,7 @@ MARC::Moose::Record - MARC::Moose bibliographic record
 
 =head1 VERSION
 
-version 1.0.33
+version 1.0.34
 
 =head1 DESCRIPTION
 
@@ -354,7 +354,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Frédéric Demians.
+This software is copyright (c) 2017 by Frédéric Demians.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

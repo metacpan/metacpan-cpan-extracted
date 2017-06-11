@@ -22,12 +22,12 @@ requires:
   Class::InsideOut: '1.13'
   DBI: '1.631'
   Data::Dumper: '2.154'
-  Log::Log4perl: '1.41'
+  Log::Any: '1.049'
   Scalar::Util: '1.45'
   Test::More: '1'
   Try::Tiny: '0.22'
   interface: '0.03'
 resources:
   repository: https://sourceforge.net/projects/gtk2-ex-dblinker-dbtools/
-version: '0.111'
+version: '0.112'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

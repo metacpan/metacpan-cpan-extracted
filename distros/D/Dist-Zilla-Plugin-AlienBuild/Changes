@@ -1,5 +1,14 @@
 Revision history for Dist-Zilla-Plugin-AlienBuild
 
+0.19      2017-06-10 13:33:21 -0400
+  - Tweak requirements to handle recent deprecations
+
+0.18      2017-06-10 06:42:34 -0400
+  - Fix support for patch_ffi hook
+
+0.17      2017-06-10 06:33:36 -0400
+  - Add support for _ffi hooks
+
 0.16      2017-03-28 14:18:44 -0400
   - Fix some typos
   - Bump prereq for Alien::Build to 0.32

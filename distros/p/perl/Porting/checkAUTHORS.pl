@@ -215,7 +215,7 @@ sub read_authors_files {
     return unless (@authors);
     my (%count, %raw);
     foreach my $filename (@authors) {
-        open FH, "<$filename" or die "Can't open $filename: $!";
+        open FH, '<', $filename or die "Can't open $filename: $!";
         binmode FH, ':encoding(UTF-8)';
         while (<FH>) {
             next if /^\#/;
@@ -226,7 +226,7 @@ sub read_authors_files {
                 $name =~ s/\s*\z//;
                 $raw{$email} = $name;
                 $count{$email}++;
-            } elsif (/^([-A-Za-z0-9 .\'À-ÖØöø-ÿ]+)[\t\n]/) {
+            } elsif (/^([- .'\w]+)[\t\n]/) {
 
                 # Name only
                 $untraced{$1}++;
@@ -593,11 +593,13 @@ damian\100conway.org                    damian\100cs.monash.edu.au
 dan\100sidhe.org                        sugalsd\100lbcc.cc.or.us
 +                                       sugalskd\100osshe.edu
 daniel\100bitpusher.com                 daniel\100biz.bitpusher.com
+dave\100mag-sol.com                     dave\100dave.org.uk
 david.dyck\100fluke.com                 dcd\100tc.fluke.com
 david\100justatheory.com                david\100wheeler.net
 +                                       david\100kineticode.com
 +                                       david\100wheeler.com
 +                                       david\100wheeler.net
+whatever\100davidnicol.com              davidnicol\100gmail.com
 dennis\100booking.com                   dennis\100camel.ams6.corp.booking.com
 +					dennis.kaarsemaker\100booking.com
 +                                       dennis\100kaarsemaker.net
@@ -660,6 +662,7 @@ jasons\100cs.unm.edu                    jasons\100sandy-home.arc.unm.edu
 jbuehler\100hekimian.com                jhpb\100hekimian.com
 jcromie\100100divsol.com                jcromie\100cpan.org
 +                                       jim.cromie\100gmail.com
+jd\100cpanel.net                        lightsey\100debian.org
 jdhedden\100cpan.org                    jerry\100hedden.us
 +                                       jdhedden\1001979.usna.com
 +                                       jdhedden\100gmail.com
@@ -731,6 +734,7 @@ marcel\100codewerk.com                  gr\100univie.ac.at
 +                                       hanekomu\100gmail.com
 marcgreen\100cpan.org                   marcgreen\100wpi.edu
 markleightonfisher\100gmail.com         fisherm\100tce.com
++                                       mark-fisher\100mindspring.com
 mark.p.lutz\100boeing.com               tecmpl1\100triton.ca.boeing.com
 marnix\100gmail.com                     pttesac!marnix!vanam
 marty+p5p\100kasei.com                  marty\100martian.org
@@ -830,6 +834,7 @@ module@renee-baecker.de                 renee.baecker\100smart-websolutions.de
 +                                       github@renee-baecker.de
 +                                       otrs\100ubuntu.(none)
 +                                       perl\100renee-baecker.de
++                                       reb\100perl-services.de
 richard.foley\100rfi.net                richard.foley\100t-online.de
 +                                       richard.foley\100ubs.com
 +                                       richard.foley\100ubsw.com

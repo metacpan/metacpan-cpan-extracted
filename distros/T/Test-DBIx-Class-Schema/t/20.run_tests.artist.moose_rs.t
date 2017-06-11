@@ -37,6 +37,7 @@ $schematest->methods({
     relations => [qw(
         person
         cds
+        cds_90s
     )],
 
     custom => [

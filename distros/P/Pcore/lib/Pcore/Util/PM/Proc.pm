@@ -1,7 +1,8 @@
 package Pcore::Util::PM::Proc;
 
 use Pcore -class;
-use Pcore::AE::Handle2;
+use Config;
+use Pcore::AE::Handle;
 use Pcore::Util::Scalar qw[refcount weaken blessed];
 use AnyEvent::Util qw[portable_socketpair];
 use if $MSWIN, 'Win32::Process';
@@ -21,16 +22,31 @@ has pid => ( is => 'ro', isa => PositiveInt, init_arg => undef );
 has status => ( is => 'ro', isa => Maybe [Int], init_arg => undef );    # undef - process is still alive
 has reason => ( is => 'ro', isa => Str, init_arg => undef );
 
-has stdin  => ( is => 'ro', isa => InstanceOf ['Pcore::AE::Handle2'], init_arg => undef );    # process STDIN, we can write
-has stdout => ( is => 'ro', isa => InstanceOf ['Pcore::AE::Handle2'], init_arg => undef );    # process STDOUT, we can read
-has stderr => ( is => 'ro', isa => InstanceOf ['Pcore::AE::Handle2'], init_arg => undef );    # process STDERR, we can read
+has stdin  => ( is => 'ro', isa => InstanceOf ['Pcore::AE::Handle'], init_arg => undef );    # process STDIN, we can write
+has stdout => ( is => 'ro', isa => InstanceOf ['Pcore::AE::Handle'], init_arg => undef );    # process STDOUT, we can read
+has stderr => ( is => 'ro', isa => InstanceOf ['Pcore::AE::Handle'], init_arg => undef );    # process STDERR, we can read
 
-has _on_finish => ( is => 'ro', isa => Maybe [CodeRef], init_arg => undef );                  # on_finish callback
-has _win32_proc => ( is => 'ro', isa => InstanceOf ['Win32::Process'], init_arg => undef );   # MSWIN process descriptor
+has _on_finish => ( is => 'ro', isa => Maybe [CodeRef], init_arg => undef );                 # on_finish callback
+has _win32_proc => ( is => 'ro', isa => InstanceOf ['Win32::Process'], init_arg => undef );  # MSWIN process descriptor
 has _sigchild    => ( is => 'ro', isa => Object, init_arg => undef );
 has _blocking_cv => ( is => 'ro', isa => Object, init_arg => undef );
 
 our $CACHE = {};
+
+sub DEMOLISH ( $self, $global ) {
+    if ( $self->{pid} ) {
+
+        # kill process group, eg.: windows console subprocess
+        kill '-KILL', $self->{pid};                                                          ## no critic qw[InputOutput::RequireCheckedSyscalls]
+
+        # kill process, because -9 is ignoref by process itself
+        kill 'KILL', $self->{pid};                                                           ## no critic qw[InputOutput::RequireCheckedSyscalls]
+    }
+
+    $self->_on_exit( 128 + 9 ) if !$global;
+
+    return;
+}
 
 around new => sub ( $orig, $self, $cmd, @ ) {
     $cmd = [$cmd] if !ref $cmd;
@@ -46,7 +62,7 @@ around new => sub ( $orig, $self, $cmd, @ ) {
         win32_cflags           => 0,        # NOTE not works if not 0, Win32::Process::CREATE_NO_WINDOW(),
         win32_create_no_window => 0,        # NOTE preventing to redirect handles
         win32_alive_timeout    => 0.5,
-        splice @_, 3,
+        @_[ 3 .. $#_ ],
     );
 
     $args{win32_cflags} = Win32::Process::CREATE_NO_WINDOW() if $MSWIN && delete $args{win32_create_no_window};
@@ -136,6 +152,11 @@ sub _redirect_std ( $self, $args ) {
 }
 
 sub _create_process ( $self, $win32_cflags, @cmd ) {
+
+    # prepare environment
+    local $ENV{PERL5LIB} = join $Config{path_sep}, grep { !ref } @INC;
+    local $ENV{PATH} = "$ENV{PATH}$Config{path_sep}$ENV{PAR_TEMP}" if $ENV->is_par;
+
     my $proc = bless {}, $self;
 
     # run process
@@ -169,7 +190,7 @@ sub _create_handles ( $self, $hdl ) {
 
     # create STDIN handle
     if ( $hdl->{in_w} ) {
-        Pcore::AE::Handle2->new(
+        Pcore::AE::Handle->new(
             fh         => $hdl->{in_w},
             on_connect => sub ( $h, @ ) {
                 $self->{stdin} = $h;
@@ -181,7 +202,7 @@ sub _create_handles ( $self, $hdl ) {
 
     # create STDOUT handle
     if ( $hdl->{out_r} ) {
-        Pcore::AE::Handle2->new(
+        Pcore::AE::Handle->new(
             fh         => $hdl->{out_r},
             on_connect => sub ( $h, @ ) {
                 $self->{stdout} = $h;
@@ -199,7 +220,7 @@ sub _create_handles ( $self, $hdl ) {
 
     # create STDERR handle
     if ( $hdl->{err_r} ) {
-        Pcore::AE::Handle2->new(
+        Pcore::AE::Handle->new(
             fh         => $hdl->{err_r},
             on_connect => sub ( $h, @ ) {
                 $self->{stderr} = $h;
@@ -228,7 +249,7 @@ sub _create_sigchild ( $self, $win32_alive_timeout ) {
             if ( $status != Win32::Process::STILL_ACTIVE() ) {
                 undef $self->{_sigchild};    # remove timer
 
-                $self->_on_exit($status);
+                AE::postpone { $self->_on_exit($status) };
             }
 
             return;
@@ -238,26 +259,11 @@ sub _create_sigchild ( $self, $win32_alive_timeout ) {
         $self->{_sigchild} = AE::child $self->pid, sub ( $pid, $status ) {
             undef $self->{_sigchild};        # remove timer
 
-            $self->_on_exit( $status >> 8 );
+            AE::postpone { $self->_on_exit( $status >> 8 ) };
 
             return;
         };
     }
-
-    return;
-}
-
-sub DEMOLISH ( $self, $global ) {
-    if ( $self->{pid} ) {
-
-        # kill process group, eg.: windows console subprocess
-        kill '-KILL', $self->{pid};    ## no critic qw[InputOutput::RequireCheckedSyscalls]
-
-        # kill process, because -9 is ignoref by process itself
-        kill 'KILL', $self->{pid};     ## no critic qw[InputOutput::RequireCheckedSyscalls]
-    }
-
-    $self->_on_exit( 128 + 9 ) if !$global;
 
     return;
 }

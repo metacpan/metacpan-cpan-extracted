@@ -1,5 +1,23 @@
 Revision history for Ryu
 
+0.018     2017-06-11 03:38:39+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    * ->filter_isa - filter by object classes
+
+0.017     2017-05-31 23:14:01+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Documentation:
+
+    * bring much-needed clarity to the documentation for Ryu::Observable.
+
+0.016     2017-05-31 22:56:43+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    * ->first - convenience wrapper for ->take(1)
+
+
 0.015     2017-05-22 21:22:25+08:00 Asia/Kuala_Lumpur
     New features:
 
@@ -96,3 +114,4 @@ Revision history for Ryu
 
 0.001     2017-01-08 19:45:18+08:00 Asia/Kuala_Lumpur
     Initial CPAN release
+

@@ -1,11 +1,11 @@
-#!/usr/bin/perl
 use strict;
 use warnings;
 
-use Test::RequiresInternet 'api.metacpan.org' => 80;
+use lib 't/lib';
+use Test::RequiresInternet 'fastapi.metacpan.org' => 443;
 use Test::More tests => 8;
 use Test::Fatal;
-use t::lib::Functions;
+use TestFunctions;
 
 my $mcpan = mcpan();
 

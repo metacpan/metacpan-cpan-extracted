@@ -68,3 +68,28 @@ ReadPreProcess.pm: On rename Text::ReadConditionally -> IO::ReadPreProcess
 addw: Mon 22 May 2017 19:27
 test.t: Add OutOnError: flag
 README: Add OutOnError: flag
+
+addw: Mon 22 May 2017 20:25
+README: Mutter about the name change
+
+addw: Mon 22 May 2017 23:04
+ReadPreProcess.pm: Bit more example
+
+addw: Tue 23 May 2017 13:55
+ReadPreProcess.pm: Improve documentation
+
+addw: Thu 25 May 2017 16:03
+ReadPreProcess.pm: Document that text following .fi or .else will be ignored
+
+addw: Sat 03 Jun 2017 11:44
+test.t: Generate a bit more debugging information
+
+addw: Sat 03 Jun 2017 13:53
+ReadPreProcess.pm: Version 0.81 -> 0.82
+	More, better documentation.
+
+addw: Sat 03 Jun 2017 14:00
+MANIFEST: Add new tests
+
+addw: Sat 03 Jun 2017 16:59
+ReadPreProcess.pm: Tweak example; bump version for when this is next released

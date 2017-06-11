@@ -19,19 +19,19 @@ use DateTime;
 
 =head1 NAME
 
-Business::UPS::Tracking::Response - A response from the UPS webservice 
+Business::UPS::Tracking::Response - A response from the UPS webservice
 
 =head1 SYNOPSIS
 
   my $response = $request->run();
   my $shipment = $response->shipment->[0];
   say $shipment->ScheduledDelivery;
-  
+
 =head1 DESCRIPTION
 
-This class represents a UPS tracking response. This class glues a 
-L<Business::UPS::Tracking::Request> object and a 
-L<Business::UPS::Tracking::Shipment> object togheter. All methods and 
+This class represents a UPS tracking response. This class glues a
+L<Business::UPS::Tracking::Request> object and a
+L<Business::UPS::Tracking::Shipment> object togheter. All methods and
 accessors available in L<Business::UPS::Tracking::Shipment> can also be
 accessed via this class.
 
@@ -39,7 +39,7 @@ accessed via this class.
 
 =head2 request
 
-The request that lead to this response. 
+The request that lead to this response.
 L<Business::UPS::Tracking::Request> object.
 
 =head2 xml
@@ -49,7 +49,7 @@ Parsed xml document. L<XML::LibXML::Document> object
 =head2 shipment
 
 Array reference of shipments in the response (
-L<Business::UPS::Tracking::Shipment::SmallPackage> or 
+L<Business::UPS::Tracking::Shipment::SmallPackage> or
 L<Business::UPS::Tracking::Shipment::Freight> objects)
 
 =head2 CustomerContext
@@ -89,7 +89,7 @@ sub BUILD {
     my $response_status
         = $xml->findvalue('/TrackResponse/Response/ResponseStatusCode');
 
-    # LOGGER            
+    # LOGGER
 #    use Path::Class;
 #    my $filename = $self->request->TrackingNumber || $self->request->ReferenceNumber;
 #    my $file = Path::Class::File->new('t','xmlresponse',$filename); # Same thing
@@ -113,16 +113,16 @@ sub BUILD {
             context     => $xml->findnodes('/TrackResponse/Response/Error')->get_node(1),
         );
     }
-    
+
     my $shipment_return = [];
     my @shipments = $xml->findnodes('/TrackResponse/Shipment');
-    
+
     foreach my $shipment_xml (@shipments) {
         my $shipment_type = $xml->findvalue('ShipmentType/Code');
         my $shipment_class;
-        
+
         $shipment_type ||= '01';
-        
+
         given ($shipment_type) {
             when ('01') {
                 $shipment_class = 'Business::UPS::Tracking::Shipment::SmallPackage';
@@ -137,34 +137,34 @@ sub BUILD {
                 );
             }
         }
-        
+
         push @$shipment_return, $shipment_class->new(
             xml => $shipment_xml,
         );
     }
 
     $self->shipment($shipment_return);
-    
+
     return;
 }
 
 sub _build_CustomerContext {
     my ($self) = @_;
-    
+
     return $self->xml->findvalue('/TrackResponse/Response/TransactionReference/CustomerContext')
 }
 
 #sub _handle_shipment {
 #    my ($meta,$metaclass) = @_;
 #
-#    my @classes = ($metaclass->subclasses,$metaclass); 
-#    
+#    my @classes = ($metaclass->subclasses,$metaclass);
+#
 #    my @name;
 #    foreach my $class (@classes) {
 #        push @name, map { $_ } $class->meta->get_method_list;
 #        push @name, map { $_ } $class->meta->get_attribute_list;
 #    }
-#    
+#
 #    my %return = map { $_ => $_ } grep { $_ !~ m/_.+/ && m/[A-Z]/ } @name;
 #    delete $return{DESTROY};
 #    delete $return{BUILD};

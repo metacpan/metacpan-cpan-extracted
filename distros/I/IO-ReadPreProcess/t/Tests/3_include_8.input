@@ -1,0 +1,24 @@
+.# Title: Include using absolute path
+.# This is about testing the different first character of an include path.
+.#
+.# This was originally part of 3_include_4.input but was removed because
+.# it does not seem to work on MS Windows. Quite what Cwd() does on MS Windows
+.# I don't know since I don't have such a machine; the documentation suggests
+.# that it should work ... ho hum, I suspect that absolute paths will not be
+.# wanted very often.
+.# ADDW
+.#
+.# UnixOnly: 1
+.#
+.# OutOnError: 1
+.#
+.let count := 0
+Line 1
+.#
+.# Absolute path.
+.# PWD starts with a '/'
+.# 2 ways of doing the same thing:
+.eval .include \v{PWD}/t/Tests/3_include_4.inc
+.include $PWD/t/Tests/3_include_4.inc
+.#
+Line end

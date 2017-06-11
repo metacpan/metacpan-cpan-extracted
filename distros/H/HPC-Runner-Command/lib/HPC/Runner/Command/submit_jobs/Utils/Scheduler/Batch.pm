@@ -54,6 +54,11 @@ has 'cmd_count' => (
     required => 1,
 );
 
+has 'cmd_start' => (
+    is => 'rw',
+    required => 1,
+);
+
 has 'job' => (
     is       => 'rw',
     isa      => 'Str',

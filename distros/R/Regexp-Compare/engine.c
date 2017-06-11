@@ -8,23 +8,11 @@
 #if PERL_API_REVISION != 5
 #error This module is only for Perl 5
 #else
-#if PERL_API_VERSION == 20
-#define RC_ANYOF_UTF8 ANYOF_UTF8
-
-/* renamed */
-#define ANYOF_NON_UTF8_LATIN1_ALL ANYOF_NON_UTF8_NON_ASCII_ALL
-
-/* no longer exists - using 5.18 definition */
-#define ANYOF_NONBITMAP(node)	(ARG(node) != ANYOF_NONBITMAP_EMPTY)
-#else
 #if PERL_API_VERSION == 22
 
 #define RC_ANYOF_UTF8 ANYOF_HAS_UTF8_NONBITMAP_MATCHES
 
 #define ANYOF_NON_UTF8_LATIN1_ALL ANYOF_MATCHES_ALL_NON_UTF8_NON_ASCII
-
-#define ANYOF_LARGE 0
-#define ANYOF_UNICODE_ALL ANYOF_MATCHES_ALL_ABOVE_BITMAP
 
 #define ANYOF_NONBITMAP(node)	(ANYOF_FLAGS(node) & ANYOF_HAS_UTF8_NONBITMAP_MATCHES)
 #else
@@ -36,8 +24,14 @@
 
 #define ANYOF_NON_UTF8_LATIN1_ALL ANYOF_SHARED_d_MATCHES_ALL_NON_UTF8_NON_ASCII_non_d_WARN_SUPER
 
-#define ANYOF_LARGE 0
-#define ANYOF_UNICODE_ALL ANYOF_MATCHES_ALL_ABOVE_BITMAP
+#define ANYOF_NONBITMAP(node)	(ANYOF_FLAGS(node) & ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP)
+#else
+#if PERL_API_VERSION == 26
+#define RC_ANYOFS
+
+#define RC_ANYOF_UTF8 ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP
+
+#define ANYOF_NON_UTF8_LATIN1_ALL ANYOF_SHARED_d_MATCHES_ALL_NON_UTF8_NON_ASCII_non_d_WARN_SUPER
 
 #define ANYOF_NONBITMAP(node)	(ANYOF_FLAGS(node) & ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP)
 #else
@@ -485,30 +479,18 @@ static int convert_invlist_to_map(SV *invlist, int invert, U32 *map)
     static UV vertical_space_invlist[] = { 128, 133, 134, 8232, 8234 };
 
     static UV xposix_digit_invlist[] = { 128, 
-#if PERL_API_VERSION == 20
-#include "XPosixDigit.20"
-#else
-#if PERL_API_VERSION == 22
 #include "XPosixDigit.22"
-#else
-#if PERL_API_VERSION == 24
-#include "XPosixDigit.22"
-#else
-#error unexpected PERL_API_VERSION
-#endif
-#endif
-#endif
     };
 
     static UV xposix_alnum_invlist[] = { 128,
-#if PERL_API_VERSION == 20
-#include "XPosixAlnum.20"
-#else
 #if PERL_API_VERSION == 22
 #include "XPosixAlnum.22"
 #else
 #if PERL_API_VERSION == 24
 #include "XPosixAlnum.24"
+#else
+#if PERL_API_VERSION == 26
+#include "XPosixAlnum.26"
 #else
 #error unexpected PERL_API_VERSION
 #endif
@@ -517,31 +499,23 @@ static int convert_invlist_to_map(SV *invlist, int invert, U32 *map)
     };
 
     static UV xposix_alpha_invlist[] = { 128,
-#if (PERL_API_VERSION == 20) || (PERL_API_VERSION == 22)
-#include "XPosixAlpha.20"
+#if PERL_API_VERSION == 22
+#include "XPosixAlpha.22"
 #else
 #if PERL_API_VERSION == 24
 #include "XPosixAlpha.24"
 #else
+#if PERL_API_VERSION == 26
+#include "XPosixAlpha.26"
+#else
 #error unexpected PERL_API_VERSION
+#endif
 #endif
 #endif
     };
 
     static UV xposix_word_invlist[] = { 128,
-#if PERL_API_VERSION == 20
-#include "XPosixWord.20"
-#else
-#if PERL_API_VERSION == 22
 #include "XPosixWord.22"
-#else
-#if PERL_API_VERSION == 24
-#include "XPosixWord.22"
-#else
-#error unexpected PERL_API_VERSION
-#endif
-#endif
-#endif
     };
 
     static UV xposix_xdigit_invlist[] = { 128, 65296, 65306, 65313,
@@ -995,7 +969,7 @@ static int get_synth_offset(regnode *p)
         /* other flags obviously exist, but they haven't been seen yet
 	   and it isn't clear what they mean */
         unsigned int unknown = p->flags & ~(ANYOF_INVERT |
-	    ANYOF_LARGE | ANYOF_UNICODE_ALL | RC_ANYOF_UTF8
+	    ANYOF_MATCHES_ALL_ABOVE_BITMAP | RC_ANYOF_UTF8
 #ifdef RC_ANYOFS
 	    | ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP
 #endif
@@ -1009,7 +983,7 @@ static int get_synth_offset(regnode *p)
 	    return -1;
 	}
 
-	return (p->flags & ANYOF_LARGE) ? 12 : 11;
+	return 11;
     }
     else if ((p->type == IFMATCH) || (p->type == UNLESSM) || 
 	(p->type == SUSPEND))
@@ -1748,7 +1722,7 @@ static int compare_anyof_multiline(int anchored, Arrow *a1, Arrow *a2)
 	);
     assert((a2->rn->type == MBOL) || (a2->rn->type == MEOL));
 
-    if (a1->rn->flags & ANYOF_UNICODE_ALL)
+    if (a1->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP)
     {
 	return compare_mismatch(anchored, a1, a2);
     }
@@ -1796,8 +1770,8 @@ static int compare_anyof_anyof(int anchored, Arrow *a1, Arrow *a2)
 	);
 
     extra_left = ANYOF_NONBITMAP(a1->rn);
-    if ((extra_left || (a1->rn->flags & ANYOF_UNICODE_ALL)) &&
-	!(a2->rn->flags & ANYOF_UNICODE_ALL))
+    if ((extra_left || (a1->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP)) &&
+	!(a2->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP))
     {
         U32 m1, m2;
 	int cr1, cr2;
@@ -2081,7 +2055,7 @@ static int compare_posix_anyof(int anchored, Arrow *a1, Arrow *a2)
 
     /* fprintf(stderr, "right flags = %d\n", a2->rn->flags); */
 
-    if (!(a2->rn->flags & ANYOF_UNICODE_ALL))
+    if (!(a2->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP))
     {
         U32 right_map;
 
@@ -2143,7 +2117,7 @@ static int compare_negative_posix_anyof(int anchored, Arrow *a1, Arrow *a2)
 
     /* fprintf(stderr, "left %d -> 0x%x\n", a1->rn->flags, (unsigned)left_block); */
 
-    if (!(a2->rn->flags & ANYOF_UNICODE_ALL))
+    if (!(a2->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP))
     {
         U32 right_map;
 
@@ -2278,7 +2252,7 @@ static int compare_sany_anyof(int anchored, Arrow *a1, Arrow *a2)
     /* fprintf(stderr, "left flags = 0x%x, right flags = 0x%x\n", 
        a1->rn->flags, a2->rn->flags); */
 
-    if (a2->rn->flags & ANYOF_UNICODE_ALL)
+    if (a2->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP)
     {
 	return compare_right_full(anchored, a1, a2);
     }
@@ -2456,7 +2430,7 @@ static int compare_anyof_exact(int anchored, Arrow *a1, Arrow *a2)
 	);
     assert(a2->rn->type == EXACT);
 
-    if (a1->rn->flags & ANYOF_UNICODE_ALL)
+    if (a1->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP)
     {
 	return compare_mismatch(anchored, a1, a2);
     }
@@ -2491,7 +2465,7 @@ static int compare_anyof_exactf(int anchored, Arrow *a1, Arrow *a2)
 	);
     assert((a2->rn->type == EXACTF) || (a2->rn->type == EXACTFU));
 
-    if (a1->rn->flags & ANYOF_UNICODE_ALL)
+    if (a1->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP)
     {
 	return compare_mismatch(anchored, a1, a2);
     }
@@ -3705,7 +3679,7 @@ static int compare_bound(int anchored, Arrow *a1, Arrow *a2,
     {
         /* fprintf(stderr, "next is bitmap; flags = 0x%x\n", left.rn->flags); */
 
-        if (left.rn->flags & ANYOF_UNICODE_ALL)
+        if (left.rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP)
 	{
 	    return compare_mismatch(anchored, a1, a2);
 	}
@@ -3830,7 +3804,7 @@ static int compare_anyof_bound(int anchored, Arrow *a1, Arrow *a2)
 	);
     assert(a2->rn->type == BOUND);
 
-    if (a1->rn->flags & ANYOF_UNICODE_ALL)
+    if (a1->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP)
     {
 	return compare_mismatch(anchored, a1, a2);
     }
@@ -3847,7 +3821,7 @@ static int compare_anyof_nbound(int anchored, Arrow *a1, Arrow *a2)
 	);
     assert(a2->rn->type == NBOUND);
 
-    if (a1->rn->flags & ANYOF_UNICODE_ALL)
+    if (a1->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP)
     {
 	return compare_mismatch(anchored, a1, a2);
     }

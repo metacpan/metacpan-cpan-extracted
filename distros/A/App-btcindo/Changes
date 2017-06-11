@@ -1,0 +1,21 @@
+0.004   2017-06-03 (PERLANCAR)
+
+	- Adjust to Finance::BTCIndo 0.005 (new period argument for
+	  'price-history').
+
+
+0.003   2017-06-01 (PERLANCAR)
+
+	- Add subcommands: depth, price-history.
+
+
+0.002   2017-05-31 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Add more examples in Synopsis.
+
+
+0.001   2017-05-31 (PERLANCAR)
+
+        - First release.

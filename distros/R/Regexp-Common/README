@@ -1,5 +1,5 @@
 ==============================================================================
-               Release of version 2017040401 of Regexp::Common
+               Release of version 2017060201 of Regexp::Common
 ==============================================================================
 
 IMPORTANT NOTICE:
@@ -115,7 +115,7 @@ MAINTAINER
 
 COPYRIGHT and LICENSE
 
-    This software is Copyright (c) 2001 - 2016, Damian Conway and Abigail.
+    This software is Copyright (c) 2001 - 2017, Damian Conway and Abigail.
 
     This module is free software, and maybe used under any of the following
     licenses:

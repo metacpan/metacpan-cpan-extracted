@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Types::Standard::Tuple::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::Tuple::VERSION   = '1.000006';
+	$Types::Standard::Tuple::VERSION   = '1.002001';
 }
 
 use Type::Tiny ();
@@ -141,22 +141,32 @@ sub __inline_generator
 	{
 		my $v = $_[1];
 		join " and ",
-			"ref($v) eq 'ARRAY'",
-			"scalar(\@{$v}) >= $min",
+			Types::Standard::ArrayRef->inline_check($v),
 			(
-				$slurpy_any
-					? ()
+				(scalar @constraints == $min and not $slurpy)
+					? "\@{$v} == $min"
 					: (
-						$slurpy
-							? sprintf($tmpl, $v, $#constraints+1, $v, $slurpy->inline_check('$tmp'))
-							: sprintf("\@{$v} <= %d", scalar @constraints)
+						"\@{$v} >= $min",
+						(
+							$slurpy_any
+								? ()
+								: (
+									$slurpy
+										? sprintf($tmpl, $v, $#constraints+1, $v, $slurpy->inline_check('$tmp'))
+										: sprintf("\@{$v} <= %d", scalar @constraints)
+								)
+						),
 					)
 			),
 			map {
 				my $inline = $constraints[$_]->inline_check("$v\->[$_]");
-				$is_optional[$_]
-					? sprintf('(@{%s} <= %d or %s)', $v, $_, $inline)
-					: $inline;
+				$inline eq '(!!1)'
+					? ()
+					: (
+						$is_optional[$_]
+							? sprintf('(@{%s} <= %d or %s)', $v, $_, $inline)
+							: $inline
+					);
 			} 0 .. $#constraints;
 	};
 }
@@ -216,7 +226,6 @@ my $label_counter = 0;
 sub __coercion_generator
 {
 	my ($parent, $child, @tuple) = @_;
-	my $C = "Type::Coercion"->new(type_constraint => $child);
 	
 	my $slurpy;
 	if (exists $tuple[-1] and ref $tuple[-1] eq "HASH")
@@ -224,14 +233,18 @@ sub __coercion_generator
 		$slurpy = pop(@tuple)->{slurpy};
 	}
 	
+	my $child_coercions_exist = 0;
 	my $all_inlinable = 1;
 	for my $tc (@tuple, ($slurpy ? $slurpy : ()))
 	{
 		$all_inlinable = 0 if !$tc->can_be_inlined;
 		$all_inlinable = 0 if $tc->has_coercion && !$tc->coercion->can_be_inlined;
-		last if!$all_inlinable;
+		$child_coercions_exist++ if $tc->has_coercion;
 	}
-	
+
+	return unless $child_coercions_exist;
+	my $C = "Type::Coercion"->new(type_constraint => $child);
+
 	if ($all_inlinable)
 	{
 		$C->add_type_coercions($parent => Types::Standard::Stringable {
@@ -247,7 +260,7 @@ sub __coercion_generator
 				my $ct_optional = $ct->is_a_type_of(Types::Standard::Optional);
 				
 				push @code, sprintf(
-					'if (@$orig > %d) { $tmp = %s; (%s) ? ($new[%d]=$tmp) : ($return_orig=1 and last %s) }',
+					'if (@$orig > %d) { $tmp = %s; (%s) ? ($new[%d]=$tmp) : (($return_orig=1), last %s) }',
 					$i,
 					$ct_coerce
 						? $ct->coercion->inline_coercion("\$orig->[$i]")

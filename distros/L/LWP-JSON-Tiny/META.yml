@@ -39,4 +39,4 @@ requires:
 resources:
   homepage: https://github.com/skington/lwp-json-tiny
   repository: https://github.com/skington/lwp-json-tiny.git
-version: '0.012'
+version: '0.013'

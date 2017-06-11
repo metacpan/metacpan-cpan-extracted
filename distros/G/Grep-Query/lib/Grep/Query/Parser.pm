@@ -23,6 +23,7 @@ sub parsequery
 	{
 		local $/ = undef;
 		my $grammar = <DATA>;
+		local $Parse::RecDescent::skip = qr#(?ms:\s+|/\*.*?\*/)*#;
 		$PARSER = Parse::RecDescent->new($grammar);
 		die("Failed to parse query grammar") unless defined($PARSER);
 	}
@@ -114,7 +115,15 @@ sub __preprocessParsedQuery
 				{
 					push(@$fieldRefs, $parsedQuery->{$k}->{field});
 					my $op = $parsedQuery->{$k}->{op};
-					if ($op =~ /^(?:regexp|=~)$/)
+					if ($op eq 'true')
+					{
+						$parsedQuery->{$k}->{op} = eval "sub { 1 }";						
+					}
+					elsif ($op eq 'false')
+					{
+						$parsedQuery->{$k}->{op} = eval "sub { 0 }";						
+					}
+					elsif ($op =~ /^(?:regexp|=~)$/)
 					{
 						$parsedQuery->{$k}->{value} = __compileRx($parsedQuery->{$k}->{value});
 						$parsedQuery->{$k}->{op} = __getAnonWithOp('=~');
@@ -197,7 +206,8 @@ unary:
 
 field_op_value_test:
 		/
-				(?:(?<field>[^.\s]+)\.)?(?<op>(?i)regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)\((?<value>[^)]*)\)						# allow paired '()' delimiters
+				(?:(?<field>[^.\s]+)\.)?(?<op>(?i)true|false)
+			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)\((?<value>[^)]*)\)						# allow paired '()' delimiters
 			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)\{(?<value>[^}]*)\}						# allow paired '{}' delimiters
 			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)\[(?<value>[^\]]*)\]						# allow paired '[]' delimiters
 			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)<(?<value>[^>]*)>						# allow paired '<>' delimiters

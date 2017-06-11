@@ -77,7 +77,7 @@ Google::Ads::AdWords::v201609::TargetCpaBiddingScheme
 Perl data type class for the XML Schema defined complexType
 TargetCpaBiddingScheme from the namespace https://adwords.google.com/api/adwords/cm/v201609.
 
-<a href="https://support.google.com/adwords/answer/6268632">Target CPA</a> is an automated bid strategy that sets bids to help get as many conversions as possible at the target cost-per-acquisition (CPA) you set. <p>A {@linkplain #targetCpa target CPA} must be set for the strategy, but can also be optionally set for individual ad groups in the strategy. Ad group targets, if set, will override strategy targets. <p>Note that campaigns must meet <a href="https://support.google.com/adwords/answer/2471188">specific eligibility requirements</a> before they can use the Target CPA bid strategy. <span class="constraint AdxEnabled">This is disabled for AdX.</span> 
+<a href="https://support.google.com/adwords/answer/6268632">Target CPA</a> is an automated bid strategy that sets bids to help get as many conversions as possible at the target cost per acquisition (CPA) you set. <p>A {@linkplain #targetCpa target CPA} must be set for the strategy, but can also be optionally set for individual ad groups in the strategy. Ad group targets, if set, will override strategy targets. <p>Note that campaigns must meet <a href="https://support.google.com/adwords/answer/2471188">specific eligibility requirements</a> before they can use the Target CPA bid strategy. <span class="constraint AdxEnabled">This is disabled for AdX.</span> 
 
 
 

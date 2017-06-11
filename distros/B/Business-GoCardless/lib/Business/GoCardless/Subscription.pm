@@ -18,23 +18,35 @@ extends 'Business::GoCardless::Resource';
 
 =head1 ATTRIBUTES
 
+Note Pro only API attributes marked with (Pro), Basic only API attributes marked
+with (Basic)
+
     amount
     created_at
     currency
+    day_of_month (Pro)
     description
     expires_at
+    end_date (Pro)
     id
     interval_length
     interval_unit
+    interval (Pro)
+    links (Pro)
     merchant_id
+    metadata (Pro)
+    month (Pro)
     name
     next_interval_start
+    payment_reference (Pro)
     setup_fee
     start_at
+    start_date (Pro)
     status
     sub_resource_uris
     uri
     user_id
+    upcoming_payments (Pro)
 
 =cut
 
@@ -43,19 +55,28 @@ has [ qw/
     created_at
     currency
     description
+    day_of_month
     expires_at
+    end_date
     id
     interval_length
     interval_unit
+    interval
+    links
     merchant_id
+    metadata
+    month
     name
     next_interval_start
+    payment_reference
     setup_fee
     start_at
+    start_date
     status
     sub_resource_uris
     uri
     user_id
+    upcoming_payments
 / ] => (
     is => 'rw',
 );
@@ -70,7 +91,15 @@ Cancels a subscription.
 
 =cut
 
-sub cancel { shift->_operation( 'cancel','api_put' ); }
+sub cancel {
+    my ( $self ) = @_;
+
+    if ( $self->client->api_version > 1 ) {
+        return $self->_operation( undef,'api_post',undef,'actions/cancel' );
+    } else {
+        return $self->_operation( 'cancel','api_put' );
+    }
+}
 
 =head1 Status checks on a subscription
 

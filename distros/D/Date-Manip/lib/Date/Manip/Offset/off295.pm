@@ -6,9 +6,9 @@ Date::Manip::Offset::off295;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Wed Mar  1 10:11:12 EST 2017
-#    Data version: tzdata2017a
-#    Code version: tzcode2017a
+#    Generated on: Tue May 30 10:44:03 EDT 2017
+#    Data version: tzdata2017b
+#    Code version: tzcode2017b
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -19,7 +19,7 @@ use warnings;
 require 5.010000;
 
 our ($VERSION);
-$VERSION='6.58';
+$VERSION='6.59';
 END { undef $VERSION; }
 
 our ($Offset,%Offset);
@@ -95,11 +95,11 @@ $Offset        = '-04:00:00';
       'america/indiana/vevay',
       'america/indiana/vincennes',
       'america/indiana/winamac',
+      'america/port-au-prince',
       'america/pangnirtung',
       'america/kentucky/monticello',
       'america/indiana/petersburg',
       'america/grand_turk',
-      'america/port-au-prince',
       'america/cancun',
       'america/eirunepe',
       'america/lima',

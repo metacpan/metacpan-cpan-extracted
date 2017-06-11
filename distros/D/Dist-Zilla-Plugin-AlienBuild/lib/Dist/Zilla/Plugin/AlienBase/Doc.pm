@@ -5,7 +5,7 @@ use Moose;
 use Carp ();
 
 # ABSTRACT: Generate boilerplate documentation for Alien::Base subclass
-our $VERSION = '0.16'; # VERSION
+our $VERSION = '0.19'; # VERSION
 
 
 with 'Dist::Zilla::Role::FileMunger';
@@ -207,7 +207,7 @@ Dist::Zilla::Plugin::AlienBase::Doc - Generate boilerplate documentation for Ali
 
 =head1 VERSION
 
-version 0.16
+version 0.19
 
 =head1 SYNOPSIS
 

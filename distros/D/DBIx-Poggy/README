@@ -61,6 +61,22 @@ DESCRIPTION
     parallel queries then you need many connections. pg_bouncer and haproxy
     are your friends.
 
+  Pool management
+    In auto mode (default) you just "loose" reference to database handle and
+    it gets released back into the pool after all queries are done:
+
+        {
+            my $cv = AnyEvent->condvar;
+            $pool->take->do(...)->finally($cv);
+            $cv->recv;
+        }
+        # released
+
+    Or: { my $cv = AnyEvent->condvar; my $dbh = $pool->take; $dbh->do(...)
+    ->then(sub { $dbh->do(...) }) ->then(sub { ... }) ->finally($cv);
+    $cv->recv; } # $dbh goes out of scope and all queries are done (cuz of
+    condvar) # released
+
 METHODS
   new
     Named arguments:
@@ -73,14 +89,14 @@ METHODS
 
   connect
     Takes the same arguments as "connect" in DBI, opens "pool_size"
-    connections.
+    connections. Saves connection settings for reuse when pool is exhausted.
 
   take
     Gives one connection from the pool. Takes arguments:
 
     auto
-        Connection will be released to the pool after transaction or as soon
-        as query queue becomes empty. True by default.
+        Connection will be released to the pool once "dbh" goes out of scope
+        (gets "DESTROYED"). True by default.
 
     Returns DBIx::Poggy::DBI handle. When "auto" is turned off then in list
     context returns also guard object that will "release" handle to the pool

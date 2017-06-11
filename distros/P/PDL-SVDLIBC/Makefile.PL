@@ -15,7 +15,7 @@ foreach (map {"$cconfig{SVD_SRCDIR}/$_"} qw(svdutil.h svdutil.c svdlib.h svdlib.
 
 ##-- pdlmaker stuff
 PDL::Core::Dev->import();
-require "pdlmaker.plm";
+require "./pdlmaker.plm";
 
 $package = ["SVDLIBC.pd",SVDLIBC,PDL::SVDLIBC];
 %hash = pdlmaker_init($package);

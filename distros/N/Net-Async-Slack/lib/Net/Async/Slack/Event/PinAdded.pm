@@ -1,0 +1,25 @@
+package Net::Async::Slack::Event::PinAdded;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.001'; # VERSION
+
+use Net::Async::Slack::EventType;
+
+=head1 NAME
+
+Net::Async::Slack::Event::PinAdded - A pin was added to a channel
+
+=head1 DESCRIPTION
+
+Example input data:
+
+    pins:read
+
+=cut
+
+sub type { 'pin_added' }
+
+1;
+

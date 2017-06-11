@@ -30,7 +30,7 @@ if($online_tests) {
 	$build_requires->{'Geo::Coder::Google::V3'} = 0.10;
 	$build_requires->{'Geo::Coder::OSM'} = 0;
 	$build_requires->{'Geo::Coder::CA'} = 0;
-	$build_requires->{'Geo::Coder::XYZ'} = 0;
+	$build_requires->{'Geo::Coder::XYZ'} = 0.03;
 	$build_requires->{'Test::Number::Delta'} = 0;
 	$build_requires->{'Test::LWP::UserAgent'} = 0;
 	$build_requires->{'Test::Carp'} = 0;

@@ -4,9 +4,9 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = '../lib' if -d '../lib' && -d '../ext';
 
     require "./test.pl";
+    set_up_inc( '../lib' ) if -d '../lib' && -d '../ext';
     require Config; import Config;
 
     skip_all_if_miniperl();
@@ -128,6 +128,40 @@ SKIP: {
     }
 }
 
+SKIP:
+{
+    eval { require Errno; defined &Errno::EMFILE }
+      or skip "Can't load Errno or EMFILE not defined", 1;
+    # stdio might return strange values in errno if it runs
+    # out of FILE entries, and does on darwin
+    $^O eq "darwin" && exists $ENV{PERLIO} && $ENV{PERLIO} =~ /stdio/
+      and skip "errno values from stdio are unspecified", 1;
+    my @socks;
+    my $sock_limit = 1000; # don't consume every file in the system
+    # Default limits on various systems I have:
+    #  65536 - Linux
+    #    256 - Solaris
+    #    128 - NetBSD
+    #    256 - Cygwin
+    #    256 - darwin
+    while (@socks < $sock_limit) {
+        socket my $work, PF_INET, SOCK_STREAM, $tcp
+          or last;
+        push @socks, $work;
+    }
+    @socks == $sock_limit
+      and skip "Didn't run out of open handles", 1;
+    is(0+$!, Errno::EMFILE(), "check correct errno for too many files");
+}
+
+{
+    my $sock;
+    my $proto = getprotobyname('tcp');
+    socket($sock, PF_INET, SOCK_STREAM, $proto);
+    accept($sock, $sock);
+    ok('RT #7614: still alive after accept($sock, $sock)');
+}
+
 done_testing();
 
 my @child_tests;
@@ -146,3 +180,4 @@ sub is_child {
 sub end_child {
     print @child_tests;
 }
+

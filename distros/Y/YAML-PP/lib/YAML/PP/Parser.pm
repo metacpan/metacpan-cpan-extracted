@@ -3,19 +3,51 @@ use strict;
 use warnings;
 package YAML::PP::Parser;
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use YAML::PP::Render;
 
 sub new {
     my ($class, %args) = @_;
+    my $reader = delete $args{reader};
     my $self = bless {
-        receiver => $args{receiver},
+        reader => $reader,
     }, $class;
+    my $receiver = delete $args{receiver};
+    if ($receiver) {
+        $self->set_receiver($receiver);
+    }
     return $self;
 }
 sub receiver { return $_[0]->{receiver} }
-sub set_receiver { $_[0]->{receiver} = $_[1] }
+sub set_receiver {
+    my ($self, $receiver) = @_;
+    my $callback;
+    if (ref $receiver eq 'CODE') {
+        $callback = $receiver;
+    }
+    else {
+        $callback = sub {
+            my ($self, $event, $info) = @_;
+            return $receiver->$event($info);
+        };
+    }
+    $self->{callback} = $callback;
+    $self->{receiver} = $receiver;
+}
+sub reader {
+    my ($self) = @_;
+    if (defined $self->{reader}) {
+        return $self->{reader};
+    }
+
+    my $input = $self->{input} // die "No input";
+
+    require YAML::PP::Reader;
+    return YAML::PP::Reader->new(input => $input);
+}
+sub callback { return $_[0]->{callback} }
+sub set_callback { $_[0]->{callback} = $_[1] }
 sub yaml { return $_[0]->{yaml} }
 sub set_yaml { $_[0]->{yaml} = $_[1] }
 sub level { return $_[0]->{level} }
@@ -120,7 +152,10 @@ my $RE_ALIAS = qr/\A\*($RE_ANCHOR)/m;
 
 sub parse {
     my ($self, $yaml) = @_;
-    $self->set_yaml(\$yaml);
+    if (defined $yaml) {
+        $self->{input} = $yaml;
+    }
+    $self->set_yaml(\$self->reader->read);
     $self->set_level(-1);
     $self->set_offset([0]);
     $self->set_events([]);
@@ -555,7 +590,7 @@ sub parse_next {
 sub res_to_event {
     my ($self, $res) = @_;
     if (defined(my $alias = $res->{alias})) {
-        $self->event([ ALIAS => { content => $alias }]);
+        $self->event([ ALI => { content => $alias }]);
     }
     elsif (defined(my $value = $res->{value})) {
         my $style = $res->{style} // ':';
@@ -876,12 +911,23 @@ sub parse_block_scalar {
     TRACE and warn "=== parse_block_scalar()\n";
     my ($self) = @_;
     my $yaml = $self->yaml;
-    unless ($$yaml =~ s/\A([|>])([1-9]\d*)?([+-]?)( +#.*)?($RE_LB|\z)//) {
+
+    my $block_type;
+    my $exp_indent;
+    my $chomp;
+    if ($$yaml =~ s/\A([|>])([1-9]\d*)?([+-]?)( +#.*)?($RE_LB|\z)//) {
+        $block_type = $1;
+        $exp_indent = $2;
+        $chomp = $3;
+    }
+    elsif ($$yaml =~ s/\A([|>])([+-]?)([1-9]\d*)?( +#.*)?($RE_LB|\z)//) {
+        $block_type = $1;
+        $chomp = $2;
+        $exp_indent = $3;
+    }
+    else {
         return 0;
     }
-    my $block_type = $1;
-    my $exp_indent = $2;
-    my $chomp = $3;
     if (defined $exp_indent) {
         TRACE and warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\$exp_indent], ['exp_indent']);
     }
@@ -994,7 +1040,7 @@ sub event_value {
         $self->set_anchor(undef);
         $info{anchor} = $anchor;
     }
-    $self->event([ VALUE => { content => $value, %info, }]);
+    $self->event([ VAL => { content => $value, %info, }]);
 }
 
 sub push_events {
@@ -1017,6 +1063,15 @@ sub pop_events {
     }
 }
 
+my %event_to_method = (
+    MAP => 'mapping',
+    SEQ => 'sequence',
+    DOC => 'document',
+    STR => 'stream',
+    VAL => 'scalar',
+    ALI => 'alias',
+);
+
 sub begin {
     my ($self, $event, $offset, @content) = @_;
     my $event_name = $event;
@@ -1036,7 +1091,8 @@ sub begin {
         }
     }
     TRACE and $self->debug_event("------------->> BEGIN $event ($offset) @content");
-    $self->receiver->($self, [ BEGIN => { %info, content => $content[0] } ]);
+    $self->callback->($self, $event_to_method{ $event_name } . "_start_event"
+        => { %info, content => $content[0] });
     $self->push_events($event, $offset);
     TRACE and $self->debug_events;
 }
@@ -1046,7 +1102,8 @@ sub end {
     $self->pop_events($event);
     TRACE and $self->debug_event("-------------<< END   $event @{[$content//'']}");
     return if $event eq 'END';
-    $self->receiver->($self, [ END => { type => $event, content => $content } ]);
+    $self->callback->($self, $event_to_method{ $event } . "_end_event"
+        => { type => $event, content => $content });
     if ($event eq 'DOC') {
         $self->set_tagmap({
             '!!' => "tag:yaml.org,2002:",
@@ -1058,7 +1115,8 @@ sub event {
     my ($self, $event) = @_;
     TRACE and $self->debug_event("------------- EVENT @{[ $self->event_to_test_suite($event)]}");
 
-    $self->receiver->($self, $event);
+    my ($type, $info) = @$event;
+    $self->callback->($self, $event_to_method{ $type } . "_event", $info);
 }
 
 sub event_to_test_suite {
@@ -1068,7 +1126,7 @@ sub event_to_test_suite {
         my $string;
         my $type = $info->{type};
         my $content = $info->{content};
-        if ($ev eq 'BEGIN') {
+        if ($ev =~ m/start/) {
             $string = "+$type";
             if (defined $info->{anchor}) {
                 $string .= " &$info->{anchor}";
@@ -1078,11 +1136,11 @@ sub event_to_test_suite {
             }
             $string .= " $content" if defined $content;
         }
-        elsif ($ev eq 'END') {
+        elsif ($ev =~ m/end/) {
             $string = "-$type";
             $string .= " $content" if defined $content;
         }
-        elsif ($ev eq 'VALUE') {
+        elsif ($ev eq 'scalar_event') {
             $string = '=VAL';
             if (defined $info->{anchor}) {
                 $string .= " &$info->{anchor}";
@@ -1092,7 +1150,7 @@ sub event_to_test_suite {
             }
             $string .= ' ' . $info->{style} . ($content // '');
         }
-        elsif ($ev eq 'ALIAS') {
+        elsif ($ev eq 'alias_event') {
             $string = "=ALI *$content";
         }
         return $string;

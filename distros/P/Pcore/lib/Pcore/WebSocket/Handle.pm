@@ -23,7 +23,7 @@ has on_disconnect => ( is => 'ro', isa => Maybe [CodeRef], reader => undef );   
 has on_ping       => ( is => 'ro', isa => Maybe [CodeRef], reader => undef );                        # ($ws, $status)
 has on_pong       => ( is => 'ro', isa => Maybe [CodeRef], reader => undef );                        # ($ws, $status)
 
-has h => ( is => 'ro', isa => InstanceOf ['Pcore::AE::Handle2'], init_arg => undef );
+has h => ( is => 'ro', isa => InstanceOf ['Pcore::AE::Handle'], init_arg => undef );
 has is_connected => ( is => 'ro', isa => Bool, default => 0, init_arg => undef );
 
 # mask data on send, for websocket client only

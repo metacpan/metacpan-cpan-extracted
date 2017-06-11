@@ -1,7 +1,6 @@
-requires Mango       => '1.20';
-requires Minion      => '5.05';
-requires Mojolicious => '6.0';
-requires perl        => '5.010001';
+requires Mango       => '1.29';
+requires Minion      => '6.0';
+requires Mojolicious => '7.0';
 
 on 'test' => sub {
   requires 'Test::More';

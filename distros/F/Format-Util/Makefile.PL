@@ -6,11 +6,18 @@ use 5.014000;
 
 use ExtUtils::MakeMaker 6.48;
 
+use File::ShareDir::Install;
+$File::ShareDir::Install::INCLUDE_DOTFILES = 1;
+$File::ShareDir::Install::INCLUDE_DOTDIRS = 1;
+install_share dist => "share";
+
+
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Miscellaneous routines to do with manipulating with strings and numbers!",
   "AUTHOR" => "binary.com <BINARY\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => "6.48"
+    "ExtUtils::MakeMaker" => "6.48",
+    "File::ShareDir::Install" => "0.06"
   },
   "DISTNAME" => "Format-Util",
   "LICENSE" => "perl",
@@ -18,9 +25,12 @@ my %WriteMakefileArgs = (
   "NAME" => "Format::Util",
   "PREREQ_PM" => {
     "Encode" => 0,
+    "File::ShareDir" => 0,
+    "Math::BigFloat" => 0,
     "Math::BigInt" => 0,
     "POSIX" => 0,
-    "Scalar::Util" => 0
+    "Scalar::Util" => 0,
+    "YAML::XS" => 0
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -32,7 +42,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.94",
     "Test::NoWarnings" => 0
   },
-  "VERSION" => "0.09",
+  "VERSION" => "0.11",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,16 +52,19 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Encode" => 0,
   "ExtUtils::MakeMaker" => 0,
+  "File::ShareDir" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Math::BigFloat" => 0,
   "Math::BigInt" => 0,
   "POSIX" => 0,
   "Scalar::Util" => 0,
   "Test::CheckDeps" => "0.010",
   "Test::Exception" => 0,
   "Test::More" => "0.94",
-  "Test::NoWarnings" => 0
+  "Test::NoWarnings" => 0,
+  "YAML::XS" => 0
 );
 
 
@@ -65,3 +78,9 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
+
+{
+package
+MY;
+use File::ShareDir::Install qw(postamble);
+}

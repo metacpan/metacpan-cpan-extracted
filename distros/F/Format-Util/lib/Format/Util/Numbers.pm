@@ -5,11 +5,14 @@ use strict;
 use warnings FATAL => 'all';
 
 use base 'Exporter';
-our @EXPORT_OK = qw( commas to_monetary_number_format roundnear );
+our @EXPORT_OK = qw/commas to_monetary_number_format roundnear financialrounding formatnumber/;
 
 use Carp qw(cluck);
 use Scalar::Util qw(looks_like_number);
 use POSIX qw(ceil);
+use YAML::XS;
+use File::ShareDir;
+use Math::BigFloat lib => 'Calc';
 
 =head1 NAME
 
@@ -17,11 +20,11 @@ Format::Util::Numbers - Miscellaneous routines to do with manipulating number fo
 
 =cut
 
-our $VERSION = '0.09';    ## VERSION
+our $VERSION = '0.11';    ## VERSION
 
 =head1 SYNOPSIS
 
-    use Format::Util::Numbers qw( commas to_monetary_number_format roundnear );
+    use Format::Util::Numbers qw( commas to_monetary_number_format roundnear formatnumber financialrounding);
     ...
 
 =head1 EXPORT
@@ -31,6 +34,7 @@ our $VERSION = '0.09';    ## VERSION
 Round a number near the precision of the supplied one.
 
     roundnear( 0.01, 12345.678) => 12345.68
+
 =cut
 
 {
@@ -63,6 +67,12 @@ Round a number near the precision of the supplied one.
         return 1 * $rounded;
     }
 }
+
+# format of precsion should be
+# TYPE:
+#   CURRENCY: PRECISION
+my $precisions = YAML::XS::LoadFile($ENV{FORMAT_UTIL_PRECISION} // File::ShareDir::dist_file('Format-Util', 'precision.yml'));
+my $floating_point_regex = qr/^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/;
 
 =head2 commas
 
@@ -137,6 +147,111 @@ sub to_monetary_number_format {
     return $text;
 }
 
+=head2 formatnumber
+
+This sub is used to format number as per precision defined
+per currency.
+
+Use this sub only for formatting not for rounding, i.e
+use this in modules which are used for display purpose
+only i.e client facing.
+
+DON'T USE THIS FOR CALCULATION, COMPARISON OF NUMBERS
+DON'T USE THIS FOR QUANTITATIVE ANALYSIS
+
+This sub accepts type i.e whether its price or amount
+- price e.g. ask price, bid price
+- amount e.g. balance, deposit/withdraw amount
+
+and takes currency to calculate precision defined per
+currency.
+
+this subs takes precision defined per currency in config file passed by
+ENV{FORMAT_UTIL_PRECISION}, else it defaults to precision.yml
+
+Returns string
+
+    formatnumber('price', 'USD', 10) => 10.00
+
+=cut
+
+sub formatnumber {
+    my ($type, $currency, $val) = @_;
+
+    # return val if any one of value, currency or type is invalid
+    return $val
+        if ((
+            not defined $val
+            or $val !~ $floating_point_regex
+        )
+        or not defined $precisions->{$type // 'unknown-type'}
+        or not defined $precisions->{$type}->{$currency // 'unknown-type'});
+
+    return sprintf('%0.0' . $precisions->{$type}->{$currency} . 'f', $val);
+}
+
+=head2 financialrounding
+
+This sub is used to round number as per precision defined
+per currency.
+
+Use this sub only for rounding numbers thats are related
+to currency like price, amount, balance etc
+
+USE THIS WHEN YOU WANT TO COMPARE NUMBERS RELATED TO CURRENCY
+USE THIS FOR QUANTITATIVE ANALYSIS FOR NUMBER RELATED TO CURRENCY
+
+This sub accepts type i.e whether its price or amount
+- price e.g. ask price, bid price
+- amount e.g. balance, deposit/withdraw amount
+
+and takes currency to calculate precision defined per
+currency.
+
+this subs takes precision defined per currency in config file passed by
+ENV{FORMAT_UTIL_PRECISION}, else it defaults to precision.yml
+
+Returns number
+
+    financialrounding('amount', 'USD', 10.345) => 10.35
+
+=cut
+
+sub financialrounding {
+    my ($type, $currency, $val) = @_;
+
+    # return val if any one of value, currency or type is invalid
+    return $val
+        if ((
+            not defined $val
+            or $val !~ $floating_point_regex
+        )
+        or not defined $precisions->{$type // 'unknown-type'}
+        or not defined $precisions->{$type}->{$currency // 'unknown-type'});
+
+    # get current global mode
+    my $current_mode = Math::BigFloat->round_mode();
+    Math::BigFloat->round_mode('common');
+
+    my $x = Math::BigFloat->new($val)->bfround('-' . $precisions->{$type}->{$currency});
+    $x = $x->numify();
+
+    # set back to origianl mode
+    Math::BigFloat->round_mode($current_mode);
+
+    return $x;
+}
+
+=head2 get_precision_config
+
+This is used get complete currency precision config.
+
+=cut
+
+sub get_precision_config {
+    return $precisions;
+}
+
 =head1 AUTHOR
 
 binary.com, C<< <rakesh at binary.com> >>
@@ -147,13 +262,11 @@ Please report any bugs or feature requests to C<bug-format-util at rt.cpan.org>,
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Format-Util>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
-
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
     perldoc Format::Util::Numbers
-
 
 You can also look for information at:
 
@@ -177,9 +290,7 @@ L<http://search.cpan.org/dist/Format-Util/>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
-
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -220,7 +331,6 @@ YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
 CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
 CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 
 =cut
 

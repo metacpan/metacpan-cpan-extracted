@@ -25,7 +25,7 @@ __END__
 Perl data type class for the XML Schema defined simpleType
 TrialStatus from the namespace https://adwords.google.com/api/adwords/cm/v201609.
 
-Status diagram available at go/adsapi-commander 
+Status of a trial. 
 
 
 

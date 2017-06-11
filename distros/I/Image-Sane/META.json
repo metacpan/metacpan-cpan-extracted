@@ -23,8 +23,8 @@
       "build" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "Readonly" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "Test::Requires" : "0"
          }
       },
       "configure" : {
@@ -35,11 +35,12 @@
       },
       "runtime" : {
          "requires" : {
-            "Exception::Class" : "0"
+            "Exception::Class" : "0",
+            "Readonly" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.10",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

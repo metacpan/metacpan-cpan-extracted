@@ -1,0 +1,59 @@
+Revision history for overload-reify
+
+0.07      2017-05-31 15:48:06-04:00 America/New_York
+
+  [BUG FIX]
+    * clean namespace of symbols imported from Carp;
+
+  [BUILD]
+    * more developer/release tests added
+
+
+0.06      2017-01-25 13:41:53-05:00 America/New_York (TRIAL RELEASE)
+
+  [BUILD]
+
+    * dist.ini: use [AutoPreqs] plugin to find Perl version in reify.pm
+      (thanks @manwar!)
+
+0.05      2017-01-17 15:39:03-05:00 America/New_York (TRIAL RELEASE)
+
+  [ENHANCEMENT]
+    * -redefine option, if false, will throw an exception if the target
+      package already defines the operator or method_name to be installed.
+      defaults to false.
+
+
+0.04      2017-01-17 15:39:03-05:00 America/New_York (TRIAL RELEASE)
+
+  [BUG FIX]
+
+    * mapping from operators to method_names consistent with the
+      currently executing version of Perl was broken.
+
+
+0.03      2017-01-17 15:39:03-05:00 America/New_York (TRIAL RELEASE)
+
+  [API CHANGE]
+
+    * method_names now takes an optional list of operators; the options
+    hash is now passed as an optional trailing hashref
+
+  [ENHANCEMENTS]
+
+    * new class method tag_to_ops, returns list of operators
+      corresponding to a tag
+
+    * arguments to method_names are now passed through tag_to_ops
+
+
+0.02      2017-01-17 10:12:51-05:00 America/New_York (TRIAL RELEASE)
+
+  [BUG FIX]
+
+    * wrapping an existing method with the same name as the wrapper
+      caused an infinite loop
+
+0.01      2017-01-15 17:19:08-05:00 America/New_York (TRIAL RELEASE)
+
+    * initial release

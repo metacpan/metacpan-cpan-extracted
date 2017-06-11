@@ -1,5 +1,13 @@
 Revision history for Perl extension App-Kritika
 
+0.04 2017-06-01T18:58:23Z
+
+    - better error handling
+    - better error report and hook example
+    - multiple files and additional options
+    - prepend volume to the root when needed
+    - use _kritikarc as fallback on windows
+
 0.03 2017-03-21T23:06:21Z
 
     - more portable path handling

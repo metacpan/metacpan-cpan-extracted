@@ -1,9 +1,10 @@
 package CracTools::Annotator;
+
 {
   $CracTools::Annotator::DIST = 'CracTools';
 }
 # ABSTRACT: Generic annotation base on CracTools::GFF::Query::File
-$CracTools::Annotator::VERSION = '1.25';
+$CracTools::Annotator::VERSION = '1.251';
 use strict;
 use warnings;
 
@@ -400,7 +401,7 @@ CracTools::Annotator - Generic annotation base on CracTools::GFF::Query::File
 
 =head1 VERSION
 
-version 1.25
+version 1.251
 
 =head1 SYNOPSIS
 

@@ -1,8 +1,10 @@
 package Dist::Surveyor::DB_File;
-$Dist::Surveyor::DB_File::VERSION = '0.016';
+
 use strict;
 use warnings;
 use Storable qw(freeze thaw);
+
+our $VERSION = '0.019';
 
 our @ISA;
 if    (eval { require DB_File;   1; }) {

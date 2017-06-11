@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::Chrome::ExtraPrompt; # git description: v0.013-3-g7e4034d
+package Dist::Zilla::Plugin::Chrome::ExtraPrompt; # git description: v0.014-17-gecdfd0f
+# vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Perform arbitrary commands when Dist::Zilla prompts you
 # KEYWORDS: prompt execute command external
-# vim: set ts=8 sts=4 sw=4 tw=78 et :
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 use Moose;
 with 'Dist::Zilla::Role::Plugin';
@@ -24,7 +24,20 @@ has repeat_prompt => (
     default => 0,
 );
 
-# no dump_config, as what we do here should never be relevant to the outcome of the build
+# metaconfig is unimportant for this distribution since it does not alter the
+# built distribution in any way
+around dump_config => sub
+{
+    my ($orig, $self) = @_;
+    my $config = $self->$orig;
+
+    my $data = {
+        blessed($self) ne __PACKAGE__ ? ( version => $VERSION ) : (),
+    };
+    $config->{+__PACKAGE__} = $data if keys %$data;
+
+    return $config;
+};
 
 around register_component => sub
 {
@@ -52,9 +65,9 @@ around register_component => sub
 __PACKAGE__->meta->make_immutable;
 
 
-package Dist::Zilla::Role::Chrome::ExtraPrompt; # git description: v0.013-3-g7e4034d
+package Dist::Zilla::Role::Chrome::ExtraPrompt; # git description: v0.014-17-gecdfd0f
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 use Moose::Role;
 use IPC::Open3;
@@ -125,7 +138,7 @@ Dist::Zilla::Plugin::Chrome::ExtraPrompt - Perform arbitrary commands when Dist:
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 
@@ -166,17 +179,22 @@ avoid a shell intermediary).
 
 =head1 SUPPORT
 
-=for stopwords irc
-
 Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Chrome-ExtraPrompt>
 (or L<bug-Dist-Zilla-Plugin-Chrome-ExtraPrompt@rt.cpan.org|mailto:bug-Dist-Zilla-Plugin-Chrome-ExtraPrompt@rt.cpan.org>).
+
+There is also a mailing list available for users of this distribution, at
+L<http://dzil.org/#mailing-list>.
+
+There is also an irc channel available for users of this distribution, at
+L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
+
 I am also usually active on irc, as 'ether' at C<irc.perl.org>.
 
 =head1 AUTHOR
 
 Karen Etheridge <ether@cpan.org>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT AND LICENCE
 
 This software is copyright (c) 2013 by Karen Etheridge.
 

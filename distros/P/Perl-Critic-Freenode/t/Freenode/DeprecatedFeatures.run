@@ -43,6 +43,7 @@ keys %$href;
 keys(%{$href});
 keys %{$foo{bar}[5]};
 keys $foo->{bar}[5]->%*;
+keys $foo->{bar}[5]->%* > 4;
 shift(@array);
 shift @$aref;
 shift @{$aref};

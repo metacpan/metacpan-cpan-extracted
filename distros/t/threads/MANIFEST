@@ -32,6 +32,7 @@ t/stress_cv.t
 t/stress_re.t
 t/stress_string.t
 t/thread.t
+t/unique.t
 t/test.pl
 examples/pool.pl
 examples/pool_reuse.pl

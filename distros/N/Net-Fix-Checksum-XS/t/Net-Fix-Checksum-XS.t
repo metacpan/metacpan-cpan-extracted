@@ -16,18 +16,18 @@ my $fixmsg = "8=FIX.4.4|9=122|35=D|34=215|49=CLIENT12|52=20100225-19:41:57.316|5
 # Use SOH separator - from now on all separators will be written "\001"
 $fixmsg =~ s/\|/\001/g;
 
-my $fixnocksum = $fixmsg =~ s/10=\d{3}\001$//r;
-my $fixbadcksum1 = $fixmsg =~ s/10=\d{3}\001$/10=123\001/r;
-my $fixbadcksum2 = $fixmsg =~ s/49=CLIENT12/49=CLIENT13/r; # checksum will be +1
+(my $fixnocksum = $fixmsg) =~ s/10=\d{3}\001$//;
+(my $fixbadcksum1 = $fixmsg) =~ s/10=\d{3}\001$/10=123\001/;
+(my $fixbadcksum2 = $fixmsg) =~ s/49=CLIENT12/49=CLIENT13/; # checksum will be +1
 
 my $verylongstring = "@" x 4096; # This string can be added without affecting the checksum as (sum % 256) == 0
-my $fixtoolong = $fixnocksum =~ s/49=CLIENT12/49=CLIENT21$verylongstring/r;
+(my $fixtoolong = $fixnocksum) =~ s/49=CLIENT12/49=CLIENT21$verylongstring/;
 my $fixlongbadcksum = $fixtoolong . "10=123\001";
 my $fixlonggoodcksum = $fixtoolong . "10=072\001";
 
-my $fixinvalidcksum = $fixmsg =~ s/10=\d{3}\001$/10=256\001/r; # 256 is the max checksum value
-my $fixbadterminaison = $fixnocksum =~ s/\001$//r;
-my $fixbadtermchsum = $fixmsg =~ s/\001$//r;
+(my $fixinvalidcksum = $fixmsg) =~ s/10=\d{3}\001$/10=256\001/; # 256 is the max checksum value
+(my $fixbadterminaison = $fixnocksum) =~ s/\001$//;
+(my $fixbadtermchsum = $fixmsg) =~ s/\001$//;
 
 ok(Net::Fix::Checksum::XS::validate_checksum($fixmsg) eq 1, "Validate Checksum OK");
 ok(Net::Fix::Checksum::XS::generate_checksum($fixnocksum) eq "072", "Generate Checksum OK");

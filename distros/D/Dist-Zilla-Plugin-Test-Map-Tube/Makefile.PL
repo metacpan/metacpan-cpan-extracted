@@ -21,12 +21,12 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Role::FileGatherer" => 0,
     "Dist::Zilla::Role::PrereqSource" => 0,
     "Moose" => 0,
-    "Test::Map::Tube" => "0.27"
+    "Test::Map::Tube" => "0.28"
   },
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.15",
+  "VERSION" => "0.16",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,7 +38,7 @@ my %FallbackPrereqs = (
   "Dist::Zilla::Role::FileGatherer" => 0,
   "Dist::Zilla::Role::PrereqSource" => 0,
   "Moose" => 0,
-  "Test::Map::Tube" => "0.27",
+  "Test::Map::Tube" => "0.28",
   "Test::More" => 0
 );
 

@@ -968,8 +968,8 @@ win32_readdir(DIR *dirp)
 		 * new name and its null terminator */
 		while (newsize > dirp->size) {
 		    long curpos = dirp->curr - dirp->start;
+		    Renew(dirp->start, dirp->size * 2, char);
 		    dirp->size *= 2;
-		    Renew(dirp->start, dirp->size, char);
 		    dirp->curr = dirp->start + curpos;
 		}
 		strcpy(dirp->start + endpos, buffer);
@@ -4161,15 +4161,15 @@ win32_fdupopen(FILE *pf)
     int fileno = win32_dup(win32_fileno(pf));
 
     /* open the file in the same mode */
-    if((pf)->_flag & _IOREAD) {
+    if (PERLIO_FILE_flag(pf) & PERLIO_FILE_flag_RD) {
 	mode[0] = 'r';
 	mode[1] = 0;
     }
-    else if((pf)->_flag & _IOWRT) {
+    else if (PERLIO_FILE_flag(pf) & PERLIO_FILE_flag_WR) {
 	mode[0] = 'a';
 	mode[1] = 0;
     }
-    else if((pf)->_flag & _IORW) {
+    else if (PERLIO_FILE_flag(pf) & PERLIO_FILE_flag_RW) {
 	mode[0] = 'r';
 	mode[1] = '+';
 	mode[2] = 0;

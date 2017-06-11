@@ -134,6 +134,28 @@ Found = in conditional, should be == at - line 3.
 Found = in conditional, should be == at - line 4.
 ########
 # op.c
+# NAME while with assignment as condition
+use warnings 'syntax';
+1 while $a = 0;
+while ($a = 0) {
+    1;
+}
+EXPECT
+Found = in conditional, should be == at - line 3.
+Found = in conditional, should be == at - line 4.
+########
+# op.c
+# NAME until with assignment as condition
+use warnings 'syntax';
+1 until $a = 1;
+until ($a = 1) {
+    1;
+}
+EXPECT
+Found = in conditional, should be == at - line 3.
+Found = in conditional, should be == at - line 4.
+########
+# op.c
 use warnings 'syntax' ;
 @a[3];
 @a{3};
@@ -145,9 +167,13 @@ use warnings 'syntax' ;
 @a{--$_};
 @a[$_];
 @a[--$_];
+delete @a[$x];
+delete @a{$x};
 no warnings 'syntax' ;
 @a[3];
 @a{3};
+delete @a[$x];
+delete @a{$x};
 EXPECT
 Scalar value @a[3] better written as $a[3] at - line 3.
 Scalar value @a{3} better written as $a{3} at - line 4.
@@ -159,6 +185,8 @@ Scalar value @a{...} better written as $a{...} at - line 9.
 Scalar value @a{...} better written as $a{...} at - line 10.
 Scalar value @a[...] better written as $a[...] at - line 11.
 Scalar value @a[...] better written as $a[...] at - line 12.
+Scalar value @a[...] better written as $a[...] at - line 13.
+Scalar value @a{...} better written as $a{...} at - line 14.
 ########
 # op.c
 use utf8;
@@ -997,15 +1025,11 @@ sub phred { 2 };
 state sub jorge { 1 }
 sub jorge () { 2 } # should *not* produce redef warnings by default
 EXPECT
-The lexical_subs feature is experimental at - line 3.
 Prototype mismatch: sub fred () vs none at - line 4.
 Constant subroutine fred redefined at - line 4.
-The lexical_subs feature is experimental at - line 5.
 Prototype mismatch: sub george: none vs () at - line 6.
-The lexical_subs feature is experimental at - line 7.
 Prototype mismatch: sub phred () vs none at - line 8.
 Constant subroutine phred redefined at - line 8.
-The lexical_subs feature is experimental at - line 9.
 Prototype mismatch: sub jorge: none vs () at - line 10.
 ########
 # op.c
@@ -1435,6 +1459,7 @@ END { print "in end\n"; }
 print "in mainline\n";
 1;
 --FILE--
+BEGIN { unshift @INC, '.' }
 require abc;
 do "abc.pm";
 EXPECT
@@ -1747,13 +1772,13 @@ if (my $w2) { $a=1 }
 if ($a && (my $w3 = 1)) {$a = 2}
 
 EXPECT
-Deprecated use of my() in false conditional at - line 2.
-Deprecated use of my() in false conditional at - line 3.
-Deprecated use of my() in false conditional at - line 4.
-Deprecated use of my() in false conditional at - line 5.
-Deprecated use of my() in false conditional at - line 6.
-Deprecated use of my() in false conditional at - line 7.
-Deprecated use of my() in false conditional at - line 8.
+Deprecated use of my() in false conditional. This will be a fatal error in Perl 5.30 at - line 2.
+Deprecated use of my() in false conditional. This will be a fatal error in Perl 5.30 at - line 3.
+Deprecated use of my() in false conditional. This will be a fatal error in Perl 5.30 at - line 4.
+Deprecated use of my() in false conditional. This will be a fatal error in Perl 5.30 at - line 5.
+Deprecated use of my() in false conditional. This will be a fatal error in Perl 5.30 at - line 6.
+Deprecated use of my() in false conditional. This will be a fatal error in Perl 5.30 at - line 7.
+Deprecated use of my() in false conditional. This will be a fatal error in Perl 5.30 at - line 8.
 ########
 # op.c
 $[ = 1;
@@ -2024,6 +2049,17 @@ EXPECT
 Negative repeat count does nothing at - line 3.
 Negative repeat count does nothing at - line 4.
 ########
+use Config;
+my $non_ieee_fp = ($Config{doublekind} == 9 ||
+                   $Config{doublekind} == 10 ||
+                   $Config{doublekind} == 11);
+if ($non_ieee_fp) {
+    print <<EOM ;
+SKIPPED
+# No inf/nan support
+EOM
+    exit ;
+}
 my $a = "inf" + 0;
 my $b = -$a;
 my $c = "nan" + 0;
@@ -2037,9 +2073,9 @@ my $y = "y" x $b;
 my $z = "z" x $c;
 no warnings 'numeric';
 EXPECT
-Non-finite repeat count does nothing at - line 5.
-Non-finite repeat count does nothing at - line 6.
-Non-finite repeat count does nothing at - line 7.
+Non-finite repeat count does nothing at - line 16.
+Non-finite repeat count does nothing at - line 17.
+Non-finite repeat count does nothing at - line 18.
 ########
 # NAME warn on stat @array
 @foo = ("op/stat.t");
@@ -2057,3 +2093,33 @@ Array passed to stat will be coerced to a scalar (did you want stat $foo[0]?) at
 Array passed to stat will be coerced to a scalar (did you want stat $bar[0]?) at - line 9.
 Array passed to stat will be coerced to a scalar at - line 10.
 
+########
+# NAME barewords and conditionals near constant folding
+use warnings;
+my $x1 = !a || !b; # no "in conditional" warnings
+my $x2 = !A || !B; # warning-free, because upper-case won't clash
+EXPECT
+Unquoted string "a" may clash with future reserved word at - line 2.
+Unquoted string "b" may clash with future reserved word at - line 2.
+########
+# RT #6870: Odd parsing of do...for...
+# This was really more a tokenizer bug, but it manifests as spurious warnings
+use warnings;
+no warnings 'reserved';
+$a=do xa for ax;
+do "xa" for ax;
+do xa for ax;
+do xa for "ax";
+do xa for sin(1);
+do xa for (sin(1));
+do xa for "sin";
+do xa for qq(sin);
+do xa for my $a;
+do xa for my @a;
+EXPECT
+########
+# TODO [perl #125493
+use warnings;
+$_="3.14159";
+tr/0-9/\x{6F0}-\x{6F9}/;
+EXPECT

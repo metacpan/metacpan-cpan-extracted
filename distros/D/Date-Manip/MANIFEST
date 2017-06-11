@@ -30,6 +30,7 @@ internal/leak.pl
 internal/module.isp
 internal/NOTES
 internal/TODO
+internal/TODO.7
 internal/translate
 internal/tzdata
 internal/tztab
@@ -57,6 +58,7 @@ lib/Date/Manip/DM6.pod
 lib/Date/Manip/Examples.pod
 lib/Date/Manip/History.pod
 lib/Date/Manip/Holidays.pod
+lib/Date/Manip/Interfaces.pod
 lib/Date/Manip/Lang.pod
 lib/Date/Manip/Lang/catalan.pm
 lib/Date/Manip/Lang/catalan.pod

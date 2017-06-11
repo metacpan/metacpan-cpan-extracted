@@ -1,7 +1,7 @@
 package DDG::Test::Spice;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Adds keywords to easily test Spice plugins.
-$DDG::Test::Spice::VERSION = '1016';
+$DDG::Test::Spice::VERSION = '1017';
 use strict;
 use warnings;
 use Carp;
@@ -91,7 +91,7 @@ DDG::Test::Spice - Adds keywords to easily test Spice plugins.
 
 =head1 VERSION
 
-version 1016
+version 1017
 
 =head1 DESCRIPTION
 

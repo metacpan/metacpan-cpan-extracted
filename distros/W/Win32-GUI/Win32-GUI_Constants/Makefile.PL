@@ -57,7 +57,7 @@ sub special_targets {
 # Add rules to install demo scripts
 # Add rules to make the perfect hash code (phash.inc)
 sub postamble {
-  return <<'__POSTAMBLE';
+  return sprintf <<'__POSTAMBLE', ($^O eq 'cygwin' ? 'hash/perfect.exe' : 'hash\perfect.exe');
 
 # Win32::GUI::Constansts RC section
 
@@ -82,7 +82,7 @@ clean ::
 phash.def :: subdirs
 
 phash.def :: constants.src
-	hash$(DIRFILESEP)perfect.exe < constants.src
+	%s < constants.src
 
 __POSTAMBLE
 }

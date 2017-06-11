@@ -53,7 +53,7 @@ Toby Thurston -- 20 Feb 2016
 
 my $want_diff   = 0;
 my $want_update = 0;
-my $new_version = '2.16';
+my $new_version = '2.17';
 my $module_name = 'Maps.pm';
 my $lib_module_name = File::Spec->catfile(qw(lib Geo Coordinates OSGB), $module_name);
 
@@ -344,90 +344,85 @@ for my $m (@sheets) {
     print $pm " };\n";
 }
 
-print $pm "1;\n\n=pod\n\n";
-print $pm <<'END_PODA';
-
-=head1 NAME
-
-Geo::Coordinates::OSGB::Maps - Data for OSGB Maps
-
-=head1 VERSION
-
-END_PODA
-
-print $pm "V$new_version\n";
-
-print $pm <<'END_PODB';
-
-=head1 SUBROUTINES AND METHODS
-
-This module exports no functions, but just two hashes of data.
-
-=head2 Hash C<%name_for_map_series>
-
-The keys are the single letter codes used for each map series.  
-The values are the descriptive names of each series.
-Currently we have:
-
-END_PODB
+print $pm "1;\n\n";
+my @pod;
+push @pod, '=pod';
+push @pod, '';
+push @pod, '=head1 NAME';
+push @pod, '';
+push @pod, 'Geo::Coordinates::OSGB::Maps - Data for OSGB Maps';
+push @pod, '';
+push @pod, '=head1 VERSION';
+push @pod, '';
+push @pod, "V$new_version";
+push @pod, '';
+push @pod, '=head1 SUBROUTINES AND METHODS';
+push @pod, '';
+push @pod, 'This module exports no functions, but just two hashes of data.';
+push @pod, '';
+push @pod, '=head2 Hash C<%name_for_map_series>';
+push @pod, '';
+push @pod, 'The keys are the single letter codes used for each map series.';
+push @pod, 'The values are the descriptive names of each series.';
+push @pod, 'Currently we have:';
+push @pod, '';
 for my $s (@series_to_build) {
-    printf $pm "  %s : %s\n", $s->{id}, $s->{long_name};
+    push @pod, sprintf "  %s : %s", $s->{id}, $s->{long_name};
 }
-
-print $pm <<'END_PODC';
-
-=head2 Hash C<%maps>
-
-The keys are short identifiers for each sheet or inset.  Where a map has more than one side, or includes
-insets then, there will be a separate entry for each side and inset.
-
-The value for each key is another hash containing the following items
-
-=over 4
-
-=item bbox
-
-The bounding box of the sheet as a list of two pairs of coordinates (in metres
-from the grid origin)
-
-=item polygon
-  
-A list of pairs of coordinates (in metres from grid origin) that define the
-corners of the sheet.  The list starts at the SW corner (approximately, on some
-sheets it's not entirely obvious where to start), and works round
-anticlockwise.  In all cases the last pair is the same as the first pair.
-
-=item area 
-
-The calculated area of the sheet in square kilometres
-
-=item series
-
-A single letter series identifier -- this will be one of the keys from the
-"name_for_map_series" hash
-
-=item number
-
-The identifier for this map within the series, not including any suffix for a
-sheet or an inset.  The two sides of a single map have the same number.  The
-number is not always an integer - Outdoor Leisure maps are designated "OL14"
-etc.  Those maps known by two numbers have a "number" consisting of both
-numbers divided by a "/"; such as "418/OL60" in the Explorer series.
-
-=item parent
-
-The key of the parent map for an inset.  Main sheets of a map, will have
-"parent" equal to their own key.
-
-=item title
-
-The title of the map.  Different sheets and insets from the same map will have
-the same title.
-
-=back
-END_PODC
-
-print $pm "\n=cut\n\n";
+push @pod, '';
+push @pod, '=head2 Hash C<%maps>';
+push @pod, '';
+push @pod, 'The keys are short identifiers for each sheet or inset.  Where a map has more than one side, or includes';
+push @pod, 'insets then, there will be a separate entry for each side and inset.';
+push @pod, '';
+push @pod, 'The value for each key is another hash containing the following items';
+push @pod, '';
+push @pod, '=over 4';
+push @pod, '';
+push @pod, '=item bbox';
+push @pod, '';
+push @pod, 'The bounding box of the sheet as a list of two pairs of coordinates (in metres';
+push @pod, 'from the grid origin)';
+push @pod, '';
+push @pod, '=item polygon';
+push @pod, '  ';
+push @pod, 'A list of pairs of coordinates (in metres from grid origin) that define the';
+push @pod, 'corners of the sheet.  The list starts at the SW corner (approximately, some do';
+push @pod, 'not have an obvious place to start), and works round anticlockwise.  In all';
+push @pod, 'cases the last pair is the same as the first pair.';
+push @pod, '';
+push @pod, '=item area ';
+push @pod, '';
+push @pod, 'The calculated area of the sheet in square kilometres.';
+push @pod, '';
+push @pod, '=item series';
+push @pod, '';
+push @pod, 'A single letter series identifier -- this will be one of the keys from the';
+push @pod, '"name_for_map_series" hash.';
+push @pod, '';
+push @pod, '=item number';
+push @pod, '';
+push @pod, 'The identifier for this map within the series, not including any suffix for a';
+push @pod, 'sheet or an inset.  The two sides of a single map have the same number.  The';
+push @pod, 'number is not always an integer - Outdoor Leisure maps are designated "OL14"';
+push @pod, 'etc.  Those maps known by two numbers have a "number" consisting of both';
+push @pod, 'numbers divided by a "/"; such as "418/OL60" in the Explorer series.';
+push @pod, '';
+push @pod, '=item parent';
+push @pod, '';
+push @pod, 'The key of the parent map for an inset.  Main sheets of a map will have';
+push @pod, '"parent" equal to their own key.';
+push @pod, '';
+push @pod, '=item title';
+push @pod, '';
+push @pod, 'The title of the map.  Different sheets and insets from the same map will have';
+push @pod, 'the same title.';
+push @pod, '';
+push @pod, '=back';
+push @pod, '';
+push @pod, '=cut';
+push @pod, '';
+print $pm join "\n", @pod;
 close $pm;
 warn sprintf "Wrote %d sheet definitions to maps module\n", scalar @sheets;
 

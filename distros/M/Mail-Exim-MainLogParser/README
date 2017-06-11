@@ -1,0 +1,140 @@
+Mail::Exim::MainLogParser
+============================
+
+Mail::Exim::MainLogParser - Parse log lines from the Exim Main Log
+
+
+Build and install this module:
+
+perl Makefile.PL
+make
+make test
+make install
+
+
+
+NAME
+    Mail::Exim::MainLogParser - Parse log lines from the Exim Main Log
+
+SYNOPSIS
+      use Mail::Exim::MainLogParser;
+      use Data::Dumper;
+      my $exlog = new Mail::Exim::MainLogParser;
+
+      my $logline = "2017-06-08 11:17:56 1dJ08B-0003oP-5i <= do-not-reply@nowhere.com H=realmail.server.example.com (ehlo-name.example.com) [192.168.250.101] P=esmtp S=1364 id=266785270.3.2385849643852@peerhost.server.example.com";
+      $logLineHashStructure = $exlog->parse($logline);
+
+      print Dumper($logLineHashStructure);
+      $VAR1 = {
+              'eximid' => '1dJ08B-0003oP-5i',
+              'time' => '11:17:56',
+              'date' => '2017-06-08',
+              'args' => [
+                          {
+                            'H' => 'realmail.server.example.com (ehlo-name.example.com) [192.168.250.101]'
+                          },
+                          {
+                            'P' => 'esmtp'
+                          },
+                          {
+                            'S' => '1364'
+                          },
+                          {
+                            'id' => '266785270.3.2385849643852@peerhost.server.example.com'
+                          }
+                        ],
+              'address' => 'do-not-reply@nowhere.com',
+              'flag' => '<='
+            };
+
+DESCRIPTION
+    This module will parse log lines from Exim version 4, according to the
+    source
+    http://www.exim.org/exim-html-current/doc/html/spec_html/ch-log_files.ht
+    ml as of 2017-06-08
+
+REQUIREMENTS
+    This module is pure perl and does not depend on other modules. But does
+    depend on a log file from Exim version 4 main log output.
+
+    *   Exim 4
+
+IMPORTED METHODS
+    When the calling application invokes this module in a use clause, the
+    following method can be imported into its space.
+
+    *   "EximMainLoglineParse"
+
+METHODS
+  new
+    Create a new object instances of this module. It is not necessary to
+    create an object for this module, as the methods can be called outside
+    of OO style programming.
+
+    *   *returns*
+
+        An object instance of this module.
+
+        my $eximlog = new Mail::Exim::MainLogParser();
+
+  EximMainLoglineParse
+    See "parse()".
+
+  parse
+    Parse a line from the Exim main log file and return a hash structure.
+
+        $logLineHashStructure = $exlog->parse($logline);
+
+    *   exim_main_log_line
+
+        This is a single line from the Exim main log output. The below
+        example log line is split over several lines in order to fit it on
+        the page.
+
+            2017-06-08 11:17:56 1dJ08B-0003oP-5i <= do-not-reply@nowhere.com
+                H=realmail.server.example.com (ehlo-name.example.com) [192.168.250.101]
+                P=esmtp S=1364 id=266785270.3.2385849643852@peerhost.server.example.com
+
+    This method returns a hash structure of the parsed log line.
+
+        print Dumper($logLineHashStructure);
+        $VAR1 = {
+              'eximid' => '1dJ08B-0003oP-5i',
+              'time' => '11:17:56',
+              'date' => '2017-06-08',
+              'args' => [
+                          {
+                            'H' => 'realmail.server.example.com (ehlo-name.example.com) [192.168.250.101]'
+                          },
+                          {
+                            'P' => 'esmtp'
+                          },
+                          {
+                            'S' => '1364'
+                          },
+                          {
+                            'id' => '266785270.3.2385849643852@peerhost.server.example.com'
+                          }
+                        ],
+              'address' => 'do-not-reply@nowhere.com',
+              'flag' => '<='
+            };
+
+AUTHOR
+    Russell Glaue, http://russ.glaue.org
+
+SEE ALSO
+    http://www.exim.org/exim-html-current/doc/html/spec_html/ch-log_files.ht
+    ml
+
+COPYRIGHT
+    Copyright (c) 2017 Russell E Glaue, Center for the Application of
+    Information Technologies, Western Illinois University All rights
+    reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

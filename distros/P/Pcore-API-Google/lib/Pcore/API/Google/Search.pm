@@ -69,7 +69,7 @@ sub _request ( $self, $url, $cb ) {
         return;
     };
 
-    P->log->sendlog( 'Pcore-API-Google-Search', 'start request' );
+    P->sendlog( 'Pcore-API-Google-Search.DEBUG', 'start request' ) if $ENV{PCORE_API_GOOGLE_SEARCH_DEBUG};
 
     http_get(
         $url,
@@ -85,7 +85,7 @@ sub _request ( $self, $url, $cb ) {
 
                     # store request in the pool if captcha is solved now
                     if ( $self->{_captcha_in_progress} ) {
-                        P->log->sendlog( 'Pcore-API-Google-Search', 'waiting until captcha resolved' );
+                        P->sendlog( 'Pcore-API-Google-Search.DEBUG', 'waiting until captcha resolved' ) if $ENV{PCORE_API_GOOGLE_SEARCH_DEBUG};
 
                         $self->{_threads}--;
 
@@ -108,7 +108,7 @@ sub _request ( $self, $url, $cb ) {
                 }
             }
             elsif ( $res->status == 403 ) {    # IP banned
-                P->log->sendlog( 'Pcore-API-Google-Search', 'IP addr. banned' );
+                P->sendlog( 'Pcore-API-Google-Search.DEBUG', 'IP addr. banned' ) if $ENV{PCORE_API_GOOGLE_SEARCH_DEBUG};
 
                 $on_finish->($res);
             }
@@ -124,7 +124,7 @@ sub _request ( $self, $url, $cb ) {
 }
 
 sub _resolve_captcha ( $self, $url, $res, $cb ) {
-    P->log->sendlog( 'Pcore-API-Google-Search', 'resolving captcha' );
+    P->sendlog( 'Pcore-API-Google-Search.DEBUG', 'resolving captcha' ) if $ENV{PCORE_API_GOOGLE_SEARCH_DEBUG};
 
     my $base_url = $res->url;
 
@@ -176,7 +176,7 @@ sub _resolve_captcha ( $self, $url, $res, $cb ) {
 
                             # captcha recognized incorrectly
                             if ( $res->status == 503 ) {
-                                P->log->sendlog( 'Pcore-API-Google-Search', 'captcha resolving error' );
+                                P->sendlog( 'Pcore-API-Google-Search.DEBUG', 'captcha resolving error' ) if $ENV{PCORE_API_GOOGLE_SEARCH_DEBUG};
 
                                 # TODO report failure to AntiCaptcha
 
@@ -185,7 +185,7 @@ sub _resolve_captcha ( $self, $url, $res, $cb ) {
 
                             # captcha is valid
                             else {
-                                P->log->sendlog( 'Pcore-API-Google-Search', 'captcha OK' );
+                                P->sendlog( 'Pcore-API-Google-Search.DEBUG', 'captcha OK' ) if $ENV{PCORE_API_GOOGLE_SEARCH_DEBUG};
 
                                 $cb->($res);
                             }

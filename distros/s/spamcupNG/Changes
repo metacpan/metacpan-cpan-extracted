@@ -1,0 +1,34 @@
+==================================================
+Changes from 2016-06-06 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 0.4 at 2017-06-06 05:27:36 +0000
+----------------------------------------
+
+  Change: 1b7a986ba2dc6d76b85a3cdd066c95f6d353b494
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-06-01 21:42:35 +0000
+
+    Renamed configuration file
+
+    The expected configuration file is now ".spamcupNG.yml". Fixed the
+    README regarding setup procedures. Now waiting CPAN to cleanup the
+    mess I did with the distribution name to upload it again. :) 
+
+----------------------------------------
+version 0.4 at 2017-06-02 00:32:07 +0000
+----------------------------------------
+
+  Change: cc1530e474ea3158553abdbabe5d196e5239d92d
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-06-01 21:32:07 +0000
+
+    Initial release
+
+    Copied from spamcup-ng, fixed references to the old project Updated
+    the TODO file 
+
+================
+End of releases.
+================

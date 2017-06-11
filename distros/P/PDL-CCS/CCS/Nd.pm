@@ -19,7 +19,7 @@ BEGIN {
   *can = \&UNIVERSAL::can;
 }
 
-our $VERSION = '1.23.3'; ##-- update with perl-reversion from Perl::Version module
+our $VERSION = '1.23.4'; ##-- update with perl-reversion from Perl::Version module
 our @ISA = qw();
 our %EXPORT_TAGS =
   (
@@ -1719,7 +1719,7 @@ foreach my $intop (
 		   qw(and2 or2 xor shiftleft shiftright),
 		  )
   {
-    my $deftype = PDL->can($intop)->(pdl(0),pdl(0),0)->type->ioname;
+    my $deftype = PDL->can($intop)->(PDL->pdl(0),PDL->pdl(0),0)->type->ioname;
     eval "*${intop} = *${intop}_mia = _ccsnd_binary_op_mia('${intop}',PDL->can('${intop}'),PDL::${deftype}());";
     die(__PACKAGE__, ": could not define integer operation $intop: $@") if ($@);
   }

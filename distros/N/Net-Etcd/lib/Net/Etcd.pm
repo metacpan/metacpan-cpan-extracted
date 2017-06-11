@@ -1,6 +1,6 @@
 use utf8;
 package Net::Etcd;
-# ABSTRACT: [depricated] Please see Net::Etcd.
+# ABSTRACT: Provide access to the etcd v3 API.
 
 use strict;
 use warnings;
@@ -27,7 +27,7 @@ Net::Etcd
 
 =cut
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 =head1 SYNOPSIS
 
@@ -282,6 +282,12 @@ Returns a L<Net::Etcd::KV::Put> object.
 =head2 range
 
 Returns a L<Net::Etcd::KV::Range> object.
+
+=cut
+
+=head2 txn
+
+Returns a L<Net::Etcd::KV::Txn> object.
 
 =cut
 

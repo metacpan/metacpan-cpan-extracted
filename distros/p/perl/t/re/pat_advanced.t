@@ -6,9 +6,9 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = qw(../lib .);
     require './test.pl';
     require './charset_tools.pl';
+    set_up_inc(qw '../lib .');
     skip_all_if_miniperl("miniperl can't load Tie::Hash::NamedCapture, need for %+ and %-");
 }
 
@@ -62,7 +62,7 @@ sub run_tests {
     }
 
     {
-        my $message = 'bug id 20001008.001';
+        my $message = 'bug id 20001008.001 (#4407)';
 
         my $strasse = "stra" . uni_to_native("\337") . "e";
         my @x = ("$strasse 138", "$strasse 138");
@@ -947,7 +947,7 @@ sub run_tests {
         ok "\N{LONG-STR}" =~ /^\N{LONG-STR}$/i, 'Verify under folding that long string works';
 
         eval '/(?[[\N{EMPTY-STR}]])/';
-        ok $@ && $@ =~ /Zero length \\N\{}/;
+        ok $@ && $@ =~ /Zero length \\N\{\}/;
 
         undef $w;
         {
@@ -986,41 +986,13 @@ sub run_tests {
                         . "SPACE";
         my $NBSP_utf8 = $NBSP_Latin1;
         utf8::upgrade($NBSP_utf8);
-        eval qq[is("\\N{$NBSP_Latin1}", "$NBSP_Latin1", "An NBSP in character name works")];
-        like ($w, qr/NO-BREAK SPACE in a charnames alias definition is deprecated/, "... but returns a deprecation warning");
+        () = eval qq[is("\\N{$NBSP_Latin1}", "$NBSP_Latin1"];
+        like ($@, qr/Invalid character in \\N\{...}/, "A NO-BREAK SPACE in a charnames alias is fatal");
         undef $w;
             {
             use feature 'unicode_eval';
-            eval qq[use utf8; is("\\N{$NBSP_utf8}", "$NBSP_utf8", "Same under 'use utf8': they work")];
-            like ($w, qr/NO-BREAK SPACE in a charnames alias definition is deprecated/, "... but return a deprecation warning");
-        }
-        {
-            # disable lexical warnings
-            BEGIN { ${^WARNING_BITS} = undef; $^W = 0 }
-            undef $w;
-            () = eval qq["\\N{$NBSP_Latin1}"];
-            like ($w, qr/NO-BREAK SPACE in a charnames alias definition is deprecated/, "And returns a deprecation warning outside of lexical warnings");
-            undef $w;
-            use feature 'unicode_eval';
-            eval qq[use utf8; () = "\\N{$NBSP_utf8}"];
-            like ($w, qr/NO-BREAK SPACE in a charnames alias definition is deprecated/, "... same under utf8");
-        }
-        {
-            no warnings 'deprecated';
-            undef $w;
-            eval qq["\\N{$NBSP_Latin1}"];
-            ok (! defined $w, "... and no warning if warnings are off");
-            use feature 'unicode_eval';
-            eval qq[use utf8; "\\N{$NBSP_utf8}"];
-            ok (! defined $w, "... same under 'use utf8'");
-        }
-        {
-            use warnings FATAL=>'deprecated';
-            () = eval qq["\\N{$NBSP_Latin1}"];
-            like ($@, qr/NO-BREAK SPACE in a charnames alias definition is deprecated/, "... the warning can be fatal");
-            use feature 'unicode_eval';
-            eval qq[use utf8; () = "\\N{$NBSP_utf8}"];
-            like ($@, qr/NO-BREAK SPACE in a charnames alias definition is deprecated/, "... same under utf8");
+            eval qq[use utf8; is("\\N{$NBSP_utf8}"];
+            like ($@, qr/Invalid character in \\N\{...}/, "A NO-BREAK SPACE in a charnames alias is fatal");
         }
 
         {
@@ -1187,11 +1159,6 @@ sub run_tests {
     }
 
     {
-        # \, breaks {3,4}
-        no warnings qw{deprecated regexp};
-        ok "xaaay"    !~ /xa{3\,4}y/, '\, in a pattern';
-        ok "xa{3,4}y" =~ /xa{3\,4}y/, '\, in a pattern';
-
         # \c\ followed by _
         ok "x\c_y"    !~ /x\c\_y/,    '\_ in a pattern';
         ok "x\c\_y"   =~ /x\c\_y/,    '\_ in a pattern';
@@ -2465,6 +2432,15 @@ EOF
                         {},
                         'No segfault [perl #126886]');
     }
+
+    {
+        # [perl 130010]  Downstream application texinfo started to report panics
+        # as of commit a5540cf.
+
+        runperl( prog => 'A::xx(); package A; sub InFullwidth{ return qq|\n| } sub xx { split /[^\s\p{InFullwidth}]/, q|x| }' );
+        ok(! $?, "User-defined pattern did not cause panic [perl 130010]");
+    }
+
 
     # !!! NOTE that tests that aren't at all likely to crash perl should go
     # a ways above, above these last ones.  There's a comment there that, like

@@ -1,0 +1,84 @@
+NAME
+
+    Plack::Session::Store::RedisFast - Redis session store.
+
+    Default implementation of Redis handle is Redis::Fast; otherwise Redis.
+
+    May be overriden through "redis" or "builder" param.
+
+    Default implementation of serializer handle is JSON::XS; otherwise
+    JSON.
+
+    May be overriden through "inflate" and "deflate" param.
+
+SYNOPSIS
+
+      use Plack::Builder;
+      use Plack::Session::Store::RedisFast;
+    
+      my $app = sub {
+          return [ 200, [ 'Content-Type' => 'text/plain' ], [ 'Hello Foo' ] ];
+      };
+    
+      builder {
+          enable 'Session',
+              store => Plack::Session::Store::RedisFast->new;
+          $app;
+      };
+
+DESCRIPTION
+
+    This will persist session data using Redis::Fast or Redis.
+
+    This is a subclass of Plack::Session::Store and implements its full
+    interface.
+
+METHODS
+
+    new ( %params )
+
+    redis
+
+      A simple accessor for the Redis handle.
+
+    builder
+
+      A simple builder for the Redis handle if "redis" not set.
+
+    inflate
+
+      A simple serializer, JSON::XS->new->utf8->allow_nonref->encode or
+      JSON->new->utf8->allow_nonref->encode by default.
+
+    deflate
+
+      A simple deserializer, JSON::XS->new->utf8->allow_nonref->decode or
+      JSON->new->utf8->allow_nonref->decode by default.
+
+    prefix
+
+      A prefix for Redis session ids. 'Plack::Session::Store::RedisFast:'
+      by default.
+
+    expire
+
+      An expire for Redis sessions. "ONE_MONTH" in Time::Seconds by
+      default.
+
+BUGS
+
+    All complex software has bugs lurking in it, and this module is no
+    exception. If you find a bug please fill in GitHub issues.
+
+AUTHOR
+
+    Akzhan Abdulin <akzhan.abdulin@gmail.com>
+
+COPYRIGHT
+
+    Copyright 2017- Akzhan Abdulin
+
+LICENSE
+
+    MIT License
+

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION);
-$VERSION = '3.57';
+$VERSION = '3.59';
 
 =head1 NAME
 
@@ -64,10 +64,12 @@ sub Create {
 
     my @rmax = $dbi->GetQuery('array','GetReportMax');
     my $rmax = @rmax ? ($rmax[0]->[0] || 0) : 0;
+    my @dmax = $dbi->GetQuery('array','GetReleaseDataMax');
+    my $dmax = @dmax ? ($dmax[0]->[0] || 0) : 0;
 
     my $id = 0;
-    my $step = 1000;
-    my ($from,$to) = (0,$step);
+    my $step = 1000000;
+    my ($from,$to) = ($dmax,$step + $dmax);
     while(1) {
         my $changes = 0;
         my @summ = $dbi->GetQuery('hash','GetSummaryBlock',$from,$to);
@@ -80,12 +82,13 @@ sub Create {
                 next;
             }
 
-            $progress->( ".. inserting $row->{id}" )     if(defined $progress);
+            $progress->( ".. inserting $row->{id} for $row->{dist} - $row->{version} = " . $cpan->DistIndex($row->{dist},$row->{version}) )
+                if(defined $progress);
 
             $dbi->DoQuery('InsertReleaseData',
                 $row->{dist},$row->{version},$row->{id},$row->{guid},
 
-                $cpan->check_oncpan($row->{dist},$row->{version}) ? 1 : 2,
+                $cpan->OnCPAN($row->{dist},$row->{version}) ? 1 : 2,
 
                 $row->{version} =~ /_/        ? 2 : 1,
                 $row->{perl} =~ /^5.(7|9|[1-9][13579])/ ? 2 : 1,
@@ -94,7 +97,9 @@ sub Create {
                 $row->{state} eq 'pass'    ? 1 : 0,
                 $row->{state} eq 'fail'    ? 1 : 0,
                 $row->{state} eq 'na'      ? 1 : 0,
-                $row->{state} eq 'unknown' ? 1 : 0);
+                $row->{state} eq 'unknown' ? 1 : 0,
+
+                $cpan->DistIndex($row->{dist},$row->{version}));
 
                 $changes++;
         }
@@ -133,12 +138,13 @@ sub Update {
             my $next = $dbi->Iterator('array','GetReleaseData',$from,$to);
             while( my $row = $next->() ) {
                 $progress->( ".. .. processing $row->[2]" )     if(defined $progress);
-                $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{id}       = $row->[2];
-                $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{guid}     = $row->[3];
-                $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{pass}    += $row->[8];
-                $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{fail}    += $row->[9];
-                $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{na}      += $row->[10];
-                $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{unknown} += $row->[11];
+                $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{id}        = $row->[2];
+                $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{guid}      = $row->[3];
+                $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{pass}     += $row->[8];
+                $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{fail}     += $row->[9];
+                $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{na}       += $row->[10];
+                $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{unknown}  += $row->[11];
+                $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{uploadid}  = $row->[12];
             }
 
             for my $dist (keys %summ) {
@@ -166,10 +172,11 @@ sub Update {
 #                        $dbi->DoQuery('InsertReleaseSummary',
 #                            $summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{id},
 #                            $summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{guid},
-#                            ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{pass}    || 0),
-#                            ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{fail}    || 0),
-#                            ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{na}      || 0),
-#                            ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{unknown} || 0),
+#                            ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{pass}     || 0),
+#                            ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{fail}     || 0),
+#                            ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{na}       || 0),
+#                            ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{unknown}  || 0),
+#                            ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{uploadid} || 0),
 #                            $dist,$vers,$key1,$key2,$key3,$key4);
 #
 #                    } elsif(scalar(@rows) > 0) {
@@ -185,15 +192,17 @@ sub Update {
                             ($rows[0]->{fail}    + ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{fail}    || 0)),
                             ($rows[0]->{na}      + ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{na}      || 0)),
                             ($rows[0]->{unknown} + ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{unknown} || 0)),
+                            ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{uploadid} || 0),
                             $dist,$vers,$key1,$key2,$key3,$key4);
                     } else {
                         $dbi->DoQuery('InsertReleaseSummary',
                             $summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{id},
                             $summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{guid},
-                            ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{pass}    || 0),
-                            ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{fail}    || 0),
-                            ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{na}      || 0),
-                            ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{unknown} || 0),
+                            ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{pass}     || 0),
+                            ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{fail}     || 0),
+                            ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{na}       || 0),
+                            ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{unknown}  || 0),
+                            ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{uploadid} || 0),
                             $dist,$vers,$key1,$key2,$key3,$key4);
                     }
                 }
@@ -221,12 +230,13 @@ sub Rebuild {
     my $next = $dbi->Iterator('array','GetReleaseDataByDistVers',$dist,$vers);
     while( my $row = $next->() ) {
         $progress->( ".. .. processing $row->[2]" )     if(defined $progress);
-        $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{id}       = $row->[2];
-        $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{guid}     = $row->[3];
-        $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{pass}    += $row->[8];
-        $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{fail}    += $row->[9];
-        $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{na}      += $row->[10];
-        $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{unknown} += $row->[11];
+        $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{id}        = $row->[2];
+        $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{guid}      = $row->[3];
+        $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{pass}     += $row->[8];
+        $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{fail}     += $row->[9];
+        $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{na}       += $row->[10];
+        $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{unknown}  += $row->[11];
+        $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{uploadid}  = $row->[12];
     }
     $dbi->DoQuery('DeleteReleaseSummaryByDistVers',$dist,$vers);
     for my $key1 (keys %{ $summ{$dist}{$vers} }) {
@@ -238,10 +248,11 @@ sub Rebuild {
         $dbi->DoQuery('InsertReleaseSummary',
             $summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{id},
             $summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{guid},
-            ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{pass}    || 0),
-            ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{fail}    || 0),
-            ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{na}      || 0),
-            ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{unknown} || 0),
+            ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{pass}     || 0),
+            ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{fail}     || 0),
+            ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{na}       || 0),
+            ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{unknown}  || 0),
+            ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{uploadid} || 0),
             $dist,$vers,$key1,$key2,$key3,$key4);
     }
     }
@@ -261,12 +272,13 @@ sub Fix {
         my $next = $dbi->Iterator('array','GetReleaseDataByDist',$rs->{dist});
         while( my $row = $next->() ) {
             $progress->( ".. .. processing $row->[2]" )     if(defined $progress);
-            $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{id}      = $row->[2];
-            $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{guid}    = $row->[3];
-            $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{pass}    = $row->[8];
-            $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{fail}    = $row->[9];
-            $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{na}      = $row->[10];
-            $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{unknown} = $row->[11];
+            $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{id}        = $row->[2];
+            $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{guid}      = $row->[3];
+            $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{pass}     += $row->[8];
+            $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{fail}     += $row->[9];
+            $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{na}       += $row->[10];
+            $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{unknown}  += $row->[11];
+            $summ{$row->[0]}{$row->[1]}{$row->[4]}{$row->[5]}{$row->[6]}{$row->[7]}{uploadid}  = $row->[12];
         }
 
         $dbi->DoQuery('DeleteReleaseSummaryByDist',$rs->{dist});
@@ -282,10 +294,11 @@ sub Fix {
                 $dbi->DoQuery('InsertReleaseSummary',
                     $summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{id},
                     $summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{guid},
-                    ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{pass}    || 0),
-                    ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{fail}    || 0),
-                    ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{na}      || 0),
-                    ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{unknown} || 0),
+                    ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{pass}     || 0),
+                    ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{fail}     || 0),
+                    ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{na}       || 0),
+                    ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{unknown}  || 0),
+                    ($summ{$dist}{$vers}{$key1}{$key2}{$key3}{$key4}{uploadid} || 0),
                     $dist,$vers,$key1,$key2,$key3,$key4);
             }
             }
@@ -313,7 +326,7 @@ Miss Barbell Productions, L<http://www.missbarbell.co.uk/>
 
 =head1 COPYRIGHT & LICENSE
 
-  Copyright (C) 2008-2015 Barbie for Miss Barbell Productions
+  Copyright (C) 2008-2017 Barbie for Miss Barbell Productions
   All Rights Reserved.
 
   This module is free software; you can redistribute it and/or

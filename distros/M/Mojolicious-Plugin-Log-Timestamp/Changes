@@ -1,3 +1,6 @@
+0.041 2017-06-02
+  - Configure for TravisCI.
+
 0.031 2017-03-30
   - Upgrade for Mojo::File.
   - Minor tweak to package syntax.

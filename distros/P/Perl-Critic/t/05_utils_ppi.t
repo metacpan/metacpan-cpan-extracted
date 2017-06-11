@@ -28,11 +28,10 @@ use Perl::Critic::Utils::PPI qw< :all >;
 
 use Test::More tests => 64;
 
-#-----------------------------------------------------------------------------
+our $VERSION = '1.128';
 
-our $VERSION = '1.126';
-
-#-----------------------------------------------------------------------------
+use Perl::Critic::TestUtils;
+Perl::Critic::TestUtils::assert_version( $VERSION );
 
 my @ppi_statement_classes = qw{
     PPI::Statement
@@ -372,12 +371,6 @@ can_ok('main', 'is_in_subroutine');
     );
     ## use critic
 }
-
-#-----------------------------------------------------------------------------
-
-# ensure we return true if this test is loaded by
-# t/05_utils_ppi.t_without_optional_dependencies.t
-1;
 
 # Local Variables:
 #   mode: cperl

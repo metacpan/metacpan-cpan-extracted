@@ -22,15 +22,15 @@ JSON::Create - fast, minimal, UTF-8-only serialization of data to JSON
 
 produces output
 
-    {"c":"d","a":"b"}
+    {"a":"b","c":"d"}
 
-(This example is included as L<F<examples/synopsis.pl>|https://api.metacpan.org/source/BKB/JSON-Create-0.22/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<examples/synopsis.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.23/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This document describes JSON::Create version 0.22,
-corresponding to git commit c73686ee5a97e8eccc3ab29b1790bd3d8800d1a3 at Fri Jul 15 20:00:54 2016 +0900.
+This document describes JSON::Create version 0.23,
+corresponding to git commit c911ca5956c0c6e88d074f024129b0a040149885 at Tue Jun 6 11:18:35 2017 +0900.
 
 =head1 DESCRIPTION
 
@@ -102,7 +102,7 @@ produces output
 
     {"y":2,"x":1,"z":3}
 
-(This example is included as L<F<examples/hash.pl>|https://api.metacpan.org/source/BKB/JSON-Create-0.22/examples/hash.pl> in the distribution.)
+(This example is included as L<F<examples/hash.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.23/examples/hash.pl> in the distribution.)
 
 
 Nested hashes are recursively followed:
@@ -124,9 +124,9 @@ Nested hashes are recursively followed:
 
 produces output
 
-    {"a":{"b":4,"c":5},"x":{"y":2,"z":3}}
+    {"a":{"c":5,"b":4},"x":{"y":2,"z":3}}
 
-(This example is included as L<F<examples/nested-hash.pl>|https://api.metacpan.org/source/BKB/JSON-Create-0.22/examples/nested-hash.pl> in the distribution.)
+(This example is included as L<F<examples/nested-hash.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.23/examples/nested-hash.pl> in the distribution.)
 
 
 =head2 Arrays
@@ -144,7 +144,7 @@ produces output
 
     [1,2,2.5,"mocha","dusty","milky","Tico","Rocky","Pinky"]
 
-(This example is included as L<F<examples/array.pl>|https://api.metacpan.org/source/BKB/JSON-Create-0.22/examples/array.pl> in the distribution.)
+(This example is included as L<F<examples/array.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.23/examples/array.pl> in the distribution.)
 
 
 Nested arrays are recursively followed:
@@ -159,7 +159,7 @@ produces output
 
     [[1,2,2.5],["mocha","dusty","milky"],["Tico","Rocky","Pinky"]]
 
-(This example is included as L<F<examples/nested-array.pl>|https://api.metacpan.org/source/BKB/JSON-Create-0.22/examples/nested-array.pl> in the distribution.)
+(This example is included as L<F<examples/nested-array.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.23/examples/nested-array.pl> in the distribution.)
 
 
 Nested hashes and arrays are converted similarly:
@@ -181,9 +181,9 @@ Nested hashes and arrays are converted similarly:
 
 produces output
 
-    {"numbers":[1,2,2.5,99.99],"dogs":["Tico","Rocky","Pinky"],"fruit":{"australia":"orange","japan":"persimmon","thai":"pineapple"},"cats":["mocha","dusty","milky"]}
+    {"cats":["mocha","dusty","milky"],"dogs":["Tico","Rocky","Pinky"],"numbers":[1,2,2.5,99.99],"fruit":{"thai":"pineapple","australia":"orange","japan":"persimmon"}}
 
-(This example is included as L<F<examples/nested.pl>|https://api.metacpan.org/source/BKB/JSON-Create-0.22/examples/nested.pl> in the distribution.)
+(This example is included as L<F<examples/nested.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.23/examples/nested.pl> in the distribution.)
 
 
 =head2 Scalars
@@ -231,7 +231,7 @@ produces output
 
     {"weird":"\t\r\n\u0000 \"\\/"}
 
-(This example is included as L<F<examples/weirdstring.pl>|https://api.metacpan.org/source/BKB/JSON-Create-0.22/examples/weirdstring.pl> in the distribution.)
+(This example is included as L<F<examples/weirdstring.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.23/examples/weirdstring.pl> in the distribution.)
 
 
 =head4 U+2028 and U+2029 (JavaScript clashes)
@@ -318,7 +318,7 @@ produces output
     Use of uninitialized value in print at /usr/home/ben/projects/json-create/examples/strict-non-finite.pl line 5.
 
 
-(This example is included as L<F<examples/strict-non-finite.pl>|https://api.metacpan.org/source/BKB/JSON-Create-0.22/examples/strict-non-finite.pl> in the distribution.)
+(This example is included as L<F<examples/strict-non-finite.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.23/examples/strict-non-finite.pl> in the distribution.)
 
 
 A JSON::Create object created with L</new> converts in the same way as
@@ -342,7 +342,7 @@ produces output
     {"a":null,"b":[null,null]}
 
 
-(This example is included as L<F<examples/undef.pl>|https://api.metacpan.org/source/BKB/JSON-Create-0.22/examples/undef.pl> in the distribution.)
+(This example is included as L<F<examples/undef.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.23/examples/undef.pl> in the distribution.)
 
 
 =head3 Booleans
@@ -362,7 +362,7 @@ produces output
 
     [true,false,"boo"]
 
-(This example is included as L<F<examples/json-parse-bool.pl>|https://api.metacpan.org/source/BKB/JSON-Create-0.22/examples/json-parse-bool.pl> in the distribution.)
+(This example is included as L<F<examples/json-parse-bool.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.23/examples/json-parse-bool.pl> in the distribution.)
 
 
 Other kinds of object can be converted to booleans using the method
@@ -466,7 +466,7 @@ produces output
     
 
 
-(This example is included as L<F<examples/fatal-errors.pl>|https://api.metacpan.org/source/BKB/JSON-Create-0.22/examples/fatal-errors.pl> in the distribution.)
+(This example is included as L<F<examples/fatal-errors.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.23/examples/fatal-errors.pl> in the distribution.)
 
 
 This method was added in version 0.10 of the module.
@@ -533,11 +533,11 @@ true or false. For example,
 
 produces output
 
-    {"No":0,"Yes":1}
-    {"No":false,"Yes":true}
+    {"Yes":1,"No":0}
+    {"Yes":true,"No":false}
 
 
-(This example is included as L<F<examples/boolean.pl>|https://api.metacpan.org/source/BKB/JSON-Create-0.22/examples/boolean.pl> in the distribution.)
+(This example is included as L<F<examples/boolean.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.23/examples/boolean.pl> in the distribution.)
 
 
 If you prefer to take over all object handling yourself, there is also
@@ -649,7 +649,7 @@ produces output
     {"/dog/":"/run/"}
 
 
-(This example is included as L<F<examples/escape-slash.pl>|https://api.metacpan.org/source/BKB/JSON-Create-0.22/examples/escape-slash.pl> in the distribution.)
+(This example is included as L<F<examples/escape-slash.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.23/examples/escape-slash.pl> in the distribution.)
 
 
 See also L</Other escapes>.
@@ -664,8 +664,6 @@ If called with a true value, this switches off JavaScript protection
 in the output JSON. If called with a false value, the JavaScript
 protection is switched on again.
 
-    
-    binmode STDOUT, ":utf8";
     use JSON::Create;
     my $in = ["\x{2028}"];
     my $jc = JSON::Create->new ();
@@ -681,7 +679,7 @@ produces output
     [" "]
 
 
-(This example is included as L<F<examples/js-safe.pl>|https://api.metacpan.org/source/BKB/JSON-Create-0.22/examples/js-safe.pl> in the distribution.)
+(This example is included as L<F<examples/js-safe.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.23/examples/js-safe.pl> in the distribution.)
 
 
 See also L</U+2028 and U+2029 (JavaScript clashes)>.
@@ -715,7 +713,7 @@ produces output
     {"curry":null}
 
 
-(This example is included as L<F<examples/non-finite-handler.pl>|https://api.metacpan.org/source/BKB/JSON-Create-0.22/examples/non-finite-handler.pl> in the distribution.)
+(This example is included as L<F<examples/non-finite-handler.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.23/examples/non-finite-handler.pl> in the distribution.)
 
 
 =over
@@ -825,7 +823,7 @@ produces output
     {"zilog":"I can address as many as 64 kbytes of memory"}
 
 
-(This example is included as L<F<examples/zilog.pl>|https://api.metacpan.org/source/BKB/JSON-Create-0.22/examples/zilog.pl> in the distribution.)
+(This example is included as L<F<examples/zilog.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.23/examples/zilog.pl> in the distribution.)
 
 
 The function is called "in scalar context", so
@@ -845,7 +843,7 @@ produces output
 
     {"x":"c"}
 
-(This example is included as L<F<examples/too-many-values.pl>|https://api.metacpan.org/source/BKB/JSON-Create-0.22/examples/too-many-values.pl> in the distribution.)
+(This example is included as L<F<examples/too-many-values.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.23/examples/too-many-values.pl> in the distribution.)
 
 
 If you need to pass or return more than a single argument, use a
@@ -875,7 +873,7 @@ produces output
 
     {"cool":false}
 
-(This example is included as L<F<examples/closure.pl>|https://api.metacpan.org/source/BKB/JSON-Create-0.22/examples/closure.pl> in the distribution.)
+(This example is included as L<F<examples/closure.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.23/examples/closure.pl> in the distribution.)
 
 
 Exceptions (fatal errors) are not caught by JSON::Create, so if you
@@ -906,7 +904,7 @@ produces output
     
 
 
-(This example is included as L<F<examples/exception.pl>|https://api.metacpan.org/source/BKB/JSON-Create-0.22/examples/exception.pl> in the distribution.)
+(This example is included as L<F<examples/exception.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.23/examples/exception.pl> in the distribution.)
 
 
 If you prefer to take over all object handling yourself, there is also
@@ -1016,12 +1014,12 @@ user-supplied handler:
 
 produces output
 
-    {"CuriousGeorge":{},"PeterTork":"Monkees","FunkyKong":0,"KingKong":1}
-    {"CuriousGeorge":null,"PeterTork":"Monkees","FunkyKong":false,"KingKong":true}
-    {"CuriousGeorge":{},"PeterTork":"Monkees","FunkyKong":0,"KingKong":1}
+    {"CuriousGeorge":{},"PeterTork":"Monkees","KingKong":1,"FunkyKong":0}
+    {"CuriousGeorge":null,"PeterTork":"Monkees","KingKong":true,"FunkyKong":false}
+    {"CuriousGeorge":{},"PeterTork":"Monkees","KingKong":1,"FunkyKong":0}
 
 
-(This example is included as L<F<examples/obj-handler.pl>|https://api.metacpan.org/source/BKB/JSON-Create-0.22/examples/obj-handler.pl> in the distribution.)
+(This example is included as L<F<examples/obj-handler.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.23/examples/obj-handler.pl> in the distribution.)
 
 
 Here is an example of a "try harder" routine which does something like
@@ -1064,12 +1062,12 @@ the L<JSON> module does, by looking for methods on all objects:
 
 produces output
 
-    Jsonifying Path::Tiny with 'TO_JSON'.
     Stringifying Mojo::URL with 'to_string'.
-    {"path":"/home/ben/software/install/bin/perl","url":"http://sri:foo@example.com:3000/foo?foo=bar#23"}
+    Jsonifying Path::Tiny with 'TO_JSON'.
+    {"url":"http://example.com:3000/foo?foo=bar#23","path":"/home/ben/software/install/bin/perl"}
 
 
-(This example is included as L<F<examples/try-harder.pl>|https://api.metacpan.org/source/BKB/JSON-Create-0.22/examples/try-harder.pl> in the distribution.)
+(This example is included as L<F<examples/try-harder.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.23/examples/try-harder.pl> in the distribution.)
 
 
 This C<obj_handler> overrides whatever you have set with L</bool> or
@@ -1127,7 +1125,7 @@ produces output
     [1e+09,3.14159,1e-09]
 
 
-(This example is included as L<F<examples/set-fformat.pl>|https://api.metacpan.org/source/BKB/JSON-Create-0.22/examples/set-fformat.pl> in the distribution.)
+(This example is included as L<F<examples/set-fformat.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.23/examples/set-fformat.pl> in the distribution.)
 
 
 This method was added in version 0.07 of the module.
@@ -1230,9 +1228,9 @@ The following example shows a few possibilities for handling types:
 produces output
 
     Wide character in print at /usr/home/ben/projects/json-create/examples/type-handler.pl line 30.
-    {"glob":{"value":"GLOB(0x28806d80)","type":"GLOB"},"code":{"type":"CODE","value":"강남스타일"},"regex":{"value":"(?^:.*)","type":"Regexp"}}
+    {"code":{"value":"강남스타일","type":"CODE"},"glob":{"type":"GLOB","value":"GLOB(0x28806d80)"},"regex":{"type":"Regexp","value":"(?^:.*)"}}
 
-(This example is included as L<F<examples/type-handler.pl>|https://api.metacpan.org/source/BKB/JSON-Create-0.22/examples/type-handler.pl> in the distribution.)
+(This example is included as L<F<examples/type-handler.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.23/examples/type-handler.pl> in the distribution.)
 
 
 If the L</strict> option is chosen, this method is also passed scalar
@@ -1261,7 +1259,7 @@ produces output
     1
 
 
-(This example is included as L<F<examples/type-handler-scalar.pl>|https://api.metacpan.org/source/BKB/JSON-Create-0.22/examples/type-handler-scalar.pl> in the distribution.)
+(This example is included as L<F<examples/type-handler-scalar.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.23/examples/type-handler-scalar.pl> in the distribution.)
 
 
 This method was added in version 0.10 of the module.
@@ -1278,7 +1276,6 @@ For example,
     
     use JSON::Create;
     use utf8;
-    binmode STDOUT, ":utf8";
     my $jc = JSON::Create->new ();
     my $in = '赤ブöＡↂϪ';
     print $jc->run ($in), "\n";
@@ -1298,7 +1295,7 @@ produces output
     "赤ブöＡↂϪ"
 
 
-(This example is included as L<F<examples/escape-all.pl>|https://api.metacpan.org/source/BKB/JSON-Create-0.22/examples/escape-all.pl> in the distribution.)
+(This example is included as L<F<examples/escape-all.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.23/examples/escape-all.pl> in the distribution.)
 
 
 Note that JSON::Create contains its own UTF-8 validation, and this
@@ -1327,7 +1324,7 @@ produces output
     "赤ブöＡↂϪ"
 
 
-(This example is included as L<F<examples/escape-all-no-utf8.pl>|https://api.metacpan.org/source/BKB/JSON-Create-0.22/examples/escape-all-no-utf8.pl> in the distribution.)
+(This example is included as L<F<examples/escape-all-no-utf8.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.23/examples/escape-all-no-utf8.pl> in the distribution.)
 
 
 See also L</Input strings must be UTF-8>.
@@ -1403,7 +1400,6 @@ To illustrate this, examine the following example:
     use JSON::Create 'create_json';
     use utf8;
     $| = 1;
-    binmode STDOUT, ":encoding(utf8)";
     print create_json ('赤ブöＡↂϪ'), "\n";
     no utf8;
     binmode STDOUT, ":raw";
@@ -1420,7 +1416,7 @@ produces output
     
 
 
-(This example is included as L<F<examples/valid-chars.pl>|https://api.metacpan.org/source/BKB/JSON-Create-0.22/examples/valid-chars.pl> in the distribution.)
+(This example is included as L<F<examples/valid-chars.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.23/examples/valid-chars.pl> in the distribution.)
 
 
 The point here is that the UTF-8 validation is carried out regardless
@@ -1473,18 +1469,17 @@ JSON::Create:
     use utf8;
     my $y = 'さしすせそ';
     my $v = {x => $x, y => $y};
-    binmode STDOUT, ":encoding(utf8)";
     print to_json ($v), "\n";
     print create_json ($v), "\n";
 
 
 produces output
 
-    {"y":"さしすせそ","x":"ããããã"}
-    {"y":"さしすせそ","x":"かきくけこ"}
+    {"x":"ããããã","y":"さしすせそ"}
+    {"x":"かきくけこ","y":"さしすせそ"}
 
 
-(This example is included as L<F<examples/json-unicode.pl>|https://api.metacpan.org/source/BKB/JSON-Create-0.22/examples/json-unicode.pl> in the distribution.)
+(This example is included as L<F<examples/json-unicode.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.23/examples/json-unicode.pl> in the distribution.)
 
 
 The Perl convention is that if a non-utf8 string and a utf8 string are
@@ -1508,7 +1503,6 @@ This example illustrates what happens with non-UTF-8 bytes:
     use utf8;
     my $y = 'さしすせそ';
     my $v = {x => $x, y => $y};
-    binmode STDOUT, ":encoding(utf8)";
     print to_json ($v), "\n";
     print create_json ($v), "\n";
 
@@ -1521,7 +1515,7 @@ produces output
     
 
 
-(This example is included as L<F<examples/json-unicode-gzip-bytes.pl>|https://api.metacpan.org/source/BKB/JSON-Create-0.22/examples/json-unicode-gzip-bytes.pl> in the distribution.)
+(This example is included as L<F<examples/json-unicode-gzip-bytes.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.23/examples/json-unicode-gzip-bytes.pl> in the distribution.)
 
 
 =item Using replace_bad_utf8 may cause a utf8 upgrade
@@ -1562,7 +1556,7 @@ produces output
     Use of uninitialized value in print at /usr/home/ben/projects/json-create/examples/user-bad-utf8.pl line 11.
 
 
-(This example is included as L<F<examples/user-bad-utf8.pl>|https://api.metacpan.org/source/BKB/JSON-Create-0.22/examples/user-bad-utf8.pl> in the distribution.)
+(This example is included as L<F<examples/user-bad-utf8.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.23/examples/user-bad-utf8.pl> in the distribution.)
 
 
 =back
@@ -1800,18 +1794,10 @@ JSON::Create.
 
 Ben Bullock, <bkb@cpan.org>
 
-=head2 Request
-
-If you'd like to see this module continued, let me know that you're
-using it. For example, send an email, write a bug report, star the
-project's github repository, add a patch, add a C<++> on Metacpan.org,
-or write a rating at CPAN ratings. It really does make a
-difference. Thanks.
-
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2015-2016
+2015-2017
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

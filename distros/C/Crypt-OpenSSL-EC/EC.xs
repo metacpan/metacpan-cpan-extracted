@@ -315,6 +315,14 @@ EC_POINT_bn2point(const EC_GROUP *group, const BIGNUM *bn, EC_POINT *point, BN_C
 
 char *
 EC_POINT_point2hex(const EC_GROUP *group, const EC_POINT *point, point_conversion_form_t theform, BN_CTX *ctx)
+	PREINIT:
+                char* hex;
+	CODE: 
+	        hex =  EC_POINT_point2hex(group, point, theform, ctx);
+                sv_setpv(TARG, hex);
+	        Safefree(hex);
+                ST(0) = TARG;
+		  
 
 EC_POINT *
 EC_POINT_hex2point(const EC_GROUP *group, const char *buf, EC_POINT *point, BN_CTX *ctx)

@@ -326,7 +326,7 @@ Returns true if there is still data to come from the handle.
 
 sub grow_buffer {
     my $self = shift;
-    local $/ = \($self->{'min_buffer'}*2);
+    local $/ = $self->{'min_buffer'}? \($self->{'min_buffer'}*2) : undef;
     $self->{'buffer'} .= readline($_[0]) // return 0;
     return 1 && $self->{'min_buffer'};
 }

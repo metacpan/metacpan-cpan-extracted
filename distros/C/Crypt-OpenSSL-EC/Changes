@@ -1,5 +1,11 @@
 Revision history for Perl extension Crypt::OpenSSL::EC.
 
+1.3	 2017-06-01
+	 Fixed test failures in t/prime-field.t if EC2M is not available in OpenSSL
+	 
+1.2	 2017-06-01
+	 Fixed leak in EC_POINT::point2hex, reported by OLEG
+	 
 1.01  2015-01-29
       Added some more tests.
       Fixed crashes associated with get0_private_key and get0_group.

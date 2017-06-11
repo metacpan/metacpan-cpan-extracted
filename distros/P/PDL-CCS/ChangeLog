@@ -1,3 +1,11 @@
+##-*- Mode: Change-Log; coding: utf-8; -*-
+##
+## Change log for perl distribution PDL::CCS
+
+v1.23.4 Tue, 06 Jun 2017 10:17:44 +0200 moocow
+	+ fixed bogus bareword pdl() call in CCS/Nd.pm (RT bug #121952)
+	+ added 'use lib "."' to Makefile.PL (RT bug #121661)
+
 v1.23.3 Mon, 06 Jun 2016 14:45:29 +0200 moocow
 	+ fixed ccs_wfits() typecast-to-long hack for indx types
 	  - feature request including patch posted to https://sourceforge.net/p/pdl/bugs/421/

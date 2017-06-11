@@ -4,7 +4,7 @@ Test2::Plugin::NoWarnings - Fail if tests warn
 
 # VERSION
 
-version 0.05
+version 0.06
 
 # SYNOPSIS
 
@@ -32,10 +32,13 @@ you can ask for this with the `echo` import argument:
 
 # SUPPORT
 
-Bugs may be submitted through [the RT bug tracker](http://rt.cpan.org/Public/Dist/Display.html?Name=Test2-Plugin-NoWarnings)
-(or [bug-test2-plugin-nowarnings@rt.cpan.org](mailto:bug-test2-plugin-nowarnings@rt.cpan.org)).
+Bugs may be submitted at [http://rt.cpan.org/Public/Dist/Display.html?Name=Test2-Plugin-NoWarnings](http://rt.cpan.org/Public/Dist/Display.html?Name=Test2-Plugin-NoWarnings) or via email to [bug-test2-plugin-nowarnings@rt.cpan.org](mailto:bug-test2-plugin-nowarnings@rt.cpan.org).
 
-I am also usually active on IRC as 'drolsky' on `irc://irc.perl.org`.
+I am also usually active on IRC as 'autarch' on `irc://irc.perl.org`.
+
+# SOURCE
+
+The source code repository for Test2-Plugin-NoWarnings can be found at [https://github.com/houseabsolute/Test2-Plugin-NoWarnings](https://github.com/houseabsolute/Test2-Plugin-NoWarnings).
 
 # DONATIONS
 
@@ -60,8 +63,11 @@ Dave Rolsky <autarch@urth.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Dave Rolsky.
+This software is Copyright (c) 2017 by Dave Rolsky.
 
 This is free software, licensed under:
 
     The Artistic License 2.0 (GPL Compatible)
+
+The full text of the license can be found in the
+`LICENSE` file included with this distribution.

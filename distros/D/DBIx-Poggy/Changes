@@ -1,3 +1,14 @@
+0.08 2017-06-01
+
+    * INCOMPATIBLE: handles with transactions are not released
+      to the pool after commit/rollback. They behave as any other
+      handle and gets released on "destruction"
+    * don't listen IO when a query gets rejected by error in pg_ready
+      call
+    * calls to commit/rollback are not allowed (die) when there is
+      an active query on the handle
+    * update documentation
+
 0.07 2017-05-08
 
     * ping DB if we take 30+ seconds old handle from the pool

@@ -7,7 +7,7 @@ use Moo;
 use MooX::StrictConstructor;
 use namespace::autoclean;
 
-our $VERSION = '1.026';
+our $VERSION = '1.027';
 
 with qw(
     Locale::TextDomain::OO::Lexicon::Role::File
@@ -30,13 +30,13 @@ __END__
 
 Locale::TextDomain::OO::Lexicon::File::MO - Gettext mo file as lexicon
 
-$Id: MO.pm 467 2014-01-20 15:56:22Z steffenw $
+$Id: MO.pm 651 2017-05-31 18:10:43Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/module/trunk/lib/Locale/TextDomain/OO/Lexicon/File/MO.pm $
 
 =head1 VERSION
 
-1.026
+1.027
 
 =head1 DESCRIPTION
 
@@ -45,6 +45,7 @@ This module reads a gettext mo file into the lexicon.
 =head1 SYNOPSIS
 
     use Locale::TextDomain::OO::Lexicon::File::MO;
+    use Log::Any qw($log);
 
     Locale::TextDomain::OO::Lexicon::File::MO
         ->new(
@@ -59,7 +60,7 @@ This module reads a gettext mo file into the lexicon.
             logger => sub {
                 my ($message, $arg_ref) = @_;
                 my $type = $arg_ref->{type}; # debug
-                Log::Log4perl->get_logger(...)->$type($message);
+                $log->$type($message);
                 return;
             },
         )
@@ -121,7 +122,7 @@ Set the logger
         sub {
             my ($message, $arg_ref) = @_;
             my $type = $arg_ref->{type};
-            Log::Log4perl->get_logger(...)->$type($message);
+            $log->$type($message);
             return;
         },
     );
@@ -173,7 +174,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2013 - 2014,
+Copyright (c) 2013 - 2017,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

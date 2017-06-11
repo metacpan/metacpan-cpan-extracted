@@ -1,5 +1,9 @@
 Revision history for Dancer2-Plugin-Auth-OAuth
 
+0.12  2017-05-30 23:06:50 CEST
+        - minor twitter changes
+        - Salesforce added (tests welcome!), thanks to TheAmigo
+
 0.11  2017-01-14 01:42:58 CET
         - documentation fix as reported by biafra
         - LinkedIn added

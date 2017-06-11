@@ -26,73 +26,73 @@ no_index:
 provides:
   Perl::Critic::Freenode:
     file: lib/Perl/Critic/Freenode.pm
-    version: '0.020'
+    version: '0.021'
   Perl::Critic::Freenode::Utils:
     file: lib/Perl/Critic/Freenode/Utils.pm
-    version: '0.020'
+    version: '0.021'
   Perl::Critic::Policy::Freenode::AmpersandSubCalls:
     file: lib/Perl/Critic/Policy/Freenode/AmpersandSubCalls.pm
-    version: '0.020'
+    version: '0.021'
   Perl::Critic::Policy::Freenode::ArrayAssignAref:
     file: lib/Perl/Critic/Policy/Freenode/ArrayAssignAref.pm
-    version: '0.020'
+    version: '0.021'
   Perl::Critic::Policy::Freenode::BarewordFilehandles:
     file: lib/Perl/Critic/Policy/Freenode/BarewordFilehandles.pm
-    version: '0.020'
+    version: '0.021'
   Perl::Critic::Policy::Freenode::ConditionalDeclarations:
     file: lib/Perl/Critic/Policy/Freenode/ConditionalDeclarations.pm
-    version: '0.020'
+    version: '0.021'
   Perl::Critic::Policy::Freenode::ConditionalImplicitReturn:
     file: lib/Perl/Critic/Policy/Freenode/ConditionalImplicitReturn.pm
-    version: '0.020'
+    version: '0.021'
   Perl::Critic::Policy::Freenode::DeprecatedFeatures:
     file: lib/Perl/Critic/Policy/Freenode/DeprecatedFeatures.pm
-    version: '0.020'
+    version: '0.021'
   Perl::Critic::Policy::Freenode::DiscouragedModules:
     file: lib/Perl/Critic/Policy/Freenode/DiscouragedModules.pm
-    version: '0.020'
+    version: '0.021'
   Perl::Critic::Policy::Freenode::DollarAB:
     file: lib/Perl/Critic/Policy/Freenode/DollarAB.pm
-    version: '0.020'
+    version: '0.021'
   Perl::Critic::Policy::Freenode::Each:
     file: lib/Perl/Critic/Policy/Freenode/Each.pm
-    version: '0.020'
+    version: '0.021'
   Perl::Critic::Policy::Freenode::EmptyReturn:
     file: lib/Perl/Critic/Policy/Freenode/EmptyReturn.pm
-    version: '0.020'
+    version: '0.021'
   Perl::Critic::Policy::Freenode::IndirectObjectNotation:
     file: lib/Perl/Critic/Policy/Freenode/IndirectObjectNotation.pm
-    version: '0.020'
+    version: '0.021'
   Perl::Critic::Policy::Freenode::ModPerl:
     file: lib/Perl/Critic/Policy/Freenode/ModPerl.pm
-    version: '0.020'
+    version: '0.021'
   Perl::Critic::Policy::Freenode::OpenArgs:
     file: lib/Perl/Critic/Policy/Freenode/OpenArgs.pm
-    version: '0.020'
+    version: '0.021'
   Perl::Critic::Policy::Freenode::OverloadOptions:
     file: lib/Perl/Critic/Policy/Freenode/OverloadOptions.pm
-    version: '0.020'
+    version: '0.021'
   Perl::Critic::Policy::Freenode::POSIXImports:
     file: lib/Perl/Critic/Policy/Freenode/POSIXImports.pm
-    version: '0.020'
+    version: '0.021'
   Perl::Critic::Policy::Freenode::Prototypes:
     file: lib/Perl/Critic/Policy/Freenode/Prototypes.pm
-    version: '0.020'
+    version: '0.021'
   Perl::Critic::Policy::Freenode::StrictWarnings:
     file: lib/Perl/Critic/Policy/Freenode/StrictWarnings.pm
-    version: '0.020'
+    version: '0.021'
   Perl::Critic::Policy::Freenode::Threads:
     file: lib/Perl/Critic/Policy/Freenode/Threads.pm
-    version: '0.020'
+    version: '0.021'
   Perl::Critic::Policy::Freenode::Wantarray:
     file: lib/Perl/Critic/Policy/Freenode/Wantarray.pm
-    version: '0.020'
+    version: '0.021'
   Perl::Critic::Policy::Freenode::WarningsSwitch:
     file: lib/Perl/Critic/Policy/Freenode/WarningsSwitch.pm
-    version: '0.020'
+    version: '0.021'
   Perl::Critic::Policy::Freenode::WhileDiamondDefaultAssignment:
     file: lib/Perl/Critic/Policy/Freenode/WhileDiamondDefaultAssignment.pm
-    version: '0.020'
+    version: '0.021'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -111,10 +111,10 @@ resources:
   bugtracker: https://github.com/Grinnz/Perl-Critic-Freenode/issues
   homepage: https://github.com/Grinnz/Perl-Critic-Freenode
   repository: https://github.com/Grinnz/Perl-Critic-Freenode.git
-version: '0.020'
+version: '0.021'
 x_Dist_Zilla:
   perl:
-    version: '5.024000'
+    version: '5.026000'
   plugins:
     -
       class: Dist::Zilla::Plugin::GithubMeta
@@ -163,13 +163,13 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          'git --version': 2.5.5
+          git_version: 2.5.5
           include_authors: 0
           include_releaser: 1
           order_by: name
           paths: []
       name: '@Author::DBOOK/Git::Contributors'
-      version: '0.029'
+      version: '0.030'
     -
       class: Dist::Zilla::Plugin::MetaNoIndex
       name: '@Author::DBOOK/MetaNoIndex'
@@ -195,10 +195,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.5.5
+          git_version: 2.5.5
           repo_root: .
       name: '@Author::DBOOK/Git::Check'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::RewriteVersion
       config:
@@ -248,12 +248,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.5.5
+          git_version: 2.5.5
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::DBOOK/Git::Commit'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -261,16 +261,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.020
+          tag: v0.021
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.5.5
+          git_version: 2.5.5
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::DBOOK/Git::Tag'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease
       config:
@@ -296,12 +296,12 @@ x_Dist_Zilla:
             - (?^:^(?:lib|script|bin)/)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.5.5
+          git_version: 2.5.5
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::DBOOK/Commit_Version_Bump'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -310,10 +310,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.5.5
+          git_version: 2.5.5
           repo_root: .
       name: '@Author::DBOOK/Git::Push'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::DBOOK/PodSyntaxTests'
@@ -321,7 +321,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@Author::DBOOK/Test::ReportPrereqs'
-      version: '0.025'
+      version: '0.027'
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
@@ -343,7 +343,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@Author::DBOOK/Git::GatherDir'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Regenerate::AfterReleasers
       config:

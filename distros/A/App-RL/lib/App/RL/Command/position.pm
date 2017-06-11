@@ -18,7 +18,7 @@ sub opt_spec {
 }
 
 sub usage_desc {
-    return "runlist position [options] <runlist file> <position files>";
+    return "runlist position [options] <runlist file> <position file>";
 }
 
 sub description {
@@ -35,7 +35,7 @@ sub validate_args {
     my ( $self, $opt, $args ) = @_;
 
     if ( @{$args} < 2 ) {
-        my $message = "This command need two or more input files.\n\tIt found";
+        my $message = "This command need two input files.\n\tIt found";
         $message .= sprintf " [%s]", $_ for @{$args};
         $message .= ".\n";
         $self->usage_error($message);

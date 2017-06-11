@@ -1,5 +1,7 @@
 # Load the Module::Install bundled in ./inc/
+use lib ".";
 use strict;
+use warnings;
 use inc::Module::Install 1.05;
 
 my $from = 'lib/Mail/Builder.pm';

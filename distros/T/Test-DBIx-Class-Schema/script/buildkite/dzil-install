@@ -1,9 +1,0 @@
-#!/bin/bash
-
-# https://buildkite.com/docs/guides/writing-build-scripts
-set -eo pipefail
-
-source ~/perl5/perlbrew/etc/bashrc
-
-# install dist-zilla!
-cpanm --notest Dist::Zilla

@@ -1,13 +1,15 @@
 use strict;
 use warnings;
+use lib 't/lib';
 use Test::More;
 use File::Spec;
 use File::Basename qw(dirname);
-use File::Temp ();
-use File::Path;
+use TempDir;
 use Config;
 use local::lib ();
 use IPC::Open3 qw(open3);
+use lib 't/lib';
+use ENVDumper qw(undump);
 
 my @ext = $^O eq 'MSWin32' ? (split /\Q$Config{path_sep}/, $ENV{PATHEXT}) : ();
 sub which {
@@ -21,16 +23,16 @@ sub which {
 }
 
 BEGIN {
-    *quote_literal =
-      $^O ne 'MSWin32'
-        ? sub { $_[0] }
-        : sub {
-          my ($text) = @_;
-          $text =~ s{(\\*)(?="|\z)}{$1$1}g;
-          $text =~ s{"}{\\"}g;
-          $text = qq{"$text"};
-          return $text;
-        };
+  *quote_literal =
+    $^O ne 'MSWin32'
+      ? sub { $_[0] }
+      : sub {
+        my ($text) = @_;
+        $text =~ s{(\\*)(?="|\z)}{$1$1}g;
+        $text =~ s{"}{\\"}g;
+        $text = qq{"$text"};
+        return $text;
+      };
 }
 
 my %shell_path;
@@ -49,6 +51,7 @@ my %shell_path;
 
 my @extra_lib = ('-I' . dirname(dirname($INC{'local/lib.pm'})));
 my $nul = File::Spec->devnull;
+my $perl = local::lib::_perl();
 
 my @shells;
 for my $shell (
@@ -97,16 +100,26 @@ for my $shell (
     opt => '/Q /D /C',
     test => '/Q /D /C "exit 0"',
     ext => 'bat',
-    perl => qq{@"$^X"},
+    perl => qq{@"$perl"},
     skip => $^O ne 'MSWin32',
   },
   {
     name => 'powershell.exe',
     shell => which('powershell.exe'),
-    opt => '-NoProfile -ExecutionPolicy Unrestricted -File',
-    test => '-NoProfile -Command "exit 0"',
+    opt => '-Version 2 -NoProfile -ExecutionPolicy Bypass -Command "& { . $args[0]; Exit $LastExitCode }"',
+    test => q{-Version 2 -NoProfile -ExecutionPolicy Bypass -Command "If ((Get-ExecutionPolicy) -eq 'Unrestricted') { Exit 0 } Exit 1"},
     ext => 'ps1',
-    perl => qq{& '$^X'},
+    perl => qq{& '$perl'},
+    skip => $^O ne 'MSWin32',
+  },
+  {
+    name => 'powershell1',
+    exe => 'powershell.exe',
+    shell => which('powershell.exe'),
+    opt => '-NoProfile -Command "& { . $args[0]; Exit $LastExitCode }"',
+    test => q{-NoProfile -Command "If (-Not (Test-Path variable:PSVersionTable)) { If ((Get-ExecutionPolicy) -eq 'Unrestricted') { exit 0 } } exit 1"},
+    ext => 'ps1',
+    perl => qq{& '$perl'},
     skip => $^O ne 'MSWin32',
   },
 ) {
@@ -114,7 +127,7 @@ for my $shell (
   my $exe = $shell->{exe} || $name;
   $shell->{shell} ||= $shell_path{$exe};
   $shell->{ext}   ||= $exe;
-  $shell->{perl}  ||= qq{"$^X"};
+  $shell->{perl}  ||= qq{"$perl"};
   if (@ARGV) {
     next
       if !grep {$_ eq $name} @ARGV;
@@ -130,7 +143,7 @@ for my $shell (
   elsif ($shell->{test}) {
     no warnings 'exec';
     if (system "$shell->{shell} $shell->{test} > $nul 2> $nul") {
-      diag "$name seems broken, skipping";
+      print "# $name is unusable, skipping\n";
       next;
     }
   }
@@ -156,8 +169,11 @@ plan tests => @shells * (@vars * 2 + @strings * 2);
 my $sep = $Config{path_sep};
 
 my $root = File::Spec->rootdir;
+my $home = mk_temp_dir;
+$ENV{HOME} = $home;
+
 for my $shell (@shells) {
-  my $ll = local::lib->normalize_path(File::Temp::tempdir(CLEANUP => 1));
+  my $ll = local::lib->normalize_path(mk_temp_dir);
   local $ENV{$_}
     for @vars;
   delete $ENV{$_}
@@ -229,7 +245,7 @@ sub call_ll {
   open my $in, '<', File::Spec->devnull;
   open my $err, '>', File::Spec->devnull;
   open3 $in, my $out, $err,
-    $^X, @extra_lib, '-Mlocal::lib', '-', '--no-create',
+    $perl, @extra_lib, '-Mlocal::lib', '-', '--no-create',
     map { quote_literal($_) } @options
     or die "blah";
   my $script = do { local $/; <$out> };
@@ -239,14 +255,10 @@ sub call_ll {
 
 sub call_shell {
   my ($info, $script) = @_;
-  $script .= "\n" . qq{$info->{perl} -It/lib -MENVDumper -e1\n};
+  $script .= "\n" . qq{$info->{perl} -It/lib -MENVDumper=--dump -e1\n};
 
-  my ($fh, $file) = File::Temp::tempfile(
-    'll-test-script-XXXXX',
-    DIR      => File::Spec->tmpdir,
-    SUFFIX   => '.'.$info->{ext},
-    UNLINK   => 1,
-  );
+  my ($fh, $file) = mk_temp_file({SUFFIX => '.'.$info->{ext}});
+  binmode $fh;
   print { $fh } $script;
   close $fh;
 
@@ -256,9 +268,9 @@ sub call_shell {
   if ($?) {
     diag "script:\n$script";
     diag "running:\n$cmd";
+    diag "output:\n$output";
     diag "failed with code: $?";
     return {};
   }
-  my $env = eval $output or die "bad output: $@";
-  $env;
+  undump $output;
 }

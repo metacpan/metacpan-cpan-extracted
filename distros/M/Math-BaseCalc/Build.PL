@@ -18,7 +18,7 @@ my %module_build_args = (
     "Ken Williams <kwilliams\@cpan.org>"
   ],
   "dist_name" => "Math-BaseCalc",
-  "dist_version" => "1.017",
+  "dist_version" => "1.019",
   "license" => "perl",
   "module_name" => "Math::BaseCalc",
   "recommends" => {},
@@ -26,29 +26,26 @@ my %module_build_args = (
   "requires" => {
     "Carp" => 0,
     "integer" => 0,
-    "strict" => 0,
-    "vars" => 0
+    "strict" => 0
   },
   "script_files" => [],
   "test_requires" => {
-    "Config" => 0,
     "Test::More" => 0,
     "warnings" => 0
   }
 );
 
 
+my %fallback_build_requires = (
+  "Module::Build" => "0.3601",
+  "Test::More" => 0,
+  "warnings" => 0
+);
+
+
 unless ( eval { Module::Build->VERSION(0.4004) } ) {
-  my $tr = delete $module_build_args{test_requires};
-  my $br = $module_build_args{build_requires};
-  for my $mod ( keys %$tr ) {
-    if ( exists $br->{$mod} ) {
-      $br->{$mod} = $tr->{$mod} if $tr->{$mod} > $br->{$mod};
-    }
-    else {
-      $br->{$mod} = $tr->{$mod};
-    }
-  }
+  delete $module_build_args{test_requires};
+  $module_build_args{build_requires} = \%fallback_build_requires;
 }
 
 my $build = Module::Build->new(%module_build_args);

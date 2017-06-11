@@ -67,6 +67,7 @@ unless(GetOptions(\%options,
                   'all-fixups', 'early-fixup=s@', 'late-fixup=s@', 'valgrind',
                   'check-args', 'check-shebang!', 'usage|help|?', 'gold=s',
                   'module=s', 'with-module=s', 'cpan-config-dir=s',
+                  'no-module-tests',
                   'A=s@',
                   'D=s@' => sub {
                       my (undef, $val) = @_;
@@ -130,6 +131,10 @@ pod2usage(exitval => 255, verbose => 1)
     unless @ARGV || $match || $options{'test-build'} || defined $options{'one-liner'} || defined $options{module};
 pod2usage(exitval => 255, verbose => 1)
     if !$options{'one-liner'} && ($options{l} || $options{w});
+if ($options{'no-module-tests'} && $options{module}) {
+    print STDERR "--module and --no-module-tests are exclusive.\n\n";
+    pod2usage(exitval => 255, verbose => 1)
+}
 
 check_shebang($ARGV[0])
     if $options{'check-shebang'} && @ARGV && !$options{match};
@@ -595,6 +600,18 @@ modules and they can then be used in other tests.
 For example:
 
   .../Porting/bisect.pl --with-module=Moose -e 'use Moose; ...'
+
+=item *
+
+--no-module-tests
+
+Use in conjunction with I<--with-module> to install the modules without
+running their tests. This can be a big time saver.
+
+For example:
+
+  .../Porting/bisect.pl --with-module=Moose --no-module-tests \
+       -e 'use Moose; ...'
 
 =item *
 
@@ -1249,7 +1266,7 @@ sub match_and_exit {
         while (<$fh>) {
             if ($_ =~ $re) {
                 ++$matches;
-                if (/[^[:^cntrl:]\h\v]/a) { # Matches non-spacing non-C1 controls
+                if (/[^[:^cntrl:]\h\v]/) { # Matches non-spacing non-C1 controls
                     print "Binary file $file matches\n";
                 } else {
                     $_ .= "\n" unless /\n\z/;
@@ -1403,7 +1420,15 @@ if (-f 'config.sh') {
     # Emulate noextensions if Configure doesn't support it.
     fake_noextensions()
         if $major < 10 && $defines{noextensions};
-    system_or_die('./Configure -S');
+    if (system './Configure -S') {
+        # See commit v5.23.5-89-g7a4fcb3.  Configure may try to run
+        # ./optdef.sh instead of UU/optdef.sh.  Copying the file is
+        # easier than patching Configure (which mentions optdef.sh multi-
+        # ple times).
+        require File::Copy;
+        File::Copy::copy("UU/optdef.sh", "./optdef.sh");
+        system_or_die('./Configure -S');
+    }
 }
 
 if ($target =~ /config\.s?h/) {
@@ -1501,8 +1526,13 @@ if ($options{module} || $options{'with-module'}) {
     s/-/::/g if /-/ and !m|/|;
   }
   my $install = join ",", map { "'$_'" } @m;
+  if ($options{'no-module-tests'}) {
+    $install = "notest('install',$install)";
+  } else {
+    $install = "install($install)";
+  }
   my $last = $m[-1];
-  my $shellcmd = "install($install); die unless CPAN::Shell->expand(Module => '$last')->uptodate;";
+  my $shellcmd = "$install; die unless CPAN::Shell->expand(Module => '$last')->uptodate;";
 
   if ($options{module}) {
     run_report_and_exit(@cpanshell, $shellcmd);

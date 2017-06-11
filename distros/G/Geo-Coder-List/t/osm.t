@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 28;
+use Test::Most tests => 31;
 use Test::NoWarnings;
 
 eval 'use autodie qw(:all)';	# Test for open/close failures
@@ -13,7 +13,7 @@ BEGIN {
 
 OSM: {
 	SKIP: {
-		skip 'Test requires Internet access', 26 unless(-e 't/online.enabled');
+		skip 'Test requires Internet access', 29 unless(-e 't/online.enabled');
 
 		eval {
 			require Geo::Coder::OSM;
@@ -31,7 +31,7 @@ OSM: {
 
 		if($@) {
 			diag('Geo::Coder::OSM not installed - skipping tests');
-			skip 'Geo::Coder::OSM not installed', 26;
+			skip 'Geo::Coder::OSM not installed', 29;
 		} else {
 			diag("Using Geo::Coder::OSM $Geo::Coder::OSM::VERSION");
 		}
@@ -79,6 +79,7 @@ OSM: {
 		my @locations = $geocoderlist->geocode('Portland, USA');
 
 		ok(scalar(@locations) > 1);
+		is(ref($locations[0]->{'geocoder'}), 'Geo::Coder::OSM', 'Verify OSM encoder is used');
 
 		my ($maine, $oregon);
 		foreach my $state(map { $_->{'address'}->{'state'} } @locations) {
@@ -92,5 +93,10 @@ OSM: {
 
 		ok($maine == 1);
 		ok($oregon == 1);
+
+		@locations = $geocoderlist->geocode('Portland, USA');
+
+		ok(scalar(@locations) > 1);
+		is($locations[0]->{'geocoder'}, undef, 'Verify subsequent reads are cached');
 	}
 }

@@ -1,5 +1,5 @@
 package ExtUtils::HasCompiler;
-$ExtUtils::HasCompiler::VERSION = '0.016';
+$ExtUtils::HasCompiler::VERSION = '0.017';
 use strict;
 use warnings;
 
@@ -124,7 +124,7 @@ sub can_compile_loadable_object {
 			push @extra, qq{"-L$incdir"}, '-lperl', $perllibs;
 		}
 		push @commands, qq{$cc $ccflags $optimize "-I$incdir" $cccdlflags -c $source_name -o $object_file};
-		push @commands, qq{$ld $optimize $object_file -o $loadable_object $lddlflags @extra};
+		push @commands, qq{$ld $object_file -o $loadable_object $lddlflags @extra};
 	}
 
 	for my $command (@commands) {
@@ -173,7 +173,7 @@ ExtUtils::HasCompiler - Check for the presence of a compiler
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 DESCRIPTION
 

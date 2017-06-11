@@ -1,10 +1,17 @@
 Revision history for Module-Starter-Smart
 
+0.0.8  Jun 4, 2017
+    * Bug fixes for tests
+
+0.0.7  Jun 1, 2017
+    * Fix inconsistencies with more recent releases of Module::Starter::Simple (Markus Böhme)
+    * Some more bug fixes
+
 0.0.6  Jan 30, 2015
-    * Some amendments to the code for clarity and a new test for basic function
+    * Some amendments to the code for clarity and a new test for basic function (Andrew Kirkpatrick)
 
 0.0.5  Jan 18, 2014
-    * Fix typos and update CPAN metadata
+    * Fix typos and update CPAN metadata (David Steinbrunner)
 
 0.0.4  Mar 29, 2012
     * Fix broken dependency

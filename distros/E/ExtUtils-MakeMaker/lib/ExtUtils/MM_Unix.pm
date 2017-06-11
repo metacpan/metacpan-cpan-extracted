@@ -14,7 +14,7 @@ use ExtUtils::MakeMaker qw($Verbose neatvalue _sprintf562);
 
 # If we make $VERSION an our variable parse_version() breaks
 use vars qw($VERSION);
-$VERSION = '7.26';
+$VERSION = '7.28';
 $VERSION = eval $VERSION;  ## no critic [BuiltinFunctions::ProhibitStringyEval]
 
 require ExtUtils::MM_Any;
@@ -2537,6 +2537,14 @@ $(MAKE_APERL_FILE) : static $(FIRST_MAKEFILE) pm_to_blib
 	'auto', $self->{FULLEXT}, "$self->{BASEEXT}$self->{LIB_EXT}"
     );
     File::Find::find(sub {
+	if ($File::Find::name =~ m{/auto/share\z}) {
+	    # in a subdir of auto/share, prune because e.g.
+	    # Alien::pkgconfig uses File::ShareDir to put .a files
+	    # there. do not want
+	    $File::Find::prune = 1;
+	    return;
+	}
+
 	return unless m/\Q$self->{LIB_EXT}\E$/;
 
         # Skip perl's libraries.

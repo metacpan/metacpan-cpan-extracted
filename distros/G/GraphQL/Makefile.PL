@@ -15,6 +15,7 @@ WriteMakefile(
   },
   TEST_REQUIRES => {
     'Test::More' => '0.88', # done_testing
+    'Test::Exception' => '0',
   },
   PREREQ_PM => {
     'Moo' => '0',
@@ -30,8 +31,8 @@ WriteMakefile(
     resources => {
       repository => {
         type => 'git',
-        url => 'git@github.com:mohawk2/graphql-perl.git',
-        web => 'https://github.com/mohawk2/graphql-perl',
+        url => 'git@github.com:graphql-perl/graphql-perl.git',
+        web => 'https://github.com/graphql-perl/graphql-perl',
       },
     },
     prereqs => {
@@ -45,3 +46,10 @@ WriteMakefile(
     },
   },
 );
+
+sub MY::postamble {
+  <<EOF;
+lib/GraphQL/Grammar.pm : graphql.pgx
+\t\$(PERL) -Ilib -MGraphQL::Grammar=compile
+EOF
+}

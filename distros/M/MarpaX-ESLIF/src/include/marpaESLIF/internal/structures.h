@@ -33,12 +33,13 @@ typedef struct  marpaESLIF_rule            marpaESLIF_rule_t;
 typedef struct  marpaESLIF_grammar         marpaESLIF_grammar_t;
 typedef enum    marpaESLIF_matcher_value   marpaESLIF_matcher_value_t;
 typedef enum    marpaESLIF_event_type      marpaESLIF_event_type_t;
-typedef enum    marpaESLIF_array_type      marpaESLIF_array_type_t;
 typedef struct  marpaESLIF_readerContext   marpaESLIF_readerContext_t;
 typedef struct  marpaESLIF_cloneContext    marpaESLIF_cloneContext_t;
 typedef         marpaESLIFValueType_t      marpaESLIF_stack_type_t;
 typedef struct  marpaESLIF_lexeme_data     marpaESLIF_lexeme_data_t;
 typedef struct  marpaESLIF_alternative     marpaESLIF_alternative_t;
+typedef         marpaESLIFAction_t         marpaESLIF_action_t;
+typedef         marpaESLIFActionType_t     marpaESLIF_action_type_t;
 
 /* Symbol types */
 enum marpaESLIF_symbol_type {
@@ -155,7 +156,7 @@ struct marpaESLIFSymbol {
   short                        eventNulledb;           /* Nulled initial state: 0: off, 1: on */
   char                        *eventCompleteds;        /* Event name for completion */
   short                        eventCompletedb;        /* Completion initial state: 0: off, 1: on */
-  char                        *discardEvents;          /* Discard event name - shallow pointer to a :discard rule */
+  char                        *discardEvents;          /* Discard event name - shallow pointer to a :discard rule's discardEvents */
   short                        discardEventb;          /* Discard event initial state: 0: off, 1: on - copy of :discard's rule value */
   int                          lookupLevelDeltai;      /* Referenced grammar delta level */
   char                        *lookupMetas;            /* Referenced lookup meta name - shallow pointer */
@@ -163,7 +164,7 @@ struct marpaESLIFSymbol {
   int                          priorityi;              /* Symbol priority */
   genericStack_t               _nullableRuleStack;     /* Used during validation, to determine nullable semantics */
   genericStack_t              *nullableRuleStackp;     /* Pointer to _nullableRuleStack */
-  char                        *nullableActions;        /* Nullable semantic */
+  marpaESLIFAction_t          *nullableActionp;        /* Nullable semantic */
   int                          propertyBitSet;
   genericStack_t               _lhsRuleStack;          /* Stack of rules having this symbol as LHS */
   genericStack_t              *lhsRuleStackp;          /* Pointer to stack of rules having this symbol as LHS */
@@ -181,10 +182,11 @@ struct marpaESLIF_rule {
   marpaESLIF_symbol_t   *separatorp;                   /* Eventual separator symbol */
   genericStack_t         _rhsStack;                    /* Stack of RHS symbols */
   genericStack_t        *rhsStackp;                    /* Pointer to stack of RHS symbols */
+  int                   *rhsip;                        /* Convenience array of RHS ids for rule introspection */
   marpaESLIF_symbol_t   *exceptionp;                   /* Exception symbol */
   int                    exceptionIdi;                 /* Exception symbol Id */
-  char                  *actions;                      /* Action */
-  char                  *discardEvents;                /* Discard event name - shallowed with its RHS */
+  marpaESLIFAction_t    *actionp;                      /* Action */
+  char                  *discardEvents;                /* Discard event name - shallowed to its RHS */
   short                  discardEventb;                /* Discard event initial state: 0: off, 1: on - copied to its RHS */
   int                    ranki;
   short                  nullRanksHighb;
@@ -193,6 +195,7 @@ struct marpaESLIF_rule {
   int                    minimumi;
   short                  passthroughb;                 /* This rule is a passthrough */
   int                    propertyBitSet;
+  short                  hideseparatorb;
 };
 
 /* A grammar */
@@ -211,13 +214,15 @@ struct marpaESLIF_grammar {
   genericStack_t        *symbolStackp;                       /* Pointer to stack of symbols */
   genericStack_t         _ruleStack;                         /* Stack of rules */
   genericStack_t        *ruleStackp;                         /* Pointer to stack of rules */
-  char                  *defaultSymbolActions;               /* Default action for symbols */
-  char                  *defaultRuleActions;                 /* Default action for rules */
-  char                  *defaultFreeActions;                 /* Default action for free */
+  marpaESLIFAction_t    *defaultSymbolActionp;               /* Default action for symbols - never NULL */
+  marpaESLIFAction_t    *defaultRuleActionp;                 /* Default action for rules - never NULL */
+  marpaESLIFAction_t    *defaultFreeActionp;                 /* Default action for free - can be NULL */
   int                    starti;                             /* Default start symbol ID - filled during grammar validation */
   char                  *starts;                             /* Default start symbol name - filled during grammar validation - shallow pointer */
   int                   *ruleip;                             /* Array of rule IDs - filled by grammar validation */
-  size_t                 rulel;                              /* Size of the rule IDs array - filled by grammar validation */
+  size_t                 nrulel;                             /* Size of the rule IDs array - filled by grammar validation */
+  int                   *symbolip;                           /* Array of symbol IDs - filled by grammar validation */
+  size_t                 nsymboll;                           /* Size of the symbol IDs array - filled by grammar validation */
   unsigned int           nbupdatei;                          /* Number of updates - used in grammar ESLIF actions */
   char                  *asciishows;                         /* Grammar show (ASCII) */
   int                    discardi;                           /* Discard symbol ID - filled during grammar validation */
@@ -261,7 +266,8 @@ struct marpaESLIFValue {
   short                    inValuationb;
   marpaESLIF_symbol_t     *symbolp;
   marpaESLIF_rule_t       *rulep;
-  char                    *actions;
+  char                    *actions; /* True external name of best-effort ASCII in case of literal */
+  marpaESLIF_string_t     *stringp; /* Not NULL only when is a literal - then callback is forced to be internal */
 };
 
 struct marpaESLIFRecognizer {

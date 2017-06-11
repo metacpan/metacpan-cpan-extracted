@@ -1,9 +1,11 @@
 use strict;
 use warnings;
 use File::Basename qw/dirname/;
+use FindBin qw/$RealBin/;
 
 use Test::More tests => 29;
 
+use lib "$RealBin/../lib";
 use_ok 'Bio::Kmer';
 
 # expected histogram
@@ -40,7 +42,7 @@ for my $query(keys(%query)){
 }
 
 # Test JF
-my $kmerJf=Bio::Kmer->new(dirname($0)."/../data/rand.fastq.gz",{kmerlength=>8, kmerCounter=>"jellyfish"});
+my $kmerJf=Bio::Kmer->new(dirname($0)."/../data/rand.fastq.gz",{kmerlength=>8, kmercounter=>"jellyfish"});
 my $histJf=$kmerJf->histogram();
 for(my $i=0;$i<@correctCounts;$i++){
   is $$histJf[$i], $correctCounts[$i], "Freq of $i checks out";

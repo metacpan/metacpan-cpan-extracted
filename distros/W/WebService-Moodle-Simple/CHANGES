@@ -1,0 +1,141 @@
+==================================================
+Changes from 2016-06-10 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.06 at 2017-06-10 16:37:48 +0000
+-----------------------------------------
+
+  Change: 75f43540b61e2ea0b631785c96b928af423ceaf3
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2017-06-10 17:37:34 +0000
+
+    move from Dist::Milla to Dist::Zilla 
+
+  Change: 0a8cc8ff259e50a3c90d988730331e325c5a5704
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2017-06-10 16:50:29 +0000
+
+    unit tests and documentation 
+
+  Change: af1cf3ca9fe4ce213cff25597658003bffc00413
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2017-06-08 22:09:25 +0000
+
+    add get_user method 
+
+  Change: 41a0b781c9e6cde98ca8187f2e35f4ae355d865b
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2017-06-05 23:46:11 +0000
+
+    clean up check_password 
+
+  Change: 28cb7c1401acf6d17adb46bdea6d7076b2be084d
+  Author: Andrew Solomon <andrew@illywhacker.net>
+  Date : 2016-10-01 22:57:21 +0000
+
+    0.05 
+
+  Change: e3b8c8bd7fedfd533745140b3a21540cfe7ba2dd
+  Author: Andrew Solomon <andrew@illywhacker.net>
+  Date : 2016-10-01 22:51:14 +0000
+
+    reduce dependency on non-core Moodle APIs 
+
+  Change: dac4138a5a9e5e84c45db548c0dba45c05bef09d
+  Author: Andrew Solomon <andrew@illywhacker.net>
+  Date : 2014-09-20 23:15:04 +0000
+
+    0.04 
+
+  Change: 2ea37b3315413878e9dd173bca18f9b74cf8d3db
+  Author: Andrew Solomon <andrew@illywhacker.net>
+  Date : 2014-09-20 23:09:17 +0000
+
+    run milla build 
+
+  Change: cac0fb3190a643222795d14a1a3a873c5d51b14d
+  Author: Andrew Solomon <andrew@illywhacker.net>
+  Date : 2014-09-20 23:05:32 +0000
+
+    MDL-0030 add acknowledement 
+
+  Change: 1959e877d17892bbad6ee775b14c1e4d8b4280c0
+  Author: Andrew Solomon <andrew@illywhacker.net>
+  Date : 2014-09-20 23:00:10 +0000
+
+    MDL-0030 tidy up documentation 
+
+  Change: 043abb4f496ca59ec029e5124599b3f3c19da906
+  Author: Andrew Solomon <andrew@illywhacker.net>
+  Date : 2014-04-26 18:12:24 +0000
+
+    MDL-0030 comment out debugging dumps, accommodate very slow moodle 
+
+  Change: 39fc4e855e546165d525fbe3ebb673f9ad181f10
+  Author: Andrew Solomon <andrew@illywhacker.net>
+  Date : 2014-04-01 21:22:49 +0000
+
+    MDL-0030 add user suspension method
+
+    Assumes Moodle server has had this patch applied:
+    https://github.com/fabiomsouto/moodle/compare/MOODLE_22_STABLE...MDL-
+    31465-MOODLE_22_STABLE 
+
+  Change: 4ab601d006bbe9cfe78a744ef4a699b37717dc5e
+  Author: Andrew Solomon <andrew@illywhacker.net>
+  Date : 2014-03-23 19:04:15 +0000
+
+    MDL-0029 more useful return value from add_user 
+
+  Change: 3644497df8c9900aca0a2c52b7dc7e80fe92bae2
+  Author: Andrew Solomon <andrew@illywhacker.net>
+  Date : 2014-03-21 22:29:55 +0000
+
+    MDL-0029 add raw_api 
+
+  Change: ade65b91bc1935edd22575cac9663fea059ab763
+  Author: Andrew Solomon <andrew@illywhacker.net>
+  Date : 2014-02-28 18:23:30 +0000
+
+    0.03 
+
+  Change: aaf1e2e88fe997a3949a93d53e40169fb8bfd892
+  Author: Andrew Solomon <andrew@illywhacker.net>
+  Date : 2014-02-28 18:21:10 +0000
+
+    MDL-0029 add documentation 
+
+  Change: be5e8ae58dcc391344bf49ba20823ceabfc8972c
+  Author: Andrew Solomon <andrew@illywhacker.net>
+  Date : 2014-02-28 18:02:52 +0000
+
+    0.02 
+
+  Change: 8c0760fb5c005e5e8447e7190c7858e50e63d09b
+  Author: Andrew Solomon <andrew@illywhacker.net>
+  Date : 2014-02-28 17:52:47 +0000
+
+    MDL-0029 Move alpha to Dist::Milla 
+
+  Change: 38122a52390c8f6138b5283f996c3f436f7c0bac
+  Author: Andrew Solomon <andrew@illywhacker.net>
+  Date : 2014-02-28 16:54:48 +0000
+
+    0.01 
+
+  Change: 226f170f1d5bcd8f3da109c103457fb13d8b4e3b
+  Author: Andrew Solomon <andrew@illywhacker.net>
+  Date : 2014-02-28 16:52:15 +0000
+
+    git stuff 
+
+  Change: 6f15e459dd9886f34b7aaa6310581b32c52a9deb
+  Author: Andrew Solomon <andrew@illywhacker.net>
+  Date : 2014-02-28 16:35:15 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

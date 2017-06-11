@@ -1,25 +1,51 @@
 Changes file for Task-Date-Holidays
 
-0.05 2015-08-22 feature release, update not required
+0.07 2017-06-05 Maintenance release, update not required
+
+- Added CONTRIBUTING.md
+
+- Updated Dist::Zilla config to contemporary version
+
+- Added Gitter link (Date::Holidays channel)
+
+- Added MANIFEST.SKIP from my Gist: https://gist.github.com/jonasbn/aa6646544f2233de39f34c49532215ad
+
+- Changed bug reporting to Github issues
+
+
+0.06 2017-06-03 Feature release, update not required
+
+- Added Date::Holidays::BY, Belarus
+
+- Added Date::Japanese::Holiday, Japan - had been left out?
+
+- Added Date::Holidays::UK, United Kingdom - had also been left out?
+
+
+0.05 2015-08-22 Feature release, update not required
 
 - Re-enabled Date::Holidays::PT, thanks to AMBS for patching it
   so it will work again, thanks to AMBS for patch resulting in release 0.03 (see RT:98441)
 
   https://rt.cpan.org/Ticket/Display.html?id=98441
 
+- Date::Holidays::CZ disabled (broken build)
 
-0.04 2015-01-31 feature release, update not required
+- Date::Holidays::CN disabled (broken build)
+
+
+0.04 2015-01-31 Feature release, update not required
 
 - Adding Date::Holidays::RU, contribution by Alexander Nalobin
 
 
-0.03 2014-08-30 maintenance release, update not required
+0.03 2014-08-30 Maintenance release, update not required
 
 - Merged changes from Gabor Szabo adding handling of META data on
   Github and generation of META.json
 
 
-0.02 2014.08.29 maintenance release, update not required
+0.02 2014.08.29 Maintenance release, update not required
 
 - Fixed POD error (missing heading)
 

@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use Test::Kantan;
 use rlib;
@@ -16,6 +17,12 @@ describe "Functional interfaces of SQL::Concat", sub {
   describe "PAR", sub {
     expect(PAR(SELECT => '*', FROM => 'foo')->sql)
       ->to_be("(SELECT * FROM foo)");
+  };
+
+  describe "paren_nl_indent" => sub {
+    it "should put paren, newline and indent", sub {
+      expect(SQL("foo", SQL("bar")->paren_nl_indent)->sql)->to_be("foo (\n  bar\n)")
+    };
   };
 
   describe "CAT", sub {
@@ -37,6 +44,10 @@ SELECT * FROM y
 INTERSECT
 SELECT * FROM z");
 
+    describe "CAT empty CAT", sub {
+      expect(CAT(AND => 1, CAT(AND => ()))->sql)
+	->to_be("1");
+    };
   };
   
   describe "CSV", sub {

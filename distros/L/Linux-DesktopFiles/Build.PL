@@ -19,8 +19,10 @@ my $builder = Module::Build->new(
                           },
     meta_merge => {
                    resources => {
-                                 repository => 'https://github.com/trizen/Linux-DesktopFiles'
-                                }
+                                 bugtracker => "https://github.com/trizen/Linux-DesktopFiles/issues",
+                                 homepage   => "https://github.com/trizen/Linux-DesktopFiles",
+                                 repository => "https://github.com/trizen/Linux-DesktopFiles",
+                                },
                   },
 
     requires => {
@@ -30,6 +32,6 @@ my $builder = Module::Build->new(
 
     add_to_cleanup     => ['Linux-DesktopFiles-*'],
     create_makefile_pl => 'traditional',
-                                );
+);
 
 $builder->create_build_script();

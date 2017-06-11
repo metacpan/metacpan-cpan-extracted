@@ -1,5 +1,8 @@
 Revision history for Alien-GvaScript
 
+1.45 04.06.2017
+  - fix #121658 : . no longer in @INC in Perl 5.26 (Graham Ollis&Slaven_Rezic++)
+
 1.44 20.08.2014
   - fixes #98172 in POD documentation (DOLMEN++)
 

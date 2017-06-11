@@ -17,17 +17,15 @@ requires qw( config log );
 
 # Attribute constructors
 my $_build_factory_args = sub {
-   my $self = shift; my $localiser;
-
-   $self->can( 'l10n' ) and $localiser = sub { $self->l10n->localize( @_ ) };
+   my $self = shift;
 
    my $prefix = deref $self->config, 'name';
 
    return sub {
       my ($self, $attr) = @_;
 
-      $localiser and $attr->{localiser    } = $localiser;
-      $prefix    and $attr->{domain_prefix} = $prefix;
+      $prefix and $attr->{domain_prefix} = $prefix;
+
       return $attr;
    };
 };
@@ -36,7 +34,7 @@ my $_build__factory = sub {
    my $self = shift;
 
    return Web::ComposableRequest->new
-      ( buildargs => $_build_factory_args->( $self ), config => $self->config );
+      ( buildargs => $self->factory_args, config => $self->config );
 };
 
 my $_build__routes = sub {
@@ -46,6 +44,9 @@ my $_build__routes = sub {
 };
 
 # Public attributes
+has 'factory_args' => is => 'lazy', isa => CodeRef,
+   builder => $_build_factory_args;
+
 has 'controllers' => is => 'lazy', isa => HashRef[Object], builder => sub {
    load_components 'Controller', application => $_[ 0 ] };
 

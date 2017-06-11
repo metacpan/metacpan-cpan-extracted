@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Role::WarpMaster;
-$Config::Model::Role::WarpMaster::VERSION = '2.103';
+$Config::Model::Role::WarpMaster::VERSION = '2.105';
 # ABSTRACT: register and trigger a warped element
 
 use Mouse::Role;
@@ -106,7 +106,7 @@ Config::Model::Role::WarpMaster - register and trigger a warped element
 
 =head1 VERSION
 
-version 2.103
+version 2.105
 
 =head1 SYNOPSIS
 

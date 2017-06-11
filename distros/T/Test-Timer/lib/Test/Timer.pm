@@ -15,7 +15,7 @@ use Test::Timer::TimeoutException;
 
 @EXPORT = qw(time_ok time_nok time_atleast time_atmost time_between);
 
-$VERSION = '0.18';
+$VERSION = '2.00';
 
 my $test  = Test::Builder->new;
 our $alarm = 2; #default alarm
@@ -27,12 +27,12 @@ sub time_ok {
 sub time_nok {
     my ( $code, $upperthreshold, $name ) = @_;
 
-    my $ok = _runtest( $code, 0, $upperthreshold, $name );
+    my ($ok, $time) = _runtest( $code, 0, $upperthreshold, $name );
 
     if ($ok == 1) {
         $ok = 0;
         $test->ok( $ok, $name );
-        $test->diag( 'Test did not exceed specified threshold' );
+        $test->diag( "Test ran $time seconds and did not exceed specified threshold of $upperthreshold seconds" );
     } else {
         $ok = 1;
         $test->ok( $ok, $name );
@@ -44,13 +44,13 @@ sub time_nok {
 sub time_atmost {
     my ( $code, $upperthreshold, $name ) = @_;
 
-    my $ok = _runtest( $code, 0, $upperthreshold, $name );
+    my ($ok, $time) = _runtest( $code, 0, $upperthreshold, $name );
 
     if ($ok == 1) {
         $test->ok( $ok, $name );
     } else {
         $test->ok( $ok, $name );
-        $test->diag( 'Test exceeded specified threshold' );
+        $test->diag( "Test ran $time seconds and exceeded specified threshold of $upperthreshold seconds" );
     }
 
     return $ok;
@@ -59,11 +59,11 @@ sub time_atmost {
 sub time_atleast {
     my ( $code, $lowerthreshold, $name ) = @_;
 
-    my $ok = _runtest_atleast( $code, $lowerthreshold, undef, $name );
+    my ($ok, $time) = _runtest( $code, $lowerthreshold, undef, $name );
 
     if ($ok == 0) {
         $test->ok( $ok, $name );
-        $test->diag( 'Test did not exceed specified threshold' );
+        $test->diag( "Test ran $time seconds and did not exceed specified threshold of $lowerthreshold seconds" );
     } else {
         $test->ok( $ok, $name );
     }
@@ -74,14 +74,14 @@ sub time_atleast {
 sub time_between {
     my ( $code, $lowerthreshold, $upperthreshold, $name ) = @_;
 
-    my $ok = _runtest( $code, $lowerthreshold, $upperthreshold, $name );
+    my ($ok, $time) = _runtest( $code, $lowerthreshold, $upperthreshold, $name );
 
     if ($ok == 1) {
         $test->ok( $ok, $name );
     } else {
         $ok = 0;
         $test->ok( $ok, $name );
-        $test->diag( 'Test did not execute within specified interval' );
+        $test->diag( "Test ran $time seconds and did not execute within specified interval $lowerthreshold - $upperthreshold seconds" );
     }
 
     return $ok;
@@ -91,15 +91,27 @@ sub _runtest {
     my ( $code, $lowerthreshold, $upperthreshold, $name ) = @_;
 
     my $within = 0;
+    my $time = 0;
 
     try {
 
-        my $timestring = _benchmark( $code, $upperthreshold );
-        my $time = _timestring2time($timestring);
+        if ( defined $lowerthreshold and defined $upperthreshold and $name) {
 
-        if ( defined $lowerthreshold && defined $upperthreshold ) {
+            my $timestring = _benchmark( $code, $upperthreshold );
+            $time = _timestring2time($timestring);
 
             if ( $time >= $lowerthreshold && $time <= $upperthreshold ) {
+                $within = 1;
+            } else {
+                $within = 0;
+            }
+
+        } elsif ( defined $lowerthreshold and $name ) {
+
+            my $timestring = _benchmark( $code, $lowerthreshold );
+            $time = _timestring2time($timestring);
+
+            if ( $time > $lowerthreshold ) {
                 $within = 1;
             } else {
                 $within = 0;
@@ -108,6 +120,7 @@ sub _runtest {
         } else {
             croak 'Insufficient number of parameters';
         }
+
     }
     catch Test::Timer::TimeoutException with {
         my $E = shift;
@@ -120,55 +133,20 @@ sub _runtest {
         croak( $E->{-text} );
     };
 
-    return $within;
-}
-
-sub _runtest_atleast {
-    my ( $code, $lowerthreshold, $upperthreshold, $name ) = @_;
-
-    my $exceed = 0;
-
-    try {
-
-        if ( defined $lowerthreshold ) {
-
-            my $timestring = _benchmark( $code, $lowerthreshold );
-            my $time = _timestring2time($timestring);
-
-            if ( $time > $lowerthreshold ) {
-                $exceed = 1;
-            } else {
-                $exceed = 0;
-            }
-
-        } else {
-            croak 'Insufficient number of parameters';
-        }
-    }
-    catch Test::Timer::TimeoutException with {
-        my $E = shift;
-
-        $test->ok( 0, $name );
-        $test->diag( $E->{-text} );
-    }
-    otherwise {
-        my $E = shift;
-        croak( $E->{-text} );
-    };
-
-    return $exceed;
+    return ($within, $time);
 }
 
 sub _benchmark {
     my ( $code, $threshold ) = @_;
 
     my $timestring;
+    my $time = 0;
     my $alarm = $alarm + ($threshold || 0);
 
     try {
         local $SIG{ALRM} = sub {
             throw Test::Timer::TimeoutException(
-                'Execution exceeded threshold and timed out');
+                "Execution ran $time seconds and exceeded threshold of $threshold seconds and timed out" );
         };
 
         alarm( $alarm );
@@ -178,6 +156,7 @@ sub _benchmark {
         my $t1 = new Benchmark;
 
         $timestring = timestr( timediff( $t1, $t0 ) );
+        $time = _timestring2time($timestring);
     }
     otherwise {
         my $E = shift;
@@ -203,9 +182,16 @@ __END__
 
 =begin markdown
 
+# Test::Timer
+
 [![CPAN version](https://badge.fury.io/pl/Test-Timer.svg)](http://badge.fury.io/pl/Test-Timer)
-[![Build Status](https://travis-ci.org/jonasbn/testt.svg?branch=master)](https://travis-ci.org/jonasbn/testt)
-[![Coverage Status](https://coveralls.io/repos/jonasbn/testt/badge.png)](https://coveralls.io/r/jonasbn/testt)
+[![Build Status](https://travis-ci.org/jonasbn/perl-test-timer.svg?branch=master)](https://travis-ci.org/jonasbn/perl-test-timer)
+[![Coverage Status](https://coveralls.io/repos/github/jonasbn/perl-test-timer/badge.svg?branch=master)](https://coveralls.io/github/jonasbn/perl-test-timer?branch=master)
+
+<!-- MarkdownTOC autoanchor=false -->
+
+
+<!-- /MarkdownTOC -->
 
 =end markdown
 
@@ -215,7 +201,7 @@ Test::Timer - test module to test/assert response times
 
 =head1 VERSION
 
-The documentation in this module describes version 0.18 of Test::Timer
+The documentation in this module describes version 2.00 of Test::Timer
 
 =head1 SYNOPSIS
 
@@ -253,7 +239,7 @@ The key features are subroutines to assert or test the following:
 
 =item * that a given piece of code does not exceed a specified time limit
 
-=item * that a given piece of code takes longer than a specified time limit 
+=item * that a given piece of code takes longer than a specified time limit
 and does not exceed another
 
 =back
@@ -291,6 +277,7 @@ Takes the following parameters:
 =item * a string specifying a test name
 
 =back
+
 
     time_ok( sub { doYourStuffButBeQuickAboutIt(); }, 1, 'threshold of one second');
 
@@ -343,11 +330,6 @@ interval in order for the test to succeed
 This is a method to handle the result from L<_benchmark|/_benchmark> is initiates the
 benchmark calling benchmark and based on whether it is within the provided
 interval true (1) is returned and if not false (0).
-
-=head2 _runtest_atleast
-
-This is a simpler variant of the method above, it is the author's hope that is
-can be refactored out at some point, due to the similarity with L<_runtest|/_runtest>.
 
 =head2 _benchmark
 
@@ -450,11 +432,19 @@ This module holds no known incompatibilities.
 
 This module holds no known bugs.
 
-As listed on the TODO, the current implementations only use seconds and
-resolutions should be higher, so the current implementation is limited to
-seconds as the highest resolution.
+The current implementations only use seconds and resolutions should be higher,
+so the current implementation is limited to seconds as the highest resolution.
+
+On occassion failing tests with CPAN-testers have been observed. This seem to be related to the test-suite
+being not taking into account that some smoke-testers do not prioritize resources for the test run and that
+addional processes/jobs are running. The test-suite have been adjusted to accomodate this but these issues
+might reoccur.
 
 =head1 TEST AND QUALITY
+
+=for HTML <a href='https://coveralls.io/github/jonasbn/perl-test-timer'><img src='https://coveralls.io/repos/github/jonasbn/perl-test-timer/badge.svg' alt='Coverage Status' /></a>
+
+=for markdown [![Coverage Status](https://coveralls.io/repos/github/jonasbn/perl-test-timer/badge.svg?branch=master)](https://coveralls.io/github/jonasbn/perl-test-timer?branch=master)
 
 Coverage report for the release described in this documentation (see L<VERSION|/VERSION>).
 
@@ -479,24 +469,9 @@ Set TEST_CRITIC to enable L<Test::Perl::Critic> test in F<t/critic.t>
 This distribution uses Travis for continuous integration testing, the
 Travis reports are public available.
 
-=for HTML <a href="https://travis-ci.org/jonasbn/testt"><img src="https://travis-ci.org/jonasbn/testt.png?branch=master"></a>
+=for HTML <a href="https://travis-ci.org/jonasbn/perl-test-timer"><img src="https://travis-ci.org/jonasbn/perl-test-timer.png?branch=master"></a>
 
-=for markdown [![Build Status](https://travis-ci.org/jonasbn/testt.png?branch=master)](https://travis-ci.org/jonasbn/testt)
-
-=head1 TODO
-
-=over
-
-=item * Implement higher resolution for thresholds
-
-=item * Factor out L<_runtest_atleast|/_runtest_atleast>
-
-=item * Add more tests to get a better feeling for the use and border cases
-requiring alarm etc.
-
-=item * Rewrite POD to emphasize L<time_atleast|/time_atleast> over L<time_ok|/time_ok>
-
-=back
+=for markdown [![Build Status](https://travis-ci.org/jonasbn/perl-test-timer.svg?branch=master)](https://travis-ci.org/jonasbn/perl-test-timer)
 
 =head1 SEE ALSO
 
@@ -506,16 +481,13 @@ requiring alarm etc.
 
 =back
 
-=head1 BUGS
+=head1 ISSUE REPORTING
 
-Please report any bugs or feature requests either using rt.cpan.org or Github
-
-I will be notified, and then you'll automatically be notified of progress on
-your bug as I make changes.
+Please report any bugs or feature requests either using Github
 
 =over
 
-=item * Github: L<https://github.com/jonasbn/testt/issues>
+=item * L<Github Issues|https://github.com/jonasbn/perl-test-timer/issues>
 
 =back
 
@@ -529,11 +501,13 @@ You can also look for information at:
 
 =over
 
+=item * L<Homepage|https://jonasbn.github.io/perl-test-timer/>
+
+=item * L<MetaCPAN|https://metacpan.org/pod/Test-Timer>
+
 =item * L<AnnoCPAN: Annotated CPAN documentation|http://annocpan.org/dist/Test-Timer>
 
 =item * L<CPAN Ratings|http://cpanratings.perl.org/d/Test-Timer>
-
-=item * L<MetaCPAN|https://metacpan.org/pod/Test-Timer>
 
 =back
 
@@ -541,7 +515,9 @@ You can also look for information at:
 
 =over
 
-=item * L<Github Repository|https://github.com/jonasbn/testt>
+=item * L<Github Repository|https://github.com/jonasbn/perl-test-timer>, please see L<the guidelines for contributing|https://github.com/jonasbn/perl-test-timer/blob/master/CONTRIBUTING.md>.
+
+
 
 =back
 
@@ -557,6 +533,8 @@ You can also look for information at:
 
 =over
 
+=item * Nigel Horne, issue #10/#12 suggestion for improvement to diagnostics
+
 =item * p-alik, PR #4 eliminating warnings during test
 
 =item * Kent Fredric, PR #7 addressing file permissions
@@ -568,8 +546,8 @@ You can also look for information at:
 =item * Gabor Szabo (GZABO), suggestion for specification of interval thresholds
 even though this was obsoleted by the later introduced time_between
 
-=item * Paul Leonerd Evans (PEVANS), suggestions for time_atleast and time_atmost 
-and the handling of $SIG{ALRM}. Also bug report for addressing issue with Debian 
+=item * Paul Leonerd Evans (PEVANS), suggestions for time_atleast and time_atmost
+and the handling of $SIG{ALRM}. Also bug report for addressing issue with Debian
 packaging resulting in release 0.10
 
 =item * brian d foy (BDFOY), for patch to L<_run_test|/_run_test>
@@ -579,9 +557,13 @@ packaging resulting in release 0.10
 =head1 LICENSE AND COPYRIGHT
 
 Test::Timer and related modules are (C) by Jonas B. Nielsen,
-(jonasbn) 2007-2016
+(jonasbn) 2007-2017
 
 Test::Timer and related modules are released under the Artistic
 License 2.0
+
+Used distributions are under copyright of there respective authors and designated licenses
+
+Image used on L<website|https://jonasbn.github.io/perl-test-timer/> is under copyright by L<Veri Ivanova|https://unsplash.com/@veri_ivanova?photo=p3Pj7jOYvnM>
 
 =cut

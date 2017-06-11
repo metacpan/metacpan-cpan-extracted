@@ -1,7 +1,6 @@
 NAME
 
-    Plack::App::Catmandu::Bag - Plack application that wraps a REST API
-    around a Catmandu::Bag
+    Plack::App::Catmandu::Bag - Wrap a REST API around a Catmandu::Bag
 
 SYNOPSIS
 

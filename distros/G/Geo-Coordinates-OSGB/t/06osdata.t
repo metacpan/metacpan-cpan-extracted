@@ -1,4 +1,4 @@
-# Toby Thurston --- 16 Apr 2009
+# Toby Thurston -- 04 Jun 2017 
 use strict;
 use warnings;
 
@@ -74,6 +74,12 @@ my $gotten = sprintf "%.7f %.7f", $lat, $lon;
 my $given  = sprintf "%.7f %.7f", $lat_given, $lon_given;
 is($gotten, $given, "Fixed pos from OS example");
 
+# approximate constants of 1mm and 5mm in degrees of lat/lon
+my $one_mm_lat = 0.00000001;
+my $one_mm_lon = 1.6e-08;   
+my $five_mm_lat = 0.00000005;
+my $five_mm_lon = 8e-08;   
+
 for my $k ( sort keys %test_input ) {
     my ($lat,$lon, $e, $n) = @{$test_input{$k}}{qw/lat lon e n/};
      
@@ -85,9 +91,11 @@ for my $k ( sort keys %test_input ) {
     my $lon_error = abs($lon-$got_lon);
 
     is($got_grid, $given_grid, "ll_to_grid for Station $k" );
-    # the error limits here allow for St Kilda at 8.6W
-    ok($lat_error <= 4e-8, sprintf "Lat for %s %.9g %.10g", $k, $lat, $lat_error);
-    ok($lon_error <= 5e-8, sprintf "Lon for %s %.9g %.10g", $k, $lon, $lon_error); 
+    # adjust the error limits to be more generous beyond 7W, (Flannan, St Kilda)
+    my $allowed_lat_error = $lon > -7 ? $one_mm_lat : $five_mm_lat;
+    my $allowed_lon_error = $lon > -7 ? $one_mm_lon : $five_mm_lon;
+    ok($lat_error <= $allowed_lat_error, sprintf "Lat for %s %.9g + %.1g mm", $k, $lat, $lat_error/$one_mm_lat);
+    ok($lon_error <= $allowed_lon_error, sprintf "Lon for %s %.9g + %.1g mm", $k, $lon, $lon_error/$one_mm_lon); 
 }
 
 
@@ -119,8 +127,6 @@ my $got_ll;
 for my $t (@test_data) {
     $given_ll = sprintf "%s %s", @{$t->{gps}}[0,1];
     $got_ll   = sprintf "%.6f %.6f", grid_to_ll(@{$t->{grid}});
-   
     is($got_ll, $given_ll, sprintf "grid_to_ll for %s %s", @{$t->{grid}});
-
 }
 

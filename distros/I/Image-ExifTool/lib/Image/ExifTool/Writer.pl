@@ -28,6 +28,7 @@ sub Sanitize($$);
 sub ConvInv($$$$$;$$);
 
 my $loadedAllTables;    # flag indicating we loaded all tables
+my $advFmtSelf;         # ExifTool during evaluation of advanced formatting expr
 
 # the following is a road map of where we write each directory
 # in the different types of files.
@@ -1338,7 +1339,7 @@ sub SetNewValuesFromFile($$;@)
             # redirect this tag
             $isExclude and return { Error => "Can't redirect excluded tag" };
             # set destination group the same as source if necessary
-          # (removed in 7.72 so '-xmp:*>*:*' will preserve XMP family 1 groups)
+          # (removed in 7.72 so '-*:*<xmp:*' will preserve XMP family 1 groups)
           # $dstGrp = $grp if $dstGrp eq '*' and $grp;
             # write to specified destination group/tag
             $dst = [ $dstGrp, $dstTag ];
@@ -2801,9 +2802,9 @@ sub InsertTagValues($$$;$)
     local $_;
     my ($self, $foundTags, $line, $opt) = @_;
     my $rtnStr = '';
-    while ($line =~ /(.*?)\$(\{\s*)?([-\w]*\w|\$|\/)(.*)/s) {
-        my (@tags, $pre, $var, $bra, $val, $tg, @vals, $type, $expr, $level);
-        ($pre, $bra, $var, $line) = ($1, $2, $3, $4);
+    while ($line =~ s/(.*?)\$(\{\s*)?([-\w]*\w|\$|\/)//s) {
+        my ($pre, $bra, $var) = ($1, $2, $3);
+        my (@tags, $val, $tg, @val, $type, $expr, $didExpr, $level, $asList);
         # "$$" represents a "$" symbol, and "$/" is a newline
         if ($var eq '$' or $var eq '/') {
             $var = "\n" if $var eq '/';
@@ -2819,9 +2820,14 @@ sub InsertTagValues($$$;$)
         }
         # allow trailing '#' to indicate ValueConv value
         $type = 'ValueConv' if $line =~ s/^#//;
+        # (and undocumented feature to allow '@' to evaluate values separately, but only in braces)
+        if ($bra and $line =~ s/^\@(#)?//) {
+            $asList = 1;
+            $type = 'ValueConv' if $1;
+        }
         # remove trailing bracket if there was a leading one
         # and extract Perl expression from inside brackets if it exists
-        if ($bra and not $line =~ s/^\s*\}// and $line =~ s/^\s*;\s*(.*?)\s*\}//s) {
+        if ($bra and $line !~ s/^\s*\}// and $line =~ s/^\s*;\s*(.*?)\s*\}//s) {
             my $part = $1;
             $expr = '';
             for ($level=0; ; --$level) {
@@ -2883,7 +2889,9 @@ sub InsertTagValues($$$;$)
                 }
             }
             if (ref $val eq 'ARRAY') {
-                $val = join($$self{OPTIONS}{ListSep}, @$val);
+                push @val, @$val;
+                undef $val;
+                last unless @tags;
             } elsif (ref $val eq 'SCALAR') {
                 if ($$self{OPTIONS}{Binary} or $$val =~ /^Binary data/) {
                     $val = $$val;
@@ -2894,36 +2902,53 @@ sub InsertTagValues($$$;$)
                 require 'Image/ExifTool/XMPStruct.pl';
                 $val = Image::ExifTool::XMP::SerializeStruct($val);
             } elsif (not defined $val) {
-                last unless @tags;
-                next;
-            }
-            # evaluate advanced formatting expression if given (eg. "${TAG;EXPR}")
-            if (defined $expr) {
-                local $SIG{'__WARN__'} = \&SetWarning;
-                undef $evalWarning;
-                $_ = $val;
-                #### eval translation expression ($_, $self)
-                eval $expr;
-                $val = $_;
-                $@ and $evalWarning = $@;
-                if ($evalWarning) {
-                    my $str = CleanWarning() . " for $tag";
-                    ($opt and $opt eq 'Error') ? $self->Error($str) : $self->Warn($str);
-                }
+                $val = $$self{OPTIONS}{MissingTagValue} if $asList;
             }
             last unless @tags;
-            push @vals, $val;
+            push @val, $val if defined $val;
             undef $val;
         }
-        if (@vals) {
-            push @vals, $val if defined $val;
-            $val = join '', @vals;
+        if (@val) {
+            push @val, $val if defined $val;
+            $val = join $$self{OPTIONS}{ListSep}, @val;
+        } else {
+            push @val, $val if defined $val; # (so the eval has access to @val if required)
+        }
+        # evaluate advanced formatting expression if given (eg. "${TAG;EXPR}")
+        if (defined $expr and defined $val) {
+            local $SIG{'__WARN__'} = \&SetWarning;
+            undef $evalWarning;
+            $advFmtSelf = $self;
+            if ($asList) {
+                foreach (@val) {
+                    #### eval advanced formatting expression ($_, $self, @val, $advFmtSelf)
+                    eval $expr;
+                    $@ and $evalWarning = $@;
+                }
+                # join back together if any values are still defined
+                @val = grep defined, @val;
+                $val = @val ? join $$self{OPTIONS}{ListSep}, @val : undef;
+            } else {
+                $_ = $val;
+                #### eval advanced formatting expression ($_, $self, @val, $advFmtSelf)
+                eval $expr;
+                $@ and $evalWarning = $@;
+                $val = $_;
+            }
+            if ($evalWarning) {
+                my $str = CleanWarning() . " for '$var'";
+                ($opt and $opt eq 'Error') ? $self->Error($str) : $self->Warn($str);
+            }
+            undef $advFmtSelf;
+            $didExpr = 1;   # set flag indicating an expression was evaluated
         }
         unless (defined $val or ref $opt) {
             $val = $$self{OPTIONS}{MissingTagValue};
             unless (defined $val) {
+                my $msg = $didExpr ? "Advanced formatting expression returned undef for '$var'" :
+                                     "Tag '$var' not defined";
                 no strict 'refs';
-                $opt and &$opt($self, "Tag '$var' not defined", 2) and return $$self{FMT_EXPR} = undef;
+                $opt and &$opt($self, $msg, 2) and return $$self{FMT_EXPR} = undef;
                 $val = '';
             }
         }
@@ -2943,6 +2968,28 @@ sub InsertTagValues($$$;$)
     }
     $$self{FMT_EXPR} = undef;
     return $rtnStr . $line;
+}
+
+#------------------------------------------------------------------------------
+# Reformat date/time value in $_ based on specified format string
+# Inputs: 0) date/time format string
+sub DateFmt($)
+{
+    my $et = bless { OPTIONS => { DateFormat => shift, StrictDate => 1 } };
+    $_ = $et->ConvertDateTime($_);
+    defined $_ or warn "Error converting date/time\n";
+}
+
+#------------------------------------------------------------------------------
+# Utility routine to remove duplicate items from default input string
+# Inputs: 0) true to set $_ to undef if not changed
+# Notes: - for use only in advanced formatting expressions
+sub NoDups
+{
+    my %seen;
+    my $sep = $advFmtSelf ? $$advFmtSelf{OPTIONS}{ListSep} : ', ';
+    my $new = join $sep, grep { !$seen{$_}++ } split /$sep/, $_;
+    $_ = ($_[0] and $new eq $_) ? undef : $new;
 }
 
 #------------------------------------------------------------------------------
@@ -4244,16 +4291,6 @@ sub TimeNow(;$)
     return sprintf("%4d:%.2d:%.2d %.2d:%.2d:%.2d%s",
                    $tm[5]+1900, $tm[4]+1, $tm[3],
                    $tm[2], $tm[1], $tm[0], $tz);
-}
-
-#------------------------------------------------------------------------------
-# Reformat date/time value in $_ based on specified format string
-# Inputs: 0) date/time format string
-sub DateFmt($)
-{
-    my $et = bless { OPTIONS => { DateFormat => shift, StrictDate => 1 } };
-    $_ = $et->ConvertDateTime($_);
-    defined $_ or warn "Error converting date/time\n";
 }
 
 #------------------------------------------------------------------------------
@@ -6085,12 +6122,15 @@ my $k32SetFileTime;
 sub SetFileTime($$;$$$$)
 {
     my ($self, $file, $atime, $mtime, $ctime, $noWarn) = @_;
+    my $saveFile;
+    local *FH;
 
     # open file by name if necessary
     unless (ref $file) {
-        local *FH;
+        # (file will be automatically closed when *FH goes out of scope)
         $self->Open(\*FH, $file, '+<') or $self->Warn('Error opening file for update'), return 0;
-        $file = *FH;  # (not \*FH, so *FH will be kept open until $file goes out of scope)
+        $saveFile = $file;
+        $file = \*FH;
     }
     # on Windows, try to work around incorrect file times when daylight saving time is in effect
     if ($^O eq 'MSWin32') {
@@ -6134,9 +6174,17 @@ sub SetFileTime($$;$$$$)
     }
     # other OS (or Windows fallback)
     if (defined $atime and defined $mtime) {
+        my $success;
         local $SIG{'__WARN__'} = \&SetWarning; # (this may not be necessary)
-        undef $evalWarning;
-        my $success = eval { utime($atime, $mtime, $file) };
+        for (;;) {
+            undef $evalWarning;
+            # (this may fail on the first try if futimes is not implemented)
+            $success = eval { utime($atime, $mtime, $file) };
+            last if $success or not defined $saveFile;
+            close $file;
+            $file = $saveFile;
+            undef $saveFile;
+        }
         unless ($noWarn) {
             if ($@ or $evalWarning) {
                 $self->Warn(CleanWarning($@ || $evalWarning));

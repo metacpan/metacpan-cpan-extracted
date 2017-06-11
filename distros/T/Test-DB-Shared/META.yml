@@ -1,0 +1,28 @@
+---
+abstract: 'Share DB cluster instance accross processes for faster tests'
+author:
+  - 'Jerome Eteve <jerome.eteve@gmail.com>'
+build_requires:
+  File::Temp: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-DB-Shared
+requires:
+  File::Flock::Tiny: '0.14'
+  File::Slurp: '0'
+  JSON: '0'
+  Log::Any: '1.040'
+  Moose: '2.1605'
+  POSIX: '0'
+  Test::More: '1.001014'
+  Test::mysqld: '0.17'
+resources:
+  homepage: https://github.com/jeteve/Test-DB-Shared
+  repository: https://github.com/jeteve/Test-DB-Shared.git
+version: '0.002'

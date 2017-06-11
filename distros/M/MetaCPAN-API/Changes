@@ -1,5 +1,13 @@
 Revision history for MetaCPAN-API
 
+0.51  2017-06-07
+            * switch to v1 API
+              - old complex query forms may stop working with new API
+            * stop relying on . being in @INC
+            * drop URI::Escape prereq
+            * switch from JSON to JSON::MaybeXS
+            * test cleanups
+
 0.50        24.01.15
             * Convert to Moo. (Graham Knop @haarg)
             * Use Types::Standard. (Graham Knop @haarg)

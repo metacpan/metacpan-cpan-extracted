@@ -6,13 +6,14 @@ use utf8;
 use open qw(:std :utf8);
 use lib qw(lib ../lib);
 
-use Test::More tests    => 5;
+use Test::More tests    => 6;
 use Encode qw(decode encode);
 
 BEGIN {
     require_ok 'Mojolicious';
     require_ok 'DateTime';
     require_ok 'DateTime::Format::DateParse';
+    require_ok 'DateTime::TimeZone';
     require_ok 'Test::Compile';
 }
 

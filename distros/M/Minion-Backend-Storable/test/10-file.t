@@ -12,7 +12,7 @@ use Sys::Hostname 'hostname';
 use Time::HiRes qw(time usleep);
 
 # Clean up before start
-my $tmpdir = tempdir CLEANUP => 1;
+my $tmpdir = tempdir CLEANUP => 1, EXLOCK => 0;
 my $file = catfile $tmpdir, 'minion.data';
 my $minion = Minion->new(Storable => $file);
 $minion->reset;
@@ -629,6 +629,5 @@ is $minion->job($id)->info->{result}, 'Parent went away', 'right result';
 $worker->unregister;
 
 # Clean up once we are done
-$guard = $minion->backend->_guard->_write->_spurt({});
-
+$minion->backend->reset;
 done_testing();

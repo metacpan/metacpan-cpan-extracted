@@ -3,6 +3,8 @@ package Module::Starter::Smart;
 use warnings;
 use strict;
 
+=encoding utf8
+
 =head1 NAME
 
 Module::Starter::Smart - A Module::Starter plugin for adding new modules into
@@ -10,11 +12,11 @@ an existing distribution
 
 =head1 VERSION
 
-version 0.0.6
+version 0.0.8
 
 =cut
 
-our $VERSION = '0.0.6';
+our $VERSION = '0.0.8';
 
 =head1 SYNOPSIS
 
@@ -170,11 +172,12 @@ sub create_t {
 }
 
 sub _create_t {
-    my $self = shift;
+    my $self     = shift;
+    my $testdir  = @_ == 2 ? 't' : shift;
     my $filename = shift;
-    my $content = shift;
+    my $content  = shift;
 
-    my @dirparts = ( $self->{basedir}, "t" );
+    my @dirparts = ( $self->{basedir}, $testdir );
     my $tdir = File::Spec->catdir( @dirparts );
     if ( not -d $tdir ) {
         local @ARGV = $tdir;
@@ -193,7 +196,7 @@ sub _create_t {
         $self->progress( "Created $fname" );
     }
 
-    return "t/$filename";
+    return File::Spec->catfile( $testdir, $filename );
 }
 
 sub create_Makefile_PL {
@@ -351,15 +354,31 @@ L<http://rt.cpan.org>.
 
 =head1 ACKNOWLEDGEMENT
 
-Special thanks to David Messina, who kindly contributes the example.
+Special thanks to the following contributors:
+
+=over 4
+
+=item *
+David Messina
+
+=item *
+David Steinbrunner
+
+=item *
+Andrew Kirkpatrick
+
+=item *
+Markus Böhme
+
+=back
 
 =head1 AUTHOR
 
-Ruey-Cheng Chen  C<< <rueycheng@gmail.com> >>
+Ruey-Cheng Chen  C<< <rueycheng@cpan.com> >>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2006, 2012 Ruey-Cheng Chen C<< <rueycheng@gmail.com> >>. All rights reserved.
+Copyright (c) 2006, 2012, 2017 Ruey-Cheng Chen C<< <rueycheng@cpan.com> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.

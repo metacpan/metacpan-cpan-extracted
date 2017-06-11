@@ -1,5 +1,5 @@
 package Dist::Surveyor::MakeCpan;
-$Dist::Surveyor::MakeCpan::VERSION = '0.016';
+
 use strict;
 use warnings;
 use Carp; # core
@@ -10,6 +10,8 @@ use File::Basename qw{dirname};  # core
 use HTTP::Tiny;
 use Dist::Surveyor::Inquiry;
 use List::Util qw(max); # core
+
+our $VERSION = '0.019';
 
 our $verbose;
 *verbose = \$::VERBOSE;
@@ -136,7 +138,7 @@ sub add_release {
     }
 
     my $mirror_status;
-    my $ua = HTTP::Tiny->new;
+    my $ua = HTTP::Tiny->new(agent => "dist_surveyor/$VERSION");
     for my $url (@urls) {
         $mirror_status = $ua->mirror($url, $destfile);
         last if $mirror_status->{success};
@@ -299,10 +301,6 @@ sub errors {
 =head1 NAME
 
 Dist::Surveyor::MakeCpan - Create a Mini-CPAN for the surveyed modules
-
-=head1 VERSION
-
-version 0.016
 
 =head1 SYNOPSIS
 

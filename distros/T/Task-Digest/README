@@ -17,7 +17,9 @@ DEPENDENCIES
 This module requires these other modules and libraries:
 
     Crypt::RIPEMD160
+    CryptX
     Digest::BLAKE
+    Digest::BLAKE2
     Digest::BMW
     Digest::CubeHash
     Digest::ECHO
@@ -37,6 +39,7 @@ This module requires these other modules and libraries:
     Digest::Perl::MD5
     Digest::SHA
     Digest::SHA1
+    Digest::SHA3
     Digest::SHA::PurePerl
     Digest::SHAvite3
     Digest::SIMD
@@ -46,7 +49,7 @@ This module requires these other modules and libraries:
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2010 by gray <gray@cpan.org>
+Copyright (C) 2010-2017 by gray <gray@cpan.org>
 
-This library is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

@@ -7,6 +7,7 @@ use File::Path qw(make_path remove_tree);
 use IPC::Cmd;
 use Cwd qw(getcwd);
 use Try::Tiny;
+use List::MoreUtils qw(uniq);
 
 with 'MooseX::Object::Pluggable';
 
@@ -147,7 +148,7 @@ sub app_load_plugins {
             $self->app_log->warn("Could not load plugin $plugin!\n$_");
             return;
         };
-        $self->app_log->info('Loaded plugin '.$plugin);
+        $self->app_log->info( 'Loaded plugin ' . $plugin );
     }
 
 }
@@ -180,23 +181,25 @@ sub create_plugin_str {
     my $plugin_str = "";
 
     if ( $self->job_plugins ) {
+        my @uniq = uniq( @{ $self->job_plugins } );
+        $self->job_plugins( \@uniq );
         $plugin_str .= " \\\n\t";
-        $plugin_str
-            .= "--job_plugins " . join( ",", @{ $self->job_plugins } );
+        $plugin_str .= "--job_plugins " . join( ",", @{ $self->job_plugins } );
         $plugin_str .= " \\\n\t" if $self->job_plugins_opts;
-        $plugin_str
-            .= $self->unparse_plugin_opts( $self->job_plugins_opts,
-            'job_plugins' )
-            if $self->job_plugins_opts;
+        $plugin_str .=
+          $self->unparse_plugin_opts( $self->job_plugins_opts, 'job_plugins' )
+          if $self->job_plugins_opts;
     }
 
     if ( $self->plugins ) {
+        my @uniq = uniq( @{ $self->job_plugins } );
+        $self->job_plugins( \@uniq );
         $plugin_str .= " \\\n\t";
         $plugin_str .= "--plugins " . join( ",", @{ $self->plugins } );
         $plugin_str .= " \\\n\t" if $self->plugins_opts;
-        $plugin_str
-            .= $self->unparse_plugin_opts( $self->plugins_opts, 'plugins' )
-            if $self->plugins_opts;
+        $plugin_str .=
+          $self->unparse_plugin_opts( $self->plugins_opts, 'plugins' )
+          if $self->plugins_opts;
     }
 
     return $plugin_str;

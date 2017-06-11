@@ -69,17 +69,46 @@ be called on any stream which has been activated
 Complete I/O on the stream. Either this function or C<abort> must
 be called on any stream which has been activated
 
-=item $rv = $st->recv($data, $nbytes)
+=item $rv = $st->recv($data, $nbytes, $flags=0)
 
-Receive upto C<$nbytes> worth of data, copying into C<$data>.
-Returns the number of bytes read, or -2 if I/O would block,
-or -1 on error.
+Receive up to C<$nbytes> worth of data, copying into C<$data>.
+Returns the number of bytes read, or -3 if hole is reached and
+C<$flags> contains RECV_STOP_AT_HOLE, or -2 if I/O would block,
+or -1 on error. The C<$flags> parameter accepts the following
+flags:
+
+=over 4
+
+=item Sys::Virt::Stream::RECV_STOP_AT_HOLE
+
+If this flag is set, the C<recv> function will stop reading from
+stream if it has reached a hole. In that case, -3 is returned and
+C<recv_hole> should be called to get the hole size.
+
+=back
 
 =item $rv = $st->send($data, $nbytes)
 
 Send upto C<$nbytes> worth of data, copying from C<$data>.
 Returns the number of bytes sent, or -2 if I/O would block,
 or -1 on error.
+
+=item $rv = $st->recv_hole($flags=0)
+
+Determine the amount of the empty space (in bytes) to be created
+in a stream's target file when uploading or downloading sparsely
+populated files. This is the counterpart to C<send_hole>. The
+optional C<$flags> parameter is currently unused and defaults to
+zero if omitted.
+
+=item $st->send_hole($length, $flags=0)
+
+Rather than transmitting empty file space, this method directs
+the stream target to create C<$length> bytes of empty space.
+This method would be used when uploading or downloading sparsely
+populated files to avoid the needless copy of empty file space.
+The optional C<$flags> parameter is currently unused and defaults
+to zero if omitted.
 
 =item $st->recv_all($handler)
 
@@ -100,6 +129,39 @@ scalar which must be filled with data and a maximum
 data byte count desired. The function should return
 the number of bytes filled, 0 on end of file, or
 -1 upon error
+
+=item $st->sparse_recv_all($handler, $hole_handler)
+
+Receive all data available from the sparse stream, invoking
+C<$handler> to process the data. The C<$handler> parameter must
+be a function which expects three arguments, the C<$st> stream
+object, a scalar containing the data received and a data byte
+count. The function should return the number of bytes processed,
+or -1 upon error. The second argument C<$hole_handler> is a
+function which expects two arguments: the C<$st> stream and a
+scalar, number describing the size of the hole in the stream (in
+bytes). The C<$hole_handler> is expected to return a non-negative
+number on success (usually 0) and a negative number (usually -1)
+otherwise.
+
+=item $st->sparse_send_all($handler, $hole_handler, $skip_handler)
+
+Send all data produced by C<$handler> to the stream.  The
+C<$handler> parameter must be a function which expects three
+arguments, the C<$st> stream object, a scalar which must be
+filled with data and a maximum data byte count desired.  The
+function should return the number of bytes filled, 0 on end of
+file, or -1 upon error. The second argument C<$hole_handler> is a
+function expecting just one argument C<$st> and returning an
+array of two elements (C<$in_data>, C<$section_len>) where
+C<$in_data> has zero or non-zero value if underlying file is in a
+hole or data section respectively. The C<$section_len> then is the
+number of remaining bytes in the current section in the
+underlying file. Finally, the third C<$skip_handler> is a function
+expecting two arguments C<$st> and C<$length> which moves cursor
+in the underlying file for C<$length> bytes. The C<$skip_handler>
+is expected to return a non-negative number on success (usually
+0) and a negative number (usually -1) otherwise.
 
 =item $st->add_callback($events, $coderef)
 

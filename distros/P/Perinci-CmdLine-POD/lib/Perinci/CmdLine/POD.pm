@@ -1,7 +1,7 @@
 package Perinci::CmdLine::POD;
 
-our $DATE = '2017-02-27'; # DATE
-our $VERSION = '0.012'; # VERSION
+our $DATE = '2017-06-08'; # DATE
+our $VERSION = '0.013'; # VERSION
 
 use 5.010001;
 use strict;
@@ -641,7 +641,8 @@ sub gen_pod_for_pericmd_script {
                         lc($a) cmp lc($b);
                     } grep {!$check_common_arg->($opts, $_)} keys %$opts;
                     next unless @opts;
-                    push @sectpod, "=head2 Options for subcommand $sc_name\n\n";
+                    my $sc_name_e = $sc_name =~ /\A\S+\z/ ? $sc_name : "'$sc_name'";
+                    push @sectpod, "=head2 Options for subcommand $sc_name_e\n\n";
                     push @sectpod, "=over\n\n";
                     for (@opts) {
                         push @sectpod, _fmt_opt($_, $opts->{$_});
@@ -866,7 +867,8 @@ _
                     for my $sc_name (@sc_names) {
                         my $sc_spec = $cli->{subcommands}{$sc_name};
                         next if $sc_spec->{is_alias};
-                        push @sectpod, "=head2 Configuration for subcommand '$sc_name'\n\n";
+                        my $sc_name_e = $sc_name =~ /\A\S+\z/ ? $sc_name : "'$sc_name'";
+                        push @sectpod, "=head2 Configuration for subcommand $sc_name_e\n\n";
                         $param2opts = _list_config_params(
                             $clidocdata{$sc_name},
                             sub { !('common' ~~ @{ $_[0]->{tags} // []}) && $_[0]->{arg} });
@@ -975,7 +977,7 @@ Perinci::CmdLine::POD - Generate POD for Perinci::CmdLine-based CLI script
 
 =head1 VERSION
 
-This document describes version 0.012 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2017-02-27.
+This document describes version 0.013 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2017-06-08.
 
 =head1 SYNOPSIS
 

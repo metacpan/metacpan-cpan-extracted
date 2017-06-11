@@ -8,7 +8,7 @@ use File::Spec::Functions qw/catfile catdir/;
 use Text::Amuse::Compile;
 use Text::Amuse::Compile::Utils qw/write_file read_file/;
 
-my $tmpdir = File::Temp->newdir(CLEANUP => 0);
+my $tmpdir = File::Temp->newdir(CLEANUP => 1);
 
 my $target = catfile($tmpdir, 'default.muse');
 my $tex = catfile($tmpdir, 'default.tex');

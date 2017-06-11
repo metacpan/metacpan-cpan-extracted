@@ -3,13 +3,14 @@ abstract: 'Benchmark various number-to-words modules of different languages agai
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
-  Bencher::Backend: '1.034'
+  Bencher::Backend: '1.036'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -28,7 +29,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenario-Nums2WordsModules
   homepage: https://metacpan.org/release/Bencher-Scenario-Nums2WordsModules
   repository: git://github.com/perlancar/perl-Bencher-Scenario-Nums2WordsModules.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.024000'
@@ -104,7 +105,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.54'
+      version: '0.55'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -129,6 +130,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::CheckMetaResources
       name: '@Author::PERLANCAR/CheckMetaResources'
       version: '0.001'
+    -
+      class: Dist::Zilla::Plugin::CopyrightYearFromGit
+      name: '@Author::PERLANCAR/CopyrightYearFromGit'
+      version: '0.003'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
@@ -272,7 +277,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.05'
+              version: '0.06'
             -
               class: Pod::Weaver::Plugin::Bencher::Scenario
               name: -Bencher::Scenario
@@ -347,7 +352,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::InsertDistImage
       name: InsertDistImage
-      version: '0.004'
+      version: '0.005'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:

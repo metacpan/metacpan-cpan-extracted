@@ -16,7 +16,8 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.06"
          }
       },
       "develop" : {
@@ -38,7 +39,7 @@
       },
       "test" : {
          "requires" : {
-            "Bencher::Backend" : "1.034",
+            "Bencher::Backend" : "1.036",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
@@ -70,7 +71,7 @@
          "web" : "https://github.com/perlancar/perl-Bencher-Scenario-Nums2WordsModules"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024000"
@@ -165,7 +166,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.54"
+            "version" : "0.55"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -196,6 +197,11 @@
             "class" : "Dist::Zilla::Plugin::CheckMetaResources",
             "name" : "@Author::PERLANCAR/CheckMetaResources",
             "version" : "0.001"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CopyrightYearFromGit",
+            "name" : "@Author::PERLANCAR/CopyrightYearFromGit",
+            "version" : "0.003"
          },
          {
             "class" : "Dist::Zilla::Plugin::IfBuilt",
@@ -374,7 +380,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
                         "name" : "@Author::PERLANCAR/PERLANCAR::SortSections",
-                        "version" : "0.05"
+                        "version" : "0.06"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::Bencher::Scenario",
@@ -472,7 +478,7 @@
          {
             "class" : "Dist::Zilla::Plugin::InsertDistImage",
             "name" : "InsertDistImage",
-            "version" : "0.004"
+            "version" : "0.005"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -545,6 +551,6 @@
       }
    },
    "x_authority" : "cpan:PERLANCAR",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
 }
 

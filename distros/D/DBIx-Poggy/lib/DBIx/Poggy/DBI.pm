@@ -134,6 +134,7 @@ sub _do_async {
         my $ready;
         local $@;
         eval { $ready = $self->pg_ready; 1 } or do {
+            $guard = undef;
             return $done->('reject', $@);
         };
         return unless $ready;
@@ -182,15 +183,17 @@ sub prepare {
 This module wraps L</begin_work>, L</commit> and L</rollback> methods to
 help handle transactions.
 
-B<NOTE> that behaviour is not yet defined when commiting or rolling back
-a transaction with active query. I just havn't decided what to do in this
-case. Now it's your job to make sure commit/rollback happens after all
-queries on the handle.
+B<NOTE> that flow is similar to sync DBI: begin, query, query, ..., commit or
+rollback, so it's your job to make sure commit or rollback is called after
+all queries on the handle are finished otherwise code dies.
 
 =head4 begin_work
 
 Returns a Promise that will be resolved once transaction is committed or
-rejected on rollback or failed attempt to start the transaction.
+rejected if the transaction is rolled back or failed attempt to start
+the transaction.
+
+Value of the promise would be whatever is passed to commit or rollback.
 
 =cut
 
@@ -200,24 +203,24 @@ sub begin_work {
     $self->SUPER::begin_work(@_)
         or return $d->reject( $self->errobj )->promise;
     $self->{private_poggy_state}{txn} = $d;
-    my $wself = $self;
-    if ( my $pool = $self->{private_poggy_state}{release_to} ) {
-        $d->finally(sub { $pool->release( $wself ) });
-    }
-    weaken $wself;
     return $d->promise;
 }
 
 =head4 commit
 
 Takes resolution value of the transaction, commits and resolves the promise returned
-by L</begin_work>.
+by L</begin_work> with the value.
+
+Dies if you call commit without transaction or while queries are active.
 
 =cut
 
 sub commit {
     my $self = shift;
-    my $d = delete $self->{private_poggy_state}{txn} or die "No transaction in progress";
+    my $state = $self->{private_poggy_state};
+    die "Can not commit when you have active queries"
+        if $state->{active} || @{$state->{queue}};
+    my $d = delete $state->{txn} or die "No transaction in progress";
     my $rv = $self->SUPER::commit();
     unless ( $rv ) {
         $d->reject($self->errobj);
@@ -230,13 +233,18 @@ sub commit {
 =head4 rollback
 
 Takes rollback value of the transaction, commits and rejects the promise returned
-by L</begin_work>.
+by L</begin_work> with the value.
+
+Dies if you call rollback without transaction or while queries are active.
 
 =cut
 
 sub rollback {
     my $self = shift;
-    my $d = delete $self->{private_poggy_state}{txn} or die "No transaction in progress";
+    my $state = $self->{private_poggy_state};
+    die "Can not commit when you have active queries"
+        if $state->{active} || @{$state->{queue}};
+    my $d = delete $state->{txn} or die "No transaction in progress";
     my $rv = $self->SUPER::rollback();
     unless ( $rv ) {
         $d->reject($self->errobj);

@@ -1,0 +1,60 @@
+{
+   "abstract" : "BlankOnDev - Development tools for BlankOn GNU/Linux.",
+   "author" : [
+      "Achmad Yusri Afandi <yusrideb@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "BlankOnDev",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Test::More" : "0.88",
+            "Test::Requires" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.06"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Capture::Tiny::Extended" : "0",
+            "Crypt::Blowfish" : "0",
+            "DateTime" : "0",
+            "Digest::MD5" : "0",
+            "Digest::SHA1" : "0",
+            "GnuPG" : "0",
+            "Hash::MultiValue" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "List::Util" : "0",
+            "MIME::Base64" : "0",
+            "MIME::Base64::Perl" : "0",
+            "Term::ReadKey" : "0",
+            "Text::SimpleTable::AutoWidth" : "0",
+            "parent" : "0",
+            "perl" : "5.01205"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.1003"
+}

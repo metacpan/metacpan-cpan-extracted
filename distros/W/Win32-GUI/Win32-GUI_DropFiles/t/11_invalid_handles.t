@@ -53,7 +53,7 @@ for my $h (@handles) {
         skip "DragQueryPoint: Can't test error codes if we didn't get an error", 2 if defined $r;
 
         cmp_ok($!, "==", EINVAL, "DragQueryPoint: Errno set to EINVAL");
-        cmp_ok($^E, "==", $EXPECTED_E, "DragQueryPoint: LastError set to ERROR_INVALID_HANDLE");
+        cmp_ok($e, "==", $EXPECTED_E, "DragQueryPoint: LastError set to ERROR_INVALID_HANDLE");
     }
 
     # DragFinish

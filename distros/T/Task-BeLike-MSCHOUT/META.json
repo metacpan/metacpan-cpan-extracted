@@ -4,7 +4,7 @@
       "Michael Schout <mschout@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -45,6 +45,7 @@
             "Dist::Zilla::Plugin::Twitter" : "0",
             "Dist::Zilla::PluginBundle::MSCHOUT" : "0",
             "File::Find::Rule" : "0",
+            "Function::Parameters" : "0",
             "Git::CPAN::Patch" : "0",
             "Gravatar::URL" : "0",
             "IO::Socket::SSL" : "0",
@@ -60,16 +61,15 @@
             "Moose" : "0",
             "Moose::Autobox" : "0",
             "MooseX::App" : "0",
-            "MooseX::Method::Signatures" : "0",
             "Mouse" : "0",
             "Perl6::Junction" : "0",
             "Perl::Tidy" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "SQL::Beautify" : "0",
             "String::Truncate" : "0",
+            "Syntax::Feature::Try" : "0",
             "Template::Test" : "0",
             "Test::Pod::Coverage" : "0",
-            "TryCatch" : "0",
             "URI" : "0",
             "Vimana" : "0",
             "WWW::Shorten" : "0",
@@ -96,6 +96,7 @@
          "web" : "https://github.com/mschout/task-belike-mschout"
       }
    },
-   "version" : "1.162770"
+   "version" : "1.171510",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 

@@ -38638,14 +38638,14 @@ yyreduce:
   case 3037:
 #line 4471 "VParseBison.y" /* yacc.c:1646  */
     { PARSEP->symPushNew(VAstType::CLASS, (yyvsp[0].str));
-			  PARSEP->classCb((yyvsp[-3].fl),(yyvsp[-2].str),(yyvsp[0].str),(yyvsp[-3].str)); }
+			  PARSEP->classCb((yyvsp[-2].fl),(yyvsp[-2].str),(yyvsp[0].str),(yyvsp[-3].str)); }
 #line 38643 "VParseBison.c" /* yacc.c:1646  */
     break;
 
   case 3038:
 #line 4475 "VParseBison.y" /* yacc.c:1646  */
     { PARSEP->symPushNew(VAstType::CLASS, (yyvsp[0].str));
-			  PARSEP->classCb((yyvsp[-3].fl),(yyvsp[-2].str),(yyvsp[0].str),(yyvsp[-3].str)); }
+			  PARSEP->classCb((yyvsp[-2].fl),(yyvsp[-2].str),(yyvsp[0].str),(yyvsp[-3].str)); }
 #line 38650 "VParseBison.c" /* yacc.c:1646  */
     break;
 

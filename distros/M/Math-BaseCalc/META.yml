@@ -3,7 +3,6 @@ abstract: 'Convert numbers between various bases'
 author:
   - 'Ken Williams <kwilliams@cpan.org>'
 build_requires:
-  Config: 0
   Module::Build: 0.3601
   Test::More: 0
   warnings: 0
@@ -11,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.30
   Module::Build: 0.3601
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,8 +20,7 @@ requires:
   Carp: 0
   integer: 0
   strict: 0
-  vars: 0
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Math-BaseCalc
   repository: git://github.com/kenahoo/perl-math-basecalc.git
-version: 1.017
+version: 1.019

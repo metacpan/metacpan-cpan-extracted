@@ -1,0 +1,40 @@
+---
+abstract: 'I want 5000trillion yen.'
+author:
+  - '@ie.u-ryukyu.ac.jp>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.11, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-Want5000trillion
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Acme::Want5000trillion:
+    file: lib/Acme/Want5000trillion.pm
+    version: '0.01'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/AnaTofuZ/perl5-acme-Want5000trillio/issues
+  homepage: https://github.com/AnaTofuZ/perl5-acme-Want5000trillio
+  repository: git://github.com/AnaTofuZ/perl5-acme-Want5000trillio.git
+version: '0.01'
+x_authority: cpan:ANATOFUZ
+x_contributors:
+  - 'AnaTofuZ <e155730@ie.u-ryukyu.ac.jp>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

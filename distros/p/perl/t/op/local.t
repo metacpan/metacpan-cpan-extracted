@@ -2,10 +2,10 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = qw(. ../lib);
     require './test.pl';
+    set_up_inc(  qw(. ../lib) );
 }
-plan tests => 310;
+plan tests => 315;
 
 my $list_assignment_supported = 1;
 
@@ -469,8 +469,7 @@ is($h{'c'}, 3);
 # local() should preserve the existenceness of tied hash elements
 ok(! exists $h{'y'});
 ok(! exists $h{'z'});
-TODO: {
-    todo_skip("Localize entire tied hash");
+{
     my $d = join("\n", map { "$_=>$h{$_}" } sort keys %h);
     local %h = %h;
     is(join("\n", map { "$_=>$h{$_}" } sort keys %h), $d);
@@ -825,3 +824,25 @@ local $SIG{__WARN__};
     delete local @Grompits::{<foo bar>};
 }
 pass 'rmagic does not cause delete local to crash on nonexistent elems';
+
+TODO: {
+    my @a = (1..5);
+    {
+        local $#a = 2;
+        is($#a, 2, 'RT #7411: local($#a) should change count');
+        is("@a", '1 2 3', 'RT #7411: local($#a) should shorten array');
+    }
+
+    local $::TODO = 'RT #7411: local($#a)';
+
+    is($#a, 4, 'RT #7411: after local($#a), count should be restored');
+    is("@a", '1 2 3 4 5', 'RT #7411: after local($#a), array should be restored');
+}
+
+$a = 10;
+TODO: {
+    local $::TODO = 'RT #7615: if (local $a)';
+    if (local $a = 1){
+    }
+    is($a, 10, 'RT #7615: local in if condition should be restored');
+}

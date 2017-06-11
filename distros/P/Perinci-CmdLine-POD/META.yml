@@ -36,7 +36,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-POD
   homepage: https://metacpan.org/release/Perinci-CmdLine-POD
   repository: git://github.com/perlancar/perl-Perinci-CmdLine-POD.git
-version: '0.012'
+version: '0.013'
 x_Dist_Zilla:
   perl:
     version: '5.024000'

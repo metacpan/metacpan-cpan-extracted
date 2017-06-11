@@ -1,50 +1,54 @@
---- #YAML:1.0
-name:               Task-Digest
-version:            0.05
-abstract:           Task to install all available cryptographic message digests
+---
+abstract: 'Task to install all available cryptographic message digests'
 author:
-    - gray <gray@cpan.org>
-license:            perl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'gray <gray@cpan.org>'
 build_requires:
-    Test::More:  0.82
-requires:
-    Crypt::RIPEMD160:     0
-    Digest::BLAKE:        0
-    Digest::BMW:          0
-    Digest::CubeHash::XS:  0
-    Digest::ECHO:         0
-    Digest::EdonR:        0
-    Digest::Fugue:        0
-    Digest::GOST:         0
-    Digest::Groestl:      0
-    Digest::Hamsi:        0
-    Digest::JH:           0
-    Digest::Keccak:       0
-    Digest::Luffa:        0
-    Digest::MD2:          0
-    Digest::MD4:          0
-    Digest::MD5:          0
-    Digest::MD6:          0
-    Digest::Perl::MD4:    0
-    Digest::Perl::MD5:    0
-    Digest::SHA:          0
-    Digest::SHA1:         0
-    Digest::SHA::PurePerl:  0
-    Digest::Shabal:       0
-    Digest::SHAvite3:     0
-    Digest::SIMD:         0
-    Digest::Skein:        0
-    Digest::Whirlpool:    0
-resources:
-    repository:  http://github.com/gray/task-digest
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.56
+  Test::More: '0.82'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.2901, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Task-Digest
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Crypt::RIPEMD160: '0'
+  CryptX: '0'
+  Digest::BLAKE: '0'
+  Digest::BLAKE2: '0'
+  Digest::BMW: '0'
+  Digest::CubeHash::XS: '0'
+  Digest::ECHO: '0'
+  Digest::EdonR: '0'
+  Digest::Fugue: '0'
+  Digest::GOST: '0'
+  Digest::Groestl: '0'
+  Digest::Hamsi: '0'
+  Digest::JH: '0'
+  Digest::Keccak: '0'
+  Digest::Luffa: '0'
+  Digest::MD2: '0'
+  Digest::MD4: '0'
+  Digest::MD5: '0'
+  Digest::MD6: '0'
+  Digest::Perl::MD4: '0'
+  Digest::Perl::MD5: '0'
+  Digest::SHA: '0'
+  Digest::SHA1: '0'
+  Digest::SHA3: '0'
+  Digest::SHA::PurePerl: '0'
+  Digest::SHAvite3: '0'
+  Digest::SIMD: '0'
+  Digest::Shabal: '0'
+  Digest::Skein: '0'
+  Digest::Whirlpool: '0'
+resources:
+  repository: http://github.com/gray/task-digest
+version: '0.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

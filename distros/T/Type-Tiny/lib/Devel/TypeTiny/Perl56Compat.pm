@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.000006';
+our $VERSION   = '1.002001';
 
 #### B doesn't provide perlstring() in 5.6. Monkey patch it.
 
@@ -23,7 +23,12 @@ unless (exists &B::perlstring)
 	};
 }
 
-push @B::EXPORT_OK, 'perlstring';
+unless (exists &B::cstring)
+{
+	*B::cstring = \&B::perlstring;
+}
+
+push @B::EXPORT_OK, qw( perlstring cstring );
 
 #### Done!
 

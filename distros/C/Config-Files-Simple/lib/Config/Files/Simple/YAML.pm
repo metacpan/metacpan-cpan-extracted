@@ -8,11 +8,11 @@ Config::Files::Simple::YAML - Yet another config file reader.
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =cut
 
-our $VERSION = '0.02';    # VERSION
+our $VERSION = '0.03';    # VERSION
 
 use utf8;
 use strict;

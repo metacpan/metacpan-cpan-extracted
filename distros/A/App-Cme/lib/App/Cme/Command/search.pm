@@ -10,7 +10,7 @@
 # ABSTRACT: Search the configuration of an application
 
 package App::Cme::Command::search ;
-$App::Cme::Command::search::VERSION = '1.019';
+$App::Cme::Command::search::VERSION = '1.020';
 use strict;
 use warnings;
 use 5.10.1;
@@ -22,7 +22,9 @@ use base qw/App::Cme::Common/;
 use Config::Model::ObjTreeScanner;
 
 sub validate_args {
-    shift->process_args(@_);
+    my ($self, $opt, $args) = @_;
+    $self->check_unknown_args($args);
+    $self->process_args($opt,$args);
 }
 
 sub opt_spec {
@@ -84,7 +86,7 @@ App::Cme::Command::search - Search the configuration of an application
 
 =head1 VERSION
 
-version 1.019
+version 1.020
 
 =head1 SYNOPSIS
 

@@ -5,7 +5,8 @@ our $VERSION = $Gtk2::Ex::DbLinker::DbTools::VERSION;
 use strict;
 use warnings;
 # use Data::Dumper;
-# use Carp;
+use Log::Any;
+use Carp;
 use Try::Tiny;
 
 my %fieldtype = ( tinyint => "integer", "int" => "integer" );
@@ -35,7 +36,8 @@ sub new {
     };
     $self->{cols}  = [];
     $self->{hcols} = {};
-    $self->{rs_log}   = Log::Log4perl->get_logger(__PACKAGE__); #log is used in the derived class
+    #$self->{rs_log}   = Log::Log4perl->get_logger(__PACKAGE__); #log is used in the derived class
+    $self->{rs_log}   = Log::Any->get_logger; #log is used in the derived class
     bless $self, $class;
 }
 
@@ -262,8 +264,8 @@ sub get_field {
     my ( $self, $fieldname ) = @_;
 
 # $self->{rs_log}->debug("get_field - name : " . $fieldname . "\nRecords: " . (Dumper $self->{records}));
-     $self->{rs_log}->logcarp("get_field($fieldname) called on an empty recordset ! Did you forget to call set_row_pos(0) after query ?"
-    ) unless ( $self->{records} );
+     carp($self->{rs_log}->warn("get_field($fieldname) called on an empty recordset ! Did you forget to call set_row_pos(0) after query ?"
+    )) unless ( $self->{records} );
     my $data = $self->{records}[ $self->{batch_pos} ]->{$fieldname};
     return $data;
 }

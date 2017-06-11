@@ -2,12 +2,12 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = '../lib';
     require './test.pl';
+    set_up_inc('../lib');
 }
 use strict;
 
-plan tests => 39;
+plan tests => 40;
 
 package aiieee;
 
@@ -140,6 +140,16 @@ for our $z (*_) {
     is $z, "*main::_", 'And the glob still has the right value';
 }
 
+package _128106 {
+    # Crash on non-globs in the stash.
+    sub u;    # stub without proto
+    sub v($); # proto stub
+    sub w{};  # as of 5.22, $::{w} == \&w
+    $::{x} = undef;
+    reset 'u-x';
+    ::ok (1, "no crash on non-globs in the stash");
+}
+
 # This used to crash under threaded builds, because pmops were remembering
 # their stashes by name, rather than by pointer.
 fresh_perl_is( # it crashes more reliably with a smaller script
@@ -174,7 +184,7 @@ SKIP:
 	    my $copy = $prog;
 	    $copy =~ s/8/$eight/gm;
 	    $copy =~ s/9/$nine/gm;
-	    fresh_perl_is($copy, "pass", "",
+	    fresh_perl_is($copy, "pass", {},
 			  "first pattern $eight$eight, second $nine$nine");
 	}
     }

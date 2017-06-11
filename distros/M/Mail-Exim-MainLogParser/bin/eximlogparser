@@ -1,0 +1,58 @@
+#! /usr/bin/perl -w
+
+=pod
+
+This script, eximlogparser, will parse a given log file and print out a list
+of parsed log line hash structures grouped by EximID and each group ordered
+by when the EximID is first seen in the log file.
+
+=cut
+
+use strict;
+use Mail::Exim::MainLogParser qw(EximMainLoglineParse);
+use Data::Dumper;
+
+my $logfile = shift @ARGV;
+
+if ( ! defined $logfile ) {
+  die "Usage: $0 <Exim_Main_logfile>\n"
+} elsif ( ! -f $logfile ) {
+  die "File $logfile does not exist.\n"
+}
+
+open (EXIMLOG, "< $logfile") or die "unable to open $logfile";
+
+my $queue = [];
+my $map = {};
+my $c = 0;
+while (<EXIMLOG>) {
+  $c++;
+  my $p = EximMainLoglineParse($_) || undef;
+
+  if (! defined $p) {
+    warn ("Error parsing line ".$c.": ".$_."\n");
+    next;
+  }
+  if (! defined $p->{'eximid'}) {
+  #if ((defined $p->{'eximid'}) && (! defined $p->{'flag'})) {
+    print Dumper($p); next;
+    next;
+  }
+  #DEBUG# print "===== ".$c." =====\n"; print Dumper($p);
+  if (defined $p->{'eximid'}) {
+    if (! exists $map->{$p->{'eximid'}}) {
+      # create a new transaction
+      my $transaction = []; # Holds the entire transaction of a message
+      $map->{$p->{'eximid'}} = $transaction;
+      push(@{$queue},$transaction);
+    }
+    my $tx = $map->{$p->{'eximid'}};
+    push (@{$tx},$p);
+  }
+}
+
+close (EXIMLOG);
+
+foreach my $qi (@$queue) {
+  print Dumper($qi);
+}

@@ -1,7 +1,7 @@
 package DDG::IsGoodie;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Role for Goodies
-$DDG::IsGoodie::VERSION = '1016';
+$DDG::IsGoodie::VERSION = '1017';
 use Moo::Role;
 
 requires qw(
@@ -21,7 +21,7 @@ DDG::IsGoodie - Role for Goodies
 
 =head1 VERSION
 
-version 1016
+version 1017
 
 =head1 DESCRIPTION
 

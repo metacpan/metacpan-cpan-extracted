@@ -32,9 +32,6 @@ sub run ($self) {
         exit 1;
     }
 
-    # load global pcore.perl config
-    my $pcore_cfg = P->cfg->load( $ENV->share->get( '/data/pcore.perl', lib => 'Pcore' ) );
-
     # build scripts
     for my $script ( sort keys $self->dist->par_cfg->%* ) {
 
@@ -49,7 +46,7 @@ sub run ($self) {
         else {
             say qq["$pardeps_path" is not exists.];
 
-            say BOLD . RED . qq[Deps for script "$script" wasn't scanned.] . RESET;
+            say $BOLD . $RED . qq[Deps for script "$script" wasn't scanned.] . $RESET;
 
             say q[Run source scripts with --scan-deps option.];
 
@@ -66,39 +63,19 @@ sub run ($self) {
 
         # check, that script from par profile exists in filesystem
         if ( !-f $profile->{script} ) {
-            say BOLD . RED . qq[Script "$script" wasn't found.] . RESET;
+            say $BOLD . $RED . qq[Script "$script" wasn't found.] . $RESET;
 
             next;
         }
 
-        # add pardeps.json modules, skip eval records
+        # add pardeps.json modules, skip eval modules
         $profile->{mod}->@{ grep { !/\A[(]eval\s/sm } $pardeps->@* } = ();
-
-        # add common modules
-        $profile->{mod}->@{ $pcore_cfg->{par}->{mod}->@* } = ();
-
-        # add global arch modules
-        $profile->{mod}->@{ $pcore_cfg->{par}->{arch}->{ $Config{archname} }->{mod}->@* } = () if exists $pcore_cfg->{par}->{arch}->{ $Config{archname} }->{mod};
-
-        # remove common ignored modules
-        delete $profile->{mod}->@{ $pcore_cfg->{par}->{mod_ignore}->@* };
 
         # replace Inline.pm with Pcore/Core/Inline.pm
         $profile->{mod}->{'Pcore/Core/Inline.pm'} = undef if delete $profile->{mod}->{'Inline.pm'};
 
         # add Filter::Crypto::Decrypt deps if crypt mode is used
         $profile->{mod}->{'Filter/Crypto/Decrypt.pm'} = undef if $profile->{crypt};
-
-        # index and add shlib
-        my $shlib = {};
-
-        if ( exists $pcore_cfg->{par}->{arch}->{ $Config{archname} }->{mod_shlib} ) {
-            for my $mod ( grep { exists $profile->{mod}->{$_} } keys $pcore_cfg->{par}->{arch}->{ $Config{archname} }->{mod_shlib}->%* ) {
-                $shlib->@{ $pcore_cfg->{par}->{arch}->{ $Config{archname} }->{mod_shlib}->{$mod}->@* } = ();
-            }
-        }
-
-        $profile->{shlib} = [ keys $shlib->%* ];
 
         Pcore::Dist::Build::PAR::Script->new($profile)->run;
     }

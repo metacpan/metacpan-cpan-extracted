@@ -15,6 +15,7 @@ WriteMakefile(
     BUILD_REQUIRES => {
 	'Test::Most' => 0,
 	'Test::Timer' => 0,
+	'LWP::Protocol::https' => 0,
 	# 'Test::Kwalitee' => 0,
     },
     PREREQ_PM => {

@@ -1,4 +1,8 @@
 
+0.171600  2017-06-09 10:55:10-04:00 EST5EDT
+
+	- added sdy to the list of known date fields
+
 0.170480  2017-02-17 16:21:06-05:00 EST5EDT
 
 	- added preserve_detection_limits option

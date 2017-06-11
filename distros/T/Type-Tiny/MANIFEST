@@ -13,11 +13,14 @@ SIGNATURE
 TODO
 dist.ini
 doap.ttl
-examples/benchmark-coercions.pl
-examples/benchmark-constraints.pl
-examples/benchmark-param-validation.pl
+examples/benchmarking/benchmark-coercions.pl
+examples/benchmarking/benchmark-constraints.pl
+examples/benchmarking/benchmark-named-param-validation.pl
+examples/benchmarking/benchmark-param-validation.pl
+examples/benchmarking/versus-scalar-validation.pl
 examples/datetime-coercions.pl
-examples/versus-scalar-validation.pl
+examples/nonempty.pl
+examples/page-numbers.pl
 inc/Test/Fatal.pm
 inc/Test/Requires.pm
 inc/Try/Tiny.pm
@@ -60,6 +63,7 @@ lib/Types/Common/Numeric.pm
 lib/Types/Common/String.pm
 lib/Types/Standard.pm
 lib/Types/Standard/ArrayRef.pm
+lib/Types/Standard/CycleTuple.pm
 lib/Types/Standard/Dict.pm
 lib/Types/Standard/HashRef.pm
 lib/Types/Standard/Map.pm
@@ -102,6 +106,8 @@ t/20-unit/Type-Library/types.t
 t/20-unit/Type-Params/badsigs.t
 t/20-unit/Type-Params/carping.t
 t/20-unit/Type-Params/coerce.t
+t/20-unit/Type-Params/compile-named.t
+t/20-unit/Type-Params/hashorder.t
 t/20-unit/Type-Params/methods.t
 t/20-unit/Type-Params/mixednamed.t
 t/20-unit/Type-Params/multisig.t
@@ -130,10 +136,12 @@ t/20-unit/Type-Tiny-Role/basic.t
 t/20-unit/Type-Tiny-Role/errors.t
 t/20-unit/Type-Tiny-Union/basic.t
 t/20-unit/Type-Tiny-Union/errors.t
+t/20-unit/Type-Tiny-_HalfOp/double-union.t
 t/20-unit/Type-Tiny-_HalfOp/overload-precedence.t
 t/20-unit/Type-Tiny/arithmetic.t
 t/20-unit/Type-Tiny/basic.t
 t/20-unit/Type-Tiny/coercion-modifiers.t
+t/20-unit/Type-Tiny/constraint-strings.t
 t/20-unit/Type-Tiny/esoteric.t
 t/20-unit/Type-Tiny/my-methods.t
 t/20-unit/Type-Tiny/parameterization.t
@@ -153,6 +161,7 @@ t/20-unit/Types-Common-String/basic.t
 t/20-unit/Types-Common-String/coerce.t
 t/20-unit/Types-Common-String/unicode.t
 t/20-unit/Types-Standard/basic.t
+t/20-unit/Types-Standard/cycletuple.t
 t/20-unit/Types-Standard/deep-coercions.t
 t/20-unit/Types-Standard/lockdown.t
 t/20-unit/Types-Standard/mxtmlb-alike.t
@@ -180,6 +189,7 @@ t/30-integration/Moops/basic.t
 t/30-integration/Moops/library-keyword.t
 t/30-integration/Moose/accept-moose-types.t
 t/30-integration/Moose/basic.t
+t/30-integration/Moose/coercion-more.t
 t/30-integration/Moose/coercion.t
 t/30-integration/Moose/inflate-then-inline.t
 t/30-integration/Moose/native-attribute-traits.t
@@ -204,6 +214,7 @@ t/30-integration/match-simple/basic.t
 t/40-regression/73f51e2d.pl
 t/40-regression/73f51e2d.t
 t/40-regression/gh1.t
+t/40-regression/gh14.t
 t/40-regression/rt85911.t
 t/40-regression/rt86004.t
 t/40-regression/rt86233.t

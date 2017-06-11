@@ -52,6 +52,8 @@ sub post_json {
 =head3 put_json
 
 A variant on LWP::UserAgent::put with the same transformations as post_json.
+This requires that your version of LWP supports PUT, i.e. you have LWP 6.00
+or later.
 
 =cut
 
@@ -59,12 +61,18 @@ sub put_json {
     my $self = shift;
     my $url = shift;
 
-    $self->SUPER::put($url, $self->_mangle_request_arguments(@_));
+    my @parameters = $self->_mangle_request_arguments(@_);
+    if ($self->SUPER::can('put')) {
+        $self->SUPER::put($url, @parameters);
+    } else {
+        $self->_send_unimplemented_http_method(PUT => $url, @parameters);
+    }
 }
 
 =head3 patch_json
 
 As post_json and put_json, but generates a PATCH request instead.
+As put_json, you need a semi-modern version of LWP for this.
 
 =cut
 
@@ -83,12 +91,17 @@ here.
 =cut
 
 sub patch {
-    require HTTP::Request::Common;
     my ($self, @parameters) = @_;
+    $self->_send_unimplemented_http_method(PATCH => @parameters);
+}
+
+sub _send_unimplemented_http_method {
+    require HTTP::Request::Common;
+    my ($self, $method, @parameters) = @_;
     my @suff = $self->_process_colonic_headers(\@parameters,
         (ref($parameters[1]) ? 2 : 1));
     return $self->request(
-        HTTP::Request::Common::request_type_with_data('PATCH', @parameters),
+        HTTP::Request::Common::request_type_with_data($method, @parameters),
         @suff);
 }
 

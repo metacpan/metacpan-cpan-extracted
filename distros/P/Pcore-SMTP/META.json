@@ -48,6 +48,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore-smtp/overview"
       }
    },
-   "version" : "v0.2.1",
-   "x_serialization_backend" : "JSON::PP version 2.93"
+   "version" : "v0.4.0",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

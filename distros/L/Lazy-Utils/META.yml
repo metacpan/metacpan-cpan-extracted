@@ -26,4 +26,4 @@ resources:
   homepage: https://github.com/orkunkaraduman/Lazy-Utils/tree/master
   license: https://www.gnu.org/licenses/gpl-3.0.html
   repository: git://git@github.com:orkunkaraduman/Lazy-Utils.git
-version: '1.20'
+version: '1.21'

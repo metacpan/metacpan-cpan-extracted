@@ -51,3 +51,6 @@ perl -I lib/ script/runlist position --op overlap t/intergenic.yml t/S288c.txt -
 
 perl -I lib/ script/runlist genome t/chr.sizes -o stdout \
     | perl -I lib/ script/runlist stat stdin -s t/chr.sizes --all -o stdout
+
+perl -I lib/ script/runlist convert t/repeat.yml -o stdout
+perl -I lib/ t/15-convert.t

@@ -1,7 +1,7 @@
 package Pcore::HTTP::Server;
 
 use Pcore -class, -const, -result;
-use Pcore::AE::Handle2;
+use Pcore::AE::Handle;
 use AnyEvent::Socket qw[];
 use Pcore::Util::Scalar qw[blessed];
 use Pcore::HTTP::Server::Request;
@@ -79,7 +79,7 @@ sub _on_prepare ( $self, $fh, $host, $port ) {
 }
 
 sub _on_accept ( $self, $fh, $host, $port ) {
-    Pcore::AE::Handle2->new(
+    Pcore::AE::Handle->new(
         fh              => $fh,
         tcp_no_delay    => $self->tcp_no_delay,
         tcp_so_kepalive => $self->tcp_so_keepalive,

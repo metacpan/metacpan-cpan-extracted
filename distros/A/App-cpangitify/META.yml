@@ -16,7 +16,7 @@ configure_requires:
   Sort::Versions: '0'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -39,6 +39,7 @@ requires:
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/plicease/App-cpangitify/issues
-  homepage: http://perl.wdlabs.com/App-cpangitify
+  homepage: https://metacpan.org/pod/App::cpangitify
   repository: git://github.com/plicease/App-cpangitify.git
-version: '0.12'
+version: '0.14'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,5 +1,5 @@
 {
-   "abstract" : "Plack application that wraps a REST API around a Catmandu::Bag",
+   "abstract" : "Wrap a REST API around a Catmandu::Bag",
    "author" : [
       "Nicolas Steenlant <nicolas.steenlant@ugent.be>"
    ],
@@ -67,7 +67,7 @@
          "web" : "https://github.com/LibreCat/Plack-App-Catmandu-Bag"
       }
    },
-   "version" : "0.01",
+   "version" : "0.0101",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
 }
 

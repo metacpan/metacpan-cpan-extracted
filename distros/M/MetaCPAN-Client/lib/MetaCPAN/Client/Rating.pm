@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::Rating;
 # ABSTRACT: A Rating data object
-$MetaCPAN::Client::Rating::VERSION = '2.015000';
+$MetaCPAN::Client::Rating::VERSION = '2.016000';
 use Moo;
 
 with 'MetaCPAN::Client::Role::Entity';
@@ -52,7 +52,7 @@ MetaCPAN::Client::Rating - A Rating data object
 
 =head1 VERSION
 
-version 2.015000
+version 2.016000
 
 =head1 SYNOPSIS
 

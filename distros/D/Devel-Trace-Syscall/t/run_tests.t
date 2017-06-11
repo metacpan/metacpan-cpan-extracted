@@ -5,9 +5,8 @@ use warnings;
 use autodie;
 use feature qw(say);
 
-use Carp::Always;
-
 use FindBin;
+use File::Spec;
 use Test::More;
 use Test::Differences;
 
@@ -38,7 +37,7 @@ sub capture_trace_output {
         return ( $? >> 8, \@lines );
     } else {
         close $read;
-        close STDOUT;
+        open STDOUT, '>', File::Spec->devnull;
         open STDERR, '>&', $write;
 
         exec @command;

@@ -1,6 +1,7 @@
-package Pcore::XMPP v0.8.2;
+package Pcore::XMPP v0.10.0;
 
 use Pcore -dist;
+use AnyEvent::XMPP::Client;
 
 1;
 __END__
@@ -13,15 +14,6 @@ __END__
 Pcore::XMPP
 
 =head1 SYNOPSIS
-
-    # create handle
-    my $xmpp = P->handle('xmpp://username:password@gmail.com?gtalk');
-
-    # send message
-    $xmpp->sendmsg( 'to_user@gmail.com', 'message' );
-
-    # create log channel
-    P->log->add( 'channel', 'xmpp://username:password@gmail.com?gtalk&to=to_user@gmail.com' );
 
 =head1 DESCRIPTION
 

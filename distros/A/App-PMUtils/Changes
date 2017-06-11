@@ -1,3 +1,9 @@
+0.68    2017-06-09 (PERLANCAR)
+
+	- Update to use MetaCPAN v1 API instead of v0 which has been shut
+	  down [RT#122015].
+
+
 0.67    2017-02-01 (PERLANCAR)
 
 	- pmpath: Adjust to Module::Path::More 0.32 (find_* options are now

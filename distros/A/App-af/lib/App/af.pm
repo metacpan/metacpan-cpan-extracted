@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use 5.014;
 
-package App::af 0.09 {
+package App::af 0.10 {
 
   use Moose::Role;
   use namespace::autoclean;
@@ -79,7 +79,7 @@ package App::af 0.09 {
   requires 'main';  
 }
 
-package App::af::default {
+package App::af::default 0.10 {
 
   use Moose;
   with 'App::af';
@@ -94,7 +94,7 @@ package App::af::default {
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::role::alienfile {
+package App::af::role::alienfile 0.10 {
 
   use Moose::Role;
   use namespace::autoclean;
@@ -160,6 +160,14 @@ package App::af::role::alienfile {
       say STDERR "unable to read $alienfile";
       exit 2;
     }
+    
+    if(my $patch = $alienfile->parent->child('patch'))
+    {
+      if(-d $patch)
+      {
+        $args{patch} = "$patch";
+      }
+    }
   
     require Alien::Build;
     my $build = Alien::Build->load("$alienfile", %args);
@@ -169,7 +177,7 @@ package App::af::role::alienfile {
   }  
 }
 
-package App::af::role::phase {
+package App::af::role::phase 0.10 {
 
   use Moose::Role;
   use namespace::autoclean;
@@ -196,7 +204,7 @@ package App::af::role::phase {
   
 }
 
-package App::af::opt {
+package App::af::opt 0.10 {
 
   use Moose::Role;
   use namespace::autoclean;
@@ -239,7 +247,7 @@ App::af - Command line tool for alienfile
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    Version 0.001
+    Version 0.002
 
 INSTALLATION
 
@@ -25,10 +25,12 @@ INSTALLATION
 
 DEPENDENCIES
 
-            Test::Simple    0.44
-            File::Tie       1.02
+            Data::Dumper    2.16
+            Log::Any        1.049
+            Test::More      1.001014
             Pod::Simple     3.32
-             Log::Log4perl  1.47
+            Tie::File       1.02
+            Carp    1.4
 
 DESCRIPTION
 
@@ -38,8 +40,7 @@ DESCRIPTION
 
 AUTHOR
 
-        FranE<ccedil>ois Rappaz
-        CPAN ID: RAPPAZF
+    François Rappaz CPAN ID: RAPPAZF
 
 COPYRIGHT
 

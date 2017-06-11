@@ -1,6 +1,24 @@
 Changes for the CPAN Testers Reports website
 ============================================
 
+3.59    2017-06-07
+        - introduced auto incrementing storeid to stats_store, to make updates
+          easier than lots of inserts.
+        - updated scripts & files with changes from production environment.
+
+3.58    2017-06-04
+        - updated Release code to use new distribution indices.
+        - upgrade to Labyrinth-5.32.
+        - upgrade to Labyrinth-Plugin-Core-5.19.
+        - upgrade to Labyrinth-Plugin-CPAN-3.54.
+        - upgrade to Labyrinth-Plugin-Requests-1.08.
+        - updated view-report.cgi to latest live version
+          (thanks to Alceu Rodrigues de Freitas Junior for the patch)
+        - updated changes from live production.
+        - added Try::Tiny capture around the RemoveAuthorPages block due to
+          some odd JSON parsing that was causing it to crash.
+        - new code to load Perl/OS stats, due to the previous db overload.
+
 3.57    2015-08-16
         - fixes from live.
         - updated quotation.

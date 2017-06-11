@@ -1,7 +1,11 @@
 Revision history for Perl module Mojo::WebSocketProxy
 
-0.05      2017-05-01 06:30:16+00:00 UTC
+0.06      2017-06-01 03:05:17+00:00 UTC
+    This introduces support for callbacks which return Future instances,
+    allowing for deferred processing when the before or after hooks need
+    to perform I/O before returning a result.
 
+0.05      2017-05-01 06:30:16+00:00 UTC
     - remove Data::UUID
 
 0.04      2017-02-21 02:16:06+00:00 UTC

@@ -1,5 +1,5 @@
 package Net::Whois::Raw::Data;
-$Net::Whois::Raw::Data::VERSION = '2.99007';
+$Net::Whois::Raw::Data::VERSION = '2.99008';
 # ABSTRACT: Config for Net::Whois::Raw.
 
 use utf8;
@@ -4271,6 +4271,11 @@ our %query_prefix = (
     'whois.arin.net'           => 'n + ',
 );
 
+# Servers (within ports) to bypass recursion
+our %whois_servers_no_recurse = (
+    # 'rwhois.servercentral.net:4321' => 1,
+);
+
 1;
 
 __END__
@@ -4285,7 +4290,7 @@ Net::Whois::Raw::Data - Config for Net::Whois::Raw.
 
 =head1 VERSION
 
-version 2.99007
+version 2.99008
 
 =head1 AUTHOR
 

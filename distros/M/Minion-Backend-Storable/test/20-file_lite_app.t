@@ -9,7 +9,7 @@ use Mojo::IOLoop;
 use Mojolicious::Lite;
 use Test::Mojo;
 
-my $tmpdir = tempdir CLEANUP => 1;
+my $tmpdir = tempdir CLEANUP => 1, EXLOCK => 0;
 my $file = catfile $tmpdir, 'minion.data';
 
 # Missing backend

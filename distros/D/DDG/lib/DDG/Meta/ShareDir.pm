@@ -1,7 +1,7 @@
 package DDG::Meta::ShareDir;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Installing functions for easy access to the module sharedir
-$DDG::Meta::ShareDir::VERSION = '1016';
+$DDG::Meta::ShareDir::VERSION = '1017';
 use strict;
 use warnings;
 use Carp qw( croak );
@@ -91,7 +91,7 @@ DDG::Meta::ShareDir - Installing functions for easy access to the module sharedi
 
 =head1 VERSION
 
-version 1016
+version 1017
 
 =head1 DESCRIPTION
 

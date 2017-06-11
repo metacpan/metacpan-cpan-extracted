@@ -1,3 +1,8 @@
+Overview of changes in Glib::Object::Introspection 0.043
+========================================================
+
+* Add functions for handling raw flags values
+
 Overview of changes in Glib::Object::Introspection 0.042
 ========================================================
 

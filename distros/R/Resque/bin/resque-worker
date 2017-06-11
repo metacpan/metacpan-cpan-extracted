@@ -45,7 +45,7 @@ resque-worker - Executable to run your resque workers
 
 =head1 VERSION
 
-version 0.31
+version 0.34
 
 =head1 SYNOPSIS
 

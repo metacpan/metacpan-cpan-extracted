@@ -4,7 +4,7 @@
       "Olaf Alders <olaf@wundercounter.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -41,6 +41,7 @@
       "runtime" : {
          "requires" : {
             "Browser::Open" : "0",
+            "Capture::Tiny" : "0",
             "Carp" : "0",
             "File::pushd" : "0",
             "Getopt::Long" : "0",
@@ -90,8 +91,9 @@
          "web" : "https://github.com/oalders/git-helpers"
       }
    },
-   "version" : "0.000010",
+   "version" : "0.000011",
    "x_contributors" : [
+      "Chris Weyl <cweyl@alumni.drew.edu>",
       "Kevin Phair <phair.kevin@gmail.com>",
       "Olaf Alders <olaf@wundersolutions.com>",
       "Philippe Bruhat (BooK) <book@cpan.org>"

@@ -68,7 +68,7 @@
          "web" : "https://github.com/LibreCat/Plack-Middleware-Memento"
       }
    },
-   "version" : "0.0101",
+   "version" : "0.0102",
    "x_contributors" : [
       "vpeil <vitali.peil@uni-bielefeld.de>"
    ],

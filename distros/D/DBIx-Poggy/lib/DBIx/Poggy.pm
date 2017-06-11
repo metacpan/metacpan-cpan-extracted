@@ -3,7 +3,7 @@ use warnings;
 use v5.14;
 
 package DBIx::Poggy;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Scalar::Util qw(weaken refaddr);
 
@@ -73,6 +73,31 @@ one connection. Handy for transactions and pool doesn't grow too much.
 Only a queries on multiple connections, so if you need to execute many parallel
 queries then you need many connections. pg_bouncer and haproxy are your friends.
 
+=head2 Pool management
+
+In auto mode (default) you just "loose" reference to database handle and it gets
+released back into the pool after all queries are done:
+
+    {
+        my $cv = AnyEvent->condvar;
+        $pool->take->do(...)->finally($cv);
+        $cv->recv;
+    }
+    # released
+
+Or:
+    {
+        my $cv = AnyEvent->condvar;
+        my $dbh = $pool->take;
+        $dbh->do(...)
+        ->then(sub { $dbh->do(...) })
+        ->then(sub { ... })
+        ->finally($cv);
+        $cv->recv;
+    }
+    # $dbh goes out of scope and all queries are done (cuz of condvar)
+    # released
+
 =cut
 
 use DBIx::Poggy::DBI;
@@ -112,6 +137,7 @@ sub init {
 =head2 connect
 
 Takes the same arguments as L<DBI/connect>, opens "pool_size" connections.
+Saves connection settings for reuse when pool is exhausted.
 
 =cut
 
@@ -150,8 +176,8 @@ Gives one connection from the pool. Takes arguments:
 
 =item auto
 
-Connection will be released to the pool after transaction or
-as soon as query queue becomes empty. True by default.
+Connection will be released to the pool once C<dbh> goes out of
+scope (gets "DESTROYED"). True by default.
 
 =back
 

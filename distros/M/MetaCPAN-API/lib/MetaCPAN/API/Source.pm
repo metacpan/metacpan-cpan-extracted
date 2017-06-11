@@ -2,7 +2,9 @@ use strict;
 use warnings;
 package MetaCPAN::API::Source;
 # ABSTRACT: Source information for MetaCPAN::API
-$MetaCPAN::API::Source::VERSION = '0.50';
+
+our $VERSION = '0.51';
+
 use Carp;
 use Moo::Role;
 use namespace::autoclean;
@@ -49,7 +51,7 @@ MetaCPAN::API::Source - Source information for MetaCPAN::API
 
 =head1 VERSION
 
-version 0.50
+version 0.51
 
 =head1 DESCRIPTION
 

@@ -1,7 +1,7 @@
 # ABSTRACT: TestRail testing harness
 # PODNAME: Test::Rail::Harness
 package Test::Rail::Harness;
-$Test::Rail::Harness::VERSION = '0.040';
+$Test::Rail::Harness::VERSION = '0.041';
 use strict;
 use warnings;
 
@@ -35,10 +35,11 @@ sub make_parser {
     $args->{'configs'} = \@configs if scalar(@configs);
     $args->{'result_options'} = { 'version' => $ENV{'TESTRAIL_VERSION'} }
       if $ENV{'TESTRAIL_VERSION'};
-    $args->{'step_results'} = $ENV{'TESTRAIL_STEPS'};
-    $args->{'testsuite_id'} = $ENV{'TESTRAIL_SPAWN'};
-    $args->{'testsuite'}    = $ENV{'TESTRAIL_TESTSUITE'};
-    $args->{'config_group'} = $ENV{'TESTRAIL_CGROUP'};
+    $args->{'step_results'}    = $ENV{'TESTRAIL_STEPS'};
+    $args->{'testsuite_id'}    = $ENV{'TESTRAIL_SPAWN'};
+    $args->{'testsuite'}       = $ENV{'TESTRAIL_TESTSUITE'};
+    $args->{'config_group'}    = $ENV{'TESTRAIL_CGROUP'};
+    $args->{'test_bad_status'} = $ENV{'TESTRAIL_TBAD'};
 
     @sections = split( /:/, $ENV{'TESTRAIL_SECTIONS'} )
       if $ENV{'TESTRAIL_SECTIONS'};
@@ -80,7 +81,7 @@ Test::Rail::Harness - TestRail testing harness
 
 =head1 VERSION
 
-version 0.040
+version 0.041
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,88 @@
+package puny;
+
+use strict;
+use warnings::register;
+
+use URI::UTF8::Punycode;
+
+my $VERSION = '1.05';
+
+my $PKGNAM = __PACKAGE__;
+
+my $HELPTXT = <<__END_OF_USAGE__;
+$PKGNAM [OPTIONS] string...
+
+  [OPTIONS]
+    -e        encode punycode(defaults).
+    -d        decode punycode.
+
+  This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+__END_OF_USAGE__
+
+my $VERSTXT = <<__END_OF_VERSION__;
+$PKGNAM (twinkle-utils) $VERSION
+   _                                    
+  | |                                   
+  | |___      ___ __  _   _ _ __  _   _ 
+  | __\\ \\ /\\ / / '_ \\| | | | '_ \\| | | |
+  | |_ \\ V  V /| |_) | |_| | | | | |_| |
+   \\__| \\_/\\_/ | .__/ \\__,_|_| |_|\\__, |
+               | |                 __/ |
+               |_|                |___/ 
+
+Copyright (C)2013- TWINKLE COMPUTING All rights reserved.
+
+Reporting bugs to <twinkle\@cpan.org>
+__END_OF_VERSION__
+
+sub main{
+  my $m = 1;
+  for(my $i=0;$i<@_;$i++){
+    if($_[$i] =~ /^([\-\/][hH\?]|(\-\-|\/)help)$/i){
+      print STDOUT $HELPTXT;
+      exit(0);
+    } elsif($_[$i] =~ /^([\-\/][vV]|(\-\-|\/)version)$/i){
+      print STDOUT $VERSTXT;
+      exit(0);
+    } elsif($_[$i] =~ /^[\-\/]([dD]+)$/){
+      $m = 0;
+    } elsif($_[$i] =~ /^[\-\/]([eE]+)$/){
+      $m = 1;
+    } else{
+      print STDOUT ($m)? puny_enc($_[$i]) : puny_dec($_[$i]);
+      print STDOUT "\n";
+    }
+  }
+}
+
+&main(@ARGV);
+
+__END__
+☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠
+This free software is no warranty always anything anyway.
+"NO WARRANTY" assumed even if taking also if not taking this seal ☞ ⬚
+☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠☠
+=head1 NAME
+
+URI::UTF8::Punycode - Punycode conversion of UTF-8 string.
+
+=head1 SYNOPSIS
+
+  use URI::UTF8::Punycode;
+
+  $punycode = puny_enc($utf8str);
+  $utf8onsv = puny_dec($punycode);
+
+=head1 DESCRIPTION
+
+Punycode conversion of UTF-8 string.
+
+=head1 AUTHOR
+
+Twinkle Computing <twinkle@cpan.org>
+
+=head1 LISENCE
+
+This released under The GPL General Public License.
+
+=cut

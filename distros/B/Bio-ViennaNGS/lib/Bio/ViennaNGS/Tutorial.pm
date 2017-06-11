@@ -1,12 +1,13 @@
 # -*-CPerl-*-
-# Last changed Time-stamp: <2015-10-27 14:41:51 mtw>
+# Last changed Time-stamp: <2017-06-10 19:09:38 michl>
 
 package Bio::ViennaNGS::Tutorial;
 
+use Bio::ViennaNGS;
 use Exporter;
-use version; our $VERSION = qv('0.16');
 use strict;
 use warnings;
+use version; our $VERSION = version->declare("$Bio::ViennaNGS::VERSION");
 
 our @ISA = qw(Exporter);
 our @EXPORT = ();
@@ -46,12 +47,6 @@ repository|http://nibiru.tbi.univie.ac.at/ViennaNGS/>.
 
 =over
 
-=item L<Tutorial 00|http://search.cpan.org/dist/Bio-ViennaNGS/scripts/Tutorial_pipeline00.pl>: Inferring detailed mapping statistics from BAM files
-
-=item L<Tutorial 01|http://search.cpan.org/dist/Bio-ViennaNGS/scripts/Tutorial_pipeline01.pl>: Computation and analysis of sequence motifs in close proximity to gene starts in a set of ENCODE human protein coding genes
-
-=item L<Tutorial 02|http://search.cpan.org/dist/Bio-ViennaNGS/scripts/Tutorial_pipeline02.pl>: Extraction and manipulation of strand-specific ENCODE RNA-seq data and automatic generation of coverage profiles
-
 =item L<Tutorial 03|http://search.cpan.org/dist/Bio-ViennaNGS/scripts/Tutorial_pipeline03.pl>: Automatic generation of UCSC genome browser Track Hubs for visualization of ENCODE RNA-seq data
 
 =back
@@ -72,7 +67,7 @@ repository|http://nibiru.tbi.univie.ac.at/ViennaNGS/>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2015 Michael T. Wolfinger
+Copyright (C) 2014-2017 Michael T. Wolfinger
 E<lt>michael@wolfinger.euE<gt>
 
 This library is free software; you can redistribute it and/or modify

@@ -13,6 +13,7 @@ lib/Net/Etcd/Role/Actions.pm
 lib/Net/Etcd/KV.pm
 lib/Net/Etcd/KV/Put.pm
 lib/Net/Etcd/KV/Range.pm
+lib/Net/Etcd/KV/Txn.pm
 lib/Net/Etcd/User.pm
 lib/Net/Etcd/User/Role.pm
 lib/Net/Etcd/Watch.pm

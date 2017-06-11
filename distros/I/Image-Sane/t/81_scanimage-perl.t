@@ -2,6 +2,7 @@ use warnings;
 use strict;
 use English;
 use Test::More;
+use Test::Requires qw( v5.10 );
 
 #########################
 

@@ -35,7 +35,7 @@ cme - Check or edit configuration data with Config::Model
 
 =head1 VERSION
 
-version 1.019
+version 1.020
 
 =head1 SYNOPSIS
 
@@ -238,12 +238,6 @@ Example:
 =head1 Advanced options
 
 =over
-
-=item -dev
-
-Use this option if you want to test a model under development. This
-option will add C<lib> in C<@INC> and use C<lib/Config/Model/models>
-as model directory. This option is ignored when run as root.
 
 =item -model-dir
 

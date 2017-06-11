@@ -1,5 +1,34 @@
 Revision history for Test-Timer
 
+2.00 2017-06-06 Feature release, update recommended
+
+- Improved diagnostics based on feedback for change introduced in 1.00
+  from Nigel Horne. The actual measured time used is now presented (#12)
+
+- private subroutine _runtest_atleast factored out (#9)
+
+
+1.00 2017-06-03 Feature release, update recommended
+
+- Implemented suggestion for improvement from Nigel Horne (#10)
+  https://github.com/jonasbn/perl-test-timer/issues/10
+
+  This change impacts all the diagnostics, so these now communicate
+  the relevant specified thresholds
+
+- Added Dist::Zilla plugins requirements causing issues to dist.ini, so these
+  are explicitly specified
+
+- Exchanged CJM´s:
+  https://metacpan.org/pod/Dist::Zilla::Plugin::VersionFromModule
+
+  For Dave Rolskys:
+  https://metacpan.org/pod/Dist::Zilla::Plugin::VersionFromMainModule
+
+  There are some deprecation notices from Dist::Zilla making tests fail
+  see XDG's PR: https://github.com/madsen/dist-zilla-plugins-cjm/pull/5
+
+
 0.18 2016-12-30 Maintenance release, update not required
 
 - Reenabled Github issues over RT, the Dist::Zilla plugins not completely compatible
@@ -9,10 +38,10 @@ Revision history for Test-Timer
 
 - Exchanged use of Test::Exception for Test::Fatal
 
-- Exchanged use of: Dist::Zilla::Plugin::GitHub::Meta for Dist::Zilla::Plugin::GithubMeta 
+- Exchanged use of: Dist::Zilla::Plugin::GitHub::Meta for Dist::Zilla::Plugin::GithubMeta
   to specify a proper homepage attribute
-  
-  Ref: https://metacpan.org/pod/Dist::Zilla::Plugin::GithubMeta 
+
+  Ref: https://metacpan.org/pod/Dist::Zilla::Plugin::GithubMeta
 
 
 0.16 2016-12-29 Maintenance release, update not required
@@ -22,7 +51,7 @@ Revision history for Test-Timer
 
 0.15 2016-12-11 Maintenance release, update not required
 
-- Addressed Kwalitee test: has_meta_json 
+- Addressed Kwalitee test: has_meta_json
 
 - Addressing minor cosmetics issues in release 0.14
 
@@ -49,7 +78,7 @@ Revision history for Test-Timer
 
 0.11 2015-07-15 Maintenance release, update not required
 
-- Requirement for Perl 5.12 sneaked in [issue #3], analysed code with Perl::MinimumVersion 
+- Requirement for Perl 5.12 sneaked in [issue #3], analysed code with Perl::MinimumVersion
   and decided for Perl version 5.6.0 as minimum requirement
 
 
@@ -140,7 +169,7 @@ Revision history for Test-Timer
 
 - Added some more tests, to get better coverage, thanks to PJCJ for Devel::Cover
   this module really helps, since aiming at better coverage, makes you think
-  about your tests and code and you can eliminate stuff you do not need 
+  about your tests and code and you can eliminate stuff you do not need
 
 - Updated POD added DIAGNOSTICS among other things
 

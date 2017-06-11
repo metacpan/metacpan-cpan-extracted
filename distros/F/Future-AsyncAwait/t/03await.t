@@ -70,4 +70,35 @@ async sub makelist
    is( $f2->failure, "It failed\n", '$f2->failure for fail' );
 }
 
+# ANON sub
+{
+   my $func = async sub {
+      return await $_[0];
+   };
+
+   my $f1 = Future->new;
+   my $f2 = $func->( $f1 );
+
+   ok( !$f2->is_ready, '$f2 is not immediate for pending ANON' );
+
+   $f1->done( "later" );
+   is( scalar $f2->get, "later", '$f2->get for ANON' );
+}
+
+# ANON sub closure
+{
+   my $f1 = Future->new;
+
+   my $func = async sub {
+      return await $f1;
+   };
+
+   my $f2 = $func->( $f1 );
+
+   ok( !$f2->is_ready, '$f2 is not immediate for pending ANON closure' );
+
+   $f1->done( "later" );
+   is( scalar $f2->get, "later", '$f2->get for ANON closure' );
+}
+
 done_testing;

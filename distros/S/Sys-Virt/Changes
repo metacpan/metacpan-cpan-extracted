@@ -1,5 +1,20 @@
 Revision history for perl module Sys::Virt
 
+3.4.0 2017-06-05
+
+ - Add LIST_CAP_MDEV & LIST_CAP_MDEV_TYPES constants
+ - Fix send_all() callback helper
+ - Introduce flags to Stream::recv() and
+   register RECV_STOP_AT_HOLE constant
+ - Introduce Stream::recv_hole() and Stream::send_hole()
+ - Introduce Stream::sparse_recv_all()
+ - Introduce Stream::sparse_send_all()
+ - Register VOL_DOWNLOAD_SPARSE_STREAM &
+   VOL_UPLOAD_SPARSE_STREAM constants
+ - Add vol-sparse.pl example
+ - Add new domain event constants
+ - Add new LIST_CAP_CCW_DEV constant
+
 3.3.0 2017-05-08
 
  - Add VIR_DOMAIN_JOB_OPERATION* constants

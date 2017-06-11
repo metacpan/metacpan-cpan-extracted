@@ -18,8 +18,8 @@ Business::UPS::Tracking::Shipment::SmallPackage - A small package shipment
 =head1 DESCRIPTION
 
 
-This class represents an small package shipment and extends 
-L<Business::UPS::Tracking::Shipment>. Usually it is created 
+This class represents an small package shipment and extends
+L<Business::UPS::Tracking::Shipment>. Usually it is created
 automatically from a L<Business::UPS::Tracking::Response> object.
 
 =head1 ACCESSORS

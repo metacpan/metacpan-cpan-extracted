@@ -15,8 +15,9 @@ See L<Gtk2::Ex::DbLinker::Datasheet> and L<Wx::Perl::DbLinker::Wxdatasheet>.
 
 use strict;
 use warnings;
-# use Carp qw(confess);
+use Carp qw(confess);
 # use Data::Dumper;
+use Log::Any;
 
 use constant {
     UNCHANGED     => 0,
@@ -70,8 +71,10 @@ sub new {
     my $self;
     @$self{ keys %arg } = values(%arg);
     bless $self, $class;
-     $self->{log} = Log::Log4perl->get_logger(__PACKAGE__);
-    $self->{log}->logconfess( __PACKAGE__, " new : ", join( " ", @$missing ), " keys with values missing" ) if ( defined( $missing = $self->_get_missing_arg( \%arg, [qw(cols dman)] ) ) );
+    #$self->{log} = Log::Log4perl->get_logger(__PACKAGE__);
+    $self->{log} = Log::Any->get_logger;
+    #$self->{log}->logconfess( __PACKAGE__, " new : ", join( " ", @$missing ), " keys with values missing" ) if ( defined( $missing = $self->_get_missing_arg( \%arg, [qw(cols dman)] ) ) );
+    confess($self->{log}->error( __PACKAGE__, " new : ", join( " ", @$missing ), " keys with values missing" )) if ( defined( $missing = $self->_get_missing_arg( \%arg, [qw(cols dman)] ) ) );
     $self->{log}->debug("new called ** cols are ", join(" ", @{ $self->{cols}}) );
     my %hcols = map { $_ => 1 } @{ $self->{cols} };
     $self->{hcols} = \%hcols;
@@ -94,7 +97,8 @@ sub _get_val {
     #so the call to colnumber_from_name fails
     #return undef for db columns (from @cols) not in the @fields list
     #return unless defined $self->colnumber_from_name($name);
-    $self->{log}->logconfess ("col number undef") unless defined $col;
+    #$self->{log}->logconfess ("col number undef") unless defined $col;
+    confess($self->{log}->error("col number undef")) unless defined $col;
     # $self->{log}->debug( "_get_val \n", Dumper $row);
     $self->{get_val}->( $row, $col, $name );
 
@@ -187,7 +191,8 @@ sub init_apply {
     #my @given  = keys %arg;
     #my @needed = qw(next get_val set_val del_row has_more_row iter);
     my $missing;
-     $self->{log}->logconfess( __PACKAGE__, " init : ", join( " ", @$missing ), " keys with code ref missing" ) if ( defined( $missing = $self->_get_missing_arg( \%arg, [qw(next get_val set_val del_row has_more_row iter status_col)] ) ) );
+    # $self->{log}->logconfess( __PACKAGE__, " init : ", join( " ", @$missing ), " keys with code ref missing" ) if ( defined( $missing = $self->_get_missing_arg( \%arg, [qw(next get_val set_val del_row has_more_row iter status_col)] ) ) );
+    confess( $self->{log}->error( __PACKAGE__, " init : ", join( " ", @$missing ), " keys with code ref missing" )) if ( defined( $missing = $self->_get_missing_arg( \%arg, [qw(next get_val set_val del_row has_more_row iter status_col)] ) ) );
 
     #$self->{log}->debug( Dumper %seen);
     @$self{ ( keys %arg ) } = values %arg;
@@ -231,7 +236,8 @@ Param: the name of the column.
 sub colnumber_from_name {
 
     my ( $self, $fieldname ) = @_;
-     $self->{log}->logconfess( "fieldname undef") unless ( defined $fieldname );
+    #$self->{log}->logconfess( "fieldname undef") unless ( defined $fieldname );
+    confess($self->{log}->error( "fieldname undef")) unless ( defined $fieldname );
     
     return $self->{colname_to_number}->{$fieldname}
 
@@ -380,7 +386,8 @@ sub setup_fields {
 	my $self = shift;
 	my %args =  ( ref $_[0] eq "HASH" ? %$_[0] : (@_) );
 	my $missing;
-	  $self->{log}->logconfess( __PACKAGE__, "setup_fields : ", join( " ", @$missing ), " keys with value missing" ) if ( defined( $missing = $self->_get_missing_arg( \%args, [qw(allfields cols )] ) ) );
+    #$self->{log}->logconfess( __PACKAGE__, "setup_fields : ", join( " ", @$missing ), " keys with value missing" ) if ( defined( $missing = $self->_get_missing_arg( \%args, [qw(allfields cols )] ) ) );
+    confess($self->{log}->error( __PACKAGE__, "setup_fields : ", join( " ", @$missing ), " keys with value missing" )) if ( defined( $missing = $self->_get_missing_arg( \%args, [qw(allfields cols )] ) ) );
 	my $fields = $args{allfields};
 
 	    if ( !$fields ) {
@@ -471,7 +478,8 @@ sub init_combo_setup {
 	my $self = shift;
 	my %args =  ( ref $_[0] eq "HASH" ? %$_[0] : (@_) );
 	my $missing;
-	  $self->{log}->logconfess( __PACKAGE__, " init_combo_setup : ", join( " ", @$missing ), " keys with value missing" ) if ( defined( $missing = $self->_get_missing_arg( \%args, [qw(name fields)] ) ) );
+    #$self->{log}->logconfess( __PACKAGE__, " init_combo_setup : ", join( " ", @$missing ), " keys with value missing" ) if ( defined( $missing = $self->_get_missing_arg( \%args, [qw(name fields)] ) ) );
+    confess($self->{log}->error( __PACKAGE__, " init_combo_setup : ", join( " ", @$missing ), " keys with value missing" )) if ( defined( $missing = $self->_get_missing_arg( \%args, [qw(name fields)] ) ) );
 	   my $fields = $args{fields};
     my @cols;
     if ( $fields->{fieldnames} ) {
@@ -517,7 +525,8 @@ sub get_liste_def {
 	my $self = shift;
 	my %args =  ( ref $_[0] eq "HASH" ? %$_[0] : (@_) );
 	my $missing;
-	  $self->{log}->logconfess( __PACKAGE__, " get_liste_def : ", join( " ", @$missing ), " keys with value missing" ) if ( defined( $missing = $self->_get_missing_arg( \%args, [qw(fields renderer default_renderer col_ref)] ) ) );
+    #$self->{log}->logconfess( __PACKAGE__, " get_liste_def : ", join( " ", @$missing ), " keys with value missing" ) if ( defined( $missing = $self->_get_missing_arg( \%args, [qw(fields renderer default_renderer col_ref)] ) ) );
+    confess($self->{log}->error( __PACKAGE__, " get_liste_def : ", join( " ", @$missing ), " keys with value missing" )) if ( defined( $missing = $self->_get_missing_arg( \%args, [qw(fields renderer default_renderer col_ref)] ) ) );
     my $fields = $args{fields};
     my @cols = @{$args{col_ref}};
     my $rdbtype = $fieldtype{ $fields->{data_manager}->get_field_type( $cols[0] ) };
@@ -571,7 +580,8 @@ sub setup_combo {
     my $self = shift;
     my %args = ( ref $_[0] eq "HASH" ? %$_[0] : (@_) );
     my $missing;
-     $self->{log}->logconfess( __PACKAGE__, " setup_combo : ", join( " ", @$missing ), " keys with value missing" ) if ( defined( $missing = $self->_get_missing_arg( \%args, [qw(fields name col_ref)] ) ) );
+    #$self->{log}->logconfess( __PACKAGE__, " setup_combo : ", join( " ", @$missing ), " keys with value missing" ) if ( defined( $missing = $self->_get_missing_arg( \%args, [qw(fields name col_ref)] ) ) );
+     confess( $self->{log}->error( __PACKAGE__, " setup_combo : ", join( " ", @$missing ), " keys with value missing" )) if ( defined( $missing = $self->_get_missing_arg( \%args, [qw(fields name col_ref)] ) ) );
     my $fields    = $args{fields};
     my $column_no = $self->colnumber_from_name( $args{name} );
     my $dman      = $fields->{data_manager};

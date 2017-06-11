@@ -13,10 +13,10 @@ use Business::UPS::Tracking::Utils;
 =head1 NAME
 
 Business::UPS::Tracking::Element::Address - An address
-  
+
 =head1 DESCRIPTION
 
-This class represents an address. Usually it is created 
+This class represents an address. Usually it is created
 automatically from a L<Business::UPS::Tracking::Shipment> object.
 
 =head1 ACCESSORS
@@ -96,7 +96,7 @@ sub _build_address {
 
 =head1 METHODS
 
-=head2 printall 
+=head2 printall
 
 Serialize address into a string.
 
@@ -108,7 +108,7 @@ Moose meta method
 
 sub printall {
     my ($self) = @_;
-    
+
     my @address;
     push (@address,$self->AddressLine1)
         if $self->AddressLine1;
@@ -116,15 +116,15 @@ sub printall {
         if $self->AddressLine2;
     push (@address,$self->AddressLine3)
         if $self->AddressLine3;
-    
+
     my $line = $self->CountryCode;
     $line .= '-'.$self->PostalCode
         if $self->PostalCode;
     $line .= ' '.$self->City
         if $self->City;
-        
+
     push (@address,$line);
-    
+
     return join("\n",@address);
 }
 

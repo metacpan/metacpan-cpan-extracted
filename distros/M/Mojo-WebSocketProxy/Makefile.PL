@@ -14,7 +14,8 @@ my %WriteMakefileArgs = (
     "Test::MockObject" => 0,
     "Test::Mojo" => 0,
     "Test::More" => "0.94",
-    "Test::Simple" => "0.44"
+    "Test::Simple" => "0.44",
+    "Test::TCP" => 0
   },
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => "6.64"
@@ -25,11 +26,15 @@ my %WriteMakefileArgs = (
   "NAME" => "Mojo::WebSocketProxy",
   "PREREQ_PM" => {
     "Class::Method::Modifiers" => 0,
+    "Data::UUID" => 0,
+    "Future" => 0,
     "Guard" => 0,
     "JSON" => 0,
+    "JSON::XS" => 0,
     "MojoX::JSON::RPC" => 0,
     "Mojolicious" => 0,
-    "Time::Out" => 0
+    "Scalar::Util" => 0,
+    "Variable::Disposition" => 0
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -39,7 +44,7 @@ my %WriteMakefileArgs = (
     "Test::CheckDeps" => "0.010",
     "Test::More" => "0.94"
   },
-  "VERSION" => "0.05",
+  "VERSION" => "0.06",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,21 +53,26 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Class::Method::Modifiers" => 0,
+  "Data::UUID" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
+  "Future" => 0,
   "Guard" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "JSON" => 0,
+  "JSON::XS" => 0,
   "MojoX::JSON::RPC" => 0,
   "Mojolicious" => 0,
+  "Scalar::Util" => 0,
   "Test::CheckDeps" => "0.010",
   "Test::MockModule" => 0,
   "Test::MockObject" => 0,
   "Test::Mojo" => 0,
   "Test::More" => "0.94",
   "Test::Simple" => "0.44",
-  "Time::Out" => 0
+  "Test::TCP" => 0,
+  "Variable::Disposition" => 0
 );
 
 

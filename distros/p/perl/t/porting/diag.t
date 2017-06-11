@@ -9,7 +9,7 @@ use warnings;
 use strict;
 use Config;
 
-require 't/test.pl';
+require './t/test.pl';
 
 if ( $Config{usecrosscompile} ) {
   skip_all( "Not all files are available during cross-compilation" );
@@ -26,7 +26,7 @@ plan('no_plan');
 my $make_exceptions_list = ($ARGV[0]||'') eq '--make-exceptions-list'
   and shift;
 
-require 'regen/embed_lib.pl';
+require './regen/embed_lib.pl';
 
 # Look for functions that look like they could be diagnostic ones.
 my @functions;
@@ -685,7 +685,7 @@ Usage: VMS::Filespec::unixrealpath(spec)
 Usage: VMS::Filespec::vmsify(spec)
 Usage: VMS::Filespec::vmspath(spec)
 Usage: VMS::Filespec::vmsrealpath(spec)
-Use of inherited AUTOLOAD for non-method %s::%s() is deprecated
+Use of inherited AUTOLOAD for non-method %s::%s() is deprecated. This will be fatal in Perl 5.28
 utf8 "\x%X" does not map to Unicode
 Value of logical "%s" too long. Truncating to %i bytes
 waitpid: process %x is not a child of process %x

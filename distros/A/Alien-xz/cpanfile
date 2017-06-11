@@ -1,9 +1,10 @@
-requires "Alien::Base" => "0.036";
+requires "Alien::Base" => "0.038";
 requires "perl" => "5.006";
 
 on 'build' => sub {
-  requires "Alien::Build" => "0.19";
-  requires "Alien::Build::MM" => "0.19";
+  requires "Alien::Build" => "0.40";
+  requires "Alien::Build::MM" => "0.40";
+  requires "Config" => "0";
   requires "ExtUtils::MakeMaker" => "6.52";
 };
 
@@ -15,8 +16,9 @@ on 'test' => sub {
 };
 
 on 'configure' => sub {
-  requires "Alien::Build" => "0.19";
-  requires "Alien::Build::MM" => "0.19";
+  requires "Alien::Build" => "0.40";
+  requires "Alien::Build::MM" => "0.40";
+  requires "Alien::Build::Plugin::Build::Autoconf" => "0.41";
   requires "ExtUtils::MakeMaker" => "6.52";
   requires "IPC::Cmd" => "0";
   requires "perl" => "5.006";

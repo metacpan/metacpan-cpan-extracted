@@ -45,16 +45,19 @@ SKIP: {
         my $plug = $wr_test->child('plug.cds');
         $plug->spew($plug_data);
 
-        my $result = test_app(
-            'App::Cme' => [
-                qw/meta plugin fstab my-plugin/,
-                '-test-and-quit' => 's',
-                '-load' => $plug->stringify,
-                '-dir' => $wr_test->stringify,
-            ]
-        ) ;
+        my @test_args = (
+            qw/meta plugin fstab my-plugin/,
+            '-test-and-quit' => 's',
+            '-load' => $plug->stringify,
+            '-dir' => $wr_test->stringify,
+        );
 
-        say $result->stdout if $trace;
+        say "test command: cme @test_args"if $trace;
+        my $result = test_app( 'App::Cme' => \@test_args ) ;
+
+        is($result->error, undef, 'threw no exceptions');
+
+        say "-- stdout --\n", $result->stdout,"-----"  if $trace;
 
         like($result->stdout , qr/Preparing plugin my-plugin for model Fstab/, "edit plugin and quit");
         like($result->stdout , qr/Test mode: save and quit/, "edit plugin is in test mode");

@@ -4,9 +4,9 @@
       "Mario Zieschang <mziescha@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
    "license" : [
-      "artistic_2"
+      "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -22,10 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Hash::MD5" : "0.08",
-            "Path::Tiny" : "0",
-            "Test::Exception" : "0.43",
-            "Test::More" : "1.302031"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -42,11 +39,32 @@
             "Ref::Util" : "0",
             "String::Any::Extensions" : "v0.1.1",
             "YAML" : "0",
-            "perl" : "5.006"
+            "perl" : "5.006000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Hash::MD5" : "0.08",
+            "Path::Tiny" : "0",
+            "Test::Exception" : "0.43",
+            "Test::More" : "1.302031"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Config-Files-Simple"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/rsavage/Config-Files-Simple.git",
+         "web" : "https://github.com/mziescha/Config-Files-Simple"
+      }
+   },
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

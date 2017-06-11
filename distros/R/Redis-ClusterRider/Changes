@@ -1,5 +1,8 @@
 Revision history for Perl extension Redis::ClusterRider.
 
+0.12 Thu Jun 1 16:15:53 MSK 2017
+  - Bugfix. Did not returning command replay after MOVED and ACK reply.
+
 0.10 Mon May 29 16:13:41 MSK 2017
   - Prevented DESTROY to fall back into AUTOLOAD.
 

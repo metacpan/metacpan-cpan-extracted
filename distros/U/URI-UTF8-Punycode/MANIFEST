@@ -1,3 +1,8 @@
+bin/Makefile.PL
+bin/mypuny.c
+bin/mypuny.h
+bin/mypuny.ico
+bin/mypuny.rc
 Changes
 idnfkc.c
 lib/URI/UTF8/Punycode.pm
@@ -9,6 +14,8 @@ pcodes.h
 ppport.h
 Punycode.xs
 README
+script/Makefile.PL
+script/puny.in
 spreps.h
 strerr.c
 t/URI-UTF8-Punycode.t

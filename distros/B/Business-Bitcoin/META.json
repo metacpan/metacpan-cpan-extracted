@@ -1,7 +1,7 @@
 {
    "abstract" : "Easy and secure way to accept Bitcoin payments online",
    "author" : [
-      "Ashish Gulhati <biz-btc at hash dot neomailbox.ch>"
+      "Ashish Gulhati <biz-btc at hash.neo.tc>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
@@ -33,19 +33,19 @@
       "runtime" : {
          "requires" : {
             "Crypt::RIPEMD160" : "0",
-            "DBD::SQLite" : "0",
+            "DBD::SQLite" : "1.54",
             "DBI" : "0",
-            "Digest::SHA" : "0",
+            "Digest::SHA" : "5.95",
             "Encode::Base58::BigInt" : "0",
-            "LWP" : "0",
+            "LWP" : "6.15",
             "LWP::Protocol::https" : "0",
-            "Math::EllipticCurve::Prime" : "0",
+            "Math::EllipticCurve::Prime" : "0.003",
             "Mozilla::CA" : "0",
             "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.044",
+   "version" : "1.046",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

@@ -5,9 +5,12 @@
 #include "perl.h"
 #include "XSUB.h"
 #include "ppport.h"
+#include <time.h>
+#include <stdlib.h>
 
 #define NEED_newRV_noinc
 #define DUKTAPE_DONT_LOAD_SHARED
+
 
 #include "./lib/duktape.c"
 #include "./lib/module-duktape/duk_module_duktape.c"
@@ -20,23 +23,150 @@
 
 
 
+typedef struct {
+    /* The double value in the union is there to ensure alignment is
+     * good for IEEE doubles too.  In many 32-bit environments 4 bytes
+     * would be sufficiently aligned and the double value is unnecessary.
+     */
+    union {
+        size_t sz;
+        double d;
+    } u;
+} perlDukMemHdr;
+
+typedef struct {
+    int timeout;
+    size_t max_memory;
+    size_t total_allocated;
+    duk_context *ctx;
+} perlDuk;
+
+
+
 /**
-  * dump_stack
-  * for debugging
+  * perl_duk_exec_timeout
 ******************************************************************************/
-int dump_stack(duk_context *ctx, const char *name) {
-    duk_idx_t i, n;
-    n = duk_get_top(ctx);
-    printf("%s (top=%ld):", name, (long) n);
-    for (i = 0; i < n; i++) {
-        printf(" ");
-        duk_dup(ctx, i);
-        printf("%s", duk_safe_to_string(ctx, -1));
-        duk_pop(ctx);
+int perl_duk_exec_timeout( void *udata ) {
+    perlDuk *duk = (perlDuk *) udata;
+    int timeout = duk->timeout;
+
+    if (timeout > 0){
+        clock_t uptime = clock();
+        int passed_time = (int)(uptime / CLOCKS_PER_SEC);
+        if (passed_time > timeout){
+            return 1;
+        }
     }
-    printf("\n");
-    fflush(stdout);
-    return 1;
+    return 0;
+}
+
+
+
+/**
+  * duk_sandbox_alloc
+******************************************************************************/
+static void *duk_sandbox_alloc(void *udata, duk_size_t size) {
+    perlDuk *duk = (perlDuk *) udata;
+    perlDukMemHdr *hdr;
+
+    size_t max_memory = duk->max_memory;
+    size_t total_allocated  = duk->total_allocated;
+
+    if (size == 0) return NULL;
+
+    if (total_allocated + size >= max_memory) {
+        duk->total_allocated = 0;
+        return NULL;
+    }
+
+    hdr = (perlDukMemHdr *) malloc(size + sizeof(perlDukMemHdr));
+    if (!hdr) return NULL;
+
+    hdr->u.sz = size;
+    duk->total_allocated += size;
+    return (void *) (hdr + 1);
+}
+
+
+
+/**
+  * duk_sandbox_realloc
+******************************************************************************/
+static void *duk_sandbox_realloc(void *udata, void *ptr, duk_size_t size) {
+    perlDukMemHdr *hdr;
+    size_t old_size;
+    void *t;
+
+    perlDuk *duk = (perlDuk *) udata;
+    size_t max_memory    = duk->max_memory;
+    size_t total_allocated  = duk->total_allocated;
+
+    if (ptr) {
+        hdr = (perlDukMemHdr *) (((char *) ptr) - sizeof(perlDukMemHdr));
+        old_size = hdr->u.sz;
+
+        if (size == 0) {
+            duk->total_allocated -= old_size;
+            free((void *) hdr);
+            return NULL;
+        }
+
+        if (total_allocated - old_size + size > max_memory) {
+            duk->total_allocated = 0;
+            return NULL;
+        }
+
+        t = realloc((void *) hdr, size + sizeof(perlDukMemHdr));
+        if (!t) return NULL;
+
+        hdr = (perlDukMemHdr *) t;
+        duk->total_allocated -= old_size;
+        duk->total_allocated += size;
+        hdr->u.sz = size;
+        return (void *) (hdr + 1);
+    } else {
+        if (size == 0) return NULL;
+
+        if (total_allocated + size > max_memory) {
+            duk->total_allocated = 0;
+            return NULL;
+        }
+
+        hdr = (perlDukMemHdr *) malloc(size + sizeof(perlDukMemHdr));
+        if (!hdr) return NULL;
+
+        hdr->u.sz = size;
+        duk->total_allocated += size;
+        return (void *) (hdr + 1);
+    }
+}
+
+
+
+/**
+  * duk_sandbox_free
+******************************************************************************/
+static void duk_sandbox_free(void *udata, void *ptr) {
+    perlDukMemHdr *hdr;
+
+    perlDuk *duk = (perlDuk *) udata;
+
+    if (!ptr) return;
+
+    hdr = (perlDukMemHdr *) (((char *) ptr) - sizeof(perlDukMemHdr));
+    duk->total_allocated -= hdr->u.sz;
+    free((void *) hdr);
+}
+
+
+
+/**
+  * get_user_data
+******************************************************************************/
+perlDuk *get_user_data (duk_context *ctx){
+    duk_memory_functions funcs;
+    duk_get_memory_functions(ctx, &funcs);
+    return (perlDuk *)funcs.udata;
 }
 
 
@@ -53,12 +183,23 @@ void fatal_handler (void *udata, const char *msg) {
 /**
   * new
 ******************************************************************************/
-SV *perl_duk_new(const char * classname) {
+SV *perl_duk_new(const char *classname, size_t max_memory, int timeout) {
     duk_context *ctx;
-    SV         *obj;
-    SV         *obj_ref;
+    SV          *obj;
+    SV          *obj_ref;
 
-    ctx = duk_create_heap(NULL, NULL, NULL, NULL, fatal_handler);
+    perlDuk *duk = malloc(sizeof(*duk));
+    duk->ctx = NULL;
+    duk->timeout = timeout;
+    duk->max_memory = max_memory;
+    duk->total_allocated = 0;
+
+    if (max_memory > 0){
+        ctx = duk_create_heap(duk_sandbox_alloc, duk_sandbox_realloc, duk_sandbox_free, (void *)duk, fatal_handler);
+    } else {
+        ctx = duk_create_heap(NULL, NULL, NULL, (void *)duk, fatal_handler);
+    }
+
     duk_module_duktape_init(ctx);
     duk_print_alert_init(ctx, 0);
 
@@ -67,7 +208,34 @@ SV *perl_duk_new(const char * classname) {
     sv_bless(obj_ref, gv_stashpv(classname, GV_ADD));
     SvREADONLY_on(obj);
 
+    duk->ctx = ctx;
     return obj_ref;
+}
+
+
+
+/**
+  * perl_duk_set_timeout
+******************************************************************************/
+void perl_duk_set_timeout(duk_context *ctx, int timeout){
+    perlDuk *duk = get_user_data(ctx);
+    int current = 0;
+
+    if (timeout > 0){
+        timeout += (int)(clock() / CLOCKS_PER_SEC);
+    }
+
+    duk->timeout = current + timeout;
+}
+
+
+
+/**
+  * perl_duk_resize_memory
+******************************************************************************/
+void perl_duk_resize_memory(duk_context *ctx, size_t max_memory){
+    perlDuk *duk = get_user_data(ctx);
+    duk->max_memory = max_memory;
 }
 
 
@@ -81,15 +249,17 @@ void perl_duk_reset_top(duk_context *ctx){
     duk_pop_n(ctx, top);
 }
 
+
+
 /**
   * is number
 ******************************************************************************/
 int duk_sv_is_number(SV *sv) {
-    if (SvIOK(sv) || SvNOK(sv)){
-        return 1;
-    }
+    if (SvIOK(sv) || SvNOK(sv)) return 1;
     return 0;
 }
+
+
 
 /**
   * call_safe_perl_sub
@@ -273,10 +443,24 @@ int duktape_dlClose(duk_context *ctx, void *dlHandle){
 }
 
 
-void DESTROY(duk_context *ctx) {
-    printf("Destroying %p\n", ctx);
-    //Safefree(ctx);
+
+/**
+  * destructions
+******************************************************************************/
+void free_perl_duk (duk_context *ctx){
+    perlDuk *duk = get_user_data(ctx);
+    if (duk != NULL) free(duk);
 }
+
+
+// not callabel
+void DESTROY(duk_context *ctx) {
+    perlDuk *duk = get_user_data(ctx);
+    if (duk != NULL) free(duk);
+    printf("Destroying %p\n", ctx);
+}
+
+
 
 /*
     Auto Generated C Code by parser.pl

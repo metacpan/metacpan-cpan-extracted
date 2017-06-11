@@ -22,7 +22,7 @@ sub loadopts {
 	shift @ARGV;
 	my $optfile = shift @ARGV;
 	local (*OPTF);
-	open OPTF, $optfile or die "Can't open $optfile: $!\n";
+	open OPTF, '<', $optfile or die "Can't open $optfile: $!\n";
 	my @opts;
 	chomp(my $line = <OPTF>);
 	my @vars = split(/\t+~\t+/, $line);
@@ -59,7 +59,7 @@ $opt{known_extensions} = join(' ',FindExt::known_extensions()) || ' ';
 my $pl_h = '../patchlevel.h';
 
 if (-e $pl_h) {
-    open PL, "<$pl_h" or die "Can't open $pl_h: $!";
+    open PL, "<", $pl_h or die "Can't open $pl_h: $!";
     while (<PL>) {
 	if (/^#\s*define\s+(PERL_\w+)\s+([\d.]+)/) {
 	    $opt{$1} = $2;
@@ -277,6 +277,13 @@ if ($opt{cc} =~ /\bcl/ and $opt{ccversion} =~ /^(\d+)/) {
     if($ccversion < 13) { #VC6
 	$opt{ar} ='lib';
     }
+    if ($ccversion >= 19) { # VC14
+	$opt{stdio_base} = 'PERLIO_FILE_base(fp)';
+	$opt{stdio_bufsiz} = '(PERLIO_FILE_cnt(fp) + PERLIO_FILE_ptr(fp) - PERLIO_FILE_base(fp))';
+	$opt{stdio_cnt} = 'PERLIO_FILE_cnt(fp)';
+	$opt{stdio_ptr} = 'PERLIO_FILE_ptr(fp)';
+	$opt{i_stdbool} = 'define';
+    }
 }
 #find out which MSVC this ICC is using
 elsif ($opt{cc} =~ /\bicl/) {
@@ -285,6 +292,13 @@ elsif ($opt{cc} =~ /\bicl/) {
     if($num_ver =~ /^(\d+)/ && $1 >= 14) {
 	$opt{sGMTIME_max} = 32535291599;
 	$opt{sLOCALTIME_max} = 32535244799;
+    }
+    if ($num_ver =~ /^(\d+)/ && $1 >= 19) { # VC14
+	$opt{stdio_base} = 'PERLIO_FILE_base(fp)';
+	$opt{stdio_bufsiz} = '(PERLIO_FILE_cnt(fp) + PERLIO_FILE_ptr(fp) - PERLIO_FILE_base(fp))';
+	$opt{stdio_cnt} = 'PERLIO_FILE_cnt(fp)';
+	$opt{stdio_ptr} = 'PERLIO_FILE_ptr(fp)';
+	$opt{i_stdbool} = 'define';
     }
     $opt{ar} ='xilib';
 }

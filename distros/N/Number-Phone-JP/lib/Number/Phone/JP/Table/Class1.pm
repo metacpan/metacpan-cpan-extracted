@@ -3,9 +3,9 @@ package Number::Phone::JP::Table::Class1;
 use strict;
 use warnings;
 
-our $VERSION = '0.20170501';
+our $VERSION = '0.20170601';
 
-# Table last modified: 2017-05-01
+# Table last modified: 2017-06-01
 our %TEL_TABLE = (
     # Pref => q<Assoc-Pref-Regex>,
     '01'    => '\d+', # KDDI
@@ -39,6 +39,7 @@ our %TEL_TABLE = (
     '073'   => '\d+', # 安子の電話
     '074'   => '\d+', # 安子の電話
     '077'   => '\d+', # KDDI
+    '078'   => '\d+', # 株式会社コムスクエア
     '081'   => '\d+', # 楽天コミュニケーションズ
     '082'   => '\d+', # 楽天コミュニケーションズ
     '083'   => '\d+', # ソフトバンク

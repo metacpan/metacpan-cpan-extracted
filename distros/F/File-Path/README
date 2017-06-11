@@ -1,70 +1,52 @@
-This file is the README for File::Path version 2.09
-[![Build Status](https://travis-ci.org/rpcme/File-Path.svg?branch=master)](https://travis-ci.org/rpcme/File-Path)
-[![CPAN version](https://badge.fury.io/pl/File-Path.svg)](http://badge.fury.io/pl/File-Path)
+NAME
+File::Path - Create or remove directory trees
 
 INSTALLATION
+    perl Makefile.PL
+    make
+    make test
+    make install
 
-perl Makefile.PL
-make
-make test
-make install
+PREREQUISITES
+All prerequisites are found in the Perl 5 core distribution.
 
-TESTING
+To configure:
+    ExtUtils::MakeMaker
 
-This module requires the following modules for thorough testing:
+To build:
+    Cwd                         File::Basename
+    Exporter                    File::Spec
 
-  (These are core, you should be ok)
-  Cwd
-  File::Path
-  File::Spec::Functions
-  Test::More
-
-  (These are optional)
-  Test::Output
-  Test::Pod
-  Test::Pod::Coverage
-
-For more advanced testing, it is possible to run the
-eg/setup-extra-tests program as root. This will create a
-directory 'EXTRA' that contains a mixture of files and
-directories owned both by root and a specified user
-(uid or login name).
-
-  sudo perl eg/setup-extra-tests -u david
-  make test
-
-This is used to exercise parts of the code that ordinarily
-wouldn't be visited. That is, as root, some files and
-directories will be created that the user 'david', which
-will run the test suite, will not be able to remove.
-
-It would be nice to do something tricksy like this for
-Win32, which has a much richer privilege scheme.
+To test:
+    Carp                        File::Spec::Functions
+    Config                      SelectSaver
+    Cwd                         Test::More
+    Errno                       Win32       # Windows only
+    Fcntl
 
 BUGS
+The File-Path bug tracker is located at:
 
-Please report all bugs on the RT queue:
+<http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Path>
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Path>
+File reports by sending email to:
 
-You can also send pull requests to the Github repository:
+    bug-File-Path@rt.cpan.org
 
-L<https://github.com/rpcme/File-Path>
+Include test programs or patches as email attachments.
 
 AUTHORS
+Prior authors and maintainers: Tim Bunce, Charles Bailey, and David
+Landgren (david at landgren dot net).
 
-Prior authors and maintainers: Tim Bunce, Charles Bailey, and
-David Landgren <F<david@landgren.net>>.
-
-Current maintainers are Richard Elberger <F<riche@cpan.org>> and
-James (Jim) Keenan <F<jkeenan@cpan.org>>.
+Current maintainers are Richard Elberger (riche at cpan dot org) and
+James E Keenan (jkeenan at cpan dot org).
 
 COPYRIGHT
-
 This module is copyright (C) Charles Bailey, Tim Bunce, David Landgren,
-James Keenan, and Richard Elberger 1995-2015. All rights reserved.
+James Keenan, and Richard Elberger 1995-2017. All rights reserved.
 
 LICENSE
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.

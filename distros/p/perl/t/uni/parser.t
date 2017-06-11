@@ -9,7 +9,7 @@ BEGIN {
     skip_all_without_unicode_tables();
 }
 
-plan (tests => 52);
+plan (tests => 55);
 
 use utf8;
 use open qw( :utf8 :std );
@@ -191,11 +191,13 @@ like( $@, qr/Bad name after Ｆｏｏ'/, 'Bad name after Ｆｏｏ\'' );
 
 {
     no warnings 'utf8';
+    local $SIG{__WARN__} = sub { }; # The eval will also output a warning,
+                                    # which we ignore
     my $malformed_to_be = ($::IS_EBCDIC)   # Overlong sequence
                            ? "\x{74}\x{41}"
                            : "\x{c0}\x{a0}";
     CORE::evalbytes "use charnames ':full'; use utf8; my \$x = \"\\N{abc$malformed_to_be}\"";
-    like( $@, qr/Malformed UTF-8 character immediately after '\\N\{abc' at .* within string/, 'Malformed UTF-8 input to \N{}');
+    like( $@, qr/Malformed UTF-8 character \(fatal\) at /, 'Malformed UTF-8 input to \N{}');
 }
 
 # RT# 124216: Perl_sv_clear: Assertion
@@ -228,3 +230,35 @@ like( $@, qr/Bad name after Ｆｏｏ'/, 'Bad name after Ｆｏｏ\'' );
 
         {stderr => 1}, "RT# 124216");
 }
+
+SKIP: {   # [perl #128738]
+    use Config;
+    if ($Config{uvsize} < 8) {
+        skip("test is only valid on 64-bit ints", 2);
+    }
+    else {
+        no warnings 'deprecated';
+        my $a;
+        eval "\$a = q \x{ffffffff}Hello, \\\\whirled!\x{ffffffff}";
+        is $@, "",
+               "No errors in eval'ing a string with large code point delimiter";
+        is $a, 'Hello, \whirled!',
+               "Got expected result in eval'ing a string with a large code point"
+            . " delimiter";
+    }
+}
+
+
+# New tests go here ^^^^^
+
+# Keep this test last, as it will mess up line number reporting for any
+# subsequent tests.
+
+<<END;
+${
+#line 57
+qq ϟϟ }
+END
+is __LINE__, 59, '#line directive and qq with uni delims inside heredoc';
+
+# Put new tests above the line number tests.

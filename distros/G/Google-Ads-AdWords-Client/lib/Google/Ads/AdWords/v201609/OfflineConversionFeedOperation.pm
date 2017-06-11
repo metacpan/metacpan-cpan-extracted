@@ -72,7 +72,7 @@ Google::Ads::AdWords::v201609::OfflineConversionFeedOperation
 Perl data type class for the XML Schema defined complexType
 OfflineConversionFeedOperation from the namespace https://adwords.google.com/api/adwords/cm/v201609.
 
-Operation for uploading {@link OfflineConversionFeed}. See {@link OfflineConversionFeedService#mutate} 
+Operation for uploading {@link OfflineConversionFeed}. See {@link OfflineConversionFeedService#mutate}. <p><b>Note:</b> Only the {@code ADD} operator is supported. 
 
 
 

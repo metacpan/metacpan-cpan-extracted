@@ -13,7 +13,7 @@ use DynaLoader;
 
 
 
-   $PDL::HMM::VERSION = 0.06004;
+   $PDL::HMM::VERSION = 0.06005;
    @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::HMM $VERSION;

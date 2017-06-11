@@ -1,0 +1,31 @@
+---
+abstract: 'provide API used in translator modules without translating'
+author:
+  - 'Jens Rehsack <rehsack@cpan.org>'
+build_requires:
+  Test::More: '0.9'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooX-Locale-TextDomain-OO
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Locale::TextDomain::OO: '0'
+  Moo: '1.003'
+  MooX::Locale::Passthrough: '0'
+  perl: v5.8.1
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=MooX-Locale-TextDomain-OO
+  homepage: https://metacpan.org/release/MooX-Locale-TextDomain-OO
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com:rehsack/MooX-Locale-TextDomain-OO.git
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

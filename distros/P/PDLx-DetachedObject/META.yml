@@ -1,35 +1,51 @@
 ---
-abstract: 'parent class for subclassing PDL from class frameworks'
+abstract: 'parent class for subclassing PDL 2.X from class frameworks'
 author:
-  - 'The Smithsonian Astrophysical Observatory'
+  - 'Diab Jerius <djerius@cpan.org>'
 build_requires:
   Class::Accessor: '0'
   Class::Tiny: '0'
-  ExtUtils::MakeMaker: '6.36'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
   Moo: '0'
   Object::Tiny: '0'
+  PDL: '2.000'
   Test::Deep: '0'
   Test::More: '0'
+  blib: '1.01'
+  parent: '0'
+  perl: '5.006'
 configure_requires:
-  CPAN::Meta: '0'
-  ExtUtils::MakeMaker: '6.36'
-dynamic_config: '0'
-generated_by: 'Module::Install version 1.16, CPAN::Meta::Converter version 2.150005'
-license: unknown
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: PDLx-DetachedObject
 no_index:
   directory:
+    - eg
+    - examples
     - inc
+    - share
     - t
     - xt
+provides:
+  PDLx::DetachedObject:
+    file: lib/PDLx/DetachedObject.pm
+    version: '0.02'
 requires:
-  PDL: '0'
+  Moo: '0'
+  PDL: '2.000'
+  PDL::Lite: '0'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=PDLx-DetachedObject
-  license: http://www.gnu.org/licenses/gpl-3.0.html
-  repository: https://github.com/djerius/PDLx-DetachedObject
-version: '0.01'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+  repository: git://github.com/djerius/pdlx-detachedobject.git
+version: '0.02'
+x_serialization_backend: 'YAML::Tiny version 1.69'

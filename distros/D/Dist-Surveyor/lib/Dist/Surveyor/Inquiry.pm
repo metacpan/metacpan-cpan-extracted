@@ -1,5 +1,5 @@
 package Dist::Surveyor::Inquiry;
-$Dist::Surveyor::Inquiry::VERSION = '0.016';
+
 use strict;
 use warnings;
 use Memoize; # core
@@ -12,13 +12,11 @@ use Scalar::Util qw(looks_like_number); # core
 use Data::Dumper;
 use version;
 
+our $VERSION = '0.019';
+
 =head1 NAME
 
 Dist::Surveyor::Inquiry - Handling the meta-cpan API access for Dist::Surveyor
-
-=head1 VERSION
-
-version 0.016
 
 =head1 DESCRIPTION
 
@@ -60,12 +58,6 @@ our ($DEBUG, $VERBOSE);
 *DEBUG = \$::DEBUG;
 *VERBOSE = \$::VERBOSE;
 
-my $ua = HTTP::Tiny->new(
-    agent => $0,
-    timeout => 10,
-    keep_alive => 1, 
-);
-
 require Exporter;
 our @ISA = qw{Exporter};
 our @EXPORT = qw{
@@ -74,6 +66,51 @@ our @EXPORT = qw{
     get_module_versions_in_release
     get_release_info
 };
+
+my $agent_string = "dist_surveyor/$VERSION";
+
+my ($ua, $wget, $curl);
+if (HTTP::Tiny->can_ssl) {
+    $ua = HTTP::Tiny->new(
+        agent => $agent_string,
+        timeout => 10,
+        keep_alive => 1, 
+    );
+} else { # for fatpacking support
+    require File::Which;
+    require IPC::System::Simple;
+    $wget = File::Which::which('wget');
+    $curl = File::Which::which('curl');
+}
+
+sub _https_request {
+    my ($method, $url, $headers, $content) = @_;
+    $headers ||= {};
+    $method = uc($method || 'GET');
+    if (defined $ua) {
+        my %options;
+        $options{headers} = $headers if %$headers;
+        $options{content} = $content if defined $content;
+        my $response = $ua->request($method, $url, \%options);
+        unless ($response->{success}) {
+            die "Transport error: $response->{content}\n" if $response->{status} == 599;
+            die "HTTP error: $response->{status} $response->{reason}\n";
+        }
+        return $response->{content};
+    } elsif (defined $wget) {
+        my @args = ('-q', '-O', '-', '-U', $agent_string, '-T', 10, '--method', $method);
+        push @args, '--header', "$_: $headers->{$_}" for keys %$headers;
+        push @args, '--body-data', $content if defined $content;
+        return IPC::System::Simple::capturex($wget, @args, $url);
+    } elsif (defined $curl) {
+        my @args = ('-s', '-S', '-L', '-A', $agent_string, '--connect-timeout', 10, '-X', $method);
+        push @args, '-H', "$_: $headers->{$_}" for keys %$headers;
+        push @args, '--data-raw', $content if defined $content;
+        return IPC::System::Simple::capturex($curl, @args, $url);
+    } else {
+        die "None of IO::Socket::SSL, wget, or curl are available; cannot make HTTPS requests.";
+    }
+}
 
 # caching via persistent memoize
 
@@ -127,7 +164,7 @@ Receive release info, such as:
     get_release_info('SEMUELF', 'Dist-Surveyor-0.009')
 
 Returns a hashref containing all that release meta information, returned by
-http://api.metacpan.org/v0/release/$author/$release
+C<https://fastapi.metacpan.org/v1/release/$author/$release>
 (but not information on the files inside the module)
 
 Dies on HTTP error, and warns on empty response.
@@ -137,9 +174,8 @@ Dies on HTTP error, and warns on empty response.
 sub get_release_info {
     my ($author, $release) = @_;
     $metacpan_calls++;
-    my $response = $ua->get("http://api.metacpan.org/v0/release/$author/$release");
-    die "$response->{status} $response->{reason}" unless $response->{success};
-    my $release_data = decode_json $response->{content};
+    my $response = _https_request(GET => "https://fastapi.metacpan.org/v1/release/$author/$release");
+    my $release_data = decode_json $response;
     if (!$release_data) {
         warn "Can't find release details for $author/$release - SKIPPED!\n";
         return; # XXX could fake some of $release_data instead
@@ -181,10 +217,10 @@ sub get_candidate_cpan_dist_releases {
     my $version_qual = _prepare_version_query(0, $version);
 
     my @and_quals = (
-        {"term" => {"file.module.name" => $module }},
-        (@$version_qual > 1 ? { "or" => $version_qual } : $version_qual->[0]),
+        {"term" => {"module.name" => $module }},
+        (@$version_qual > 1 ? { "bool" => { "should" => $version_qual } } : $version_qual->[0]),
     );
-    push @and_quals, {"term" => {"file.stat.size" => $file_size }}
+    push @and_quals, {"term" => {"stat.size" => $file_size }}
         if $file_size;
 
     # XXX doesn't cope with odd cases like 
@@ -193,23 +229,19 @@ sub get_candidate_cpan_dist_releases {
 
     my $query = {
         "size" => $metacpan_size,
-        "query" =>  { "filtered" => {
-            "filter" => {"and" => \@and_quals },
-            "query" => {"match_all" => {}},
+        "query" =>  { "bool" => {
+            "filter" => \@and_quals,
         }},
         "fields" => [qw(
-            release _parent author version version_numified file.module.version 
-            file.module.version_numified date stat.mtime distribution file.path
+            release _parent author version version_numified module.version 
+            module.version_numified date stat.mtime distribution path
             )]
     };
 
-    my $response = $ua->post(
-        'http://api.metacpan.org/v0/file', {
-            headers => { 'Content-Type' => 'application/json;charset=UTF-8' },
-            content => JSON->new->utf8->canonical->encode($query),
-        }
+    my $response = _https_request(POST => 'https://fastapi.metacpan.org/v1/file',
+        { 'Content-Type' => 'application/json;charset=UTF-8' },
+        JSON->new->utf8->canonical->encode($query),
     );
-    die "$response->{status} $response->{reason}" unless $response->{success};
     return _process_response($funcstr, $response);
 }
 
@@ -234,28 +266,24 @@ sub get_candidate_cpan_dist_releases_fallback {
 
     my @and_quals = (
         {"term" => {"distribution" => $distname }},
-        (@$version_qual > 1 ? { "or" => $version_qual } : $version_qual->[0]),
+        (@$version_qual > 1 ? { "bool" => { "should" => $version_qual } } : $version_qual->[0]),
     );
 
     # XXX doesn't cope with odd cases like 
     $metacpan_calls++;
     my $query = {
         "size" => $metacpan_size,
-        "query" =>  { "filtered" => {
-            "filter" => {"and" => \@and_quals },
-            "query" => {"match_all" => {}},
+        "query" =>  { "bool" => {
+            "filter" => \@and_quals,
         }},
         "fields" => [qw(
-            release _parent author version version_numified file.module.version 
-            file.module.version_numified date stat.mtime distribution file.path)]
+            release _parent author version version_numified module.version 
+            module.version_numified date stat.mtime distribution path)]
     };
-    my $response = $ua->post(
-        'http://api.metacpan.org/v0/file', {
-            headers => { 'Content-Type' => 'application/json;charset=UTF-8' },
-            content => JSON->new->utf8->canonical->encode($query),
-        }
+    my $response = _https_request(POST => 'https://fastapi.metacpan.org/v1/file',
+        { 'Content-Type' => 'application/json;charset=UTF-8' },
+        JSON->new->utf8->canonical->encode($query),
     );
-    die "$response->{status} $response->{reason}" unless $response->{success};
     return _process_response("get_candidate_cpan_dist_releases_fallback($module, $version)", $response);
 }
 
@@ -265,7 +293,7 @@ sub _prepare_version_query {
     my ($v_key, $num_key) = 
         $is_fallback 
         ? qw{ version version_numified } 
-        : qw{ file.module.version file.module.version_numified };
+        : qw{ module.version module.version_numified };
 
     # timbunce: So, the current situation is that: version_numified is a float
     # holding version->parse($raw_version)->numify, and version is a string
@@ -286,7 +314,7 @@ sub _prepare_version_query {
 sub _process_response {
     my ($funcname, $response) = @_;
 
-    my $results = decode_json $response->{content};
+    my $results = decode_json $response;
 
     my $hits = $results->{hits}{hits};
     die "$funcname: too many results (>$metacpan_size)"
@@ -343,24 +371,21 @@ sub get_module_versions_in_release {
     my $results = eval { 
         my $query = {
             "size" => $metacpan_size,
-            "query" =>  { "filtered" => {
-                "filter" => {"and" => [
+            "query" =>  { "bool" => {
+                "filter" => [
                     {"term" => {"release" => $release }},
                     {"term" => {"author" => $author }},
                     {"term" => {"mime" => "text/x-script.perl-module"}},
-                ]},
-                "query" => {"match_all" => {}},
+                ],
             }},
-            "fields" => ["path","name","_source.module", "_source.stat.size"],
+            "fields" => ["path","name","stat.size"],
+            "inner_hits" => {"module" => {"path" => {"module" => {}}}},
         }; 
-        my $response = $ua->post(
-            'http://api.metacpan.org/v0/file', {
-                headers => { 'Content-Type' => 'application/json;charset=UTF-8' },
-                content => JSON->new->utf8->canonical->encode($query),
-            }
+        my $response = _https_request(POST => 'https://fastapi.metacpan.org/v1/file',
+            { 'Content-Type' => 'application/json;charset=UTF-8' },
+            JSON->new->utf8->canonical->encode($query),
         );
-        die "$response->{status} $response->{reason}" unless $response->{success};
-        decode_json $response->{content};
+        decode_json $response;
     };
     if (not $results) {
         warn "Failed get_module_versions_in_release for $author/$release: $@";
@@ -382,10 +407,11 @@ sub get_module_versions_in_release {
             next;
         }
 
-        my $size = $hit->{fields}{"_source.stat.size"};
+        my $size = $hit->{fields}{"stat.size"};
         # files can contain more than one package ('module')
-        my $rel_mods = $hit->{fields}{"_source.module"} || [];
-        for my $mod (@$rel_mods) { # actually packages in the file
+        my $rel_mods = $hit->{inner_hits}{module}{hits}{hits} || [];
+        for my $inner_hit (@$rel_mods) { # actually packages in the file
+            my $mod = $inner_hit->{_source};
 
             # Some files may contain multiple packages. We want to ignore
             # all except the one that matches the name of the file.

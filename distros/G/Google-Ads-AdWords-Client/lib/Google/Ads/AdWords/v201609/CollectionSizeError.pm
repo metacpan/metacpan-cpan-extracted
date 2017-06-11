@@ -5,7 +5,7 @@ use warnings;
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'https://adwords.google.com/api/adwords/rm/v201609' };
+sub get_xmlns { 'https://adwords.google.com/api/adwords/cm/v201609' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -80,7 +80,7 @@ Google::Ads::AdWords::v201609::CollectionSizeError
 =head1 DESCRIPTION
 
 Perl data type class for the XML Schema defined complexType
-CollectionSizeError from the namespace https://adwords.google.com/api/adwords/rm/v201609.
+CollectionSizeError from the namespace https://adwords.google.com/api/adwords/cm/v201609.
 
 Errors associated with the size of the given collection being out of bounds. 
 

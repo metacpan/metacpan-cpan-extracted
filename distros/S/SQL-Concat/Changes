@@ -1,5 +1,11 @@
 Revision history for Perl extension SQL-Concat
 
+0.002 2017-06-11T07:18:13Z
+    - Better docs (I hope;-)
+    - Added paren_nl_indent()
+    - Fixed PAR()/->paren() to handle empty sql correctly.
+    - Fixed CAT() to handle empty sql correctly.
+
 0.001    2015-12-16
     - First release.
 

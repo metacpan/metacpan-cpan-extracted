@@ -1,7 +1,7 @@
 package DDG::IsSpice;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Role for Spice
-$DDG::IsSpice::VERSION = '1016';
+$DDG::IsSpice::VERSION = '1017';
 use Moo::Role;
 
 requires qw(
@@ -21,7 +21,7 @@ DDG::IsSpice - Role for Spice
 
 =head1 VERSION
 
-version 1016
+version 1017
 
 =head1 DESCRIPTION
 

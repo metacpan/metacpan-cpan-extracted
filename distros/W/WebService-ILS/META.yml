@@ -27,7 +27,7 @@ no_index:
 provides:
   WebService::ILS:
     file: lib/WebService/ILS.pm
-    version: '0.12'
+    version: '0.14'
   WebService::ILS::JSON:
     file: lib/WebService/ILS/JSON.pm
   WebService::ILS::OneClickDigital:
@@ -63,5 +63,5 @@ requires:
   perl: '5.008001'
 resources:
   repository: git+ssh://git.catalyst.net.nz/git/private/webservice-ils.git
-version: '0.12'
+version: '0.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -2,7 +2,16 @@
 use warnings;
 use strict;
 
-use Test::More;
+
+BEGIN {
+    require Test::More;
+    if ($Test::More::VERSION ge '0.87_01') { # Implements "done_testing".
+        'Test::More'->import;
+    } else {
+        'Test::More'->import('no_plan');
+    }
+}
+
 use Syntax::Construct ();
 
 
@@ -13,6 +22,19 @@ sub skippable {
 
 
 my %tests = (
+    '5.026' => [
+        [ '<<~',
+          "<<~ 'EOF'\n a\n EOF", "a\n" ],
+        [ '/xx',
+          '" " !~ /[a b]/xx', 1 ],
+        [ '^CAPTURE',
+          '"ab" =~ /(.)(.)/; "@{^CAPTURE}"', "a b" ],
+        [ 'unicode9.0',
+          '"\N{BUTTERFLY}"', eval q("\N{U+1F98B}") ],
+        [ 'unicode-scx',
+          '"\N{KATAKANA-HIRAGANA DOUBLE HYPHEN}" !~ /\p{Common}/', 1],
+    ],
+
     '5.024' => [
         [ 'unicode8.0',
           '"\N{OLD HUNGARIAN CAPITAL LETTER A}" eq "\N{U+10C80}"', 1 ],
@@ -67,7 +89,7 @@ my %tests = (
         [ '\p{Unicode}',
           'scalar grep $_ =~ /\p{Unicode}/, "a", "\N{U+0FFFFF}"', 2 ],
         [ 's-utf8-delimiters',
-          "'a' =~ s\N{U+2759}a\N{U+2759}b\N{U+2759}r", 'b' ],
+          eval q("'a' =~ s\N{U+2759}a\N{U+2759}b\N{U+2759}r"), 'b' ],
         # TODO: 'utf8-locale'.
     ],
 
@@ -174,6 +196,10 @@ my %tests = (
         [ 'lexical-$_',
           '$_ = 7; { my $_ = 42; } $_ ', 7 ],
     ],
+    '5.008' => [
+        [ 's-utf8-delimiters-hack',
+          eval q{qq{ my \$string = "a"; use utf8; \$string =~ s\N{U+2759}a\N{U+2759}\N{U+2759}b\N{U+2759}; \$string }}, 'b' ],
+    ],
 );
 
 my $count = 0;
@@ -213,7 +239,7 @@ for my $version (keys %tests) {
     }
 }
 
-done_testing($count);
+done_testing($count) if $Test::More::VERSION ge '0.87_01';
 
 
 __DATA__
@@ -226,7 +252,6 @@ readline default
     '5.020' => [
         [ 'utf8-locale',
     old => [
-        [ 's-utf8-delimiters-hack', # See 04-extra.t
 
 =cut
 

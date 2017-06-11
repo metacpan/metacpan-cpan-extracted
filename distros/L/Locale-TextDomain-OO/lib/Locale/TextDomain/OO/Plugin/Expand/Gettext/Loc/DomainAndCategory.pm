@@ -5,9 +5,8 @@ use warnings;
 use Carp qw(confess cluck);
 use Locale::Utils::PlaceholderNamed;
 use Moo::Role;
-use namespace::autoclean;
 
-our $VERSION = '1.014';
+our $VERSION = '1.027';
 
 with qw(
     Locale::TextDomain::OO::Plugin::Expand::Gettext::Loc
@@ -279,13 +278,13 @@ __END__
 
 Locale::TextDomain::OO::Plugin::Expand::Gettext::Loc::DomainAndCategory - Methods for dynamic domain and/or category, prefixed with loc_
 
-$Id: DomainAndCategory.pm 545 2014-10-30 13:23:00Z steffenw $
+$Id: DomainAndCategory.pm 651 2017-05-31 18:10:43Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/module/trunk/lib/Locale/TextDomain/OO/Plugin/Expand/Gettext/Loc/DomainAndCategory.pm $
 
 =head1 VERSION
 
-1.014
+1.027
 
 =head1 DESCRIPTION
 
@@ -411,8 +410,6 @@ L<Locale::Utils::PlaceholderNamed|Locale::Utils::PlaceholderNamed>
 
 L<Moo::Role|Moo::Role>
 
-L<namespace::autoclean|namespace::autoclean>
-
 L<Locale::TextDomain::OO::Plugin::Expand::Gettext::Loc|Locale::TextDomain::OO::Plugin::Expand::Gettext::Loc>
 
 =head1 INCOMPATIBILITIES
@@ -433,7 +430,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2013,
+Copyright (c) 2013 - 2017,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

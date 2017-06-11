@@ -1,0 +1,177 @@
+#!/usr/bin/perl
+# -*-cperl-*-
+#
+# vault.pl - Vault server for HashCash digital cash
+# Copyright (c) 2017 Ashish Gulhati <crypt-hashcash at hash.neo.tc>
+#
+# $Id: bin/vault.pl v1.118 Sat Jun 10 13:59:12 PDT 2017 $
+
+use strict;
+use warnings;
+
+package Crypt::HashCash::Vault;
+
+use vars qw(@ISA);
+use Crypt::HashCash::Vault::Bitcoin;
+use Crypt::HashCash::Coin::Blinded;
+use Crypt::HashCash::CoinRequest;
+use Crypt::HashCash::Coin;
+use Crypt::HashCash qw (_dec _hex);
+use Crypt::EECDH;
+use Digest::MD5 qw(md5_hex);
+use Net::Server::PreFork;
+use Crypt::CBC;
+
+my $vault = new Crypt::HashCash::Vault::Bitcoin;
+
+if (defined $ARGV[0] and $ARGV[0] eq '--keygen') {
+  $vault->keygen( Name   => 'HashCash.ch',
+		  Server => 'vault.hashcash.ch',
+		  Fees   => { mf => 50, mp => 0, vf => 50, vp => 0.001 } );
+  exit;
+}
+
+$vault->mint->loadkeys();
+my $sk = pack ('H*',$vault->mint->keydb->{vaultsec});
+
+@ISA = qw(Net::Server::PreFork);
+
+Crypt::HashCash::Vault->run();
+exit;
+
+sub process_request {
+  my $self = shift;
+  eval {
+    local $SIG{ALRM} = sub { die "Timed Out!\n" };
+    my $timeout = 60;                                    # Give client 60 seconds to send input
+    alarm($timeout);
+    while (<STDIN>) {
+      /(\S+)/;                                           # Decrypt the message and get the key to encrypt reply with
+      my $enchex = _hex($1);
+      my $eecdh = new Crypt::EECDH;
+      my ($request, $pubkey) = $eecdh->decrypt (Key => $sk, Ciphertext => pack ('H*', $enchex));
+      alarm(0);
+      my ($ret) = $vault->process_request($request);     # Process the request
+      if ( defined $ret) {                               # Encrypt and return response
+	my ($encrypted) = $eecdh->encrypt (PublicKey => $pubkey, Message => $ret);
+	my $response = _dec(unpack 'H*', $encrypted);
+	diag("R: $ret\nRES: $response\n");
+	print "$response\n";
+      }
+      alarm($timeout);
+    }
+  };
+  if( $@=~/timed out/i ){
+    print STDERR "Timed out\n";
+    return;
+  }
+}
+
+sub diag {
+  print STDERR shift if 0;
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+vault.pl - Vault for HashCash digital cash
+
+=head1 VERSION
+
+ $Revision: 1.118 $
+ $Date: Sat Jun 10 13:59:12 PDT 2017 $
+
+=head1 SYNOPSIS
+
+  vault.pl [--keygen]
+
+=head1 DESCRIPTION
+
+vault.pl is a server for a vault in the HashCash digital cash
+system. It accepts connections from clients, processes their requests
+and returns the responses.
+
+This command is primarily for testing. For real vaults, optimal
+security and performance can be achieved by running the vault on an
+offline cluster using B<vault-worker.pl> and B<vault-queuer.pl>
+instead,
+
+=head1 COMMAND LINE OPTIONS
+
+=over
+
+=item B<--keygen>
+
+=back
+
+=over
+
+Create blind-signing keys for all coin denominations supported by the
+vault.
+
+=back
+
+=head1 SEE ALSO
+
+=head2 vault-worker.pl
+
+=head2 vault-queuer.pl
+
+=head2 www.hashcash.com
+
+=head2 IPC::Serial
+
+=head2 IPC::Queue::Duplex
+
+=head2
+
+=head1 AUTHOR
+
+Ashish Gulhati, C<< <crypt-hashcash at hash.neo.tc> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-crypt-hashcash at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Crypt-HashCash>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this command with the perldoc command.
+
+    perldoc vault.pl
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Crypt-HashCash>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Crypt-HashCash>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Crypt-HashCash>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Crypt-HashCash/>
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2017 Ashish Gulhati.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+See http://www.perlfoundation.org/artistic_license_2_0 for the full
+license terms.

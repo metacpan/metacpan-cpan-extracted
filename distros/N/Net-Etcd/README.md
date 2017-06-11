@@ -1,4 +1,4 @@
-[![Build Status](https://api.travis-ci.org/hexfusion/perl-etcd3.svg?branch=master)](https://travis-ci.org/hexfusion/perl-etcd3)
+[![Build Status](https://api.travis-ci.org/hexfusion/perl-net-etcd.svg?branch=master)](https://travis-ci.org/hexfusion/perl-net-etcd)
 
 # NAME
 
@@ -41,7 +41,7 @@ Net::Etcd
 
 # DESCRIPTION
 
-`Net::Etcd` An object oriented interface to the v3 REST API provided by the etcd grpc gateway.
+This module has been superseded by [Net::Etcd](https://metacpan.org/pod/Net::Etcd) and will be removed from CPAN on June 29th 2017
 
 # ACCESSORS
 
@@ -54,8 +54,6 @@ Net::Etcd
 ## password
 
 ## ssl
-
-## auth
 
 ## api\_root
 
@@ -87,9 +85,9 @@ Returns a [Net::Etcd::User::Role](https://metacpan.org/pod/Net::Etcd::User::Role
 
     $etcd->user_role({ name => 'samba', role => 'foo' });
 
-## auth\_enable
+## auth
 
-Currently not available.
+Returns a [Net::Etcd::Auth](https://metacpan.org/pod/Net::Etcd::Auth) object.
 
 ## lease
 
@@ -106,6 +104,10 @@ Returns a [Net::Etcd::KV::Put](https://metacpan.org/pod/Net::Etcd::KV::Put) obje
 ## range
 
 Returns a [Net::Etcd::KV::Range](https://metacpan.org/pod/Net::Etcd::KV::Range) object.
+
+## txn
+
+Returns a [Net::Etcd::KV::Txn](https://metacpan.org/pod/Net::Etcd::KV::Txn) object.
 
 ## configuration
 

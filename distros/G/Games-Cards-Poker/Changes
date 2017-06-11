@@ -1,0 +1,161 @@
+CHANGES
+    Revision history for Perl extension Games::Cards::Poker:
+
+    - 1.4 H66ML4K8 Tue Jun 6 21:04:20:08 -0500 2017
+        * prepended new Pod tests and renumbered all others, added test
+        names to all tests
+
+        * started FindNuts() to hopefully compute what BenB's old
+        flop-gen.pl was looking for
+
+        * fixed WorstHand() on As 2s from returning FullHouse
+        HTTPS://RT.CPAN.Org/Public/Bug/Display.html?id=100391 (Thanks Iain!)
+
+        * removed all old PDat duplicate data structures && accessor
+        functions && renamed %pdat to %pd8a with matching :pd8a export tag
+        which also has holz,flpz,hndz
+
+        * removed all %pdat ways d8a (since all should be gener8d easily) &&
+        replaced lists with just qw() && fixed CountWays() && CalcOdds() to
+        gener8 nstd of index
+
+        * got rid of OrigHandScore except good category commentz
+
+        * audited all of old MANIFEST, yanked SuitAbstraction.pm, fixed
+        t/*.t, && it seems like none of following old bin files are really
+        needed until maybe l8r after reviving CalcOdds (so I'm removing all
+        of the old bin/ from the next release):
+
+          bin/tstPoker.pl  - generate test runs of Texas Hold'Em poker hands and print out the results (probably just a precursor to ex/txholdem.pl ?)
+          bin/runHands.pl  - create MySQL databases and tables for storing Games::Cards::Poker exhaustive odds data
+          bin/findOdds.pl  - try to query odds from a pre-generated MySQL database
+          bin/mkDecks.pl   - made suit-abstracted B64 hole pairs but could all be in qw()
+          bin/mkTable.pl   - select odds from a MySQL server populated by runHands.pl and build HTML summary of results for all holes versus each number of opponents
+          bin/mkHoleDr.pl  - make 'h' . ShortHand(@hole) directories (not suit-abstracted B64 but just joined Ranks maybe 's'uited together)
+          bin/mkHoleDr.bat - a batch file generated to do the same as the above .pl file
+          bin/Makefile     - make pokr.c into pokr executable binary
+          bin/pokr.c       - C source file for generating *.ppx files?
+          bin/mkPPX.pl     - try to compile a root h.ppx file from all subdirectories
+          bin/h.ppx        - example root hole Pip's Poker Xml aggregate odds file
+          bin/ckOdds.pl    - lookup odds within already explored .ppx directory structure
+          bin/pokrlocl.pl  - attempt to provide a local interactive (Perl/Tk) interface to pokr odds
+          bin/index.cgi    - provide a basic web-interface to picking game-state to query odds
+
+        * replaced Hold'Em and BlackJack synopsis examples with new ex/ .pl
+        scripts
+
+        * updated license to GPLv3
+
+        * s/Slow//g && further downplayed OrigHandScore
+
+        * s/(Hand|Score)(Score|Hand)/$2$1/g to be consistent with others
+        (e.g., CardB64 implying X-to-Y)
+
+        * s/(for)each/$1/g
+
+        * fixed DecCard(0) to return 'As' error reported by Dan C.
+
+        * restored code &&'s, reverted license
+
+    - 1.2.565CHh5 Sun Jun 5 12:17:43:05 2005
+        * added VerboseHandName() from code contributed by Roy Lyons
+
+        * fixed Shuffle() off-by-one results skewing error reported by Lee
+
+    - 1.2.4CCJ12M Sun Dec 12 19:01:02:22 2004
+        * added MySQL and XML and .c and Tk scripts to bin/
+
+        * fixed pod typo and updated License
+
+    - 1.2.46QD4ax Sat Jun 26 13:04:36:59 2004
+        * added Dec functions
+
+    - 1.2.4610lBw Tue Jun 1 00:47:11:58 2004
+        * removed benchmrk.pl since it's not worth including in pkg
+
+        * fixed some out-of-date POD and rearranged USAGE
+
+    - 1.2.45UGmiC Sun May 30 16:48:44:12 2004
+        * upped minor version number since CPAN doesn't recognize my PTVR
+
+        * split test.pl into t/*.t and added those + bin/pokr to MANIFEST
+
+        * added separate EXPORT_TAGS and added ADVANCED USAGE POD
+
+        * added RemoveCard(), WorstHand(), CountWays(), and CalcOdds()
+
+        * added %pdat as common structure for all my Poker Data and Counts
+
+        * added B64Hand and HandB64 functions
+
+        * added simple accessors to internal data
+
+        * added possible hole and flop data
+
+        * made CardName take either of just rank or suit
+
+        * made new b64 card conversion functions: CardB64() and B64Card()
+
+        * changed b64 maps to use letters
+
+    - 1.0.44P0KER Sun Apr 25 00:20:14:27 2004
+        * made CardName() to return 'Ace of Spades' or 'Two of Clubs' for
+        'As'or'A' or '2c'or'z' and NameCard() to do inverse
+
+        * made HandName() to return 'Royal Flush' or 'High Card' for
+        ScoreHand() or ShortHand() or @hand or \@hand and NameHand()
+
+        * rewrote SortCards() to accept any length ShortHand() params
+
+        * s/valu/rank/g s/scor/score/g s/bord/board/g
+
+    - 1.0.44LCEw8 Wed Apr 21 12:14:58:08 2004
+        * s/HoldEm//g; on advice from Joe since Best*() are useful for more
+        than just Hold'Em (like 7-card stud)
+
+        * fixed minor typos in POD
+
+    - 1.0.44KFNKP Tue Apr 20 15:23:20:25 2004
+        * wrote UseSlow() so that benchmrk.pl would still work without
+        Best() and in case anyone would rather have ScoreHand() call
+        SlowScoreHand() every time instead.
+
+        * since my old Best() was actually slower than BestHoldEmIndices()
+        =O I removed Best().
+
+        * since old Scor() was so much faster than old ScoreHand(), I
+        renamed them to ScoreHand() and SlowScoreHand() respectively since
+        computational version is unnecessary now.
+
+        * wrote benchmrk.pl to test BestHoldEmIndices() + ScoreHand()
+        against Best() + Scor(). Best()+Scor() only took 60% as long to run.
+
+        * added SortCards() call on ShortHand() param just in case
+
+    - 1.0.44ILBKV Sun Apr 18 21:11:20:31 2004
+        * wrote Scor() with gen'd enumerated hash of ShortHand => Score
+
+        * wrote HandScore() to just lookup index of a ShortHand from a score
+
+        * squashed 4 scoring bugs in one pair section
+
+        * used Algorithm::ChooseSubsets for new BestHoldEmIndices (on Jan's
+        recommendation)
+
+        * renamed enumerated BestHoldEmIndices() as Best()
+
+        * gave ScoreHand() optional arrayref param like others
+
+        * gave ScoreHand() optional ShortHand() string param
+
+        * updated 2do and tidied up documentation a bit
+
+    - 1.0.44H2DUS Sat Apr 17 02:13:30:28 2004
+        * added BestHoldEmIndices() and BestHoldEmHand() for Tim and Jan
+
+        * commented unnecessary Games::Cards inheritance since I haven't
+        written any compatability / object interface yet
+
+    - 1.0.44F2Q8F Thu Apr 15 02:26:08:15 2004
+        * original version
+

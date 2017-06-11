@@ -3099,6 +3099,14 @@ The domain has shutdown but is not yet stopped
 
 The domain finished shutting down
 
+=item Sys::Virt::Domain::EVENT_SHUTDOWN_HOST
+
+The domain shutdown due to host trigger
+
+=item Sys::Virt::Domain::EVENT_SHUTDOWN_GUEST
+
+The domain shutdown due to guest trigger
+
 =back
 
 =item Sys::Virt::Domain::EVENT_SUSPENDED

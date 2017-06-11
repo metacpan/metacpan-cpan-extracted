@@ -4,7 +4,7 @@
       "Chris Williams"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -55,6 +55,7 @@
          "web" : "https://github.com/bingos/acme-cpanauthors-duallife"
       }
    },
-   "version" : "0.42"
+   "version" : "0.44",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

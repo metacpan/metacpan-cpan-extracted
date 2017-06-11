@@ -1,0 +1,22 @@
+Revision history for Perl extension Text-CaboCha
+
+0.05 2017-06-08T10:17:17Z
+
+    - Fixed test case of not found Text::MeCab
+
+0.04 2017-06-07T10:08:30Z
+
+    - Added new method "$parser->parse_from_node(Text::MeCab::Node)"
+
+0.03 2017-06-03T02:26:29Z
+
+    - Patched some issues by skaji.
+
+0.02 2017-06-02T16:08:15Z
+
+    - Fixed a pod document
+
+0.01 2017-06-02T15:56:01Z
+
+    - original version
+

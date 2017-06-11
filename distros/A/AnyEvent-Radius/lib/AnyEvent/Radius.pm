@@ -2,7 +2,7 @@ package AnyEvent::Radius;
 # DUMMY
 use strict;
 use warnings;
-our $VERSION = '1.0.2';
+our $VERSION = '1.1.1';
 1;
 
 __END__

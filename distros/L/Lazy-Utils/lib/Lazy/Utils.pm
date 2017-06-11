@@ -5,7 +5,7 @@ Lazy::Utils - Utility functions
 
 =head1 VERSION
 
-version 1.20
+version 1.21
 
 =head1 SYNOPSIS
 
@@ -23,6 +23,7 @@ version 1.20
 	whereis($name, $path);
 	file_cache($tag, $expiry, $coderef);
 	get_pod_text($file_name, $section, $exclude_section);
+	array_to_hash(@array);
 
 =head1 DESCRIPTION
 
@@ -42,11 +43,11 @@ use Pod::Simple::Text;
 BEGIN
 {
 	require Exporter;
-	our $VERSION     = '1.20';
+	our $VERSION     = '1.21';
 	our @ISA         = qw(Exporter);
 	our @EXPORT      = qw(trim ltrim rtrim file_get_contents file_put_contents shellmeta system2 _system
 		bash_readline bashReadLine cmdargs commandArgs cmdArgs whereis whereisBin file_cache fileCache
-		get_pod_text getPodText);
+		get_pod_text getPodText array_to_hash);
 	our @EXPORT_OK   = qw();
 }
 
@@ -204,32 +205,22 @@ $cmd: I<command>
 
 return value: I<exit code of command. -1 if fatal error occurs>
 
-returned $?: I<return code of wait call like on perls system call>
+returned $!: I<system error message>
 
-returned $!: I<system error message like on perls system call>
+returned $?: I<return code of wait call like on perls system call>
 
 =cut
 sub system2
 {
-	eval
+	my $pid;
+	return -1 unless defined($pid = fork);
+	unless ($pid)
 	{
-		my $pid;
-		if (not defined($pid = fork))
-		{
-			return -1;
-		}
-		if (not $pid)
-		{
-			no warnings FATAL => 'exec';
-			exec(@_);
-			die $!;
-		}
-		if (waitpid($pid, 0) <= 0)
-		{
-			return -1;
-		}
-	};
-	return -1 if $@;
+		no warnings FATAL => 'exec';
+		exec(@_);
+		exit 255;
+	}
+	return -1 unless waitpid($pid, 0) > 0;
 	return $? >> 8;
 }
 sub _system
@@ -585,6 +576,24 @@ sub get_pod_text
 sub getPodText
 {
 	return get_pod_text(@_);
+}
+
+=head2 array_to_hash(@array)
+
+returns hash with indexes for given array
+
+@array: I<command line arguments>
+
+return value: I<Hash or HashRef by B<wantarray>>
+
+=cut
+sub array_to_hash
+{
+	my %h;
+	my $i = 0;
+	%h = map { $i++ => $_ } @_;
+	return \%h unless wantarray;
+	return %h;
 }
 
 

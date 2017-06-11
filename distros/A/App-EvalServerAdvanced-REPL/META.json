@@ -35,6 +35,7 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "blib" : "1.01",
             "perl" : "5.006"
@@ -44,11 +45,14 @@
          "requires" : {
             "App::EvalServerAdvanced::Protocol" : "0",
             "Data::Dumper" : "0",
+            "Encode" : "0",
             "Exporter" : "0",
             "IO::Async::Loop" : "0",
             "IO::Async::Stream" : "0",
             "Term::ReadLine" : "0",
+            "open" : "0",
             "strict" : "0",
+            "utf8" : "0",
             "warnings" : "0"
          }
       },
@@ -66,11 +70,21 @@
    "provides" : {
       "App::EvalServerAdvanced::REPL" : {
          "file" : "lib/App/EvalServerAdvanced/REPL.pm",
-         "version" : "0.002"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
-   "version" : "0.002",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/perlbot/evalserver-async-repl/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/perlbot/evalserver-async-repl.git",
+         "web" : "https://github.com/perlbot/evalserver-async-repl"
+      }
+   },
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024000"
@@ -247,7 +261,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.002",
+                  "tag" : "v0.004",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
@@ -263,6 +277,42 @@
             "version" : "2.042"
          },
          {
+            "class" : "Dist::Zilla::Plugin::GitHub::Meta",
+            "name" : "GitHub::Meta",
+            "version" : "0.44"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::RewriteVersion",
+            "config" : {
+               "Dist::Zilla::Plugin::RewriteVersion" : {
+                  "add_tarball_name" : 0,
+                  "finders" : [
+                     ":ExecFiles",
+                     ":InstallModules"
+                  ],
+                  "global" : 0,
+                  "skip_version_provider" : 0
+               }
+            },
+            "name" : "RewriteVersion",
+            "version" : "0.015"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::BumpVersionAfterRelease",
+            "config" : {
+               "Dist::Zilla::Plugin::BumpVersionAfterRelease" : {
+                  "finders" : [
+                     ":ExecFiles",
+                     ":InstallModules"
+                  ],
+                  "global" : 0,
+                  "munge_makefile_pl" : 1
+               }
+            },
+            "name" : "BumpVersionAfterRelease",
+            "version" : "0.015"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::Readme::Brief",
             "config" : {
                "Dist::Zilla::Plugin::Readme::Brief" : {
@@ -273,25 +323,19 @@
             "version" : "0.003002"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Git::NextVersion",
-            "config" : {
-               "Dist::Zilla::Plugin::Git::NextVersion" : {
-                  "first_version" : "0.001",
-                  "version_by_branch" : 0,
-                  "version_regexp" : "(?^:^v(.+)$)"
-               },
-               "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.11.0",
-                  "repo_root" : "."
-               }
-            },
-            "name" : "Git::NextVersion",
-            "version" : "2.042"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",
             "name" : "AutoPrereqs",
             "version" : "6.009"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Perl::Critic",
+            "name" : "Test::Perl::Critic",
+            "version" : "3.001"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CheckChangesHasContent",
+            "name" : "CheckChangesHasContent",
+            "version" : "0.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",

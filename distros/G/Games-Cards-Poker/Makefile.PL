@@ -1,16 +1,21 @@
 use ExtUtils::MakeMaker;
-  # See lib/ExtUtils/MakeMaker.pm for details of how to influence
-  # # the contents of the Makefile that is written.
-  WriteMakefile(
-    'NAME'         => 'Games::Cards::Poker',
-    'VERSION'      => '1.2.565CHh5',
-    'ABSTRACT'     => 'Pure Perl Poker functions',
-    'AUTHOR'       => 'Pip Stuart <Pip@CPAN.Org>',
-    'EXE_FILES'    => [ 
-                    ],
-    'PREREQ_PM'    => {
-    'Math::BaseCnv'                  => 0,
+WriteMakefile(
+  'NAME'           => 'Games::Cards::Poker',
+# 'VERSION_FROM'   => 'lib/Games/Cards/Poker.pm',
+  'VERSION'        => '1.4',
+# 'ABSTRACT_FROM'  => 'lib/Games/Cards/Poker.pm',
+  'ABSTRACT'       => 'Pure Perl Poker functions',
+  'LICENSE'        => 'gpl_3',
+  'AUTHOR'         => [ 'Pip Stuart <Pip@CPAN.Org>' ],
+  'TEST_REQUIRES'  => {
+    'Test'                           => 0,
+    'Test::More'                     => 0,
+    'Test::Pod'                      => 0,
+    'Test::Pod::Coverage'            => 0,
+  }, # Module::Name                  => 1.1,
+  'PREREQ_PM'      => {
     'Algorithm::ChooseSubsets'       => 0,
-    }, # Module::Name => 1.1,
-    'dist'         => { 'COMPRESS' => 'gzip', 'SUFFIX' => 'tgz' },
-  );
+  },
+  'dist'           => { 'COMPRESS'   => 'gzip',
+                        'SUFFIX'     => '.tgz' },
+);

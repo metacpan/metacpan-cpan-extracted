@@ -6,7 +6,7 @@ use Alien::Build::Plugin;
 use Carp ();
 
 # ABSTRACT: LWP plugin for fetching files
-our $VERSION = '0.36'; # VERSION
+our $VERSION = '0.41'; # VERSION
 
 
 has '+url' => sub { Carp::croak "url is a required property" };
@@ -85,7 +85,7 @@ Alien::Build::Plugin::Fetch::LWP - LWP plugin for fetching files
 
 =head1 VERSION
 
-version 0.36
+version 0.41
 
 =head1 SYNOPSIS
 
@@ -123,7 +123,11 @@ L<Alien::Build::Plugin::Download::Negotiate>, L<Alien::Build>, L<alienfile>, L<A
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Diab Jerius (DJERIUS)
 
 =head1 COPYRIGHT AND LICENSE
 

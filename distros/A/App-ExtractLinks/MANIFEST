@@ -9,3 +9,4 @@ dist.ini
 lib/App/ExtractLinks.pm
 t/basic.t
 t/page.t
+t/test.html

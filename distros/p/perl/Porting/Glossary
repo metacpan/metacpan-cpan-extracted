@@ -694,6 +694,38 @@ d_dlsymun (d_dlsymun.U):
 	indicates that we need to prepend an underscore to the symbol
 	name before calling dlsym().
 
+d_double_has_inf (infnan.U):
+	This variable conditionally defines the symbol DOUBLE_HAS_INF
+	which indicates that the double type has an infinity.
+
+d_double_has_nan (infnan.U):
+	This variable conditionally defines the symbol DOUBLE_HAS_INF
+	which indicates that the double type has a not-a-number.
+
+d_double_has_negative_zero (infnan.U):
+	This variable conditionally defines the symbol DOUBLE_HAS_NEGATIVE_ZERO
+	which indicates that the double type has a negative zero.
+
+d_double_has_subnormals (infnan.U):
+	This variable conditionally defines the symbol DOUBLE_HAS_SUBNORMALS
+	which indicates that the double type has subnormals (denormals).
+
+d_double_style_cray (longdblfio.U):
+	This variable conditionally defines the symbol DOUBLE_STYLE_CRAY
+	which indicates that the double is the 64-bit CRAY mainframe format.
+
+d_double_style_ibm (longdblfio.U):
+	This variable conditionally defines the symbol DOUBLE_STYLE_IBM,
+	which indicates that the double is the 64-bit IBM mainframe format.
+
+d_double_style_ieee (longdblfio.U):
+	This variable conditionally defines the symbol DOUBLE_STYLE_IEEE,
+	which indicates that the double is the 64-bit IEEE 754.
+
+d_double_style_vax (longdblfio.U):
+	This variable conditionally defines the symbol DOUBLE_STYLE_VAX,
+	which indicates that the double is the 64-bit VAX format D or G.
+
 d_dosuid (d_dosuid.U):
 	This variable conditionally defines the symbol DOSUID, which
 	tells the C program that it should insert setuid emulation code
@@ -982,6 +1014,12 @@ d_ftime (d_ftime.U):
 d_futimes (d_futimes.U):
 	This variable conditionally defines the HAS_FUTIMES symbol, which
 	indicates to the C program that the futimes() routine is available.
+
+d_gai_strerror (d_gai_strerror.U):
+	This variable conditionally defines the HAS_GAI_STRERROR symbol
+	if the gai_strerror() routine is available and can be used to
+	translate error codes returned by getaddrinfo() into human
+	readable strings.
 
 d_Gconvert (d_gconvert.U):
 	This variable holds what Gconvert is defined as to convert
@@ -1549,6 +1587,30 @@ d_longdbl (d_longdbl.U):
 	This variable conditionally defines HAS_LONG_DOUBLE if
 	the long double type is supported.
 
+d_long_double_style_ieee (d_longdbl.U):
+	This variable conditionally defines LONG_DOUBLE_STYLE_IEEE
+	if the long double is any of the IEEE 754 style long doubles:
+	LONG_DOUBLE_STYLE_IEEE_STD, LONG_DOUBLE_STYLE_IEEE_EXTENDED,
+	LONG_DOUBLE_STYLE_IEEE_DOUBLEDOUBLE.
+
+d_long_double_style_ieee_doubledouble (d_longdbl.U):
+	This variable conditionally defines LONG_DOUBLE_STYLE_IEEE_DOUBLEDOUBLE
+	if the long double is the 128-bit IEEE 754 double-double.
+
+d_long_double_style_ieee_extended (d_longdbl.U):
+	This variable conditionally defines LONG_DOUBLE_STYLE_IEEE_EXTENDED
+	if the long double is the 80-bit IEEE 754 extended precision.
+	Note that despite the 'extended' this is less than the 'std',
+	since thisis an extension of the double precision.
+
+d_long_double_style_ieee_std (d_longdbl.U):
+	This variable conditionally defines LONG_DOUBLE_STYLE_IEEE_STD
+	if the long double is the 128-bit IEEE 754.
+
+d_long_double_style_vax (d_longdbl.U):
+	This variable conditionally defines LONG_DOUBLE_STYLE_VAX
+	if the long double is the 128-bit VAX format H.
+
 d_longlong (d_longlong.U):
 	This variable conditionally defines HAS_LONG_LONG if
 	the long long type is supported.
@@ -2008,6 +2070,11 @@ d_qgcvt (d_qgcvt.U):
 d_quad (quadtype.U):
 	This variable, if defined, tells that there's a 64-bit integer type,
 	quadtype.
+
+d_querylocale (d_newlocale.U):
+	This variable conditionally defines the HAS_QUERYLOCALE symbol, which
+	indicates to the C program that the querylocale() routine is available
+	to return the name of the locale for a category mask.
 
 d_random_r (d_random_r.U):
 	This variable conditionally defines the HAS_RANDOM_R symbol,
@@ -2558,6 +2625,12 @@ d_strerror (d_strerror.U):
 	This variable conditionally defines HAS_STRERROR if strerror() is
 	available to translate error numbers to strings.
 
+d_strerror_l (d_strerror_l.U):
+	This variable conditionally defines the HAS_STRERROR_L symbol, which
+	indicates to the C program that the strerror_l() routine is available
+	to return the error message for a given errno value in a particular
+	locale (identified by a locale_t object).
+
 d_strerror_r (d_strerror_r.U):
 	This variable conditionally defines the HAS_STRERROR_R symbol,
 	which indicates to the C program that the strerror_r()
@@ -2886,6 +2959,9 @@ db_version_patch (i_db.U):
 	Berkeley DB found in the <db.h> header file.
 	For DB version 1 this is always 0.
 
+default_inc_excludes_dot (defaultincdot.U):
+	When defined, remove the legacy '.' from @INC
+
 direntrytype (i_dirent.U):
 	This symbol is set to 'struct direct' or 'struct dirent' depending on
 	whether dirent is available or not. You should use this pseudo type to
@@ -2913,6 +2989,12 @@ doublekind (longdblfio.U):
 	6 = IEEE 754 128-bit big endian,
 	7 = IEEE 754 64-bit mixed endian le-be,
 	8 = IEEE 754 64-bit mixed endian be-le,
+	9 = VAX 32bit little endian F float format
+	10 = VAX 64bit little endian D float format
+	11 = VAX 64bit little endian G float format
+	12 = IBM 32bit format
+	13 = IBM 64bit format
+	14 = Cray 64bit format
 	-1 = unknown format.
 
 doublemantbits (mantbits.U):
@@ -2948,6 +3030,11 @@ dtrace (usedtrace.U):
 
 dtraceobject (dtraceobject.U):
 	Whether we need to build an object file with the dtrace tool.
+
+dtracexnolibs (dtraceobject.U):
+	Whether dtrace accepts -xnolibs.  If available we call dtrace -h
+	and dtrace -G with -xnolibs to allow dtrace to run in a jail on
+	FreeBSD.
 
 dynamic_ext (Extensions.U):
 	This variable holds a list of XS extension files we want to
@@ -4170,8 +4257,9 @@ longdblkind (d_longdbl.U):
 	4 = x86 80-bit big endian,
 	5 = double-double 128-bit little endian,
 	6 = double-double 128-bit big endian,
-	7 = 128-bit mixed double-double (64-bit LEs in BE),
-	8 = 128-bit mixed double-double (64-bit BEs in LE),
+	7 = 128-bit mixed-endian double-double (64-bit LEs in BE),
+	8 = 128-bit mixed-endian double-double (64-bit BEs in LE),
+	9 = 128-bit PDP-style mixed-endian long doubles,
 	-1 = unknown format.
 
 longdblmantbits (mantbits.U):

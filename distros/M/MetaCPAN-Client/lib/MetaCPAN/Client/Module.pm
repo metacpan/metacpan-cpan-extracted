@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::Module;
 # ABSTRACT: A Module data object
-$MetaCPAN::Client::Module::VERSION = '2.015000';
+$MetaCPAN::Client::Module::VERSION = '2.016000';
 use Moo;
 extends 'MetaCPAN::Client::File';
 
@@ -36,7 +36,7 @@ MetaCPAN::Client::Module - A Module data object
 
 =head1 VERSION
 
-version 2.015000
+version 2.016000
 
 =head1 SYNOPSIS
 

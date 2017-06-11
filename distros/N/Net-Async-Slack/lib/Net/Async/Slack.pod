@@ -1,0 +1,138 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Net::Async::Slack
+at lib/Net/Async/Slack.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Net::Async::Slack - support for the L<https://slack.com> APIs with L<IO::Async>
+
+=head1 SYNOPSIS
+
+ use IO::Async::Loop;
+ use Net::Async::Slack;
+ my $loop = IO::Async::Loop->new;
+ $loop->add(
+  my $gh = Net::Async::Slack->new(
+   token => '...',
+  )
+ );
+
+=head1 DESCRIPTION
+
+This is a basic wrapper for Slack's API. It's an early version, the module API is likely
+to change somewhat over time.
+
+See the C<examples/> directory for usage.
+
+=head1 METHODS
+
+=head2 rtm
+
+Establishes a connection to the Slack RTM websocket API, and
+resolves to a L<Net::Async::Slack::RTM> instance.
+
+=head2 send_message
+
+Send a message to a user or channel.
+
+Supports the following named parameters:
+
+=over 4
+
+=item * channel - who to send the message to, can be a channel ID or C<#channel> name, or user ID
+
+=item * text - the message, see L<https://api.slack.com/docs/message-formatting> for details
+
+=item * attachments - more advanced messages, see L<https://api.slack.com/docs/message-attachments>
+
+=item * parse - whether to parse content and convert things like links
+
+=back
+
+and the following named boolean parameters:
+
+=over 4
+
+=item * link_names - convert C<@user> and C<#channel> to links
+
+=item * unfurl_links - show preview for URLs
+
+=item * unfurl_media - show preview for things that look like media links
+
+=item * as_user - send as user
+
+=item * reply_broadcast - send to all users when replying to a thread
+
+=back
+
+Returns a L<Future>, although the content of the response is subject to change.
+
+=head1 METHODS - Internal
+
+=head2 endpoints
+
+Returns the hashref of API endpoints, loading them on first call from the C<share/endpoints.json> file.
+
+=head2 endpoint
+
+Processes the given endpoint as a template, using the named parameters
+passed to the method.
+
+=head2 oauth_request
+
+=head2 token
+
+Our API token.
+
+=head2 http
+
+Returns the HTTP instance used for communicating with the API.
+
+Currently autocreates a L<Net::Async::HTTP> instance.
+
+=head2 http_get
+
+Issues an HTTP GET request.
+
+=head2 http_post
+
+Issues an HTTP POST request.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<https://metacpan.org/pod/AnyEvent::SlackRTM>
+
+=item * L<https://metacpan.org/pod/Mojo::SlackRTM>
+
+=item * L<https://metacpan.org/pod/Slack::RTM::Bot>
+
+=item * L<https://metacpan.org/pod/WebService::Slack::WebApi>
+
+=back
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2016-2017. Licensed under the same terms as Perl itself.
+

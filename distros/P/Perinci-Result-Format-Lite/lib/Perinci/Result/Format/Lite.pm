@@ -1,7 +1,7 @@
 package Perinci::Result::Format::Lite;
 
-our $DATE = '2017-05-24'; # DATE
-our $VERSION = '0.24'; # VERSION
+our $DATE = '2017-05-31'; # DATE
+our $VERSION = '0.25'; # VERSION
 
 use 5.010001;
 #IFUNBUILT
@@ -163,6 +163,8 @@ sub __gen_table {
             }
         }
 
+        my $nf;
+
         for my $i (0..$#{$data}) {
             next if $i==0 && $header_row;
             my $row = $data->[$i];
@@ -198,6 +200,17 @@ sub __gen_table {
                 } elsif ($fmt_name eq 'percent') {
                     my $fmt = $fmt_opts->{sprintf} // '%.2f%%';
                     $row->[$j] = sprintf($fmt, $row->[$j] * 100);
+                } elsif ($fmt_name eq 'number') {
+                    $nf //= do {
+                        require Number::Format;
+                        Number::Format->new(
+                            THOUSANDS_SEP => $fmt_opts->{thousands_sep} // ',',
+                            DECIMAL_POINT => $fmt_opts->{decimal_point} // '.',
+                            DECIMAL_FILL  => $fmt_opts->{decimal_fill} // 1,
+                        );
+                    };
+                    $row->[$j] = $nf->format_number(
+                        $row->[$j], $fmt_opts->{precision} // 0);
                 }
             }
         }
@@ -206,7 +219,10 @@ sub __gen_table {
     if ($format eq 'text-pretty') {
         # align columns
         {
-            no warnings 'uninitialized';
+            # XXX we just want to turn off 'uninitialized' and 'negative repeat
+            # count does nothing' from the operator x
+            no warnings;
+
             my $tfa = $resmeta->{'table.field_aligns'} or last;
             last unless @$data;
 
@@ -484,7 +500,7 @@ Perinci::Result::Format::Lite - Format enveloped result
 
 =head1 VERSION
 
-This document describes version 0.24 of Perinci::Result::Format::Lite (from Perl distribution Perinci-Result-Format-Lite), released on 2017-05-24.
+This document describes version 0.25 of Perinci::Result::Format::Lite (from Perl distribution Perinci-Result-Format-Lite), released on 2017-05-31.
 
 =head1 SYNOPSIS
 

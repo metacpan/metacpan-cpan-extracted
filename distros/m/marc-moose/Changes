@@ -1,5 +1,9 @@
 Revision history for Perl module MARC::Moose
 
+1.0.34 2017-05-24
+
+  - Fix bug in linting
+
 1.0.33 2016-09-13
 
   - Fix typo in UnimarcToMarc21, thks Julien Sicot

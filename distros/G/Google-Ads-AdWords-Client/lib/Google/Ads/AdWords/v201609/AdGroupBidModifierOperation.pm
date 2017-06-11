@@ -72,7 +72,7 @@ Google::Ads::AdWords::v201609::AdGroupBidModifierOperation
 Perl data type class for the XML Schema defined complexType
 AdGroupBidModifierOperation from the namespace https://adwords.google.com/api/adwords/cm/v201609.
 
-Operation used to create or mutate a AdGroupBidModifier. 
+Operation used to create or mutate a AdGroupBidModifier. <p>If you try to ADD a criterion that already exists, it will be treated as a SET operation on the existing criterion. 
 
 
 

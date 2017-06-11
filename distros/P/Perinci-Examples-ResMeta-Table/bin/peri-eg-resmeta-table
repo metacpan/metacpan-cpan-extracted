@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2017-05-24'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2017-05-31'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -51,7 +51,7 @@ peri-eg-resmeta-table - Render example in Perinci::Examples::ResMeta::Table usin
 
 =head1 VERSION
 
-This document describes version 0.001 of peri-eg-resmeta-table (from Perl distribution Perinci-Examples-ResMeta-Table), released on 2017-05-24.
+This document describes version 0.002 of peri-eg-resmeta-table (from Perl distribution Perinci-Examples-ResMeta-Table), released on 2017-05-31.
 
 =head1 SYNOPSIS
 

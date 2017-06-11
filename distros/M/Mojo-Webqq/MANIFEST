@@ -102,6 +102,7 @@ lib/Mojo/Webqq/Plugin/ProgramCode.pm
 lib/Mojo/Webqq/Plugin/Pu.pm
 lib/Mojo/Webqq/Plugin/Qiandao.pm
 lib/Mojo/Webqq/Plugin/Riddle.pm
+lib/Mojo/Webqq/Plugin/RikkaGCM.pm
 lib/Mojo/Webqq/Plugin/ShowMsg.pm
 lib/Mojo/Webqq/Plugin/ShowQRcode.pm
 lib/Mojo/Webqq/Plugin/SmartReply.pm

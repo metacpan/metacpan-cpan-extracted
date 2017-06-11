@@ -6,9 +6,9 @@ Date::Manip::TZ::afmonr00;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Wed Mar  1 10:08:16 EST 2017
-#    Data version: tzdata2017a
-#    Code version: tzcode2017a
+#    Generated on: Tue May 30 10:43:26 EDT 2017
+#    Data version: tzdata2017b
+#    Code version: tzcode2017b
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -25,7 +25,7 @@ END {
 }
 
 our ($VERSION);
-$VERSION='6.58';
+$VERSION='6.59';
 END { undef $VERSION; }
 
 %Dates         = (
@@ -44,14 +44,14 @@ END { undef $VERSION; }
    1919 =>
      [
         [ [1919,3,1,0,43,8],[1919,2,28,23,58,38],'-00:44:30',[0,-44,-30],
-          '-004430',0,[1972,5,1,0,44,29],[1972,4,30,23,59,59],
-          '1919030100:43:08','1919022823:58:38','1972050100:44:29','1972043023:59:59' ],
+          'MMT',0,[1972,1,7,0,44,29],[1972,1,6,23,59,59],
+          '1919030100:43:08','1919022823:58:38','1972010700:44:29','1972010623:59:59' ],
      ],
    1972 =>
      [
-        [ [1972,5,1,0,44,30],[1972,5,1,0,44,30],'+00:00:00',[0,0,0],
+        [ [1972,1,7,0,44,30],[1972,1,7,0,44,30],'+00:00:00',[0,0,0],
           'GMT',0,[9999,12,31,0,0,0],[9999,12,31,0,0,0],
-          '1972050100:44:30','1972050100:44:30','9999123100:00:00','9999123100:00:00' ],
+          '1972010700:44:30','1972010700:44:30','9999123100:00:00','9999123100:00:00' ],
      ],
 );
 

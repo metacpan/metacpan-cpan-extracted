@@ -1,3 +1,6 @@
+5.084 2016-06-27
+  - Make more FreeBSD-friendly.
+
 5.083 2016-06-24
   - Upgrade v2.01->v5.08.
   - Rename File->Storable.

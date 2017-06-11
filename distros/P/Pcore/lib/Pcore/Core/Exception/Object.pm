@@ -1,14 +1,14 @@
 package Pcore::Core::Exception::Object;
 
 use Pcore -class;
-use Devel::StackTrace qw[];
 use Pcore::Util::Scalar qw[blessed];
+use Time::HiRes qw[];
 
 use overload    #
   q[""] => sub {
 
     # string overloading can happens only from perl internals calls, such as eval in "use" or "require" (or other compilation errors), or not handled "die", so we don't need full trace here
-    return $_[0]->msg . $LF;
+    return $_[0]->{msg} . $LF;
   },
   q[0+] => sub {
     return $_[0]->exit_code;
@@ -19,17 +19,18 @@ use overload    #
   fallback => undef;
 
 has msg => ( is => 'ro', isa => Str, required => 1 );
-has exit_code => ( is => 'lazy', isa => Int );
 has level => ( is => 'ro', isa => Enum [qw[ERROR WARN]], required => 1 );
-has trace => ( is => 'ro', isa => Bool, default => 1 );
-has call_stack => ( is => 'ro', isa => Maybe [ArrayRef], required => 1 );
-has caller_frame => ( is => 'lazy', isa => InstanceOf ['Devel::StackTrace::Frame'], required => 1 );
+has call_stack => ( is => 'ro', isa => Maybe [ScalarRef], required => 1 );
+has timestamp => ( is => 'ro', isa => Num, required => 1 );
 
-has is_ae_cb_error => ( is => 'lazy', isa => Bool, init_arg => undef );
-has longmess       => ( is => 'lazy', isa => Str,  init_arg => undef );
-has to_string      => ( is => 'lazy', isa => Str,  init_arg => undef );
+has exit_code      => ( is => 'lazy', isa => Int );
+has with_trace     => ( is => 'ro',   isa => Bool, default => 1 );
+has is_ae_cb_error => ( is => 'ro',   isa => Bool, required => 1 );
 
-has logged => ( is => 'ro', isa => Bool, default => 0, init_arg => undef );
+has longmess  => ( is => 'lazy', isa => Str, init_arg => undef );
+has to_string => ( is => 'lazy', isa => Str, init_arg => undef );
+
+has is_logged => ( is => 'ro', isa => Bool, default => 0, init_arg => undef );
 
 around new => sub ( $orig, $self, $msg, %args ) {
     $args{skip_frames} //= 0;
@@ -61,43 +62,43 @@ around new => sub ( $orig, $self, $msg, %args ) {
         chomp $msg;
     };
 
-    # collect stack trace
-    $args{call_stack} = [
-        Devel::StackTrace->new(
-            unsafe_ref_capture => 0,
-            no_args            => 1,
-            max_arg_length     => 32,
-            indent             => 0,
-            skip_frames        => $args{skip_frames} + 3,    # skip frames: Devel::StackTrace::new, __ANON__ (around new), new
-        )->frames
-    ];
+    \my $is_ae_cb_error = \$args{is_ae_cb_error};
 
-    $args{caller_frame} = shift $args{call_stack}->@*;
+    my $x = $args{skip_frames} + 3;
+
+    my @frames;
+
+    while ( my @frame = caller $x++ ) {
+        push @frames, "$frame[3] at $frame[1] line $frame[2]";
+
+        # detect AnyEvent error in callback
+        if ( !defined $is_ae_cb_error ) {
+            if ( $frame[3] eq '(eval)' ) {
+                if ( $frame[0] eq 'AnyEvent::Impl::EV' ) {
+                    $is_ae_cb_error = 1;
+                }
+                else {
+                    $is_ae_cb_error = 0;
+                }
+            }
+        }
+    }
+
+    $args{call_stack} = \join $LF, @frames;
+
+    $args{timestamp} = Time::HiRes::time();
 
     # stringify $msg
-    return $self->$orig( { %args, msg => "$msg" } );         ## no critic qw[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
+    $args{msg} = "$msg";
+
+    # $args{msg} = "AE: error in callback: $args{msg}" if $is_ae_cb_error;
+
+    return bless \%args, $self;
 };
 
 # CLASS METHODS
 sub PROPAGATE ( $self, $file, $line ) {
     return $self;
-}
-
-sub _build_is_ae_cb_error ($self) {
-    for my $frame ( $self->{call_stack}->@* ) {
-        if ( $frame->{subroutine} eq '(eval)' ) {
-            if ( $frame->{package} eq 'AnyEvent::Impl::EV' ) {
-                $self->{msg} = 'AE: error in callback: ' . $self->{msg};
-
-                return 1;
-            }
-            else {
-                return 0;
-            }
-        }
-    }
-
-    return 0;
 }
 
 sub _build_exit_code ($self) {
@@ -108,36 +109,26 @@ sub _build_exit_code ($self) {
 }
 
 sub _build_longmess ($self) {
-    if ( $self->call_stack->@* ) {
-        return $self->msg . $LF . join $LF, map { q[ ] x 4 . $_->as_string } $self->call_stack->@*;
+    if ( $self->{call_stack}->@* ) {
+        return $self->{msg} . $LF . $self->{call_stack}->$*;
     }
     else {
-        return $self->msg;
+        return $self->{msg};
     }
 }
 
 sub _build_to_string ($self) {
-    return $self->trace ? $self->longmess : $self->msg;
+    return $self->{with_trace} ? $self->longmess : $self->{msg};
 }
 
-sub sendlog ( $self, @ ) {
-    my %args = (
-        force      => 0,                                 # force logging if already logged
-        channel    => $self->level,
-        package    => $self->caller_frame->package,
-        filename   => $self->caller_frame->filename,
-        line       => $self->caller_frame->line,
-        subroutine => $self->caller_frame->subroutine,
-        splice @_, 1,
-    );
+sub sendlog ( $self, $level = undef ) {
+    return if $self->{is_logged};    # prevent logging the same exception twice
 
-    return 0 if $self->{logged} && !delete $args{force};    # prevent logging same exception twice
+    $level //= $self->{level};
 
-    $self->{logged} = 1;
+    $self->{is_logged} = 1;
 
-    my $channel = lc delete $args{channel};
-
-    P->log->sendlog( $channel, $self->to_string, %args );
+    P->sendlog( "EXCEPTION.$level", $self->{msg}, $self->{with_trace} ? $self->{call_stack}->$* : undef );
 
     return;
 }

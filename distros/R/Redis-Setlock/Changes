@@ -1,5 +1,8 @@
 Revision history for Perl extension Redis-Setlock
 
+0.08 2017-05-31T01:36:25Z
+    - fix tests (#2)
+
 0.07 2014-06-09T04:07:44Z
 
     - fix shebang

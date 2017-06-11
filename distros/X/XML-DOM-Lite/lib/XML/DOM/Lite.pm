@@ -1,6 +1,6 @@
 package XML::DOM::Lite;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 use warnings;
 use strict;
 

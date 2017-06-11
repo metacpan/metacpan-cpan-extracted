@@ -2,7 +2,7 @@
 use strict;
 $|++;
 
-my $VERSION = '3.53';
+my $VERSION = '3.59';
 
 #----------------------------------------------------------------------------
 
@@ -134,7 +134,7 @@ use Template;
 # -------------------------------------
 # Variables
 
-my $DEBUG = 0;
+my $DEBUG = $ENV{DEBUG} || 0;
 my $LONG_ALLOWED = 0;
 
 my $VHOST = '/var/www/reports/';
@@ -164,6 +164,11 @@ init_options();
 process_dist()      if($cgiparams{dist});
 process_author()    if($cgiparams{author});
 writer();
+
+local $SIG{__DIE__} = sub {
+    audit( "Dying: $_[0]" );
+    die @_;
+};
 
 # -------------------------------------
 # Subroutines
@@ -195,7 +200,8 @@ sub init_options {
 
     # configure upload DB
     for my $db (qw(CPANSTATS)) {
-        my %opts = map {$_ => $cfg->val($db,lc $db . '_' . $_);} qw(driver database dbfile dbhost dbport dbuser dbpass);
+        my %opts = map {$_ => scalar $cfg->val($db,lc $db . '_' . $_);} qw(driver database dbfile dbhost dbport dbuser dbpass);
+        $opts{ errsub } = sub { audit( "DB ERROR: " . Dumper( \@_ ) ) };
         $options{$db} = CPAN::Testers::Common::DBUtils->new(%opts);
         error("Cannot configure '$options{database}' database\n")   unless($options{$db});
     }
@@ -206,14 +212,14 @@ sub init_options {
     $options{format} = 'html' unless($options{format} =~ /html|txt|xml|csv|json/);
     $options{format} = 'csv'  if($options{format} =~ /txt/);
 
-    #audit("DEBUG: configuration done");
+    audit("DEBUG: configuration done");
 
     for my $key (keys %rules) {
         my $val = $options{$key} || $cgi->param("${key}_pref") || $cgi->param($key);
         $cgiparams{$key} = $1   if($val =~ $rules{$key});
     }
 
-    #audit('DEBUG: cgiparams=',Dumper(\%cgiparams));
+    audit('DEBUG: cgiparams=',Dumper(\%cgiparams));
 
     # set up API to Template Toolkit
     $tt = Template->new(
@@ -263,7 +269,7 @@ sub process_dist {
 }
 
 sub process_dist_short {
-    #audit("DEBUG: start process dist (short): $cgiparams{dist}");
+    audit("DEBUG: start process dist (short): $cgiparams{dist}");
 
     %output = (
         template  => 'dist_summary',
@@ -282,9 +288,13 @@ sub process_dist_short {
     my $sql = "SELECT version,sum(pass) as pass, sum(fail) as fail, sum(na) as na, sum(unknown) as unknown FROM release_summary" .
     	" WHERE dist IN ($dist) $where GROUP BY version ORDER BY version";
 
-    #audit("DEBUG: sql=$sql");
+    audit("DEBUG: sql=$sql");
 
-    my $next = $options{CPANSTATS}->iterator('hash', $sql );
+    my $next;
+    eval { $next = $options{CPANSTATS}->iterator('hash', $sql ) };
+    if ( $@ ) { audit( "SQL failed: $@" ); return; }
+
+    audit( "DEBUG: SQL ran successfully" );
 
     my ( $summary );
     while ( my $row = $next->() ) {
@@ -297,9 +307,12 @@ sub process_dist_short {
         $summary->{ $row->{version} }->{ ALL }     = $row->{pass} + $row->{fail} + $row->{na} + $row->{unknown};
     }
 
-    return  unless(keys %$summary);
+    if (!keys %$summary) {
+	audit( "DEBUG: nothing to process for dist $dist" );
+	return;
+    }
 
-    #audit("DEBUG: summary=".Dumper($summary));
+    audit("DEBUG: summary=".Dumper($summary));
 
     my $oncpan = q!'cpan','upload','backpan'!;
     $oncpan = q!'cpan','upload'!    if($cgiparams{oncpan} && $cgiparams{oncpan} == 1);
@@ -322,7 +335,7 @@ sub process_dist_short {
 
     my %versions = map {my $v = $_; $v =~ s/[^\w\.\-]/X/g; $_ => $v} @versions;
 
-    #audit("DEBUG: versions=".Dumper(\%versions));
+    audit("DEBUG: versions=".Dumper(\%versions));
 
     %output = (
         template  => 'dist_summary',
@@ -336,7 +349,7 @@ sub process_dist_short {
 }
 
 sub process_dist_long {
-    #audit("DEBUG: start process dist (long): $cgiparams{dist}");
+    audit("DEBUG: start process dist (long): $cgiparams{dist}");
 
     %output = (
         template  => 'dist_summary',
@@ -354,7 +367,7 @@ sub process_dist_long {
     $dist = "'" . join("','",@{$MERGED{$cgiparams{dist}}}) . "'"    if(defined $MERGED{$cgiparams{dist}});
     my $sql = "SELECT id, state, version, perl, osname, FROM cpanstats WHERE dist IN ($dist) AND state != 'cpan' $where ORDER BY version, id";
 
-    #audit("DEBUG: sql=$sql");
+    audit("DEBUG: sql=$sql");
 
     my $next = $options{CPANSTATS}->iterator('hash', $sql );
 
@@ -377,7 +390,7 @@ sub process_dist_long {
 
     return  unless(keys %$summary);
 
-    #audit("DEBUG: summary=".Dumper($summary));
+    audit("DEBUG: summary=".Dumper($summary));
 
     my $oncpan = q!'cpan','upload','backpan'!;
     $oncpan = q!'cpan','upload'!    if($cgiparams{oncpan} && $cgiparams{oncpan} == 1);
@@ -395,7 +408,7 @@ sub process_dist_long {
     }
     my %versions = map {my $v = $_; $v =~ s/[^\w\.\-]/X/g; $_ => $v} @versions;
 
-    #audit("DEBUG: versions=".Dumper(\%versions));
+    audit("DEBUG: versions=".Dumper(\%versions));
 
     %output = (
         template  => 'dist_summary',
@@ -419,7 +432,7 @@ sub process_author {
 }
 
 sub process_author_short {
-    #audit("DEBUG: start process author (short): $cgiparams{author}");
+    audit("DEBUG: start process author (short): $cgiparams{author}");
     my (@dists,%summary);
 
     %output = (
@@ -452,15 +465,15 @@ sub process_author_short {
             "WHERE x.author=? AND s.version IS NOT NULL AND s.version!='' $where " .
             'GROUP BY x.dist';
 
-    #audit("DEBUG: sql=$sql");
+    audit("DEBUG: sql=$sql");
 
     #my $next = $options{CPANSTATS}->iterator('hash', $sql, $cgiparams{author} );
     my @rows = $options{CPANSTATS}->get_query('hash', $sql, $cgiparams{author} );
-    #audit("DEBUG: rows=".(scalar(@rows)));
+    audit("DEBUG: rows=".(scalar(@rows)));
 
     #while ( my $row = $next->() ) {
     for my $row (@rows) {
-        #audit("DEBUG: processing $inx/$max: $row->{dist} [$row->{type}]");
+        audit("DEBUG: processing: $row->{dist} [$row->{type}]");
 
         next    unless($row->{dist} =~ /^[A-Za-z0-9][A-Za-z0-9\-_]*$/
                     || $row->{dist} =~ /$EXCEPTIONS/);
@@ -480,8 +493,8 @@ sub process_author_short {
             }
         } sort keys %summary;
 
-    #audit("DEBUG: summary data retrieved");
-    #audit("DEBUG: dists=".Dumper(\@dists));
+    audit("DEBUG: summary data retrieved");
+    audit("DEBUG: dists=".Dumper(\@dists));
 
     %output = (
         template  => 'author_summary',
@@ -492,7 +505,7 @@ sub process_author_short {
 }
 
 sub process_author_long {
-    #audit("DEBUG: start process author: $cgiparams{author}");
+    audit("DEBUG: start process author: $cgiparams{author}");
     my (@dists,%summary);
 
     %output = (
@@ -513,11 +526,11 @@ sub process_author_long {
                 'INNER JOIN uploads AS u ON u.dist=x.dist AND u.version=x.version ' .
                 "WHERE x.author=? $where ORDER BY id";
 
-    #audit("DEBUG: sql=$sql");
+    audit("DEBUG: sql=$sql");
 
     #my $next = $options{CPANSTATS}->iterator('hash', $sql, $cgiparams{author} );
     my @rows = $options{CPANSTATS}->get_query('hash', $sql, $cgiparams{author} );
-    #audit("DEBUG: rows=".(scalar(@rows)));
+    audit("DEBUG: rows=".(scalar(@rows)));
 
     return  unless(@rows);
 
@@ -526,7 +539,7 @@ sub process_author_long {
     #while ( my $row = $next->() ) {
     for my $row (@rows) {
         $inx++;
-        #audit("DEBUG: processing $inx/$max: $row->{dist} [$row->{type}]");
+        audit("DEBUG: processing $inx/$max: $row->{dist} [$row->{type}]");
 
         next    unless($row->{dist} =~ /^[A-Za-z0-9][A-Za-z0-9\-_]*$/
                     || $row->{dist} =~ /$EXCEPTIONS/);
@@ -549,8 +562,8 @@ sub process_author_long {
             }
         } sort keys %summary;
 
-    #audit("DEBUG: summary data retrieved");
-    #audit("DEBUG: dists=".Dumper(\@dists));
+    audit("DEBUG: summary data retrieved");
+    audit("DEBUG: dists=".Dumper(\@dists));
 
     %output = (
         template  => 'author_summary',
@@ -563,7 +576,8 @@ sub process_author_long {
 sub writer {
     my $result;
 
-    #audit("DEBUG: output=" . Dumper(\%output));
+    audit("DEBUG: output=" . Dumper(\%output));
+    audit("DEBUG: options=" . Dumper(\%options));
 
     my $template = $output{template} . '.' . $options{format};
     unless(-f "templates/$template") {
@@ -577,7 +591,7 @@ sub writer {
 
     $result =~ s/\s{2,}/ /g;
 
-    #audit("DEBUG: result=$result");
+    audit("DEBUG: result=$result");
 
     if($options{format} eq 'xml') {
         print $cgi->header('text/xml') . $result . "\n";
@@ -592,7 +606,7 @@ sub writer {
         $html->{'reportsummary'} = $result;
         $OT->param( $html );
 
-        #audit("DEBUG: response=" . $OT->response());
+        audit("DEBUG: response=" . $OT->response());
 
         print $cgi->header;
         print $OT->response();
@@ -650,7 +664,7 @@ F<http://blog.cpantesters.org/>
 
 =head1 COPYRIGHT AND LICENSE
 
-  Copyright (C) 2008-2014 Barbie <barbie@cpan.org>
+  Copyright (C) 2008-2017 Barbie <barbie@cpan.org>
 
   This module is free software; you can redistribute it and/or
   modify it under the Artistic License 2.0.

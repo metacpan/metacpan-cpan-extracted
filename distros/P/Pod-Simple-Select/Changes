@@ -2,5 +2,9 @@ Revision history for Perl module Pod::Simple::Select
 
 0.001 Wed Apr 12 14:03:14 2017
     - original version; created by ExtUtils::ModuleMaker 0.56
+0.002 28.4.2017 
+    Updated pod
+    Log::Any instead of Log::Log4perl
+    Corrected t/001_load.t
 
 

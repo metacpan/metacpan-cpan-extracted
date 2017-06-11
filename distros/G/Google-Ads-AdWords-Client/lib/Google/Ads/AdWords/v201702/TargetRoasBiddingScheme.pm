@@ -77,7 +77,7 @@ Google::Ads::AdWords::v201702::TargetRoasBiddingScheme
 Perl data type class for the XML Schema defined complexType
 TargetRoasBiddingScheme from the namespace https://adwords.google.com/api/adwords/cm/v201702.
 
-Target Roas bidding strategy helps you maximize revenue while averaging a specific target Return On Average Spend (ROAS). <p>For example: If TargetRoas is 1.5, the strategy will create as much revenue as possible while ensuring that every $1.00 of clicks provides $1.50 in conversion value. <p>Note that campaigns must meet <a href="//support.google.com/adwords/answer/6268637">specific eligibility requirements</a> before they can use the <code>TargetRoasBiddingScheme</code> bidding strategy. <span class="constraint AdxEnabled">This is disabled for AdX.</span> 
+Target Roas bidding strategy helps you maximize revenue while averaging a specific target return on average spend (ROAS). <p>For example: If TargetRoas is 1.5, the strategy will create as much revenue as possible while ensuring that every $1.00 of clicks provides $1.50 in conversion value. <p>Note that campaigns must meet <a href="//support.google.com/adwords/answer/6268637">specific eligibility requirements</a> before they can use the <code>TargetRoasBiddingScheme</code> bidding strategy. <span class="constraint AdxEnabled">This is disabled for AdX.</span> 
 
 
 

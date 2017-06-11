@@ -2,7 +2,7 @@
 use strict;
 $|++;
 
-my $VERSION = '3.53';
+my $VERSION = '3.59';
 
 #----------------------------------------------------------------------------
 
@@ -99,7 +99,7 @@ sub init_options {
 
     # configure upload DB
     for my $db (qw(CPANSTATS)) {
-        my %opts = map {$_ => $cfg->val($db,lc $db . '_' . $_);} qw(driver database dbfile dbhost dbport dbuser dbpass);
+        my %opts = map {$_ => scalar $cfg->val($db,lc $db . '_' . $_);} qw(driver database dbfile dbhost dbport dbuser dbpass);
         $options{$db} = CPAN::Testers::Common::DBUtils->new(%opts);
         error("Cannot configure '$options{database}' database\n")   unless($options{$db});
     }
@@ -240,7 +240,7 @@ F<http://blog.cpantesters.org/>
 
 =head1 COPYRIGHT AND LICENSE
 
-  Copyright (C) 2012-2014 Barbie <barbie@cpan.org>
+  Copyright (C) 2012-2017 Barbie <barbie@cpan.org>
 
   This module is free software; you can redistribute it and/or
   modify it under the Artistic License 2.0.

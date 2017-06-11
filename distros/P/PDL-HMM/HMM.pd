@@ -4,7 +4,7 @@
 ## Header Administrivia
 ##======================================================================
 
-our $VERSION = '0.06004';
+our $VERSION = '0.06005';
 pp_setversion($VERSION);
 
 ##-- accomodate typo-fix in PDL-2.008 API

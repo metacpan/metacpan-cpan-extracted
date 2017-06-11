@@ -12,12 +12,8 @@ use Perl::Critic::TestUtils;
 
 use Test::More tests => 24;
 
-#-----------------------------------------------------------------------------
-
-our $VERSION = '1.126';
-
-#-----------------------------------------------------------------------------
-
+our $VERSION = '1.128';
+Perl::Critic::TestUtils::assert_version( $VERSION );
 Perl::Critic::TestUtils::block_perlcriticrc();
 
 #-----------------------------------------------------------------------------
@@ -88,12 +84,6 @@ isa_ok($stats, $package);
 while ( my($method, $expected) = each %expected_stats) {
     is( $stats->$method, $expected, "Statistics: $method");
 }
-
-#-----------------------------------------------------------------------------
-
-# ensure we return true if this test is loaded by
-# t/15_statistics.t_without_optional_dependencies.t
-1;
 
 ###############################################################################
 # Local Variables:

@@ -14,11 +14,11 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 d75c9e2492e8c1f72f11a9b2d5f3714c84dc73e6 ChangeLog
+SHA1 779f6457cd3435582d1ee884832b5505275b3047 ChangeLog
 SHA1 62647027745e394450492878f8d8730548d83fa2 LICENSE
-SHA1 53906d20be482b148d30570d171ef001c2ff62fd MANIFEST
-SHA1 e12547b5dcce19228ce82903a81c256f9642039b META.yml
-SHA1 65e7802d70a4005bac80f4e5b01fe8ace310fdf1 Makefile.PL
+SHA1 25c0dbc4074e3cc984a1da71a7b663315561f98d MANIFEST
+SHA1 fff079e3fc2ccc46c1ed91fd319abf550f0cd076 META.yml
+SHA1 f4a70a849242037e62e48a39350a21453ecb8cc0 Makefile.PL
 SHA1 d78ed6f21f203e2054419369d111efa325a97d1b README
 SHA1 ecb089134bba590f02aa974be5a6e86d72cdb0dc UNINSTALL_CYGWIN
 SHA1 0da04817f80ed6c542780dffe674926c1bf7b3de api/Docker_is.py
@@ -103,7 +103,7 @@ SHA1 acb1a0daeae8b6c0cfd3ce4ee899204052d40855 installer/runputty.ahk
 SHA1 2887d192d7c656080bab522cf64354975b77a915 installer/runputty.exe
 SHA1 784955e0e44b132341668db4efa407569dd71189 installer/standup.gif
 SHA1 6c3adc63eb0e790491af15178fabb88f9508bf50 lbbroker_zmqv4.pl
-SHA1 965618ff5a1bd51994b0a1afaa9d496c40af6c9a lib/Net/FullAuto.pm
+SHA1 5e9321ad0df72656ffe982cbfd9d794289a1f6a9 lib/Net/FullAuto.pm
 SHA1 a73fa03896208dc550b292954f51722d7b139c24 lib/Net/FullAuto/Cloud/fa_amazon.pm
 SHA1 71928e8ed46e6c63d2effda32c2ceba413ab3976 lib/Net/FullAuto/Cloud/fa_azure.pm
 SHA1 2d1d4af82b485a801bd146f5c079418f4bd56dd2 lib/Net/FullAuto/Cloud/fa_google.pm
@@ -117,13 +117,14 @@ SHA1 5c037b9dab607eda4180c9a0a4fb45b5d8623a6e lib/Net/FullAuto/Distro/fa_host.pm
 SHA1 6202a9521a72073183056b8624f4c45f29760b37 lib/Net/FullAuto/Distro/fa_menu.pm
 SHA1 4aec48b3910d5e0ea241342b1e081ffbde8ba689 lib/Net/FullAuto/Distro/fa_menu_demo.pm
 SHA1 c61c03f9beda14559fdf07e569e813a2bd553a53 lib/Net/FullAuto/Distro/fullautologo.jpg
-SHA1 27d080ace52809aac2744c7634a0ff110bd21e9d lib/Net/FullAuto/FA_Core.pm
+SHA1 ec40397c798ce1b3adc65c0c588f2f3f3adae216 lib/Net/FullAuto/FA_Core.pm
 SHA1 64b95f216f3697cdbbcc99e2743fdf8259111268 lib/Net/FullAuto/ISets/Amazon/Catalyst_is.pm
 SHA1 03fcc64c771c95461171243b1c0aa71bed35b95b lib/Net/FullAuto/ISets/Amazon/Chaining_is.pm
 SHA1 18418dea6918c8ef2b951b624652b166705d6607 lib/Net/FullAuto/ISets/Amazon/Chef_is.pm
-SHA1 203d593521ca10cca5c91afdaed2c26ce0ba4988 lib/Net/FullAuto/ISets/Amazon/ClipBucket_is.pm
+SHA1 fa9c0eefea1608ce76804a4a4b358264ccea36c5 lib/Net/FullAuto/ISets/Amazon/ClipBucket_is.pm
 SHA1 ae5b0b2e9009e22a4be0782f69258cfe76af8bba lib/Net/FullAuto/ISets/Amazon/GNUSocial_is.pm
-SHA1 2bd12d254d582ee0e918d31298940e65ef6b209b lib/Net/FullAuto/ISets/Amazon/Hadoop_is.pm
+SHA1 c69508088f6b3d2c3e41d754b56cb24654ba963b lib/Net/FullAuto/ISets/Amazon/Hadoop_is.pm
+SHA1 9f318c186318ac77e0bd8c33f7d1f3ec5c85b728 lib/Net/FullAuto/ISets/Amazon/Jenkins_is.pm
 SHA1 a4d5e6f009042ecde8701230f3b31d1a66236279 lib/Net/FullAuto/ISets/Amazon/KaliLinux_is.pm
 SHA1 ddb48cea930f376830b4b3c5a80f29826e231bad lib/Net/FullAuto/ISets/Amazon/Liferay_is.pm
 SHA1 4708044b661f8aa812d1d9dc2d61496509ba72d8 lib/Net/FullAuto/ISets/Amazon/OpenLDAP_is.pm
@@ -132,11 +133,11 @@ SHA1 7f2e13f5f6a798d52ea897d24d07b49af4039341 t/0-signature.t
 SHA1 6fac6b17647d05b71441ac3783ceec38b9b71fa6 t/test.t
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJY/ibwAAoJEBa/9Pad787EDrUH/1CUk6cWUtmJ8LyDtwejI/nB
-NmxTa8I6JTZjMrqmWvk/AsGDQWHUJXlX7bfcPRcT2ZoY9eEuGAVfhbZdLewo4gzR
-e7h9AqQckpNpUCzmCGVUxQjfEYqng+d4+JRRXpY8+9EsmolfF62uU6Dn/Y2CUvkZ
-sQ8FO1lRvB/XK8Q0Junz9eOTznImA5d+FaptOI/jGk/EZ+l6RxpliDNvw8+fxOiM
-d76gG3V++1SNJfa6Xm6GLU85I3RXxPTOqDDGOJYSZCPFNF/DlBdzLBjyKDAodYWf
-KIfcevpCVxflyDyaU5I0eWsDJK1pEubQt5MYbGOs7HhX3NFbDxZtelbwUjcDNgE=
-=HIjd
+iQEcBAEBAgAGBQJZPKc3AAoJEBa/9Pad787EK8MIAIY+URbkBqVpd23ed4UUEO1Y
+HwvqvJQMQzefeaXzCxfnZWHEvTe2gKcnbPlpUGelXVjS0pp57woe/GayTcVU1oG/
+E/4nTFTW7zQRkLtzZCV0Sf4zfnLuV3R3WoVMTYLJpAnrSFXA+Qv0N8ym//PJcI+Q
+aWALUy2yC0mqnEbp6ljUHXNzRKAa8i1/yD5Up5dRIkFLXgvsfFVnNJTMhMAT7vdp
+KKJxmRxpNAkFWOKYz+MCfw+iZceJMkxgqu2BsEe8vbYwBsxcUK2bD2LGCigWiJC0
+XY7oE3jwlChKA/prLKY4ffcbqdFwv7ST4fhfShddSEEl/OTGZ+Q2A7jpVOSjuyE=
+=Tph4
 -----END PGP SIGNATURE-----

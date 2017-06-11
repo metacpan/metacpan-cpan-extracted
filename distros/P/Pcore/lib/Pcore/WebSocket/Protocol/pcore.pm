@@ -11,8 +11,8 @@ use Pcore::Util::Scalar qw[blessed weaken];
 has protocol => ( is => 'ro', isa => Str, default => 'pcore', init_arg => undef );
 
 has on_rpc          => ( is => 'ro', isa => Maybe [CodeRef] );    # ($ws, $req, $tx)
-has on_listen_event => ( is => 'ro', isa => Maybe [CodeRef] );    # ($ws, $ev), should return true if operation is allowed
-has on_fire_event   => ( is => 'ro', isa => Maybe [CodeRef] );    # ($ws, $ev), should return true if operation is allowed
+has on_listen_event => ( is => 'ro', isa => Maybe [CodeRef] );    # ($ws, $mask), should return true if operation is allowed
+has on_fire_event   => ( is => 'ro', isa => Maybe [CodeRef] );    # ($ws, $key), should return true if operation is allowed
 
 has _listeners => ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg => undef );
 has _callbacks => ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg => undef );
@@ -99,16 +99,16 @@ sub rpc_call ( $self, $method, @ ) {
     return;
 }
 
-sub forward_events ( $self, $events ) {
-    $self->_set_listeners($events);
+sub forward_events ( $self, $masks ) {
+    $self->_set_listeners($masks);
 
     return;
 }
 
-sub listen_events ( $self, $events ) {
+sub listen_events ( $self, $masks ) {
     my $msg = {
-        type   => $TX_TYPE_LISTEN,
-        events => $events,
+        type  => $TX_TYPE_LISTEN,
+        masks => $masks,
     };
 
     $self->send_binary( \$CBOR->encode($msg) );
@@ -116,11 +116,25 @@ sub listen_events ( $self, $events ) {
     return;
 }
 
-sub fire_remote_event ( $self, $event, $data = undef ) {
+sub fire_remote_event ( $self, $key, $data = undef ) {
     my $msg = {
-        type  => $TX_TYPE_EVENT,
-        event => $event,
-        data  => $data,
+        type => $TX_TYPE_EVENT,
+        ev   => {                 #
+            key => $key,
+        },
+    };
+
+    \$msg->{ev}->{data} = \$data;
+
+    $self->send_binary( \$CBOR->encode($msg) );
+
+    return;
+}
+
+sub forward_remote_event ( $self, $ev ) {
+    my $msg = {
+        type => $TX_TYPE_EVENT,
+        ev   => $ev,
     };
 
     $self->send_binary( \$CBOR->encode($msg) );
@@ -130,9 +144,9 @@ sub fire_remote_event ( $self, $event, $data = undef ) {
 
 sub before_connect_server ( $self, $env, $args ) {
     if ( $env->{HTTP_PCORE_LISTEN_EVENTS} ) {
-        my $events = [ map { trim $_} split /,/sm, $env->{HTTP_PCORE_LISTEN_EVENTS} ];
+        my $masks = [ map { trim $_} split /,/sm, $env->{HTTP_PCORE_LISTEN_EVENTS} ];
 
-        $self->_set_listeners($events) if $events->@*;
+        $self->_set_listeners($masks) if $masks->@*;
     }
 
     if ( $args->{forward_events} ) {
@@ -146,9 +160,9 @@ sub before_connect_server ( $self, $env, $args ) {
     }
 
     if ( $args->{listen_events} ) {
-        my $events = ref $args->{listen_events} eq 'ARRAY' ? $args->{listen_events} : [ $args->{listen_events} ];
+        my $masks = ref $args->{listen_events} eq 'ARRAY' ? $args->{listen_events} : [ $args->{listen_events} ];
 
-        push $headers->@*, 'Pcore-Listen-Events', join ',', $events->@*;
+        push $headers->@*, 'Pcore-Listen-Events', join ',', $masks->@*;
     }
 
     return $headers;
@@ -166,9 +180,9 @@ sub before_connect_client ( $self, $args ) {
     }
 
     if ( $args->{listen_events} ) {
-        my $events = ref $args->{listen_events} eq 'ARRAY' ? $args->{listen_events} : [ $args->{listen_events} ];
+        my $masks = ref $args->{listen_events} eq 'ARRAY' ? $args->{listen_events} : [ $args->{listen_events} ];
 
-        push $headers->@*, 'Pcore-Listen-Events:' . join ',', $events->@*;
+        push $headers->@*, 'Pcore-Listen-Events:' . join ',', $masks->@*;
     }
 
     if ( $args->{token} ) {
@@ -184,9 +198,9 @@ sub on_connect_server ( $self ) {
 
 sub on_connect_client ( $self, $headers ) {
     if ( $headers->{PCORE_LISTEN_EVENTS} ) {
-        my $events = [ map { trim $_} split /,/sm, $headers->{PCORE_LISTEN_EVENTS} ];
+        my $masks = [ map { trim $_} split /,/sm, $headers->{PCORE_LISTEN_EVENTS} ];
 
-        $self->_set_listeners($events) if $events->@*;
+        $self->_set_listeners($masks) if $masks->@*;
     }
 
     return;
@@ -231,21 +245,21 @@ sub on_binary ( $self, $data_ref ) {
     return;
 }
 
-sub _set_listeners ( $self, $events ) {
-    $events = [$events] if ref $events ne 'ARRAY';
+sub _set_listeners ( $self, $masks ) {
+    $masks = [$masks] if ref $masks ne 'ARRAY';
 
     weaken $self;
 
-    for my $event ( $events->@* ) {
-        next if exists $self->{_listeners}->{$event};
+    for my $mask ( $masks->@* ) {
+        next if exists $self->{_listeners}->{$mask};
 
         # do not set event listener, if not authorized
-        next if $self->{on_listen_event} && !$self->{on_listen_event}->( $self, $event );
+        next if $self->{on_listen_event} && !$self->{on_listen_event}->( $self, $mask );
 
-        $self->{_listeners}->{$event} = P->listen_events(
-            $event,
-            sub ( $event, $data ) {
-                $self->fire_remote_event( $event, $data ) if $self;
+        $self->{_listeners}->{$mask} = P->listen_events(
+            $mask,
+            sub ( $ev ) {
+                $self->forward_remote_event($ev) if $self;
 
                 return;
             }
@@ -263,7 +277,7 @@ sub _on_message ( $self, $msg, $is_json ) {
 
         # forward local events to remote peer
         if ( $tx->{type} eq $TX_TYPE_LISTEN ) {
-            $self->_set_listeners( $tx->{events} );
+            $self->_set_listeners( $tx->{masks} );
 
             next;
         }
@@ -272,9 +286,9 @@ sub _on_message ( $self, $msg, $is_json ) {
         if ( $tx->{type} eq $TX_TYPE_EVENT ) {
 
             # ignore event, if not authorized
-            next if $self->{on_fire_event} && !$self->{on_fire_event}->( $self, $tx->{event} );
+            next if $self->{on_fire_event} && !$self->{on_fire_event}->( $self, $tx->{ev}->{key} );
 
-            P->fire_event( $tx->{event}, $tx->{data} );
+            P->forward_event( $tx->{ev} );
 
             next;
         }
@@ -383,9 +397,9 @@ sub _on_message ( $self, $msg, $is_json ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 258                  | Subroutines::ProhibitExcessComplexity - Subroutine "_on_message" with high complexity score (27)               |
+## |    3 | 272                  | Subroutines::ProhibitExcessComplexity - Subroutine "_on_message" with high complexity score (27)               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 308, 330, 345        | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 322, 344, 359        | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

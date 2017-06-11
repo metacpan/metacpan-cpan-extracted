@@ -1,9 +1,10 @@
 package CracTools::Utils;
+
 {
   $CracTools::Utils::DIST = 'CracTools';
 }
 # ABSTRACT: A set of useful functions
-$CracTools::Utils::VERSION = '1.25';
+$CracTools::Utils::VERSION = '1.251';
 use strict;
 use warnings;
 
@@ -343,7 +344,7 @@ sub parseGFFLine {
   if($type =~ /gff3/i) {
     $attribute_split = sub {my $attr = shift; return $attr =~ /(\S+)=(.*)/;};
   } elsif ($type eq 'gtf' || $type eq 'gff2') {
-    $attribute_split = sub {my $attr = shift; return $attr  =~ /(\S+)\s+"(.*)"/;};
+    $attribute_split = sub {my $attr = shift; return $attr  =~ /(\S+)\s+"?(.*)"?/;};
   } else {
     croak "Undefined GFF format (must be either gff3,gtf, or gff2)";
   }
@@ -352,7 +353,9 @@ sub parseGFFLine {
   my %attributes_hash;
   foreach my $attr (@attributes_tab) {
     my ($k,$v) = $attribute_split->($attr);
-    $attributes_hash{$k} = $v;
+    if(defined $k and defined $v) {
+      $attributes_hash{$k} = $v;
+    }
   }
   return { chr        => $chr,
     source     => $source,
@@ -585,7 +588,7 @@ CracTools::Utils - A set of useful functions
 
 =head1 VERSION
 
-version 1.25
+version 1.251
 
 =head1 SYNOPSIS
 

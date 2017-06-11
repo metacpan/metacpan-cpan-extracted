@@ -1,6 +1,6 @@
 package Resque;
 # ABSTRACT: Redis-backed library for creating background jobs, placing them on multiple queues, and processing them later.
-$Resque::VERSION = '0.31';
+$Resque::VERSION = '0.34';
 use Moose;
 use Scalar::Util 'blessed';
 use Moose::Util::TypeConstraints;
@@ -181,7 +181,7 @@ Resque - Redis-backed library for creating background jobs, placing them on mult
 
 =head1 VERSION
 
-version 0.31
+version 0.34
 
 =head1 SYNOPSIS
 
@@ -384,9 +384,9 @@ to build a redis key name for this resque instance.
 
 =head2 keys
 
-Returns an array of all known Resque keys in Redis, or an arrayref in scalar context. 
-Redis' KEYS operation is O(N) for the keyspace, so be careful - 
-this can be slow for big databases.
+Returns an array of all known Resque keys in Redis, or an arrayref in scalar context.
+Redis' KEYS operation is O(N) for the keyspace, so be careful this can be slow for
+big databases.
 
 =head2 flush_namespace
 
@@ -421,15 +421,7 @@ what you've fixed.
 
 =item *
 
-Improve docs for plugin authors
-
-=item *
-
-A generic runner for attaching workers to queues.
-
-=item *
-
-Test worker fork and signal handling.
+More tests on worker fork and signal handling.
 
 =back
 

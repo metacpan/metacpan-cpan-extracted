@@ -1,6 +1,6 @@
 package WWW::Google::UserAgent;
 
-$WWW::Google::UserAgent::VERSION   = '0.20';
+$WWW::Google::UserAgent::VERSION   = '0.21';
 $WWW::Google::UserAgent::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WWW::Google::UserAgent - Low-level HTTP request handler for Google API.
 
 =head1 VERSION
 
-Version 0.20
+Version 0.21
 
 =cut
 
@@ -92,7 +92,7 @@ Mohammad S Anwar, C<< <mohammad.anwar at yahoo.com> >>
 
 =head1 REPOSITORY
 
-L<https://github.com/Manwar/WWW-Google-UserAgent>
+L<https://github.com/manwar/WWW-Google-UserAgent>
 
 =head1 SEE ALSO
 

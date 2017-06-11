@@ -50,6 +50,7 @@
       },
       "test" : {
          "requires" : {
+            "Test::Fatal" : "0",
             "Test::MonkeyMock" : "0",
             "Test::More" : "0.98",
             "Test::TempDir::Tiny" : "0"
@@ -59,7 +60,7 @@
    "provides" : {
       "App::Kritika" : {
          "file" : "lib/App/Kritika.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "App::Kritika::Settings" : {
          "file" : "lib/App/Kritika/Settings.pm"
@@ -76,7 +77,7 @@
          "web" : "https://github.com/kritikaio/app-kritika"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_authority" : "cpan:VTI",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

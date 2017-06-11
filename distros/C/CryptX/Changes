@@ -7,9 +7,32 @@ TODO:
         - DSA: generate_key($p, $q, $g), generate_key(\$dsa_params_der), generate_key($dsa_params_file)
         - XS croaks should report the "real caller" (Crypt::Mac::*, Crypt::Mode::*, ...)
         - maybe: add CCM interface for new-add-add-done mode
-        - maybe: switch yarrow > fortuna for Crypt::PK::*
         - maybe: add encode_b32/decode_b32
-        - maybe: x509_rsa_pubkey + x509_rsa_pubkey_alg
+
+0.048   2017/05/31
+        - NEW: Crypt::Digest::SHA3_224
+        - NEW: Crypt::Digest::SHA3_256
+        - NEW: Crypt::Digest::SHA3_384
+        - NEW: Crypt::Digest::SHA3_512
+        - NEW: Crypt::Digest::SHAKE
+        - NEW: Crypt::Digest::BLAKE2b_160
+        - NEW: Crypt::Digest::BLAKE2b_256
+        - NEW: Crypt::Digest::BLAKE2b_384
+        - NEW: Crypt::Digest::BLAKE2b_512
+        - NEW: Crypt::Digest::BLAKE2s_128
+        - NEW: Crypt::Digest::BLAKE2s_160
+        - NEW: Crypt::Digest::BLAKE2s_224
+        - NEW: Crypt::Digest::BLAKE2s_256
+        - NEW: Crypt::AuthEnc::ChaCha20Poly1305
+        - NEW: Crypt::Mac::Poly1305
+        - NEW: Crypt::Mac::BLAKE2s
+        - NEW: Crypt::Mac::BLAKE2b
+        - NEW: Crypt::PRNG::ChaCha20
+        - NEW: Crypt::Stream::ChaCha
+        - NEW: Crypt::Stream::RC4
+        - NEW: Crypt::Stream::Sober128
+        - NEW: functions in Crypt::Misc - increment_octets_be, increment_octets_le
+        - Crypt::PRNG now uses chacha20 prng by default
 
 0.047   2017/04/05
         - fix #32 Compile "ar" step fails when Perl built with -flto (better version)

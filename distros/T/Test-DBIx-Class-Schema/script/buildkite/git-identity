@@ -1,5 +1,0 @@
-#!/bin/bash
-if [ "$(which git 2>/dev/null)" != "" ]; then
-    git config --global user.email "chisel+buildkite@chizography.net"
-    git config --global user.name  "Chizography Buildkite Agent"
-fi

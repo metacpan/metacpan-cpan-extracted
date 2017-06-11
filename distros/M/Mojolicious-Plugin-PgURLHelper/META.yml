@@ -1,0 +1,22 @@
+---
+abstract: 'Mojolicious::Plugin::PgURLHelper - Mojolicious Plugin to easily create PostgreSQL URLs suitable for Mojo::Pg or Minion::Backend::Pg'
+author:
+  - 'Luc Didry <ldidry@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-PgURLHelper
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: '7.23'
+version: '0.02'

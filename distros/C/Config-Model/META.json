@@ -74,7 +74,7 @@
       },
       "test" : {
          "requires" : {
-            "Config::Model::Tester" : "2.059",
+            "Config::Model::Tester" : "2.062",
             "Test::Differences" : "0",
             "Test::Exception" : "0",
             "Test::File::Contents" : "0",
@@ -97,7 +97,7 @@
          "web" : "http://github.com/dod38fr/config-model"
       }
    },
-   "version" : "2.103",
+   "version" : "2.105",
    "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

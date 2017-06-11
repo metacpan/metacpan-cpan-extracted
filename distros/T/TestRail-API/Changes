@@ -1,5 +1,12 @@
 Revision history for Perl module TestRail::API
 
+0.041 2017-06-06 TEODESIAN
+    - Fix MCE usage issue with confusion based on array -> hash inputs in TestRail::Utils::Find
+    - Fix issue where Test plans were not recorded in the raw output of a case.
+    - Add ability to specify a custom status for failures which emit no test plan
+    - Change tests which emit a plan but no assertions into failures.
+    - Fix issue where configuration groups in the testrailrc were ignored
+
 0.040 2017-05-24 TEODESIAN
     - Fix performance issue in TestRail::Utils::Find::FindTests
     - Fix strange testsuite bug caused by regressions in MCE

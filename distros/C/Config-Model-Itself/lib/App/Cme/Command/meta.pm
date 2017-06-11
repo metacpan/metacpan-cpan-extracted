@@ -10,7 +10,7 @@
 # ABSTRACT: Work on the configuration model of an application
 
 package App::Cme::Command::meta ;
-$App::Cme::Command::meta::VERSION = '2.010';
+$App::Cme::Command::meta::VERSION = '2.011';
 use strict ;
 use warnings ;
 use 5.10.1;
@@ -81,6 +81,7 @@ sub opt_spec {
             . "or only customized values (default)",
             {callbacks => { 'expected values' => sub { $_[0] =~ m/^full|preset|custom$/ ; }}}
         ],
+        [ "dev!"          => 'use model in ./lib to create a plugin'],
 		[ "open-item=s"   => "force the UI to open the specified node"],
 		[ "plugin-file=s" => "create a model plugin in this file" ],
         [ "load-yaml=s"   => "load model from YAML file" ],
@@ -405,7 +406,7 @@ App::Cme::Command::meta - Work on the configuration model of an application
 
 =head1 VERSION
 
-version 2.010
+version 2.011
 
 =head1 SYNOPSIS
 

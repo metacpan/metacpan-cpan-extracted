@@ -1,5 +1,5 @@
 {
-   "abstract" : "Perl implementation",
+   "abstract" : "A reference implementation of the GraphQL spec in Perl.",
    "author" : [
       "Ed J <etj@cpan.org>"
    ],
@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "GraphQL",
    "no_index" : {
@@ -49,6 +49,7 @@
       },
       "test" : {
          "requires" : {
+            "Test::Exception" : "0",
             "Test::More" : "0.88"
          }
       }
@@ -57,8 +58,8 @@
    "resources" : {
       "repository" : {
          "type" : "git",
-         "web" : "https://github.com/mohawk2/graphql-perl"
+         "web" : "https://github.com/graphql-perl/graphql-perl"
       }
    },
-   "version" : "0.03"
+   "version" : "0.04"
 }

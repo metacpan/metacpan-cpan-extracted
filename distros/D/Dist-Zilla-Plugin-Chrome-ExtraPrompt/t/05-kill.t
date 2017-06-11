@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More 0.88;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::DZil;
 use Path::Tiny;
@@ -47,7 +47,7 @@ require Dist::Zilla::MVP::Reader::Finder;
 Dist::Zilla::MVP::Reader::Finder->new->read_config($tempdir->child('config'), { assembler => $assembler });
 
 my $tzil = Builder->from_config(
-    { dist_root => 't/does_not_exist' },
+    { dist_root => 'does-not-exist' },
     {
         add_files => {
             path(qw(source dist.ini)) => simple_ini(
@@ -66,7 +66,7 @@ $tzil->chrome->logger->set_debug(1);
 $tzil->build;
 
 # the command takes 10 seconds to run, but we responded to the prompt after 1s
-cmp_ok(time() - $start_time, '<=', 2, 'the command was aborted before it ran to completion');
+cmp_ok(time() - $start_time, '<', 4, 'the command was aborted before it ran to completion');
 
 diag 'got log messages: ', explain $tzil->log_messages
     if not Test::Builder->new->is_passing;

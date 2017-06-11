@@ -96,6 +96,9 @@ around run => sub ( $orig, $self, $cb = undef ) {
                 # start HTTP server
                 $self->http_server->run;
 
+                say qq[Listen: @{[$self->listen]}] if $self->listen;
+                say qq[App "@{[$self->name]}" started];
+
                 $cb->($self) if $cb;
 
                 return;

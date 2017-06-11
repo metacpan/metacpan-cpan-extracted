@@ -7,7 +7,7 @@ use App::cpangitify;
 
 # PODNAME: cpangitify
 # ABSTRACT: Convert cpan distribution from BackPAN to a git repository
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 
 exit App::cpangitify->main(@ARGV);
@@ -24,7 +24,7 @@ cpangitify - Convert cpan distribution from BackPAN to a git repository
 
 =head1 VERSION
 
-version 0.12
+version 0.14
 
 =head1 SYNOPSIS
 

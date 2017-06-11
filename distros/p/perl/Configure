@@ -506,6 +506,7 @@ d_ftello=''
 d_ftime=''
 d_gettimeod=''
 d_futimes=''
+d_gai_strerror=''
 d_Gconvert=''
 d_getaddrinfo=''
 d_getcwd=''
@@ -634,6 +635,11 @@ d_log1p=''
 d_log2=''
 d_logb=''
 d_ldexpl=''
+d_long_double_style_ieee=''
+d_long_double_style_ieee_doubledouble=''
+d_long_double_style_ieee_extended=''
+d_long_double_style_ieee_std=''
+d_long_double_style_vax=''
 d_longdbl=''
 longdblkind=''
 longdblsize=''
@@ -681,6 +687,7 @@ d_nearbyint=''
 d_duplocale=''
 d_freelocale=''
 d_newlocale=''
+d_querylocale=''
 d_uselocale=''
 i_xlocale=''
 d_nextafter=''
@@ -861,6 +868,7 @@ d_strerrm=''
 d_strerror=''
 d_sysernlst=''
 d_syserrlst=''
+d_strerror_l=''
 d_strerror_r=''
 strerror_r_proto=''
 d_strftime=''
@@ -929,6 +937,7 @@ d_wcstombs=''
 d_wcsxfrm=''
 d_wctomb=''
 d_writev=''
+default_inc_excludes_dot=''
 dlext=''
 bin_ELF=''
 cccdlflags=''
@@ -940,6 +949,7 @@ lddlflags=''
 usedl=''
 doublesize=''
 dtraceobject=''
+dtracexnolibs=''
 ebcdic=''
 fflushNULL=''
 fflushall=''
@@ -1117,6 +1127,14 @@ d_PRIeldbl=''
 d_PRIfldbl=''
 d_PRIgldbl=''
 d_SCNfldbl=''
+d_double_has_inf=''
+d_double_has_nan=''
+d_double_has_negative_zero=''
+d_double_has_subnormals=''
+d_double_style_cray=''
+d_double_style_ibm=''
+d_double_style_ieee=''
+d_double_style_vax=''
 doublekind=''
 sPRIEUldbl=''
 sPRIFUldbl=''
@@ -2878,7 +2896,6 @@ case "$lns" in
 *)	echo "No symbolic links, so not testing for their testing..." >&4
 	;;
 esac
-echo " "
 
 : Make symlinks util
 case "$mksymlinks" in
@@ -2973,7 +2990,7 @@ $define|true|[yY]*)
 	*)  echo "Using targetarch $targetarch." >&4 ;;
 	esac
 	case "$targethost" in
-	'') echo "Targethost not defined." >&4; croak=y ;;
+	'') echo "Targethost not defined." >&4; croak=n ;;
 	*)  echo "Using targethost $targethost." >&4
 	esac
 	locincpth=' '
@@ -5239,6 +5256,20 @@ case "$usequadmath" in
 *)                    usequadmath="$undef"  ;;
 esac
 
+: Fail if both uselongdouble and usequadmath are requested
+case "$usequadmath:$uselongdouble" in
+define:define)
+	$cat <<EOM >&4
+
+*** You requested the use of the quadmath library and use
+*** of long doubles.
+***
+*** Please select one or the other.
+EOM
+	exit 1
+	;;
+esac
+
 : Looking for optional libraries
 echo " "
 echo "Checking for optional libraries..." >&4
@@ -6798,13 +6829,13 @@ yes)
 		if $contains $tlook $tf >/dev/null 2>&1; then
 			tval=true;
 		elif $test "$mistrustnm" = compile -o "$mistrustnm" = run; then
-			echo "$extern_C void *$1$tdc; void *(*(p()))$tdc { return &$1; } int main() { if(p() && p() != (void *)main) return(0); else return(1); }"> try.c;
+			echo "$extern_C void *$1$tdc; void *(*(p()))$tdc { return &$1; } int main(int argc, char **argv) { if(p() && p() != (void *)argv[0]) return(0); else return(1); }"> try.c;
 			$cc -o try $optimize $ccflags $ldflags try.c >/dev/null 2>&1 $libs && tval=true;
 			$test "$mistrustnm" = run -a -x try && { $run ./try$_exe >/dev/null 2>&1 || tval=false; };
 			$rm_try;
 		fi;
 	else
-		echo "$extern_C void *$1$tdc; void *(*(p()))$tdc { return &$1; } int main() { if(p() && p() != (void *)main) return(0); else return(1); }"> try.c;
+		echo "$extern_C void *$1$tdc; void *(*(p()))$tdc { return &$1; } int main(int argc, char **argv) { if(p() && p() != (void *)argv[0]) return(0); else return(1); }"> try.c;
 		$cc -o try $optimize $ccflags $ldflags try.c $libs >/dev/null 2>&1 && tval=true;
 		$rm_try;
 	fi;
@@ -7028,6 +7059,16 @@ int main() {
     exit(0);
   }
 #endif
+/* We are largely making this up because it may well be
+ * that the VAX format H was never made available to C,
+ * only to Fortran. */
+#if LONGDBLSIZE == 16 && defined(__vax__)
+  if (b[0] == 0xFD && b[15] == 0x99) {
+    /* VAX format H, PDP-11 mixed endian. */
+    printf("9\n");
+    exit(0);
+  }
+#endif
   printf("-1\n"); /* unknown */
   exit(0);
 }
@@ -7049,9 +7090,30 @@ case "$longdblkind" in
 4) echo "You have x86 80-bit big endian long doubles." >& 4 ;;
 5) echo "You have 128-bit fully little-endian double-double long doubles (64-bit LEs in LE)." >& 4 ;;
 6) echo "You have 128-bit fully big-endian double-double long doubles (64-bit BEs in BE)." >& 4 ;;
-7) echo "You have 128-bit mixed double-double long doubles (64-bit LEs in BE)." >& 4 ;;
-8) echo "You have 128-bit mixed double-double long doubles (64-bit BEs in LE)." >& 4 ;;
+7) echo "You have 128-bit mixed-endian double-double long doubles (64-bit LEs in BE)." >& 4 ;;
+8) echo "You have 128-bit mixed-endian double-double long doubles (64-bit BEs in LE)." >& 4 ;;
+9) echo "You have 128-bit PDP-style mixed-endian long doubles (VAX format H)." >& 4 ;;
 *) echo "Cannot figure out your long double." >&4 ;;
+esac
+d_long_double_style_ieee=$undef
+d_long_double_style_ieee_std=$undef
+d_long_double_style_ieee_extended=$undef
+d_long_double_style_ieee_doubledouble=$undef
+d_long_double_style_vax=$undef
+case "$longdblkind" in
+1|2|3|4|5|6|7|8) d_long_double_style_ieee=$define ;;
+esac
+case "$longdblkind" in
+1|2) d_long_double_style_ieee_std=$define ;;
+esac
+case "$longdblkind" in
+3|4) d_long_double_style_ieee_extended=$define ;;
+esac
+case "$longdblkind" in
+5|6|7|8) d_long_double_style_ieee_doubledouble=$define ;;
+esac
+case "$longdblkind" in
+9) d_long_double_style_vax=$define ;;
 esac
 $rm_try
 
@@ -7185,7 +7247,7 @@ case "$usequadmath" in
 $define)
 	echo "quadmath selected." >&4
 	case "$archname" in
-	*-ld*) echo "...and architecture name already has -quadmath." >&4
+	*-quadmath*) echo "...and architecture name already has -quadmath." >&4
 		;;
 	*)      archname="$archname-quadmath"
 		echo "...setting architecture name to $archname." >&4
@@ -9379,17 +9441,20 @@ rp='Perl administrator e-mail address'
 . ./myread
 perladmin="$ans"
 
-: determine whether to only install version-specific parts.
+: determine whether to use a version number suffix for installed binaries
 echo " "
 $cat <<EOM
-Do you want to install only the version-specific parts of the perl
-distribution?  Usually you do *not* want to do this.
+Do you want to use a version number suffix for installed binaries? This
+will install 'perl$version' instead of 'perl', and likewise for other
+binaries like 'perldoc' and 'cpan'. This allows many versions of perl
+to be installed side-by-side. Unless you are a developer, you probably
+do *not* want to do this.
 EOM
 case "$versiononly" in
 "$define"|[Yy]*|true) dflt='y' ;;
 *) dflt='n';
 esac
-rp="Do you want to install only the version-specific parts of perl?"
+rp="Do you want to use a version number suffix for installed binaries?"
 . ./myread
 case "$ans" in
 [yY]*)	val="$define";;
@@ -10125,6 +10190,16 @@ int main() {
     printf("2\n");
     exit(0);
   }
+  if (b[0] == 0xCC && b[3] == 0xCC) {
+    /* VAX format F, 32-bit PDP-style mixed endian. */
+    printf("9\n");
+    exit(0);
+  }
+  if (b[0] == 0xC0 && b[3] == 0x9A) {
+    /* IBM single 32-bit */
+    printf("12\n");
+    exit(0);
+  }
 #endif
 #if DOUBLESIZE == 8
   if (b[0] == 0x9A && b[7] == 0xBF) {
@@ -10151,6 +10226,26 @@ int main() {
     printf("8\n");
     exit(0);
   }
+  if (b[0] == 0xCC && b[7] == 0xCC) {
+   /* VAX format D, 64-bit PDP-style mixed endian. */
+    printf("10\n");
+    exit(0);
+  }
+  if (b[0] == 0xD9 && b[7] == 0x99) {
+   /* VAX format G, 64-bit PDP-style mixed endian. */
+    printf("11\n");
+    exit(0);
+  }
+  if (b[0] == 0xC0 && b[7] == 0x9A) {
+    /* IBM double 64-bit */
+    printf("13\n");
+    exit(0);
+  }
+  if (b[0] == 0xBF && b[7] == 0xCD) {
+    /* CRAY single 64-bit */
+    printf("14\n");
+    exit(0);
+  }
 #endif
 #if DOUBLESIZE == 16
   if (b[0] == 0x9A && b[15] == 0xBF) {
@@ -10164,7 +10259,7 @@ int main() {
     exit(0);
   }
 #endif
-  /* Then there are old mainframe/miniframe formats like VAX, IBM, and CRAY.
+  /* Then there are old mainframe/miniframe formats like IBM and CRAY.
    * Whether those environments can still build Perl is debatable. */
   printf("-1\n"); /* unknown */
   exit(0);
@@ -10185,7 +10280,37 @@ case "$doublekind" in
 6) echo "You have IEEE 754 128-bit big endian doubles." >&4 ;;
 7) echo "You have IEEE 754 64-bit mixed endian doubles (32-bit LEs in BE)." >&4 ;;
 8) echo "You have IEEE 754 64-bit mixed endian doubles (32-bit BEs in LE)." >&4 ;;
-*) echo "Cannot figure out your double.  You VAX, or something?" >&4 ;;
+9) echo "You have VAX format F 32-bit PDP-style mixed endian doubles." >&4 ;;
+10) echo "You have VAX format D 64-bit PDP-style mixed endian doubles." >&4 ;;
+11) echo "You have VAX format G 64-bit PDP-style mixed endian doubles." >&4 ;;
+12) echo "You have IBM short 32-bit doubles." >&4 ;;
+13) echo "You have IBM long 64-bit doubles." >&4 ;;
+14) echo "You have Cray single 64-bit doubles." >&4 ;;
+*) echo "Cannot figure out your double.  You Cyber, or something?" >&4 ;;
+esac
+d_double_style_ieee=$undef
+d_double_style_vax=$undef
+d_double_style_ibm=$undef
+d_double_style_cray=$undef
+case "$doublekind" in
+1|2|3|4|5|6|7|8) d_double_style_ieee=$define ;;
+9|10|11) d_double_style_vax=$define ;;
+12|13) d_double_style_ibm=$define ;;
+14) d_double_style_cray=$define ;;
+esac
+case "$d_double_style_ieee" in
+$define)
+    d_double_has_inf=$define
+    d_double_has_nan=$define
+    d_double_has_negative_zero=$define
+    d_double_has_subnormals=$define
+    ;;
+*)
+    d_double_has_inf=$undef
+    d_double_has_nan=$undef
+    d_double_has_negative_zero=$undef
+    d_double_has_subnormals=$undef
+    ;;
 esac
 $rm_try
 
@@ -14149,6 +14274,10 @@ eval $inlibc
 set duplocale d_duplocale
 eval $inlibc
 
+: see if querylocale exists
+set querylocale d_querylocale
+eval $inlibc
+
 : see if frexpl exists
 set frexpl d_frexpl
 eval $inlibc
@@ -14239,6 +14368,34 @@ if eval $compile; then
 else
     echo "No, it does not (probably harmless)" >&4
 fi
+$rm_try
+
+: look for gai_strerror
+echo " "
+$cat >try.c <<'EOCP'
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+int main ()
+{
+    return (gai_strerror (0) ? 0 : 1);
+    }
+EOCP
+set try
+val="$undef"
+if eval $compile; then
+    `$run ./try`
+    case "$?" in
+	0)  echo "A working gai_strerror() found." >&4
+	    val="$define" ;;
+	*)  echo "gai_strerror() found, but it doesn't work" >&4
+	    ;;
+	esac
+else
+    echo "gai_strerror() NOT found." >&4
+    fi
+set d_gai_strerror
+eval $setvar
 $rm_try
 
 : see if ndbm.h is available
@@ -16956,8 +17113,9 @@ $volatile int bletched = 0;
 $signal_t blech(int s) { bletched = 1; }
 #endif
 
-int checkit($nvtype d, char *where) {
-    unsigned char *p = (char *)&d;
+int checkit($nvtype d, const char *where) {
+    void *v = &d;
+    unsigned char *p = (unsigned char *)v;
     unsigned char *end = p + sizeof(d);
     int fail = 0;
 
@@ -16967,7 +17125,7 @@ int checkit($nvtype d, char *where) {
     if (!fail)
 	return 0;
 
-    p = (char *)&d;
+    p = (unsigned char *)v;
     printf("No - %s: 0x", where);
     while (p < end)
 	printf ("%02X", *p++);
@@ -18703,7 +18861,7 @@ $cat >try.c <<EOCP
 int main(int argc, char **argv)
 {
     NV x = 0.0;
-    NV y = -0.0;
+    NV y = -1.0;
     if ((signbit(x) == 0) && (signbit(y) != 0))
 	return 0;
     else
@@ -19274,6 +19432,10 @@ if test "X$d_strerror" = X -o "X$d_syserrlst" = X; then
 		d_strerrm='"unknown"'
     fi
 fi
+
+: see if strerror_l exists
+set strerror_l d_strerror_l
+eval $inlibc
 
 : see if strerror_r exists
 set strerror_r d_strerror_r
@@ -20465,18 +20627,51 @@ EOCP
 	;;
 esac
 
+: Include . in @INC
+$cat <<EOM
+
+Historically Perl has provided a final fallback of the current working
+directory '.' when searching for a library. This, however, can lead to
+problems when a Perl program which loads optional modules is called from
+a shared directory. This can lead to executing unexpected code.
+
+EOM
+
+# When changing to exclude by default:
+case "$default_inc_excludes_dot" in
+    $undef|false|[nN]*) dflt="n" ;;
+    *)                  dflt="y" ;;
+esac
+# To turn exclude off by default:
+#case "$default_inc_excludes_dot" in
+#    $define|true|[yY]*) dflt="y" ;;
+#    *)                  dflt="n" ;;
+#esac
+
+rp='Exclude '.' from @INC by default? '
+. ./myread
+case "$ans" in
+    [nN]|undef) default_inc_excludes_dot="$undef"  ;;
+    *)          default_inc_excludes_dot="$define" ;;
+esac
+
 : Check what kind of inf/nan your system has
 $echo "Checking the kind of infinities and nans you have..." >&4
+$echo "(The following tests may crash.  That's okay.)" >&4
 $cat >try.c <<EOP
 #define DOUBLESIZE $doublesize
 #$d_longdbl HAS_LONG_DOUBLE
 #ifdef HAS_LONG_DOUBLE
-#define LONGDBLSIZE $longdblsize
-#define LONGDBLKIND $longdblkind
+#define LONG_DOUBLESIZE $longdblsize
+#define LONG_DOUBLEKIND $longdblkind
 #endif
 #$i_math I_MATH
+#$i_string I_STRING
 #ifdef I_MATH
 #include <math.h>
+#endif
+#ifdef I_STRING
+#  include <string.h>
 #endif
 #include <stdio.h>
 /* Note that whether the sign bit is on or off
@@ -20488,8 +20683,14 @@ $cat >try.c <<EOP
  * 0x7f, 0xf4, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
  * (respectively) as opposed to the more usual
  * 0x7f, 0xf8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+ *
+ * Pre-IEEE-754 floating point format do not even have inf/nan support
+ * at all.  They might have a "max" value (DBL_MAX), which may be deadly
+ * to even mention, causing immediate SIGFPE or equivalent: this is
+ * the case with VAX floating point, for example.
  */
-static void bytes(unsigned char *p, unsigned int n) {
+static void bytes(void *v, unsigned int n) {
+  unsigned char *p = (unsigned char *)v;
   int i;
   for (i = 0; i < n; i++) {
     printf("0x%02x%s", p[i], i < n - 1 ? ", " : "\n");
@@ -20504,16 +20705,15 @@ int main(int argc, char *argv[]) {
 #ifdef HAS_LONG_DOUBLE
    long double ldinf = (long double)exp(1e9);
    long double ldnan = (long double)sqrt(-1.0);
-#endif
+# if LONG_DOUBLEKIND == 3 || LONG_DOUBLEKIND == 4
+/* the 80-bit long doubles might have garbage in their excess bytes */
+    memset((char *)&ldinf + 10, '\0', LONG_DOUBLESIZE - 10);
+    memset((char *)&ldnan + 10, '\0', LONG_DOUBLESIZE - 10);
+# endif
   if (argc == 2) {
     switch (argv[1][0]) {
     case '1': bytes(&dinf, sizeof(dinf)); break;
     case '2': bytes(&dnan, sizeof(dnan)); break;
-#ifdef HAS_LONG_DOUBLE
-# if LONG_DOUBLEKIND == 3 || LONG_DOUBLEKIND == 4
-/* the 80-bit long doubles might have garbage in their excess bytes */
-    memset((char *)&ldinf + 10, '\0', LONG_DOUBLESIZE - 10);
-# endif
     case '3': bytes(&ldinf, sizeof(ldinf)); break;
     case '4': bytes(&ldnan, sizeof(ldnan)); break;
 #endif
@@ -20566,6 +20766,10 @@ else
     8) # IEEE 754 64-bit mixed: 32-bit BEs in LE
        doubleinfbytes='0x00, 0x00, 0x00, 0x00, 0x7f, 0xf0, 0x00, 0x00'
        doublenanbytes='0x00, 0x00, 0x00, 0x00, 0x7f, 0xf8, 0x00, 0x00'
+       ;;
+    9|10|11|12|13|14) # VAX/Cray/IBM floating point formats, no inf/nan.
+       doubleinfbytes=$undef
+       doublenanbytes=$undef
        ;;
     *) # No idea.
        doubleinfbytes=$undef
@@ -20629,12 +20833,29 @@ else
        longdblinfbytes='0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7f, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00'
        longdblnanbytes='0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7f, 0xf8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00'
        ;;
+    9|10|11|12|13|14) # VAX/Cray/IBM floating point formats, no inf/nan.
+       longdblinfbytes=$undef
+       longdblnanbytes=$undef
+       ;;
     *) # No idea.
        longdblinfbytes=$undef
        longdblnanbytes=$undef
        ;;
     esac
 fi
+# In case the program crashed the values are empty, turn them undef.
+case "$doubleinfbytes" in
+'') doubleinfbytes=$undef ;;
+esac
+case "$doublenanbytes" in
+'') doublenanbytes=$undef ;;
+esac
+case "$longdblinfbytes" in
+'') longdblinfbytes=$undef ;;
+esac
+case "$longdblnanbytes" in
+'') longdblnanbytes=$undef ;;
+esac
 $rm_try
 
 : Check the length of the double mantissa
@@ -20751,12 +20972,38 @@ randseedtype=U32
 : object file that uses at least one of the probes defined in the .d file
 case "$usedtrace" in
 $define)
+    case "$dtracexnolibs" in
+    $define|true|[yY]*)
+        dtracexnolibs=$define
+	$dtrace -h -xnolibs -s ../perldtrace.d -o perldtrace.h
+	;;
+    ' '|'')
+        if $dtrace -h -xnolibs -s ../perldtrace.d -o perldtrace.h 2>&1 ; then
+	     dtracexnolibs=$define
+	     echo "Your dtrace accepts -xnolibs"
+	elif $dtrace -h -s ../perldtrace.d -o perldtrace.h 2>&1 ; then
+	     dtracexnolibs=$undef
+	     echo "Your dtrace doesn't accept -xnolibs"
+	else
+             echo "Your dtrace doesn't work at all, try building without dtrace support" >&4
+	     exit 1
+	fi
+	;;
+    *)
+        dtracexnolibs=$undef
+	$dtrace -h -s ../perldtrace.d -o perldtrace.h
+	;;
+    esac
+    case $dtracexnolibs in
+    $define) xnolibs=-xnolibs ;;
+    *) xnolibs= ;;
+    esac
+
     case "$dtraceobject" in
     $define|true|[yY]*)
         dtraceobject=$define
         ;;
     ' '|'')
-        $dtrace -h -s ../perldtrace.d -o perldtrace.h
         $cat >try.c <<EOM
 #include "perldtrace.h"
 int main(void) {
@@ -20766,14 +21013,14 @@ int main(void) {
 EOM
         dtraceobject=$undef
         if $cc -c -o try.o $optimize $ccflags try.c \
-                    && $dtrace -G -s ../perldtrace.d try.o >/dev/null 2>&1; then
+                    && $dtrace -G $xnolibs -s ../perldtrace.d try.o >/dev/null 2>&1; then
                 dtraceobject=$define
             echo "Your dtrace builds an object file"
         fi
-        $rm -f try.c try.o perldtrace.o
         ;;
     *) dtraceobject=$undef ;;
     esac
+    $rm_try perldtrace.o perldtrace.h
 esac
 
 : Determine if this is an EBCDIC system
@@ -22813,7 +23060,7 @@ main(int argc, char **argv) {
 	return 4;
     }
 
-    buffer = malloc(size);
+    buffer = (char *)malloc(size);
     if (!buffer) {
 	perror("malloc");
 	return 5;
@@ -22912,7 +23159,7 @@ main(int argc, char **argv) {
 	return 2;
     }
 
-    buffer = malloc(size);
+    buffer = (char *)malloc(size);
     if (!buffer) {
 	perror("malloc");
 	return 3;
@@ -24253,6 +24500,14 @@ d_dlerror='$d_dlerror'
 d_dlopen='$d_dlopen'
 d_dlsymun='$d_dlsymun'
 d_dosuid='$d_dosuid'
+d_double_has_inf='$d_double_has_inf'
+d_double_has_nan='$d_double_has_nan'
+d_double_has_negative_zero='$d_double_has_negative_zero'
+d_double_has_subnormals='$d_double_has_subnormals'
+d_double_style_cray='$d_double_style_cray'
+d_double_style_ibm='$d_double_style_ibm'
+d_double_style_ieee='$d_double_style_ieee'
+d_double_style_vax='$d_double_style_vax'
 d_drand48_r='$d_drand48_r'
 d_drand48proto='$d_drand48proto'
 d_dup2='$d_dup2'
@@ -24318,6 +24573,7 @@ d_fsync='$d_fsync'
 d_ftello='$d_ftello'
 d_ftime='$d_ftime'
 d_futimes='$d_futimes'
+d_gai_strerror='$d_gai_strerror'
 d_gdbm_ndbm_h_uses_prototypes='$d_gdbm_ndbm_h_uses_prototypes'
 d_gdbmndbm_h_uses_prototypes='$d_gdbmndbm_h_uses_prototypes'
 d_getaddrinfo='$d_getaddrinfo'
@@ -24431,6 +24687,11 @@ d_lockf='$d_lockf'
 d_log1p='$d_log1p'
 d_log2='$d_log2'
 d_logb='$d_logb'
+d_long_double_style_ieee='$d_long_double_style_ieee'
+d_long_double_style_ieee_doubledouble='$d_long_double_style_ieee_doubledouble'
+d_long_double_style_ieee_extended='$d_long_double_style_ieee_extended'
+d_long_double_style_ieee_std='$d_long_double_style_ieee_std'
+d_long_double_style_vax='$d_long_double_style_vax'
 d_longdbl='$d_longdbl'
 d_longlong='$d_longlong'
 d_lrint='$d_lrint'
@@ -24518,6 +24779,7 @@ d_pwpasswd='$d_pwpasswd'
 d_pwquota='$d_pwquota'
 d_qgcvt='$d_qgcvt'
 d_quad='$d_quad'
+d_querylocale='$d_querylocale'
 d_random_r='$d_random_r'
 d_re_comp='$d_re_comp'
 d_readdir64_r='$d_readdir64_r'
@@ -24637,6 +24899,7 @@ d_strcoll='$d_strcoll'
 d_strctcpy='$d_strctcpy'
 d_strerrm='$d_strerrm'
 d_strerror='$d_strerror'
+d_strerror_l='$d_strerror_l'
 d_strerror_r='$d_strerror_r'
 d_strftime='$d_strftime'
 d_strlcat='$d_strlcat'
@@ -24710,6 +24973,7 @@ db_prefixtype='$db_prefixtype'
 db_version_major='$db_version_major'
 db_version_minor='$db_version_minor'
 db_version_patch='$db_version_patch'
+default_inc_excludes_dot='$default_inc_excludes_dot'
 direntrytype='$direntrytype'
 dlext='$dlext'
 dlsrc='$dlsrc'
@@ -24722,6 +24986,7 @@ drand01='$drand01'
 drand48_r_proto='$drand48_r_proto'
 dtrace='$dtrace'
 dtraceobject='$dtraceobject'
+dtracexnolibs='$dtracexnolibs'
 dynamic_ext='$dynamic_ext'
 eagain='$eagain'
 ebcdic='$ebcdic'
@@ -25316,8 +25581,7 @@ Id='$Id'
 : Finish up by extracting the .SH files
 case "$alldone" in
 exit)
-	$rm -rf UU
-	echo "Extraction done."
+	echo "Stopping at your request, leaving temporary files around."
 	exit 0
 	;;
 cont)
@@ -25392,11 +25656,10 @@ the policy defaults.
 
 EOM
 fi
-if $test -f config.msg; then
+if $test -f UU/config.msg; then
     echo "Hmm.  I also noted the following information while running:"
     echo " "
-    $cat config.msg >&4
-    $rm -f config.msg
+    $cat UU/config.msg >&4
 fi
 $rm -f kit*isdone ark*isdone
 $rm -rf UU

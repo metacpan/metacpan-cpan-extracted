@@ -20,7 +20,8 @@ use warnings;
 use Test::More;
 use Test::Moose;
 
-require 't/funcs.pm' unless eval { require funcs };
+use lib 't';
+require funcs;
 
 my %foo_accessors = (
     reader   => 'foo',

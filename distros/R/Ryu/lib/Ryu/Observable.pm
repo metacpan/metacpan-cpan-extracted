@@ -3,7 +3,7 @@ package Ryu::Observable;
 use strict;
 use warnings;
 
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 =encoding utf8
 
@@ -13,7 +13,13 @@ Ryu::Observable - plus ça change
 
 =head1 DESCRIPTION
 
-This module is still of no great use to you in its current state.
+This is by way of being a thing that lets you set up subscriptions on things
+so that you can be notified when said things are in some way not the same as
+the things they used to be, but are indeed now possessed of some detectable
+difference which may be of relevance to the thing that makes use of this thing
+which notifies as per the aforementioned conditions.
+
+
 
 =cut
 
@@ -154,8 +160,8 @@ sub source {
 	my $src = Ryu::Source->new;
 	weaken(my $copy = $self);
 	$self->subscribe(my $code = sub {
-		return unless $copy;
-		$src->emit($copy->value)
+		return unless my $self = $copy;
+		$src->emit($self->value)
 	});
 	$src->completion->on_ready(sub {
 		$copy->unsubscribe($code) if $copy;

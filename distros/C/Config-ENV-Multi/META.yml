@@ -4,11 +4,12 @@ author:
   - 'Hiroyoshi Houchi <git@hixi-hyi.com>'
 build_requires:
   Test::Clear: '0'
+  Test::Deep: '0'
   Test::More: '0.98'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v1.0.0, CPAN::Meta::Converter version 2.140640'
+generated_by: 'Minilla/v3.0.11, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,18 +28,20 @@ no_index:
 provides:
   Config::ENV::Multi:
     file: lib/Config/ENV/Multi.pm
-    version: '0.03'
+    version: '0.04'
   Config::ENV::Multi::ConfigInstance:
     file: lib/Config/ENV/Multi.pm
 requires:
-  Carp: '0'
   List::MoreUtils: '0'
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/hixi-hyi/p5-Config-ENV-Multi/issues
   homepage: https://github.com/hixi-hyi/p5-Config-ENV-Multi
   repository: git://github.com/hixi-hyi/p5-Config-ENV-Multi.git
-version: '0.03'
+version: '0.04'
 x_authority: cpan:HIXI
 x_contributors:
   - 'Tanaka Tatsuya <ta.ts.yt@gmail.com>'
+  - 'Tatsuya Tanaka <tanaka.tatsuya@dena.jp>'
+  - 'karupanerura <karupa@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

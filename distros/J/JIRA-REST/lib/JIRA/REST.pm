@@ -1,6 +1,6 @@
 package JIRA::REST;
 # ABSTRACT: Thin wrapper around JIRA's REST API
-$JIRA::REST::VERSION = '0.017';
+$JIRA::REST::VERSION = '0.018';
 use 5.008_008;
 use utf8;
 use strict;
@@ -46,6 +46,12 @@ sub new {
         $api = $1;
         $args{url}->path($path);
     }
+    # Strip trailing slashes from $path. For some reason they cause 404
+    # errors down the road.
+    if ($path =~ s:/+$::) {
+        $args{url}->path($path);
+    }
+
     unless ($args{anonymous}) {
         # If username and password are not set we try to lookup the credentials
         if (! defined $args{username} || ! defined $args{password}) {
@@ -231,8 +237,9 @@ sub _content {
 sub _build_path {
     my ($self, $path, $query) = @_;
 
-    # Prefix $path with the default API prefix unless it already specifies one
-    $path = $self->{api} . $path unless $path =~ m:^/rest/:;
+    # Prefix $path with the default API prefix unless it already specifies
+    # one or it's an absolute URL.
+    $path = $self->{api} . $path unless $path =~ m@^(?:/rest/|(?i)https?:)@;
 
     if (defined $query) {
         croak $self->_error("The QUERY argument must be a hash reference.")
@@ -348,7 +355,7 @@ sub attach_files {
             %{$rest->{_headers}},
             'X-Atlassian-Token' => 'nocheck',
             'Content-Type'      => 'form-data',
-            'Content'           => [ file => [$file] ],
+            'Content'           => [ file => [$file, Encode::encode_utf8( $file )] ],
         );
 
         $response->is_success
@@ -370,7 +377,7 @@ JIRA::REST - Thin wrapper around JIRA's REST API
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 

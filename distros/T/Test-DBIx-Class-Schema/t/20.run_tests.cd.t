@@ -33,6 +33,8 @@ $schematest->methods({
 
     relations => [qw(
         artist
+        notes
+        liner_notes
     )],
 
     custom => [

@@ -1,0 +1,85 @@
+NAME
+    Bio::Kmer
+
+SYNOPSIS
+    A module for helping with kmer analysis.
+
+      use strict;
+      use warnings;
+      use Bio::Kmer;
+  
+      my $kmer=Bio::Kmer->new("file.fastq.gz",{kmercounter=>"jellyfish",numcpus=>4});
+      my $kmerHash=$kmer->kmers();
+      my $countOfCounts=$kmer->histogram();
+
+DESCRIPTION
+    A module for helping with kmer analysis. The basic methods help count
+    kmers and can produce a count of counts. Currently this module only
+    supports fastq format. Although this module can count kmers with pure
+    perl, it is recommended to give the option for a different kmer counter
+    such as Jellyfish.
+
+METHODS
+    Bio::Kmer->new($filename, \%options)
+        Create a new instance of the kmer counter. One object per file.
+
+          Applicable arguments:
+          Argument     Default    Description
+          kmercounter  perl       What kmer counter software to use.
+                                  Choices: Perl, Jellyfish.
+          kmerlength   21         Kmer length
+          numcpus      1          This module uses perl 
+                                  multithreading with pure perl or 
+                                  can supply this option to other 
+                                  software like jellyfish.
+          gt           1          If the count of kmers is fewer 
+                                  than this, ignore the kmer. This 
+                                  might help speed analysis if you 
+                                  do not care about low-count kmers.
+
+          Examples:
+          my $kmer=Bio::Kmer->new("file.fastq.gz",{kmercounter=>"jellyfish",numcpus=>4});
+
+    $kmer->query($queryString)
+        Query the set of kmers with your own query
+
+          Arguments: query (string)
+          Returns:   Count of kmers. 
+                      0 indicates that the kmer was not found.
+                     -1 indicates an invalid kmer (e.g., invalid length)
+
+    $kmer->histogram()
+        Count the frequency of kmers.
+
+          Arguments: none
+          Returns:   Reference to an array of counts. The index of 
+                     the array is the frequency.
+
+    $kmer->union($kmer2)
+        Finds the union between two sets of kmers
+
+          Arguments: Another Bio::Kmer object
+          Returns:   List of kmers
+
+    $kmer->intersection($kmer2)
+        Finds the intersection between two sets of kmers
+
+          Arguments: Another Bio::Kmer object
+          Returns:   List of kmers
+
+    $kmer->subtract($kmer2)
+        Finds the set of kmers unique to this Bio::Kmer object.
+
+          Arguments: Another Bio::Kmer object
+          Returns:   List of kmers
+
+COPYRIGHT AND LICENSE
+    MIT license. Go nuts.
+
+AUTHOR
+    Author: Lee Katz <lkatz@cdc.gov>
+
+    For additional help, go to https://github.com/lskatz/Bio--Kmer
+
+    CPAN module at http://search.cpan.org/~lskatz/Bio-Kmer/
+

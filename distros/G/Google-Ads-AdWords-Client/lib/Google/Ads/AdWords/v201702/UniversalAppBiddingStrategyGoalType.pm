@@ -25,7 +25,7 @@ __END__
 Perl data type class for the XML Schema defined simpleType
 UniversalAppBiddingStrategyGoalType from the namespace https://adwords.google.com/api/adwords/cm/v201702.
 
-Represents the goal towards which the bidding strategy, of a universal app campaign, should optimize for. See go/walnut-pie-apdr for more. 
+Represents the goal towards which the bidding strategy, of a universal app campaign, should optimize for. 
 
 
 

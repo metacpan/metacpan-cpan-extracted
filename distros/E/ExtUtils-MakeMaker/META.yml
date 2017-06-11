@@ -5,7 +5,7 @@ author:
 build_requires: {}
 configure_requires: {}
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.26, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.28, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,6 +30,8 @@ requires:
   perl: '5.006'
 resources:
   MailingList: makemaker@perl.org
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=ExtUtils-MakeMaker
   homepage: https://metacpan.org/release/ExtUtils-MakeMaker
   license: http://dev.perl.org/licenses/
-version: '7.26'
+  repository: http://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker
+version: '7.28'

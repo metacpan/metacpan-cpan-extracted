@@ -1,0 +1,1115 @@
+#!perl
+
+our $DATE = '2017-06-03'; # DATE
+our $VERSION = '0.004'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+use Perinci::CmdLine::Any;
+
+our %SPEC;
+
+my $sch_type = ['str*', in=>['buy','sell']];
+my $sch_txtype = ['str*', in=>['deposit','withdraw']];
+my $sch_currency = ['str*', in=>[qw/btc bts crave doge drk eth idr ltc nbt nem nxt sdc str xpy xrp/]];
+
+my %args_tapi = (
+    key => {
+        schema => ['str*', match=>qr/\A\w{8}-\w{8}-\w{8}-\w{8}-\w{8}\z/],
+        req => 1,
+    },
+    secret => {
+        schema => ['str*', match=>qr/\A[0-9a-z]{80}\z/],
+        req => 1,
+    },
+);
+
+my %arg_filter_type = (
+    type => {
+        summary => 'Filter by type (buy/sell)',
+        schema => $sch_type,
+        tags => ['category:filtering'],
+    },
+);
+
+my %arg_filter_txtype = (
+    txtype => {
+        summary => 'Filter by transaction type (deposit/withdraw)',
+        schema => $sch_txtype,
+        tags => ['category:filtering'],
+    },
+);
+
+my %arg_filter_currency = (
+    txtype => {
+        summary => 'Filter by currency',
+        schema => $sch_currency,
+        tags => ['category:filtering'],
+    },
+);
+
+my %args_filter_time = (
+    time_from => {
+        summary => 'Filter by beginning time',
+        schema => 'date*',
+        tags => ['category:filtering'],
+    },
+    time_to => {
+        summary => 'Filter by ending time',
+        schema => 'date*',
+        tags => ['category:filtering'],
+    },
+);
+
+my %args_filter_trade_id = (
+    trade_id_from => {
+        summary => 'Filter by beginning trade ID',
+        schema => 'int*',
+        tags => ['category:filtering'],
+    },
+    trade_id_to => {
+        summary => 'Filter by ending trade ID',
+        schema => 'int*',
+        tags => ['category:filtering'],
+    },
+);
+
+my %arg_pair = (
+    pair => {
+        summary => 'Pair',
+        schema => ['str*', match=>qr/\A\w{3}_\w{3}\z/],
+        default => 'btc_idr',
+    },
+);
+
+my %arg_0_type = (
+    type => {
+        schema => $sch_type,
+        req => 1,
+        pos => 0,
+        cmdline_aliases => {
+            buy  => {is_flag=>1, summary => 'Alias for --type buy' , code => sub { $_[0]{type} = 'buy'  }},
+            sell => {is_flag=>1, summary => 'Alias for --type sell', code => sub { $_[0]{type} = 'sell' }},
+        },
+    },
+);
+
+my $btcindo;
+
+sub _init {
+    require Finance::BTCIndo;
+    my ($args) = @_;
+    $btcindo //= Finance::BTCIndo->new(
+        (key    => $args->{key}   ) x !!(defined $args->{key}),
+        (secret => $args->{secret}) x !!(defined $args->{secret}),
+    );
+}
+
+$SPEC{':package'} = {
+    v => 1.1,
+    summary => 'CLI for bitcoin.co.id',
+};
+
+$SPEC{ticker} = {
+    v => 1.1,
+    summary => 'Show ticker',
+    args => {
+    },
+};
+sub ticker {
+    my %args = @_;
+    _init(\%args);
+    [200, "OK", $btcindo->get_ticker->{ticker}];
+}
+
+$SPEC{trades} = {
+    v => 1.1,
+    summary => 'Show latest trades',
+    args => {
+        %arg_filter_type,
+    },
+};
+sub trades {
+    my %args = @_;
+    _init(\%args);
+
+    my $res = $btcindo->get_trades;
+
+    my @rows;
+    for my $row (@$res) {
+        if ($args{type}) {
+            next unless $row->{type} eq $args{type};
+        }
+        $row->{idr} = int($row->{amount} * $row->{price});
+        push @rows, $row;
+    }
+
+    my $fnum0 = [number => {precision=>0}];
+    my $fnum8 = [number => {precision=>8}];
+
+    my $resmeta = {};
+    $resmeta->{'table.fields'}        = [qw/date tid    type price  amount idr/];
+    $resmeta->{'table.field_aligns'}  = [qw/left number left right  right  right/];
+    $resmeta->{'table.field_formats'} = ['iso8601_datetime', undef, undef, $fnum0, $fnum8, $fnum0];
+
+    [200, "OK", \@rows, $resmeta];
+}
+
+$SPEC{depth} = {
+    v => 1.1,
+    summary => 'Show depth',
+    args => {
+        %arg_filter_type,
+    },
+};
+sub depth {
+    my %args = @_;
+    _init(\%args);
+
+    my $res = $btcindo->get_depth;
+    my @rows;
+    for my $type (keys %$res) {
+        next if $args{type} && $type ne $args{type};
+        my $v1 = $res->{$type};
+        for my $row0 (@$v1) {
+            my $row = {
+                type => $type,
+                idr  => $row0->[0],
+                btc  => $row0->[1],
+            };
+            push @rows, $row;
+        }
+    }
+
+    my $fnum0 = [number => {precision=>0}];
+    my $fnum8 = [number => {precision=>8}];
+
+    my $resmeta = {};
+    $resmeta->{'table.fields'}        = [qw/type idr btc/];
+    $resmeta->{'table.field_aligns'}  = [qw/left right right/];
+    $resmeta->{'table.field_formats'} = [undef, $fnum0, $fnum8];
+
+    [200, "OK", \@rows, $resmeta];
+}
+
+$SPEC{price_history} = {
+    v => 1.1,
+    summary => 'Show price history, which can be used to draw candlestick chart',
+    description => <<'_',
+
+The function will return an array of records. Each record is an array with the
+following data:
+
+    [timestamp-in-unix-epoch, open, high, low, close]
+
+_
+    args => {
+        period => {
+            schema => ['str*', in=>[qw/day all/]],
+            default => 'day',
+        },
+    },
+};
+sub price_history {
+    my %args = @_;
+    _init(\%args);
+
+    my $res = $btcindo->get_price_history(period => $args{period})->{chart};
+
+    my @rows;
+    for my $row (@$res) {
+        $row->[0] /= 1000;
+        push @rows, $row;
+    }
+
+    my $fnum0 = [number => {precision=>0}];
+
+    my $resmeta = {};
+    $resmeta->{'table.fields'}        = [qw/time open high low close vol_btc/];
+    $resmeta->{'table.field_aligns'}  = [qw/left right right right right number/];
+    $resmeta->{'table.field_formats'} = ['iso8601_datetime', $fnum0, $fnum0, $fnum0, $fnum0, undef];
+
+    [200, "OK", \@rows, $resmeta];
+}
+
+$SPEC{info} = {
+    v => 1.1,
+    summary => 'Show balance, server timestamp, and some other information',
+    args => {
+        %args_tapi,
+    },
+};
+sub info {
+    my %args = @_;
+    _init(\%args);
+
+    my $res = $btcindo->get_info;
+    [200, "OK", $res];
+}
+
+$SPEC{balance} = {
+    v => 1.1,
+    summary => 'Show current balances',
+    args => {
+        %args_tapi,
+        hold => {
+            summary => 'Show held balance instead of available-to-trade balance',
+            schema => ['bool*', is=>1],
+        },
+    },
+};
+sub balance {
+    my %args = @_;
+    _init(\%args);
+
+    my $res = $btcindo->get_info;
+    [200, "OK", $args{hold} ? $res->{return}{balance_hold} : $res->{return}{balance}];
+}
+
+$SPEC{tx_history} = {
+    v => 1.1,
+    summary => 'Show history of deposits and withdrawals',
+    args => {
+        %args_tapi,
+        %arg_filter_txtype,
+        %arg_filter_currency,
+    },
+};
+sub tx_history {
+    my %args = @_;
+    _init(\%args);
+
+    my $res = $btcindo->get_tx_history->{return};
+
+    # rearrange into a single table
+    my @rows;
+    for my $txtype (sort keys %$res) {
+        my $v1 = $res->{$txtype};
+        for my $currency (sort keys %$v1) {
+            my $v2 = $v1->{$currency};
+            for my $row (@$v2) {
+                next if $args{txtype} && $txtype ne $args{txtype};
+                next if $args{currency} && $currency ne $args{currency};
+                $row->{txtype} = $txtype;
+                $row->{currency} = $currency;
+                push @rows, $row;
+            }
+        }
+    }
+
+    my $fnum0 = [number => {precision=>0}];
+
+    my $resmeta = {};
+    $resmeta->{'table.fields'}        = [qw/txtype currency type deposit_id amount rp fee submit_time success_time status/];
+    $resmeta->{'table.field_formats'} = [undef, undef, undef, undef, $fnum0, $fnum0, $fnum0, 'iso8601_datetime', 'iso8601_datetime', undef];
+    $resmeta->{'table.field_aligns'}  = [qw/left left left right right right right left left left/];
+
+    [200, "OK", \@rows, $resmeta];
+}
+
+$SPEC{trade_history} = {
+    v => 1.1,
+    summary => 'Show history of trades',
+    args => {
+        %args_tapi,
+        %arg_pair,
+        # XXX count
+        # XXX order asc/desc
+        %args_filter_trade_id,
+        %args_filter_time,
+    },
+};
+sub trade_history {
+    my %args = @_;
+    _init(\%args);
+
+    my $res = $btcindo->get_trade_history(
+        pair => $args{pair},
+        (since => $args{time_from}) x !!(defined $args{time_from}),
+        (end   => $args{time_to}  ) x !!(defined $args{time_to}  ),
+        (from_id => $args{trade_id_from}) x !!(defined $args{trade_id_from}),
+        (end_id  => $args{trade_id_to}  ) x !!(defined $args{trade_id_to}  ),
+    )->{return};
+
+    # rearrange into a single table
+    my @rows;
+    for my $row (@{ $res->{trades} }) {
+        push @rows, $row;
+    }
+
+    my $fnum0 = [number => {precision=>0}];
+    my $fnum8 = [number => {precision=>8}];
+
+    my $resmeta = {};
+    $resmeta->{'table.fields'}        = [qw/trade_id order_id trade_time type btc price fee/];
+    $resmeta->{'table.field_formats'} = [undef, undef, 'iso8601_datetime', undef, $fnum8, $fnum0, $fnum0];
+    $resmeta->{'table.field_aligns'}  = [qw/right right left left right right right/];
+
+    [200, "OK", \@rows, $resmeta];
+}
+
+$SPEC{open_orders} = {
+    v => 1.1,
+    summary => 'Show open orders',
+    args => {
+        %args_tapi,
+        %arg_pair,
+    },
+};
+sub open_orders {
+    my %args = @_;
+    _init(\%args);
+
+    my $res = $btcindo->get_open_orders(
+        pair => $args{pair},
+    )->{return};
+
+    # rearrange into a single table
+    my @rows;
+    for my $row (@{ $res->{orders} }) {
+        push @rows, $row;
+    }
+
+    my $fnum0 = [number => {precision=>0}];
+    my $fnum8 = [number => {precision=>8}];
+
+    my $resmeta = {};
+    $resmeta->{'table.fields'}        = [qw/order_id submit_time type price order_idr remain_idr order_btc remain_btc/];
+    $resmeta->{'table.field_formats'} = [undef, 'iso8601_datetime', undef, $fnum0, $fnum0, $fnum0, $fnum8, $fnum8];
+    $resmeta->{'table.field_aligns'}  = [qw/right left left right right right right right/];
+
+    [200, "OK", \@rows, $resmeta];
+}
+
+$SPEC{create_order} = {
+    v => 1.1,
+    summary => 'Create a new order',
+    args => {
+        %args_tapi,
+        %arg_pair,
+        %arg_0_type,
+        price => {
+            schema => 'posint*',
+            req => 1,
+            pos => 1,
+        },
+        idr => {
+            schema => 'posint*',
+            # Perinci::Sub::GetArgs::Argv not smart enough yet
+            #pos => 2,
+        },
+        btc => {
+            schema => 'float*',
+            # Perinci::Sub::GetArgs::Argv not smart enough yet
+            #pos => 2,
+        },
+    },
+    args_rels => {
+        req_one => [qw/idr btc/],
+    },
+};
+sub create_order {
+    my %args = @_;
+    _init(\%args);
+
+    my $res = $btcindo->create_order(
+        pair => $args{pair},
+        type => $args{type},
+        price => $args{price},
+        (idr => $args{idr}) x !!(defined $args{idr}),
+        (btc => $args{btc}) x !!(defined $args{btc}),
+    )->{return};
+
+    [200, "OK"];
+}
+
+$SPEC{cancel_order} = {
+    v => 1.1,
+    summary => 'Cancel an existing open order',
+    args => {
+        %args_tapi,
+        %arg_0_type,
+        order_id => {
+            schema => 'posint*',
+            req => 1,
+            pos => 1,
+        },
+    },
+};
+sub cancel_order {
+    my %args = @_;
+    _init(\%args);
+
+    my $res = $btcindo->cancel_order(
+        type => $args{type},
+        order_id => $args{order_id},
+    )->{return};
+
+    my $fnum0 = [number => {precision=>0}];
+    my $fnum8 = [number => {precision=>8}];
+
+    my $resmeta = {};
+    $resmeta->{'table.fields'}        = [qw/order_id submit_time type price order_idr remain_idr order_btc remain_btc/];
+    $resmeta->{'table.field_formats'} = [undef, 'iso8601_datetime', undef, $fnum0, $fnum0, $fnum0, $fnum8, $fnum8];
+    $resmeta->{'table.field_aligns'}  = [qw/right left left right right right right right/];
+
+    [200, "OK"];
+}
+
+# MAIN
+
+Perinci::CmdLine::Any->new(
+    url => '/main/',
+    subcommands => {
+        # public
+        ticker => { url => '/main/ticker', },
+        trades => { url => '/main/trades', },
+        depth => { url => '/main/depth', },
+        "price-history" => { url => '/main/price_history', },
+
+        info => { url => '/main/info', },
+        balance => { url => '/main/balance', },
+        "tx-history" => { url => '/main/tx_history', },
+        "trade-history" => { url => '/main/trade_history', },
+        "open-orders" => { url => '/main/open_orders', },
+        "create-order" => { url => '/main/create_order', },
+        "cancel-order" => { url => '/main/cancel_order', },
+
+        # aliases
+        "trade" => { url => '/main/create_order', },
+    },
+)->run;
+
+# ABSTRACT: CLI for bitcoin.co.id
+# PODNAME: btcindo
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+btcindo - CLI for bitcoin.co.id
+
+=head1 VERSION
+
+This document describes version 0.004 of btcindo (from Perl distribution App-btcindo), released on 2017-06-03.
+
+=head1 SYNOPSIS
+
+First, create an account at L<bitcoin.co.id>, create the trade API key then
+insert the API key and secret key in F<~/.config/btcindo.conf>. Since the
+configuration file contains the API secret key, please make sure that the
+permission of the file is set so that unauthorized users cannot read it (e.g.
+chmod it to 0600).
+
+ # In ~/.config/btcindo.conf
+ key = ...
+ secret = ...
+
+To show a ticker:
+
+ % btcindo ticker
+
+To show latest trades:
+
+ % btcindo trades
+
+To show your balance:
+
+ % btcindo balance
+
+To show transaction history (Rupiah deposits & withdrawals):
+
+ % btcindo tx-history
+
+To show your trade history:
+
+ % btcindo trade-history
+ % btcindo trade-history --time-from 2017-05-31
+ % btcindo trade-history --trade-id-from 1200000 --trade-id-to 1200100
+
+To show your open/pending orders:
+
+ % btcindo open-orders
+
+To create a new order:
+
+ # buy Rp 1.500.000-worth of bitcoin at Rp 34.000.000/BTC
+ % btcindo trade buy 34000000 --idr 1500000
+
+ # sell 0.01 bitcoin at Rp 38.000.000/BTC (create-order is alias for trade)
+ % btcindo create-order sell 38000000 --btc 0.01
+
+Cancel an existing order:
+
+ % btcindo cancel-order sell 2345678
+
+For other available commands, see the help message or documentation:
+
+ % btcindo -h
+
+=head1 SUBCOMMANDS
+
+=head2 B<balance>
+
+Show current balances.
+
+=head2 B<cancel-order>
+
+Cancel an existing open order.
+
+=head2 B<create-order>
+
+Create a new order.
+
+=head2 B<depth>
+
+Show depth.
+
+=head2 B<info>
+
+Show balance, server timestamp, and some other information.
+
+=head2 B<open-orders>
+
+Show open orders.
+
+=head2 B<price-history>
+
+Show price history, which can be used to draw candlestick chart.
+
+The function will return an array of records. Each record is an array with the
+following data:
+
+ [timestamp-in-unix-epoch, open, high, low, close]
+
+
+=head2 B<ticker>
+
+Show ticker.
+
+=head2 B<trade>
+
+Create a new order.
+
+=head2 B<trade-history>
+
+Show history of trades.
+
+=head2 B<trades>
+
+Show latest trades.
+
+=head2 B<tx-history>
+
+Show history of deposits and withdrawals.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Common options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=item B<--subcommands>
+
+List available subcommands.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head2 Options for subcommand balance
+
+=over
+
+=item B<--hold>
+
+Show held balance instead of available-to-trade balance.
+
+=item B<--key>=I<s>*
+
+=item B<--secret>=I<s>*
+
+=back
+
+=head2 Options for subcommand cancel-order
+
+=over
+
+=item B<--buy*>
+
+Alias for --type buy.
+
+See C<--type>.
+
+=item B<--key>=I<s>*
+
+=item B<--order-id>=I<i>*
+
+=item B<--secret>=I<s>*
+
+=item B<--sell*>
+
+Alias for --type sell.
+
+See C<--type>.
+
+=item B<--type>=I<s>*
+
+Valid values:
+
+ ["buy","sell"]
+
+=back
+
+=head2 Options for subcommand create-order
+
+=over
+
+=item B<--btc>=I<f>
+
+=item B<--buy*>
+
+Alias for --type buy.
+
+See C<--type>.
+
+=item B<--idr>=I<i>
+
+=item B<--key>=I<s>*
+
+=item B<--pair>=I<s>
+
+Pair.
+
+Default value:
+
+ "btc_idr"
+
+=item B<--price>=I<i>*
+
+=item B<--secret>=I<s>*
+
+=item B<--sell*>
+
+Alias for --type sell.
+
+See C<--type>.
+
+=item B<--type>=I<s>*
+
+Valid values:
+
+ ["buy","sell"]
+
+=back
+
+=head2 Options for subcommand depth
+
+=over
+
+=item B<--type>=I<s>
+
+Filter by type (buy/sell).
+
+Valid values:
+
+ ["buy","sell"]
+
+=back
+
+=head2 Options for subcommand info
+
+=over
+
+=item B<--key>=I<s>*
+
+=item B<--secret>=I<s>*
+
+=back
+
+=head2 Options for subcommand open-orders
+
+=over
+
+=item B<--key>=I<s>*
+
+=item B<--pair>=I<s>
+
+Pair.
+
+Default value:
+
+ "btc_idr"
+
+=item B<--secret>=I<s>*
+
+=back
+
+=head2 Options for subcommand price-history
+
+=over
+
+=item B<--period>=I<s>
+
+Default value:
+
+ "day"
+
+Valid values:
+
+ ["day","all"]
+
+=back
+
+=head2 Options for subcommand trade
+
+=over
+
+=item B<--btc>=I<f>
+
+=item B<--buy*>
+
+Alias for --type buy.
+
+See C<--type>.
+
+=item B<--idr>=I<i>
+
+=item B<--key>=I<s>*
+
+=item B<--pair>=I<s>
+
+Pair.
+
+Default value:
+
+ "btc_idr"
+
+=item B<--price>=I<i>*
+
+=item B<--secret>=I<s>*
+
+=item B<--sell*>
+
+Alias for --type sell.
+
+See C<--type>.
+
+=item B<--type>=I<s>*
+
+Valid values:
+
+ ["buy","sell"]
+
+=back
+
+=head2 Options for subcommand trade-history
+
+=over
+
+=item B<--key>=I<s>*
+
+=item B<--pair>=I<s>
+
+Pair.
+
+Default value:
+
+ "btc_idr"
+
+=item B<--secret>=I<s>*
+
+=item B<--time-from>=I<s>
+
+Filter by beginning time.
+
+=item B<--time-to>=I<s>
+
+Filter by ending time.
+
+=item B<--trade-id-from>=I<i>
+
+Filter by beginning trade ID.
+
+=item B<--trade-id-to>=I<i>
+
+Filter by ending trade ID.
+
+=back
+
+=head2 Options for subcommand trades
+
+=over
+
+=item B<--type>=I<s>
+
+Filter by type (buy/sell).
+
+Valid values:
+
+ ["buy","sell"]
+
+=back
+
+=head2 Options for subcommand tx-history
+
+=over
+
+=item B<--key>=I<s>*
+
+=item B<--secret>=I<s>*
+
+=item B<--txtype>=I<s>
+
+Filter by currency.
+
+Valid values:
+
+ ["btc","bts","crave","doge","drk","eth","idr","ltc","nbt","nem","nxt","sdc","str","xpy","xrp"]
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C btcindo btcindo
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install L<shcompgen> which allows you to
+activate completion scripts for several kinds of scripts on multiple shells.
+Some CPAN distributions (those that are built with
+L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
+completion for their included scripts (using L<shcompgen>) at installation time,
+so you can immediately have tab completion.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete btcindo 'p/*/`btcindo`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/btcindo.conf>, F<~/btcindo.conf>, or F</etc/btcindo.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+To put configuration for a certain subcommand only, use a section name like C<[subcommand=NAME]> or C<[SOMESECTION subcommand=NAME]>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]> or C<[subcommand=SUBCOMMAND_NAME profile=SOMENAME]> or C<[SOMESECTION subcommand=SUBCOMMAND_NAME profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+=head2 Common for all subcommands
+
+ format (see --format)
+ naked_res (see --naked-res)
+
+=head2 Configuration for subcommand 'balance'
+
+ hold (see --hold)
+ key (see --key)
+ secret (see --secret)
+
+=head2 Configuration for subcommand 'cancel-order'
+
+ key (see --key)
+ order_id (see --order-id)
+ secret (see --secret)
+ type (see --type)
+
+=head2 Configuration for subcommand 'create-order'
+
+ btc (see --btc)
+ idr (see --idr)
+ key (see --key)
+ pair (see --pair)
+ price (see --price)
+ secret (see --secret)
+ type (see --type)
+
+=head2 Configuration for subcommand 'depth'
+
+ type (see --type)
+
+=head2 Configuration for subcommand 'info'
+
+ key (see --key)
+ secret (see --secret)
+
+=head2 Configuration for subcommand 'open-orders'
+
+ key (see --key)
+ pair (see --pair)
+ secret (see --secret)
+
+=head2 Configuration for subcommand 'price-history'
+
+ period (see --period)
+
+=head2 Configuration for subcommand 'ticker'
+
+
+=head2 Configuration for subcommand 'trade'
+
+ btc (see --btc)
+ idr (see --idr)
+ key (see --key)
+ pair (see --pair)
+ price (see --price)
+ secret (see --secret)
+ type (see --type)
+
+=head2 Configuration for subcommand 'trade-history'
+
+ key (see --key)
+ pair (see --pair)
+ secret (see --secret)
+ time_from (see --time-from)
+ time_to (see --time-to)
+ trade_id_from (see --trade-id-from)
+ trade_id_to (see --trade-id-to)
+
+=head2 Configuration for subcommand 'trades'
+
+ type (see --type)
+
+=head2 Configuration for subcommand 'tx-history'
+
+ key (see --key)
+ secret (see --secret)
+ txtype (see --txtype)
+
+=head1 ENVIRONMENT
+
+=head2 BTCINDO_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/btcindo.conf>
+
+F<~/btcindo.conf>
+
+F</etc/btcindo.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-btcindo>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-btcindo>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-btcindo>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

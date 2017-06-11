@@ -1,5 +1,12 @@
 Revision history for BankAccount::Validator::UK
 
+0.30  2017-06-10T13:50:00:+01:00
+      - Updated the valacdos.txt dated 2017-07-03.
+      - Removed the following sorting codes from the range
+        400516 - 404799 DBIAI: 401055, 401199, 401266, 401276 - 401279, 401900, 401950 and 404375 - 404384.
+      - Amended the weight for the following sorting codes from the range
+        400516 - 404788 Mod 11: 401055, 401199, 401266, 401276 - 401279, 401900, 401950 and 404375 - 404384.
+
 0.29  2017-05-11T19:55:00:+01:00
       - Addition of new sorting codes. (v4.20)
       - Updated the valacdos.txt dated 12th Jun'2017.

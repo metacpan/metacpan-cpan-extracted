@@ -6,7 +6,7 @@ use strict;
 use warnings;
 no  warnings 'syntax';
 
-our $VERSION = '2017040401';
+our $VERSION = '2017060201';
 our %RE;
 our %sub_interface;
 our $AUTOLOAD;
@@ -727,7 +727,7 @@ Provides regexes for lists.
 
 =item Regexp::Common::net
 
-Provides regexes for IPv4 addresses and MAC addresses.
+Provides regexes for IPv4, IPv6, and MAC addresses.
 
 =item Regexp::Common::number
 
@@ -861,7 +861,7 @@ bug. If you want the pattern to be anchored, use something like:
 
 =head1 LICENSE and COPYRIGHT
 
-This software is Copyright (c) 2001 - 2016, Damian Conway and Abigail.
+This software is Copyright (c) 2001 - 2017, Damian Conway and Abigail.
 
 This module is free software, and maybe used under any of the following
 licenses:

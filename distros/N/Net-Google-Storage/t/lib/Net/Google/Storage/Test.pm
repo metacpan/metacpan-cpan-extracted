@@ -88,7 +88,7 @@ sub bucket_2_create : Test(6)
 	my $existing_bucket = $gs->get_bucket($new_bucket_name);
 	is($existing_bucket, undef, 'Bucket does not exist yet') or return "Test bucket $new_bucket_name already exists";
 	
-	my $bucket = $gs->insert_bucket({id => $new_bucket_name});
+	my $bucket = $gs->insert_bucket({name => $new_bucket_name});
 	isa_ok($bucket, 'Net::Google::Storage::Bucket');
 	is($bucket->id, $new_bucket_name);
 	
@@ -130,11 +130,10 @@ sub object_1_view : Test(4)
 	my $existing_object = $gs->get_object(bucket => $test_bucket_name, object => $test_object_name);
 	isa_ok($existing_object, 'Net::Google::Storage::Object');
 	is($existing_object->name, $test_object_name);
-	my $media = $existing_object->media;
-	is($media->{timeCreated}, $self->{config}->{test_bucket}->{known_object}->{created});
-	if($media->{algorithm} eq 'MD5')
+	is($existing_object->timeCreated, $self->{config}->{test_bucket}->{known_object}->{created});
+	if($existing_object->md5Hash)
 	{
-		is($media->{hash}, $self->{config}->{test_bucket}->{known_object}->{md5sum}, 'MD5 hash matches metadata');
+		is($existing_object->md5Hash, $self->{config}->{test_bucket}->{known_object}->{md5sum}, 'MD5 hash matches metadata');
 	}
 	else
 	{
@@ -156,7 +155,7 @@ sub object_2_download : Test(2)
 	ok(-e $filename);
 	my $ctx = Digest::MD5->new;
 	$ctx->addfile($fh);
-	is($ctx->hexdigest, $self->{config}->{test_bucket}->{known_object}->{md5sum}, 'MD5 hash matches downloaded file');
+	is($ctx->b64digest . '==', $self->{config}->{test_bucket}->{known_object}->{md5sum}, 'MD5 hash matches downloaded file');
 }
 
 sub object_3_list : Test(3)
@@ -192,13 +191,12 @@ sub object_4_upload : Test(5)
 	my $new_object = $gs->insert_object(bucket => $test_bucket_name, object => {name => $filename, media => {}}, filename => $filename);
 	isa_ok($new_object, 'Net::Google::Storage::Object');
 	is($new_object->name, $filename);
-	my $media = $new_object->media;
-	if($media->{algorithm} eq 'MD5')
+	if($new_object->md5Hash)
 	{
 		my $ctx = Digest::MD5->new;
 		open(my $fh, '<', $filename);
 		$ctx->addfile($fh);
-		is($media->{hash}, $ctx->hexdigest, 'MD5 hash metadata matches uploaded file');
+		is($new_object->md5Hash, $ctx->b64digest . '==', 'MD5 hash metadata matches uploaded file');
 	}
 	else
 	{

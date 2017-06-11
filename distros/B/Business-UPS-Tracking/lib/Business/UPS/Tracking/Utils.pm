@@ -24,26 +24,26 @@ Business::UPS::Tracking::Utils - Utility functions
 =head1 SYNOPSIS
 
  use Business::UPS::Tracking::Utils;
- 
+
 =head1 DESCRIPTION
 
-This module provides some basic utility functions for 
-L<Business::UPS::Tracking> and defines some Moose type constraints and 
+This module provides some basic utility functions for
+L<Business::UPS::Tracking> and defines some Moose type constraints and
 coercions.
- 
+
 =head1 FUNCTIONS
 
 =cut
 
-subtype 'Business::UPS::Tracking::Type::XMLDocument' 
+subtype 'Business::UPS::Tracking::Type::XMLDocument'
     => as class_type('XML::LibXML::Document');
 
-coerce 'Business::UPS::Tracking::Type::XMLDocument' 
-    => from 'Str' 
+coerce 'Business::UPS::Tracking::Type::XMLDocument'
+    => from 'Str'
     => via {
         my $xml = $_;
         $xml = decode("iso-8859-1", $xml);
-        
+
         my $parser = XML::LibXML->new(
             #encoding    => 'iso-8859-15'
         );
@@ -56,37 +56,37 @@ coerce 'Business::UPS::Tracking::Type::XMLDocument'
             );
         }
     };
-    
-subtype 'Business::UPS::Tracking::Type::Date' 
+
+subtype 'Business::UPS::Tracking::Type::Date'
     => as class_type('DateTime');
 
-subtype 'Business::UPS::Tracking::Type::DateStr' 
-    => as 'Str' 
+subtype 'Business::UPS::Tracking::Type::DateStr'
+    => as 'Str'
     => where {
-        m/^ 
+        m/^
             (19|20)\d\d #year
             (0[1-9]|1[012]) #month
             (3[01]|[12]\d|0[1-9]) #day
         $/x;
     };
 
-coerce 'Business::UPS::Tracking::Type::DateStr' 
-    => from 'Business::UPS::Tracking::Type::Date' 
+coerce 'Business::UPS::Tracking::Type::DateStr'
+    => from 'Business::UPS::Tracking::Type::Date'
     => via {
         return $_->format_cldr('yyyyMMdd');
     };
 
 subtype 'Business::UPS::Tracking::Type::TrackingNumber'
     => as 'Str'
-    => where { 
+    => where {
         my $trackingnumber = $_;
-        return 0 
-            unless ($trackingnumber =~ m/^1Z(?<tracking>[A-Z0-9]{8}\d{7})(?<checksum>\d)$/); 
+        return 0
+            unless ($trackingnumber =~ m/^1Z(?<tracking>[A-Z0-9]{8}\d{7})(?<checksum>\d)$/);
         # Checksum check fails because UPS testdata has invalid checksum!
         return 1
             unless $Business::UPS::Tracking::CHECKSUM;
         my $checksum = $+{checksum};
-        my $tracking = $+{tracking}; 
+        my $tracking = $+{tracking};
         $tracking =~ tr/ABCDEFGHIJKLMNOPQRSTUVWXYZ/23456789012345678901234567/;
         my ($odd,$even,$pos) = (0,0,0);
         foreach (split //,$tracking) {
@@ -121,7 +121,7 @@ Parses a date string (YYYYMMDD) and returns a L<DateTime> object.
 
 sub parse_date {
     my $datestr = shift;
-    
+
     return
         unless $datestr
         && $datestr =~ m/^
@@ -129,7 +129,7 @@ sub parse_date {
             (?<month>0[1-9]|1[012])
             (?<day>3[01]|[12]\d|0[1-9])
         $/x;
-    
+
     return try {
         DateTime->new(
             year    => $+{year},
@@ -155,18 +155,18 @@ L<DateTime> object
 
 sub parse_time {
     my ($timestr,$datetime) = @_;
-    
-    return 
+
+    return
         unless $datetime;
-    
+
     return $datetime
-        unless $timestr 
+        unless $timestr
         && $timestr =~ m/^
             (?<hour>\d\d)
             (?<minute>\d\d)
             (?<second>\d\d)
         $/x;
-    
+
    try {
         $datetime->set_hour( $+{hour} );
         $datetime->set_minute( $+{minute} );
@@ -193,13 +193,13 @@ Escapes a string for xml
 
 sub escape_xml {
     my ($string) = @_;
-    
+
     $string =~ s/&/&amp;/g;
     $string =~ s/</&gt;/g;
     $string =~ s/>/&lt;/g;
     $string =~ s/"/&qout;/g;
     $string =~ s/'/&apos;/g;
-    
+
     return $string;
 }
 

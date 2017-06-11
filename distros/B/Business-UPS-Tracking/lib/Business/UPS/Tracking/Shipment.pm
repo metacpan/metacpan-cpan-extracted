@@ -18,9 +18,9 @@ Business::UPS::Tracking::Shipment - Base class for shipments
 
 =head1 DESCRIPTION
 
-This class is a base class for 
-L<Business::UPS::Tracking::Shipment::SmallPackage> and 
-L<Business::UPS::Tracking::Shipment::Freight>. Usually it is created 
+This class is a base class for
+L<Business::UPS::Tracking::Shipment::SmallPackage> and
+L<Business::UPS::Tracking::Shipment::Freight>. Usually it is created
 automatically from a L<Business::UPS::Tracking::Response> object. It provides
 accessors common to all shipment types.
 
@@ -54,17 +54,17 @@ object.
 
 =head2 ShipToAddress
 
-Shipment destination address. Returns a 
+Shipment destination address. Returns a
 L<Business::UPS::Tracking::Element::Address> object.
 
 =head2 Service
 
-Service code and description. 
+Service code and description.
 Returns a L<Business::UPS::Tracking::Element::Code> object.
 
 =head2 ShipmentReferenceNumber
 
-Reference number for the whole shipment as provided by the shipper. Returns a 
+Reference number for the whole shipment as provided by the shipper. Returns a
 L<Business::UPS::Tracking::Element::ReferenceNumber> object.
 
 =cut
@@ -159,37 +159,37 @@ sub _build_PickupDate {
 
 sub _build_ShipperNumber {
     my ($self) = @_;
-    
+
     return $self->xml->findvalue('Shipper/ShipperNumber');
 }
 
 sub _build_ShipperAddress {
     my ($self) = @_;
-    
+
     return $self->build_address('Shipper/Address');
 }
 
 sub _build_ShipmentWeight {
     my ($self) = @_;
-    
+
     return $self->build_weight('ShipmentWeight');
 }
 
 sub _build_ShipToAddress {
     my ($self) = @_;
-    
+
     return $self->build_address('ShipTo/Address');
 }
 
 sub _build_Service {
     my ($self) = @_;
-    
+
     return $self->build_code('Service');
 }
 
 sub _build_ReferenceNumber {
     my ($self) = @_;
-    
+
     return $self->build_referencenumber('ReferenceNumber');
 }
 

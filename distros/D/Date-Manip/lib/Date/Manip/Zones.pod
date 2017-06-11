@@ -5,9 +5,9 @@
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Wed Mar  1 10:25:48 EST 2017
-#    Data version: tzdata2017a
-#    Code version: tzcode2017a
+#    Generated on: Tue May 30 10:45:15 EDT 2017
+#    Data version: tzdata2017b
+#    Code version: tzcode2017b
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -846,10 +846,10 @@ default alias can be overridden as described above.
                                           America/Indiana/Winamac
                                           America/Thunder_Bay
                                           America/Iqaluit
+                                          America/Port-au-Prince
                                           America/Pangnirtung
                                           America/Kentucky/Monticello
                                           America/Indiana/Petersburg
-                                          America/Port-au-Prince
                                           America/Grand_Turk
                                           America/Cancun
                                           America/Jamaica
@@ -2334,11 +2334,11 @@ L<Date::Manip::TZ> module.
                         America/Indiana/Vevay
                         America/Indiana/Vincennes
                         America/Indiana/Winamac
+                        America/Port-au-Prince
                         America/Pangnirtung
                         America/Kentucky/Monticello
                         America/Indiana/Petersburg
                         America/Grand_Turk
-                        America/Port-au-Prince
                         America/Cancun
                         America/Eirunepe
                         America/Lima
@@ -3048,11 +3048,11 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       America/Indiana/Winamac
                       America/Thunder_Bay
                       America/Iqaluit
+                      America/Port-au-Prince
                       America/Pangnirtung
                       America/Kentucky/Monticello
                       America/Indiana/Petersburg
                       America/Grand_Turk
-                      America/Port-au-Prince
                       America/Cancun
                       America/Jamaica
                       America/Indiana/Tell_City
@@ -3262,12 +3262,12 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       America/Regina
      MEST             MET
      MET              MET
-     MMT              Indian/Maldives
+     MMT              Africa/Monrovia
+                      Indian/Maldives
                       America/Managua
                       Asia/Makassar
                       Europe/Minsk
                       America/Montevideo
-                      Africa/Monrovia
                       Europe/Moscow
                       Asia/Colombo
      MPT              America/Denver

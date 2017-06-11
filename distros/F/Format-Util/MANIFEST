@@ -13,6 +13,7 @@ dist.ini
 lib/Format/Util.pm
 lib/Format/Util/Numbers.pm
 lib/Format/Util/Strings.pm
+share/precision.yml
 t/00-check-deps.t
 t/00-compile.t
 t/00-report-prereqs.dd

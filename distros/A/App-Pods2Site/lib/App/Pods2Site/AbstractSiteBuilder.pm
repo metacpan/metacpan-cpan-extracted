@@ -19,6 +19,11 @@ sub new
 	return $self;
 }
 
+sub makeSite
+{
+	# do nothing
+}
+
 sub prepareCss
 {
 	my $self = shift;
@@ -29,25 +34,28 @@ sub prepareCss
 	my $sbName = $self->getStyleName();
 	my $sbCssContent = $self->_getCssContent();
 
-	my $sbCssFile = slashify("$sitedir/$sbName.css");
-	writeUTF8File($sbCssFile, $sbCssContent);
-
-	my $systemCSSContent = <<SYSCSS;
+	if ($sbCssContent)
+	{
+		my $sbCssFile = slashify("$sitedir/$sbName.css");
+		writeUTF8File($sbCssFile, $sbCssContent);
+	
+		my $systemCSSContent = <<SYSCSS;
 \@charset "UTF-8";
 \@import url($sbName.css);
 SYSCSS
  	
-	my $inUserCSSFile = $args->getCSS();
-	if ($inUserCSSFile)
-	{
-		my $outUserCSSFile = slashify("$sitedir/user.css");
-		copy($inUserCSSFile, $outUserCSSFile) || die("Failed to copy CSS '$inUserCSSFile' => '$outUserCSSFile': $!\n");
-		$systemCSSContent .= "\@import url(user.css)";
-	}
+		my $inUserCSSFile = $args->getCSS();
+		if ($inUserCSSFile)
+		{
+			my $outUserCSSFile = slashify("$sitedir/user.css");
+			copy($inUserCSSFile, $outUserCSSFile) || die("Failed to copy CSS '$inUserCSSFile' => '$outUserCSSFile': $!\n");
+			$systemCSSContent .= "\@import url(user.css)";
+		}
 
-	my $sysCssName = $self->getSystemCssName();
-	my $systemCSSFile = slashify("$sitedir/$sysCssName.css");
-	writeUTF8File($systemCSSFile, $systemCSSContent);
+		my $sysCssName = $self->getSystemCssName();
+		my $systemCSSFile = slashify("$sitedir/$sysCssName.css");
+		writeUTF8File($systemCSSFile, $systemCSSContent);
+	}
 }
 
 sub getStyleName
@@ -64,7 +72,7 @@ sub getSystemCssName
 
 sub _getCssContent
 {
-	die("Missing override: getCssContent()");
+	# do nothing
 }
 
 1;

@@ -1,0 +1,66 @@
+{
+   "abstract" : "Some utility functions from libUV.",
+   "author" : [
+      "Chase Whitener <capoeirab@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.28, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "UV-Util",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "examples",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.12"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.12",
+            "File::Spec" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.12",
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/genio/p5-UV-Util"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/genio/p5-UV-Util.git",
+         "web" : "https://github.com/genio/p5-UV-Util"
+      },
+      "x_IRC" : "irc://irc.perl.org/#perl"
+   },
+   "version" : "0.002",
+   "x_serialization_backend" : "JSON::PP version 2.94"
+}

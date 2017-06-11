@@ -9,8 +9,9 @@ README
 cpanfile
 dist.ini
 lib/Datahub/Factory/Arthub.pm
+lib/Datahub/Factory/Exporter/Arthub.pm
+lib/Datahub/Factory/Importer/EIZ.pm
 lib/Datahub/Factory/Importer/KMSKA.pm
-lib/Datahub/Factory/Importer/MSK.pm
 lib/Datahub/Factory/Importer/TMS/Index.pm
 lib/Datahub/Factory/Importer/VKC.pm
 lib/Datahub/Factory/Module/PID.pm

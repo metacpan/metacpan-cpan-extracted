@@ -1,6 +1,11 @@
 History for Mojolicious::Plugin::I18NUtils
 ==========================================
 
+0.20 2017-06-07
+
+  [DOCUMENTATION]
+  * Documentation for currency() was wrong. Thanks to dmanto for filing the bug (#9)
+
 0.19 2015-11-17
 
   [IMPROVEMENTS]

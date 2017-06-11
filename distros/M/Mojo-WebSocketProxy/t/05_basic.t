@@ -103,7 +103,7 @@ is_deeply $res,
     {
     'error' => {
         'code'    => 'UnrecognisedRequest',
-        'message' => 'Unrecognised request.'
+        'message' => 'Unrecognised request'
     },
     'debug'    => 1,
     'msg_type' => 'error'

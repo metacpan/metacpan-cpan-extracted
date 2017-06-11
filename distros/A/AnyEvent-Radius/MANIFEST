@@ -9,5 +9,6 @@ lib/AnyEvent/Radius.pm
 lib/AnyEvent/Radius/Client.pm
 lib/AnyEvent/Radius/Server.pm
 t/client-server.t
+t/socket-cleanup.t
 example/client.pl
 example/server.pl

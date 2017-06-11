@@ -4,9 +4,8 @@ use strict;
 use warnings;
 use Locale::Utils::PlaceholderBabelFish;
 use Moo::Role;
-use namespace::autoclean;
 
-our $VERSION = '1.025';
+our $VERSION = '1.027';
 
 requires qw(
     translate
@@ -92,7 +91,7 @@ $HeadURL: $
 
 =head1 VERSION
 
-1.025
+1.027
 
 =head1 DESCRIPTION
 
@@ -230,8 +229,6 @@ none
 L<Locale::Utils::PlaceholderBabelFish|Locale::Utils::PlaceholderBabelFish>
 
 L<Moo::Role|Moo::Role>
-
-L<namespace::autoclean|namespace::autoclean>
 
 =head1 INCOMPATIBILITIES
 

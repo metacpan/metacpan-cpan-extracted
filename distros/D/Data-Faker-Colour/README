@@ -1,0 +1,33 @@
+Data-Faker-Colour version 0.001
+===============================
+
+This module is a plugin for Data::Faker for generating random colours.
+It uses the HSLuv colour space to permit generation of colours with
+specific hue, saturation, or lightness values. One use case would be
+generating colour schemes.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+* Convert::Colour::HSLuv
+* Data::Faker
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2017 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.24.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

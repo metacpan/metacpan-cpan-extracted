@@ -32,3 +32,6 @@ xt/release/dist-manifest.t
 xt/release/kwalitee.t
 xt/release/localbrew-pristine-5.18.t
 xt/release/localbrew-pristine-5.20.t
+xt/release/localbrew-pristine-5.22.t
+xt/release/localbrew-pristine-5.24.t
+xt/release/localbrew-pristine-5.26.t

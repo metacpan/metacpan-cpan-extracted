@@ -17,6 +17,9 @@
 #define PERLIO_NOT_STDIO 1
 #include "perl.h"
 #include "XSUB.h"
+
+static int not_here(const char *s);
+
 #if defined(PERL_IMPLICIT_SYS)
 #  undef signal
 #  undef open
@@ -35,7 +38,9 @@
 #include <float.h>
 #endif
 #ifdef I_FENV
+#if !(defined(__vax__) && defined(__NetBSD__))
 #include <fenv.h>
+#endif
 #endif
 #ifdef I_LIMITS
 #include <limits.h>
@@ -704,7 +709,11 @@ static NV my_expm1(NV x)
 #ifndef c99_fdim
 static NV my_fdim(NV x, NV y)
 {
+#ifdef NV_NAN
   return (Perl_isnan(x) || Perl_isnan(y)) ? NV_NAN : (x > y ? x - y : 0);
+#else
+  return (x > y ? x - y : 0);
+#endif
 }
 #  define c99_fdim my_fdim
 #endif
@@ -720,11 +729,13 @@ static NV my_fma(NV x, NV y, NV z)
 #ifndef c99_fmax
 static NV my_fmax(NV x, NV y)
 {
+#ifdef NV_NAN
   if (Perl_isnan(x)) {
     return Perl_isnan(y) ? NV_NAN : y;
   } else if (Perl_isnan(y)) {
     return x;
   }
+#endif
   return x > y ? x : y;
 }
 #  define c99_fmax my_fmax
@@ -733,11 +744,13 @@ static NV my_fmax(NV x, NV y)
 #ifndef c99_fmin
 static NV my_fmin(NV x, NV y)
 {
+#ifdef NV_NAN
   if (Perl_isnan(x)) {
     return Perl_isnan(y) ? NV_NAN : y;
   } else if (Perl_isnan(y)) {
     return x;
   }
+#endif
   return x < y ? x : y;
 }
 #  define c99_fmin my_fmin
@@ -768,8 +781,10 @@ static NV my_hypot(NV x, NV y)
   x = PERL_ABS(x); /* Take absolute values. */
   if (y == 0)
     return x;
+#ifdef NV_INF
   if (Perl_isnan(y))
     return NV_INF;
+#endif
   y = PERL_ABS(y);
   if (x < y) { /* Swap so that y is less. */
     t = x;
@@ -816,10 +831,18 @@ static NV my_lgamma(NV x);
 static NV my_tgamma(NV x)
 {
   const NV gamma = 0.577215664901532860606512090; /* Euler's gamma constant. */
+#ifdef NV_NAN
   if (Perl_isnan(x) || x < 0.0)
     return NV_NAN;
+#endif
+#ifdef NV_INF
   if (x == 0.0 || x == NV_INF)
+#ifdef DOUBLE_IS_IEEE_FORMAT
     return x == -0.0 ? -NV_INF : NV_INF;
+#else
+    return NV_INF;
+#endif
+#endif
 
   /* The function domain is split into three intervals:
    * (0, 0.001), [0.001, 12), and (12, infinity) */
@@ -891,6 +914,7 @@ static NV my_tgamma(NV x)
     return result;
   }
 
+#ifdef NV_INF
   /* Third interval: [12, +Inf) */
 #if LDBL_MANT_DIG == 113 /* IEEE quad prec */
   if (x > 1755.548) {
@@ -901,6 +925,7 @@ static NV my_tgamma(NV x)
     return NV_INF;
   }
 #endif
+#endif
 
   return Perl_exp(c99_lgamma(x));
 }
@@ -909,10 +934,14 @@ static NV my_tgamma(NV x)
 #ifdef USE_MY_LGAMMA
 static NV my_lgamma(NV x)
 {
+#ifdef NV_NAN
   if (Perl_isnan(x))
     return NV_NAN;
+#endif
+#ifdef NV_INF
   if (x <= 0 || x == NV_INF)
     return NV_INF;
+#endif
   if (x == 1.0 || x == 2.0)
     return 0;
   if (x < 12.0)
@@ -953,10 +982,14 @@ static NV my_log1p(NV x)
 {
   /* http://www.johndcook.com/cpp_log_one_plus_x.html -- public domain.
    * Taylor series, the first four terms (the last term quartic). */
+#ifdef NV_NAN
   if (x < -1.0)
     return NV_NAN;
+#endif
+#ifdef NV_INF
   if (x == -1.0)
     return -NV_INF;
+#endif
   if (PERL_ABS(x) > 1e-4)
     return Perl_log(1.0 + x);
   else
@@ -1032,7 +1065,7 @@ static NV my_rint(NV x)
   case FE_TOWARDZERO: return MY_ROUND_TRUNC(x);
   case FE_DOWNWARD:   return MY_ROUND_DOWN(x);
   case FE_UPWARD:     return MY_ROUND_UP(x);
-  default: return NV_NAN;
+  default: break;
   }
 #elif defined(HAS_FPGETROUND)
   switch (fpgetround()) {
@@ -1040,11 +1073,10 @@ static NV my_rint(NV x)
   case FP_RZ: return MY_ROUND_TRUNC(x);
   case FP_RM: return MY_ROUND_DOWN(x);
   case FE_RP: return MY_ROUND_UP(x);
-  default: return NV_NAN;
+  default: break;
   }
-#else
-  return NV_NAN;
 #endif
+  not_here("rint");
 }
 #endif
 
@@ -1118,6 +1150,8 @@ static NV my_trunc(NV x)
 #  define c99_trunc my_trunc
 #endif
 
+#ifdef NV_NAN
+
 #undef NV_PAYLOAD_DEBUG
 
 /* NOTE: the NaN payload API implementation is hand-rolled, since the
@@ -1153,10 +1187,12 @@ static NV my_trunc(NV x)
 #  define NV_PAYLOAD_TYPE NV
 #endif
 
-#ifdef LONGDOUBLE_DOUBLEDOUBLE
-#  define NV_PAYLOAD_SIZEOF_ASSERT(a) assert(sizeof(a) == NVSIZE / 2)
+#if defined(USE_LONG_DOUBLE) && defined(LONGDOUBLE_DOUBLEDOUBLE)
+#  define NV_PAYLOAD_SIZEOF_ASSERT(a) \
+    STATIC_ASSERT_STMT(sizeof(a) == NVSIZE / 2)
 #else
-#  define NV_PAYLOAD_SIZEOF_ASSERT(a) assert(sizeof(a) == NVSIZE)
+#  define NV_PAYLOAD_SIZEOF_ASSERT(a) \
+    STATIC_ASSERT_STMT(sizeof(a) == NVSIZE)
 #endif
 
 static void S_setpayload(NV* nvp, NV_PAYLOAD_TYPE payload, bool signaling)
@@ -1178,7 +1214,7 @@ static void S_setpayload(NV* nvp, NV_PAYLOAD_TYPE payload, bool signaling)
   {
     NV t1 = c99_trunc(payload); /* towards zero (drop fractional) */
 #ifdef NV_PAYLOAD_DEBUG
-    Perl_warn(aTHX_ "t1 = %"NVgf" (payload %"NVgf")\n", t1, payload);
+    Perl_warn(aTHX_ "t1 = %" NVgf " (payload %" NVgf ")\n", t1, payload);
 #endif
     if (t1 <= UV_MAX) {
       a[0] = (UV)t1;  /* Fast path, also avoids rounding errors (right?) */
@@ -1208,7 +1244,7 @@ static void S_setpayload(NV* nvp, NV_PAYLOAD_TYPE payload, bool signaling)
 #endif
 #ifdef NV_PAYLOAD_DEBUG
   for (i = 0; i < (int)C_ARRAY_LENGTH(a); i++) {
-    Perl_warn(aTHX_ "a[%d] = 0x%"UVxf"\n", i, a[i]);
+    Perl_warn(aTHX_ "a[%d] = 0x%" UVxf "\n", i, a[i]);
   }
 #endif
   for (i = 0; i < (int)sizeof(p); i++) {
@@ -1219,7 +1255,9 @@ static void S_setpayload(NV* nvp, NV_PAYLOAD_TYPE payload, bool signaling)
       ((U8 *)(nvp))[i] &= ~m[i]; /* For NaNs with non-zero payload bits. */
       ((U8 *)(nvp))[i] |= b;
 #ifdef NV_PAYLOAD_DEBUG
-      Perl_warn(aTHX_ "set p[%2d] = %02x (i = %d, m = %02x, s = %2d, b = %02x, u = %08"UVxf")\n", i, ((U8 *)(nvp))[i], i, m[i], s, b, u);
+      Perl_warn(aTHX_
+                "set p[%2d] = %02x (i = %d, m = %02x, s = %2d, b = %02x, u = %08"
+                UVxf ")\n", i, ((U8 *)(nvp))[i], i, m[i], s, b, u);
 #endif
       a[p[i] / UVSIZE] &= ~u;
     }
@@ -1236,7 +1274,7 @@ static void S_setpayload(NV* nvp, NV_PAYLOAD_TYPE payload, bool signaling)
 #endif
   for (i = 0; i < (int)C_ARRAY_LENGTH(a); i++) {
     if (a[i]) {
-      Perl_warn(aTHX_ "payload lost bits (%"UVxf")", a[i]);
+      Perl_warn(aTHX_ "payload lost bits (%" UVxf ")", a[i]);
       break;
     }
   }
@@ -1267,7 +1305,7 @@ static NV_PAYLOAD_TYPE S_getpayload(NV nv)
   }
   for (i = (int)C_ARRAY_LENGTH(a) - 1; i >= 0; i--) {
 #ifdef NV_PAYLOAD_DEBUG
-    Perl_warn(aTHX_ "a[%d] = %"UVxf"\n", i, a[i]);
+    Perl_warn(aTHX_ "a[%d] = %" UVxf "\n", i, a[i]);
 #endif
     payload *= UV_MAX;
     payload += a[i];
@@ -1280,6 +1318,8 @@ static NV_PAYLOAD_TYPE S_getpayload(NV nv)
 #endif
   return payload;
 }
+
+#endif  /* #ifdef NV_NAN */
 
 /* XXX This comment is just to make I_TERMIO and I_SGTTY visible to
    metaconfig for future extension writers.  We don't use them in POSIX.
@@ -1662,6 +1702,11 @@ static void *
 allocate_struct(pTHX_ SV *rv, const STRLEN size, const char *packname) {
     SV *const t = newSVrv(rv, packname);
     void *const p = sv_grow(t, size + 1);
+
+    /* Ensure at least one use of not_here() to avoid "defined but not
+     * used" warning.  This is not at all related to allocate_struct(); I
+     * just needed somewhere to dump it - DAPM */
+    if (0) { not_here(""); }
 
     SvCUR_set(t, size);
     SvPOK_on(t);
@@ -2114,16 +2159,17 @@ localeconv()
 		    (void) hv_store(RETVAL,
                         strings->name,
                         strlen(strings->name),
-                        newSVpvn_utf8(value,
-                                      strlen(value),
+                        newSVpvn_utf8(
+                                value,
+                                strlen(value),
 
-                                      /* We mark it as UTF-8 if a utf8 locale
-                                       * and is valid and variant under UTF-8 */
-                                      is_utf8_locale
-                                        && ! is_invariant_string((U8 *) value, 0)
-                                        && is_utf8_string((U8 *) value, 0)),
-                        0);
-                }
+                                /* We mark it as UTF-8 if a utf8 locale and is
+                                 * valid and variant under UTF-8 */
+                                     is_utf8_locale
+                                && ! is_utf8_invariant_string((U8 *) value, 0)
+                                &&   is_utf8_string((U8 *) value, 0)),
+                    0);
+            }
                 strings++;
 	    }
 
@@ -2297,7 +2343,11 @@ acos(x)
 	y1 = 30
     CODE:
 	PERL_UNUSED_VAR(x);
+#ifdef NV_NAN
 	RETVAL = NV_NAN;
+#else
+	RETVAL = 0;
+#endif
 	switch (ix) {
 	case 0:
 	    RETVAL = Perl_acos(x); /* C89 math */
@@ -2592,7 +2642,12 @@ fpclassify(x)
 #ifdef Perl_signbit
 	    RETVAL = Perl_signbit(x);
 #else
-	    RETVAL = (x < 0) || (x == -0.0);
+	    RETVAL = (x < 0);
+#ifdef DOUBLE_IS_IEEE_FORMAT
+            if (x == -0.0) {
+              RETVAL = TRUE;
+            }
+#endif
 #endif
 	    break;
 	}
@@ -2603,7 +2658,13 @@ NV
 getpayload(nv)
 	NV nv
     CODE:
+#ifdef DOUBLE_HAS_NAN
 	RETVAL = S_getpayload(nv);
+#else
+        PERL_UNUSED_VAR(nv);
+        RETVAL = 0.0;
+	not_here("getpayload");
+#endif
     OUTPUT:
 	RETVAL
 
@@ -2612,7 +2673,13 @@ setpayload(nv, payload)
 	NV nv
 	NV payload
     CODE:
+#ifdef DOUBLE_HAS_NAN
 	S_setpayload(&nv, payload, FALSE);
+#else
+        PERL_UNUSED_VAR(nv);
+        PERL_UNUSED_VAR(payload);
+	not_here("setpayload");
+#endif
     OUTPUT:
 	nv
 
@@ -2621,8 +2688,14 @@ setpayloadsig(nv, payload)
 	NV nv
 	NV payload
     CODE:
+#ifdef DOUBLE_HAS_NAN
 	nv = NV_NAN;
 	S_setpayload(&nv, payload, TRUE);
+#else
+        PERL_UNUSED_VAR(nv);
+        PERL_UNUSED_VAR(payload);
+	not_here("setpayloadsig");
+#endif
     OUTPUT:
 	nv
 
@@ -2630,7 +2703,13 @@ int
 issignaling(nv)
 	NV nv
     CODE:
+#ifdef DOUBLE_HAS_NAN
 	RETVAL = Perl_isnan(nv) && NV_NAN_IS_SIGNALING(&nv);
+#else
+        PERL_UNUSED_VAR(nv);
+        RETVAL = 0.0;
+	not_here("issignaling");
+#endif
     OUTPUT:
 	RETVAL
 
@@ -2656,7 +2735,11 @@ copysign(x,y)
     CODE:
         PERL_UNUSED_VAR(x);
         PERL_UNUSED_VAR(y);
+#ifdef NV_NAN
 	RETVAL = NV_NAN;
+#else
+	RETVAL = 0;
+#endif
 	switch (ix) {
 	case 0:
 #ifdef c99_copysign
@@ -2850,9 +2933,14 @@ nan(payload = 0)
         }
 #elif defined(c99_nan)
 	{
-	  STRLEN elen = my_snprintf(PL_efloatbuf, PL_efloatsize, "%g", nv);
+	  STRLEN elen = my_snprintf(PL_efloatbuf, PL_efloatsize, "%g", payload);
           if ((IV)elen == -1) {
+#ifdef NV_NAN
 	    RETVAL = NV_NAN;
+#else            
+            RETVAL = 0.0;
+            not_here("nan");
+#endif
           } else {
             RETVAL = c99_nan(PL_efloatbuf);
           }
@@ -2870,7 +2958,11 @@ jn(x,y)
     ALIAS:
 	yn = 1
     CODE:
+#ifdef NV_NAN
 	RETVAL = NV_NAN;
+#else
+	RETVAL = 0;
+#endif
         switch (ix) {
 	case 0:
 #ifdef bessel_jn
@@ -2928,7 +3020,7 @@ sigaction(sig, optaction, oldaction = 0)
 	        const char *s = SvPVX_const(ST(0));
 		int i = whichsig(s);
 
-	        if (i < 0 && memEQ(s, "SIG", 3))
+	        if (i < 0 && _memEQs(s, "SIG"))
 		    i = whichsig(s + 3);
 	        if (i < 0) {
 	            if (ckWARN(WARN_SIGNAL))
@@ -3241,32 +3333,6 @@ write(fd, buffer, nbytes)
 	char *		buffer
 	size_t		nbytes
 
-SV *
-tmpnam()
-    PREINIT:
-	STRLEN i;
-	int len;
-    CODE:
-	RETVAL = newSVpvs("");
-	SvGROW(RETVAL, L_tmpnam);
-	/* Yes, we know tmpnam() is bad.  So bad that some compilers
-	 * and linkers warn against using it.  But it is here for
-	 * completeness.  POSIX.pod warns against using it.
-	 *
-	 * Then again, maybe this should be removed at some point.
-	 * No point in enabling dangerous interfaces. */
-        if (ckWARN_d(WARN_DEPRECATED)) {
-	    HV *warned = get_hv("POSIX::_warned", GV_ADD | GV_ADDMULTI);
-            if (! hv_exists(warned, (const char *)&PL_op, sizeof(PL_op))) {
-                Perl_warner(aTHX_ packWARN(WARN_DEPRECATED), "Calling POSIX::tmpnam() is deprecated");
-                (void)hv_store(warned, (const char *)&PL_op, sizeof(PL_op), &PL_sv_yes, 0);
-            }
-        }
-	len = strlen(tmpnam(SvPV(RETVAL, i)));
-	SvCUR_set(RETVAL, len);
-    OUTPUT:
-	RETVAL
-
 void
 abort()
 
@@ -3385,7 +3451,7 @@ strtoul(str, base = 0)
 	int		base
     PREINIT:
 	unsigned long num;
-	char *unparsed;
+	char *unparsed = NULL;
     PPCODE:
 	PERL_UNUSED_VAR(str);
 	PERL_UNUSED_VAR(base);
@@ -3520,7 +3586,7 @@ asctime(sec, min, hour, mday, mon, year, wday = 0, yday = 0, isdst = -1)
 		if (result == (time_t)-1)
 		    SvOK_off(TARG);
 		else if (result == 0)
-		    sv_setpvn(TARG, "0 but true", 10);
+		    sv_setpvs(TARG, "0 but true");
 		else
 		    sv_setiv(TARG, (IV)result);
 	    } else {
@@ -3586,7 +3652,7 @@ strftime(fmt, sec, min, hour, mday, mon, year, wday = -1, yday = -1, isdst = -1)
                 STRLEN len = strlen(buf);
 		sv_usepvn_flags(sv, buf, len, SV_HAS_TRAILING_NUL);
 		if (SvUTF8(fmt)
-                    || (! is_invariant_string((U8*) buf, len)
+                    || (! is_utf8_invariant_string((U8*) buf, len)
                         && is_utf8_string((U8*) buf, len)
 #ifdef USE_LOCALE_TIME
                         && _is_cur_LC_category_utf8(LC_TIME)

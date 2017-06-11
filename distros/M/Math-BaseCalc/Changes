@@ -1,5 +1,21 @@
 Revision history for Perl extension Math::BaseCalc.
 
+1.19 - Thu Jun  8 00:20:13 CDT 2017
+
+ - No code changes; didn't update the version number correctly in the last release.
+
+1.18 - Sat Jun  3 20:21:33 CDT 2017
+
+ - If '.' is part of the digit set, from_base() now deals it properly,
+   by not processing digits after a decimal point. [Atsushi Kato]
+
+ - Confirmed on Wikipedia that the base64 digit set is correct
+
+ - Fixed my email address
+
+ - Switched packaging to use Git::Tag
+
+
 1.17 - Fri Jun  7 21:54:56 CDT 2013
 
  - Fixed problem that occurs when digits of an M::BC object are

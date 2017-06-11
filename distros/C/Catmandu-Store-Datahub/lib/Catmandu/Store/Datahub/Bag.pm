@@ -38,14 +38,6 @@ around add => sub {
     return $self->$orig($data);
 };
 
-around update => sub {
-    my $orig = shift;
-    my ($self, $id, $data) = @_;
-    delete $data->{'_id'};
-    return $self->$orig($data);
-};
-
-
 sub generator {
     my $self = shift;
     # api/v1/data -> results ; not paginated
@@ -78,17 +70,7 @@ sub get {
 # Create a new record
 sub add {
     my ($self, $data) = @_;
-    my $url;
-    my $lido_data = $self->store->lido->to_xml($data);
-    return $self->api->add($lido_data, $data->{'lidoRecID'}->[0]->{'_'});
-}
-
-##
-# Update a record
-sub update {
-    my ($self, $id, $data) = @_;
-    my $lido_data = $self->store->lido->to_xml($data);
-    return $self->api->update($id, $lido_data);
+    return $self->api->update($data->{'id'}, $data->{'_'});
 }
 
 ##
@@ -100,6 +82,6 @@ sub delete {
 
 sub delete_all {}
 
-
-
 1;
+
+__END__

@@ -4,7 +4,8 @@ package IO::ReadPreProcess;
 # Read lines, process .if/.else/.fi, do .include .let .print - and more.
 # It provides IO::Handle-ish functions to slot in easily to most scripts.
 
-# Author Alain D D Williams <addw@phcomp.co.uk> March 2015, 2016, 2017 Copyright (C) the author.
+# Author: Alain D D Williams <addw@phcomp.co.uk> March 2015, 2016, 2017 Copyright (C) the author.
+# SCCS: @(#)ReadPreProcess.pm	1.12 06/03/17 16:59:37
 
 use 5.006;
 use strict;
@@ -17,7 +18,7 @@ our $errstr; # Error string
 
 use Math::Expression;
 
-our $VERSION = 0.80;
+our $VERSION = 0.83;
 
 # Control directive recognised by getline():
 my %ctlDirectives = map { $_ => 1 } qw/ break case close continue do done echo else elseif elsif endswitch error eval exit
@@ -1426,6 +1427,10 @@ files included: .if/.else/.elseif/.fi, do: .include .let .print, loops: .while
 
 Provides IO::Handle-ish functions and input diamond - thus easy to slot in to existing scripts.
 
+The preprocessing layer has variables that can be set and read by your perl code.
+In the input files they are set via C<.let> directives, and can be made part of your
+script's input with C<.echo> and C<\v{xxx}>.
+
 C<IO::ReadPreProcess> returns lines from the input stream.
 This may have directives that include:
 
@@ -1546,9 +1551,42 @@ may be directly assigned to at any time.
 
 Eg:
 
- $fh->Raw = 1;
+    $fh->Raw = 1;
 
-The last line read was from file C<File> at line number C<LineNumber>. This is conveniently summarised in C<Place>, useful for error messages.
+Also the following:
+
+=over 4
+
+=item C<Math>
+
+Note that there are many useful values that you can get here,
+some set by C<IO::ReadPreProcess> (see below), others by C<.let> directives.
+You can thus communicate with the preprocessing layer.
+
+Eg:
+
+You can set C<Math> variables like this:
+
+    $fh->{Math}->VarSetScalar('FirstName', 'Henry');
+
+You can get C<Math> variable values like this:
+
+    $name = $fh->{Math}->ParseToScalar('FirstName');
+
+    $fileName = $fh->{Math}->ParseToScalar('_FileName');
+
+=item C<Place>
+
+A string that can be used in messages to the user about the current input place.
+The value will be like:
+
+    line 201 of slides/regular-expressions.mod
+
+Eg:
+
+    warn "Something wrong at $fh->{Place}\n";
+
+=back
 
 =head1 METHODS
 
@@ -1696,6 +1734,8 @@ C<.elseif> may be used where a C<.else> can be found and must be followed by a c
 C<.elsif> is a synonym for C<.elseif>.
 
 C<.unless> is the same as C<.if> except that the truthness of the result is considered inverted.
+
+Text following C<.fi> or C<.else> will be ignored - you may use as comment.
 
 The condition may be a defined subroutine which will be run and the value set by C<.return> used
 as the boolean. The arguments are processed as if by C<.print>.
@@ -2116,31 +2156,54 @@ Note also the property C<OnError> (see above).
 
 =head1 EXAMPLES
 
-The script below sets some variables that are passed on the command line
-and then reads a file. The variables that are set can be used to control
-what it reads.
+The script below sets some variables that are passed on the command line,
+more from include files and then reads stdin.
+The variables that are set can be used to control what it reads.
 
     use IO::ReadPreProcess;
     use Getopt::Long;
+    use Math::Expression;
+
+    # One arithmetic instance so that variables are visible in all files:
+    my $ArithEnv = new Math::Expression( PermitLoops => 1, EnablePrintf => 1 );
 
     my @let = ();
+    my @includes = ();
     my $verbose = 0;
     my $help = 0;
 
-    GetOptions(help => \$help, 'let=s' => \@let, verbose => \$verbose); # and other options ...
+    # Look at command line options ... add other options here:
+    GetOptions(help => \$help, 'include=s' => \@includes, 'let=s' => \@let, verbose => \$verbose);
 
     Usage if $help;
-
-    my $fh = new IO::ReadPreProcess(Fd => \*STDIN, File => 'Standard input') or
-        die "Startup error: $IO::ReadPreProcess::errstr\n";
 
     # Evaluate all --let
     # Look like: --let='advanced := 1'
     for (@let) {
-        say "evaluating: $_" if $verbose;
+        say "Evaluating: $_" if $verbose;
         die "Invalid --let='$_'\n"
-            unless(defined $fh->{Math}->ParseToScalar($_));
+            unless(defined $ArithEnv->ParseToScalar($_));
     }
+
+    # Read all --include
+    # These must not yeild anything other than blank lines
+    # The point is that we evaluate .let, etc.
+    for my $file (@includes) {        
+        say "Including: $file" if $verbose;
+ 
+        my $inc = IO::ReadPreProcess->new(File => $file, Math => $ArithEnv, OnError => 'die', PipeOK => 1) or
+            die "$0: Opening include '$file': $IO::ReadPreProcess::errstr\n";                       
+
+        # All that is next should be empty lines:
+        while (<$inc>) {
+            die "Non empty line found via '--include $file' at $inc->{Place}\n"
+                if /\S/;
+        }
+    }
+
+    # If not stdin, maybe loop over @ARGV:
+    my $fh = new IO::ReadPreProcess(Fd => \*STDIN, File => 'Standard input', Math => $ArithEnv) or
+        die "Startup error: $IO::ReadPreProcess::errstr\n";
 
     while(<$fh>) {
 	...
@@ -2150,10 +2213,11 @@ what it reads.
     }
 
     # Use pre-processor variable
-    print "Sum output " . $fh->{Math}->ParseToScalar('sum') . "\n";
+    print "Sum output " . $ArithEnv->ParseToScalar('sum') . "\n";
 
 Most of the interest lies in the input:
 
+    .let sum := 0
     A line of input
 
     .# Check to see if this is advanced
@@ -2166,8 +2230,9 @@ Most of the interest lies in the input:
 
     .# Bring in an extra file:
     .include extra_files/very_complex
+    .let sum = sum + 2
 
-    .fi
+    .fi advanced > 1
     .else
 
     Simple stuff
@@ -2182,6 +2247,11 @@ Most of the interest lies in the input:
 
 
 For more examples see the test suite.
+
+At the end of the run you might want to do this:
+
+    # Some stats, for fun:
+    say STDERR $ArithEnv->ParseToScalar('printf("Preprocessing: lines generated %d, skipped %d. Directives %d, frames opened %d, files opened %d", _CountGen, _CountSkip, _CountDirect, _CountFrames, _CountOpen)');
 
 =head1 SECURITY
 

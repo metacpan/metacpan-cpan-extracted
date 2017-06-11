@@ -55,8 +55,8 @@ is scalar @{ $pool->{free} }, 3;
     });
     is scalar @{ $pool->{free} }, 2;
     $cv->recv;
-    is scalar @{ $pool->{free} }, 3;
 }
+is scalar @{ $pool->{free} }, 3;
 
 {
     my $cv = AnyEvent->condvar;

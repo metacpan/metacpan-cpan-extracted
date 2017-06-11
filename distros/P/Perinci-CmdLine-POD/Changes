@@ -1,3 +1,9 @@
+0.013   2017-06-08 (PERLANCAR)
+
+	- [ux] Consistency in formatting for headings 'Configuration for
+	  subcommand ...' and 'Options for subcommand ...'.
+
+
 0.012   2017-02-27 (PERLANCAR)
 
 	- [ux] Show how many lines were snipped in a long example output.

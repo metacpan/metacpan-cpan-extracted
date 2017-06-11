@@ -2,11 +2,12 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = '../lib';
-    require './test.pl'; require './charset_tools.pl';
+    require './test.pl';
+    set_up_inc('../lib');
+    require './charset_tools.pl';
 }
 
-plan(tests => 8);
+plan(tests => 9);
 
 {
     local $SIG{__WARN__} = sub {};
@@ -33,3 +34,7 @@ chop($upcode = "use utf8; $U_100" . chr 256);
 is evalbytes $upcode, chr 256, 'use utf8 within evalbytes on utf8 string';
 eval { evalbytes chr 256 };
 like $@, qr/Wide character/, 'evalbytes croaks on non-bytes';
+
+eval 'evalbytes S';
+ok 1, '[RT #129196] evalbytes S should not segfault';
+

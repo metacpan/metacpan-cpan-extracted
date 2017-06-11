@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::IdElementReference;
-$Config::Model::IdElementReference::VERSION = '2.103';
+$Config::Model::IdElementReference::VERSION = '2.105';
 use Mouse;
 
 use Carp;
@@ -190,7 +190,7 @@ Config::Model::IdElementReference - Refer to id element(s) and extract keys
 
 =head1 VERSION
 
-version 2.103
+version 2.105
 
 =head1 SYNOPSIS
 

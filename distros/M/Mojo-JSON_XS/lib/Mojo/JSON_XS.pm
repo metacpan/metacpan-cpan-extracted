@@ -2,17 +2,17 @@ package Mojo::JSON_XS;
 use strict;
 use warnings;
 
-our $VERSION = 0.101;
+our $VERSION = 1.003;
 # From groups.google.com/forum/#!msg/mojolicious/a4jDdz-gTH0/Exs0-E1NgQEJ
 
 use Cpanel::JSON::XS;
 use Mojo::JSON;
 use Mojo::Util 'monkey_patch';
 
-my $Binary = Cpanel::JSON::XS->new->utf8(1)->allow_nonref(1)
-    ->allow_blessed(1)->convert_blessed(1);
-my $Text = Cpanel::JSON::XS->new->utf8(0)->allow_nonref(1)
-    ->allow_blessed(1)->convert_blessed(1);
+my $Binary = Cpanel::JSON::XS->new->utf8(1)->canonical(1)
+  ->allow_blessed(1)->allow_nonref(1)->allow_unknown(1)->convert_blessed(1);
+my $Text = Cpanel::JSON::XS->new->utf8(0)->canonical(1)
+  ->allow_blessed(1)->allow_nonref(1)->allow_unknown(1)->convert_blessed(1);
 
 monkey_patch 'Mojo::JSON', encode_json => sub { $Binary->encode(shift) };
 monkey_patch 'Mojo::JSON', decode_json => sub { $Binary->decode(shift) };
@@ -145,7 +145,7 @@ L<https://github.com/niczero/mojo-jsonxs/issues>
 
 =head1 COPYRIGHT AND LICENCE
 
-Copyright (C) 2014--15, Sebastian Riedel, Nic Sandfield.
+Copyright (C) 2014--17, Sebastian Riedel, Nic Sandfield.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.

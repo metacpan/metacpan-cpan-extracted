@@ -1,4 +1,6 @@
 package XML::DOM::Lite::Node;
+use warnings;
+use strict;
 
 use Scalar::Util qw(weaken);
 use XML::DOM::Lite::NodeList;
@@ -13,6 +15,9 @@ sub new {
     }
     $proto->{attributes} = XML::DOM::Lite::NodeList->new([ ])
         unless defined $proto->{attributes};
+
+    weaken($proto->{parentNode}) if defined $proto->{parentNode};
+    weaken($proto->{ownerDocument}) if defined $proto->{ownerDocument};
 
     my $self = bless $proto, $class;
     return $self;
@@ -33,7 +38,8 @@ sub parentNode {
 }
 
 sub documentElement {
-    weaken($_[0]->{documentElement} = $_[1]) if $_[1]; $_[0]->{documentElement};
+    $_[0]->{documentElement} = $_[1] if $_[1];
+    $_[0]->{documentElement};
 }
 
 sub nodeType {
@@ -57,7 +63,7 @@ sub appendChild {
         $node->{parentNode}->removeChild($node);
     }
     unless ($node->nodeType == DOCUMENT_FRAGMENT_NODE) {
-        $node->{parentNode} = $self;
+        $node->parentNode($self);
         $self->{childNodes}->insertNode($node);
     } else {
         while ($node->childNodes->length) {
@@ -81,7 +87,7 @@ sub nextSibling {
     my $self = shift;
     if ($self->parentNode) {
         my $index = $self->parentNode->childNodes->nodeIndex($self);
-        return undef if $index == @{$self->childNodes->length} - 1;
+        return undef if $index == $self->parentNode->childNodes->length - 1;
         return $self->parentNode->childNodes->[$index + 1];
     }
 }
@@ -197,18 +203,17 @@ sub getElementsByTagName {
 sub cloneNode {
     my ($self, $deep) = @_;
 
-    my $copy = { };
-    @copy{keys %$self}     = values %$self;
-    $copy->{childNodes}    = XML::DOM::Lite::NodeList->new([ ]);
-    $copy->{attributes}    = XML::DOM::Lite::NodeList->new([@{$self->attributes}]);
-    $copy->{tagName}       = $self->tagName;
-    $copy->{nodeName}      = $self->nodeName;
-    $copy->{nodeType}      = $self->nodeType;
-    $copy->{ownerDocument} = $self->ownerDocument;
+    my $copy = { %$self };
+    $copy->{childNodes} = XML::DOM::Lite::NodeList->new([ ]);
+    $copy->{attributes} = XML::DOM::Lite::NodeList->new([@{$self->attributes}]);
+    weaken($copy->{ownerDocument});
+    weaken($copy->{parentNode});
 
     bless $copy, ref($self);
 
     if ($deep) {
+	$copy->{documentElement} = $copy->{documentElement}->cloneNode($deep)
+	    if defined $copy->{documentElement};
 	foreach (@{$self->childNodes}) {
 	    $copy->childNodes->insertNode($_->cloneNode($deep));
 	}

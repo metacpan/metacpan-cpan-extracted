@@ -1,14 +1,12 @@
 package Workflow::Condition::HasUser;
 
-# $Id$
-
 use warnings;
 use strict;
 use base qw( Workflow::Condition );
 use Log::Log4perl qw( get_logger );
 use Workflow::Exception qw( condition_error );
 
-$Workflow::Condition::HasUser::VERSION = '1.42';
+$Workflow::Condition::HasUser::VERSION = '1.43';
 
 my $DEFAULT_USER_KEY = 'current_user';
 
@@ -48,7 +46,7 @@ This documentation describes version 1.05 of this package
 =head1 SYNOPSIS
 
  # First setup the condition
- 
+
  <conditions>
    <condition name="HasUser"
               class="Workflow::Condition::HasUser">
@@ -57,7 +55,7 @@ This documentation describes version 1.05 of this package
    ...
 
  # Next, attach it to an action
- 
+
  <state name="INITIAL">
    <action name="create issue"
            resulting_state="CREATED">

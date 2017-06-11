@@ -13,7 +13,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.17'
+generated_by: 'Module::Install version 1.18'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -65,4 +65,4 @@ resources:
   homepage: http://search.cpan.org/dist/RDF-Trine/
   license: http://dev.perl.org/licenses/
   repository: http://github.com/kasei/perlrdf/
-version: '1.016'
+version: '1.017'

@@ -1,7 +1,5 @@
 package Workflow::Exception;
 
-# $Id$
-
 use warnings;
 use strict;
 
@@ -37,7 +35,7 @@ my %TYPE_CLASSES = (
     workflow_error      => 'Workflow::Exception',
 );
 
-$Workflow::Exception::VERSION   = '1.42';
+$Workflow::Exception::VERSION   = '1.43';
 @Workflow::Exception::ISA       = qw( Exporter Exception::Class::Base );
 @Workflow::Exception::EXPORT_OK = keys %TYPE_CLASSES;
 
@@ -50,8 +48,13 @@ sub _mythrow {
     my $log = get_logger();
     my ( $pkg, $line ) = (caller)[ 0, 2 ];
     my ( $prev_pkg, $prev_line ) = ( caller 1 )[ 0, 2 ];
-    $log->error( "$type exception thrown from [$pkg: $line; before: ",
-        "$prev_pkg: $prev_line]: $msg" );
+
+    # Do not log condition errors
+    if ($type ne 'condition_exception') {
+        $log->error( "$type exception thrown from [$pkg: $line; before: ",
+            "$prev_pkg: $prev_line]: $msg" );
+    }
+
     goto &Exception::Class::Base::throw(
         $TYPE_CLASSES{$type},
         message => $msg,
@@ -122,23 +125,23 @@ This documentation describes version 1.08 of this package
 
  # Standard usage
  use Workflow::Exception qw( workflow_error );
- 
+
  my $user = $wf->context->param( 'current_user' );
  unless ( $user->check_password( $entered_password ) ) {
    workflow_error "User exists but password check failed";
  }
- 
+
  # Pass a list of strings to form the message
- 
+
  unless ( $user->check_password( $entered_password ) ) {
    workflow_error 'Bad login: ', $object->login_attempted;
  }
- 
+
  # Using other exported shortcuts
- 
+
  use Workflow::Exception qw( configuration_error );
  configuration_error "Field 'foo' must be a set to 'bar'";
- 
+
  use Workflow::Exception qw( validation_error );
  validation_error "Validation for field 'foo' failed: $error";
 

@@ -11,7 +11,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.17'
+generated_by: 'Module::Install version 1.18'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,16 +30,16 @@ requires:
   File::Slurp: '9999.19'
   HTTP::Message: '6.11'
   IPC::System::Simple: '1.25'
-  LWP: '6.15'
+  LWP: '6.26'
   MIME::Types: '2.13'
   Method::Signatures::Simple: '1.07'
-  Mouse: v2.4.5
+  Mouse: v2.4.9
   Parallel::parallel_map: '0.02'
-  Try::Tiny: '0.27'
+  Try::Tiny: '0.28'
   URI: '1.71'
   perl: 5.8.8
 resources:
   bugtracker: https://github.com/chocolateboy/App-Wax/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/chocolateboy/App-Wax
-version: 1.1.0
+version: 1.1.1

@@ -33,6 +33,6 @@ is
     'translation count';
 like
     $obj->error,
-    qr{ \A \Qtest error\E \b }xms,
+    qr{ \A \QAPI error: test error\E \b }xms,
     'error';
 unlink $output_filename;

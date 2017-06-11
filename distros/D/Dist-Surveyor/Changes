@@ -1,5 +1,16 @@
 Revision history for Dist-Surveyor
 
+0.019     2017-06-09 01:32:40-04:00 America/New_York
+	- Bump HTTP::Tiny requirement to 0.056 for can_ssl
+
+0.018     2017-06-06 12:52:16-04:00 America/New_York
+	- Add --version option to dist_surveyor script
+	- Send a better user-agent string with HTTP requests
+
+0.017     2017-06-05 15:36:07-04:00 America/New_York
+	- Use MetaCPAN v1 API
+	- Add wget and curl fallback when IO::Socket::SSL is not available for fatpacked script
+
 0.016     2016-06-15 23:03:13-04:00 America/New_York
 	- Use Test::RequiresInternet in test files
 

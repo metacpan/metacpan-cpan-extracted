@@ -10,11 +10,11 @@ Geo::Coder::List - Call many geocoders
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 our %locations;
 
 =head1 SYNOPSIS
@@ -101,8 +101,18 @@ sub geocode {
 	return unless(length($location) > 0);
 
 	if((!wantarray) && (my $rc = $locations{$location})) {
-		delete $rc->{'geocoder'};
-		return $rc;
+		if(ref($rc) eq 'HASH') {
+			delete $rc->{'geocoder'};
+			return $rc;
+		}
+	}
+	if(wantarray && defined($locations{$location}) && (ref($locations{$location}) eq 'ARRAY') && (my @rc = @{$locations{$location}})) {
+		if(scalar(@rc)) {
+			foreach (@rc) {
+				delete $_->{'geocoder'};
+			}
+			return @rc;
+		}
 	}
 
 	foreach my $g(@{$self->{geocoders}}) {
@@ -122,44 +132,48 @@ sub geocode {
 			@rc = $geocoder->geocode(%params);
 		};
 		if($@) {
-			Carp::carp(ref($geocoder) . ": $@");
+			Carp::carp(ref($geocoder) . " '$location': $@");
 			next;
 		}
 		foreach my $location(@rc) {
 			if($location->{'error'}) {
 				@rc = ();
-				last;
-			}
-			# Try to create a common interface, helps with HTML::GoogleMaps::V3
-			unless($location->{geometry}{location}{lat}) {
-				if($location->{lat}) {
-					# OSM
-					$location->{geometry}{location}{lat} = $location->{lat};
-					$location->{geometry}{location}{lng} = $location->{lon};
-				} elsif($location->{BestLocation}) {
-					# Bing
-					$location->{geometry}{location}{lat} = $location->{BestLocation}->{Coordinates}->{Latitude};
-					$location->{geometry}{location}{lng} = $location->{BestLocation}->{Coordinates}->{Longitude};
-				} elsif($location->{point}) {
-					# Bing
-					$location->{geometry}{location}{lat} = $location->{point}->{coordinates}[0];
-					$location->{geometry}{location}{lng} = $location->{point}->{coordinates}[1];
-				} elsif($location->{latt}) {
-					# geocoder.ca
-					$location->{geometry}{location}{lat} = $location->{latt};
-					$location->{geometry}{location}{lng} = $location->{longt};
-				}
+			} else {
+				# Try to create a common interface, helps with HTML::GoogleMaps::V3
+				if(!defined($location->{geometry}{location}{lat})) {
+					if($location->{lat}) {
+						# OSM
+						$location->{geometry}{location}{lat} = $location->{lat};
+						$location->{geometry}{location}{lng} = $location->{lon};
+					} elsif($location->{BestLocation}) {
+						# Bing
+						$location->{geometry}{location}{lat} = $location->{BestLocation}->{Coordinates}->{Latitude};
+						$location->{geometry}{location}{lng} = $location->{BestLocation}->{Coordinates}->{Longitude};
+					} elsif($location->{point}) {
+						# Bing
+						$location->{geometry}{location}{lat} = $location->{point}->{coordinates}[0];
+						$location->{geometry}{location}{lng} = $location->{point}->{coordinates}[1];
+					} elsif($location->{latt}) {
+						# geocoder.ca
+						$location->{geometry}{location}{lat} = $location->{latt};
+						$location->{geometry}{location}{lng} = $location->{longt};
+					}
 
-				if($location->{'standard'}{'countryname'}) {
-					# XYZ
-					$location->{'address'}{'country'} = $location->{'standard'}{'countryname'};
+					if($location->{'standard'}{'countryname'}) {
+						# XYZ
+						$location->{'address'}{'country'} = $location->{'standard'}{'countryname'};
+					}
+				}
+				if(defined($location->{geometry}{location}{lat})) {
+					$location->{geocoder} = $geocoder;
+					last;
 				}
 			}
-			$location->{geocoder} = $geocoder;
 		}
 
 		if(scalar(@rc)) {
 			if(wantarray) {
+				$locations{$location} = \@rc;
 				return @rc;
 			}
 			if(length($rc[0])) {

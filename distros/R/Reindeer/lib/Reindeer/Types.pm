@@ -1,7 +1,7 @@
 #
 # This file is part of Reindeer
 #
-# This software is Copyright (c) 2011 by Chris Weyl.
+# This software is Copyright (c) 2017, 2015, 2014, 2012, 2011 by Chris Weyl.
 #
 # This is free software, licensed under:
 #
@@ -9,7 +9,7 @@
 #
 package Reindeer::Types;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-$Reindeer::Types::VERSION = '0.018';
+$Reindeer::Types::VERSION = '0.019';
 # ABSTRACT: Reindeer combined type library
 
 use strict;
@@ -30,9 +30,7 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Chris Weyl
-
-=for :stopwords Wishlist flattr flattr'ed gittip gittip'ed
+=for :stopwords Chris Weyl Alex Balhatchet
 
 =head1 NAME
 
@@ -40,7 +38,7 @@ Reindeer::Types - Reindeer combined type library
 
 =head1 VERSION
 
-This document describes version 0.018 of Reindeer::Types - released March 28, 2015 as part of Reindeer.
+This document describes version 0.019 of Reindeer::Types - released June 09, 2017 as part of Reindeer.
 
 =head1 SYNOPSIS
 
@@ -69,46 +67,51 @@ Like C<LoadableClass>, except the loaded package must be a L<Moose::Role>.
 
 =head2 C<SimpleStr>
 
-A C<Str> with no new-line characters.
+A C<Str> with no new-line characters and length <= 255.
 
 =head2 C<NonEmptySimpleStr>
 
-A C<Str> with no new-line characters and length > 0
+A C<SimpleStr> with length > 0.
 
 =head2 C<LowerCaseSimpleStr>
 
-A C<Str> with no new-line characters, length > 0 and no uppercase characters
-A coercion exists via C<lc> from C<NonEmptySimpleStr>
+A C<NonEmptySimpleStr> with no uppercase characters. A coercion exists via
+C<lc> from C<NonEmptySimpleStr>.
 
 =head2 C<UpperCaseSimpleStr>
 
-A C<Str> with no new-line characters, length > 0 and no lowercase characters
-A coercion exists via C<uc> from C<NonEmptySimpleStr>
+A C<NonEmptySimpleStr> with no lowercase characters. A coercion exists via
+C<uc> from C<NonEmptySimpleStr>.
 
 =head2 C<Password>
 
+A C<NonEmptySimpleStr> with length > 3.
+
 =head2 C<StrongPassword>
+
+A C<NonEmptySimpleStr> with length > 7 containing at least one non-alpha
+character.
 
 =head2 C<NonEmptyStr>
 
-A C<Str> with length > 0
+A C<Str> with length > 0.
 
 =head2 C<LowerCaseStr>
 
 A C<Str> with length > 0 and no uppercase characters.
-A coercion exists via C<lc> from C<NonEmptyStr>
+A coercion exists via C<lc> from C<NonEmptyStr>.
 
 =head2 C<UpperCaseStr>
 
 A C<Str> with length > 0 and no lowercase characters.
-A coercion exists via C<uc> from C<NonEmptyStr>
+A coercion exists via C<uc> from C<NonEmptyStr>.
 
 =head2 C<NumericCode>
 
 A C<Str> with no new-line characters that consists of only Numeric characters.
 Examples include, Social Security Numbers, Personal Identification Numbers, Postal Codes, HTTP Status
 Codes, etc. Supports attempting to coerce from a string that has punctuation
-in it ( e.g credit card number 4111-1111-1111-1111 ).
+or whitespaces in it ( e.g credit card number 4111-1111-1111-1111 ).
 
 =head2 C<PositiveNum>
 
@@ -187,15 +190,10 @@ L<L<MooseX::Types::Combine>.|L<MooseX::Types::Combine>.>
 
 =back
 
-=head1 SOURCE
-
-The development version is on github at L<http://https://github.com/RsrchBoy/reindeer>
-and may be cloned from L<git://https://github.com/RsrchBoy/reindeer.git>
-
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-https://github.com/RsrchBoy/reindeer/issues
+L<https://github.com/RsrchBoy/reindeer/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -205,28 +203,9 @@ feature.
 
 Chris Weyl <cweyl@alumni.drew.edu>
 
-=head2 I'm a material boy in a material world
-
-=begin html
-
-<a href="https://www.gittip.com/RsrchBoy/"><img src="https://raw.githubusercontent.com/gittip/www.gittip.com/master/www/assets/%25version/logo.png" /></a>
-<a href="http://bit.ly/rsrchboys-wishlist"><img src="http://wps.io/wp-content/uploads/2014/05/amazon_wishlist.resized.png" /></a>
-<a href="https://flattr.com/submit/auto?user_id=RsrchBoy&url=https%3A%2F%2Fgithub.com%2FRsrchBoy%2Freindeer&title=RsrchBoy's%20CPAN%20Reindeer&tags=%22RsrchBoy's%20Reindeer%20in%20the%20CPAN%22"><img src="http://api.flattr.com/button/flattr-badge-large.png" /></a>
-
-=end html
-
-Please note B<I do not expect to be gittip'ed or flattr'ed for this work>,
-rather B<it is simply a very pleasant surprise>. I largely create and release
-works like this because I need them or I find it enjoyable; however, don't let
-that stop you if you feel like it ;)
-
-L<Flattr this|https://flattr.com/submit/auto?user_id=RsrchBoy&url=https%3A%2F%2Fgithub.com%2FRsrchBoy%2Freindeer&title=RsrchBoy's%20CPAN%20Reindeer&tags=%22RsrchBoy's%20Reindeer%20in%20the%20CPAN%22>,
-L<gittip me|https://www.gittip.com/RsrchBoy/>, or indulge my
-L<Amazon Wishlist|http://bit.ly/rsrchboys-wishlist>...  If you so desire.
-
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2011 by Chris Weyl.
+This software is Copyright (c) 2017, 2015, 2014, 2012, 2011 by Chris Weyl.
 
 This is free software, licensed under:
 

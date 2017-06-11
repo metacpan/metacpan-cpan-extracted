@@ -1,5 +1,6 @@
 package App::EvalServerAdvanced::JobManager;
 use v5.24.0;
+our $VERSION = '0.017';
 
 use strict;
 use warnings;
@@ -33,17 +34,23 @@ method run_job($eval_job) {
     my $out = '';
     my $in = '';
 
+    my ($code_file) = grep {$_->filename eq '__code'} $eval_obj->{files}->@*;
+    my $code = $code_file->get_contents;
+
     my $proc_future;
     my $proc = IO::Async::Process->new(
         code => sub {
             close(STDERR);
             dup2(1,2) or _exit(212); # Setup the C side of things
             *STDERR = \*STDOUT; # Setup the perl side of things
+            binmode STDOUT, ":encoding(utf8)"; # these really only affect perl subs, but they should also support other encodings
+            binmode STDERR, ":encoding(utf8)";
+            binmode STDIN, ":encoding(utf8)";
 
             $SIG{$_} = sub {_exit(1)} for (keys %SIG);
 
             eval {
-                App::EvalServerAdvanced::Sandbox::run_eval($eval_obj->{files}{__code}, $eval_obj->{language}, $eval_obj->{files});
+                App::EvalServerAdvanced::Sandbox::run_eval($code, $eval_obj->{language}, $eval_obj->{files});
             };
             if ($@) {
                 print "$@";
@@ -52,8 +59,9 @@ method run_job($eval_job) {
             _exit(0);
         },
         stdout => {into => \$out},
-        stdin => {from => $in},
-        on_finish => sub { $job_future->done($out) unless $job_future->is_ready; delete $self->workers->{$proc_future}; }
+        # TODO these two things need to be handled differently for encoding
+        stdin => {from => Encode::encode("utf8", $in)},
+        on_finish => sub { my $out_utf8 = Encode::decode("utf8", $out); $job_future->done($out_utf8) unless $job_future->is_ready; delete $self->workers->{$proc_future}; }
     );
 
     $proc_future = $self->loop->timeout_future(after => config->jobmanager->timeout // 10);
@@ -65,7 +73,7 @@ method run_job($eval_job) {
 
 method tick() {
     debug "Tick ", "".$self->workers->%*;
-    if (keys $self->workers->%* < config->jobmanager->max_workers) {
+    if (keys $self->workers->%* < config->jobmanager->max_workers) { ## no critic
         my $rtcount =()= $self->jobs->{realtime}->@*;
         # TODO implement deadline jobs properly
 

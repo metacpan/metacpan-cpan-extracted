@@ -16,10 +16,10 @@ use Path::Class::File;
 =head1 NAME
 
 Business::UPS::Tracking::Role::Base - Helper role
-  
+
 =head1 DESCRIPTION
 
-This role provides accessors for the UPS webservice credentials. 
+This role provides accessors for the UPS webservice credentials.
 The credentials can be provided when constructing a new object, or optionally
 stored in a configuration file.
 
@@ -51,7 +51,7 @@ Example configuration file:
     <UserId>myupsuser</UserId>
     <Password>secret</Password>
  </UPS_tracing_webservice_config>
- 
+
 =cut
 
 has 'config' => (
@@ -91,9 +91,9 @@ has 'Password' => (
 
 sub _build_AccessLicenseNumber {
     my ($self) = @_;
-    
+
     $self->_build_config();
-    
+
     if ($self->_has_AccessLicenseNumber) {
         return $self->AccessLicenseNumber;
     }
@@ -101,9 +101,9 @@ sub _build_AccessLicenseNumber {
 
 sub _build_UserId {
     my ($self) = @_;
-    
+
     $self->_build_config();
-    
+
     if ($self->_has_UserId) {
         return $self->UserId;
     }
@@ -111,9 +111,9 @@ sub _build_UserId {
 
 sub _build_Password {
     my ($self) = @_;
-    
+
     $self->_build_config();
-    
+
     if ($self->_has_Password) {
         return $self->Password;
     }
@@ -121,37 +121,37 @@ sub _build_Password {
 
 sub _build_config {
     my ($self) = @_;
-    
+
     unless (-e $self->config) {
         Business::UPS::Tracking::X->throw('Could not find UPS tracking webservice access config file at "'.$self->config.'"');
     }
-    
+
     my $parser = XML::LibXML->new();
-    
+
     try {
         my $document = $parser->parse_file( $self->config );
         my $root = $document->documentElement();
-        
+
         my $params = {};
         foreach my $param ($root->childNodes) {
             my $method = $param->nodeName;
             next
                 unless grep { $_ eq $method } qw(AccessLicenseNumber UserId Password);
             $params->{$method} = $param->textContent;
-            $self->$method($param->textContent); 
+            $self->$method($param->textContent);
         }
         return 1;
     } catch {
         my $e = $_ || 'Unknwon error';
         Business::UPS::Tracking::X->throw('Could not open/parse UPS tracking webservice access config file at '.$self->config.' : '.$e);
     };
-    
-    unless ($self->_has_AccessLicenseNumber 
+
+    unless ($self->_has_AccessLicenseNumber
         && $self->_has_UserId
         && $self->_has_Password) {
         Business::UPS::Tracking::X->throw('AccessLicenseNumber,UserId and Passwortd must be provided or set via a config file located at '.$self->config);
     }
-    
+
     return;
 }
 

@@ -1,6 +1,6 @@
 package Pcore::Dist::Build::Issues;
 
-use Pcore -ansi, -class;
+use Pcore -class;
 use Pcore::Util::Scalar qw[blessed];
 
 has dist => ( is => 'ro', isa => InstanceOf ['Pcore::Dist'], required => 1 );

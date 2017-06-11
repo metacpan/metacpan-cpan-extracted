@@ -4,7 +4,7 @@ author:
   - 'Ingy döt Net <ingy@cpan.org>'
 build_requires:
   File::Copy::Recursive: '0'
-  IO::All: '0'
+  File::Path: '0'
   Test::More: '0.88'
   Test::Warn: '0.23'
   YAML::XS: '0'
@@ -40,5 +40,5 @@ resources:
   bugtracker: https://github.com/ingydotnet/inline-c-pm/issues
   homepage: https://github.com/ingydotnet/inline-c-pm
   repository: https://github.com/ingydotnet/inline-c-pm.git
-version: '0.77'
+version: '0.78'
 x_serialization_backend: 'YAML::Tiny version 1.70'

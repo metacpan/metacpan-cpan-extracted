@@ -22,7 +22,7 @@ BEGIN {
 }
 
 
-plan tests => 527;  # Update this when adding/deleting tests.
+plan tests => 533;  # Update this when adding/deleting tests.
 
 run_tests() unless caller;
 
@@ -1231,6 +1231,66 @@ sub run_tests {
 	is "$&", "foo"x1000 . "bar"x1000,
 	    'padtmp swiping does not affect "$a$b" =~ /(??{})/'
     }
+
+    {
+        # [perl #129140]
+        # this used to cause a double-free of the code_block struct
+        # when re-running the compilation after spotting utf8.
+        # This test doesn't catch it, but might panic, or fail under
+        # valgrind etc
+
+        my $s = '';
+        /$s(?{})\x{100}/ for '', '';
+        pass "RT #129140";
+    }
+
+    # RT #130650 code blocks could get double-freed during a pattern
+    # compilation croak
+
+    {
+        # this used to panic or give ASAN errors
+        eval 'qr/(?{})\6/';
+        like $@, qr/Reference to nonexistent group/, "RT #130650";
+    }
+
+    # RT #129881
+    # on exit from a pattern with multiple code blocks from different
+    # CVs, PL_comppad wasn't being restored correctly
+
+    sub {
+        # give first few pad slots known values
+        my ($x1, $x2, $x3, $x4, $x5) = 101..105;
+        # these vars are in a separate pad
+        my $r = qr/((?{my ($y1, $y2) = 201..202; 1;})A){2}X/;
+        # the first alt fails, causing a switch to this anon
+        # sub's pad
+        "AAA" =~ /$r|(?{my ($z1, $z2) = 301..302; 1;})A/;
+        is $x1, 101, "RT #129881: x1";
+        is $x2, 102, "RT #129881: x2";
+        is $x3, 103, "RT #129881: x3";
+    }->();
+
+
+    # RT #126697
+    # savestack wasn't always being unwound on EVAL failure
+    {
+        local our $i = 0;
+        my $max = 0;
+
+        'ABC' =~ m{
+            \A
+            (?:
+                (?: AB | A | BC )
+                (?{
+                    local $i = $i + 1;
+                    $max = $i if $max < $i;
+                })
+            )*
+            \z
+        }x;
+        is $max, 2, "RT #126697";
+    }
+
 
 } # End of sub run_tests
 

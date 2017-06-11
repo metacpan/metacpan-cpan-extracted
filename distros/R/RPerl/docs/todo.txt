@@ -1,5 +1,5 @@
 DONE
-
+    Fix recursive dependencies from Inline::create_config_file() system() call
 
 DOING
     Learning RPerl exercises, check on CloudForFree.org
@@ -14,7 +14,7 @@ DOING
         subroutines, final operation must be return operator
         WHAT ELSE?!?
 
-    Inline::Pluto
+    Alien::Pluto
     Inline::RPerl
     update tests to emit more useful failure info, for CPAN testers debugging
     update CPPOPS_DUALTYPES reference files
@@ -225,10 +225,11 @@ MATHPERL
     tan, cot, sec, csc
     Math::Trig support
     Math::Complex support
+    fractal, hsv coloring
 
 PHYSICSPERL
-    nbody, optimize graphics speed
-    fractal, hsv coloring
+    n_body, add command-line option for SystemGasGiants.pm & SystemSSEGasGiants.pm
+    n_body, optimize graphics speed
 
 WEB BACK-END
     asm.js and/or webassembly backend

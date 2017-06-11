@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME            => 'NOLookup',
     VERSION_FROM    => 'lib/NOLookup.pm',
-    MIN_PERL_VERSION => '5.18',
+    MIN_PERL_VERSION => '5.18.0',
 
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 6.64,

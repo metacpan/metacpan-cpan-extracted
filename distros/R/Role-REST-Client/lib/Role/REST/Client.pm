@@ -1,5 +1,5 @@
 package Role::REST::Client;
-$Role::REST::Client::VERSION = '0.19';
+$Role::REST::Client::VERSION = '0.22';
 use Moo::Role;
 use MooX::HandlesVia;
 use Types::Standard qw(HashRef Str Int Enum HasMethods);
@@ -165,6 +165,11 @@ sub _call {
 	my $res = $self->_handle_response( $self->do_request($method, $uri, \%options) );
 
 	$self->reset_headers unless $args->{preserve_headers};
+
+	my $use_serializer = exists $args->{deserializer}
+		? defined $args->{deserializer} ? 1 : 0
+		: $res->header('Content-Type') !~ m{(?:text/(?:plain|html)|application/octet-stream)};
+
 	my $deserializer_cb = sub {
 		# Try to find a serializer for the result content
 		my $content_type = $args->{deserializer} || $res->header('Content-Type');
@@ -174,10 +179,12 @@ sub _call {
 		$content = $deserializer->deserialize($content) if $deserializer && $content;
 		$content ||= {};
 	};
+
 	return $self->_new_rest_response(
 		code => $res->code,
 		response => $res,
-		data => $deserializer_cb,
+		data => $use_serializer
+			? $deserializer_cb : sub { $res->decoded_content },
 		$res->is_error ? ( error => $res->message) : (),
 	);
 }
@@ -229,7 +236,7 @@ Role::REST::Client - REST Client Role
 
 =head1 VERSION
 
-version 0.19
+version 0.22
 
 =head1 SYNOPSIS
 
@@ -288,6 +295,11 @@ Currently Role::REST::Client supports these encodings
 
 x-www-form-urlencoded only works for GET and POST, and only for encoding, not decoding.
 
+Responses which claim to not be serialised data (eg C<text/plain>,
+C<application/octet-stream>) will by default not be serialised. When the
+response is none of these, and it is impossible to determine what encoding is
+used, the content will be treated as JSON by default.
+
 =head1 NAME
 
 Role::REST::Client - REST Client Role
@@ -321,7 +333,11 @@ args - the optional argument parameter can have these entries
 
 	deserializer - if you KNOW that the content-type of the response is incorrect,
 	you can supply the correct content type, like
+
 	my $res = $self->post('/foo/bar/baz', {foo => 'bar'}, {deserializer => 'application/yaml'});
+
+	Alternatively, if you KNOW that the response is not serial data, you can
+	disable deserialization by setting this to undef.
 
 	preserve_headers - set this to true if you want to keep the headers between calls
 
@@ -424,7 +440,7 @@ Kaare Rasmussen <kaare at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Kaare Rasmussen.
+This software is copyright (c) 2017 by Kaare Rasmussen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

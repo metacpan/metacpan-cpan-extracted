@@ -1,10 +1,11 @@
 package CracTools::Interval::Query;
+
 {
   $CracTools::Interval::Query::DIST = 'CracTools';
 }
 # ABSTRACT: Store and query genomics intervals.
 #
-$CracTools::Interval::Query::VERSION = '1.25';
+$CracTools::Interval::Query::VERSION = '1.251';
 use strict;
 use warnings;
 
@@ -208,7 +209,7 @@ CracTools::Interval::Query - Store and query genomics intervals.
 
 =head1 VERSION
 
-version 1.25
+version 1.251
 
 =head1 SYNOPSIS
 

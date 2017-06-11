@@ -198,7 +198,7 @@ use strict;
 
     # find which ops use 0,1,2,3 or 4 bits of op_private for arg count info
 
-    $args0{$_} = 1 for qw(entersub); # UNOPs that usurp bit 0
+    $args0{$_} = 1 for qw(entersub avhvswitch); # UNOPs that usurp bit 0
 
     $args1{$_} = 1 for (
                         qw(reverse), # ck_fun(), but most bits stolen
@@ -300,7 +300,7 @@ for (qw(nextstate dbstate)) {
 #   my $x
 
 addbits($_, 7 => qw(OPpLVAL_INTRO LVINTRO))
-    for qw(gvsv rv2sv rv2hv rv2gv rv2av aelem helem aslice
+    for qw(gvsv rv2sv rv2hv rv2gv rv2av aelem helem aslice split
            hslice delete padsv padav padhv enteriter entersub padrange
            pushmark cond_expr refassign lvref lvrefslice lvavref multideref),
            'list', # this gets set in my_attrs() for some reason
@@ -396,12 +396,6 @@ addbits($_, 7 => qw(OPpLVALUE LV)) for qw(leave leaveloop);
 
 
 
-# Pattern coming in on the stack
-addbits($_, 6 => qw(OPpRUNTIME RTIME))
-    for qw(match subst substcont qr pushre);
-
-
-
 # autovivify: Want ref to something
 for (qw(rv2gv rv2sv padsv aelem helem entersub)) {
     addbits($_, '4..5' => {
@@ -437,7 +431,8 @@ addbits($_, 6 => qw(OPpOUR_INTRO OURINTR)) # Variable was in an our()
 # We might be an lvalue to return
 addbits($_, 3 => qw(OPpMAYBE_LVSUB LVSUB))
     for qw(aassign rv2av rv2gv rv2hv padav padhv aelem helem aslice hslice
-           av2arylen keys kvaslice kvhslice substr pos vec multideref);
+           av2arylen keys akeys avhvswitch kvaslice kvhslice substr pos vec
+           multideref);
 
 
 
@@ -592,7 +587,7 @@ addbits('substr', 4 => qw(OPpSUBSTR_REPL_FIRST REPL1ST));
 addbits('padrange',
     # bits 0..6 hold target range
     '0..6' =>  {
-            label         => '-',
+            label         => 'range',
             mask_def      => 'OPpPADRANGE_COUNTMASK',
             bitcount_def  => 'OPpPADRANGE_COUNTSHIFT',
           }
@@ -604,7 +599,7 @@ addbits('padrange',
 for (qw(aelemfast aelemfast_lex)) {
     addbits($_,
         '0..7' =>  {
-                label     => '-',
+                label     => 'key',
               }
     );
 }
@@ -730,8 +725,13 @@ addbits('coreargs',
 
 
 
-addbits('split', 7 => qw(OPpSPLIT_IMPLIM IMPLIM)); # implicit limit
-
+addbits('split',
+    # @a = split() has been replaced with  split() where split itself
+    # does the array assign
+    4 => qw(OPpSPLIT_ASSIGN ASSIGN), 
+    3 => qw(OPpSPLIT_LEX LEX),  # the OPpSPLIT_ASSIGN is a lexical array
+    2 => qw(OPpSPLIT_IMPLIM IMPLIM), # implicit limit
+);
 
 
 addbits($_,
@@ -756,6 +756,28 @@ addbits('multideref',
     4 => qw(OPpMULTIDEREF_EXISTS EXISTS), # deref is actually exists
     5 => qw(OPpMULTIDEREF_DELETE DELETE), # deref is actually delete
 );
+
+
+
+addbits('avhvswitch',
+    '0..1' => {
+                   mask_def  => 'OPpAVHVSWITCH_MASK',
+                   label     => 'offset',
+    }
+);
+
+
+addbits('argelem',
+   '1..2' =>  {
+                   mask_def  => 'OPpARGELEM_MASK',
+                   enum => [ qw(
+                               0   OPpARGELEM_SV   SV
+                               1   OPpARGELEM_AV   AV
+                               2   OPpARGELEM_HV   HV
+                           )],
+               },
+);
+
 
 1;
 

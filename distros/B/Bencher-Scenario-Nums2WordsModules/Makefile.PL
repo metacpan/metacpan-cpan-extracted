@@ -6,11 +6,18 @@ use 5.010001;
 
 use ExtUtils::MakeMaker;
 
+use File::ShareDir::Install;
+$File::ShareDir::Install::INCLUDE_DOTFILES = 1;
+$File::ShareDir::Install::INCLUDE_DOTDIRS = 1;
+install_share dist => "share";
+
+
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Benchmark various number-to-words modules of different languages against one another",
   "AUTHOR" => "perlancar <perlancar\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0
+    "ExtUtils::MakeMaker" => 0,
+    "File::ShareDir::Install" => "0.06"
   },
   "DISTNAME" => "Bencher-Scenario-Nums2WordsModules",
   "LICENSE" => "perl",
@@ -24,13 +31,13 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Bencher::Backend" => "1.034",
+    "Bencher::Backend" => "1.036",
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,7 +45,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Bencher::Backend" => "1.034",
+  "Bencher::Backend" => "1.036",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
@@ -61,3 +68,9 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
+
+{
+package
+MY;
+use File::ShareDir::Install qw(postamble);
+}

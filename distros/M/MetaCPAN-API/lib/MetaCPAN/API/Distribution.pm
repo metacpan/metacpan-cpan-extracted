@@ -2,7 +2,9 @@ use strict;
 use warnings;
 package MetaCPAN::API::Distribution;
 # ABSTRACT: Distribution information for MetaCPAN::API
-$MetaCPAN::API::Distribution::VERSION = '0.50';
+
+our $VERSION = '0.51';
+
 use Carp;
 use Moo::Role;
 use namespace::autoclean;
@@ -25,7 +27,7 @@ sub distribution {
         } elsif ( defined ( my $search_opts = $opts{'search'} ) ) {
             ref $search_opts && ref $search_opts eq 'HASH'
                 or croak $error;
-    
+
             %extra_opts = %{$search_opts};
             $url        = 'distribution/_search';
         } else {
@@ -52,7 +54,7 @@ MetaCPAN::API::Distribution - Distribution information for MetaCPAN::API
 
 =head1 VERSION
 
-version 0.50
+version 0.51
 
 =head1 DESCRIPTION
 
@@ -62,9 +64,9 @@ returning information about the distribution which is not specific to a version
 
 =head1 METHODS
 
-=head2 distibution
+=head2 distribution
 
-    my $result = $mcpan->distibution('DBIx-Class');
+    my $result = $mcpan->distribution('DBIx-Class');
 
 Searches MetaCPAN for a dist.
 

@@ -10,6 +10,8 @@ use strict;
 use warnings;
 use Config;
 
+delete $ENV{PERLDB_OPTS};
+
 BEGIN {
     if (! -c "/dev/null") {
         print "1..0 # Skip: no /dev/null\n";
@@ -2769,7 +2771,7 @@ SKIP:
     );
 
     $wrapper->output_like(
-        qr/No manual entry for perlrules/,
+        qr/No (?:manual )?entry for perlrules/,
         'perldoc command works fine',
     );
 }

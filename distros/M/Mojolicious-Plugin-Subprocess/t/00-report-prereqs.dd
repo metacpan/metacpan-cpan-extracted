@@ -16,6 +16,9 @@ do { my $x = {
                                       'Mojolicious' => '7.12',
                                       'Scalar::Util' => '0',
                                       'perl' => '5.010001'
+                                    },
+                      'suggests' => {
+                                      'Sereal' => '3.001'
                                     }
                     },
        'test' => {

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION);
-$VERSION = '3.57';
+$VERSION = '3.59';
 
 =head1 NAME
 
@@ -36,6 +36,7 @@ use File::Slurp;
 use JSON::XS;
 #use Sort::Versions;
 use Time::Local;
+use Try::Tiny;
 use XML::RSS;
 #use YAML::XS;
 use version;
@@ -260,6 +261,8 @@ sub RemovePages {
         $progress->( ".. processing $index->{type} $index->{name}" )     if(defined $progress);
 
         if($index->{type} eq 'rmauth') {
+            # 2016-04-21 = Barbie - temporarily suspended line below to allow author pages to generate
+            # seems to be a bug picking up UUID for PSIXDISTS :(
             RemoveAuthorPages($cpan,$dbi,$progress,$index->{name});
         } else {
             RemoveDistroPages($cpan,$dbi,$progress,$index->{name});
@@ -272,6 +275,7 @@ sub RemovePages {
 sub RemoveAuthorPages {
     my ($cpan,$dbi,$progress,$name) = @_;
     my (%remove,%author,@reports);
+    my $fail = 0;
 
     # get ids from the page requests
     my @requests = $dbi->GetQuery('hash','GetRequestIDs',{names => $name},'rmauth');
@@ -292,45 +296,56 @@ sub RemoveAuthorPages {
         my $cache = sprintf "%s/static/author/%s", $settings{webdir}, substr($author,0,1);
         my $destfile = "$cache/$author.json";
 
-        # load JSON, if we have one
-        if(-f $destfile) {
-            my $data  = read_file($destfile);
-            my $store;
-            eval { $store = decode_json($data) };
-            if(!$@ && $store) {
-                for my $row (@$store) {
-                    next    if($requests{$row->{id}});                      # filter out requests
+        try {
+            # load JSON, if we have one
+            if(-f $destfile) {
+                $progress->( ".. processing rmauth $author $name (cleaning JSON file)" )     if(defined $progress);
+                my $data  = read_file($destfile);
+                $progress->( ".. processing rmauth $author $name (read JSON file)" )     if(defined $progress);
+                my $store;
+                eval { $store = decode_json($data) };
+                $progress->( ".. processing rmauth $author $name (decoded JSON data)" )     if(defined $progress);
+                if(!$@ && $store) {
+                    for my $row (@$store) {
+                        next    if($requests{$row->{id}});                      # filter out requests
 
-                    push @reports, $row;
+                        push @reports, $row;
+                    }
                 }
-            }
-            overwrite_file( $destfile, _make_json( \@reports ) );
-        }
-
-        # clean the summary, if we have one
-        my @summary = $dbi->GetQuery('hash','GetAuthorSummary',$author);
-        if(@summary) {
-            $progress->( ".. processing rmauth $author $name" )     if(defined $progress);
-            my $dataset = decode_json($summary[0]->{dataset});
-
-            for my $data ( @{ $dataset->{distributions} } ) {
-                my $dist = $data->{dist};
-                my $summ = $data->{summary};
-
-                next    unless($remove{$dist});
-
-                for my $state (keys %{ $remove{$dist} }) {
-                    $summ->{ $state } -= $remove{$dist}{$state};
-                    $summ->{ 'ALL'  } -= $remove{$dist}{$state};
-                }
+                overwrite_file( $destfile, _make_json( \@reports ) );
             }
 
-            $dbi->DoQuery('UpdateAuthorSummary',$summary[0]->{lastid},encode_json($dataset),$author);
-        }
+            # clean the summary, if we have one
+            my @summary = $dbi->GetQuery('hash','GetAuthorSummary',$author);
+            if(@summary) {
+                $progress->( ".. processing rmauth $author $name (cleaning summary) " . scalar(@summary) . ' ' . ($summary[0] && $summary[0]->{dataset} ? 'true' : 'false') )     if(defined $progress);
+                my $dataset = decode_json($summary[0]->{dataset});
+                $progress->( ".. processing rmauth $author $name (decoded JSON summary)" )     if(defined $progress);
 
-        # push in author queue to rebuild pages
-        $dbi->DoQuery('PushAuthor',$author);
+                for my $data ( @{ $dataset->{distributions} } ) {
+                    my $dist = $data->{dist};
+                    my $summ = $data->{summary};
+
+                    next    unless($remove{$dist});
+
+                    for my $state (keys %{ $remove{$dist} }) {
+                        $summ->{ $state } -= $remove{$dist}{$state};
+                        $summ->{ 'ALL'  } -= $remove{$dist}{$state};
+                    }
+                }
+
+                $dbi->DoQuery('UpdateAuthorSummary',$summary[0]->{lastid},encode_json($dataset),$author);
+            }
+
+            # push in author queue to rebuild pages
+            $dbi->DoQuery('PushAuthor',$author);
+        } catch {
+            $progress->( ".. failed rmauth $author $name (catch block)" )     if(defined $progress);
+            $fail = 1;
+        };
     }
+
+    return 0 if($fail);
 
     # remove requests
     $dbi->DoQuery('DeletePageRequests',{ids => join(',',@ids)},'rmauth',$name);
@@ -571,6 +586,7 @@ sub DistroPages {
     my %vars = %{ clone (\%tvars) };
 
 #LogDebug("DistroPages: before tvars=".total_size(\%tvars)." bytes");
+#$progress->( ".. .. starting $name" ) if(defined $progress);
 
     my $exceptions = $cpan->exceptions;
     my $symlinks   = $cpan->symlinks;
@@ -597,7 +613,9 @@ sub DistroPages {
             @delete = ($name);
         }
 
+#$progress->( ".. .. getting records for $name" ) if(defined $progress);
         my @valid = $dbi->GetQuery('hash','FindDistro',{dist=>$dist});
+#$progress->( ".. .. retrieved records for $name" ) if(defined $progress);
         if(@valid) {
             my (@reports,%authors,%version,$summary,$byversion,$next);
             my $fromid = '';
@@ -619,6 +637,7 @@ sub DistroPages {
             my $destfile = "$cache/$name.json";
             mkpath($cache);
 
+#$progress->( ".. .. loading JSON data for $name" ) if(defined $progress);
             # load JSON data if available
             if(-f $destfile && $lastid) {
                 my $json = read_file($destfile);
@@ -644,6 +663,7 @@ sub DistroPages {
                     $fromid = " AND id > $lastid ";
                 }
             }
+#$progress->( ".. .. loaded JSON data for $name" ) if(defined $progress);
 
             # if we have ids in the page requests, just update these
             my @requests = $dbi->GetQuery('hash','GetRequestIDs',{names => $dist},'distro');
@@ -655,6 +675,7 @@ sub DistroPages {
                 $next = $dbi->Iterator('hash','GetDistroReports',{fromid => $fromid, dist => $dist});
             }
 
+#$progress->( ".. .. starting data update for $name" ) if(defined $progress);
             while(my $row = $next->()) {
                 $row->{perl} = "5.004_05"               if $row->{perl} eq "5.4.4"; # RT 15162
                 $row->{perl} =~ s/patch.*/patch blead/  if $row->{perl} =~ /patch.*blead/;
@@ -678,6 +699,7 @@ sub DistroPages {
                 unshift @{ $reports{$row->{version}} }, $row    if($reports{$row->{version}});
                 $version{$row->{version}}->{new} = 1;
             }
+#$progress->( ".. .. summary data update complete for $name" ) if(defined $progress);
 
             for my $version ( keys %$byversion ) {
                 my @list = @{ $byversion->{$version} };
@@ -709,22 +731,93 @@ sub DistroPages {
                 }
                 $release{$version}->{header} .= "</h2>";
             }
+#$progress->( ".. .. version data update complete for $name" ) if(defined $progress);
 
+# V1 code starts
+#            my ($stats,$oses);
+#            @rows = $dbi->GetQuery('hash','GetDistrosPass',{dist=>$dist});
+#            for(@rows) {
+#                my ($osname,$code) = $cpan->OSName($_->{osname});
+#                $stats->{$_->{perl}}{$code}{count} = $_->{count};
+#                $oses->{$code} = $osname;
+#            }
+##$progress->( ".. .. OS data update complete for $name" ) if(defined $progress);
+#
+#            # distribution PASS stats
+#            my @stats = $dbi->GetQuery('hash','GetStatsPass',{dist=>$dist});
+#            for(@stats) {
+#                my ($osname,$code) = $cpan->OSName($_->{osname});
+#                $stats->{$_->{perl}}{$code}{version} = $_->{version}
+#                    if(!$stats->{$_->{perl}}->{$code} || _versioncmp($_->{version},$stats->{$_->{perl}}->{$code}{version}));
+#            }
+##$progress->( ".. .. Pass Stats data update complete for $name" ) if(defined $progress);
+# V1 code end
+
+# V2 code starts
+#            # retrieve perl/os stats
+#            my ($stats,$oses);
+#            my @stats = $dbi->GetQuery('hash','GetStatsPass',{dist=>$dist});
+#            for(@stats) {
+#                my ($osname,$code) = $cpan->OSName($_->{osname});
+#                $stats->{$_->{perl}}{$code}{version} = $_->{version}
+#                    if(!$stats->{$_->{perl}}->{$code} || _versioncmp($_->{version},$stats->{$_->{perl}}->{$code}{version}));
+#
+#                $stats->{$_->{perl}}{$code}{count}++;
+#                $oses->{$code} = $osname;
+#            }
+##$progress->( ".. .. Perl/OS data update complete for $name" ) if(defined $progress);
+# V2 code end
+
+# V3 code starts
+            # retrieve perl/os stats
             my ($stats,$oses);
-            @rows = $dbi->GetQuery('hash','GetDistrosPass',{dist=>$dist});
+            my $lastref = 0;
+            @rows = $dbi->GetQuery('hash','GetStatsStore',$name);
             for(@rows) {
-                my ($osname,$code) = $cpan->OSName($_->{osname});
-                $stats->{$_->{perl}}{$code}{count} = $_->{count};
-                $oses->{$code} = $osname;
+                $stats->{$_->{perl}}{$_->{osname}}{storeid} = $_->{storeid};
+                $stats->{$_->{perl}}{$_->{osname}}{version} = $_->{version};
+                $stats->{$_->{perl}}{$_->{osname}}{count}   = $_->{counter};
+                $stats->{$_->{perl}}{$_->{osname}}{updated} = 0;
+                $oses->{$_->{osname}} = $_->{osname};
+                $lastref = $_->{lastid};
             }
 
-            # distribution PASS stats
-            my @stats = $dbi->GetQuery('hash','GetStatsPass',{dist=>$dist});
+            # update perl/os stats
+            my @stats = $dbi->GetQuery('hash','GetStatsPass2',{dist=>$dist},$lastref);
             for(@stats) {
                 my ($osname,$code) = $cpan->OSName($_->{osname});
-                $stats->{$_->{perl}}{$code}{version} = $_->{version}
-                    if(!$stats->{$_->{perl}}->{$code} || _versioncmp($_->{version},$stats->{$_->{perl}}->{$code}{version}));
+                my $perl = $_->{perl};
+                $perl =~ s/ .*$//; # don't care about the patch/RC number
+
+                $stats->{$perl}{$code}{updated} = 1;
+
+                $stats->{$perl}{$code}{version} = $_->{version}
+                    if(!$stats->{$perl}->{$code} || _versioncmp($_->{version},$stats->{$perl}->{$code}{version}));
+
+                $stats->{$perl}{$code}{count}++;
+                $oses->{$code} = $osname;
+                $lastref = $_->{id} if($lastref < $_->{id});
             }
+
+            # store perl/os stats
+            for my $perl (keys %$stats) {
+                for my $code (keys %{$stats->{$perl}}) {
+                    next unless($stats->{$perl}{$code}{updated});
+                    if($stats->{$perl}{$code}{storeid}) {
+                        $dbi->DoQuery('UpdStatsStore',$name,$perl,$code,$stats->{$perl}{$code}{version},$stats->{$perl}{$code}{count},$lastref, $stats->{$perl}{$code}{storeid});
+                    } else {
+                        $dbi->DoQuery('SetStatsStore',$name,$perl,$code,$stats->{$perl}{$code}{version},$stats->{$perl}{$code}{count},$lastref);
+                    }
+                }
+            }
+#            $dbi->DoQuery('DelStatsStore',$name);
+#            for my $perl (keys %$stats) {
+#                for my $code (keys %{$stats->{$perl}}) {
+#                    $dbi->DoQuery('SetStatsStore',$name,$perl,$code,$stats->{$perl}{$code}{version},$stats->{$perl}{$code}{count},$lastref);
+#                }
+#            }
+#$progress->( ".. .. Perl/OS data update complete for $name" ) if(defined $progress);
+# V3 code end
 
             my @stats_oses = sort keys %$oses;
             my @stats_perl = sort {_versioncmp($b,$a)} keys %$stats;
@@ -743,6 +836,7 @@ sub DistroPages {
             $vars{builder}{perlvers}        = $cpan->mklist_perls;
             $vars{builder}{osnames}         = $cpan->osnames;
             $vars{builder}{processed}       = time;
+#$progress->( ".. .. memory data update complete for $name" ) if(defined $progress);
 
             # insert summary details
             {
@@ -750,6 +844,7 @@ sub DistroPages {
                 if(@summary)    { $dbi->DoQuery('UpdateDistroSummary',$lastid,$dataset,$name); }
                 else            { $dbi->DoQuery('InsertDistroSummary',$lastid,$dataset,$name); }
             }
+#$progress->( ".. .. summary data stored for $name" ) if(defined $progress);
 
             $vars{versions}        = \@versions;
             $vars{versions_tag}    = \%versions;
@@ -759,15 +854,19 @@ sub DistroPages {
             $vars{cache}           = $cache;
             $vars{processed}       = formatDate(8);
 
+#$progress->( ".. .. building static pages for $name" ) if(defined $progress);
             # build other static pages
             $vars{content} = 'cpan/distro-reports-static.html';
             my $text = Transform( 'cpan/layout-static.html', \%vars );
             overwrite_file( "$cache/$name.html", $text );
+#$progress->( ".. .. Dynamic HTML page written for $name" ) if(defined $progress);
 
             $text = Transform( 'cpan/distro.js', \%vars );
             overwrite_file( "$cache/$name.js", $text );
+#$progress->( ".. .. JS page written for $name" ) if(defined $progress);
 
             overwrite_file( "$cache/$name.json", _make_json( \@reports ) );
+#$progress->( ".. .. JSON page written for $name" ) if(defined $progress);
 
             $cache = sprintf "%s/stats/distro/%s", $settings{webdir}, substr($name,0,1);
             mkpath($cache);
@@ -776,6 +875,7 @@ sub DistroPages {
             $vars{content} = 'cpan/stats-distro-static.html';
             $text = Transform( 'cpan/layout-stats-static.html', \%vars );
             overwrite_file( "$cache/$name.html", $text );
+#$progress->( ".. .. Static HTML page written for $name" ) if(defined $progress);
 
             # generate symbolic links where necessary
             if($merged->{$name}) {
@@ -792,6 +892,7 @@ sub DistroPages {
                     }
                 }
                 chdir($cwd);
+#$progress->( ".. .. symbolic links created for $name" ) if(defined $progress);
             }
         }
     }
@@ -800,7 +901,12 @@ sub DistroPages {
 #LogDebug("DistroPages: ids=@ids, distros=@delete");
 
     # remove requests
-    $dbi->DoQuery('DeletePageRequests',{ids => join(',',@ids)},'distro',$_) for(@delete);
+    while(@ids) {
+#$progress->( ".. .. removing page_request entries for $name. ids=".scalar(@ids) ) if(defined $progress);
+        my @remove = splice(@ids,0,100);
+        $dbi->DoQuery('DeletePageRequests',{ids => join(',',@remove)},'distro',$_) for(@delete);
+    };
+#$progress->( ".. .. removed page_request entries for $name" ) if(defined $progress);
 }
 
 sub StatsPages {
@@ -1105,7 +1211,7 @@ Miss Barbell Productions, L<http://www.missbarbell.co.uk/>
 
 =head1 COPYRIGHT & LICENSE
 
-  Copyright (C) 2008-2015 Barbie for Miss Barbell Productions
+  Copyright (C) 2008-2017 Barbie for Miss Barbell Productions
   All Rights Reserved.
 
   This module is free software; you can redistribute it and/or

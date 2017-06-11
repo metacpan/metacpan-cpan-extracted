@@ -10,8 +10,8 @@ BEGIN {
 
 BEGIN {
 	$Type::Tiny::AUTHORITY   = 'cpan:TOBYINK';
-	$Type::Tiny::VERSION     = '1.000006';
-	$Type::Tiny::XS_VERSION  = '0.010';
+	$Type::Tiny::VERSION     = '1.002001';
+	$Type::Tiny::XS_VERSION  = '0.011';
 }
 
 use Eval::TypeTiny ();
@@ -53,30 +53,74 @@ BEGIN {
 		: sub () { !!0 };
 };
 
+sub __warn__ {
+	my ($msg, $thing) = @_==2 ? @_ : (Thing => @_);
+	my $string = do {
+		blessed($thing) && $thing->isa('Type::Tiny::Union') ? sprintf('Union[%s]', join q{, }, map $_->name, @{$thing->type_constraints}) :
+		blessed($thing) && $thing->isa('Type::Tiny') ? $thing->name :
+		blessed($thing) && $thing->isa('Type::Tiny::_HalfOp') ? sprintf('HalfOp[ q{%s}, %s, %s ]', $thing->{op}, $thing->{type}->name, $thing->{param}) :
+		!defined($thing) ? 'NIL' :
+		"$thing"
+	};
+	warn "$msg => $string\n";
+	$thing;
+}
+
 use overload
 	q("")      => sub { caller =~ m{^(Moo::HandleMoose|Sub::Quote)} ? overload::StrVal($_[0]) : $_[0]->display_name },
 	q(bool)    => sub { 1 },
 	q(&{})     => "_overload_coderef",
 	q(|)       => sub {
 		my @tc = _swap @_;
-		if (!_FIXED_PRECEDENCE && !blessed $tc[0] && ref $tc[0] eq 'ARRAY') {
-			require Type::Tiny::_HalfOp;
-			return "Type::Tiny::_HalfOp"->new('|', @tc);
-		}
+		if (!_FIXED_PRECEDENCE && $_[2]) {
+			if (blessed $tc[0]) {
+				if (blessed $tc[0] eq "Type::Tiny::_HalfOp") {
+					my $type  = $tc[0]->{type};
+					my $param = $tc[0]->{param};
+					my $op    = $tc[0]->{op};
+					require Type::Tiny::Union;
+					return "Type::Tiny::_HalfOp"->new(
+						$op,
+						$param,
+						"Type::Tiny::Union"->new(type_constraints => [$type, $tc[1]]),
+					);
+				}
+			}
+			elsif (ref $tc[0] eq 'ARRAY') {
+				require Type::Tiny::_HalfOp;
+				return "Type::Tiny::_HalfOp"->new('|', @tc);
+			}
+	}
 		require Type::Tiny::Union;
-		"Type::Tiny::Union"->new(type_constraints => \@tc)
+		return "Type::Tiny::Union"->new(type_constraints => \@tc)
 	},
 	q(&)       => sub {
 		my @tc = _swap @_;
-		if (!_FIXED_PRECEDENCE && !blessed $tc[0] && ref $tc[0] eq 'ARRAY') {
-			require Type::Tiny::_HalfOp;
-			return "Type::Tiny::_HalfOp"->new('&', @tc);
-		}
+		if (!_FIXED_PRECEDENCE && $_[2]) {
+			if (blessed $tc[0]) {
+				if (blessed $tc[0] eq "Type::Tiny::_HalfOp") {
+					my $type  = $tc[0]->{type};
+					my $param = $tc[0]->{param};
+					my $op    = $tc[0]->{op};
+					require Type::Tiny::Intersection;
+					return "Type::Tiny::_HalfOp"->new(
+						$op,
+						$param,
+						"Type::Tiny::Intersection"->new(type_constraints => [$type, $tc[1]]),
+					);
+				}
+			}
+			elsif (ref $tc[0] eq 'ARRAY') {
+				require Type::Tiny::_HalfOp;
+				return "Type::Tiny::_HalfOp"->new('&', @tc);
+			}
+	}
 		require Type::Tiny::Intersection;
 		"Type::Tiny::Intersection"->new(type_constraints => \@tc)
 	},
 	q(~)       => sub { shift->complementary_type },
 	q(==)      => sub { $_[0]->equals($_[1]) },
+	q(!=)      => sub { not $_[0]->equals($_[1]) },
 	q(<)       => sub { my $m = $_[0]->can('is_subtype_of'); $m->(_swap @_) },
 	q(>)       => sub { my $m = $_[0]->can('is_subtype_of'); $m->(reverse _swap @_) },
 	q(<=)      => sub { my $m = $_[0]->can('is_a_type_of');  $m->(_swap @_) },
@@ -119,10 +163,28 @@ our %ALL_TYPES;
 
 my $QFS;
 my $uniq = 1;
+my $subname;
 sub new
 {
 	my $class  = shift;
 	my %params = (@_==1) ? %{$_[0]} : @_;
+	
+	if (exists $params{constraint}
+	and not ref $params{constraint}
+	and not exists $params{constraint_generator}
+	and not exists $params{inline_generator})
+	{
+		my $code = $params{constraint};
+		$params{constraint} = Eval::TypeTiny::eval_closure(
+			source      => sprintf('sub ($) { %s }', $code),
+			description => "anonymous check",
+		);
+		$params{inlined} ||= sub {
+			my ($type) = @_;
+			my $inlined = $_ eq '$_' ? "do { $code }" : "do { local \$_ = $_; $code }";
+			$type->has_parent ? (undef, $inlined) : $inlined;
+		};
+	}
 	
 	if (exists $params{parent})
 	{
@@ -203,14 +265,19 @@ sub new
 		$self->coercion->add_type_coercions(@$arr);
 	}
 	
-	if ($params{my_methods} and eval { require Sub::Name })
+	if ($params{my_methods})
 	{
-		for my $key (keys %{$params{my_methods}})
+		$subname =
+			eval { require Sub::Util } ? \&Sub::Util::set_subname :
+			eval { require Sub::Name } ? \&Sub::Name::subname :
+			0
+			if not defined $subname;
+		if ($subname)
 		{
-			Sub::Name::subname(
-				sprintf("%s::my_%s", $self->qualified_name, $key),
-				$params{my_methods}{$key},
-			);
+			$subname->(
+				sprintf("%s::my_%s", $self->qualified_name, $_),
+				$params{my_methods}{$_},
+			) for keys %{$params{my_methods}};
 		}
 	}
 	
@@ -1231,9 +1298,12 @@ in reading when dealing with type constraint objects.
 
 =item C<< constraint >>
 
-Coderef to validate a value (C<< $_ >>) against the type constraint. The
-coderef will not be called unless the value is known to pass any parent
-type constraint (see C<parent> below).
+Coderef to validate a value (C<< $_ >>) against the type constraint.
+The coderef will not be called unless the value is known to pass any
+parent type constraint (see C<parent> below).
+
+Alternatively, a string of Perl code checking C<< $_ >> can be passed
+as a parameter to the constructor, and will be converted to a coderef.
 
 Defaults to C<< sub { 1 } >> - i.e. a coderef that passes all values.
 
@@ -1251,6 +1321,7 @@ type. Optional.
 
 If C<constraint> (above) is a coderef generated via L<Sub::Quote>, then
 Type::Tiny I<may> be able to automatically generate C<inlined> for you.
+If C<constraint> (above) is a string, it will be able to.
 
 =item C<< name >>
 
@@ -1477,6 +1548,11 @@ C<< HashRef->where(sub { exists($_->{name}) }) >>. That said, you can
 get a similar result using overloaded C<< & >>:
 
    HashRef & sub { exists($_->{name}) }
+
+Like the C<< constraint >> attribute, this will accept a string of Perl
+code:
+
+   HashRef->where('exists($_->{name})')
 
 =item C<< child_type_class >>
 

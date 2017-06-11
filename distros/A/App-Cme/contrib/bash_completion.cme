@@ -40,7 +40,7 @@ _cme_cmd_run()
         var=$( perl -E 'my @v; while(<>) { push  @v, /\$(\w+)/g }; my %map = map { ($_ => 1)} @v; print map { "$_= " } sort keys %map;' $script);
         COMPREPLY=( $( compgen -W "$var" -- $cur ) )
     elif [[ $prev != '-list' ]]; then
-        COMPREPLY=( $( compgen -W "-arg -info" -- $cur ) )
+        COMPREPLY=( $( compgen -W "-arg -doc" -- $cur ) )
     fi
 }
 
@@ -61,7 +61,7 @@ _cme()
     COMPREPLY=()
     _get_comp_words_by_ref -n : cur prev
 
-    global_options='-dev -force-load -create -backend -trace -quiet -file'
+    global_options='-force-load -create -backend -trace -quiet -file'
 
     if [[ $COMP_CWORD -eq 1 ]] ; then
         _cme_commands
@@ -79,6 +79,9 @@ _cme()
             ;;
            -model-dir|-root-dir|-fuse-dir)
                 _filedir -d
+            ;;
+           -file)
+                _filedir
             ;;
              *)
             case ${COMP_WORDS[1]} in

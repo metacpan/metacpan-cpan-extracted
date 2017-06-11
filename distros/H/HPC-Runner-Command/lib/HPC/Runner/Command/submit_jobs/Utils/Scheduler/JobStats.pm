@@ -138,7 +138,7 @@ sub collect_stats {
     $self->set_batches(
         $batch_counter . "_"
           . $current_job => {
-            commands => $cmd_counter,
+            # commands => $cmd_counter,
             jobname  => $current_job,
             batch    => $batch_counter,
           }

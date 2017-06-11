@@ -2,27 +2,102 @@ package AI::XGBoost::CAPI;
 use strict;
 use warnings;
 
-use parent 'NativeCall';
+use Exporter::Easy (
+    TAGS => [
+        all => [
+            qw(
+              XGDMatrixCreateFromFile
+              XGDMatrixNumRow
+              XGDMatrixNumCol
+              XGDMatrixFree
+              XGBoosterCreate
+              XGBoosterUpdateOneIter
+              XGBoosterPredict
+              XGBoosterFree
+              )
+        ]
+    ]
+);
+use AI::XGBoost::CAPI::RAW;
+use FFI::Platypus;
+use Exception::Class ( 'XGBoostException' );
 
-our $VERSION = '0.001';    # VERSION
+our $VERSION = '0.004';    # VERSION
 
 # ABSTRACT: Perl wrapper for XGBoost C API https://github.com/dmlc/xgboost
 
-sub XGBGetLastError : Args() : Native(xgboost) : Returns(string) { }
+sub XGDMatrixCreateFromFile {
+    my ( $filename, $silent ) = @_;
+    $silent //= 1;
+    my $matrix = 0;
+    my $error = AI::XGBoost::CAPI::RAW::XGDMatrixCreateFromFile( $filename, $silent, \$matrix );
+    _CheckCall($error);
+    return $matrix;
+}
 
-sub XGDMatrixCreateFromFile : Args(string, int, opaque*) : Native(xgboost) : Returns(int) { }
+sub XGDMatrixNumRow {
+    my ($matrix) = @_;
+    my $rows = 0;
+    _CheckCall( AI::XGBoost::CAPI::RAW::XGDMatrixNumRow( $matrix, \$rows ) );
+    return $rows;
+}
 
-sub XGDMatrixNumRow : Args(opaque, uint64*) : Native(xgboost) : Returns(int) { }
+sub XGDMatrixNumCol {
+    my ($matrix) = @_;
+    my $cols = 0;
+    _CheckCall( AI::XGBoost::CAPI::RAW::XGDMatrixNumCol( $matrix, \$cols ) );
+    return $cols;
+}
 
-sub XGDMatrixNumCol : Args(opaque, uint64*) : Native(xgboost) : Returns(int) { }
+sub XGDMatrixFree {
+    my ($matrix) = @_;
+    _CheckCall( AI::XGBoost::CAPI::RAW::XGDMatrixFree($matrix) );
+    return ();
+}
 
-sub XGBoosterCreate : Args(opaque[], uint64, opaque*) : Native(xgboost) : Returns(int) { }
+sub XGBoosterCreate {
+    my ($matrices) = @_;
+    my $booster = 0;
+    _CheckCall( AI::XGBoost::CAPI::RAW::XGBoosterCreate( $matrices, scalar @$matrices, \$booster ) );
+    return $booster;
+}
 
-sub XGBoosterFree : Args(opaque) : Native(xgboost) : Returns(int) { }
+sub XGBoosterUpdateOneIter {
+    my ( $booster, $iter, $train_matrix ) = @_;
+    _CheckCall( AI::XGBoost::CAPI::RAW::XGBoosterUpdateOneIter( $booster, $iter, $train_matrix ) );
+    return ();
+}
 
-sub XGBoosterUpdateOneIter : Args(opaque, int, opaque) : Native(xgboost) : Returns(int) { }
+sub XGBoosterPredict {
+    my ( $booster, $data_matrix, $option_mask, $ntree_limit ) = @_;
+    my $out_len    = 0;
+    my $out_result = 0;
+    _CheckCall(
+                AI::XGBoost::CAPI::RAW::XGBoosterPredict( $booster,     $data_matrix, $option_mask,
+                                                          $ntree_limit, \$out_len,    \$out_result
+                )
+    );
+    my $ffi = FFI::Platypus->new();
+    return $ffi->cast( opaque => "float[$out_len]", $out_result );
+}
 
-sub XGBoosterPredict : Args(opaque, opaque, int, uint, uint64*, opaque*) : Native(xgboost) : Returns(int) { }
+sub XGBoosterFree {
+    my ($booster) = @_;
+    _CheckCall( AI::XGBoost::CAPI::RAW::XGBoosterFree($booster) );
+    return ();
+}
+
+# _CheckCall
+#
+#  Check return code and if necesary, launch an exception
+#
+sub _CheckCall {
+    my ($return_code) = @_;
+    if ($return_code) {
+        my $error_message = AI::XGBoost::CAPI::RAW::XGBGetLastError();
+        XGBoostException->throw( error => $error_message );
+    }
+}
 
 1;
 
@@ -38,63 +113,42 @@ AI::XGBoost::CAPI - Perl wrapper for XGBoost C API https://github.com/dmlc/xgboo
 
 =head1 VERSION
 
-version 0.001
+version 0.004
 
 =head1 SYNOPSIS
 
  use 5.010;
- use AI::XGBoost::CAPI;
- use FFI::Platypus;
+ use AI::XGBoost::CAPI qw(:all);
  
- my $silent = 0;
- my ($dtrain, $dtest) = (0, 0);
+ my $dtrain = XGDMatrixCreateFromFile('agaricus.txt.train');
+ my $dtest = XGDMatrixCreateFromFile('agaricus.txt.test');
  
- AI::XGBoost::CAPI::XGDMatrixCreateFromFile('agaricus.txt.test', $silent, \$dtest);
- AI::XGBoost::CAPI::XGDMatrixCreateFromFile('agaricus.txt.train', $silent, \$dtrain);
+ my ($rows, $cols) = (XGDMatrixNumRow($dtrain), XGDMatrixNumCol($dtrain));
+ say "Train dimensions: $rows, $cols";
  
- my ($rows, $cols) = (0, 0);
- AI::XGBoost::CAPI::XGDMatrixNumRow($dtrain, \$rows);
- AI::XGBoost::CAPI::XGDMatrixNumCol($dtrain, \$cols);
- say "Dimensions: $rows, $cols";
- 
- my $booster = 0;
- 
- AI::XGBoost::CAPI::XGBoosterCreate( [$dtrain] , 1, \$booster);
+ my $booster = XGBoosterCreate([$dtrain]);
  
  for my $iter (0 .. 10) {
-     AI::XGBoost::CAPI::XGBoosterUpdateOneIter($booster, $iter, $dtrain);
+     XGBoosterUpdateOneIter($booster, $iter, $dtrain);
  }
  
- my $out_len = 0;
- my $out_result = 0;
+ my $predictions = XGBoosterPredict($booster, $dtest, 0, 0);
+ # say join "\n", @$predictions;
  
- AI::XGBoost::CAPI::XGBoosterPredict($booster, $dtest, 0, 0, \$out_len, \$out_result);
- my $ffi = FFI::Platypus->new();
- my $predictions = $ffi->cast(opaque => "float[$out_len]", $out_result);
- 
- #say join "\n", @$predictions;
- 
- AI::XGBoost::CAPI::XGBoosterFree($booster);
+ XGBoosterFree($booster);
+ XGDMatrixFree($dtrain);
+ XGDMatrixFree($dtest);
 
 =head1 DESCRIPTION
 
-Wrapper for the C API.
+Perlified wrapper for the C API
 
-The doc for the methods is extracted from doxygen comments: https://github.com/dmlc/xgboost/blob/master/include/xgboost/c_api.h
+=head2 Error handling
+
+XGBoost c api functions returns some int to signal the presence/absence of error.
+In this module that is achieved using Exceptions from L<Exception::Class>
 
 =head1 FUNCTIONS
-
-=head2 XGBGetLastError
-
-Get string message of the last error
-
-All functions in this file will return 0 when success
-and -1 when an error occurred,
-XGBGetLastError can be called to retrieve the error
-
-This function is thread safe and can be called by different thread
-
-Returns string error information
 
 =head2 XGDMatrixCreateFromFile
 
@@ -112,101 +166,83 @@ the name of the file
 
 whether print messages during loading
 
-=item out 
-
-a loaded data matrix
-
 =back
+
+Returns a loaded data matrix
 
 =head2 XGDMatrixNumRow
 
-Get number of rows.
+Get number of rows
 
 Parameters:
 
 =over 4
 
-=item handle 
+=item matrix
 
-the handle to the DMatrix
-
-=item out 
-
-The address to hold number of rows.
+DMatrix
 
 =back
 
 =head2 XGDMatrixNumCol
 
-Get number of cols.
+Get number of cols
 
 Parameters:
 
 =over 4
 
-=item handle 
+=item matrix
 
-the handle to the DMatrix
+DMatrix
 
-=item out 
+=back
 
-The address to hold number of cols.
+=head2 XGDMatrixFree
+
+Free space in data matrix
+
+Parameters:
+
+=over 4
+
+=item matrix
+
+DMatrix to be freed
 
 =back
 
 =head2 XGBoosterCreate
 
-Create xgboost learner
+Create XGBoost learner
 
 Parameters:
 
 =over 4
 
-=item dmats 
+=item matrices
 
 matrices that are set to be cached
-
-=item len 
-
-length of dmats
-
-=item out 
-
-handle to the result booster
-
-=back
-
-=head2 XGBoosterFree
-
-Free obj in handle
-
-Parameters:
-
-=over 4
-
-=item handle 
-
-handle to be freed
 
 =back
 
 =head2 XGBoosterUpdateOneIter
 
-Update the model in one round using dtrain
+Update the model in one round using train matrix
 
 Parameters:
 
 =over 4
 
-=item handle 
+=item booster
 
-handle
+XGBoost learner to train
 
 =item iter
 
 current iteration rounds
 
-=item dtrain
+=item train_matrix
 
 training data
 
@@ -214,21 +250,21 @@ training data
 
 =head2 XGBoosterPredict
 
-Make prediction based on dmat
+Make prediction based on train matrix
 
 Parameters:
 
 =over 4
 
-=item handle 
+=item booster
 
-handle
+XGBoost learner 
 
-=item dmat 
+=item data_matrix
 
-data matrix
+Data matrix with the elements to predict
 
-=item option_mask 
+=item option_mask
 
 bit-mask of options taken in prediction, possible values
 
@@ -252,18 +288,26 @@ bit-mask of options taken in prediction, possible values
 
 =back
 
-=item ntree_limit 
+=item ntree_limit
 
 limit number of trees used for prediction, this is only valid for boosted trees
 when the parameter is set to 0, we will use all the trees
 
-=item out_len 
+=back
 
-used to store length of returning result
+Returns an arrayref with the predictions corresponding to the rows of data matrix
 
-=item out_result 
+=head2 XGBoosterFree
 
-used to set a pointer to array
+Free booster object
+
+Parameters:
+
+=over 4
+
+=item booster
+
+booster to be freed
 
 =back
 
@@ -273,7 +317,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2017 by Pablo Rodríguez González.
+This software is Copyright (c) 2017 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

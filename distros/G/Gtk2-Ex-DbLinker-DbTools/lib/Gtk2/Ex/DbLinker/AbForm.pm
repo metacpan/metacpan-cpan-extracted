@@ -2,6 +2,7 @@ package Gtk2::Ex::DbLinker::AbForm;
 use Class::InsideOut qw(public private register id);
 use Gtk2::Ex::DbLinker::DbTools;
 use Scalar::Util qw(weaken);
+use Log::Any;
 #use Carp 'croak';
 our $VERSION = $Gtk2::Ex::DbLinker::DbTools::VERSION;
 =head1 NAME
@@ -18,7 +19,7 @@ use strict;
 use warnings;
 #use Data::Dumper;
 use DateTime::Format::Strptime;
-#use Carp qw(confess);
+use Carp qw(confess croak);
 
 private data_manager => my %dman;
 public child_class => my %child_class;
@@ -73,7 +74,8 @@ sub new {
         }
     
     }
-    $log{ $id } = Log::Log4perl->get_logger(__PACKAGE__);
+    #$log{ $id } = Log::Log4perl->get_logger(__PACKAGE__);
+    $log{ $id } = Log::Any->get_logger();
         my @dates;
 
     #$self->{subform} = [];
@@ -200,14 +202,16 @@ sub _datawidgetsName {
 sub _cols {
     my $self = shift;
     my $id =  id $self; 
-  $log{ $id }->logconfess( __PACKAGE__ . "_cols is readonly") if (defined $_[0]);
+    #$log{ $id }->logconfess( __PACKAGE__ . "_cols is readonly") if (defined $_[0]);
+    confess($log{ $id }->error( __PACKAGE__ . "_cols is readonly")) if (defined $_[0]);
     return  $widgets{ $id }->{cols};
 }
 
 sub _dman {
      my $self = shift;
      my $id =  id $self;
-     $log{ $id }->logconfess( __PACKAGE__ . "_dman is readonly") if (defined $_[0]);
+     #$log{ $id }->logconfess( __PACKAGE__ . "_dman is readonly") if (defined $_[0]);
+     confess($log{ $id }->error( __PACKAGE__ . "_dman is readonly")) if (defined $_[0]);
     return  $dman{ $id };
 
 }
@@ -215,7 +219,8 @@ sub _dman {
 sub _pos {
      my $self = shift;
     my $id =  id $self;
-     $log{ $id }->logconfess( __PACKAGE__ . "_pos is readonly") if (defined $_[0]);
+    # $log{ $id }->logconfess( __PACKAGE__ . "_pos is readonly") if (defined $_[0]);
+    confess($log{ $id }->error( __PACKAGE__ . "_pos is readonly")) if (defined $_[0]);
     return  $states{ $id }->{pos};
 
 }
@@ -223,7 +228,8 @@ sub _pos {
 sub _auto_apply {
      my $self = shift;
      my $id =  id $self;
-      $log{ $id }->logconfess( __PACKAGE__ . "_auto_apply is readonly") if (defined $_[0]);
+     # $log{ $id }->logconfess( __PACKAGE__ . "_auto_apply is readonly") if (defined $_[0]);
+     confess( $log{ $id }->error( __PACKAGE__ . "_auto_apply is readonly")) if (defined $_[0]);
     return  $states{ $id }->{auto_apply};
 }
 
@@ -743,11 +749,13 @@ sub _format_date {
     my ( $pos1, $pos2 ) = ( $in_db ? ( 1, 0 ) : ( 0, 1 ) );
     my $format = $widgets{ $id }->{date_formatters}->{$idcol}->[$pos1];
     my $f      = $self->_get_dateformatter($format);
-    my $dt     = $f->parse_datetime($v) or $log{ $id }->logcroak( $f->errmsg );
+    #my $dt     = $f->parse_datetime($v) or $log{ $id }->logcroak( $f->errmsg );
+    my $dt     = $f->parse_datetime($v) or croak($log{ $id }->error( $f->errmsg ));
     $log{ $id }->debug( "format_date:  date time object ymd: " . $dt->ymd );
     $format = $widgets{ $id }->{date_formatters}->{$idcol}->[$pos2];
     $f      = $self->_get_dateformatter($format);
-    my $r = $f->format_datetime($dt) or $log{ $id }->logcroak( $f->errmsg );
+    # my $r = $f->format_datetime($dt) or $log{ $id }->logcroak( $f->errmsg );
+     my $r = $f->format_datetime($dt) or croak($log{ $id }->error( $f->errmsg ));
     $log{ $id }->debug( "format_date formatted date: " . $r );
 
     return $r;

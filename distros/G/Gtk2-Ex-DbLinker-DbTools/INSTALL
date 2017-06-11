@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.111
+    version 0.112
 
 INSTALLATION
 
@@ -30,13 +30,13 @@ INSTALLATION
 
 DEPENDENCIES
 
-            Test::More      1
-            Carp    1.17
             Try::Tiny       0.22
+            Scalar::Util    1.45
+            Log::Any        1.049
+            Carp    1.17
+            Class::InsideOut        1.13
             Data::Dumper    2.154
             interface       0.03
-            Scalar::Util    1.45
             DBI     1.631
-            Class::InsideOut        1.13
-            Log::Log4perl   1.41
+            Test::More      1
 

@@ -10,19 +10,22 @@
 # ABSTRACT: Run a cme script
 
 package App::Cme::Command::run ;
-$App::Cme::Command::run::VERSION = '1.019';
+$App::Cme::Command::run::VERSION = '1.020';
 use strict;
 use warnings;
 use 5.10.1;
 use File::HomeDir;
 use Path::Tiny;
 use Config::Model;
+use Log::Log4perl qw(get_logger :levels);
 
 use Encode qw(decode_utf8);
 
 use App::Cme -command ;
 
 use base qw/App::Cme::Common/;
+
+my $logger = get_logger("Cme::run");
 
 my $__test_home = '';
 sub _set_test_home { $__test_home = shift; }
@@ -45,6 +48,12 @@ sub opt_spec {
         [ "list!"   => "list available scripts" ],
         $class->cme_global_options,
     );
+}
+
+sub validate_args {
+    my ($self, $opt, $args) = @_;
+
+    $self->check_unknown_args($args);
 }
 
 sub usage_desc {
@@ -92,6 +101,8 @@ sub execute {
 
     die "Error: cannot find script $script_name\n" unless $script->is_file;
 
+    $logger->info("Running script $script");
+
     my $content = $script->slurp_utf8;
 
     # parse variables passed on command line
@@ -99,17 +110,19 @@ sub execute {
 
     if ($content =~ m/^#!/ or $content =~ /^use/m) {
         splice @ARGV, 0,2; # remove 'run script' arguments
+        $logger->info("Running script $script with perl");
         eval $script->slurp_utf8;
         die "Error in script $script_name: $@\n" if $@;
         return;
     }
 
+    $logger->info("Running script $script");
     my %var;
 
     # find if all variables are accounted for
     my %missing ;
 
-    # %args can be used in var ssection of a script. A new entry in
+    # %args can be used in var section of a script. A new entry in
     # added in %missing if the script tries to read an undefined value
     tie my %args, 'App::Cme::Run::Var', \%missing;
     %args = %user_args;
@@ -148,8 +161,10 @@ sub execute {
             unshift @$app_args, $value;
         }
         elsif ($key eq 'var') {
-            eval ($value) ;
+            $logger->trace("Eval var expression: $value");
+            my $res = eval ($value) ;
             die "Error in var specification line $line_nb: $@\n" if $@;
+            $logger->debug("Eval var result: $res");
         }
         elsif ($key eq 'doc') {
             push @doc, $value;
@@ -197,7 +212,7 @@ sub execute {
 }
 
 package App::Cme::Run::Var;
-$App::Cme::Run::Var::VERSION = '1.019';
+$App::Cme::Run::Var::VERSION = '1.020';
 require Tie::Hash;
 
 our @ISA = qw(Tie::ExtraHash);
@@ -223,7 +238,7 @@ App::Cme::Command::run - Run a cme script
 
 =head1 VERSION
 
-version 1.019
+version 1.020
 
 =head1 SYNOPSIS
 

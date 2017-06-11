@@ -1,0 +1,33 @@
+BlankOnDev version 0.1003
+=========================
+
+INSTALLATION
+
+To manual install this module on GNU/Linux environment the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+    make clean
+
+Or install from cpan:
+
+    cpan -i BlankOnDev
+
+install from cpan can do that in GNU/Linux and Microsoft Windows.
+
+DEPENDENCIES
+
+  JSON
+
+Dependencies must install before install module BlankOnDev if you not from CPAN.
+
+COPYRIGHT AND LICENCE.
+
+Copyright (C) 2017 by Achmad Yusri Afandi
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

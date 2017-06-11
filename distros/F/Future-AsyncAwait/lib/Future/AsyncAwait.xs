@@ -36,6 +36,9 @@ typedef struct {
   SV *awaiting_future;   /* the Future that 'await' is currently waiting for */
   SV *returning_future;  /* the Future that its contining CV will eventually return */
   SuspendedFrame *frames;
+
+  U32 padlen;
+  SV **padslots;
 } SuspendedState;
 
 static MGVTBL vtbl = {
@@ -73,10 +76,77 @@ static SuspendedState *MY_suspendedstate_new(pTHX_ CV *cv)
   return ret;
 }
 
-#define suspendedstate_suspend(state)  MY_suspendedstate_suspend(aTHX_ state)
-static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state)
+#define suspend_block(frame, cx)  MY_suspend_block(aTHX_ frame, cx)
+static void MY_suspend_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
+{
+  /* The base of the stack within this context */
+  SV **bp = PL_stack_base + cx->blk_oldsp + 1;
+  I32 *markbase = PL_markstack + cx->blk_oldmarksp + 1;
+
+  frame->stacklen = (I32)(PL_stack_sp - PL_stack_base)  - cx->blk_oldsp;
+  if(frame->stacklen) {
+    I32 i;
+    /* Steal SVs right off the stack */
+    Newx(frame->stack, frame->stacklen, SV *);
+    for(i = 0; i < frame->stacklen; i++) {
+      frame->stack[i] = bp[i];
+      bp[i] = NULL;
+    }
+    PL_stack_sp = PL_stack_base + cx->blk_oldsp;
+  }
+
+  frame->marklen = (I32)(PL_markstack_ptr - PL_markstack) - cx->blk_oldmarksp;
+  if(frame->marklen) {
+    I32 i;
+    Newx(frame->marks, frame->marklen, I32);
+    for(i = 0; i < frame->marklen; i++) {
+      /* Translate mark value relative to bp */
+      I32 relmark = markbase[i] - cx->blk_oldsp;
+      frame->marks[i] = relmark;
+    }
+    PL_markstack_ptr = PL_markstack + cx->blk_oldmarksp;
+  }
+
+  I32 savelen = PL_savestack_ix - cx->blk_oldsaveix;
+  if(savelen) {
+    /* Useful references
+     *   scope.h
+     *   scope.c: Perl_leave_scope()
+     */
+
+    /* TODO: cope with more things
+     * Right now all we can handle is a single SAVEt_ALLOC that implies zero size
+     */
+    if(savelen > 1)
+      croak("TODO: PL_savestack is longer than expected");
+
+    UV uv = PL_savestack[PL_savestack_ix].any_uv;
+    U8 type = (U8)uv & SAVE_MASK;
+
+    if(type != SAVEt_ALLOC)
+      croak("TODO: Top of PL_savestack is not SAVEt_ALLOC but %d", type);
+
+    UV size = (type >> SAVE_TIGHT_SHIFT);
+    if(size > 0)
+      croak("TODO: Handle SAVEt_ALLOC of non-zero size %d", size);
+
+    /* At this point we know it's safe to just ignore it */
+    PL_savestack_ix--;
+  }
+
+  if(cx->blk_oldsaveix != PL_savestack_ix)
+    croak("TODO: handle cx->blk_oldsaveix");
+}
+
+#define suspendedstate_suspend(state, cv)  MY_suspendedstate_suspend(aTHX_ state, cv)
+static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
 {
   I32 cxix;
+  PADOFFSET padnames_max, pad_max, i;
+  PADLIST *plist;
+  PADNAME **padnames;
+  PAD *pad;
+
   for(cxix = cxstack_ix; cxix; cxix--) {
     PERL_CONTEXT *cx = &cxstack[cxix];
     if(CxTYPE(cx) == CXt_SUB)
@@ -88,37 +158,7 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state)
     frame->next = state->frames;
     state->frames = frame;
 
-    /* Some common checks for all frame types */
-    if(cx->blk_oldsaveix != PL_savestack_ix)
-      croak("TODO: handle cx->blk_oldsaveix");
-
-    /* The base of the stack within this context */
-    SV **bp = PL_stack_base + cx->blk_oldsp + 1;
-    I32 *markbase = PL_markstack + cx->blk_oldmarksp + 1;
-
-    frame->stacklen = (I32)(PL_stack_sp - PL_stack_base)  - cx->blk_oldsp;
-    if(frame->stacklen) {
-      I32 i;
-      /* Steal SVs right off the stack */
-      Newx(frame->stack, frame->stacklen, SV *);
-      for(i = 0; i < frame->stacklen; i++) {
-        frame->stack[i] = bp[i];
-        bp[i] = NULL;
-      }
-      PL_stack_sp = PL_stack_base + cx->blk_oldsp;
-    }
-
-    frame->marklen = (I32)(PL_markstack_ptr - PL_markstack) - cx->blk_oldmarksp;
-    if(frame->marklen) {
-      I32 i;
-      Newx(frame->marks, frame->marklen, I32);
-      for(i = 0; i < frame->marklen; i++) {
-        /* Translate mark value relative to bp */
-        I32 relmark = markbase[i] - cx->blk_oldsp;
-        frame->marks[i] = relmark;
-      }
-      PL_markstack_ptr = PL_markstack + cx->blk_oldmarksp;
-    }
+    suspend_block(frame, cx);
 
     /* ref:
      *   https://perl5.git.perl.org/perl.git/blob/b4972372a75776de3c9e6bd234a398d103677
@@ -151,11 +191,65 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state)
     }
   }
 
+  /* Now steal the lexical SVs from the PAD */
+  plist = CvPADLIST(cv);
+
+  padnames = PadnamelistARRAY(PadlistNAMES(plist));
+  padnames_max = PadnamelistMAX(PadlistNAMES(plist));
+
+  pad = PadlistARRAY(plist)[CvDEPTH(cv)];
+  pad_max = PadMAX(pad);
+
+  state->padlen = PadMAX(pad) + 1;
+  Newx(state->padslots, state->padlen - 1, SV *);
+
+  /* slot 0 is always the @_ AV */
+  for(i = 1; i <= pad_max; i++) {
+    PADNAME *pname = (i <= padnames_max) ? padnames[i] : NULL;
+
+    /* Only the lexicals that have names; if there's no name then skip it. */
+    if(!pname || !PadnameLEN(pname)) {
+      state->padslots[i-1] = NULL;
+      continue;
+    }
+
+    /* Don't fiddle refcount */
+    state->padslots[i-1] = PadARRAY(pad)[i];
+    PadARRAY(pad)[i] = newSV(0);
+  }
+
   dounwind(cxix);
 }
 
-#define suspendedstate_resume(state)  MY_suspendedstate_resume(aTHX_ state)
-static void MY_suspendedstate_resume(pTHX_ SuspendedState *state)
+#define resume_block(frame, cx)  MY_resume_block(aTHX_ frame, cx)
+static void MY_resume_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
+{
+  if(frame->stacklen) {
+    dSP;
+    I32 i;
+    EXTEND(SP, frame->stacklen);
+
+    for(i = 0; i < frame->stacklen; i++) {
+      PUSHs(frame->stack[i]);
+    }
+
+    Safefree(frame->stack);
+    PUTBACK;
+  }
+
+  if(frame->marklen) {
+    I32 i;
+
+    for(i = 0; i < frame->marklen; i++) {
+      PUSHMARK(PL_stack_base + frame->marks[i] - cx->blk_oldsp);
+    }
+
+    Safefree(frame->marks);
+  }
+}
+
+#define suspendedstate_resume(state, cv)  MY_suspendedstate_resume(aTHX_ state, cv)
+static void MY_suspendedstate_resume(pTHX_ SuspendedState *state, CV *cv)
 {
   SuspendedFrame *frame, *next;
   for(frame = state->frames; frame; frame = next) {
@@ -176,30 +270,23 @@ static void MY_suspendedstate_resume(pTHX_ SuspendedState *state)
         croak("TODO: Unsure how to restore a %d frame\n", frame->type);
     }
 
-    if(frame->stacklen) {
-      dSP;
-      I32 i;
-      EXTEND(SP, frame->stacklen);
-
-      for(i = 0; i < frame->stacklen; i++) {
-        PUSHs(frame->stack[i]);
-      }
-
-      Safefree(frame->stack);
-      PUTBACK;
-    }
-
-    if(frame->marklen) {
-      I32 i;
-
-      for(i = 0; i < frame->marklen; i++) {
-        PUSHMARK(PL_stack_base + frame->marks[i] - cx->blk_oldsp);
-      }
-
-      Safefree(frame->marks);
-    }
+    resume_block(frame, cx);
 
     Safefree(frame);
+  }
+
+  if(state->padlen) {
+    PAD *pad = PadlistARRAY(CvPADLIST(cv))[CvDEPTH(cv)];
+    PADOFFSET i;
+
+    /* slot 0 is always the @_ AV */
+    for(i = 1; i < state->padlen; i++) {
+      if(!state->padslots[i-1])
+        continue;
+
+      SvREFCNT_dec(PadARRAY(pad)[i]);
+      PadARRAY(pad)[i] = state->padslots[i-1];
+    }
   }
 }
 
@@ -402,9 +489,13 @@ static OP *pp_await(pTHX)
   SV *f;
 
   CV *curcv = find_runcv(0);
+  CV *origcv = curcv;
+
   SuspendedState *state = suspendedstate_get(curcv);
 
   if(state) {
+    I32 orig_height;
+
     if(!state->awaiting_future)
       croak("TODO: pp_await() with state while not awaiting");
     f = state->awaiting_future;
@@ -413,15 +504,20 @@ static OP *pp_await(pTHX)
     /* Before we restore the stack we first need to POP the caller's
      * arguments, as we don't care about those
      */
-    I32 orig_height = CX_CUR()->blk_oldsp;
+    orig_height = CX_CUR()->blk_oldsp;
     while(sp > PL_stack_base + orig_height)
       POPs;
     PUTBACK;
-    orig_height = CX_CUR()->blk_oldmarksp;
-    while(PL_markstack_ptr >= PL_markstack + orig_height)
-      POPMARK;
 
-    suspendedstate_resume(state);
+    /* We also need to clean up the markstack and insert a new mark at the
+     * beginning
+     */
+    orig_height = CX_CUR()->blk_oldmarksp;
+    while(PL_markstack_ptr > PL_markstack + orig_height)
+      POPMARK;
+    PUSHMARK(SP);
+
+    suspendedstate_resume(state, curcv);
   }
   else {
     f = POPs;
@@ -443,7 +539,7 @@ static OP *pp_await(pTHX)
     state = suspendedstate_new(curcv);
   }
 
-  suspendedstate_suspend(state);
+  suspendedstate_suspend(state, origcv);
 
   CvSTART(curcv) = PL_op; /* resume from here */
   future_on_ready(f, curcv);
@@ -591,6 +687,12 @@ static int async_keyword_plugin(pTHX_ OP **op_ptr)
     return KEYWORD_PLUGIN_STMT;
   }
   else {
+    /* Placate Perl RT#131519
+     * cv_clone() doesn't set CvOUTSIDE if !CvHASEVAL, and in doing so causes a
+     * subsequent cv_clone() on *that* CV to SEGV
+     */
+    CvHASEVAL_on(cv);
+
     *op_ptr = newUNOP(OP_REFGEN, 0,
       newSVOP(OP_ANONCODE, 0, (SV *)cv));
 

@@ -11,7 +11,7 @@ use WWW::Favicon ();
 use LWP::UserAgent;
 use URI;
 
-our $VERSION = "0.05";
+our $VERSION = "0.07";
 
 our @CARP_NOT = qw(Try::Tiny XML::FeedPP);
 
@@ -81,7 +81,9 @@ sub _extract_image_urls {
 sub _get_home_url {
     my ($self, $feed, $statuses) = @_;
     my $home_url = $feed->link;
-    return $home_url if defined $home_url;
+    if(defined($home_url) && $home_url =~ m{^https?://}i) {
+        return $home_url;
+    }
     
     foreach my $status (@$statuses) {
         $home_url = $status->{busybird}{status_permalink} if defined($status->{busybird});
@@ -119,9 +121,12 @@ sub _make_timestamp_datetime {
 sub _make_status_from_item {
     my ($self, $feed_title, $feed_item) = @_;
     my $created_at_dt = $self->_make_timestamp_datetime($feed_item->pubDate);
+    my $text = $feed_item->title;
+    $text = "" if !defined($text);
+    my $permalink = $feed_item->link;
     my $status = {
-        text => $feed_item->title,
-        busybird => { status_permalink => $feed_item->link },
+        text => $text,
+        busybird => { defined($permalink) ? (status_permalink => $permalink) : () },
         created_at => ($created_at_dt ? BusyBird::DateTime::Format->format_datetime($created_at_dt) : undef ),
         user => { screen_name => $feed_title },
     };

@@ -7,7 +7,7 @@ die "$0: reading 'Config.PL' failed: $@" if ($@);
 
 ##-- pdlmaker stuff
 PDL::Core::Dev->import();
-require "pdlmaker.plm";
+require "./pdlmaker.plm";
 
 $package = ["svdslepc.pd",SVDSLEPc,PDL::SVDSLEPc];
 %hash = pdlmaker_init($package);

@@ -30,6 +30,7 @@
             "Moose" : "0",
             "Moose::Autobox" : "0",
             "Path::Class" : "0",
+            "Path::Tiny" : "0",
             "Text::Template" : "0",
             "namespace::autoclean" : "0",
             "perl" : "5.006"
@@ -57,7 +58,7 @@
          "web" : "https://github.com/SkySymbol/perl-dist-zilla-plugin-rpm"
       }
    },
-   "version" : "0.014",
+   "version" : "0.015",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

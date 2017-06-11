@@ -1,7 +1,11 @@
+0.23 2017-06-06
+* Update PP module
+* Update documentation links to metacpan
+
 0.22 2016-07-15
 * Handle strings with leading zeros which look like numbers.
 
-0.21 2016-06-28 06:59:06
+0.21 2016-06-28
 * Tests changed for Perl 5.25 regex changes.
 
 0.20 2016-01-23

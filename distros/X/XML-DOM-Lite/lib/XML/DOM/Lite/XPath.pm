@@ -1,4 +1,6 @@
 package XML::DOM::Lite::XPath;
+use warnings;
+use strict;
 
 use XML::DOM::Lite::NodeList;
 use XML::DOM::Lite::Constants qw(:nodeTypes);
@@ -847,7 +849,7 @@ sub new {
 sub evaluate {
   my ($self, $ctx) = @_;
   my $nodes = $self->{expr}->evaluate($ctx)->nodeSetValue();
-  for (my $i = 0; $i < @$predicate; ++$i) {
+  for (my $i = 0; $i < @{$self->{predicate}}; ++$i) {
     my $nodes0 = $nodes;
     $nodes = [];
     for (my $j = 0; $j < @$nodes0; ++$j) {
@@ -1065,6 +1067,309 @@ package XML::DOM::Lite::XPath;
 #use Array::Object;
 
 our $DEBUG = 0;
+
+our $xpathAxis = $XML::DOM::Lite::XPath::StepExpr::xpathAxis;
+
+our $xpathAxesRe = join('|', (
+    $xpathAxis->{ANCESTOR_OR_SELF},
+    $xpathAxis->{ANCESTOR},
+    $xpathAxis->{ATTRIBUTE},
+    $xpathAxis->{CHILD},
+    $xpathAxis->{DESCENDANT_OR_SELF},
+    $xpathAxis->{DESCENDANT},
+    $xpathAxis->{FOLLOWING_SIBLING},
+    $xpathAxis->{FOLLOWING},
+    $xpathAxis->{NAMESPACE},
+    $xpathAxis->{PARENT},
+    $xpathAxis->{PRECEDING_SIBLING},
+    $xpathAxis->{PRECEDING},
+    $xpathAxis->{SELF}
+));
+
+
+our $TOK_PIPE =   { label => "|",   prec =>   17, re => qr/^\|/ };
+our $TOK_DSLASH = { label => "//",  prec =>   19, re => qr/^\/\//  };
+our $TOK_SLASH =  { label => "/",   prec =>   30, re => qr/^\//   };
+our $TOK_AXIS =   { label => '::',  prec =>   20, re => qr/^::/  };
+our $TOK_COLON =  { label => ":",   prec => 1000, re => qr/^:/   };
+our $TOK_AXISNAME = { label => "[axis]", re => qr/^($xpathAxesRe)/ };
+our $TOK_PARENO = { label => "(",   prec =>   34, re => qr/^\(/ };
+our $TOK_PARENC = { label => ")",               re => qr/^\)/ };
+our $TOK_DDOT =   { label => "..",  prec =>   34, re => qr/^\.\./ };
+our $TOK_DOT =    { label => ".",   prec =>   34, re => qr/^\./ };
+our $TOK_AT =     { label => "@",   prec =>   34, re => qr/^@/   };
+
+our $TOK_COMMA =  { label => ",",               re => qr/^,/ };
+
+our $TOK_OR =     { label => "or",  prec =>   10, re => qr/^or\b/ };
+our $TOK_AND =    { label => "and", prec =>   11, re => qr/^and\b/ };
+our $TOK_EQ =     { label => "=",   prec =>   12, re => qr/^=/   };
+our $TOK_NEQ =    { label => "!=",  prec =>   12, re => qr/^!=/  };
+our $TOK_GE =     { label => ">=",  prec =>   13, re => qr/^>=/  };
+our $TOK_GT =     { label => ">",   prec =>   13, re => qr/^>/   };
+our $TOK_LE =     { label => "<=",  prec =>   13, re => qr/^<=/  };
+our $TOK_LT =     { label => "<",   prec =>   13, re => qr/^</   };
+our $TOK_PLUS =   { label => "+",   prec =>   14, re => qr/^\+/, left => 1 };
+our $TOK_MINUS =  { label => "-",   prec =>   14, re => qr/^\-/, left => 1 };
+our $TOK_DIV =    { label => "div", prec =>   15, re => qr/^div\b/, left => 1 };
+our $TOK_MOD =    { label => "mod", prec =>   15, re => qr/^mod\b/, left => 1 };
+
+our $TOK_BRACKO = { label => "[",   prec =>   32, re => qr/^\[/ };
+our $TOK_BRACKC = { label => "]",               re => qr/^\]/ };
+our $TOK_DOLLAR = { label => '$',               re => qr/^\$/ };
+
+our $TOK_NCNAME = { label => "[ncname]", re => qr/^[a-z][-\w]*/i };
+
+our $TOK_ASTERISK = { label => "*", prec => 15, re => qr/^\*/, left => 1 };
+our $TOK_LITERALQ = { label => "[litq]", prec => 20, re => qr/^'[^']*'/ };
+our $TOK_LITERALQQ = {
+  label => "[litqq]",
+  prec => 20,
+  re => qr/^"[^"]*"/
+};
+
+our $TOK_NUMBER  = {
+  label => "[number]",
+  prec => 35,
+  re => qr/^\d+(\.\d*)?/
+};
+
+our $TOK_QNAME = {
+  label => "[qname]",
+  re => qr/^([a-z][-\w]*:)?[a-z][-\w]*/i
+};
+
+our $TOK_NODEO = {
+  label => "[nodetest-start]",
+  re => qr/^(processing-instruction|comment|text|node)\(/
+};
+
+our $xpathTokenRules = [
+    $TOK_DSLASH,
+    $TOK_SLASH,
+    $TOK_DDOT,
+    $TOK_DOT,
+    $TOK_AXIS,
+    $TOK_COLON,
+    $TOK_AXISNAME,
+    $TOK_NODEO,
+    $TOK_PARENO,
+    $TOK_PARENC,
+    $TOK_BRACKO,
+    $TOK_BRACKC,
+    $TOK_AT,
+    $TOK_COMMA,
+    $TOK_OR,
+    $TOK_AND,
+    $TOK_NEQ,
+    $TOK_EQ,
+    $TOK_GE,
+    $TOK_GT,
+    $TOK_LE,
+    $TOK_LT,
+    $TOK_PLUS,
+    $TOK_MINUS,
+    $TOK_ASTERISK,
+    $TOK_PIPE,
+    $TOK_MOD,
+    $TOK_DIV,
+    $TOK_LITERALQ,
+    $TOK_LITERALQQ,
+    $TOK_NUMBER,
+    $TOK_QNAME,
+    $TOK_NCNAME,
+    $TOK_DOLLAR
+];
+
+our $XPathLocationPath = { label => "LocationPath" };
+our $XPathRelativeLocationPath = { label => "RelativeLocationPath" };
+our $XPathAbsoluteLocationPath = { label => "AbsoluteLocationPath" };
+our $XPathStep = { label => "Step" };
+our $XPathNodeTest = { label => "NodeTest" };
+our $XPathPredicate = { label => "Predicate" };
+our $XPathLiteral = { label => "Literal" };
+our $XPathExpr = { label => "Expr" };
+our $XPathPrimaryExpr = { label => "PrimaryExpr" };
+our $XPathVariableReference = { label => "Variablereference" };
+our $XPathNumber = { label => "Number" };
+our $XPathFunctionCall = { label => "FunctionCall" };
+our $XPathArgumentRemainder = { label => "ArgumentRemainder" };
+our $XPathPathExpr = { label => "PathExpr" };
+our $XPathUnionExpr = { label => "UnionExpr" };
+our $XPathFilterExpr = { label => "FilterExpr" };
+our $XPathDigits = { label => "Digits" };
+
+our $xpathNonTerminals = [
+    $XPathLocationPath,
+    $XPathRelativeLocationPath,
+    $XPathAbsoluteLocationPath,
+    $XPathStep,
+    $XPathNodeTest,
+    $XPathPredicate,
+    $XPathLiteral,
+    $XPathExpr,
+    $XPathPrimaryExpr,
+    $XPathVariableReference,
+    $XPathNumber,
+    $XPathFunctionCall,
+    $XPathArgumentRemainder,
+    $XPathPathExpr,
+    $XPathUnionExpr,
+    $XPathFilterExpr,
+    $XPathDigits
+];
+
+our $Q_01 = { label => "?" };
+our $Q_MM = { label => "*" };
+our $Q_1M = { label => "+" };
+
+our $ASSOC_LEFT = 1;
+
+our $xpathGrammarRules =
+  [
+   [ $XPathLocationPath, [ $XPathRelativeLocationPath ], 18,
+     \&passExpr ],
+   [ $XPathLocationPath, [ $XPathAbsoluteLocationPath ], 18,
+     \&passExpr ],
+
+   [ $XPathAbsoluteLocationPath, [ $TOK_SLASH, $XPathRelativeLocationPath ], 18, 
+     \&makeLocationExpr1 ],
+   [ $XPathAbsoluteLocationPath, [ $TOK_DSLASH, $XPathRelativeLocationPath ], 18,
+     \&makeLocationExpr2 ],
+
+   [ $XPathAbsoluteLocationPath, [ $TOK_SLASH ], 0,
+     \&makeLocationExpr3 ],
+   [ $XPathAbsoluteLocationPath, [ $TOK_DSLASH ], 0,
+     \&makeLocationExpr4 ],
+
+   [ $XPathRelativeLocationPath, [ $XPathStep ], 31,
+     \&makeLocationExpr5 ],
+   [ $XPathRelativeLocationPath,
+     [ $XPathRelativeLocationPath, $TOK_SLASH, $XPathStep ], 31,
+     \&makeLocationExpr6 ],
+   [ $XPathRelativeLocationPath,
+     [ $XPathRelativeLocationPath, $TOK_DSLASH, $XPathStep ], 31,
+     \&makeLocationExpr7 ],
+
+   [ $XPathStep, [ $TOK_DOT ], 33,
+     \&makeStepExpr1 ],
+   [ $XPathStep, [ $TOK_DDOT ], 33,
+     \&makeStepExpr2 ],
+   [ $XPathStep,
+     [ $TOK_AXISNAME, $TOK_AXIS, $XPathNodeTest ], 33,
+     \&makeStepExpr3 ],
+   [ $XPathStep, [ $TOK_AT, $XPathNodeTest ], 33,
+     \&makeStepExpr4 ],
+   [ $XPathStep, [ $XPathNodeTest ], 33,
+     \&makeStepExpr5 ],
+   [ $XPathStep, [ $XPathStep, $XPathPredicate ], 33,
+     \&makeStepExpr6 ],
+
+   [ $XPathNodeTest, [ $TOK_ASTERISK ], 33,
+     \&makeNodeTestExpr1 ],
+   [ $XPathNodeTest, [ $TOK_NCNAME, $TOK_COLON, $TOK_ASTERISK ], 33,
+     \&makeNodeTestExpr2 ],
+   [ $XPathNodeTest, [ $TOK_QNAME ], 33,
+     \&makeNodeTestExpr3 ],
+   [ $XPathNodeTest, [ $TOK_NODEO, $TOK_PARENC ], 33,
+     \&makeNodeTestExpr4 ],
+   [ $XPathNodeTest, [ $TOK_NODEO, $XPathLiteral, $TOK_PARENC ], 33,
+     \&makeNodeTestExpr5 ],
+
+   [ $XPathPredicate, [ $TOK_BRACKO, $XPathExpr, $TOK_BRACKC ], 33,
+     \&makePredicateExpr ],
+
+   [ $XPathPrimaryExpr, [ $XPathVariableReference ], 33,
+     \&passExpr ],
+   [ $XPathPrimaryExpr, [ $TOK_PARENO, $XPathExpr, $TOK_PARENC ], 33,
+     \&makePrimaryExpr ],
+   [ $XPathPrimaryExpr, [ $XPathLiteral ], 30,
+     \&passExpr ],
+   [ $XPathPrimaryExpr, [ $XPathNumber ], 30,
+     \&passExpr ],
+   [ $XPathPrimaryExpr, [ $XPathFunctionCall ], 30,
+     \&passExpr ],
+
+   [ $XPathFunctionCall, [ $TOK_QNAME, $TOK_PARENO, $TOK_PARENC ], -1,
+     \&makeFunctionCallExpr1 ],
+   [ $XPathFunctionCall,
+     [ $TOK_QNAME, $TOK_PARENO, $XPathExpr, $XPathArgumentRemainder, $Q_MM,
+       $TOK_PARENC ], -1,
+    \&makeFunctionCallExpr2 ],
+   [ $XPathArgumentRemainder, [ $TOK_COMMA, $XPathExpr ], -1,
+    \&makeArgumentExpr ],
+
+   [ $XPathUnionExpr, [ $XPathPathExpr ], 20,
+    \&passExpr ],
+   [ $XPathUnionExpr, [ $XPathUnionExpr, $TOK_PIPE, $XPathPathExpr ], 20,
+    \&makeUnionExpr ],
+
+   [ $XPathPathExpr, [ $XPathLocationPath ], 20, 
+    \&passExpr ], 
+   [ $XPathPathExpr, [ $XPathFilterExpr ], 19, 
+    \&passExpr ], 
+   [ $XPathPathExpr, 
+     [ $XPathFilterExpr, $TOK_SLASH, $XPathRelativeLocationPath ], 20,
+    \&makePathExpr1 ],
+   [ $XPathPathExpr,
+     [ $XPathFilterExpr, $TOK_DSLASH, $XPathRelativeLocationPath ], 20,
+    \&makePathExpr2 ],
+
+   [ $XPathFilterExpr, [ $XPathPrimaryExpr, $XPathPredicate, $Q_MM ], 20,
+    \&makeFilterExpr ], 
+
+   [ $XPathExpr, [ $XPathPrimaryExpr ], 16,
+    \&passExpr ],
+   [ $XPathExpr, [ $XPathUnionExpr ], 16,
+    \&passExpr ],
+
+   [ $XPathExpr, [ $TOK_MINUS, $XPathExpr ], -1,
+    \&makeUnaryMinusExpr ],
+
+   [ $XPathExpr, [ $XPathExpr, $TOK_OR, $XPathExpr ], -1,
+    \&makeBinaryExpr ],
+   [ $XPathExpr, [ $XPathExpr, $TOK_AND, $XPathExpr ], -1,
+    \&makeBinaryExpr ],
+
+   [ $XPathExpr, [ $XPathExpr, $TOK_EQ, $XPathExpr ], -1,
+    \&makeBinaryExpr ],
+   [ $XPathExpr, [ $XPathExpr, $TOK_NEQ, $XPathExpr ], -1,
+     \&makeBinaryExpr ],
+
+   [ $XPathExpr, [ $XPathExpr, $TOK_LT, $XPathExpr ], -1,
+     \&makeBinaryExpr ],
+   [ $XPathExpr, [ $XPathExpr, $TOK_LE, $XPathExpr ], -1,
+     \&makeBinaryExpr ],
+   [ $XPathExpr, [ $XPathExpr, $TOK_GT, $XPathExpr ], -1,
+     \&makeBinaryExpr ],
+   [ $XPathExpr, [ $XPathExpr, $TOK_GE, $XPathExpr ], -1,
+     \&makeBinaryExpr ],
+
+   [ $XPathExpr, [ $XPathExpr, $TOK_PLUS, $XPathExpr ], -1,
+     \&makeBinaryExpr, $ASSOC_LEFT ],
+   [ $XPathExpr, [ $XPathExpr, $TOK_MINUS, $XPathExpr ], -1,
+     \&makeBinaryExpr, $ASSOC_LEFT ],
+
+   [ $XPathExpr, [ $XPathExpr, $TOK_ASTERISK, $XPathExpr ], -1,
+     \&makeBinaryExpr, $ASSOC_LEFT ],
+   [ $XPathExpr, [ $XPathExpr, $TOK_DIV, $XPathExpr ], -1,
+     \&makeBinaryExpr, $ASSOC_LEFT ],
+   [ $XPathExpr, [ $XPathExpr, $TOK_MOD, $XPathExpr ], -1,
+     \&makeBinaryExpr, $ASSOC_LEFT ],
+
+   [ $XPathLiteral, [ $TOK_LITERALQ ], -1,
+     \&makeLiteralExpr ],
+   [ $XPathLiteral, [ $TOK_LITERALQQ ], -1,
+     \&makeLiteralExpr ],
+
+   [ $XPathNumber, [ $TOK_NUMBER ], -1,
+     \&makeNumberExpr ],
+
+   [ $XPathVariableReference, [ $TOK_DOLLAR, $TOK_QNAME ], 200,
+     \&makeVariableReference ]
+   ];
+
+our $xpathRules = [];
 
 sub new { bless { }, $_[0] }
 
@@ -1608,309 +1913,6 @@ sub makeSimpleExpr2 {
   return $c;
 }
 
-our $xpathAxis = $XML::DOM::Lite::XPath::StepExpr::xpathAxis;
-
-our $xpathAxesRe = join('|', (
-    $xpathAxis->{ANCESTOR_OR_SELF},
-    $xpathAxis->{ANCESTOR},
-    $xpathAxis->{ATTRIBUTE},
-    $xpathAxis->{CHILD},
-    $xpathAxis->{DESCENDANT_OR_SELF},
-    $xpathAxis->{DESCENDANT},
-    $xpathAxis->{FOLLOWING_SIBLING},
-    $xpathAxis->{FOLLOWING},
-    $xpathAxis->{NAMESPACE},
-    $xpathAxis->{PARENT},
-    $xpathAxis->{PRECEDING_SIBLING},
-    $xpathAxis->{PRECEDING},
-    $xpathAxis->{SELF}
-));
-
-
-our $TOK_PIPE =   { label => "|",   prec =>   17, re => qr/^\|/ };
-our $TOK_DSLASH = { label => "//",  prec =>   19, re => qr/^\/\//  };
-our $TOK_SLASH =  { label => "/",   prec =>   30, re => qr/^\//   };
-our $TOK_AXIS =   { label => '::',  prec =>   20, re => qr/^::/  };
-our $TOK_COLON =  { label => ":",   prec => 1000, re => qr/^:/   };
-our $TOK_AXISNAME = { label => "[axis]", re => qr/^($xpathAxesRe)/ };
-our $TOK_PARENO = { label => "(",   prec =>   34, re => qr/^\(/ };
-our $TOK_PARENC = { label => ")",               re => qr/^\)/ };
-our $TOK_DDOT =   { label => "..",  prec =>   34, re => qr/^\.\./ };
-our $TOK_DOT =    { label => ".",   prec =>   34, re => qr/^\./ };
-our $TOK_AT =     { label => "@",   prec =>   34, re => qr/^@/   };
-
-our $TOK_COMMA =  { label => ",",               re => qr/^,/ };
-
-our $TOK_OR =     { label => "or",  prec =>   10, re => qr/^or\b/ };
-our $TOK_AND =    { label => "and", prec =>   11, re => qr/^and\b/ };
-our $TOK_EQ =     { label => "=",   prec =>   12, re => qr/^=/   };
-our $TOK_NEQ =    { label => "!=",  prec =>   12, re => qr/^!=/  };
-our $TOK_GE =     { label => ">=",  prec =>   13, re => qr/^>=/  };
-our $TOK_GT =     { label => ">",   prec =>   13, re => qr/^>/   };
-our $TOK_LE =     { label => "<=",  prec =>   13, re => qr/^<=/  };
-our $TOK_LT =     { label => "<",   prec =>   13, re => qr/^</   };
-our $TOK_PLUS =   { label => "+",   prec =>   14, re => qr/^\+/, left => 1 };
-our $TOK_MINUS =  { label => "-",   prec =>   14, re => qr/^\-/, left => 1 };
-our $TOK_DIV =    { label => "div", prec =>   15, re => qr/^div\b/, left => 1 };
-our $TOK_MOD =    { label => "mod", prec =>   15, re => qr/^mod\b/, left => 1 };
-
-our $TOK_BRACKO = { label => "[",   prec =>   32, re => qr/^\[/ };
-our $TOK_BRACKC = { label => "]",               re => qr/^\]/ };
-our $TOK_DOLLAR = { label => '$',               re => qr/^\$/ };
-
-our $TOK_NCNAME = { label => "[ncname]", re => qr/^[a-z][-\w]*/i };
-
-our $TOK_ASTERISK = { label => "*", prec => 15, re => qr/^\*/, left => 1 };
-our $TOK_LITERALQ = { label => "[litq]", prec => 20, re => qr/^'[^']*'/ };
-our $TOK_LITERALQQ = {
-  label => "[litqq]",
-  prec => 20,
-  re => qr/^"[^"]*"/
-};
-
-our $TOK_NUMBER  = {
-  label => "[number]",
-  prec => 35,
-  re => qr/^\d+(\.\d*)?/
-};
-
-our $TOK_QNAME = {
-  label => "[qname]",
-  re => qr/^([a-z][-\w]*:)?[a-z][-\w]*/i
-};
-
-our $TOK_NODEO = {
-  label => "[nodetest-start]",
-  re => qr/^(processing-instruction|comment|text|node)\(/
-};
-
-our $xpathTokenRules = [
-    $TOK_DSLASH,
-    $TOK_SLASH,
-    $TOK_DDOT,
-    $TOK_DOT,
-    $TOK_AXIS,
-    $TOK_COLON,
-    $TOK_AXISNAME,
-    $TOK_NODEO,
-    $TOK_PARENO,
-    $TOK_PARENC,
-    $TOK_BRACKO,
-    $TOK_BRACKC,
-    $TOK_AT,
-    $TOK_COMMA,
-    $TOK_OR,
-    $TOK_AND,
-    $TOK_NEQ,
-    $TOK_EQ,
-    $TOK_GE,
-    $TOK_GT,
-    $TOK_LE,
-    $TOK_LT,
-    $TOK_PLUS,
-    $TOK_MINUS,
-    $TOK_ASTERISK,
-    $TOK_PIPE,
-    $TOK_MOD,
-    $TOK_DIV,
-    $TOK_LITERALQ,
-    $TOK_LITERALQQ,
-    $TOK_NUMBER,
-    $TOK_QNAME,
-    $TOK_NCNAME,
-    $TOK_DOLLAR
-];
-
-our $XPathLocationPath = { label => "LocationPath" };
-our $XPathRelativeLocationPath = { label => "RelativeLocationPath" };
-our $XPathAbsoluteLocationPath = { label => "AbsoluteLocationPath" };
-our $XPathStep = { label => "Step" };
-our $XPathNodeTest = { label => "NodeTest" };
-our $XPathPredicate = { label => "Predicate" };
-our $XPathLiteral = { label => "Literal" };
-our $XPathExpr = { label => "Expr" };
-our $XPathPrimaryExpr = { label => "PrimaryExpr" };
-our $XPathVariableReference = { label => "Variablereference" };
-our $XPathNumber = { label => "Number" };
-our $XPathFunctionCall = { label => "FunctionCall" };
-our $XPathArgumentRemainder = { label => "ArgumentRemainder" };
-our $XPathPathExpr = { label => "PathExpr" };
-our $XPathUnionExpr = { label => "UnionExpr" };
-our $XPathFilterExpr = { label => "FilterExpr" };
-our $XPathDigits = { label => "Digits" };
-
-our $xpathNonTerminals = [
-    $XPathLocationPath,
-    $XPathRelativeLocationPath,
-    $XPathAbsoluteLocationPath,
-    $XPathStep,
-    $XPathNodeTest,
-    $XPathPredicate,
-    $XPathLiteral,
-    $XPathExpr,
-    $XPathPrimaryExpr,
-    $XPathVariableReference,
-    $XPathNumber,
-    $XPathFunctionCall,
-    $XPathArgumentRemainder,
-    $XPathPathExpr,
-    $XPathUnionExpr,
-    $XPathFilterExpr,
-    $XPathDigits
-];
-
-our $Q_01 = { label => "?" };
-our $Q_MM = { label => "*" };
-our $Q_1M = { label => "+" };
-
-our $ASSOC_LEFT = 1;
-
-our $xpathGrammarRules =
-  [
-   [ $XPathLocationPath, [ $XPathRelativeLocationPath ], 18,
-     \&passExpr ],
-   [ $XPathLocationPath, [ $XPathAbsoluteLocationPath ], 18,
-     \&passExpr ],
-
-   [ $XPathAbsoluteLocationPath, [ $TOK_SLASH, $XPathRelativeLocationPath ], 18, 
-     \&makeLocationExpr1 ],
-   [ $XPathAbsoluteLocationPath, [ $TOK_DSLASH, $XPathRelativeLocationPath ], 18,
-     \&makeLocationExpr2 ],
-
-   [ $XPathAbsoluteLocationPath, [ $TOK_SLASH ], 0,
-     \&makeLocationExpr3 ],
-   [ $XPathAbsoluteLocationPath, [ $TOK_DSLASH ], 0,
-     \&makeLocationExpr4 ],
-
-   [ $XPathRelativeLocationPath, [ $XPathStep ], 31,
-     \&makeLocationExpr5 ],
-   [ $XPathRelativeLocationPath,
-     [ $XPathRelativeLocationPath, $TOK_SLASH, $XPathStep ], 31,
-     \&makeLocationExpr6 ],
-   [ $XPathRelativeLocationPath,
-     [ $XPathRelativeLocationPath, $TOK_DSLASH, $XPathStep ], 31,
-     \&makeLocationExpr7 ],
-
-   [ $XPathStep, [ $TOK_DOT ], 33,
-     \&makeStepExpr1 ],
-   [ $XPathStep, [ $TOK_DDOT ], 33,
-     \&makeStepExpr2 ],
-   [ $XPathStep,
-     [ $TOK_AXISNAME, $TOK_AXIS, $XPathNodeTest ], 33,
-     \&makeStepExpr3 ],
-   [ $XPathStep, [ $TOK_AT, $XPathNodeTest ], 33,
-     \&makeStepExpr4 ],
-   [ $XPathStep, [ $XPathNodeTest ], 33,
-     \&makeStepExpr5 ],
-   [ $XPathStep, [ $XPathStep, $XPathPredicate ], 33,
-     \&makeStepExpr6 ],
-
-   [ $XPathNodeTest, [ $TOK_ASTERISK ], 33,
-     \&makeNodeTestExpr1 ],
-   [ $XPathNodeTest, [ $TOK_NCNAME, $TOK_COLON, $TOK_ASTERISK ], 33,
-     \&makeNodeTestExpr2 ],
-   [ $XPathNodeTest, [ $TOK_QNAME ], 33,
-     \&makeNodeTestExpr3 ],
-   [ $XPathNodeTest, [ $TOK_NODEO, $TOK_PARENC ], 33,
-     \&makeNodeTestExpr4 ],
-   [ $XPathNodeTest, [ $TOK_NODEO, $XPathLiteral, $TOK_PARENC ], 33,
-     \&makeNodeTestExpr5 ],
-
-   [ $XPathPredicate, [ $TOK_BRACKO, $XPathExpr, $TOK_BRACKC ], 33,
-     \&makePredicateExpr ],
-
-   [ $XPathPrimaryExpr, [ $XPathVariableReference ], 33,
-     \&passExpr ],
-   [ $XPathPrimaryExpr, [ $TOK_PARENO, $XPathExpr, $TOK_PARENC ], 33,
-     \&makePrimaryExpr ],
-   [ $XPathPrimaryExpr, [ $XPathLiteral ], 30,
-     \&passExpr ],
-   [ $XPathPrimaryExpr, [ $XPathNumber ], 30,
-     \&passExpr ],
-   [ $XPathPrimaryExpr, [ $XPathFunctionCall ], 30,
-     \&passExpr ],
-
-   [ $XPathFunctionCall, [ $TOK_QNAME, $TOK_PARENO, $TOK_PARENC ], -1,
-     \&makeFunctionCallExpr1 ],
-   [ $XPathFunctionCall,
-     [ $TOK_QNAME, $TOK_PARENO, $XPathExpr, $XPathArgumentRemainder, $Q_MM,
-       $TOK_PARENC ], -1,
-    \&makeFunctionCallExpr2 ],
-   [ $XPathArgumentRemainder, [ $TOK_COMMA, $XPathExpr ], -1,
-    \&makeArgumentExpr ],
-
-   [ $XPathUnionExpr, [ $XPathPathExpr ], 20,
-    \&passExpr ],
-   [ $XPathUnionExpr, [ $XPathUnionExpr, $TOK_PIPE, $XPathPathExpr ], 20,
-    \&makeUnionExpr ],
-
-   [ $XPathPathExpr, [ $XPathLocationPath ], 20, 
-    \&passExpr ], 
-   [ $XPathPathExpr, [ $XPathFilterExpr ], 19, 
-    \&passExpr ], 
-   [ $XPathPathExpr, 
-     [ $XPathFilterExpr, $TOK_SLASH, $XPathRelativeLocationPath ], 20,
-    \&makePathExpr1 ],
-   [ $XPathPathExpr,
-     [ $XPathFilterExpr, $TOK_DSLASH, $XPathRelativeLocationPath ], 20,
-    \&makePathExpr2 ],
-
-   [ $XPathFilterExpr, [ $XPathPrimaryExpr, $XPathPredicate, $Q_MM ], 20,
-    \&makeFilterExpr ], 
-
-   [ $XPathExpr, [ $XPathPrimaryExpr ], 16,
-    \&passExpr ],
-   [ $XPathExpr, [ $XPathUnionExpr ], 16,
-    \&passExpr ],
-
-   [ $XPathExpr, [ $TOK_MINUS, $XPathExpr ], -1,
-    \&makeUnaryMinusExpr ],
-
-   [ $XPathExpr, [ $XPathExpr, $TOK_OR, $XPathExpr ], -1,
-    \&makeBinaryExpr ],
-   [ $XPathExpr, [ $XPathExpr, $TOK_AND, $XPathExpr ], -1,
-    \&makeBinaryExpr ],
-
-   [ $XPathExpr, [ $XPathExpr, $TOK_EQ, $XPathExpr ], -1,
-    \&makeBinaryExpr ],
-   [ $XPathExpr, [ $XPathExpr, $TOK_NEQ, $XPathExpr ], -1,
-     \&makeBinaryExpr ],
-
-   [ $XPathExpr, [ $XPathExpr, $TOK_LT, $XPathExpr ], -1,
-     \&makeBinaryExpr ],
-   [ $XPathExpr, [ $XPathExpr, $TOK_LE, $XPathExpr ], -1,
-     \&makeBinaryExpr ],
-   [ $XPathExpr, [ $XPathExpr, $TOK_GT, $XPathExpr ], -1,
-     \&makeBinaryExpr ],
-   [ $XPathExpr, [ $XPathExpr, $TOK_GE, $XPathExpr ], -1,
-     \&makeBinaryExpr ],
-
-   [ $XPathExpr, [ $XPathExpr, $TOK_PLUS, $XPathExpr ], -1,
-     \&makeBinaryExpr, $ASSOC_LEFT ],
-   [ $XPathExpr, [ $XPathExpr, $TOK_MINUS, $XPathExpr ], -1,
-     \&makeBinaryExpr, $ASSOC_LEFT ],
-
-   [ $XPathExpr, [ $XPathExpr, $TOK_ASTERISK, $XPathExpr ], -1,
-     \&makeBinaryExpr, $ASSOC_LEFT ],
-   [ $XPathExpr, [ $XPathExpr, $TOK_DIV, $XPathExpr ], -1,
-     \&makeBinaryExpr, $ASSOC_LEFT ],
-   [ $XPathExpr, [ $XPathExpr, $TOK_MOD, $XPathExpr ], -1,
-     \&makeBinaryExpr, $ASSOC_LEFT ],
-
-   [ $XPathLiteral, [ $TOK_LITERALQ ], -1,
-     \&makeLiteralExpr ],
-   [ $XPathLiteral, [ $TOK_LITERALQQ ], -1,
-     \&makeLiteralExpr ],
-
-   [ $XPathNumber, [ $TOK_NUMBER ], -1,
-     \&makeNumberExpr ],
-
-   [ $XPathVariableReference, [ $TOK_DOLLAR, $TOK_QNAME ], 200,
-     \&makeVariableReference ]
-   ];
-
-our $xpathRules = [];
-
 sub xpathParseInit {
   if (@$xpathRules) {
     return;
@@ -1924,7 +1926,7 @@ sub xpathParseInit {
     $xpathNonTerminals->[$i]->{key} = $k++;
   }
 
-  for ($i = 0; $i < @$xpathTokenRules; ++$i) {
+  for (my $i = 0; $i < @$xpathTokenRules; ++$i) {
     $xpathTokenRules->[$i]->{key} = $k++;
   }
 
@@ -1936,7 +1938,7 @@ sub xpathParseInit {
     push @{$array->[$position]}, $element;
   };
 
-  for ($i = 0; $i < @$xpathGrammarRules; ++$i) {
+  for (my $i = 0; $i < @$xpathGrammarRules; ++$i) {
     my $rule = $xpathGrammarRules->[$i];
     my $pattern = $rule->[1];
 
@@ -2020,7 +2022,7 @@ sub xpathSort {
   @$sortlist = sort \&xpathSortByKey, @$sortlist;
 
   my $nodes = [];
-  for ($i = 0; $i < @$sortlist; ++$i) {
+  for (my $i = 0; $i < @$sortlist; ++$i) {
     push(@$nodes, $sortlist->[$i]->{node});
   }
   $input->{nodelist} = $nodes;

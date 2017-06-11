@@ -1,0 +1,120 @@
+NAME
+    Mojolicious::Plugin::Pager - Pagination plugin for Mojolicious
+
+SYNOPSIS
+  Example lite app
+      use Mojolicious::Lite;
+
+      plugin "pager";
+
+      get "/" => sub {
+        my $c = shift;
+        $c->stash(total_entries => 1431, entries_per_page => 20);
+      };
+
+  Example template
+      <ul class="pager">
+        % for my $page (pages_for $total_entries / $entries_per_page) {
+          <li><%= pager_link $page %></li>
+        % }
+      </ul>
+
+  Custom template
+      <ul class="pager">
+        % for my $page (pages_for $total_entries / $entries_per_page) {
+          % my $url = url_with; $url->query->param(x => $page->{n});
+          <li><%= link_to "hey!", $url %></li>
+        % }
+      </ul>
+
+DESCRIPTION
+    Mojolicious::Plugin::Pager is a Mojolicious plugin for creating paged
+    navigation, without getting in the way. There are other plugins which
+    ship with complete markup, but this is often not the markup that *you*
+    want.
+
+    Note that this plugin is currently EXPERIMENTAL.
+
+HELPERS
+  pager_link
+      $bytestream = $c->pager_link(\%page, @args);
+      $bytestream = $c->pager_link(\%page, @args, sub { int(rand 100) });
+
+    Takes a %page hash and creates an anchor using "link_to" in
+    Mojolicious::Controller. @args is passed on, without modification, to
+    "link_to()". The anchor generated has some classes added.
+
+    See "pages_for" for detail about %page.
+
+    Examples output:
+
+      <a href="?page=2" class="prev" rel="prev">12</a>
+      <a href="?page=1" class="first">1</a>
+      <a href="?page=2" class="page">2</a>
+      <a href="?page=3" class="active">3</a>
+      <a href="?page=4" class="page">4</a>
+      <a href="?page=5" class="page">5</a>
+      <a href="?page=6" class="last">6</a>
+      <a href="?page=3" class="next" rel="next">3</a>
+
+  pages_for
+      @pages = $self->pages_for($total_pages);
+
+    Returns a list of %page hash-refs, that can be passed on to
+    "pager_link".
+
+    Example %page:
+
+      {
+        n       => 2,    # page number
+        current => 1,    # if page number matches "page" query parameter
+        first   => 1,    # if this is the first page
+        last    => 1,    # if this is the last page
+        next    => 1,    # if this is last, that brings you to the next page
+        prev    => 1,    # if this is first, that brings you to the previous page
+      }
+
+METHODS
+  register
+      $app->plugin("pager" => \%config);
+
+    Used to register this plugin and the "HELPERS" above. %config can be:
+
+    *   classes
+
+        Used to set default class names, used by "pager_link".
+
+        Default:
+
+          {
+            current => "active",
+            first   => "first",
+            last    => "last",
+            next    => "next",
+            prev    => "prev",
+            normal  => "page",
+          }
+
+    *   param_name
+
+        The query parameter that will be looked up to figure out which page
+        you are on. Can also be set in "stash" in Mojolicious::Controller on
+        each request under the name "page_param_name".
+
+        Default: "page"
+
+    *   window_size
+
+        Used to decide how many pages to show after/before the current page.
+
+        Default: 3
+
+AUTHOR
+    Jan Henning Thorsen
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2016, Jan Henning Thorsen
+
+    This program is free software, you can redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+

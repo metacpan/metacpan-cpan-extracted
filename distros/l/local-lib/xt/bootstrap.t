@@ -1,16 +1,16 @@
 use strict;
 use warnings;
 
+use lib 't/lib', 'xt/lib';
 use Test::More 0.81_01;
 use IPC::Open3;
-use File::Temp;
+use TempDir;
 use File::Spec;
 use File::Path qw(rmtree);
 use File::Basename qw(dirname);
 use local::lib ();
 use ExtUtils::MakeMaker;
 use Cwd qw(cwd);
-use lib 'xt/lib';
 use dist_util;
 
 sub check_version {
@@ -53,7 +53,7 @@ END {
 
 chdir $dist_dir;
 
-@perl = $^X
+@perl = local::lib::_perl
   unless @perl;
 
 my %modules = (
@@ -87,12 +87,14 @@ for my $perl (@perl) {
     }
   }
 
-  for my $home_tmpl ('local-lib-home-XXXXX', 'local-lib-home with space-XXXXX') {
+  my $home_base = mk_temp_dir('home-base');
+
+  for my $home_tmpl ('home', 'spaces in home') {
     delete $ENV{PERL5LIB};
     delete $ENV{PERL_LOCAL_LIB_ROOT};
     delete $ENV{PERL_MM_OPT};
     delete $ENV{PERL_MB_OPT};
-    local $ENV{HOME} = my $home = File::Temp::tempdir($home_tmpl, CLEANUP => 1, TMPDIR => 1);
+    local $ENV{HOME} = my $home = "$home_base/$home_tmpl";
 
     my $ll = File::Spec->catdir($home, 'local-lib');
     note "local::lib dir is $ll";
@@ -101,7 +103,8 @@ for my $perl (@perl) {
     unlink 'Makefile';
 
     open my $null_in, '<', File::Spec->devnull;
-    my $pid = open3 $null_in, my $out, undef, $perl, 'Makefile.PL', '--bootstrap='.$ll;
+    my $pid = open3 $null_in, my $out, undef,
+      $perl, 'Makefile.PL', '--bootstrap='.$ll, '--no-manpages';
     while (my $line = <$out>) {
       note $line
         if $verbose || $line =~ /^Running |^\s.* -- (?:NOT OK|OK|NA|TIMED OUT)$/;

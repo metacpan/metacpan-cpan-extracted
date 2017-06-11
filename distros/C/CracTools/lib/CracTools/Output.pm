@@ -1,9 +1,10 @@
 package CracTools::Output;
+
 {
   $CracTools::Output::DIST = 'CracTools';
 }
 # ABSTRACT: A module to manage CracTools output files.
-$CracTools::Output::VERSION = '1.25';
+$CracTools::Output::VERSION = '1.251';
 
 use strict;
 use warnings;
@@ -131,7 +132,7 @@ CracTools::Output - A module to manage CracTools output files.
 
 =head1 VERSION
 
-version 1.25
+version 1.251
 
 =head1 SYNOPSIS
 

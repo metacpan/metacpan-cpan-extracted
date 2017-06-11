@@ -21,4 +21,5 @@ Revision history for Perl module Wx::Perl::DbLinker
 0.012 Corrected pod. ./eg : Dumper and log msg. Log4perl->easy_init instead of ->init(file) 
       logcroak, logconfess etc instead of croak, confess
       Improved readme file
+0.013 use Log::Any in modules. Adapted examples.
 

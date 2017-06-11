@@ -18,7 +18,7 @@
 #     CONFIGURE_REQUIRES => {  }
 #     META_MERGE => { resources=>{ repository=>q[https://sourceforge.net/projects/gtk2-ex-dblinker/] } }
 #     NAME => q[Gtk2::Ex::DbLinker]
-#     PREREQ_PM => { Class::InsideOut=>q[1.13], DBD::SQLite=>q[1.46], Data::Dumper=>q[2.154], DateTime::Format::Strptime=>q[1.5], Gtk2=>q[1.24], Gtk2::Ex::DbLinker::DbTools=>q[0.11], Log::Log4perl=>q[1.41], Scalar::Util=>q[1.45], Test::More=>q[1] }
+#     PREREQ_PM => { Carp=>q[1.17], Class::InsideOut=>q[1.13], DBD::SQLite=>q[1.46], Data::Dumper=>q[2.154], DateTime::Format::Strptime=>q[1.5], Gtk2=>q[1.24], Gtk2::Ex::DbLinker::DbTools=>q[0.112], Log::Any=>q[1.049], Log::Any::Adapter=>q[1.049], Log::Any::Adapter::Log4perl=>q[0.08], Log::Log4perl=>q[1.41], Scalar::Util=>q[1.45], Test::More=>q[1] }
 #     TAR => q[ptar]
 #     TARFLAGS => q[-c -C -f]
 #     TEST_REQUIRES => {  }
@@ -65,11 +65,11 @@ DIRFILESEP = \\
 DFSEP = $(DIRFILESEP)
 NAME = Gtk2::Ex::DbLinker
 NAME_SYM = Gtk2_Ex_DbLinker
-VERSION = 0.111
+VERSION = 0.112
 VERSION_MACRO = VERSION
-VERSION_SYM = 0_111
+VERSION_SYM = 0_112
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 0.111
+XS_VERSION = 0.112
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib\arch
@@ -264,7 +264,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = Gtk2-Ex-DbLinker
-DISTVNAME = Gtk2-Ex-DbLinker-0.111
+DISTVNAME = Gtk2-Ex-DbLinker-0.112
 
 
 # --- MakeMaker macro section:
@@ -513,18 +513,22 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) "    - t" >> META_new.yml
 	$(NOECHO) $(ECHO) "    - inc" >> META_new.yml
 	$(NOECHO) $(ECHO) requires: >> META_new.yml
+	$(NOECHO) $(ECHO) "  Carp: '1.17'" >> META_new.yml
 	$(NOECHO) $(ECHO) "  Class::InsideOut: '1.13'" >> META_new.yml
 	$(NOECHO) $(ECHO) "  DBD::SQLite: '1.46'" >> META_new.yml
 	$(NOECHO) $(ECHO) "  Data::Dumper: '2.154'" >> META_new.yml
 	$(NOECHO) $(ECHO) "  DateTime::Format::Strptime: '1.5'" >> META_new.yml
 	$(NOECHO) $(ECHO) "  Gtk2: '1.24'" >> META_new.yml
-	$(NOECHO) $(ECHO) "  Gtk2::Ex::DbLinker::DbTools: '0.11'" >> META_new.yml
+	$(NOECHO) $(ECHO) "  Gtk2::Ex::DbLinker::DbTools: '0.112'" >> META_new.yml
+	$(NOECHO) $(ECHO) "  Log::Any: '1.049'" >> META_new.yml
+	$(NOECHO) $(ECHO) "  Log::Any::Adapter: '1.049'" >> META_new.yml
+	$(NOECHO) $(ECHO) "  Log::Any::Adapter::Log4perl: '0.08'" >> META_new.yml
 	$(NOECHO) $(ECHO) "  Log::Log4perl: '1.41'" >> META_new.yml
 	$(NOECHO) $(ECHO) "  Scalar::Util: '1.45'" >> META_new.yml
 	$(NOECHO) $(ECHO) "  Test::More: '1'" >> META_new.yml
 	$(NOECHO) $(ECHO) resources: >> META_new.yml
 	$(NOECHO) $(ECHO) "  repository: https://sourceforge.net/projects/gtk2-ex-dblinker/" >> META_new.yml
-	$(NOECHO) $(ECHO) "version: '0.111'" >> META_new.yml
+	$(NOECHO) $(ECHO) "version: '0.112'" >> META_new.yml
 	$(NOECHO) $(ECHO) "x_serialization_backend: 'CPAN::Meta::YAML version 0.018'" >> META_new.yml
 	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 	$(NOECHO) $(ECHO) Generating META.json
@@ -562,12 +566,16 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) "      }}," >> META_new.json
 	$(NOECHO) $(ECHO) "      \"runtime\" : {{" >> META_new.json
 	$(NOECHO) $(ECHO) "         \"requires\" : {{" >> META_new.json
+	$(NOECHO) $(ECHO) "            \"Carp\" : \"1.17\"," >> META_new.json
 	$(NOECHO) $(ECHO) "            \"Class::InsideOut\" : \"1.13\"," >> META_new.json
 	$(NOECHO) $(ECHO) "            \"DBD::SQLite\" : \"1.46\"," >> META_new.json
 	$(NOECHO) $(ECHO) "            \"Data::Dumper\" : \"2.154\"," >> META_new.json
 	$(NOECHO) $(ECHO) "            \"DateTime::Format::Strptime\" : \"1.5\"," >> META_new.json
 	$(NOECHO) $(ECHO) "            \"Gtk2\" : \"1.24\"," >> META_new.json
-	$(NOECHO) $(ECHO) "            \"Gtk2::Ex::DbLinker::DbTools\" : \"0.11\"," >> META_new.json
+	$(NOECHO) $(ECHO) "            \"Gtk2::Ex::DbLinker::DbTools\" : \"0.112\"," >> META_new.json
+	$(NOECHO) $(ECHO) "            \"Log::Any\" : \"1.049\"," >> META_new.json
+	$(NOECHO) $(ECHO) "            \"Log::Any::Adapter\" : \"1.049\"," >> META_new.json
+	$(NOECHO) $(ECHO) "            \"Log::Any::Adapter::Log4perl\" : \"0.08\"," >> META_new.json
 	$(NOECHO) $(ECHO) "            \"Log::Log4perl\" : \"1.41\"," >> META_new.json
 	$(NOECHO) $(ECHO) "            \"Scalar::Util\" : \"1.45\"," >> META_new.json
 	$(NOECHO) $(ECHO) "            \"Test::More\" : \"1\"" >> META_new.json
@@ -580,7 +588,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) "         \"url\" : \"https://sourceforge.net/projects/gtk2-ex-dblinker/\"" >> META_new.json
 	$(NOECHO) $(ECHO) "      }}" >> META_new.json
 	$(NOECHO) $(ECHO) "   }}," >> META_new.json
-	$(NOECHO) $(ECHO) "   \"version\" : \"0.111\"," >> META_new.json
+	$(NOECHO) $(ECHO) "   \"version\" : \"0.112\"," >> META_new.json
 	$(NOECHO) $(ECHO) "   \"x_serialization_backend\" : \"JSON::PP version 2.27400\"" >> META_new.json
 	$(NOECHO) $(ECHO) }} >> META_new.json
 	-$(NOECHO) $(MV) META_new.json $(DISTVNAME)/META.json
@@ -890,16 +898,20 @@ testdb_static :: static pure_all
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
-	$(NOECHO) $(ECHO) "<SOFTPKG NAME=\"Gtk2-Ex-DbLinker\" VERSION=\"0.111\">" > Gtk2-Ex-DbLinker.ppd
+	$(NOECHO) $(ECHO) "<SOFTPKG NAME=\"Gtk2-Ex-DbLinker\" VERSION=\"0.112\">" > Gtk2-Ex-DbLinker.ppd
 	$(NOECHO) $(ECHO) "    <ABSTRACT>Gui building part with Gtk2 of DbLinker</ABSTRACT>" >> Gtk2-Ex-DbLinker.ppd
 	$(NOECHO) $(ECHO) "    <AUTHOR>FranE&lt;ccedil&gt;ois Rappaz (rappazf@gmail.com)</AUTHOR>" >> Gtk2-Ex-DbLinker.ppd
 	$(NOECHO) $(ECHO) "    <IMPLEMENTATION>" >> Gtk2-Ex-DbLinker.ppd
+	$(NOECHO) $(ECHO) "        <REQUIRE NAME=\"Carp::\" VERSION=\"1.17\" />" >> Gtk2-Ex-DbLinker.ppd
 	$(NOECHO) $(ECHO) "        <REQUIRE NAME=\"Class::InsideOut\" VERSION=\"1.13\" />" >> Gtk2-Ex-DbLinker.ppd
 	$(NOECHO) $(ECHO) "        <REQUIRE NAME=\"DBD::SQLite\" VERSION=\"1.46\" />" >> Gtk2-Ex-DbLinker.ppd
 	$(NOECHO) $(ECHO) "        <REQUIRE NAME=\"Data::Dumper\" VERSION=\"2.154\" />" >> Gtk2-Ex-DbLinker.ppd
 	$(NOECHO) $(ECHO) "        <REQUIRE NAME=\"DateTime::Format::Strptime\" VERSION=\"1.5\" />" >> Gtk2-Ex-DbLinker.ppd
 	$(NOECHO) $(ECHO) "        <REQUIRE NAME=\"Gtk2::\" VERSION=\"1.24\" />" >> Gtk2-Ex-DbLinker.ppd
-	$(NOECHO) $(ECHO) "        <REQUIRE NAME=\"Gtk2::Ex::DbLinker::DbTools\" VERSION=\"0.11\" />" >> Gtk2-Ex-DbLinker.ppd
+	$(NOECHO) $(ECHO) "        <REQUIRE NAME=\"Gtk2::Ex::DbLinker::DbTools\" VERSION=\"0.112\" />" >> Gtk2-Ex-DbLinker.ppd
+	$(NOECHO) $(ECHO) "        <REQUIRE NAME=\"Log::Any\" VERSION=\"1.049\" />" >> Gtk2-Ex-DbLinker.ppd
+	$(NOECHO) $(ECHO) "        <REQUIRE NAME=\"Log::Any::Adapter\" VERSION=\"1.049\" />" >> Gtk2-Ex-DbLinker.ppd
+	$(NOECHO) $(ECHO) "        <REQUIRE NAME=\"Log::Any::Adapter::Log4perl\" VERSION=\"0.08\" />" >> Gtk2-Ex-DbLinker.ppd
 	$(NOECHO) $(ECHO) "        <REQUIRE NAME=\"Log::Log4perl\" VERSION=\"1.41\" />" >> Gtk2-Ex-DbLinker.ppd
 	$(NOECHO) $(ECHO) "        <REQUIRE NAME=\"Scalar::Util\" VERSION=\"1.45\" />" >> Gtk2-Ex-DbLinker.ppd
 	$(NOECHO) $(ECHO) "        <REQUIRE NAME=\"Test::More\" VERSION=\"1\" />" >> Gtk2-Ex-DbLinker.ppd

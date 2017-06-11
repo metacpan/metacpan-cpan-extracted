@@ -1,0 +1,24 @@
+0.017 - June 3rd 2017
+  * Use the file object instead of the decoded content when writing __code to /tmp
+
+0.016 - June 3rd 2017
+  * Fix more utf8 related stuff
+
+0.015 - June 2nd 2017
+  * Fix some UTF8 related stuff.
+  * Prepare for a protocol change to allow other encodings than utf8
+  * Minor ergonomic fixes to gensystem.sh
+
+0.014 - May 30th 2017
+  * Again
+
+0.013 - May 30th 2017
+  * Hide some internal warnings
+
+0.012 - May 28th 2017
+  * Fix some syntax errors I didn't catch
+  * Actually tested from an installed version
+  * Fix the config to use shadowsystem relative lib paths
+
+0.011 - May 27th 2017
+  * First potentially usable release

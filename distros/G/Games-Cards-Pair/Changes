@@ -1,5 +1,9 @@
 Revision history for Games::Cards::Pair
 
+0.17  Thu Jun 08 10:20:00 2017
+      - Updated pod document with regard to the game script.
+      - Updated game script to be more user friendly.
+
 0.16  Fri Oct 14 10:20:00 2016
       - Added missing dependency Type::Tiny.
       - Added new attribute type definitions 'Card' and 'Cards'.

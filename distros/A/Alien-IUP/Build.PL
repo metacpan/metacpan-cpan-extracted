@@ -112,7 +112,7 @@ else {
  #$builder->notes('im_sha1', '6d38b5c16ab9f2d9e0ab86f29a426921473d2f6b');
   $builder->notes('im_url', 'http://strawberryperl.com/package/kmx/iup/im-3.11a_Sources.tar.gz');
   $builder->notes('im_sha1', '9ccd337471c03ffbab4f49438d83837d066dd03f');
-  $builder->notes('im_patches', [ qw!patches/im-dragonfly.diff patches/im-3.11-cygwin.diff! ] );
+  $builder->notes('im_patches', [ qw!patches/im-dragonfly.diff patches/im-3.11-cygwin.diff patches/im-tiff.diff! ] );
 
  #$builder->notes('cd_url', 'http://download.sf.net/canvasdraw/cd-5.10_Sources.tar.gz');
   $builder->notes('cd_url', 'http://strawberryperl.com/package/kmx/iup/cd-5.10_Sources.tar.gz');

@@ -5,7 +5,7 @@
 #	Windows SDK 64-bit compiler and tools
 #
 # This is set up to build a perl.exe that runs off a shared library
-# (perl524.dll).  Also makes individual DLLs for the XS extensions.
+# (perl526.dll).  Also makes individual DLLs for the XS extensions.
 #
 
 ##
@@ -38,7 +38,7 @@ INST_TOP	= $(INST_DRV)\perl
 # versioned installation can be obtained by setting INST_TOP above to a
 # path that includes an arbitrary version string.
 #
-#INST_VER	= \5.24.1
+#INST_VER	= \5.26.0
 
 #
 # Comment this out if you DON'T want your perl installation to have
@@ -96,6 +96,12 @@ USE_LARGE_FILES	= define
 #USE_64_BIT_INT	= define
 
 #
+# Comment this out if you want the legacy default behavior of including '.' at
+# the end of @INC.
+#
+DEFAULT_INC_EXCLUDES_DOT = define
+
+#
 # Uncomment this if you want to disable looking up values from
 # HKEY_CURRENT_USER\Software\Perl and HKEY_LOCAL_MACHINE\Software\Perl in
 # the Registry.
@@ -133,6 +139,10 @@ CCTYPE		= MSVC60
 #CCTYPE		= MSVC120
 # Visual C++ 2013 Express Edition (aka Visual C++ 12.0) (free version)
 #CCTYPE		= MSVC120FREE
+# Visual C++ 2015 (aka Visual C++ 14.0) (full version)
+#CCTYPE		= MSVC140
+# Visual C++ 2015 Express Edition (aka Visual C++ 14.0) (free version)
+#CCTYPE		= MSVC140FREE
 
 #
 # If you are using Intel C++ Compiler uncomment this
@@ -192,7 +202,7 @@ CCTYPE		= MSVC60
 # set this to additionally provide a statically linked perl-static.exe.
 # Note that dynamic loading will not work with this perl, so you must
 # include required modules statically using the STATIC_EXT or ALL_STATIC
-# variables below. A static library perl524s.lib will also be created.
+# variables below. A static library perl526s.lib will also be created.
 # Ordinary perl.exe is not affected by this option.
 #
 #BUILD_STATIC	= define
@@ -299,6 +309,10 @@ USE_LARGE_FILES	= undef
 
 !IF "$(USE_64_BIT_INT)" == ""
 USE_64_BIT_INT	= undef
+!ENDIF
+
+!IF "$(DEFAULT_INC_EXCLUDES_DOT)" == ""
+DEFAULT_INC_EXCLUDES_DOT = undef
 !ENDIF
 
 !IF "$(USE_NO_REGISTRY)" == ""
@@ -467,7 +481,11 @@ DEFINES		= -DWIN32 -D_CONSOLE -DNO_STRICT
 LOCDEFS		= -DPERLDLL -DPERL_CORE
 CXX_FLAG	= -TP -EHsc
 
+!IF "$(CCTYPE)" == "MSVC140" || "$(CCTYPE)" == "MSVC140FREE"
+LIBC		= ucrt.lib
+!ELSE
 LIBC		= msvcrt.lib
+!ENDIF
 
 !IF  "$(CFG)" == "Debug"
 OPTIMIZE	= -Od -MD -Zi -DDEBUGGING
@@ -478,7 +496,11 @@ OPTIMIZE	= -Od -MD -Zi
 LINK_DBG	= -debug
 !ELSE
 !IF  "$(CFG)" == "DebugFull"
+!IF "$(CCTYPE)" == "MSVC140" || "$(CCTYPE)" == "MSVC140FREE"
+LIBC		= ucrtd.lib
+!ELSE
 LIBC		= msvcrtd.lib
+!ENDIF
 OPTIMIZE	= -Od -MDd -Zi -D_DEBUG -DDEBUGGING
 LINK_DBG	= -debug
 !ELSE
@@ -513,6 +535,11 @@ OPTIMIZE	= $(OPTIMIZE) -fp:precise
 DEFINES		= $(DEFINES) -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE
 !ENDIF
 
+# Likewise for deprecated Winsock APIs in VC++ 14.0 for now.
+!IF "$(CCTYPE)" == "MSVC140" || "$(CCTYPE)" == "MSVC140FREE"
+DEFINES		= $(DEFINES) -D_WINSOCK_DEPRECATED_NO_WARNINGS
+!ENDIF
+
 # In VS 2005 (VC++ 8.0) Microsoft changes time_t from 32-bit to
 # 64-bit, even in 32-bit mode.  It also provides the _USE_32BIT_TIME_T
 # preprocessor option to revert back to the old functionality for
@@ -532,6 +559,14 @@ LIBBASEFILES	= \
 		comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib \
 		netapi32.lib uuid.lib ws2_32.lib mpr.lib winmm.lib \
 		version.lib odbc32.lib odbccp32.lib comctl32.lib
+
+!IF "$(CCTYPE)" == "MSVC140" || "$(CCTYPE)" == "MSVC140FREE"
+!  IF  "$(CFG)" == "DebugFull"
+LIBBASEFILES	= $(LIBBASEFILES) msvcrtd.lib vcruntimed.lib
+!  ELSE
+LIBBASEFILES	= $(LIBBASEFILES) msvcrt.lib vcruntime.lib
+!  ENDIF
+!ENDIF
 
 # Avoid __intel_new_proc_init link error for libircmt.
 # libmmd is /MD equivelent, other variants exist.
@@ -630,9 +665,9 @@ $(o).dll:
 
 # makedef.pl must be updated if this changes, and this should normally
 # only change when there is an incompatible revision of the public API.
-PERLIMPLIB	= ..\perl524.lib
-PERLSTATICLIB	= ..\perl524s.lib
-PERLDLL		= ..\perl524.dll
+PERLIMPLIB	= ..\perl526.lib
+PERLSTATICLIB	= ..\perl526s.lib
+PERLDLL		= ..\perl526.dll
 
 MINIPERL	= ..\miniperl.exe
 MINIDIR		= .\mini
@@ -679,8 +714,6 @@ UTILS		=			\
 		..\utils\splain		\
 		..\utils\perlbug	\
 		..\utils\pl2pm 		\
-		..\utils\c2ph		\
-		..\utils\pstruct	\
 		..\utils\h2xs		\
 		..\utils\perldoc	\
 		..\utils\perlivp	\
@@ -882,6 +915,7 @@ CFG_VARS	=					\
 		"uselongdouble=undef"			\
 		"uselargefiles=$(USE_LARGE_FILES)"	\
 		"usesitecustomize=$(USE_SITECUST)"	\
+		"default_inc_excludes_dot=$(DEFAULT_INC_EXCLUDES_DOT)"	\
 		"LINK_FLAGS=$(LINK_FLAGS:"=\")"		\
 		"optimize=$(OPTIMIZE:"=\")"		\
 		"WIN64=$(WIN64)"
@@ -930,6 +964,17 @@ perlglob$(o)  : perlglob.c
 	@echo.>>$@
 	@echo #ifndef _config_h_footer_>>$@
 	@echo #define _config_h_footer_>>$@
+!IF "$(CCTYPE)" == "MSVC140" || "$(CCTYPE)" == "MSVC140FREE"
+	@echo #undef FILE_ptr>>$@
+	@echo #define FILE_ptr(fp) PERLIO_FILE_ptr(fp)>>$@
+	@echo #undef FILE_cnt>>$@
+	@echo #define FILE_cnt(fp) PERLIO_FILE_cnt(fp)>>$@
+	@echo #undef FILE_base>>$@
+	@echo #define FILE_base(fp) PERLIO_FILE_base(fp)>>$@
+	@echo #undef FILE_bufsiz>>$@
+	@echo #define FILE_bufsiz(fp) (PERLIO_FILE_cnt(fp) + PERLIO_FILE_ptr(fp) - PERLIO_FILE_base(fp))>>$@
+	@echo #define I_STDBOOL>>$@
+!ENDIF
 	@echo #undef Off_t>>$@
 	@echo #undef LSEEKSIZE>>$@
 	@echo #undef Off_t_size>>$@
@@ -1215,7 +1260,7 @@ utils: $(PERLEXE) ..\utils\Makefile
 	copy ..\README.tw       ..\pod\perltw.pod
 	copy ..\README.vos      ..\pod\perlvos.pod
 	copy ..\README.win32    ..\pod\perlwin32.pod
-	copy ..\pod\perldelta.pod ..\pod\perl5241delta.pod
+	copy ..\pod\perldelta.pod ..\pod\perl5260delta.pod
 	cd ..\win32
 	$(PERLEXE) $(PL2BAT) $(UTILS)
 	$(MINIPERL) -I..\lib ..\autodoc.pl ..
@@ -1302,6 +1347,7 @@ distclean: realclean
 	-if exist $(LIBDIR)\TAP rmdir /s /q $(LIBDIR)\TAP
 	-if exist $(LIBDIR)\Term rmdir /s /q $(LIBDIR)\Term
 	-if exist $(LIBDIR)\Test rmdir /s /q $(LIBDIR)\Test
+	-if exist $(LIBDIR)\Test2 rmdir /s /q $(LIBDIR)\Test2
 	-if exist $(LIBDIR)\Text rmdir /s /q $(LIBDIR)\Text
 	-if exist $(LIBDIR)\Thread rmdir /s /q $(LIBDIR)\Thread
 	-if exist $(LIBDIR)\threads rmdir /s /q $(LIBDIR)\threads
@@ -1313,7 +1359,7 @@ distclean: realclean
 	-if exist $(LIBDIR)\Win32API rmdir /s /q $(LIBDIR)\Win32API
 	-if exist $(LIBDIR)\XS rmdir /s /q $(LIBDIR)\XS
 	-cd $(PODDIR) && del /f *.html *.bat roffitall \
-	    perl5241delta.pod perlaix.pod perlamiga.pod perlandroid.pod \
+	    perl5260delta.pod perlaix.pod perlamiga.pod perlandroid.pod \
 	    perlapi.pod perlbs2000.pod perlce.pod perlcn.pod perlcygwin.pod \
 	    perldos.pod perlfreebsd.pod perlhaiku.pod perlhpux.pod \
 	    perlhurd.pod perlintern.pod perlirix.pod perljp.pod perlko.pod \
@@ -1323,7 +1369,7 @@ distclean: realclean
 	    perlsolaris.pod perlsymbian.pod perlsynology.pod perltoc.pod \
 	    perltru64.pod perltw.pod perluniprops.pod perlvos.pod \
 	    perlwin32.pod
-	-cd ..\utils && del /f h2ph splain perlbug pl2pm c2ph pstruct h2xs \
+	-cd ..\utils && del /f h2ph splain perlbug pl2pm h2xs \
 	    perldoc perlivp libnetcfg enc2xs encguess piconv cpan *.bat \
 	    xsubpp pod2html instmodsh json_pp prove ptar ptardiff ptargrep shasum corelist zipdetails
 	-del /f ..\config.sh perlmain.c dlutils.c config.h.new \

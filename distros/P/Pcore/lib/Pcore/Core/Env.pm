@@ -285,46 +285,82 @@ sub scan_deps ($self) {
 
 sub DEMOLISH ( $self, $global ) {
     if ( $self->{SCAN_DEPS} ) {
-        my $index;
+        my ( $fh, $index );
 
-        my $mode = -e $self->{SCAN_DEPS} ? '+<:raw' : '>:raw';
+        if ( -f $self->{SCAN_DEPS} ) {
+            open $fh, '+<:raw', $self->{SCAN_DEPS} or die;    ## no critic qw[InputOutput::RequireBriefOpen]
 
-        open my $FH, $mode, $self->{SCAN_DEPS} or die;    ## no critic qw[InputOutput::RequireBriefOpen]
+            flock $fh, LOCK_EX or die;
 
-        flock $FH, LOCK_EX or die;
-
-        {
             local $/;
 
-            my $deps = JSON::XS->new->ascii(0)->latin1(0)->utf8(1)->pretty(1)->canonical(1)->decode(<$FH>);
+            my $deps = JSON::XS->new->ascii(0)->latin1(0)->utf8(1)->pretty(1)->canonical(1)->decode(<$fh>);
 
             $index->@{ $deps->@* } = ();
         }
+        else {
+            open $fh, '>:raw', $self->{SCAN_DEPS} or die;     ## no critic qw[InputOutput::RequireBriefOpen]
 
-        my $updated;
+            flock $fh, LOCK_EX or die;
+        }
 
-        for my $pkg ( sort keys %INC ) {
-            if ( !exists $index->{$pkg} ) {
-                $updated = 1;
+        my ( $updated, $embedded_packages );
 
-                $index->{$pkg} = undef;
+        for my $module ( sort keys %INC ) {
+            if ( !exists $index->{$module} ) {
+                if ( $INC{$module} !~ /\Q$module\E\z/sm ) {
+                    $embedded_packages->{$module} = $INC{$module};
+                }
+                else {
+                    $updated = 1;
 
-                say qq[new deps found: $pkg];
+                    $index->{$module} = undef;
+
+                    say qq[new deps found: $module];
+                }
+            }
+        }
+
+        # find real module for embedded modules
+        if ($embedded_packages) {
+            for my $embedded_package ( keys $embedded_packages->%* ) {
+                my $added;
+
+                for my $module ( keys %INC ) {
+                    if ( $INC{$module} eq $embedded_packages->{$embedded_package} ) {
+
+                        # embedded package is already added
+                        if ( exists $index->{$module} ) {
+
+                            # say "$module ---> $embedded_package";
+
+                            $added = 1;
+
+                            last;
+                        }
+                    }
+                }
+
+                if ( !$added ) {
+                    $updated = 1;
+
+                    $index->{$embedded_package} = undef;
+
+                    say qq[new deps found: $embedded_package];
+                }
             }
         }
 
         # store deps
         if ($updated) {
-            truncate $FH, 0 or die;
+            truncate $fh, 0 or die;
 
-            seek $FH, 0, SEEK_SET or die;
+            seek $fh, 0, SEEK_SET or die;
 
-            print {$FH} JSON::XS->new->ascii(0)->latin1(0)->utf8(1)->pretty(1)->canonical(1)->encode( [ sort keys $index->%* ] );
-
-            say "WRITE DEPS - $$";
+            print {$fh} JSON::XS->new->ascii(0)->latin1(0)->utf8(1)->pretty(1)->canonical(1)->encode( [ sort keys $index->%* ] );
         }
 
-        close $FH or die;
+        close $fh or die;
     }
 
     return;
@@ -339,9 +375,13 @@ sub DEMOLISH ( $self, $global ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 278                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 297                  | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
+## |    3 | 286                  | Subroutines::ProhibitExcessComplexity - Subroutine "DEMOLISH" with high complexity score (22)                  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 299, 322             | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 7                    |
+## |    3 | 295                  | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    3 | 333                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    2 | 297, 360             | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 7                    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 101                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

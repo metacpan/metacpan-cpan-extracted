@@ -1,23 +1,33 @@
 Revision history for Datahub-Factory-VKC
 
+0.9  2017-06-08 11:27:39 CEST
+    - changed: conform to new Catmandu::Store::Datahub API
+    - added: Arthub Exporter module
+    - changed: disabled Rackspace and Webfile support. Only local file supported. PIDs should be part of the registration system.
+    - renamed: MSK importer to EIZ (ErfgoedInzicht) importer
+    - changed: break if no CSV file was found
+    - added: missing dependencies
+    - updated: CHANGES file
+    - added: missing required modules
+
 0.8  2017-05-12 12:58:42 UTC
-	- Improved error handling
+    - Improved error handling
 
 0.07  2017-05-11 08:01:17 UTC
-	- Updated documentation
-	- Added extra PID options
+    - Updated documentation
+    - Added extra PID options
 
 0.06  2017-05-04 07:48:16 UTC
-	- Updated documentation for MSK
+    - Updated documentation for MSK
 
 0.05  2017-05-04 06:48:17 UTC
-	- Updated documentation
+    - Updated documentation
 
 0.04  2017-05-04 06:16:37 UTC
-	- Added re-usable PID module
+    - Added re-usable PID module
 
 0.03  2017-04-20 08:05:34 UTC
-	- PIDS are now in TMS
+    - PIDS are now in TMS
 
 0.02  2017-03-28 11:40:32 UTC
-        - Initial release (merge of Datahub::Factory::KMSKA, Datahub::Factory::MSK, Datahub::Factory::PIDS and Datahub::Factory::VKC)
+    - Initial release (merge of Datahub::Factory::KMSKA, Datahub::Factory::MSK, Datahub::Factory::PIDS and Datahub::Factory::VKC)

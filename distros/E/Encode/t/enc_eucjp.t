@@ -1,4 +1,4 @@
-# $Id: enc_eucjp.t,v 2.4 2017/04/21 05:20:14 dankogai Exp dankogai $
+# $Id: enc_eucjp.t,v 2.5 2017/06/10 17:23:50 dankogai Exp dankogai $
 # This is the twin of enc_utf8.t .
 
 BEGIN {
@@ -19,8 +19,8 @@ BEGIN {
     print "1..0 # Skip: Perl 5.8.1 or later required\n";
     exit 0;
     }
-    if ($] >= 5.025003){
-    print "1..0 # Skip: Perl 5.25.2 or lower required\n";
+    if ($] >= 5.025003 and !$Config{usecperl}){
+    print "1..0 # Skip: Perl <=5.25.2 or cperl required\n";
     exit 0;
     }
 }

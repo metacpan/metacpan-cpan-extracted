@@ -1,7 +1,7 @@
 ---
 abstract: 'YAML Parser and Loader'
 author:
-  - 'Tina Müller <cpan2@tinita.de>'
+  - 'Tina Müller <tinita@cpan.org>'
 build_requires:
   File::Basename: '0'
   File::Spec: '0'
@@ -22,16 +22,19 @@ name: YAML-PP
 provides:
   YAML::PP:
     file: lib/YAML/PP.pm
-    version: '0.002'
+    version: '0.003'
   YAML::PP::Loader:
     file: lib/YAML/PP/Loader.pm
-    version: '0.002'
+    version: '0.003'
   YAML::PP::Parser:
     file: lib/YAML/PP/Parser.pm
-    version: '0.002'
+    version: '0.003'
+  YAML::PP::Reader:
+    file: lib/YAML/PP/Reader.pm
+    version: '0.003'
   YAML::PP::Render:
     file: lib/YAML/PP/Render.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   Data::Dumper: '0'
   Encode: '0'
@@ -42,5 +45,5 @@ requires:
 resources:
   bugtracker: https://github.com/perlpunk/YAML-PP-p5/issues
   repository: git://github.com/perlpunk/YAML-PP-p5.git
-version: '0.002'
+version: '0.003'
 x_serialization_backend: 'YAML::Tiny version 1.70'

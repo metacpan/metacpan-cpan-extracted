@@ -1,5 +1,9 @@
 Revision history for Perl module Mail::Builder
 
+2.13 Wed May 31 2017
+    - CORRECTED
+        - Fix Makefile.PL for perl 5.26
+
 2.12 Mon Mar 13 2017
     - CORRECTED
         - Fix text failures with Encode 2.87 #118885 (fixed by Kivanc Yazan)

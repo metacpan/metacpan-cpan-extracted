@@ -4,33 +4,34 @@ author:
   - 'Thomas Sibley <tsibley@cpan.org>'
 build_requires: {}
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.1, Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.132830'
+generated_by: 'Dist::Zilla version 6.005, Dist::Milla version v1.0.16, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: App-cpanchanges
 no_index:
   directory:
-    - t
-    - xt
-    - inc
-    - share
     - eg
     - examples
+    - inc
+    - share
+    - t
+    - xt
 requires:
-  File::Temp: 0
-  Getopt::Long: 0
-  JSON: 0
-  LWP::UserAgent: 0
-  URI::Escape: 0
-  perl: 5.008005
+  File::Temp: '0'
+  Getopt::Long: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  URI::Escape: '0'
+  perl: '5.008005'
 resources:
   bugtracker: https://github.com/tsibley/App-cpanchanges/issues
   homepage: https://github.com/tsibley/App-cpanchanges
   repository: https://github.com/tsibley/App-cpanchanges.git
-version: 20140125.0
+version: '20170606.0'
 x_contributors:
   - 'Olaf Alders <olaf@wundersolutions.com>'
+  - 'Thomas Sibley <trsibley@uw.edu>'

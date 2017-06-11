@@ -1,3 +1,9 @@
+0.25    2017-05-31 (PERLANCAR)
+
+	- Recognize field format 'number' (with options: decimal_point,
+	  thousands_sep, decimal_fill, precision).
+
+
 0.24    2017-05-24 (PERLANCAR)
 
 	- Allow field format to be of the form [NAME, \%OPTS] instead of

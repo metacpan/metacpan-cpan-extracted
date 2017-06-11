@@ -6,6 +6,7 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   Test::More: '0'
+  utf8: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -26,9 +27,10 @@ no_index:
 provides:
   App::EvalServerAdvanced::Protocol:
     file: lib/App/EvalServerAdvanced/Protocol.pm
-    version: '0.100'
+    version: '0.104'
 requires:
   Data::Dumper: '0'
+  Encode: '0'
   Exporter: '0'
   FindBin: '0'
   Function::Parameters: '0'
@@ -36,9 +38,13 @@ requires:
   Path::Tiny: '0'
   Time::HiRes: '0'
   lib: '0'
+  perl: v5.24.0
   strict: '0'
   warnings: '0'
-version: '0.100'
+resources:
+  bugtracker: https://github.com/perlbot/evalserver-async-protocol/issues
+  repository: git://github.com/perlbot/evalserver-async-protocol.git
+version: '0.104'
 x_Dist_Zilla:
   perl:
     version: '5.024000'
@@ -160,6 +166,10 @@ x_Dist_Zilla:
       name: '@Starter/UploadToCPAN'
       version: '6.009'
     -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: AutoPrereqs
+      version: '6.009'
+    -
       class: Dist::Zilla::Plugin::Encoding
       name: Encoding
       version: '6.009'
@@ -185,7 +195,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.100
+          tag: v0.104
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -196,21 +206,52 @@ x_Dist_Zilla:
       name: Git::Tag
       version: '2.042'
     -
-      class: Dist::Zilla::Plugin::Git::NextVersion
+      class: Dist::Zilla::Plugin::GitHub::Meta
+      name: GitHub::Meta
+      version: '0.44'
+    -
+      class: Dist::Zilla::Plugin::Git::Push
       config:
-        Dist::Zilla::Plugin::Git::NextVersion:
-          first_version: '0.001'
-          version_by_branch: 0
-          version_regexp: (?^:^v(.+)$)
+        Dist::Zilla::Plugin::Git::Push:
+          push_to:
+            - origin
+          remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
           git_version: 2.11.0
           repo_root: .
-      name: Git::NextVersion
+      name: Git::Push
       version: '2.042'
     -
-      class: Dist::Zilla::Plugin::AutoPrereqs
-      name: AutoPrereqs
-      version: '6.009'
+      class: Dist::Zilla::Plugin::RewriteVersion
+      config:
+        Dist::Zilla::Plugin::RewriteVersion:
+          add_tarball_name: 0
+          finders:
+            - ':ExecFiles'
+            - ':InstallModules'
+          global: 0
+          skip_version_provider: 0
+      name: RewriteVersion
+      version: '0.015'
+    -
+      class: Dist::Zilla::Plugin::BumpVersionAfterRelease
+      config:
+        Dist::Zilla::Plugin::BumpVersionAfterRelease:
+          finders:
+            - ':ExecFiles'
+            - ':InstallModules'
+          global: 0
+          munge_makefile_pl: 1
+      name: BumpVersionAfterRelease
+      version: '0.015'
+    -
+      class: Dist::Zilla::Plugin::Test::Perl::Critic
+      name: Test::Perl::Critic
+      version: '3.001'
+    -
+      class: Dist::Zilla::Plugin::CheckChangesHasContent
+      name: CheckChangesHasContent
+      version: '0.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'

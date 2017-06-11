@@ -9,7 +9,7 @@ use 5.014;
 #use strict;
 #use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 sub new {
     my ($class, %opts) = @_;
@@ -163,11 +163,12 @@ sub get_icon_path {
                                    "$self->{home_dir}/.local/share/icons/$icon_theme"
                                   );
 
+            my %seen_dir;
             while (@icon_theme_dirs) {
                 my $icon_dir = shift @icon_theme_dirs;
 
                 if (-d $icon_dir) {
-                    push @icon_dirs, $icon_dir if -d $icon_dir;
+                    push @icon_dirs, $icon_dir;
                     if (-e (my $index_theme = "$icon_dir/index.theme")) {
 
                         sysopen my $fh, $index_theme, 0 or next;
@@ -179,7 +180,7 @@ sub get_icon_path {
                                 while (defined(my $para = <$fh>)) {
                                     if ($para =~ /^Inherits=(\S+)/m) {
                                         my $base = substr($icon_dir, 0, rindex($icon_dir, '/'));
-                                        push @icon_theme_dirs, map { "$base/$_" } split(/,/, $1);
+                                        push @icon_theme_dirs, grep { !$seen_dir{$_}++ } map { "$base/$_" } split(/,/, $1);
                                         last;
                                     }
                                     last if $para =~ /^\[.*?\]/m;
@@ -451,7 +452,7 @@ Set directories where to find the desktop files (default: /usr/share/application
 
 =item keys_to_keep => [qw(Name Exec Icon Comment ...)]
 
-Any of the valid keys from desktop files. This keys will be stored in the retured
+Any of the valid keys from desktop files. This keys will be stored in the returned
 hash reference when calling C<$obj-E<gt>parse_desktop_files>.
 
 =item categories => [qw(Graphics Network AudioVideo ...)]
@@ -506,7 +507,7 @@ I<NOTE:> It works with Gtk3 as well.
 
 =item true_values => [qw(1 true True)]
 
-This values are used to test for trueness some values from the desktop files.
+This values are used to test for truthiness some values from the desktop files.
 
 =back
 
@@ -656,7 +657,7 @@ Daniel "Trizen" Șuteu, E<lt>trizenx@gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012-2016
+Copyright (C) 2012-2017
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.2 or,

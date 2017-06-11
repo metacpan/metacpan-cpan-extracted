@@ -1,7 +1,7 @@
 package Mojar::Config;
 use Mojo::Base -base;
 
-our $VERSION = 0.042;
+our $VERSION = 0.051;
 # Adapted from Mojolicious::Plugin::Config (3.57)
 
 use Carp 'croak';

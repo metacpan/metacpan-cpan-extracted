@@ -1,5 +1,14 @@
 Revision history for Perl extension Locale::TextDomain::OO.
 
+1.028  Mon Jun  5 21:53:09 2017
+- Thanks to SREZIC for reporting https://rt.cpan.org/Ticket/Display.html?id=122011
+  renewed javascript/Example.html
+
+1.027  Wed May 31 19:58:57 2017
+- followed hints of REHSACK
+  - removed namespace::autoclean from roles
+  - changed Log4Perl to Log::Any in Pod examples
+
 1.026  Sat Feb 25 09:05:56 2017
 - fixed and wrote some pod
 

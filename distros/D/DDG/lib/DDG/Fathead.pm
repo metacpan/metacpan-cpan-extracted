@@ -1,7 +1,7 @@
 package DDG::Fathead;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Fathead package for easy keywords
-$DDG::Fathead::VERSION = '1016';
+$DDG::Fathead::VERSION = '1017';
 use strict;
 use warnings;
 use DDG::Meta;
@@ -27,7 +27,7 @@ DDG::Fathead - Fathead package for easy keywords
 
 =head1 VERSION
 
-version 1016
+version 1017
 
 =head1 SYNOPSIS
 

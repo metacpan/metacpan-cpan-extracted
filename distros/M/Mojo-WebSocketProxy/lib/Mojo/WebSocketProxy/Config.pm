@@ -5,7 +5,7 @@ use warnings;
 
 use Mojo::Base -base;
 
-our $VERSION = '0.05';    ## VERSION
+our $VERSION = '0.06';    ## VERSION
 
 sub init {
     my ($self, $in_config) = @_;

@@ -1,37 +1,36 @@
-==============================
-2012-10-05 15:44:56 +0100 0.08
-==============================
+==================================================
+Changes from 2012-06-07 00:00:00 +0000 to present.
+==================================================
 
-  commit 22ac5e70c825b5bc1c50ff74aa5d778b8076a269
+-----------------------------------------
+version 0.10 at 2017-06-06 12:47:02 +0000
+-----------------------------------------
+
+  Change: 2b1692bbbdd9368cae80025e3482b7f53759904c
   Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date:   Fri Oct 5 15:44:56 2012 +0100
-  
+  Date : 2017-06-06 13:47:02 +0000
+
+    v1 supports http now, hoorah! 
+
+  Change: 145c26029b2a085f98bcc8fc41e4325d0a20bf6f
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-06-06 13:22:39 +0000
+
+    v0 retired, this is broken now.
+
+    Make note of cpanm code that seems to shimmed. Re-engineer when have
+    a chance. 
+
+-----------------------------------------
+version 0.08 at 2012-10-05 14:44:56 +0000
+-----------------------------------------
+
+  Change: 22ac5e70c825b5bc1c50ff74aa5d778b8076a269
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2012-10-05 15:44:56 +0000
+
     Only retrieve module information if 'indexed' is true 
 
-==============================
-2011-08-03 12:27:47 +0100 0.06
-==============================
-
-  commit ac534e281fd9c490328997e08d885e2e4ddb1be6
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date:   Wed Aug 3 12:27:47 2011 +0100
-  
-    Change the User-Agent string to something the metacpan people can use
-    for stats 
-
-==============================
-2011-07-30 21:41:08 +0100 0.04
-==============================
-
-  commit bbea3765d696b72b9371aa0a3707c7e7d5d96e85
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date:   Sat Jul 30 21:41:08 2011 +0100
-  
-    Skip returning modules that have 'maturity' equal to 'developer'.
-
-    These are not indexed by PAUSE and it would be a wrong to resolve
-    them. 
-
-====================================
-End of changes in the last 1825 days
-====================================
+================================================
+Plus 3 releases after 2012-06-07 00:00:00 +0000.
+================================================

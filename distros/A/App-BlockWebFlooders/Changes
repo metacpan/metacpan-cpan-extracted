@@ -1,0 +1,24 @@
+0.004   2017-06-09 (PERLANCAR)
+
+        - Add option: --spanel-site.
+
+        - [ux] Add -v as alias for --version.
+
+
+0.003   2017-06-08 (PERLANCAR)
+
+	- No functional changes.
+
+	- Fix Getopt::Long configuration.
+
+
+0.002   2017-06-08 (PERLANCAR)
+
+	- [doc] Update/tweak example.
+
+	- [Bugfix] Don't block the same IP multiple times.
+
+
+0.001   2017-06-07 (PERLANCAR)
+
+        - First release.

@@ -1,0 +1,24 @@
+0.003   2017-06-09 (PERLANCAR)
+
+	- [Incompatible change] Change construction argument syntax to
+	  accepting hash arguments.
+
+        - [Enhancement] Support multiple glob patterns.
+
+	- [Enhancement] Add option: tail_new.
+
+	- [ux] Change default of check_freq from 5 to 2.
+
+	- [ux] Warn when no files matched glob pattern.
+
+
+0.002   2017-06-09 (PERLANCAR)
+
+	- No functional changes.
+
+	- Fix example in Synopsis.
+
+
+0.001   2017-06-09 (PERLANCAR)
+
+        - First release.

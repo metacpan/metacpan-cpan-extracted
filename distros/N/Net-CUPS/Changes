@@ -1,5 +1,9 @@
 Revision history for Perl extension Net::CUPS.
 
+0.64 Thu Jun 08 20:10:00 2017
+	- Report the printer-state attribute and support non-string device
+	  attributes in general by Edgar Fuß
+
 0.63 Thu Oct 31 09:15:00 2016
 	- Fix segfaults in Net::CUPS::PPD::getNextOption when enumerating
 	  options by Alexis Bienvenüe

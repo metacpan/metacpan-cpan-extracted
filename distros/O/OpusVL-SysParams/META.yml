@@ -19,7 +19,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,22 +36,23 @@ no_index:
 provides:
   OpusVL::SysParams:
     file: lib/OpusVL/SysParams.pm
-    version: '0.19'
+    version: '0.20'
   OpusVL::SysParams::RolesFor::Schema:
     file: lib/OpusVL/SysParams/RolesFor/Schema.pm
-    version: '0.19'
+    version: '0.20'
   OpusVL::SysParams::Schema:
     file: lib/OpusVL/SysParams/Schema.pm
-    version: '0.19'
+    version: '0.20'
   OpusVL::SysParams::Schema::Result::SysInfo:
     file: lib/OpusVL/SysParams/Schema/Result/SysInfo.pm
-    version: '0.19'
+    version: '0.20'
   OpusVL::SysParams::Schema::ResultSet::SysInfo:
     file: lib/OpusVL/SysParams/Schema/ResultSet/SysInfo.pm
-    version: '0.19'
+    version: '0.20'
 requires:
   Config::JFDI: '0'
   DBIx::Class: '0'
+  DBIx::Class::Core: '0'
   DBIx::Class::ResultSet: '0'
   DBIx::Class::Schema: '0'
   Data::Munge: '0'
@@ -59,17 +60,17 @@ requires:
   Moose: '0'
   Moose::Role: '0'
   MooseX::NonMoose: '0.26'
+  Scalar::Util: '0'
   namespace::autoclean: '0'
   perl: '5.010'
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/OpusVL/OpusVL-SysParams/issues
-  repository: git://github.com/OpusVL/OpusVL-SysParams.git
-version: '0.19'
+  repository: git://github.com//OpusVL-SysParams.git
+version: '0.20'
 x_Dist_Zilla:
   perl:
-    version: '5.020002'
+    version: '5.020001'
   plugins:
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
@@ -96,7 +97,6 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::PodWeaver:
           finder:
             - ':InstallModules'
-            - ':ExecFiles'
           plugins:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
@@ -167,15 +167,15 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/PruneCruft'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/ManifestSkip'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/MetaConfig'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -184,116 +184,111 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: '@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '6.007'
+              version: '6.005'
         Dist::Zilla::Role::MetaProvider::Provider:
-          Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.001011'
           inherit_missing: '1'
           inherit_version: '1'
           meta_noindex: '1'
       name: '@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/MetaProvides::Package'
-      version: '2.003002'
+      version: '2.003001'
     -
       class: Dist::Zilla::Plugin::MetaNoIndex
       name: '@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/MetaNoIndex'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/MetaYAML'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/MetaJSON'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/License'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
         Dist::Zilla::Role::FileWatcher:
           version: '0.006'
       name: '@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/ReadmeAnyFromPod'
-      version: '0.161170'
+      version: '0.150250'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/ExecDir'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/ShareDir'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/PodSyntaxTests'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/Test::ReportPrereqs'
-      version: '0.024'
+      version: '0.021'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
         Dist::Zilla::Plugin::Test::Compile:
           bail_out_on_fail: '0'
           fail_on_warning: author
-          fake_home: 0
+          fake_home: '0'
           filename: xt/author/00-compile.t
           module_finder:
             - ':InstallModules'
-          needs_display: 0
+          needs_display: '0'
           phase: develop
           script_finder:
-            - ':PerlExecFiles'
+            - ':ExecFiles'
           skips: []
       name: '@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/Test::Compile'
-      version: '2.054'
+      version: '2.053'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/MakeMaker'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/Manifest'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/RunExtraTests'
-      version: '0.028'
+      version: '0.027'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/ConfirmRelease'
-      version: '6.007'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: '@Author::OpusVL::ToCPAN/@Author::OpusVL/AutoPrereqs'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::CheckChangesHasContent
       name: '@Author::OpusVL::ToCPAN/@Author::OpusVL/CheckChangesHasContent'
       version: '0.008'
     -
       class: Dist::Zilla::Plugin::RewriteVersion
-      config:
-        Dist::Zilla::Plugin::RewriteVersion:
-          add_tarball_name: 0
-          finders:
-            - ':ExecFiles'
-            - ':InstallModules'
-          global: 0
-          skip_version_provider: 0
       name: '@Author::OpusVL::ToCPAN/@Author::OpusVL/RewriteVersion'
-      version: '0.015'
+      version: '0.009'
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@Author::OpusVL::ToCPAN/@Author::OpusVL/NextRelease'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::Encoding
       name: '@Author::OpusVL::ToCPAN/@Author::OpusVL/CommonBinaryFiles'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -317,11 +312,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::OpusVL::ToCPAN/@Author::OpusVL/ExecDir'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::OpusVL::ToCPAN/@Author::OpusVL/ScriptDir'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -329,7 +324,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.19
+          tag: v0.20
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -340,15 +335,8 @@ x_Dist_Zilla:
       version: '2.036'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease
-      config:
-        Dist::Zilla::Plugin::BumpVersionAfterRelease:
-          finders:
-            - ':ExecFiles'
-            - ':InstallModules'
-          global: 0
-          munge_makefile_pl: 1
       name: '@Author::OpusVL::ToCPAN/@Author::OpusVL/BumpVersionAfterRelease'
-      version: '0.015'
+      version: '0.009'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -386,15 +374,15 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: '@Author::OpusVL::ToCPAN/@Author::OpusVL/TestMoreWithSubtests'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Author::OpusVL::ToCPAN/UploadToCPAN'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::GitHub::Meta
       name: '@Author::OpusVL::ToCPAN/GitHub::Meta'
-      version: '0.42'
+      version: '0.40'
     -
       class: Dist::Zilla::Plugin::Test::PAUSE::Permissions
       name: Test::PAUSE::Permissions
@@ -402,7 +390,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: TestRelease
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::MinimumPerl
       name: MinimumPerl
@@ -410,50 +398,49 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: '@Author::OpusVL::ToCPAN/@Author::OpusVL/@Starter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '6.007'
+      version: '6.005'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.007'
-x_serialization_backend: 'YAML::Tiny version 1.66'
+    version: '6.005'

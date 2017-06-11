@@ -1,0 +1,39 @@
+---
+abstract: "It's hash manipulation module"
+author:
+  - 'matsumura-taichi <hiroto.in.the.cromagnons@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  Module::Build::Tiny: 0.035
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.11, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Hash-Unique
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Hash::Unique:
+    file: lib/Hash/Unique.pm
+    version: 0.06
+requires:
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/matsumura-taichi/Hash-Unique/issues
+  homepage: https://github.com/matsumura-taichi/Hash-Unique
+  repository: git://github.com/matsumura-taichi/Hash-Unique.git
+version: 0.06
+x_contributors:
+  - 'K <x00.x7f@gmail.com>'
+x_static_install: 1

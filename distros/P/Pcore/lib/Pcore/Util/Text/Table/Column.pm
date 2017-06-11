@@ -8,7 +8,7 @@ has idx => ( is => 'ro', isa => Int, required => 1 );
 has width => ( is => 'ro', isa => Maybe [PositiveInt] );
 
 has title        => ( is => 'ro', isa => Str );
-has title_color  => ( is => 'ro', isa => Maybe [Str], default => BOLD . WHITE );
+has title_color  => ( is => 'ro', isa => Maybe [Str], default => $BOLD . $WHITE );
 has title_align  => ( is => 'ro', isa => Enum [ -1, 0, 1 ], default => 0 );
 has title_valign => ( is => 'ro', isa => Enum [ -1, 0, 1 ], default => 1 );
 

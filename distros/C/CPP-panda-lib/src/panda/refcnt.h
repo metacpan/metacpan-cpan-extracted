@@ -107,10 +107,10 @@ public:
         operator=(p);
     }
 
-    T* operator ->   () const { return ptr; }
-    T& operator*     () const { return *ptr; }
-       operator T*   () const { return ptr; }
-       operator bool () const { return ptr ? true : false; }
+    T* operator-> () const { return ptr; }
+    T& operator*  () const { return *ptr; }
+    operator T*   () const { return ptr; }
+    explicit operator bool () const { return ptr; }
 
     T*       get       () const { return ptr; }
     long int use_count () const { return ptr->refcnt(); }
@@ -178,10 +178,10 @@ public:
         operator=(p);
     }
 
-    T* operator->    () const { return ptr; }
-    T& operator*     () const { return *ptr; }
-       operator T*   () const { return ptr; }
-       operator bool () const { return ptr ? true : false; }
+    T* operator-> () const { return ptr; }
+    T& operator*  () const { return *ptr; }
+    operator T*   () const { return ptr; }
+    explicit operator bool () const { return ptr; }
 
     T*       get       () const { return ptr; }
     long int use_count () const { return *refcnt; }

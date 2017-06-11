@@ -12,7 +12,7 @@ $result = test_app( 'App::RL' => [qw(position)] );
 like( $result->error, qr{need .+input file}, 'need infile' );
 
 $result = test_app( 'App::RL' => [qw(position t/not_exists)] );
-like( $result->error, qr{need two or more input files}, 'need infiles' );
+like( $result->error, qr{need two.+input files}, 'need infiles' );
 
 $result = test_app( 'App::RL' => [qw(position t/not_exists t/not_exists)] );
 like( $result->error, qr{doesn't exist}, 'infile not exists' );

@@ -173,7 +173,8 @@ sub val {
   return $tag eq 'textarea' ? $self->text : $self->{value} if $tag ne 'select';
 
   # "select"
-  my $v = $self->find('option:checked')->map('val');
+  my $v = $self->find('option:checked:not([disabled])')
+    ->grep(sub { !$_->ancestors('optgroup[disabled]')->size })->map('val');
   return exists $self->{multiple} ? $v->size ? $v->to_array : undef : $v->last;
 }
 

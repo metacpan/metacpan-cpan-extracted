@@ -78,7 +78,11 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.36",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
+   "version" : "0.41",
+   "x_contributors" : [
+      "Graham Ollis <plicease@cpan.org>",
+      "Diab Jerius (DJERIUS)"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

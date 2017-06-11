@@ -1,7 +1,7 @@
 package DDG::Block::Words;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Block implementation to handle words based plugins
-$DDG::Block::Words::VERSION = '1016';
+$DDG::Block::Words::VERSION = '1017';
 use Moo;
 use Carp;
 with qw( DDG::Block );
@@ -261,7 +261,7 @@ DDG::Block::Words - Block implementation to handle words based plugins
 
 =head1 VERSION
 
-version 1016
+version 1017
 
 =head1 DESCRIPTION
 

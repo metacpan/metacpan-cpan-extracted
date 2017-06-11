@@ -1,5 +1,9 @@
 Revision history for Map::Tube::CLI
 
+0.27  Tue Jun 06 10:20:00 2017
+      - Upgraded dependency on Map::Tube v3.30.
+      - Upgraded dependency on Map::Tube::Exception v3.12.
+
 0.26  Tue May 16 10:15:00 2017
       - Updated test minimum requirement Map::Tube::London v0.83.
 

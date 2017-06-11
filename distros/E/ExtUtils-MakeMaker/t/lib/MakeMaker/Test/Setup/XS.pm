@@ -19,7 +19,8 @@ use ExtUtils::MM;
 my $tempdir = tempdir(DIR => getcwd, CLEANUP => 1);
 chdir $tempdir;
 my $typemap = 'type map';
-$typemap =~ s/ //g unless MM->new({NAME=>'name', NORECURS=>1})->can_dep_space;
+my $MM = MM->new({NAME=>'name', NORECURS=>1});
+$typemap =~ s/ //g unless $MM->can_dep_space;
 chdir File::Spec->updir;
 
 my $PM_TEST = <<'END';
@@ -148,6 +149,7 @@ $label2files{static} = +{
     $MAKEFILEPL, 'Test', 'lib/XS/Test.pm', qq{'$typemap'},
     q{LINKTYPE => 'static'},
   ),
+  "blib/arch/auto/share/dist/x-y/libwhatevs$MM->{LIB_EXT}" => 'hi there', # mimic what File::ShareDir can do
 };
 
 $label2files{subdirs} = +{
@@ -455,7 +457,11 @@ sub run_tests {
   }
 
   chdir File::Spec->updir or die;
-  ok rmtree($dir), "teardown $dir";
+  if ($ENV{EUMM_KEEP_TESTDIRS}) {
+    ok 1, "don't teardown $dir";
+  } else {
+    ok rmtree($dir), "teardown $dir";
+  }
 }
 
 1;

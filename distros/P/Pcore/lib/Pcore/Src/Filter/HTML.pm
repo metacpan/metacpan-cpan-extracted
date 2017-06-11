@@ -1,6 +1,6 @@
 package Pcore::Src::Filter::HTML;
 
-use Pcore -class, -try;
+use Pcore -class;
 use Pcore::Util::Text qw[trim];
 use Pcore::Src::Filter::JS;
 use Pcore::Src::Filter::CSS;
@@ -58,7 +58,7 @@ sub compress ($self) {
 
     state $init = !!require HTML::Packer;
 
-    try {
+    eval {
         $self->buffer->$* = HTML::Packer->init->minify( $self->buffer, $html_packer_minify_args );    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
     };
 
@@ -66,6 +66,16 @@ sub compress ($self) {
 }
 
 1;
+## -----SOURCE FILTER LOG BEGIN-----
+##
+## PerlCritic profile "pcore-script" policy violations:
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+## | Sev. | Lines                | Policy                                                                                                         |
+## |======+======================+================================================================================================================|
+## |    3 | 61                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+##
+## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

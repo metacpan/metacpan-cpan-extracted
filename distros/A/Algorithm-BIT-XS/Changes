@@ -1,4 +1,7 @@
 Revision history for Perl extension Algorithm::BIT::XS.
 
+0.002 2017-06-10T21:33+01:00
+ - Add support for 2D binary indexed trees
+
 0.001 2017-04-30T18:50+01:00
  - Initial release

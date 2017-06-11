@@ -1500,6 +1500,32 @@ my %sSubVersion = (
     ConfidenceLevel => { Writable => 'integer' },
 );
 
+# Google audio namespace
+%Image::ExifTool::XMP::GAudio = (
+    %xmpTableDefaults,
+    GROUPS => { 1 => 'XMP-GAudio', 2 => 'Audio' },
+    NAMESPACE => 'GAudio',
+    Data => {
+        Name => 'AudioData',
+        ValueConv => 'Image::ExifTool::XMP::DecodeBase64($val)',
+        ValueConvInv => 'Image::ExifTool::XMP::EncodeBase64($val)',
+    },
+    Mime => { Name => 'AudioMimeType' },
+);
+
+# Google image namespace
+%Image::ExifTool::XMP::GImage = (
+    %xmpTableDefaults,
+    GROUPS => { 1 => 'XMP-GImage', 2 => 'Image' },
+    NAMESPACE => 'GImage',
+    Data => {
+        Name => 'ImageData',
+        ValueConv => 'Image::ExifTool::XMP::DecodeBase64($val)',
+        ValueConvInv => 'Image::ExifTool::XMP::EncodeBase64($val)',
+    },
+    Mime => { Name => 'ImageMimeType' },
+);
+
 # Google panorama namespace properties
 # (ref http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,4569.0.html)
 %Image::ExifTool::XMP::GPano = (
@@ -1539,6 +1565,46 @@ my %sSubVersion = (
     LargestValidInteriorRectHeight  => { Writable => 'real' },
 );
 
+# Google Spherical Images namespace (ref https://github.com/google/spatial-media/blob/master/docs/spherical-video-rfc.md)
+%Image::ExifTool::XMP::GSpherical = (
+    %xmpTableDefaults,
+    GROUPS => { 1 => 'XMP-GSpherical', 2 => 'Image' },
+    NAMESPACE => 'GSpherical',
+    NOTES => q{
+        Not actually XMP.  These RDF/XML tags are used in Google spherical MP4
+        videos.  See
+        L<https://github.com/google/spatial-media/blob/master/docs/spherical-video-rfc.md>
+        for the specification.
+    },
+    # (avoid due to conflicts with XMP-GPano tags)
+    Spherical                   => { Avoid => 1, Writable => 'boolean' },
+    Stitched                    => { Avoid => 1, Writable => 'boolean' },
+    StitchingSoftware           => { Avoid => 1 },
+    ProjectionType              => { Avoid => 1 },
+    StereoMode                  => { Avoid => 1 },
+    SourceCount                 => { Avoid => 1, Writable => 'integer' },
+    InitialViewHeadingDegrees   => { Avoid => 1, Writable => 'real' },
+    InitialViewPitchDegrees     => { Avoid => 1, Writable => 'real' },
+    InitialViewRollDegrees      => { Avoid => 1, Writable => 'real' },
+    Timestamp                   => {
+        Name => 'TimeStamp',
+        Groups => { 2 => 'Time' },
+        Avoid => 1,
+        Writable => 'date',
+        Shift => 'Time',
+        ValueConv => 'ConvertUnixTime($val)', #(NC)
+        ValueConvInv => 'GetUnixTime($val)',
+        PrintConv => '$self->ConvertDateTime($val)',
+        PrintConvInv => '$self->InverseDateTime($val)',
+    },
+    FullPanoWidthPixels         => { Avoid => 1, Writable => 'integer' },
+    FullPanoHeightPixels        => { Avoid => 1, Writable => 'integer' },
+    CroppedAreaImageWidthPixels => { Avoid => 1, Writable => 'integer' },
+    CroppedAreaImageHeightPixels=> { Avoid => 1, Writable => 'integer' },
+    CroppedAreaLeftPixels       => { Avoid => 1, Writable => 'integer' },
+    CroppedAreaTopPixels        => { Avoid => 1, Writable => 'integer' },
+);
+
 # Getty Images namespace (ref PH)
 %Image::ExifTool::XMP::GettyImages = (
     %xmpTableDefaults,
@@ -1570,41 +1636,6 @@ my %sSubVersion = (
     RoutingExclusions   => { List => 'Bag' },
     SecondaryFTP        => { List => 'Bag' },
     TimeShot            => { },
-);
-
-# Google Spherical Images namespace (ref https://github.com/google/spatial-media/blob/master/docs/spherical-video-rfc.md)
-%Image::ExifTool::XMP::GSpherical = (
-    %xmpTableDefaults,
-    WRITABLE => 0,
-    GROUPS => { 1 => 'XMP-GSpherical', 2 => 'Image' },
-    NAMESPACE => 'GSpherical',
-    NOTES => q{
-        Not actually XMP.  These RDF/XML tags are used in Google spherical MP4
-        videos.  See
-        L<https://github.com/google/spatial-media/blob/master/docs/spherical-video-rfc.md>
-        for the specification.
-    },
-    Spherical                   => { },
-    Stitched                    => { },
-    StitchingSoftware           => { },
-    ProjectionType              => { },
-    StereoMode                  => { },
-    SourceCount                 => { },
-    InitialViewHeadingDegrees   => { },
-    InitialViewPitchDegrees     => { },
-    InitialViewRollDegrees      => { },
-    Timestamp                   => {
-        Name => 'TimeStamp',
-        Groups => { 2 => 'Time' },
-        ValueConv => 'ConvertUnixTime($val)', #(NC)
-        PrintConv => '$self->ConvertDateTime($val)',
-    },
-    FullPanoWidthPixels         => { },
-    FullPanoHeightPixels        => { },
-    CroppedAreaImageWidthPixels => { },
-    CroppedAreaImageHeightPixels=> { },
-    CroppedAreaLeftPixels       => { },
-    CroppedAreaTopPixels        => { },
 );
 
 # SVG namespace properties (ref 9)

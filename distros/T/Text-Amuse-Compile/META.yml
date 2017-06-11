@@ -34,4 +34,4 @@ resources:
   WebIRC: https://webchat.freenode.net/?channels=#amusewiki
   homepage: http://amusewiki.org
   repository: https://github.com/melmothx/text-amuse-compile
-version: '0.91'
+version: '0.92'

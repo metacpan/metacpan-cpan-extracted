@@ -20,32 +20,60 @@ do_not_warn_unused(void *x ZHINST_UNUSED)
 {
 }
 
-#define HANDLE_ERROR(conn, func, ...) \
-  handle_error(conn, func(conn, ## __VA_ARGS__), #func)
-
-#define HANDLE_ZI_API_ERROR(func, ...) \
-  handle_zi_api_error(func(__VA_ARGS__), #func)
+#define CROAK(arg1, ...) \
+    call_va_list(aTHX_ "Carp::croak", arg1, ## __VA_ARGS__, NULL)
+#define CARP(arg1, ...) \
+    call_va_list(aTHX_ "Carp::carp", arg1, ## __VA_ARGS__, NULL)
 
 static void
-handle_zi_api_error(ZIResult_enum number, const char *function)
+call_va_list(pTHX_ char *func, char *arg1, ...)
+{
+    va_list ap;
+    va_start(ap, arg1);
+    
+    /* See perlcall.  */
+    dSP;
+    
+    ENTER;
+    SAVETMPS;
+    
+    PUSHMARK(SP);
+    mXPUSHp(arg1, strlen(arg1));
+    while (1) {
+        char *arg = va_arg(ap, char *);
+        if (arg == NULL)
+            break;
+        mXPUSHp(arg, strlen(arg));
+    }
+    PUTBACK;
+
+    call_pv(func, G_DISCARD);
+
+    FREETMPS;
+    LEAVE;
+}
+
+
+static void
+handle_zi_api_error(pTHX_ ZIResult_enum number, const char *function)
 {
   if (number == ZI_INFO_SUCCESS)
     return;
 
   char *buffer;
   ziAPIGetError(number, &buffer, NULL);
-  croak("Error in %s: %s", function, buffer);
+  CROAK("Error in ", function, ": ", buffer);
 }
 
 
 static void
-handle_error(ZIConnection conn, ZIResult_enum number, const char *function)
+handle_error(pTHX_ ZIConnection conn, ZIResult_enum number, const char *function)
 {
   if (number == ZI_INFO_SUCCESS)
     return;
 
   if (number != ZI_ERROR_GENERAL) {
-    handle_zi_api_error(number, function);
+    handle_zi_api_error(aTHX_ number, function);
   }
 
   char *buffer = NULL;
@@ -59,15 +87,14 @@ handle_error(ZIConnection conn, ZIResult_enum number, const char *function)
         break;
 
       if (rv == ZI_ERROR_CONNECTION)
-        croak("Invalid connection in error handler");
+        CROAK("Invalid connection in error handler");
 
       if (rv == ZI_ERROR_LENGTH)
         buffer_len = (buffer_len * 3) / 2;
       else
-        croak("Unknown error %d returned from ziAPIGetLastError", rv);
+        CROAK("Unknown error returned from ziAPIGetLastError");
   }
-
-  croak("Error in %s. Details: %s", function, buffer);
+  CROAK("Error in ", function, ". Details: ", buffer);
 }
 
 static HV *
@@ -111,14 +138,23 @@ MODULE = Lab::Zhinst		PACKAGE = Lab::Zhinst		PREFIX = ziAPI
 
 INCLUDE: const-xs.inc
 
+#####################################################################
+#
+# Important:
+# If a method or function throws, add it to the @modify_methods array in
+# Zhinst.pm
+#
+#####################################################################
 
 Lab::Zhinst
 new(const char *class, const char *hostname, U16 port)
 CODE:
     do_not_warn_unused((void *) class);
     ZIConnection conn;
-    HANDLE_ZI_API_ERROR(ziAPIInit, &conn);
-    HANDLE_ZI_API_ERROR(ziAPIConnect, conn, hostname, port);
+    int rv = ziAPIInit(&conn);
+    handle_zi_api_error(aTHX_ rv, "ziAPIInit");
+    rv = ziAPIConnect(conn, hostname, port);
+    handle_zi_api_error(aTHX_ rv, "ziAPIConnect");
     RETVAL = conn;
 OUTPUT:
     RETVAL
@@ -138,7 +174,8 @@ CODE:
     size_t buffer_len = 100;
     char *buffer;
     New(0, buffer, buffer_len, char);
-    HANDLE_ZI_API_ERROR(ziAPIListImplementations, buffer, buffer_len);
+    int rv = ziAPIListImplementations(buffer, buffer_len);
+    handle_zi_api_error(aTHX_ rv, "ziAPIListImplementations");
     RETVAL = buffer;
 OUTPUT:
     RETVAL
@@ -151,7 +188,8 @@ unsigned
 GetConnectionAPILevel(Lab::Zhinst conn)
 CODE:
     ZIAPIVersion_enum version;
-    HANDLE_ERROR(conn, ziAPIGetConnectionAPILevel, &version);
+    int rv = ziAPIGetConnectionAPILevel(conn, &version);
+    handle_error(aTHX_ conn, rv, "ziAPIGetConnectionAPILevel");
     RETVAL = version;
 OUTPUT:
     RETVAL
@@ -170,7 +208,7 @@ CODE:
         if (rv == 0)
             break;
         if (rv != ZI_ERROR_LENGTH)
-            handle_error(conn, rv, "ziAPIListNodes");
+            handle_error(aTHX_ conn, rv, "ziAPIListNodes");
 
         nodes_len = (nodes_len * 3) / 2;
     }
@@ -185,7 +223,8 @@ double
 GetValueD(Lab::Zhinst conn, const char *path)
 CODE:
     double result;
-    HANDLE_ERROR(conn, ziAPIGetValueD, path, &result);
+    int rv = ziAPIGetValueD(conn, path, &result);
+    handle_error(aTHX_ conn, rv, "ziAPIGetValueD");
     RETVAL = result;
 OUTPUT:
     RETVAL
@@ -194,7 +233,8 @@ IV
 GetValueI(Lab::Zhinst conn, const char *path)
 CODE:
     IV result;
-    HANDLE_ERROR(conn, ziAPIGetValueI, path, &result);
+    int rv = ziAPIGetValueI(conn, path, &result);
+    handle_error(aTHX_ conn, rv, "ziAPIGetValueI");
     RETVAL = result;
 OUTPUT:
     RETVAL
@@ -204,7 +244,8 @@ HV *
 GetDemodSample(Lab::Zhinst conn, const char *path)
 CODE:
     ZIDemodSample sample;
-    HANDLE_ERROR(conn, ziAPIGetDemodSample, path, &sample);
+    int rv = ziAPIGetDemodSample(conn, path, &sample);
+    handle_error(aTHX_ conn, rv, "ziAPIGetDemodSample");
     RETVAL = demod_sample_to_hash(aTHX_ &sample);
 OUTPUT:
     RETVAL
@@ -214,7 +255,8 @@ HV *
 GetDIOSample(Lab::Zhinst conn, const char *path)
 CODE:
     ZIDIOSample sample;
-    HANDLE_ERROR(conn, ziAPIGetDIOSample, path, &sample);
+    int rv = ziAPIGetDIOSample(conn, path, &sample);
+    handle_error(aTHX_ conn, rv, "ziAPIGetDIOSample");
     RETVAL = dio_sample_to_hash(aTHX_ &sample);
 OUTPUT:
     RETVAL
@@ -224,7 +266,8 @@ HV *
 GetAuxInSample(Lab::Zhinst conn, const char *path)
 CODE:
     ZIAuxInSample sample;
-    HANDLE_ERROR(conn, ziAPIGetAuxInSample, path, &sample);
+    int rv = ziAPIGetAuxInSample(conn, path, &sample);
+    handle_error(aTHX_ conn, rv, "ziAPIGetAuxInSample");
     RETVAL = aux_in_sample_to_hash(aTHX_ &sample);
 OUTPUT:
     RETVAL
@@ -245,8 +288,10 @@ CODE:
         if (rv == 0)
             break;
         if (rv != ZI_ERROR_LENGTH)
-            handle_error(conn, rv, "ziAPIGetValueB");
-
+          {
+            Safefree(result);
+            handle_error(aTHX_ conn, rv, "ziAPIGetValueB");
+          }
         result_avail = (result_avail * 3) / 2;
     }
     RETVAL = newSVpvn(result, length);
@@ -258,13 +303,14 @@ OUTPUT:
 void
 SetValueD(Lab::Zhinst conn, const char *path, double value)
 CODE:
-    HANDLE_ERROR(conn, ziAPISetValueD, path, value);
+    int rv = ziAPISetValueD(conn, path, value);
+    handle_error(aTHX_ conn, rv, "ziAPISetValueD");
 
 void
 SetValueI(Lab::Zhinst conn, const char *path, IV value)
 CODE:
-    HANDLE_ERROR(conn, ziAPISetValueI, path, value);
-
+    int rv = ziAPISetValueI(conn, path, value);
+    handle_error(aTHX_ conn, rv, "ziAPISetValueI");
 
 void
 SetValueB(Lab::Zhinst conn, const char *path, SV *value)
@@ -275,14 +321,16 @@ CODE:
     char *bytes;
     STRLEN len;
     bytes = SvPV(value, len);
-    HANDLE_ERROR(conn, ziAPISetValueB, path, (unsigned char *) bytes, len);
+    int rv = ziAPISetValueB(conn, path, (unsigned char *) bytes, len);
+    handle_error(aTHX_ conn, rv, "ziAPISetValueB");
 
 
 double
 SyncSetValueD(Lab::Zhinst conn, const char *path, double value)
 CODE:
     double result = value;
-    HANDLE_ERROR(conn, ziAPISyncSetValueD, path, &result);
+    int rv = ziAPISyncSetValueD(conn, path, &result);
+    handle_error(aTHX_ conn, rv, "ziAPISyncSetValueD");
     RETVAL = result;
 OUTPUT:
     RETVAL
@@ -291,7 +339,8 @@ IV
 SyncSetValueI(Lab::Zhinst conn, const char *path, IV value)
 CODE:
     IV result = value;
-    HANDLE_ERROR(conn, ziAPISyncSetValueI, path, &result);
+    int rv = ziAPISyncSetValueI(conn, path, &result);
+    handle_error(aTHX_ conn, rv, "ziAPISyncSetValueI");
     RETVAL = result;
 OUTPUT:
     RETVAL
@@ -309,8 +358,9 @@ CODE:
     char *new_string;
     New(0, new_string, len, char);
     Copy(original, new_string, len, char);
-    HANDLE_ERROR(conn, ziAPISyncSetValueB, path, (uint8_t *) new_string,
-                 (uint32_t *) &len, len);
+    int rv = ziAPISyncSetValueB(conn,  path, (uint8_t *) new_string,
+                                (uint32_t *) &len, len);
+    handle_error(aTHX_ conn, rv, "ziAPISyncSetValueB");
     RETVAL = newSVpvn(new_string, len);
     Safefree(new_string);
 OUTPUT:
@@ -320,12 +370,14 @@ OUTPUT:
 void
 Sync(Lab::Zhinst conn)
 CODE:
-    HANDLE_ERROR(conn, ziAPISync);
+    int rv = ziAPISync(conn);
+    handle_error(aTHX_ conn, rv, "ziAPISync");
 
 void
 EchoDevice(Lab::Zhinst conn, const char *device_serial)
 CODE:
-    HANDLE_ERROR(conn, ziAPIEchoDevice, device_serial);
+    int rv = ziAPIEchoDevice(conn, device_serial);
+    handle_error(aTHX_ conn, rv, "ziAPIEchoDevice");
 
 void
 ziAPISetDebugLevel(I32 level)
@@ -338,7 +390,8 @@ const char *
 DiscoveryFind(Lab::Zhinst conn, const char *device_address)
 CODE:
     const char *device_id;
-    HANDLE_ERROR(conn, ziAPIDiscoveryFind, device_address, &device_id);
+    int rv = ziAPIDiscoveryFind(conn, device_address, &device_id);
+    handle_error(aTHX_ conn, rv, "ziAPIDiscoveryFind");
     RETVAL = device_id;
 OUTPUT:
     RETVAL
@@ -348,7 +401,8 @@ const char *
 DiscoveryGet(Lab::Zhinst conn, const char *device_id)
 CODE:
     const char *props_json;
-    HANDLE_ERROR(conn, ziAPIDiscoveryGet, device_id, &props_json);
+    int rv = ziAPIDiscoveryGet(conn, device_id, &props_json);
+    handle_error(aTHX_ conn, rv, "ziAPIDiscoveryGet");
     RETVAL = props_json;
 OUTPUT:
     RETVAL

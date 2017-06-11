@@ -7,7 +7,8 @@ use interface qw(Gtk2::Ex::DbLinker::AbDataManager);
 # use Carp qw(carp croak confess cluck);
 # use Data::Dumper;
 use Try::Tiny;
-
+use Log::Any;
+use Carp qw(croak confess);
 my %fieldtype = ( tinyint => 'integer', );
 
 #$self->{rs} holds a RecordSet that is a query def of the data to fetch from the database.
@@ -37,7 +38,8 @@ sub new {
         defaults        => $arg{defaults},
 
     };
-    $self->{log} = Log::Log4perl->get_logger(__PACKAGE__);
+    #$self->{log} = Log::Log4perl->get_logger(__PACKAGE__);
+    $self->{log} = Log::Any->get_logger();
 
     bless $self, $class;
     $self->{cols}    = [];
@@ -271,7 +273,8 @@ sub save {
             }
         }
         catch {
-             $self->{log}->logcarp("Can't save record : $_");
+            # $self->{log}->logcarp("Can't save record : $_");
+            carp( $self->{log}->warn("Can't save record : $_"));
             $done = 0;
         }
 
@@ -335,7 +338,10 @@ sub delete {
 
         # my $row = $self->{rs}->find( @{$self->{data}[$pos]} );
         my $row = $self->{current_row};
-        if ( !$row->delete ) {  $self->{log}->logcroak( " can't delete row at pos " . $pos ) }
+        if ( !$row->delete ) {  
+            #$self->{log}->logcroak( " can't delete row at pos " . $pos ) 
+            croak($self->{log}->error( " can't delete row at pos " . $pos ));
+            }
 
         splice @{ $self->{data} }, $pos, 1;
         if ( $self->row_count == 0 ) {
@@ -468,8 +474,8 @@ sub _init {
             join( " ", @{ $self->{primary_keys} } )
         );
     }
-     $self->{log}->logcroak("can't work without a pk")
-      if ( scalar @{ $self->{primary_keys} } == 0 );
+    # $self->{log}->logcroak("can't work without a pk") if ( scalar @{ $self->{primary_keys} } == 0 );
+     croak( $self->{log}->error("can't work without a pk")) if ( scalar @{ $self->{primary_keys} } == 0 );
     my @apk;
     if ( !defined $self->{ai_primary_keys} ) {
         foreach my $c (@pk) {

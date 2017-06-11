@@ -27,7 +27,7 @@ my %module_build_args = (
     "Dominique Dumont"
   ],
   "dist_name" => "App-Cme",
-  "dist_version" => "1.019",
+  "dist_version" => "1.020",
   "license" => "lgpl",
   "module_name" => "App::Cme",
   "recommends" => {
@@ -37,7 +37,7 @@ my %module_build_args = (
   "recursive_test_files" => 1,
   "requires" => {
     "App::Cmd::Setup" => 0,
-    "Config::Model" => "2.101",
+    "Config::Model" => "2.103",
     "Config::Model::FuseUI" => 0,
     "Config::Model::Lister" => 0,
     "Config::Model::ObjTreeScanner" => 0,
@@ -48,6 +48,7 @@ my %module_build_args = (
     "Encode" => 0,
     "File::HomeDir" => 0,
     "JSON" => 0,
+    "Log::Log4perl" => 0,
     "Path::Tiny" => 0,
     "Pod::POM" => 0,
     "Pod::POM::View::Text" => 0,

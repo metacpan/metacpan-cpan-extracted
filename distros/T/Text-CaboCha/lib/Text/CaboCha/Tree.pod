@@ -1,0 +1,116 @@
+=encoding utf-8
+
+=head1 NAME
+
+Text::CaboCha::Tree - CaboCha Tree Object
+
+=head1 SYNOPSIS
+
+    use Text::CaboCha;
+    my $cabocha = Text::CaboCha->new();
+    my $tree = $cabocha->parse($text);
+
+    $tree->tostr(Text::CaboCha::CABOCHA_FORMAT_TREE); # You can check the tree.
+
+    $tree->size;
+    
+    # Way to get token - (1)
+    my $token_size = $tree->token_size;
+    for (my $i = 0; $i < $token_size; $i++) {
+        my $token = $tree->token($i);
+        # do something
+    }
+
+    # Way to get token - (2)
+    foreach my $token (@{ $tree->tokens }) {
+        # do something
+    }
+
+    # Way to get chunk - (1)
+    my $chunk_size = $tree->chunk_size;
+    for (my $i = 0; $i < $chunk_size; $i++) {
+        my $chunk = $tree->chunk($i);
+        # do something
+    }
+
+    # Way to get chunk - (2)
+    foreach my $chunk (@{ $tree->chunks }) {
+        # do something
+    }
+
+=head1 DESCRIPTION
+
+Text::CaboCha::Tree encapsulates the cabocha tree object returned by parsing
+some text.
+
+=head1 METHODS
+
+=head2 tostr($format)
+
+It will express of the tree as sring that you specified format.  
+You can follow below format.
+
+=over 4
+
+=item B<CABOCHA_FORMAT_TREE>
+
+=item B<CABOCHA_FORMAT_LATTICE>
+
+=item B<CABOCHA_FORMAT_TREE_LATTICE>
+
+=item B<CABOCHA_FORMAT_XML>
+
+=item B<CABOCHA_FORMAT_CONLL>
+
+=item B<CABOCHA_FORMAT_NONE>
+
+=back
+
+=head2 $tree_size = $tree->size;
+
+It will return size of tree.
+
+=head2 $tokens = $tree->tokens;
+
+It will return array reference of Text::CaboCha::Token object.
+
+=head2 $chunks = $tree->chunks;
+
+It will return array reference of Text::CaboCha::Chunk object.
+
+=head2 $token_size = $tree->token_size;
+
+It will return size of token.
+
+=head2 $chunk_size = $tree->chunk_size;
+
+It will return size of chunk.
+
+=head2 my $token = $tree->token($i :Int);
+
+It will return Text::CaboCha::Token object.
+
+=head2 my $chunk = $tree->chunk($i :Int);
+
+It will return Text::CaboCha::Chunk object.
+
+=head1 SEE ALSO
+
+L<Text::CaboCha|Text::CaboCha>  
+L<Text::CaboCha::Token|Text::CaboCha::Token>  
+L<Text::CaboCha::Chunk|Text::CaboCha::Chunk>
+
+=head1 LICENSE
+
+Copyright (C) Kei Kamikawa.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See http://www.perl.com/perl/misc/Artistic.html
+
+=head1 AUTHOR
+
+Kei Kamikawa E<lt>x00.x7f@gmail.comE<gt>  
+L<@codehex|https://twitter.com/CodeHex>
+
+=cut

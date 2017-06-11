@@ -1,10 +1,11 @@
 # -*-CPerl-*-
-# Last changed Time-stamp: <2015-10-27 14:48:09 mtw>
+# Last changed Time-stamp: <2017-06-10 18:19:30 michl>
 
 package Bio::ViennaNGS;
-
-use version; our $VERSION = qv('0.16');
-
+use Exporter;
+use version; our $VERSION = version->declare("v0.17.1");
+our @ISA = qw(Exporter);
+our @EXPORT = ($VERSION);
 1;
 
 =head1 NAME
@@ -30,12 +31,6 @@ conversion of sequence annotation data.
 
 =item L<Bio::ViennaNGS::Bam>: Routines for high-level manipulation of
 BAM files.
-
-=item L<Bio::ViennaNGS::BamStat>: A L<Moose> based class for
-collecting mapping statistics.
-
-=item L<Bio::ViennaNGS::BamStatSummary>: A L<Moose> interface for
-processing L<Bio::ViennaNGS::BamStat> objects on a set of BAM files.
 
 =item L<Bio::ViennaNGS::Bed>: A L<Moose> interface for manipulation of
 genomic interval data in BED format.
@@ -75,6 +70,8 @@ and characterization of peaks/enriched regions in RNA-seq data.
 
 =item L<Bio::ViennaNGS::SpliceJunc>: A collection of routines for
 alternative splicing analysis.
+
+=item L<Bio::ViennaNGS::Subtypes>: Moose subtypes for internal usage.
 
 =item L<Bio::ViennaNGS::Tutorial>: A comprehensive tutorial of the
   L<Bio::ViennaNGS> core routines with real-world NGS data.
@@ -128,9 +125,13 @@ files for easy UCSC visualization.
 =item F<bed2nt2aa.pl>: Provide nucleotide and amino acid sequences for
 BED6 intervals.
 
-=item F<extend_bed.pl>: Extend genomic features in BED files by a
-certain number of nucleotides, either on both sides or specifically at
-the 5' or 3' end, respectively.
+=item F<bed62bed12.pl>: A simple BED6 -> BED12 converter.
+
+=item F<fasta_multigrep.pl>: Extract indivudual (whole) sequences from
+a multi Fasta file.
+
+=item F<fasta_subgrep.pl>: Extract subsequences from (multi) Fasta
+files.
 
 =item F<gff2bed.pl>: Convert RefSeq GFF3 annotation files to BED12
 format. Individual BED12 files are created for each feature type
@@ -163,6 +164,10 @@ visualization in genome Browsers.
 junctions from RNA-seq data by intersecting them with annotated splice
 junctions.
 
+=item F<track_hub_constructor.pl>: Analogous to
+assembly_hub_constructor.pl, construct a Track Hub for an organism
+listed in the UCSC Genome Browser.
+
 =item F<trim_fastq.pl>: Trim sequence and quality string fields in a
 Fastq file by user defined length.
 
@@ -171,71 +176,12 @@ Fastq file by user defined length.
 =head1 DEPENDENCIES
 
 The L<Bio::ViennaNGS> modules and classes depend on a set of Perl
-modules, some of which are part of the Perl core distribution:
+modules, some of which are part of the Perl core distribution, most
+notably L<Bio::Perl> >= 1.00690001 and L<Bio::DB::Sam> >= 1.37.
 
-=over
-
-=item L<Bio::Perl> >= 1.00690001
-
-=item L<Bio::DB::Sam> >= 1.37
-
-=item L<Bio::DB::Fasta>
-
-=item L<Bio::Tools::GFF>
-
-=item L<File::Basename>
-
-=item L<File::Share>
-
-=item L<File::Slurp>
-
-=item L<File::Temp>
-
-=item L<List::Util>
-
-=item L<Path::Class>
-
-=item L<IPC::Cmd>
-
-=item L<Carp>
-
-=item L<Template>
-
-=item L<Moose>
-
-=item L<Moose::Util::TypeConstraints>
-
-=item L<namespace::autoclean>
-
-=item L<MooseX::Clone>
-
-=item L<MooseX::InstanceTracking>
-
-=item L<Tie::Hash::Indexed>
-
-=item L<Test::Files>
-
-=item L<Test::File::Contents>
-
-=back
-
-In addition the following modules are required by the L<Bio::ViennaNGS> utilities:
-
-=over
-
-=item L<PerlIO::gzip>
-
-=item L<Math::Round>
-
-=item L<XML::Simple>
-
-=item L<Statistics::R>
-
-=back
-
-L<Bio::ViennaNGS> depends on a set of third-party tools and libraries which
-are required for specific filtering and file format conversion tasks as
-well as for building internally used Perl modules:
+In addition, L<Bio::ViennaNGS> depends on third-party tools and
+libraries which are required for specific filtering and file format
+conversion tasks as well as for building internally used Perl modules:
 
 =over
 
@@ -290,10 +236,6 @@ test Windows compatibility.
 
 =item L<Bio::ViennaNGS::Bam>
 
-=item L<Bio::ViennaNGS::BamStat>
-
-=item L<Bio::ViennaNGS::BamStatSummary>
-
 =item L<Bio::ViennaNGS::Bed>
 
 =item L<Bio::ViennaNGS::BedGraphEntry>
@@ -308,9 +250,9 @@ test Windows compatibility.
 
 =item L<Bio::ViennaNGS::FeatureChain>
 
-=item L<Bio::ViennaNGS::FeatureIO>
-
 =item L<Bio::ViennaNGS::FeatureInterval>
+
+=item L<Bio::ViennaNGS::FeatureIO>
 
 =item L<Bio::ViennaNGS::FeatureLine>
 
@@ -319,6 +261,8 @@ test Windows compatibility.
 =item L<Bio::ViennaNGS::Peak>
 
 =item L<Bio::ViennaNGS::SpliceJunc>
+
+=item L<Bio::ViennaNGS::Subtypes>
 
 =item L<Bio::ViennaNGS::Tutorial>
 
@@ -344,7 +288,7 @@ test Windows compatibility.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2015 Michael T. Wolfinger
+Copyright (C) 2014-2017 Michael T. Wolfinger
 E<lt>michael@wolfinger.euE<gt>
 
 This library is free software; you can redistribute it and/or modify

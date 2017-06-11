@@ -1,3 +1,6 @@
+0.021     2017-06-03 19:49:16 EDT
+  - Be more lenient when trying to detect postderef for DeprecatedFeatures autoderef violations
+
 0.020     2017-05-15 20:45:02 EDT
   - Updates to documentation for DeprecatedFeatures and DiscouragedModules policies
   - Add require ::Foo::Bar to DeprecatedFeatures policy

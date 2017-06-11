@@ -1,0 +1,29 @@
+---
+abstract: 'Simple ephemeral ECDH + AES hybrid cryptosystem'
+author:
+  - 'Ashish Gulhati <crypt-eecdh at hash.neo.tc>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Crypt-EECDH
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Bytes::Random::Secure: '0'
+  Crypt::Curve25519: '0'
+  Crypt::EC_DSA: '0'
+  Crypt::Ed25519: '0'
+  Crypt::Rijndael: '0'
+  Digest::SHA: '0'
+version: '1.005'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -10,11 +10,11 @@ FSM::Basic -  Finite state machine using HASH as state definitions
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 SYNOPSIS
 
@@ -96,7 +96,7 @@ The keys are the states name.
 
 =over 2
 
-=item executable code ( "do" for perl code, "exec" for system code).
+=item executable code ( "do" for perl code, "exec" for system code, and a specific "cat" just reading the file content provided in parameter).
 
 =item "matching" to define the state when the input match the "expect" value
 
@@ -208,14 +208,16 @@ sub run
                 if ( exists $state->{ cmd_exec } )
                 {
                     my $cmd_exec = join ' ', @{ $self->{ cmd_stack } };
-                    $output = `$cmd_exec` . $output;
+                    my $string = `$cmd_exec`;
+                    $output =  eval (print $string) . $output;
                     $self->{ cmd_exec } = [];
                 }
                 if ( exists $state->{ exec } )
                 {
                     my $old_exec = $state->{ exec };
                     $state->{ exec } =~ s/__IN__/$in/g;
-                    $output = `$state->{exec}` . $output;
+                    my $string =`$state->{exec}`;
+                    $output =  eval (print $string) . $output;
                     $state->{ exec } = $old_exec;
                 }
                 if ( exists $state->{ do } )
@@ -225,13 +227,20 @@ sub run
                     $output = ( eval $state->{ do } ) . $output;
                     $state->{ do } = $old_do;
                 }
+                if ( exists $state->{ cat } )
+                {
+                    my $old_cat = $state->{ cat };
+                    $state->{ cat } =~ s/__IN__/$in/g;
+                    my $string = do { local ( @ARGV, $/ ) =  $state->{ cat }; <> }; 
+                    $output =  eval (print $string) . $output;
+                    $state->{ cat } = $old_cat;
+                }
             }
             else
             {
                 $self->{ previous_state } = $self->{ state };
                 $self->{ state } = $self->{ states_list }{ $self->{ state } }{ not_matching } // $self->{ state };
-                $self->{ states_list }{ $self->{ state } }{ repeat }--
-                  if exists $self->{ states_list }{ $self->{ state } }{ repeat };
+                $self->{ states_list }{ $self->{ state } }{ repeat }-- if exists $self->{ states_list }{ $self->{ state } }{ repeat };
                 $output .= $self->{ states_list }{ $self->{ state } }{ output } // '';
                 if ( exists $self->{ states_list }{ $self->{ state } }{ not_matching_info } )
                 {

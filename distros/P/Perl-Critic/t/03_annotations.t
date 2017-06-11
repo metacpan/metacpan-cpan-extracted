@@ -13,12 +13,9 @@ use Perl::Critic::TestUtils qw(bundled_policy_names);
 
 use Test::More;
 
-#-----------------------------------------------------------------------------
+our $VERSION = '1.128';
 
-our $VERSION = '1.126';
-
-#-----------------------------------------------------------------------------
-
+Perl::Critic::TestUtils::assert_version( $VERSION );
 Perl::Critic::TestUtils::block_perlcriticrc();
 
 my @bundled_policy_names = bundled_policy_names();
@@ -237,12 +234,6 @@ SKIP: {
     }
 
 }
-
-#-----------------------------------------------------------------------------
-
-# ensure we return true if this test is loaded by
-# t/00_modules.t_without_optional_dependencies.t
-1;
 
 # Local Variables:
 #   mode: cperl

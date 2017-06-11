@@ -135,7 +135,10 @@
                   . "elements in the configuration tree. The available choice "
                   . "of this reference value (or check list) is made from the "
                   . "available keys of the pointed hash element or the values "
-                  . "of the pointed array element.",
+                  . "of the pointed array element. The keys of several hashes (or lists) "
+                  . "can be combined by using the '+' operator in the formula. "
+                  . "For instance, '! host:$a lan + ! host:foobar lan'. See "
+                  . "L<Config::Model::IdElementReference> for more details."
             },
 
             'replace_follow' => {

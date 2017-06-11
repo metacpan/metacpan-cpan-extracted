@@ -76,7 +76,7 @@ my %engines = (
 	},
 	Remote     => {
 		args    => sub {(
-			servers => [{host => 'localhost', port => 9321}],
+			servers => [{host => 'localhost'}], # port is filled in during make_engine
 		)},
 	},
 	BigMemory => {},
@@ -91,7 +91,13 @@ sub make_engine {
 	my $eargs = $engines{$name}->{args} || sub {};
 	my %args = $eargs->();
 	if (defined $extra) {
+	        my $server_port = delete $extra->{server_port};
 		%args = ( %args, %$extra );
+		if ($server_port and $args{servers}) {
+			foreach my $server ( @{$args{servers}} ) {
+				$server->{port} //= $server_port;
+			}
+		}
 	}
 	return engine_package($name)->new(%args,
 		logger => POE::Component::MessageQueue::Logger->new(level=>LOG_LEVEL),

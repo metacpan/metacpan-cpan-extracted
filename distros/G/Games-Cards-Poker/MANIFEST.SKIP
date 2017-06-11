@@ -6,4 +6,5 @@
 \.swp$
 \..*\.swp$
 \b\.xvpics\b
+\#
 ~$

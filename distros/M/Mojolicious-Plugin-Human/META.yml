@@ -4,15 +4,15 @@ author:
   - 'Dmitry E. Oboukhov <unera@debian.org>,'
   - 'Roman V. Nikolaev <rshadow@rambler.ru>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Mojolicious-Plugin-Human
 no_index:
   directory:
@@ -20,13 +20,13 @@ no_index:
     - inc
     - t
 requires:
-  DateTime: 0
-  DateTime::Format::DateParse: 0
-  Mojo::Base: 0
-  Test::Compile: 0
-  perl: 5.010000
+  DateTime: '0'
+  DateTime::Format::DateParse: '0'
+  Mojo::Base: '0'
+  Test::Compile: '0'
+  perl: '5.010000'
 resources:
   bugtracker: https://github.com/dr-co/libmojolicious-plugin-human-perl/issues
   homepage: https://github.com/dr-co/libmojolicious-plugin-human-perl
   repository: https://github.com/dr-co/libmojolicious-plugin-human-perl
-version: 0.7
+version: '1.0'

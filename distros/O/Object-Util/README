@@ -183,7 +183,22 @@ DESCRIPTION
         Data::Dumper::Concise.)
 
         If the object provides its own `dump` method, this will be called
-        instead.
+        instead. Any additional arguments will be passed through to it.
+
+    $_dwarn
+        Calling `$object->$_dwarn(@args)` prints a similar dump of the object
+        and any arguments as a warning, then returns the object, so is
+        suitable for tap-like chaining.
+
+        Unlike $_dump, will not call the object's own `dump` method.
+
+    $_dwarn_call
+        Calling `$object->$_dwarn_call($method, @args)` calls the method on
+        the object, passing it the arguments, and returns the result. Along
+        the way, it will dump the object, method, arguments, and return value
+        as warnings. Returns the method's return value.
+
+        Unlike $_dump, will not call the object's own `dump` method.
 
   Implementation Details
     B::Hooks::Parser is used to inject these methods into your lexical scope,

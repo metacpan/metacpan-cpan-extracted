@@ -1,7 +1,10 @@
 # Before "make install", this script should be runnable with "make test".
 # After "make install" it should work as "perl t/IPTC.t".
 
-BEGIN { $| = 1; print "1..8\n"; $Image::ExifTool::configFile = ''; }
+BEGIN {
+    $| = 1; print "1..8\n"; $Image::ExifTool::configFile = '';
+    require './t/TestLib.pm'; t::TestLib->import();
+}
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load the module(s)
@@ -9,8 +12,6 @@ use Image::ExifTool 'ImageInfo';
 use Image::ExifTool::IPTC;
 $loaded = 1;
 print "ok 1\n";
-
-use t::TestLib;
 
 my $testname = 'IPTC';
 my $testnum = 1;
@@ -43,7 +44,7 @@ my $testnum = 1;
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    $exifTool->Options(Duplicates => 1, Binary => 1, List => 1);
+    $exifTool->Options(Duplicates => 1, Binary => 1, ListJoin => undef);
     my $info = $exifTool->ImageInfo('t/images/IPTC.jpg');
     my $tag;
     foreach $tag (keys %$info) {

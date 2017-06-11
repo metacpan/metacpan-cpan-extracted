@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,10 +14,12 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Resque",
   "EXE_FILES" => [
-    "bin/resque-tool",
+    "bin/resque-admin",
+    "bin/resque-queue",
     "bin/resque-worker"
   ],
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010000",
   "NAME" => "Resque",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -37,6 +39,7 @@ my %WriteMakefileArgs = (
     "Redis" => 0,
     "Scalar::Util" => 0,
     "Sys::Hostname" => 0,
+    "Time::Concise" => 0,
     "Time::HiRes" => 0,
     "Try::Tiny" => 0,
     "namespace::autoclean" => 0,
@@ -55,7 +58,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.31",
+  "VERSION" => "0.34",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -87,6 +90,7 @@ my %FallbackPrereqs = (
   "Test::More" => "0.96",
   "Test::Pod" => 0,
   "Test::Pod::Coverage" => 0,
+  "Time::Concise" => 0,
   "Time::HiRes" => 0,
   "Try::Tiny" => 0,
   "base" => 0,

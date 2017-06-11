@@ -3,7 +3,9 @@
 # This test script plagiarises the perlcall documentation.
 
 use strict; use warnings; use diagnostics;
-use lib -e 't' ? 't' : 'test';
+use FindBin '$Bin';
+use lib $Bin;
+my $t = $Bin;
 use Test::More;
 use TestInlineSetup;
 use Inline Config => DIRECTORY => $TestInlineSetup::DIR;

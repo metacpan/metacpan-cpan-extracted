@@ -4,11 +4,13 @@ use strict;
 use warnings;
 
 sub packagesetup {
-    my ($class, $type, $version, $function) = @_;
+    my ($class, $type, $version, $function, $runtype) = @_;
 
     $version = $version ? ' Version="' . $version . '"' : '';
 
-    return qq~    <$type Type="post"$version><![CDATA[
+    $runtype //= 'post';
+
+    return qq~    <$type Type="$runtype"$version><![CDATA[
         # define function name
         my \$FunctionName = '$function';
 
@@ -62,7 +64,7 @@ OTRS::OPM::Maker::Utils::OTRS3
 
 =head1 VERSION
 
-version 1.37
+version 1.39
 
 =head1 AUTHOR
 

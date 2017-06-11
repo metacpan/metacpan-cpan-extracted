@@ -1,3 +1,19 @@
+3.001 2017-06-03
+
+    * Jump to version 3.001 because I messed up previous release.
+    * fix typos in doc
+
+2.062 2017-06-01
+
+  Bug fix
+    * Skip file mode test on Windows.
+
+2.061 2017-05-31
+
+  Improvements:
+    * add support for backend_arg (for Config::Model 2.104)
+    * add update_warnings parameter
+
 2.060 2017-03-05
 
   Improvements:

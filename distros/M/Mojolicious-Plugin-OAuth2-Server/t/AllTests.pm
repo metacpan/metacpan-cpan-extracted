@@ -126,7 +126,7 @@ sub run {
       $tx->req->headers->header( 'Authorization' => "Bearer $access_token" );
     });
 
-    $t->get_ok('/api/eat')->status_is( 200 );
+    $t->get_ok('/api/eat')->status_is( $args->{no_200_responses} ? 401 : 200 );
     $t->get_ok('/api/sleep')->status_is( 401 );
 
     return;
@@ -203,27 +203,39 @@ sub run {
   }
 
   $t->post_ok( @post_args )
-    ->status_is( 200 )
+    ->status_is( $args->{no_200_responses} ? 400 : 200 )
     ->header_is( 'Cache-Control' => 'no-store' )
     ->header_is( 'Pragma'        => 'no-cache' )
   ;
 
-  cmp_deeply(
-    $t->tx->res->json,
-    {
-      access_token  => re( '^.+$' ),
-      token_type    => 'Bearer',
-      expires_in    => '3600',
-      ( $grant_type eq 'client_credentials'
-        ? ()
-        : ( refresh_token => re( '^.+$' ) )
-      ),
-    },
-    'json_is_deeply'
-  );
+  if ( $args->{no_200_responses} ) {
 
-  my $access_token  = $t->tx->res->json->{access_token};
-  my $refresh_token = $t->tx->res->json->{refresh_token};
+    cmp_deeply(
+      $t->tx->res->json,
+      {
+        'error' => 'unauthorized_client',
+      },
+      'json_is_deeply'
+    );
+
+  } else {
+    cmp_deeply(
+      $t->tx->res->json,
+      {
+        access_token  => re( '^.+$' ),
+        token_type    => 'Bearer',
+        expires_in    => '3600',
+        ( $grant_type eq 'client_credentials'
+          ? ()
+          : ( refresh_token => re( '^.+$' ) )
+        ),
+      },
+      'json_is_deeply'
+    );
+  }
+
+  my $access_token  = $t->tx->res->json->{access_token} // '';
+  my $refresh_token = $t->tx->res->json->{refresh_token} // '';
 
   note( "don't use access token to access route" );
   $t->get_ok('/api/eat')->status_is( 401 );
@@ -236,7 +248,7 @@ sub run {
     $tx->req->headers->header( 'Authorization' => "Bearer $access_token" );
   });
 
-  $t->get_ok('/api/eat')->status_is( 200 );
+  $t->get_ok('/api/eat')->status_is( $args->{no_200_responses} ? 401 : 200 );
   $t->get_ok('/api/sleep')->status_is( 401 );
 
   if ( $grant_type ne 'client_credentials' ) {
@@ -279,7 +291,7 @@ sub run {
     isnt( $t->tx->res->json->{refresh_token},$refresh_token,'new refresh_token' );
   }
 
-  return if $args->{skip_revoke_tests};
+  return $t if $args->{skip_revoke_tests};
 
   my $new_access_token  = $t->tx->res->json->{access_token};
   my $new_refresh_token = $t->tx->res->json->{refresh_token};
@@ -309,6 +321,7 @@ sub run {
   $t->get_ok('/api/eat')->status_is( 401 );
   $t->get_ok('/api/sleep')->status_is( 401 );
 
+  return $t;
 }
 
 1;

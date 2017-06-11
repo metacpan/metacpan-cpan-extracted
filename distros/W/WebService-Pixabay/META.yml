@@ -2,7 +2,8 @@
 abstract: 'Perl 5 interface to Pixabay API.'
 author:
   - 'faraco <skelic3@gmail.com>'
-build_requires: {}
+build_requires:
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -13,17 +14,16 @@ meta-spec:
   version: '1.4'
 name: WebService-Pixabay
 requires:
-  Data::Printer: '0.39'
+  Data::Dumper: '0'
   Function::Parameters: '2.000006'
   LWP::Online: '1.08'
   Modern::Perl: '1.20170117'
   Moo: '2.003000'
-  Test::More: '1.302075'
-  WebService::Client: '0.0501'
+  WebService::Client: '0.0601'
   perl: '5.008'
 resources:
   bugtracker: https://github.com/faraco/WebService-Pixabay/issues
   homepage: https://github.com/faraco/WebService-Pixabay
   repository: https://github.com/faraco/WebService-Pixabay.git
-version: 0.0.6
+version: 2.0.1
 x_serialization_backend: 'YAML::Tiny version 1.69'

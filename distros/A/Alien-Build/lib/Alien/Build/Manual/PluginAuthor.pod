@@ -14,7 +14,7 @@ Alien::Build::Manual::PluginAuthor - Alien::Build plugin author documentation
 
 =head1 VERSION
 
-version 0.36
+version 0.41
 
 =head1 SYNOPSIS
 
@@ -235,9 +235,23 @@ This hook is completely optional.  If registered, it will be triggered after
 extraction and before build.  It allows you to apply any patches or make any
 modifications to the source if they are necessary.
 
+=head2 patch_ffi hook
+
+ $meta->register_hook( patch_ffi => sub {
+   my($build) = @_;
+   ...
+ });
+
 =head2 build hook
 
  $meta->register_hook( build => sub {
+   my($build) = @_;
+   ...
+ });
+
+=head2 build_ffi hook
+
+ $meta->register_hook( build_ffi => sub {
    my($build) = @_;
    ...
  });
@@ -249,9 +263,20 @@ modifications to the source if they are necessary.
    ... 
  });
 
+=head2 gather_ffi hook
+
+ $meta->register_hook( register_ffi => sub {
+   my($build) = @_;
+   ... 
+ });
+
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Diab Jerius (DJERIUS)
 
 =head1 COPYRIGHT AND LICENSE
 

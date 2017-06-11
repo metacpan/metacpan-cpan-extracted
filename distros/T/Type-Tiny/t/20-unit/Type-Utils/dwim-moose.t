@@ -9,7 +9,7 @@ picked up by C<dwim_type> from L<Type::Utils>.
 
 =head1 DEPENDENCIES
 
-Moose 2.0600 and MooseX::Types 0.35; skipped otherwise.
+Moose 2.0201 and MooseX::Types 0.35; skipped otherwise.
 
 =head1 AUTHOR
 
@@ -28,7 +28,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::Requires { "Moose" => "2.0600" };
+use Test::Requires { "Moose" => "2.0201" };
 use Test::Requires { "MooseX::Types" => "0.35" };
 use Test::TypeTiny;
 
@@ -83,6 +83,9 @@ should_fail([3, 4, 3], $threes);
 	should_pass([bless({}, $testclass)], $fallbackp);
 	should_pass([], $fallbackp);
 	should_fail([bless({}, 'main')], $fallbackp);
+	
+	my $fallbacku = dwim_type("ArrayRef[$testclass]", fallback => []);
+	is($fallbacku, undef);
 }
 
 {

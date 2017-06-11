@@ -31,7 +31,19 @@ incompatible. These are marked with an exclamation mark (!).
 
 =head1 VERSION 6.60  (planned 2017-09-01)
 
-=head1 VERSION 6.59  (planned 2017-06-01)
+=head1 VERSION 6.59  2017-06-01
+
+=over 4
+
+=item Time zone fixes
+
+Newest zoneinfo data (tzdata 2017b)
+
+=item Documentation fixes
+
+Improved some of the documentation.
+
+=back
 
 =head1 VERSION 6.58  2017-03-01
 

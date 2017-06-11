@@ -1,9 +1,9 @@
 # -*-cperl-*-
 #
 # Business::Bitcoin - Easy and secure way to accept Bitcoin payments online
-# Copyright (c) 2016-2017 Ashish Gulhati <biz-btc at hash dot neomailbox.ch>
+# Copyright (c) 2016-2017 Ashish Gulhati <biz-btc at hash.neo.tc>
 #
-# $Id: lib/Business/Bitcoin.pm v1.044 Mon May 15 14:18:00 PDT 2017 $
+# $Id: lib/Business/Bitcoin.pm v1.046 Tue Jun  6 01:38:01 PDT 2017 $
 
 use strict;
 
@@ -18,7 +18,7 @@ use Business::Bitcoin::Request;
 
 use vars qw( $VERSION $AUTOLOAD );
 
-our ( $VERSION ) = '$Revision: 1.044 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.046 $' =~ /\s+([\d\.]+)/;
 
 sub new {
   my $class = shift;
@@ -92,8 +92,8 @@ Business::Bitcoin - Easy and secure way to accept Bitcoin payments online
 
 =head1 VERSION
 
- $Revision: 1.044 $
- $Date: Mon May 15 14:18:00 PDT 2017 $
+ $Revision: 1.046 $
+ $Date: Tue Jun  6 01:38:01 PDT 2017 $
 
 =head1 SYNOPSIS
 
@@ -303,7 +303,7 @@ blockchain.info API.
 
 =head1 AUTHOR
 
-Ashish Gulhati, C<< <biz-btc at hash dot neomailbox.ch> >>
+Ashish Gulhati, C<< <biz-btc at hash.neo.tc> >>
 
 =head1 BUGS
 

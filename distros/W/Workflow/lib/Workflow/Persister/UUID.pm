@@ -1,12 +1,10 @@
 package Workflow::Persister::UUID;
 
-# $Id$
-
 use warnings;
 use strict;
 use Data::UUID;
 
-$Workflow::Persister::UUID::VERSION = '1.42';
+$Workflow::Persister::UUID::VERSION = '1.43';
 
 sub new {
     my ( $class, $params ) = @_;
@@ -72,7 +70,7 @@ This method is unimplemented at this time, please see the TODO.
 
 =item * Implement L</post_fetch_id>
 
-=back 
+=back
 
 =head1 SEE ALSO
 

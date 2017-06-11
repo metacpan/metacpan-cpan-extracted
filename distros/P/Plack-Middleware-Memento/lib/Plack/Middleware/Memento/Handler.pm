@@ -1,6 +1,6 @@
 package Plack::Middleware::Memento::Handler;
 
-our $VERSION = '0.0101';
+our $VERSION = '0.0102';
 
 use strict;
 use warnings;

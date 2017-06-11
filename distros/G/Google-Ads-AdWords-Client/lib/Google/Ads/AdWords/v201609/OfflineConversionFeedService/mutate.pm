@@ -73,7 +73,7 @@ Google::Ads::AdWords::v201609::OfflineConversionFeedService::mutate
 Perl data type class for the XML Schema defined element
 mutate from the namespace https://adwords.google.com/api/adwords/cm/v201609.
 
-Reports an offline conversion for each entry in {@code operations}. <p> This bulk operation does not have any transactional guarantees. Some operations can succeed while others fail. @param operations A list of offline conversion feed operations. @return The list of offline conversion feed results (in the same order as the operations). @throws {@link ApiException} if problems occurred while applying offline conversions. 
+Reports an offline conversion for each entry in {@code operations}. <p> This bulk operation does not have any transactional guarantees. Some operations can succeed while others fail. <p><b>Note:</b> {@link OfflineConversionFeedOperation} supports only the {@code ADD} operator. ({@code SET} and {@code REMOVE} are not supported.) @param operations A list of offline conversion feed operations. @return The list of offline conversion feed results (in the same order as the operations). @throws {@link ApiException} if problems occurred while applying offline conversions. 
 
 
 

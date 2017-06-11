@@ -1143,9 +1143,21 @@ sub getUri
 {
 	my $self = shift;
 
-	return( NETCUPS_getDeviceAttribute( $self->getName(), 
+	return( NETCUPS_getDeviceAttribute( $self->getName(),
 										"device-uri",
 										IPP_TAG_URI() ) );
+}
+
+##----------------------------------------------##
+##  getState                                    ##
+##----------------------------------------------##
+sub getState
+{
+	my $self = shift;
+
+	return( NETCUPS_getDeviceAttribute( $self->getName(),
+										"printer-state",
+										IPP_TAG_ENUM() ) );
 }
 
 ##----------------------------------------------##
@@ -1274,6 +1286,14 @@ my $uri = $dest->getUri();
 
 This function returns the device URI of a destination.
 For example, a network printer might appear as socket://192.168.1.1
+
+=item B<getState>
+
+my $state = $dest->getState();
+
+This function returns the state of a destination.
+The value is an enumeration type with 3 meaning 'idle', 4 'processing'
+and 5 'stopped'.
 
 =back
 

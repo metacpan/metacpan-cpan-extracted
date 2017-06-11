@@ -16,7 +16,7 @@ has missing_after => 1800;
 has remove_after  => 172800;
 has tasks         => sub { {} };
 
-our $VERSION = '6.05';
+our $VERSION = '6.06';
 
 sub add_task { ($_[0]->tasks->{$_[1]} = $_[2]) and return $_[0] }
 
@@ -214,6 +214,14 @@ Which are loaded like any other plugin from your application.
 
   # Mojolicious::Lite
   plugin 'MyApp::Task::PokeMojo';
+
+=head1 EXAMPLES
+
+This distribution also contains a great example application you can use for
+inspiration. The
+L<link checker|https://github.com/kraih/minion/tree/master/examples/linkcheck>
+will show you how to integrate background jobs into well-structured
+L<Mojolicious> applications.
 
 =head1 EVENTS
 

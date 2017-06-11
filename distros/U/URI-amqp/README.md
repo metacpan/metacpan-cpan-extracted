@@ -54,7 +54,7 @@ return options which works with [AnyEvent::RabbitMQ](https://metacpan.org/pod/An
 
     use URI;
     use AnyEvent::RabbitMQ;
-     
+
     my $cv = AnyEvent->condvar;
     my $uri = URI->new('amqp://user:pass@host.domain:1234/');
     my $ar = AnyEvent::RabbitMQ->new->load_xml_spec()->connect(

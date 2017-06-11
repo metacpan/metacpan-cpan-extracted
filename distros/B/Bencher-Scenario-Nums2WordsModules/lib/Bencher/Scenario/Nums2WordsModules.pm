@@ -1,7 +1,7 @@
 package Bencher::Scenario::Nums2WordsModules;
 
-our $DATE = '2017-01-25'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2017-06-09'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -43,7 +43,7 @@ Bencher::Scenario::Nums2WordsModules - Benchmark various number-to-words modules
 
 =head1 VERSION
 
-This document describes version 0.003 of Bencher::Scenario::Nums2WordsModules (from Perl distribution Bencher-Scenario-Nums2WordsModules), released on 2017-01-25.
+This document describes version 0.004 of Bencher::Scenario::Nums2WordsModules (from Perl distribution Bencher-Scenario-Nums2WordsModules), released on 2017-06-09.
 
 =head1 SYNOPSIS
 
@@ -115,7 +115,7 @@ Function call template:
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.24.0 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2 cores) >>, OS: I<< GNU/Linux LinuxMint version 17.3 >>, OS kernel: I<< Linux version 3.19.0-32-generic >>.
+Run on: perl: I<< v5.24.0 >>, CPU: I<< Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz (4 cores) >>, OS: I<< GNU/Linux Debian version 8.0 >>, OS kernel: I<< Linux version 3.16.0-4-amd64 >>.
 
 Benchmark with default options (C<< bencher -m Nums2WordsModules >>):
 
@@ -123,21 +123,21 @@ Benchmark with default options (C<< bencher -m Nums2WordsModules >>):
  +------------------------------------+-----------+-----------+-----------+------------+---------+---------+
  | participant                        | dataset   | rate (/s) | time (μs) | vs_slowest |  errors | samples |
  +------------------------------------+-----------+-----------+-----------+------------+---------+---------+
- | Lingua::ID::Nums2Words::nums2words | 123456789 |     32000 |    31     |        1   | 4.4e-08 |      30 |
- | Lingua::EN::Numbers::num2en        | 123456789 |     50000 |    20     |        1.6 | 2.6e-08 |      21 |
- | Lingua::ID::Nums2Words::nums2words | 123       |     89000 |    11     |        2.8 |   9e-08 |      23 |
- | Lingua::FR::Numbers::number_to_fr  | 123456789 |    110000 |     8.9   |        3.5 | 1.5e-08 |      26 |
- | Lingua::ID::Nums2Words::nums2words | 1         |    140000 |     7.2   |        4.3 | 1.7e-08 |      20 |
- | Lingua::EN::Numbers::num2en        | 123       |    200000 |     5     |        6.2 | 6.7e-09 |      20 |
- | Lingua::FR::Numbers::number_to_fr  | 123       |    290000 |     3.4   |        9.1 | 4.9e-09 |      21 |
- | Lingua::FR::Numbers::number_to_fr  | 1         |    380000 |     2.6   |       12   |   1e-08 |      20 |
- | Lingua::EN::Numbers::num2en        | 1         |   2790000 |     0.359 |       86.4 | 4.7e-11 |      20 |
+ | Lingua::ID::Nums2Words::nums2words | 123456789 |     25600 |     39    |       1    | 1.3e-08 |      21 |
+ | Lingua::EN::Numbers::num2en        | 123456789 |     30000 |     33.3  |       1.17 | 1.3e-08 |      20 |
+ | Lingua::ID::Nums2Words::nums2words | 123       |     62000 |     16    |       2.4  | 2.7e-08 |      20 |
+ | Lingua::FR::Numbers::number_to_fr  | 123456789 |     74000 |     14    |       2.9  |   2e-08 |      20 |
+ | Lingua::ID::Nums2Words::nums2words | 1         |     80000 |     12    |       3.1  | 5.3e-08 |      20 |
+ | Lingua::EN::Numbers::num2en        | 123       |    110000 |      9    |       4.3  | 1.7e-08 |      20 |
+ | Lingua::FR::Numbers::number_to_fr  | 123       |    160000 |      6.2  |       6.3  |   2e-08 |      23 |
+ | Lingua::FR::Numbers::number_to_fr  | 1         |    210000 |      4.7  |       8.3  | 7.9e-09 |      22 |
+ | Lingua::EN::Numbers::num2en        | 1         |   2200000 |      0.44 |      88    | 3.5e-09 |      21 |
  +------------------------------------+-----------+-----------+-----------+------------+---------+---------+
 
 
 =begin html
 
-<img src="https://api.metacpan.org/source/PERLANCAR/Bencher-Scenario-Nums2WordsModules-0.003/share/images/bencher-result-1.png" />
+<img src="https://st.aticpan.org/source/PERLANCAR/Bencher-Scenario-Nums2WordsModules-0.004/share/images/bencher-result-1.png" />
 
 =end html
 
@@ -148,16 +148,16 @@ Benchmark module startup overhead (C<< bencher -m Nums2WordsModules --module-sta
  +------------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
  | participant            | proc_private_dirty_size (MB) | proc_rss_size (MB) | proc_size (MB) | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
  +------------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
- | Lingua::FR::Numbers    | 1.1                          | 4.4                | 16             |      13   |                    7.1 |        1   | 2.3e-05 |      20 |
- | Lingua::ID::Nums2Words | 1.4                          | 4.8                | 17             |      10   |                    4.1 |        1.2 | 4.8e-05 |      20 |
- | Lingua::EN::Numbers    | 0.82                         | 4.1                | 16             |       9.8 |                    3.9 |        1.3 |   4e-05 |      21 |
- | perl -e1 (baseline)    | 1.1                          | 4.5                | 16             |       5.9 |                    0   |        2.2 | 1.6e-05 |      20 |
+ | Lingua::FR::Numbers    | 1                            | 4.4                | 20             |      13   |                    7.5 |        1   | 6.8e-05 |      20 |
+ | Lingua::ID::Nums2Words | 1.4                          | 4.8                | 21             |      10   |                    4.5 |        1.3 | 3.3e-05 |      20 |
+ | Lingua::EN::Numbers    | 0.82                         | 4.1                | 20             |       9.6 |                    4.1 |        1.4 | 2.4e-05 |      21 |
+ | perl -e1 (baseline)    | 1.1                          | 4.4                | 20             |       5.5 |                    0   |        2.4 | 1.7e-05 |      21 |
  +------------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
 
 
 =begin html
 
-<img src="https://api.metacpan.org/source/PERLANCAR/Bencher-Scenario-Nums2WordsModules-0.003/share/images/bencher-result-2.png" />
+<img src="https://st.aticpan.org/source/PERLANCAR/Bencher-Scenario-Nums2WordsModules-0.004/share/images/bencher-result-2.png" />
 
 =end html
 
@@ -186,7 +186,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

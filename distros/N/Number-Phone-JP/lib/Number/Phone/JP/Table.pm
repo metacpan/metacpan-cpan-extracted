@@ -3,7 +3,7 @@ package Number::Phone::JP::Table;
 use strict;
 use warnings;
 
-our $VERSION = '0.20170501';
+our $VERSION = '0.20170601';
 
 require Number::Phone::JP::Table::Class1;
 require Number::Phone::JP::Table::Class2;

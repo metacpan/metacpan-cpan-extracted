@@ -6,10 +6,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 1 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'MooseX/AttributeShortcuts.pm'
+    'MooseX/AttributeShortcuts.pm',
+    'MooseX/AttributeShortcuts/Trait/Attribute.pm',
+    'MooseX/AttributeShortcuts/Trait/Attribute/HasAnonBuilder.pm',
+    'MooseX/AttributeShortcuts/Trait/Role/Attribute.pm'
 );
 
 

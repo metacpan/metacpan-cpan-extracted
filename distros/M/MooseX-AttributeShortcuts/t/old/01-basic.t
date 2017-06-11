@@ -17,7 +17,8 @@ use warnings;
 use Test::More;
 use Test::Moose;
 
-require 't/funcs.pm' unless eval { require funcs };
+use lib 't';
+require funcs;
 
 test_class('TestClass');
 

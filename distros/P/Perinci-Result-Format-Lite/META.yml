@@ -21,6 +21,7 @@ recommends:
   Data::Clean::JSON: '0.38'
   HTML::Entities: '0'
   JSON::Tiny::Subclassable: '0'
+  Number::Format: '0'
   Sort::ByExample: '0'
 requires:
   Data::Check::Structure: '0'
@@ -36,7 +37,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Result-Format-Lite
   homepage: https://metacpan.org/release/Perinci-Result-Format-Lite
   repository: git://github.com/perlancar/perl-Perinci-Result-Format-Lite.git
-version: '0.24'
+version: '0.25'
 x_Dist_Zilla:
   perl:
     version: '5.024000'

@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Types::Standard::ArrayRef::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::ArrayRef::VERSION   = '1.000006';
+	$Types::Standard::ArrayRef::VERSION   = '1.002001';
 }
 
 use Type::Tiny ();
@@ -24,6 +24,9 @@ sub __constraint_generator
 	my $param = Types::TypeTiny::to_TypeTiny(shift);
 	Types::TypeTiny::TypeTiny->check($param)
 		or _croak("Parameter to ArrayRef[`a] expected to be a type constraint; got $param");
+	
+	_croak("Only one parameter to ArrayRef[`a] expected; got @{[ 1 + @_ ]}. Did you mean to use Tuple[`a]?")
+		if @_;
 	
 	my $param_compiled_check = $param->compiled_check;
 	my $xsub;
@@ -67,7 +70,8 @@ sub __inline_generator
 	my $param_check = $param->inline_check('$i');
 	return sub {
 		my $v = $_[1];
-		"ref($v) eq 'ARRAY' and do { "
+		my $p = Types::Standard::ArrayRef->inline_check($v);
+		"$p and do { "
 		.  "my \$ok = 1; "
 		.  "for my \$i (\@{$v}) { "
 		.    "(\$ok = 0, last) unless $param_check "

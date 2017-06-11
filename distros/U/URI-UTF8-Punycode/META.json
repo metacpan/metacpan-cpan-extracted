@@ -4,7 +4,7 @@
       "Twinkle Computing <twinkle@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120630",
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640",
    "license" : [
       "gpl_3"
    ],
@@ -35,5 +35,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.00"
+   "version" : "1.05"
 }

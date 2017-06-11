@@ -32,5 +32,5 @@ resources:
   bugtracker: https://github.com/plicease/Dist-Zilla-Plugin-AlienBuild/issues
   homepage: https://metacpan.org/pod/Dist::Zilla::Plugin::AlienBuild
   repository: git://github.com/plicease/Dist-Zilla-Plugin-AlienBuild.git
-version: '0.16'
+version: '0.19'
 x_serialization_backend: 'YAML::Tiny version 1.70'

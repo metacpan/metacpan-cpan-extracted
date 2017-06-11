@@ -53,9 +53,9 @@ sub randkey {
 }
 
 sub limited ($max_size) {
-    state $init = !!require Pcore::Util::Hash::Limited;
+    state $init = !!require Pcore::Util::Hash::LRU;
 
-    return Pcore::Util::Hash::Limited->new($max_size);
+    return Pcore::Util::Hash::LRU->new($max_size);
 }
 
 1;

@@ -6,7 +6,7 @@ use base 'My::Builder';
 
 use File::Spec::Functions qw(catdir catfile rel2abs);
 use File::Spec;
-use File::Glob qw(glob);
+use File::Glob qw(bsd_glob);
 use File::Copy;
 use Config;
 
@@ -366,8 +366,8 @@ MARKER
 
   #make a list of libs necessary to link with IUP and related libraries
   my %seen;
-  my @gl_l = glob("$build_out/lib/*");
-  my @gl_i = glob("$build_out/include/*");
+  my @gl_l = bsd_glob("$build_out/lib/*");
+  my @gl_i = bsd_glob("$build_out/include/*");
   print STDERR "Output counts: lib=" . scalar(@gl_l) . " include=" . scalar(@gl_i) . "\n";
   if ((scalar(@gl_l) < 3) || (scalar(@gl_i) < 3)) {
     warn "###WARN### $build_out/lib/ or $build_out/include/ not complete";
@@ -418,8 +418,8 @@ sub build_via_tecmake {
     copy('../../iup/tecmake.mak', '../tecmake.mak') unless -f '../tecmakewin.mak'; #WORKAROUND
     $done{"freetype"} = $self->run_custom($make, 'freetype', @{$mopts});
     $success = 0 unless $done{"freetype"};
-    copy($_, "$prefixdir/include/") foreach (glob("../include/*.h"));
-    copy($_, "$prefixdir/lib/") foreach (glob("../lib/*/*"));
+    copy($_, "$prefixdir/include/") foreach (bsd_glob("../include/*.h"));
+    copy($_, "$prefixdir/lib/") foreach (bsd_glob("../lib/*/*"));
     chdir $self->base_dir();
   }
 
@@ -429,8 +429,8 @@ sub build_via_tecmake {
     copy('../../iup/tecmake.mak', '../tecmake.mak') unless -f '../tecmakewin.mak'; #WORKAROUND
     $done{"ftgl"} = $self->run_custom($make, 'ftgl', @{$mopts});
     $success = 0 unless $done{"ftgl"};
-    copy($_, "$prefixdir/include/") foreach (glob("../include/*.h"));
-    copy($_, "$prefixdir/lib/") foreach (glob("../lib/*/*"));
+    copy($_, "$prefixdir/include/") foreach (bsd_glob("../include/*.h"));
+    copy($_, "$prefixdir/lib/") foreach (bsd_glob("../lib/*/*"));
     chdir $self->base_dir();
   }
 
@@ -441,8 +441,8 @@ sub build_via_tecmake {
       $done{"im:$t"} = $self->run_custom($make, $t, @{$mopts});
       $success = 0 unless $done{"im:$t"};
     }
-    copy($_, "$prefixdir/include/") foreach (glob("../include/*.h"));
-    copy($_, "$prefixdir/lib/") foreach (glob("../lib/*/*"));
+    copy($_, "$prefixdir/include/") foreach (bsd_glob("../include/*.h"));
+    copy($_, "$prefixdir/lib/") foreach (bsd_glob("../lib/*/*"));
     chdir $self->base_dir();
   }
 
@@ -453,8 +453,8 @@ sub build_via_tecmake {
       $done{"cd:$t"} = $self->run_custom($make, $t, @{$mopts});
       $success = 0 unless $done{"cd:$t"};
     }
-    copy($_, "$prefixdir/include/") foreach (glob("../include/*.h"));
-    copy($_, "$prefixdir/lib/") foreach (glob("../lib/*/*"));
+    copy($_, "$prefixdir/include/") foreach (bsd_glob("../include/*.h"));
+    copy($_, "$prefixdir/lib/") foreach (bsd_glob("../lib/*/*"));
     chdir $self->base_dir();
   }
 
@@ -465,8 +465,8 @@ sub build_via_tecmake {
       $done{"iup:$t"} = $self->run_custom($make, $t, @{$mopts});
       $success = 0 unless $done{"iup:$t"};
     }
-    copy($_, "$prefixdir/include/") foreach (glob("./include/*.h"));
-    copy($_, "$prefixdir/lib/") foreach (glob("./lib/*/*"));
+    copy($_, "$prefixdir/include/") foreach (bsd_glob("./include/*.h"));
+    copy($_, "$prefixdir/lib/") foreach (bsd_glob("./lib/*/*"));
     chdir $self->base_dir();
   }
 

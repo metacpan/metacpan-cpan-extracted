@@ -50,3 +50,8 @@ CREATE TABLE person (
   personid INTEGER PRIMARY KEY NOT NULL,
   first_name VARCHAR(100)
 );
+
+CREATE TABLE liner_notes (
+  liner_id INTEGER NOT NULL,
+  notes VARCHAR(100)
+);

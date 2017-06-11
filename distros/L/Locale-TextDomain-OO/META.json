@@ -69,7 +69,7 @@
    "provides" : {
       "Locale::TextDomain::OO" : {
          "file" : "lib/Locale/TextDomain/OO.pm",
-         "version" : "1.026"
+         "version" : "1.028"
       },
       "Locale::TextDomain::OO::FunctionalInterface" : {
          "file" : "lib/Locale/TextDomain/OO/FunctionalInterface.pm",
@@ -81,15 +81,15 @@
       },
       "Locale::TextDomain::OO::Lexicon::File::MO" : {
          "file" : "lib/Locale/TextDomain/OO/Lexicon/File/MO.pm",
-         "version" : "1.026"
+         "version" : "1.027"
       },
       "Locale::TextDomain::OO::Lexicon::File::PO" : {
          "file" : "lib/Locale/TextDomain/OO/Lexicon/File/PO.pm",
-         "version" : "1.026"
+         "version" : "1.027"
       },
       "Locale::TextDomain::OO::Lexicon::Hash" : {
          "file" : "lib/Locale/TextDomain/OO/Lexicon/Hash.pm",
-         "version" : "1.026"
+         "version" : "1.027"
       },
       "Locale::TextDomain::OO::Lexicon::Role::File" : {
          "file" : "lib/Locale/TextDomain/OO/Lexicon/Role/File.pm",
@@ -113,43 +113,43 @@
       },
       "Locale::TextDomain::OO::Plugin::Expand::BabelFish::Loc" : {
          "file" : "lib/Locale/TextDomain/OO/Plugin/Expand/BabelFish/Loc.pm",
-         "version" : "1.025"
+         "version" : "1.027"
       },
       "Locale::TextDomain::OO::Plugin::Expand::Gettext" : {
          "file" : "lib/Locale/TextDomain/OO/Plugin/Expand/Gettext.pm",
-         "version" : "1.014"
+         "version" : "1.027"
       },
       "Locale::TextDomain::OO::Plugin::Expand::Gettext::DomainAndCategory" : {
          "file" : "lib/Locale/TextDomain/OO/Plugin/Expand/Gettext/DomainAndCategory.pm",
-         "version" : "1.014"
+         "version" : "1.027"
       },
       "Locale::TextDomain::OO::Plugin::Expand::Gettext::Loc" : {
          "file" : "lib/Locale/TextDomain/OO/Plugin/Expand/Gettext/Loc.pm",
-         "version" : "1.014"
+         "version" : "1.027"
       },
       "Locale::TextDomain::OO::Plugin::Expand::Gettext::Loc::DomainAndCategory" : {
          "file" : "lib/Locale/TextDomain/OO/Plugin/Expand/Gettext/Loc/DomainAndCategory.pm",
-         "version" : "1.014"
+         "version" : "1.027"
       },
       "Locale::TextDomain::OO::Plugin::Expand::Gettext::Named" : {
          "file" : "lib/Locale/TextDomain/OO/Plugin/Expand/Gettext/Named.pm",
-         "version" : "1.016"
+         "version" : "1.027"
       },
       "Locale::TextDomain::OO::Plugin::Expand::Maketext" : {
          "file" : "lib/Locale/TextDomain/OO/Plugin/Expand/Maketext.pm",
-         "version" : "1.009"
+         "version" : "1.027"
       },
       "Locale::TextDomain::OO::Plugin::Expand::Maketext::Loc" : {
          "file" : "lib/Locale/TextDomain/OO/Plugin/Expand/Maketext/Loc.pm",
-         "version" : "1.014"
+         "version" : "1.027"
       },
       "Locale::TextDomain::OO::Plugin::Expand::Maketext::Localise" : {
          "file" : "lib/Locale/TextDomain/OO/Plugin/Expand/Maketext/Localise.pm",
-         "version" : "1.014"
+         "version" : "1.027"
       },
       "Locale::TextDomain::OO::Plugin::Expand::Maketext::Localize" : {
          "file" : "lib/Locale/TextDomain/OO/Plugin/Expand/Maketext/Localize.pm",
-         "version" : "1.014"
+         "version" : "1.027"
       },
       "Locale::TextDomain::OO::Plugin::Language::LanguageOfLanguages" : {
          "file" : "lib/Locale/TextDomain/OO/Plugin/Language/LanguageOfLanguages.pm",
@@ -157,7 +157,7 @@
       },
       "Locale::TextDomain::OO::Role::Logger" : {
          "file" : "lib/Locale/TextDomain/OO/Role/Logger.pm",
-         "version" : "1.006"
+         "version" : "1.027"
       },
       "Locale::TextDomain::OO::Singleton::Lexicon" : {
          "file" : "lib/Locale/TextDomain/OO/Singleton/Lexicon.pm",
@@ -173,7 +173,7 @@
       },
       "Locale::TextDomain::OO::Translator" : {
          "file" : "lib/Locale/TextDomain/OO/Translator.pm",
-         "version" : "1.026"
+         "version" : "1.027"
       }
    },
    "release_status" : "stable",
@@ -182,6 +182,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "1.026",
+   "version" : "1.028",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

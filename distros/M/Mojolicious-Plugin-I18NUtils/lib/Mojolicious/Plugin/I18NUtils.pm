@@ -8,7 +8,7 @@ use HTTP::AcceptLanguage;
 
 use Mojolicious::Plugin::I18NUtils::Locale;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 sub register {
     my ($self, $app, $config) = @_;
@@ -284,7 +284,7 @@ Mojolicious::Plugin::I18NUtils - provide some helper functions for I18N
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 
@@ -378,9 +378,9 @@ will return
 
 If you need to handle prices, the helper C<currency> might help you
 
-  <%= currency(1111.99, 'EUR', 'ar') %>
-  <%= currency(1111.99, 'EUR', 'de') %>
-  <%= currency(1111.99, 'EUR', 'en') %>
+  <%= currency(1111.99, 'ar', 'EUR') %>
+  <%= currency(1111.99, 'de', 'EUR') %>
+  <%= currency(1111.99, 'en', 'EUR') %>
 
 will return
 
@@ -475,7 +475,7 @@ Renee Baecker <reneeb@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015 by Renee Baecker.
+This software is Copyright (c) 2017 by Renee Baecker.
 
 This is free software, licensed under:
 

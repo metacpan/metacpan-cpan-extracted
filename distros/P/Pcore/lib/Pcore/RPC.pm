@@ -147,6 +147,12 @@ sub connect_rpc ( $self, % ) {
                 listen_events  => $args{listen_events},
                 forward_events => $args{forward_events},
             },
+            on_listen_event => sub ( $ws, $mask ) {    # RPC server can listen client event
+                return 1;
+            },
+            on_fire_event => sub ( $ws, $key ) {       # RPC server can fire client event
+                return 1;
+            },
             on_connect_error => sub ($status) {
                 die "$status";
             },
@@ -201,7 +207,7 @@ sub rpc_call ( $self, $method, @ ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 75, 164              | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 75, 170              | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

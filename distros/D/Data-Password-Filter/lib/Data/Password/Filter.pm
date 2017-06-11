@@ -1,6 +1,6 @@
 package Data::Password::Filter;
 
-$Data::Password::Filter::VERSION   = '0.16';
+$Data::Password::Filter::VERSION   = '0.17';
 $Data::Password::Filter::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Data::Password::Filter - Interface to the password filter.
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =cut
 
@@ -32,16 +32,11 @@ L<http://perl.sys-con.com/node/1911661>
 
 =cut
 
-has 'word_list'             => (is => 'ro');
-has 'word_hash'             => (is => 'ro');
-has 'length'                => (is => 'ro', isa => PositiveNum, default => sub { return 8; });
-has 'min_lowercase_letter'  => (is => 'ro', isa => PositiveNum, default => sub { return 1; });
-has 'min_uppercase_letter'  => (is => 'ro', isa => PositiveNum, default => sub { return 1; });
-has 'min_special_character' => (is => 'ro', isa => PositiveNum, default => sub { return 1; });
-has 'min_digit'             => (is => 'ro', isa => PositiveNum, default => sub { return 1; });
-has 'check_variation'       => (is => 'ro', isa => ZeroOrOne,   default => sub { return 1; });
-has 'check_dictionary'      => (is => 'ro', isa => ZeroOrOne,   default => sub { return 1; });
-has 'user_dictionary'       => (is => 'ro', isa => FilePath );
+has [ qw(word_list word_hash) ] => (is => 'ro');
+has [ qw(check_variation check_dictionary) ] => (is => 'ro', isa => ZeroOrOne, default => sub { return 1; });
+has [ qw(min_lowercase_letter min_uppercase_letter min_special_character min_digit) ] => (is => 'ro', isa => PositiveNum, default => sub { return 1; });
+has 'length'          => (is => 'ro', isa => PositiveNum, default => sub { return 8; });
+has 'user_dictionary' => (is => 'ro', isa => FilePath );
 
 our $STATUS = {
     'check_dictionary'        => 'Check Dictionary       :',

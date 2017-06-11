@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.3'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,5 +27,5 @@ resources:
   bugtracker: http://github.com/niczero/mojolicious-plugin-log-timestamp/issues
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: http://github.com/niczero/mojolicious-plugin-log-timestamp
-version: 0.031
+version: 0.041
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

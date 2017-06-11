@@ -1,0 +1,34 @@
+SYNOPSIS
+
+     use Time::HiRes 'sleep'; # for subsecond sleep
+     use Tie::Handle::TailSwitch;
+     tie *FH, 'Tie::Handle::TailSwitch',
+         globs => ['/var/log/http_*', '/var/log/https_*'],
+         # other Logfile::Tail::Switch options;
+    
+     while (1) {
+         my $line = <FH>;
+         if (length $line) {
+             print $line;
+         } else {
+             sleep 0.1;
+         }
+     }
+
+DESCRIPTION
+
+    This module ties a filehandle to Logfile::Tail::Switch object.
+
+METHODS
+
+ TIEHANDLE classname, LIST
+
+    Tie this package to file handle. LIST will be passed to
+    Logfile::Tail::Switch's constructor.
+
+ READLINE this
+
+SEE ALSO
+
+    Logfile::Tail::Switch
+

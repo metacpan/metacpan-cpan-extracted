@@ -1,9 +1,10 @@
 package CracTools::App::Command;
+
 {
   $CracTools::App::Command::DIST = 'CracTools';
 }
 # ABSTRACT: base class for cractools commands
-$CracTools::App::Command::VERSION = '1.25';
+$CracTools::App::Command::VERSION = '1.251';
 use App::Cmd::Setup -command;
 
 #sub opt_spec {
@@ -40,7 +41,7 @@ CracTools::App::Command - base class for cractools commands
 
 =head1 VERSION
 
-version 1.25
+version 1.251
 
 =head1 AUTHORS
 

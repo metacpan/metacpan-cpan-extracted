@@ -1,4 +1,4 @@
-URI-UTF8-Punycode version 1.00
+URI-UTF8-Punycode version 1.05
 ==============================
 
 INSTALLATION
@@ -10,6 +10,25 @@ To install this module type the following:
    make test
    make install
 
+SYNOPSIS
+   /* encode */
+   puny_enc($utf8str);
+   /* decode */
+   puny_dec($punycode);
+
 LICENCE
 
 This released under The GNU-GPL General Public License.
+
+   _                                    
+  | |                                   
+  | |___      ___ __  _   _ _ __  _   _ 
+  | __\ \ /\ / / '_ \| | | | '_ \| | | |
+  | |_ \ V  V /| |_) | |_| | | | | |_| |
+   \__| \_/\_/ | .__/ \__,_|_| |_|\__, |
+               | |                 __/ |
+               |_|                |___/ 
+
+URI:UTF8::Punycode Copyright (C)2013- TWINKLE COMPUTING
+
+Reporting bugs to <twinkle@cpan.org>

@@ -10,13 +10,13 @@ this file contains all dereferencing tests from ref.t but using postfix instead 
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = qw(. ../lib);
     require './test.pl';
+    set_up_inc(qw(. ../lib));
 }
 
 use strict qw(refs subs);
 
-plan(115);
+plan(116);
 
 {
     no strict 'refs';
@@ -352,4 +352,16 @@ is "$_->@{foo}", "foo->7 8 9", '->@{ does not interpolate without feature';
     is "@{[foo->@*]}", "7 8 9", '->@* inside "@{...}"';
     is "@{[foo->@[0,1]]}", "7 8", '->@[ inside "@{...}"';
     is "@{[foo->@{foo}]}", "oof", '->@{ inside "@{...}"';
+
+    # "foo $_->$*" should be equivalent to "foo $$_", which uses concat
+    # overloading
+    package o {
+	use overload fallback=>1,
+	    '""' => sub { $_[0][0] },
+	    '.'  => sub { bless [ "$_[$_[2]]"." plus "."$_[!$_[2]]" ] };
+    }
+    my $o = bless ["overload"], o::;
+    my $ref = \$o;
+    is "foo$ref->$*bar", "foo plus overload plus bar",
+       '"foo $s->$* bar" does concat overloading';
 }

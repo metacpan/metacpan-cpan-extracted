@@ -28,9 +28,9 @@ sub parse_file_slurm {
     my $self = shift;
 
     my $fh = IO::File->new( $self->infile, q{<} )
-        or print "Error opening file  "
-        . $self->infile . "  "
-        . $!;    # even better!
+      or print "Error opening file  "
+      . $self->infile . "  "
+      . $!;    # even better!
 
     $self->reset_cmd_counter;
     $self->reset_batch_counter;
@@ -58,21 +58,22 @@ sub parse_file_slurm {
 
     close($fh);
 
-    $self->post_process_file_slurm;
+    $self->post_process_parse_file_slurm;
 }
 
 =head3 post_process_file_slurm
 
 =cut
 
-sub post_process_file_slurm {
+sub post_process_parse_file_slurm {
     my $self = shift;
 
     $self->check_for_commands;
-    if(! $self->sanity_check_schedule){
-      return;
+    if ( !$self->sanity_check_schedule ) {
+        return;
     }
     $self->schedule_jobs;
+    $self->print_table_schedule_info;
     $self->chunk_commands;
 }
 
@@ -91,6 +92,7 @@ sub check_for_commands {
     $self->reset_batch_counter;
 
     foreach my $key (@keys) {
+
         # next if $self->jobs->{$key}->count_cmds;
         next if $self->jobs->{$key}->cmd_counter;
         delete $self->jobs->{$key};
@@ -164,6 +166,7 @@ sub check_lines_add_cmd {
     if ( $line =~ m/\\$/ ) {
         return;
     }
+
     #If we're using 'wait' its linear deps
     elsif ( $self->match_cmd(qr/^wait$/) ) {
         $self->clear_cmd;
@@ -174,8 +177,8 @@ sub check_lines_add_cmd {
     }
 
     #TODO Get rid of this
-    $self->job_files->{$self->jobname}->print($self->cmd) if $self->has_cmd;
-    $self->jobs->{$self->jobname}->inc_cmd_counter if $self->has_cmd;
+    $self->job_files->{ $self->jobname }->print( $self->cmd ) if $self->has_cmd;
+    $self->jobs->{ $self->jobname }->inc_cmd_counter if $self->has_cmd;
 
     $self->inc_cmd_counter;
     $self->clear_cmd;
@@ -198,7 +201,7 @@ sub check_sanity {
     #Do a sanity check for nohup
     if ( $line =~ m/^nohup / ) {
         die print
-            "You cannot submit jobs to the queue using nohup! Please remove nohup and try again.\n";
+"You cannot submit jobs to the queue using nohup! Please remove nohup and try again.\n";
     }
 }
 
@@ -215,7 +218,6 @@ sub check_note_meta {
     return unless $line =~ m/^#TASK/;
     $self->add_cmd($line);
 }
-
 
 =head3 process_hpc_meta
 
@@ -245,7 +247,7 @@ sub process_hpc_meta {
     return unless $line =~ m/^#HPC/;
     chomp($line);
 
-    my( $t1, $t2 ) = parse_meta($line);
+    my ( $t1, $t2 ) = parse_meta($line);
 
     if ( !$self->can($t1) ) {
         print "Option $t1 is an invalid option!\n";
@@ -260,14 +262,15 @@ sub process_hpc_meta {
         return;
     }
 
-    if($jobname eq 'hpcjob_001'){
-        # Could also just be using global defs...
-        # $self->app_log->warn('You have not defined a job name. It is best practice to defined jobnames, but we will define hpcjob_001 for you.');
-        $self->apply_global_directives($t1, $t2);
-        $self->apply_job_directives($t1, $t2);
+    if ( $jobname eq 'hpcjob_001' ) {
+
+# Could also just be using global defs...
+# $self->app_log->warn('You have not defined a job name. It is best practice to defined jobnames, but we will define hpcjob_001 for you.');
+        $self->apply_global_directives( $t1, $t2 );
+        $self->apply_job_directives( $t1, $t2 );
     }
-    else{
-        $self->apply_job_directives($t1, $t2);
+    else {
+        $self->apply_job_directives( $t1, $t2 );
     }
 
     push( @{ $self->jobs->{ $self->jobname }->{hpc_meta} }, $line );
@@ -275,8 +278,8 @@ sub process_hpc_meta {
 
 sub apply_global_directives {
     my $self = shift;
-    my $t1 = shift;
-    my $t2 = shift;
+    my $t1   = shift;
+    my $t2   = shift;
 
     if ($t1) {
         $self->$t1($t2);
@@ -285,14 +288,20 @@ sub apply_global_directives {
 
 sub apply_job_directives {
     my $self = shift;
-    my $t1 = shift;
-    my $t2 = shift;
+    my $t1   = shift;
+    my $t2   = shift;
 
     return unless $self->jobs->{ $self->jobname };
-    $self->jobs->{ $self->jobname }->$t1($t2);
+    if ( $self->jobs->{ $self->jobname }->can($t1) ) {
+        $self->jobs->{ $self->jobname }->$t1($t2);
+    }
+    else{
+      ##Warnings
+    }
 }
 
 memoize('parse_meta');
+
 sub parse_meta {
     my $line = shift;
     my ( @match, $t1, $t2 );

@@ -27,5 +27,10 @@ __PACKAGE__->belongs_to(
     { 'foreign.artistid_foreign' => 'self.artistid' }
 );
 
+__PACKAGE__->might_have(liner_notes => 'TDCSTest::Schema::LinerNotes',
+    undef, {
+        proxy => [ qw/notes/ ],
+    }
+);
 
 1;

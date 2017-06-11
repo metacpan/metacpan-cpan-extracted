@@ -14,7 +14,7 @@ MarpaX::ESLIF::BNF - MarpaX::ESLIF's BNF
 
 =head1 VERSION
 
-version 2.0.11
+version 2.0.13
 
 =head1 DESCRIPTION
 
@@ -59,6 +59,8 @@ They can be single or double-quoted, the content is any valid unicode character,
   'string':i
   'string\'s'
   "string\"s\\"
+
+Please notes this is really a I<quoted string>, B<not> a string terminal. I.e. everything inside the quoted is taken as-is, with no interpretation.
 
 =item * Character classes
 
@@ -272,7 +274,7 @@ Hook that is enabling C<:discard> rule for the current recognizer. Equivalent to
 
 =back
 
-Please note that the C<:discard[on]> and C<:discard[off]> events will I<always> happen if specified in the grammar, at any level of parsing, regardless if you the grammar's C<parse()> method. This is because these are internal events, not visible by the user.
+Please note that the C<:discard[on]> and C<:discard[off]> events will I<always> happen if specified in the grammar, at any level of parsing, regardless if you use the grammar's C<parse()> method (that is never propagating any event to the end user) or not. This is because these are internal events, not visible by the end user, and categorized as parsing hooks, not as a facility in the user-space.
 
 =item * Event initializers
 
@@ -410,6 +412,12 @@ During valuation, a specific action can be associated to a rule:
 
   action => my_action
 
+It is possible to set a hardcoded UTF-8 string as result, using a string literal:
+
+  action => ::u8"string literal, supporting \x{0D}, \u{0972} and \U{0001F600}"
+
+where C<\x{hh}> will translate to a byte having the hexadecimal value C<hh>, and C<\u{uuuu}> and C<\U{uuuuuuuu}> will translate to the UTF-8 version of C<uuuu> unicode code point, C<uuuuuuuu> is for the very large, less common, code points.
+
 =item Left association
 
 In a prioritized statement, associate with the left-most operand:
@@ -444,6 +452,12 @@ Modifiers are allowed after string, character class or regular expressions.
 Sequence rules can be I<proper>, i.e. without trailing separator:
 
   proper => 1
+
+=item Hiding separator specification
+
+Default for sequence rules actions is to always include the separator in the stack. This may be changed in the grammar using:
+
+  hide-separator => 1
 
 =item Rank specification
 
@@ -507,6 +521,14 @@ MarpaX::ESLIF BNF can be expressed in itself:
   :discard                       ::= whitespace
   :discard                       ::= <perl comment> 
   :discard                       ::= <cplusplus comment> 
+
+  /*
+   * ***************
+   * Event settings:
+   * ***************
+   */
+  event :discard[off]=on           = nulled <discard off>
+  event :discard[on]=on            = nulled <discard on>
 
   /*
    * ******
@@ -578,13 +600,17 @@ MarpaX::ESLIF BNF can be expressed in itself:
                                    | <symbol action>
                                    | <free action>
                                    | <event specification>
+                                   | <hide separator specification>
   <action>                       ::= 'action' '=>' <action name>
+  <action>                       ::= 'action' '=>' <string literal>
   <left association>             ::= 'assoc' '=>' 'left'
   <right association>            ::= 'assoc' '=>' 'right'
   <group association>            ::= 'assoc' '=>' 'group'
   <separator specification>      ::= 'separator' '=>' <single symbol>
   <proper specification>         ::= 'proper' '=>' false
                                    | 'proper' '=>' true
+  <hide separator specification> ::= 'hide-separator' '=>' false
+  <hide separator specification> ::= 'hide-separator' '=>' true
   <rank specification>           ::= 'rank' '=>' <signed integer>
   <null ranking specification>   ::= 'null-ranking' '=>' <null ranking constant>
                                    | 'null' 'rank' '=>' <null ranking constant>
@@ -604,6 +630,7 @@ MarpaX::ESLIF BNF can be expressed in itself:
   naming                         ::= 'name' '=>' <alternative name>
   <null adverb>                  ::= ','
   <symbol action>                ::= 'symbol-action' '=>' <symbol action name>
+  <symbol action>                ::= 'symbol-action' '=>' <string literal>
   <free action>                  ::= 'free-action' '=>' <free name>
   <alternative name>             ::= <standard name>
   <alternative name>             ::= <quoted name>
@@ -644,6 +671,16 @@ MarpaX::ESLIF BNF can be expressed in itself:
                                    | <signed integer>
                                    | '=' <unsigned integer>
 
+  <string literal>               ::= <string literal unit>+
+  <string literal unit>          ::= '::u8"' <discard off> <string literal inside any> '"' <discard on>
+  <discard off>                  ::=
+  <discard on>                   ::=
+  <string literal inside any>    ::= <string literal inside>*
+  <string literal inside>        ::= /[^"\\\n]/
+  <string literal inside>        ::= '\\' /["'?\\abfnrtve]/
+  <string literal inside>        ::= '\\' /x\{[a-fA-F0-9]{2}\}/
+  <string literal inside>        ::= '\\' /u\{[a-fA-F0-9]{4}\}/
+  <string literal inside>        ::= '\\' /U\{[a-fA-F0-9]{8}\}/
   #
   # ---------------------------------------
   # Lexemes of the grammar given above are:

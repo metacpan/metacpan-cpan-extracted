@@ -1,4 +1,4 @@
-#!/home/ben/software/install/bin/perl
+#!/usr/bin/env perl
 
 # Benchmark JSON::Create against JSON::XS.
 

@@ -13,7 +13,7 @@ use DynaLoader;
 
 
 
-   $PDL::SVDLIBC::VERSION = 0.17;
+   $PDL::SVDLIBC::VERSION = 0.18;
    @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::SVDLIBC $VERSION;

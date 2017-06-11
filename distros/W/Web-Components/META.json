@@ -68,19 +68,19 @@
    "provides" : {
       "Web::Components" : {
          "file" : "lib/Web/Components.pm",
-         "version" : "v0.9.1"
+         "version" : "v0.10.1"
       },
       "Web::Components::Loader" : {
          "file" : "lib/Web/Components/Loader.pm",
-         "version" : "v0.9.1"
+         "version" : "v0.10.1"
       },
       "Web::Components::Role" : {
          "file" : "lib/Web/Components/Role.pm",
-         "version" : "v0.9.1"
+         "version" : "v0.10.1"
       },
       "Web::Components::Util" : {
          "file" : "lib/Web/Components/Util.pm",
-         "version" : "v0.9.1"
+         "version" : "v0.10.1"
       }
    },
    "release_status" : "stable",
@@ -99,7 +99,7 @@
          "web" : "http://github.com/pjfl/p5-web-components"
       }
    },
-   "version" : "0.9.1",
+   "version" : "0.10.1",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.014004"

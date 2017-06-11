@@ -5,7 +5,7 @@ use Mojo::Base -base;
 use WebService::MusicBrainz::Request;
 use Data::Dumper;
 
-our $VERSION = '1.0.1';
+our $VERSION = '1.0.2';
 
 has 'request';
 has valid_resources => sub { ['area','artist','label','recording','release','release_group'] };

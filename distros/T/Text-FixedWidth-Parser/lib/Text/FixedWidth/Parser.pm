@@ -8,7 +8,7 @@ use Moose;
 use Math::Expression;
 use DateTime::Format::Strptime;
 
-our $VERSION = '0.3';
+our $VERSION = '0.4';
 
 # ========================================================================== #
 
@@ -18,11 +18,11 @@ our $VERSION = '0.3';
 
 =head1 NAME
 
-	Text::FixedWidth::Parser - Used to parse the fixed width text file 
+Text::FixedWidth::Parser - Used to parse the fixed width text file 
 
 =head1 DESCRIPTION
 
-	The Text::FixedWidth::Parser module allows you to read fixed width text file by specifying string mapper
+The Text::FixedWidth::Parser module allows you to read fixed width text file by specifying string mapper
 
 
 =head1 SYNOPSIS

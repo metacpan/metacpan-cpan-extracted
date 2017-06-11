@@ -2,7 +2,9 @@ use strict;
 use warnings;
 package MetaCPAN::API::Autocomplete;
 # ABSTRACT: Autocompletion info for MetaCPAN::API
-$MetaCPAN::API::Autocomplete::VERSION = '0.50';
+
+our $VERSION = '0.51';
+
 use Carp;
 use Moo::Role;
 
@@ -51,17 +53,17 @@ MetaCPAN::API::Autocomplete - Autocompletion info for MetaCPAN::API
 
 =head1 VERSION
 
-version 0.50
+version 0.51
 
 =head1 DESCRIPTION
 
-This role provides MetaCPAN::API with fetching autocomplete information 
+This role provides MetaCPAN::API with fetching autocomplete information
 
 =head1 METHODS
 
 =head2 autocomplete
 
-    my $result = $mcpan->autocomplete( 
+    my $result = $mcpan->autocomplete(
         search => {
             query => 'Moose',
         },
@@ -70,7 +72,7 @@ This role provides MetaCPAN::API with fetching autocomplete information
 By default, you get 20 results (at maximum). If you need more, you
 can also pass C<size>:
 
-    my $result = $mcpan->autocomplete( 
+    my $result = $mcpan->autocomplete(
         search => {
             query => 'Moose',
             size  => 30,

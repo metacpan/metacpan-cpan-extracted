@@ -1,10 +1,10 @@
 # NAME
 
-App::nodie - runs immortal processes
+App::nodie - runs command again when its dead
 
 # VERSION
 
-version 1.00
+version 1.03
 
 # SYNOPSIS
 
@@ -13,9 +13,9 @@ version 1.00
 
 # DESCRIPTION
 
-App::nodie runs immortal processes.
+App::nodie runs command again when its dead.
 
-See also: [nodie.pl](https://metacpan.org/pod/distribution/App-Virtualenv/lib/App/nodie/nodie.pl)
+See also: [nodie.pl](https://metacpan.org/pod/distribution/App-nodie/lib/App/nodie/nodie.pl)
 
 # INSTALLATION
 

@@ -1,17 +1,17 @@
 # -*-CPerl-*-
-# Last changed Time-stamp: <2015-10-27 17:31:43 mtw>
+# Last changed Time-stamp: <2017-06-10 19:08:23 michl>
 
 package Bio::ViennaNGS::Peak;
 
-use version; our $VERSION = qv('0.16');
+use Bio::ViennaNGS;
 use Moose;
 use Carp;
 use Data::Dumper;
 use Path::Class;
 use List::Util qw(sum sum0 min max first);
 use Bio::ViennaNGS::Util qw(sortbed);
-
 use namespace::autoclean;
+use version; our $VERSION = version->declare("$Bio::ViennaNGS::VERSION");
 
 has 'data' => (
 	       is => 'ro',
@@ -125,6 +125,7 @@ sub raw_peaks {
   my ($index_of_maxwin);
   my $suffix = "rawpeaks.bed";
   my $this_function = (caller(0))[3];
+  my $flex = 10;
 
   croak "ERROR [$this_function]: $dest does not exist\n"
     unless (-d $dest);
@@ -162,7 +163,7 @@ sub raw_peaks {
       $winend = $winstart + $self->winsize - 1;
       $winsum = sum0 @{$self->data->{$chr}{pos}}[$winstart..$winend];
       $mean = $winsum/$self->winsize;
-      # print "processing $winstart - $winend sum=$winsum mean=$mean lastmax=$lastmax\n";
+       #print LOG "**processing $winstart - $winend sum=$winsum mean=$mean lastmax=$lastmax\n";
 
       if ($mean > $lastmax){
 	$lastmax = $mean;
@@ -170,7 +171,7 @@ sub raw_peaks {
 	unless ($have_pstart == 1) {
 	  $pstart = $winstart;
 	  $have_pstart = 1;
-	  #print "Peak start $chr:$winstart -- ";
+	  #print LOG "Peak start $chr:$winstart -- ";
 	}
       }
       else {
@@ -179,7 +180,10 @@ sub raw_peaks {
 	  $have_pstart = 0;
 	  $from = min($pstart,$pend);
 	  $to   = max($pstart, $pend);
-	  #print "$pend end\n";
+	  # now add +- $flex nt to raw peaks, required fro better peak boundary determination below
+	  if ($from-$flex > 0){$from = $from - $flex;}
+	  $to= $to+$flex; # we dont know the chromsize here, hence override it in case
+	  #print LOG "$pend end\n";
 	  my %pk = (
 		    chr      => $chr,
 		    start    => $from,
@@ -231,6 +235,9 @@ sub raw_peaks {
 	  $have_pstart = 0;
 	  $from = min($pstart,$pend);
 	  $to   = max($pstart, $pend);
+	  # now add +- $flex nt to raw peaks, required fro better peak boundary determination below
+	  if ($from-$flex > 0){$from = $from - $flex;}
+	  $to = $to+$flex; # we dont know the chromsize here, hence override it in case
 	  #print "$pend end\n";
 	  my %pk = (
 		    chr    => $chr,
@@ -292,11 +299,13 @@ sub final_peaks {
       my $have_pleft = 0; # we have found a proper left end
       my $have_pright = 0; # we have found a proper right end
       $strand = $$peak{strand};
+      print LOG ">>processing peak $$peak{start}-$$peak{end} [$strand] ";
       $max = max @{$self->data->{$chr}{$strand}}[$$peak{start}..$$peak{end}]; # max peak elevation
-      next if ($max < $self->mincov);
+      print LOG "max is $max";
+      if ($max < $self->mincov){print LOG " ..SKIPPING\n";next;}
       $idx = first { @{$self->data->{$chr}{$strand}}[$_] eq $max } $$peak{start}..$$peak{end}; # coordinate
       #print LOG Dumper(\$peak);
-      print LOG "max in window $$peak{start}..$$peak{end} is $max at $idx\n";
+      print LOG " at $idx ..KEEPING\n";
 
       # process regions left/right of the maximum to identify peak boundaries
       # validity check first
@@ -306,26 +315,26 @@ sub final_peaks {
       # find left end
       for ($position = $idx; $position>$$peak{start}; $position--){
 	$val =  ${$self->data->{$chr}{$strand}}[$position];
-	#print "* VAL_L at pos $position $val - \$have_pleft=$have_pleft ";
+	print LOG "** VAL_L at pos $position $val - \$have_pleft=$have_pleft ";
 	if ( $val < $max*$self->threshold){
 	  $have_pleft = 1;
-	  #print "exiting 'cause $val < ".$max*$threshold." - \$have_pleft=$have_pleft\n";
+	  print LOG "exiting 'cause $val < ".$max*$self->threshold." - \$have_pleft=$have_pleft\n";
 	  last;
 	}
-	#print "\n";
+	print LOG "\n";
       }
       $pleft = $position;
 
       # find right end
       for ($position = $idx; $position<=$$peak{end}; $position++){
 	$val =  ${$self->data->{$chr}{$strand}}[$position];
-	#print "* VAL_R at pos $position $val - \$have_pright=$have_pright ";
+	print LOG "** VAL_R at pos $position $val - \$have_pright=$have_pright ";
 	if ( $val < $max*$self->threshold){
 	  $have_pright = 1;
-	  #print "exiting 'cause $val < ".$max*$threshold."- \$have_pright=$have_pright\n";
+	  print LOG "exiting 'cause $val < ".$max*$self->threshold."- \$have_pright=$have_pright\n";
 	  last;
 	}
-	#print "\n";
+	print LOG "\n";
       }
       $pright = $position;
       if ($strand eq "neg"){
@@ -334,7 +343,7 @@ sub final_peaks {
       else{
 	$str = '+';
       }
-      #print LOG "# PEAK characterized at $chr:$pleft-$pright\n";
+      print LOG "# PEAK characterized at $chr:$pleft-$pright\n";
 
       if ($have_pleft == 1 && $have_pright == 1){ # print only if its a proper peak
 	if ($pright-$pleft<=$self->length){ # filter peak length 
@@ -500,7 +509,7 @@ Michael T. Wolfinger, E<lt>michael@wolfinger.euE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2015 by Michael T. Wolfinger
+Copyright (C) 2015-2017 by Michael T. Wolfinger
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

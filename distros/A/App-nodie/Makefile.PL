@@ -9,14 +9,14 @@ WriteMakefile(
 	MIN_PERL_VERSION	=> '5.010001',
 	PREREQ_PM			=> {
 		'Scalar::Util'	=> '1.47',
-		'Lazy::Utils'	=> '1.20',
+		'Lazy::Utils'	=> '1.21',
 	},
 	EXE_FILES			=> [qw(
 		lib/App/nodie/nodie.pl
 		lib/App/nodie/nodie
 	)],
 	AUTHOR				=> 'Orkun Karaduman <orkunkaraduman@gmail.com>',
-	ABSTRACT			=> 'runs immortal processes',
+	ABSTRACT			=> 'runs command again when its dead',
 	LICENSE				=> 'gpl_3',
 	META_MERGE			=> {
 		'meta-spec'		=> {

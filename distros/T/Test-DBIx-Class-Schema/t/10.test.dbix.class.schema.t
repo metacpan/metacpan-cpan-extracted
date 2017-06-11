@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 3;
+use Test::More tests => 4;
 
 use_ok('Test::DBIx::Class::Schema');
 
@@ -23,3 +23,4 @@ my $dbicschematest = Test::DBIx::Class::Schema->new(
     }
 );
 isa_ok($dbicschematest, 'Test::DBIx::Class::Schema');
+isa_ok(Test::DBIx::Class::Schema->new, 'Test::DBIx::Class::Schema');

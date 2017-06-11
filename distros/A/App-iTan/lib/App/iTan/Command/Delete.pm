@@ -10,14 +10,14 @@ with qw(App::iTan::Utils);
 
 sub execute {
     my ( $self, $opts, $args ) = @_;
-    
+
     say 'All unused iTANs have been deleted';
-    
-    $self->dbh->do('DELETE FROM itan 
-        WHERE valid = 0 
+
+    $self->dbh->do('DELETE FROM itan
+        WHERE valid = 0
         AND used IS NULL')
         or die "ERROR: Cannot execute: " . $self->dbh->errstr();
-    
+
     return;
 }
 

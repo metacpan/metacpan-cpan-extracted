@@ -1,7 +1,7 @@
 package DDG::Meta::Information;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: DDG plugin meta information storage
-$DDG::Meta::Information::VERSION = '1016';
+$DDG::Meta::Information::VERSION = '1017';
 use strict;
 use warnings;
 use Carp qw( croak );
@@ -264,7 +264,7 @@ DDG::Meta::Information - DDG plugin meta information storage
 
 =head1 VERSION
 
-version 1016
+version 1017
 
 =head1 DESCRIPTION
 

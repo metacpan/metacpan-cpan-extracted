@@ -47,7 +47,7 @@ sub update_proxy_status ( $self, $proxy ) {
 sub new_identity ($self) {
     my $cache_key = 'tor_control_server_' . $self->host . q[:] . $self->control_port;
 
-    my $h = Pcore::AE::Handle->fetch($cache_key);
+    my $h = Pcore::AE::Handle2->fetch($cache_key);
 
     state $req = sub ($h) {
 
@@ -60,7 +60,7 @@ sub new_identity ($self) {
     };
 
     if ( !$h ) {
-        $h = Pcore::AE::Handle->new(
+        $h = Pcore::AE::Handle2->new(
             connect => [ $self->host, $self->control_port ],
             on_error => sub ( $h, $fatal, $message ) {
                 $h->destroy;

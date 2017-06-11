@@ -7,7 +7,7 @@ use Moose::Util::TypeConstraints;
 use Path::Tiny;
 use namespace::autoclean;
 
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 with 'Dist::Zilla::Role::Releaser',
      'Dist::Zilla::Role::FilePruner';
@@ -258,7 +258,7 @@ Dist::Zilla::Plugin::RPM - Build an RPM from your Dist::Zilla release
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 
@@ -324,8 +324,10 @@ If set to a true value, rpmbuild will be called with the --nodeps option.
 
 =item push_packages (default: false)
 
-This allowes you to specify a command to push your generated RPM packages to a repository.
-RPM filenames are writen one-per-line to stdin.
+This allowes you to specify a command to push your generated RPM packages to a
+repository.  RPM filenames are writen one-per-line to stdin. If push_packages
+is set to 1, it will execute the push_command on the generated RPMs. By default
+the source packages will be excluded.
 
 =item push_command (default: rhnpush -s)
 

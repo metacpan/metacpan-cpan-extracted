@@ -64,3 +64,4 @@ Revision history for Perl module Gtk2::Ex::DbLinker
 0.110 DbcDataManager: row_count taken from scalar @{ $self->{data}}, not from resultset->count
 0.111 Corrected pod. ./lib: Log4perl->logconfess, ->logcroak ... instead of confess, croak
       Improved readme file
+0.112 Log::Any + Carp for all modules. 

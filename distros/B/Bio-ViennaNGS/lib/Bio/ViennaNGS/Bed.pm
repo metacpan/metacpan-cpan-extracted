@@ -1,13 +1,14 @@
 # -*-CPerl-*-
-# Last changed Time-stamp: <2015-10-27 14:44:37 mtw>
+# Last changed Time-stamp: <2017-06-10 18:20:26 michl>
 
 package Bio::ViennaNGS::Bed;
 
-use version; our $VERSION = qv('0.16');
+use Bio::ViennaNGS;
 use Carp;
 use Moose;
 use namespace::autoclean;
 use Data::Dumper;
+use version; our $VERSION = version->declare("$Bio::ViennaNGS::VERSION");
 
 extends 'Bio::ViennaNGS::Feature';
 
@@ -79,7 +80,6 @@ sub as_bed_line {
   my $this_function = (caller(0))[3];
   croak "ERROR [$this_function] no argument provided"
     unless (defined $n);
-  print Dumper(\$n);
   croak "ERROR [$this_function] argument of as_bed_line() must be 6 or 12"
     unless ( ($n == 6) | ($n == 12) );
   my $bed6= join ("\t",
@@ -193,7 +193,7 @@ Michael T. Wolfinger E<lt>michael@wolfinger.euE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2015 Michael T. Wolfinger E<lt>michael@wolfinger.euE<gt>
+Copyright (C) 2015-2017 Michael T. Wolfinger E<lt>michael@wolfinger.euE<gt>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

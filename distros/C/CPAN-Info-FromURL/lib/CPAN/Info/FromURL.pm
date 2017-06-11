@@ -1,7 +1,7 @@
 package CPAN::Info::FromURL;
 
-our $DATE = '2016-11-07'; # DATE
-our $VERSION = '0.07'; # VERSION
+our $DATE = '2017-06-09'; # DATE
+our $VERSION = '0.08'; # VERSION
 
 use 5.010001;
 use strict;
@@ -31,12 +31,13 @@ $SPEC{extract_cpan_info_from_url} = {
     description => <<'_',
 
 Return a hash of information from a CPAN-related URL. Possible keys include:
-`site` (site nickname, include: `mcpan` [metacpan.org, api.metacpan.org], `sco`
-[search.cpan.org], `cpanratings` [cpanratings.perl.org], `rt` ([rt.cpan.org]),
-`cpan` [any normal CPAN mirror]), `author` (CPAN author ID), `module` (module
-name), `dist` (distribution name), `version` (distribution version). Some keys
-might not exist, depending on what information the URL provides. Return undef if
-URL is not detected to be of some CPAN-related URL.
+`site` (site nickname, include: `mcpan` [metacpan.org, api.metacpan.org,
+fastapi.metacpan.org], `sco` [search.cpan.org], `cpanratings`
+[cpanratings.perl.org], `rt` ([rt.cpan.org]), `cpan` [any normal CPAN mirror]),
+`author` (CPAN author ID), `module` (module name), `dist` (distribution name),
+`version` (distribution version). Some keys might not exist, depending on what
+information the URL provides. Return undef if URL is not detected to be of some
+CPAN-related URL.
 
 _
     args => {
@@ -82,6 +83,11 @@ _
             name => "api.mcpan/source/AUTHOR/DIST-VERSION",
             args => {url=>'http://api.metacpan.org/source/SRI/Mojolicious-6.46?'},
             result => {site=>'mcpan', author=>'SRI', dist=>'Mojolicious', version=>'6.46'},
+        },
+        {
+            name => "fastapi.mcpan/v1/module/MODULE",
+            args => {url=>'http://fastapi.metacpan.org/v1/module/Moose'},
+            result => {site=>'mcpan', module=>'Moose'},
         },
         {
             name => 'mcpan/release/DIST',
@@ -192,7 +198,7 @@ sub extract_cpan_info_from_url {
     my $res;
 
     # metacpan
-    if ($url =~ s!\A$re_proto_http?(api\.)?metacpan\.org/?!!i) {
+    if ($url =~ s!\A$re_proto_http?(?:fastapi\.|api\.)?metacpan\.org/?(?:v\d/)?!!i) {
 
         $res->{site} = 'mcpan';
         # note: /module is the old URL. /pod might misreport a script as a
@@ -346,12 +352,16 @@ CPAN::Info::FromURL - Extract/guess information from a URL
 
 =head1 VERSION
 
-This document describes version 0.07 of CPAN::Info::FromURL (from Perl distribution CPAN-Info-FromURL), released on 2016-11-07.
+This document describes version 0.08 of CPAN::Info::FromURL (from Perl distribution CPAN-Info-FromURL), released on 2017-06-09.
 
 =head1 FUNCTIONS
 
 
-=head2 extract_cpan_info_from_url($url) -> hash
+=head2 extract_cpan_info_from_url
+
+Usage:
+
+ extract_cpan_info_from_url($url) -> hash
 
 Extract/guess information from a URL.
 
@@ -417,11 +427,19 @@ Result:
 
  { author => "SRI", dist => "Mojolicious", site => "mcpan", version => 6.46 }
 
-=item * Example #7 (mcpan/release/DIST):
+=item * Example #7 (fastapi.mcpan/v1/module/MODULE):
+
+ extract_cpan_info_from_url("http://fastapi.metacpan.org/v1/module/Moose");
+
+Result:
+
+ { module => "Moose", site => "mcpan" }
+
+=item * Example #8 (mcpan/release/DIST):
 
  extract_cpan_info_from_url("https://metacpan.org/release/Foo-Bar"); # -> { dist => "Foo-Bar", site => "mcpan" }
 
-=item * Example #8 (mcpan/release/AUTHOR/DIST-VERSION):
+=item * Example #9 (mcpan/release/AUTHOR/DIST-VERSION):
 
  extract_cpan_info_from_url("https://metacpan.org/release/FOO/Bar-1.23");
 
@@ -429,11 +447,11 @@ Result:
 
  { author => "FOO", dist => "Bar", site => "mcpan", version => 1.23 }
 
-=item * Example #9 (mcpan/author/AUTHOR):
+=item * Example #10 (mcpan/author/AUTHOR):
 
  extract_cpan_info_from_url("https://metacpan.org/author/FOO"); # -> { author => "FOO", site => "mcpan" }
 
-=item * Example #10 (mcpan/changes/distribution/DIST):
+=item * Example #11 (mcpan/changes/distribution/DIST):
 
  extract_cpan_info_from_url("https://metacpan.org/changes/distribution/Module-XSOrPP");
 
@@ -441,7 +459,7 @@ Result:
 
  { dist => "Module-XSOrPP", site => "mcpan" }
 
-=item * Example #11 (mcpan/requires/distribution/DIST):
+=item * Example #12 (mcpan/requires/distribution/DIST):
 
  extract_cpan_info_from_url("https://metacpan.org/requires/distribution/Module-XSOrPP?sort=[[2,1]]");
 
@@ -449,11 +467,11 @@ Result:
 
  { dist => "Module-XSOrPP", site => "mcpan" }
 
-=item * Example #12 (sco/dist/DIST):
+=item * Example #13 (sco/dist/DIST):
 
  extract_cpan_info_from_url("http://search.cpan.org/dist/Foo-Bar/"); # -> { dist => "Foo-Bar", site => "sco" }
 
-=item * Example #13 (sco/perldoc?MOD):
+=item * Example #14 (sco/perldoc?MOD):
 
  extract_cpan_info_from_url("http://search.cpan.org/perldoc?Foo::Bar");
 
@@ -461,7 +479,7 @@ Result:
 
  { module => "Foo::Bar", site => "sco" }
 
-=item * Example #14 (sco/search?mode=module&query=MOD):
+=item * Example #15 (sco/search?mode=module&query=MOD):
 
  extract_cpan_info_from_url("http://search.cpan.org/search?mode=module&query=DBIx%3A%3AClass");
 
@@ -469,7 +487,7 @@ Result:
 
  { module => "DBIx::Class", site => "sco" }
 
-=item * Example #15 (sco/search?module=MOD):
+=item * Example #16 (sco/search?module=MOD):
 
  extract_cpan_info_from_url("http://search.cpan.org/search?module=ToolSet");
 
@@ -477,7 +495,7 @@ Result:
 
  { module => "ToolSet", site => "sco" }
 
-=item * Example #16 (sco/search?module=MOD (#2)):
+=item * Example #17 (sco/search?module=MOD (#2)):
 
  extract_cpan_info_from_url("http://search.cpan.org/search?module=Acme::Don't");
 
@@ -485,11 +503,11 @@ Result:
 
  { module => "Acme::Don::t", site => "sco" }
 
-=item * Example #17 (sco/~AUTHOR):
+=item * Example #18 (sco/~AUTHOR):
 
  extract_cpan_info_from_url("http://search.cpan.org/~unera?"); # -> { author => "unera", site => "sco" }
 
-=item * Example #18 (sco/~AUTHOR/DIST-REL/lib/MOD.pm):
+=item * Example #19 (sco/~AUTHOR/DIST-REL/lib/MOD.pm):
 
  extract_cpan_info_from_url("http://search.cpan.org/~unera/DR-SunDown-0.02/lib/DR/SunDown.pm");
 
@@ -503,7 +521,7 @@ Result:
    version => 0.02,
  }
 
-=item * Example #19 (sco/~AUTHOR/DIST-REL/bin/SCRIPT.pm):
+=item * Example #20 (sco/~AUTHOR/DIST-REL/bin/SCRIPT.pm):
 
  extract_cpan_info_from_url("http://search.cpan.org/~perlancar/App-PMUtils-1.23/bin/pmpath");
 
@@ -517,11 +535,11 @@ Result:
    version => 1.23,
  }
 
-=item * Example #20 (cpan/authors/id/A/AU/AUTHOR):
+=item * Example #21 (cpan/authors/id/A/AU/AUTHOR):
 
  extract_cpan_info_from_url("file:/cpan/authors/id/A/AU/AUTHOR?"); # -> { author => "AUTHOR", site => "cpan" }
 
-=item * Example #21 (cpan/authors/id/A/AU/AUTHOR/DIST-VERSION.tar.gz):
+=item * Example #22 (cpan/authors/id/A/AU/AUTHOR/DIST-VERSION.tar.gz):
 
  extract_cpan_info_from_url("file:/cpan/authors/id/A/AU/AUTHOR/Foo-Bar-1.0.tar.gz");
 
@@ -535,7 +553,7 @@ Result:
    version => "1.0",
  }
 
-=item * Example #22 (cpanratings/dist/DIST):
+=item * Example #23 (cpanratings/dist/DIST):
 
  extract_cpan_info_from_url("http://cpanratings.perl.org/dist/Submodules");
 
@@ -543,7 +561,7 @@ Result:
 
  { dist => "Submodules", site => "cpanratings" }
 
-=item * Example #23 (perldoc.perl.org/MOD/SUBMOD.html):
+=item * Example #24 (perldoc.perl.org/MOD/SUBMOD.html):
 
  extract_cpan_info_from_url("http://perldoc.perl.org/Module/CoreList.html");
 
@@ -551,7 +569,7 @@ Result:
 
  { module => "Module::CoreList", site => "perldoc.perl.org" }
 
-=item * Example #24 (rt/(Public/)Dist/Display.html?Queue=DIST):
+=item * Example #25 (rt/(Public/)Dist/Display.html?Queue=DIST):
 
  extract_cpan_info_from_url("https://rt.cpan.org/Dist/Display.html?Queue=Perinci-Sub-Gen-AccessTable-DBI");
 
@@ -559,19 +577,20 @@ Result:
 
  { dist => "Perinci-Sub-Gen-AccessTable-DBI", site => "rt" }
 
-=item * Example #25 (unknown):
+=item * Example #26 (unknown):
 
  extract_cpan_info_from_url("https://www.google.com/"); # -> undef
 
 =back
 
 Return a hash of information from a CPAN-related URL. Possible keys include:
-C<site> (site nickname, include: C<mcpan> [metacpan.org, api.metacpan.org], C<sco>
-[search.cpan.org], C<cpanratings> [cpanratings.perl.org], C<rt> ([rt.cpan.org]),
-C<cpan> [any normal CPAN mirror]), C<author> (CPAN author ID), C<module> (module
-name), C<dist> (distribution name), C<version> (distribution version). Some keys
-might not exist, depending on what information the URL provides. Return undef if
-URL is not detected to be of some CPAN-related URL.
+C<site> (site nickname, include: C<mcpan> [metacpan.org, api.metacpan.org,
+fastapi.metacpan.org], C<sco> [search.cpan.org], C<cpanratings>
+[cpanratings.perl.org], C<rt> ([rt.cpan.org]), C<cpan> [any normal CPAN mirror]),
+C<author> (CPAN author ID), C<module> (module name), C<dist> (distribution name),
+C<version> (distribution version). Some keys might not exist, depending on what
+information the URL provides. Return undef if URL is not detected to be of some
+CPAN-related URL.
 
 This function is not exported by default, but exportable.
 
@@ -617,7 +636,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -4,7 +4,7 @@
       "Jonas B. Nielsen <jonasbn@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "artistic_2"
    ],
@@ -29,6 +29,7 @@
          "requires" : {
             "Pod::Coverage::TrustPod" : "0",
             "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta::JSON" : "0.16",
             "Test::Kwalitee" : "1.21",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08"
@@ -39,6 +40,7 @@
             "Date::Holidays::AT" : "0",
             "Date::Holidays::AU" : "0",
             "Date::Holidays::BR" : "0",
+            "Date::Holidays::BY" : "0",
             "Date::Holidays::CA" : "0",
             "Date::Holidays::CA_ES" : "0",
             "Date::Holidays::DE" : "0",
@@ -53,7 +55,9 @@
             "Date::Holidays::PT" : "0.03",
             "Date::Holidays::RU" : "0",
             "Date::Holidays::SK" : "0",
+            "Date::Holidays::UK" : "0",
             "Date::Holidays::USFederal" : "0",
+            "Date::Japanese::Holiday" : "0",
             "perl" : "5.006"
          }
       },
@@ -62,19 +66,33 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::More" : "0"
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
          }
+      }
+   },
+   "provides" : {
+      "Task::Date::Holidays" : {
+         "file" : "lib/Task/Date/Holidays.pm",
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "https://github.com/jonasbn/perl-Task-Date-Holidays",
+      "bugtracker" : {
+         "web" : "https://github.com/jonasbn/perl-Task-Date-Holidays/issues"
+      },
+      "homepage" : "https://github.com/jonasbn/perl-task-date-holidays",
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/jonasbn/perl-Task-Date-Holidays.git",
          "web" : "https://github.com/jonasbn/perl-Task-Date-Holidays"
       }
    },
-   "version" : "0.05"
+   "version" : "0.07",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

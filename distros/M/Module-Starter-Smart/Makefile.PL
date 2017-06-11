@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME                => 'Module::Starter::Smart',
-    AUTHOR              => 'Ruey-Cheng Chen <rueycheng@gmail.com>',
+    AUTHOR              => 'Ruey-Cheng Chen <rueycheng@cpan.com>',
     VERSION_FROM        => 'lib/Module/Starter/Smart.pm',
     ABSTRACT_FROM       => 'lib/Module/Starter/Smart.pm',
     PL_FILES            => {},

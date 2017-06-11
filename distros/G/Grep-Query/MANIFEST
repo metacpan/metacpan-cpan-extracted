@@ -1,3 +1,4 @@
+author/patch-next-version.pl
 Changes
 lib/Grep/Query.pm
 lib/Grep/Query/Parser.pm

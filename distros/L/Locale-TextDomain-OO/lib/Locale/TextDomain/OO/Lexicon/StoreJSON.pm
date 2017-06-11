@@ -54,7 +54,7 @@ __END__
 
 Locale::TextDomain::OO::Lexicon::StoreJSON - Stores the lexicon for other programming languages
 
-$Id: StoreJSON.pm 611 2015-08-10 07:12:05Z steffenw $
+$Id: StoreJSON.pm 647 2017-02-25 08:22:10Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/module/trunk/lib/Locale/TextDomain/OO/Lexicon/StoreJSON.pm $
 

@@ -6,6 +6,7 @@ README.md
 cpanfile
 lib/Text/Shirasu.pm
 lib/Text/Shirasu/Node.pm
+lib/Text/Shirasu/Tree.pm
 minil.toml
 t/00_compile.t
 t/01_method.t

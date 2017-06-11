@@ -2,7 +2,7 @@ do { my $x = {
        'configure' => {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0',
-                                        'perl' => '5.006'
+                                        'perl' => '5.010'
                                       }
                       },
        'develop' => {
@@ -31,8 +31,11 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Carp' => '0',
-                                      'MarpaX::ESLIF' => 'v2.0.9',
-                                      'perl' => '5.006',
+                                      'MarpaX::ESLIF' => 'v2.0.13',
+                                      'Math::BigFloat' => '0',
+                                      'Math::BigInt' => '0',
+                                      'Scalar::Util' => '0',
+                                      'perl' => '5.010',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }
@@ -46,16 +49,13 @@ do { my $x = {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'File::Temp' => '0',
+                                   'FindBin' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
-                                   'Log::Any' => '0',
-                                   'Log::Any::Adapter' => '0',
-                                   'Log::Any::Adapter::Log4perl' => '0',
-                                   'Log::Log4perl' => '0',
                                    'Test::More' => '0',
                                    'Test::More::UTF8' => '0',
                                    'blib' => '1.01',
-                                   'perl' => '5.006'
+                                   'perl' => '5.010'
                                  }
                  }
      };

@@ -9,10 +9,13 @@ dist.ini
 examples/agaricus.txt.test
 examples/agaricus.txt.train
 examples/capi.pl
+examples/capi_raw.pl
 lib/AI/XGBoost.pm
 lib/AI/XGBoost/CAPI.pm
+lib/AI/XGBoost/CAPI/RAW.pm
 misc/using_capi.c
 t/00-load.t
+t/10-cast_arguments.t
 t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t

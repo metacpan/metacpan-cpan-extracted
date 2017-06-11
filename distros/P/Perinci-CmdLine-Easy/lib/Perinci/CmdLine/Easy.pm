@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Easy;
 
-our $DATE = '2015-09-03'; # DATE
-our $VERSION = '1.17'; # VERSION
+our $DATE = '2017-06-09'; # DATE
+our $VERSION = '1.18'; # VERSION
 
 use 5.010001;
 use strict;
@@ -44,7 +44,7 @@ _
     "x.perinci.sub.wrapper.disable_validate_args" => 1,
 };
 sub run_cmdline_app {
-    my %args = @_; no warnings ('void');require List::Util;my $_sahv_dpath = []; my $arg_err; if (exists($args{'argv'})) { (($args{'argv'} //= []), 1) && ((defined($args{'argv'})) ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Required but not specified"),0)) && ((ref($args{'argv'}) eq 'ARRAY') ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Not of type array"),0)) && ([push(@{$_sahv_dpath}, undef), ~~((!defined(List::Util::first(sub {!( ($_sahv_dpath->[-1] = $_), ((defined($args{'argv'}->[$_])) ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Required but not specified"),0)) && ((!ref($args{'argv'}->[$_])) ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Not of type text"),0)) )}, 0..@{$args{'argv'}}-1))) ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Not of type text"),0)), pop(@{$_sahv_dpath})]->[1]); if ($arg_err) { die "run_cmdline_app(): " . "Invalid argument value for argv: $arg_err" } } else { $args{'argv'} = [];}if (exists($args{'description'})) { ((defined($args{'description'})) ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Required but not specified"),0)) && ((!ref($args{'description'})) ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Not of type text"),0)); if ($arg_err) { die "run_cmdline_app(): " . "Invalid argument value for description: $arg_err" } }if (!exists($args{'sub'})) { die "run_cmdline_app(): " . "Missing argument: sub" } if (exists($args{'summary'})) { ((defined($args{'summary'})) ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Required but not specified"),0)) && ((!ref($args{'summary'})) ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Not of type text"),0)); if ($arg_err) { die "run_cmdline_app(): " . "Invalid argument value for summary: $arg_err" } }# VALIDATE_ARGS
+    my %args = @_; no warnings ('void');require Data::Sah::Compiler::perl::TH::array;require List::Util;require Data::Sah::Compiler::perl::TH::str;my $_sahv_dpath = []; my $arg_err; if (exists($args{'argv'})) { (($args{'argv'} //= []), 1) && ((defined($args{'argv'})) ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Required but not specified"),0)) && ((ref($args{'argv'}) eq 'ARRAY') ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type array"),0)) && ([push(@{$_sahv_dpath}, undef), ~~((!defined(List::Util::first(sub {!( ($_sahv_dpath->[-1] = $_), ((defined($args{'argv'}->[$_])) ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Required but not specified"),0)) && ((!ref($args{'argv'}->[$_])) ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type text"),0)) )}, 0..@{$args{'argv'}}-1))) ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type text"),0)), pop(@{$_sahv_dpath})]->[1]); if ($arg_err) { die "run_cmdline_app(): " . "Invalid argument value for argv: $arg_err" } } else { $args{'argv'} = [];}no warnings ('void');if (exists($args{'description'})) { ((defined($args{'description'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'description'})) ? 1 : (($arg_err //= "Not of type text"),0)); if ($arg_err) { die "run_cmdline_app(): " . "Invalid argument value for description: $arg_err" } }if (!exists($args{'sub'})) { die "run_cmdline_app(): " . "Missing argument: sub" } no warnings ('void');if (exists($args{'summary'})) { ((defined($args{'summary'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'summary'})) ? 1 : (($arg_err //= "Not of type text"),0)); if ($arg_err) { die "run_cmdline_app(): " . "Invalid argument value for summary: $arg_err" } }# VALIDATE_ARGS
 
     my $meta = {
         v            => 1.1,
@@ -110,7 +110,7 @@ Perinci::CmdLine::Easy - A simple interface to run a subroutine as command-line 
 
 =head1 VERSION
 
-This document describes version 1.17 of Perinci::CmdLine::Easy (from Perl distribution Perinci-CmdLine-Easy), released on 2015-09-03.
+This document describes version 1.18 of Perinci::CmdLine::Easy (from Perl distribution Perinci-CmdLine-Easy), released on 2017-06-09.
 
 =head1 SYNOPSIS
 
@@ -123,7 +123,7 @@ In your command-line script (e.g. named list-cpan-dists):
      summary => "List CPAN distributions that belong to an author",
      sub     => sub {
          my $cpanid = shift or die "Please supply CPAN ID\n";
-         my $res = get "http://api.metacpan.org/v0/release/_search?q=author:".
+         my $res = get "http://fastapi.metacpan.org/v1/release/_search?q=author:".
              uc($cpanid)."%20AND%20status:latest&fields=name&size=5000"
              or die "Can't query MetaCPAN";
          $res = $json->decode($res);
@@ -180,9 +180,15 @@ What you'll get:
 =head1 FUNCTIONS
 
 
-=head2 run_cmdline_app(%args) -> any
+=head2 run_cmdline_app
+
+Usage:
+
+ run_cmdline_app(%args) -> any
 
 A simple interface to run a subroutine as command-line app.
+
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
@@ -210,10 +216,6 @@ Return value:  (any)
 
 =for Pod::Coverage .+
 
-=head1 SEE ALSO
-
-L<Perinci::CmdLine>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Perinci-CmdLine-Easy>.
@@ -230,13 +232,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Perinci::CmdLine>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

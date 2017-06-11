@@ -1,7 +1,7 @@
 package DDG::ZeroClickInfo::Fathead;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: DuckDuckGo server side used ZeroClickInfo Fathead result class
-$DDG::ZeroClickInfo::Fathead::VERSION = '1016';
+$DDG::ZeroClickInfo::Fathead::VERSION = '1017';
 use Moo;
 with 'DDG::IsControllable';
 
@@ -141,7 +141,7 @@ DDG::ZeroClickInfo::Fathead - DuckDuckGo server side used ZeroClickInfo Fathead 
 
 =head1 VERSION
 
-version 1016
+version 1017
 
 =head1 SYNOPSIS
 

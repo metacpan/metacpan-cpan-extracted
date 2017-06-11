@@ -13,10 +13,10 @@ use Business::UPS::Tracking::Utils;
 =head1 NAME
 
 Business::UPS::Tracking::Element::ReferenceNumber - A reference number
-  
+
 =head1 DESCRIPTION
 
-This class represents a reference number. Usually it is created 
+This class represents a reference number. Usually it is created
 automatically from a L<Business::UPS::Tracking::Shipment> object.
 
 =head1 ACCESSORS
@@ -27,7 +27,7 @@ Original L<XML::LibXML::Node> node.
 
 =head2 Code
 
-Reference number types. 
+Reference number types.
 
 For small package available options are:
 
@@ -134,13 +134,13 @@ sub _build_referencenumber {
 
     $self->Code( $xml->findvalue('Code') );
     $self->Value( $xml->findvalue('Value') );
-    
+
     return;
 }
 
 =head1 METHODS
 
-=head2 printall 
+=head2 printall
 
 Returns the serialized object content
 
@@ -167,7 +167,7 @@ sub Description {
 
 sub serialize {
     my ($self) = @_;
-    
+
     return $self->Value;
 }
 

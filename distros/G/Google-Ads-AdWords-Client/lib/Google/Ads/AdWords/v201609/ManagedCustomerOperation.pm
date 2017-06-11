@@ -72,7 +72,7 @@ Google::Ads::AdWords::v201609::ManagedCustomerOperation
 Perl data type class for the XML Schema defined complexType
 ManagedCustomerOperation from the namespace https://adwords.google.com/api/adwords/mcm/v201609.
 
-An operation to create or modify a managed customer. <p class="note"><b>Note:</b> <li><code>ADD</code> operator is supported in all API versions.</li> <li><code>SET</code> operator is supported beginning with v201601.</li> <li><code>REMOVE</code> operator is not supported.</li> </p> 
+An operation to create or modify a managed customer. <p><b>Note:</b> The {@code REMOVE} operator is not supported.</p> 
 
 
 

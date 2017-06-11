@@ -1,5 +1,10 @@
 Revision history for Tickit-Async
 
+0.21    2017/06/08 17:36:59
+        [CHANGES]
+         * Implement the ->cancel_timer API
+         * Restore STDIN to blocking mode on exit
+
 0.20    2017/03/01 21:53:55
         [BUGFIXES]
          * Fixes for Tickit 0.62:

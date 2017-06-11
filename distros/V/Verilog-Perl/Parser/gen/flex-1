@@ -35,8 +35,8 @@
 
 #define FLEX_SCANNER
 #define YY_FLEX_MAJOR_VERSION 2
-#define YY_FLEX_MINOR_VERSION 5
-#define YY_FLEX_SUBMINOR_VERSION 35
+#define YY_FLEX_MINOR_VERSION 6
+#define YY_FLEX_SUBMINOR_VERSION 0
 #if YY_FLEX_SUBMINOR_VERSION > 0
 #define FLEX_BETA
 #endif
@@ -223,8 +223,13 @@ typedef unsigned int flex_uint32_t;
 typedef struct yy_buffer_state *YY_BUFFER_STATE;
 #endif
 
+#ifndef YY_TYPEDEF_YY_SIZE_T
+#define YY_TYPEDEF_YY_SIZE_T
+typedef size_t yy_size_t;
+#endif
+
 /* %if-not-reentrant */
-extern int VParseLexleng;
+extern yy_size_t VParseLexleng;
 /* %endif */
 
 /* %if-c-only */
@@ -238,6 +243,7 @@ extern FILE *VParseLexin, *VParseLexout;
 #define EOB_ACT_LAST_MATCH 2
 
     #define YY_LESS_LINENO(n)
+    #define YY_LINENO_REWIND_TO(ptr)
     
 /* Return all but the first "n" matched characters back to the input stream. */
 #define yyless(n) \
@@ -254,11 +260,6 @@ extern FILE *VParseLexin, *VParseLexout;
 	while ( 0 )
 
 #define unput(c) yyunput( c, (yytext_ptr)  )
-
-#ifndef YY_TYPEDEF_YY_SIZE_T
-#define YY_TYPEDEF_YY_SIZE_T
-typedef size_t yy_size_t;
-#endif
 
 #ifndef YY_STRUCT_YY_BUFFER_STATE
 #define YY_STRUCT_YY_BUFFER_STATE
@@ -367,7 +368,7 @@ static YY_BUFFER_STATE * yy_buffer_stack = 0; /**< Stack as an array. */
 /* yy_hold_char holds the character lost when VParseLextext is formed. */
 static char yy_hold_char;
 static int yy_n_chars;		/* number of characters read into yy_ch_buf */
-int VParseLexleng;
+yy_size_t VParseLexleng;
 
 /* Points to current character in buffer. */
 static char *yy_c_buf_p = (char *) 0;
@@ -398,7 +399,7 @@ static void VParseLex_init_buffer (YY_BUFFER_STATE b,FILE *file  );
 
 YY_BUFFER_STATE VParseLex_scan_buffer (char *base,yy_size_t size  );
 YY_BUFFER_STATE VParseLex_scan_string (yyconst char *yy_str  );
-YY_BUFFER_STATE VParseLex_scan_bytes (yyconst char *bytes,int len  );
+YY_BUFFER_STATE VParseLex_scan_bytes (yyconst char *bytes,yy_size_t len  );
 
 /* %endif */
 
@@ -446,13 +447,21 @@ extern int VParseLexlineno;
 int VParseLexlineno = 1;
 
 extern char *VParseLextext;
+#ifdef yytext_ptr
+#undef yytext_ptr
+#endif
 #define yytext_ptr VParseLextext
+
+/* %% [1.5] DFA */
 
 /* %if-c-only Standard (non-C++) definition */
 
 static yy_state_type yy_get_previous_state (void );
 static yy_state_type yy_try_NUL_trans (yy_state_type current_state  );
 static int yy_get_next_buffer (void );
+#if defined(__GNUC__) && __GNUC__ >= 3
+__attribute__((__noreturn__))
+#endif
 static void yy_fatal_error (yyconst char msg[]  );
 
 /* %endif */
@@ -698,7 +707,7 @@ static yyconst flex_int32_t yy_accept[1946] =
         0,    0,    0,  407,    0
     } ;
 
-static yyconst flex_int32_t yy_ec[256] =
+static yyconst YY_CHAR yy_ec[256] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    2,    3,
         1,    4,    5,    1,    1,    1,    1,    1,    1,    1,
@@ -730,7 +739,7 @@ static yyconst flex_int32_t yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static yyconst flex_int32_t yy_meta[81] =
+static yyconst YY_CHAR yy_meta[81] =
     {   0,
         1,    2,    3,    4,    4,    2,    1,    1,    1,    5,
         1,    1,    1,    1,    1,    6,    7,    1,    7,    1,
@@ -742,7 +751,7 @@ static yyconst flex_int32_t yy_meta[81] =
        11,   11,   11,   10,   11,   10,    1,    1,    1,    1
     } ;
 
-static yyconst flex_int32_t yy_base[1976] =
+static yyconst flex_uint32_t yy_base[1976] =
     {   0,
         0,    0,    0,    0,   65,    0, 2979, 2978,  130,    0,
       200,  265,  330,  395,  468,    0,  548,    0,  628,    0,
@@ -1184,7 +1193,7 @@ static yyconst flex_int32_t yy_def[1976] =
      1945, 1945, 1945, 1945, 1945
     } ;
 
-static yyconst flex_int32_t yy_nxt[3132] =
+static yyconst flex_uint32_t yy_nxt[3132] =
     {   0,
        27,   28,   29,   28,   30,   28,   31,   32,   33,   34,
        35,   36,   37,   38,   39,   40,   41,   42,   43,   44,
@@ -2040,7 +2049,7 @@ void yyerrorf(const char* format, ...) {
 /* identifier */
 /* escaped identifier */
 /* verilog numbers, constructed to not match the ' that begins a '(  or '{ */
-#line 2044 "VParseLex_pretmp.cpp"
+#line 2053 "VParseLex_pretmp.cpp"
 
 #define INITIAL 0
 #define V95 1
@@ -2097,19 +2106,19 @@ void VParseLexset_extra (YY_EXTRA_TYPE user_defined  );
 
 FILE *VParseLexget_in (void );
 
-void VParseLexset_in  (FILE * in_str  );
+void VParseLexset_in  (FILE * _in_str  );
 
 FILE *VParseLexget_out (void );
 
-void VParseLexset_out  (FILE * out_str  );
+void VParseLexset_out  (FILE * _out_str  );
 
-int VParseLexget_leng (void );
+yy_size_t VParseLexget_leng (void );
 
 char *VParseLexget_text (void );
 
 int VParseLexget_lineno (void );
 
-void VParseLexset_lineno (int line_number  );
+void VParseLexset_lineno (int _line_number  );
 
 /* %if-bison-bridge */
 /* %endif */
@@ -2128,8 +2137,11 @@ extern int VParseLexwrap (void );
 
 /* %not-for-header */
 
+#ifndef YY_NO_UNPUT
+    
     static void yyunput (int c,char *buf_ptr  );
     
+#endif
 /* %ok-for-header */
 
 /* %endif */
@@ -2162,7 +2174,7 @@ static int input (void );
         static int yy_start_stack_depth = 0;
         static int *yy_start_stack = NULL;
     
-    static void yy_push_state (int new_state );
+    static void yy_push_state (int _new_state );
     
     static void yy_pop_state (void );
     
@@ -2290,7 +2302,7 @@ extern int VParseLexlex (void);
 
 /* Code executed at the end of each rule. */
 #ifndef YY_BREAK
-#define YY_BREAK break;
+#define YY_BREAK /*LINTED*/break;
 #endif
 
 /* %% [6.0] YY_RULE_SETUP definition goes here */
@@ -2303,16 +2315,10 @@ extern int VParseLexlex (void);
  */
 YY_DECL
 {
-	register yy_state_type yy_current_state;
-	register char *yy_cp, *yy_bp;
-	register int yy_act;
+	yy_state_type yy_current_state;
+	char *yy_cp, *yy_bp;
+	int yy_act;
     
-/* %% [7.0] user's declarations go here */
-#line 112 "VParseLex.l"
-
-
-#line 2315 "VParseLex_pretmp.cpp"
-
 	if ( !(yy_init) )
 		{
 		(yy_init) = 1;
@@ -2347,7 +2353,14 @@ YY_DECL
 		VParseLex_load_buffer_state( );
 		}
 
-	while ( 1 )		/* loops until end-of-file is reached */
+	{
+/* %% [7.0] user's declarations go here */
+#line 112 "VParseLex.l"
+
+
+#line 2362 "VParseLex_pretmp.cpp"
+
+	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
 /* %% [8.0] yymore()-related code goes here */
 		(yy_more_len) = 0;
@@ -2371,7 +2384,7 @@ YY_DECL
 yy_match:
 		do
 			{
-			register YY_CHAR yy_c = yy_ec[YY_SC_TO_UI(*yy_cp)];
+			YY_CHAR yy_c = yy_ec[YY_SC_TO_UI(*yy_cp)] ;
 			if ( yy_accept[yy_current_state] )
 				{
 				(yy_last_accepting_state) = yy_current_state;
@@ -4672,7 +4685,7 @@ YY_RULE_SETUP
 #line 683 "VParseLex.l"
 ECHO;
 	YY_BREAK
-#line 4676 "VParseLex_pretmp.cpp"
+#line 4689 "VParseLex_pretmp.cpp"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(V95):
 case YY_STATE_EOF(V01):
@@ -4704,7 +4717,11 @@ case YY_STATE_EOF(DUMMY_TO_AVOID_WARNING):
 			 * back-up) that will match for the new input source.
 			 */
 			(yy_n_chars) = YY_CURRENT_BUFFER_LVALUE->yy_n_chars;
+/* %if-c-only */
 			YY_CURRENT_BUFFER_LVALUE->yy_input_file = VParseLexin;
+/* %endif */
+/* %if-c++-only */
+/* %endif */
 			YY_CURRENT_BUFFER_LVALUE->yy_buffer_status = YY_BUFFER_NORMAL;
 			}
 
@@ -4811,6 +4828,7 @@ case YY_STATE_EOF(DUMMY_TO_AVOID_WARNING):
 			"fatal flex scanner internal error--no action found" );
 	} /* end of action switch */
 		} /* end of scanning one token */
+	} /* end of user's declarations */
 } /* end of VParseLexlex */
 /* %ok-for-header */
 
@@ -4834,9 +4852,9 @@ static int yy_get_next_buffer (void)
 /* %if-c++-only */
 /* %endif */
 {
-    	register char *dest = YY_CURRENT_BUFFER_LVALUE->yy_ch_buf;
-	register char *source = (yytext_ptr);
-	register int number_to_move, i;
+    	char *dest = YY_CURRENT_BUFFER_LVALUE->yy_ch_buf;
+	char *source = (yytext_ptr);
+	yy_size_t number_to_move, i;
 	int ret_val;
 
 	if ( (yy_c_buf_p) > &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[(yy_n_chars) + 1] )
@@ -4865,7 +4883,7 @@ static int yy_get_next_buffer (void)
 	/* Try to read more data. */
 
 	/* First move last chars to start of buffer. */
-	number_to_move = (int) ((yy_c_buf_p) - (yytext_ptr)) - 1;
+	number_to_move = (yy_size_t) ((yy_c_buf_p) - (yytext_ptr)) - 1;
 
 	for ( i = 0; i < number_to_move; ++i )
 		*(dest++) = *(source++);
@@ -4878,21 +4896,21 @@ static int yy_get_next_buffer (void)
 
 	else
 		{
-			int num_to_read =
+			yy_size_t num_to_read =
 			YY_CURRENT_BUFFER_LVALUE->yy_buf_size - number_to_move - 1;
 
 		while ( num_to_read <= 0 )
 			{ /* Not enough room in the buffer - grow it. */
 
 			/* just a shorter name for the current buffer */
-			YY_BUFFER_STATE b = YY_CURRENT_BUFFER;
+			YY_BUFFER_STATE b = YY_CURRENT_BUFFER_LVALUE;
 
 			int yy_c_buf_p_offset =
 				(int) ((yy_c_buf_p) - b->yy_ch_buf);
 
 			if ( b->yy_is_our_buffer )
 				{
-				int new_size = b->yy_buf_size * 2;
+				yy_size_t new_size = b->yy_buf_size * 2;
 
 				if ( new_size <= 0 )
 					b->yy_buf_size += b->yy_buf_size / 8;
@@ -4923,7 +4941,7 @@ static int yy_get_next_buffer (void)
 
 		/* Read in more data. */
 		YY_INPUT( (&YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[number_to_move]),
-			(yy_n_chars), (size_t) num_to_read );
+			(yy_n_chars), num_to_read );
 
 		YY_CURRENT_BUFFER_LVALUE->yy_n_chars = (yy_n_chars);
 		}
@@ -4947,9 +4965,9 @@ static int yy_get_next_buffer (void)
 	else
 		ret_val = EOB_ACT_CONTINUE_SCAN;
 
-	if ((yy_size_t) ((yy_n_chars) + number_to_move) > YY_CURRENT_BUFFER_LVALUE->yy_buf_size) {
+	if ((int) ((yy_n_chars) + number_to_move) > YY_CURRENT_BUFFER_LVALUE->yy_buf_size) {
 		/* Extend the array by 50%, plus the number we really need. */
-		yy_size_t new_size = (yy_n_chars) + number_to_move + ((yy_n_chars) >> 1);
+		int new_size = (yy_n_chars) + number_to_move + ((yy_n_chars) >> 1);
 		YY_CURRENT_BUFFER_LVALUE->yy_ch_buf = (char *) VParseLexrealloc((void *) YY_CURRENT_BUFFER_LVALUE->yy_ch_buf,new_size  );
 		if ( ! YY_CURRENT_BUFFER_LVALUE->yy_ch_buf )
 			YY_FATAL_ERROR( "out of dynamic memory in yy_get_next_buffer()" );
@@ -4974,8 +4992,8 @@ static int yy_get_next_buffer (void)
 /* %if-c++-only */
 /* %endif */
 {
-	register yy_state_type yy_current_state;
-	register char *yy_cp;
+	yy_state_type yy_current_state;
+	char *yy_cp;
     
 /* %% [15.0] code to get the start state into yy_current_state goes here */
 	yy_current_state = (yy_start);
@@ -4983,7 +5001,7 @@ static int yy_get_next_buffer (void)
 	for ( yy_cp = (yytext_ptr) + YY_MORE_ADJ; yy_cp < (yy_c_buf_p); ++yy_cp )
 		{
 /* %% [16.0] code to find the next state goes here */
-		register YY_CHAR yy_c = (*yy_cp ? yy_ec[YY_SC_TO_UI(*yy_cp)] : 1);
+		YY_CHAR yy_c = (*yy_cp ? yy_ec[YY_SC_TO_UI(*yy_cp)] : 1);
 		if ( yy_accept[yy_current_state] )
 			{
 			(yy_last_accepting_state) = yy_current_state;
@@ -5012,11 +5030,11 @@ static int yy_get_next_buffer (void)
 /* %if-c++-only */
 /* %endif */
 {
-	register int yy_is_jam;
+	int yy_is_jam;
     /* %% [17.0] code to find the next state, and perhaps do backing up, goes here */
-	register char *yy_cp = (yy_c_buf_p);
+	char *yy_cp = (yy_c_buf_p);
 
-	register YY_CHAR yy_c = 1;
+	YY_CHAR yy_c = 1;
 	if ( yy_accept[yy_current_state] )
 		{
 		(yy_last_accepting_state) = yy_current_state;
@@ -5031,17 +5049,18 @@ static int yy_get_next_buffer (void)
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
 	yy_is_jam = (yy_current_state == 1945);
 
-	return yy_is_jam ? 0 : yy_current_state;
+		return yy_is_jam ? 0 : yy_current_state;
 }
 
+#ifndef YY_NO_UNPUT
 /* %if-c-only */
 
-    static void yyunput (int c, register char * yy_bp )
+    static void yyunput (int c, char * yy_bp )
 /* %endif */
 /* %if-c++-only */
 /* %endif */
 {
-	register char *yy_cp;
+	char *yy_cp;
     
     yy_cp = (yy_c_buf_p);
 
@@ -5051,10 +5070,10 @@ static int yy_get_next_buffer (void)
 	if ( yy_cp < YY_CURRENT_BUFFER_LVALUE->yy_ch_buf + 2 )
 		{ /* need to shift things up to make room */
 		/* +2 for EOB chars. */
-		register int number_to_move = (yy_n_chars) + 2;
-		register char *dest = &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[
+		yy_size_t number_to_move = (yy_n_chars) + 2;
+		char *dest = &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[
 					YY_CURRENT_BUFFER_LVALUE->yy_buf_size + 2];
-		register char *source =
+		char *source =
 				&YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[number_to_move];
 
 		while ( source > YY_CURRENT_BUFFER_LVALUE->yy_ch_buf )
@@ -5080,6 +5099,7 @@ static int yy_get_next_buffer (void)
 /* %if-c-only */
 
 /* %endif */
+#endif
 
 /* %if-c-only */
 #ifndef YY_NO_INPUT
@@ -5109,7 +5129,7 @@ static int yy_get_next_buffer (void)
 
 		else
 			{ /* need more input */
-			int offset = (yy_c_buf_p) - (yytext_ptr);
+			yy_size_t offset = (yy_c_buf_p) - (yytext_ptr);
 			++(yy_c_buf_p);
 
 			switch ( yy_get_next_buffer(  ) )
@@ -5185,6 +5205,9 @@ static int yy_get_next_buffer (void)
 	VParseLex_load_buffer_state( );
 }
 
+/* %if-c++-only */
+/* %endif */
+
 /** Switch to a different input buffer.
  * @param new_buffer The new input buffer.
  * 
@@ -5232,7 +5255,11 @@ static void VParseLex_load_buffer_state  (void)
 {
     	(yy_n_chars) = YY_CURRENT_BUFFER_LVALUE->yy_n_chars;
 	(yytext_ptr) = (yy_c_buf_p) = YY_CURRENT_BUFFER_LVALUE->yy_buf_pos;
+/* %if-c-only */
 	VParseLexin = YY_CURRENT_BUFFER_LVALUE->yy_input_file;
+/* %endif */
+/* %if-c++-only */
+/* %endif */
 	(yy_hold_char) = *(yy_c_buf_p);
 }
 
@@ -5254,7 +5281,7 @@ static void VParseLex_load_buffer_state  (void)
 	if ( ! b )
 		YY_FATAL_ERROR( "out of dynamic memory in VParseLex_create_buffer()" );
 
-	b->yy_buf_size = size;
+	b->yy_buf_size = (yy_size_t)size;
 
 	/* yy_ch_buf has to be 2 characters longer than the size given because
 	 * we need to put in 2 end-of-buffer characters.
@@ -5269,6 +5296,9 @@ static void VParseLex_load_buffer_state  (void)
 
 	return b;
 }
+
+/* %if-c++-only */
+/* %endif */
 
 /** Destroy the buffer.
  * @param b a buffer created with VParseLex_create_buffer()
@@ -5293,17 +5323,6 @@ static void VParseLex_load_buffer_state  (void)
 	VParseLexfree((void *) b  );
 }
 
-/* %if-c-only */
-
-#ifndef __cplusplus
-extern int isatty (int );
-#endif /* __cplusplus */
-    
-/* %endif */
-
-/* %if-c++-only */
-/* %endif */
-
 /* Initializes or reinitializes a buffer.
  * This function is sometimes called more than once on the same buffer,
  * such as during a VParseLexrestart() or at EOF.
@@ -5319,7 +5338,11 @@ extern int isatty (int );
     
 	VParseLex_flush_buffer(b );
 
+/* %if-c-only */
 	b->yy_input_file = file;
+/* %endif */
+/* %if-c++-only */
+/* %endif */
 	b->yy_fill_buffer = 1;
 
     /* If b is the current buffer, then VParseLex_init_buffer was _probably_
@@ -5446,7 +5469,7 @@ static void VParseLexensure_buffer_stack (void)
 /* %if-c++-only */
 /* %endif */
 {
-	int num_to_alloc;
+	yy_size_t num_to_alloc;
     
 	if (!(yy_buffer_stack)) {
 
@@ -5454,7 +5477,7 @@ static void VParseLexensure_buffer_stack (void)
 		 * scanner will even need a stack. We use 2 instead of 1 to avoid an
 		 * immediate realloc on the next call.
          */
-		num_to_alloc = 1;
+		num_to_alloc = 1; /* After all that talk, this was set to 1 anyways... */
 		(yy_buffer_stack) = (struct yy_buffer_state**)VParseLexalloc
 								(num_to_alloc * sizeof(struct yy_buffer_state*)
 								);
@@ -5471,7 +5494,7 @@ static void VParseLexensure_buffer_stack (void)
 	if ((yy_buffer_stack_top) >= ((yy_buffer_stack_max)) - 1){
 
 		/* Increase the buffer to prepare for a possible push. */
-		int grow_size = 8 /* arbitrary grow size */;
+		yy_size_t grow_size = 8 /* arbitrary grow size */;
 
 		num_to_alloc = (yy_buffer_stack_max) + grow_size;
 		(yy_buffer_stack) = (struct yy_buffer_state**)VParseLexrealloc
@@ -5549,12 +5572,12 @@ YY_BUFFER_STATE VParseLex_scan_string (yyconst char * yystr )
  * 
  * @return the newly allocated buffer state object.
  */
-YY_BUFFER_STATE VParseLex_scan_bytes  (yyconst char * yybytes, int  _yybytes_len )
+YY_BUFFER_STATE VParseLex_scan_bytes  (yyconst char * yybytes, yy_size_t  _yybytes_len )
 {
 	YY_BUFFER_STATE b;
 	char *buf;
 	yy_size_t n;
-	int i;
+	yy_size_t i;
     
 	/* Get memory for full buffer, including space for trailing EOB's. */
 	n = _yybytes_len + 2;
@@ -5581,7 +5604,7 @@ YY_BUFFER_STATE VParseLex_scan_bytes  (yyconst char * yybytes, int  _yybytes_len
 /* %endif */
 
 /* %if-c-only */
-    static void yy_push_state (int  new_state )
+    static void yy_push_state (int  _new_state )
 /* %endif */
 /* %if-c++-only */
 /* %endif */
@@ -5605,7 +5628,7 @@ YY_BUFFER_STATE VParseLex_scan_bytes  (yyconst char * yybytes, int  _yybytes_len
 
 	(yy_start_stack)[(yy_start_stack_ptr)++] = YY_START;
 
-	BEGIN(new_state);
+	BEGIN(_new_state);
 }
 
 /* %if-c-only */
@@ -5636,7 +5659,7 @@ YY_BUFFER_STATE VParseLex_scan_bytes  (yyconst char * yybytes, int  _yybytes_len
 /* %if-c-only */
 static void yy_fatal_error (yyconst char* msg )
 {
-    	(void) fprintf( stderr, "%s\n", msg );
+			(void) fprintf( stderr, "%s\n", msg );
 	exit( YY_EXIT_FAILURE );
 }
 /* %endif */
@@ -5694,7 +5717,7 @@ FILE *VParseLexget_out  (void)
 /** Get the length of the current token.
  * 
  */
-int VParseLexget_leng  (void)
+yy_size_t VParseLexget_leng  (void)
 {
         return VParseLexleng;
 }
@@ -5712,29 +5735,29 @@ char *VParseLexget_text  (void)
 /* %endif */
 
 /** Set the current line number.
- * @param line_number
+ * @param _line_number line number
  * 
  */
-void VParseLexset_lineno (int  line_number )
+void VParseLexset_lineno (int  _line_number )
 {
     
-    VParseLexlineno = line_number;
+    VParseLexlineno = _line_number;
 }
 
 /** Set the input stream. This does not discard the current
  * input buffer.
- * @param in_str A readable stream.
+ * @param _in_str A readable stream.
  * 
  * @see VParseLex_switch_to_buffer
  */
-void VParseLexset_in (FILE *  in_str )
+void VParseLexset_in (FILE *  _in_str )
 {
-        VParseLexin = in_str ;
+        VParseLexin = _in_str ;
 }
 
-void VParseLexset_out (FILE *  out_str )
+void VParseLexset_out (FILE *  _out_str )
 {
-        VParseLexout = out_str ;
+        VParseLexout = _out_str ;
 }
 
 int VParseLexget_debug  (void)
@@ -5742,9 +5765,9 @@ int VParseLexget_debug  (void)
         return VParseLex_flex_debug;
 }
 
-void VParseLexset_debug (int  bdebug )
+void VParseLexset_debug (int  _bdebug )
 {
-        VParseLex_flex_debug = bdebug ;
+        VParseLex_flex_debug = _bdebug ;
 }
 
 /* %endif */
@@ -5825,7 +5848,8 @@ int VParseLexlex_destroy  (void)
 #ifndef yytext_ptr
 static void yy_flex_strncpy (char* s1, yyconst char * s2, int n )
 {
-	register int i;
+		
+	int i;
 	for ( i = 0; i < n; ++i )
 		s1[i] = s2[i];
 }
@@ -5834,7 +5858,7 @@ static void yy_flex_strncpy (char* s1, yyconst char * s2, int n )
 #ifdef YY_NEED_STRLEN
 static int yy_flex_strlen (yyconst char * s )
 {
-	register int n;
+	int n;
 	for ( n = 0; s[n]; ++n )
 		;
 
@@ -5844,11 +5868,12 @@ static int yy_flex_strlen (yyconst char * s )
 
 void *VParseLexalloc (yy_size_t  size )
 {
-	return (void *) malloc( size );
+			return (void *) malloc( size );
 }
 
 void *VParseLexrealloc  (void * ptr, yy_size_t  size )
 {
+		
 	/* The cast to (char *) in the following accommodates both
 	 * implementations that use char* generic pointers, and those
 	 * that use void* generic pointers.  It works with the latter
@@ -5861,7 +5886,7 @@ void *VParseLexrealloc  (void * ptr, yy_size_t  size )
 
 void VParseLexfree (void * ptr )
 {
-	free( (char *) ptr );	/* see VParseLexrealloc() for (char *) cast */
+			free( (char *) ptr );	/* see VParseLexrealloc() for (char *) cast */
 }
 
 /* %if-tables-serialization definitions */

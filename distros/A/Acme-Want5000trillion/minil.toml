@@ -1,0 +1,6 @@
+name = "Acme-Want5000trillion"
+# badges = ["travis"]
+authority="cpan:ANATOFUZ"
+
+module_maker="ModuleBuildTiny"
+

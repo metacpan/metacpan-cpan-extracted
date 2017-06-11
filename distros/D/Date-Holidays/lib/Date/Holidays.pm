@@ -12,7 +12,7 @@ use Scalar::Util qw(blessed);
 
 use base 'Date::Holidays::Adapter';
 
-$VERSION = '1.03';
+$VERSION = '1.06';
 
 sub new {
     my ( $class, %params ) = @_;
@@ -48,13 +48,16 @@ sub new {
             if ($adapter) {
                 $self->{'_inner_object'} = $adapter;
             } else {
+                warn 'Adapter not defined';
                 $self = undef;
             }
         } catch ($error) {
+            warn 'Unable to initialize adapter';
             $self = undef;
         }
 
     } elsif ( !$self->{'_inner_class'} ) {
+        warn 'No inner class instantiated';
         $self = undef;
     }
 
@@ -152,13 +155,17 @@ sub _check_countries {
             my $dh = $self->new( countrycode => $country );
 
             if ( !$dh ) {
-                die "Unable to initialize Date::Holidays for country: $country\n";
+                my $countryname = code2country($country);
+                my $countrycode = uc $country;
+
+                die 'Unable to initialize Date::Holidays for country: '
+                    . "$countrycode - $countryname\n";
             }
 
             my %prepared_parameters = (
                 year  => $params{'year'},
                 month => $params{'month'},
-                day   => $params{'day'},                
+                day   => $params{'day'},
             );
 
             # did we receive special regions parameter?
@@ -185,7 +192,7 @@ sub _check_countries {
                     %prepared_parameters
                 );
 
-                # our precedent calendar dictates overwrite or nullification                
+                # our precedent calendar dictates overwrite or nullification
                 if (defined $holiday) {
                     $r = $holiday;
                 }
@@ -259,9 +266,11 @@ __END__
 
 =begin markdown
 
+# Date::Holidays
+
 [![CPAN version](https://badge.fury.io/pl/Date-Holidays.svg)](http://badge.fury.io/pl/Date-Holidays)
 [![Build Status](https://travis-ci.org/jonasbn/Date-Holidays.svg?branch=master)](https://travis-ci.org/jonasbn/Date-Holidays)
-[![Coverage Status](https://coveralls.io/repos/jonasbn/Date-Holidays/badge.png?branch=master)](https://coveralls.io/r/jonasbn/Date-Holidays?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/jonasbn/Date-Holidays/badge.svg?branch=master)](https://coveralls.io/github/jonasbn/Date-Holidays?branch=master)
 
 =end markdown
 
@@ -271,7 +280,7 @@ Date::Holidays - Date::Holidays::* adapter and aggregator for all your holiday n
 
 =head1 VERSION
 
-This POD describes version 1.03 of Date::Holidays
+This POD describes version 1.06 of Date::Holidays
 
 =head1 FEATURES
 
@@ -283,7 +292,7 @@ This POD describes version 1.03 of Date::Holidays
 
 =item * Inquire for a holidays for a given year for a specific country or a set of countries
 
-=item * Overwrite/rename/suppress national holidays with your own calendar 
+=item * Overwrite/rename/suppress national holidays with your own calendar
 
 =back
 
@@ -361,14 +370,14 @@ This POD describes version 1.03 of Date::Holidays
 
 =head1 DESCRIPTION
 
-Date::Holidays is an adapters exposing a uniform API to a set of dsitributions 
-in the Date::Holidays::* namespace. All of these modules deliver methods and 
+Date::Holidays is an adapters exposing a uniform API to a set of dsitributions
+in the Date::Holidays::* namespace. All of these modules deliver methods and
 information on national calendars, but no standardized API exist.
 
 The distributions more or less follow a I<de> I<facto> standard (see: also the generic
 adapter L<Date::Holidays::Adapter>), but the adapters are implemented to uniform
 this and Date::Holidays exposes a more readable API and at the same time it
-provides an OO interface, to these diverse implementations, which primarily 
+provides an OO interface, to these diverse implementations, which primarily
 holds a are produceral.
 
 As described below it is recommended that a certain API is implemented (SEE:
@@ -376,12 +385,12 @@ B<holidays> and B<is_holiday> below), but taking the adapter strategy into
 consideration this does not matter, or we attempt to do what we can with what is
 available on CPAN.
 
-If you are an module author/CPAN contributor who wants to comply to the suggested, 
+If you are an module author/CPAN contributor who wants to comply to the suggested,
 either look at some of the other modules in the Date::Holidays::* namespace to get an
 idea of the I<de> I<facto> standard or have a look at L<Date::Holidays::Abstract> and
 L<Date::Holidays::Super> - or write me.
 
-In addition to the adapter feature, Date::Holidays also do aggregation, so you 
+In addition to the adapter feature, Date::Holidays also do aggregation, so you
 can combine calendars and you can overwrite and redefined existing calendars.
 
 =head2 DEFINING YOUR OWN CALENDAR
@@ -426,7 +435,7 @@ This is the constructor. It takes the following parameters:
 country name.  Please refer to ISO3166 (or L<Locale::Country>)
 
 =item nocheck (optional), if set to true the countrycode specified will not be
-validated against a list of known country codes for existance, so you can build 
+validated against a list of known country codes for existance, so you can build
 fake holidays for fake countries, I currently use this for test. This parameter
 might disappear in the future.
 
@@ -659,7 +668,7 @@ This message is emitted if a given country code cannot be loaded.
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
-As mentioned in the section on defining your own calendar. You have to 
+As mentioned in the section on defining your own calendar. You have to
 set the environment variable:
 
     $HOLIDAYS_FILE
@@ -812,7 +821,14 @@ Test coverage in version 1.02
 
 =over
 
-=item * Alexander Nalobin, patch for using of Date::Holidays::RU, 1.03
+=item * CHORNY (Alexandr Ciornii), Github issue #10, letting me know I included local/ by accident,
+resulting in release 1.05
+
+=item * Vladimir Varlamov, PR introducing Date::Holidays::BY resulting in 1.04
+
+=item * Joseph M. Orost, bug report resulting in 1.03
+
+=item * Alexander Nalobin, patch for using of Date::Holidays::RU, 1.01
 
 =item * Gabor Szabo, patch assisting META data generation
 
@@ -845,8 +861,10 @@ Jonas B. Nielsen, (jonasbn) - C<< <jonasbn@cpan.org> >>
 =head1 LICENSE AND COPYRIGHT
 
 Date-Holidays and related modules are (C) by Jonas B. Nielsen, (jonasbn)
-2004-2015
+2004-2017
 
 Date-Holidays and related modules are released under the Artistic License 2.0
+
+Image used on L<website|https://jonasbn.github.io/Date-Holidays/> is under copyright by L<Markus Spiske|https://unsplash.com/@markusspiske?photo=AF_4tBQjdtc>
 
 =cut

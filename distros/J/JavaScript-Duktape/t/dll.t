@@ -6,6 +6,10 @@ use JavaScript::Duktape::C::libPath;
 use Data::Dumper;
 use Test::More;
 
+if (!$ENV{DUK_DEV}) {
+    plan skip_all => 'DEV test';
+}
+
 my $js  = JavaScript::Duktape->new();
 my $duk = $js->duk;
 

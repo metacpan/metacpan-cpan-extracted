@@ -2,10 +2,7 @@ use strict;
 use warnings;
 use autodie;
 package Net::Google::Storage;
-{
-  $Net::Google::Storage::VERSION = '0.1.2';
-}
-
+$Net::Google::Storage::VERSION = '0.2.0';
 # ABSTRACT: Access the Google Storage JSON API (currently experimental).
 # https://developers.google.com/storage/docs/json_api/
 
@@ -25,8 +22,8 @@ has projectId => (
 	isa => 'Int',
 );
 
-my $api_base = 'https://www.googleapis.com/storage/v1beta1/b';
-my $upload_api_base = 'https://www.googleapis.com/upload/storage/v1beta1/b';
+my $api_base = 'https://www.googleapis.com/storage/v1/b';
+my $upload_api_base = 'https://www.googleapis.com/upload/storage/v1/b';
 
 
 sub list_buckets
@@ -35,9 +32,9 @@ sub list_buckets
 	
 	my $projectId = $self->projectId;
 	
-	my $res = $self->_get("$api_base?projectId=$projectId");
+	my $res = $self->_get("$api_base?project=$projectId");
 	
-	die 'Failed to list buckets' unless $res->is_success;
+	die 'Failed to list buckets' . $res->decoded_content unless $res->is_success;
 	
 	my $response = decode_json($res->decoded_content);
 	
@@ -67,9 +64,8 @@ sub insert_bucket
 	my $self = shift;
 	
 	my $bucket_args = shift;
-	$bucket_args->{projectId} ||= $self->projectId;
-	my $res = $self->_json_post($api_base, $bucket_args);
-	die "Failed to create bucket: $bucket_args->{id}" unless $res->is_success;
+	my $res = $self->_json_post($api_base . '?project=' . $self->projectId, $bucket_args);
+	die "Failed to create bucket: $bucket_args->{id}" . $res->content unless $res->is_success;
 	
 	my $response = decode_json($res->decoded_content);
 	
@@ -129,7 +125,7 @@ sub download_object
 	
 	my %args = @_;
 	
-	my $res = $self->_get($self->_form_url("$api_base/%s/o/%s", $args{bucket}, $args{object}), ':content_file' => $args{filename});
+	my $res = $self->_get($self->_form_url("$api_base/%s/o/%s?alt=media", $args{bucket}, $args{object}), ':content_file' => $args{filename});
 	return undef if $res->code == HTTP_NOT_FOUND;
 	die "Failed to get object: $args{object} in bucket: $args{bucket}" unless $res->is_success;
 }
@@ -225,7 +221,10 @@ __PACKAGE__->meta->make_immutable;
 1;
 
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -233,7 +232,7 @@ Net::Google::Storage - Access the Google Storage JSON API (currently experimenta
 
 =head1 VERSION
 
-version 0.1.2
+version 0.2.0
 
 =head1 SYNOPSIS
 
@@ -349,4 +348,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

@@ -1,3 +1,15 @@
+Version 0.12: 2017-06-05
+  * Allow generating README.pod instead of README.
+
+Version 0.11: 2017-06-02
+  * Replace ReadmeFromPod with ReadmeAnyFromPod to really fix README issues
+
+Version 0.10: 2017-06-02
+  * Add prereqs = cpanfile to support getting prereqs from cpanfile.
+  * no_autoprereq = 1 should now be spelled "prereqs = manual".
+  * AutoPrereq is still the default but can be specified as "prereqs = auto".
+  * Commit META.json and Makefile.PL/Build.PL for contributor friendliness
+
 Version 0.09: 2017-02-26
   * Add MetaJSON plugin
 

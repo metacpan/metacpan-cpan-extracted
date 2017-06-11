@@ -1,6 +1,5 @@
 use strict;
 use warnings;
-use IO::Zlib;
 use File::Fetch;
 use File::Spec;
 use IO::Zlib;

@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,7 +33,7 @@ resources:
   bugtracker: https://github.com/thedatahub/Catmandu-Store-Datahub/issues
   homepage: https://github.com/thedatahub/Catmandu-Store-Datahub
   repository: https://github.com/thedatahub/Catmandu-Store-Datahub.git
-version: '0.04'
+version: '0.05'
 x_contributors:
   - 'Matthias Vandermaesen <matthias@colada.be>'
   - 'Pieter De Praetere <pieter.de.praetere@helptux.be>'

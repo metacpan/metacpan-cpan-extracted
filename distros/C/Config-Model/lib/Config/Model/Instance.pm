@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Instance;
-$Config::Model::Instance::VERSION = '2.103';
+$Config::Model::Instance::VERSION = '2.105';
 #use Scalar::Util qw(weaken) ;
 use strict;
 
@@ -229,7 +229,7 @@ sub register_write_back {
 }
 
 # used for auto_read auto_write feature
-has [qw/name application root_dir backend backup/] => (
+has [qw/name application root_dir backend backend_arg backup/] => (
     is  => 'ro',
     isa => 'Maybe[Str]',
 );
@@ -251,6 +251,7 @@ sub _build_read_root_dir {
 # config_file cannot be a Path::Tiny object: it may be a file name
 # relative to a directory only known by a backend (e.g. a patch in
 # debian/patches directory)
+# TODO: the above argument goes down if debian/patch uses backend_arg
 has config_file => (is  => 'ro', isa => 'Maybe[Str]');
 
 has config_dir => (is  => 'ro', isa => 'Maybe[Str]');
@@ -519,7 +520,8 @@ sub write_back {
         $logger->info("write_back called on node $path");
 
         if ( $path and $self->{config_file} ) {
-            die "write_back: cannot override config_file in non root node ($path)\n";
+            $logger->warn("write_back: cannot override config_file in non root node ($path)");
+            delete  $self->{config_file}
         }
 
         $self->_write_back_node(%args, path => $path, force_write => $force_write) ;
@@ -631,7 +633,7 @@ Config::Model::Instance - Instance of configuration tree
 
 =head1 VERSION
 
-version 2.103
+version 2.105
 
 =head1 SYNOPSIS
 
@@ -705,6 +707,11 @@ supplied if not provided by the configuration model.
 =item backend
 
 Specify which backend to use. See L</write_back ( ... )> for details
+
+=item backend_arg
+
+Specify a backend argument that may be retrieved by some
+backend. Instance is used as a relay and does not use this data.
 
 =item check
 

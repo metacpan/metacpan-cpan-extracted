@@ -11,9 +11,12 @@ WriteMakefile(
     PREREQ_PM    => {
                      'Test::More' => 1,
 		     'Wx' => 0.9,
-		      'Gtk2::Ex::DbLinker::DbTools' => 0.110,
+		      'Gtk2::Ex::DbLinker::DbTools' => 0.112,
+              'Carp' => 1.17,
 		      'DateTime::Format::Strptime' => 1.5,
 		        'Log::Log4perl' => 1.41,
+                'Log::Any::Adapter' => 1.049,
+                 'Log::Any::Adapter::Log4perl' => 0.08,
 		      'Data::Dumper' => 2.154,
 		       'DBD::SQLite'	=> 1.46,
                'Scalar::Util' => 1.45,

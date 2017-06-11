@@ -573,6 +573,28 @@ is $minion->job($id3)->info->{result}, undef,                      'no result';
 is $minion->job($id4)->info->{state},  'failed',                   'right state';
 is $minion->job($id4)->info->{result}, 'Non-zero exit status (1)', 'right result';
 $worker->unregister;
+
+# Worker remote control commands
+$worker  = $minion->worker->register->process_commands;
+$worker2 = $minion->worker->register;
+my @commands;
+$_->add_command(test_id => sub { push @commands, shift->id }) for $worker, $worker2;
+$worker->add_command(test_args => sub { shift and push @commands, [@_] })->register;
+ok $minion->backend->broadcast('test_id', [], [$worker->id]), 'sent command';
+ok $minion->backend->broadcast('test_id', [], [$worker->id, $worker2->id]), 'sent command';
+$worker->process_commands->register;
+$worker2->process_commands;
+is_deeply \@commands, [$worker->id, $worker->id, $worker2->id], 'right structure';
+@commands = ();
+ok $minion->backend->broadcast('test_id'),       'sent command';
+ok $minion->backend->broadcast('test_whatever'), 'sent command';
+ok $minion->backend->broadcast('test_args', [23], []), 'sent command';
+ok $minion->backend->broadcast('test_args', [1, [2], {3 => 'three'}], [$worker->id]), 'sent command';
+$_->process_commands for $worker, $worker2;
+is_deeply \@commands, [$worker->id, [23], [1, [2], {3 => 'three'}], $worker2->id], 'right structure';
+$_->unregister for $worker, $worker2;
+ok !$minion->backend->broadcast('test_id', []), 'command not sent';
+
 $minion->reset;
 
 done_testing();

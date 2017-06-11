@@ -7,8 +7,8 @@ use strict;
 use warnings;
 use parent 'Gtk2::Ex::DbLinker::AbForm';
 use Glib qw/TRUE FALSE/;
-# use Carp qw(croak confess carp);
-
+use Carp qw(croak confess carp);
+use Log::Any;
 #use DateTime::Format::Strptime;
 #use Data::Dumper;
 my %fieldtype = (
@@ -232,7 +232,8 @@ sub _init {
         ? $widgets{ $id }->{status_label}
         : $self->_builder->get_object( $widgets{ $id }->{status_label} ) );
 
-    $log{ $id } = Log::Log4perl->get_logger(__PACKAGE__);
+    #$log{ $id } = Log::Log4perl->get_logger(__PACKAGE__);
+    $log{ $id } = Log::Any->get_logger;
     $log{ $id }->debug(" ** New Form object ** ");
     $self->_changed(0);
 =for comment
@@ -244,7 +245,7 @@ sub _init {
     $log{ $id }->debug( "_init: cols ", join(" ", @{ $self->_cols  }) );
     $self->_bind_on_changed;
     $self->_set_recordspinner;
-    $log{ $id }->logcroak( __PACKAGE__ . ": a data manager is required")
+    croak($log{ $id }->error("A data manager is required"))
       unless ( defined $self->_dman );
     $self->_dman->set_row_pos(0);
 }
@@ -258,8 +259,8 @@ sub add_combo_values {
     my $wref       = ref $w;
     my @supp_class = (qw/Gtk2::ComboBox Gtk2::ComboBoxEntry/);
     my %supported  = map { $_ => 1 } @supp_class;
-    $log{ $id }->logconfess(
-        "only " . join( " ", @supp_class ) . " supported by add_combo_values" )
+    confess($log{ $id }->error(
+        "only " . join( " ", @supp_class ) . " supported by add_combo_values" ))
       unless ( $supported{$wref} );
     if ( $wref eq "Gtk2::ComboBox" ) {
         my $renderer = Gtk2::CellRendererText->new();
@@ -320,7 +321,8 @@ sub add_combo {
         bless $self, $class;
         $self->_builder( $$req{builder} );
 
-        $log{ $id } = Log::Log4perl->get_logger("Gtk2::Ex::DbLinker::Form");
+        #$log{ $id } = Log::Log4perl->get_logger("Gtk2::Ex::DbLinker::Form");
+        $log{ $id } = Log::Any->get_logger();
 
         my $w = $self->_builder->get_object( $combo->{id} );
         if ($w) {
@@ -328,7 +330,7 @@ sub add_combo {
             $self->_datawidgets( $combo->{id} , $w);
             $self->_datawidgetsName( $combo->{id},  $name);
         } else {
-            $log{ $id }->logcroak( "no widget found for combo " . $combo->{id});
+            croak( $log{ $id }->error( "no widget found for combo " . $combo->{id}));
         }
     } 
     else {
@@ -341,10 +343,10 @@ sub add_combo {
 
     # $log{ $id }->debug( Dumper $self->{datawidgets});
     # die Dumper $w;
-    $log{ $id }->logcroak( 'no widget found for combo ' . $combo->{id} ) unless ($w);
+    croak($log{ $id }->error( 'no widget found for combo ' . $combo->{id} )) unless ($w);
 
     #my @col = @{$self->{cols}};
-    $log{ $id }->logcroak("no fields found for combo $combo->{id}") unless (@cols);
+    croak($log{ $id }->error("no fields found for combo $combo->{id}")) unless (@cols);
     my $lastfield = @cols;
 
     #the column to show is either the first (pos 0) if it's the only column or

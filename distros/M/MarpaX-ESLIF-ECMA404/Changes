@@ -1,6 +1,57 @@
 Changelog for MarpaX-ESLIF-ECMA404
 
-0.003 2017-05-15T04:36:24
+0.006 2017-06-01T04:06:08
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - t/test.t: forces UTF-8 in some cases just to please tests with old
+   versions of perl [ci skip]
+ - ECMA404/ValueInterface.pm: Added an eval because of old perls that does
+   not like some unicode characters e.g. U+0x10ffff [ci skip]
+ - t/test.t: renaming of a variable from want_ok to want_ko to avoid
+   confusion -; [ci skip]
+
+0.005 2017-05-31T19:56:22Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - use MarpaX::ESLIF 2.0.13 [ci skip]
+
+0.004 2017-05-31T18:50:02Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - ECMA404/ValueInterface.pm: POD fix [ci skip]
+ - ESLIF/ECMA404.pm: POD typo
+ - dist.ini: encoding bytes for t/test_parsing/*.json
+ - t/test.c: Completely comment $log dependency [ci skip]
+ - POD for disallow_dupkeys [ci skip]
+ - t/test.t: commented Log::Log4perl dependency [ci skip]
+ - Pass all options to the value interface, Support of disallow_dupkeys
+   option [ci skip]
+ - Pass all options to the recognizer interface [ci skip]
+ - Removed del_character option by restriction cntrl to unicode
+   speficication, POD [ci skip]
+ - Option del_character, removed from cntrl as per RFC7159 [ci skip]
+ - allow inf and nan in tests [ci skip]
+ - trailing_separator, inf, nan and cntrl options [ci skip]
+ - ESLIF/ECMA404.pm: grammar reorg + nan/inf fix [ci skip]
+ - t/test.c: raise max_depth to 500 [ci skip]
+ - Encoding information from the user, eventually [ci skip]
+ - t/test.t: use test_parsing as a directory of json files [ci skip]
+ - For unicode, use replacement character 0xFFFD if chr() fails [ci skip]
+ - bignumber, number fix, more tests [ci skip]
+ - max_depth extension [ci skip]
+ - unlimited_commas, perl_comment and cplusplus_comment options [ci skip]
+ - ECMA404/ValueInterface.pm: cosmetic changes
+ - ECMA404/ValueInterface.pm: few internal op
+ - UTF-16 surrotage pair anywhere in \u sequence fix
+ - UTF-16 surrotage pair support: removed a debug print statement -;
+ - UTF-16 surrotage pair support
+ - t/test.t: Added a test with \u character
+ - Prepare for upcoming MarpaX::ESLIF 2.0.12: hide-separator + perl
+   built-ins
+ - t/test.t: sort tests for ease of comparisons
+ - true and false must return perl's true and false values, respectively
+ - ESLIF/ECMA404.pm: Fix link for perl license
+ - README.pod: Fix link for perl license
+ - README.pod: =for html placement
+
+0.003 2017-05-15T04:36:24Z
  [Jean-Damien Durand <jeandamiendurand@free.fr>]
  - dist.ini: Switch from ReadmeFromPod to ReadmeAnyFromPod
 

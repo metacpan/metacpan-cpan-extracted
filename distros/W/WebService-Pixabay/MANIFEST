@@ -6,7 +6,6 @@ META.json
 META.yml
 Makefile.PL
 README
-WebService-Pixabay.komodoproject
 dist.ini
 lib/WebService/Pixabay.pm
 t/Pixabay.t

@@ -1,0 +1,26 @@
+---
+abstract: 'YAML infrastructure for Perl 5'
+author:
+  - 'Ingy dÃ¶t Net <ingy@cpan.org>'
+  - 'Tina MÃ¼ller <tinita@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: YAML-Perl
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  YAML::PP::Parser: '0.003'
+  perl: '5.008001'
+version: '0.12'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,3 +1,7 @@
+v0.08 Tue, 06 Jun 2017 10:51:52 +0200 moocow
+	* added 'use lib "."' to Makefile.PL (RT bug #121661)
+	* pdlmaker.plm doesn't distribute generated PM files any more (PDL now does this for us)
+
 v0.07 Thu, 26 Sep 2013 13:44:08 +0200 moocow
 	* use $Config{drand01} macro instead of drand48() directly
 	  - avoid errors like `GA.o:GA.c:(.text+0x137ae): undefined reference to `drand48''

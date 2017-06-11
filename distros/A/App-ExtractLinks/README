@@ -1,7 +1,7 @@
 
 
 This archive contains the distribution App-ExtractLinks,
-version 0.0.2:
+version 0.0.3:
 
   extract href's in HTML docs to stdout
 

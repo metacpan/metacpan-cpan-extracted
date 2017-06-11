@@ -1,7 +1,7 @@
 
 use strict;
 use Test::Tester;
-use Test::More tests => 60;
+use Test::More;
 
 use Test::Timer;
 $Test::Timer::alarm = 20;
@@ -54,7 +54,7 @@ check_test(
     { ok => 0, name => 'Failing test', depth => 1 }, 'Failing test of time_between'
 );
 
-#test 
+#test
 check_test(
     sub {
         time_atmost( sub { sleep(1); }, 2, 'Passing test' );
@@ -62,7 +62,7 @@ check_test(
     { ok => 1, name => 'Passing test', depth => 1 }, 'Succeeding test of time_atmost'
 );
 
-#test 
+#test
 check_test(
     sub {
         time_atmost( sub { sleep(2); }, 1, 'Failing test' );
@@ -85,3 +85,5 @@ check_test(
     },
     { ok => 1, name => 'Passing test', depth => 1 }, 'Passing test of time_atleast'
 );
+
+done_testing();

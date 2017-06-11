@@ -9,9 +9,15 @@ use Mojo::WebSocketProxy::Config;
 use Mojo::WebSocketProxy::CallingEngine;
 
 use Class::Method::Modifiers;
-use Time::Out qw(timeout);
 
-our $VERSION = '0.05';    ## VERSION
+use Mojo::JSON qw(encode_json);
+use Future::Utils qw/fmap/;
+use Scalar::Util qw(blessed);
+use Variable::Disposition qw(dispose retain retain_future);
+
+use constant TIMEOUT => $ENV{MOJO_WEBSOCKETPROXY_TIMEOUT} || 15;
+
+our $VERSION = '0.06';    ## VERSION
 
 around 'send' => sub {
     my ($orig, $c, $api_response, $req_storage) = @_;
@@ -66,40 +72,68 @@ sub on_message {
 
     my $config = $c->wsp_config->{config};
 
-    my $result;
     my $req_storage = {};
     $req_storage->{args} = $args;
-    timeout 15 => sub {
-        $result = Mojo::WebSocketProxy::Parser::parse_req($c, $req_storage);
-        if (!$result
-            && (my $action = $c->dispatch($args)))
-        {
+
+    my $result = Mojo::WebSocketProxy::Parser::parse_req($c, $req_storage);
+
+    my $result_f = $result ? Future->fail($result) : Future->done;
+
+    # main processing pipeline
+    my $f = $result_f->then(
+        sub {
+            my $action = $c->dispatch($args);
+            Future->fail($result = $c->wsp_error('error', 'UnrecognisedRequest', 'Unrecognised request'))
+                unless $action;
+            Future->done($action);
+        }
+        )->then(
+        sub {
+            my $action = shift;
+
             %$req_storage = (%$req_storage, %$action);
             $req_storage->{method} = $req_storage->{name};
-            $result = $c->before_forward($req_storage);
 
-            # Don't forward call to RPC if any before_forward hook returns response
-            # Or if there is instead_of_forward action
-            unless ($result) {
-                $result =
-                      $req_storage->{instead_of_forward}
-                    ? $req_storage->{instead_of_forward}->($c, $req_storage)
-                    : $c->forward($req_storage);
-            }
-
-            $c->after_forward($result, $req_storage);
-        } elsif (!$result) {
-            $c->app->log->debug("unrecognised request: " . $c->dumper($args));
-            $result = $c->wsp_error('error', 'UnrecognisedRequest', 'Unrecognised request.');
+            my $f = $c->before_forward($req_storage)->then(
+                sub {
+                    my $next =
+                        $req_storage->{instead_of_forward}
+                        ? sub { $req_storage->{instead_of_forward}->($c, $req_storage) }
+                        : sub { $c->forward($req_storage) };
+                    Future->done($next->());
+                }
+                )->else(
+                sub {
+                    $result = shift;
+                    Future->fail;
+                });
         }
-    };
-    if ($@) {
-        warn("$$ timeout for " . JSON::to_json($args));
-    }
+        )->then(
+        sub {
+            $result = shift;
+            $c->after_forward($result, $req_storage)->then(
+                sub {
+                    Future->done;
+                });
+        });
 
-    $c->send({json => $result}, $req_storage) if $result;
+    # timeout guard
+    my $timer_id = Mojo::IOLoop->timer(
+        TIMEOUT,
+        sub {
+            $c->app->log->warn("$0 ($$) timeout, args: " . encode_json($args));
+            $result = $c->wsp_error('error', 'Timeout', 'Timeout');
+            $f->fail($result);
+        });
 
-    $c->_run_hooks($config->{after_dispatch} || []);
+    # post-process pipeline, always response
+    retain_future(
+        $f->followed_by(
+            sub {
+                Mojo::IOLoop->remove($timer_id);
+                $c->send({json => $result}, $req_storage) if $result;
+                return $c->_run_hooks($config->{after_dispatch} || []);
+            }));
 
     return;
 }
@@ -130,15 +164,16 @@ sub _run_hooks {
     my $c           = shift @hook_params;
     my $hooks       = shift @hook_params;
 
-    my $i = 0;
-    my $result;
-    while (!$result && $i < @$hooks) {
-        my $hook = $hooks->[$i++];
-        next unless $hook;
-        $result = $hook->($c, @hook_params);
+    my $result_f = fmap {
+        my $hook = shift;
+        my $result = $hook->($c, @hook_params);
+        !$result ? Future->done()
+            : (blessed($result) && $result->isa('Future')) ? $result
+            :                                                Future->fail($result);
     }
-
-    return $result;
+    foreach        => [grep { defined } @$hooks],
+        concurrent => 1;
+    return $result_f;
 }
 
 sub dispatch {

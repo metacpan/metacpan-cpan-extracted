@@ -1,7 +1,5 @@
 package Workflow::Action::InputField;
 
-# $Id$
-
 use warnings;
 use strict;
 use base qw( Class::Accessor );
@@ -9,7 +7,7 @@ use Log::Log4perl qw( get_logger );
 use Workflow::Exception qw( configuration_error );
 use English qw( -no_match_vars );
 
-$Workflow::Action::InputField::VERSION = '1.42';
+$Workflow::Action::InputField::VERSION = '1.43';
 
 my @PROPS = qw( name label description type requirement
     source_class source_list class );
@@ -126,7 +124,7 @@ This documentation describes version 1.09 of this package
 =head1 SYNOPSIS
 
  # Declare the fields needed by your action in the configuration...
- 
+
  <action name="CreateUser">
     <field name="username"
            is_required="yes"

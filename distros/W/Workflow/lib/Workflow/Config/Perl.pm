@@ -1,7 +1,5 @@
 package Workflow::Config::Perl;
 
-# $Id$
-
 use warnings;
 use strict;
 use base qw( Workflow::Config );
@@ -10,7 +8,7 @@ use Workflow::Exception qw( configuration_error );
 use Data::Dumper qw( Dumper );
 use English qw( -no_match_vars );
 
-$Workflow::Config::Perl::VERSION = '1.42';
+$Workflow::Config::Perl::VERSION = '1.43';
 
 sub parse {
     my ( $self, $type, @items ) = @_;
@@ -114,7 +112,7 @@ This documentation describes version 1.03 of this package
  # either of these is acceptable
  my $parser = Workflow::Config->new( 'perl' );
  my $parser = Workflow::Config->new( 'pl' );
- 
+
  my $conf = $parser->parse( 'condition',
                             'my_conditions.pl', 'your_conditions.perl' );
 

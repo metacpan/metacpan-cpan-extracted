@@ -1,5 +1,12 @@
 Revision history for App-VTide
 
+0.1.3   2017-06-04
+        Updating for release of version 0.1.3
+        turning off tests (Ivan Wills)
+        Trying to get more informative error messages (Ivan Wills)
+        Better command display (Ivan Wills)
+        Added examples (Ivan Wills)
+
 0.1.2   2017-05-21
         Updating for release of version 0.1.2
         Checking history file created (Ivan Wills)

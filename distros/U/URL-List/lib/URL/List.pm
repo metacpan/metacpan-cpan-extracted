@@ -12,7 +12,7 @@ Version 0.13
 
 =cut
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Carp;
 use Domain::PublicSuffix;
@@ -94,7 +94,7 @@ has 'urls'             => ( isa => 'ArrayRef[Str]', is => 'rw', default => sub {
 
 sub _add {
     my $self = shift;
-    my $url  = shift // '';
+    my $url  = shift || '';
 
     if ( length $url ) {
         if ( my $uri = URI->new($url) ) {
@@ -441,7 +441,7 @@ __PACKAGE__->meta->make_immutable;
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012-2016 Tore Aursand.
+Copyright 2012-2017 Tore Aursand.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

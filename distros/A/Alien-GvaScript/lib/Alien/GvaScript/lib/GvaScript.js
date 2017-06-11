@@ -13,7 +13,7 @@
  *--------------------------------------------------------------------------*/
 
 var GvaScript = {
-  Version: '1.44',
+  Version: '1.45',
   REQUIRED_PROTOTYPE: '1.7',
   load: function() {
     function convertVersionString(versionString) {

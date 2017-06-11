@@ -1,0 +1,12 @@
+diff -u im.orig/src/libtiff/tiffiop.h im.new/src/libtiff/tiffiop.h
+--- im.orig/src/libtiff/tiffiop.h	2017-06-01 15:19:56.752324700 +0200
++++ im.new/src/libtiff/tiffiop.h	2017-06-01 15:35:20.446140300 +0200
+@@ -59,7 +59,7 @@
+ */
+ #endif
+ 
+-#if defined(WIN32) && !defined(__CYGWIN__)
++#if defined(WIN32) && !defined(__CYGWIN__) && !defined(__USE_MINGW_ANSI_STDIO)
+ #define snprintf _snprintf
+ #if _MSC_VER >= 1900 /* IMLIB vc14 */
+ #undef snprintf

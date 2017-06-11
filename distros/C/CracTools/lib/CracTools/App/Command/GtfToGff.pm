@@ -1,10 +1,11 @@
 package CracTools::App::Command::GtfToGff;
+
 {
   $CracTools::App::Command::GtfToGff::DIST = 'CracTools';
 }
 # ABSTRACT: Convert GFT2 files to GFF3 format
 # PODNAME: cractools gtftogff
-$CracTools::App::Command::GtfToGff::VERSION = '1.25';
+$CracTools::App::Command::GtfToGff::VERSION = '1.251';
 use CracTools::App -command;
 use CracTools::Output;
 
@@ -170,7 +171,7 @@ cractools gtftogff - Convert GFT2 files to GFF3 format
 
 =head1 VERSION
 
-version 1.25
+version 1.251
 
 =head1 SYNOPSIS
 

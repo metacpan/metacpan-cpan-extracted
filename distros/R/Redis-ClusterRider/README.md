@@ -63,7 +63,7 @@ For more information about Redis Cluster see here:
 - startup\_nodes => \\@nodes
 
     Specifies the list of startup nodes. Parameter should contain the array of
-    addresses of some nodes in the cluster. . The client will try to connect to
+    addresses of some nodes in the cluster. The client will try to connect to
     random node from the list to retrieve information about all cluster nodes and
     slots mapping. If the client could not connect to first selected node, it will
     try to connect to another random node from the list.

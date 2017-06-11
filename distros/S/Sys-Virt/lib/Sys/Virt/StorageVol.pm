@@ -141,17 +141,39 @@ Return the physical size in allocation
 
 =back
 
-=item $vol->download($st, $offset, $length);
+=item $vol->download($st, $offset, $length, $flags=0);
 
 Download data from C<$vol> using the stream C<$st>. If C<$offset>
 and C<$length> are non-zero, then restrict data to the specified
-volume byte range.
+volume byte range. The C<$flags> accept the following values:
 
-=item $vol->upload($st, $offset, $length);
+=over 4
+
+=item Sys::Virt::StorageVol::VOL_DOWNLOAD_SPARSE_STREAM
+
+If this flag is is set in @flags effective transmission of holes
+is enabled. This assumes using the stream C<$st> with combination of
+C<sparse_recv_all> or C<recv($flags =
+VIR_STREAM_RECV_STOP_AT_HOLE)> for honouring holes sent by server.
+
+=back
+
+=item $vol->upload($st, $offset, $length, $flags=0);
 
 Upload data to C<$vol> using the stream C<$st>. If C<$offset>
 and C<$length> are non-zero, then restrict data to the specified
-volume byte range.
+volume byte range. The C<$flags> accept the following values:
+
+=over 4
+
+=item Sys::Virt::StorageVol::VOL_UPLOAD_SPARSE_STREAM
+
+If this is set in C<$flags> effective transmission of holes is
+enabled. This assumes using the stream C<$st> with combination of
+C<sparse_send_all> or C<send_hole> to preserve source file
+sparseness.
+
+=back
 
 =back
 

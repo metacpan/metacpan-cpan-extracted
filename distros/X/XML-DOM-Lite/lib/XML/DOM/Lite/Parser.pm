@@ -1,4 +1,6 @@
 package XML::DOM::Lite::Parser;
+use warnings;
+use strict;
 
 use XML::DOM::Lite::Document;
 use XML::DOM::Lite::Node;
@@ -94,8 +96,8 @@ sub parseFile {
     }
     my $stream;
     {
-        open FH, $filename or
-            die "can't open file $filename for reading ".$!;
+        open FH, '<', $filename or
+            die "can't open file $filename for reading: $!";
         local $/ = undef;
         $stream = <FH>;
         close FH;
@@ -127,7 +129,7 @@ sub _handle_decl_node {
     my $kind;
     my $length = length($decl);
     my $start = 1;
-    $parent = $self->{stack}->[$#{$self->{stack}}];
+    my $parent = $self->{stack}->[$#{$self->{stack}}];
     substr($decl, 0, 4) eq '<!--' && do {
 	$start = 4;
 	$length = $length - $start - 3;
@@ -150,13 +152,13 @@ sub _handle_pi_node {
     my ($self, $pi) = @_;
     $pi =~ s/^<\?\S+//o;
     $pi =~ s/\?>$//so;
-    $parent = $self->{stack}->[$#{$self->{stack}}];
+    my $parent = $self->{stack}->[$#{$self->{stack}}];
     return $self->_mk_gen_node($pi, $parent, PROCESSING_INSTRUCTION_NODE);
 }
 
 sub _handle_text_node {
     my ($self, $text) = @_;
-    $parent = $self->{stack}->[$#{$self->{stack}}];
+    my $parent = $self->{stack}->[$#{$self->{stack}}];
     $text =~ s/^\n//so; return unless defined $text;
     return $self->_mk_gen_node($text, $parent, TEXT_NODE);
 }
@@ -245,9 +247,9 @@ sub _mk_text_node {
 sub _mk_element_node {
     my ($self, $elmnt, $parent) = @_;
 
-    ($tagName, $elmnt) = split(/\s+/, $elmnt, 2);
+    my($tagName, $elmnt2) = split(/\s+/, $elmnt, 2);
     $tagName =~ s/\/$//;
-    my $attrs = $self->_parse_attributes($elmnt);
+    my $attrs = $self->_parse_attributes($elmnt2);
     my $node = XML::DOM::Lite::Node->new({
 	nodeType   => ELEMENT_NODE,
 	attributes => $attrs,

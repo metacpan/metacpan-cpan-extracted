@@ -60,6 +60,19 @@
                 description => "set when there's no default path for the configuration file."
                 . "user will have to specify a configuration file with C<--file> option."
             },
+            require_backend_argument => {
+                type => 'leaf',
+                upstream_default => '0',
+                value_type => 'boolean',
+                description => "set when the application backend requires an argument passed "
+                . "as 3rd argument to cme, e.g. cme <cmd> <app> <backend_arg>."
+            },
+            backend_argument_info => {
+                type => 'leaf',
+                value_type => 'uniline',
+                description => "Short description of the backend argument. Used to generate error "
+                    ."message when user forgets to set the 3rd cme argument."
+            },
             config_dir => {
                 type => 'leaf',
                 value_type => 'uniline',

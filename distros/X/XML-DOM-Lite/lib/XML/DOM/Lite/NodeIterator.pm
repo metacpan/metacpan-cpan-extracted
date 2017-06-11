@@ -1,4 +1,6 @@
 package XML::DOM::Lite::NodeIterator;
+use warnings;
+use strict;
 
 use XML::DOM::Lite::Constants qw(:all);
 

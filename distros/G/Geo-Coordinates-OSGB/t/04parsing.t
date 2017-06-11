@@ -1,8 +1,8 @@
-# Toby Thurston -- 14 Jan 2016 
+# Toby Thurston -- 09 Jun 2017 
 
 # test grid ref parsing 
 
-use Test::More tests=>58;
+use Test::More tests=>61;
 
 use Geo::Coordinates::OSGB::Grid qw(
     parse_grid
@@ -57,6 +57,9 @@ is( parse_grid('B:OL43E 914 701'),   '391400 570100',   "scalar context: map Che
 is( parse_grid('B:OL43E','914701'),  '391400 570100',   "scalar context: map 2-arg Chesters Bridge");      
 is( parse_grid('B:OL43E',914,701),   '391400 570100',   "scalar context: map 3-arg Chesters Bridge");      
 is( parse_grid(164,513,62),          '451300 206200',   'scalar context: Carfax');                         
+is( parse_grid('B:OL43E'),           '380000 550000',   "scalar context: just the sheet, B series");
+is( parse_grid('A:82'),              '195000 530000',   "scalar context: just the sheet, A series");
+is( parse_grid('161'),               '309000 205000',   "scalar context: just the sheet, A series by default");
 
 is( parse_grid('B:119/OL3/480103'),      '448000 110300',   "scalar context: map with dual name");      
 is( parse_grid('B:309S.a 26432 34013'),   '226432 534013',   "scalar context: inset on B:309");      

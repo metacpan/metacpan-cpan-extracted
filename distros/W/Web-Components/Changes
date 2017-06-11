@@ -1,5 +1,8 @@
 Revision history for Web::Components
 
+0.10.1    2017-06-01 23:02:25
+          - Makes factory_args a public attribute
+
 0.9.1     2017-02-18 23:43:05
           - Toolchain update
           - Refactored controller routes in loader

@@ -1,7 +1,7 @@
 package DDG::Location;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: A location, can be empty (given by Geo::IP::Record)
-$DDG::Location::VERSION = '1016';
+$DDG::Location::VERSION = '1017';
 use Moo;
 
 my @geo_ip_record_attrs = qw( country_code country_code3 country_name region
@@ -64,7 +64,7 @@ DDG::Location - A location, can be empty (given by Geo::IP::Record)
 
 =head1 VERSION
 
-version 1016
+version 1017
 
 =head1 AUTHOR
 

@@ -80,7 +80,7 @@ sub drop {
             skip "Can't test error values if no error", 2 if defined $r;
 
             cmp_ok($!, '==', EINVAL, "errno set to EINVAL");
-            cmp_ok($^E, '==', $EXPECTED_E, "GetLastError returns ERROR_INVALID_INDEX");
+            cmp_ok($e, '==', $EXPECTED_E, "GetLastError returns ERROR_INVALID_INDEX");
         }
     }
     

@@ -1,5 +1,5 @@
 ---
-abstract: 'Perl wrapper for XGBoost library https://github.com/dmlc/xgboost'
+abstract: 'Perl wrapper for XGBoost library L<https://github.com/dmlc/xgboost>'
 author:
   - 'Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>'
 build_requires:
@@ -17,14 +17,17 @@ meta-spec:
   version: '1.4'
 name: AI-XGBoost
 requires:
+  Exception::Class: '0'
+  Exporter::Easy: '0'
+  FFI::Platypus: '0'
   NativeCall: '0'
   parent: '0'
-  perl: '5.008'
+  perl: '5.010'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/pablrod/p5-AI-XGBoost/issues
   homepage: https://github.com/pablrod/p5-AI-XGBoost
   repository: https://github.com/pablrod/p5-AI-XGBoost.git
-version: '0.001'
+version: '0.004'
 x_serialization_backend: 'YAML::Tiny version 1.69'

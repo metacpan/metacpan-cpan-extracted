@@ -57,8 +57,6 @@ padav		private array		ck_null		d0
 padhv		private hash		ck_null		d0
 padany		private value		ck_null		d0
 
-pushre		push regexp		ck_null		d/
-
 # References and stuff.
 
 rv2gv		ref-to-glob cast	ck_rvconst	ds1	
@@ -94,9 +92,8 @@ trans		transliteration (tr///)	ck_match	is"	S
 transr		transliteration (tr///)	ck_match	is"	S
 
 # Lvalue operators.
-# sassign is special-cased for op class
 
-sassign		scalar assignment	ck_sassign	s0
+sassign		scalar assignment	ck_sassign	s2	S S
 aassign		list assignment		ck_null		t2	L L
 
 chop		chop			ck_spair	mts%	L
@@ -165,12 +162,12 @@ scmp		string comparison (cmp)	ck_null		ifst2	S S
 bit_and		bitwise and (&)		ck_bitop	fst2	S S|
 bit_xor		bitwise xor (^)		ck_bitop	fst2	S S|
 bit_or		bitwise or (|)		ck_bitop	fst2	S S|
-nbit_and	numeric bitiwse and (&)	ck_bitop	fsT2	S S|
+nbit_and	numeric bitwise and (&)	ck_bitop	fsT2	S S|
 nbit_xor	numeric bitwise xor (^)	ck_bitop	fsT2	S S|
 nbit_or		numeric bitwise or (|)	ck_bitop	fsT2	S S|
-sbit_and	string bitiwse and (&)	ck_bitop	fst2	S S|
-sbit_xor	string bitwise xor (^)	ck_bitop	fst2	S S|
-sbit_or		string bitwise or (|)	ck_bitop	fst2	S S|
+sbit_and	string bitwise and (&.)	ck_bitop	fst2	S S|
+sbit_xor	string bitwise xor (^.)	ck_bitop	fst2	S S|
+sbit_or		string bitwise or (|.)	ck_bitop	fst2	S S|
 
 negate		negation (-)		ck_null		Ifst1	S
 i_negate	integer negation (-)	ck_null		ifst1	S
@@ -231,8 +228,8 @@ aslice		array slice		ck_null		m@	A L
 kvaslice	index/value array slice	ck_null		m@	A L
 
 aeach		each on array		ck_each		d%	A
-akeys		keys on array		ck_each		t%	A
 avalues		values on array		ck_each		dt%	A
+akeys		keys on array		ck_each		t%	A
 
 # Hashes.
 
@@ -254,7 +251,7 @@ multideref	array or hash lookup	ck_null		ds+
 
 unpack		unpack			ck_fun		u@	S S?
 pack		pack			ck_fun		fmst@	S L
-split		split			ck_split	t@	S S S
+split		split			ck_split	t/	S S S
 join		join or string		ck_join		fmst@	S L
 
 # List operators.
@@ -299,6 +296,9 @@ method		method lookup		ck_method	d.
 entersub	subroutine entry	ck_subr		dm1	L
 leavesub	subroutine exit		ck_null		1	
 leavesublv	lvalue subroutine return	ck_null		1	
+argcheck	check subroutine arguments	ck_null		+
+argelem		subroutine argument	ck_null		+
+argdefelem	subroutine argument default value	ck_null		|
 caller		caller			ck_fun		t%	S?
 warn		warn			ck_fun		imst@	L
 die		die			ck_fun		imst@	L
@@ -556,6 +556,7 @@ custom		unknown custom operator		ck_null		0
 
 # For CORE:: subs
 coreargs	CORE:: subroutine	ck_null		$	
+avhvswitch	Array/hash switch	ck_null		t1
 
 runcv		__SUB__			ck_null		s0
 

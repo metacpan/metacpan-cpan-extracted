@@ -11,7 +11,6 @@ WriteMakefile(
     VERSION_FROM       => 'lib/WWW/Google/UserAgent.pm',
     ABSTRACT_FROM      => 'lib/WWW/Google/UserAgent.pm',
     LICENSE            => 'artistic_2',
-    PL_FILES           => {},
     MIN_PERL_VERSION   => 5.006,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
@@ -33,15 +32,15 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'WWW::Google::UserAgent'            => { file => 'lib/WWW/Google/UserAgent.pm',           version => '0.20' },
-            'WWW::Google::UserAgent::DataTypes' => { file => 'lib/WWW/Google/UserAgent/DataTypes.pm', version => '0.20' },
-            'WWW::Google::UserAgent::Exception' => { file => 'lib/WWW/Google/UserAgent/Exception.pm', version => '0.20' },
+            'WWW::Google::UserAgent'            => { file => 'lib/WWW/Google/UserAgent.pm',           version => '0.21' },
+            'WWW::Google::UserAgent::DataTypes' => { file => 'lib/WWW/Google/UserAgent/DataTypes.pm', version => '0.21' },
+            'WWW::Google::UserAgent::Exception' => { file => 'lib/WWW/Google/UserAgent/Exception.pm', version => '0.21' },
         },
         resources => {
             repository => {
                 type => 'git',
-                url  => 'https://github.com/Manwar/WWW-Google-UserAgent.git',
-                web  => 'https://github.com/Manwar/WWW-Google-UserAgent',
+                url  => 'https://github.com/manwar/WWW-Google-UserAgent.git',
+                web  => 'https://github.com/manwar/WWW-Google-UserAgent',
             },
         }})
      : ()

@@ -1,9 +1,18 @@
+1.1.1 2017-06-01
+
+- Data::Radius v1.2.1 is required for test
+
+1.1.0 2017-05-30
+
+- Added destroy() method to fix socket leak
+  (Reported by Yuriy Zhilovets)
+
 1.0.2 2016-09-19
- 
+
  - Fixing Kwalitee warnings
 
 1.0.1 2016-09-19
- 
+
  - Fixing Kwalitee warnings
 
 1.0 2016-09-15

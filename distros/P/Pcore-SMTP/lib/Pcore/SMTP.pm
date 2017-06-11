@@ -1,7 +1,7 @@
-package Pcore::SMTP v0.2.1;
+package Pcore::SMTP v0.4.0;
 
 use Pcore -dist, -const, -class, -result;
-use Pcore::AE::Handle2;
+use Pcore::AE::Handle qw[:TLS_CTX];
 use Pcore::Util::Data qw[from_b64 to_b64];
 use Pcore::Util::Text qw[encode_utf8];
 use Authen::SASL;
@@ -11,6 +11,7 @@ has port     => ( is => 'ro', isa => PositiveInt, required => 1 );
 has username => ( is => 'ro', isa => Str,         required => 1 );
 has password => ( is => 'ro', isa => Str,         required => 1 );
 has tls      => ( is => 'ro', isa => Bool,        default  => 1 );
+has tls_ctx => ( is => 'ro', isa => Maybe [ HashRef | Enum [ $TLS_CTX_HIGH, $TLS_CTX_LOW ] ], default => $TLS_CTX_HIGH );
 
 const our $STATUS_REASON => {
     200 => q[(nonstandard success response, see rfc876)],
@@ -35,6 +36,7 @@ const our $STATUS_REASON => {
     504 => q[Command parameter not implemented],
     521 => q[<domain> does not accept mail (see rfc1846)],
     530 => q[Access denied (???a Sendmailism)],
+    535 => q[AUTH failed with the remote server],
     550 => q[Requested action not taken: mailbox unavailable],
     551 => q[User not local; please try <forward-path>],
     552 => q[Requested mail action aborted: exceeded storage allocation],
@@ -61,11 +63,12 @@ sub sendmail ( $self, @ ) {
     $args{cc}  = [ $args{cc} ]  if $args{cc}  and ref $args{cc} ne 'ARRAY';
     $args{bcc} = [ $args{bcc} ] if $args{bcc} and ref $args{bcc} ne 'ARRAY';
 
-    Pcore::AE::Handle2->new(
-        connect          => 'tcp://' . $self->host . q[:] . $self->port,
+    Pcore::AE::Handle->new(
+        connect          => 'smtp://' . $self->host . q[:] . $self->port,
         connect_timeout  => 10,
         timeout          => 10,
         persistent       => 0,
+        tls_ctx          => $self->{tls_ctx},
         on_connect_error => sub ( $h, $reason ) {
             $cb->( result [ 500, $reason ] );
 
@@ -491,20 +494,20 @@ sub _read_response ( $self, $h, $cb ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 45                   | Subroutines::ProhibitExcessComplexity - Subroutine "sendmail" with high complexity score (23)                  |
+## |    3 | 47                   | Subroutines::ProhibitExcessComplexity - Subroutine "sendmail" with high complexity score (23)                  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 157                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 160                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
-## |      | 418                  | * Private subroutine/method '_RSET' declared but not used                                                      |
-## |      | 426                  | * Private subroutine/method '_VRFY' declared but not used                                                      |
-## |      | 432                  | * Private subroutine/method '_NOOP' declared but not used                                                      |
+## |      | 421                  | * Private subroutine/method '_RSET' declared but not used                                                      |
+## |      | 429                  | * Private subroutine/method '_VRFY' declared but not used                                                      |
+## |      | 435                  | * Private subroutine/method '_NOOP' declared but not used                                                      |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 427                  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
+## |    3 | 430                  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 461, 463             | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
+## |    3 | 464, 466             | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 48                   | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
+## |    1 | 50                   | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

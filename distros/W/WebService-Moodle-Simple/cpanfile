@@ -12,7 +12,7 @@ requires 'JSON';
 requires 'Ouch';
 requires 'OptArgs';
 requires 'List::Util';
-requires 'Data::Dumper';
+requires 'Data::Dump';
 
 on test => sub {
     requires 'Test::More', '0.88';

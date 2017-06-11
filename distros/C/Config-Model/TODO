@@ -5,10 +5,18 @@ o [domi] Update compute so that a built-in value can also be computed. This
 
 o [domi] Filter element according to element in SimpleUI and TERMUI
 
-o [domi] Provide import/export of configuration data in free form XML
 
-o [domi] REmove Exception::Class. Does not behave well when a error is
-   throw within an external eval: error message in lost (seen with XML::Twig).
 
-* A web interface. May be a Webmin integration
+* Rework backends:
+
+- obsolete custom backend
+
+- move cds backend in C::M::Backend::Any child class
+
+- move perl backend in C::M::Backend::Any child class
+
+- Use the same backend object to read and write files
+   This need to move most parameters of read/write to object attributes
+
+- Migrate file handling to Path::Tiny
 

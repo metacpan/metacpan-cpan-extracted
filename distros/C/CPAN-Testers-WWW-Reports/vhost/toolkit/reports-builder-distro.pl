@@ -4,7 +4,7 @@ use strict;
 $|++;
 
 use vars qw($VERSION);
-$VERSION = '3.44';
+$VERSION = '3.59';
 
 =head1 NAME
 
@@ -48,10 +48,10 @@ Labyrinth::Variables::init();   # initial standard variable values
 Labyrinth::Globals::LoadSettings("$BASE/cgi-bin/config/settings.ini");
 Labyrinth::Globals::DBConnect();
 
-    SetLogFile( FILE   => '/var/www/reports/toolkit/audit1.log',
+    SetLogFile( FILE   => '/var/www/reports/toolkit/logs/builder-audit-distro.log',
                 USER   => 'labyrinth',
                 LEVEL  => 0,
-                CLEAR  => 1,
+                CLEAR  => 0,
                 CALLER => 1);
 
 my $content = Labyrinth::Plugin::Content->new();
@@ -75,7 +75,7 @@ __END__
 
 =head1 AUTHOR
 
-  Copyright (c) 2009 Barbie <barbie@cpan.org> Miss Barbell Productions.
+  Copyright (c) 2009-2017 Barbie <barbie@cpan.org> Miss Barbell Productions.
 
 =head1 LICENSE
 

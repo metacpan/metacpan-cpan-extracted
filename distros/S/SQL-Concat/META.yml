@@ -1,33 +1,49 @@
 ---
 abstract: 'SQL concatenator, only cares about bind-vars, to write SQL generator'
 author:
-  - 'KOBAYASHI, Hiroaki <hkoba@cpan.org>'
+  - 'Kobayasi, Hiroaki <hkoba @ cpan.org>'
 build_requires:
-  Module::Build::Pluggable::CPANfile: '0.05'
   Test::Kantan: '0.4'
   rlib: '0'
 configure_requires:
   Module::Build: '0'
   Module::Build::Pluggable: '0'
-  Module::Build::Pluggable::CPANfile: '0.05'
+  Module::Build::Tiny: '0.035'
   Module::CPANfile: '0'
   rlib: '0'
-dynamic_config: 1
-generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150001'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.11, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: SQL-Concat
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
 provides:
   SQL::Concat:
     file: lib/SQL/Concat.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   MOP4Import::Declare: '0.003'
   perl: '5.010'
   rlib: '0'
 resources:
-  license: http://dev.perl.org/licenses/
-  repository: https://github.com/hkoba/perl-SQL-Concat
-version: '0.001'
+  bugtracker: https://github.com/hkoba/perl-SQL-Concat/issues
+  homepage: https://github.com/hkoba/perl-SQL-Concat
+  repository: git://github.com/hkoba/perl-SQL-Concat.git
+version: '0.002'
+x_authority: cpan:HKOBA
+x_contributors:
+  - 'KOBAYASI, Hiroaki <hkoba@ssri.com>'
+  - 'Kobayasi, Hiroaki <buribullet@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

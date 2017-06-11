@@ -1,6 +1,6 @@
 package Method::ParamValidator::Exception;
 
-$Method::ParamValidator::Exception::VERSION   = '0.10';
+$Method::ParamValidator::Exception::VERSION   = '0.11';
 $Method::ParamValidator::Exception::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Method::ParamValidator::Exception - Handles 'exception' for Method::ParamValidat
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
@@ -23,10 +23,8 @@ with 'Throwable';
 
 use overload q{""} => 'as_string', fallback => 1;
 
-has method   => (is => 'ro', required => 1);
-has filename => (is => 'ro', required => 1);
-has line     => (is => 'ro', required => 1);
-has field    => (is => 'ro', default  => sub { '' });
+has [ qw(method filename line) ] => (is => 'ro', required => 1);
+has field => (is => 'ro', default  => sub { '' });
 
 sub as_string {
     my ($self) = @_;

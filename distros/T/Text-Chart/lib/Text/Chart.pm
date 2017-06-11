@@ -1,7 +1,7 @@
 package Text::Chart;
 
-our $DATE = '2015-01-03'; # DATE
-our $VERSION = '0.02'; # VERSION
+our $DATE = '2017-06-01'; # DATE
+our $VERSION = '0.03'; # VERSION
 
 use 5.010001;
 use strict;
@@ -31,12 +31,22 @@ our @CHART_TYPES = (
 my @sparkline_chars  = split //, '▁▂▃▄▅▆▇█';
 my @hsparkline_chars = split //, '▏▎▍▌▋▊▉█';
 
+sub _get_column_data {
+    my ($tbl, $col) = @_;
+    my $res = $tbl->select_as_aoaos([$col]);
+    my $coldata = [];
+    for (@{ $res->{data} }) {
+        push @$coldata, $_->[0];
+    }
+    $coldata;
+}
+
 sub _find_first_numcol {
     my $tbl = shift;
 
   COL:
-    for my $col (@{ $tbl->columns }) {
-        my $coldata = $tbl->column_data($col);
+    for my $col (@{ $tbl->cols_by_idx }) {
+        my $coldata = _get_column_data($tbl, $col);
         my $is_numeric = 1;
         for (1..10) {
             last if $_ > @$coldata;
@@ -54,8 +64,8 @@ sub _find_first_nonnumcol {
     my $tbl = shift;
 
   COL:
-    for my $col (@{ $tbl->columns }) {
-        my $coldata = $tbl->column_data($col);
+    for my $col (@{ $tbl->cols_by_idx }) {
+        my $coldata = _get_column_data($tbl, $col);
         my $is_nonnum = 1;
         for (1..10) {
             last if $_ > @$coldata;
@@ -195,7 +205,7 @@ sub gen_text_chart {
     if ($type eq 'sparkline') {
         $chart_height //= 1;
         for my $col (@data_columns) {
-            my $coldata = [map {$_//0} @{ $tbl->column_data($col) }];
+            my $coldata = [map {$_//0} @{ _get_column_data($tbl, $col) }];
             my @dbuf = ( (" " x @$coldata) . "\n" ) x $chart_height;
             my ($min, $max) = minmax(@$coldata);
             my @heights;
@@ -249,7 +259,7 @@ Text::Chart - Generate text-based chart
 
 =head1 VERSION
 
-This document describes version 0.02 of Text::Chart (from Perl distribution Text-Chart), released on 2015-01-03.
+This document describes version 0.03 of Text::Chart (from Perl distribution Text-Chart), released on 2017-06-01.
 
 =head1 SYNOPSIS
 
@@ -340,9 +350,15 @@ This module lets you generate text-based charts.
 =head1 FUNCTIONS
 
 
-=head2 gen_text_chart(%args) -> str
+=head2 gen_text_chart
+
+Usage:
+
+ gen_text_chart(%args) -> str
 
 Generate text-based chart.
+
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
@@ -401,6 +417,7 @@ Chart type.
 =back
 
 Return value:  (str)
+
 =head1 FAQ
 
 =head2 Why am I getting 'Wide character in print/say' warning?
@@ -409,17 +426,6 @@ You are probably printing Unicode characters to STDOUT without doing something
 like this beforehand:
 
  binmode(STDOUT, ":utf8");
-
-=head1 SEE ALSO
-
-L<Text::Graph>, a mature CPAN module for doing text-based graphs. Before writing
-Text::Chart I used this module for a while, but ran into the problem of weird
-generated graphs. In addition, I don't like the way Text::Graph draws things,
-e.g. a data value of 1 is drawn as zero-width bar, or the label separator C<:>
-is always drawn. So I decided to write an alternative charting module instead.
-Compared to Text::Graph, here are the things I want to add or do differently as
-well: functional (non-OO) interface, colors, Unicode, resampling, more chart
-types like sparkline, animation and some interactivity (perhaps).
 
 =head1 HOMEPAGE
 
@@ -437,13 +443,26 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Text::Graph>, a mature CPAN module for doing text-based graphs. Before writing
+Text::Chart I used this module for a while, but ran into the problem of weird
+generated graphs. In addition, I don't like the way Text::Graph draws things,
+e.g. a data value of 1 is drawn as zero-width bar, or the label separator C<:>
+is always drawn. So I decided to write an alternative charting module instead.
+Compared to Text::Graph, here are the things I want to add or do differently as
+well: functional (non-OO) interface, colors, Unicode, resampling, more chart
+types like sparkline, animation and some interactivity (perhaps).
+
+L<App::tchart>, a CLI for Text::Chart.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

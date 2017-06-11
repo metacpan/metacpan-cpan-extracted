@@ -5,7 +5,7 @@ use File::Spec;
 use FindBin;
 use File::Path; # core
 use Test::More;
-use Test::RequiresInternet 'api.metacpan.org' => 80, 'cpan.metacpan.org' => 80, 'backpan.perl.org' => 80;
+use Test::RequiresInternet 'fastapi.metacpan.org' => 443, 'cpan.metacpan.org' => 80, 'backpan.perl.org' => 80;
 
 my $cpan_dir = File::Spec->catdir($FindBin::Bin, "testcpan");
 rmtree($cpan_dir);

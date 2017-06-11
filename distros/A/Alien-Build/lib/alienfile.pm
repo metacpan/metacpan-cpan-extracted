@@ -10,10 +10,10 @@ use Carp ();
 sub _path { Path::Tiny::path(@_) }
 
 # ABSTRACT: Specification for defining an external dependency for CPAN
-our $VERSION = '0.36'; # VERSION
+our $VERSION = '0.41'; # VERSION
 
 
-our @EXPORT = qw( requires on plugin probe configure share sys download fetch decode prefer extract patch build gather meta_prop );
+our @EXPORT = qw( requires on plugin probe configure share sys download fetch decode prefer extract patch patch_ffi build build_ffi gather gather_ffi meta_prop ffi );
 
 
 sub requires
@@ -191,7 +191,19 @@ sub patch
   my($instr) = @_;
   _in_phase 'share';
   my $caller = caller;
-  $caller->meta->register_hook(patch => $instr);
+  my $suffix = $caller->meta->{build_suffix};
+  $caller->meta->register_hook("patch$suffix" => $instr);
+  return;
+}
+
+
+sub patch_ffi
+{
+  my($instr) = @_;
+  Carp::carp("patch_ffi is deprecated, use ffi { patch ... } } instead");
+  _in_phase 'share';
+  my $caller = caller;
+  $caller->meta->register_hook(patch_ffi => $instr);
   return;
 }
 
@@ -201,7 +213,19 @@ sub build
   my($instr) = @_;
   _in_phase 'share';
   my $caller = caller;
-  $caller->meta->register_hook(build => $instr);
+  my $suffix = $caller->meta->{build_suffix};
+  $caller->meta->register_hook("build$suffix" => $instr);
+  return;
+}
+
+
+sub build_ffi
+{
+  my($instr) = @_;
+  Carp::carp("build_ffi is deprecated, use ffi { build ... } } instead");
+  _in_phase 'share';
+  my $caller = caller;
+  $caller->meta->register_hook(build_ffi => $instr);
   return;
 }
 
@@ -214,9 +238,39 @@ sub gather
   my $phase = $meta->{phase};
   Carp::croak "gather is not allowed in configure block"
     if $phase eq 'configure';
-  $meta->register_hook(gather_system => $instr) if $phase =~ /^(any|system)$/;
-  $meta->register_hook(gather_share => $instr)  if $phase =~ /^(any|share)$/;
-  return;;
+  my $suffix = $caller->meta->{build_suffix};
+  if($suffix eq '_ffi')
+  {
+    $meta->register_hook(gather_ffi => $instr)
+  }
+  else
+  {
+    $meta->register_hook(gather_system => $instr) if $phase =~ /^(any|system)$/;
+    $meta->register_hook(gather_share => $instr)  if $phase =~ /^(any|share)$/;
+  }
+  return;
+}
+
+
+sub gather_ffi
+{
+  my($instr) = @_;
+  Carp::carp("gather_ffi is deprecated, use ffi { gather ... } } instead");
+  _in_phase 'share';
+  my $caller = caller;
+  $caller->meta->register_hook(gather_ffi => $instr);
+  return;
+}
+
+
+sub ffi (&)
+{
+  my($code) = @_;
+  _in_phase 'share';
+  my $caller = caller;
+  local $caller->meta->{build_suffix} = '_ffi';
+  $code->();
+  return;
 }
 
 
@@ -249,7 +303,7 @@ alienfile - Specification for defining an external dependency for CPAN
 
 =head1 VERSION
 
-version 0.36
+version 0.41
 
 =head1 SYNOPSIS
 
@@ -481,6 +535,18 @@ code reference, or a command list.
 Instructions for the patch stage.  May be either a
 code reference, or a command list.
 
+=head2 patch_ffi
+
+ share {
+   patch_ffi \&code;
+   patch_ffi \@commandlist;
+ };
+
+[DEPRECATED]
+
+Instructions for the patch_ffi stage.  May be either a
+code reference, or a command list.
+
 =head2 build
 
  share {
@@ -490,6 +556,19 @@ code reference, or a command list.
 
 Instructions for the build stage.  May be either a
 code reference, or a command list.
+
+=head2 build_ffi
+
+ share {
+   build \&code;
+   build \@commandlist;
+ };
+
+[DEPRECATED]
+
+Instructions for the build FFI stage.  Builds shared libraries instead of static.
+This is optional, and is only necessary if a fresh and separate build needs to be
+done for FFI.
 
 =head2 gather
 
@@ -510,6 +589,32 @@ Instructions for the gather stage.  May be either a code reference, or a command
 In the root block of the alienfile it will trigger in both share and system build.
 In the share or sys block it will only trigger in the corresponding build.
 
+=head2 gather_ffi
+
+ share {
+   gather_ffi \&code;
+   gather_ffi \@commandlist;
+ }
+
+[DEPRECATED]
+
+Gather specific to C<build_ffi>.  Not usually necessary.
+
+=head2 ffi
+
+ share {
+   ffi {
+     patch \&code;
+     patch \@commandlist;
+     build \&code;
+     build \@commandlist;
+     gather \&code;
+     gather \@commandlist;
+   }
+ }
+
+Specify patch, build or gather stages related to FFI.
+
 =head2 meta_prop
 
  my $hash = meta_prop;
@@ -528,7 +633,11 @@ L<Alien::Build>, L<Alien::Build::MM>, L<Alien::Base>
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Diab Jerius (DJERIUS)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -11,11 +11,11 @@ use warnings;
 
 =head1 VERSION
 
-version  0.012 but see version at the end of MYMETA.yml to check that I'm correct here...
+version  0.013 but see version at the end of MYMETA.yml to check that I'm correct here...
 
 =cut
 
-our $VERSION     = '0.012';
+our $VERSION     = '0.013';
 $VERSION = eval $VERSION;
 
 1;

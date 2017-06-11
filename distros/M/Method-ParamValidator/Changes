@@ -1,5 +1,8 @@
 Revision history for Method::ParamValidator
 
+0.11   Wed Jun 07 10:00:00 2017
+       - Tidied up attribute definitions.
+
 0.10   Fri May 05 11:25:00 2017
        - Added support to field, can now have more than one value,
          issue #2, raised against WWW::Google::Places.

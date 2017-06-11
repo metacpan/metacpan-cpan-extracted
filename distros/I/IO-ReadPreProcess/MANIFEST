@@ -64,6 +64,8 @@ t/Tests/3_include_6.want
 t/Tests/3_include_7.input
 t/Tests/3_include_7.pl
 t/Tests/3_include_7.want
+t/Tests/3_include_8.input
+t/Tests/3_include_8.want
 t/Tests/4_sub_10.input
 t/Tests/4_sub_10.want
 t/Tests/4_sub_1.input
@@ -132,6 +134,8 @@ t/Tests/7_condDir_7.want
 t/Tests/7_condDir_8.inc
 t/Tests/7_condDir_8.input
 t/Tests/7_condDir_8.want
+t/Tests/7_condDir_9.input
+t/Tests/7_condDir_9.want
 t/Tests/8_test_1.input
 t/Tests/8_test_1.want
 t/Examples/Hacks
@@ -145,5 +149,3 @@ t/Examples/tin5
 t/Examples/tin6
 t/Examples/tin7
 t/Examples/tin9
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

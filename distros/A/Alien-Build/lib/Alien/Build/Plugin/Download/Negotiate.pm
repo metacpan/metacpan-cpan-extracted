@@ -7,7 +7,7 @@ use Module::Load ();
 use Carp ();
 
 # ABSTRACT: Download negotiation plugin
-our $VERSION = '0.36'; # VERSION
+our $VERSION = '0.41'; # VERSION
 
 
 has '+url' => sub { Carp::croak "url is a required property" };
@@ -112,7 +112,7 @@ Alien::Build::Plugin::Download::Negotiate - Download negotiation plugin
 
 =head1 VERSION
 
-version 0.36
+version 0.41
 
 =head1 SYNOPSIS
 
@@ -168,7 +168,11 @@ L<Alien::Build>, L<alienfile>, L<Alien::Build::MM>, L<Alien>
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Diab Jerius (DJERIUS)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -2,7 +2,7 @@ package Plack::App::Catmandu::Bag;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.01';
+our $VERSION = '0.0101';
 
 use parent 'Plack::Component';
 use Catmandu;
@@ -32,16 +32,16 @@ sub _build_router {
         $router->connect(
             '/{id}/versions',
             {action => 'version_list'},
-            {method => 'GET'}
+            {method => ['GET', 'HEAD']},
         );
         $router->connect(
             '/{id}/versions/{version}',
             {action => 'version_show'},
-            {method => 'GET'}
+            {method => ['GET', 'HEAD']},
         );
     }
-    $router->connect('/',     {action => 'list'}, {method => 'GET'});
-    $router->connect('/{id}', {action => 'show'}, {method => 'GET'});
+    $router->connect('/',     {action => 'list'}, {method => ['GET', 'HEAD']});
+    $router->connect('/{id}', {action => 'show'}, {method => ['GET', 'HEAD']});
     $router;
 }
 
@@ -117,13 +117,14 @@ sub call {
 }
 
 1;
+
 __END__
 
 =encoding utf-8
 
 =head1 NAME
 
-Plack::App::Catmandu::Bag - Plack application that wraps a REST API around a Catmandu::Bag
+Plack::App::Catmandu::Bag - Wrap a REST API around a Catmandu::Bag
 
 =head1 SYNOPSIS
 

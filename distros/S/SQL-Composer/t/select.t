@@ -87,7 +87,7 @@ subtest 'build with where' => sub {
 
     my $sql = $expr->to_sql;
     is $sql,
-      'SELECT `table`.`a`,`table`.`b` FROM `table` WHERE `table`.`a` = ?';
+      'SELECT `table`.`a`,`table`.`b` FROM' . ' `table` WHERE `table`.`a` = ?';
 
     my @bind = $expr->to_bind;
     is_deeply \@bind, ['b'];
@@ -101,7 +101,8 @@ subtest 'build with group_by' => sub {
     );
 
     my $sql = $expr->to_sql;
-    is $sql, 'SELECT `table`.`a`,`table`.`b` FROM `table` GROUP BY `table`.`a`';
+    is $sql,
+      'SELECT `table`.`a`,`table`.`b`' . ' FROM `table` GROUP BY `table`.`a`';
 
     my @bind = $expr->to_bind;
     is_deeply \@bind, [];
@@ -115,7 +116,7 @@ subtest 'build with group_by as is' => sub {
     );
 
     my $sql = $expr->to_sql;
-    is $sql, 'SELECT `table`.`a`,`table`.`b` FROM `table` GROUP BY a';
+    is $sql, 'SELECT `table`.`a`,`table`.`b`' . ' FROM `table` GROUP BY a';
 
     my @bind = $expr->to_bind;
     is_deeply \@bind, [];
@@ -141,11 +142,13 @@ subtest 'build with group_by and having' => sub {
         from     => 'table',
         columns  => ['a', 'b'],
         group_by => 'a',
-        having => [c => 1]
+        having   => [c => 1]
     );
 
     my $sql = $expr->to_sql;
-    is $sql, 'SELECT `table`.`a`,`table`.`b` FROM `table` GROUP BY `table`.`a` HAVING `table`.`c` = ?';
+    is $sql,
+      'SELECT `table`.`a`,`table`.`b` FROM `table`'
+      . ' GROUP BY `table`.`a` HAVING `table`.`c` = ?';
 
     my @bind = $expr->to_bind;
     is_deeply \@bind, [1];
@@ -173,7 +176,8 @@ subtest 'build with order by' => sub {
     );
 
     my $sql = $expr->to_sql;
-    is $sql, 'SELECT `table`.`a`,`table`.`b` FROM `table` ORDER BY `table`.`foo`';
+    is $sql,
+      'SELECT `table`.`a`,`table`.`b` FROM `table`' . ' ORDER BY `table`.`foo`';
 
     my @bind = $expr->to_bind;
     is_deeply \@bind, [];
@@ -188,7 +192,8 @@ subtest 'build with order by with order type' => sub {
 
     my $sql = $expr->to_sql;
     is $sql,
-      'SELECT `table`.`a`,`table`.`b` FROM `table` ORDER BY `table`.`foo` DESC';
+      'SELECT `table`.`a`,`table`.`b` FROM `table`'
+      . ' ORDER BY `table`.`foo` DESC';
 
     my @bind = $expr->to_bind;
     is_deeply \@bind, [];
@@ -203,7 +208,8 @@ subtest 'build with order by multi' => sub {
 
     my $sql = $expr->to_sql;
     is $sql,
-'SELECT `table`.`a`,`table`.`b` FROM `table` ORDER BY `table`.`foo` DESC,`table`.`bar` ASC';
+      'SELECT `table`.`a`,`table`.`b` FROM `table`'
+      . ' ORDER BY `table`.`foo` DESC,`table`.`bar` ASC';
 
     my @bind = $expr->to_bind;
     is_deeply \@bind, [];
@@ -217,7 +223,8 @@ subtest 'build with order by ignoring invalid order type' => sub {
     );
 
     my $sql = $expr->to_sql;
-    is $sql, 'SELECT `table`.`a`,`table`.`b` FROM `table` ORDER BY `table`.`foo`';
+    is $sql,
+      'SELECT `table`.`a`,`table`.`b` FROM `table`' . ' ORDER BY `table`.`foo`';
 
     my @bind = $expr->to_bind;
     is_deeply \@bind, [];
@@ -231,7 +238,9 @@ subtest 'build with order by with as is order type' => sub {
     );
 
     my $sql = $expr->to_sql;
-    is $sql, 'SELECT `table`.`a`,`table`.`b` FROM `table` ORDER BY `table`.`foo` DESC NULLS LAST';
+    is $sql,
+      'SELECT `table`.`a`,`table`.`b` FROM `table`'
+      . ' ORDER BY `table`.`foo` DESC NULLS LAST';
 
     my @bind = $expr->to_bind;
     is_deeply \@bind, [];
@@ -323,6 +332,21 @@ subtest 'build with limit and offset 0' => sub {
     is_deeply \@bind, [];
 };
 
+subtest 'build with invalid limit' => sub {
+    my $expr = SQL::Composer::Select->new(
+        from    => 'table',
+        columns => ['a', 'b'],
+        limit   => 'injection',
+        offset  => 'injection'
+    );
+
+    my $sql = $expr->to_sql;
+    is $sql, 'SELECT `table`.`a`,`table`.`b` FROM `table` LIMIT 0 OFFSET 0';
+
+    my @bind = $expr->to_bind;
+    is_deeply \@bind, [];
+};
+
 subtest 'build with join' => sub {
     my $expr = SQL::Composer::Select->new(
         from    => 'table',
@@ -332,7 +356,8 @@ subtest 'build with join' => sub {
 
     my $sql = $expr->to_sql;
     is $sql,
-'SELECT `table`.`a`,`table2`.`b` FROM `table` JOIN `table2` ON `table`.`a` = ?';
+      'SELECT `table`.`a`,`table2`.`b` FROM `table`'
+      . ' JOIN `table2` ON `table`.`a` = ?';
 
     my @bind = $expr->to_bind;
     is_deeply \@bind, ['1'];
@@ -355,7 +380,8 @@ subtest 'build with join with alias' => sub {
 
     my $sql = $expr->to_sql;
     is $sql,
-'SELECT `table`.`a`,`new_table2`.`b` FROM `table` JOIN `table2` AS `new_table2` ON `table`.`a` = ?';
+      'SELECT `table`.`a`,`new_table2`.`b` FROM `table`'
+      . ' JOIN `table2` AS `new_table2` ON `table`.`a` = ?';
 
     my @bind = $expr->to_bind;
     is_deeply \@bind, ['1'];
@@ -378,7 +404,8 @@ subtest 'build with join and prefix' => sub {
 
     my $sql = $expr->to_sql;
     is $sql,
-'SELECT `table`.`a`,`new_table2`.`b` FROM `table` JOIN `table2` AS `new_table2` ON `table`.`a` = ?';
+      'SELECT `table`.`a`,`new_table2`.`b` FROM `table`'
+      . ' JOIN `table2` AS `new_table2` ON `table`.`a` = ?';
 
     my @bind = $expr->to_bind;
     is_deeply \@bind, ['1'];
@@ -399,7 +426,8 @@ subtest 'build with multiple joins' => sub {
 
     my $sql = $expr->to_sql;
     is $sql,
-'SELECT `table`.`a`,`table`.`b` FROM `table` JOIN `table2` ON `table`.`a` = ? JOIN `table3` ON `table`.`c` = ?';
+      'SELECT `table`.`a`,`table`.`b` FROM `table`'
+      . ' JOIN `table2` ON `table`.`a` = ? JOIN `table3` ON `table`.`c` = ?';
 
     my @bind = $expr->to_bind;
     is_deeply \@bind, ['b', 'd'];
@@ -427,7 +455,8 @@ subtest 'build with deep joins' => sub {
 
     my $sql = $expr->to_sql;
     is $sql,
-'SELECT `table`.`a`,`table2`.`b`,`table3`.`c` FROM `table` JOIN `table2` ON `table2`.`a` = ? JOIN `table3` ON `table3`.`b` = ?';
+      'SELECT `table`.`a`,`table2`.`b`,`table3`.`c` FROM `table`'
+      . ' JOIN `table2` ON `table2`.`a` = ? JOIN `table3` ON `table3`.`b` = ?';
 
     my @bind = $expr->to_bind;
     is_deeply \@bind, ['1', '2'];
@@ -460,7 +489,8 @@ subtest 'build with deep joins and as' => sub {
 
     my $sql = $expr->to_sql;
     is $sql,
-'SELECT `table`.`a`,`second`.`b`,`third`.`c` FROM `table` JOIN `table2` AS `second` ON `second`.`a` = ? JOIN `table3` AS `third` ON `third`.`b` = ?';
+      'SELECT `table`.`a`,`second`.`b`,`third`.`c` FROM `table`'
+      . ' JOIN `table2` AS `second` ON `second`.`a` = ? JOIN `table3` AS `third` ON `third`.`b` = ?';
 
     my @bind = $expr->to_bind;
     is_deeply \@bind, ['1', '2'];
@@ -495,7 +525,8 @@ subtest 'build with deep joins and as and rel_name' => sub {
 
     my $sql = $expr->to_sql;
     is $sql,
-'SELECT `table`.`a`,`second`.`b`,`third`.`c` FROM `table` JOIN `table2` AS `second` ON `second`.`a` = ? JOIN `table3` AS `third` ON `third`.`b` = ?';
+      'SELECT `table`.`a`,`second`.`b`,`third`.`c` FROM `table`'
+      . ' JOIN `table2` AS `second` ON `second`.`a` = ? JOIN `table3` AS `third` ON `third`.`b` = ?';
 
     my @bind = $expr->to_bind;
     is_deeply \@bind, ['1', '2'];

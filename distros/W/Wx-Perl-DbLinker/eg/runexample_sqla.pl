@@ -10,7 +10,8 @@ Log::Log4perl->easy_init($DEBUG);
 use Forms::Langues;
 use DataAccess::Sqla::Service;
 #use Devel::Cycle;
-
+use Log::Any::Adapter;
+Log::Any::Adapter->set('Log::Log4perl');
 sub get_dbh {
     my $dbfile = shift;
     my $dbh    = DBI->connect(

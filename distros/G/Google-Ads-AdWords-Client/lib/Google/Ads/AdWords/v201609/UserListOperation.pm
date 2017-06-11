@@ -72,7 +72,7 @@ Google::Ads::AdWords::v201609::UserListOperation
 Perl data type class for the XML Schema defined complexType
 UserListOperation from the namespace https://adwords.google.com/api/adwords/rm/v201609.
 
-UserList operations for adding/updating UserList entities. 
+UserList operations for adding/updating UserList entities. The following {@link Operator}s are supported: ADD and SET. The REMOVE operator is not supported. 
 
 
 

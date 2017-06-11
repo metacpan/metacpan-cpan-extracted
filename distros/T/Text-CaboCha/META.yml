@@ -1,0 +1,44 @@
+---
+abstract: 'Alternate Interface To libcabocha'
+author:
+  - 'Kei Kamikawa <x00.x7f@gmail.com>  '
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Cwd::Guard: '0'
+  Devel::CheckLib: '0'
+  File::Which: '0'
+  Module::Build: '0.4005'
+  Module::Build::XSUtil: '0.03'
+  parent: '0'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.11, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-CaboCha
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Text::CaboCha:
+    file: lib/Text/CaboCha.pm
+    version: '0.05'
+resources:
+  bugtracker: https://github.com/Code-Hex/Text-CaboCha/issues
+  homepage: https://github.com/Code-Hex/Text-CaboCha
+  repository: git://github.com/Code-Hex/Text-CaboCha.git
+version: '0.05'
+x_authority: cpan:CODEHEX
+x_contributors:
+  - 'Shoichi Kaji <skaji@cpan.org>'
+  - 'K <Code-Hex@users.noreply.github.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

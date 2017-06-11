@@ -1,4 +1,4 @@
-# Toby Thurston -- 14 Feb 2016 
+# Toby Thurston -- 09 Jun 2017 
 # Plot a nice picture of a series of maps
 
 use strict;
@@ -14,7 +14,7 @@ use File::Temp;
 use File::Spec;
 use Carp;
 
-our $VERSION = '2.16';
+our $VERSION = '2.17';
 
 =pod
 
@@ -29,14 +29,9 @@ provided by L<Geo::Coordinates::OSGB::Maps>.
 
 =head1 SYNOPSIS
 
-This programme shows off several features of L<Geo::Coordinates::OSGB>.
-
   perl plot_maps.pl --series A --paper A3 --outfile some.pdf 
-                    --[no]grid --[no]graticule --[no]towns --[no]ostn --[no]coast
-
-If you have a working TeXLive installation with GhostScript installed,
-you can use it to produce PDF index maps of the various map series
-provided by L<Geo::Coordinates::OSGB::Maps>.
+                    --[no]grid --[no]graticule --[no]towns 
+                    --[no]ostn --[no]coast
 
 =head1 OPTIONS
 
@@ -104,7 +99,7 @@ This section describes how L<Geo::Coordinates::OSGB> functions are used.
 =head2 Converting longitude and latitude to grid
 
 Since the output consists of the whole country formatted for an A4 or A3 page
-and thin line on the page will represent a distance of at least 500 m on the
+a thin line on the page will represent a distance of at least 500 m on the
 ground so the C<ll_to_grid_helmert> routine gives all the accuracy we need.
 
 The coast line shapes also include points outside the OSTN02 area; this is another reason 
@@ -138,7 +133,7 @@ through C< ... map { $_/$scale } ... >.
 =head2 Working with the map data
 
 The implementation of C<Geo::Coordinates::OSGB::Maps> is experimental and may change 
-significantly in future releases.  Possibly the exist hash exports will be replaced
+significantly in future releases.  Possibly the hash exports will be replaced
 by a more sophisticated object-oriented interface.
 In the mean while, this programme shows how to use the current map data.
 
@@ -271,6 +266,8 @@ my %color_for = (
     A => '(224/255,36/255,114/255)', # Landranger pink
     B => '(221/255,61/255, 31/255)', # Explorer orange
     C => '(228/255, 0, 28/255)',     # Seventh series red
+    H => '(128/255, 4/255, 36/255)', # Harvey dark red
+    J => '(128/255, 4/255, 36/255)', # Harvey dark red
 );
 
 # open a tempory file for MP

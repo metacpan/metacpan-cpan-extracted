@@ -1019,6 +1019,26 @@ convert_enum_to_sv (class, const gchar *package, gint n)
     OUTPUT:
 	RETVAL
 
+gint
+convert_sv_to_flags (class, const gchar *package, SV *sv)
+    PREINIT:
+	GType gtype;
+    CODE:
+	gtype = gperl_type_from_package (package);
+	RETVAL = gperl_convert_flags (gtype, sv);
+    OUTPUT:
+	RETVAL
+
+SV *
+convert_flags_to_sv (class, const gchar *package, gint n)
+    PREINIT:
+	GType gtype;
+    CODE:
+	gtype = gperl_type_from_package (package);
+	RETVAL = gperl_convert_back_flags (gtype, n);
+    OUTPUT:
+	RETVAL
+
 # --------------------------------------------------------------------------- #
 
 MODULE = Glib::Object::Introspection	PACKAGE = Glib::Object::Introspection::GValueWrapper

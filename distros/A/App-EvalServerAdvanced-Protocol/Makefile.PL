@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.024000;
 
 use ExtUtils::MakeMaker;
 
@@ -18,9 +18,11 @@ my %WriteMakefileArgs = (
     "bin/encode_packet"
   ],
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.024000",
   "NAME" => "App::EvalServerAdvanced::Protocol",
   "PREREQ_PM" => {
     "Data::Dumper" => 0,
+    "Encode" => 0,
     "Exporter" => 0,
     "FindBin" => 0,
     "Function::Parameters" => 0,
@@ -34,9 +36,10 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
-    "Test::More" => 0
+    "Test::More" => 0,
+    "utf8" => 0
   },
-  "VERSION" => "0.100",
+  "VERSION" => "0.104",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,6 +48,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Data::Dumper" => 0,
+  "Encode" => 0,
   "Exporter" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
@@ -56,6 +60,7 @@ my %FallbackPrereqs = (
   "Time::HiRes" => 0,
   "lib" => 0,
   "strict" => 0,
+  "utf8" => 0,
   "warnings" => 0
 );
 

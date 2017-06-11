@@ -1,3 +1,24 @@
+2.0.1	2017-06-10 (faraco)
+			- update doc
+
+2.0.0	2017-06-10 (faraco)
+			- major change (deprecating method chaining)
+			- revert to 0.0.6 method style for clarity and less 'clever' programming
+			- improved doc
+			- updated tests
+
+1.0.1	2017-06-09 (faraco)
+			- bugfix for WebService::Client malformed JSON has been patched
+			- using the latest WebService::Client whenever possible
+			- update the doc (removing duplicates and a few improvements)
+
+1.0.0	2017-06-08 (faraco)
+			- first major update
+			- add method chaining functionality for quick one liner OO 
+			- ensure to use strict 0.0502 WebService::Client version because of the malformed json issue - https://github.com/ironcamel/WebService-Client/issues/13
+			- updated doc
+
+
 0.0.6	2017-05-25 (faraco)
 			- fix doc typo
 

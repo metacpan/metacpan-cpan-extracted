@@ -1,5 +1,10 @@
 Revision history for perl module Text::Amuse::Compile
 
+0.92 2017-06-06
+
+ - Replace enumerate package with enumitem (more flexible)
+ - Support #nocoverpage both in options and in file header
+
 0.91 2017-05-11
 
  - Make \sout (strike) really robust and survive hyperref

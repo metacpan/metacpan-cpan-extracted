@@ -20,23 +20,26 @@ sub new
 sub _getCategoryTOC
 {
 	my $self = shift;
-	my $category = shift;
-	my $n2h = shift;
+	my $groupName = shift;
+	my $podInfo = shift;
 	my $sitedir = shift;
 	
 	my $toc = '';
 	my %tree;
-	foreach my $name (keys(%$n2h))
+	foreach my $podName (sort(keys(%$podInfo)))
 	{
 		my $treeloc = \%tree;
-		for my $level (split(/::/, $name))
+		for my $level (split(/::/, $podName))
 		{
 			$treeloc->{$level} = {} unless exists($treeloc->{$level});
 			$treeloc = $treeloc->{$level};
 		}
 	}
-	$self->_genRefs($sitedir, \$toc, $n2h, \%tree, -1);
-	$toc = qq(<details class="toc-top">\n<summary class="toc-top">$category</summary>\n$toc</details>\n) if $toc;
+	$self->_genRefs($sitedir, \$toc, $podInfo, \%tree, -1);
+	chomp($toc);
+	$toc = qq(<details class="toc-top">\n<summary class="toc-top">$groupName</summary>\n$toc\n</details>) if $toc;
+	
+	return $toc;
 }
 
 sub _genRefs
@@ -44,7 +47,7 @@ sub _genRefs
 	my $self = shift;
 	my $sitedir = shift;
 	my $ref = shift;
-	my $n2h = shift;
+	my $podInfo = shift;
 	my $treeloc = shift;
 	my $depth = shift;
 	my $n = shift;
@@ -62,7 +65,7 @@ sub _genRefs
 		$$ref .= qq(<details class="toc-$depth">\n) if $hasSubNodes;
 		
 		$$ref .= ($hasSubNodes ? qq(<summary class="toc-$depth">) : qq(<div class="toc-$depth">));
-		my $p = $n2h->{$n};
+		my $p = $podInfo->{$n}->{htmlfile};
 		if ($p)
 		{
 			$p =~ s#\Q$sitedir\E.##;
@@ -82,7 +85,7 @@ sub _genRefs
 		my $subn = "$r$subnp";
 		
 		$depth++;
-		$self->_genRefs($sitedir, $ref, $n2h, $treeloc->{$subnp}, $depth, $subn, $subnp);
+		$self->_genRefs($sitedir, $ref, $podInfo, $treeloc->{$subnp}, $depth, $subn, $subnp);
 		$depth--;
 	}
 	

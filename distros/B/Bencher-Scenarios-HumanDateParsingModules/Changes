@@ -1,3 +1,11 @@
+0.007   2017-06-09 (PERLANCAR)
+
+	- No functional changes.
+
+        - [build] Rebuild with updated DZP:InsertDistImage to update the image
+          URLs (MetaCPAN v0 API was shut down).
+
+
 0.006   2017-01-25 (PERLANCAR)
 
 	- No functional changes.

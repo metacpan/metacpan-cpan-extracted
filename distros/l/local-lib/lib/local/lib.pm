@@ -1,10 +1,16 @@
 package local::lib;
 use 5.006;
-use strict;
-use warnings;
-use Config;
+BEGIN {
+  if ($ENV{RELEASE_TESTING}) {
+    require strict;
+    strict->import;
+    require warnings;
+    warnings->import;
+  }
+}
+use Config ();
 
-our $VERSION = '2.000019';
+our $VERSION = '2.000023';
 $VERSION = eval $VERSION;
 
 BEGIN {
@@ -14,6 +20,11 @@ BEGIN {
   *_USE_FSPEC = ($^O eq 'MacOS' || $^O eq 'VMS' || $INC{'File/Spec.pm'})
     ? sub(){1} : sub(){0};
 }
+my $_archname = $Config::Config{archname};
+my $_version = $Config::Config{version};
+my @_inc_version_list = reverse split / /, $Config::Config{inc_version_list};
+my $_path_sep = $Config::Config{path_sep};
+
 our $_DIR_JOIN = _WIN32 ? '\\' : '/';
 our $_DIR_SPLIT = (_WIN32 || $^O eq 'cygwin') ? qr{[\\/]}
                                               : qr{/};
@@ -23,27 +34,50 @@ our $_ROOT = _WIN32 ? do {
 } : qr{^/};
 our $_PERL;
 
-sub _cwd {
-  my $drive = shift;
+sub _perl {
   if (!$_PERL) {
-    ($_PERL) = $^X =~ /(.+)/; # $^X is internal how could it be tainted?!
+    # untaint and validate
+    ($_PERL, my $exe) = $^X =~ /((?:.*$_DIR_SPLIT)?(.+))/;
+    $_PERL = 'perl'
+      if $exe !~ /perl/;
     if (_is_abs($_PERL)) {
     }
-    elsif (-x $Config{perlpath}) {
-      $_PERL = $Config{perlpath};
+    elsif (-x $Config::Config{perlpath}) {
+      $_PERL = $Config::Config{perlpath};
+    }
+    elsif ($_PERL =~ $_DIR_SPLIT && -x $_PERL) {
+      $_PERL = _rel2abs($_PERL);
     }
     else {
       ($_PERL) =
         map { /(.*)/ }
         grep { -x $_ }
+        map { ($_, _WIN32 ? ("$_.exe") : ()) }
         map { join($_DIR_JOIN, $_, $_PERL) }
-        split /\Q$Config{path_sep}\E/, $ENV{PATH};
+        split /\Q$_path_sep\E/, $ENV{PATH};
     }
   }
+  $_PERL;
+}
+
+sub _cwd {
+  if (my $cwd
+    = defined &Cwd::sys_cwd ? \&Cwd::sys_cwd
+    : defined &Cwd::cwd     ? \&Cwd::cwd
+    : undef
+  ) {
+    no warnings 'redefine';
+    *_cwd = $cwd;
+    goto &$cwd;
+  }
+  my $drive = shift;
+  return Win32::Cwd()
+    if _WIN32 && defined &Win32::Cwd && !$drive;
   local @ENV{qw(PATH IFS CDPATH ENV BASH_ENV)};
   my $cmd = $drive ? "eval { Cwd::getdcwd(q($drive)) }"
                    : 'getcwd';
-  my $cwd = `"$_PERL" -MCwd -le "print $cmd"`;
+  my $perl = _perl;
+  my $cwd = `"$perl" -MCwd -le "print $cmd"`;
   chomp $cwd;
   if (!length $cwd && $drive) {
     $cwd = $drive;
@@ -80,7 +114,7 @@ sub _rel2abs {
     if _is_abs($dir);
 
   $base = _WIN32 && $dir =~ s/^([A-Za-z]:)// ? _cwd("$1")
-        : $base                              ? $base
+        : $base                              ? _rel2abs($base)
                                              : _cwd;
   return _catdir($base, $dir);
 }
@@ -96,8 +130,10 @@ sub _devnull {
 
 sub import {
   my ($class, @args) = @_;
-  push @args, @ARGV
-    if $0 eq '-';
+  if ($0 eq '-') {
+    push @args, @ARGV;
+    require Cwd;
+  }
 
   my @steps;
   my %opts;
@@ -191,11 +227,6 @@ sub roots { $_[0]->{roots} ||= [ \'PERL_LOCAL_LIB_ROOT' ] }
 sub extra { $_[0]->{extra} ||= {} }
 sub quiet { $_[0]->{quiet} }
 
-my $_archname = $Config{archname};
-my $_version  = $Config{version};
-my @_inc_version_list = reverse split / /, $Config{inc_version_list};
-my $_path_sep = $Config{path_sep};
-
 sub _as_list {
   my $list = shift;
   grep length, map {
@@ -217,7 +248,7 @@ my @_lib_subdirs = (
   [$_version, $_archname],
   [$_version],
   [$_archname],
-  (@_inc_version_list ? \@_inc_version_list : ()),
+  (map [$_], @_inc_version_list),
   [],
 );
 
@@ -692,7 +723,7 @@ sub ensure_dir_structure_for {
 
 sub guess_shelltype {
   my $shellbin
-    = defined $ENV{SHELL}
+    = defined $ENV{SHELL} && length $ENV{SHELL}
       ? ($ENV{SHELL} =~ /([\w.]+)$/)[-1]
     : ( $^O eq 'MSWin32' && exists $ENV{'!EXITCODE'} )
       ? 'bash'

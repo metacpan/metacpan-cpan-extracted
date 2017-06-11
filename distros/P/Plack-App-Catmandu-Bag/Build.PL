@@ -13,12 +13,12 @@ my %module_build_args = (
   "configure_requires" => {
     "Module::Build" => "0.28"
   },
-  "dist_abstract" => "Plack application that wraps a REST API around a Catmandu::Bag",
+  "dist_abstract" => "Wrap a REST API around a Catmandu::Bag",
   "dist_author" => [
     "Nicolas Steenlant <nicolas.steenlant\@ugent.be>"
   ],
   "dist_name" => "Plack-App-Catmandu-Bag",
-  "dist_version" => "0.01",
+  "dist_version" => "0.0101",
   "license" => "perl",
   "module_name" => "Plack::App::Catmandu::Bag",
   "recursive_test_files" => 1,

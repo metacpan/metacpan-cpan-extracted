@@ -1,5 +1,9 @@
 Revision history for URL::List
 
+0.14    2017-06-07
+        - Minor compatibility fix for earlier Perl versions.
+        - Upped requirements' version numbers.
+
 0.13    2016-10-10
         - Added blocks_by_host, blocks_by_domain and blocks_by_tld.
 

@@ -80,6 +80,21 @@ msgstr[1] "Bitte schreiben Sie {name} heute {count :num} Postkarten."
 
 EOT
     },
+    {
+        test   => '13_translate_any_msgid',
+        path   => 'example',
+        script => '-I../lib -T 13_translate_any_msgid_utf-8.pl',
+        result => <<'EOT',
+en: postcard
+de: Postkarte
+en: postcards
+de: Postkarten
+Postkarte
+Error: no error
+Postkarten
+Error: no error
+EOT
+    },
 );
 
 plan tests => 0 + @data;

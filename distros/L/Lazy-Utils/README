@@ -2,7 +2,7 @@ NAME
     Lazy::Utils - Utility functions
 
 VERSION
-    version 1.20
+    version 1.21
 
 SYNOPSIS
             use Lazy::Utils;
@@ -19,6 +19,7 @@ SYNOPSIS
             whereis($name, $path);
             file_cache($tag, $expiry, $coderef);
             get_pod_text($file_name, $section, $exclude_section);
+            array_to_hash(@array);
 
 DESCRIPTION
     Collection of utility functions all of exported by default.
@@ -92,9 +93,9 @@ FUNCTIONS
 
     return value: *exit code of command. -1 if fatal error occurs*
 
-    returned $?: *return code of wait call like on perls system call*
+    returned $!: *system error message*
 
-    returned $!: *system error message like on perls system call*
+    returned $?: *return code of wait call like on perls system call*
 
   bash_readline($prompt)
     bashReadLine($prompt) *OBSOLETE*
@@ -196,6 +197,13 @@ FUNCTIONS
 
     return value: *text of pod in string or array by line, otherwise undef
     if an error occurs*
+
+  array_to_hash(@array)
+    returns hash with indexes for given array
+
+    @array: *command line arguments*
+
+    return value: *Hash or HashRef by wantarray*
 
 INSTALLATION
     To install this module type the following

@@ -36,14 +36,11 @@ sub run ( $self, $opt ) {
 
             $files->add_dir( $ENV->share->get_storage( 'pcore', 'Pcore' ) . '/par/' );
 
-            $files->render_tmpl(
-                {   main_script => 'main.pl',    #
-                }
-            );
+            $files->render_tmpl( { main_script => 'main.pl' } );
 
             $files->write_to( $self->dist->root );
 
-            say q[PAR profile was created. You should edit "par.perl" manually.];
+            say q[PAR profile was created. You should edit "par.ini" manually.];
         }
 
         return;

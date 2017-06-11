@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-Author-Plicease
 
+2.14      2017-06-09 11:35:06 -0400
+  - Thanks to set x_contributors meta
+
 2.12      2017-03-22 11:58:24 -0400
   - Update default .travis.yml
 

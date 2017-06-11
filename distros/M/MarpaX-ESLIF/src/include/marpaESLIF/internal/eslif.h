@@ -66,8 +66,11 @@
 #define G1_RULE_ADVERB_ITEM_14                   "G1_rule_adverb_item_14"
 #define G1_RULE_ADVERB_ITEM_15                   "G1_rule_adverb_item_15"
 #define G1_RULE_ADVERB_ITEM_16                   "G1_rule_adverb_item_16"
-#define G1_RULE_ACTION                           "G1_rule_action"
-#define G1_RULE_SYMBOL_ACTION                    "G1_rule_symbol_action"
+#define G1_RULE_ADVERB_ITEM_17                   "G1_rule_adverb_item_17"
+#define G1_RULE_ACTION_1                         "G1_rule_action_1"
+#define G1_RULE_ACTION_2                         "G1_rule_action_2"
+#define G1_RULE_SYMBOL_ACTION_1                  "G1_rule_symbol_action_1"
+#define G1_RULE_SYMBOL_ACTION_2                  "G1_rule_symbol_action_2"
 #define G1_RULE_FREE_ACTION                      "G1_rule_free_action"
 #define G1_RULE_LEFT_ASSOCIATION                 "G1_rule_left_association"
 #define G1_RULE_RIGHT_ASSOCIATION                "G1_rule_right_association"
@@ -75,6 +78,8 @@
 #define G1_RULE_SEPARATOR_SPECIFICATION          "G1_rule_separator_specification"
 #define G1_RULE_PROPER_SPECIFICATION_1           "G1_rule_proper_specification_1"
 #define G1_RULE_PROPER_SPECIFICATION_2           "G1_rule_proper_specification_2"
+#define G1_RULE_HIDESEPARATOR_SPECIFICATION_1    "G1_rule_hideseparator_specification_1"
+#define G1_RULE_HIDESEPARATOR_SPECIFICATION_2    "G1_rule_hideseparator_specification_2"
 #define G1_RULE_RANK_SPECIFICATION               "G1_rule_rank_specification"
 #define G1_RULE_NULL_RANKING_SPECIFICATION_1     "G1_rule_null_ranking_specification_1"
 #define G1_RULE_NULL_RANKING_SPECIFICATION_2     "G1_rule_null_ranking_specification_2"
@@ -134,6 +139,16 @@
 #define G1_RULE_DISCARD_1                        "G1_rule_discard_1"
 #define G1_RULE_DISCARD_2                        "G1_rule_discard_2"
 #define G1_RULE_DISCARD_3                        "G1_rule_discard_3"
+#define G1_RULE_STRING_LITERAL                   "G1_rule_string_literal"
+#define G1_RULE_STRING_LITERAL_UNIT              "G1_rule_string_literal_unit"
+#define G1_RULE_STRING_LITERAL_INSIDE_ANY        "G1_rule_string_literal_inside_any"
+#define G1_RULE_STRING_LITERAL_INSIDE_1          "G1_rule_string_literal_inside_1"
+#define G1_RULE_STRING_LITERAL_INSIDE_2          "G1_rule_string_literal_inside_2"
+#define G1_RULE_STRING_LITERAL_INSIDE_3          "G1_rule_string_literal_inside_3"
+#define G1_RULE_STRING_LITERAL_INSIDE_4          "G1_rule_string_literal_inside_4"
+#define G1_RULE_STRING_LITERAL_INSIDE_5          "G1_rule_string_literal_inside_5"
+#define G1_RULE_DISCARD_OFF                      "G1_rule_discard_off"
+#define G1_RULE_DISCARD_ON                       "G1_rule_discard_on"
 
 #define G1_ACTION_STATEMENTS                       "::undef"
 #define G1_ACTION_STATEMENT_01                     "::undef"
@@ -188,8 +203,8 @@
 #define G1_ACTION_ADVERB_ITEM_02                   "::shift" /* <adverb item> ::= <left association> */
 #define G1_ACTION_ADVERB_ITEM_03                   "::shift" /* <adverb item> ::= <right association> */
 #define G1_ACTION_ADVERB_ITEM_04                   "::shift" /* <adverb item> ::= <group association> */
-#define G1_ACTION_ADVERB_ITEM_05                   "::shift" /* <adverb item> ::= <separator association> */
-#define G1_ACTION_ADVERB_ITEM_06                   "::shift" /* <adverb item> ::= <proper association> */
+#define G1_ACTION_ADVERB_ITEM_05                   "::shift" /* <adverb item> ::= <separator specification> */
+#define G1_ACTION_ADVERB_ITEM_06                   "::shift" /* <adverb item> ::= <proper specification> */
 #define G1_ACTION_ADVERB_ITEM_07                   "::shift" /* <adverb item> ::= <rank specification> */
 #define G1_ACTION_ADVERB_ITEM_08                   "::shift" /* <adverb item> ::= <null ranking specification> */
 #define G1_ACTION_ADVERB_ITEM_09                   "::shift" /* <adverb item> ::= <priority specification> */
@@ -200,8 +215,11 @@
 #define G1_ACTION_ADVERB_ITEM_14                   "::shift" /* <adverb item> ::= symbolaction */
 #define G1_ACTION_ADVERB_ITEM_15                   "::shift" /* <adverb item> ::= freeaction */
 #define G1_ACTION_ADVERB_ITEM_16                   "::shift" /* <adverb item> ::= <event specification> */
-#define G1_ACTION_ACTION                           "G1_action_action"                           /* done */
-#define G1_ACTION_SYMBOLACTION                     "G1_action_symbolaction"                     /* done */
+#define G1_ACTION_ADVERB_ITEM_17                   "::shift" /* <adverb item> ::= <hide separator specification> */
+#define G1_ACTION_ACTION_1                         "G1_action_action_1"                         /* done */
+#define G1_ACTION_ACTION_2                         "G1_action_action_2"                         /* done */
+#define G1_ACTION_SYMBOLACTION_1                   "G1_action_symbolaction_1"                   /* done */
+#define G1_ACTION_SYMBOLACTION_2                   "G1_action_symbolaction_2"                   /* done */
 #define G1_ACTION_FREEACTION                       "G1_action_freeaction"                       /* done */
 #define G1_ACTION_LEFT_ASSOCIATION                 "G1_action_left_association"                 /* done */
 #define G1_ACTION_RIGHT_ASSOCIATION                "G1_action_right_association"                /* done */
@@ -209,6 +227,8 @@
 #define G1_ACTION_SEPARATOR_SPECIFICATION          "G1_action_separator_specification"          /* done */
 #define G1_ACTION_PROPER_SPECIFICATION_1           "G1_action_proper_specification_1"           /* done */
 #define G1_ACTION_PROPER_SPECIFICATION_2           "G1_action_proper_specification_2"           /* done */
+#define G1_ACTION_HIDESEPARATOR_SPECIFICATION_1    "G1_action_hideseparator_specification_1"    /* done */
+#define G1_ACTION_HIDESEPARATOR_SPECIFICATION_2    "G1_action_hideseparator_specification_2"    /* done */
 #define G1_ACTION_RANK_SPECIFICATION               "G1_action_rank_specification"               /* done */
 #define G1_ACTION_NULL_RANKING_SPECIFICATION_1     "G1_action_null_ranking_specification_1"     /* done */
 #define G1_ACTION_NULL_RANKING_SPECIFICATION_2     "G1_action_null_ranking_specification_2"     /* done */
@@ -265,6 +285,16 @@
 #define G1_ACTION_GRAMMAR_REFERENCE_1              "G1_action_grammar_reference_1"              /* done */
 #define G1_ACTION_GRAMMAR_REFERENCE_2              "G1_action_grammar_reference_2"              /* done */
 #define G1_ACTION_GRAMMAR_REFERENCE_3              "G1_action_grammar_reference_3"              /* done */
+#define G1_ACTION_STRING_LITERAL                   "G1_action_string_literal"                   /* done */
+#define G1_ACTION_STRING_LITERAL_UNIT              "::copy[2]" /* <string literal unit> ::= '::u8"' <switch :discard off> <string literal inside many> '"' <switch :discard on> */
+#define G1_ACTION_STRING_LITERAL_INSIDE_ANY        "::concat" /* <string literal inside any> ::= <string literal inside>* */
+#define G1_ACTION_STRING_LITERAL_INSIDE_1          "::shift" /* <string literal inside> ::= /[^"\\\n]/ */
+#define G1_ACTION_STRING_LITERAL_INSIDE_2          "G1_action_string_literal_inside_2"          /* done */
+#define G1_ACTION_STRING_LITERAL_INSIDE_3          "G1_action_string_literal_inside_3"          /* done */
+#define G1_ACTION_STRING_LITERAL_INSIDE_4          "G1_action_string_literal_inside_4"          /* done */
+#define G1_ACTION_STRING_LITERAL_INSIDE_5          "G1_action_string_literal_inside_5"          /* done */
+#define G1_ACTION_DISCARD_OFF                      "::undef"
+#define G1_ACTION_DISCARD_ON                       "::undef"
 
 typedef struct bootstrap_grammar_terminal {
   int                        idi;                 /* Identifier */
@@ -280,8 +310,8 @@ typedef struct bootstrap_grammar_meta {
   char  *descs;                /* Description */
   short  startb;               /* Start symbol ? */
   short  discardb;             /* Discard symbol ? */
-  char  *defaultSymbolactions; /* Default symbol action */
-  char  *defaultRuleactions;   /* Default rule action */
+  short  discardonb;           /* :discard[on] event ? */
+  short  discardoffb;          /* :discard[off] event ? */
 } bootstrap_grammar_meta_t;
 
 typedef enum bootstrap_grammar_rule_type {
@@ -298,6 +328,7 @@ typedef struct bootstrap_grammar_rule {
   int                           minimumi;
   int                           separatori;
   short                         properb;
+  short                         hideseparatorb;
   char                         *actions;
 } bootstrap_grammar_rule_t;
 

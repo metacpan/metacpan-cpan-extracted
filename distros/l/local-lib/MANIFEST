@@ -13,7 +13,6 @@ MANIFEST			This list of files
 t/bad_variables.t
 t/carp-mismatch.t
 t/classmethod.t
-t/coderefs_in_inc.t
 t/de-dup.t
 t/lib-core-only.t
 t/lib/ENVDumper.pm
@@ -24,14 +23,14 @@ t/stackable.t
 t/subroutine-in-inc.t
 t/taint-mode.t
 xt/author/cpan-changes.t
-xt/author/eol.t
-xt/author/no-tabs.t
 xt/author/pod-syntax.t
 xt/bootstrap.t
 xt/cpan-bootstrap.pl
 xt/cpan-bootstrap.t
 xt/install.t
 xt/lib/dist_util.pm
+xt/release/eol.t
+xt/release/no-tabs.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 README                                   README file (added by Distar)

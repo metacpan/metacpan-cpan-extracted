@@ -32,9 +32,6 @@ hpcrunner.pl submit_jobs --help
     --metastr             Meta str passed from HPC::Runner::Scheduler
     --module              List of modules to load ex. R2, samtools, etc [
                           Multiple; Split by ","]
-    --no_submit_to_slurm  Bool value whether or not to submit to slurm. If
-                          you are looking to debug your files, or this script
-                          you will want to set this to zero. [Flag]
     --nodes_count         Number of nodes requested. You should only use this
                           if submitting parallel jobs. [Default:"1"; Integer
                           ]

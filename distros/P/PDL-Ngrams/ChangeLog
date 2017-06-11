@@ -1,3 +1,6 @@
+v0.10 Tue, 06 Jun 2017 11:00:36 +0200 moocow
+	+ added 'use lib "."' to top-level Makefile.PL (RT bug #121661)
+
 v0.09 Thu, 17 Dec 2015 11:15:55 +0100 moocow
 	+ fixed wrongly succeeding bogus tests with unary ok()
 	  - tests now use Test::More and re-factored common test subroutines

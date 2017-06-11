@@ -1,0 +1,27 @@
+---
+abstract: 'Pagination plugin for Mojolicious'
+author:
+  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
+build_requires:
+  Test::More: '1.30'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Pager
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: '7.20'
+resources:
+  bugtracker: https://github.com/jhthorsen/mojolicious-plugin-pager/issues
+  homepage: https://github.com/jhthorsen/mojolicious-plugin-pager
+  repository: https://github.com/jhthorsen/mojolicious-plugin-pager.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

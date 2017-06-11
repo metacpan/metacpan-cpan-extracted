@@ -16,11 +16,11 @@ Geo::Coder::XYZ - Provides a geocoding functionality using https://geocode.xyz
 
 =head1 VERSION
 
-Version 0.03
+Version 0.05
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -100,7 +100,8 @@ sub geocode {
 	my $json = JSON->new->utf8;
 	my $rc = $json->decode($res->content);
 
-	if(wantarray && $rc->{'otherlocations'} && $rc->{'otherlocations'}->{'loc'}) {
+	if(wantarray && $rc->{'otherlocations'} && $rc->{'otherlocations'}->{'loc'} &&
+	   (ref($rc->{'otherlocations'}->{'loc'}) eq 'ARRAY')) {
 		my @rc = @{$rc->{'otherlocations'}->{'loc'}};
 		if(scalar(@rc)) {
 			return @rc;
@@ -122,7 +123,7 @@ environment variables:
 
 You can also set your own User-Agent object:
 
-  $geocoder->ua(LWPx::ParanoidAgent->new());
+  $geocoder->ua(LWP::UserAgent::Throttled->new());
 
 =cut
 

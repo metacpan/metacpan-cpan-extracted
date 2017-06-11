@@ -1,13 +1,14 @@
 #!/usr/bin/perl
 package main;
-use 5.008004;  # In accordance with Git's CodingGuidelines.
+use 5.008004;
 use strict;
 use warnings FATAL => 'all';
 
+use Carp qw(croak);
 use Pod::Usage;
-use Getopt::Long qw(GetOptionsFromArray :config bundling);
+use Getopt::Long qw(:config bundling);
 
-our $VERSION = 0.001001; # X.00Y00Z
+our $VERSION = 0.002001; # X.YYYZZZ
 
 my $verbose;
 
@@ -15,15 +16,16 @@ my $verbose;
 my ($CONTEXT, $ADJACENT, $SURROUNDED) = (0..10);
 
 my $usage =<<'END';
-usage: git-autofixup [<options>] <upstream-revision>
+usage: git-autofixup [<options>] <revision>
 
--h, --help         show help
+-h                 show usage
+--help             show manpage
 --version          show version
---man              show manpage
 -v, --verbose      increase verbosity (use up to 2 times)
 -c N, --context N  set number of diff context lines (default 3)
 -s N, --strict N   set strictness (default 0):
-    0: exactly one topic branch commit blamed in hunk context
+    0: exactly one topic branch commit blamed in hunk context, but disambiguate
+       using adjacent lines when possible
     1: changed lines adjacent to exactly one topic branch commit
     2: changed lines surrounded by exactly one topic branch commit
 END
@@ -33,7 +35,8 @@ sub parse_hunks {
     my $fh = shift;
     my ($file_a, $file_b);
     my @hunks;
-    while (my $line = <$fh>) {
+    my $line;
+    while ($line = <$fh>) {
         if ($line =~ /^--- (.*)/) {
             $file_a = $1;
         } elsif ($line =~ /^\+\+\+ (.*)/) {
@@ -59,13 +62,13 @@ sub parse_hunks {
             push(@hunks, {
                 file => $file_a,
                 start => $1,
-                count => $2 // 1,
+                count => defined($2) ? $2 : 1,
                 header => $header,
                 lines => $lines,
             });
             # The next line after a hunk could be a header for the next commit
             # or hunk.
-            redo if defined($line);
+            redo if defined $line;
         }
     }
     return @hunks;
@@ -85,16 +88,16 @@ sub get_summary_for_commits {
 # Return targets of fixup!/squash! commits.
 sub get_sha_aliases {
     my $summary_for = shift;
-    my @candidates = keys(%{$summary_for});
     my %aliases;
-    for my $sha (keys(%{$summary_for})) {
+    my @targets = keys(%{$summary_for});
+    for my $sha (@targets) {
         my $summary = $summary_for->{$sha};
         next if $summary !~ /^(?:fixup|squash)! (.*)/;
         my $prefix = $1;
         if ($prefix =~ /^(?:(?:fixup|squash)! ){2}/) {
             die "fixup commits for fixup commits aren't supported: $sha";
         }
-        my @matches = grep {startswith($summary_for->{$_}, $prefix)} keys(%{$summary_for});
+        my @matches = grep {startswith($summary_for->{$_}, $prefix)} @targets;
         if (@matches > 1) {
             die "ambiguous fixup commit target: multiple commit summaries start with: $prefix\n";
         } elsif (@matches == 0) {
@@ -107,22 +110,64 @@ sub get_sha_aliases {
 }
 
 sub get_fixup_sha {
-    my ($hunk, $blame, $sha_set, $strict) = @_;
-    if ($strict == $CONTEXT) {
-        return get_context_fixup_sha($hunk, $blame, $sha_set);
-    } else {
-        return get_strict_fixup_sha($hunk, $blame, $sha_set, $strict);
+    my $args = shift;
+    my $hunk = $args->{hunk};
+    my $blame = $args->{blame};
+    my $summary_for = $args->{summary_for};
+    my $strict = $args->{strict};
+    if (grep {!defined} ($hunk, $blame, $summary_for, $strict)) {
+        croak 'missing argument';
     }
-}
 
-sub get_context_fixup_sha {
-    my ($hunk, $blame, $sha_set) = @_;
-    my @blamed_shas = uniq(map {$_->{sha}} values(%{$blame}));
-    my @candidate_shas = grep {defined $sha_set->{$_}} @blamed_shas;
-    if (@candidate_shas != 1) {
+    my @targets;
+    if ($args->{strict} == $CONTEXT) {
+        @targets = get_fixup_targets_from_all_context($args);
+        my @topic_targets = grep {defined $summary_for->{$_}} @targets;
+        if (@topic_targets > 1) {
+            # The context assignment is ambiguous, but an adjacency assignment
+            # might not be.
+            @targets = get_fixup_targets_from_adjacent_context($args);
+        }
+    } else {
+        @targets = get_fixup_targets_from_adjacent_context($args);
+    }
+
+    my $upstream_is_blamed = grep {!defined $summary_for->{$_}} @targets;
+    my @topic_targets = grep {defined $summary_for->{$_}} @targets;
+    if ($strict && $upstream_is_blamed) {
+        $verbose && print hunk_desc($hunk), " changes lines blamed on upstream\n";
+        return;
+    } elsif (@topic_targets > 1) {
+        $verbose && print hunk_desc($hunk), " has multiple targets\n";
+        return;
+    } elsif (@topic_targets == 0) {
+        $verbose && print hunk_desc($hunk), " has no targets\n";
         return;
     }
-    return $candidate_shas[0];
+    if ($verbose) {
+        printf "%s fixes %s %s\n",
+            hunk_desc($hunk),
+            substr($topic_targets[0], 0, 8),
+            $summary_for->{$topic_targets[0]};
+    }
+    return $topic_targets[0];
+}
+
+sub hunk_desc {
+    my $hunk = shift;
+    return join " ", (
+        $hunk->{file},
+        $hunk->{header} =~ /(@@[^@]*@@)/,
+    );
+}
+
+sub get_fixup_targets_from_all_context {
+    my $args = shift;
+    my ($hunk, $blame, $summary_for) = @{$args}{qw(hunk blame summary_for)};
+    croak 'missing argument' if grep {!defined} ($hunk, $blame, $summary_for);
+
+    my @targets = uniq(map {$_->{sha}} values(%{$blame}));
+    return wantarray ? @targets : \@targets;
 }
 
 sub uniq {
@@ -130,31 +175,26 @@ sub uniq {
     return grep {!$seen{$_}++} @_;
 }
 
-sub get_strict_fixup_sha {
-    my ($hunk, $blame, $sha_set, $strict) = @_;
+sub get_fixup_targets_from_adjacent_context {
+    my $args = shift;
+    my $hunk = $args->{hunk};
+    my $blame = $args->{blame};
+    my $summary_for = $args->{summary_for};
+    my $strict = $args->{strict};
+    if (grep {!defined} ($hunk, $blame, $summary_for, $strict)) {
+        croak 'missing argument';
+    }
+
     my $blame_indexes = get_blame_indexes($hunk);
-    my $target;
 
-    my $is_valid_target = sub {
-        my $sha = shift;
-        return if !defined($sha_set->{$sha});
-        $target //= $sha;
-        if ($sha ne $target) {
-            if ($verbose) {
-                print STDERR "multiple fixup targets for $hunk->{file}, $hunk->{header}";
-            }
-            return;
-        }
-        return 1;
-    };
-
+    my %blamed;
     my $diff = $hunk->{lines};
     for (my $di = 0; $di < @{$diff}; $di++) { # diff index
         my $bi = $blame_indexes->[$di];
         my $line = $diff->[$di];
         if (startswith($line, '-')) {
             my $sha = $blame->{$bi}{sha};
-            &$is_valid_target($sha) or return;
+            $blamed{$sha} = 1;
         } elsif (startswith($line, '+')) {
             my @lines;
             if ($di > 0 && defined $blame->{$bi-1}) {
@@ -164,26 +204,23 @@ sub get_strict_fixup_sha {
                 push @lines, $bi;
             }
             my @adjacent_shas = uniq(map {$_->{sha}} @{$blame}{@lines});
-            my @target_shas = grep {defined $sha_set->{$_}} @adjacent_shas;
+            my @target_shas = grep {defined $summary_for->{$_}} @adjacent_shas;
             # Note that lines at the beginning or end of a file can be
             # "surrounded" by a single line.
             my $is_surrounded = @target_shas > 0
                 && @target_shas == @adjacent_shas
                 && $target_shas[0] eq $target_shas[-1];
             my $is_adjacent = @target_shas == 1;
-            if (!$is_adjacent || ($strict >= $SURROUNDED && !$is_surrounded)) {
-                return;
+            if ($is_surrounded || ($strict < $SURROUNDED && $is_adjacent)) {
+                $blamed{$target_shas[0]} = 1;
             }
-            &$is_valid_target($target_shas[0]) or return;
             while ($di < @$diff-1 && startswith($diff->[$di+1], '+')) {
                 $di++;
             }
         }
     }
-    if ($verbose && !$target) {
-        print STDERR "no fixup targets found for $hunk->{file}, $hunk->{header}\n";
-    }
-    return $target;
+    my @targets = keys %blamed;
+    return wantarray ? @targets : \@targets;
 }
 
 sub startswith {
@@ -208,27 +245,35 @@ sub get_blame_indexes {
 }
 
 sub print_hunk_blamediff {
-    my ($fh, $hunk, $sha_set, $blame, $blame_indexes) = @_;
+    my $args = shift;
+    my $fh = $args->{fh};
+    my $hunk = $args->{hunk};
+    my $summary_for = $args->{summary_for};
+    my $blame = $args->{blame};
+    my $blame_indexes = $args->{blame_indexes};
+    if (grep {!defined} ($fh, $hunk, $summary_for, $blame, $blame_indexes)) {
+        croak 'missing argument';
+    }
+
     my $format = "%-8.8s|%4.4s|%-30.30s|%-30.30s\n";
-    print {$fh} "hunk blamediff: $hunk->{file}, $hunk->{header}";
     for (my $i = 0; $i < @{$hunk->{lines}}; $i++) {
         my $line_r = $hunk->{lines}[$i];
         my $bi = $blame_indexes->[$i];
         my $sha = defined $blame->{$bi} ? $blame->{$bi}{sha} : undef;
 
-        my $display_sha = $sha // q{};
+        my $display_sha = defined($sha) ? $sha : q{};
         my $display_bi = $bi;
         if (startswith($line_r, '+')) {
             $display_sha = q{}; # For added lines.
             $display_bi = q{};
         }
-        if (defined($sha) && !defined($sha_set->{$sha})) {
+        if (defined($sha) && !defined($summary_for->{$sha})) {
             # For lines from before the given upstream revision.
             $display_sha = '^';
         }
 
         my $line_l = '';
-        if (defined $blame->{$bi}) {
+        if (defined $blame->{$bi} && !startswith($line_r, '+')) {
             $line_l = $blame->{$bi}{text};
         }
 
@@ -240,7 +285,7 @@ sub print_hunk_blamediff {
             $_ = rtrim($_);
         }
 
-        printf {$fh} $format, $display_sha, $bi, $line_l, $line_r;
+        printf {$fh} $format, $display_sha, $display_bi, $line_l, $line_r;
     }
     print {$fh} "\n";
     return;
@@ -319,14 +364,33 @@ sub is_index_dirty {
 }
 
 sub get_fixup_hunks_by_sha {
-    my ($hunks, $blame_for, $summary_for, $strict) = @_;
+    my $args = shift;
+    my $hunks = $args->{hunks};
+    my $blame_for = $args->{blame_for};
+    my $summary_for = $args->{summary_for};
+    my $strict = $args->{strict};
+    if (grep {!defined} ($hunks, $blame_for, $summary_for, $strict)) {
+        croak 'missing argument';
+    }
+
     my %hunks_for;
     for my $hunk (@{$hunks}) {
         my $blame = $blame_for->{$hunk};
+        my $sha = get_fixup_sha({
+            hunk => $hunk,
+            blame => $blame,
+            summary_for => $summary_for,
+            strict => $strict,
+        });
         if ($verbose > 1) {
-            print_hunk_blamediff(*STDERR, $hunk, $summary_for, $blame, get_blame_indexes($hunk));
+            print_hunk_blamediff({
+                fh => *STDOUT,
+                hunk => $hunk,
+                summary_for => $summary_for,
+                blame => $blame,
+                blame_indexes => get_blame_indexes($hunk)
+            });
         }
-        my $sha = get_fixup_sha($hunk, $blame, $summary_for, $strict);
         next if !$sha;
         push @{$hunks_for{$sha}}, $hunk;
     }
@@ -334,17 +398,15 @@ sub get_fixup_hunks_by_sha {
 }
 
 sub main {
-    my @args = @_;
-
     $verbose = 0;
     my $num_context_lines = 3;
     my $strict = $CONTEXT;
     my $man;
 
     my ($help, $show_version);
-    GetOptionsFromArray(\@args,
-        'help|h' => \$help,
-        'man' => \$man,
+    GetOptions(
+        'h' => \$help,
+        'help' => \$man,
         'version' => \$show_version,
         'verbose|v+' => \$verbose,
         'strict|s=i' => \$strict,
@@ -362,10 +424,10 @@ sub main {
         pod2usage(-exitval => 0, -verbose => 2);
     }
 
-    @args == 1 or die "No upstream revision given.\n";
-    my $upstream = shift @args;
+    @ARGV == 1 or die "No upstream commit given.\n";
+    my $upstream = shift @ARGV;
     qx(git rev-parse --verify ${upstream}^{commit});
-    $? == 0 or die "Bad revision.\n";
+    $? == 0 or die "Can't resolve given commit.\n";
 
     if ($num_context_lines < 0) {
         die "invalid number of context lines: $num_context_lines\n";
@@ -386,7 +448,12 @@ sub main {
     my $summary_for = get_summary_for_commits($upstream);
     my $alias_for = get_sha_aliases($summary_for);
     my %blame_for = map {$_ => blame($_, $alias_for)} @{$hunks};
-    my $hunks_for = get_fixup_hunks_by_sha($hunks, \%blame_for, $summary_for, $strict);
+    my $hunks_for = get_fixup_hunks_by_sha({
+        hunks => $hunks,
+        blame_for => \%blame_for,
+        summary_for => $summary_for,
+        strict => $strict,
+    });
     while (my ($sha, $fixup_hunks) = each %{$hunks_for}) {
         commit_fixup($sha, $fixup_hunks);
     }
@@ -394,9 +461,11 @@ sub main {
 }
 
 if (!caller()) {
-    exit main(@ARGV);
+    exit main();
 }
 1;
+
+__END__
 
 =pod
 
@@ -406,15 +475,15 @@ App::Git::Autofixup - create fixup commits for topic branches
 
 =head1 SYNOPSIS
 
-    git-autofixup [<options>] REVISION
+    git-autofixup [<options>] <revision>
 
 =head1 DESCRIPTION
 
-F<git-autofixup> parses hunks of changes in the working directory out of C<git diff> output and uses C<git blame> to assign those hunks to commits in C<REVISION..HEAD>, which will typically represent a topic branch, and then creates fixup commits to be used with C<git rebase --interactive --autosquash>. [See C<git help revisions> for information about git revision specification syntax.] It is assumed that unstaged changes near changes previously committed to the topic branch are related.
+F<git-autofixup> parses hunks of changes in the working directory out of C<git diff> output and uses C<git blame> to assign those hunks to commits in C<E<lt>revision<gt>..HEAD>, which will typically represent a topic branch, and then creates fixup commits to be used with C<git rebase --interactive --autosquash>. [See C<git help revisions> for information about git revision specification syntax.] It is assumed that unstaged changes near changes previously committed to the topic branch are related.
 
-C<@{upstream}> or C<@{u}> is likely a convenient value to use for C<REVISION> if the current branch has a tracking branch.
+C<@{upstream}> or C<@{u}> is likely a convenient value to use for C<E<lt>revision<gt>> if the current branch has a tracking branch.
 
-By default a hunk will be included in a fixup commit if all the lines in the hunk's context blamed on topic branch commits refer to the same commit, so there's no ambiguity about which commit the hunk corresponds to. If C<--strict 1> is given  the same topic branch commit must be blamed for every removed line and at least one of the lines adjacent to each added line, and added lines must not be adjacent to lines blamed on other topic branch commits. All the same restrictions apply when C<--strict 2> is given, but each added line must be surrounded by lines blamed on the same topic branch commit.
+By default a hunk will be included in a fixup commit if all the lines in the hunk's context blamed on topic branch commits refer to the same commit, so there's no ambiguity about which commit the hunk corresponds to. If there is ambiguity the assignment behaviour used under C<--strict 1> will be used to attempt to resolve it. If C<--strict 1> is given the same topic branch commit must be blamed for every removed line and at least one of the lines adjacent to each added line, and added lines must not be adjacent to lines blamed on other topic branch commits. All the same restrictions apply when C<--strict 2> is given, but each added line must be surrounded by lines blamed on the same topic branch commit.
 
 For example,  the added line in the hunk below is adjacent to lines committed by commits C<99f370af> and C<a1eadbe2>. If these are both topic branch commits then it's ambiguous which commit the added line is fixing up and the hunk will be ignored.
 
@@ -437,17 +506,17 @@ F<git-autofixup> is not to be used mindlessly. Always inspect the created fixup 
 
 =over
 
-=item -h, --help
+=item -h
 
-Show help.
+Show usage.
+
+=item --help
+
+Show manpage.
 
 =item --version
 
 Show version.
-
-=item --man
-
-Show manpage.
 
 =item -v, --verbose
 
@@ -471,9 +540,14 @@ Git is distributed with Perl 5 for platforms not expected to already have it ins
 
 If copied to the path printed by C<git --exec-path> and named F<git-autofixup> this script can be invoked as C<git autofixup> but this isn't recommended as future updates to git could change the exec path.
 
+Requires a git supporting C<commit --fixup>: 1.7.4 or later.
+
+
 =head1 BUGS/LIMITATIONS
 
 If a topic branch adds some lines in one commit and subsequently removes some of them in another, a hunk in the working directory that re-adds those lines will be assigned to fixup the first commit, and during rebasing they'll be removed again by the later commit.
+
+Not tested in F<cmd.exe> on Windows. Run it from Git Bash, Cygwin, or a similar Unix emulation environment.
 
 =head1 ACKNOWLEDGEMENTS
 

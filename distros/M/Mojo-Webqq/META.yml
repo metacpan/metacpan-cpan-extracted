@@ -30,5 +30,5 @@ requires:
   Time::Seconds: '0'
 resources:
   repository: git://github.com/sjdy521/Mojo-Webqq.git
-version: v2.1.1
+version: v2.1.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

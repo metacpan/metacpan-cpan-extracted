@@ -68,7 +68,7 @@ Google::Ads::AdWords::v201609::CustomerService::getCustomers
 Perl data type class for the XML Schema defined element
 getCustomers from the namespace https://adwords.google.com/api/adwords/mcm/v201609.
 
-Returns details of all the customers directly accessible by the user authenticating the call. <p> Following V201605, if {@code clientCustomerId} is specified in the request header, only details of that customer will be returned. 
+Returns details of all the customers directly accessible by the user authenticating the call. <p> Starting with v201607, if {@code clientCustomerId} is specified in the request header, only details of that customer will be returned. To do this for prior versions, use the {@code get()} method instead. 
 
 
 

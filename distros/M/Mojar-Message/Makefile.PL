@@ -11,7 +11,7 @@ WriteMakefile(
   AUTHOR       => 'Nic Sandfield <niczero@cpan.org>',
   LICENSE      => 'artistic_2',
   META_MERGE   => {
-    requires  => {perl => 5.010001},
+    requires  => {perl => 5.014_001},
     resources => {
       homepage    => 'http://niczero.github.com/mojar',
       license     => 'http://www.opensource.org/licenses/artistic-license-2.0',
@@ -23,9 +23,9 @@ WriteMakefile(
   BUILD_REQUIRES => {'Test::More' => 0},
   CONFIGURE_REQUIRES => {'ExtUtils::MakeMaker' => 6.3},
   PREREQ_PM => {
-    Mojolicious => 5,
-    Mojar => 2,
-    'Mojar::Cron' => 0.2,
+    Mojolicious    => 7.15,
+    Mojar          => 2.05,
+    'Mojar::Cron'  => 0.2,
     'MIME::Entity' => 5.5
   },
   EXE_FILES => [],

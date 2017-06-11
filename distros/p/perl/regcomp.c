@@ -101,14 +101,6 @@ EXTERN_C const struct regexp_engine my_reg_engine;
 #define	STATIC	static
 #endif
 
-#ifndef MIN
-#define MIN(a,b) ((a) < (b) ? (a) : (b))
-#endif
-
-#ifndef MAX
-#define MAX(a,b) ((a) > (b) ? (a) : (b))
-#endif
-
 /* this is a chain of data about sub patterns we are processing that
    need to be handled separately/specially in study_chunk. Its so
    we can simulate recursion without losing state.  */
@@ -185,20 +177,19 @@ struct RExC_state_t {
     U32         study_chunk_recursed_bytes;  /* bytes in bitmap */
     I32		in_lookbehind;
     I32		contains_locale;
-    I32		contains_i;
     I32		override_recoding;
 #ifdef EBCDIC
     I32		recode_x_to_native;
 #endif
     I32		in_multi_char_class;
-    struct reg_code_block *code_blocks;	/* positions of literal (?{})
+    struct reg_code_blocks *code_blocks;/* positions of literal (?{})
 					    within pattern */
-    int		num_code_blocks;	/* size of code_blocks[] */
     int		code_index;		/* next code_blocks[] slot */
     SSize_t     maxlen;                        /* mininum possible number of chars in string to match */
     scan_frame *frame_head;
     scan_frame *frame_last;
     U32         frame_count;
+    AV         *warn_text;
 #ifdef ADD_TO_REGEXEC
     char 	*starttry;		/* -Dr: where regtry was called. */
 #define RExC_starttry	(pRExC_state->starttry)
@@ -222,6 +213,7 @@ struct RExC_state_t {
 #endif
     bool        seen_unfolded_sharp_s;
     bool        strict;
+    bool        study_started;
 };
 
 #define RExC_flags	(pRExC_state->flags)
@@ -278,8 +270,6 @@ struct RExC_state_t {
                                    (pRExC_state->study_chunk_recursed_bytes)
 #define RExC_in_lookbehind	(pRExC_state->in_lookbehind)
 #define RExC_contains_locale	(pRExC_state->contains_locale)
-#define RExC_contains_i (pRExC_state->contains_i)
-#define RExC_override_recoding (pRExC_state->override_recoding)
 #ifdef EBCDIC
 #   define RExC_recode_x_to_native (pRExC_state->recode_x_to_native)
 #endif
@@ -288,6 +278,8 @@ struct RExC_state_t {
 #define RExC_frame_last (pRExC_state->frame_last)
 #define RExC_frame_count (pRExC_state->frame_count)
 #define RExC_strict (pRExC_state->strict)
+#define RExC_study_started      (pRExC_state->study_started)
+#define RExC_warn_text (pRExC_state->warn_text)
 
 /* Heuristic check on the complexity of the pattern: if TOO_NAUGHTY, we set
  * a flag to disable back-off on the fixed/floating substrings - if it's
@@ -560,7 +552,6 @@ static const scan_data_t zero_scan_data =
 #define OOB_UNICODE		0xDEADBEEF
 
 #define CHR_SVLEN(sv) (UTF ? sv_len_utf8(sv) : SvCUR(sv))
-#define CHR_DIST(a,b) (UTF ? utf8_distance(a,b) : a - b)
 
 
 /* length of regex to show in messages that don't mark a position within */
@@ -575,7 +566,7 @@ static const scan_data_t zero_scan_data =
 #define MARKER2 " <-- HERE "  /* marker as it appears within the regex */
 
 #define REPORT_LOCATION " in regex; marked by " MARKER1    \
-                        " in m/%"UTF8f MARKER2 "%"UTF8f"/"
+                        " in m/%" UTF8f MARKER2 "%" UTF8f "/"
 
 /* The code in this file in places uses one level of recursion with parsing
  * rebased to an alternate string constructed by us in memory.  This can take
@@ -663,11 +654,11 @@ static const scan_data_t zero_scan_data =
 } STMT_END
 
 #define	FAIL(msg) _FAIL(			    \
-    Perl_croak(aTHX_ "%s in regex m/%"UTF8f"%s/",	    \
+    Perl_croak(aTHX_ "%s in regex m/%" UTF8f "%s/",	    \
 	    msg, UTF8fARG(UTF, len, RExC_precomp), ellipses))
 
 #define	FAIL2(msg,arg) _FAIL(			    \
-    Perl_croak(aTHX_ msg " in regex m/%"UTF8f"%s/",	    \
+    Perl_croak(aTHX_ msg " in regex m/%" UTF8f "%s/",	    \
 	    arg, UTF8fARG(UTF, len, RExC_precomp), ellipses))
 
 /*
@@ -1004,24 +995,25 @@ Perl_re_indentf(pTHX_ const char *fmt, U32 depth, ...)
 
 #define DEBUG_STUDYDATA(str,data,depth)                              \
 DEBUG_OPTIMISE_MORE_r(if(data){                                      \
-    Perl_re_indentf( aTHX_  "" str "Pos:%"IVdf"/%"IVdf                           \
-        " Flags: 0x%"UVXf,                                           \
+    Perl_re_indentf( aTHX_  "" str "Pos:%" IVdf "/%" IVdf            \
+        " Flags: 0x%" UVXf,                                          \
         depth,                                                       \
         (IV)((data)->pos_min),                                       \
         (IV)((data)->pos_delta),                                     \
         (UV)((data)->flags)                                          \
     );                                                               \
     DEBUG_SHOW_STUDY_FLAGS((data)->flags," [ ","]");                 \
-    Perl_re_printf( aTHX_                                                        \
-        " Whilem_c: %"IVdf" Lcp: %"IVdf" %s",                        \
+    Perl_re_printf( aTHX_                                            \
+        " Whilem_c: %" IVdf " Lcp: %" IVdf " %s",                    \
         (IV)((data)->whilem_c),                                      \
         (IV)((data)->last_closep ? *((data)->last_closep) : -1),     \
         is_inf ? "INF " : ""                                         \
     );                                                               \
     if ((data)->last_found)                                          \
-        Perl_re_printf( aTHX_                                                    \
-            "Last:'%s' %"IVdf":%"IVdf"/%"IVdf" %sFixed:'%s' @ %"IVdf \
-            " %sFloat: '%s' @ %"IVdf"/%"IVdf"",                      \
+        Perl_re_printf( aTHX_                                        \
+            "Last:'%s' %" IVdf ":%" IVdf "/%" IVdf                   \
+            " %sFixed:'%s' @ %" IVdf                                 \
+            " %sFloat: '%s' @ %" IVdf "/%" IVdf,                     \
             SvPVX_const((data)->last_found),                         \
             (IV)((data)->last_end),                                  \
             (IV)((data)->last_start_min),                            \
@@ -1279,8 +1271,8 @@ S_ssc_anything(pTHX_ regnode_ssc *ssc)
 
     assert(is_ANYOF_SYNTHETIC(ssc));
 
-    ssc->invlist = sv_2mortal(_new_invlist(2)); /* mortalize so won't leak */
-    _append_range_to_invlist(ssc->invlist, 0, UV_MAX);
+    /* mortalize so won't leak */
+    ssc->invlist = sv_2mortal(_add_range_to_invlist(NULL, 0, UV_MAX));
     ANYOF_FLAGS(ssc) |= SSC_MATCHES_EMPTY_STRING;  /* Plus matches empty */
 }
 
@@ -2016,7 +2008,7 @@ S_dump_trie(pTHX_ const struct _reg_trie_data *trie, HV *widecharmap,
     for( state = 1 ; state < trie->statecount ; state++ ) {
 	const U32 base = trie->states[ state ].trans.base;
 
-        Perl_re_indentf( aTHX_  "#%4"UVXf"|", depth+1, (UV)state);
+        Perl_re_indentf( aTHX_  "#%4" UVXf "|", depth+1, (UV)state);
 
         if ( trie->states[ state ].wordnum ) {
             Perl_re_printf( aTHX_  " W%4X", trie->states[ state ].wordnum );
@@ -2024,7 +2016,7 @@ S_dump_trie(pTHX_ const struct _reg_trie_data *trie, HV *widecharmap,
             Perl_re_printf( aTHX_  "%6s", "" );
         }
 
-        Perl_re_printf( aTHX_  " @%4"UVXf" ", (UV)base );
+        Perl_re_printf( aTHX_  " @%4" UVXf " ", (UV)base );
 
         if ( base ) {
             U32 ofs = 0;
@@ -2035,7 +2027,7 @@ S_dump_trie(pTHX_ const struct _reg_trie_data *trie, HV *widecharmap,
                                                                     != state))
                     ofs++;
 
-            Perl_re_printf( aTHX_  "+%2"UVXf"[ ", (UV)ofs);
+            Perl_re_printf( aTHX_  "+%2" UVXf "[ ", (UV)ofs);
 
             for ( ofs = 0 ; ofs < trie->uniquecharcount ; ofs++ ) {
                 if ( ( base + ofs >= trie->uniquecharcount )
@@ -2044,7 +2036,7 @@ S_dump_trie(pTHX_ const struct _reg_trie_data *trie, HV *widecharmap,
                         && trie->trans[ base + ofs
                                     - trie->uniquecharcount ].check == state )
                 {
-                   Perl_re_printf( aTHX_  "%*"UVXf, colwidth,
+                   Perl_re_printf( aTHX_  "%*" UVXf, colwidth,
                     (UV)trie->trans[ base + ofs - trie->uniquecharcount ].next
                    );
                 } else {
@@ -2093,7 +2085,7 @@ S_dump_trie_interim_list(pTHX_ const struct _reg_trie_data *trie,
     for( state=1 ; state < next_alloc ; state ++ ) {
         U16 charid;
 
-        Perl_re_indentf( aTHX_  " %4"UVXf" :",
+        Perl_re_indentf( aTHX_  " %4" UVXf " :",
             depth+1, (UV)state  );
         if ( ! trie->states[ state ].wordnum ) {
             Perl_re_printf( aTHX_  "%5s| ","");
@@ -2106,7 +2098,7 @@ S_dump_trie_interim_list(pTHX_ const struct _reg_trie_data *trie,
 	    SV ** const tmp = av_fetch( revcharmap,
                                         TRIE_LIST_ITEM(state,charid).forid, 0);
 	    if ( tmp ) {
-                Perl_re_printf( aTHX_  "%*s:%3X=%4"UVXf" | ",
+                Perl_re_printf( aTHX_  "%*s:%3X=%4" UVXf " | ",
                     colwidth,
                     pv_pretty(sv, SvPV_nolen_const(*tmp), SvCUR(*tmp),
                               colwidth,
@@ -2177,22 +2169,22 @@ S_dump_trie_interim_table(pTHX_ const struct _reg_trie_data *trie,
 
     for( state=1 ; state < next_alloc ; state += trie->uniquecharcount ) {
 
-        Perl_re_indentf( aTHX_  "%4"UVXf" : ",
+        Perl_re_indentf( aTHX_  "%4" UVXf " : ",
             depth+1,
             (UV)TRIE_NODENUM( state ) );
 
         for( charid = 0 ; charid < trie->uniquecharcount ; charid++ ) {
             UV v=(UV)SAFE_TRIE_NODENUM( trie->trans[ state + charid ].next );
             if (v)
-                Perl_re_printf( aTHX_  "%*"UVXf, colwidth, v );
+                Perl_re_printf( aTHX_  "%*" UVXf, colwidth, v );
             else
                 Perl_re_printf( aTHX_  "%*s", colwidth, "." );
         }
         if ( ! trie->states[ TRIE_NODENUM( state ) ].wordnum ) {
-            Perl_re_printf( aTHX_  " (%4"UVXf")\n",
+            Perl_re_printf( aTHX_  " (%4" UVXf ")\n",
                                             (UV)trie->trans[ state ].check );
         } else {
-            Perl_re_printf( aTHX_  " (%4"UVXf") W%4X\n",
+            Perl_re_printf( aTHX_  " (%4" UVXf ") W%4X\n",
                                             (UV)trie->trans[ state ].check,
             trie->states[ TRIE_NODENUM( state ) ].wordnum );
         }
@@ -2363,8 +2355,9 @@ is the recommended Unicode-aware way of saying
 
 #define TRIE_LIST_PUSH(state,fid,ns) STMT_START {               \
     if ( TRIE_LIST_CUR( state ) >=TRIE_LIST_LEN( state ) ) {    \
-	U32 ging = TRIE_LIST_LEN( state ) *= 2;                 \
+	U32 ging = TRIE_LIST_LEN( state ) * 2;                  \
 	Renew( trie->states[ state ].trans.list, ging, reg_trie_trans_le ); \
+        TRIE_LIST_LEN( state ) = ging;                          \
     }                                                           \
     TRIE_LIST_ITEM( state, TRIE_LIST_CUR( state ) ).forid = fid;     \
     TRIE_LIST_ITEM( state, TRIE_LIST_CUR( state ) ).newstate = ns;   \
@@ -2430,6 +2423,21 @@ is the recommended Unicode-aware way of saying
            : ( state==1 ? special : 0 )					\
       )
 
+#define TRIE_BITMAP_SET_FOLDED(trie, uvc, folder)           \
+STMT_START {                                                \
+    TRIE_BITMAP_SET(trie, uvc);                             \
+    /* store the folded codepoint */                        \
+    if ( folder )                                           \
+        TRIE_BITMAP_SET(trie, folder[(U8) uvc ]);           \
+                                                            \
+    if ( !UTF ) {                                           \
+        /* store first byte of utf8 representation of */    \
+        /* variant codepoints */                            \
+        if (! UVCHR_IS_INVARIANT(uvc)) {                    \
+            TRIE_BITMAP_SET(trie, UTF8_TWO_BYTE_HI(uvc));   \
+        }                                                   \
+    }                                                       \
+} STMT_END
 #define MADE_TRIE       1
 #define MADE_JUMP_TRIE  2
 #define MADE_EXACT_TRIE 4
@@ -2555,12 +2563,23 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch,
                                                bitmap?*/
 
         if (OP(noper) == NOTHING) {
+            /* skip past a NOTHING at the start of an alternation
+             * eg, /(?:)a|(?:b)/ should be the same as /a|b/
+             */
             regnode *noper_next= regnext(noper);
             if (noper_next < tail)
                 noper= noper_next;
         }
 
-        if ( noper < tail && ( OP(noper) == flags || ( flags == EXACTFU && OP(noper) == EXACTFU_SS ) ) ) {
+        if ( noper < tail &&
+                (
+                    OP(noper) == flags ||
+                    (
+                        flags == EXACTFU &&
+                        OP(noper) == EXACTFU_SS
+                    )
+                )
+        ) {
             uc= (U8*)STRING(noper);
             e= uc + STR_LEN(noper);
         } else {
@@ -2577,6 +2596,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch,
                 TRIE_BITMAP_SET(trie, LATIN_SMALL_LETTER_SHARP_S);
             }
         }
+
         for ( ; uc < e ; uc += len ) {  /* Look at each char in the current
                                            branch */
             TRIE_CHARCOUNT(trie)++;
@@ -2660,18 +2680,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch,
                 if ( set_bit ) {
 		    /* store the codepoint in the bitmap, and its folded
 		     * equivalent. */
-                    TRIE_BITMAP_SET(trie, uvc);
-
-		    /* store the folded codepoint */
-                    if ( folder ) TRIE_BITMAP_SET(trie, folder[(U8) uvc ]);
-
-		    if ( !UTF ) {
-			/* store first byte of utf8 representation of
-			   variant codepoints */
-			if (! UVCHR_IS_INVARIANT(uvc)) {
-			    TRIE_BITMAP_SET(trie, UTF8_TWO_BYTE_HI(uvc));
-			}
-		    }
+                    TRIE_BITMAP_SET_FOLDED(trie, uvc, folder);
                     set_bit = 0; /* We've done our bit :-) */
                 }
             } else {
@@ -2690,7 +2699,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch,
                 svpp = hv_fetch( widecharmap, (char*)&uvc, sizeof( UV ), 1 );
 
                 if ( !svpp )
-                    Perl_croak( aTHX_ "error creating/fetching widecharmap entry for 0x%"UVXf, uvc );
+                    Perl_croak( aTHX_ "error creating/fetching widecharmap entry for 0x%" UVXf, uvc );
 
                 if ( !SvTRUE( *svpp ) ) {
                     sv_setiv( *svpp, ++trie->uniquecharcount );
@@ -2834,7 +2843,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch,
                         }
                         state = newstate;
                     } else {
-                        Perl_croak( aTHX_ "panic! In trie construction, no char mapping for %"IVdf, uvc );
+                        Perl_croak( aTHX_ "panic! In trie construction, no char mapping for %" IVdf, uvc );
 		    }
 		}
 	    }
@@ -3031,7 +3040,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch,
                         }
                         state = trie->trans[ state + charid ].next;
                     } else {
-                        Perl_croak( aTHX_ "panic! In trie construction, no char mapping for %"IVdf, uvc );
+                        Perl_croak( aTHX_ "panic! In trie construction, no char mapping for %" IVdf, uvc );
                     }
                     /* charid is now 0 if we dont know the char read, or
                      * nonzero if we do */
@@ -3164,7 +3173,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch,
 	    PerlMemShared_realloc( trie->states, laststate
 				   * sizeof(reg_trie_state) );
         DEBUG_TRIE_COMPILE_MORE_r(
-            Perl_re_indentf( aTHX_  "Alloc: %d Orig: %"IVdf" elements, Final:%"IVdf". Savings of %%%5.2f\n",
+            Perl_re_indentf( aTHX_  "Alloc: %d Orig: %" IVdf " elements, Final:%" IVdf ". Savings of %%%5.2f\n",
                 depth+1,
                 (int)( ( TRIE_CHARCOUNT(trie) + 1 ) * trie->uniquecharcount
                        + 1 ),
@@ -3176,7 +3185,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch,
         } /* end table compress */
     }
     DEBUG_TRIE_COMPILE_MORE_r(
-            Perl_re_indentf( aTHX_  "Statecount:%"UVxf" Lasttrans:%"UVxf"\n",
+            Perl_re_indentf( aTHX_  "Statecount:%" UVxf " Lasttrans:%" UVxf "\n",
                 depth+1,
                 (UV)trie->statecount,
                 (UV)trie->lasttrans)
@@ -3227,7 +3236,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch,
             });
         }
         DEBUG_OPTIMISE_r(
-            Perl_re_indentf( aTHX_  "MJD offset:%"UVuf" MJD length:%"UVuf"\n",
+            Perl_re_indentf( aTHX_  "MJD offset:%" UVuf " MJD length:%" UVuf "\n",
                 depth+1,
                 (UV)mjd_offset, (UV)mjd_nodelen)
         );
@@ -3236,13 +3245,19 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch,
            split out as an EXACT and put in front of the TRIE node.  */
         trie->startstate= 1;
         if ( trie->bitmap && !widecharmap && !trie->jump  ) {
+            /* we want to find the first state that has more than
+             * one transition, if that state is not the first state
+             * then we have a common prefix which we can remove.
+             */
             U32 state;
             for ( state = 1 ; state < trie->statecount-1 ; state++ ) {
                 U32 ofs = 0;
-                I32 idx = -1;
+                I32 first_ofs = -1; /* keeps track of the ofs of the first
+                                       transition, -1 means none */
                 U32 count = 0;
                 const U32 base = trie->states[ state ].trans.base;
 
+                /* does this state terminate an alternation? */
                 if ( trie->states[state].wordnum )
                         count = 1;
 
@@ -3252,44 +3267,54 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch,
                          trie->trans[ base + ofs - trie->uniquecharcount ].check == state )
                     {
                         if ( ++count > 1 ) {
-                            SV **tmp = av_fetch( revcharmap, ofs, 0);
-			    const U8 *ch = (U8*)SvPV_nolen_const( *tmp );
+                            /* we have more than one transition */
+                            SV **tmp;
+                            U8 *ch;
+                            /* if this is the first state there is no common prefix
+                             * to extract, so we can exit */
                             if ( state == 1 ) break;
+                            tmp = av_fetch( revcharmap, ofs, 0);
+                            ch = (U8*)SvPV_nolen_const( *tmp );
+
+                            /* if we are on count 2 then we need to initialize the
+                             * bitmap, and store the previous char if there was one
+                             * in it*/
                             if ( count == 2 ) {
+                                /* clear the bitmap */
                                 Zero(trie->bitmap, ANYOF_BITMAP_SIZE, char);
                                 DEBUG_OPTIMISE_r(
-                                    Perl_re_indentf( aTHX_  "New Start State=%"UVuf" Class: [",
+                                    Perl_re_indentf( aTHX_  "New Start State=%" UVuf " Class: [",
                                         depth+1,
                                         (UV)state));
-				if (idx >= 0) {
-				    SV ** const tmp = av_fetch( revcharmap, idx, 0);
+                                if (first_ofs >= 0) {
+                                    SV ** const tmp = av_fetch( revcharmap, first_ofs, 0);
 				    const U8 * const ch = (U8*)SvPV_nolen_const( *tmp );
 
-                                    TRIE_BITMAP_SET(trie,*ch);
-                                    if ( folder )
-                                        TRIE_BITMAP_SET(trie, folder[ *ch ]);
+                                    TRIE_BITMAP_SET_FOLDED(trie,*ch,folder);
                                     DEBUG_OPTIMISE_r(
                                         Perl_re_printf( aTHX_  "%s", (char*)ch)
                                     );
 				}
 			    }
-			    TRIE_BITMAP_SET(trie,*ch);
-			    if ( folder )
-				TRIE_BITMAP_SET(trie,folder[ *ch ]);
+                            /* store the current firstchar in the bitmap */
+                            TRIE_BITMAP_SET_FOLDED(trie,*ch,folder);
                             DEBUG_OPTIMISE_r(Perl_re_printf( aTHX_ "%s", ch));
 			}
-                        idx = ofs;
+                        first_ofs = ofs;
 		    }
                 }
                 if ( count == 1 ) {
-                    SV **tmp = av_fetch( revcharmap, idx, 0);
+                    /* This state has only one transition, its transition is part
+                     * of a common prefix - we need to concatenate the char it
+                     * represents to what we have so far. */
+                    SV **tmp = av_fetch( revcharmap, first_ofs, 0);
                     STRLEN len;
                     char *ch = SvPV( *tmp, len );
                     DEBUG_OPTIMISE_r({
                         SV *sv=sv_newmortal();
-                        Perl_re_indentf( aTHX_  "Prefix State: %"UVuf" Idx:%"UVuf" Char='%s'\n",
+                        Perl_re_indentf( aTHX_  "Prefix State: %" UVuf " Ofs:%" UVuf " Char='%s'\n",
                             depth+1,
-                            (UV)state, (UV)idx,
+                            (UV)state, (UV)first_ofs,
                             pv_pretty(sv, SvPV_nolen_const(*tmp), SvCUR(*tmp), 6,
 	                        PL_colors[0], PL_colors[1],
 	                        (SvUTF8(*tmp) ? PERL_PV_ESCAPE_UNI : 0) |
@@ -3580,11 +3605,11 @@ S_construct_ahocorasick_from_trie(pTHX_ RExC_state_t *pRExC_state, regnode *sour
      */
     fail[ 0 ] = fail[ 1 ] = 0;
     DEBUG_TRIE_COMPILE_r({
-        Perl_re_indentf( aTHX_  "Stclass Failtable (%"UVuf" states): 0",
+        Perl_re_indentf( aTHX_  "Stclass Failtable (%" UVuf " states): 0",
                       depth, (UV)numstates
         );
         for( q_read=1; q_read<numstates; q_read++ ) {
-            Perl_re_printf( aTHX_  ", %"UVuf, (UV)fail[q_read]);
+            Perl_re_printf( aTHX_  ", %" UVuf, (UV)fail[q_read]);
         }
         Perl_re_printf( aTHX_  "\n");
     });
@@ -3882,7 +3907,7 @@ S_join_exact(pTHX_ RExC_state_t *pRExC_state, regnode *scan,
                     }
                     else {
                         STRLEN len;
-                        _to_utf8_fold_flags(s, d, &len, FOLD_FLAGS_FULL);
+                        _toFOLD_utf8_flags(s, s_end, d, &len, FOLD_FLAGS_FULL);
                         d += len;
                     }
                     s += s_len;
@@ -4102,6 +4127,7 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
     GET_RE_DEBUG_FLAGS_DECL;
 
     PERL_ARGS_ASSERT_STUDY_CHUNK;
+    RExC_study_started= 1;
 
 
     if ( depth == 0 ) {
@@ -4422,7 +4448,7 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 
                         DEBUG_TRIE_COMPILE_r({
                             regprop(RExC_rx, RExC_mysv, tail, NULL, pRExC_state);
-                            Perl_re_indentf( aTHX_  "%s %"UVuf":%s\n",
+                            Perl_re_indentf( aTHX_  "%s %" UVuf ":%s\n",
                               depth+1,
                               "Looking for TRIE'able sequences. Tail node is ",
                               (UV)(tail - RExC_emit_start),
@@ -5059,7 +5085,7 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 		    SAVEFREESV(RExC_rx_sv);
 		    Perl_ck_warner(aTHX_ packWARN(WARN_REGEXP),
 			"Quantifier unexpected on zero-length expression "
-			"in regex m/%"UTF8f"/",
+			"in regex m/%" UTF8f "/",
 			 UTF8fARG(UTF, RExC_precomp_end - RExC_precomp,
 				  RExC_precomp));
 		    (void)ReREFCNT_inc(RExC_rx_sv);
@@ -5186,15 +5212,21 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 			    However, this time it's not a subexpression
 			    we care about, but the expression itself. */
 			 && (maxcount == REG_INFTY)
-			 && data && ++data->whilem_c < 16) {
+			 && data) {
 		    /* This stays as CURLYX, we can put the count/of pair. */
 		    /* Find WHILEM (as in regexec.c) */
 		    regnode *nxt = oscan + NEXT_OFF(oscan);
 
 		    if (OP(PREVOPER(nxt)) == NOTHING) /* LONGJMP */
 			nxt += ARG(nxt);
-		    PREVOPER(nxt)->flags = (U8)(data->whilem_c
-			| (RExC_whilem_seen << 4)); /* On WHILEM */
+                    nxt = PREVOPER(nxt);
+                    if (nxt->flags & 0xf) {
+                        /* we've already set whilem count on this node */
+                    } else if (++data->whilem_c < 16) {
+                        assert(data->whilem_c <= RExC_whilem_seen);
+                        nxt->flags = (U8)(data->whilem_c
+                            | (RExC_whilem_seen << 4)); /* On WHILEM */
+                    }
 		}
 		if (data && fl & (SF_HAS_PAR|SF_IN_PAR))
 		    pars++;
@@ -5255,13 +5287,13 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 		    /* It is counted once already... */
 		    data->pos_min += minnext * (mincount - counted);
 #if 0
-Perl_re_printf( aTHX_  "counted=%"UVuf" deltanext=%"UVuf
-                              " SSize_t_MAX=%"UVuf" minnext=%"UVuf
-                              " maxcount=%"UVuf" mincount=%"UVuf"\n",
+Perl_re_printf( aTHX_  "counted=%" UVuf " deltanext=%" UVuf
+                              " SSize_t_MAX=%" UVuf " minnext=%" UVuf
+                              " maxcount=%" UVuf " mincount=%" UVuf "\n",
     (UV)counted, (UV)deltanext, (UV)SSize_t_MAX, (UV)minnext, (UV)maxcount,
     (UV)mincount);
 if (deltanext != SSize_t_MAX)
-Perl_re_printf( aTHX_  "LHS=%"UVuf" RHS=%"UVuf"\n",
+Perl_re_printf( aTHX_  "LHS=%" UVuf " RHS=%" UVuf "\n",
     (UV)(-counted * deltanext + (minnext + deltanext) * maxcount
           - minnext * mincount), (UV)(SSize_t_MAX - data->pos_delta));
 #endif
@@ -5566,7 +5598,7 @@ Perl_re_printf( aTHX_  "LHS=%"UVuf" RHS=%"UVuf"\n",
 			FAIL("Variable length lookbehind not implemented");
                     }
                     else if (minnext > (I32)U8_MAX) {
-			FAIL2("Lookbehind longer than %"UVuf" not implemented",
+			FAIL2("Lookbehind longer than %" UVuf " not implemented",
                               (UV)U8_MAX);
                     }
                     scan->flags = (U8)minnext;
@@ -5655,7 +5687,7 @@ Perl_re_printf( aTHX_  "LHS=%"UVuf" RHS=%"UVuf"\n",
 			FAIL("Variable length lookbehind not implemented");
                     }
                     else if (*minnextp > (I32)U8_MAX) {
-			FAIL2("Lookbehind longer than %"UVuf" not implemented",
+			FAIL2("Lookbehind longer than %" UVuf " not implemented",
                               (UV)U8_MAX);
                     }
                     scan->flags = (U8)*minnextp;
@@ -5899,15 +5931,10 @@ Perl_re_printf( aTHX_  "LHS=%"UVuf" RHS=%"UVuf"\n",
 	/* Else: zero-length, ignore. */
 	scan = regnext(scan);
     }
-    /* If we are exiting a recursion we can unset its recursed bit
-     * and allow ourselves to enter it again - no danger of an
-     * infinite loop there.
-    if (stopparen > -1 && recursed) {
-	DEBUG_STUDYDATA("unset:", data,depth);
-        PAREN_UNSET( recursed, stopparen);
-    }
-    */
+
+  finish:
     if (frame) {
+        /* we need to unwind recursion. */
         depth = depth - 1;
 
         DEBUG_STUDYDATA("frame-end:",data,depth);
@@ -5924,7 +5951,6 @@ Perl_re_printf( aTHX_  "LHS=%"UVuf" RHS=%"UVuf"\n",
         goto fake_study_recurse;
     }
 
-  finish:
     assert(!frame);
     DEBUG_STUDYDATA("pre-fin:",data,depth);
 
@@ -6075,7 +6101,7 @@ Perl_pregcomp(pTHX_ SV * const pattern, const U32 flags)
 
     /* Dispatch a request to compile a regexp to correct regexp engine. */
     DEBUG_COMPILE_r({
-        Perl_re_printf( aTHX_  "Using engine %"UVxf"\n",
+        Perl_re_printf( aTHX_  "Using engine %" UVxf "\n",
 			PTR2UV(eng));
     });
     return CALLREGCOMP_ENG(eng, pattern, flags);
@@ -6099,6 +6125,39 @@ Perl_re_compile(pTHX_ SV * const pattern, U32 rx_flags)
                                 &PL_core_reg_engine,
 #endif
                                 NULL, NULL, rx_flags, 0);
+}
+
+
+static void
+S_free_codeblocks(pTHX_ struct reg_code_blocks *cbs)
+{
+    int n;
+
+    if (--cbs->refcnt > 0)
+        return;
+    for (n = 0; n < cbs->count; n++) {
+        REGEXP *rx = cbs->cb[n].src_regex;
+        cbs->cb[n].src_regex = NULL;
+        SvREFCNT_dec(rx);
+    }
+    Safefree(cbs->cb);
+    Safefree(cbs);
+}
+
+
+static struct reg_code_blocks *
+S_alloc_code_blocks(pTHX_  int ncode)
+{
+     struct reg_code_blocks *cbs;
+    Newx(cbs, 1, struct reg_code_blocks);
+    cbs->count = ncode;
+    cbs->refcnt = 1;
+    SAVEDESTRUCTOR_X(S_free_codeblocks, cbs);
+    if (ncode)
+        Newx(cbs->cb, ncode, struct reg_code_block);
+    else
+        cbs->cb = NULL;
+    return cbs;
 }
 
 
@@ -6128,14 +6187,16 @@ S_pat_upgrade_to_utf8(pTHX_ RExC_state_t * const pRExC_state,
 
     while (s < *plen_p) {
         append_utf8_from_native_byte(src[s], &d);
+
         if (n < num_code_blocks) {
-            if (!do_end && pRExC_state->code_blocks[n].start == s) {
-                pRExC_state->code_blocks[n].start = d - dst - 1;
+            assert(pRExC_state->code_blocks);
+            if (!do_end && pRExC_state->code_blocks->cb[n].start == s) {
+                pRExC_state->code_blocks->cb[n].start = d - dst - 1;
                 assert(*(d - 1) == '(');
                 do_end = 1;
             }
-            else if (do_end && pRExC_state->code_blocks[n].end == s) {
-                pRExC_state->code_blocks[n].end = d - dst - 1;
+            else if (do_end && pRExC_state->code_blocks->cb[n].end == s) {
+                pRExC_state->code_blocks->cb[n].end = d - dst - 1;
                 assert(*(d - 1) == ')');
                 do_end = 0;
                 n++;
@@ -6255,10 +6316,10 @@ S_concat_pat(pTHX_ RExC_state_t * const pRExC_state,
             if (oplist->op_type == OP_NULL
                 && (oplist->op_flags & OPf_SPECIAL))
             {
-                assert(n < pRExC_state->num_code_blocks);
-                pRExC_state->code_blocks[n].start = pat ? SvCUR(pat) : 0;
-                pRExC_state->code_blocks[n].block = oplist;
-                pRExC_state->code_blocks[n].src_regex = NULL;
+                assert(n < pRExC_state->code_blocks->count);
+                pRExC_state->code_blocks->cb[n].start = pat ? SvCUR(pat) : 0;
+                pRExC_state->code_blocks->cb[n].block = oplist;
+                pRExC_state->code_blocks->cb[n].src_regex = NULL;
                 n++;
                 code = 1;
                 oplist = OpSIBLING(oplist); /* skip CONST */
@@ -6288,7 +6349,8 @@ S_concat_pat(pTHX_ RExC_state_t * const pRExC_state,
             sv_setsv(pat, sv);
             /* overloading involved: all bets are off over literal
              * code. Pretend we haven't seen it */
-            pRExC_state->num_code_blocks -= n;
+            if (n)
+                pRExC_state->code_blocks->count -= n;
             n = 0;
         }
         else  {
@@ -6322,11 +6384,23 @@ S_concat_pat(pTHX_ RExC_state_t * const pRExC_state,
                 sv_catsv_nomg(pat, msv);
                 rx = msv;
             }
-            else
-                pat = msv;
+            else {
+                /* We have only one SV to process, but we need to verify
+                 * it is properly null terminated or we will fail asserts
+                 * later. In theory we probably shouldn't get such SV's,
+                 * but if we do we should handle it gracefully. */
+                if ( SvTYPE(msv) != SVt_PV || (SvLEN(msv) > SvCUR(msv) && *(SvEND(msv)) == 0) ) {
+                    /* not a string, or a string with a trailing null */
+                    pat = msv;
+                } else {
+                    /* a string with no trailing null, we need to copy it
+                     * so it we have a trailing null */
+                    pat = newSVsv(msv);
+                }
+            }
 
             if (code)
-                pRExC_state->code_blocks[n-1].end = SvCUR(pat)-1;
+                pRExC_state->code_blocks->cb[n-1].end = SvCUR(pat)-1;
         }
 
         /* extract any code blocks within any embedded qr//'s */
@@ -6335,25 +6409,31 @@ S_concat_pat(pTHX_ RExC_state_t * const pRExC_state,
         {
 
             RXi_GET_DECL(ReANY((REGEXP *)rx), ri);
-            if (ri->num_code_blocks) {
+            if (ri->code_blocks && ri->code_blocks->count) {
                 int i;
                 /* the presence of an embedded qr// with code means
                  * we should always recompile: the text of the
                  * qr// may not have changed, but it may be a
                  * different closure than last time */
                 *recompile_p = 1;
-                Renew(pRExC_state->code_blocks,
-                    pRExC_state->num_code_blocks + ri->num_code_blocks,
-                    struct reg_code_block);
-                pRExC_state->num_code_blocks += ri->num_code_blocks;
+                if (pRExC_state->code_blocks) {
+                    int new_count = pRExC_state->code_blocks->count
+                            + ri->code_blocks->count;
+                    Renew(pRExC_state->code_blocks->cb,
+                            new_count, struct reg_code_block);
+                    pRExC_state->code_blocks->count = new_count;
+                }
+                else
+                    pRExC_state->code_blocks = S_alloc_code_blocks(aTHX_
+                                                    ri->code_blocks->count);
 
-                for (i=0; i < ri->num_code_blocks; i++) {
+                for (i=0; i < ri->code_blocks->count; i++) {
                     struct reg_code_block *src, *dst;
                     STRLEN offset =  orig_patlen
                         + ReANY((REGEXP *)rx)->pre_prefix;
-                    assert(n < pRExC_state->num_code_blocks);
-                    src = &ri->code_blocks[i];
-                    dst = &pRExC_state->code_blocks[n];
+                    assert(n < pRExC_state->code_blocks->count);
+                    src = &ri->code_blocks->cb[i];
+                    dst = &pRExC_state->code_blocks->cb[n];
                     dst->start	    = src->start + offset;
                     dst->end	    = src->end   + offset;
                     dst->block	    = src->block;
@@ -6388,10 +6468,11 @@ S_has_runtime_code(pTHX_ RExC_state_t * const pRExC_state,
     PERL_UNUSED_CONTEXT;
 
     for (s = 0; s < plen; s++) {
-	if (n < pRExC_state->num_code_blocks
-	    && s == pRExC_state->code_blocks[n].start)
+	if (   pRExC_state->code_blocks
+            && n < pRExC_state->code_blocks->count
+	    && s == pRExC_state->code_blocks->cb[n].start)
 	{
-	    s = pRExC_state->code_blocks[n].end;
+	    s = pRExC_state->code_blocks->cb[n].end;
 	    n++;
 	    continue;
 	}
@@ -6451,7 +6532,7 @@ S_compile_runtime_code(pTHX_ RExC_state_t * const pRExC_state,
 	int n = 0;
 	STRLEN s;
 	char *p, *newpat;
-	int newlen = plen + 6; /* allow for "qr''x\0" extra chars */
+	int newlen = plen + 7; /* allow for "qr''xx\0" extra chars */
 	SV *sv, *qr_ref;
 	dSP;
 
@@ -6466,12 +6547,13 @@ S_compile_runtime_code(pTHX_ RExC_state_t * const pRExC_state,
 	*p++ = 'q'; *p++ = 'r'; *p++ = '\'';
 
 	for (s = 0; s < plen; s++) {
-	    if (n < pRExC_state->num_code_blocks
-		&& s == pRExC_state->code_blocks[n].start)
+	    if (   pRExC_state->code_blocks
+	        && n < pRExC_state->code_blocks->count
+		&& s == pRExC_state->code_blocks->cb[n].start)
 	    {
 		/* blank out literal code block */
 		assert(pat[s] == '(');
-		while (s <= pRExC_state->code_blocks[n].end) {
+		while (s <= pRExC_state->code_blocks->cb[n].end) {
 		    *p++ = '_';
 		    s++;
 		}
@@ -6484,8 +6566,12 @@ S_compile_runtime_code(pTHX_ RExC_state_t * const pRExC_state,
 	    *p++ = pat[s];
 	}
 	*p++ = '\'';
-	if (pRExC_state->pm_flags & RXf_PMf_EXTENDED)
+	if (pRExC_state->pm_flags & RXf_PMf_EXTENDED) {
 	    *p++ = 'x';
+            if (pRExC_state->pm_flags & RXf_PMf_EXTENDED_MORE) {
+                *p++ = 'x';
+            }
+        }
 	*p++ = '\0';
 	DEBUG_COMPILE_r({
             Perl_re_printf( aTHX_
@@ -6511,11 +6597,8 @@ S_compile_runtime_code(pTHX_ RExC_state_t * const pRExC_state,
 	{
 	    SV * const errsv = ERRSV;
 	    if (SvTRUE_NN(errsv))
-	    {
-		Safefree(pRExC_state->code_blocks);
                 /* use croak_sv ? */
-		Perl_croak_nocontext("%"SVf, SVfARG(errsv));
-	    }
+		Perl_croak_nocontext("%" SVf, SVfARG(errsv));
 	}
 	assert(SvROK(qr_ref));
 	qr = SvRV(qr_ref);
@@ -6547,42 +6630,46 @@ S_compile_runtime_code(pTHX_ RExC_state_t * const pRExC_state,
 	struct reg_code_block *new_block, *dst;
 	RExC_state_t * const r1 = pRExC_state; /* convenient alias */
 	int i1 = 0, i2 = 0;
+        int r1c, r2c;
 
-	if (!r2->num_code_blocks) /* we guessed wrong */
+	if (!r2->code_blocks || !r2->code_blocks->count) /* we guessed wrong */
 	{
 	    SvREFCNT_dec_NN(qr);
 	    return 1;
 	}
 
-	Newx(new_block,
-	    r1->num_code_blocks + r2->num_code_blocks,
-	    struct reg_code_block);
+        if (!r1->code_blocks)
+            r1->code_blocks = S_alloc_code_blocks(aTHX_ 0);
+
+        r1c = r1->code_blocks->count;
+        r2c = r2->code_blocks->count;
+
+	Newx(new_block, r1c + r2c, struct reg_code_block);
+
 	dst = new_block;
 
-	while (    i1 < r1->num_code_blocks
-		|| i2 < r2->num_code_blocks)
-	{
+	while (i1 < r1c || i2 < r2c) {
 	    struct reg_code_block *src;
 	    bool is_qr = 0;
 
-	    if (i1 == r1->num_code_blocks) {
-		src = &r2->code_blocks[i2++];
+	    if (i1 == r1c) {
+		src = &r2->code_blocks->cb[i2++];
 		is_qr = 1;
 	    }
-	    else if (i2 == r2->num_code_blocks)
-		src = &r1->code_blocks[i1++];
-	    else if (  r1->code_blocks[i1].start
-	             < r2->code_blocks[i2].start)
+	    else if (i2 == r2c)
+		src = &r1->code_blocks->cb[i1++];
+	    else if (  r1->code_blocks->cb[i1].start
+	             < r2->code_blocks->cb[i2].start)
 	    {
-		src = &r1->code_blocks[i1++];
-		assert(src->end < r2->code_blocks[i2].start);
+		src = &r1->code_blocks->cb[i1++];
+		assert(src->end < r2->code_blocks->cb[i2].start);
 	    }
 	    else {
-		assert(  r1->code_blocks[i1].start
-		       > r2->code_blocks[i2].start);
-		src = &r2->code_blocks[i2++];
+		assert(  r1->code_blocks->cb[i1].start
+		       > r2->code_blocks->cb[i2].start);
+		src = &r2->code_blocks->cb[i2++];
 		is_qr = 1;
-		assert(src->end < r1->code_blocks[i1].start);
+		assert(src->end < r1->code_blocks->cb[i1].start);
 	    }
 
 	    assert(pat[src->start] == '(');
@@ -6594,9 +6681,9 @@ S_compile_runtime_code(pTHX_ RExC_state_t * const pRExC_state,
 				    : src->src_regex;
 	    dst++;
 	}
-	r1->num_code_blocks += r2->num_code_blocks;
-	Safefree(r1->code_blocks);
-	r1->code_blocks = new_block;
+	r1->code_blocks->count += r2c;
+	Safefree(r1->code_blocks->cb);
+	r1->code_blocks->cb = new_block;
     }
 
     SvREFCNT_dec_NN(qr);
@@ -6642,7 +6729,11 @@ S_setup_longest(pTHX_ RExC_state_t *pRExC_state, SV* sv_longest,
         calculate it.*/
     ml = minlen ? *(minlen) : (SSize_t)longest_length;
     *rx_end_shift = ml - offset
-        - longest_length + (SvTAIL(sv_longest) != 0)
+        - longest_length
+            /* XXX SvTAIL is always false here - did you mean FBMcf_TAIL
+             * intead? - DAPM
+            + (SvTAIL(sv_longest) != 0)
+            */
         + lookbehind;
 
     t = (eol/* Can't have SEOL and MULTI */
@@ -6711,7 +6802,6 @@ Perl_re_op_compile(pTHX_ SV ** const patternp, int pat_count,
     SSize_t minlen = 0;
     U32 rx_flags;
     SV *pat;
-    SV *code_blocksv = NULL;
     SV** new_patternp = patternp;
 
     /* these are all flags - maybe they should be turned
@@ -6767,8 +6857,8 @@ Perl_re_op_compile(pTHX_ SV ** const patternp, int pat_count,
 #endif
     }
 
+    pRExC_state->warn_text = NULL;
     pRExC_state->code_blocks = NULL;
-    pRExC_state->num_code_blocks = 0;
 
     if (is_bare_re)
 	*is_bare_re = FALSE;
@@ -6782,10 +6872,9 @@ Perl_re_op_compile(pTHX_ SV ** const patternp, int pat_count,
 	for (o = cLISTOPx(expr)->op_first; o; o = OpSIBLING(o))
 	    if (o->op_type == OP_NULL && (o->op_flags & OPf_SPECIAL))
 		ncode++; /* count of DO blocks */
-	if (ncode) {
-	    pRExC_state->num_code_blocks = ncode;
-	    Newx(pRExC_state->code_blocks, ncode, struct reg_code_block);
-	}
+
+	if (ncode)
+            pRExC_state->code_blocks = S_alloc_code_blocks(aTHX_ ncode);
     }
 
     if (!pat_count) {
@@ -6829,7 +6918,7 @@ Perl_re_op_compile(pTHX_ SV ** const patternp, int pat_count,
 
     /* set expr to the first arg op */
 
-    if (pRExC_state->num_code_blocks
+    if (pRExC_state->code_blocks && pRExC_state->code_blocks->count
          && expr->op_type != OP_CONST)
     {
             expr = cLISTOPx(expr)->op_first;
@@ -6851,7 +6940,6 @@ Perl_re_op_compile(pTHX_ SV ** const patternp, int pat_count,
             if (is_bare_re)
                 *is_bare_re = TRUE;
             SvREFCNT_inc(re);
-            Safefree(pRExC_state->code_blocks);
             DEBUG_PARSE_r(Perl_re_printf( aTHX_
                 "Precompiled pattern%s\n",
                     orig_rx_flags & RXf_SPLIT ? " for split" : ""));
@@ -6871,7 +6959,6 @@ Perl_re_op_compile(pTHX_ SV ** const patternp, int pat_count,
 	    pat = newSVpvn_flags(exp, plen, SVs_TEMP |
 					(IN_BYTES ? 0 : SvUTF8(pat)));
 	}
-	Safefree(pRExC_state->code_blocks);
 	return CALLREGCOMP_ENG(eng, pat, orig_rx_flags);
     }
 
@@ -6881,8 +6968,8 @@ Perl_re_op_compile(pTHX_ SV ** const patternp, int pat_count,
     RExC_uni_semantics = 0;
     RExC_seen_unfolded_sharp_s = 0;
     RExC_contains_locale = 0;
-    RExC_contains_i = 0;
     RExC_strict = cBOOL(pm_flags & RXf_PMf_STRICT);
+    RExC_study_started = 0;
     pRExC_state->runtime_code_qr = NULL;
     RExC_frame_head= NULL;
     RExC_frame_last= NULL;
@@ -6926,15 +7013,11 @@ Perl_re_op_compile(pTHX_ SV ** const patternp, int pat_count,
         && memEQ(RX_PRECOMP(old_re), exp, plen)
 	&& !runtime_code /* with runtime code, always recompile */ )
     {
-        Safefree(pRExC_state->code_blocks);
         return old_re;
     }
 
     rx_flags = orig_rx_flags;
 
-    if (rx_flags & PMf_FOLD) {
-        RExC_contains_i = 1;
-    }
     if (   initial_charset == REGEX_DEPENDS_CHARSET
         && (RExC_utf8 ||RExC_uni_semantics))
     {
@@ -6958,7 +7041,7 @@ Perl_re_op_compile(pTHX_ SV ** const patternp, int pat_count,
 	    /* whoops, we have a non-utf8 pattern, whilst run-time code
 	     * got compiled as utf8. Try again with a utf8 pattern */
             S_pat_upgrade_to_utf8(aTHX_ pRExC_state, &exp, &plen,
-                                    pRExC_state->num_code_blocks);
+                pRExC_state->code_blocks ? pRExC_state->code_blocks->count : 0);
             goto redo_first_pass;
 	}
     }
@@ -6971,7 +7054,6 @@ Perl_re_op_compile(pTHX_ SV ** const patternp, int pat_count,
     RExC_in_lookbehind = 0;
     RExC_seen_zerolen = *exp == '^' ? -1 : 0;
     RExC_extralen = 0;
-    RExC_override_recoding = 0;
 #ifdef EBCDIC
     RExC_recode_x_to_native = 0;
 #endif
@@ -7015,17 +7097,7 @@ Perl_re_op_compile(pTHX_ SV ** const patternp, int pat_count,
         RExC_lastnum=0;
         RExC_lastparse=NULL;
     );
-    /* reg may croak on us, not giving us a chance to free
-       pRExC_state->code_blocks.  We cannot SAVEFREEPV it now, as we may
-       need it to survive as long as the regexp (qr/(?{})/).
-       We must check that code_blocksv is not already set, because we may
-       have jumped back to restart the sizing pass. */
-    if (pRExC_state->code_blocks && !code_blocksv) {
-	code_blocksv = newSV_type(SVt_PV);
-	SAVEFREESV(code_blocksv);
-	SvPV_set(code_blocksv, (char *)pRExC_state->code_blocks);
-	SvLEN_set(code_blocksv, 1); /*sufficient to make sv_clear free it*/
-    }
+
     if (reg(pRExC_state, 0, &flags,1) == NULL) {
         /* It's possible to write a regexp in ascii that represents Unicode
         codepoints outside of the byte range, such as via \x{100}. If we
@@ -7038,7 +7110,7 @@ Perl_re_op_compile(pTHX_ SV ** const patternp, int pat_count,
         if (flags & RESTART_PASS1) {
             if (flags & NEED_UTF8) {
                 S_pat_upgrade_to_utf8(aTHX_ pRExC_state, &exp, &plen,
-                                    pRExC_state->num_code_blocks);
+                pRExC_state->code_blocks ? pRExC_state->code_blocks->count : 0);
             }
             else {
                 DEBUG_PARSE_r(Perl_re_printf( aTHX_
@@ -7047,14 +7119,12 @@ Perl_re_op_compile(pTHX_ SV ** const patternp, int pat_count,
 
             goto redo_first_pass;
         }
-        Perl_croak(aTHX_ "panic: reg returned NULL to re_op_compile for sizing pass, flags=%#"UVxf"", (UV) flags);
+        Perl_croak(aTHX_ "panic: reg returned NULL to re_op_compile for sizing pass, flags=%#" UVxf, (UV) flags);
     }
-    if (code_blocksv)
-	SvLEN_set(code_blocksv,0); /* no you can't have it, sv_clear */
 
     DEBUG_PARSE_r({
         Perl_re_printf( aTHX_
-            "Required size %"IVdf" nodes\n"
+            "Required size %" IVdf " nodes\n"
             "Starting second pass (creation)\n",
             (IV)RExC_size);
         RExC_lastnum=0;
@@ -7103,16 +7173,8 @@ Perl_re_op_compile(pTHX_ SV ** const patternp, int pat_count,
 
     if (pm_flags & PMf_IS_QR) {
 	ri->code_blocks = pRExC_state->code_blocks;
-	ri->num_code_blocks = pRExC_state->num_code_blocks;
-    }
-    else
-    {
-	int n;
-	for (n = 0; n < pRExC_state->num_code_blocks; n++)
-	    if (pRExC_state->code_blocks[n].src_regex)
-		SAVEFREESV(pRExC_state->code_blocks[n].src_regex);
-	if(pRExC_state->code_blocks)
-	    SAVEFREEPV(pRExC_state->code_blocks); /* often null */
+	if (ri->code_blocks)
+            ri->code_blocks->refcnt++;
     }
 
     {
@@ -7129,7 +7191,7 @@ Perl_re_op_compile(pTHX_ SV ** const patternp, int pat_count,
                                                    == REG_RUN_ON_COMMENT_SEEN);
 	U8 reganch = (U8)((r->extflags & RXf_PMf_STD_PMMOD)
 			    >> RXf_PMf_STD_PMMOD_SHIFT);
-	const char *fptr = STD_PAT_MODS;        /*"msixn"*/
+	const char *fptr = STD_PAT_MODS;        /*"msixxn"*/
 	char *p;
 
         /* We output all the necessary flags; we never output a minus, as all
@@ -7192,7 +7254,7 @@ Perl_re_op_compile(pTHX_ SV ** const patternp, int pat_count,
 #ifdef RE_TRACK_PATTERN_OFFSETS
     Newxz(ri->u.offsets, 2*RExC_size+1, U32); /* MJD 20001228 */
     DEBUG_OFFSETS_r(Perl_re_printf( aTHX_
-                          "%s %"UVuf" bytes for offset annotations.\n",
+                          "%s %" UVuf " bytes for offset annotations.\n",
                           ri->u.offsets ? "Got" : "Couldn't get",
                           (UV)((2*RExC_size+1) * sizeof(U32))));
 #endif
@@ -7246,7 +7308,7 @@ Perl_re_op_compile(pTHX_ SV ** const patternp, int pat_count,
     RExC_npar = 1;
     if (reg(pRExC_state, 0, &flags,1) == NULL) {
 	ReREFCNT_dec(rx);
-        Perl_croak(aTHX_ "panic: reg returned NULL to re_op_compile for generation pass, flags=%#"UVxf"", (UV) flags);
+        Perl_croak(aTHX_ "panic: reg returned NULL to re_op_compile for generation pass, flags=%#" UVxf, (UV) flags);
     }
     DEBUG_OPTIMISE_r(
         Perl_re_printf( aTHX_  "Starting post parse optimization\n");
@@ -7391,7 +7453,7 @@ Perl_re_op_compile(pTHX_ SV ** const patternp, int pat_count,
             !sawlookahead &&
 	    (OP(first) == STAR &&
 	    PL_regkind[OP(NEXTOPER(first))] == REG_ANY) &&
-            !(r->intflags & PREGf_ANCH) && !pRExC_state->num_code_blocks)
+            !(r->intflags & PREGf_ANCH) && !pRExC_state->code_blocks)
 	{
 	    /* turn .* into ^.* with an implied $*=1 */
 	    const int type =
@@ -7404,7 +7466,7 @@ Perl_re_op_compile(pTHX_ SV ** const patternp, int pat_count,
 	}
         if (sawplus && !sawminmod && !sawlookahead
             && (!sawopen || !RExC_sawback)
-	    && !pRExC_state->num_code_blocks) /* May examine pos and $& */
+	    && !pRExC_state->code_blocks) /* May examine pos and $& */
 	    /* x+ must match at the 1st pos of run of x's */
 	    r->intflags |= PREGf_SKIP;
 
@@ -7412,12 +7474,12 @@ Perl_re_op_compile(pTHX_ SV ** const patternp, int pat_count,
 #ifdef TRIE_STUDY_OPT
 	DEBUG_PARSE_r(
 	    if (!restudied)
-                Perl_re_printf( aTHX_  "first at %"IVdf"\n",
+                Perl_re_printf( aTHX_  "first at %" IVdf "\n",
 			      (IV)(first - scan + 1))
         );
 #else
 	DEBUG_PARSE_r(
-            Perl_re_printf( aTHX_  "first at %"IVdf"\n",
+            Perl_re_printf( aTHX_  "first at %" IVdf "\n",
 	        (IV)(first - scan + 1))
         );
 #endif
@@ -7644,7 +7706,7 @@ Perl_re_op_compile(pTHX_ SV ** const patternp, int pat_count,
     /* Guard against an embedded (?=) or (?<=) with a longer minlen than
        the "real" pattern. */
     DEBUG_OPTIMISE_r({
-        Perl_re_printf( aTHX_ "minlen: %"IVdf" r->minlen:%"IVdf" maxlen:%"IVdf"\n",
+        Perl_re_printf( aTHX_ "minlen: %" IVdf " r->minlen:%" IVdf " maxlen:%" IVdf "\n",
                       (IV)minlen, (IV)r->minlen, (IV)RExC_maxlen);
     });
     r->minlenret = minlen;
@@ -7660,7 +7722,7 @@ Perl_re_op_compile(pTHX_ SV ** const patternp, int pat_count,
     if (RExC_seen & REG_LOOKBEHIND_SEEN)
         r->extflags |= RXf_NO_INPLACE_SUBST; /* inplace might break the
                                                 lookbehind */
-    if (pRExC_state->num_code_blocks)
+    if (pRExC_state->code_blocks)
 	r->extflags |= RXf_EVAL_SEEN;
     if (RExC_seen & REG_VERBARG_SEEN)
     {
@@ -7732,6 +7794,18 @@ Perl_re_op_compile(pTHX_ SV ** const patternp, int pat_count,
 
     while ( RExC_recurse_count > 0 ) {
         const regnode *scan = RExC_recurse[ --RExC_recurse_count ];
+        /*
+         * This data structure is set up in study_chunk() and is used
+         * to calculate the distance between a GOSUB regopcode and
+         * the OPEN/CURLYM (CURLYM's are special and can act like OPEN's)
+         * it refers to.
+         *
+         * If for some reason someone writes code that optimises
+         * away a GOSUB opcode then the assert should be changed to
+         * an if(scan) to guard the ARG2L_SET() - Yves
+         *
+         */
+        assert(scan && OP(scan) == GOSUB);
         ARG2L_SET( scan, RExC_open_parens[ARG(scan)] - scan );
     }
 
@@ -7752,10 +7826,10 @@ Perl_re_op_compile(pTHX_ SV ** const patternp, int pat_count,
         STRLEN i;
         GET_RE_DEBUG_FLAGS_DECL;
         Perl_re_printf( aTHX_
-                      "Offsets: [%"UVuf"]\n\t", (UV)ri->u.offsets[0]);
+                      "Offsets: [%" UVuf "]\n\t", (UV)ri->u.offsets[0]);
         for (i = 1; i <= len; i++) {
             if (ri->u.offsets[i*2-1] || ri->u.offsets[i*2])
-                Perl_re_printf( aTHX_  "%"UVuf":%"UVuf"[%"UVuf"] ",
+                Perl_re_printf( aTHX_  "%" UVuf ":%" UVuf "[%" UVuf "] ",
                 (UV)i, (UV)ri->u.offsets[i*2-1], (UV)ri->u.offsets[i*2]);
             }
         Perl_re_printf( aTHX_  "\n");
@@ -7822,14 +7896,10 @@ SV*
 Perl_reg_named_buff_fetch(pTHX_ REGEXP * const r, SV * const namesv,
 			  const U32 flags)
 {
-    AV *retarray = NULL;
     SV *ret;
     struct regexp *const rx = ReANY(r);
 
     PERL_ARGS_ASSERT_REG_NAMED_BUFF_FETCH;
-
-    if (flags & RXapif_ALL)
-        retarray=newAV();
 
     if (rx && RXp_PAREN_NAMES(rx)) {
         HE *he_str = hv_fetch_ent( RXp_PAREN_NAMES(rx), namesv, 0, 0 );
@@ -7837,6 +7907,7 @@ Perl_reg_named_buff_fetch(pTHX_ REGEXP * const r, SV * const namesv,
             IV i;
             SV* sv_dat=HeVAL(he_str);
             I32 *nums=(I32*)SvPVX(sv_dat);
+            AV * const retarray = (flags & RXapif_ALL) ? newAV() : NULL;
             for ( i=0; i<SvIVX(sv_dat); i++ ) {
                 if ((I32)(rx->nparens) >= nums[i]
                     && rx->offs[nums[i]].start != -1
@@ -8097,7 +8168,7 @@ Perl_reg_numbered_buff_fetch(pTHX_ REGEXP * const r, const I32 paren,
         }
     } else {
       ret_undef:
-        sv_setsv(sv,&PL_sv_undef);
+        sv_set_undef(sv);
         return;
     }
 }
@@ -8229,17 +8300,18 @@ S_reg_scan_name(pTHX_ RExC_state_t *pRExC_state, U32 flags)
 
     assert (RExC_parse <= RExC_end);
     if (RExC_parse == RExC_end) NOOP;
-    else if (isIDFIRST_lazy_if(RExC_parse, UTF)) {
+    else if (isIDFIRST_lazy_if_safe(RExC_parse, RExC_end, UTF)) {
          /* Note that the code here assumes well-formed UTF-8.  Skip IDFIRST by
           * using do...while */
 	if (UTF)
 	    do {
 		RExC_parse += UTF8SKIP(RExC_parse);
-	    } while (isWORDCHAR_utf8((U8*)RExC_parse));
+	    } while (   RExC_parse < RExC_end
+                     && isWORDCHAR_utf8_safe((U8*)RExC_parse, (U8*) RExC_end));
 	else
 	    do {
 		RExC_parse++;
-	    } while (isWORDCHAR(*RExC_parse));
+	    } while (RExC_parse < RExC_end && isWORDCHAR(*RExC_parse));
     } else {
         RExC_parse++; /* so the <- from the vFAIL is after the offending
                          character */
@@ -8323,33 +8395,47 @@ S_reg_scan_name(pTHX_ RExC_state_t *pRExC_state, U32 flags)
  * as an SVt_INVLIST scalar.
  *
  * An inversion list for Unicode is an array of code points, sorted by ordinal
- * number.  The zeroth element is the first code point in the list.  The 1th
- * element is the first element beyond that not in the list.  In other words,
- * the first range is
- *  invlist[0]..(invlist[1]-1)
- * The other ranges follow.  Thus every element whose index is divisible by two
- * marks the beginning of a range that is in the list, and every element not
- * divisible by two marks the beginning of a range not in the list.  A single
- * element inversion list that contains the single code point N generally
- * consists of two elements
- *  invlist[0] == N
- *  invlist[1] == N+1
- * (The exception is when N is the highest representable value on the
- * machine, in which case the list containing just it would be a single
- * element, itself.  By extension, if the last range in the list extends to
- * infinity, then the first element of that range will be in the inversion list
- * at a position that is divisible by two, and is the final element in the
- * list.)
+ * number.  Each element gives the code point that begins a range that extends
+ * up-to but not including the code point given by the next element.  The final
+ * element gives the first code point of a range that extends to the platform's
+ * infinity.  The even-numbered elements (invlist[0], invlist[2], invlist[4],
+ * ...) give ranges whose code points are all in the inversion list.  We say
+ * that those ranges are in the set.  The odd-numbered elements give ranges
+ * whose code points are not in the inversion list, and hence not in the set.
+ * Thus, element [0] is the first code point in the list.  Element [1]
+ * is the first code point beyond that not in the list; and element [2] is the
+ * first code point beyond that that is in the list.  In other words, the first
+ * range is invlist[0]..(invlist[1]-1), and all code points in that range are
+ * in the inversion list.  The second range is invlist[1]..(invlist[2]-1), and
+ * all code points in that range are not in the inversion list.  The third
+ * range invlist[2]..(invlist[3]-1) gives code points that are in the inversion
+ * list, and so forth.  Thus every element whose index is divisible by two
+ * gives the beginning of a range that is in the list, and every element whose
+ * index is not divisible by two gives the beginning of a range not in the
+ * list.  If the final element's index is divisible by two, the inversion list
+ * extends to the platform's infinity; otherwise the highest code point in the
+ * inversion list is the contents of that element minus 1.
+ *
+ * A range that contains just a single code point N will look like
+ *  invlist[i]   == N
+ *  invlist[i+1] == N+1
+ *
+ * If N is UV_MAX (the highest representable code point on the machine), N+1 is
+ * impossible to represent, so element [i+1] is omitted.  The single element
+ * inversion list
+ *  invlist[0] == UV_MAX
+ * contains just UV_MAX, but is interpreted as matching to infinity.
+ *
  * Taking the complement (inverting) an inversion list is quite simple, if the
  * first element is 0, remove it; otherwise add a 0 element at the beginning.
  * This implementation reserves an element at the beginning of each inversion
  * list to always contain 0; there is an additional flag in the header which
  * indicates if the list begins at the 0, or is offset to begin at the next
- * element.
+ * element.  This means that the inversion list can be inverted without any
+ * copying; just flip the flag.
  *
  * More about inversion lists can be found in "Unicode Demystified"
  * Chapter 13 by Richard Gillam, published by Addison-Wesley.
- * More will be coming when functionality is added later.
  *
  * The inversion list data structure is currently implemented as an SV pointing
  * to an array of UVs that the SV thinks are bytes.  This allows us to have an
@@ -8360,6 +8446,8 @@ S_reg_scan_name(pTHX_ RExC_state_t *pRExC_state, U32 flags)
  * should eventually be made public */
 
 /* The header definitions are in F<invlist_inline.h> */
+
+#ifndef PERL_IN_XSUB_RE
 
 PERL_STATIC_INLINE UV*
 S__invlist_array_init(SV* const invlist, const bool will_have_0)
@@ -8387,6 +8475,8 @@ S__invlist_array_init(SV* const invlist, const bool will_have_0)
     return zero_addr + *offset;
 }
 
+#endif
+
 PERL_STATIC_INLINE void
 S_invlist_set_len(pTHX_ SV* const invlist, const UV len, const bool offset)
 {
@@ -8409,9 +8499,9 @@ S_invlist_set_len(pTHX_ SV* const invlist, const UV len, const bool offset)
 STATIC void
 S_invlist_replace_list_destroys_src(pTHX_ SV * dest, SV * src)
 {
-    /* Replaces the inversion list in 'src' with the one in 'dest'.  It steals
-     * the list from 'src', so 'src' is made to have a NULL list.  This is
-     * similar to what SvSetMagicSV() would do, if it were implemented on
+    /* Replaces the inversion list in 'dest' with the one from 'src'.  It
+     * steals the list from 'src', so 'src' is made to have a NULL list.  This
+     * is similar to what SvSetMagicSV() would do, if it were implemented on
      * inversion lists, though this routine avoids a copy */
 
     const UV src_len          = _invlist_len(src);
@@ -8523,6 +8613,8 @@ S_invlist_is_iterating(SV* const invlist)
     return *(get_invlist_iter_addr(invlist)) < (STRLEN) UV_MAX;
 }
 
+#ifndef PERL_IN_XSUB_RE
+
 PERL_STATIC_INLINE UV
 S_invlist_max(SV* const invlist)
 {
@@ -8539,8 +8631,6 @@ S_invlist_max(SV* const invlist)
            ? FROM_INTERNAL_SIZE(SvCUR(invlist)) - 1
            : FROM_INTERNAL_SIZE(SvLEN(invlist)) - 1;
 }
-
-#ifndef PERL_IN_XSUB_RE
 SV*
 Perl__new_invlist(pTHX_ IV initial_size)
 {
@@ -8626,7 +8716,6 @@ Perl__new_invlist_C_array(pTHX_ const UV* const list)
 
     return invlist;
 }
-#endif /* ifndef PERL_IN_XSUB_RE */
 
 STATIC void
 S_invlist_extend(pTHX_ SV* const invlist, const UV new_max)
@@ -8670,18 +8759,18 @@ S__append_range_to_invlist(pTHX_ SV* const invlist,
 
 	UV final_element = len - 1;
 	array = invlist_array(invlist);
-	if (array[final_element] > start
+	if (   array[final_element] > start
 	    || ELEMENT_RANGE_MATCHES_INVLIST(final_element))
 	{
-	    Perl_croak(aTHX_ "panic: attempting to append to an inversion list, but wasn't at the end of the list, final=%"UVuf", start=%"UVuf", match=%c",
+	    Perl_croak(aTHX_ "panic: attempting to append to an inversion list, but wasn't at the end of the list, final=%" UVuf ", start=%" UVuf ", match=%c",
 		     array[final_element], start,
 		     ELEMENT_RANGE_MATCHES_INVLIST(final_element) ? 't' : 'f');
 	}
 
-	/* Here, it is a legal append.  If the new range begins with the first
-	 * value not in the set, it is extending the set, so the new first
-	 * value not in the set is one greater than the newly extended range.
-	 * */
+        /* Here, it is a legal append.  If the new range begins 1 above the end
+         * of the range below it, it is extending the range below it, so the
+         * new first value not in the set is one greater than the newly
+         * extended range.  */
         offset = *get_invlist_offset_addr(invlist);
 	if (array[final_element] == start) {
 	    if (end != UV_MAX) {
@@ -8689,7 +8778,8 @@ S__append_range_to_invlist(pTHX_ SV* const invlist,
 	    }
 	    else {
 		/* But if the end is the maximum representable on the machine,
-		 * just let the range that this would extend to have no end */
+                 * assume that infinity was actually what was meant.  Just let
+                 * the range that this would extend to have no end */
 		invlist_set_len(invlist, len - 1, offset);
 	    }
 	    return;
@@ -8727,9 +8817,7 @@ S__append_range_to_invlist(pTHX_ SV* const invlist,
     }
 }
 
-#ifndef PERL_IN_XSUB_RE
-
-IV
+SSize_t
 Perl__invlist_search(SV* const invlist, const UV cp)
 {
     /* Searches the inversion list for the entry that contains the input code
@@ -8920,26 +9008,20 @@ void
 Perl__invlist_union_maybe_complement_2nd(pTHX_ SV* const a, SV* const b,
                                          const bool complement_b, SV** output)
 {
-    /* Take the union of two inversion lists and point <output> to it.  *output
-     * SHOULD BE DEFINED upon input, and if it points to one of the two lists,
-     * the reference count to that list will be decremented if not already a
-     * temporary (mortal); otherwise just its contents will be modified to be
-     * the union.  The first list, <a>, may be NULL, in which case a copy of
-     * the second list is returned.  If <complement_b> is TRUE, the union is
-     * taken of the complement (inversion) of <b> instead of b itself.
+    /* Take the union of two inversion lists and point '*output' to it.  On
+     * input, '*output' MUST POINT TO NULL OR TO AN SV* INVERSION LIST (possibly
+     * even 'a' or 'b').  If to an inversion list, the contents of the original
+     * list will be replaced by the union.  The first list, 'a', may be
+     * NULL, in which case a copy of the second list is placed in '*output'.
+     * If 'complement_b' is TRUE, the union is taken of the complement
+     * (inversion) of 'b' instead of b itself.
      *
      * The basis for this comes from "Unicode Demystified" Chapter 13 by
      * Richard Gillam, published by Addison-Wesley, and explained at some
      * length there.  The preface says to incorporate its examples into your
      * code at your own risk.
      *
-     * The algorithm is like a merge sort.
-     *
-     * XXX A potential performance improvement is to keep track as we go along
-     * if only one of the inputs contributes to the result, meaning the other
-     * is a subset of that one.  In that case, we can skip the final copy and
-     * return the larger of the input lists, but then outside code might need
-     * to keep track of whether to free the input list or not */
+     * The algorithm is like a merge sort. */
 
     const UV* array_a;    /* a's array */
     const UV* array_b;
@@ -8956,110 +9038,94 @@ Perl__invlist_union_maybe_complement_2nd(pTHX_ SV* const a, SV* const b,
 
     /* running count, as explained in the algorithm source book; items are
      * stopped accumulating and are output when the count changes to/from 0.
-     * The count is incremented when we start a range that's in the set, and
-     * decremented when we start a range that's not in the set.  So its range
-     * is 0 to 2.  Only when the count is zero is something not in the set.
-     */
+     * The count is incremented when we start a range that's in an input's set,
+     * and decremented when we start a range that's not in a set.  So this
+     * variable can be 0, 1, or 2.  When it is 0 neither input is in their set,
+     * and hence nothing goes into the union; 1, just one of the inputs is in
+     * its set (and its current range gets added to the union); and 2 when both
+     * inputs are in their sets.  */
     UV count = 0;
 
     PERL_ARGS_ASSERT__INVLIST_UNION_MAYBE_COMPLEMENT_2ND;
     assert(a != b);
+    assert(*output == NULL || SvTYPE(*output) == SVt_INVLIST);
 
     len_b = _invlist_len(b);
     if (len_b == 0) {
 
-        /* Here, 'b' is empty.  If the output is the complement of 'b', the
-         * union is all possible code points, and we need not even look at 'a'.
-         * It's easiest to create a new inversion list that matches everything.
-         * */
+        /* Here, 'b' is empty, hence it's complement is all possible code
+         * points.  So if the union includes the complement of 'b', it includes
+         * everything, and we need not even look at 'a'.  It's easiest to
+         * create a new inversion list that matches everything.  */
         if (complement_b) {
-            SV* everything = _new_invlist(1);
-            _append_range_to_invlist(everything, 0, UV_MAX);
+            SV* everything = _add_range_to_invlist(NULL, 0, UV_MAX);
 
-            /* If the output didn't exist, just point it at the new list */
-            if (*output == NULL) {
+            if (*output == NULL) { /* If the output didn't exist, just point it
+                                      at the new list */
                 *output = everything;
-                return;
+            }
+            else { /* Otherwise, replace its contents with the new list */
+                invlist_replace_list_destroys_src(*output, everything);
+                SvREFCNT_dec_NN(everything);
             }
 
-            /* Otherwise, replace its contents with the new list */
-            invlist_replace_list_destroys_src(*output, everything);
-            SvREFCNT_dec_NN(everything);
             return;
         }
 
-        /* Here, we don't want the complement of 'b', and since it is empty,
+        /* Here, we don't want the complement of 'b', and since 'b' is empty,
          * the union will come entirely from 'a'.  If 'a' is NULL or empty, the
          * output will be empty */
 
-        if (a == NULL) {
-            *output = _new_invlist(0);
-            return;
-        }
-
-        if (_invlist_len(a) == 0) {
-            invlist_clear(*output);
-            return;
-        }
-
-        /* Here, 'a' is not empty, and entirely determines the union.  If the
-         * output is not to overwrite 'b', we can just return 'a'. */
-        if (*output != b) {
-
-            /* If the output is to overwrite 'a', we have a no-op, as it's
-             * already in 'a' */
-            if (*output == a) {
-                return;
+        if (a == NULL || _invlist_len(a) == 0) {
+            if (*output == NULL) {
+                *output = _new_invlist(0);
             }
+            else {
+                invlist_clear(*output);
+            }
+            return;
+        }
 
-            /* But otherwise we have to copy 'a' to the output */
+        /* Here, 'a' is not empty, but 'b' is, so 'a' entirely determines the
+         * union.  We can just return a copy of 'a' if '*output' doesn't point
+         * to an existing list */
+        if (*output == NULL) {
             *output = invlist_clone(a);
             return;
         }
 
-        /* Here, 'b' is to be overwritten by the output, which will be 'a' */
+        /* If the output is to overwrite 'a', we have a no-op, as it's
+         * already in 'a' */
+        if (*output == a) {
+            return;
+        }
+
+        /* Here, '*output' is to be overwritten by 'a' */
         u = invlist_clone(a);
         invlist_replace_list_destroys_src(*output, u);
         SvREFCNT_dec_NN(u);
 
-	return;
+        return;
     }
+
+    /* Here 'b' is not empty.  See about 'a' */
 
     if (a == NULL || ((len_a = _invlist_len(a)) == 0)) {
 
         /* Here, 'a' is empty (and b is not).  That means the union will come
-         * entirely from 'b'.  If the output is not to overwrite 'a', we can
-         * just return what's in 'b'.  */
-        if (*output != a) {
+         * entirely from 'b'.  If '*output' is NULL, we can directly return a
+         * clone of 'b'.  Otherwise, we replace the contents of '*output' with
+         * the clone */
 
-            /* If the output is to overwrite 'b', it's already in 'b', but
-             * otherwise we have to copy 'b' to the output */
-            if (*output != b) {
-                *output = invlist_clone(b);
-            }
-
-            /* And if the output is to be the inversion of 'b', do that */
-            if (complement_b) {
-                _invlist_invert(*output);
-            }
-
-            return;
+        SV ** dest = (*output == NULL) ? output : &u;
+        *dest = invlist_clone(b);
+        if (complement_b) {
+            _invlist_invert(*dest);
         }
 
-        /* Here, 'a', which is empty or even NULL, is to be overwritten by the
-         * output, which will either be 'b' or the complement of 'b' */
-
-        if (a == NULL) {
-            *output = invlist_clone(b);
-        }
-        else {
-            u = invlist_clone(b);
+        if (dest == &u) {
             invlist_replace_list_destroys_src(*output, u);
             SvREFCNT_dec_NN(u);
-	}
-
-        if (complement_b) {
-            _invlist_invert(*output);
         }
 
 	return;
@@ -9093,32 +9159,32 @@ Perl__invlist_union_maybe_complement_2nd(pTHX_ SV* const a, SV* const b,
     u = _new_invlist(len_a + len_b);
 
     /* Will contain U+0000 if either component does */
-    array_u = _invlist_array_init(u, (len_a > 0 && array_a[0] == 0)
-				      || (len_b > 0 && array_b[0] == 0));
+    array_u = _invlist_array_init(u, (    len_a > 0 && array_a[0] == 0)
+                                      || (len_b > 0 && array_b[0] == 0));
 
-    /* Go through each list item by item, stopping when exhausted one of
-     * them */
+    /* Go through each input list item by item, stopping when have exhausted
+     * one of them */
     while (i_a < len_a && i_b < len_b) {
 	UV cp;	    /* The element to potentially add to the union's array */
 	bool cp_in_set;   /* is it in the the input list's set or not */
 
 	/* We need to take one or the other of the two inputs for the union.
 	 * Since we are merging two sorted lists, we take the smaller of the
-	 * next items.  In case of a tie, we take the one that is in its set
-	 * first.  If we took one not in the set first, it would decrement the
-	 * count, possibly to 0 which would cause it to be output as ending the
-	 * range, and the next time through we would take the same number, and
-	 * output it again as beginning the next range.  By doing it the
-	 * opposite way, there is no possibility that the count will be
-	 * momentarily decremented to 0, and thus the two adjoining ranges will
-	 * be seamlessly merged.  (In a tie and both are in the set or both not
-	 * in the set, it doesn't matter which we take first.) */
-	if (array_a[i_a] < array_b[i_b]
-	    || (array_a[i_a] == array_b[i_b]
+         * next items.  In case of a tie, we take first the one that is in its
+         * set.  If we first took the one not in its set, it would decrement
+         * the count, possibly to 0 which would cause it to be output as ending
+         * the range, and the next time through we would take the same number,
+         * and output it again as beginning the next range.  By doing it the
+         * opposite way, there is no possibility that the count will be
+         * momentarily decremented to 0, and thus the two adjoining ranges will
+         * be seamlessly merged.  (In a tie and both are in the set or both not
+         * in the set, it doesn't matter which we take first.) */
+	if (       array_a[i_a] < array_b[i_b]
+	    || (   array_a[i_a] == array_b[i_b]
 		&& ELEMENT_RANGE_MATCHES_INVLIST(i_a)))
 	{
 	    cp_in_set = ELEMENT_RANGE_MATCHES_INVLIST(i_a);
-	    cp= array_a[i_a++];
+	    cp = array_a[i_a++];
 	}
 	else {
 	    cp_in_set = ELEMENT_RANGE_MATCHES_INVLIST(i_b);
@@ -9142,39 +9208,53 @@ Perl__invlist_union_maybe_complement_2nd(pTHX_ SV* const a, SV* const b,
 	}
     }
 
-    /* Here, we are finished going through at least one of the lists, which
-     * means there is something remaining in at most one.  We check if the list
-     * that hasn't been exhausted is positioned such that we are in the middle
-     * of a range in its set or not.  (i_a and i_b point to the element beyond
-     * the one we care about.) If in the set, we decrement 'count'; if 0, there
-     * is potentially more to output.
-     * There are four cases:
-     *	1) Both weren't in their sets, count is 0, and remains 0.  What's left
-     *	   in the union is entirely from the non-exhausted set.
-     *	2) Both were in their sets, count is 2.  Nothing further should
-     *	   be output, as everything that remains will be in the exhausted
-     *	   list's set, hence in the union; decrementing to 1 but not 0 insures
-     *	   that
-     *	3) the exhausted was in its set, non-exhausted isn't, count is 1.
-     *	   Nothing further should be output because the union includes
-     *	   everything from the exhausted set.  Not decrementing ensures that.
-     *	4) the exhausted wasn't in its set, non-exhausted is, count is 1;
-     *	   decrementing to 0 insures that we look at the remainder of the
-     *	   non-exhausted set */
+
+    /* The loop above increments the index into exactly one of the input lists
+     * each iteration, and ends when either index gets to its list end.  That
+     * means the other index is lower than its end, and so something is
+     * remaining in that one.  We decrement 'count', as explained below, if
+     * that list is in its set.  (i_a and i_b each currently index the element
+     * beyond the one we care about.) */
     if (   (i_a != len_a && PREV_RANGE_MATCHES_INVLIST(i_a))
 	|| (i_b != len_b && PREV_RANGE_MATCHES_INVLIST(i_b)))
     {
 	count--;
     }
 
-    /* The final length is what we've output so far, plus what else is about to
-     * be output.  (If 'count' is non-zero, then the input list we exhausted
-     * has everything remaining up to the machine's limit in its set, and hence
-     * in the union, so there will be no further output. */
-    len_u = i_u;
-    if (count == 0) {
-	/* At most one of the subexpressions will be non-zero */
-	len_u += (len_a - i_a) + (len_b - i_b);
+    /* Above we decremented 'count' if the list that had unexamined elements in
+     * it was in its set.  This has made it so that 'count' being non-zero
+     * means there isn't anything left to output; and 'count' equal to 0 means
+     * that what is left to output is precisely that which is left in the
+     * non-exhausted input list.
+     *
+     * To see why, note first that the exhausted input obviously has nothing
+     * left to add to the union.  If it was in its set at its end, that means
+     * the set extends from here to the platform's infinity, and hence so does
+     * the union and the non-exhausted set is irrelevant.  The exhausted set
+     * also contributed 1 to 'count'.  If 'count' was 2, it got decremented to
+     * 1, but if it was 1, the non-exhausted set wasn't in its set, and so
+     * 'count' remains at 1.  This is consistent with the decremented 'count'
+     * != 0 meaning there's nothing left to add to the union.
+     *
+     * But if the exhausted input wasn't in its set, it contributed 0 to
+     * 'count', and the rest of the union will be whatever the other input is.
+     * If 'count' was 0, neither list was in its set, and 'count' remains 0;
+     * otherwise it gets decremented to 0.  This is consistent with 'count'
+     * == 0 meaning the remainder of the union is whatever is left in the
+     * non-exhausted list. */
+    if (count != 0) {
+        len_u = i_u;
+    }
+    else {
+        IV copy_count = len_a - i_a;
+        if (copy_count > 0) {   /* The non-exhausted input is 'a' */
+	    Copy(array_a + i_a, array_u + i_u, copy_count, UV);
+        }
+        else { /* The non-exhausted input is b */
+            copy_count = len_b - i_b;
+	    Copy(array_b + i_b, array_u + i_u, copy_count, UV);
+        }
+        len_u = i_u + copy_count;
     }
 
     /* Set the result to the final length, which can change the pointer to
@@ -9186,46 +9266,17 @@ Perl__invlist_union_maybe_complement_2nd(pTHX_ SV* const a, SV* const b,
 	array_u = invlist_array(u);
     }
 
-    /* When 'count' is 0, the list that was exhausted (if one was shorter than
-     * the other) ended with everything above it not in its set.  That means
-     * that the remaining part of the union is precisely the same as the
-     * non-exhausted list, so can just copy it unchanged.  (If both lists were
-     * exhausted at the same time, then the operations below will be both 0.)
-     */
-    if (count == 0) {
-	IV copy_count; /* At most one will have a non-zero copy count */
-	if ((copy_count = len_a - i_a) > 0) {
-	    Copy(array_a + i_a, array_u + i_u, copy_count, UV);
-	}
-	else if ((copy_count = len_b - i_b) > 0) {
-	    Copy(array_b + i_b, array_u + i_u, copy_count, UV);
-	}
-    }
-
-    /* If the output is not to overwrite either of the inputs, just return the
-     * calculated union */
-    if (a != *output && b != *output) {
+    if (*output == NULL) {  /* Simply return the new inversion list */
         *output = u;
     }
     else {
-        /*  Here, the output is to be the same as one of the input scalars,
-         *  hence replacing it.  The simple thing to do is to free the input
-         *  scalar, making it instead be the output one.  But experience has
-         *  shown [perl #127392] that if the input is a mortal, we can get a
-         *  huge build-up of these during regex compilation before they get
-         *  freed.  So for that case, replace just the input's interior with
-         *  the output's, and then free the output */
-
-        assert(! invlist_is_iterating(*output));
-
-        if (! SvTEMP(*output)) {
-            SvREFCNT_dec_NN(*output);
-            *output = u;
-        }
-        else {
-            invlist_replace_list_destroys_src(*output, u);
-            SvREFCNT_dec_NN(u);
-        }
+        /* Otherwise, overwrite the inversion list that was in '*output'.  We
+         * could instead free '*output', and then set it to 'u', but experience
+         * has shown [perl #127392] that if the input is a mortal, we can get a
+         * huge build-up of these during regex compilation before they get
+         * freed. */
+        invlist_replace_list_destroys_src(*output, u);
+        SvREFCNT_dec_NN(u);
     }
 
     return;
@@ -9235,14 +9286,13 @@ void
 Perl__invlist_intersection_maybe_complement_2nd(pTHX_ SV* const a, SV* const b,
                                                const bool complement_b, SV** i)
 {
-    /* Take the intersection of two inversion lists and point <i> to it.  *i
-     * SHOULD BE DEFINED upon input, and if it points to one of the two lists,
-     * the reference count to that list will be decremented if not already a
-     * temporary (mortal); otherwise just its contents will be modified to be
-     * the intersection.  The first list, <a>, may be NULL, in which case an
-     * empty list is returned.  If <complement_b> is TRUE, the result will be
-     * the intersection of <a> and the complement (or inversion) of <b> instead
-     * of <b> directly.
+    /* Take the intersection of two inversion lists and point '*i' to it.  On
+     * input, '*i' MUST POINT TO NULL OR TO AN SV* INVERSION LIST (possibly
+     * even 'a' or 'b').  If to an inversion list, the contents of the original
+     * list will be replaced by the intersection.  The first list, 'a', may be
+     * NULL, in which case '*i' will be an empty list.  If 'complement_b' is
+     * TRUE, the result will be the intersection of 'a' and the complement (or
+     * inversion) of 'b' instead of 'b' directly.
      *
      * The basis for this comes from "Unicode Demystified" Chapter 13 by
      * Richard Gillam, published by Addison-Wesley, and explained at some
@@ -9266,16 +9316,17 @@ Perl__invlist_intersection_maybe_complement_2nd(pTHX_ SV* const a, SV* const b,
     UV i_b = 0;
     UV i_r = 0;
 
-    /* running count, as explained in the algorithm source book; items are
-     * stopped accumulating and are output when the count changes to/from 2.
-     * The count is incremented when we start a range that's in the set, and
-     * decremented when we start a range that's not in the set.  So its range
-     * is 0 to 2.  Only when the count is 2 is something in the intersection.
-     */
+    /* running count of how many of the two inputs are postitioned at ranges
+     * that are in their sets.  As explained in the algorithm source book,
+     * items are stopped accumulating and are output when the count changes
+     * to/from 2.  The count is incremented when we start a range that's in an
+     * input's set, and decremented when we start a range that's not in a set.
+     * Only when it is 2 are we in the intersection. */
     UV count = 0;
 
     PERL_ARGS_ASSERT__INVLIST_INTERSECTION_MAYBE_COMPLEMENT_2ND;
     assert(a != b);
+    assert(*i == NULL || SvTYPE(*i) == SVt_INVLIST);
 
     /* Special case if either one is empty */
     len_a = (a == NULL) ? 0 : _invlist_len(a);
@@ -9291,13 +9342,11 @@ Perl__invlist_intersection_maybe_complement_2nd(pTHX_ SV* const a, SV* const b,
                 return;
             }
 
-            /* If not overwriting either input, just make a copy of 'a' */
-            if (*i != b) {
+            if (*i == NULL) {
                 *i = invlist_clone(a);
                 return;
             }
 
-            /* Here we are overwriting 'b' with 'a's contents */
             r = invlist_clone(a);
             invlist_replace_list_destroys_src(*i, r);
             SvREFCNT_dec_NN(r);
@@ -9343,10 +9392,10 @@ Perl__invlist_intersection_maybe_complement_2nd(pTHX_ SV* const a, SV* const b,
     r= _new_invlist(len_a + len_b);
 
     /* Will contain U+0000 iff both components do */
-    array_r = _invlist_array_init(r, len_a > 0 && array_a[0] == 0
-				     && len_b > 0 && array_b[0] == 0);
+    array_r = _invlist_array_init(r,    len_a > 0 && array_a[0] == 0
+                                     && len_b > 0 && array_b[0] == 0);
 
-    /* Go through each list item by item, stopping when exhausted one of
+    /* Go through each list item by item, stopping when have exhausted one of
      * them */
     while (i_a < len_a && i_b < len_b) {
 	UV cp;	    /* The element to potentially add to the intersection's
@@ -9355,21 +9404,21 @@ Perl__invlist_intersection_maybe_complement_2nd(pTHX_ SV* const a, SV* const b,
 
 	/* We need to take one or the other of the two inputs for the
 	 * intersection.  Since we are merging two sorted lists, we take the
-	 * smaller of the next items.  In case of a tie, we take the one that
-	 * is not in its set first (a difference from the union algorithm).  If
-	 * we took one in the set first, it would increment the count, possibly
-	 * to 2 which would cause it to be output as starting a range in the
-	 * intersection, and the next time through we would take that same
-	 * number, and output it again as ending the set.  By doing it the
-	 * opposite of this, there is no possibility that the count will be
-	 * momentarily incremented to 2.  (In a tie and both are in the set or
-	 * both not in the set, it doesn't matter which we take first.) */
-	if (array_a[i_a] < array_b[i_b]
-	    || (array_a[i_a] == array_b[i_b]
+         * smaller of the next items.  In case of a tie, we take first the one
+         * that is not in its set (a difference from the union algorithm).  If
+         * we first took the one in its set, it would increment the count,
+         * possibly to 2 which would cause it to be output as starting a range
+         * in the intersection, and the next time through we would take that
+         * same number, and output it again as ending the set.  By doing the
+         * opposite of this, there is no possibility that the count will be
+         * momentarily incremented to 2.  (In a tie and both are in the set or
+         * both not in the set, it doesn't matter which we take first.) */
+	if (       array_a[i_a] < array_b[i_b]
+	    || (   array_a[i_a] == array_b[i_b]
 		&& ! ELEMENT_RANGE_MATCHES_INVLIST(i_a)))
 	{
 	    cp_in_set = ELEMENT_RANGE_MATCHES_INVLIST(i_a);
-	    cp= array_a[i_a++];
+	    cp = array_a[i_a++];
 	}
 	else {
 	    cp_in_set = ELEMENT_RANGE_MATCHES_INVLIST(i_b);
@@ -9391,36 +9440,55 @@ Perl__invlist_intersection_maybe_complement_2nd(pTHX_ SV* const a, SV* const b,
 	    }
 	    count--;
 	}
+
     }
 
-    /* Here, we are finished going through at least one of the lists, which
-     * means there is something remaining in at most one.  We check if the list
-     * that has been exhausted is positioned such that we are in the middle
-     * of a range in its set or not.  (i_a and i_b point to elements 1 beyond
-     * the ones we care about.)  There are four cases:
-     *	1) Both weren't in their sets, count is 0, and remains 0.  There's
-     *	   nothing left in the intersection.
-     *	2) Both were in their sets, count is 2 and perhaps is incremented to
-     *	   above 2.  What should be output is exactly that which is in the
-     *	   non-exhausted set, as everything it has is also in the intersection
-     *	   set, and everything it doesn't have can't be in the intersection
-     *	3) The exhausted was in its set, non-exhausted isn't, count is 1, and
-     *	   gets incremented to 2.  Like the previous case, the intersection is
-     *	   everything that remains in the non-exhausted set.
-     *	4) the exhausted wasn't in its set, non-exhausted is, count is 1, and
-     *	   remains 1.  And the intersection has nothing more. */
+    /* The loop above increments the index into exactly one of the input lists
+     * each iteration, and ends when either index gets to its list end.  That
+     * means the other index is lower than its end, and so something is
+     * remaining in that one.  We increment 'count', as explained below, if the
+     * exhausted list was in its set.  (i_a and i_b each currently index the
+     * element beyond the one we care about.) */
     if (   (i_a == len_a && PREV_RANGE_MATCHES_INVLIST(i_a))
-	|| (i_b == len_b && PREV_RANGE_MATCHES_INVLIST(i_b)))
+        || (i_b == len_b && PREV_RANGE_MATCHES_INVLIST(i_b)))
     {
 	count++;
     }
 
-    /* The final length is what we've output so far plus what else is in the
-     * intersection.  At most one of the subexpressions below will be non-zero
-     * */
-    len_r = i_r;
-    if (count >= 2) {
-	len_r += (len_a - i_a) + (len_b - i_b);
+    /* Above we incremented 'count' if the exhausted list was in its set.  This
+     * has made it so that 'count' being below 2 means there is nothing left to
+     * output; otheriwse what's left to add to the intersection is precisely
+     * that which is left in the non-exhausted input list.
+     *
+     * To see why, note first that the exhausted input obviously has nothing
+     * left to affect the intersection.  If it was in its set at its end, that
+     * means the set extends from here to the platform's infinity, and hence
+     * anything in the non-exhausted's list will be in the intersection, and
+     * anything not in it won't be.  Hence, the rest of the intersection is
+     * precisely what's in the non-exhausted list  The exhausted set also
+     * contributed 1 to 'count', meaning 'count' was at least 1.  Incrementing
+     * it means 'count' is now at least 2.  This is consistent with the
+     * incremented 'count' being >= 2 means to add the non-exhausted list to
+     * the intersection.
+     *
+     * But if the exhausted input wasn't in its set, it contributed 0 to
+     * 'count', and the intersection can't include anything further; the
+     * non-exhausted set is irrelevant.  'count' was at most 1, and doesn't get
+     * incremented.  This is consistent with 'count' being < 2 meaning nothing
+     * further to add to the intersection. */
+    if (count < 2) { /* Nothing left to put in the intersection. */
+        len_r = i_r;
+    }
+    else { /* copy the non-exhausted list, unchanged. */
+        IV copy_count = len_a - i_a;
+        if (copy_count > 0) {   /* a is the one with stuff left */
+	    Copy(array_a + i_a, array_r + i_r, copy_count, UV);
+        }
+        else {  /* b is the one with stuff left */
+            copy_count = len_b - i_b;
+	    Copy(array_b + i_b, array_r + i_r, copy_count, UV);
+        }
+        len_r = i_r + copy_count;
     }
 
     /* Set the result to the final length, which can change the pointer to
@@ -9432,97 +9500,282 @@ Perl__invlist_intersection_maybe_complement_2nd(pTHX_ SV* const a, SV* const b,
 	array_r = invlist_array(r);
     }
 
-    /* Finish outputting any remaining */
-    if (count >= 2) { /* At most one will have a non-zero copy count */
-	IV copy_count;
-	if ((copy_count = len_a - i_a) > 0) {
-	    Copy(array_a + i_a, array_r + i_r, copy_count, UV);
-	}
-	else if ((copy_count = len_b - i_b) > 0) {
-	    Copy(array_b + i_b, array_r + i_r, copy_count, UV);
-	}
-    }
-
-    /* If the output is not to overwrite either of the inputs, just return the
-     * calculated intersection */
-    if (a != *i && b != *i) {
+    if (*i == NULL) { /* Simply return the calculated intersection */
         *i = r;
     }
-    else {
-        /*  Here, the output is to be the same as one of the input scalars,
-         *  hence replacing it.  The simple thing to do is to free the input
-         *  scalar, making it instead be the output one.  But experience has
-         *  shown [perl #127392] that if the input is a mortal, we can get a
-         *  huge build-up of these during regex compilation before they get
-         *  freed.  So for that case, replace just the input's interior with
-         *  the output's, and then free the output.  A short-cut in this case
-         *  is if the output is empty, we can just set the input to be empty */
-
-        assert(! invlist_is_iterating(*i));
-
-        if (! SvTEMP(*i)) {
-            SvREFCNT_dec_NN(*i);
-            *i = r;
+    else { /* Otherwise, replace the existing inversion list in '*i'.  We could
+              instead free '*i', and then set it to 'r', but experience has
+              shown [perl #127392] that if the input is a mortal, we can get a
+              huge build-up of these during regex compilation before they get
+              freed. */
+        if (len_r) {
+            invlist_replace_list_destroys_src(*i, r);
         }
         else {
-            if (len_r) {
-                invlist_replace_list_destroys_src(*i, r);
-            }
-            else {
-                invlist_clear(*i);
-            }
-            SvREFCNT_dec_NN(r);
+            invlist_clear(*i);
         }
+        SvREFCNT_dec_NN(r);
     }
 
     return;
 }
 
 SV*
-Perl__add_range_to_invlist(pTHX_ SV* invlist, const UV start, const UV end)
+Perl__add_range_to_invlist(pTHX_ SV* invlist, UV start, UV end)
 {
     /* Add the range from 'start' to 'end' inclusive to the inversion list's
      * set.  A pointer to the inversion list is returned.  This may actually be
      * a new list, in which case the passed in one has been destroyed.  The
      * passed-in inversion list can be NULL, in which case a new one is created
-     * with just the one range in it */
+     * with just the one range in it.  The new list is not necessarily
+     * NUL-terminated.  Space is not freed if the inversion list shrinks as a
+     * result of this function.  The gain would not be large, and in many
+     * cases, this is called multiple times on a single inversion list, so
+     * anything freed may almost immediately be needed again.
+     *
+     * This used to mostly call the 'union' routine, but that is much more
+     * heavyweight than really needed for a single range addition */
 
-    SV* range_invlist;
-    UV len;
+    UV* array;              /* The array implementing the inversion list */
+    UV len;                 /* How many elements in 'array' */
+    SSize_t i_s;            /* index into the invlist array where 'start'
+                               should go */
+    SSize_t i_e = 0;        /* And the index where 'end' should go */
+    UV cur_highest;         /* The highest code point in the inversion list
+                               upon entry to this function */
 
+    /* This range becomes the whole inversion list if none already existed */
     if (invlist == NULL) {
 	invlist = _new_invlist(2);
-	len = 0;
-    }
-    else {
-	len = _invlist_len(invlist);
+        _append_range_to_invlist(invlist, start, end);
+        return invlist;
     }
 
-    /* If comes after the final entry actually in the list, can just append it
-     * to the end, */
-    if (len == 0
-	|| (! ELEMENT_RANGE_MATCHES_INVLIST(len - 1)
-            && start >= invlist_array(invlist)[len - 1]))
-    {
-	_append_range_to_invlist(invlist, start, end);
-	return invlist;
+    /* Likewise, if the inversion list is currently empty */
+    len = _invlist_len(invlist);
+    if (len == 0) {
+        _append_range_to_invlist(invlist, start, end);
+        return invlist;
     }
 
-    /* Here, can't just append things, create and return a new inversion list
-     * which is the union of this range and the existing inversion list.  (If
-     * the new range is well-behaved wrt to the old one, we could just insert
-     * it, doing a Move() down on the tail of the old one (potentially growing
-     * it first).  But to determine that means we would have the extra
-     * (possibly throw-away) work of first finding where the new one goes and
-     * whether it disrupts (splits) an existing range, so it doesn't appear to
-     * me (khw) that it's worth it) */
-    range_invlist = _new_invlist(2);
-    _append_range_to_invlist(range_invlist, start, end);
+    /* Starting here, we have to know the internals of the list */
+    array = invlist_array(invlist);
 
-    _invlist_union(invlist, range_invlist, &invlist);
+    /* If the new range ends higher than the current highest ... */
+    cur_highest = invlist_highest(invlist);
+    if (end > cur_highest) {
 
-    /* The temporary can be freed */
-    SvREFCNT_dec_NN(range_invlist);
+        /* If the whole range is higher, we can just append it */
+        if (start > cur_highest) {
+            _append_range_to_invlist(invlist, start, end);
+            return invlist;
+        }
+
+        /* Otherwise, add the portion that is higher ... */
+        _append_range_to_invlist(invlist, cur_highest + 1, end);
+
+        /* ... and continue on below to handle the rest.  As a result of the
+         * above append, we know that the index of the end of the range is the
+         * final even numbered one of the array.  Recall that the final element
+         * always starts a range that extends to infinity.  If that range is in
+         * the set (meaning the set goes from here to infinity), it will be an
+         * even index, but if it isn't in the set, it's odd, and the final
+         * range in the set is one less, which is even. */
+        if (end == UV_MAX) {
+            i_e = len;
+        }
+        else {
+            i_e = len - 2;
+        }
+    }
+
+    /* We have dealt with appending, now see about prepending.  If the new
+     * range starts lower than the current lowest ... */
+    if (start < array[0]) {
+
+        /* Adding something which has 0 in it is somewhat tricky, and uncommon.
+         * Let the union code handle it, rather than having to know the
+         * trickiness in two code places.  */
+        if (UNLIKELY(start == 0)) {
+            SV* range_invlist;
+
+            range_invlist = _new_invlist(2);
+            _append_range_to_invlist(range_invlist, start, end);
+
+            _invlist_union(invlist, range_invlist, &invlist);
+
+            SvREFCNT_dec_NN(range_invlist);
+
+            return invlist;
+        }
+
+        /* If the whole new range comes before the first entry, and doesn't
+         * extend it, we have to insert it as an additional range */
+        if (end < array[0] - 1) {
+            i_s = i_e = -1;
+            goto splice_in_new_range;
+        }
+
+        /* Here the new range adjoins the existing first range, extending it
+         * downwards. */
+        array[0] = start;
+
+        /* And continue on below to handle the rest.  We know that the index of
+         * the beginning of the range is the first one of the array */
+        i_s = 0;
+    }
+    else { /* Not prepending any part of the new range to the existing list.
+            * Find where in the list it should go.  This finds i_s, such that:
+            *     invlist[i_s] <= start < array[i_s+1]
+            */
+        i_s = _invlist_search(invlist, start);
+    }
+
+    /* At this point, any extending before the beginning of the inversion list
+     * and/or after the end has been done.  This has made it so that, in the
+     * code below, each endpoint of the new range is either in a range that is
+     * in the set, or is in a gap between two ranges that are.  This means we
+     * don't have to worry about exceeding the array bounds.
+     *
+     * Find where in the list the new range ends (but we can skip this if we
+     * have already determined what it is, or if it will be the same as i_s,
+     * which we already have computed) */
+    if (i_e == 0) {
+        i_e = (start == end)
+              ? i_s
+              : _invlist_search(invlist, end);
+    }
+
+    /* Here generally invlist[i_e] <= end < array[i_e+1].  But if invlist[i_e]
+     * is a range that goes to infinity there is no element at invlist[i_e+1],
+     * so only the first relation holds. */
+
+    if ( ! ELEMENT_RANGE_MATCHES_INVLIST(i_s)) {
+
+        /* Here, the ranges on either side of the beginning of the new range
+         * are in the set, and this range starts in the gap between them.
+         *
+         * The new range extends the range above it downwards if the new range
+         * ends at or above that range's start */
+        const bool extends_the_range_above = (   end == UV_MAX
+                                              || end + 1 >= array[i_s+1]);
+
+        /* The new range extends the range below it upwards if it begins just
+         * after where that range ends */
+        if (start == array[i_s]) {
+
+            /* If the new range fills the entire gap between the other ranges,
+             * they will get merged together.  Other ranges may also get
+             * merged, depending on how many of them the new range spans.  In
+             * the general case, we do the merge later, just once, after we
+             * figure out how many to merge.  But in the case where the new
+             * range exactly spans just this one gap (possibly extending into
+             * the one above), we do the merge here, and an early exit.  This
+             * is done here to avoid having to special case later. */
+            if (i_e - i_s <= 1) {
+
+                /* If i_e - i_s == 1, it means that the new range terminates
+                 * within the range above, and hence 'extends_the_range_above'
+                 * must be true.  (If the range above it extends to infinity,
+                 * 'i_s+2' will be above the array's limit, but 'len-i_s-2'
+                 * will be 0, so no harm done.) */
+                if (extends_the_range_above) {
+                    Move(array + i_s + 2, array + i_s, len - i_s - 2, UV);
+                    invlist_set_len(invlist,
+                                    len - 2,
+                                    *(get_invlist_offset_addr(invlist)));
+                    return invlist;
+                }
+
+                /* Here, i_e must == i_s.  We keep them in sync, as they apply
+                 * to the same range, and below we are about to decrement i_s
+                 * */
+                i_e--;
+            }
+
+            /* Here, the new range is adjacent to the one below.  (It may also
+             * span beyond the range above, but that will get resolved later.)
+             * Extend the range below to include this one. */
+            array[i_s] = (end == UV_MAX) ? UV_MAX : end + 1;
+            i_s--;
+            start = array[i_s];
+        }
+        else if (extends_the_range_above) {
+
+            /* Here the new range only extends the range above it, but not the
+             * one below.  It merges with the one above.  Again, we keep i_e
+             * and i_s in sync if they point to the same range */
+            if (i_e == i_s) {
+                i_e++;
+            }
+            i_s++;
+            array[i_s] = start;
+        }
+    }
+
+    /* Here, we've dealt with the new range start extending any adjoining
+     * existing ranges.
+     *
+     * If the new range extends to infinity, it is now the final one,
+     * regardless of what was there before */
+    if (UNLIKELY(end == UV_MAX)) {
+        invlist_set_len(invlist, i_s + 1, *(get_invlist_offset_addr(invlist)));
+        return invlist;
+    }
+
+    /* If i_e started as == i_s, it has also been dealt with,
+     * and been updated to the new i_s, which will fail the following if */
+    if (! ELEMENT_RANGE_MATCHES_INVLIST(i_e)) {
+
+        /* Here, the ranges on either side of the end of the new range are in
+         * the set, and this range ends in the gap between them.
+         *
+         * If this range is adjacent to (hence extends) the range above it, it
+         * becomes part of that range; likewise if it extends the range below,
+         * it becomes part of that range */
+        if (end + 1 == array[i_e+1]) {
+            i_e++;
+            array[i_e] = start;
+        }
+        else if (start <= array[i_e]) {
+            array[i_e] = end + 1;
+            i_e--;
+        }
+    }
+
+    if (i_s == i_e) {
+
+        /* If the range fits entirely in an existing range (as possibly already
+         * extended above), it doesn't add anything new */
+        if (ELEMENT_RANGE_MATCHES_INVLIST(i_s)) {
+            return invlist;
+        }
+
+        /* Here, no part of the range is in the list.  Must add it.  It will
+         * occupy 2 more slots */
+      splice_in_new_range:
+
+        invlist_extend(invlist, len + 2);
+        array = invlist_array(invlist);
+        /* Move the rest of the array down two slots. Don't include any
+         * trailing NUL */
+        Move(array + i_e + 1, array + i_e + 3, len - i_e - 1, UV);
+
+        /* Do the actual splice */
+        array[i_e+1] = start;
+        array[i_e+2] = end + 1;
+        invlist_set_len(invlist, len + 2, *(get_invlist_offset_addr(invlist)));
+        return invlist;
+    }
+
+    /* Here the new range crossed the boundaries of a pre-existing range.  The
+     * code above has adjusted things so that both ends are in ranges that are
+     * in the set.  This means everything in between must also be in the set.
+     * Just squash things together */
+    Move(array + i_e + 1, array + i_s + 1, len - i_e - 1, UV);
+    invlist_set_len(invlist,
+                    len - i_e + i_s,
+                    *(get_invlist_offset_addr(invlist)));
 
     return invlist;
 }
@@ -9548,7 +9801,7 @@ Perl__setup_canned_invlist(pTHX_ const STRLEN size, const UV element0,
 
     PERL_ARGS_ASSERT__SETUP_CANNED_INVLIST;
 
-    _append_range_to_invlist(invlist, element0, element0);
+    invlist = add_cp_to_invlist(invlist, element0);
     offset = *get_invlist_offset_addr(invlist);
 
     invlist_set_len(invlist, size, offset);
@@ -9738,18 +9991,18 @@ S_invlist_contents(pTHX_ SV* const invlist, const bool traditional_style)
     invlist_iterinit(invlist);
     while (invlist_iternext(invlist, &start, &end)) {
 	if (end == UV_MAX) {
-	    Perl_sv_catpvf(aTHX_ output, "%04"UVXf"%cINFINITY%c",
+	    Perl_sv_catpvf(aTHX_ output, "%04" UVXf "%cINFINITY%c",
                                           start, intra_range_delimiter,
                                                  inter_range_delimiter);
 	}
 	else if (end != start) {
-	    Perl_sv_catpvf(aTHX_ output, "%04"UVXf"%c%04"UVXf"%c",
+	    Perl_sv_catpvf(aTHX_ output, "%04" UVXf "%c%04" UVXf "%c",
 		                          start,
                                                    intra_range_delimiter,
                                                   end, inter_range_delimiter);
 	}
 	else {
-	    Perl_sv_catpvf(aTHX_ output, "%04"UVXf"%c",
+	    Perl_sv_catpvf(aTHX_ output, "%04" UVXf "%c",
                                           start, inter_range_delimiter);
 	}
     }
@@ -9796,16 +10049,16 @@ Perl__invlist_dump(pTHX_ PerlIO *file, I32 level,
     while (invlist_iternext(invlist, &start, &end)) {
 	if (end == UV_MAX) {
 	    Perl_dump_indent(aTHX_ level, file,
-                                       "%s[%"UVuf"] 0x%04"UVXf" .. INFINITY\n",
+                                       "%s[%" UVuf "] 0x%04" UVXf " .. INFINITY\n",
                                    indent, (UV)count, start);
 	}
 	else if (end != start) {
 	    Perl_dump_indent(aTHX_ level, file,
-                                    "%s[%"UVuf"] 0x%04"UVXf" .. 0x%04"UVXf"\n",
+                                    "%s[%" UVuf "] 0x%04" UVXf " .. 0x%04" UVXf "\n",
 		                indent, (UV)count, start,         end);
 	}
 	else {
-	    Perl_dump_indent(aTHX_ level, file, "%s[%"UVuf"] 0x%04"UVXf"\n",
+	    Perl_dump_indent(aTHX_ level, file, "%s[%" UVuf "] 0x%04" UVXf "\n",
                                             indent, (UV)count, start);
 	}
         count += 2;
@@ -9821,9 +10074,10 @@ Perl__load_PL_utf8_foldclosures (pTHX)
      * to force that */
     if (! PL_utf8_tofold) {
         U8 dummy[UTF8_MAXBYTES_CASE+1];
+        const U8 hyphen[] = HYPHEN_UTF8;
 
         /* This string is just a short named one above \xff */
-        to_utf8_fold((U8*) HYPHEN_UTF8, dummy, NULL);
+        toFOLD_utf8_safe(hyphen, hyphen + sizeof(hyphen) - 1, dummy, NULL);
         assert(PL_utf8_tofold); /* Verify that worked */
     }
     PL_utf8_foldclosures = _swash_inversion_hash(PL_utf8_tofold);
@@ -9842,9 +10096,6 @@ Perl__invlistEQ(pTHX_ SV* const a, SV* const b, const bool complement_b)
     const UV* array_b = invlist_array(b);
     UV len_a = _invlist_len(a);
     UV len_b = _invlist_len(b);
-
-    UV i = 0;		    /* current index into the arrays */
-    bool retval = TRUE;     /* Assume are identical until proven otherwise */
 
     PERL_ARGS_ASSERT__INVLISTEQ;
 
@@ -9875,20 +10126,9 @@ Perl__invlistEQ(pTHX_ SV* const a, SV* const b, const bool complement_b)
         }
     }
 
-    /* Make sure that the lengths are the same, as well as the final element
-     * before looping through the remainder.  (Thus we test the length, final,
-     * and first elements right off the bat) */
-    if (len_a != len_b || array_a[len_a-1] != array_b[len_a-1]) {
-        retval = FALSE;
-    }
-    else for (i = 0; i < len_a - 1; i++) {
-        if (array_a[i] != array_b[i]) {
-            retval = FALSE;
-            break;
-        }
-    }
+    return    len_a == len_b
+           && memEQ(array_a, array_b, len_a * sizeof(array_a[0]));
 
-    return retval;
 }
 #endif
 
@@ -9974,7 +10214,7 @@ S__make_exactf_invlist(pTHX_ RExC_state_t *pRExC_state, regnode *node)
                 }
                 else {
                     STRLEN len;
-                    to_utf8_fold(s, d, &len);
+                    toFOLD_utf8_safe(s, e, d, &len);
                     d += len;
                     s += UTF8SKIP(s);
                 }
@@ -10015,7 +10255,7 @@ S__make_exactf_invlist(pTHX_ RExC_state_t *pRExC_state, regnode *node)
             {
                 AV* list = (AV*) *listp;
                 IV k;
-                for (k = 0; k <= av_tindex_nomg(list); k++) {
+                for (k = 0; k <= av_tindex_skip_len_mg(list); k++) {
                     SV** c_p = av_fetch(list, k, FALSE);
                     UV c;
                     assert(c_p);
@@ -10224,25 +10464,28 @@ S_parse_lparen_question_flags(pTHX_ RExC_state_t *pRExC_state)
                 }
                 flagsp = &negflags;
                 wastedflags = 0;  /* reset so (?g-c) warns twice */
+                x_mod_count = 0;
                 break;
             case ':':
             case ')':
+
+                if ((posflags & (RXf_PMf_EXTENDED|RXf_PMf_EXTENDED_MORE)) == RXf_PMf_EXTENDED) {
+                    negflags |= RXf_PMf_EXTENDED_MORE;
+                }
                 RExC_flags |= posflags;
+
+                if (negflags & RXf_PMf_EXTENDED) {
+                    negflags |= RXf_PMf_EXTENDED_MORE;
+                }
                 RExC_flags &= ~negflags;
                 set_regex_charset(&RExC_flags, cs);
-                if (RExC_flags & RXf_PMf_FOLD) {
-                    RExC_contains_i = 1;
-                }
-                if (PASS2) {
-                    STD_PMMOD_FLAGS_PARSE_X_WARN(x_mod_count);
-                }
+
                 return;
-                /*NOTREACHED*/
             default:
               fail_modifiers:
                 RExC_parse += SKIP_IF_CHAR(RExC_parse);
 		/* diag_listed_as: Sequence (?%s...) not recognized in regex; marked by <-- HERE in m/%s/ */
-                vFAIL2utf8f("Sequence (%"UTF8f"...) not recognized",
+                vFAIL2utf8f("Sequence (%" UTF8f "...) not recognized",
                       UTF8fARG(UTF, RExC_parse-seqstart, seqstart));
                 NOT_REACHED; /*NOTREACHED*/
         }
@@ -10454,7 +10697,7 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
 	    if ( ! op ) {
 	        RExC_parse += UTF ? UTF8SKIP(RExC_parse) : 1;
                 vFAIL2utf8f(
-                    "Unknown verb pattern '%"UTF8f"'",
+                    "Unknown verb pattern '%" UTF8f "'",
                     UTF8fARG(UTF, verb_len, start_verb));
 	    }
             if ( arg_required && !start_arg ) {
@@ -10619,7 +10862,10 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
                 RExC_seen |= REG_LOOKBEHIND_SEEN;
 		RExC_in_lookbehind++;
 		RExC_parse++;
-                assert(RExC_parse < RExC_end);
+                if (RExC_parse >= RExC_end) {
+                    vFAIL("Sequence (?... not terminated");
+                }
+
                 /* FALLTHROUGH */
 	    case '=':           /* (?=...) */
 		RExC_seen_zerolen++;
@@ -10748,7 +10994,7 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
 	            }
 	            RExC_recurse_count++;
                     DEBUG_OPTIMISE_MORE_r(Perl_re_printf( aTHX_
-                        "%*s%*s Recurse #%"UVuf" to %"IVdf"\n",
+                        "%*s%*s Recurse #%" UVuf " to %" IVdf "\n",
                               22, "|    |", (int)(depth * 2 + 1), "",
                               (UV)ARG(ret), (IV)ARG2L(ret)));
                 }
@@ -10770,7 +11016,7 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
                     RExC_parse += SKIP_IF_CHAR(RExC_parse);
                     /* diag_listed_as: Sequence (?%s...) not recognized in regex; marked by <-- HERE in m/%s/ */
                     vFAIL2utf8f(
-                        "Sequence (%"UTF8f"...) not recognized",
+                        "Sequence (%" UTF8f "...) not recognized",
                         UTF8fARG(UTF, RExC_parse-seqstart, seqstart));
 		    NOT_REACHED; /*NOTREACHED*/
 		}
@@ -10785,9 +11031,10 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
 
 		RExC_seen_zerolen++;
 
-		if (   !pRExC_state->num_code_blocks
-		    || pRExC_state->code_index >= pRExC_state->num_code_blocks
-		    || pRExC_state->code_blocks[pRExC_state->code_index].start
+		if (   !pRExC_state->code_blocks
+		    || pRExC_state->code_index
+                                        >= pRExC_state->code_blocks->count
+		    || pRExC_state->code_blocks->cb[pRExC_state->code_index].start
 			!= (STRLEN)((RExC_parse -3 - (is_logical ? 1 : 0))
 			    - RExC_start)
 		) {
@@ -10796,7 +11043,7 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
 		    FAIL("Eval-group not allowed at runtime, use re 'eval'");
 		}
 		/* this is a pre-compiled code block (?{...}) */
-		cb = &pRExC_state->code_blocks[pRExC_state->code_index];
+		cb = &pRExC_state->code_blocks->cb[pRExC_state->code_index];
 		RExC_parse = RExC_start + cb->end;
 		if (!SIZE_ONLY) {
 		    OP *o = cb->block;
@@ -10972,7 +11219,7 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
                             *flagp = flags & (RESTART_PASS1|NEED_UTF8);
                             return NULL;
                         }
-                        FAIL2("panic: regbranch returned NULL, flags=%#"UVxf"",
+                        FAIL2("panic: regbranch returned NULL, flags=%#" UVxf,
                               (UV) flags);
                     } else
                         REGTAIL(pRExC_state, br, reganode(pRExC_state,
@@ -10993,7 +11240,7 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
                                 *flagp = flags & (RESTART_PASS1|NEED_UTF8);
                                 return NULL;
                             }
-                            FAIL2("panic: regbranch returned NULL, flags=%#"UVxf"",
+                            FAIL2("panic: regbranch returned NULL, flags=%#" UVxf,
                                   (UV) flags);
                         }
                         REGTAIL(pRExC_state, ret, lastbr);
@@ -11061,7 +11308,7 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
                 if (RExC_open_parens && !RExC_open_parens[parno])
 	        {
                     DEBUG_OPTIMISE_MORE_r(Perl_re_printf( aTHX_
-                        "%*s%*s Setting open paren #%"IVdf" to %d\n",
+                        "%*s%*s Setting open paren #%" IVdf " to %d\n",
                         22, "|    |", (int)(depth * 2 + 1), "",
 			(IV)parno, REG_NODE_NUM(ret)));
                     RExC_open_parens[parno]= ret;
@@ -11091,7 +11338,7 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
             *flagp = flags & (RESTART_PASS1|NEED_UTF8);
             return NULL;
         }
-        FAIL2("panic: regbranch returned NULL, flags=%#"UVxf"", (UV) flags);
+        FAIL2("panic: regbranch returned NULL, flags=%#" UVxf, (UV) flags);
     }
     if (*RExC_parse == '|') {
 	if (!SIZE_ONLY && RExC_extralen) {
@@ -11138,7 +11385,7 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
                 *flagp = flags & (RESTART_PASS1|NEED_UTF8);
                 return NULL;
             }
-            FAIL2("panic: regbranch returned NULL, flags=%#"UVxf"", (UV) flags);
+            FAIL2("panic: regbranch returned NULL, flags=%#" UVxf, (UV) flags);
         }
         REGTAIL(pRExC_state, lastbr, br);               /* BRANCH -> BRANCH. */
 	lastbr = br;
@@ -11155,7 +11402,7 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
 	    ender = reganode(pRExC_state, CLOSE, parno);
             if ( RExC_close_parens ) {
                 DEBUG_OPTIMISE_MORE_r(Perl_re_printf( aTHX_
-                        "%*s%*s Setting close paren #%"IVdf" to %d\n",
+                        "%*s%*s Setting close paren #%" IVdf " to %d\n",
                         22, "|    |", (int)(depth * 2 + 1), "", (IV)parno, REG_NODE_NUM(ender)));
                 RExC_close_parens[parno]= ender;
 	        if (RExC_nestroot == parno)
@@ -11192,7 +11439,7 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
             DEBUG_PARSE_MSG("lsbr");
             regprop(RExC_rx, RExC_mysv1, lastbr, NULL, pRExC_state);
             regprop(RExC_rx, RExC_mysv2, ender, NULL, pRExC_state);
-            Perl_re_printf( aTHX_  "~ tying lastbr %s (%"IVdf") to ender %s (%"IVdf") offset %"IVdf"\n",
+            Perl_re_printf( aTHX_  "~ tying lastbr %s (%" IVdf ") to ender %s (%" IVdf ") offset %" IVdf "\n",
                           SvPV_nolen_const(RExC_mysv1),
                           (IV)REG_NODE_NUM(lastbr),
                           SvPV_nolen_const(RExC_mysv2),
@@ -11231,7 +11478,7 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
                     DEBUG_PARSE_MSG("NADA");
                     regprop(RExC_rx, RExC_mysv1, ret, NULL, pRExC_state);
                     regprop(RExC_rx, RExC_mysv2, ender, NULL, pRExC_state);
-                    Perl_re_printf( aTHX_  "~ converting ret %s (%"IVdf") to ender %s (%"IVdf") offset %"IVdf"\n",
+                    Perl_re_printf( aTHX_  "~ converting ret %s (%" IVdf ") to ender %s (%" IVdf ") offset %" IVdf "\n",
                                   SvPV_nolen_const(RExC_mysv1),
                                   (IV)REG_NODE_NUM(ret),
                                   SvPV_nolen_const(RExC_mysv2),
@@ -11352,10 +11599,10 @@ S_regbranch(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, I32 first, U32 depth)
                 *flagp = flags & (RESTART_PASS1|NEED_UTF8);
                 return NULL;
             }
-            FAIL2("panic: regpiece returned NULL, flags=%#"UVxf"", (UV) flags);
+            FAIL2("panic: regpiece returned NULL, flags=%#" UVxf, (UV) flags);
 	}
 	else if (ret == NULL)
-	    ret = latest;
+            ret = latest;
 	*flagp |= flags&(HASWIDTH|POSTPONED);
 	if (chain == NULL) 	/* First piece. */
 	    *flagp |= flags&SPSTART;
@@ -11381,7 +11628,7 @@ S_regbranch(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, I32 first, U32 depth)
 }
 
 /*
- - regpiece - something followed by possible [*+?]
+ - regpiece - something followed by possible quantifier * + ? {n,m}
  *
  * Note that the branching code sequences used for ? and the general cases
  * of * and + are somewhat optimized:  they use the same NOTHING node as
@@ -11424,7 +11671,7 @@ S_regpiece(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth)
 	if (flags & (TRYAGAIN|RESTART_PASS1|NEED_UTF8))
 	    *flagp |= flags & (TRYAGAIN|RESTART_PASS1|NEED_UTF8);
         else
-            FAIL2("panic: regatom returned NULL, flags=%#"UVxf"", (UV) flags);
+            FAIL2("panic: regatom returned NULL, flags=%#" UVxf, (UV) flags);
 	return(NULL);
     }
 
@@ -11476,19 +11723,11 @@ S_regpiece(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth)
 	    nextchar(pRExC_state);
             if (max < min) {    /* If can't match, warn and optimize to fail
                                    unconditionally */
-                if (SIZE_ONLY) {
-
-                    /* We can't back off the size because we have to reserve
-                     * enough space for all the things we are about to throw
-                     * away, but we can shrink it by the amount we are about
-                     * to re-use here */
-                    RExC_size += PREVOPER(RExC_size) - regarglen[(U8)OPFAIL];
-                }
-                else {
+                reginsert(pRExC_state, OPFAIL, orig_emit, depth+1);
+                if (PASS2) {
                     ckWARNreg(RExC_parse, "Quantifier {n,m} with n > m can't match");
-                    RExC_emit = orig_emit;
+                    NEXT_OFF(orig_emit)= regarglen[OPFAIL] + NODE_STEP_REGNODE;
                 }
-                ret = reganode(pRExC_state, OPFAIL, 0);
                 return ret;
             }
             else if (min == max && *RExC_parse == '?')
@@ -11605,7 +11844,7 @@ S_regpiece(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth)
     if (!SIZE_ONLY && !(flags&(HASWIDTH|POSTPONED)) && max > REG_INFTY/3) {
 	SAVEFREESV(RExC_rx_sv); /* in case of fatal warnings */
 	ckWARN2reg(RExC_parse,
-		   "%"UTF8f" matches null string many times",
+		   "%" UTF8f " matches null string many times",
 		   UTF8fARG(UTF, (RExC_parse >= origparse
                                  ? RExC_parse - origparse
                                  : 0),
@@ -11779,13 +12018,15 @@ S_grok_bslash_N(pTHX_ RExC_state_t *pRExC_state,
 
     RExC_parse++;	/* Skip past the '{' */
 
-    if (! (endbrace = strchr(RExC_parse, '}'))  /* no trailing brace */
-	|| ! (endbrace == RExC_parse		/* nothing between the {} */
+    if (! (endbrace = strchr(RExC_parse, '}'))) { /* no trailing brace */
+        vFAIL2("Missing right brace on \\%c{}", 'N');
+    }
+    else if(!(endbrace == RExC_parse		/* nothing between the {} */
               || (endbrace - RExC_parse >= 2	/* U+ (bad hex is checked... */
                   && strnEQ(RExC_parse, "U+", 2)))) /* ... below for a better
                                                        error msg) */
     {
-	if (endbrace) RExC_parse = endbrace;	/* position msg's '<--HERE' */
+	RExC_parse = endbrace;	/* position msg's '<--HERE' */
 	vFAIL("\\N{NAME} must be resolved by the lexer");
     }
 
@@ -11931,7 +12172,6 @@ S_grok_bslash_N(pTHX_ RExC_state_t *pRExC_state,
         /* The values are Unicode, and therefore not subject to recoding, but
          * have to be converted to native on a non-Unicode (meaning non-ASCII)
          * platform. */
-	RExC_override_recoding = 1;
 #ifdef EBCDIC
         RExC_recode_x_to_native = 1;
 #endif
@@ -11942,7 +12182,7 @@ S_grok_bslash_N(pTHX_ RExC_state_t *pRExC_state,
                     *flagp = flags & (RESTART_PASS1|NEED_UTF8);
                     return FALSE;
                 }
-                FAIL2("panic: reg returned NULL to grok_bslash_N, flags=%#"UVxf"",
+                FAIL2("panic: reg returned NULL to grok_bslash_N, flags=%#" UVxf,
                     (UV) flags);
             }
             *flagp |= flags&(HASWIDTH|SPSTART|SIMPLE|POSTPONED);
@@ -11952,7 +12192,6 @@ S_grok_bslash_N(pTHX_ RExC_state_t *pRExC_state,
 	RExC_start = RExC_adjusted_start = save_start;
 	RExC_parse = endbrace;
 	RExC_end = orig_end;
-	RExC_override_recoding = 0;
 #ifdef EBCDIC
         RExC_recode_x_to_native = 0;
 #endif
@@ -11964,39 +12203,6 @@ S_grok_bslash_N(pTHX_ RExC_state_t *pRExC_state,
     }
 }
 
-
-/*
- * reg_recode
- *
- * It returns the code point in utf8 for the value in *encp.
- *    value: a code value in the source encoding
- *    encp:  a pointer to an Encode object
- *
- * If the result from Encode is not a single character,
- * it returns U+FFFD (Replacement character) and sets *encp to NULL.
- */
-STATIC UV
-S_reg_recode(pTHX_ const U8 value, SV **encp)
-{
-    STRLEN numlen = 1;
-    SV * const sv = newSVpvn_flags((const char *) &value, numlen, SVs_TEMP);
-    const char * const s = *encp ? sv_recode_to_utf8(sv, *encp) : SvPVX(sv);
-    const STRLEN newlen = SvCUR(sv);
-    UV uv = UNICODE_REPLACEMENT;
-
-    PERL_ARGS_ASSERT_REG_RECODE;
-
-    if (newlen)
-	uv = SvUTF8(sv)
-	     ? utf8n_to_uvchr((U8*)s, newlen, &numlen, UTF8_ALLOW_DEFAULT)
-	     : *(U8*)s;
-
-    if (!newlen || numlen != newlen) {
-	uv = UNICODE_REPLACEMENT;
-	*encp = NULL;
-    }
-    return uv;
-}
 
 PERL_STATIC_INLINE U8
 S_compute_EXACTish(RExC_state_t *pRExC_state)
@@ -12211,13 +12417,15 @@ S_backref_value(char *p)
 /*
  - regatom - the lowest level
 
-   Try to identify anything special at the start of the pattern. If there
-   is, then handle it as required. This may involve generating a single regop,
-   such as for an assertion; or it may involve recursing, such as to
-   handle a () structure.
+   Try to identify anything special at the start of the current parse position.
+   If there is, then handle it as required. This may involve generating a
+   single regop, such as for an assertion; or it may involve recursing, such as
+   to handle a () structure.
 
    If the string doesn't start with something special then we gobble up
-   as much literal text as we can.
+   as much literal text as we can.  If we encounter a quantifier, we have to
+   back off the final literal character, as that quantifier applies to just it
+   and not to the whole string of literals.
 
    Once we have been able to handle whatever type of thing started the
    sequence, we return.
@@ -12339,7 +12547,7 @@ S_regatom(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth)
         if (ret == NULL) {
             if (*flagp & (RESTART_PASS1|NEED_UTF8))
                 return NULL;
-            FAIL2("panic: regclass returned NULL to regatom, flags=%#"UVxf"",
+            FAIL2("panic: regclass returned NULL to regatom, flags=%#" UVxf,
                   (UV) *flagp);
         }
 	if (*RExC_parse != ']') {
@@ -12366,7 +12574,7 @@ S_regatom(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth)
                     *flagp = flags & (RESTART_PASS1|NEED_UTF8);
                     return NULL;
                 }
-                FAIL2("panic: reg returned NULL to regatom, flags=%#"UVxf"",
+                FAIL2("panic: reg returned NULL to regatom, flags=%#" UVxf,
                                                                  (UV) flags);
 	}
 	*flagp |= flags&(HASWIDTH|SPSTART|SIMPLE|POSTPONED);
@@ -12529,7 +12737,7 @@ S_regatom(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth)
                       bad_bound_type:
                         RExC_parse = endbrace;
 			vFAIL2utf8f(
-                            "'%"UTF8f"' is an unknown bound type",
+                            "'%" UTF8f "' is an unknown bound type",
 			    UTF8fARG(UTF, length, endbrace - length));
                         NOT_REACHED; /*NOTREACHED*/
                 }
@@ -12647,7 +12855,7 @@ S_regatom(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth)
             /* regclass() can only return RESTART_PASS1 and NEED_UTF8 if
              * multi-char folds are allowed.  */
             if (!ret)
-                FAIL2("panic: regclass returned NULL to regatom, flags=%#"UVxf"",
+                FAIL2("panic: regclass returned NULL to regatom, flags=%#" UVxf,
                       (UV) *flagp);
 
             RExC_parse--;
@@ -12932,6 +13140,9 @@ S_regatom(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth)
                    || UTF8_IS_INVARIANT(UCHARAT(RExC_parse))
                    || UTF8_IS_START(UCHARAT(RExC_parse)));
 
+            /* Here, we have a literal character.  Find the maximal string of
+             * them in the input that we can fit into a single EXACTish node.
+             * We quit at the first non-literal or when the node gets full */
 	    for (p = RExC_parse;
 	         len < upper_parse && p < RExC_end;
 	         len++)
@@ -13062,9 +13273,6 @@ S_regatom(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth)
 				vFAIL(error_msg);
 			    }
                             ender = result;
-			    if (IN_ENCODING && ender < 0x100) {
-				goto recode_encoding;
-			    }
 			    if (ender > 0xff) {
 				REQUIRE_UTF8(flagp);
 			    }
@@ -13097,11 +13305,7 @@ S_regatom(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth)
                                 if (RExC_recode_x_to_native) {
                                     ender = LATIN1_TO_NATIVE(ender);
                                 }
-                                else
 #endif
-                                if (IN_ENCODING) {
-                                    goto recode_encoding;
-                                }
 			    }
                             else {
 				REQUIRE_UTF8(flagp);
@@ -13161,17 +13365,6 @@ S_regatom(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth)
                                          form_short_octal_warning(p, numlen));
                             }
 			}
-			if (IN_ENCODING && ender < 0x100)
-			    goto recode_encoding;
-			break;
-		      recode_encoding:
-			if (! RExC_override_recoding) {
-			    SV* enc = _get_encoding();
-			    ender = reg_recode((U8)ender, &enc);
-			    if (!enc && PASS2)
-				ckWARNreg(p, "Invalid escape in the specified encoding");
-			    REQUIRE_UTF8(flagp);
-			}
 			break;
 		    case '\0':
 			if (p >= RExC_end)
@@ -13189,15 +13382,40 @@ S_regatom(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth)
 		    } /* End of switch on '\' */
 		    break;
 		case '{':
-		    /* Currently we don't warn when the lbrace is at the start
+		    /* Currently we don't care if the lbrace is at the start
 		     * of a construct.  This catches it in the middle of a
 		     * literal string, or when it's the first thing after
 		     * something like "\b" */
-		    if (! SIZE_ONLY
-			&& (len || (p > RExC_start && isALPHA_A(*(p -1)))))
-		    {
-			ckWARNregdep(p + 1, "Unescaped left brace in regex is deprecated, passed through");
+		    if (len || (p > RExC_start && isALPHA_A(*(p -1)))) {
+
+                        /* GNU Autoconf is depended on by a lot of code, and
+                         * can't seem to release a new version that avoids the
+                         * deprecation now made fatal.  (A commit to do so has
+                         * been in its repository since early 2013; only one
+                         * pattern is affected.)  As a work-around, don't
+                         * fatalize this if the pattern being compiled is the
+                         * precise one that trips up Autoconf.  See [perl
+                         * #130497] for more details. */
+                        if (memNEs(RExC_start, RExC_end - RExC_start,
+                                   "\\${[^\\}]*}"))
+                        {
+                            RExC_parse = p + 1;
+                            vFAIL("Unescaped left brace in regex is "
+                                  "illegal here");
+                        }
+                        if (PASS2) {
+                            ckWARNregdep(p + 1,
+                                        "Unescaped left brace in regex is "
+                                        "deprecated here (and will be fatal "
+                                        "in Perl 5.30), passed through");
+                        }
 		    }
+		    goto normal_default;
+                case '}':
+                case ']':
+                    if (PASS2 && p > RExC_parse && RExC_strict) {
+                        ckWARN2reg(p + 1, "Unescaped literal '%c'", *p);
+                    }
 		    /*FALLTHROUGH*/
 		default:    /* A literal character */
 		  normal_default:
@@ -13228,6 +13446,7 @@ S_regatom(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth)
                  * the node, close the node with just them, and set up to do
                  * this character again next time through, when it will be the
                  * only thing in its new node */
+
                 if ((next_is_quantifier = (   LIKELY(p < RExC_end)
                                            && UNLIKELY(ISMULT2(p))))
                     && LIKELY(len))
@@ -13601,8 +13820,6 @@ S_regatom(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth)
 	    RExC_parse = p - 1;
             Set_Node_Cur_Length(ret, parse_start);
 	    RExC_parse = p;
-            skip_to_be_ignored_text(pRExC_state, &RExC_parse,
-                                    FALSE /* Don't force to /x */ );
 	    {
 		/* len is STRLEN which is unsigned, need to copy to signed */
 		IV iv = len;
@@ -13613,6 +13830,13 @@ S_regatom(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth)
 	} /* End of label 'defchar:' */
 	break;
     } /* End of giant switch on input character */
+
+    /* Position parse to next real character */
+    skip_to_be_ignored_text(pRExC_state, &RExC_parse,
+                                            FALSE /* Don't force to /x */ );
+    if (PASS2 && *RExC_parse == '{' && OP(ret) != SBOL && ! regcurly(RExC_parse)) {
+        ckWARNregdep(RExC_parse + 1, "Unescaped left brace in regex is deprecated here (and will be fatal in Perl 5.30), passed through");
+    }
 
     return(ret);
 }
@@ -13704,8 +13928,8 @@ S_populate_ANYOF_from_invlist(pTHX_ regnode *node, SV** invlist_ptr)
  * routine. q.v. */
 #define ADD_POSIX_WARNING(p, text)  STMT_START {                            \
         if (posix_warnings) {                                               \
-            if (! warn_text) warn_text = newAV();                           \
-            av_push(warn_text, Perl_newSVpvf(aTHX_                          \
+            if (! RExC_warn_text ) RExC_warn_text = (AV *) sv_2mortal((SV *) newAV()); \
+            av_push(RExC_warn_text, Perl_newSVpvf(aTHX_                          \
                                              WARNING_PREFIX                 \
                                              text                           \
                                              REPORT_LOCATION,               \
@@ -13836,7 +14060,6 @@ S_handle_possible_posix(pTHX_ RExC_state_t *pRExC_state,
     bool has_opening_colon    = FALSE;
     int class_number          = OOB_NAMEDCLASS; /* Out-of-bounds until find
                                                    valid class */
-    AV* warn_text             = NULL;   /* any warning messages */
     const char * possible_end = NULL;   /* used for a 2nd parse pass */
     const char* name_start;             /* ptr to class name first char */
 
@@ -13851,6 +14074,9 @@ S_handle_possible_posix(pTHX_ RExC_state_t *pRExC_state,
     UV input_text[15];
 
     PERL_ARGS_ASSERT_HANDLE_POSSIBLE_POSIX;
+
+    if (posix_warnings && RExC_warn_text)
+        av_clear(RExC_warn_text);
 
     if (p >= e) {
         return NOT_MEANT_TO_BE_A_POSIX_CLASS;
@@ -14469,14 +14695,8 @@ S_handle_possible_posix(pTHX_ RExC_state_t *pRExC_state,
                 ADD_POSIX_WARNING(p, "there is no terminating ']'");
             }
 
-            if (warn_text) {
-                if (posix_warnings) {
-                    /* mortalize to avoid a leak with FATAL warnings */
-                    *posix_warnings = (AV *) sv_2mortal((SV *) warn_text);
-                }
-                else {
-                    SvREFCNT_dec_NN(warn_text);
-                }
+            if (posix_warnings && RExC_warn_text && av_top_index(RExC_warn_text) > -1) {
+                *posix_warnings = RExC_warn_text;
             }
         }
         else if (class_number != OOB_NAMEDCLASS) {
@@ -14493,7 +14713,7 @@ S_handle_possible_posix(pTHX_ RExC_state_t *pRExC_state,
                                                    ? "^"
                                                    : "";
             RExC_parse = (char *) p;
-            vFAIL3utf8f("POSIX class [:%s%"UTF8f":] unknown",
+            vFAIL3utf8f("POSIX class [:%s%" UTF8f ":] unknown",
                         complement_string,
                         UTF8fARG(UTF, RExC_parse - name_start - 2, name_start));
         }
@@ -14636,7 +14856,7 @@ S_handle_regex_sets(pTHX_ RExC_state_t *pRExC_state, SV** return_invlist,
                                   &posix_warnings
                                  ))
                         FAIL2("panic: regclass returned NULL to handle_sets, "
-                              "flags=%#"UVxf"", (UV) *flagp);
+                              "flags=%#" UVxf, (UV) *flagp);
 
                     /* function call leaves parse pointing to the ']', except
                      * if we faked it */
@@ -14672,7 +14892,7 @@ S_handle_regex_sets(pTHX_ RExC_state_t *pRExC_state, SV** return_invlist,
       no_close:
         /* We output the messages even if warnings are off, because we'll fail
          * the very next thing, and these give a likely diagnosis for that */
-        if (posix_warnings && av_tindex_nomg(posix_warnings) >= 0) {
+        if (posix_warnings && av_tindex_skip_len_mg(posix_warnings) >= 0) {
             output_or_return_posix_warnings(pRExC_state, posix_warnings, NULL);
         }
 
@@ -14781,7 +15001,13 @@ S_handle_regex_sets(pTHX_ RExC_state_t *pRExC_state, SV** return_invlist,
 
 redo_curchar:
 
-        top_index = av_tindex_nomg(stack);
+#ifdef ENABLE_REGEX_SETS_DEBUGGING
+                    /* Enable with -Accflags=-DENABLE_REGEX_SETS_DEBUGGING */
+        DEBUG_U(dump_regex_sets_structures(pRExC_state,
+                                           stack, fence, fence_stack));
+#endif
+
+        top_index = av_tindex_skip_len_mg(stack);
 
         switch (curchar) {
             SV** stacked_ptr;       /* Ptr to something already on 'stack' */
@@ -14882,8 +15108,8 @@ redo_curchar:
                 }
 
                 /* Stack the position of this undealt-with left paren */
-                fence = top_index + 1;
                 av_push(fence_stack, newSViv(fence));
+                fence = top_index + 1;
                 break;
 
             case '\\':
@@ -14899,7 +15125,7 @@ redo_curchar:
                               NULL))
                 {
                     FAIL2("panic: regclass returned NULL to handle_sets, "
-                          "flags=%#"UVxf"", (UV) *flagp);
+                          "flags=%#" UVxf, (UV) *flagp);
                 }
 
                 /* regclass() will return with parsing just the \ sequence,
@@ -14938,7 +15164,7 @@ redo_curchar:
                                 ))
                 {
                     FAIL2("panic: regclass returned NULL to handle_sets, "
-                          "flags=%#"UVxf"", (UV) *flagp);
+                          "flags=%#" UVxf, (UV) *flagp);
                 }
 
                 /* function call leaves parse pointing to the ']', except if we
@@ -14959,12 +15185,17 @@ redo_curchar:
                 goto done;
 
             case ')':
-                if (av_tindex_nomg(fence_stack) < 0) {
+                if (av_tindex_skip_len_mg(fence_stack) < 0) {
                     RExC_parse++;
                     vFAIL("Unexpected ')'");
                 }
 
-                 /* If at least two thing on the stack, treat this as an
+                /* If nothing after the fence, is missing an operand */
+                if (top_index - fence < 0) {
+                    RExC_parse++;
+                    goto bad_syntax;
+                }
+                /* If at least two things on the stack, treat this as an
                   * operator */
                 if (top_index - fence >= 1) {
                     goto join_operators;
@@ -15102,17 +15333,12 @@ redo_curchar:
                     {
                         SV* i = NULL;
                         SV* u = NULL;
-                        SV* element;
 
                         _invlist_union(lhs, rhs, &u);
                         _invlist_intersection(lhs, rhs, &i);
-                        /* _invlist_subtract will overwrite rhs
-                            without freeing what it already contains */
-                        element = rhs;
                         _invlist_subtract(u, i, &rhs);
                         SvREFCNT_dec_NN(i);
                         SvREFCNT_dec_NN(u);
-                        SvREFCNT_dec_NN(element);
                         break;
                     }
                 }
@@ -15155,7 +15381,7 @@ redo_curchar:
              * may have altered the stack in the time since we earlier set
              * 'top_index'.  */
 
-            top_index = av_tindex_nomg(stack);
+            top_index = av_tindex_skip_len_mg(stack);
             if (top_index - fence >= 0) {
                 /* If the top entry on the stack is an operator, it had better
                  * be a '!', otherwise the entry below the top operand should
@@ -15206,15 +15432,15 @@ redo_curchar:
     } /* End of loop parsing through the construct */
 
   done:
-    if (av_tindex_nomg(fence_stack) >= 0) {
+    if (av_tindex_skip_len_mg(fence_stack) >= 0) {
         vFAIL("Unmatched (");
     }
 
-    if (av_tindex_nomg(stack) < 0   /* Was empty */
+    if (av_tindex_skip_len_mg(stack) < 0   /* Was empty */
         || ((final = av_pop(stack)) == NULL)
         || ! IS_OPERAND(final)
         || SvTYPE(final) != SVt_INVLIST
-        || av_tindex_nomg(stack) >= 0)  /* More left on stack */
+        || av_tindex_skip_len_mg(stack) >= 0)  /* More left on stack */
     {
       bad_syntax:
         SvREFCNT_dec(final);
@@ -15234,10 +15460,10 @@ redo_curchar:
     result_string = newSVpvs("");
     while (invlist_iternext(final, &start, &end)) {
         if (start == end) {
-            Perl_sv_catpvf(aTHX_ result_string, "\\x{%"UVXf"}", start);
+            Perl_sv_catpvf(aTHX_ result_string, "\\x{%" UVXf "}", start);
         }
         else {
-            Perl_sv_catpvf(aTHX_ result_string, "\\x{%"UVXf"}-\\x{%"UVXf"}",
+            Perl_sv_catpvf(aTHX_ result_string, "\\x{%" UVXf "}-\\x{%" UVXf "}",
                                                      start,          end);
         }
     }
@@ -15267,7 +15493,7 @@ redo_curchar:
                     NULL
                 );
     if (!node)
-        FAIL2("panic: regclass returned NULL to handle_sets, flags=%#"UVxf,
+        FAIL2("panic: regclass returned NULL to handle_sets, flags=%#" UVxf,
                     PTR2UV(flagp));
 
     /* Fix up the node type if we are in locale.  (We have pretended we are
@@ -15309,6 +15535,61 @@ redo_curchar:
     Set_Node_Length(node, RExC_parse - oregcomp_parse + 1); /* MJD */
     return node;
 }
+
+#ifdef ENABLE_REGEX_SETS_DEBUGGING
+
+STATIC void
+S_dump_regex_sets_structures(pTHX_ RExC_state_t *pRExC_state,
+                             AV * stack, const IV fence, AV * fence_stack)
+{   /* Dumps the stacks in handle_regex_sets() */
+
+    const SSize_t stack_top = av_tindex_skip_len_mg(stack);
+    const SSize_t fence_stack_top = av_tindex_skip_len_mg(fence_stack);
+    SSize_t i;
+
+    PERL_ARGS_ASSERT_DUMP_REGEX_SETS_STRUCTURES;
+
+    PerlIO_printf(Perl_debug_log, "\nParse position is:%s\n", RExC_parse);
+
+    if (stack_top < 0) {
+        PerlIO_printf(Perl_debug_log, "Nothing on stack\n");
+    }
+    else {
+        PerlIO_printf(Perl_debug_log, "Stack: (fence=%d)\n", (int) fence);
+        for (i = stack_top; i >= 0; i--) {
+            SV ** element_ptr = av_fetch(stack, i, FALSE);
+            if (! element_ptr) {
+            }
+
+            if (IS_OPERATOR(*element_ptr)) {
+                PerlIO_printf(Perl_debug_log, "[%d]: %c\n",
+                                            (int) i, (int) SvIV(*element_ptr));
+            }
+            else {
+                PerlIO_printf(Perl_debug_log, "[%d] ", (int) i);
+                sv_dump(*element_ptr);
+            }
+        }
+    }
+
+    if (fence_stack_top < 0) {
+        PerlIO_printf(Perl_debug_log, "Nothing on fence_stack\n");
+    }
+    else {
+        PerlIO_printf(Perl_debug_log, "Fence_stack: \n");
+        for (i = fence_stack_top; i >= 0; i--) {
+            SV ** element_ptr = av_fetch(fence_stack, i, FALSE);
+            if (! element_ptr) {
+            }
+
+            PerlIO_printf(Perl_debug_log, "[%d]: %d\n",
+                                            (int) i, (int) SvIV(*element_ptr));
+        }
+    }
+}
+
+#endif
+
 #undef IS_OPERATOR
 #undef IS_OPERAND
 
@@ -15569,8 +15850,10 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth,
                                        character; used under /i */
     UV n;
     char * stop_ptr = RExC_end;    /* where to stop parsing */
-    const bool skip_white = cBOOL(ret_invlist); /* ignore unescaped white
-                                                   space? */
+
+    /* ignore unescaped whitespace? */
+    const bool skip_white = cBOOL(   ret_invlist
+                                  || (RExC_flags & RXf_PMf_EXTENDED_MORE));
 
     /* Unicode properties are stored in a swash; this holds the current one
      * being parsed.  If this swash is the only above-latin1 component of the
@@ -15715,7 +15998,7 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth,
     while (1) {
 
         if (   posix_warnings
-            && av_tindex_nomg(posix_warnings) >= 0
+            && av_tindex_skip_len_mg(posix_warnings) >= 0
             && RExC_parse > not_posix_region_end)
         {
             /* Warnings about posix class issues are considered tentative until
@@ -15771,7 +16054,7 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth,
                  * posix class, and it failed, it was a false alarm, as this
                  * successful one proves */
                 if (   posix_warnings
-                    && av_tindex_nomg(posix_warnings) >= 0
+                    && av_tindex_skip_len_mg(posix_warnings) >= 0
                     && not_posix_region_end >= RExC_parse
                     && not_posix_region_end <= posix_class_end)
                 {
@@ -16041,7 +16324,7 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth,
                             RExC_parse = e + 1;
 
                             /* diag_listed_as: Can't find Unicode property definition "%s" */
-                            vFAIL3utf8f("%s \"%"UTF8f"\"",
+                            vFAIL3utf8f("%s \"%" UTF8f "\"",
                                 msg, UTF8fARG(UTF, n, name));
                         }
 
@@ -16060,7 +16343,7 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth,
                                 SAVEFREEPV(name);
                             }
                         }
-                        Perl_sv_catpvf(aTHX_ listsv, "%cutf8::%s%"UTF8f"%s\n",
+                        Perl_sv_catpvf(aTHX_ listsv, "%cutf8::%s%" UTF8f "%s\n",
                                         (value == 'p' ? '+' : '!'),
                                         (FOLD) ? "__" : "",
                                         UTF8fARG(UTF, n, name),
@@ -16145,9 +16428,6 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth,
 		    }
 		}
                 non_portable_endpoint++;
-		if (IN_ENCODING && value < 0x100) {
-		    goto recode_encoding;
-		}
 		break;
 	    case 'x':
 		RExC_parse--;	/* function expects to be pointed at the 'x' */
@@ -16165,8 +16445,6 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth,
 		    }
 		}
                 non_portable_endpoint++;
-		if (IN_ENCODING && value < 0x100)
-		    goto recode_encoding;
 		break;
 	    case 'c':
 		value = grok_bslash_c(*RExC_parse++, PASS2);
@@ -16199,23 +16477,6 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth,
                         }
                     }
                     non_portable_endpoint++;
-		    if (IN_ENCODING && value < 0x100)
-			goto recode_encoding;
-		    break;
-		}
-	      recode_encoding:
-		if (! RExC_override_recoding) {
-		    SV* enc = _get_encoding();
-		    value = reg_recode((U8)value, &enc);
-		    if (!enc) {
-                        if (strict) {
-                            vFAIL("Invalid escape in the specified encoding");
-                        }
-                        else if (PASS2) {
-                            ckWARNreg(RExC_parse,
-				  "Invalid escape in the specified encoding");
-                        }
-                    }
 		    break;
 		}
 	    default:
@@ -16252,13 +16513,13 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth,
                                   : 0;
                     if (strict) {
                         vFAIL2utf8f(
-                            "False [] range \"%"UTF8f"\"",
+                            "False [] range \"%" UTF8f "\"",
                             UTF8fARG(UTF, w, rangebegin));
                     }
                     else {
                         SAVEFREESV(RExC_rx_sv); /* in case of fatal warnings */
                         ckWARN2reg(RExC_parse,
-                            "False [] range \"%"UTF8f"\"",
+                            "False [] range \"%" UTF8f "\"",
                             UTF8fARG(UTF, w, rangebegin));
                         (void)ReREFCNT_inc(RExC_rx_sv);
                         cp_list = add_cp_to_invlist(cp_list, '-');
@@ -16356,9 +16617,9 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth,
             else if (! SIZE_ONLY) {
 
                 /* Here, not in pass1 (in that pass we skip calculating the
-                 * contents of this class), and is /l, or is a POSIX class for
-                 * which /l doesn't matter (or is a Unicode property, which is
-                 * skipped here). */
+                 * contents of this class), and is not /l, or is a POSIX class
+                 * for which /l doesn't matter (or is a Unicode property, which
+                 * is skipped here). */
                 if (namedclass >= ANYOF_POSIXL_MAX) {  /* If a special class */
                     if (namedclass != ANYOF_UNIPROP) { /* UNIPROP = \p and \P */
 
@@ -16383,9 +16644,9 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth,
                                 &cp_list);
                     }
                 }
-                else if (UNI_SEMANTICS
+                else if (  UNI_SEMANTICS
                         || classnum == _CC_ASCII
-                        || (DEPENDS_SEMANTICS && (classnum == _CC_DIGIT
+                        || (DEPENDS_SEMANTICS && (   classnum == _CC_DIGIT
                                                   || classnum == _CC_XDIGIT)))
                 {
                     /* We usually have to worry about /d and /a affecting what
@@ -16446,7 +16707,7 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth,
 #endif
                 w = RExC_parse - rangebegin;
                 vFAIL2utf8f(
-                    "Invalid [] range \"%"UTF8f"\"",
+                    "Invalid [] range \"%" UTF8f "\"",
                     UTF8fARG(UTF, w, rangebegin));
                 NOT_REACHED; /* NOTREACHED */
 	    }
@@ -16551,7 +16812,7 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth,
                                                       foldbuf + foldlen);
                         SV* multi_fold = sv_2mortal(newSVpvs(""));
 
-                        Perl_sv_catpvf(aTHX_ multi_fold, "\\x{%"UVXf"}", value);
+                        Perl_sv_catpvf(aTHX_ multi_fold, "\\x{%" UVXf "}", value);
 
                         multi_char_matches
                                         = add_multi_match(multi_char_matches,
@@ -16588,15 +16849,19 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth,
                      * must be be all digits or all letters of the same case.
                      * Otherwise, the range is non-portable and unclear as to
                      * what it contains */
-                    if ((isPRINT_A(prevvalue) || isPRINT_A(value))
-                        && (non_portable_endpoint
-                            || ! ((isDIGIT_A(prevvalue) && isDIGIT_A(value))
-                                   || (isLOWER_A(prevvalue) && isLOWER_A(value))
-                                   || (isUPPER_A(prevvalue) && isUPPER_A(value)))))
-                    {
-                        vWARN(RExC_parse, "Ranges of ASCII printables should be some subset of \"0-9\", \"A-Z\", or \"a-z\"");
+                    if (             (isPRINT_A(prevvalue) || isPRINT_A(value))
+                        && (          non_portable_endpoint
+                            || ! (   (isDIGIT_A(prevvalue) && isDIGIT_A(value))
+                                  || (isLOWER_A(prevvalue) && isLOWER_A(value))
+                                  || (isUPPER_A(prevvalue) && isUPPER_A(value))
+                    ))) {
+                        vWARN(RExC_parse, "Ranges of ASCII printables should"
+                                          " be some subset of \"0-9\","
+                                          " \"A-Z\", or \"a-z\"");
                     }
                     else if (prevvalue >= 0x660) { /* ARABIC_INDIC_DIGIT_ZERO */
+                        SSize_t index_start;
+                        SSize_t index_final;
 
                         /* But the nature of Unicode and languages mean we
                          * can't do the same checks for above-ASCII ranges,
@@ -16604,40 +16869,68 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth,
                          * contain only digits from the same group of 10.  The
                          * ASCII case is handled just above.  0x660 is the
                          * first digit character beyond ASCII.  Hence here, the
-                         * range could be a range of digits.  Find out.  */
-                        IV index_start = _invlist_search(PL_XPosix_ptrs[_CC_DIGIT],
-                                                         prevvalue);
-                        IV index_final = _invlist_search(PL_XPosix_ptrs[_CC_DIGIT],
-                                                         value);
+                         * range could be a range of digits.  First some
+                         * unlikely special cases.  Grandfather in that a range
+                         * ending in 19DA (NEW TAI LUE THAM DIGIT ONE) is bad
+                         * if its starting value is one of the 10 digits prior
+                         * to it.  This is because it is an alternate way of
+                         * writing 19D1, and some people may expect it to be in
+                         * that group.  But it is bad, because it won't give
+                         * the expected results.  In Unicode 5.2 it was
+                         * considered to be in that group (of 11, hence), but
+                         * this was fixed in the next version */
 
-                        /* If the range start and final points are in the same
-                         * inversion list element, it means that either both
-                         * are not digits, or both are digits in a consecutive
-                         * sequence of digits.  (So far, Unicode has kept all
-                         * such sequences as distinct groups of 10, but assert
-                         * to make sure).  If the end points are not in the
-                         * same element, neither should be a digit. */
-                        if (index_start == index_final) {
-                            assert(! ELEMENT_RANGE_MATCHES_INVLIST(index_start)
-                            || (invlist_array(PL_XPosix_ptrs[_CC_DIGIT])[index_start+1]
-                               - invlist_array(PL_XPosix_ptrs[_CC_DIGIT])[index_start]
-                               == 10)
-                               /* But actually Unicode did have one group of 11
-                                * 'digits' in 5.2, so in case we are operating
-                                * on that version, let that pass */
-                            || (invlist_array(PL_XPosix_ptrs[_CC_DIGIT])[index_start+1]
-                               - invlist_array(PL_XPosix_ptrs[_CC_DIGIT])[index_start]
-                                == 11
-                               && invlist_array(PL_XPosix_ptrs[_CC_DIGIT])[index_start]
-                                == 0x19D0)
-                            );
+                        if (UNLIKELY(value == 0x19DA && prevvalue >= 0x19D0)) {
+                            goto warn_bad_digit_range;
                         }
-                        else if ((index_start >= 0
-                                  && ELEMENT_RANGE_MATCHES_INVLIST(index_start))
-                                 || (index_final >= 0
-                                     && ELEMENT_RANGE_MATCHES_INVLIST(index_final)))
+                        else if (UNLIKELY(   prevvalue >= 0x1D7CE
+                                          &&     value <= 0x1D7FF))
                         {
-                            vWARN(RExC_parse, "Ranges of digits should be from the same group of 10");
+                            /* This is the only other case currently in Unicode
+                             * where the algorithm below fails.  The code
+                             * points just above are the end points of a single
+                             * range containing only decimal digits.  It is 5
+                             * different series of 0-9.  All other ranges of
+                             * digits currently in Unicode are just a single
+                             * series.  (And mktables will notify us if a later
+                             * Unicode version breaks this.)
+                             *
+                             * If the range being checked is at most 9 long,
+                             * and the digit values represented are in
+                             * numerical order, they are from the same series.
+                             * */
+                            if (         value - prevvalue > 9
+                                ||    (((    value - 0x1D7CE) % 10)
+                                     <= (prevvalue - 0x1D7CE) % 10))
+                            {
+                                goto warn_bad_digit_range;
+                            }
+                        }
+                        else {
+
+                            /* For all other ranges of digits in Unicode, the
+                             * algorithm is just to check if both end points
+                             * are in the same series, which is the same range.
+                             * */
+                            index_start = _invlist_search(
+                                                    PL_XPosix_ptrs[_CC_DIGIT],
+                                                    prevvalue);
+
+                            /* Warn if the range starts and ends with a digit,
+                             * and they are not in the same group of 10. */
+                            if (   index_start >= 0
+                                && ELEMENT_RANGE_MATCHES_INVLIST(index_start)
+                                && (index_final =
+                                    _invlist_search(PL_XPosix_ptrs[_CC_DIGIT],
+                                                    value)) != index_start
+                                && index_final >= 0
+                                && ELEMENT_RANGE_MATCHES_INVLIST(index_final))
+                            {
+                              warn_bad_digit_range:
+                                vWARN(RExC_parse, "Ranges of digits should be"
+                                                  " from the same group of"
+                                                  " 10");
+                            }
                         }
                     }
                 }
@@ -16718,7 +17011,7 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth,
     } /* End of loop through all the text within the brackets */
 
 
-    if (   posix_warnings && av_tindex_nomg(posix_warnings) >= 0) {
+    if (   posix_warnings && av_tindex_skip_len_mg(posix_warnings) >= 0) {
         output_or_return_posix_warnings(pRExC_state, posix_warnings,
                                         return_posix_warnings);
     }
@@ -16751,7 +17044,7 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth,
 #endif
 
         /* Look at the longest folds first */
-        for (cp_count = av_tindex_nomg(multi_char_matches);
+        for (cp_count = av_tindex_skip_len_mg(multi_char_matches);
                         cp_count > 0;
                         cp_count--)
         {
@@ -16807,7 +17100,6 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth,
         RExC_adjusted_start = RExC_start + prefix_end;
 	RExC_end = RExC_parse + len;
         RExC_in_multi_char_class = 1;
-	RExC_override_recoding = 1;
         RExC_emit = (regnode *)orig_emit;
 
 	ret = reg(pRExC_state, 1, &reg_flags, depth+1);
@@ -16820,7 +17112,6 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth,
         RExC_precomp_adj = 0;
 	RExC_end = save_end;
 	RExC_in_multi_char_class = 0;
-	RExC_override_recoding = 0;
         SvREFCNT_dec_NN(multi_char_matches);
         return ret;
     }
@@ -17135,7 +17426,7 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth,
                     {
                         AV* list = (AV*) *listp;
                         IV k;
-                        for (k = 0; k <= av_tindex_nomg(list); k++) {
+                        for (k = 0; k <= av_tindex_skip_len_mg(list); k++) {
                             SV** c_p = av_fetch(list, k, FALSE);
                             UV c;
                             assert(c_p);
@@ -17182,76 +17473,152 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth,
 	SvREFCNT_dec_NN(cp_foldable_list);
     }
 
-    /* And combine the result (if any) with any inversion list from posix
+    /* And combine the result (if any) with any inversion lists from posix
      * classes.  The lists are kept separate up to now because we don't want to
      * fold the classes (folding of those is automatically handled by the swash
      * fetching code) */
-    if (simple_posixes) {
-        _invlist_union(cp_list, simple_posixes, &cp_list);
-        SvREFCNT_dec_NN(simple_posixes);
+    if (simple_posixes) {   /* These are the classes known to be unaffected by
+                               /a, /aa, and /d */
+        if (cp_list) {
+            _invlist_union(cp_list, simple_posixes, &cp_list);
+            SvREFCNT_dec_NN(simple_posixes);
+        }
+        else {
+            cp_list = simple_posixes;
+        }
     }
     if (posixes || nposixes) {
-        if (posixes && AT_LEAST_ASCII_RESTRICTED) {
+
+        /* We have to adjust /a and /aa */
+        if (AT_LEAST_ASCII_RESTRICTED) {
+
             /* Under /a and /aa, nothing above ASCII matches these */
-            _invlist_intersection(posixes,
-                                  PL_XPosix_ptrs[_CC_ASCII],
-                                  &posixes);
-        }
-        if (nposixes) {
-            if (DEPENDS_SEMANTICS) {
-                /* Under /d, everything in the upper half of the Latin1 range
-                 * matches these complements */
-                ANYOF_FLAGS(ret) |= ANYOF_SHARED_d_MATCHES_ALL_NON_UTF8_NON_ASCII_non_d_WARN_SUPER;
+            if (posixes) {
+                _invlist_intersection(posixes,
+                                    PL_XPosix_ptrs[_CC_ASCII],
+                                    &posixes);
             }
-            else if (AT_LEAST_ASCII_RESTRICTED) {
-                /* Under /a and /aa, everything above ASCII matches these
-                 * complements */
+
+            /* Under /a and /aa, everything above ASCII matches these
+             * complements */
+            if (nposixes) {
                 _invlist_union_complement_2nd(nposixes,
                                               PL_XPosix_ptrs[_CC_ASCII],
                                               &nposixes);
             }
-            if (posixes) {
-                _invlist_union(posixes, nposixes, &posixes);
-                SvREFCNT_dec_NN(nposixes);
-            }
-            else {
-                posixes = nposixes;
-            }
         }
+
         if (! DEPENDS_SEMANTICS) {
-            if (cp_list) {
-                _invlist_union(cp_list, posixes, &cp_list);
-                SvREFCNT_dec_NN(posixes);
+
+            /* For everything but /d, we can just add the current 'posixes' and
+             * 'nposixes' to the main list */
+            if (posixes) {
+                if (cp_list) {
+                    _invlist_union(cp_list, posixes, &cp_list);
+                    SvREFCNT_dec_NN(posixes);
+                }
+                else {
+                    cp_list = posixes;
+                }
             }
-            else {
-                cp_list = posixes;
+            if (nposixes) {
+                if (cp_list) {
+                    _invlist_union(cp_list, nposixes, &cp_list);
+                    SvREFCNT_dec_NN(nposixes);
+                }
+                else {
+                    cp_list = nposixes;
+                }
             }
         }
         else {
-            /* Under /d, we put into a separate list the Latin1 things that
-             * match only when the target string is utf8 */
-            SV* nonascii_but_latin1_properties = NULL;
-            _invlist_intersection(posixes, PL_UpperLatin1,
-                                  &nonascii_but_latin1_properties);
-            _invlist_subtract(posixes, nonascii_but_latin1_properties,
-                              &posixes);
-            if (cp_list) {
-                _invlist_union(cp_list, posixes, &cp_list);
-                SvREFCNT_dec_NN(posixes);
+            /* Under /d, things like \w match upper Latin1 characters only if
+             * the target string is in UTF-8.  But things like \W match all the
+             * upper Latin1 characters if the target string is not in UTF-8.
+             *
+             * Handle the case where there something like \W separately */
+            if (nposixes) {
+                SV* only_non_utf8_list = invlist_clone(PL_UpperLatin1);
+
+                /* A complemented posix class matches all upper Latin1
+                 * characters if not in UTF-8.  And it matches just certain
+                 * ones when in UTF-8.  That means those certain ones are
+                 * matched regardless, so can just be added to the
+                 * unconditional list */
+                if (cp_list) {
+                    _invlist_union(cp_list, nposixes, &cp_list);
+                    SvREFCNT_dec_NN(nposixes);
+                    nposixes = NULL;
+                }
+                else {
+                    cp_list = nposixes;
+                }
+
+                /* Likewise for 'posixes' */
+                _invlist_union(posixes, cp_list, &cp_list);
+
+                /* Likewise for anything else in the range that matched only
+                 * under UTF-8 */
+                if (has_upper_latin1_only_utf8_matches) {
+                    _invlist_union(cp_list,
+                                   has_upper_latin1_only_utf8_matches,
+                                   &cp_list);
+                    SvREFCNT_dec_NN(has_upper_latin1_only_utf8_matches);
+                    has_upper_latin1_only_utf8_matches = NULL;
+                }
+
+                /* If we don't match all the upper Latin1 characters regardless
+                 * of UTF-8ness, we have to set a flag to match the rest when
+                 * not in UTF-8 */
+                _invlist_subtract(only_non_utf8_list, cp_list,
+                                  &only_non_utf8_list);
+                if (_invlist_len(only_non_utf8_list) != 0) {
+                    ANYOF_FLAGS(ret) |= ANYOF_SHARED_d_MATCHES_ALL_NON_UTF8_NON_ASCII_non_d_WARN_SUPER;
+                }
             }
             else {
-                cp_list = posixes;
-            }
+                /* Here there were no complemented posix classes.  That means
+                 * the upper Latin1 characters in 'posixes' match only when the
+                 * target string is in UTF-8.  So we have to add them to the
+                 * list of those types of code points, while adding the
+                 * remainder to the unconditional list.
+                 *
+                 * First calculate what they are */
+                SV* nonascii_but_latin1_properties = NULL;
+                _invlist_intersection(posixes, PL_UpperLatin1,
+                                      &nonascii_but_latin1_properties);
 
-            if (has_upper_latin1_only_utf8_matches) {
+                /* And add them to the final list of such characters. */
                 _invlist_union(has_upper_latin1_only_utf8_matches,
                                nonascii_but_latin1_properties,
                                &has_upper_latin1_only_utf8_matches);
-                SvREFCNT_dec_NN(nonascii_but_latin1_properties);
-            }
-            else {
-                has_upper_latin1_only_utf8_matches
-                                            = nonascii_but_latin1_properties;
+
+                /* Remove them from what now becomes the unconditional list */
+                _invlist_subtract(posixes, nonascii_but_latin1_properties,
+                                  &posixes);
+
+                /* And add those unconditional ones to the final list */
+                if (cp_list) {
+                    _invlist_union(cp_list, posixes, &cp_list);
+                    SvREFCNT_dec_NN(posixes);
+                    posixes = NULL;
+                }
+                else {
+                    cp_list = posixes;
+                }
+
+                SvREFCNT_dec(nonascii_but_latin1_properties);
+
+                /* Get rid of any characters that we now know are matched
+                 * unconditionally from the conditional list, which may make
+                 * that list empty */
+                _invlist_subtract(has_upper_latin1_only_utf8_matches,
+                                  cp_list,
+                                  &has_upper_latin1_only_utf8_matches);
+                if (_invlist_len(has_upper_latin1_only_utf8_matches) == 0) {
+                    SvREFCNT_dec_NN(has_upper_latin1_only_utf8_matches);
+                    has_upper_latin1_only_utf8_matches = NULL;
+                }
             }
         }
     }
@@ -17341,79 +17708,14 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth,
             invlist_iterfinish(cp_list);
         }
     }
-
-#define MATCHES_ALL_NON_UTF8_NON_ASCII(ret)                                 \
-    (   DEPENDS_SEMANTICS                                                   \
-     && (ANYOF_FLAGS(ret)                                                   \
-        & ANYOF_SHARED_d_MATCHES_ALL_NON_UTF8_NON_ASCII_non_d_WARN_SUPER))
-
-    /* See if we can simplify things under /d */
-    if (   has_upper_latin1_only_utf8_matches
-        || MATCHES_ALL_NON_UTF8_NON_ASCII(ret))
+    else if (   DEPENDS_SEMANTICS
+             && (    has_upper_latin1_only_utf8_matches
+                 || (ANYOF_FLAGS(ret) & ANYOF_SHARED_d_MATCHES_ALL_NON_UTF8_NON_ASCII_non_d_WARN_SUPER)))
     {
-        /* But not if we are inverting, as that screws it up */
-        if (! invert) {
-            if (has_upper_latin1_only_utf8_matches) {
-                if (MATCHES_ALL_NON_UTF8_NON_ASCII(ret)) {
-
-                    /* Here, we have both the flag and inversion list.  Any
-                     * character in 'has_upper_latin1_only_utf8_matches'
-                     * matches when UTF-8 is in effect, but it also matches
-                     * when UTF-8 is not in effect because of
-                     * MATCHES_ALL_NON_UTF8_NON_ASCII.  Therefore it matches
-                     * unconditionally, so can be added to the regular list,
-                     * and 'has_upper_latin1_only_utf8_matches' cleared */
-                    _invlist_union(cp_list,
-                                   has_upper_latin1_only_utf8_matches,
-                                   &cp_list);
-                    SvREFCNT_dec_NN(has_upper_latin1_only_utf8_matches);
-                    has_upper_latin1_only_utf8_matches = NULL;
-                }
-                else if (cp_list) {
-
-                    /* Here, 'cp_list' gives chars that always match, and
-                     * 'has_upper_latin1_only_utf8_matches' gives chars that
-                     * were specified to match only if the target string is in
-                     * UTF-8.  It may be that these overlap, so we can subtract
-                     * the unconditionally matching from the conditional ones,
-                     * to make the conditional list as small as possible,
-                     * perhaps even clearing it, in which case more
-                     * optimizations are possible later */
-                    _invlist_subtract(has_upper_latin1_only_utf8_matches,
-                                      cp_list,
-                                      &has_upper_latin1_only_utf8_matches);
-                    if (_invlist_len(has_upper_latin1_only_utf8_matches) == 0) {
-                        SvREFCNT_dec_NN(has_upper_latin1_only_utf8_matches);
-                        has_upper_latin1_only_utf8_matches = NULL;
-                    }
-                }
-            }
-
-            /* Similarly, if the unconditional matches include every upper
-             * latin1 character, we can clear that flag to permit later
-             * optimizations */
-            if (cp_list && MATCHES_ALL_NON_UTF8_NON_ASCII(ret)) {
-                SV* only_non_utf8_list = invlist_clone(PL_UpperLatin1);
-                _invlist_subtract(only_non_utf8_list, cp_list,
-                                  &only_non_utf8_list);
-                if (_invlist_len(only_non_utf8_list) == 0) {
-                    ANYOF_FLAGS(ret) &= ~ANYOF_SHARED_d_MATCHES_ALL_NON_UTF8_NON_ASCII_non_d_WARN_SUPER;
-                }
-                SvREFCNT_dec_NN(only_non_utf8_list);
-                only_non_utf8_list = NULL;;
-            }
-        }
-
-        /* If we haven't gotten rid of all conditional matching, we change the
-         * regnode type to indicate that */
-        if (   has_upper_latin1_only_utf8_matches
-            || MATCHES_ALL_NON_UTF8_NON_ASCII(ret))
-        {
-            OP(ret) = ANYOFD;
-            optimizable = FALSE;
-        }
+        OP(ret) = ANYOFD;
+        optimizable = FALSE;
     }
-#undef MATCHES_ALL_NON_UTF8_NON_ASCII
+
 
     /* Optimize inverted simple patterns (e.g. [^a-z]) when everything is known
      * at compile time.  Besides not inverting folded locale now, we can't
@@ -17815,7 +18117,7 @@ Perl__get_regclass_nonbitmap_data(pTHX_ const regexp *prog,
 
 	    si = *ary;	/* ary[0] = the string to initialize the swash with */
 
-            if (av_tindex_nomg(av) >= 2) {
+            if (av_tindex_skip_len_mg(av) >= 2) {
                 if (only_utf8_locale_ptr
                     && ary[2]
                     && ary[2] != &PL_sv_undef)
@@ -17831,7 +18133,7 @@ Perl__get_regclass_nonbitmap_data(pTHX_ const regexp *prog,
                  * is any inversion list generated at compile time; [4]
                  * indicates if that inversion list has any user-defined
                  * properties in it. */
-                if (av_tindex_nomg(av) >= 3) {
+                if (av_tindex_skip_len_mg(av) >= 3) {
                     invlist = ary[3];
                     if (SvUV(ary[4])) {
                         swash_init_flags |= _CORE_SWASH_INIT_USER_DEFINED_PROPERTY;
@@ -18111,7 +18413,7 @@ S_nextchar(pTHX_ RExC_state_t *pRExC_state)
         RExC_parse += (UTF) ? UTF8SKIP(RExC_parse) : 1;
 
         skip_to_be_ignored_text(pRExC_state, &RExC_parse,
-                                FALSE /* Don't assume /x */ );
+                                FALSE /* Don't force /x */ );
     }
 }
 
@@ -18144,7 +18446,7 @@ S_regnode_guts(pTHX_ RExC_state_t *pRExC_state, const U8 op, const STRLEN extra_
 #else
     if (RExC_offsets) {         /* MJD */
 	MJD_OFFSET_DEBUG(
-              ("%s:%d: (op %s) %s %"UVuf" (len %"UVuf") (max %"UVuf").\n",
+              ("%s:%d: (op %s) %s %" UVuf " (len %" UVuf ") (max %" UVuf ").\n",
               name, __LINE__,
               PL_reg_name[op],
               (UV)(RExC_emit - RExC_emit_start) > RExC_offsets[0]
@@ -18221,9 +18523,17 @@ S_reg2Lanode(pTHX_ RExC_state_t *pRExC_state, const U8 op, const U32 arg1, const
 - reginsert - insert an operator in front of already-emitted operand
 *
 * Means relocating the operand.
+*
+* IMPORTANT NOTE - it is the *callers* responsibility to correctly
+* set up NEXT_OFF() of the inserted node if needed. Something like this:
+*
+* reginsert(pRExC, OPFAIL, orig_emit, depth+1);
+* if (PASS2)
+*     NEXT_OFF(orig_emit) = regarglen[OPFAIL] + NODE_STEP_REGNODE;
+*
 */
 STATIC void
-S_reginsert(pTHX_ RExC_state_t *pRExC_state, U8 op, regnode *opnd, U32 depth)
+S_reginsert(pTHX_ RExC_state_t *pRExC_state, U8 op, regnode *operand, U32 depth)
 {
     regnode *src;
     regnode *dst;
@@ -18241,24 +18551,29 @@ S_reginsert(pTHX_ RExC_state_t *pRExC_state, U8 op, regnode *opnd, U32 depth)
 	RExC_size += size;
 	return;
     }
-
+    assert(!RExC_study_started); /* I believe we should never use reginsert once we have started
+                                    studying. If this is wrong then we need to adjust RExC_recurse
+                                    below like we do with RExC_open_parens/RExC_close_parens. */
     src = RExC_emit;
     RExC_emit += size;
     dst = RExC_emit;
     if (RExC_open_parens) {
         int paren;
-        /*DEBUG_PARSE_FMT("inst"," - %"IVdf, (IV)RExC_npar);*/
+        /*DEBUG_PARSE_FMT("inst"," - %" IVdf, (IV)RExC_npar);*/
         /* remember that RExC_npar is rex->nparens + 1,
          * iow it is 1 more than the number of parens seen in
          * the pattern so far. */
         for ( paren=0 ; paren < RExC_npar ; paren++ ) {
-            if ( RExC_open_parens[paren] >= opnd ) {
+            /* note, RExC_open_parens[0] is the start of the
+             * regex, it can't move. RExC_close_parens[0] is the end
+             * of the regex, it *can* move. */
+            if ( paren && RExC_open_parens[paren] >= operand ) {
                 /*DEBUG_PARSE_FMT("open"," - %d",size);*/
                 RExC_open_parens[paren] += size;
             } else {
                 /*DEBUG_PARSE_FMT("open"," - %s","ok");*/
             }
-            if ( RExC_close_parens[paren] >= opnd ) {
+            if ( RExC_close_parens[paren] >= operand ) {
                 /*DEBUG_PARSE_FMT("close"," - %d",size);*/
                 RExC_close_parens[paren] += size;
             } else {
@@ -18269,12 +18584,12 @@ S_reginsert(pTHX_ RExC_state_t *pRExC_state, U8 op, regnode *opnd, U32 depth)
     if (RExC_end_op)
         RExC_end_op += size;
 
-    while (src > opnd) {
+    while (src > operand) {
 	StructCopy(--src, --dst, regnode);
 #ifdef RE_TRACK_PATTERN_OFFSETS
         if (RExC_offsets) {     /* MJD 20010112 */
 	    MJD_OFFSET_DEBUG(
-                 ("%s(%d): (op %s) %s copy %"UVuf" -> %"UVuf" (max %"UVuf").\n",
+                 ("%s(%d): (op %s) %s copy %" UVuf " -> %" UVuf " (max %" UVuf ").\n",
                   "reg_insert",
 		  __LINE__,
 		  PL_reg_name[op],
@@ -18290,11 +18605,11 @@ S_reginsert(pTHX_ RExC_state_t *pRExC_state, U8 op, regnode *opnd, U32 depth)
     }
 
 
-    place = opnd;		/* Op node, where operand used to be. */
+    place = operand;		/* Op node, where operand used to be. */
 #ifdef RE_TRACK_PATTERN_OFFSETS
     if (RExC_offsets) {         /* MJD */
 	MJD_OFFSET_DEBUG(
-              ("%s(%d): (op %s) %s %"UVuf" <- %"UVuf" (max %"UVuf").\n",
+              ("%s(%d): (op %s) %s %" UVuf " <- %" UVuf " (max %" UVuf ").\n",
               "reginsert",
 	      __LINE__,
 	      PL_reg_name[op],
@@ -18443,7 +18758,7 @@ S_regtail_study(pTHX_ RExC_state_t *pRExC_state, regnode *p,
         DEBUG_PARSE_MSG("");
         regprop(RExC_rx, RExC_mysv, val, NULL, pRExC_state);
         Perl_re_printf( aTHX_
-                      "~ attach to %s (%"IVdf") offset to %"IVdf"\n",
+                      "~ attach to %s (%" IVdf ") offset to %" IVdf "\n",
 		      SvPV_nolen_const(RExC_mysv),
 		      (IV)REG_NODE_NUM(val),
 		      (IV)(val - scan)
@@ -18556,14 +18871,14 @@ Perl_regdump(pTHX_ const regexp *r)
 	RE_PV_QUOTED_DECL(s, 0, dsv, SvPVX_const(r->anchored_substr),
 	    RE_SV_DUMPLEN(r->anchored_substr), 30);
         Perl_re_printf( aTHX_
-		      "anchored %s%s at %"IVdf" ",
+		      "anchored %s%s at %" IVdf " ",
 		      s, RE_SV_TAIL(r->anchored_substr),
 		      (IV)r->anchored_offset);
     } else if (r->anchored_utf8) {
 	RE_PV_QUOTED_DECL(s, 1, dsv, SvPVX_const(r->anchored_utf8),
 	    RE_SV_DUMPLEN(r->anchored_utf8), 30);
         Perl_re_printf( aTHX_
-		      "anchored utf8 %s%s at %"IVdf" ",
+		      "anchored utf8 %s%s at %" IVdf " ",
 		      s, RE_SV_TAIL(r->anchored_utf8),
 		      (IV)r->anchored_offset);
     }
@@ -18571,14 +18886,14 @@ Perl_regdump(pTHX_ const regexp *r)
 	RE_PV_QUOTED_DECL(s, 0, dsv, SvPVX_const(r->float_substr),
 	    RE_SV_DUMPLEN(r->float_substr), 30);
         Perl_re_printf( aTHX_
-		      "floating %s%s at %"IVdf"..%"UVuf" ",
+		      "floating %s%s at %" IVdf "..%" UVuf " ",
 		      s, RE_SV_TAIL(r->float_substr),
 		      (IV)r->float_min_offset, (UV)r->float_max_offset);
     } else if (r->float_utf8) {
 	RE_PV_QUOTED_DECL(s, 1, dsv, SvPVX_const(r->float_utf8),
 	    RE_SV_DUMPLEN(r->float_utf8), 30);
         Perl_re_printf( aTHX_
-		      "floating utf8 %s%s at %"IVdf"..%"UVuf" ",
+		      "floating utf8 %s%s at %" IVdf "..%" UVuf " ",
 		      s, RE_SV_TAIL(r->float_utf8),
 		      (IV)r->float_min_offset, (UV)r->float_max_offset);
     }
@@ -18610,12 +18925,12 @@ Perl_regdump(pTHX_ const regexp *r)
         Perl_re_printf( aTHX_ " ");
     }
     if (r->intflags & PREGf_GPOS_SEEN)
-        Perl_re_printf( aTHX_  "GPOS:%"UVuf" ", (UV)r->gofs);
+        Perl_re_printf( aTHX_  "GPOS:%" UVuf " ", (UV)r->gofs);
     if (r->intflags & PREGf_SKIP)
         Perl_re_printf( aTHX_  "plus ");
     if (r->intflags & PREGf_IMPLICIT)
         Perl_re_printf( aTHX_  "implicit ");
-    Perl_re_printf( aTHX_  "minlen %"IVdf" ", (IV)r->minlen);
+    Perl_re_printf( aTHX_  "minlen %" IVdf " ", (IV)r->minlen);
     if (r->extflags & RXf_EVAL_SEEN)
         Perl_re_printf( aTHX_  "with eval ");
     Perl_re_printf( aTHX_  "\n");
@@ -18691,7 +19006,7 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o, const regmatch_
 
     PERL_ARGS_ASSERT_REGPROP;
 
-    sv_setpvn(sv, "", 0);
+    SvPVCLEAR(sv);
 
     if (OP(o) > REGNODE_MAX)		/* regnode.type is unsigned */
 	/* It would be nice to FAIL() here, but this may be called from
@@ -18727,9 +19042,11 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o, const regmatch_
 	    = (reg_trie_data*)progi->data->data[!IS_TRIE_AC(op) ? n : ac->trie];
 
         Perl_sv_catpvf(aTHX_ sv, "-%s",PL_reg_name[o->flags]);
-        DEBUG_TRIE_COMPILE_r(
+        DEBUG_TRIE_COMPILE_r({
+          if (trie->jump)
+            sv_catpvs(sv, "(JUMP)");
           Perl_sv_catpvf(aTHX_ sv,
-            "<S:%"UVuf"/%"IVdf" W:%"UVuf" L:%"UVuf"/%"UVuf" C:%"UVuf"/%"UVuf">",
+            "<S:%" UVuf "/%" IVdf " W:%" UVuf " L:%" UVuf "/%" UVuf " C:%" UVuf "/%" UVuf ">",
             (UV)trie->startstate,
             (IV)trie->statecount-1, /* -1 because of the unused 0 element */
             (UV)trie->wordcount,
@@ -18738,7 +19055,7 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o, const regmatch_
             (UV)TRIE_CHARCOUNT(trie),
             (UV)trie->uniquecharcount
           );
-        );
+        });
         if ( IS_ANYOF_TRIE(op) || trie->bitmap ) {
             sv_catpvs(sv, "[");
             (void) put_charclass_bitmap_innards(sv,
@@ -18747,11 +19064,11 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o, const regmatch_
                                                  : TRIE_BITMAP(trie)),
                                                 NULL,
                                                 NULL,
-                                                NULL
+                                                NULL,
+                                                FALSE
                                                );
             sv_catpvs(sv, "]");
         }
-
     } else if (k == CURLY) {
         U32 lo = ARG1(o), hi = ARG2(o);
 	if (OP(o) == CURLYM || OP(o) == CURLYN || OP(o) == CURLYX)
@@ -18770,7 +19087,7 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o, const regmatch_
     {
         AV *name_list= NULL;
         U32 parno= OP(o) == ACCEPT ? (U32)ARG2L(o) : ARG(o);
-        Perl_sv_catpvf(aTHX_ sv, "%"UVuf, (UV)parno);        /* Parenth number */
+        Perl_sv_catpvf(aTHX_ sv, "%" UVuf, (UV)parno);        /* Parenth number */
 	if ( RXp_PAREN_NAMES(prog) ) {
             name_list= MUTABLE_AV(progi->data->data[progi->name_list_idx]);
         } else if ( pRExC_state ) {
@@ -18780,7 +19097,7 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o, const regmatch_
             if ( k != REF || (OP(o) < NREF)) {
                 SV **name= av_fetch(name_list, parno, 0 );
 	        if (name)
-	            Perl_sv_catpvf(aTHX_ sv, " '%"SVf"'", SVfARG(*name));
+	            Perl_sv_catpvf(aTHX_ sv, " '%" SVf "'", SVfARG(*name));
             }
             else {
                 SV *sv_dat= MUTABLE_SV(progi->data->data[ parno ]);
@@ -18789,10 +19106,10 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o, const regmatch_
                 I32 n;
                 if (name) {
                     for ( n=0; n<SvIVX(sv_dat); n++ ) {
-                        Perl_sv_catpvf(aTHX_ sv, "%s%"IVdf,
+                        Perl_sv_catpvf(aTHX_ sv, "%s%" IVdf,
 			   	    (n ? "," : ""), (IV)nums[n]);
                     }
-                    Perl_sv_catpvf(aTHX_ sv, " '%"SVf"'", SVfARG(*name));
+                    Perl_sv_catpvf(aTHX_ sv, " '%" SVf "'", SVfARG(*name));
                 }
             }
         }
@@ -18824,7 +19141,7 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o, const regmatch_
         if (name_list) {
             SV **name= av_fetch(name_list, ARG(o), 0 );
             if (name)
-                Perl_sv_catpvf(aTHX_ sv, " '%"SVf"'", SVfARG(*name));
+                Perl_sv_catpvf(aTHX_ sv, " '%" SVf "'", SVfARG(*name));
         }
     }
     else if (k == LOGICAL)
@@ -18845,6 +19162,8 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o, const regmatch_
 
         /* And things that aren't in the bitmap, but are small enough to be */
         SV* bitmap_range_not_in_bitmap = NULL;
+
+        const bool inverted = flags & ANYOF_INVERT;
 
 	if (OP(o) == ANYOFL) {
             if (ANYOFL_UTF8_LOCALE_REQD(flags)) {
@@ -18890,21 +19209,37 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o, const regmatch_
                                               ANYOF_BITMAP(o),
                                               bitmap_range_not_in_bitmap,
                                               only_utf8_locale_invlist,
-                                              o);
+                                              o,
+
+                                              /* Can't try inverting for a
+                                               * better display if there are
+                                               * things that haven't been
+                                               * resolved */
+                                              unresolved != NULL);
         SvREFCNT_dec(bitmap_range_not_in_bitmap);
 
         /* If there are user-defined properties which haven't been defined yet,
-         * output them, in a separate [] from the bitmap range stuff */
+         * output them.  If the result is not to be inverted, it is clearest to
+         * output them in a separate [] from the bitmap range stuff.  If the
+         * result is to be complemented, we have to show everything in one [],
+         * as the inversion applies to the whole thing.  Use {braces} to
+         * separate them from anything in the bitmap and anything above the
+         * bitmap. */
         if (unresolved) {
-            if (do_sep) {
+            if (inverted) {
+                if (! do_sep) { /* If didn't output anything in the bitmap */
+                    sv_catpvs(sv, "^");
+                }
+                sv_catpvs(sv, "{");
+            }
+            else if (do_sep) {
                 Perl_sv_catpvf(aTHX_ sv,"%s][%s",PL_colors[1],PL_colors[0]);
             }
-            if (flags & ANYOF_INVERT) {
-                sv_catpvs(sv, "^");
-            }
             sv_catsv(sv, unresolved);
-            do_sep = TRUE;
-            SvREFCNT_dec_NN(unresolved);
+            if (inverted) {
+                sv_catpvs(sv, "}");
+            }
+            do_sep = ! inverted;
         }
 
         /* And, finally, add the above-the-bitmap stuff */
@@ -18921,9 +19256,11 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o, const regmatch_
                 Perl_sv_catpvf(aTHX_ sv,"%s][%s",PL_colors[1],PL_colors[0]);
             }
 
-            /* And, for easy of understanding, it is always output not-shown as
-             * complemented */
-            if (flags & ANYOF_INVERT) {
+            /* And, for easy of understanding, it is shown in the
+             * uncomplemented form if possible.  The one exception being if
+             * there are unresolved items, where the inversion has to be
+             * delayed until runtime */
+            if (inverted && ! unresolved) {
                 _invlist_invert(nonbitmap_invlist);
                 _invlist_subtract(nonbitmap_invlist, PL_InBitmap, &nonbitmap_invlist);
             }
@@ -18960,6 +19297,8 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o, const regmatch_
 
         /* And finally the matching, closing ']' */
 	Perl_sv_catpvf(aTHX_ sv, "%s]", PL_colors[1]);
+
+        SvREFCNT_dec(unresolved);
     }
     else if (k == POSIXD || k == NPOSIXD) {
         U8 index = FLAGS(o) * 2;
@@ -18995,7 +19334,7 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o, const regmatch_
 
     /* add on the verb argument if there is one */
     if ( ( k == VERB || OP(o) == ACCEPT || OP(o) == OPFAIL ) && o->flags) {
-        Perl_sv_catpvf(aTHX_ sv, ":%"SVf,
+        Perl_sv_catpvf(aTHX_ sv, ":%" SVf,
                        SVfARG((MUTABLE_SV(progi->data->data[ ARG( o ) ]))));
     }
 #else
@@ -19214,12 +19553,8 @@ Perl_regfree_internal(pTHX_ REGEXP * const rx)
     if (ri->u.offsets)
         Safefree(ri->u.offsets);             /* 20010421 MJD */
 #endif
-    if (ri->code_blocks) {
-	int n;
-	for (n = 0; n < ri->num_code_blocks; n++)
-	    SvREFCNT_dec(ri->code_blocks[n].src_regex);
-	Safefree(ri->code_blocks);
-    }
+    if (ri->code_blocks)
+        S_free_codeblocks(aTHX_ ri->code_blocks);
 
     if (ri->data) {
 	int n = ri->data->count;
@@ -19436,16 +19771,18 @@ Perl_regdupe_internal(pTHX_ REGEXP * const rx, CLONE_PARAMS *param)
     Copy(ri->program, reti->program, len+1, regnode);
 
 
-    reti->num_code_blocks = ri->num_code_blocks;
     if (ri->code_blocks) {
 	int n;
-	Newxc(reti->code_blocks, ri->num_code_blocks, struct reg_code_block,
-		struct reg_code_block);
-	Copy(ri->code_blocks, reti->code_blocks, ri->num_code_blocks,
-		struct reg_code_block);
-	for (n = 0; n < ri->num_code_blocks; n++)
-	     reti->code_blocks[n].src_regex = (REGEXP*)
-		    sv_dup_inc((SV*)(ri->code_blocks[n].src_regex), param);
+	Newx(reti->code_blocks, 1, struct reg_code_blocks);
+	Newx(reti->code_blocks->cb, ri->code_blocks->count,
+                    struct reg_code_block);
+	Copy(ri->code_blocks->cb, reti->code_blocks->cb,
+             ri->code_blocks->count, struct reg_code_block);
+	for (n = 0; n < ri->code_blocks->count; n++)
+	     reti->code_blocks->cb[n].src_regex = (REGEXP*)
+		    sv_dup_inc((SV*)(ri->code_blocks->cb[n].src_regex), param);
+        reti->code_blocks->count = ri->code_blocks->count;
+        reti->code_blocks->refcnt = 1;
     }
     else
 	reti->code_blocks = NULL;
@@ -19576,7 +19913,7 @@ S_re_croak2(pTHX_ bool utf8, const char* pat1,const char* pat2,...)
 	l1 = 512;
     Copy(message, buf, l1 , char);
     /* l1-1 to avoid \n */
-    Perl_croak(aTHX_ "%"UTF8f, UTF8fARG(utf8, l1-1, buf));
+    Perl_croak(aTHX_ "%" UTF8f, UTF8fARG(utf8, l1-1, buf));
 }
 
 /* XXX Here's a total kludge.  But we need to re-enter for swash routines. */
@@ -19628,7 +19965,7 @@ S_put_code_point(pTHX_ SV *sv, UV c)
     PERL_ARGS_ASSERT_PUT_CODE_POINT;
 
     if (c > 255) {
-        Perl_sv_catpvf(aTHX_ sv, "\\x{%04"UVXf"}", c);
+        Perl_sv_catpvf(aTHX_ sv, "\\x{%04" UVXf "}", c);
     }
     else if (isPRINT(c)) {
 	const char string = (char) c;
@@ -19773,30 +20110,36 @@ S_put_range(pTHX_ SV *sv, UV start, const UV end, const bool allow_literals)
          * mnemonic names.  Split off any of those at the beginning and end of
          * the range to print mnemonically.  It isn't possible for many of
          * these to be in a row, so this won't overwhelm with output */
-        while (isMNEMONIC_CNTRL(start) && start <= end) {
-            put_code_point(sv, start);
-            start++;
-        }
-        if (start < end && isMNEMONIC_CNTRL(end)) {
-
-            /* Here, the final character in the range has a mnemonic name.
-             * Work backwards from the end to find the final non-mnemonic */
-            UV temp_end = end - 1;
-            while (isMNEMONIC_CNTRL(temp_end)) {
-                temp_end--;
-            }
-
-            /* And separately output the interior range that doesn't start or
-             * end with mnemonics */
-            put_range(sv, start, temp_end, FALSE);
-
-            /* Then output the mnemonic trailing controls */
-            start = temp_end + 1;
-            while (start <= end) {
+        if (   start <= end
+            && (isMNEMONIC_CNTRL(start) || isMNEMONIC_CNTRL(end)))
+        {
+            while (isMNEMONIC_CNTRL(start) && start <= end) {
                 put_code_point(sv, start);
                 start++;
             }
-            break;
+
+            /* If this didn't take care of the whole range ... */
+            if (start <= end) {
+
+                /* Look backwards from the end to find the final non-mnemonic
+                 * */
+                UV temp_end = end;
+                while (isMNEMONIC_CNTRL(temp_end)) {
+                    temp_end--;
+                }
+
+                /* And separately output the interior range that doesn't start
+                 * or end with mnemonics */
+                put_range(sv, start, temp_end, FALSE);
+
+                /* Then output the mnemonic trailing controls */
+                start = temp_end + 1;
+                while (start <= end) {
+                    put_code_point(sv, start);
+                    start++;
+                }
+                break;
+            }
         }
 
         /* As a final resort, output the range or subrange as hex. */
@@ -19806,10 +20149,10 @@ S_put_range(pTHX_ SV *sv, UV start, const UV end, const bool allow_literals)
                     : NUM_ANYOF_CODE_POINTS - 1;
 #if NUM_ANYOF_CODE_POINTS > 256
         format = (this_end < 256)
-                 ? "\\x%02"UVXf"-\\x%02"UVXf""
-                 : "\\x{%04"UVXf"}-\\x{%04"UVXf"}";
+                 ? "\\x%02" UVXf "-\\x%02" UVXf
+                 : "\\x{%04" UVXf "}-\\x{%04" UVXf "}";
 #else
-        format = "\\x%02"UVXf"-\\x%02"UVXf"";
+        format = "\\x%02" UVXf "-\\x%02" UVXf;
 #endif
         GCC_DIAG_IGNORE(-Wformat-nonliteral);
         Perl_sv_catpvf(aTHX_ sv, format, start, this_end);
@@ -19884,7 +20227,9 @@ S_put_charclass_bitmap_innards_common(pTHX_
 )
 {
     /* Create and return an SV containing a displayable version of the bitmap
-     * and associated information determined by the input parameters. */
+     * and associated information determined by the input parameters.  If the
+     * output would have been only the inversion indicator '^', NULL is instead
+     * returned. */
 
     SV * output;
 
@@ -19943,9 +20288,8 @@ S_put_charclass_bitmap_innards_common(pTHX_
         }
     }
 
-    /* If the only thing we output is the '^', clear it */
     if (invert && SvCUR(output) == 1) {
-        SvCUR_set(output, 0);
+        return NULL;
     }
 
     return output;
@@ -19956,7 +20300,8 @@ S_put_charclass_bitmap_innards(pTHX_ SV *sv,
                                      char *bitmap,
                                      SV *nonbitmap_invlist,
                                      SV *only_utf8_locale_invlist,
-                                     const regnode * const node)
+                                     const regnode * const node,
+                                     const bool force_as_is_display)
 {
     /* Appends to 'sv' a displayable version of the innards of the bracketed
      * character class defined by the other arguments:
@@ -19972,13 +20317,16 @@ S_put_charclass_bitmap_innards(pTHX_ SV *sv,
      *  'node' is the regex pattern node.  It is needed only when the above two
      *      parameters are not null, and is passed so that this routine can
      *      tease apart the various reasons for them.
+     *  'force_as_is_display' is TRUE if this routine should definitely NOT try
+     *      to invert things to see if that leads to a cleaner display.  If
+     *      FALSE, this routine is free to use its judgment about doing this.
      *
      * It returns TRUE if there was actually something output.  (It may be that
      * the bitmap, etc is empty.)
      *
      * When called for outputting the bitmap of a non-ANYOF node, just pass the
-     * bitmap, with the succeeding parameters set to NULL.
-     *
+     * bitmap, with the succeeding parameters set to NULL, and the final one to
+     * FALSE.
      */
 
     /* In general, it tries to display the 'cleanest' representation of the
@@ -19986,7 +20334,7 @@ S_put_charclass_bitmap_innards(pTHX_ SV *sv,
      * whether the class itself is to be inverted.  However,  there are some
      * cases where it can't try inverting, as what actually matches isn't known
      * until runtime, and hence the inversion isn't either. */
-    bool inverting_allowed = TRUE;
+    bool inverting_allowed = ! force_as_is_display;
 
     int i;
     STRLEN orig_sv_cur = SvCUR(sv);
@@ -20002,7 +20350,7 @@ S_put_charclass_bitmap_innards(pTHX_ SV *sv,
                                        is UTF-8 */
 
     SV* as_is_display;      /* The output string when we take the inputs
-                              literally */
+                               literally */
     SV* inverted_display;   /* The output string when we invert the inputs */
 
     U8 flags = (node) ? ANYOF_FLAGS(node) : 0;
@@ -20115,7 +20463,10 @@ S_put_charclass_bitmap_innards(pTHX_ SV *sv,
 
     /* If have to take the output as-is, just do that */
     if (! inverting_allowed) {
-        sv_catsv(sv, as_is_display);
+        if (as_is_display) {
+            sv_catsv(sv, as_is_display);
+            SvREFCNT_dec_NN(as_is_display);
+        }
     }
     else { /* But otherwise, create the output again on the inverted input, and
               use whichever version is shorter */
@@ -20151,10 +20502,13 @@ S_put_charclass_bitmap_innards(pTHX_ SV *sv,
             _invlist_invert(only_utf8);
             _invlist_intersection(only_utf8, PL_UpperLatin1, &only_utf8);
         }
+        else if (not_utf8) {
 
-        if (not_utf8) {
-            _invlist_invert(not_utf8);
-            _invlist_intersection(not_utf8, PL_UpperLatin1, &not_utf8);
+            /* If a code point matches iff the target string is not in UTF-8,
+             * then complementing the result has it not match iff not in UTF-8,
+             * which is the same thing as matching iff it is UTF-8. */
+            only_utf8 = not_utf8;
+            not_utf8 = NULL;
         }
 
         if (only_utf8_locale) {
@@ -20173,17 +20527,19 @@ S_put_charclass_bitmap_innards(pTHX_ SV *sv,
 
         /* Use the shortest representation, taking into account our bias
          * against showing it inverted */
-        if (SvCUR(inverted_display) + inverted_bias
-            < SvCUR(as_is_display) + as_is_bias)
+        if (   inverted_display
+            && (   ! as_is_display
+                || (  SvCUR(inverted_display) + inverted_bias
+                    < SvCUR(as_is_display)    + as_is_bias)))
         {
 	    sv_catsv(sv, inverted_display);
         }
-        else {
+        else if (as_is_display) {
 	    sv_catsv(sv, as_is_display);
         }
 
-        SvREFCNT_dec_NN(as_is_display);
-        SvREFCNT_dec_NN(inverted_display);
+        SvREFCNT_dec(as_is_display);
+        SvREFCNT_dec(inverted_display);
     }
 
     SvREFCNT_dec_NN(invlist);
@@ -20198,7 +20554,7 @@ S_put_charclass_bitmap_innards(pTHX_ SV *sv,
 #define CLEAR_OPTSTART                                                       \
     if (optstart) STMT_START {                                               \
         DEBUG_OPTIMISE_r(Perl_re_printf( aTHX_                                           \
-                              " (%"IVdf" nodes)\n", (IV)(node - optstart))); \
+                              " (%" IVdf " nodes)\n", (IV)(node - optstart))); \
         optstart=NULL;                                                       \
     } STMT_END
 
@@ -20247,7 +20603,7 @@ S_dumpuntil(pTHX_ const regexp *r, const regnode *start, const regnode *node,
 	    CLEAR_OPTSTART;
 
         regprop(r, sv, node, NULL, NULL);
-        Perl_re_printf( aTHX_  "%4"IVdf":%*s%s", (IV)(node - start),
+        Perl_re_printf( aTHX_  "%4" IVdf ":%*s%s", (IV)(node - start),
 		      (int)(2*indent + 1), "", SvPVX_const(sv));
 
         if (OP(node) != OPTIMIZED) {
@@ -20257,7 +20613,7 @@ S_dumpuntil(pTHX_ const regexp *r, const regnode *start, const regnode *node,
                      && PL_regkind[OP(next)] != BRANCH )
                 Perl_re_printf( aTHX_  " (FAIL)");
             else
-                Perl_re_printf( aTHX_  " (%"IVdf")", (IV)(next - start));
+                Perl_re_printf( aTHX_  " (%" IVdf ")", (IV)(next - start));
             Perl_re_printf( aTHX_ "\n");
         }
 
@@ -20292,7 +20648,7 @@ S_dumpuntil(pTHX_ const regexp *r, const regnode *start, const regnode *node,
 #endif
 	    const regnode *nextbranch= NULL;
 	    I32 word_idx;
-            sv_setpvs(sv, "");
+            SvPVCLEAR(sv);
 	    for (word_idx= 0; word_idx < (I32)trie->wordcount; word_idx++) {
 		SV ** const elem_ptr = av_fetch(trie_words,word_idx,0);
 
@@ -20312,7 +20668,7 @@ S_dumpuntil(pTHX_ const regexp *r, const regnode *start, const regnode *node,
                 );
                 if (trie->jump) {
                     U16 dist= trie->jump[word_idx+1];
-                    Perl_re_printf( aTHX_  "(%"UVuf")\n",
+                    Perl_re_printf( aTHX_  "(%" UVuf ")\n",
                                (UV)((dist ? this_trie + dist : next) - start));
                     if (dist) {
                         if (!nextbranch)

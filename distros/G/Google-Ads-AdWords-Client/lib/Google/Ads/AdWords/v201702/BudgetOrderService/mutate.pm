@@ -73,7 +73,7 @@ Google::Ads::AdWords::v201702::BudgetOrderService::mutate
 Perl data type class for the XML Schema defined element
 mutate from the namespace https://adwords.google.com/api/adwords/billing/v201702.
 
-Mutates BudgetOrders, supported operations are: <p><code>ADD</code>: Adds a {@link BudgetOrder} to the billing account specified by the billing account ID.</p> <p><code>SET</code>: Sets the start/end date and amount of the {@link BudgetOrder}.</p> <p><code>REMOVE</code>: Cancels the {@link BudgetOrder} (status change).</p> <p class="warning"><b>Warning:</b> The <code>BudgetOrderService</code> is limited to one operation per mutate request. Any attempt to make more than one operation will result in an <code>ApiException</code>.</p> @param operations A list of operations, <b>however currently we only support one operation per mutate call</b>. @return BudgetOrders affected by the mutate operation. @throws ApiException 
+Adds, updates, or removes budget orders. Supported operations are: <p><code>ADD</code>: Adds a {@link BudgetOrder} to the billing account specified by the billing account ID.</p> <p><code>SET</code>: Sets the start/end date and amount of the {@link BudgetOrder}.</p> <p><code>REMOVE</code>: Cancels the {@link BudgetOrder} (status change).</p> <p class="warning"><b>Warning:</b> The <code>BudgetOrderService</code> is limited to one operation per mutate request. Any attempt to make more than one operation will result in an <code>ApiException</code>.</p> <p class="note"><b>Note:</b> This action is available only on a whitelist basis.</p> @param operations A list of operations, <b>however currently we only support one operation per mutate call</b>. @return BudgetOrders affected by the mutate operation. @throws ApiException 
 
 
 

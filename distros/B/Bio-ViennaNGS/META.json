@@ -4,7 +4,7 @@
       "Michael T. Wolfinger"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -22,7 +22,8 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "Test::Prereq" : "0"
          }
       },
       "configure" : {
@@ -34,14 +35,22 @@
          "requires" : {
             "Bio::DB::Fasta" : "0",
             "Bio::DB::Sam" : "1.37",
+            "Bio::Perl" : "0",
             "Bio::Root::Version" : "1.00690001",
+            "Bio::SeqUtils" : "0",
             "Bio::Tools::GFF" : "0",
             "Carp" : "0",
+            "Cwd" : "0",
             "Data::Dumper" : "0",
+            "Env" : "0",
+            "Exporter" : "0",
             "File::Basename" : "0",
+            "File::Find" : "0",
+            "File::Path" : "0",
             "File::Share" : "0",
             "File::Slurp" : "0",
             "File::Temp" : "0",
+            "FindBin" : "0",
             "Getopt::Long" : "2.0",
             "IPC::Cmd" : "0",
             "List::Util" : "0",
@@ -49,22 +58,27 @@
             "Moose" : "0",
             "Moose::Util::TypeConstraints" : "0",
             "MooseX::Clone" : "0",
-            "MooseX::InstanceTracking" : "0",
             "POSIX" : "0",
+            "Params::Coerce" : "0",
             "Path::Class" : "0",
             "PerlIO::gzip" : "0",
             "Pod::Usage" : "0",
-            "Statistics::R" : "0",
             "Template" : "0",
             "Test::Deep" : "0",
             "Test::File::Contents" : "0",
             "Test::Files" : "0",
             "Tie::Hash::Indexed" : "0",
+            "constant" : "0",
+            "lib" : "0",
             "namespace::autoclean" : "0",
-            "perl" : "5.010"
+            "perl" : "5.010",
+            "strict" : "0",
+            "version" : "0",
+            "warnings" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v0.16.0"
+   "version" : "v0.17.1",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

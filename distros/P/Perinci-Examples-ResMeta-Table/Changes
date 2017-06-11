@@ -1,3 +1,9 @@
+0.002   2017-05-31 (PERLANCAR)
+
+	- Add examples: field_format_iso8601_datetime, field_format_number
+	  (Perinci::Result::Format::Lite 0.25).
+
+
 0.001   2017-05-24 (PERLANCAR)
 
         - First release.

@@ -1,4 +1,6 @@
 package XML::DOM::Lite::Serializer;
+use warnings;
+use strict;
 
 use XML::DOM::Lite::Constants qw(:all);
 

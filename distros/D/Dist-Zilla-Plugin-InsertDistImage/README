@@ -4,7 +4,7 @@ SYNOPSIS
 
     In dist.ini:
 
-     [InsertDistImages]
+     [InsertDistImage]
      ;hosting=metacpan
      ;include_files=...
      ;exclude_files=...
@@ -26,13 +26,13 @@ SYNOPSIS
     
      =begin html
     
-     <img src="https://api.metacpan.org/source/CPANID/Your-Dist-Name-0.123/share/images/img1.jpg" />
+     <img src="https://st.aticpan.org/source/CPANID/Your-Dist-Name-0.123/share/images/img1.jpg" />
     
      =end html
     
      =begin html
     
-     <img src="https://api.metacpan.org/source/CPANID/Your-Dist-Name-0.123/share/images/img2.png" />
+     <img src="https://st.aticpan.org/source/CPANID/Your-Dist-Name-0.123/share/images/img2.png" />
     
      =end html
 

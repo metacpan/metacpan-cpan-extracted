@@ -6,7 +6,7 @@ Kafka::IO - Interface to network communication with the Apache Kafka server.
 
 =head1 VERSION
 
-This documentation refers to C<Kafka::IO> version 1.03 .
+This documentation refers to C<Kafka::IO> version 1.04 .
 
 =cut
 
@@ -20,7 +20,7 @@ use warnings;
 
 our $DEBUG = 0;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 
 
@@ -222,7 +222,7 @@ in C<Kafka> L<EXPORT|Kafka/EXPORT>.
 
 =cut
 sub new {
-    my ( $class, @args ) = @_;
+    my ( $class, %p ) = @_;
 
     my $self = bless {
         host        => '',
@@ -234,10 +234,7 @@ sub new {
         ip          => '',  # Human-readable textual representation of the ip address
     }, $class;
 
-    while ( @args ) {
-        my $k = shift @args;
-        $self->{ $k } = shift @args if exists $self->{ $k };
-    }
+    exists $p{$_} and $self->{$_} = $p{$_} foreach keys %$self;
 
     # we trust it: make it untainted
     ( $self->{host} ) = $self->{host} =~ /\A(.+)\z/;

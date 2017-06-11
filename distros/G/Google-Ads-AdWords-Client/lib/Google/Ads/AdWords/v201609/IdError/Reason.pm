@@ -25,7 +25,7 @@ __END__
 Perl data type class for the XML Schema defined simpleType
 IdError.Reason from the namespace https://adwords.google.com/api/adwords/cm/v201609.
 
-
+The reasons for the target error. 
 
 
 

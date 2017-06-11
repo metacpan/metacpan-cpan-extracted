@@ -11,18 +11,18 @@ const our $PRIORITY => {
 };
 
 const our $PRIORITY_COLOR => {
-    trivial  => WHITE,
-    minor    => BLACK . ON_WHITE,
-    major    => BLACK . ON_YELLOW,
-    critical => WHITE . ON_RED,
-    blocker  => BOLD . WHITE . ON_RED,
+    trivial  => $WHITE,
+    minor    => $BLACK . $ON_WHITE,
+    major    => $BLACK . $ON_YELLOW,
+    critical => $WHITE . $ON_RED,
+    blocker  => $BOLD . $WHITE . $ON_RED,
 };
 
 const our $KIND => {
-    bug         => [ 'bug',  WHITE . ON_RED ],
-    enhancement => [ 'enh',  WHITE ],
-    proposal    => [ 'prop', WHITE ],
-    task        => [ 'task', WHITE ],
+    bug         => [ 'bug',  $WHITE . $ON_RED ],
+    enhancement => [ 'enh',  $WHITE ],
+    proposal    => [ 'prop', $WHITE ],
+    task        => [ 'task', $WHITE ],
 };
 
 const our $STATUS_ID => {
@@ -37,14 +37,14 @@ const our $STATUS_ID => {
 };
 
 const our $STATUS_COLOR => {
-    new       => BLACK . ON_WHITE,
-    open      => BLACK . ON_WHITE,
-    resolved  => WHITE . ON_RED,
-    closed    => BLACK . ON_GREEN,
-    'on hold' => WHITE . ON_BLUE,
-    invalid   => WHITE . ON_BLUE,
-    duplicate => WHITE . ON_BLUE,
-    wontfix   => WHITE . ON_BLUE,
+    new       => $BLACK . $ON_WHITE,
+    open      => $BLACK . $ON_WHITE,
+    resolved  => $WHITE . $ON_RED,
+    closed    => $BLACK . $ON_GREEN,
+    'on hold' => $WHITE . $ON_BLUE,
+    invalid   => $WHITE . $ON_BLUE,
+    duplicate => $WHITE . $ON_BLUE,
+    wontfix   => $WHITE . $ON_BLUE,
 };
 
 has api => ( is => 'ro', isa => InstanceOf ['Pcore::API::Bitbucket'], required => 1 );
@@ -63,7 +63,7 @@ sub _build_priority_id ($self) {
 }
 
 sub _build_priority_color ($self) {
-    return $PRIORITY_COLOR->{ $self->{priority} } . " $self->{priority} " . RESET;
+    return $PRIORITY_COLOR->{ $self->{priority} } . " $self->{priority} " . $RESET;
 }
 
 sub _build_status_id ($self) {
@@ -71,11 +71,11 @@ sub _build_status_id ($self) {
 }
 
 sub _build_status_color ($self) {
-    return $STATUS_COLOR->{ $self->{status} } . " $self->{status} " . RESET;
+    return $STATUS_COLOR->{ $self->{status} } . " $self->{status} " . $RESET;
 }
 
 sub _build_kind_color ($self) {
-    return $KIND->{ $self->{metadata}->{kind} }->[1] . " @{[$self->kind_abbr]} " . RESET;
+    return $KIND->{ $self->{metadata}->{kind} }->[1] . " @{[$self->kind_abbr]} " . $RESET;
 }
 
 sub _build_kind_abbr ($self) {

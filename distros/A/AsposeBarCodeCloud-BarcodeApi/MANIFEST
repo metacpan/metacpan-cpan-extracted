@@ -33,7 +33,5 @@ Makefile.PL
 MANIFEST
 META.json
 META.yml
-README
+README.md
 t/01_barcode_api.t
-t/data/sample-barcode.jpeg
-t/data/sample.txt

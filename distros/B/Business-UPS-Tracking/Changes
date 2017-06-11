@@ -1,5 +1,8 @@
 Revision history fon Perl module Business::UPS::Tracking
 
+1.13 Fri Jun 2 2017
+    - Fix Makefile.PL for perl 5.26
+
 1.12 Sat Apr 2 2016
     - Fix typos in method names
 

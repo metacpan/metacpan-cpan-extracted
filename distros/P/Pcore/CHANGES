@@ -1,3 +1,80 @@
+v0.40.3 2017-06-08T05:22:02Z
+ - No issues on bugtracker were closed since the last release
+ - cache lru bench added
+ - Pcore::Util::Hash::LRU added
+ - par.perl renamed to par.ini
+ - app start message added
+
+v0.40.2 2017-06-05T11:49:28Z
+ - No issues on bugtracker were closed since the last release
+ - install perl exclusions before update cpan
+ - use binmode for RPC control FH
+ - scan deps fixed when pardeps is not exists
+ - fixed %ENV before run external process
+ - PAR shlib do not add perl interptreter twice
+ - PAR do not add perl dso twice
+ - PAR fixed invalid path in zip
+ - PAR do not write tree to temp dir
+ - PAR drop read-only attr
+
+v0.40.1 2017-06-03T15:55:02Z
+ - No issues on bugtracker were closed since the last release
+ - RPC protocol fix for windows
+
+v0.40.0 2017-06-03T14:15:26Z
+ - No issues on bugtracker were closed since the last release
+ - Net::SSLeay init removed
+ - Filter::Crypto  preload removed
+ - stderr pipe return if stderr handle is closed
+ - AE::Handle support for linux abstract UDS improved
+ - AE::Socket::tcp_connect patch removed
+ - perl v5.26.0
+
+v0.39.0 2017-06-02T07:47:22Z
+ - No issues on bugtracker were closed since the last release
+ - Pcore::AE::Handle <-> Pcore::AE::Handle2
+ - log pipes attrs changed to private
+ - dump() tags attr added
+ - dump() TO_DUMP method name is hardcoded
+ - dump() improved
+ - log pipes serialize event data manually
+ - event log pipes improved
+ - exception fire events via sendlog
+ - forward event interface
+ - pcore websocket uses forward_event interface
+ - websocket event message format changed
+ - event variables renamed
+ - event listener get single $ev argument
+ - on_listen_event get mask as argument
+ - on_fire_event get key as argument
+ - invalid common longest prefix in src report fixed
+
+v0.38.0 2017-05-31T16:36:41Z
+ - No issues on bugtracker were closed since the last release
+ - renamed LOG_STDERR_DISABLED to PCORE_LOG_STDERR_DISABLED
+ - chdir to dist root when changing docker from tag
+ - quote strings using qq[] instead of " in dump
+ - dump improved
+ - docker perl updated to v5.26.0
+ - $ENV{ANSI_COLORS_DISABLED} removed
+ - handle perlcritic exceptions
+ - remove longest common prefix from paths in src report
+
+v0.37.0 2017-05-30T15:35:28Z
+ - No issues on bugtracker were closed since the last release
+ - destroy handle after calling on_error callback
+ - PAR DSO scan
+ - scan deps improved to find embedded packages sources
+ - par helper file pcore.perl removed
+ - PAR so scan process improved
+ - use AE::postpone for callbacks in proc
+ - ANSI const added
+ - migrate to ANSI colors vars
+ - TRUE / FALSE const removed
+ - event-based log
+ - stack trace speed optimized
+ - try/catch removed
+
 v0.36.0 2017-05-27T09:49:39Z
  - No issues on bugtracker were closed since the last release
  - connect_ws on_error -> on_connect_error

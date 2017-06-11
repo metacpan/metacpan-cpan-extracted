@@ -1,7 +1,7 @@
 package Module::CheckVersion::cpan;
 
-our $DATE = '2016-03-16'; # DATE
-our $VERSION = '0.07'; # VERSION
+our $DATE = '2017-06-09'; # DATE
+our $VERSION = '0.08'; # VERSION
 
 use 5.010;
 use strict;
@@ -13,7 +13,7 @@ use JSON::MaybeXS;
 sub check_latest_version {
     my ($mod, $installed_version, $chkres) = @_;
 
-    my $res = HTTP::Tiny->new->get("http://api.metacpan.org/v0/module/$mod?fields=name,version");
+    my $res = HTTP::Tiny->new->get("http://fastapi.metacpan.org/v1/module/$mod?fields=name,version");
     return [$res->{status}, "API request failed: $res->{reason}"] unless $res->{success};
     eval { $res = JSON::MaybeXS::decode_json($res->{content}) };
     return [500, "Can't decode JSON API response: $@"] if $@;
@@ -54,7 +54,7 @@ Module::CheckVersion::cpan - Handler for cpan
 
 =head1 VERSION
 
-This document describes version 0.07 of Module::CheckVersion::cpan (from Perl distribution Module-CheckVersion), released on 2016-03-16.
+This document describes version 0.08 of Module::CheckVersion::cpan (from Perl distribution Module-CheckVersion), released on 2017-06-09.
 
 =for Pod::Coverage .+
 
@@ -80,7 +80,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

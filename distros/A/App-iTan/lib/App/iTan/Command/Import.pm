@@ -33,7 +33,7 @@ option 'overwrite' => (
 
 sub execute {
     my ( $self, $opts, $args ) = @_;
-    
+
     my @itans = $self->file->slurp(chomp => 1)
         or die ('Cannot read file '.$self->file->stringify);
 
@@ -43,7 +43,7 @@ sub execute {
 
     my $sth = $self->dbh->prepare("INSERT INTO itan (tindex,itan,imported,valid,used,memo) VALUES (?,?,'$date',1,NULL,NULL)")
         or die "ERROR: Cannot prepare: " . $self->dbh->errstr();
-    
+
     foreach my $line (@itans) {
         my ($index,$tan);
         unless ($line =~ m/^(?<index>\d{1,4})\D+(?<tan>\d{4,8})$/) {
@@ -75,11 +75,11 @@ sub execute {
         }
     }
     $sth->finish();
-    
+
     if ($self->deletefile) {
         $self->file->remove();
     }
-    
+
     return;
 }
 
@@ -102,8 +102,8 @@ App::iTan::Command::Import - Imports a list of iTans into the database
 
 Imports a list of iTans into the database form a file with one iTAN per line.
 
-The file must contain two columns (separated by any non numeric characters). 
-The first  column must be the index number. The second column must be the tan 
+The file must contain two columns (separated by any non numeric characters).
+The first  column must be the index number. The second column must be the tan
 number. If your online banking application does not use index numbers just set
 the first column to zero.
 
@@ -117,13 +117,13 @@ the first column to zero.
 
 =head2 file
 
-Path to a file containing the iTANs to be imported. 
+Path to a file containing the iTANs to be imported.
 
 =head2 deletefile
 
 Delete import file after a successfull import
 
-=head2 overwrite 
+=head2 overwrite
 
 Overwrite duplicate index numbers.
 

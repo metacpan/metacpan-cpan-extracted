@@ -471,9 +471,9 @@ different from other models)</span>
   <br>19 = 2000
   <br>20 = 2500
   <br>21 = 3200
-  <br>22 = 4000</td><td>&nbsp;&nbsp;</td>
-  <td>23 = 5000
-  <br>24 = 6400
+  <br>22 = 4000
+  <br>23 = 5000</td><td>&nbsp;&nbsp;</td>
+  <td>24 = 6400
   <br>25 = 8000
   <br>26 = 10000
   <br>27 = 12800
@@ -491,10 +491,10 @@ different from other models)</span>
   <br>39 = 204800
   <br>40 = 256000
   <br>41 = 320000
-  <br>42 = 409600</td><td>&nbsp;&nbsp;</td>
-  <td>43 = 512000
-  <br>44 = 640000
-  <br>45 = 819200
+  <br>42 = 409600
+  <br>43 = 512000
+  <br>44 = 640000</td><td>&nbsp;&nbsp;</td>
+  <td>45 = 819200
   <br>50 = 50
   <br>100 = 100
   <br>200 = 200
@@ -511,11 +511,11 @@ different from other models)</span>
   <br>268 = 1600
   <br>269 = 2200
   <br>270 = 3200
-  <br>271 = 4500</td><td>&nbsp;&nbsp;</td>
-  <td>272 = 6400
+  <br>271 = 4500
+  <br>272 = 6400
   <br>273 = 9000
-  <br>274 = 12800
-  <br>275 = 18000
+  <br>274 = 12800</td><td>&nbsp;&nbsp;</td>
+  <td>275 = 18000
   <br>276 = 25600
   <br>277 = 36000
   <br>278 = 51200
@@ -531,6 +531,7 @@ different from other models)</span>
   <br>800 = 800
   <br>1600 = 1600
   <br>3200 = 3200
+  <br>65534 = Auto 2
   <br>65535 = Auto</td></tr></table>
 </td></tr>
 <tr class=b>
@@ -627,8 +628,8 @@ available.  Extended bracket values are printed as &#39;WB-BA&#39;, &#39;WB-GM&#
   <td>0 = -2 (low)
   <br>1 = 0 (normal)
   <br>2 = +2 (high)
-  <br>3 = -1 (med low)
-  <br>4 = +1 (med high)</td><td>&nbsp;&nbsp;</td>
+  <br>3 = -1 (medium low)
+  <br>4 = +1 (medium high)</td><td>&nbsp;&nbsp;</td>
   <td>5 = -3 (very low)
   <br>6 = +3 (very high)
   <br>7 = -4 (minimum)
@@ -644,8 +645,8 @@ available.  Extended bracket values are printed as &#39;WB-BA&#39;, &#39;WB-GM&#
   <td>0 = -2 (low)
   <br>1 = 0 (normal)
   <br>2 = +2 (high)
-  <br>3 = -1 (med low)
-  <br>4 = +1 (med high)</td><td>&nbsp;&nbsp;</td>
+  <br>3 = -1 (medium low)
+  <br>4 = +1 (medium high)</td><td>&nbsp;&nbsp;</td>
   <td>5 = -3 (very low)
   <br>6 = +3 (very high)
   <br>7 = -4 (minimum)
@@ -661,8 +662,8 @@ available.  Extended bracket values are printed as &#39;WB-BA&#39;, &#39;WB-GM&#
   <td>0 = -2 (soft)
   <br>1 = 0 (normal)
   <br>2 = +2 (hard)
-  <br>3 = -1 (med soft)
-  <br>4 = +1 (med hard)</td><td>&nbsp;&nbsp;</td>
+  <br>3 = -1 (medium soft)
+  <br>4 = +1 (medium hard)</td><td>&nbsp;&nbsp;</td>
   <td>5 = -3 (very soft)
   <br>6 = +3 (very hard)
   <br>7 = -4 (minimum)
@@ -767,11 +768,11 @@ available.  Extended bracket values are printed as &#39;WB-BA&#39;, &#39;WB-GM&#
   <br>&#39;0 29&#39; = Forest
   <br>&#39;0 30&#39; = Backlight Silhouette
   <br>&#39;1 4&#39; = Auto PICT (Standard)
-  <br>&#39;1 5&#39; = Auto PICT (Portrait)</td><td>&nbsp;&nbsp;</td>
-  <td>&#39;1 6&#39; = Auto PICT (Landscape)
+  <br>&#39;1 5&#39; = Auto PICT (Portrait)
+  <br>&#39;1 6&#39; = Auto PICT (Landscape)
   <br>&#39;1 7&#39; = Auto PICT (Macro)
-  <br>&#39;1 8&#39; = Auto PICT (Sport)
-  <br>&#39;2 0&#39; = Program (HyP)
+  <br>&#39;1 8&#39; = Auto PICT (Sport)</td><td>&nbsp;&nbsp;</td>
+  <td>&#39;2 0&#39; = Program (HyP)
   <br>&#39;2 1&#39; = Hi-speed Program (HyP)
   <br>&#39;2 2&#39; = DOF Program (HyP)
   <br>&#39;2 3&#39; = MTF Program (HyP)
@@ -796,8 +797,13 @@ available.  Extended bracket values are printed as &#39;WB-BA&#39;, &#39;WB-GM&#
   <br>&#39;18 22&#39; = Auto Program (Shallow DOF)
   <br>&#39;19 0&#39; = Astrotracer
   <br>&#39;20 22&#39; = Blur Control
-  <br>&#39;254 0&#39; = Video
-  <br>&#39;255 0&#39; = Video (Auto Aperture)
+  <br>&#39;249 0&#39; = Movie (TAv)
+  <br>&#39;250 0&#39; = Movie (TAv, Auto Aperture)
+  <br>&#39;251 0&#39; = Movie (Manual)
+  <br>&#39;252 0&#39; = Movie (Manual, Auto Aperture)
+  <br>&#39;253 0&#39; = Movie (Av)
+  <br>&#39;254 0&#39; = Movie (Av, Auto Aperture)
+  <br>&#39;255 0&#39; = Movie (P, Auto Aperture)
   <br>&#39;255 4&#39; = Video (4)</td></tr></table>
 <span class=s>[Value 2]</span><table class=cols><tr>
   <td>0 = 1/2 EV steps</td><td>&nbsp;&nbsp;</td>
@@ -821,14 +827,18 @@ available.  Extended bracket values are printed as &#39;WB-BA&#39;, &#39;WB-GM&#
   <td>15 = Video
   <br>16 = Mirror Lock-up
   <br>255 = n/a</td></tr></table>
-<span class=s>[Value 2]
-  <br>0 = Shutter Button
+<span class=s>[Value 2]</span><table class=cols><tr>
+  <td>0 = Shutter Button
   <br>1 = Remote Control (3 s delay)
   <br>2 = Remote Control
   <br>4 = Remote Continuous Shooting
-  <br>[Value 3]</span><table class=cols><tr>
+  <br>10 = Composite Average
+  <br>11 = Composite Additive
+  <br>12 = Composite Bright</td></tr></table>
+<span class=s>[Value 3]</span><table class=cols><tr>
   <td>0 = Single Exposure
   <br>1 = Multiple Exposure
+  <br>8 = Interval Shooting
   <br>15 = Interval Movie
   <br>16 = HDR
   <br>32 = HDR Strong 1</td><td>&nbsp;&nbsp;</td>
@@ -1522,7 +1532,7 @@ segments for the K-3, converted to LV)</span></span></td></tr>
 <td title='0x0230 = 560'>0x0230</td>
 <td>FirmwareVersion</td>
 <td class=c>string</td>
-<td><span class=s><span class=n>(only in AVI videos)</span></span></td></tr>
+<td><span class=s><span class=n>(only in videos)</span></span></td></tr>
 <tr>
 <td title='0x0231 = 561'>0x0231</td>
 <td>ContrastDetectAFArea</td>
@@ -1540,43 +1550,48 @@ are left, top, width and height in a 720x480 frame, with Y downwards)</span></sp
 <td class=c>-</td>
 <td>--&gt; <a href='Pentax.html#LensInfoQ'>Pentax LensInfoQ Tags</a></td></tr>
 <tr class=b>
+<td title='0x023f = 575'>0x023f</td>
+<td>Model</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td title='0x0243 = 579'>0x0243</td>
 <td>PixelShiftInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Pentax.html#PixelShiftInfo'>Pentax PixelShiftInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0245 = 581'>0x0245</td>
 <td>AFPointInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Pentax.html#AFPointInfo'>Pentax AFPointInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x03fe = 1022'>0x03fe</td>
 <td>DataDump</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x03ff = 1023'>0x03ff</td>
 <td>TempInfo
   <br>UnknownInfo</td>
 <td class=c>-<br>-</td>
 <td>--&gt; <a href='Pentax.html#TempInfo'>Pentax TempInfo Tags</a>
   <br>--&gt; <a href='Pentax.html#UnknownInfo'>Pentax UnknownInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0402 = 1026'>0x0402</td>
 <td>ToneCurve</td>
 <td class=c title=' ~ = Writable only with -n'>yes~</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0403 = 1027'>0x0403</td>
 <td>ToneCurves</td>
 <td class=c title=' ~ = Writable only with -n'>yes~</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0405 = 1029'>0x0405</td>
 <td>UnknownBlock?</td>
 <td class=c>undef</td>
 <td><span class=s><span class=n>(large unknown data block in PEF/DNG images but not JPG images)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0e00 = 3584'>0x0e00</td>
 <td>PrintIM</td>
 <td class=c>-</td>
@@ -2120,6 +2135,7 @@ identify the specific lens model.</p>
 </tr><tr><td>'13 19'</td><td>= smc PENTAX-D FA 645 25mm F4 AL [IF] SDM AW</td>
 </tr><tr><td>'13 20'</td><td>= HD PENTAX-D FA 645 90mm F2.8 ED AW SR</td>
 </tr><tr><td>'13 253'</td><td>= HD PENTAX-DA 645 28-45mm F4.5 ED AW SR</td>
+</tr><tr><td>'13 254'</td><td>= smc PENTAX-DA 645 25mm F4 AL [IF] SDM AW</td>
 </tr><tr><td>'21 0'</td><td>= Pentax Q Manual Lens</td>
 </tr><tr><td>'21 1'</td><td>= 01 Standard Prime 8.5mm F1.9</td>
 </tr><tr><td>'21 2'</td><td>= 02 Standard Zoom 5-15mm F2.8-4.5</td>
@@ -4495,13 +4511,15 @@ tags used by Casio.</p>
 <td><table class=cols><tr>
   <td>10 = 100
   <br>16 = 200
-  <br>50 = 50</td><td>&nbsp;&nbsp;</td>
-  <td>100 = 100
-  <br>200 = 200
-  <br>400 = 400</td><td>&nbsp;&nbsp;</td>
-  <td>800 = 800
-  <br>1600 = 1600
-  <br>3200 = 3200</td></tr></table>
+  <br>50 = 50
+  <br>100 = 100</td><td>&nbsp;&nbsp;</td>
+  <td>200 = 200
+  <br>400 = 400
+  <br>800 = 800
+  <br>1600 = 1600</td><td>&nbsp;&nbsp;</td>
+  <td>3200 = 3200
+  <br>65534 = Auto 2
+  <br>65535 = Auto</td></tr></table>
 </td></tr>
 <tr>
 <td title='0x0017 = 23'>0x0017</td>
@@ -4845,7 +4863,7 @@ stored as ASCII text in a format very similar to some HP models.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Apr 19, 2017</i>
+<br><i>Last revised May 30, 2017</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

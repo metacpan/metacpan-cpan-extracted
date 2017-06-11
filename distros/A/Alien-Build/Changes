@@ -1,5 +1,21 @@
 Revision history for Alien-Build
 
+0.41      2017-06-10 19:03:49 -0400
+  - Added (undocumented so far) ffi option to Build::Autoconf plugin
+
+0.40      2017-06-10 13:15:33 -0400
+  - Added ffi block for alienfile.
+  - Deprecate patch_ffi, build_ffi and gather_ffi directives.
+
+0.39      2017-06-10 06:40:45 -0400
+  - Added patch_ffi keyword for alienfile missing in previous release
+
+0.38      2017-06-10 06:28:21 -0400
+  - Added build_ffi and gather_ffi stages
+
+0.37      2017-06-09 17:04:21 -0400
+  - Generate ::Install::Files module for use with Inline, if cflags or libs are detected.
+
 0.36      2017-04-13 04:05:45 -0400
   - Add runtime property: alien_build_version
 

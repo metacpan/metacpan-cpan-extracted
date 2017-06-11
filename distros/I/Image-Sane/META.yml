@@ -4,8 +4,8 @@ author:
   - 'Jeffrey Ratcliffe'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Readonly: '0'
   Test::More: '0'
+  Test::Requires: '0'
 configure_requires:
   ExtUtils::Depends: '0'
   ExtUtils::PkgConfig: '0'
@@ -22,5 +22,6 @@ no_index:
     - inc
 requires:
   Exception::Class: '0'
-version: '0.10'
+  Readonly: '0'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -8,7 +8,6 @@ Makefile.PL
 README.pod
 dist.ini
 lib/JIRA/REST.pm
-lib/JIRA/REST.pm.orig
 t/00-load.t
 t/01-atlassian.t
 t/author-pod-coverage.t

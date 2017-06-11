@@ -1,10 +1,10 @@
 {
    "abstract" : "A Module::Starter plugin for adding new modules into an existing distribution",
    "author" : [
-      "Ruey-Cheng Chen <rueycheng@gmail.com>"
+      "Ruey-Cheng Chen <rueycheng@cpan.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142060",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "unknown"
    ],
@@ -54,5 +54,5 @@
          "web" : "https://github.com/rueycheng/Module-Starter-Smart"
       }
    },
-   "version" : "v0.0.6"
+   "version" : "v0.0.8"
 }

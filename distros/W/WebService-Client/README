@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.0502
+    version 0.0601
 
 SYNOPSIS
 
@@ -164,6 +164,18 @@ ATTRIBUTES
  ua
 
     Optional. A proper default LWP::UserAgent will be created for you.
+
+ json
+
+    Optional. A proper default JSON object will be created via
+    JSON::MaybeXS
+
+    You can also pass in your own custom JSON object to have more control
+    over the JSON settings:
+
+        my $client = WebService::Foo->new(
+            json => JSON::MaybeXS->new(utf8 => 1, pretty => 1)
+        );
 
  timeout
 

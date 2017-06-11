@@ -1,7 +1,7 @@
 #
 # This file is part of Reindeer
 #
-# This software is Copyright (c) 2011 by Chris Weyl.
+# This software is Copyright (c) 2017, 2015, 2014, 2012, 2011 by Chris Weyl.
 #
 # This is free software, licensed under:
 #
@@ -9,8 +9,8 @@
 #
 package Reindeer;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-# git description: 0.017-6-ga58dc6d
-$Reindeer::VERSION = '0.018';
+# git description: 0.018-20-g9af504b
+$Reindeer::VERSION = '0.019';
 
 # ABSTRACT: Moose with more antlers
 
@@ -18,7 +18,7 @@ use strict;
 use warnings;
 
 use Reindeer::Util;
-use Moose::Exporter;
+use Moose::Exporter 2.1400;
 use Import::Into;
 use Class::Load;
 
@@ -41,7 +41,10 @@ sub init_meta {
 
     # enable features to the level of Perl being used
     my $features
-        = $] >= 5.020 ? ':5.20'
+        = $] >= 5.026 ? ':5.26'
+        : $] >= 5.024 ? ':5.24'
+        : $] >= 5.022 ? ':5.22'
+        : $] >= 5.020 ? ':5.20'
         : $] >= 5.018 ? ':5.18'
         : $] >= 5.016 ? ':5.16'
         : $] >= 5.014 ? ':5.14'
@@ -78,10 +81,8 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Chris Weyl AutoDestruct MultiInitArg UndefTolerant autoclean rwp ttl
-metaclass Specifing
-
-=for :stopwords Wishlist flattr flattr'ed gittip gittip'ed
+=for :stopwords Chris Weyl Alex Balhatchet AutoDestruct MultiInitArg UndefTolerant
+autoclean rwp ttl metaclass Specifing
 
 =head1 NAME
 
@@ -89,7 +90,7 @@ Reindeer - Moose with more antlers
 
 =head1 VERSION
 
-This document describes version 0.018 of Reindeer - released March 28, 2015 as part of Reindeer.
+This document describes version 0.019 of Reindeer - released June 09, 2017 as part of Reindeer.
 
 =head1 SYNOPSIS
 
@@ -166,6 +167,8 @@ Specifying C<is =E<gt> 'rwp'> will cause the following options to be set:
     is     => 'ro'
     writer => "_set_$name"
 
+rwp can be read as "read + write private".
+
 =head2 is => 'lazy'
 
 Specifying C<is =E<gt> 'lazy'> will cause the following options to be set:
@@ -196,6 +199,26 @@ we won't try to set a builder, as well.
 Specifying C<builder =E<gt> 1> will cause the following options to be set:
 
     builder => "_build_$name"
+
+=head2 builder => sub { ... }
+
+Passing a coderef to builder will cause that coderef to be installed in the
+class this attribute is associated with the name you'd expect, and
+C<builder =E<gt> 1> to be set.
+
+e.g., in your class (or role),
+
+    has foo => (is => 'ro', builder => sub { 'bar!' });
+
+...is effectively the same as...
+
+    has foo => (is => 'ro', builder => '_build_foo');
+    sub _build_foo { 'bar!' }
+
+The behaviour of this option in roles changed in 0.030, and the builder
+methods will be installed in the role itself.  This means you can
+alias/exclude/etc builder methods in roles, just as you can with any other
+method.
 
 =head2 clearer => 1
 
@@ -239,94 +262,6 @@ For an attribute named "_foo":
 This naming scheme, in which the trigger is always private, is the same as the
 builder naming scheme (just with a different prefix).
 
-=head2 builder => sub { ... }
-
-Passing a coderef to builder will cause that coderef to be installed in the
-class this attribute is associated with the name you'd expect, and
-C<builder =E<gt> 1> to be set.
-
-e.g., in your class,
-
-    has foo => (is => 'ro', builder => sub { 'bar!' });
-
-...is effectively the same as...
-
-    has foo => (is => 'ro', builder => '_build_foo');
-    sub _build_foo { 'bar!' }
-
-=head2 isa_instance_of => ...
-
-Given a package name, this option will create an C<isa> type constraint that
-requires the value of the attribute be an instance of the class (or a
-descendant class) given.  That is,
-
-    has foo => (is => 'ro', isa_instance_of => 'SomeThing');
-
-...is effectively the same as:
-
-    use Moose::TypeConstraints 'class_type';
-    has foo => (
-        is  => 'ro',
-        isa => class_type('SomeThing'),
-    );
-
-...but a touch less awkward.
-
-=head2 isa => ..., constraint => sub { ... }
-
-Specifying the constraint option with a coderef will cause a new subtype
-constraint to be created, with the parent type being the type specified in the
-C<isa> option and the constraint being the coderef supplied here.
-
-For example, only integers greater than 10 will pass this attribute's type
-constraint:
-
-    # value must be an integer greater than 10 to pass the constraint
-    has thinger => (
-        isa        => 'Int',
-        constraint => sub { $_ > 10 },
-        # ...
-    );
-
-Note that if you supply a constraint, you must also provide an C<isa>.
-
-=head2 isa => ..., constraint => sub { ... }, coerce => 1
-
-Supplying a constraint and asking for coercion will "Just Work", that is, any
-coercions that the C<isa> type has will still work.
-
-For example, let's say that you're using the C<File> type constraint from
-L<MooseX::Types::Path::Class>, and you want an additional constraint that the
-file must exist:
-
-    has thinger => (
-        is         => 'ro',
-        isa        => File,
-        constraint => sub { !! $_->stat },
-        coerce     => 1,
-    );
-
-C<thinger> will correctly coerce the string "/etc/passwd" to a
-C<Path::Class:File>, and will only accept the coerced result as a value if
-the file exists.
-
-=head2 coerce => [ Type => sub { ...coerce... }, ... ]
-
-Specifying the coerce option with a hashref will cause a new subtype to be
-created and used (just as with the constraint option, above), with the
-specified coercions added to the list.  In the passed hashref, the keys are
-Moose types (well, strings resolvable to Moose types), and the values are
-coderefs that will coerce a given type to our type.
-
-    has bar => (
-        is     => 'ro',
-        isa    => 'Str',
-        coerce => [
-            Int    => sub { "$_"                       },
-            Object => sub { 'An instance of ' . ref $_ },
-        ],
-    );
-
 =head2 handles => { foo => sub { ... }, ... }
 
 Creating a delegation with a coderef will now create a new, "custom accessor"
@@ -356,6 +291,9 @@ reader accessor named 'bar' and two custom accessors named 'foo' and
 
                 return $self->bar + 1;
             },
+
+            # ...as you'd expect.
+            bar => 'bar',
         },
     );
 
@@ -701,15 +639,10 @@ L<L<Moose>, and all of the above-referenced packages.|L<Moose>, and all of the a
 
 =back
 
-=head1 SOURCE
-
-The development version is on github at L<http://https://github.com/RsrchBoy/reindeer>
-and may be cloned from L<git://https://github.com/RsrchBoy/reindeer.git>
-
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-https://github.com/RsrchBoy/reindeer/issues
+L<https://github.com/RsrchBoy/reindeer/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -719,28 +652,15 @@ feature.
 
 Chris Weyl <cweyl@alumni.drew.edu>
 
-=head2 I'm a material boy in a material world
+=head1 CONTRIBUTOR
 
-=begin html
+=for stopwords Alex Balhatchet
 
-<a href="https://www.gittip.com/RsrchBoy/"><img src="https://raw.githubusercontent.com/gittip/www.gittip.com/master/www/assets/%25version/logo.png" /></a>
-<a href="http://bit.ly/rsrchboys-wishlist"><img src="http://wps.io/wp-content/uploads/2014/05/amazon_wishlist.resized.png" /></a>
-<a href="https://flattr.com/submit/auto?user_id=RsrchBoy&url=https%3A%2F%2Fgithub.com%2FRsrchBoy%2Freindeer&title=RsrchBoy's%20CPAN%20Reindeer&tags=%22RsrchBoy's%20Reindeer%20in%20the%20CPAN%22"><img src="http://api.flattr.com/button/flattr-badge-large.png" /></a>
-
-=end html
-
-Please note B<I do not expect to be gittip'ed or flattr'ed for this work>,
-rather B<it is simply a very pleasant surprise>. I largely create and release
-works like this because I need them or I find it enjoyable; however, don't let
-that stop you if you feel like it ;)
-
-L<Flattr this|https://flattr.com/submit/auto?user_id=RsrchBoy&url=https%3A%2F%2Fgithub.com%2FRsrchBoy%2Freindeer&title=RsrchBoy's%20CPAN%20Reindeer&tags=%22RsrchBoy's%20Reindeer%20in%20the%20CPAN%22>,
-L<gittip me|https://www.gittip.com/RsrchBoy/>, or indulge my
-L<Amazon Wishlist|http://bit.ly/rsrchboys-wishlist>...  If you so desire.
+Alex Balhatchet <kaoru@slackwise.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2011 by Chris Weyl.
+This software is Copyright (c) 2017, 2015, 2014, 2012, 2011 by Chris Weyl.
 
 This is free software, licensed under:
 

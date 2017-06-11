@@ -3,7 +3,7 @@
 # PODNAME: TestRail::Bin::Report
 
 package TestRail::Bin::Report;
-$TestRail::Bin::Report::VERSION = '0.040';
+$TestRail::Bin::Report::VERSION = '0.041';
 use strict;
 use warnings;
 
@@ -123,7 +123,7 @@ TestRail::Bin::Report - Upload your TAP results to TestRail after they've finish
 
 =head1 VERSION
 
-version 0.040
+version 0.041
 
 =head1 SYNOPSIS
 

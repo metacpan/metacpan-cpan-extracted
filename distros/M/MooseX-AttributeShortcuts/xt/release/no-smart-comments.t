@@ -19,19 +19,26 @@ plan skip_all => 'Test::NoSmartComments required for checking comment IQ'
     if $@;
 
 no_smart_comments_in("lib/MooseX/AttributeShortcuts.pm");
+no_smart_comments_in("lib/MooseX/AttributeShortcuts/Trait/Attribute.pm");
+no_smart_comments_in("lib/MooseX/AttributeShortcuts/Trait/Attribute/HasAnonBuilder.pm");
+no_smart_comments_in("lib/MooseX/AttributeShortcuts/Trait/Role/Attribute.pm");
 no_smart_comments_in("t/00-compile.t");
 no_smart_comments_in("t/00-report-prereqs.t");
 no_smart_comments_in("t/02-parameterized.t");
 no_smart_comments_in("t/03-lazy.t");
 no_smart_comments_in("t/05-extend.t");
 no_smart_comments_in("t/06-role.t");
+no_smart_comments_in("t/builder/anon-builder-conflict-toclass.t");
+no_smart_comments_in("t/builder/anon-builder-conflict-torole.t");
+no_smart_comments_in("t/builder/anon-role-role-class.t");
 no_smart_comments_in("t/builder/anon.t");
 no_smart_comments_in("t/builder/basic.t");
 no_smart_comments_in("t/clearer.t");
 no_smart_comments_in("t/constraint.t");
 no_smart_comments_in("t/funcs.pm");
-no_smart_comments_in("t/handles-coderef.t");
-no_smart_comments_in("t/handles-metaclass.t");
+no_smart_comments_in("t/handles/coderef-class.t");
+no_smart_comments_in("t/handles/coderef.t");
+no_smart_comments_in("t/handles/metaclass.t");
 no_smart_comments_in("t/inline_subtyping/basic.t");
 no_smart_comments_in("t/inline_subtyping/coercion.t");
 no_smart_comments_in("t/inline_subtyping/with_coercion.t");

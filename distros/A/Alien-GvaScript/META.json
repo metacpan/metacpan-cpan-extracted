@@ -4,13 +4,13 @@
       "Laurent Dami <laurent.dami@justice.ge.ch>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4205",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Alien-GvaScript",
    "prereqs" : {
@@ -39,7 +39,7 @@
    "provides" : {
       "Alien::GvaScript" : {
          "file" : "lib/Alien/GvaScript.pm",
-         "version" : "1.44"
+         "version" : "1.45"
       }
    },
    "release_status" : "stable",
@@ -51,5 +51,6 @@
          "url" : "https://github.com/damil/Alien-GvaScript"
       }
    },
-   "version" : "1.44"
+   "version" : "1.45",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

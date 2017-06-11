@@ -62,9 +62,9 @@
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/gnustavo/JIRA-REST.git",
-         "web" : "https://github.com/gnustavo/gerrit-rest"
+         "web" : "https://github.com/gnustavo/jira-rest"
       }
    },
-   "version" : "0.017"
+   "version" : "0.018"
 }
 

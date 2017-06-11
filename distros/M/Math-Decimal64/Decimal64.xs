@@ -11,15 +11,8 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#include <stdlib.h>
 
-#ifdef OLDPERL
-#define SvUOK SvIsUV
-#endif
-
-#ifndef Newx
-#  define Newx(v,n,t) New(0,v,n,t)
-#endif
+#include "math_decimal64_include.h"
 
 typedef _Decimal64 D64;
 
@@ -111,7 +104,15 @@ int _is_neg_zero(_Decimal64 d64) {
   int n = sizeof(_Decimal64);
   void * p = &d64;
 
-  if(d64 != 0.0DD) return 0;
+  /*****************************************************
+   We perform the following oddness because of gcc's
+   buggy optimization of signed zero _Decimal64.
+   See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80692
+  ******************************************************/
+  if(d64 != 0.0DD) {
+    if(d64 * -1.0DD == 0.0DD) return 1; /* it's a -0 */
+    return 0; /* it's not zero */
+  }
 
 #ifdef WE_HAVE_BENDIAN /* Big Endian architecture */
   if(((unsigned char*)p)[0] >= 128) return 1;
@@ -182,8 +183,8 @@ _Decimal64 _atodecimal(pTHX_ char * s) {
     negative = -1;
     s++;
   }
-  if(s[0] == '+') {
-    s++;
+  else {
+    if(s[0] == '+') s++;
   }
 
   if((s[0] == 'i' || s[0] == 'I') && (s[1] == 'n' || s[1] == 'N') && (s[2] == 'f' || s[2] == 'F')) {
@@ -604,7 +605,7 @@ int  have_strtod64(void) {
 }
 
 SV * D64toNV(pTHX_ SV * d64) {
-     return newSVnv((NV)(*(INT2PTR(_Decimal64*, SvIV(SvRV(d64))))));
+     return newSVnv((NV)(*(INT2PTR(_Decimal64*, SvIVX(SvRV(d64))))));
 }
 
 void LDtoD64(pTHX_ SV * d64, SV * ld) {
@@ -612,7 +613,7 @@ void LDtoD64(pTHX_ SV * d64, SV * ld) {
        const char *h1 = HvNAME(SvSTASH(SvRV(d64)));
        const char *h2 = HvNAME(SvSTASH(SvRV(ld)));
        if(strEQ(h1, "Math::Decimal64") && strEQ(h2, "Math::LongDouble")) {
-         *(INT2PTR(_Decimal64 *, SvIV(SvRV(d64)))) = (_Decimal64)*(INT2PTR(long double *, SvIV(SvRV(ld))));
+         *(INT2PTR(_Decimal64 *, SvIVX(SvRV(d64)))) = (_Decimal64)*(INT2PTR(long double *, SvIVX(SvRV(ld))));
        }
        else croak("Invalid object supplied to Math::Decimal64::LDtoD64");
      }
@@ -624,7 +625,7 @@ void D64toLD(pTHX_ SV * ld, SV * d64) {
        const char *h1 = HvNAME(SvSTASH(SvRV(d64)));
        const char *h2 = HvNAME(SvSTASH(SvRV(ld)));
        if(strEQ(h1, "Math::Decimal64") && strEQ(h2, "Math::LongDouble")) {
-         *(INT2PTR(long double *, SvIV(SvRV(ld)))) = (long double)*(INT2PTR(_Decimal64 *, SvIV(SvRV(d64))));
+         *(INT2PTR(long double *, SvIVX(SvRV(ld)))) = (long double)*(INT2PTR(_Decimal64 *, SvIVX(SvRV(d64))));
        }
        else croak("Invalid object supplied to Math::Decimal64::D64toLD");
      }
@@ -632,7 +633,7 @@ void D64toLD(pTHX_ SV * ld, SV * d64) {
 }
 
 void DESTROY(pTHX_ SV *  rop) {
-     Safefree(INT2PTR(_Decimal64 *, SvIV(SvRV(rop))));
+     Safefree(INT2PTR(_Decimal64 *, SvIVX(SvRV(rop))));
 }
 
 void _assignME(pTHX_ SV * a, char * mantissa, SV * c) {
@@ -642,19 +643,19 @@ void _assignME(pTHX_ SV * a, char * mantissa, SV * c) {
 
      man = strtold(mantissa, &ptr);
 
-     *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) = (_Decimal64)man;
+     *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) = (_Decimal64)man;
 
      if(exp < 0) {
-       for(i = 0; i > exp; --i) *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) *= 0.1DD;
+       for(i = 0; i > exp; --i) *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) *= 0.1DD;
      }
      else {
-       for(i = 0; i < exp; ++i) *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) *= 10.0DD;
+       for(i = 0; i < exp; ++i) *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) *= 10.0DD;
      }
 }
 
 
 void assignPV(pTHX_ SV * a, char * s) {
-     *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) = _atodecimal(aTHX_ s);
+     *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) = _atodecimal(aTHX_ s);
 }
 
 void assignIV(pTHX_ SV * a, SV * val) {
@@ -662,7 +663,7 @@ void assignIV(pTHX_ SV * a, SV * val) {
      if(sv_isobject(a)) {
        const char * h = HvNAME(SvSTASH(SvRV(a)));
        if(strEQ(h, "Math::Decimal64")) {
-          *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) = (_Decimal64)SvIV(val);
+          *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) = (_Decimal64)SvIV(val);
        }
        else croak("Invalid object supplied to Math::Decimal64::assignIV function");
      }
@@ -675,7 +676,7 @@ void assignUV(pTHX_ SV * a, SV * val) {
      if(sv_isobject(a)) {
        const char * h = HvNAME(SvSTASH(SvRV(a)));
        if(strEQ(h, "Math::Decimal64")) {
-          *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) = (_Decimal64)SvUV(val);
+          *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) = (_Decimal64)SvUV(val);
        }
        else croak("Invalid object supplied to Math::Decimal64::assignUV function");
      }
@@ -688,7 +689,7 @@ void assignNV(pTHX_ SV * a, SV * val) {
      if(sv_isobject(a)) {
        const char * h = HvNAME(SvSTASH(SvRV(a)));
        if(strEQ(h, "Math::Decimal64")) {
-          *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) = (_Decimal64)SvNV(val);
+          *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) = (_Decimal64)SvNV(val);
        }
        else croak("Invalid object supplied to Math::Decimal64::assignNV function");
      }
@@ -702,7 +703,7 @@ void assignD64(pTHX_ SV * a, SV * val) {
        const char * h =  HvNAME(SvSTASH(SvRV(a)));
        const char * hh = HvNAME(SvSTASH(SvRV(val)));
        if(strEQ(h, "Math::Decimal64") && strEQ(hh, "Math::Decimal64")) {
-          *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) = *(INT2PTR(_Decimal64 *, SvIV(SvRV(val))));
+          *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(val))));
        }
        else croak("Invalid object supplied to Math::Decimal64::assignD64 function");
      }
@@ -715,7 +716,7 @@ void assignNaN(pTHX_ SV * a) {
      if(sv_isobject(a)) {
        const char * h = HvNAME(SvSTASH(SvRV(a)));
        if(strEQ(h, "Math::Decimal64")) {
-          *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) = _get_nan();
+          *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) = _get_nan();
        }
        else croak("Invalid object supplied to Math::Decimal64::assignNaN function");
      }
@@ -727,7 +728,7 @@ void assignInf(pTHX_ SV * a, int sign) {
      if(sv_isobject(a)) {
        const char * h = HvNAME(SvSTASH(SvRV(a)));
        if(strEQ(h, "Math::Decimal64")) {
-          *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) = _get_inf(sign);
+          *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) = _get_inf(sign);
        }
        else croak("Invalid object supplied to Math::Decimal64::assignInf function");
      }
@@ -749,24 +750,24 @@ SV * _overload_add(pTHX_ SV * a, SV * b, SV * third) {
      SvREADONLY_on(obj);
 
     if(SvUOK(b)) {
-      *d64 = *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) + (D64)SvUV(b);
+      *d64 = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) + (D64)SvUVX(b);
       return obj_ref;
     }
 
     if(SvIOK(b)) {
-      *d64 = *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) + (D64)SvIV(b);
+      *d64 = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) + (D64)SvIVX(b);
       return obj_ref;
     }
 
     if(SvPOK(b) && !SvNOK(b)) {
-      *d64 = *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) + _atodecimal(aTHX_ SvPV_nolen(b));
+      *d64 = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) + _atodecimal(aTHX_ SvPV_nolen(b));
       return obj_ref;
     }
 
     if(sv_isobject(b)) {
       const char *h = HvNAME(SvSTASH(SvRV(b)));
       if(strEQ(h, "Math::Decimal64")) {
-        *d64 = *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) + *(INT2PTR(_Decimal64 *, SvIV(SvRV(b))));
+        *d64 = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) + *(INT2PTR(_Decimal64 *, SvIVX(SvRV(b))));
         return obj_ref;
       }
       croak("Invalid object supplied to Math::Decimal64::_overload_add function");
@@ -789,24 +790,24 @@ SV * _overload_mul(pTHX_ SV * a, SV * b, SV * third) {
      SvREADONLY_on(obj);
 
     if(SvUOK(b)) {
-      *d64 = *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) * (D64)SvUV(b);
+      *d64 = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) * (D64)SvUVX(b);
       return obj_ref;
     }
 
     if(SvIOK(b)) {
-      *d64 = *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) * (D64)SvIV(b);
+      *d64 = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) * (D64)SvIVX(b);
       return obj_ref;
     }
 
     if(SvPOK(b) && !SvNOK(b)) {
-      *d64 = *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) * _atodecimal(aTHX_ SvPV_nolen(b));
+      *d64 = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) * _atodecimal(aTHX_ SvPV_nolen(b));
       return obj_ref;
     }
 
     if(sv_isobject(b)) {
       const char *h = HvNAME(SvSTASH(SvRV(b)));
       if(strEQ(h, "Math::Decimal64")) {
-        *d64 = *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) * *(INT2PTR(_Decimal64 *, SvIV(SvRV(b))));
+        *d64 = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) * *(INT2PTR(_Decimal64 *, SvIVX(SvRV(b))));
         return obj_ref;
       }
       croak("Invalid object supplied to Math::Decimal64::_overload_mul function");
@@ -829,34 +830,34 @@ SV * _overload_sub(pTHX_ SV * a, SV * b, SV * third) {
      SvREADONLY_on(obj);
 
     if(SvUOK(b)) {
-      if(third == &PL_sv_yes) *d64 = (D64)SvUV(b) - *(INT2PTR(_Decimal64 *, SvIV(SvRV(a))));
-      else *d64 = *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) - (D64)SvUV(b);
+      if(third == &PL_sv_yes) *d64 = (D64)SvUVX(b) - *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a))));
+      else *d64 = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) - (D64)SvUVX(b);
       return obj_ref;
     }
 
     if(SvIOK(b)) {
-      if(third == &PL_sv_yes) *d64 = (D64)SvIV(b) - *(INT2PTR(_Decimal64 *, SvIV(SvRV(a))));
-      else *d64 = *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) - (D64)SvIV(b);
+      if(third == &PL_sv_yes) *d64 = (D64)SvIVX(b) - *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a))));
+      else *d64 = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) - (D64)SvIVX(b);
       return obj_ref;
     }
 
     if(SvPOK(b) && !SvNOK(b)) {
-      if(third == &PL_sv_yes) *d64 = _atodecimal(aTHX_ SvPV_nolen(b)) - *(INT2PTR(_Decimal64 *, SvIV(SvRV(a))));
-      else *d64 = *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) - _atodecimal(aTHX_ SvPV_nolen(b));
+      if(third == &PL_sv_yes) *d64 = _atodecimal(aTHX_ SvPV_nolen(b)) - *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a))));
+      else *d64 = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) - _atodecimal(aTHX_ SvPV_nolen(b));
       return obj_ref;
     }
 
     if(sv_isobject(b)) {
       const char *h = HvNAME(SvSTASH(SvRV(b)));
       if(strEQ(h, "Math::Decimal64")) {
-        *d64 = *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) - *(INT2PTR(_Decimal64 *, SvIV(SvRV(b))));
+        *d64 = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) - *(INT2PTR(_Decimal64 *, SvIVX(SvRV(b))));
         return obj_ref;
       }
       croak("Invalid object supplied to Math::Decimal64::_overload_sub function");
     }
     /* replaced by _overload_neg
     if(third == &PL_sv_yes) {
-      *d64 = *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) * -1.0DD;
+      *d64 = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) * -1.0DD;
       return obj_ref;
     }
     */
@@ -877,7 +878,7 @@ SV * _overload_neg(pTHX_ SV * a, SV * b, SV * third) {
      sv_setiv(obj, INT2PTR(IV,d64));
      SvREADONLY_on(obj);
 
-     *d64 = *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) * -1.0DD;
+     *d64 = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) * -1.0DD;
      return obj_ref;
 }
 
@@ -896,27 +897,27 @@ SV * _overload_div(pTHX_ SV * a, SV * b, SV * third) {
      SvREADONLY_on(obj);
 
     if(SvUOK(b)) {
-      if(third == &PL_sv_yes) *d64 = (D64)SvUV(b) / *(INT2PTR(_Decimal64 *, SvIV(SvRV(a))));
-      else *d64 = *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) / (D64)SvUV(b);
+      if(third == &PL_sv_yes) *d64 = (D64)SvUVX(b) / *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a))));
+      else *d64 = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) / (D64)SvUVX(b);
       return obj_ref;
     }
 
     if(SvIOK(b)) {
-      if(third == &PL_sv_yes) *d64 = (D64)SvIV(b) / *(INT2PTR(_Decimal64 *, SvIV(SvRV(a))));
-      else *d64 = *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) / (D64)SvIV(b);
+      if(third == &PL_sv_yes) *d64 = (D64)SvIVX(b) / *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a))));
+      else *d64 = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) / (D64)SvIVX(b);
       return obj_ref;
     }
 
     if(SvPOK(b) && !SvNOK(b)) {
-      if(third == &PL_sv_yes) *d64 = _atodecimal(aTHX_ SvPV_nolen(b)) / *(INT2PTR(_Decimal64 *, SvIV(SvRV(a))));
-      else *d64 = *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) / _atodecimal(aTHX_ SvPV_nolen(b));
+      if(third == &PL_sv_yes) *d64 = _atodecimal(aTHX_ SvPV_nolen(b)) / *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a))));
+      else *d64 = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) / _atodecimal(aTHX_ SvPV_nolen(b));
       return obj_ref;
     }
 
     if(sv_isobject(b)) {
       const char *h = HvNAME(SvSTASH(SvRV(b)));
       if(strEQ(h, "Math::Decimal64")) {
-        *d64 = *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) / *(INT2PTR(_Decimal64 *, SvIV(SvRV(b))));
+        *d64 = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) / *(INT2PTR(_Decimal64 *, SvIVX(SvRV(b))));
         return obj_ref;
       }
       croak("Invalid object supplied to Math::Decimal64::_overload_div function");
@@ -929,22 +930,22 @@ SV * _overload_add_eq(pTHX_ SV * a, SV * b, SV * third) {
      SvREFCNT_inc(a);
 
     if(SvUOK(b)) {
-      *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) += (D64)SvUV(b);
+      *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) += (D64)SvUVX(b);
       return a;
     }
     if(SvIOK(b)) {
-      *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) += (D64)SvIV(b);
+      *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) += (D64)SvIVX(b);
       return a;
     }
     if(SvPOK(b) && !SvNOK(b)) {
-      *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) += _atodecimal(aTHX_ SvPV_nolen(b));
+      *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) += _atodecimal(aTHX_ SvPV_nolen(b));
       return a;
     }
 
     if(sv_isobject(b)) {
       const char *h = HvNAME(SvSTASH(SvRV(b)));
       if(strEQ(h, "Math::Decimal64")) {
-        *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) += *(INT2PTR(_Decimal64 *, SvIV(SvRV(b))));
+        *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) += *(INT2PTR(_Decimal64 *, SvIVX(SvRV(b))));
         return a;
       }
       SvREFCNT_dec(a);
@@ -959,22 +960,22 @@ SV * _overload_mul_eq(pTHX_ SV * a, SV * b, SV * third) {
      SvREFCNT_inc(a);
 
     if(SvUOK(b)) {
-      *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) *= (D64)SvUV(b);
+      *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) *= (D64)SvUVX(b);
       return a;
     }
     if(SvIOK(b)) {
-      *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) *= (D64)SvIV(b);
+      *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) *= (D64)SvIVX(b);
       return a;
     }
     if(SvPOK(b) && !SvNOK(b)) {
-      *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) *= _atodecimal(aTHX_ SvPV_nolen(b));
+      *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) *= _atodecimal(aTHX_ SvPV_nolen(b));
       return a;
     }
 
     if(sv_isobject(b)) {
       const char *h = HvNAME(SvSTASH(SvRV(b)));
       if(strEQ(h, "Math::Decimal64")) {
-        *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) *= *(INT2PTR(_Decimal64 *, SvIV(SvRV(b))));
+        *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) *= *(INT2PTR(_Decimal64 *, SvIVX(SvRV(b))));
         return a;
       }
       SvREFCNT_dec(a);
@@ -989,22 +990,22 @@ SV * _overload_sub_eq(pTHX_ SV * a, SV * b, SV * third) {
      SvREFCNT_inc(a);
 
     if(SvUOK(b)) {
-      *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) -= (D64)SvUV(b);
+      *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) -= (D64)SvUVX(b);
       return a;
     }
     if(SvIOK(b)) {
-      *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) -= (D64)SvIV(b);
+      *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) -= (D64)SvIVX(b);
       return a;
     }
     if(SvPOK(b) && !SvNOK(b)) {
-      *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) -= _atodecimal(aTHX_ SvPV_nolen(b));
+      *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) -= _atodecimal(aTHX_ SvPV_nolen(b));
       return a;
     }
 
     if(sv_isobject(b)) {
       const char *h = HvNAME(SvSTASH(SvRV(b)));
       if(strEQ(h, "Math::Decimal64")) {
-        *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) -= *(INT2PTR(_Decimal64 *, SvIV(SvRV(b))));
+        *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) -= *(INT2PTR(_Decimal64 *, SvIVX(SvRV(b))));
         return a;
       }
       SvREFCNT_dec(a);
@@ -1019,22 +1020,22 @@ SV * _overload_div_eq(pTHX_ SV * a, SV * b, SV * third) {
      SvREFCNT_inc(a);
 
     if(SvUOK(b)) {
-      *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) /= (D64)SvUV(b);
+      *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) /= (D64)SvUVX(b);
       return a;
     }
     if(SvIOK(b)) {
-      *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) /= (D64)SvIV(b);
+      *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) /= (D64)SvIVX(b);
       return a;
     }
     if(SvPOK(b) && !SvNOK(b)) {
-      *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) /= _atodecimal(aTHX_ SvPV_nolen(b));
+      *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) /= _atodecimal(aTHX_ SvPV_nolen(b));
       return a;
     }
 
     if(sv_isobject(b)) {
       const char *h = HvNAME(SvSTASH(SvRV(b)));
       if(strEQ(h, "Math::Decimal64")) {
-        *(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) /= *(INT2PTR(_Decimal64 *, SvIV(SvRV(b))));
+        *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) /= *(INT2PTR(_Decimal64 *, SvIVX(SvRV(b))));
         return a;
       }
       SvREFCNT_dec(a);
@@ -1047,23 +1048,23 @@ SV * _overload_div_eq(pTHX_ SV * a, SV * b, SV * third) {
 SV * _overload_equiv(pTHX_ SV * a, SV * b, SV * third) {
 
      if(SvUOK(b)) {
-       if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) == (D64)SvUV(b)) return newSViv(1);
+       if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) == (D64)SvUVX(b)) return newSViv(1);
        return newSViv(0);
      }
 
      if(SvIOK(b)) {
-       if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) == (D64)SvIV(b)) return newSViv(1);
+       if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) == (D64)SvIVX(b)) return newSViv(1);
        return newSViv(0);
      }
      if(SvPOK(b) && !SvNOK(b)) {
-       if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) == _atodecimal(aTHX_ SvPV_nolen(b))) return newSViv(1);
+       if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) == _atodecimal(aTHX_ SvPV_nolen(b))) return newSViv(1);
        return newSViv(0);
      }
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
        if(strEQ(h, "Math::Decimal64")) {
-         if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) == *(INT2PTR(_Decimal64 *, SvIV(SvRV(b))))) return newSViv(1);
+         if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) == *(INT2PTR(_Decimal64 *, SvIVX(SvRV(b))))) return newSViv(1);
          return newSViv(0);
        }
        croak("Invalid object supplied to Math::Decimal64::_overload_equiv function");
@@ -1074,23 +1075,23 @@ SV * _overload_equiv(pTHX_ SV * a, SV * b, SV * third) {
 SV * _overload_not_equiv(pTHX_ SV * a, SV * b, SV * third) {
 
      if(SvUOK(b)) {
-       if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) != (D64)SvUV(b)) return newSViv(1);
+       if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) != (D64)SvUVX(b)) return newSViv(1);
        return newSViv(0);
      }
 
      if(SvIOK(b)) {
-       if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) != (D64)SvIV(b)) return newSViv(1);
+       if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) != (D64)SvIVX(b)) return newSViv(1);
        return newSViv(0);
      }
      if(SvPOK(b) && !SvNOK(b)) {
-       if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) != _atodecimal(aTHX_ SvPV_nolen(b))) return newSViv(1);
+       if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) != _atodecimal(aTHX_ SvPV_nolen(b))) return newSViv(1);
        return newSViv(0);
      }
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
        if(strEQ(h, "Math::Decimal64")) {
-         if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) == *(INT2PTR(_Decimal64 *, SvIV(SvRV(b))))) return newSViv(0);
+         if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) == *(INT2PTR(_Decimal64 *, SvIVX(SvRV(b))))) return newSViv(0);
          return newSViv(1);
        }
        croak("Invalid object supplied to Math::Decimal64::_overload_not_equiv function");
@@ -1102,35 +1103,35 @@ SV * _overload_lt(pTHX_ SV * a, SV * b, SV * third) {
 
      if(SvUOK(b)) {
        if(third == &PL_sv_yes) {
-         if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) > (D64)SvUV(b)) return newSViv(1);
+         if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) > (D64)SvUVX(b)) return newSViv(1);
          return newSViv(0);
        }
-       if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) < (D64)SvUV(b)) return newSViv(1);
+       if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) < (D64)SvUVX(b)) return newSViv(1);
        return newSViv(0);
      }
 
      if(SvIOK(b)) {
        if(third == &PL_sv_yes) {
-         if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) > (D64)SvIV(b)) return newSViv(1);
+         if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) > (D64)SvIVX(b)) return newSViv(1);
          return newSViv(0);
        }
-       if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) < (D64)SvIV(b)) return newSViv(1);
+       if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) < (D64)SvIVX(b)) return newSViv(1);
        return newSViv(0);
      }
 
      if(SvPOK(b) && !SvNOK(b)) {
        if(third == &PL_sv_yes) {
-         if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) > _atodecimal(aTHX_ SvPV_nolen(b))) return newSViv(1);
+         if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) > _atodecimal(aTHX_ SvPV_nolen(b))) return newSViv(1);
          return newSViv(0);
        }
-       if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) < _atodecimal(aTHX_ SvPV_nolen(b))) return newSViv(1);
+       if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) < _atodecimal(aTHX_ SvPV_nolen(b))) return newSViv(1);
        return newSViv(0);
      }
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
        if(strEQ(h, "Math::Decimal64")) {
-         if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) < *(INT2PTR(_Decimal64 *, SvIV(SvRV(b))))) return newSViv(1);
+         if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) < *(INT2PTR(_Decimal64 *, SvIVX(SvRV(b))))) return newSViv(1);
          return newSViv(0);
        }
        croak("Invalid object supplied to Math::Decimal64::_overload_lt function");
@@ -1142,35 +1143,35 @@ SV * _overload_gt(pTHX_ SV * a, SV * b, SV * third) {
 
     if(SvUOK(b)) {
       if(third == &PL_sv_yes) {
-        if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) < (D64)SvUV(b)) return newSViv(1);
+        if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) < (D64)SvUVX(b)) return newSViv(1);
         return newSViv(0);
       }
-      if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) > (D64)SvUV(b)) return newSViv(1);
+      if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) > (D64)SvUVX(b)) return newSViv(1);
       return newSViv(0);
     }
 
     if(SvIOK(b)) {
       if(third == &PL_sv_yes) {
-        if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) < (D64)SvIV(b)) return newSViv(1);
+        if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) < (D64)SvIVX(b)) return newSViv(1);
         return newSViv(0);
       }
-      if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) > (D64)SvIV(b)) return newSViv(1);
+      if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) > (D64)SvIVX(b)) return newSViv(1);
       return newSViv(0);
     }
 
     if(SvPOK(b) && !SvNOK(b)) {
       if(third == &PL_sv_yes) {
-        if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) < _atodecimal(aTHX_ SvPV_nolen(b))) return newSViv(1);
+        if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) < _atodecimal(aTHX_ SvPV_nolen(b))) return newSViv(1);
         return newSViv(0);
       }
-      if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) > _atodecimal(aTHX_ SvPV_nolen(b))) return newSViv(1);
+      if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) > _atodecimal(aTHX_ SvPV_nolen(b))) return newSViv(1);
       return newSViv(0);
     }
 
     if(sv_isobject(b)) {
       const char *h = HvNAME(SvSTASH(SvRV(b)));
       if(strEQ(h, "Math::Decimal64")) {
-        if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) > *(INT2PTR(_Decimal64 *, SvIV(SvRV(b))))) return newSViv(1);
+        if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) > *(INT2PTR(_Decimal64 *, SvIVX(SvRV(b))))) return newSViv(1);
         return newSViv(0);
       }
       croak("Invalid object supplied to Math::Decimal64::_overload_gt function");
@@ -1182,35 +1183,35 @@ SV * _overload_lte(pTHX_ SV * a, SV * b, SV * third) {
 
      if(SvUOK(b)) {
        if(third == &PL_sv_yes) {
-         if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) >= (D64)SvUV(b)) return newSViv(1);
+         if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) >= (D64)SvUVX(b)) return newSViv(1);
          return newSViv(0);
        }
-       if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) <= (D64)SvUV(b)) return newSViv(1);
+       if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) <= (D64)SvUVX(b)) return newSViv(1);
        return newSViv(0);
      }
 
      if(SvIOK(b)) {
        if(third == &PL_sv_yes) {
-         if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) >= (D64)SvIV(b)) return newSViv(1);
+         if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) >= (D64)SvIVX(b)) return newSViv(1);
          return newSViv(0);
        }
-       if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) <= (D64)SvIV(b)) return newSViv(1);
+       if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) <= (D64)SvIVX(b)) return newSViv(1);
        return newSViv(0);
      }
 
      if(SvPOK(b) && !SvNOK(b)) {
        if(third == &PL_sv_yes) {
-         if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) >= _atodecimal(aTHX_ SvPV_nolen(b))) return newSViv(1);
+         if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) >= _atodecimal(aTHX_ SvPV_nolen(b))) return newSViv(1);
          return newSViv(0);
        }
-       if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) <= _atodecimal(aTHX_ SvPV_nolen(b))) return newSViv(1);
+       if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) <= _atodecimal(aTHX_ SvPV_nolen(b))) return newSViv(1);
        return newSViv(0);
      }
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
        if(strEQ(h, "Math::Decimal64")) {
-         if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) <= *(INT2PTR(_Decimal64 *, SvIV(SvRV(b))))) return newSViv(1);
+         if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) <= *(INT2PTR(_Decimal64 *, SvIVX(SvRV(b))))) return newSViv(1);
          return newSViv(0);
        }
        croak("Invalid object supplied to Math::Decimal64::_overload_lte function");
@@ -1222,35 +1223,35 @@ SV * _overload_gte(pTHX_ SV * a, SV * b, SV * third) {
 
      if(SvUOK(b)) {
        if(third == &PL_sv_yes) {
-         if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) <= (D64)SvUV(b)) return newSViv(1);
+         if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) <= (D64)SvUVX(b)) return newSViv(1);
          return newSViv(0);
        }
-       if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) >= (D64)SvUV(b)) return newSViv(1);
+       if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) >= (D64)SvUVX(b)) return newSViv(1);
        return newSViv(0);
      }
 
      if(SvIOK(b)) {
        if(third == &PL_sv_yes) {
-         if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) <= (D64)SvIV(b)) return newSViv(1);
+         if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) <= (D64)SvIVX(b)) return newSViv(1);
          return newSViv(0);
        }
-       if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) >= (D64)SvIV(b)) return newSViv(1);
+       if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) >= (D64)SvIVX(b)) return newSViv(1);
        return newSViv(0);
      }
 
      if(SvPOK(b) && !SvNOK(b)) {
        if(third == &PL_sv_yes) {
-         if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) <= _atodecimal(aTHX_ SvPV_nolen(b))) return newSViv(1);
+         if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) <= _atodecimal(aTHX_ SvPV_nolen(b))) return newSViv(1);
          return newSViv(0);
        }
-       if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) >= _atodecimal(aTHX_ SvPV_nolen(b))) return newSViv(1);
+       if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) >= _atodecimal(aTHX_ SvPV_nolen(b))) return newSViv(1);
        return newSViv(0);
      }
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
        if(strEQ(h, "Math::Decimal64")) {
-         if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) >= *(INT2PTR(_Decimal64 *, SvIV(SvRV(b))))) return newSViv(1);
+         if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) >= *(INT2PTR(_Decimal64 *, SvIVX(SvRV(b))))) return newSViv(1);
          return newSViv(0);
        }
        croak("Invalid object supplied to Math::Decimal64::_overload_gte function");
@@ -1263,32 +1264,32 @@ SV * _overload_spaceship(pTHX_ SV * a, SV * b, SV * third) {
     if(third == &PL_sv_yes) reversal = -1;
 
     if(SvUOK(b)) {
-      if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) > (D64)SvUV(b)) return newSViv(1 * reversal);
-      if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) < (D64)SvUV(b)) return newSViv(-1 * reversal);
-      if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) == (D64)SvUV(b)) return newSViv(0);
+      if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) > (D64)SvUVX(b)) return newSViv(1 * reversal);
+      if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) < (D64)SvUVX(b)) return newSViv(-1 * reversal);
+      if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) == (D64)SvUVX(b)) return newSViv(0);
       return &PL_sv_undef; /* Math::Decimal64 object (1st arg) is a nan */
     }
 
     if(SvIOK(b)) {
-      if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) > (D64)SvIV(b)) return newSViv(1 * reversal);
-      if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) < (D64)SvIV(b)) return newSViv(-1 * reversal);
-      if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) == (D64)SvIV(b)) return newSViv(0);
+      if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) > (D64)SvIVX(b)) return newSViv(1 * reversal);
+      if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) < (D64)SvIVX(b)) return newSViv(-1 * reversal);
+      if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) == (D64)SvIVX(b)) return newSViv(0);
       return &PL_sv_undef; /* Math::Decimal64 object (1st arg) is a nan */
     }
 
      if(SvPOK(b) && !SvNOK(b)) {
-       if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) > _atodecimal(aTHX_ SvPV_nolen(b))) return newSViv(1 * reversal);
-       if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) < _atodecimal(aTHX_ SvPV_nolen(b))) return newSViv(-1 * reversal);
-       if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) == _atodecimal(aTHX_ SvPV_nolen(b))) return newSViv(0);
+       if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) > _atodecimal(aTHX_ SvPV_nolen(b))) return newSViv(1 * reversal);
+       if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) < _atodecimal(aTHX_ SvPV_nolen(b))) return newSViv(-1 * reversal);
+       if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) == _atodecimal(aTHX_ SvPV_nolen(b))) return newSViv(0);
       return &PL_sv_undef; /* Math::Decimal64 object (1st arg) is a nan */
      }
 
     if(sv_isobject(b)) {
       const char *h = HvNAME(SvSTASH(SvRV(b)));
       if(strEQ(h, "Math::Decimal64")) {
-        if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) < *(INT2PTR(_Decimal64 *, SvIV(SvRV(b))))) return newSViv(-1);
-        if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) > *(INT2PTR(_Decimal64 *, SvIV(SvRV(b))))) return newSViv(1);
-        if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) == *(INT2PTR(_Decimal64 *, SvIV(SvRV(b))))) return newSViv(0);
+        if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) < *(INT2PTR(_Decimal64 *, SvIVX(SvRV(b))))) return newSViv(-1);
+        if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) > *(INT2PTR(_Decimal64 *, SvIVX(SvRV(b))))) return newSViv(1);
+        if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) == *(INT2PTR(_Decimal64 *, SvIVX(SvRV(b))))) return newSViv(0);
         return &PL_sv_undef; /* it's a nan */
       }
       croak("Invalid object supplied to Math::Decimal64::_overload_spaceship function");
@@ -1304,7 +1305,7 @@ SV * _overload_copy(pTHX_ SV * a, SV * b, SV * third) {
      Newx(d64, 1, _Decimal64);
      if(d64 == NULL) croak("Failed to allocate memory in _overload_copy function");
 
-     *d64 = *(INT2PTR(_Decimal64 *, SvIV(SvRV(a))));
+     *d64 = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a))));
 
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::Decimal64");
@@ -1324,7 +1325,7 @@ SV * D64toD64(pTHX_ SV * a) {
          Newx(d64, 1, _Decimal64);
          if(d64 == NULL) croak("Failed to allocate memory in D64toD64 function");
 
-         *d64 = *(INT2PTR(_Decimal64 *, SvIV(SvRV(a))));
+         *d64 = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a))));
 
          obj_ref = newSV(0);
          obj = newSVrv(obj_ref, "Math::Decimal64");
@@ -1339,14 +1340,14 @@ SV * D64toD64(pTHX_ SV * a) {
 
 SV * _overload_true(pTHX_ SV * a, SV * b, SV * third) {
 
-     if(_is_nan(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))))) return newSViv(0);
-     if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) != 0.0DD) return newSViv(1);
+     if(_is_nan(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))))) return newSViv(0);
+     if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) != 0.0DD) return newSViv(1);
      return newSViv(0);
 }
 
 SV * _overload_not(pTHX_ SV * a, SV * b, SV * third) {
-     if(_is_nan(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))))) return newSViv(1);
-     if(*(INT2PTR(_Decimal64 *, SvIV(SvRV(a)))) != 0.0DD) return newSViv(0);
+     if(_is_nan(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))))) return newSViv(1);
+     if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) != 0.0DD) return newSViv(0);
      return newSViv(1);
 }
 
@@ -1364,20 +1365,20 @@ SV * _overload_abs(pTHX_ SV * a, SV * b, SV * third) {
      sv_setiv(obj, INT2PTR(IV,d64));
      SvREADONLY_on(obj);
 
-     *d64 = *(INT2PTR(_Decimal64 *, SvIV(SvRV(a))));
+     *d64 = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a))));
      if(_is_neg_zero(*d64) || *d64 < 0 ) *d64 *= -1.0DD;
      return obj_ref;
 }
 
 SV * _overload_inc(pTHX_ SV * p, SV * second, SV * third) {
      SvREFCNT_inc(p);
-     *(INT2PTR(_Decimal64 *, SvIV(SvRV(p)))) += 1.0DD;
+     *(INT2PTR(_Decimal64 *, SvIVX(SvRV(p)))) += 1.0DD;
      return p;
 }
 
 SV * _overload_dec(pTHX_ SV * p, SV * second, SV * third) {
      SvREFCNT_inc(p);
-     *(INT2PTR(_Decimal64 *, SvIV(SvRV(p)))) -= 1.0DD;
+     *(INT2PTR(_Decimal64 *, SvIVX(SvRV(p)))) -= 1.0DD;
      return p;
 }
 
@@ -1397,7 +1398,7 @@ SV * is_NaND64(pTHX_ SV * b) {
      if(sv_isobject(b)) {
       const char *h = HvNAME(SvSTASH(SvRV(b)));
       if(strEQ(h, "Math::Decimal64"))
-         return newSViv(_is_nan(*(INT2PTR(_Decimal64 *, SvIV(SvRV(b))))));
+         return newSViv(_is_nan(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(b))))));
      }
      croak("Invalid argument supplied to Math::Decimal64::is_NaND64 function");
 }
@@ -1406,7 +1407,7 @@ SV * is_InfD64(pTHX_ SV * b) {
      if(sv_isobject(b)) {
       const char *h = HvNAME(SvSTASH(SvRV(b)));
       if(strEQ(h, "Math::Decimal64"))
-         return newSViv(_is_inf(*(INT2PTR(_Decimal64 *, SvIV(SvRV(b))))));
+         return newSViv(_is_inf(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(b))))));
      }
      croak("Invalid argument supplied to Math::Decimal64::is_InfD64 function");
 }
@@ -1415,8 +1416,8 @@ SV * is_ZeroD64(pTHX_ SV * b) {
      if(sv_isobject(b)) {
       const char *h = HvNAME(SvSTASH(SvRV(b)));
       if(strEQ(h, "Math::Decimal64"))
-         if (_is_neg_zero(*(INT2PTR(_Decimal64 *, SvIV(SvRV(b)))))) return newSViv(-1);
-         if (*(INT2PTR(_Decimal64 *, SvIV(SvRV(b)))) == 0.0DD) return newSViv(1);
+         if (_is_neg_zero(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(b)))))) return newSViv(-1);
+         if (*(INT2PTR(_Decimal64 *, SvIVX(SvRV(b)))) == 0.0DD) return newSViv(1);
          return newSViv(0);
      }
      croak("Invalid argument supplied to Math::Decimal64::is_ZeroD64 function");
@@ -1433,7 +1434,7 @@ void _D64toME(SV * a) {
      if(sv_isobject(a)) {
        const char *h = HvNAME(SvSTASH(SvRV(a)));
        if(strEQ(h, "Math::Decimal64")) {
-          t = *(INT2PTR(_Decimal64 *, SvIV(SvRV(a))));
+          t = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a))));
           if(_is_nan(t) || _is_inf(t) || t == 0.0DD) {
             EXTEND(SP, 2);
             ST(0) = sv_2mortal(newSVnv(t));
@@ -1487,7 +1488,7 @@ void _D64toME_deprecated(SV * a) {
        const char *h = HvNAME(SvSTASH(SvRV(a)));
        if(strEQ(h, "Math::Decimal64")) {
           EXTEND(SP, 2);
-          t = *(INT2PTR(_Decimal64 *, SvIV(SvRV(a))));
+          t = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a))));
           if(_is_nan(t) || _is_inf(t) || t == 0.0DD) {
             ST(0) = sv_2mortal(newSVnv(t));
             ST(1) = sv_2mortal(newSViv(0));
@@ -1517,7 +1518,7 @@ SV * _get_xs_version(pTHX) {
 
 void _d64_bytes(pTHX_ SV * sv) {
   dXSARGS;
-  _Decimal64 d64 = *(INT2PTR(_Decimal64 *, SvIV(SvRV(sv))));
+  _Decimal64 d64 = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(sv))));
   int i, n = sizeof(_Decimal64);
   char * buff;
   void * p = &d64;
@@ -1616,7 +1617,7 @@ void _assignDPD(pTHX_ SV * a, char * in) {
     ((unsigned char*)p)[i] = in[n - 1 - i];
 #endif
 
-  *(INT2PTR(D64 *, SvIV(SvRV(a)))) = out;
+  *(INT2PTR(D64 *, SvIVX(SvRV(a)))) = out;
 }
 
 int nnumflag(void) {

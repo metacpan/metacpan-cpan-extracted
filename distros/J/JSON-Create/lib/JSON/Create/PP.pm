@@ -36,11 +36,18 @@ Floating point printing cannot be made to work like the XS version.
 The XS version tests for NV or IV directly, but it is next to
 impossible to get this information from Perl without XS.
 
+=head1 TESTING
+
+To test this module, do
+
+    make
+    JSONCreatePP=1 make test
+
 =cut
 
 package JSON::Create::PP;
 use parent Exporter;
-our @EXPORT_OK = qw/create_json/;
+our @EXPORT_OK = qw/create_json create_json_strict json_escape/;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 use warnings;
 use strict;
@@ -49,6 +56,7 @@ use Carp qw/croak carp confess cluck/;
 use Scalar::Util qw/looks_like_number blessed reftype/;
 use Unicode::UTF8 qw/decode_utf8 valid_utf8/;
 use B;
+our $VERSION = '0.23';
 
 # http://stackoverflow.com/questions/1185822/how-do-i-create-or-test-for-nan-or-infinity-in-perl#1185828
 
@@ -67,9 +75,9 @@ sub isnan {
 sub isfloat
 {
     my ($num) = @_;
-#  print "Looking at $num...";
+
     if ($num != int ($num)) {
-#	print "it's obviously a float.\n";
+	# It's clearly a floating point number
 	return 1;
     }
 
@@ -82,16 +90,7 @@ sub isfloat
     # Perl programmer.
 
     my $r = B::svref_2object (\$num);
-#    print "$r\n";
-    my $isfloat = $r->isa("B::NV") || $r->isa("B::PVNV");# && ! $r->isa ('B::IV');
-    # if ($isfloat) {
-    # 	print "it's a float";
-    # }
-    # else {
-    # 	print "it's not a float";
-    # }
-    # print "\n";
-
+    my $isfloat = $r->isa("B::NV") || $r->isa("B::PVNV");
     return $isfloat;
 }
 
@@ -102,16 +101,32 @@ sub isbool
     my ($ref) = @_;
     my $poo = B::svref_2object ($ref);
     if (ref $poo eq 'B::SPECIAL') {
-#	if ($B::specialsv_name[$$poo] eq '&PL_sv_yes') {
+	# Leave the following commented-out code as reference for what
+	# the magic numbers mean.
+
+	# if ($B::specialsv_name[$$poo] eq '&PL_sv_yes') {
 	if ($$poo == 2) {
 	    return 'true';
 	}
-#	elsif ($B::specialsv_name[$$poo] eq '&PL_sv_no') {
+	# elsif ($B::specialsv_name[$$poo] eq '&PL_sv_no') {
 	elsif ($$poo == 3) {
 	    return 'false';
 	}
     }
     return undef;
+}
+
+sub json_escape
+{
+    my ($input) = @_;
+    $input =~ s/("|\\)/\\$1/g;
+    $input =~ s/\x08/\\b/g;
+    $input =~ s/\f/\\f/g;
+    $input =~ s/\n/\\n/g;
+    $input =~ s/\r/\\r/g;
+    $input =~ s/\t/\\t/g;
+    $input =~ s/([\x00-\x1f])/sprintf ("\\u%04x", ord ($1))/ge;
+    return $input;
 }
 
 sub escape_all_unicode
@@ -134,6 +149,9 @@ sub stringify
     my ($jc, $input) = @_;
     my $abstraction_leaked;
     if (! utf8::is_utf8 ($input)) {
+	if ($input =~ /[\x{80}-\x{FF}]/ && $jc->{_strict}) {
+	    return "Non-ASCII byte in non-utf8 string";
+	}
 	if (! valid_utf8 ($input)) {
 	    if ($jc->{_replace_bad_utf8}) {
 		# Discard the warnings from Unicode::UTF8.
@@ -145,13 +163,7 @@ sub stringify
 	    }
 	}
     }
-    $input =~ s/("|\\)/\\$1/g;
-    $input =~ s/\x08/\\b/g;
-    $input =~ s/\f/\\f/g;
-    $input =~ s/\n/\\n/g;
-    $input =~ s/\r/\\r/g;
-    $input =~ s/\t/\\t/g;
-    $input =~ s/([\x00-\x1f])/sprintf ("\\u%04x", ord ($1))/ge;
+    $input = json_escape ($input);
     if ($jc->{_escape_slash}) {
 	$input =~ s!/!\\/!g;
     }
@@ -189,10 +201,8 @@ sub call_to_json
 	return 'undefined value from user routine';
     }
     if ($jc->{_validate}) {
-#	print "Validating...\n";
 	my $error = $jc->validate_user_json ($json);
 	if ($error) {
-#	    cluck "Validating failed";
 	    return $error;
 	}
     }
@@ -200,25 +210,45 @@ sub call_to_json
     return undef;
 }
 
+# This handles a non-finite floating point number, which is either
+# nan, inf, or -inf. The return value is undefined if successful, or
+# the error value if an error occurred.
+
+sub handle_non_finite
+{
+    my ($jc, $input, $type) = @_;
+    my $handler = $jc->{_non_finite_handler};
+    if ($handler) {
+	my $output = &{$handler} ($type);
+	if (! $output) {
+	    return "Empty output from non-finite handler";
+	}
+	$jc->{output} .= $output;
+	return undef;
+    }
+    if ($jc->{_strict}) {
+	return "non-finite number";
+    }
+    $jc->{output} .= "\"$type\"";
+    return undef;
+}
+
 sub handle_number
 {
     my ($jc, $input) = @_;
-    # Perl thinks that nan, inf, etc. look like numbers,
-    # apparently.
+    # Perl thinks that nan, inf, etc. look like numbers.
     if (isnan ($input)) {
-	$jc->{output} .= '"nan"';
+	return $jc->handle_non_finite ($input, 'nan');
     }
     elsif (isinf ($input)) {
-	$jc->{output} .= '"inf"';
+	return $jc->handle_non_finite ($input, 'inf');
     }
     elsif (isneginf ($input)) {
-	$jc->{output} .= '"-inf"';
+	return $jc->handle_non_finite ($input, '-inf');
     }
     elsif (isfloat ($input)) {
-#	print "Priting floats.\n";
 	# Default format
 	if ($jc->{_fformat}) {
-#	    print "Overriing floats with $jc->{_fformat} for $input.\n";
 	    # Override. Validation is in
 	    # JSON::Create::set_fformat.
 	    $jc->{output} .= sprintf ($jc->{_fformat}, $input);
@@ -229,15 +259,7 @@ sub handle_number
     }
     else {
 	# integer or looks like integer.
-	# if ($jc->{_fformat}) {
-	#     print "Overriing integer with $jc->{_fformat} for $input.\n";
-	#     $jc->{output} .= sprintf ($jc->{_fformat}, $input);
-	# }
-	# else {
-#	    print "INT $input\n";
-	    # integer
-	    $jc->{output} .= $input;
-#	}
+	$jc->{output} .= $input;
     }
     return undef;
 }
@@ -257,6 +279,12 @@ sub create_json_recursively
     else {
 	# Break encapsulation if the user has not supplied handlers.
 	$ref = reftype ($input);
+	if ($ref && $jc->{_strict}) {
+	    my $origref = ref ($input);
+	    if ($ref ne $origref) {
+		return "Object cannot be serialized to JSON: $origref";
+	    }
+	}
     }
     if ($ref) {
 	if ($ref eq 'HASH') {
@@ -299,7 +327,10 @@ sub create_json_recursively
 	    $jc->{output} =~ s/,$/]/;
 	}
 	elsif ($ref eq 'SCALAR') {
-	    $error = stringify ($jc, $$input);
+	    if ($jc->{_strict}) {
+		return "Input's type cannot be serialized to JSON";
+	    }
+	    $error = $jc->create_json_recursively ($$input);
 	    if ($error) {
 		return $error;
 	    }
@@ -314,7 +345,6 @@ sub create_json_recursively
 		}
 		else {
 		    my $handler = $jc->{_handlers}{$ref};
-#		    printf ("%s:%d: %s\n", __FILE__, __LINE__, $handler);
 		    if ($handler) {
 			if ($handler eq 'bool') {
 			    if ($$input) {
@@ -354,7 +384,7 @@ sub create_json_recursively
     }
     else {
 	my $error;
-	if (looks_like_number ($input) && $input !~ /^0/) {
+	if (looks_like_number ($input) && $input !~ /^0[^.]/) {
 	    $error = $jc->handle_number ($input);
 	}
 	else {
@@ -385,6 +415,7 @@ sub create_json
     my $jc = bless {
 	output => '',
     };
+    $jc->{_strict} = !! $options{strict};
     my $error = create_json_recursively ($jc, $input);
     if ($error) {
 	$jc->user_error ($error);
@@ -394,11 +425,24 @@ sub create_json
     return $jc->{output};
 }
 
+sub create_json_strict
+{
+    my ($input, %options) = @_;
+    $options{strict} = 1;
+    return create_json ($input, %options);
+}
+
 sub new
 {
     return bless {
 	_handlers => {},
     };
+}
+
+sub strict
+{
+    my ($jc, $onoff) = @_;
+    $jc->{_strict} = !! $onoff;
 }
 
 sub get_handlers
@@ -407,12 +451,18 @@ sub get_handlers
     return $jc->{_handlers};
 }
 
+sub non_finite_handler
+{
+    my ($jc, $handler) = @_;
+    $jc->{_non_finite_handler} = $handler;
+    return undef;
+}
+
 sub obj
 {
     my ($jc, %things) = @_;
     my $handlers = $jc->get_handlers ();
     for my $k (keys %things) {
-#	printf "%s:%d: Adding key %s for %s.\n", __FILE__, __LINE__, $things{$k}, $k;
 	$handlers->{$k} = $things{$k};
     }
 }
@@ -434,8 +484,6 @@ sub escape_slash
 
 sub set_fformat_unsafe
 {
-#    printf ("%s:%d: ", __FILE__, __LINE__);
-#    print ("@_ OK\n");
     my ($jc, $fformat) = @_;
     if ($fformat) {
 	$jc->{_fformat} = $fformat;
@@ -473,7 +521,6 @@ sub type_handler
 sub obj_handler
 {
     my ($jc, $handler) = @_;
-#    print "Handler for object set.\n";
     $jc->{_obj_handler} = $handler;
 }
 

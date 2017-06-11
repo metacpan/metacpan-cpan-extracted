@@ -13,6 +13,7 @@ __PACKAGE__->load_classes(
         Person
         Shop
         Track
+        LinerNotes
     >,
 );
 

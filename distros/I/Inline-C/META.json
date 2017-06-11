@@ -50,7 +50,7 @@
       "test" : {
          "requires" : {
             "File::Copy::Recursive" : "0",
-            "IO::All" : "0",
+            "File::Path" : "0",
             "Test::More" : "0.88",
             "Test::Warn" : "0.23",
             "YAML::XS" : "0",
@@ -71,7 +71,7 @@
          "web" : "https://github.com/ingydotnet/inline-c-pm"
       }
    },
-   "version" : "0.77",
+   "version" : "0.78",
    "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

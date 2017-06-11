@@ -4,13 +4,13 @@
       "gray <gray@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.2901, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Acme-CPANAuthors-GitHub",
    "no_index" : {
@@ -43,5 +43,6 @@
          "url" : "http://github.com/gray/acme-cpanauthors-github"
       }
    },
-   "version" : "0.08"
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

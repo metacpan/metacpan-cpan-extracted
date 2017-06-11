@@ -42,7 +42,7 @@ use JSON qw(to_json);
 use parent qw(WebService::ILS::JSON);
 
 use constant API_VERSION => "v1";
-use constant DEFAULT_DOMAIN => "oneclickdigital.com";
+use constant BASE_DOMAIN => "oneclickdigital.com";
 
 =head1 CONSTRUCTOR
 
@@ -54,28 +54,26 @@ use constant DEFAULT_DOMAIN => "oneclickdigital.com";
 
 =item C<ssl>            => if set to true use https
 
-=item C<country>        => API server country, default "us"
-
-=item C<domain>         => API http domain, default "oneclickdigital.us"
+=item C<domain>         => OneClickDigital domain for title url
 
 =back
 
 C<client_id> is either OneClickDigital id (barcode) or email
 
+C<domain> if set is either "whatever.oneclickdigital.com" or "whatever",
+in which case oneclickdigital.com is appended.
+
 =cut
 
 use Class::Tiny qw(
     ssl
-    country
+    domain
     _api_base_url
-), {
-    domain => DEFAULT_DOMAIN,
-};
+);
 
 __PACKAGE__->_set_param_spec({
     client_id  => { required => 0 },
     library_id => { required => 1 },
-    country    => { required => 0 },
     domain     => { required => 0 },
     ssl        => { required => 0 },
 });
@@ -84,35 +82,16 @@ sub BUILD {
     my $self = shift;
     my $params = shift;
 
-    my $ssl = $self->ssl;
-    my $domain = $self->domain;
+    if (my $domain = $self->domain) {
+        $self->domain("$domain.".BASE_DOMAIN) unless $domain =~ m/\./;
+    }
 
+    my $ssl = $self->ssl;
     my $ua = $self->user_agent;
     $ua->ssl_opts( verify_hostname => 0 ) if $ssl;
 
-    my $api_url = sprintf "%s://api.%s", $ssl ? "https" : "http", $domain;
+    my $api_url = sprintf "%s://api.%s", $ssl ? "https" : "http", BASE_DOMAIN;
     $self->_api_base_url($api_url);
-
-    if (my $country = $self->country) {
-        $country = uc $country;
-        local $@;
-        my $data = eval { $self->native_countries };
-        if (!$data && $domain ne DEFAULT_DOMAIN) {
-            # temporary use DEFAULT_DOMAIN to get the list of countries
-            $api_url = sprintf "%s://api.%s", $ssl ? "https" : "http", DEFAULT_DOMAIN;
-            $self->_api_base_url($api_url);
-            $data = $self->native_countries;
-            $api_url = sprintf "%s://api.%s", $ssl ? "https" : "http", $domain;
-            $self->_api_base_url($api_url);
-        }
-        foreach (@$data) {
-            $api_url = $_->{oneClickApi} or next;
-            if (grep { $_ eq $country } ($_->{isoA2}, $_->{isoA3})) {
-                $self->_api_base_url($api_url);
-                last;
-            }
-        }
-    }
 }
 
 sub api_url {
@@ -270,8 +249,13 @@ sub _search_result_xlate {
     my $self = shift;
     my $res = shift or return;
 
+    my $domain = $self->domain;
     return {
-        items => [ map $self->_item_xlate($_->{item}), @{$res->{items} || []} ],
+        items => [ map {
+            my $i = $self->_item_xlate($_->{item});
+            $i->{url} ||= "https://$domain/#titles/$i->{isbn}" if $domain;
+            $i;
+        } @{$res->{items} || []} ],
         page_size => $res->{pageSize},
         page => $res->{pageIndex} + 1,
         pages => $res->{pageCount},
@@ -282,7 +266,7 @@ my %SEARCH_RESULT_ITEM_XLATE = (
     id => "id",
     title => "title",
     subtitle => "subtitle",
-    description => "description",
+    shortDescription => "description",
     mediaType => "media",
     downloadUrl => "url",
     encryptionKey => "encryption_key",
@@ -380,7 +364,8 @@ sub facet_search {
 
 sub item_metadata {
     my $self = shift;
-    return $self->_item_xlate( $self->native_item(@_) );
+    my $ni = $self->native_item(@_) or return;
+    return $self->_item_xlate( $ni->{item} );
 }
 
 =head1 CIRCULATION METHOD SPECIFICS

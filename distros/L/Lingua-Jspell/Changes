@@ -1,5 +1,8 @@
 Revision history for Lingua-Jspell
 
+1.93 June 6, 2017
+   - make ujspell croak to standard error;
+
 1.92 March 3, 2017
    - added --flush option to ujspell;
    - added jspell-to command line utility;

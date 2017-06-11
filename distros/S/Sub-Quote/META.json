@@ -1,5 +1,5 @@
 {
-   "abstract" : "efficient generation of subroutines via string eval",
+   "abstract" : "Efficient generation of subroutines via string eval",
    "author" : [
       "mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>"
    ],
@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Sub-Quote",
    "no_index" : {
@@ -63,7 +63,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#moose"
    },
-   "version" : "2.003001",
+   "version" : "2.004000",
    "x_authority" : "cpan:MSTROUT",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

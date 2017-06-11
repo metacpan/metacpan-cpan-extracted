@@ -11,7 +11,7 @@ our ($CLASS, $CALC);
 package Math::Foo;
 
 use Math::BigInt lib => $main::CALC;
-our @ISA = (qw/Math::BigInt/);
+our @ISA = qw/Math::BigInt/;
 
 use overload
   # customized overload for sub, since original does not use swap there
@@ -33,7 +33,7 @@ sub _swap {
 ##############################################################################
 package main;
 
-is($CLASS->config()->{lib}, $CALC, "$CLASS->config()->{lib}");
+is($CLASS->config('lib'), $CALC, "$CLASS->config('lib')");
 
 my ($x, $y, $z, @args, $try, $got, $want);
 my ($f, $round_mode, $expected_class);
@@ -110,16 +110,20 @@ while (<DATA>) {
         } elsif ($f eq "bacmp") {
             $try .= ' $x->bacmp($y);';
         } elsif ($f eq "badd") {
-            $try .= ' $x + $y;';
+            $try .= ' $x->badd($y);';
         } elsif ($f eq "bsub") {
-            $try .= ' $x - $y;';
+            $try .= ' $x->bsub($y);';
         } elsif ($f eq "bmul") {
-            $try .= ' $x * $y;';
+            $try .= ' $x->bmul($y);';
         } elsif ($f eq "bdiv") {
-            $try .= ' $x / $y;';
+            $try .= ' $x->bdiv($y);';
         } elsif ($f eq "bdiv-list") {
-            $try .= ' join (",", $x->bdiv($y));';
-            # overload via x=
+            $try .= ' join(",", $x->bdiv($y));';
+        } elsif ($f eq "btdiv") {
+            $try .= ' $x->btdiv($y);';
+        } elsif ($f eq "btdiv-list") {
+            $try .= ' join (",", $x->btdiv($y));';
+        # overload via x=
         } elsif ($f =~ /^.=$/) {
             $try .= " \$x $f \$y;";
             # overload via x
@@ -206,7 +210,7 @@ while (<DATA>) {
     }
     # check internal state of number objects
     is_valid($got, $f) if ref $got;
-}                               # endwhile data tests
+}                               # end while data tests
 close DATA;
 
 # test whether self-multiplication works correctly (result is 2**64)
@@ -560,9 +564,13 @@ is($x->bsstr(), '105e+13',	# not 1.05e+15
 $z = 1e+129;			# definitely a float (may fail on UTS)
 # don't compare to $z, since some Perl versions stringify $z into something
 # like '1.e+129' or something equally ugly
-$x = $CLASS->new($z);
-is($x->bsstr(), '1e+129',
-   qq|\$x = $CLASS->new($z); \$x->bsstr() = "1e+129"|);
+SKIP:{
+    my $vax_float = (pack("d", 1) =~ /^[\x80\x10]\x40/);
+    skip("vax float range smaller", 1) if $vax_float;
+    $x = $CLASS->new($z);
+    is($x -> bsstr(), '1e+129',
+       qq|\$x = $CLASS->new($z); \$x->bsstr() = "1e+129"|);
+}
 
 ###############################################################################
 # test for whitespace including newlines to be handled correctly
@@ -651,18 +659,6 @@ $x = Math::Foo->new(5);
 $x = 8 - $x;		# 5 - 8 instead of 8 - 5
 is($x, -3, '$x = Math::Foo->new(5); $x = 8 - $x; $x = -3');
 is(ref($x), 'Math::Foo', '$x is an object of class "Math::Foo"');
-
-###############################################################################
-# Check numify on non-finite objects.
-
-{
-    require Math::Complex;
-    my $inf = Math::Complex::Inf();
-    my $nan = $inf - $inf;
-    is($CLASS -> binf("+") -> numify(),  $inf, "numify of +Inf");
-    is($CLASS -> binf("-") -> numify(), -$inf, "numify of -Inf");
-    is($CLASS -> bnan()    -> numify(),  $nan, "numify of NaN");
-}
 
 ###############################################################################
 # Test whether +inf eq inf
@@ -1844,43 +1840,83 @@ NaNmul:-inf:NaN
 9999999999999999999:10000000000000000000:99999999999999999990000000000000000000
 
 &bdiv-list
-100:20:5,0
-4095:4095:1,0
--4095:-4095:1,0
-4095:-4095:-1,0
--4095:4095:-1,0
-123:2:61,1
-9:5:1,4
-9:4:2,1
-# inf handling and general remainder
-5:8:0,5
-0:8:0,0
-11:2:5,1
-11:-2:-6,-1
--11:2:-6,1
-# see table in documentation in MBI
-0:inf:0,0
-0:-inf:0,0
-5:inf:0,5
-5:-inf:-1,-inf
--5:inf:-1,inf
--5:-inf:0,-5
-inf:5:inf,NaN
--inf:5:-inf,NaN
-inf:-5:-inf,NaN
--inf:-5:inf,NaN
-5:5:1,0
--5:-5:1,0
-inf:inf:NaN,NaN
--inf:-inf:NaN,NaN
--inf:inf:NaN,NaN
-inf:-inf:NaN,NaN
-8:0:inf,8
+
+# Divide by zero and modulo zero.
+
 inf:0:inf,inf
-# exceptions to remainder rule
--8:0:-inf,-8
--inf:0:-inf,-inf
+5:0:inf,5
 0:0:NaN,0
+-5:0:-inf,-5
+-inf:0:-inf,-inf
+
+# Numerator (dividend) is +/-inf, and denominator is finite and non-zero.
+
+inf:-inf:NaN,NaN
+inf:-5:-inf,NaN
+inf:5:inf,NaN
+inf:inf:NaN,NaN
+
+-inf:-inf:NaN,NaN
+-inf:-5:inf,NaN
+-inf:5:-inf,NaN
+-inf:inf:NaN,NaN
+
+# Denominator (divisor) is +/-inf. The cases when the numerator is +/-inf
+# are covered above.
+
+-5:inf:-1,inf
+0:inf:0,0
+5:inf:0,5
+
+-5:-inf:0,-5
+0:-inf:0,0
+5:-inf:-1,-inf
+
+# Numerator is finite, and denominator is finite and non-zero.
+
+-5:-5:1,0
+-5:-2:2,-1
+-5:-1:5,0
+-5:1:-5,0
+-5:2:-3,1
+-5:5:-1,0
+-2:-5:0,-2
+-2:-2:1,0
+-2:-1:2,0
+-2:1:-2,0
+-2:2:-1,0
+-2:5:-1,3
+-1:-5:0,-1
+-1:-2:0,-1
+-1:-1:1,0
+-1:1:-1,0
+-1:2:-1,1
+-1:5:-1,4
+0:-5:0,0
+0:-2:0,0
+0:-1:0,0
+0:1:0,0
+0:2:0,0
+0:5:0,0
+1:-5:-1,-4
+1:-2:-1,-1
+1:-1:-1,0
+1:1:1,0
+1:2:0,1
+1:5:0,1
+2:-5:-1,-3
+2:-2:-1,0
+2:-1:-2,0
+2:1:2,0
+2:2:1,0
+2:5:0,2
+5:-5:-1,0
+5:-2:-3,-1
+5:-1:-5,0
+5:1:5,0
+5:2:2,1
+5:5:1,0
+
 # test the shortcut in Calc if @$x == @$yorg
 1234567812345678:123456712345678:10,688888898
 12345671234567:1234561234567:10,58888897
@@ -1916,32 +1952,42 @@ inf:0:inf,inf
 9999999_9999999_9999999_9999999:1_0000000_0000000_0000000:9999999,999999999999999999999
 
 &bdiv
-abc:abc:NaN
-abc:1:NaN
-1:abc:NaN
+
+# Divide by zero and modulo zero.
+
+inf:0:inf
+5:0:inf
 0:0:NaN
-# inf handling (see table in doc)
-0:inf:0
-0:-inf:0
-5:inf:0
-5:-inf:-1
--5:inf:-1
--5:-inf:0
-inf:5:inf
--inf:5:-inf
+-5:0:-inf
+-inf:0:-inf
+
+# Numerator (dividend) is +/-inf, and denominator is finite and non-zero.
+
+inf:-inf:NaN
 inf:-5:-inf
+inf:5:inf
+inf:inf:NaN
+
+-inf:-inf:NaN
 -inf:-5:inf
+-inf:5:-inf
+-inf:inf:NaN
+
+# Denominator (divisor) is +/-inf. The cases when the numerator is +/-inf
+# are covered above.
+
+-5:inf:-1
+0:inf:0
+5:inf:0
+
+-5:-inf:0
+0:-inf:0
+5:-inf:-1
+
+# Numerator is finite, and denominator is finite and non-zero.
+
 5:5:1
 -5:-5:1
-inf:inf:NaN
--inf:-inf:NaN
--inf:inf:NaN
-inf:-inf:NaN
-8:0:inf
-inf:0:inf
--8:0:-inf
--inf:0:-inf
-0:0:NaN
 11:2:5
 -11:-2:5
 -11:2:-6
@@ -2032,6 +2078,164 @@ inf:0:inf
 9999999_9999999_9999999_9999999:1_0000000_0000000_0000000:9999999
 # bug with shortcut in Calc 0.44
 949418181818187070707070707070707070:181818181853535353535353535353535353:5
+
+&btdiv-list
+
+# Divide by zero and modulo zero.
+
+inf:0:inf,inf
+5:0:inf,5
+0:0:NaN,0
+-5:0:-inf,-5
+-inf:0:-inf,-inf
+
+# Numerator (dividend) is +/-inf, and denominator is finite and non-zero.
+
+inf:-inf:NaN,NaN
+inf:-5:-inf,NaN
+inf:5:inf,NaN
+inf:inf:NaN,NaN
+
+-inf:-inf:NaN,NaN
+-inf:-5:inf,NaN
+-inf:5:-inf,NaN
+-inf:inf:NaN,NaN
+
+# Denominator (divisor) is +/-inf. The cases when the numerator is +/-inf
+# are covered above.
+
+-5:inf:0,-5
+0:inf:0,0
+5:inf:0,5
+
+-5:-inf:0,-5
+0:-inf:0,0
+5:-inf:0,5
+
+# Numerator is finite, and denominator is finite and non-zero.
+
+-5:-5:1,0
+-5:-2:2,-1
+-5:-1:5,0
+-5:1:-5,0
+-5:2:-2,-1
+-5:5:-1,0
+-2:-5:0,-2
+-2:-2:1,0
+-2:-1:2,0
+-2:1:-2,0
+-2:2:-1,0
+-2:5:0,-2
+-1:-5:0,-1
+-1:-2:0,-1
+-1:-1:1,0
+-1:1:-1,0
+-1:2:0,-1
+-1:5:0,-1
+0:-5:0,0
+0:-2:0,0
+0:-1:0,0
+0:1:0,0
+0:2:0,0
+0:5:0,0
+1:-5:0,1
+1:-2:0,1
+1:-1:-1,0
+1:1:1,0
+1:2:0,1
+1:5:0,1
+2:-5:0,2
+2:-2:-1,0
+2:-1:-2,0
+2:1:2,0
+2:2:1,0
+2:5:0,2
+5:-5:-1,0
+5:-2:-2,1
+5:-1:-5,0
+5:1:5,0
+5:2:2,1
+5:5:1,0
+
+&btdiv
+
+# Divide by zero and modulo zero.
+
+inf:0:inf
+5:0:inf
+0:0:NaN
+-5:0:-inf
+-inf:0:-inf
+
+# Numerator (dividend) is +/-inf, and denominator is finite and non-zero.
+
+inf:-inf:NaN
+inf:-5:-inf
+inf:5:inf
+inf:inf:NaN
+
+-inf:-inf:NaN
+-inf:-5:inf
+-inf:5:-inf
+-inf:inf:NaN
+
+# Denominator (divisor) is +/-inf. The cases when the numerator is +/-inf
+# are covered above.
+
+-5:inf:0
+0:inf:0
+5:inf:0
+
+-5:-inf:0
+0:-inf:0
+5:-inf:0
+
+# Numerator is finite, and denominator is finite and non-zero.
+
+-5:-5:1
+-5:-2:2
+-5:-1:5
+-5:1:-5
+-5:2:-2
+-5:5:-1
+-2:-5:0
+-2:-2:1
+-2:-1:2
+-2:1:-2
+-2:2:-1
+-2:5:0
+-1:-5:0
+-1:-2:0
+-1:-1:1
+-1:1:-1
+-1:2:0
+-1:5:0
+0:-5:0
+0:-2:0
+0:-1:0
+0:1:0
+0:2:0
+0:5:0
+1:-5:0
+1:-2:0
+1:-1:-1
+1:1:1
+1:2:0
+1:5:0
+2:-5:0
+2:-2:-1
+2:-1:-2
+2:1:2
+2:2:1
+2:5:0
+5:-5:-1
+5:-2:-2
+5:-1:-5
+5:1:5
+5:2:2
+5:5:1
+
+###############################################################################
 
 &bmodinv
 # format: number:modulus:result
@@ -2248,35 +2452,44 @@ inf:5:13:NaN
 5:inf:13:NaN
 
 &bmod
-# inf handling, see table in doc
-0:inf:0
-0:-inf:0
-5:inf:5
-5:-inf:-inf
--5:inf:inf
--5:-inf:-5
-inf:5:NaN
--inf:5:NaN
+
+# Divide by zero and modulo zero.
+
+inf:0:inf
+5:0:5
+0:0:0
+-5:0:-5
+-inf:0:-inf
+
+# Numerator (dividend) is +/-inf, and denominator is finite and non-zero.
+
+inf:-inf:NaN
 inf:-5:NaN
+inf:5:NaN
+inf:inf:NaN
+
+-inf:-inf:NaN
 -inf:-5:NaN
+-inf:5:NaN
+-inf:inf:NaN
+
+# Denominator (divisor) is +/-inf. The cases when the numerator is +/-inf
+# are covered above.
+
+-5:inf:inf
+0:inf:0
+5:inf:5
+
+-5:-inf:-5
+0:-inf:0
+5:-inf:-inf
+
+# Numerator is finite, and denominator is finite and non-zero.
+
 5:5:0
 -5:-5:0
-inf:inf:NaN
--inf:-inf:NaN
--inf:inf:NaN
-inf:-inf:NaN
-8:0:8
-inf:0:inf
--inf:0:-inf
--8:0:-8
-0:0:0
-abc:abc:NaN
-abc:1:abc:NaN
-1:abc:NaN
 0:1:0
-1:0:1
 0:-1:0
--1:0:-1
 1:1:0
 -1:-1:0
 1:-1:0
@@ -2385,7 +2598,7 @@ abc:+0:NaN
 abc:abc:NaN
 abc:+0:NaN
 +0:abc:NaN
-+0:+0:NaN
++0:+0:0
 +1:+0:0
 +0:+1:0
 +27:+90:270

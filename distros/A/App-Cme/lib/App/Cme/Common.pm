@@ -10,12 +10,12 @@
 #ABSTRACT: Common methods for App::Cme
 
 package App::Cme::Common;
-$App::Cme::Common::VERSION = '1.019';
+$App::Cme::Common::VERSION = '1.020';
 use strict;
 use warnings;
 use 5.10.1;
 
-use Config::Model 2.101;
+use Config::Model 2.103;
 use Config::Model::Lister;
 use Pod::POM;
 use Pod::POM::View::Text;
@@ -30,7 +30,6 @@ sub cme_global_options {
       [ "model-dir=s"        => "Specify an alternate directory to find model files"],
       [ "try-app-as-model!"  => "try to load a model using directly the application name "
                               . "specified as 3rd parameter on the command line"],
-      [ "dev!"               => "test a model under development"],
       [ "save!"              => "Force a save even if no change was done" ],
       [ "force-load!"        => "Load file even if error are found in data. Bad data are discarded (imply save)"],
       [ "create!"            => "start from scratch."],
@@ -46,6 +45,14 @@ sub cme_global_options {
   return (
       @global_options,
   );
+}
+
+sub check_unknown_args {
+    my ($self, $args) = @_;
+
+    my @unknown_options = grep { /^-/ } @$args ;
+    # $self->usage_error("Unknown option: @unknown_options") if @unknown_options;
+    warn("Unknown option: @unknown_options. Unknown option will soon be a fatal error.") if @unknown_options;
 }
 
 # modifies $args in place
@@ -72,17 +79,6 @@ sub process_args {
 
     say "cme: using $root_model model" unless $opt->{quiet};
 
-    if ($opt->{dev}) {
-        # ignore $dev if run as root
-        if ( $> ) {
-            unshift @INC, 'lib';
-            $opt->{model_dir} = 'lib/Config/Model/models/';
-        }
-        else {
-            warn "-dev option is ignored when run as root\n";
-        }
-    }
-
     my $command = (split('::', ref($self)))[-1] ;
 
     # @ARGV should be [ $config_file ] [ modification_instructions ]
@@ -95,6 +91,17 @@ sub process_args {
     }
     elsif ( $appli_info->{$application}{allow_config_file_override}) {
         $config_file = $opt->{file};
+    }
+
+    if ( $appli_info->{$application}{require_backend_argument} ) {
+        # let the backend handle a missing arg and provide a clear error message
+        my $b_arg = $opt->{_backend_arg} = shift @$args ;
+        if (not $b_arg) {
+            my $message = $appli_info->{$application}{backend_argument_info} ;
+            my $insert = $message ? " ( $message )": '';
+            die "application $application requires a 3rd argument$insert. "
+                . "I.e. 'cme $command $application <backend_arg>'";
+        }
     }
 
     # remove legacy '~~'
@@ -153,6 +160,7 @@ sub instance {
             check           => $opt->{force_load} ? 'no' : 'yes',
             auto_create     => $opt->{create},
             backend         => $opt->{backend},
+            backend_arg     => $opt->{_backend_arg},
             backup          => $opt->{backup},
             config_file     => $opt->{_config_file},
             config_dir      => $opt->{_config_dir},
@@ -250,7 +258,7 @@ App::Cme::Common - Common methods for App::Cme
 
 =head1 VERSION
 
-version 1.019
+version 1.020
 
 =head1 SYNOPSIS
 

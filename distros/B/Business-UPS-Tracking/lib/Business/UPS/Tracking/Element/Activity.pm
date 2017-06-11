@@ -18,10 +18,10 @@ use Business::UPS::Tracking::Element::Activity;
 =head1 NAME
 
 Business::UPS::Tracking::Element::Activity - A small freight package activity
-  
+
 =head1 DESCRIPTION
 
-This class represents an small freight package activity. Usually it is created 
+This class represents an small freight package activity. Usually it is created
 automatically from a L<Business::UPS::Tracking::Element::Package> object.
 
 =head1 ACCESSORS
@@ -32,12 +32,12 @@ Original L<XML::LibXML::Node> node.
 
 =head2 ActivityLocationAddress
 
-A L<Business::UPS::Tracking::Element::Address> object representing the 
+A L<Business::UPS::Tracking::Element::Address> object representing the
 location of the activity.
 
 =head2 ActivityLocation
 
-Type of location. 
+Type of location.
 Returns a L<Business::UPS::Tracking::Element::Code> object.
 
 =head2 SignedForByName
@@ -127,7 +127,7 @@ sub _build_DateTime {
 
 sub _build_StatusType {
     my ($self) = @_;
-    
+
     return $self->build_code('Status/StatusType');
 }
 
@@ -145,7 +145,7 @@ sub _build_ActivityLocationAddress {
 
 sub _build_ActivityLocation {
     my ($self) = @_;
-    
+
     return $self->build_code('ActivityLocation' );
 }
 
@@ -181,7 +181,7 @@ Translates the L<StatusTypeCode> to a short description. Can return
 
 sub Status {
     my ($self) = @_;
-    
+
     given ($self->StatusType->Code) {
         when ('I') {
             return 'In Transit';

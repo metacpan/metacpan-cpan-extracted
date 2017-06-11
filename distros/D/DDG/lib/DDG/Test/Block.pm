@@ -1,7 +1,7 @@
 package DDG::Test::Block;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Adds a function to easily test L<DDG::Block>.
-$DDG::Test::Block::VERSION = '1016';
+$DDG::Test::Block::VERSION = '1017';
 use strict;
 use warnings;
 use Carp;
@@ -79,7 +79,7 @@ DDG::Test::Block - Adds a function to easily test L<DDG::Block>.
 
 =head1 VERSION
 
-version 1016
+version 1017
 
 =head1 EXPORTS FUNCTIONS
 

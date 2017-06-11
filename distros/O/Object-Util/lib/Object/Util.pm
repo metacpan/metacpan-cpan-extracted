@@ -7,7 +7,7 @@ BEGIN { if ($] < 5.010000) { require UNIVERSAL::DOES } };
 package Object::Util;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.006';
+our $VERSION   = '0.007';
 
 use Carp                         qw( carp croak );
 use List::Util       1.29        qw( pairkeys pairvalues );
@@ -234,12 +234,68 @@ sub _dump :method
 	local $Data::Dumper::Deparse = 1;
 	local $Data::Dumper::Quotekeys = 0;
 	local $Data::Dumper::Sortkeys = 1;
+	local $Data::Dumper::Trailingcomma = 1;
 	
 	if ( _can($_[0], "dump") ) {
 		return shift->dump(@_);
 	}
 	
 	Data::Dumper::Dumper($_[0]);
+}
+
+sub _dwarn :method
+{
+	require Data::Dumper;
+	local $Data::Dumper::Terse = 1;
+	local $Data::Dumper::Indent = 1;
+	local $Data::Dumper::Useqq = 1;
+	local $Data::Dumper::Deparse = 1;
+	local $Data::Dumper::Quotekeys = 0;
+	local $Data::Dumper::Sortkeys = 1;
+	local $Data::Dumper::Trailingcomma = 1;
+	
+	warn Data::Dumper::Dumper(@_);
+	
+	wantarray ? @_ : $_[0];
+}
+
+sub _dwarn_call :method
+{
+	require Data::Dumper;
+	local $Data::Dumper::Terse = 1;
+	local $Data::Dumper::Indent = 1;
+	local $Data::Dumper::Useqq = 1;
+	local $Data::Dumper::Deparse = 1;
+	local $Data::Dumper::Quotekeys = 0;
+	local $Data::Dumper::Sortkeys = 1;
+	local $Data::Dumper::Trailingcomma = 1;
+	
+	my $object = shift;
+	my $method = shift;
+	my @args   = @_;
+	
+	warn "== INVOCANT ==\n";
+	warn Data::Dumper::Dumper($object);
+
+	warn "== METHOD ==\n";
+	warn Data::Dumper::Dumper($method);
+
+	if (@args) {
+		warn "== ARGUMENTS ==\n";
+		warn Data::Dumper::Dumper(@args);
+	}
+	
+	my @r;
+	if    (wantarray)         { @r = $object->$method(@args) }
+	elsif (defined wantarray) { @r = scalar $object->$method(@args) }
+	else                      { $object->$method(@args); undef; }
+	
+	if (defined wantarray) {
+		warn "== RETURN ==\n";
+		warn Data::Dumper::Dumper(@r);
+	}
+	
+	wantarray ? @r : $r[0];
 }
 
 {
@@ -333,6 +389,8 @@ sub subs :method
 	'$_clone'           => \&_clone,
 	'$_with_traits'     => \&_with_traits,
 	'$_dump'            => \&_dump,
+	'$_dwarn'           => \&_dwarn,
+	'$_dwarn_call'      => \&_dwarn_call,
 	'$_extend'          => \&_extend,
 }
 
@@ -621,7 +679,24 @@ object, with some useful changes to the default Data::Dumper output.
 (Same as L<Data::Dumper::Concise>.)
 
 If the object provides its own C<dump> method, this will be called
-instead.
+instead. Any additional arguments will be passed through to it.
+
+=item C<< $_dwarn >>
+
+Calling C<< $object->$_dwarn(@args) >> prints a similar dump of the
+object and any arguments as a warning, then returns the object, so
+is suitable for tap-like chaining.
+
+Unlike C<< $_dump >>, will not call the object's own C<dump> method.
+
+=item C<< $_dwarn_call >>
+
+Calling C<< $object->$_dwarn_call($method, @args) >> calls the
+method on the object, passing it the arguments, and returns the
+result. Along the way, it will dump the object, method, arguments,
+and return value as warnings. Returns the method's return value.
+
+Unlike C<< $_dump >>, will not call the object's own C<dump> method.
 
 =back
 

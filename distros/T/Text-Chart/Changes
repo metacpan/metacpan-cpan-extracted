@@ -1,4 +1,9 @@
-Revision history for Text-Chart
+0.03    2017-06-01 (PERLANCAR)
+
+	- Update to newer TableData::Object API.
+
+	- Mention App::tchart.
+
 
 0.02    2015-01-03 (PERLANCAR)
 

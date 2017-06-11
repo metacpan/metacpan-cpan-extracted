@@ -22,11 +22,8 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Exporter' => '0',
-                                      'Fcntl' => '0',
                                       'Inline' => '0.80',
                                       'Inline::C' => '0.77',
-                                      'constant' => '0',
                                       'perl' => '5.014004'
                                     }
                     },

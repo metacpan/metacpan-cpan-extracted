@@ -5,7 +5,7 @@ use Path::Class qw( dir );
 use Moose;
 
 # ABSTRACT: add a travis status button to the README.md file
-our $VERSION = '2.12'; # VERSION
+our $VERSION = '2.14'; # VERSION
 
 
 with 'Dist::Zilla::Role::AfterBuild';
@@ -64,7 +64,7 @@ Dist::Zilla::Plugin::Author::Plicease::MarkDownCleanup - add a travis status but
 
 =head1 VERSION
 
-version 2.12
+version 2.14
 
 =head1 SYNOPSIS
 

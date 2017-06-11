@@ -1,6 +1,6 @@
 package Pcore::DBH::DDL;
 
-use Pcore -role, -try;
+use Pcore -role;
 use Pcore::DBH::DDL::ChangeSet;
 
 requires qw[schema_info_sql];
@@ -41,7 +41,7 @@ sub upgrade ($self) {
         if ( !exists $info->{ $cset->component } || !defined $info->{ $cset->component }->{changeset} || $info->{ $cset->component }->{changeset} < $cset->id ) {
             $dbh->begin_work if $cset->transaction;
 
-            my $error = try {
+            eval {
                 if ( ref $cset->sql eq 'CODE' ) {
                     die qq[Changeset "@{[$cset->id]}" for component "@{[$cset->component]}" did not return true value] if !$cset->sql->( $cset, $dbh );
                 }
@@ -50,20 +50,15 @@ sub upgrade ($self) {
                 }
 
                 $dbh->commit if $cset->transaction;
+            };
 
-                return 0;
-            }
-            catch {
-                my $e = shift;
-
-                $e->sendlog;
+            if ($@) {
+                $@->sendlog;
 
                 $dbh->rollback if $cset->transaction;
 
-                return 1;
-            };
-
-            die qq[Failed to apply changeset "@{[$cset->id]}" for component "@{[$cset->component]}"] if $error;
+                die qq[Failed to apply changeset "@{[$cset->id]}" for component "@{[$cset->component]}"];
+            }
 
             # update schema info
             $dbh->do( [ UPDATE => [ $self->_schema_info_table ], SET => { changeset => $cset->id }, 'WHERE component =', \$cset->component ] );
@@ -88,6 +83,16 @@ sub _get_cset_sql ( $self, $cset ) {
 }
 
 1;
+## -----SOURCE FILTER LOG BEGIN-----
+##
+## PerlCritic profile "pcore-script" policy violations:
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+## | Sev. | Lines                | Policy                                                                                                         |
+## |======+======================+================================================================================================================|
+## |    3 | 44                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+##
+## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

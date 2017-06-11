@@ -1,6 +1,6 @@
 package Pcore::Dist::CLI::Id;
 
-use Pcore -class, -ansi;
+use Pcore -class;
 
 with qw[Pcore::Dist::CLI];
 

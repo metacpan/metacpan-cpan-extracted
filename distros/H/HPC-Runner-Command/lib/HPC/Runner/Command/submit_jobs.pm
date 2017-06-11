@@ -31,7 +31,7 @@ option 'dry_run' => (
     documentation => 'Do a dry run - do not submit to the scheduler.'
 );
 
-# TODO investigate changing this to after 'BUILD'.
+use Moose::Util qw/apply_all_roles/;
 
 sub BUILD {
     my $self = shift;
@@ -43,13 +43,22 @@ sub BUILD {
     $self->git_things;
     $self->gen_load_plugins;
     $self->hpc_load_plugins;
+
+    if($self->use_batches){
+      apply_all_roles($self, 'HPC::Runner::Command::submit_jobs::Utils::Scheduler::UseBatches');
+    }
+    else{
+      apply_all_roles($self, 'HPC::Runner::Command::submit_jobs::Utils::Scheduler::UseArrays');
+    }
 }
 
 sub execute {
     my $self = shift;
 
-    $self->parse_file_slurm();
-    $self->iterate_schedule();
+    $self->app_log->info('Parsing input file');
+    $self->parse_file_slurm;
+    $self->app_log->info('Submitting jobs');
+    $self->iterate_schedule;
 }
 
 1;

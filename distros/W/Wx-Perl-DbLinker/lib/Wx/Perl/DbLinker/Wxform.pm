@@ -8,7 +8,8 @@ use strict;
 use warnings;
 use parent 'Gtk2::Ex::DbLinker::AbForm';
 
-# use Carp qw(croak confess carp);
+use Carp qw(croak confess carp);
+use Log::Any;
 #use DateTime::Format::Strptime;
 #use Data::Dumper;
 use Scalar::Util qw( weaken );
@@ -206,8 +207,8 @@ sub _init {
         ref $widgets{ $id }->{status_label}
         ? $widgets{ $id }->{status_label}
         : $self->_builder()->get_object( $widgets{ $id }->{status_label} ) );
-
-    $log{ $id } = Log::Log4perl->get_logger(__PACKAGE__);
+    $log{ $id } = Log::Any->get_logger;
+    #$log{ $id } = Log::Log4perl->get_logger(__PACKAGE__);
     $log{ $id }->debug(" ** New Form object ** ");
     $self->_changed(0);
 =for comment
@@ -232,7 +233,7 @@ sub _init {
 
     $self->_bind_on_changed;
     $self->_set_recordspinner;
-    $log{$id }->logcroak("A data manager is required")
+    croak($log{$id }->error("A data manager is required"))
       unless ( defined $self->_dman );
     $self->_dman->set_row_pos(0);
 }
@@ -257,8 +258,8 @@ sub add_combo_values {
     my $wref       = ref $w;
     my @supp_class = (qw/Wx::ComboBox Wx::ListBox/);
     my %supported  = map { $_ => 1 } @supp_class;
-    $log{$id }->logconfess(
-        "only " . join( " ", @supp_class ) . " supported by add_combo_values" )
+    confess($log{$id }->error(
+        "only " . join( " ", @supp_class ) . " supported by add_combo_values" ))
       unless ( $supported{$wref} );
 
     my $size = 0;
@@ -338,8 +339,8 @@ sub add_combo {
 
         $self = {};
         $self->_builder($$req{builder});
-
-        $log{ $id } = Log::Log4perl->get_logger(__PACKAGE__);
+        $log{ $id } = Log::Any->get_logger;
+        #$log{ $id } = Log::Log4perl->get_logger(__PACKAGE__);
 
         my $w = $self->_builder()->get_object( $combo->{id} );
         if ($w) {
@@ -354,18 +355,18 @@ sub add_combo {
             $self->_datawidgetsName( $combo->{id}, $name);
         } else {
             $log{ $id }->debug( "cols: " . join( " ", @cols ) );
-            $log{$id }->logconfess( "no widget found for combo " . $combo->{id});
+            confess($log{$id }->error( "no widget found for combo " . $combo->{id}));
         }
     }
 
     $log{ $id }->debug( "cols: " . join( " ", @cols ) );
     my $w = $self->_datawidgets( $combo->{id} );
-    $log{$id }->logconfess( 'no widget found for combo ' . $combo->{id} ) unless ($w);
+    confess($log{$id }->error( 'no widget found for combo ' . $combo->{id} )) unless ($w);
 
     $w->Clear;
 
     #my @col = @{$self->{cols}};
-    $log{$id }->logcroak("no fields found for combo $combo->{id}") unless (@cols);
+     croak($log{$id }->error("no fields found for combo $combo->{id}")) unless (@cols);
     my $lastfield = @cols;
 
     #the column to show is either the first (pos 0) if it's the only column or
@@ -428,7 +429,7 @@ sub add_combo {
                 } elsif (
                     !( $name eq "Wx::ComboBox" || $name eq "Wx::ListBox" ) )
                 {
-                    $log{$id }->logconfess("add_combo: $name is not supported");
+                    confess($log{$id }->error("add_combo: $name is not supported"));
                 }
 
       #else {$log{ $id }->error("add_combo: $name is not supported" ); return;}
@@ -626,7 +627,7 @@ sub _set_entry {
 #$w->set_text( $x ) ;
 # SetValue generates a wxEVT_TEXT event. To avoid this you can use ChangeValue() instead.
 #$self->{hecols}->{$id} ? $w->SetValue($x) && $log{ $id }->debug("SetValue called") : $w->ChangeValue($x);
-        $log{$id }->logconfess("id undef") unless ( defined $id );
+        confess($log{$id }->error("id undef")) unless ( defined $id );
         #if ( $self->{hecols}->{$id} ) {
         if ( $is_ecols{ $ido }->{$id} ) {
             $w->SetValue($x);
@@ -679,7 +680,7 @@ sub _set_combo {
 
         $w->SetItemState( $item, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED );
     } elsif ( $name eq "Wx::ComboBox" || $name eq "Wx::ListBox" ) {
-        $log{$id }->logconfess( "undef datawidgetsPos  for ", $id )
+        confess($log{$id }->error( "undef datawidgetsPos  for ", $id ))
         unless ( $datawidgets_pos{ $ido }->{$id} );
         #unless ( $self->{datawidgetsPos}->{$id} );
         #my %idpos = %{ $self->{datawidgetsPos}->{$id} };
@@ -735,7 +736,7 @@ sub _on_combo_newval {
 sub _get_combobox_selectedvalue {
     my ( $self, $id ) = @_;
      my $ido = id $self;
-    $log{$id }->logconfess("id undef") unless ( defined $id );
+    confess($log{$id }->error("id undef")) unless ( defined $id );
    
     my $w    = $self->_datawidgets( $id );
     my $name = $self->_datawidgetsName( $id );
@@ -815,9 +816,9 @@ sub _on_selected {
     if ( $self->_datawidgetsName( $id  ) eq "Wx::ListCtrl" ) {
         $datawidgets_value{ $ido }->{$id} = $event->GetText;
     } else {
-        $log{$id }->logcroak(  "_on_selected not implemented for $id ("
+        croak($log{$id }->error(  "_on_selected not implemented for $id ("
               . $self->_datawidgetsName($id)
-              . ")" );
+              . ")" ));
     }
 
 }

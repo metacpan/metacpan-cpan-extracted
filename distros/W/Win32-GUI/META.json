@@ -4,7 +4,7 @@
       "Aldo Calpini <dada@perl.it>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -70,6 +70,6 @@
          "url" : "http://sourceforge.net/p/perl-win32-gui/git/"
       }
    },
-   "version" : "1.13",
+   "version" : "1.14",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

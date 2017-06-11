@@ -4,14 +4,14 @@ use Config;
 eval { require DynaLoader };
 
 1 while unlink "XSLoader.pm";
-open OUT, ">XSLoader.pm" or die $!;
+open OUT, '>', 'XSLoader.pm' or die $!;
 print OUT <<'EOT';
-# Generated from XSLoader.pm.PL (resolved %Config::Config value)
+# Generated from XSLoader_pm.PL (resolved %Config::Config value)
 # This file is unique for every OS
 
 package XSLoader;
 
-$VERSION = "0.22";
+$VERSION = "0.27";
 
 #use strict;
 
@@ -145,7 +145,7 @@ print OUT <<'EOT';
 
     if (-s $bs) { # only read file if it's not empty
 #       print STDERR "BS: $bs ($^O, $dlsrc)\n" if $dl_debug;
-        eval { do $bs; };
+        eval { local @INC = ('.'); do $bs; };
         warn "$bs: $@\n" if $@;
 	goto \&XSLoader::bootstrap_inherit;
     }
@@ -255,7 +255,7 @@ XSLoader - Dynamically load C libraries into Perl code
 
 =head1 VERSION
 
-Version 0.22
+Version 0.24
 
 =head1 SYNOPSIS
 

@@ -38,21 +38,20 @@ use warnings (
       unopened
       ]
 );
+
 no if $^V ge 'v5.18', warnings => 'experimental';
 use if $^V lt 'v5.23', warnings => 'experimental::autoderef', FATAL => 'experimental::autoderef';
 
 use if $^V ge 'v5.10', feature => ':all';
 no  if $^V ge 'v5.16', feature => 'array_base';
 
-# TODO enable, when memory leak will be fixed
-# TODO https://rt.perl.org/Public/Bug/Display.html?id=128313
-use if $^V ge 'v5.22', re => 'strict';
+use if $^V ge 'v5.22', re => 'strict';    # NOTE https://rt.perl.org/Public/Bug/Display.html?id=128313
 
 no multidimensional;
 
 # TODO mro caller
 BEGIN {
-    eval <<"PERL";    ## no critic qw[BuiltinFunctions::ProhibitStringyEval ErrorHandling::RequireCheckingReturnValueOfEval]
+    eval <<"PERL";                        ## no critic qw[BuiltinFunctions::ProhibitStringyEval ErrorHandling::RequireCheckingReturnValueOfEval]
         sub import {
             local \$^W;
 

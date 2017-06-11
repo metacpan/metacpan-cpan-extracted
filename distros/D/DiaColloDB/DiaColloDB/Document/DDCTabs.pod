@@ -136,10 +136,10 @@ The following is an example file in the format accepted by this module:
  %%$DDC:meta.collection=tiny
  %%$DDC:meta.textClass=dummy:test-data
  %%$DDC:meta.title=test document
- %%$DDC:BREAK.s=5
- %%$DDC:BREAK.p=11
- %%$DDC:BREAK.file=17
- %%$DDC:BREAK.textarea=17
+ %%$DDC:BREAK.s[1]=5
+ %%$DDC:BREAK.p[1]=11
+ %%$DDC:BREAK.file[1]=17
+ %%$DDC:BREAK.textarea[1]=17
  %%$DDC:index[0]=Token w
  %%$DDC:index[1]=Pos p
  %%$DDC:index[2]=Lemma l
@@ -149,7 +149,7 @@ The following is an example file in the format accepted by this module:
  test	NN	test
  .	SENT	.
  
- %%$DDC:BREAK.s=5
+ %%$DDC:BREAK.s[2]=5
  This	DT	this
  is	VBZ	be
  only	RB	only
@@ -157,8 +157,8 @@ The following is an example file in the format accepted by this module:
  test	NN	test
  .	SENT	.
  
- %%$DDC:BREAK.s=11
- %%$DDC:BREAK.p=11
+ %%$DDC:BREAK.s[3]=11
+ %%$DDC:BREAK.p[2]=11
  This	DT	this
  is	VBZ	be
  still	RB	still
@@ -180,7 +180,7 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2015-2016 by Bryan Jurish
+Copyright (C) 2015-2017 by Bryan Jurish
 
 This package is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.2 or,

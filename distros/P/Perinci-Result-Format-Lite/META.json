@@ -32,6 +32,7 @@
             "Data::Clean::JSON" : "0.38",
             "HTML::Entities" : "0",
             "JSON::Tiny::Subclassable" : "0",
+            "Number::Format" : "0",
             "Sort::ByExample" : "0"
          },
          "requires" : {
@@ -67,7 +68,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-Result-Format-Lite"
       }
    },
-   "version" : "0.24",
+   "version" : "0.25",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024000"
@@ -554,6 +555,6 @@
       }
    },
    "x_authority" : "cpan:PERLANCAR",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
 }
 

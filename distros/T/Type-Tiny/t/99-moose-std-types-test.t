@@ -8,7 +8,7 @@ Type constraint tests pilfered from the L<Moose> test suite.
 
 =head1 DEPENDENCIES
 
-Test is skipped if Moose 2.0600 is not available.
+Test is skipped if Moose 2.0000 is not available.
 
 =head1 AUTHOR
 
@@ -48,7 +48,7 @@ BEGIN {
 use strict;
 use warnings;
 use Test::Fatal;
-use Test::Requires { 'Moose' => '2.0600' };
+use Test::Requires { 'Moose' => '2.0000' };
 
 use Eval::TypeTiny;
 use IO::File;
@@ -571,6 +571,7 @@ my %tests = (
 		accept => [
 			$REGEX,
 			$REGEX_OBJ,
+			$FAKE_REGEX,
 		],
 		reject => [
 			$ZERO,
@@ -595,7 +596,6 @@ my %tests = (
 			$FH_OBJECT,
 			$OBJECT,
 			$UNDEF,
-			$FAKE_REGEX,
 		],
 	},
 	GlobRef => {

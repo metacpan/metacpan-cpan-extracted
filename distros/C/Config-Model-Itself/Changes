@@ -1,3 +1,17 @@
+2.011 2017-06-10
+
+  New features:
+    * application model: add backend_argument
+
+  Bug fixes:
+    * meta cmd: add -dev option which was removed from
+      the global options of cme
+    * Fix a bug in model plugin write that was revealed
+      by a bug fix in Config::Model 2.104
+    * improve doc of "choice" and "computed_refer_to" parameters
+    * fix "yaml_class" parameter so that it shows up in GUI
+      when backend is set to "yaml"
+
 2.010 2017-05-14
 
   New features:

@@ -3,7 +3,7 @@ use strict;
 use vars qw/$VERSION %released %version %families %upstream
 	    %bug_tracker %deprecated %delta/;
 use version;
-$VERSION = '5.20170420';
+$VERSION = '5.20170531';
 
 sub _undelta {
     my ($delta) = @_;
@@ -320,6 +320,8 @@ sub changes_between {
     5.025010 => '2017-02-20',
     5.025011 => '2017-03-20',
     5.025012 => '2017-04-20',
+    5.026000 => '2017-05-30',
+    5.027000 => '2017-05-31',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -14095,6 +14097,31 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         removed => {
         }
     },
+    5.026000 => {
+        delta_from => 5.025012,
+        changed => {
+            'B::Op_private'         => '5.026000',
+            'Config'                => '5.026',
+            'Module::CoreList'      => '5.20170530',
+            'Module::CoreList::TieHashDelta'=> '5.20170530',
+            'Module::CoreList::Utils'=> '5.20170530',
+        },
+        removed => {
+        }
+    },
+    5.027000 => {
+        delta_from => 5.026,
+        changed => {
+            'B::Op_private'         => '5.027000',
+            'Config'                => '5.027',
+            'Module::CoreList'      => '5.20170531',
+            'Module::CoreList::TieHashDelta'=> '5.20170531',
+            'Module::CoreList::Utils'=> '5.20170531',
+            'feature'               => '1.48',
+        },
+        removed => {
+        }
+    },
 );
 
 sub is_core
@@ -14842,6 +14869,20 @@ sub is_core
     },
     5.025012 => {
         delta_from => 5.025011,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.026000 => {
+        delta_from => 5.025012,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.027000 => {
+        delta_from => 5.026,
         changed => {
         },
         removed => {
@@ -15656,7 +15697,7 @@ sub is_core
     'Test2::Event::Encoding'=> 'http://github.com/Test-More/test-more/issues',
     'Test2::Event::Exception'=> 'http://github.com/Test-More/test-more/issues',
     'Test2::Event::Generic' => 'http://github.com/Test-More/test-more/issues',
-    'Test2::Event::Info'    => 'http://github.com/Test-More/test-more/issues',
+    'Test2::Event::Info'    => undef,
     'Test2::Event::Note'    => 'http://github.com/Test-More/test-more/issues',
     'Test2::Event::Ok'      => 'http://github.com/Test-More/test-more/issues',
     'Test2::Event::Plan'    => 'http://github.com/Test-More/test-more/issues',

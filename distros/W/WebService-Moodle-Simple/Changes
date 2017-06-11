@@ -1,5 +1,7 @@
 Revision history for WebService-Moodle-Simple
 
+{{$NEXT}}
+
 0.05  2016-10-01 22:56:55 UTC
         - reduce dependency on non-core Moodle API methods
 

@@ -1,6 +1,6 @@
 #!./perl
 
-print "1..104\n";
+print "1..109\n";
 
 $x = 'x';
 
@@ -360,7 +360,7 @@ print "not " if $@;
 print "ok $test - listop({$_ => 1} + 1)\n"; $test++;
 print "# $@" if $@;
 
-for(qw< require goto last next redo dump >) {
+for(qw< require goto last next redo CORE::dump >) {
     eval "sub { $_ foo << 2 }";
     print "not " if $@;
     print "ok ", $test++, " - [perl #105924] $_ WORD << ...\n";
@@ -522,3 +522,29 @@ eval q|s##[}#e|;
  eval ('qq{@{[0}*sub{]]}}}=sub{0' . "\c[");
  print "ok $test - 125350\n"; $test++;
 }
+
+{
+ # Used to crash [perl #128171]
+ eval ('/@0{0*->@*/*]');
+ print "ok $test - 128171\n"; $test++;
+}
+
+$foo = "WRONG"; $foo:: = "bar"; $bar = "baz";
+print "not " unless "$foo::$bar" eq "barbaz";
+print qq|ok $test - [perl #128478] "\$foo::\$bar"\n|; $test++;
+@bar = ("baz","bonk");
+print "not " unless "$foo::@bar" eq "barbaz bonk";
+print qq|ok $test - [perl #128478] "\$foo::\@bar"\n|; $test ++;
+
+# Test that compilation of tentative indirect method call syntax which
+# turns out not to be such does not upgrade constants to full globs in the
+# symbol table.
+sub fop() { 0 }
+sub bas() { 0 }
+{ local $SIG{__WARN__}=sub{}; eval 'fop bas'; }
+print "not " unless ref $::{fop} eq 'SCALAR';
+print "ok $test - first constant in 'const1 const2' is not upgraded\n";
+$test++;
+print "not " unless ref $::{bas} eq 'SCALAR';
+print "ok $test - second constant in 'const1 const2' is not upgraded\n";
+$test++;

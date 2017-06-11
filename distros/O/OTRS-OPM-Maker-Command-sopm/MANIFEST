@@ -29,6 +29,12 @@ t/changes_file/01/Test.txt
 t/changes_file/01_changelog.t
 t/changes_file/Changelog.json
 t/changes_file/doc/CHANGES
+t/code_packagesetup/01_code_uninstall.t
+t/code_packagesetup/02_code_uninstall_pre.t
+t/code_packagesetup/03_code_uninstall_pre_3.t
+t/code_packagesetup/Test.json
+t/code_packagesetup/TestPre.json
+t/code_packagesetup/TestPre3.json
 t/column_drop/01_column_drop.t
 t/column_drop/ColumnDrop.json
 t/exclude/01/Test.lyx
@@ -51,6 +57,12 @@ t/otrs4/Packagesetup.json
 t/otrs5/01/Test.txt
 t/otrs5/01_packagesetup.t
 t/otrs5/Packagesetup.json
+t/simple_code/01_code_uninstall.t
+t/simple_code/02_code_uninstall_pre.t
+t/simple_code/03_code_uninstall_pre_3.t
+t/simple_code/Test.json
+t/simple_code/TestPre.json
+t/simple_code/TestPre3.json
 t/unique_add/01_unique_add.t
 t/unique_add/UniqueAdd.json
 t/unique_drop/01_unique_drop.t

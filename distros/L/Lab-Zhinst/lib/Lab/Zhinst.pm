@@ -108,7 +108,7 @@ object.
 =head2 Error Handling
 
 Most ziAPI functions return an error code. This library checks the return
-values from the ziAPI functions and throws exceptions (with croak) on error.
+values from the ziAPI functions and calls L<Carp>'s croak function on error.
 
 =head2 Automatic Memory Allocation
 
@@ -270,14 +270,14 @@ at your option, any later version of Perl 5 you may have available.
 
 
 package Lab::Zhinst;
-$Lab::Zhinst::VERSION = '0.06';
+
 use strict;
 use warnings;
 use Carp;
-
 require Exporter;
 use AutoLoader;
 
+our $VERSION = '0.07';
 our @ISA = qw(Exporter);
 
 our @EXPORT = qw(
@@ -479,10 +479,6 @@ sub AUTOLOAD {
 
 require XSLoader;
 XSLoader::load('Lab::Zhinst', $Lab::Zhinst::VERSION);
-
-# Preloaded methods go here.
-
-# Autoload methods go after =cut, and are processed by the autosplit program.
 
 1;
 __END__

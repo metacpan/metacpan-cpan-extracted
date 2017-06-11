@@ -63,18 +63,6 @@ SYNOPSIS
 
 TODO
 
-      * Save and resume the PAD of the calling function, so that local
-      variables are preserved:
-
-       async sub with_pad
-       {
-          my $x = func();
-      
-          await $F;
-      
-          print "I still have X: $x\n";
-       }
-
       * Suspend and resume over other interesting types of context, such as
       BLOCK and various LOOPs:
 

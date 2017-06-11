@@ -5,7 +5,7 @@ use warnings;
 use base 'My::Builder';
 
 use File::Spec::Functions qw(catdir catfile rel2abs);
-use File::Glob qw(bsd_glob glob);
+use File::Glob qw(bsd_glob);
 use Config;
 
 sub build_binaries {
@@ -206,7 +206,7 @@ sub build_binaries {
 
   # go through really existing libs
   my %seen;
-  my @gl_l = glob("$prefixdir/lib/*");
+  my @gl_l = bsd_glob("$prefixdir/lib/*");
   foreach (@gl_l) {
     print STDERR "Created lib: $_\n" if $self->notes('build_debug_info');
     if ($_ =~ /lib([a-zA-Z0-9\_\-\.]*?)\.(a|dll\.a)$/) { #gcc

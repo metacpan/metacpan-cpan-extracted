@@ -12,7 +12,7 @@ BEGIN {
 
 BEGIN {
 	$Types::Standard::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::VERSION   = '1.000006';
+	$Types::Standard::VERSION   = '1.002001';
 }
 
 use Type::Library -base;
@@ -37,6 +37,12 @@ BEGIN {
 			}
 			return !!0;
 		};
+};
+
+my $HAS_RUXS = eval {
+	require Ref::Util::XS;
+	Ref::Util::XS::->VERSION(0.100);
+	1;
 };
 
 my $add_core_type = sub {
@@ -216,7 +222,7 @@ $meta->$add_core_type({
 	name       => "Int",
 	parent     => $_num,
 	constraint => sub { /\A-?[0-9]+\z/ },
-	inlined    => sub { "defined $_[1] and $_[1] =~ /\\A-?[0-9]+\\z/" },
+	inlined    => sub { "defined($_[1]) and !ref($_[1]) and $_[1] =~ /\\A-?[0-9]+\\z/" },
 });
 
 my $_classn = $meta->add_type({
@@ -276,21 +282,25 @@ $meta->$add_core_type({
 	name       => "CodeRef",
 	parent     => $_ref,
 	constraint => sub { ref $_ eq "CODE" },
-	inlined    => sub { "ref($_[1]) eq 'CODE'" },
+	inlined    => $HAS_RUXS
+		? sub { "Ref::Util::XS::is_plain_coderef($_[1])" }
+		: sub { "ref($_[1]) eq 'CODE'" },
 });
 
-$meta->$add_core_type({
+my $_regexp = $meta->$add_core_type({
 	name       => "RegexpRef",
 	parent     => $_ref,
-	constraint => sub { ref($_) && !!re::is_regexp($_) },
-	inlined    => sub { "ref($_[1]) && !!re::is_regexp($_[1])" },
+	constraint => sub { ref($_) && !!re::is_regexp($_) or blessed($_) && $_->isa('Regexp') },
+	inlined    => sub { my $v = $_[1]; "ref($v) && !!re::is_regexp($v) or Scalar::Util::blessed($v) && $v\->isa('Regexp')" },
 });
 
 $meta->$add_core_type({
 	name       => "GlobRef",
 	parent     => $_ref,
 	constraint => sub { ref $_ eq "GLOB" },
-	inlined    => sub { "ref($_[1]) eq 'GLOB'" },
+	inlined    => $HAS_RUXS
+		? sub { "Ref::Util::XS::is_plain_globref($_[1])" }
+		: sub { "ref($_[1]) eq 'GLOB'" },
 });
 
 $meta->$add_core_type({
@@ -310,7 +320,9 @@ my $_arr = $meta->$add_core_type({
 	name       => "ArrayRef",
 	parent     => $_ref,
 	constraint => sub { ref $_ eq "ARRAY" },
-	inlined    => sub { "ref($_[1]) eq 'ARRAY'" },
+	inlined    => $HAS_RUXS
+		? sub { "Ref::Util::XS::is_plain_arrayref($_[1])" }
+		: sub { "ref($_[1]) eq 'ARRAY'" },
 	constraint_generator => LazyLoad(ArrayRef => 'constraint_generator'),
 	inline_generator     => LazyLoad(ArrayRef => 'inline_generator'),
 	deep_explanation     => LazyLoad(ArrayRef => 'deep_explanation'),
@@ -321,7 +333,9 @@ my $_hash = $meta->$add_core_type({
 	name       => "HashRef",
 	parent     => $_ref,
 	constraint => sub { ref $_ eq "HASH" },
-	inlined    => sub { "ref($_[1]) eq 'HASH'" },
+	inlined    => $HAS_RUXS
+		? sub { "Ref::Util::XS::is_plain_hashref($_[1])" }
+		: sub { "ref($_[1]) eq 'HASH'" },
 	constraint_generator => LazyLoad(HashRef => 'constraint_generator'),
 	inline_generator     => LazyLoad(HashRef => 'inline_generator'),
 	deep_explanation     => LazyLoad(HashRef => 'deep_explanation'),
@@ -361,7 +375,9 @@ my $_obj = $meta->$add_core_type({
 	name       => "Object",
 	parent     => $_ref,
 	constraint => sub { blessed $_ },
-	inlined    => sub { "Scalar::Util::blessed($_[1])" },
+	inlined    => $HAS_RUXS
+		? sub { "Ref::Util::XS::is_blessed_ref($_[1])" }
+		: sub { "Scalar::Util::blessed($_[1])" },
 });
 
 $meta->$add_core_type({
@@ -530,6 +546,20 @@ $meta->$add_core_type({
 });
 
 $meta->add_type({
+	name       => "CycleTuple",
+	parent     => $_arr,
+	name_generator => sub
+	{
+		my ($s, @a) = @_;
+		sprintf('%s[%s]', $s, join q[,], @a);
+	},
+	constraint_generator => LazyLoad(CycleTuple => 'constraint_generator'),
+	inline_generator     => LazyLoad(CycleTuple => 'inline_generator'),
+	deep_explanation     => LazyLoad(CycleTuple => 'deep_explanation'),
+	coercion_generator   => LazyLoad(CycleTuple => 'coercion_generator'),
+});
+
+$meta->add_type({
 	name       => "Dict",
 	parent     => $_hash,
 	name_generator => sub
@@ -657,6 +687,28 @@ $meta->add_type({
 });
 
 our %_StrMatch;
+my $has_regexp_util;
+my $serialize_regexp = sub {
+	$has_regexp_util = eval {
+		require Regexp::Util;
+		Regexp::Util->VERSION('0.003');
+		1;
+	} || 0 unless defined $has_regexp_util;
+	
+	my $re = shift;
+	my $serialized;
+	if ($has_regexp_util) {
+		$serialized = eval { Regexp::Util::serialize_regexp($re) };
+	}
+	
+	if (!$serialized) {
+		my $key = sprintf('%s|%s', ref($re), $re);
+		$_StrMatch{$key} = $re;
+		$serialized = sprintf('$Types::Standard::_StrMatch{%s}', B::perlstring($key));
+	}
+	
+	return $serialized;
+};
 $meta->add_type({
 	name       => "StrMatch",
 	parent     => $_str,
@@ -666,7 +718,7 @@ $meta->add_type({
 		
 		my ($regexp, $checker) = @_;
 		
-		ref($regexp) eq 'Regexp'
+		$_regexp->check($regexp)
 			or _croak("First parameter to StrMatch[`a] expected to be a Regexp; got $regexp");
 		
 		if (@_ > 1)
@@ -693,30 +745,39 @@ $meta->add_type({
 	{
 		require B;
 		my ($regexp, $checker) = @_;
-		my $regexp_string = "$regexp";
-		$_StrMatch{$regexp_string} = $regexp;
 		if ($checker)
 		{
 			return unless $checker->can_be_inlined;
+			
+			my $serialized_re = $regexp->$serialize_regexp;
 			return sub
 			{
 				my $v = $_[1];
 				sprintf
-					"!ref($v) and do { my \$m = [$v =~ \$Types::Standard::_StrMatch{%s}]; %s }",
-					B::perlstring($regexp_string),
+					"!ref($v) and do { my \$m = [$v =~ %s]; %s }",
+					$serialized_re,
 					$checker->inline_check('$m'),
 				;
 			};
 		}
 		else
 		{
+			my $regexp_string = "$regexp";
+			if ($regexp_string =~ /\A\(\?\^u?:(\.+)\)\z/) {
+				my $length = length $1;
+				return sub { "!ref($_) and length($_)>=$length" };
+			}
+			
+			if ($regexp_string =~ /\A\(\?\^u?:\\A(\.+)\\z\)\z/) {
+				my $length = length $1;
+				return sub { "!ref($_) and length($_)==$length" };
+			}
+			
+			my $serialized_re = $regexp->$serialize_regexp;
 			return sub
 			{
 				my $v = $_[1];
-				sprintf
-					"!ref($v) and $v =~ \$Types::Standard::_StrMatch{%s}",
-					B::perlstring($regexp_string),
-				;
+				"!ref($v) and $v =~ $serialized_re";
 			};
 		}
 	},
@@ -1061,7 +1122,8 @@ Other customers also bought: C<< CodeLike >> from L<Types::TypeTiny>.
 
 =item C<< RegexpRef >>
 
-A value where C<< ref($value) eq "Regexp" >>.
+A reference where C<< re::is_regexp($value) >> is true, or
+a blessed reference where C<< $value->isa("Regexp") >> is true.
 
 =item C<< GlobRef >>
 
@@ -1093,14 +1155,14 @@ C<Str>.
 
 =item C<< Tuple[...] >>
 
-Subtype of C<ArrayRef>, accepting an list of type constraints for
+Subtype of C<ArrayRef>, accepting a list of type constraints for
 each slot in the array.
 
 C<< Tuple[Int, HashRef] >> would match C<< [1, {}] >> but not C<< [{}, 1] >>.
 
 =item C<< Dict[...] >>
 
-Subtype of C<HashRef>, accepting an list of type constraints for
+Subtype of C<HashRef>, accepting a list of type constraints for
 each slot in the hash.
 
 For example C<< Dict[name => Str, id => Int] >> allows
@@ -1151,7 +1213,13 @@ hashref and validated:
 
 In either C<Tuple> or C<Dict>, C<< slurpy Any >> can be used to indicate
 that additional values are acceptable, but should not be constrained in
-any way. (C<< slurpy Any >> is an optimized code path.)
+any way. 
+
+C<< slurpy Any >> is an optimized code path. Although the following are
+essentially equivalent checks, the former should run a lot faster:
+
+   Tuple[Int, slurpy Any]
+   Tuple[Int, slurpy ArrayRef]
 
 =begin trustme
 
@@ -1263,6 +1331,10 @@ You can optionally provide a type constraint for the array of subexpressions:
          ],
       ];
 
+On certain versions of Perl, type constraints of the forms
+C<< StrMatch[qr/../ >> and C<< StrMatch[qr/\A..\z/ >> with any number
+of intervening dots can be optimized to simple length checks.
+
 =item C<< Enum[`a] >>
 
 As per MooX::Types::MooseLike::Base:
@@ -1291,6 +1363,39 @@ C<Num> is being strict.
 Most people should probably use C<Num> or C<StrictNum>. Don't explicitly
 use C<LaxNum> unless you specifically need an attribute which will accept
 things like "Inf".
+
+=item C<< CycleTuple[`a] >>
+
+Similar to Tuple, but cyclical.
+
+   CycleTuple[Int, HashRef]
+
+will allow C<< [1,{}] >> and C<< [1,{},2,{}] >> but disallow
+C<< [1,{},2] >> and C<< [1,{},2,[]] >>.
+
+I think you understand CycleTuples already.
+
+Currently C<Optional> and C<slurpy> parameters are forbidden. There are
+fairly limited use cases for them, and it's not exactly clear what they
+should mean.
+
+The following is an efficient way of checking for an even-sized arrayref:
+
+   CycleTuple[Any, Any]
+
+The following is an arrayref which would be suitable for coercing to a
+hashref:
+
+   CycleTuple[Str, Any]
+
+All the examples so far have used two parameters, but the following is
+also a possible CycleTuple:
+
+   CycleTuple[Str, Int, HashRef]
+
+This will be an arrayref where the 0th, 3rd, 6th, etc values are
+strings, the 1st, 4th, 7th, etc values are integers, and the 2nd,
+5th, 8th, etc values are hashrefs.
 
 =back
 

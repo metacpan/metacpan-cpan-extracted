@@ -318,8 +318,8 @@ Values of the returned hash are usually simple scalars, but a scalar
 reference is used to indicate binary data and an array reference may be used
 to indicate a list.  Also, a hash reference may be returned if the L</Struct>
 option is used.  Lists of values are joined by commas into a single
-string only if the PrintConv option is enabled and the List option is
-disabled (which are the defaults).  Note that binary values are not
+string only if the PrintConv option is enabled and the ListJoin option is
+enabled (which are the defaults).  Note that binary values are not
 necessarily extracted unless specifically requested, or the Binary option is
 enabled and the tag is not specifically excluded.  If not extracted the
 value is a reference to a string of the form "Binary data ##### bytes".
@@ -718,12 +718,6 @@ set to undef to select the built-in default language.  Default is 'en'.
 Flag to indicate that 64-bit file offsets are supported on this system.
 Default is undef.
 
-=item List
-
-Flag to extract lists of PrintConv values into arrays instead of joining
-them into a string of values.  The L</ListSep> option specifies the
-separator used when combining values.  Default is undef.
-
 =item ListItem
 
 Return only a specific item from list-type values.  A value of 0 returns the
@@ -732,16 +726,17 @@ also be used, with -1 representing the last item in the list.  Applies only
 to the top-level list of nested lists.  Default is undef to return all items
 in the list.
 
-=item ListSep
+=item ListJoin
 
-Separator string used to join lists of PrintConv values when L</List> option
-is not set.  Default is ', '.
+Separator used to join the PrintConv value of multi-item List-type tags into
+a single string.  If not defined, multi-item lists are returned as a list
+reference.  Does not affect ValueConv values.  Default is ', '.
 
 =item ListSplit
 
 Regular expression used to split values of list-type tags into individual
-items when writing.  (eg. use ',\\s*' to split a comma-separated list.) 
-Default is undef.
+items when writing.  (eg. use ',\\s*' to split a comma-separated list.)
+Split when writing either PrintConv or ValueConv values.  Default is undef.
 
 =item MakerNotes
 
@@ -1033,8 +1028,8 @@ Inputs are the same as L</ExtractInfo> and L</ImageInfo> except that an
 image can not be specified.  Options in effect are:
 
 Charset, CoordFormat, DateFormat, Duplicates, Escape, Exclude, Filter,
-Group#, GlobalTimeShift, Lang, List, ListItem, ListSep, PrintConv, Sort (if
-a tag list reference is given) and StrictDate.
+Group#, GlobalTimeShift, Lang, ListItem, ListJoin, PrintConv, Sort (if a tag
+list reference is given) and StrictDate.
 
 =item Return Value:
 
@@ -1045,9 +1040,9 @@ Reference to information hash, the same as with L</ImageInfo>.
 The following options are effective in the call to L</GetInfo>:
 
 Charset, CoordFormat, DateFormat, Duplicates, Escape, Exclude, Filter,
-Group#, GlobalTimeShift, Lang, List, ListItem, ListSep, PrintConv,
-QuickTimeUTC (conversion to local time), Sort (if a tag list reference is
-given) and StrictDate.
+Group#, GlobalTimeShift, Lang, ListItem, ListJoin, PrintConv, QuickTimeUTC
+(conversion to local time), Sort (if a tag list reference is given) and
+StrictDate.
 
 =head2 WriteInfo
 
@@ -1224,9 +1219,9 @@ unless the PrintConv option is disabled.
 Tags which represent lists of multiple values (as may happen with 'Keywords'
 for example) are handled specially.  In scalar context, the returned
 PrintConv value for these tags is either a string of values or a list
-reference (depending on the List option setting), and the ValueConv value is
-always a list reference.  But in list context, L</GetValue> always returns
-the list itself.
+reference (depending on the ListJoin option setting), and the ValueConv
+value is always a list reference.  But in list context, L</GetValue> always
+returns the list itself.
 
 Note that L</GetValue> requires a case-sensitive tag key as an argument.  To
 retrieve tag information based on a case-insensitive tag name (with an
@@ -1255,8 +1250,8 @@ optional group specifier), use L</GetInfo> instead.
 The following options are in effect when L</GetValue> is called:
 
 Charset, CoordFormat, DateFormat, Escape, Filter, GlobalTimeShift, Lang,
-List, ListItem, ListSep, PrintConv, QuickTimeUTC (conversion to local time),
-and StrictDate.
+ListItem, ListJoin, PrintConv, QuickTimeUTC (conversion to local time), and
+StrictDate.
 
 =over 4
 
@@ -1278,9 +1273,9 @@ types.
 =item Return Values:
 
 The value of the specified tag.  If the tag represents a list of multiple
-values and the List option is disabled then PrintConv returns a string of
-values, otherwise a reference to the list is returned in scalar context. 
-The list itself is returned in list context.  (Unless 'Both' values are
+values and the ListJoin option is enabled then PrintConv returns a string of
+values, otherwise a reference to the list is returned in scalar context. The
+list itself is returned in list context.  (Unless 'Both' values are
 requested, in which case two list references are returned, regardless of
 context.)  Values may also be scalar references to binary data, or hash
 references if the L</Struct> option is set.
@@ -1510,7 +1505,7 @@ explicitly, either by group (with 'Adobe:*') or as a block (with 'Adobe').
 
 The following ExifTool options are effective in the call to L</SetNewValue>:
 
-Charset, DateFormat, Escape, IgnoreMinorErrors, Lang, ListSep, ListSplit,
+Charset, DateFormat, Escape, IgnoreMinorErrors, Lang, ListJoin, ListSplit,
 PrintConv, QuickTimeUTC, StrictDate, Verbose and WriteMode.
 
 =head2 GetNewValue
@@ -1556,10 +1551,10 @@ in a specified file.
     $exifTool->SetNewValuesFromFile($srcFile, @tags);
 
     # set new value from a different tag in specific group
-    $exifTool->SetNewValuesFromFile($fp, 'IPTC:Keywords>XMP-dc:Subject');
+    $exifTool->SetNewValuesFromFile($fp, 'XMP-dc:Subject<IPTC:Keywords');
 
     # add all IPTC keywords to XMP subject list
-    $exifTool->SetNewValuesFromFile($fp, 'IPTC:Keywords+>XMP-dc:Subject');
+    $exifTool->SetNewValuesFromFile($fp, 'XMP-dc:Subject+<IPTC:Keywords');
 
     # set new value from an expression involving other tags
     $exifTool->SetNewValuesFromFile($file,
@@ -1570,8 +1565,8 @@ in a specified file.
         'keywords<xmp:subject', 'keywords<filename');
 
     # copy all EXIF information, preserving the original IFD
-    # (without '>*.*' tags would be copied to the preferred EXIF IFD)
-    $exifTool->SetNewValuesFromFile($file, 'EXIF:*>*:*');
+    # (without '*.*<' tags would be copied to the preferred EXIF IFD)
+    $exifTool->SetNewValuesFromFile($file, '*:*<EXIF:*');
 
     # copy all tags with names starting with "gps" (note: this is
     # different than "gps:*" because it will also copy XMP GPS tags)
@@ -1591,30 +1586,32 @@ in a specified file.
 
 2-N) [optional] List of tag names to set or options hash references.  All
 writable tags are set if none are specified.  The tag names are not case
-sensitive, and may be prefixed by one or more family 0, 1 or 2 group names with
-optional leading family numbers, separated by colons (eg. 'exif:iso').  A
-leading '-' indicates tags to be excluded (eg. '-comment'), or a trailing '#'
-causes the ValueConv value to be copied (same as setting the Type option to
-'ValueConv' for this tag only).  Wildcards ('*' and '?') may be used in the tag
-name.  A tag name of '*' is commonly used when a group is specified to copy all
-tags in the group (eg. 'XMP:*').  A special feature allows tag names of the form
-'DSTTAGE<lt>SRCTAG' (or 'SRCTAGE<gt>DSTTAG') to be specified to copy information
-to a tag with a different name or a specified group.  Both 'SRCTAG' and 'DSTTAG'
-may contain wildcards and/or be prefixed by a group name (eg.
-'fileModifyDateE<lt>modifyDate' or 'xmp:*E<lt>*'), and/or suffixed by a '#' to
-disable print conversion.  Copied tags may also be added or deleted from a list
-with arguments of the form 'DSTTAG+E<lt>SRCTAG' or 'DSTTAG-E<lt>SRCTAG'.  Tags
-are evaluated in order, so exclusions apply only to tags included earlier in the
-list.  An extension of this feature allows the tag value to be set from an
-expression containing tag names with leading '$' symbols (eg. 'CommentE<lt>the
-file is $filename').  Braces '{}' may be used around the tag name to separate it
-from subsequent text, and a '$$' is used to to represent a '$' symbol.  The
-behaviour for missing tags in expressions is defined by the L</MissingTagValue>
-option.  The tag value may be modified via changes to the default input variable
-($_) in Perl expressions placed inside the braces and after a semicolon
-following the tag name.  Braces within the expression must be balanced. 
-Multiple options hash references may be passed to set different options for
-different tags.  Options apply to subsequent tags in the argument list.
+sensitive, and may be prefixed by one or more family 0, 1 or 2 group names
+with optional leading family numbers, separated by colons (eg. 'exif:iso'). 
+A leading '-' indicates tags to be excluded (eg. '-comment'), or a trailing
+'#' causes the ValueConv value to be copied (same as setting the Type option
+to 'ValueConv' for this tag only).  Wildcards ('*' and '?') may be used in
+the tag name.  A tag name of '*' is commonly used when a group is specified
+to copy all tags in the group (eg. 'XMP:*').  A special feature allows tag
+names of the form 'DSTTAGE<lt>SRCTAG' (or 'SRCTAGE<gt>DSTTAG') to be
+specified to copy information to a tag with a different name or a specified
+group.  Both 'SRCTAG' and 'DSTTAG' may contain wildcards and/or be prefixed
+by a group name (eg. 'fileModifyDateE<lt>modifyDate' or 'xmp:*E<lt>*'),
+and/or suffixed by a '#' to disable print conversion.  Copied tags may also
+be added or deleted from a list with arguments of the form
+'DSTTAG+E<lt>SRCTAG' or 'DSTTAG-E<lt>SRCTAG'.  Tags are evaluated in order,
+so exclusions apply only to tags included earlier in the list.  An extension
+of this feature allows the tag value to be set from a string containing tag
+names with leading '$' symbols (eg. 'CommentE<lt>the file is $filename'). 
+Braces '{}' may be used around the tag name to separate it from subsequent
+text, and a '$$' is used to to represent a '$' symbol.  The behaviour for
+missing tags in expressions is defined by the L</MissingTagValue> option. 
+The tag value may be modified via changes to the default input variable ($_)
+in a Perl expression placed inside the braces and after a semicolon
+following the tag name (see the last example above).  Braces within the
+expression must be balanced.  Multiple options hash references may be passed
+to set different options for different tags.  Options apply to subsequent
+tags in the argument list.
 
 By default, this routine will commute information between same-named tags in
 different groups, allowing information to be translated between images with
@@ -1622,10 +1619,10 @@ different formats.  This behaviour may be modified by specifying a group
 name for extracted tags (even if '*' is used as a group name), in which case
 the information is written to the original group, unless redirected to a
 different group.  When '*' is used for a group name, by default the family 1
-group of the original tag is preserved, but a different family may be specified
-with a leading family number.  (For example, specifying '*:*' copies all
-information while preserving the original family 1 groups, while '0*:*'
-preserves the family 0 group.)
+group of the original tag is preserved, but a different family may be
+specified with a leading family number.  (For example, specifying '*:*'
+copies all information while preserving the original family 1 groups, while
+'0*:*' preserves the family 0 group.)
 
 =item SetNewValuesFromFile Options:
 

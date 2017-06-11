@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Error::TypeTiny::Assertion::AUTHORITY = 'cpan:TOBYINK';
-	$Error::TypeTiny::Assertion::VERSION   = '1.000006';
+	$Error::TypeTiny::Assertion::VERSION   = '1.002001';
 }
 
 require Error::TypeTiny;
@@ -76,7 +76,7 @@ sub _build_message
 	$msg .= sprintf(" at %s line %s", $c->{file}||'file?', $c->{line}||'NaN') if $c;
 	
 	my $explain = $e->explain;
-	return $msg unless @{ $explain || [] };
+	return "$msg\n" unless @{ $explain || [] };
 	
 	$msg .= "\n";
 	for my $line (@$explain) {

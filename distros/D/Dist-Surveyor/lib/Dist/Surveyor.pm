@@ -1,12 +1,8 @@
 package Dist::Surveyor;
-$Dist::Surveyor::VERSION = '0.016';
+
 =head1 NAME
 
 Dist::Surveyor - Survey installed modules and determine the specific distribution versions they came from
-
-=head1 VERSION
-
-version 0.016
 
 =head1 SYNOPSIS
 
@@ -41,6 +37,8 @@ use List::Util qw(max sum); # core
 use Dist::Surveyor::Inquiry; # internal
 use Module::CoreList;
 use Module::Metadata;
+
+our $VERSION = '0.019';
 
 use constant ON_WIN32 => $^O eq 'MSWin32';
 use constant ON_VMS   => $^O eq 'VMS';
@@ -84,7 +82,7 @@ A hash-ref, with a list of irregular named releases. i.e. 'libwww-perl' => 'LWP'
 $search_dirs is an array-ref containing the list of directories to survey.
 
 Returns a list, where each element is a hashref representing one installed distibution.
-This hashref is what MetaCPAN returns for http://api.metacpan.org/v0/release/$author/$release,
+This hashref is what MetaCPAN returns for C<https://fastapi.metacpan.org/v1/release/$author/$release>,
 with two additional keys: 
 
 =over

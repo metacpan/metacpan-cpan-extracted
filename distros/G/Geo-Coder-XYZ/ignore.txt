@@ -15,3 +15,4 @@ Geo-Coder-XYZ-*
 .appveyor.yml
 .travis.yml
 t/online.enabled
+*.BAK

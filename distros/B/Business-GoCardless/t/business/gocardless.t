@@ -40,7 +40,11 @@ can_ok(
     /,
 );
 
-cmp_deeply( $GoCardless->client_details,{},'client_details' );
+cmp_deeply(
+    $GoCardless->client_details,
+    { api_version => 1 },
+    'client_details'
+);
 isa_ok( $GoCardless->client,'Business::GoCardless::Client' );
 
 # monkey patching LWP here to make this test work without

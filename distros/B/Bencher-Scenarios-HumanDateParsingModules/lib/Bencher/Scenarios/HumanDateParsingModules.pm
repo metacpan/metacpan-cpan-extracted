@@ -1,7 +1,7 @@
 package Bencher::Scenarios::HumanDateParsingModules;
 
-our $DATE = '2017-01-25'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2017-06-09'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 1;
 # ABSTRACT: Benchmark human date parsing modules e.g. DF:Natural, DF:Alami, etc.
@@ -18,7 +18,7 @@ Bencher::Scenarios::HumanDateParsingModules - Benchmark human date parsing modul
 
 =head1 VERSION
 
-This document describes version 0.006 of Bencher::Scenarios::HumanDateParsingModules (from Perl distribution Bencher-Scenarios-HumanDateParsingModules), released on 2017-01-25.
+This document describes version 0.007 of Bencher::Scenarios::HumanDateParsingModules (from Perl distribution Bencher-Scenarios-HumanDateParsingModules), released on 2017-06-09.
 
 =head1 DESCRIPTION
 
@@ -54,7 +54,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

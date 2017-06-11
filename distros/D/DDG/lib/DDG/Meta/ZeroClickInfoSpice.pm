@@ -1,7 +1,7 @@
 package DDG::Meta::ZeroClickInfoSpice;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Functions for generating a L<DDG::ZeroClickInfo::Spice> factory
-$DDG::Meta::ZeroClickInfoSpice::VERSION = '1016';
+$DDG::Meta::ZeroClickInfoSpice::VERSION = '1017';
 use strict;
 use warnings;
 use Carp;
@@ -261,7 +261,7 @@ DDG::Meta::ZeroClickInfoSpice - Functions for generating a L<DDG::ZeroClickInfo:
 
 =head1 VERSION
 
-version 1016
+version 1017
 
 =head1 AUTHOR
 

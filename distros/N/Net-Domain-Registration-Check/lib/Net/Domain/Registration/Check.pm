@@ -19,11 +19,11 @@ Net::Domain::Registration::Check - Fast check on availability of domain registra
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 
 =head1 SYNOPSIS
@@ -37,6 +37,8 @@ So it gets a quick check response.
 For domain which is redemptionPeriod status, it does not get listed on parent nameservers, but you can't register it from the registrar this time. See: https://icann.org/epp#redemptionPeriod
 
 It makes no sense on second-level ccTLDs, such as com.cn, co.uk etc. For IANA official root zone DB please see: https://www.iana.org/domains/root/db
+
+I have made a webpage for bulk searching domains based on this module: http://fenghe.org/names/
 
 该模块用来快速检查域名是否可以被注册。
 
@@ -56,13 +58,7 @@ Usage:
 
 Run via command line:
 
-    $ perl -MNet::Domain::Registration::Check -le 'print domain_on_parent(+shift)' yahoo.com
-    1
-
     $ perl -MNet::Domain::Registration::Check -le 'print domain_on_parent(+shift)' yahoo.io
-    1
-
-    $ perl -MNet::Domain::Registration::Check -le 'print domain_on_parent(+shift)' yahoo.email
     1
 
     $ perl -MNet::Domain::Registration::Check -le 'print domain_on_parent(+shift)' yahoo234.com
@@ -101,24 +97,24 @@ So using this tool for reference only, maybe as a fast filter before whois.
 
 sub domain_on_parent {
 
-	my $domain = shift || croak "no domain provided";
-	my $tld;
+    my $domain = shift || croak "no domain provided";
+    my $tld;
 
-	if ($domain =~ /^(.*?)\.(.*)$/) {
+    if ($domain =~ /^(.*?)\.(.*)$/) {
         $tld = $2;
-	}
+    }
     
-	croak "domain TLD not exists" unless tld_exists($tld);
+    croak "domain TLD not exists" unless tld_exists($tld);
 
-	my $res = Net::DNS::Resolver->new;
+    my $res = Net::DNS::Resolver->new;
     my $answer = $res->query($tld, 'NS');
-	my @nameservers;
+    my @nameservers;
 
     if (defined $answer) {
         my @rr= $answer->answer;
         for (@rr) {
             my $ns = $_->rdatastr;
-			push @nameservers, $ns;
+            push @nameservers, $ns;
         }
     }
 
@@ -137,11 +133,11 @@ sub domain_on_parent {
 
 =head1 AUTHOR
 
-Peng Yonghua <pyh@vodafonemail.de>
+Peng Yonghua <pyh@cpan.org>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to <pyh@vodafonemail.de>, I will respond it quickly.
+Please report any bugs or feature requests to <pyh@cpan.org>, I will respond it quickly.
 
 
 

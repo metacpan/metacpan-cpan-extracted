@@ -70,7 +70,7 @@ BEGIN {
 }
 use constant PLATFORM => $ARGS{PLATFORM};
 
-require "$ARGS{TARG_DIR}regen/embed_lib.pl";
+require "./$ARGS{TARG_DIR}regen/embed_lib.pl";
 
 # Is the following guard strictly necessary? Added during refactoring
 # to keep the same behaviour when merging other code into here.
@@ -206,6 +206,7 @@ if ($ARGS{PLATFORM} ne 'os2') {
         ++$skip{Perl_my_symlink} unless $Config{d_symlink};
     } else {
 	++$skip{PL_statusvalue_vms};
+	++$skip{PL_perllib_sep};
 	if ($ARGS{PLATFORM} ne 'aix') {
 	    ++$skip{$_} foreach qw(
 				PL_DBcv
@@ -398,6 +399,14 @@ unless ($define{'USE_ITHREADS'}) {
 			 );
 }
 
+unless (   $define{'USE_ITHREADS'}
+        && $define{'HAS_NEWLOCALE'})
+{
+    ++$skip{$_} foreach qw(
+        PL_C_locale_obj
+    );
+}
+
 unless ($define{'PERL_IMPLICIT_CONTEXT'}) {
     ++$skip{$_} foreach qw(
 		    PL_my_cxt_index
@@ -435,21 +444,6 @@ unless ($define{'USE_DTRACE'}) {
                     Perl_dtrace_probe_op
                     Perl_dtrace_probe_phase
                 );
-}
-
-if ($define{'NO_MATHOMS'}) {
-    # win32 builds happen in the win32/ subdirectory, but vms builds happen
-    # at the top level, so we need to look in two candidate locations for
-    # the mathoms.c file.
-    my ($file) = grep { -f } qw( mathoms.c ../mathoms.c )
-        or die "No mathoms.c file found in . or ..\n";
-    open my $mathoms, '<', $file
-        or die "Cannot open $file: $!\n";
-    while (<$mathoms>) {
-        ++$skip{$1} if /\A ( NATIVE_TO_NEED
-                           | ASCII_TO_NEED
-                           | Perl_\w+ ) \s* \( /axms;
-    }
 }
 
 unless ($define{'PERL_NEED_APPCTX'}) {
@@ -692,7 +686,9 @@ unless ($define{'USE_QUADMATH'}) {
     foreach (@$embed) {
 	my ($flags, $retval, $func, @args) = @$_;
 	next unless $func;
-	if ($flags =~ /[AX]/ && $flags !~ /[xmi]/ || $flags =~ /b/) {
+	if (   ($flags =~ /[AX]/ && $flags !~ /[xmi]/)
+            || ($flags =~ /b/ && ! $define{'NO_MATHOMS'}))
+        {
 	    # public API, so export
 
 	    # If a function is defined twice, for example before and after
@@ -701,7 +697,7 @@ unless ($define{'USE_QUADMATH'}) {
 	    # mean "don't export"
 	    next if $seen{$func}++;
 	    # Should we also skip adding the Perl_ prefix if $flags =~ /o/ ?
-	    $func = "Perl_$func" if ($flags =~ /[pbX]/ && $func !~ /^Perl_/); 
+	    $func = "Perl_$func" if ($flags =~ /[pX]/ && $func !~ /^Perl_/);
 	    ++$export{$func} unless exists $skip{$func};
 	}
     }
@@ -1231,7 +1227,7 @@ if ($ARGS{PLATFORM} =~ /^win(?:32|ce)$/) {
 
 if ($ARGS{PLATFORM} eq 'os2') {
     my (%mapped, @missing);
-    open MAP, 'miniperl.map' or die 'Cannot read miniperl.map';
+    open MAP, '<', 'miniperl.map' or die 'Cannot read miniperl.map';
     /^\s*[\da-f:]+\s+(\w+)/i and $mapped{$1}++ foreach <MAP>;
     close MAP or die 'Cannot close miniperl.map';
 

@@ -1,9 +1,18 @@
+Changes
 lib/Mojolicious/Plugin/Human.pm
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
 README.md
 t/001_use_ok.t
 t/005_compile.t
-t/010_human.t
+t/010_date_time.t
+t/020_money.t
+t/030_phones.t
+t/040_suffix.t
+t/040_suffix_ru.t
+t/050_distance.t
+t/060_interval.t
+t/070_cut.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

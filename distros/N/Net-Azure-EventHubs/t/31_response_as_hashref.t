@@ -16,7 +16,7 @@ subtest 'html response' => sub {
 };
 
 subtest 'json response' => sub {
-    my $uri = URI->new('http://api.metacpan.org/v0/release/_search');
+    my $uri = URI->new('http://fastapi.metacpan.org/v1/release/_search');
     $uri->query_form(q => 'name:Net-Azure-EventHubs-0.02', fields => 'download_url,name'); 
     my $req = Net::Azure::EventHubs::Request->new(GET => $uri);
     $req->agent(LWP::UserAgent->new);

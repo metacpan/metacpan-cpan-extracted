@@ -1,0 +1,31 @@
+0.005   2017-06-03 (PERLANCAR)
+
+	- get_price_history(): add argument 'period' to allow getting all
+	  as well as daily data (using API chart_1d).
+
+
+0.004   2017-06-01 (PERLANCAR)
+
+	- Add method: get_price_history.
+
+
+0.003   2017-05-31 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention App::btcindo.
+
+
+0.002   2017-05-31 (PERLANCAR)
+
+	- Avoid perl undef warning.
+
+	- Fix API method name TransHistory -> transHistory (wrong
+	  bitcoin.co.id documentation).
+
+	- Handle (die) when API return non-success.
+
+
+0.001   2017-05-31 (PERLANCAR)
+
+        - First release.

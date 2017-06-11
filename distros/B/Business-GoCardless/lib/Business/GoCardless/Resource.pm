@@ -69,10 +69,12 @@ Calls the gocardless API and populates the resource object with the data.
 =cut
 
 sub find_with_client {
-    my ( $self ) = @_;
+    my ( $self,$sub_key ) = @_;
 
     my $path = sprintf( $self->endpoint,$self->id );
     my $data = $self->client->api_get( $path );
+
+    $data = $data->{$sub_key} if $sub_key;
 
     foreach my $attr ( keys( %{ $data } ) ) {
         $self->$attr( $data->{$attr} );
@@ -82,7 +84,7 @@ sub find_with_client {
 }
 
 sub _operation {
-    my ( $self,$operation,$method,$params ) = @_;
+    my ( $self,$operation,$method,$params,$suffix ) = @_;
 
     $method //= 'api_post',
 
@@ -90,7 +92,17 @@ sub _operation {
         ? sprintf( $self->endpoint,$self->id ) . "/$operation"
         : sprintf( $self->endpoint,$self->id );
 
+    $uri .= "/$suffix" if $suffix;
+
     my $data = $self->client->$method( $uri,$params );
+
+    if ( $self->client->api_version > 1 ) {
+
+        $data = $data->{payments}
+            if ref( $self ) eq 'Business::GoCardless::Payment';
+        $data = $data->{subscriptions}
+            if ref( $self ) eq 'Business::GoCardless::Subscription';
+    }
 
     foreach my $attr ( keys( %{ $data } ) ) {
         $self->$attr( $data->{$attr} );

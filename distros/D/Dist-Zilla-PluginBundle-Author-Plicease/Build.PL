@@ -26,7 +26,7 @@ my %module_build_args = (
     "Graham Ollis <plicease\@cpan.org>"
   ],
   "dist_name" => "Dist-Zilla-PluginBundle-Author-Plicease",
-  "dist_version" => "2.12",
+  "dist_version" => "2.14",
   "license" => "perl",
   "module_name" => "Dist::Zilla::PluginBundle::Author::Plicease",
   "recommends" => {
@@ -37,7 +37,7 @@ my %module_build_args = (
     "Dist::Zilla" => "6.00",
     "Dist::Zilla::App::Command::aliendeps" => "0.01",
     "Dist::Zilla::Plugin::Alien" => "0.023",
-    "Dist::Zilla::Plugin::Author::Plicease" => "2.12",
+    "Dist::Zilla::Plugin::Author::Plicease" => "2.14",
     "Dist::Zilla::Plugin::AutoMetaResources" => "1.20",
     "Dist::Zilla::Plugin::CopyFilesFromBuild" => "0.150250",
     "Dist::Zilla::Plugin::InsertExample" => "0.04",

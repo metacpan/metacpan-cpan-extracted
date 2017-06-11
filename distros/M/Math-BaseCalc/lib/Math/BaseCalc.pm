@@ -1,9 +1,9 @@
-package Math::BaseCalc;
-
 use strict;
+package Math::BaseCalc;
+{
+  $Math::BaseCalc::VERSION = '1.019';
+}
 use Carp;
-use vars qw($VERSION);
-$VERSION = '1.014';
 
 sub new {
   my ($pack, %opts) = @_;
@@ -27,7 +27,13 @@ sub digits {
       croak "Unrecognized digit set '$name'" unless exists $digitsets{$name};
       $self->{digits} = $digitsets{$name};
     }
-    $self->{has_dash} = grep { $_ eq '-' } @{$self->{digits}};
+    foreach my $digit (@{$self->{digits}}) {
+      if ($digit eq '-') {
+        $self->{has_dash} = 1;
+      } elsif ($digit eq '.') {
+        $self->{has_dot} = 1;
+      }
+    }
 
     $self->{trans} = {};
     # Build the translation table back to numbers
@@ -57,7 +63,7 @@ sub from_base {
 
   # Deal with stuff after the decimal point
   my $add_in = 0;
-  if ($str =~ s/\.(.+)//) {
+  if (!$self->{has_dot} && $str =~ s/\.(.+)//) {
     $add_in = $self->from_base(reverse $1)/$dignum**length($1);
   }
 
@@ -102,7 +108,7 @@ Math::BaseCalc - Convert numbers between various bases
 
 =head1 VERSION
 
-version 1.017
+version 1.019
 
 =head1 SYNOPSIS
 
@@ -200,15 +206,9 @@ currently undefined.
 
 =back
 
-=head1 QUESTIONS
-
-The '64' digit set is meant to be useful for Base64 encoding.  I took
-it from the MIME::Base64.pm module.  Does it look right?  It's sure in
-a strange order.
-
 =head1 AUTHOR
 
-Ken Williams, ken@forum.swarthmore.edu
+Ken Williams, kwilliams@cpan.org
 
 =head1 COPYRIGHT
 

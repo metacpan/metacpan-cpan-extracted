@@ -81,8 +81,10 @@ SKIP: {
     {
 	my $warning;
 	local $SIG{__WARN__} = sub {$warning = "@_"};
-	is (create_json_strict ($thing), undef, "got undefined value with strict");
-	like ($warning, qr/non-finite number/i, "got warning with strict option");
+	is (create_json_strict ($thing), undef,
+	    "got undefined value with strict");
+	like ($warning, qr/non-finite number/i,
+	      "got warning with strict option");
     }
     }
     # tests with object.

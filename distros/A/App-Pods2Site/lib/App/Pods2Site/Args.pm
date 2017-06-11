@@ -7,27 +7,31 @@ package App::Pods2Site::Args;
 use strict;
 use warnings;
 
-use App::Pods2Site::Util qw(slashify readData writeData expandAts);
+use App::Pods2Site::Util qw(slashify trim readData writeData expandAts $IS_PACKED $IS_WINDOWS $SHELL_ARG_DELIM);
 use App::Pods2Site::SiteBuilderFactory;
 
+use FindBin qw($RealBin $Script);
 use Getopt::Long qw(GetOptionsFromArray :config require_order no_ignore_case bundling);
 use File::Spec;
+use File::Basename;
 use File::Temp qw(tempdir);
 use File::Path qw(make_path);
 use Config qw(%Config);
 use Pod::Usage;
-use Pod::Find qw(pod_where);
+use Pod::Simple::Search;
 use List::MoreUtils qw(uniq);
 use Grep::Query;
+use POSIX;
 
 # CTOR
 #
 sub new
 {
 	my $class = shift;
+	my $version = shift;
 
 	my $self = bless( {}, $class);
-	$self->__parseArgv(@_);
+	$self->__parseArgv($version, @_);
 
 	return $self;
 }
@@ -60,6 +64,13 @@ sub getTitle
 	return $self->{title};
 }
 
+sub getStyle
+{
+	my $self = shift;
+	
+	return $self->{style};
+}
+
 sub getWorkDir
 {
 	my $self = shift;
@@ -67,12 +78,11 @@ sub getWorkDir
 	return $self->{workdir};
 }
 
-sub getFilter
+sub getGroupDefs
 {
 	my $self = shift;
-	my $section = shift;
 	
-	return $self->{"${section}filter"};
+	return $self->{groupdefs};
 }
 
 sub getCSS
@@ -103,6 +113,7 @@ sub isVerboseLevel
 sub __parseArgv
 {
 	my $self = shift;
+	my $version = shift;
 	my @argv = @_;
 
 	# these options are persisted to the site
@@ -113,10 +124,7 @@ sub __parseArgv
 			(
 				bindirectory
 				libdirectory
-				script-skip
-				core-skip
-				pragma-skip
-				module-skip
+				group
 				css
 				style
 				title
@@ -130,6 +138,11 @@ sub __parseArgv
 			v => 0,
 			workdirectory => undef,
 			quiet => 0,
+			
+			# hidden
+			#
+			_help => 0,
+			_pp => 0,					# print basic PAR::Packer 'pp' command line
 		);
 		
 	my @specs =
@@ -143,17 +156,23 @@ sub __parseArgv
 			'quiet',
 			'bindirectory=s@',
 			'libdirectory=s@',
-			'script-skip=s',
-			'core-skip=s',
-			'pragma-skip=s',
-			'module-skip=s',
+			'group=s@',
 			'css=s',
 			'style=s',
-			'title=s'
+			'title=s',
+			
+			# hidden
+			#
+			'_help',
+			'_pp',
 		);
 
-	my $argsPodInput = pod_where( { -inc => 1 }, 'App::Pods2Site::Args');
-	my $manualPodInput = pod_where( { -inc => 1 }, 'App::TestOnTap');
+	my $_argsPodName = 'App/Pods2Site/_Args.pod';
+	my $_argsPodInput = Pod::Simple::Search->find($_argsPodName);
+	my $argsPodName = 'App/Pods2Site/Args.pod';
+	my $argsPodInput = Pod::Simple::Search->find($argsPodName);
+	my $manualPodName = 'App/Pods2Site.pod';
+	my $manualPodInput = Pod::Simple::Search->find($manualPodName);
 
 	# for consistent error handling below, trap getopts problems
 	# 
@@ -168,6 +187,23 @@ sub __parseArgv
 		pod2usage(-input => $argsPodInput, -message => "Failure parsing options:\n  $@", -exitval => 255, -verbose => 0);
 	}
 
+	# help with the hidden flags...
+	#
+	pod2usage(-input => $_argsPodInput, -exitval => 0, -verbose => 2, -noperldoc => 1) if $rawOpts{_help};
+
+	# for the special selection of using --_pp, print command line and exit
+	#
+	if ($rawOpts{_pp})
+	{
+		$self->__print_pp_cmdline
+					(
+						$version,
+						$argsPodName, $argsPodInput,
+						$manualPodName, $manualPodInput
+					);
+		exit(0);
+	}
+
 	# if any of the doc switches made, display the pod
 	#
 	pod2usage(-input => $manualPodInput, -exitval => 0, -verbose => 2, -noperldoc => 1) if $rawOpts{manual};
@@ -175,16 +211,21 @@ sub __parseArgv
 	pod2usage(-input => $argsPodInput, -exitval => 0, -verbose => 0) if $rawOpts{usage};
 	pod2usage(-message => "$0 version $App::Pods2Site::VERSION", -exitval => 0, -verbose => 99, -sections => '_') if $rawOpts{version};
 
+	# if -quiet has been given, it trumps any verbosity
+	#	
+	$self->{verbose} = $rawOpts{quiet} ? -1 : $rawOpts{v};
+
 	# manage the sitedir
 	# assume we need to create it
 	#
 	my $newSiteDir = 1;
-	my $sitedir = $argv[0];
-	die("You must provide a sitedir\n") unless $sitedir;
+	my $sitedir = $self->__getSiteDir($argv[0]);
+	die("You must provide a sitedir (use ':std' for a default location)\n") unless $sitedir;
 	$sitedir = slashify(File::Spec->rel2abs($sitedir));
 	if (-e $sitedir)
 	{
 		$newSiteDir = 0;
+		
 		# if the sitedir exists as a dir, our sticky opts better be found in it
 		# otherwise it's not a sitedir
 		#
@@ -194,13 +235,17 @@ sub __parseArgv
 
 		# clean up any sticky opts given by the user
 		#
-		print "NOTE: reusing options used when creating '$sitedir'!\n";
+		print "NOTE: updating '$sitedir' - reusing options used when created!\n" if $self->isVerboseLevel(0);
 		foreach my $opt (@stickyOpts)
 		{
 			warn("WARNING: The option '$opt' ignored when updating the existing site '$sitedir'\n") if exists($rawOpts{$opt});
 			delete($rawOpts{$opt});
 		}
 		%rawOpts = ( %rawOpts, %$savedOpts );
+	}
+	else
+	{
+		print "Creating '$sitedir'...\n" if $self->isVerboseLevel(0);
 	}
 	
 	# fix up any user given bindir locations or get us the standard ones
@@ -216,13 +261,13 @@ sub __parseArgv
 	$self->{libdirs} = $rawOpts{libdirectory} = \@libdirs;
 
 	my $workdir;
-	if ($rawOpts{workdir})
+	if ($rawOpts{workdirectory})
 	{
 		# if user specifies a workdir this implies that it should be kept
 		# just make sure there is no such directory beforehand, and create it here
 		# (similar to below; tempdir() will also create one)
 		#
-		$workdir = slashify(File::Spec->rel2abs($rawOpts{workdir}));
+		$workdir = slashify(File::Spec->rel2abs($rawOpts{workdirectory}));
 		die("The workdir '$workdir' already exists\n") if -e $workdir;
 		make_path($workdir) or die("Failed to create workdir '$workdir': $!\n");
 	}
@@ -234,78 +279,43 @@ sub __parseArgv
 	}
 	$self->{workdir} = $workdir;
 
-	# test the user skip filter for pruning the list of script names later
-	# but only store the query for later use since it will be rewritten as a negated test 
-	#
-	eval
+	# Ensure we have group definitions, and test queries before storing
+	# 
+	my @rawGroupDefs  = $self->__getRawGroupDefs($rawOpts{group});
+	my @groupDefs;
+	my %groupsSeen;
+	foreach my $rawGroupDef (@rawGroupDefs)
 	{
-		$self->{scriptfilter} = $rawOpts{'script-skip'};
-		Grep::Query->new($self->{scriptfilter}) if $self->{scriptfilter};
-	};
-	if ($@)
-	{
-		pod2usage(-message => "Failure creating script-skip filter:\n  $@", -exitval => 255, -verbose => 0);
+		eval
+		{
+			die("Group definition not in form 'name=query': '$rawGroupDef'\n") unless $rawGroupDef =~ /^([^=]+)=(.+)/s;
+			my ($name, $query) = (trim($1), trim($2));
+			die("Group '$name' multiply defined\n") if $groupsSeen{$name};
+			$groupsSeen{$name} = 1;
+			push(@groupDefs, { name => $name, query => Grep::Query->new($query) });
+		};
+		pod2usage(-message => "Problem with group definition '$rawGroupDef':\n  $@", -exitval => 255, -verbose => 0) if $@;
 	}
-
-	# test the user skip filter for pruning the list of core names later
-	# but only store the query for later use since it will be rewritten as a negated test 
-	#
-	eval
-	{
-		$self->{corefilter} = $rawOpts{'core-skip'};
-		Grep::Query->new($self->{corefilter}) if $self->{corefilter};
-	};
-	if ($@)
-	{
-		pod2usage(-message => "Failure creating core-skip filter:\n  $@", -exitval => 255, -verbose => 0);
-	}
-
-	# test the user skip filter for pruning the list of pragma names later
-	# but only store the query for later use since it will be rewritten as a negated test 
-	#
-	eval
-	{
-		$self->{pragmafilter} = $rawOpts{'pragma-skip'};
-		Grep::Query->new($self->{pragmafilter}) if $self->{pragmafilter};
-	};
-	if ($@)
-	{
-		pod2usage(-message => "Failure creating pragma-skip filter:\n  $@", -exitval => 255, -verbose => 0);
-	}
-
-	# test the user skip filter for pruning the list of module names later
-	# but only store the query for later use since it will be rewritten as a negated test 
-	#
-	eval
-	{
-		$self->{modulefilter} = $rawOpts{'module-skip'};
-		Grep::Query->new($self->{modulefilter}) if $self->{modulefilter};
-	};
-	if ($@)
-	{
-		pod2usage(-message => "Failure creating module-skip filter:\n  $@", -exitval => 255, -verbose => 0);
-	}
+	$rawOpts{group} = \@rawGroupDefs;
+	$self->{groupdefs} = \@groupDefs;
 
 	# fix up any css path given by user
 	#	
-	my $css = slashify(File::Spec->rel2abs($rawOpts{css})) if $rawOpts{css};
-	if ($css)
+	if ($rawOpts{css})
 	{
+		my $css = slashify(File::Spec->rel2abs($rawOpts{css}));
 		die("No such file: -css '$css'\n") unless -f $css;
-		
 		$self->{css} = $css;
 	}
 
-	$self->{title} = $rawOpts{title} || 'Pods2Site';
+	$rawOpts{title} = 'Pods2Site' unless $rawOpts{title};
+	$self->{title} = $rawOpts{title};
 	
+	$self->{style} = $rawOpts{style};
 	my $sbf = App::Pods2Site::SiteBuilderFactory->new($rawOpts{style});
-	$rawOpts{style} = $sbf->getRealStyle();
+	$self->{style} = $sbf->getRealStyle();
 	$self->{sitebuilder} = $sbf->createSiteBuilder();
 	
-	# if -quiet has been given, it trumps any verbosity
-	#	
-	$self->{verbose} = $rawOpts{quiet} ? -1 : $rawOpts{v};
-
 	# if we need to create the site dir...
 	#
 	if ($newSiteDir)
@@ -318,6 +328,118 @@ sub __parseArgv
 	}
 	
 	$self->{sitedir} = $sitedir;
+}
+
+sub __getSiteDir
+{
+	my $self = shift;
+	my $sitedir = shift;
+	
+	if ($sitedir && $sitedir eq ':std')
+	{
+		die("Sorry, don't have a ':std' directory when running a packed binary\n") if $IS_PACKED;
+		$sitedir = slashify((dirname(dirname($^X)) . '/pods2site'));
+	}
+	
+	return $sitedir;
+}
+
+sub __getRawGroupDefs
+{
+	my $self = shift;
+	my $groupDefs = shift;
+	
+	my @newDefs = ($groupDefs && @$groupDefs) ? @$groupDefs :  ':std';
+	my $ndx = 0;
+	while ($ndx <= $#newDefs)
+	{
+		if ($newDefs[$ndx] =~ /^:/)
+		{
+			splice(@newDefs, $ndx, 1, $self->__getInternalRawGroupDefs($newDefs[$ndx]));
+		}
+		else
+		{
+			$ndx++;
+		}
+	}
+	
+	return @newDefs;
+}
+
+sub __getInternalRawGroupDefs
+{
+	my $self = shift;
+	my $internal = shift;
+	
+	my @groupDefs;
+	if ($internal eq ':std')
+	{
+		@groupDefs = qw(:std-core :std-scripts :std-pragmas :std-modules);
+	}
+	elsif ($internal eq ':std-core')
+	{
+		@groupDefs = <<'CORE',
+			Core=
+			/*
+				Select any pods in library locations that are named with prefix 'perl'
+				in the top or in the pods package. 
+			*/
+			type.eq(lib) && name.regexp{^(?:pods::)?perl}
+CORE
+	}
+	elsif ($internal eq ':std-scripts')
+	{
+		@groupDefs = <<'SCRIPTS',
+			Scripts=
+			/*
+				Assume all pods in bin locations are scripts. Also add the PAR::Packer
+				'pp' pod; while there is a pp script it has no pod docs, they're in
+				the toplevel pp.pm. 
+			*/
+			type.eq(bin) || name.eq(pp)
+SCRIPTS
+	}
+	elsif ($internal eq ':std-pragmas')
+	{
+		@groupDefs = <<'PRAGMAS',
+			Pragmas=
+			/*
+				Select any pods in library locations that are named with a lower-case
+				initial in their package name and consider them pragmas.
+				Avoid those pods picked up by the Core/Script groups. 
+			*/
+			type.eq(lib) &&
+				name.regexp{^[a-z]} &&
+				NOT
+					(
+						name.regexp{^(?:pods::)?perl} ||
+						name.eq(pp)
+					)
+PRAGMAS
+	}
+	elsif ($internal eq ':std-modules')
+	{
+		@groupDefs = <<'MODULES'
+			Modules=
+			/*
+				Any pods not selected by the other three are assumed to
+				be 'normal' modules.
+			*/
+			NOT
+				(
+					type.eq(bin) ||
+					name.regexp{^(?:pods::)?perl} ||
+					name.eq(pp) ||
+					name.regexp{^[a-z]}
+				)
+MODULES
+	}
+	else
+	{
+		die("Unknown internal group definition: '$internal'\n");
+	}
+	
+	return @groupDefs;
 }
 
 sub __getBinLocations
@@ -360,6 +482,27 @@ sub __getBinLocations
 	$_ = slashify(File::Spec->rel2abs($_)) foreach (@locs);
 	
 	return @locs;
+}
+
+sub __getDefaultBinLocations
+{
+	my $self = shift;
+
+	# a somewhat guessed list for Config keys for scripts...
+	# note: order is important
+	#
+	return $self->__getConfigLocations
+		(
+			qw
+				(
+					installsitebin
+					installsitescript
+					installvendorbin
+					installvendorscript
+					installbin
+					installscript
+				)
+		);
 }
 
 sub __getLibLocations
@@ -408,27 +551,6 @@ sub __getLibLocations
 	return @locs;
 }
 
-sub __getDefaultBinLocations
-{
-	my $self = shift;
-
-	# a somewhat guessed list for Config keys for scripts...
-	# note: order is important
-	#
-	return $self->__getConfigLocations
-		(
-			qw
-				(
-					installsitebin
-					installsitescript
-					installvendorbin
-					installvendorscript
-					installbin
-					installscript
-				)
-		);
-}
-
 sub __getDefaultLibLocations
 {
 	my $self = shift;
@@ -449,7 +571,6 @@ sub __getDefaultLibLocations
 				)
 		);
 }
-
 sub __getConfigLocations
 {
 	my $self = shift;
@@ -470,6 +591,42 @@ sub __getConfigLocations
 	}	
 	
 	return @locs;
+}
+
+sub __print_pp_cmdline
+{
+	my $self = shift;
+	my $version = shift;
+	my $argsPodName = shift;
+	my $argsPodInput = shift;
+	my $manualPodName = shift;
+	my $manualPodInput = shift;
+	
+	die("Sorry, you're already running a binary/packed instance\n") if $IS_PACKED;
+	
+	eval "require PAR::Packer";
+	warn("Sorry, it appears PAR::Packer is not installed/working!\n") if $@;
+
+	my $os = $IS_WINDOWS ? 'windows' : $^O;
+	my $arch = (POSIX::uname())[4];
+	my $exeSuffix = $IS_WINDOWS ? '.exe' : '';
+	my $bnScript = basename($Script);
+	my $output = "$bnScript-$version-$os-$arch$exeSuffix";
+	my @liblocs = map { $_ ne '.' ? ('-I', slashify(File::Spec->rel2abs($_))) : () } @INC;
+	my @cmd =
+		(
+			'pp',
+			@liblocs,
+			'-a', "$argsPodInput;lib/$argsPodName",
+			'-a', "$manualPodInput;lib/$manualPodName",
+			'-o', $output,
+			slashify("$RealBin/$Script")
+		);
+
+	my $cmdline = '';
+	$cmdline .= "$SHELL_ARG_DELIM$_$SHELL_ARG_DELIM " foreach (@cmd);
+	chop($cmdline);
+	print "$cmdline\n";
 }
 
 1;

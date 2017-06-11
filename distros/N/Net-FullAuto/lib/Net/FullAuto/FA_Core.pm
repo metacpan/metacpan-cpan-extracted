@@ -224,7 +224,6 @@ BEGIN {
       exit;
    }
 
-   #use if ($^O eq 'cygwin'), 'Win32::Semaphore';
    if ($^O eq 'cygwin' && $0 ne 'test.t') {
       my $srvout=`/bin/cygrunsrv -Q cygserver 2>&1`;
       if (-1<index $srvout,'Stopped') {
@@ -237,131 +236,6 @@ BEGIN {
                " installed:\n\n   ${srvout}To install type:  ",
                "'/bin/cygserver-config'\n\n";
          exit;
-      }
-      if (0) {
-      $srvout=`/bin/cygrunsrv -Q sshd 2>&1`;
-      if (-1<index $srvout,'Stopped') {
-         my $ps=`/bin/ps -e`;
-         if (-1<index $ps,'sshd') {
-            foreach my $line (split "\n", $ps) {
-               my $pid=$line;
-               next unless -1<index $line,'sshd';
-               $pid=~s/^\s(\d+)\s+.*$/$1/;
-               `/bin/kill -f $pid`;
-            }
-            my $output=`net start sshd 2>&1`; 
-            unless (-1<index $output,'CYGWIN sshd service was started') {
-               print "\n   FATAL ERROR! - The Cygwin sshd (Secure Shell) ",
-                     "service is NOT running:\n\n   ${srvout}To start type:  ",
-                     "'net start sshd'\n\n";
-               exit;
-            }
-         } else {
-            print "\n   FATAL ERROR! - The Cygwin sshd (Secure Shell) ",
-                  "service is NOT running:\n\n   ${srvout}To start type:  ",
-                  "'net start sshd'\n\n";
-            exit;
-         }
-      } elsif (-1<index $srvout,'The specified service does not exist') {
-         print "\n   FATAL ERROR! - The Cygwin sshd (Secure Shell) ",
-               "service is NOT installed:\n\n   ${srvout}To install type:  ",
-               "'/bin/ssh-host-config --privileged'\n\n";
-         exit;
-      }
-      my $srvaccount=`sc qc sshd`;
-      $srvaccount=~s/^.*SERVICE_START_NAME : (?:.\\)*(.*?)\s*$/$1/s;
-      my $rights=`/bin/editrights -u $srvaccount -l 2>&1`;
-      if ($rights!~/^Error/) {
-         if ((-1<index $rights,'SeDenyRemoteInteractiveLogonRight') ||
-               (-1==index $rights,'SeServiceLogonRight') ||
-               (-1==index $rights,'SeTcbPrivilege') ||
-               (-1==index $rights,'SeCreateTokenPrivilege') ||
-               (-1==index $rights,'SeAssignPrimaryTokenPrivilege') || 1) {
-            my @missing_rights=();
-            my $output='';my $restart_sshd=0;
-            if (-1<index $rights,'SeDenyRemoteInteractiveLogonRight') {
-               my $rt='SeDenyRemoteInteractiveLogonRight';
-               $output=`/bin/editrights -r $rt -u $srvaccount 2>&1`;
-               if ($output=~/^Error/) {
-                  my $die="\n   ".
-                          "FATAL ERROR! - The following restriction was\n   ".
-                          "               discovered for the sshd service\n   ".
-                          "               account '".$srvaccount."':\n\n".
-                          $rt."\n\n   An attempt was made to remove this,\n".
-                          "   but was not successful:\n\n   $output\n\n".
-                          "   Please contact your Domain and/or System".
-                          "   Administrators for assistance.\n\n";
-                  print $die;
-                  exit 1;
-               } else { $restart_sshd=1 }
-            }
-            if (-1==index $rights,'SeTcbPrivilege') {
-               $output=`/bin/editrights -a SeTcbPrivilege -u $srvaccount 2>&1`;
-               if ($output=~/^Error/) {
-                  push @missing_rights, 'SeTcbPrivilege';
-               } else { $restart_sshd=1 }
-            }
-            if (-1==index $rights,'SeCreateTokenPrivilege') {
-               my $prv='SeCreateTokenPrivilege';
-               $output=`/bin/editrights -a $prv -u $srvaccount 2>&1`;
-               if ($output=~/^Error/) {
-                  push @missing_rights, 'SeCreateTokenPrivilege';
-               } else { $restart_sshd=1 }
-            }
-            if (-1==index $rights,'SeAssignPrimaryTokenPrivilege') {
-               my $prv='SeAssignPrimaryTokenPrivilege';
-               $output=`/bin/editrights -a $prv -u $srvaccount 2>&1`;
-               if ($output=~/^Error/) {
-                  push @missing_rights, 'SeAssignPrimaryTokenPrivilege';
-               } else { $restart_sshd=1 }
-            }
-            if (-1==index $rights,'SeServiceLogonRight') {
-               my $prv='SeServiceLogonRight';
-               $output=`/bin/editrights -a $prv -u $srvaccount 2>&1`;
-               if ($output=~/^Error/) {
-                  push @missing_rights, 'SeServiceLogonRight';
-               } else { $restart_sshd=1 }
-            }
-            if (-1<$#missing_rights) {
-               my $mis=join "\n",map { "               $_" } @missing_rights;
-               my $die="\n   FATAL ERROR! - The following priviliges are\n   ".
-                    "               missing from the ID '".$srvaccount."':\n\n".
-                    $mis."\n\n   An attempt was made to add these priviliges,".
-                    "\n   but was not successful. Please contact your\n".
-                    "   your Domain and/or System Administrators for\n".
-                    "   assistance. These priviliges can be controlled at\n".
-                    "   the domain level with a global policy that\n".
-                    "   affects one or multiple hosts. These policies\n".
-                    "   are enforced at host startup - which would\n".
-                    "   explain why sshd may have worked in an earlier\n".
-                    "   session, or immediately following installation,\n".
-                    "   but not after a reboot.\n\n";
-               print $die;
-               exit 1;
-            } elsif ($restart_sshd) {
-               $srvout=`/bin/cygrunsrv -Q sshd 2>&1`;
-               my $output=`net stop sshd 2>&1`;
-               unless (-1<index $output,'CYGWIN sshd service was stopped') {
-                  print "\n   FATAL ERROR! - ".
-                        " The Cygwin sshd (Secure Shell) service ",
-                        " could NOT be restarted:\n\n${srvout}".
-                        "Error: $output\n\nTo restart, Run as Administrator\n".
-                        "\nand type:  'net stop sshd'\n".
-                        "and then:  'net start sshd'\n\n";
-                  exit;
-               }
-               $output=`net start sshd 2>&1`;
-               unless (-1<index $output,'CYGWIN sshd service was started') {
-                  print "\n   FATAL ERROR! - ".
-                        " The Cygwin sshd (Secure Shell) service ",
-                        " could NOT be started:\n\n${srvout}".
-                        "Error: $output\n\nTo restart, Run as Administrator\n".
-                        "\nand then:  'net start sshd'\n\n";
-                  exit;
-               }
-            }
-         }
-      }
       }
    }
    use IPC::Semaphore;
@@ -31049,55 +30923,10 @@ print $Net::FullAuto::FA_Core::LOG "LETS LOOK AT LINE=$line<== and LASTLINE=$las
                                        $line!~/\s-e\s\'s\/\^\/stdout
                                        \:\s*\/\'\s2\>\&1\s*$/sx) ||
                                        ($fullerror && $line=~/^\n$/s)) {
-#print "DOIN FULLERROR1==>$line<== and STRCNT=$str_cnt\n";# if $Net::FullAuto::FA_Core::debug;
-#print $Net::FullAuto::FA_Core::LOG "DOIN FULLERROR1==>$line<==\n"
-#                     if $Net::FullAuto::FA_Core::log && -1<index $Net::FullAuto::FA_Core::LOG,'*';
-if (!$line) {
-                        my $lastDB43=0;my $testline='';
-                        DB43: while (1) {
-print $Net::FullAuto::FA_Core::LOG "WE ARE INSIDE DB43\n";
-                           $self->{_cmd_handle}->autoflush(1);
-                           $self->{_cmd_handle}->print(' echo FAECHO');
-                           eval {
-                              while (my $line=$self->{_cmd_handle}->get) {
-                                 $line=~tr/\0-\11\13-\37\177-\377//d;
-                                 ($testline=$line)=~s/\s//g;
-print "DB43output=$testline<==\n" if !$Net::FullAuto::FA_Core::cron && $Net::FullAuto::FA_Core::debug;
-print $Net::FullAuto::FA_Core::LOG "DB43output=$testline<==\n"
-                     if $Net::FullAuto::FA_Core::log && -1<index $Net::FullAuto::FA_Core::LOG,'*';
-                                 if ($testline=~/^$cmd_prompt$/) {
-                                    $lastDB43=1;last
-                                 }
-                                 if ($testline=~s/$cmd_prompt$//s) {
-                                    $line=~s/$cmd_prompt$//s;
-                                    $output.=$line;last;
-                                 } else { $output.=$line }
-                              }
-#print "DONEWITHDB43WILE and OUTPUTNOW=$output\n" if !$Net::FullAuto::FA_Core::cron && $Net::FullAuto::FA_Core::debug;
-print $Net::FullAuto::FA_Core::LOG "DONEWITHDB43WHILE and OUTPUTNOW=$output\n"
-                     if $Net::FullAuto::FA_Core::log && -1<index $Net::FullAuto::FA_Core::LOG,'*';
-                           }; $self->{_cmd_handle}->autoflush(0);
-                           last if $lastDB43;
-                           if ($@) {
-                              if (-1<index $@,'read timed-out') {
-                                 next;
-                              } else { die "$@       $!" }
-                           }
-                        }
-                        my $tst_out=$output;
-                        $tst_out=~s/\s*//gs;
-print "TST_OUTTTTT=$tst_out<==\n";
-print $Net::FullAuto::FA_Core::LOG "TST_OUTTTT=$tst_out<==\n"
-                     if $Net::FullAuto::FA_Core::log && -1<index $Net::FullAuto::FA_Core::LOG,'*';
-
-}
                                     if ($fullerror && !$errflag) {
                                        $fullerror.="\n";
                                     } $errflag=1;
                                     $fullerror.=$line;
-#print "\n\nLINENOWWWW=$line<==\n\n";
-                                    #&display($line,$cmd_prompt,$save,
-                                    #   $live_command) if $display;
                                  } elsif ($fulloutput || $line!~/^\s*$/s) {
                                     $fulloutput.=$line;
                                     $save=&display($line,$cmd_prompt,$save)
@@ -31503,6 +31332,9 @@ print $Net::FullAuto::FA_Core::LOG "LOGINRETRY2=$login_retry and ",
          if ($wantarray) {
 print $Net::FullAuto::FA_Core::LOG "WE ARE RETURNING ERROR=$eval_error\n"
    if $Net::FullAuto::FA_Core::log && -1<index $Net::FullAuto::FA_Core::LOG,'*';
+            if ($stdout=~/^.*\S+\d+$/s) {
+               $stdout=~s/^(.*\S+)(\d+)$/$1\n$2/s;
+            }
             my @stdout_contents=split "\n",$stdout;
             my $exitcode=pop(@stdout_contents);
             $exitcode=-1 unless defined $exitcode;

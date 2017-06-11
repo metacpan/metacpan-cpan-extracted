@@ -2,7 +2,9 @@ use strict;
 use warnings;
 package MetaCPAN::API::Release;
 # ABSTRACT: Distribution and releases information for MetaCPAN::API
-$MetaCPAN::API::Release::VERSION = '0.50';
+
+our $VERSION = '0.51';
+
 use Carp;
 use Moo::Role;
 use namespace::autoclean;
@@ -54,7 +56,7 @@ MetaCPAN::API::Release - Distribution and releases information for MetaCPAN::API
 
 =head1 VERSION
 
-version 0.50
+version 0.51
 
 =head1 DESCRIPTION
 

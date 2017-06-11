@@ -3,7 +3,7 @@ package Datahub::Factory::Importer::VKC;
 use strict;
 use warnings;
 
-our $VERSION = '0.8';
+our $VERSION = '0.9';
 
 use Moo;
 use Catmandu;

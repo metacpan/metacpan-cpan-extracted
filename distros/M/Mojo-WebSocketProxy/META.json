@@ -21,6 +21,7 @@
             "Test::Mojo" : "0",
             "Test::More" : "0.94",
             "Test::Simple" : "0.44",
+            "Test::TCP" : "0",
             "perl" : "5.014000"
          }
       },
@@ -45,11 +46,15 @@
       "runtime" : {
          "requires" : {
             "Class::Method::Modifiers" : "0",
+            "Data::UUID" : "0",
+            "Future" : "0",
             "Guard" : "0",
             "JSON" : "0",
+            "JSON::XS" : "0",
             "MojoX::JSON::RPC" : "0",
             "Mojolicious" : "0",
-            "Time::Out" : "0",
+            "Scalar::Util" : "0",
+            "Variable::Disposition" : "0",
             "perl" : "5.014000"
          }
       },
@@ -78,7 +83,7 @@
          "web" : "https://github.com/binary-com/perl-Mojo-WebSocketProxy"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0222"
 }
 

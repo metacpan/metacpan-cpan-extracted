@@ -21,7 +21,7 @@ use CPAN::ReleaseHistory;
 use HTTP::Tiny;
 
 # ABSTRACT: Convert cpan distribution from BackPAN to a git repository
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 
 our $ua  = HTTP::Tiny->new;
@@ -79,7 +79,7 @@ sub main
   my %skip;
   my $opt_backpan_index_url;
   my $opt_backpan_url = "http://backpan.perl.org/authors/id";
-  $opt_metacpan_url   = "http://api.metacpan.org/";
+  $opt_metacpan_url   = "http://fastapi.metacpan.org/";
   my $opt_trace = 0;
   my $opt_output;
   my $opt_resume;
@@ -162,7 +162,7 @@ sub main
   
     unless(defined $cache->{$cpanid})
     {
-      my $uri = URI->new($opt_metacpan_url . "v0/author/" . $cpanid);
+      my $uri = URI->new($opt_metacpan_url . "v1/author/" . $cpanid);
       my $res = $ua->get($uri);
       unless($res->{success})
       {
@@ -285,7 +285,7 @@ App::cpangitify - Convert cpan distribution from BackPAN to a git repository
 
 =head1 VERSION
 
-version 0.12
+version 0.14
 
 =head1 DESCRIPTION
 

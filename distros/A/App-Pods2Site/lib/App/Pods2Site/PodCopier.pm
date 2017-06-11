@@ -33,18 +33,18 @@ sub getCount
 	return $self->{count};
 }
 
-sub getT2I
-{
-	my $self = shift;
-	
-	return $self->{t2i}; 	
-}
-
 sub getPodRoot
 {
 	my $self = shift;
 	
 	return $self->{podroot};
+}
+
+sub getWorkGroups
+{
+	my $self = shift;
+	
+	return $self->{workgroups};
 }
 
 # copy all found pods into a work tree, so the HTML generation
@@ -56,83 +56,54 @@ sub __copyPods
 	my $args = shift;
 	my $podFinder = shift;
 
-	# keep 'types' to 'info' for later use by the HTML generation
-	# the types are prefixed by number to allow the gen to sort them
+	# keep running tally of groups and associated pods
 	#
-	my %t2i;
+	my @workGroups;
 
 	# set up some progress feedback
 	#
 	my $spinner = createSpinner($args);
 
-	# copy pods from each category
+	# copy pods from each group
 	#
-	my $coren2p = $podFinder->getCoreN2P();
-	foreach my $name (sort { lc($a) cmp lc($b) } (keys(%$coren2p)))
+	my $count = 0;
+	my $groups = $podFinder->getGroups();
+	foreach my $group (@$groups)
 	{
-		my $type = '1-core';
-		my $alias = $name;
-		$alias =~ s/^pods:://;
-		my $p = $coren2p->{$name};
-		# for core, we copy to an alias too, as many links go to 'perlxxx' rather than 'pods::perlxxx'
-		# 
-		my $names = [ $alias, $name ];
-		my $podfiles = $self->__copy($args, $names, $p, $type);
-		my $ra = $t2i{$type} || [];
-		push(@$ra, { names => $names, infile => $p, podfiles => $podfiles });
-		$t2i{$type} = $ra; 
-		$spinner->();
+		my $groupName = $group->{name};
+		my $pods = $group->{pods};
+		my %podInfo;
+		foreach my $pod (@$pods)
+		{
+			my $podName = $pod->{name};
+			my $inFile = $pod->{path};
+			my $copyToNames = [ $podName ];
+			
+			# if we see a pod in namespace 'pods::', we also copy to an alias as it seems many links
+			# go to 'perlxxx' rather than 'pods::perlxxx'
+			# 
+			push(@$copyToNames, $1) if ($podName =~ /^pods::(.*)/);
+			
+			my @podFiles = $self->__copy($inFile, $copyToNames, $groupName, $args);
+			
+			$podInfo{$podName} = { podfile => $podFiles[0], htmlfile => undef };
+			
+			$spinner->(++$count); 
+		}
+		
+		push(@workGroups, { group => $groupName, podinfo => \%podInfo });
 	}
 	
-	my $pragman2p = $podFinder->getPragmaN2P();
-	foreach my $name (sort { lc($a) cmp lc($b) } (keys(%$pragman2p)))
-	{
-		my $type = '2-pragma';
-		my $p = $pragman2p->{$name};
-		my $names = [ $name ];
-		my $podfiles = $self->__copy($args, $names, $p, $type);
-		my $ra = $t2i{$type} || [];
-		push(@$ra, { names => $names, infile => $p, podfiles => $podfiles });
-		$t2i{$type} = $ra; 
-		$spinner->();
-	}
-	
-	my $modulen2p = $podFinder->getModuleN2P();
-	foreach my $name (sort { lc($a) cmp lc($b) } (keys(%$modulen2p)))
-	{
-		my $type = '3-module';
-		my $p = $modulen2p->{$name};
-		my $names = [ $name ];
-		my $podfiles = $self->__copy($args, $names, $p, $type);
-		my $ra = $t2i{$type} || [];
-		push(@$ra, { names => $names, infile => $p, podfiles => $podfiles });
-		$t2i{$type} = $ra; 
-		$spinner->();
-	}
-
-	my $scriptn2p = $podFinder->getScriptN2P();
-	foreach my $name (sort { lc($a) cmp lc($b) } (keys(%$scriptn2p)))
-	{
-		my $type = '4-script';
-		my $p = $scriptn2p->{$name};
-		my $names = [ $name ];
-		my $podfiles = $self->__copy($args, $names, $p, $type);
-		my $ra = $t2i{$type} || [];
-		push(@$ra, { names => $names, infile => $p, podfiles => $podfiles });
-		$t2i{$type} = $ra; 
-		$spinner->();
-	}
-	
-	$self->{t2i} = \%t2i;
+	$self->{workgroups} = \@workGroups;
 }
 
 sub __copy
 {
 	my $self = shift;
-	my $args = shift;
-	my $names = shift;
 	my $infile = shift;
-	my $typeRoot = shift;
+	my $names = shift;
+	my $group = shift;
+	my $args = shift;
 
 	# copy every 'name' infile to possibly multiple outfiles
 	# for simplicity, always use the '.pod' extension
@@ -142,7 +113,7 @@ sub __copy
 	{
 		my $podname = $name;
 		$podname =~ s#::#/#g;
-		my $outfile = slashify("$self->{podroot}/$typeRoot/$podname.pod");
+		my $outfile = slashify("$self->{podroot}/$group/$podname.pod");
 		push(@podfiles, $outfile);
 	
 		# we're copying in a specific order, and it's possible
@@ -164,7 +135,7 @@ sub __copy
 		print "Copied '$infile' => '$outfile'\n" if $args->isVerboseLevel(3);
 	}
 	
-	return \@podfiles;
+	return @podfiles;
 }
 
 1;

@@ -14,11 +14,25 @@ perls.
     # Basic: run the tests in t/perf/benchmarks against two or
     # more perls
 
-    bench.pl [options] perl1[=label1] perl2[=label2] ...
+    bench.pl [options] -- perlA[=labelA] perlB[=labelB] ...
+
+    # run the tests against same perlA 2x, with and without extra
+    # options
+
+    bench.pl [options] -- perlA=fast PerlA=slow -Mstrict -Dpsltoc 
 
     # Run bench.pl's own built-in sanity tests
 
     bench.pl --action=selftest
+
+    # Run bench on blead, which is then modified and timed again
+
+    bench.pl [options] --write=blead.time -- ./perl=blead
+    # hack hack hack
+    bench.pl --read=blead.time -- ./perl=hacked
+
+    # You can also combine --read with --write
+    bench.pl --read=blead.time --write=last.time -- ./perl=hacked
 
 =head1 DESCRIPTION
 
@@ -37,10 +51,14 @@ measurements, such as instruction reads, conditional branch misses etc.
 
 There are options to write the raw data to a file, and to read it back.
 This means that you can view the same run data in different views with
-different selection and sort options.
+different selection and sort options. You can also use this mechanism
+to save the results of timing one perl, and then read it back while timing
+a modification, so that you dont have rerun the same tests on the same
+perl over and over, or have two perls built at the same time.
 
 The optional C<=label> after each perl executable is used in the display
-output.
+output. If you are doing a two step benchmark then you should provide
+a label for at least the "base" perl.
 
 =head1 OPTIONS
 
@@ -111,7 +129,70 @@ If only one field is selected, the output is in more compact form.
 
 --grindargs=I<foo>
 
-Optional command-line arguments to pass to cachegrind invocations.
+Optional command-line arguments to pass to all cachegrind invocations.
+
+This option is appended to those which bench.pl uses for its own
+purposes; so it can be used to override them (see --debug output
+below), and can also be 'abused' to add redirects into the valgrind
+command invocation.
+
+For example, this writes PERL_MEM_LOG activity to foobar.$$, because
+3>foobar.$$ redirects fd 3, then perl under PERL_MEM_LOG writes to fd 3.
+
+ $ perl Porting/bench.pl --jobs=2 --verbose --debug \
+    --tests=call::sub::amp_empty \
+    \
+    --grindargs='--cachegrind-out-file=junk.$$ 3>foobar.$$' \
+    -- \
+    perl5.24.0	perl5.24.0:+memlog:PERL_MEM_LOG=3mst
+
+for the +memlog tests, this executes as: (shown via --debug, then prettyfied)
+
+  Command: PERL_HASH_SEED=0 PERL_MEM_LOG=3mst
+    valgrind --tool=cachegrind  --branch-sim=yes
+    --cachegrind-out-file=/dev/null --cachegrind-out-file=junk.$$
+    3>foobar.$$ perl5.24.0  - 10 2>&1
+
+The result is that a set of junk.$$ files containing raw cachegrind
+output are written, and foobar.$$ contains the expected memlog output.
+
+Notes:
+
+Theres no obvious utility for those junk.$$ and foobar.$$ files, but
+you can have them anyway.
+
+The 3 in PERL_MEM_LOG=3mst is needed because the output would
+otherwize go to STDERR, and cause parse_cachegrind() to reject the
+test and die.
+
+The --grindargs redirect is needed to capture the memlog output;
+without it, the memlog output is written to fd3, around
+parse_cachegrind and effectively into /dev/null
+
+PERL_MEM_LOG is expensive when used.
+
+call::sub::amp_empty
+&foo function call with no args or body
+
+       perl5.24.0 perl5.24.0+memlog
+       ---------- -----------------
+    Ir      394.0          543477.5
+    Dr      161.0          146814.1
+    Dw       72.0          122304.6
+  COND       58.0           66796.4
+   IND        5.0            5537.7
+
+COND_m        0.0            6743.1
+ IND_m        5.0            1490.2
+
+ Ir_m1        0.0             683.7
+ Dr_m1        0.0              65.9
+ Dw_m1        0.0               8.5
+
+ Ir_mm        0.0              11.6
+ Dr_mm        0.0              10.6
+ Dw_mm        0.0               4.7
+
 
 =item *
 
@@ -140,8 +221,8 @@ It defaults to the leftmost column.
 
 --perlargs=I<foo>
 
-Optional command-line arguments to pass to each perl that is run as part of
-a cachegrind session. For example, C<--perlargs=-Ilib>.
+Optional command-line arguments to pass to each perl-under-test
+(perlA, perlB in synopsis) For example, C<--perlargs=-Ilib>.
 
 =item *
 
@@ -196,7 +277,9 @@ Display progress information.
 --write=I<file>
 
 Save the raw data to the specified file. It can be read back later with
-C<--read>.
+C<--read>. If combined with C<--read> then the output file will be
+the merge of the file read and any additional perls added on the command
+line.
 
 Requires C<JSON::PP> to be available.
 
@@ -209,7 +292,7 @@ Requires C<JSON::PP> to be available.
 use 5.010000;
 use warnings;
 use strict;
-use Getopt::Long qw(:config no_auto_abbrev);
+use Getopt::Long qw(:config no_auto_abbrev require_order);
 use IPC::Open2 ();
 use IO::Select;
 use IO::File;
@@ -227,7 +310,7 @@ my %VALID_FIELDS = map { $_ => 1 }
 
 sub usage {
     die <<EOF;
-usage: $0 [options] perl[=label] ...
+usage: $0 [options] -- perl[=label] ...
   --action=foo       What action to perform [default: grind].
   --average          Only display average, not individual test results.
   --benchfile=foo    File containing the benchmarks;
@@ -247,6 +330,7 @@ usage: $0 [options] perl[=label] ...
                        [default: 0].
   --perlargs=foo     Optional command-line args to pass to each perl to run.
   --raw              Display raw data counts rather than percentages.
+  --show             Show results even though we are going to write results.
   --sort=field:perl  Sort the tests based on the value of 'field' in the
                        column 'perl'. The perl value is as per --norm.
   -r|--read=file     Read in previously saved data from the specified file.
@@ -283,6 +367,7 @@ my %OPTS = (
     perlargs  => '',
     raw       => 0,
     read      => undef,
+    show      => 0,
     sort      => undef,
     tests     => undef,
     verbose   => 0,
@@ -308,6 +393,7 @@ my %OPTS = (
         'perlargs=s'  => \$OPTS{perlargs},
         'raw'         => \$OPTS{raw},
         'read|r=s'    => \$OPTS{read},
+        'show!'       => \$OPTS{show},
         'sort=s'      => \$OPTS{sort},
         'tests=s'     => \$OPTS{tests},
         'verbose'     => \$OPTS{verbose},
@@ -316,10 +402,6 @@ my %OPTS = (
 
     usage if $OPTS{help};
 
-
-    if (defined $OPTS{read} and defined $OPTS{write}) {
-        die "Error: can't specify both --read and --write options\n";
-    }
 
     if (defined $OPTS{read} or defined $OPTS{write}) {
         # fail early if it's not present
@@ -370,21 +452,6 @@ my %OPTS = (
         die "Error: Can't specify both --bisect and --write\n"
                                                 if defined $OPTS{write};
     }
-    elsif (defined $OPTS{read}) {
-        if (@ARGV) {
-            die "Error: no perl executables may be specified with --read\n"
-        }
-    }
-    elsif ($OPTS{raw}) {
-        unless (@ARGV) {
-            die "Error: at least one perl executable must be specified\n";
-        }
-    }
-    else {
-        unless (@ARGV >= 2) {
-            die "Error: at least two perl executables must be specified\n";
-        }
-    }
 
     if ($OPTS{action} eq 'grind') {
         do_grind(\@ARGV);
@@ -417,13 +484,16 @@ sub filter_tests {
     else {
         my %t;
         for (split /,/, $opt) {
-            die "Error: no such test found: '$_'\n" unless exists $tests->{$_};
+            die "Error: no such test found: '$_'\n"
+                . ($OPTS{verbose} ? "  have: @{[ sort keys %$tests ]}\n" : "")
+                unless exists $tests->{$_};
             $t{$_} = 1;
         }
         for (keys %$tests) {
             delete $tests->{$_} unless exists $t{$_};
         }
     }
+    die "Error: no tests to run\n" unless %$tests;
 }
 
 
@@ -434,7 +504,11 @@ sub filter_tests {
 sub read_tests_file {
     my ($file) = @_;
 
-    my $ta = do $file;
+    my $ta;
+    {
+        local @INC = ('.');
+        $ta = do $file;
+    }
     unless ($ta) {
         die "Error: can't parse '$file': $@\n" if $@;
         die "Error: can't read '$file': $!\n";
@@ -456,7 +530,7 @@ sub read_tests_file {
 
 sub select_a_perl {
     my ($perl, $perls, $who) = @_;
-
+    $perls||=[];
     if ($perl =~ /^[0-9]$/) {
         die "Error: $who value $perl outside range 0.." . $#$perls . "\n"
                                         unless $perl < @$perls;
@@ -475,19 +549,41 @@ sub select_a_perl {
 }
 
 
-# Validate the list of perl=label on the command line.
-# Return a list of [ exe, label ] pairs.
+# Validate the list of perl=label (+ cmdline options) on the command line.
+# Return a list of [ exe, label, cmdline-options ] tuples, i.e.
+# 'perl-under-test's (PUTs)
 
-sub process_perls {
-    my @results;
-    for my $p (@_) {
-        my ($perl, $label) = split /=/, $p, 2;
+sub process_puts {
+    my $read_perls= shift;
+    my @res_puts; # returned, each item is [ perlexe, label, @putargs ]
+    my %seen= map { $_->[1] => 1 } @$read_perls;
+    my @putargs; # collect not-perls into args per PUT
+
+    for my $p (reverse @_) {
+        push @putargs, $p and next if $p =~ /^-/; # not-perl, dont send to qx//
+
+        my ($perl, $label, $env) = split /[=:,]/, $p, 3;
         $label //= $perl;
+        $label = $perl.$label if $label =~ /^\+/;
+        die "$label cannot be used on 2 different perls under test\n" if $seen{$label}++;
+
+        my %env;
+        if ($env) {
+            %env = split /[=,]/, $env;
+        }
         my $r = qx($perl -e 'print qq(ok\n)' 2>&1);
-        die "Error: unable to execute '$perl': $r" if $r ne "ok\n";
-        push @results, [ $perl, $label ];
+        if ($r eq "ok\n") {
+	    push @res_puts, [ $perl, $label, \%env, reverse @putargs ];
+            @putargs = ();
+            warn "Added Perl-Under-Test: [ @{[@{$res_puts[-1]}]} ]\n"
+                if $OPTS{verbose};
+	} else {
+            warn "perl-under-test args: @putargs + a not-perl: $p $r\n"
+                if $OPTS{verbose};
+            push @putargs, $p; # not-perl
+	}
     }
-    return @results;
+    return reverse @res_puts;
 }
 
 
@@ -583,9 +679,9 @@ sub do_grind {
             if $bisect_min > $bisect_max;
     }
 
-    if (defined $OPTS{read}) {
+    if ($OPTS{read}) {
         open my $in, '<:encoding(UTF-8)', $OPTS{read}
-            or die " Error: can't open $OPTS{read} for reading: $!\n";
+            or die " Error: can't open '$OPTS{read}' for reading: $!\n";
         my $data = do { local $/; <$in> };
         close $in;
 
@@ -604,23 +700,30 @@ sub do_grind {
             $order = [ sort keys %$tests ];
         }
     }
-    else {
-        # How many times to execute the loop for the two trials. The lower
-        # value is intended to do the loop enough times that branch
-        # prediction has taken hold; the higher loop allows us to see the
-        # branch misses after that
-        $loop_counts = [10, 20];
 
-        ($tests, $order) = read_tests_file($OPTS{benchfile});
-        die "Error: only a single test may be specified with --bisect\n"
-            if defined $OPTS{bisect} and keys %$tests != 1;
+    if (@$perl_args) {
+        unless ($loop_counts) {
+            # How many times to execute the loop for the two trials. The lower
+            # value is intended to do the loop enough times that branch
+            # prediction has taken hold; the higher loop allows us to see the
+            # branch misses after that
+            $loop_counts = [10, 20];
 
-        $perls = [ process_perls(@$perl_args) ];
+            ($tests, $order) = read_tests_file($OPTS{benchfile});
+            die "Error: only a single test may be specified with --bisect\n"
+                if defined $OPTS{bisect} and keys %$tests != 1;
+        }
 
-
-        $results = grind_run($tests, $order, $perls, $loop_counts);
+        my @run_perls= process_puts($perls, @$perl_args);
+        push @$perls, @run_perls;
+        die "Error: Not enough perls to run a report, and --write not specified.\n"
+            if @$perls < 2 and !$OPTS{write};
+        $results = grind_run($tests, $order, \@run_perls, $loop_counts, $results);
     }
 
+    if (!$perls or !@$perls) {
+        die "Error: nothing to do: no perls to run, no data to read.\n";
+    }
     # now that we have a list of perls, use it to process the
     # 'perl' component of the --norm and --sort args
 
@@ -645,11 +748,14 @@ sub do_grind {
                 });
 
         open my $out, '>:encoding(UTF-8)', $OPTS{write}
-            or die " Error: can't open $OPTS{write} for writing: $!\n";
+            or die "Error: can't open '$OPTS{write}' for writing: $!\n";
         print $out $json or die "Error: writing to file '$OPTS{write}': $!\n";
         close $out       or die "Error: closing file '$OPTS{write}': $!\n";
     }
-    else {
+    if (!$OPTS{write} or $OPTS{show}) {
+        if (@$perls < 2) {
+            die "Error: need more than one perl to do a report.\n";
+        }
         my ($processed, $averages) =
                     grind_process($results, $perls, $loop_counts);
 
@@ -682,7 +788,7 @@ sub do_grind {
 # Return a hash ref suitable for input to grind_process()
 
 sub grind_run {
-    my ($tests, $order, $perls, $counts) = @_;
+    my ($tests, $order, $perls, $counts, $results) = @_;
 
     # Build a list of all the jobs to run
 
@@ -702,20 +808,24 @@ sub grind_run {
         );
 
         for my $p (@$perls) {
-            my ($perl, $label) = @$p;
+            my ($perl, $label, $env, @putargs) = @$p;
 
             # Run both the empty loop and the active loop
             # $counts->[0] and $counts->[1] times.
 
             for my $i (0,1) {
                 for my $j (0,1) {
-                    my $cmd = "PERL_HASH_SEED=0 "
+                    my $envstr = '';
+                    if (ref $env) {
+                        $envstr .= "$_=$env->{$_} " for sort keys %$env;
+                    }
+                    my $cmd = "PERL_HASH_SEED=0 $envstr"
                             . "valgrind --tool=cachegrind  --branch-sim=yes "
                             . "--cachegrind-out-file=/dev/null "
                             . "$OPTS{grindargs} "
-                            . "$perl $OPTS{perlargs} - $counts->[$j] 2>&1";
+                            . "$perl $OPTS{perlargs} @putargs - $counts->[$j] 2>&1";
                     # for debugging and error messages
-                    my $id = "$test/$perl "
+                    my $id = "$test/$label "
                         . ($i ? "active" : "empty") . "/"
                         . ($j ? "long"   : "short") . " loop";
 
@@ -742,7 +852,6 @@ sub grind_run {
     my $running  = 0; # count of executing jobs
     my %pids;         # map pids to jobs
     my %fds;          # map fds  to jobs
-    my %results;
     my $select = IO::Select->new();
 
     while (@jobs or $running) {
@@ -843,7 +952,7 @@ sub grind_run {
                     . "Output\n$o";
             }
 
-            $results{$j->{test}}{$j->{perl}}[$j->{active}][$j->{loopix}]
+            $results->{$j->{test}}{$j->{plabel}}[$j->{active}][$j->{loopix}]
                     = parse_cachegrind($output, $j->{id}, $j->{perl});
         }
 
@@ -866,7 +975,7 @@ sub grind_run {
         }
     }
 
-    return \%results;
+    return $results;
 }
 
 
@@ -932,7 +1041,7 @@ sub grind_process {
     my %counts;
     my %data;
 
-    my $perl_norm = $perls->[$OPTS{norm}][0]; # the name of the reference perl
+    my $perl_norm = $perls->[$OPTS{norm}][1]; # the label of the reference perl
 
     for my $test_name (keys %$res) {
         my $res1 = $res->{$test_name};
@@ -1057,7 +1166,7 @@ sub sorted_test_names {
     unless ($OPTS{average}) {
         if (defined $OPTS{'sort-field'}) {
             my ($field, $perlix) = @OPTS{'sort-field', 'sort-perl'};
-            my $perl = $perls->[$perlix][0];
+            my $perl = $perls->[$perlix][1];
             @names = sort
                 {
                         $results->{$a}{$perl}{$field}
@@ -1088,6 +1197,7 @@ sub grind_print {
     my ($results, $averages, $perls, $tests, $order) = @_;
 
     my @perl_names = map $_->[0], @$perls;
+    my @perl_labels = map $_->[1], @$perls;
     my %perl_labels;
     $perl_labels{$_->[0]} = $_->[1] for @$perls;
 
@@ -1095,7 +1205,7 @@ sub grind_print {
     # Calculate the width to display for each column.
     my $min_width = $OPTS{raw} ? 8 : 6;
     my @widths = map { length($_) < $min_width ? $min_width : length($_) }
-                            @perl_labels{@perl_names};
+    			@perl_labels;
 
     # Print standard header.
     grind_blurb($perls);
@@ -1125,7 +1235,7 @@ sub grind_print {
             print " " x $field_label_width;
             for (0..$#widths) {
                 printf " %*s", $widths[$_],
-                    $i ? ('-' x$widths[$_]) :  $perl_labels{$perl_names[$_]};
+                    $i ? ('-' x$widths[$_]) :  $perl_labels[$_];
             }
             print "\n";
         }
@@ -1147,7 +1257,7 @@ sub grind_print {
                 print " " x $field_label_width;
                 for (0..$#widths) {
                     printf " %*s", $widths[$_],
-                        $i ? ('-' x$widths[$_]) :  $perl_labels{$perl_names[$_]};
+                        $i ? ('-' x$widths[$_]) :  $perl_labels[$_];
                 }
                 print "\n";
             }
@@ -1177,7 +1287,7 @@ sub grind_print {
             }
 
             for my $i (0..$#widths) {
-                my $res2 = $res1->{$perl_names[$i]};
+                my $res2 = $res1->{$perl_labels[$i]};
                 my $p = $res2->{$field};
                 if (!defined $p) {
                     printf " %*s", $widths[$i], '-';
@@ -1240,7 +1350,7 @@ sub grind_print_compact {
     for my $test_name (@test_names) {
         my $doing_ave = ($test_name eq 'AVERAGE');
         my $res = $doing_ave ? $averages : $results->{$test_name};
-        $res = $res->{$perls->[$which_perl][0]};
+        $res = $res->{$perls->[$which_perl][1]};
 
         for my $field (@fields) {
             my $p = $res->{$field};
@@ -1315,8 +1425,10 @@ EOF
         },
     );
 
-    for ('t', '.') {
-        last if require "$_/test.pl";
+    for ('./t', '.') {
+        my $t = "$_/test.pl";
+        next unless  -f $t;
+        require $t;
     }
     plan(@tests / 3 * keys %VALID_FIELDS);
 

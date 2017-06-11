@@ -90,6 +90,7 @@ has [ qw/ username password api_key / ] => (
 has user_agent => (
     is      => 'ro',
     default => sub {
+        require Business::Fixflo;
         # probably want more info in here, version of perl, platform, and such
         return "business-fixflo/perl/v" . $Business::Fixflo::VERSION;
     }

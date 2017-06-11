@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Library::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Library::VERSION   = '1.000006';
+	$Type::Library::VERSION   = '1.002001';
 }
 
 use Eval::TypeTiny qw< eval_closure >;
@@ -22,14 +22,17 @@ BEGIN { *NICE_PROTOTYPES = ($] >= 5.014) ? sub () { !!1 } : sub () { !!0 } };
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
 {
-	my $got_subname;
+	my $subname;
 	my %already; # prevent renaming established functions
 	sub _subname ($$)
 	{
-		($got_subname or eval "require Sub::Name")
-			and ($got_subname = 1)
-			and !$already{refaddr($_[1])}++
-			and return(Sub::Name::subname(@_));
+		$subname =
+			eval { require Sub::Util } ? \&Sub::Util::set_subname :
+			eval { require Sub::Name } ? \&Sub::Name::subname :
+			0
+			if not defined $subname;
+		!$already{refaddr($_[1])}++ and return($subname->(@_))
+			if $subname;
 		return $_[1];
 	}
 }

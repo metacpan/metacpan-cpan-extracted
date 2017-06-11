@@ -1,4 +1,13 @@
 Changes
+examples/linkcheck/lib/LinkCheck.pm
+examples/linkcheck/lib/LinkCheck/Controller/Links.pm
+examples/linkcheck/lib/LinkCheck/Task/CheckLinks.pm
+examples/linkcheck/linkcheck.conf
+examples/linkcheck/script/linkcheck
+examples/linkcheck/t/linkcheck.t
+examples/linkcheck/templates/layouts/linkcheck.html.ep
+examples/linkcheck/templates/links/index.html.ep
+examples/linkcheck/templates/links/result.html.ep
 examples/minion_bench.pl
 lib/Minion.pm
 lib/Minion/Backend.pm

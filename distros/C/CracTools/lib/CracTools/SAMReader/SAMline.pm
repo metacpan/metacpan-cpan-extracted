@@ -1,9 +1,10 @@
 package CracTools::SAMReader::SAMline;
+
 {
   $CracTools::SAMReader::SAMline::DIST = 'CracTools';
 }
 # ABSTRACT: The object for manipulation a SAM line.
-$CracTools::SAMReader::SAMline::VERSION = '1.25';
+$CracTools::SAMReader::SAMline::VERSION = '1.251';
 
 use strict;
 use warnings;
@@ -648,7 +649,7 @@ CracTools::SAMReader::SAMline - The object for manipulation a SAM line.
 
 =head1 VERSION
 
-version 1.25
+version 1.251
 
 =head1 SYNOPSIS
 

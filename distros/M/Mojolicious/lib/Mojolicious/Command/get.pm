@@ -15,17 +15,23 @@ has usage => sub { shift->extract_usage };
 sub run {
   my ($self, @args) = @_;
 
+  # Data from STDIN
+  vec(my $r, fileno(STDIN), 1) = 1;
+  my $in = !-t STDIN && select($r, undef, undef, 0) ? join '', <STDIN> : undef;
+
   my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
+  my %form;
   getopt \@args,
-    'C|charset=s'            => \my $charset,
-    'c|content=s'            => \(my $content = ''),
-    'H|header=s'             => \my @headers,
+    'C|charset=s' => \my $charset,
+    'c|content=s' => \$in,
+    'f|form=s'    => sub { _form(\%form) if $_[1] =~ /^(.+)=(\@?)(.+)$/ },
+    'H|header=s'  => \my @headers,
     'i|inactivity-timeout=i' => sub { $ua->inactivity_timeout($_[1]) },
-    'M|method=s'             => \(my $method = 'GET'),
-    'o|connect-timeout=i'    => sub { $ua->connect_timeout($_[1]) },
-    'r|redirect'             => \my $redirect,
-    'S|response-size=i'      => sub { $ua->max_response_size($_[1]) },
-    'v|verbose'              => \my $verbose;
+    'M|method=s' => \(my $method = 'GET'),
+    'o|connect-timeout=i' => sub { $ua->connect_timeout($_[1]) },
+    'r|redirect'          => \my $redirect,
+    'S|response-size=i'   => sub { $ua->max_response_size($_[1]) },
+    'v|verbose'           => \my $verbose;
 
   @args = map { decode 'UTF-8', $_ } @args;
   die $self->usage unless my $url = shift @args;
@@ -62,7 +68,8 @@ sub run {
   # Switch to verbose for HEAD requests
   $verbose = 1 if $method eq 'HEAD';
   STDOUT->autoflush(1);
-  my $tx = $ua->start($ua->build_tx($method, $url, \%headers, $content));
+  my @content = %form ? (form => \%form) : defined $in ? ($in) : ();
+  my $tx = $ua->start($ua->build_tx($method, $url, \%headers, @content));
   my $res = $tx->result;
 
   # JSON Pointer
@@ -73,6 +80,8 @@ sub run {
   $charset //= $res->content->charset || $res->default_charset;
   _select($buffer, $selector, $charset, @args);
 }
+
+sub _form { push @{$_[0]{$1}}, $2 ? {file => $3} : $3 }
 
 sub _header { $_[0]->build_start_line, $_[0]->headers->to_string, "\n\n" }
 
@@ -133,20 +142,25 @@ Mojolicious::Command::get - Get command
     mojo get mojolicious.org
     mojo get -v -r -o 25 -i 50 google.com
     mojo get -v -H 'Host: mojolicious.org' -H 'Accept: */*' mojolicious.org
-    mojo get -M POST -H 'Content-Type: text/trololo' -c 'trololo' perl.org
+    mojo get mojolicious.org > example.html
+    mojo get -M PUT mojolicious.org < example.html
+    mojo get -f 'q=Mojolicious' -f 'size=5' https://metacpan.org/search
+    mojo get -M POST -f 'upload=@example.html' mojolicious.org
     mojo get mojolicious.org 'head > title' text
     mojo get mojolicious.org .footer all
     mojo get mojolicious.org a attr href
     mojo get mojolicious.org '*' attr id
     mojo get mojolicious.org 'h1, h2, h3' 3 text
-    mojo get https://api.metacpan.org/v0/author/SRI /name
+    mojo get https://fastapi.metacpan.org/v1/author/SRI /name
     mojo get -H 'Host: example.com' http+unix://%2Ftmp%2Fmyapp.sock/index.html
 
   Options:
     -C, --charset <charset>              Charset of HTML/XML content, defaults
                                          to auto-detection
     -c, --content <content>              Content to send with request
-    -H, --header <name:value>            Additional HTTP header
+    -f, --form <name=value>              One or more form values and file
+                                         uploads
+    -H, --header <name:value>            One or more additional HTTP headers
     -h, --help                           Show this summary of available options
         --home <path>                    Path to home directory of your
                                          application, defaults to the value of

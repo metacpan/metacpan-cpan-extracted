@@ -1,0 +1,2 @@
+hello:
+    $class: My::Runnable::Greeting

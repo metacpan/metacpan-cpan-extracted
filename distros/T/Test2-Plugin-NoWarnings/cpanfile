@@ -24,6 +24,8 @@ on 'configure' => sub {
 };
 
 on 'develop' => sub {
+  requires "Code::TidyAll" => "0.56";
+  requires "Code::TidyAll::Plugin::SortLines::Naturally" => "0.000003";
   requires "Code::TidyAll::Plugin::Test::Vars" => "0.02";
   requires "IPC::Run3" => "0";
   requires "Parallel::ForkManager" => "1.19";

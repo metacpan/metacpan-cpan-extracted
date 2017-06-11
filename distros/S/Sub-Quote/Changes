@@ -1,5 +1,12 @@
 Revision history for Sub::Quote
 
+2.004000 - 2017-06-07
+  - more extensive quotify tests
+  - split tests into separate files
+  - propagate package to deferred subs, even if unnamed
+  - reject invalid attributes
+  - include line numbers compile errors (PR#1, djerius)
+
 2.003001 - 2016-12-09
   - fix use of Sub::Name
 

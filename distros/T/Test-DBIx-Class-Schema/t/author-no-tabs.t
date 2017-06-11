@@ -1,8 +1,8 @@
 
 BEGIN {
   unless ($ENV{AUTHOR_TESTING}) {
-    require Test::More;
-    Test::More::plan(skip_all => 'these tests are for testing by the author');
+    print qq{1..0 # SKIP these tests are for testing by the author\n};
+    exit
   }
 }
 
@@ -29,6 +29,7 @@ my @files = (
     't/30.failing_tests.cd.t',
     't/30.failing_tests.track.t',
     't/30.missing_methods.t',
+    't/30.todo.skip.t',
     't/40.untested.columns.t',
     't/author-no-tabs.t',
     't/author-pod-syntax.t',
@@ -41,6 +42,7 @@ my @files = (
     't/lib/TDCSTest/Schema/CD.pm',
     't/lib/TDCSTest/Schema/CDShop.pm',
     't/lib/TDCSTest/Schema/CDShopAudiophile.pm',
+    't/lib/TDCSTest/Schema/LinerNotes.pm',
     't/lib/TDCSTest/Schema/Person.pm',
     't/lib/TDCSTest/Schema/Shop.pm',
     't/lib/TDCSTest/Schema/Track.pm',

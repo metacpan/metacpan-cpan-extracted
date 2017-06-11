@@ -1,0 +1,187 @@
+=head1 NAME
+
+L<BlankOnDev>::DateTime - Module for Date and Time Handling
+
+=head1 SYNOPSIS
+
+    use BlankOnDev::DateTime;
+
+    # For set new DateTime Language :
+    my $hashref = {}; # Please see "Explain subroutine "set_lang" for example hashref.
+    my $lang = 'test_US';
+    BlankOnDev::DateTime->set_lang($hashref, $lang);
+
+    # For get DateTime :
+    my $dateTime = BlankOnDev::DateTime->get();
+
+=head1 DESCRIPTION
+
+This module used for make DateTime format. And module is fork from CellBash::DateTime.
+
+=head1 Explain Subrotuine set_lang() :
+
+    Description :
+    -------------------------------------------
+	Subroutine for set new languages DateTime.
+
+	Format parameter $hashdate :
+	----------------------------------------
+	$hashdate = {
+		'month' => [
+			0 => '',
+			1 => 'Januari',
+			2 => 'Februari',
+			3 => 'Maret',
+			4 => 'April',
+			5 => 'Mei',
+			6 => 'Juni',
+			7 => 'Juli',
+			8 => 'Agustus',
+			9 => 'September',
+			10 => 'Oktober',
+			11 => 'November',
+			12 => 'Desember'
+		],
+		'month_short' => [
+			0 => '',
+			1 => 'Jan',
+			2 => 'Feb',
+			3 => 'Mar',
+			4 => 'Apr',
+			5 => 'Mei',
+			6 => 'Jun',
+			7 => 'Jul',
+			8 => 'Agu',
+			9 => 'Sep',
+			10 => 'Okt',
+			11 => 'Nov',
+			12 => 'Des'
+		],
+		'day' => [
+			0 => '',
+			1 => 'Senin',       # Monday
+			2 => 'Selasa',      # Tuesday
+			3 => 'Rabu',        # Wednesday
+			4 => 'Kamis',       # Thursday
+			5 => 'Jum\'at',     # Friday
+			6 => 'Sabtu',       # Saturday
+			7 => 'Minggu'       # Sunday
+		]
+		'day_short' => [
+			0 => '',
+			1 => 'Sen',         # Mon
+			2 => 'Sel',         # Tue
+			3 => 'Rab',         # Wed
+			4 => 'Kam',         # Thu
+			5 => 'Jum',         # Fri
+			6 => 'Sab',         # Sat
+			7 => 'Min'          # Sun
+		]
+	}
+
+	Format scalar $lang :
+	----------------------------------------
+	$lang       => Example : id_ID or en_US
+
+	Parameter subroutine set_lang() :
+	----------------------------------------
+	$hashdate       =>  Contains hashref day, month and short month name.
+	$lang           =>  Contains name of language which will be make.
+
+=head1 SUBROUTINE add_or_subtract()
+
+	Deskripsi subroutine add_or_subtract() :
+	----------------------------------------
+	Subroutine for add extra time and specific minus time.
+
+	Parameter subroutine add_or_subtract() :
+	----------------------------------------
+	$dt             =>  [ Berisi DateTime module initialized ],
+	$minplus        =>  [ Berisi Identification Time Add/Subtract ].
+						Ex :
+								+1D || +D == add 1 day, -1D || -D == subtract 1 day.
+								+1W || +W == add 1 week, -1W || -W == subtract 1 week.
+								+1M || +M == add 1 month, -1M || -M == subtract 1 month.
+								+1Y || +Y == add 1 year, -1Y || -Y == subtract 1 year.
+								+1h || +h == add 1 hour, -1h || -h == subtract 1 hour.
+								+1m || +m == add 1 minute, -1m || -m == subtract 1 minute.
+								+1s || +s == add 1 second, -1s || -s == subtract 1 second.
+
+=head1 Explain Subrotuine get() :
+
+	Deskripsi subroutine get() :
+	----------------------------------------
+	Subroutine to get data DateTime.
+
+	Format Delimiter in $config :
+	--------------------------------------------------
+	$attribute = {
+		date => '/', # Delimiter date
+		time => ':', # Delimiter time.
+		datetime => [ Delimiter between date and time ex : "_" ],
+		format => [ Format DateTime. Ex: "DD-MM-YYYY hms" ],
+		minplus => [ For Add and Subtract Duration time. value = "add" => extra time, "subtract" => "Time before". ],
+		            See explain subroutine "add_or_subtract()" for key "minplus".
+	}
+
+	Format Key "format" in hashref $config :
+	--------------------------------------------------
+	format      =   DD      =>  Date of Calender
+					MM      =>  Mount Number of Calender
+					YYYY    =>  Years of Calender
+					Dn      =>  Day Name of Week
+					dn      =>  Day name sort of Week
+					Di      =>  Day number of Week
+					Mn      =>  Month Name of Calendar
+					h       =>  Hour of clock.
+					m       =>  Minue of clock.
+					s       =>  Second of clock.
+
+	Format Key "minplus" in hashref $config :
+	--------------------------------------------------
+	minplus     =   +       =>  Add Duration. --> if example current years in 2017 and +1 equals 2018.
+					-       =>  Subtract Duration. --> if example current years in 2017 and -1 equals 2016.
+					D       =>  add/subtract Day.
+					M       =>  add/subtract Month.
+					Y       =>  add/subtract Year.
+					h       =>  add/subtract Hour.
+					m       =>  add/subtract Minutes.
+					s       =>  add/subtract Second.
+
+	Parameter subroutine get() :
+	--------------------------------------------------
+	$timestamp      =>  Contain UNIX TimeStamp Format.
+	$timezone       =>  Contain TimeZone name. Ex: "Asia/Makassar".
+	$attribute      =>  Contains attribute get. See above in section "Format subroutine".
+
+	Output Parameter :
+	--------------------------------------------------
+	$hash_ref = {
+		'custom' => $DateNow_custom,
+		'datetime' => $DateNow,
+		'calender' => {
+			'day_num' => $dayNum,
+			'day_name' => $dayName,
+			'date' => $date_num,
+			'month' => $monthNum,
+			'month_name' => $monthName,
+			'year' => $years
+		},
+		'time' => {
+			'hour' => $hours,
+			'minute' => $minutes,
+			'second' => $second,
+		},
+	}
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2017 by Achmad Yusri Afandi.
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Achmad Yusri Afandi, (linuxer08@gmail.com)
+
+=cut

@@ -4,7 +4,7 @@
       "Kei Kamikawa <x00.x7f@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.7",
+   "generated_by" : "Minilla/v3.0.11",
    "license" : [
       "perl_5"
    ],
@@ -55,10 +55,13 @@
    "provides" : {
       "Text::Shirasu" : {
          "file" : "lib/Text/Shirasu.pm",
-         "version" : "v0.0.3"
+         "version" : "v0.0.4"
       },
       "Text::Shirasu::Node" : {
          "file" : "lib/Text/Shirasu/Node.pm"
+      },
+      "Text::Shirasu::Tree" : {
+         "file" : "lib/Text/Shirasu/Tree.pm"
       }
    },
    "release_status" : "stable",
@@ -72,7 +75,12 @@
          "web" : "https://github.com/Code-Hex/Text-Shirasu"
       }
    },
-   "version" : "0.0.3",
+   "version" : "0.0.4",
    "x_authority" : "cpan:CODEHEX",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "x_contributors" : [
+      "Toshiaki Yokoda <adokoy001@gmail.com>",
+      "K <Code-Hex@users.noreply.github.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300_01",
+   "x_static_install" : 1
 }

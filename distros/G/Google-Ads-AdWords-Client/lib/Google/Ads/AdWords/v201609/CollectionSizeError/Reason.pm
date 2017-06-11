@@ -2,7 +2,7 @@ package Google::Ads::AdWords::v201609::CollectionSizeError::Reason;
 use strict;
 use warnings;
 
-sub get_xmlns { 'https://adwords.google.com/api/adwords/rm/v201609'};
+sub get_xmlns { 'https://adwords.google.com/api/adwords/cm/v201609'};
 
 # derivation by restriction
 use base qw(
@@ -23,7 +23,7 @@ __END__
 =head1 DESCRIPTION
 
 Perl data type class for the XML Schema defined simpleType
-CollectionSizeError.Reason from the namespace https://adwords.google.com/api/adwords/rm/v201609.
+CollectionSizeError.Reason from the namespace https://adwords.google.com/api/adwords/cm/v201609.
 
 The reasons for the target error. 
 

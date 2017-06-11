@@ -127,9 +127,16 @@ END
       "sudo pecl install mailparse-2.1.6",'__display__');
    ($stdout,$stderr)=$handle->cmd('sudo yum -y install epel-release',
       '__display__');
+   ($stdout,$stderr)=$handle->cwd('/etc/yum.repos.d');
+   ($stdout,$stderr)=$handle->cmd('sudo '.
+      "wget --random-wait --progress=dot ".
+      "http://www.nasm.us/nasm.repo",'__display__');
+   ($stdout,$stderr)=$handle->cmd('sudo '.
+      'yum -y --disablerepo=amzn-main '.
+      'install nasm','__display__');
    ($stdout,$stderr)=$handle->cmd('sudo '.
       'yum -y install autoconf automake gcc gcc-c++ '.
-      'git libtool make nasm pkgconfig wget opencv zlib-devel dbus-devel '.
+      'git libtool make pkgconfig wget opencv zlib-devel dbus-devel '.
       'lua-devel zvbi libdvdread-devel libdc1394-devel libxcb-devel '.
       'xcb-util-devel libxml2-devel mesa-libGLU-devel pulseaudio-libs-devel '.
       'alsa-lib-devel libgcrypt-devel qt-devel re2c lshw','__display__');

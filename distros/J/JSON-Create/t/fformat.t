@@ -13,8 +13,8 @@ use JSON::Create;
 
 my $jc = JSON::Create->new ();
 my @array = (1000_000_000.0, 100_000_000.0, 10_000_000.0, 1_000_000.0, 100_000.0, 10_000.0, 1000.0, 100.0,10.0,1.0,0.1,0.01,0.001,0.0001,0.000_01,0.000_001,0.000_000_1,0.000_000_01,0.000_000_001);
-$jc->set_fformat ('%f');
-my $fout = $jc->run (\@array);
+#$jc->set_fformat ('%f');
+#my $fout = $jc->run (\@array);
 #note $fout;
 $jc->set_fformat ('%e');
 my $eout = $jc->run (\@array);
@@ -38,7 +38,7 @@ my $eout_re = qr/
 		    \]$
 		/x;
 
-like ($eout, $eout_re);
+like ($eout, $eout_re, "%e format output looks like it should");
 #note $eout;
 # $jc->set_fformat ('%2.4g');
 # my $gout = $jc->run (\@array);
@@ -53,7 +53,7 @@ my $glpout = $jc->run (\@piarray);
 #note $glpout;
 $jc->set_fformat ('%2.10e');
 my $elpout = $jc->run (\@piarray);
-note $elpout;
+#note $elpout;
 like ($elpout, $eout_re, "%2.10e looks like e format");
 
 badformat ($jc, '%2.100g');

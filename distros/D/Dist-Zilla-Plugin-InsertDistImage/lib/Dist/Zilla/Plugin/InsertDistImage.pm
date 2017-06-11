@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::InsertDistImage;
 
-our $DATE = '2016-07-17'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2017-06-09'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -80,7 +80,7 @@ sub munge_files {
         my $url;
         if ($hosting eq 'metacpan') {
             $url = sprintf(
-                "https://api.metacpan.org/source/%s/%s-%s/%s",
+                "https://st.aticpan.org/source/%s/%s-%s/%s",
                 $authority,
                 $dist_name,
                 $dist_version,
@@ -188,7 +188,7 @@ Dist::Zilla::Plugin::InsertDistImage - Insert images contained in distribution i
 
 =head1 VERSION
 
-This document describes version 0.004 of Dist::Zilla::Plugin::InsertDistImage (from Perl distribution Dist-Zilla-Plugin-InsertDistImage), released on 2016-07-17.
+This document describes version 0.005 of Dist::Zilla::Plugin::InsertDistImage (from Perl distribution Dist-Zilla-Plugin-InsertDistImage), released on 2017-06-09.
 
 =head1 SYNOPSIS
 
@@ -196,7 +196,7 @@ In F<share/images>, put some images e.g. F<img1.jpg> and F<img2.png>.
 
 In F<dist.ini>:
 
- [InsertDistImages]
+ [InsertDistImage]
  ;hosting=metacpan
  ;include_files=...
  ;exclude_files=...
@@ -218,13 +218,13 @@ After build, F<lib/Foo.pm> will contain:
 
  =begin html
 
- <img src="https://api.metacpan.org/source/CPANID/Your-Dist-Name-0.123/share/images/img1.jpg" />
+ <img src="https://st.aticpan.org/source/CPANID/Your-Dist-Name-0.123/share/images/img1.jpg" />
 
  =end html
 
  =begin html
 
- <img src="https://api.metacpan.org/source/CPANID/Your-Dist-Name-0.123/share/images/img2.png" />
+ <img src="https://st.aticpan.org/source/CPANID/Your-Dist-Name-0.123/share/images/img2.png" />
 
  =end html
 
@@ -327,7 +327,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

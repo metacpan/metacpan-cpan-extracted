@@ -1,4 +1,9 @@
 Revision history for Perl module Math::Decimal128
+
+0.09
+    - Adjust _is_neg_zero() to circumvent gcc optimization bug.
+      See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80692
+
 0.08
     - Remove occurrences of 'aTHX' that had been auto-implanted in some error messages
     - Replace SvIV/SvUV/SvNV with SvIVX/SvUVX/SvNVX where appropriate.

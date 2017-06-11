@@ -26,6 +26,11 @@ typedef struct digest_struct {          /* used by Crypt::Digest */
   struct ltc_hash_descriptor *desc;
 } *Crypt__Digest;
 
+typedef struct digest_shake_struct {    /* used by Crypt::Digest::SHAKE */
+  hash_state state;
+  int num;
+} *Crypt__Digest__SHAKE;
+
 typedef struct ccm_struct {             /* used by Crypt::AuthEnc::CCM */
   ccm_state state;
   int id;
@@ -41,10 +46,30 @@ typedef struct gcm_struct {             /* used by Crypt::AuthEnc::GCM */
   int id;
 } *Crypt__AuthEnc__GCM;
 
+typedef struct chacha20poly1305_struct {/* used by Crypt::AuthEnc::ChaCha20Poly1305 */
+  chacha20poly1305_state state;
+  int id;
+} *Crypt__AuthEnc__ChaCha20Poly1305;
+
 typedef struct ocb_struct {             /* used by Crypt::AuthEnc::OCB */
   ocb3_state state;
   int id;
 } *Crypt__AuthEnc__OCB;
+
+typedef struct chacha_struct {          /* used by Crypt::Stream::ChaCha */
+  chacha_state state;
+  int id;
+} *Crypt__Stream__ChaCha;
+
+typedef struct rc4_struct {             /* used by Crypt::Stream::RC4 */
+  rc4_state state;
+  int id;
+} *Crypt__Stream__RC4;
+
+typedef struct sober128_struct {        /* used by Crypt::Stream::Sober128 */
+  sober128_state state;
+  int id;
+} *Crypt__Stream__Sober128;
 
 typedef struct f9_struct {              /* used by Crypt::Mac::F9 */
   f9_state state;
@@ -75,6 +100,21 @@ typedef struct xcbc_struct {            /* used by Crypt::Mac::XCBC */
   xcbc_state state;
   int id;
 } *Crypt__Mac__XCBC;
+
+typedef struct poly1305_struct {        /* used by Crypt::Mac::Poly1305 */
+  poly1305_state state;
+  int id;
+} *Crypt__Mac__Poly1305;
+
+typedef struct blake2s_struct {         /* used by Crypt::Mac::BLAKE2s */
+  blake2smac_state state;
+  int id;
+} *Crypt__Mac__BLAKE2s;
+
+typedef struct blake2b_struct {         /* used by Crypt::Mac::BLAKE2b */
+  blake2bmac_state state;
+  int id;
+} *Crypt__Mac__BLAKE2b;
 
 typedef struct cbc_struct {             /* used by Crypt::Mode::CBC */
   int cipher_id, cipher_rounds;
@@ -147,29 +187,29 @@ typedef struct prng_struct {            /* used by Crypt::PRNG */
 } *Crypt__PRNG;
 
 typedef struct rsa_struct {             /* used by Crypt::PK::RSA */
-  prng_state yarrow_prng_state;
-  int yarrow_prng_index;
+  prng_state pstate;
+  int pindex;
   rsa_key key;
   int id;
 } *Crypt__PK__RSA;
 
 typedef struct dsa_struct {             /* used by Crypt::PK::DSA */
-  prng_state yarrow_prng_state;
-  int yarrow_prng_index;
+  prng_state pstate;
+  int pindex;
   dsa_key key;
   int id;
 } *Crypt__PK__DSA;
 
 typedef struct dh_struct {              /* used by Crypt::PK::DH */
-  prng_state yarrow_prng_state;
-  int yarrow_prng_index;
+  prng_state pstate;
+  int pindex;
   dh_key key;
   int id;
 } *Crypt__PK__DH;
 
 typedef struct ecc_struct {             /* used by Crypt::PK::ECC */
-  prng_state yarrow_prng_state;
-  int yarrow_prng_index;
+  prng_state pstate;
+  int pindex;
   ecc_key key;
   ltc_ecc_set_type dp;
   int id;
@@ -323,15 +363,28 @@ BOOT:
     if(register_hash(&sha512_desc)==-1)        { croak("FATAL: cannot register_hash sha512"); }
     if(register_hash(&sha512_224_desc)==-1)    { croak("FATAL: cannot register_hash sha512_224"); }
     if(register_hash(&sha512_256_desc)==-1)    { croak("FATAL: cannot register_hash sha512_256"); }
+    if(register_hash(&sha3_224_desc)==-1)      { croak("FATAL: cannot register_hash sha3_224"); }
+    if(register_hash(&sha3_256_desc)==-1)      { croak("FATAL: cannot register_hash sha3_256"); }
+    if(register_hash(&sha3_384_desc)==-1)      { croak("FATAL: cannot register_hash sha3_384"); }
+    if(register_hash(&sha3_512_desc)==-1)      { croak("FATAL: cannot register_hash sha3_512"); }
     if(register_hash(&tiger_desc)==-1)         { croak("FATAL: cannot register_hash tiger"); }
     if(register_hash(&whirlpool_desc)==-1)     { croak("FATAL: cannot register_hash whirlpool"); }
+    if(register_hash(&blake2b_160_desc)==-1)   { croak("FATAL: cannot register_hash blake2b_160"); }
+    if(register_hash(&blake2b_256_desc)==-1)   { croak("FATAL: cannot register_hash blake2b_256"); }
+    if(register_hash(&blake2b_384_desc)==-1)   { croak("FATAL: cannot register_hash blake2b_384"); }
+    if(register_hash(&blake2b_512_desc)==-1)   { croak("FATAL: cannot register_hash blake2b_512"); }
+    if(register_hash(&blake2s_128_desc)==-1)   { croak("FATAL: cannot register_hash blake2s_128"); }
+    if(register_hash(&blake2s_160_desc)==-1)   { croak("FATAL: cannot register_hash blake2s_160"); }
+    if(register_hash(&blake2s_224_desc)==-1)   { croak("FATAL: cannot register_hash blake2s_224"); }
+    if(register_hash(&blake2s_256_desc)==-1)   { croak("FATAL: cannot register_hash blake2s_256"); }
     /* --- */
     if(chc_register(find_cipher("aes"))==-1)   { croak("FATAL: chc_register failed"); }
     /* --- */
     if(register_prng(&fortuna_desc)==-1)       { croak("FATAL: cannot register_prng fortuna"); }
+    if(register_prng(&yarrow_desc)==-1)        { croak("FATAL: cannot register_prng yarrow"); }
     if(register_prng(&rc4_desc)==-1)           { croak("FATAL: cannot register_prng rc4"); }
     if(register_prng(&sober128_desc)==-1)      { croak("FATAL: cannot register_prng sober128"); }
-    if(register_prng(&yarrow_desc)==-1)        { croak("FATAL: cannot register_prng yarrow"); }
+    if(register_prng(&chacha20_prng_desc)==-1) { croak("FATAL: cannot register_prng chacha20"); }
     /* --- */
 #ifdef TFM_DESC
     ltc_mp = tfm_desc;
@@ -423,9 +476,64 @@ CryptX__decode_base64(SV * in)
     OUTPUT:
         RETVAL
 
+SV *
+CryptX__increment_octets_le(SV * in)
+    CODE:
+    {
+        STRLEN len, i = 0;
+        unsigned char *out_data, *in_data;
+        int rv;
+
+        if (!SvPOK(in)) XSRETURN_UNDEF;
+        in_data = (unsigned char *) SvPVbyte(in, len);
+        if (len == 0) XSRETURN_UNDEF;
+
+        RETVAL = NEWSV(0, len);
+        SvPOK_only(RETVAL);
+        SvCUR_set(RETVAL, len);
+        out_data = (unsigned char *)SvPV_nolen(RETVAL);
+        Copy(in_data, out_data, len, unsigned char);
+        while (i < len) {
+          out_data[i]++;
+          if (0 != out_data[i]) break;
+          i++;
+        }
+        if (i == len) croak("FATAL: increment_octets_le overflow");
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+CryptX__increment_octets_be(SV * in)
+    CODE:
+    {
+        STRLEN len, i = 0;
+        unsigned char *out_data, *in_data;
+        int rv;
+
+        if (!SvPOK(in)) XSRETURN_UNDEF;
+        in_data = (unsigned char *) SvPVbyte(in, len);
+        if (len == 0) XSRETURN_UNDEF;
+
+        RETVAL = NEWSV(0, len);
+        SvPOK_only(RETVAL);
+        SvCUR_set(RETVAL, len);
+        out_data = (unsigned char *)SvPV_nolen(RETVAL);
+        Copy(in_data, out_data, len, unsigned char);
+        while (i < len) {
+          out_data[len - 1 - i]++;
+          if (0 != out_data[len - 1 - i]) break;
+          i++;
+        }
+        if (i == len) croak("FATAL: increment_octets_le overflow");
+    }
+    OUTPUT:
+        RETVAL
+
 ###############################################################################
 
 INCLUDE: inc/CryptX_Digest.xs.inc
+INCLUDE: inc/CryptX_Digest_SHAKE.xs.inc 
 INCLUDE: inc/CryptX_Cipher.xs.inc
 
 INCLUDE: inc/CryptX_Checksum_Adler32.xs.inc
@@ -435,6 +543,11 @@ INCLUDE: inc/CryptX_AuthEnc_EAX.xs.inc
 INCLUDE: inc/CryptX_AuthEnc_GCM.xs.inc
 INCLUDE: inc/CryptX_AuthEnc_OCB.xs.inc
 INCLUDE: inc/CryptX_AuthEnc_CCM.xs.inc
+INCLUDE: inc/CryptX_AuthEnc_ChaCha20Poly1305.xs.inc
+
+INCLUDE: inc/CryptX_Stream_ChaCha.xs.inc
+INCLUDE: inc/CryptX_Stream_RC4.xs.inc
+INCLUDE: inc/CryptX_Stream_Sober128.xs.inc
 
 INCLUDE: inc/CryptX_Mac_F9.xs.inc
 INCLUDE: inc/CryptX_Mac_HMAC.xs.inc
@@ -442,6 +555,9 @@ INCLUDE: inc/CryptX_Mac_OMAC.xs.inc
 INCLUDE: inc/CryptX_Mac_Pelican.xs.inc
 INCLUDE: inc/CryptX_Mac_PMAC.xs.inc
 INCLUDE: inc/CryptX_Mac_XCBC.xs.inc
+INCLUDE: inc/CryptX_Mac_Poly1305.xs.inc
+INCLUDE: inc/CryptX_Mac_BLAKE2s.xs.inc
+INCLUDE: inc/CryptX_Mac_BLAKE2b.xs.inc
 
 INCLUDE: inc/CryptX_Mode_CBC.xs.inc
 INCLUDE: inc/CryptX_Mode_ECB.xs.inc

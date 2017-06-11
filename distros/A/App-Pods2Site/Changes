@@ -1,5 +1,8 @@
 Revision history for App-Pods2Site
 
+0.010	2017-02-01
+
+	Attempt to address some minor Kwalitee issues
 0.009	2017-02-01
 
 	Support for simple argv expansion using @filename entries

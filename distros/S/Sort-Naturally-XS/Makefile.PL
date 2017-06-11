@@ -16,6 +16,22 @@ WriteMakefile(
 	# OBJECT            => '$(O_FILES)', # link all the C files too
 	MYEXTLIB     => 'src/libnsort$(LIB_EXT)',
 	OPTIMIZE     => '-O3',
+	META_MERGE   => {
+		'meta-spec' => {
+			version => 2
+		},
+		resources   => {
+			repository => {
+				type => 'git',
+				url  => 'https://github.com/CaballerosTeam/Sort-Naturally-XS.git',
+				web  => 'https://github.com/CaballerosTeam/Sort-Naturally-XS',
+			},
+			bugtracker => {
+				web    => 'https://github.com/CaballerosTeam/Sort-Naturally-XS/issues',
+				mailto => 'jurzin.s@gmail.com',
+			},
+		},
+	},
 );
 if (eval {
 	require ExtUtils::Constant;

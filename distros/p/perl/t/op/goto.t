@@ -4,13 +4,13 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = qw(. ../lib);
     require "./test.pl"; require './charset_tools.pl';
+    set_up_inc( qw(. ../lib) );
 }
 
 use warnings;
 use strict;
-plan tests => 98;
+plan tests => 100;
 our $TODO;
 
 my $deprecated = 0;
@@ -97,7 +97,7 @@ for (1) {
 is($count, 2, 'end of loop');
 
 # Does goto work correctly within a for(;;) loop?
-#  (BUG ID 20010309.004)
+#  (BUG ID 20010309.004 (#5998))
 
 for(my $i=0;!$i++;) {
   my $x=1;
@@ -280,7 +280,7 @@ YYY: print "OK\n";
 EOT
 close $f;
 
-$r = runperl(prog => 'use Op_goto01; print qq[DONE\n]');
+$r = runperl(prog => 'BEGIN { unshift @INC, q[.] } use Op_goto01; print qq[DONE\n]');
 is($r, "OK\nDONE\n", "goto within use-d file"); 
 unlink_all "Op_goto01.pm";
 
@@ -774,3 +774,39 @@ sub FETCH     { $_[0][0] }
 tie my $t, "", sub { "cluck up porridge" };
 is eval { sub { goto $t }->() }//$@, 'cluck up porridge',
   'tied arg returning sub ref';
+
+TODO: {
+  local $::TODO = 'RT #45091: goto in CORE::GLOBAL::exit unsupported';
+  fresh_perl_is(<<'EOC', "before\ndie handler\n", {stderr => 1}, 'RT #45091: goto in CORE::GLOBAL::EXIT');
+  BEGIN {
+    *CORE::GLOBAL::exit = sub {
+      goto FASTCGI_NEXT_REQUEST;
+    };
+  }
+  while (1) {
+    eval { that_cgi_script() };
+    FASTCGI_NEXT_REQUEST:
+    last;
+  }
+  
+  sub that_cgi_script {
+    local $SIG{__DIE__} = sub { print "die handler\n"; exit; print "exit failed?\n"; };
+    print "before\n";
+    eval { buggy_code() };
+    print "after\n";
+  }
+  sub buggy_code {
+    die "error!";
+    print "after die\n";
+  }
+EOC
+}
+
+sub revnumcmp ($$) {
+  goto FOO;
+  die;
+  FOO:
+  return $_[1] <=> $_[0];
+}
+is eval { join(":", sort revnumcmp (9,5,1,3,7)) }, "9:7:5:3:1",
+  "can goto at top level of multicalled sub";

@@ -20,7 +20,7 @@ Net::Etcd::Lease
 
 =cut
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 =head1 DESCRIPTION
 
@@ -82,7 +82,7 @@ a given time to live period. All keys attached to the lease will be expired and 
 the lease expires. Each expired key generates a delete event in the event history.
 
 
-$etcd->lease({ name =>'foo' password => 'bar' })->grant
+    $etcd->lease({ name =>'foo' password => 'bar' })->grant
 
 =cut
 
@@ -99,7 +99,7 @@ sub grant {
 
 LeaseRevoke revokes a lease. All keys attached to the lease will expire and be deleted.
 
-$etcd->lease({{ ID => 7587821338341002662 })->revoke
+    $etcd->lease({{ ID => 7587821338341002662 })->revoke
 
 =cut
 
@@ -116,7 +116,7 @@ sub revoke {
 
 LeaseTimeToLive retrieves lease information.
 
-$etcd->lease({{ ID => 7587821338341002662, keys => 1 })->ttl
+    $etcd->lease({{ ID => 7587821338341002662, keys => 1 })->ttl
 
 =cut
 
@@ -135,7 +135,7 @@ sub ttl {
 LeaseKeepAlive keeps the lease alive by streaming keep alive requests from the client
 to the server and streaming keep alive responses from the server to the client."
 
-$etcd->lease({{ ID => 7587821338341002662 })->keepalive
+    $etcd->lease({{ ID => 7587821338341002662 })->keepalive
 
 =cut
 

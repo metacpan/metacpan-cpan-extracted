@@ -1,4 +1,5 @@
 package App::EvalServerAdvanced::Seccomp;
+our $VERSION = '0.017';
 
 use strict;
 use warnings;
@@ -7,7 +8,7 @@ use Data::Dumper;
 use List::Util qw/reduce uniq/;
 use Moo;
 use Linux::Clone;
-use POSIX;
+use POSIX ();
 use Linux::Seccomp;
 use Carp qw/croak/;
 use Permute::Named::Iter qw/permute_named_iter/;
@@ -123,7 +124,7 @@ our %rule_sets = (
   },
   file_opendir => {
     rules => [{syscall => 'getdents'},
-              {syscall => 'open', rules => [['1', '==', $O_DIRECTORY|&POSIX::O_RDONLY|&POSIX::O_NONBLOCK|$O_CLOEXEC]]}, 
+              {syscall => 'open', rules => [['1', '==', $O_DIRECTORY|POSIX::O_RDONLY|POSIX::O_NONBLOCK|$O_CLOEXEC]]}, 
              ],
     include => ['file_open'],
   },
@@ -132,11 +133,11 @@ our %rule_sets = (
     include => ['file_open'],
   },
   file_readonly => { 
-    permute => {open_modes => [&POSIX::O_NONBLOCK, &POSIX::O_EXCL, &POSIX::O_RDONLY, $O_NOFOLLOW, $O_CLOEXEC]},
+    permute => {open_modes => [POSIX::O_NONBLOCK, POSIX::O_EXCL, POSIX::O_RDONLY, $O_NOFOLLOW, $O_CLOEXEC]},
     include => ['file_open'],
   },
   file_write => {
-    permute => {open_modes => [&POSIX::O_CREAT,&POSIX::O_WRONLY, &POSIX::O_TRUNC, &POSIX::O_RDWR]},
+    permute => {open_modes => [POSIX::O_CREAT,POSIX::O_WRONLY, POSIX::O_TRUNC, POSIX::O_RDWR]},
     rules => [{syscall => 'write'},
               {syscall => 'pwrite64'},
     ],
@@ -284,12 +285,12 @@ sub build_seccomp {
     my @modes = @{$self->_permutes->{$permute}} = sort {$a <=> $b} uniq @{$self->_permutes->{$permute}};
 
     # Produce every bitpattern for this permutation
-    for my $b (1..(2**@modes) - 1) {
+    for my $bit (1..(2**@modes) - 1) {
       my $q = 1;
       my $mode = 0;
       #printf "%04b: ", $b;
       do {
-        if ($q & $b) {
+        if ($q & $bit) {
           my $r = int(log($q)/log(2)+0.5); # get the thing
 
           $mode |= $modes[$r];
@@ -297,7 +298,7 @@ sub build_seccomp {
           #print "$r";
         }
         $q <<= 1;
-      } while ($q <= $b);
+      } while ($q <= $bit);
 
       push @{$full_permute{$permute}}, $mode;
     }

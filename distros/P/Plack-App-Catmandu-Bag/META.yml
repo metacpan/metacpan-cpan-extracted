@@ -1,5 +1,5 @@
 ---
-abstract: 'Plack application that wraps a REST API around a Catmandu::Bag'
+abstract: 'Wrap a REST API around a Catmandu::Bag'
 author:
   - 'Nicolas Steenlant <nicolas.steenlant@ugent.be>'
 build_requires:
@@ -32,5 +32,5 @@ resources:
   bugtracker: https://github.com/LibreCat/Plack-App-Catmandu-Bag/issues
   homepage: https://github.com/LibreCat/Plack-App-Catmandu-Bag
   repository: https://github.com/LibreCat/Plack-App-Catmandu-Bag.git
-version: '0.01'
+version: '0.0101'
 x_serialization_backend: 'YAML::Tiny version 1.69'

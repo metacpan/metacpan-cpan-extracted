@@ -1,9 +1,10 @@
 package CracTools;
+
 {
   $CracTools::DIST = 'CracTools';
 }
 # ABSTRACT: A set of tools designed to extract data from CRAC's SAM files and to provide annotations.
-$CracTools::VERSION = '1.25';
+$CracTools::VERSION = '1.251';
 our $PACKAGE_NAME = "CracTools";
 
 
@@ -27,7 +28,7 @@ CracTools - A set of tools designed to extract data from CRAC's SAM files and to
 
 =head1 VERSION
 
-version 1.25
+version 1.251
 
 =head1 DESCRIPTION
 

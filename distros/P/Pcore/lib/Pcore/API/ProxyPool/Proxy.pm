@@ -2,7 +2,7 @@ package Pcore::API::ProxyPool::Proxy;
 
 use Pcore -class;
 use Pcore::API::ProxyPool::Proxy::Removed;
-use Pcore::AE::Handle qw[:ALL];
+use Pcore::AE::Handle2 qw[:ALL];
 
 extends qw[Pcore::Util::URI];
 
@@ -211,7 +211,7 @@ sub get_slot ( $self, $connect, @ ) {
         $cb->( $self, 0 );
     }
     else {
-        $connect = Pcore::AE::Handle::get_connect($connect);
+        $connect = Pcore::AE::Handle2::get_connect($connect);
 
         my $cached_proxy_type = $self->{test_connection}->{ $connect->[3] };
 
@@ -444,7 +444,7 @@ sub _check_tunnel ( $self, $proxy_type, $connect, $cb ) {
 }
 
 sub _test_connection ( $self, $connect, $proxy_type, $cb ) {
-    Pcore::AE::Handle->new(
+    Pcore::AE::Handle2->new(
         connect                     => $connect,
         connect_timeout             => $PROXY_TEST_TIMEOUT,
         timeout                     => $PROXY_TEST_TIMEOUT,

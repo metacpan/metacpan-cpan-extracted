@@ -111,7 +111,6 @@ padsv		SKIP my $x
 padav		SKIP my @x
 padhv		SKIP my %x
 padany		SKIP (not implemented)
-pushre		SKIP split /foo/
 rv2gv		*x
 rv2sv		$x
 av2arylen	$#x
@@ -287,7 +286,7 @@ return		return
 last		last
 next		next
 redo		redo THIS
-dump		dump
+dump		CORE::dump
 goto		goto THERE
 exit		exit 0
 open		open FOO

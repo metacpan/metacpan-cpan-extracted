@@ -1,0 +1,56 @@
+---
+abstract: 'Restore paths from borg backups'
+author:
+  - '-2017  Florian Pritz <bluewind@xinu.at>'
+build_requires:
+  Test::Differences: '0'
+  Test::Exception: '0'
+  Test::MockObject: '0'
+  Test::More: '0.98'
+configure_requires:
+  Devel::CheckBin: '0'
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-BorgRestore
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::BorgRestore:
+    file: lib/App/BorgRestore.pm
+    version: v2.0.1
+  App::BorgRestore::Borg:
+    file: lib/App/BorgRestore/Borg.pm
+  App::BorgRestore::DB:
+    file: lib/App/BorgRestore/DB.pm
+  App::BorgRestore::Helper:
+    file: lib/App/BorgRestore/Helper.pm
+  App::BorgRestore::Settings:
+    file: lib/App/BorgRestore/Settings.pm
+requires:
+  DBD::SQLite: '0'
+  DBI: '0'
+  Function::Parameters: '0'
+  IPC::Run: '0'
+  Log::Any: '0'
+  Log::Any::Adapter::Log4perl: '0'
+  Log::Log4perl: '0'
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/Bluewind/App-BorgRestore/issues
+  homepage: https://github.com/Bluewind/App-BorgRestore
+  repository: git://github.com/Bluewind/App-BorgRestore.git
+version: 2.0.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

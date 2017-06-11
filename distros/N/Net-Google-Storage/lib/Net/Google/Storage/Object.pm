@@ -1,10 +1,7 @@
 use strict;
 use warnings;
 package Net::Google::Storage::Object;
-{
-  $Net::Google::Storage::Object::VERSION = '0.1.2';
-}
-
+$Net::Google::Storage::Object::VERSION = '0.2.0';
 # ABSTRACT: Interface for a Google Storage Object
 # https://developers.google.com/storage/docs/json_api/v1/objects#resource
 
@@ -37,9 +34,15 @@ has bucket => (
 );
 
 
-has media => (
+has timeCreated => (
 	is => 'ro',
-	isa => 'HashRef',
+	isa => 'Str',
+);
+
+
+has md5Hash => (
+	is => 'ro',
+	isa => 'Str',
 );
 
 
@@ -77,9 +80,11 @@ __PACKAGE__->meta->make_immutable;
 
 1;
 
-
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -87,7 +92,7 @@ Net::Google::Storage::Object - Interface for a Google Storage Object
 
 =head1 VERSION
 
-version 0.1.2
+version 0.2.0
 
 =head1 DESCRIPTION
 
@@ -118,10 +123,13 @@ not the id.>
 
 The name of the bucket the object resides within.
 
-=head2 media
+=head2 timeCreated
 
-A hashref containing sundry information about the file itself - check out the
-L<docs|https://developers.google.com/storage/docs/json_api/v1/objects#resource>.
+The creation timestamp of the object
+
+=head2 md5Hash
+
+A base64 encoded checksum of the object's data
 
 =head2 contentEncoding
 
@@ -155,4 +163,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

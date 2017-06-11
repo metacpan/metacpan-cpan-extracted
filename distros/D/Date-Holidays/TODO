@@ -1,7 +1,5 @@
 TODO file for Date-Holidays
 
-$Id: TODO 1742 2007-02-22 19:47:55Z jonasbn $
-
 - Investigate whether we need an adapter at all
 
 - Look into implementing a Class Adapter pattern for exposure of adaptee's
@@ -18,7 +16,7 @@ $Id: TODO 1742 2007-02-22 19:47:55Z jonasbn $
     module to use.
 
 - Add more documentation on OOP or procedural approach
-  
+
 From processing of test results from bin/test_date-holidays_modules.t
 
 - Date::Holidays::UK misses holidays or similar method
@@ -39,7 +37,7 @@ From processing of test results from bin/test_date-holidays_modules.t
 
   DONE, available on CPAN
 
-- BORUP suggests letting is_holiday and holidays take DateTime objects as 
+- BORUP suggests letting is_holiday and holidays take DateTime objects as
   parameters and also returning results of these types or DateTime::Spans.
 
   DONE, added as an experiment to 0.02

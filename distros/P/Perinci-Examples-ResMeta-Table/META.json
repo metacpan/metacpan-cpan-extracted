@@ -62,7 +62,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-Examples-ResMeta-Table"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024000"
@@ -549,6 +549,6 @@
       }
    },
    "x_authority" : "cpan:PERLANCAR",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
 }
 

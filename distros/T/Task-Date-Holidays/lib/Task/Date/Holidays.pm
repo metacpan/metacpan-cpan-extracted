@@ -3,12 +3,22 @@ use warnings;
 use 5.006;
 
 package Task::Date::Holidays;
-$Task::Date::Holidays::VERSION = '0.05';
+$Task::Date::Holidays::VERSION = '0.07';
 1;
 
 __END__
 
 =pod
+
+=begin markdown
+
+# Task::Date::Holidays
+
+[![CPAN version](https://badge.fury.io/pl/Task-Date-Holidays.svg)](http://badge.fury.io/pl/Task-Date-Holidays)
+[![Build Status](https://travis-ci.org/jonasbn/perl-Task-Date-Holidays.svg?branch=master)](https://travis-ci.org/jonasbn/perl-Task-Date-Holidays)
+[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/perl-date-holidays)
+
+=end markdown
 
 =head1 NAME
 
@@ -16,7 +26,7 @@ Task::Date::Holidays - Work package for holiday modules in the Date::Holidays na
 
 =head1 VERSION
 
-version 0.05
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -34,25 +44,19 @@ version 0.05
 
 =head1 DESCRIPTION
 
-THis module is intended to provide an easy way to
-install all of the Date::Holidays::* distributions.
+THis module is intended to provide an easy way to install all of the Date::Holidays::* distributions.
 
-Bundling these makes it easier for me to maintain
-Date::Holidays.
+Bundling these makes it easier for me personally, in the work related to maintaining L<Date::Holidays>.
 
-If your distribution is missing, let me know or
-fork and send me a pull request or just let me know.
+If your distribution is missing, let me know or fork and send me a pull request or just let me know.
 
-If you want to provide a distribution to the namespace
-please see Date::Holidays for more documentation on this.
+If you want to provide a distribution to the namespace, please see Date::Holidays for more documentation on this.
 
-Please note that because a distribution is listed in
-the below list, does not necessarily make it compatible
-with the Date::Holidays API. Distributions listed here
-indicate that a given distribution is either compatible or
-being condisered for inclusion.
+Do note that because a distribution is listed in the below list, does not necessarily make it compatible with the
+Date::Holidays API. Distributions listed here indicate that a given distribution is either compatible or
+being considered for inclusion.
 
-Please see Date::Holidays
+Please see L<Date::Holidays>
 
 =head1 CONTENTS
 
@@ -63,6 +67,8 @@ Please see Date::Holidays
 =item * L<Date::Holidays::AU>
 
 =item * L<Date::Holidays::BR>
+
+=item * L<Date::Holidays::BY>
 
 =item * L<Date::Holidays::CA>
 
@@ -122,15 +128,15 @@ Please see Date::Holidays
 
 No special configuration or environment is required.
 
-=head1 BUG REPORTING
+=head1 ISSUE REPORTING
 
-Please report issues via CPAN RT:
+Please report any bugs or feature requests either using Github
 
-  http://rt.cpan.org/NoAuth/Bugs.html?Dist=Date-Holidays
+=over
 
-or by sending mail to
+=item * L<Github Issues|https://github.com/jonasbn/perl-test-timer/issues>
 
-  bug-Date-Holidays@rt.cpan.org
+=back
 
 =head1 AUTHOR
 
@@ -151,7 +157,7 @@ Jonas B. Nielsen, (jonasbn) - C<< <jonasbn@cpan.org> >>
 =head1 LICENSE AND COPYRIGHT
 
 Task-Date-Holidays and related modules are (C) by Jonas B. Nielsen, (jonasbn)
-2014-2015
+2014-2017
 
 Task-Date-Holidays and related modules are released under the Artistic License 2.0
 

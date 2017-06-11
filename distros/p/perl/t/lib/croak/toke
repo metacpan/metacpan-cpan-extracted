@@ -70,6 +70,13 @@ Can't find string terminator "foo" anywhere before EOF at (eval 1) line 1.
 EXPECT
 Can't find string terminator "foo" anywhere before EOF at - line 1.
 ########
+# NAME Unterminated here-doc with non-Latin-1 terminator
+BEGIN { binmode STDERR, ":utf8" }
+use utf8;
+<<옷옷
+EXPECT
+Can't find string terminator "옷옷" anywhere before EOF at - line 3.
+########
 # NAME Unterminated qw//
 qw/
 EXPECT
@@ -85,6 +92,20 @@ Can't find string terminator "/" anywhere before EOF at - line 1.
 EXPECT
 Can't find string terminator "'" anywhere before EOF at - line 1.
 ########
+# NAME Unterminated q// with non-ASCII delimiter, under utf8
+BEGIN { binmode STDERR, ":utf8" }
+use utf8;
+q«
+EXPECT
+Can't find string terminator "«" anywhere before EOF at - line 3.
+########
+# NAME Unterminated q// with non-Latin-1 delimiter
+BEGIN { binmode STDERR, ":utf8" }
+use utf8;
+q 옷
+EXPECT
+Can't find string terminator "옷" anywhere before EOF at - line 3.
+########
 # NAME /\N{/
 /\N{/
 EXPECT
@@ -99,20 +120,17 @@ Missing $ on loop variable at - line 1.
 # NAME Missing name in "my sub"
 use feature 'lexical_subs'; my sub;
 EXPECT
-The lexical_subs feature is experimental at - line 1.
 Missing name in "my sub" at - line 1.
 ########
 # NAME Missing name in "our sub"
 use feature 'lexical_subs'; our sub;
 EXPECT
-The lexical_subs feature is experimental at - line 1.
 Missing name in "our sub" at - line 1.
 ########
 # NAME Missing name in "state sub"
-use 5.01; use feature 'lexical_subs';
+use 5.01;
 state sub;
 EXPECT
-The lexical_subs feature is experimental at - line 2.
 Missing name in "state sub" at - line 2.
 ########
 # NAME my sub pack::foo
@@ -120,8 +138,6 @@ use feature 'lexical_subs', 'state';
 my sub foo::bar;
 state sub foo::bear;
 EXPECT
-The lexical_subs feature is experimental at - line 2.
-The lexical_subs feature is experimental at - line 3.
 "my" subroutine &foo::bar can't be in a package at - line 2, near "my sub foo::bar"
 "state" subroutine &foo::bear can't be in a package at - line 3, near "state sub foo::bear"
 Execution of - aborted due to compilation errors.
@@ -164,9 +180,16 @@ Execution of - aborted due to compilation errors.
 # NAME Regexp constant overloading when *^H is undefined
 use overload;
 BEGIN { overload::constant qr => sub {}; undef *^H }
-/a/, m'a'
+/a/
 EXPECT
 Constant(qq) unknown at - line 3, within pattern
+Execution of - aborted due to compilation errors.
+########
+# NAME Regexp constant overloading when *^H is undefined
+use overload;
+BEGIN { overload::constant qr => sub {}; undef *^H }
+m'a'
+EXPECT
 Constant(q) unknown at - line 3, within pattern
 Execution of - aborted due to compilation errors.
 ########
@@ -216,9 +239,16 @@ Execution of - aborted due to compilation errors.
 # NAME Regexp constant overloading returning undef
 use overload;
 BEGIN { overload::constant qr => sub {} }
-/a/, m'a'
+/a/
 EXPECT
 Constant(qq): Call to &{$^H{qr}} did not return a defined value at - line 3, within pattern
+Execution of - aborted due to compilation errors.
+########
+# NAME Regexp constant overloading returning undef
+use overload;
+BEGIN { overload::constant qr => sub {} }
+m'a'
+EXPECT
 Constant(q): Call to &{$^H{qr}} did not return a defined value at - line 3, within pattern
 Execution of - aborted due to compilation errors.
 ########
@@ -256,49 +286,88 @@ Unterminated delimiter for here document at - line 1.
 # NAME my (our $x) errors
 my (our $x);
 EXPECT
-Can't redeclare "our" in "my" at - line 1, at end of line
+Can't redeclare "our" in "my" at - line 1, near "(our"
 Execution of - aborted due to compilation errors.
 ########
 # NAME our (my $x) errors
 our (my $x);
 EXPECT
-Can't redeclare "my" in "our" at - line 1, at end of line
+Can't redeclare "my" in "our" at - line 1, near "(my"
 Execution of - aborted due to compilation errors.
 ########
 # NAME state (my $x) errors
 use feature 'state';
 state (my $x);
 EXPECT
-Can't redeclare "my" in "state" at - line 2, at end of line
+Can't redeclare "my" in "state" at - line 2, near "(my"
 Execution of - aborted due to compilation errors.
 ########
 # NAME our (state $x) errors
 use feature 'state';
 our (state $x);
 EXPECT
-Can't redeclare "state" in "our" at - line 2, at end of line
+Can't redeclare "state" in "our" at - line 2, near "(state"
 Execution of - aborted due to compilation errors.
 ########
 # NAME my (my $x) errors
 my (my $x, $y, $z);
 EXPECT
-Can't redeclare "my" in "my" at - line 1, at end of line
+Can't redeclare "my" in "my" at - line 1, near "(my"
 Execution of - aborted due to compilation errors.
 ########
 # NAME our (our $x) errors
 our ($x, our($y), $z);
 EXPECT
-Can't redeclare "our" in "our" at - line 1, near ", "
+Can't redeclare "our" in "our" at - line 1, near ", our"
 Execution of - aborted due to compilation errors.
 ########
 # NAME state (state $x) errors
 use feature 'state';
 state ($x, $y, state $z);
 EXPECT
-Can't redeclare "state" in "state" at - line 2, near ", "
+Can't redeclare "state" in "state" at - line 2, near ", state"
 Execution of - aborted due to compilation errors.
 ########
 # NAME BEGIN <> [perl #125341]
 BEGIN <>
 EXPECT
 Illegal declaration of subroutine BEGIN at - line 1.
+########
+# NAME multiple conflict markers
+<<<<<<< yours:sample.txt
+my $some_code;
+=======
+my $some_other_code;
+>>>>>>> theirs:sample.txt
+EXPECT
+Version control conflict marker at - line 1, near "<<<<<<<"
+Version control conflict marker at - line 3, near "======="
+Version control conflict marker at - line 5, near ">>>>>>>"
+Execution of - aborted due to compilation errors.
+########
+# NAME (Might be a runaway multi-line...) with Latin-1 delimiters in utf8
+BEGIN { binmode STDERR, ':utf8' }
+use utf8;
+q«
+« time
+EXPECT
+syntax error at - line 4, near "« time"
+  (Might be a runaway multi-line «« string starting on line 3)
+Execution of - aborted due to compilation errors.
+########
+# NAME (Might be a runaway multi-line...) with non-Latin-1 delimiters
+BEGIN { binmode STDERR, ':utf8' }
+use utf8;
+q ϡ
+ϡ time
+EXPECT
+syntax error at - line 4, near "ϡ time"
+  (Might be a runaway multi-line ϡϡ string starting on line 3)
+Execution of - aborted due to compilation errors.
+########
+# NAME tr/// handling of mis-formatted \o characters
+# may only fail with ASAN
+tr/\o-0//;
+EXPECT
+Missing braces on \o{} at - line 2, within string
+Execution of - aborted due to compilation errors.

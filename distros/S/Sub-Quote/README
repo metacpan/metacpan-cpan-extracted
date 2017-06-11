@@ -1,5 +1,5 @@
 NAME
-    Sub::Quote - efficient generation of subroutines via string eval
+    Sub::Quote - Efficient generation of subroutines via string eval
 
 SYNOPSIS
      package Silly;
@@ -220,6 +220,8 @@ CONTRIBUTORS
 
     kanashiro - Lucas Kanashiro (cpan:KANASHIRO)
     <kanashiro.duarte@gmail.com>
+
+    djerius - Diab Jerius (cpan:DJERIUS) <djerius@cfa.harvard.edu>
 
 COPYRIGHT
     Copyright (c) 2010-2016 the Sub::Quote "AUTHOR" and "CONTRIBUTORS" as

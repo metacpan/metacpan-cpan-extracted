@@ -1,0 +1,36 @@
+SYNOPSIS
+
+     use Tie::Array::Expire;
+    
+     # the elements will expire/disappear after 5 minutes (300 seconds)
+     tie my @ary, 'Tie::Array::Expire', 300;
+    
+     push @ary, 1, 2, 3;
+    
+     # 3 minutes later
+     push @ary, 4, 5;
+     unshift @ary, 6;
+    
+     # 3 minutes later
+     print @ary; # (6 5 4) (the elements 1, 2, 3 have expired)
+    
+     # 5 minutes later
+     print @ary; # () (the elements 6, 5, 4 have also expired)
+
+DESCRIPTION
+
+    This module allows you to create an array with the elements
+    autodisappearing after a specified expiry time. This array can be used
+    in, e.g.: rate control checking ("maximum sending 20 emails in 4
+    hours").
+
+SEE ALSO
+
+    Algorithm::FloodControl
+
+    Tie::Array::QueueExpire
+
+    CHI
+
+    Tie::Scalar::Expire, Tie::Hash::Expire
+

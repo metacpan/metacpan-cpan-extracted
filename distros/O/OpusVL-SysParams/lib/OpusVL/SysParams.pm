@@ -24,7 +24,7 @@ has 'schema' => (isa => 'DBIx::Class::Schema', is => 'ro', required => 1,
 # ABSTRACT: Module to handle system wide parameters
 
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 
 
@@ -36,13 +36,13 @@ sub get {
 
 
 sub get_or_set {
-    my ($self, $name, $default_sub) = @_;
+    my ($self, $name, $default_sub, $type) = @_;
     if (elem $name, [$self->key_names]) {
         return $self->get($name);
     }
     else {
         my $value = $default_sub->($self);
-        $self->set($name, $value);
+        $self->set($name, $value, $type);
         return $value;
     }
 }
@@ -103,7 +103,7 @@ OpusVL::SysParams - Module to handle system wide parameters
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 
@@ -152,6 +152,8 @@ Get a system parameter, setting it to a default if it doesn't already exist.
 C<$name> - the name of the system parameter
 
 C<$default_sub> - A CODEREF returning the default value.  C<$params> (your instance of L<OpusVL::SysParams>) is passed as the first argument.
+
+C<$type> - We will try to determine the type from your C<$default_sub>, but if it's unclear, you may wish to be explicit here.
 
 Example:
 

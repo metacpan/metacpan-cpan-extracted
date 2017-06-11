@@ -23,12 +23,26 @@ sub test_000 : Tags(require) {
     require_ok('HPC::Runner::Command::Utils::Base');
     require_ok('HPC::Runner::Command::Utils::Log');
     require_ok('HPC::Runner::Command::Utils::Git');
-    require_ok('HPC::Runner::Command::submit_jobs::Utils::Scheduler');
+    require_ok('HPC::Runner::Command::Utils::Plugin');
+    require_ok('HPC::Runner::Command::Utils::Traits');
     require_ok('HPC::Runner::Command::submit_jobs::Utils::Log');
+    require_ok('HPC::Runner::Command::submit_jobs::Utils::Scheduler');
+    require_ok('HPC::Runner::Command::submit_jobs::Utils::Scheduler::Batch');
+    require_ok('HPC::Runner::Command::submit_jobs::Utils::Scheduler::Directives');
+    require_ok('HPC::Runner::Command::submit_jobs::Utils::Scheduler::Files');
+    require_ok('HPC::Runner::Command::submit_jobs::Utils::Scheduler::Job');
+    require_ok('HPC::Runner::Command::submit_jobs::Utils::Scheduler::JobStats');
+    require_ok('HPC::Runner::Command::submit_jobs::Utils::Scheduler::ParseInput');
+    require_ok('HPC::Runner::Command::submit_jobs::Utils::Scheduler::ResolveDeps');
+    require_ok('HPC::Runner::Command::submit_jobs::Utils::Scheduler::Submit');
+    require_ok('HPC::Runner::Command::submit_jobs::Utils::Scheduler::UseArrays');
+    require_ok('HPC::Runner::Command::submit_jobs::Utils::Scheduler::UseBatches');
     require_ok('HPC::Runner::Command::submit_jobs::Plugin::Slurm');
     require_ok('HPC::Runner::Command::submit_jobs::Plugin::Dummy');
     require_ok('HPC::Runner::Command::execute_job::Utils::Log');
     require_ok('HPC::Runner::Command::execute_job');
+    require_ok('HPC::Runner::Command::execute_array');
+    require_ok('HPC::Runner::Command::single_node');
     ok(1);
 }
 

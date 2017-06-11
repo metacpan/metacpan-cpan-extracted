@@ -1,5 +1,11 @@
 Revision history for Perl extension Image::Sane.
 
+0.12  Sun, 04 Jun 2017 09:30 +0200
+        - skip t/81_scanimage-perl.t if we don't have Perl 5.10
+
+0.11  Wed, 31 May 2017 18:30 +0200
+        - remove postamble from Makefile.PL if OS is not linux to fix RT 121936.
+
 0.10  Mon, 29 May 2017 17:30 +0200
         - skip scanimage tests if not installed to fix RT 121922.
 

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.006;
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -14,11 +14,14 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "MarpaX-ESLIF-ECMA404",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.006",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "MarpaX::ESLIF::ECMA404",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "MarpaX::ESLIF" => "2.0.9",
+    "MarpaX::ESLIF" => "2.0.13",
+    "Math::BigFloat" => 0,
+    "Math::BigInt" => 0,
+    "Scalar::Util" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -27,17 +30,14 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "File::Temp" => 0,
+    "FindBin" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Log::Any" => 0,
-    "Log::Any::Adapter" => 0,
-    "Log::Any::Adapter::Log4perl" => 0,
-    "Log::Log4perl" => 0,
     "Test::More" => 0,
     "Test::More::UTF8" => 0,
     "blib" => "1.01"
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,13 +50,13 @@ my %FallbackPrereqs = (
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "File::Temp" => 0,
+  "FindBin" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Log::Any" => 0,
-  "Log::Any::Adapter" => 0,
-  "Log::Any::Adapter::Log4perl" => 0,
-  "Log::Log4perl" => 0,
-  "MarpaX::ESLIF" => "2.0.9",
+  "MarpaX::ESLIF" => "2.0.13",
+  "Math::BigFloat" => 0,
+  "Math::BigInt" => 0,
+  "Scalar::Util" => 0,
   "Test::More" => 0,
   "Test::More::UTF8" => 0,
   "blib" => "1.01",

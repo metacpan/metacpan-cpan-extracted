@@ -7,7 +7,7 @@ use WWW::Leech::Parser;
 BEGIN {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION     = '0.01';
+    $VERSION     = '0.02';
     @ISA         = qw(Exporter);
     @EXPORT      = qw();
     @EXPORT_OK   = qw();
@@ -34,18 +34,19 @@ sub leech{
 	my $this = shift;
 	$this->{'_stop_flag'} = undef;
 
-	my $current_url = $this->{'url'};
+	my $current_url = $this->{'url'} or die("No url provided");
 
 	while(1){
 
 		$this->log("Getting links list: $current_url ");
 
 		# get and parse link list
-		my $data = $this->_get($current_url);
+		my $data = $this->_get($current_url, $this->{'post_data'});
 
 		my $parse_result = $this->{'parser'}->parseList($data);
 
 		my $links = [map { url($_, $this->{'url'})->abs } @{$parse_result->{'links'}}];
+		my $links_text = $parse_result->{'links_text'};
 
 		$this->log("Links list length: ".scalar(@$links));
 
@@ -59,7 +60,7 @@ sub leech{
 		# filtering if required
 		if( $this->{'filter'} ){
 			$this->log("Filtering links");
-			$links = $this->{'filter'}->($links,$this);
+			$links = $this->{'filter'}->($links, $this, $links_text);
 			$this->log("Filtered links list length: ".scalar(@$links));
 
 			return if($this->{'_stop_flag'});
@@ -125,11 +126,24 @@ sub stop{
 sub _get{
 	my $this = shift;
 	my $url = shift;
+	my $post_data = shift;
 
-	my $req = new HTTP::Request('GET',$url);
+	my $req;
+
+	if( $post_data ){
+		$req = new HTTP::Request('POST',$url);
+		$req->content_type('application/x-www-form-urlencoded');
+		$req->content( $post_data );
+
+	} else {
+		$req = new HTTP::Request('GET',$url);
+	}
+
 	my $res = $this->{'ua'}->request($req);
 
 	return $res->decoded_content();
+	
+	
 }
 
 
@@ -204,6 +218,10 @@ LWP compatible user-agent object.
 
 Starting url.
 
+=item post_data
+
+Url-encoded post data. By default Walker will fetch items list using GET method. POST method is used if post_data is set. Requests fetching individual items pages are still using GET method.
+
 =item parser
 
 Parameters for L<WWW::Leech::Parser>
@@ -220,7 +238,7 @@ Optional logging callback. Whenever something happens walker runs this subroutin
 
 =item filter
 
-Optional urls filtering callback. When walker gets a list of items-pages urls it passes that list to the filter subroutine. Walker expects it to return filtered list. Empty list is okay.
+Optional urls filtering callback. When walker gets a list of items-pages urls it passes that list to the filter subroutine. Walker itself is passed as a second argument and an arrayref with links text as third. Walker expects it to return filtered list. Empty list is okay.
 
 
 =item processor

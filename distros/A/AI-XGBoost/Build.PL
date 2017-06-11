@@ -13,19 +13,22 @@ my %module_build_args = (
   "configure_requires" => {
     "Module::Build" => "0.28"
   },
-  "dist_abstract" => "Perl wrapper for XGBoost library https://github.com/dmlc/xgboost",
+  "dist_abstract" => "Perl wrapper for XGBoost library L<https://github.com/dmlc/xgboost>",
   "dist_author" => [
     "Pablo Rodr\x{ed}guez Gonz\x{e1}lez <pablo.rodriguez.gonzalez\@gmail.com>"
   ],
   "dist_name" => "AI-XGBoost",
-  "dist_version" => "0.001",
+  "dist_version" => "0.004",
   "license" => "apache",
   "module_name" => "AI::XGBoost",
   "recursive_test_files" => 1,
   "requires" => {
+    "Exception::Class" => 0,
+    "Exporter::Easy" => 0,
+    "FFI::Platypus" => 0,
     "NativeCall" => 0,
     "parent" => 0,
-    "perl" => "5.008",
+    "perl" => "5.010",
     "strict" => 0,
     "warnings" => 0
   },

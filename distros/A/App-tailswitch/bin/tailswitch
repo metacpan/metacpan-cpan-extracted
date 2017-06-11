@@ -1,0 +1,167 @@
+#!perl
+
+our $DATE = '2017-06-09'; # DATE
+our $VERSION = '0.001'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Getopt::Long qw(:config no_ignore_case bundling no_ignore_case gnu_compat no_getopt_compat);
+use Time::HiRes 'sleep';
+
+my %Opts = (
+    check_freq => undef,
+    tail_new => undef,
+    glob => undef,
+);
+
+my $PROG = "tailswitch";
+
+sub parse_options {
+    require String::Wildcard::Bash;
+
+    Getopt::Long::GetOptions(
+        'help|h|?' => sub {
+            print "Usage: $PROG [options] <glob-pattern> ...\n";
+            print <<EOT;
+Usage:
+  $PROG [options] <site>
+  $PROG --help, -h, -?
+  $PROG --version, -v
+Options:
+  --check-freq=i
+For more details, see the documentation (man $PROG).
+EOT
+            exit 0;
+        },
+        'version|v' => sub {
+            no warnings 'once';
+            print "$PROG version ", ($main::VERSION // "dev"), "\n";
+            exit 0;
+        },
+        'check-freq=i' => \$Opts{check_freq},
+        'tail-new' => \$Opts{tail_new},
+        'follow|f' => sub {},
+    );
+
+    die "$PROG: Please specify at least 1 glob\n" unless @ARGV;
+    for (@ARGV) {
+        String::Wildcard::Bash::contains_wildcard($_)
+              or warn "You passed '$_' which doesn't contain any wildcard, ".
+              "probably you need to quote it first?\n";
+    }
+
+    $Opts{globs} = [@ARGV];
+}
+
+sub run {
+    require Logfile::Tail::Switch;
+
+    my $tail = Logfile::Tail::Switch->new(
+        globs => $Opts{globs},
+        check_freq => $Opts{check_freq},
+        tail_new   => $Opts{tail_new},
+    );
+
+    while (1) {
+        my $line = $tail->getline;
+        if (length $line) {
+            print $line;
+        } else {
+            sleep 0.1;
+        }
+    }
+}
+
+# MAIN
+
+$|++;
+parse_options();
+run();
+
+# PODNAME: tailswitch
+# ABSTRACT: Tail a file, but switch when another file with newer name appears
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+tailswitch - Tail a file, but switch when another file with newer name appears
+
+=head1 VERSION
+
+This document describes version 0.001 of tailswitch (from Perl distribution App-tailswitch), released on 2017-06-09.
+
+=head1 SYNOPSIS
+
+ % tailswitch [OPTIONS] <GLOB PATTERN> ...
+
+Don't forget to quote the glob pattern to prevent shell expansion. Example:
+
+ % tailswitch '/var/log/http_access.*.log' '/var/log/https_access.*.log'
+
+=head1 DESCRIPTION
+
+This utility can tail a file, but switch when another file with newer name
+appears. This utility is useful when tailing log that are written to separated
+files (usually with timestamps in their names). For example, on an Spanel
+server, the webserver is configured to write to daily log files:
+
+ /s/<SITE-NAME>/syslog/http_access.<YYYY>-<MM>-<DD>.log
+ /s/<SITE-NAME>/syslog/https_access.<YYYY>-<MM>-<DD>.log
+
+=head1 OPTIONS
+
+=head2 --follow, -f
+
+No-op, provided just for compatibility with B<tail> Unix command. Heavy C<tail>
+users might have C<-f> in their muscle memory.
+
+=head2 --tail-new
+
+If this option is given, then when a new file appears it will not be read from
+the beginning but directly tail'ed.
+
+=head2 --check-freq=i (default: 1)
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-tailswitch>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-tailswitch>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-tailswitch>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+B<tail> Unix command.
+
+L<tail> from L<ppt>.
+
+L<Logfile::Tail::Switch> which is used by this utility.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

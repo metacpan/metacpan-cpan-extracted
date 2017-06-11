@@ -1,5 +1,8 @@
 Revision history for Perl extension Config-ENV
 
+0.15 2017-06-08T09:04:15Z
+	- FIX: local config is broken when localize guard object has released in a different order (by karupanerura)
+
 0.14 2016-12-08T10:57:00Z
 	- FIX: Avoid following warning "Constants from lexical variables potentially modified elsewhere are deprecated"
 

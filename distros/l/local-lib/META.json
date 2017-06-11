@@ -4,13 +4,13 @@
       "mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "local-lib",
    "no_index" : {
@@ -68,5 +68,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#local-lib"
    },
-   "version" : "2.000019"
+   "version" : "2.000023",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

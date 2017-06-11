@@ -1,0 +1,96 @@
+{
+   "abstract" : "Restore paths from borg backups",
+   "author" : [
+      "-2017  Florian Pritz <bluewind@xinu.at>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.10",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-BorgRestore",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Devel::CheckBin" : "0",
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "Function::Parameters" : "0",
+            "IPC::Run" : "0",
+            "Log::Any" : "0",
+            "Log::Any::Adapter::Log4perl" : "0",
+            "Log::Log4perl" : "0",
+            "perl" : "v5.10.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Differences" : "0",
+            "Test::Exception" : "0",
+            "Test::MockObject" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "App::BorgRestore" : {
+         "file" : "lib/App/BorgRestore.pm",
+         "version" : "v2.0.1"
+      },
+      "App::BorgRestore::Borg" : {
+         "file" : "lib/App/BorgRestore/Borg.pm"
+      },
+      "App::BorgRestore::DB" : {
+         "file" : "lib/App/BorgRestore/DB.pm"
+      },
+      "App::BorgRestore::Helper" : {
+         "file" : "lib/App/BorgRestore/Helper.pm"
+      },
+      "App::BorgRestore::Settings" : {
+         "file" : "lib/App/BorgRestore/Settings.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Bluewind/App-BorgRestore/issues"
+      },
+      "homepage" : "https://github.com/Bluewind/App-BorgRestore",
+      "repository" : {
+         "url" : "git://github.com/Bluewind/App-BorgRestore.git",
+         "web" : "https://github.com/Bluewind/App-BorgRestore"
+      }
+   },
+   "version" : "2.0.1",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

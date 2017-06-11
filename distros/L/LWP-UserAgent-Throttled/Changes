@@ -1,5 +1,8 @@
 Revision history for LWP-UserAgent-Throttled
 
+0.05	Tue May 30 08:19:29 EDT 2017
+	Fixed t/request.t for https test
+
 0.04	Sat 27 May 14:43:36 EDT 2017
 	Important code tidy - forgot some hashrefs now hash
 

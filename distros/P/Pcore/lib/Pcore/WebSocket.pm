@@ -5,7 +5,7 @@ use Pcore::Util::Scalar qw[refaddr];
 use Pcore::Util::Data qw[to_b64];
 use Pcore::Util::List qw[pairs];
 use Pcore::WebSocket::Handle;
-use Pcore::AE::Handle2 qw[:TLS_CTX];
+use Pcore::AE::Handle qw[:TLS_CTX];
 
 our $HANDLE = {};
 
@@ -148,7 +148,7 @@ sub connect_ws ( $self, $protocol, $uri, @ ) {
     if ( $uri =~ m[\Awss?://unix:(.+)?/]sm ) {
         $connect = [ 'unix/', $1 ];
 
-        $uri = Pcore->uri($uri) if !ref $uri;
+        $uri = P->uri($uri) if !ref $uri;
     }
     elsif ( $uri =~ m[\A(wss?)://[*]:(.+)]sm ) {
         $uri = P->uri("$1://127.0.0.1:$2");
@@ -156,12 +156,12 @@ sub connect_ws ( $self, $protocol, $uri, @ ) {
         $connect = $uri;
     }
     else {
-        $uri = Pcore->uri($uri) if !ref $uri;
+        $uri = P->uri($uri) if !ref $uri;
 
         $connect = $uri;
     }
 
-    Pcore::AE::Handle2->new(
+    Pcore::AE::Handle->new(
         connect         => $connect,
         connect_timeout => $args{connect_timeout},
         tls_ctx         => $args{tls_ctx},

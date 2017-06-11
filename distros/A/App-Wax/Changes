@@ -1,5 +1,9 @@
 Revision history for Perl extension App::Wax.
 
+1.1.1 Tue 6 Jun 22:42:39 2017
+
+   - perl 5.26 compatibility fix: add '.' to @INC to load inc::Module::Install
+
 1.1.0 Fri 16 Dec 23:15:52 2016
 
     - add -D option equivalent to -d "${XDG_CACHE_HOME:-$HOME/.cache}/wax"

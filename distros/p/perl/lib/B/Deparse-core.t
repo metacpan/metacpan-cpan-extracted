@@ -102,10 +102,12 @@ sub testit {
 
 	unless ($got_text =~ /
     package (?:lexsub)?test;
-    use strict 'refs', 'subs';
+(?:    BEGIN \{\$\{\^WARNING_BITS\} = "[^"]+"\}
+)?    use strict 'refs', 'subs';
     use feature [^\n]+
-    \Q$vars\E\(\) = (.*)
-}/s) {
+(?:    (?:CORE::)?state sub \w+;
+)?    \Q$vars\E\(\) = (.*)
+\}/s) {
 	    ::fail($desc);
 	    ::diag("couldn't extract line from boilerplate\n");
 	    ::diag($got_text);

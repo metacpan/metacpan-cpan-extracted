@@ -27,7 +27,7 @@ no_index:
 provides:
   Net::Azure::NotificationHubs:
     file: lib/Net/Azure/NotificationHubs.pm
-    version: '0.01'
+    version: '0.02'
   Net::Azure::NotificationHubs::Request:
     file: lib/Net/Azure/NotificationHubs/Request.pm
   Net::Azure::NotificationHubs::Response:
@@ -48,5 +48,5 @@ resources:
   bugtracker: https://github.com/ytnobody/p5-Net-Azure-NotifcationHubs/issues
   homepage: https://github.com/ytnobody/p5-Net-Azure-NotifcationHubs
   repository: git://github.com/ytnobody/p5-Net-Azure-NotifcationHubs.git
-version: '0.01'
+version: '0.02'
 x_authority: cpan:YTURTLE

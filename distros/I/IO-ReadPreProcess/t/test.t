@@ -8,7 +8,7 @@
 #	 .
 #	   .
 #
-#	SCCS: @(#)test.t	1.5 05/22/17 19:27:11
+#	SCCS: %W% %G% %U%
 #
 # Test program for the module IO::ReadPreProcess
 # This also serves as a demonstration program on how to use the module.
@@ -110,6 +110,7 @@ my $OriginalExpression;
 my $Operation;
 
 my $pwd = cwd();
+warn "pwd = '$pwd'\n";	# I'm not sure about this on MS Windows
 
 sub MyPrintError {
 	printf "#Error in $Operation '%s': ", $OriginalExpression;
@@ -245,7 +246,7 @@ for my $test (@TestFiles) {
     my $preopen = 0;		# Preopen the file
     my $lfn = '';		# File name for log messages
     my $UnixOnly = 0;		# Only run the test on a *nix box
-    my $Enabled = 1;		# The test will be run
+    my $Enable = 1;		# The test will be run
     my $OutOnError = 0;		# Show output generated on error
 
 #    print STDERR "DO test $test\n";
@@ -268,7 +269,7 @@ for my $test (@TestFiles) {
 	push(@newopt, $1, $2)	if(/^\.#\s+NewOpt:\s+(\S+)\s+(.*\S)\s*$/);
 	$fork = $1		if(/^\.#\s+Fork:\s*(\S+)\s*$/);
 	$UnixOnly = $1		if(/^\.#\s+UnixOnly:\s*(\S+)\s*$/);
-	$Enabled = $1		if(/^\.#\s+Enabled:\s*(\S+)\s*$/);
+	$Enable = $1		if(/^\.#\s+Enable:\s*(\S+)\s*$/);
 	$OutOnError = $1	if(/^\.#\s+OutOnError:\s*(\S+)\s*$/);
     }
     $fork = 1 if(@require);
@@ -276,20 +277,20 @@ for my $test (@TestFiles) {
     # If we have a title the file name is lost, keep elsewhere:
     $lfn = $test . '.input' if($title);
 
-    if(!$Enabled) {
-	warn "Not running $lfn as it is not enabled\n";
+    if(!$Enable) {
+	warn "$Tests: Not running $lfn as it is not enabled\n";
 	next;
     }
 
     if($UnixOnly && !$RunningOnUnix) {
-	warn "Not running $lfn as this is not a Unix machine\n";
+	warn "$Tests: Not running $lfn as this is not a Unix machine\n";
 	next;
     }
 
     # Where we put the generated output
     my $outf = $TestOutDir . '/' . $test . '.out';
     unless($out = IO::File->new($outf, 'w')) {
-	ok(0, "not ok $Tests - $title: - cannot open (write) $outf: $!");
+	ok(0, "$Tests: not ok - $title: - cannot open (write) $outf: $!");
 	$NumFails++;
 	next;
     }
@@ -297,7 +298,7 @@ for my $test (@TestFiles) {
     # This is what we want: ie what we expect to generate
     my $wantf = $TestDir . '/' . $test . '.want';
     unless($want = IO::File->new($wantf, 'r')) {
-	ok(0, "not ok - $title: - cannot open (read) $wantf: $!");
+	ok(0, "$Tests: not ok - $title: - cannot open (read) $wantf: $!");
 	$NumFails++;
 	next;
     }
@@ -310,7 +311,7 @@ for my $test (@TestFiles) {
     }
 
     unless($rc = IO::ReadPreProcess->new(File => $input, @newopt)) {
-	ok(0, "not ok - $title: - cannot open ReadConditionally '$input' as: $!");
+	ok(0, "$Tests: not ok - $title: - cannot open ReadConditionally '$input' as: $!");
 	$NumFails++;
 	next;
     }
@@ -322,7 +323,7 @@ for my $test (@TestFiles) {
 	warn "evaluating: $_\n" if $verbose;
 	my $ex;
 	unless($ex = $rc->{Math}->Parse($_)) {
-	    ok(0, "not ok - $title: Invalid Set: '$_'");
+	    ok(0, "$Tests: not ok - $title: Invalid Set: '$_'");
 	    $NumFails++;
 	    next ALL_TESTS;
 	}
@@ -373,7 +374,7 @@ for my $test (@TestFiles) {
 		my $in;
 		if($in = IO::File->new($outf, 'r')) {
 		    my $line;
-		    warn "\nGenerated output for $title\n";
+		    warn "\nGenerated output for $Tests: $title\n";
 		    warn "****************\n";
 		    warn $line while($line = <$in>);
 		    warn "****************\n";

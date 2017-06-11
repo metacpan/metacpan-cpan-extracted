@@ -1,25 +1,16 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+use 5.010;
 
 use Acme::CPANAuthors::Utils;
 use Cwd qw(realpath);
-use Search::Elasticsearch;
-use File::Spec::Functions qw(catfile splitpath updir);
+use MetaCPAN::Client;
+use FindBin;
 
-my $VERSION = '0.08';
+my $VERSION = '0.09';
 
-my $es = Search::Elasticsearch->new(
-    nodes            => 'api.metacpan.org',
-    cxn_pool         => 'Static::NoPing',
-    send_get_body_as => 'POST',
-    deflate          => 1,
-);
-
-my (%authors, %names);
-
-# TODO: verify the document mapping (data structure) has not changed.
-
+my (%name, %github);
 process_authors();
 process_releases();
 write_file();
@@ -28,56 +19,60 @@ exit;
 
 
 sub process_authors {
-    my $req = $es->scroll_helper(
-        index       => 'author',
-        q           => '*',
-        search_type => 'scan',
-        scroll      => '5m',
-        size        => 1_000,
-    );
-
-    while (my $res = $req->next) {
-        my $source = $res->{_source};
-        my ($pauseid, $name) = @$source{qw(pauseid name)};
+    my $search = MetaCPAN::Client->new->all('authors');
+    AUTHOR:
+    while (my $author = $search->next) {
+        my $pauseid = $author->pauseid;
         next unless $pauseid;
 
-        $names{$pauseid} = $name || '';
+        my $name = $author->name // '';
+        $name{$pauseid} = $name;
 
-        for my $website (@{$source->{website}}) {
+        for my $website (@{$author->website // []}) {
             next unless is_github_site($website);
-            $authors{$pauseid} = $name;
-            last;
+            $github{$pauseid} = $name;
+            next AUTHOR;
         }
 
-        for my $profile (@{$source->{profile}}) {
+        for my $profile (@{$author->profile // []}) {
             next unless 'github' eq $profile->{name};
-            $authors{$pauseid} = $name || '';
-            last;
+            $github{$pauseid} = $name;
+            next AUTHOR;
         }
     }
 }
+
 
 sub process_releases {
-    my $req = $es->scroll_helper(
-        index       => 'release',
-        q           => 'status:latest',
-        fields      => [qw(author homepage url web)],
-        search_type => 'scan',
-        scroll      => '5m',
-        size        => 1_000,
+    my $search = MetaCPAN::Client->new->release({
+        all => [
+            { maturity => 'released' },
+            { status   => 'latest' },
+            {
+                either => [
+                    { 'resources.repository.url' => '*github.com/*' },
+                    { 'resources.repository.web' => '*github.com/*' },
+                    { 'resources.homepage'       => '*github.com/*' },
+                ]
+            },
+        ]},
+        { _source => [qw(author resources)] }
     );
 
-    while (my $res = $req->next) {
-        my $author = delete $res->{fields}{author};
-        next if exists $authors{$author};
+    while (my $release = $search->next) {
+        my $pauseid = $release->author // next;
+        next if exists $github{$pauseid};
 
-        for my $url (values %{$res->{fields}}) {
+        my $home = $release->resources->{homepage} // '';
+        my $repo = $release->resources->{repository} // {};
+        for my $url ($home, @$repo{qw(url web)}) {
             next unless is_github_site($url);
-            $authors{$author} = $names{$author};
+            $github{$pauseid} = $name{$pauseid} // '';
             last;
         }
     }
 }
+
 
 sub is_github_site {
     return $_[0]
@@ -86,11 +81,9 @@ sub is_github_site {
         ]ix;
 }
 
+
 sub write_file {
-    my $file = catfile(
-        (splitpath(realpath __FILE__))[0, 1], updir,
-        qw(lib Acme CPANAuthors GitHub.pm)
-    );
+    my $file = "$FindBin::Bin/../lib/Acme/CPANAuthors/GitHub.pm";
 
     open my $fh, '>:encoding(utf-8)', $file or die "$file: $!";
     (my $header =<< "    __HEADER__") =~ s/^ +//gm;
@@ -106,8 +99,8 @@ sub write_file {
         use Acme::CPANAuthors::Register(
     __HEADER__
     print $fh $header;
-    for my $cpanid (sort keys %authors) {
-        printf $fh "    q(%s) => q(%s),\n", $cpanid, $authors{$cpanid};
+    for my $pauseid (sort keys %github) {
+        printf $fh "    q(%s) => q(%s),\n", $pauseid, $github{$pauseid};
     }
     print $fh <DATA>;
     close $fh;
@@ -191,10 +184,10 @@ L<http://search.cpan.org/dist/Acme-CPANAuthors-GitHub/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2015 gray <gray at cpan.org>, all rights reserved.
+Copyright (C) 2010-2017 gray <gray at cpan.org>, all rights reserved.
 
-This library is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
 
 =head1 AUTHOR
 

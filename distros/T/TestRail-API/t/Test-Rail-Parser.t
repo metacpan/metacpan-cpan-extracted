@@ -10,7 +10,7 @@ use Scalar::Util qw{reftype};
 use TestRail::API;
 use Test::LWP::UserAgent::TestRailMock;
 use Test::Rail::Parser;
-use Test::More 'tests' => 118;
+use Test::More 'tests' => 124;
 use Test::Fatal qw{exception};
 use Test::Deep qw{cmp_deeply};
 use Capture::Tiny qw{capture};
@@ -180,6 +180,7 @@ isa_ok($tap,"Test::Rail::Parser");
 if (!$res) {
     $tap->run();
     is($tap->{'errors'},0,"No errors encountered uploading case results");
+    like( $tap->{raw_output}, qr/cause I can/i, "SKIP_ALL reason recorded");
     is($tap->{'global_status'},6, "Test global result is SKIP on skip all");
 }
 
@@ -291,7 +292,7 @@ isa_ok($tap,"Test::Rail::Parser");
 if (!$res) {
     $tap->run();
     is($tap->{'errors'},0,"No errors encountered uploading case results");
-    is($tap->{'global_status'},4, "Test global result is RETEST on env fail");
+    is($tap->{'global_status'},5, "Test global result is FAIL by default on env fail");
 }
 
 undef $tap;
@@ -387,9 +388,24 @@ isa_ok($tap,"Test::Rail::Parser");
 if (!$res) {
     $tap->run();
     is($tap->{'errors'},0,"No errors encountered uploading case results");
-    is($tap->{'global_status'},4, "Test global result is retest when insta-bombout occurs");
+    is($tap->{'global_status'},5, "Test global result is FAILURE when insta-bombout occurs");
     my $srs = $tap->{'tr_opts'}->{'result_custom_options'}->{'step_results'};
     is($srs->[-1]->{'content'},"Bad Plan.","Bad plan noted in step results");
+}
+
+$opts->{test_bad_status} = 'bogus_status';
+$res = exception { $tap = Test::Rail::Parser->new($opts) };
+like($res,qr/bogus_status/,"TR Parser explodes on instantiation w bogus status");
+
+$opts->{test_bad_status} = 'blocked';
+$res = exception { $tap = Test::Rail::Parser->new($opts) };
+is($res,undef,"TR Parser doesn't explode on instantiation");
+isa_ok($tap,"Test::Rail::Parser");
+
+if (!$res) {
+    $tap->run();
+    is($tap->{'errors'},0,"No errors encountered uploading case results");
+    is($tap->{'global_status'},2, "Test global result is BLOCKED when insta-bombout occurs & custom status set");
 }
 undef $opts->{'step_results'};
 

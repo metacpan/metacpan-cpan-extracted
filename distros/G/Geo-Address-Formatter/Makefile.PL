@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "Try::Tiny" => 0,
     "YAML" => 0
   },
-  "VERSION" => "1.60",
+  "VERSION" => "1.61",
   "test" => {
     "TESTS" => "t/blackbox/*.t t/unit/*.t"
   }

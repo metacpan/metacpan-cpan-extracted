@@ -431,7 +431,7 @@ checkOptree ( name	=> '@foo = grep(!/^\#/, @bar)',
 # 5  <1> rv2av[t4] lKM/1
 # 6  <@> grepstart lK
 # 7  <|> grepwhile(other->8)[t5] lK
-# 8      </> match(/"^#"/) s/RTIME
+# 8      </> match(/"^#"/) s
 # 9      <1> not sK/1
 #            goto 7
 # a  <0> pushmark s
@@ -447,7 +447,7 @@ EOT_EOT
 # 5  <1> rv2av[t2] lKM/1
 # 6  <@> grepstart lK
 # 7  <|> grepwhile(other->8)[t3] lK
-# 8      </> match(/"^\\#"/) s/RTIME
+# 8      </> match(/"^\\#"/) s
 # 9      <1> not sK/1
 #            goto 7
 # a  <0> pushmark s
@@ -710,13 +710,13 @@ checkOptree ( name	=> 'my $a; my @b; my %c; return 1',
 	      bcopts	=> '-exec',
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 1  <;> nextstate(main 991 (eval 17):1) v
-# 2  <0> padrange[$a:991,994; @b:992,994; %c:993,994] vM/LVINTRO,3
+# 2  <0> padrange[$a:991,994; @b:992,994; %c:993,994] vM/LVINTRO,range=3
 # 3  <;> nextstate(main 994 (eval 17):1) v:{
 # 4  <$> const[IV 1] s
 # 5  <1> leavesub[1 ref] K/REFC,1
 EOT_EOT
 # 1  <;> nextstate(main 991 (eval 17):1) v
-# 2  <0> padrange[$a:991,994; @b:992,994; %c:993,994] vM/LVINTRO,3
+# 2  <0> padrange[$a:991,994; @b:992,994; %c:993,994] vM/LVINTRO,range=3
 # 3  <;> nextstate(main 994 (eval 17):1) v:{
 # 4  <$> const(IV 1) s
 # 5  <1> leavesub[1 ref] K/REFC,1

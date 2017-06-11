@@ -1,5 +1,9 @@
 Revision history for Digest-SIMD
 
+0.05  Wed May 31 23:05:42 UTC 2017
+    - Fixed macro conflict with variable name under cygwin.
+    - Upgraded ppport.h
+
 0.04  Mon Nov 29 11:04:26 UTC 2010
     - Converted hex and base64 encoders to C.
     - Added implicit reset upon call to digest method.

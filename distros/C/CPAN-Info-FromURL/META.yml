@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Info-FromURL
   homepage: https://metacpan.org/release/CPAN-Info-FromURL
   repository: git://github.com/perlancar/perl-CPAN-Info-FromURL.git
-version: '0.07'
+version: '0.08'
 x_Dist_Zilla:
   perl:
     version: '5.024000'
@@ -96,6 +96,10 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/@Filter/ConfirmRelease'
       version: '6.008'
     -
+      class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
+      name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
+      version: '0.55'
+    -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
       version: '0.09'
@@ -106,7 +110,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
-      version: '0.02'
+      version: '0.04'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
@@ -119,6 +123,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::CheckMetaResources
       name: '@Author::PERLANCAR/CheckMetaResources'
       version: '0.001'
+    -
+      class: Dist::Zilla::Plugin::CopyrightYearFromGit
+      name: '@Author::PERLANCAR/CopyrightYearFromGit'
+      version: '0.003'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
@@ -220,9 +228,9 @@ x_Dist_Zilla:
               name: '@Author::PERLANCAR/Completion::GetoptLongSubcommand'
               version: '0.04'
             -
-              class: Pod::Weaver::Section::Completion::PerinciCmdLine
-              name: '@Author::PERLANCAR/Completion::PerinciCmdLine'
-              version: '0.14'
+              class: Pod::Weaver::Section::Completion::GetoptLongMore
+              name: '@Author::PERLANCAR/Completion::GetoptLongMore'
+              version: '0.001'
             -
               class: Pod::Weaver::Section::Homepage::DefaultCPAN
               name: '@Author::PERLANCAR/Homepage::DefaultCPAN'
@@ -246,7 +254,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.68'
+              version: '0.76'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'
@@ -262,7 +270,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.04'
+              version: '0.06'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -313,7 +321,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple
       name: '@Author::PERLANCAR/UploadToCPAN::WWWPAUSESimple'
-      version: '0.03'
+      version: '0.04'
     -
       class: Dist::Zilla::Plugin::EnsureSQLSchemaVersionedTest
       name: '@Author::PERLANCAR/EnsureSQLSchemaVersionedTest'
@@ -351,8 +359,8 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::Prereqs:
           phase: develop
-          type: recommends
-      name: DevelopRecommends
+          type: x_spec
+      name: DevelopX_spec
       version: '6.008'
     -
       class: Dist::Zilla::Plugin::FinderCode

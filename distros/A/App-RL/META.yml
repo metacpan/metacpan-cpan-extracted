@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.0.11, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,11 +26,13 @@ no_index:
 provides:
   App::RL:
     file: lib/App/RL.pm
-    version: v0.2.32
+    version: v0.2.33
   App::RL::Command::combine:
     file: lib/App/RL/Command/combine.pm
   App::RL::Command::compare:
     file: lib/App/RL/Command/compare.pm
+  App::RL::Command::convert:
+    file: lib/App/RL/Command/convert.pm
   App::RL::Command::cover:
     file: lib/App/RL/Command/cover.pm
   App::RL::Command::coverage:
@@ -68,7 +70,7 @@ resources:
   bugtracker: https://github.com/wang-q/App-RL/issues
   homepage: https://github.com/wang-q/App-RL
   repository: git://github.com/wang-q/App-RL.git
-version: 0.2.32
+version: 0.2.33
 x_contributors:
   - 'Qiang Wang <wang-q@users.noreply.github.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.014'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -21,16 +21,81 @@ typedef double NV; /* 5.6 and later define NVTYPE, and typedef NV to it.  */
 #endif
 
 static int
+constant_13 (pTHX_ const char *name, IV *iv_return) {
+  /* When generated this function returned values for the list of names given
+     here.  However, subsequent manual editing may have added or removed some.
+     BCM2835_BSC_A BCM2835_BSC_C BCM2835_BSC_S BCM2835_GPPUD BCM2835_ST_CS */
+  /* Offset 12 gives the best switch position.  */
+  switch (name[12]) {
+  case 'A':
+    if (memEQ(name, "BCM2835_BSC_", 12)) {
+    /*                           A      */
+#ifdef BCM2835_BSC_A
+      *iv_return = BCM2835_BSC_A;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'C':
+    if (memEQ(name, "BCM2835_BSC_", 12)) {
+    /*                           C      */
+#ifdef BCM2835_BSC_C
+      *iv_return = BCM2835_BSC_C;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'D':
+    if (memEQ(name, "BCM2835_GPPU", 12)) {
+    /*                           D      */
+#ifdef BCM2835_GPPUD
+      *iv_return = BCM2835_GPPUD;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'S':
+    if (memEQ(name, "BCM2835_BSC_", 12)) {
+    /*                           S      */
+#ifdef BCM2835_BSC_S
+      *iv_return = BCM2835_BSC_S;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "BCM2835_ST_C", 12)) {
+    /*                           S      */
+#ifdef BCM2835_ST_CS
+      *iv_return = BCM2835_ST_CS;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  }
+  return PERL_constant_NOTFOUND;
+}
+
+static int
 constant_14 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
      BCM2835_GPCLR0 BCM2835_GPCLR1 BCM2835_GPEDS0 BCM2835_GPEDS1 BCM2835_GPFEN0
      BCM2835_GPFEN1 BCM2835_GPHEN0 BCM2835_GPHEN1 BCM2835_GPLEN0 BCM2835_GPLEN1
      BCM2835_GPLEV0 BCM2835_GPLEV1 BCM2835_GPREN0 BCM2835_GPREN1 BCM2835_GPSET0
-     BCM2835_GPSET1 RPI_GPIO_P1_03 RPI_GPIO_P1_05 RPI_GPIO_P1_07 RPI_GPIO_P1_08
-     RPI_GPIO_P1_10 RPI_GPIO_P1_11 RPI_GPIO_P1_12 RPI_GPIO_P1_13 RPI_GPIO_P1_15
-     RPI_GPIO_P1_16 RPI_GPIO_P1_18 RPI_GPIO_P1_19 RPI_GPIO_P1_21 RPI_GPIO_P1_22
-     RPI_GPIO_P1_23 RPI_GPIO_P1_24 RPI_GPIO_P1_26 */
+     BCM2835_GPSET1 BCM2835_ST_CHI BCM2835_ST_CLO RPI_GPIO_P1_03 RPI_GPIO_P1_05
+     RPI_GPIO_P1_07 RPI_GPIO_P1_08 RPI_GPIO_P1_10 RPI_GPIO_P1_11 RPI_GPIO_P1_12
+     RPI_GPIO_P1_13 RPI_GPIO_P1_15 RPI_GPIO_P1_16 RPI_GPIO_P1_18 RPI_GPIO_P1_19
+     RPI_GPIO_P1_21 RPI_GPIO_P1_22 RPI_GPIO_P1_23 RPI_GPIO_P1_24 RPI_GPIO_P1_26
+     */
   /* Offset 13 gives the best switch position.  */
   switch (name[13]) {
   case '0':
@@ -282,6 +347,28 @@ constant_14 (pTHX_ const char *name, IV *iv_return) {
       return PERL_constant_ISIV;
     }
     break;
+  case 'I':
+    if (memEQ(name, "BCM2835_ST_CH", 13)) {
+    /*                            I      */
+#ifdef BCM2835_ST_CHI
+      *iv_return = BCM2835_ST_CHI;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'O':
+    if (memEQ(name, "BCM2835_ST_CL", 13)) {
+    /*                            O      */
+#ifdef BCM2835_ST_CLO
+      *iv_return = BCM2835_ST_CLO;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
   }
   return PERL_constant_NOTFOUND;
 }
@@ -290,10 +377,11 @@ static int
 constant_15 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     BCM2835_GPAFEN0 BCM2835_GPAFEN1 BCM2835_GPAREN0 BCM2835_GPAREN1
-     BCM2835_GPFSEL0 BCM2835_GPFSEL1 BCM2835_GPFSEL2 BCM2835_GPFSEL3
-     BCM2835_GPFSEL4 BCM2835_GPFSEL5 BCM2835_SPI0_CS BCM2835_SPI0_DC
-     BCM2835_SPI_CS0 BCM2835_SPI_CS1 BCM2835_SPI_CS2 */
+     BCM2835_BSC_DEL BCM2835_BSC_DIV BCM2835_GPAFEN0 BCM2835_GPAFEN1
+     BCM2835_GPAREN0 BCM2835_GPAREN1 BCM2835_GPFSEL0 BCM2835_GPFSEL1
+     BCM2835_GPFSEL2 BCM2835_GPFSEL3 BCM2835_GPFSEL4 BCM2835_GPFSEL5
+     BCM2835_SPI0_CS BCM2835_SPI0_DC BCM2835_SPI_CS0 BCM2835_SPI_CS1
+     BCM2835_SPI_CS2 BCM2835_ST_BASE BCM2835_VERSION */
   /* Offset 14 gives the best switch position.  */
   switch (name[14]) {
   case '0':
@@ -424,11 +512,165 @@ constant_15 (pTHX_ const char *name, IV *iv_return) {
 #endif
     }
     break;
+  case 'E':
+    if (memEQ(name, "BCM2835_ST_BAS", 14)) {
+    /*                             E      */
+#ifdef BCM2835_ST_BASE
+      *iv_return = BCM2835_ST_BASE;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'L':
+    if (memEQ(name, "BCM2835_BSC_DE", 14)) {
+    /*                             L      */
+#ifdef BCM2835_BSC_DEL
+      *iv_return = BCM2835_BSC_DEL;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'N':
+    if (memEQ(name, "BCM2835_VERSIO", 14)) {
+    /*                             N      */
+#ifdef BCM2835_VERSION
+      *iv_return = BCM2835_VERSION;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
   case 'S':
     if (memEQ(name, "BCM2835_SPI0_C", 14)) {
     /*                             S      */
 #ifdef BCM2835_SPI0_CS
       *iv_return = BCM2835_SPI0_CS;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'V':
+    if (memEQ(name, "BCM2835_BSC_DI", 14)) {
+    /*                             V      */
+#ifdef BCM2835_BSC_DIV
+      *iv_return = BCM2835_BSC_DIV;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  }
+  return PERL_constant_NOTFOUND;
+}
+
+static int
+constant_16 (pTHX_ const char *name, IV *iv_return) {
+  /* When generated this function returned values for the list of names given
+     here.  However, subsequent manual editing may have added or removed some.
+     BCM2835_BSC_CLKT BCM2835_BSC_C_ST BCM2835_BSC_DLEN BCM2835_BSC_FIFO
+     BCM2835_BSC_S_TA BCM2835_GPIO_PWM BCM2835_PWM_DMAC BCM2835_PWM_FIF1
+     BCM2835_SPI0_CLK */
+  /* Offset 14 gives the best switch position.  */
+  switch (name[14]) {
+  case 'A':
+    if (memEQ(name, "BCM2835_PWM_DMAC", 16)) {
+    /*                             ^        */
+#ifdef BCM2835_PWM_DMAC
+      *iv_return = BCM2835_PWM_DMAC;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'E':
+    if (memEQ(name, "BCM2835_BSC_DLEN", 16)) {
+    /*                             ^        */
+#ifdef BCM2835_BSC_DLEN
+      *iv_return = BCM2835_BSC_DLEN;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'F':
+    if (memEQ(name, "BCM2835_BSC_FIFO", 16)) {
+    /*                             ^        */
+#ifdef BCM2835_BSC_FIFO
+      *iv_return = BCM2835_BSC_FIFO;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "BCM2835_PWM_FIF1", 16)) {
+    /*                             ^        */
+#ifdef BCM2835_PWM_FIF1
+      *iv_return = BCM2835_PWM_FIF1;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'K':
+    if (memEQ(name, "BCM2835_BSC_CLKT", 16)) {
+    /*                             ^        */
+#ifdef BCM2835_BSC_CLKT
+      *iv_return = BCM2835_BSC_CLKT;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'L':
+    if (memEQ(name, "BCM2835_SPI0_CLK", 16)) {
+    /*                             ^        */
+#ifdef BCM2835_SPI0_CLK
+      *iv_return = BCM2835_SPI0_CLK;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'S':
+    if (memEQ(name, "BCM2835_BSC_C_ST", 16)) {
+    /*                             ^        */
+#ifdef BCM2835_BSC_C_ST
+      *iv_return = BCM2835_BSC_C_ST;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'T':
+    if (memEQ(name, "BCM2835_BSC_S_TA", 16)) {
+    /*                             ^        */
+#ifdef BCM2835_BSC_S_TA
+      *iv_return = BCM2835_BSC_S_TA;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'W':
+    if (memEQ(name, "BCM2835_GPIO_PWM", 16)) {
+    /*                             ^        */
+#ifdef BCM2835_GPIO_PWM
+      *iv_return = BCM2835_GPIO_PWM;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
@@ -443,16 +685,20 @@ static int
 constant_17 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     BCM2835_GPIO_BASE BCM2835_GPIO_PADS BCM2835_GPPUDCLK0 BCM2835_GPPUDCLK1
-     BCM2835_PAGE_SIZE BCM2835_PERI_BASE BCM2835_PWM0_DATA BCM2835_PWM1_DATA
-     BCM2835_SPI0_BASE BCM2835_SPI0_DLEN BCM2835_SPI0_FIFO BCM2835_SPI0_LTOH
-     BCM2835_SPI_MODE0 BCM2835_SPI_MODE1 BCM2835_SPI_MODE2 BCM2835_SPI_MODE3
-     RPI_V2_GPIO_P1_03 RPI_V2_GPIO_P1_05 RPI_V2_GPIO_P1_07 RPI_V2_GPIO_P1_08
-     RPI_V2_GPIO_P1_10 RPI_V2_GPIO_P1_11 RPI_V2_GPIO_P1_12 RPI_V2_GPIO_P1_13
-     RPI_V2_GPIO_P1_15 RPI_V2_GPIO_P1_16 RPI_V2_GPIO_P1_18 RPI_V2_GPIO_P1_19
-     RPI_V2_GPIO_P1_21 RPI_V2_GPIO_P1_22 RPI_V2_GPIO_P1_23 RPI_V2_GPIO_P1_24
-     RPI_V2_GPIO_P1_26 RPI_V2_GPIO_P5_03 RPI_V2_GPIO_P5_04 RPI_V2_GPIO_P5_05
-     RPI_V2_GPIO_P5_06 */
+     BCM2835_BSC0_BASE BCM2835_BSC1_BASE BCM2835_BSC_S_ERR BCM2835_BSC_S_RXD
+     BCM2835_BSC_S_RXF BCM2835_BSC_S_RXR BCM2835_BSC_S_TXD BCM2835_BSC_S_TXE
+     BCM2835_BSC_S_TXW BCM2835_GPIO_BASE BCM2835_GPIO_PADS BCM2835_GPPUDCLK0
+     BCM2835_GPPUDCLK1 BCM2835_PAGE_SIZE BCM2835_PERI_BASE BCM2835_PERI_SIZE
+     BCM2835_PWM0_DATA BCM2835_PWM1_DATA BCM2835_SPI0_BASE BCM2835_SPI0_DLEN
+     BCM2835_SPI0_FIFO BCM2835_SPI0_LTOH BCM2835_SPI_MODE0 BCM2835_SPI_MODE1
+     BCM2835_SPI_MODE2 BCM2835_SPI_MODE3 RPI_V2_GPIO_P1_03 RPI_V2_GPIO_P1_05
+     RPI_V2_GPIO_P1_07 RPI_V2_GPIO_P1_08 RPI_V2_GPIO_P1_10 RPI_V2_GPIO_P1_11
+     RPI_V2_GPIO_P1_12 RPI_V2_GPIO_P1_13 RPI_V2_GPIO_P1_15 RPI_V2_GPIO_P1_16
+     RPI_V2_GPIO_P1_18 RPI_V2_GPIO_P1_19 RPI_V2_GPIO_P1_21 RPI_V2_GPIO_P1_22
+     RPI_V2_GPIO_P1_23 RPI_V2_GPIO_P1_24 RPI_V2_GPIO_P1_26 RPI_V2_GPIO_P1_29
+     RPI_V2_GPIO_P1_31 RPI_V2_GPIO_P1_32 RPI_V2_GPIO_P1_33 RPI_V2_GPIO_P1_35
+     RPI_V2_GPIO_P1_36 RPI_V2_GPIO_P1_37 RPI_V2_GPIO_P1_38 RPI_V2_GPIO_P1_40
+     RPI_V2_GPIO_P5_03 RPI_V2_GPIO_P5_04 RPI_V2_GPIO_P5_05 RPI_V2_GPIO_P5_06 */
   /* Offset 16 gives the best switch position.  */
   switch (name[16]) {
   case '0':
@@ -473,6 +719,11 @@ constant_17 (pTHX_ const char *name, IV *iv_return) {
     if (memEQ(name, "RPI_V2_GPIO_P1_1", 16)) {
     /*                               0      */
       *iv_return = RPI_V2_GPIO_P1_10;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "RPI_V2_GPIO_P1_4", 16)) {
+    /*                               0      */
+      *iv_return = RPI_V2_GPIO_P1_40;
       return PERL_constant_ISIV;
     }
     break;
@@ -501,6 +752,11 @@ constant_17 (pTHX_ const char *name, IV *iv_return) {
       *iv_return = RPI_V2_GPIO_P1_21;
       return PERL_constant_ISIV;
     }
+    if (memEQ(name, "RPI_V2_GPIO_P1_3", 16)) {
+    /*                               1      */
+      *iv_return = RPI_V2_GPIO_P1_31;
+      return PERL_constant_ISIV;
+    }
     break;
   case '2':
     if (memEQ(name, "BCM2835_SPI_MODE", 16)) {
@@ -516,6 +772,11 @@ constant_17 (pTHX_ const char *name, IV *iv_return) {
     if (memEQ(name, "RPI_V2_GPIO_P1_2", 16)) {
     /*                               2      */
       *iv_return = RPI_V2_GPIO_P1_22;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "RPI_V2_GPIO_P1_3", 16)) {
+    /*                               2      */
+      *iv_return = RPI_V2_GPIO_P1_32;
       return PERL_constant_ISIV;
     }
     break;
@@ -538,6 +799,11 @@ constant_17 (pTHX_ const char *name, IV *iv_return) {
     if (memEQ(name, "RPI_V2_GPIO_P1_2", 16)) {
     /*                               3      */
       *iv_return = RPI_V2_GPIO_P1_23;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "RPI_V2_GPIO_P1_3", 16)) {
+    /*                               3      */
+      *iv_return = RPI_V2_GPIO_P1_33;
       return PERL_constant_ISIV;
     }
     if (memEQ(name, "RPI_V2_GPIO_P5_0", 16)) {
@@ -569,6 +835,11 @@ constant_17 (pTHX_ const char *name, IV *iv_return) {
       *iv_return = RPI_V2_GPIO_P1_15;
       return PERL_constant_ISIV;
     }
+    if (memEQ(name, "RPI_V2_GPIO_P1_3", 16)) {
+    /*                               5      */
+      *iv_return = RPI_V2_GPIO_P1_35;
+      return PERL_constant_ISIV;
+    }
     if (memEQ(name, "RPI_V2_GPIO_P5_0", 16)) {
     /*                               5      */
       *iv_return = RPI_V2_GPIO_P5_05;
@@ -586,6 +857,11 @@ constant_17 (pTHX_ const char *name, IV *iv_return) {
       *iv_return = RPI_V2_GPIO_P1_26;
       return PERL_constant_ISIV;
     }
+    if (memEQ(name, "RPI_V2_GPIO_P1_3", 16)) {
+    /*                               6      */
+      *iv_return = RPI_V2_GPIO_P1_36;
+      return PERL_constant_ISIV;
+    }
     if (memEQ(name, "RPI_V2_GPIO_P5_0", 16)) {
     /*                               6      */
       *iv_return = RPI_V2_GPIO_P5_06;
@@ -596,6 +872,11 @@ constant_17 (pTHX_ const char *name, IV *iv_return) {
     if (memEQ(name, "RPI_V2_GPIO_P1_0", 16)) {
     /*                               7      */
       *iv_return = RPI_V2_GPIO_P1_07;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "RPI_V2_GPIO_P1_3", 16)) {
+    /*                               7      */
+      *iv_return = RPI_V2_GPIO_P1_37;
       return PERL_constant_ISIV;
     }
     break;
@@ -610,11 +891,21 @@ constant_17 (pTHX_ const char *name, IV *iv_return) {
       *iv_return = RPI_V2_GPIO_P1_18;
       return PERL_constant_ISIV;
     }
+    if (memEQ(name, "RPI_V2_GPIO_P1_3", 16)) {
+    /*                               8      */
+      *iv_return = RPI_V2_GPIO_P1_38;
+      return PERL_constant_ISIV;
+    }
     break;
   case '9':
     if (memEQ(name, "RPI_V2_GPIO_P1_1", 16)) {
     /*                               9      */
       *iv_return = RPI_V2_GPIO_P1_19;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "RPI_V2_GPIO_P1_2", 16)) {
+    /*                               9      */
+      *iv_return = RPI_V2_GPIO_P1_29;
       return PERL_constant_ISIV;
     }
     break;
@@ -638,7 +929,54 @@ constant_17 (pTHX_ const char *name, IV *iv_return) {
 #endif
     }
     break;
+  case 'D':
+    if (memEQ(name, "BCM2835_BSC_S_RX", 16)) {
+    /*                               D      */
+#ifdef BCM2835_BSC_S_RXD
+      *iv_return = BCM2835_BSC_S_RXD;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "BCM2835_BSC_S_TX", 16)) {
+    /*                               D      */
+#ifdef BCM2835_BSC_S_TXD
+      *iv_return = BCM2835_BSC_S_TXD;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
   case 'E':
+    if (memEQ(name, "BCM2835_BSC0_BAS", 16)) {
+    /*                               E      */
+#ifdef BCM2835_BSC0_BASE
+      *iv_return = BCM2835_BSC0_BASE;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "BCM2835_BSC1_BAS", 16)) {
+    /*                               E      */
+#ifdef BCM2835_BSC1_BASE
+      *iv_return = BCM2835_BSC1_BASE;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "BCM2835_BSC_S_TX", 16)) {
+    /*                               E      */
+#ifdef BCM2835_BSC_S_TXE
+      *iv_return = BCM2835_BSC_S_TXE;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
     if (memEQ(name, "BCM2835_GPIO_BAS", 16)) {
     /*                               E      */
 #ifdef BCM2835_GPIO_BASE
@@ -666,10 +1004,30 @@ constant_17 (pTHX_ const char *name, IV *iv_return) {
       return PERL_constant_NOTDEF;
 #endif
     }
+    if (memEQ(name, "BCM2835_PERI_SIZ", 16)) {
+    /*                               E      */
+#ifdef BCM2835_PERI_SIZE
+      *iv_return = BCM2835_PERI_SIZE;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
     if (memEQ(name, "BCM2835_SPI0_BAS", 16)) {
     /*                               E      */
 #ifdef BCM2835_SPI0_BASE
       *iv_return = BCM2835_SPI0_BASE;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'F':
+    if (memEQ(name, "BCM2835_BSC_S_RX", 16)) {
+    /*                               F      */
+#ifdef BCM2835_BSC_S_RXF
+      *iv_return = BCM2835_BSC_S_RXF;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
@@ -709,11 +1067,42 @@ constant_17 (pTHX_ const char *name, IV *iv_return) {
 #endif
     }
     break;
+  case 'R':
+    if (memEQ(name, "BCM2835_BSC_S_ER", 16)) {
+    /*                               R      */
+#ifdef BCM2835_BSC_S_ERR
+      *iv_return = BCM2835_BSC_S_ERR;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "BCM2835_BSC_S_RX", 16)) {
+    /*                               R      */
+#ifdef BCM2835_BSC_S_RXR
+      *iv_return = BCM2835_BSC_S_RXR;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
   case 'S':
     if (memEQ(name, "BCM2835_GPIO_PAD", 16)) {
     /*                               S      */
 #ifdef BCM2835_GPIO_PADS
       *iv_return = BCM2835_GPIO_PADS;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'W':
+    if (memEQ(name, "BCM2835_BSC_S_TX", 16)) {
+    /*                               W      */
+#ifdef BCM2835_BSC_S_TXW
+      *iv_return = BCM2835_BSC_S_TXW;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
@@ -728,11 +1117,24 @@ static int
 constant_18 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     BCM2835_BLOCK_SIZE BCM2835_CLOCK_BASE BCM2835_PWM0_RANGE
+     BCM2835_BLOCK_SIZE BCM2835_BSC_C_INTD BCM2835_BSC_C_INTR
+     BCM2835_BSC_C_INTT BCM2835_BSC_C_READ BCM2835_BSC_S_CLKT
+     BCM2835_BSC_S_DONE BCM2835_CLOCK_BASE BCM2835_PWM0_RANGE
      BCM2835_PWM1_RANGE BCM2835_PWMCLK_DIV BCM2835_PWM_STATUS
-     BCM2835_SPI0_CS_CS BCM2835_SPI0_CS_TA */
+     BCM2835_REGBASE_ST BCM2835_SPI0_CS_CS BCM2835_SPI0_CS_TA */
   /* Offset 16 gives the best switch position.  */
   switch (name[16]) {
+  case 'A':
+    if (memEQ(name, "BCM2835_BSC_C_READ", 18)) {
+    /*                               ^        */
+#ifdef BCM2835_BSC_C_READ
+      *iv_return = BCM2835_BSC_C_READ;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
   case 'C':
     if (memEQ(name, "BCM2835_SPI0_CS_CS", 18)) {
     /*                               ^        */
@@ -775,6 +1177,28 @@ constant_18 (pTHX_ const char *name, IV *iv_return) {
 #endif
     }
     break;
+  case 'K':
+    if (memEQ(name, "BCM2835_BSC_S_CLKT", 18)) {
+    /*                               ^        */
+#ifdef BCM2835_BSC_S_CLKT
+      *iv_return = BCM2835_BSC_S_CLKT;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'N':
+    if (memEQ(name, "BCM2835_BSC_S_DONE", 18)) {
+    /*                               ^        */
+#ifdef BCM2835_BSC_S_DONE
+      *iv_return = BCM2835_BSC_S_DONE;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
   case 'S':
     if (memEQ(name, "BCM2835_CLOCK_BASE", 18)) {
     /*                               ^        */
@@ -785,8 +1209,40 @@ constant_18 (pTHX_ const char *name, IV *iv_return) {
       return PERL_constant_NOTDEF;
 #endif
     }
+    if (memEQ(name, "BCM2835_REGBASE_ST", 18)) {
+    /*                               ^        */
+      *iv_return = BCM2835_REGBASE_ST;
+      return PERL_constant_ISIV;
+    }
     break;
   case 'T':
+    if (memEQ(name, "BCM2835_BSC_C_INTD", 18)) {
+    /*                               ^        */
+#ifdef BCM2835_BSC_C_INTD
+      *iv_return = BCM2835_BSC_C_INTD;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "BCM2835_BSC_C_INTR", 18)) {
+    /*                               ^        */
+#ifdef BCM2835_BSC_C_INTR
+      *iv_return = BCM2835_BSC_C_INTR;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "BCM2835_BSC_C_INTT", 18)) {
+    /*                               ^        */
+#ifdef BCM2835_BSC_C_INTT
+      *iv_return = BCM2835_BSC_C_INTT;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
     if (memEQ(name, "BCM2835_SPI0_CS_TA", 18)) {
     /*                               ^        */
 #ifdef BCM2835_SPI0_CS_TA
@@ -827,9 +1283,11 @@ static int
 constant_19 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     BCM2835_GPIO_PUD_UP BCM2835_PWM0_ENABLE BCM2835_PWM0_SERIAL
+     BCM2835_BSC_C_I2CEN BCM2835_CORE_CLK_HZ BCM2835_GPIO_PUD_UP
+     BCM2835_PAD_PASSWRD BCM2835_PWM0_ENABLE BCM2835_PWM0_SERIAL
      BCM2835_PWM1_ENABLE BCM2835_PWM1_SERIAL BCM2835_PWMCLK_CNTL
-     BCM2835_PWM_CONTROL BCM2835_SPI0_CS_LEN BCM2835_SPI0_CS_REN
+     BCM2835_PWM_CONTROL BCM2835_PWM_PASSWRD BCM2835_REGBASE_CLK
+     BCM2835_REGBASE_PWM BCM2835_SPI0_CS_LEN BCM2835_SPI0_CS_REN
      BCM2835_SPI0_CS_RXD BCM2835_SPI0_CS_RXF BCM2835_SPI0_CS_RXR
      BCM2835_SPI0_CS_TXD BCM2835_SPI_CS_NONE */
   /* Offset 17 gives the best switch position.  */
@@ -855,6 +1313,15 @@ constant_19 (pTHX_ const char *name, IV *iv_return) {
     }
     break;
   case 'E':
+    if (memEQ(name, "BCM2835_BSC_C_I2CEN", 19)) {
+    /*                                ^        */
+#ifdef BCM2835_BSC_C_I2CEN
+      *iv_return = BCM2835_BSC_C_I2CEN;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
     if (memEQ(name, "BCM2835_SPI0_CS_LEN", 19)) {
     /*                                ^        */
 #ifdef BCM2835_SPI0_CS_LEN
@@ -868,6 +1335,17 @@ constant_19 (pTHX_ const char *name, IV *iv_return) {
     /*                                ^        */
 #ifdef BCM2835_SPI0_CS_REN
       *iv_return = BCM2835_SPI0_CS_REN;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'H':
+    if (memEQ(name, "BCM2835_CORE_CLK_HZ", 19)) {
+    /*                                ^        */
+#ifdef BCM2835_CORE_CLK_HZ
+      *iv_return = BCM2835_CORE_CLK_HZ;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
@@ -893,6 +1371,11 @@ constant_19 (pTHX_ const char *name, IV *iv_return) {
       return PERL_constant_NOTDEF;
 #endif
     }
+    if (memEQ(name, "BCM2835_REGBASE_CLK", 19)) {
+    /*                                ^        */
+      *iv_return = BCM2835_REGBASE_CLK;
+      return PERL_constant_ISIV;
+    }
     break;
   case 'N':
     if (memEQ(name, "BCM2835_SPI_CS_NONE", 19)) {
@@ -906,6 +1389,26 @@ constant_19 (pTHX_ const char *name, IV *iv_return) {
     /*                                ^        */
 #ifdef BCM2835_PWM_CONTROL
       *iv_return = BCM2835_PWM_CONTROL;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'R':
+    if (memEQ(name, "BCM2835_PAD_PASSWRD", 19)) {
+    /*                                ^        */
+#ifdef BCM2835_PAD_PASSWRD
+      *iv_return = BCM2835_PAD_PASSWRD;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "BCM2835_PWM_PASSWRD", 19)) {
+    /*                                ^        */
+#ifdef BCM2835_PWM_PASSWRD
+      *iv_return = BCM2835_PWM_PASSWRD;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
@@ -927,6 +1430,13 @@ constant_19 (pTHX_ const char *name, IV *iv_return) {
     if (memEQ(name, "BCM2835_GPIO_PUD_UP", 19)) {
     /*                                ^        */
       *iv_return = BCM2835_GPIO_PUD_UP;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case 'W':
+    if (memEQ(name, "BCM2835_REGBASE_PWM", 19)) {
+    /*                                ^        */
+      *iv_return = BCM2835_REGBASE_PWM;
       return PERL_constant_ISIV;
     }
     break;
@@ -977,11 +1487,186 @@ constant_20 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
      BCM2835_GPIO_PUD_OFF BCM2835_PWM0_MS_MODE BCM2835_PWM0_USEFIFO
-     BCM2835_PWM1_MS_MODE BCM2835_PWM1_USEFIFO BCM2835_SPI0_CS_ADCS
-     BCM2835_SPI0_CS_CPHA BCM2835_SPI0_CS_CPOL BCM2835_SPI0_CS_DONE
-     BCM2835_SPI0_CS_INTD BCM2835_SPI0_CS_INTR */
+     BCM2835_PWM1_MS_MODE BCM2835_PWM1_USEFIFO BCM2835_REGBASE_BSC0
+     BCM2835_REGBASE_BSC1 BCM2835_REGBASE_GPIO BCM2835_REGBASE_PADS
+     BCM2835_REGBASE_SPI0 BCM2835_SPI0_CS_ADCS BCM2835_SPI0_CS_CPHA
+     BCM2835_SPI0_CS_CPOL BCM2835_SPI0_CS_DONE BCM2835_SPI0_CS_INTD
+     BCM2835_SPI0_CS_INTR RPI_BPLUS_GPIO_J8_03 RPI_BPLUS_GPIO_J8_05
+     RPI_BPLUS_GPIO_J8_07 RPI_BPLUS_GPIO_J8_08 RPI_BPLUS_GPIO_J8_10
+     RPI_BPLUS_GPIO_J8_11 RPI_BPLUS_GPIO_J8_12 RPI_BPLUS_GPIO_J8_13
+     RPI_BPLUS_GPIO_J8_15 RPI_BPLUS_GPIO_J8_16 RPI_BPLUS_GPIO_J8_18
+     RPI_BPLUS_GPIO_J8_19 RPI_BPLUS_GPIO_J8_21 RPI_BPLUS_GPIO_J8_22
+     RPI_BPLUS_GPIO_J8_23 RPI_BPLUS_GPIO_J8_24 RPI_BPLUS_GPIO_J8_26
+     RPI_BPLUS_GPIO_J8_29 RPI_BPLUS_GPIO_J8_31 RPI_BPLUS_GPIO_J8_32
+     RPI_BPLUS_GPIO_J8_33 RPI_BPLUS_GPIO_J8_35 RPI_BPLUS_GPIO_J8_36
+     RPI_BPLUS_GPIO_J8_37 RPI_BPLUS_GPIO_J8_38 RPI_BPLUS_GPIO_J8_40 */
   /* Offset 19 gives the best switch position.  */
   switch (name[19]) {
+  case '0':
+    if (memEQ(name, "BCM2835_REGBASE_BSC", 19)) {
+    /*                                  0      */
+      *iv_return = BCM2835_REGBASE_BSC0;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "BCM2835_REGBASE_SPI", 19)) {
+    /*                                  0      */
+      *iv_return = BCM2835_REGBASE_SPI0;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "RPI_BPLUS_GPIO_J8_1", 19)) {
+    /*                                  0      */
+      *iv_return = RPI_BPLUS_GPIO_J8_10;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "RPI_BPLUS_GPIO_J8_4", 19)) {
+    /*                                  0      */
+      *iv_return = RPI_BPLUS_GPIO_J8_40;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case '1':
+    if (memEQ(name, "BCM2835_REGBASE_BSC", 19)) {
+    /*                                  1      */
+      *iv_return = BCM2835_REGBASE_BSC1;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "RPI_BPLUS_GPIO_J8_1", 19)) {
+    /*                                  1      */
+      *iv_return = RPI_BPLUS_GPIO_J8_11;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "RPI_BPLUS_GPIO_J8_2", 19)) {
+    /*                                  1      */
+      *iv_return = RPI_BPLUS_GPIO_J8_21;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "RPI_BPLUS_GPIO_J8_3", 19)) {
+    /*                                  1      */
+      *iv_return = RPI_BPLUS_GPIO_J8_31;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case '2':
+    if (memEQ(name, "RPI_BPLUS_GPIO_J8_1", 19)) {
+    /*                                  2      */
+      *iv_return = RPI_BPLUS_GPIO_J8_12;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "RPI_BPLUS_GPIO_J8_2", 19)) {
+    /*                                  2      */
+      *iv_return = RPI_BPLUS_GPIO_J8_22;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "RPI_BPLUS_GPIO_J8_3", 19)) {
+    /*                                  2      */
+      *iv_return = RPI_BPLUS_GPIO_J8_32;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case '3':
+    if (memEQ(name, "RPI_BPLUS_GPIO_J8_0", 19)) {
+    /*                                  3      */
+      *iv_return = RPI_BPLUS_GPIO_J8_03;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "RPI_BPLUS_GPIO_J8_1", 19)) {
+    /*                                  3      */
+      *iv_return = RPI_BPLUS_GPIO_J8_13;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "RPI_BPLUS_GPIO_J8_2", 19)) {
+    /*                                  3      */
+      *iv_return = RPI_BPLUS_GPIO_J8_23;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "RPI_BPLUS_GPIO_J8_3", 19)) {
+    /*                                  3      */
+      *iv_return = RPI_BPLUS_GPIO_J8_33;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case '4':
+    if (memEQ(name, "RPI_BPLUS_GPIO_J8_2", 19)) {
+    /*                                  4      */
+      *iv_return = RPI_BPLUS_GPIO_J8_24;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case '5':
+    if (memEQ(name, "RPI_BPLUS_GPIO_J8_0", 19)) {
+    /*                                  5      */
+      *iv_return = RPI_BPLUS_GPIO_J8_05;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "RPI_BPLUS_GPIO_J8_1", 19)) {
+    /*                                  5      */
+      *iv_return = RPI_BPLUS_GPIO_J8_15;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "RPI_BPLUS_GPIO_J8_3", 19)) {
+    /*                                  5      */
+      *iv_return = RPI_BPLUS_GPIO_J8_35;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case '6':
+    if (memEQ(name, "RPI_BPLUS_GPIO_J8_1", 19)) {
+    /*                                  6      */
+      *iv_return = RPI_BPLUS_GPIO_J8_16;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "RPI_BPLUS_GPIO_J8_2", 19)) {
+    /*                                  6      */
+      *iv_return = RPI_BPLUS_GPIO_J8_26;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "RPI_BPLUS_GPIO_J8_3", 19)) {
+    /*                                  6      */
+      *iv_return = RPI_BPLUS_GPIO_J8_36;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case '7':
+    if (memEQ(name, "RPI_BPLUS_GPIO_J8_0", 19)) {
+    /*                                  7      */
+      *iv_return = RPI_BPLUS_GPIO_J8_07;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "RPI_BPLUS_GPIO_J8_3", 19)) {
+    /*                                  7      */
+      *iv_return = RPI_BPLUS_GPIO_J8_37;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case '8':
+    if (memEQ(name, "RPI_BPLUS_GPIO_J8_0", 19)) {
+    /*                                  8      */
+      *iv_return = RPI_BPLUS_GPIO_J8_08;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "RPI_BPLUS_GPIO_J8_1", 19)) {
+    /*                                  8      */
+      *iv_return = RPI_BPLUS_GPIO_J8_18;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "RPI_BPLUS_GPIO_J8_3", 19)) {
+    /*                                  8      */
+      *iv_return = RPI_BPLUS_GPIO_J8_38;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case '9':
+    if (memEQ(name, "RPI_BPLUS_GPIO_J8_1", 19)) {
+    /*                                  9      */
+      *iv_return = RPI_BPLUS_GPIO_J8_19;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "RPI_BPLUS_GPIO_J8_2", 19)) {
+    /*                                  9      */
+      *iv_return = RPI_BPLUS_GPIO_J8_29;
+      return PERL_constant_ISIV;
+    }
+    break;
   case 'A':
     if (memEQ(name, "BCM2835_SPI0_CS_CPH", 19)) {
     /*                                  A      */
@@ -1070,6 +1755,11 @@ constant_20 (pTHX_ const char *name, IV *iv_return) {
       return PERL_constant_NOTDEF;
 #endif
     }
+    if (memEQ(name, "BCM2835_REGBASE_GPI", 19)) {
+    /*                                  O      */
+      *iv_return = BCM2835_REGBASE_GPIO;
+      return PERL_constant_ISIV;
+    }
     break;
   case 'R':
     if (memEQ(name, "BCM2835_SPI0_CS_INT", 19)) {
@@ -1083,6 +1773,11 @@ constant_20 (pTHX_ const char *name, IV *iv_return) {
     }
     break;
   case 'S':
+    if (memEQ(name, "BCM2835_REGBASE_PAD", 19)) {
+    /*                                  S      */
+      *iv_return = BCM2835_REGBASE_PADS;
+      return PERL_constant_ISIV;
+    }
     if (memEQ(name, "BCM2835_SPI0_CS_ADC", 19)) {
     /*                                  S      */
 #ifdef BCM2835_SPI0_CS_ADCS
@@ -1101,12 +1796,13 @@ static int
 constant_21 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     BCM2835_GPIO_PUD_DOWN BCM2835_PAD_DRIVE_2mA BCM2835_PAD_DRIVE_4mA
-     BCM2835_PAD_DRIVE_6mA BCM2835_PAD_DRIVE_8mA BCM2835_PWM0_OFFSTATE
-     BCM2835_PWM0_REPEATFF BCM2835_PWM0_REVPOLAR BCM2835_PWM1_OFFSTATE
-     BCM2835_PWM1_REPEATFF BCM2835_PWM1_REVPOLAR BCM2835_SPI0_CS_CLEAR
-     BCM2835_SPI0_CS_CSPOL BCM2835_SPI0_CS_DMAEN BCM2835_SPI0_CS_LMONO
-     BCM2835_SPI0_CS_TE_EN */
+     BCM2835_BSC_C_CLEAR_1 BCM2835_BSC_C_CLEAR_2 BCM2835_BSC_FIFO_SIZE
+     BCM2835_GPIO_PUD_DOWN BCM2835_I2C_REASON_OK BCM2835_PAD_DRIVE_2mA
+     BCM2835_PAD_DRIVE_4mA BCM2835_PAD_DRIVE_6mA BCM2835_PAD_DRIVE_8mA
+     BCM2835_PWM0_OFFSTATE BCM2835_PWM0_REPEATFF BCM2835_PWM0_REVPOLAR
+     BCM2835_PWM1_OFFSTATE BCM2835_PWM1_REPEATFF BCM2835_PWM1_REVPOLAR
+     BCM2835_SPI0_CS_CLEAR BCM2835_SPI0_CS_CSPOL BCM2835_SPI0_CS_DMAEN
+     BCM2835_SPI0_CS_LMONO BCM2835_SPI0_CS_TE_EN */
   /* Offset 18 gives the best switch position.  */
   switch (name[18]) {
   case '2':
@@ -1193,6 +1889,17 @@ constant_21 (pTHX_ const char *name, IV *iv_return) {
 #endif
     }
     break;
+  case 'I':
+    if (memEQ(name, "BCM2835_BSC_FIFO_SIZE", 21)) {
+    /*                                 ^         */
+#ifdef BCM2835_BSC_FIFO_SIZE
+      *iv_return = BCM2835_BSC_FIFO_SIZE;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
   case 'L':
     if (memEQ(name, "BCM2835_PWM0_REVPOLAR", 21)) {
     /*                                 ^         */
@@ -1240,6 +1947,26 @@ constant_21 (pTHX_ const char *name, IV *iv_return) {
 #endif
     }
     break;
+  case 'R':
+    if (memEQ(name, "BCM2835_BSC_C_CLEAR_1", 21)) {
+    /*                                 ^         */
+#ifdef BCM2835_BSC_C_CLEAR_1
+      *iv_return = BCM2835_BSC_C_CLEAR_1;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "BCM2835_BSC_C_CLEAR_2", 21)) {
+    /*                                 ^         */
+#ifdef BCM2835_BSC_C_CLEAR_2
+      *iv_return = BCM2835_BSC_C_CLEAR_2;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
   case 'T':
     if (memEQ(name, "BCM2835_PWM0_REPEATFF", 21)) {
     /*                                 ^         */
@@ -1261,6 +1988,11 @@ constant_21 (pTHX_ const char *name, IV *iv_return) {
     }
     break;
   case '_':
+    if (memEQ(name, "BCM2835_I2C_REASON_OK", 21)) {
+    /*                                 ^         */
+      *iv_return = BCM2835_I2C_REASON_OK;
+      return PERL_constant_ISIV;
+    }
     if (memEQ(name, "BCM2835_SPI0_CS_TE_EN", 21)) {
     /*                                 ^         */
 #ifdef BCM2835_SPI0_CS_TE_EN
@@ -1283,8 +2015,8 @@ constant_22 (pTHX_ const char *name, IV *iv_return) {
      BCM2835_GPIO_FSEL_ALT3 BCM2835_GPIO_FSEL_ALT4 BCM2835_GPIO_FSEL_ALT5
      BCM2835_GPIO_FSEL_INPT BCM2835_GPIO_FSEL_MASK BCM2835_GPIO_FSEL_OUTP
      BCM2835_PADS_GPIO_0_27 BCM2835_PAD_DRIVE_10mA BCM2835_PAD_DRIVE_12mA
-     BCM2835_PAD_DRIVE_14mA BCM2835_PAD_DRIVE_16mA BCM2835_SPI0_CS_CSPOL0
-     BCM2835_SPI0_CS_CSPOL1 BCM2835_SPI0_CS_CSPOL2 */
+     BCM2835_PAD_DRIVE_14mA BCM2835_PAD_DRIVE_16mA BCM2835_PWM_CLEAR_FIFO
+     BCM2835_SPI0_CS_CSPOL0 BCM2835_SPI0_CS_CSPOL1 BCM2835_SPI0_CS_CSPOL2 */
   /* Offset 21 gives the best switch position.  */
   switch (name[21]) {
   case '0':
@@ -1412,6 +2144,17 @@ constant_22 (pTHX_ const char *name, IV *iv_return) {
       return PERL_constant_ISIV;
     }
     break;
+  case 'O':
+    if (memEQ(name, "BCM2835_PWM_CLEAR_FIF", 21)) {
+    /*                                    O      */
+#ifdef BCM2835_PWM_CLEAR_FIFO
+      *iv_return = BCM2835_PWM_CLEAR_FIFO;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
   case 'P':
     if (memEQ(name, "BCM2835_GPIO_FSEL_OUT", 21)) {
     /*                                    P      */
@@ -1523,12 +2266,19 @@ static int
 constant_27 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     BCM2835_PAD_GROUP_GPIO_0_27 BCM2835_SPI_CLOCK_DIVIDER_1
+     BCM2835_PAD_GROUP_GPIO_0_27 BCM2835_PWM_CLOCK_DIVIDER_1
+     BCM2835_PWM_CLOCK_DIVIDER_2 BCM2835_PWM_CLOCK_DIVIDER_4
+     BCM2835_PWM_CLOCK_DIVIDER_8 BCM2835_SPI_CLOCK_DIVIDER_1
      BCM2835_SPI_CLOCK_DIVIDER_2 BCM2835_SPI_CLOCK_DIVIDER_4
      BCM2835_SPI_CLOCK_DIVIDER_8 */
   /* Offset 26 gives the best switch position.  */
   switch (name[26]) {
   case '1':
+    if (memEQ(name, "BCM2835_PWM_CLOCK_DIVIDER_", 26)) {
+    /*                                         1      */
+      *iv_return = BCM2835_PWM_CLOCK_DIVIDER_1;
+      return PERL_constant_ISIV;
+    }
     if (memEQ(name, "BCM2835_SPI_CLOCK_DIVIDER_", 26)) {
     /*                                         1      */
       *iv_return = BCM2835_SPI_CLOCK_DIVIDER_1;
@@ -1536,6 +2286,11 @@ constant_27 (pTHX_ const char *name, IV *iv_return) {
     }
     break;
   case '2':
+    if (memEQ(name, "BCM2835_PWM_CLOCK_DIVIDER_", 26)) {
+    /*                                         2      */
+      *iv_return = BCM2835_PWM_CLOCK_DIVIDER_2;
+      return PERL_constant_ISIV;
+    }
     if (memEQ(name, "BCM2835_SPI_CLOCK_DIVIDER_", 26)) {
     /*                                         2      */
       *iv_return = BCM2835_SPI_CLOCK_DIVIDER_2;
@@ -1543,6 +2298,11 @@ constant_27 (pTHX_ const char *name, IV *iv_return) {
     }
     break;
   case '4':
+    if (memEQ(name, "BCM2835_PWM_CLOCK_DIVIDER_", 26)) {
+    /*                                         4      */
+      *iv_return = BCM2835_PWM_CLOCK_DIVIDER_4;
+      return PERL_constant_ISIV;
+    }
     if (memEQ(name, "BCM2835_SPI_CLOCK_DIVIDER_", 26)) {
     /*                                         4      */
       *iv_return = BCM2835_SPI_CLOCK_DIVIDER_4;
@@ -1557,6 +2317,11 @@ constant_27 (pTHX_ const char *name, IV *iv_return) {
     }
     break;
   case '8':
+    if (memEQ(name, "BCM2835_PWM_CLOCK_DIVIDER_", 26)) {
+    /*                                         8      */
+      *iv_return = BCM2835_PWM_CLOCK_DIVIDER_8;
+      return PERL_constant_ISIV;
+    }
     if (memEQ(name, "BCM2835_SPI_CLOCK_DIVIDER_", 26)) {
     /*                                         8      */
       *iv_return = BCM2835_SPI_CLOCK_DIVIDER_8;
@@ -1572,11 +2337,17 @@ constant_28 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
      BCM2835_PAD_GROUP_GPIO_28_45 BCM2835_PAD_GROUP_GPIO_46_53
-     BCM2835_SPI_CLOCK_DIVIDER_16 BCM2835_SPI_CLOCK_DIVIDER_32
-     BCM2835_SPI_CLOCK_DIVIDER_64 */
+     BCM2835_PWM_CLOCK_DIVIDER_16 BCM2835_PWM_CLOCK_DIVIDER_32
+     BCM2835_PWM_CLOCK_DIVIDER_64 BCM2835_SPI_CLOCK_DIVIDER_16
+     BCM2835_SPI_CLOCK_DIVIDER_32 BCM2835_SPI_CLOCK_DIVIDER_64 */
   /* Offset 27 gives the best switch position.  */
   switch (name[27]) {
   case '2':
+    if (memEQ(name, "BCM2835_PWM_CLOCK_DIVIDER_3", 27)) {
+    /*                                          2      */
+      *iv_return = BCM2835_PWM_CLOCK_DIVIDER_32;
+      return PERL_constant_ISIV;
+    }
     if (memEQ(name, "BCM2835_SPI_CLOCK_DIVIDER_3", 27)) {
     /*                                          2      */
       *iv_return = BCM2835_SPI_CLOCK_DIVIDER_32;
@@ -1591,6 +2362,11 @@ constant_28 (pTHX_ const char *name, IV *iv_return) {
     }
     break;
   case '4':
+    if (memEQ(name, "BCM2835_PWM_CLOCK_DIVIDER_6", 27)) {
+    /*                                          4      */
+      *iv_return = BCM2835_PWM_CLOCK_DIVIDER_64;
+      return PERL_constant_ISIV;
+    }
     if (memEQ(name, "BCM2835_SPI_CLOCK_DIVIDER_6", 27)) {
     /*                                          4      */
       *iv_return = BCM2835_SPI_CLOCK_DIVIDER_64;
@@ -1605,6 +2381,11 @@ constant_28 (pTHX_ const char *name, IV *iv_return) {
     }
     break;
   case '6':
+    if (memEQ(name, "BCM2835_PWM_CLOCK_DIVIDER_1", 27)) {
+    /*                                          6      */
+      *iv_return = BCM2835_PWM_CLOCK_DIVIDER_16;
+      return PERL_constant_ISIV;
+    }
     if (memEQ(name, "BCM2835_SPI_CLOCK_DIVIDER_1", 27)) {
     /*                                          6      */
       *iv_return = BCM2835_SPI_CLOCK_DIVIDER_16;
@@ -1619,28 +2400,85 @@ static int
 constant_29 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     BCM2835_SPI_CLOCK_DIVIDER_128 BCM2835_SPI_CLOCK_DIVIDER_256
-     BCM2835_SPI_CLOCK_DIVIDER_512 */
-  /* Offset 26 gives the best switch position.  */
-  switch (name[26]) {
+     BCM2835_I2C_CLOCK_DIVIDER_148 BCM2835_I2C_CLOCK_DIVIDER_150
+     BCM2835_I2C_CLOCK_DIVIDER_626 BCM2835_I2C_REASON_ERROR_CLKT
+     BCM2835_I2C_REASON_ERROR_DATA BCM2835_I2C_REASON_ERROR_NACK
+     BCM2835_PWM_CLOCK_DIVIDER_128 BCM2835_PWM_CLOCK_DIVIDER_256
+     BCM2835_PWM_CLOCK_DIVIDER_512 BCM2835_SPI_CLOCK_DIVIDER_128
+     BCM2835_SPI_CLOCK_DIVIDER_256 BCM2835_SPI_CLOCK_DIVIDER_512 */
+  /* Offset 27 gives the best switch position.  */
+  switch (name[27]) {
   case '1':
-    if (memEQ(name, "BCM2835_SPI_CLOCK_DIVIDER_128", 29)) {
-    /*                                         ^         */
-      *iv_return = BCM2835_SPI_CLOCK_DIVIDER_128;
+    if (memEQ(name, "BCM2835_PWM_CLOCK_DIVIDER_512", 29)) {
+    /*                                          ^        */
+      *iv_return = BCM2835_PWM_CLOCK_DIVIDER_512;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "BCM2835_SPI_CLOCK_DIVIDER_512", 29)) {
+    /*                                          ^        */
+      *iv_return = BCM2835_SPI_CLOCK_DIVIDER_512;
       return PERL_constant_ISIV;
     }
     break;
   case '2':
-    if (memEQ(name, "BCM2835_SPI_CLOCK_DIVIDER_256", 29)) {
-    /*                                         ^         */
-      *iv_return = BCM2835_SPI_CLOCK_DIVIDER_256;
+    if (memEQ(name, "BCM2835_I2C_CLOCK_DIVIDER_626", 29)) {
+    /*                                          ^        */
+      *iv_return = BCM2835_I2C_CLOCK_DIVIDER_626;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "BCM2835_PWM_CLOCK_DIVIDER_128", 29)) {
+    /*                                          ^        */
+      *iv_return = BCM2835_PWM_CLOCK_DIVIDER_128;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "BCM2835_SPI_CLOCK_DIVIDER_128", 29)) {
+    /*                                          ^        */
+      *iv_return = BCM2835_SPI_CLOCK_DIVIDER_128;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case '4':
+    if (memEQ(name, "BCM2835_I2C_CLOCK_DIVIDER_148", 29)) {
+    /*                                          ^        */
+      *iv_return = BCM2835_I2C_CLOCK_DIVIDER_148;
       return PERL_constant_ISIV;
     }
     break;
   case '5':
-    if (memEQ(name, "BCM2835_SPI_CLOCK_DIVIDER_512", 29)) {
-    /*                                         ^         */
-      *iv_return = BCM2835_SPI_CLOCK_DIVIDER_512;
+    if (memEQ(name, "BCM2835_I2C_CLOCK_DIVIDER_150", 29)) {
+    /*                                          ^        */
+      *iv_return = BCM2835_I2C_CLOCK_DIVIDER_150;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "BCM2835_PWM_CLOCK_DIVIDER_256", 29)) {
+    /*                                          ^        */
+      *iv_return = BCM2835_PWM_CLOCK_DIVIDER_256;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "BCM2835_SPI_CLOCK_DIVIDER_256", 29)) {
+    /*                                          ^        */
+      *iv_return = BCM2835_SPI_CLOCK_DIVIDER_256;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case 'C':
+    if (memEQ(name, "BCM2835_I2C_REASON_ERROR_NACK", 29)) {
+    /*                                          ^        */
+      *iv_return = BCM2835_I2C_REASON_ERROR_NACK;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case 'K':
+    if (memEQ(name, "BCM2835_I2C_REASON_ERROR_CLKT", 29)) {
+    /*                                          ^        */
+      *iv_return = BCM2835_I2C_REASON_ERROR_CLKT;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case 'T':
+    if (memEQ(name, "BCM2835_I2C_REASON_ERROR_DATA", 29)) {
+    /*                                          ^        */
+      *iv_return = BCM2835_I2C_REASON_ERROR_DATA;
       return PERL_constant_ISIV;
     }
     break;
@@ -1652,43 +2490,61 @@ static int
 constant_30 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     BCM2835_PAD_HYSTERESIS_ENABLED BCM2835_SPI_BIT_ORDER_LSBFIRST
-     BCM2835_SPI_BIT_ORDER_MSBFIRST BCM2835_SPI_CLOCK_DIVIDER_1024
-     BCM2835_SPI_CLOCK_DIVIDER_2048 BCM2835_SPI_CLOCK_DIVIDER_4096
-     BCM2835_SPI_CLOCK_DIVIDER_8192 */
-  /* Offset 26 gives the best switch position.  */
-  switch (name[26]) {
-  case '1':
-    if (memEQ(name, "BCM2835_SPI_CLOCK_DIVIDER_1024", 30)) {
-    /*                                         ^          */
-      *iv_return = BCM2835_SPI_CLOCK_DIVIDER_1024;
+     BCM2835_I2C_CLOCK_DIVIDER_2500 BCM2835_PAD_HYSTERESIS_ENABLED
+     BCM2835_PWM_CLOCK_DIVIDER_1024 BCM2835_PWM_CLOCK_DIVIDER_2048
+     BCM2835_SPI_BIT_ORDER_LSBFIRST BCM2835_SPI_BIT_ORDER_MSBFIRST
+     BCM2835_SPI_CLOCK_DIVIDER_1024 BCM2835_SPI_CLOCK_DIVIDER_2048
+     BCM2835_SPI_CLOCK_DIVIDER_4096 BCM2835_SPI_CLOCK_DIVIDER_8192 */
+  /* Offset 29 gives the best switch position.  */
+  switch (name[29]) {
+  case '0':
+    if (memEQ(name, "BCM2835_I2C_CLOCK_DIVIDER_250", 29)) {
+    /*                                            0      */
+      *iv_return = BCM2835_I2C_CLOCK_DIVIDER_2500;
       return PERL_constant_ISIV;
     }
     break;
   case '2':
-    if (memEQ(name, "BCM2835_SPI_CLOCK_DIVIDER_2048", 30)) {
-    /*                                         ^          */
-      *iv_return = BCM2835_SPI_CLOCK_DIVIDER_2048;
+    if (memEQ(name, "BCM2835_SPI_CLOCK_DIVIDER_819", 29)) {
+    /*                                            2      */
+      *iv_return = BCM2835_SPI_CLOCK_DIVIDER_8192;
       return PERL_constant_ISIV;
     }
     break;
   case '4':
-    if (memEQ(name, "BCM2835_SPI_CLOCK_DIVIDER_4096", 30)) {
-    /*                                         ^          */
+    if (memEQ(name, "BCM2835_PWM_CLOCK_DIVIDER_102", 29)) {
+    /*                                            4      */
+      *iv_return = BCM2835_PWM_CLOCK_DIVIDER_1024;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "BCM2835_SPI_CLOCK_DIVIDER_102", 29)) {
+    /*                                            4      */
+      *iv_return = BCM2835_SPI_CLOCK_DIVIDER_1024;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case '6':
+    if (memEQ(name, "BCM2835_SPI_CLOCK_DIVIDER_409", 29)) {
+    /*                                            6      */
       *iv_return = BCM2835_SPI_CLOCK_DIVIDER_4096;
       return PERL_constant_ISIV;
     }
     break;
   case '8':
-    if (memEQ(name, "BCM2835_SPI_CLOCK_DIVIDER_8192", 30)) {
-    /*                                         ^          */
-      *iv_return = BCM2835_SPI_CLOCK_DIVIDER_8192;
+    if (memEQ(name, "BCM2835_PWM_CLOCK_DIVIDER_204", 29)) {
+    /*                                            8      */
+      *iv_return = BCM2835_PWM_CLOCK_DIVIDER_2048;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "BCM2835_SPI_CLOCK_DIVIDER_204", 29)) {
+    /*                                            8      */
+      *iv_return = BCM2835_SPI_CLOCK_DIVIDER_2048;
       return PERL_constant_ISIV;
     }
     break;
-  case 'B':
-    if (memEQ(name, "BCM2835_PAD_HYSTERESIS_ENABLED", 30)) {
-    /*                                         ^          */
+  case 'D':
+    if (memEQ(name, "BCM2835_PAD_HYSTERESIS_ENABLE", 29)) {
+    /*                                            D      */
 #ifdef BCM2835_PAD_HYSTERESIS_ENABLED
       *iv_return = BCM2835_PAD_HYSTERESIS_ENABLED;
       return PERL_constant_ISIV;
@@ -1697,14 +2553,14 @@ constant_30 (pTHX_ const char *name, IV *iv_return) {
 #endif
     }
     break;
-  case 'I':
-    if (memEQ(name, "BCM2835_SPI_BIT_ORDER_LSBFIRST", 30)) {
-    /*                                         ^          */
+  case 'T':
+    if (memEQ(name, "BCM2835_SPI_BIT_ORDER_LSBFIRS", 29)) {
+    /*                                            T      */
       *iv_return = BCM2835_SPI_BIT_ORDER_LSBFIRST;
       return PERL_constant_ISIV;
     }
-    if (memEQ(name, "BCM2835_SPI_BIT_ORDER_MSBFIRST", 30)) {
-    /*                                         ^          */
+    if (memEQ(name, "BCM2835_SPI_BIT_ORDER_MSBFIRS", 29)) {
+    /*                                            T      */
       *iv_return = BCM2835_SPI_BIT_ORDER_MSBFIRST;
       return PERL_constant_ISIV;
     }
@@ -1774,7 +2630,17 @@ constant (pTHX_ const char *name, STRLEN len, IV *iv_return) {
 use ExtUtils::Constant qw (constant_types C_constant XS_constant);
 
 my $types = {map {($_, 1)} qw(IV)};
-my @names = (qw(BCM2835_BLOCK_SIZE BCM2835_CLOCK_BASE BCM2835_GPAFEN0
+my @names = (qw(BCM2835_BLOCK_SIZE BCM2835_BSC0_BASE BCM2835_BSC1_BASE
+	       BCM2835_BSC_A BCM2835_BSC_C BCM2835_BSC_CLKT
+	       BCM2835_BSC_C_CLEAR_1 BCM2835_BSC_C_CLEAR_2 BCM2835_BSC_C_I2CEN
+	       BCM2835_BSC_C_INTD BCM2835_BSC_C_INTR BCM2835_BSC_C_INTT
+	       BCM2835_BSC_C_READ BCM2835_BSC_C_ST BCM2835_BSC_DEL
+	       BCM2835_BSC_DIV BCM2835_BSC_DLEN BCM2835_BSC_FIFO
+	       BCM2835_BSC_FIFO_SIZE BCM2835_BSC_S BCM2835_BSC_S_CLKT
+	       BCM2835_BSC_S_DONE BCM2835_BSC_S_ERR BCM2835_BSC_S_RXD
+	       BCM2835_BSC_S_RXF BCM2835_BSC_S_RXR BCM2835_BSC_S_TA
+	       BCM2835_BSC_S_TXD BCM2835_BSC_S_TXE BCM2835_BSC_S_TXW
+	       BCM2835_CLOCK_BASE BCM2835_CORE_CLK_HZ BCM2835_GPAFEN0
 	       BCM2835_GPAFEN1 BCM2835_GPAREN0 BCM2835_GPAREN1 BCM2835_GPCLR0
 	       BCM2835_GPCLR1 BCM2835_GPEDS0 BCM2835_GPEDS1 BCM2835_GPFEN0
 	       BCM2835_GPFEN1 BCM2835_GPFSEL0 BCM2835_GPFSEL1 BCM2835_GPFSEL2
@@ -1789,15 +2655,17 @@ my @names = (qw(BCM2835_BLOCK_SIZE BCM2835_CLOCK_BASE BCM2835_GPAFEN0
 	       BCM2835_PAD_DRIVE_16mA BCM2835_PAD_DRIVE_2mA
 	       BCM2835_PAD_DRIVE_4mA BCM2835_PAD_DRIVE_6mA
 	       BCM2835_PAD_DRIVE_8mA BCM2835_PAD_HYSTERESIS_ENABLED
-	       BCM2835_PAD_SLEW_RATE_UNLIMITED BCM2835_PAGE_SIZE
-	       BCM2835_PERI_BASE BCM2835_PWM0_DATA BCM2835_PWM0_ENABLE
-	       BCM2835_PWM0_MS_MODE BCM2835_PWM0_OFFSTATE BCM2835_PWM0_RANGE
-	       BCM2835_PWM0_REPEATFF BCM2835_PWM0_REVPOLAR BCM2835_PWM0_SERIAL
-	       BCM2835_PWM0_USEFIFO BCM2835_PWM1_DATA BCM2835_PWM1_ENABLE
-	       BCM2835_PWM1_MS_MODE BCM2835_PWM1_OFFSTATE BCM2835_PWM1_RANGE
-	       BCM2835_PWM1_REPEATFF BCM2835_PWM1_REVPOLAR BCM2835_PWM1_SERIAL
-	       BCM2835_PWM1_USEFIFO BCM2835_PWMCLK_CNTL BCM2835_PWMCLK_DIV
-	       BCM2835_PWM_CONTROL BCM2835_PWM_STATUS BCM2835_SPI0_BASE
+	       BCM2835_PAD_PASSWRD BCM2835_PAD_SLEW_RATE_UNLIMITED
+	       BCM2835_PAGE_SIZE BCM2835_PERI_BASE BCM2835_PERI_SIZE
+	       BCM2835_PWM0_DATA BCM2835_PWM0_ENABLE BCM2835_PWM0_MS_MODE
+	       BCM2835_PWM0_OFFSTATE BCM2835_PWM0_RANGE BCM2835_PWM0_REPEATFF
+	       BCM2835_PWM0_REVPOLAR BCM2835_PWM0_SERIAL BCM2835_PWM0_USEFIFO
+	       BCM2835_PWM1_DATA BCM2835_PWM1_ENABLE BCM2835_PWM1_MS_MODE
+	       BCM2835_PWM1_OFFSTATE BCM2835_PWM1_RANGE BCM2835_PWM1_REPEATFF
+	       BCM2835_PWM1_REVPOLAR BCM2835_PWM1_SERIAL BCM2835_PWM1_USEFIFO
+	       BCM2835_PWMCLK_CNTL BCM2835_PWMCLK_DIV BCM2835_PWM_CLEAR_FIFO
+	       BCM2835_PWM_CONTROL BCM2835_PWM_DMAC BCM2835_PWM_FIF1
+	       BCM2835_PWM_PASSWRD BCM2835_PWM_STATUS BCM2835_SPI0_BASE
 	       BCM2835_SPI0_CLK BCM2835_SPI0_CS BCM2835_SPI0_CS_ADCS
 	       BCM2835_SPI0_CS_CLEAR BCM2835_SPI0_CS_CLEAR_RX
 	       BCM2835_SPI0_CS_CLEAR_TX BCM2835_SPI0_CS_CPHA
@@ -1810,7 +2678,10 @@ my @names = (qw(BCM2835_BLOCK_SIZE BCM2835_CLOCK_BASE BCM2835_GPAFEN0
 	       BCM2835_SPI0_CS_REN BCM2835_SPI0_CS_RXD BCM2835_SPI0_CS_RXF
 	       BCM2835_SPI0_CS_RXR BCM2835_SPI0_CS_TA BCM2835_SPI0_CS_TE_EN
 	       BCM2835_SPI0_CS_TXD BCM2835_SPI0_DC BCM2835_SPI0_DLEN
-	       BCM2835_SPI0_FIFO BCM2835_SPI0_LTOH HIGH LOW),
+	       BCM2835_SPI0_FIFO BCM2835_SPI0_LTOH BCM2835_ST_BASE
+	       BCM2835_ST_CHI BCM2835_ST_CLO BCM2835_ST_CS BCM2835_VERSION
+	       BMC2835_RPI2_DT_PERI_BASE_ADDRESS_OFFSET
+	       BMC2835_RPI2_DT_PERI_SIZE_OFFSET HIGH LOW),
             {name=>"BCM2835_GPIO_FSEL_ALT0", type=>"IV", macro=>"1"},
             {name=>"BCM2835_GPIO_FSEL_ALT1", type=>"IV", macro=>"1"},
             {name=>"BCM2835_GPIO_FSEL_ALT2", type=>"IV", macro=>"1"},
@@ -1823,9 +2694,37 @@ my @names = (qw(BCM2835_BLOCK_SIZE BCM2835_CLOCK_BASE BCM2835_GPAFEN0
             {name=>"BCM2835_GPIO_PUD_DOWN", type=>"IV", macro=>"1"},
             {name=>"BCM2835_GPIO_PUD_OFF", type=>"IV", macro=>"1"},
             {name=>"BCM2835_GPIO_PUD_UP", type=>"IV", macro=>"1"},
+            {name=>"BCM2835_I2C_CLOCK_DIVIDER_148", type=>"IV", macro=>"1"},
+            {name=>"BCM2835_I2C_CLOCK_DIVIDER_150", type=>"IV", macro=>"1"},
+            {name=>"BCM2835_I2C_CLOCK_DIVIDER_2500", type=>"IV", macro=>"1"},
+            {name=>"BCM2835_I2C_CLOCK_DIVIDER_626", type=>"IV", macro=>"1"},
+            {name=>"BCM2835_I2C_REASON_ERROR_CLKT", type=>"IV", macro=>"1"},
+            {name=>"BCM2835_I2C_REASON_ERROR_DATA", type=>"IV", macro=>"1"},
+            {name=>"BCM2835_I2C_REASON_ERROR_NACK", type=>"IV", macro=>"1"},
+            {name=>"BCM2835_I2C_REASON_OK", type=>"IV", macro=>"1"},
             {name=>"BCM2835_PAD_GROUP_GPIO_0_27", type=>"IV", macro=>"1"},
             {name=>"BCM2835_PAD_GROUP_GPIO_28_45", type=>"IV", macro=>"1"},
             {name=>"BCM2835_PAD_GROUP_GPIO_46_53", type=>"IV", macro=>"1"},
+            {name=>"BCM2835_PWM_CLOCK_DIVIDER_1", type=>"IV", macro=>"1"},
+            {name=>"BCM2835_PWM_CLOCK_DIVIDER_1024", type=>"IV", macro=>"1"},
+            {name=>"BCM2835_PWM_CLOCK_DIVIDER_128", type=>"IV", macro=>"1"},
+            {name=>"BCM2835_PWM_CLOCK_DIVIDER_16", type=>"IV", macro=>"1"},
+            {name=>"BCM2835_PWM_CLOCK_DIVIDER_2", type=>"IV", macro=>"1"},
+            {name=>"BCM2835_PWM_CLOCK_DIVIDER_2048", type=>"IV", macro=>"1"},
+            {name=>"BCM2835_PWM_CLOCK_DIVIDER_256", type=>"IV", macro=>"1"},
+            {name=>"BCM2835_PWM_CLOCK_DIVIDER_32", type=>"IV", macro=>"1"},
+            {name=>"BCM2835_PWM_CLOCK_DIVIDER_4", type=>"IV", macro=>"1"},
+            {name=>"BCM2835_PWM_CLOCK_DIVIDER_512", type=>"IV", macro=>"1"},
+            {name=>"BCM2835_PWM_CLOCK_DIVIDER_64", type=>"IV", macro=>"1"},
+            {name=>"BCM2835_PWM_CLOCK_DIVIDER_8", type=>"IV", macro=>"1"},
+            {name=>"BCM2835_REGBASE_BSC0", type=>"IV", macro=>"1"},
+            {name=>"BCM2835_REGBASE_BSC1", type=>"IV", macro=>"1"},
+            {name=>"BCM2835_REGBASE_CLK", type=>"IV", macro=>"1"},
+            {name=>"BCM2835_REGBASE_GPIO", type=>"IV", macro=>"1"},
+            {name=>"BCM2835_REGBASE_PADS", type=>"IV", macro=>"1"},
+            {name=>"BCM2835_REGBASE_PWM", type=>"IV", macro=>"1"},
+            {name=>"BCM2835_REGBASE_SPI0", type=>"IV", macro=>"1"},
+            {name=>"BCM2835_REGBASE_ST", type=>"IV", macro=>"1"},
             {name=>"BCM2835_SPI_BIT_ORDER_LSBFIRST", type=>"IV", macro=>"1"},
             {name=>"BCM2835_SPI_BIT_ORDER_MSBFIRST", type=>"IV", macro=>"1"},
             {name=>"BCM2835_SPI_CLOCK_DIVIDER_1", type=>"IV", macro=>"1"},
@@ -1853,6 +2752,32 @@ my @names = (qw(BCM2835_BLOCK_SIZE BCM2835_CLOCK_BASE BCM2835_GPAFEN0
             {name=>"BCM2835_SPI_MODE1", type=>"IV", macro=>"1"},
             {name=>"BCM2835_SPI_MODE2", type=>"IV", macro=>"1"},
             {name=>"BCM2835_SPI_MODE3", type=>"IV", macro=>"1"},
+            {name=>"RPI_BPLUS_GPIO_J8_03", type=>"IV", macro=>"1"},
+            {name=>"RPI_BPLUS_GPIO_J8_05", type=>"IV", macro=>"1"},
+            {name=>"RPI_BPLUS_GPIO_J8_07", type=>"IV", macro=>"1"},
+            {name=>"RPI_BPLUS_GPIO_J8_08", type=>"IV", macro=>"1"},
+            {name=>"RPI_BPLUS_GPIO_J8_10", type=>"IV", macro=>"1"},
+            {name=>"RPI_BPLUS_GPIO_J8_11", type=>"IV", macro=>"1"},
+            {name=>"RPI_BPLUS_GPIO_J8_12", type=>"IV", macro=>"1"},
+            {name=>"RPI_BPLUS_GPIO_J8_13", type=>"IV", macro=>"1"},
+            {name=>"RPI_BPLUS_GPIO_J8_15", type=>"IV", macro=>"1"},
+            {name=>"RPI_BPLUS_GPIO_J8_16", type=>"IV", macro=>"1"},
+            {name=>"RPI_BPLUS_GPIO_J8_18", type=>"IV", macro=>"1"},
+            {name=>"RPI_BPLUS_GPIO_J8_19", type=>"IV", macro=>"1"},
+            {name=>"RPI_BPLUS_GPIO_J8_21", type=>"IV", macro=>"1"},
+            {name=>"RPI_BPLUS_GPIO_J8_22", type=>"IV", macro=>"1"},
+            {name=>"RPI_BPLUS_GPIO_J8_23", type=>"IV", macro=>"1"},
+            {name=>"RPI_BPLUS_GPIO_J8_24", type=>"IV", macro=>"1"},
+            {name=>"RPI_BPLUS_GPIO_J8_26", type=>"IV", macro=>"1"},
+            {name=>"RPI_BPLUS_GPIO_J8_29", type=>"IV", macro=>"1"},
+            {name=>"RPI_BPLUS_GPIO_J8_31", type=>"IV", macro=>"1"},
+            {name=>"RPI_BPLUS_GPIO_J8_32", type=>"IV", macro=>"1"},
+            {name=>"RPI_BPLUS_GPIO_J8_33", type=>"IV", macro=>"1"},
+            {name=>"RPI_BPLUS_GPIO_J8_35", type=>"IV", macro=>"1"},
+            {name=>"RPI_BPLUS_GPIO_J8_36", type=>"IV", macro=>"1"},
+            {name=>"RPI_BPLUS_GPIO_J8_37", type=>"IV", macro=>"1"},
+            {name=>"RPI_BPLUS_GPIO_J8_38", type=>"IV", macro=>"1"},
+            {name=>"RPI_BPLUS_GPIO_J8_40", type=>"IV", macro=>"1"},
             {name=>"RPI_GPIO_P1_03", type=>"IV", macro=>"1"},
             {name=>"RPI_GPIO_P1_05", type=>"IV", macro=>"1"},
             {name=>"RPI_GPIO_P1_07", type=>"IV", macro=>"1"},
@@ -1887,6 +2812,15 @@ my @names = (qw(BCM2835_BLOCK_SIZE BCM2835_CLOCK_BASE BCM2835_GPAFEN0
             {name=>"RPI_V2_GPIO_P1_23", type=>"IV", macro=>"1"},
             {name=>"RPI_V2_GPIO_P1_24", type=>"IV", macro=>"1"},
             {name=>"RPI_V2_GPIO_P1_26", type=>"IV", macro=>"1"},
+            {name=>"RPI_V2_GPIO_P1_29", type=>"IV", macro=>"1"},
+            {name=>"RPI_V2_GPIO_P1_31", type=>"IV", macro=>"1"},
+            {name=>"RPI_V2_GPIO_P1_32", type=>"IV", macro=>"1"},
+            {name=>"RPI_V2_GPIO_P1_33", type=>"IV", macro=>"1"},
+            {name=>"RPI_V2_GPIO_P1_35", type=>"IV", macro=>"1"},
+            {name=>"RPI_V2_GPIO_P1_36", type=>"IV", macro=>"1"},
+            {name=>"RPI_V2_GPIO_P1_37", type=>"IV", macro=>"1"},
+            {name=>"RPI_V2_GPIO_P1_38", type=>"IV", macro=>"1"},
+            {name=>"RPI_V2_GPIO_P1_40", type=>"IV", macro=>"1"},
             {name=>"RPI_V2_GPIO_P5_03", type=>"IV", macro=>"1"},
             {name=>"RPI_V2_GPIO_P5_04", type=>"IV", macro=>"1"},
             {name=>"RPI_V2_GPIO_P5_05", type=>"IV", macro=>"1"},
@@ -1923,14 +2857,7 @@ __END__
     }
     break;
   case 13:
-    if (memEQ(name, "BCM2835_GPPUD", 13)) {
-#ifdef BCM2835_GPPUD
-      *iv_return = BCM2835_GPPUD;
-      return PERL_constant_ISIV;
-#else
-      return PERL_constant_NOTDEF;
-#endif
-    }
+    return constant_13 (aTHX_ name, iv_return);
     break;
   case 14:
     return constant_14 (aTHX_ name, iv_return);
@@ -1939,33 +2866,7 @@ __END__
     return constant_15 (aTHX_ name, iv_return);
     break;
   case 16:
-    /* Names all of length 16.  */
-    /* BCM2835_GPIO_PWM BCM2835_SPI0_CLK */
-    /* Offset 15 gives the best switch position.  */
-    switch (name[15]) {
-    case 'K':
-      if (memEQ(name, "BCM2835_SPI0_CL", 15)) {
-      /*                              K      */
-#ifdef BCM2835_SPI0_CLK
-        *iv_return = BCM2835_SPI0_CLK;
-        return PERL_constant_ISIV;
-#else
-        return PERL_constant_NOTDEF;
-#endif
-      }
-      break;
-    case 'M':
-      if (memEQ(name, "BCM2835_GPIO_PW", 15)) {
-      /*                              M      */
-#ifdef BCM2835_GPIO_PWM
-        *iv_return = BCM2835_GPIO_PWM;
-        return PERL_constant_ISIV;
-#else
-        return PERL_constant_NOTDEF;
-#endif
-      }
-      break;
-    }
+    return constant_16 (aTHX_ name, iv_return);
     break;
   case 17:
     return constant_17 (aTHX_ name, iv_return);
@@ -2005,6 +2906,26 @@ __END__
     break;
   case 31:
     return constant_31 (aTHX_ name, iv_return);
+    break;
+  case 32:
+    if (memEQ(name, "BMC2835_RPI2_DT_PERI_SIZE_OFFSET", 32)) {
+#ifdef BMC2835_RPI2_DT_PERI_SIZE_OFFSET
+      *iv_return = BMC2835_RPI2_DT_PERI_SIZE_OFFSET;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 40:
+    if (memEQ(name, "BMC2835_RPI2_DT_PERI_BASE_ADDRESS_OFFSET", 40)) {
+#ifdef BMC2835_RPI2_DT_PERI_BASE_ADDRESS_OFFSET
+      *iv_return = BMC2835_RPI2_DT_PERI_BASE_ADDRESS_OFFSET;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
     break;
   }
   return PERL_constant_NOTFOUND;

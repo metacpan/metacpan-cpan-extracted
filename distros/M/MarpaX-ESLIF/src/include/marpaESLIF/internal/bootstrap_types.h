@@ -34,6 +34,7 @@ enum marpaESLIF_bootstrap_stack_context {
   MARPAESLIF_BOOTSTRAP_STACK_TYPE_ADVERB_ITEM_GROUP_ASSOCIATION,
   MARPAESLIF_BOOTSTRAP_STACK_TYPE_ADVERB_ITEM_SEPARATOR,
   MARPAESLIF_BOOTSTRAP_STACK_TYPE_ADVERB_ITEM_PROPER,
+  MARPAESLIF_BOOTSTRAP_STACK_TYPE_ADVERB_ITEM_HIDESEPARATOR,
   MARPAESLIF_BOOTSTRAP_STACK_TYPE_ADVERB_ITEM_RANK,
   MARPAESLIF_BOOTSTRAP_STACK_TYPE_ADVERB_ITEM_NULL_RANKING,
   MARPAESLIF_BOOTSTRAP_STACK_TYPE_ADVERB_ITEM_PRIORITY,
@@ -54,7 +55,9 @@ enum marpaESLIF_bootstrap_stack_context {
   MARPAESLIF_BOOTSTRAP_STACK_TYPE_QUANTIFIER,
   MARPAESLIF_BOOTSTRAP_STACK_TYPE_EVENT_INITIALIZER,
   MARPAESLIF_BOOTSTRAP_STACK_TYPE_EVENT_INITIALIZATION,
-  MARPAESLIF_BOOTSTRAP_STACK_TYPE_ALTERNATIVE_NAME
+  MARPAESLIF_BOOTSTRAP_STACK_TYPE_ALTERNATIVE_NAME,
+  MARPAESLIF_BOOTSTRAP_STACK_TYPE_ARRAY,
+  MARPAESLIF_BOOTSTRAP_STACK_TYPE_STRING
 };
 
 enum marpaESLIF_bootstrap_adverb_list_item_type {
@@ -65,6 +68,7 @@ enum marpaESLIF_bootstrap_adverb_list_item_type {
   MARPAESLIF_BOOTSTRAP_ADVERB_LIST_ITEM_TYPE_GROUP_ASSOCIATION,
   MARPAESLIF_BOOTSTRAP_ADVERB_LIST_ITEM_TYPE_SEPARATOR,
   MARPAESLIF_BOOTSTRAP_ADVERB_LIST_ITEM_TYPE_PROPER,
+  MARPAESLIF_BOOTSTRAP_ADVERB_LIST_ITEM_TYPE_HIDESEPARATOR,
   MARPAESLIF_BOOTSTRAP_ADVERB_LIST_ITEM_TYPE_RANK,
   MARPAESLIF_BOOTSTRAP_ADVERB_LIST_ITEM_TYPE_NULL_RANKING,
   MARPAESLIF_BOOTSTRAP_ADVERB_LIST_ITEM_TYPE_PRIORITY,
@@ -109,20 +113,21 @@ struct marpaESLIF_bootstrap_single_symbol {
 struct marpaESLIF_bootstrap_adverb_list_item {
   marpaESLIF_bootstrap_adverb_list_item_type_t type;
   union {
-    char                                        *actions;
+    marpaESLIF_action_t                         *actionp;
     short                                        left_associationb;
     short                                        right_associationb;
     short                                        group_associationb;
     marpaESLIF_bootstrap_single_symbol_t        *separatorSingleSymbolp;
     short                                        properb;
+    short                                        hideseparatorb;
     int                                          ranki;
     short                                        nullRanksHighb;
     int                                          priorityi;
     marpaESLIF_bootstrap_pause_type_t            pausei;
     short                                        latmb;
     marpaESLIF_bootstrap_utf_string_t           *namingp;
-    char                                        *symbolactions;
-    char                                        *freeactions;
+    marpaESLIF_action_t                         *symbolactionp;
+    marpaESLIF_action_t                         *freeactionp;
     marpaESLIF_bootstrap_event_initialization_t *eventInitializationp;
   } u;
 };

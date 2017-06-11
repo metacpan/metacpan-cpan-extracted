@@ -10,7 +10,7 @@ use Capture::Tiny qw( capture );
 use List::Util ();
 
 # ABSTRACT: Probe for GnuWin32 packages using the Windows registry
-our $VERSION = '0.36'; # VERSION
+our $VERSION = '0.41'; # VERSION
 
 has native_only         => 0;
 has registery_key_regex => sub { Carp::croak "register_key_regex is required" };
@@ -141,11 +141,15 @@ Alien::Build::Plugin::Probe::GnuWin32 - Probe for GnuWin32 packages using the Wi
 
 =head1 VERSION
 
-version 0.36
+version 0.41
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Diab Jerius (DJERIUS)
 
 =head1 COPYRIGHT AND LICENSE
 

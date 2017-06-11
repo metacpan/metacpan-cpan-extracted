@@ -32,11 +32,14 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "1.17",
             "Class::InsideOut" : "1.13",
             "DBD::SQLite" : "1.46",
             "Data::Dumper" : "2.154",
             "DateTime::Format::Strptime" : "1.5",
-            "Gtk2::Ex::DbLinker::DbTools" : "0.11",
+            "Gtk2::Ex::DbLinker::DbTools" : "0.112",
+            "Log::Any::Adapter" : "1.049",
+            "Log::Any::Adapter::Log4perl" : "0.08",
             "Log::Log4perl" : "1.41",
             "Scalar::Util" : "1.45",
             "Test::More" : "1",
@@ -50,6 +53,6 @@
          "url" : "https://sourceforge.net/projects/wx-perl-dblinker/"
       }
    },
-   "version" : "0.012",
+   "version" : "0.013",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

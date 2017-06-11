@@ -16,6 +16,8 @@ share {
 
   plugin Extract => 'tar.gz';
 
-  plugin 'Build::Autoconf' => ();
+  plugin 'Build::Autoconf' => (
+    ffi => 1,
+  );
 
 };

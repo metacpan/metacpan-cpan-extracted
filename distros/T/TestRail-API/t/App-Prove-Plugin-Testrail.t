@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-use Test::More 'tests' => 8;
+use Test::More 'tests' => 9;
 use Test::Fatal;
 use Capture::Tiny qw{capture};
 use App::Prove;
@@ -48,6 +48,12 @@ $prove = App::Prove->new();
 $prove->process_args("-PTestRail=apiurl=http://some.testrail.install/,user=someUser,password=somePassword,project=TestProject,plan=FinalPlan,run=FinalRun,configs=testConfig,version=0.014,autoclose=1",'t/fake.test');
 
 is (exception { capture { $prove->run() } },undef,"Running TR parser with autoclose works correctly");
+
+$prove = App::Prove->new();
+$prove->process_args("-PTestRail=apiurl=http://some.testrail.install/,user=someUser,password=somePassword,project=TestProject,plan=FinalPlan,run=FinalRun,configs=testConfig,version=0.014,test_bad_status=blocked,config_group=Operating Systems",'t/fake.test');
+
+is (exception { capture { $prove->run() } },undef,"Running TR parser with test_bad_status & config_group throws no exceptions/warnings");
+
 
 #Test multi-job upload shizz
 #Note that I don't care if it even uploads, just that it *would have* done so correctly.

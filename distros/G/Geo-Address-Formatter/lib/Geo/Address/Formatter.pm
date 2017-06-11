@@ -1,7 +1,7 @@
 # ABSTRACT: take structured address data and format it according to the various global/country rules
 
 package Geo::Address::Formatter;
-$Geo::Address::Formatter::VERSION = '1.60';
+$Geo::Address::Formatter::VERSION = '1.61';
 use strict;
 use warnings;
 use feature qw(say);
@@ -392,12 +392,32 @@ sub _add_state_code {
     $rh_components->{country_code} = uc($rh_components->{country_code});
 
     if ( my $mapping = $self->{state_codes}{$rh_components->{country_code}} ){
+
         foreach ( keys %$mapping ){
             if ( uc($rh_components->{state}) eq uc($mapping->{$_}) ){
                 $rh_components->{state_code} = $_;
+                last;
             }
         }
+
+        # try again for odd variants like "United States Virgin Islands"
+        if (!defined($rh_components->{state_code})){
+            if ($rh_components->{country_code} eq 'US'){
+                if ($rh_components->{state} =~ m/^united states/i){
+                    my $state = $rh_components->{state};
+                    $state =~ s/^United States/US/i;
+                    foreach ( keys %$mapping ){
+                        if ( uc($state) eq uc($mapping->{$_}) ){
+                            $rh_components->{state_code} = $_;
+                            last;                            
+                        }               
+                    }     
+                }
+            }
+        }
+        
     }
+    
     return $rh_components->{state_code};
 }
 
@@ -583,7 +603,7 @@ Geo::Address::Formatter - take structured address data and format it according t
 
 =head1 VERSION
 
-version 1.60
+version 1.61
 
 =head1 SYNOPSIS
 

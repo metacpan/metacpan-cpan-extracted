@@ -30,7 +30,7 @@
             "App::Cme" : "1.002",
             "App::Cme::Common" : "0",
             "Carp" : "0",
-            "Config::Model" : "2.101",
+            "Config::Model" : "2.103",
             "Config::Model::TkUI" : "0",
             "Config::Model::Value" : "0",
             "Data::Compare" : "0",
@@ -75,7 +75,7 @@
          "web" : "http://github.com/dod38fr/config-model-itself"
       }
    },
-   "version" : "2.010",
+   "version" : "2.011",
    "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

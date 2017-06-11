@@ -1,5 +1,9 @@
 Revision history for Perl extension Minion-Backend-Mango
 
+1.02 2017-06-06T05:20:09Z
+    - Implement broadcast and receive methods to allow use worker remote control
+      with Mango backend.
+
 1.01 2017-03-29T06:17:56Z
     - Added dummy broadcast and receive methods to allow use Mango backend
       with new versions of Minion.

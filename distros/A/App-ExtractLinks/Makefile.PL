@@ -25,10 +25,9 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Test::Cmd" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.0.2",
+  "VERSION" => "0.0.3",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,7 +36,6 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "HTML::Parser" => 0,
-  "Test::Cmd" => 0,
   "Test::More" => 0,
   "lib" => 0,
   "strict" => 0,

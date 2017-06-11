@@ -5,6 +5,7 @@ examples/blog/lib/Blog/Controller/Posts.pm
 examples/blog/lib/Blog/Model/Posts.pm
 examples/blog/migrations/blog.sql
 examples/blog/script/blog
+examples/blog/t/blog.t
 examples/blog/templates/layouts/blog.html.ep
 examples/blog/templates/posts/_form.html.ep
 examples/blog/templates/posts/create.html.ep

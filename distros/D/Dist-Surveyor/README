@@ -3,10 +3,6 @@ NAME
     Dist::Surveyor - Survey installed modules and determine the specific
     distribution versions they came from
 
-VERSION
-
-    version 0.016
-
 SYNOPSIS
 
         my $options = {
@@ -55,7 +51,7 @@ determine_installed_releases($options, $search_dirs)
 
     Returns a list, where each element is a hashref representing one
     installed distibution. This hashref is what MetaCPAN returns for
-    http://api.metacpan.org/v0/release/$author/$release, with two
+    https://fastapi.metacpan.org/v1/release/$author/$release, with two
     additional keys:
 
       * 'url' - that same as 'download_url', but without the hostname. can

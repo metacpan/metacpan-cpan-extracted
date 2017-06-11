@@ -4,33 +4,34 @@
       "Thomas Sibley <tsibley@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.1, Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.132830",
+   "generated_by" : "Dist::Zilla version 6.005, Dist::Milla version v1.0.16, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-cpanchanges",
    "no_index" : {
       "directory" : [
-         "t",
-         "xt",
+         "eg",
+         "examples",
          "inc",
          "share",
-         "eg",
-         "examples"
+         "t",
+         "xt"
       ]
    },
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.30"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
          "requires" : {
+            "Dist::Milla" : "v1.0.16",
             "Test::Pod" : "1.41"
          }
       },
@@ -57,9 +58,10 @@
          "web" : "https://github.com/tsibley/App-cpanchanges"
       }
    },
-   "version" : "20140125.0",
+   "version" : "20170606.0",
    "x_contributors" : [
-      "Olaf Alders <olaf@wundersolutions.com>"
+      "Olaf Alders <olaf@wundersolutions.com>",
+      "Thomas Sibley <trsibley@uw.edu>"
    ]
 }
 

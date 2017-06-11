@@ -4,6 +4,7 @@ README
 Decimal64.pm
 Decimal64.xs
 Makefile.PL
+math_decimal64_include.h
 t/aab_basic.t
 t/boundaries.t
 t/conv.t

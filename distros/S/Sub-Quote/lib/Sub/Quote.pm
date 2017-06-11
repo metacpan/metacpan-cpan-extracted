@@ -15,7 +15,7 @@ BEGIN {
   *_HAVE_PERLSTRING = defined &B::perlstring ? sub(){1} : sub(){0};
 }
 
-our $VERSION = '2.003001';
+our $VERSION = '2.004000';
 $VERSION = eval $VERSION;
 
 our @EXPORT = qw(quote_sub unquote_sub quoted_from_sub qsub);
@@ -24,15 +24,16 @@ our @EXPORT_OK = qw(quotify capture_unroll inlinify sanitize_identifier);
 our %QUOTED;
 
 sub quotify {
+  my $value = $_[0];
   no warnings 'numeric';
-  ! defined $_[0]     ? 'undef()'
+  ! defined $value     ? 'undef()'
   # numeric detection
-  : (length( (my $dummy = '') & $_[0] )
-    && 0 + $_[0] eq $_[0]
-    && $_[0] * 0 == 0
-  ) ? $_[0]
-  : _HAVE_PERLSTRING  ? B::perlstring($_[0])
-  : qq["\Q$_[0]\E"];
+  : (length( (my $dummy = '') & $value )
+    && 0 + $value eq $value
+    && $value * 0 == 0
+  ) ? $value
+  : _HAVE_PERLSTRING  ? B::perlstring($value)
+  : qq["\Q$value\E"];
 }
 
 sub sanitize_identifier {
@@ -105,6 +106,10 @@ sub quote_sub {
   }
   my @caller = caller(0);
   my $attributes = $options->{attributes};
+  if ($attributes) {
+    /\A\w+(?:\(.*\))?\z/s || croak "invalid attribute $_"
+      for @$attributes;
+  }
   my $quoted_info = {
     name     => $name,
     code     => $code,
@@ -125,10 +130,17 @@ sub quote_sub {
     return $sub;
   }
   else {
-    my $deferred = defer_sub +($options->{no_install} ? undef : $name) => sub {
-      $unquoted if 0;
-      unquote_sub($quoted_info->{deferred});
-    }, ($attributes ? { attributes => $attributes } : ());
+    my $deferred = defer_sub(
+      ($options->{no_install} ? undef : $name),
+      sub {
+        $unquoted if 0;
+        unquote_sub($quoted_info->{deferred});
+      },
+      {
+        ($attributes ? ( attributes => $attributes ) : ()),
+        ($name ? () : ( package => $quoted_info->{package} )),
+      },
+    );
     weaken($quoted_info->{deferred} = $deferred);
     weaken($QUOTED{$deferred} = $quoted_info);
     return $deferred;
@@ -216,6 +228,9 @@ sub unquote_sub {
         $e = $@;
       }
       unless ($success) {
+        my $space = length($make_sub =~ tr/\n//);
+        my $line = 0;
+        $make_sub =~ s/^/sprintf "%${space}d: ", ++$line/emg;
         croak "Eval went very, very wrong:\n\n${make_sub}\n\n$e";
       }
       weaken($QUOTED{$$unquoted} = $quoted_info);
@@ -243,7 +258,7 @@ __END__
 
 =head1 NAME
 
-Sub::Quote - efficient generation of subroutines via string eval
+Sub::Quote - Efficient generation of subroutines via string eval
 
 =head1 SYNOPSIS
 
@@ -488,6 +503,8 @@ getty - Torsten Raudssus (cpan:GETTY) <torsten@raudss.us>
 arcanez - Justin Hunter (cpan:ARCANEZ) <justin.d.hunter@gmail.com>
 
 kanashiro - Lucas Kanashiro (cpan:KANASHIRO) <kanashiro.duarte@gmail.com>
+
+djerius - Diab Jerius (cpan:DJERIUS) <djerius@cfa.harvard.edu>
 
 =head1 COPYRIGHT
 

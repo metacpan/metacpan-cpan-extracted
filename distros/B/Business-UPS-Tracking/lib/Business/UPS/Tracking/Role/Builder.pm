@@ -17,10 +17,10 @@ use Business::UPS::Tracking::Element::Code;
 =head1 NAME
 
 Business::UPS::Tracking::Role::Builder - Helper role
-  
+
 =head1 DESCRIPTION
 
-This role provides methods that construct various objects (eg. 
+This role provides methods that construct various objects (eg.
 Business::UPS::Tracking::Element::Address).
 
 =head1 METHODS
@@ -29,19 +29,19 @@ Business::UPS::Tracking::Element::Address).
 
  my $address = $self->build_address($xpath_expression);
 
-Turns an address xml node into a L<Business::UPS::Tracking::Element::Address> 
+Turns an address xml node into a L<Business::UPS::Tracking::Element::Address>
 object.
 
 =cut
 
 sub build_address {
     my ($self,$xpath) = @_;
-    
+
     my $node = $self->xml->findnodes($xpath)->get_node(1);
-    
-    return 
+
+    return
         unless $node && ref $node;
-        
+
     return Business::UPS::Tracking::Element::Address->new(
         xml => $node,
     );
@@ -51,7 +51,7 @@ sub build_address {
 
  my $address = $self->build_code($xpath_expression);
 
-Turns an address xml node into a L<Business::UPS::Tracking::Element::Address> 
+Turns an address xml node into a L<Business::UPS::Tracking::Element::Address>
 object.
 
 =cut
@@ -59,12 +59,12 @@ object.
 
 sub build_code {
     my ($self,$xpath) = @_;
-    
+
     my $node = $self->xml->findnodes($xpath)->get_node(1);
-    
-    return 
+
+    return
         unless $node && ref $node;
-        
+
     return Business::UPS::Tracking::Element::Code->new(
         xml => $node,
     );
@@ -74,19 +74,19 @@ sub build_code {
 
  my $weight = $self->build_weight($xpath_expression);
 
-Turns an weight xml node into a L<Business::UPS::Tracking::Element::Weight> 
+Turns an weight xml node into a L<Business::UPS::Tracking::Element::Weight>
 object.
 
 =cut
 
 sub build_weight {
     my ($self,$xpath) = @_;
-    
+
     my $node = $self->xml->findnodes($xpath)->get_node(1);
-    
-    return 
+
+    return
         unless $node && ref $node;
-        
+
     return Business::UPS::Tracking::Element::Weight->new(
         xml => $node,
     );
@@ -96,19 +96,19 @@ sub build_weight {
 
  my $weight = $self->build_referencenumber($xpath_expression);
 
-Turns an weight xml node into a 
+Turns an weight xml node into a
 L<Business::UPS::Tracking::Element::ReferenceNumber> object.
 
 =cut
 
 sub build_referencenumber {
     my ($self,$xpath) = @_;
-    
+
     my $node = $self->xml->findnodes($xpath)->get_node(1);
-    
-    return 
+
+    return
         unless $node && ref $node;
-        
+
     return Business::UPS::Tracking::Element::ReferenceNumber->new(
         xml => $node,
     );

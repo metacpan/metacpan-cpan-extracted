@@ -18,7 +18,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,6 +31,7 @@ no_index:
     - xt
 requires:
   Browser::Open: '0'
+  Capture::Tiny: '0'
   Carp: '0'
   File::pushd: '0'
   Getopt::Long: '0'
@@ -51,8 +52,9 @@ resources:
   bugtracker: https://github.com/oalders/git-helpers/issues
   homepage: https://github.com/oalders/git-helpers
   repository: https://github.com/oalders/git-helpers.git
-version: '0.000010'
+version: '0.000011'
 x_contributors:
+  - 'Chris Weyl <cweyl@alumni.drew.edu>'
   - 'Kevin Phair <phair.kevin@gmail.com>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
   - 'Philippe Bruhat (BooK) <book@cpan.org>'

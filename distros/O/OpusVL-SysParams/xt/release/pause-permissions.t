@@ -10,4 +10,4 @@ BEGIN {
 }
 use Test::PAUSE::Permissions;
 
-all_permissions_ok();
+all_permissions_ok('ALTREUS');

@@ -4,7 +4,7 @@
       "Chisel Wright <chisel@chizography.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.044, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -48,6 +48,7 @@
             "Test::More" : "1.302015",
             "Test::NoTabs" : "0",
             "Test::Pod" : "0",
+            "Test::Tester" : "0",
             "base" : "0",
             "lib" : "0",
             "namespace::autoclean" : "0",
@@ -66,13 +67,14 @@
          "web" : "https://github.com/chiselwright/test-dbix-class-schema"
       }
    },
-   "version" : "1.0.10",
+   "version" : "1.0.11",
    "x_contributors" : [
-      "Chisel Wright <chisel@cleavag.es>",
       "Darius Jokilehto <darius.jokilehto@net-a-porter.com>",
       "Dave Cross <davidc@broadbean.com>",
       "Jason Tang <tang.jason.ch@gmail.com>",
-      "Rupert Lane <rupert@rupert-lane.org>"
-   ]
+      "Rupert Lane <rupert@rupert-lane.org>",
+      "simbabque <simbabque@cpan.org>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

@@ -7,18 +7,17 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Moose::Role: '0'
   Moose::Util: '0'
   MooseX::Types::Path::Class: '0'
   Path::Class: '0'
   Test::CheckDeps: '0.010'
   Test::Fatal: '0'
   Test::Moose: '0'
-  Test::Moose::More: '0.044'
+  Test::Moose::More: '0.047'
   Test::More: '0.94'
   blib: '1.01'
   constant: '0'
-  namespace::autoclean: '0.24'
+  lib: '0'
   perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -37,15 +36,22 @@ no_index:
 provides:
   MooseX::AttributeShortcuts:
     file: lib/MooseX/AttributeShortcuts.pm
-    version: '0.029'
+    version: '0.031'
   MooseX::AttributeShortcuts::Trait::Attribute:
-    file: lib/MooseX/AttributeShortcuts.pm
-    version: '0.029'
+    file: lib/MooseX/AttributeShortcuts/Trait/Attribute.pm
+    version: '0.031'
+  MooseX::AttributeShortcuts::Trait::Attribute::HasAnonBuilder:
+    file: lib/MooseX/AttributeShortcuts/Trait/Attribute/HasAnonBuilder.pm
+    version: '0.031'
+  MooseX::AttributeShortcuts::Trait::Role::Attribute:
+    file: lib/MooseX/AttributeShortcuts/Trait/Role/Attribute.pm
+    version: '0.031'
 requires:
   List::Util: '1.33'
   Moose: '1.14'
   Moose::Exporter: '0'
   Moose::Meta::TypeConstraint: '0'
+  Moose::Role: '0'
   Moose::Util::MetaRole: '0'
   Moose::Util::TypeConstraints: '0'
   MooseX::Meta::TypeConstraint::Mooish: '0'
@@ -61,7 +67,7 @@ resources:
   bugtracker: https://github.com/RsrchBoy/moosex-attributeshortcuts/issues
   homepage: https://github.com/RsrchBoy/moosex-attributeshortcuts
   repository: https://github.com/RsrchBoy/moosex-attributeshortcuts.git
-version: '0.029'
+version: '0.031'
 x_BuiltWith:
   modules:
     CPAN::Meta: '2.150005'
@@ -103,6 +109,7 @@ x_BuiltWith:
     aliased: '0.34'
     blib: '1.06'
     constant: '1.33'
+    lib: '0.63'
     namespace::autoclean: '0.28'
     strict: '1.11'
     warnings: '1.36'
@@ -130,7 +137,7 @@ x_Dist_Zilla:
           version_by_branch: '0'
           version_regexp: (?^:^(\d.\d+(_\d\d)?)(-TRIAL|)$)
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.12.2
+          'git --version': 2.13.0
           repo_root: .
       name: '@RSRCHBOY/Git::NextVersion'
       version: '2.041'
@@ -146,7 +153,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.12.2
+          'git --version': 2.13.0
           repo_root: .
       name: '@RSRCHBOY/@Git::CheckFor/Git::CheckFor::CorrectBranch'
       version: '0.014'
@@ -154,7 +161,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::Fixups
       config:
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.12.2
+          'git --version': 2.13.0
           repo_root: .
       name: '@RSRCHBOY/@Git::CheckFor/Git::CheckFor::Fixups'
       version: '0.014'
@@ -162,7 +169,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.12.2
+          'git --version': 2.13.0
           repo_root: .
       name: '@RSRCHBOY/@Git::CheckFor/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -454,7 +461,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.12.2
+          'git --version': 2.13.0
           repo_root: .
       name: '@RSRCHBOY/Git::Check'
       version: '2.041'
@@ -476,7 +483,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.12.2
+          'git --version': 2.13.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -518,11 +525,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: '1'
-          tag: '0.029'
+          tag: '0.031'
           tag_format: '%v'
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.12.2
+          'git --version': 2.13.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -539,7 +546,7 @@ x_Dist_Zilla:
           release_branch: ~
           release_message: 'Build results of %h (on %b)'
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.12.2
+          'git --version': 2.13.0
           repo_root: .
       name: '@RSRCHBOY/Git::CommitBuild::Build'
       version: '2.041'
@@ -554,7 +561,7 @@ x_Dist_Zilla:
           release_branch: release/cpan
           release_message: 'Full build of CPAN release %v%t'
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.12.2
+          'git --version': 2.13.0
           repo_root: .
       name: '@RSRCHBOY/Git::CommitBuild::Release'
       version: '2.041'
@@ -567,7 +574,7 @@ x_Dist_Zilla:
             - 'origin refs/heads/release/cpan:refs/heads/release/cpan'
           remotes_must_exist: '1'
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.12.2
+          'git --version': 2.13.0
           repo_root: .
       name: '@RSRCHBOY/Git::Push'
       version: '2.041'

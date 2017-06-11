@@ -1,7 +1,7 @@
 package DDG::Request;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: A request to DuckDuckGo itself, so the query itself and parameter around the query defining him
-$DDG::Request::VERSION = '1016';
+$DDG::Request::VERSION = '1017';
 use Moo;
 use utf8;
 
@@ -268,7 +268,7 @@ DDG::Request - A request to DuckDuckGo itself, so the query itself and parameter
 
 =head1 VERSION
 
-version 1016
+version 1017
 
 =head1 SYNOPSIS
 

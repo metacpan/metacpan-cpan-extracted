@@ -2,7 +2,7 @@ package Linux::NFS::BigDir::Syscalls;
 use strict;
 use Exporter 'import';
 our @EXPORT = qw(SYS_getdents);
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 =pod
 

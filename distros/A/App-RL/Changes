@@ -1,5 +1,8 @@
 Revision history for App-RL
 
+0.2.33 2017-06-01T02:51:05Z
+    - Add command convert
+
 0.2.32 2017-05-07T17:37:15Z
     - Don't use `Path::Tiny::path($filename)->lines( { chomp => 1 } );`
 

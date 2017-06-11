@@ -1,5 +1,22 @@
 Revision history for Syntax-Keyword-Try
 
+0.06    2017/06/06 14:59:30
+        [CHANGES]
+         * Clarify documentation about the behaviour of try {} blocks without
+           catch {}; include comparison with other modules
+
+        [BUGFIXES]
+         * Fix typo in #ifdef test (RT119709)
+         * Restore C89 compatibility again (RT119665)
+
+0.05    2017/06/05 14:04:06
+        [CHANGES]
+         * Add a SEE ALSO link pointing at the value-semantics RT ticket
+
+        [BUGFIXES]
+         * Fix cLISTOP->op_last field to keep DEBUGGING builds happy
+           (RT119095)
+
 0.04    2016/11/25 15:06:18
         [CHANGES]
          * Removed stale documentation about now-fixed warnings from

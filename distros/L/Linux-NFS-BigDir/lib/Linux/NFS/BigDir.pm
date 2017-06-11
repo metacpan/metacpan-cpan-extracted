@@ -8,7 +8,7 @@ use Config;
 use Linux::NFS::BigDir::Syscalls;
 
 use constant BUF_SIZE     => 4096;
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 =pod
 

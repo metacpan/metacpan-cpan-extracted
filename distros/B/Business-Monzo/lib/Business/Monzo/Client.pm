@@ -61,6 +61,7 @@ has user_agent => (
     is      => 'ro',
     default => sub {
         # probably want more infoin here, version of perl, platform, and such
+        require Business::Monzo;
         return "business-monzo/perl/v" . $Business::Monzo::VERSION;
     }
 );

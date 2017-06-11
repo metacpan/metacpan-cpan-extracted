@@ -1,5 +1,8 @@
 Revision history for Alien-xz
 
+0.05      2017-06-10 19:11:08 -0400
+  - Build dynamic libraries too
+
 0.04      2017-03-02 06:50:07 +1100
   - Remove dep on Alien::Base2
 

@@ -1,6 +1,6 @@
 package Pcore::Util::Text;
 
-use Pcore -export, [
+use Pcore -ansi, -export, [
     qw[
       cut
       cut_all
@@ -37,7 +37,6 @@ use Pcore -export, [
       ]
 ];
 use Encode qw[];    ## no critic qw[Modules::ProhibitEvilModules]
-use Term::ANSIColor qw[];
 use Text::Xslate qw[mark_raw unmark_raw];
 
 our $ENC_CACHE = {};
@@ -235,10 +234,10 @@ sub escape_scalar {
     }
 
     my %args = (
-        bin         => undef,     # if TRUE - always treats scalar as binary data
-        utf8_encode => 1,         # if FALSE - in bin mode escape utf8 multi-byte chars as \x{...}
+        bin         => undef,    # if TRUE - always treats scalar as binary data
+        utf8_encode => 1,        # if FALSE - in bin mode escape utf8 multi-byte chars as \x{...}
         esc_color   => undef,
-        reset_color => 'reset',
+        reset_color => $RESET,
         splice @_, 1,
     );
 
@@ -274,9 +273,9 @@ sub escape_scalar {
         }
     }
     else {
-        my $esc_color = $args{esc_color} ? Term::ANSIColor::color( $args{esc_color} ) : q[];
+        my $esc_color = $args{esc_color} || q[];
 
-        my $reset_color = $args{esc_color} ? Term::ANSIColor::color( $args{reset_color} ) : q[];
+        my $reset_color = $args{esc_color} ? $args{reset_color} : q[];
 
         s/([\a\b\t\n\f\r\e])/${esc_color}$ESC_ANSI_CTRL{$1}${reset_color}/smg;    # escape ANSI
 
@@ -575,18 +574,18 @@ sub to_camel_case {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 204                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 203                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 228, 416             | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
+## |    3 | 227, 415             | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 294                  | Subroutines::ProhibitExcessComplexity - Subroutine "wrap" with high complexity score (28)                      |
+## |    3 | 293                  | Subroutines::ProhibitExcessComplexity - Subroutine "wrap" with high complexity score (28)                      |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 |                      | NamingConventions::ProhibitAmbiguousNames                                                                      |
-## |      | 400, 401             | * Ambiguously named variable "left"                                                                            |
-## |      | 401                  | * Ambiguously named variable "right"                                                                           |
+## |      | 399, 400             | * Ambiguously named variable "left"                                                                            |
+## |      | 400                  | * Ambiguously named variable "right"                                                                           |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 46, 47, 48, 49, 50,  | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
-## |      | 51, 52               |                                                                                                                |
+## |    1 | 45, 46, 47, 48, 49,  | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
+## |      | 50, 51               |                                                                                                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -1,15 +1,14 @@
 # -*-CPerl-*-
-# Last changed Time-stamp: <2015-10-27 14:44:26 mtw>
+# Last changed Time-stamp: <2017-06-10 19:00:46 michl>
 
 package Bio::ViennaNGS::ExtFeature;
 
-use version; our $VERSION = qv('0.16');
-
+use Bio::ViennaNGS;
 use Moose;
-with 'MooseX::Clone';
-use MooseX::InstanceTracking;
+use version; our $VERSION = version->declare("$Bio::ViennaNGS::VERSION");
 
 extends 'Bio::ViennaNGS::Feature';
+
 
 has 'extension' => (
 		    is      => 'rw',
@@ -68,7 +67,7 @@ Michael T. Wolfinger E<lt>michael@wolfinger.euE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2015 Michael T. Wolfinger E<lt>michael@wolfinger.euE<gt>
+Copyright (C) 2014-2017 Michael T. Wolfinger E<lt>michael@wolfinger.euE<gt>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

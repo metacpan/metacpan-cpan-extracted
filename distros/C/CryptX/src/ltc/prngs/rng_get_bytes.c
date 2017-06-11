@@ -5,8 +5,6 @@
  *
  * The library is free for all purposes without any express
  * guarantee it works.
- *
- * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
  */
 #include "tomcrypt.h"
 
@@ -134,6 +132,15 @@ unsigned long rng_get_bytes(unsigned char *out, unsigned long outlen,
    unsigned long x;
 
    LTC_ARGCHK(out != NULL);
+
+#ifdef LTC_PRNG_ENABLE_LTC_RNG
+   if (ltc_rng) {
+      x = ltc_rng(out, outlen, callback);
+      if (x != 0) {
+         return x;
+      }
+   }
+#endif
 
 #if defined(_WIN32) || defined(_WIN32_WCE)
    x = rng_win32(out, outlen, callback); if (x != 0) { return x; }

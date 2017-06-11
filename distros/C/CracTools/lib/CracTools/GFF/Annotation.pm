@@ -1,9 +1,10 @@
 package CracTools::GFF::Annotation;
+
 {
   $CracTools::GFF::Annotation::DIST = 'CracTools';
 }
 # ABSTRACT: Parse GFF lines.
-$CracTools::GFF::Annotation::VERSION = '1.25';
+$CracTools::GFF::Annotation::VERSION = '1.251';
 use strict;
 use warnings;
 
@@ -202,7 +203,7 @@ CracTools::GFF::Annotation - Parse GFF lines.
 
 =head1 VERSION
 
-version 1.25
+version 1.251
 
 =head1 SYNOPSIS
 

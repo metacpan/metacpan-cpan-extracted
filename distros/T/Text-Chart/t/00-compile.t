@@ -2,7 +2,7 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.051
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.054
 
 use Test::More;
 
@@ -35,6 +35,9 @@ for my $lib (@module_files)
     my @_warnings = <$stderr>;
     waitpid($pid, 0);
     is($?, 0, "$lib loaded ok");
+
+    shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
+        and not eval { require blib; blib->VERSION('1.01') };
 
     if (@_warnings)
     {

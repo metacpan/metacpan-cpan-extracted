@@ -40,16 +40,18 @@ requires:
   Redis: '0'
   Scalar::Util: '0'
   Sys::Hostname: '0'
+  Time::Concise: '0'
   Time::HiRes: '0'
   Try::Tiny: '0'
   namespace::autoclean: '0'
   overload: '0'
+  perl: v5.10.0
   strict: '0'
 resources:
   bugtracker: https://github.com/diegok/resque-perl/issues
   homepage: https://github.com/diegok/resque-perl
   repository: https://github.com/diegok/resque-perl.git
-version: '0.31'
+version: '0.34'
 x_Dist_Zilla:
   perl:
     version: '5.024000'
@@ -134,7 +136,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.11.1
+          'git --version': 2.13.0
           repo_root: .
       name: '@Git/Check'
       version: '2.041'
@@ -151,7 +153,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.11.1
+          'git --version': 2.13.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -164,11 +166,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.31
+          tag: v0.34
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.11.1
+          'git --version': 2.13.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -182,7 +184,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.11.1
+          'git --version': 2.13.0
           repo_root: .
       name: '@Git/Push'
       version: '2.041'
@@ -214,7 +216,7 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.11.1
+          'git --version': 2.13.0
           repo_root: .
       name: Git::NextVersion
       version: '2.041'

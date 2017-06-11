@@ -1,0 +1,77 @@
+.# Title: Condition that is a directive - top level & in sub - MK II
+.# NewOpt: PipeOK 1
+.# UnixOnly: 1
+.# OutOnError: 1
+.#
+.# This is a replacement for 7_condDir_7.input -- hopefully something
+.# portable to all *nix.
+.# The first part is stolen direct from it.
+.#
+.# Finding a simple, portable command that generates more than 1 line of
+.# output was quite hard.
+.# Cannot separate 2 commands with a ';' as that does not work.
+.#
+.#
+.include -s echo | echo The man in the moon
+.if .read -s echo line
+.echo Read line: '\v{line}' - EOF = \v{_EOF}
+.else
+Error: did not read line
+.fi
+After if
+
+.if .read -s echo line
+Unexpected Read line: \v{line}
+.else
+.echo Expected read EOF - \v{_EOF}
+.fi
+.#
+.close -s echo
+.#
+.#
+2 echo commands read in .while loop:
+.include -s echo2 |awk '{print NR};NR == 3 { exit }' /etc/passwd
+.#
+.while .read -s echo2 line
+.echo Read line '\v{line}'
+.done
+.close -s echo2
+.#
+.#
+2 echo read in .for loop:
+.include -s echo2 |awk '{print NR + 3};NR == 3 { exit }' /etc/passwd
+.for ;; .read -s echo2 line ;;
+.echo Read line '\v{line}'
+.done
+.close -s echo2
+.#
+.#
+.sub a
+2 echo commands read in .while loop in a .sub:
+.include -s echo2 |awk '{print NR + 8};NR == 3 { exit }' /etc/passwd
+.#
+.while .read -s echo2 line
+.echo Read line '\v{line}'
+.done
+.close -s echo2
+.#
+.#
+2 echo read in .for loop in a .sub:
+.include -s echo2 |awk '{print NR + 12};NR == 3 { exit }' /etc/passwd
+.#
+.for ;; .read -s echo2 line ;;
+.echo Read line '\v{line}'
+.done
+.close -s echo2
+.#
+.done
+.#
+Defined .a
+.#
+Run .a
+.#
+.a
+.#
+.#
+.# Mark the last line
+EOF

@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.53';
+our $VERSION = '0.54';
 
 use Exporter qw( import );
 
@@ -83,7 +83,7 @@ List::SomeUtils - Provide the stuff missing in List::Util
 
 =head1 VERSION
 
-version 0.53
+version 0.54
 
 =head1 SYNOPSIS
 
@@ -812,10 +812,13 @@ Copyright 2013 - 2015 by Jens Rehsack
 
 =head1 SUPPORT
 
-Bugs may be submitted through L<the RT bug tracker|http://rt.cpan.org/Public/Dist/Display.html?Name=List-SomeUtils>
-(or L<bug-list-someutils@rt.cpan.org|mailto:bug-list-someutils@rt.cpan.org>).
+Bugs may be submitted at L<https://github.com/houseabsolute/List-SomeUtils/issues>.
 
-I am also usually active on IRC as 'drolsky' on C<irc://irc.perl.org>.
+I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for List-SomeUtils can be found at L<https://github.com/houseabsolute/List-SomeUtils>.
 
 =head1 DONATIONS
 
@@ -914,9 +917,12 @@ Tom Wyant <wyant@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Dave Rolsky <autarch@urth.org>.
+This software is copyright (c) 2017 by Dave Rolsky <autarch@urth.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

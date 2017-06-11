@@ -25,7 +25,7 @@ __END__
 Perl data type class for the XML Schema defined simpleType
 LinkStatus from the namespace https://adwords.google.com/api/adwords/mcm/v201609.
 
-These status values match the values in the ServicedAccounts.Status column. 
+Status of the link. 
 
 
 

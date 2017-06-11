@@ -2,7 +2,7 @@ package Crypt::Digest;
 
 use strict;
 use warnings;
-our $VERSION = '0.047';
+our $VERSION = '0.048';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 'import';
 our %EXPORT_TAGS = ( all => [qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u )] );
@@ -28,14 +28,26 @@ use CryptX;
 sub _trans_digest_name {
   my $name = shift;
   my %trans = (
-    CHAES     => 'chc_hash',
-    RIPEMD128 => 'rmd128',
-    RIPEMD160 => 'rmd160',
-    RIPEMD256 => 'rmd256',
-    RIPEMD320 => 'rmd320',
-    TIGER192  => 'tiger',
-    SHA512_224=> 'sha512-224',
-    SHA512_256=> 'sha512-256',
+    CHAES       => 'chc_hash',
+    RIPEMD128   => 'rmd128',
+    RIPEMD160   => 'rmd160',
+    RIPEMD256   => 'rmd256',
+    RIPEMD320   => 'rmd320',
+    TIGER192    => 'tiger',
+    SHA512_224  => 'sha512-224',
+    SHA512_256  => 'sha512-256',
+    SHA3_224    => 'sha3-224',
+    SHA3_256    => 'sha3-256',
+    SHA3_384    => 'sha3-384',
+    SHA3_512    => 'sha3-512',
+    BLAKE2B_160 => 'blake2b-160',
+    BLAKE2B_256 => 'blake2b-256',
+    BLAKE2B_384 => 'blake2b-384',
+    BLAKE2B_512 => 'blake2b-512',
+    BLAKE2S_128 => 'blake2s-128',
+    BLAKE2S_160 => 'blake2s-160',
+    BLAKE2S_224 => 'blake2s-224',
+    BLAKE2S_256 => 'blake2s-256',
   );
   $name =~ s/^Crypt::Digest:://i;
   return $trans{uc($name)} if defined $trans{uc($name)};
@@ -175,7 +187,8 @@ Please note that all functions take as its first argument the algoritm name, sup
 
  'CHAES', 'MD2', 'MD4', 'MD5', 'RIPEMD128', 'RIPEMD160',
  'RIPEMD256', 'RIPEMD320', 'SHA1', 'SHA224', 'SHA256',
- 'SHA384', 'SHA512', 'SHA512_224', 'SHA512_256', 'Tiger192', 'Whirlpool'
+ 'SHA384', 'SHA512', 'SHA512_224', 'SHA512_256', 'Tiger192', 'Whirlpool',
+ 'SHA3_224', 'SHA3_256', 'SHA3_384', 'SHA3_512'
 
  (simply any <FUNCNAME> for which there is Crypt::Digest::<FUNCNAME> module)
 

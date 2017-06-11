@@ -1,3 +1,16 @@
+1.020 2017-06-05
+
+  Improvements for all commands :
+    * allow backend_argument (used by systemd)
+    * unknown options are fatal
+
+  Bug fixes:
+    * all: fix bash completion of -file option
+    * cme run: fix bash_completion of -doc option
+    * cme dump: allow non_upstream_default mode
+    * all: remove -dev option which raises security issues. Use
+      'perl -Ilib -S cme' for the same effect
+
 1.019 2017-04-30
 
   This release brings some improvements:

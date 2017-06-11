@@ -4,7 +4,8 @@ our $VERSION = $Gtk2::Ex::DbLinker::DbTools::VERSION;
 use strict;
 use warnings;
 use interface qw(Gtk2::Ex::DbLinker::AbDataManager);
-# use Carp;
+use Carp qw(confess croak carp);
+use Log::Any;
 # use Data::Dumper;
 
 #$self->{data} holds an array of objects returned by the Rose::DB::Manager's descendant
@@ -29,8 +30,8 @@ sub new {
         defaults        => $arg{defaults},
 
     };
-    $self->{log} =
-        Log::Log4perl->get_logger("Gtk2::Ex::DbLinker::RdbDataManager");
+    #$self->{log} = Log::Log4perl->get_logger("Gtk2::Ex::DbLinker::RdbDataManager");
+    $self->{log} = Log::Any->get_logger;
 
     $self->{rocols} = [];
     bless $self, $class;
@@ -83,7 +84,7 @@ sub set_row_pos {
     }
     else {
         $found = 0;
-         $self->{log}->logcroak(" position outside rows limits ");
+         croak($self->{log}->error(" position outside rows limits "));
     }
 
 # $self->{log}->debug("set_row_pos current pos: " . $self->{row}->{pos} . " new pos : " . $pos . " last: " . $self->{row}->{last_row} . " count : " . scalar @{ $self->{data}} );
@@ -223,7 +224,7 @@ sub save {
 =cut
 
     my $done;
-    $done = $row->save or  $self->{log}->logcarp("can't save ...\n");
+    $done = $row->save or  carp($self->{log}->warn("can't save ...\n"));
     $self->{new_row} = undef;
     return $done;
 }
@@ -245,11 +246,11 @@ sub new_row {
 sub delete {
     my $self = shift;
     $self->{log}
-        ->debug( "Linker::RdbDataManager delete at " . $self->{row}->{pos} );
+        ->debug(" delete at " . $self->{row}->{pos} );
     my $pos = $self->{row}->{pos};
     if ( defined $pos ) {    # if ($pos) is false when $pos is 0
         my $row = $self->{data}[$pos];
-        if ( !$row->delete ) {  $self->{log}->logcroak( " can't delete row at pos " . $pos ) }
+        if ( !$row->delete ) { croak ($self->{log}->error( " can't delete row at pos " . $pos )) }
 
         splice @{ $self->{data} }, $pos, 1;
         if ( $self->row_count == 0 ) {
@@ -336,16 +337,16 @@ sub _init_fields_access {
         ->debug( "init_fields_access: fields are " . join( " ", @$aref ) );
     foreach my $id (@$aref) {
         my $c = $meta->column($id);
-         $self->{log}->logcroak("Field $id not found in $meta->class metadata") unless ($c);
+         croak($self->{log}->error("Field $id not found in $meta->class metadata")) unless ($c);
         my $method = $c->method_name('get') || $c->method_name('get_set')
-            or  $self->{log}->logcroak("no get/get_set method found for $id");
+            or  croak($self->{log}->error("no get/get_set method found for $id"));
         $self->{fieldGetter}->{ $relname . $id } = $method;
         $self->{log}->debug( "get method for field "
                 . $relname . " "
                 . $id . " : "
                 . $method );
         $method = $c->method_name('set') || $c->method_name('get_set')
-            or  $self->{log}->logcroak("no set/get_set method found for $id");
+            or  croak($self->{log}->error("no set/get_set method found for $id"));
         $self->{fieldSetter}->{ $relname . $id }  = $method;
         $self->{fieldsDBType}->{ $relname . $id } = $c->type;
 

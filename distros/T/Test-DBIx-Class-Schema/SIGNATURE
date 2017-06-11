@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,31 +14,22 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 2a8daa9afd6b64653709b078f4a81a2b1bb80662 Changes
-SHA1 1eb604725a0fbce483923ed1a5f9b5a71549ed29 LICENSE
-SHA1 a8a0d73f8f4347a27cc5f35c8fad06730728a1b1 MANIFEST
-SHA1 0b0aa3bc359b8f25f6e4dcd10fedfd205f472e90 META.json
-SHA1 d605f6a4688a83f58a038435ef7b7370cce6f98d META.yml
-SHA1 3d947e0ca4eac59788eaa413ceb3d451d0ed68a1 Makefile.PL
-SHA1 3e15311db5f78ea39b84623e72b75ce123a0bc61 README.mkdn
+SHA1 3f56c1b64735a83bfe5b52db4bac1d47242744a5 Changes
+SHA1 7e6f65547635e6316f29f3a11b66debcf0c56cc9 LICENSE
+SHA1 ade8f962e7ec56d4f0c10cb58c94a7f0a0a4142c MANIFEST
+SHA1 6c3f9857f4cd6c66bac15bd3f88f456a69d2b2a1 META.json
+SHA1 5d723bf3d84f420539fa39e8889066646ac58e2d META.yml
+SHA1 b0a161e50f132922a781d0d4e53c51e7362f3c1e Makefile.PL
+SHA1 e6393dc91a4077ba9d39ca63d8ac954c290e9df3 README.mkdn
 SHA1 80b87a11b70a06c26334f2d24685cebbaad868eb dist.ini
-SHA1 ee928b23735d4645f85c9753e97ad2077abeb2f8 lib/Test/DBIx/Class/Schema.pm
+SHA1 96a8dd68ab7e726c541b0371c3aa69fd7b5ac4b6 lib/Test/DBIx/Class/Schema.pm
 SHA1 bad45123d4184a7d07244fb4a82bda7180361449 script/buildkite-init/build-project
 SHA1 7fe2e0f0789feea19409889f9c11ca4d45a86457 script/buildkite-init/create-project
-SHA1 bb92ca4644ee9cc476e677b44d835886cb220232 script/buildkite/README.md
-SHA1 d4426c3a7150a7a522cb0617b5e0b6c806995b5e script/buildkite/dzil-authordeps
-SHA1 7872b53eabda8b053bc1e540724da4dd721a3751 script/buildkite/dzil-distrodeps
-SHA1 e68ecb276d56454d75134d2afb1176550fcfd378 script/buildkite/dzil-install
-SHA1 176466926452610b5b7b808082e3603ed77215ad script/buildkite/dzil-tests-basic
-SHA1 ef72d3dd2bdde3b4eabeedb9ff49c0c3678d45ff script/buildkite/dzil-tests-full
-SHA1 60aec03698cd211783143cfd2fef14acc51a6ee2 script/buildkite/git-identity
-SHA1 b9dd2f94fed7d67e1d34dbb1c93f2b9033d294b4 script/buildkite/perlbrew-install
-SHA1 0f841effbeb886bcbe1d88f8a7e2c29974c2a8e0 script/buildkite/perlbrew-setup
-SHA1 820501b5591b35b12062ab4aed104d221530356e t/10.test.dbix.class.schema.t
+SHA1 ceb80d8b6de753bf985aae18cd4cdbf9805d636d t/10.test.dbix.class.schema.t
 SHA1 6fd6c404b69c02cb7089292e286bf2dfe36b8987 t/11.testdata.t
-SHA1 48cc0f583f87786f72802c22abdb838593c09ef4 t/20.run_tests.artist.moose_rs.t
-SHA1 16dd9ed5f75101300dad047b588d06067ccc37c3 t/20.run_tests.artist.t
-SHA1 139f1473d6fdc580c18d687deab25e2b60cb2058 t/20.run_tests.cd.t
+SHA1 a67a2b34bbfe8ea1033c5b42714bd440105977e4 t/20.run_tests.artist.moose_rs.t
+SHA1 6a3f0913cb7f802bcebba4336ed7af70170c36ce t/20.run_tests.artist.t
+SHA1 f247a5f55576ce999723475f13859c0276fb2cf5 t/20.run_tests.cd.t
 SHA1 148d1909247f50443e41193e3b3e932a60879a39 t/20.run_tests.compound_fk.t
 SHA1 2de43fb2be43abbee64432774dddc814465ed1ef t/20.run_tests.person.t
 SHA1 113a5a120186d1cdff9a02df7a95971482f51267 t/20.run_tests.proxy.t
@@ -46,33 +37,35 @@ SHA1 c8a160c2d58b3f70af598bb998bb0d8a810af28c t/20.run_tests.track.t
 SHA1 5813ce94b160606d9266b6d08db1207f3b6fba45 t/30.failing_tests.artist.t
 SHA1 a3e4f26cb650daad5e121f565de2a5180ba299bc t/30.failing_tests.cd.t
 SHA1 c595d0d957c5fe2969f2ea5b14d2e47c19808742 t/30.failing_tests.track.t
-SHA1 7fe3dd3bd1effa54fc1dd5db50f40430edcf6f02 t/30.missing_methods.t
+SHA1 6c8ca0e97977ceeaf59a846adb5c98619f0d3b94 t/30.missing_methods.t
+SHA1 4e76c991f870b7b09300ef8bb0ff261f011a608b t/30.todo.skip.t
 SHA1 be0ce7710c38d548e86bc21b6df186a584f38204 t/40.untested.columns.t
-SHA1 b31862d6032db7bdf85583cbcd70f927746960a2 t/author-no-tabs.t
-SHA1 d2eebabfd34d330bd59043a4b6879faf4de7229d t/author-pod-syntax.t
+SHA1 a41c15a5898efb72ba7ce626fa6e243138765981 t/author-no-tabs.t
+SHA1 8efad25309730a4d501fb40fc03eda4697303372 t/author-pod-syntax.t
 SHA1 af9f2b59cca4fcf130deefd45072e2248d1ff975 t/lib/DBHelper.pm
 SHA1 fb56b1f84a45bdaafd17069e1cedb4a99b049217 t/lib/TDCSTest.pm
 SHA1 d48d0548d3d8762b271f249240395c6b429aa129 t/lib/TDCSTest/ResultSet/ArtistMoose.pm
-SHA1 46a0635aeaba980e670e71e3c7ff3ae757499b28 t/lib/TDCSTest/Schema.pm
-SHA1 dfa236304f4d4529c140de8148613c970dd40546 t/lib/TDCSTest/Schema/Artist.pm
+SHA1 8fc2a3e6cb05dac1d17fa77f517065679389c51c t/lib/TDCSTest/Schema.pm
+SHA1 47e22bbb5af07d960809102df93127e3ffbe0ba7 t/lib/TDCSTest/Schema/Artist.pm
 SHA1 a43fb4f05c77be2a1241ccae46b99525f53db96b t/lib/TDCSTest/Schema/Audiophile.pm
-SHA1 d789a53175da8911befc4c8d9cf3f8e8c461795d t/lib/TDCSTest/Schema/CD.pm
+SHA1 40c19ff8c78e896a2257f9ceb65d92b03a86cfd5 t/lib/TDCSTest/Schema/CD.pm
 SHA1 885872999a60b2f0988d8b12586a7f9db8b0113e t/lib/TDCSTest/Schema/CDShop.pm
 SHA1 7551e7aa4ca8e43e7904cebcc0a891eb89aee918 t/lib/TDCSTest/Schema/CDShopAudiophile.pm
+SHA1 75a847ca7c6e1a5f93cb6b04982cb2167b75b6bd t/lib/TDCSTest/Schema/LinerNotes.pm
 SHA1 52f7371ee6364959268cec0168af82471db44fa4 t/lib/TDCSTest/Schema/Person.pm
 SHA1 a5a64ff6e237acb01efabf1c83ef961c9fbeb0fa t/lib/TDCSTest/Schema/Shop.pm
 SHA1 7725aff0e2b19873360898308a37d7fb1221ef85 t/lib/TDCSTest/Schema/Track.pm
 SHA1 308ada1f0090658c464bfdfaa05115fc0ae1ab80 t/lib/UnexpectedTest.pm
 SHA1 20be9dd34045a2aad6dfcd0dab34b619c4a0aeb0 t/lib/UnexpectedTest/Schema.pm
 SHA1 8fd198ec8c12b39911de1daf3e01d238a9dedb60 t/lib/UnexpectedTest/Schema/Result/SpanishInquisition.pm
-SHA1 07b7aceb44d6efd8f4731e1afa8634ee2127cd45 t/lib/sqlite.sql
+SHA1 d17dd71f54ad94c7b0803d1e7076e8ada0d942e6 t/lib/sqlite.sql
 SHA1 4adcc825f92e81f87f1154c7eeec0d899d3f4f2e t/lib/unexpected.sqlite.sql
-SHA1 0068bf52fc88b39cc6509199f19a77890edb9bb0 t/release-has-version.t
+SHA1 d11c4f9a91716fcd18b00198c8726584b90ba084 t/release-has-version.t
 SHA1 91bacb1498d0fb115ed2f1130ffbe8d593931a2d weaver.ini
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iEYEARECAAYFAlc0RokACgkQh4j7xTiFuxFuQQCgzdH+0b/XLlxeNaCqHeJw08qv
-5NwAn0rAb02u/on0spmfWeBj7RqT4W/c
-=ERLV
+iEYEARECAAYFAlk1GE8ACgkQh4j7xTiFuxFM/QCeKbccHkLSqgO+rdc0eG7yACCb
+wE4AnAgvyRHf9rZ5+EHZcfxaelzQU91d
+=dnfk
 -----END PGP SIGNATURE-----

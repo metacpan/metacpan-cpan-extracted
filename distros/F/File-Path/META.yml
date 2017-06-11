@@ -1,14 +1,21 @@
 ---
 abstract: 'Create or remove directory trees'
 author:
-  - 'Richard Elberger'
+  - unknown
 build_requires:
+  Carp: '0'
+  Config: '0'
+  Errno: '0'
   ExtUtils::MakeMaker: '0'
+  Fcntl: '0'
+  File::Spec::Functions: '0'
+  SelectSaver: '0'
+  Test::Simple: '0.44'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
-license: perl
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -18,12 +25,11 @@ no_index:
     - t
     - inc
 requires:
-  Carp: '0'
   Cwd: '0'
+  Exporter: '0'
   File::Basename: '0'
   File::Spec: '0'
-  SelectSaver: '0'
 resources:
-  repository: https://github.com/rpcme/File-Path.git
-version: '2.12'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
+  repository: https://github.com/jkeenan/File-Path.git
+version: '2.14'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

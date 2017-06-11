@@ -1,5 +1,8 @@
 Revision history for Perl extension Test-UNIXSock
 
+0.2 2017-05-31T00:45:02Z
+    - Fix tests. (#2 mans0954)
+
 0.1 2015-12-02T06:39:22Z
 
     - original version.

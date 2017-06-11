@@ -4,7 +4,12 @@ use warnings;
 use Grep::Query qw(qgrep);
 use Grep::Query::FieldAccessor;
 
-use Test::More tests => 9;
+use Test::More tests => 18;
+
+is(scalar(qgrep('true')), 0, "query empty plain set (non-OO)");
+is(scalar(qgrep('TRUE')), 0, "query empty plain set (non-OO)");
+is(scalar(qgrep('false')), 0, "query empty plain set (non-OO)");
+is(scalar(qgrep('FALSE')), 0, "query empty plain set (non-OO)");
 
 is(scalar(qgrep('REGEXP(.*)')), 0, "query empty plain set (non-OO)");
 
@@ -26,3 +31,19 @@ ok(defined(Grep::Query->new('regexp(.*) and eq(42) or ne(15) and gt(9) or ge(98)
 ok(defined(Grep::Query->new('==(42) or !=(15) and >(9) or >=(98) and <(65) or <=(32)')), "NUMERICAL");
 
 ok(defined(Grep::Query->new('foo.==(42) OR foo.==(68)')), "one field multiple times");
+
+ok(defined(Grep::Query->new('/**/ true')), "Empty comment");
+ok(defined(Grep::Query->new('/* before */ true')), "Comment before");
+ok(defined(Grep::Query->new('true /* after */')), "Comment after");
+ok(defined(Grep::Query->new('/* before */ true /* after */')), "Comments before and after");
+
+my $qWithComments = <<'Q';
+	true
+	/* first part */
+	or
+	/* second part
+	   which is no
+	   multiple lines */
+	false
+Q
+ok(defined(Grep::Query->new($qWithComments)), "Multiline comment");

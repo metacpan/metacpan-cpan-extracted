@@ -1,3 +1,7 @@
+0.041 2017-06-02
+  - Update version.t.
+  - Configure for TravisCI.
+
 0.031 2017-04-01
   - Add 'query' to the logged entry.
   - Update to use Mojo::File (version).

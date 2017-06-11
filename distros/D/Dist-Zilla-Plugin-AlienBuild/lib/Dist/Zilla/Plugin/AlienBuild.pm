@@ -6,7 +6,7 @@ use List::Util qw( first );
 use Path::Tiny qw( path );
 
 # ABSTRACT: Use Alien::Build with Dist::Zilla
-our $VERSION = '0.16'; # VERSION
+our $VERSION = '0.19'; # VERSION
 
 
 with 'Dist::Zilla::Role::FileMunger';
@@ -53,6 +53,11 @@ sub register_prereqs
 
     my $ab_version = '0.32';
 
+    foreach my $hook (qw( build_ffi gather_ffi patch_ffi ))
+    {
+      $ab_version = '0.40';
+    }
+
     if($self->_installer eq 'Makefile.PL')
     {
       $self->zilla->register_prereqs(
@@ -65,7 +70,7 @@ sub register_prereqs
     {
       $self->zilla->register_prereqs(
         { phase => $_ },
-        'Alien::Build::MB' => '0.01',
+        'Alien::Build::MB' => '0.02',
       ) for qw( configure build );
     }
 
@@ -172,7 +177,7 @@ Dist::Zilla::Plugin::AlienBuild - Use Alien::Build with Dist::Zilla
 
 =head1 VERSION
 
-version 0.16
+version 0.19
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,8 @@
 Revision history for perl module Text::FixedWidth::Parser
 
+0.4 
+	* Adding missed module in Pre-Requirement
+
 0.3
 	* POD changes
 	* Bug fixes

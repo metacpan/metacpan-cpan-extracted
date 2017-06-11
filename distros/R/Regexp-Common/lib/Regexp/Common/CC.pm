@@ -9,7 +9,7 @@ no  warnings 'syntax';
 use Regexp::Common qw /pattern clean no_defaults/;
 use Regexp::Common::_support qw /luhn/;
 
-our $VERSION = '2017040401';
+our $VERSION = '2017060201';
 
 my @cards = (
     # Name           Prefix                    Length           mod 10
@@ -110,7 +110,7 @@ Bound to be plenty. Send them in to S<I<regexp-common@abigail.be>>.
 
 =head1 LICENSE and COPYRIGHT
 
-This software is Copyright (c) 2001 - 2016, Damian Conway and Abigail.
+This software is Copyright (c) 2001 - 2017, Damian Conway and Abigail.
 
 This module is free software, and maybe used under any of the following
 licenses:

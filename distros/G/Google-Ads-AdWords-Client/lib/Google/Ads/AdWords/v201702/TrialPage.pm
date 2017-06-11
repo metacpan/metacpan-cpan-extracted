@@ -72,7 +72,7 @@ Google::Ads::AdWords::v201702::TrialPage
 Perl data type class for the XML Schema defined complexType
 TrialPage from the namespace https://adwords.google.com/api/adwords/cm/v201702.
 
-Contains a filtered and paged subset of campaign trials as returned by {@link TrialService#get(com.google.ads.api.services.common.selector.Selector)}. 
+Contains a filtered and paged subset of campaign trials as returned by {@link TrialService#get}. 
 
 
 

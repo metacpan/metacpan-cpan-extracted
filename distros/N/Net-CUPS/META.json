@@ -44,6 +44,6 @@
          "x_git" : "https://github.com/niner/perl-Net-CUPS.git"
       }
    },
-   "version" : "0.63",
+   "version" : "0.64",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

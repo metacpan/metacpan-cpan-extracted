@@ -8,7 +8,8 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::PlainFile;
-$Config::Model::Backend::PlainFile::VERSION = '2.103';
+$Config::Model::Backend::PlainFile::VERSION = '2.105';
+use 5.10.1;
 use Carp;
 use Mouse;
 use Config::Model::Exception;
@@ -87,7 +88,7 @@ sub read_leaf {
     return unless $file->exists;
 
     my $v = $file->slurp_utf8;
-    chomp $v unless $obj->value_type eq 'string';
+    chomp($v) unless $obj->value_type eq 'string';
     $obj->store( value => $v, check => $check );
 }
 
@@ -209,7 +210,7 @@ Config::Model::Backend::PlainFile - Read and write config as plain file
 
 =head1 VERSION
 
-version 2.103
+version 2.105
 
 =head1 SYNOPSIS
 

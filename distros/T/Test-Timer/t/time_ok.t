@@ -1,6 +1,6 @@
 
 use strict;
-use Test::More tests => 3;
+use Test::More;
 
 use Test::Fatal;
 
@@ -13,3 +13,5 @@ like(
     qr/^Insufficient number of parameters/,
     'Dying test, missing argument'
 );
+
+done_testing();

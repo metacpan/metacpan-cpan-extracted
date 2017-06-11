@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.012 but see version at the end of MYMETA.yml to check that
+    version 0.013 but see version at the end of MYMETA.yml to check that
     I'm correct here...
 
 INSTALLATION
@@ -32,13 +32,16 @@ INSTALLATION
 
 DEPENDENCIES
 
+            Log::Log4perl   1.41
+            Class::InsideOut        1.13
+            Log::Any::Adapter::Log4perl     0.08
+            DBD::SQLite     1.46
+            Carp    1.17
             Wx      0.9
-            DateTime::Format::Strptime      1.5
+            Scalar::Util    1.45
             Test::More      1
             Data::Dumper    2.154
-            Gtk2::Ex::DbLinker::DbTools     0.11
-            Scalar::Util    1.45
-            DBD::SQLite     1.46
-            Class::InsideOut        1.13
-            Log::Log4perl   1.41
+            Gtk2::Ex::DbLinker::DbTools     0.112
+            DateTime::Format::Strptime      1.5
+            Log::Any::Adapter       1.049
 

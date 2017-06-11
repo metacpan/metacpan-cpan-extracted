@@ -1,0 +1,27 @@
+{
+   "abstract" : "HTML Page parser used by WWW::Leech::Walker",
+   "author" : [
+      "Dmitry Selverstov <jaredspb@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-Leech-Parser",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::XS version 2.34"
+}
+

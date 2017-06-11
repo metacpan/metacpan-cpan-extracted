@@ -1,4 +1,6 @@
 use ExtUtils::MakeMaker;
+
+use lib '.'; ##-- fix RT bug #121661?
 require "pdlmaker.plm";
 pdlmaker_init();
 

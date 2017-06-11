@@ -3,7 +3,7 @@ use warnings;
 use Dist::Surveyor::Inquiry;
 use Data::Dumper;
 use Test::More;
-use Test::RequiresInternet 'api.metacpan.org' => 80;
+use Test::RequiresInternet 'fastapi.metacpan.org' => 443;
 
 my $module_data = get_module_versions_in_release('SEMUELF', 'Dist-Surveyor-0.009');
 my $expected =  {
@@ -28,7 +28,7 @@ is( $releases->{'Dist-Surveyor-0.009'}->{path}, 'lib/Dist/Surveyor/DB_File.pm', 
 
 my $release_info = get_release_info('SEMUELF', 'Dist-Surveyor-0.009');
 is($release_info->{name}, 'Dist-Surveyor-0.009', "Got the right release");
-is($release_info->{download_url}, 'http://cpan.metacpan.org/authors/id/S/SE/SEMUELF/Dist-Surveyor-0.009.tar.gz', 
+is($release_info->{download_url}, 'https://cpan.metacpan.org/authors/id/S/SE/SEMUELF/Dist-Surveyor-0.009.tar.gz', 
     "Got the right download URL");
 
 done_testing();

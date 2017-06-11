@@ -1,0 +1,78 @@
+TYPEMAP
+TextCaboCha*              T_CABOCHA
+TextCaboCha_Tree*         T_CABOCHA_TREE
+TextCaboCha_Token*        T_CABOCHA_TOKEN
+const TextCaboCha_Token*  T_CONST_CABOCHA_TOKEN
+TextCaboCha_Chunk*        T_CABOCHA_CHUNK
+const TextCaboCha_Chunk*  T_CONST_CABOCHA_CHUNK
+const TextMeCab_Node*     T_MECAB_NODE
+const char **             T_PTROBJ
+unsigned short int        T_UV
+
+INPUT
+T_CABOCHA
+    {
+        MAGIC *mg;
+        $var = NULL;
+        mg = TextCaboCha_mg_find(aTHX_ SvRV($arg), &TextCaboCha_vtbl);
+        if (mg) {
+            $var = (TextCaboCha *)mg->mg_ptr;
+        }
+    }
+    
+INPUT
+T_CABOCHA_TREE
+    $var = XS_STATE(TextCaboCha_Tree *, $arg);
+
+T_CABOCHA_TOKEN
+    $var = XS_STATE(TextCaboCha_Token *, $arg);
+
+T_CONST_CABOCHA_TOKEN
+    $var = XS_STATE(const TextCaboCha_Token *, $arg);
+
+T_CABOCHA_CHUNK
+    $var = XS_STATE(TextCaboCha_Chunk *, $arg);
+
+T_CONST_CABOCHA_CHUNK
+    $var = XS_STATE(const TextCaboCha_Chunk *, $arg);
+
+T_MECAB_NODE
+    $var = XS_STATE(TextMeCab_Node *, $arg);
+
+OUTPUT
+T_CABOCHA
+    if (!$var)          /* if null */
+        SvOK_off($arg); /* then return as undef instead of reaf to undef */
+    else {
+        /* setup $arg as a ref to a blessed hash hv */
+        MAGIC *mg;
+        HV *hv = newHV();
+        const char *classname = \"Text::CaboCha\";
+        /* take (sub)class name to use from class_sv if appropriate */
+        if (class_sv && SvOK(class_sv) && sv_derived_from(class_sv, classname))
+            classname = (SvROK(class_sv)) ? HvNAME(SvSTASH(class_sv)) : SvPV_nolen(class_sv);
+        sv_setsv($arg, sv_2mortal(newRV_noinc((SV*)hv)));
+        (void)sv_bless($arg, gv_stashpv(classname, TRUE));
+
+        /* now attach $var to the HV */
+        /* done as two steps to avoid sv_magic SvREFCNT_inc and MGf_REFCOUNTED */
+        /* sv_magic((SV*)hv, NULL, '~', NULL, 0);*/
+        /* PKETAMA_STATE_FROM_SV($arg) = (void *) $var; */
+        mg = sv_magicext((SV*)hv, NULL, PERL_MAGIC_ext, &TextCaboCha_vtbl, (char*) $var, 0); /* sizeof($var));  */
+        mg->mg_flags |= MGf_DUP;
+    }
+
+T_CABOCHA_TREE
+    XS_STRUCT2OBJ($arg, "Text::CaboCha::Tree", $var);
+
+T_CABOCHA_TOKEN
+    XS_STRUCT2OBJ($arg, TEXT_CABOCHA_TOKEN_KLASS, $var);
+
+T_CONST_CABOCHA_TOKEN
+    XS_STRUCT2OBJ($arg, TEXT_CABOCHA_TOKEN_KLASS, $var);
+
+T_CABOCHA_CHUNK
+    XS_STRUCT2OBJ($arg, TEXT_CABOCHA_CHUNK_KLASS, $var);
+
+T_CONST_CABOCHA_CHUNK
+    XS_STRUCT2OBJ($arg, TEXT_CABOCHA_CHUNK_KLASS, $var);

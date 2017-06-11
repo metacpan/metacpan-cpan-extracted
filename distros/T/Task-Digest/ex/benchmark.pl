@@ -7,33 +7,56 @@ use Getopt::Long qw(GetOptions :config no_ignore_case);
 use List::Util qw(max);
 
 # Install Task::Digest
-use Crypt::RIPEMD160      ();
-use Digest::BLAKE         ();
-use Digest::BMW           ();
-use Digest::CubeHash::XS  ();
-use Digest::ECHO          ();
-use Digest::EdonR         ();
-use Digest::Fugue         ();
-use Digest::GOST          ();
-use Digest::Groestl       ();
-use Digest::Hamsi         ();
-use Digest::JH            ();
-use Digest::Keccak        ();
-use Digest::Luffa         ();
-use Digest::MD2           ();
-use Digest::MD4           ();
-use Digest::MD5           ();
-use Digest::MD6           ();
-use Digest::Perl::MD4     ();
-use Digest::Perl::MD5     ();
-use Digest::SHA           ();
-use Digest::SHA1          ();
-use Digest::SHA::PurePerl ();
-use Digest::SHAvite3      ();
-use Digest::SIMD          ();
-use Digest::Shabal        ();
-use Digest::Skein         ();
-use Digest::Whirlpool     ();
+use Crypt::Digest::CHAES      ();
+use Crypt::Digest::MD2        ();
+use Crypt::Digest::MD4        ();
+use Crypt::Digest::MD5        ();
+use Crypt::Digest::RIPEMD128  ();
+use Crypt::Digest::RIPEMD160  ();
+use Crypt::Digest::RIPEMD256  ();
+use Crypt::Digest::RIPEMD320  ();
+use Crypt::Digest::SHA1       ();
+use Crypt::Digest::SHA224     ();
+use Crypt::Digest::SHA256     ();
+use Crypt::Digest::SHA384     ();
+use Crypt::Digest::SHA512     ();
+use Crypt::Digest::SHA512_224 ();
+use Crypt::Digest::SHA512_256 ();
+use Crypt::Digest::Tiger192   ();
+use Crypt::Digest::Whirlpool  ();
+use Crypt::Digest::SHA3_224   ();
+use Crypt::Digest::SHA3_256   ();
+use Crypt::Digest::SHA3_384   ();
+use Crypt::Digest::SHA3_512   ();
+use Crypt::RIPEMD160          ();
+use Digest::BLAKE             ();
+use Digest::BLAKE2            ();
+use Digest::BMW               ();
+use Digest::CubeHash::XS      ();
+use Digest::ECHO              ();
+use Digest::EdonR             ();
+use Digest::Fugue             ();
+use Digest::GOST              ();
+use Digest::Groestl           ();
+use Digest::Hamsi             ();
+use Digest::JH                ();
+use Digest::Keccak            ();
+use Digest::Luffa             ();
+use Digest::MD2               ();
+use Digest::MD4               ();
+use Digest::MD5               ();
+use Digest::MD6               ();
+use Digest::Perl::MD4         ();
+use Digest::Perl::MD5         ();
+use Digest::SHA               ();
+use Digest::SHA::PurePerl     ();
+use Digest::SHA1              ();
+use Digest::SHA3              ();
+use Digest::SHAvite3          ();
+use Digest::SIMD              ();
+use Digest::Shabal            ();
+use Digest::Skein             ();
+use Digest::Whirlpool         ();
 
 my %opts = (
     iterations => -1,
@@ -48,6 +71,8 @@ my %digests = (
     blake_256    => sub { Digest::BLAKE::blake_256($data) },
     blake_384    => sub { Digest::BLAKE::blake_384($data) },
     blake_512    => sub { Digest::BLAKE::blake_512($data) },
+    blake2b      => sub { Digest::BLAKE2::blake2b($data) },
+    blake2s      => sub { Digest::BLAKE2::blake2s($data) },
     bmw_224      => sub { Digest::BMW::bmw_224($data) },
     bmw_256      => sub { Digest::BMW::bmw_256($data) },
     bmw_384      => sub { Digest::BMW::bmw_384($data) },
@@ -106,28 +131,53 @@ my %digests = (
     ripemd_160   => sub {
         my $c = Crypt::RIPEMD160->new; $c->add($data); $c->digest;
     },
-    sha1_sha_1   => sub { Digest::SHA1::sha1($data) },
-    sha_sha_1    => sub { Digest::SHA::sha1($data) },
-    sha_224      => sub { Digest::SHA::sha224($data) },
-    sha_256      => sub { Digest::SHA::sha384($data) },
-    sha_384      => sub { Digest::SHA::sha256($data) },
-    sha_512      => sub { Digest::SHA::sha512($data) },
-    shabal_224   => sub { Digest::Shabal::shabal_224($data) },
-    shabal_256   => sub { Digest::Shabal::shabal_256($data) },
-    shabal_384   => sub { Digest::Shabal::shabal_384($data) },
-    shabal_512   => sub { Digest::Shabal::shabal_512($data) },
-    shavite3_224 => sub { Digest::SHAvite3::shavite3_224($data) },
-    shavite3_256 => sub { Digest::SHAvite3::shavite3_256($data) },
-    shavite3_384 => sub { Digest::SHAvite3::shavite3_384($data) },
-    shavite3_512 => sub { Digest::SHAvite3::shavite3_512($data) },
-    simd_224     => sub { Digest::SIMD::simd_224($data) },
-    simd_256     => sub { Digest::SIMD::simd_256($data) },
-    simd_384     => sub { Digest::SIMD::simd_384($data) },
-    simd_512     => sub { Digest::SIMD::simd_512($data) },
-    skein_256    => sub { Digest::Skein::skein_256($data) },
-    skein_512    => sub { Digest::Skein::skein_512($data) },
-    skein_1024   => sub { Digest::Skein::skein_1024($data) },
-    whirlpool    => sub { Digest::Whirlpool->new->add($data)->digest },
+    sha1_sha_1        => sub { Digest::SHA1::sha1($data) },
+    sha_sha_1         => sub { Digest::SHA::sha1($data) },
+    sha_224           => sub { Digest::SHA::sha224($data) },
+    sha_256           => sub { Digest::SHA::sha384($data) },
+    sha_384           => sub { Digest::SHA::sha256($data) },
+    sha_512           => sub { Digest::SHA::sha512($data) },
+    sha3_224          => sub { Digest::SHA3::sha3_224($data) },
+    sha3_256          => sub { Digest::SHA3::sha3_384($data) },
+    sha3_384          => sub { Digest::SHA3::sha3_256($data) },
+    sha3_512          => sub { Digest::SHA3::sha3_512($data) },
+    shabal_224        => sub { Digest::Shabal::shabal_224($data) },
+    shabal_256        => sub { Digest::Shabal::shabal_256($data) },
+    shabal_384        => sub { Digest::Shabal::shabal_384($data) },
+    shabal_512        => sub { Digest::Shabal::shabal_512($data) },
+    shavite3_224      => sub { Digest::SHAvite3::shavite3_224($data) },
+    shavite3_256      => sub { Digest::SHAvite3::shavite3_256($data) },
+    shavite3_384      => sub { Digest::SHAvite3::shavite3_384($data) },
+    shavite3_512      => sub { Digest::SHAvite3::shavite3_512($data) },
+    simd_224          => sub { Digest::SIMD::simd_224($data) },
+    simd_256          => sub { Digest::SIMD::simd_256($data) },
+    simd_384          => sub { Digest::SIMD::simd_384($data) },
+    simd_512          => sub { Digest::SIMD::simd_512($data) },
+    skein_256         => sub { Digest::Skein::skein_256($data) },
+    skein_512         => sub { Digest::Skein::skein_512($data) },
+    skein_1024        => sub { Digest::Skein::skein_1024($data) },
+    whirlpool         => sub { Digest::Whirlpool->new->add($data)->digest },
+    cryptx_chaes      => sub { Crypt::Digest::CHAES::chaes($data) },
+    cryptx_md2        => sub { Crypt::Digest::MD2::md2($data) },
+    cryptx_md4        => sub { Crypt::Digest::MD4::md4($data) },
+    cryptx_md5        => sub { Crypt::Digest::MD5::md5($data) },
+    cryptx_ripemd128  => sub { Crypt::Digest::RIPEMD128::ripemd128($data) },
+    cryptx_ripemd160  => sub { Crypt::Digest::RIPEMD160::ripemd160($data) },
+    cryptx_ripemd256  => sub { Crypt::Digest::RIPEMD256::ripemd256($data) },
+    cryptx_ripemd320  => sub { Crypt::Digest::RIPEMD320::ripemd320($data) },
+    cryptx_sha1       => sub { Crypt::Digest::SHA1::sha1($data) },
+    cryptx_sha224     => sub { Crypt::Digest::SHA224::sha224($data) },
+    cryptx_sha256     => sub { Crypt::Digest::SHA256::sha256($data) },
+    cryptx_sha384     => sub { Crypt::Digest::SHA384::sha384($data) },
+    cryptx_sha512     => sub { Crypt::Digest::SHA512::sha512($data) },
+    cryptx_sha512_224 => sub { Crypt::Digest::SHA512_224::sha512_224($data) },
+    cryptx_sha512_256 => sub { Crypt::Digest::SHA512_256::sha512_256($data) },
+    cryptx_tiger192   => sub { Crypt::Digest::Tiger192::tiger192($data) },
+    cryptx_whirlpool  => sub { Crypt::Digest::Whirlpool::whirlpool($data) },
+    cryptx_sha3_224   => sub { Crypt::Digest::SHA3_224::sha3_224($data) },
+    cryptx_sha3_256   => sub { Crypt::Digest::SHA3_256::sha3_256($data) },
+    cryptx_sha3_384   => sub { Crypt::Digest::SHA3_384::sha3_384($data) },
+    cryptx_sha3_512   => sub { Crypt::Digest::SHA3_512::sha3_512($data) },
 );
 
 my $times = timethese -1, \%digests, 'none';

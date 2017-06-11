@@ -20,14 +20,11 @@ Commandline options and arguments understood for Pods2Site processing
     [ --workdirectory <path> ]
     [ --bindirectory <location> [ --bindirectory ... ] ]
     [ --libdirectory <location> [ --libdirectory ... ] ]
-    [ --core-include <query> ]
-    [ --script-include <query> ]
-    [ --pragma-include <query> ]
-    [ --module-include <query> ]
+    [ --group name=<query> [ --group name2=<query> ... ] ]
     [ --css <file> ]
     [ --title <title> ]
     [ --style <name> ]
-    <sitedirectory>
+    { <sitedirectory> || :std }
 
 =head1 OPTIONS AND ARGUMENTS
 
@@ -144,13 +141,17 @@ in order to make the pod docs navigatable. At minimum an F<index.html> is genera
 at least a TOC and possibly other pages. As this can be done in different fashions, this option allows
 you to select some different styles of viewing the pod docs.
 
-It uses 'style' names to select different internal implementations. The following is currently available:
+It uses 'style' names to select different internal implementations. The following are currently available:
  
 =over
 
 =item * :std
 
 This special name will use the currently defined default style. At present this is 'basicframes-simple-toc'.
+
+=item * none
+
+This 'style' does nothing; useful if you want to process the site with something external. 
 
 =item * basicframes-simple-toc
 
@@ -221,26 +222,106 @@ like paths listed in PERL5LIB etc.
 
 =back
 
-=item B<--xxx-include E<lt>queryE<gt>>
+=item B<--group E<lt>name=queryE<gt>>
 
-By default, all pods found will be converted to HTML. 
+The pods may be separated into groups. By default a grouping loosely similar to an ActivePerl installation
+will be used, e.g. 'Core', 'Scripts', 'Pragmas' and 'Other modules'.
 
-By providing a I<query> (see L<Grep::Query> for details on queries), a subset of pods can be selected.
+Any number of groups can be specified, and the query will be able to use fields to select which pods go where
+(see L<Grep::Query> for details of the query language). 
 
-Note that there are separate queries for the for categories of core pods, scripts, pragmas and other modules. 
+=over
+
+=item * type
+
+Contains a value of either 'bin' or 'lib', for pods found in the bin directories or lib directories.
+
+=item * name
+
+The package name for the pod.
+
+=item * path
+
+The full path to the pod file.
 
 =back
 
-=item B<sitedirectory>
+Note that the groups are independent, i.e. it's possible to have overlapping groups so if this is not desired,
+the queries must implement that (see the default group queries for examples).
 
-This is where the site should be created or updated.
+A common situation is to add a group with 'favourites', but keep the default grouping. Just place your own group(s)
+first and then add a '--group :std' for automatically filling in all the others. For a bit more control, each of the
+groups in ':std' can be used separately, e.g. as ':std-core'.
+ 
+The groups will maintain the order given.
 
-If the path doesn't exist, the full site will be created.
+Available internal groups:
+
+=over
+
+=item * :std-core
+
+Generally the pods named 'perlxxx' (in top and pods:: namespace).
+
+Corresponds to the query:
+
+  type.eq(lib) && name.regexp{^(?:pods::)?perl}
+
+=item * :std-scripts
+
+All pods found in the bin directories, plus the 'pp' module.
+
+Corresponds to the query:
+
+  type.eq(bin) || name.eq(pp)
+
+=item * :std-pragmas
+
+All pods starting with a lowercase letter (but not any selected by the other groups).
+
+Corresponds to the query:
+
+  type.eq(lib) &&
+    name.regexp{^[a-z]} &&
+    NOT
+        (
+            name.regexp{^(?:pods::)?perl} ||
+            name.eq(pp)
+        )
+
+=item * :std-modules
+
+All pods not selected by the other groups.
+
+Corresponds to the query:
+
+  NOT
+    (
+        type.eq(bin) ||
+        name.regexp{^(?:pods::)?perl} ||
+        name.eq(pp) ||
+        name.regexp{^[a-z]}
+    )
+
+=item * :std
+
+All of the above in the order: :std-core, :std-scripts, :std-pragmas, :std-modules.
+
+=back
+
+=back
+
+=item B<sitedirectory> or B<:std>
+
+This is where the site should be created or updated. If the path doesn't exist, the full site will be created.
 
 If the path exists, it must contain a site created by this tool, and will then be updated efficiently
-(e.g. only new/updated pods will be written, as necessary).
+(e.g. only new/updated pods will be written as necessary).
 In this case however, the listed L<"Sticky options"> above are not allowed on the command line.
 Instead they will be read from the site and reused as they were when the site was created.
+
+Use C<:std> for the sitedir 'pods2site' inside the Perl tree (will only work if you have write permissions
+there).
  
 =back
 

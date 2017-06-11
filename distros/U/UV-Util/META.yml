@@ -1,0 +1,35 @@
+---
+abstract: 'Some utility functions from libUV.'
+author:
+  - 'Chase Whitener <capoeirab@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '7.12'
+  Test::More: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '7.12'
+  File::Spec: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.28, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: UV-Util
+no_index:
+  directory:
+    - t
+    - inc
+    - examples
+    - t
+requires:
+  Carp: '0'
+  Exporter: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+resources:
+  IRC: irc://irc.perl.org/#perl
+  bugtracker: https://github.com/genio/p5-UV-Util
+  repository: https://github.com/genio/p5-UV-Util.git
+version: '0.002'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

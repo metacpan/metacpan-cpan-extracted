@@ -49,6 +49,6 @@
          "url" : "git://github.com/mamod/JavaScript-Duktape.git"
       }
    },
-   "version" : "v2.1.5",
+   "version" : "v2.2.0",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

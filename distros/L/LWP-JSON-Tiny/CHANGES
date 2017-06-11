@@ -1,3 +1,11 @@
+0.013 2017-06-02
+
+    [Compatibility]
+
+        Work completely with ancient versions of LWP (6.00 to 6.03 inclusive),
+        and don't fail the tests on earlier versions, just warn that
+        put_json and patch_json won't work.
+
 0.012 2017-05-28
 
     [Documentation]

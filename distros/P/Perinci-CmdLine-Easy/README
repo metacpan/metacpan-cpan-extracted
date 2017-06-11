@@ -9,7 +9,7 @@ SYNOPSIS
          summary => "List CPAN distributions that belong to an author",
          sub     => sub {
              my $cpanid = shift or die "Please supply CPAN ID\n";
-             my $res = get "http://api.metacpan.org/v0/release/_search?q=author:".
+             my $res = get "http://fastapi.metacpan.org/v1/release/_search?q=author:".
                  uc($cpanid)."%20AND%20status:latest&fields=name&size=5000"
                  or die "Can't query MetaCPAN";
              $res = $json->decode($res);

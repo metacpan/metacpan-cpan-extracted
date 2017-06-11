@@ -2,7 +2,7 @@
 # PODNAME: App::Prove::Plugin::TestRail
 
 package App::Prove::Plugin::TestRail;
-$App::Prove::Plugin::TestRail::VERSION = '0.040';
+$App::Prove::Plugin::TestRail::VERSION = '0.041';
 use strict;
 use warnings;
 use utf8;
@@ -55,7 +55,8 @@ sub load {
     $ENV{'TESTRAIL_SECTIONS'}  = $params->{sections};
     $ENV{'TESTRAIL_AUTOCLOSE'} = $params->{autoclose};
     $ENV{'TESTRAIL_ENCODING'}  = $params->{encoding};
-    $ENV{'TESTRIAL_CGROUP'}    = $params->{'configuration_group'};
+    $ENV{'TESTRAIL_CGROUP'}    = $params->{'configuration_group'};
+    $ENV{'TESTRAIL_TBAD'}      = $params->{'test_bad_status'};
     return $class;
 }
 
@@ -73,7 +74,7 @@ App::Prove::Plugin::TestRail - Upload your TAP results to TestRail in realtime
 
 =head1 VERSION
 
-version 0.040
+version 0.041
 
 =head1 SYNOPSIS
 
@@ -104,6 +105,7 @@ If \$HOME/.testrailrc exists, it will be parsed for any of these values in a new
     autoclose=0
     encoding=UTF-8
     configuration_group=Operating Systems
+    test_bad_status=blocked
 
 Note that passing configurations as filters for runs inside of plans are separated by colons.
 

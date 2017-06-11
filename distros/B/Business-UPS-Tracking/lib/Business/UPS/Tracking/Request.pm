@@ -35,13 +35,13 @@ Business::UPS::Tracking::Request - A tracking request
     ReferenceNumber       => 'myreferencenumber',
     DestinationPostalCode => '1020',
   );
-  
+
 =head1 DESCRIPTION
 
 This class represents a UPS tracking request. You can search either for a
 UPS TrackingNumber or for a custom ReferenceNumber. Since ReferenceNumbers are
 not guaranteed to be unique you can provide additional parameters to narrow
-the ReferenceNumber search. 
+the ReferenceNumber search.
 
 You have to provide either a ReferenceNumber or a TrackingNumber.
 
@@ -55,7 +55,7 @@ L<Business::UPS::Tracking> object.
 
 UPS tracking number. This number has to start with '1Z' and have a valid
 checksum. You can globally turn off this check by setting
-C<$Business::UPS::Tracking::CHECKSUM = 0> (which is not recommended, 
+C<$Business::UPS::Tracking::CHECKSUM = 0> (which is not recommended,
 but eg. needed for testing since test shipments at the UPS server do not
 have a valid checksum)
 
@@ -73,7 +73,7 @@ Shipment destination postal code. Only in combination with L<ReferenceNumber>.
 
 =head2 DestinationCountryCountry
 
-Shipment destination country (<>ISO 3166-1 alpha-2)s. Only in combination 
+Shipment destination country (<>ISO 3166-1 alpha-2)s. Only in combination
 with L<ReferenceNumber>.
 
 =head2 OriginPostalCode
@@ -82,7 +82,7 @@ Shipment origin postal code. Only in combination with L<ReferenceNumber>.
 
 =head2 OriginCountryCode
 
-Shipment origin country (ISO 3166-1 alpha-2). Only in combination 
+Shipment origin country (ISO 3166-1 alpha-2). Only in combination
 with L<ReferenceNumber>.
 
 =head2 ShipmentIdentificationNumber
@@ -101,7 +101,7 @@ object. Only in combination with L<ReferenceNumber>.
 
 =head2 ShipmentType
 
-Type of shipment. '01' small packackage or '02' freight. Only in combination 
+Type of shipment. '01' small packackage or '02' freight. Only in combination
 with L<ReferenceNumber>.
 
 =head2 CustomerContext
@@ -110,7 +110,7 @@ Arbitraty string that will be echoed back by UPS webservice.
 
 =head2 IncludeFreight
 
-Indicates whether the search should only include freight or small package 
+Indicates whether the search should only include freight or small package
 only. The default is small package only.
 
 =cut
@@ -275,7 +275,7 @@ sub tracking_request {
 
  my $response = $request->run;
 
-Executes the request and returns either an exception or a 
+Executes the request and returns either an exception or a
 L<Business::UPS::Tracking::Response> object.
 
 =cut
@@ -305,8 +305,8 @@ sub run {
                 );
             } catch {
                 my $e = $_;
-                if (defined $e 
-                    && ref $e 
+                if (defined $e
+                    && ref $e
                     && $e->isa('Business::UPS::Tracking::X')) {
                     $e->rethrow();
                 } else {

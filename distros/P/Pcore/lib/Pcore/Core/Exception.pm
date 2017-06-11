@@ -2,7 +2,6 @@ package Pcore::Core::Exception;
 
 use Pcore -export => {    #
     DEFAULT => [qw[croak cluck]],
-    TRY     => [qw[try catch]],
 };
 use Carp qw[];
 use Pcore::Core::Exception::Object;
@@ -12,7 +11,7 @@ our $IGNORE_ERRORS = 1;    # do not write errors to error log channel by default
 # needed to properly destruct TEMP_DIR
 $SIG->{INT} = AE::signal INT => \&SIGINT;
 
-# needed to properly destruct TEMP_DIR
+# required for properly remove TEMP_DIR
 $SIG->{TERM} = AE::signal TERM => \&SIGTERM;
 
 $SIG{__DIE__} = \&SIGDIE;    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
@@ -46,43 +45,36 @@ sub SIGTERM {
 
 # SIGNALS
 sub SIGDIE {
-    my $e = Pcore::Core::Exception::Object->new( $_[0], level => 'ERROR', skip_frames => 1, trace => 1 );
+    my $e = Pcore::Core::Exception::Object->new( $_[0], level => 'ERROR', skip_frames => 1, with_trace => 1 );
 
-    if ( $^S && $e->is_ae_cb_error ) {
-
-        # error in AE callback
+    # error in AE callback
+    if ( $^S && $e->{is_ae_cb_error} ) {
         {
             local $@;
 
-            eval {    #
-                $e->sendlog( channel => 'fatal', force => 1 );
-            };
+            eval { $e->sendlog('FATAL') };
         }
 
-        return CORE::die $e;    # set $@ = $e
+        return CORE::die $e;    # set $@ to $e
     }
+
+    # ERROR, !defined $^S - parsing module, eval, or main program, true - executing an eval
     elsif ( !defined $^S || $^S ) {
-
-        # ERROR, !defined $^S - parsing module, eval, or main program, true - executing an eval
-        {
+        if ( !$IGNORE_ERRORS ) {
             local $@;
 
-            eval {              #
-                $e->sendlog( channel => 'error' ) unless $IGNORE_ERRORS;
-            };
+            eval { $e->sendlog('ERROR') };
         }
 
-        return CORE::die $e;    # set $@ = $e
+        return CORE::die $e;    # set $@ to $e
     }
-    else {
 
-        # FATAL
+    # FATAL
+    else {
         {
             local $@;
 
-            eval {              #
-                $e->sendlog( channel => 'fatal', force => 1 );
-            };
+            eval { $e->sendlog('FATAL') };
         }
 
         exit $e->exit_code;
@@ -94,12 +86,12 @@ sub SIGWARN {
     # skip AE callback error warning
     return if $_[0] =~ /\AEV: error in callback/sm;
 
-    my $e = Pcore::Core::Exception::Object->new( $_[0], level => 'WARN', skip_frames => 1, trace => 1 );
+    my $e = Pcore::Core::Exception::Object->new( $_[0], level => 'WARN', skip_frames => 1, with_trace => 1 );
 
     {
         local $@;
 
-        $e->sendlog( channel => 'warn' );
+        $e->sendlog('WARN');
     }
 
     return;    # skip standard warn behaviour
@@ -124,7 +116,7 @@ sub croak {
         $msg = 'Died';
     }
 
-    my $e = Pcore::Core::Exception::Object->new( $msg, level => 'ERROR', skip_frames => 1, trace => 0 );
+    my $e = Pcore::Core::Exception::Object->new( $msg, level => 'ERROR', skip_frames => 1, with_trace => 0 );
 
     return CORE::die $e;
 }
@@ -148,62 +140,9 @@ sub cluck {
         $msg = q[Warning: something's wrong];
     }
 
-    my $e = Pcore::Core::Exception::Object->new( $msg, level => 'WARN', skip_frames => 1, trace => 0 );
+    my $e = Pcore::Core::Exception::Object->new( $msg, level => 'WARN', skip_frames => 1, with_trace => 0 );
 
     return CORE::warn $e;
-}
-
-# TRY / CATCH
-sub try ( $try, $catch = undef ) : prototype(&@) {
-    my $wantarray = wantarray;
-
-    my $prev_error = $@;
-
-    my @res;
-
-    my $failed = not eval {
-
-        # we should create exception object manually, because __DIE__ will not work if try/catch will called from __DIE__ handler
-        local $SIG{__DIE__} = undef;
-
-        # make previous $@ accesible inside eval, eval clean $@ before start
-        $@ = $prev_error;    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
-
-        if ($wantarray) {
-            @res = $try->();
-        }
-        elsif ( defined $wantarray ) {
-            $res[0] = $try->();
-        }
-        else {
-            $try->();
-        }
-
-        return 1;
-    };
-
-    # error handling
-    if ($failed) {
-        my $e = Pcore::Core::Exception::Object->new( $@, level => 'ERROR', skip_frames => 1, trace => 1 );
-
-        if ($catch) {
-            if ($wantarray) {
-                @res = $catch->($e);
-            }
-            elsif ( defined $wantarray ) {
-                $res[0] = $catch->($e);
-            }
-            else {
-                $catch->($e);
-            }
-        }
-    }
-
-    return $wantarray ? @res : $res[0];
-}
-
-sub catch ($code) : prototype(&) {
-    return $code;
 }
 
 1;
@@ -213,9 +152,9 @@ sub catch ($code) : prototype(&) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 55, 68, 81, 100      | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
+## |    3 | 53, 64, 75, 92       | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 57, 70, 83           | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 55, 66, 77           | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -1,146 +1,120 @@
-NAME
-    PDLx::DetachedObject - parent class for subclassing PDL from class
-    frameworks
+PDLx::DetachedObject
 
-SYNTAX
-   Moo
-       package MyPDL;
+PDLx::DetachedObject provides a minimal shim between PDL and
+object-orientation frameworks. Directly subclassing PDL is tricky, as a
+PDL object (a piddle) is a blessed scalar, not a blessed hash. PDL
+provides an alternate means of subclassing; this class encapsulates that
+prescription.
 
-       use Moo;
-       use PDL::Lite;
+For Moo based classes, see MooX::PDL2, which provides a more integrated
+approach.
 
-       extends 'PDLx::DetachedObject';
+  Background
 
-       has PDL => ( is => 'rw' );
+Because a PDL object is a blessed scalar, outside of using inside-out
+classes as the subclass, there is no easy means of adding extra
+attributes to the object.
 
-   Class::Tiny
-        package MyPDL;
+To work around this, PDL will treat any hash blessed into a subclass of
+PDL which has an entry with key "PDL" whose value is a real PDL object
+as a PDL object.
 
-        use Class::Tiny qw[ PDL ];
+So far, here's a Moo version of the class
 
-        use parent 'PDLx::DetachedObject';
+   package MyPDL;
 
-   Object::Tiny
-        package MyPDL;
+   use Moo;
 
-        use Object::Tiny qw[ PDL ];
+   extends 'PDL';
 
-        use parent 'PDLx::DetachedObject';
+   # don't pass any constructor arguments to PDL->new; it confuses it
+   sub FOREIGNBUILDARGS {}
 
-   Class::Accessor
-        package MyPDL;
+   has PDL => ( is => 'rw' );
+   has required_attr => ( is => 'ro', required =>1 );
 
-        use parent 'Class::Accessor', 'PDLx::DetachedObject';
-        __PACKAGE__->follow_best_practice;
-        __PACKAGE__->mk_accessors( 'PDL' );
+When PDL needs to instantiate an object from the subclass, it doesn't
+call the subclass's constructor, rather it calls the initialize class
+method, which is expected to return a hash, blessed into the subclass,
+containing the "PDL" key as well as any other attributes.
 
-    or with Antlers:
+  sub initialize {
+    my $class = shift;
+    bless { PDL => PDL->null }, $class;
+  }
 
-        package MyPDL;
-        use Class::Accessor "antlers";
-        use parent 'PDLx::DetachedObject';
+The initialize method is invoked in a variety of places. For instance,
+it's called in PDL::new, which due to Moo's inheritance scheme will be
+called by MyPDL's constructor:
 
-        has PDL => ( is => 'ro' );
+  $mypdl = MyPDL->new( required_attr => 2 );
 
-DESCRIPTION
-    PDL has a non-standard way of handling subclasses. Because a PDL object
-    is a blessed scalar, outside of using inside-out classes as the
-    subclass, there is no easy means of adding extra attributes to the
-    object.
+It's also called when PDL needs to create an object to receive the
+results of a PDL operation on a MyPDL object:
 
-    To work around this, PDL will treat any hash blessed into a subclass of
-    PDL which has an entry with key "PDL" whose value is a real PDL object
-    as a PDL object.
+  $newpdl = $mypdl + 1;
 
-    So far, here's a Moo version of the class
+There's one wrinkle, however. PDL *must* create an object without any
+extra attributes (it cannot know which values to give them) so
+initialize() is called with a *single* argument, the class name. This
+means that $newpdl will be an *incomplete* MyPDL object, i.e.
+"required_attr" is uninitialized. This can *really* confuse polymorphic
+code which operates differently when handed a PDL or MyPDL object.
 
-       package MyPDL;
+One way out of this dilemma is to have PDL create a *normal* piddle
+instead of a MyPDL object. MyPDL has explicitly indicated it wants to be
+treated as a normal piddle in PDL operations (by subclassing from PDL)
+so this doesn't break that contract.
 
-       use Moo;
+  $newpdl = $mypdl + 1;
 
-       extends 'PDL';
+would result in $newpdl being a normal PDL object, not a MyPDL object.
 
-       # don't pass any constructor arguments to PDL->new; it confuses it
-       sub FOREIGNBUILDARGS {}
+Subclassing from PDLx::DetachedObject effects this behavior.
+PDLx::DetachedObject provides a wrapper constructor and an initialize
+class method. The constructor ensures returns a properly subclassed hash
+with the "PDL" key, keeping PDL happy. When PDL calls the initialize
+function it gets a normal PDL.
 
-       has PDL => ( is => 'rw' );
-       has required_attr => ( is => 'ro', required =>1 );
+  Classes without required constructor parameters
 
-    When PDL needs to instantiate an object from the subclass, it doesn't
-    call the subclass's constructor, rather it calls the initialize class
-    method, which is expected to return a hash, blessed into the subclass,
-    containing the "PDL" key as well as any other attributes.
+If your class does *not* require parameters be passed to the
+constructor, it is safe to overload the "initialize" method to return a
+fully fledged instance of your class:
 
-      sub initialize {
-        my $class = shift;
-        bless { PDL => PDL->null }, $class;
-      }
-
-    The initialize method is invoked in a variety of places. For instance,
-    it's called in PDL::new, which due to Moo's inheritance scheme will be
-    called by MyPDL's constructor:
-
-      $mypdl = MyPDL->new( required_attr => 2 );
-
-    It's also called when PDL needs to create an object to recieve the
-    results of a PDL operation on a MyPDL object:
-
-      $newpdl = $mypdl + 1;
-
-    There's one wrinkle, however. PDL *must* create an object without any
-    extra attributes (it cannot know which values to give them) so
-    initialize() is called with a *single* argument, the class name. This
-    means that $newpdl will be an *incomplete* MyPDL object, i.e.
-    "required_attr" is uninitiailzed. This can *really* confuse polymorphic
-    code which operates differently when handed a PDL or MyPDL object.
-
-    One way out of this dilemma is to have PDL create a *normal* piddle
-    instead of a MyPDL object. MyPDL has explicitly indicated it wants to be
-    treated as a normal piddle in PDL operations (by subclassing from PDL)
-    so this doesn't break that contract.
-
-      $newpdl = $mypdl + 1;
-
-    would result in $newpdl being a normal PDL object, not a MyPDL object.
-
-    Subclassing from PDLx::DetachedObject effects this behavior.
-    PDLx::DetachedObject provides a wrapper constructor and an initialize
-    class method. The constructor ensures returns a properly subclassed hash
-    with the "PDL" key, keeping PDL happy. When PDL calls the initialize
-    function it gets a normal PDL.
+ sub initialize { shift->new() }
 
   Using with Class Frameworks
-    The "SYNOPSIS" shows how to use PDLx::DetachedObject with various class
-    frameworks. The key differentiation between frameworks is whether or not
-    they will call a superclass's constructor. Moo always calls it,
-    Class::Tiny calls it only if it inherits from Class::Tiny::Object, and
-    Object::Tiny and Class::Accessor never will call the superclass'
-    constructor.
 
-BUGS AND LIMITATIONS
-    Please report any bugs or feature requests to
-    "bug-pdlx-mask@rt.cpan.org", or through the web interface at
-    <http://rt.cpan.org/Public/Dist/Display.html?Name=PDLx-DetachedObject>.
+The "SYNOPSIS" shows how to use PDLx::DetachedObject with various class
+frameworks. The key differentiation between frameworks is whether or not
+they will call a superclass's constructor. Moo always calls it,
+Class::Tiny calls it only if it inherits from Class::Tiny::Object, and
+Object::Tiny and Class::Accessor never will call the superclass'
+constructor.
 
-VERSION
-    Version 0.01
+INSTALLATION
 
-LICENSE AND COPYRIGHT
-    Copyright (c) 2016 The Smithsonian Astrophysical Observatory
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
 
-    PDLx::DetachedObject is free software: you can redistribute it and/or
-    modify it under the terms of the GNU General Public License as published
-    by the Free Software Foundation, either version 3 of the License, or (at
-    your option) any later version.
+  cpanm .
+  cpan  .
+  cpanp -i .
 
-    This program is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
-    Public License for more details.
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
 
-    You should have received a copy of the GNU General Public License along
-    with this program. If not, see <http://www.gnu.org/licenses/>.
+  perl Makefile.PL
+  make
+  make test
+  make install
 
-AUTHOR
-    Diab Jerius <djerius@cpan.org>
+COPYRIGHT AND LICENSE
 
+This software is Copyright (c) 2016 by Smithsonian Astrophysical
+Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007

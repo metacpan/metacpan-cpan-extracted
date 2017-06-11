@@ -66,6 +66,7 @@ lib/Alien/Build/Plugin/Build/MSYS.pm
 lib/Alien/Build/Plugin/Build/SearchDep.pm
 lib/Alien/Build/Plugin/Core.pod
 lib/Alien/Build/Plugin/Core/Download.pm
+lib/Alien/Build/Plugin/Core/FFI.pm
 lib/Alien/Build/Plugin/Core/Gather.pm
 lib/Alien/Build/Plugin/Core/Legacy.pm
 lib/Alien/Build/Plugin/Core/Setup.pm
@@ -116,6 +117,7 @@ t/alien_build_plugin_build_autoconf.t
 t/alien_build_plugin_build_msys.t
 t/alien_build_plugin_build_searchdep.t
 t/alien_build_plugin_core_download.t
+t/alien_build_plugin_core_ffi.t
 t/alien_build_plugin_core_gather.t
 t/alien_build_plugin_core_legacy.t
 t/alien_build_plugin_core_setup.t

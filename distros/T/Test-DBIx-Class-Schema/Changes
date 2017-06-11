@@ -1,5 +1,7 @@
 This file documents the revision history for Test::DBIx::Class::Schema.
 
+1.0.11    2017-06-05 04:37:31-04:00 America/New_York
+
 1.0.10    2016-05-12 05:01:56-04:00 America/New_York
  - replace ContributorsFromGit with Git::Contributors
  - bump minimum Test::More version to 1.302015

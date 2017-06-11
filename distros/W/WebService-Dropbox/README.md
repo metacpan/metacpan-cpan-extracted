@@ -541,7 +541,7 @@ my $result = $dropbox->save_url_check_job_status($async_job_id);
 
 [https://www.dropbox.com/developers/documentation/http/documentation#files-save\_url-check\_job\_status](https://www.dropbox.com/developers/documentation/http/documentation#files-save_url-check_job_status)
 
-### search($path \[, \\%optional\_params\])
+### search($path, $query, \[, \\%optional\_params\])
 
 Searches for files and folders.
 
@@ -550,8 +550,7 @@ Note: Recent changes may not immediately be reflected in search results due to a
 ```perl
 my $result = $dropbox->search($path);
 
-my $result = $dropbox->search($path, {
-    query => 'prime numbers',
+my $result = $dropbox->search($path, 'prime numbers', {
     start => 0,
     max_results => 100,
     mode => 'filename'
@@ -589,9 +588,9 @@ Uploads large files by upload\_session API
 # File Handle
 my $content = IO::File->new('./mysql.dump', '<');
 
-my $result = $dropbox->upload($path, $content);
+my $result = $dropbox->upload_session($path, $content);
 
-my $result = $dropbox->upload($path, $content, {
+my $result = $dropbox->upload_session($path, $content, {
     mode => 'add',
     autorename => JSON::true,
     mute => JSON::false

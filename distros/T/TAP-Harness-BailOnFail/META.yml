@@ -1,0 +1,25 @@
+---
+abstract: 'Bail on remaining tests after first failure'
+author:
+  - 'gray <gray@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.2901, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: TAP-Harness-BailOnFail
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  TAP::Harness::Restricted: '0'
+resources:
+  repository: https://github.com/gray/tap-harness-bailonfail
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -22,8 +22,6 @@ the semantics and interface have changed slightly.
 
 - The default lat/lon is now WGS84
 
-- OSGB.pm no longer exports an ':all' tag
-
 - The functions `shift_ll_into_WGS84` and `shift_ll_from_WGS84` are 
   no longer provided (or needed)
  
@@ -64,7 +62,7 @@ None.
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2002-2016 Toby Thurston
+Copyright (C) 2002-2017 Toby Thurston
 
 OSTN02 transformation data included in this module is freely available
 from the Ordnance Survey but remains Crown Copyright (C) 2002

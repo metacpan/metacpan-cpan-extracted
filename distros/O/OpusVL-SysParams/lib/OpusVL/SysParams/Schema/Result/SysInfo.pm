@@ -8,7 +8,7 @@ use MooseX::NonMoose;
 use namespace::autoclean;
 use JSON;
 use Data::Munge qw/elem/;
-use Scalar::Util qw/reftype/;
+use Scalar::Util qw/reftype looks_like_number/;
 extends 'DBIx::Class::Core';
 
 __PACKAGE__->load_components("InflateColumn::DateTime", "TimeStamp");
@@ -123,6 +123,12 @@ sub set_type_from_value {
         elsif (reftype $value eq 'ARRAY') {
             $self->data_type('array');
         }
+        elsif ( reftype $value eq 'SCALAR' 
+            and looks_like_number($$value)
+            and ($$value == 0 or $$value == 1) )
+        {
+            $self->data_type('bool');
+        }
         else {
             warn "Cannot determine type for " . $self->name . " given " . reftype $value . ".";
         }
@@ -153,7 +159,7 @@ OpusVL::SysParams::Schema::Result::SysInfo
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 ACCESSORS
 

@@ -107,7 +107,7 @@ sub fromFile {
       elsif (/^%%\$DDC:index\[([0-9]+)\]=Pos\b/ || /^%%\$DDC:index\[([0-9]+)\]=\S+ page$/) {
 	$pagef = $doc->{pagef} = $1;
       }
-      elsif (/^%%\$DDC:BREAK.([^=]+)/) {
+      elsif (/^%%\$DDC:BREAK.([^=\[\]]+)/) {
 	push(@$tokens,"#$1");
       }
       elsif (/^%%\$DDC:PAGE=/) {

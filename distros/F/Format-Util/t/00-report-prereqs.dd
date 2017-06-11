@@ -6,7 +6,8 @@ do { my $x = {
                   },
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '6.48'
+                                        'ExtUtils::MakeMaker' => '6.48',
+                                        'File::ShareDir::Install' => '0.06'
                                       }
                       },
        'develop' => {
@@ -25,9 +26,12 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Encode' => '0',
+                                      'File::ShareDir' => '0',
+                                      'Math::BigFloat' => '0',
                                       'Math::BigInt' => '0',
                                       'POSIX' => '0',
                                       'Scalar::Util' => '0',
+                                      'YAML::XS' => '0',
                                       'perl' => '5.014000'
                                     }
                     },

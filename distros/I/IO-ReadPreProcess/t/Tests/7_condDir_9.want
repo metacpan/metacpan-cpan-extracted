@@ -1,0 +1,23 @@
+Read line: 'The man in the moon' - EOF = 0
+After if
+
+Expected read EOF - 1
+2 echo commands read in .while loop:
+Read line '1'
+Read line '2'
+Read line '3'
+2 echo read in .for loop:
+Read line '4'
+Read line '5'
+Read line '6'
+Defined .a
+Run .a
+2 echo commands read in .while loop in a .sub:
+Read line '9'
+Read line '10'
+Read line '11'
+2 echo read in .for loop in a .sub:
+Read line '13'
+Read line '14'
+Read line '15'
+EOF

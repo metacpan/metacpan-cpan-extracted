@@ -10,7 +10,8 @@ use JSON::MaybeXS;
 use LWP;
 use LWP::UserAgent::JSON;
 
-our $VERSION = '0.012';
+# Have you updated the version number in the POD below?
+our $VERSION = '0.013';
 $VERSION = eval $VERSION;
 
 =head1 NAME
@@ -19,7 +20,7 @@ LWP::JSON::Tiny - use JSON natively with LWP objects
 
 =head1 VERSION
 
-This is version 0.012.
+This is version 0.013.
 
 =head1 SYNOPSIS
 
@@ -155,7 +156,7 @@ best place to look for suggestions and feedback.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2015 Sam Kington.
+Copyright (c) 2015-2017 Sam Kington.
 
 =head1 LICENSE
 

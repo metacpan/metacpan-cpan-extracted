@@ -1,0 +1,76 @@
+{
+   "abstract" : "It's hash manipulation module",
+   "author" : [
+      "matsumura-taichi <hiroto.in.the.cromagnons@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.11",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Hash-Unique",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Hash::Unique" : {
+         "file" : "lib/Hash/Unique.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/matsumura-taichi/Hash-Unique/issues"
+      },
+      "homepage" : "https://github.com/matsumura-taichi/Hash-Unique",
+      "repository" : {
+         "url" : "git://github.com/matsumura-taichi/Hash-Unique.git",
+         "web" : "https://github.com/matsumura-taichi/Hash-Unique"
+      }
+   },
+   "version" : "0.06",
+   "x_contributors" : [
+      "K <x00.x7f@gmail.com>"
+   ],
+   "x_static_install" : 1
+}

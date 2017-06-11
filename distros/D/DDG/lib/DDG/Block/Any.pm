@@ -1,7 +1,7 @@
 package DDG::Block::Any;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: EXPERIMENTAL
-$DDG::Block::Any::VERSION = '1016';
+$DDG::Block::Any::VERSION = '1017';
 use Moo;
 use Carp;
 with qw( DDG::Block );
@@ -41,7 +41,7 @@ DDG::Block::Any - EXPERIMENTAL
 
 =head1 VERSION
 
-version 1016
+version 1017
 
 =head1 AUTHOR
 

@@ -1,0 +1,47 @@
+{
+   "abstract" : "Blind ECDSA Signatures",
+   "author" : [
+      "Ashish Gulhati <crypt-ecdsab at hash.neo.tc>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Crypt-ECDSA-Blind",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Bytes::Random::Secure" : "0",
+            "DBD::SQLite" : "1.54",
+            "DBI" : "0",
+            "Digest::SHA" : "5.95",
+            "Math::EllipticCurve::Prime" : "0.003"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.014",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

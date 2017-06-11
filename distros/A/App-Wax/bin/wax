@@ -135,7 +135,7 @@ Node.js man-page viewer
 
     node_version=${NODE_VERSION:-`node --version`}
     docroot="https://cdn.rawgit.com/nodejs/node/$node_version/doc/api"
-    wax -D --cache pandoc --standalone --from markdown --to man "$docroot/$1.md" | man -l -
+    wax --cache -D pandoc --standalone --from markdown --to man "$docroot/$1.md" | man -l -
 
 =head1 CAVEATS
 
@@ -157,7 +157,7 @@ URLs e.g:
 
 =head1 VERSION
 
-1.1.0
+1.1.1
 
 =head1 SEE ALSO
 
@@ -177,7 +177,7 @@ chocolateboy <chocolate@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2016 by chocolateboy
+Copyright (C) 2010-2017 by chocolateboy
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.1 or,

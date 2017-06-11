@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::IniFile;
-$Config::Model::Backend::IniFile::VERSION = '2.103';
+$Config::Model::Backend::IniFile::VERSION = '2.105';
 use Carp;
 use Mouse;
 use 5.10.0;
@@ -231,7 +231,7 @@ sub _write_list{
                                                     $obj_note . $note );
             }
             else {
-                $logger->debug("NOT writing undef or empty list elt");
+                $logger->trace("NOT writing undef or empty list elt");
             }
         }
     }
@@ -285,7 +285,7 @@ sub _write_leaf{
         $res .= $self->write_data_and_comments( undef, $delimiter, "$elt$assign_with$v", $obj_note );
     }
     else {
-        $logger->debug("NOT writing undef or empty leaf elt");
+        $logger->trace("NOT writing undef or empty leaf elt");
     }
     return $res;
 }
@@ -412,7 +412,7 @@ Config::Model::Backend::IniFile - Read and write config as a INI file
 
 =head1 VERSION
 
-version 2.103
+version 2.105
 
 =head1 SYNOPSIS
 

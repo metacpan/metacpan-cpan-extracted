@@ -3,6 +3,8 @@ use strict;
 use warnings;
 use lib qw(lib ../lib/ ../../hg_Gtk2-Ex-DbLinker-DbTools/lib/);
 use Gtk2 -init;
+use Log::Any::Adapter;
+
 use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($DEBUG);
 #use Devel::Cycle;
@@ -11,6 +13,8 @@ Log::Log4perl->easy_init($DEBUG);
 use Forms::Langues1;
 
 use DBI;
+
+Log::Any::Adapter->set('Log::Log4perl');
 
 my $dbfile = "./data/ex1";
 

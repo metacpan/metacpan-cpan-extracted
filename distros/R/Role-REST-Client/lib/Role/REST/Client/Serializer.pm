@@ -1,5 +1,5 @@
 package Role::REST::Client::Serializer;
-$Role::REST::Client::Serializer::VERSION = '0.19';
+$Role::REST::Client::Serializer::VERSION = '0.22';
 use Try::Tiny;
 use Moo;
 use Types::Standard qw(Enum InstanceOf);
@@ -61,7 +61,7 @@ sub serialize {
 	try {
 		$result = $self->serializer->serialize($data)
 	} catch {
-		warn "Couldn't serialize data with " . $self->type;
+		warn "Couldn't serialize data with " . $self->type . ": $_";
 	};
 
 	return $result;
@@ -75,7 +75,10 @@ sub deserialize {
 	try {
 		$result = $self->serializer->deserialize($data);
 	} catch {
-		warn "Couldn't deserialize data with " . $self->type;
+        use Data::Dumper 'Dumper';
+        $Data::Dumper::Maxdepth = 4;
+        warn 'Data was ' . Dumper([ $data ]), ' ';
+		warn "Couldn't deserialize data with " . $self->type . ": $_";
 	};
 
 	return $result;
@@ -95,7 +98,7 @@ Role::REST::Client::Serializer
 
 =head1 VERSION
 
-version 0.19
+version 0.22
 
 =head1 AUTHOR
 
@@ -103,7 +106,7 @@ Kaare Rasmussen <kaare at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Kaare Rasmussen.
+This software is copyright (c) 2017 by Kaare Rasmussen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

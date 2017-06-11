@@ -177,7 +177,7 @@ SKIP: {
     skip "Date::Holidays::GB not installed", 7 if $@;
 
     ok( $holidays_hashref->{'gb'}, 'Checking for English holiday' );
-    
+
     can_ok('Date::Holidays::GB', qw(holidays is_holiday));
 
     ok( my $holidays_hashref_sct = Date::Holidays::GB::holidays(year => 2014, regions => ['SCT']));
@@ -213,6 +213,23 @@ SKIP: {
 
     ok( Date::Holidays::RU->can('holidays') );
     ok( Date::Holidays::RU->can('is_holiday') );
+}
+
+SKIP: {
+    eval { load Date::Holidays::BY };
+    skip "Date::Holidays::BY not installed", 3 if $@;
+
+    my $holidays_hashref = Date::Holidays->is_holiday(
+        year  => 2017,
+        month => 1,
+        day   => 1,
+        countries => [ 'by' ],
+    );
+
+    ok( $holidays_hashref->{by}, 'Checking for Belarys New Year' );
+
+    ok( Date::Holidays::BY->can('holidays') );
+    ok( Date::Holidays::BY->can('is_holiday') );
 }
 
 done_testing();

@@ -11,15 +11,19 @@ use Text::CSV;
 use URI;
 # use URI::Escape qw{ uri_escape };
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 {
 
 ##  my %valid_arg = map { $_ => 1 } qw{ debug interface ua };
     my %valid_arg = map { $_ => 1 } qw{ debug ua };
 
+    my $warned;
     sub new {
 	my ( $class, %args ) = @_;
+	$warned++
+	    or carp( 'Geo::Coder::Geocoder::US is being retracted, because the underlying web site no longer exists' );
+
 	ref $class
 	    and $class = ref $class;
 
@@ -325,15 +329,13 @@ site, B<this code does nothing, and does it slowly since the query must
 time out.>
 
 Consequently, I am putting this module through a deprecation cycle.
-Currently, the installer warns when you install this module. Beginning
-with the first release after June 1 2017, the first call to
-L<new()|/new> will produce a warning (i.e. C<Carp::carp()>.) With the
-first release on or after December 1 2017, every call to L<new()|/new>
-will warn with stack trace (i.e.  C<Carp::cluck()>,) and it will warn
-when loaded. With the first release after June 1 2018, loading this
-module will produce a fatal error.  On or after the first of December
-2018 I will delete this module from CPAN.  It will still be available
-via BackPAN
+Currently, the installer warns when you install this module, as does the
+first call to L<new()|/new>.  With the first release on or after
+December 1 2017, every call to L<new()|/new> will warn with stack trace
+(i.e. C<Carp::cluck()>,) and it will warn when loaded. With the first
+release after June 1 2018, loading this module will produce a fatal
+error.  On or after the first of December 2018 I will delete this module
+from CPAN. It will still be available via BackPAN
 (L<http://backpan.perl.org/authors/id/W/WY/WYANT/>) or GitHub
 (L<https://github.com/trwyant/perl-Geo-Coder-Geocoder-US>.)
 
@@ -444,7 +446,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2016 by Thomas R. Wyant, III
+Copyright (C) 2011-2017 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

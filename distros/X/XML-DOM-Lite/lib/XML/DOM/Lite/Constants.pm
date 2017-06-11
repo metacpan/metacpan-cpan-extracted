@@ -1,7 +1,9 @@
 package XML::DOM::Lite::Constants;
+use warnings;
+use strict;
 
 require Exporter;
-@ISA = qw(Exporter);
+our @ISA = qw(Exporter);
 
 our @filterActions = qw(FILTER_ACCEPT FILTER_REJECT FILTER_SKIP);
 our @nodeTypes = qw(
@@ -64,9 +66,9 @@ use constant DOCUMENT_TYPE_NODE          => 10;
 use constant DOCUMENT_FRAGMENT_NODE      => 11;
 use constant NOTATION_NODE               => 12;
 
-@EXPORT_OK = (@nodeTypes, @filterActions, @showTypes);
+our @EXPORT_OK = (@nodeTypes, @filterActions, @showTypes);
 
-%EXPORT_TAGS = (
+our %EXPORT_TAGS = (
     nodeTypes     => \@nodeTypes,
     filterActions => \@filterActions,
     showTypes     => \@showTypes,

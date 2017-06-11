@@ -5,9 +5,9 @@ package Date::Manip::Zones;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Wed Mar  1 10:25:48 EST 2017
-#    Data version: tzdata2017a
-#    Code version: tzcode2017a
+#    Generated on: Tue May 30 10:45:15 EDT 2017
+#    Data version: tzdata2017b
+#    Code version: tzcode2017b
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -18,7 +18,7 @@ use warnings;
 require 5.010000;
 
 our ($VERSION);
-$VERSION='6.58';
+$VERSION='6.59';
 END { undef $VERSION; }
 
 our ($TzdataVersion,$TzcodeVersion,
@@ -37,8 +37,8 @@ END {
    undef %Offmod;
 }
 
-$TzdataVersion = 'tzdata2017a';
-$TzcodeVersion = 'tzcode2017a';
+$TzdataVersion = 'tzdata2017b';
+$TzcodeVersion = 'tzcode2017b';
 $FirstDate     = '0001010200:00:00';
 $LastDate      = '9999123100:00:00';
 $LastYear      = '2067';
@@ -1996,11 +1996,11 @@ $LastYear      = '2067';
                      'america/indiana/winamac',
                      'america/thunder_bay',
                      'america/iqaluit',
+                     'america/port-au-prince',
                      'america/pangnirtung',
                      'america/kentucky/monticello',
                      'america/indiana/petersburg',
                      'america/grand_turk',
-                     'america/port-au-prince',
                      'america/cancun',
                      'america/jamaica',
                      'america/indiana/tell_city',
@@ -2210,12 +2210,12 @@ $LastYear      = '2067';
                      'america/regina' ],
   'mest'        => [ 'met' ],
   'met'         => [ 'met' ],
-  'mmt'         => [ 'indian/maldives',
+  'mmt'         => [ 'africa/monrovia',
+                     'indian/maldives',
                      'america/managua',
                      'asia/makassar',
                      'europe/minsk',
                      'america/montevideo',
-                     'africa/monrovia',
                      'europe/moscow',
                      'asia/colombo' ],
   'mpt'         => [ 'america/denver',

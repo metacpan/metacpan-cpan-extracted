@@ -2,8 +2,9 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = '../lib';
-    require './test.pl'; require './charset_tools.pl';
+    require './test.pl';
+    set_up_inc('../lib');
+    require './charset_tools.pl';
 }
 
 my $tests_count = 148;
@@ -123,7 +124,7 @@ is ($_, "\x{1234}");
 my @stuff = qw(this that);
 is (chop(@stuff[0,1]), 't');
 
-# bug id 20010305.012
+# bug id 20010305.012 (#5972)
 @stuff = qw(ab cd ef);
 is (chop(@stuff = @stuff), 'f');
 

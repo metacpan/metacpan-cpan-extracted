@@ -1,4 +1,4 @@
-#!/home/ben/software/install/bin/perl
+#!/usr/bin/env perl
 use warnings;
 use strict;
 use JSON::Parse '0.38', 'parse_json';

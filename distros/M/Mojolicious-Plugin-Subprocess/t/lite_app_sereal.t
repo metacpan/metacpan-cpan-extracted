@@ -1,14 +1,12 @@
 use Mojolicious::Lite;
 use Test::More;
 use Test::Mojo;
-use Test::Needs 'Sereal::Encoder', 'Sereal::Decoder';
-
-my $encoder = Sereal::Encoder->new;
-my $decoder = Sereal::Decoder->new;
-plugin 'Subprocess' => {
-  serialize => sub { $encoder->encode($_[0]) },
-  deserialize => sub { $decoder->decode($_[0]) },
+use Test::Needs {
+  'Sereal::Encoder' => '3.001',
+  'Sereal::Decoder' => '3.001',
 };
+
+plugin 'Subprocess' => {use_sereal => 1};
 
 get '/' => sub {
   my $c = shift;

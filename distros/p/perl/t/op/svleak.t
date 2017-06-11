@@ -15,7 +15,7 @@ BEGIN {
 
 use Config;
 
-plan tests => 131;
+plan tests => 141;
 
 # run some code N times. If the number of SVs at the end of loop N is
 # greater than (N-1)*delta at the end of loop 1, we've got a leak
@@ -77,6 +77,19 @@ leak(5, 1, sub {push @a,1;},       "basic check 3 of leak test infrastructure");
     leak(2, 0, sub { delete local $ENV{$key} },
 	'delete local on nonexistent env var');
 }
+
+# defined
+leak(2, 0, sub { defined *{"!"} }, 'defined *{"!"}');
+leak(2, 0, sub { defined *{"["} }, 'defined *{"["}');
+leak(2, 0, sub { defined *{"-"} }, 'defined *{"-"}');
+sub def_bang { defined *{"!"}; delete $::{"!"} }
+def_bang;
+leak(2, 0, \&def_bang,'defined *{"!"} vivifying GV');
+leak(2, 0, sub { defined *{"["}; delete $::{"["} },
+    'defined *{"["} vivifying GV');
+sub def_neg { defined *{"-"}; delete $::{"-"} }
+def_neg;
+leak(2, 0, \&def_neg, 'defined *{"-"} vivifying GV');
 
 # Fatal warnings
 my $f = "use warnings FATAL =>";
@@ -536,4 +549,47 @@ EOF
     sub h {}
 
     ::leak(5, 0, \&f, q{goto shouldn't leak @_});
+}
+
+# [perl #128313] POSIX warnings shouldn't leak
+{
+    no warnings 'experimental';
+    use re 'strict';
+    my $a = 'aaa';
+    my $b = 'aa';
+    sub f { $a =~ /[^.]+$b/; }
+    ::leak(2, 0, \&f, q{use re 'strict' shouldn't leak warning strings});
+}
+
+# check that B::RHE->HASH does not leak
+{
+    package BHINT;
+    sub foo {}
+    require B;
+    my $op = B::svref_2object(\&foo)->ROOT->first;
+    sub lk { { my $d = $op->hints_hash->HASH } }
+    ::leak(3, 0, \&lk, q!B::RHE->HASH shoudln't leak!);
+}
+
+
+# dying while compiling a regex with codeblocks imported from an embedded
+# qr// could leak
+
+{
+    my sub codeblocks {
+        my $r = qr/(?{ 1; })/;
+        my $c = '(?{ 2; })';
+        eval { /$r$c/ }
+    }
+    ::leak(2, 0, \&codeblocks, q{leaking embedded qr codeblocks});
+}
+
+{
+    # Perl_reg_named_buff_fetch() leaks an AV when called with an RE
+    # with no named captures
+    sub named {
+        "x" =~ /x/;
+        re::regname("foo", 1);
+    }
+    ::leak(2, 0, \&named, "Perl_reg_named_buff_fetch() on no-name RE");
 }

@@ -1,0 +1,64 @@
+NAME
+
+    PPIx::Utils - Utility functions for PPI
+
+SYNOPSIS
+
+        use PPIx::Utils qw(:classification :language :traversal);
+
+DESCRIPTION
+
+    PPIx::Utils is a collection of utility functions for working with PPI
+    documents. The functions are organized into submodules, and may be
+    imported from the appropriate submodule or via this module.
+
+    These functions were originally from Perl::Critic::Utils and related
+    modules, and have been split off to this distribution for use outside
+    of Perl::Critic.
+
+MODULES
+
+    The import tag :all will import the functions from all modules listed
+    below.
+
+ PPIx::Utils::Classification
+
+    Functions related to classification of PPI elements. All functions from
+    this module can be imported with the import tag :classification.
+
+ PPIx::Utils::Language
+
+    Functions related to the Perl language. All functions from this module
+    can be imported with the import tag :language.
+
+ PPIx::Utils::Traversal
+
+    Functions related to traversal of PPI documents. All functions from
+    this module can be imported with the import tag :traversal.
+
+BUGS
+
+    Report any issues on the public bugtracker.
+
+AUTHOR
+
+    Dan Book <dbook@cpan.org>
+
+    Code originally from Perl::Critic::Utils by Jeffrey Ryan Thalhammer
+    <jeff@imaginative-software.com>, Perl::Critic::Utils::PPI +
+    Perl::Critic::Utils::Perl + PPIx::Utilities::Node by Elliot Shank
+    <perl@galumph.com>, and PPIx::Utilities::Statement by Thomas R. Wyant,
+    III <wyant@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2005-2011 Imaginative Software Systems,
+    2007-2011 Elliot Shank, 2009-2010 Thomas R. Wyant, III, 2017 Dan Book.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+SEE ALSO
+
+    PPI, Perl::Critic::Utils, PPIx::Utilities
+

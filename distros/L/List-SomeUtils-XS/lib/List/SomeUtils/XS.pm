@@ -4,41 +4,39 @@ use 5.006;
 use strict;
 use warnings;
 
-BEGIN {
-    our $VERSION = '0.52';
+our $VERSION = '0.53';
 
-    require XSLoader;
-    XSLoader::load( __PACKAGE__, $VERSION );
+require XSLoader;
+XSLoader::load( __PACKAGE__, $VERSION );
 
-    require List::SomeUtils::PP;
+require List::SomeUtils::PP;
 
-    # This list is copied from List::SomeUtils itself and should be updated
-    # when subs are added.
-    my @subs = qw(
-        any all none notall
-        true false
-        firstidx lastidx
-        insert_after insert_after_string
-        apply indexes
-        after after_incl before before_incl
-        firstval lastval
-        each_array each_arrayref
-        pairwise natatime
-        mesh uniq
-        minmax part
-        bsearch
-        sort_by nsort_by
-        one any_u all_u none_u notall_u one_u
-        firstres onlyidx onlyval onlyres lastres
-        singleton bsearchidx
-    );
+# This list is copied from List::SomeUtils itself and should be updated
+# when subs are added.
+my @subs = qw(
+    any all none notall
+    true false
+    firstidx lastidx
+    insert_after insert_after_string
+    apply indexes
+    after after_incl before before_incl
+    firstval lastval
+    each_array each_arrayref
+    pairwise natatime
+    mesh uniq
+    minmax part
+    bsearch
+    sort_by nsort_by
+    one any_u all_u none_u notall_u one_u
+    firstres onlyidx onlyval onlyres lastres
+    singleton bsearchidx
+);
 
-    for my $sub (@subs) {
-        next if __PACKAGE__->can($sub);
-        ## no critic (TestingAndDebugging::ProhibitNoStrict)
-        no strict 'refs';
-        *{$sub} = List::SomeUtils::PP->can($sub);
-    }
+for my $sub (@subs) {
+    next if __PACKAGE__->can($sub);
+    ## no critic (TestingAndDebugging::ProhibitNoStrict)
+    no strict 'refs';
+    *{$sub} = List::SomeUtils::PP->can($sub);
 }
 
 1;
@@ -57,7 +55,7 @@ List::SomeUtils::XS - XS implementation for List::SomeUtils
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 DESCRIPTION
 
@@ -87,10 +85,13 @@ Copyright 2013 - 2015 by Jens Rehsack
 
 =head1 SUPPORT
 
-Bugs may be submitted through L<the RT bug tracker|http://rt.cpan.org/Public/Dist/Display.html?Name=List-SomeUtils-XS>
-(or L<bug-list-someutils-xs@rt.cpan.org|mailto:bug-list-someutils-xs@rt.cpan.org>).
+Bugs may be submitted at L<https://github.com/houseabsolute/List-SomeUtils-XS/issues>.
 
-I am also usually active on IRC as 'drolsky' on C<irc://irc.perl.org>.
+I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for List-SomeUtils-XS can be found at L<https://github.com/houseabsolute/List-SomeUtils-XS>.
 
 =head1 DONATIONS
 
@@ -113,12 +114,15 @@ button at L<http://www.urth.org/~autarch/fs-donation.html>.
 
 Dave Rolsky <autarch@urth.org>
 
-=head1 COPYRIGHT AND LICENCE
+=head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Dave Rolsky.
+This software is Copyright (c) 2017 by Dave Rolsky.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

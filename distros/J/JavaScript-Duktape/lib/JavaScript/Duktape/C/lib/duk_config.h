@@ -3585,4 +3585,8 @@ typedef struct duk_hthread duk_context;
 #error unsupported: byte order detection failed
 #endif  /* defined(DUK_USE_BYTEORDER) */
 
+int perl_duk_exec_timeout( void *udata );
+#define DUK_USE_INTERRUPT_COUNTER
+#define DUK_USE_EXEC_TIMEOUT_CHECK perl_duk_exec_timeout
+
 #endif  /* DUK_CONFIG_H_INCLUDED */

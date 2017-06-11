@@ -26,7 +26,7 @@ our %EXPORT_TAGS =
    Func => [@EXPORT_OK],               ##-- respect PDL conventions (hopefully)
   );
 
-our $VERSION = '0.09'; ##-- use perl-reversion to update
+our $VERSION = '0.10'; ##-- use perl-reversion to update
 
 ##======================================================================
 ## pod: header

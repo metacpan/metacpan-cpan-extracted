@@ -1,10 +1,10 @@
-#!/usr/bin/perl
 use strict;
 use warnings;
 
+use lib 't/lib';
 use Test::More tests => 4;
 use Test::Fatal;
-use t::lib::Functions;
+use TestFunctions;
 
 my $mcpan = mcpan();
 

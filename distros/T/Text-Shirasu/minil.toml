@@ -2,3 +2,6 @@ name = "Text-Shirasu"
 badges = ["travis", "metacpan"]
 authority="cpan:CODEHEX"
 module_maker="ModuleBuildTiny"
+
+[Metadata]
+x_static_install = 1

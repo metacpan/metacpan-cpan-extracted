@@ -21,7 +21,7 @@ use Perl::Critic::Violation qw<>;
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = '1.126';
+our $VERSION = '1.128';
 
 #-----------------------------------------------------------------------------
 
@@ -469,7 +469,6 @@ sub _get_option_specification {
 
     return qw<
         5 4 3 2 1
-        Safari
         version
         brutal
         count|C

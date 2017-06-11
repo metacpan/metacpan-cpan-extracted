@@ -11,7 +11,7 @@ DDG::Manual - Overview of all documentations
 
 =head1 VERSION
 
-version 1016
+version 1017
 
 =head1 NAME
 

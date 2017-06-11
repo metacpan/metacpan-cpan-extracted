@@ -59,7 +59,7 @@ Google::Ads::AdWords::v201609::RuleItemGroup
 Perl data type class for the XML Schema defined complexType
 RuleItemGroup from the namespace https://adwords.google.com/api/adwords/rm/v201609.
 
-A group of rule items that are ANDed together. 
+A group of rule items that are ANDed together before version V201705. Starting from version V201705, rule item groups will be grouped together based on {@link Rule#getRuleType()}. 
 
 
 

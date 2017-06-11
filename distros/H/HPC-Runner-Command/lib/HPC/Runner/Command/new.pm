@@ -57,7 +57,7 @@ sub execute{
 
     my $project = $self->projectname;
 
-    #$DB::single=2;
+    ###$DB::single=2;
     make_path($self->projectname."/conf");
     make_path($self->projectname."/script");
     make_path($self->projectname."/data");
@@ -69,7 +69,7 @@ sub execute{
 
     $self->log->info("By default ./data and ./hpcrunner are added to your git ignore.");
 
-    #$DB::single=2;
+    ###$DB::single=2;
 
     $self->log->info("Setup complete!");
 }

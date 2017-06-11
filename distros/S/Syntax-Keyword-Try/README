@@ -64,6 +64,12 @@ KEYWORDS
     contained statement. Because of this, there is no need to end with a
     terminating semicolon.
 
+    Note (especially to users of Try::Tiny and similar) that the try {}
+    block itself does not necessarily stop exceptions thrown inside it from
+    propagating outside. It is the presence of a later catch {} block which
+    causes this to happen. A try with only a finally and no catch will
+    still propagate exceptions up to callers as normal.
+
  catch
 
        ...
@@ -132,6 +138,8 @@ TODO
           catch { return "failure" }
        }->();
 
+      See also https://rt.cpan.org/Ticket/Display.html?id=121267.
+
 OTHER MODULES
 
     There are already quite a number of modules on CPAN that provide a
@@ -199,6 +207,19 @@ OTHER MODULES
     In comparison, the behaviour implemented by Try::Tiny can be used as a
     valued expression, such as assigned to a variable or returned to the
     caller of its containing function.
+
+ try without catch
+
+    Like Syntax::Feature::Try, the syntax provided by this module allows a
+    try block to be followed by only a finally block, with no catch. In
+    this case, exceptions thrown by code contained by the try are not
+    suppressed, instead they propagate as normal to callers. This matches
+    the behaviour familiar to Java or C++ programmers.
+
+    In comparison, the code provided by Try and Try::Tiny always suppress
+    exception propagation even without an actual catch block.
+
+    The TryCatch module does not allow a try block not followed by catch.
 
  Typed catch
 

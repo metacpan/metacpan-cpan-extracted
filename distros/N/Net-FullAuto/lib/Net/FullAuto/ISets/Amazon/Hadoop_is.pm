@@ -146,28 +146,28 @@ END
          "${hadoop_mirror}stable/$targz 2>&1",
          '__display__');
       print "wget ERROR: $stderr\n" if $stderr;
-      ($stdout,$stderr)=$handle->cmd(
-         "sudo wget --random-wait --progress=dot ".
-         "${hadoop_mirror}stable/$md5 2>&1",
-         '__display__');
-      ($stdout,$stderr)=$handle->cmd("cat $md5");
-      my $checksum=$stdout;
-      $checksum=~s/^.*MD5\s*[=]\s*(.*?)\n$targz.*$/$1/s;
-      $checksum=~s/\s//g;
-      ($stdout,$stderr)=$handle->cmd("md5sum -c - <<<\"$checksum $targz\"",
-         '__display__');
-      unless ($stderr) {
-         print(qq{ + CHECKSUM Test for $targz *PASSED* \n});
-      } else {
-         if ($dc<3) {
-            ($stdout,$stderr)=$handle->cmd("sudo rm -rvf $md5",'__display__');
+      #($stdout,$stderr)=$handle->cmd(
+      #   "sudo wget --random-wait --progress=dot ".
+      #   "${hadoop_mirror}stable/$md5 2>&1",
+      #   '__display__');
+      #($stdout,$stderr)=$handle->cmd("cat $md5");
+      #my $checksum=$stdout;
+      #$checksum=~s/^.*MD5\s*[=]\s*(.*?)\n$targz.*$/$1/s;
+      #$checksum=~s/\s//g;
+      #($stdout,$stderr)=$handle->cmd("md5sum -c - <<<\"$checksum $targz\"",
+      #   '__display__');
+      #unless ($stderr) {
+      #   print(qq{ + CHECKSUM Test for $targz *PASSED* \n});
+      #} else {
+      #   if ($dc<3) {
+      #      ($stdout,$stderr)=$handle->cmd("sudo rm -rvf $md5",'__display__');
             ($stdout,$stderr)=$handle->cmd("sudo rm -rvf $targz",'__display__');
-            next; 
-         }
-         print "FATAL ERROR! : CHECKSUM Test for $targz *FAILED* ",
-               "after $dc attempts\n";
+      #      next; 
+      #   }
+      #   print "FATAL ERROR! : CHECKSUM Test for $targz *FAILED* ",
+      #         "after $dc attempts\n";
          &Net::FullAuto::FA_Core::cleanup;
-      }
+      #}
       ($stdout,$stderr)=$handle->cmd("sudo tar zxvf $targz -C /opt",
          '__display__');
       $stderr.=$stdout;
@@ -175,7 +175,7 @@ END
          last;
       } else {
          if ($dc<3) {
-            ($stdout,$stderr)=$handle->cmd("sudo rm -rvf $md5",'__display__');
+      #      ($stdout,$stderr)=$handle->cmd("sudo rm -rvf $md5",'__display__');
             ($stdout,$stderr)=$handle->cmd("sudo rm -rvf $targz",'__display__');
             next;
          }
@@ -183,7 +183,7 @@ END
                "after $dc attempts\n";
       }
    }
-   ($stdout,$stderr)=$handle->cmd("sudo rm -rvf $md5",'__display__');
+   #($stdout,$stderr)=$handle->cmd("sudo rm -rvf $md5",'__display__');
    ($stdout,$stderr)=$handle->cmd("sudo rm -rvf $targz",'__display__');
    $targz=~s/[.]tar[.]gz//;
    my $id=$main::aws->{$server_type}->[$cnt]->[0]->{InstanceId};

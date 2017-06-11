@@ -1,3 +1,8 @@
+0.14    2017-06-01 (PERLANCAR)
+
+	- [ux] pp-json, pp-yaml: Make sure we print terminating newline.
+
+
 0.13    2017-05-23 (PERLANCAR)
 
 	- pp-yaml: by default colorize YAML in interactive mode using

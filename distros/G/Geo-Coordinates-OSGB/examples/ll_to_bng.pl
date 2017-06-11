@@ -1,6 +1,6 @@
 #! /usr/bin/perl -w
 
-# Toby Thurston ---  6 May 2009
+# Toby Thurston -- 09 Jun 2017 
 # Parse LL and show as National Grid ref
 
 use strict;
@@ -12,7 +12,7 @@ use Geo::Coordinates::OSGB::Grid qw/format_grid_landranger/;
 use Getopt::Long;
 use Pod::Usage;
 
-our $VERSION = '2.16';
+our $VERSION = '2.17';
 
 =pod
 
@@ -31,7 +31,8 @@ This programme shows off some features of L<Geo::Coordinates::OSGB>.
 The argument should be a string that represents a latitude
 and longitude in the UK like '51.3 -0.01'
 No need to use quotes.  Latitude and longitude can be given in 
-either order.
+either order.  You can leave an optional comma between them if you like. 
+This allows you to cut and paste from a web page for example.
 
 =over 4 
 
@@ -104,7 +105,7 @@ if ( $test_me or $ARGV[0] eq 'test' ) {
     $lon =  1 + ( 43 +  4.5177/60 )/60;
 } 
 else {
-    ($lat, $lon) = @ARGV;
+    ($lat, $lon) = split /[^-0-9.]+/, "@ARGV";
 }
 
 my ($e,  $n)  = ll_to_grid($lat, $lon);

@@ -1,6 +1,6 @@
 package Games::Cards::Pair;
 
-$Games::Cards::Pair::VERSION   = '0.16';
+$Games::Cards::Pair::VERSION   = '0.17';
 $Games::Cards::Pair::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Games::Cards::Pair - Interface to the Pelmanism (Pair) Card Game.
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =cut
 
@@ -29,9 +29,8 @@ use namespace::clean;
 
 use overload ('""' => \&as_string);
 
+has [ qw(bank seen) ] => (is => 'rw', isa => Cards);
 has 'cards'     => (is => 'rw', default => sub { 12 });
-has 'bank'      => (is => 'rw', isa => Cards);
-has 'seen'      => (is => 'rw', isa => Cards);
 has 'board'     => (is => 'rw');
 has 'available' => (is => 'ro', isa => Cards);
 has 'screen'    => (is => 'ro', default => sub { Term::Screen::Lite->new; });
@@ -47,66 +46,18 @@ Cards picked up from the collection comprises each of the thirteen values (2,3,4
 5,6,7,8,9,10,Queen,King,Ace and Jack) in  each of the four suits (Clubs,Diamonds,
 Hearts and Spades) plus two jokers. The Joker will not have any suit.
 
-=head1 SYNOPSIS
+The game script C<play-pelmanism> is supplied with the distribution and on install
+is available to play with.
 
-Below is the working code  for the Pelmanism game using the L<Games::Cards::Pair>
-package. The game script C<play-pelmanism> is supplied with the distribution  and
-on install is available to play with.
+  USAGE: play-pelmanism [-h] [long options...]
 
-    use strict; use warnings;
-    use Games::Cards::Pair;
+    --cards=Int  Cards count (min:12, max:54).
+    --verbose    Play the game in verbose mode.
 
-    $|=1;
-
-    $SIG{'INT'} = sub { print {*STDOUT} "\n\nCaught Interrupt (^C), Aborting\n"; exit(1); };
-
-    my $game = Games::Cards::Pair->new({debug => 1});
-
-    my ($count);
-    do {
-        print {*STDOUT} "How many cards do you want to play with? (min:12, max:54): ";
-        $count = <STDIN>;
-        chomp($count);
-    } until ($game->is_valid_card_count($count));
-
-    $game->cards($count);
-
-    my ($response);
-    do {
-        $game->init;
-        print {*STDOUT} $game->get_board;
-        print {*STDOUT} "You have 30 seconds to memorise the card positions.\n";
-        sleep 30;
-        $game->screen->clear;
-
-        do {
-            my ($cards);
-            print {*STDOUT} $game->as_string(1);
-            do {
-                print {*STDOUT} "Pick pair of cards: ";
-                $cards = <STDIN>;
-                chomp($cards);
-            } until ($cards =~ /^\d+\,\d+$/);
-
-            $game->play($cards);
-
-        } until ($game->is_over);
-
-        print "\n\nTotal moves [" . $game->count . "]\n";
-
-        do {
-            print {*STDOUT} "Do you wish to continue (Y/N)? ";
-            $response = <STDIN>;
-            chomp($response);
-        } until (defined $response && ($response =~ /^[Y|N]$/i));
-
-    } until ($response =~ /^N$/i);
-
-    print {*STDOUT} "Thank you.\n";
-
-Once it is installed, it can be played on a terminal/command window  as below:
-
-    $ play-pelmanism
+    --usage      show a short help message
+    -h           show a compact help message
+    --help       show a long help message
+    --man        show the manual
 
 =head1 METHODS
 

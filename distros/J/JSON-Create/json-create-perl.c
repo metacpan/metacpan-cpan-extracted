@@ -316,8 +316,8 @@ static INLINE json_create_status_t
 add_u (json_create_t * jc, unsigned int u)
 {
     if (u > 0xffff) {
-	unsigned hi;
-	unsigned lo;
+	int hi;
+	int lo;
 	int status = unicode_to_surrogates (u, & hi, & lo);
 	if (status != UNICODE_OK) {
 	    if (JCEH) {
@@ -935,7 +935,7 @@ json_create_add_stringified (json_create_t * jc, SV *r)
 	 CALL (add_str_len (jc, s, (unsigned int) rlen));
 	 CALL (add_char (jc, '"'));
 	 return json_create_ok;
-     } /**/
+     }
      /* This doesn't backtrace correctly, but the calling routine
        should print out that it was calling "add_stringified", so as
        long as we're careful not to ignore the caller line, it

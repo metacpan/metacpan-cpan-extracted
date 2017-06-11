@@ -1,4 +1,4 @@
-#!/home/ben/software/install/bin/perl
+#!/usr/bin/env perl
 use warnings;
 use strict;
 use JSON::Create 'create_json';

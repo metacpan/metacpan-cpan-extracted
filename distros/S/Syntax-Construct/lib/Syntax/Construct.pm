@@ -4,9 +4,12 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.29';
+our $VERSION = '1.003';
 
-my %introduces = ( '5.024' => [qw[
+my %introduces = ( '5.026' => [qw[
+                                 <<~ /xx ^CAPTURE unicode9.0 unicode-scx
+                              ]],
+                   '5.024' => [qw[
                                  unicode8.0 \b{lb} sprintf-reorder
                               ]],
                    '5.022' => [qw[
@@ -38,8 +41,11 @@ my %introduces = ( '5.024' => [qw[
                                  stack-file-test recursive-sort /p
                                  lexical-$_
                               ]],
-                   old => [qw[
+                   '5.008' => [qw[
                                  s-utf8-delimiters-hack
+                              ]],
+                   # No construct to fake initial version ATM.
+                   old => [qw[
                           ]],
                  );
 
@@ -126,6 +132,7 @@ sub import {
     $_->() for @actions;
 }
 
+sub _is_old_empty { @{ $introduces{old} } ? 0 : 1 }
 
 =head1 NAME
 
@@ -133,7 +140,7 @@ Syntax::Construct - Identify which non-feature constructs are used in the code.
 
 =head1 VERSION
 
-Version 0.29
+Version 1.003
 
 =head1 SYNOPSIS
 
@@ -223,6 +230,12 @@ Same as C<introduced>, but for removed constructs (e.g. auto-deref in
 =back
 
 =head1 RECOGNISED CONSTRUCTS
+
+=head2 5.008
+
+=head3 s-utf8-delimiters-hack
+
+See below. The hack doesn't seem to work in 5.006.
 
 =head2 5.010
 
@@ -485,19 +498,49 @@ L<perl5220delta/Incompatible Changes>.
 
 =head3 unicode8.0
 
-L<perldelta/Unicode 8.0 is now supported>.
+L<perl5240delta/Unicode 8.0 is now supported>.
 
 =head3 \b{lb}
 
-L<perldelta/New \b{lb} boundary in regular expressions>.
+L<perl5240delta/New \b{lb} boundary in regular expressions>.
 
 =head3 sprintf-reorder
 
-L<perldelta/printf and sprintf now allow reordered precision arguments>.
+L<perl5240delta/printf and sprintf now allow reordered precision arguments>.
+
+=head2 5.026
+
+=head3 <<~
+
+L<perldelta/Indented Here documents>.
+
+=head3 /xx
+
+L<perldelta/New-regular-expression-modifier-/xx>.
+
+=head3 ^CAPTURE
+
+See C<@{^CAPTURE}>, C<%{^CAPTURE}>, and C<%{^CAPTURE_ALL}> in L<perldelta>.
+
+=head3 unicode9.0
+
+L<perldelta/Unicode 9.0 is now supported>.
+
+=head3 unicode-scx
+
+See I<"Use of \p{script} uses the improved Script_Extensions property">
+in L<perldelta>.
 
 =for completeness
 =head2 old
-=head3 s-utf8-delimiters-hack
+
+=head2 Accepted Features
+
+Some features have been accepted in Perl (C<postderef> and
+C<postderef_qq> in 5.24, C<lexical_subs> in 5.26). In the spirit of
+Syntax::Construct, you should still declare them, even if their usage
+has no effect in newer Perl versions to provide meaningful error
+messages to users of older versions.
 
 =head1 AUTHOR
 
@@ -508,7 +551,7 @@ E. Choroba, C<< <choroba at cpan.org> >>
 Please report any bugs or feature requests to the GitHub repository,
 see below.
 
-=head2 Unstable Perl versions
+=head2 Unstable Perl Versions
 
 In development versions of Perl, the removal of constructs is tested
 against the coming stable version -- e.g., 5.23 forbids all the
@@ -556,7 +599,7 @@ L<Perl::MinimumVersion>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013 - 2016 E. Choroba.
+Copyright 2013 - 2017 E. Choroba.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

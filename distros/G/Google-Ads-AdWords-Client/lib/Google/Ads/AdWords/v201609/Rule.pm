@@ -59,7 +59,7 @@ Google::Ads::AdWords::v201609::Rule
 Perl data type class for the XML Schema defined complexType
 Rule from the namespace https://adwords.google.com/api/adwords/rm/v201609.
 
-A client defined rule based on custom parameters sent by web sites. It consists of rule item groups that are connected by OR. 
+A client defined rule based on custom parameters sent by web sites. 
 
 
 

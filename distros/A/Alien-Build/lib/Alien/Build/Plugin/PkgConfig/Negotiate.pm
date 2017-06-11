@@ -6,7 +6,7 @@ use Alien::Build::Plugin;
 use Carp ();
 
 # ABSTRACT: Package configuration negotiation plugin
-our $VERSION = '0.36'; # VERSION
+our $VERSION = '0.41'; # VERSION
 
 
 has '+pkg_name' => sub {
@@ -60,7 +60,7 @@ Alien::Build::Plugin::PkgConfig::Negotiate - Package configuration negotiation p
 
 =head1 VERSION
 
-version 0.36
+version 0.41
 
 =head1 SYNOPSIS
 
@@ -90,7 +90,11 @@ L<Alien::Build>, L<alienfile>, L<Alien::Build::MM>, L<Alien>
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Diab Jerius (DJERIUS)
 
 =head1 COPYRIGHT AND LICENSE
 

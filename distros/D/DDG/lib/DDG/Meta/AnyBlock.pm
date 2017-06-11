@@ -1,7 +1,7 @@
 package DDG::Meta::AnyBlock;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Implement L<DDG::Block::Blockable::Any> to the plugin
-$DDG::Meta::AnyBlock::VERSION = '1016';
+$DDG::Meta::AnyBlock::VERSION = '1017';
 use strict;
 use warnings;
 use Carp;
@@ -32,7 +32,7 @@ DDG::Meta::AnyBlock - Implement L<DDG::Block::Blockable::Any> to the plugin
 
 =head1 VERSION
 
-version 1016
+version 1017
 
 =head1 DESCRIPTION
 

@@ -483,7 +483,6 @@ copy_expand_unix_filename_escape(char *outspec, const char *inspec, int *output_
 	return 1;
 	break;
     case '.':
-    case '~':
     case '!':
     case '#':
     case '&':
@@ -505,7 +504,7 @@ copy_expand_unix_filename_escape(char *outspec, const char *inspec, int *output_
         /* Don't escape again if following character is 
          * already something we escape.
          */
-        if (strchr(".~!#&\'`()+@{},;[]%^=_\\", *(inspec+1))) {
+        if (strchr(".!#&\'`()+@{},;[]%^=_\\", *(inspec+1))) {
 	    *outspec = *inspec;
 	    *output_cnt = 1;
 	    return 1;
@@ -1301,7 +1300,7 @@ prime_env_iter(void)
   envhv = GvHVn(PL_envgv);
   /* Perform a dummy fetch as an lval to insure that the hash table is
    * set up.  Otherwise, the hv_store() will turn into a nullop. */
-  (void) hv_fetch(envhv,"DEFAULT",7,TRUE);
+  (void) hv_fetchs(envhv,"DEFAULT",TRUE);
 
   for (i = 0; env_tables[i]; i++) {
      if (!have_sym && (tmpdsc.dsc$a_pointer = env_tables[i]->dsc$a_pointer) &&
@@ -8335,7 +8334,6 @@ posix_to_vmsspec_hardway(char *vmspath, int vmspath_len, const char *unixpath,
 	vmsptr += out_cnt;
 	unixptr += in_cnt;
 	break;
-    case '~':
     case ';':
     case '\\':
     case '?':
@@ -8789,7 +8787,6 @@ int_tovmsspec(const char *path, char *rslt, int dir_flag, int * utf8_flag)
 	}
 	break;
     case '\"':
-    case '~':
     case '`':
     case '!':
     case '#':
@@ -8798,7 +8795,7 @@ int_tovmsspec(const char *path, char *rslt, int dir_flag, int * utf8_flag)
         /* Don't escape again if following character is 
          * already something we escape.
          */
-        if (strchr("\"~`!#%^&()=+\'@[]{}:\\|<>_.", *(cp2+1))) {
+        if (strchr("\"`!#%^&()=+\'@[]{}:\\|<>_.", *(cp2+1))) {
 	    *(cp1++) = *(cp2++);
 	    break;
         }
@@ -12034,7 +12031,7 @@ Perl_cando_by_name_int(pTHX_ I32 bit, bool effective, const char *fname, int opt
 
 }
 
-/* Do the permissions allow some operation?  Assumes PL_statcache already set. */
+/* Do the permissions in *statbufp allow some operation? */
 /* Do this via $Check_Access on VMS, since the CRTL stat() returns only a
  * subset of the applicable information.
  */
@@ -13986,6 +13983,9 @@ vmsperl_set_features(void)
 	 vms_unlink_all_versions = 0;
     }
 
+    /* The path separator in PERL5LIB is '|' unless running under a Unix shell. */
+    PL_perllib_sep = '|';
+
     /* Detect running under GNV Bash or other UNIX like shell */
     gnv_unix_shell = 0;
     status = simple_trnlnm("GNV$UNIX_SHELL", val_str, sizeof(val_str));
@@ -14000,6 +14000,7 @@ vmsperl_set_features(void)
 	 /* Reverse default ordering of PERL_ENV_TABLES. */
 	 defenv[0] = &crtlenvdsc;
 	 defenv[1] = &fildevdsc;
+	 PL_perllib_sep = ':';
     }
     /* Some reasonable defaults that are not CRTL defaults */
     set_feature_default("DECC$EFS_CASE_PRESERVE", 1);

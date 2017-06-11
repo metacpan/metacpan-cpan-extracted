@@ -10,7 +10,7 @@ use Moo;
 use MooX::StrictConstructor;
 use namespace::autoclean;
 
-our $VERSION = '1.026';
+our $VERSION = '1.027';
 
 with qw(
     Locale::TextDomain::OO::Role::Logger
@@ -73,13 +73,13 @@ __END__
 
 Locale::TextDomain::OO::Lexicon::Hash - Lexicon from data structure
 
-$Id: Hash.pm 618 2015-08-22 18:02:42Z steffenw $
+$Id: Hash.pm 651 2017-05-31 18:10:43Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/module/trunk/lib/Locale/TextDomain/OO/Lexicon/Hash.pm $
 
 =head1 VERSION
 
-1.026
+1.027
 
 =head1 DESCRIPTION
 
@@ -88,14 +88,15 @@ This module allows to create a lexicon from data structure.
 =head1 SYNOPSIS
 
     require Locale::TextDomain::OO::Lexicon::Hash;
-
+    use Log::Any qw($log);
+    
     Locale::TextDomain::OO::Lexicon::Hash
         ->new(
             # all parameters are optional
             logger => sub {
                 my ($message, $arg_ref) = @_;
                 my $type = $arg_ref->{type}; # debug
-                Log::Log4perl->get_logger(...)->$type($message);
+                $log->$type($message);
                 return;
             },
         )
@@ -171,7 +172,7 @@ Set the logger
         sub {
             my ($message, $arg_ref) = @_;
             my $type = $arg_ref->{type};
-            Log::Log4perl->get_logger(...)->$type($message);
+            $log->$type($message);
             return;
         },
     );
@@ -231,7 +232,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2013 - 2015,
+Copyright (c) 2013 - 2017,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

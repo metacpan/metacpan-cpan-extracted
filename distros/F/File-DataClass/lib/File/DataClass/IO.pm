@@ -1154,12 +1154,13 @@ sub splitpath {
 }
 
 sub stat {
-   my $self = shift; $self->exists or $self->is_open or return;
+   my $self = shift; my $exists = my @fields = stat( $self->name );
+
+   $exists or $self->is_open or return;
 
    my %stat_hash = ( id => $self->filename );
 
-   @stat_hash{ STAT_FIELDS() }
-      = stat( $self->exists ? $self->name : $self->io_handle );
+   @stat_hash{ STAT_FIELDS() } = $exists ? @fields : stat( $self->io_handle );
 
    return \%stat_hash;
 }

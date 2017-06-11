@@ -19,6 +19,7 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Browser::Open' => '0',
+                                      'Capture::Tiny' => '0',
                                       'Carp' => '0',
                                       'File::pushd' => '0',
                                       'Getopt::Long' => '0',

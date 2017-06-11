@@ -27,11 +27,12 @@ sub makeSite
 {
 	my $self = shift;
 	my $args = shift;
-	my $pod2html = shift;
+	my $workGroups = shift;
+	my $partCounts = shift;
 
-	$self->__updateMain($args);
+	$self->__updateMain($args, $partCounts);
 	$self->__updateHeader($args);
-	$self->__updateTOC($args, $pod2html);
+	$self->__updateTOC($args, $workGroups);
 	$self->__updateIndex($args);
 }
 
@@ -42,6 +43,7 @@ sub __updateMain
 {
 	my $self = shift;
 	my $args = shift;
+	my $partCounts = shift;
 
 	my $z = encode_entities(slashify($0));
 	my $zv = encode_entities($App::Pods2Site::VERSION);
@@ -52,28 +54,35 @@ sub __updateMain
 	$builtBy .= "&emsp;$x ($xv)<br/>\n";
 	$builtBy .= "</p>\n";
 	
+	my $scannedLocations = '';
+	foreach my $loc ($args->getBinDirs(), $args->getLibDirs())
+	{
+		$loc = encode_entities($loc);
+		$scannedLocations .= "&emsp;$loc<br/>"
+	}
+	$scannedLocations = "<p><strong>Scanned locations:</strong><br/>$scannedLocations</p>\n";
+
 	my $style = "<p><strong>Style:</strong><br/>";
 	$style .= "&emsp;" . encode_entities($self->getStyleName()) . "<br/>";
 	$style .= "</p>\n";
 	
-	my $scannedLocations = '';
-	$scannedLocations .= "&emsp;$_<br/>" foreach ($args->getBinDirs(), $args->getLibDirs());
-	$scannedLocations = "<p><strong>Scanned locations:</strong><br/>$scannedLocations</p>\n";
-	
-	my $coreFilter = encode_entities($args->getFilter('core') || '(no core query)');
-	my $coreQuery = "<p><strong>Core skip query:</strong><br/>&emsp;$coreFilter</br></p>";
-
-	my $scriptFilter = encode_entities($args->getFilter('script') || '(no script query)');
-	my $scriptQuery = "<p><strong>Script skip query:</strong><br/>&emsp;$scriptFilter</br></p>";
-
-	my $pragmaFilter = encode_entities($args->getFilter('pragma') || '(no pragma query)');
-	my $pragmaQuery = "<p><strong>Pragma skip query:</strong><br/>&emsp;$pragmaFilter</br></p>";
-
-	my $moduleFilter = encode_entities($args->getFilter('module') || '(no module query)');
-	my $moduleQuery = "<p><strong>Module skip query:</strong><br/>&emsp;$moduleFilter</br></p>";
-	
-	my $actualCSS = encode_entities($args->getCSS() || '(no css)');
+	my $actualCSS = encode_entities($args->getCSS() || '(no custom css)');
 	$actualCSS = "<p><strong>CSS:</strong><br/>&emsp;$actualCSS<br/></p>";
+	
+	my $groupDefs = '';
+	foreach my $groupDef (@{$args->getGroupDefs()})
+	{
+		$groupDefs .= '<br/>' if $groupDefs;
+		my $name = encode_entities($groupDef->{name});
+		$groupDefs .= "&emsp;<strong>$name</strong> ($partCounts->{$groupDef->{name}} pods)<br/>";
+		my $query = encode_entities($groupDef->{query}->getQuery());
+		if ($query =~ s#\n#<br/>#g)
+		{
+			$query =~ s#\t#&emsp;#g;
+		}
+		$groupDefs .= "&emsp;&emsp;<em>$query</em><br/>";
+	}	
+	$groupDefs = "<p><strong>Groups:</strong><br/>$groupDefs</p>\n";
 	
 	my $sitedir = $args->getSiteDir();
 	my $savedTS = readData($sitedir, 'timestamps') || [];
@@ -98,13 +107,10 @@ sub __updateMain
 		
 	<body>
 $builtBy
-$style
 $scannedLocations
-$coreQuery
-$scriptQuery
-$pragmaQuery
-$moduleQuery
+$style
 $actualCSS
+$groupDefs
 $createdUpdated
 	</body>
 	
@@ -152,17 +158,16 @@ sub __updateTOC
 {
 	my $self = shift;
 	my $args = shift;
-	my $pod2html = shift;
+	my $workGroups = shift;
 
 	my $sitedir = $args->getSiteDir();
 
-	my $s2n2h = $pod2html->getS2N2H();
+	my $sections = '';
+	foreach my $workGroup (@$workGroups)
+	{
+		$sections .= $self->_getCategoryTOC($workGroup->{group}, $workGroup->{podinfo}, $sitedir);
+	}
 	
-	my $core = $self->_getCategoryTOC('Core', $s2n2h->{core}, $sitedir);
-	my $script = $self->_getCategoryTOC('Scripts', $s2n2h->{script}, $sitedir);
-	my $pragma = $self->_getCategoryTOC('Pragmas', $s2n2h->{pragma}, $sitedir);
-	my $module = $self->_getCategoryTOC('Modules', $s2n2h->{module}, $sitedir);
-
 	$self->_rewriteCss($args);
 	
 	my $sysCssName = $self->getSystemCssName();
@@ -178,10 +183,7 @@ sub __updateTOC
 	</head>
 		
 	<body>
-$core
-$script
-$pragma
-$module
+$sections
 	</body>
 	
 </html>

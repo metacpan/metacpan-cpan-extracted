@@ -1,10 +1,10 @@
-# LWP::UserAgent::Throttled
+# NAME
 
-Throttle requests to a site
+LWP::UserAgent::Throttled - Throttle requests to a site
 
 # VERSION
 
-Version 0.04
+Version 0.05
 
 # SYNOPSIS
 

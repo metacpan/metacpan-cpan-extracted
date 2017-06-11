@@ -27,4 +27,4 @@ requires:
   PDL: '0'
   PDL::VectorValued: v1.0.4
   Test::More: '0'
-version: v1.23.3
+version: v1.23.4

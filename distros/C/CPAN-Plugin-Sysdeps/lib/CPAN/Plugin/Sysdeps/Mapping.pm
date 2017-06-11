@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 # shortcuts
 #  os and distros
@@ -304,8 +304,11 @@ sub mapping {
       [os_freebsd,
        [package => 'taglib']],
       [like_debian,
-       # but does not work, because the module wants taglib 1.9.1, but wheezy has 1.7.2-1
-       [package => ['libtag1-dev', 'g++']]]],
+       # but does only work with newer debians (like stretch), because the module wants taglib 1.9.1 (e.g. wheezy has 1.7.2-1)
+       [package => ['libtag1-dev', 'g++']]],
+      [os_darwin, # ... but does not seem to build
+       [package => 'taglib']],
+     ],
 
      [cpanmod => 'Authen::Krb5Password',
       [os_freebsd,
@@ -323,6 +326,15 @@ sub mapping {
        [package => 'cyrus-sasl']],
       [like_debian,
        [package => 'libsasl2-dev']]],
+
+     [cpanmod => 'Barcode::ZBar',
+      [os_freebsd,
+       [package => 'zbar']],
+      [like_debian,
+       [package => 'libzbar-dev']],
+      [like_fedora,
+       [package => 'zbar-devel']],
+     ],
 
      [cpanmod => ['BerkeleyDB', 'BDB'],
       [os_freebsd,
@@ -488,7 +500,7 @@ sub mapping {
        [package => 'cracklib-devel']],
      ],
 
-     [cpanmod => ['Crypt::DH::GMP', 'Math::GMPq', 'Math::GMPz', 'Math::BigInt::GMP'],
+     [cpanmod => [qw(Crypt::DH::GMP Math::GMPq Math::GMPz Math::BigInt::GMP)],
       [os_freebsd,
        [package => 'gmp']],
       [like_debian,
@@ -497,10 +509,8 @@ sub mapping {
        [package => 'libgmp-dev']],
       [like_fedora,
        [package => 'gmp-devel']],
-      ## Does not work: "Symbol not found: ___gmp_randclear"
-      ## Same problem with homebrew/versions/gmp4
-      #[os_darwin,
-      # [package => 'gmp']]
+      [os_darwin,
+       [package => 'gmp']],
      ],
 
      [cpanmod => 'Crypt::GCrypt',
@@ -692,8 +702,18 @@ sub mapping {
 
      [cpanmod => 'Devel::IPerl',
       [like_debian,
+       [linuxdistrocodename => [qw(stretch)],
+	[package => [qw(libzmq3-dev ipython libmagic-dev)]], # ipython-notebook not anymore available, see https://github.com/EntropyOrg/p5-Devel-IPerl/issues/70
        [package => [qw(libzmq3-dev ipython ipython-notebook libmagic-dev)]], # as specified in https://metacpan.org/source/ZMUGHAL/Devel-IPerl-0.006/README.md
-      ]],
+       ]]
+     ],
+
+     [cpanmod => 'Devel::Jemallctl',
+      [like_debian,
+       [package => 'libjemalloc-dev']],
+      [like_fedora,
+       [package => 'jemalloc-devel']],
+     ],
 
      [cpanmod => 'Devel::Valgrind::Client',
       [os_freebsd,
@@ -1080,7 +1100,7 @@ sub mapping {
        [package => 'plplot-devel']],
      ],
 
-     [cpanmod => ['Graphics::SANE', 'Sane'],
+     [cpanmod => ['Graphics::SANE', 'Sane', 'Image::Sane'],
       [os_freebsd,
        [package => 'sane-backends']],
       [like_debian,
@@ -1136,6 +1156,13 @@ sub mapping {
        [package => 'gtkimageview']],
       [like_debian,
        [package => 'libgtkimageview-dev']]],
+
+     [cpanmod => 'Gtk2::Notify', # but compilation errors, see https://rt.cpan.org/Ticket/Display.html?id=67467
+      [os_freebsd,
+       [package => 'libnotify']],
+      [like_debian,
+       [package => 'libnotify-dev']],
+     ],
 
      [cpanmod => 'Gtk2::Spell',
       [os_freebsd,
@@ -2154,6 +2181,8 @@ sub mapping {
        [package => 'xapian-core']],
       [like_debian,
        [package => 'libxapian-dev']],
+      [like_fedora,
+       [package => 'xapian-core-devel']],
       [os_darwin,
        [package => 'xapian']],
      ],
@@ -2405,6 +2434,19 @@ sub mapping {
        [package => 'rpm-devel']],
       # XXX what about freebsd?
      ],
+
+     [cpanmod => 'UV::Util',
+      [os_freebsd,
+       [package => 'libuv']], # does not work, -I/usr/local/include seems to be missing
+      [like_debian,
+       [linuxdistrocodename => ['squeeze', 'wheezy'],
+	[package => []], # not available before jessie
+       ],
+       [linuxdistrocodename => ['jessie', 'xenial'],
+	[package => 'libuv0.10-dev']], # does not work, probably too old
+       [package => 'libuv1-dev']],
+      [like_fedora,
+       [package => 'libuv-devel']]],
 
      [cpanmod => 'Video::FFmpeg',
       [package => 'ffmpeg']], # on Debian only found in backports or www.deb-multimedia.org; still does not build because avformat.h is not available

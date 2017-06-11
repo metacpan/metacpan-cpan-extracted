@@ -1,5 +1,25 @@
 Revision history for Business-GoCardless
 
+0.21     2017-06-09
+        - Fix add missing module to MANIFESt
+
+0.20     2017-06-09
+        - Fix add missing module to MANIFESt
+
+0.19     2017-06-08
+        - Fix documentation typos
+        - Fix VERSION confusion by moving $Business::GoCardless::VERSION
+          into the main module to avoid parts of the cpan(m|ts) toolchain
+          getting confused
+
+0.18     2017-06-06
+        - Fix documentation typos
+
+0.17     2017-06-06
+        - Add support for some functionality in the v2 (Pro) API
+        - Add classes and tests to support the v2 (Pro) API
+        - Add Business::GoCardless::Upgrading to document upgrade steps
+
 0.16     2016-09-29
         - Clarify the version of the GoCardless API this dist works with
 

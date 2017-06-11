@@ -240,3 +240,5 @@ p.caption {clear:both; margin:0.5em 0 2.0em 20px; text-align:left; color:rgb(80,
 #iheart a img,
 #iheart a:hover img,
 #iheart a:visited img { border:0 }
+#iheart ul { list-style: none outside none; display: list-item; background-image: none; }
+#iheart ul li { list-style: none outside none; display: list-item; background-image: none; }

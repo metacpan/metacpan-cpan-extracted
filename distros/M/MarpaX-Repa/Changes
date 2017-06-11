@@ -1,3 +1,7 @@
+0.12 2017-06-01
+
+    * avoid deprecation warning
+
 0.11 2017-03-25
 
     * new option 'complete' in lexer

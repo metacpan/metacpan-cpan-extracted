@@ -1,0 +1,36 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/BlankOnDev.t
+lib/BlankOnDev.pm
+lib/BlankOnDev.pod
+lib/BlankOnDev/Version.pm
+lib/BlankOnDev/Version.pod
+lib/BlankOnDev/config.pm
+lib/BlankOnDev/config/save.pm
+lib/BlankOnDev/config/save.pod
+lib/BlankOnDev/Repo.pm
+lib/BlankOnDev/enkripsi.pm
+lib/BlankOnDev/enkripsi.pod
+lib/BlankOnDev/DataDev.pm
+lib/BlankOnDev/HTTP/request.pm
+lib/BlankOnDev/Utils/file.pm
+lib/BlankOnDev/Utils/file.pod
+lib/BlankOnDev/Migration/bazaar2GitHub.pm
+lib/BlankOnDev/Migration/bazaar2GitHub.pod
+lib/BlankOnDev/Migration/bazaar2GitHub/bazaar.pm
+lib/BlankOnDev/Migration/bazaar2GitHub/bazaar.pod
+lib/BlankOnDev/Migration/bazaar2GitHub/github.pm
+lib/BlankOnDev/Migration/bazaar2GitHub/github.pod
+lib/BlankOnDev/Tutorial/en.pod
+lib/BlankOnDev/Tutorial/id.pod
+lib/BlankOnDev/DateTime.pm
+lib/BlankOnDev/DateTime.pod
+lib/BlankOnDev/DateTime/lang.pm
+lib/BlankOnDev/DateTime/lang.pod
+lib/BlankOnDev/syslog.pm
+script/boidev
+share/share.txt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

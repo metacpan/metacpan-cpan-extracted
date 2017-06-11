@@ -24,7 +24,7 @@ has access_token => (
 
 sub _build_client {
     my $self = shift;
-    return LWP::UserAgent->new();
+    return LWP::UserAgent->new(keep_alive => 1);
 }
 
 sub _build_access_token {
@@ -49,6 +49,7 @@ sub get {
     my $url = sprintf('%s/api/v1/data/%s', $self->url, $id);
 
     my $response = $self->client->get($url, Authorization => sprintf('Bearer %s', $self->access_token));
+
     if ($response->is_success) {
         return decode_json($response->decoded_content);
     } elsif ($response->code == 401) {
@@ -62,7 +63,7 @@ sub get {
     } else {
         Catmandu::HTTPError->throw({
                 code             => $response->code,
-                message          => $response->status_line,
+                message          => $response->headers->header('message'),
                 url              => $response->request->uri,
                 method           => $response->request->method,
                 request_headers  => [],
@@ -75,26 +76,14 @@ sub get {
 }
 
 sub add {
-    my ($self, $data, $id) = @_;
-    my $url;
+    my ($self, $data) = @_;
+    my $url = sprintf('%s/api/v1/data.lidoxml', $self->url);
 
     my $token = $self->access_token;
     my $response;
 
-    # TODO: replace with LIDO-agnostic code
-    if (!defined($id) || $id eq '') {
-        Catmandu::BadVal->throw(
-            'message' => sprintf('An identifier needs to be present before a record can be added.')
-        );
-    }
+    $response = $self->client->post($url, Content_Type => 'application/lido+xml', Authorization => sprintf('Bearer %s', $token), Content => $data);
 
-    if ($self->in_datahub($id)) {
-        $url = sprintf('%s/api/v1/data/%s', $self->url, $id);
-        $response = $self->client->put($url, Content_Type => 'application/xml', Authorization => sprintf('Bearer %s', $token), Content => $data);
-    } else {
-        $url = sprintf('%s/api/v1/data.lidoxml', $self->url);
-        $response = $self->client->post($url, Content_Type => 'application/xml', Authorization => sprintf('Bearer %s', $token), Content => $data);
-    }
     if ($response->is_success) {
         return $response->decoded_content;
     } elsif ($response->code == 401) {
@@ -106,7 +95,7 @@ sub add {
     } else {
         Catmandu::HTTPError->throw({
                 code             => $response->code,
-                message          => $response->status_line,
+                message          => $response->headers->header('message'),
                 url              => $response->request->uri,
                 method           => $response->request->method,
                 request_headers  => [],
@@ -121,8 +110,12 @@ sub add {
 sub update {
     my ($self, $id, $data) = @_;
     my $url = sprintf('%s/api/v1/data/%s', $self->url, $id);
+
     my $token = $self->access_token;
-    my $response = $self->client->put($url, Content_Type => 'application/lido+xml', Authorization => sprintf('Bearer %s', $token), Content => $data);
+    my $response;
+
+    $response = $self->client->put($url, Content_Type => 'application/lido+xml', Authorization => sprintf('Bearer %s', $token), Content => $data);
+
     if ($response->is_success) {
         return $response->decoded_content;
     } elsif ($response->code == 401) {
@@ -134,7 +127,7 @@ sub update {
     } else {
         Catmandu::HTTPError->throw({
                 code             => $response->code,
-                message          => $response->status_line,
+                message          => $response->headers->header('message'),
                 url              => $response->request->uri,
                 method           => $response->request->method,
                 request_headers  => [],
@@ -151,7 +144,10 @@ sub delete {
     my $url = sprintf('%s/api/v1/data/%s', $self->url, $id);
 
     my $token = $self->access_token;
-    my $response = $self->client->delete($url, Authorization => sprintf('Bearer %s', $token));
+    my $response;
+
+    $response = $self->client->delete($url, Authorization => sprintf('Bearer %s', $token));
+
     if ($response->is_success) {
         return $response->decoded_content;
     } elsif ($response->code == 401) {
@@ -163,7 +159,7 @@ sub delete {
     } else {
         Catmandu::HTTPError->throw({
                 code             => $response->code,
-                message          => $response->status_line,
+                message          => $response->headers->header('message'),
                 url              => $response->request->uri,
                 method           => $response->request->method,
                 request_headers  => [],
@@ -187,7 +183,7 @@ sub list {
     } else {
         Catmandu::HTTPError->throw({
                 code             => $response->code,
-                message          => $response->status_line,
+                message          => $response->headers->header('message'),
                 url              => $response->request->uri,
                 method           => $response->request->method,
                 request_headers  => [],
@@ -199,21 +195,6 @@ sub list {
     }
 }
 
-##
-# Check whether an item as identified by $id is already in the datahub.
-# @param $id
-# @return 1 (yes) / 0 (no)
-sub in_datahub {
-    my ($self, $id) = @_;
-    my $token = $self->access_token;
-    my $url = sprintf('%s/api/v1/data/%s', $self->url, $id);
-    my $res = $self->client->get($url);
-    if ($res->is_success) {
-        return 1;
-    } else {
-        return 0;
-    }
-}
-
 1;
+
 __END__

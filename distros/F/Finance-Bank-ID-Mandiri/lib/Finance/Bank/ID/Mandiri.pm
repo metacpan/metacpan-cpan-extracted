@@ -1,7 +1,7 @@
 package Finance::Bank::ID::Mandiri;
 
-our $DATE = '2016-01-07'; # DATE
-our $VERSION = '0.33'; # VERSION
+our $DATE = '2017-05-31'; # DATE
+our $VERSION = '0.34'; # VERSION
 
 use 5.010001;
 
@@ -23,28 +23,28 @@ my $re_date1       = qr!(?:\d{2}/\d{2}/\d{4})!; # 25/12/2010
 my $re_txcode      = qr!(?:\d{4})!;
 
 # original version when support first added
-my $re_mcm_v201009 = qr!^(?<acc>$re_acc);(?<currency>$re_currency);
-                        (?<date_d>\d\d)/(?<date_m>\d\d)/(?<date_y>\d\d\d\d)
-                        (?<txcode>$re_txcode);
-                        (?<desc1>[^;]+);(?<desc2>[^;]*);
-                        (?<amount>$re_money)(?<amount_dbmarker>DR)?;
-                        (?<bal>$re_money)(?<bal_dbmarker>DR)?$!mx;
+our $re_mcm_v201009 = qr!^(?<acc>$re_acc);(?<currency>$re_currency);
+                         (?<date_d>\d\d)/(?<date_m>\d\d)/(?<date_y>\d\d\d\d)
+                         (?<txcode>$re_txcode);
+                         (?<desc1>[^;]+);(?<desc2>.*?);
+                         (?<amount>$re_money)(?<amount_dbmarker>DR)?;
+                         (?<bal>$re_money)(?<bal_dbmarker>DR)?$!mx;
 # what's new: third line argument
-my $re_mcm_v201103 = qr!^(?<acc>$re_acc);(?<currency>$re_currency);
-                        (?<date_d>\d\d)/(?<date_m>\d\d)/(?<date_y>\d\d\d\d)
-                        (?<txcode>$re_txcode);
-                        (?<desc1>[^;]+);(?<desc2>[^;]*);(?:(?<desc3>[^;]*);)?
-                        (?<amount>$re_money)(?<amount_dbmarker>DR)?;
-                        (?<bal>$re_money)(?<bal_dbmarker>DR)?$!mx;
+our $re_mcm_v201103 = qr!^(?<acc>$re_acc);(?<currency>$re_currency);
+                         (?<date_d>\d\d)/(?<date_m>\d\d)/(?<date_y>\d\d\d\d)
+                         (?<txcode>$re_txcode);
+                         (?<desc1>[^;]+);(?<desc2>[^;]*);(?:(?<desc3>.*?);)?
+                         (?<amount>$re_money)(?<amount_dbmarker>DR)?;
+                         (?<bal>$re_money)(?<bal_dbmarker>DR)?$!mx;
 # what's new: txcode moved to 3rd column, credit & debit amount split into 2
 # fields
-my $re_mcm_v201107 = qr!^(?<acc>$re_acc);(?<currency>$re_currency);
-                        (?<txcode>$re_txcode);
-                        (?<date_d>\d\d)/(?<date_m>\d\d)/(?<date_y>\d\d\d\d);
-                        (?<desc1>[^;]+);(?<desc2>[^;]*);(?:(?<desc3>[^;]*);)?
-                        (?<amount_db>$re_money);
-                        (?<amount_cr>$re_money);
-                        (?<bal>$re_moneymin)!mx; # maybe? no more DR marker
+our $re_mcm_v201107 = qr!^(?<acc>$re_acc);(?<currency>$re_currency);
+                         (?<txcode>$re_txcode);
+                         (?<date_d>\d\d)/(?<date_m>\d\d)/(?<date_y>\d\d\d\d);
+                         (?<desc1>[^;]+);(?<desc2>[^;]*);(?:(?<desc3>.*?);)?
+                         (?<amount_db>$re_money);
+                         (?<amount_cr>$re_money);
+                         (?<bal>$re_moneymin)!mx; # maybe? no more DR marker
 
 sub _make_readonly_inputs_rw {
     my ($self, @forms) = @_;
@@ -638,7 +638,7 @@ Finance::Bank::ID::Mandiri - Check your Bank Mandiri accounts from Perl
 
 =head1 VERSION
 
-This document describes version 0.33 of Finance::Bank::ID::Mandiri (from Perl distribution Finance-Bank-ID-Mandiri), released on 2016-01-07.
+This document describes version 0.34 of Finance::Bank::ID::Mandiri (from Perl distribution Finance-Bank-ID-Mandiri), released on 2017-05-31.
 
 =head1 SYNOPSIS
 
@@ -933,7 +933,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

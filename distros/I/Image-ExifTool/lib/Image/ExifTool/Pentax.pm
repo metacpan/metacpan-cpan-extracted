@@ -58,7 +58,7 @@ use Image::ExifTool::Exif;
 use Image::ExifTool::GPS;
 use Image::ExifTool::HP;
 
-$VERSION = '3.13';
+$VERSION = '3.16';
 
 sub CryptShutterCount($$);
 sub PrintFilter($$$);
@@ -377,8 +377,7 @@ sub DecodeAFPoints($$$$;$);
     '13 19' => 'smc PENTAX-D FA 645 25mm F4 AL [IF] SDM AW', #PH
     '13 20' => 'HD PENTAX-D FA 645 90mm F2.8 ED AW SR', #PH
     '13 253' => 'HD PENTAX-DA 645 28-45mm F4.5 ED AW SR', #Dominique Schrekling email
-    # missing:
-    # 'smc PENTAX-DA 645 25mm F4.0 AL SDM AW [IF]' ? different than D FA version?
+    '13 254' => 'smc PENTAX-DA 645 25mm F4 AL [IF] SDM AW', #forum8253
 #
 # Q-mount lenses (21=auto focus lens, 22=manual focus)
 #
@@ -1490,7 +1489,7 @@ my %binaryDataAttrs = (
             284 => 409600, #PH (NC)
             285 => 576000, #PH (NC)
             286 => 819200, #PH (NC)
-            # 65534 Auto? (Q/Q10/Q7 MOV) PH
+            65534 => 'Auto 2', #PH (Q/Q10/Q7 MOV) [how is this different from 65535?]
             65535 => 'Auto', #PH/31 (K-01/K-70 MP4)
         },
     },
@@ -1663,8 +1662,8 @@ my %binaryDataAttrs = (
             0 => '-2 (low)', #PH
             1 => '0 (normal)', #PH
             2 => '+2 (high)', #PH
-            3 => '-1 (med low)', #2
-            4 => '+1 (med high)', #2
+            3 => '-1 (medium low)', #2
+            4 => '+1 (medium high)', #2
             5 => '-3 (very low)', #PH
             6 => '+3 (very high)', #PH (NC)
             7 => '-4 (minimum)', #PH (NC)
@@ -1682,8 +1681,8 @@ my %binaryDataAttrs = (
             0 => '-2 (low)', #PH
             1 => '0 (normal)', #PH
             2 => '+2 (high)', #PH
-            3 => '-1 (med low)', #2
-            4 => '+1 (med high)', #2
+            3 => '-1 (medium low)', #2
+            4 => '+1 (medium high)', #2
             5 => '-3 (very low)', #PH
             6 => '+3 (very high)', #PH (NC)
             7 => '-4 (minimum)', #PH (NC)
@@ -1701,8 +1700,8 @@ my %binaryDataAttrs = (
             0 => '-2 (soft)', #PH
             1 => '0 (normal)', #PH
             2 => '+2 (hard)', #PH
-            3 => '-1 (med soft)', #2
-            4 => '+1 (med hard)', #2
+            3 => '-1 (medium soft)', #2
+            4 => '+1 (medium hard)', #2
             5 => '-3 (very soft)', #(NC)
             6 => '+3 (very hard)', #(NC)
             7 => '-4 (minimum)', #PH (NC)
@@ -1874,8 +1873,13 @@ my %binaryDataAttrs = (
             '18 3' => 'Auto Program (MTF)', #PH (NC)
             '18 22' => 'Auto Program (Shallow DOF)', #PH (NC)
             '20 22' => 'Blur Control', #PH (Q)
-            '254 0' => 'Video', #PH (K-7,K-5)
-            '255 0' => 'Video (Auto Aperture)', #PH (K-5)
+            '249 0' => 'Movie (TAv)', #31
+            '250 0' => 'Movie (TAv, Auto Aperture)', #31
+            '251 0' => 'Movie (Manual)', #31
+            '252 0' => 'Movie (Manual, Auto Aperture)', #31
+            '253 0' => 'Movie (Av)', #31
+            '254 0' => 'Movie (Av, Auto Aperture)', #31
+            '255 0' => 'Movie (P, Auto Aperture)', #31
             '255 4' => 'Video (4)', #PH (K-x,K-01)
         },{
             # EV step size (ref 19)
@@ -1906,9 +1910,13 @@ my %binaryDataAttrs = (
             1 => 'Remote Control (3 s delay)', #19
             2 => 'Remote Control', #19
             4 => 'Remote Continuous Shooting', # (K-5)
+            10 => 'Composite Average', #31
+            11 => 'Composite Additive', #31
+            12 => 'Composite Bright', #31
         },{
             0x00 => 'Single Exposure',
             0x01 => 'Multiple Exposure',
+            0x08 => 'Interval Shooting', #31
             0x0f => 'Interval Movie', #PH (K-01)
             0x10 => 'HDR', #PH (645D)
             0x20 => 'HDR Strong 1', #PH (NC) (K-5)
@@ -2839,10 +2847,10 @@ my %binaryDataAttrs = (
         Groups => { 2 => 'Author' },
         Writable => 'string',
     },
-    0x0230 => { #PH (K-x AVI videos)
+    0x0230 => { #PH (K-x AVI videos) (and K-70/Q-S1 MOV videos, ref 31)
         Name => 'FirmwareVersion',
-        Notes => 'only in AVI videos',
-        # this tag only exists in AVI videos, and for the K-x the value of
+        Notes => 'only in videos',
+        # this tag only exists in AVI/MOV videos, and for the K-x the value of
         # this tag is "K-x Ver 1.00", which is the same as the EXIF Software
         # tag.  I used a different tag name for this because Pentax uses the
         # AVI Software tag for a different string, "PENTAX K-x".
@@ -2875,6 +2883,11 @@ my %binaryDataAttrs = (
     # 0x023b - undef[9] (K-01)
     #  01a700500000000000, 91a700500000000000, 41a700500000000000, 002700500000000000
     #  c00500400000000000, 400500500000000000, 4004ff420100000000, 4087ff480000000000
+    0x023f => { #31 (K-70 MOV videos)
+        Name => 'Model',
+        Description => 'Camera Model Name',
+        Writable => 'string',
+    },
     0x0243 => { #PH
         Name => 'PixelShiftInfo',
         SubDirectory => { TagTable => 'Image::ExifTool::Pentax::PixelShiftInfo' },
@@ -5614,8 +5627,8 @@ my %binaryDataAttrs = (
             800 => 800, #PH
             1600 => 1600, #PH
             3200 => 3200, #PH
-            # seen 65534 for Q-S1 MOV video - PH
-            # seen 65535 for K-S1 MOV video - PH
+            65534 => 'Auto 2', #PH (Q-S1 MOV) [how is this different from 65535?]
+            65535 => 'Auto', #PH (K-S1 MOV)
         },
     },
     0x0017 => {
@@ -5744,6 +5757,7 @@ my %binaryDataAttrs = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0x0c => {
         Name => 'Model',
+        Description => 'Camera Model Name',
         Format => 'string[32]',
     },
 );

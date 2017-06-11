@@ -1,5 +1,15 @@
 Revision history for Future-AsyncAwait
 
+0.04    2017/06/06 18:42:15
+        [CHANGES]
+         * Suspend and resume the PAD around an await so lexical variables are
+           preserved
+         * Ensure that anon async subs can suspend/resume - see also
+             https://rt.perl.org/Public/Bug/Display.html?id=131519
+        
+        [BUGFIXES]
+         * Ensure MARK stack doesn't upset debugperl
+
 0.03    2017/05/08 21:33:46
         [CHANGES]
          * Handle the value and mark stacks around suspend/await, allowing

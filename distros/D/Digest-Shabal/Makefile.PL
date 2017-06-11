@@ -10,7 +10,6 @@ my %conf = (
     ABSTRACT_FROM => 'lib/Digest/Shabal.pm',
     PREREQ_PM => {
         Digest         => 0,
-        'MIME::Base64' => 0,
         parent         => 0,
     },
     BUILD_REQUIRES => { 'Test::More' => 0.82, },

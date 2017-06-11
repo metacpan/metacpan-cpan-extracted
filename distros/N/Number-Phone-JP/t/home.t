@@ -2655,7 +2655,6 @@ ok($tel->set_number('022 7571234')->is_valid_number, 'checking for 022 7571234')
 ok($tel->set_number('022 7581234')->is_valid_number, 'checking for 022 7581234');
 ok($tel->set_number('022 7591234')->is_valid_number, 'checking for 022 7591234');
 ok($tel->set_number('022 7621234')->is_valid_number, 'checking for 022 7621234');
-ok($tel->set_number('022 7641234')->is_valid_number, 'checking for 022 7641234');
 ok($tel->set_number('022 7651234')->is_valid_number, 'checking for 022 7651234');
 ok($tel->set_number('022 7661234')->is_valid_number, 'checking for 022 7661234');
 ok($tel->set_number('022 7671234')->is_valid_number, 'checking for 022 7671234');
@@ -11570,7 +11569,6 @@ ok($tel->set_number('04996 91234')->is_valid_number, 'checking for 04996 91234')
 ok($tel->set_number('04998 21234')->is_valid_number, 'checking for 04998 21234');
 ok($tel->set_number('04998 31234')->is_valid_number, 'checking for 04998 31234');
 ok($tel->set_number('04998 41234')->is_valid_number, 'checking for 04998 41234');
-ok($tel->set_number('052 2001234')->is_valid_number, 'checking for 052 2001234');
 ok($tel->set_number('052 2011234')->is_valid_number, 'checking for 052 2011234');
 ok($tel->set_number('052 2021234')->is_valid_number, 'checking for 052 2021234');
 ok($tel->set_number('052 2031234')->is_valid_number, 'checking for 052 2031234');
@@ -21392,7 +21390,6 @@ ok($tel->set_number('092 8821234')->is_valid_number, 'checking for 092 8821234')
 ok($tel->set_number('092 8831234')->is_valid_number, 'checking for 092 8831234');
 ok($tel->set_number('092 8841234')->is_valid_number, 'checking for 092 8841234');
 ok($tel->set_number('092 8851234')->is_valid_number, 'checking for 092 8851234');
-ok($tel->set_number('092 8881234')->is_valid_number, 'checking for 092 8881234');
 ok($tel->set_number('092 8901234')->is_valid_number, 'checking for 092 8901234');
 ok($tel->set_number('092 8911234')->is_valid_number, 'checking for 092 8911234');
 ok($tel->set_number('092 8921234')->is_valid_number, 'checking for 092 8921234');
@@ -25978,6 +25975,7 @@ ok(!$tel->set_number('022 7501234')->is_valid_number, 'checking for 022 7501234'
 ok(!$tel->set_number('022 7601234')->is_valid_number, 'checking for 022 7601234');
 ok(!$tel->set_number('022 7611234')->is_valid_number, 'checking for 022 7611234');
 ok(!$tel->set_number('022 7631234')->is_valid_number, 'checking for 022 7631234');
+ok(!$tel->set_number('022 7641234')->is_valid_number, 'checking for 022 7641234');
 ok(!$tel->set_number('022 7701234')->is_valid_number, 'checking for 022 7701234');
 ok(!$tel->set_number('022 7801234')->is_valid_number, 'checking for 022 7801234');
 ok(!$tel->set_number('022 7871234')->is_valid_number, 'checking for 022 7871234');
@@ -31255,6 +31253,7 @@ ok(!$tel->set_number('04998 61234')->is_valid_number, 'checking for 04998 61234'
 ok(!$tel->set_number('04998 71234')->is_valid_number, 'checking for 04998 71234');
 ok(!$tel->set_number('04998 81234')->is_valid_number, 'checking for 04998 81234');
 ok(!$tel->set_number('04998 91234')->is_valid_number, 'checking for 04998 91234');
+ok(!$tel->set_number('052 2001234')->is_valid_number, 'checking for 052 2001234');
 ok(!$tel->set_number('052 2061234')->is_valid_number, 'checking for 052 2061234');
 ok(!$tel->set_number('052 2071234')->is_valid_number, 'checking for 052 2071234');
 ok(!$tel->set_number('052 2081234')->is_valid_number, 'checking for 052 2081234');
@@ -40502,6 +40501,7 @@ ok(!$tel->set_number('092 8791234')->is_valid_number, 'checking for 092 8791234'
 ok(!$tel->set_number('092 8801234')->is_valid_number, 'checking for 092 8801234');
 ok(!$tel->set_number('092 8861234')->is_valid_number, 'checking for 092 8861234');
 ok(!$tel->set_number('092 8871234')->is_valid_number, 'checking for 092 8871234');
+ok(!$tel->set_number('092 8881234')->is_valid_number, 'checking for 092 8881234');
 ok(!$tel->set_number('092 8891234')->is_valid_number, 'checking for 092 8891234');
 ok(!$tel->set_number('092 8961234')->is_valid_number, 'checking for 092 8961234');
 ok(!$tel->set_number('092 8971234')->is_valid_number, 'checking for 092 8971234');

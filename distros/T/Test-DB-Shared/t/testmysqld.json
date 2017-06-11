@@ -1,0 +1,6 @@
+{
+    "test_namespace": "mynamespace",
+    "my_cnf": {
+        "skip-networking": ""
+    }
+}

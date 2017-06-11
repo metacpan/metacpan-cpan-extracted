@@ -81,6 +81,26 @@ Cancels a pre_authorization.
 sub bill {
     my ( $self,%params ) = @_;
 
+    if ( $self->client->api_version > 1 ) {
+
+        my $post_data = {
+            payments => {
+                %params,
+                links    => {
+                    # $self here will be a RedirectFlow
+                    mandate => $self->links->{mandate},
+                },
+            },
+        };
+
+        my $data = $self->client->api_post( "/payments",$post_data );
+
+        return Business::GoCardless::Payment->new(
+            client => $self->client,
+            %{ $data->{payments} },
+        );
+    }
+
     my $data = $self->client->api_post(
         "/bills",
         {

@@ -1,5 +1,5 @@
 package Mira::View::Floor;
-$Mira::View::Floor::VERSION = '00.07.47';
+$Mira::View::Floor::VERSION = '00.07.49';
 
 use strict;
 use warnings;
@@ -54,6 +54,8 @@ sub template {
         my $floor_index = Template->new({
             INCLUDE_PATH => [ $floor_template_root, catdir($floor_template_root, 'include') ],
             INTERPOLATE  => 1,
+            TRIM      => 1,
+            EVAL_PERL => 1,
             ENCODING => 'utf8',
             START_TAG => quotemeta($config->{$floor}->{t_start_tag}),
             END_TAG   => quotemeta($config->{$floor}->{t_end_tag}),

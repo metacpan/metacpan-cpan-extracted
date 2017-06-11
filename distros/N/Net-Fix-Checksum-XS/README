@@ -1,4 +1,4 @@
-Net-Fix-Checksum-XS version 0.02
+Net-Fix-Checksum-XS version 0.03
 ================================
 
 Fast FIX Checksum calculations from Perl
@@ -21,7 +21,7 @@ This module has no other dependencies.
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2015 by Thomas Guyot-Sionnest <tguyot@gmail.com>
+Copyright (C) 2015-2017 by Thomas Guyot-Sionnest <tguyot@gmail.com>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.20.2 or,

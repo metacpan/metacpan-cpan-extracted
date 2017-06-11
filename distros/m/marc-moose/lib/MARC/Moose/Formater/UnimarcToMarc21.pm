@@ -1,5 +1,5 @@
 package MARC::Moose::Formater::UnimarcToMarc21;
-$MARC::Moose::Formater::UnimarcToMarc21::VERSION = '1.0.33';
+$MARC::Moose::Formater::UnimarcToMarc21::VERSION = '1.0.34';
 # ABSTRACT: Convert biblio record from UNIMARC to MARC21
 use Moose;
 
@@ -1272,7 +1272,7 @@ MARC::Moose::Formater::UnimarcToMarc21 - Convert biblio record from UNIMARC to M
 
 =head1 VERSION
 
-version 1.0.33
+version 1.0.34
 
 =head1 SYNOPSYS
 
@@ -1300,9 +1300,9 @@ into MARC21:
 
  my $reader = MARC::Moose::Reader::File::Iso2709->new(
    file => 'biblio-unimarc.iso' );
- my $writer = MARC::Moose::Writer::File->new(
-   file => 'biblio-marc21.iso',
-   formater => MARC::Moose::Formater::Iso2709->new()
+ my $writer = MARC::Moose::Writer->new(
+   fh => IO::File->new('koha.mrc', '>:encoding(utf8)'),
+   formater => MARC::Moose::Formater::Iso2709->new() )
  );
  my $tomarc21 = MARC::Moose::Formater::UnimarcToMarc21->new();
  while ( my $unimarc = $reader->read() ) {
@@ -1324,7 +1324,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Frédéric Demians.
+This software is copyright (c) 2017 by Frédéric Demians.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

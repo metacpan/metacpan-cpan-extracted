@@ -7,7 +7,7 @@ my $meta = {
   "abstract"       => "a selection of utility methods that can be called on blessed objects",
   "author"         => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
   "dynamic_config" => 1,
-  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.021, CPAN::Meta::Converter version 2.140640",
+  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150005",
   "keywords"       => [],
   "license"        => ["perl_5"],
   "meta-spec"      => {
@@ -42,7 +42,7 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "Object::Util" => { file => "lib/Object/Util.pm", version => 0.006 },
+                        "Object::Util" => { file => "lib/Object/Util.pm", version => 0.007 },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -56,7 +56,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Object-Util/project",
                       },
-  "version"        => 0.006,
+  "version"        => 0.007,
 };
 
 my %dynamic_config;

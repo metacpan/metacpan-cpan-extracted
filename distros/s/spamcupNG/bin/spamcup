@@ -1,0 +1,359 @@
+#!perl
+
+use warnings;
+use strict;
+use LWP::UserAgent 6.05;
+use HTML::Form 6.03;
+use HTTP::Cookies 6.01;
+use Getopt::Std;
+use YAML::XS 0.62 qw(LoadFile);
+use File::Spec;
+use SpamcupNG qw(main_loop get_browser read_config %MAP);
+
+our $VERSION = '0.4'; #VERSION
+# Delay between HTTP requests. Adjust this if Spamcop.net asks!
+use constant DELAY => 5;
+
+my %opts;
+my $accounts;
+
+# :TODO:23/04/2017 17:15:49:ARFREITAS: migrate to Getopt::Long, too many options here
+# to use mnemonics
+getopts( 'vnac:sqdhDul:p:', \%opts );
+
+print_footer() if ( $opts{v} );
+
+if ( $opts{h} ) {
+
+    print qq(Usage: $0 [options] <Spamcop-Username>\n
+ $0 <options> <Spamcop-Username>
+
+ Options:
+  -n Does nothing, just shows if you have unreported SPAM or not.
+  -a Run in a loop untill all SPAM is reported.
+  -s Stupid. Runs without asking confirmation. Use with care.
+  -q Be quiet.
+  -c Alternate method for signifying code. (Unpaid users WITHOUT username & password)
+  -l Alternate method for providing username. (Paid & unpaid users with password)
+  -p Method for providing password. (Required for users with password)
+  -d Debug mode. Prints all kinds of funny things.
+  -D Even more debug mode. Dumps also HTML.
+  -v Show version and quit.
+  -h You are reading it.
+
+ By default the script confirms every SPAM it's about to report. With option -s it does not
+ ask for confirmation.
+
+ You can combine one or more options. If you're using command line options you MUST put those before the code.
+
+ See the perldoc documentation for more details:
+
+ \$ perldoc spamcup
+
+);
+    print_footer();
+}
+
+my $cfg = File::Spec->catfile( $ENV{HOME}, '.spamcupNG.yml' );
+
+if ( ( -e $cfg ) and ( scalar(@ARGV) < 1 ) ) {
+    $accounts = read_config( $cfg, \%opts );
+	$opts{delay} = DELAY;
+}
+else {
+    warn
+"Couldn't find the standard configuration file $cfg, using command line options available";
+
+    # DEBUG++: option -D dumps all HTML, used with in development only
+    # force d if D
+    if ( $opts{D} ) {
+        $opts{d} = 1;
+    }
+
+    if ( $opts{n} ) {
+        print
+"* Running with -n. Not actually reporting SPAM, just showing what is about to happen.\n";
+    }
+
+    unless ( $opts{q} ) {
+
+        if ( $opts{a} ) {
+            print
+              "* Running with -a. Runs in a loop while all SPAM is reported.\n";
+        }
+
+        if ( $opts{d} ) {
+            print
+"* Running with -d. Information mode. Prints all kinds of funny things.\n";
+        }
+        if ( $opts{D} ) {
+            print "* Running with -D. Even more messages. Dumps also HTML.\n";
+        }
+
+        if ( $opts{s} ) {
+            print
+"* Running with -s. No report confirmation will be asked.\n* Make sure you don't post false reports!\n";
+            sleep DELAY;
+        }
+
+    }
+
+    my ( $ident, $pass ) = define_auth( \%opts );
+    compat_opts( $ident, $pass, \%opts );
+}
+
+my $ua = get_browser( 'spamcupNG', $VERSION );
+
+if ($accounts) {
+
+    foreach my $account ( keys( %{$accounts} ) ) {
+        $opts{ident} = $accounts->{$account}->{'e-mail'};
+        $opts{pass}  = $accounts->{$account}->{password};
+        print "Running reports for $account account\n" unless ( $opts{quiet} );
+        run_report( $ua, \%opts );
+    }
+
+}
+else {
+    print "* Using ID '$opts{ident}'.\n" unless ( $opts{quiet} );
+    run_report( $ua, \%opts );
+}
+
+# :TODO:23/04/2017 17:31:11:ARFREITAS: for compatibility between old
+# version of spamcup, it should go away once Getopts::Std is replaced with Getopts::Long
+
+# changes opts in place
+sub compat_opts {
+    my ( $ident, $pass, $opts_ref ) = @_;
+    my %new_opts = ( ident => $ident, pass => $pass, delay => DELAY );
+
+    while ( my ( $long, $short ) = each %MAP ) {
+        $new_opts{$long} = $opts_ref->{$short}
+          if ( exists( $opts_ref->{$short} ) );
+    }
+
+    $opts_ref = \%new_opts;
+    return 1;
+}
+
+sub run_report {
+    my ( $ua, $opts_ref ) = @_;
+    my $retval;
+
+    if ( $opts_ref->{all} and not( $opts_ref->{nothing} ) ) {
+
+        # run while there is more spam
+        while (1) {    # Ugly, but does the thing...
+            $retval = main_loop( $ua, $opts_ref );
+            last if ( $retval == -1 );    # no more spam
+
+            unless ( $opts_ref->{quiet} ) {
+
+                unless ($retval) {
+                    print
+                      "W: Error occured while processing SPAM. Continuing.\n";
+                }
+                print
+"\n-------------------------------------------------------\n* Processing next SPAM.\n";
+            }
+        }
+    }
+    else {
+        # run once
+        main_loop( $ua, $opts_ref );
+    }
+
+}
+
+# prints footer information and exits
+sub print_footer {
+    print
+qq(\n* Spamcup NG $VERSION - (C) Alceu Rodrigues de Freitas Junior <arfreitas\@cpan.org>
+Based on Spamcup from Toni Willberg <toniw\@iki.fi>
+* Source code and bug reports: https://github.com/glasswalk3r/spamcupNG
+);
+    exit;
+}
+
+sub define_auth {
+    my $opts_ref = shift;
+
+    my ( $ident, $pass );
+
+  DEF_USER: {
+
+        if ($accounts) {
+            last DEF_USER;
+        }
+
+        if ( $opts_ref->{l} ) {
+            $ident = $opts_ref->{l};
+            last DEF_USER;
+        }
+
+        if ( $opts_ref->{c} ) {
+            $ident = $opts_ref->{c};
+            last DEF_USER;
+        }
+
+        if ( $ident =~ /\@/ ) {
+
+            unless ( $opts_ref->{p} || $opts_ref->{p} eq '' ) {
+                print "Enter password: ";
+                $pass = <STDIN>;
+                chomp($pass);
+            }
+            else {
+                $pass = $opts_ref->{p};
+            }
+        }
+        else {
+            undef $pass;
+        }
+
+    }
+
+    return $ident, $pass;
+
+}
+
+__END__
+
+
+=head1 NAME
+
+spamcup - frontend program for SpamcupNG project
+
+=head1 SYNOPSIS
+
+In your favorite shell:
+
+    $ spamcup
+
+That's it! See the configuration file details.
+
+You can also provide all the parameters in the command line. Check the command line documentation:
+
+Usage: spamcup [options] <Spamcop-Username>
+
+   $ spamcup.pl -h
+   spamcup.pl <options> <Spamcop-Username>
+
+   Options:
+    -n Does nothing, just shows if you have unreported SPAM or not.
+    -a Run in a loop untill all SPAM is reported.
+    -s Stupid. Runs without asking confirmation. Use with care.
+    -q Be quiet.
+    -c Alternate method for signifying code. (Unpaid users WITHOUT username & password)
+    -l Alternate method for providing username. (Paid & unpaid users with password)
+    -p Method for providing password. (Required for users with password)
+    -d Debug mode. Prints all kinds of funny things.
+    -D Even more debug mode. Dumps also HTML.
+    -v Show version and quit.
+    -h You are reading it.
+
+=head1 DESCRIPTION
+
+Spamcup NG is a Perl web crawler for finishing Spamcop.net reports automatically.
+
+It will use your account details to login into Spamcop.net web page and finish reporting your SPAM. Spamcup NG tries to be as polite as possible, 
+introducing forced delays to not overwhelm Spamcop.net website. All reports are sent sequentially.
+
+Spamcup NG is a fork from the original Spamcup project.
+
+Spamcup is copyright (C) Toni Willberg E<lt>toniw@iki.fiE<gt> L<http://toniw.iki.fi>.
+
+=head1 WARNINGS
+
+Some important warnings before starting using it:
+
+=over
+
+=item * 
+
+The script does NOT know where the SPAM report will be sent so IT'S YOUR RESPONSIBILITY!
+
+=item * 
+
+If the script asks Spamcop to send reports to wrong places IT'S YOUR FAULT!
+
+=item *
+
+If the script has a bug that causes same report being sent thousand times IT'S YOUR MAIL ADDRESSES!
+
+=item *
+
+DO NOT USE THIS SCRIPT IF YOU DON'T UNDERSTAND WHAT IT DOES! IT'S YOUR SHAME!
+
+=back
+
+=head1 CONFIGURATION FILE
+
+You can also provide a configuration file to avoid having to provide the same information every time you want to execute the program.
+
+Another advantage of using the configuration file is that you can setup multiple Spamcop.net in the same file and the C<spamcup> program will
+loop over them and report the associated SPAM automatically.
+
+The program will look for a configuration file named C<.spamcup.yml> in the corresponding home directory of the user (that will dependend
+on the OS you're executing it).
+
+The configuration file must be written as an YAML file, with the exact properties below:
+
+    ---
+    ExecutionOptions:
+    all: y
+    stupid: y
+    nothing: n
+    quiet: n
+    alt_code: n
+    alt_user: n
+    info_level: n
+    debug_level: n
+    Accounts:
+      Provider1:
+        e-mail: account@provider1.com.br
+        password: FOOBAR
+      Provider2:
+        e-mail: account@provider2.com.br
+        password: FOOBAR
+
+You can use any name instead of "Provider1" or "Provider2" as long as their are valid key names for YAML format.
+
+All those options have their corresponding command line parameter. Be sure to take care of file permissions to avoid disclosure of your Spamcop.net password!
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<SpamcupNG>
+
+=back
+
+=head1 AUTHOR
+
+Alceu Rodrigues de Freitas Junior, E<lt>arfreitas@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 of Alceu Rodrigues de Freitas Junior, E<lt>arfreitas@cpan.orgE<gt>
+
+This file is part of spamcupNG distribution.
+
+spamcupNG is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+spamcupNG is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Term-YAP. If not, see <http://www.gnu.org/licenses/>.
+
+=cut
+
+# vim: filetype=perl

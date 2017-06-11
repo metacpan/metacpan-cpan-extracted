@@ -1,5 +1,9 @@
 Revision history for App-PS1
 
+0.05   2017-06-11
+        Updating for release of version 0.05
+        Added missing file (Ivan Wills)
+
 0.04   2017-03-15
         Updating for release of version 0.04
         Fixed POD and spelling (Ivan Wills)

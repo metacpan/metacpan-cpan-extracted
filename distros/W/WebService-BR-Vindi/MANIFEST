@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WebService-BR-Vindi.t
+lib/WebService/BR/Vindi.pm

@@ -6,7 +6,7 @@ use File::Spec;
 use Archive::Tar;
 use File::Path; # core
 use Test::More;
-use Test::RequiresInternet 'api.metacpan.org' => 80;
+use Test::RequiresInternet 'fastapi.metacpan.org' => 443;
 
 # for updating the scanlib direcotry:
 # 1. open the current scanlib.tar:

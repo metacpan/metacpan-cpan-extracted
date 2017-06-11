@@ -1,3 +1,6 @@
+2.201 2017-05-22
+  - Extend slurp_chomped to take path components (Util).
+
 2.101 2017-03-27
   - Upgrade to use Mojo::File (Config).
   - Upgrade to use Mojo::File (Util).

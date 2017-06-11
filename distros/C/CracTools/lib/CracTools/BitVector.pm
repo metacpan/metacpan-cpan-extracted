@@ -1,9 +1,10 @@
 package CracTools::BitVector;
+
 {
   $CracTools::BitVector::DIST = 'CracTools';
 }
 # ABSTRACT: Full Perl BitVector implementation
-$CracTools::BitVector::VERSION = '1.25';
+$CracTools::BitVector::VERSION = '1.251';
 use Exporter;
 our @ISA = qw(Exporter);
 
@@ -245,7 +246,7 @@ CracTools::BitVector - Full Perl BitVector implementation
 
 =head1 VERSION
 
-version 1.25
+version 1.251
 
 =head1 SYNOPSIS
 

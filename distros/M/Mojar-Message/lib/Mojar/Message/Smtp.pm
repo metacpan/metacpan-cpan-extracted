@@ -1,15 +1,13 @@
 package Mojar::Message::Smtp;
 use Mojo::Base -base;
 
-our $VERSION = 0.031;
+our $VERSION = 0.041;
 
 use Carp ();
 use MIME::Entity;
 use Mojar::Cron::Util 'tz_offset';
 use Mojar::Log;
 use POSIX 'strftime';
-
-require Mojar::Util;
 
 # Attributes
 
@@ -21,19 +19,21 @@ has [qw(user secret agent)];  # SASL username, password
 has domain => 'localhost.localdomain';  # for helo handshake
 has timeout => 120;
 has debug => 1;
+#TODO: set 'debug => 0' before first CPAN release
 has date_pattern => '%a, %d %b %Y %H:%M:%S';
 
 # Message
 has From => sub { ($ENV{USER} // $ENV{USERNAME} // '_') .'@'. shift->domain };
 has [qw(To Cc Bcc attachments)];
 has [qw(Subject body)] => '';
+has Type => 'text/plain';
 
-sub headers {  # virtual attribute
+sub headers {
   my $self = shift;
   return $self->set(@_) if @_;
   map +($_ => $self->{$_}), grep +(/^[A-Z]/), keys %$self  # Titlecase fields
 }
-sub param {  # virtual attribute
+sub param {
   my $self = shift;
   return $self->set(@_) if @_;
   return (
@@ -106,8 +106,7 @@ sub connect {
 
 sub disconnect {
   my ($self, %param) = @_;
-  $self->agent->quit if $self->agent;
-  delete $self->{agent};
+  $_ and $_->quit for delete $self->{agent};
   return $self;
 }
 
@@ -126,20 +125,20 @@ sub send {
       $self->headers
     );
     $mime->attach(
-      Type => 'text/plain',
+      Type        => $self->Type,
       Disposition => 'inline',
-      Encoding => '-SUGGEST',
-      Data => $self->body
+      Encoding    => '-SUGGEST',
+      Data        => $self->body
     );
     $mime->attach(%$_) for @{$self->attachments};
   }
   else {
     $mime = MIME::Entity->build(
-      Type => 'text/plain',
+      Type        => $self->Type,
       Disposition => 'inline',
-      Encoding => '-SUGGEST',
+      Encoding    => '-SUGGEST',
       $self->headers,
-      Data => $self->body
+      Data        => $self->body
     );
   }
 
@@ -185,7 +184,7 @@ Mojar::Message::Smtp - Lightweight email sender.
 
 =head1 USAGE
 
-Sends a plain email, possibly with attachments, via an SMTP mailserver.
+Sends an email, possibly with attachments, via an SMTP mailserver.
 
 There are two distinct ways of using this module.  The common simple way is to
 just let connections be handled implicitly.  The second way is to connect and
@@ -312,6 +311,7 @@ The blind carbon copy recipient address(es); similar to C<To>.
 The text body of the email.
 
   $email->body('Some text');
+  $email->body('<h1>Hi</h1>')->Type('text/html');
 
 =back
 

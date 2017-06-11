@@ -3,9 +3,8 @@ package Locale::TextDomain::OO::Plugin::Expand::Maketext::Localise; ## no critic
 use strict;
 use warnings;
 use Moo::Role;
-use namespace::autoclean;
 
-our $VERSION = '1.014';
+our $VERSION = '1.027';
 
 with qw(
     Locale::TextDomain::OO::Plugin::Expand::Maketext
@@ -29,13 +28,13 @@ __END__
 
 Locale::TextDomain::OO::Plugin::Expand::Maketext::Localise - Alternative maketext methods
 
-$Id: Localise.pm 547 2014-10-31 09:56:41Z steffenw $
+$Id: Localise.pm 651 2017-05-31 18:10:43Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/module/trunk/lib/Locale/TextDomain/OO/Plugin/Expand/Maketext/Localise.pm $
 
 =head1 VERSION
 
-1.014
+1.027
 
 =head1 DESCRIPTION
 
@@ -75,8 +74,6 @@ none
 
 L<Moo::Role|Moo::Role>
 
-L<namespace::autoclean|namespace::autoclean>
-
 L<Locale::TextDomain::OO::Plugin::Expand::Maketext|Locale::TextDomain::OO::Plugin::Expand::Maketext>
 
 =head1 INCOMPATIBILITIES
@@ -97,7 +94,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2013 - 2014,
+Copyright (c) 2013 - 2017,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

@@ -23,6 +23,7 @@ Alders'
 BooK
 Bruhat
 CPAN
+Chris
 Git
 Helpers
 Kevin
@@ -30,9 +31,11 @@ MetaCPAN
 Olaf
 Phair
 Philippe
+Weyl
 bin
 book
 cpan
+cweyl
 gh
 lib
 olaf

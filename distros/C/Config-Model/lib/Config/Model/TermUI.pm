@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::TermUI;
-$Config::Model::TermUI::VERSION = '2.103';
+$Config::Model::TermUI::VERSION = '2.105';
 use Carp;
 use utf8;      # so literals and identifiers can be in UTF-8
 use v5.12;     # or later to get "unicode_strings" feature
@@ -238,7 +238,7 @@ Config::Model::TermUI - Interactive command line interface for cme
 
 =head1 VERSION
 
-version 2.103
+version 2.105
 
 =head1 SYNOPSIS
 

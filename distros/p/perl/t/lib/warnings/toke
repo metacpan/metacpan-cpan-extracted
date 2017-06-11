@@ -4,7 +4,7 @@ toke.c	AOK
 
  
  		$a = <<;
- 		Use of comma-less variable list is deprecated 
+ 		Use of comma-less variable list is deprecated. Its use will be fatal in Perl 5.28
 		(called 3 times via depcom)
 
      \1 better written as $1 
@@ -136,9 +136,9 @@ format STDOUT =
 $a    $b    "abc" 'def'
 .
 EXPECT
-Use of comma-less variable list is deprecated at - line 4.
-Use of comma-less variable list is deprecated at - line 4.
-Use of comma-less variable list is deprecated at - line 4.
+Use of comma-less variable list is deprecated. Its use will be fatal in Perl 5.28 at - line 4.
+Use of comma-less variable list is deprecated. Its use will be fatal in Perl 5.28 at - line 4.
+Use of comma-less variable list is deprecated. Its use will be fatal in Perl 5.28 at - line 4.
 ########
 # toke.c
 $a = <<;
@@ -147,7 +147,16 @@ no warnings 'deprecated' ;
 $a = <<;
 
 EXPECT
-Use of bare << to mean <<"" is deprecated at - line 2.
+Use of bare << to mean <<"" is deprecated. Its use will be fatal in Perl 5.28 at - line 2.
+########
+# toke.c
+$a = <<~;
+
+$a = <<~ ;
+
+EXPECT
+Use of bare << to mean <<"" is deprecated. Its use will be fatal in Perl 5.28 at - line 2.
+Use of bare << to mean <<"" is deprecated. Its use will be fatal in Perl 5.28 at - line 4.
 ########
 # toke.c
 $a =~ m/$foo/eq;
@@ -668,6 +677,34 @@ _123
 12340000000000
 ########
 # toke.c
+use warnings 'syntax';
+$a = 1_; print "$a\n";
+$a = 01_; print "$a\n";
+$a = 0_; print "$a\n";
+$a = 0x1_; print "$a\n";
+$a = 0x_; print "$a\n";
+$a = 1.2_; print "$a\n";
+$a = 1._2; print "$a\n";
+$a = 1._; print "$a\n";
+EXPECT
+Misplaced _ in number at - line 3.
+Misplaced _ in number at - line 4.
+Misplaced _ in number at - line 5.
+Misplaced _ in number at - line 6.
+Misplaced _ in number at - line 7.
+Misplaced _ in number at - line 8.
+Misplaced _ in number at - line 9.
+Misplaced _ in number at - line 10.
+1
+1
+0
+1
+0
+1.2
+1.2
+1
+########
+# toke.c
 use warnings 'bareword' ;
 #line 25 "bar"
 $a = FRED:: ;
@@ -1069,11 +1106,28 @@ Integer overflow in octal number at - line 11.
 ########
 # toke.c
 BEGIN { $^C = 1; }
+dump;
+CORE::dump;
+EXPECT
+dump() better written as CORE::dump(). dump() will no longer be available in Perl 5.30 at - line 3.
+- syntax OK
+########
+# toke.c
+BEGIN { $^C = 1; }
+no warnings 'deprecated';
+dump;
+CORE::dump;
+EXPECT
+- syntax OK
+########
+# toke.c
+BEGIN { $^C = 1; }
+no warnings 'deprecated';
 use warnings 'misc';
 dump;
 CORE::dump;
 EXPECT
-dump() better written as CORE::dump() at - line 4.
+dump() better written as CORE::dump(). dump() will no longer be available in Perl 5.30 at - line 5.
 - syntax OK
 ########
 # toke.c
@@ -1111,6 +1165,11 @@ no warnings 'ambiguous';
 "@mjd_previously_unused_ぁrrぁy2";        
 EXPECT
 Possible unintended interpolation of @mjd_previously_unused_ぁrrぁy in string at - line 5.
+########
+-w
+# toke.c
+$_ = "@DB::args";        
+EXPECT
 ########
 # toke.c
 # 20020328 mjd-perl-patch+@plover.com at behest of jfriedl@yahoo.com
@@ -1222,13 +1281,13 @@ sub ker_plop :locked {
 sub swa_a_p ($) : locked {
 }
 EXPECT
-Use of :unique is deprecated at - line 2.
-Use of :locked is deprecated at - line 3.
-Use of :locked is deprecated at - line 4.
-Use of :locked is deprecated at - line 6.
+Attribute "unique" is deprecated, and will disappear in Perl 5.28 at - line 2.
+Attribute "locked" is deprecated, and will disappear in Perl 5.28 at - line 3.
+Attribute "locked" is deprecated, and will disappear in Perl 5.28 at - line 4.
+Attribute "locked" is deprecated, and will disappear in Perl 5.28 at - line 6.
 ########
 # toke.c
-use warnings "syntax"; use feature 'lexical_subs';
+use warnings "syntax";
 sub proto_after_array(@$);
 sub proto_after_arref(\@$);
 sub proto_after_arref2(\[@$]);
@@ -1257,11 +1316,8 @@ Prototype after '@' for main::proto_after_array : @$ at - line 3.
 Prototype after '%' for main::proto_after_hash : %$ at - line 7.
 Illegal character after '_' in prototype for main::underscore_fail : $_$ at - line 12.
 Prototype after '@' for main::underscore_after_at : @_ at - line 13.
-The lexical_subs feature is experimental at - line 14.
 Prototype after '@' for hour : @$ at - line 14.
-The lexical_subs feature is experimental at - line 15.
 Prototype after '@' for migh : @$ at - line 15.
-The lexical_subs feature is experimental at - line 17.
 Prototype after '@' for estate : @$ at - line 17.
 Prototype after '@' for hour : @$ at - line 19.
 Prototype after '@' for migh : @$ at - line 20.
@@ -1509,3 +1565,89 @@ my $v = 𝛃 - 5;
 EXPECT
 OPTION regex
 (Wide character.*\n)?Warning: Use of "𝛃" without parentheses is ambiguous
+########
+# RT #4346 Case 1: Warnings for print (...)
+# TODO RT #4346: Warnings for print(...) are inconsistent
+use warnings;
+print ("((\n");
+print (">>\n");
+EXPECT
+print (...) interpreted as function at - line 3.
+print (...) interpreted as function at - line 4.
+((
+>>
+########
+# RT #4346 Case 2: Warnings for print (...)
+use warnings;
+print ("((\n");
+print (">>\n")
+EXPECT
+print (...) interpreted as function at - line 3.
+print (...) interpreted as function at - line 4.
+((
+>>
+########
+# RT #4346 Case 3: Warnings for print (...)
+# TODO RT #4346: Warnings for print(...) are inconsistent
+use warnings;
+print (">>\n");
+print ("((\n");
+EXPECT
+print (...) interpreted as function at - line 3.
+print (...) interpreted as function at - line 4.
+>>
+((
+########
+# RT #4346 Case 4: Warnings for print (...)
+# TODO RT #4346: Warnings for print(...) are inconsistent
+use warnings;
+print (")\n");
+print ("))\n");
+EXPECT
+print (...) interpreted as function at - line 3.
+print (...) interpreted as function at - line 4.
+)
+))
+########
+# NAME  Non-grapheme delimiters
+BEGIN{
+    if (ord('A') == 193) {
+        print "SKIPPED\n# ebcdic platforms generates different Malformed UTF-8 warnings.";
+        exit 0;
+    }
+}
+use utf8;
+my $a = qr ̂foobar̂;
+EXPECT
+Use of unassigned code point or non-standalone grapheme for a delimiter will be a fatal error starting in Perl 5.30 at - line 8.
+########
+# NAME  [perl #130567] Assertion failure
+BEGIN {
+    if (ord('A') != 65) {
+        print "SKIPPED\n# test is ASCII-specific";
+        exit 0;
+    }
+}
+no warnings "uninitialized";
+$_= "";
+s//\3000/;
+s//"\x{180};;s\221(*$@$`\241\275";/gee;
+s//"s\221\302\302\302\302\302\302\302$@\241\275";/gee;
+EXPECT
+########
+# NAME  [perl #130666] Assertion failure
+no warnings "uninitialized";
+BEGIN{$^H=-1};my $l; s $0[$l]  
+EXPECT
+########
+# NAME  [perl #129036] Assertion failure
+BEGIN{$0="";$^H=hex join""=>A00000}p?
+EXPECT
+OPTION fatal
+syntax error at - line 1, at EOF
+Execution of - aborted due to compilation errors.
+########
+# NAME  [perl #130655]
+use utf8;
+qw∘foo ∞ ♥ bar∘
+EXPECT

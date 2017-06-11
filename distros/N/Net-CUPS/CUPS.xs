@@ -30,8 +30,10 @@
 #ifndef HAVE_CUPS_1_6
 #define ippGetGroupTag(attr)  attr->group_tag
 #define ippGetName(attr)      attr->name
+#define ippGetCount(attr)     attr->num_values
 #define ippGetValueTag(attr)  attr->value_tag
 #define ippGetInteger(attr, element) attr->values[element].integer
+#define ippGetBoolean(attr, element) attr->values[element].boolean
 #define ippGetString(attr, element, language) attr->values[element].string.text
 #define ippGetStatusCode(ipp)  ipp->request.status.status_code
 #define ippFirstAttribute(ipp) ipp->current = ipp->attrs
@@ -451,25 +453,39 @@ NETCUPS_getDeviceAttribute( device, attribute, attribute_type )
 		request = ippNewRequest (CUPS_GET_PRINTERS);
  
 		if ((response = cupsDoRequest (http, request, "/")) != NULL) {
-			attr = ippFindNextAttribute(response, "printer-name", IPP_TAG_NAME);
-
-			while (attr != NULL) {
-				if (strcmp(ippGetString(attr, 0, NULL), device) == 0) { 
-					attr = ippFindNextAttribute( response, 
-												 attribute, 
-												 attribute_type);
-					rv = sv_newmortal();  
-					sv_setpv( rv, ippGetString(attr, 0, NULL)); 
-					XPUSHs( rv );
-					break;	
-				}					
-				attr = ippFindNextAttribute( response, 
-											 "printer-name", 
-											 IPP_TAG_NAME);
-				if (attr == NULL) {
-					break;
-				}   
+			rv = sv_newmortal();
+			int match = 0;
+			for (attr = ippFirstAttribute(response); attr != NULL; attr = ippNextAttribute(response)) {
+				if (ippGetName(attr) == NULL) {
+					if (match) break; else continue;
+				}
+				if (!strcmp(ippGetName(attr), "printer-name") && ippGetValueTag(attr) == IPP_TAG_NAME) {
+					match = !strcmp(ippGetString(attr, 0, NULL), device);
+				} else if (!strcmp(ippGetName(attr), attribute) && ippGetValueTag(attr) == attribute_type) {
+					if (ippGetCount(attr) == 1) {
+						switch (attribute_type) {
+							case IPP_TAG_TEXT:
+							case IPP_TAG_NAME:
+							case IPP_TAG_KEYWORD:
+							case IPP_TAG_URI:
+							case IPP_TAG_CHARSET:
+							case IPP_TAG_LANGUAGE:
+								sv_setpv(rv, ippGetString(attr, 0, NULL));
+								break;
+							case IPP_TAG_BOOLEAN:
+								sv_setiv(rv, ippGetBoolean(attr, 0));
+								break;
+							case IPP_TAG_INTEGER:
+							case IPP_TAG_ENUM:
+								sv_setiv(rv, ippGetInteger(attr, 0));
+								break;
+						}
+					} else {
+						/* XXX */
+					}
+				}
 			}
+			if (match) XPUSHs(rv);
 		}
 		ippDelete( response ); 
 		httpClose( http );   	 

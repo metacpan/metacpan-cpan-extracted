@@ -1,5 +1,9 @@
 Revision history for Perl module DateTime::Format::CLDR
 
+1.19 Fri Jun 2 2017
+    - Fix failing timezone tests rt121273
+    - perl 5.26 Makefile.PL
+
 1.18 Sat Dec 31 2016
     - Fix failing tests rt118286
     - Various cleanups

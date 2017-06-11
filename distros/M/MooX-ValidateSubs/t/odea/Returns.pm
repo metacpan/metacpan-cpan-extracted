@@ -10,11 +10,11 @@ validate_subs (
             one   => [ Str, sub { 'I Have a Default Value' } ],
             two   => [ ArrayRef ],
             three => [ HashRef ],
-			four  => [ Str ],
-        },
+        	four  => [ Str ],
+		},
     },
     [qw/a_list a_single_arrayref/] => {
-        returns => [ [Str], [ArrayRef], [HashRef] ],
+        returns => [ [Str], [ArrayRef], [HashRef], [Str] ],
     },
 );
 
@@ -34,18 +34,20 @@ sub hello_hashref {
 
 sub a_list {
     my ($self, @args) = @_;    
-    return @args;
+ 	push @args, 'd';
+	return @args;
 }
 
 sub a_single_arrayref {
     my ($self, $args) = @_;    
+	push @{ $args }, 'd';
 	return $args;
 }
 
 sub okay_test {
     my ($self) = shift;
-    my ($one, $two, $three) = $self->a_list( 'a', ['b'], { four => 'ahh' } );
-    return ($one, $two, $three);
+    my ($one, $two, $three, $four) = $self->a_list( 'a', ['b'], { four => 'ahh' } );
+    return ($one, $two, $three, $four);
 }
 
 1;

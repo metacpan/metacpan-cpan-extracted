@@ -1,0 +1,48 @@
+{
+   "abstract" : "Simple ephemeral ECDH + AES hybrid cryptosystem",
+   "author" : [
+      "Ashish Gulhati <crypt-eecdh at hash.neo.tc>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Crypt-EECDH",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Bytes::Random::Secure" : "0",
+            "Crypt::Curve25519" : "0",
+            "Crypt::EC_DSA" : "0",
+            "Crypt::Ed25519" : "0",
+            "Crypt::Rijndael" : "0",
+            "Digest::SHA" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.005",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

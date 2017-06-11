@@ -26,6 +26,7 @@ examples/vcpuinfo.pl
 examples/vol-download-all.pl
 examples/vol-download-nonblock.pl
 examples/vol-download.pl
+examples/vol-sparse.pl
 examples/vol-upload-all.pl
 examples/vol-upload-nonblock.pl
 examples/vol-upload.pl

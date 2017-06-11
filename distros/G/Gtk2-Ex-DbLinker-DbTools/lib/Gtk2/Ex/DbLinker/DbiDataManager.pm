@@ -7,6 +7,9 @@ use interface qw(Gtk2::Ex::DbLinker::AbDataManager);
 # use Carp qw(carp croak confess cluck);
 # use Data::Dumper;
 use Try::Tiny;
+use Carp qw(croak confess);
+use Log::Any;
+
 use parent qw(Gtk2::Ex::DbLinker::Recordset);
 
 #my %fieldtype = (tinyint => "integer", "int" => "integer");
@@ -33,21 +36,21 @@ sub new {
       if ( exists( $arg{ai_primary_key} ) );
 
     # bless $self, $class;
-
-    $self->{log} = Log::Log4perl->get_logger(__PACKAGE__);
+    $self->{log} = Log::Any->get_logger;
+    #$self->{log} = Log::Log4perl->get_logger(__PACKAGE__);
 
     # $self->{log}->debug("args\n", Dumper(%arg));
 
     $self->{auto_incrementing} = ( defined( $self->{ai_primary_key} ) ? 1 : 0 );
-     $self->{log}->logconfess(
-        __PACKAGE__ . ": use ai_primary_key or primary_keys but not both..." )
-      if ( defined $self->{ai_primary_key} && defined $self->{primary_keys} );
+    # $self->{log}->logconfess( __PACKAGE__ . ": use ai_primary_key or primary_keys but not both..." ) if ( defined $self->{ai_primary_key} && defined $self->{primary_keys} );
+    confess( $self->{log}->error( __PACKAGE__ . ": use ai_primary_key or primary_keys but not both..." )) if ( defined $self->{ai_primary_key} && defined $self->{primary_keys} );
 
     $self->{primary_keys} = $self->{ai_primary_key}
       if ( defined $self->{ai_primary_key} );
 
     if ( !$self->{dbh} ) {
-         $self->{log}->logconfess( __PACKAGE__ . ": constructor missing a dbh!\n" );
+        # $self->{log}->logconfess( __PACKAGE__ . ": constructor missing a dbh!\n" );
+        confess(  $self->{log}->error( __PACKAGE__ . ": constructor missing a dbh!\n" ));
     }
 
     if ( $self->{sql}->{select_distinct} ) {
@@ -63,10 +66,10 @@ sub new {
         if ( exists $self->{sql}->{pass_through} ) {
             $self->{read_only} = 1;
         } elsif ( !( exists $self->{sql}->{from} ) ) {
-             $self->{log}->logconfess(__PACKAGE__
+             confess($self->{log}->error(__PACKAGE__
                   . " constructor missing a complete sql definition!\n"
                   . "You either need to specify a pass_through key ( 'pass_through' )\n"
-                  . "or a 'from' key\n" );
+                  . "or a 'from' key\n" ));
         }
     }
 
@@ -90,7 +93,8 @@ sub new {
             $sth->execute;
         }
         catch {
-             $self->{log}->logcroak( $self->{dbh}->errstr);
+            #$self->{log}->logcroak( $self->{dbh}->errstr);
+            croak($self->{log}->error( $self->{dbh}->errstr));
         };
     }
 
@@ -115,14 +119,14 @@ sub new {
     }
     catch {
 
-         $self->{log}->logconfess($self->{dbh}->errstr);
+        confess($self->{log}->error($self->{dbh}->errstr));
     };
 
     try {
         $sth->execute;
     }
     catch {
-         $self->{log}->logconfess($self->{dbh}->errstr);
+        confess( $self->{log}->error($self->{dbh}->errstr));
 
     };
 
@@ -208,7 +212,7 @@ sub query {
                 { Slice => {} } );
         }
         catch {
-             $self->{log}->logconfess( $self->{dbh}->errstr);
+             confess($self->{log}->error( $self->{dbh}->errstr));
 
         };
         $self->rs_init( $rec, undef );
@@ -250,7 +254,7 @@ sub query {
 
         }
         catch {
-             $self->{log}->logcroak( $self->{dbh}->errstr . " " . $local_sql);
+             croak($self->{log}->error( $self->{dbh}->errstr . " " . $local_sql));
         };
 
 #die $local_sql;
@@ -266,7 +270,7 @@ sub query {
 
         }
         catch {
-             $self->{log}->logconfess( $self->{dbh}->errstr . " " . $local_sql);
+             confess($self->{log}->error( $self->{dbh}->errstr . " " . $local_sql));
         };
 
         # $self->{log}->debug("DBI_dman_query sql: $local_sql");
@@ -380,7 +384,7 @@ sub _get_rows_from_batch {
         $data = $self->{dbh}->selectall_arrayref( $local_sql, { Slice => {} } );
     }
     catch {
-         $self->{log}->logconfess( $self->{dbh}->errstr . " Local SQL was:\n$local_sql");
+         confess($self->{log}->error( $self->{dbh}->errstr . " Local SQL was:\n$local_sql"));
     };
     return $data;
 
@@ -499,7 +503,7 @@ sub save {
         $sth = $self->{dbh}->prepare($update_sql);
 
     }
-    catch {  $self->{log}->logconfess( $self->{dbh}->errstr) ; };
+    catch {  confess($self->{log}->error( $self->{dbh}->errstr)) ; };
 
     try {
         $sth->execute(@bind_values);

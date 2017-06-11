@@ -1,10 +1,43 @@
 Changes file for Date-Holidays
 
+1.06 2017-05-31 Maintenance release, update not required
+
+- Added use of Test::Fatal
+
+- Added homepage metadata and changed Github URL
+
+- Added Dist::Zilla plugins requirements causing issues to dist.ini, so these
+  are explicitly specified
+
+- Exchanged CJM´s:
+  https://metacpan.org/pod/Dist::Zilla::Plugin::VersionFromModule
+
+  For Dave Rolskys:
+  https://metacpan.org/pod/Dist::Zilla::Plugin::VersionFromMainModule
+
+  There are some deprecation notices from Dist::Zilla making tests fail
+  see XDG's PR: https://github.com/madsen/dist-zilla-plugins-cjm/pull/5
+
+
+1.05 2017-05-31 Bug fix release, update not required
+
+- Addressed Github issue #10, reported by Alexandr Ciornii (CHORNY)
+  carton generated directory local/ was included in distrubution by accident
+
+  Ref: https://github.com/jonasbn/Date-Holidays/issues/10
+
+
+1.04 2017-05-30 Feature release, update not required
+
+- Added adapter for:
+    Date::Holidays::BY via patch from Vladimir Varlamov
+
+
 1.03 2015-08-10 bug fix release, update not required
 
 - Following up on some TODOs in the code, propably in relation to: RT:101366
 
-  https://rt.cpan.org/Ticket/Display.html?id=101366 
+  Ref: https://rt.cpan.org/Ticket/Display.html?id=101366
 
 
 1.02 2015-08-03 Maintenance release, update not required
@@ -13,7 +46,7 @@ Changes file for Date-Holidays
 
 - Added missing version in Date::Holidays::Adapter::LOCAL
 
-- Added MetaProvides to Dist::Zilla build, this should assist in addressing 
+- Added MetaProvides to Dist::Zilla build, this should assist in addressing
   the issue listed on CPANTS
 
   Ref: http://cpants.cpanauthors.org/dist/Date-Holidays-1.01
@@ -29,13 +62,13 @@ Changes file for Date-Holidays
 
 - License upgraded from Artistic License 1.0 to Artistic License 2.0
 
-- You can now overwrite calendars with a local file, see issue #6 
- 
-  https://github.com/jonasbn/Date-Holidays/issues/6
+- You can now overwrite calendars with a local file, see issue #6
+
+  Ref: https://github.com/jonasbn/Date-Holidays/issues/6
 
 - Use of Error has been removed
 
-- Use of UNIVERSAL's can had been changed to more contemporary 
+- Use of UNIVERSAL's can had been changed to more contemporary
   pattern
 
 - Adapter strategy has also been changed so adapters have precedence
@@ -43,11 +76,11 @@ Changes file for Date-Holidays
 
 
 0.22 2014-09-15 bug fix release, update not required
- 
+
 - Addressing issue #7
- 
-  https://github.com/jonasbn/Date-Holidays/issues/7
- 
+
+  Ref: https://github.com/jonasbn/Date-Holidays/issues/7
+
   This is bug in the tests suite generating reports on failures from
   CPAN testers.
 

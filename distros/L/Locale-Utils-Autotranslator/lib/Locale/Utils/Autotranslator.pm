@@ -3,16 +3,17 @@ package Locale::Utils::Autotranslator; ## no critic (TidyCode)
 use strict;
 use warnings;
 use Carp qw(confess);
-use Encode qw(decode find_encoding);
+use Encode qw(decode encode_utf8 find_encoding);
 use Locale::PO;
 use Locale::TextDomain::OO::Util::ExtractHeader;
 use Moo;
 use MooX::StrictConstructor;
 use MooX::Types::MooseLike::Base qw(CodeRef Str);
+use MooX::Types::MooseLike::Numeric qw(PositiveInt);
 use Try::Tiny;
 use namespace::autoclean;
 
-our $VERSION = '1.002';
+our $VERSION = '1.004';
 
 # plural_ref e.g. ru
 # The key is the plural form 0, 1 or 2.
@@ -78,13 +79,29 @@ has error => (
 has translation_count => (
     is       => 'rw',
     init_arg => undef,
+    default  => 0,
     writer   => '_translation_count',
+);
+
+has item_translation_count => (
+    is       => 'rw',
+    init_arg => undef,
+    default  => 0,
+    writer   => '_item_translation_count',
 );
 
 sub _translation_count_increment {
     my $self = shift;
 
     $self->_translation_count( $self->translation_count + 1 );
+
+    return;
+}
+
+sub _item_translation_count_increment {
+    my $self = shift;
+
+    $self->_item_translation_count( $self->item_translation_count + 1 );
 
     return;
 }
@@ -101,14 +118,14 @@ has language => (
     required => 1,
 );
 
-has before_translation_code => (
+has [ qw( before_translation_code after_translation_code ) ] => (
     is  => 'ro',
     isa => CodeRef,
 );
 
-has after_translation_code => (
+has bytes_max => (
     is  => 'ro',
-    isa => CodeRef,
+    isa => PositiveInt,
 );
 
 has comment => (
@@ -310,6 +327,7 @@ sub translate { ## no critic (ExcessComplexity)
     my $entry_ref = { encode_obj => $encode_obj };
 
     $self->_translation_count(0);
+    $self->_item_translation_count(0);
     try {
         MESSAGE:
         for my $po ( @{$pos_ref}[ 1 .. $#{$pos_ref} ] ) { # without 0 = header
@@ -366,8 +384,17 @@ sub translate { ## no critic (ExcessComplexity)
         if ( $self->translation_count ) {
             Locale::PO->save_file_fromarray($name_write, $pos_ref);
         }
-        m{ \A \QAPI error\E | \A (?: Before | After ) \Q translation break\E \b }xms
-            or confess $_;
+        ## no critic (ComplexRegexes)
+        m{
+            \A \QAPI error: \E
+            |
+            \A \QByte limit exceeded, \E
+            |
+            \A (?: Before | After )
+            (?: \Q paragraph\E | \Q line\E )?
+            \Q translation break\E \b
+        }xms or confess $_;
+        ## use critic (ComplexRegexes)
     };
 
     return $self;
@@ -421,7 +448,7 @@ sub _translate_named {
     my ( $self, $entry_ref, $po ) = @_;
 
     my $msgid = $self->_encode_named( $entry_ref->{msgid} );
-    my $msgstr = $self->_translate_with_api($msgid);
+    my $msgstr = $self->translate_any_msgid($msgid, 1);
     $msgstr = $self->_decode_named($msgstr);
     $po->msgstr( $entry_ref->{encode_obj}->encode($msgstr) );
 
@@ -443,7 +470,7 @@ sub _translate_named_plural {
                 ? ( $msgid_plural, $self->_plural_ref->{$index} )
                 : $msgid,
         );
-        my $any_msgstr = $self->_translate_with_api($any_msgid);
+        my $any_msgstr = $self->translate_any_msgid($any_msgid, 1);
         $any_msgstr = $self->_decode_named($any_msgstr);
         $po->msgstr_n->{$index}
            = $po->quote( $entry_ref->{encode_obj}->encode($any_msgstr) );
@@ -458,7 +485,7 @@ sub _encode_gettext_inner { ## no critic (ManyArgs)
     $self->_gettext_ref->{$inner} ||= [
         map {
             ( defined && length )
-            ? $self->_translate_with_api($_)
+            ? $self->translate_any_msgid($_, 1)
             : undef;
         } $singular, $plural, $zero
     ];
@@ -536,7 +563,7 @@ sub _translate_gettext {
 
     $self->_clear_gettext_ref;
     my $msgid = $self->_encode_gettext( $entry_ref->{msgid} );
-    my $msgstr = $self->_translate_with_api($msgid);
+    my $msgstr = $self->translate_any_msgid($msgid, 1);
     $msgstr = $self->_decode_gettext($msgstr);
     $po->msgstr( $entry_ref->{encode_obj}->encode($msgstr) );
 
@@ -548,7 +575,7 @@ sub _translate_simple {
 
     $po->msgstr(
         $entry_ref->{encode_obj}->encode(
-            $self->_translate_with_api( $entry_ref->{msgid} ),
+            $self->translate_any_msgid( $entry_ref->{msgid}, 1 ),
         ),
     );
 
@@ -576,25 +603,140 @@ sub _update_comment {
     return;
 }
 
-sub _translate_with_api {
+sub with_paragraphs {
+    my ( $self, $msgid, $callback ) = @_;
+
+    ref $callback eq 'CODE'
+        or confess 'Code reference expected';
+    defined $msgid
+        or return $msgid;
+
+    my $has_network_line_endings = $msgid =~ s{ \r\n }{\n}xmsg;
+    my ( @prefix, @suffix );
+    my $msgstr
+        = join "\n\n",
+        map {
+            ( shift @prefix ) . $_ . ( shift @suffix );
+        }
+        map { length $_ ? $callback->($_) : $_ }
+        map { ## no critic (ComplexMappings)
+            my $paragraph = $_;
+            $paragraph =~ s{ \A ( \s* ) }{ push @prefix, $1; q{} }xmse; # left
+            $paragraph =~ s{ ( \s* ) \z }{ push @suffix, $1; q{} }xmse; # right
+            $paragraph;
+        }
+        split m{ \n [^\S\n]* \n }xms, $msgid;
+    $has_network_line_endings
+        and $msgstr =~ s{ \n }{\r\n}xmsg;
+
+    return $msgstr;
+}
+
+sub with_lines {
+    my ( $self, $msgid, $callback ) = @_;
+
+    ref $callback eq 'CODE'
+        or confess 'Code reference expected';
+    defined $msgid
+        or return $msgid;
+
+    my $has_network_line_endings = $msgid =~ s{ \r\n }{\n}xmsg;
+    my ( @prefix, @suffix );
+
+    return
+        join $has_network_line_endings ? ( "\r\n" ) : ( "\n" ),
+        map {
+            ( shift @prefix ) . $_ . ( shift @suffix );
+        }
+        map { length $_ ? $callback->($_) : $_ }
+        map { ## no critic (ComplexMappings)
+            my $line = $_;
+            $line =~ s{ \A ( \s* ) }{ push @prefix, $1; q{} }xmse; # left
+            $line =~ s{ ( \s* ) \z }{ push @suffix, $1; q{} }xmse; # right
+            $line =~ s{ \s+ }{ }xmsg;                              # inner
+            $line;
+        }
+        split m{ \n }xms, $msgid;
+}
+
+sub _bytes_max_fail_message {
     my ( $self, $msgid ) = @_;
 
+    $self->bytes_max
+        or return 0;
+    my $msgid_bytes = length encode_utf8($msgid);
+
+    return $msgid_bytes > $self->bytes_max
+        ? do {
+            ( my $msgid_short = $msgid ) =~ s{ \A ( .{80} ) .* \z }{$1 ...}xms;
+            "Byte limit exceeded, $msgid_bytes bytes at: $msgid_short";
+        }
+        : q{};
+}
+
+sub _translate_paragraph {
+    my ( $self, $msgid ) = @_;
+
+    return $self->_bytes_max_fail_message($msgid)
+        ? $self->with_lines(
+            $msgid,
+            sub {
+                my $fail_message = $self->_bytes_max_fail_message($_);
+                $fail_message
+                    and die $fail_message, "\n";
+                my $msgstr = $self->translate_text($_);
+                $self->_item_translation_count_increment;
+                $msgstr =~ s{ [\x{0}\x{4}] }{}xmsg; # because of mo file conflicts
+                length $msgstr
+                    or die "No translation break\n";
+                return $msgstr;
+            },
+        )
+        : do {
+            my $msgstr = $self->translate_text($msgid);
+            $self->_item_translation_count_increment;
+            $msgstr =~ s{ [\x{0}\x{4}] }{}xmsg; # because of mo file conflicts
+            length $msgstr
+                or die "No translation break\n";
+            $msgstr;
+        };
+}
+
+sub translate_any_msgid {
+    my ( $self, $msgid, $is_called_indirectly ) = @_;
+
     $self->error
-        and die "API error\n";
+        and $is_called_indirectly
+            ? ( die $self->error, "\n" )
+            : return q{};
     if ( $self->before_translation_code ) {
         $self->before_translation_code->($self, $msgid)
             or die "Before translation break\n";
     }
-    my $msgstr = try {
-        $self->translate_text($msgid);
-    }
-    catch {
-        $self->_error( ( defined && length ) ? $_ : 'unknown error' );
-        q{};
-    };
+    my $fail_message = $self->_bytes_max_fail_message($msgid);
+    my $msgstr
+        = try {
+            $fail_message
+                ? $self->with_paragraphs($msgid, sub { $self->_translate_paragraph($_) })
+                : $self->_translate_paragraph($msgid, 'is_not_paragraph');
+        }
+        catch {
+            if ( m{ \A \QNo translation break\E \b }xms ) {
+                ;
+            }
+            elsif ( m{ \A \QByte limit exceeded, \E }xms ) {
+                chomp;
+                $self->_error($_);
+            }
+            else {
+                $self->_error("API error: $_")
+            }
+            q{};
+        };
     $self->error
-        and die "API error\n";
-    $msgstr =~ s{ [\x{0}\x{4}] }{}xmsg; # because of mo file conflicts
+        and $is_called_indirectly
+            ? ( die $self->error, "\n" )
+            : return q{};
     $self->_translation_count_increment;
     if ( $self->after_translation_code ) {
         $self->after_translation_code->($self, $msgid, $msgstr)
@@ -620,15 +762,17 @@ __END__
 
 Locale::Utils::Autotranslator - Base class to translate automaticly
 
-$Id: Autotranslator.pm 641 2017-02-24 13:14:23Z steffenw $
+$Id: Autotranslator.pm 653 2017-06-03 20:16:11Z steffenw $
 
 $HeadURL: $
 
 =head1 VERSION
 
-1.002
+1.004
 
 =head1 SYNOPSIS
+
+=head2 Create your own translator
 
     package MyAutotranslator;
 
@@ -651,7 +795,10 @@ $HeadURL: $
         return $translation;
     }
 
-How to use see L<Locale::Utils::Autotranslator::ApiMymemoryTranslatedNet|Locale::Utils::Autotranslator::ApiMymemoryTranslatedNet>.
+How to use see also
+L<Locale::Utils::Autotranslator::ApiMymemoryTranslatedNet|Locale::Utils::Autotranslator::ApiMymemoryTranslatedNet>.
+
+=head2 Translate po files
 
     my $obj = MyAutotranslator->new(
         language                => 'de',
@@ -667,17 +814,29 @@ How to use see L<Locale::Utils::Autotranslator::ApiMymemoryTranslatedNet|Locale:
             ...
             return 1; # true: translate, false: skip translation
         },
+        bytes_max               => 500,
     );
     $identical_obj = $obj->translate(
         'mydir/de.pot',
         'mydir/de.po',
     );
-    my $translation_count = $obj->translation_count;
+    # differs in case of bytes_max
+    my $translation_count      = $obj->translation_count;
+    my $item_translation_count = $obj->item_translation_count;
 
-Return code of E.g. you have a limit of 100 free translations or 10000 words for 1 day
+E.g. you have a limit of 100 free translations or 10000 words for 1 day
 you can skip further translations by return any false.
 
-Use that methods for debugging output.
+Use that before_... and after_... callbacks for debugging output.
+
+=head2 Translate text directly
+
+    my $obj = MyAutotranslator->new(
+        ...
+    );
+    $msgstr = $obj->translate_any_msgid(
+        'short text, long text with paragraphs or multiline text',
+    );
 
 =head1 DESCRIPTION
 
@@ -697,14 +856,20 @@ Get back the language of all msgid's. The default is 'en';
 
 Get back the language you want to translate.
 
-=head2 before_translation_code, after_translation_code
+=head2 before_translation_code, after_translation_code, bytes_max
 
 Get back the code references:
 
 $code_ref = $obj->before_translation_code;
 $code_ref = $obj->after_translation_code;
 
+Get back the bytes the translator API can handle:
+
+$positive_int = $obj->bytes_max;
+
 =head2 method translate
+
+Translate po files.
 
     $obj->translate('dir/de.pot', 'dir/de.po');
 
@@ -712,6 +877,42 @@ That means:
 Read the de.pot file (also possible *.po).
 Translate the missing stuff.
 Write back to de.po file.
+
+=head2 method translate_any_msgid
+
+Translate in one or more steps. Count of steps depend on bytes_max.
+
+    $msgstr = $obj->translate($msgid);
+
+=head2 method with_paragraphs (normally not used directly)
+
+Called if bytes_max < length of whole text.
+
+Split text into paragraphslines, remove empty lines around.
+Translate line by paragraph.
+Add the empty lines and join the translated lines.
+
+    $msgstr = $self->with_paragraths(
+        $msgid,
+        sub {
+            return $self->translate_paragraph($_);
+        },
+    );
+
+=head2 method with_lines (normally not used directly)
+
+Called if bytes_max < length of a paragraph.
+
+Split paragraph into lines, remove the whitespace noise around.
+Translate line by line.
+Add the whitespace noise and join the translated lines.
+
+    $msgstr = $self->with_lines(
+        $msgid,
+        sub {
+            return $self->translate_line($_);
+        },
+    );
 
 =head2 method translate_text
 
@@ -734,6 +935,18 @@ E.g.
 =head2 method translation_count
 
 Get back the count of translations.
+This is not the count of translated messages.
+This is the count of successful translate_text calls
+if it would not be splitted into paragraphs and lines.
+
+For plural forms we have to translate 1 to 6 times.
+That depends on language.
+
+my $translation_count = $obj->translation_count;
+
+=head2 method item_translation_count
+
+Get back the count of splitted translations by paragraphs or lines.
 This is not the count of translated messages,
 this is the count of successful translate_text calls.
 

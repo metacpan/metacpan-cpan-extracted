@@ -19,7 +19,7 @@
 ##  + clobbers sub ExtUtils::MakeMaker::WriteMakefile()
 ##    - unlinks all @pdpm files before calling "real" WriteMakefile()
 ##  + clobbers/appends MY::depend (appends)
-##    - adds @pdpm dependencies to dist,distcheck,create_distdir
+##    x- adds @pdpm dependencies to dist,distcheck,create_distdir
 ##    - also adds README.txt dependencies if README.txt or README.rpod is present
 ##  + clobbers/appends MY::special_targets (appends)
 ##    - adds (pm|pod|rpod) -> (txt|html) rules
@@ -95,7 +95,9 @@ sub pdlmaker_init {
   my $depend0 = MY->can('depend') || sub {''};
   my $depend = sub {
     my $inherited  = $depend0->(@_) . shift->SUPER::depend(@_);
-    my $deps = join(' ', ($MY::README ? 'README.txt' : qw()), sort keys %manipm);
+    my $deps = join(' ', ($MY::README ? 'README.txt' : qw()),
+		    #sort keys %manipm
+		   );
     return $inherited if (!$deps);
     return $inherited .<<EOF;
 

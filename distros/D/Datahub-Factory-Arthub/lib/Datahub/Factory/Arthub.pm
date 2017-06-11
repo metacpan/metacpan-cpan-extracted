@@ -1,7 +1,7 @@
 package Datahub::Factory::Arthub;
 
 use strict;
-our $VERSION = '0.8';
+our $VERSION = '0.9';
 
 1;
 __END__

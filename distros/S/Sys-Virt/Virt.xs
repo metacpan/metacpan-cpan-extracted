@@ -1948,13 +1948,107 @@ _stream_send_all_source(virStreamPtr st,
         const char *newdata = SvPV_nolen(datasv);
         if (ret > nbytes)
             ret = nbytes;
-        strncpy(data, newdata, nbytes);
+        memcpy(data, newdata, nbytes);
     }
 
     FREETMPS;
     LEAVE;
 
     SvREFCNT_dec(datasv);
+
+    return ret;
+}
+
+
+static int
+_stream_sparse_send_all_hole_handler(virStreamPtr st,
+                                     int *inData,
+                                     long long *length,
+                                     void *opaque)
+{
+    AV *av = opaque;
+    SV **self;
+    SV **hole_handler;
+    SV *inDataSV;
+    SV *lengthSV;
+    int count;
+    int ret;
+    dSP;
+
+    self = av_fetch(av, 0, 0);
+    hole_handler = av_fetch(av, 2, 0);
+
+    SvREFCNT_inc(*self);
+
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(SP);
+    XPUSHs(*self);
+    PUTBACK;
+
+    count = call_sv((SV*)*hole_handler, G_ARRAY);
+
+    SPAGAIN;
+
+    if (count == 2) {
+        /* @hole_handler returns (in_data, length), but on a stack.
+         * Therefore the order is reversed. */
+        lengthSV = POPs;
+        inDataSV = POPs;
+        *inData = virt_SvIVll(inDataSV);
+        *length = virt_SvIVll(lengthSV);
+        ret = 0;
+    } else {
+        ret = -1;
+    }
+
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+
+    return ret;
+}
+
+
+static int
+_stream_sparse_send_all_skip_handler(virStreamPtr st,
+                                     long long length,
+                                     void *opaque)
+{
+    AV *av = opaque;
+    SV **self;
+    SV **skip_handler;
+    int rv;
+    int ret;
+    dSP;
+
+    self = av_fetch(av, 0, 0);
+    skip_handler = av_fetch(av, 3, 0);
+
+    SvREFCNT_inc(*self);
+
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(SP);
+    XPUSHs(*self);
+    XPUSHs(sv_2mortal(virt_newSVll(length)));
+    PUTBACK;
+
+    rv = call_sv((SV*)*skip_handler, G_SCALAR);
+
+    SPAGAIN;
+
+    if (rv == 1) {
+        ret = POPi;
+    } else {
+        ret = -1;
+    }
+
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
 
     return ret;
 }
@@ -2003,6 +2097,48 @@ _stream_recv_all_sink(virStreamPtr st,
     LEAVE;
 
     SvREFCNT_dec(datasv);
+
+    return ret;
+}
+
+
+static int
+_stream_sparse_recv_hole_handler(virStreamPtr st,
+                                 long long offset,
+                                 void *opaque)
+{
+    AV *av = opaque;
+    SV **self;
+    SV **hole_handler;
+    int rv;
+    int ret;
+    dSP;
+
+    self = av_fetch(av, 0, 0);
+    hole_handler = av_fetch(av, 2, 0);
+
+    SvREFCNT_inc(*self);
+
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(SP);
+    XPUSHs(*self);
+    XPUSHs(sv_2mortal(virt_newSVll(offset)));
+    PUTBACK;
+
+    rv = call_sv((SV*)*hole_handler, G_SCALAR);
+
+    SPAGAIN;
+
+    if (rv == 1) {
+        ret = POPi;
+    } else {
+        ret = -1;
+    }
+
+    FREETMPS;
+    LEAVE;
 
     return ret;
 }
@@ -7874,16 +8010,21 @@ send(st, data, nbytes)
 
 
 int
-recv(st, data, nbytes)
+recv(st, data, nbytes, flags=0)
       virStreamPtr st;
       SV *data;
       size_t nbytes;
+      unsigned int flags;
  PREINIT:
       char *rawdata;
     CODE:
       Newx(rawdata, nbytes, char);
-      if ((RETVAL = virStreamRecv(st, rawdata, nbytes)) < 0 &&
-          RETVAL != -2) {
+      if (flags)
+          RETVAL = virStreamRecvFlags(st, rawdata, nbytes, flags);
+      else
+          RETVAL = virStreamRecv(st, rawdata, nbytes);
+
+      if (RETVAL != -2 && RETVAL != -3) {
           Safefree(rawdata);
           _croak_error();
       }
@@ -7893,6 +8034,34 @@ recv(st, data, nbytes)
       Safefree(rawdata);
   OUTPUT:
       RETVAL
+
+
+SV *
+recv_hole(st, flags=0)
+      virStreamPtr st;
+      unsigned int flags;
+  PREINIT:
+      long long length;
+    CODE:
+      if (virStreamRecvHole(st, &length, flags) < 0)
+          _croak_error();
+
+      RETVAL = virt_newSVll(length);
+  OUTPUT:
+      RETVAL
+
+
+void
+send_hole(st, lengthSV, flags=0)
+      virStreamPtr st;
+      SV *lengthSV;
+      unsigned int flags;
+ PREINIT:
+      long long length;
+  PPCODE:
+      length = virt_SvIVll(lengthSV);
+      if (virStreamSendHole(st, length, flags) < 0)
+          _croak_error();
 
 
 void
@@ -7938,6 +8107,64 @@ recv_all(stref, handler)
 
       SvREFCNT_dec(opaque);
 
+
+void
+sparse_recv_all(stref, handler, hole_handler)
+      SV *stref;
+      SV *handler;
+      SV *hole_handler;
+ PREINIT:
+      AV *opaque;
+      virStreamPtr st;
+    CODE:
+      st = (virStreamPtr)SvIV((SV*)SvRV(stref));
+
+      opaque = newAV();
+      SvREFCNT_inc(stref);
+      SvREFCNT_inc(handler);
+      SvREFCNT_inc(hole_handler);
+      av_push(opaque, stref);
+      av_push(opaque, handler);
+      av_push(opaque, hole_handler);
+
+      if (virStreamSparseRecvAll(st,
+                                 _stream_recv_all_sink,
+                                 _stream_sparse_recv_hole_handler,
+                                 opaque) < 0)
+          _croak_error();
+
+      SvREFCNT_dec(opaque);
+
+void
+sparse_send_all(stref, handler, hole_handler, skip_handler)
+      SV *stref;
+      SV *handler;
+      SV *hole_handler;
+      SV *skip_handler;
+ PREINIT:
+      AV *opaque;
+      virStreamPtr st;
+    CODE:
+      st = (virStreamPtr)SvIV((SV*)SvRV(stref));
+
+      opaque = newAV();
+      SvREFCNT_inc(stref);
+      SvREFCNT_inc(handler);
+      SvREFCNT_inc(hole_handler);
+      SvREFCNT_inc(skip_handler);
+      av_push(opaque, stref);
+      av_push(opaque, handler);
+      av_push(opaque, hole_handler);
+      av_push(opaque, skip_handler);
+
+      if (virStreamSparseSendAll(st,
+                                 _stream_send_all_source,
+                                 _stream_sparse_send_all_hole_handler,
+                                 _stream_sparse_send_all_skip_handler,
+                                 opaque) < 0)
+          _croak_error();
+
+      SvREFCNT_dec(opaque);
 
 void
 add_callback(stref, events, cb)
@@ -8334,6 +8561,8 @@ BOOT:
       REGISTER_CONSTANT(VIR_DOMAIN_EVENT_STOPPED_FROM_SNAPSHOT, EVENT_STOPPED_FROM_SNAPSHOT);
 
       REGISTER_CONSTANT(VIR_DOMAIN_EVENT_SHUTDOWN_FINISHED, EVENT_SHUTDOWN_FINISHED);
+      REGISTER_CONSTANT(VIR_DOMAIN_EVENT_SHUTDOWN_HOST, EVENT_SHUTDOWN_HOST);
+      REGISTER_CONSTANT(VIR_DOMAIN_EVENT_SHUTDOWN_GUEST, EVENT_SHUTDOWN_GUEST);
 
       REGISTER_CONSTANT(VIR_DOMAIN_EVENT_PMSUSPENDED_MEMORY, EVENT_PMSUSPENDED_MEMORY);
 
@@ -8938,6 +9167,9 @@ BOOT:
       REGISTER_CONSTANT(VIR_CONNECT_LIST_NODE_DEVICES_CAP_VPORTS, LIST_CAP_VPORTS);
       REGISTER_CONSTANT(VIR_CONNECT_LIST_NODE_DEVICES_CAP_SCSI_GENERIC, LIST_CAP_SCSI_GENERIC);
       REGISTER_CONSTANT(VIR_CONNECT_LIST_NODE_DEVICES_CAP_DRM, LIST_CAP_DRM);
+      REGISTER_CONSTANT(VIR_CONNECT_LIST_NODE_DEVICES_CAP_MDEV, LIST_CAP_MDEV);
+      REGISTER_CONSTANT(VIR_CONNECT_LIST_NODE_DEVICES_CAP_MDEV_TYPES, LIST_CAP_MDEV_TYPES);
+      REGISTER_CONSTANT(VIR_CONNECT_LIST_NODE_DEVICES_CAP_CCW_DEV, LIST_CAP_CCW_DEV);
 
       REGISTER_CONSTANT(VIR_NODE_DEVICE_EVENT_ID_LIFECYCLE, EVENT_ID_LIFECYCLE);
       REGISTER_CONSTANT(VIR_NODE_DEVICE_EVENT_ID_UPDATE, EVENT_ID_UPDATE);
@@ -8980,6 +9212,10 @@ BOOT:
       REGISTER_CONSTANT(VIR_STORAGE_VOL_USE_ALLOCATION, USE_ALLOCATION);
       REGISTER_CONSTANT(VIR_STORAGE_VOL_GET_PHYSICAL, GET_PHYSICAL);
 
+      REGISTER_CONSTANT(VIR_STORAGE_VOL_DOWNLOAD_SPARSE_STREAM, VOL_DOWNLOAD_SPARSE_STREAM);
+
+      REGISTER_CONSTANT(VIR_STORAGE_VOL_UPLOAD_SPARSE_STREAM, VOL_UPLOAD_SPARSE_STREAM);
+
       stash = gv_stashpv( "Sys::Virt::Secret", TRUE );
       REGISTER_CONSTANT(VIR_SECRET_USAGE_TYPE_NONE, USAGE_TYPE_NONE);
       REGISTER_CONSTANT(VIR_SECRET_USAGE_TYPE_VOLUME, USAGE_TYPE_VOLUME);
@@ -9007,6 +9243,8 @@ BOOT:
       REGISTER_CONSTANT(VIR_STREAM_EVENT_WRITABLE, EVENT_WRITABLE);
       REGISTER_CONSTANT(VIR_STREAM_EVENT_ERROR, EVENT_ERROR);
       REGISTER_CONSTANT(VIR_STREAM_EVENT_HANGUP, EVENT_HANGUP);
+
+      REGISTER_CONSTANT(VIR_STREAM_RECV_STOP_AT_HOLE, RECV_STOP_AT_HOLE);
 
 
 

@@ -94,10 +94,10 @@ sub create_repo ( $self, @ ) {
         name          => $self->repo_name,
         description   => undef,
         homepage      => undef,
-        private       => $FALSE,
-        has_issues    => $TRUE,
-        has_wiki      => $TRUE,
-        has_downloads => $TRUE,
+        private       => \0,
+        has_issues    => \1,
+        has_wiki      => \1,
+        has_downloads => \1,
         splice @_, 1
     );
 

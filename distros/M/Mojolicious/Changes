@@ -1,4 +1,18 @@
 
+7.33  2017-06-05
+  - Added EXPERIMENTAL support for :matches pseudo-class and :not pseudo-class
+    with compount selectors to Mojo::DOM::CSS.
+  - Fixed a few form element value extraction bugs in Mojo::DOM.
+  - Fixed version command to use the new MetaCPAN API, since the old one got
+    shut down.
+
+7.32  2017-05-28
+  - Added -f option to get command.
+  - Improved get command with support for passing request data by redirecting
+    STDIN.
+  - Fixed memory leak in Mojo::IOLoop::Client that sometimes prevented the
+    connect timeout from working correctly for TLS handshakes.
+
 7.31  2017-04-23
   - Removed deprecated files, slurp and spurt functions from Mojo::Util.
   - Removed deprecated parts attribute from Mojo::Home.

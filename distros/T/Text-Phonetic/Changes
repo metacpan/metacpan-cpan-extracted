@@ -1,5 +1,12 @@
 Revision history for Perl module Text::Phonetic
 
+2.08 Wed May 31 2017
+    - Makefile fix for perl 5.26
+
+2.07 Sat Apr 2 2016
+    - Fix tests
+    - Declare dependencies
+
 2.06 Wed Sep 23 2015
     - Moose -> Moo (implemented by Miquel Ruiz)
     - Update Phonix to match WAIS (implemented by olsgaard)

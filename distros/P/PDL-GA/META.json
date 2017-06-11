@@ -1,0 +1,42 @@
+{
+   "abstract" : "Genetic algorithm utilities for PDL",
+   "author" : [
+      "Bryan Jurish"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PDL-GA",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "PDL" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "PDL" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.08"
+}

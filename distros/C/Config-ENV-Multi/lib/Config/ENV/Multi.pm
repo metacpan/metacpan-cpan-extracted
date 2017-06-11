@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp qw/croak/;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 use constant DELIMITER => '@#%@#';
 
@@ -46,6 +46,7 @@ sub import {
             rule     => $opts{rule},
             wildcard => \%wildcard,
             cache    => {},
+            local    => [],
             export   => $opts{export},
         };
     } else {
@@ -183,6 +184,20 @@ sub current {
     };
 }
 
+sub local :method {
+    my ($package, %hash) = @_;
+    not defined wantarray and croak "local returns guard object; Can't use in void context.";
+
+    my $data = _data($package);
+    push @{ $data->{local} }, \%hash;
+    %{ $data->{cache} } = ();
+
+    bless sub {
+        @{ $data->{local} } = grep { $_ != \%hash } @{ $data->{local} };
+        %{ $data->{cache} } = ();
+    }, 'Config::ENV::Multi::Local';
+}
+
 sub param {
     my ($package, $name) = @_;
     $package->current->{$name};
@@ -205,10 +220,11 @@ sub _match {
     my $data = _data($package);
 
     return +{
-        map  { %{ $_->as_hashref } }
-        grep { $_->match($target_envs) }
-        sort { $a->{order} - $b->{order} }
-        values %{ $data->{configs} }
+        (map  { %{ $_->as_hashref } }
+         grep { $_->match($target_envs) }
+         sort { $a->{order} - $b->{order} }
+         values %{ $data->{configs} }),
+        (map { %$_ } @{ $data->{local} })
     };
 }
 
@@ -242,6 +258,14 @@ sub match {
 }
 
 sub as_hashref { $_[0]->{hash} }
+
+package # to hide from pause
+    Config::ENV::Multi::Local;
+
+sub DESTROY {
+    my $self = shift;
+    $self->();
+}
 
 1;
 

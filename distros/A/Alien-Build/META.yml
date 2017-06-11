@@ -38,5 +38,8 @@ resources:
   bugtracker: https://github.com/plicease/Alien-Build/issues
   homepage: https://metacpan.org/pod/Alien::Build
   repository: git://github.com/plicease/Alien-Build.git
-version: '0.36'
+version: '0.41'
+x_contributors:
+  - 'Graham Ollis <plicease@cpan.org>'
+  - 'Diab Jerius (DJERIUS)'
 x_serialization_backend: 'YAML::Tiny version 1.70'
