@@ -3,7 +3,7 @@ package Mojolicious::Plugin::PgURLHelper;
 use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::URL;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub register {
     my ($self, $app) = @_;
@@ -25,7 +25,7 @@ sub _pg_url {
         $c->app->log->error('Missing database parameter.');
         $croak++;
     }
-    if (index($s->{user}, ':') != -1) {
+    if ($s->{user} && index($s->{user}, ':') != -1) {
         $c->app->log->error('You can\'t have a colon in the user name.');
         $croak++;
     }
@@ -40,7 +40,6 @@ sub _pg_url {
     my $user = (defined $s->{user}) ? $s->{user} : '';
     my $pwd  = (defined $s->{pwd}) ? $s->{pwd} : '';
     $addr->userinfo($user.':'.$pwd) if ($user && $pwd);
-    warn $addr->to_unsafe_string;
     return $addr->to_unsafe_string;
 }
 
@@ -62,7 +61,7 @@ Mojolicious::Plugin::PgURLHelper - Mojolicious Plugin
   plugin 'PgURLHelper';
 
   # Use the helper
-  my $pg_url = $self->pg_url({host => 'localhost', database => 'foo', user => 'bar', pwd => 'baz');
+  my $pg_url = $self->pg_url({host => 'localhost', database => 'foo', user => 'bar', pwd => 'baz'});
   my $pg = Mojo::Pg->new($pg_url);
   $self->plugin('Minion', {Pg => $pg_url});
 
@@ -74,7 +73,7 @@ L<Mojolicious::Plugin::PgURLHelper> is a L<Mojolicious> plugin to easily create 
 
 =head2 pg_url
 
-  my $pg_url = $self->pg_url({host => 'localhost', database => 'foo', user => 'bar', pwd => 'baz');
+  my $pg_url = $self->pg_url({host => 'localhost', database => 'foo', user => 'bar', pwd => 'baz'});
 
 Arguments:
 

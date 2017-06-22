@@ -231,7 +231,7 @@ package Astro::Coord::ECI::TLE;
 use strict;
 use warnings;
 
-our $VERSION = '0.081';
+our $VERSION = '0.082';
 
 use base qw{ Astro::Coord::ECI Exporter };
 
@@ -8786,7 +8786,7 @@ sub _next_elevation_screen {
                'comment' => '',
                'id' => '25345',
                'name' => 'Iridium 74',
-               'status' => 1,
+               'status' => 2,
                'type' => 'iridium'
              },
   '25346' => {
@@ -8973,7 +8973,7 @@ sub _next_elevation_screen {
 #
 #   $ eg/visual -merge
 #
-# Last-Modified: Thu, 25 May 2017 00:30:11 GMT
+# Last-Modified: Sun, 11 Jun 2017 23:15:34 GMT
 
 %magnitude_table = (
   '00694' => 3.5,

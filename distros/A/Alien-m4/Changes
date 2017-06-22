@@ -1,5 +1,9 @@
 Revision history for Alien-m4
 
+0.10      2017-06-17 11:48:36 -0400
+  - Use the Alien::MSYS version of m4 on Windows
+    if no other version can be found.
+
 0.09      2017-03-04 20:25:58 -0500
   - Migrated to alienfile + Alien::Build
 

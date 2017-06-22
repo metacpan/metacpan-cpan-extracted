@@ -3,7 +3,7 @@ package Geo::Compass::Variation;
 use strict; 
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '1.00';
 
 use Exporter qw(import);
  
@@ -20,7 +20,6 @@ use constant {
     DEG2RAD             => atan2(1, 1) / 45,
     WMM_RELEASE_YEAR    => 2015,
     WMM_EXPIRE_YEAR     => 2019,
-    DEFAULT_YEAR_ARG    => 2017.5,
     DEFAULT_ALT_ARG     => 0,
 };
 
@@ -145,18 +144,31 @@ sub _args {
     }
 
     $alt = defined $alt ? $alt : DEFAULT_ALT_ARG;
+    $year = defined $year ? $year : _calc_year();
 
-    if (defined $year){
-       if ($year < WMM_RELEASE_YEAR || $year > WMM_EXPIRE_YEAR){
-           die "Calculation model has expired: "
-               . WMM_RELEASE_YEAR . '-' . WMM_EXPIRE_YEAR . "\n";
-       }
-    }
-    else {
-       $year = DEFAULT_YEAR_ARG;
+    if ($year < WMM_RELEASE_YEAR || $year > WMM_EXPIRE_YEAR){
+        die "Calculation model has expired: "
+            . WMM_RELEASE_YEAR . '-' . WMM_EXPIRE_YEAR . "\n";
     }
 
     return ($lat, $lon, $alt, $year);
+}
+sub _calc_year {
+    my (undef, undef, undef, undef, $month_num, $year) = localtime;
+    $year += 1900;
+    $month_num += 1; # starts at zero
+
+    # normalization of month, where:
+    # oldvalue = $month_num
+    # oldmin = 1 (month starts at one)
+    # newmax = 10
+    # newmin = 1
+    # oldmax = 12
+
+    # ((oldvalue - oldmin) * (newmax - newmin)) / (oldmax - oldmin) + newmin
+    my $month_normalized = int(((($month_num - 1) * (10 - 1)) / (12 - 1)) + 1);
+
+    return "$year.$month_normalized";
 }
 sub _wmm {
     # 2015
@@ -285,6 +297,9 @@ and longitude pair.
 
 See L<NOAA|https://www.ngdc.noaa.gov/geomag/WMM/DoDWMM.shtml> for details.
 
+The WMM data is currently valid from January 1, 2015 through December 31, 2019.
+This module will be updated with new WMM data as it becomes available.
+
 =head1 EXPORT_OK
 
 All functions must be imported explicitly:
@@ -323,7 +338,10 @@ Optional, Integer: Altitude above sea level, in metres. Defaults to C<0>.
     $year
 
 Optional, Integer|Float: The year to base the calculation from. Defaults to
-C<2017.5>.
+C<YYYY.M>, where C<YYYY> is the year from C<localtime()> and C<M> is the month
+number from C<localtime()>, normalized to a digit between 1-10.
+
+We will C<die()> if the year is out of range of the current WMM specification.
 
 Return: A floating point number representing the magnetic declination.
 

@@ -1,5 +1,8 @@
 Revision history for perl distribution Mojolicious-Plugin-CGI
 
+0.38 2017-06-12T21:05:08+0200
+ - Bumped Mojolicious version to 7.28 #27
+
 0.37 2017-05-15T22:01:59+0200
  - Stop using deprecated "spurt" #26
 

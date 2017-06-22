@@ -3,6 +3,8 @@ use 5.010;
 use strict;
 use warnings;
 
+use Ref::Util qw/is_plain_arrayref/;
+
 sub new {
     my ($class, $config)= @_;
 
@@ -28,7 +30,7 @@ sub new {
     }, $class;
 
     if (my $cp= $config->{contact_points}) {
-        if (ref($cp) eq 'ARRAY') {
+        if (is_plain_arrayref($cp)) {
             @{$self->{contact_points}=[]}= @$cp;
         } else { die "contact_points must be an arrayref"; }
     } else { die "contact_points not specified"; }

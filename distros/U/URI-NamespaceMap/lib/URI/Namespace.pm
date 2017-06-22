@@ -5,7 +5,7 @@ use IRI 0.003;
 use Types::Namespace 0.004 qw( Iri );
 use namespace::autoclean;
 
-our $VERSION = '1.00';
+our $VERSION = '1.02';
 
 =head1 NAME
 
@@ -82,7 +82,10 @@ has _uri => (
 sub iri {
 	my ($self, $name) = @_;
 	if (defined($name)) {
-		return IRI->new($self->_uri->as_string . "$name");
+		my $str = $self->_uri->as_string;
+		my $lastc = substr($str, -1); # Find the last character of the string
+		$str .= '#' unless (($lastc eq '#') or ($lastc eq '/'));
+		return IRI->new($str . "$name");
 	} else {
 		return $self->_uri;
 	}
@@ -92,6 +95,8 @@ sub uri {
 	my ($self, $name) = @_;
 	my $iri = $self->_uri->as_string;
 	if (defined($name)) {
+		my $lastc = substr($iri, -1); # Find the last character of the string
+		$iri .= '#' unless (($lastc eq '#') or ($lastc eq '/')); 
 		return URI->new($iri . "$name");
 	} else {
 		return URI->new($iri);

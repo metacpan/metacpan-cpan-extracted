@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # NanoB2B::NER
-# (Last Updated $Id: NER.pm,v 1.0 2017/02/22 14:44:33 charityml Exp $)
+# (Last Updated $Id: NER.pm,v 1.5 2017/04/03 16:52:33 charityml Exp $)
 #
 # Perl module that turns labeled text lines into 
 # ARFF files based on specified features
@@ -112,6 +112,9 @@ our $VERSION = '0.01';
 #option variables
 my $debug = 0;
 
+#for wcs
+my $wcs_found = 1;
+
 =head1 NAME
 
 NanoB2B-NNER-PM::NER - The main file that runs all of the processes for NER
@@ -183,11 +186,15 @@ sub _init {
     my $opt_importmeta 	= $params->{'import_meta'};
     my $opt_features 	= $params->{'features'};
     my $opt_buckets 	= $params->{'buckets'};
-    my $opt_stopwords 	= $params->{'exclude_stopwords'};
+    my $opt_stopwords 	= $params->{'stopwords'};
+    my $opt_is_cui 		= $params->{'is_cui'};
+    my $opt_sparse 		= $params->{'sparse_matrix'};
     my $opt_prefix 		= $params->{'prefix'};
     my $opt_suffix 		= $params->{'suffix'};
+    my $opt_wcs 		= $params->{'wcs'};
     my $opt_wekatype 	= $params->{'weka_type'};
     my $opt_wekasize 	= $params->{'weka_size'};
+	my $opt_metamaparguments = $params->{'metamap_arguments'};
 
 
     #set the global variables
@@ -220,9 +227,19 @@ sub _init {
 	}
 
 	if(defined $opt_stopwords){									#exclude stop words from arff vectors
-		$self->{no_stopwords} = $opt_stopwords;
+		$self->{stopwords} = $opt_stopwords;
+	}
+
+	if(defined $opt_is_cui){									#if a word doesn't have a cui - don't make a vector
+		$self->{is_cui} = $opt_is_cui;
 	}else{
-		$self->{no_stopwords} = 0;
+		$self->{is_cui} = 0;
+	}
+
+	if(defined $opt_sparse){									#decide to turn vector's into sparse format
+		$self->{sparse_matrix} = $opt_sparse;
+	}else{
+		$self->{sparse_matrix} = 0;
 	}
 
 	if(defined $opt_importmeta){								#decide to import metamap or not
@@ -240,6 +257,11 @@ sub _init {
 		$self->{suffix} = $opt_suffix;
 	}else{
 		$self->{suffix} = 3;
+	}
+
+	if(defined $opt_wcs){										#check if to do worst-case-scenario backup
+		$self->{wcs} = $opt_wcs;
+		$wcs_found = 0;
 	}
 
 	if(defined $opt_wekatype){									#get the type of weka algorithm to run
@@ -270,6 +292,11 @@ sub _init {
 		$self->{sortSize} = $opt_sortbysize;
 	}else{
 		$self->{sortSize} = 0;
+	}
+	if(defined $opt_metamaparguments){							#run metamap with specific arguments
+		$self->{metamap_arguments} = $opt_metamaparguments;
+	} else {
+		$self->{metamap_arguments} = "-q";
 	}
 
 	#error handling?
@@ -344,7 +371,12 @@ sub nerByFile{
 			#metamap the files if needed
 			if(!$self->{import_meta}){
 				$uniSub->printColorDebug("bold cyan", "---  METAMAP  ---\n");
-				$metaboy = NanoB2B::NER::Metaman->new($self->{program_dir}, $self->{index}, $debug);
+				my %paramsm = ();
+				$paramsm{'directory'} = $self->{program_dir};
+				$paramsm{'index'} = $self->{index};
+				$paramsm{'metamap_arguments'} = $self->{metamap_arguments};
+				$paramsm{'debug'} = $debug;
+				$metaboy = NanoB2B::NER::Metaman->new(\%paramsm);
 				$metaboy->meta_file($tag);
 			}
 
@@ -352,14 +384,20 @@ sub nerByFile{
 			$uniSub->printColorDebug("bold magenta", "---    ARFF    ---\n");
 				#define arffboy with the parameters
 				my %paramsr = ();
-				$paramsr{'dir'} = $self->{'program_dir'};
-				$paramsr{'features'} = $self->{'features'};
-				$paramsr{'bucketsNum'} = $self->{'bucketsNum'};
+				$paramsr{'directory'} = $self->{program_dir};
+				$paramsr{'features'} = $self->{features};
+				$paramsr{'bucketsNum'} = $self->{bucketsNum};
 			    $paramsr{'debug'} = $debug;
-				$paramsr{'prefix'} = $self->{'prefix'};
-				$paramsr{'suffix'} = $self->{'suffix'};
-			    $paramsr{'index'} = $self->{'index'};
-			    $paramsr{'no_stopwords'} = $self->{'no_stopwords'};
+				$paramsr{'prefix'} = $self->{prefix};
+				$paramsr{'suffix'} = $self->{suffix};
+			    $paramsr{'index'} = $self->{index};
+			    $paramsr{'stopwords'} = $self->{stopwords};
+			    $paramsr{'is_cui'} = $self->{is_cui};
+			    $paramsr{'sparse_matrix'} = $self->{sparse_matrix};
+			    if(!$wcs_found){
+			   		$paramsr{'wcs'} = $self->{wcs};
+			   		$wcs_found = 1;
+			    }
 				$arffboy = NanoB2B::NER::Arffman->new(\%paramsr);	
 			$arffboy->arff_file($tag);
 
@@ -398,7 +436,12 @@ sub nerByFile{
 		#metamap the files if needed
 		if(!$self->{import_meta}){
 			$uniSub->printColorDebug("bold cyan", "---  METAMAP  ---\n");
-			$metaboy = NanoB2B::NER::Metaman->new($self->{program_dir}, $self->{index}, $debug);
+			my %paramsm = ();
+			$paramsm{'directory'} = $self->{program_dir};
+			$paramsm{'index'} = $self->{index};
+			$paramsm{'metamap_arguments'} = $self->{metamap_arguments};
+			$paramsm{'debug'} = $debug;
+			$metaboy = NanoB2B::NER::Metaman->new(\%paramsm);
 			$metaboy->meta_file($tag);
 		}
 
@@ -406,14 +449,20 @@ sub nerByFile{
 		$uniSub->printColorDebug("bold magenta", "---    ARFF    ---\n");
 			#define arffboy with the parameters
 			my %paramsr = ();
-			$paramsr{'dir'} = $self->{'program_dir'};
-			$paramsr{'features'} = $self->{'features'};
-			$paramsr{'bucketsNum'} = $self->{'bucketsNum'};
+			$paramsr{'directory'} = $self->{program_dir};
+			$paramsr{'features'} = $self->{features};
+			$paramsr{'bucketsNum'} = $self->{bucketsNum};
 		    $paramsr{'debug'} = $debug;
-			$paramsr{'prefix'} = $self->{'prefix'};
-			$paramsr{'suffix'} = $self->{'suffix'};
-		    $paramsr{'index'} = $self->{'index'};
-		    $paramsr{'no_stopwords'} = $self->{'no_stopwords'};
+			$paramsr{'prefix'} = $self->{prefix};
+			$paramsr{'suffix'} = $self->{suffix};
+		    $paramsr{'index'} = $self->{index};
+		    $paramsr{'stopwords'} = $self->{stopwords};
+		    $paramsr{'is_cui'} = $self->{is_cui};
+		    $paramsr{'sparse_matrix'} = $self->{sparse_matrix};
+		    if(!$wcs_found){
+			   	$paramsr{'wcs'} = $self->{wcs};
+			   	$wcs_found = 1;
+			}
 			$arffboy = NanoB2B::NER::Arffman->new(\%paramsr);	
 		$arffboy->arff_file($tag);
 
@@ -481,17 +530,17 @@ sub nerByMethod{
 
 	#meta the files if needed
 	if(!$self->{import_meta}){
-		metaSet();
+		$self->metaSet();
 	}
 	
 	#arff the files
-	arffSet();
+	$self->arffSet();
 
 	#weka the files
-	wekaSet();
+	$self->wekaSet();
 
 	#average the files
-	avgSet();
+	$self->avgSet();
 }
 
 =head3 metaSet
@@ -521,11 +570,18 @@ example:
 =cut
 sub metaSet{
 	my $self = shift;
+
+	print "\tDIR: " .  $self->{'program_dir'} . "\n";
 	
 	#open the directory	 
 	opendir (my $DIR, $self->{program_dir}) or die $!;							
 	my @tags = grep { $_ ne '.' and $_ ne '..' and substr($_, 0, 1) ne '_'} readdir $DIR;	#get each file from the directory
 	my $totalTags = @tags;
+
+	#if only file
+	if($self->{program_file}){
+		$totalTags = 1;
+	}
 
 	#sort by size?
 	if($self->{sortSize}){
@@ -538,7 +594,12 @@ sub metaSet{
 	}
 
 	#define metaboy with the parameters
-	$metaboy = NanoB2B::NER::Metaman->new($self->{program_dir}, $self->{index}, $debug);
+	my %params = ();
+	$params{'directory'} = $self->{program_dir};
+	$params{'index'} = $self->{index};
+	$params{'metamap_arguments'} = $self->{metamap_arguments};
+	$params{'debug'} = $debug;
+	$metaboy = NanoB2B::NER::Metaman->new(\%params);
 	
 	#run set through metamap
 	for(my $a = $self->{fileIndex}; $a <= $totalTags; $a++){
@@ -582,6 +643,11 @@ sub arffSet{
 	my @tags = grep { $_ ne '.' and $_ ne '..' and substr($_, 0, 1) ne '_'} readdir $DIR;	#get each file from the directory
 	my $totalTags = @tags;
 
+	#if only one file
+	if($self->{program_file}){
+		$totalTags = 1;
+	}
+
 	#sort by size?
 	if($self->{sortSize}){
 		@tags = sortBySize($self, \@tags);
@@ -594,19 +660,28 @@ sub arffSet{
 
 	#define arffboy with the parameters
 	my %params = ();
-	$params{'dir'} = $self->{'program_dir'};
+	$params{'directory'} = $self->{'program_dir'};
 	$params{'features'} = $self->{'features'};
 	$params{'bucketsNum'} = $self->{'bucketsNum'};
     $params{'debug'} = $debug;
 	$params{'prefix'} = $self->{'prefix'};
 	$params{'suffix'} = $self->{'suffix'};
     $params{'index'} = $self->{'index'};
-    $params{'no_stopwords'} = $self->{'no_stopwords'};
+    $params{'stopwords'} = $self->{'stopwords'};
+    $params{'is_cui'} = $self->{'is_cui'};
+    $params{'sparse_matrix'} = $self->{'sparse_matrix'};
+    $params{'wcs'} = $self->{'wcs'};
 	$arffboy = NanoB2B::NER::Arffman->new(\%params);			
 
 	for(my $a = $self->{fileIndex}; $a <= $totalTags; $a++){
 		$uniSub->printColorDebug("bold magenta", "ARFF FILE #$a / $totalTags\n");
 		my $tag = $tags[$a - 1];
+		if($wcs_found){
+			$params{'wcs'} = "";
+			$arffboy = NanoB2B::NER::Arffman->new(\%params);
+		}else{
+			$wcs_found = 1;
+		}
 		$arffboy->arff_file($tag);
 		$uniSub->printColorDebug("bold magenta", "##         FINISHED ARFF #$a - $tag!        ##\n");
 	}
@@ -645,6 +720,11 @@ sub wekaSet{
 	my @tags = grep { $_ ne '.' and $_ ne '..' and substr($_, 0, 1) ne '_'} readdir $DIR;	#get each file from the directory
 	my $totalTags = @tags;
 
+	#if only one file
+	if($self->{program_file}){
+		$totalTags = 1;
+	}
+
 	#sort by size?
 	if($self->{sortSize}){
 		@tags = sortBySize($self, \@tags);
@@ -660,16 +740,17 @@ sub wekaSet{
 	$params{'directory'} = $self->{program_dir};
 	$params{'type'} = $self->{weka_type};
 	$params{'weka_size'} = $self->{weka_size};
-	$params{'sets'} = $self->{features};
+	$params{'features'} = $self->{features};
 	$params{'buckets'} = $self->{bucketsNum};
 	$params{'debug'} = $debug;
 	$wekaboy = NanoB2B::NER::Wekaman->new(\%params);			
 
 	for(my $a = $self->{fileIndex}; $a <= $totalTags; $a++){
-		$uniSub->printColorDebug("bold yellow", "WEKA FILE #$a / $totalTags\n");
+		$uniSub->printColorDebug("bold yellow", "##         WEKA FILE #$a / $totalTags         ##\n");
 		my $tag = $tags[$a - 1];
 		$wekaboy->weka_file($tag);
 		$uniSub->printColorDebug("bold yellow", "##         FINISHED WEKA #$a - $tag!        ##\n");
+		sleep(1);
 	}
 }
 
@@ -705,6 +786,11 @@ sub avgSet{
 	opendir (my $DIR, $self->{program_dir}) or die $!;							
 	my @tags = grep { $_ ne '.' and $_ ne '..' and substr($_, 0, 1) ne '_'} readdir $DIR;	#get each file from the directory
 	my $totalTags = @tags;
+
+	#if only one file
+	if($self->{program_file}){
+		$totalTags = 1;
+	}
 
 	#sort by size?
 	if($self->{sortSize}){

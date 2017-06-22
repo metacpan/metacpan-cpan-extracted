@@ -74,12 +74,7 @@ sub import_needed_pubkeys_from_file {
     my ($kv) = grep { (hex($keyid) == hex($_->{id})) } @keys;
     my $imported;
     if (!$kv) {
-	    if (!import_pubkey_file($db, $pubkey_file)) {
-		#$urpm->{debug_URPM}("Couldn't import public key from ".$pubkey_file) if $urpm->{debug_URPM};
-		$imported = 0;
-	    } else {
-		$imported = 1;
-	    }
+	    $imported = import_pubkey_file($db, $pubkey_file);
 	    @keys = parse_pubkeys_($db);
 	    ($kv) = grep { (hex($keyid) == hex($_->{id})) } @keys;
     }

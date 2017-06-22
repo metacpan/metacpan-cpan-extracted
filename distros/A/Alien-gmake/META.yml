@@ -3,8 +3,8 @@ abstract: 'Find or build GNU Make'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
-  Alien::Build: '0.25'
-  Alien::Build::MM: '0.25'
+  Alien::Build: '0.40'
+  Alien::Build::MM: '0.40'
   Capture::Tiny: '0'
   ExtUtils::MakeMaker: '6.52'
   Test2::Suite: '0.000060'
@@ -12,8 +12,8 @@ build_requires:
   Test::More: '0.94'
   perl: '5.006'
 configure_requires:
-  Alien::Build: '0.25'
-  Alien::Build::MM: '0.25'
+  Alien::Build: '0.40'
+  Alien::Build::MM: '0.40'
   Capture::Tiny: '0'
   ExtUtils::MakeMaker: '6.52'
   File::chdir: '0'
@@ -34,5 +34,5 @@ resources:
   bugtracker: https://github.com/Perl5-Alien/Alien-gmake/issues
   homepage: https://metacpan.org/pod/Alien::gmake
   repository: git://github.com/Perl5-Alien/Alien-gmake.git
-version: '0.19'
+version: '0.20'
 x_serialization_backend: 'YAML::Tiny version 1.70'

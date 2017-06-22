@@ -1,12 +1,13 @@
-Build.PL
 Changes
+DiscID.xs
 examples/discid.pl
 lib/MusicBrainz/DiscID.pm
-lib/MusicBrainz/DiscID.xs
-lib/MusicBrainz/typemap
+Makefile.PL
 MANIFEST
-META.yml
-README
+README.md
 t/00use.t
 t/05pod.t
 t/10discid.t
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

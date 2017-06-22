@@ -142,5 +142,5 @@ for (+note 'Connect before server started') {
     
     like $tip->log, qr{entering the event loop}, 'tarantool was really started';
     cmp_ok Time::HiRes::time - $started, '>=', 0.7, 'pause lo';
-    cmp_ok Time::HiRes::time - $started, '<=', 1.3, 'pause hi';
+    cmp_ok Time::HiRes::time - $started, '<=', 1.5, 'pause hi';
 }

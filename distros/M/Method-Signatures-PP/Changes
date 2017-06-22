@@ -1,0 +1,11 @@
+Revision history for Method-Signatures-PP
+
+0.000003 - 2017-06-21
+  - add .pmc generation support to avoid the 5.10 PPR dep in shipped code
+  - anchor the regexp before it summons cthulhu (thanks mauke)
+
+0.000002 - 2017-06-21
+  - fix ridiculous pod tyop (thanks genio)
+
+0.000001 - 2017-06-21
+  - released onto an unsuspecting world

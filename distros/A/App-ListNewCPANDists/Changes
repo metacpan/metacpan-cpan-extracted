@@ -1,0 +1,17 @@
+0.003   2017-06-16 (PERLANCAR)
+
+	- Avoid perl undef warning.
+
+	- [ux] Do not display the 'date' column in HTML output.
+
+
+0.002   2017-06-16 (PERLANCAR)
+
+	- Add CLIs: list-new-cpan-dists, list-monthly-new-cpan-dists-html.
+
+	- [ux] Set nicer defaults for to_time.
+
+
+0.001   2017-06-15 (PERLANCAR)
+
+        - First release.

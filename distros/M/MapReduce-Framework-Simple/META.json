@@ -43,10 +43,12 @@
       "runtime" : {
          "requires" : {
             "Data::MessagePack" : "0",
+            "Data::Serializer" : "0",
             "Mouse" : "0",
             "Parallel::ForkManager" : "0",
             "Plack" : "0",
             "Plack::Runner" : "0",
+            "Storable" : "2.05",
             "WWW::Mechanize" : "0",
             "perl" : "5.010001"
          }
@@ -60,7 +62,7 @@
    "provides" : {
       "MapReduce::Framework::Simple" : {
          "file" : "lib/MapReduce/Framework/Simple.pm",
-         "version" : "0.06"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -74,7 +76,7 @@
          "web" : "https://github.com/adokoy001/MapReduce-Framework-Simple"
       }
    },
-   "version" : "0.06",
+   "version" : "0.09",
    "x_contributors" : [
       "ToshiakiYokoda <yokoda@example.com>"
    ]

@@ -6,12 +6,12 @@ use POSIX ();
 use constant PAGE_PARAM  => 'page_param_name';
 use constant WINDOW_SIZE => 'pager.window_size';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub pager_link {
   my ($self, $c, $page, @args) = @_;
   my $url = $c->url_with;
-  my @text = ref @args eq 'CODE' ? () : ($page->{n});
+  my @text = (@args and ref $args[-1] eq 'CODE') ? () : ($page->{n});
   my (@extra, @classes);
 
   push @classes, $self->{classes}{current} if $page->{current};
@@ -214,7 +214,7 @@ Jan Henning Thorsen
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016, Jan Henning Thorsen
+Copyright (C) 2017, Jan Henning Thorsen
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.

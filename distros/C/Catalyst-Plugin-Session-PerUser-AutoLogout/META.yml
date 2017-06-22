@@ -23,13 +23,13 @@ no_index:
 provides:
   Catalyst::Plugin::Session::PerUser::AutoLogout:
     file: lib/Catalyst/Plugin/Session/PerUser/AutoLogout.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Catalyst::Plugin::Session::PerUser: '0'
 resources:
   bugtracker: https://github.com/Altreus/Catalyst-Plugin-Session-PerUser-AutoLogout/issues
   homepage: https://github.com/Altreus/Catalyst-Plugin-Session-PerUser-AutoLogout
   repository: https://github.com/Altreus/Catalyst-Plugin-Session-PerUser-AutoLogout.git
-version: '0.001'
+version: '0.002'
 x_contributors:
   - 'Alastair McGowan-Douglas <alastair.mcgowan@opusvl.com>'

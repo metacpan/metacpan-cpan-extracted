@@ -4,7 +4,7 @@ use base qw/Prty::Sdoc::Node/;
 use strict;
 use warnings;
 
-our $VERSION = 1.107;
+our $VERSION = 1.108;
 
 use Prty::OrderedHash;
 
@@ -171,7 +171,7 @@ sub dump {
 
 =head1 VERSION
 
-1.107
+1.108
 
 =head1 AUTHOR
 

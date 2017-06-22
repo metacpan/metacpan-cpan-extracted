@@ -19,6 +19,7 @@ no_index:
     - inc
 requires:
   Encode: 0
+  HTML::Entities: 0
   Test::More: 0.86
   Unicode::GCString: 0
-version: 0.15
+version: 0.90

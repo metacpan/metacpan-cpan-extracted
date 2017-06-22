@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use lib '.';
 use inc::Module::Install;
 
 name 'Test-LeakTrace';

@@ -1,4 +1,8 @@
-Revision history for WWW-Google-PageSpeedOnline
+Revision history for WWW::Google::PageSpeedOnline
+
+0.22    Sat Jun 17 09:45:00 2017
+        - Added $AUTHORITY
+        - Tidied up attribute definitions.
 
 0.21    Tue Nov 17 10:50:00 2015
         - Added LICENSE file.

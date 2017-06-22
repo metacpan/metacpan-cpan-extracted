@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 75 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 76 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/lcpan.pm',
@@ -86,7 +86,8 @@ my @module_files = (
 
 my @scripts = (
     'bin/lcpan',
-    'bin/lcpanm'
+    'bin/lcpanm',
+    'bin/lcpanm-script'
 );
 
 # no fake home requested

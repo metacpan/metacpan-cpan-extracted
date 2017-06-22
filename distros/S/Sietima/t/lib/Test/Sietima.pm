@@ -5,7 +5,7 @@ use Email::Stuffer;
 use Email::Sender::Transport::Test;
 use Data::Printer;
 use Sietima;
-use Test2::Bundle::Extended;
+use Test2::V0;
 use Test2::API qw(context);
 use Sietima::Policy;
 use namespace::clean;

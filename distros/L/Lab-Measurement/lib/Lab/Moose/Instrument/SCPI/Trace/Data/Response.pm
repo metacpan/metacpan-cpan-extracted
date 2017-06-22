@@ -1,10 +1,9 @@
 package Lab::Moose::Instrument::SCPI::Trace::Data::Response;
+$Lab::Moose::Instrument::SCPI::Trace::Data::Response::VERSION = '3.550';
 use Moose::Role;
 use Lab::Moose::Instrument qw/getter_params/;
 use Lab::Moose::Instrument::Cache;
 use MooseX::Params::Validate;
-
-our $VERSION = '3.543';
 
 sub trace_data_response_all {
     my ( $self, %args ) = validated_hash(

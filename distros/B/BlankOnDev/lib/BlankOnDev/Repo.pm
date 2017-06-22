@@ -6,7 +6,7 @@ use warnings FATAL => 'all';
 use BlankOnDev::Utils::file;
 
 # Version :
-our $VERSION = '0.1003';
+our $VERSION = '0.1005';;
 
 # Subroutine for Read Repository :
 # ------------------------------------------------------------------------

@@ -1,14 +1,18 @@
 package Data::Record::Serialize::Role::Default;
 
 use Moo::Role;
+
+our $VERSION = '0.12';
+
 use Hash::Util qw[ hv_store ];
+
+use namespace::clean;
+
 
 # provide default if not already defined
 sub send {
 
     my $self = shift;
-
-    $self->encode( @_ );
 
     $self->_needs_eol
       ? $self->say( $self->encode( @_ ) )
@@ -84,11 +88,68 @@ before 'send' => sub {
 };
 
 
-# this is overridden by the composing module, but must exist here in
-# case it doesn't exist there.
-sub cleanup { }
-
-
 1;
 
+=pod
 
+=head1 NAME
+
+Data::Record::Serialize::Role::Default
+
+=head1 VERSION
+
+version 0.12
+
+=begin pod_coverage
+
+=head3 cleanup
+
+=head3 send
+
+=head3 setup
+
+=end pod_coverage
+
+=head1 BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize>.
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<Data::Record::Serialize|Data::Record::Serialize>
+
+=back
+
+=head1 AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut
+
+__END__
+
+#pod =begin pod_coverage
+#pod
+#pod =head3 cleanup
+#pod
+#pod =head3 send
+#pod
+#pod =head3 setup
+#pod
+#pod =end pod_coverage
+#pod

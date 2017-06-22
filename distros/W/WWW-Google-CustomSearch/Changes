@@ -1,5 +1,10 @@
 Revision history for WWW::Google::CustomSearch
 
+0.35  Mon Jun 12 14:10:00 2017
+      - Updated dependency on WWW::Google::UserAgent v0.21.
+      - Updated attribute definitions.
+      - Updated unit test accordingly.
+
 0.34  Wed Apr 12 18:15:00 2017
       - Tidied up test scripts and removed "-T" switch.
 

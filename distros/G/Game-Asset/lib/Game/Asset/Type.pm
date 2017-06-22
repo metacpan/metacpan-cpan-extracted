@@ -22,7 +22,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
 package Game::Asset::Type;
-$Game::Asset::Type::VERSION = '0.3';
+$Game::Asset::Type::VERSION = '0.5';
 use strict;
 use warnings;
 use Moose::Role;
@@ -57,9 +57,9 @@ has '_orig_content' => (
 
 sub process_content
 {
-    my ($self, $content) = @_;
+    my ($self, $content, @args) = @_;
     return if $self->has_been_processed;
-    $self->_process_content( $content );
+    $self->_process_content( $content, @args );
     $self->_set_has_been_processed;
     return;
 }
@@ -84,6 +84,9 @@ Types are determined by L<Game::Asset> using the file extension.
 
 This is called with the full data. If it's the first time the data was passed, 
 then it calls C<_process_content()> and sets C<has_been_processed()> to true.
+
+Any additional arguments passed to this will be passed to 
+C<_process_content()>.
 
 =head2 name
 

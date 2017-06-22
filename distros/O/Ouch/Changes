@@ -1,5 +1,8 @@
 Revision history for Perl module Ouch 
 
+0.0500 2017-06-21
+ - Made :trytiny more Try::Tiny-sh thanks to Flavio Poletti
+
 0.0410 2016-10-19
  - Fixed some bugs related to Travis. Thanks to Zshawn Syed.
  - Fix bugs when working with passed exceptions. Thanks to Flavio Poletti.

@@ -1,5 +1,5 @@
 package Facebook::Graph::Publish::Photo;
-$Facebook::Graph::Publish::Photo::VERSION = '1.1202';
+$Facebook::Graph::Publish::Photo::VERSION = '1.1204';
 use Moo;
 extends 'Facebook::Graph::Publish';
 
@@ -64,7 +64,7 @@ Facebook::Graph::Publish::Photo - Publish Photos
 
 =head1 VERSION
 
-version 1.1202
+version 1.1204
 
 =head1 SYNOPSIS
 

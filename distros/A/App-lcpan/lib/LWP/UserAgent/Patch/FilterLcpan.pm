@@ -1,7 +1,7 @@
 package LWP::UserAgent::Patch::FilterLcpan;
 
-our $DATE = '2017-02-03'; # DATE
-our $VERSION = '1.017'; # VERSION
+our $DATE = '2017-06-19'; # DATE
+our $VERSION = '1.019'; # VERSION
 
 use 5.010001;
 use strict;
@@ -117,7 +117,7 @@ LWP::UserAgent::Patch::FilterLcpan - Filter mirror()
 
 =head1 VERSION
 
-This document describes version 1.017 of LWP::UserAgent::Patch::FilterLcpan (from Perl distribution App-lcpan), released on 2017-02-03.
+This document describes version 1.019 of LWP::UserAgent::Patch::FilterLcpan (from Perl distribution App-lcpan), released on 2017-06-19.
 
 =head1 HOMEPAGE
 
@@ -141,7 +141,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

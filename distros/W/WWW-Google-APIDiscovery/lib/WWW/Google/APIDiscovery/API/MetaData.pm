@@ -1,6 +1,7 @@
 package WWW::Google::APIDiscovery::API::MetaData;
 
-$WWW::Google::APIDiscovery::API::MetaData::VERSION = '0.20';
+$WWW::Google::APIDiscovery::API::MetaData::VERSION   = '0.22';
+$WWW::Google::APIDiscovery::API::MetaData::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
 
@@ -8,7 +9,7 @@ WWW::Google::APIDiscovery::API::MetaData - Placeholder for supported APIS Meta D
 
 =head1 VERSION
 
-Version 0.20
+Version 0.22
 
 =cut
 
@@ -16,28 +17,10 @@ use 5.006;
 use Moo;
 use namespace::clean;
 
-has id                => (is => 'ro');
-has name              => (is => 'ro');
-has title             => (is => 'ro');
-has description       => (is => 'ro');
-has revision          => (is => 'ro');
-has etag              => (is => 'ro');
-has kind              => (is => 'ro');
-has discoveryVersion  => (is => 'ro');
-has icons             => (is => 'ro');
-has ownerDomain       => (is => 'ro');
-has ownerName         => (is => 'ro');
-has documentationLink => (is => 'ro');
-has protocol          => (is => 'ro');
-has baseUrl           => (is => 'ro');
-has basePath          => (is => 'ro');
-has rootUrl           => (is => 'ro');
-has servicePath       => (is => 'ro');
-has batchPath         => (is => 'ro');
-has parameters        => (is => 'ro');
-has auth              => (is => 'ro');
-has schemas           => (is => 'ro');
-has resources         => (is => 'ro');
+has [ qw(id name title description revision etag kind discoveryVersion
+         icons ownerDomain ownerName documentationLInk protocol baseUrl
+         basePath rootUrl servicePath batchPath parameters auth schemas
+         resources) ] => (is => 'ro');
 
 =head1 METHODS
 
@@ -89,7 +72,7 @@ Mohammad S Anwar, C<< <mohammad.anwar at yahoo.com> >>
 
 =head1 REPOSITORY
 
-L<https://github.com/Manwar/WWW-Google-APIDiscovery>
+L<https://github.com/manwar/WWW-Google-APIDiscovery>
 
 =head1 CONTRIBUTORS
 

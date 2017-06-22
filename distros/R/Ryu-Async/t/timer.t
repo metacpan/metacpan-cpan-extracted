@@ -21,7 +21,7 @@ $loop->add(
 
 	my $count = 0;
 	my $timer = $ryu->timer(
-		interval => 0.1
+		interval => 0.2
 	);
 	{
 		Future->needs_any(
@@ -30,10 +30,12 @@ $loop->add(
 			 ->count
 			 ->each(sub { $count = shift })
 			 ->completed,
-			$loop->timeout_future(after => 3)
+			$loop->timeout_future(after => 5)
 		)->get;
 		is($count, 10, 'have 10');
-		cmp_deeply(Time::HiRes::time - $start, num(1.0, 0.15), 'elapsed time looks about right');
+        my $elapsed = Time::HiRes::time - $start;
+        note 'Elapsed ' . $elapsed . 's';
+		cmp_deeply($elapsed, num(1.0, 0.15), 'elapsed time looks about right');
 	}
 	is_refcount($timer, 1, 'have only one ref after completion');
 	dispose($timer);

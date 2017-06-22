@@ -6,11 +6,17 @@ lib/Test/WriteVariants.pm
 lib/Test/WriteVariants/Context.pm
 LICENSE
 Makefile.PL
-MANIFEST			This list of files
+MANIFEST
 MANIFEST.SKIP
-README
+README.md
 t/00-basic.t
 t/10-simple.t
+t/20-test_modules.t
+t/30-inline_tests.t
+t/inline/bar.it
+t/inline/foo.it
+t/lib/WM/Bar.pm
+t/lib/WM/Foo.pm
 TODO
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

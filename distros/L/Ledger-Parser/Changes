@@ -1,4 +1,9 @@
-Revision history for Ledger-Parser
+0.06    2017-06-16 (PERLANCAR)
+
+        - No functional changes.
+
+        - Bump prereq version: Ledger::Examples to 0.05 [RT#122107].
+
 
 0.05    2016-01-12 (PERLANCAR)
 
@@ -7,9 +12,9 @@ Revision history for Ledger-Parser
         - Use Math::BigFloat for amount arithmetics to avoid floating point
           round-off error.
 
-	- as_string() was not implemented, derp.
+        - as_string() was not implemented, derp.
 
-	- Fix handling of file with no newline at EOF.
+        - Fix handling of file with no newline at EOF.
 
 
 0.04    2015-03-26 (PERLANCAR)

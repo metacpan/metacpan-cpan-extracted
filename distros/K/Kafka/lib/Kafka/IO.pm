@@ -6,7 +6,7 @@ Kafka::IO - Interface to network communication with the Apache Kafka server.
 
 =head1 VERSION
 
-This documentation refers to C<Kafka::IO> version 1.04 .
+This documentation refers to C<Kafka::IO> version 1.05 .
 
 =cut
 
@@ -20,7 +20,7 @@ use warnings;
 
 our $DEBUG = 0;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 
 
@@ -644,7 +644,7 @@ sub _connect {
     socket( my $connection, $self->{pf}, SOCK_STREAM, scalar getprotobyname( 'tcp' ) ) or die( "socket: $!\n" );
 
     # Set autoflushing.
-    $_ = select( $connection ); $| = 1; select $_;
+    my $file_handle = select( $connection ); $| = 1; select $file_handle;
 
     # Set FD_CLOEXEC.
     my $flags = fcntl( $connection, F_GETFL, 0 ) or die "fcntl: $!\n";

@@ -1,0 +1,15 @@
+INSERT INTO stats_store ( storeid, dist, version, perl, osname, counter, lastid ) VALUES (1,'Acme-Buffy','1.5','5.10.0','aix',1,2980000);
+INSERT INTO stats_store ( storeid, dist, version, perl, osname, counter, lastid ) VALUES (2,'AI-NeuralNet-SOM','0.07','5.10.0','linux',1,2980000);
+INSERT INTO stats_store ( storeid, dist, version, perl, osname, counter, lastid ) VALUES (3,'Acme','1.11111','5.10.0','linux',1,2980000);
+INSERT INTO stats_store ( storeid, dist, version, perl, osname, counter, lastid ) VALUES (4,'Acme-CPANAuthors-CodeRepos','0.080522','5.10.0','linux',1,2980000);
+INSERT INTO stats_store ( storeid, dist, version, perl, osname, counter, lastid ) VALUES (5,'Acme-CPANAuthors-Japanese','0.090101','5.10.0','linux',1,2980000);
+INSERT INTO stats_store ( storeid, dist, version, perl, osname, counter, lastid ) VALUES (6,'Acme-CPANAuthors-French','0.07','5.10.0','linux',1,2980000);
+INSERT INTO stats_store ( storeid, dist, version, perl, osname, counter, lastid ) VALUES (7,'Acme-CPANAuthors-Canadian','0.0101','5.10.0','linux',1,2980000);
+INSERT INTO stats_store ( storeid, dist, version, perl, osname, counter, lastid ) VALUES (8,'Acme-BOPE','0.01','5.10.0','linux',1,2980000);
+INSERT INTO stats_store ( storeid, dist, version, perl, osname, counter, lastid ) VALUES (9,'AEAE','0.02','5.10.0','linux',1,2980000);
+INSERT INTO stats_store ( storeid, dist, version, perl, osname, counter, lastid ) VALUES (10,'Acme-Anything','0.02','5.10.0','linux',1,2980000);
+INSERT INTO stats_store ( storeid, dist, version, perl, osname, counter, lastid ) VALUES (11,'AI-NeuralNet-BackProp','0.89','5.10.0','linux',1,2980000);
+INSERT INTO stats_store ( storeid, dist, version, perl, osname, counter, lastid ) VALUES (12,'AI-NeuralNet-Mesh','0.44','5.10.0','linux',1,2980000);
+INSERT INTO stats_store ( storeid, dist, version, perl, osname, counter, lastid ) VALUES (13,'Acme-Brainfuck','1.1.1','5.10.0','linux',1,2980000);
+INSERT INTO stats_store ( storeid, dist, version, perl, osname, counter, lastid ) VALUES (14,'AOL-TOC','0.340','5.10.0','linux',1,2980000);
+INSERT INTO stats_store ( storeid, dist, version, perl, osname, counter, lastid ) VALUES (15,'Abstract-Meta-Class','0.13','5.10.0','linux',1,2980000);

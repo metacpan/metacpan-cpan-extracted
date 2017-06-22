@@ -26,7 +26,7 @@ use DynaLoader ();
 use Carp;
 
 use vars   qw( $VERSION @ISA @EXPORT_OK );
-$VERSION   = "1.30";
+$VERSION   = "1.31";
 @ISA       = qw( DynaLoader Exporter );
 @EXPORT_OK = qw( csv );
 bootstrap Text::CSV_XS $VERSION;
@@ -95,23 +95,26 @@ my %attr_alias = (
     quote_always		=> "always_quote",
     verbose_diag		=> "diag_verbose",
     quote_null			=> "escape_null",
+    escape			=> "escape_char",
     );
 my $last_new_err = Text::CSV_XS->SetDiag (0);
 
 # NOT a method: is also used before bless
 sub _unhealthy_whitespace {
-    my $self = shift;
-    $_[0] or return 0; # no checks needed without allow_whitespace
+    my ($self, $aw, $sep) = @_;
+    $aw or return 0; # no checks needed without allow_whitespace
+
+#   $sep =~ m/^[ \t]/ || $sep =~ m/[ \t]$/ and return 1002;
 
     my $quo = $self->{quote};
     defined $quo && length ($quo) or $quo = $self->{quote_char};
     my $esc = $self->{escape_char};
 
-    (defined $quo && $quo =~ m/^[ \t]/) || (defined $esc && $esc =~ m/^[ \t]/) and
-	return 1002;
+    defined $quo && $quo =~ m/^[ \t]/ and return 1002;
+    defined $esc && $esc =~ m/^[ \t]/ and return 1002;
 
     return 0;
-    } # _sane_whitespace
+    } # _unhealty_whitespace
 
 sub _check_sanity {
     my $self = shift;
@@ -128,27 +131,24 @@ sub _check_sanity {
 #	        "', ESC: '", DPeek ($esc),"'");
 
     # sep_char should not be undefined
-    if (defined $sep && $sep ne "") {
-	length ($sep) > 16		and return 1006;
-	$sep =~ m/[\r\n]/		and return 1003;
-	}
-    else {
-					    return 1008;
-	}
+    $sep ne ""			or  return 1008;
+    length ($sep) > 16		and return 1006;
+    $sep =~ m/[\r\n]/		and return 1003;
+
     if (defined $quo) {
-	defined $sep && $quo eq $sep	and return 1001;
-	length ($quo) > 16		and return 1007;
-	$quo =~ m/[\r\n]/		and return 1003;
+	$quo eq $sep		and return 1001;
+	length ($quo) > 16	and return 1007;
+	$quo =~ m/[\r\n]/	and return 1003;
 	}
     if (defined $esc) {
-	defined $sep && $esc eq $sep	and return 1001;
-	$esc =~ m/[\r\n]/		and return 1003;
+	$esc eq $sep		and return 1001;
+	$esc =~ m/[\r\n]/	and return 1003;
 	}
     if (defined $eol) {
-	length ($eol) > 16		and return 1005;
+	length ($eol) > 16	and return 1005;
 	}
 
-    return _unhealthy_whitespace ($self, $self->{allow_whitespace});
+    return _unhealthy_whitespace ($self, $self->{allow_whitespace}, $sep);
     } # _check_sanity
 
 sub known_attributes {
@@ -190,7 +190,7 @@ sub new {
 	$attr{auto_diag} and error_diag ();
 	return;
 	}
-    if ($sep_aliased and defined $attr{sep_char}) {
+    if ($sep_aliased) {
 	my @b = unpack "U0C*", $attr{sep_char};
 	if (@b > 1) {
 	    $attr{sep} = $attr{sep_char};
@@ -454,7 +454,7 @@ sub allow_whitespace {
     my $self = shift;
     if (@_) {
 	my $aw = shift;
-	_unhealthy_whitespace ($self, $aw) and
+	_unhealthy_whitespace ($self, $aw, $self->sep) and
 	    croak ($self->SetDiag (1002));
 	$self->_set_attr_X ("allow_whitespace", $aw);
 	}
@@ -551,7 +551,9 @@ sub callbacks {
 	        : @_ % 2 == 0                    ? { @_ }
 	        : croak ($self->SetDiag (1004));
 	    foreach my $cbk (keys %$cb) {
-		(!ref $cbk && $cbk =~ m/^[\w.]+$/) && ref $cb->{$cbk} eq "CODE" or
+		# A key cannot be a ref. That would be stored as the *string
+		# 'SCALAR(0x1f3e710)' or 'ARRAY(0x1a5ae18)'
+		$cbk =~ m/^[\w.]+$/ && ref $cb->{$cbk} eq "CODE" or
 		    croak ($self->SetDiag (1004));
 		}
 	    exists $cb->{error}        and $hf |= 0x01;
@@ -585,7 +587,7 @@ sub error_diag {
 	$diag[3] =     $self->{_RECNO};
 	$diag[4] =     $self->{_ERROR_FLD} if exists $self->{_ERROR_FLD};
 
-	$diag[0] && $self && $self->{callbacks} && $self->{callbacks}{error} and
+	$diag[0] && $self->{callbacks} && $self->{callbacks}{error} and
 	    return $self->{callbacks}{error}->(@diag);
 	}
 
@@ -668,21 +670,21 @@ sub meta_info {
     } # meta_info
 
 sub is_quoted {
-    my ($self, $idx, $val) = @_;
+    my ($self, $idx) = @_;
     ref $self->{_FFLAGS} &&
 	$idx >= 0 && $idx < @{$self->{_FFLAGS}} or return;
     $self->{_FFLAGS}[$idx] & 0x0001 ? 1 : 0;
     } # is_quoted
 
 sub is_binary {
-    my ($self, $idx, $val) = @_;
+    my ($self, $idx) = @_;
     ref $self->{_FFLAGS} &&
 	$idx >= 0 && $idx < @{$self->{_FFLAGS}} or return;
     $self->{_FFLAGS}[$idx] & 0x0002 ? 1 : 0;
     } # is_binary
 
 sub is_missing {
-    my ($self, $idx, $val) = @_;
+    my ($self, $idx) = @_;
     $idx < 0 || !ref $self->{_FFLAGS} and return;
     $idx >= @{$self->{_FFLAGS}} and return 1;
     $self->{_FFLAGS}[$idx] & 0x0010 ? 1 : 0;
@@ -785,10 +787,14 @@ sub header {
     defined $args{munge_column_names} or $args{munge_column_names} = "lc";
     defined $args{set_column_names}   or $args{set_column_names}   = 1;
 
-    defined $args{sep_set} && ref $args{sep_set} eq "ARRAY" and
+    if (defined $args{sep_set}) {
+	ref $args{sep_set} eq "ARRAY" or
+	    croak ($self->SetDiag (1500, "sep_set should be an array ref"));
 	@seps =  @{$args{sep_set}};
+	}
 
     my $hdr = <$fh>;
+    # check if $hdr can be empty here, I don't think so
     defined $hdr && $hdr ne "" or croak ($self->SetDiag (1010));
 
     my %sep;
@@ -812,6 +818,9 @@ sub header {
 	elsif ($hdr =~ s/^\x0e\xfe\xff//)     { $enc = "scsu"       }
 	elsif ($hdr =~ s/^\xfb\xee\x28//)     { $enc = "bocu-1"     }
 	elsif ($hdr =~ s/^\x84\x31\x95\x33//) { $enc = "gb-18030"   }
+	elsif ($hdr =~ s/^\x{feff}//)         { $enc = ""           }
+
+	$hdr eq "" and croak ($self->SetDiag (1010));
 
 	if ($enc) {
 	    if ($enc =~ m/([13]).le$/) {
@@ -829,11 +838,12 @@ sub header {
     $args{munge_column_names} eq "uc" and $hdr = uc $hdr;
 
     my $hr = \$hdr; # Will cause croak on perl-5.6.x
-    open my $h, "<$enc", $hr;
+    open my $h, "<$enc", $hr or croak ($self->SetDiag (1010));
+
     my $row = $self->getline ($h) or croak;
     close $h;
 
-    my @hdr = @$row   or  croak ($self->SetDiag (1010));
+    my @hdr = @$row;
     ref $args{munge_column_names} eq "CODE" and
 	@hdr = map { $args{munge_column_names}->($_) } @hdr;
     my %hdr = map { $_ => 1 } @hdr;
@@ -879,7 +889,7 @@ sub getline_hr {
     } # getline_hr
 
 sub getline_hr_all {
-    my ($self, @args, %hr) = @_;
+    my ($self, @args) = @_;
     $self->{_COLUMN_NAMES} or croak ($self->SetDiag (3002));
     my @cn = @{$self->{_COLUMN_NAMES}};
     [ map { my %h; @h{@cn} = @$_; \%h } @{$self->getline_all (@args)} ];
@@ -888,7 +898,7 @@ sub getline_hr_all {
 sub say {
     my ($self, $io, @f) = @_;
     my $eol = $self->eol;
-    defined $eol && $eol ne "" or $self->eol ($\ || $/);
+    $eol eq "" and $self->eol ($\ || $/);
     # say ($fh, undef) does not propage actual undef to print ()
     my $state = $self->print ($io, @f == 1 && !defined $f[0] ? undef : @f);
     $self->eol ($eol);
@@ -973,7 +983,8 @@ sub fragment {
 	    or croak ($self->SetDiag (2013));
 	$to ||= $from;
 	$to eq "*" and ($to, $eod) = ($from, 1);
-	$from <= 0 || $to <= 0 || $to < $from and croak ($self->SetDiag (2013));
+	# $to cannot be <= 0 due to regex and ||=
+	$from <= 0 || $to < $from and croak ($self->SetDiag (2013));
 	$r[$_] = 1 for $from .. $to;
 	}
 
@@ -1021,7 +1032,6 @@ sub _csv_attr {
     ref $in eq "CODE" || ref $in eq "ARRAY" and $out ||= \*STDOUT;
 
     if ($out) {
-	$in or croak $csv_usage;	# No out without in
 	if ((ref $out and ref $out ne "SCALAR") or "GLOB" eq ref \$out) {
 	    $fh = $out;
 	    }

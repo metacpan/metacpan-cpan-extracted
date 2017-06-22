@@ -1,39 +1,33 @@
 #!perl
 
-use Test::More;
-use Test::Fatal;
+use Test2::Bundle::Extended;
 
 use lib 't/lib';
 
 use Data::Record::Serialize;
 
-use lib 't/lib';
-
 use Data::Dumper;
 
 my ( $s, $buf );
 
-is(
-    exception {
+ok(
+    lives {
         $s = Data::Record::Serialize->new(
             encode => 'ddump',
             output => \$buf,
           ),
           ;
     },
-    undef,
     "constructor"
-);
+) or diag $@;
 
 $s->send( { a => 1, b => 2, c => 'nyuck nyuck' } );
 
 my $VAR1;
 
-is( exception { $VAR1 = eval "$buf" },
-    undef,
-    'deserialize record' );
+ok( lives { $VAR1 = eval "$buf" }, 'deserialize record', ) or diag $@;
 
-is_deeply(
+is(
     $VAR1,
     {
         a => '1',

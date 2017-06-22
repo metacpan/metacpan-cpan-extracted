@@ -42,4 +42,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ikruglov/YAHC
-version: '0.033'
+version: '0.034'

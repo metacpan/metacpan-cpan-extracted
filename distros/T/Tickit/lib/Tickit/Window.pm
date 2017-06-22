@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2017 -- leonerd@leonerd.org.uk
 
 package Tickit::Window;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use 5.010; # //
 
-our $VERSION = '0.62';
+our $VERSION = '0.63';
 
 use Carp;
 
@@ -296,10 +296,9 @@ Returns the root window
 Returns the L<Tickit::Term> instance of the terminal on which this window
 lives.
 
-For forward-compatibility with a C-library implementation of C<Tickit::Window>
-it is no longer guaranteed that this method will return the same Perl-level
-terminal instance that the root window was constructed with. In particular, if
-the root window in fact lives on a mock terminal created by
+Note that it is not guaranteed that this method will return the same
+Perl-level terminal instance that the root window was constructed with. In
+particular, if the root window in fact lives on a mock terminal created by
 L<Tickit::Test::MockTerm> this method may "forget" this fact, returning an
 object instance simply in the C<Tickit::Term> class instead. While the
 instance will still be useable as a terminal, the fact it was a mock terminal
@@ -816,6 +815,22 @@ sub focus
    $focused = $win->is_focused
 
 Returns true if this window currently has the input focus
+
+=cut
+
+=head2 is_steal_input
+
+   $steal = $win->is_steal_input
+
+Returns true if this window is currently stealing input from its siblings
+
+=cut
+
+=head2 set_steal_input
+
+   $win->set_steal_input( $steal )
+
+Controls whether this window is currently stealing input from its siblings
 
 =cut
 

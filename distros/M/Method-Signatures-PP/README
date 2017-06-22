@@ -1,0 +1,95 @@
+NAME
+    Method::Signatures::PP - EXPERIMENTAL pure perl method keyword
+
+SYNOPSIS
+        use strict;
+        use warnings;
+        use Test::More;
+        use Method::Signatures::PP;
+    
+        package Wat;
+    
+        use Moo;
+    
+        method foo {
+          "FOO from ".ref($self);
+        }
+    
+        method bar ($arg) {
+          "WOOO $arg";
+        }
+    
+        package main;
+    
+        my $wat = Wat->new;
+    
+        is($wat->foo, 'FOO from Wat', 'Parenless method');
+    
+        is($wat->bar('BAR'), 'WOOO BAR', 'Method w/argument');
+    
+        done_testing;
+
+DESCRIPTION
+    It's ... a method keyword.
+
+        method foo { ... }
+
+    is equivalent to
+
+        sub foo { my $self = shift; ... }
+
+    and
+
+        method bar ($arg) { ... }
+
+    is equivalent to
+
+        method bar ($arg) { my $self = shift; my ($arg) = @_; ... }
+
+    In fact, it isn't just equivalent, this module literally rewrites the
+    source code in the way shown in the examples above. It does so by using
+    a source filter (boo, hiss, yes I know) to slurp the entire file, then
+    Damian's wonderfully insane PPR module to parse the code to find the
+    keywords, and then rewrites the source before returning the file to perl
+    to compile.
+
+    The wonderful part of this is that it's 100% pure perl and therefore
+    unlike every other method implementation is amenable to App::FatPacker
+    use. The terrible part of this is that if the parse phase doesn't work,
+    the code has no idea at all what it's doing and ends up not touching the
+    source code at all, at which point the compilation failures from the
+    keyword rewriting not having happened will almost certainly hide the
+    actual problem.
+
+    So, for the moment, you are strongly advised to not use this module
+    while developing code, and instead use Function::Parameters if you have
+    a not completely ancient perl and Method::Signatures::Simple if you're
+    still back in the stone age banging rocks together, and to then switch
+    your 'use' line to this module for fatpacking/shipping/etc. - I may yet
+    come up with a better solution to this and/or beg Damian for help doing
+    so, but at the time of writing I can offer no guarantees.
+
+    Note that PPR requires perl 5.10 and as such so does this module.
+    However, if you need to support older perls, you can
+
+        use Method::Signatures::PP::Compile;
+
+    which uses ingy's Module::Compile to generate a .pmc file that should
+    run fine on whatever version of perl the rest of your code requires.
+    This will likely be rewritten to use a slightly less lunatic compilation
+    mechanism in later releases.
+
+AUTHOR
+     mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>
+
+CONTRIBUTORS
+    None yet - maybe this software is perfect! (ahahahahahahahahaha)
+
+COPYRIGHT
+    Copyright (c) 2017 the Method::Signatures::PP "AUTHOR" and
+    "CONTRIBUTORS" as listed above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself.
+

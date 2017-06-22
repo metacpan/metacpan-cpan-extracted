@@ -1,65 +1,76 @@
-use 5.006;
 use strict;
 use warnings;
+
 use ExtUtils::MakeMaker;
 
-my %config = (
-	NAME         => 'Make',
-	VERSION_FROM => 'lib/Make.pm',
-	DISTNAME     => 'Make',
-	(
-		$] >= 5.005
-		? (
-			ABSTRACT_FROM => 'lib/Make.pm',
-			AUTHOR        => 'Nick Ing-Simmons',
-			)
-		: ()
-	),
-	( $ExtUtils::MakeMaker::VERSION >= 6.3002
-		? ( 'LICENSE' => 'perl' )
-		: () ),
-
-	clean => {
-		FILES => "*% *.bak Make/*% *~"
+my %WriteMakefileArgs = (
+	"ABSTRACT"           => "module for processing makefiles",
+	"AUTHOR"             => "Nick Ing-Simmons",
+	"CONFIGURE_REQUIRES" => {
+		"ExtUtils::MakeMaker" => 0
 	},
-	dist => {
-		COMPRESS => 'gzip -f',
-		SUFFIX   => '.gz',
+	"DISTNAME"   => "Make",
+	"EXE_FILES"  => [],
+	"LICENSE"    => "perl",
+	"META_MERGE" => {
+		dynamic_config => 0,
+		'meta-spec'    => { version => 2 },
+		no_index       => { directory => ['t'] },
+		prereqs        => { runtime => { requires => { perl => '5.006' } } },
+		resources      => {
+			bugtracker => { web => 'http://github.com/klp2/Make/issues' },
+			homepage   => 'http://metacpan.org/pod/Make',
+			repository => {
+				type => 'git',
+				url  => 'http://github.com/klp2/Make.git',
+				web  => 'http://github.com/klp2/Make',
+			},
+			x_IRC => 'irc://irc.perl.org/#perl'
+		},
 	},
-	EXE_FILES => ['pmake'],
-	(
-		eval { ExtUtils::MakeMaker->VERSION(6.46) }
-		? (
-			META_MERGE => {
-				'meta-spec' => { version => 2 },
-				resources   => {
-					repository => {
-						type => 'git',
-						url  => 'http://github.com/klp2/Make.git',
-						web  => 'http://github.com/klp2/Make',
-					},
-					bugtracker => {
-						web => 'http://github.com/klp2/Make/issues',
-					},
-					homepage => 'http://metacpan.org/pod/Make',
-				},
-			}
-			)
-		: ()
-	)
+	"MIN_PERL_VERSION" => "5.006",
+	"NAME"             => "Make",
+	"PREREQ_PM"        => {
+		"Carp"       => 0,
+		"Config"     => 0,
+		"Cwd"        => 0,
+		"File::Spec" => 0,
+		"strict"     => 0,
+		"warnings"   => 0
+	},
+	"TEST_REQUIRES" => {
+		"ExtUtils::MakeMaker" => 0,
+		"Test::Compile"       => "1.002001",
+		"Test::More"          => "1.00",
+		"Test::Pod"           => "1.00",
+	},
+	"VERSION" => "1.1.4",
+	"test"    => {
+		"TESTS" => "t/*.t"
+	}
 );
 
-my %test_requires = (
-	'Test::More'    => 1,
-	'Test::Compile' => '1.2.1',
-	'Test::Pod'     => '1.00'
+my %FallbackPrereqs = (
+	"Carp"                => 0,
+	"Config"              => 0,
+	"Cwd"                 => 0,
+	"File::Spec"          => 0,
+	"ExtUtils::MakeMaker" => 0,
+	"File::Spec"          => 0,
+	"Test::Compile"       => "1.002001",
+	"Test::More"          => "1.00",
+	"Test::Pod"           => "1.00",
+	"strict"              => 0,
+	"warnings"            => 0
 );
 
-if ( eval { ExtUtils::MakeMaker->VERSION(6.64) } ) {
-	$config{TEST_REQUIRES} = \%test_requires;
-}
-else {
-	$config{BUILD_REQUIRES} = \%test_requires;
+unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
+	delete $WriteMakefileArgs{TEST_REQUIRES};
+	delete $WriteMakefileArgs{BUILD_REQUIRES};
+	$WriteMakefileArgs{PREREQ_PM} = \%FallbackPrereqs;
 }
 
-WriteMakefile(%config);
+delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
+	unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
+
+WriteMakefile(%WriteMakefileArgs);

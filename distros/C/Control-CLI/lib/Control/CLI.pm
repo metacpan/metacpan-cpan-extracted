@@ -11,7 +11,7 @@ use IO::Socket::INET;
 use Errno qw( EINPROGRESS EWOULDBLOCK );
 
 my $Package = __PACKAGE__;
-our $VERSION = '2.03';
+our $VERSION = '2.05';
 our %EXPORT_TAGS = (
 		use	=> [qw(useTelnet useSsh useSerial useIPv6)],
 		prompt	=> [qw(promptClear promptHide promptCredential)],
@@ -29,6 +29,8 @@ my $ComPortReadBuffer = 4096;	# Size of serial port read buffers
 my $ComReadInterval = 100;	# Timeout between single character reads
 my $ComBreakDuration = 300;	# Number of milliseconds the break signal is held for
 my $ChangeBaudDelay = 100;	# Number of milliseconds to sleep between tearing down and restarting serial port connection
+my $VT100_QueryDeviceStatus	= "\e\\[5n";	# Used in regex, so '[' needs to be backslashed
+my $VT100_ReportDeviceOk	= "\e[0n";	# Sent to host
 
 my %Default = ( # Hash of default object settings which can be modified on a per object basis
 	timeout			=> 10,			# Default Timeout value in secs
@@ -59,6 +61,7 @@ my %Default = ( # Hash of default object settings which can be modified on a per
 	errmsg_format		=> 'default',		# Default error message format; can be: terse/default/verbose
 	poll_obj_complete	=> 'all',		# Default mode for poll() method
 	poll_obj_error		=> 'ignore',		# Default error mode for poll() method
+	report_query_status	=> 0,			# Default setting of report_query_status for class object
 	prompt		=> '.*[\?\$%#>]\s?$',		# Default prompt used in login() and cmd() methods
 	username_prompt	=> '(?i:username|login)[: ]+$',	# Default username prompt used in login() method
 	password_prompt	=> '(?i)password[: ]+$',	# Default password prompt used in login() method
@@ -70,7 +73,7 @@ my %Default = ( # Hash of default object settings which can be modified on a per
 our @ConstructorArgs = ( 'use', 'timeout', 'errmode', 'return_reference', 'prompt', 'username_prompt', 'password_prompt',
 			'input_log', 'output_log', 'dump_log', 'blocking', 'debug', 'prompt_credentials', 'read_attempts',
 			'readwait_timer', 'read_block_size', 'output_record_separator', 'connection_timeout', 'data_with_error',
-			'terminal_type', 'window_size', 'errmsg_format',
+			'terminal_type', 'window_size', 'errmsg_format', 'report_query_status',
 			);
 
 # Debug levels can be set using the debug() method or via debug argument to new() constructor
@@ -300,6 +303,7 @@ sub new {
 			croak "$pkgsub: Module 'Win32::SerialPort' required for serial access" unless $UseSerial;
 			@CLI::ISA = qw(Win32::SerialPort);
 			Win32::SerialPort->set_test_mode_active(!($debug & 1));	 # Suppress carping except if debug bit1 set
+			Win32::SerialPort::debug($debug & 2 ? 'ON' : 'OFF');
 			$parent = Win32::SerialPort->new($connectionType, !($debug & 1))
 				or return _error(__FILE__, __LINE__, $errmode, "$pkgsub: Cannot open serial port '$connectionType'", $msgFormat);
 		}
@@ -307,6 +311,7 @@ sub new {
 			croak "$pkgsub: Module 'Device::SerialPort' required for serial access" unless $UseSerial;
 			@CLI::ISA = qw(Device::SerialPort);
 			Device::SerialPort->set_test_mode_active(!($debug & 1)); # Suppress carping except if debug bit1 set
+			Device::SerialPort::debug($debug & 2 ? 'ON' : 'OFF');
 			$parent = Device::SerialPort->new($connectionType, !($debug & 1))
 				or return _error(__FILE__, __LINE__, $errmode, "$pkgsub: Cannot open serial port '$connectionType'", $msgFormat);
 		}
@@ -321,6 +326,7 @@ sub new {
 		SSHCHANNEL		=>	undef,
 		SSHAUTH			=>	undef,
 		BUFFER			=>	'', # Always defined; greater than 0 length if in use
+		QUERYBUFFER		=>	'', # Always defined; greater than 0 length if in use
 		COMPORT			=>	$comPort,
 		HOST			=>	undef,
 		TCPPORT			=>	undef,
@@ -363,6 +369,7 @@ sub new {
 		password_prompt_qr	=>	qr/$Default{password_prompt}/,
 		terminal_type		=>	$connectionType eq 'SSH' ? $Default{terminal_type} : undef,
 		window_size		=>	$Default{window_size},
+		report_query_status	=>	$Default{report_query_status},
 		debug			=>	$Default{debug},
 	};
 	if ($connectionType eq 'SERIAL') { # Adjust read_block_size defaults for Win32::SerialPort & Device::SerialPort
@@ -394,6 +401,7 @@ sub new {
 		elsif ($arg eq 'password_prompt')		{ $self->password_prompt($args{$arg}) }
 		elsif ($arg eq 'terminal_type')			{ $self->terminal_type($args{$arg}) }
 		elsif ($arg eq 'window_size')			{ $self->window_size(@{$args{$arg}}) }
+		elsif ($arg eq 'report_query_status')		{ $self->report_query_status($args{$arg}) }
 		elsif ($arg eq 'input_log')			{ $self->input_log($args{$arg}) }
 		elsif ($arg eq 'output_log')			{ $self->output_log($args{$arg}) }
 		elsif ($arg eq 'dump_log')			{ $self->dump_log($args{$arg}) }
@@ -423,7 +431,7 @@ sub connect { # Connect to host
 	else {
 		my @validArgs = ('host', 'port', 'username', 'password', 'publickey', 'privatekey', 'passphrase',
 				 'prompt_credentials', 'baudrate', 'parity', 'databits', 'stopbits', 'handshake',
-				 'errmode', 'connection_timeout', 'blocking', 'terminal_type', 'window_size', 'callback');
+				 'errmode', 'connection_timeout', 'blocking', 'terminal_type', 'window_size', 'callback', 'forcebaud');
 		%args = parseMethodArgs($pkgsub, \@_, \@validArgs);
 	}
 
@@ -457,6 +465,7 @@ sub connect { # Connect to host
 		terminal_type		=>	$args{terminal_type},
 		window_size		=>	$args{window_size},
 		callback		=>	$args{callback},
+		forcebaud		=>	$args{forcebaud},
 		# Declare method storage keys which will be used
 		stage			=>	0,
 		authPublicKey		=>	0,
@@ -501,9 +510,8 @@ sub read { # Read in data from connection
 	my $errmode = defined $args{errmode} ? parse_errmode($pkgsub, $args{errmode}) : undef;
 	local $self->{errmode} = $errmode if defined $errmode;
 
-	return $self->_read_buffer($returnRef) if length $self->{BUFFER};
-	return $self->_read_blocking($pkgsub, $timeout, $returnRef) if $blocking;
-	return $self->_read_nonblocking($pkgsub, $returnRef);
+	return $self->_read_blocking($pkgsub, $timeout, $returnRef) if $blocking && !length $self->{BUFFER};
+	return $self->_read_nonblocking($pkgsub, $returnRef); # if !$blocking || ($blocking && length $self->{BUFFER})
 }
 
 
@@ -807,7 +815,7 @@ sub change_baudrate { # Change baud rate of active SERIAL connection
 		$args{baudrate} = shift;
 	}
 	else {
-		my @validArgs = ('baudrate', 'parity', 'databits', 'stopbits', 'handshake', 'blocking', 'errmode');
+		my @validArgs = ('baudrate', 'parity', 'databits', 'stopbits', 'handshake', 'blocking', 'errmode', 'forcebaud');
 		%args = parseMethodArgs($pkgsub, \@_, \@validArgs);
 	}
 
@@ -830,6 +838,7 @@ sub change_baudrate { # Change baud rate of active SERIAL connection
 		databits		=>	defined $args{databits} ? $args{databits} : $self->{DATABITS},
 		stopbits		=>	defined $args{stopbits} ? $args{stopbits} : $self->{STOPBITS},
 		handshake		=>	defined $args{handshake} ? $args{handshake} : $self->{HANDSHAKE},
+		forcebaud		=>	$args{forcebaud},
 		# Declare method storage keys which will be used
 		stage			=>	0,
 	};
@@ -962,8 +971,9 @@ sub eof { # End-Of-File indicator
 		# Return Net::SSH2's own method if it is true (but it never is & seems not to work...)
 		return 1 if $self->{SSHCHANNEL}->eof;
 		# So we fudge it by checking Net::SSH2's last error code.. 
-		return 1 if $self->{PARENT}->error == -1;  # LIBSSH2_ERROR_SOCKET_NONE
-		return 1 if $self->{PARENT}->error == -43; # LIBSSH2_ERROR_SOCKET_RECV
+		my $sshError = $self->{PARENT}->error; # Minimize calls to Net::SSH2 error method, as it leaks in version 0.58
+		return 1 if $sshError == -1;  # LIBSSH2_ERROR_SOCKET_NONE
+		return 1 if $sshError == -43; # LIBSSH2_ERROR_SOCKET_RECV
 		return 0; # If we get here, return 0
 	}
 	elsif ($self->{TYPE} eq 'SERIAL') {
@@ -1006,6 +1016,14 @@ sub break { # Send the break signal
 sub disconnect { # Disconnect from host
 	my $pkgsub = "${Package}::disconnect";
 	my $self = shift;
+	my %args;
+	if (@_ == 1) { # Method invoked with just the command argument
+		$args{close_logs} = shift;
+	}
+	else {
+		my @validArgs = ('close_logs');
+		%args = parseMethodArgs($pkgsub, \@_, \@validArgs);
+	}
 
 	if ($self->{TYPE} eq 'TELNET') {
 		$self->{PARENT}->close if defined $self->{PARENT};
@@ -1022,7 +1040,7 @@ sub disconnect { # Disconnect from host
 		$self->{SOCKET} = undef;
 	}
 	elsif ($self->{TYPE} eq 'SERIAL') {
-		if (defined $self->{PARENT}) {
+		if (defined $self->{PARENT} && !$self->{SERIALEOF}) {
 			# Needed to flush writes before closing with Device::SerialPort (do once only)
 			$self->{PARENT}->write_done(1) if defined $self->{BAUDRATE};
 			$self->{PARENT}->close;
@@ -1037,13 +1055,31 @@ sub disconnect { # Disconnect from host
 	else {
 		return $self->error("$pkgsub: Invalid connection mode");
 	}
+	if ($args{close_logs}) {
+		if (defined $self->input_log) {
+			close $self->input_log;
+			$self->input_log('');
+		}
+		if (defined $self->output_log) {
+			close $self->output_log;
+			$self->output_log('');
+		}
+		if (defined $self->dump_log) {
+			close $self->dump_log;
+			$self->dump_log('');
+		}
+		if ($self->{TYPE} eq 'TELNET' && defined $self->parent->option_log) {
+			close $self->parent->option_log;
+			$self->parent->option_log('');
+		}
+	}
 	return 1;
 }
 
 
 sub close { # Same as disconnect
 	my $self = shift;
-	return $self->disconnect;
+	return $self->disconnect(@_);
 }
 
 
@@ -1363,6 +1399,14 @@ sub window_size { # Read/Set object terminal window size
 }
 
 
+sub report_query_status { # Enable/Disable ability to Reply Device OK ESC sequence to Query Device Status ESC sequence
+	my ($self, $newSetting) = @_;
+	my $currentSetting = $self->{report_query_status};
+	$self->{report_query_status} = $newSetting if defined $newSetting;
+	return $currentSetting;
+}
+
+
 sub errmode { # Set/read error mode
 	my $pkgsub = "${Package}::errmode";
 	my ($self, $newSetting) = @_;
@@ -1420,12 +1464,13 @@ sub debug { # Set/read debug level
 			$self->{PARENT}->debug($newSetting & 2 ? 1 : 0);
 		}
 		elsif ($self->{TYPE} eq 'SERIAL') {
-			$self->{PARENT}->debug($newSetting & 2 ? 1 : 0);
 			if ($^O eq 'MSWin32') {
 				Win32::SerialPort->set_test_mode_active(!($newSetting & 1));
+				Win32::SerialPort::debug($newSetting & 2 ? 'ON' : 'OFF');
 			}
 			else {
 				Device::SerialPort->set_test_mode_active(!($newSetting & 1));
+				Device::SerialPort::debug($newSetting & 2 ? 'ON' : 'OFF');
 			}
 		}
 	}
@@ -1949,7 +1994,7 @@ sub poll_connect { # Internal method to connect to host (used for both blocking 
 	unless (defined $self->{POLL}{$pollsub}) { # Only applicable if called from another method already in polling mode
 		my @validArgs = ('host', 'port', 'username', 'password', 'publickey', 'privatekey', 'passphrase',
 				 'prompt_credentials', 'baudrate', 'parity', 'databits', 'stopbits', 'handshake',
-				 'errmode', 'connection_timeout', 'terminal_type', 'window_size', 'callback');
+				 'errmode', 'connection_timeout', 'terminal_type', 'window_size', 'callback', 'forcebaud');
 		my %args = parseMethodArgs($pkgsub, \@_, \@validArgs, 1);
 		if (@_ && !%args) { # Legacy syntax
 			($args{host}, $args{port}, $args{username}, $args{password}, $args{publickey}, $args{privatekey}, $args{passphrase}, $args{baudrate},
@@ -1974,6 +2019,7 @@ sub poll_connect { # Internal method to connect to host (used for both blocking 
 			terminal_type		=>	$args{terminal_type},
 			window_size		=>	$args{window_size},
 			callback		=>	$args{callback},
+			forcebaud		=>	$args{forcebaud},
 			# Declare method storage keys which will be used
 			stage			=>	0,
 			authPublicKey		=>	0,
@@ -2186,17 +2232,30 @@ sub poll_connect { # Internal method to connect to host (used for both blocking 
 		$connect->{parity} = $Default{parity} unless defined $connect->{parity};
 		$connect->{databits} = $Default{databits} unless defined $connect->{databits};
 		$connect->{stopbits} = $Default{stopbits} unless defined $connect->{stopbits};
-		$self->{PARENT}->handshake($connect->{handshake});
-		$self->{PARENT}->baudrate($connect->{baudrate});
-		$self->{PARENT}->parity($connect->{parity});
-		# According to Win32::SerialPort, parity_enable needs to be set when parity is not 'none'...
-		$self->{PARENT}->parity_enable(1) unless $connect->{parity} eq 'none';
-		$self->{PARENT}->databits($connect->{databits});
-		$self->{PARENT}->stopbits($connect->{stopbits});
+		$self->{PARENT}->handshake($connect->{handshake}) or return $self->poll_return($self->error("$pkgsub: Can't set SerialPort Handshake"));
+		$self->{PARENT}->baudrate($connect->{baudrate}) or do {
+			# If error, could be Win32::SerialPort bug https://rt.cpan.org/Ticket/Display.html?id=120068
+			if ($^O eq 'MSWin32' && $connect->{forcebaud}) { # With forcebaud we can force-set the desired baudrate
+				$self->{PARENT}->{"_N_BAUD"} = $connect->{baudrate};
+			}
+			else { # Else we come out with error
+				return $self->poll_return($self->error("$pkgsub: Can't set SerialPort Baudrate"));
+			}
+		};
+		$self->{PARENT}->parity($connect->{parity}) or return $self->poll_return($self->error("$pkgsub: Can't set SerialPort Parity"));
+		unless ($connect->{parity} eq 'none') { # According to Win32::SerialPort, parity_enable needs to be set when parity is not 'none'...
+			$self->{PARENT}->parity_enable(1) or return $self->poll_return($self->error("$pkgsub: Can't set SerialPort Parity_Enable"));
+		}
+		$self->{PARENT}->databits($connect->{databits}) or return $self->poll_return($self->error("$pkgsub: Can't set SerialPort DataBits"));
+		$self->{PARENT}->stopbits($connect->{stopbits}) or return $self->poll_return($self->error("$pkgsub: Can't set SerialPort StopBits"));
 		$self->{PARENT}->write_settings or return $self->poll_return($self->error("$pkgsub: Can't change Device_Control_Block: $^E"));
-		$self->{PARENT}->buffers($ComPortReadBuffer, 0); #Set Read & Write buffers
-		$self->{PARENT}->read_interval($ComReadInterval) if $^O eq 'MSWin32';
-		$self->{PARENT}->read_char_time(0);     # don't wait for each character
+		#Set Read & Write buffers
+		$self->{PARENT}->buffers($ComPortReadBuffer, 0) or return $self->poll_return($self->error("$pkgsub: Can't set SerialPort Buffers"));
+		if ($^O eq 'MSWin32') {
+			$self->{PARENT}->read_interval($ComReadInterval) or return $self->poll_return($self->error("$pkgsub: Can't set SerialPort Read_Interval"));
+		}
+		# Don't wait for each character
+		defined $self->{PARENT}->read_char_time(0) or return $self->poll_return($self->error("$pkgsub: Can't set SerialPort Read_Char_Time"));
 		$self->{HANDSHAKE} = $connect->{handshake};
 		$self->{BAUDRATE} = $connect->{baudrate};
 		$self->{PARITY}	= $connect->{parity};
@@ -2465,7 +2524,7 @@ sub poll_change_baudrate { # Method to handle change_baudrate for poll methods (
 	}
 
 	unless (defined $self->{POLL}{$pollsub}) { # Only applicable if called from another method already in polling mode
-		my @validArgs = ('baudrate', 'parity', 'databits', 'stopbits', 'handshake', 'errmode');
+		my @validArgs = ('baudrate', 'parity', 'databits', 'stopbits', 'handshake', 'errmode', 'forcebaud');
 		my %args = parseMethodArgs($pkgsub, \@_, \@validArgs, 1);
 		if (@_ && !%args) { # Legacy syntax
 			($args{baudrate}, $args{parity}, $args{databits}, $args{stopbits}, $args{handshake}, $args{errmode}) = @_;
@@ -2478,6 +2537,7 @@ sub poll_change_baudrate { # Method to handle change_baudrate for poll methods (
 			databits		=>	defined $args{databits} ? $args{databits} : $self->{DATABITS},
 			stopbits		=>	defined $args{stopbits} ? $args{stopbits} : $self->{STOPBITS},
 			handshake		=>	defined $args{handshake} ? $args{handshake} : $self->{HANDSHAKE},
+			forcebaud		=>	$args{forcebaud},
 			# Declare method storage keys which will be used
 			stage			=>	0,
 			# Declare keys to be set if method called from another polled method
@@ -2511,17 +2571,30 @@ sub poll_change_baudrate { # Method to handle change_baudrate for poll methods (
 		$self->{PARENT} = Device::SerialPort->new($self->{COMPORT}, !($self->{debug} & 1))
 			or return $self->poll_return($self->error("$pkgsub: Cannot re-open serial port '$self->{COMPORT}'"));
 	}
-	$self->{PARENT}->handshake($changeBaud->{handshake});
-	$self->{PARENT}->baudrate($changeBaud->{baudrate});
-	$self->{PARENT}->parity($changeBaud->{parity});
-	# According to Win32::SerialPort, parity_enable needs to be set when parity is not 'none'...
-	$self->{PARENT}->parity_enable(1) unless $changeBaud->{parity} eq 'none';
-	$self->{PARENT}->databits($changeBaud->{databits});
-	$self->{PARENT}->stopbits($changeBaud->{stopbits});
+	$self->{PARENT}->handshake($changeBaud->{handshake}) or return $self->poll_return($self->error("$pkgsub: Can't set SerialPort Handshake"));
+	$self->{PARENT}->baudrate($changeBaud->{baudrate}) or do {
+		# If error, could be Win32::SerialPort bug https://rt.cpan.org/Ticket/Display.html?id=120068
+		if ($^O eq 'MSWin32' && $changeBaud->{forcebaud}) { # With forcebaud we can force-set the desired baudrate
+			$self->{PARENT}->{"_N_BAUD"} = $changeBaud->{baudrate};
+		}
+		else { # Else we come out with error
+			return $self->poll_return($self->error("$pkgsub: Can't set SerialPort Baudrate"));
+		}
+	};
+	$self->{PARENT}->parity($changeBaud->{parity}) or return $self->poll_return($self->error("$pkgsub: Can't set SerialPort Parity"));
+	unless ($changeBaud->{parity} eq 'none') { # According to Win32::SerialPort, parity_enable needs to be set when parity is not 'none'...
+		$self->{PARENT}->parity_enable(1) or return $self->poll_return($self->error("$pkgsub: Can't set SerialPort Parity_Enable"));
+	}
+	$self->{PARENT}->databits($changeBaud->{databits}) or return $self->poll_return($self->error("$pkgsub: Can't set SerialPort DataBits"));
+	$self->{PARENT}->stopbits($changeBaud->{stopbits}) or return $self->poll_return($self->error("$pkgsub: Can't set SerialPort StopBits"));
 	$self->{PARENT}->write_settings or return $self->poll_return($self->error("$pkgsub: Can't change Device_Control_Block: $^E"));
-	$self->{PARENT}->buffers($ComPortReadBuffer, 0); #Set Read & Write buffers
-	$self->{PARENT}->read_interval($ComReadInterval) if $^O eq 'MSWin32';
-	$self->{PARENT}->read_char_time(0); # don't wait for each character
+	#Set Read & Write buffers
+	$self->{PARENT}->buffers($ComPortReadBuffer, 0) or return $self->poll_return($self->error("$pkgsub: Can't set SerialPort Buffers"));
+	if ($^O eq 'MSWin32') {
+		$self->{PARENT}->read_interval($ComReadInterval) or return $self->poll_return($self->error("$pkgsub: Can't set SerialPort Read_Interval"));
+	}
+	# Don't wait for each character
+	defined $self->{PARENT}->read_char_time(0) or return $self->poll_return($self->error("$pkgsub: Can't set SerialPort Read_Char_Time"));
 	$self->{BAUDRATE} = $changeBaud->{baudrate};
 	$self->{PARITY}	= $changeBaud->{parity};
 	$self->{DATABITS} = $changeBaud->{databits};
@@ -2546,6 +2619,23 @@ sub debugMsg { # Print a debug message
 
 ########################################## Internal Private Methods ##########################################
 
+sub _check_query { # Internal method to process Query Device Status escape sequences
+	my ($self, $pkgsub, $bufRef) = @_;
+	if (length $self->{QUERYBUFFER}) { # If an escape sequence fragment was cashed
+		$$bufRef = join('', $self->{QUERYBUFFER}, $$bufRef); # prepend it to new output
+		$self->{QUERYBUFFER} = '';
+	}
+	if ($$bufRef =~ s/(\e(?:\[.?)?)$//){ # If output stream ends with \e, or \e[ or \e[.
+		# We could be looking at an escape sequence fragment; so we strip it and cache it
+		$self->{QUERYBUFFER} .= $1;
+	}
+	return unless $$bufRef =~ s/$VT100_QueryDeviceStatus//go;
+	# A Query Device Status escape sequence was found and removed from output buffer
+	$self->_put($pkgsub, \$VT100_ReportDeviceOk); # Send a Report Device OK escape sequence
+	return;
+}
+
+
 sub _read_buffer { # Internal method to read (and clear) any data cached in object buffer
 	my ($self, $returnRef) = @_;
 	my $buffer = $self->{BUFFER};
@@ -2557,64 +2647,75 @@ sub _read_buffer { # Internal method to read (and clear) any data cached in obje
 
 sub _read_blocking { # Internal read method; data must be read or we timeout
 	my ($self, $pkgsub, $timeout, $returnRef) = @_;
-	my $buffer;
+	my ($buffer, $startTime);
 
-	if ($self->{TYPE} eq 'TELNET') {
-		$buffer = $self->{PARENT}->get(Timeout => $timeout);
-		return $self->error("$pkgsub: Received eof from connection") if $self->eof;
-		return $self->error("$pkgsub: Telnet ".$self->{PARENT}->errmsg) unless defined $buffer;
-	}
-	elsif ($self->{TYPE} eq 'SSH') {
-		return $self->error("$pkgsub: No SSH channel to read from") unless defined $self->{SSHCHANNEL};
-		$self->{SSHCHANNEL}->read($buffer, $self->{read_block_size});
-		unless (defined $buffer && length $buffer) {
+	until (length $buffer) {
+		$startTime = time; # Record start time
+		if ($self->{TYPE} eq 'TELNET') {
+			$buffer = $self->{PARENT}->get(Timeout => $timeout);
 			return $self->error("$pkgsub: Received eof from connection") if $self->eof;
-			my @poll = { handle => $self->{SSHCHANNEL}, events => ['in'] };
-			unless ($self->{PARENT}->poll($timeout*1000, \@poll) && $poll[0]->{revents}->{in}) {
-				return $self->error("$pkgsub: SSH read timeout");
-			}
-			my $inBytes = $self->{SSHCHANNEL}->read($buffer, $self->{read_block_size});
-			return $self->error("$pkgsub: SSH channel read error") unless defined $inBytes;
+			return $self->error("$pkgsub: Telnet ".$self->{PARENT}->errmsg) unless defined $buffer;
 		}
-		_log_print($self->{INPUTLOGFH}, \$buffer) if defined $self->{INPUTLOGFH};
-		_log_dump('<', $self->{DUMPLOGFH}, \$buffer) if defined $self->{DUMPLOGFH};
-	}
-	elsif ($self->{TYPE} eq 'SERIAL') {
-		return $self->error("$pkgsub: Received eof from connection") if $self->{SERIALEOF};
-		if ($^O eq 'MSWin32') { # Win32::SerialPort
-			my $inBytes;
-			# Set timeout in millisecs
-			local $SIG{__WARN__} = sub {}; # Disable carp from Win32::SerialPort
-			$self->{PARENT}->read_const_time($timeout == 0 ? 1 : $timeout * 1000) or do {
-				$self->{PARENT}->close;
-				$self->{SERIALEOF} = 1;
-				return $self->error("$pkgsub: Unable to read serial port");
-			};
-			($inBytes, $buffer) = $self->{PARENT}->read($self->{read_block_size});
-			return $self->error("$pkgsub: Serial Port read timeout") unless $inBytes;
-		}
-		else { # Device::SerialPort; we handle polling ourselves
-			# Wait defined millisecs during every read
-			$self->{PARENT}->read_const_time($PollTimer) or do {
-				$self->{PARENT}->close;
-				$self->{SERIALEOF} = 1;
-				return $self->error("$pkgsub: Unable to read serial port");
-			};
-			my $inBytes;
-			my $ticks = 0;
-			my $ticksTimeout = $timeout*$PollTimer/10;
-			do {
-				if ($ticks++ > $ticksTimeout) {
-					return $self->error("$pkgsub: Serial port read timeout");
+		elsif ($self->{TYPE} eq 'SSH') {
+			return $self->error("$pkgsub: No SSH channel to read from") unless defined $self->{SSHCHANNEL};
+			$self->{SSHCHANNEL}->read($buffer, $self->{read_block_size});
+			unless (defined $buffer && length $buffer) {
+				return $self->error("$pkgsub: Received eof from connection") if $self->eof;
+				my @poll = { handle => $self->{SSHCHANNEL}, events => ['in'] };
+				unless ($self->{PARENT}->poll($timeout*1000, \@poll) && $poll[0]->{revents}->{in}) {
+					return $self->error("$pkgsub: SSH read timeout");
 				}
-				($inBytes, $buffer) = $self->{PARENT}->read($self->{read_block_size});
-			} until $inBytes > 0;
+				my $inBytes = $self->{SSHCHANNEL}->read($buffer, $self->{read_block_size});
+				return $self->error("$pkgsub: SSH channel read error") unless defined $inBytes;
+			}
+			_log_print($self->{INPUTLOGFH}, \$buffer) if defined $self->{INPUTLOGFH};
+			_log_dump('<', $self->{DUMPLOGFH}, \$buffer) if defined $self->{DUMPLOGFH};
 		}
-		_log_print($self->{INPUTLOGFH}, \$buffer) if defined $self->{INPUTLOGFH};
-		_log_dump('<', $self->{DUMPLOGFH}, \$buffer) if defined $self->{DUMPLOGFH};
-	}
-	else {
-		return $self->error("$pkgsub: Invalid connection mode");
+		elsif ($self->{TYPE} eq 'SERIAL') {
+			return $self->error("$pkgsub: Received eof from connection") if $self->{SERIALEOF};
+			if ($^O eq 'MSWin32') { # Win32::SerialPort
+				my $inBytes;
+				# Set timeout in millisecs
+				local $SIG{__WARN__} = sub {}; # Disable carp from Win32::SerialPort
+				$self->{PARENT}->read_const_time($timeout == 0 ? 1 : $timeout * 1000) or do {
+					$self->{PARENT}->close;
+					$self->{SERIALEOF} = 1;
+					return $self->error("$pkgsub: Unable to read serial port");
+				};
+				($inBytes, $buffer) = $self->{PARENT}->read($self->{read_block_size});
+				return $self->error("$pkgsub: Serial Port read timeout") unless $inBytes;
+			}
+			else { # Device::SerialPort; we handle polling ourselves
+				# Wait defined millisecs during every read
+				$self->{PARENT}->read_const_time($PollTimer) or do {
+					$self->{PARENT}->close;
+					$self->{SERIALEOF} = 1;
+					return $self->error("$pkgsub: Unable to read serial port");
+				};
+				my $inBytes;
+				my $ticks = 0;
+				my $ticksTimeout = $timeout*$PollTimer/10;
+				do {
+					if ($ticks++ > $ticksTimeout) {
+						return $self->error("$pkgsub: Serial port read timeout");
+					}
+					($inBytes, $buffer) = $self->{PARENT}->read($self->{read_block_size});
+				} until $inBytes > 0;
+			}
+			_log_print($self->{INPUTLOGFH}, \$buffer) if defined $self->{INPUTLOGFH};
+			_log_dump('<', $self->{DUMPLOGFH}, \$buffer) if defined $self->{DUMPLOGFH};
+		}
+		else {
+			return $self->error("$pkgsub: Invalid connection mode");
+		}
+		# Check for Query Device Status escape sequences and process a reply if necessary
+		if ($self->{report_query_status}){
+			$self->_check_query($pkgsub, \$buffer);
+			unless (length $buffer) { # If buffer was just a Query Device Status escape sequence we now have an empty buffer
+				$timeout -= (time - $startTime);	# Re-calculate a reduced timeout value, to perform next read cycle
+				return $self->error("$pkgsub: Read timeout with report_query_status active") if $timeout <= 0;
+			}
+		}
 	}
 	# $buffer should always be a defined, non-empty string
 	return $returnRef ? \$buffer : $buffer;
@@ -2633,6 +2734,9 @@ sub _read_nonblocking { # Internal read method; if no data available return imme
 	elsif ($self->{TYPE} eq 'SSH') {
 		return $self->error("$pkgsub: No SSH channel to read from") unless defined $self->{SSHCHANNEL};
 		$self->{SSHCHANNEL}->read($buffer, $self->{read_block_size});
+		# With Net::SSH2 0.58 & libssh2 1.5.0 line below was not necessary, as an emty read would leave $buffer defined and empty
+		# But with Net::SSH2 0.63 & libssh2 1.7.0 this is no longer the case; now an empty read returns undef as both method return value and $buffer 
+		$buffer = '' unless defined $buffer;
 		if (length $buffer) {
 			_log_print($self->{INPUTLOGFH}, \$buffer) if defined $self->{INPUTLOGFH};
 			_log_dump('<', $self->{DUMPLOGFH}, \$buffer) if defined $self->{DUMPLOGFH};
@@ -2658,6 +2762,12 @@ sub _read_nonblocking { # Internal read method; if no data available return imme
 	else {
 		return $self->error("$pkgsub: Invalid connection mode");
 	}
+	# Check for Query Device Status escape sequences and process a reply if necessary
+	$self->_check_query($pkgsub, \$buffer) if length $buffer && $self->{report_query_status};
+
+	# Pre-pend local buffer if not empty
+	$buffer = join('', $self->_read_buffer(0), $buffer) if length $self->{BUFFER};
+
 	# If nothing was read, $buffer should be a defined, empty string
 	return $returnRef ? \$buffer : $buffer;
 }
@@ -2746,11 +2856,11 @@ sub _log_dump { # Dump log procedure; copied and modified directly from Net::Tel
 sub _error_format { # Format the error message
 	my ($msgFormat, $errmsg) = @_;
 
-	return $errmsg if $msgFormat =~ /^\s*verbose\s*$/i;
+	return ucfirst $errmsg if $msgFormat =~ /^\s*verbose\s*$/i;
 	$errmsg =~ s/\s+\/\/\s+.*$//;
-	return $errmsg if $msgFormat =~ /^\s*default\s*$/i || $msgFormat !~ /^\s*terse\s*$/i;
+	return ucfirst $errmsg if $msgFormat =~ /^\s*default\s*$/i || $msgFormat !~ /^\s*terse\s*$/i;
 	$errmsg =~ s/^(?:[^:]+::)+[^:]+:\s+//;
-	return $errmsg; # terse
+	return ucfirst $errmsg; # terse
 }
 
 
@@ -2791,7 +2901,7 @@ sub _call_poll_method { # Call object's poll method and optionally alter and the
 }
 
 
-sub _setup_telnet_option { # Sets up specifed telnet option
+sub _setup_telnet_option { # Sets up specified telnet option
 	my ($self, $telobj, $option) = @_;
 
 	$self->{PARENT}->option_accept(Do => $option);
@@ -3079,6 +3189,7 @@ Used to create an object instance of Control::CLI
   	[Output_record_separator => $ors,]
   	[Terminal_type		 => $string,]
   	[Window_size		 => [$width, $height],]
+  	[Report_query_status	 => $flag,]
   	[Debug			 => $debugFlag,]
   );
 
@@ -3116,6 +3227,7 @@ Methods which can be run on a previously created Control::CLI object instance
   	[Passphrase		=> $passphrase,]
   	[Prompt_credentials	=> $flag,]
   	[BaudRate		=> $baudRate,]
+  	[ForceBaud		=> $flag,]
   	[Parity			=> $parity,]
   	[DataBits		=> $dataBits,]
   	[StopBits		=> $stopBits,]
@@ -3230,6 +3342,7 @@ For Serial port, these arguments are used:
 
   $ok = $obj->connect(
   	[BaudRate		=> $baudRate,]
+  	[ForceBaud		=> $flag,]
   	[Parity			=> $parity,]
   	[DataBits		=> $dataBits,]
   	[StopBits		=> $stopBits,]
@@ -3264,6 +3377,8 @@ B<Stop Bits> : Legal values are 1, 1.5, and 2. But 1.5 only works with 5 databit
 B<Handshake> : One of the following: "none", "rts", "xoff", "dtr"
 
 =back
+
+On Windows systems the underlying Win32::SerialPort module can have issues with some serial ports, and fail to set the desired baudrate (see bug report https://rt.cpan.org/Ticket/Display.html?id=120068); if hitting that problem (and no official Win32::SerialPort fix is yet available) set the ForceBaud argument; this will force Win32::SerialPort into setting the desired baudrate even if it does not think the serial port supports it.
 
 Remember that when connecting over the serial port, the device at the far end is not necessarily alerted that the connection is established. So it might be necessary to send some character sequence (usually a carriage return) over the serial connection to wake up the far end. This can be achieved with a simple print() immediately after connect().
 
@@ -3708,6 +3823,7 @@ If you only want to retrieve the command output at the end:
 
   $ok = $obj->change_baudrate(
   	[BaudRate		=> $baudRate,]
+  	[ForceBaud		=> $flag,]
   	[Parity			=> $parity,]
   	[DataBits		=> $dataBits,]
   	[StopBits		=> $stopBits,]
@@ -3817,7 +3933,14 @@ Over a Serial connection this method calls the underlying pulse_break_on($millis
 
   $ok = $obj->disconnect;
 
+  $ok = $obj->disconnect($close_logs_flag);
+
+  $ok = $obj->disconnect(
+  	[Close_logs		=> $flag,]
+  );
+
 This method closes the connection. Always returns true.
+If the close_logs flag is set and any of the logging methods input_log() or output_log() or dump_log() or even Net::Telnet's option_log() are active then their respective filehandle is closed and the logging is disabled.
 
 
 =item B<close> - disconnect from host
@@ -4202,6 +4325,16 @@ Currently a terminal window size is only negotiated with a SSH or TELNET connect
 By default no terminal window size is set which results in TELNET simply not negotiating any window size while SSH will default to 80 x 24.
 Once a terminal window size is set via this method, both TELNET and SSH will negotiate that window size during connect().
 To undefine the window size call the method with either or both $width and $height set to 0 (or empty string).
+
+
+=item B<report_query_status()> - set if read methods should automatically respond to Query Device Status escape sequences 
+
+  $flag = $obj->report_query_status;
+
+  $prev = $obj->report_query_status($flag);
+
+Some devices use the ANSI/VT100 Query Device Status escape sequence - <ESC>[5n - to check whether a terminal is still connected. A real VT100 terminal will automatically respond to these with a Report Device OK escape sequence - <ESC>[0n - otherwise the connection is reset. This is sometimes done on serial port connections to detect when the terminal is disconnected (serial cable removed) so as to reset the connection. The Query Device Status sequence can be sent as often as every second. While this is uncommon on Telnet and SSH connections, it can happen when SSH or Telnet accessing serial connections via some terminal server device. In order to successfully script such connections using this class it is necessary for the script to be able to generate the appropriate Report Device OK escape sequence in a timely manner.
+This method activates the ability for the read methods of this class to (a) detect a Query Device Status escape sequence within the received data stream, (b) remove it from the data stream which they ultimately return and (c) automatically send a Report Device OK escape sequence back to the connected device. This functionality, by default disabled, is embedded within the read methods of this class and is active for all of the following methods in both blocking and non blocking modes: read(), readwait(), waitfor(), login(), cmd(). However the script will need to interact with the connection (using the above mentioned methods) on a regular basis otherwise the connection will get reset. If you don't need to read the connection for more than a couple of seconds or you are just doing print() or printlist() to the connection, you will have to ensure that some non-blocking reads are done at regular intervals, either via a thread or within your mainloop.
 
 
 =item B<debug()> - set debugging
@@ -4931,7 +5064,7 @@ A lot of the methods and functionality of this class, as well as some code, is d
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2015 Ludovico Stevens.
+Copyright 2017 Ludovico Stevens.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

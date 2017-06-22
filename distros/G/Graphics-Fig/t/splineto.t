@@ -1,23 +1,42 @@
 use utf8;
 use strict;
 use warnings;
-use File::Temp qw/ tempdir /;
-use Test::More tests => 2;
-use Math::Trig;
+use Test::More;
 use t::FigCmp;
 
+#
+# Skip tests if required modules are not available.
+#
+if (!eval { require File::Temp; 1 }) {
+    plan skip_all => "File::Temp moduled required";
+}
+if (!eval { require Math::Trig; 1 }) {
+    plan skip_all => "Math::Trig moduled required";
+}
+if (!eval { require Regexp::Common; 1 }) {
+    plan skip_all => "Regexp::Common moduled required";
+}
+if (!eval { require Image::Info; 1 }) {
+    plan skip_all => "Image::Info moduled required";
+}
+plan tests => 1;
+
+#
+# Load modules.
+#
+use Graphics::Fig;
+use File::Temp qw/ tempdir /;
+use Math::Trig;
+
+#
+# Create temp directory.
+#
 my $dir = tempdir(CLEANUP => 1);
 #my $dir = "/tmp";
 
-#
-# Test 1: load the module
-#
-BEGIN {
-    use_ok('Graphics::Fig')
-};
 
 #
-# Test 2: basic splineto test
+# Test 1: basic splineto test
 #
 eval {
     my $fig = Graphics::Fig->new({ position => [ 1, 1 ], arrowMode => "forw" });
@@ -36,9 +55,9 @@ eval {
     # rendered as a polyline.
     #
     $fig->splineto([ 4, 4 ], { new => 1 });
-    $fig->save("${dir}/splineto2.fig");
-    &FigCmp::figCmp("${dir}/splineto2.fig", "t/splineto2.fig") || die;
+    $fig->save("${dir}/splineto1.fig");
+    &FigCmp::figCmp("${dir}/splineto1.fig", "t/splineto1.fig") || die;
 };
-ok($@ eq "", "test2");
+ok($@ eq "", "test1");
 
 exit(0);

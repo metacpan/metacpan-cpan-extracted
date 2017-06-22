@@ -6,7 +6,7 @@ use IO::Socket;
 
 use constant DEBUG => $ENV{MOJO_FASTCGI_DEBUG} || 0;
 
-our $VERSION = '0.41';
+our $VERSION = '0.50';
 
 # Roles
 my @ROLES = qw/RESPONDER  AUTHORIZER FILTER/;
@@ -226,7 +226,7 @@ sub run {
     $self->write_response($tx);
 
     # Finish transaction
-    $tx->server_close;
+    $tx->closed;
   }
 }
 

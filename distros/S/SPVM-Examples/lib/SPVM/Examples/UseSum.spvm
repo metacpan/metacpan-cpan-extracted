@@ -1,0 +1,8 @@
+# example from SPVM.pm, modified
+use Examples::Sum;
+package Examples::UseSum {
+  sub foo ($a : int, $b : int) : int {
+    my $total = ($a * $b) + MyModule1::sum(2, 4);
+    return $total;
+  }
+}

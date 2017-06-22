@@ -1,8 +1,5 @@
 package Task::CPANPLUS::Metabase;
-BEGIN {
-  $Task::CPANPLUS::Metabase::VERSION = '0.08';
-}
-
+$Task::CPANPLUS::Metabase::VERSION = '1.16';
 # ABSTRACT: Install everything for CPANPLUS to use Metabase
 
 use strict;
@@ -10,9 +7,11 @@ use warnings;
 
 1;
 
-
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -20,7 +19,7 @@ Task::CPANPLUS::Metabase - Install everything for CPANPLUS to use Metabase
 
 =head1 VERSION
 
-version 0.08
+version 1.16
 
 =head1 SYNOPSIS
 
@@ -43,10 +42,9 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2010 by Chris Williams.
+This software is copyright (c) 2017 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

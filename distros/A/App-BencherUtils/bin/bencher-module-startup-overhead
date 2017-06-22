@@ -1,16 +1,16 @@
 #!perl
 
 # Note: This script is a CLI  for Riap function /App/BencherUtils/bencher_module_startup_overhead
-# and generated automatically using Perinci::CmdLine::Gen version 0.35
+# and generated automatically using Perinci::CmdLine::Gen version 0.45_001
 
-our $DATE = '2016-10-27'; # DATE
+our $DATE = '2017-06-20'; # DATE
 our $DIST = 'App-BencherUtils'; # DIST
-our $VERSION = '0.19'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any;
+use Log::ger;
 
 use Perinci::CmdLine::Any;
 
@@ -20,6 +20,7 @@ Perinci::CmdLine::Any->new(
     log => 1,
     pass_cmdline_object => 1,
     config_filename => ["bencher.conf", "bencher-module-startup-overhead.conf"],
+    use_utf8 => 1,
 )->run;
 
 # ABSTRACT: Accept a list of module names and perform startup overhead benchmark
@@ -37,7 +38,7 @@ bencher-module-startup-overhead - Accept a list of module names and perform star
 
 =head1 VERSION
 
-This document describes version 0.19 of bencher-module-startup-overhead (from Perl distribution App-BencherUtils), released on 2016-10-27.
+This document describes version 0.20 of bencher-module-startup-overhead (from Perl distribution App-BencherUtils), released on 2017-06-20.
 
 =head1 SYNOPSIS
 
@@ -116,23 +117,23 @@ Do not read environment for default options.
 
 =item B<--debug>
 
-Set log level to debug (note: you also need to set LOG=1 to enable logging, or use DEBUG=1).
+Shortcut for --log-level=debug.
 
 =item B<--log-level>=I<s>
 
-Set log level (note: you also need to set LOG=1 to enable logging).
+Set log level.
 
 =item B<--quiet>
 
-Set log level to quiet (note: you also need to set LOG=1 to enable logging, or use QUIET=1).
+Shortcut for --log-level=error.
 
 =item B<--trace>
 
-Set log level to trace (note: you also need to set LOG=1 to enable logging, or use TRACE=1).
+Shortcut for --log-level=trace.
 
 =item B<--verbose>
 
-Set log level to info (note: you also need to set LOG=1 to enable logging, or use VERBOSE=1).
+Shortcut for --log-level=info.
 
 =back
 
@@ -200,7 +201,7 @@ To activate bash completion for this script, put:
 
  complete -C bencher-module-startup-overhead bencher-module-startup-overhead
 
-in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
 recognize tab completion for the command. Or, you can also directly execute the
 line above in your shell to activate immediately.
 
@@ -208,8 +209,8 @@ It is recommended, however, that you install L<shcompgen> which allows you to
 activate completion scripts for several kinds of scripts on multiple shells.
 Some CPAN distributions (those that are built with
 L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
-completion for their included scripts (using C<shcompgen>) at installation time,
-so you can immadiately have tab completion.
+completion for their included scripts (using L<shcompgen>) at installation time,
+so you can immediately have tab completion.
 
 =head2 tcsh
 
@@ -217,15 +218,15 @@ To activate tcsh completion for this script, put:
 
  complete bencher-module-startup-overhead 'p/*/`bencher-module-startup-overhead`/'
 
-in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
 recognize tab completion for the command. Or, you can also directly execute the
 line above in your shell to activate immediately.
 
-It is also recommended to install C<shcompgen> (see above).
+It is also recommended to install L<shcompgen> (see above).
 
 =head2 other shells
 
-For fish and zsh, install C<shcompgen> as described above.
+For fish and zsh, install L<shcompgen> as described above.
 
 =head1 CONFIGURATION FILE
 
@@ -254,21 +255,21 @@ List of available configuration parameters:
 
 =head2 BENCHER_MODULE_STARTUP_OVERHEAD_OPT => str
 
-Specify additional command-line options
+Specify additional command-line options.
 
 =head1 FILES
 
-~/.config/bencher.conf
+F<~/.config/bencher.conf>
 
-~/.config/bencher-module-startup-overhead.conf
+F<~/.config/bencher-module-startup-overhead.conf>
 
-~/bencher.conf
+F<~/bencher.conf>
 
-~/bencher-module-startup-overhead.conf
+F<~/bencher-module-startup-overhead.conf>
 
-/etc/bencher.conf
+F</etc/bencher.conf>
 
-/etc/bencher-module-startup-overhead.conf
+F</etc/bencher-module-startup-overhead.conf>
 
 =head1 HOMEPAGE
 
@@ -292,7 +293,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

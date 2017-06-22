@@ -4,7 +4,7 @@ use warnings;
 use Carp ();
 use Time::HiRes ();
 
-our $VERSION = '0.10';
+our $VERSION = '0.111';
 
 require Dumbbench::Result;
 require Dumbbench::Stats;
@@ -54,20 +54,20 @@ sub new {
       push @{$self->{instances}}, $instance->new;
     }
   }
-  
+
   if ($self->target_abs_precision <= 0 and $self->target_rel_precision <= 0) {
     Carp::croak("Need either target_rel_precision or target_abs_precision > 0");
   }
   if ($self->initial_runs < 6) {
     Carp::carp("Number of initial runs is very small (<6). Precision will be off.");
   }
-  
+
   return $self;
 }
 
 sub add_instances {
   my $self = shift;
-  
+
   if ($self->started) {
     Carp::croak("Can't add instances after the benchmark has been started");
   }
@@ -140,7 +140,7 @@ sub _run {
   else {
     $instance->single_run();
   }
-  
+
   my @timings;
   print "${name}Running $initial_timings initial timings...\n" if $V;
   foreach (1..$initial_timings) {
@@ -179,7 +179,7 @@ sub _run {
       $mean = 0; $sigma = 0;
       last;
     }
-    
+
     if ($n_good) {
       my $new_stats = Dumbbench::Stats->new(data => $good);
       $sigma = $new_stats->$variability_measure() / sqrt($n_good);
@@ -238,11 +238,15 @@ sub _run {
 }
 
 sub report {
-  my $self = shift;
-  my $raw = shift;
+  my ( $self, $raw, $options ) = @_;
+  $options ||= {};
+  Carp::carp( "The second option to report was not a hash ref" )
+    unless ref $options eq ref {};
+
   foreach my $instance ($self->instances) {
     my $result = $instance->result;
-    
+    my $result_str = ($options->{float}) ? unscientific_notation($result) : "$result";
+
     if (not $raw) {
       my $mean = $result->raw_number;
       my $sigma = $result->raw_error->[0];
@@ -256,7 +260,7 @@ sub report {
       printf(
         "%sRounded run time per iteration: %s (%.1f%%)\n",
         $name,
-        "$result",
+        $result_str,
         $sigma/$mean*100
       );
       if ($self->verbosity) {
@@ -264,7 +268,7 @@ sub report {
       }
     }
     else {
-      print $result, "\n";
+      print $result_str, "\n";
     }
   }
 }
@@ -275,6 +279,10 @@ sub box_plot {
   return() if $@;
 
   return Dumbbench::BoxPlot->new($self);
+}
+
+sub unscientific_notation {
+  sprintf( "%f %s %f", split( / /, $_[0] ) );
 }
 
 1;
@@ -300,13 +308,13 @@ This will start churning for a while and then prints something like:
 As a module:
 
   use Dumbbench;
-  
+
   my $bench = Dumbbench->new(
     target_rel_precision => 0.005, # seek ~0.5%
     initial_runs         => 20,    # the higher the more reliable
   );
   $bench->add_instances(
-    Dumbbench::Instance::Cmd->new(command => [qw(perl -e 'something')]), 
+    Dumbbench::Instance::Cmd->new(command => [qw(perl -e 'something')]),
     Dumbbench::Instance::PerlEval->new(code => 'for(1..1e7){something}'),
     Dumbbench::Instance::PerlSub->new(code => sub {for(1..1e7){something}}),
   );
@@ -387,6 +395,18 @@ Prints a short report about the benchmark results.
 Returns a list of all instance objects in this benchmark set.
 The instance objects each have a C<result()> and C<dry_result()>
 method for accessing the numeric benchmark results.
+
+=head2 box_plot
+
+Returns a L<Dumbbench::BoxPlot> instance.
+
+A L<Dumbbench::BoxPlot> is a nice an easy way to get a graphic chart if
+you're in the mood instead of getting the same results from C<report>.
+
+If you don't want to get into the details of L<Dumbbench::BoxPlot>, you can do:
+
+  # $bench is your Dumbbench instance
+  $bench->box_plot->show;
 
 =head1 HOW IT WORKS AND WHY IT DOESN'T
 
@@ -497,8 +517,8 @@ robust estimates of the run time of meaningless benchmarks instead.
 
 L<Dumbbench::Instance>,
 L<Dumbbench::Instance::Cmd>,
-L<Dumbbench::Instance::PerlEval>, 
-L<Dumbbench::Instance::PerlSub>, 
+L<Dumbbench::Instance::PerlEval>,
+L<Dumbbench::Instance::PerlSub>,
 L<Dumbbench::Result>
 
 L<Benchmark>

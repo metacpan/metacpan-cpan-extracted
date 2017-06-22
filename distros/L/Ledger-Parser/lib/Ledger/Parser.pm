@@ -1,14 +1,14 @@
 package Ledger::Parser;
 
-our $DATE = '2016-01-12'; # DATE
-our $VERSION = '0.05'; # VERSION
+our $DATE = '2017-06-16'; # DATE
+our $VERSION = '0.06'; # VERSION
 
 use 5.010001;
 use strict;
 use utf8;
 use warnings;
-use Carp;
 
+use Carp;
 use Math::BigFloat;
 use Time::Moment;
 
@@ -256,7 +256,7 @@ sub _init_read {
 sub _read_file {
     my ($self, $filename) = @_;
     open my $fh, "<", $filename
-        or die "Can't open file '$filename': $!";
+        or croak "Can't open file '$filename': $!";
     binmode($fh, ":utf8");
     local $/;
     return ~~<$fh>;
@@ -266,7 +266,7 @@ sub read_file {
     my ($self, $filename) = @_;
     $self->_init_read;
     my $res = $self->_push_include_stack($filename);
-    die "Can't read '$filename': $res->[1]" unless $res->[0] == 200;
+    croak "Can't read '$filename': $res->[1]" unless $res->[0] == 200;
     $res =
         $self->_read_string($self->_read_file($filename));
     $self->_pop_include_stack;
@@ -447,7 +447,7 @@ sub _parsed_as_string {
                 $line->[COL_P_NL],
             );
         } else {
-            die "Bad parsed data (line #$linum): unknown type '$type'";
+            croak "Bad parsed data (line #$linum): unknown type '$type'";
         }
     }
     join("", @res);
@@ -468,7 +468,7 @@ Ledger::Parser - Parse Ledger journals
 
 =head1 VERSION
 
-This document describes version 0.05 of Ledger::Parser (from Perl distribution Ledger-Parser), released on 2016-01-12.
+This document describes version 0.06 of Ledger::Parser (from Perl distribution Ledger-Parser), released on 2017-06-16.
 
 =head1 SYNOPSIS
 
@@ -501,8 +501,11 @@ See L<Ledger::Journal> for available methods for the journal object.
 
 =head1 DESCRIPTION
 
-This module parses Ledger journal into L<Ledger::Journal> object. See
-http://ledger-cli.org/ for more on Ledger, the command-line double-entry
+B<EARLY RELEASE, SOME THINGS ARE NOT IMPLEMENTED YET.>
+
+This module parses Ledger journal into L<Ledger::Journal> object.
+
+See http://ledger-cli.org/ for more on Ledger, the command-line double-entry
 accounting system software.
 
 Ledger 3 can be extended with Python, and this module only supports a subset of
@@ -511,7 +514,7 @@ However, this module can also modify/write the journal, so it can be used e.g.
 to insert transactions programmatically (which is my use case and the reason I
 first created this module).
 
-This is an inexhaustive list of things that are not currently supported:
+This is an inexhaustive list of things that are not yet supported:
 
 =over
 
@@ -529,7 +532,7 @@ For example, things like:
 
 =item * Expression
 
-=item * Various commands
+=item * Various command directives
 
 Including but not limited to: assert, C (currency conversion), ...
 
@@ -558,11 +561,15 @@ Only used when encountering a date without year.
 
 =head2 new(%attrs) => obj
 
-Create a new parser instance.
+Create a new parser instance. Return parser object.
 
 =head2 $ledgerp->read_file($filename) => obj
 
+Parse a journal file. Return L<Ledger::Journal> document object.
+
 =head2 $ledgerp->read_string($str) => obj
+
+Parse a journal string. Return L<Ledger::Journal> document object.
 
 =head1 HOMEPAGE
 
@@ -570,7 +577,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Ledger-Par
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Ledger-Parser>.
+Source repository is at L<https://github.com/perlancar/perl-Ledger-Parser>.
 
 =head1 BUGS
 
@@ -586,7 +593,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

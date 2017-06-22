@@ -7,12 +7,6 @@ App::Netdisco::Manual::Configuration - How to Configure Netdisco
 The configuration files for Netdisco come with all options set to sensible
 default values, and just a few that you must initially set yourself.
 
-However as you use the system over time, there are many situations where you
-might want to tune the behaviour of Netdisco, and for that we have a lot of
-configuration settings available.
-
-=head2 GUIDANCE
-
 There are two configuration files: C<config.yml> (which lives inside Netdisco)
 and C<deployment.yml> (which usually lives in C<${HOME}/environments>).
 
@@ -21,8 +15,10 @@ alone.  Any time you want to set an option, use only the C<deployment.yml>
 file. The two are merged when Netdisco starts, with your settings in
 C<deployment.yml> overriding the defaults from C<config.yml>.
 
+=head2 YAML GUIDANCE
+
 The configuration file format for Netdisco is YAML. This is easy for humans to
-edit, but you should take care over whitespace and avoid TAB characters. YAML
+edit, but you should take care with whitespace and avoid TAB characters. YAML
 supports several data types:
 
 =over 4
@@ -30,23 +26,99 @@ supports several data types:
 =item *
 
 Boolean - True/False value, using C<1> and C<0> or C<true> and C<false>
-respectively
+respectively, e.g.:
+
+ check_userlog: true
 
 =item *
 
-List - Set of things using C<[a, b, c]> on one line or C<-> on separate lines
+List - Set of things using C<[a, b, c]> on one line or C<-> on separate lines,
+e.g.:
+
+ community: ['public', 'another']
+ 
+ discover_no:
+   - 192.0.2.0/24
+   - '2001:db8::/32'
 
 =item *
 
-Dictionary - Key/Value pairs (like Perl Hash) using C<{key1: val1, key2:
-val2}> on one line or C<key: value> on separate lines
+Dictionary - Key/Value pairs (like Perl Hash) using C<< {key1: val1, key2:
+val2} >> on one line or C<key: value> on separate lines, e.g.:
+
+ port_control_reasons:
+   address:   'Address Allocation Abuse'
+   copyright: 'Copyright Violation'
 
 =item *
 
 String - Quoted, just like in Perl (and essential if the item contains the
-colon character)
+colon character).
 
 =back
+
+=head2 ACCESS CONTROL LISTS
+
+Access Control Lists (ACLs) appear in many places in the configuration file,
+used to select or exclude devices or hosts for certain settings. ACLs are a
+single item or YAML list of items, which can contain:
+
+=over 4
+
+=item *
+
+Hostname, IP address, IP prefix (i.e. subnet), such as:
+
+ - hostname.example.com
+ - 192.0.2.1
+ - '2001:db8::/32'
+
+=item *
+
+IP address range, using a hyphen on the last octet/hextet, and no whitespace:
+
+ - 192.0.2.1-10
+
+=item *
+
+Regular expression in YAML format (no enforced anchors) which will match the
+device DNS name (using a fresh DNS lookup, so works on new discovery), e.g.:
+
+ - !!perl/regexp ^sep0.*$
+
+=item *
+
+"C<property:regexp>" to match against a device property, such as C<model> or
+C<vendor> (with enforced begin/end regexp anchors). When matching a device's
+interface, "C<port:regexp>" is also an option (see C<device_identity>).
+
+ - 'vendor:cisco'
+
+=item *
+
+"C<group:groupname>" to reference the "C<groupname>" group from the
+C<host_groups> setting. This is a way to either include ACLs in other ACLs, or
+re-use ACLs.
+
+=item *
+
+"C<op:and>" to require all items to match (or not match) the provided IP or
+device. Note that this includes IP address version mismatches (v4-v6).
+
+=back
+
+To negate any item in an ACL (except YAML regexp), prefix with "C<!>", for
+example "C<!192.0.2.0/29>". In that case the test will be that the ACL entry
+does I<not> match the device or IP being assessed. Note, however, that the
+first match in an ACL wins (because the default mode is "OR"), so take care
+with the order of items or include "C<op:and>" in the ACL if appropriate.
+
+To match any device, use "C<any>". To match no devices use "C<!any>".
+
+Configuration settings in Netdisco that take an Access Control List (most of
+the "C<*_no>" and "C<*_only>" settings, and "C<only>" settings) can accept
+either a YAML list of the above items, or merely a single item. This is useful
+if you create a C<host_groups> entry and wish to reference that as the ACL.
 
 =head1 SUPPORTED SETTINGS
 
@@ -78,11 +150,35 @@ Value: List. Default: Empty List.
 
 Additional library paths for the application (both web frontend and backend
 poller daemons). You can also use a colon-separated list in the
-"C<NETDISCO_INC>" environment variable.
+"C<NETDISCO_INC>" environment variable which makes code available even earlier
+in the app startup sequence.
+
+=head3 C<template_paths>
+
+Value: List. Default: Empty List.
+
+Additional paths for L<Template::Toolkit> templates. Files in these paths will
+be loaded before (and hence override) any templates built in to Netdisco.
+
+If you want to copy and override a built in web template, then create the
+directories necessary (such as "ajax" or "sidebar") in this path.  Note that
+templates may need to have a further "C<views>" subdirectory created.
+
+=head3 C<site_local_files>
+
+Value: Boolean. Default: false.
+
+A shortcut for using C<include_paths> and C<template_paths>. Setting this to
+true will push C<< $ENV{NETDISCO_HOME}/nd-site-local/{lib,share} >> into those
+settings, respectively. You can then put Perl code in C</lib> and templates in
+C</share> within the C<nd-site-local> directory.
+
+Note that you still need to create the directories yourself, and templates may
+need to have a further "C<views>" subdirectory created within "C<share>".
 
 =head3 C<external_databases>
 
-Value: List of Database Configuration Hashes. Default: None.
+Value: List of Database Configuration dictionaries. Default: None.
 
 The Plugins and User Reports features of Netdisco can gather data from
 external databases. You need to install the Perl database driver for the
@@ -227,8 +323,9 @@ Proxy user password. Ignored if proxy user defined as anonymous.
 
 =head4 C<opts>
 
-Hash of options to add to the connect string. Normally only needed if server
-does not support LDAPv3, or to enable debugging as in the example above.
+Dictionary of options to add to the connect string. Normally only needed if
+server does not support LDAPv3, or to enable debugging as in the example
+above.
 
 =head4 C<tls_opts>
 
@@ -275,7 +372,7 @@ C<web_plugins> setting.
 
 =head3 C<reports>
 
-Value: List of Reports Hashes. Default: None.
+Value: List of Reports dictionaries. Default: None.
 
 Use this configuration to add reports to Netdisco without writing any Perl
 code or HTML templates. For example:
@@ -314,8 +411,8 @@ Title for the Report.
 
 =head4 C<columns>
 
-List of single-key Hashes which map database column (field) name to table
-heading.
+List of single-key dictionaries which map database column (field) name to
+table heading.
 
 =head4 C<query>
 
@@ -434,7 +531,7 @@ network.
 
 =head3 C<port_control_reasons>
 
-Value: Hash of Strings. Default:
+Value: Dictionary of Strings. Default:
 
  port_control_reasons:
    address:     'Address Allocation Abuse'
@@ -476,6 +573,107 @@ Set to the URL of an image file which will be displayed alongside the C<Log
 In> form.
 
 =head2 Netdisco Core
+
+=head3 C<host_groups>
+
+Value: Dictionary of Access Control Lists. Default: None.
+
+Several configuration settings in Netdisco make use of L</"ACCESS CONTROL
+LISTS"> to identify lists of devices or hosts. Examples are the C<*_no>
+settings such as C<discover_no>, the C<*_only> settings such as C<macsuck_no>,
+and some "C<only>" settings which appear in C<snmp_auth> and C<dns>
+configuration.
+
+The C<host_groups> setting allows for naming of groups which are then
+referenced in settings or even within other groups, to include the values.
+Each item in the dictionary has the name of the group for the key, and the ACL
+for its value. Note that ACLs may be single items, or lists. For example:
+
+ host_groups:
+   problem_switches: badhost.example.com
+   friendly_devices:
+     - 192.0.2.0/24
+     - 'group:problem_switches'
+ 
+ macsuck_no: 'group:problem_switches'
+ discover_only:
+   - 'group:friendly_devices'
+   - '2001:db8::/32'
+
+As you can see, a host group is referenced by prefixing its name with
+"C<group:>" and enclosing in quotes (because the colon character is part of
+YAML syntax too). Host groups may be used in any setting that mentions support
+for L</"ACCESS CONTROL LISTS">.
+
+=head3 C<device_identity>
+
+Value: Dictionary of Access Control List mappings. Default: None.
+
+This setting allows you to control the canonical name or identity of devices
+in Netdisco. For example if Netdisco discovers devices and uses the "wrong"
+interface to identfy them (thereby confusing users) you can correct that here.
+
+The C<device_identity> setting is a dictionary where each key is an Access
+Control List matching a device and the corresponding value is another Access
+Control List matching one of the device's interfaces to use as the device
+canonical identity. The format of Access Control Lists is described in
+L</"ACCESS CONTROL LISTS">.
+
+In general, because the key of a dictionary must be a simple text string, you
+can use hostname, IP prefix, device properties, and group references to match
+devices. Regular expressions and combinations of device attributes should be
+placed in a C<host_groups> entry and referenced by name. For example:
+
+ host_groups:
+   backbone_devices:
+     - 'op:and'
+     - 'vendor:arista'
+     - 'model:.*(?i:DCS7508).*'
+ 
+ device_identity:
+   'group:backbone_devices':
+     - !!perl/regexp ^.*\.backbone\.example\.com$
+     - '172.16.20.0/24'
+   'vendor:cisco': '192.0.2.0/24'
+
+During "discover" jobs, Netdisco will find all entries in C<device_identity>
+where the I<key> matches the device in some way. For those entries, the
+device's interface IPs are put in ascending order, and then tested in turn
+against the entry's I<value>. If any interface matches, then the device is
+renumbered to use that interface as its new identity and the process stops.
+
+When using an Access Control List for the value (interface selection), as well
+as the options described in L</"ACCESS CONTROL LISTS"> you can use
+"C<port:regexp>" to match an interface's port name. For example to renumber
+all Arista devices to the IP and host name of their Mgmt1 interface (if they
+have one), you could use:
+
+ device_identity:
+   'vendor:arista': 'port:(?i)mgmt1'
+
+Once a device is renumbered, its new identity is "sticky". That is, you could
+remove the C<device_identity> configuration and the next "discover" job will
+not revert any device's identity.
+
+Remember that all L</"ACCESS CONTROL LISTS"> have an implicit "OR" condition -
+any of their entries matching will cause the whole list to match.  If you need
+very specific matching on devices, use a host group of several properties
+together with the "C<op:and>" modifier to require that all items in the list
+match the device (as in the example above).
+
+Note also that whatever interface you select as canonical for the device must
+be reachable by SNMP. Interfaces where an SNMP connection fails are ignored.
+
+The order in which Netdisco evaluates clauses in C<device_identity> is not
+specified. If you need to control the sequence, pass a I<list> of single-key
+dictionaries instead of one multi-key dictionary. The above example could then
+become:
+
+ device_identity:
+   - 'group:backbone_devices':
+       - !!perl/regexp ^.*\.backbone\.example\.com$
+       - '172.16.20.0/24'
+   - 'vendor:cisco': '192.0.2.0/24'
 
 =head3 C<mibhome>
 
@@ -533,16 +731,15 @@ or to set SNMPv3 authentication, see C<snmp_auth>, below.
 
 Value: List of Settings Trees. Default: Empty List.
 
-This setting is used for SNMPv3 authentication configuration, and also
-provides an alternative fine-grained control for SNMPv1 and SNMPv2 community
-strings. You provide a list of authentication stanzas, and Netdisco will try
-each in turn, then cache the one which works for a device.
+This setting configures authenticaiton for all SNMP versions, and provides an
+alternative fine-grained control for SNMPv1 and SNMPv2 community strings. You
+provide a list of authentication "I<stanza>", and Netdisco will try each in
+turn, then cache the one which works for a device.
 
-Each stanza can be restricted for use only on specific IP prefixes (subnets),
-and also limited to read (get) and/or write (set) operations. By default, a
-stanza is enabled for all device IPs, for read access only. The "tag" of a
-stanza is simply a friendly name used by Netdisco to refer to the
-configuration.
+Each stanza can be restricted for use only on specific devices, and also
+limited to read (get) and/or write (set) operations. By default, a stanza is
+enabled for all device IPs, for read access only. The "tag" of a stanza is
+simply a friendly name used by Netdisco when referring to the configuration.
 
  snmp_auth:
    - community: public
@@ -569,34 +766,42 @@ configuration.
      community: s3kr1t
      read: false
      write: true
-     only:
-       - 2001:db8::/32
+     only: '2001:db8::/32'
 
 For SNMPv1 and SNMPv2, only the C<community> key is required.  Unlike the
 global C<community>/C<community_rw> setting, this is not a list but a single
-item. To emulate their list behaviour, have multiple entries at the top
-C<snmp_auth> level, as in the example below.
+item. That is, to configure multiple community strings, have one stanza per
+community, as in the examples above and below.
 
 You can add C<read> and/or C<write> restrictions, and an IP restriction using
-C<only>. Giving the stanza a C<tag> name is optional, but recommended.
+C<only> (see L</"ACCESS CONTROL LISTS">. Giving the stanza a C<tag> name is
+optional, but recommended.
 
 For SNMPv3 the C<tag> and C<user> keys are required. You can add C<read>
 and/or C<write> restrictions, and an IP restriction using C<only>. Providing
 an C<auth> section enables the authentication security level. Providing a
 C<priv> section enables the message encryption security level.
 
-As per Net-SNMP, the default SNMPv3 authentication security method is MD5, and
-the default encryption protocol is DES, with AES or AES256 being common
-alternatives. Note that you cannot have C<priv> without C<auth>.
+The default SNMPv3 authentication security method is MD5, and the default
+encryption protocol is DES, with AES or AES256 being common alternatives. Note
+that you cannot have C<priv> without C<auth>.
 
 On some device platforms SNMPv3 contexts are used to macsuck each VLAN. For
-this you usually configure a common context prefix, with Netdisco's default
+this you usually configure a common context "prefix", with Netdisco's default
 being "C<vlan->" (i.e. C<vlan-1>, C<vlan-2>, etc). Add the C<context_prefix>
-key to a stanza to override this.
+key to a stanza to override this default.
 
-Note that multiple SNMP v2 community strings need to be in separate named
-stanza, as below. However for simple v2 configurations you can use the
-C<community> shorthand instead:
+Netdisco caches both the successful SNMPv2 read and write community strings,
+as well as the C<tag> names if available. This allows for faster operations
+once a connection has previously been made to a device.
+
+If you have SNMP connect failures, or notice that devices are not appearing in
+Netdisco, take a look at the "SNMP Connect Failures" Admin Report, and also
+the C<max_deferrals> setting, below.
+
+Finally, a reminder that multiple SNMPv2 community strings need to be in
+separate named stanza, as below. However for simple v2 configurations you can
+revert to the "C<community>" setting, instead:
 
  snmp_auth:
    - tag: 'default_v2_readonly1'
@@ -606,10 +811,6 @@ C<community> shorthand instead:
   
  # or...
  community: ['read1', 'read2']
-
-Netdisco caches both the successful SNMPv2 read and write community strings,
-as well as the C<tag> names if available. This allows for faster operations
-once a connection has previously been made to a device.
 
 =head3 C<get_community>
 
@@ -645,15 +846,11 @@ devices. For more fine-grained control see the C<bulkwalk_no> setting.
 
 =head3 C<bulkwalk_no>
 
-Value: List of Network Identifiers or Device Properties. Default: Empty List.
+Value: Single item or list of Network Identifiers or Device Properties.
+Default: Empty List.
 
-IP addresses in the list will use C<GETNEXT> (and not C<BULKWALK>). You can
-include hostnames, IP addresses, subnets (IPv4 or IPv6), YAML Regexp to match
-the DNS name, and address ranges (using a hyphen and no whitespace) in the
-list.
-
-Alternatively include a "C<property:regex>" entry to match the named property
-of the device. The regex must match the complete value.
+IP addresses in the list will use C<GETNEXT> (and not C<BULKWALK>).  See
+L</"ACCESS CONTROL LISTS"> for what you can use here.
 
 =head3 C<bulkwalk_repeaters>
 
@@ -710,29 +907,42 @@ Value: Number. Default: 2.
 
 Number of times to retry connecting to a device before giving up.
 
+=head3 C<devices_no>
+
+Value: Single item or list of Network Identifiers or Device Properties.
+Default: Empty List.
+
+The value will be copied into C<discover_no>, C<macsuck_no>, C<arpnip_no>, and
+C<nbtstat_no>, so is a shorthand way to restrict backend workers to avoid
+these device targets. See L</"ACCESS CONTROL LISTS"> for what you can use
+here.
+
+=head3 C<devices_only>
+
+Value: Single item or list of Network Identifiers or Device Properties.
+Default: Empty List.
+
+The value will be copied into C<discover_only>, C<macsuck_only>,
+C<arpnip_only>, and C<nbtstat_only>, so is a shorthand way to restrict backend
+workers to only specified device targets. See L</"ACCESS CONTROL LISTS"> for
+what you can use here.
+
 =head3 C<discover_no>
 
-Value: List of Network Identifiers or Device Properties. Default: Empty List.
+Value: Single item or list of Network Identifiers or Device Properties.
+Default: Empty List.
 
-IP addresses in the list will not be visited during device discovery. You can
-include hostnames, IP addresses, subnets (IPv4 or IPv6), YAML Regexp to match
-the DNS name, and address ranges (using a hyphen and no whitespace) in the
-list.
+IP addresses in the list will not be visited during device discovery.  See
+L</"ACCESS CONTROL LISTS"> for what you can use here.
 
-Alternatively include a "C<property:regex>" entry to match the named property
-of the device. The regex must match the complete value.
 
 =head3 C<discover_only>
 
-Value: List of Network Identifiers or Device Properties. Default: Empty List.
+Value: Single item or list of Network Identifiers or Device Properties.
+Default: Empty List.
 
 If present, device discovery will be limited to IP addresses matching entries
-in this list. You can include hostnames, IP addresses, subnets (IPv4 and
-IPv6), YAML Regexp to match the DNS name, and address ranges (using a hyphen
-and no whitespace).
-
-Alternatively include a "C<property:regex>" entry to match the named property
-of the device. The regex must match the complete value.
+in this list. See L</"ACCESS CONTROL LISTS"> for what you can use here.
 
 =head3 C<discover_no_type>
 
@@ -758,24 +968,16 @@ discover jobs for a device.
 
 Value: List of Network Identifiers or Device Properties. Default: Empty List.
 
-IP addresses in the list will not be visited for macsuck. You can include
-hostnames, IP addresses, subnets (IPv4 or IPv6), YAML Regexp to match the DNS
-name, and address ranges (using a hyphen and no whitespace) in the list.
-
-Alternatively include a "C<property:regex>" entry to match the named property
-of the device. The regex must match the complete value.
+IP addresses in the list will not be visited for macsuck. See L</"ACCESS
+CONTROL LISTS"> for what you can use here.
 
 =head3 C<macsuck_only>
 
-Value: List of Network Identifiers or Device Properties. Default: Empty List.
+Value: Single item or list of Network Identifiers or Device Properties.
+Default: Empty List.
 
 If present, macsuck will be limited to IP addresses matching entries in this
-list. You can include hostnames, IP addresses, subnets (IPv4 and IPv6), YAML
-Regexp to match the DNS name, and address ranges (using a hyphen and no
-whitespace).
-
-Alternatively include a "C<property:regex>" entry to match the named property
-of the device. The regex must match the complete value.
+list.  See L</"ACCESS CONTROL LISTS"> for what you can use here.
 
 =head3 C<macsuck_all_vlans>
 
@@ -810,11 +1012,13 @@ Similar to C<macsuck_no_vlan>, but allows specifying the device root
 
 =head3 C<macsuck_unsupported>
 
-Value: List of Network Identifiers or Device Properties. Default: Empty List.
+Value: Single item or list of Network Identifiers or Device Properties.
+Default: Empty List.
 
 Similar to C<macsuck_no>, but instead of skipping nodes on this device, they
 are allowed to gather on the upstream device port. Useful for devices which
 can be discovered by Netdisco but do not provide a MAC address table via SNMP.
+See L</"ACCESS CONTROL LISTS"> for what you can use here.
 
 =head3 C<macsuck_unsupported_type>
 
@@ -848,24 +1052,16 @@ macsuck jobs for a device.
 
 Value: List of Network Identifiers or Device Properties. Default: Empty List.
 
-IP addresses in the list will not be visited for arpnip. You can include
-hostnames, IP addresses, subnets (IPv4 or IPv6), YAML Regexp to match the DNS
-name, and address ranges (using a hyphen and no whitespace) in the list.
-
-Alternatively include a "C<property:regex>" entry to match the named property
-of the device. The regex must match the complete value.
+IP addresses in the list will not be visited for arpnip.  See L</"ACCESS
+CONTROL LISTS"> for what you can use here.
 
 =head3 C<arpnip_only>
 
-Value: List of Network Identifiers or Device Properties. Default: Empty List.
+Value: Single item or list of Network Identifiers or Device Properties.
+Default: Empty List.
 
 If present, arpnip will be limited to IP addresses matching entries in this
-list. You can include hostnames, IP addresses, subnets (IPv4 and IPv6), YAML
-Regexp to match the DNS name, and address ranges (using a hyphen and no
-whitespace).
-
-Alternatively include a "C<property:regex>" entry to match the named property
-of the device. The regex must match the complete value.
+list.  See L</"ACCESS CONTROL LISTS"> for what you can use here.
 
 =head3 C<arpnip_min_age>
 
@@ -878,19 +1074,15 @@ arpnip jobs for a device.
 
 Value: List of Network Identifiers. Default: Empty List.
 
-IP addresses in the list will not be visited for nbtstat. You can include
-hostnames, IP addresses, subnets (nbtstat only supports IPv4), YAML Regexp
-to match the DNS name, and address ranges (using a hyphen and no whitespace)
-in the list.
+IP addresses in the list will not be visited for nbtstat.  See L</"ACCESS
+CONTROL LISTS"> for what you can use here.
 
 =head3 C<nbtstat_only>
 
-Value: List of Network Identifiers. Default: Empty List.
+Value: Single item or list of Network Identifiers. Default: Empty List.
 
 If present, nbtstat will be limited to IP addresses matching entries in this
-list. You can include hostnames, IP addresses, subnets
-(nbtstat only supports IPv4), YAML Regexp to match the DNS name, and address
-ranges (using a hyphen and no whitespace).
+list.  See L</"ACCESS CONTROL LISTS"> for what you can use here.
 
 =head3 C<nbtstat_max_age>
 
@@ -978,8 +1170,9 @@ library default of 10.
 Similarly, the location of the Hosts file can be overridden in this config, or
 using the C<PERL_ANYEVENT_HOSTS> environment variable.
 
-C<no> is a list of IP addresses or CIDR ranges to excluded from DNS
-resolution.  Link local addresses are excluded by default.
+C<no> is a single item or list of IP addresses or CIDR ranges to excluded from
+DNS resolution (see L</"ACCESS CONTROL LISTS">). Link local addresses are
+excluded as in the defaults shown above.
 
 =head3 C<store_wireless_clients>
 
@@ -1133,6 +1326,8 @@ Value: Settings Tree. Default:
    tasks: 'AUTO * 2'
    sleep_time: 1
    min_runtime: 0
+   max_deferrals: 10
+   retry_after: '7 days'
 
 Control the activity of the backend daemon with this configuration setting.
 
@@ -1149,6 +1344,14 @@ new jobs. This is a balance between responsiveness and database load.
 C<min_runtime> allows you to set a time that each worker will sleep before
 recycling and starting another job. Some users report this needs to be set
 to avoid a 'runaway worker' bug. It can take a fractional number of seconds.
+
+C<max_deferrals> is the number of times an SNMP connect failure can occur
+before the device is no longer polled. The setting and counters are local to
+each poller backend. To reset device counters, restart the backend daemon. To
+disable this feature configure the setting with a value of zero.
+
+C<retry_after> is the time when each job is retried once, even when
+permanently deferred. The default is each job retried once per week.
 
 =head3 C<schedule>
 

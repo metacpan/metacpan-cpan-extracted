@@ -1,5 +1,5 @@
 package Beam::Runner;
-our $VERSION = '0.011';
+our $VERSION = '0.013';
 # ABSTRACT: Configure, list, document, and execute runnable task objects
 
 #pod =head1 SYNOPSIS
@@ -18,7 +18,7 @@ our $VERSION = '0.011';
 #pod discovery of configuration files and objects, and allows you to document
 #pod your objects for your users.
 #pod
-#pod =head2 Create a Task
+#pod =head2 Tasks
 #pod
 #pod A task is an object that consumes the L<Beam::Runnable> role. This role
 #pod requires only a C<run()> method be implemented in the class. This
@@ -229,7 +229,7 @@ Beam::Runner - Configure, list, document, and execute runnable task objects
 
 =head1 VERSION
 
-version 0.011
+version 0.013
 
 =head1 SYNOPSIS
 
@@ -247,7 +247,7 @@ configuration files and then execute them. This also allows easy
 discovery of configuration files and objects, and allows you to document
 your objects for your users.
 
-=head2 Create a Task
+=head2 Tasks
 
 A task is an object that consumes the L<Beam::Runnable> role. This role
 requires only a C<run()> method be implemented in the class. This

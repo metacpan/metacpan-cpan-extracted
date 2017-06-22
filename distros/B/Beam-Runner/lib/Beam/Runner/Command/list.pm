@@ -1,5 +1,5 @@
 package Beam::Runner::Command::list;
-our $VERSION = '0.011';
+our $VERSION = '0.013';
 # ABSTRACT: List the available containers and services
 
 #pod =head1 SYNOPSIS
@@ -231,7 +231,7 @@ Beam::Runner::Command::list - List the available containers and services
 
 =head1 VERSION
 
-version 0.011
+version 0.013
 
 =head1 SYNOPSIS
 

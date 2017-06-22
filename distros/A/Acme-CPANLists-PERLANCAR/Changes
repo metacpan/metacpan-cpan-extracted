@@ -1,3 +1,14 @@
+0.22    2017-06-19 (PERLANCAR)
+
+	- Add Log::Any::IfLOG to list of modules to avoid (tired of the
+	  LOG=1 workaround).
+
+
+0.21    2017-06-19 (PERLANCAR)
+
+	- Replace mention of Log::Gurat with Log::ger.
+
+
 0.20    2017-05-30 (PERLANCAR)
 
 	- Add module list: PERLANCAR::UpsideDownTextWithUnicode.

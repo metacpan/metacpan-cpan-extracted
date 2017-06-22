@@ -69,6 +69,11 @@ subtest 'decode_args, all defaults' => sub {
                 is( $token, $jwt,   'psgix token' );
                 is( $sub,   'bart', 'psgix claim' );
             };
+            subtest 'invalid token' => sub {
+                my $res = $cb->( GET "http://localhost/?token=NotAToken" );
+                is( $res->code, 401, 'status 401' );
+                like($res->content,qr/invalid token/,'error message');
+            };
 
             subtest 'missing token' => sub {
                 my $res = $cb->( GET "http://localhost/?" );
@@ -117,6 +122,43 @@ subtest 'decode_args, token required' => sub {
                 is( $res->code, 401, 'status 401' );
             };
         }
+    };
+};
+
+subtest 'decode_args, ignore invalid token' => sub {
+    my $handler = builder {
+        enable "Plack::Middleware::Auth::JWT",
+            decode_args    => { key => "12345" },
+            ignore_invalid_token => 1;
+        $app
+    };
+
+    test_psgi
+        app    => $handler,
+        client => sub {
+        my $cb = shift;
+        {
+            subtest 'valid token via header' => sub {
+                my $res = $cb->(
+                    GET "http://localhost",
+                    Authorization => "Bearer " . $jwt
+                );
+                is( $res->code, 200, 'status' );
+                my ( $token, $sub ) = split( /\|/, $res->content );
+                is( $token, $jwt,   'psgix token' );
+                is( $sub,   'bart', 'psgix claim' );
+            };
+            subtest 'invalid token via header' => sub {
+                my $res = $cb->(
+                    GET "http://localhost",
+                    Authorization => "Bearer NotAToken"
+                );
+                is( $res->code, 200, 'status 200, even though token is invalid' );
+                my ( $token, $sub ) = split( /\|/, $res->content );
+                is( $token, 'none',   'no psgix token' );
+                is( $sub,   'none', 'no psgix claim' );
+            };
+         }
     };
 };
 

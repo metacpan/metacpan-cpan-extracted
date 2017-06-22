@@ -1,14 +1,16 @@
 package App::MysqlUtils;
 
-our $DATE = '2016-12-23'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2017-06-17'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use Log::Any::IfLOG '$log';
 
+use IPC::System::Options qw(system);
 use Perinci::Object;
+use String::ShellQuote;
 
 our %SPEC;
 
@@ -25,11 +27,30 @@ my %args_common = (
     },
     username => {
         schema => 'str*',
+        description => <<'_',
+
+Will try to get default from `~/.my.cnf`.
+
+_
         tags => ['category:connection'],
     },
     password => {
         schema => 'str*',
+        description => <<'_',
+
+Will try to get default from `~/.my.cnf`.
+
+_
         tags => ['category:connection'],
+    },
+);
+
+my %args_database0 = (
+    database => {
+        schema => 'str*',
+        req => 1,
+        pos => 0,
+        completion => \&_complete_database,
     },
 );
 
@@ -37,8 +58,7 @@ my %args_database = (
     database => {
         schema => 'str*',
         req => 1,
-        pos => 0,
-        completion => \&_complete_database,
+        cmdline_aliases => { db=>{} },
     },
 );
 
@@ -139,7 +159,7 @@ supply `--no-dry-run` or DRY_RUN=0.
 _
     args => {
         %args_common,
-        %args_database,
+        %args_database0,
     },
     features => {
         dry_run => {default=>1},
@@ -188,7 +208,7 @@ Examples:
 _
     args => {
         %args_common,
-        %args_database,
+        %args_database0,
         tables => {
             'x.name.is_plural' => 1,
             'x.name.singular' => 'table',
@@ -280,7 +300,7 @@ Examples:
 _
     args => {
         %args_common,
-        %args_database,
+        %args_database0,
         query => {
             schema => 'str*',
             req => 1,
@@ -316,6 +336,175 @@ sub mysql_query {
     [200, "OK", \@rows, {'table.fields'=>\@columns}];
 }
 
+$SPEC{mysql_sql_dump_extract_tables} = {
+    v => 1.1,
+    summary => 'Parse SQL dump and spit out tables to separate files',
+    args => {
+        include_tables => {
+            'x.name.is_plural' => 1,
+            'x.name.singular' => 'include_table',
+            schema => ['array*', of=>'str*'],
+            tags => ['category:filtering'],
+        },
+        exclude_tables => {
+            'x.name.is_plural' => 1,
+            'x.name.singular' => 'exclude_table',
+            schema => ['array*', of=>'str*'],
+            tags => ['category:filtering'],
+        },
+        include_table_patterns => {
+            'x.name.is_plural' => 1,
+            'x.name.singular' => 'include_table_pattern',
+            schema => ['array*', of=>'re*'],
+            tags => ['category:filtering'],
+        },
+        exclude_table_patterns => {
+            'x.name.is_plural' => 1,
+            'x.name.singular' => 'exclude_table_pattern',
+            schema => ['array*', of=>'re*'],
+            tags => ['category:filtering'],
+        },
+        stop_after_table => {
+            schema => 'str*',
+        },
+        stop_after_table_pattern => {
+            schema => 're*',
+        },
+        # XXX output_file_pattern
+        # XXX overwrite
+    },
+};
+sub mysql_sql_dump_extract_tables {
+    my %args = @_;
+
+    my $stop_after_tbl  = $args{stop_after_table};
+    my $stop_after_tpat = $args{stop_after_table_pattern};
+    my $inc_tbl  = $args{include_tables};
+    $inc_tbl  = undef unless $inc_tbl  && @$inc_tbl;
+    my $inc_tpat = $args{include_table_patterns};
+    $inc_tpat = undef unless $inc_tpat && @$inc_tpat;
+    my $exc_tbl  = $args{exclude_tables};
+    $exc_tbl  = undef unless $exc_tbl  && @$exc_tbl;
+    my $exc_tpat = $args{exclude_table_patterns};
+    $exc_tpat = undef unless $exc_tpat && @$exc_tpat;
+    my $has_tbl_filters = $inc_tbl || $inc_tpat || $exc_tbl || $exc_tpat;
+
+    my ($prevtbl, $curtbl, $pertblfile, $pertblfh);
+
+    my $code_tbl_is_included = sub {
+        my $tbl = shift;
+        return 0 if $exc_tbl  && (grep { $tbl eq $_ } @$exc_tbl );
+        return 0 if $exc_tpat && (grep { $tbl =~ $_ } @$exc_tpat);
+        return 1 if $inc_tbl  && (grep { $tbl eq $_ } @$inc_tbl );
+        return 1 if $inc_tpat && (grep { $tbl =~ $_ } @$inc_tpat);
+        if ($inc_tbl || $inc_tpat) { return 0 } else { return 1 }
+    };
+
+    # we use direct <>, instead of cmdline_src for speed
+    my %seentables;
+    while (<>) {
+        if (/^(?:-- Table structure for table|-- Dumping data for table|CREATE TABLE IF NOT EXISTS|CREATE TABLE|DROP TABLE IF EXISTS) `(.+)`/) {
+            goto L1 if $seentables{$1}++;
+            $prevtbl = $curtbl;
+            if (defined $prevtbl && $args{stop_after_table} && $prevtbl eq $args{stop_after_table}) {
+                last;
+            } elsif (defined $prevtbl && $args{stop_after_table_pattern} && $prevtbl =~ $args{stop_after_table_pattern}) {
+                last;
+            }
+            $curtbl = $1;
+            $pertblfile = "$curtbl";
+            if ($has_tbl_filters && !$code_tbl_is_included->($curtbl)) {
+                warn "SKIPPING table $curtbl\n";
+                undef $pertblfh;
+            } else {
+                warn "Writing $pertblfile ...\n";
+                open $pertblfh, ">", $pertblfile or die "Can't open $pertblfile: $!";
+            }
+        }
+      L1:
+        next unless $curtbl && $pertblfh;
+        print $pertblfh $_;
+    }
+
+    [200, "OK"];
+}
+
+$SPEC{mysql_run_sql_files} = {
+    v => 1.1,
+    summary => 'Feed each .sql file to `mysql` command and '.
+        'write result to .txt file',
+    args => {
+        sql_files => {
+            schema => ['array*', of=>'filename*'],
+            req => 1,
+            pos => 0,
+            greedy => 1,
+        },
+        %args_database,
+        # XXX output_file_pattern
+        overwrite_when => {
+            summary => 'Specify when to overwrite existing .txt file',
+            schema => ['str*', in=>[qw/none older always/]],
+            default => 'none',
+            description => <<'_',
+
+`none` means to never overwrite existing .txt file. `older` overwrites existing
+.txt file if it's older than the corresponding .sql file. `always` means to
+always overwrite existing .txt file.
+
+_
+            cmdline_aliases => {
+                o         => {summary=>'Shortcut for --overwrite_when=older' , is_flag=>1, code=>sub {$_[0]{overwrite_when} = 'older' }},
+                O         => {summary=>'Shortcut for --overwrite_when=always', is_flag=>1, code=>sub {$_[0]{overwrite_when} = 'always'}},
+            },
+        },
+    },
+    deps => {
+        prog => 'mysql',
+    },
+};
+sub mysql_run_sql_files {
+    my %args = @_;
+
+    my $ov_when = $args{overwrite_when} // 'none';
+
+    for my $sqlfile (@{ $args{sql_files} }) {
+
+        my $txtfile = $sqlfile;
+        $txtfile =~ s/\.sql$/.txt/i;
+        if ($sqlfile eq $txtfile) { $txtfile .= ".txt" }
+
+        if (-f $txtfile) {
+            if ($ov_when eq 'always') {
+                $log->debugf("Overwriting existing %s ...", $txtfile);
+            } elsif ($ov_when eq 'older') {
+                if ((-M $txtfile) > (-M $sqlfile)) {
+                    $log->debugf("Overwriting existing %s because it is older than the corresponding %s ...", $txtfile, $sqlfile);
+                } else {
+                    $log->infof("%s already exists and newer than corresponding %s, skipped", $txtfile, $sqlfile);
+                    next;
+                }
+            } else {
+                $log->infof("%s already exists, we never overwrite existing .txt file, skipped", $txtfile);
+                next;
+            }
+        }
+
+        $log->infof("Running SQL file '%s' and putting result to '%s' ...",
+                    $sqlfile, $txtfile);
+        my $cmd = join(
+            " ",
+            "mysql",
+            shell_quote($args{database}),
+            "<", shell_quote($sqlfile),
+            ">", shell_quote($txtfile),
+        );
+        system({log=>1}, $cmd);
+    }
+
+    [200, "OK"];
+}
+
 1;
 # ABSTRACT: CLI utilities related to MySQL
 
@@ -331,7 +520,7 @@ App::MysqlUtils - CLI utilities related to MySQL
 
 =head1 VERSION
 
-This document describes version 0.003 of App::MysqlUtils (from Perl distribution App-MysqlUtils), released on 2016-12-23.
+This document describes version 0.007 of App::MysqlUtils (from Perl distribution App-MysqlUtils), released on 2017-06-17.
 
 =head1 SYNOPSIS
 
@@ -344,7 +533,11 @@ This distribution includes the following CLI utilities:
 =head1 FUNCTIONS
 
 
-=head2 mysql_drop_all_tables(%args) -> [status, msg, result, meta]
+=head2 mysql_drop_all_tables
+
+Usage:
+
+ mysql_drop_all_tables(%args) -> [status, msg, result, meta]
 
 Drop all tables in a MySQL database.
 
@@ -366,9 +559,13 @@ Arguments ('*' denotes required arguments):
 
 =item * B<password> => I<str>
 
+Will try to get default from C<~/.my.cnf>.
+
 =item * B<port> => I<int> (default: 3306)
 
 =item * B<username> => I<str>
+
+Will try to get default from C<~/.my.cnf>.
 
 =back
 
@@ -394,7 +591,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 mysql_drop_tables(%args) -> [status, msg, result, meta]
+=head2 mysql_drop_tables
+
+Usage:
+
+ mysql_drop_tables(%args) -> [status, msg, result, meta]
 
 Drop tables in a MySQL database.
 
@@ -431,6 +632,8 @@ Don't delete more than this number of tables.
 
 =item * B<password> => I<str>
 
+Will try to get default from C<~/.my.cnf>.
+
 =item * B<port> => I<int> (default: 3306)
 
 =item * B<table_pattern> => I<re>
@@ -438,6 +641,8 @@ Don't delete more than this number of tables.
 =item * B<tables> => I<array[str]>
 
 =item * B<username> => I<str>
+
+Will try to get default from C<~/.my.cnf>.
 
 =back
 
@@ -463,7 +668,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 mysql_query(%args) -> [status, msg, result, meta]
+=head2 mysql_query
+
+Usage:
+
+ mysql_query(%args) -> [status, msg, result, meta]
 
 Run query and return table result.
 
@@ -500,11 +709,95 @@ Add first field containing number from 1, 2, ...
 
 =item * B<password> => I<str>
 
+Will try to get default from C<~/.my.cnf>.
+
 =item * B<port> => I<int> (default: 3306)
 
 =item * B<query>* => I<str>
 
 =item * B<username> => I<str>
+
+Will try to get default from C<~/.my.cnf>.
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (result) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+=head2 mysql_run_sql_files
+
+Usage:
+
+ mysql_run_sql_files(%args) -> [status, msg, result, meta]
+
+Feed each .sql file to `mysql` command and write result to .txt file.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<database>* => I<str>
+
+=item * B<overwrite_when> => I<str> (default: "none")
+
+Specify when to overwrite existing .txt file.
+
+C<none> means to never overwrite existing .txt file. C<older> overwrites existing
+.txt file if it's older than the corresponding .sql file. C<always> means to
+always overwrite existing .txt file.
+
+=item * B<sql_files>* => I<array[filename]>
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (result) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+=head2 mysql_sql_dump_extract_tables
+
+Usage:
+
+ mysql_sql_dump_extract_tables(%args) -> [status, msg, result, meta]
+
+Parse SQL dump and spit out tables to separate files.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<exclude_table_patterns> => I<array[re]>
+
+=item * B<exclude_tables> => I<array[str]>
+
+=item * B<include_table_patterns> => I<array[re]>
+
+=item * B<include_tables> => I<array[str]>
+
+=item * B<stop_after_table> => I<str>
+
+=item * B<stop_after_table_pattern> => I<re>
 
 =back
 
@@ -543,7 +836,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,9 @@
 Revision history for Perl extension Test-Fluent-Logger
 
+0.03 2017-06-13T04:09:53Z
+
+    - Fix dependency: make Fluent::Logger version locking free
+
 0.02 2017-01-29T10:31:54Z
 
     - Export fundamental functions

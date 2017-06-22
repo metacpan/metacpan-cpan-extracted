@@ -2,7 +2,7 @@ package Acme::MetaSyntactic::pasta;
 use strict;
 use Acme::MetaSyntactic::List;
 our @ISA = qw( Acme::MetaSyntactic::List );
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 __PACKAGE__->init();
 1;
 
@@ -27,6 +27,13 @@ Philippe "BooK" Bruhat.
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2017-06-12 - v1.001
+
+Updated with C<strozzapreti> by Flavio Polleti,
+published in Acme-MetaSyntactic-Themes version 1.050.
 
 =item *
 
@@ -790,6 +797,7 @@ stricchetti_bolognesi
 stricchetti_tondi
 strichetti
 stringozzi
+strozzapreti
 svoltini
 svuotini
 svuotini_rigati

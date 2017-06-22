@@ -4,12 +4,11 @@ use 5.014002;
 use strict;
 use warnings;
 use Carp;
+use Scalar::Util qw/blessed/;
 
 use Ceph::Rados::List;
 
 our @ISA = qw();
-
-our $VERSION = '0.01';
 
 # Preloaded methods go here.
 
@@ -34,10 +33,33 @@ sub DESTROY {
 }
 
 sub write {
+    my ($self, $oid, $source) = @_;
+    if (tell $source) {
+        &write_io;
+    } else {
+        &write_data;
+    }
+}
+
+sub write_handle {
+    my ($self, $oid, $handle) = @_;
+    my ($retval, $data);
+    my $offset = 0;
+    while (my $length = sysread($handle, $data, $DEFAULT_OSD_MAX_WRITE)) {
+        #printf "Writing bytes %i to %i\n", $offset, $offset+$length;
+        $retval = $self->_write($oid, $data, $length, $offset)
+            or last;
+        # add returned length to offset, not read length - they shouldn't differ, but this is probably safer
+        $offset += $length;
+    }
+    return $retval;
+}
+
+sub write_data {
     my ($self, $oid, $data) = @_;
     my $length = length($data);
     my $retval;
-    for (my $offset = 0; $offset < $length; $offset += $DEFAULT_OSD_MAX_WRITE) {
+    for (my $offset = 0; $offset <= $length; $offset += $DEFAULT_OSD_MAX_WRITE) {
         my $chunk;
         if ($offset + $DEFAULT_OSD_MAX_WRITE > $length) {
             $chunk = $length % $DEFAULT_OSD_MAX_WRITE;
@@ -56,6 +78,22 @@ sub append {
     $self->_append($oid, $data, length($data));
 }
 
+sub read_handle {
+    my ($self, $oid, $handle) = @_;
+    (my $length, undef) = $self->_stat($oid);
+    #
+    for (my $offset = 0; $offset <= $length; $offset += $DEFAULT_OSD_MAX_WRITE) {
+        my $chunk;
+        if ($offset + $DEFAULT_OSD_MAX_WRITE > $length) {
+            $chunk = $length % $DEFAULT_OSD_MAX_WRITE;
+        } else {
+            $chunk = $DEFAULT_OSD_MAX_WRITE;
+        }
+        my $data = $self->_read($oid, $chunk, $offset);
+        syswrite $handle, $data;
+    }
+}
+
 sub read {
     my ($self, $oid, $len, $off) = @_;
     # if undefined is passed as len, we stat the obj first to get the correct len
@@ -69,6 +107,11 @@ sub read {
 sub stat {
     my ($self, $oid) = @_;
     $self->_stat($oid);
+}
+
+sub pool_required_alignment {
+    my ($self) = @_;
+    return $self->_pool_required_alignment();
 }
 
 sub mtime {
@@ -91,44 +134,42 @@ __END__
 
 =head1 NAME
 
-Ceph::Rados - Perl extension for blah blah blah
+Ceph::Rados::IO - Perl wrapper to librados IO context.
 
-=head1 SYNOPSIS
+=head1 METHODS
 
-  use Ceph::Rados;
-  blah blah blah
+=head2 list()
 
-=head1 DESCRIPTION
+Wraps C<rados_objects_list_open()>.  Returns a list context for the pool, as a L<Ceph::Rados::List> object.
 
-Stub documentation for Ceph::Rados, created by h2xs. It looks like the
-author of the extension was negligent enough to leave the stub
-unedited.
+=head2 write(oid, source)
 
-Blah blah blah.
+Wraps C<rados_write()>.  Write data from the source, to a ceph object with the supplied ID.  Source can either be a perl scalar, or a handle to read data from.  Returns 1 on success.  Croaks on failure.  
 
+=head2 write_data(oid, data)
 
-=head1 SEE ALSO
+=head2 write_handle(oid, handle)
 
-Mention other useful documentation such as the documentation of
-related modules or operating system documentation (such as man pages
-in UNIX), or any relevant external documentation such as RFCs or
-standards.
+As L<write_data()>, but explicitly declaring the source type.
+ 
+=head2 append(oid, data)
 
-If you have a mailing list set up for your module, mention it here.
+Wraps C<rados_append()>.  Appends data to the ceph object with the supplied ID.  Data must be a perl scalar, not a handle.  Returns 1 on success.  Croaks on failure.  
 
-If you have a web site set up for your module, mention it here.
+=head2 stat(oid)
 
-=head1 AUTHOR
+Wraps C<rados_stat()>.  Returns a 2-element list of (filesize, mtime) for the ceph object with the supplied ID.
 
-Alex, E<lt>alex@E<gt>
+=head2 read(oid, len=filesize, offset=0)
 
-=head1 COPYRIGHT AND LICENSE
+Wraps C<rados_read()>.  Read data from the ceph object with the supplied ID, and return the data read.  Croaks on failure.
 
-Copyright (C) 2014 by Alex
+=head2 read_handle(oid, handle)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.14.2 or,
-at your option, any later version of Perl 5 you may have available.
+As C<read()>, but writes the data directly to the supplied handle instead of returning it.
 
+=head2 remove(oid)
+
+Wraps C<rados_remove()>.  Deletes the ceph object with the supplied ID.  Returns 1 on success.  Croaks on failure.
 
 =cut

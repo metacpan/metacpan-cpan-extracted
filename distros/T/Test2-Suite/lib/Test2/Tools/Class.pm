@@ -2,7 +2,7 @@ package Test2::Tools::Class;
 use strict;
 use warnings;
 
-our $VERSION = '0.000070';
+our $VERSION = '0.000072';
 
 use Test2::API qw/context/;
 use Test2::Util::Ref qw/render_ref/;
@@ -38,7 +38,7 @@ BEGIN {
 
             $name ||= @items == 1 ? "$thing_name\->$op('$items[0]')" : "$thing_name\->$op(...)";
 
-            unless ($thing && (blessed($thing) || !ref($thing))) {
+            unless (defined($thing) && (blessed($thing) || !ref($thing) && length($thing))) {
                 my $thing = defined($thing)
                     ? ref($thing) || "'$thing'"
                     : '<undef>';

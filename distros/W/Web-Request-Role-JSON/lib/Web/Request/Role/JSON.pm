@@ -2,7 +2,7 @@ package Web::Request::Role::JSON;
 
 # ABSTRACT: Make handling JSON easier in Web::Request
 
-our $VERSION = '1.003';
+our $VERSION = '1.004';
 
 use 5.010;
 use Moose::Role;
@@ -12,12 +12,14 @@ use Encode;
 sub json_payload {
     my $self = shift;
 
+    return unless my $raw = $self->content;
+
     # Web::Request->content will decode content based on
     # $req->encoding, which is utf8 for JSON. So $content has UTF8 flag
     # on, which means we have to tell JSON::MaybeXS to turn
     # utf8-handling OFF
 
-    return JSON::MaybeXS->new(utf8=>0)->decode($self->content);
+    return JSON::MaybeXS->new(utf8=>0)->decode($raw);
 
     # Alternatives:
     # - reencode the content (stupid because double the work)
@@ -80,7 +82,7 @@ Web::Request::Role::JSON - Make handling JSON easier in Web::Request
 
 =head1 VERSION
 
-version 1.003
+version 1.004
 
 =head1 SYNOPSIS
 

@@ -2,46 +2,57 @@ NAME
     App::git::ship - Git command for shipping your project
 
 VERSION
-    0.22
+    0.23
 
 DESCRIPTION
     App::git::ship is a git <http://git-scm.com/> command for building and
     shipping your project.
 
     The main focus is to automate away the boring steps, but at the same
-    time not get in your (or any random contributor) way. Problems should be
-    solved with sane defaults according to standard rules instead of
+    time not get in your (or any random contributor's) way. Problems should
+    be solved with sane defaults according to standard rules instead of
     enforcing more rules.
 
     This project can also "start" (create) a new project, just "build"
-    (prepare for shipping), and "clean" projects.
+    (prepare for shipping), "ship" (upload), and "clean" projects.
 
     App::git::ship differs from other tools like dzil by not enforcing new
-    ways to do things, but rather incorporate with the existing way. Example
-    structure and how App::git::ship works on your files:
+    ways to do things, but rather incorporates with the existing way.
+
+    Example structure and how App::git::ship works on your files:
 
     *   my-app/cpanfile and my-app/Makefile.PL
 
-        The cpanfile is used to build the "PREREQ_PM" and "BUILD_REQUIRES"
+        The "cpanfile" is used to build the "PREREQ_PM" and "BUILD_REQUIRES"
         structures in the ExtUtils::MakeMaker based "Makefile.PL" build
-        file. The reason for this is that cpanfile is a more powerful format
-        that can be used by Carton and other tools, so generating cpanfile
-        from Makefile.PL would simply not be possible. Other data used to
-        generate Makefile.PL are:
+        file. The reason for this is that "cpanfile" is a more powerful
+        format that can be used by Carton and other tools, so generating
+        "cpanfile" from Makefile.PL would simply not be possible. Other data
+        used to generate Makefile.PL are:
 
-        "NAME" and "LICENSE" will have values from "project_name" and
-        "license". "AUTHOR" will have the name and email from the last git
-        committer. "ABSTRACT_FROM" and "VERSION_FROM" are fetched from the
-        main_module_path. "EXE_FILES" will be the files in "bin/" and
+        "NAME" and "LICENSE" will have values from .ship.conf "project_name"
+        and "license". "AUTHOR" will have the name and email from the last
+        git committer. "ABSTRACT_FROM" and "VERSION_FROM" are fetched from
+        the main_module_path. "EXE_FILES" will be the files in "bin/" and
         "script/" which are executable. "META_MERGE" will use data from
-        "bugtracker", "homepage", and"repository".
+        "bugtracker", "homepage", and "repository". It is important to
+        define your license in your .ship.conf before starting.
+
+        Both "cpanfile" and "Makefile.PL" are automatically created for you
+        if you set the class to App::git::ship::perl or you specify the
+        main_module_path as an argument to git start.
 
     *   my-app/CHANGELOG.md or my-app/Changes
 
         The Changes file will be updated with the correct timestamp, from
         when you ran the "build" action. The Changes file will also be the
         source for "next_version". Both "CHANGELOG.md" and "Changes" are
-        valid sources.
+        valid sources. App::git::ship looks for a version-timestamp line
+        with the case-sensitive text "Not Released" as the the timestamp.
+
+        Changes is automatically created for you if you set the class to
+        App::git::ship::perl or your specify the main_module_path as an
+        argument to git start.
 
     *   my-app/README
 
@@ -54,6 +65,10 @@ DESCRIPTION
         manually instead. The presense of that file will prevent
         "my-app/README" from getting generated.
 
+        Both "README" and "README.pod" are automatically created for you if
+        you set the class to App::git::ship::perl or your specify the
+        main_module_path as an argument to git start.
+
     *   my-app/lib/My/App.pm
 
         This file will be updated with the version number from the Changes
@@ -62,7 +77,7 @@ DESCRIPTION
     *   .gitignore and MANIFEST.SKIP
 
         Unless these files exist, they will be generated from a template
-        which skip the most common files. The default content of these two
+        which skips the most common files. The default content of these two
         files might change over time if new temp files are created by new
         editors or some other formats come along.
 
@@ -72,12 +87,20 @@ DESCRIPTION
         that your modules can compile and that the POD is correct. The file
         can be customized afterwards and will not be overwritten.
 
+    *   .git
+
+        It is important to commit any uncommitted code to your git
+        repository beforing building.
+
+        It is important to have a remote setup in your git repository before
+        shipping. It is important to have a ~/.pause file setup with 'user'
+        and 'password' entries before shipping.
+
 SYNOPSIS
   Existing project
-      # Set up .ship config and basic repo files
+      # Set up git ship config and basic files for a Perl repo
       $ cd my-project
-      $ echo 'class = App::git::ship::perl' > .ship.conf
-      $ git ship start
+      $ git ship start lib/My/Project.pm
 
       # make changes
       $ $EDITOR lib/My/Project.pm
@@ -171,7 +194,7 @@ CONFIG
         "%v" will be replaced by the version, while the format arguments are
         passed on to "strftime" in POSIX.
 
-        The default is "%-7v %a %b %e %H:%M:%S %Y".
+        The default is "%v %Y-%m-%dT%H:%M:%S%z".
 
     *   project_name
 
@@ -224,8 +247,11 @@ ATTRIBUTES
   repository
       $str = $self->repository;
 
-    Returns the URL to the first repository that point to "origin". This
+    Returns the URL to the first repository that points to "origin". This
     attribute can be read from "config".
+
+    The username is detected by the uid on your OS, you can override this by
+    setting GITHUB_USERNAME.
 
   silent
       $bool = $self->silent;
@@ -293,7 +319,8 @@ METHODS
 
   ship
     This method ships the project to some online repository. The default
-    behavior is to make a new tag and push it to "origin".
+    behavior is to make a new tag and push it to "origin". Push occurs only
+    if origin is defined in git.
 
   start
     This method is called when initializing the project. The default

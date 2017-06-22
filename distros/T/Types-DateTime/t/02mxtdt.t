@@ -120,7 +120,7 @@ use Moose::Util::TypeConstraints;
 	
 	my $loc = Gorch->new( loc => "he_IL" )->loc;
 	
-	isa_ok( $loc, "DateTime::Locale::he", "coerced from string" );
+	like( $loc->id, qr/he[_\-]IL/, "coerced from string" );
 	
 	like(exception { Gorch->new( loc => "not_a_place_or_a_locale" ) }, qr/Invalid locale/, "bad locale name");
 	
@@ -143,7 +143,7 @@ use Moose::Util::TypeConstraints;
 		
 		isa_ok( $handle, "Some::L10N", "maketext handle" );
 		
-		isa_ok( Gorch->new( loc => $handle )->loc, "DateTime::Locale::ja", "coerced from maketext" );;
+		is( Gorch->new( loc => $handle )->loc->id, "ja", "coerced from maketext" );;
 	}
 }
 

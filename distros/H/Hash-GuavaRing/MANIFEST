@@ -1,0 +1,14 @@
+Changes
+GuavaRing.xs
+lib/Hash/GuavaRing.pm
+LICENSE-Artistic-1.0
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+perl-Hash-GuavaRing.spec
+ppport.h
+README
+spec/Hash-GuavaRing.spec
+t/Hash-GuavaRing.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -5,7 +5,7 @@ use Mojo::UserAgent;
 use constant DEBUG => $ENV{MOJO_PAYPAL_DEBUG} || 0;
 
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 has base_url              => 'https://api.sandbox.paypal.com';
 has client_id             => 'dummy_client';
@@ -256,7 +256,7 @@ sub _extract_error {
 }
 
 sub _get_access_token {
-  my ($self, $cb) = @_;
+  my ($self, $c, $cb) = @_;
   my $token_url = $self->_url('/v1/oauth2/token');
   my %headers = ('Accept' => 'application/json', 'Accept-Language' => 'en_US');
 
@@ -291,7 +291,7 @@ sub _make_request_with_token {
     sub {    # get token unless we have it
       my ($delay) = @_;
       return $delay->pass($self->{access_token}, undef) if $self->{access_token};
-      return $self->_get_access_token($delay->begin);
+      return $self->_get_access_token($c, $delay->begin);
     },
     sub {    # abort or make request with token
       my ($delay, $token, $tx) = @_;
@@ -302,7 +302,7 @@ sub _make_request_with_token {
     },
     sub {    # get token if it has expired
       my ($delay, $tx) = @_;
-      return $self->_get_access_token($delay->begin) if $tx->res->code == 401;
+      return $self->_get_access_token($c, $delay->begin) if $tx->res->code == 401;
       return $delay->pass(undef, $tx);    # success
     },
     sub {                                 # return or retry request with new token
@@ -340,7 +340,7 @@ Mojolicious::Plugin::PayPal - Make payments using PayPal
 
 =head1 VERSION
 
-0.07
+0.08
 
 =head1 DESCRIPTION
 

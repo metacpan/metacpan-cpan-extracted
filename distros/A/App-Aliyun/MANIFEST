@@ -10,6 +10,7 @@ cpanfile
 dist.ini
 lib/App/Aliyun.pm
 lib/MojoX/Aliyun.pm
+script/aliyun-cli-ec2-restart-by-name
 script/aliyun-cli-rds-whitelist-my-ip
 script/aliyun-cli-regions
 t/author-pod-syntax.t

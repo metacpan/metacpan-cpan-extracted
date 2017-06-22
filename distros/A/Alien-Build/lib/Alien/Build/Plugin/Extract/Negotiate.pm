@@ -5,7 +5,7 @@ use warnings;
 use Alien::Build::Plugin;
 
 # ABSTRACT: Extraction negotiation plugin
-our $VERSION = '0.41'; # VERSION
+our $VERSION = '0.45'; # VERSION
 
 
 has '+format' => 'tar';
@@ -69,7 +69,7 @@ Alien::Build::Plugin::Extract::Negotiate - Extraction negotiation plugin
 
 =head1 VERSION
 
-version 0.41
+version 0.45
 
 =head1 SYNOPSIS
 
@@ -104,6 +104,8 @@ Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 Contributors:
 
 Diab Jerius (DJERIUS)
+
+Roy Storey
 
 =head1 COPYRIGHT AND LICENSE
 

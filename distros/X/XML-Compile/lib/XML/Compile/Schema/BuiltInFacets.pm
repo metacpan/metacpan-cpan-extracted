@@ -8,7 +8,7 @@ no warnings 'recursion';
 
 package XML::Compile::Schema::BuiltInFacets;
 use vars '$VERSION';
-$VERSION = '1.56';
+$VERSION = '1.57';
 
 use base 'Exporter';
 
@@ -19,7 +19,6 @@ use Math::BigInt;
 use Math::BigFloat;
 use XML::LibXML;  # for ::RegExp
 use XML::Compile::Util qw/SCHEMA2001 pack_type duration2secs/;
-use MIME::Base64       qw/decoded_base64_length/;
 
 use POSIX              qw/DBL_MAX_10_EXP DBL_DIG/;
 
@@ -124,12 +123,13 @@ sub _date_whiteSpace($$$)
 }
 
 sub _whitespace_replace($)
-{   (my $value = shift) =~ s/[\t\r\n]/ /gs;
+{   my $value = ref $_[0] ? $_[0]->textContent : $_[0];
+    $value =~ s/[\t\r\n]/ /gs;
     $value;
 }
 
 sub _whitespace_collapse($)
-{   my $value = shift;
+{   my $value = ref $_[0] ? $_[0]->textContent : $_[0];
     for($value)
     {   s/[\t\r\n ]+/ /gs;
         s/^ +//;
@@ -207,22 +207,11 @@ my $qname = pack_type SCHEMA2001, 'QName';
 sub _enumeration($$$$$$)
 {   my ($path, $args, $enums, $type, $nss, $action) = @_;
 
-    if($action eq 'WRITER' && $nss->doesExtend($type, $qname))
-    {   # quite tricky to get ns involved here..., so validation
-        # only partial
-        my %enum = map { s/.*\}//; ($_ => 1) } @$enums;
-        return sub
-          { my $x = $_[0]; $x =~ s/.*\://;
-            return $_[0] if exists $enum{$x};
-            error __x"invalid enumerate `{string}' at {where}"
-              , string => $_[0], where => $path;
-          };
-    }
-
-    my %enum = map { ($_ => 1) } @$enums;
-    sub { return $_[0] if exists $enum{$_[0]};
+    my %enum = map +($_ => 1), @$enums;
+    sub { my $v = ref $_[0] eq 'ARRAY' ? join(' ', @{$_[0]}) : $_[0];
+        return $v if exists $enum{$v};
         error __x"invalid enumerate `{string}' at {where}"
-          , string => $_[0], where => $path;
+          , string => $v, where => $path;
     };
 }
 
@@ -279,42 +268,8 @@ sub _s_totalFracDigits($$$)
       };
 }
 
-my $base64 = pack_type SCHEMA2001, 'base64Binary';
-my $hex    = pack_type SCHEMA2001, 'hexBinary';
-
-sub _hex_length($)
-{   my $ref  = shift;
-    my $enc = $$ref =~ tr/0-9a-fA-F//;
-    $enc >> 1;
-}
-
 sub _s_length($$$$$$)
 {   my ($path, $args, $len, $type, $nss, $action) = @_;
-
-    if($action eq 'WRITER' && $nss->doesExtend($type, $base64))
-    {   # it is a pitty that this is called after formatting... now the
-        # size check is expensive.
-        return sub
-          { defined $_[0]
-                or error __x"base64 data missing at {where}", where => $path;
-            my $size = decoded_base64_length $_[0];
-            return $_[0] if $size == $len;
-            error __x"base64 data does not have required length {len}, but {has} at {where}"
-              , len => $len, has => $size, where => $path;
-          };
-    }
-
-    if($action eq 'WRITER' && $nss->doesExtend($type, $hex))
-    {   return sub
-          { defined $_[0]
-                or error __x"hex data missing at {where}", where => $path;
-            my $size = _hex_length \$_[0];
-            return $_[0] if $size == $len;
-
-            error __x"hex data does not have required length {len}, but {has} at {where}"
-              , len => $len, has => $size, where => $path;
-          };
-    }
 
     sub { return $_[0] if defined $_[0] && length($_[0])==$len;
       error __x"string `{string}' does not have required length {len} but {size} at {where}"
@@ -333,28 +288,6 @@ sub _list_length($$$)
 sub _s_minLength($$$)
 {   my ($path, $args, $len, $type, $nss, $action) = @_;
 
-    if($action eq 'WRITER' && $nss->doesExtend($type, $base64))
-    {   return sub
-          { defined $_[0]
-                or error __x"base64 data missing at {where}", where => $path;
-            my $size = decoded_base64_length $_[0];
-            return $_[0] if $size >= $len;
-            error __x"base64 data does not have minimal length {len}, but {has} at {where}"
-              , len => $len, has => $size, where => $path;
-          };
-    }
-
-    if($action eq 'WRITER' && $nss->doesExtend($type, $hex))
-    {   return sub
-          { defined $_[0]
-                or error __x"hex data missing at {where}", where => $path;
-            my $size = _hex_length \$_[0];
-            return $_[0] if $size >= $len;
-            error __x"hex data does not have minimal length {len}, but {has} at {where}"
-              , len => $len, has => $size, where => $path;
-          };
-    }
-
     sub { return $_[0] if defined $_[0] && length($_[0]) >=$len;
         error __x"string `{string}' does not have minimum length {len} at {where}"
           , string => $_[0], len => $len, where => $path;
@@ -371,28 +304,6 @@ sub _list_minLength($$$)
 
 sub _s_maxLength($$$)
 {   my ($path, $args, $len, $type, $nss, $action) = @_;
-
-    if($action eq 'WRITER' && $nss->doesExtend($type, $base64))
-    {   return sub
-          { defined $_[0]
-                or error __x"base64 data missing at {where}", where => $path;
-            my $size = decoded_base64_length $_[0];
-            return $_[0] if $size <= $len;
-            error __x"base64 data longer than maximum length {len}, but {has} at {where}"
-              , len => $len, has => $size, where => $path;
-          };
-    }
-
-    if($action eq 'WRITER' && $nss->doesExtend($type, $hex))
-    {   return sub
-          { defined $_[0]
-                or error __x"hex data missing at {where}", where => $path;
-            my $size = _hex_length \$_[0];
-            return $_[0] if $size >= $len;
-            error __x"hex data longer than maximum length {len}, but {has} at {where}"
-              , len => $len, has => $size, where => $path;
-          };
-    }
 
     sub { return $_[0] if defined $_[0] && length $_[0] <= $len;
         error __x"string `{string}' longer than maximum length {len} at {where}"
@@ -415,9 +326,10 @@ sub _pattern($$$)
     my $compiled = XML::LibXML::RegExp->new($regex);
 
     sub {
-        return $_[0] if $compiled->matches($_[0]);
+		my $v = ref $_[0] ? $_[0]->textContent : $_[0];
+        return $_[0] if $compiled->matches($v);
         error __x"string `{string}' does not match pattern `{pat}' at {where}"
-          , string => $_[0], pat => $regex, where => $path;
+          , string => $v, pat => $regex, where => $path;
     };
 }
 

@@ -1,3 +1,74 @@
+0.12      2017-06-15 15:43:52-04:00 America/New_York
+
+  [BUILD]
+    * require a recent version of Moo::Role to ensure that testers
+      use one with which this code is compatible.
+
+
+0.11      2017-05-09 10:41:54-04:00 America/New_York (TRIAL RELEASE)
+
+ [ENHANCEMENT]
+
+   * new close() method, causes output to sink to be flushed and
+     the sink to be closed.
+
+   * dbi encoder: more robust when destroyed during global destruction
+
+ [ BUILD FIX ]
+
+   * specify required version of Types::Standard
+
+0.10      2017-04-28 16:55:38-04:00 America/New_York (TRIAL RELEASE)
+
+ [ BUG FIX ]
+
+   * dbi encoder: renaming a field to itself caused the field to be
+     deleted
+
+ [ BUILD FIX ]
+
+   * require Perl >= 5.10 (for // operator)
+   * require List::Util >= 1.29 ( for pairmap )
+   * switch to Test2
+
+
+0.09      2017-04-28 16:55:38-04:00 America/New_York (TRIAL RELEASE)
+
+ [ BUG FIX ]
+    * dbi encoder: handle table names which include schema, e.g.
+        schema.table
+
+0.08      2017-04-28 10:05:23-04:00 America/New_York (TRIAL RELEASE)
+
+ [ ENHANCEMENTS ]
+    * dbi encoder: SQL::Translator is used to generated DDL to create tables
+    * dbi encoder: multiple primary keys are supported
+
+ [ BEHAVIOR CHANGE ]
+
+    * use JSON::MaybeXS and YAML::Any to discover JSON/YAML encoders
+      instead of homegrown code
+
+ [ BUG FIXES ]
+
+    * clean up extraneous symbols in class namespaces
+
+
+ [ DEVELOPMENT ]
+
+    * switch to Dist::Zilla
+
+
+0.07_01 2017-04-20T16:59:45-0400
+
+ [ENHANCEMENT]
+
+    * include SQL in output if sqlite driver can't create the table
+
+ [DISTRIBUTION]
+
+    * install with no '.' in @INC for perl 5.25.11+
+
 0.07	2015-01-21T14:50:25-0500
 
     * CPAN testers is all green!

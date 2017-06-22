@@ -4,24 +4,26 @@ use 5.006;
 use strict;
 use warnings;
 
+=encoding utf8
+
 =head1 NAME
 
 AnyEvent::MySQL - Pure Perl AnyEvent socket implementation of MySQL client
 
 =head1 VERSION
 
-Version 1.1.6
+Version 1.2.1
 
 =cut
 
-our $VERSION = '1.001007';
+our $VERSION = '1.002001';
 
 use AnyEvent::MySQL::Imp;
 
 
 =head1 SYNOPSIS
 
-This package is used in my company since 2012 to today (2014). I think it should be stable.
+This package is used in my company since 2012 to today (2017). I think it should be stable.
 (though some data type fetching through prepared command are not implemented)
 
 Please read the test.pl file as a usage example. >w<
@@ -347,7 +349,7 @@ Please read the test.pl file as a usage example. >w<
     $end5->recv;
 
     my $readonly_dbh = AnyEvent::MySQL->connect("DBI:mysql:database=test;host=127.0.0.1;port=3306", "ptest", "pass", { ReadOnly => 1 }, sub {
-      # ... we can only use "select" and "show" command on this handle
+      # ... we can only use "select" and "show" and "set names" command on this handle
     });
 
     $end->recv;
@@ -717,7 +719,7 @@ sub _do {
     my $cb = ref($_[-1]) eq 'CODE' ? pop : \&AnyEvent::MySQL::_empty_cb;
     my($rev_dir, $dbh, $statement, $attr, @bind_values) = @_;
 
-    if( $dbh->{_}[ATTRi]{ReadOnly} && $statement !~ /^\s*(?:show|select)/i ){
+    if( $dbh->{_}[ATTRi]{ReadOnly} && $statement !~ /^\s*(?:show|select|set\s+names)\s+/i ){
         _report_error($dbh, 'do', 1227, 'unable to perform write queries on a ReadOnly handle');
         $cb->();
         return;
@@ -1501,6 +1503,12 @@ sub fetchcol_arrayref {
 
 Cindy Wang (CindyLinz)
 
+=head1 CONTRIBUTOR
+
+Dmitriy Shamatrin L<justnoxx@github|https://github.com/justnoxx>
+
+clking L<clking@github|https://github.com/clking>
+
 =head1 BUGS
 
 Please report any bugs or feature requests to C<http://github.com/CindyLinz/Perl-AnyEvent-MySQL>.
@@ -1541,12 +1549,6 @@ under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
 See http://dev.perl.org/licenses/ for more information.
-
-=head1 CONTRIBUTOR
-
-Dmitriy Shamatrin (justnoxx@github)
-
-clking (clking@github)
 
 =cut
 

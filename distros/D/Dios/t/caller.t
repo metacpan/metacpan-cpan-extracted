@@ -40,14 +40,17 @@
     my @have      = Foo->method_caller2(0);
     my @have2     = Foo->method_caller2(1);
 
+#line 44
     $expected[3]  = 'Foo::method_caller';
     $expected2[3] = 'Foo::method_caller2';
 
-    is_deeply([@have[0..7]],  [@expected[0..7]]);
+    is_deeply([@have[0..7]],  [@expected[0..7]]) if $] > 5.020;
     is_deeply([@have2[0..7]], [@expected2[0..7]]);
 
     # hints and bitmask change and are twitchy so I'm just going to
     # check that they're there.
     isnt $have[8],  undef;
     isnt $have2[8], undef;
+
+    done_testing;
 }

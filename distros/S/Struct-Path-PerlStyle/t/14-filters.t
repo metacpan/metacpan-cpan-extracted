@@ -5,20 +5,20 @@ use warnings;
 use Struct::Path::PerlStyle qw(ps_parse);
 use Test::More tests => 24;
 
-eval { ps_parse('(<<') };
-like($@, qr/^Unsupported thing '\(<<' in the path/, "Unclosed parenthesis");
+eval { ps_parse('(back') };
+like($@, qr/^Unsupported thing '\(back' in the path/, "Unclosed parenthesis");
 
-eval { ps_parse('(<<}') };
-like($@, qr/^Unsupported thing '\(<<' in the path/, "Unmatched brackets");
+eval { ps_parse('(back}') };
+like($@, qr/^Unsupported thing '\(back' in the path/, "Unmatched brackets");
 
 eval { ps_parse('[0](=>)[-2]') };
 like($@, qr/^Unsupported operator '=>' specified/, "Unsupported operator");
 
-eval { ps_parse('[0](<<(<<))[-2]') };
-like($@, qr/^Unsupported thing '\(<<\)' as operator argument/, "Unsupported arg type");
+eval { ps_parse('[0](back(back))[-2]') };
+like($@, qr/^Unsupported thing '\(back\)' as operator argument/, "Unsupported arg type");
 
-eval { ps_parse('[0](<<<<)[-2]') };
-like($@, qr/^Unsupported thing '<<' as operator argument/, "Unsupported arg type");
+eval { ps_parse('[0](back back)[-2]') };
+like($@, qr/^Unsupported thing 'back' as operator argument/, "Unsupported arg type");
 
 # args passed to callback by Struct::Path (sample)
 my $args = [
@@ -27,7 +27,7 @@ my $args = [
 ];
 
 ok(
-    ps_parse('[0](<<)')->[1]->($args->[0], $args->[1]),
+    ps_parse('[0](back)')->[1]->($args->[0], $args->[1]),
     "Step back must returns 1"
 );
 
@@ -42,7 +42,7 @@ $args = [
     ["a","b"],
 ];
 
-my $spath = ps_parse('[0](<<2)');
+my $spath = ps_parse('[0](back 2)');
 ok(
     $spath->[1]->($args->[0], $args->[1]),
     "Step back must returns 1"
@@ -71,7 +71,7 @@ $args = [
     ["a","b"],
 ];
 
-eval { ps_parse('[0](<<3)')->[1]->($args->[0], $args->[1]) };
+eval { ps_parse('[0](back 3)')->[1]->($args->[0], $args->[1]) };
 like(
     $@, qr/^Can't step back \(root of the structure\)/,
     "Must fail if backs steps more than current path length"

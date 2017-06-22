@@ -1,3 +1,6 @@
+1.0.2     2017-06-21 22:53:06+01:00 Europe/London
+ - bump all dependencies to latest
+
 1.0.1     2017-03-24 17:56:55+00:00 Europe/London
  - fix list headers:
    * list headers are structured, should never be encoded

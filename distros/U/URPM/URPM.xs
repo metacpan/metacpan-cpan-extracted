@@ -126,7 +126,7 @@ static ssize_t write_nocheck(int fd, const void *buf, size_t count) {
 }
 static int rpmError_callback_data;
 
-static int rpmError_callback(rpmlogRec rec, rpmlogCallbackData data) {
+static int rpmError_callback(rpmlogRec rec, __attribute__((unused)) rpmlogCallbackData data) {
   write_nocheck(rpmError_callback_data, rpmlogRecMessage(rec), strlen(rpmlogRecMessage(rec)));
   return RPMLOG_DEFAULT;
 }
@@ -1214,7 +1214,7 @@ ts_nosignature(rpmts ts) {
   return rpmtsSetVSFlags(ts, _RPMVSF_NODIGESTS | _RPMVSF_NOSIGNATURES);
 }
 
-static void *rpmRunTransactions_callback(const void *arg,
+static void *rpmRunTransactions_callback(__attribute__((unused)) const void *h,
 					 const rpmCallbackType what, 
 					 const rpm_loff_t amount, 
 					 const rpm_loff_t total,
@@ -1229,7 +1229,6 @@ static void *rpmRunTransactions_callback(const void *arg,
   SV *callback = NULL;
   char *callback_type = NULL;
   char *callback_subtype = NULL;
-  Header h = (Header) arg;
 
   if (!td)
     return NULL;

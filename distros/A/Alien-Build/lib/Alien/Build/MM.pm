@@ -8,7 +8,7 @@ use Capture::Tiny qw( capture );
 use Carp ();
 
 # ABSTRACT: Alien::Build installer code for ExtUtils::MakeMaker
-our $VERSION = '0.41'; # VERSION
+our $VERSION = '0.45'; # VERSION
 
 
 sub new
@@ -239,8 +239,8 @@ sub import
         my $cflags = $build->runtime_prop->{cflags};
         my $libs   = $build->runtime_prop->{libs};
         
-        if($cflags && $cflags !~ /^\s*$/
-        && $libs   && $libs   !~ /^\s*$/)
+        if(($cflags && $cflags !~ /^\s*$/)
+        || ($libs   && $libs   !~ /^\s*$/))
         {
           my $mod = join '::', split /-/, $distname;
           my $install_files_pm = Path::Tiny->new("blib/lib/@{[ join '/', split /-/, $distname ]}/Install/Files.pm");
@@ -249,7 +249,13 @@ sub import
             "package ${mod}::Install::Files;\n",
             "require ${mod};\n",
             "sub Inline { shift; ${mod}->Inline(\@_) }\n",
-            "1;"
+            "1;\n",
+            "\n",
+            "=begin Pod::Coverage\n",
+            "\n",
+            "  Inline\n",
+            "\n",
+            "=cut\n",
           );
         }
         
@@ -274,7 +280,7 @@ Alien::Build::MM - Alien::Build installer code for ExtUtils::MakeMaker
 
 =head1 VERSION
 
-version 0.41
+version 0.45
 
 =head1 SYNOPSIS
 
@@ -371,6 +377,8 @@ Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 Contributors:
 
 Diab Jerius (DJERIUS)
+
+Roy Storey
 
 =head1 COPYRIGHT AND LICENSE
 

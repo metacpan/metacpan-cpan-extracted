@@ -1,0 +1,85 @@
+##################################################################
+#
+#    INSTALLATION Instructions for the NanoB2B::NER Package
+#    $Id: CHANGELOG.pod,v 1.05 2017/06/14 10:57:05 charityml Exp $ 
+##################################################################
+
+=head1 NanoB2B-NER
+
+Provide a description of the package
+
+=head1 TESTING PLATFORMS
+
+NanoB2B-NER has been developed and tested on Linux 
+primarily using Perl and the Bash shell. 
+
+=head1 REQUIREMENTS
+
+NanoB2B-NER REQUIRES that the following software be installed. 
+More details on how to obtain and install appear below. 
+
+--Programming Languages
+Perl (version 5.8.5 or better)
+
+--CPAN modules
+MetaMap::DataStructures
+
+=head1 PROGGRAMMING LANGUAGES
+
+=head2 Perl (version 5.8.5 or better)
+
+Perl is freely available at:
+
+L<http://www.perl.org>
+
+It is very likely that you will already have Perl installed 
+if you are using a Unix/Linux based system. 
+
+=head1 CPAN MODULES
+
+=head2 MetaMap::DataStructures
+
+Please see the MetaMap::DataStructures documentation.
+
+=head1 INSTALLATION 
+
+If you have supervisor access, or have configured MCPAN for local 
+install, you can install via: 
+
+ perl -MCPAN -e shell
+ > install NanoB2B-NER 
+
+
+If not, you can, "manually" install by downloading the *.tar.gz file,  
+unpacking, and executing the following commands. 
+
+                perl Makefile.PL PREFIX=/home/programs LIB=/home/lib
+                make
+                make test
+                make install
+
+Note that the PREFIX and LIB settings are just examples to help you create 
+a local install, if you do not have supervisor (su) access. 
+
+You must include /home/lib in your PERL5LIB environment 
+variable to access this module when running.
+
+If you have the super-user access, then you can install NanoB2B-NER 
+into system directories via :
+		perl Makefile.PL
+		make
+		make install
+	 	make clean
+
+The exact location of where NanoB2B-NER will be installed 
+depends on your system configuration. A message will be printed 
+out after 'make install' telling your exactly where it was installed. 
+
+=head1 CONTACT US
+
+If you have any trouble installing and using NanoB2B-NER, please 
+contact us:
+
+ Megan Charity: charityml at vcu.edu
+ Bridget T. McInnes: btmcinnes at vcu.edu
+

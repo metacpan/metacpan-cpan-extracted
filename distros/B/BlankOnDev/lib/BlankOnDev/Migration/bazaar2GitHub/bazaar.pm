@@ -6,10 +6,11 @@ use warnings FATAL => 'all';
 use BlankOnDev::DataDev;
 use BlankOnDev::syslog;
 use BlankOnDev::Utils::file;
+use BlankOnDev::command;
 use Capture::Tiny::Extended 'capture';
 
 # Version :
-our $VERSION = '0.1003';
+our $VERSION = '0.1005';;
 
 # Subrouitne for cmd bzr branch :
 # ------------------------------------------------------------------------
@@ -72,21 +73,17 @@ sub branch {
     my $log_branch = BlankOnDev::syslog->bzr_branch($allconfig, $pkg_name);
     my $re_branch;
 
-    my $cmd_list = list_cmd();
+    my $cmd_list = BlankOnDev::command::bzr();
     my $bzr_branch = $cmd_list->{'bzr'}->{'branch'};
     my $branch_url = $bzr_url.'/'.$pkg_name;
 
-    # Check Type :
-
-
+    # Check Dir :
     if (-d $dest_dir) {
         if ($type ne 'no' and $type eq 'rm') {
             cmd_bzrBranch('rm', $locfile_outlogs, $locfile_errlogs, $dirPkg_grp, $dest_dir, $bzr_branch, $branch_url);
-            print "\n";
-            print "Re-branch : \"$pkg_name\"\n";
+            print "Action re-branch for packages \"$pkg_name\" \n";
         } else {
-            print "\n";
-            print "No branch: \"$pkg_name\"\n";
+            print "Action branch for packages \"$pkg_name\" \n";
         }
     } else {
         cmd_bzrBranch($type, $locfile_outlogs, $locfile_errlogs, $dirPkg_grp, $dest_dir, $bzr_branch, $branch_url);
@@ -154,8 +151,6 @@ sub bzr_convert_git {
 
     # For Data Developer :
     my $data_dev = BlankOnDev::DataDev::data_dev();
-    my $home_dir = $data_dev->{'home_dir'};
-    my $dir_dev = $data_dev->{'dir_dev'};
     my $logs_dir = $data_dev->{'dirlogs'};
     my $prefix_log = $data_dev->{'prefix_bzrCgit_fllog'};
     my $ext_out_log = $data_dev->{'log_ext_out'};
@@ -174,7 +169,7 @@ sub bzr_convert_git {
     # Bazaar convert git Logs :
     my $log_bzrCgit = BlankOnDev::syslog->bzr_convert_git($allconfig, $pkg_name);
 
-    my $cmd_list = list_cmd();
+    my $cmd_list = BlankOnDev::command::bzr();;
     my $bzr_export = $cmd_list->{'bzr'}->{'bzr-export'};
     my $bzr_import = $cmd_list->{'bzr'}->{'bzr-fast-import'};
     my $cmd_bzrCgit = "git init; $bzr_export $dirOfPkgs | $bzr_import";
@@ -194,7 +189,131 @@ sub bzr_convert_git {
         } else {
             return 1;
         }
-#        rmdir $log_bzrCgit;
+    }
+}
+# Subroutine for bzr2git_branch :
+# ------------------------------------------------------------------------
+sub bzr2git_branch {
+    my ($self, $allconfig, $pkg_name, $input_group) = @_;
+
+    # Get current Config :
+    my $build = $allconfig->{'build'};
+    my $build_rilis = $build->{'rilis'};
+    my $pkg = $allconfig->{'pkg'};
+    my $dir_pkgs = $pkg->{'dirpkg'};
+    my $bzr = $allconfig->{'bzr'};
+    my $bzr_url = $bzr->{'url'};
+
+    # For Data Developer :
+    my $data_dev = BlankOnDev::DataDev::data_dev();
+    my $logs_dir = $data_dev->{'dirlogs'};
+    my $prefix_log = $data_dev->{'prefix_bzr2git_branchLg'};
+    my $ext_out_log = $data_dev->{'log_ext_out'};
+    my $ext_err_log = $data_dev->{'log_ext_err'};
+    my $dirPkg_grp = $dir_pkgs.'/'.$input_group;
+    my $dest_dir = $dir_pkgs.'/'.$input_group.'/'.$pkg_name;
+    my $filename_outlogs = $prefix_log.$pkg_name.'_'.$build_rilis.$ext_out_log;
+    my $filename_errlogs = $prefix_log.$pkg_name.'_'.$build_rilis.$ext_err_log;
+    my $locfile_outlogs = $logs_dir.$build_rilis.'/'.$filename_outlogs;
+    my $locfile_errlogs = $logs_dir.$build_rilis.'/'.$filename_errlogs;
+
+    # Remove file Logs :
+    system("rm -rf ".$locfile_errlogs) if (-e $locfile_errlogs);
+    system("rm -rf ".$locfile_outlogs) if (-e $locfile_outlogs);
+
+    # Bzr branch Logs :
+    my $log_branch = BlankOnDev::syslog->bzr2git_branch($allconfig, $pkg_name);
+    my $re_branch;
+
+    my $cmd_list = BlankOnDev::command::bzr();
+    my $bzr_branch = $cmd_list->{'bzr'}->{'branch'};
+    my $branch_url = $bzr_url.'/'.$pkg_name;
+
+    # Check Dir :
+    if (-d $dest_dir) {
+        cmd_bzrBranch('rm', $locfile_outlogs, $locfile_errlogs, $dirPkg_grp, $dest_dir, $bzr_branch, $branch_url);
+        print "Action re-branch for packages \"$pkg_name\" \n";
+    } else {
+        cmd_bzrBranch('no', $locfile_outlogs, $locfile_errlogs, $dirPkg_grp, $dest_dir, $bzr_branch, $branch_url);
+        print "Branch : \"$pkg_name\"\n";
+    }
+
+    # Read File :
+    my $read_file = BlankOnDev::Utils::file->read($log_branch);
+    if ($read_file =~ m/(bzr)\:\s+(ERROR)\:\s+(.*)\:/) {
+        if ($3 eq 'Not a branch') {
+            return 3;
+        }
+        elsif ($3 eq 'Already a branch') {
+            return 2;
+        } else {
+            my $read_errfile = BlankOnDev::Utils::file->read($locfile_errlogs);
+            if ($read_errfile =~ m/(bzr)\:\s+(ERROR)\:\s+(.*)\:/) {
+                return 3;
+            } else {
+                return 0;
+            }
+        }
+    }
+    else {
+        system("rm -rf $locfile_outlogs");
+        system("rm -rf $locfile_errlogs");
+        return 1;
+    }
+}
+# Subroutine for convert format bazaar to git :
+# ------------------------------------------------------------------------
+sub bzr2git_bzr_cgit {
+    my ($self, $allconfig, $pkg_name) = @_;
+
+    # Get current Config :
+    my $build = $allconfig->{'build'};
+    my $build_rilis = $build->{'rilis'};
+    my $pkg = $allconfig->{'pkg'};
+    my $dir_pkgs = $pkg->{'dirpkg'};
+    my $bzr = $allconfig->{'bzr'};
+    my $bzr_url = $bzr->{'url'};
+
+    # For Data Developer :
+    my $data_dev = BlankOnDev::DataDev::data_dev();
+    my $logs_dir = $data_dev->{'dirlogs'};
+    my $prefix_log = $data_dev->{'prefix_bzr2git_bzr_cgit'};
+    my $ext_out_log = $data_dev->{'log_ext_out'};
+    my $ext_err_log = $data_dev->{'log_ext_err'};
+    my $dir_pkggroup = $pkg->{'pkgs'}->{$pkg_name}->{'group'};
+    my $dirOfPkgs = $dir_pkgs.'/'.$dir_pkggroup.'/'.$pkg_name;
+    my $filename_outlogs = $prefix_log.$pkg_name.'_'.$build_rilis.$ext_out_log;
+    my $locfile_outlogs = $logs_dir.$build_rilis.'/'.$filename_outlogs;
+    my $filename_errlogs = $prefix_log.$pkg_name.'_'.$build_rilis.$ext_err_log;
+    my $locfile_errlogs = $logs_dir.$build_rilis.'/'.$filename_errlogs;
+
+    # Remove file Logs :
+    system("rm -rf ".$locfile_errlogs) if -e $locfile_errlogs;
+    system("rm -rf ".$locfile_outlogs) if -e $locfile_outlogs;
+
+    # Bazaar convert git Logs :
+    my $log_bzrCgit = BlankOnDev::syslog->bzr2git_bzrCgit($allconfig, $pkg_name);
+
+    my $cmd_list = BlankOnDev::command::bzr();;
+    my $bzr_export = $cmd_list->{'bzr'}->{'bzr-export'};
+    my $bzr_import = $cmd_list->{'bzr'}->{'bzr-fast-import'};
+    my $cmd_bzrCgit = "git init; $bzr_export $dirOfPkgs | $bzr_import";
+    #    system("cd $dirOfPkgs; $cmd_bzrCgit %> $log_bzrCgit");
+    cmd_bzrConvertGit($locfile_outlogs, $locfile_errlogs, $dirOfPkgs, $cmd_bzrCgit);
+
+    # Read File :
+    my $read_file = BlankOnDev::Utils::file->read($log_bzrCgit);
+    if ($read_file =~ m/(fatal)\:\s+(.*)/) {
+        return 0;
+    } else {
+        my $read_errfile = BlankOnDev::Utils::file->read($locfile_errlogs);
+        if ($read_errfile =~ m/(fatal)\:\s+(.*)/) {
+            return 0;
+        } elsif ($read_errfile =~ m/(bzr)\:\s+(ERROR)\:/) {
+            return 2;
+        } else {
+            return 1;
+        }
     }
 }
 # Subroutine for Bazaar activies logs :
@@ -207,13 +326,10 @@ sub bzr_activities {
     my $build = $allconfig->{'build'};
     my $build_rilis = $build->{'rilis'};
     my $curr_pkg = $allconfig->{'pkg'};
-    my $curr_dirpkg = $curr_pkg->{'dirpkg'};
     my $loc_pkg = $curr_pkg.'/'.$input_group.'/'.$input_pkg;
 
     # For Data Developer :
     my $data_dev = BlankOnDev::DataDev::data_dev();
-    my $home_dir = $data_dev->{'home_dir'};
-    my $dir_dev = $data_dev->{'dir_dev'};
     my $logs_dir = $data_dev->{'dirlogs'};
 
     # Branch Logs :
@@ -257,16 +373,5 @@ sub bzr_activities {
 
     # Create Logs :
     BlankOnDev::syslog->general_logs($allconfig, $msg);
-}
-# Subroutine for list command :
-# ------------------------------------------------------------------------
-sub list_cmd {
-    my %data = ();
-    $data{'bzr'} = {
-        'branch'          => => 'bzr branch',
-        'bzr-export'      => 'bzr fast-export',
-        'bzr-fast-import' => 'git fast-import'
-    };
-    return \%data;
 }
 1;

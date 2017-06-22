@@ -6,6 +6,14 @@ Mark Overmeer.
 
 Plans and unwanted limitations? see README.todo
 
+version 1.57: Wed 14 Jun 14:48:18 CEST 2017
+
+	Fixes:
+	- better separation between lexical- and value-space facets.
+	  rt.cpan.org#121946 [Nils Barkald]
+	- json_friendly changes broke some (semi-illegal) enumeration and
+	  pattern facets.  Now new solution with dualvar [Wesley Schwengle]
+
 version 1.56: Thu 30 Mar 08:54:49 CEST 2017
 
 	Fixes:

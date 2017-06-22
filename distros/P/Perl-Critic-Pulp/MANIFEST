@@ -11,6 +11,7 @@ devel/apropos-markup.pl
 devel/array-delete.pl
 devel/backslash-control.pl
 devel/bareword-colon.pl
+devel/charnames.pl
 devel/churn-posix.pl
 devel/churn-unbalanced.pl
 devel/churn.pl

@@ -29,6 +29,7 @@ my %WriteMakefileArgs = (
     "Pod::Find" => 0,
     "Pod::Simple::SimpleTree" => 0,
     "Term::ANSIColor" => 0,
+    "Types::Path::Tiny" => 0,
     "Types::Standard" => 0
   },
   "TEST_REQUIRES" => {
@@ -42,7 +43,7 @@ my %WriteMakefileArgs = (
     "Test::Lib" => 0,
     "Test::More" => "1.001005"
   },
-  "VERSION" => "0.011",
+  "VERSION" => "0.013",
   "test" => {
     "TESTS" => "t/*.t t/command/*.t t/timeout/*.t"
   }
@@ -68,6 +69,7 @@ my %FallbackPrereqs = (
   "Test::Fatal" => 0,
   "Test::Lib" => 0,
   "Test::More" => "1.001005",
+  "Types::Path::Tiny" => 0,
   "Types::Standard" => 0
 );
 

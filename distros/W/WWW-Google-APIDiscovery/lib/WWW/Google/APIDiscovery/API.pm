@@ -1,6 +1,7 @@
 package WWW::Google::APIDiscovery::API;
 
-$WWW::Google::APIDiscovery::API::VERSION = '0.20';
+$WWW::Google::APIDiscovery::API::VERSION   = '0.22';
+$WWW::Google::APIDiscovery::API::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
 
@@ -8,7 +9,7 @@ WWW::Google::APIDiscovery::API - Placeholder for supported APIS.
 
 =head1 VERSION
 
-Version 0.20
+Version 0.22
 
 =cut
 
@@ -16,12 +17,7 @@ use 5.006;
 use Moo;
 use namespace::clean;
 
-has id          => (is => 'ro', required => 1);
-has name        => (is => 'ro', required => 1);
-has title       => (is => 'ro', required => 1);
-has version     => (is => 'ro', required => 1);
-has url         => (is => 'ro', required => 1);
-has description => (is => 'ro', required => 1);
+has [ qw(id name title version url description) ] => (is => 'ro', required => 1);
 
 =head1 METHODS
 
@@ -43,7 +39,7 @@ Mohammad S Anwar, C<< <mohammad.anwar at yahoo.com> >>
 
 =head1 REPOSITORY
 
-L<https://github.com/Manwar/WWW-Google-APIDiscovery>
+L<https://github.com/manwar/WWW-Google-APIDiscovery>
 
 =head1 CONTRIBUTORS
 

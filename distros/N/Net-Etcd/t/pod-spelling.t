@@ -55,3 +55,9 @@ ro
 wishto
 peerURLs
 grpc
+changepw
+paxosdb
+Txn
+MultiOp
+txn
+

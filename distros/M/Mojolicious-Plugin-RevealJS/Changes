@@ -1,5 +1,10 @@
 Revision history for Perl module Mojolicious::Plugin::RevealJS
 
+0.12 2017-06-17
+  - Bump bundled reveal.js to 3.5.0
+  - Add a configurable base tag
+  - Allow export to override the base tag (Experimental)
+
 0.11 2017-05-16
   - Bump dependency of Perl to 5.12 for regexp \N
 

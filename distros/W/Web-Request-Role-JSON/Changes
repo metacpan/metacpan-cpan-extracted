@@ -1,7 +1,11 @@
 Revision history for Web::Request::Role::JSON
 
+1.004   2017-06-13T12:39:32
+    - return undef if there is no payload
+
+
 1.003   2017-01-24T09:54:55
-    - fix test fails on Win32 caused by booleans (Thomas Klausner)
+    - fix test fails on Win32 caused by booleans
 
 
 1.002   2017-01-21T15:53:40

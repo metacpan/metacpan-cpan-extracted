@@ -1,0 +1,109 @@
+# $Id: password_get_info.t,v 1.1 2017/06/21 19:29:22 cmanley Exp $
+# This file must be saved in UTF-8 encoding!
+use strict;
+use warnings;
+use Test::More; #qw(no_plan);
+use lib qw(../lib);
+
+my %tests_info = (
+	'$2a$10$O0fG6ExZRx4mEZxsRHqPKuDy9U2HW9M4UONC1hnsx84tW/bb5URFO' => {
+		'algo'		=> 1, #$class::PASSWORD_BCRYPT,
+		'algoName'	=> 'bcrypt',
+		'options'	=> {
+			'cost'	=> 10,
+		},
+		'algoSig'	=> '2a',
+		'salt'		=> 'O0fG6ExZRx4mEZxsRHqPKu',
+		'hash'		=> 'Dy9U2HW9M4UONC1hnsx84tW/bb5URFO',
+	},
+	'$2b$10$wOmSB/8mvcXJBAnPTJzO..tFOq4nCxP21vTfWqunrVi5Irsi3Obcy' => {
+		'algo'		=> 1, #$class::PASSWORD_BCRYPT,
+		'algoName' => 'bcrypt',
+		'options'	=> {
+			'cost'	=> 10,
+		},
+		'algoSig'	=> '2b',
+		'salt'		=> 'wOmSB/8mvcXJBAnPTJzO..',
+		'hash'		=> 'tFOq4nCxP21vTfWqunrVi5Irsi3Obcy',
+	},
+	'$2y$04$f5VgvyHCr0OiPbvjdZ8zJuPBHD6Tul6nleZSWUVkk/HSOKOC8DmFy' => {
+		'algo'		=> 1, #$class::PASSWORD_BCRYPT,
+		'algoName' => 'bcrypt',
+		'options'	=> {
+			'cost'	=> 4,
+		},
+		'algoSig'	=> '2y',
+		'salt'		=> 'f5VgvyHCr0OiPbvjdZ8zJu',
+		'hash'		=> 'PBHD6Tul6nleZSWUVkk/HSOKOC8DmFy',
+	},
+	'yabadabadoo' => {
+		'algo'		=> 0,
+		'algoName'	=> 'unknown',
+		'options'	=> {},
+	},
+);
+
+my @methods = map { $_, "password_$_"; } qw(
+	get_info
+);
+
+my $php;
+if (!($ENV{'HARNESS_ACTIVE'} || ($^O eq 'MSWin32'))) {	# experimental: that's why it's only executed when not in a test harness
+	$php = `which php`;
+	$php =~ s/^\s+|\s+$//g;
+	if (-x $php) {
+		my $phpversion = `php -v`;
+		$phpversion =~ s/^PHP (\S+)\s.*/$1/s;
+		if ($phpversion =~ /^(\d{1,3}\.\d{1,6})\b/) {
+			if ($1 < 5.5) {
+				undef($php);
+			}
+		}
+		print "Found PHP executable $php with version $phpversion: " . ($php ? 'OK' : 'TOO OLD') . "\n";
+	}
+	else {
+		undef($php);
+	}
+	eval {
+		require	JSON::PP;
+	};
+	if ($@) {
+		warn("JSON::PP not avaible. Won't use PHP\n");
+		undef($php);
+	}
+}
+
+plan tests => 1 + scalar(@methods) + ($php ? 3 : 2) * scalar(keys(%tests_info));
+my $class = 'PHP::Functions::Password';
+require_ok($class) || BAIL_OUT("$class has errors");
+foreach my $method (@methods) {
+	can_ok($class, $method);
+	if ($method =~ /^password/) {
+		$class->import($method);
+	}
+}
+
+foreach my $crypted (sort keys %tests_info) {
+	my $expect = $tests_info{$crypted};
+
+	my $info = $class->get_info($crypted);
+	is_deeply($info, $expect, "$class->get_info(\"$crypted\")");
+
+	$info = password_get_info($crypted);
+	is_deeply($info, $expect, "password_get_info(\"$crypted\")");
+
+	if ($php) {
+		$crypted =~ s/^\$2[ab]\$/\$2y\$/;	# because PHP's function doesn't recognize older bcrypt signatures
+		my $phpcode = "print json_encode(password_get_info('" . $crypted . "'),JSON_FORCE_OBJECT);";
+		my $h;
+		open($h, '-|', $php, '-r', $phpcode) || die("Failed to execute $php: $!");
+		my $json = join('', <$h>);
+		close($h);
+		$info = JSON::PP::decode_json($json);
+		delete($expect->{'algoSig'});
+		delete($expect->{'salt'});
+		delete($expect->{'hash'});
+		#print "$json\n";
+		is_deeply($info, $expect, "PHP's password_get_info(\"$crypted\")");
+	}
+}

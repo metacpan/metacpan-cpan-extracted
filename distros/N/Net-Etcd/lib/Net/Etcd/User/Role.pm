@@ -17,7 +17,7 @@ Net::Etcd::User::Role
 
 =cut
 
-our $VERSION = '0.009';
+our $VERSION = '0.013';
 
 =head1 DESCRIPTION
 

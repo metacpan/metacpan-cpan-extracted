@@ -18,7 +18,7 @@ use Astro::Coord::ECI::Utils qw(deg2rad rad2deg SECSPERDAY);
 use Astro::SpaceTrack;
 use POSIX qw{strftime};
 
-our $VERSION = '0.081';
+our $VERSION = '0.082';
 
 use constant TIMFMT => '%d %b %H:%M:%S';
 

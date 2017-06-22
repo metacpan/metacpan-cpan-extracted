@@ -6,7 +6,7 @@ use Test::More tests => 25;
 use Struct::Diff qw(diff dtraverse);
 use Storable qw(dclone freeze);
 
-$Storable::canonical = 1;
+local $Storable::canonical = 1; # to have equal snapshots for equal by data hashes
 
 use lib "t";
 use _common qw(sdump);

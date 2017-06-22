@@ -1,0 +1,72 @@
+NAME
+
+    Dist::Zilla::Plugin::Test::Perl::Critic::Freenode - Tests to check your
+    code against policies inspired by #perl on Freenode
+
+VERSION
+
+    version 0.002
+
+SYNOPSIS
+
+    In your dist.ini:
+
+        [Test::Perl::Critic::Freenode]
+
+DESCRIPTION
+
+    This will provide a xt/author/critic-freenode.t file for use during the
+    "test" and "release" calls of dzil. To use this, make the changes to
+    dist.ini above and run one of the following:
+
+        dzil test
+        dzil release
+
+    During these runs, xt/author/critic-freenode.t will use
+    Test::Perl::Critic to run Perl::Critic against your code and report its
+    findings.
+
+    This plugin is an extension of Dist::Zilla::Plugin::InlineFiles.
+
+    This plugin is a fork of Dist::Zilla::Plugin::Test::Perl::Critic.
+
+SEE ALSO
+
+    You can look for information on this module at:
+
+      * Search CPAN
+
+      http://search.cpan.org/dist/Dist-Zilla-Plugin-Test-Perl-Critic-Freenode
+
+      * See open / report bugs
+
+      https://github.com/pink-mist/Dist-Zilla-Plugin-Test-Perl-Critic-Freenode/issues
+
+      * Git repository
+
+      https://github.com/pink-mist/Dist-Zilla-Plugin-Test-Perl-Critic-Freenode
+
+      * AnnoCPAN: Annotated CPAN documentation
+
+      http://annocpan.org/dist/Dist-Zilla-Plugin-Test-Perl-Critic-Freenode
+
+      * CPAN Ratings
+
+      http://cpanratings.perl.org/d/Dist-Zilla-Plugin-Test-Perl-Critic-Freenode
+
+ORIGINAL AUTHOR
+
+    Original author of Dist::Zilla::Plugin::Test::Perl::Critic is Jerome
+    Quelin
+
+AUTHOR
+
+    Andreas Guldstrand
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Andreas Guldstrand.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

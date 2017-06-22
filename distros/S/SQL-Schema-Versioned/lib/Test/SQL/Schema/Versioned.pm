@@ -1,7 +1,7 @@
 package Test::SQL::Schema::Versioned;
 
-our $DATE = '2015-09-06'; # DATE
-our $VERSION = '0.20'; # VERSION
+our $DATE = '2017-06-15'; # DATE
+our $VERSION = '0.21'; # VERSION
 
 use 5.010001;
 use strict;
@@ -53,11 +53,10 @@ sub sql_schema_spec_ok {
                 my $res = create_or_update_db_schema(dbh=>$dbh2, spec=>$spec);
                 is($res->[0], 200, 'create/update status') or diag explain $res;
             } "upgrade from v1 to latest";
+            my $diff = diff_db_schema($dbh1, $dbh2);
+            is_deeply($diff, {}, 'create from scratch vs upgrade from v1 results in the same database schema')
+                or diag explain $diff;
         } if $spec->{latest_v} > 1;
-
-        my $diff = diff_db_schema($dbh1, $dbh2);
-        is_deeply($diff, {}, 'create from scratch vs upgrade from v1 results in the same database schema')
-            or diag explain $diff;
     };
 }
 
@@ -76,7 +75,7 @@ Test::SQL::Schema::Versioned - Test SQL::Schema::Versioned spec
 
 =head1 VERSION
 
-This document describes version 0.20 of Test::SQL::Schema::Versioned (from Perl distribution SQL-Schema-Versioned), released on 2015-09-06.
+This document describes version 0.21 of Test::SQL::Schema::Versioned (from Perl distribution SQL-Schema-Versioned), released on 2017-06-15.
 
 =head1 FUNCTIONS
 
@@ -91,7 +90,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/SQL-Schema
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-SHARYANTO-SQL-Schema>.
+Source repository is at L<https://github.com/perlancar/perl-SQL-Schema-Versioned>.
 
 =head1 BUGS
 
@@ -107,7 +106,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,3 +1,6 @@
+0.004     2017-06-14 16:29:16 EDT
+  - Fix syntax oddity occasionally causing use_sereal serialization to fail
+
 0.003     2017-06-08 02:27:13 EDT
   - Include Sereal::Encoder and Sereal::Decoder versions in tests for debugging purposes
 

@@ -1,8 +1,6 @@
-# Copyright (c) 2009-2013 Martin Becker.  All rights reserved.
+# Copyright (c) 2009-2017 Martin Becker.  All rights reserved.
 # This package is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-#
-# $Id: 95_versions.t 15 2013-05-31 16:52:22Z demetri $
 
 # Checking if $VERSION strings of updated perl modules have been updated.
 # These are tests for the distribution maintainer.

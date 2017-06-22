@@ -1,19 +1,23 @@
 package Log::Log4perl::Appender::Graylog;
 
 # ABSTRACT: Log dispatcher writing to udp Graylog server
-our $VERSION = '1.3'; # VERSION 1.3
-my $VERSION=1.3;
+our $VERSION = '1.7'; # VERSION 1.7
+my $VERSION = 1.7;
 our @ISA = qw(Log::Log4perl::Appender);
 
 use strict;
 use warnings;
 
-use JSON -convert_blessed_universally;
 use Sys::Hostname;
 use Data::UUID;
 use POSIX qw(strftime);
+use IO::Compress::Gzip qw( gzip $GzipError );
 use IO::Socket;
 use Data::DTO::GELF;
+use Carp;
+use Log::GELF::Util qw(
+    :all
+);
 
 ##################################################
 # Log dispatcher writing to udp Graylog server
@@ -30,12 +34,28 @@ sub new {
         name     => "unknown name",
         PeerAddr => "",
         PeerPort => "",
+        Proto    => "udp",
+        Gzip     => 1,
+        Chunked  => 0,
         %params,
-    };
 
+    };
     bless $self, $class;
+
 }
 
+sub _create_socket {
+    my ( $self, $socket_opts ) = @_;
+
+    require IO::Socket::INET;
+    my $socket = IO::Socket::INET->new(
+        PeerAddr => $socket_opts->{host},
+        PeerPort => $socket_opts->{port},
+        Proto    => $socket_opts->{protocol},
+    ) or die "Cannot create socket: $!";
+
+    return $socket;
+}
 ##################################################
 sub log {
 ##################################################
@@ -52,18 +72,18 @@ sub log {
         "_pid"         => $$,
 
     );
-    # TODO: Use the gzip way, however the specs say it can send plain if there is no new line
-    my $json = JSON->new->utf8->space_after->allow_nonref->convert_blessed;
-    my $j_packet = $json->encode($packet);
 
-    my $socket = IO::Socket::INET->new(
-        PeerAddr => "$self->{'PeerAddr'}",
-        PeerPort => $self->{'PeerPort'},
-        Type     => SOCK_DGRAM,
-        Proto    => 'udp'
-    ) or die "Socket error";
-    $socket->send( $j_packet . "\n" );
-
+    my $msg     = validate_message( $packet->TO_HASH() );
+    my $chunked = parse_size( $self->{Chunked} );
+    $msg = encode($msg);
+    $msg = compress($msg) if $self->{'Gzip'};
+    my $socket = $self->_create_socket(
+        {   'host'     => $self->{'PeerAddr'},
+            'port'     => $self->{'PeerPort'},
+            'protocol' => $self->{'Proto'}
+        }
+    );
+    $socket->send($_) foreach enchunk( $msg, $chunked );
     $socket->close();
 
 }
@@ -82,7 +102,7 @@ Log::Log4perl::Appender::Graylog - Log dispatcher writing to udp Graylog server
 
 =head1 VERSION
 
-version 1.3
+version 1.7
 
 =head1 SYNOPSIS
 
@@ -91,20 +111,41 @@ version 1.3
     my $appender = Log::Log4perl::Appender::Graylog->new(
       PeerAddr => "glog.foo.com",
       PeerPort => 12209,
+      Gzip => 1, # Glog2 usually requires gzip but can send plain text
     );
  
     $appender->log(message => "Log me\n");
+ 
+    or
+    log4perl.appender.SERVER          = Log::Log4perl::Appender::Graylog
+    log4perl.appender.SERVER.layout = NoopLayout
+    log4perl.appender.SERVER.PeerAddr = <ip>
+    log4perl.appender.SERVER.PeerPort = 12201
+    log4perl.appender.SERVER.Gzip    = 1
 
 =head1 DESCRIPTION
 
 This is a simple appender for writing to a graylog server.
-It relies on L<IO::Socket::INET>. This sends in the 1.1
-format. Hoever it does not gzip the message. There are plans
-to use the gzip method later.
+
+    It relies on L<IO::Socket::INET>. L<Log::GELF::Util>. This sends in the 1.1
+    format. 
 
 =head1 NAME
 
 Log::Log4perl::Appender::Graylog; - Log to a Graylog server
+
+=head1 CONFIG
+
+    log4perl.appender.SERVER          = Log::Log4perl::Appender::Graylog
+    log4perl.appender.SERVER.layout = NoopLayout
+    log4perl.appender.SERVER.PeerAddr = <ip>
+    log4perl.appender.SERVER.PeerPort = 12201
+    log4perl.appender.SERVER.Gzip    = 1
+    log4perl.appender.SERVER.Chunked = <0|lan|wan> 
+    
+        layout This needs to be NoopLayout as we do not want any special formatting.
+        Gzip Accepts an integer specifying if to compress the message. 
+        Chunked Accepts an integer specifying the chunk size or the special string values lan or wan corresponding to 8154 or 1420 respectively.
 
 =head1 EXAMPLE
 
@@ -156,8 +197,6 @@ Copyright 2017 by Brandon "Dimentox Travanti" Husbands E<lt>xotmid@gmail.comE<gt
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 
-
-=cut
 
 =head1 AUTHOR
 

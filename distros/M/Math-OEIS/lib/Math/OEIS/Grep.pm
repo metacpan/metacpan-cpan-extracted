@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
 
 # This file is part of Math-OEIS.
 #
@@ -22,7 +22,7 @@ use Carp 'croak';
 use Math::OEIS::Names;
 use Math::OEIS::Stripped;
 
-our $VERSION = 9;
+our $VERSION = 10;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
@@ -61,12 +61,24 @@ sub search {
 
   my $verbose = $h{'verbose'} || 0;
 
+  my $values_min = $h{'values_min'};
+  my $values_max = $h{'values_max'};
+  ### $values_min
+  ### $values_max
+
   my $name = $h{'name'};
   if (defined $name) {
     $name = "$name: ";
   } else {
     $name = '';
   }
+  ### $name
+
+  my %exclude;
+  if (my $aref = $h{'exclude_list'}) {
+    @exclude{@$aref} = ();  # hash slice
+  }
+  ### %exclude
 
   my $array = $h{'array'};
   if (! $array) {
@@ -117,15 +129,15 @@ sub search {
   }
 
   {
-    my $join = $array->[0];
+    my $str = $array->[0];
     for (my $i = 1; $i <= $#$array; $i++) {
-      $join .= ','.$array->[$i];
-      if (length($join) > 50) {
-        $join .= ',...';
+      $str .= ','.$array->[$i];
+      if (length($str) > 50 && $i != $#$array) {
+        $str .= ',...';
         last;
       }
     }
-    $name .= "match $join\n";
+    $name .= "match $str\n";
   }
 
   if (defined (my $value = _constant_array(@$array))) {
@@ -189,7 +201,7 @@ sub search {
     } elsif ($mung eq 'negate') {
       $mung_desc = "[NEGATED]\n";
       $array = [ map { my $value = $_;
-                       unless ($value =~ s/^-//) {
+                       unless ($value eq '0' || $value =~ s/^-//) {
                          $value = "-$value";
                        }
                        $value
@@ -265,6 +277,9 @@ sub search {
         $stripped_mmap =~ /$re/g or last SEARCH;
         my $found_pos = pos($stripped_mmap);
 
+        # my $found_whole = $&;
+        # ### $found_whole
+
         # $re matches , or \n at end
         # $found_pos may be after \n of matched line
         # So for $end look from $found_pos-1 onwards.
@@ -279,6 +294,8 @@ sub search {
         ### char at found_pos: substr($stripped_mmap,$found_pos,1)
         ### $start
         ### $end
+        ### found_pos from line end: $end-$found_pos
+        ### $line
         ### assert: $end >= $start
 
         # my $pos = 0;
@@ -318,13 +335,29 @@ sub search {
         }
       }
 
+      my ($anum,$found_values_str)
+        = Math::OEIS::Stripped->line_split_anum($line)
+        or die "oops, A-number not matched in line: ",$line;
+
+      if (exists $exclude{$anum}) {
+        ### exclude: $anum
+        next;
+      }
+
+      # enforce values_min, values_max on the found sequence
+      if (defined $values_min || defined $values_max) {
+        my @found_values =Math::OEIS::Stripped->values_split($found_values_str);
+        if ((defined $values_min && grep {$_ < $values_min} @found_values)
+            || (defined $values_max && grep {$_ > $values_max} @found_values)) {
+          ### skip due to found values out of range ...
+          next;
+        }
+      }
+
       if (defined $max_matches && $count >= $max_matches) {
         print "... and more matches\n";
         last SEARCH;
       }
-
-      my ($anum) = ($line =~ /^(A\d+)/);
-      $anum || die "oops, A-number not matched in line: ",$line;
 
       print $name;
       $name = '';
@@ -382,6 +415,10 @@ sub _read_block_lines {
   }
 }
 
+use constant _MIN_MATCH_COUNT => 15;
+use constant _MIN_MATCH_CHARS => 40;
+use constant _MAX_REGEXP_LENGTH => 400;
+
 # Return a regexp (a string) which matches the numbers in $array.
 # $str =~ s/^\s+//;
 # $str =~ s/\s+$//;
@@ -389,30 +426,29 @@ sub _read_block_lines {
 sub array_to_regexp {
   my ($self, $array) = @_;
   ### array_to_regexp(): join(',',@$array)
-  my $re = '';
+  my $re = ',';
   my $close = 0;
   foreach my $i (0 .. $#$array) {
     my $value = $array->[$i];
-    if (length($re) > 400) {  # don't make a huge regexp
+    if (length($re) > _MAX_REGEXP_LENGTH) {  # don't make a huge regexp
       last;
     }
-    $re .= ',';
 
-    # Mandatory match of 10 numbers or 40 chars, whichever comes first,
+    # Mandatory match of numbers or chars, whichever comes first,
     # after that OEIS can end.
     # Most OEIS samples are nice and long, with even hard ones going to
     # limits of reasonable computing, but some are shorter.  For example
     # A109680 circa July 2016 had only 19 values 46 chars.
     # ENHANCE-ME: take a parameter for these minimums.
     #
-    if ($i >= 10 || length($re) > 40) {
-      $re .= '(?:';
+    if ($i >= _MIN_MATCH_COUNT || length($re) > _MIN_MATCH_CHARS) {
+      $re .= '(?:[\r\n]|';
       $close++;
     }
-    $re .= $value;
+    $re .= $value . ',';
   }
-  $re .= ')?' x $close;
-  $re .= "[,\r\n]";
+  $re .= ')' x $close;
+#  $re .= "[,\r\n]";
   ### $re
   return $re;
 }
@@ -522,7 +558,10 @@ connection.
 
 If the given array of values is longer than the OEIS samples then it will
 still match.  Matching stops at the end of the given values or the end of
-the OEIS samples, whichever comes first.
+the OEIS samples, whichever comes first.  A minimum match length is
+demanded, and it's possible this is at the end of the sample values.  (Small
+values like 0,1 tend to hit various false matches under this rule.  The
+intention is to tighten in some way.)
 
 Values can be either numbers or strings and are stringized for the grep.
 For numbers be careful of round-off if exceeding a Perl UV.  C<Math::BigInt>
@@ -544,8 +583,8 @@ here by stripping leading zeros and one initial value if no full match.
 It may be worth dividing out a small common factor.  There's attempts here
 to automate that here by searching for /2 and /4 if no exact match (and
 doubling *2 too).  Maybe more divisions could be attempted, even a full GCD.
-In practice sequences with common factors are often present when they arise
-naturally from a sequence definition.
+In practice OEIS sequences with common factors are often present when they
+arise naturally from a sequence definition.
 
 Non-integer constants appear in the OEIS as sequences of decimal digits (and
 sometimes other bases).  Digits should be given here as values 0 to 9 etc.
@@ -561,21 +600,38 @@ worth trying both.  There's no attempt here to automate that.
 Print matches of the given C<array> values in the OEIS F<stripped> file.
 The key/value pairs can be
 
-    array       => $arrayref (mandatory)
-    name        => $string
-    max_matches => $integer (default 10)
+    array        => $arrayref (mandatory)
+    name         => $string
+    max_matches  => $integer (default 10)
+    values_min   => $integer or undef
+    values_max   => $integer or undef
+    exclude_list => arrayref of A-number strings
 
 C<array> is an arrayref of values to search for.  This parameter must be
 given.
 
-C<name> is printed if matches are found.  When doing many searches this
+C<name> is printed if matches are found.  When doing many searches this can
 identify which one has matched.  Eg.
 
     name => "case d=123",
 
 C<max_matches> limits the number of sequences returned.  This is intended as
-a protection against a large number of matches from some small list or
+a protection against a large number of matches from a small array or
 frequently occurring values.
+
+C<values_min>, C<values_max> specify the range of values permitted in the
+matched sequence.  Default C<undef> means no limits.  These limits can be
+used when the range of the target values is known and so sequences with
+bigger or smaller should be skipped.
+
+    values_min => 0,
+    values_max => 2,
+
+C<exclude_list> is an arrayref of A-numbers which should be excluded from
+matching.  This can be used to avoid sequences close enough to match but
+which you have reviewed and know to be different.
+
+    exclude_list => [ "A123456", "A234567" ],
 
 =back
 
@@ -588,7 +644,8 @@ from the command line
     # search and then exit perl
 
 Non-ASCII characters in sequence names are printed per C<Encode::Locale> if
-that module is available (and C<PerlIO::encoding>).
+that module (and C<PerlIO::encoding>) is available.  (The module calls don't
+touch output encoding, that's left to application mainline setups.)
 
 From within Emacs see the author's C<oeis.el> to run a search on numbers
 entered or at point in the buffer
@@ -618,7 +675,7 @@ L<http://user42.tuxfamily.org/math-oeis/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
 
 Math-OEIS is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

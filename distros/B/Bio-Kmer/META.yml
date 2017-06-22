@@ -3,12 +3,13 @@ abstract: unknown
 author:
   - unknown
 build_requires:
+  ExtUtils::MakeMaker: '0'
   Test::More: '0.47'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
-license: unknown
+license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -24,7 +25,10 @@ requires:
   File::Temp: '0'
   IO::Uncompress::Gunzip: '0'
   Thread::Queue: '0'
+  perl: '5.010000'
   threads: '0'
   threads::shared: '0'
-version: '0.14'
+resources:
+  repository: git://github.com/lskatz/Bio--Kmer.git
+version: '0.17'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

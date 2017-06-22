@@ -16,6 +16,11 @@ my @results;
 {
     package Yipee;
     use Moo;
+
+    # make sure we don't inadvertently use bool context
+    use overload bool => sub { 0 };
+    use overload '""' => sub { $_[0] };
+
     sub halloo {
         shift;
         $_[0] = "Yipee";

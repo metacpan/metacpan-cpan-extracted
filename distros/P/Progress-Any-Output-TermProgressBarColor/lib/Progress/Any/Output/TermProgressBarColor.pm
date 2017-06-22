@@ -1,7 +1,7 @@
 package Progress::Any::Output::TermProgressBarColor;
 
-our $DATE = '2016-03-11'; # DATE
-our $VERSION = '0.22'; # VERSION
+our $DATE = '2017-06-21'; # DATE
+our $VERSION = '0.23'; # VERSION
 
 use 5.010001;
 use strict;
@@ -20,21 +20,47 @@ sub _patch {
 
     return if $ph1;
     require Monkey::Patch::Action;
-    $ph1 = Monkey::Patch::Action::patch_package(
-        'Log::Any::Adapter::Screen', 'hook_before_log', 'replace',
-        sub {
-            $out->cleanup;
-            $Progress::Any::output_data{"$out"}{force_update} = 1;
-        }
-    ) if defined &{"Log::Any::Adapter::Screen::hook_before_log"};
-    $ph2 = Monkey::Patch::Action::patch_package(
-        'Log::Any::Adapter::Screen', 'hook_after_log', 'replace',
-        sub {
-            my ($self, $msg) = @_;
-            print { $self->{_fh} } "\n" unless $msg =~ /\R\z/;
-            $out->keep_delay_showing if $out->{show_delay};
-        }
-    ) if defined &{"Log::Any::Adapter::Screen::hook_after_log"};
+    if (defined &{"Log::Any::Adapter::Screen::hook_before_log"}) {
+        $ph1 = Monkey::Patch::Action::patch_package(
+            'Log::Any::Adapter::Screen', 'hook_before_log', 'replace',
+            sub {
+                # we install a hook to clean up progress indicator first before
+                # we print log message to the screen.
+                $out->cleanup;
+                $Progress::Any::output_data{"$out"}{force_update} = 1;
+            }
+        );
+    } elsif (defined  &{"Log::ger::Output::Screen::hook_before_log"}) {
+        $ph1 = Monkey::Patch::Action::patch_package(
+            'Log::ger::Output::Screen', 'hook_before_log', 'replace',
+            sub {
+                # we install a hook to clean up progress indicator first before
+                # we print log message to the screen.
+                $out->cleanup;
+                $Progress::Any::output_data{"$out"}{force_update} = 1;
+            }
+        );
+    }
+
+    if (defined &{"Log::Any::Adapter::Screen::hook_after_log"}) {
+        $ph2 = Monkey::Patch::Action::patch_package(
+            'Log::Any::Adapter::Screen', 'hook_after_log', 'replace',
+            sub {
+                my ($self, $msg) = @_;
+                print { $self->{_fh} } "\n" unless $msg =~ /\R\z/;
+                $out->keep_delay_showing if $out->{show_delay};
+            }
+        );
+    } elsif (defined &{"Log::ger::Output::Screen::hook_after_log"}) {
+        $ph2 = Monkey::Patch::Action::patch_package(
+            'Log::ger::Output::Screen', 'hook_after_log', 'replace',
+            sub {
+                my ($ctx, $msg) = @_;
+                print { $ctx->{_fh} } "\n" unless $msg =~ /\R\z/;
+                $out->keep_delay_showing if $out->{show_delay};
+            }
+        );
+    }
 }
 
 sub _unpatch {
@@ -214,7 +240,7 @@ Progress::Any::Output::TermProgressBarColor - Output progress to terminal as col
 
 =head1 VERSION
 
-This document describes version 0.22 of Progress::Any::Output::TermProgressBarColor (from Perl distribution Progress-Any-Output-TermProgressBarColor), released on 2016-03-11.
+This document describes version 0.23 of Progress::Any::Output::TermProgressBarColor (from Perl distribution Progress-Any-Output-TermProgressBarColor), released on 2017-06-21.
 
 =head1 SYNOPSIS
 
@@ -325,7 +351,7 @@ again before showing.
 
 =head2 COLOR => BOOL
 
-Can be used to force or disable color.
+Can be used to force or disable color. See L<Color::ANSI::Util>.
 
 =head2 COLOR_DEPTH => INT
 
@@ -365,7 +391,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

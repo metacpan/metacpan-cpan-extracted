@@ -33,4 +33,4 @@ sub run_tests {
     ok( "total  $total",  "total  10" );
 }
 
-do "t/test_runner.pm";
+do "./t/test_runner.pm";

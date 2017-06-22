@@ -1,5 +1,16 @@
 Revision history for Test-Moose-More
 
+0.048     2017-06-17 23:19:13 CDT-0500
+	* Add method_is_accessor_ok(), method_is_not_accessor_ok()
+	* Fix POD link to Class::MOP::Method::Accessor
+	* Add no_meta_ok()
+	* Simplify some of the logic in our _validate_thing_guts()'s attribute
+	  loop
+	* Skip to the next attribute if current one DNE in _thing_guts()
+	  attribute loop
+	* Use _thing_name() in _role_wraps(), like everybody else
+	* In POD, wrap more things with C<> vs '', etc.
+
 0.047     2017-04-24 22:48:33 CDT-0500
 	* Add method_from_pkg_ok(), method_not_from_pkg_ok()
 	* Tests which support subtests (typically validate_*()) now do something

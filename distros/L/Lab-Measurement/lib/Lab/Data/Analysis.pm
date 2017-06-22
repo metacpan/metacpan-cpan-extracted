@@ -1,5 +1,5 @@
 package Lab::Data::Analysis;
-
+$Lab::Data::Analysis::VERSION = '3.550';
 use 5.006;
 use strict;
 use Clone qw(clone);
@@ -17,7 +17,6 @@ Version 0.01
 
 =cut
 
-our $VERSION = '3.543';
 
 # default config values, copied to $self->{CONFIG} initially
 

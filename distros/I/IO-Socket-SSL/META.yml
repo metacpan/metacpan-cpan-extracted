@@ -25,4 +25,4 @@ resources:
   homepage: https://github.com/noxxi/p5-io-socket-ssl
   license: http://dev.perl.org/licenses/
   repository: https://github.com/noxxi/p5-io-socket-ssl
-version: '2.048'
+version: '2.049'

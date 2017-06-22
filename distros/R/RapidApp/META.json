@@ -45,7 +45,7 @@
             "Catalyst::Component::ApplicationAttribute" : "0",
             "Catalyst::Controller" : "0",
             "Catalyst::Controller::AutoAssets" : "0.40",
-            "Catalyst::Controller::SimpleCAS" : "1.000",
+            "Catalyst::Controller::SimpleCAS" : "1.001",
             "Catalyst::Devel" : "1.39",
             "Catalyst::Helper" : "0",
             "Catalyst::Helper::Model::DBIC::Schema" : "0",
@@ -55,8 +55,8 @@
             "Catalyst::Plugin::AutoAssets" : "0",
             "Catalyst::Plugin::Session::State::Cookie" : "0.17",
             "Catalyst::Plugin::Session::Store::DBIC" : "0.14",
-            "Catalyst::Plugin::SimpleCAS" : "1.000",
-            "Catalyst::Runtime" : "5.90114",
+            "Catalyst::Plugin::SimpleCAS" : "1.001",
+            "Catalyst::Runtime" : "5.90115",
             "Catalyst::ScriptRunner" : "0",
             "Catalyst::Test" : "0",
             "Catalyst::Utils" : "0",
@@ -151,6 +151,7 @@
             "Try::Tiny" : "0.22",
             "Type::Tiny" : "1.000005",
             "Types::Standard" : "0",
+            "URI" : "0",
             "URI::Escape" : "3.31",
             "autodie" : "0",
             "base" : "2.18",
@@ -172,7 +173,7 @@
       "test" : {
          "requires" : {
             "Catalyst" : "0",
-            "Catalyst::Runtime" : "5.90114",
+            "Catalyst::Runtime" : "5.90115",
             "HTTP::Headers::Util" : "6.03",
             "HTTP::Request::Common" : "6.04",
             "LWP::UserAgent" : "6.02",
@@ -198,7 +199,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#rapidapp"
    },
-   "version" : "1.2111",
+   "version" : "1.3001",
    "x_contributors" : [
       "Michael Conrad <mconrad@intellitree.com>",
       "Torsten Raudssus <torsten@raudss.us>",

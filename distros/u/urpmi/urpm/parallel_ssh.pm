@@ -3,6 +3,7 @@ package urpm::parallel_ssh;
 
 #- Copyright (C) 2002, 2003, 2004, 2005 MandrakeSoft SA
 #- Copyright (C) 2005-2010 Mandriva SA
+#- Copyright (C) 2011-2017 Mageia
 
 use strict;
 use urpm::util 'dirname';

@@ -27,7 +27,7 @@ eval {
     $HOSTNAME = hostname();
 };
 
-$VERSION = '2.09';
+$VERSION = '2.12';
 
 sub VERSION { $VERSION }
 
@@ -521,22 +521,43 @@ C<aes192-ctr>, and C<aes128-ctr>) and Chacha20-Poly1305 ciphers are
 currently supported for SSH2 encryption.  Deprecated ciphers 
 AES-CBC (C<aes256-cbc>, C<aes192-cbc>, and C<aes128-cbc>) 3DES 
 (C<3des-cbc>), Blowfish (C<blowfish-cbc>), and RC4 (C<arcfour>)
-are available but not enabled by default.
+are available but not enabled by default.  One can enable them by
+using the Ciphers options parameter. For example:
+
+    options => [ "Ciphers +aes256-cbc" ]
+
+Using the + notation will append a cipher to the default ciphers list.
 
 Integrity checking is performed by the C<hmac-sha2-256>, 
 C<hmac-sha2-512>, C<hmac-sha2-256-etm@openssh.com>, or
 C<hmac-sha2-512-etm@openssh.com> algorithms.  The deprecated C<hmac-sha1>
-or C<hmac-md5> algorithms are available but not enabled by default.
+or C<hmac-md5> algorithms are available but not enabled by default.  Many
+older SSH server installations still use hmac-sha1 as the main accepted
+MAC algorithm.  To enable this, use the following options parameter:
+
+    options => [ "MACs +hmac-sha1" ]
 
 Compression, if requested, is limited to Zlib. 
 
 Supported server host key algorithms are C<ssh-ed25519>, C<rsa-sha2-512>,
 C<rsa-sha2-256>, C<ecdsa-sha2-nistp521>, C<ecdsa-sha2-nistp384>,
 C<ecdsa-sha2-nistp256>, and C<ssh-rsa>.  Deprecated C<ssh-dss> is 
-supported but not enabled by default.
+supported but not enabled by default.  It can be enabled with the options
+parameter:
+
+    options => [ "HostKeyAlgorithms +ssh-dss" ]
 
 Supported SSH2 public key authentication algorithms are the same.
 
+Supported Key Exchange (KEX) algorithms are C<diffie-hellman-group1-sha1>, 
+C<diffie-hellman-group14-sha1>, c<diffie-hellman-group14-sha256>, 
+C<diffie-hellman-group16-sha512>, C<diffie-hellman-group18-sha512>, 
+C<diffie-hellman-group-exchange-sha256>, C<diffie-hellman-group-exchange-sha1>, 
+and C<curve25519-sha256@libssh.org>/C<curve25519-sha256>.  The 
+C<diffie-hellman-group1-sha1> algorithm is disabled by default, but can
+be activated via the options parameter:
+
+    options => [ "KexAlgorithms +diffie-hellman-group1-sha1" ]
 
 If you're looking for SFTP support, take a look at I<Net::SFTP>,
 which provides a full-featured Perl implementation of SFTP, and
@@ -735,6 +756,61 @@ directives in the format used in the config file. For example:
 
     my $ssh = Net::SSH::Perl->new("host", options => [
         "BatchMode yes", "RhostsAuthentication no" ]);
+
+Available options are:
+
+    BindAddress
+    Host
+    BatchMode
+    ChallengeResponseAuthentication
+    CheckHostIP
+    Cipher
+    Ciphers*
+    Compression
+    CompressionLevel
+    DSAAuthentication
+    FingerprintHash
+    GlobalKnownHostsFile
+    HashKnownHosts
+    HostKeyAlgorithms*
+    HostName
+    IdentityFile
+    KexAlgorithms*
+    MACs*
+    NumberOfPasswordPrompts
+    PasswordAuthentication
+    PasswordPromptHost
+    PasswordPromptLogin
+    Port
+    Protocol
+    RhostsAuthentication
+    RhostsRSAAuthentication
+    RSAAuthentication
+    StrictHostKeyChecking
+    UpdateHostKeys
+    UsePrivilegedPort
+    User
+    UserKnownHostsFile
+
+* Indicates the +/- wildcard notation may be used.
+
+For example:
+
+    MACs +hmac-sha1
+
+will add hmac-sha1 to the default MACs list.
+
+Or:
+
+    Ciphers +aes*-cbc
+
+will add aes128-cbc, aes192-cbc, and aes256-cbc to the default Ciphers 
+
+While:
+
+    KexAlgorithms -*-sha512
+    
+will remove all algorithms that end in -sha512 from the default list.
 
 =back
 
@@ -1012,7 +1088,7 @@ Originally written by Benjamin Trott.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2015-2016 Rythmos, Inc.
+Copyright (c) 2015-2017 Rythmos, Inc.
 Copyright (c) 2001-2003 Benjamin Trott, Copyright (c) 2003-2008 David
 Rolsky.  Copyright (c) David Robins.  All rights reserved.  This
 program is free software; you can redistribute it and/or modify it

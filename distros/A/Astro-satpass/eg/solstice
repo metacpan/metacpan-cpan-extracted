@@ -11,7 +11,7 @@ use Astro::Coord::ECI::Utils qw{ PI };
 use Getopt::Long 2.33 qw{ :config auto_version };
 use Pod::Usage;
 
-our $VERSION = '0.081';
+our $VERSION = '0.082';
 
 my %opt;
 

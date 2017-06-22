@@ -6,6 +6,33 @@ Home page:    <https://metacpan.org/release/Subclass-Of>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Subclass-Of>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.007	2017-06-16
+
+ [ Bug Fixes ]
+ - Don't use __SUB__ because it breaks older Perl, even if hidden behind a
+   conditional. Just use a plain old weakened reference.
+
+ [ Other ]
+ - Added: Undocumented/unsupported _alias_to_package_name function.
+
+0.006	2017-06-13
+
+ [ Documentation ]
+ - Remove superfluous usage of Data::Dumper from example.
+
+ [ Other ]
+ - Added: Support -lazy option to defer subclassing.
+
+0.005	2017-06-13
+
+ [ Documentation ]
+ - Correct syntax of SYNOPSIS.
+
+0.004	2017-06-13	Four years later. (29 Feb doesn't count.)
+
+ - Updated: Use List::Util (core module) instead of List::MoreUtils.
+ - Updated: Use Sub::Util (core module) instead of Sub::Name.
+
 0.003	2013-06-14
 
  [ Packaging ]

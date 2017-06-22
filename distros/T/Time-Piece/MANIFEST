@@ -16,5 +16,6 @@ t/06subclass.t
 t/07arith.t
 t/lib/Time/Piece/Twin.pm
 TODO
+reverse_deps.txt
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

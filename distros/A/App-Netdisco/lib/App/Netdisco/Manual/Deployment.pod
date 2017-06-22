@@ -7,7 +7,7 @@ App::Netdisco::Manual::Deployment - Tips and Tricks for Deployment
 The Netdisco applications will generate RC scripts suitable for Linux systems:
 
  bin/netdisco-web get_init_file
- bin/netdisco-daemon get_init_file
+ bin/netdisco-backend get_init_file
 
 On C<systemd>-based systems please see L<our systemd
 guide|App::Netdisco::Manual::Systemd>.
@@ -30,6 +30,19 @@ the database service):
 
  # TYPE  DATABASE  USER  ADDRESS       METHOD
  host    all       all   127.0.0.1/32  md5
+
+=head1 Run multiple poller daemons
+
+A common scenario is that the network is split into security domains (or
+zones) and one Netdisco poller daemon cannot see all devices.
+
+You can run multiple pollers, as long as they all connect back to the same
+PostgreSQL database. Use the C<devices_only> or C<devices_no> configuration
+settings to control which devices are "seen" by each poller. You can also
+include only the necessary minimum SNMP community/authentication settings in
+each poller's configuration.
+
+Of course you will also need to start the web server somewhere, as well.
 
 =head1 Connect to PostgreSQL database on non-standard port
 

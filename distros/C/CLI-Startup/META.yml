@@ -13,7 +13,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.33'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4212, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,11 +22,11 @@ name: CLI-Startup
 provides:
   CLI::Startup:
     file: lib/CLI/Startup.pm
-    version: '0.17'
+    version: '0.20'
 recommends:
   Config::INI::Writer: '0'
   Config::Tiny: '0'
-  JSON::Any: '0'
+  JSON::MaybeXS: '0'
   XML::Simple: '0'
   YAML::Any: '0'
 requires:
@@ -43,9 +43,11 @@ requires:
   Hash::Merge: '0'
   List::Util: '0'
   Pod::Text: '3.01'
+  Readonly: '0'
   Symbol: '0'
   Text::CSV: '0'
-  perl: v5.8.8
+  perl: v5.10.0
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.17'
+version: '0.20'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

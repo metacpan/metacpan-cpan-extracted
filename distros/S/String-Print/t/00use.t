@@ -11,6 +11,7 @@ my @show_versions =
  qw/
     Test::More
     Unicode::GCString
+	HTML::Entities
    /;
 
 warn "Perl $]\n";

@@ -36,6 +36,7 @@
       "runtime" : {
          "requires" : {
             "Clone" : "0.36",
+            "Devel::GlobalDestruction" : "0.11",
             "EV" : "4.0",
             "Net::SSLeay" : "1.63",
             "Promises" : "0.94",
@@ -46,6 +47,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.10",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

@@ -1,301 +1,760 @@
 package Keyword::Declare;
-our $VERSION = '0.000005';
+our $VERSION = '0.001000';
 
-# Perl 5.14 required for pluggable keywords and /.../r
-use 5.014; use warnings;
-
-use Keyword::Simple; # ...This module provides the keyword pluggability
-use PPI;             # ...This module handles the parsing
+use 5.014;     # required for pluggable keywords plus /.../r
+use warnings;
 use Carp;
-use List::Util 'max';
+use List::Util 1.45 'max', 'uniqstr';
 
-# When to warn about possible endless re-substitution loops...
-my $REPLACEMENT_WARN_THRESHOLD  = 100;
-my $REPLACEMENT_ABORT_THRESHOLD = 1000;
+use Keyword::Simple;
+use PPR;
 
-# Useful patterns...
+my $NESTING_THRESHOLD = 100;   # How many nested keyword expansions is probably too many?
 
-my $IDENT = qr{
-    (?<ident>
-        [^\W\d] \w*+
-    )
-}xms;
+my $TYPE_JUNCTION = qr{ [^\W\d] \w*+ (?: [|] [^\W\d] \w*+ )*+ }x;   # How to match a TypeA|TypeB type
 
-my $QUAL_IDENT = qr{
-    (?<qual_ident>
-        (?&ident) (?: :: (?&ident) )*+
-    )
+my @keyword_impls;  # Tracks all keyword information in every scope
 
-    (?(DEFINE) $IDENT )
-}xms;
+sub import {
+    my (undef, $opt_ref) = @_;
+    $opt_ref //= {};
 
-my $UNEXPECTED = qr{
-    \s*+ (?<unexpected> \S{0,10} )
-}xms;
-
-my $EMPTY_BLOCK = qr{
-    \A \{ \s* \} \Z
-}xms;
-
-# Take a keyword specification and make a pretty text representation of it...
-sub _build_syntax {
-    my ($name, @params) = @_;
-
-    # Compose the syntax description...
-    my $syntax = $name;
-    for my $param (@params) {
-        # Literal parameters are shown verbatim, everything else in angles...
-        $syntax .= q{ }
-                .  ( $param->{type} =~ /\A'/ && !$param->{upto}
-                                     ? substr($param->{type},1,-1)
-                   : $param->{desc}  ? ($param->{desc} =~ /\A</ ? $param->{desc} : "<$param->{desc}>")
-                   :                   '<' . lc($param->{type} =~ tr/A-Z_/a-z /r) . '>'
-                   );
-    }
-    return $syntax;
-}
-
-# Tidy up a list of re-subsitutions, so it shows the cyclic order...
-sub _sort_cycle {
-    my @list = @_;
-
-    # Start with the first re-substitution...
-    my $next  = shift @list;
-    my @cycle = $next;
-    my $tail  = $next =~ s{\w+\s{2,}(\w+)\b.*}{$1}r;
-
-    # For the rest...
-    while (@list) {
-        # Work out potential next-in-cycle candidates...
-        my @followers    = grep {   m{\A \s* $tail\b }x } @list;
-        my @nonfollowers = grep { ! m{\A \s* $tail\b }x } @list;
-
-        # Choose one at random...
-        $next = shift(@followers) // shift(@nonfollowers) // last;
-
-        # Continue with that follower as the new end-of-chain...
-        push @cycle, $next;
-        $tail  = $next =~ s{\w+\s*-->\s*(\w+)\b.*}{$1}r;
-        @list = (@nonfollowers, @followers);
+    # Don't allow bad arguments to be passed when the module is loaded...
+    my $arg_type = ref($opt_ref);
+    if (@_ > 2 || $arg_type ne 'HASH') {
+        $arg_type ||= $opt_ref;
+        croak "Invalid option for: use Keyword::Declare.\n",
+              "Expected single hash reference, but found $arg_type instead.\n",
+              "Error detected";
     }
 
-    return @cycle;
-}
-
-# Prretty print reports about ambiguous keywords...
-sub _align_reports {
-    my @reports = @_;
-
-    # The reports break down into four whitespace-separated components...
-    @reports = map { [ split /\s{2,}/ ] } @reports;
-
-    # Find the longest of each component across all reports...
-    my ($max_from, $max_to, $max_spec, $max_loc) = (0,0,0,0);
-    for my $report (@reports) {
-        $max_from = max($max_from, length($report->[0]));
-        $max_to   = max($max_to  , length($report->[1]));
-        $max_spec = max($max_spec, length($report->[2]));
-        $max_loc  = max($max_loc , length($report->[3]));
+    # If debugging requested, set in on for the caller's lexical scope...
+    if ($opt_ref->{debug}) {
+        ${^H}{'Keyword::Declare debug'} = !!$opt_ref->{debug};
     }
 
-    # Reformat every report, with each component aligned to the longest...
-    return map {
-        sprintf("             %*s --> %-*s  by keyword %-*s  defined at %-*s\n",
-                $max_from, $_->[0],
-                $max_to  , $_->[1],
-                $max_spec, $_->[2],
-                $max_loc , $_->[3],
-        );
-    } @reports;
-}
+    # Install the 'keytype' (meta-)keyword...
+    Keyword::Simple::define 'keytype', sub {
+        # Unpack trailing code...
+        my ($src_ref) = @_;
 
-# Install a newly declared keyword...
-sub _install_keyword {
-    my ($NAME, $SYNTAX, $DESC, $INDEX) = @_;
+        # Where was this keyword declared???
+        my ($file, $line) = (caller)[1,2];
 
-    # This tracks possible re-substitutions...
-    state %replacement_tracker;
+        # These track error messages and help decompose the parameter list...
+        # (they have to be package vars, so they're visible to in-regex code blocks in older Perls)
+        our ($expected, $failed_at, $block_start, @params) = ('new type name', 0, 0);
 
-    # Tell the current lexical scope that this particular keyword syntax is active...
-    ${^H}{"Keyword::Declare active=$SYNTAX"} = $INDEX;
+        # Match and extract the keyword definition...
+        use re 'eval';
+        $$src_ref =~ s{
+            \A
+            (?<syntax>
+                            (?&PerlNWS)
+                (?{ $expected = "new type name"; $failed_at = pos() })
+                (?<newtype> (?&PerlIdentifier) )
+                            (?&PerlOWS)
+                (?{ $expected = "'is <existing type>'"; $failed_at = pos() })
+                            is
+                            (?&PerlOWS)
+                (?{ $expected = "existing typename or literal string or regex after 'is'"; $failed_at = pos() })
+                (?<oldtype> (?&PerlMatch) | (?&PerlString) | $TYPE_JUNCTION )
+            )
 
-    # Where are we going to install this keyword???
-    my $package_where_keyword_used = caller;
+            $PPR::GRAMMAR
+        }{}xms
+            or croak "Invalid keytype definition. Expected $expected\nbut found: ",
+                     substr($$src_ref, $failed_at) =~ /(\S+)/;
 
-    # Install the keyword...
-    Keyword::Simple::define "$NAME", sub {
-        my ($ref) = @_;
+        # Save the information from the keyword definition...
+        my %keytype_info = ( %+, location => "$file line $line" );
 
-        # Pretend this anonymous sub's name is the keyword's name (for error messages)...
-        local *__ANON__ = " $DESC ";
-
-        # Work out where the keyword is being invoked...
-        my (undef, $filename, $linenum) = caller();
-        my $linecount = $$ref =~ tr/\n//;
-
-        # Track source modifications...
-        my $pre_source = $$ref;
-
-        # Are there any versions of this keyword in scope???
-        use Carp;
-        my @candidate_indices = @{^H}{grep {/^Keyword::Declare active=$NAME\b/} keys %{^H}}
-            or croak "Keyword '$NAME' not in scope";
-
-        # Parse the code following the keyword with each available keyword variant...
-        my @matches;
-        my $max_match_score = 0;
-        my %errors;
-        my @impls = @{$Keyword::Declare::keyword_impls{$NAME}}[@candidate_indices];
-        my $parse_src = PPI::Document->new($ref);
-        $parse_src->index_locations;
-        IMPL:
-        foreach my $impl (@impls) {
-            # Can this keyword variant parse the code components actually found after the keyword???
-            my ($components_ref, $trailing_source, $error)
-                = Keyword::Declare::_match_syntax(
-                    $parse_src->clone,
-                    $NAME,
-                    $impl->{desc} // qq{'$NAME' declaration},
-                    @{$impl->{params}},
-                );
-
-            # Handle or remember any parsing failure...
-            if (defined $error) {
-                die "$error->{msg} at $filename line $linenum\n" if exists $error->{msg};
-                push @{ $errors{"after $error->{after} but found: $error->{found}"} }, $error->{expected};
-            };
-            next IMPL if !$components_ref;
-
-            # Remember any successful parse (and how good it was)...
-            my $match_score = @{$components_ref};
-            push @matches, {
-                impl  => $impl,
-                args  => $components_ref,
-                score => $match_score,
-                src   => $trailing_source,
-            };
-
-            # Longer variant matches are better than shorter ones...
-            $max_match_score = max($match_score, $max_match_score);
+        if (${^H}{"Keyword::Declare debug"}) {
+            warn +( ("#" x 50) . "\n"
+                . " Installed keytype at $keytype_info{location}:\n\n$keytype_info{syntax}\n\n"
+                . ("#" x 50) . "\n"
+                ) =~ s{^}{###}gmr;
         }
 
-        # Discard less-than-maximal matches...
-        @matches = grep { $_->{score} == $max_match_score } @matches;
-
-        # Resolve ambiguous matches, if possible...
-        if (@matches > 1) {
-            @matches = _resolve_matches(@matches);
-        }
-        if (@matches > 1) {
-            my @preferred_matches = grep { $_->{impl}{prefer} } @matches;
-            if (@preferred_matches) {
-                @matches = @preferred_matches;
-            }
-        }
-
-        # A single match means we can unambiguously handle the keyword...
-        if (@matches == 1) {
-            # Generate code to unpack the keyword parameters into variants...
-            my $param_list
-                = join q{}, map {
-                    my $default = $_->{default} // 'undef';
-                      !defined($_->{var}) ? 'shift;'
-                    : $_->{var} =~ /^\@/  ? qq{my $_->{var}=\@{shift()//[]};}
-                    : $_->{upto}          ? qq{my $_->{var}=defined(\$_[0])? join(q{},\@{shift()}) : $default;}
-                    :                       qq{my $_->{var} = shift // $default;}
-                  } @{$matches[0]{impl}{params}};
-
-            # Generate a subroutine that implements the keyword's code substitution behaviour...
-            my $generator = eval qq{
-                package $package_where_keyword_used;
-                sub {
-                    $param_list              # Unpack the parameters
-                    $matches[0]{impl}{code}; # Perform the substitution
-                }
-            };
-            die "Internal error: $@" if $@; # This shouldn't ever happen, but we definitely need to know if it does! ;-)
-
-            # Apply the code substitution to generate the replacement source code...
-            my $new_source = do {
-                no warnings 'redefine';
-                local *PPI::Structure::Block::reline
-                    = sub { my $self = shift;
-                            my $line = $self->logical_line_number + $linenum - 1;
-                            return "{\n#line $line $filename\n".substr($self,1);
-                        };
-
-                $generator->(@{$matches[0]{args}}) // q{};
-            };
-
-            # Prepare a pretty version of the keyword syntax for any subsequent error messages...
-            $matches[0]{impl}{syntax}
-                //= Keyword::Declare::_build_syntax("$NAME", @{$matches[0]{impl}{params}});
-
-            # Check for possible keyword substitution loops...
-            my $new_keyword = $new_source =~ m{ \A \s* ([^\W\d]\w*) \b }x ? $1 : q{};
-            $replacement_tracker{$filename,$linenum,'count'}++;
-            $replacement_tracker{$filename,$linenum,'involves'}{
-                qq{$NAME  $new_keyword  $matches[0]{impl}{syntax}  $matches[0]{impl}{loc}}
-            } = 1;
-
-            # If it seems possible that a re-substitution cycle is occurring, warn about that...
-            if ($replacement_tracker{$filename,$linenum,'count'} == $REPLACEMENT_WARN_THRESHOLD) {
-                carp "\n",
-                     "Warning: Possible unresolvable keyword substitution cycle involving:\n",
-                     _align_reports(_sort_cycle(keys %{$replacement_tracker{$filename,$linenum,'involves'}})),
-                     "         More than $replacement_tracker{$filename,$linenum,'count'} keyword subsitutions";
-            }
-
-            # If it seems highly likely that a re-substitution cycle is occurring, give up...
-            elsif ($replacement_tracker{$filename,$linenum,'count'} == $REPLACEMENT_ABORT_THRESHOLD) {
-                croak "\n",
-                      "Error: Probable unresolvable keyword substitution cycle involving:\n",
-                      _align_reports(_sort_cycle(keys %{$replacement_tracker{$filename,$linenum,'involves'}})),
-                      "       Keywords on line $linenum were not resolved ",
-                      "after $replacement_tracker{$filename,$linenum,'count'} keyword substitutions\n",
-                      "       Compilation aborted";
-            }
-
-            # If debugging requested, provide a summary of the substitution...
-            if (${^H}{"Keyword::Declare debug"}) {
-                my $keyword = $matches[0]{impl}{syntax};
-                my $from    = $NAME . substr($$ref,0,1-length($matches[0]{src}));
-                my $to      = $new_source;
-                s{^}{    }gm for $keyword, $from, $to;
-
-                my $debug_msg = ( ("#" x 50) . "\n"
-                                . " Keyword macro defined at $matches[0]{impl}{loc}:\n\n$keyword\n\n"
-                                . " Converted code at $filename line $linenum:\n\n$from\n\n"
-                                . " Into:\n\n$to\n\n"
-                                . ("#" x 50) . "\n"
-                                ) =~ s{^}{###}gmr;
-
-                warn $debug_msg;
-            }
-
-            # Preserve line numbers in the original source file...
-            $linenum += $linecount - ($matches[0]{src} =~ tr/\n//);
-            $$ref = $new_source . "\n#line $linenum $filename\n" . $matches[0]{src};
-
-        }
-
-        # If no valid keyword variants are in scope, report a fatal syntax error...
-        elsif (@matches == 0) {
-            my %descs = map { $_->{desc} ? ($_->{desc} => 1) : () } @impls;
-            my $desc = join ' or ', (%descs ? keys(%descs) : "$NAME declaration");
-            croak "Syntax error in $desc...\n",
-                  map({ ' Expected ' . join(' or ', @{$errors{$_}}) . " $_\n" } keys %errors);
-        }
-
-        # If too many valid keyword variants are in scope, report a fatal ambiguity...
-        else {
-            croak "Ambiguous use of '$NAME'...\n",
-                       ' Could be:  ',
-                  join('       or:  ',
-                       map { Keyword::Declare::_build_syntax("$NAME", @{$_->{impl}{params}}) . "\n" } @matches
-                   );
-        }
+        # Install the lexical type definition...
+        $$src_ref
+            = qq{BEGIN{\$^H{q{Keyword::Declare keytype:$keytype_info{newtype}=$keytype_info{oldtype}}} = 1;}}
+            . $$src_ref;
     };
+
+    # Install the 'keyword' (meta-)keyword...
+    Keyword::Simple::define 'keyword', sub {
+        # Unpack trailing code...
+        my ($src_ref) = @_;
+
+        # Where was this keyword declared???
+        my ($file, $line) = (caller)[1,2];
+
+        # Which keywords are allowed in nested code at this point...
+        my @active_IDs = @^H{ grep { m{^ Keyword::Declare \s+ active:}xms } keys %^H };
+        my $lexical_keywords
+            = @active_IDs ? join '|', reverse sort map { $keyword_impls[$_]{skip_matcher} } @active_IDs
+            :               '(?!)';
+
+        # These track error messages and help decompose the parameter list...
+        # (they have to be package vars, so they're visible to in-regex code blocks in older Perls)
+        our ($expected, $failed_at, $block_start, @params) = ('keyword name', 0, 0);
+
+        # Match and extract the keyword definition...
+        use re 'eval';
+        $$src_ref =~ s{
+            \A
+            (?<____K_D___KeywordDeclaration>
+                            (?&PerlNWS)
+                (?<____K_D___keyword> (?&PerlIdentifier)                  )
+                            (?&PerlOWS)
+                (?{ $expected = "keyword parameters or block, or 'from' specifier"; $failed_at = pos() })
+                (?<____K_D___params>  (?&____K_D___ParamList)                       )
+                            (?&PerlOWS)
+                (?{ $expected = 'keyword block or attribute'; $failed_at = pos() })
+                (?<____K_D___attrs>   (?&PerlAttributes)?+                )
+                            (?&PerlOWS)
+                (?{ $expected = 'keyword block'; $failed_at = $block_start = pos() })
+                (?<____K_D___block>   \{\{\{ .*? \}\}\} | (?&PerlBlock)   )
+            )
+
+            (?(DEFINE)
+                (?<____K_D___ParamList>
+                    \(
+                        (?&____K_D___ParamSet)?+
+                        (?:
+                            (?&PerlOWS) \) (?&PerlOWS) :then\(
+                            (?{ push @Keyword::Declare::params, undef; })
+                            (?&____K_D___ParamSet)
+                        )?+
+                    \)
+                |
+                    # Nothing
+                )
+
+                (?<____K_D___ParamSet>
+                                        (?&PerlOWS) (?&____K_D___Param)
+                    (?: (?&PerlOWS) ,   (?&PerlOWS) (?&____K_D___Param) )*+
+                                    ,?+ (?&PerlOWS)
+                )
+
+                (?<____K_D___Param>
+                    (?{ $expected = 'keyword parameter type'; $failed_at = pos() })
+                                     (?<____K_D___type> (?&PerlMatch) | (?&PerlString) | $TYPE_JUNCTION )
+
+                    (?{ $expected = 'keyword parameter quantifier or variable'; $failed_at = pos() })
+                        (?: (?&PerlOWS)  (?<____K_D___quantifier> [?*+][?+]?+      )  )?+
+
+                    (?{ $expected = 'keyword parameter variable'; $failed_at = pos() })
+                        (?: (?&PerlOWS)  (?<____K_D___sigil>    [\$\@]             )
+                                         (?<____K_D___name>     (?&PerlIdentifier) )  )?+
+
+                    (?: (?&PerlOWS)  =
+                    (?{ $expected = 'keyword parameter default string after ='; $failed_at = pos() })
+                        (?&PerlOWS)  (?<____K_D___default>  (?&PerlQuotelikeQ) )  )?+
+
+                    (?{ push @Keyword::Declare::params, { %+ } })
+                )
+
+
+                (?<PerlKeyword>
+                    keyword (?&____K_D___KeywordDeclaration)
+                |
+                    $lexical_keywords
+                )
+            )
+
+            $PPR::GRAMMAR
+        }{}xms
+            or croak "Invalid keyword definition. Expected $expected\nbut found: ",
+                     substr($$src_ref, $failed_at) =~ /(\S+)/;
+
+        # Save the information from the keyword definition..
+        @Keyword::Declare::params = map { _deprefix($_) } @Keyword::Declare::params;
+        my %keyword_info = %+;
+           %keyword_info = ( %{ _deprefix(\%keyword_info) },
+                             desc            => $keyword_info{____K_D___keyword},
+                             param_list      => [ @Keyword::Declare::params],
+                             location        => "$file line $line",
+                           );
+
+        # Check for excessive meta-ness...
+        if ($keyword_info{keyword} =~ /^(?:keyword|keytype)$/) {
+            croak "Can't redefine '$keyword_info{keyword}' keyword";
+        }
+
+        # Remember where the block started...
+        my $block_location
+            = ($line + substr($keyword_info{KeywordDeclaration}, 0, $block_start) =~ tr/\n//) . " $file";
+
+        # Convert any {{{...}}} block...
+        if ($keyword_info{block} =~ m{ \A \{\{\{ }xms) {
+            $keyword_info{block} = _convert_triple_block(\%keyword_info);
+        }
+
+        # Extract and verify any attributes...
+        _unpack_attrs(\%keyword_info);
+
+        # Extract various useful components from the parameter list...
+        _unpack_signature(\%keyword_info);
+
+        # Prepare for a trailing #line directive to keep trailing line numbers straight...
+        $line += $keyword_info{KeywordDeclaration} =~ tr/\n//;
+
+        # Record the keyword definition...
+        my $keyword_ID = $keyword_info{ID} = @keyword_impls;
+        push @keyword_impls, \%keyword_info;
+
+        # Create the keyword dispatching function...
+        my $keyword_defn = _build_keyword_code(\%keyword_info);
+
+        # Report installation of keyword if requested...
+        if (${^H}{"Keyword::Declare debug"}) {
+            warn +( ("#" x 50) . "\n"
+                . " Installed keyword macro at $keyword_info{location}:\n\n$keyword_info{syntax}\n\n"
+                . ("#" x 50) . "\n"
+                ) =~ s{^}{###}gmr;
+        }
+
+        # Install the keyword, exporting it as well if it's in an import() or unimport() sub...
+        $$src_ref = qq{ if (((caller 0)[3]//q{}) =~ /\\b(?:un)?import\\Z/) { $keyword_defn } }
+                  . qq{ BEGIN{ $keyword_defn } }
+                  . "\n#line $line $file\n"
+                  . $$src_ref;
+    };
+}
+
+sub _deprefix {
+    my ($hash_ref) = @_;
+
+    return undef if !defined $hash_ref;
+    return { map { s{^____K_D___}{}r => $hash_ref->{$_} }  keys %{$hash_ref} };
+}
+
+
+# Generate the source code that actually installs a keyword...
+sub _build_keyword_code {
+    my ($keyword_name, $keyword_sig, $keyword_ID, $keyword_block, $block_location)
+        = @{shift()}{qw< keyword sig_desc ID block location >};
+
+    # Generate the keyword definition and set up its unique lexical ID...
+    return qq{
+        \$^H{"Keyword::Declare active:$keyword_name:\Q$keyword_sig\E"} = $keyword_ID;
+        Keyword::Simple::define '$keyword_name', Keyword::Declare::_get_dispatcher_for('$keyword_name',
+            $keyword_ID, sub
+#line $block_location
+            { $keyword_impls[$keyword_ID]{sig_vars_unpack}  do $keyword_block });
+    };
+}
+
+
+# Install keyword's source-code generator, and return a dispatcher sub for that keyword
+# (building a closure for it, if necessary)...
+sub _get_dispatcher_for {
+    my ($keyword_name, $keyword_ID, $keyword_generator) = @_;
+
+    # Install the keyword generator sub...
+    $keyword_impls[$keyword_ID]{generator} = $keyword_generator;
+
+    # This will dispatch any keyword of the specified name...
+    state %dispatcher_for;
+    return $dispatcher_for{$keyword_name} //= sub {
+        my ($src_ref) = @_;
+        my ($package, $file, $line) = caller;
+
+        # Which variants of this keyword are currently in scope???
+        my @candidate_IDs = @^H{ grep { m{^ Keyword::Declare \s+ active:$keyword_name:}xms } keys %^H };
+
+        # Which keywords are allowed in nested code at this point...
+        my @active_IDs = @^H{ grep { m{^ Keyword::Declare \s+ active:}xms } keys %^H };
+        my $lexical_keywords
+            = @active_IDs ? join '|', reverse sort map { $keyword_impls[$_]{skip_matcher} } @active_IDs
+            :               '(?!)';
+        $lexical_keywords = "(?(DEFINE) (?<PerlKeyword> $lexical_keywords ) )";
+
+        # Which of them match the keyword's actual arguments???
+        my @viable_IDs
+            = grep { $$src_ref =~ m{ \A $keyword_impls[$_]{sig_matcher} $lexical_keywords $PPR::GRAMMAR }xms }
+                   @candidate_IDs;
+
+
+        # If none of them match...game over!!!
+        if (!@viable_IDs) {
+            croak "Invalid "
+                . join(" or ", uniqstr map { $keyword_impls[$_]{desc} } @candidate_IDs)
+                . " at $file line $line.\nExpected:"
+                . join("\n    ", q{}, uniqstr map { $keyword_impls[$_]{syntax} } @candidate_IDs)
+                . "\nbut found:\n    $keyword_name  "
+                . ($$src_ref =~ s{ \A \s*+ (\S++ [^\n]*+) \n .* }{$1}xsr)
+                . "\nCompilation failed";
+        }
+
+        # If too many of them match...see if we can reduce it to a single match...
+        if (@viable_IDs > 1) {
+            # Only keep those with the most parameters...
+            my $max_sig_len = max map { $keyword_impls[$_]{sig_len} } @viable_IDs;
+            @viable_IDs = grep { $keyword_impls[$_]{sig_len} == $max_sig_len } @viable_IDs;
+
+            # Resolve ambiguous matches, if possible...
+            if (@viable_IDs > 1) {
+                @viable_IDs = _resolve_matches(@viable_IDs);
+            }
+
+            # If still too many, see if one is marked :prefer...
+            if (@viable_IDs > 1) {
+                if (my @preferred_IDs = grep { $keyword_impls[$_]{prefer} } @viable_IDs) {
+                    @viable_IDs = @preferred_IDs;
+                }
+            }
+
+            # If still too many, give up and report the ambiguity...
+            if (@viable_IDs > 1) {
+                croak "Ambiguous "
+                    . join(" or ", uniqstr map { $keyword_impls[$_]{desc} } @viable_IDs)
+                    . " at $file line $line:\n    $keyword_name  "
+                    . ($$src_ref =~ s{ \A \s*+ ( \S++ [^\n]*+) \n .* }{$1}xsr)
+                    . "\nCould be:\n"
+                    . join("\n", map { "    $keyword_impls[$_]{syntax}" } @viable_IDs)
+                    . "\nCompilation failed";
+            }
+        }
+
+        # If we get here, we have a unique best candidate, so install it...
+        my ($ID) = @viable_IDs;
+
+        # Add in the replacement code...
+        _insert_replacement_code($src_ref, $ID, $file, $line, $lexical_keywords);
+    }
+}
+
+# These help unpack /.../ type specifiers...
+my $REGEX_TYPE = qr{ \A (?&PerlMatch) \z $PPR::GRAMMAR }x;
+
+my $REGEX_PAT = qr{
+        \A
+        (?: (?<delim> / ) | m \s* (?<delim> \S ))
+        (?<pattern> .* )
+        (?: \k<delim> | [])>\}] )
+        (?<modifiers> [imnsxadlup]*+ )
+        \z
+    }xs;
+
+my %ACTUAL_TYPE_OF = (
+  # Specified type...                         # Translated to...
+
+
+# Autogenerated type translations (from bin/gen_types.pl)...
+
+    'ArrayIndexer'                               => '/(?&PerlArrayIndexer)/',
+    'AssignmentOperator'                         => '/(?&PerlAssignmentOperator)/',
+    'Attributes'                                 => '/(?&PerlAttributes)/',
+    'Comma'                                      => '/(?&PerlComma)/',
+    'Document'                                   => '/(?&PerlDocument)/',
+    'HashIndexer'                                => '/(?&PerlHashIndexer)/',
+    'InfixBinaryOperator'                        => '/(?&PerlInfixBinaryOperator)/',
+    'LowPrecedenceInfixOperator'                 => '/(?&PerlLowPrecedenceInfixOperator)/',
+    'OWS'                                        => '/(?&PerlOWS)/',
+    'PostfixUnaryOperator'                       => '/(?&PerlPostfixUnaryOperator)/',
+    'PrefixUnaryOperator'                        => '/(?&PerlPrefixUnaryOperator)/',
+    'StatementModifier'                          => '/(?&PerlStatementModifier)/',
+    'NWS'                                        => '/(?&PerlNWS)/',
+    'Whitespace'                                 => '/(?&PerlNWS)/',
+    'Statement'                                  => '/(?&PerlStatement)/',
+    'Block'                                      => '/(?&PerlBlock)/',
+    'Comment'                                    => '/(?&PerlComment)/',
+    'ControlBlock'                               => '/(?&PerlControlBlock)/',
+    'Expression'                                 => '/(?&PerlExpression)/',
+    'Expr'                                       => '/(?&PerlExpression)/',
+    'Format'                                     => '/(?&PerlFormat)/',
+    'Keyword'                                    => '/(?&PerlKeyword)/',
+    'Label'                                      => '/(?&PerlLabel)/',
+    'PackageDeclaration'                         => '/(?&PerlPackageDeclaration)/',
+    'Pod'                                        => '/(?&PerlPod)/',
+    'SubroutineDeclaration'                      => '/(?&PerlSubroutineDeclaration)/',
+    'UseStatement'                               => '/(?&PerlUseStatement)/',
+    'LowPrecedenceNotExpression'                 => '/(?&PerlLowPrecedenceNotExpression)/',
+    'List'                                       => '/(?&PerlList)/',
+    'CommaList'                                  => '/(?&PerlCommaList)/',
+    'Assignment'                                 => '/(?&PerlAssignment)/',
+    'ConditionalExpression'                      => '/(?&PerlConditionalExpression)/',
+    'Ternary'                                    => '/(?&PerlConditionalExpression)/',
+    'ListElem'                                   => '/(?&PerlConditionalExpression)/',
+    'BinaryExpression'                           => '/(?&PerlBinaryExpression)/',
+    'PrefixPostfixTerm'                          => '/(?&PerlPrefixPostfixTerm)/',
+    'Term'                                       => '/(?&PerlTerm)/',
+    'AnonymousArray'                             => '/(?&PerlAnonymousArray)/',
+    'AnonArray'                                  => '/(?&PerlAnonymousArray)/',
+    'AnonymousHash'                              => '/(?&PerlAnonymousHash)/',
+    'AnonHash'                                   => '/(?&PerlAnonymousHash)/',
+    'AnonymousSubroutine'                        => '/(?&PerlAnonymousSubroutine)/',
+    'Call'                                       => '/(?&PerlCall)/',
+    'DiamondOperator'                            => '/(?&PerlDiamondOperator)/',
+    'DoBlock'                                    => '/(?&PerlDoBlock)/',
+    'EvalBlock'                                  => '/(?&PerlEvalBlock)/',
+    'Literal'                                    => '/(?&PerlLiteral)/',
+    'Lvalue'                                     => '/(?&PerlLvalue)/',
+    'ParenthesesList'                            => '/(?&PerlParenthesesList)/',
+    'ParensList'                                 => '/(?&PerlParenthesesList)/',
+    'Quotelike'                                  => '/(?&PerlQuotelike)/',
+    'ReturnStatement'                            => '/(?&PerlReturnStatement)/',
+    'Typeglob'                                   => '/(?&PerlTypeglob)/',
+    'VariableDeclaration'                        => '/(?&PerlVariableDeclaration)/',
+    'VarDecl'                                    => '/(?&PerlVariableDeclaration)/',
+    'Variable'                                   => '/(?&PerlVariable)/',
+    'Var'                                        => '/(?&PerlVariable)/',
+    'ArrayAccess'                                => '/(?&PerlArrayAccess)/',
+    'Bareword'                                   => '/(?&PerlBareword)/',
+    'BuiltinFunction'                            => '/(?&PerlBuiltinFunction)/',
+    'HashAccess'                                 => '/(?&PerlHashAccess)/',
+    'Number'                                     => '/(?&PerlNumber)/',
+    'Num'                                        => '/(?&PerlNumber)/',
+    'QuotelikeQW'                                => '/(?&PerlQuotelikeQW)/',
+    'QuotelikeQX'                                => '/(?&PerlQuotelikeQX)/',
+    'Regex'                                      => '/(?&PerlRegex)/',
+    'Regexp'                                     => '/(?&PerlRegex)/',
+    'ScalarAccess'                               => '/(?&PerlScalarAccess)/',
+    'String'                                     => '/(?&PerlString)/',
+    'Str'                                        => '/(?&PerlString)/',
+    'Substitution'                               => '/(?&PerlSubstitution)/',
+    'QuotelikeS'                                 => '/(?&PerlSubstitution)/',
+    'Transliteration'                            => '/(?&PerlTransliteration)/',
+    'QuotelikeTR'                                => '/(?&PerlTransliteration)/',
+    'ContextualRegex'                            => '/(?&PerlContextualRegex)/',
+    'Heredoc'                                    => '/(?&PerlHeredoc)/',
+    'Integer'                                    => '/(?&PerlInteger)/',
+    'Int'                                        => '/(?&PerlInteger)/',
+    'Match'                                      => '/(?&PerlMatch)/',
+    'QuotelikeM'                                 => '/(?&PerlMatch)/',
+    'NullaryBuiltinFunction'                     => '/(?&PerlNullaryBuiltinFunction)/',
+    'OldQualifiedIdentifier'                     => '/(?&PerlOldQualifiedIdentifier)/',
+    'QuotelikeQ'                                 => '/(?&PerlQuotelikeQ)/',
+    'QuotelikeQQ'                                => '/(?&PerlQuotelikeQQ)/',
+    'QuotelikeQR'                                => '/(?&PerlQuotelikeQR)/',
+    'VString'                                    => '/(?&PerlVString)/',
+    'VariableArray'                              => '/(?&PerlVariableArray)/',
+    'VarArray'                                   => '/(?&PerlVariableArray)/',
+    'ArrayVar'                                   => '/(?&PerlVariableArray)/',
+    'VariableHash'                               => '/(?&PerlVariableHash)/',
+    'VarHash'                                    => '/(?&PerlVariableHash)/',
+    'HashVar'                                    => '/(?&PerlVariableHash)/',
+    'VariableScalar'                             => '/(?&PerlVariableScalar)/',
+    'VarScalar'                                  => '/(?&PerlVariableScalar)/',
+    'ScalarVar'                                  => '/(?&PerlVariableScalar)/',
+    'VersionNumber'                              => '/(?&PerlVersionNumber)/',
+    'ContextualMatch'                            => '/(?&PerlContextualMatch)/',
+    'ContextualQuotelikeM'                       => '/(?&PerlContextualMatch)/',
+    'PositiveInteger'                            => '/(?&PerlPositiveInteger)/',
+    'PosInt'                                     => '/(?&PerlPositiveInteger)/',
+    'QualifiedIdentifier'                        => '/(?&PerlQualifiedIdentifier)/',
+    'QualIdent'                                  => '/(?&PerlQualifiedIdentifier)/',
+    'QuotelikeQR'                                => '/(?&PerlQuotelikeQR)/',
+    'VString'                                    => '/(?&PerlVString)/',
+    'Identifier'                                 => '/(?&PerlIdentifier)/',
+    'Ident'                                      => '/(?&PerlIdentifier)/',
+
+# End of autogenerated type translations
+
+    'Integer'                                => '/(?:[+-]?+(?&PPR_digit_seq)(?!\.))/',
+    'Int'                                    => '/(?:[+-]?+(?&PPR_digit_seq)(?!\.))/',
+    'PositiveInteger'                        => '/(?:[+]?+(?&PPR_digit_seq)(?!\.))/',
+    'PosInt'                                 => '/(?:[+]?+(?&PPR_digit_seq)(?!\.))/',
+    'Comment'                                => '/\#[^\n]*\n/',
+);
+
+our %isa = (
+
+# Autogenerated type ISA hierarchy (from bin/gen_types.pl)...
+
+"AnonArray\34Assignment"=>1,"AnonArray\34BinaryExpression"=>1,"AnonArray\34CommaList"=>1,"AnonArray\34ConditionalExpression"=>1,"AnonArray\34Document"=>1,"AnonArray\34Expr"=>1,"AnonArray\34Expression"=>1,"AnonArray\34List"=>1,"AnonArray\34ListElem"=>1,"AnonArray\34LowPrecedenceNotExpression"=>1,"AnonArray\34PrefixPostfixTerm"=>1,"AnonArray\34Statement"=>1,"AnonArray\34Term"=>1,"AnonArray\34Ternary"=>1,"AnonHash\34Assignment"=>1,"AnonHash\34BinaryExpression"=>1,"AnonHash\34CommaList"=>1,"AnonHash\34ConditionalExpression"=>1,"AnonHash\34Document"=>1,"AnonHash\34Expr"=>1,"AnonHash\34Expression"=>1,"AnonHash\34List"=>1,"AnonHash\34ListElem"=>1,"AnonHash\34LowPrecedenceNotExpression"=>1,"AnonHash\34PrefixPostfixTerm"=>1,"AnonHash\34Statement"=>1,"AnonHash\34Term"=>1,"AnonHash\34Ternary"=>1,"AnonymousArray\34Assignment"=>1,"AnonymousArray\34BinaryExpression"=>1,"AnonymousArray\34CommaList"=>1,"AnonymousArray\34ConditionalExpression"=>1,"AnonymousArray\34Document"=>1,"AnonymousArray\34Expr"=>1,"AnonymousArray\34Expression"=>1,"AnonymousArray\34List"=>1,"AnonymousArray\34ListElem"=>1,"AnonymousArray\34LowPrecedenceNotExpression"=>1,"AnonymousArray\34PrefixPostfixTerm"=>1,"AnonymousArray\34Statement"=>1,"AnonymousArray\34Term"=>1,"AnonymousArray\34Ternary"=>1,"AnonymousHash\34Assignment"=>1,"AnonymousHash\34BinaryExpression"=>1,"AnonymousHash\34CommaList"=>1,"AnonymousHash\34ConditionalExpression"=>1,"AnonymousHash\34Document"=>1,"AnonymousHash\34Expr"=>1,"AnonymousHash\34Expression"=>1,"AnonymousHash\34List"=>1,"AnonymousHash\34ListElem"=>1,"AnonymousHash\34LowPrecedenceNotExpression"=>1,"AnonymousHash\34PrefixPostfixTerm"=>1,"AnonymousHash\34Statement"=>1,"AnonymousHash\34Term"=>1,"AnonymousHash\34Ternary"=>1,"AnonymousSubroutine\34Assignment"=>1,"AnonymousSubroutine\34BinaryExpression"=>1,"AnonymousSubroutine\34CommaList"=>1,"AnonymousSubroutine\34ConditionalExpression"=>1,"AnonymousSubroutine\34Document"=>1,"AnonymousSubroutine\34Expr"=>1,"AnonymousSubroutine\34Expression"=>1,"AnonymousSubroutine\34List"=>1,"AnonymousSubroutine\34ListElem"=>1,"AnonymousSubroutine\34LowPrecedenceNotExpression"=>1,"AnonymousSubroutine\34PrefixPostfixTerm"=>1,"AnonymousSubroutine\34Statement"=>1,"AnonymousSubroutine\34Term"=>1,"AnonymousSubroutine\34Ternary"=>1,"ArrayAccess\34Assignment"=>1,"ArrayAccess\34BinaryExpression"=>1,"ArrayAccess\34CommaList"=>1,"ArrayAccess\34ConditionalExpression"=>1,"ArrayAccess\34Document"=>1,"ArrayAccess\34Expr"=>1,"ArrayAccess\34Expression"=>1,"ArrayAccess\34List"=>1,"ArrayAccess\34ListElem"=>1,"ArrayAccess\34LowPrecedenceNotExpression"=>1,"ArrayAccess\34PrefixPostfixTerm"=>1,"ArrayAccess\34Statement"=>1,"ArrayAccess\34Term"=>1,"ArrayAccess\34Ternary"=>1,"ArrayAccess\34Var"=>1,"ArrayAccess\34Variable"=>1,"ArrayVar\34ArrayAccess"=>1,"ArrayVar\34Assignment"=>1,"ArrayVar\34BinaryExpression"=>1,"ArrayVar\34CommaList"=>1,"ArrayVar\34ConditionalExpression"=>1,"ArrayVar\34Document"=>1,"ArrayVar\34Expr"=>1,"ArrayVar\34Expression"=>1,"ArrayVar\34List"=>1,"ArrayVar\34ListElem"=>1,"ArrayVar\34LowPrecedenceNotExpression"=>1,"ArrayVar\34PrefixPostfixTerm"=>1,"ArrayVar\34Statement"=>1,"ArrayVar\34Term"=>1,"ArrayVar\34Ternary"=>1,"ArrayVar\34Var"=>1,"ArrayVar\34Variable"=>1,"Assignment\34CommaList"=>1,"Assignment\34Document"=>1,"Assignment\34Expr"=>1,"Assignment\34Expression"=>1,"Assignment\34List"=>1,"Assignment\34LowPrecedenceNotExpression"=>1,"Assignment\34Statement"=>1,"Bareword\34Assignment"=>1,"Bareword\34BinaryExpression"=>1,"Bareword\34CommaList"=>1,"Bareword\34ConditionalExpression"=>1,"Bareword\34Document"=>1,"Bareword\34Expr"=>1,"Bareword\34Expression"=>1,"Bareword\34List"=>1,"Bareword\34ListElem"=>1,"Bareword\34Literal"=>1,"Bareword\34LowPrecedenceNotExpression"=>1,"Bareword\34PrefixPostfixTerm"=>1,"Bareword\34Statement"=>1,"Bareword\34Term"=>1,"Bareword\34Ternary"=>1,"BinaryExpression\34Assignment"=>1,"BinaryExpression\34CommaList"=>1,"BinaryExpression\34ConditionalExpression"=>1,"BinaryExpression\34Document"=>1,"BinaryExpression\34Expr"=>1,"BinaryExpression\34Expression"=>1,"BinaryExpression\34List"=>1,"BinaryExpression\34ListElem"=>1,"BinaryExpression\34LowPrecedenceNotExpression"=>1,"BinaryExpression\34Statement"=>1,"BinaryExpression\34Ternary"=>1,"Block\34Document"=>1,"Block\34Statement"=>1,"BuiltinFunction\34Assignment"=>1,"BuiltinFunction\34BinaryExpression"=>1,"BuiltinFunction\34Call"=>1,"BuiltinFunction\34CommaList"=>1,"BuiltinFunction\34ConditionalExpression"=>1,"BuiltinFunction\34Document"=>1,"BuiltinFunction\34Expr"=>1,"BuiltinFunction\34Expression"=>1,"BuiltinFunction\34List"=>1,"BuiltinFunction\34ListElem"=>1,"BuiltinFunction\34LowPrecedenceNotExpression"=>1,"BuiltinFunction\34PrefixPostfixTerm"=>1,"BuiltinFunction\34Statement"=>1,"BuiltinFunction\34Term"=>1,"BuiltinFunction\34Ternary"=>1,"Call\34Assignment"=>1,"Call\34BinaryExpression"=>1,"Call\34CommaList"=>1,"Call\34ConditionalExpression"=>1,"Call\34Document"=>1,"Call\34Expr"=>1,"Call\34Expression"=>1,"Call\34List"=>1,"Call\34ListElem"=>1,"Call\34LowPrecedenceNotExpression"=>1,"Call\34PrefixPostfixTerm"=>1,"Call\34Statement"=>1,"Call\34Term"=>1,"Call\34Ternary"=>1,"CommaList\34Document"=>1,"CommaList\34Expr"=>1,"CommaList\34Expression"=>1,"CommaList\34List"=>1,"CommaList\34LowPrecedenceNotExpression"=>1,"CommaList\34Statement"=>1,"Comment\34NWS"=>1,"Comment\34OWS"=>1,"Comment\34Whitespace"=>1,"ConditionalExpression\34Assignment"=>1,"ConditionalExpression\34CommaList"=>1,"ConditionalExpression\34Document"=>1,"ConditionalExpression\34Expr"=>1,"ConditionalExpression\34Expression"=>1,"ConditionalExpression\34List"=>1,"ConditionalExpression\34LowPrecedenceNotExpression"=>1,"ConditionalExpression\34Statement"=>1,"ContextualMatch\34Assignment"=>1,"ContextualMatch\34BinaryExpression"=>1,"ContextualMatch\34CommaList"=>1,"ContextualMatch\34ConditionalExpression"=>1,"ContextualMatch\34ContextualRegex"=>1,"ContextualMatch\34Document"=>1,"ContextualMatch\34Expr"=>1,"ContextualMatch\34Expression"=>1,"ContextualMatch\34List"=>1,"ContextualMatch\34ListElem"=>1,"ContextualMatch\34LowPrecedenceNotExpression"=>1,"ContextualMatch\34Match"=>1,"ContextualMatch\34PrefixPostfixTerm"=>1,"ContextualMatch\34Quotelike"=>1,"ContextualMatch\34QuotelikeM"=>1,"ContextualMatch\34Regex"=>1,"ContextualMatch\34Regexp"=>1,"ContextualMatch\34Statement"=>1,"ContextualMatch\34Term"=>1,"ContextualMatch\34Ternary"=>1,"ContextualQuotelikeM\34Assignment"=>1,"ContextualQuotelikeM\34BinaryExpression"=>1,"ContextualQuotelikeM\34CommaList"=>1,"ContextualQuotelikeM\34ConditionalExpression"=>1,"ContextualQuotelikeM\34ContextualRegex"=>1,"ContextualQuotelikeM\34Document"=>1,"ContextualQuotelikeM\34Expr"=>1,"ContextualQuotelikeM\34Expression"=>1,"ContextualQuotelikeM\34List"=>1,"ContextualQuotelikeM\34ListElem"=>1,"ContextualQuotelikeM\34LowPrecedenceNotExpression"=>1,"ContextualQuotelikeM\34Match"=>1,"ContextualQuotelikeM\34PrefixPostfixTerm"=>1,"ContextualQuotelikeM\34Quotelike"=>1,"ContextualQuotelikeM\34QuotelikeM"=>1,"ContextualQuotelikeM\34Regex"=>1,"ContextualQuotelikeM\34Regexp"=>1,"ContextualQuotelikeM\34Statement"=>1,"ContextualQuotelikeM\34Term"=>1,"ContextualQuotelikeM\34Ternary"=>1,"ContextualRegex\34Assignment"=>1,"ContextualRegex\34BinaryExpression"=>1,"ContextualRegex\34CommaList"=>1,"ContextualRegex\34ConditionalExpression"=>1,"ContextualRegex\34Document"=>1,"ContextualRegex\34Expr"=>1,"ContextualRegex\34Expression"=>1,"ContextualRegex\34List"=>1,"ContextualRegex\34ListElem"=>1,"ContextualRegex\34LowPrecedenceNotExpression"=>1,"ContextualRegex\34PrefixPostfixTerm"=>1,"ContextualRegex\34Quotelike"=>1,"ContextualRegex\34Regex"=>1,"ContextualRegex\34Regexp"=>1,"ContextualRegex\34Statement"=>1,"ContextualRegex\34Term"=>1,"ContextualRegex\34Ternary"=>1,"ControlBlock\34Document"=>1,"ControlBlock\34Statement"=>1,"DiamondOperator\34Assignment"=>1,"DiamondOperator\34BinaryExpression"=>1,"DiamondOperator\34CommaList"=>1,"DiamondOperator\34ConditionalExpression"=>1,"DiamondOperator\34Document"=>1,"DiamondOperator\34Expr"=>1,"DiamondOperator\34Expression"=>1,"DiamondOperator\34List"=>1,"DiamondOperator\34ListElem"=>1,"DiamondOperator\34LowPrecedenceNotExpression"=>1,"DiamondOperator\34PrefixPostfixTerm"=>1,"DiamondOperator\34Statement"=>1,"DiamondOperator\34Term"=>1,"DiamondOperator\34Ternary"=>1,"DoBlock\34Assignment"=>1,"DoBlock\34BinaryExpression"=>1,"DoBlock\34CommaList"=>1,"DoBlock\34ConditionalExpression"=>1,"DoBlock\34Document"=>1,"DoBlock\34Expr"=>1,"DoBlock\34Expression"=>1,"DoBlock\34List"=>1,"DoBlock\34ListElem"=>1,"DoBlock\34LowPrecedenceNotExpression"=>1,"DoBlock\34PrefixPostfixTerm"=>1,"DoBlock\34Statement"=>1,"DoBlock\34Term"=>1,"DoBlock\34Ternary"=>1,"EvalBlock\34Assignment"=>1,"EvalBlock\34BinaryExpression"=>1,"EvalBlock\34CommaList"=>1,"EvalBlock\34ConditionalExpression"=>1,"EvalBlock\34Document"=>1,"EvalBlock\34Expr"=>1,"EvalBlock\34Expression"=>1,"EvalBlock\34List"=>1,"EvalBlock\34ListElem"=>1,"EvalBlock\34LowPrecedenceNotExpression"=>1,"EvalBlock\34PrefixPostfixTerm"=>1,"EvalBlock\34Statement"=>1,"EvalBlock\34Term"=>1,"EvalBlock\34Ternary"=>1,"Expr\34Document"=>1,"Expr\34Statement"=>1,"Expression\34Document"=>1,"Expression\34Statement"=>1,"Format\34Document"=>1,"Format\34Statement"=>1,"HashAccess\34Assignment"=>1,"HashAccess\34BinaryExpression"=>1,"HashAccess\34CommaList"=>1,"HashAccess\34ConditionalExpression"=>1,"HashAccess\34Document"=>1,"HashAccess\34Expr"=>1,"HashAccess\34Expression"=>1,"HashAccess\34List"=>1,"HashAccess\34ListElem"=>1,"HashAccess\34LowPrecedenceNotExpression"=>1,"HashAccess\34PrefixPostfixTerm"=>1,"HashAccess\34Statement"=>1,"HashAccess\34Term"=>1,"HashAccess\34Ternary"=>1,"HashAccess\34Var"=>1,"HashAccess\34Variable"=>1,"HashVar\34Assignment"=>1,"HashVar\34BinaryExpression"=>1,"HashVar\34CommaList"=>1,"HashVar\34ConditionalExpression"=>1,"HashVar\34Document"=>1,"HashVar\34Expr"=>1,"HashVar\34Expression"=>1,"HashVar\34HashAccess"=>1,"HashVar\34List"=>1,"HashVar\34ListElem"=>1,"HashVar\34LowPrecedenceNotExpression"=>1,"HashVar\34PrefixPostfixTerm"=>1,"HashVar\34Statement"=>1,"HashVar\34Term"=>1,"HashVar\34Ternary"=>1,"HashVar\34Var"=>1,"HashVar\34Variable"=>1,"Heredoc\34Assignment"=>1,"Heredoc\34BinaryExpression"=>1,"Heredoc\34CommaList"=>1,"Heredoc\34ConditionalExpression"=>1,"Heredoc\34Document"=>1,"Heredoc\34Expr"=>1,"Heredoc\34Expression"=>1,"Heredoc\34List"=>1,"Heredoc\34ListElem"=>1,"Heredoc\34Literal"=>1,"Heredoc\34LowPrecedenceNotExpression"=>1,"Heredoc\34PrefixPostfixTerm"=>1,"Heredoc\34Statement"=>1,"Heredoc\34Str"=>1,"Heredoc\34String"=>1,"Heredoc\34Term"=>1,"Heredoc\34Ternary"=>1,"Ident\34Assignment"=>1,"Ident\34Bareword"=>1,"Ident\34BinaryExpression"=>1,"Ident\34CommaList"=>1,"Ident\34ConditionalExpression"=>1,"Ident\34Document"=>1,"Ident\34Expr"=>1,"Ident\34Expression"=>1,"Ident\34List"=>1,"Ident\34ListElem"=>1,"Ident\34Literal"=>1,"Ident\34LowPrecedenceNotExpression"=>1,"Ident\34OldQualifiedIdentifier"=>1,"Ident\34PrefixPostfixTerm"=>1,"Ident\34QualIdent"=>1,"Ident\34QualifiedIdentifier"=>1,"Ident\34Statement"=>1,"Ident\34Term"=>1,"Ident\34Ternary"=>1,"Identifier\34Assignment"=>1,"Identifier\34Bareword"=>1,"Identifier\34BinaryExpression"=>1,"Identifier\34CommaList"=>1,"Identifier\34ConditionalExpression"=>1,"Identifier\34Document"=>1,"Identifier\34Expr"=>1,"Identifier\34Expression"=>1,"Identifier\34List"=>1,"Identifier\34ListElem"=>1,"Identifier\34Literal"=>1,"Identifier\34LowPrecedenceNotExpression"=>1,"Identifier\34OldQualifiedIdentifier"=>1,"Identifier\34PrefixPostfixTerm"=>1,"Identifier\34QualIdent"=>1,"Identifier\34QualifiedIdentifier"=>1,"Identifier\34Statement"=>1,"Identifier\34Term"=>1,"Identifier\34Ternary"=>1,"Int\34Assignment"=>1,"Int\34BinaryExpression"=>1,"Int\34CommaList"=>1,"Int\34ConditionalExpression"=>1,"Int\34Document"=>1,"Int\34Expr"=>1,"Int\34Expression"=>1,"Int\34List"=>1,"Int\34ListElem"=>1,"Int\34Literal"=>1,"Int\34LowPrecedenceNotExpression"=>1,"Int\34Num"=>1,"Int\34Number"=>1,"Int\34PrefixPostfixTerm"=>1,"Int\34Statement"=>1,"Int\34Term"=>1,"Int\34Ternary"=>1,"Integer\34Assignment"=>1,"Integer\34BinaryExpression"=>1,"Integer\34CommaList"=>1,"Integer\34ConditionalExpression"=>1,"Integer\34Document"=>1,"Integer\34Expr"=>1,"Integer\34Expression"=>1,"Integer\34List"=>1,"Integer\34ListElem"=>1,"Integer\34Literal"=>1,"Integer\34LowPrecedenceNotExpression"=>1,"Integer\34Num"=>1,"Integer\34Number"=>1,"Integer\34PrefixPostfixTerm"=>1,"Integer\34Statement"=>1,"Integer\34Term"=>1,"Integer\34Ternary"=>1,"Keyword\34Document"=>1,"Keyword\34Statement"=>1,"Label\34Document"=>1,"Label\34Statement"=>1,"List\34Document"=>1,"List\34Expr"=>1,"List\34Expression"=>1,"List\34LowPrecedenceNotExpression"=>1,"List\34Statement"=>1,"ListElem\34Assignment"=>1,"ListElem\34CommaList"=>1,"ListElem\34Document"=>1,"ListElem\34Expr"=>1,"ListElem\34Expression"=>1,"ListElem\34List"=>1,"ListElem\34LowPrecedenceNotExpression"=>1,"ListElem\34Statement"=>1,"Literal\34Assignment"=>1,"Literal\34BinaryExpression"=>1,"Literal\34CommaList"=>1,"Literal\34ConditionalExpression"=>1,"Literal\34Document"=>1,"Literal\34Expr"=>1,"Literal\34Expression"=>1,"Literal\34List"=>1,"Literal\34ListElem"=>1,"Literal\34LowPrecedenceNotExpression"=>1,"Literal\34PrefixPostfixTerm"=>1,"Literal\34Statement"=>1,"Literal\34Term"=>1,"Literal\34Ternary"=>1,"LowPrecedenceNotExpression\34Document"=>1,"LowPrecedenceNotExpression\34Expr"=>1,"LowPrecedenceNotExpression\34Expression"=>1,"LowPrecedenceNotExpression\34Statement"=>1,"Lvalue\34Assignment"=>1,"Lvalue\34BinaryExpression"=>1,"Lvalue\34CommaList"=>1,"Lvalue\34ConditionalExpression"=>1,"Lvalue\34Document"=>1,"Lvalue\34Expr"=>1,"Lvalue\34Expression"=>1,"Lvalue\34List"=>1,"Lvalue\34ListElem"=>1,"Lvalue\34LowPrecedenceNotExpression"=>1,"Lvalue\34PrefixPostfixTerm"=>1,"Lvalue\34Statement"=>1,"Lvalue\34Term"=>1,"Lvalue\34Ternary"=>1,"Match\34Assignment"=>1,"Match\34BinaryExpression"=>1,"Match\34CommaList"=>1,"Match\34ConditionalExpression"=>1,"Match\34Document"=>1,"Match\34Expr"=>1,"Match\34Expression"=>1,"Match\34List"=>1,"Match\34ListElem"=>1,"Match\34LowPrecedenceNotExpression"=>1,"Match\34PrefixPostfixTerm"=>1,"Match\34Quotelike"=>1,"Match\34Regex"=>1,"Match\34Regexp"=>1,"Match\34Statement"=>1,"Match\34Term"=>1,"Match\34Ternary"=>1,"NullaryBuiltinFunction\34Assignment"=>1,"NullaryBuiltinFunction\34BinaryExpression"=>1,"NullaryBuiltinFunction\34BuiltinFunction"=>1,"NullaryBuiltinFunction\34Call"=>1,"NullaryBuiltinFunction\34CommaList"=>1,"NullaryBuiltinFunction\34ConditionalExpression"=>1,"NullaryBuiltinFunction\34Document"=>1,"NullaryBuiltinFunction\34Expr"=>1,"NullaryBuiltinFunction\34Expression"=>1,"NullaryBuiltinFunction\34List"=>1,"NullaryBuiltinFunction\34ListElem"=>1,"NullaryBuiltinFunction\34LowPrecedenceNotExpression"=>1,"NullaryBuiltinFunction\34PrefixPostfixTerm"=>1,"NullaryBuiltinFunction\34Statement"=>1,"NullaryBuiltinFunction\34Term"=>1,"NullaryBuiltinFunction\34Ternary"=>1,"Num\34Assignment"=>1,"Num\34BinaryExpression"=>1,"Num\34CommaList"=>1,"Num\34ConditionalExpression"=>1,"Num\34Document"=>1,"Num\34Expr"=>1,"Num\34Expression"=>1,"Num\34List"=>1,"Num\34ListElem"=>1,"Num\34Literal"=>1,"Num\34LowPrecedenceNotExpression"=>1,"Num\34PrefixPostfixTerm"=>1,"Num\34Statement"=>1,"Num\34Term"=>1,"Num\34Ternary"=>1,"Number\34Assignment"=>1,"Number\34BinaryExpression"=>1,"Number\34CommaList"=>1,"Number\34ConditionalExpression"=>1,"Number\34Document"=>1,"Number\34Expr"=>1,"Number\34Expression"=>1,"Number\34List"=>1,"Number\34ListElem"=>1,"Number\34Literal"=>1,"Number\34LowPrecedenceNotExpression"=>1,"Number\34PrefixPostfixTerm"=>1,"Number\34Statement"=>1,"Number\34Term"=>1,"Number\34Ternary"=>1,"NWS\34OWS"=>1,"OldQualifiedIdentifier\34Assignment"=>1,"OldQualifiedIdentifier\34Bareword"=>1,"OldQualifiedIdentifier\34BinaryExpression"=>1,"OldQualifiedIdentifier\34CommaList"=>1,"OldQualifiedIdentifier\34ConditionalExpression"=>1,"OldQualifiedIdentifier\34Document"=>1,"OldQualifiedIdentifier\34Expr"=>1,"OldQualifiedIdentifier\34Expression"=>1,"OldQualifiedIdentifier\34List"=>1,"OldQualifiedIdentifier\34ListElem"=>1,"OldQualifiedIdentifier\34Literal"=>1,"OldQualifiedIdentifier\34LowPrecedenceNotExpression"=>1,"OldQualifiedIdentifier\34PrefixPostfixTerm"=>1,"OldQualifiedIdentifier\34Statement"=>1,"OldQualifiedIdentifier\34Term"=>1,"OldQualifiedIdentifier\34Ternary"=>1,"PackageDeclaration\34Document"=>1,"PackageDeclaration\34Statement"=>1,"ParensList\34Assignment"=>1,"ParensList\34BinaryExpression"=>1,"ParensList\34CommaList"=>1,"ParensList\34ConditionalExpression"=>1,"ParensList\34Document"=>1,"ParensList\34Expr"=>1,"ParensList\34Expression"=>1,"ParensList\34List"=>1,"ParensList\34ListElem"=>1,"ParensList\34LowPrecedenceNotExpression"=>1,"ParensList\34PrefixPostfixTerm"=>1,"ParensList\34Statement"=>1,"ParensList\34Term"=>1,"ParensList\34Ternary"=>1,"ParenthesesList\34Assignment"=>1,"ParenthesesList\34BinaryExpression"=>1,"ParenthesesList\34CommaList"=>1,"ParenthesesList\34ConditionalExpression"=>1,"ParenthesesList\34Document"=>1,"ParenthesesList\34Expr"=>1,"ParenthesesList\34Expression"=>1,"ParenthesesList\34List"=>1,"ParenthesesList\34ListElem"=>1,"ParenthesesList\34LowPrecedenceNotExpression"=>1,"ParenthesesList\34PrefixPostfixTerm"=>1,"ParenthesesList\34Statement"=>1,"ParenthesesList\34Term"=>1,"ParenthesesList\34Ternary"=>1,"Pod\34NWS"=>1,"Pod\34OWS"=>1,"Pod\34Whitespace"=>1,"PosInt\34Assignment"=>1,"PosInt\34BinaryExpression"=>1,"PosInt\34CommaList"=>1,"PosInt\34ConditionalExpression"=>1,"PosInt\34Document"=>1,"PosInt\34Expr"=>1,"PosInt\34Expression"=>1,"PosInt\34Int"=>1,"PosInt\34Integer"=>1,"PosInt\34List"=>1,"PosInt\34ListElem"=>1,"PosInt\34Literal"=>1,"PosInt\34LowPrecedenceNotExpression"=>1,"PosInt\34Num"=>1,"PosInt\34Number"=>1,"PosInt\34PrefixPostfixTerm"=>1,"PosInt\34Statement"=>1,"PosInt\34Term"=>1,"PosInt\34Ternary"=>1,"PositiveInteger\34Assignment"=>1,"PositiveInteger\34BinaryExpression"=>1,"PositiveInteger\34CommaList"=>1,"PositiveInteger\34ConditionalExpression"=>1,"PositiveInteger\34Document"=>1,"PositiveInteger\34Expr"=>1,"PositiveInteger\34Expression"=>1,"PositiveInteger\34Int"=>1,"PositiveInteger\34Integer"=>1,"PositiveInteger\34List"=>1,"PositiveInteger\34ListElem"=>1,"PositiveInteger\34Literal"=>1,"PositiveInteger\34LowPrecedenceNotExpression"=>1,"PositiveInteger\34Num"=>1,"PositiveInteger\34Number"=>1,"PositiveInteger\34PrefixPostfixTerm"=>1,"PositiveInteger\34Statement"=>1,"PositiveInteger\34Term"=>1,"PositiveInteger\34Ternary"=>1,"PrefixPostfixTerm\34Assignment"=>1,"PrefixPostfixTerm\34BinaryExpression"=>1,"PrefixPostfixTerm\34CommaList"=>1,"PrefixPostfixTerm\34ConditionalExpression"=>1,"PrefixPostfixTerm\34Document"=>1,"PrefixPostfixTerm\34Expr"=>1,"PrefixPostfixTerm\34Expression"=>1,"PrefixPostfixTerm\34List"=>1,"PrefixPostfixTerm\34ListElem"=>1,"PrefixPostfixTerm\34LowPrecedenceNotExpression"=>1,"PrefixPostfixTerm\34Statement"=>1,"PrefixPostfixTerm\34Ternary"=>1,"QualIdent\34Assignment"=>1,"QualIdent\34Bareword"=>1,"QualIdent\34BinaryExpression"=>1,"QualIdent\34CommaList"=>1,"QualIdent\34ConditionalExpression"=>1,"QualIdent\34Document"=>1,"QualIdent\34Expr"=>1,"QualIdent\34Expression"=>1,"QualIdent\34List"=>1,"QualIdent\34ListElem"=>1,"QualIdent\34Literal"=>1,"QualIdent\34LowPrecedenceNotExpression"=>1,"QualIdent\34OldQualifiedIdentifier"=>1,"QualIdent\34PrefixPostfixTerm"=>1,"QualIdent\34Statement"=>1,"QualIdent\34Term"=>1,"QualIdent\34Ternary"=>1,"QualifiedIdentifier\34Assignment"=>1,"QualifiedIdentifier\34Bareword"=>1,"QualifiedIdentifier\34BinaryExpression"=>1,"QualifiedIdentifier\34CommaList"=>1,"QualifiedIdentifier\34ConditionalExpression"=>1,"QualifiedIdentifier\34Document"=>1,"QualifiedIdentifier\34Expr"=>1,"QualifiedIdentifier\34Expression"=>1,"QualifiedIdentifier\34List"=>1,"QualifiedIdentifier\34ListElem"=>1,"QualifiedIdentifier\34Literal"=>1,"QualifiedIdentifier\34LowPrecedenceNotExpression"=>1,"QualifiedIdentifier\34OldQualifiedIdentifier"=>1,"QualifiedIdentifier\34PrefixPostfixTerm"=>1,"QualifiedIdentifier\34Statement"=>1,"QualifiedIdentifier\34Term"=>1,"QualifiedIdentifier\34Ternary"=>1,"Quotelike\34Assignment"=>1,"Quotelike\34BinaryExpression"=>1,"Quotelike\34CommaList"=>1,"Quotelike\34ConditionalExpression"=>1,"Quotelike\34Document"=>1,"Quotelike\34Expr"=>1,"Quotelike\34Expression"=>1,"Quotelike\34List"=>1,"Quotelike\34ListElem"=>1,"Quotelike\34LowPrecedenceNotExpression"=>1,"Quotelike\34PrefixPostfixTerm"=>1,"Quotelike\34Statement"=>1,"Quotelike\34Term"=>1,"Quotelike\34Ternary"=>1,"QuotelikeM\34Assignment"=>1,"QuotelikeM\34BinaryExpression"=>1,"QuotelikeM\34CommaList"=>1,"QuotelikeM\34ConditionalExpression"=>1,"QuotelikeM\34Document"=>1,"QuotelikeM\34Expr"=>1,"QuotelikeM\34Expression"=>1,"QuotelikeM\34List"=>1,"QuotelikeM\34ListElem"=>1,"QuotelikeM\34LowPrecedenceNotExpression"=>1,"QuotelikeM\34PrefixPostfixTerm"=>1,"QuotelikeM\34Quotelike"=>1,"QuotelikeM\34Regex"=>1,"QuotelikeM\34Regexp"=>1,"QuotelikeM\34Statement"=>1,"QuotelikeM\34Term"=>1,"QuotelikeM\34Ternary"=>1,"QuotelikeQ\34Assignment"=>1,"QuotelikeQ\34BinaryExpression"=>1,"QuotelikeQ\34CommaList"=>1,"QuotelikeQ\34ConditionalExpression"=>1,"QuotelikeQ\34Document"=>1,"QuotelikeQ\34Expr"=>1,"QuotelikeQ\34Expression"=>1,"QuotelikeQ\34List"=>1,"QuotelikeQ\34ListElem"=>1,"QuotelikeQ\34Literal"=>1,"QuotelikeQ\34LowPrecedenceNotExpression"=>1,"QuotelikeQ\34PrefixPostfixTerm"=>1,"QuotelikeQ\34Quotelike"=>1,"QuotelikeQ\34Statement"=>1,"QuotelikeQ\34Str"=>1,"QuotelikeQ\34String"=>1,"QuotelikeQ\34Term"=>1,"QuotelikeQ\34Ternary"=>1,"QuotelikeQQ\34Assignment"=>1,"QuotelikeQQ\34BinaryExpression"=>1,"QuotelikeQQ\34CommaList"=>1,"QuotelikeQQ\34ConditionalExpression"=>1,"QuotelikeQQ\34Document"=>1,"QuotelikeQQ\34Expr"=>1,"QuotelikeQQ\34Expression"=>1,"QuotelikeQQ\34List"=>1,"QuotelikeQQ\34ListElem"=>1,"QuotelikeQQ\34Literal"=>1,"QuotelikeQQ\34LowPrecedenceNotExpression"=>1,"QuotelikeQQ\34PrefixPostfixTerm"=>1,"QuotelikeQQ\34Quotelike"=>1,"QuotelikeQQ\34Statement"=>1,"QuotelikeQQ\34Str"=>1,"QuotelikeQQ\34String"=>1,"QuotelikeQQ\34Term"=>1,"QuotelikeQQ\34Ternary"=>1,"QuotelikeQR\34Assignment"=>1,"QuotelikeQR\34BinaryExpression"=>1,"QuotelikeQR\34CommaList"=>1,"QuotelikeQR\34ConditionalExpression"=>1,"QuotelikeQR\34ContextualRegex"=>1,"QuotelikeQR\34Document"=>1,"QuotelikeQR\34Expr"=>1,"QuotelikeQR\34Expression"=>1,"QuotelikeQR\34List"=>1,"QuotelikeQR\34ListElem"=>1,"QuotelikeQR\34LowPrecedenceNotExpression"=>1,"QuotelikeQR\34PrefixPostfixTerm"=>1,"QuotelikeQR\34Quotelike"=>1,"QuotelikeQR\34Regex"=>1,"QuotelikeQR\34Regexp"=>1,"QuotelikeQR\34Statement"=>1,"QuotelikeQR\34Term"=>1,"QuotelikeQR\34Ternary"=>1,"QuotelikeQW\34Assignment"=>1,"QuotelikeQW\34BinaryExpression"=>1,"QuotelikeQW\34CommaList"=>1,"QuotelikeQW\34ConditionalExpression"=>1,"QuotelikeQW\34Document"=>1,"QuotelikeQW\34Expr"=>1,"QuotelikeQW\34Expression"=>1,"QuotelikeQW\34List"=>1,"QuotelikeQW\34ListElem"=>1,"QuotelikeQW\34LowPrecedenceNotExpression"=>1,"QuotelikeQW\34PrefixPostfixTerm"=>1,"QuotelikeQW\34Quotelike"=>1,"QuotelikeQW\34Statement"=>1,"QuotelikeQW\34Term"=>1,"QuotelikeQW\34Ternary"=>1,"QuotelikeQX\34Assignment"=>1,"QuotelikeQX\34BinaryExpression"=>1,"QuotelikeQX\34CommaList"=>1,"QuotelikeQX\34ConditionalExpression"=>1,"QuotelikeQX\34Document"=>1,"QuotelikeQX\34Expr"=>1,"QuotelikeQX\34Expression"=>1,"QuotelikeQX\34List"=>1,"QuotelikeQX\34ListElem"=>1,"QuotelikeQX\34LowPrecedenceNotExpression"=>1,"QuotelikeQX\34PrefixPostfixTerm"=>1,"QuotelikeQX\34Quotelike"=>1,"QuotelikeQX\34Statement"=>1,"QuotelikeQX\34Term"=>1,"QuotelikeQX\34Ternary"=>1,"QuotelikeS\34Assignment"=>1,"QuotelikeS\34BinaryExpression"=>1,"QuotelikeS\34CommaList"=>1,"QuotelikeS\34ConditionalExpression"=>1,"QuotelikeS\34Document"=>1,"QuotelikeS\34Expr"=>1,"QuotelikeS\34Expression"=>1,"QuotelikeS\34List"=>1,"QuotelikeS\34ListElem"=>1,"QuotelikeS\34LowPrecedenceNotExpression"=>1,"QuotelikeS\34PrefixPostfixTerm"=>1,"QuotelikeS\34Quotelike"=>1,"QuotelikeS\34Statement"=>1,"QuotelikeS\34Term"=>1,"QuotelikeS\34Ternary"=>1,"QuotelikeTR\34Assignment"=>1,"QuotelikeTR\34BinaryExpression"=>1,"QuotelikeTR\34CommaList"=>1,"QuotelikeTR\34ConditionalExpression"=>1,"QuotelikeTR\34Document"=>1,"QuotelikeTR\34Expr"=>1,"QuotelikeTR\34Expression"=>1,"QuotelikeTR\34List"=>1,"QuotelikeTR\34ListElem"=>1,"QuotelikeTR\34LowPrecedenceNotExpression"=>1,"QuotelikeTR\34PrefixPostfixTerm"=>1,"QuotelikeTR\34Quotelike"=>1,"QuotelikeTR\34Statement"=>1,"QuotelikeTR\34Term"=>1,"QuotelikeTR\34Ternary"=>1,"Regex\34Assignment"=>1,"Regex\34BinaryExpression"=>1,"Regex\34CommaList"=>1,"Regex\34ConditionalExpression"=>1,"Regex\34Document"=>1,"Regex\34Expr"=>1,"Regex\34Expression"=>1,"Regex\34List"=>1,"Regex\34ListElem"=>1,"Regex\34LowPrecedenceNotExpression"=>1,"Regex\34PrefixPostfixTerm"=>1,"Regex\34Quotelike"=>1,"Regex\34Statement"=>1,"Regex\34Term"=>1,"Regex\34Ternary"=>1,"Regexp\34Assignment"=>1,"Regexp\34BinaryExpression"=>1,"Regexp\34CommaList"=>1,"Regexp\34ConditionalExpression"=>1,"Regexp\34Document"=>1,"Regexp\34Expr"=>1,"Regexp\34Expression"=>1,"Regexp\34List"=>1,"Regexp\34ListElem"=>1,"Regexp\34LowPrecedenceNotExpression"=>1,"Regexp\34PrefixPostfixTerm"=>1,"Regexp\34Quotelike"=>1,"Regexp\34Statement"=>1,"Regexp\34Term"=>1,"Regexp\34Ternary"=>1,"ReturnStatement\34Assignment"=>1,"ReturnStatement\34BinaryExpression"=>1,"ReturnStatement\34CommaList"=>1,"ReturnStatement\34ConditionalExpression"=>1,"ReturnStatement\34Document"=>1,"ReturnStatement\34Expr"=>1,"ReturnStatement\34Expression"=>1,"ReturnStatement\34List"=>1,"ReturnStatement\34ListElem"=>1,"ReturnStatement\34LowPrecedenceNotExpression"=>1,"ReturnStatement\34PrefixPostfixTerm"=>1,"ReturnStatement\34Statement"=>1,"ReturnStatement\34Term"=>1,"ReturnStatement\34Ternary"=>1,"ScalarAccess\34Assignment"=>1,"ScalarAccess\34BinaryExpression"=>1,"ScalarAccess\34CommaList"=>1,"ScalarAccess\34ConditionalExpression"=>1,"ScalarAccess\34Document"=>1,"ScalarAccess\34Expr"=>1,"ScalarAccess\34Expression"=>1,"ScalarAccess\34List"=>1,"ScalarAccess\34ListElem"=>1,"ScalarAccess\34LowPrecedenceNotExpression"=>1,"ScalarAccess\34PrefixPostfixTerm"=>1,"ScalarAccess\34Statement"=>1,"ScalarAccess\34Term"=>1,"ScalarAccess\34Ternary"=>1,"ScalarAccess\34Var"=>1,"ScalarAccess\34Variable"=>1,"ScalarVar\34Assignment"=>1,"ScalarVar\34BinaryExpression"=>1,"ScalarVar\34CommaList"=>1,"ScalarVar\34ConditionalExpression"=>1,"ScalarVar\34Document"=>1,"ScalarVar\34Expr"=>1,"ScalarVar\34Expression"=>1,"ScalarVar\34List"=>1,"ScalarVar\34ListElem"=>1,"ScalarVar\34LowPrecedenceNotExpression"=>1,"ScalarVar\34PrefixPostfixTerm"=>1,"ScalarVar\34ScalarAccess"=>1,"ScalarVar\34Statement"=>1,"ScalarVar\34Term"=>1,"ScalarVar\34Ternary"=>1,"ScalarVar\34Var"=>1,"ScalarVar\34Variable"=>1,"Statement\34Document"=>1,"Str\34Assignment"=>1,"Str\34BinaryExpression"=>1,"Str\34CommaList"=>1,"Str\34ConditionalExpression"=>1,"Str\34Document"=>1,"Str\34Expr"=>1,"Str\34Expression"=>1,"Str\34List"=>1,"Str\34ListElem"=>1,"Str\34Literal"=>1,"Str\34LowPrecedenceNotExpression"=>1,"Str\34PrefixPostfixTerm"=>1,"Str\34Quotelike"=>1,"Str\34Statement"=>1,"Str\34Term"=>1,"Str\34Ternary"=>1,"String\34Assignment"=>1,"String\34BinaryExpression"=>1,"String\34CommaList"=>1,"String\34ConditionalExpression"=>1,"String\34Document"=>1,"String\34Expr"=>1,"String\34Expression"=>1,"String\34List"=>1,"String\34ListElem"=>1,"String\34Literal"=>1,"String\34LowPrecedenceNotExpression"=>1,"String\34PrefixPostfixTerm"=>1,"String\34Quotelike"=>1,"String\34Statement"=>1,"String\34Term"=>1,"String\34Ternary"=>1,"SubroutineDeclaration\34Document"=>1,"SubroutineDeclaration\34Statement"=>1,"Substitution\34Assignment"=>1,"Substitution\34BinaryExpression"=>1,"Substitution\34CommaList"=>1,"Substitution\34ConditionalExpression"=>1,"Substitution\34Document"=>1,"Substitution\34Expr"=>1,"Substitution\34Expression"=>1,"Substitution\34List"=>1,"Substitution\34ListElem"=>1,"Substitution\34LowPrecedenceNotExpression"=>1,"Substitution\34PrefixPostfixTerm"=>1,"Substitution\34Quotelike"=>1,"Substitution\34Statement"=>1,"Substitution\34Term"=>1,"Substitution\34Ternary"=>1,"Term\34Assignment"=>1,"Term\34BinaryExpression"=>1,"Term\34CommaList"=>1,"Term\34ConditionalExpression"=>1,"Term\34Document"=>1,"Term\34Expr"=>1,"Term\34Expression"=>1,"Term\34List"=>1,"Term\34ListElem"=>1,"Term\34LowPrecedenceNotExpression"=>1,"Term\34PrefixPostfixTerm"=>1,"Term\34Statement"=>1,"Term\34Ternary"=>1,"Ternary\34Assignment"=>1,"Ternary\34CommaList"=>1,"Ternary\34Document"=>1,"Ternary\34Expr"=>1,"Ternary\34Expression"=>1,"Ternary\34List"=>1,"Ternary\34LowPrecedenceNotExpression"=>1,"Ternary\34Statement"=>1,"Transliteration\34Assignment"=>1,"Transliteration\34BinaryExpression"=>1,"Transliteration\34CommaList"=>1,"Transliteration\34ConditionalExpression"=>1,"Transliteration\34Document"=>1,"Transliteration\34Expr"=>1,"Transliteration\34Expression"=>1,"Transliteration\34List"=>1,"Transliteration\34ListElem"=>1,"Transliteration\34LowPrecedenceNotExpression"=>1,"Transliteration\34PrefixPostfixTerm"=>1,"Transliteration\34Quotelike"=>1,"Transliteration\34Statement"=>1,"Transliteration\34Term"=>1,"Transliteration\34Ternary"=>1,"Typeglob\34Assignment"=>1,"Typeglob\34BinaryExpression"=>1,"Typeglob\34CommaList"=>1,"Typeglob\34ConditionalExpression"=>1,"Typeglob\34Document"=>1,"Typeglob\34Expr"=>1,"Typeglob\34Expression"=>1,"Typeglob\34List"=>1,"Typeglob\34ListElem"=>1,"Typeglob\34LowPrecedenceNotExpression"=>1,"Typeglob\34PrefixPostfixTerm"=>1,"Typeglob\34Statement"=>1,"Typeglob\34Term"=>1,"Typeglob\34Ternary"=>1,"UseStatement\34Document"=>1,"UseStatement\34Statement"=>1,"Var\34Assignment"=>1,"Var\34BinaryExpression"=>1,"Var\34CommaList"=>1,"Var\34ConditionalExpression"=>1,"Var\34Document"=>1,"Var\34Expr"=>1,"Var\34Expression"=>1,"Var\34List"=>1,"Var\34ListElem"=>1,"Var\34LowPrecedenceNotExpression"=>1,"Var\34PrefixPostfixTerm"=>1,"Var\34Statement"=>1,"Var\34Term"=>1,"Var\34Ternary"=>1,"VarArray\34ArrayAccess"=>1,"VarArray\34Assignment"=>1,"VarArray\34BinaryExpression"=>1,"VarArray\34CommaList"=>1,"VarArray\34ConditionalExpression"=>1,"VarArray\34Document"=>1,"VarArray\34Expr"=>1,"VarArray\34Expression"=>1,"VarArray\34List"=>1,"VarArray\34ListElem"=>1,"VarArray\34LowPrecedenceNotExpression"=>1,"VarArray\34PrefixPostfixTerm"=>1,"VarArray\34Statement"=>1,"VarArray\34Term"=>1,"VarArray\34Ternary"=>1,"VarArray\34Var"=>1,"VarArray\34Variable"=>1,"VarDecl\34Assignment"=>1,"VarDecl\34BinaryExpression"=>1,"VarDecl\34CommaList"=>1,"VarDecl\34ConditionalExpression"=>1,"VarDecl\34Document"=>1,"VarDecl\34Expr"=>1,"VarDecl\34Expression"=>1,"VarDecl\34List"=>1,"VarDecl\34ListElem"=>1,"VarDecl\34LowPrecedenceNotExpression"=>1,"VarDecl\34PrefixPostfixTerm"=>1,"VarDecl\34Statement"=>1,"VarDecl\34Term"=>1,"VarDecl\34Ternary"=>1,"VarHash\34Assignment"=>1,"VarHash\34BinaryExpression"=>1,"VarHash\34CommaList"=>1,"VarHash\34ConditionalExpression"=>1,"VarHash\34Document"=>1,"VarHash\34Expr"=>1,"VarHash\34Expression"=>1,"VarHash\34HashAccess"=>1,"VarHash\34List"=>1,"VarHash\34ListElem"=>1,"VarHash\34LowPrecedenceNotExpression"=>1,"VarHash\34PrefixPostfixTerm"=>1,"VarHash\34Statement"=>1,"VarHash\34Term"=>1,"VarHash\34Ternary"=>1,"VarHash\34Var"=>1,"VarHash\34Variable"=>1,"Variable\34Assignment"=>1,"Variable\34BinaryExpression"=>1,"Variable\34CommaList"=>1,"Variable\34ConditionalExpression"=>1,"Variable\34Document"=>1,"Variable\34Expr"=>1,"Variable\34Expression"=>1,"Variable\34List"=>1,"Variable\34ListElem"=>1,"Variable\34LowPrecedenceNotExpression"=>1,"Variable\34PrefixPostfixTerm"=>1,"Variable\34Statement"=>1,"Variable\34Term"=>1,"Variable\34Ternary"=>1,"VariableArray\34ArrayAccess"=>1,"VariableArray\34Assignment"=>1,"VariableArray\34BinaryExpression"=>1,"VariableArray\34CommaList"=>1,"VariableArray\34ConditionalExpression"=>1,"VariableArray\34Document"=>1,"VariableArray\34Expr"=>1,"VariableArray\34Expression"=>1,"VariableArray\34List"=>1,"VariableArray\34ListElem"=>1,"VariableArray\34LowPrecedenceNotExpression"=>1,"VariableArray\34PrefixPostfixTerm"=>1,"VariableArray\34Statement"=>1,"VariableArray\34Term"=>1,"VariableArray\34Ternary"=>1,"VariableArray\34Var"=>1,"VariableArray\34Variable"=>1,"VariableDeclaration\34Assignment"=>1,"VariableDeclaration\34BinaryExpression"=>1,"VariableDeclaration\34CommaList"=>1,"VariableDeclaration\34ConditionalExpression"=>1,"VariableDeclaration\34Document"=>1,"VariableDeclaration\34Expr"=>1,"VariableDeclaration\34Expression"=>1,"VariableDeclaration\34List"=>1,"VariableDeclaration\34ListElem"=>1,"VariableDeclaration\34LowPrecedenceNotExpression"=>1,"VariableDeclaration\34PrefixPostfixTerm"=>1,"VariableDeclaration\34Statement"=>1,"VariableDeclaration\34Term"=>1,"VariableDeclaration\34Ternary"=>1,"VariableHash\34Assignment"=>1,"VariableHash\34BinaryExpression"=>1,"VariableHash\34CommaList"=>1,"VariableHash\34ConditionalExpression"=>1,"VariableHash\34Document"=>1,"VariableHash\34Expr"=>1,"VariableHash\34Expression"=>1,"VariableHash\34HashAccess"=>1,"VariableHash\34List"=>1,"VariableHash\34ListElem"=>1,"VariableHash\34LowPrecedenceNotExpression"=>1,"VariableHash\34PrefixPostfixTerm"=>1,"VariableHash\34Statement"=>1,"VariableHash\34Term"=>1,"VariableHash\34Ternary"=>1,"VariableHash\34Var"=>1,"VariableHash\34Variable"=>1,"VariableScalar\34Assignment"=>1,"VariableScalar\34BinaryExpression"=>1,"VariableScalar\34CommaList"=>1,"VariableScalar\34ConditionalExpression"=>1,"VariableScalar\34Document"=>1,"VariableScalar\34Expr"=>1,"VariableScalar\34Expression"=>1,"VariableScalar\34List"=>1,"VariableScalar\34ListElem"=>1,"VariableScalar\34LowPrecedenceNotExpression"=>1,"VariableScalar\34PrefixPostfixTerm"=>1,"VariableScalar\34ScalarAccess"=>1,"VariableScalar\34Statement"=>1,"VariableScalar\34Term"=>1,"VariableScalar\34Ternary"=>1,"VariableScalar\34Var"=>1,"VariableScalar\34Variable"=>1,"VarScalar\34Assignment"=>1,"VarScalar\34BinaryExpression"=>1,"VarScalar\34CommaList"=>1,"VarScalar\34ConditionalExpression"=>1,"VarScalar\34Document"=>1,"VarScalar\34Expr"=>1,"VarScalar\34Expression"=>1,"VarScalar\34List"=>1,"VarScalar\34ListElem"=>1,"VarScalar\34LowPrecedenceNotExpression"=>1,"VarScalar\34PrefixPostfixTerm"=>1,"VarScalar\34ScalarAccess"=>1,"VarScalar\34Statement"=>1,"VarScalar\34Term"=>1,"VarScalar\34Ternary"=>1,"VarScalar\34Var"=>1,"VarScalar\34Variable"=>1,"VersionNumber\34Assignment"=>1,"VersionNumber\34BinaryExpression"=>1,"VersionNumber\34CommaList"=>1,"VersionNumber\34ConditionalExpression"=>1,"VersionNumber\34Document"=>1,"VersionNumber\34Expr"=>1,"VersionNumber\34Expression"=>1,"VersionNumber\34List"=>1,"VersionNumber\34ListElem"=>1,"VersionNumber\34Literal"=>1,"VersionNumber\34LowPrecedenceNotExpression"=>1,"VersionNumber\34Num"=>1,"VersionNumber\34Number"=>1,"VersionNumber\34PrefixPostfixTerm"=>1,"VersionNumber\34Statement"=>1,"VersionNumber\34Term"=>1,"VersionNumber\34Ternary"=>1,"VString\34Assignment"=>1,"VString\34BinaryExpression"=>1,"VString\34CommaList"=>1,"VString\34ConditionalExpression"=>1,"VString\34Document"=>1,"VString\34Expr"=>1,"VString\34Expression"=>1,"VString\34List"=>1,"VString\34ListElem"=>1,"VString\34Literal"=>1,"VString\34LowPrecedenceNotExpression"=>1,"VString\34Num"=>1,"VString\34Number"=>1,"VString\34PrefixPostfixTerm"=>1,"VString\34Statement"=>1,"VString\34Str"=>1,"VString\34String"=>1,"VString\34Term"=>1,"VString\34Ternary"=>1,"VString\34VersionNumber"=>1,"Whitespace\34OWS"=>1,
+
+# End of autogenerated type ISA hierarchy
+
+);
+
+# Convert type aliases into standard PPR types...
+sub _resolve_type {
+    my ($type, $user_defined_type_for) = @_;
+
+    # Identify valid user-defined types in the current calling scope...
+    $user_defined_type_for //= { map { m{ \A Keyword::Declare \s* keytype: (\w+) = (.*) }xms } keys %^H };
+
+    while ($type =~ /\A \w++ \Z/x) {
+        $type = $user_defined_type_for->{$type}
+             // $ACTUAL_TYPE_OF{$type}
+             // croak "Unknown type ($type) for keyword parameter.\nDid you mean: ",
+                     join(' or ', grep { lc substr($_,0,1) eq lc substr($type,0,1) } keys %ACTUAL_TYPE_OF);
+    }
+
+    if ($type =~ m{\A (?: q\s*\S | ' ) (.*) \S \z }x) {
+        return quotemeta $1
+    }
+    elsif ($type =~ $REGEX_TYPE ) {
+        $type =~ $REGEX_PAT or die "Keyword::Declare internal error: weird regex";
+        return $+{pattern} =~ s{(?<!\\)/}{\\/}gr;
+    }
+    elsif ($type =~ $TYPE_JUNCTION) {
+        return join '|', map { _resolve_type($_, $user_defined_type_for) } split /[|]/, $type;
+    }
+    else {
+        die 'Keyword::Declare internal error: incomprehensible type: [$type]';
+    }
+
+}
+
+
+# Convert the keyword's parameter list to various useful representations...
+sub _unpack_signature {
+    my ($keyword_info_ref) = @_;
+
+    # We're setting up all these entries...
+    my $sig_vars                          = "";  # List of variables into which keyword args are unpacked
+    $keyword_info_ref->{sig_vars_unpack}  = "";  # Statements that unpack keyword args
+    $keyword_info_ref->{sig_matcher}      = "";  # Pattern that matches entire arg list
+    $keyword_info_ref->{sig_skip_matcher} = "";  # Pattern that matches entire arg list without captures
+    $keyword_info_ref->{sig}              = [];  # Array of parameter types
+    $keyword_info_ref->{sig_quantified}   = [];  # Array of quantified parameter types
+    $keyword_info_ref->{sig_names}        = [];  # Names of each parameter ("" if no unnamed)
+    $keyword_info_ref->{sig_defaults}     = {};  # Defaults for any parameter that has them
+
+    # Walk through the parameters...
+    my $not_post = 1;
+    for my $param (@{$keyword_info_ref->{param_list}}) {
+        if (!defined($param)) {
+            $not_post = 0;
+            next;
+        }
+
+        my $matcher;    # Accumulates a regex to match this parameter
+
+        # Convert type specification to PPR subrule invocations and build a description...
+        # ...for named types...
+        my $type = $param->{type};
+        if ($type =~ m{\A \w++ (?: [|] \w++ )* \Z}x) {
+            # Extract component types...
+            my @types = split /[|]/, $type;
+
+            # First set up pseudo-inheritance...
+            for my $component_type (@types) {
+                $isa{$component_type, $type} = 1;
+            }
+
+            # Convert component types to regexes...
+            $param->{desc} //= ($param->{name} ? "<$param->{name}>" : '<'.join(' or ', @types).'>') =~ tr/_/ /r;
+            $type = '/' . join('|', map { _resolve_type( $_ ) } @types) . '/';
+
+        }
+
+        # ...for literal string types...
+        if ($type =~ m{\A (?: q\s*\S | ' ) (.*) \S \z }x) {
+            $param->{desc} //= ($param->{name} ? "<$param->{name}>" =~ tr/_/ /r : $1);
+            $matcher = '(?:' . quotemeta($1) . ')';
+        }
+
+        # ...for regex types...
+        elsif ($type =~ $REGEX_TYPE ) {
+            $type =~ $REGEX_PAT or die "Keyword::Declare internal error: weird regex";
+            my %match = %+;
+            $match{pattern} =~ s{(?<!\\)/}{\\/}g;
+            $param->{desc} //= ($param->{name} ? "<$param->{name}>" =~ tr/_/ /r : "/$match{pattern}/$match{modifiers}");
+            $matcher = "(?$match{modifiers}:$match{pattern})";
+        }
+
+        # Incomprehensible types...
+        else {
+            die "Keyword::Declare internal error: incomprehensible type: [$type]"
+        }
+
+        # Matchers also handle leading whitespace (unless they ARE whitespace)...
+        $matcher = "(?:(?&PerlOWS)$matcher)"
+            if $type !~ m{^/\(\?\&Perl[ON]WS\)/$};
+
+        # Resolve implicit quantification (and any default value)...
+        if (exists $param->{default}) {
+            $keyword_info_ref->{sig_defaults}{$param->{name}}
+                = $param->{default} =~ s{\A (?: qq? \s* \S | ["']) (.*) \S \Z }{$1}grx;
+            $param->{quantifier} //= $param->{sigil} && $param->{sigil} eq '@' ? '*' : '?';
+        }
+        else {
+            $param->{quantifier} //= $param->{sigil} && $param->{sigil} eq '@' ? '+' : '';
+        }
+
+        # Array parameters are minimally repeatable...
+        my $single_matcher = $matcher;
+        if ($param->{quantifier}) {
+            $matcher      = "(?:$matcher$param->{quantifier})";
+        }
+
+        # Named parameters have to be named captured...
+        my $skip_matcher = $matcher;
+        if ($param->{name}) {
+            $matcher = "(?<$param->{name}>$matcher)";
+        }
+
+        # Accumulate the signature matching pattern...
+        $keyword_info_ref->{sig_matcher} .= $matcher;
+        $keyword_info_ref->{sig_skip_matcher} .= $skip_matcher
+            if $not_post;
+
+        # Accumulate signature types and names (if any)...
+        push @{ $keyword_info_ref->{sig} },            $param->{type};
+        push @{ $keyword_info_ref->{sig_quantified} }, $param->{type}.$param->{quantifier};
+        push @{ $keyword_info_ref->{sig_names} },      $param->{name} // q{};
+
+        # Accumulate variable list into which parameters will be unpacked...
+        if ($param->{name}) {
+            $sig_vars                            .= "$param->{sigil}$param->{name},";
+            $keyword_info_ref->{sig_vars_unpack} .= "$param->{sigil}$param->{name} = "
+                                                  . ( $param->{sigil} eq '$'
+                                                        ? 'shift();'
+                                                        : "map { s{^(?: \\s*+ (?: [#].*\\n \\s*+ )*+)}{}rx } grep {defined && /\\S/} split m{($single_matcher \$PPR::GRAMMAR)}x, shift();"
+                                                    )
+        }
+        else {
+            $keyword_info_ref->{sig_vars_unpack} .= 'shift();';
+        }
+    }
+
+    # Build a human readable version of the signature...
+    $keyword_info_ref->{sig_desc} = '(' . join(',', @{$keyword_info_ref->{sig_quantified}}) . ')';
+
+    # Build a pretty description for debugging and error messages...
+    $keyword_info_ref->{syntax} = "$keyword_info_ref->{keyword}  "
+                                . join("  ", map { $_->{desc} } grep {defined} @Keyword::Declare::params);
+
+    # Build a regex that matches the keyword plus its arguments...
+    $keyword_info_ref->{matcher} = "$keyword_info_ref->{keyword}$keyword_info_ref->{sig_matcher}";
+    $keyword_info_ref->{skip_matcher} = "$keyword_info_ref->{keyword}$keyword_info_ref->{sig_skip_matcher}";
+
+    # Precompute the length of the signature (for multiple-dispatch tie-breaking)...
+    $keyword_info_ref->{sig_len} = scalar @{ $keyword_info_ref->{sig} };
+
+    # Consolidate the signature-unpacking code...
+    $keyword_info_ref->{sig_vars_unpack} =
+        $sig_vars ? "my ($sig_vars); $keyword_info_ref->{sig_vars_unpack}" : q{};
+}
+
+
+# Extract and verify any attrs specified on the keyword...
+sub _unpack_attrs {
+    my ($keyword_info_ref) = @_;
+
+    # Are there any keyword attrs to unpack???
+    if ($keyword_info_ref->{attrs}) {
+        # Extract any :prefer or :keepspace attr...
+        $keyword_info_ref->{prefer}
+            = $keyword_info_ref->{attrs} =~ s{\bprefer\b}{}xms;
+        $keyword_info_ref->{keepspace}
+            = $keyword_info_ref->{attrs} =~ s{\bkeepspace\b}{}xms;
+
+        # Extract any :desc(...) attr...
+        if ($keyword_info_ref->{attrs} =~ s{\bdesc\( (.*?) \)}{}xms) {
+            $keyword_info_ref->{desc} = $1;
+        }
+        else {
+            $keyword_info_ref->{desc} = $keyword_info_ref->{keyword};
+        }
+
+        # Complain about anything else...
+        croak ":then attribute specified too late (must come immediately after parameter list)"
+            if $keyword_info_ref->{attrs} =~ s{\bthen\b}{}xms;
+        croak "Invalid attribute: $keyword_info_ref->{attrs}"
+            if $keyword_info_ref->{attrs} =~ /[^\s:]/;
+    }
+}
+
+
+# Convert a {{{...}}} interpolated keyword body to a normal body...
+sub _convert_triple_block {
+    my ($block, $keyword) = @{shift()}{qw< block keyword >};
+
+    # Peel off extra curlies...
+    $block = substr($block, 3, -3);
+
+    # Report unclosed «...}> interpolations...
+    if ($block =~ m{ <\{ (?<interpolation> (?<leader> \s* \S*) .*? ) (?: <\{ | « | \Z ) }xms) {
+        my %match = %+;
+        croak qq[Missing }> on interpolation <{$match{leader}...\n]
+            . qq[in string-style block of keyword $keyword\ndefined]
+                if $match{interpolation} !~ m{ \}> }xms;
+    }
+    if ($block =~ m{ « (?<interpolation> (?<leader> \s* \S*) .*? ) (?: <\{ | « | \Z ) }xms) {
+        my %match = %+;
+        croak qq[Missing » on interpolation «$match{leader}...\n]
+            . qq[in string-style block of keyword $keyword\ndefined]
+                if $match{interpolation} !~ m{ » }xms;
+    }
+
+    # Convert the inter polated text to code that does the interpolations...
+    $block =~ s{
+            « (?<interpolation> .*? ) »
+        |
+            <\{ (?<interpolation> .*? ) \}>
+        |
+            (?<literal_code> .+? ) (?= <\{ | « | \z )
+    }{
+           if (exists $+{literal_code} ) { 'qq{' . quotemeta($+{literal_code}) . '},'; }
+        elsif (exists $+{interpolation}) { qq{ do{$+{interpolation}}, };               }
+        else { say {*STDERR} 'Keyword::Declare internal error in {{{...}}} block'; exit; }
+    }gexms;
+
+    # Build and return the block's new source code...
+    return "{ return join '', $block; }";
+}
+
+
+# Transform a keyword invocation into the code generated by the keyword's body...
+sub _insert_replacement_code {
+    my ($src_ref, $ID, $file, $line, $active_keywords) = @_;
+
+    # Unpack keyword information...
+    my $keyword = $keyword_impls[$ID];
+
+    # Remove the arguments from the source code...
+    $$src_ref =~ s{ \A ($keyword->{sig_matcher}) $active_keywords $PPR::GRAMMAR }{}xms;
+    my %args     = %+;
+    for my $argname (keys %args) {
+        $args{$argname} = $keyword->{sig_defaults}{$argname} // q{}
+            if $args{$argname} eq q{};
+    }
+    my $arg_list = $1;
+    my @args     = @args{ @{$keyword_impls[$ID]{sig_names}} };
+
+    # Tidy them, if requested...
+    @args = map {
+        !defined($_) ? undef : m{\S} ? s{\A\s*+(?:\#.*\n\s*+)*+}{}r =~ s{\s*+(?:\#.*\n\s*+)*+\z}{}r : $_
+    } @args
+        if !$keyword->{keepspace};
+
+    # Adjust the line number so trailing code stays correct...
+    $line += $arg_list =~ tr/\n//;
+
+    # Generate replacement code...
+    my $replacement_code = $keyword->{generator}->(@args) // q{};
+
+    # If debugging requested, provide a summary of the substitution...
+    if (${^H}{"Keyword::Declare debug"}) {
+        my $keyword = "    $keyword_impls[$ID]{syntax}";
+        my $from    = "    $keyword_impls[$ID]{keyword} $arg_list";
+        my $to      = $replacement_code =~ s{\A\s*\n|\n\s*\Z}{}gmr =~ s{\h+}{ }gr =~ s{^}{    }gmr;
+
+        warn +( ("#" x 50) . "\n"
+              . " Keyword macro defined at $keyword_impls[$ID]{location}:\n\n$keyword\n\n"
+              . " Converted code at $file line $line:"                . "\n\n$from\n\n"
+              . " Into:"                                              . "\n\n$to\n\n"
+              . ("#" x 50) . "\n"
+              ) =~ s{^}{###}gmr;
+    }
+
+    # Track possible cycles...
+    $$src_ref =~ s{^(\#KDCT:_:_:)(\d+)([^\n]*)}
+                  { my ($comment, $count, $trace) = ($1, $2, $3);
+                    croak "Likely keyword substitution cycle:\n    $trace\nCompilation abandoned",
+                        if $count > $NESTING_THRESHOLD && $trace =~ m{(\w++) --> .+ --> \1};
+                    $comment.($count+1).$trace." --> $keyword->{keyword}";
+                  }gexms;
+
+    # Install the replacement code...
+    $$src_ref = "$replacement_code\n#KDCT:_:_:1 $keyword->{keyword}\n#line $line $file\n" . $$src_ref;
 }
 
 # Compare two types...
@@ -306,13 +765,13 @@ sub _is_narrower {
     return 0  if $type_a eq $type_b;
 
     # Otherwise, work out the metatypes of the types...
-    my $kind_a = $type_a =~ /\A'/ ? 'literal'  :  $type_a =~ m{\A/}xms ? 'pattern'  :  'typename';
-    my $kind_b = $type_b =~ /\A'/ ? 'literal'  :  $type_b =~ m{\A/}xms ? 'pattern'  :  'typename';
+    my $kind_a = $type_a =~ /\A'|\Aq\W/ ? 'literal'  :  $type_a =~ m{\A/|\Am\W}xms ? 'pattern'  :  'typename';
+    my $kind_b = $type_b =~ /\A'|\Aq\W/ ? 'literal'  :  $type_b =~ m{\A/|\Am\W}xms ? 'pattern'  :  'typename';
 
     # If both are named types, try the standard inheritance hierarchy rules...
     if ($kind_a eq 'typename' && $kind_b eq 'typename') {
-        return +1 if $type_b->isa($type_a);
-        return -1 if $type_a->isa($type_b);
+        return +1 if $isa{$type_a,$type_b};
+        return -1 if $isa{$type_b,$type_a};
     }
 
     # Otherwise, the metatype names "just happen" to be in narrowness order ;-)...
@@ -342,822 +801,65 @@ sub _cmp_signatures {
 
 # Resolve ambiguous argument lists using Perl6-ish multiple dispatch rules...
 sub _resolve_matches {
-    my @sigs = @_;
+    my @IDs = @_;
+
+    # Extend type hierarchy...
+    my @keytype_isa = map { my ($derived, $base) = m{ \A Keyword::Declare \s+ keytype:(\w+)=(\w+) \z}xms;
+                            if ($derived) {
+                                my @ancestors = map  { s{ \A $base $; }{$derived$;}xmsr => 1 }
+                                                grep { m{ \A $base $; }xms }
+                                                keys %isa;
+                                $derived.$;.$base => 1, @ancestors;
+                            }
+                            else {
+                                ();
+                            }
+                          } keys %^H;
+    local %isa = ( %isa, @keytype_isa );
 
     # Track narrownesses...
-    my %narrower = map { $_ => [] } 0..$#sigs;
+    my %narrower = map { $_ => [] } 0..$#IDs;
 
     # Compare all signatures, recording definitive differences in narrowness...
-    for my $index_1 (0 .. $#sigs) {
-        for my $index_2 ($index_1+1 .. $#sigs) {
-            my $narrowness = _cmp_signatures($sigs[$index_1]{impl}{sig}, $sigs[$index_2]{impl}{sig});
+    for my $index_1 (0 .. $#IDs) {
+        for my $index_2 ($index_1+1 .. $#IDs) {
+            my $narrowness = _cmp_signatures($keyword_impls[$IDs[$index_1]]{sig},
+                                             $keyword_impls[$IDs[$index_2]]{sig});
 
-            if    ($narrowness < 0) { push @{$narrower{$index_1}}, $index_2; }
-            elsif ($narrowness > 0) { push @{$narrower{$index_2}}, $index_1; }
+            if    ($narrowness > 0) { push @{$narrower{$index_1}}, $index_2; }
+            elsif ($narrowness < 0) { push @{$narrower{$index_2}}, $index_1; }
         }
     }
 
     # Was there a signature narrower than all the others???
     my $max_narrower = max map { scalar @{$_} } values %narrower;
-    my $unique_narrowest = $max_narrower == $#sigs;
+    my $unique_narrowest = $max_narrower == $#IDs;
 
     # If not, return the entire set...
-    return @sigs if !$unique_narrowest;
+    return @IDs if !$unique_narrowest;
 
     # Otherwise, return the narrowest...
-    return @sigs[ grep { @{$narrower{$_}} >= $max_narrower } keys %narrower ];
+    return @IDs[ grep { @{$narrower{$_}} >= $max_narrower } keys %narrower ];
 }
-
-# Generate the code to be substituted in place of the keyword declaration...
-sub _build_keyword_code {
-    # These parameters are all going tobe string-interpolated, so quotemeta them...
-    my ($NAME, $SYNTAX, $DESC, $INDEX) = map {defined($_) ? quotemeta($_) : $_} @_;
-    $DESC //= "$NAME declaration";
-
-    # The keyword declaration is simply replaced by a compile-time call to _install_keyword()...
-    return qq{ Keyword::Declare::_install_keyword(qq{$NAME}, qq{$SYNTAX}, qq{$DESC}, qq{$INDEX}); };
-
-}
-
-# Generate a subroutine that implements /.../-style parameter matching...
-sub _matcher_for {
-    my $regex = shift;
-
-    return sub {
-            my $candidate = shift;
-            my $source    = q{}.shift;
-
-            # If the following source code matches the regex...
-            use re 'eval';
-            if ($source =~ s{\A$regex}{}p) {
-                my $match = ${^MATCH};
-
-                # If it matched a single PPI token, return that token...
-                return (1, $candidate)  if $match eq $candidate;
-
-                # Otherwise, return the first capture or the raw match
-                # and the remaining source code (for reparsing)...
-                return (1, $1 // $match, $source);
-            }
-
-            # If no match, return failure for the original candidate...
-            else {
-                return (0, $candidate);
-            }
-    };
-}
-
-# Generate a subroutine that matches a single declared class type...
-sub _is_a {
-    my ($classname) = @_;
-    return sub {
-        return ($_[0]->isa($classname), $_[0]);
-    }
-}
-
-# Generate a subroutine that matches any one of several declared class types...
-sub _is_any {
-    my @classnames = @_;
-    return sub {
-        for my $classname (@classnames) {
-            return (1, $_[0]) if $_[0]->isa($classname);
-        }
-        return (0, $_[0]);
-    }
-}
-
-# The following PPI types are all matched using _is_a(), so generate them from a table...
-my @single_matches = qw{
-    PPI::Statement
-
-    PPI::Token::Regexp
-    PPI::Token::Regexp::Match
-    PPI::Token::Regexp::Substitute
-    PPI::Token::Regexp::Transliterate
-
-    PPI::Token::HereDoc
-    PPI::Token::Label
-
-    PPI::Token::Whitespace
-    PPI::Token::Comment
-    PPI::Token::Pod
-
-    PPI::Token::Number
-    PPI::Token::Number::Binary
-    PPI::Token::Number::Octal
-    PPI::Token::Number::Hex
-    PPI::Token::Number::Float
-    PPI::Token::Number::Exp
-    PPI::Token::Number::Version
-
-    PPI::Token::ArrayIndex
-
-    PPI::Token::Operator
-
-    PPI::Token::Quote
-    PPI::Token::Quote::Single
-    PPI::Token::Quote::Double
-    PPI::Token::Quote::Literal
-    PPI::Token::Quote::Interpolate
-
-    PPI::Token::QuoteLike
-    PPI::Token::QuoteLike::Backtick
-    PPI::Token::QuoteLike::Command
-    PPI::Token::QuoteLike::Words
-    PPI::Token::QuoteLike::Readline
-
-    PPI::Structure::Subscript
-
-    PPI::Structure::Constructor
-};
-
-my %multi_matches = (
-    List       => [qw<  PPI::Structure::List           PPI::Structure::Condition >],
-    Expression => [qw<  PPI::Statement::Expression     PPI::Statement            >],
-    AnonHash   => [qw<  PPI::Structure::Constructor    PPI::Structure::Block     >],
-    String     => [qw<  PPI::Token::HereDoc            PPI::Token::Quote         >],
-    Pattern    => [qw<  PPI::Token::QuoteLike::Regexp  PPI::Token::Regexp::Match >],
-);
-
-# Build look-up table of standard recognizers...
-my %recognizer_for = (
-    # Everything from the preceding type tables...
-    map( { m{.*::(.*)}; $1 => _is_a($_) } @single_matches ),
-
-    map( { $_ => _is_any( @{$multi_matches{$_}} ) } keys %multi_matches ),
-
-    # But override these...
-    Block      => sub { return ($_[0] =~ $EMPTY_BLOCK || $_[0]->isa('PPI::Structure::Block'), $_[0]) },
-    Identifier => sub { return (scalar $_[0] =~ m{\A [^\W\d]\w* \Z }x,                      $_[0]) },
-    QualIdent  => sub { return (scalar $_[0] =~ m{\A [^\W\d]\w* (?: :: [^\W\d]\w* )* \Z }x, $_[0]) },
-    Comma      => sub { return (scalar $_[0] =~ m{\A (?:,|=>) \Z }x,                        $_[0]) },
-    Var        => sub { return (scalar $_[0] =~ m{\A [\$\@%] [^\W\d]\w* \Z}x,               $_[0]) },
-    ScalarVar  => sub { return (scalar $_[0] =~ m{\A      \$ [^\W\d]\w* \Z}x,               $_[0]) },
-    ArrayVar   => sub { return (scalar $_[0] =~ m{\A      \@ [^\W\d]\w* \Z}x,               $_[0]) },
-    HashVar    => sub { return (scalar $_[0] =~ m{\A       % [^\W\d]\w* \Z}x,               $_[0]) },
-    Integer    => sub { return (scalar $_[0] =~ m{\A     [+-]? \d+      \Z}x,               $_[0]) },
-);
-
-# Add in some convenient aliases...
-my %type_aliases = (
-    Identifier => 'Ident',
-    Operator   => 'Op',
-    String     => 'Str',
-    Regexp     => 'Regex',
-    Expression => 'Expr',
-    Pattern    => 'Pat',
-    Integer    => 'Int',
-);
-for my $typename (keys %type_aliases) {
-    $recognizer_for{ $type_aliases{$typename} } = $recognizer_for{$typename};
-}
-
-# Conversion of Keyword::Declare types back to longer PPI equivalents...
-my %actual_type_for = (
-    # Everything from the preceding type tables...
-    map( { m{.*::(.*)};   $1 => $_                                 } @single_matches     ),
-    map( {                $_ => "Keyword::Declare::Pseudotype::$_" } keys %multi_matches ),
-
-    # Plus these Keyword::Declare additions...
-    Block      => 'PPI::Structure::Block',
-    Identifier => '/\A[^\W\d]\w*\Z/',
-    Comma      => '/\A(?:,|=>)\Z/',
-    Var        => 'Keyword::Declare::Pseudotype::Var',
-    ScalarVar  => 'Keyword::Declare::Pseudotype::ScalarVar',
-    ArrayVar   => 'Keyword::Declare::Pseudotype::ArrayVar',
-    HashVar    => 'Keyword::Declare::Pseudotype::HashVar',
-);
-
-  @actual_type_for{ values %type_aliases }
-= @actual_type_for{   keys %type_aliases };
-
-
-# Set up pseudotype hierarchy to facilitate multiple dispatch resolution on built-in types...
-BEGIN {
-    no strict 'refs';
-    for my $typename (keys %multi_matches) {
-        @{"Keyword::Declare::Pseudotype::${typename}::ISA"}
-            = @{ $multi_matches{$typename} };
-    }
-
-    @Keyword::Declare::Pseudotype::Var::ISA = qw< PPI::Statement::Expression PPI::Statement >;
-    for my $typename (qw< ScalarVar ArrayVar HashVar >) {
-        @{"Keyword::Declare::Pseudotype::${typename}::ISA"}
-            = 'Keyword::Declare::Pseudotype::Var';
-    }
-}
-
-# Convert a type specification into a sub that recognizes instances of that type...
-sub _get_recognizer_for {
-    my ($type) = @_;
-
-    # Is it an explicit literal???
-    return _matcher_for('\s*+\K'. quotemeta(substr($type,1,-1))) if $type =~ m{\A'};
-
-    # Is it an explicit pattern (with possible suffix flags than need to be inlined)???
-    if ($type =~ m{\A/}) {
-        my ($pat, $flags) = $type =~ m{\A / (.*) / (\w*) \Z}xms;
-        if (length $flags) {
-            $pat = "(?$flags:$pat)";
-        }
-        return _matcher_for($pat)
-    }
-
-    # Is it a user-defined type???
-    if (defined ${^H}{"Keyword::Declare type=$type"}) {
-        return eval(${^H}{"Keyword::Declare type=$type"}) // croak $@;
-    }
-
-    # Otherwise, it's a standard named type (or an unknown)...
-    return $recognizer_for{$type};
-}
-
-sub _parse_params {
-    my ($desc, $param_list) = @_;
-
-    my @params;
-    my $expected = 'type';
-    my $has_upto;
-
-    COMPONENT:
-    for my $component (eval{ $param_list->schild(0)->schildren() }) {
-
-        # Comma marks the end of a component --> start looking for the next...
-        if ($component eq ',') {
-            $expected = 'type';
-            next COMPONENT;
-        }
-
-        # At the start of a component there must be a type...
-        if ($expected eq 'type') {
-            # The type may have a single optional 'up to' (...) prefix...
-            if (!$has_upto && $component eq '...') {
-                $has_upto = 1;
-                next COMPONENT;
-            }
-
-            my $type = "$component";
-
-            # The type must be an typename (an identifier) or a regex or string...
-            my $is_named_type = $type =~ /\A$QUAL_IDENT\Z/;
-            croak "Expected parameter type specification, but found $type instead\n"
-                . "in parameter list of $desc"
-                if not (   $is_named_type
-                       ||  $component->isa('PPI::Token::Regexp::Match')
-                       ||  $component->isa('PPI::Token::Quote::Single')
-                       ||  $component->isa('PPI::Token::Quote::Double')
-                );
-
-            # The type must be recognizable by the module...
-            my $recognizer = _get_recognizer_for($type);
-
-            # Is it a known type?
-            if ($is_named_type && !$recognizer) {
-                croak "Unknown type ($type) in parameter list of $desc";
-            }
-
-            # Set up a new parameter...
-            push @params, { type => $type, recognizer => $recognizer, var => undef, upto => $has_upto };
-            $has_upto = 0;
-
-            # Then go look for a variable...
-            $expected = 'var';
-            next COMPONENT;
-        }
-
-        # After the type there is optionally a parameter...
-        if ($expected eq 'var') {
-            # After the variable, there may be an 'optional' marker...
-            $expected = 'optional';
-
-            # Parameter variables are scalar or array variables...
-            if ($component =~ /[\$\@]$IDENT/) {
-                # If found, remember them and infer a description and a repeatability...
-                $params[-1]{var}        = "$component";
-                $params[-1]{desc}       = substr("$component",1);
-                $params[-1]{optional}   = 0;
-                $params[-1]{repeatable} = !$params[-1]{upto} && substr("$component",0,1) eq '@';
-
-                # Then continue parsing...
-                next COMPONENT;
-            }
-            # If it's not there, we're already looking at the next token, so reparse it...
-            else {
-                redo COMPONENT;
-            }
-        }
-
-        # Having just seen a type or variable, we need to check whether it's marked 'optional'...
-        if ($expected eq 'optional') {
-
-            # The 'optional marker has to be at the end of the parameter...
-            $expected = 'default';
-
-            # If it's there, remember it and move on to the next parameter...
-            if ($component eq '?') {
-                $params[-1]{optional} = 1;
-                next COMPONENT;
-            }
-            # If it's not there, we're already looking at the next token, so reparse it...
-            else {
-                redo COMPONENT;
-            }
-        }
-
-        # Having just seen a type or variable, we need to check whether it has a default value...
-        if ($expected eq 'default') {
-
-            # If it's there, remember it and move on to the next parameter...
-            if ($component eq '=') {
-                $expected = 'default_val';
-                $params[-1]{optional} = 1;
-                next COMPONENT;
-            }
-            # If it's not there, we're already looking at the next token, so reparse it...
-            else {
-                $expected = 'comma';
-                redo COMPONENT;
-            }
-        }
-
-        # Having found a default value introducer, we expect a default value...
-        if ($expected eq 'default_val') {
-
-            if ($component eq ',' || $component eq ')') {
-                $expected = 'comma';
-                redo COMPONENT;
-            }
-
-            $params[-1]{default} .= "$component";
-            next COMPONENT;
-        }
-
-        # If we find anything unexpected at the end of a parameter defn, report it...
-        if ($expected eq 'comma') {
-            croak "Expected comma or closing paren, but found $component instead\n"
-                . "in parameter list of $desc";
-        }
-
-        # If we find anything unexpected anywhere else, report it too...
-        croak "Unexpected $component in parameter list of $desc";
-    }
-
-    return @params;
-}
-
-
-sub _match_syntax {
-    my ($src, $name, $desc, @expected) = @_;
-
-    my $parse = ref($src) ? $src : PPI::Document->new(\$src);
-    $parse->index_locations;
-
-    my @candidates = $parse->children;
-    my @matches;
-    my $reparsed = 1;
-    my $repeated;
-
-    for my $expected (@expected) {
-        my $type = $expected->{type};
-
-        # Normalize parameter description...
-        if (!defined $expected->{desc}) {
-            $expected->{desc} = $type =~ m{\A/} ? "something matching $type"
-                              : $type =~ m{\A'} ? substr($type,1,-1)
-                              :                   "<$type>";
-        }
-        $expected->{desc} =~ tr{A-Z_}{a-z };
-    }
-
-    my $prev_candidate = $name;
-    EXPECTED:
-    for my $expected (@expected) {
-        # Next candidate...
-        my $candidate = shift @candidates;
-        return (undef, $src, {expected => $expected->{desc}, after => "$prev_candidate", found => 'end of file'})
-            if !defined $candidate;
-
-        if ($expected->{recognizer}) {
-
-            my ($matched, $new_source);
-            ($matched, $candidate, $new_source)
-                = $expected->{recognizer}->( $candidate, $parse, @candidates );
-
-            if (defined $new_source) {
-                $parse = PPI::Document->new(\$new_source);
-                $parse->index_locations;
-                @candidates = $parse->children();
-            }
-
-            if ($matched) {
-                # Remember this matched...
-                $prev_candidate = eval{ $candidate->isa('PPI::Structure::Block')} ? 'code block' : $candidate;
-
-                if (ref $candidate) {
-                    # Extract the match from the parse, and remember it...
-                    if ($expected->{repeatable} || $expected->{upto}) {
-                        if ($repeated) { push @{ $matches[-1] }, $candidate->remove();  }
-                        else           { push @matches,         [$candidate->remove()]; }
-                    }
-                    else {
-                        push @matches, $candidate->remove();
-                    }
-
-                    # Expressions need to give back their terminators...
-                    if ($expected->{type} ne 'Statement' &&$candidate->isa('PPI::Statement')) {
-                        my $terminator = $candidate->schild(-1);
-                        if ($terminator eq ';') {
-                            unshift @candidates, $terminator->remove();
-                        }
-                    }
-                }
-                else {
-                    # Remember the match from the parse...
-                    if ($expected->{repeatable} || $expected->{upto}) {
-                        if ($repeated) { push @{ $matches[-1] }, $candidate;  }
-                        else           { push @matches,         [$candidate]; }
-                    }
-                    else {
-                        push @matches, $candidate;
-                    }
-                }
-
-                # Having matched something, this becomes the One True Parse...
-                $reparsed = 0;
-
-                # Having matched something repeatable, remember it's been repeated...
-                if ($expected->{repeatable}) {
-                    $repeated = 1;
-                }
-
-                # If this item is repeatable, try it again...
-                if ($expected->{repeatable}) {
-                    unshift @expected, $expected;
-                }
-
-                # Then move on to the next expectation...
-                next EXPECTED;
-            }
-        }
-
-        if (ref($candidate)) {
-            # If candidate is decomposable, decompose it...
-            if ($candidate->isa('PPI::Statement')) {
-                unshift @candidates, $candidate->children();
-                redo EXPECTED;
-            }
-
-            # Not matching whitespace is not fatal: just skip over it...
-            if (!$candidate->significant()) {
-                $candidate->remove();
-                redo EXPECTED;
-            }
-        }
-
-        # If this is an "upto" then failures just mean we're not their yet..
-        if ($expected->{upto}) {
-            if (ref $candidate) {
-                # Extract the match from the parse, and remember it...
-                if ($repeated) { push @{ $matches[-1] }, $candidate->remove();  }
-                else           { push @matches,         [$candidate->remove()]; }
-
-                # Expressions need to give back their terminators...
-                if ($expected->{type} ne 'Statement' &&$candidate->isa('PPI::Statement')) {
-                    my $terminator = $candidate->schild(-1);
-                    if ($terminator eq ';') {
-                        unshift @candidates, $terminator->remove();
-                    }
-                }
-            }
-            else {
-                # Remember the match from the parse...
-                if ($repeated) { push @{ $matches[-1] }, $candidate;  }
-                else           { push @matches,         [$candidate]; }
-            }
-
-            # An "upto" is inherently a repeatable parameter...
-            $repeated = 1;
-
-            redo EXPECTED;
-        }
-
-        # Move on if expected component is repeatable...
-        if ($expected->{repeatable} && $repeated && eval{ $candidate->significant }) {
-            $repeated = 0;
-            unshift @candidates, $candidate;
-            next EXPECTED;
-        }
-
-        # Give up if expected component is optional...
-        if ($expected->{optional} && eval{ $candidate->significant }) {
-            $repeated = 0;
-            push @matches, undef;
-            unshift @candidates, $candidate;
-            next EXPECTED;
-        }
-
-        # If we failed "inside" a parse, try reparsing from that point (once only!)...
-        if (!$reparsed) {
-            # Rebuild the parse...
-            my $source = "$parse";
-            $parse  = PPI::Document->new(\$source);
-            $parse->index_locations;
-            @candidates = $parse->children();
-
-            # Remember we did so...
-            $reparsed = 1;
-
-            # And then retry...
-            redo EXPECTED;
-        }
-
-        # Otherwise, we've failed...
-        $candidate = 'code block' if $candidate->isa('PPI::Structure::Block');
-        return (undef, $src, {expected => $expected->{desc}, after => "$prev_candidate", found => "$candidate"});
-    }
-
-    return (\@matches, join q{}, @candidates);
-}
-
-
-# Track lexical keyword implementations...
-our %keyword_impls;
-
-sub import {
-    my (undef, $opt_ref) = @_;
-    $opt_ref //= {};
-
-    my $arg_type = ref($opt_ref);
-    if (@_ > 2 || $arg_type ne 'HASH') {
-        $arg_type ||= $opt_ref;
-        croak "Invalid option for: use Keyword::Declare.\n",
-              "Expected single hash reference, but found $arg_type instead.\n",
-              "Error detected";
-    }
-
-    if ($opt_ref->{debug}) {
-        ${^H}{'Keyword::Declare debug'} = !!$opt_ref->{debug};
-    }
-
-    Keyword::Simple::define 'keytype', sub {
-        my ($ref) = @_;
-
-        # Track line numbers in trailing source...
-        my (undef, $filename, $linenum) = caller(0);
-        my $linecount = $$ref =~ tr/\n//;
-        my $loc = "$filename line $linenum";
-
-        # Parse the keytype declaration...
-        my ($components_ref, $trailing_source, $error)
-            = _match_syntax(
-                $$ref,
-                'keytype',
-                'keyword type declaration',
-                { desc       => 'type name',
-                  type       => 'Ident',
-                  recognizer => $recognizer_for{'Ident'},
-                },
-                { desc       => 'type parameter',
-                  type       => 'List',
-                  recognizer => $recognizer_for{'List'},
-                  optional   => 1,
-                  default    => '(undef)',
-                },
-                { desc       => 'type specification',
-                  type       => 'Block',
-                  recognizer => $recognizer_for{'Block'},
-                },
-            );
-
-        # Report any parsing failure...
-        croak $error->{msg} // "Expected $error->{expected} after $error->{after} but found: $error->{found}"
-            if defined $error;
-
-        # Put everything following the parsed components back into the source code...
-        $$ref = $trailing_source;
-
-        # Adjust line numbers in source code...
-        $linenum += $linecount - ($$ref =~ tr/\n//);
-        $$ref = "\n#line $linenum $filename\n" . $$ref;
-
-        # Unpack and normalize the components of the declaration...
-        my ($name, $param, $block) = @{$components_ref};
-        $name = "$name";
-        $param = substr($param//'(undef)', 1, -1);
-
-        # Convert block specification to a recognizer generator...
-        my $typedef = qq{ sub { my ($param) = \@_; return( scalar do $block, $param ) } };
-        if ($block->schildren() == 1) {
-            my $content = $block->schild(0)->schild(0);
-            if ($content->isa('PPI::Token::Word')) {
-                if ($content =~ m{\A PPI:: }xms) {
-                    $typedef = qq{Keyword::Declare::_is_a(q{$content})};
-                }
-                else {
-                    $typedef = qq{Keyword::Declare::_get_recognizer_for(q{$content})};
-                }
-            }
-            elsif ($content->isa('PPI::Token::Quote')) {
-                $typedef = qq{Keyword::Declare::_get_recognizer_for(q{$content})};
-            }
-            elsif ($content->isa('PPI::Token::Regexp::Match')) {
-                croak "Not a valid regex: $content\nin keytype specification"
-                    if !eval qq{#line 0 keytype:$name\n1;\nsub{$content} };
-                $content =~ s{\\}{\\\\}g;
-                $typedef = qq{Keyword::Declare::_get_recognizer_for(q{$content})};
-            }
-            else {
-                eval "#line 1 keytype:$name\n$typedef" or croak $@;
-            }
-        }
-        else {
-            eval "#line 1 keytype:$name\n$typedef" or croak $@;
-        }
-
-        # Install new type...
-        $$ref = qq{ BEGIN{ \${^H}{'Keyword::Declare type=$name'} = qq{\Q$typedef\E} } } . $$ref;
-    };
-
-    Keyword::Simple::define 'keyword', sub {
-        my ($ref) = @_;
-
-        # Track line numbers in trailing source...
-        my (undef, $filename, $linenum) = caller(0);
-        my $linecount = $$ref =~ tr/\n//;
-        my $loc = "$filename line $linenum";
-
-        # Parse the standard keyword declaration...
-        my ($components_ref, $trailing_source, $error)
-            = _match_syntax(
-                $$ref,
-                'keyword',
-                'keyword declaration',
-                { desc       => 'keyword name',
-                  type       => 'Ident',
-                  recognizer => $recognizer_for{'Ident'},
-                },
-                { desc       => 'parameter list',
-                  type       => 'List',
-                  recognizer => $recognizer_for{'List'},
-                  optional   => 1,
-                  default    => '()',
-                },
-                { desc       => 'keyword attribute',
-                  type       => 'Attribute',
-                  recognizer => _matcher_for(':\s*[^\W\d]\w*(?:\([^)]*\))?'),
-                  optional   => 1,
-                  repeatable => 1,
-                },
-                { desc       => 'keyword block',
-                  type       => 'Block',
-                  recognizer => $recognizer_for{'Block'},
-                },
-            );
-
-        # Parse the special keyword declaration...
-        if (defined $error) {
-            my ($components_ref_special, $trailing_source_special, $error_special)
-                = _match_syntax(
-                    $$ref,
-                    'keyword',
-                    'keyword declaration',
-                    { desc       => 'keyword name',
-                      type       => 'Ident',
-                      recognizer => $recognizer_for{'Ident'},
-                    },
-                    { desc       => 'from',
-                      type       => 'Ident',
-                      recognizer => _matcher_for('from'),
-                    },
-                    { desc       => 'keyword source',
-                      type       => 'QualIdent',
-                      recognizer => $recognizer_for{'QualIdent'},
-                    },
-                );
-            if (!defined $error_special) {
-                $components_ref = [
-                    $components_ref_special->[0],
-                    undef,
-                    undef,
-                    qq({{{ use $components_ref_special->[2]; $components_ref_special->[0] }}}),
-                ];
-                ($trailing_source, $error) = ($trailing_source_special, $error_special);
-            }
-            else {
-                carp $error_special->{msg} // "Expected $error_special->{expected} after $error_special->{after} but found: $error_special->{found}"
-            }
-        }
-
-        # Report any parsing failure...
-        croak $error->{msg} // "Expected $error->{expected} after $error->{after} but found: $error->{found}"
-            if defined $error;
-
-        # Put everything following the parsed components back into the source code...
-        $$ref = $trailing_source;
-
-        # Adjust line numbers in source code...
-        $linenum += $linecount - ($$ref =~ tr/\n//);
-        $$ref = "\n#line $linenum $filename\n" . $$ref;
-
-        # Unpack and normalize the components of the declaration...
-        my ($name, $param_list, $attrs, $block) = @{$components_ref};
-        $attrs //= [];
-        my %attr;
-        for my $attr (@{$attrs}) {
-            $attr =~ m{\A : \s* (?: (?<name> desc ) \( (?<value> [^)]*) \) | (?<name> prefer ) ) \Z}xms
-                or croak "Unknown attribute:  $attr\nin keyword declaration";
-            $attr{$+{name}} = $+{value} // 1;
-        }
-        $name  = "$name";
-        $block = $block =~ $EMPTY_BLOCK ? '{;}' : "$block";
-
-        # Is it a template block???
-        if ($block =~ s[ \A \{\{\{ ][]xms) {
-            croak qq(Missing }}} on string-style block of keyword $name\ndefined)
-                if $block !~ m[ \}\}\}\Z ]xms;
-
-            if ($block =~ m{ <\{ (?<interpolation> (?<leader> \s* \S*) .*? ) (?: <\{ | \Z ) }xms) {
-                my %match = %+;
-                croak qq[Missing }> on interpolation <{$match{leader}...\n]
-                    . qq[in string-style block of keyword $name\ndefined]
-                        if $match{interpolation} !~ m{ \}> }xms;
-            }
-
-            $block =~ s{
-                  (?<end_of_block> \}\}\} \Z )
-                |
-                  <\{ (?<interpolation> .*? ) \}>
-                |
-                  (?<literal_code> .*? ) (?= <\{ | \}\}\} )
-            }{
-                if (exists $+{literal_code}) {
-                    'qq{' . quotemeta($+{literal_code}) . '}.';
-                }
-                elsif (exists $+{interpolation}) {
-                    qq{ do{$+{interpolation}}. };
-                }
-                elsif (exists $+{end_of_block}) {
-                    q{''};
-                }
-                else {
-                    say {*STDERR} 'Inconceivable!'; exit;
-                }
-            }gexms;
-
-            $block = "{ return $block; }";
-        }
-
-        # Extract the parameter specifications...
-        my @params = _parse_params("keyword $name", $param_list);
-
-        # Record the definition and track its lexical scope...
-        push @{$keyword_impls{$name}}, {
-            desc   => $attr{desc},
-            prefer => $attr{prefer},
-            params => \@params,
-            sig    => [ map {my $typename = $_->{type}; $actual_type_for{$typename} // $typename } @params ],
-            code   => $block,
-            loc    => $loc,
-        };
-
-        my $next_index = $#{$keyword_impls{$name}};
-
-        my $keyword_defn
-            = _build_keyword_code($name, _build_syntax($name, @params), $attr{desc}, $next_index);
-
-        # Install the keyword, exporting as well if it's in an import() or unimport() sub...
-        $$ref = qq{ BEGIN{ $keyword_defn } if (((caller 0)[3]//q{}) =~ /\\b(?:un)?import\\Z/) { $keyword_defn } $$ref };
-    };
-}
-
-sub _normalize_desc {
-    my ($component) = @_;
-    return eval{ $component->isa('PPI::Structure::Block') } ? 'code block' : "$component";
-}
-
-
 
 1; # Magic true value required at end of module
 __END__
 
 =head1 NAME
 
-Keyword::Declare - Declare new Perl keywords...via a keyword
+Keyword::Declare - Declare new Perl keywords...via a keyword...named C<keyword>
 
 
 =head1 VERSION
 
-This document describes Keyword::Declare version 0.000005
+This document describes Keyword::Declare version 0.001000
 
 
 =head1 STATUS
 
 This module is an alpha release.
-Aspects of its behaviour will probably change in future releases.
-
-In particular, do not rely on keyword parameters having been parsed into
-PPI objects. This is an interim solution that is likely to go away in
-future releases.
+Aspects of its behaviour may still change in future releases.
+They already have in past releases.
 
 
 =head1 SYNOPSIS
@@ -1165,7 +867,7 @@ future releases.
     use Keyword::Declare;
 
     # Declare something matchable within a keyword's syntax...
-    keytype UntilOrWhile { /until|while/ }
+    keytype UntilOrWhile is /until|while/;
 
     # Declare a keyword and its syntax...
     keyword repeat (UntilOrWhile $type, List $condition, Block $code) {
@@ -1254,7 +956,7 @@ code such as:
 then the keyword's $count parameter would be assigned the value C<"10">
 and its $code parameter would be assigned the value
 S<C<"{\n$cmd = readline;\nlast if valid_cmd($cmd);\n}">>. Then the "body" of
-the keyword definition would be executed and its return value used as the
+the keyword definition would be executed and its return value would be used as the
 replacement source code:
 
     for (1..10) {
@@ -1270,12 +972,13 @@ replacement source code:
 
 The general syntax for declaring new keywords is:
 
-    keyword NAME (PARAM, PARAM, PARAM...) [:desc] { REPLACEMENT }
+    keyword NAME (PARAM, PARAM, PARAM...) ATTRS { REPLACEMENT }
 
 The name of the new keyword can be any identifier, including the name of
 an existing Perl keyword. However, using the name of an existing keyword
 usually creates an infinite loop of keyword expansion, so it rarely does
-what you actually wanted.
+what you actually wanted. In particular, the module will not allow you
+to declare a new keyword named C<keyword>, as that way lies madness.
 
 
 =head3 Specifying keyword parameters
@@ -1283,102 +986,143 @@ what you actually wanted.
 The parameters of the keyword tell it how to parse the source code that
 follows it. The general syntax for each parameter is:
 
-                           [...] TYPE [$@] VARNAME [?] [= DEFAULT]
+                            TYPE  [?*+][?+]  [$@]NAME  = 'DEFAULT'
 
-                            \_/  \__/  VV  \_____/ \_/ \_________/
-    Everything up to [opt]...:     :   ::     :     :       :
-    Component type.................:   ::     :     :       :
-    Appears once.......................::     :     :       :
-    Appears once or more................:     :     :       :
-    Capture variable..........................:     :       :
-    Component is optional [opt].....................:       :
-    Default source (if missing) [opt].......................:
+                            \__/  \_______/  \______/  \_________/
+    Parameter type............:       :          :          :
+    Repetition specifier..............:          :          :
+    Parameter variable...........................:          :
+    Default source code (if argument is missing)............:
+
+The type specifier is required, but the other three components
+are optional. Each component is described in the following sections.
 
 
-=head4 Named keyword parameter types
+=head4 Keyword parameter types
 
 The type of each keyword parameter specifies how to parse the
-corresponding item in the source code after the keyword. Most
-of the available types are drawn from the PPI class hierarchy,
-and are named with the final component of the PPI class name.
+corresponding item in the source code after the keyword.
+
+The type of each keyword parameter may be specified as either a type
+name, a regex, or a literal string...
+
+=head5 Named types
+
+A named type is simply a convenient label for some standard or
+user-defined regex or string. Most of the available named types are
+drawn from the PPR module, and are named with just the post-"Perl..."
+component of the PPR name.
+
+For example, the C<Expression> type is the same as the PPR named
+subpattern C<(?&PerlExpression>) and the C<Variable> type is identical
+to the PPR named subpattern C<(?&PerlVariable)>.
 
 The standard named types that are available are:
 
-    Typename             Matches                    PPI equivalent
-    ========             =======                    ==============
-    Statement            a full Perl statement      PPI::Statement
 
-    Block                a block of Perl code       PPI::Structure::Block
+=for comment Autogenerated type descriptions (from bin/gen_types.pl)...
 
-    List                 a parenthesized list       PPI::Structure::List
-                                                       or PPI::Structure::Condition
+    ArrayIndexer .................................. An expression or list in square brackets
+    AssignmentOperator ............................ A '=' or any operator assignment: '+=', '*=', etc.
+    Attributes .................................... Subroutine or variable :attr(ributes) :with : colons
+    Comma ......................................... A ',' or '=>'
+    Document ...................................... Perl code and optional __END__ block
+    HashIndexer ................................... An expression or list in curly brackets
+    InfixBinaryOperator ........................... An infix operator of precedence from '**' down to '..'
+    LowPrecedenceInfixOperator .................... An 'and', 'or', or 'xor
+    OWS ........................................... Optional whitespace (including comments or POD)
+    PostfixUnaryOperator .......................... A high-precedence postfix operator like '++' or '--'
+    PrefixUnaryOperator ........................... A high-precedence prefix operator like '+' or '--'
+    StatementModifier ............................. A postfix 'if', 'while', 'for', etc.
+    NWS or Whitespace ............................. Non-optional whitespace (including comments or POD)
+    Statement ..................................... Any single valid Perl statement
+    Block ......................................... A curly bracket delimited block of statements
+    Comment ....................................... A #-to-newline comment
+    ControlBlock .................................. An if, while, for, unless, or until and its block
+    Expression or Expr ............................ An expression involving operators of any precedence
+    Format ........................................ A format declaration
+    Keyword ....................................... Any user-defined keyword and its arguments
+    Label ......................................... A statement label
+    PackageDeclaration ............................ A package declaration or definition
+    Pod ........................................... Documentation terminated by a =cut
+    SubroutineDeclaration ......................... A named subroutine declaration or definition
+    UseStatement .................................. A use <module> or use <version> statement
+    LowPrecedenceNotExpression .................... An expression at the precedence of not
+    List .......................................... An list of comma-separated expressions
+    CommaList ..................................... An unparenthesized list of comma-separated expressions
+    Assignment .................................... One or more chained assignments
+    ConditionalExpression or Ternary or ListElem... An expression involving the ?: operator;
+                                                    also matches a single element of a comma-separated list
+    BinaryExpression .............................. An expression involving infix operators
+    PrefixPostfixTerm ............................. A term with optional unary operator(s)
+    Term .......................................... An expression not involving operators
+    AnonymousArray or AnonArray ................... An anonymous array constructor
+    AnonymousHash or AnonHash ..................... An anonymous hash constructor
+    AnonymousSubroutine ........................... An unnamed subroutine definition
+    Call .......................................... A call to a built-in function or user-defined subroutine
+    DiamondOperator ............................... A <readline> or <shell glob>
+    DoBlock ....................................... A do block
+    EvalBlock ..................................... An eval block
+    Literal ....................................... Any literal compile-time value
+    Lvalue ........................................ Anything that can be assigned to
+    ParenthesesList or ParensList ................. A parenthesized list of zero-or-more elements
+    Quotelike ..................................... Any quotelike term
+    ReturnStatement ............................... A return statement in a subroutine
+    Typeglob ...................................... A typeglob lookup
+    VariableDeclaration or VarDecl ................ A my, our, or state declaration
+    Variable or Var ............................... A variable of any species
+    ArrayAccess ................................... An array lookup or a slice
+    Bareword ...................................... A bareword
+    BuiltinFunction ............................... A call to a builtin-in function
+    HashAccess .................................... A hash lookup or key/value slice
+    Number or Num ................................. Any number
+    QuotelikeQW ................................... A qw/.../
+    QuotelikeQX ................................... A `...` or qx/.../
+    Regex or Regexp ............................... A /.../, m/.../, or qr/.../
+    ScalarAccess .................................. A scalar variable or lookup
+    String or Str ................................. Any single- or double-quoted string
+    Substitution or QuotelikeS .................... An s/.../.../
+    Transliteration or QuotelikeTR ................ A tr/.../.../
+    ContextualRegex ............................... A /.../, m/.../, or qr/.../ where it's valid in Perl
+    Heredoc ....................................... A heredoc marker (but not the contents)
+    Integer or Int ................................ An integer
+    Match or QuotelikeM ........................... A /.../ or m/.../
+    NullaryBuiltinFunction ........................ A call to a built-in function that takes no arguments
+    OldQualifiedIdentifier ........................ An identifier optionally qualified with :: or '
+    QuotelikeQ .................................... A single-quoted string
+    QuotelikeQQ ................................... A double-quoted string
+    QuotelikeQR ................................... A qr/.../
+    VString ....................................... A v-string
+    VariableArray or VarArray or ArrayVar ......... An array variable
+    VariableHash or VarHash or HashVar ............ A hash variable
+    VariableScalar or VarScalar or ScalarVar ...... A scalar variable
+    VersionNumber ................................. A version number allowed after use
+    ContextualMatch or ContextualQuotelikeM ....... A /.../ or m/.../ where it's valid in Perl
+    PositiveInteger or PosInt ..................... A non-negative integer
+    QualifiedIdentifier or QualIdent .............. An identifier optionally qualified with ::
+    QuotelikeQR ................................... A qr/.../
+    VString ....................................... A v-string
+    Identifier or Ident ........................... An unqualified identifier
 
-    Expression or Expr   a Perl expression          PPI::Statement::Expression
-                                                       or PPI::Statement
-
-    Number               any Perl number            PPI::Token::Number
-    Integer or Int       any Perl integer                  <none>
-    Binary               0b111                      PPI::Token::Number::Binary
-    Octal                07777                      PPI::Token::Number::Octal
-    Hex                  0xFFF                      PPI::Token::Number::Hex
-    Float                -1.234                     PPI::Token::Number::Float
-    Exp                  -1.234e-56                 PPI::Token::Number::Exp
-    Version              v1.2.3                     PPI::Token::Number::Version
-
-    Quote                a string literal           PPI::Token::Quote
-    Single               'single quoted'            PPI::Token::Quote::Single
-    Double               "double quoted"            PPI::Token::Quote::Double
-    Literal              q{uninterpolated}          PPI::Token::Quote::Literal
-    Interpolate          qq{interpolated}           PPI::Token::Quote::Interpolate
-    HereDoc              <<HERE_DOC                 PPI::Token::HereDoc
-    String or Str        a string literal           PPI::Token::HereDoc
-                                                       or PPI::Token::Quote
-
-    Regex or Regexp      /.../                      PPI::Token::Regexp
-    Match                m/.../                     PPI::Token::Regexp::Match
-    Substitute           s/.../.../                 PPI::Token::Regexp::Substitute
-    Transliterate        tr/.../.../                PPI::Token::Regexp::Transliterate
-    Pattern or Pat       qr/.../ or m/.../          PPI::Token::QuoteLike::Regexp
-                                                       or PPI::Token::Regexp::Match
-
-    QuoteLike            any Perl quotelike         PPI::Token::QuoteLike
-    Backtick             `cmd in backticks`         PPI::Token::QuoteLike::Backtick
-    Command              qx{cmd in quotelike}       PPI::Token::QuoteLike::Command
-    Words                qw{ words here }           PPI::Token::QuoteLike::Words
-    Readline             <FILE>                     PPI::Token::QuoteLike::Readline
-
-    Operator or Op       any Perl operator          PPI::Token::Operator
-    Comma                , or =>
-
-    Label                LABEL:                     PPI::Token::Label
-    Whitespace           Empty space                PPI::Token::Whitespace
-    Comment              # A comment                PPI::Token::Comment
-    Pod                  =pod ... =cut              PPI::Token::Pod
-
-    Identifier or Ident  simple identifier                 <none>
-    QualIdent            identifier containing ::          <none>
-
-    Var                  a scalar, array, or hash          <none>
-    ScalarVar            a scalar                          <none>
-    ArrayVar             an array                          <none>
-    HashVar              a hash                            <none>
-    ArrayIndex           $#arrayname                PPI::Token::ArrayIndex
-    Constructor          [arrayref] or {hashref}    PPI::Structure::Constructor
-    AnonHash             {...}                      PPI::Structure::Constructor
-                                                       or  PPI::Structure::Block
-    Subscript            ...[$index] or ...{$key}   PPI::Structure::Subscript
+=for comment End of autogenerated type descriptions
 
 
-=head3 Regex and literal parameter types
+Which Perl construct each of these will match after a keyword is
+intended to be self-evident; see the documentation of the PPR module
+for more detail on any of them that aren't.
+
+
+
+=head5 Regex and literal parameter types
 
 In addition to the standard named types listed in the previous section,
 a keyword parameter can have its type specified as either a regex or a
 string, in which case the corresponding component in the trailing source
-code is expected to match the pattern or literal.
+code is expected to match that pattern or literal.
 
 For example:
 
-    keyword fail ('all' $all?, /hard|soft/ $fail_mode, Block $code) {...}
+    keyword fail ('all'? $all, /hard|soft/ $fail_mode, Block $code) {...}
 
 would accept:
 
@@ -1397,15 +1141,22 @@ may not be a need to give it an actual parameter variable. For example:
         return qq{for my \$data ($EXTRACTOR $hash) { say join ': ',$REPORTER }
     }
 
-Here the C<'in'> parameter just parses a fixed syntactic component of the
-keyword, so there's no need to capture it in a parameter.
+Here the C<'in'> parameter type just parses a fixed syntactic component of the
+keyword, so there's no need to capture it into a parameter variable.
+
+Note that types specified as regexes can be given any of the following
+trailing modifiers: C</imnsxadlup>. For example:
+
+    keyword list (/ keys | values | pairs /xiaa $what, 'in', HashVar $hash) {...}
+                                           ^^^^
 
 
-=head4 Naming literal and regex types
+=head4 Naming literal and regex types via C<keytype>
 
-Literal and regex parameter types are useful for matching syntax that PPI
-cannot recognize. However, they tend to muddy a keyword definition with
-large amounts of line noise (especially the regexes).
+Literal and regex parameter types are useful for matching non-standard
+syntax that PPR cannot recognize. However, using a regex or a literal
+as a type specifier does tend to muddy a keyword definition with large
+amounts of line noise (especially the regexes).
 
 So the module allows you to declare a named type that matches whatever
 a given literal or regex would have matched in the same place...via the
@@ -1413,81 +1164,82 @@ C<keytype> keyword.
 
 For example, instead of explicit regexes and string literals:
 
-    keyword fail ('all' $all?, /hard|soft/ $fail_mode, Block $code) {...}
+    keyword fail ('all'? $all, /hard|soft/ $fail_mode, Block $code) {...}
 
     keyword list (/keys|values|pairs/ $what, 'in', HashVar $hash) {
 
 ...you could predeclare named types that work the same:
 
-    keytype All       { 'all' }
-    keytype FailMode  { /hard|soft/ }
+    keytype All       is  'all'       ;
+    keytype FailMode  is  /hard|soft/ ;
 
-    keytype ListMode  { /keys|values|pairs/ }
-    keytype In        { 'In' }
+    keytype ListMode  is  /keys|values|pairs/ ;
+    keytype In        is  'In'                ;
 
 and then declare the keywords like so:
 
-    keyword fail (All $all?, FailMode $fail_mode, Block $code) {...}
+    keyword fail (All? $all, FailMode $fail_mode, Block $code) {...}
 
     keyword list (ListMode $what, In, HashVar $hash) {
 
-A C<keytype> can also be used to rename an existing named type more 
-meaningfully. For example:
-
-    keytype Name      { Ident  }
-    keytype ParamList { List   }
-    keytype Attr      { /:\w+/ }
-    keytype Body      { Block  }
-
-    keyword method (Name $name, ParamList $params?, Attr @attrs?, Body $body)
-    {...}
-
-Finally, if the block of the C<keytype> is not a simple regex, string
-literal, or standard type name, it is treated as the code of a
-subroutine that is passed the value of the parameter and should return
-true if the type matches. In that case, the keytype may be given a
-parameter, so you don't need to unpack C<@_> manually.
-
-For example, if a keyword could take either a block or an
-expression after it:
-
-    keytype BlockOrExpr ($block_expr) {
-        return $block_expr->isa('PPI::Structure::Block')
-            or $block_expr->isa('PPI::Statement::Expression');
-    }
-
-    # and later...
-
-    keyword demo (BlockOrExpr $demo_what) {...}
-
-B<Note:> Do not rely on source code components having been parsed via PPI
-in the long-term. The module implementation is likely to change to
-a lighter-weight parsing solution once one can be created.
-
-
-=head4 "Up-to" types
-
-Normally, a parameter's type tells the module how to parse it out of the
-source code. But you can also use any type to specify when to stop parsing
-the source code...that is: what to parse B<up to> in the source code when
-matching the parameter.
-
-If you place an ellipsis (C<...>) before the type specifier, the module
-matches everything in the source code until it has also matched the type.
-The parameter variable will contain all of the source up to and including
-whatever the type specifier matched.
-
+A C<keytype> can also be used to rename an existing named type
+(including other C<keytype>'d names) more meaningfully.
 For example:
 
-    keyword omniloop (Ident $type, ...Block $config_plus_block) {...}
-    # After the type, grab everything up to the block
+    keytype Name      is  Ident  ;
+    keytype ParamList is  List   ;
+    keytype Attr      is  /:\w+/ ;
+    keytype Body      is  Block  ;
 
-    keyword test (Expr $condition, ...';' $description) {...}
-    # After the condition expression, grab everything to the next semicolon
+    keyword method (Name $name, ParamList? $params, Attr? @attrs, Body $body)
+    {...}
 
 
+=head4 Junctive named types
 
-=head4 Scalar vs array keyword parameters
+Sometimes a keyword may need to take two or more different types of arguments
+in the same syntactic slot. For example, you might wish to create a keyword
+that accepts either a block or an expression as its argument:
+
+    try { for (1..10) { say foo() } }
+
+    try say foo();
+
+...or a block or regex:
+
+    filter { $_ < 10 } @list;
+    filter /important/ @list;
+
+When specifying the a keyword parameter, you can specify two or more
+named types for it, by conjoining them with a vertical bar (C<|>) like so:
+
+    keyword try (Block|Expression $trial) {{{
+        eval «$trial =~ /^\{/ ? $trial : "{$trial}"»
+    }}}
+
+    keyword filter (Regex|Block $selector, ArrayVar $var) {{{
+        «$var» = grep «$selector» «$var»;
+    }}}
+
+This is known as a I<disjunctive type>.
+
+Disjunctive types can only be constructed from named types (either built-in
+or defined by a C<keytype>); they cannot include from regex or literal types.
+However, this is not an onerous restriction, as it is always possible to
+convert a non-named type to a named type using C<keytype>:
+
+    keytype In   is /(?:with)?in/;
+    keytype From is 'from';
+
+    keyword list (Regex $rx, From|In, Expression $list) {{{
+        say for grep «$rx» «$list»;
+    }}}
+
+    list /fluffy/ within cats();
+    list /rex/ from dogs();
+
+
+=head3 Scalar vs array keyword parameters
 
 Declaring a keyword's parameter as a scalar (the usual approach) causes
 the source code parser to match the corresponding type of component
@@ -1498,33 +1250,249 @@ exactly once in the trailing source. For example:
 
 Declaring a keyword's parameter as an array causes the source code
 parser to match the corresponding type of component as many times as it
-appears (but at least once) in the trailing source.
+appears (but at least once) in the trailing source, with each matching
+occurence becoming one element of the array.
 
     # tryall takes one or more trailing blocks
     keyword tryall (Block @blocks) {...}
 
 
-=head4 Optional keyword parameters (with or without defaults)
+=head4 Changing the number of expected parameter matches
 
-Any parameter can be marked as optional, in which case failing to
-find a corresponding component in the trailing source is no longer
-a fatal error. For example:
+An explicit quantifier can be appended to any parameter type to change the
+number of repetitions that parameter type will match.
+For example:
 
     # The forpair keyword takes an optional iterator variable
-    keyword forpair ( Var $itervar?, '(', HashVar $hash, ')', Block $block) {...}
+    keyword forpair ( Var? $itervar, '(', HashVar $hash, ')', Block $block) {...}
 
     # The checkpoint keyword can be followed by zero or more trailing strings
-    keyword checkpoint (Str @identifier?) {...}
+    keyword checkpoint (Str* @identifier) {...}
 
-Instead of a C<?>, you can specify an optional parameter with an C<=> followed
-by a compile-time expression. The parameter is still optional, but if th e
-corresponding syntactic component is mising, the parameter variable will be assigned
-the result of the compile-time expression, rather than C<undef>.
+The available quantifiers are:
+
+=over
+
+=item C<?>
+
+to indicate zero-or-one times, as many times as possible, with backtracking
+
+=item C<*>
+
+to indicate zero-or-more times, as many times as possible, with backtracking
+
+=item C<+>
+
+to explicitly indicate one-or-more times, as many times as possible, with backtracking
+(This is also the default quantifier if the parameter variable is declared as an array.)
+
+=item C<??>
+
+to indicate zero-or-one times, as I<few> times as possible, with backtracking
+
+=item C<*?>
+
+to indicate zero-or-more times, as I<few> times as possible, with backtracking
+
+=item C<+?>
+
+to indicate one-or-more times, as I<few> times as possible, with backtracking
+
+=item C<?+>
+
+to indicate zero-or-one times, as many times as possible, I<without> backtracking
+
+=item C<*+>
+
+to indicate zero-or-more times, as many times as possible, I<without> backtracking
+
+=item C<++>
+
+to indicate one-or-more times, as many times as possible, I<without> backtracking
+
+=back
 
 For example:
 
+    # The watch keyword takes as many statements as possible, and at least one...
+    keyword watch ( Statement++ @statements) {
+        return join "\n", map { "say q{$_}; $_;" } @statements;
+    }
+
+    # The begin...end keyword takes as few statements as possible, including none...
+    keyword begin ( Statement*? $statements, 'end') {
+        return "{ $statements }";
+    }
+
+Note that any repetition quantifier is appended to the parameter's type, not after
+its variable. As the previous example indicates, any quantifier may be applied to
+either a scalar or an array parameter: the quantifier tells the type how often to
+match; the kind of parameter determines how that match is made available inside
+the keyword body: as a single string (for scalar parameters), or as a list of
+individual matches (for array parameters).
+
+
+=head4 Providing a default for optional parameters
+
+If a parameter is optional (i.e. it has a <?>, C<??>, C<?+>, <*>, <*?>,
+or C<*+> quantifier), you can specify a string to be placed in the
+parameter variable in cases where the parameter matches zero times.
+
+For example to use C<$_> as the iterator variable, if no explicit variable
+is supplied:
+
+    # The forpair keyword takes an optional iterator variable (or defaults to $_)
+    keyword forpair ( Var? $itervar = '$_', '(', HashVar $hash, ')', Block $block) {...}
+
+Another common use for defaults is to force optional arguments to default to an
+empty string, rather than to C<undef>, so it's easier to interpolate:
+
+    keyword display ( Str? $label = '', ScalarVar $var) {{{
+        say '«$label»«$var»=', «$var»
+    }}}
+
+
+Note that the default value represents an alternative piece of source
+code to be generated at compile-time, so it must be specified as an
+uninterpolated single-quoted string (either C<'...'> or C<q{...}>).
+
+Array parameters can also have a default value specified. However, as
+for scalar parameters, the default must still be a single single-quoted
+string (not a list or array). For example:
+
+    # The checkpoint keyword defaults to check-pointing CHECKPOINT...
+    keyword checkpoint (Str* @identifier = 'CHECKPOINT') {...}
+
+If you provide a default for an unquantified parameter, the module will infer
+that you intended the parameter to be optional and will quietly provide a
+suitable implicit quantifier (C<?> for scalars, C<*> for arrays). So the
+previous examples could also have been written:
+
     # The forpair keyword takes an optional iterator variable (or defaults to $_)
     keyword forpair ( Var $itervar = '$_', '(', HashVar $hash, ')', Block $block) {...}
+
+    # The checkpoint keyword defaults to check-pointing CHECKPOINT...
+    keyword checkpoint (Str @identifier = 'CHECKPOINT') {...}
+
+
+=head3 Handling whitespace between arguments
+
+Normally, a keyword parses and discards any Perl whitespaces (spaces,
+tabs, newlines, comments, POD, etc.) between its arguments. Each
+parameter receives the appropriate matching code component with its
+leading whitespace removed (unless, of course, that component itself
+explicitly matches whitespace, in which case it's preserved).
+
+Occasionally, however, leading whitespace may be significant.
+For example, you may wish to implement a C<note> keyword that
+differentiates between:
+
+    note (1..3)  --> $filename;
+
+and:
+
+    note( 1..3 ) --> $filename;
+
+You could achieve that by explicitly matching the optional whitespace before the
+opening paranthesis:
+
+    keyword note (OWS $ws, ParenList $list, /-->[^;]*/ $comment) {
+        return 'say '
+             . (length($ws) ? "'(', $list, ')'" : $list);
+    }
+
+However, this approach can quickly get tedious and unwieldy when
+multiple parameters all need to preserve leading whitespace:
+
+    keyword note (OWS $ws1, ParenList $list, OWS $ws2, /-->[^;]*/ $comment)
+    {
+        return 'say '
+             . (length($ws1) ? "'(', $list, ')'" : $list)
+             . ("'$ws2$comment'");
+    }
+
+So the module provides an attribute, C<:keepspace>, that causes a keyword to
+simply keep any leading whitespace at the start of each parameter:
+
+    keyword note (ParenList $list, /-->[^;]*/ $comment) :keepspace {...}
+    {
+        return 'say '
+             . ($list !~ /^\(/  ? "'(', $list, ')'" : $list)
+             . $comment;
+    }
+
+When using the :keepspace attribute, be aware that the leading whitespace
+preserved at the start of each attribute is Perl's concept of whitespace
+(which includes comments, POD, and possibly even heredoc contents), so if
+your keyword later needs to strip it out, then:
+
+    $list =~ s{ ^ \s* }{}x;
+
+will not suffice. At a minimum, you'll need to cater for comments as
+well:
+
+    $list =~ s{ ^ \s*+ (?: [#].*+\n \s*+)*+ }{}x
+
+and, to be really safe, you need to handle every other Perlish
+"whitespace" as well:
+
+    $list =~ s{ ^ (?PerlOWS) $PPR::GRAMMAR }{}x;
+
+
+=head3 Keywords with trailing context
+
+Sometimes a keyword implementation needs to modify more of the source
+code than just its own arguments. For example, a C<let> keyword might
+need to install some code after the end of the surrounding block:
+
+    keyword let (Var $var, '=', Expr $value, Statement* $trailing_code, '}')
+    {{{
+            «trailing_code»
+        }
+        «$var» = «$value»;
+    }}}
+
+But you can't create a keyword like that, because it can't be
+successfully parsed as part of a larger Perl code block...because it
+"eats" the right-curly that surrounding block needs to close itself.
+
+What's needed here is a way to have a keyword operate on trailing
+code, but then not consider that trailing code to be part of its
+"official" argument list, so that subsequent parsing doesn't
+prematurely consume it.
+
+The module supports this via the C<:then> attribute. You could, for example,
+successfully implement the C<let> keyword like so:
+
+    keyword let (Var $var, '=', Expr $value) :then(Statement* $trailing_code, '}')
+    {{{
+            «trailing_code»
+        }
+        «$var» = «$value»;
+    }}}
+
+The parentheses of the C<:then> act like a second parameter list, which
+must match when the keyword is encountered and expanded within the
+source, but which is treated like mere "lookahead" when the keyword is
+parsed as part of the processing of other keywords.
+
+The C<:then> attribute must come immediately after the keyword's normal
+parameter list (i.e. before any other attribute the keyword might have),
+and uses exactly the name parameter specification syntax as the normal
+parameter list.
+
+Moreover, any arguments the C<:then> parameters match are removed from the
+source, and must be replaced or amended as part of the new source code
+returned by the keyword body. For example: the new source returned by
+the body of C<let> starts with reinstating both the trailing code and
+the closing curly:
+
+    keyword let (Var $var, '=', Expr $value) :then(Statement* $trailing_code, '}')
+    {{{
+            «trailing_code»
+        }
+        «$var» = «$value»;
+    }}}
 
 
 =head3 Specifying a keyword description
@@ -1533,31 +1501,29 @@ Normally the error messages the module generates refer to the
 keyword by name. For example, an error detected in parsing a
 C<repeat> keyword with:
 
-    keyword repeat (/while/ $while, List $condition, Block $code)
+    keyword repeat ('while', List $condition, Block $code)
     {...}
 
 might produce the error message:
 
-    Syntax error in repeat...
-    Expected while after repeat but found: with
+    Invalid repeat at demo.pl line 28.
 
-which is a good message, but would be slightly better if it was:
+which is a reasonable message, but would be slightly better if it was:
 
-    Syntax error in repeat-while loop...
-    Expected while after repeat but found: with
+    Invalid repeat-while loop at demo.pl line 28.
 
 You can request that a particular keyword be referred to in error
 messages using a specific description, by adding the C<:desc>
 modifier to the keyword definition. For example:
 
-    keyword repeat (/while/ $while, List $condition, Block $code)
+    keyword repeat ('while', List $condition, Block $code)
     :desc(repeat-while loop)
     {...}
 
 
 =head2 Simplifying keyword generation with an interpolator
 
-Frequently, the code block that generates the replacement syntax for the
+Frequently, the code block that generates the replacement syntax for a
 keyword will consist of something like:
 
     {
@@ -1565,20 +1531,22 @@ keyword will consist of something like:
         return qq{ REPLACEMENT $code_interpolation HERE };
     }
 
-in which the block does some maniulation of one or more parameters, then
-interpolates the results into a single string, which it returns.
+in which the block does some manipulation of one or more of its
+parameters, then interpolates the results into a single string,
+which it returns as the replacement source code.
 
 So the module provides a shortcut for that structure: the "triple
-curly" block. If a keyword's block is delimited by three adjacent curly
-brackets, the entire block is taken to be a single uninterpolated string
-that specifies the replacement source code. Within that single string
-anything in C<< <{...}> >> delimiters is a piece of code to be executed
-and its result is interpolated at that point in the replacement code.
+curly" block. If a keyword's block is delimited by three contiguous
+curly brackets, then the entire block is taken to be a single
+uninterpolated string that specifies the replacement source code.
+Within that single string anything in C<«...»> is treated as a piece
+of code to be executed and its result interpolated at that point in
+the replacement code.
 
 In other words, a triple-curly block is a literal code template, with
-special C<< <{...}> >> interpolators.
+special C<«...»> interpolators.
 
-For example, instead of:
+For example, instead of writing:
 
     keyword forall (List $list, '->', Params @params, Block $code_block)
     {
@@ -1608,24 +1576,28 @@ For example, instead of:
     {{{
         {
             state $__acc__ = [];
-            foreach my $__nary__  <{ $list =~ s{\)\Z}{,\\\$__acc__)}r }>
+            foreach my $__nary__  « $list =~ s{\)\Z}{,\\\$__acc__)}r »
             {
                 if (!ref($__nary__) || $__nary__ != \$__acc__) {
                     push @{$__acc__}, $__nary__;
-                    next if @{$__acc__} <= <{ $#parameters }>;
+                    next if @{$__acc__} <= «$#params»;
                 }
                 next if !@{$__acc__};
-                my ( <{"@parameters"}> ) = @{$__acc__};
+                my ( «"@params"» ) = @{$__acc__};
                 @{$__acc__} = ();
 
-                <{substr $code_block, 1, -1}>
+                « substr $code_block, 1, -1 »
             }
         }
     }}}
 
 ...with a significant reduction in the number of sigils that have to be
-escaped (and hence a significant decrease in the likelihood of errors
+escaped (and hence a significant decrease in the likelihood of bugs
 creeping in).
+
+Note: for those living without the blessings of Unicode, you can also
+      use the pure ASCII C<< <{...}> >> to delimit interpolations,
+      instead of C<«...»>.
 
 
 =head2 Declaring multiple variants of a single keyword
@@ -1639,82 +1611,167 @@ provide the replacement code.
 For example, you might specify three syntaxes for a C<repeat> loop:
 
     keyword repeat ('while', List $condition, Block $block) {{{
-        while (1) { do <{$block}>; last if !(<{$condition}>); }
+        while (1) { do «$block»; last if !(«$condition»); }
     }}}
 
     keyword repeat ('until', List $condition, Block $block) {{{
-        while (1) { do <{$block}>; last if <{$condition}>; }
+        while (1) { do «$block»; last if «$condition»; }
     }}}
 
     keyword repeat (Num $count, Block $block) {{{
-        for (1..<{$count}>) <{$block}>
+        for (1..«$count») «$block»
     }}}
 
 When it encounters a keyword, the module now attempts to (re)parse the
 trailing code with each of the definitions of that keyword in the
-current lexical scope, collecting those definitions that successfuly
-parse the source.
+current lexical scope, collecting every definition that successfuly
+parses the source at that point.
 
-If more than one definition was successful, the module selects the
+If more than one definition was successful, the module first selects the
 definition(s) with the most parameters. If more than one definition had
-the maximal number of parameters, the module selects the one whose
-parameters matched most specifically. If two or more definitions matched
-equally specifically, the module looks for one that is marked with a
-C<:prefer> attribute. If there is no C<:prefer> indicated (or more than
-one), the module gives up and reports a syntax ambiguity.
+the maximal number of parameters, the module then selects the one whose
+parameters matched most specifically. For example, if you had two keywords:
 
-The C<:prefer> attribute works like this:
+    keyword wait (Int $how_long, Str $msg) {{{
+        { sleep «$how_long»; warn «$msg»; }
+    }}}
 
-    
+    keyword wait (Num $how_long, Str $msg) {{{
+        { use Time::HiRes 'sleep'; sleep «$how_long»; warn «$msg»; }
+    }}}
 
-The order of specificity for a paremeter match is determined by the relationships
-between the various components of a Perl program, as follows (where the further
-left a type is, the more specific it is):
+...and wrote:
 
-    ArrayIndex
-    Comment
-    Label
-    Pod
-    Subscript
-    Whitespace
-    Operator
-        Comma
-    Statement
-        Block
-        Expr
-            Identifier
-            QualIdent
-            Var
-                ScalarVar
-                ArrayVar
-                HashVar
-            Number
-                Integer
-                Binary
-                Octal
-                Hex
-                Float
-                Exp
-                Version
-            Quote/String
-                Single
-                Double
-                Literal
-                Interpolate
-                HereDoc
-            QuoteLike
-                Backtick
-                Command
-                Words
-                Readline
-            Regexp/Pattern
-                Match
-                Substitute
-                Transliterate
-            AnonHash
-            Constructor
-            Condition
-            List
+    wait 1, 'Done';
+
+...then the first keyword would be selected over the second,
+because C<Int> is more specific than C<Num> and C<Str> is just
+as specific as C<Str>.
+
+If two or more definitions matched equally specifically, the module
+looks for one that is marked with a C<:prefer> attribute. If there is no
+C<:prefer> indicated (or more than one), the module gives up and reports
+a syntax ambiguity.
+
+The order of specificity for a parameter match is determined by the relationships
+between the various components of a Perl program, as illustrated in the following
+tree (where a child type is more specific that its parent or higher ancestors,
+and less specific than its children or deeper descendants):
+
+=for comment Autogenerated type hierarchy (from bin/gen_types.pl)...
+
+    ArrayIndexer
+
+    InfixBinaryOperator
+
+    StatementModifier
+
+    HashIndexer
+
+    OWS
+     \..NWS or Whitespace 
+       |...Pod 
+        \..Comment 
+
+    PostfixUnaryOperator
+
+    Attributes
+
+    LowPrecedenceInfixOperator
+
+    PrefixUnaryOperator
+
+    Document
+     \..Statement 
+       |...Block 
+       |...PackageDeclaration 
+       |...Label 
+       |...UseStatement 
+       |...Format 
+       |...Expression or Expr 
+       |    \..LowPrecedenceNotExpression 
+       |       \..List 
+       |          \..CommaList 
+       |             \..Assignment 
+       |                \..ConditionalExpression or Ternary or ListElem 
+       |                   \..BinaryExpression 
+       |                      \..PrefixPostfixTerm 
+       |                         \..Term 
+       |                           |...AnonymousHash or AnonHash 
+       |                           |...VariableDeclaration or VarDecl 
+       |                           |...Literal 
+       |                           |   |...Number or Num 
+       |                           |   |   |...Integer or Int 
+       |                           |   |   |    \..PositiveInteger or PosInt 
+       |                           |   |    \..VersionNumber 
+       |                           |   |       \..VString 
+       |                           |   |...Bareword 
+       |                           |   |    \..OldQualifiedIdentifier 
+       |                           |   |       \..QualifiedIdentifier or QualIdent 
+       |                           |   |          \..Identifier or Ident 
+       |                           |    \..String or Str 
+       |                           |      |...VString 
+       |                           |      |...QuotelikeQ 
+       |                           |      |...QuotelikeQQ 
+       |                           |       \..Heredoc 
+       |                           |...Lvalue 
+       |                           |...AnonymousSubroutine 
+       |                           |...AnonymousArray or AnonArray 
+       |                           |...DoBlock 
+       |                           |...DiamondOperator 
+       |                           |...Variable or Var 
+       |                           |   |...ScalarAccess 
+       |                           |   |    \..VariableScalar or VarScalar or ScalarVar 
+       |                           |   |...ArrayAccess 
+       |                           |   |    \..VariableArray or VarArray or ArrayVar 
+       |                           |    \..HashAccess 
+       |                           |       \..VariableHash or VarHash or HashVar 
+       |                           |...Typeglob 
+       |                           |...Call 
+       |                           |    \..BuiltinFunction 
+       |                           |       \..NullaryBuiltinFunction 
+       |                           |...ParenthesesList or ParensList 
+       |                           |...ReturnStatement 
+       |                           |...EvalBlock 
+       |                            \..Quotelike 
+       |                              |...Regex or Regexp 
+       |                              |   |...QuotelikeQR 
+       |                              |   |...ContextualRegex 
+       |                              |   |   |...ContextualMatch or ContextualQuotelikeM 
+       |                              |   |    \..QuotelikeQR 
+       |                              |    \..Match or QuotelikeM 
+       |                              |       \..ContextualMatch or ContextualQuotelikeM 
+       |                              |...QuotelikeQW 
+       |                              |...QuotelikeQX 
+       |                              |...Substitution or QuotelikeS 
+       |                              |...Transliteration or QuotelikeTR 
+       |                               \..String or Str 
+       |                                 |...QuotelikeQQ 
+       |                                  \..QuotelikeQ 
+       |...SubroutineDeclaration 
+       |...Keyword 
+        \..ControlBlock 
+
+    Comma
+
+    AssignmentOperator
+
+=for comment End of autogenerated type hierarchy
+
+User-defined named types (declared via the C<keytype> mechanism)
+are treated as being more specific than the type they rename.
+
+Junctive types are treated as being less specific than any one of their
+components, and exactly as specific as any other junctive type.
+
+Regex and string types are treated as being more specific than
+any named or junctive type.
+
+Generally speaking, the mechanism should just do the right thing,
+without your having to think about it too much...and will warn you at
+compile-time when it can't work out the right thing to do, in which
+case you'll need to think about it some more.
+
 
 =head2 Exporting keywords
 
@@ -1736,8 +1793,9 @@ If you load the module with the C<'debug'> option:
 
     use Keyword::Declare {debug=>1};
 
-then keywords declared in that lexical scope will report how they 
-transform the source following them. For example:
+then keywords and keytypes declared in that lexical scope will report
+their own declarations, and will subsequently report how they transform
+the source following them. For example:
 
     use Keyword::Declare {debug=>1};
 
@@ -1745,7 +1803,7 @@ transform the source following them. For example:
         my $EXTRACTOR = $what eq 'values' ? 'values' : 'keys';
         my $REPORTER  = $what eq 'pairs' ? $hash.'{$data}' : '$data';
 
-        return qq{for my \$data ($EXTRACTOR $hash) { say join ': ', $REPORTER }};
+        return qq{for my \$data ($EXTRACTOR $hash) { say join "\\n", ${REPORTER}_from($hash) }};
     }
 
     # And later...
@@ -1755,17 +1813,23 @@ transform the source following them. For example:
 ...would print to STDERR:
 
     #####################################################
-    ### Keyword macro defined at demo.pl line 3:
+    ### Installed keyword macro at demo.pl line 10:
     ###
-    ###    list <what> in <hash>
+    ###list  <what>  in  <hash>
     ###
-    ### Converted code at demo.pl line 12:
+    #####################################################
+    #####################################################
+    ### Keyword macro defined at demo.pl line 10:
     ###
-    ###    list pairs in %foo;
+    ###    list  <what>  in  <hash>
+    ###
+    ### Converted code at demo.pl line 19:
+    ###
+    ###    list  pairs in %foo
     ###
     ### Into:
     ###
-    ###    for my $data (keys %foo) { say join ': ', %foo{$data} }
+    ###    for my $data (keys %foo) { say join "\n", keys_from(\%foo) }
     ###
     #####################################################
 
@@ -1773,50 +1837,6 @@ transform the source following them. For example:
 =head1 DIAGNOSTICS
 
 =over
-
-=item C<< Keyword %s not in scope >>
-
-The module detected that you used a user-defined keyword, but not
-in a lexical scope in which that keyword was declared or imported.
-
-You need to move the keyword declaration (or the import) into scope, or
-else move the use of the keyword to a scope where the keyword is valid.
-
-
-=item C<< Syntax error in %s... Expected %s >>
-
-You used a keyword, but with the wrong syntax after it.
-The error message lists what the valid possibilities were.
-
-
-=item C<< Ambiguous use of %s >>
-
-You used a keyword, but the syntax after it was ambiguous
-(i.e. it matched two or more variants of the keyword).
-
-You either need to change the syntax you used (so that it matches only
-one variant of the keyword syntax) or else change the definition of one
-or more of the keywords (to ensure their syntaxes are no longer ambiguous).
-
-
-=item C<< Expected parameter type specification, but found %s instead >>
-
-=item C<< Unexpected %s in parameter list of %s >>
-
-You put something in the parameter list of a keyword definition that the
-mechanism didn't recognize. Perhaps you misspelled something?
-
-=item C<< Unknown type (%s) in parameter list of keyword >>
-
-You used a type for a keyword parameter that the module did not
-recognize. See earlier in this document for a list of the types that the
-module knows. Alternatively, did you declare a C<keytype> but then use
-it in the wrong lexical scope?
-
-=item C<< Expected comma or closing paren, but found %s instead >>
-
-There was something unexpected after the end of a keyword parameter.
-Possibly a misspelling, or a missing closing parenthesis.
 
 =item C<< Invalid option for: use Keyword::Declare >>
 
@@ -1832,34 +1852,99 @@ instead of:
     use Keyword::Declare {debug=>1};
 
 
-=item C<< Expected %s after %s but found: %s >>
+=item C<< Can't redefine 'keyword' keyword >>
 
-You used a user-defined keyword, but with the wrong syntax.
-The error message indicates the point at which an unexpected
-component was encountered during compilation, and what should
-have been there instead.
+You attempted to use the C<keyword> keyword to define a new keyword
+named C<keyword>. Isn't your life hard enough without attempting to
+inject that amount of meta into it???
 
-=item C<< Not a valid regex: %s in keytype specification" >>
-
-A C<keytype> expects a valid regex to specify the new keyword-parameter
-type. The regex you supplied wasn't valid (for the reason listed).
-
-=item C<< Missing }}} on string-style block of keyword %s >>
-
-You created a C<keyword> definition with a C<{{{...}}}> interpolator
-for its body, but the module couldn't find the closing C<}}}>. Did
-you use C<}}> or C<}> instead?
+Future versions of this module may well allow you to overload the
+C<keyword> keyword, but this version doesn't. You could always use
+C<Keyword> instead.
 
 
+=item C<< Can't redefine 'keytype' keyword >>
+
+No, you can't redefine the C<keytype> keyword either.
+
+
+
+=item C<< Unknown type (%s) for keyword parameter. Did you mean: %s", >>
+
+You used a type for a keyword parameter that the module did not
+recognize. See earlier in this document for a list of the types that the
+module knows. You may also have misspelled a type.
+Alternatively, did you declare a C<keytype> but then use it in the
+wrong lexical scope?
+
+
+=item C<< :then attribute specified too late >>
+
+A C<:then> attribute must be specified immediately after the closing
+parenthesis of the keyword's main parameter list, without any other
+attributes between the two. You placed the C<:then> attribute after
+some other attribute. Move it so that it follows the parameter list
+directly.
+
+
+=item C<< Invalid attribute: %s >>
+
+Keywords may only be specified with four attributes:
+C<:then>, C<:desc>, C<:prefer>, and C<:keepspace>.
+
+You specified some other attribute that the module doesn't know how to
+handle (or possibly misspelled one of the valid three).
+
+
+=item C<< Missing » on interpolation «%s... >>
 =item C<< Missing }> on interpolation <{%s... >>
 
 You created a C<keyword> definition with a C<{{{...}}}> interpolator,
 within which there was an interpolation that extended to the end of the
-interpolator without supplying a closing C<< }> >>. Did you accidentally
-use just a C<< > >> or a C<< } >> instead?
+interpolator without supplying a closing C<»> or C<< }> >>. Did you
+accidentally use just a C<< > >> or a C<< } >> instead?
 
+
+=item C<< Invalid %s at %s. Expected: %s but found: %s >>
+
+You used a defined keyword, but with the wrong syntax after it.
+The error message lists what the valid possibilities were.
+
+
+=item C<< Ambiguous %s at %s. Could be: %s >>
+
+You used a keyword, but the syntax after it was ambiguous
+(i.e. it matched two or more variants of the keyword equally well).
+
+You either need to change the syntax you used (so that it matches only
+one variant of the keyword syntax) or else change the definition of one
+or more of the keywords (to ensure their syntaxes are no longer ambiguous).
+
+
+=item C<< Invalid keyword definition. Expected %s but found: %s >>
+
+You attempted to define a keyword, but used the wrong syntax.
+The parameter specification is the usual suspect, or else a
+syntax error in the block.
+
+
+=item C<< Likely keyword substitution cycle: %s >>
+
+The module replaced a keyword with some code that contained another
+keyword, which the module replaced with some code that contained another
+keyword, which the module replaced with...et cetera, et cetera.
+
+If the module detects itself rewriting the same section of code many
+times, and with the same keyword being recursively expanded more than
+once, then it infers that the expansion process is never going to
+end...and simply gives up.
+
+To avoid this problem, don't create a keyword A that generates code that
+includes keyword B, where keyword B generates code that includes keyword
+C, where keyword C generates code that includes keyword A.
 
 =back
+
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
@@ -1873,7 +1958,7 @@ was introduced in Perl 5.12. Hence it will never work under earlier
 versions of Perl. The implementation also uses contructs introduced in
 Perl 5.14, so that is the minimal practical version.
 
-Currently requires both the Keyword::Simple module and the PPI module.
+Currently requires both the Keyword::Simple module and the PPR module.
 
 
 =head1 INCOMPATIBILITIES
@@ -1888,21 +1973,14 @@ or Devel::Declare.
 
 The module currently relies on Keyword::Simple, so it is subject to all
 the limitations of that module. Most significantly, it can only create
-keywords that appear at the beginning of a statement.
+keywords that appear at the beginning of a statement (though you can
+almost always code around that limitation by wrapping the keyword in
+a C<do{...}> block.
 
-Even with the remarkable PPI module, parsing Perl code is tricky, and
-parsing Perl code to build Perl code that parses other Perl code is even
-more so. Hence, there are likely to be cases where this module gets it
-spectacularly wrong. In particular, attempting to mix PPI-based parsing with
-regex-based parsing--as this module does--is madness, and almost certain
-to lead to tears for someone (apart from the author, obviously).
-
-Moreover, because of the extensive (and sometimes iterated) use of PPI,
-the module currently imposes a noticeable compile-time delay, both on the
-code that declares keywords, and also on any code that subsequently uses
-them.
-
-Plans are in train to address most or all of these limitations....eventually.
+Even with the PPR module, parsing Perl code is tricky, and parsing Perl
+code to build Perl code that parses other Perl code is even more so.
+Hence, there are likely to be cases where this module gets it
+spectacularly wrong.
 
 Please report any bugs or feature requests to
 C<bug-keyword-declare.cpan.org>, or through the web interface at
@@ -1916,7 +1994,7 @@ Damian Conway  C<< <DCONWAY@CPAN.org> >>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2015, Damian Conway C<< <DCONWAY@CPAN.org> >>. All rights reserved.
+Copyright (c) 2015-2017, Damian Conway C<< <DCONWAY@CPAN.org> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.

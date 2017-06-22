@@ -1,7 +1,7 @@
 package JobCenter::Client::Mojo;
 use Mojo::Base -base;
 
-our $VERSION = '0.19'; # VERSION
+our $VERSION = '0.23'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -13,26 +13,30 @@ BEGIN {
 }
 # more Mojolicious
 use Mojo::IOLoop;
+use Mojo::IOLoop::Stream;
 use Mojo::Log;
 
 # standard perl
 use Carp qw(croak);
 use Cwd qw(realpath);
+use Data::Dumper;
 use Encode qw(encode_utf8 decode_utf8);
 use File::Basename;
-use FindBin;
+use IO::Handle;
+use POSIX ();
+use Storable;
 use Sys::Hostname;
 
 # from cpan
-use JSON::RPC2::TwoWay;
+use JSON::RPC2::TwoWay 0.02;
 # JSON::RPC2::TwoWay depends on JSON::MaybeXS anyways, so it can be used here
 # without adding another dependency
 use JSON::MaybeXS qw(decode_json encode_json);
-use MojoX::NetstringStream 0.04;
+use MojoX::NetstringStream 0.04; # older versions have utf-8 bugs
 
 has [qw(
-	actions address auth conn daemon debug jobs json log method 
-	port rpc timeout tls token who
+	actions address auth clientid conn daemon debug jobs json lastping log
+	method ping_timeout port rpc timeout tls token who
 )];
 
 sub new {
@@ -105,6 +109,7 @@ sub new {
 	$self->{debug} = $args{debug} // 1;
 	$self->{jobs} = {};
 	$self->{json} = $json;
+	$self->{ping_timeout} = $args{ping_timeout} // 300;
 	$self->{log} = $log;
 	$self->{method} = $method;
 	$self->{port} = $port;
@@ -329,6 +334,15 @@ sub work {
 		_daemonize();
 	}
 
+	my $pt = $self->ping_timeout;
+	my $tmr = Mojo::IOLoop->timer($pt => sub {
+		my $ioloop = shift;
+		return if ($self->lastping // 0) > time - $pt;
+		$self->log->error('ping timeout');
+		$ioloop->remove($self->clientid);
+		$ioloop->stop;
+	}) if $pt > 0;
+
 	$self->log->debug('JobCenter::Client::Mojo starting work');
 	Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 	$self->log->debug('JobCenter::Client::Mojo done?');
@@ -340,7 +354,10 @@ sub announce {
 	my ($self, %args) = @_;
 	my $actionname = $args{actionname} or croak 'no actionname?';
 	my $cb = $args{cb} or croak 'no cb?';
-	my $async = $args{async} // 0;
+	#my $async = $args{async} // 0;
+	my $mode = $args{mode} // (($args{async}) ? 'async' : 'sync');
+	croak "unknown callback mode $mode" unless $mode =~ /^(subproc|async|sync)$/;
+	my $undocb = $args{undocb};
 	my $slots = $args{slots} // 1;
 	my $host = hostname;
 	my $workername = $args{workername} // "$self->{who} $host $0 $$";
@@ -367,7 +384,11 @@ sub announce {
 		}
 		my ($res, $msg) = @$r;
 		$self->log->debug("announce got res: $res msg: $msg");
-		$self->actions->{$actionname} = { cb => $cb, async => $async, slots => $slots } if $res;
+		$self->actions->{$actionname} = {
+			cb => $cb,
+			mode => $mode,
+			undocb => $undocb,
+			slots => $slots } if $res;
 		$err = $msg unless $res;
 	})->catch(sub {
 		my $d;
@@ -380,6 +401,7 @@ sub announce {
 
 sub rpc_ping {
 	my ($self, $c, $i, $rpccb) = @_;
+	$self->lastping(time());
 	return 'pong!';
 }
 
@@ -416,19 +438,100 @@ sub rpc_task_ready {
 			return;
 		}
 		local $@;
-		if ($action->{async}) {
+		if ($action->{mode} eq 'subproc') {
+			eval {
+				$self->_subproc($c, $action, $job_id, $cookie, $inargs);
+			};
+			$c->notify('task_done', { cookie => $cookie, outargs => { error => $@ } }) if $@;
+		} elsif ($action->{mode} eq 'async') {
 			eval {
 				$action->{cb}->($job_id, $inargs, sub {
 					$c->notify('task_done', { cookie => $cookie, outargs => $_[0] });
 				});
 			};
 			$c->notify('task_done', { cookie => $cookie, outargs => { error => $@ } }) if $@;
-		} else { 
+		} elsif ($action->{mode} eq 'sync') {
 			my $outargs = eval { $action->{cb}->($job_id, $inargs) };
 			$outargs = { error => $@ } if $@;
 			$c->notify('task_done', { cookie => $cookie, outargs => $outargs });
+		} else { 
+			die "unkown mode $action->{mode}";
 		}
 	});
+}
+
+sub _subproc {
+	my ($self, $c, $action, $job_id, $cookie, $inargs) = @_;
+
+	# based on Mojo::IOLoop::Subprocess
+	my $ioloop = Mojo::IOLoop->singleton;
+
+	# Pipe for subprocess communication
+	pipe(my $reader, my $writer) or die "Can't create pipe: $!";
+
+	die "Can't fork: $!" unless defined(my $pid = fork);
+	unless ($pid) {# Child
+		$self->log->debug("in child $$");;
+		$ioloop->reset;
+		close $reader; # or we won't get a sigpipe when daddy dies..
+		my $undo = 0;
+		my $outargs = eval { $action->{cb}->($job_id, $inargs) };
+		if ($@) {
+			$outargs = {'error' => $@};
+			$undo++;
+		} elsif (ref $outargs eq 'HASH' and $outargs->{'error'}) {
+			$undo++;
+		}
+		if ($undo and $action->{undocb}) {
+			$self->log->info("undoing for $job_id");;
+			my $res = eval { $action->{undocb}->($job_id, $inargs); };
+			$res = $@ if $@;
+			# how should this look?
+			$outargs = {'error' => {
+				'msg' => 'undo failure',
+				'undo' => $res,
+				'olderr' => $outargs->{error},
+			}};
+			$undo = 0;
+		}
+		# stop ignoring sigpipe
+		$SIG{PIPE} = sub { $undo++ };
+		# if the parent is gone we get a sigpipe here:
+		print $writer Storable::freeze($outargs);
+		$writer->flush or $undo++;
+		close $writer or $undo++;
+		if ($undo and $action->{undocb}) {
+			$self->log->info("undoing for $job_id");;
+			eval { $action->{undocb}->($job_id, $inargs); };
+			# ignore errors because we can't report them back..
+		}
+		# FIXME: normal exit?
+		POSIX::_exit(0);
+	}
+
+	# Parent
+	my $me = $$;
+	close $writer;
+	my $stream = Mojo::IOLoop::Stream->new($reader)->timeout(0);
+	$ioloop->stream($stream);
+	my $buffer = '';
+	$stream->on(read => sub { $buffer .= pop });
+	$stream->on(
+		close => sub {
+			#say "close handler!";
+			return unless $$ == $me;
+			waitpid $pid, 0;
+			my $outargs = eval { Storable::thaw($buffer) };
+			$outargs = { error => $@ } if $@;
+			if ($outargs and ref $outargs eq 'HASH') {
+				$self->log->debug('subprocess results: ' . Dumper($outargs));
+				eval { $c->notify(
+						'task_done',
+						{ cookie => $cookie, outargs => $outargs }
+				); }; # the connection might be gone?
+			} # else?
+		}
+	);
 }
 
 # copied from Mojo::Server
@@ -538,9 +641,14 @@ expected and json encoded.  (default true)
 
 (per default a new L<Mojo::Log> object is created)
 
-=item - timeout: how long to wait for operations to complete
+=item - timeout: how long to wait for Api calls to complete
 
 (default 60 seconds)
+
+=item - ping_timeout: after this long without a ping from the Api the
+connection will be closed and the work() method will return
+
+(default 5 minutes)
 
 =back
 
@@ -563,7 +671,7 @@ Valid arguments are:
 =item - vtag: version tag of the workflow to use (optional)
 
 =item - timeout: wait this many seconds for the job to finish
-(optional, defaults to 5 minutes)
+(optional, defaults to 5 times the Api-call timeout, so default 5 minutes)
 
 =back
 
@@ -642,8 +750,29 @@ Valid arguments are:
 
 (required)
 
-=item - async: if true then the callback gets passed another callback as the
-last argument that is to be called on completion of the task.
+=item - mode: callback mode
+
+(optional, default 'sync')
+
+Possible values:
+
+=over 8
+
+=item - 'sync': simple blocking mode, just return the results from the
+callback.  Use only for callbacks taking less than (about) a second.
+
+=item - 'subproc': the simple blocking callback is started in a seperate
+process.  Useful for callbacks that take a long time.
+
+=item - 'async': the callback gets passed another callback as the last
+argument that is to be called on completion of the task.  For advanced use
+cases where the worker is actually more like a proxy.  The (initial)
+callback is expected to return soonish to the event loop, after setting up
+some Mojo-callbacks.
+
+=back
+
+=item - async: backwards compatible way for specifying mode 'async'
 
 (optional, default false)
 
@@ -651,6 +780,12 @@ last argument that is to be called on completion of the task.
 for this action.
 
 (optional, default 1)
+
+=item - undocb: a callback that gets called when the original callback
+returns an error object or throws an error.  Called with the same arguments
+as the original callback.
+
+(optional, only valid for mode 'subproc')
 
 =back
 

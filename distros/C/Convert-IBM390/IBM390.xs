@@ -3,6 +3,7 @@
 #include "XSUB.h"
 
 #include "IBM390lib.h"
+#define SHORTY_SIZE 2048
 
  /*---- Translation tables ----*/
 
@@ -115,14 +116,14 @@ asc2eb(instring_sv)
 	char *  instring;
 	char *  outstring_wk;
 	 /* To avoid allocating small amounts of storage: */
-	char    shorty[1024];
+	char    shorty[SHORTY_SIZE];
 
 	PPCODE:
 	instring = SvPV(instring_sv, ilength);
 #ifdef DEBUG390
 	fprintf(stderr, "*D* asc2eb: beginning; length %d\n", ilength);
 #endif
-	if (ilength <= 1024) {
+	if (ilength <= SHORTY_SIZE) {
 	   CF_fcs_xlate(shorty, instring, ilength, a2e_table);
 	   PUSHs(sv_2mortal(newSVpvn(shorty, ilength)));
 	} else {
@@ -144,14 +145,14 @@ eb2asc(instring_sv)
 	char *  instring;
 	char *  outstring_wk;
 	 /* To avoid allocating small amounts of storage: */
-	char    shorty[1024];
+	char    shorty[SHORTY_SIZE];
 
 	PPCODE:
 	instring = SvPV(instring_sv, ilength);
 #ifdef DEBUG390
 	fprintf(stderr, "*D* eb2asc: beginning; length %d\n", ilength);
 #endif
-	if (ilength <= 1024) {
+	if (ilength <= SHORTY_SIZE) {
 	   CF_fcs_xlate(shorty, instring, ilength, e2a_table);
 	   PUSHs(sv_2mortal(newSVpvn(shorty, ilength)));
 	} else {
@@ -173,14 +174,14 @@ eb2ascp(instring_sv)
 	char *  instring;
 	char *  outstring_wk;
 	 /* To avoid allocating small amounts of storage: */
-	char    shorty[1024];
+	char    shorty[SHORTY_SIZE];
 
 	PPCODE:
 	instring = SvPV(instring_sv, ilength);
 #ifdef DEBUG390
 	fprintf(stderr, "*D* eb2ascp: beginning; length %d\n", ilength);
 #endif
-	if (ilength <= 1024) {
+	if (ilength <= SHORTY_SIZE) {
 	   CF_fcs_xlate(shorty, instring, ilength, e2ap_table);
 	   PUSHs(sv_2mortal(newSVpvn(shorty, ilength)));
 	} else {
@@ -293,9 +294,9 @@ packeb(pat, ...)
 	         aptr = SvPV(item, item_len);
 	         if (pat[-1] == '*') {
 	             len = item_len;
-                 if (len > sizeof(eb_work))
-	               croak("String too long in packeb: %c*", datumtype);
-             }
+	         if (len > sizeof(eb_work))
+	             croak("String too long in packeb: %c*", datumtype);
+	         }
 	         CF_fcs_xlate(eb_work, aptr, min(len, item_len), a2e_table);
 
 	         if (item_len > len) {
@@ -788,17 +789,17 @@ _set_translation(a2e_sv, e2a_sv, e2ap_sv)
 	CODE:
 	a2e_string = SvPVbyte(a2e_sv, ilength);
 	if (ilength != 256) {
-       croak("a2e table must be 256 bytes, not %d", ilength);
+	      croak("a2e table must be 256 bytes, not %d", ilength);
 	}
 
 	e2a_string = SvPVbyte(e2a_sv, ilength);
 	if (ilength != 256) {
-       croak("e2a table must be 256 bytes, not %d", ilength);
+	      croak("e2a table must be 256 bytes, not %d", ilength);
 	}
 
 	e2ap_string = SvPVbyte(e2ap_sv, ilength);
 	if (ilength != 256) {
-       croak("e2ap table must be 256 bytes, not %d", ilength);
+	      croak("e2ap table must be 256 bytes, not %d", ilength);
 	}
 
     memcpy(a2e_table, a2e_string, 256);

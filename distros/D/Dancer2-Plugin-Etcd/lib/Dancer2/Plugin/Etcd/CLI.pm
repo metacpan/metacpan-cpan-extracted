@@ -10,7 +10,7 @@ Dancer2::Plugin::Etcd::CLI
 
 =cut
 
-our $VERSION = '0.006';
+our $VERSION = '0.011';
 
 use Dancer2::Core::Runner;
 use Dancer2::FileUtils qw/dirname path/;
@@ -20,7 +20,7 @@ use Getopt::Long;
 use Path::Tiny;
 use Hash::Flatten;
 use Cwd;
-use Etcd3;
+use Net::Etcd;
 use JSON;
 use YAML::Syck;
 use Path::Class qw( file );
@@ -180,7 +180,7 @@ sub cmd_get{
     my($self, @args) = @_;
 
     my($env, $version, $app_path, $app_name, $app_host, $readonly, $etcd_host,
-      $etcd_ssl, $etcd_port, $etcd_user, $etcd_pass, $settings);
+      $etcd_ssl, $etcd_port, $etcd_user, $etcd_pass);
 
     $self->parse_options(
         \@args,
@@ -201,24 +201,37 @@ sub cmd_get{
     $app_path ||= getcwd;
     $app_host ||= hostname;
 
-    $settings->{username} = $etcd_user if $etcd_user;
-    $settings->{password} = $etcd_pass if $etcd_pass;
-    $settings->{ssl} = $etcd_ssl if $etcd_ssl;
-    $settings->{port} = $etcd_port if $etcd_port;
-
     my $app = ReadConfig->new( location => $app_path, environment => $env );
     my $files = $app->config_files;
 
+    #TODO this is a nasty hack
+    my $base_conf = file( File::Spec->rel2abs($files->[0]) );
+    my $base_conf_data = LoadFile($base_conf);
+
+    my $settings = $base_conf_data->{plugins}{Etcd};
+
+    # check for plugin conf
+
     die "This command must be run from the base dir of a dancer app.\n" unless (@$files);
 
-    my $etcd = $self->{etcd} || Etcd3->new($settings);
+    $settings->{name} = $etcd_user if $etcd_user;
+    $settings->{password} = $etcd_pass if $etcd_pass;
+    $settings->{ssl} = $etcd_ssl if $etcd_ssl;
+    $settings->{port} = $etcd_port if $etcd_port;
+    $settings->{host} = $etcd_host if $etcd_host;
 
-#    print STDERR Dumper($etcd);
+    die "You must pass the etcd name, password, host and port.\n" unless $settings;
+
+    my $etcd = Net::Etcd->new(\%$settings);
+
+	#print STDERR Dumper($etcd);
 
     for my $file (@$files) {
         my $conf_path = file( File::Spec->rel2abs($file) );
 
         my $conf_data = LoadFile($conf_path);
+
+        my $test = $conf_data->{'plugins'}{'Etcd'};
 
         unless ($app_name) {
             $app_name = $conf_data->{'appname'} if $conf_data->{'appname'};
@@ -293,7 +306,7 @@ sub cmd_put{
     my($self, @args) = @_;
 
     my($env, $app_path, $app_name, $app_host, $readonly, $etcd_host,
-      $etcd_ssl, $etcd_port, $etcd_user, $etcd_pass, $settings, @configs);
+      $etcd_ssl, $etcd_port, $etcd_user, $etcd_pass, @configs);
 
     $self->parse_options(
         \@args,
@@ -313,20 +326,28 @@ sub cmd_put{
     $app_path ||= getcwd;
     $app_host ||= hostname;
 
-    $settings->{username} = $etcd_user if $etcd_user;
+    my $app = ReadConfig->new( location => $app_path, environment => $env );
+    my $files = $app->config_files;
+
+    #TODO this is a nasty hack
+    my $base_conf = file( File::Spec->rel2abs($files->[0]) );
+    my $base_conf_data = LoadFile($base_conf);
+
+    my $settings = $base_conf_data->{plugins}{Etcd};
+
+    # check for plugin conf
+
+    die "This command must be run from the base dir of a dancer app.\n" unless (@$files);
+
+    $settings->{name} = $etcd_user if $etcd_user;
     $settings->{password} = $etcd_pass if $etcd_pass;
     $settings->{ssl} = $etcd_ssl if $etcd_ssl;
     $settings->{port} = $etcd_port if $etcd_port;
     $settings->{host} = $etcd_host if $etcd_host;
 
-    my $etcd = Etcd3->new($settings);
+    die "You must pass the etcd name, password, host and port.\n" unless $settings;
 
-#    print STDERR Dumper($etcd);
-
-    my $app = ReadConfig->new( location => $app_path, environment => $env );
-    my $files = $app->config_files;
-
-    die "This command must be run from the base dir of a dancer app.\n" unless (@$files);
+    my $etcd = Net::Etcd->new(\%$settings);
 
     for my $file (@$files) {
         my $conf_path = file( File::Spec->rel2abs($file) );
@@ -342,6 +363,7 @@ sub cmd_put{
         unless ($app_name) {
             $app_name = $conf_data->{'appname'} if $conf_data->{'appname'};
         }
+
 
         my $output;
         my $line_count = 0;
@@ -375,8 +397,8 @@ sub cmd_put{
           data => $flat_conf_data, line_count => $line_count };
     }
 
+ 
     my $env_path = File::Spec->catdir( $app_name, $app_host, $env);
-    print "env_path : $env_path";
     my $version = $etcd->range({ key => "/$env_path/version" })->get_value || sprintf("%08d", 0);
     $version++;
 
@@ -389,9 +411,9 @@ sub cmd_put{
             my $value = $data->{$key} || '\n';
             #print "/$key_path/$version/$key/, $value\n";
             $etcd->put( { key => "/$key_path/$version/$key/", value => $value });
-        }
+        } 
     }
-    print "latest version is now: /$env_path/$version\n";
+    print "latest version is now: $env_path:v" . sprintf("%d\n",$version);
     $etcd->put({ key => "/$env_path/version", value =>  sprintf("%08d", $version) });
 }
 

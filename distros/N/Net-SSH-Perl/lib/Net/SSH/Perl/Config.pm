@@ -15,18 +15,18 @@ use Carp qw( croak );
     ChallengeResponseAuthentication => [ \&_set_yesno, 'auth_ch_res' ],
     CheckHostIP             => [ \&_set_yesno, 'check_host_ip' ],
     Cipher                  => [ \&_cipher ],
-    Ciphers                 => [ \&_set_str, 'ciphers', KEX_DEFAULT_ENCRYPT ],
+    Ciphers                 => [ \&_set_str, 'ciphers', KEX_DEFAULT_ENCRYPT, KEX_ALL_ENCRYPT ],
     Compression             => [ \&_set_yesno, 'compression' ],
     CompressionLevel        => [ \&_set_str, 'compression_level' ],
     DSAAuthentication       => [ \&_set_yesno, 'auth_dsa' ],
     FingerprintHash         => [ \&_set_str, 'fingerprint_hash' ],
     GlobalKnownHostsFile    => [ \&_set_str, 'global_known_hosts' ],
     HashKnownHosts          => [ \&_set_yesno, 'hash_known_hosts' ],
-    HostKeyAlgorithms       => [ \&_set_str, 'host_key_algorithms', KEX_DEFAULT_PK_ALG ],
+    HostKeyAlgorithms       => [ \&_set_str, 'host_key_algorithms', KEX_DEFAULT_PK_ALG, KEX_ALL_PK_ALG ],
     HostName                => [ \&_set_str, 'hostname' ],
     IdentityFile            => [ \&_identity_file ],
-    KexAlgorithms           => [ \&_set_str, 'kex_algorithms', KEX_DEFAULT_KEX ],
-    MACs                    => [ \&_set_str, 'macs', KEX_DEFAULT_MAC ],
+    KexAlgorithms           => [ \&_set_str, 'kex_algorithms', KEX_DEFAULT_KEX, KEX_ALL_KEX ],
+    MACs                    => [ \&_set_str, 'macs', KEX_DEFAULT_MAC, KEX_ALL_MAC ],
     NumberOfPasswordPrompts => [ \&_set_str, 'number_of_password_prompts' ],
     PasswordAuthentication  => [ \&_set_yesno, 'auth_password' ],
     PasswordPromptHost      => [ \&_set_yesno, 'password_prompt_host' ],
@@ -128,8 +128,26 @@ sub _protocol {
 sub _set_str {
     my($cfg, $key, $value) = @_;
     return if exists $cfg->{o}{ $DIRECTIVES{$key}[1] };
-    $cfg->{o}{ $DIRECTIVES{$key}[1] } = $value =~ s/^\+// ? 
-        $DIRECTIVES{$key}[2] . ',' . $value : $value;
+    if ($value =~ s/^-//) {
+        my @list;
+        $value =~ s/\*/\.\*/g;
+        my $defaults = $DIRECTIVES{$key}[2] or return;
+        foreach (split(',', $defaults)) {
+            next if /^$value$/;
+            push @list, $_;
+        }
+        $value = join(',',@list);
+    }
+    elsif ($value =~ s/^\+//) {
+        my @list;
+        $value =~ s/\*/\.\*/g;
+        my $all = $DIRECTIVES{$key}[3] or return;
+        foreach (split(',', $all)) {
+            push @list, $_ if /^$value$/;
+        }
+        $value = join(',', $DIRECTIVES{$key}[2], @list);
+    }
+    $cfg->{o}{ $DIRECTIVES{$key}[1] } = $value;
 }
 
 {

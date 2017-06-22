@@ -18,7 +18,7 @@ Perinci::CmdLine::Manual::FAQ - FAQs
 
 =head1 VERSION
 
-This document describes version 1.50 of Perinci::CmdLine::Manual::FAQ (from Perl distribution Perinci-CmdLine), released on 2016-12-10.
+This document describes version 1.51 of Perinci::CmdLine::Manual::FAQ (from Perl distribution Perinci-CmdLine), released on 2017-06-17.
 
 =head1 NOMENCLATURE
 
@@ -191,6 +191,54 @@ for remote code as well as local Perl code.
 This framework is currently function-centric. There are already several OO-based
 command-line frameworks on CPAN.
 
+=head1 GENERATING DOCUMENTATION
+
+=head2 How do I add examples using Rinci metadata?
+
+In your Rinci function metadata, add the C<examples> property, e.g.:
+
+ # myapp script
+ use Perinci::CmdLine::Any;
+ our %SPEC;
+ $SPEC{myadd} = {
+     v => 1.1,
+     args => {
+         num1 => {summary=>'First number' , schema='float*', req=>1, pos=>0},
+         num2 => {summary=>'Second number', schema='float*', req=>1, pos=>1},
+         round => {
+             summary=>'Round to nearest integer',
+             schema =>'bool*',
+             cmdline_aliases=>{r=>{}},
+         },
+     },
+     examples => [
+         {
+             summary => 'Add two integers',
+             args => {num1=>7, num2=>5},
+         },
+         {
+             summary => 'Add two floats, round to nearest integer',
+             args => {num1=>7.1, num2=>5.5, round=>1},
+             result => 13,
+         },
+     ],
+ }
+ sub myadd { ... }
+ Perinci::CmdLine::Any->new(url => '/main/myadd')->run;
+
+If you run C<myapp --help>, you'll see the examples shown as:
+
+ Examples:
+   Add two integers:
+   % myadd 7 5
+
+   Add two floats, round to the nearest integer:
+   % myadd 7.1 5.5 --round
+
+If you use L<Dist::Zilla> and L<Pod::Weaver> and L<Pod::Weaver::Plugin::Rinci>
+to generate your POD, you'll also have the Synopsis section filled with the
+above.
+
 =head1 DEBUGGING
 
 =head2 How do I enable/view log messages?
@@ -243,13 +291,16 @@ feature.
 
 L<Perinci::CmdLine::Manual>
 
+For the Generating Documentation section: L<Rinci::function>, L<Rinci::FAQ> (the
+Documentation section)
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

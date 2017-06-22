@@ -1,4 +1,5 @@
 package Lab::Connection::USBtmc::Trace;
+$Lab::Connection::USBtmc::Trace::VERSION = '3.550';
 use 5.010;
 use warnings;
 use strict;
@@ -8,8 +9,6 @@ use parent 'Lab::Connection::USBtmc';
 use Role::Tiny::With;
 use Carp;
 use autodie;
-
-our $VERSION = '3.543';
 
 our %fields = (
     logfile   => undef,

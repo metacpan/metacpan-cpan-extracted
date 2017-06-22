@@ -1,0 +1,86 @@
+{
+   "abstract" : "A fast and easy way to integrate your apps with Facebook.",
+   "author" : [
+      "JT Smith <jt@plainblack.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.044, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Facebook-Graph",
+   "no_index" : {
+      "directory" : [
+         "author.t",
+         "eg"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0.61",
+            "DateTime::Format::Strptime" : "1.4000",
+            "JSON" : "2.16",
+            "LWP::Protocol::https" : "6.06",
+            "LWP::UserAgent" : "6.13",
+            "MIME::Base64::URLSafe" : "0.01",
+            "Moo" : "0",
+            "Ouch" : "0.0400",
+            "Test::More" : "0",
+            "URI" : "1.54"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/rizen/Facebook-Graph/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rizen/Facebook-Graph.git",
+         "web" : "http://github.com/rizen/Facebook-Graph"
+      }
+   },
+   "version" : "1.1204",
+   "x_contributors" : [
+      "Adam Hopkins <SirChickenHair@srchulo-aire.local>",
+      "Andrew Grangaard <granny-github@ofb.net>",
+      "Chris Weyl <rsrchboy@cpan.org>",
+      "Daisuke Murase <typester@cpan.org>",
+      "David Steinbrunner <dsteinbrunner@pobox.com>",
+      "Fayland Lam <fayland@gmail.com>",
+      "Guillaume Aubert <aubertg@cpan.org>",
+      "James Wright <james2vegas@aim.com>",
+      "Jason Wieland <jwieland@gmail.com>",
+      "Jussi Kinnula <jussi.kinnula@frantic.com>",
+      "Mark Carey <mark@mt-hacks.com>",
+      "Mark Stosberg <mark@stosberg.com>",
+      "Maroun NAJM <mnajm@cinemoz.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Nathan Handy <nhandy@Nathans-MacBook-Pro.local>",
+      "Oklahomer <hagiwara.go@gmail.com>",
+      "Olaf Alders <olaf@wundersolutions.com>",
+      "Sebastien Wernerus <s.wernerus@gmail.com>",
+      "Syohei YOSHIDA <syohex@gmail.com>",
+      "Tim Heaney <oylenshpeegul@gmail.com>",
+      "hurricup <hurricup@gmail.com>",
+      "mathieu viel <mathieu.viel@linkfluence.net>",
+      "root <root@li125-92.members.linode.com>"
+   ]
+}
+

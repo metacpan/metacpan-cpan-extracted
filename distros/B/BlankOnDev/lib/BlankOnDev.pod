@@ -1,6 +1,6 @@
 =head1 NAME
 
-BlankOnDev - Development tools for BlankOn GNU/Linux. [testing]
+BlankOnDev - Development tools for BlankOn GNU/Linux. [stable]
 
 =head1 DESCRIPTION
 
@@ -13,11 +13,15 @@ For Tutorial of command "boidev", see link following :
 
 =over
 
-=item * For English L<BlankOnDev::Tutorial::en>
+=item * For English L<BlankOnDev::Tutorial::en> [Coming soon]
 
 =item * For Indonesian L<BlankOnDev::Tutorial::id>
 
-=item * RT Bug Tracker : L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=BlankOnDev>
+=item *
+RT Bug Tracker : L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=BlankOnDev> or
+on Github : L<https://github.com/yusrideb/BlankOnDev/issues>
+
+=item *
 
 =back
 

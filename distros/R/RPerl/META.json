@@ -74,7 +74,7 @@
             "Module::Refresh" : "0.17",
             "Module::ScanDeps" : "1.19",
             "PadWalker" : "2.1",
-            "Parse::Eyapp" : "1.182",
+            "Parse::Eyapp" : "1.21",
             "Perl::Critic" : "1.121",
             "Perl::Tidy" : "20140711",
             "Pod::PseudoPod" : "0.18",
@@ -104,6 +104,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#perl11"
    },
-   "version" : "2.601000",
+   "version" : "2.800000",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

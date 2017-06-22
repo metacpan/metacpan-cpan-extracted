@@ -13,7 +13,7 @@ use File::Slurp;
 use AsposeCellsCloud::ApiClient;
 use AsposeCellsCloud::Configuration;
 
-my $VERSION = '1.01';
+my $VERSION = '1.02';
 
 sub new {
     my $class   = shift;
@@ -533,6 +533,97 @@ sub PostDocumentSaveAs {
 	}    
 	
 	my $_response_object = $self->{api_client}->pre_deserialize($response->content, 'SaveResponse', $response->header('content-type'));
+    return $_response_object;
+    
+}
+#
+# PostTaskDataMultipartContent
+#
+# 
+# 
+# @param String $storage  (optional)
+# @param String $folder  (optional)
+# @param ImportOption $body  (required)
+# @param String $file1  (required)
+# @param String $file2  (required)
+# @return SaaSposeResponse
+#
+sub PostTaskDataMultipartContent {
+    my ($self, %args) = @_;
+
+            
+    # verify the required parameter 'body' is set
+    unless (exists $args{'body'}) {
+      croak("Missing the required parameter 'body' when calling PostTaskDataMultipartContent");
+    }
+    
+# verify the required parameter 'file1' is set
+    unless (exists $args{'file1'}) {
+      croak("Missing the required parameter 'file1' when calling PostTaskDataMultipartContent");
+    }
+
+# verify the required parameter 'file2' is set
+    unless (exists $args{'file2'}) {
+      croak("Missing the required parameter 'file1' when calling PostTaskDataMultipartContent");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/task/runtask/?appSid={appSid}&amp;storage={storage}&amp;folder={folder}';
+    
+	$_resource_path =~ s/\Q&amp;\E/&/g;
+    $_resource_path =~ s/\Q\/?\E/?/g;
+    $_resource_path =~ s/\QtoFormat={toFormat}\E/format={format}/g;
+	$_resource_path =~ s/\Q{path}\E/{Path}/g;
+    
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/xml', 'application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+  # query params
+    if ( exists $args{'storage'}) {        		
+		$_resource_path =~ s/\Q{storage}\E/$args{'storage'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]storage.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'folder'}) {        		
+		$_resource_path =~ s/\Q{folder}\E/$args{'folder'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]folder.*?(?=&|\?|$)//g;
+	}
+    
+    
+    my $_body_data;
+	
+    
+    # body params
+    if ( exists $args{'body'}) {
+        $_body_data = $args{'body'};
+    }
+
+    # authentication setting, if any
+    my $auth_settings = [];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+
+	if($AsposeCellsCloud::Configuration::debug){
+		print "\nResponse Content: ".$response->content;
+	}    
+	
+	my $_response_object = $self->{api_client}->pre_deserialize($response->content, 'SaaSposeResponse', $response->header('content-type'));
     return $_response_object;
     
 }
@@ -10532,6 +10623,101 @@ sub DeleteWorkSheetComment {
     
 }
 #
+# DeleteWorkSheetComments
+#
+# 
+# 
+# @param String $name  (required)
+# @param String $sheetName  (required)
+# @param String $storage  (optional)
+# @param String $folder  (optional)
+# @return SaaSposeResponse
+#
+sub DeleteWorkSheetComments {
+    my ($self, %args) = @_;
+
+    
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling DeleteWorkSheetComment");
+    }
+    
+    # verify the required parameter 'sheetName' is set
+    unless (exists $args{'sheetName'}) {
+      croak("Missing the required parameter 'sheetName' when calling DeleteWorkSheetComment");
+    }
+    
+    
+    
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/comments/?appSid={appSid}&amp;storage={storage}&amp;folder={folder}';
+    
+	$_resource_path =~ s/\Q&amp;\E/&/g;
+    $_resource_path =~ s/\Q\/?\E/?/g;
+    $_resource_path =~ s/\QtoFormat={toFormat}\E/format={format}/g;
+	$_resource_path =~ s/\Q{path}\E/{Path}/g;
+    
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/xml', 'application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'name'}) {        		
+		$_resource_path =~ s/\Q{name}\E/$args{'name'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]name.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'sheetName'}) {        		
+		$_resource_path =~ s/\Q{sheetName}\E/$args{'sheetName'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]sheetName.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'storage'}) {        		
+		$_resource_path =~ s/\Q{storage}\E/$args{'storage'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]storage.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'folder'}) {        		
+		$_resource_path =~ s/\Q{folder}\E/$args{'folder'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]folder.*?(?=&|\?|$)//g;
+	}
+    
+    
+    my $_body_data;
+	
+    
+    
+
+    # authentication setting, if any
+    my $auth_settings = [];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+
+	if($AsposeCellsCloud::Configuration::debug){
+		print "\nResponse Content: ".$response->content;
+	}    
+	
+	my $_response_object = $self->{api_client}->pre_deserialize($response->content, 'SaaSposeResponse', $response->header('content-type'));
+    return $_response_object;
+    
+}
+#
 # PostCopyWorksheet
 #
 # 
@@ -10541,6 +10727,7 @@ sub DeleteWorkSheetComment {
 # @param String $sourceSheet  (required)
 # @param String $folder  (optional)
 # @param String $storage  (optional)
+# @param CopyOptions $body (optional)
 # @return SaaSposeResponse
 #
 sub PostCopyWorksheet {
@@ -10613,7 +10800,10 @@ sub PostCopyWorksheet {
     
     my $_body_data;
 	
-    
+   # body params
+    if ( exists $args{'body'}) {
+        $_body_data = $args{'body'};
+    }    
     
 
     # authentication setting, if any

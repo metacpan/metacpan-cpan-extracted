@@ -8,7 +8,7 @@ plugin 'Probe::CommandLine' => (
 
 if($^O eq 'MSWin32')
 {
-  if(`gmake --version` !~ /GNU Make/ && `gmake --version` !~ /GNU Make/)
+  if(`gmake --version` !~ /GNU Make/ && `make --version` !~ /GNU Make/)
   {
     probe sub {
       my($build) = @_;

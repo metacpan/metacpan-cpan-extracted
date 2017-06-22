@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
-use Test::Differences qw(eq_or_diff);
+use Test::Exception;
 use IO::Socket::SSL ();
 
 my $mn = "Gearman::Objects";
@@ -24,6 +24,7 @@ can_ok(
 );
 
 subtest "job servers", sub {
+    plan tests => 19;
     {
         # scalar
         my $host = "foo";
@@ -36,10 +37,15 @@ subtest "job servers", sub {
         is(1, $c->{js_count}, "js_count=1");
         ok(my @js = $c->job_servers(), "job_servers");
         is(scalar(@js), 1, "job_servers count");
-
-        eq_or_diff($js[0], @{ $c->canonicalize_job_servers($host) }[0],
-            "job_servers=$host");
         is($js[0], join(':', $host, 4730), "$host:4730");
+        is(@{ $c->canonicalize_job_servers($host) }[0],
+            $js[0], "job_servers=$host");
+
+        throws_ok {
+            $c->job_servers(sub { });
+        }
+        qr/unsupported job server value of type/,
+            "unsupported job server value";
     }
 
     {
@@ -51,12 +57,10 @@ subtest "job servers", sub {
             "Gearman::Objects->new(job_servers => hash reference)"
         );
 
-        is(1, $c->{js_count}, "js_count=1");
+        is($c->{js_count}, 1, "js_count=1");
         ok(my @js = $c->job_servers(), "job_servers");
         is(scalar(@js), 1, "job_servers count");
-
-        eq_or_diff($js[0], @{ $c->canonicalize_job_servers($j) }[0],
-            "job_servers");
+        is(@{ $c->canonicalize_job_servers($j) }[0], $js[0], "job_servers");
     }
 
     {
@@ -74,16 +78,20 @@ subtest "job servers", sub {
         ok(my @js = $c->job_servers, "job_servers");
         isa_ok($js[$#servers], "HASH");
         for (my $i = 0; $i <= $#servers; $i++) {
-            eq_or_diff(@{ $c->canonicalize_job_servers($servers[$i]) }[0],
+            is(@{ $c->canonicalize_job_servers($servers[$i]) }[0],
                 $js[$i], "canonicalize_job_servers($servers[$i])");
         }
     }
+
 };
 
 subtest "debug", sub {
+    plan tests => 6;
+
     my $c = new_ok($mn, [debug => 1]);
     is($c->debug(),  1);
     is($c->debug(0), 0);
+
     $c = new_ok($mn);
     is($c->debug(),  undef);
     is($c->debug(1), 1);
@@ -118,7 +126,7 @@ subtest "prefix func", sub {
         my $separator = '#';
         my $c = new_ok($mn, [prefix => $p, prefix_separator => $separator]);
 
-        is($c->prefix(), $p);
+        is($c->prefix(),           $p);
         is($c->prefix_separator(), $separator);
         is($c->func($f), join($separator, $c->prefix(), $f));
 
@@ -131,6 +139,7 @@ subtest "prefix func", sub {
 };
 
 subtest "socket", sub {
+    plan tests => 6;
 
     my $host = "google.com";
     my %p    = (
@@ -162,6 +171,8 @@ subtest "socket", sub {
 };
 
 subtest "sock cache", sub {
+    plan tests => 10;
+
     my $c = new_ok($mn);
     isa_ok($c->{sock_cache}, "HASH");
     is(keys(%{ $c->{sock_cache} }), 0);
@@ -184,6 +195,8 @@ subtest "sock cache", sub {
 };
 
 subtest "js stringify", sub {
+    plan tests => 5;
+
     my $c = new_ok($mn);
     my ($h, $p) = ("foo", int(rand(10) + 1000));
     my ($js_str, $js) = (join(':', $h, $p), { host => $h, port => $p });

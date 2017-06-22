@@ -13,8 +13,6 @@ L<Beam::Runnable::Timeout::Alarm>
 use strict;
 use warnings;
 use Test::More;
-use Test::Lib;
-use Test::Fatal;
 
 my $RUNNING = 1;
 { package

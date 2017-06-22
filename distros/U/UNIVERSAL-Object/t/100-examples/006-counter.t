@@ -28,13 +28,6 @@ BEGIN {
 
     sub count { $_[0]->{count} }
 
-    # NOTE:
-    # so apparently the overload
-    # will pass more values to the
-    # subroutines then just the
-    # instance, no idea why though
-    # it is mostly just garbage.
-    # - SL
     sub inc { $_[0]->{count}++ }
     sub dec { $_[0]->{count}-- }
 }

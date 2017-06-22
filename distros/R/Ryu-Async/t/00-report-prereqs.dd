@@ -24,8 +24,8 @@ do { my $x = {
                                       },
                       'requires' => {
                                       'Future' => '0.34',
-                                      'IO::Async' => '0.60',
-                                      'Ryu' => '0.013',
+                                      'IO::Async' => '0.71',
+                                      'Ryu' => '0.020',
                                       'curry' => '1.000',
                                       'namespace::clean' => '0',
                                       'parent' => '0'

@@ -60,7 +60,7 @@
       },
       "AsposeCellsCloud::CellsApi" : {
          "file" : "lib/AsposeCellsCloud/CellsApi.pm",
-         "version" : "1.01"
+         "version" : "1.02"
       },
       "AsposeCellsCloud::Configuration" : {
          "file" : "lib/AsposeCellsCloud/Configuration.pm"
@@ -175,6 +175,9 @@
       },
       "AsposeCellsCloud::Object::ContentMessage" : {
          "file" : "lib/AsposeCellsCloud/Object/ContentMessage.pm"
+      },
+      "AsposeCellsCloud::Object::CopyOptions" : {
+         "file" : "lib/AsposeCellsCloud/Object/CopyOptions.pm"
       },
       "AsposeCellsCloud::Object::CreatePivotTableRequest" : {
          "file" : "lib/AsposeCellsCloud/Object/CreatePivotTableRequest.pm"
@@ -516,8 +519,9 @@
    "release_status" : "stable",
    "resources" : {
       "license" : [
-         "http://opensource.org/licenses/mit-license.php"
+         "http://www.opensource.org/licenses/mit-license.php"
       ]
    },
-   "version" : "1.01"
+   "version" : "1.02",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

@@ -1,3 +1,17 @@
+6.051 2017-06-18
+  - Upgrade v6.00->v6.05.
+    - Add status to register_worker options.
+    - Modify behaviour of retry_job.
+
+6.001 2017-06-17
+  - Upgrade v5.09->v6.00.
+    - Add broadcast/receive.
+
+5.092 2017-06-16
+  - Upgrade v5.08->v5.09.
+    - Add enqueued_jobs to stats.
+  - Remove unused dependencies.
+
 5.084 2016-06-27
   - Make more FreeBSD-friendly.
 

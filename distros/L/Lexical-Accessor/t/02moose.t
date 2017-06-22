@@ -33,6 +33,12 @@ use Test::Fatal;
 my $trigger;
 my ($ggg, $get_ggg, $set_ggg, $has_ggg, $clear_ggg);
 
+# *_rv is the return value
+my ($aaa, $aaa_rv);  # rw
+my ($get_bbb, $get_bbb_rv);  # ro
+my ($get_ccc, $get_ccc_rv, $set_ccc, $set_ccc_rv);  # rwp
+my ($get_ddd, $get_ddd_rv);  # lazy
+
 {
 	package Goose;
 	
@@ -49,6 +55,28 @@ my ($ggg, $get_ggg, $set_ggg, $has_ggg, $clear_ggg);
 		isa        => Str->plus_coercions(ArrayRef, q[join('', @$_)]),
 		coerce     => 1,
 		trigger    => sub { ++$trigger },
+	);
+	
+	$aaa_rv = lexical_has aaa => (
+		is => 'rw',
+		accessor => \$aaa,
+	);
+	
+	$get_bbb_rv = lexical_has bbb => (
+		is => 'ro',
+		reader => \$get_bbb,
+	);
+	
+	($get_ccc_rv, $set_ccc_rv) = lexical_has ccc => (
+		is => 'rwp',
+		reader => \$get_ccc,
+		writer => \$set_ccc,
+	);
+	
+	$get_ddd_rv = lexical_has ddd => (
+		is => 'lazy',
+		reader => \$get_ddd,
+		default => sub { 42 },
 	);
 }
 
@@ -83,5 +111,11 @@ undef($g2);
 
 is($trigger, 2, 'triggers work');
 ok(!keys %Sub::Accessor::Small::FIELDS, 'no leaks');
+
+is($aaa_rv, $aaa, 'correct accessor returned for is => rw');
+is($get_bbb_rv, $get_bbb, 'correct getter returned for is => ro');
+is($get_ccc_rv, $get_ccc, 'correct getter returned for is => rwp');
+is($set_ccc_rv, $set_ccc, 'correct setter returned for is => rwp');
+is($get_ddd_rv, $get_ddd, 'correct reader returned for is => lazy');
 
 done_testing;

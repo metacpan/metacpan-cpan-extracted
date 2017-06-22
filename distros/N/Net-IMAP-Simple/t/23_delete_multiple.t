@@ -23,5 +23,5 @@ sub run_tests {
     ok( $imap->last, 7 );
 }   
 
-do "t/test_runner.pm";
+do "./t/test_runner.pm";
 

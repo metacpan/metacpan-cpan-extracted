@@ -228,6 +228,8 @@ END
       './configure --enable-shared','__display__');
    ($stdout,$stderr)=$handle->cmd('sudo make','__display__');
    ($stdout,$stderr)=$handle->cmd('sudo make install','__display__');
+   ($stdout,$stderr)=$handle->cmd('sudo cp -v ogg.pc /usr/lib64/pkgconfig',
+      '__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source/ffmpeg/');
    my $libtheora_tar='libtheora-1.1.1.tar.gz';
    my $libtheora_md5='bb4dc37f0dc97db98333e7160bfbb52b';

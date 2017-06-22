@@ -1,5 +1,5 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "create fixup commits for topic branches",
    "author" : [
       "Jordan Torbiak"
    ],
@@ -44,6 +44,6 @@
          "web" : "https://github.com/torbiak/git-autofixup"
       }
    },
-   "version" : 0.002001,
+   "version" : 0.002002,
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

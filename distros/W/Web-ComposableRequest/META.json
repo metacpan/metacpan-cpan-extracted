@@ -71,63 +71,63 @@
    "provides" : {
       "Web::ComposableRequest" : {
          "file" : "lib/Web/ComposableRequest.pm",
-         "version" : "v0.19.1"
+         "version" : "v0.20.1"
       },
       "Web::ComposableRequest::Base" : {
          "file" : "lib/Web/ComposableRequest/Base.pm",
-         "version" : "v0.19.1"
+         "version" : "v0.20.1"
       },
       "Web::ComposableRequest::Config" : {
          "file" : "lib/Web/ComposableRequest/Config.pm",
-         "version" : "v0.19.1"
+         "version" : "v0.20.1"
       },
       "Web::ComposableRequest::Constants" : {
          "file" : "lib/Web/ComposableRequest/Constants.pm",
-         "version" : "v0.19.1"
+         "version" : "v0.20.1"
       },
       "Web::ComposableRequest::Exception" : {
          "file" : "lib/Web/ComposableRequest/Exception.pm",
-         "version" : "v0.19.1"
+         "version" : "v0.20.1"
       },
       "Web::ComposableRequest::Role::Cookie" : {
          "file" : "lib/Web/ComposableRequest/Role/Cookie.pm",
-         "version" : "v0.19.1"
+         "version" : "v0.20.1"
       },
       "Web::ComposableRequest::Role::Cookie::Config" : {
          "file" : "lib/Web/ComposableRequest/Role/Cookie.pm",
-         "version" : "v0.19.1"
+         "version" : "v0.20.1"
       },
       "Web::ComposableRequest::Role::JSON" : {
          "file" : "lib/Web/ComposableRequest/Role/JSON.pm",
-         "version" : "v0.19.1"
+         "version" : "v0.20.1"
       },
       "Web::ComposableRequest::Role::L10N" : {
          "file" : "lib/Web/ComposableRequest/Role/L10N.pm",
-         "version" : "v0.19.1"
+         "version" : "v0.20.1"
       },
       "Web::ComposableRequest::Role::L10N::Config" : {
          "file" : "lib/Web/ComposableRequest/Role/L10N.pm",
-         "version" : "v0.19.1"
+         "version" : "v0.20.1"
       },
       "Web::ComposableRequest::Role::Session" : {
          "file" : "lib/Web/ComposableRequest/Role/Session.pm",
-         "version" : "v0.19.1"
+         "version" : "v0.20.1"
       },
       "Web::ComposableRequest::Role::Session::Config" : {
          "file" : "lib/Web/ComposableRequest/Role/Session.pm",
-         "version" : "v0.19.1"
+         "version" : "v0.20.1"
       },
       "Web::ComposableRequest::Role::Static" : {
          "file" : "lib/Web/ComposableRequest/Role/Static.pm",
-         "version" : "v0.19.1"
+         "version" : "v0.20.1"
       },
       "Web::ComposableRequest::Session" : {
          "file" : "lib/Web/ComposableRequest/Session.pm",
-         "version" : "v0.19.1"
+         "version" : "v0.20.1"
       },
       "Web::ComposableRequest::Util" : {
          "file" : "lib/Web/ComposableRequest/Util.pm",
-         "version" : "v0.19.1"
+         "version" : "v0.20.1"
       }
    },
    "release_status" : "stable",
@@ -146,7 +146,7 @@
          "web" : "http://github.com/pjfl/p5-web-composablerequest"
       }
    },
-   "version" : "0.19.1",
+   "version" : "0.20.1",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.014004"

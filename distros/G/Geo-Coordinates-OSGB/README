@@ -58,7 +58,7 @@ You may or may not need sudo depending on how you have set up your system.
 
 DEPENDENCIES
 
-None.
+perl 5.08 or better 
 
 COPYRIGHT AND LICENCE
 

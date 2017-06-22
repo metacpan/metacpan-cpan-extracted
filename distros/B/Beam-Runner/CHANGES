@@ -1,5 +1,23 @@
 Changelog for Beam-Runner
 
+0.013     2017-06-20 14:26:20-04:00 America/New_York
+
+    [Fixed]
+
+    - Fixed missing dependency on Types::Path::Tiny. This is why
+      I should never, ever ignore the failures from Travis, but this is
+      also why CPAN Testers is so valuable...
+
+0.012     2017-06-18 20:45:07-04:00 America/New_York
+
+    [Added]
+    - Added Beam::Runnable::AllowUsers role to provide a simple
+      pre-check so only certain users can run a script.
+    - Added Beam::Runnable::DenyUsers role to provide a simple pre-check
+      so certain users are not allowed to run a script.
+    - Added Beam::Runnable::Single role to ensure a task is only able to
+      be run once at a time.
+
 0.011     2017-06-09 01:48:33-05:00 America/Chicago
 
     [Added]

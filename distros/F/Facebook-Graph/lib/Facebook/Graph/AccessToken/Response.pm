@@ -1,5 +1,5 @@
 package Facebook::Graph::AccessToken::Response;
-$Facebook::Graph::AccessToken::Response::VERSION = '1.1202';
+$Facebook::Graph::AccessToken::Response::VERSION = '1.1204';
 use Moo;
 use URI;
 use URI::QueryParam;
@@ -72,7 +72,7 @@ Facebook::Graph::AccessToken::Response - The Facebook access token request respo
 
 =head1 VERSION
 
-version 1.1202
+version 1.1204
 
 =head1 Description
 

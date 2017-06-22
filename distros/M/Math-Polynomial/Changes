@@ -1,5 +1,22 @@
 Revision history for Perl extension Math::Polynomial.
 
+                    Math::Polynomial Version 1.013
+                    ------------------------------
+
+- Release date: 2017-06-14
+
+- Fixed old Exporter compatibility issue in test suite
+
+                    Math::Polynomial Version 1.012
+                    ------------------------------
+
+- Release date: 2017-06-11
+
+- Compatibility tests with alien modules do not trigger failures any more.
+  Closes: [rt.cpan.org #114004], [rt.cpan.org #118895]
+
+- Math::BigNum replaces Math::BigRat in recommendations and examples.
+
                     Math::Polynomial Version 1.011
                     ------------------------------
 

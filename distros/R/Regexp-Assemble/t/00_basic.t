@@ -9,13 +9,9 @@
 # copyright (C) 2004-2007 David Landgren
 
 use strict;
+use warnings;
 
-eval qq{use Test::More tests => 324 };
-if( $@ ) {
-    warn "# Test::More not available, no tests performed\n";
-    print "1..1\nok 1\n";
-    exit 0;
-}
+use Test::More tests => 323;
 
 use Regexp::Assemble;
 
@@ -24,16 +20,6 @@ $_ = $fixed;
 
 diag('Testing Regexp::Assemble');
 
-my $have_Test_Pod_Coverage = do {
-    eval { require Test::Pod::Coverage; import Test::Pod::Coverage };
-    $@ ? 0 : 1;
-};
-
-SKIP: {
-    skip( 'Test::Pod::Coverage not installed on this system', 1 )
-        unless $have_Test_Pod_Coverage;
-    pod_coverage_ok( "Regexp::Assemble", "POD coverage is go!" );
-}
 my $rt = Regexp::Assemble->new;
 ok( defined($rt), 'new() defines something' );
 is( ref($rt), 'Regexp::Assemble', 'new() returns a Regexp::Assemble object' );

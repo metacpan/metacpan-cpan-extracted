@@ -2,7 +2,7 @@ requires 'perl', '5.010001';
 
 on develop => sub {
     requires 'CPAN::Uploader', '0.103012';
-    requires 'Minilla', '3.0.4';
+    requires 'Minilla', '3.0.12';
     requires 'Perl::Critic', '1.125';
     requires 'Software::License::MIT', '0.103011';
     requires 'Test::CPAN::Meta', '0.25';

@@ -13,6 +13,20 @@ subtest "args" => sub {
 			optional => 'Int?',
 			default  => 'Int? = 3',
 			hashref  => { isa => 'Str' },
+			nested   => {
+				isa   => 'HashRef',
+				rules => {
+					id   => 'Int',
+					name => 'Str'
+				}
+			},
+			array_of_hash => {
+				isa   => 'ArrayRef|HashRef',
+				rules => {
+					id   => 'Int',
+					name => 'Str'
+				}
+			},
 		},
 		$module,
 		{
@@ -21,6 +35,20 @@ subtest "args" => sub {
 			optional => undef,
 			default  => undef,
 			hashref  => 'fuga',
+			nested   => {
+				id   => 1,
+				name => 'hoge',
+			},
+			array_of_hash => [
+				{
+					id   => 1,
+					name => 'hoge',
+				},
+				{
+					id   => 2,
+					name => 'fuga',
+				},
+			],
 		}
 	);
 
@@ -30,6 +58,8 @@ subtest "args" => sub {
 	ok !$args->{optional}, 'optional value';
 	is $args->{default}, 3, 'optional value with default value';
 	is $args->{hashref}, 'fuga', 'hash value';
+	is_deeply $args->{nested}, { id => 1, name => 'hoge' }, 'nested value';
+	is_deeply $args->{array_of_hash}, [{ id => 1, name => 'hoge' }, { id => 2, name => 'fuga' }], 'array_of_hash value';
 };
 
 done_testing;

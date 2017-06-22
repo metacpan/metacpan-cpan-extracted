@@ -90,7 +90,7 @@ my %handler_for = (
 
         # Otherwise does Perl think it's a number and does it look like an integer???
         return looks_like_number($value)
-            && $value =~ m{\A \s*+ [+-]?+ (?: \d++ (\.0*+)?+ | inf(?:inity)?+ ) \s* \Z}ixms;
+            && $value =~ m{\A \s*+ [+-]?+ (?: \d++ (\.0*+)?+ | inf(?:inity)?+ ) \s*+ \Z}ixms;
     },
 
     # A number
@@ -180,9 +180,9 @@ my %BASIC_NARROWER = (
 # This is the full typename syntax...
 my $BASIC_TYPES = join('|', keys %handler_for);
 
-my $TYPED_OR_PURE_ETC = qr{ \s* ,? \s* \.\.\.}xms;
-my $TYPED_ETC         = qr{        \s* \.\.\.}xms;
-my $PURE_ETC          = qr{ \s* ,  \s* \.\.\.}xms;
+my $TYPED_OR_PURE_ETC = qr{ \s*+ ,? \s*+ \.\.\.}xms;
+my $TYPED_ETC         = qr{         \s*+ \.\.\.}xms;
+my $PURE_ETC          = qr{ \s*+ ,  \s*+ \.\.\.}xms;
 
 my $KEYED_TYPENAME = q{
     \\s*
@@ -196,21 +196,21 @@ my $KEYED_TYPENAME = q{
 my $TYPENAME_GRAMMAR = qr{
 
     (?<ATOM_TYPENAME>
-                  (?<user>       (?&QUAL_IDENT)          )
-    |   Is    \[  (?<disj>   \s* (?&DISJ_TYPENAME)   \s* )  \]
-    |   Is    \[  (?<conj>   \s* (?&CONJ_TYPENAME)   \s* )  \]
-    |   Not   \[  (?<not>    \s* (?&CONJ_TYPENAME)   \s* )  \]
-    |   List  \[  (?<list>   \s* (?&CONJ_TYPENAME)   \s* )  \]
-    |   Array \[  (?<array>  \s* (?&CONJ_TYPENAME)   \s* )  \]
-    |   Tuple \[  (?<tuple>  \s* (?&TUPLE_FORMAT)    \s* )  \]
-    |   Hash  \[  (?<hash>   \s* (?&CONJ_TYPENAME)   \s* )  \]
-    |   Dict  \[  (?<dict>   \s* (?&DICT_FORMAT)     \s* )  \]
-    |   Ref   \[  (?<ref>    \s* (?&CONJ_TYPENAME)   \s* )  \]
-    |   Eq    \[  (?<eq>     \s* (?&STR_SPEC)        \s* )  \]
-    |   Match \[  (?<match>  \s* (?&REGEX_SPEC)      \s* )  \]
-    |   Can   \[  (?<can>    \s* (?&OPT_QUAL_IDENT)  \s* )  \]
-    |             (?<basic>      (?&BASIC)               )
-    |             (?<user>       (?!(?&BASIC)) (?&IDENT) (?: \s* \[ \s* (?&TYPE_LIST) \s* \] )?+  )
+                  (?<user>        (?&QUAL_IDENT)           )
+    |   Is    \[  (?<disj>   \s*+ (?&DISJ_TYPENAME)   \s*+ )  \]
+    |   Is    \[  (?<conj>   \s*+ (?&CONJ_TYPENAME)   \s*+ )  \]
+    |   Not   \[  (?<not>    \s*+ (?&CONJ_TYPENAME)   \s*+ )  \]
+    |   List  \[  (?<list>   \s*+ (?&CONJ_TYPENAME)   \s*+ )  \]
+    |   Array \[  (?<array>  \s*+ (?&CONJ_TYPENAME)   \s*+ )  \]
+    |   Tuple \[  (?<tuple>  \s*+ (?&TUPLE_FORMAT)    \s*+ )  \]
+    |   Hash  \[  (?<hash>   \s*+ (?&CONJ_TYPENAME)   \s*+ )  \]
+    |   Dict  \[  (?<dict>   \s*+ (?&DICT_FORMAT)     \s*+ )  \]
+    |   Ref   \[  (?<ref>    \s*+ (?&CONJ_TYPENAME)   \s*+ )  \]
+    |   Eq    \[  (?<eq>     \s*+ (?&STR_SPEC)        \s*+ )  \]
+    |   Match \[  (?<match>  \s*+ (?&REGEX_SPEC)      \s*+ )  \]
+    |   Can   \[  (?<can>    \s*+ (?&OPT_QUAL_IDENT)  \s*+ )  \]
+    |             (?<basic>       (?&BASIC)                )
+    |             (?<user>        (?!(?&BASIC)) (?&IDENT) (?: \s*+ \[ \s*+ (?&TYPE_LIST) \s*+ \] )?+  )
     )
 
     (?(DEFINE)
@@ -263,12 +263,12 @@ sub _build_handler_for {
     my ($type, $context, $level) = @_;
 
     # Reformat conjunctions and disjunctions to avoid left recursion...
-    if ($type =~ m{\A \s* ((?&NON_ATOM_TYPENAME)) \s* \Z  $FROM_TYPENAME_GRAMMAR }xms) {
+    if ($type =~ m{\A \s*+ ((?&NON_ATOM_TYPENAME)) \s*+ \Z  $FROM_TYPENAME_GRAMMAR }xms) {
         $type = "Is[$1]";
     }
 
     # Parse the type specification...
-    $type =~ m{\A \s* $TYPENAME_GRAMMAR \s* \Z }xms
+    $type =~ m{\A \s*+ $TYPENAME_GRAMMAR \s*+ \Z }xms
         or croak "Incomprehensible type name: $type\n",
                  (defined $context ? $context : q{});
 
@@ -635,7 +635,7 @@ sub _set_var_type {
         croak 'Typed attributes require the Variable::Magic module, which could not be loaded'
             if !eval{ require Variable::Magic };
 
-        Variable::Magic::cast ${$varref}, Variable::Magic::wizard set => sub {
+        Variable::Magic::cast( ${$varref}, Variable::Magic::wizard( set => sub {
             # Code around awkward Object::Insideout behaviour...
             return if ((caller 3)[3]//"") eq 'Object::InsideOut::DESTROY';
 
@@ -644,11 +644,11 @@ sub _set_var_type {
             local *croak = *confess{CODE};
             return if eval { validate($type, ${$_[0]}, $value_desc, @constraint) };
             die $@ =~ s{\s+at .*}{}r
-                =~ s{[\h\S]*Dios.*}{}gr
-                =~ s{.*\(eval .*}{}gr
-                =~ s{\s*[\h\S]*called at}{ at}r
-                =~ s{.*called at.*}{}gr;
-        };
+                   =~ s{[\h\S]*Dios.*}{}gr
+                   =~ s{.*\(eval .*}{}gr
+                   =~ s{\s*[\h\S]*called at}{ at}r
+                   =~ s{.*called at.*}{}gr;
+        }));
     }
     elsif ($vartype eq 'ARRAY') {
         tie @{$varref}, 'Dios::Types::Pure::TypedArray', [$type, $value_desc, @constraint];
@@ -709,7 +709,7 @@ sub _validate_return_type {
         }
 
         # ..or convert the error message to report from the correct line number...
-        // die $@ =~ s{\s*at \S+ line \d+.*}{sprintf "\nat %s line %d\n", (caller 1)[1,2]}ser;
+        // die $@ =~ s{\s*+at \S+ line \d++.*+}{sprintf "\nat %s line %d\n", (caller 1)[1,2]}ser;
 
         # If the return values are valid, return them...
         return @retvals;
@@ -775,10 +775,10 @@ sub _is_narrower {
     elsif (!$unnormalized && $type_a eq 'Hash') {
         $type_a = "Ref[Hash[Any]]";
     }
-    elsif ($type_a =~ m{\A \s* ((?&NON_ATOM_TYPENAME)) \s* \Z  $FROM_TYPENAME_GRAMMAR }xms) {
+    elsif ($type_a =~ m{\A \s*+ ((?&NON_ATOM_TYPENAME)) \s*+ \Z  $FROM_TYPENAME_GRAMMAR }xms) {
         $type_a = "Is[$1]";
     }
-    $type_a =~ m{\A \s* $TYPENAME_GRAMMAR \s* \Z }xms;  my %type_a_is = %+;
+    $type_a =~ m{\A \s*+ $TYPENAME_GRAMMAR \s*+ \Z }xms;  my %type_a_is = %+;
 
     if (!$unnormalized && $type_b =~ m{\A (?: Ref ) \Z }xms) {
         $type_b = "Ref[Any]";
@@ -789,10 +789,10 @@ sub _is_narrower {
     elsif (!$unnormalized && $type_b eq 'Hash') {
         $type_b = "Ref[Hash[Any]]";
     }
-    elsif ($type_b =~ m{\A \s* ((?&NON_ATOM_TYPENAME)) \s* \Z  $FROM_TYPENAME_GRAMMAR }xms) {
+    elsif ($type_b =~ m{\A \s*+ ((?&NON_ATOM_TYPENAME)) \s*+ \Z  $FROM_TYPENAME_GRAMMAR }xms) {
         $type_b = "Is[$1]";
     }
-    $type_b =~ m{\A \s* $TYPENAME_GRAMMAR \s* \Z }xms;  my %type_b_is = %+;
+    $type_b =~ m{\A \s*+ $TYPENAME_GRAMMAR \s*+ \Z }xms;  my %type_b_is = %+;
 
     # If both are basic types, use the standard comparisons...
     if (exists $type_a_is{basic} && exists $type_b_is{basic}) {
@@ -942,10 +942,11 @@ sub _describe_constraint {
             hint_bits => $hint_bits, warning_bits => $warning_bits, '$[' => 0 + $[
         );
         $constraint_desc = $deparser->coderef2text($constraint);
-        $constraint_desc =~ s{\s* BEGIN \s* \{ (?&CODE) \}
+        $constraint_desc =~ s{\s*+ BEGIN \s*+ \{ (?&CODE) \}
                                 (?(DEFINE) (?<CODE> [^{}]*+ (\{ (?&CODE) \} [^{}]*+ )*+ ))}{}gxms;
         $constraint_desc =~ s{(?: (?:use|no) \s*+ feature | die \s*+ sprintf ) [^;]* ;}{}gxms;
-        $constraint_desc =~ s{\s+}{ }g;
+        $constraint_desc =~ s{package \s*+ Dios::Types::Pure \s*+ ;}{}gxms;
+        $constraint_desc =~ s{\s++}{ }g;
     }
     return $constraint_desc // "$constraint";
 }
@@ -953,7 +954,7 @@ sub _describe_constraint {
 sub _perl {
     use Data::Dump 'dump';
     dump( map { my $classname = blessed $_; $classname ? "<$classname object>" : $_ } @_ )
-        =~ s{" (< \S+ \s object >) "}{$1}xgmsr;
+        =~ s{" (< \S++ \s object >) "}{$1}xgmsr;
 
 }
 
@@ -1519,7 +1520,12 @@ For example:
 
 If you don't want the exception on failure, use an C<eval> to defuse it:
 
-    if (!eval{ validate('Int', $matches); 1}) {
+    while (1) {
+        say 'Enter an integer: ';
+        $input = readline;
+
+        last if eval{ validate('Int', $input) };
+
         say "Warning: $@";
         redo;
     }

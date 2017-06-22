@@ -1,4 +1,4 @@
-Regexp::Common::time v0.04
+Regexp::Common::time v0.08
 ==========================
 
 This is a Regexp::Common plugin that provides regular expressions for
@@ -33,13 +33,6 @@ INSTALLATION
 
 To install this module type the following:
 
-   perl Build.PL
-   perl Build
-   perl Build test
-   perl Build install
-
-If you do not have Module::Build, you can use the older steps:
-
    perl Makefile.PL
    make
    make test
@@ -53,7 +46,7 @@ DEPENDENCIES
 This module requires this other modules and libraries:
 
   Regexp::Common
-  POSIX
+  POSIX (optional)
   I18N::Langinfo (optional, but needed for internationalization)
 
 Also, Time::Normalize is likely to be useful to you.

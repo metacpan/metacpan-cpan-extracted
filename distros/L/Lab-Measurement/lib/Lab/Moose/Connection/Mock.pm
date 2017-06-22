@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::Mock;
-
+$Lab::Moose::Connection::Mock::VERSION = '3.550';
 use 5.010;
 use Moose;
 use MooseX::Params::Validate;
@@ -8,7 +8,6 @@ use Data::Dumper;
 use YAML::XS;
 use Carp;
 
-our $VERSION = '3.543';
 
 has log_file => (
     is        => 'ro',

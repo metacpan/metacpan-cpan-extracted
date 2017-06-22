@@ -2,7 +2,7 @@ package App::prowess;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 1;
 
@@ -14,7 +14,7 @@ App::prowess - Watch files for changes and re-run prove
 
 =head1 VERSION
 
-0.04
+0.05
 
 =head1 DESCRIPTION
 

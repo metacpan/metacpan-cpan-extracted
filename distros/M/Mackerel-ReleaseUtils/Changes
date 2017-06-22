@@ -1,5 +1,8 @@
 Revision history for Perl extension Mackerel-ReleaseUtils
 
+v0.2.1 2017-06-12T09:51:59Z
+    - diff with origin/master instead of master
+
 v0.2.0 2017-05-28T11:12:10Z
     - use truncate && append, instead of using spew in replace
     - detect debian revision from debian changelog

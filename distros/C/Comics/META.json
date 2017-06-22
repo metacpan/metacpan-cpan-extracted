@@ -55,6 +55,6 @@
          "web" : "http://github.com/sciurius/comics"
       }
    },
-   "version" : "1.05",
+   "version" : "1.06",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

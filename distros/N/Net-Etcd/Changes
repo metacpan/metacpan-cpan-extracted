@@ -1,5 +1,22 @@
 Revision history for Net::Etcd
 
+0.013
+[ ENHANCEMENTS ]
+* Add Net::Etcd::Auth::RolePermission class allowing roles to be defined by key/range.
+
+0.012
+[ ENHANCEMENTS ]
+* Add full support for header based authentication via grpc-gateway.  Requires etcd 3.2.0+
+* Improve POD
+
+0.011
+[ ENHANCEMENTS ]
+* Add full support for Txn with tests.  Recommended for use with etcd 3.2.0+
+
+0.010
+[ ENHANCEMENTS ]
+* Add intial support for snapshot
+
 0.009
 [ ENHANCEMENTS ]
  * Add intial support for Txn

@@ -21,6 +21,7 @@ Bertrand
 Bucheli
 CPAN
 Carly
+Carsten
 Chatterjee
 Cholet
 Code
@@ -38,11 +39,14 @@ File
 Goess
 Graham
 Gregory
+Grohmann
 Handle
 Jackson
 Johann
 Jonathan
 Karen
+Kerin
+Kivanc
 Konrad
 Locked
 Log
@@ -52,6 +56,7 @@ MailSender
 MailSendmail
 Manfredi
 Mengué
+Millar
 Miyagawa
 NTLM
 Null
@@ -83,6 +88,7 @@ Types
 UTF
 Vars
 Whitney
+Yazan
 anirvan
 apache
 appenders
@@ -106,8 +112,11 @@ ident
 jorol
 kb
 kern
+kfm
+kivancyazan
 lib
 logopt
+mail
 multi
 olaf
 params

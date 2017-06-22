@@ -35,6 +35,7 @@
             "Moo::Role" : "0",
             "SOAP::Lite" : "0",
             "Scalar::Util" : "0",
+            "XML::Parser" : "0",
             "XML::Simple" : "0",
             "constant" : "0",
             "perl" : "5.006",
@@ -56,35 +57,35 @@
    "provides" : {
       "Net::Fritz" : {
          "file" : "lib/Net/Fritz.pm",
-         "version" : "v0.0.5"
+         "version" : "v0.0.7"
       },
       "Net::Fritz::Action" : {
          "file" : "lib/Net/Fritz/Action.pm",
-         "version" : "v0.0.5"
+         "version" : "v0.0.7"
       },
       "Net::Fritz::Box" : {
          "file" : "lib/Net/Fritz/Box.pm",
-         "version" : "v0.0.5"
+         "version" : "v0.0.7"
       },
       "Net::Fritz::Data" : {
          "file" : "lib/Net/Fritz/Data.pm",
-         "version" : "v0.0.5"
+         "version" : "v0.0.7"
       },
       "Net::Fritz::Device" : {
          "file" : "lib/Net/Fritz/Device.pm",
-         "version" : "v0.0.5"
+         "version" : "v0.0.7"
       },
       "Net::Fritz::Error" : {
          "file" : "lib/Net/Fritz/Error.pm",
-         "version" : "v0.0.5"
+         "version" : "v0.0.7"
       },
       "Net::Fritz::IsNoError" : {
          "file" : "lib/Net/Fritz/IsNoError.pm",
-         "version" : "v0.0.5"
+         "version" : "v0.0.7"
       },
       "Net::Fritz::Service" : {
          "file" : "lib/Net/Fritz/Service.pm",
-         "version" : "v0.0.5"
+         "version" : "v0.0.7"
       }
    },
    "release_status" : "stable",
@@ -98,6 +99,6 @@
          "web" : "https://github.com/mmitch/fritz"
       }
    },
-   "version" : "v0.0.5"
+   "version" : "v0.0.7"
 }
 

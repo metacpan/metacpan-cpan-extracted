@@ -8,6 +8,7 @@ use File::Spec::Functions 'catfile';
 use File::Temp 'tempdir';
 use Minion;
 use Mojo::IOLoop;
+use Mojo::Util 'dumper';
 use Sys::Hostname 'hostname';
 use Time::HiRes qw(time usleep);
 
@@ -86,8 +87,8 @@ ok !$minion->job($id2), 'job has been cleaned up';
 ok !$minion->job($id3), 'job has been cleaned up';
 
 # List workers
-$worker  = $minion->worker->register;
-$worker2 = $minion->worker->register;
+$worker = $minion->worker->register;
+$worker2 = $minion->worker->status({whatever => 'works!'})->register;
 my $batch = $minion->backend->list_workers(0, 10);
 ok $batch->[0]{id},        'has id';
 is $batch->[0]{host},      $host, 'right host';
@@ -98,7 +99,11 @@ is $batch->[1]{pid},       $$, 'right pid';
 ok !$batch->[2], 'no more results';
 $batch = $minion->backend->list_workers(0, 1);
 is $batch->[0]{id}, $worker2->id, 'right id';
+is_deeply $batch->[0]{status}, {whatever => 'works!'}, 'right status';
 ok !$batch->[1], 'no more results';
+$worker2->status({whatever => 'works too!'})->register;
+$batch = $minion->backend->list_workers(0, 1);
+is_deeply $batch->[0]{status}, {whatever => 'works too!'}, 'right status';
 $batch = $minion->backend->list_workers(1, 1);
 is $batch->[0]{id}, $worker->id, 'right id';
 ok !$batch->[1], 'no more results';
@@ -128,6 +133,7 @@ $minion->add_task(fail => sub { die "Intentional failure!\n" });
 my $stats = $minion->stats;
 is $stats->{active_workers},   0, 'no active workers';
 is $stats->{inactive_workers}, 0, 'no inactive workers';
+is $stats->{enqueued_jobs},    0, 'no enqueued jobs';
 is $stats->{active_jobs},      0, 'no active jobs';
 is $stats->{failed_jobs},      0, 'no failed jobs';
 is $stats->{finished_jobs},    0, 'no finished jobs';
@@ -136,7 +142,9 @@ is $stats->{delayed_jobs},     0, 'no delayed jobs';
 $worker = $minion->worker->register;
 is $minion->stats->{inactive_workers}, 1, 'one inactive worker';
 $minion->enqueue('fail');
+is $minion->stats->{enqueued_jobs}, 1, 'one enqueued job';
 $minion->enqueue('fail');
+is $minion->stats->{enqueued_jobs}, 2, 'two enqueued jobs';
 is $minion->stats->{inactive_jobs}, 2, 'two inactive jobs';
 $job   = $worker->dequeue(0);
 $stats = $minion->stats;
@@ -273,17 +281,15 @@ is $info->{state},     'inactive',   'right state';
 is $info->{retries},   1,            'job has been retried once';
 $job = $worker->dequeue(0);
 is $job->retries, 1, 'job has been retried once';
-ok !$job->retry, 'job not retried';
-is $job->id, $id, 'right id';
-ok !$job->remove, 'job has not been removed';
-ok $job->fail,  'job failed';
 ok $job->retry, 'job retried';
+is $job->id, $id, 'right id';
 is $job->info->{retries}, 2, 'job has been retried twice';
 $job = $worker->dequeue(0);
 is $job->info->{state}, 'active', 'right state';
 ok $job->finish, 'job finished';
 ok $job->remove, 'job has been removed';
-is $job->info,   undef, 'no information';
+ok !$job->retry, 'job not retried';
+is $job->info, undef, 'no information';
 $id = $minion->enqueue(add => [6, 5]);
 $job = $minion->job($id);
 is $job->info->{state},   'inactive', 'right state';
@@ -565,16 +571,16 @@ $job    = $worker->dequeue(0);
 $job2   = $worker->dequeue(0);
 my $job3 = $worker->dequeue(0);
 my $job4 = $worker->dequeue(0);
-$pid = $job->start;
-my $pid2 = $job2->start;
-my $pid3 = $job3->start;
-my $pid4 = $job4->start;
+$job->start;
+$job2->start;
+$job3->start;
+$job4->start;
 my ($first, $second, $third, $fourth);
 usleep 50000
-  until $first ||= $job->is_finished($pid)
-  and $second  ||= $job2->is_finished($pid2)
-  and $third   ||= $job3->is_finished($pid3)
-  and $fourth  ||= $job4->is_finished($pid4);
+  until $first ||= $job->is_finished
+  and $second  ||= $job2->is_finished
+  and $third   ||= $job3->is_finished
+  and $fourth  ||= $job4->is_finished;
 is $minion->job($id)->info->{state}, 'finished', 'right state';
 is_deeply $minion->job($id)->info->{result}, {added => 21}, 'right result';
 is $minion->job($id2)->info->{state}, 'finished', 'right state';
@@ -584,6 +590,19 @@ is $minion->job($id3)->info->{result}, undef,      'no result';
 is $minion->job($id4)->info->{state},  'failed',   'right state';
 is $minion->job($id4)->info->{result}, 'Non-zero exit status (1)',
   'right result';
+$worker->unregister;
+
+# Stopping jobs
+$minion->add_task(long_running => sub { sleep 1000 });
+$worker = $minion->worker->register;
+$minion->enqueue('long_running');
+$job = $worker->dequeue(0);
+ok $job->start->pid, 'has a process id';
+ok !$job->is_finished, 'job is not finished';
+$job->stop;
+usleep 5000 until $job->is_finished;
+is $job->info->{state}, 'failed', 'right state';
+like $job->info->{result}, qr/Non-zero exit status/, 'right result';
 $worker->unregister;
 
 # Job dependencies
@@ -627,6 +646,34 @@ like $minion->job($id)->info->{finished}, qr/^[\d.]+$/,
 is $minion->job($id)->info->{state},  'failed',           'right state';
 is $minion->job($id)->info->{result}, 'Parent went away', 'right result';
 $worker->unregister;
+
+# Worker remote control commands
+$worker  = $minion->worker->register->process_commands;
+$worker2 = $minion->worker->register;
+my @commands;
+$_->add_command(test_id => sub { push @commands, shift->id })
+  for $worker, $worker2;
+$worker->add_command(test_args => sub { shift and push @commands, [@_] })
+  ->register;
+ok $minion->backend->broadcast('test_id', [], [$worker->id]), 'sent command';
+ok $minion->backend->broadcast('test_id', [], [$worker->id, $worker2->id]),
+    'sent command';
+$worker->process_commands->register;
+$worker2->process_commands;
+is_deeply \@commands, [$worker->id, $worker->id, $worker2->id],
+    'right structure';
+@commands = ();
+ok $minion->backend->broadcast('test_id'),       'sent command';
+ok $minion->backend->broadcast('test_whatever'), 'sent command';
+ok $minion->backend->broadcast('test_args', [23], []), 'sent command';
+ok $minion->backend->broadcast('test_args', [1, [2], {3 => 'three'}],
+    [$worker->id]), 'sent command';
+$_->process_commands for $worker, $worker2;
+is_deeply \@commands,
+    [$worker->id, [23], [1, [2], {3 => 'three'}], $worker2->id],
+    'right structure';
+$_->unregister for $worker, $worker2;
+ok !$minion->backend->broadcast('test_id', []), 'command not sent';
 
 # Clean up once we are done
 $minion->backend->reset;

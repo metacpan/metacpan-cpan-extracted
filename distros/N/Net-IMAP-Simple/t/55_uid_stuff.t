@@ -33,4 +33,4 @@ sub run_tests {
     ok( "@ssuid", "@uid" );
 }
 
-do "t/test_runner.pm";
+do "./t/test_runner.pm";

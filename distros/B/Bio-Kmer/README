@@ -73,6 +73,14 @@ METHODS
           Arguments: Another Bio::Kmer object
           Returns:   List of kmers
 
+    $kmer->close()
+        Cleans the temporary directory and removes this object from RAM.
+        Good for when you might be counting kmers for many things but want
+        to keep your overhead low.
+
+          Arguments: None
+          Returns:   1
+
 COPYRIGHT AND LICENSE
     MIT license. Go nuts.
 

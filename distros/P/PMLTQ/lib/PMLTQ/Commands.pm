@@ -1,6 +1,6 @@
 package PMLTQ::Commands;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Commands::VERSION = '1.3.1';
+$PMLTQ::Commands::VERSION = '1.3.2';
 # ABSTRACT: PMLTQ command line interface
 
 use PMLTQ::Base -strict;
@@ -25,6 +25,7 @@ sub DEFAULT_CONFIG {
       port => 5432
     },
     isFree => 'false',
+    isAllLogged => 'false',
     isPublic => 'false',
     isFeatured => 'false',
   };
@@ -169,7 +170,7 @@ PMLTQ::Commands - PMLTQ command line interface
 
 =head1 VERSION
 
-version 1.3.1
+version 1.3.2
 
 =head1 SYNOPSIS
 
@@ -373,6 +374,12 @@ Boolean value (C<true>, C<false>) sets if the logging in is not required for que
 
 Defaults: B<false>
 
+=item C<isAllLogged>
+
+Boolean value (C<true>, C<false>) sets if treebank is queryable for all logged in users.
+
+Defaults: B<false>
+
 =item C<isPublic>
 
 Boolean value (C<true>, C<false>) sets if the treebank is visible for not logged users.
@@ -429,7 +436,7 @@ Language code
 
 =item C<result_dir>
 
-Directory where sould be saved results of test queries (SVG and text files)
+Directory where should be saved results of test queries (SVG and text files)
 
 =item C<queries>
 
@@ -437,7 +444,7 @@ Directory where sould be saved results of test queries (SVG and text files)
 
 =item C<filename>
 
-Filename where sould be the result saved
+Name of the file where the results should be saved
 
 =item C<query>
 

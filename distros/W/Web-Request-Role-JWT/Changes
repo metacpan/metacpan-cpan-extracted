@@ -1,0 +1,14 @@
+Revision history for Web::Request::Role::JWT
+
+1.001   2017-06-21T14:00:53
+    - add requires_jwt_claim_aud
+    - requires_* fails are now logged via Log::Any
+
+
+1.000	2017-06-12T12:04:25
+    - first public release
+
+
+0.900	2017-06-12T11:59:02
+    - extracted from various Validad tools, added docs, added tests
+

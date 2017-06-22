@@ -1,0 +1,7 @@
+WebService::CoinSpot - perl API for CoinSpot
+
+0.002 2017-06-12
+ - Fix for pod only
+
+0.001 2017-06-12
+ - Initial revision

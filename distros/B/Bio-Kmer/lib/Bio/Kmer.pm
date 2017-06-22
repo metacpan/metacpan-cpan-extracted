@@ -5,7 +5,7 @@
 
 package Bio::Kmer;
 require 5.10.0;
-our $VERSION=0.14;
+our $VERSION=0.17;
 
 use strict;
 use warnings;
@@ -13,6 +13,7 @@ use warnings;
 use List::Util qw/max/;
 use File::Basename qw/basename fileparse dirname/;
 use File::Temp qw/tempdir tempfile/;
+use File::Path qw/remove_tree/;
 use Data::Dumper;
 use IO::Uncompress::Gunzip;
 
@@ -245,6 +246,11 @@ sub histogramJellyfish{
     $hist[$count]=$countOfCounts;
   }
   close $fh;
+
+  # Fill in gaps in the histogram
+  for(@hist){
+    $_||=0;
+  }
 
   return \@hist;
 }
@@ -593,6 +599,32 @@ sub openFastq{
 sub closeFastq{
   my($self,$fastq)=@_;
   close $fastq;
+  return 1;
+}
+
+=pod
+
+=over
+
+=item $kmer->close()
+
+Cleans the temporary directory and removes this object from 
+RAM. Good for when you might be counting kmers for many 
+things but want to keep your overhead low.
+
+  Arguments: None
+  Returns:   1
+
+=back
+
+=cut
+
+sub close{
+  my($self)=@_;
+
+  remove_tree($self->{tempdir});
+  undef($self);
+
   return 1;
 }
 

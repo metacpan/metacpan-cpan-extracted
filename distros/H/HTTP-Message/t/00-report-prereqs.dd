@@ -1,0 +1,60 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'perl' => '5.006'
+                                      },
+                        'suggests' => {
+                                        'JSON::PP' => '2.27300'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::CPAN::Changes' => '0.19',
+                                      'Test::More' => '0.96'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Compress::Raw::Zlib' => '0',
+                                      'Encode' => '2.21',
+                                      'Encode::Locale' => '1',
+                                      'Exporter' => '5.57',
+                                      'HTTP::Date' => '6',
+                                      'IO::Compress::Bzip2' => '2.021',
+                                      'IO::Compress::Deflate' => '0',
+                                      'IO::Compress::Gzip' => '0',
+                                      'IO::HTML' => '0',
+                                      'IO::Uncompress::Bunzip2' => '2.021',
+                                      'IO::Uncompress::Gunzip' => '0',
+                                      'IO::Uncompress::Inflate' => '0',
+                                      'IO::Uncompress::RawInflate' => '0',
+                                      'LWP::MediaTypes' => '6',
+                                      'MIME::Base64' => '2.1',
+                                      'MIME::QuotedPrint' => '0',
+                                      'Storable' => '0',
+                                      'URI' => '1.10',
+                                      'base' => '0',
+                                      'perl' => '5.008001',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'PerlIO::encoding' => '0',
+                                   'Test::More' => '0.88',
+                                   'Time::Local' => '0',
+                                   'Try::Tiny' => '0',
+                                   'perl' => '5.008001'
+                                 }
+                 }
+     };
+  $x;
+ }

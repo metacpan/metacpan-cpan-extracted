@@ -1,7 +1,6 @@
 
 package Lab::Measurement;
-our $VERSION = '3.543';
-
+$Lab::Measurement::VERSION = '3.550';
 use strict;
 use warnings;
 use Lab::Generic;

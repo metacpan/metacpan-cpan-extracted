@@ -9,6 +9,7 @@ WriteMakefile(
         'Coro'                  => 0,
         'Data::Dumper'          => 0,
         'Digest::SHA'           => 0,
+        'JSON::XS'              => 0,
 #        'DR::Msgpuck'           => 0,
         'File::Spec::Functions' => 0,
         'File::Temp'            => 0,

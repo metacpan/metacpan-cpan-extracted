@@ -1,5 +1,11 @@
 Revision history for Dist-Zilla-PluginBundle-Author-OALDERS
 
+0.000011  2017-06-15 17:37:56Z
+    - Use UTC for NextRelease
+    - Use RunExtraTests rather than ExtraTests
+    - Add MetaConfig plugin
+    - Add PromptIfStale plugin
+
 0.000010  2017-04-21 09:27:47-04:00 America/Toronto
     - Adds Dist::Zilla::Plugin::Test::ReportPrereqs
 

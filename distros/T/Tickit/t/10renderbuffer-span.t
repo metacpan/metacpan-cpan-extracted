@@ -96,6 +96,30 @@ is( $rb->cols,  20, '$rb->cols' );
                'RenderBuffer correctly gets MAGIC' );
 }
 
+# Conversion of numerical arguments - RT120630
+{
+   tie my $sv, "FetchCounter";
+   my $count = 0;
+   {
+      package FetchCounter;
+      sub TIESCALAR { return bless [], shift }
+      sub FETCH     { $count++; return "AB"; }
+   }
+
+   my $cols = $rb->text_at( 0, 4, $sv );
+   is( $cols, 2, "return from ->text_at on SvIV" );
+
+   $rb->goto( 1, 4 );
+   $rb->text( $sv );
+
+   $rb->flush_to_term( $term );
+   is_termlog( [ GOTO(0,4), SETPEN(), PRINT("AB"),
+                 GOTO(1,4), SETPEN(), PRINT("AB") ],
+               'RenderBuffer correctly converts SvIV' );
+
+   is( $count, 2, 'FETCH called only twice' );
+}
+
 # Span splitting
 {
    my $pen = Tickit::Pen->new;

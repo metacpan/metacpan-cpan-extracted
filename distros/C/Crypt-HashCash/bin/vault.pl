@@ -1,10 +1,10 @@
 #!/usr/bin/perl
 # -*-cperl-*-
 #
-# vault.pl - Vault server for HashCash digital cash
+# vault.pl - Vault server for HashCash Digital Cash
 # Copyright (c) 2017 Ashish Gulhati <crypt-hashcash at hash.neo.tc>
 #
-# $Id: bin/vault.pl v1.118 Sat Jun 10 13:59:12 PDT 2017 $
+# $Id: bin/vault.pl v1.124 Mon Jun 19 15:52:00 PDT 2017 $
 
 use strict;
 use warnings;
@@ -20,15 +20,30 @@ use Crypt::HashCash qw (_dec _hex);
 use Crypt::EECDH;
 use Digest::MD5 qw(md5_hex);
 use Net::Server::PreFork;
+use File::HomeDir;
 use Crypt::CBC;
 
-my $vault = new Crypt::HashCash::Vault::Bitcoin;
+my $HASHCASH = $ENV{HASHCASHDIR} || File::HomeDir->my_home . '/.hashcash';
 
-if (defined $ARGV[0] and $ARGV[0] eq '--keygen') {
-  $vault->keygen( Name   => 'HashCash.ch',
-		  Server => 'vault.hashcash.ch',
+unless (-d $HASHCASH) {
+  die "Directory $HASHCASH doesn't exist and couldn't be created.\n" unless mkdir($HASHCASH, 0700);
+}
+
+unless (-d "$HASHCASH/vaults") {
+  die "Directory $HASHCASH/.vaults doesn't exist and couldn't be created.\n" unless mkdir("$HASHCASH/vaults", 0700);
+}
+
+my $vault = new Crypt::HashCash::Vault::Bitcoin ( DB => "$HASHCASH/vault.db",
+						  KeyDB => "$HASHCASH/vaults/vault.key" );
+
+if (!-f "$HASHCASH/vaults/vault.key" or (defined $ARGV[0] and $ARGV[0] eq '--keygen')) {
+  $|=1;
+  print STDERR "Generating vault keys... ";
+  $vault->keygen( Name   => 'localhost',
+		  Server => 'localhost',
+		  Port   => '20203',
 		  Fees   => { mf => 50, mp => 0, vf => 50, vp => 0.001 } );
-  exit;
+  print "done.\n";
 }
 
 $vault->mint->loadkeys();
@@ -50,12 +65,14 @@ sub process_request {
       my $enchex = _hex($1);
       my $eecdh = new Crypt::EECDH;
       my ($request, $pubkey) = $eecdh->decrypt (Key => $sk, Ciphertext => pack ('H*', $enchex));
+      diag("REQ: $request\n");
       alarm(0);
       my ($ret) = $vault->process_request($request);     # Process the request
+      diag("RET: $ret\n");
       if ( defined $ret) {                               # Encrypt and return response
 	my ($encrypted) = $eecdh->encrypt (PublicKey => $pubkey, Message => $ret);
 	my $response = _dec(unpack 'H*', $encrypted);
-	diag("R: $ret\nRES: $response\n");
+	diag("RES: $response\n");
 	print "$response\n";
       }
       alarm($timeout);
@@ -77,12 +94,12 @@ __END__
 
 =head1 NAME
 
-vault.pl - Vault for HashCash digital cash
+vault.pl - Vault for HashCash Digital Cash
 
 =head1 VERSION
 
- $Revision: 1.118 $
- $Date: Sat Jun 10 13:59:12 PDT 2017 $
+ $Revision: 1.124 $
+ $Date: Mon Jun 19 15:52:00 PDT 2017 $
 
 =head1 SYNOPSIS
 
@@ -96,23 +113,14 @@ and returns the responses.
 
 This command is primarily for testing. For real vaults, optimal
 security and performance can be achieved by running the vault on an
-offline cluster using B<vault-worker.pl> and B<vault-queuer.pl>
-instead,
+air-gapped cluster (see L<vault-worker.pl> and L<vault-queuer.pl>).
 
 =head1 COMMAND LINE OPTIONS
 
-=over
-
-=item B<--keygen>
-
-=back
-
-=over
+=head2 --keygen
 
 Create blind-signing keys for all coin denominations supported by the
 vault.
-
-=back
 
 =head1 SEE ALSO
 

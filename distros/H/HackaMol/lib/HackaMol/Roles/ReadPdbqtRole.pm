@@ -1,5 +1,5 @@
 package HackaMol::Roles::ReadPdbqtRole;
-$HackaMol::Roles::ReadPdbqtRole::VERSION = '0.039';
+$HackaMol::Roles::ReadPdbqtRole::VERSION = '0.040';
 # ABSTRACT: Read files with molecular information
 use Moose::Role;
 use HackaMol::PeriodicTable qw(_element_name _trim _qstring_num);
@@ -130,7 +130,7 @@ HackaMol::Roles::ReadPdbqtRole - Read files with molecular information
 
 =head1 VERSION
 
-version 0.039
+version 0.040
 
 =head1 SYNOPSIS
 
@@ -180,7 +180,7 @@ Demian Riccardi <demianriccardi@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Demian Riccardi.
+This software is copyright (c) 2017 by Demian Riccardi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2011-2016 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2011-2017 -- leonerd@leonerd.org.uk
  */
 
 
@@ -793,15 +793,17 @@ type(self,newapi=&PL_sv_undef)
   INIT:
     TickitFocusEventInfo *info = INT2PTR(TickitFocusEventInfo *, SvIV((SV*)SvRV(self)));
   CODE:
-    // Legacy API gave simple 0=out, 1=in
-    // New API gives type+name dualvar
-    if(ix == 0 && SvTRUE(newapi))
+    // Deprecated API gave simple 0=out, 1=in
+    if(ix == 0 && !SvTRUE(newapi)) {
+      Perl_ck_warner(aTHX_ packWARN(WARN_DEPRECATED),
+        "Old boolean-returning $info->type API is deprecated");
       ix = 2;
+    }
 
     switch(ix) {
-      case 0: RETVAL = newSViv(info->type == TICKIT_FOCUSEV_IN); break;
+      case 0: RETVAL = tickit_focusevtype2sv(info->type); break;
       case 1: RETVAL = newSVwin(tickit_window_ref(info->win)); break;
-      case 2: RETVAL = tickit_focusevtype2sv(info->type); break;
+      case 2: RETVAL = newSViv(info->type == TICKIT_FOCUSEV_IN); break;
     }
   OUTPUT:
     RETVAL
@@ -1547,15 +1549,15 @@ text_at(self,line,col,text,pen=NULL)
   SV *text
   Tickit::Pen pen
   INIT:
+    char *bytes;
     STRLEN len;
   CODE:
-    SvGETMAGIC(text);
-    len = SvCUR(text);
+    bytes = SvPVutf8(text, len);
     if(pen) {
       tickit_renderbuffer_savepen(self);
       tickit_renderbuffer_setpen(self, pen);
     }
-    RETVAL = tickit_renderbuffer_textn_at(self, line, col, SvPVutf8_nolen(text), len);
+    RETVAL = tickit_renderbuffer_textn_at(self, line, col, bytes, len);
     if(pen)
       tickit_renderbuffer_restore(self);
   OUTPUT:
@@ -1567,18 +1569,18 @@ text(self,text,pen=NULL)
   SV *text
   Tickit::Pen pen
   INIT:
+    char *bytes;
     STRLEN len;
   CODE:
     if(!tickit_renderbuffer_has_cursorpos(self))
       croak("Cannot ->text without a virtual cursor position");
 
-    SvGETMAGIC(text);
-    len = SvCUR(text);
+    bytes = SvPVutf8(text, len);
     if(pen) {
       tickit_renderbuffer_savepen(self);
       tickit_renderbuffer_setpen(self, pen);
     }
-    RETVAL = tickit_renderbuffer_textn(self, SvPVutf8_nolen(text), len);
+    RETVAL = tickit_renderbuffer_textn(self, bytes, len);
     if(pen)
       tickit_renderbuffer_restore(self);
   OUTPUT:
@@ -2876,6 +2878,21 @@ set_cursor_shape(self,shape)
   int             shape
   CODE:
     tickit_window_set_cursor_shape(self->win, shape);
+
+bool
+is_steal_input(self)
+  Tickit::Window  self
+  CODE:
+    RETVAL = tickit_window_is_steal_input(self->win);
+  OUTPUT:
+    RETVAL
+
+void
+set_steal_input(self,steal)
+  Tickit::Window  self
+  bool            steal
+  CODE:
+    tickit_window_set_steal_input(self->win, steal);
 
 MODULE = Tickit  PACKAGE = Tickit
 

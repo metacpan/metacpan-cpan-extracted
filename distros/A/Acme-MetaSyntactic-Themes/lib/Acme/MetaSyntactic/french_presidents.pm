@@ -2,7 +2,7 @@ package Acme::MetaSyntactic::french_presidents;
 use strict;
 use Acme::MetaSyntactic::MultiList;
 our @ISA = qw( Acme::MetaSyntactic::MultiList );
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 
 =encoding iso-8859-1
 
@@ -15,7 +15,7 @@ Acme::MetaSyntactic::french_presidents - The presidents of France theme
 Presidents of the various French republics.
 
 This list is based on the official Élysée list, available at:
-L<http://www.elysee.fr/president/la-presidence/les-presidents-depuis-1848/histoire-des-presidents-de-la-republique/les-anciens-presidents-de-la-republique.483.html>
+L<http://www.elysee.fr/la-presidence/les-presidents-de-la-republique-depuis-1848/>.
 The typograpical errors in the names have been corrected, though.
 
 =head1 FRENCH PRESIDENTS
@@ -31,7 +31,9 @@ The typograpical errors in the names have been corrected, though.
 
 =over 4
 
-=item François Hollande (2012-)
+=item Emmanuel Macron (2017-)
+
+=item François Hollande (2012-2017)
 
 =item Nicolas Sarkozy (2007-2012)
 
@@ -125,6 +127,13 @@ Philippe Bruhat (BooK)
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2017-06-12 - v1.001
+
+Updated with the latest president, and the new URL for the authoritative list,
+in Acme-MetaSyntactic-Themes version 1.050.
 
 =item *
 

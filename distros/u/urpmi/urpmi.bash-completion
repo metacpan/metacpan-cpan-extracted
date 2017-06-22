@@ -8,7 +8,7 @@ common_options="-q --quiet -v --verbose --debug -h --help --urpmi-root --wait-lo
 _urpmi_get_medias()
 {
     medias=( $( urpmq --list-media $1 2>/dev/null \
-	| sed -e 's/(/\\(/g' -e 's/)/\\)/g' -e 's/ /\\ /g' ) )
+	| \sed -e 's/(/\\(/g' -e 's/)/\\)/g' -e 's/ /\\ /g' ) )
 }
 
 _urpmi_medias()
@@ -24,7 +24,7 @@ _urpmi_aliases()
 {
     # return list of available aliases
     COMPREPLY=( $( awk -F: '{print $1}' /etc/urpmi/parallel.cfg 2>/dev/null \
-	| grep "^${cur//\\\\/}" ) )
+	| \grep "^${cur//\\\\/}" ) )
 }
 
 _urpmi_packages()
@@ -45,7 +45,7 @@ _urpmi_packages()
 	esac
     done
 
-    COMPREPLY=( $( compgen -W "$(urpmq $options --list | grep ^$cur )" -- ) )
+    COMPREPLY=( $( compgen -W "$(urpmq $options --list | \grep ^$cur )" -- ) )
 }
 
 # urpmi completion

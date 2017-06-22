@@ -1,8 +1,7 @@
 #!/usr/bin/perl -w
 
 package Lab::Bus::Socket;
-our $VERSION = '3.543';
-
+$Lab::Bus::Socket::VERSION = '3.550';
 use strict;
 use Scalar::Util qw(weaken);
 use Time::HiRes qw (usleep sleep);

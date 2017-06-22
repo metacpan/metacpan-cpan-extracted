@@ -4,7 +4,7 @@ Log::Dispatch - Dispatches messages to one or more outputs
 
 # VERSION
 
-version 2.63
+version 2.65
 
 # SYNOPSIS
 
@@ -399,12 +399,15 @@ Dave Rolsky <autarch@urth.org>
 # CONTRIBUTORS
 
 - Anirvan Chatterjee <anirvan@users.noreply.github.com>
+- Carsten Grohmann <mail@carstengrohmann.de>
 - Doug Bell <doug@preaction.me>
 - Graham Ollis <plicease@cpan.org>
 - Gregory Oschwald <goschwald@maxmind.com>
 - Johann Rolschewski <jorol@cpan.org>
 - Jonathan Swartz <swartz@pobox.com>
 - Karen Etheridge <ether@cpan.org>
+- Kerin Millar <kfm@plushkava.net>
+- Kivanc Yazan <kivancyazan@gmail.com>
 - Konrad Bucheli <kb@open.ch>
 - Olaf Alders <olaf@wundersolutions.com>
 - Olivier Mengué <dolmen@cpan.org>

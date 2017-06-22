@@ -2,7 +2,7 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More tests => 32;
+use Test::More tests => 35;
 
 use Struct::Path qw(spath);
 
@@ -16,6 +16,10 @@ my (@r, $frozen_s);
 
 # will check later it's not chaged
 $frozen_s = freeze($s_mixed);
+
+# nonref as a structure
+eval { spath(undef, []) };
+like($@, qr/^Reference expected for structure/);
 
 # path must be a list
 eval { spath($s_mixed, undef) };
@@ -39,11 +43,11 @@ like($@, qr/^Unsupported HASH regs definition \(step #0\)/); # must be error
 
 # wrong step type, strict
 eval { spath($s_mixed, [ [0] ], strict => 1) };
-like($@, qr/^Passed struct doesn't match provided path \(array expected on step #0\)/);
+like($@, qr/^ARRAY expected on step #0, got HASH/);
 
 # wrong step type, strict 2
 eval { spath($s_array, [ {keys => 'a'} ], strict => 1) };
-like($@, qr/^Passed struct doesn't match provided path \(hash expected on step #0\)/);
+like($@, qr/^HASH expected on step #0, got ARRAY/);
 
 # out of range
 eval { spath($s_mixed, [ {keys => ['a']},[1000] ]) };
@@ -71,23 +75,23 @@ ok(!@r);
 
 # must return full struct
 @r = spath($s_mixed, []);
-ok($frozen_s = freeze(${$r[0]}));
-
-# nonref as a structure
-@r = spath(undef, []);
-is_deeply(
-    \@r,
-    [\undef],
-    "nonref as a structure"
-);
+ok($frozen_s eq freeze(${$r[0]}));
 
 # blessed thing as a structure
 my $t = bless {}, "Thing";
 @r = spath($t, []);
 is_deeply(
     \@r,
-    [bless( {}, 'Thing' )],
+    [\bless( {}, 'Thing' )],
     "blessed thing as a structure"
+);
+
+# REF as a structure
+@r = spath(\$s_mixed, [ {keys => ['b']} ]);
+is_deeply(
+    \@r,
+    [\{ba => 'vba',bb => 'vbb'}],
+    "get {b}"
 );
 
 # get
@@ -142,7 +146,10 @@ is_deeply(
 @r = spath($s_mixed, [ {keys => ['a']},[1],[] ], paths => 1);
 is_deeply(
     \@r,
-    [[[{keys => ['a']},[1],[0]],\'a0'],[[{keys => ['a']},[1],[1]],\'a1']],
+    [
+        [{keys => ['a']},[1],[0]], \'a0',
+        [{keys => ['a']},[1],[1]], \'a1'
+    ],
     "get {a}[1][], paths=1"
 );
 
@@ -150,8 +157,37 @@ is_deeply(
 @r = spath($s_mixed, [ {keys => ['a']},[1],[] ], deref => 1, paths => 1);
 is_deeply(
     \@r,
-    [[[{keys => ['a']},[1],[0]],'a0'],[[{keys => ['a']},[1],[1]],'a1']],
+    [
+        [{keys => ['a']},[1],[0]], 'a0',
+        [{keys => ['a']},[1],[1]], 'a1'
+    ],
     "get {a}[1][], deref=1, paths=1"
+);
+
+# 'stack' opt
+@r = spath($s_mixed, [ {keys => ['a']},[1],[0] ], stack => 1);
+is_deeply(
+    \@r,
+    [[
+        \{a => [{a2a => {a2aa => 0},a2b => {a2ba => undef},a2c => {a2ca => []}},['a0','a1']],b => {ba => 'vba',bb => 'vbb'},c => 'vc'},
+        \[{a2a => {a2aa => 0},a2b => {a2ba => undef},a2c => {a2ca => []}},['a0','a1']],
+        \['a0','a1'],
+        \'a0'
+    ]],
+    "get {a}[1][0], stack=1"
+);
+
+# 'stack' && 'deref' opts
+@r = spath($s_mixed, [ {keys => ['a']},[1],[0] ], deref => 1, stack => 1);
+is_deeply(
+    \@r,
+    [[
+        {a => [{a2a => {a2aa => 0},a2b => {a2ba => undef},a2c => {a2ca => []}},['a0','a1']],b => {ba => 'vba',bb => 'vbb'},c => 'vc'},
+        [{a2a => {a2aa => 0},a2b => {a2ba => undef},a2c => {a2ca => []}},['a0','a1']],
+        ['a0','a1'],
+        'a0'
+    ]],
+    "get {a}[1][0], deref=1, stack=1"
 );
 
 # mixed structures

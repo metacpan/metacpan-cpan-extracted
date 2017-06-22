@@ -36,7 +36,7 @@
             "Moo" : "2.000000",
             "Type::Tiny" : "1.000005",
             "URI" : "1.65",
-            "WWW::Google::UserAgent" : "0.20",
+            "WWW::Google::UserAgent" : "0.21",
             "namespace::clean" : "0.24",
             "perl" : "5.006"
          }
@@ -45,27 +45,27 @@
    "provides" : {
       "WWW::Google::CustomSearch" : {
          "file" : "lib/WWW/Google/CustomSearch.pm",
-         "version" : "0.34"
+         "version" : "0.35"
       },
       "WWW::Google::CustomSearch::Item" : {
          "file" : "lib/WWW/Google/CustomSearch/Item.pm",
-         "version" : "0.34"
+         "version" : "0.35"
       },
       "WWW::Google::CustomSearch::Page" : {
          "file" : "lib/WWW/Google/CustomSearch/Page.pm",
-         "version" : "0.34"
+         "version" : "0.35"
       },
       "WWW::Google::CustomSearch::Params" : {
          "file" : "lib/WWW/Google/CustomSearch/Params.pm",
-         "version" : "0.34"
+         "version" : "0.35"
       },
       "WWW::Google::CustomSearch::Request" : {
          "file" : "lib/WWW/Google/CustomSearch/Request.pm",
-         "version" : "0.34"
+         "version" : "0.35"
       },
       "WWW::Google::CustomSearch::Result" : {
          "file" : "lib/WWW/Google/CustomSearch/Result.pm",
-         "version" : "0.34"
+         "version" : "0.35"
       }
    },
    "release_status" : "stable",
@@ -76,6 +76,6 @@
          "web" : "https://github.com/manwar/WWW-Google-CustomSearch"
       }
    },
-   "version" : "0.34",
+   "version" : "0.35",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

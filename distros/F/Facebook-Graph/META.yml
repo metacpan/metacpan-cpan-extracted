@@ -30,7 +30,7 @@ requires:
 resources:
   bugtracker: http://github.com/rizen/Facebook-Graph/issues
   repository: git://github.com/rizen/Facebook-Graph.git
-version: '1.1202'
+version: '1.1204'
 x_contributors:
   - 'Adam Hopkins <SirChickenHair@srchulo-aire.local>'
   - 'Andrew Grangaard <granny-github@ofb.net>'
@@ -45,6 +45,7 @@ x_contributors:
   - 'Mark Carey <mark@mt-hacks.com>'
   - 'Mark Stosberg <mark@stosberg.com>'
   - 'Maroun NAJM <mnajm@cinemoz.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Nathan Handy <nhandy@Nathans-MacBook-Pro.local>'
   - 'Oklahomer <hagiwara.go@gmail.com>'
   - 'Olaf Alders <olaf@wundersolutions.com>'

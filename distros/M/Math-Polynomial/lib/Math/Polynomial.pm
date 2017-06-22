@@ -1,8 +1,6 @@
-# Copyright (c) 2007-2016 by Martin Becker.  All rights reserved.
+# Copyright (c) 2007-2017 by Martin Becker.  All rights reserved.
 # This package is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-#
-# $Id: Polynomial.pm 129 2016-08-08 17:27:26Z demetri $
 
 package Math::Polynomial;
 
@@ -44,7 +42,7 @@ use constant NFIELDS  => 4;
 
 # ----- static data -----
 
-our $VERSION      = '1.011';
+our $VERSION      = '1.013';
 our $max_degree   = 10_000;    # limit for power operator
 
 # default values for as_string options
@@ -399,7 +397,7 @@ sub _divmod {
     my @quot = ();
     my $i    = $#rem - @den;
     while (0 <= $i) {
-        my $q = pop(@rem);
+        my $q = pop @rem;
         if (defined $hd) {
             $q /= $hd;
         }
@@ -750,6 +748,7 @@ sub as_horner_tree {
     my $var_is_dynamic = 'CODE' eq ref $config{'variable'};
     my $variable = $var_is_dynamic? undef: $config{'variable'};
     while (0 <= --$exp) {
+        $coeff = $this->coeff($exp);
         if ($is_sum) {
             $result = $config{'group'}->($result);
         }
@@ -758,12 +757,14 @@ sub as_horner_tree {
         }
         my $power = $variable;
         if ($config{'expand_power'}) {
-            $is_sum = $zero != $this->coeff($exp);
+            $is_sum = $zero != $coeff;
         }
         else {
             my $skip = 0;
-            while ($skip <= $exp && $zero == $this->coeff($exp-$skip)) {
+            while ($zero == $coeff) {
                 ++$skip;
+                last if $skip > $exp;
+                $coeff =  $this->coeff($exp - $skip);
             }
             if ($skip) {
                 $exp -= $skip;
@@ -779,7 +780,6 @@ sub as_horner_tree {
             $first_is_neg = 0;
         }
         if ($is_sum) {
-            my $coeff = $this->coeff($exp);
             my $is_neg = $ltz && $ltz->($coeff);
             if ($is_neg) {
                 $coeff = -$coeff;
@@ -912,7 +912,7 @@ Math::Polynomial - Perl class for polynomials in one variable
 
 =head1 VERSION
 
-This documentation refers to version 1.011 of Math::Polynomial.
+This documentation refers to version 1.013 of Math::Polynomial.
 
 =head1 SYNOPSIS
 
@@ -2131,10 +2131,10 @@ ordered space, i.e. lacking operators like C<E<lt>> (less than).
   });
   print "$p\n";                                # prints ((2+i) x + 3i)
 
-  use Math::BigRat;
-  $c0 = Math::BigRat->new('-1/2');
-  $c1 = Math::BigRat->new('0');
-  $c2 = Math::BigRat->new('3/2');
+  use Math::BigNum;
+  $c0 = Math::BigNum->new('-1/2');
+  $c1 = Math::BigNum->new('0');
+  $c2 = Math::BigNum->new('3/2');
   $p = Math::Polynomial->new($c0, $c1, $c2);  # p(x) == 3/2*x**2 - 1/2
 
   use Math::ModInt qw(mod);
@@ -2312,10 +2312,6 @@ Additional requirements to run the test suite are:
 
 Test (usually bundled with perl)
 
-=item *
-
-Math::Complex (usually bundled with perl)
-
 =back
 
 Recommended modules for increased functionality are:
@@ -2332,7 +2328,7 @@ Math::BigInt (usually bundled with perl)
 
 =item *
 
-Math::BigRat (usually bundled with perl, but see caveat below)
+Math::BigNum (available on CPAN)
 
 =item *
 
@@ -2347,12 +2343,10 @@ this module.  Bug reports and suggestions are welcome -- please
 submit them through the CPAN RT,
 L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Math-Polynomial>.
 
-Math::BigRat v0.260802, as shipped with perl-5.24.0, is incompatible with
-recent versions of Math::BigInt, such as v1.999726.  On environments
-with mismatched Math::BigInt / Math::BigRat versions, rational arithmetic
-goes haywire.  This can lead to failures in script t/11_math_bigrat.t of
-our test suite (as well as everything else using Math::BigRat objects).
-You probably need to upgrade Math::BigRat if you see this happen.
+Our test suite checks for compatibility with several alien modules that
+might be useful as coefficient spaces.  Issues with these modules are
+reported only in skip messages, but not as hard failures, as in the past
+usually the alien module was to blame.
 
 =head1 SEE ALSO
 
@@ -2372,9 +2366,9 @@ least one usage example for each of even the most exotic features.
 
 =item *
 
-I<Math::Polynomial::Generic> -
+I<Math::Polynomial::Generic> (deprecated) -
 an experimental interface extension with some syntactical sugar
-coating Math::Polynomial.
+coating Math::Polynomial.  It is no longer supported.
 
 =back
 
@@ -2423,8 +2417,18 @@ the Perl Data Language.
 
 =item *
 
-Math::GMPz -
-an interface to the GMP arbitrary precision integer math library.
+Math::GMPz, Math::GMPq, Math::GMPf -
+interfaces to the GMP arbitrary precision integer math library.
+
+=item *
+
+Math::BigInt, Math::BigFloat, and Math::BigRat -
+arbitrary precision math libraries.
+
+=item *
+
+Math::BigNum -
+another arbitrary precision library (using GMP).
 
 =item *
 
@@ -2470,7 +2474,7 @@ and Kevin Ryde.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2007-2016 by Martin Becker.  All rights reserved.
+Copyright (c) 2007-2017 by Martin Becker.  All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.6.0 or,

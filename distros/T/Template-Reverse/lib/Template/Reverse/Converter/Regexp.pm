@@ -5,7 +5,7 @@ package Template::Reverse::Converter::Regexp;
 use Moo;
 use Scalar::Util qw(blessed);
 use utf8;
-our $VERSION = '0.143'; # VERSION
+our $VERSION = '0.150'; # VERSION
 
 sub Convert{
     my $self = shift;
@@ -42,13 +42,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Template::Reverse::Converter::Regexp - Convert parts to Regular Expression simply
 
 =head1 VERSION
 
-version 0.143
+version 0.150
 
 =head1 SYNOPSIS
 

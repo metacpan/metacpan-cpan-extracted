@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.107;
+our $VERSION = 1.108;
 
 use Prty::Option;
 use Prty::Array;
@@ -527,7 +527,10 @@ sub rows {
             my @coordinates;
             for (my $i = 0; $i < @_; $i += 2) {
                 my $param = $_[$i];
-                push @coordinates,@{$raster->{$point}->{$param}->[1]};
+                # Quick-Fix: Wann ist das Array nicht definiert?
+                if ($raster->{$point}->{$param}->[1]) {
+                    push @coordinates,@{$raster->{$point}->{$param}->[1]};
+                }
             }
             push @row,Prty::Math->geoMidpoint(\@coordinates);
         }
@@ -607,7 +610,7 @@ sub rows {
 
 =head1 VERSION
 
-1.107
+1.108
 
 =head1 AUTHOR
 

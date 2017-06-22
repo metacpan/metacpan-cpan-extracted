@@ -1,34 +1,51 @@
-use utf8;
 use strict;
 use warnings;
-use File::Temp qw/ tempdir /;
-use Test::More tests => 2;
-use Math::Trig;
+use Test::More;
 use t::FigCmp;
 
+#
+# Skip tests if required modules are not available.
+#
+if (!eval { require File::Temp; 1 }) {
+    plan skip_all => "File::Temp moduled required";
+}
+if (!eval { require Math::Trig; 1 }) {
+    plan skip_all => "Math::Trig moduled required";
+}
+if (!eval { require Regexp::Common; 1 }) {
+    plan skip_all => "Regexp::Common moduled required";
+}
+if (!eval { require Image::Info; 1 }) {
+    plan skip_all => "Image::Info moduled required";
+}
+plan tests => 1;
+
+#
+# Load modules.
+#
+use Graphics::Fig;
+use File::Temp qw/ tempdir /;
+use Math::Trig;
+
+#
+# Create temp directory.
+#
 my $dir = tempdir(CLEANUP => 1);
 #my $dir = "/tmp";
 
 #
-# Test 1: load the module
-#
-BEGIN {
-    use_ok('Graphics::Fig')
-};
-
-#
-# Test 2: splineto given three points
+# Test 1: splineto given three points
 #
 eval {
     #
     # Create drawing environment.
     #
     my $fig = Graphics::Fig->new({
-	color          => "green",
-	arrowStyle     => "filled-indented",
-	arrowWidth     => "1.5 mm",
-	arrowHeight    => "2.0 mm",
-	units	   => "cm"
+	color       => "green",
+	arrowStyle  => "filled-indented",
+	arrowWidth  => "1.5 mm",
+	arrowHeight => "2.0 mm",
+	units       => "cm"
     });
 
     #
@@ -49,7 +66,7 @@ eval {
     #
     # Draw a polygon around the arrow tips.
     #
-    $fig->polygon(\@polygon, { color => "SlateBlue" });
+    $fig->polygon(\@polygon, { color => "#6A5ACD" });	# SlateBlue
 
     #
     # Inscribe a circle inside the polygon.  Nest a half-size circle
@@ -114,9 +131,9 @@ eval {
     my $bb = $fig->getbbox();
     $fig->translate([ -${$bb}[0][0], -${$bb}[0][1] ]);
 
-    $fig->save("${dir}/advanced2.fig");
-    &FigCmp::figCmp("${dir}/advanced2.fig", "t/advanced2.fig") || die;
+    $fig->save("${dir}/advanced1.fig");
+    &FigCmp::figCmp("${dir}/advanced1.fig", "t/advanced1.fig") || die;
 };
-ok($@ eq "", "test2");
+ok($@ eq "", "test1");
 
 exit(0);

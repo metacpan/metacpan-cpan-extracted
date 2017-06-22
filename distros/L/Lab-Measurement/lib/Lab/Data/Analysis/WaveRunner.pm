@@ -1,5 +1,5 @@
 package Lab::Data::Analysis::WaveRunner;
-
+$Lab::Data::Analysis::WaveRunner::VERSION = '3.550';
 use 5.006;
 use strict;
 use warnings;
@@ -19,7 +19,6 @@ Version 0.01
 
 =cut
 
-our $VERSION = '3.543';
 
 our @ISA = ("Lab::Data::Analysis");
 

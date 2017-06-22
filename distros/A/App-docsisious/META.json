@@ -32,8 +32,8 @@
       },
       "runtime" : {
          "requires" : {
-            "DOCSIS::ConfigFile" : "0.69",
-            "Mojolicious" : "6.00",
+            "DOCSIS::ConfigFile" : "0.71",
+            "Mojolicious" : "7.30",
             "YAML::XS" : "0.50"
          }
       }
@@ -48,6 +48,6 @@
          "url" : "https://github.com/jhthorsen/app-docsisious.git"
       }
    },
-   "version" : "0.08",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

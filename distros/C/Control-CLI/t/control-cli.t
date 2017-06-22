@@ -29,6 +29,7 @@ my $PublicKeyPath	;# = 'C:\Users\<user>\.ssh\id_dsa.pub';	# '/export/home/<user>
 my $PrivateKeyPath	;# = 'C:\Users\<user>\.ssh\id_dsa';	# '/export/home/<user>/.ssh/id_dsa'
 my $Passphrase		;
 my $Baudrate		;# = 9600;
+my $ForceBaud		= 0;
 my $Databits		= 8;	
 my $Parity		= 'none';	
 my $Stopbits		= 1;
@@ -38,7 +39,7 @@ my $PromptCredentials	= 1;		# Test the module prompting for username/password
 my $PollInterval	= 0.1;		# If testing non-blocking mode, we print a dot to screen every $PollInterval secs
 my $TermType		= 'vt100';	# Negotiate vt100; not because we need to, but because we want to test that this works
 my $WinSize		= [132, 24],	# Negotiate window size; not because we need to, but because we want to test that this works
-my $Debug		= 0;
+my $Debug		= 0; # 3 activates both levels
 ############################################################
 
 # If no $SeriaPort set above, see if one manually specified when running Build.pl or Makefile.pl
@@ -120,7 +121,7 @@ BEGIN {
 }
 
 my $modules =	((Control::CLI::useTelnet) ? "Net::Telnet $Net::Telnet::VERSION, ":'').
-		((Control::CLI::useSsh)    ? "Net::SSH2 $Net::SSH2::VERSION, ":'').
+		((Control::CLI::useSsh)    ? "Net::SSH2 $Net::SSH2::VERSION / libssh2 " . &Net::SSH2::version . ", ":'').
 		((Control::CLI::useSerial) ? ($^O eq 'MSWin32' ?
 						"Win32::SerialPort $Win32::SerialPort::VERSION, ":
 						"Device::SerialPort $Device::SerialPort::VERSION, "):
@@ -329,6 +330,7 @@ do {{ # Test loop, we keep testing until user satisfied
 			PrivateKey		=>	$PrivateKeyPath,	# optional, only ssh
 			Passphrase		=>	$Passphrase,		# optional, only ssh  (with PromptCredentials=1 will be prompted for, if required)
 			BaudRate		=>	$baudrate,		# optional, only serial
+			ForceBaud		=>	$ForceBaud,		# optional, only serial on Win32 (workaround to Win32::SerialPort bug id 120068)
 			DataBits		=>	$Databits,		# optional, only serial
 			Parity			=>	$Parity,		# optional, only serial
 			StopBits		=>	$Stopbits,		# optional, only serial
@@ -395,7 +397,7 @@ do {{ # Test loop, we keep testing until user satisfied
 	# Verify last prompt is recorded
 	$match = $cli->last_prompt;
 	ok( $match, "Checking last_prompt is set" );
-	diag "First prompt after login : $match";
+	diag "First prompt after login :\n$match";
 
 	# Test sending a command
 	prompt(\$cmd, "Specify a command to send, which generates some output: ");
@@ -427,7 +429,7 @@ do {{ # Test loop, we keep testing until user satisfied
 		$output = ($cli->waitfor_poll)[1]; # Recover output before string that matched
 		$match = ($cli->waitfor_poll)[2]; # Recover string that matched
 	}
-	if (length $match) { diag "Matched prompt : $match" }
+	if (length $match) { diag "Matched prompt :\n$match" }
 	if (length $output) { diag "Output obtained before prompt match:\n$output" }
 	if ($blocking) { ok( $ok, "Testing waitfor() method") }
 	else { ok( $ok, "Testing waitfor() and waitfor_poll() methods") }
@@ -470,7 +472,7 @@ do {{ # Test loop, we keep testing until user satisfied
 	# Verify last prompt is recorded
 	$match = $cli->last_prompt;
 	ok( $match, "Checking last_prompt is set" );
-	diag "Last prompt : $match";
+	diag "Last prompt :\n$match";
 
 	# Disconnect from host, and resume loop for further tests
 	$cli->disconnect;

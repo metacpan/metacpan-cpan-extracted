@@ -56,6 +56,22 @@ The exact details of this are likely to change in future, but a few things that 
      ->sum
      ->each(sub { print "Total was $_\n" });
 
+=head2 from_stream
+
+Create a new L<Ryu::Source> from an L<IO::Async::Stream> instance.
+
+Note that a stream which is not already attached to an L<IO::Async::Notifier>
+will be added as a child of this instance.
+
+=head2 from_stream
+
+Create a new L<Ryu::Source> that wraps STDIN.
+
+As with other L<IO::Async::Stream> wrappers, this will emit data as soon as it's available,
+as raw bytes.
+
+Use L<Ryu::Source/by_line> and L<Ryu::Source/decode> to split into lines and/or decode from UTF-8.
+
 =head2 timer
 
 Provides a L<Ryu::Source> which emits an empty string at selected intervals.

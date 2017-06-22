@@ -2,12 +2,13 @@ use ExtUtils::MakeMaker;
 
 use 5.010;
 
-my $version = '0.15';
+my $version = '0.90';
 
 my %prereq  =
   ( Test::More        => 0.86
   , Unicode::GCString => 0
   , Encode            => 0
+  , HTML::Entities    => 0
   );
 
 WriteMakefile

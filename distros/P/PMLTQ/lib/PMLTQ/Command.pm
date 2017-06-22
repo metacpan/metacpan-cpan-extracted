@@ -1,6 +1,6 @@
 package PMLTQ::Command;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Command::VERSION = '1.3.1';
+$PMLTQ::Command::VERSION = '1.3.2';
 # ABSTRACT: Command base class
 
 use PMLTQ::Base -base;
@@ -282,6 +282,7 @@ sub create_treebank_param {
     serverId => $server[0],
     database => $self->config->{db}->{name},
     isFree => $self->config->{isFree},
+    isAllLogged => $self->config->{isAllLogged},
     isPublic => $self->config->{isPublic},
     isFeatured => $self->config->{isFeatured},
   }
@@ -339,7 +340,7 @@ PMLTQ::Command - Command base class
 
 =head1 VERSION
 
-version 1.3.1
+version 1.3.2
 
 =head1 AUTHORS
 

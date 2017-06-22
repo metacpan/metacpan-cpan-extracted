@@ -10,7 +10,7 @@ use base 'BlankOnDev::DateTime::lang';
 #use vars qw($language $date_lang);
 
 # Version :
-our $VERSION = '0.1003';
+our $VERSION = '0.1005';;
 
 # scalar global :
 our ($language, $date_lang);
@@ -231,20 +231,20 @@ sub get {
 	# IF three of input parameter :
 	elsif ($keys_param eq 3) {
 		# For $_[0] :
-		if ($_[0] =~ m/^[0-9,.E]+$/) {
+		if (exists $_[0] and $_[0] =~ m/^[0-9,.E]+$/) {
 			$timestamp = $_[0];
 		} else {
 			$timestamp = time();
 		}
 		# For $_[1] :
-		if ($_[1] =~ m/^[A-Za-z\/]+/ and ref($_[1]) ne 'HASH') {
+		if (exists $_[1] and $_[1] =~ m/^[A-Za-z\/]+/ and ref($_[1]) ne 'HASH') {
 			$timezone = $_[1];
 		} else {
 			$timezone = 'Asia/Makassar';
 			$attribute = undef;
 		}
 		# For $_[2] :
-		if (ref($_[2]) eq "HASH") {
+		if (exists $_[2] and ref($_[2]) eq "HASH") {
 			$attribute = $_[2];
 		} else {
 			$attribute = undef;
@@ -387,6 +387,46 @@ sub get {
 # End of Subroutine for Get Date Time
 # ===========================================================================================================
 
+# Subroutine for Indonesia Timezone :
+# ------------------------------------------------------------------------
+sub id_timezone {
+	my %data = ();
+
+	$data{'wib'} = 'Asia/Jakarta';
+	$data{'wita'} = 'Asia/Makassar';
+	$data{'wit'} = 'Asia/Jayapura';
+	$data{'short-long'} = {
+		'wib' => 'Asia/Jakarta',
+		'wita' => 'Asia/Makassar',
+		'wit' => 'Asia/Jayapura'
+	};
+	$data{'long-short'} = {
+		'Asia/Jakarta' => 'wib',
+		'Asia/Makassar' => 'wita',
+		'Asia/Jayapura' => 'wit'
+	};
+	$data{'shor-num'} = {
+		'wib' => 1,
+		'wita' => 2,
+		'wit' => 3
+	};
+	$data{'long-num'} = {
+		'Asia/Jakarta' => 1,
+		'Asia/Makassar' => 2,
+		'Asia/Jayapura' => 3
+	};
+	$data{'num-short'} = {
+		'1' => 'wib',
+		'2' => 'wita',
+		'3' => 'wit',
+	};
+	$data{'num-long'} = {
+		'1' => 'Asia/Jakarta',
+		'2' => 'Asia/Makassar',
+		'3' => 'Asia/Jayapura'
+	};
+	return \%data;
+}
 # Subroutine for Test Module NKTIweb::DateTime :
 # ------------------------------------------------------------------------
 sub test {

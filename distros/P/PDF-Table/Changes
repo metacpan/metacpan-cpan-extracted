@@ -1,5 +1,7 @@
 Change history for Perl extension PDF::Table.
 
+Version 0.9.13 Fixed issue #33 - Desislav Kamenov
+
 Version 0.9.12 - hotfix for failing tests - Desislav Kamenov
 
 Version 0.9.11 Changes by contributors on GitHub - Keith Carangelo, Mohammad S Anwar

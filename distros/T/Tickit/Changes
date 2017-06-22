@@ -1,5 +1,21 @@
 Revision history for Changes
 
+0.63    2017/06/13 14:38:01
+        [CHANGES]
+         * Perform Tickit 0.63 deprecations:
+            + Die in HASHification overloads on Tickit::Event::*
+            + Die in $term->bind_event_default
+            + Adjust wording of non-guarantee of object same-identity for
+              $win->term
+            + Warn in old-API boolean-returning $info->type for focus events
+         * Have $tickit->timer return an ID value suitable for cancellation
+         * Added $tickit->cancel_timer
+         * Added $win->is_steal_focus and ->set_steal_focus
+
+        [BUGFIXES]
+         * Fix for $rb->text methods sometimes failing to convert numerical
+           values (RT120630)
+
 0.62    2017/02/23 18:54:35
         [CHANGES]
          * Complete reïmplementation of Tickit::Window using libtickit

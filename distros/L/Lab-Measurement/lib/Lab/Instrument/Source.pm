@@ -1,9 +1,8 @@
 package Lab::Instrument::Source;
+$Lab::Instrument::Source::VERSION = '3.550';
 use strict;
 use warnings;
 use 5.010;
-
-our $VERSION = '3.543';
 
 use Lab::Exception;
 use Lab::Instrument;

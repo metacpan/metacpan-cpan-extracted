@@ -1,0 +1,8 @@
+
+Possible enhancements:
+
+- add a locking option to announce: do worker-side locking based on job_id
+
+- add a 'progress' reference variabke to cb that the undocb can use to know
+  that to undo
+

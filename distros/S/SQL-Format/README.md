@@ -66,7 +66,7 @@ SQL::Format - Yet another yet another SQL builder
 
 SQL::Format is a easy to SQL query building library.
 
-__THIS MODULE IS ALPHA LEVEL INTERFACE!!__
+**THIS MODULE IS ALPHA LEVEL INTERFACE!!**
 
 # FUNCTIONS
 
@@ -603,7 +603,7 @@ Argument details are:
 
 # AUTHOR
 
-xaicron <xaicron {at} cpan.org>
+xaicron &lt;xaicron {at} cpan.org>
 
 # COPYRIGHT
 

@@ -10,7 +10,7 @@
 # ABSTRACT: Update the configuration of an application
 
 package App::Cme::Command::update ;
-$App::Cme::Command::update::VERSION = '1.020';
+$App::Cme::Command::update::VERSION = '1.022';
 use strict;
 use warnings;
 use 5.10.1;
@@ -42,7 +42,7 @@ sub opt_spec {
 sub usage_desc {
   my ($self) = @_;
   my $desc = $self->SUPER::usage_desc; # "%c COMMAND %o"
-  return "$desc [application] [file | ~~ ]";
+  return "$desc [application] [file ]";
 }
 
 sub description {
@@ -92,7 +92,7 @@ App::Cme::Command::update - Update the configuration of an application
 
 =head1 VERSION
 
-version 1.020
+version 1.022
 
 =head1 SYNOPSIS
 

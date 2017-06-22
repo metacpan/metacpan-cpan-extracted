@@ -1,7 +1,7 @@
 package Template::Reverse::Part;
 use Moo;
 
-our $VERSION = '0.143'; # VERSION
+our $VERSION = '0.150'; # VERSION
 # ABSTRACT: Part class.
 
 has pre=>(is=>'rw', default=>sub{[]});
@@ -18,13 +18,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Template::Reverse::Part - Part class.
 
 =head1 VERSION
 
-version 0.143
+version 0.150
 
 =head1 AUTHOR
 

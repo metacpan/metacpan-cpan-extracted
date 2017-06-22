@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::RS_SMB;
-
+$Lab::Moose::Instrument::RS_SMB::VERSION = '3.550';
 use 5.010;
 
 use Moose;
@@ -10,7 +10,6 @@ use Carp;
 use Lab::Moose::Instrument::Cache;
 use namespace::autoclean;
 
-our $VERSION = '3.543';
 
 extends 'Lab::Moose::Instrument';
 

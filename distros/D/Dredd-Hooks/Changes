@@ -1,5 +1,13 @@
 Revision history for Perl extension Dredd-Hooks
 
+0.07 2017-06-12T13:05:01Z
+
+    - Fix Changelog
+
+0.06 2017-06-12T13:03:38Z
+
+    - Support passing of --port and --host on cmd line
+
 0.05 2016-05-10T11:06:50Z
 
     - Add code missing in last release

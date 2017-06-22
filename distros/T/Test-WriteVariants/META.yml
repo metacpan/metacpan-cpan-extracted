@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,13 +19,17 @@ no_index:
   directory:
     - t
     - inc
+recommends:
+  File::Find::Rule: '0.34'
 requires:
   Data::Tumbler: '0.002'
   Module::Pluggable::Object: '4.9'
+  Module::Runtime: '0'
   base: '0'
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Test-WriteVariants
   homepage: https://metacpan.org/release/Test-WriteVariants
   license: http://dev.perl.org/licenses/
   repository: https://github.com:perl5-utils/Test-WriteVariants.git
-version: '0.012'
+version: '0.013'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

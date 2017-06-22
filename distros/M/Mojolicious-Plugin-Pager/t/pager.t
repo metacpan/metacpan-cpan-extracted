@@ -5,6 +5,11 @@ use Test::More;
 use Mojolicious::Lite;
 
 plugin 'pager';
+helper pager_text => sub {
+  my ($c, $page) = @_;
+  return sub { $page->{prev} ? 'Prev' : $page->{next} ? 'Next' : $page->{n} };
+};
+
 get
   '/' => {total_entries => 1431, entries_per_page => 20},
   'default';
@@ -26,6 +31,8 @@ $t->get_ok('/')->status_is(200)->element_exists_not('a.last')->element_exists_no
 
 $t->get_ok('/?page=3')->status_is(200)->element_exists_not('a.last')
   ->element_exists_not('a[href="/page=9"]')->element_count_is('a', 10)
+  ->text_is('a[href="/?page=2"][rel="prev"].prev', 'Prev')
+  ->text_is('a[href="/?page=4"][rel="next"].next', 'Next')
   ->element_exists('a[href="/?page=2"][rel="prev"].prev')
   ->element_exists('a[href="/?page=1"].first')->element_exists('a[href="/?page=3"].active')
   ->element_exists('a[href="/?page=8"].page')
@@ -73,7 +80,7 @@ __DATA__
 @@ default.html.ep
 <ul class="pager">
   % for my $page (pages_for $total_entries / $entries_per_page) {
-    <li><%= pager_link $page %></li>
+    <li><%= pager_link $page, pager_text($page) %></li>
   % }
 </ul>
 @@ custom.html.ep

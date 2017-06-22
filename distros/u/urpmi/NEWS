@@ -1,3 +1,18 @@
+Version 8.109 - 5 June 2017
+
+- translation updates
+
+Version 8.108 - 9 May 2017
+
+- increase transaction size from 8 to 50 (mga#18426)
+
+Version 8.107 - 26 April 2017
+
+- make sure that urpmi.cfg is world-readable (mga#9386)
+- ensure gurpmi ProgressDialog centering (mga#19196)
+- update Mageia copyright statements
+- translation updates
+
 Version 8.106 - 6 December 2016
 
 - skip kernel-firmware-nonfree too when considering real kernels

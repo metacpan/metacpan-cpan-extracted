@@ -7,6 +7,11 @@ use DBI;
 use Test::More;
 use Test::DB::Shared::mysqld;
 
+use File::Which;
+unless( File::Which::which('mysqld') ){
+    plan skip_all => 'Test irrelevant without mysqld';
+}
+
 # use Log::Any::Adapter qw/Stderr/;
 
 my $db_pid;

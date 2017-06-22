@@ -1,3 +1,19 @@
+2.65     2017-06-11
+
+- When Log::Dispatch::File is asked to chmod a file and that fails, show the
+  requested permissions in octal. Patch by Carsten Grohmann. GitHub #46.
+
+
+2.64     2017-02-25 (TRIAL RELEASE)
+
+- Improve level validation and canonicalization logic. Patch by Kerin Millar,
+  minor changes and tests by Kivanc Yazan. Github #42.
+
+- The log_and_die and log_and_croak methods are now identical, as we set
+  @CARP_NOT for Log::Dispatch to exclude the Log::Dispatch package. You can
+  still explicitly pass carp_level to log_and_croak.
+
+
 2.63     2017-02-19
 
  - Updated the conflicting version for Log::Dispatch::File::Stamped in

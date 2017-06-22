@@ -1,0 +1,821 @@
+
+.rapi-blog-postview {
+  padding: 2px 5px;
+  margin: 0;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: #333333;
+  background-color: #ffffff;
+  min-width:750px;
+}
+
+.rapi-blog-postview h1,
+.rapi-blog-postview h2,
+.rapi-blog-postview h3,
+.rapi-blog-postview h4,
+.rapi-blog-postview h5,
+.rapi-blog-postview h6 {
+  margin: 10px 0;
+  font-family: inherit;
+  font-weight: bold;
+  line-height: 20px;
+  color: inherit;
+  text-rendering: optimizelegibility;
+}
+
+.rapi-blog-postview h1,
+.rapi-blog-postview h2,
+.rapi-blog-postview h3 {
+  line-height: 40px;
+}
+
+.rapi-blog-postview h1 {
+  font-size: 38.5px;
+}
+
+.rapi-blog-postview h2 {
+  font-size: 31.5px;
+}
+
+.rapi-blog-postview h3 {
+  font-size: 24.5px;
+}
+
+.rapi-blog-postview h4 {
+  font-size: 17.5px;
+}
+
+.rapi-blog-postview h5 {
+  font-size: 14px;
+}
+
+.rapi-blog-postview h6 {
+  font-size: 11.9px;
+}
+
+.rapi-blog-postview table.r-simple-table tr * {
+  white-space: nowrap;
+}
+.rapi-blog-postview .grey {
+  color:grey !important;
+  font-size:0.9em;
+  font-weight: normal;
+}
+.rapi-blog-postview .bigger {
+  font-weight:bold;
+  font-size:1.1em;
+}
+.rapi-blog-postview .download {
+  font-weight:bold;
+  font-size:12px;
+}
+.rapi-blog-postview .with-icon {
+  display: inline-box;
+  border-bottom: medium none;
+}
+.rapi-blog-postview tr.vert {
+  font-size: 0.9em;
+}
+.rapi-blog-postview tr.vert th {
+  vertical-align: bottom;
+  color: #3F3F3F;
+  padding: 10px 8px 0px 5px;
+}
+.rapi-blog-postview tr.vert td {
+  vertical-align: top;
+  padding: 0px 8px 0px 5px;
+}
+
+
+.rapi-blog-postview div.post-body-wrap {
+  border: 1px solid #dddddd;
+  border-radius: 0px 0px 6px 6px;
+  padding: 5px;
+  
+  position: absolute;
+  top: 85px;
+  bottom: 5px;
+  left: 5px;
+  right: 5px;
+  
+  min-width:700px;
+
+}
+
+.rapi-blog-postview div.post-body-wrap div.tab-row {
+  position: absolute;
+  top: -36px;
+  height: 29px;
+  left: -1px;
+  right: -1px;
+  border: 1px solid #dddddd;
+  border-radius: 6px 6px 0px 0px;
+  border-bottom: 0px;
+  padding-top:5px;
+  background-color: rgb(246,248,250);
+  
+}
+
+.rapi-blog-postview div.post-body-wrap div.tab-row .tab-row-inner {
+  height:100%;
+  width: 100%;
+  position:relative;
+}
+
+.rapi-blog-postview div.post-body-wrap div.tab-row .tab-row-inner .publink {
+  position:absolute;
+  top:-6px;
+  right:5px;
+  text-align: center;
+}
+
+.rapi-blog-postview div.post-body-wrap div.tab-row .tab-row-inner .publink > div {
+  margin-bottom:-7px;
+  font-size:10px;
+}
+
+.rapi-blog-postview div.post-body-wrap div.tab-row .tab-row-inner .publink a {
+  color:  #1b4f72;
+  font-family: "Lucida Console", Monaco, monospace;
+  padding-left:18px;
+  padding-right:0px;
+}
+
+
+.rapi-blog-postview div.post-body-wrap div.tab-row .tab-row-inner .publink a:hover {
+  color:#0366d6;
+  text-decoration: underline;
+}
+
+
+
+.rapi-blog-postview div.post-body-wrap div.tab-row a:first-child {
+  padding-left:20px;
+}
+
+.rapi-blog-postview div.post-body-wrap div.tab-row a {
+  display: inline;
+  float: left;
+  height: 100%;
+  padding-right:10px;
+  padding-left:10px;
+  margin-left: -1px;
+  padding-top:1px;
+  vertical-align: bottom;
+  
+  /* disable text highight */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.rapi-blog-postview div.post-body-wrap div.tab-row svg {
+  vertical-align: middle;
+  color:#0366d6;
+}
+
+
+.rapi-blog-postview div.post-body-wrap div.tab-row .label {
+  display:block;
+  height:25px;
+  line-height:16px;
+  font-size:12px;
+  vertical-align: middle !important;
+  color:  #1b4f72;
+}
+
+.rapi-blog-postview div.post-body-wrap div.tab-row .label span {
+  line-height:24px;
+  font-size:12px;
+  vertical-align: middle !important;
+}
+
+
+.rapi-blog-postview div.post-body-wrap div.tab-row a.active,
+.rapi-blog-postview div.post-body-wrap div.tab-row a:hover {
+  color: rgb(88,96,105);
+}
+
+
+.rapi-blog-postview div.post-body-wrap div.tab-row a.active {
+  background-color: #F8F8F8;
+  color: rgb(36,41,46);
+  border: 1px solid #dddddd;
+  padding-top:0px;
+  border-bottom: 0px;
+  font-weight:bold;
+  border-top: 2px solid orange;
+}
+
+
+.record-update .rapi-blog-postview div.post-body-wrap div.tab-row .inactive {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.rapi-blog-postview div.post-body-wrap div.tab-row a:first-child {
+  margin-left: 10px;
+}
+
+.rapi-blog-postview div.post-body-wrap .inner {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+.rapi-blog-postview div.post-body-wrap .inner .headline,
+.rapi-blog-postview div.post-body-wrap .inner .attr-content {
+  margin-left: -5px;
+  margin-right:-5px;
+  margin-top:-5px;
+  border-bottom: 1px dashed #dddddd;
+  padding: 5px 5px 3px 5px;
+  background-color: #F8F8F8;
+  height:22px;
+  position:relative;
+  user-select: none;
+}
+
+.rapi-blog-postview div.post-body-wrap .inner .attr-content {
+  height:100%;
+  border-bottom:0px;
+  padding: 0px;
+
+}
+
+.rapi-blog-postview div.post-body-wrap .inner h5 {
+  margin-bottom:0px;
+  margin-top:0px;
+  height:100%;
+}
+
+.rapi-blog-postview div.post-body-wrap .inner .headline a {
+  display:inline-block;
+}
+
+.rapi-blog-postview div.post-body-wrap .inner .headline .title {
+  display:inline;
+  color: #24292e;
+  font-weight: 600;
+  white-space: nowrap;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+  padding-right:10px;
+}
+
+.rapi-blog-postview div.post-body-wrap .inner  pre.ra-pre-wrap {
+  margin: 0px;
+}
+
+.rapi-blog-postview div.post-body, 
+.rapi-blog-postview div.iframe-wrap {
+  position: absolute;
+  top: 38px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+	height:calc(100% - 38px);
+}
+
+.rapi-blog-postview div.iframe-wrap iframe {
+  height: 100%;
+  width: 100%;
+}
+
+
+
+.rapi-blog-postview div.post-body div.img-wrap {
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  left: 5px;
+  right: 5px;
+}
+.rapi-blog-postview div.post-body div.img-wrap img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+
+.rapi-blog-postview div.post-body div.data-holder {
+  min-width: 600px;
+}
+
+/* make the edit control always visible */
+.rapi-blog-postview .appdv-tt-generated .edit-record-toggle .edit {
+  visibility:visible;
+}
+
+
+.banner-home-link {
+  height:30px;
+  width:30px;
+  display:inline-block;
+  background-size: 30px 30px;
+  background-repeat: no-repeat;
+  opacity: 0.3;
+}
+
+.banner-home-link:hover {
+  opacity: 1.0;
+}
+
+/* disable individual field edit control for the body -- only allow whole-record edit*/
+.rapi-blog-postview div.post-body .appdv-edit-bigfield .icons {
+  display: none;
+}
+
+
+.rabl-preview-mode .appdv-tt-generated .edit-record-toggle {
+  display:none;
+}
+
+.rapi-blog-postview a.preview-edit {
+  color: blue;
+  margin-left:10px;
+  margin-bottom:4px;
+  font-size:15px;
+
+}
+
+.rapi-blog-postview a.preview-edit:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+
+}
+
+.rapi-blog-postview div.post-body-wrap .inner .headline .edit-link-wrapper {
+  padding-right:20px;
+}
+
+
+.rapi-blog-postview div.post-body-wrap .inner .headline .pub-status {
+  padding-left:20px;
+  font-size:10px;
+}
+
+.rapi-blog-postview .pub-status .label {
+  font-weight:bold;
+  font-style: italic;
+  color: #666666;
+}
+
+.rapi-blog-postview .pub-status .ts {
+  font-size:11px;
+  letter-spacing:-.5px;
+}
+
+.rapi-blog-postview .pub-status .not-published {
+  font-weight:bolder;
+  font-family: "Lucida Console", Monaco, monospace;
+  color: darkred;
+  font-size:14px;
+}
+
+
+
+.rapi-blog-postview div.post-body-wrap .inner .headline .preview-reloader {
+  display:block;
+  position:absolute;
+  right:5px;
+  top:5px;
+  opacity: 0.3;
+  font-size:12px;
+}
+
+.rapi-blog-postview div.post-body-wrap .inner .headline .preview-reloader:hover {
+  opacity: 1;
+}
+
+
+.rapi-blog-postview div.post-body-wrap .inner .headline .body-size {
+  display:block;
+  position:absolute;
+  right:8px;
+  top:5px;
+  font-size:11px;
+  color:grey;
+  font-style: italic;
+}
+
+.rapi-blog-postview .delete-post {
+    display: inline-block;
+    background: url(_ra-rel-mnt_/assets/rapidapp/misc/static/images/cross.png) center right no-repeat;
+    padding: 0px 23px 0px 1px;
+    width: 62px;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 16px;
+    font-family: arial;
+    white-space: nowrap;
+    color: darkgray;
+    font-weight: bold;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-color: transparent;
+    cursor: pointer;
+}
+
+.rapi-blog-postview .delete-post:hover {
+  border-bottom-style: dotted;
+  border-color: blue;
+  color: blue;
+}
+
+.rapi-blog-postview table.top-line th {
+  padding-top:0px;
+  margin-top:-5px;
+
+}
+
+.rapi-blog-postview .topmost-row {
+  width:100%;
+	min-width:750px;
+  height:45px;
+  position:relative;
+}
+
+.rapi-blog-postview .topmost-row .title-icon {
+  display:inline-block;
+	width:32px;
+	height:32px;
+	margin-top:6px;
+	margin-right:6px;
+}
+
+.rapi-blog-postview .responsive-title {
+	height:100%;
+  font-size: calc(0.55em + 1vmin);
+	display:        table-cell;
+  vertical-align: middle;
+	display: table;
+	margin-right:6px;
+}
+
+.rapi-blog-postview .responsive-title > p {
+	display:        table-cell;
+  vertical-align: middle;
+	color: maroon;
+	font-family: "Comic Sans MS", cursive, sans-serif
+
+}
+
+/* this centers! 
+.rapi-blog-postview .info-block {
+position: absolute;
+left: 50%;
+-webkit-transform: translateX(-50%);
+transform: translateX(-50%);
+}
+*/
+
+.rapi-blog-postview .info-block {
+float: left;
+top:2px;
+}
+
+.rapi-blog-postview .topmost-row  .toggle-controls {
+	float:right;
+	width:100px;
+}
+
+.rapi-blog-postview .topmost-row table.row-table td {
+	vertical-align:top;
+}
+
+
+.rapi-blog-postview .attr-content .tile {
+	float:left;
+	margin:5px;
+	padding:5px;
+	position:relative;
+	min-width:100px;
+	min-height: 100px;
+
+}
+
+.rapi-blog-postview .attr-content .tile.whole {
+  border: 1px solid #dddddd;
+  border-radius: 6px;
+
+}
+
+.rapi-blog-postview .attr-content .tile .heading {
+	font-size:12px;
+	line-height:24px;
+	text-align:center;
+	color:#1b4f72;
+	font-weight:bold;
+	background-color: rgb(246,248,250);
+	border: 1px solid #dddddd; 
+
+	position:absolute;
+	top:0px;
+	right: 0px;
+	left: 0px;
+	height: 24px;
+	border-radius: 6px 6px 0px 0px;
+	
+}
+
+.rapi-blog-postview .attr-content .tile .body {
+	border: 1px solid #dddddd;
+	border-top:0px;
+
+	position:absolute;
+	top:20px;
+	right: 0px;
+	left: 0px;
+	bottom:0px;
+	border-radius: 0px 0px 6px 6px;
+	
+}
+
+.rapi-blog-postview .attr-content .tile > .body:first-child {
+	border-top:1px;
+	top:0px;
+	border-radius: 6px;
+}
+
+.rapi-blog-postview .attr-content .image-column {
+	width: 200px;
+
+}
+
+.rapi-blog-postview .attr-content .summary-info {
+	width: 300px;
+
+}
+
+.rapi-blog-postview .attr-content .image-table {
+	padding-bottom:3px;
+	padding-left:10px;
+	margin-left:-5px;
+	margin-right:-5px;
+}
+
+.rapi-blog-postview .attr-content table * {
+	vertical-align: top;
+
+}
+
+.rapi-blog-postview table.image-table th {
+	width: 130px;
+	
+}
+
+.rapi-blog-postview .attr-content h1 {
+	font-size:22px;
+	line-height:22px;
+}
+
+.rapi-blog-postview .attr-content h2 {
+	font-size:18px;
+	line-height:18px;
+	margin: 0px;
+}
+
+.rapi-blog-postview .attr-content i.remark {
+	font-size:10px;
+	line-height:10px;
+	font-weight:bold;
+	opacity:0.4;
+	padding:5px;
+	display:block;
+}
+
+.rapi-blog-postview .attr-content .summary-info {
+	padding-top:10px;
+
+}
+
+.rapi-blog-postview .attr-content  .cust-summary-wrap {
+	position:relative;
+	background-color:white;
+	border: 1px dashed #dddddd;
+	margin:5px;
+  padding:5px;
+	font-size: 12px;
+	line-height:12px;
+}
+
+.rapi-blog-postview .attr-content .cust-summary  {
+	width: 100%;
+  height: 110px;
+
+}
+
+
+
+
+.rapi-blog-postview .attr-content .auto-summary-wrap {
+	position:relative;
+	background-color:rgb(246,248,250);
+	border: 1px dashed #dddddd;
+	margin:5px;
+  padding:5px;
+	min-height:30px;
+	font-size: 12px;
+	line-height:12px;
+}
+
+
+
+.rapi-blog-postview .title-block {
+	
+	margin-left:-2px;
+}
+
+.rapi-blog-postview .title-block  .label {
+	
+	padding-left:36px;
+	height:32px;
+}
+.rapi-blog-postview .title-block  .label > span {
+display: table;
+}
+
+.rapi-blog-postview .title-block  .label > span  > span {
+  display:        table-cell;
+  vertical-align: middle;
+	padding-left:5px;
+	font-family: "Lucida Console", Monaco, monospace;
+	font-weight: normal;
+}
+
+
+.rapi-blog-postview .attr-content .tile.props {
+	width: 540px;
+	height: 450px;
+
+}
+
+.rapi-blog-postview .attr-content .tile.props.right {
+	width: 325px;
+	height: auto;
+
+}
+
+.rapi-blog-postview .attr-content .tile.props table.r-simple-table {
+	margin-top:5px;
+	padding:0px;
+	border:none;
+  border-spacing:1px;
+	background-color: #dddddd;
+	margin-left:-1px;
+	width:calc(100% + 2px);
+}
+
+.rapi-blog-postview .attr-content .tile.props > .body:first-child > table.r-simple-table,
+.rapi-blog-postview .attr-content .tile.props > .body:first-child > table.r-simple-table tbody
+
+ {
+  margin-top:0px;
+	border-radius: 8px 8px 0px 0px;
+}
+
+.rapi-blog-postview .attr-content .tile.props > .body:first-child > table.r-simple-table tr:first-child {
+	border-radius: 8px 8px 0px 0px;
+}
+
+.rapi-blog-postview .attr-content .tile.props > .body:first-child > table.r-simple-table tr:first-child *:first-child {
+	border-radius: 6px 0px 0px 0px;
+}
+
+.rapi-blog-postview .attr-content .tile.props > .body:first-child > table.r-simple-table tr:first-child > *:last-child{
+	border-radius: 0px 6px 0px 0px;
+}
+
+.rapi-blog-postview .attr-content .tile.props table.r-simple-table td {
+	position:relative;
+	height:22px;
+	padding-top:18px;
+
+}
+
+.rapi-blog-postview .attr-content .tile.props table.r-simple-table th {
+	padding-left:20px;
+	width:110px;
+
+}
+
+.rapi-blog-postview .attr-content .tile.props table.r-simple-table.dbl th {
+	padding-right:5px;
+	text-align:right;
+	width:50px;
+
+}
+
+.rapi-blog-postview .attr-content .tile.props table.r-simple-table.dbl.second th {
+	padding-right:15px;
+	width:45%;
+
+}
+
+
+.rapi-blog-postview .attr-content .tile.props table.r-simple-table.dbl td {
+	position:relative;
+	height:19px;
+	padding-top:5px;
+
+}
+
+
+.tile.props table.r-simple-table  tr {
+  background: #e9e9e9;
+	/*background: #f6f6f6;*/
+}
+
+.tile.props table.r-simple-table  tr:nth-child(2n+1) {
+	/**/
+	background: #f0f3f5;
+}
+
+.topmost-row .title-td {
+  position:relative;
+  min-width: 300px;
+}
+
+.topmost-row table tr td .title-label {
+  position:absolute;
+  top:-4px;
+  left:1px;
+  font-size:.9em;
+  color:grey;
+}
+
+.topmost-row table tr td .title-value {
+  position:absolute;
+  top:12px;
+  left:10px;
+  right:0px;
+  bottom:0px;
+  word-wrap: break-word;
+  white-space: normal;
+  line-height: .95em;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+div.rabl-add-form-body-label {
+  font-size:15px;
+  font-weight:bold;
+  color:#777777;
+  position:relative;
+  height:30px;
+
+}
+
+div.rabl-add-form-body-label > * {
+  position:absolute;
+  bottom:3px;
+}
+
+div.rabl-add-form-body-label .main {
+  left:3px;
+  font-size:18px;
+  color:#333333;
+  opacity:0.8;
+}
+
+div.rabl-add-form-body-label .hashtag {
+  font-size:12px;
+  left:150px;
+  opacity:0.6;
+  bottom:5px;
+}
+
+
+div.rabl-add-form-body-label .format {
+  display: block;
+  right:5px;
+  opacity: 0.3;
+  bottom:0px;
+}
+
+
+.rapi-blog-postview .attr-content table tr td.tag-names-cell {
+	font-weight:normal;
+	text-align:right;
+	padding-right:10px;
+	font-size:.9em;
+	line-height:.8em;
+}
+
+.rapi-blog-postview .row-table .toggle-controls .delete-post {
+  margin-right:5px;
+}
+
+/* disable our custom edit control during record edit */
+.editing-record .rapi-blog-postview .row-table .toggle-controls .delete-post {
+  display: none;
+}
+
+
+/* hacky workaround to stop cas_img from being too huge in property grid. This 
+   needs fixed in RapidApp ... */
+.x-editor .x-form-display-field > img,
+.x-grid3 .yes-text-select .with-background-right-image > img {
+  max-width:100px !important;
+}

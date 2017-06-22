@@ -1,0 +1,352 @@
+<HTML><HEAD><TITLE>Evol.lua</TITLE>
+<LINK rel=stylesheet type="text/css"
+href="http://www.pjb.com.au/comp/styles.css" title="PJB Computing Styles">
+<META HTTP-EQUIV="Keywords"
+CONTENT="Optimisation, Evolutionary search, Lua, Perl, Evol">
+</HEAD>
+<BODY LINK="#000066" VLINK="#000066" ALINK="#000066">
+<DIV>
+<H1><IMG SRC="http://www.pjb.com.au/comp/logo.jpg" ALT=" " WIDTH=126 HEIGHT=52>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<FONT COLOR="#800000"><I>Evol.lua</I></FONT>
+</H1>
+<p><a name="__index__"></a></p>
+
+<!-- INDEX BEGIN -->
+<TABLE ALIGN="center" WIDTH="85%" BORDER=0 CELLSPACING=0>
+<TR><TD ALIGN="left">
+<ul>
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#functions">FUNCTIONS</a></li>
+	<li><a href="#step_sizes">STEP SIZES</a></li>
+	<li><a href="#caller_supplied_subroutines">CALLER-SUPPLIED SUBROUTINES</a></li>
+</ul>
+</TD><TD ALIGN="left">
+<ul>
+	<li><a href="#convergence_criteria">CONVERGENCE CRITERIA</a></li>
+    <li><a href="#installation">INSTALLATION</a></li>
+    <li><a href="#perl">PERL</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#credits">CREDITS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+</TD></TR>
+</TABLE>
+<!-- INDEX END -->
+
+<p>
+</p>
+<hr />
+<h2><a name="name">NAME</a></h2>
+<p>Evol - Evolution search optimisation</p>
+<p>
+</p>
+<hr />
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<pre>
+ local EV = require 'Evol'
+ xb, sm, fb, lf = evol(xb, sm, function, constrain, tm)
+ -- or
+ xb, sm = select_evol(xb, sm, choose_best, constrain)</pre>
+<pre>
+ -- not yet implemented:
+ -- new_text = text_evol(text, choose_best_text, nchoices );</pre>
+<p>
+</p>
+<hr />
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>This module implements the evolution search strategy.  Derivatives of
+the objective function are not required.  Constraints can be incorporated.
+The caller must supply initial values for the variables and for the
+initial step sizes.</p>
+<p>This evolution strategy is a random strategy, and as such is
+particularly robust and will cope well with large numbers of variables,
+or rugged objective funtions.</p>
+<p>Evol.pm works either automatically (evol) with an objective function to
+be minimised, or interactively (select_evol) with a (suitably patient)
+human who at each step will choose the better of two possibilities.
+Another subroutine (text_evol) allows the evolution of numeric parameters
+in a text file, the parameters to be varied being identified in the text
+by means of special comments.  A script <em>ps_evol</em> which uses that is
+included for human-judgement-based fine-tuning of drawings in PostScript.</p>
+<p>Version 1.12</p>
+<p>
+</p>
+<hr />
+<h2><a name="functions">FUNCTIONS</a></h2>
+<dl>
+<dt><strong><a name="evol" class="item"><em>evol</em>( xb, sm, minimise, constrain, tm);</a></strong></dt>
+
+<dd>
+<p>Where the arguments are:
+ <em>xb</em> the initial values of variables,
+ <em>sm</em> the initial values of step sizes,
+ <em>minimise</em> the function to be minimised,
+ <em>constrain</em> a function constraining the values,
+ <em>tm</em> the max allowable cpu time in seconds</p>
+<p>The step sizes and the caller-supplied functions
+<em>function</em> and <em>constrain</em> are discussed below.
+The default value of <em>tm</em> is 10 seconds.</p>
+<p><em>evol</em> returns a list of four things:
+ <em>xb</em> the best values of the variables,
+ <em>sm</em> the final values of step sizes,
+ <em>fb</em> the best value of objective function,
+ <em>lf</em> a success parameter</p>
+<p><em>lf</em> is set false if the search ran out of cpu time before converging.
+For more control over the convergence criteria, see the
+CONVERGENCE CRITERIA section below.</p>
+</dd>
+<dt><strong><a name="select_evol" class="item"><em>select_evol</em>( xb, sm, choose_best, constrain, nchoices);</a></strong></dt>
+
+<dd>
+<p>Where the arguments are:
+ <em>xb</em> the initial values of variables,
+ <em>sm</em> the initial values of step sizes,
+ <em>choose_best</em> the function allowing the user to select the best,
+ <em>constrain</em> a function constraining the values,
+ <em>choices</em> the number of choices <em>select_evol</em> generates</p>
+<p>The step sizes and the caller-supplied functions
+<em>choose_best</em> and <em>constrain</em> are discussed below.
+<em>nchoices</em> is the number of alternative choices which will be offered
+to the user, in addition to the current best array of values.
+The default value of <em>nchoices</em> is 1,
+giving the user the choice between the current best and 1 alternative.</p>
+<p><em>select_evol</em> returns a list of two things:
+ <em>xb</em> the best values of the variables, and
+ <em>sm</em> the final values of step sizes</p>
+</dd>
+<dt><strong><a name="text_evol" class="item"><em>text_evol</em>( text, choose_best_text, nchoices );</a></strong></dt>
+
+<dd>
+<p>The text is assumed to contain some numeric parameters to be varied,
+marked out by magic comments which also supply initial step sizes for them,
+and optionally also maxima and minima.
+For example:</p>
+<pre>
+ x = -2.3456; # evol step .1
+ /x 3.4567 def % evol step .2
+ /gray_sky .87 def % evol step 0.05 min 0.0 max 1.0</pre>
+<p>The magic bit of the comment is <em>evol step</em> and the previous
+number on the same line is taken as the value to be varied.
+The function <em>choose_best_text</em> is discussed below.
+<em>nchoices</em> gets passed by <em>text_evol</em> directly to <em>select_evol</em>.</p>
+<p><em>text_evol</em> returns the optimised text.</p>
+<p><em>text_evol</em> is intended for fine-tuning of PostScript, or files
+specifying GUI's, or HTML layout, or StyleSheets, or MIDI,
+where the value judgement must be made by a human being.</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h2><a name="step_sizes">STEP SIZES</a></h2>
+<p>The caller must supply initial values for the step sizes.
+Following the work of Rechenberg and of Schwefel,
+<em>evol</em> will adjust these step-sizes as it proceeds
+to give a success rate of about 0.2,
+but since the ratios between the step-sizes remain constant,
+it helps convergence to supply sensible values.</p>
+<p>A good rule of thumb is the expected distance of the value from its
+optimum divided by the square root of the number of variables.
+Larger step sizes increase the chance of discovering
+a global optimum rather than an inferior local optimum,
+at the cost of course of slower convergence.</p>
+<p>
+</p>
+<hr />
+<h2><a name="caller_supplied_subroutines">CALLER-SUPPLIED SUBROUTINES</a></h2>
+<dl>
+<dt><strong><a name="minimise" class="item"><em>minimise</em>( x );</a></strong></dt>
+
+<dd>
+<p><em>evol</em> minimises an objective funtion; that function accepts a
+list of values and returns a numerical scalar result. For example,</p>
+<pre>
+ local function minimise(x)   -- objective function, to be minimised
+    local sum = 0.0
+    for k,v in ipairs(x) do sum = sum + v*v; end  -- sigma x^2
+    return sum
+ }
+ xbref, smref, fb, lf = evol (xb, sm, minimise)</pre>
+</dd>
+<dt><strong><a name="constrain" class="item"><em>constrain</em>( x );</a></strong></dt>
+
+<dd>
+<p>You may also supply a subroutine <em>constrain(x)</em> which forces
+the variables to have acceptable values.  If you do not wish
+to constrain the values, just pass 0 instead.  <em>constrain(x)</em>
+should return the list of the acceptable values. For example,</p>
+<pre>
+ local function constrain(x)   -- force values into acceptable range
+    if x[1] &gt; 1.0 then x[1]=1.0   -- it's a probability
+    elseif x[1] &lt; 0.0 then x[1]=0.0
+    end
+    local cost = 3.45*x[2] + 4.56*x[3] + 5.67*x[4]
+    if cost &gt; 1000.0 than  -- enforce 1000 dollars maximum cost
+       x[1] = x[2] * 1000/cost
+       x[2] = x[3] * 1000/cost
+       x[3] = x[4] * 1000/cost
+    end
+    if x[5] &lt; 0.0 then x[5] = 0.0; end  -- it's a population density
+    x[6] = math.floor(x[6] + 0.5)       -- it's an integer
+    return x
+ end
+ xbref, smref, fb, lf = EV.evol(xb, sm, minimise, constrain)</pre>
+</dd>
+<dt><strong><a name="choose_best" class="item"><em>choose_best</em>({ a, b, c ... })</a></strong></dt>
+
+<dd>
+<p>This function whose reference is passed to <em>select_evol</em> 
+must accept a list of arrays;
+the first must be the current array of values,
+and the others are alternative arrays of values.
+The user should then judge which of the arrays is best,
+and <em>choose_best</em> must then return <em>(preference, continue)</em> where
+<em>$preference</em> is the index of the preferred array (1, 2, etc).
+The other argument <em>(continue)</em> is set false if the user
+thinks the optimal result has been arrived at;
+this is <em>select_evol</em>'s only convergence criterion.
+For example,</p>
+<pre>
+ local function choose_best(choices)
+    io.write(&quot;Array 1 is &quot;..table.concat(choices[1],&quot; &quot;)..&quot;\n&quot;)
+    io.write(&quot;Array 2 is &quot;..table.concat(choices[2],&quot; &quot;)..&quot;\n&quot;)
+    local preference = 0 + choose('Do you prefer 1 or 2 ?','1','2')
+    local continue   = confirm('Continue ?')
+    return preference, continue
+ end
+ xb, sm, fb, lf = EV.select_evol(xb, sm, choose_best);</pre>
+</dd>
+<dt><strong><a name="choose_best_text" class="item"><em>choose_best_text</em>( text1, text2, text3 ... );</a></strong></dt>
+
+<dd>
+<p>This function which is passed to <em>text_evol</em>
+must accept a list of text strings;
+the first will contain the current values
+while the others contain alternative values.
+The user should then judge which of the strings produces the best result.
+<em>choose_best_text</em> must return <em>(preference, continue)</em> where
+<em>preference</em> is the index of the preferred string (1, 2, etc).
+The other argument <em>(continue)</em> is set false if the user
+thinks the optimal result has been arrived at;
+this is <em>text_evol</em>'s only convergence criterion.</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h2><a name="convergence_criteria">CONVERGENCE CRITERIA</a></h2>
+<p>EV.ec (&gt;0.0) is the convergence test, absolute.  The search is
+terminated if the distance between the best and worst values
+of the objective function within the last 25 trials is less
+than or equal to EV.ec.
+The absolute convergence test is suppressed if EV.ec is undefined.</p>
+<p>EV.ed (&gt;0.0) is the convergence test, relative. The search is
+terminated if the difference between the best and worst values
+of the objective function within the last 25 trials is less
+than or equal to EV.ed multiplied by the absolute value of the
+objective function.
+The relative convergence test is suppressed if EV.ed is undefined.</p>
+<p>These interact with two other small numbers EV.ea and EV.eb, which are
+the minimum allowable step-sizes, absolute and relative respectively.</p>
+<p>These number are set within Evol as follows:</p>
+<pre>
+ EV.ea = 0.00000000000001;   -- absolute stepsize
+ EV.eb = 0.000000001;        -- relative stepsize
+ EV.ec = 0.0000000000000001; -- absolute error
+ EV.ed = 0.00000000001;      -- relative error</pre>
+<p>You can change those settings before invoking the evol subroutine, e.g.:</p>
+<pre>
+ EV.Evol.ea = 0.00000000000099;   -- absolute stepsize
+ EV.Evol.eb = 0.000000042;        -- relative stepsize
+ EV.Evol.ec = nil  -- disable absolute-error-criterion
+ EV.Evol.ec = 0.0000000000000031; -- absolute error
+ EV.Evol.ed = 0.00000000067;      -- relative error</pre>
+<p>The most robust criterion is the maximum-cpu-time parameter <I>tm</I></p>
+<p>
+</p>
+
+<hr />
+<h2><a name="installation">INSTALLATION</a></h2><p>
+This module is available  as a LuaRock in
+<A HREF="http://luarocks.org/repositories/rocks/index.html#math-evol">
+luarocks.org/repositories/rocks</A><BR>
+so you should be able to install it with the command:
+<CODE> &nbsp; <B>luarocks install math-evol</B></CODE>
+</p><p>
+The source is in
+<A HREF="http://cpansearch.perl.org/src/PJB/Math-Evol-1.12/lua/">
+cpansearch.perl.org/src/PJB/Math-Evol-1.12/lua/</A>
+for you to install by hand in your LUA_PATH
+</p><p>
+</p>
+<hr />
+<h2><a name="perl">PERL</a></h2>
+<p>This module is the translation into <em>Lua</em> of
+<A HREF="http://search.cpan.org/perldoc?Math::Evol">
+the <em>Perl</em> CPAN module Math::Evol,</A>
+and comes in its <code>./lua</code> subdirectory.
+The calling-interfaces are identical in both versions.</p>
+<p>
+</p>
+
+<hr />
+<h2><a name="author">AUTHOR</a></h2>
+<p>Peter J Billam, www.pjb.com.au/comp/contact.html</p>
+<p>
+</p>
+<hr />
+<h2><a name="credits">CREDITS</a></h2>
+<p>The strategy of adjusting the step-size to give a success rate of 0.2
+comes from the work of I. Rechenberg in his
+<em>Optimisation of Technical Systems in Accordance with the
+Principles of Biological Evolution</em>
+(Problemata Series, Vol. 15, Verlag Fromman-Holzboog, Stuttgart 1973).</p>
+<p>The code of <em>evol</em> is based on the Fortran version in
+<em>Numerical Optimisation of Computer Models</em>
+by Hans-Paul Schwefel, Wiley 1981, pp 104-117, 330-337,
+translated into english by M.W. Finnis from
+<em>Numerische Optimierung von Computer-Modellen mittels der Evolutionsstrategie</em>
+(Interdiscipliniary Systems Research, Vol. 26), Birkhaeuser Verlag, Basel 1977.
+The calling interface has been greatly modernised,
+and the constraining of values has been much simplified.</p>
+<p>
+</p>
+<hr />
+<h2><a name="see_also">SEE ALSO</a></h2>
+<p>The deterministic optimistation strategies can offer faster
+convergence on smaller problems (say 50 or 60 variables or less)
+with fairly smooth functions;
+see John A.R. Williams CPAN module Amoeba
+which implements the Simplex strategy of Nelder and Mead;
+another good algorithm is that of Davidon, Fletcher, Powell and Stewart,
+see Algorithm 46 and notes, in Comp J. 13, 1 (Feb 1970), pp 111-113;
+Comp J. 14, 1 (Feb 1971), p 106 and
+Comp J. 14, 2 (May 1971), pp 214-215.
+See also:
+</P><UL><LI>
+<a href="http://www.pjb.com.au/">http://www.pjb.com.au/</a>
+</LI><LI>
+<a href="http://www.pjb.com.au/comp/">http://www.pjb.com.au/comp/</a>
+</LI><LI>
+<A HREF="http://search.cpan.org/perldoc?Math::Evol">
+Math::Evol CPAN module</A>
+</LI><LI>
+<a href="http://www.pjb.com.au/comp/lua/WalshTransform.html">
+WalshTransform.lua</a>
+</LI><LI>
+<A HREF="http://search.cpan.org/perldoc?Math::WalshTransform">
+Math::WalshTransform CPAN module</A>
+</LI><LI>
+<a href="http://www.pjb.com.au/comp/lua/RungeKutta.html">
+RungeKutta.lua</a>
+</LI><LI>
+<A HREF="http://search.cpan.org/perldoc?Math::RungeKutta">
+Math::RungeKutta CPAN module</A>
+</LI></UL>
+
+
+</body>
+</html>

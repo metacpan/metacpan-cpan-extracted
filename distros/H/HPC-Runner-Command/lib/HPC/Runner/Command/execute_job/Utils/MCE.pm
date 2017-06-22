@@ -151,7 +151,7 @@ Initialize MCE queues
 sub run_mce {
     my $self = shift;
 
-    my $dt1 = DateTime->now();
+    my $dt1 = DateTime->now( time_zone => 'local' );
 
     $self->prepend_logfile("MAIN_");
     $self->append_logfile(".log");
@@ -172,10 +172,10 @@ sub run_mce {
 
     #End MCE specific
 
-    my $dt2      = DateTime->now();
+    my $dt2      = DateTime->now( time_zone => 'local' );
     my $duration = $dt2 - $dt1;
     my $format   = DateTime::Format::Duration->new( pattern =>
-          '%Y years, %m months, %e days, %H hours, %M minutes, %S seconds' );
+          '%e days, %H hours, %M minutes, %S seconds' );
 
     $self->log_main_messages( 'info',
         "Total execution time " . $format->format_duration($duration) );

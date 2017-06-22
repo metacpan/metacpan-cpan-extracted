@@ -1,8 +1,6 @@
-# Copyright (c) 2007-2016 Martin Becker.  All rights reserved.
+# Copyright (c) 2007-2017 Martin Becker.  All rights reserved.
 # This package is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-#
-# $Id: 11_math_bigrat.t 129 2016-08-08 17:27:26Z demetri $
 
 # Checking coefficient space compatibility with Math::BigRat.
 
@@ -15,7 +13,7 @@ use strict;
 use warnings;
 use Test;
 use lib 't/lib';
-use Test::MyUtils qw(report_version use_or_bail);
+use Test::MyUtils qw(:comp report_version use_or_bail);
 BEGIN {
     use_or_bail('Math::BigRat', 0.16);
     report_version('Math::BigInt');
@@ -23,6 +21,8 @@ BEGIN {
 }
 use Math::Polynomial 1.000;
 ok(1);  # modules loaded
+
+init_comp_check(qw(Math::Polynomial Math::BigInt Math::BigRat));
 
 my $c0 = Math::BigRat->new('-1/2');
 my $c1 = Math::BigRat->new('0');
@@ -36,26 +36,18 @@ my $y1 = Math::BigRat->new('-1/8');
 my $y2 = Math::BigRat->new('1/6');
 my $y3 = Math::BigRat->new('1');
 
-ok($y1 == $p->evaluate($x1));
-ok($y2 == $p->evaluate($x2));
-ok($y3 == $p->evaluate($x3));
+comp_ok($y1 == $p->evaluate($x1), 'y1');
+comp_ok($y2 == $p->evaluate($x2), 'y2');
+comp_ok($y3 == $p->evaluate($x3), 'y3');
 
 my $q = $p->interpolate([$x1, $x2, $x3], [$y1, $y2, $y3]);
-ok($p == $q);
-if ($p != $q) {
-    print map { "# $_\n" }
-        q[-] x 64,
-        'WARNING:  Your Math::BigRat module might need an upgrade.',
-        '          Rational arithmetic on your system might be broken.',
-        'SEE ALSO: https://rt.cpan.org/Public/Bug/Display.html?id=114004',
-        q[-] x 64;
-}
+comp_ok($p == $q, 'interpolation');
 
 my $x = $p->monomial(1);
 my $y = eval { $x - $p->coeff_one };
-ok(ref($y) && $y->isa('Math::Polynomial'));
-ok(1 == $y->degree);
-ok($p->coeff_zero == $y->evaluate($x3));
+comp_ok(ref($y) && $y->isa('Math::Polynomial'), 'isa');
+comp_ok(1 == $y->degree, 'degree');
+comp_ok($p->coeff_zero == $y->evaluate($x3), 'zero value');
 
 #########################
 

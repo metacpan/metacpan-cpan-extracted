@@ -17,9 +17,10 @@ no_index:
   directory:
     - t
     - inc
-requires: {}
+requires:
+  Test::More: '0.88'
 resources:
   bugtracker: https://github.com/DrHyde/perl-modules-Tie-Hash-Vivify/issues
   repository: https://github.com/DrHyde/perl-modules-Tie-Hash-Vivify
-version: '1.03'
+version: '1.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

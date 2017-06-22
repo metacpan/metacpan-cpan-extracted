@@ -3,15 +3,21 @@
 use strict;
 use warnings;
 use Getopt::Long;	# Technique inspired by IO::Lambda
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
 use IO::Socket::INET;
 
 my $online_tests;
 
-Getopt::Long::GetOptions('online-tests!' => \$online_tests);
-
-if(!defined($online_tests)) {
+if($ENV{RELEASE_TESTING}) {
 	$online_tests = are_online();
+} elsif($ENV{AUTOMATED_TESTING} || $ENV{NO_NETWORK_TESTING}) {
+	$online_tests = 0;
+} else {
+	Getopt::Long::GetOptions('online-tests!' => \$online_tests);
+
+	if(!defined($online_tests)) {
+		$online_tests = are_online();
+	}
 }
 
 if($online_tests) {
@@ -21,7 +27,6 @@ if($online_tests) {
 	unlink('t/online.enabled');
 	print STDERR "NA: WWW::Scrape::FindaGrave needs a permanent connexion to the Internet\n";
 	exit(0);
-# }
 }
 
 WriteMakefile(
@@ -34,7 +39,7 @@ WriteMakefile(
       ? ('LICENSE'=> 'GPL')
       : ()),
     PL_FILES	=> {},
-    BUILD_REQUIRES => {
+    TEST_REQUIRES => {
 	'Test::Most' => 0,
 	'Test::NoWarnings' => 0,
 	'Test::URI' => 0,
@@ -67,6 +72,8 @@ sub are_online
 
 	if($ENV{'http_proxy'} && ($ENV{'http_proxy'} =~ /^.+\/\/(\w+:\d+)$/)) {
 		$host = $1;
+	} elsif($ENV{'HTTP_PROXY'} && ($ENV{'HTTP_PROXY'} =~ /^.+\/\/(\w+:\d+)$/)) {
+		$host = $1;
 	}
 	my $s = IO::Socket::INET->new(
 		# PeerAddr => 'www.ripe.net:43',
@@ -75,10 +82,6 @@ sub are_online
 		Timeout => 5
 	);
 	if($s) {
-		if($ENV{AUTOMATED_TESTING}) {
-			return 1;
-		}
-
 		print <<EOF;
 
 You appear to be directly connected to the Internet.  I have some tests

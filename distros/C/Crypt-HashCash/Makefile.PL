@@ -7,9 +7,7 @@ WriteMakefile(
 	      AUTHOR              => q{Ashish Gulhati <crypt-hashcash at hash.neo.tc>},
 	      VERSION_FROM        => 'lib/Crypt/HashCash.pm',
 	      ABSTRACT_FROM       => 'lib/Crypt/HashCash.pm',
-	      ($ExtUtils::MakeMaker::VERSION >= 6.64
-	       ? ('LICENSE'=> 'artistic_2')
-	       : ()),
+              LICENSE             => 'Artistic_2_0',
 	      PL_FILES            => {},
 	      TEST_REQUIRES       => {
 				      'Test::More' => 0,

@@ -6,6 +6,12 @@ Home page:    <https://metacpan.org/release/Types-DateTime>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Types-DateTime>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.002	2017-06-19
+
+ - Updated: Compatibility fixed for newer DateTime::Locale.
+   Dagfinn Ilmari Mannsåker++
+   Dave Rolsky++
+
 0.001	2014-04-03
 
  [ Documentation ]

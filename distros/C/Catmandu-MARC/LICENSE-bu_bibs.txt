@@ -1,4 +1,4 @@
-The file t/bu_bibs.mrc exported from an Akma system was provided by Boston University Library with a CC-BY license. The license text follows below:
+The file t/bu_bibs.mrc exported from an Alma system was provided by Boston University Library with a CC-BY license. The license text follows below:
 
 Attribution 4.0 International
 

@@ -1,0 +1,25 @@
+---
+abstract: 'Output the lines of code that resulted in a failure.'
+author:
+  - 'Chad Granum <exodist@cpan.org>'
+build_requires:
+  Test2::V0: '0.000072'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test2-Plugin-SourceDiag
+requires:
+  Carp: '0'
+  PPI::Document: '1.224'
+  Test2::API: '1.302084'
+  perl: '5.008001'
+resources:
+  bugtracker: http://github.com/Test-More/Test2-Plugin-SourceDiag/issues
+  repository: http://github.com/Test-More/Test2-Plugin-SourceDiag/
+version: '0.000003'
+x_serialization_backend: 'YAML::Tiny version 1.70'

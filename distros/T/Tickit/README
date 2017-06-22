@@ -91,15 +91,25 @@ METHODS
 
  timer
 
-     $tickit->timer( at => $epoch, $code )
+     $id = $tickit->timer( at => $epoch, $code )
     
-     $tickit->timer( after => $delay, $code )
+     $id = $tickit->timer( after => $delay, $code )
 
     Runs the given CODE reference at some fixed point in time in the
     future. The first argmuent must be either the string at, or after; and
     specifies that second argument gives either the absolute epoch time
     ($epoch), or the delay relative to now ($delay), respectively.
     Fractions are supported to a resolution of microseconds.
+
+    Returns an opaque integer value that may be passed to "cancel_timer".
+    This value is safe to ignore if not required.
+
+ cancel_timer
+
+     $tickit->cancel_timer( $id )
+
+    Removes a timer previously installed by "timer". After doing so the
+    code will no longer be invoked.
 
  term
 

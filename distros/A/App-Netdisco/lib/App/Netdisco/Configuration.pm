@@ -3,9 +3,16 @@ package App::Netdisco::Configuration;
 use App::Netdisco::Environment;
 use Dancer ':script';
 
+use Path::Class 'dir';
+
 BEGIN {
-  # stuff useful locations into @INC
-  unshift @INC, @{ (setting('include_paths') || []) };
+  if (setting('include_paths') and ref [] eq ref setting('include_paths')) {
+    # stuff useful locations into @INC
+    push @{setting('include_paths')},
+         dir(($ENV{NETDISCO_HOME} || $ENV{HOME}), 'nd-site-local', 'lib')->stringify
+      if (setting('site_local_files'));
+    unshift @INC, @{setting('include_paths')};
+  }
 }
 
 # set up database schema config from simple config vars
@@ -58,6 +65,26 @@ if (exists setting('workers')->{interactives}
 # force skipped DNS resolution, if unset
 setting('dns')->{hosts_file} ||= '/etc/hosts';
 setting('dns')->{no} ||= ['fe80::/64','169.254.0.0/16'];
+
+# support unordered dictionary as if it were a single item list
+if (ref {} eq ref setting('device_identity')) {
+  config->{'device_identity'} = [ setting('device_identity') ];
+}
+else { config->{'device_identity'} ||= [] }
+
+# copy devices_no and devices_only into others
+foreach my $name (qw/devices_no devices_only
+                    discover_no macsuck_no arpnip_no nbtstat_no
+                    discover_only macsuck_only arpnip_only nbtstat_only/) {
+  config->{$name} ||= [];
+  config->{$name} = [setting($name)] if ref [] ne ref setting($name);
+}
+foreach my $name (qw/discover_no macsuck_no arpnip_no nbtstat_no/) {
+  push @{setting($name)}, @{ setting('devices_no') };
+}
+foreach my $name (qw/discover_only macsuck_only arpnip_only nbtstat_only/) {
+  push @{setting($name)}, @{ setting('devices_only') };
+}
 
 # legacy config item names
 

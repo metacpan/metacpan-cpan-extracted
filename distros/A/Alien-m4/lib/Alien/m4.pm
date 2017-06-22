@@ -5,14 +5,21 @@ use warnings;
 use base qw( Alien::Base );
 
 # ABSTRACT: Find or build m4
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 sub alien_helper
 {
+  my($class) = @_;
   return {
-    m4 => sub { 'm4' },
+    m4 => sub { $class->exe },
   };
+}
+
+sub exe
+{
+  my($class) = @_;
+  $class->runtime_prop->{command} || 'm4';
 }
 
 1;
@@ -29,7 +36,7 @@ Alien::m4 - Find or build m4
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -54,6 +61,15 @@ From Alien::Base Build.PL
 =head1 DESCRIPTION
 
 This package can be used by other CPAN modules that require m4.
+
+=head1 METHODS
+
+=head2 exe
+
+ my $m4 = Alien::m4->exe;
+
+Returns the "name" of m4.  Normally this is C<m4>, but in some cases, it
+may be the full path to m4.
 
 =head1 HELPERS
 

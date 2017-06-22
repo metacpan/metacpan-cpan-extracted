@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.107;
+our $VERSION = 1.108;
 
 use Prty::Hash;
 use Prty::Option;
@@ -160,12 +160,13 @@ Liefere folgende Liste von DBMS-Namen (in dieser Reihenfolge):
     PostgreSQL
     SQLite
     MySQL
+    Access
 
 =cut
 
 # -----------------------------------------------------------------------------
 
-my @DbmsNames = qw/Oracle PostgreSQL SQLite MySQL/;
+my @DbmsNames = qw/Oracle PostgreSQL SQLite MySQL Access/;
 
 sub dbmsNames {
     my $this = shift;
@@ -180,7 +181,7 @@ sub dbmsNames {
 
 =head4 Synopsis
 
-    ($oracle,$postgresql,$sqlite,$mysql) = $self->dbmsTestVector;
+    ($oracle,$postgresql,$sqlite,$mysql,$access) = $self->dbmsTestVector;
 
 =head4 Description
 
@@ -274,6 +275,23 @@ sub isSQLite {
 sub isMySQL {
     my $self = shift;
     return $self->{'dbms'} eq 'MySQL'? 1: 0;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 isAccess() - Teste auf Access
+
+=head4 Synopsis
+
+    $bool = $class->isAccess;
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub isAccess {
+    my $self = shift;
+    return $self->{'dbms'} eq 'Access'? 1: 0;
 }
 
 # -----------------------------------------------------------------------------
@@ -668,6 +686,14 @@ my %DataType = (
         DATETIME=>'TIMESTAMP',
         BLOB=>'LONGBLOB',
     },
+    Access=>{
+        STRING=>'TEXT',
+        TEXT=>'MEMO',
+        INTEGER=>'LONG',
+        REAL=>'DOUBLE',
+        DATETIME=>'DATETIME',
+        BLOB=>'LONGBINARY',
+    },
 );
 
 sub dataType {
@@ -1019,7 +1045,7 @@ sub setDateFormat {
     my $self = shift;
     my $format = shift || 'iso';
 
-    my ($oracle,$postgresql,$sqlite,$mysql) = $self->dbmsTestVector;
+    my ($oracle,$postgresql,$sqlite,$mysql,$access) = $self->dbmsTestVector;
 
     # Statement generieren
 
@@ -1037,7 +1063,7 @@ sub setDateFormat {
             return ('SET datestyle TO iso, ymd');
         }
     }
-    elsif ($sqlite || $mysql) {
+    elsif ($sqlite || $mysql || $access) {
         return; # FIXME: bislang nicht untersucht
     }
 
@@ -1085,7 +1111,7 @@ sub setNumberFormat {
     my $self = shift;
     my $format = shift || '.,';
 
-    my ($oracle,$postgresql,$sqlite,$mysql) = $self->dbmsTestVector;
+    my ($oracle,$postgresql,$sqlite,$mysql,$access) = $self->dbmsTestVector;
 
     # Statement generieren
 
@@ -1093,7 +1119,7 @@ sub setNumberFormat {
     if ($oracle) {
         return ("ALTER SESSION SET NLS_NUMERIC_CHARACTERS = '$format'");
     }
-    elsif ($postgresql || $sqlite || $mysql) {
+    elsif ($postgresql || $sqlite || $mysql || $access) {
         return; # FIXME: bislang nicht untersucht
     }
 
@@ -5232,7 +5258,7 @@ sub diff {
 
 =head1 VERSION
 
-1.107
+1.108
 
 =head1 AUTHOR
 

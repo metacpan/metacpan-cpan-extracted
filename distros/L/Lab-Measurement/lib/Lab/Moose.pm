@@ -1,5 +1,5 @@
 package Lab::Moose;
-
+$Lab::Moose::VERSION = '3.550';
 use warnings;
 use strict;
 use 5.010;
@@ -11,7 +11,6 @@ use Exporter 'import';
 use Lab::Moose::Connection;
 use Carp;
 
-our $VERSION = '3.543';
 
 our @EXPORT = qw/instrument datafolder datafile/;
 

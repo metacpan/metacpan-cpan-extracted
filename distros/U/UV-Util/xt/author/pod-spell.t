@@ -8,14 +8,21 @@ use Pod::Wordlist;
 
 set_spell_cmd('aspell list');
 add_stopwords(<DATA>);
-all_pod_files_spelling_ok( qw(lib ) );
+all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 CPAN
 Chase
-Whitener
 RSS
+UV
+Util
+Whitener
+capoeirab
 getrusage
+github
 hrtime
+lib
 libUV
 loadavg
+stopwords
 uptime
+wordlist

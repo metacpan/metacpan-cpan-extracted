@@ -3,7 +3,7 @@ package YAHC;
 use strict;
 use warnings;
 
-our $VERSION = '0.033';
+our $VERSION = '0.034';
 
 use EV;
 use Time::HiRes;
@@ -657,6 +657,7 @@ sub _set_read_state {
     my $neck_pos = 0;
     my $decapitated = 0;
     my $content_length = 0;
+    my $no_content_length = 0;
     my $is_chunked = 0;
     my $fh = $watchers->{_fh};
     my $chunk_size = 0;
@@ -680,6 +681,12 @@ sub _set_read_state {
             yahc_conn_register_error($conn, YAHC::Error::READ_ERROR(), "Failed to receive HTTP data: '%s' errno=%d", "$!", $!+0);
             _set_init_state($self, $conn_id);
         } elsif ($rlen == 0) {
+            if ($no_content_length) {
+                $conn->{response}{body} = $buf.$b;
+                _set_user_action_state($self, $conn_id);
+                return;
+            }
+
             if ($content_length > 0) {
                 yahc_conn_register_error($conn, YAHC::Error::READ_ERROR(), "Premature EOF, expect %d bytes more", $content_length - length($buf));
             } else {
@@ -695,14 +702,26 @@ sub _set_read_state {
                 if ($is_chunked && exists $headers->{'Trailer'}) {
                     _set_user_action_state($self, $conn_id, YAHC::Error::RESPONSE_ERROR(), "Chunked HTTP response with Trailer header");
                     return;
-                } elsif (!$is_chunked && !exists $headers->{'Content-Length'}) {
-                    _set_user_action_state($self, $conn_id, YAHC::Error::RESPONSE_ERROR(), "HTTP reponse without Content-Length");
-                    return;
                 }
 
                 $decapitated = 1;
-                $content_length = $headers->{'Content-Length'};
                 substr($buf, 0, 4, ''); # 4 = length("$CRLF$CRLF")
+
+                # Attempt to correctly determine content length, see RFC 2616 section 4.4
+                if (($conn->{request}->{method} || '') eq 'HEAD' || $conn->{response}->{status} =~ /^(1..|204|304)$/) { # 1.
+                    $content_length = 0;
+                } elsif ($is_chunked) { # 2. (sort of, should actually also care for non-chunked transfer encodings)
+                    # No content length, use chunked transfer encoding instead
+                } elsif (exists $headers->{'Content-Length'}) { # 3.
+                    $content_length = $headers->{'Content-Length'};
+                    if ($content_length !~ m#\A[0-9]+\z#) {
+                        _set_user_action_state($self, $conn_id, YAHC::Error::RESPONSE_ERROR(), "Not-numeric Content-Length received on the response");
+                        return;
+                    }
+                } else {
+                    # byteranges (point .4 on the spec) not supported
+                    $no_content_length = 1;
+                }
             }
 
             if ($decapitated && $is_chunked) {
@@ -740,9 +759,7 @@ sub _set_read_state {
                         return;
                     }
                 }
-            } elsif ($decapitated && ($conn->{request}{method} && $conn->{request}{method} eq 'HEAD')) {
-                _set_user_action_state($self, $conn_id); # We are done reading headers for a HEAD request
-            } elsif ($decapitated && length($buf) >= $content_length) {
+            } elsif ($decapitated && !$no_content_length && length($buf) >= $content_length) {
                 $conn->{response}{body} = (length($buf) > $content_length ? substr($buf, 0, $content_length) : $buf);
                 _set_user_action_state($self, $conn_id);
             }
@@ -1909,10 +1926,6 @@ to make sure that *all* data passed to YAHC is unflagged binary strings.
 
 =item * State 'RESOLVE DNS' is not implemented yet.
 
-=item * YAHC currently doesn't support servers returning a http body without an
-accompanying C<Content-Length> header; bodies B<MUST> have a C<Content-Length>
-or we won't pick them up.
-
 =back
 
 =head1 AUTHORS
@@ -1921,7 +1934,7 @@ Ivan Kruglov <ivan.kruglov@yahoo.com>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2013-2016 Ivan Kruglov C<< <ivan.kruglov@yahoo.com> >>.
+Copyright (c) 2013-2017 Ivan Kruglov C<< <ivan.kruglov@yahoo.com> >>.
 
 =head1 ACKNOWLEDGMENT
 

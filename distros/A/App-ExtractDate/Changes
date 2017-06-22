@@ -1,4 +1,8 @@
-Revision history for App-ExtractDate
+0.003   2017-06-14 (PERLANCAR)
+
+	- Change default parser module from Date::Extract to
+	  Date::Extract::PERLANCAR.
+
 
 0.002   2016-04-06 (PERLANCAR)
 

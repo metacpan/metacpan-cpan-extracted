@@ -17,6 +17,5 @@ no_index:
   directory:
     - t
     - inc
-requires:
-  perl: '5.014'
-version: v1.0.1
+requires: {}
+version: v1.0.2

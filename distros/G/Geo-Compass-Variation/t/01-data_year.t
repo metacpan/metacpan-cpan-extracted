@@ -46,5 +46,13 @@ $ok = eval {
 is $ok, undef, "fail after 2019";
 like $@, qr/Calculation model has expired:/, "error is sane";
 
+$ok = eval {
+    mag_dec(10, 10, 0, 2020);
+    1;
+};
+
+is $ok, undef, "fail after 2018.9";
+like $@, qr/Calculation model has expired:/, "error is sane";
+
 done_testing;
 

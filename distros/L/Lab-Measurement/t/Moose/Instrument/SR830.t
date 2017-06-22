@@ -119,5 +119,27 @@ set_get_test(
     values => [qw/OUT LINE 2xLINE BOTH/], is_numeric => 0
 );
 
+# Settling time
+
+$lia->set_tc( value => 1 );
+$lia->set_filter_slope( value => 6 );
+
+is_float(
+    $lia->calculate_settling_time( settling => 90 ), 2.3,
+    "settling time tc=1, slope=6, settling=90"
+);
+
+$lia->set_tc( value => 0.1 );
+$lia->set_filter_slope( value => 18 );
+
+is_float(
+    $lia->calculate_settling_time( settling => 99 ), 0.1 * 8.41,
+    "settling time tc=0.1, slope=18, settling=99"
+);
+is_float(
+    $lia->calculate_settling_time( settling => 63.2 ), 0.1 * 3.26,
+    "settling time tc=0.1, slope=18, settling=63.2"
+);
+
 $lia->rst();
 done_testing();

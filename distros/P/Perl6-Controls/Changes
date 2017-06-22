@@ -1,0 +1,15 @@
+Revision history for Perl6-Controls
+
+0.000001  Sun Apr 30 13:48:27 2017
+       Initial release.
+
+
+
+0.000002  Tue Jun 20 06:13:12 2017
+          No changes logged
+
+
+0.000003  Tue Jun 20 12:42:05 2017
+
+    * Documented limitations of FIRST phaser
+      (thanks, ZZ!)

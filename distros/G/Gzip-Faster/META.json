@@ -47,7 +47,7 @@
          "web" : "https://github.com/benkasminbullock/gzip-faster"
       }
    },
-   "version" : "0.19",
+   "version" : "0.20",
    "x_contributors" : [
       "Aristotle Pagaltzis <aristotle@cpan.org>",
       "zgrim <zgrim@cpan.org>"

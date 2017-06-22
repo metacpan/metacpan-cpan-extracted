@@ -1,3 +1,4 @@
+.appveyor.yml
 bin/dumbbench
 Changes
 examples/TryPackage.pm
@@ -18,6 +19,13 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 r/boxplot.r
 README.pod
+simulator/cfg/fast.yml
+simulator/cfg/simple.yml
+simulator/cfg/slow.yml
+simulator/gauss_cdf_test.pl
+simulator/lib/Dumbbench/Sim.pm
+simulator/lib/Dumbbench/Sim/Config.pm
+simulator/simulate_benchmark.pl
 t/000_load.t
 t/010_stats.t
 t/100_bdumb.t

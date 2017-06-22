@@ -1,8 +1,7 @@
 package Lab::Generic;
-
+$Lab::Generic::VERSION = '3.550';
 use Lab::Generic::CLOptions;
 
-our $VERSION = '3.543';
 
 use strict;
 use Term::ReadKey;

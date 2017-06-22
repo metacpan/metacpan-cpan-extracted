@@ -3,9 +3,10 @@ package Log::Dispatch::Output;
 use strict;
 use warnings;
 
-our $VERSION = '2.63';
+our $VERSION = '2.65';
 
 use Carp ();
+use Try::Tiny;
 use Log::Dispatch;
 use Log::Dispatch::Types;
 use Log::Dispatch::Vars qw( %LevelNamesToNumbers @OrderedLevels );
@@ -86,8 +87,6 @@ sub new {
         $self->{name} = $p{name} || $self->_unique_name();
 
         $self->{min_level} = $self->_level_as_number( $p{min_level} );
-        die 'Invalid level specified for min_level'
-            unless defined $self->{min_level};
 
         # Either use the parameter supplied or just the highest possible level.
         $self->{max_level} = (
@@ -95,9 +94,6 @@ sub new {
             ? $self->_level_as_number( $p{max_level} )
             : $#{ $self->{level_names} }
         );
-
-        die 'Invalid level specified for max_level'
-            unless defined $self->{max_level};
 
         $self->{callbacks} = $p{callbacks} if $p{callbacks};
 
@@ -148,11 +144,11 @@ sub _level_as_number {
         Carp::croak 'undefined value provided for log level';
     }
 
-    return $level if $level =~ /^\d$/;
-
     unless ( Log::Dispatch->level_is_valid($level) ) {
         Carp::croak "$level is not a valid Log::Dispatch log level";
     }
+
+    return $level if $level =~ /\A[0-7]+\z/;
 
     return $self->{level_numbers}{$level};
 }
@@ -166,7 +162,12 @@ sub _level_as_name {
         Carp::croak 'undefined value provided for log level';
     }
 
-    return $level unless $level =~ /^\d$/;
+    my $canonical_level;
+    unless ( $canonical_level = Log::Dispatch->level_is_valid($level) ) {
+        Carp::croak "$level is not a valid Log::Dispatch log level";
+    }
+
+    return $canonical_level unless $level =~ /\A[0-7]+\z/;
 
     return $self->{level_names}[$level];
 }
@@ -203,7 +204,7 @@ Log::Dispatch::Output - Base class for all Log::Dispatch::* objects
 
 =head1 VERSION
 
-version 2.63
+version 2.65
 
 =head1 SYNOPSIS
 

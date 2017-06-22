@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.28, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,14 +18,20 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  Math::Polynomial:
+    file: lib/Math/Polynomial.pm
+    version: '1.013'
+  Math::Polynomial::Generic:
+    file: lib/Math/Polynomial/Generic.pm
+    version: '1.013'
 recommends:
-  Math::BigInt: '0'
-  Math::BigRat: '0.260804'
+  Math::BigNum: '0'
   Math::Complex: '0'
   Math::ModInt: '0'
 requires:
   Carp: '0'
   overload: '0'
   perl: '5.006'
-version: '1.011'
+version: '1.013'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

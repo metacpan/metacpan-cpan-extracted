@@ -10,7 +10,7 @@ no if $] > 5.017010, warnings => 'experimental::smartmatch';
 use English qw( -no_match_vars );
 local $OUTPUT_AUTOFLUSH = 1;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use Term::ReadLine;
 if ( $OSNAME eq 'MSWin32' ) {
@@ -341,7 +341,7 @@ sub get_y_zero {
 	require PadWalker if 0; #forces PadWalker to be a requires not a test_requires
 
 	# say 'running on perl '. $PERL_VERSION;
-	if ( $PERL_VERSION >= 5.017006 ) {
+	if ( $PERL_VERSION >= 5.017006 && $PERL_VERSION <= 5.021003 ) {
 
 		# say 'using y=1 instead as running on perl ' . $PERL_VERSION;
 		$self->_send('y 1');
@@ -692,7 +692,7 @@ Debug::Client - debugger client side code for Padre, The Perl IDE.
 
 =head1 VERSION
 
-This document describes Debug::Client version: 0.29
+This document describes Debug::Client version: 0.30
 
 =head1 SYNOPSIS
 
@@ -1110,7 +1110,7 @@ Alexandr Ciornii E<lt>alexchorny@gmail.comE<gt>
 
 Copyright 2008-2011 Gabor Szabo
 
-Some parts Copyright E<copy> 2011-2013 Kevin Dawson and CONTRIBUTORS as listed above.
+Some parts Copyright E<copy> 2011-2014 Kevin Dawson and CONTRIBUTORS as listed above.
 
 =head1 LICENSE
 

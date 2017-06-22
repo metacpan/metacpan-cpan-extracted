@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Sense::Sweep;
-
+$Lab::Moose::Instrument::SCPI::Sense::Sweep::VERSION = '3.550';
 use Moose::Role;
 use Lab::Moose::Instrument::Cache;
 use Lab::Moose::Instrument
@@ -9,7 +9,6 @@ use Carp;
 
 use namespace::autoclean;
 
-our $VERSION = '3.543';
 
 =head1 NAME
 

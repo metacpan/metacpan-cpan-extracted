@@ -2,7 +2,7 @@
 # NanoB2B-NER::NER::Arffman
 #
 # Creates ARFF files from annotated files
-# Version 1.0
+# Version 1.5
 #
 # Program by Milk
 
@@ -11,6 +11,7 @@ package NanoB2B::NER::Arffman;
 use NanoB2B::UniversalRoutines;
 use MetaMap::DataStructures;
 use File::Path qw(make_path);			#makes sub directories	
+use List::MoreUtils qw(uniq);
 
 use strict;
 use warnings;
@@ -19,10 +20,13 @@ use warnings;
 my $debug = 1;
 my $program_dir = "";
 my $fileIndex = 0;
-my $no_stopwords = 0;
+my $stopwords_file;
 my $prefix = 3;
 my $suffix = 3;
 my $bucketsNum = 10;
+my $is_cui = 0;
+my $sparse_matrix = 0;
+my $wcs = "";
 
 #datastructure object
 my %params = ();
@@ -47,7 +51,7 @@ my $selfId = "_self";
 my $entId = "_e";
 my $morphID = "_m";
 
-my @stopWords;
+my $stopRegex;
 
 ####      A HERO IS BORN     ####
 
@@ -104,22 +108,28 @@ sub _init {
     $params = {} if(!defined $params);
 
     #  get some of the parameters
-    my $diroption = $params->{'dir'};
+    my $diroption = $params->{'directory'};
 	my $ftsoption = $params->{'features'};
 	my $bucketsNumoption = $params->{'bucketsNum'};
     my $debugoption = $params->{'debug'};
 	my $prefixoption = $params->{'prefix'};
 	my $suffixoption = $params->{'suffix'};
     my $indexoption = $params->{'index'};
-    my $stopwordoption = $params->{'no_stopwords'};
+    my $stopwordoption = $params->{'stopwords'};
+    my $iscuioption = $params->{'is_cui'};
+    my $sparsematrixoption = $params->{'sparse_matrix'};
+    my $wcsoption = $params->{'wcs'};
 
     #set the global variables
     if(defined $debugoption){$debug = $debugoption;}
     if(defined $diroption){$program_dir = $diroption;}
     if(defined $indexoption){$fileIndex = $indexoption;}
-    if(defined $stopwordoption){$no_stopwords = $stopwordoption;}
+    if(defined $stopwordoption){$stopwords_file = $stopwordoption;}
+    if(defined $iscuioption){$is_cui = $iscuioption;}
+    if(defined $sparsematrixoption){$sparse_matrix = $sparsematrixoption;}
     if(defined $prefixoption){$prefix = $prefixoption;}
     if(defined $suffixoption){$suffix = $suffixoption;}
+    if(defined $wcsoption){$wcs = $wcsoption;}
     if(defined $bucketsNumoption){$bucketsNum = $bucketsNumoption;}
     if(defined $ftsoption){@features = split(' ', $ftsoption);}
 }
@@ -153,7 +163,7 @@ sub arff_file{
 	$filename = lc($filename);
 
 	my $FILE;
-	open ($FILE, "$program_dir/$filename") || die ("what is this 'dir/file' you speak of?\n");
+	open ($FILE, "$program_dir/$file") || die ("what is this '$program_dir/$filename' you speak of?\n");
 	my @fileLines = <$FILE>;
 	my @orthoLines = @fileLines;
 	#my @orthoLines = ["Hi! I'm Milk", "I have a hamster named Scott", "I like pizza"];
@@ -161,6 +171,7 @@ sub arff_file{
 		$l = lc($l);
 	}
 	$uniSub->printColorDebug("on_red", "$filename");
+	#$uniSub->printColorDebug("on_cyan", "*** $wcs ***");
 
 	#get the total num of lines
 	my $totalLines = 0;
@@ -176,7 +187,7 @@ sub arff_file{
 	@orthoLines = retagSetOrtho(\@orthoLines);
 
 	#$uniSub->printColorDebug("red", "TAG SET: ");
-	#printArr(", ", @tagSet);
+	#$uniSub->printArr(", ", \@tagSet);
 
 	#######     ASSIGN THE VALUES TO HASHTABLES O KEEP TRACK OF THEM    #######
 
@@ -191,6 +202,7 @@ sub arff_file{
 	#put the orthographic lines in a hash
 	$indexer = 0;
 	foreach my $line (@orthoLines){
+		#$uniSub->printColorDebug("red", "$line\n");
 		$orthoHash{$indexer} = $line;
 		$indexer++;
 	}
@@ -381,12 +393,9 @@ sub importMetaData{
 
 	#create a directory to save hashtable data
 	my $META;
-	if($program_dir ne ""){
-		my $subdir = "_METAMAPS";
-		open($META, "<", ("$program_dir/$subdir/" . $name . "_meta")) || die ("HAHA No such thing!");
-	}else{
-		open($META, "<", ($name . "_meta")) || die ("DNE noob!");
-	}
+	my $subdir = "_METAMAPS";
+	open($META, "<", ("$program_dir/$subdir/" . $name . "_meta")) || die ("HAHA No such thing!");
+	
 
 	#import metamap data from the file
 	my @metaLines = <$META>;
@@ -424,7 +433,7 @@ sub retagOrtho{
 				push @newSet, $charWord;
 			}
 		}else{
-			if($word =~/<START:[a-zA-Z-]*>/g){
+			if($word =~/<START:[a-zA-Z-_]*>/g){
 				$charact = 1;
 			}else{
 				push @newSet, $word;
@@ -482,12 +491,12 @@ sub cleanToken{
 
 	#fix "# . #" tokens
 	if($tokenText =~ /\d+\s\.\s\d+/){
-		$tokenText =~s/\s\.\s/\./;
+		$tokenText =~s/\s\.\s/\./g;
 	}
 
 	#fix "__ \' __" tokens
 	if($tokenText =~ /\w+\s\\\'\s\w+/){
-		$tokenText =~s/\s\\\'\s//;
+		$tokenText =~s/\s\\\'\s//g;
 	}
 
 	if($tokenText =~ /[^a-zA-Z0-9]/){
@@ -715,17 +724,47 @@ sub zhu_li{
 		$attrSets{$item} = \%setOfAttr;						#gets both the vector and arff based attributes
 	}
 
+	if(defined $stopwords_file){
+		$stopRegex = stop($stopwords_file);
+	}
+
 	#let's make some vectors!
 	$uniSub->printColorDebug("bold yellow", "Making Vectors...\n-------------------\n");
 	my @curFeatSet = ();
 	my $abbrev = "";
+
+	#run based on wcs
+	my $wcs_bucket;
+	my $wcs_feature;
+	my $wcs_found = 0;
+	if($wcs){
+		my @wcs_parts = split("-", $wcs);
+		$wcs_feature = $wcs_parts[1];
+		$wcs_bucket = $wcs_parts[0];
+	}
+
+
 	#iteratively add on the features [e.g. o, om, omt, omtp, omtpc, omtpcs]
 	foreach my $feature (@features){
 		$uniSub->printColorDebug("yellow", "** $feature ** \n");
 		push(@curFeatSet, $feature);
 		$abbrev .= substr($feature, 0, 1);		#add to abbreviations for the name
+
+		#$uniSub->printColorDebug("on_red", "$wcs - $wcs_found - $abbrev vs. $wcs_feature");
+		if(($wcs) && (!$wcs_found) && ($abbrev ne $wcs_feature)){
+			print("**SKIP** \n");
+			next;
+		}
+
 		#go through each bucket
 		foreach my $bucket (sort keys %buckets){
+			if(($wcs) && (!$wcs_found) && ($bucket != $wcs_bucket)){
+				print("\t**SKIP**\n");
+				next;
+			}else{
+				$wcs_found = 1;
+			}
+
 			my @range = $uniSub->bully($bucketsNum, $bucket);
 
 			$uniSub->printColorDebug("on_green", "BUCKET #$bucket");
@@ -889,33 +928,54 @@ sub vectorMaker{
 	for(my $l = 0; $l < $setLen; $l++){
 		my $line = $txtLineSet[$l];
 		my @words = split(' ', $line);
+		#$uniSub->printArr(", ", \@words);
+		#print "\n";
 		my $wordLen = @words;
 		#go through each word
 		for(my $a = 0; $a < $wordLen; $a++){
 
 			$| = 1;
 
-			my $l2 = $l + 1; 
-			my $a2 = $a + 1;
-			$uniSub->printDebug("\r" . "\t\tLine - $l2/$setLen ------ Word - $a2/$wordLen       ");
-
 			#make the words for comparison
 			my $word = $words[$a];
 			my $prevWord = "";
 			my $nextWord = "";
 
+			#show progress
+			my $l2 = $l + 1; 
+			my $a2 = $a + 1;
+			$uniSub->printDebug("\r" . "\t\tLine - $l2/$setLen ------ Word - $a2/$wordLen  ----  ");
+			
+			my $smlword = substr($word, 0, 8);
+			if(length($word) > 8){
+				$smlword .= "...";
+			}
+			
+			if($word =~/$entId/){
+				$uniSub->printColorDebug("red", "$smlword!                ");
+			}else{
+				$uniSub->printDebug("$smlword!                    ")
+			}
+
+			my @word_cuis = getFeature($word, "cui");
+			my $ncui = $word_cuis[0];
+			#$uniSub->printColorDebug("red", "\n\t\t$word - $ncui\n");
+
 			#check if it's a stopword
-			if($no_stopwords and $uniSub->isStopWord($word)){
+			if(($stopwords_file and $word=~/$stopRegex/o) || ($is_cui and $word_cuis[0] eq "") || ($word eq "." || $word eq ",")){
+				#$uniSub->printColorDebug("on_red", "\t\tSKIP!");
 				next;
 			}
 
 			if($a > 0){$prevWord = $words[$a - 1];}
 			if($a < ($wordLen - 1)){$nextWord = $words[$a + 1];}
 
+			
+
 			#get rid of tag if necessary
-			$prevWord =~s/$entId//;
-			$nextWord =~s/$entId//;
-			$word =~s/$entId//;
+			$prevWord =~s/$entId//g;
+			$nextWord =~s/$entId//g;
+			$word =~s/$entId//g;
 
 			my $vec = "";
 			#use each set of attributes
@@ -933,12 +993,23 @@ sub vectorMaker{
 
 			}
 
+			#convert binary to sparse if specified
+			if($sparse_matrix){
+				$vec = convert2Sparse($vec);
+			}
+
 			#check if the word is an entity or not
 			my $wordOrig = $words[$a];	
 			$vec .= (($wordOrig =~/([\s\S]*($entId)$)/) ? "Yes " : "No ");
 
+			#close it if using sparse matrix
+			if($sparse_matrix){
+				$vec .= "}";
+			}
+
 			#finally add the word back and add the entire vector to the set
 			$vec .= "\%$word";
+
 			if($word ne ""){
 				push(@setVectors, $vec);
 			}
@@ -1158,6 +1229,24 @@ sub semVec{
 	return $strVec;
 }
 
+#converts a binary vector to a sparse vector
+sub convert2Sparse{
+	my $bin_vec = shift;
+	my @vals = split(",", $bin_vec);
+	my $numVals = @vals;
+
+	my $sparse_vec = "{";
+	for(my $c=0;$c<$numVals;$c++){
+		my $curVal = $vals[$c];
+		if($curVal eq "1"){
+			$sparse_vec .= "$c" . "$curVal, ";
+		}
+	}
+	$sparse_vec .= "$numVals, ";
+
+	return $sparse_vec;
+}
+
 
 ######################               ATTRIBUTE BASED METHODS              #####################
 
@@ -1195,7 +1284,7 @@ sub grabAttr{
 			
 			#get attributes [ unique and deluxe ]
 			my @attr = getMorphoAttributes(\@range, \%buckets);
-			@attr = makeUniq(\@attr);						#make unique forms
+			@attr = uniq(@attr);						#make unique forms
 			$bucketAttr{$testBucket} = \@attr;
 
 			my @attrARFF = @attr;
@@ -1219,7 +1308,7 @@ sub grabAttr{
 			
 			#get attributes [ unique and deluxe ]
 			my @attr = getRangeAttributes($feature, \@range, \%buckets);
-			@attr = makeUniq(\@attr);						#make unique forms
+			@attr = uniq(@attr);						#make unique forms
 			$bucketAttr{$testBucket} = \@attr;
 
 			my @attrARFF = getAttrDelux($feature, \@attr);
@@ -1305,7 +1394,7 @@ sub getRangeAttributes{
 			if($tokenText =~ /\w+\s\w+/){
 				my @tokenText2 = split(" ", $tokenText);
 				push @tokenWords, @tokenText2;
-			}elsif($tokenText ne "." and $tokenText ne "-"){
+			}elsif($tokenText ne "." and $tokenText ne "-" and !($tokenText =~ /[^a-zA-Z0-9]/)){
 				push @tokenWords, $tokenText;
 			}
 
@@ -1330,7 +1419,7 @@ sub getRangeAttributes{
 			my @conLine = split / /, $conFeat;
 			push @conWords, @conLine;
 		}
-		@attributes = makeUniq (\@conWords);
+		@attributes = uniq (@conWords);
 
 		#add a semantic label for differentiation
 		if($type eq "sem"){
@@ -1361,7 +1450,7 @@ sub getAttrDelux{
 		if($f eq "pos"){
 			$word = ($word . "_POS");
 		}
-		$word =~s/$entId//;
+		$word =~s/$entId//g;
 
 		#add the copy and then the original
 		my $copy = "$word" . "$selfId";
@@ -1460,7 +1549,7 @@ sub getMorphoAttributes{
 	#get the prefix and suffix from each word
 	my @attributes = ();
 	foreach my $word (@wordSet){
-		$word =~s/$entId//;
+		$word =~s/$entId//g;
 		push(@attributes, substr($word, 0, $prefix));									#add the word's prefix
 		push(@attributes, substr($word, -$suffix));		#add the word's suffix
 	}
@@ -1485,6 +1574,71 @@ sub makeAttrData{
 	}
 
 	return @attributes;
+}
+
+##new stoplist function
+sub stop { 
+ 
+    my $stopfile = shift; 
+
+    my $stop_regex = "";
+    my $stop_mode = "AND";
+
+    open ( STP, $stopfile ) ||
+        die ("Couldn't open the stoplist file $stopfile\n");
+    
+    while ( <STP> ) {
+	chomp; 
+	
+	if(/\@stop.mode\s*=\s*(\w+)\s*$/) {
+	   $stop_mode=$1;
+	   if(!($stop_mode=~/^(AND|and|OR|or)$/)) {
+		print STDERR "Requested Stop Mode $1 is not supported.\n";
+		exit;
+	   }
+	   next;
+	} 
+	
+	# accepting Perl Regexs from Stopfile
+	s/^\s+//;
+	s/\s+$//;
+	
+	#handling a blank lines
+	if(/^\s*$/) { next; }
+	
+	#check if a valid Perl Regex
+        if(!(/^\//)) {
+	   print STDERR "Stop token regular expression <$_> should start with '/'\n";
+	   exit;
+        }
+        if(!(/\/$/)) {
+	   print STDERR "Stop token regular expression <$_> should end with '/'\n";
+	   exit;
+        }
+
+        #remove the / s from beginning and end
+        s/^\///;
+        s/\/$//;
+        
+	#form a single big regex
+        $stop_regex.="(".$_.")|";
+    }
+
+    if(length($stop_regex)<=0) {
+	print STDERR "No valid Perl Regular Experssion found in Stop file $stopfile";
+	exit;
+    }
+    
+    chop $stop_regex;
+    
+    # making AND a default stop mode
+    if(!defined $stop_mode) {
+	$stop_mode="AND";
+    }
+    
+    close STP;
+    
+    return $stop_regex; 
 }
 
 1;

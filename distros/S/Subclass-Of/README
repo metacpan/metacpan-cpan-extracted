@@ -7,12 +7,12 @@ SYNOPSIS
        use Subclass::Of "LWP::UserAgent",
           -as      => "ImpatientUA",
           -methods => [
-             sub new {
+             new => sub {
                 my $self = ::SUPER();
                 $self->timeout(15);
                 $self->max_redirect(3);
                 return $self;
-             }
+             },
           ];
    
        my $ua = ImpatientUA->new;
@@ -104,6 +104,21 @@ DESCRIPTION
         class name (e.g. `UserAgent` for subclasses of LWP::UserAgent) will be
         used. If you don't want an alias, try `-as => []`.
 
+    `-lazy`
+        Defers the generation of the subclass until the last possible moment.
+        This might be useful in the case of:
+
+           use Subclass::Of "LWP::UserAgent", -lazy, -as => "MyUA";
+   
+           if (some_unlikely_condition()) {
+              MyUA->new->post( ... );
+           }
+           else {
+              # we don't need MyUA, so why bother generating the subclass.
+           }
+
+        Even the parent class isn't loaded until necessary.
+
   Run-Time Usage
     To create a subclass at compile-time, use the following syntax:
 
@@ -115,7 +130,7 @@ DESCRIPTION
     Subclass::Of` is called with no import list.
 
     The options supported are the same as with compile-time usage, except
-    `-as` is ignored. (No alias is generated.)
+    `-as` and `-lazy` are ignored. (No alias is generated.)
 
     The return value of `subclass_of` is the name of the class as a string.
 
@@ -168,7 +183,7 @@ AUTHOR
     Toby Inkster <tobyink@cpan.org>.
 
 COPYRIGHT AND LICENCE
-    This software is copyright (c) 2013 by Toby Inkster.
+    This software is copyright (c) 2013, 2017 by Toby Inkster.
 
     This is free software; you can redistribute it and/or modify it under the
     same terms as the Perl 5 programming language system itself.

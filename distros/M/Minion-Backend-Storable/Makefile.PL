@@ -25,7 +25,7 @@ WriteMakefile(
   CONFIGURE_REQUIRES => {'ExtUtils::MakeMaker' => 6.3},
   PREREQ_PM          => {
     Mojolicious => 6.3,
-    Minion => 5
+    Minion => 6.05
   },
   test               => {TESTS => 'test/*.t'}
 );

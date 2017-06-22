@@ -1,5 +1,11 @@
 Revision history for Module-Reader
 
+0.003003 - 2017-06-21
+  - fix EACCES handling to match the current perl
+  - fix raw file handle access for unopened files
+  - call @INC hooks for ./, ../, and / paths if they weren't found directly
+  - add handling for a string reference prefix return from a hook
+
 0.003002 - 2016-12-14
   - releasing as stable
 

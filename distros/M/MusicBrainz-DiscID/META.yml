@@ -1,24 +1,20 @@
 ---
-name: MusicBrainz-DiscID
-version: 0.03
+abstract: 'Perl interface for the MusicBrainz libdiscid library'
 author:
-  - 'Nicholas J. Humfrey <njh@aelius.com>'
-abstract: Perl interface for the MusicBrainz libdiscid library
+  - 'Nicholas J. Humfrey'
+build_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
 license: gpl
-resources:
-  license: http://opensource.org/licenses/gpl-license.php
-requires:
-  Test: 1.00
-  Test::More: 0
-build_requires:
-  Module::Build: 0.20
-recommends:
-  Test::Pod: 1.00
-provides:
-  MusicBrainz::DiscID:
-    file: lib/MusicBrainz/DiscID.pm
-    version: 0.03
-generated_by: Module::Build version 0.280801
 meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MusicBrainz-DiscID
+no_index:
+  directory:
+    - t
+    - inc
+resources:
+  bugtracker: https://github.com/njh/perl-musicbrainz-discid/issues
+  repository: https://github.com/njh/perl-musicbrainz-discid.git
+version: 0.04

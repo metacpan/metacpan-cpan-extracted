@@ -1,0 +1,28 @@
+[%- USE scalar -%]
+[%- WRAPPER site_wrapper.html 
+  title = 'Authors'
+-%]
+[%- SET 
+ p      = c.req.query_params
+ p.only = 'authors'
+ result = list_users( p )
+ users  = result.rows
+-%]
+
+  <div class="blog-post">
+  
+    <ul>
+      [% FOREACH user IN users %]
+        <li>
+          <a href="../list?username=[% user.username %]">[% user.username %]</a> 
+        </li>
+      [% END %]
+    </ul>
+    
+    [% IF result.total == 0 %]
+      <h4>No authors found.</h4>
+    [% END %]
+  
+  </div>
+
+[% END %]

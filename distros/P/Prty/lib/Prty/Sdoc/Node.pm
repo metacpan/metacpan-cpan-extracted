@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.107;
+our $VERSION = 1.108;
 
 use Prty::Array;
 use Prty::Converter;
@@ -845,7 +845,7 @@ sub tableOfContents {
 
 =head1 VERSION
 
-1.107
+1.108
 
 =head1 AUTHOR
 

@@ -1,5 +1,8 @@
 Revision history for perl distribution App-prowess
 
+0.05 2017-06-20T00:24:42+0200
+ - Fix unit tests: "'.' is no longer in @INC at ..."
+
 0.04 2016-10-02T20:11:39+0200
  - Ignore dotfiles and backup files in the watch list #3
 

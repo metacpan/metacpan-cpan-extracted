@@ -1,3 +1,8 @@
+2017-06-16 v0.2613 pjacklam
+
+ * Fix problem with second operand being changed in multiplication (CPAN RT
+   #121139).
+
 2017-03-01 v0.2612 pjacklam
 
  * Improve the logic in blog() to determine how to call objectify(). The old,

@@ -1,7 +1,6 @@
 
 package Lab::Instrument::TRMC2;
-our $VERSION = "3.543";
-
+$Lab::Instrument::TRMC2::VERSION = '3.550';
 use strict;
 use warnings;
 use Lab::Instrument;
@@ -60,6 +59,10 @@ sub TRMC2off {
     $mounted = 0;
 }
 
+sub set_heatercontrol {
+
+}
+
 sub TRMC2_Heater_Control_On {
 
     # Switch the Heater Control (The coupling heater and set point NOT the heater switch in the main menu)
@@ -95,6 +98,10 @@ sub TRMC2_get_SetPoint {
     return $value[0];
 }
 
+sub set_T {
+    return TRMC2_set_SetPoint(@_);
+}
+
 sub TRMC2_set_SetPoint {
     my $self       = shift;
     my $Setpoint   = shift;
@@ -119,6 +126,10 @@ sub TRMC2_Set_T {
         $val = RemoveFrenchComma($val);
     }
     return $value[0];
+}
+
+sub get_value {
+    return TRMC2_get_PV(@_);
 }
 
 sub TRMC2_get_PV {

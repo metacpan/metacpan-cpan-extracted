@@ -22,7 +22,7 @@ our @EXPORT = qw(cetak cetak_r cetak_pre);
 
 # Define Version :
 # ---------------------------------------------------------------- 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 # Create Subroutine for Get OS Server Information :
 # ------------------------------------------------------------------------
@@ -35,21 +35,21 @@ sub os_server_info {
     # Scalar for placing result :
     # ----------------------------------------------------------------
     my $data = undef;
-    # ----------------------------------------------------------------
+
     # Check IF $server_signature match "Win32" :
-    # ----------------------------------------------------------------
+
     if ($server_signature =~ m/win32/) {
         $data = 'mswin';
     }
     
     # Check IF $server_signature match "unix" :
-    # ----------------------------------------------------------------
+
     elsif ($server_signature =~ m/unix|debian|ubuntu|centos/) {
         $data = 'unix';
     }
     
     # Check IF $server_signature match unknown :
-    # ----------------------------------------------------------------
+
     else {
         $data = 'other';
     }

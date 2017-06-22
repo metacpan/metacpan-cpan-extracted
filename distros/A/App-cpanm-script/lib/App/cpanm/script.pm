@@ -1,7 +1,7 @@
 package App::cpanm::script;
 
-our $DATE = '2016-11-02'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2017-06-17'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 1;
 
@@ -19,7 +19,7 @@ App::cpanm::script - Install modules from CPAN (via script name)
 
 =head1 VERSION
 
-This document describes version 0.001 of App::cpanm::script (from Perl distribution App-cpanm-script), released on 2016-11-02.
+This document describes version 0.002 of App::cpanm::script (from Perl distribution App-cpanm-script), released on 2017-06-17.
 
 =head1 DESCRIPTION
 
@@ -57,7 +57,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

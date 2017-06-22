@@ -1,5 +1,5 @@
-=== README for String-Print version 0.14
-=   Generated on Mon Mar 10 16:11:33 2014 by OODoc 2.01
+=== README for String-Print version 0.90
+=   Generated on Wed Jun 14 11:48:07 2017 by OODoc 2.02
 
 There are various ways to install this module:
 
@@ -9,16 +9,16 @@ There are various ways to install this module:
  (2) if you use Windows, have a look at http://ppm.activestate.com/
 
  (3) if you have downloaded this module manually (as root/administrator)
-       gzip -d String-Print-0.14.tar.gz
-       tar -xf String-Print-0.14.tar
-       cd String-Print-0.14
+       gzip -d String-Print-0.90.tar.gz
+       tar -xf String-Print-0.90.tar
+       cd String-Print-0.90
        perl Makefile.PL
        make          # optional
        make test     # optional
        make install
 
 For usage, see the included manual-pages or
-    http://search.cpan.org/dist/String-Print-0.14/
+    http://search.cpan.org/dist/String-Print-0.90/
 
 Please report problems to
     http://rt.cpan.org/Dist/Display.html?Queue=String-Print

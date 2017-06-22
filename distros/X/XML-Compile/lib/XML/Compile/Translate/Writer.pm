@@ -5,7 +5,7 @@
  
 package XML::Compile::Translate::Writer;
 use vars '$VERSION';
-$VERSION = '1.56';
+$VERSION = '1.57';
 
 use base 'XML::Compile::Translate';
 
@@ -787,7 +787,7 @@ sub makeFacetsList
     sub { my ($doc, $v) = @_;
         defined $v or return undef;
         $_->($v) for @l;
-        my $list = join ' ', map {$st->($doc, $_)} ref $v eq 'ARRAY' ? @$v : $v;
+        my $list = join ' ', map $st->($doc, $_), ref $v eq 'ARRAY' ? @$v : $v;
         defined $list && length $list or return;
         do { $list = $_->($list) } for @e;
         $list;
@@ -795,14 +795,16 @@ sub makeFacetsList
 }
 
 sub makeFacets
-{   my ($self, $path, $st, $info, @do) = @_;
-    @do or return $st;
-    sub { defined $_[1] or return undef;
-          my $v = $st->(@_);
-          for(reverse @do)
-          { defined $v or return (); $v = $_->($v) }
-          $v;
-        };
+{   my ($self, $path, $st, $info, $early, $late) = @_;
+    @$early || @$late or return $st;
+    sub { my ($doc, $v) = @_;
+        defined $v or return undef;
+		$v = $_->($v) for @$late;
+        $v = $st->($doc, $v);
+		defined $v or return undef;
+        $v = $_->($v) for @$early;
+        $v;
+    };
 }
 
 sub makeUnion

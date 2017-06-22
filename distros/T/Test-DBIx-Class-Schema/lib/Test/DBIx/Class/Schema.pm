@@ -3,7 +3,7 @@ package Test::DBIx::Class::Schema;
 {
   $Test::DBIx::Class::Schema::DIST = 'Test-DBIx-Class-Schema';
 }
-$Test::DBIx::Class::Schema::VERSION = '1.0.11';
+$Test::DBIx::Class::Schema::VERSION = '1.0.12';
 # vim: ts=8 sts=4 et sw=4 sr sta
 use strict;
 use warnings;
@@ -102,7 +102,7 @@ sub _test_normal_methods {
     my @proxied;
     foreach my $method_type (@std_method_types) {
         SKIP: {
-            if (not @{ $self->{methods}{$method_type} }) {
+            if (not exists $self->{methods}{$method_type} or not @{ $self->{methods}{$method_type} }) {
                 skip qq{no $method_type methods}, 1;
             }
 
@@ -249,28 +249,34 @@ sub _test_unexpected_normal_methods {
     };
 
     foreach my $method_type (sort keys %{$set}) {
-        my @diff = $self->_diff_arrays(
-            $self->{methods}->{$method_type},
-            $set->{$method_type},
-        );
+        SKIP: {
+            if (not exists $self->{methods}->{$method_type} or not @{ $self->{methods}->{$method_type} }) {
+                skip qq{no $method_type methods}, 1;
+            }
 
-        my $plural = (scalar @diff == 1) ? '' : 's';
-        my $message =
-            qq{'$method_type' method${plural} defined in }
-            . $self->{moniker}
-            . ' but untested: '
-            . join(', ',@diff);
-
-        if ($self->{test_missing}) {
-            is_deeply(
-                \@diff,
-                [],
-                "All known $method_type method${plural} defined in test"
-            ) || diag $message;
-        }
-        else {
-            if (scalar @diff) {
-               diag $message;
+            my @diff = $self->_diff_arrays(
+                $self->{methods}->{$method_type},
+                $set->{$method_type},
+            );
+    
+            my $plural = (scalar @diff == 1) ? '' : 's';
+            my $message =
+                qq{'$method_type' method${plural} defined in }
+                . $self->{moniker}
+                . ' but untested: '
+                . join(', ',@diff);
+    
+            if ($self->{test_missing}) {
+                is_deeply(
+                    \@diff,
+                    [],
+                    "All known $method_type method${plural} defined in test"
+                ) || diag $message;
+            }
+            else {
+                if (scalar @diff) {
+                   diag $message;
+                }
             }
         }
     }
@@ -306,7 +312,7 @@ Test::DBIx::Class::Schema - DBIx::Class schema sanity checking tests
 
 =head1 VERSION
 
-version 1.0.11
+version 1.0.12
 
 =head1 SYNOPSIS
 
@@ -405,6 +411,11 @@ If you are running aggregated tests you will need to add
 
 to your top-level script.
 
+If you are running under L<Test::Class::Moose> or L<Test::Class> you will need to
+disable this behaviour manually as there is no way to detect it. To do that,
+set C<$ENV{TEST_AGGREGATE} = 1> before calling C<run_tests> or your test suite
+might blow up.
+
 =head1 DESCRIPTION
 
 It's really useful to be able to test and confirm that DBIC classes have and
@@ -429,7 +440,7 @@ L<Test::Aggregate>
 
 ### master
 
-[![Build status](https://badge.buildkite.com/c8793ab59e31d982dd759cadfb66a308d5278f21cb707d8822.svg?branch=master)](https://buildkite.com/chizography/test-dbix-class-schema)
+[![Build Status](https://travis-ci.org/chiselwright/test-dbix-class-schema.svg?branch=master)](https://travis-ci.org/chiselwright/test-dbix-class-schema)
 
 =end markdown
 

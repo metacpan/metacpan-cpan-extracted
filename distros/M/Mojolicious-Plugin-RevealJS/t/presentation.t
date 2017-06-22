@@ -48,8 +48,9 @@ $t->get_ok('/')
 
 $t->get_ok('/reveal/nested_route')
   ->status_is(200)
-  ->element_exists('link[href="/revealjs/css/reveal.css"]')
-  ->element_exists('script[src="/revealjs/lib/js/head.min.js"]');
+  ->element_exists('base[href="/"]')
+  ->element_exists('link[href="revealjs/css/reveal.css"]')
+  ->element_exists('script[src="revealjs/lib/js/head.min.js"]');
 
 done_testing;
 

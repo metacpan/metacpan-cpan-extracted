@@ -1,5 +1,20 @@
 Revision history for Perl extension Regexp::Assemble.
 
+0.38  2017-06-20T08:51:00
+	- Fix test prereqs; pod tests moved to xt (RT#122136, RT#122137)
+		Many thanx to Karen Etheridge for these patches.
+		Note: I (Ron) have no idea where the version 2.07 originally comes from, although I have
+		seen it before. It was not in the very first distro I got my hands on. Anyway, I've
+		reverted Karen's patch to 0.38 to match the current sequence of version #s. Apart from
+		that, all these fine improvements are hers. If this version # causes difficulties, I'll
+		just bump it to 2.08.
+	- Adopt new repo structure. For details, see
+		http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html. Specifically:
+		o Delete MANIFEST and META.yml, and hereafter auto-generate them.
+		o Modernize .gitignore and MANIFEST.SKIP.
+		o The code says Perl licence but the LICENCE file says Artistic, so replace LICENCE file
+			with LICENSE (so spelled), which says Perl.
+
 0.37  2016-04-18T08:51:00
 	- No code changes.
 	- Accept pull request from monsieurp to add a LICENCE (sic, see below) file. With thanx.

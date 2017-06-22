@@ -1,5 +1,8 @@
 Revision history for LWP-UserAgent-Throttled
 
+0.06	Tue Jun 13 12:58:19 EDT 2017
+	Fixed testing on machines that are slow so throttling doesn't occur
+
 0.05	Tue May 30 08:19:29 EDT 2017
 	Fixed t/request.t for https test
 

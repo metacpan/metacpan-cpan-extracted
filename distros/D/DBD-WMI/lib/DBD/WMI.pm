@@ -6,7 +6,7 @@ use DBI;
 use vars qw($ATTRIBUTION $VERSION);
 
 $ATTRIBUTION = 'DBD::WMI by Max Maischein <dbd-wmi@corion.net>';
-$VERSION = '0.07';
+$VERSION = '0.08';
 
 =head1 NAME
 
@@ -28,7 +28,7 @@ through the DBI.
 
   $sth->execute();
   while (my @row = $sth->fetchrow) {
-    my $proc = $row->[0];
+    my $proc = $row[0];
     print join "\t", $proc->{Caption}, $proc->{ExecutablePath} || "<system>";
     # $proc->Terminate();
     print "\n";
@@ -425,7 +425,7 @@ L<https://perlmonks.org/>.
 
 Please report bugs in this module via the RT CPAN bug queue at
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=DBD-WMI>
-or via mail to L<www-mechanize-phantomjs-Bugs@rt.cpan.org>.
+or via mail to L<dbd-wmi-Bugs@rt.cpan.org>.
 
 =head1 AUTHOR
 

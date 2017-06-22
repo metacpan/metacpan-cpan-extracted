@@ -3,7 +3,8 @@ package Cassandra::Client::Policy::Throttle::Adaptive;
 use 5.010;
 use strict;
 use warnings;
-use Time::HiRes ();
+use Time::HiRes qw/CLOCK_MONOTONIC/;
+use Ref::Util qw/is_blessed_ref/;
 
 sub new {
     my ($class, %args)= @_;
@@ -19,7 +20,7 @@ sub new {
 
 sub _process_window {
     my ($self)= @_;
-    my $now= Time::HiRes::time;
+    my $now= Time::HiRes::clock_gettime(CLOCK_MONOTONIC);
     while (@{$self->{window}} && $self->{window}[0][0] < $now) {
         my $entry= shift @{$self->{window}};
         $self->{window_total}--;
@@ -42,8 +43,8 @@ sub should_fail {
 sub count {
     my ($self, $error, $force_error)= @_;
     $self->{window_total}++;
-    my $success= !(ref($error) && $error->{is_timeout}) && !$force_error;
-    push @{$self->{window}}, [ Time::HiRes::time()+$self->{time}, $success ];
+    my $success= !(is_blessed_ref($error) && $error->{is_timeout}) && !$force_error;
+    push @{$self->{window}}, [ Time::HiRes::clock_gettime(CLOCK_MONOTONIC)+$self->{time}, $success ];
     $self->{window_success}++ if $success;
     return;
 }

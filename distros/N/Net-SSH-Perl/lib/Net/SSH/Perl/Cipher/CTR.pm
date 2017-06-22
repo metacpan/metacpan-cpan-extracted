@@ -20,22 +20,15 @@ sub encrypt {
     while (length $data) {
         my $in = substr($data, 0, $size, '');
         $in ^= $ctr->{cipher}->encrypt($iv);
-        $iv = $ctr->_increment($iv);
+        for my $i (1..$size) {
+            my $num = (unpack('C', substr($iv,-$i,1)) + 1) & 0xff;
+            substr($iv,-$i,1,pack('C',$num));
+            last if $num;
+        }
         $retval .= $in;
     }
     $ctr->{iv} = $iv;
     $retval;
-}
-
-sub _increment {
-    my $ctr = shift;
-    my $iv = shift;
-    for my $i (1..$ctr->{cipher}->blocksize) {
-        my $num = (unpack('C', substr($iv,-$i,1)) + 1) & 0xff;
-        substr($iv,-$i,1,pack('C',$num));
-        last if $num;
-    }
-    $iv
 }
 
 sub decrypt { shift->encrypt(@_) }

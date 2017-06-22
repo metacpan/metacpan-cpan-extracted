@@ -41,6 +41,8 @@ my $swagger_types = {
     'VerticalAlignment' => 'string',
     'HorizontalAlignment' => 'string',
     'BorderCollection' => 'ARRAY[Border]',
+    'BackgroundThemeColor' => 'ThemeColor',
+    'ForegroundThemeColor' => 'ThemeColor',
     'link' => 'Link'
 };
 
@@ -66,6 +68,8 @@ my $attribute_map = {
     'VerticalAlignment' => 'VerticalAlignment',
     'HorizontalAlignment' => 'HorizontalAlignment',
     'BorderCollection' => 'BorderCollection',
+    'BackgroundThemeColor' => 'BackgroundThemeColor',
+    'ForegroundThemeColor' => 'ForegroundThemeColor',
     'link' => 'link'
 };
 
@@ -115,6 +119,10 @@ sub new {
         'HorizontalAlignment' => $args{'HorizontalAlignment'}, 
         #
         'BorderCollection' => $args{'BorderCollection'}, 
+        #	
+        'BackgroundThemeColor' => $args{'BackgroundThemeColor'}, 
+        #	
+        'ForegroundThemeColor' => $args{'ForegroundThemeColor'}, 
         #
         'link' => $args{'link'}
     }; 

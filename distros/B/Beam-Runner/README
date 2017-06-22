@@ -6,7 +6,7 @@ configuration files and then execute them. This also allows easy
 discovery of configuration files and objects, and allows you to document
 your objects for your users.
 
-  Create a Task
+  Tasks
 
 A task is an object that consumes the Beam::Runnable role. This role
 requires only a "run()" method be implemented in the class. This "run()"

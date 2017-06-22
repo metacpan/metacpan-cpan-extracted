@@ -1,7 +1,7 @@
 vim:tw=80:ft=text:ai
 
-Business::KontoCheck version 5.7
-================================
+Business::KontoCheck version 5.10
+=================================
 
 This module checks the validity of German and Austrian Bank Account Numbers.
 All currently defined test methods by Deutsche Bundesbank (currently: 00 to
@@ -52,7 +52,7 @@ This module requires a C compiler and the zlib to build the library.
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2007-2015 by Michael Plugge
+Copyright (C) 2007-2016 by Michael Plugge
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself, either Perl version 5.8.8 or, at your option,

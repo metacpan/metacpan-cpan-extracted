@@ -1,4 +1,4 @@
-PerlIO/subfile version 0.08
+PerlIO/subfile version 0.09
 ===========================
 
 A layer for the PerlIO system to limit you to subsection of a file.
@@ -42,4 +42,4 @@ You may distribute this work under the terms of either the GNU General
 Public License or the Artistic License, as specified in perl's README
 file.
 
-Copyright © 2001-2003,2006 Nicholas Clark
+Copyright Â© 2001-2003,2006,2017 Nicholas Clark

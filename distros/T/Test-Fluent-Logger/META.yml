@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.9, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Minilla/v3.0.11, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,13 +26,13 @@ no_index:
 provides:
   Test::Fluent::Logger:
     file: lib/Test/Fluent/Logger.pm
-    version: '0.02'
+    version: '0.03'
 requires:
-  Fluent::Logger: '0.19'
+  Fluent::Logger: '0'
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/moznion/p5-Test-Fluent-Logger/issues
   homepage: https://github.com/moznion/p5-Test-Fluent-Logger
   repository: git://github.com/moznion/p5-Test-Fluent-Logger.git
-version: '0.02'
+version: '0.03'
 x_authority: cpan:MOZNION

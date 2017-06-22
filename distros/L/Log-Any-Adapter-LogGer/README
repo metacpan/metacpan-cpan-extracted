@@ -1,0 +1,13 @@
+SYNOPSIS
+
+     use Log::Any::Adapter;
+     Log::Any::Adapter->set('LogGer');
+
+DESCRIPTION
+
+SEE ALSO
+
+    Log::ger
+
+    Log::Any
+

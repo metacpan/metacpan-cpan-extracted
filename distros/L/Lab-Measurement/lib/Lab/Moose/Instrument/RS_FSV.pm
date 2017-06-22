@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::RS_FSV;
-
+$Lab::Moose::Instrument::RS_FSV::VERSION = '3.550';
 use 5.010;
 
 use PDL::Core qw/pdl cat/;
@@ -11,7 +11,6 @@ use Lab::Moose::Instrument qw/timeout_param precision_param/;
 use Carp;
 use namespace::autoclean;
 
-our $VERSION = '3.543';
 
 extends 'Lab::Moose::Instrument';
 

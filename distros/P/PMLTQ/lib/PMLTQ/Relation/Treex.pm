@@ -1,6 +1,6 @@
 package PMLTQ::Relation::Treex;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::Treex::VERSION = '1.3.1';
+$PMLTQ::Relation::Treex::VERSION = '1.3.2';
 # ABSTRACT: Treex user defined relations
 
 use warnings;
@@ -61,7 +61,7 @@ PMLTQ::Relation::Treex - Treex user defined relations
 
 =head1 VERSION
 
-version 1.3.1
+version 1.3.2
 
 =head1 AUTHORS
 

@@ -1,0 +1,76 @@
+{
+   "abstract" : "Catmandu modules to work with the Web Of Science web services",
+   "author" : [
+      "Nicolas Steenlant <nicolas.steenlant@ugent.be>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Catmandu-WoS",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.17",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catmandu" : "1.0507",
+            "MIME::Base64" : "0",
+            "XML::Compile::SOAP11" : "0",
+            "XML::Compile::Transport::SOAPHTTP" : "0",
+            "XML::Compile::WSDL11" : "3.06",
+            "XML::LibXML::Simple" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/LibreCat/Catmandu-WoS/issues"
+      },
+      "homepage" : "https://github.com/LibreCat/Catmandu-WoS",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/LibreCat/Catmandu-WoS.git",
+         "web" : "https://github.com/LibreCat/Catmandu-WoS"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+}
+

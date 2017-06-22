@@ -1,3 +1,9 @@
+0.13 2017-06-15
+        - Added relative redirect method.
+
+0.12 2016-09-09
+        - Made files Kwalitee compliant.
+
 0.11 2016-09-01
         - Fixed dependency to Mojolicious to deal with issues
           from cpantesters.

@@ -1,0 +1,19 @@
+DESCRIPTION
+
+    The standard DeploymentHandler storage only stores the version of the
+    schema. This means you can't deploy multiple DH-handled DBIC schemata
+    into the same database.
+
+    This module has an extra column to store the schema that it is
+    deploying as well as the version.
+
+    To use it, you'll have to create a new subclass of
+    DBIx::Class::DeploymentHandler::Dad that uses this module instead of
+    the standard one, and instantiate that in your script instead.
+
+SEE ALSO
+
+    This module implements
+    DBIx::Class::DeploymentHandler::HandlesVersionStorage and is similar to
+    DBIx::Class::DeploymentHandler::VersionStorage::Standard.
+

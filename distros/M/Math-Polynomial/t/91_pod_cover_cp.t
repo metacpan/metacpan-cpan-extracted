@@ -1,8 +1,6 @@
-# Copyright (c) 2007-2010 Martin Becker.  All rights reserved.
+# Copyright (c) 2007-2017 Martin Becker.  All rights reserved.
 # This package is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-#
-# $Id: 91_pod_cover_cp.t 4 2010-09-26 00:31:09Z demetri $
 
 # Check for POD coverage.
 # This is a test for the distribution maintainer.

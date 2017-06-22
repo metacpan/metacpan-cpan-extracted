@@ -57,6 +57,7 @@ share/app/lib/Dwarf/Module/SocialMedia/Twitter.pm
 share/app/lib/Dwarf/Module/SocialMedia/Weibo.pm
 share/app/lib/Dwarf/Plugin/AnyEvent/Redis.pm
 share/app/lib/Dwarf/Plugin/CGI/Session.pm
+share/app/lib/Dwarf/Plugin/CGI/SpeedyCGI.pm
 share/app/lib/Dwarf/Plugin/CORS.pm
 share/app/lib/Dwarf/Plugin/CSRFDefender.pm
 share/app/lib/Dwarf/Plugin/Cache/Memcached/Fast.pm
@@ -96,7 +97,9 @@ share/app/lib/Dwarf/Util/Xslate.pm
 share/app/lib/Dwarf/Validator.pm
 share/app/lib/Dwarf/Validator/Constraint.pm
 share/app/lib/Dwarf/Validator/Constraint/Default.pm
+share/app/lib/Dwarf/Validator/HashRef.pm
 share/app/lib/Dwarf/Validator/NullValue.pm
+share/app/lib/Dwarf/Validator/PlackRequest.pm
 share/app/lib/Dwarf/Validator/Upload.pm
 share/app/script/generate.pl
 share/app/script/load_schema.sh
@@ -129,6 +132,7 @@ share/app/t/00_dwarf/validator/006_array.t
 share/app/t/00_dwarf/validator/007_file.t
 share/app/t/00_dwarf/validator/008_upload.t
 share/app/t/00_dwarf/validator/009_constraints.t
+share/app/t/00_dwarf/validator/010_hashref.t
 share/app/t/01_basic/01_compile.t
 share/app/t/01_basic/02_db.t
 share/app/t/01_basic/03_xslate.t

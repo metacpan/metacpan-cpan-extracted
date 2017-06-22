@@ -16,7 +16,7 @@ my %hash  = (
 show $scalar;
 
 {
-    no Show;
+#    no Show;
 
     show @array;
 
@@ -30,7 +30,7 @@ show
     $hash{b}
     ];
 
-show # from here
+show # wait for it...
      do { 'more'; };
 
 warn 'done at line 36';

@@ -101,3 +101,28 @@ Revision history for Control-CLI
 	* Added callback argument to connect() which can be used to verify the SSH host key against a list of known host keys
 	* Added errmsg_format() method and argument to errmsg(); it is now possible to specify the format of error messages
 	* Added host() method to retrieve hostname or IP address which was supplied to connect()
+
+2.04	2017-06-14
+	* Added functionality to detect Query Device Status escape sequence within the received data stream and automatically
+	  send back Report Device OK escape sequence; this can be activated via new report_query_status() method
+	* Added close_logs argument to disconnect() and close() methods to allow all logging filehandles to be closed on
+	  disconnect
+	* On a serial port connection the class destructor could result in error:
+	  uninitialized value in subroutine entry at /lib/Win32API/CommPort.pm line 247
+	* Returned error messages, in any errmsg_format, now always start with upper case
+	* Debug level bit-2 now produces a lot more debug for issues relating to Device::SerialPort & Win32::SerialPort 
+	* Module now correctly detects underlying failures from Win32::SerialPort & Device::SerialPort to set the desired
+	  baudrate, handshake, parity, databits and stopbits and will now perform the configured error mode action
+	* Added ForceBaud argument to connect() and change_baudrate() methods as a workaround for Win32::SerialPort module
+	  bug https://rt.cpan.org/Ticket/Display.html?id=120068 which would otherwise result in this module not being able
+	  to set the desired baudrate on some USB Serial ports
+	* Non-blocking read method was no longer working correctly with newest versions of Net::SSH2 (0.63) and libssh2
+	  (1.7.0) due to some backwards incompatible changes made in Net::SSH2; the fix now works with both new and old
+	  versions of Net::SSH2
+	* Net::SSH2 version 0.58 error method suffers from a memory leak; this is fixed with latest Net::SSH2 version 0.63
+	  and libssh2 version 1.7.0. The eof method from this class, which relies on the Net::SSH2 error method, has been
+	  changed to reduce in half the number of calls made to the Net::SSH2 error method (in case an older version of
+	  Net::SSH2 is being used)
+
+2.05	2017-06-16
+	* Same as version 2.04; bumped up the version to fix a problem with the bundled control-cli.t test script

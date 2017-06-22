@@ -19,7 +19,7 @@ WriteMakefile(
 }
 ,
   PREREQ_PM => {
-  'JSON::Validator' => '0.97',
+  'JSON::Validator' => '0.99',
   'Mojolicious' => '6.40'
 }
 ,

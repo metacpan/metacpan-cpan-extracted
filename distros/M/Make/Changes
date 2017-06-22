@@ -1,3 +1,9 @@
+Changes in 1.1.4
+    Fix META information to modernize Makefile.PL and META.JSON. (Chase Whitener)
+    Remove .git info from the build. (Chase Whitener)
+    Split things out into their proper module files. (Chase Whitener)
+Changes in 1.1.3
+    new pod test, pod fixes, MANIFEST fix (Lisa Hare)
 Changes in 1.1.2
     fixed declaration of minimum Test::Compile version
         a number of CPANtesters failures occured because

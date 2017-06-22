@@ -27,5 +27,4 @@ sub run_tests {
     ok($imap->select("testing2"), 6 );
 }   
 
-do "t/test_runner.pm";
-
+do "./t/test_runner.pm";

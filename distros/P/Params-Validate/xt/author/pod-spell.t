@@ -11,6 +11,7 @@ add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 API
+Andy
 Bessarabov
 CPAN
 Choroba
@@ -21,6 +22,7 @@ DROLSKY's
 Dave
 Etheridge
 GLOBREF
+Grundman
 Ilya
 Ivan
 Karen
@@ -46,6 +48,7 @@ ValidateXS
 Vincent
 XS
 and
+andyg
 autarch
 baz
 choroba

@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::VNASweep;
-
+$Lab::Moose::Instrument::VNASweep::VERSION = '3.550';
 use Moose::Role;
 use Moose::Util::TypeConstraints;
 use MooseX::Params::Validate;
@@ -12,7 +12,6 @@ use PDL::Lite;
 use PDL::Core qw/pdl cat/;
 use namespace::autoclean;
 
-our $VERSION = '3.543';
 
 with qw(
     Lab::Moose::Instrument::Common

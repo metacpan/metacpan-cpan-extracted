@@ -91,6 +91,8 @@ my %depencencies = (
     'LinuxGpib' => ['LinuxGPIB'],
 
     'Lab::VISA' => [qw{VISA Lab/Bus/IsoBus.pm Lab/Connection/IsoBus.pm}],
+
+    'Lab::Zhinst' => ['Zhinst'],
 );
 
 for my $module ( keys %depencencies ) {

@@ -1,6 +1,7 @@
 package WWW::Google::PageSpeedOnline::Advise;
 
-$WWW::Google::PageSpeedOnline::Advise::VERSION = '0.21';
+$WWW::Google::PageSpeedOnline::Advise::VERSION   = '0.22';
+$WWW::Google::PageSpeedOnline::Advise::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
 
@@ -8,7 +9,7 @@ WWW::Google::PageSpeedOnline::Advise - Placeholder for the advise of L<WWW::Goog
 
 =head1 VERSION
 
-Version 0.21
+Version 0.22
 
 =cut
 
@@ -40,7 +41,7 @@ Mohammad S Anwar, C<< <mohammad.anwar at yahoo.com> >>
 
 =head1 REPOSITORY
 
-L<https://github.com/Manwar/WWW-Google-PageSpeedOnline>
+L<https://github.com/manwar/WWW-Google-PageSpeedOnline>
 
 =head1 BUGS
 

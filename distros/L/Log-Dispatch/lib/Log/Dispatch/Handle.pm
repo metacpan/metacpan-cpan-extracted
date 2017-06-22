@@ -3,7 +3,7 @@ package Log::Dispatch::Handle;
 use strict;
 use warnings;
 
-our $VERSION = '2.63';
+our $VERSION = '2.65';
 
 use Log::Dispatch::Types;
 use Params::ValidationCompiler qw( validation_for );
@@ -51,7 +51,7 @@ Log::Dispatch::Handle - Object for logging to IO::Handle classes
 
 =head1 VERSION
 
-version 2.63
+version 2.65
 
 =head1 SYNOPSIS
 

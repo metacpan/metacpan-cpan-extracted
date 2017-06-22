@@ -8,7 +8,7 @@ use Data::Dumper;
 
 # Define Version :
 # ---------------------------------------------------------------- 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 # Subroutine for Error Handling MySQL Connection :
 # ------------------------------------------------------------------------

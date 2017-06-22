@@ -1,0 +1,123 @@
+[%- USE date(format = '%a, %d-%b-%Y') -%]
+[%- WRAPPER site_wrapper.html 
+  title = 'List'
+-%]
+[%- SET 
+ p      = c.req.query_params
+ result = list_posts( p )
+ posts  = result.rows
+-%]
+[% BLOCK simple_paging_controls %]
+  [% IF result.first_qs %]
+    <a style="padding-left:15px;" href="?[% result.first_qs %]" title="First Page"><b>&lt;&lt;</b></a>
+  [% ELSE %]
+    <a style="padding-left:15px;text-decoration:none;opacity:0.3;"><b>&lt;&lt;</b></a>
+  [% END %]
+  [% IF result.prev_qs %]
+    <a style="padding-left:15px;" href="?[% result.prev_qs %]" title="Previous Page"><b>&lt;</b></a>
+  [% ELSE %]
+    <a style="padding-left:15px;text-decoration:none;opacity:0.3;"><b>&lt;</b></a>
+  [% END %]
+  [% IF result.next_qs %]
+    <a style="padding-left:35px;" href="?[% result.next_qs %]" title="Next Page"><b>&gt;</b></a>
+  [% ELSE %]
+    <a style="padding-left:35px;text-decoration:none;opacity:0.3;"><b>&gt;</b></a>
+  [% END %]
+  [% IF result.last_qs %]
+    <a style="padding-left:15px;" href="?[% result.last_qs %]" title="Last Page"><b>&gt;&gt;</b></a>
+  [% ELSE %]
+    <a style="padding-left:15px;text-decoration:none;opacity:0.3;"><b>&gt;&gt;</b></a>
+  [% END %]
+[% END %]
+
+  <div class="blog-post">
+  
+  <div style="padding-bottom:5px;">
+  <h3>
+    [% IF p.search %]
+      Posts containing "[% p.search %]"
+        [% IF p.tag %] and [% END %]
+    [% END %]
+    [% IF p.tag %]Tagged "[% p.tag %]" [% END %]
+  </h3>
+  
+  [% IF result.params.username %]
+    <h3>written by [% result.params.username %]</h3>
+  [% END %]
+  
+  <h4>
+    [% IF result.total > 0 %]
+      [% result.start %] - [% result.end %] of [% result.total %] posts:
+    [% ELSE %]
+      No posts found.
+    [% END %]
+  </h4>
+  
+  <div>
+    
+    [% INCLUDE simple_paging_controls %]
+    
+    <span style="padding-left:35px;font-size:.8em;">Summaries 
+      <b>
+      [% IF result.params.summary %]
+        <a href="?[% result.this_qs %]&new_summary=0" title="Turn off">on</a>
+      [% ELSE %]
+        <a href="?[% result.this_qs %]&new_summary=1" title="Turn on">off</a>
+      [% END %]
+      </b>
+    </span>
+    
+  </div>
+  
+  
+  
+  </div>
+    <ul>
+      [% FOREACH Post IN posts %]
+        <li>
+          <a href="../post/[% Post.name %]">[% Post.title %]</a> 
+          <i style="padding-left:3px;opacity:0.6;font-size:.9em;"> 
+            [% date.format(Post.ts) %] <span style="font-size:.8em;">by 
+            <a href="/list?username=[% Post.author.username %]">[% Post.author.full_name %]</a></span>
+          </i>
+          
+          [% IF result.params.summary %]
+          <div style="font-size:0.7em;padding: 5px 0px 15px 5px;">
+            <table><tr>
+              [% IF Post.image_url %]
+                <td style="width:85px; vertical-align:top; padding-right:15px;">
+                  <img src="[% Post.image_url %]" style="max-width:100%;max-height:100%;" />
+                </td>
+              [% END %]
+              <td>
+                [% Post.summary %] ... <a href="../post/[% Post.name %]">read more</a> 
+              </td>
+            </tr></table>
+            
+          </div>
+          [% END %]
+          
+        </li>
+      [% END %]
+    </ul>
+    
+  </div>
+  
+  <div style="text-align:center;padding-bottom:10px;">
+    <div>
+      [% INCLUDE simple_paging_controls %]
+    </div>
+  
+    [%- SET page_choices = [5,10,20,50,100,200,500] -%]
+    Max results per page: &nbsp;&nbsp;[%- FOREACH size IN page_choices -%]
+      [% IF size == result.limit %]
+        <b>[% size %]</b>
+      [% ELSE %]
+        <a href="?[% result.this_qs %]&new_limit=[% size %]&new_page=1">[% size %]</a>
+      [% END %]
+      &nbsp;&nbsp;
+    [%- END -%]
+  </div>
+  
+
+[% END %]

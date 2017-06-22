@@ -7,7 +7,7 @@ use Text::Template;
 use HTML::Notebook::Style;
 use namespace::autoclean;
 
-our $VERSION = '0.003';    # VERSION
+our $VERSION = '0.004';    # VERSION
 
 =encoding utf-8
 

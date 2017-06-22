@@ -32,7 +32,7 @@ use Math::OEIS;
 # VERSION
 
 {
-  my $want_version = 9;
+  my $want_version = 10;
   is ($Math::OEIS::VERSION, $want_version,
       'VERSION variable');
   is (Math::OEIS->VERSION,  $want_version,

@@ -35,7 +35,7 @@
    "provides" : {
       "Control::CLI::AvayaData" : {
          "file" : "lib/Control/CLI/AvayaData.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       }
    },
    "release_status" : "stable",
@@ -44,5 +44,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "2.02"
+   "version" : "2.03"
 }

@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::Socket;
-
+$Lab::Moose::Connection::Socket::VERSION = '3.550';
 use 5.010;
 
 use Moose;
@@ -13,7 +13,6 @@ use Lab::Moose::Instrument qw/timeout_param/;
 
 use namespace::autoclean;
 
-our $VERSION = '3.543';
 
 has client => (
     is       => 'ro',

@@ -14,6 +14,7 @@ BEGIN {
     package Stuff;
 
     use Test::More;
+
     use Dios;
 
     method add_meaning($arg is alias, *@etc is alias) {

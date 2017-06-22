@@ -17,9 +17,8 @@ use Storable qw/
     /;
 
 my $gts = t::Server->new();
-$gts || plan skip_all => $t::Server::ERROR;
-
 my @job_servers = $gts->job_servers(int(rand(1) + 1));
+@job_servers || plan skip_all => $t::Server::ERROR;
 
 use_ok("Gearman::Client");
 

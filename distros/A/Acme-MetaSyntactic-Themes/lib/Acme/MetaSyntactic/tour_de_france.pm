@@ -2,7 +2,7 @@ package Acme::MetaSyntactic::tour_de_france;
 use strict;
 use Acme::MetaSyntactic::List;
 our @ISA = qw( Acme::MetaSyntactic::List );
-our $VERSION = '1.006';
+our $VERSION = '1.007';
 
 =encoding iso-8859-1
 
@@ -31,9 +31,10 @@ The winners from 1903 onwards are:
 
 =pod
 
-    2015   Chris Froome          GBR
+    2016   Christopher Froome    GBR
+    2015   Christopher Froome    GBR
     2014   Vincenzo Nibali       ITA
-    2013   Chris Froome          GBR
+    2013   Christopher Froome    GBR
     2012   Bradley Wiggins       GBR
     2011   Cadel Evans           AUS
     2010   Andy Schleck          LUX
@@ -153,6 +154,13 @@ Abigail
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2017-06-12 - v1.007
+
+Updated with the winner of the 2016 edition,
+published in Acme-MetaSyntactic-Themes version 1.050.
 
 =item *
 

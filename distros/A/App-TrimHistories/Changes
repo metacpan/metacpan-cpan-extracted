@@ -1,0 +1,32 @@
+0.005   2017-06-19 (PERLANCAR)
+
+	- [Bug][Regression] Forgot to enable log for CLI.
+
+
+0.004   2017-06-19 (PERLANCAR)
+
+        - No functional changes.
+
+        - Replace Log::Any with Log::ger.
+
+
+0.003   2017-06-17 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild with updated Perinci::CmdLine::Dump to show --dry-run
+          in the POD.
+
+
+0.002   2017-06-14 (PERLANCAR)
+
+	- [ux] Accept hourly/daily/weekly/monthly/yearly as period
+
+	- [ux] By default show dry-run message (at level warn).
+
+        - [doc] Add examples and add description.
+
+
+0.001   2017-06-14 (PERLANCAR)
+
+        - First release.

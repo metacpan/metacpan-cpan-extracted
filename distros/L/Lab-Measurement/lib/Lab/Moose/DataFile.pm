@@ -1,5 +1,5 @@
 package Lab::Moose::DataFile;
-
+$Lab::Moose::DataFile::VERSION = '3.550';
 use 5.010;
 use warnings;
 use strict;
@@ -18,7 +18,6 @@ use Carp;
 
 use namespace::autoclean;
 
-our $VERSION = '3.543';
 
 has folder => (
     is       => 'ro',

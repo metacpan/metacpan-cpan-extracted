@@ -8,11 +8,12 @@
 #########################################################################
 
 package Term::Clui;
-$VERSION = '1.57';   # help_text(), Delete in ask(), various bugs
+$VERSION = '1.72';   # replace $[ with 0
 my $stupid_bloody_warning = $VERSION;  # circumvent -w warning
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT = qw(ask_password ask confirm choose help_text edit sorry view inform);
+@EXPORT = qw(ask ask_password ask_filename confirm
+ choose help_text edit sorry view inform);
 @EXPORT_OK = qw(beep tiview back_up get_default set_default timestamp);
 %EXPORT_TAGS = (ALL => [@EXPORT,@EXPORT_OK]);
 
@@ -27,6 +28,32 @@ if ($@) {
 	eval 'require "Term/Size.pm"';
 	if ($@) { $have_Term_Size = 0; }
 }
+
+my $Eflite;
+my $Eflite_FH;  # open here at top-level so one sub can silence the previous
+my $Espeak;
+my $Espeak_PID;  # defined at top-level so one espeak can kill the previous
+my $SpeakUpSilentFile;   # 1.62
+if ($ENV{'CLUI_SPEAK'}) {  # 1.62 emacspeak not very relevant as a criterion
+	for my $d ('/sys/accessibility', '/proc') {
+		if (-w "$d/speakup/silent") {
+			$SpeakUpSilentFile = "$d/speakup/silent"; break;
+		}
+	}
+	$Eflite = &which('eflite');
+	$Espeak = &which('espeak');
+	if ($Eflite && !$Espeak) {   # 1.68 Espeak should be the default
+		if (open($Eflite_FH,'|-',$Eflite)) {
+			select((select($Eflite_FH), $| = 1)[0]); print $Eflite_FH q{};
+		} else {
+			warn "can't run $Eflite: $!\n";
+		}
+	} elsif (! $Espeak) {
+		warn("Term::Clui warning: CLUI_SPEAK set; "
+		. "but can't find eflite or espeak\n");
+	}
+}
+
 
 # use open ':locale';  # the open pragma was introduced in 5.8.6
 my $EncodingString = q{};
@@ -47,13 +74,15 @@ $KEY_DOWN  = 0402;
 $KEY_ENTER = "\r";
 $KEY_INSERT = 0525;
 $KEY_DELETE = 0524;
-$KEY_PPAGE = 0523;
-$KEY_NPAGE = 0522;
-$KEY_BTAB  = 0541;
+$KEY_HOME   = 0523;
+$KEY_END    = 0522;
+$KEY_PPAGE  = 0521;
+$KEY_NPAGE  = 0520;
+$KEY_BTAB   = 0541;
 my $AbsCursX = 0; my $AbsCursY = 0; my $TopRow = 0; my $CursorRow;
 my $LastEventWasPress = 0;  # in order to ignore left-over button-ups
 my %SpecialKey = map { $_, 1 } (   # 1.51, used by ask to ignore these
-	$KEY_UP, $KEY_LEFT, $KEY_RIGHT, $KEY_DOWN,
+	$KEY_UP, $KEY_LEFT, $KEY_RIGHT, $KEY_DOWN, $KEY_HOME, $KEY_END,
 	$KEY_PPAGE, $KEY_NPAGE, $KEY_BTAB, $KEY_INSERT, $KEY_DELETE
 );
 
@@ -66,7 +95,7 @@ sub puts   { my $s = join q{}, @_;
 	print TTY $s;
 }
 # could terminfo sgr0, bold, rev, cub1, cuu1, cuf1, cud1 ...
-sub attrset { my $attr = $_[$[];
+sub attrset { my $attr = $_[0];
 	if (! $attr) {
 		print TTY "\e[0m";
 	} else {
@@ -84,7 +113,7 @@ sub green    { print TTY "\e[32m"; }
 sub blue     { print TTY "\e[34m"; }
 sub violet   { print TTY "\e[35m"; }
 
-sub getc_wrapper { my $timeout = 0 + $_[$[];
+sub getc_wrapper { my $timeout = 0 + $_[0];
 	if ($have_Term_ReadKey) {
 		return Term::ReadKey::ReadKey($timeout, *TTYIN);
 	} else {
@@ -113,12 +142,24 @@ sub getch {
 		if ($c eq '5') { getc_wrapper(0); return($KEY_PPAGE); }
 		if ($c eq '6') { getc_wrapper(0); return($KEY_NPAGE); }
 		if ($c eq 'Z') { return($KEY_BTAB); }
+		if ($c eq 'O') {   # 1.68 Haiku wierdness, inherited from an old Suse
+			$c = getc_wrapper(0);
+			if ($c eq 'A') { return($KEY_UP); }    # 1.68
+			if ($c eq 'B') { return($KEY_DOWN); }  # 1.68
+			if ($c eq 'C') { return($KEY_RIGHT); } # 1.68
+			if ($c eq 'D') { return($KEY_LEFT); }  # 1.68
+			if ($c eq 'F') { return($KEY_END); }   # 1.68
+			if ($c eq 'H') { return($KEY_HOME); }  # 1.68
+			return($c);
+		}
 		if ($c eq '[') {
 			$c = getc_wrapper(0);
 			if ($c eq 'A') { return($KEY_UP); }
 			if ($c eq 'B') { return($KEY_DOWN); }
 			if ($c eq 'C') { return($KEY_RIGHT); }
 			if ($c eq 'D') { return($KEY_LEFT); }
+			if ($c eq 'F') { return($KEY_END); }   # 1.67
+			if ($c eq 'H') { return($KEY_HOME); }  # 1.67
             if ($c eq 'M') {   # mouse report - we must be in BYTES !
 				# http://invisible-island.net/xterm/ctlseqs/ctlseqs.html
 				my $event_type = ord(getc_wrapper(0))-32;
@@ -190,20 +231,20 @@ sub getch {
 	}
 }
 sub up    {
-	# if ($_[$[] < 0) { &down(0 - $_[$[]); return; }
-	print TTY "\e[A" x $_[$[]; $irow -= $_[$[];
+	# if ($_[0] < 0) { &down(0 - $_[0]); return; }
+	print TTY "\e[A" x $_[0]; $irow -= $_[0];
 }
 sub down  {
-	# if ($_[$[] < 0) { &up(0 - $_[$[]); return; }
-	print TTY "\n" x $_[$[]; $irow += $_[$[];
+	# if ($_[0] < 0) { &up(0 - $_[0]); return; }
+	print TTY "\n" x $_[0]; $irow += $_[0];
 }
 sub right {
-	# if ($_[$[] < 0) { &left(0 - $_[$[]); return; }
-	print TTY "\e[C" x $_[$[]; $icol += $_[$[];
+	# if ($_[0] < 0) { &left(0 - $_[0]); return; }
+	print TTY "\e[C" x $_[0]; $icol += $_[0];
 }
 sub left  {
-	# if ($_[$[] < 0) { &right(0 - $_[$[]); return; }
-	print TTY "\e[D" x $_[$[]; $icol -= $_[$[];
+	# if ($_[0] < 0) { &right(0 - $_[0]); return; }
+	print TTY "\e[D" x $_[0]; $icol -= $_[0];
 }
 sub goto { my $newcol = shift; my $newrow = shift;
 	if ($newcol == 0) { print TTY "\r" ; $icol = 0;
@@ -217,11 +258,14 @@ sub goto { my $newcol = shift; my $newrow = shift;
 # sub move { my ($ix,$iy) = @_; printf TTY "\e[%d;%dH",$iy+1,$ix+1; }
 
 my $InitscrAlreadyRun = 0;
-my $IsMouseMode = 0;
+my $IsMouseMode  = 0;
 my $WasMouseMode = 0;
+my $IsSpeakUpSilent  = 0;  # 1.62
+my $WasSpeakUpSilent = 0;  # 1.62
 my $Stty = q{};
 
 sub enter_mouse_mode {   # 1.50
+	if ($ENV{'CLUI_MOUSE'} eq 'OFF') { return 0; }   # 1.62
 	if ($IsMouseMode) {
 		warn "enter_mouse_mode but already IsMouseMode\r\n"; return 1 ;
 	}
@@ -235,6 +279,7 @@ sub enter_mouse_mode {   # 1.50
 	return 1;
 }
 sub leave_mouse_mode {   # 1.50
+	# if ($ENV{'CLUI_MOUSE'} =~ /off/i) { return 0; }   # 1.62
 	if (!$IsMouseMode) {
 		warn "leave_mouse_mode but not IsMouseMode\r\n"; return 1 ;
 	}
@@ -248,7 +293,31 @@ sub leave_mouse_mode {   # 1.50
 	return 1;
 }
 
-sub initscr {  my $mouse_mode = $_[$[];  # needed for mouse-handling
+sub enter_speakup_silent {   # 1.62
+	# echo 7 > /sys/accessibility/speakup/silent  if it exists
+	if (!$SpeakUpSilentFile) { return 0; }
+	if ($IsSpeakUpSilent) {
+		warn "enter_speakup_silent but already IsSpeakUpSilent\r\n"; return 1 ;
+	}
+	if (open(S, '>', $SpeakUpSilentFile)) { print S "7\n"; close S; }
+	$IsSpeakUpSilent = 1;
+	return 1;
+}
+sub leave_speakup_silent {   # 1.62
+	# echo 4 > /sys/accessibility/speakup/silent  if it exists
+	if (!$SpeakUpSilentFile) { return 0; }
+	if (!$IsSpeakUpSilent) {
+		warn "leave_speakup_silent but not IsSpeakUpSilent\r\n"; return 1 ;
+	}
+	if (open(S, '>', $SpeakUpSilentFile)) { print S "4\n"; close S; }
+	$IsSpeakUpSilent = 0;
+	return 1;
+}
+
+sub initscr { my %args = @_;
+	my $mouse_mode = $args{'mouse_mode'};          # for mouse-handling
+	if ($ENV{'CLUI_MOUSE'} eq 'OFF') { $mouse_mode = undef; }  # 1.62
+	my $speakup_silent = $args{'speakup_silent'};  # to silence SpeakUp
 	if ($InitscrAlreadyRun) {
 		$InitscrAlreadyRun++;
 		if (!$mouse_mode and $IsMouseMode) {
@@ -257,6 +326,12 @@ sub initscr {  my $mouse_mode = $_[$[];  # needed for mouse-handling
 			enter_mouse_mode() or return 0;
 		}
 		$WasMouseMode = $IsMouseMode;
+		if (!$speakup_silent and $IsSpeakUpSilent) {   # 1.62
+			leave_speakup_silent() or return 0;
+		} elsif ($speakup_silent and !$IsSpeakUpSilent) {
+			enter_speakup_silent() or return 0;
+		}
+		$WasSpeakUpSilent = $IsSpeakUpSilent;
 		$icol = 0; $irow = 0;
 		return;
 	}
@@ -270,6 +345,7 @@ sub initscr {  my $mouse_mode = $_[$[];  # needed for mouse-handling
 	} else {
 		$IsMouseMode = 0; $encoding_string = $EncodingString;
 	}
+	if ($speakup_silent and !$IsSpeakUpSilent) { enter_speakup_silent(); }
 	open(TTYIN, "<$encoding_string", '/dev/tty')
 	 || (warn "Can't read /dev/tty: $!\n", return 0);
 
@@ -280,20 +356,26 @@ sub initscr {  my $mouse_mode = $_[$[];  # needed for mouse-handling
 		} else { system("stty -echo -icrnl raw </dev/tty >/dev/tty");
 		}
 	}
-
-	select((select(TTY), $| = 1)[$[]); print TTY q{};
+	select((select(TTY), $| = 1)[0]); print TTY q{};
 	$rin = q{}; vec($rin, fileno(TTYIN), 1) = 1;
 	$icol = 0; $irow = 0; $InitscrAlreadyRun = 1;
 }
+
 sub endwin {
 	print TTY "\e[0m";
 	if ($InitscrAlreadyRun > 1) {
 		if      ($IsMouseMode and !$WasMouseMode) { leave_mouse_mode();
 		} elsif (!$IsMouseMode and $WasMouseMode) { enter_mouse_mode();
 		}
+		if      ($IsSpeakUpSilent and !$WasSpeakUpSilent) {   # 1.62
+			leave_speakup_silent();
+		} elsif (!$IsSpeakUpSilent and $WasSpeakUpSilent) {
+			enter_speakup_silent();
+		}
 		$InitscrAlreadyRun--; return;
 	}
 	print TTY "\e[?1003l";   $IsMouseMode = 0;
+	if ($IsSpeakUpSilent) { leave_speakup_silent(); }
 	if ($have_Term_ReadKey) {
 		Term::ReadKey::ReadMode('restore', *TTYIN);
 		close TTY; close TTYIN;
@@ -309,7 +391,7 @@ sub endwin {
 # ----------------------- size handling ----------------------
 
 my ($maxcols, $maxrows); my $size_changed = 1;
-my ($otherlines, @otherlines, $notherlines);
+my @OtherLines;  # 20131002 $otherlines, $notherlines no longer global
 
 sub check_size {
 	if (! $size_changed) { return; }
@@ -323,9 +405,8 @@ sub check_size {
 	}
 	$maxcols = $maxcols || 80; $maxcols--;
 	$maxrows = $maxrows || 24;
-	if ($notherlines) {
-		@otherlines = &fmt($otherlines);
-		$notherlines = scalar @otherlines;
+	if (@OtherLines) {
+		@OtherLines = &fmt(join("\n",@OtherLines));
 	}
 	$size_changed = 0;
 }
@@ -338,19 +419,36 @@ $SIG{'WINCH'} = sub { $size_changed = 1; };
 # default could be just one more option, and backward compatibilty
 # could be preserved by checking whether the 2nd arg is a hashref ...
 
+sub ask_filename { my ($question, $default) = @_;  # 1.65 tab-completion
+	eval 'require Term::ReadLine'; if ($@) {
+		sorry("you should install Term::ReadLine::Gnu from www.cpan.org");
+		return ask($question, $default);
+	}
+	initscr(speakup_silent=>1);
+	endwin();
+	$term = new Term::ReadLine 'ProgramName';
+	my $filename = $term->readline($question.' ');   # 1.70
+	print STDERR "\e[J";
+	$filename =~ s/ $//;   # 1.66
+	return $filename;
+}
 sub ask_password { # no echo - use for passwords
-	local ($silent) = 'yes'; &ask($_[$[]);
+	local ($silent) = 'yes'; &ask($_[0]);
 }
 sub ask { my ($question, $default) = @_;
 	return q{} unless $question;
-	&initscr(); my $nol = &display_question($question);
+	&initscr(speakup_silent=>1);
+	my $nol = &display_question($question);
 
 	my $i = 0; my $n = 0; my @s = (); # cursor position, length, string
-	if ($default) {
+	if (defined $default) {  # 1.69 defined, to include 0
+		&speak("$question, default is $default");
 		$default =~ s/\t/	/g;
-		@s = split(q{}, $default); $n = scalar @s; $i = $[;
-		foreach $j ($[ .. $n) { &puts($s[$j]); }
+		@s = split(q{}, $default); $n = scalar @s; $i = 0;
+		foreach $j (0 .. $#s) { &puts($s[$j]); }
 		&left($n);
+	} else {
+		&speak($question);
 	}
 
 	while (1) {
@@ -366,13 +464,15 @@ sub ask { my ($question, $default) = @_;
 		} elsif ($c == $KEY_DELETE) {  # 1.54
 			if ($i < $n) {
 			 	$n--; splice(@s, $i, 1);
-			  	foreach $j ($i .. $n) { &puts($s[$j]); }
+			  	foreach $j ($i..$#s) { &puts($silent ? "x" : $s[$j]); } # 1.67
 			  	&clrtoeol(); &left($n-$i);
 			}
 		} elsif (($c eq "\cH") || ($c eq "\c?")) {
 			if ($i > 0) {
-			 	$n--; $i--; splice(@s, $i, 1); &left(1);
-			  	foreach $j ($i .. $n) { &puts($s[$j]); }
+			 	$n--; $i--;
+				if (! $silent) { &speak($s[$i]); }   # 1.63
+				splice(@s, $i, 1); &left(1);
+			  	foreach $j ($i..$#s) { &puts($silent ? "x" : $s[$j]); } # 1.67
 			  	&clrtoeol(); &left($n-$i);
 			}
 		} elsif ($c eq "\cC") {  # 1.56
@@ -380,19 +480,21 @@ sub ask { my ($question, $default) = @_;
 			warn "^C\n"; kill('INT', $$); return undef;
 		} elsif ($c eq "\cX" || $c eq "\cD") {  # clear ...
 			&left($i); $i = 0; $n = 0; &clrtoeol(); @s = ();
-		} elsif ($c eq "\cB") { &left($i); $i = 0;
-		} elsif ($c eq "\cE") { &right($n-$i); $i = $n;
-		} elsif ($c eq "\cL") {  # redraw ...
+		} elsif ($c eq "\cA" || $c == $KEY_HOME) { &left($i); $i = 0;
+		} elsif ($c eq "\cE" || $c == $KEY_END)  { &right($n-$i); $i = $n;
+		} elsif ($c eq "\cL") { &speak(join("", @s));  # redraw ...
 		} elsif ($SpecialKey{$c}) { &beep();
 		} elsif (ord($c) >= 32) {  # 1.51
 			splice(@s, $i, 0, $c);
 			&puts($silent ? "x" : $c);
+			if (! $silent) {  &speak($c); }
 			$n++; $i++;
-			foreach $j ($i .. $n) { &puts($s[$j]); }
+			foreach $j ($i..$#s) { &puts($silent ? "x" : $s[$j]); }  # 1.67
 			&clrtoeol();  &left($n-$i);
 		} else { &beep();
 		}
 	}
+	&speak(join("", @s), 'wait');
 	&endwin(); $silent = q{}; return join("", @s);
 }
 
@@ -401,7 +503,7 @@ sub debug {
 	if (! open (DEBUG, '>>/tmp/clui.log')) {
 		warn "can't open /tmp/clui.log: $!\n"; return;
 	}
-	print DEBUG "$_[$[]\n"; close DEBUG;
+	print DEBUG "$_[0]\n"; close DEBUG;
 }
 
 my (%irow, %icol, $nrows, $clue_has_been_given, $choice, $this_cell);
@@ -424,10 +526,10 @@ sub choose {  my $question = shift; local @list = @_;  # @list must be local
 	$choice = &get_default($firstline);
 	# If wantarray ? Is remembering multiple choices safe ?
 
-	&initscr('mouse_mode');
+	&initscr(mouse_mode=>1, speakup_silent=>1);
 	&size_and_layout(0);
-	@otherlines = &fmt($otherlines);
-	$notherlines = scalar @otherlines;
+	@OtherLines = &fmt($otherlines);
+	my $speaktext = join(' ',$list[$this_cell],'. ',@OtherLines);
 	if (wantarray) {
 		$#marked = $#list;
 		if ($firstlinelength < $maxcols-30) {
@@ -439,8 +541,14 @@ sub choose {  my $question = shift; local @list = @_;  # @list must be local
 		} else {
 			&puts("$firstline\n\r");
 		}
+		if ($nrows >= $maxrows) { &speak("$firstline, ", 'wait');
+		} else { &speak("$firstline, multiple choice, $speaktext");
+		}
 	} else {
 		&puts("$firstline\n\r");
+		if ($nrows >= $maxrows) { &speak("$firstline, ", 'wait');
+		} else { &speak("$firstline, choose, $speaktext");
+		}
 	}
 	if ($nrows >= $maxrows) {
 		@list = &narrow_the_search(@list);
@@ -448,6 +556,8 @@ sub choose {  my $question = shift; local @list = @_;  # @list must be local
 			&up(1); &clrtoeol(); &endwin(); $clue_has_been_given = 0;
 			return wantarray ? () : undef;
 		}
+		my $speaktext = join(' ',$list[$this_cell],'. ',@OtherLines);
+		&speak("choose, $speaktext");
 	}
 	&wr_screen();
 	# the cursor is now on this_cell, not on the question
@@ -466,15 +576,18 @@ sub choose {  my $question = shift; local @list = @_;  # @list must be local
 				}
 			}
 			&wr_screen();
+			&speak("choose, $list[$this_cell]");
 		}
-		if ($c eq "q" || $c eq "\cD") {
+		if ($c eq "q" || $c eq "\cD" || $c eq "\cX") {
 			&erase_lines(1);
 			if ($clue_has_been_given) {
 				my $re_clue = &confirm("Do you want to change your clue ?");
 				&up(1); &clrtoeol();   # erase the confirm
 				if ($re_clue) {
 					$irow = 1;
-					@list = &narrow_the_search(@biglist); &wr_screen(); next;
+					@list = &narrow_the_search(@biglist); &wr_screen();
+					&speak("choose, $list[$this_cell]");
+					next;
 				} else {
 					&up(1); &clrtoeol(); &endwin(); $clue_has_been_given = 0;
 					return wantarray ? () : undef;
@@ -483,25 +596,26 @@ sub choose {  my $question = shift; local @list = @_;  # @list must be local
 			&goto(0,0); &clrtoeol(); &endwin(); $clue_has_been_given = 0;
 			return wantarray ? () : undef;
 		} elsif (($c eq "\t") && ($this_cell < $#list)) {
-			$this_cell++; &wr_cell($this_cell-1);
-			&wr_cell($this_cell); 
+			$this_cell++; &wr_cell($this_cell-1); &wr_cell($this_cell); 
+			&speak($list[$this_cell]);
 		} elsif ((($c eq "l") || ($c == $KEY_RIGHT)) && ($this_cell < $#list)
 			&& ($irow[$this_cell] == $irow[$this_cell+1])) {
-			$this_cell++; &wr_cell($this_cell-1);
-			&wr_cell($this_cell); 
-		} elsif ((($c eq "\cH") || ($c == $KEY_BTAB)) && ($this_cell > $[)) {
-			$this_cell--; &wr_cell($this_cell+1);
-			&wr_cell($this_cell); 
-		} elsif ((($c eq "h") || ($c == $KEY_LEFT)) && ($this_cell > $[)
+			$this_cell++; &wr_cell($this_cell-1); &wr_cell($this_cell); 
+			&speak($list[$this_cell]);
+		} elsif ((($c eq "\cH") || ($c == $KEY_BTAB)) && ($this_cell > 0)) {
+			$this_cell--; &wr_cell($this_cell+1); &wr_cell($this_cell); 
+			&speak($list[$this_cell]);
+		} elsif ((($c eq "h") || ($c == $KEY_LEFT)) && ($this_cell > 0)
 			&& ($irow[$this_cell] == $irow[$this_cell-1])) {
-			$this_cell--; &wr_cell($this_cell+1);
-			&wr_cell($this_cell); 
+			$this_cell--; &wr_cell($this_cell+1); &wr_cell($this_cell); 
+			&speak($list[$this_cell]);
 		} elsif ((($c eq "j") || ($c == $KEY_DOWN)) && ($irow < $nrows)) {
-			$mid_col = $icol[$this_cell] + 0.5 * length($list[$this_cell]);
-			$left_of_target = 1000;
+			my $mid_col = $icol[$this_cell] + 0.5 * length($list[$this_cell]);
+			my $left_of_target = 1000;
 			for ($inew=$this_cell+1; $inew < $#list; $inew++) {
 				last if $icol[$inew] < $mid_col;	# skip rest of row
 			}
+			my $new_mid_col = 0;
 			for (; $inew < $#list; $inew++) {
 				$new_mid_col = $icol[$inew] + 0.5*length($list[$inew]);
 				last if $new_mid_col >= $mid_col;		# we've reached it
@@ -511,12 +625,14 @@ sub choose {  my $question = shift; local @list = @_;  # @list must be local
 			if (($new_mid_col - $mid_col) > $left_of_target) { $inew--; }
 			$iold = $this_cell; $this_cell = $inew;
 			&wr_cell($iold); &wr_cell($this_cell);
+			&speak($list[$this_cell]);
 		} elsif ((($c eq "k") || ($c == $KEY_UP)) && ($irow > 1)) {
-			$mid_col = $icol[$this_cell] + 0.5*length($list[$this_cell]);
-			$right_of_target = 1000;
+			my $mid_col = $icol[$this_cell] + 0.5*length($list[$this_cell]);
+			my $right_of_target = 1000;
 			for ($inew=$this_cell-1; $inew > 0; $inew--) {
 				last if $irow[$inew] < $irow[$this_cell];	# skip rest of row
 			}
+			my $new_mid_col = 0;
 			for (; $inew > 0; $inew--) {
 				last unless $icol[$inew];
 				$new_mid_col = $icol[$inew] + 0.5*length($list[$inew]);
@@ -526,6 +642,7 @@ sub choose {  my $question = shift; local @list = @_;  # @list must be local
 			if (($mid_col - $new_mid_col) > $right_of_target) { $inew++; }
 			$iold = $this_cell; $this_cell = $inew;
 			&wr_cell($iold); &wr_cell($this_cell);
+			&speak($list[$this_cell]);
 		} elsif ($c eq "\cL") {
 			if ($size_changed) {
 				&size_and_layout($nrows);
@@ -546,7 +663,7 @@ sub choose {  my $question = shift; local @list = @_;  # @list must be local
 			&erase_lines(1); &goto($firstlinelength+1, 0);
 			my @chosen;
 			if (wantarray) {
-				my $i; for ($i=$[; $i<=$#list; $i++) {
+				my $i; for ($i=0; $i<=$#list; $i++) {
 					if ($marked[$i] || $i==$this_cell) {
 						push @chosen, $list[$i];
 					}
@@ -575,8 +692,10 @@ sub choose {  my $question = shift; local @list = @_;  # @list must be local
 			&endwin();
 			&set_default($firstline, $list[$this_cell]); # join($,,@chosen) ?
 			$clue_has_been_given = 0;
-			if (wantarray) { return @chosen;
-			} else { return $list[$this_cell];
+			if (wantarray) {
+				&speak(join(' and ',@chosen), 'wait'); return @chosen;
+			} else {
+				&speak($list[$this_cell], 'wait'); return $list[$this_cell];
 			}
 		} elsif ($c eq " ") {
 			if (wantarray) {
@@ -584,6 +703,7 @@ sub choose {  my $question = shift; local @list = @_;  # @list must be local
 				#if ($this_cell < $#list) {
 					#  $this_cell++; &wr_cell($this_cell-1); # 1.50
 				&wr_cell($this_cell); 
+				&speak('marked');
 				#}
 			#} elsif ($this_cell < $#list) {
 			#	$this_cell++; &wr_cell($this_cell-1); &wr_cell($this_cell); 
@@ -597,7 +717,7 @@ sub choose {  my $question = shift; local @list = @_;  # @list must be local
 }
 sub layout { my @list = @_;
 	$this_cell = 0; my $irow = 1; my $icol = 0;  my $i;
-	for ($i=$[; $i<=$#list; $i++) {
+	for ($i=0; $i<=$#list; $i++) {
 		$l[$i] = length($list[$i]) + 2;
 		if ($l[$i] > $maxcols-1) { $l[$i] = $maxcols-1; }  # 1.42
 		if (($icol + $l[$i]) >= $maxcols ) { $irow++; $icol = 0; }
@@ -609,22 +729,22 @@ sub layout { my @list = @_;
 	return $irow;
 }
 sub wr_screen {
-	my $i;
-	for ($i=$[; $i<=$#list; $i++) {
+	for (my $i=0; $i<=$#list; $i++) {
 		&wr_cell($i) unless $i==$this_cell;
 	}
+	my $notherlines = scalar @OtherLines;
 	if ($notherlines && ($nrows+$notherlines) < $maxrows) {
-		&puts("\r\n", join("\r\n", @otherlines), "\r");
+		&puts("\r\n", join("\r\n", @OtherLines), "\r");
 	}
 	&wr_cell($this_cell);
 }
 sub wr_cell { my $i = shift;
+	my $no_tabs = $list[$i];
+	$no_tabs =~ s/\t/ /g;
 	&goto($icol[$i], $irow[$i]);
 	if ($marked[$i]) { &attrset($A_BOLD | $A_UNDERLINE); }
 	if ($i == $this_cell) { &attrset($A_REVERSE); }
-	my $no_tabs = $list[$i];
-	$no_tabs =~ s/\t/ /g;
-	&puts(substr " $no_tabs ", $[, $maxcols);  # 1.42, 1.54
+	&puts(substr " $no_tabs ", 0, $maxcols);  # 1.42, 1.54
 	if ($marked[$i] || $i == $this_cell) { &attrset($A_NORMAL); }
 }
 sub size_and_layout {
@@ -657,7 +777,9 @@ sub narrow_the_search { my @biglist = @_;
 			if ($i < $n) { &puts($s[$i]); $i++; next; }
 		} elsif (($c eq "\cH") || ($c eq "\c?")) {
 			if ($i > 0) {
-			 	$n--; $i--; splice(@s, $i, 1); &left(1);
+			 	$n--; $i--;
+				&speak($s[$i], 'wait');   # 1.63
+				splice(@s, $i, 1); &left(1);
 			  	foreach $j ($i..$n) { &puts($s[$j]); }
 				&clrtoeol(); &left($n-$i);
 			}
@@ -670,7 +792,7 @@ sub narrow_the_search { my @biglist = @_;
 				enter_mouse_mode(); return ();
 			}
 			&left($i); $i = 0; $n = 0; @s = (); &clrtoeol();
-		} elsif ($c eq "\cB") { &left($i); $i = 0; next;
+		} elsif ($c eq "\cA") { &left($i); $i = 0; next;
 		} elsif ($c eq "\cE") { &right($n-$i); $i = $n; next;
 		} elsif ($c eq "\cL") {
 		} elsif ($SpecialKey{$c}) { &beep();
@@ -678,11 +800,12 @@ sub narrow_the_search { my @biglist = @_;
 			splice(@s, $i, 0, $c);
 			$n++; $i++; &puts($c);
 			foreach $j ($i..$n) { &puts($s[$j]); } &clrtoeol();  &left($n-$i);
+			&speak($c, 'wait');   # 1.63
 		} else { &beep();
 		}
 		# grep, and if $nchoices=1 return
 		$s = join("", @s);
-		@list = grep($[ <= index($_,$s), @biglist);
+		@list = grep(0 <= index($_,$s), @biglist);
 		$nchoices = scalar @list;
 		$nrows = &layout(@list);
 		if ($nchoices==1 || ($nchoices && ($nrows<$maxrows))) {
@@ -699,20 +822,23 @@ sub ask_for_clue { my ($nchoices, $i, $s) = @_;
 			my $headstr = "the choices won't fit; there are still";
 			&goto(0,1); &puts("$headstr $nchoices of them"); &clrtoeol();
 			&goto(0,2); &puts("lengthen the clue : "); &right($i);
+			&speak("still $nchoices choices, lengthen the clue");
 		} else {
 			my $headstr = "the choices won't fit; there are";
 			&goto(0,1); &puts("$headstr $nchoices of them"); &clrtoeol();
 			&goto(0,2);
-			&puts("   give me a clue :            (or ctrl-X to quit)");
-			&left(30);
+			&puts("   give me a clue :             (or ctrl-X to quit)");
+			&left(31);   # 1.62
+			&speak("$nchoices choices, give me a clue, or control-X to quit");
 		}
 	} else {
 		&goto(0,1); &puts("No choices fit this clue !"); &clrtoeol();
 		&goto(0,2); &puts(" shorten the clue : "); &right($i);
+		&speak("no choices fit, shorten the clue");
 	}
 }
 sub get_default { my ($question) = @_;
-	if ($ENV{CLUI_DIR} eq 'OFF') { return undef; }
+	if ($ENV{CLUI_DIR} =~ /off/i) { return undef; }
 	if (! $question) { return undef; }
 	my @choices;
 	my $n_tries = 5;
@@ -728,11 +854,11 @@ sub get_default { my ($question) = @_;
 	}
 	@choices = split ($; ,$CHOICES{$question}); dbmclose %CHOICES;
 	if (wantarray) { return @choices;
-	} else { return $choices[$[];
+	} else { return $choices[0];
 	}
 }
 sub set_default { my $question = shift; my $s = join($; , @_);
-	if ($ENV{CLUI_DIR} eq 'OFF') { return undef; }
+	if ($ENV{CLUI_DIR} =~ /off/i) { return undef; }
 	if (! $question) { return undef; }
 	my $n_tries = 5;
 	while ($n_tries--) {
@@ -749,7 +875,7 @@ sub set_default { my $question = shift; my $s = join($; , @_);
 	return $s;
 }
 sub dbm_file {
-	if ($ENV{CLUI_DIR} eq 'OFF') { return undef; }
+	if ($ENV{CLUI_DIR} =~ /off/i) { return undef; }
 	my $db_dir;
 	if ($ENV{CLUI_DIR}) {
 		$db_dir = $ENV{CLUI_DIR};
@@ -768,7 +894,7 @@ sub handle_mouse { my ($x, $y, $button_pressed, $button_drag) = @_;  # 1.50
 	# debug("x=$x y=$y TopRow=$TopRow mouse_row=$mouse_row");
 	# debug("button_pressed=$button_pressed button_drag=$button_drag");
 	my $found = 0;
-	my $i = $[; while ($i < @irow) {
+	my $i = 0; while ($i < @irow) {
 		if ($irow[$i] == $mouse_row) {
 			# debug("list[$i]=$list[$i] is the right row");
 			if ($icol[$i] < $mouse_col
@@ -797,23 +923,33 @@ sub handle_mouse { my ($x, $y, $button_pressed, $button_drag) = @_;  # 1.50
 }
 sub help_text { # 1.54
 	my $text;
-	if ($_[$[] eq 'ask') {
-		return "\nLeft and Right arrowkeys, Backspace, Delete;"
-		 . " ctrl-B = beginning; ctrl-E = end; ctrl-X = clear; then Return.";
+	if ($_[0] eq 'ask') {
+		return "\nLeft and Right arrowkeys, Backspace, Delete; control-A = "
+		 . " beginning; control-E = end; control-X = clear; then Return.";
 	}
-	$text = "\nmove around with Mouse or Arrowkeys (or hjkl);";
-	if ($_[$[] =~ /^mult/) {
+	if ($ENV{'CLUI_MOUSE'} eq 'OFF') {
+		$text = "\nmove around with Arrowkeys (or hjkl);";
+	} else {
+		$text = "\nmove around with Mouse or Arrowkeys (or hjkl);";
+	}
+	if ($_[0] =~ /^mult/) {
 		$text .= " multiselect with Rightclick or Spacebar;";
 	}
-	$text .= " then either q for quit, or choose with Leftclick or Return.";
+	$text .= " then either q or ctrl-X for quit,";
+	if ($ENV{'CLUI_MOUSE'} eq 'OFF') {
+		$text .= " or Return to choose.";
+	} else {
+		$text .= " or choose with Leftclick or Return.";
+	}
 }
 
 # ----------------------- confirm stuff -------------------------
 
 sub confirm { my $question = shift;  # asks user Yes|No, returns 1|0
 	return(0) unless $question;  return(0) unless -t STDERR;
-	&initscr();
+	&initscr(speakup_silent=>1);
 	my $nol = &display_question($question); &puts(" (y/n) ");
+	&speak($question . ', y or n');
 	while (1) {
 		$response=&getch();
 		if ($response eq "\cC") {  # 1.56
@@ -824,7 +960,13 @@ sub confirm { my $question = shift;  # asks user Yes|No, returns 1|0
 		&beep();
 	}
 	&left(6); &clrtoeol(); 
-	if ($response=~/^[yY]/) { &puts("Yes"); } else { &puts("No"); }
+	if ($response=~/^[yY]/) {
+		&puts("Yes");
+		&speak('yess', 'wait');
+	} else {
+		&puts("No");
+		&speak('know', 'wait');
+	}
 	&erase_lines(1); &endwin();
 	if ($response =~ /^[yY]/) { return 1; } else { return 0 ; }
 }
@@ -832,16 +974,17 @@ sub confirm { my $question = shift;  # asks user Yes|No, returns 1|0
 # ----------------------- edit stuff -------------------------
 
 sub edit {	my ($title, $text) = @_;
-	my $argc = $#_ - $[ +1;
+	my $argc = $#_ - 0 +1;
 	my ($dirname, $basename, $rcsdir, $rcsfile, $rcs_ok);
 	
 	if ($argc == 0) {	# start editor session with no preloaded file
 		system $ENV{EDITOR} || "vi"; # should also look in ~/db/choices.db
 	} elsif ($argc == 2) {
 		# must create tmp file with title embedded in name
-		$tmpdir = '/tmp';
-		($safename = $title) =~ s/[\W_]+/_/g;
-		$file = "$tmpdir/$safename.$$";
+		my $tmpdir = '/tmp';
+		my $safename = $title;
+		$safename =~ s/[\W_]+/_/g;
+		my $file = "$tmpdir/$safename.$$";
 		if (!open(F,">$file")) {&sorry("can't open $file: $!\n");return q{};}
 		print F $text; close F;
 		$editor = $ENV{EDITOR} || "vi"; # should also look in ~/db/choices.db
@@ -926,14 +1069,16 @@ sub timestamp {
 # ----------------------- sorry stuff -------------------------
 
 sub sorry { # warns user of an error condition
-	print STDERR "Sorry, $_[$[]\n";
+	print STDERR "Sorry, $_[0]\n";
+	&speak("Sorry, $_[0]", 'wait');
 }
-sub inform { my $text = $_[$[];
+sub inform { my $text = $_[0];
 	$text =~ s/([^\n])$/$1\n/s;
 	if (open(TTY, ">$EncodingString", '/dev/tty')) {  # 1.43
 		print TTY $text; close TTY;
 	} else { warn $text;
 	}
+	&speak($text, 'wait');
 }
 
 # ----------------------- view stuff -------------------------
@@ -942,44 +1087,62 @@ foreach $f ("/usr/bin/less", "/usr/bin/more") {
 	if (-x $f) { $default_pager = $f; }
 }
 sub view {	my ($title, $text) = @_;	# or ($filename) =
-	if (! $text && -T $title && open(F,"< $title")) {
+	my $pager = $ENV{PAGER} || $default_pager;
+	if (! $text and ($title =~ /\.doc$/i) and -r $title) {   # 1.65
+		my $wvText = which('wvText');   if ($wvText) {
+			my $tmpf = "/tmp/wv$$";
+			system "$wvText '$title' $tmpf"; system "$pager $tmpf";
+			unlink $tmpf; return 1;
+		}
+		my $antiword = which('antiword');   if ($antiword) {
+			system "$antiword -i 1 '$title' | $pager"; return 1;
+		}
+		my $catdoc = which('catdoc');   if ($catdoc) {
+			system "$catdoc '$title' | $pager"; return 1;
+		}
+		sorry("it's a .doc file; you need to install wv, antiword or catdoc");
+		return 0;
+	} elsif (! $text && -T $title && open(F,"< $title")) {
 		$nlines = 0;
 		while (<F>) { last if ($nlines++ > $maxrows); } close F;
 		if ($nlines > (0.6*$maxrows)) {
-			system (($ENV{PAGER} || $default_pager) . " \'$title\'");
+			system "$pager  \'$title\'";
 		} else {
 			open(F,"< $title"); undef $/; $text=<F>; $/="\n"; close F;
 			&tiview($title, $text);
 		}
 	} else {
 		local (@lines) = split(/\r?\n/, $text, $maxrows);
-		if (($#lines - $[) < 21) {
+		if (($#lines) < 21) {
 			&tiview($title, $text);
 		} else {
 			local ($safetitle); ($safetitle = $title) =~ s/[^a-zA-Z0-9]+/_/g;
 			local ($tmp) = "/tmp/$safetitle.$$";
 			if (!open(TMP, ">$tmp")) {warn "can't open $tmp: $!\n"; return;}
 			print TMP $text;	close TMP;
-			system(($ENV{PAGER} || $default_pager) . " \'$tmp\'");
+			system "$pager \'$tmp\'";
 			unlink $tmp;
 			return 1;
 		}
 	}
 }
 sub tiview {	my ($title, $text) = @_;
-	return unless $text; local ($[) = 0;
+	return unless $text;
 	$title =~ s/\t/ /g; my $titlelength = length $title;
 	
 	&check_size();
 	my @rows = &fmt($text, nofill=>1);
 	&initscr();
 	if (3 > scalar @rows) {
-		&puts(join("\r\n",@rows), "\r\n"); &endwin(); return 1;
+		&puts("$title\r\n".join("\r\n",@rows), "\r\n");
+		&speak("$title, ".join(" ",@rows), 'wait');
+		&endwin(); return 1;
 	}
 	if ($titlelength > ($maxcols-35)) { &puts("$title\r\n");
 	} else { &puts("$title   (<enter> to continue, q to clear)\r\n");
 	}
 	&puts("\r", join("\e[K\r\n",@rows), "\r");
+	&speak("$title, enter to continue, ".join(" ",@rows));
 	$icol = 0; $irow = scalar @rows; &goto($titlelength+1, 0);
 	
 	while (1) {
@@ -998,25 +1161,85 @@ sub tiview {	my ($title, $text) = @_;
 
 # -------------------------- infrastructure -------------------------
 
+sub which {
+	my $f;
+	foreach $d (split(":",$ENV{'PATH'})) {$f="$d/$_[0]"; return $f if -x $f;}
+}
+%SpeakMode = ();
+sub END {
+	if ($Eflite_FH) { print $Eflite_FH "s\nq { }\n"; close $Eflite_FH;
+	} elsif ($Espeak_PID) { kill SIGHUP, $Espeak_PID; wait;
+	}
+}
+sub speak {  my ($text, $wait) = @_;
+	$text="$text";
+	return unless length($text);  # should clean up for exit: kill or wait
+	# could replace the punctuation chars with descriptive words...
+	if ($SpeakMode{'dot'}) {
+		$text =~ s/\s*\.\s*/ dot /g;
+		$text =~ s/\s*\.(\w)/ dot $1/g;
+	}
+	if ($Eflite_FH) {
+		if (length($text) == 1) {
+			if ($text eq '.') { print $Eflite_FH "s\nq { dot }\nd\n";
+			} else { print $Eflite_FH "s\nl {$text}\n";
+			}
+			if ($wait) { select(undef,undef,undef,0.5); }
+		} else {
+			print $Eflite_FH "s\nq {$text}\nd\n";
+			# useless emacspeak op: tts_sy nc_state all 0 0  1 225\nq {[:np  ]}
+			if ($wait) { select(undef,undef,undef,0.3+0.07*length($text)); }
+		}
+	} elsif ($Espeak) {  # 1.68 should be using Speech::eSpeak !
+		if ($Espeak_PID) { kill SIGHUP, $Espeak_PID; wait; $Espeak_PID = 0; }
+		$Espeak_PID = fork();
+		if ($Espeak_PID) {
+			if ($wait) {
+				if (length($text) == 1) { select(undef,undef,undef,0.5);
+				} else { select(undef,undef,undef,0.3+0.07*length($text));
+				}
+			}
+			return 1;
+		} else {
+			my $espeak_FH;
+			my $espeak_PID;
+			if ($espeak_PID = open($espeak_FH,'|-',$Espeak)) {
+				select((select($espeak_FH), $| = 1)[0]); print $espeak_FH q{};
+			} else {
+				warn "can't run $Espeak: $!\n"; return;
+			}
+			# binmode($espeak_FH, ':unix');
+			sub huphandler { kill 'KILL', $espeak_PID; }
+			$SIG{HUP} = \&huphandler;
+			if ($text eq '.') { print $espeak_FH "dot\n";
+			} else { print $espeak_FH "$text\n";
+			}
+			# close $espeak_FH;   # Must Not Close! close Hangs, unkillable !
+			wait;
+			exit 0;
+		}
+	}
+}
+
 sub display_question {   my $question = shift; my %options = @_;
 	# used by &ask and &confirm, but not by &choose ...
 	&check_size();
-	my ($firstline, @otherlines);
+	my ($firstline, $otherlines);  # 20131002 @otherlines => $otherlines
 	if ($options{nofirstline}) {
-		@otherlines = &fmt($question);
+		@OtherLines = &fmt($question);
 	} else {
 		($firstline,$otherlines) = split(/\r?\n/, $question, 2);
-		@otherlines = &fmt($otherlines);
+		@OtherLines = &fmt($otherlines);
 		if ($firstline) { &puts("$firstline "); }
 	}
-	if (@otherlines) {
-		&puts("\r\n", join("\r\n", @otherlines), "\r");
+	if (@OtherLines) {
+		&puts("\r\n", join("\r\n", @OtherLines), "\r");
 		&goto(1 + length $firstline, 0);
 	}
-	return scalar @otherlines;
+	return scalar @OtherLines;
 }
-sub erase_lines {  # leaves cursor at beginning of line $_[$[]
-	&goto(0, $_[$[]); print TTY "\e[J";
+sub erase_lines {  # leaves cursor at beginning of line $_[0]
+	&goto(0, $_[0]); print TTY "\e[J";
 }
 sub fmt { my $text = shift; my %options = @_;
 	# Used by tiview, ask and confirm; formats the text within $maxcols cols
@@ -1032,7 +1255,7 @@ sub fmt { my $text = shift; my %options = @_;
 		$last_line_empty = 0;
 
 		if ($options{nofill}) {
-			push @o_lines, substr($i_line, $[, $maxcols-1); next;
+			push @o_lines, substr($i_line, 0, $maxcols-1); next;
 		}
 		if ($i_line =~ s/^(\s+)//) {   # line begins with space ?
 			$initial_space = $1; $initial_space =~ s/\t/   /g;
@@ -1050,7 +1273,7 @@ sub fmt { my $text = shift; my %options = @_;
 				$o_line = $initial_space; $o_length = length $initial_space;
 			}
 			if ($w_length >= $maxcols) {  # chop it !
-				push @o_lines, substr($i_word,$[,$maxcols-1); next;
+				push @o_lines, substr($i_word,0,$maxcols-1); next;
 			}
 			if ($o_line) { $o_line .= ' '; $o_length += 1; }
 			$o_line .= $i_word; $o_length += $w_length;
@@ -1058,7 +1281,7 @@ sub fmt { my $text = shift; my %options = @_;
 	}
 	if ($o_line) { push @o_lines, $o_line; }
 	if ((scalar @o_lines) < $maxrows-2) { return(@o_lines);
-	} else { return splice (@o_lines, $[, $maxrows-2);
+	} else { return splice (@o_lines, 0, $maxrows-2);
 	}
 }
 sub back_up {

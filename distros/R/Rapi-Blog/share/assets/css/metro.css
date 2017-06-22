@@ -1,0 +1,202 @@
+.metro * {
+  box-sizing: border-box;
+}
+.col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2, .col-md-2, .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3, .col-xs-4, .col-sm-4, .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5, .col-xs-6, .col-sm-6, .col-md-6, .col-lg-6, .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {
+  position: relative;
+  min-height: 1px;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+.metro .thumbnail {
+  display: block;
+  padding-top: 4px;
+  padding-right: 4px;
+  padding-bottom: 4px;
+  padding-left: 4px;
+  /* margin-bottom: 20px; */
+  margin: 5px;
+  
+  line-height: 1.42857;
+  background-color: rgb(255, 255, 255);
+  border-top-width: 1px;
+  border-right-width: 1px;
+  border-bottom-width: 1px;
+  border-left-width: 1px;
+  border-top-style: solid;
+  border-right-style: solid;
+  border-bottom-style: solid;
+  border-left-style: solid;
+  border-top-color: rgb(221, 221, 221);
+  border-right-color: rgb(221, 221, 221);
+  border-bottom-color: rgb(221, 221, 221);
+  border-left-color: rgb(221, 221, 221);
+  border-image-source: initial;
+  border-image-slice: initial;
+  border-image-width: initial;
+  border-image-outset: initial;
+  border-image-repeat: initial;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+  border-bottom-left-radius: 0px;
+  transition-duration: 0.2s;
+  transition-timing-function: ease-in-out;
+  transition-delay: initial;
+  transition-property: all;
+}
+.metro .tile {
+  display: block;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transition-duration: 0.2s;
+  transition-timing-function: initial;
+  transition-delay: initial;
+  transition-property: -webkit-transform;
+  float: left;
+  min-width: 75px;
+  min-height: 75px;
+  text-align: center;
+  opacity: 0.75;
+  background-color: rgb(46, 139, 204);
+  z-index: 1;
+  border-top-width: 4px;
+  border-right-width: 4px;
+  border-bottom-width: 4px;
+  border-left-width: 4px;
+  border-top-style: solid;
+  border-right-style: solid;
+  border-bottom-style: solid;
+  border-left-style: solid;
+  border-top-color: rgb(255, 255, 255);
+  border-right-color: rgb(255, 255, 255);
+  border-bottom-color: rgb(255, 255, 255);
+  border-left-color: rgb(255, 255, 255);
+  border-image-source: initial;
+  border-image-slice: initial;
+  border-image-width: initial;
+  border-image-outset: initial;
+  border-image-repeat: initial;
+  color: rgb(255, 255, 255);
+}
+.metro .tile:hover {
+  opacity: 1;
+}
+.metro .tile.tile-green {
+  background-color: rgb(51, 153, 51);
+}
+.metro .tile.tile-blue {
+    background-color: #2e8bcc;
+}
+
+.metro .tile.tile-red {
+    background-color: #e51400;
+}
+
+.metro .tile.tile-yellow {
+    background-color: #ffc40d;
+}
+
+.metro .tile.tile-pink {
+    background-color: #e671b8;
+}
+
+.metro .tile.tile-orange {
+    background-color: #f39c12;
+}
+
+.metro .tile.tile-purple {
+    background-color: #7b4f9d;
+}
+
+.metro .tile.tile-magenta {
+    background-color: #ff0097;
+}
+
+.metro .tile.tile-medium {
+  height: 150px;
+  width: 150px;
+}
+
+.metro .tile.tile-200 {
+  height: 200px;
+  width: 200px;
+}
+
+.metro .tile.tile-long-tiny {
+  height: 25px;
+  min-height: 25px;
+  width: 90px;
+  border:0px;
+}
+
+.metro a {
+  background-image: initial;
+  background-position-x: initial;
+  background-position-y: initial;
+  background-size: initial;
+  background-repeat-x: initial;
+  background-repeat-y: initial;
+  background-attachment: initial;
+  background-origin: initial;
+  background-clip: initial;
+  background-color: transparent;
+  color: rgb(66, 139, 202);
+  text-decoration-line: none;
+  text-decoration-style: initial;
+  text-decoration-color: initial;
+}
+.metro a:focus {
+  outline-color: -webkit-focus-ring-color;
+  outline-style: auto;
+  outline-width: 5px;
+  outline-offset: -2px;
+}
+.metro .tile a:hover {
+  text-decoration-line: none;
+  text-decoration-style: initial;
+  text-decoration-color: initial;
+}
+.metro a.fa-links {
+  color: rgb(255, 255, 255);
+}
+.metro h1 {
+  font-size: 2em;
+  margin-top: 0.67em;
+  margin-right: 0px;
+  margin-bottom: 0.67em;
+  margin-left: 0px;
+}
+.metro h1, .metro h2, .metro h3, .metro h4, .metro h5, .metro h6, .metro .h1, .metro .h2, .metro .h3, .metro .h4, .metro .h5, .metro .h6 {
+  font-family: "Segoe UI Light", "Helvetica Neue", "Segoe UI", "Segoe WP", sans-serif;
+  font-weight: 100;
+  line-height: 1.1;
+  color: inherit;
+}
+.metro h1, .metro .h1, .metro h2, .metro .h2, .metro h3, .metro .h3 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+.metro h1, .metro .h1 {
+  font-size: 36px;
+}
+.metro .tile h1, .metro .tile h2, .metro .tile h3, .metro .tile h4, .metro .tile h5, .metro .tile h6 {
+  color: rgb(255, 255, 255);
+  user-select: none;
+}
+.metro .fa {
+  display: inline-block;
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+}
+.metro .fa-3x {
+  font-size: 3em;
+}
+
+
+.metro a.tile {
+  text-decoration: none !important;
+}
+

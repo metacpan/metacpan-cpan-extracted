@@ -197,7 +197,7 @@ sub node_to_root {
     my $k = shift->content_type;
     if ($k =~ /::Blog$/) {(
         '..', '..'
-    )} elsif ($k =~ /::(Month|Page|Tag)$/n) {(
+    )} elsif ($k =~ /::(?:Month|Page|Tag)$/) {(
         '..',
     )} else {
          die "Why going back from $k?"

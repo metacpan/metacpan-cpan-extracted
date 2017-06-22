@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2016-12-20'; # DATE
-our $VERSION = '0.60'; # VERSION
+our $DATE = '2017-06-21'; # DATE
+our $VERSION = '0.61'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ gitbunch - Manage gitbunch directory (directory which contain git repos)
 
 =head1 VERSION
 
-This document describes version 0.60 of gitbunch (from Perl distribution Git-Bunch), released on 2016-12-20.
+This document describes version 0.61 of gitbunch (from Perl distribution Git-Bunch), released on 2017-06-21.
 
 =head1 SYNOPSIS
 
@@ -147,7 +147,7 @@ Set configuration profile to use.
 
 =item B<--debug>
 
-Set log level to debug (note: you also need to set LOG=1 to enable logging, or use DEBUG=1).
+Shortcut for --log-level=debug.
 
 =item B<--format>=I<s>
 
@@ -167,7 +167,7 @@ Set output format to json.
 
 =item B<--log-level>=I<s>
 
-Set log level (note: you also need to set LOG=1 to enable logging).
+Set log level.
 
 =item B<--naked-res>
 
@@ -200,7 +200,7 @@ Do not read environment for default options.
 
 =item B<--quiet>
 
-Set log level to quiet (note: you also need to set LOG=1 to enable logging, or use QUIET=1).
+Shortcut for --log-level=error.
 
 =item B<--subcommands>
 
@@ -208,11 +208,11 @@ List available subcommands.
 
 =item B<--trace>
 
-Set log level to trace (note: you also need to set LOG=1 to enable logging, or use TRACE=1).
+Shortcut for --log-level=trace.
 
 =item B<--verbose>
 
-Set log level to info (note: you also need to set LOG=1 to enable logging, or use VERBOSE=1).
+Shortcut for --log-level=info.
 
 =item B<--version>, B<-v>
 
@@ -649,7 +649,7 @@ To activate bash completion for this script, put:
 
  complete -C gitbunch gitbunch
 
-in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
 recognize tab completion for the command. Or, you can also directly execute the
 line above in your shell to activate immediately.
 
@@ -657,8 +657,8 @@ It is recommended, however, that you install L<shcompgen> which allows you to
 activate completion scripts for several kinds of scripts on multiple shells.
 Some CPAN distributions (those that are built with
 L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
-completion for their included scripts (using C<shcompgen>) at installation time,
-so you can immadiately have tab completion.
+completion for their included scripts (using L<shcompgen>) at installation time,
+so you can immediately have tab completion.
 
 =head2 tcsh
 
@@ -666,15 +666,15 @@ To activate tcsh completion for this script, put:
 
  complete gitbunch 'p/*/`gitbunch`/'
 
-in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
 recognize tab completion for the command. Or, you can also directly execute the
 line above in your shell to activate immediately.
 
-It is also recommended to install C<shcompgen> (see above).
+It is also recommended to install L<shcompgen> (see above).
 
 =head2 other shells
 
-For fish and zsh, install C<shcompgen> as described above.
+For fish and zsh, install L<shcompgen> as described above.
 
 =head1 CONFIGURATION FILE
 
@@ -702,7 +702,7 @@ List of available configuration parameters:
  log_level (see --log-level)
  naked_res (see --naked-res)
 
-=head2 Configuration for subcommand 'check'
+=head2 Configuration for subcommand check
 
  exclude_files (see --exclude-files)
  exclude_non_git_dirs (see --exclude-non-git-dirs)
@@ -714,7 +714,7 @@ List of available configuration parameters:
  repo (see --repo)
  source (see --source)
 
-=head2 Configuration for subcommand 'exec'
+=head2 Configuration for subcommand exec
 
  command (see --command)
  exclude_files (see --exclude-files)
@@ -727,7 +727,7 @@ List of available configuration parameters:
  repo (see --repo)
  source (see --source)
 
-=head2 Configuration for subcommand 'ls'
+=head2 Configuration for subcommand ls
 
  detail (see --detail)
  exclude_files (see --exclude-files)
@@ -741,7 +741,7 @@ List of available configuration parameters:
  sort (see --sort)
  source (see --source)
 
-=head2 Configuration for subcommand 'sync'
+=head2 Configuration for subcommand sync
 
  backup (see --backup)
  create_bare_target (see --create-bare-target)
@@ -764,15 +764,15 @@ List of available configuration parameters:
 
 =head2 GITBUNCH_OPT => str
 
-Specify additional command-line options
+Specify additional command-line options.
 
 =head1 FILES
 
-~/.config/gitbunch.conf
+F<~/.config/gitbunch.conf>
 
-~/gitbunch.conf
+F<~/gitbunch.conf>
 
-/etc/gitbunch.conf
+F</etc/gitbunch.conf>
 
 =head1 HOMEPAGE
 
@@ -811,7 +811,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

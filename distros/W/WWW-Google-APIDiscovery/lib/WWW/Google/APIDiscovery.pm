@@ -1,6 +1,7 @@
 package WWW::Google::APIDiscovery;
 
-$WWW::Google::APIDiscovery::VERSION = '0.20';
+$WWW::Google::APIDiscovery::VERSION   = '0.22';
+$WWW::Google::APIDiscovery::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
 
@@ -8,7 +9,7 @@ WWW::Google::APIDiscovery - Interface to Google API Discovery Service.
 
 =head1 VERSION
 
-Version 0.20
+Version 0.22
 
 =cut
 
@@ -26,9 +27,7 @@ extends 'WWW::Google::UserAgent';
 
 our $BASE_URL = 'https://www.googleapis.com/discovery/v1/apis';
 
-has apis    => (is => 'rw');
-has kind    => (is => 'rw');
-has version => (is => 'rw');
+has [ qw(apis kind version) ] => (is => 'rw');
 
 =head1 DESCRIPTION
 
@@ -137,7 +136,7 @@ Mohammad S Anwar, C<< <mohammad.anwar at yahoo.com> >>
 
 =head1 REPOSITORY
 
-L<https://github.com/Manwar/WWW-Google-APIDiscovery>
+L<https://github.com/manwar/WWW-Google-APIDiscovery>
 
 =head1 CONTRIBUTORS
 

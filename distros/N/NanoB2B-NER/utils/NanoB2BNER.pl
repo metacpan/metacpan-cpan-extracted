@@ -28,7 +28,7 @@ Displays a brief summary of program options.
 
 The name of the directory that contain the files
 
-=head3 *--fts STR
+=head3 *--features STR
 
 Get the list of features you want to use for the set
 Ex. "ortho morph text pos cui sem"
@@ -51,7 +51,7 @@ Starts the program at a certain index number in a directory
 
 Defines the file source of a single article
 
-=head3 --sortBySize
+=head3 --sort
 
 Option to sort the directory files by size
 
@@ -141,8 +141,7 @@ use NanoB2B::NER;
 
 ################# 			OPTIONS        	 #####################
 
-
-eval(GetOptions("help", "dir=s", "features=s", "debug", "process=s", "file=s", "sort", "import_meta", "stopwords", "prefix=i", "suffix=i", "index=i", "weka_type=s", "weka_size=s", "buckets=i")) or die ("Check your options!\n");
+eval(GetOptions("help", "dir=s", "features=s", "debug", "process=s", "file=s", "sort", "import_meta", "stopwords=s", "is_cui", "sparse_matrix", "prefix=i", "suffix=i", "index=i", "wcs=s", "weka_type=s", "weka_size=s", "buckets=i", "metamap_arguments=s")) or die ("Check your options!\n");
 
 my %params = ();
 my $process = "";
@@ -177,7 +176,7 @@ if(defined $opt_process){
 
 if(defined $opt_file){										#if using one file
 	$params{'file'} = $opt_file;
-	if(! (-e $opt_file)){
+	if(! (-e "$opt_dir/$opt_file")){
 		print "$opt_file DNE";
 	}else{
 		print "---Opening file: \"$opt_file\"---\n";
@@ -198,8 +197,22 @@ if(defined $opt_index){										#start at a certain file given an index
 }
 
 if(defined $opt_stopwords){
-	$params{'exclude_stopwords'} = 1;
-	print("---ELIMINATING STOP WORDS---\n")				#have the debug print statements
+	$params{'stopwords'} = $opt_stopwords;
+	print("---ELIMINATING STOP WORDS w/ $opt_stopwords file---\n");				#have the debug print statements
+}
+
+if(defined $opt_is_cui){
+	$params{'is_cui'} = 1;
+	print("---EXCLUDING VECTORS FOR WORDS WITHOUT CUIS---");
+}else{
+	$params{'is_cui'} = 0;
+}
+
+if(defined $opt_sparse_matrix){
+	$params{'sparse_matrix'} = 1;
+	print("---USING SPARSE MATRIX GENERATION---");
+}else{
+	$params{'sparse_matrix'} = 0;
 }
 
 if(defined $opt_import_meta){
@@ -217,6 +230,11 @@ if(defined $opt_suffix){									#get the word suffix character count
 	$params{'suffix'} = $opt_suffix;
 }
 
+if(defined $opt_wcs){
+	$params{'wcs'} = $opt_wcs;
+	print("---RUNNING WORSE CASE SCENARIO: $opt_wcs---\n");
+}
+
 if(defined $opt_weka_type){
 	$params{'weka_type'} = $opt_weka_type;
 	print("---RUNNING $weka_type WEKA---\n");				#average the weka accuracies
@@ -224,8 +242,14 @@ if(defined $opt_weka_type){
 
 if(defined $opt_weka_size){
 	$params{'weka_size'} = $opt_weka_size;
-	print("---MAXIMUM WEKA MEMORY = $weka_size---\n");		#average the weka accuracies
+	print("---MAXIMUM WEKA MEMORY = $opt_weka_size---\n");		#average the weka accuracies
 }	
+if(defined $opt_metamap_arguments){
+	$params{'metamap_arguments'} = $opt_metamap_arguments;
+}
+else{
+	$params{'metamap_arguments'} = "-q";
+}
 
 #help screen
 sub showHelp{
@@ -247,27 +271,33 @@ sub showHelp{
 	print("--process STR      Decide how to run NNER (by method or by file)\n");
 	print("                      --> \"file\"=each method processes the file before going to the next\n");
 	print("                      --> \"method\"=each file is run in the method before going to the next\n");
+	print("                      --> \"meta\", \"arff\", \"weka\", or \"avg\"=run this process on the set\n");
 	print("--index NUM        Starts the program at a certain index number in a directory\n");
 	print("--file STR         Defines the file source of a single article\n");
 	print("--sort             Option to sort the directory files by size\n");
 	print("--import_meta      Runs the program with the pre-made meta data\n");
-	print("--stopwords        Eliminates stop words from vectors in the ARFF files\n");
+	print("--metamap_arguments STR       Runs MetaMap with specified arguments\n");
+	print("--stopwords STR    Eliminates stop words from vectors in the ARFF files with the specified file\n");
+	print("--is_cui           Creates a vector for a word only if it has a CUI associated with it\n");
+	print("--sparse_matrix    Generates the vectors as a sparse matrix\n");
 	print("--buckets NUM      The number of buckets for the k-fold cross validation\n");
 	print("--prefix NUM       Sets the prefix character amount for morph features\n");
 	print("--suffix NUM       Sets the suffix character amount for morph features\n");
+	print("--wcs STR          Worst-case-scenario -- start from a set bucket and feature set\n");
+	print("                       --> FORMAT: '(bucket #)-(feature abbreviation)\n");
 	print("--weka_type STR    Sets the type of weka algorithm to use on the data\n");
 	print("--weka_size STR    Sets the maximum memory value to run weka with\n");
 	print("                         --> (ex. -Xmx2G, -Xmx6G, -Xmx64G)\n");
 	print("\n");
 	print("*** Example command: ***\n");
-	print("perl NER12.pl --dir eon2 --debug --fts=\"ortho morph text pos cui sem\" --buckets=5 --import --index=18 --weka --average --weka_type weka.classifiers.functions.SMO --weka_dir SMO --weka_size=\"-Xmx6G\"\n");
+	print("perl NanoB2BNER.pl --dir my_directory --features=\"ortho morph text pos cui sem\" --debug --process=\"file\" --buckets=5 --import --index=18 --weka_type weka.classifiers.functions.SMO --weka_size=\"-Xmx6G\"\n");
 }
 
 
 #  function to output minimal usage notes
 sub minimalUsageNotes {
     
-    print "Usage: NanoB2BNER.pl --dir DIRECTORYNAME --fts FEATURESET [OPTIONS]\n";
+    print "Usage: NanoB2BNER.pl --dir DIRECTORYNAME --features FEATURESET [OPTIONS]\n";
     &askHelp();
     exit;
 }
@@ -291,6 +321,14 @@ if($process eq "file"){
 	$nner->nerByFile();
 }elsif($process eq "method"){
 	$nner->nerByMethod();
+}elsif($process eq "meta"){
+	$nner->metaSet();
+}elsif($process eq "arff"){
+	$nner->arffSet();
+}elsif($process eq "weka"){
+	$nner->wekaSet();
+}elsif($process eq "avg"){
+	$nner->avgSet();
 }else{
 	print("***ERROR: INVALID PROCESS METHOD FOR NNER!***\n");
 	exit;

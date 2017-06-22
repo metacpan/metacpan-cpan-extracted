@@ -33,6 +33,7 @@ option 'plugins' => (
     documentation => 'Load aplication plugins',
     cmd_split     => qr/,/,
     required      => 0,
+    default       => sub { [] },
 );
 
 option 'plugins_opts' => (
@@ -40,6 +41,7 @@ option 'plugins_opts' => (
     isa           => 'HashRef',
     documentation => 'Options for application plugins',
     required      => 0,
+    default       => sub { {} },
 );
 
 =head3 hpc_plugins
@@ -62,6 +64,7 @@ option 'hpc_plugins_opts' => (
     isa           => 'HashRef',
     documentation => 'Options for hpc_plugins',
     required      => 0,
+    default       => sub { {} },
 );
 
 =head3 job_plugins
@@ -76,6 +79,7 @@ option 'job_plugins' => (
     documentation => 'Load job execution plugins',
     cmd_split     => qr/,/,
     required      => 0,
+    default       => sub { [] },
 );
 
 option 'job_plugins_opts' => (
@@ -83,6 +87,7 @@ option 'job_plugins_opts' => (
     isa           => 'HashRef',
     documentation => 'Options for job_plugins',
     required      => 0,
+    default       => sub { {} },
 );
 
 =head2 Subroutines
@@ -129,6 +134,20 @@ sub job_load_plugins {
     $self->app_load_plugins( $self->job_plugins );
     $self->parse_plugin_opts( $self->job_plugins_opts );
 }
+
+=head3 after *load_plugins
+
+After loading the plugins make sure to reload the configs - to get any options we didn't get the first time around
+
+=cut
+
+after [ 'job_load_plugins', 'hpc_load_plugins', 'gen_load_plugins' ] => sub {
+    my $self = shift;
+
+    if ( $self->has_config_files ) {
+        $self->load_configs;
+    }
+};
 
 =head3 app_load_plugin
 

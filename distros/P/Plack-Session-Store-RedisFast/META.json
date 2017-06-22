@@ -4,13 +4,13 @@
       "Akzhan Abdulin <akzhan.abdulin@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Plack-Session-Store-RedisFast",
    "no_index" : {
@@ -50,10 +50,10 @@
       },
       "test" : {
          "requires" : {
-            "JSON::XS" : "3.03",
+            "JSON" : "2.0",
             "Redis::Fast" : "0.20",
-            "Test::More" : "0.96",
-            "Test::Spec" : "0.51"
+            "Test::Fatal" : "0",
+            "Test::More" : "0.96"
          }
       }
    },
@@ -69,7 +69,7 @@
          "web" : "https://github.com/akzhan/perl-Plack-Session-Store-RedisFast"
       }
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

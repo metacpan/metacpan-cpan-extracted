@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 =head1 NAME
 
@@ -55,7 +55,7 @@ our $FUTURE_FACTORY = sub {
 };
 
 # It'd be nice if L<Future> already provided a method for this, maybe I should suggest it
-my $future_state = sub {
+our $future_state = sub {
       $_[0]->is_done
     ? 'done'
     : $_[0]->is_failed
@@ -218,6 +218,10 @@ sub encode {
     my ($self, $type) = splice @_, 0, 2;
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
     my $code = ($ENCODER{$type} || $self->can('encode_' . $type) or die "unsupported encoding $type")->(@_);
+    $self->completed->on_ready(sub {
+        return if $src->is_ready;
+        shift->on_ready($src->completed);
+    });
     $self->each_while_source(sub {
         $src->emit($code->($_))
     }, $src);
@@ -242,6 +246,10 @@ sub decode {
     my ($self, $type) = splice @_, 0, 2;
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
     my $code = ($DECODER{$type} || $self->can('decode_' . $type) or die "unsupported encoding $type")->(@_);
+    $self->completed->on_ready(sub {
+        return if $src->is_ready;
+        shift->on_ready($src->completed);
+    });
     $self->each_while_source(sub {
         $src->emit($code->($_))
     }, $src);
@@ -249,7 +257,7 @@ sub decode {
 
 =head2 say
 
-Shortcut for C< ->each(sub { print "\n" }) >.
+Shortcut for C<< ->each(sub { print "$_\n" }) >>.
 
 =cut
 
@@ -489,6 +497,21 @@ sub suffix {
     }, $src);
 }
 
+=head2 sprintf_methods
+
+Convenience method for generating a string from a L</sprintf>-style format
+string and a set of method names to call.
+
+Note that any C<undef> items will be mapped to an empty string.
+
+Example:
+
+ $src->sprintf_methods('%d has name %s', qw(id name))
+     ->say
+     ->await;
+
+=cut
+
 sub sprintf_methods {
     my ($self, $fmt, @methods) = @_;
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
@@ -497,7 +520,7 @@ sub sprintf_methods {
     });
     $self->each_while_source(sub {
         my ($item) = @_;
-        $src->emit(sprintf $fmt, map $item->$_, @methods)
+        $src->emit(sprintf $fmt, map $item->$_ // '', @methods)
     }, $src);
 }
 

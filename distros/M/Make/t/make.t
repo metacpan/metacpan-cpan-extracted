@@ -9,3 +9,5 @@ my $m = Make->new( Makefile => "Makefile" );
 is ref($m), 'Make';
 eval { $m->Make('all') };
 is $@, '',;
+
+1;

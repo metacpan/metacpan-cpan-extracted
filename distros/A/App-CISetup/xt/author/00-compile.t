@@ -13,7 +13,7 @@ my @module_files = (
     'App/CISetup/AppVeyor/ConfigFile.pm',
     'App/CISetup/AppVeyor/ConfigUpdater.pm',
     'App/CISetup/Role/ConfigFile.pm',
-    'App/CISetup/Role/ConfigFileFinder.pm',
+    'App/CISetup/Role/ConfigUpdater.pm',
     'App/CISetup/Travis/ConfigFile.pm',
     'App/CISetup/Travis/ConfigUpdater.pm',
     'App/CISetup/Types.pm'

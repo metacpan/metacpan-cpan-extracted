@@ -26,15 +26,18 @@ no_index:
 provides:
   Acme::Want5000trillion:
     file: lib/Acme/Want5000trillion.pm
-    version: '0.01'
+    version: '0.03'
+  Acme::Want5000trillion::Asciiart:
+    file: lib/Acme/Want5000trillion/Asciiart.pm
 requires:
-  perl: '5.008001'
+  perl: '5.010'
 resources:
   bugtracker: https://github.com/AnaTofuZ/perl5-acme-Want5000trillio/issues
   homepage: https://github.com/AnaTofuZ/perl5-acme-Want5000trillio
   repository: git://github.com/AnaTofuZ/perl5-acme-Want5000trillio.git
-version: '0.01'
+version: '0.03'
 x_authority: cpan:ANATOFUZ
 x_contributors:
   - 'AnaTofuZ <e155730@ie.u-ryukyu.ac.jp>'
+  - 'AnaTofuZ <anatofuz@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

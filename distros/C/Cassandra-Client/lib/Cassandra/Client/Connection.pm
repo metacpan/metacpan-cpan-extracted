@@ -4,9 +4,9 @@ use strict;
 use warnings;
 use vars qw/$BUFFER/;
 
-use Ref::Util qw/is_arrayref/;
+use Ref::Util qw/is_blessed_ref is_plain_arrayref/;
 use IO::Socket::INET;
-use Errno;
+use Errno qw/EAGAIN/;
 use Socket qw/SOL_SOCKET IPPROTO_TCP SO_KEEPALIVE TCP_NODELAY/;
 use Scalar::Util qw/weaken/;
 use Net::SSLeay qw/ERROR_WANT_READ ERROR_WANT_WRITE ERROR_NONE/;
@@ -61,6 +61,7 @@ sub new {
         prepare_cache   => $args{metadata}->prepare_cache,
         last_stream_id  => 0,
         pending_streams => {},
+        in_prepare      => {},
 
         decompress_func => undef,
         compress_func   => undef,
@@ -206,7 +207,7 @@ sub execute_prepared {
         my ($err, $code)= @_;
 
         if ($err) {
-            if (ref $err && $err->code == 0x2500) {
+            if (is_blessed_ref($err) && $err->code == 0x2500) {
                 return $self->prepare_and_try_execute_again($callback, $queryref, $parameters, $attr, $exec_info);
             }
             return $callback->($err);
@@ -257,19 +258,19 @@ sub execute_batch {
     my ($self, $callback, $queries, $attribs, $exec_info)= @_;
     # Like execute_prepared, assumes ownership of $queries and $attribs
 
-    if (!is_arrayref($queries)) {
+    if (!is_plain_arrayref($queries)) {
         return $callback->("execute_batch: queries argument must be an array of arrays");
     }
 
     my @prepared;
     for my $query (@$queries) {
-        if (!is_arrayref($query)) {
+        if (!is_plain_arrayref($query)) {
             return $callback->("execute_batch: entries in query argument must be arrayrefs");
         }
         if (!$query->[0]) {
             return $callback->("Empty or no query given, cannot execute as part of a batch");
         }
-        if ($query->[1] && !is_arrayref($query->[1])) {
+        if ($query->[1] && !is_plain_arrayref($query->[1])) {
             return $callback->("Query parameters to batch() must be given as an arrayref");
         }
 
@@ -305,7 +306,7 @@ sub execute_batch {
         my ($err, $code)= @_;
 
         if ($err) {
-            if (ref $err && $err->code == 0x2500) {
+            if (is_blessed_ref($err) && $err->code == 0x2500) {
                 return $self->prepare_and_try_batch_again($callback, $queries, $attribs, $exec_info);
             }
             return $callback->($err);
@@ -353,7 +354,12 @@ sub prepare_and_try_batch_again {
 sub prepare {
     my ($self, $callback, $query)= @_;
 
-    # XXX Should we guard against the case of preparing the same statement in parallel?
+    if (exists $self->{in_prepare}{$query}) {
+        push @{$self->{in_prepare}{$query}}, $callback;
+        return;
+    }
+
+    $self->{in_prepare}{$query}= [ $callback ];
 
     series([
         sub {
@@ -383,13 +389,17 @@ sub prepare {
                 1;
             } or do {
                 my $error= $@ || "??";
-                return $callback->("Error while preparing query, couldn't compile encoder/decoder: $error");
+                return $next->("Error while preparing query, couldn't compile encoder/decoder: $error");
             };
 
             $self->{metadata}->add_prepared($query, $id, $metadata, $resultmetadata, $decoder, $encoder);
-            $next->();
+            return $next->();
         },
-    ], $callback);
+    ], sub {
+        my $error= shift;
+        my $in_prepare= delete($self->{in_prepare}{$query}) or die "BUG";
+        $_->($error) for @$in_prepare;
+    });
 
     return;
 }
@@ -773,6 +783,9 @@ sub request {
                     # We never actually sent our request, so take it out again
                     my $my_stream= delete $pending->{$stream_id};
 
+                    # Disable our stream's deadline
+                    ${$my_stream->[1]}= 1;
+
                     $self->shutdown($error);
 
                     # Now fail our stream properly, but include the retry notice
@@ -789,7 +802,7 @@ sub request {
             my $result= syswrite($self->{socket}, $data, $length);
             if ($result && $result == $length) {
                 # All good
-            } elsif (defined $result || $!{EAGAIN}) {
+            } elsif (defined $result || $! == EAGAIN) {
                 substr($data, 0, $result, '') if $result;
                 $self->{pending_write}= $data;
                 $self->{async_io}->register_write($self->{fileno});
@@ -799,6 +812,9 @@ sub request {
 
                 # We never actually sent our request, so take it out again
                 my $my_stream= delete $pending->{$stream_id};
+
+                # Disable our stream's deadline
+                ${$my_stream->[1]}= 1;
 
                 $self->shutdown($error);
 
@@ -823,14 +839,14 @@ sub can_read {
 
 READ:
     while (!$self->{shutdown}) {
-        my $read_something;
+        my $should_read_more;
 
         if ($self->{tls}) {
             my ($bytes, $rv)= Net::SSLeay::read(${$self->{tls}});
             if (length $bytes) {
                 $BUFFER .= $bytes;
                 $bufsize += $rv;
-                $read_something= 1;
+                $should_read_more= 1;
             }
 
             if ($rv <= 0) {
@@ -854,13 +870,13 @@ READ:
             }
 
         } else {
-            my $read_cnt= sysread($self->{socket}, $BUFFER, 10240, $bufsize);
+            my $read_cnt= sysread($self->{socket}, $BUFFER, 16384, $bufsize);
             if ($read_cnt) {
                 $bufsize += $read_cnt;
-                $read_something= 1;
+                $should_read_more= 1 if $read_cnt >= 16384;
 
             } elsif (!defined $read_cnt) {
-                if (!$!{EAGAIN}) {
+                if ($! != EAGAIN) {
                     my $error= "$!";
                     $shutdown_when_done= $error;
                 }
@@ -888,9 +904,7 @@ READ_NEXT:
         if ($stream_id != -1) {
             my $stream_cb= delete $self->{pending_streams}{$stream_id};
             if (!$stream_cb) {
-                if (!$self->{shutdown}) {
-                    warn 'BUG: received response for unknown stream';
-                } # Else: totally fine
+                warn 'BUG: received response for unknown stream';
 
             } elsif ($opcode == OPCODE_ERROR) {
                 my ($cb, $dl)= @$stream_cb;
@@ -912,7 +926,7 @@ READ_NEXT:
         goto READ_NEXT;
 
 READ_MORE:
-        last READ unless $read_something;
+        last READ unless $should_read_more;
     }
 
     if ($shutdown_when_done) {
@@ -957,7 +971,7 @@ sub can_write {
     } else {
         my $result= syswrite($self->{socket}, $self->{pending_write});
         if (!defined($result)) {
-            if ($!{EAGAIN}) {
+            if ($! == EAGAIN) {
                 return; # Huh. Oh well, whatever
             }
 
@@ -997,13 +1011,16 @@ sub shutdown {
     my $pending= $self->{pending_streams};
     $self->{pending_streams}= {};
 
-    $self->{socket}->close;
+    # Disable our deadlines
+    ${$_->[1]}= 1 for values %$pending;
+
     $self->{async_io}->unregister_read($self->{fileno});
     if (defined(delete $self->{pending_write})) {
         $self->{async_io}->unregister_write($self->{fileno});
     }
     $self->{async_io}->unregister($self->{fileno}, $self);
     $self->{client}->_disconnected($self->get_pool_id);
+    $self->{socket}->close;
 
     for (values %$pending) {
         $_->[0]->(Cassandra::Client::Error->new(
@@ -1019,7 +1036,7 @@ sub shutdown {
 
 ###### COMPRESSION
 BEGIN {
-    @compression_preference= qw/snappy lz4/;
+    @compression_preference= qw/lz4 snappy/;
 
     %available_compression= (
         snappy  => scalar eval "use Compress::Snappy (); 1;",

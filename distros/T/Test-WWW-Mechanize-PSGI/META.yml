@@ -4,33 +4,44 @@ author:
   - 'Leon Brocard <acme@astray.com>'
 build_requires:
   CGI::Cookie: '0'
-  Module::Build: '0.28'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
   Test::More: '0'
+  perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  Module::Build: '0.28'
+  perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Test-WWW-Mechanize-PSGI
+no_index:
+  directory:
+    - examples
+    - t
+    - xt
 requires:
   Carp: '0'
   HTTP::Message::PSGI: '0'
   Test::WWW::Mechanize: '0'
   Try::Tiny: '0'
   base: '0'
+  perl: '5.006'
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: http://github.com/acme/Test-WWW-Mechanize-PSGI/issues
-  homepage: https://metacpan.org/release/Test-WWW-Mechanize-PSGI
+  bugtracker: https://github.com/acme/test-www-mechanize-psgi/issues
+  homepage: https://github.com/acme/test-www-mechanize-psgi
   repository: https://github.com/acme/test-www-mechanize-psgi.git
-version: '0.36'
+version: '0.37'
 x_contributors:
   - 'Chia-liang Kao <clkao@clkao.org>'
+  - 'moznion <moznion@gmail.com>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
   - 'Shin Kojima <shin@kojima.org>'
+  - 'Tadeusz Sośnierz <tadeusz.sosnierz@onet.pl>'
   - 'tokuhirom <tokuhirom@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

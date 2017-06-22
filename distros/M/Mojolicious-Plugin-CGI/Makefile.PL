@@ -20,7 +20,7 @@ WriteMakefile(
 ,
   PREREQ_PM => {
   'IO::Pipely' => '0.005',
-  'Mojolicious' => '6.49'
+  'Mojolicious' => '7.28'
 }
 ,
   test => {TESTS => (-e 'META.yml' ? 't/*.t' : 't/*.t xt/*.t')},

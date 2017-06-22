@@ -1,7 +1,7 @@
 package App::ExtractDate;
 
-our $DATE = '2016-04-06'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2017-06-14'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -9,7 +9,7 @@ use warnings;
 
 our %SPEC;
 
-our $DATE_EXTRACT_MODULE = $ENV{PERL_DATE_EXTRACT_MODULE} // "Date::Extract";
+our $DATE_EXTRACT_MODULE = $ENV{PERL_DATE_EXTRACT_MODULE} // "Date::Extract::PERLANCAR";
 
 $SPEC{extract_date} = {
     v => 1.1,
@@ -24,7 +24,8 @@ $SPEC{extract_date} = {
         },
         module => {
             summary => 'Date::Extract module to use',
-            schema => 'str*',
+            schema => 'perl::modname*',
+            default => 'Date::Extract::PERLANCAR',
             cmdline_aliases => {m=>{}},
         },
     },
@@ -63,7 +64,7 @@ App::ExtractDate - Extract date from lines of text
 
 =head1 VERSION
 
-This document describes version 0.002 of App::ExtractDate (from Perl distribution App-ExtractDate), released on 2016-04-06.
+This document describes version 0.003 of App::ExtractDate (from Perl distribution App-ExtractDate), released on 2017-06-14.
 
 =head1 SYNOPSIS
 
@@ -74,7 +75,11 @@ This document describes version 0.002 of App::ExtractDate (from Perl distributio
 =head1 FUNCTIONS
 
 
-=head2 extract_date(%args) -> [status, msg, result, meta]
+=head2 extract_date
+
+Usage:
+
+ extract_date(%args) -> [status, msg, result, meta]
 
 Extract date from lines of text.
 
@@ -86,7 +91,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<input>* => I<array[str]>
 
-=item * B<module> => I<str>
+=item * B<module> => I<perl::modname> (default: "Date::Extract::PERLANCAR")
 
 Date::Extract module to use.
 
@@ -131,7 +136,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

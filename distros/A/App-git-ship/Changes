@@ -1,5 +1,11 @@
 Revision history for perl distribution App-git-ship
 
+0.23 2017-06-20T00:11:42+0200
+ - Add GITHUB_USERNAME and GIT_SHIP_NO_UPLOAD environment vars
+ - Add support for GIT_SHIP_NO_UPLOAD
+ - Will not add README file
+ - Documentation fixes
+
 0.22 2016-02-13T18:41:52+0100
  - Fix extending other classes, such as App::git::ship::perl
 

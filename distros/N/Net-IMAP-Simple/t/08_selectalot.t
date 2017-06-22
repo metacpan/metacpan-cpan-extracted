@@ -20,4 +20,4 @@ sub run_tests {
     ok( $imap->current_box, "anotherthingy" );
 }
 
-do "t/test_runner.pm";
+do "./t/test_runner.pm";

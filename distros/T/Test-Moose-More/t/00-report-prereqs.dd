@@ -26,6 +26,7 @@ do { my $x = {
                       'requires' => {
                                       'Carp' => '0',
                                       'Data::OptList' => '0',
+                                      'List::MoreUtils' => '0',
                                       'List::Util' => '1.45',
                                       'Moose::Util' => '0',
                                       'Moose::Util::TypeConstraints' => '0',

@@ -21,7 +21,6 @@ WriteMakefile(
         "Perl::OSType"      => 0,
         "Proc::Guard"       => "0.07",
         "Storable"          => 0,
-        "Test::Differences" => 0,
         "Test::Exception"   => 0,
         "Test::More"        => 0,
         "Test::TCP"         => "2.17",

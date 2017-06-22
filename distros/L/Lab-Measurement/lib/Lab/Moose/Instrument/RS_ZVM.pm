@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::RS_ZVM;
-
+$Lab::Moose::Instrument::RS_ZVM::VERSION = '3.550';
 use 5.010;
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -9,7 +9,6 @@ use Carp;
 use Config;
 use namespace::autoclean;
 
-our $VERSION = '3.543';
 
 extends 'Lab::Moose::Instrument';
 

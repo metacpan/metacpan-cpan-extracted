@@ -76,7 +76,7 @@ for my $type_1 (sort keys %types) {
   for my $type_2 (sort keys %types) {
     my $inc_2 = "$dir/$type_2";
 
-    my $reader = Module::Reader->new(inc => [$inc_1, $inc_2, $fallback], pmc => 0);
+    my $reader = Module::Reader->new(inc => [$inc_1, $inc_2, $fallback], pmc => 0, abort_on_eacces => 1);
     my $found = eval { $reader->module('TestModule') };
 
     my ($want)
@@ -112,15 +112,21 @@ for my $type (sort keys %types) {
                                        : 'error';
 
     for my $read_opts (
-      ['normal', {inc => [$inc, $fallback], pmc => 1}, 'TestModule.pm'],
+      ['normal', {
+        inc => [$inc, $fallback],
+        pmc => 1,
+        abort_on_eacces => 1,
+      }, 'TestModule.pm'],
       ['found', {
         found => { 'TestModule.pm' => "$inc/TestModule.pm" },
         inc => [$fallback],
         pmc => 1,
+        abort_on_eacces => 1,
       }, 'TestModule.pm'],
       ['relative', {
         inc => [$fallback],
         pmc => 1,
+        abort_on_eacces => 1,
       }, './TestModule.pm', $inc],
     ) {
       my ($name, $opts, $file, $chdir) = @$read_opts;
@@ -128,6 +134,7 @@ for my $type (sort keys %types) {
         if defined $chdir;
       my $reader = Module::Reader->new(%$opts);
       my $found = eval { $reader->file($file) };
+      my $error = $@;
       my $want = $want eq 'none' && $file =~ /^\./ ? 'error' : $want;
 
       my $got
@@ -136,7 +143,15 @@ for my $type (sort keys %types) {
         : $found->is_pmc        ? 'pmc'
                                 : 'pm';
 
-      is $got, $want, "$name search of $type with $pmc_type pmc found $want";
+      my $ok = is $got, $want, "$name search of $type with $pmc_type pmc found $want";
+      if ($got eq 'error') {
+        if ($ok) {
+          note "Got error: ".$error;
+        }
+        else {
+          diag "Got error: ".$error;
+        }
+      }
       chdir $cwd;
     }
   }

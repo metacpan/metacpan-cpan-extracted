@@ -1,43 +1,40 @@
 #!perl
 
-use Test::More;
-use Test::Fatal;
+use Test2::Bundle::Extended;
 
 use Data::Record::Serialize;
 
 use lib 't/lib';
 
 like(
-    exception { Data::Record::Serialize->new },
+    dies { Data::Record::Serialize->new },
     qr/must specify 'encode'/,
     'empty args'
 );
 
 like(
-     exception {
-	 Data::Record::Serialize->new( encode => 'both',
-				       sink => 'stream' );
+     dies {
+         Data::Record::Serialize->new( encode => 'both',
+                                       sink => 'stream' );
      },
      qr/don't specify a sink/,
      q[encode includes sink ; don't specify sink]
 );
 
 
-is (
-    exception {
-	 Data::Record::Serialize->new( encode => 'ddump',
-				       sink => 'stream' );
+ok (
+    lives {
+         Data::Record::Serialize->new( encode => 'ddump',
+                                       sink => 'stream' );
      },
-    undef,
     'encode + sink'
-   );
+   ) or diag $@;
 
-is (
-    exception {
-	 Data::Record::Serialize->new( encode => 'ddump');
+ok (
+    lives {
+         Data::Record::Serialize->new( encode => 'ddump');
      },
-    undef,
     'encode + default sink'
-   );
+   ) or diag $@;
 
 done_testing;

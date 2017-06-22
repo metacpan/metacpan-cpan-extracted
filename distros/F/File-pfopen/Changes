@@ -1,0 +1,7 @@
+Revision history for File-pfopen
+
+0.02	Fri Jun 16 15:20:57 EDT 2017
+	Make it a proper pfopen, not just find the file
+
+0.01	Thu Apr 20 17:08:56 EDT 2017
+        First draft - extracted from VWF

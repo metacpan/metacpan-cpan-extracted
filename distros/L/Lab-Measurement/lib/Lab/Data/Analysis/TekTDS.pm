@@ -1,5 +1,5 @@
 package Lab::Data::Analysis::TekTDS;
-
+$Lab::Data::Analysis::TekTDS::VERSION = '3.550';
 use 5.006;
 use strict;
 use warnings;
@@ -20,7 +20,6 @@ Version 0.01
 
 =cut
 
-our $VERSION = '3.543';
 
 our @ISA = ("Lab::Data::Analysis");
 

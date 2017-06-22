@@ -1,34 +1,53 @@
 use utf8;
 use strict;
 use warnings;
-use File::Temp qw/ tempdir /;
-use Test::More tests => 5;
-use Math::Trig;
+use Test::More;
 use t::FigCmp;
 
+#
+# Skip tests if required modules are not available.
+#
+if (!eval { require File::Temp; 1 }) {
+    plan skip_all => "File::Temp moduled required";
+}
+if (!eval { require Math::Trig; 1 }) {
+    plan skip_all => "Math::Trig moduled required";
+}
+if (!eval { require Regexp::Common; 1 }) {
+    plan skip_all => "Regexp::Common moduled required";
+}
+if (!eval { require Image::Info; 1 }) {
+    plan skip_all => "Image::Info moduled required";
+}
+plan tests => 4;
+
+#
+# Load modules.
+#
+use Graphics::Fig;
+use File::Temp qw/ tempdir /;
+use Math::Trig;
+
+#
+# Create temp directory.
+#
 my $dir = tempdir(CLEANUP => 1);
 #my $dir = "/tmp";
 
-#
-# Test 1: load the module
-#
-BEGIN {
-    use_ok('Graphics::Fig')
-};
 
 #
-# Test 2: polyline given two points
+# Test 1: polyline given two points
 #
 eval {
     my $fig = Graphics::Fig->new();
     $fig->polyline([[ 1, 2 ], [ 3, 1 ]]);
-    $fig->save("${dir}/polyline2.fig");
-    &FigCmp::figCmp("${dir}/polyline2.fig", "t/polyline2.fig") || die;
+    $fig->save("${dir}/polyline1.fig");
+    &FigCmp::figCmp("${dir}/polyline1.fig", "t/polyline1.fig") || die;
 };
-ok($@ eq "", "test2");
+ok($@ eq "", "test1");
 
 #
-# Test 3: polyline given each arrow mode and various arrow styles
+# Test 2: polyline given each arrow mode and various arrow styles
 #
 eval {
     my $fig = Graphics::Fig->new();
@@ -40,13 +59,13 @@ eval {
     $fig->polyline({ points => [[ 1, 4 ], [ 3, 4 ]], arrowMode => "both",
 		     arrowStyle => "circle", color => "blue",
                      fArrowStyle => "filled-indented" });
-    $fig->save("${dir}/polyline3.fig");
-    &FigCmp::figCmp("${dir}/polyline3.fig", "t/polyline3.fig") || die;
+    $fig->save("${dir}/polyline2.fig");
+    &FigCmp::figCmp("${dir}/polyline2.fig", "t/polyline2.fig") || die;
 };
-ok($@ eq "", "test3");
+ok($@ eq "", "test2");
 
 #
-# Test 4: polyline given three points and various line thicknesses and styles
+# Test 3: polyline given three points and various line thicknesses and styles
 #
 eval {
     my $fig = Graphics::Fig->new();
@@ -64,13 +83,13 @@ eval {
     	             lineThickness => "4.0 mm",
 		     lineStyle => "dash-double-dotted",
 		     styleVal => 0.5 });
-    $fig->save("${dir}/polyline4.fig");
-    &FigCmp::figCmp("${dir}/polyline4.fig", "t/polyline4.fig") || die;
+    $fig->save("${dir}/polyline3.fig");
+    &FigCmp::figCmp("${dir}/polyline3.fig", "t/polyline3.fig") || die;
 };
-ok($@ eq "", "test4");
+ok($@ eq "", "test3");
 
 #
-# Test 5: polyline given list of points
+# Test 4: polyline given list of points
 #
 eval {
     my $fig = Graphics::Fig->new({ areaFill => "full", fillColor => "gold" });
@@ -80,9 +99,9 @@ eval {
 	push(@points, [ 2 * (cos($a) + 1), 2 * (sin($a) + 1) ]);
     }
     $fig->polyline(\@points);
-    $fig->save("${dir}/polyline5.fig");
-    &FigCmp::figCmp("${dir}/polyline5.fig", "t/polyline5.fig") || die;
+    $fig->save("${dir}/polyline4.fig");
+    &FigCmp::figCmp("${dir}/polyline4.fig", "t/polyline4.fig") || die;
 };
-ok($@ eq "", "test5");
+ok($@ eq "", "test4");
 
 exit(0);

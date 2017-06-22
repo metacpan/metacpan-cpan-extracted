@@ -15,7 +15,7 @@ my $aliyun = MojoX::Aliyun->new(
     access_key => $ENV{ALIYUN_ACCESS_KEY},
     access_secret => $ENV{ALIYUN_ACCESS_SECRET},
 );
-my $data = $aliyun->request('GET', 'https://ecs.aliyuncs.com/', {
+my $data = $aliyun->request('GET', 'ecs', {
     Action => 'DescribeRegions',
 });
 foreach my $Region (sort { $a->{RegionId} cmp $b->{RegionId} } @{ $data->{Regions}->{Region} }) {

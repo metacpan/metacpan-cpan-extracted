@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.107;
+our $VERSION = 1.108;
 
 use Prty::Path;
 
@@ -591,8 +591,8 @@ nichts
 sub removeEofMarker {
     my $self = shift;
 
-    $self->[4] =~ s/\s+# eof\n*$//;
-    $self->[5] =~ s/\n# eof\n*$/\n/;
+    $self->[4] =~ s/\s*^# eof\n*$//m;
+    $self->[5] =~ s/\n+^# eof\n*$/\n\n/m;
 
     return;
 }
@@ -1398,7 +1398,7 @@ sub AUTOLOAD {
 
 =head1 VERSION
 
-1.107
+1.108
 
 =head1 AUTHOR
 

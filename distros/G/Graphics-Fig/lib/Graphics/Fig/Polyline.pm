@@ -14,8 +14,9 @@
 # You should have received a copy of the Artistic License along with this
 # program.  If not, see <http://www.perlfoundation.org/artistic_license_2_0>.
 #
-use 5.014;
-package Graphics::Fig::Polyline v1.0.1;
+package Graphics::Fig::Polyline;
+our $VERSION = 'v1.0.2';
+
 use strict;
 use warnings;
 use Carp;

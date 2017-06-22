@@ -1,0 +1,48 @@
+# Avoid version control files.
+\B\.git\b
+
+# Avoid Makemaker generated and utility files.
+\bMANIFEST\.bak
+\bMakefile$
+\bblib/
+\bMakeMaker-\d
+\bpm_to_blib\.ts$
+\bpm_to_blib$
+\bblibdirs\.ts$         # 6.18 through 6.25 generated this
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\b_build/
+
+# Avoid temp and backup files.
+~$
+\.old$
+\#$
+\b\.#
+\.bak$
+_bak$
+GuavaRing\.c$
+\.o$
+\.bs$
+
+# Avoid Devel::Cover files.
+\bcover_db\b
+
+# Avoid local testing/dist files
+^MYMETA\.
+^lib/.+\.pl$
+^dist/
+^makeall\.sh$
+^tmp/
+^Hash-GuavaRing-.*
+
+# Custom
+^.vagrant/
+\.gitignore
+\.gitmodules
+build.sh
+^provision/run.sh
+\.travis.yml
+t/temp.pl
+Vagrantfile
+^tnt_*

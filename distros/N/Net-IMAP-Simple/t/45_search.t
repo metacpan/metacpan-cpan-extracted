@@ -28,4 +28,4 @@ sub run_tests {
     ok( 0+$imap->search_subject("test-3"), 1 );
 }
 
-do "t/test_runner.pm";
+do "./t/test_runner.pm";

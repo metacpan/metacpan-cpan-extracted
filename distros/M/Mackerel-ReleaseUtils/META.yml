@@ -27,7 +27,7 @@ no_index:
 provides:
   Mackerel::ReleaseUtils:
     file: lib/Mackerel/ReleaseUtils.pm
-    version: v0.2.0
+    version: v0.2.1
   Mackerel::ReleaseUtils::Log:
     file: lib/Mackerel/ReleaseUtils/Log.pm
 requires:
@@ -39,7 +39,7 @@ resources:
   bugtracker: https://github.com/mackerelio/Mackerel-ReleaseUtils/issues
   homepage: https://github.com/mackerelio/Mackerel-ReleaseUtils
   repository: git://github.com/mackerelio/Mackerel-ReleaseUtils.git
-version: v0.2.0
+version: v0.2.1
 x_authority: cpan:SONGMU
 x_contributors:
   - 'Shoichi Kaji <skaji@cpan.org>'

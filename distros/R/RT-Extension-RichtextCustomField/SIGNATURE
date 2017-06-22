@@ -1,0 +1,52 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 0376428d7b287f63d54add2568b731de62227e38 Changes
+SHA1 0a3224be32be8a39834f4c2d84648064fadeb559 LICENSE
+SHA1 cc38358d20b6c02e6a2d9b12a8a9847a3b6658e3 MANIFEST
+SHA1 f633abf6e5a98e0499414bd39fc8fba5ab536414 META.yml
+SHA1 7243105b1d25eefa0f0b0f8cc4c555e03c0dcc35 Makefile.PL
+SHA1 95c97c23ede15cbddfdacc17de851ed8a267359a README
+SHA1 e8e62160dd2d61f6de3230f23920f03edc236bda README.md
+SHA1 9c2b6081f4f9b96996ee7abdc231dfe8b3581168 html/Elements/EditCustomFieldRichtext
+SHA1 61ee39aba0028dc9b9b24e12050b2a8342d28adf html/Elements/ShowCustomFieldRichtext
+SHA1 10f1ba97180b54e94ab30d9efe4aaa0a70aa1e26 inc/Module/AutoInstall.pm
+SHA1 d2664c57b65686abbfbbe1e71229761625be4922 inc/Module/Install.pm
+SHA1 b084961275ae4b66a9a0766372b0a08803aa63d1 inc/Module/Install/AutoInstall.pm
+SHA1 da41a8d9904f7b409b49a5f6c338d3eb305a2b4b inc/Module/Install/Base.pm
+SHA1 0db0afe19cd298abba248fa089e5525bd5ab3ab6 inc/Module/Install/Can.pm
+SHA1 e7152bfd5ca67d0e33f96d09c59d600bca5c1f15 inc/Module/Install/Fetch.pm
+SHA1 bd2183c72617105d0b65f3ef81d013bf4af337d6 inc/Module/Install/Include.pm
+SHA1 29ee1cb0dc262b00983e3a2f5cf00b538dff5069 inc/Module/Install/Makefile.pm
+SHA1 e963f80cfe255f16e55067d1feb6841cff3ed2fe inc/Module/Install/Metadata.pm
+SHA1 93e864def60207b13ab80f6e390c6667a4ff904b inc/Module/Install/RTx.pm
+SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
+SHA1 8d19f4485276b987b7838d4ec01909f8055a4724 inc/Module/Install/ReadmeFromPod.pm
+SHA1 13c903897bad7f0fdd7871a4a0182ff62dfbefd5 inc/Module/Install/Substitute.pm
+SHA1 65a1f09af1f4f9e47a98b6b45667c328b1b2f9c0 inc/Module/Install/Win32.pm
+SHA1 f191c49475b3f51775180cd4f7e41e3bdab7f85a inc/Module/Install/WriteAll.pm
+SHA1 7173d20065379a781d0218b7e747ca7a9b11f7a0 inc/YAML/Tiny.pm
+SHA1 260b8d6174a4d46eef8b44fd584c532181780595 lib/RT/Extension/RichtextCustomField.pm
+SHA1 f3a927662a3e5120f2aeed75a5c97aa8ee815e5c lib/RT/Extension/RichtextCustomField/Test.pm
+SHA1 2bd0118b13a2a2807e3e25a6e5ccec599084d556 lib/RT/Extension/RichtextCustomField/Test.pm.in
+SHA1 54ea0a3cc9f20469a4b9df304dd5108f450b5966 xt/00-load.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAllD0sUACgkQ8914Z7pT+T++PwCfQDpNWw2Vc9noBejjeDuwrvW9
+8qkAn1v9PnQ85tJjRDloBbgvaA82nL6s
+=XimO
+-----END PGP SIGNATURE-----

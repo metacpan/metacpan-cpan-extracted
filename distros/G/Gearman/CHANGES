@@ -1,3 +1,8 @@
+2.004.008 2017-06-13 13:35:00 Europe/Berlin
+    - bug fixing: double worker registration
+      https://github.com/p-alik/perl-Gearman/issues/21
+    - tests start gearmand with --log-file option. Default /dev/stderr
+
 2.004.007 2017-05-30 10:51:00 Europe/Berlin
     - bug fix: stringify job server in
       - get_job_server_status

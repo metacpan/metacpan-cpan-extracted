@@ -1,4 +1,11 @@
-Revision history for WWW-Google-APIDiscovery
+Revision history for WWW::Google::APIDiscovery
+
+0.22    Wed Jun 14 10:30:00 2017
+        - Tidied up test scripts and removed "-T" switch.
+
+0.21    Tue Jun 13 10:00:00 2017
+        - Added $AUTHORITY
+        - Tidied up attribute definitions.
 
 0.20    Thu Oct 08 10:35:00 2015
         - Added LICENSE file.

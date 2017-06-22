@@ -84,7 +84,7 @@
          "web" : "https://github.com/LibreCat/Catmandu-MARC"
       }
    },
-   "version" : "1.12",
+   "version" : "1.13",
    "x_contributors" : [
       "Carsten Klee <carsten.klee@sbb.spk-berlin.de>",
       "Carsten Klee <cKlee@users.noreply.github.com>",
@@ -97,6 +97,6 @@
       "Patrick Hochstenbach <Patrick.Hochstenbach@UGent.be>",
       "Robin Sheat <robin@catalyst.net.nz>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

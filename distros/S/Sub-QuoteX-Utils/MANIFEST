@@ -12,11 +12,12 @@ examples/captures.pl
 examples/synopsis.pl
 lib/Sub/QuoteX/Utils.pm
 t/00-compile.t
-t/00-report-prereqs.dd
 t/00-report-prereqs.t
+t/lexicals.t
 t/options.t
 t/quote_subs.t
 t/snippets.t
+t/store.t
 xt/author/cpan-changes.t
 xt/author/cpan-meta-json.t
 xt/author/cpan-meta.t
@@ -26,3 +27,4 @@ xt/author/pod-coverage.t
 xt/author/pod-syntax.t
 xt/author/pod.t
 xt/author/test-fixme.t
+xt/release/minimum-version.t

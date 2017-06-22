@@ -61,6 +61,7 @@ sub call_before_trigger {
 }
 
 sub will_dispatch {}
+sub did_dispatch {}
 
 sub validate {
 	my ($self, @rules) = @_;

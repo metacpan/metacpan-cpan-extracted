@@ -21,7 +21,7 @@ mkdir "$dir/tmp";
 my $libs = {
     ini  => 'Config::INI::Writer',
     xml  => 'XML::Simple',
-    json => 'JSON::Any',
+    json => 'JSON::MaybeXS',
     yaml => 'YAML::Any',
     perl => 'Data::Dumper',
 };

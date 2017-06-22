@@ -1,7 +1,7 @@
 package Acme::CPANLists::PERLANCAR::Avoided;
 
-our $DATE = '2017-05-30'; # DATE
-our $VERSION = '0.20'; # VERSION
+our $DATE = '2017-06-19'; # DATE
+our $VERSION = '0.22'; # VERSION
 
 our @Module_Lists = (
     {
@@ -23,11 +23,16 @@ _
                 summary => 'Startup overhead',
                 description => <<'_',
 
-After the 1.x version, I no longer prefer <pm:Log::Any> and am developing an
-alternative called <pm:Log::Gurat>.
+After the 1.x version, I no longer prefer <pm:Log::Any> and have developed an
+alternative called <pm:Log::ger>.
 
 _
-                alternate_modules => ['Log::Gurat'],
+                alternate_modules => ['Log::ger'],
+            },
+            {
+                module => 'Log::Any::IfLOG',
+                summary => 'Retired workaround',
+                alternate_modules => ['Log::ger'],
             },
             {
                 module => 'File::Flock',
@@ -119,7 +124,7 @@ Acme::CPANLists::PERLANCAR::Avoided - Modules I'm currently avoiding
 
 =head1 VERSION
 
-This document describes version 0.20 of Acme::CPANLists::PERLANCAR::Avoided (from Perl distribution Acme-CPANLists-PERLANCAR), released on 2017-05-30.
+This document describes version 0.22 of Acme::CPANLists::PERLANCAR::Avoided (from Perl distribution Acme-CPANLists-PERLANCAR), released on 2017-06-19.
 
 =head1 MODULE LISTS
 
@@ -138,11 +143,15 @@ modules listed here. (You should make your own blacklist though).
 
 =item * L<Log::Any> - Startup overhead
 
-After the 1.x version, I no longer prefer L<Log::Any> and am developing an
-alternative called L<Log::Gurat>.
+After the 1.x version, I no longer prefer L<Log::Any> and have developed an
+alternative called L<Log::ger>.
 
 
-Alternate modules: L<Log::Gurat>
+Alternate modules: L<Log::ger>
+
+=item * L<Log::Any::IfLOG> - Retired workaround
+
+Alternate modules: L<Log::ger>
 
 =item * L<File::Flock> - Too many deps
 

@@ -11,7 +11,7 @@ use XML::Compile::Schema;
 use XML::Compile::Tester;
 use XML::Compile::Util qw/pack_type/;
 
-use Test::More tests => 369;
+use Test::More tests => 392;
 
 set_compile_defaults
     elements_qualified => 'NONE';
@@ -176,10 +176,31 @@ my $schema   = XML::Compile::Schema->new( <<__SCHEMA__ );
   </simpleType>
 </element>
 
+<!-- rt.cpan.org#121946 canonicalization and pattern -->
+<element name="test18">
+  <simpleType>
+    <restriction base="integer">
+      <pattern value="-?[0-9]{4,4}" />
+    </restriction>
+  </simpleType>
+</element>
+
+<!-- reported by Wesley Schengle -->
+<element name="test19">
+  <simpleType name="test19">
+	<restriction base="integer">
+      <enumeration value="03" />
+      <enumeration value="14" />
+    </restriction>
+  </simpleType>
+</element>
+
 </schema>
 __SCHEMA__
 
 ok(defined $schema);
+      #<minInclusive value="0"/>
+      #<maxInclusive value="99"/>
 
 ##
 ### Integers
@@ -355,20 +376,7 @@ $error = error_r($schema, test13 => '<test13>YWJjYWJjZGU=</test13>');
 is($error, "string `abcabcde' does not have required length 5 but 8 at {http://test-types}test13#facet");
 
 $error = error_w($schema, test13 => 'abcdef');
-is($error, "base64 data does not have required length 5, but 6 at {http://test-types}test13#facet");
-
-### test15 length of hexBinary
-
-test_rw($schema, test15 => '<test15>DEADBEEF</test15>', pack('N', 0xdeadbeef));
-
-$error = error_r($schema, test15 => '<test15>345678</test15>');
-is($error, "string `4Vx' does not have required length 4 but 3 at {http://test-types}test15#facet");
-
-$error = error_w($schema, test15 => 'abc');
-is($error, "hex data does not have required length 4, but 3 at {http://test-types}test15#facet");
-
-$error = error_w($schema, test15 => 'anything');
-is($error, "hex data does not have required length 4, but 8 at {http://test-types}test15#facet");
+is($error, "string `abcdef' does not have required length 5 but 6 at {http://test-types}test13#facet");
 
 ### test14 enumeration of qnames [Aleksey Mashanov]
 
@@ -379,6 +387,20 @@ set_compile_defaults
 
 test_rw($schema, test14 => qq{<a:test14 xmlns:a="$TestNS">a:Sender</a:test14>}
   , "{$TestNS}Sender");
+
+### test15 length of hexBinary
+
+test_rw($schema, test15 => qq{<a:test15 xmlns:a="$TestNS">DEADBEEF</a:test15>},
+   pack('N', 0xdeadbeef));
+
+$error = error_r($schema, test15 => qq{<a:test15 xmlns:a="$TestNS">345678</a:test15>});
+is($error, "string `4Vx' does not have required length 4 but 3 at a:test15#facet");
+
+$error = error_w($schema, test15 => 'abc');
+is($error, "string `abc' does not have required length 4 but 3 at a:test15#facet");
+
+$error = error_w($schema, test15 => 'anything');
+is($error, "string `anything' does not have required length 4 but 8 at a:test15#facet");
 
 ### test16 fracDigits
 
@@ -405,3 +427,29 @@ is($error, 'fractional part for 3.14152 too long, got 5 digits max 2 at a:test17
 my $w17 = writer_create $schema, 'total 5, frac 2w', $t17;
 my $x17 = writer_test $w17, '3.14';
 compare_xml($x17, qq{<a:test17 xmlns:a="$TestNS">3.14</a:test17>});
+
+### test18 canonicalization and patterns
+
+my $t18 = pack_type $TestNS, 'test18';
+my $r18 = reader_create $schema, "canon patterns", $t18;
+is($r18->(qq{<test18 xmlns="$TestNS">0519</test18>}), '0519');
+
+my $w18 = writer_create $schema, 'canon patterns', $t18;
+my $x18 = writer_test $w18, '0519';
+compare_xml($x18, qq{<a:test18 xmlns:a="$TestNS">0519</a:test18>});
+
+### test19 canonicalization and patterns, multiple facets
+
+my $t19 = pack_type $TestNS, 'test19';
+my $r19 = reader_create $schema, "canon patterns multi", $t19;
+is($r19->(qq{<test19 xmlns="$TestNS">14</test19>}), '14');
+is($r19->(qq{<test19 xmlns="$TestNS">03</test19>}), '03');
+$error = error_r($schema, test19 => qq{<test19 xmlns="$TestNS">124</test19>});
+is($error, "invalid enumerate `124' at a:test19#facet");
+
+my $w19 = writer_create $schema, 'canon patterns multi', $t19;
+my $x19a = writer_test $w19, '14';
+compare_xml($x19a, qq{<a:test19 xmlns:a="$TestNS">14</a:test19>});
+my $x19b = writer_test $w19, '03';
+compare_xml($x19b, qq{<a:test19 xmlns:a="$TestNS">03</a:test19>});
+

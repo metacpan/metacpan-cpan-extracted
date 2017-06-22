@@ -27,7 +27,7 @@ no_index:
 provides:
   Mojolicious::Plugin::Subprocess:
     file: lib/Mojolicious/Plugin/Subprocess.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Mojolicious: '7.12'
   Scalar::Util: '0'
@@ -37,7 +37,7 @@ resources:
   bugtracker: https://github.com/Grinnz/Mojolicious-Plugin-Subprocess/issues
   homepage: https://github.com/Grinnz/Mojolicious-Plugin-Subprocess
   repository: https://github.com/Grinnz/Mojolicious-Plugin-Subprocess.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -187,7 +187,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.003
+          tag: v0.004
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

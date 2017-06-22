@@ -44,10 +44,10 @@
             "Dancer2::Core::Types" : "0",
             "Dancer2::Plugin" : "0",
             "Data::Structure::Util" : "0.16",
-            "Etcd3" : "0.006",
             "Getopt::Long" : "0",
             "Hash::Flatten" : "0",
             "Moo" : "2.000",
+            "Net::Etcd" : "0.013",
             "Path::Class" : "0",
             "Path::Tiny" : "0",
             "Scalar::Util" : "0",
@@ -71,5 +71,5 @@
       },
       "x_IRC" : "irc://irc.perl.org/#dancer"
    },
-   "version" : "0.006"
+   "version" : "0.011"
 }

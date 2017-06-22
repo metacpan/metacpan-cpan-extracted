@@ -6,7 +6,7 @@ use Alien::Build::Plugin;
 use Path::Tiny ();
 
 # ABSTRACT: Core download plugin
-our $VERSION = '0.41'; # VERSION
+our $VERSION = '0.45'; # VERSION
 
 
 sub _hook
@@ -98,7 +98,7 @@ Alien::Build::Plugin::Core::Download - Core download plugin
 
 =head1 VERSION
 
-version 0.41
+version 0.45
 
 =head1 SYNOPSIS
 
@@ -120,6 +120,8 @@ Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 Contributors:
 
 Diab Jerius (DJERIUS)
+
+Roy Storey
 
 =head1 COPYRIGHT AND LICENSE
 

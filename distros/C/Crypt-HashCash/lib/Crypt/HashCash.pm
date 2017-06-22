@@ -3,7 +3,7 @@
 # Crypt::HashCash - HashCash Digital Cash
 # Copyright (c) 2001-2017 Ashish Gulhati <crypt-hashcash at hash.neo.tc>
 #
-# $Id: lib/Crypt/HashCash.pm v1.118 Sat Jun 10 13:59:10 PDT 2017 $
+# $Id: lib/Crypt/HashCash.pm v1.124 Mon Jun 19 15:51:59 PDT 2017 $
 
 package Crypt::HashCash;
 
@@ -17,7 +17,7 @@ use vars qw($VERSION @ISA @EXPORT_OK);
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(breakamt changecoin _hex _dec _squish _unsquish _dectob85 _b85todec);
 
-our ( $VERSION ) = '$Revision: 1.118 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.124 $' =~ /\s+([\d\.]+)/;
 
 sub breakamt {          # Return denominations of lowest number of coins to make an amount
   my $amt = shift; my %d;
@@ -140,8 +140,8 @@ Crypt::HashCash - HashCash Digital Cash
 
 =head1 VERSION
 
- $Revision: 1.118 $
- $Date: Sat Jun 10 13:59:10 PDT 2017 $
+ $Revision: 1.124 $
+ $Date: Mon Jun 19 15:51:59 PDT 2017 $
 
 =head1 SYNOPSIS
 
@@ -150,20 +150,21 @@ introduced by David Chaum in [1].
 
 HashCash features a number of optimizations for usability and
 accessibility, including blind ECDSA signatures which make for more
-compact coins, and a simple protocol that enables the system to work
-in a permissionless manner, requiring no user accounts or
-registration.
+compact coins than blind RSA, and a simple protocol that enables the
+system to work in a permissionless manner, requiring no user accounts
+or registration.
 
 The main components of HashCash are: one or more vaults, which issue
 and verify HashCash coins; the coins themselves; and wallets, which
 hold and manage coins owned by users.
 
-HashCash coins represent a claim on a deposit at a vault. They are
-bearer tokens which can be passed directly from one user to another,
-and cannot be tracked by the vault.
+HashCash coins are blind-signed by a vault and represent specific
+denominations of some value stored by the vault. They are bearer
+tokens which can be passed directly from one user to another, and
+cannot be tracked by the vault.
 
-HashCash coins can be backed by whatever a vault accepts for deposit -
-some possibilities being precious metals, fiat currencies, gift cards,
+HashCash coins could be backed by any store of value, some
+possibilities being precious metals, fiat currencies, gift cards,
 etc. The distribution includes an implementation of a vault for
 Bitcoin, which issues HashCash coins backed by Bitcoin.
 
@@ -172,8 +173,22 @@ need for a secure communications channel between them.
 
 =head1 HOW TO USE
 
-Usually you would just run the HashCash wallet after installing the
-distribution, with the command:
+To begin with, the keys and configuration details of one or more
+vaults (in the form of vault configuration files) need to be placed in
+the "~/.hashcash/vaults" directory (or "$HASHCASHDIR/.hashcash/vaults"
+if the HASHCASHDIR environment variable is set).
+
+As there are no live public vaults at this time, and the software is
+in early beta testing, to try the system you can run a local vault
+yourself. After installing the HashCash distribution, run the command:
+
+    vault.pl
+
+This will generate vault keys on its first run. Wait for key
+generation to complete before starting the wallet, so the vault
+configuration file is in place for the wallet.
+
+Once the vault has completed key generation, start the wallet with:
 
     hashcash.pl
 
@@ -182,21 +197,29 @@ give to others, or import coins received from others into your
 wallet. You can also exchange coins for lower denominations, and
 verify coins you've imported into the wallet.
 
+For more details on testing with a local vault, see the Download page
+on the website: L<http://www.hashcash.com/download.html>. Pre-built
+executables for popular OSes are also available from that page.
+
 HashCash coins can be sent to others over any communications channel -
 email, web, instant messaging, SMS, directly by scanning a QR
 code. They could even be printed on paper and used just like normal
 paper currency, though with a higher level of security and privacy.
 
-You can easily automate the acceptance of HashCash payments on a
-website (or via email or any other communications channel) using the
-B<Business::HashCash> module.
+It's easy to automate the acceptance of HashCash payments on a website
+(or via email or any other communications channel) using the
+L<Business::HashCash> module.
 
-You could also run a HashCash vault, which is a potentially very
-profitable small business requiring a minimal amount of ongoing
-work. For more details on this visit the website:
-L<http://www.hashcash.com/>.
+It's also quite straightforward, from a technical standpoint, to start
+a HashCash vault, which could be quite a profitable automated business
+requiring minimal ongoing time investment. For more details on this
+visit the website: L<http://www.hashcash.com/>.
 
 =head1 FUNCTIONS
+
+The Crypt::HashCash module contains a few helper functions. Most of
+the actual implementation of the system is in other modules, listed in
+the SEE ALSO section below.
 
 =head2 breakamt
 
@@ -216,19 +239,17 @@ hash, as described above, followed by the total number of coins.
 
 =head1 SEE ALSO
 
-=head2 www.hashcash.com
+=head2 L<www.hashcash.com>
 
-=head2 Crypt::HashCash::Mint
+=head2 L<Crypt::HashCash::Mint>
 
-=head2 Crypt::HashCash::Client
+=head2 L<Crypt::HashCash::Client>
 
-=head2 Crypt::HashCash::Coin
+=head2 L<Crypt::HashCash::Coin>
 
-=head2 Crypt::HashCash::Vault::Bitcoin
+=head2 L<Crypt::HashCash::Vault::Bitcoin>
 
-=head2 Business::HashCash
-
-=head2
+=head2 L<Business::HashCash>
 
 =head1 REFERENCES
 

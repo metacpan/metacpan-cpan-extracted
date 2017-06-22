@@ -1,7 +1,7 @@
 #
 # This file is part of Dist-Zilla-Plugin-Travis-ConfigForReleaseBranch
 #
-# This software is Copyright (c) 2013 by Chris Weyl.
+# This software is Copyright (c) 2017, 2015, 2013 by Chris Weyl.
 #
 # This is free software, licensed under:
 #
@@ -9,8 +9,8 @@
 #
 package Dist::Zilla::Plugin::Travis::ConfigForReleaseBranch;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-# git description: 0.003-0-g3ea55af
-$Dist::Zilla::Plugin::Travis::ConfigForReleaseBranch::VERSION = '0.004';
+# git description: 0.004-4-gf9a6bb6
+$Dist::Zilla::Plugin::Travis::ConfigForReleaseBranch::VERSION = '0.005';
 
 # ABSTRACT: Create a C<.travis.yml> suitable for built branches
 
@@ -28,15 +28,13 @@ __PACKAGE__->meta->make_immutable;
 
 =for :stopwords Chris Weyl
 
-=for :stopwords Wishlist flattr flattr'ed gittip gittip'ed
-
 =head1 NAME
 
 Dist::Zilla::Plugin::Travis::ConfigForReleaseBranch - Create a C<.travis.yml> suitable for built branches
 
 =head1 VERSION
 
-This document describes version 0.004 of Dist::Zilla::Plugin::Travis::ConfigForReleaseBranch - released April 29, 2015 as part of Dist-Zilla-Plugin-Travis-ConfigForReleaseBranch.
+This document describes version 0.005 of Dist::Zilla::Plugin::Travis::ConfigForReleaseBranch - released June 21, 2017 as part of Dist-Zilla-Plugin-Travis-ConfigForReleaseBranch.
 
 =head1 SYNOPSIS
 
@@ -79,15 +77,10 @@ L<Dist::Zilla::TravisCI|Dist::Zilla::TravisCI>
 
 =back
 
-=head1 SOURCE
-
-The development version is on github at L<http://https://github.com/RsrchBoy/dist-zilla-plugin-travis-configforreleasebranch>
-and may be cloned from L<git://https://github.com/RsrchBoy/dist-zilla-plugin-travis-configforreleasebranch.git>
-
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-https://github.com/RsrchBoy/dist-zilla-plugin-travis-configforreleasebranch/issues
+L<https://github.com/RsrchBoy/dist-zilla-plugin-travis-configforreleasebranch/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -97,28 +90,9 @@ feature.
 
 Chris Weyl <cweyl@alumni.drew.edu>
 
-=head2 I'm a material boy in a material world
-
-=begin html
-
-<a href="https://gratipay.com/RsrchBoy/"><img src="http://img.shields.io/gratipay/RsrchBoy.svg" /></a>
-<a href="http://bit.ly/rsrchboys-wishlist"><img src="http://wps.io/wp-content/uploads/2014/05/amazon_wishlist.resized.png" /></a>
-<a href="https://flattr.com/submit/auto?user_id=RsrchBoy&url=https%3A%2F%2Fgithub.com%2FRsrchBoy%2Fdist-zilla-plugin-travis-configforreleasebranch&title=RsrchBoy's%20CPAN%20Dist-Zilla-Plugin-Travis-ConfigForReleaseBranch&tags=%22RsrchBoy's%20Dist-Zilla-Plugin-Travis-ConfigForReleaseBranch%20in%20the%20CPAN%22"><img src="http://api.flattr.com/button/flattr-badge-large.png" /></a>
-
-=end html
-
-Please note B<I do not expect to be gittip'ed or flattr'ed for this work>,
-rather B<it is simply a very pleasant surprise>. I largely create and release
-works like this because I need them or I find it enjoyable; however, don't let
-that stop you if you feel like it ;)
-
-L<Flattr|https://flattr.com/submit/auto?user_id=RsrchBoy&url=https%3A%2F%2Fgithub.com%2FRsrchBoy%2Fdist-zilla-plugin-travis-configforreleasebranch&title=RsrchBoy's%20CPAN%20Dist-Zilla-Plugin-Travis-ConfigForReleaseBranch&tags=%22RsrchBoy's%20Dist-Zilla-Plugin-Travis-ConfigForReleaseBranch%20in%20the%20CPAN%22>,
-L<Gratipay|https://gratipay.com/RsrchBoy/>, or indulge my
-L<Amazon Wishlist|http://bit.ly/rsrchboys-wishlist>...  If and *only* if you so desire.
-
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 by Chris Weyl.
+This software is Copyright (c) 2017, 2015, 2013 by Chris Weyl.
 
 This is free software, licensed under:
 
@@ -140,12 +114,16 @@ perl:
    - "5.16"
    - "5.18"
    - "5.20"
-   - "5.21"
+   - "5.22"
+   - "5.24"
+   - "5.26"
 
 matrix:
    allow_failures:
       - perl: "5.8"
-      - perl: "5.21"
+      - perl: "5.10"
+      - perl: "5.12"
+      - perl: "5.14"
 
 before_install:
    # git bits sometimes needed...

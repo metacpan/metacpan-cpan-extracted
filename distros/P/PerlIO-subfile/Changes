@@ -46,3 +46,7 @@ Revision history for Perl extension PerlIO::subfile.
 
 0.08  Mon Mar 13 23:06:51 GMT 2006
       It seems that 5.9.x doesn't like me unless I use () for XSLoader::load
+
+0.09  Wed Jun 21 21:06:17 CEST 2017
+      Fix Makefile.PL to work with post-sfio Perl
+      Other small Makefile.PL cleanups.

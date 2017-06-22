@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPIBlock;
-
+$Lab::Moose::Instrument::SCPIBlock::VERSION = '3.550';
 use Moose::Role;
 use MooseX::Params::Validate;
 
@@ -14,7 +14,6 @@ with qw/
     Lab::Moose::Instrument::SCPI::Format
     /;
 
-our $VERSION = '3.543';
 
 =head1 NAME
 

@@ -1,6 +1,6 @@
 #! /usr/bin/env perl
 
-use 5.014; use warnings;
+use 5.024; use warnings;
 use lib qw< dlib ../dlib >;
 
 use Keyword::Declare;

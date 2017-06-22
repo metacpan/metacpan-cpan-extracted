@@ -1,5 +1,5 @@
 package Lab::Moose::DataFile::Gnuplot::2D;
-
+$Lab::Moose::DataFile::Gnuplot::2D::VERSION = '3.550';
 use 5.010;
 use warnings;
 use strict;
@@ -15,7 +15,6 @@ use Lab::Moose::DataFile::Read 'read_2d_gnuplot_format';
 use List::Util 'any';
 use namespace::autoclean;
 
-our $VERSION = '3.543';
 
 extends 'Lab::Moose::DataFile::Gnuplot';
 

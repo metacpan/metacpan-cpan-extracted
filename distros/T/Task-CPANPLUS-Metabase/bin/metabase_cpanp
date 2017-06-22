@@ -3,13 +3,10 @@ use 5.006;
 use strict;
 use warnings;
 package metabase_cpanp;
-BEGIN {
-  $metabase_cpanp::VERSION = '0.08';
-}
 # NAME: metabase_cpanp
 # ABSTRACT: create a metabase profile
-
-use JSON 2;
+$metabase_cpanp::VERSION = '1.16';
+use JSON::MaybeXS;
 use Metabase::User::Profile;
 use Metabase::User::Secret;
 use File::Path;
@@ -72,7 +69,7 @@ unless ( -f $output ) {
   # write output
   print "Writing profile to '$output'\n";
   open my $fh, ">", $output;
-  print {$fh} JSON->new->ascii->pretty->encode([
+  print {$fh} JSON::MaybeXS->new->ascii->pretty->encode([
     $profile->as_struct,
     $secret->as_struct,
   ]);
@@ -84,7 +81,7 @@ unless ( -f $output ) {
 
 print "Updating CPANPLUS configuration\n";
 $conf->set_conf( 'cpantest' => 1 );
-$conf->set_conf( 'cpantest_reporter_args' => 
+$conf->set_conf( 'cpantest_reporter_args' =>
     {
       transport       => 'Metabase',
       transport_args  => [ uri => $url, id_file => $output ],
@@ -104,9 +101,11 @@ sub _get_dir {
   return $base;
 }
 
-
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -114,7 +113,7 @@ metabase_cpanp - create a metabase profile
 
 =head1 VERSION
 
-version 0.08
+version 1.16
 
 =head1 SYNOPSIS
 
@@ -155,10 +154,9 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2010 by Chris Williams.
+This software is copyright (c) 2017 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

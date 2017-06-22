@@ -7,9 +7,11 @@ my $ENQUEUE     = 10000;
 my $DEQUEUE     = 1000;
 my $REPETITIONS = 2;
 my $WORKERS     = 4;
+my $INFO        = 100;
 my $STATS       = 100;
 my $REPAIR      = 100;
-my $INFO        = 100;
+my $LOCK        = 1000;
+my $UNLOCK      = 1000;
 
 # A benchmark script for comparing backends and evaluating the performance
 # impact of proposed changes
@@ -20,8 +22,10 @@ $minion->reset;
 
 # Enqueue
 say "Clean start with $ENQUEUE jobs";
+my @parents = map { $minion->enqueue('foo') } 1 .. 5;
 my $before = time;
-$minion->enqueue($_ % 2 ? 'foo' : 'bar') for 1 .. $ENQUEUE;
+$minion->enqueue($_ % 2 ? 'foo' : 'bar' => [] => {parents => \@parents})
+  for 1 .. $ENQUEUE;
 my $elapsed = time - $before;
 my $avg = sprintf '%.3f', $ENQUEUE / $elapsed;
 say "Enqueued $ENQUEUE jobs in $elapsed seconds ($avg/s)";
@@ -55,6 +59,15 @@ sub dequeue {
 }
 dequeue() for 1 .. $REPETITIONS;
 
+# Job info
+say "Requesting job info $INFO times";
+$before = time;
+my $backend = $minion->backend;
+$backend->job_info($_) for 1 .. $INFO;
+$elapsed = time - $before;
+$avg = sprintf '%.3f', $INFO / $elapsed;
+say "Received job info $INFO times in $elapsed seconds ($avg/s)";
+
 # Stats
 say "Requesting stats $STATS times";
 $before = time;
@@ -71,11 +84,19 @@ $elapsed = time - $before;
 $avg = sprintf '%.3f', $REPAIR / $elapsed;
 say "Repaired $REPAIR times in $elapsed seconds ($avg/s)";
 
-# Job info
-say "Requesting job info $INFO times";
+# Lock
+say "Acquiring locks $LOCK times";
 $before = time;
-my $backend = $minion->backend;
-$backend->job_info($ENQUEUE) for 1 .. $INFO;
+$minion->lock($_ % 2 ? 'foo' : 'bar', 3600, {limit => int($LOCK / 2)})
+  for 1 .. $LOCK;
 $elapsed = time - $before;
-$avg = sprintf '%.3f', $INFO / $elapsed;
-say "Received job info $INFO times in $elapsed seconds ($avg/s)";
+$avg = sprintf '%.3f', $LOCK / $elapsed;
+say "Acquired locks $LOCK times in $elapsed seconds ($avg/s)";
+
+# Unlock
+say "Releasing locks $UNLOCK times";
+$before = time;
+$minion->unlock($_ % 2 ? 'foo' : 'bar') for 1 .. $UNLOCK;
+$elapsed = time - $before;
+$avg = sprintf '%.3f', $UNLOCK / $elapsed;
+say "Releasing locks $UNLOCK times in $elapsed seconds ($avg/s)";

@@ -5,7 +5,7 @@ use warnings;
 use namespace::autoclean;
 use autodie qw( :all );
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 use App::CISetup::Travis::ConfigFile;
 use App::CISetup::Types qw( Bool Str );
@@ -38,67 +38,17 @@ has slack_key => (
     predicate => 'has_slack_key',
 );
 
-with(
-    'App::CISetup::Role::ConfigFileFinder' => {
-        filename => '.travis.yml',
-    },
-    'MooseX::Getopt::Dashes',
-);
+with 'App::CISetup::Role::ConfigUpdater';
 
-sub run {
+## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+sub _config_filename {'.travis.yml'}
+
+sub _config_file_class {'App::CISetup::Travis::ConfigFile'}
+
+sub _cli_params {
     my $self = shift;
-
-    return $self->create
-        ? $self->_create_file
-        : $self->_update_files;
-}
-
-sub _create_file {
-    my $self = shift;
-
-    my $file = $self->dir->child('.travis.yml');
-    App::CISetup::Travis::ConfigFile->new( $self->_cf_params($file) )
-        ->create_file;
-
-    print "Created $file\n" or die $!;
-
-    return 0;
-}
-
-sub _update_files {
-    my $self = shift;
-
-    my $iter = $self->_config_file_iterator;
-
-    my $count = 0;
-    while ( my $file = $iter->() ) {
-        $count++;
-        my $updated = try {
-            App::CISetup::Travis::ConfigFile->new( $self->_cf_params($file) )
-                ->update_file;
-        }
-        catch {
-            print "\n\n\n" . $file . "\n" or die $!;
-            print $_ or die $!;
-        };
-
-        next unless $updated;
-
-        print "Updated $file\n" or die $!;
-    }
-
-    warn "WARNING: No .travis.yml files found\n"
-        unless $count;
-
-    return 0;
-}
-
-sub _cf_params {
-    my $self = shift;
-    my $file = shift;
 
     return (
-        file                 => $file,
         force_threaded_perls => $self->force_threaded_perls,
         (
             $self->has_email_address
@@ -113,6 +63,8 @@ sub _cf_params {
         ( $self->has_slack_key ? ( slack_key => $self->slack_key ) : () ),
     );
 }
+## use critic
 
 __PACKAGE__->meta->make_immutable;
+
 1;

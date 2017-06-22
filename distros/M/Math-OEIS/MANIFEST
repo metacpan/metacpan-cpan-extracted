@@ -7,8 +7,10 @@ debian/rules
 debian/source/format
 debian/watch
 devel/grep.pl
+devel/oeis-cleanup.pl
 devel/speed.pl
 devel/uninteresting.pl
+examples/grep-not-in-oeis.pl
 lib/Math/OEIS.pm
 lib/Math/OEIS/Grep.pm
 lib/Math/OEIS/Names.pm

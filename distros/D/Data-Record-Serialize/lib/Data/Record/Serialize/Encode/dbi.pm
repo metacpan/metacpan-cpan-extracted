@@ -1,10 +1,41 @@
 package Data::Record::Serialize::Encode::dbi;
 
+# ABSTRACT:  store a record in a database
+
 use Moo::Role;
+
+our $VERSION = '0.12';
+
+use Data::Record::Serialize::Types -types;
+
+use SQL::Translator;
+use SQL::Translator::Schema;
+use Types::Standard -types;
+
 use List::Util qw[ pairmap ];
 
 use DBI;
 use Carp;
+
+use namespace::clean;
+
+#pod =attr C<dsn>
+#pod
+#pod I<Required> The DBI Data Source Name (DSN) passed to B<L<DBI>>.  It
+#pod may either be a string or an arrayref containing strings or arrayrefs,
+#pod which should contain key-value pairs.  Elements in the sub-arrays are
+#pod joined with C<=>, elements in the top array are joined with C<:>.  For
+#pod example,
+#pod
+#pod   [ 'SQLite', { dbname => $db } ]
+#pod
+#pod is transformed to
+#pod
+#pod   SQLite:dbname=$db
+#pod
+#pod The standard prefix of C<dbi:> will be added if not present.
+#pod
+#pod =cut
 
 has dsn => (
     is       => 'ro',
@@ -30,28 +61,101 @@ has dsn => (
     },
 );
 
+#pod =attr C<table>
+#pod
+#pod I<Required> The name of the table in the database which will contain the records.
+#pod It will be created if it does not exist.
+#pod
+#pod =cut
+
 has table => (
     is       => 'ro',
+    isa      => Str,
     required => 1,
 );
 
+#pod =attr C<schema>
+#pod
+#pod The schema to which the table belongs.  Optional.
+#pod
+#pod =begin pod_coverage
+#pod
+#pod =head3 has_schema
+#pod
+#pod =end pod_coverage
+#pod
+#pod =cut
+
+
+has schema => (
+    is        => 'ro',
+    predicate => 1,
+    isa       => Str,
+);
+
+#pod =attr C<drop_table>
+#pod
+#pod If true, the table is dropped and a new one is created.
+#pod
+#pod =cut
+
 has drop_table => (
     is      => 'ro',
+    isa     => Bool,
     default => 0,
 );
 
+
+#pod =attr C<create_table>
+#pod
+#pod If true, a table will be created if it does not exist.
+#pod
+#pod =cut
+
 has create_table => (
     is      => 'ro',
+    isa     => Bool,
     default => 1,
 );
 
+#pod =attr C<primary>
+#pod
+#pod A single output column name or an array of output column names which
+#pod should be the primary key(s).  If not specified, no primary keys are
+#pod defined.
+#pod
+#pod =cut
+
 has primary => (
     is      => 'ro',
+    isa     => ArrayOfStr,
+    coerce  => 1,
+    default => sub { [] },
+);
+
+#pod =attr C<db_user>
+#pod
+#pod The name of the database user
+#pod
+#pod =cut
+
+has db_user => (
+    is      => 'ro',
+    isa     => Str,
     default => '',
 );
 
-has db_user => ( is => 'ro', default => '' );
-has db_pass => ( is => 'ro', default => '' );
+#pod =attr C<db_pass>
+#pod
+#pod The database password
+#pod
+#pod =cut
+
+has db_pass => (
+    is      => 'ro',
+    isa     => Str,
+    default => '',
+);
 
 
 has _sth => (
@@ -79,7 +183,7 @@ has column_defs => (
               join( ' ',
                 $field,
                 $self->output_types->{$field},
-                ( 'primary key' ) x !!( $self->primary eq $field ) );
+                ( 'primary key' )x!!( $self->primary eq $field ) );
         }
 
         return join ', ', @column_defs;
@@ -87,11 +191,27 @@ has column_defs => (
 
 );
 
+#pod =attr C<batch>
+#pod
+#pod The number of rows to write to the database at once.  This defaults to 100.
+#pod
+#pod If greater than 1, C<batch> rows are cached and then sent out in a
+#pod single transaction.  See L</Performance> for more information.
+#pod
+#pod =cut
+
 has batch => (
     is      => 'ro',
+    isa     => Int,
     default => 100,
     coerce  => sub { $_[0] > 1 ? $_[0] : 0 },
 );
+
+#pod =attr C<dbitrace>
+#pod
+#pod A trace setting passed to  L<B<DBI>>.
+#pod
+#pod =cut
 
 has dbitrace => ( is => 'ro', );
 
@@ -120,13 +240,35 @@ sub _table_exists {
 
     my $self = shift;
 
-    # ignore catalogue and schema out of sheer ignorance, and the fact
-    # that I'm not alone in that ignorance.
-
     return
-      defined $self->_dbh->table_info( '%', '%', $self->table, 'TABLE' )->fetch;
-
+      defined $self->_dbh->table_info( '%', $self->schema, $self->table,
+        'TABLE' )->fetch;
 }
+
+sub _fq_table_name {
+
+    my $self = shift;
+
+    join( '.', ( $self->has_schema ? ( $self->schema ) : () ), $self->table );
+}
+
+#pod =begin pod_coverage
+#pod
+#pod =head3  setup
+#pod
+#pod =end pod_coverage
+#pod
+#pod =cut
+
+my %producer = (
+    DB2       => 'DB2',
+    MySQL     => 'mysql',
+    Oracle    => 'Oracle',
+    Pg        => 'PostgreSQL',
+    SQLServer => 'SQLServer',
+    SQLite    => 'SQLite',
+    Sybase    => 'Sybase',
+);
 
 sub setup {
 
@@ -134,33 +276,71 @@ sub setup {
 
     return if $self->_dbh;
 
+    my @dsn = DBI->parse_dsn( $self->dsn )
+      or croak( "unable to parse DSN: ", $self->dsn );
+    my $dbi_driver = $dsn[1];
+
+    my $producer = $producer{$dbi_driver} || $dbi_driver;
+
+    my %attr = (
+        AutoCommit => !$self->batch,
+        RaiseError => 1,
+    );
+
+    $attr{sqlite_allow_multiple_statements} = 1
+      if $dbi_driver eq 'SQLite';
+
     $self->_set__dbh(
-        DBI->connect(
-            $self->dsn,
-            $self->db_user,
-            $self->db_pass,
-            {
-                AutoCommit => !$self->batch,
-                RaiseError => 1,
-            } ) ) or die( 'error connection to ', $self->dsn, "\n" );
+        DBI->connect( $self->dsn, $self->db_user, $self->db_pass, \%attr ) )
+      or croak( 'error connection to ', $self->dsn, "\n" );
 
     $self->_dbh->trace( $self->dbitrace )
       if $self->dbitrace;
 
-    $self->_dbh->do( 'drop table ' . $self->table )
-      if $self->drop_table && $self->_table_exists;
+    if ( $self->drop_table || ( $self->create_table && !$self->_table_exists ) )
+    {
+        my $tr = SQL::Translator->new(
+            from => sub {
+                my $schema = $_[0]->schema;
+                my $table = $schema->add_table( name => $self->_fq_table_name )
+                  or croak $schema->error;
 
-    $self->_dbh->commit if $self->batch;
+                for my $field_name ( @{ $self->output_fields } ) {
 
-    $self->_dbh->do(
-        sprintf( "create table %s ( %s )", $self->table, $self->column_defs ) )
-      if $self->drop_table || ( $self->create_table && !$self->_table_exists );
+                    $table->add_field(
+                        name      => $field_name,
+                        data_type => $self->output_types->{$field_name}
+                    ) or croak $table->error;
+                }
 
-    $self->_dbh->commit if $self->batch;
+                if ( @{ $self->primary } ) {
+                    $table->primary_key( @{ $self->primary } )
+                      or croak $table->error;
+                }
+
+                1;
+            },
+            to             => $producer,
+            producer_args  => { no_transaction => 1 },
+            add_drop_table => $self->drop_table && $self->_table_exists,
+        );
+
+
+        my $sql = $tr->translate
+          or croak $tr->error;
+
+        # print STDERR $sql;
+        eval { $self->_dbh->do( $sql ); };
+
+        croak( "error in table creation: $@:\n$sql\n" )
+          if $@;
+
+        $self->_dbh->commit if $self->batch;
+    }
 
     my $sql = sprintf(
         "insert into %s (%s) values (%s)",
-        $self->table,
+        $self->_fq_table_name,
         join( ',', @{ $self->output_fields } ),
         join( ',', ( '?' ) x @{ $self->output_fields } ),
     );
@@ -168,26 +348,36 @@ sub setup {
     $self->_set__sth( $self->_dbh->prepare( $sql ) );
 
     return;
-
 }
 
 sub _empty_cache {
 
     my $self = shift;
 
-    eval {
-        $self->_sth->execute( @$_ ) foreach @{ $self->_cache };
-        $self->_dbh->commit;
-    };
+    if ( @{ $self->_cache } ) {
 
-    # don't bother rolling back aborted transactions;
-    # individual inserts are independent of each other.
-    croak "Transaction aborted: $@" if $@;
+        eval {
+            $self->_sth->execute( @$_ ) foreach @{ $self->_cache };
+            $self->_dbh->commit;
+        };
 
-    @{ $self->_cache } = ();
+        # don't bother rolling back aborted transactions;
+        # individual inserts are independent of each other.
+        croak "Transaction aborted: $@" if $@;
+
+        @{ $self->_cache } = ();
+    }
 
     return;
 }
+
+#pod =begin pod_coverage
+#pod
+#pod =head3 send
+#pod
+#pod =end pod_coverage
+#pod
+#pod =cut
 
 sub send {
 
@@ -217,15 +407,44 @@ after '_trigger_output_types' => sub {
 };
 
 
-sub cleanup {
+#pod =begin pod_coverage
+#pod
+#pod =head3 close
+#pod
+#pod =end pod_coverage
+#pod
+#pod =cut
+
+sub close {
 
     my $self = shift;
 
     $self->_empty_cache
       if $self->batch;
 
-    $self->_dbh->disconnect;
+    $self->_dbh->disconnect
+      if defined $self->_dbh;
 }
+
+# these are required by the Sink/Encode interfaces but should never be
+# called in the ordinary run of things.
+
+#pod =begin pod_coverage
+#pod
+#pod =head3 say
+#pod
+#pod =head3 print
+#pod
+#pod =head3 encode
+#pod
+#pod =end pod_coverage
+#pod
+#pod =cut
+
+
+sub say    { croak }
+sub print  { croak }
+sub encode { croak }
 
 with 'Data::Record::Serialize::Role::Sink';
 with 'Data::Record::Serialize::Role::Encode';
@@ -233,13 +452,15 @@ with 'Data::Record::Serialize::Role::Encode';
 
 1;
 
-
-__END__
+=pod
 
 =head1 NAME
 
 Data::Record::Serialize::Encode::dbi - store a record in a database
 
+=head1 VERSION
+
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -257,6 +478,9 @@ L<B<DBI>>.
 It performs both the L<B<Data::Record::Serialize::Role::Encode>> and
 L<B<Data::Record::Serialize::Role::Sink>> roles.
 
+B<You cannot construct this directly; you must use
+L<B<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>.>
+
 =head2 Types
 
 Field types are recognized and converted to SQL types via the following map:
@@ -265,7 +489,6 @@ Field types are recognized and converted to SQL types via the following map:
   N => 'real'
   I => 'integer'
 
-
 =head2 Performance
 
 Records are by default written to the database in batches (see the
@@ -273,19 +496,12 @@ C<batch> attribute) to improve performance.  Each batch is performed
 as a single transaction.  If there is an error during the transaction,
 record insertions during the transaction are I<not> rolled back.
 
-=head1 INTERFACE
-
-You cannot construct this directly; you must use
-L<B<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>.
-
-=head2 Attributes
+=head1 ATTRIBUTES
 
 These attributes are available in addition to the standard attributes
 defined for L<B<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>.
 
-=over
-
-=item C<dsn>
+=head2 C<dsn>
 
 I<Required> The DBI Data Source Name (DSN) passed to B<L<DBI>>.  It
 may either be a string or an arrayref containing strings or arrayrefs,
@@ -301,88 +517,151 @@ is transformed to
 
 The standard prefix of C<dbi:> will be added if not present.
 
+=head2 C<table>
 
-=item db_user
+I<Required> The name of the table in the database which will contain the records.
+It will be created if it does not exist.
+
+=head2 C<schema>
+
+The schema to which the table belongs.  Optional.
+
+=head2 C<drop_table>
+
+If true, the table is dropped and a new one is created.
+
+=head2 C<create_table>
+
+If true, a table will be created if it does not exist.
+
+=head2 C<primary>
+
+A single output column name or an array of output column names which
+should be the primary key(s).  If not specified, no primary keys are
+defined.
+
+=head2 C<db_user>
 
 The name of the database user
 
-=item dbitrace
+=head2 C<db_pass>
 
-A trace setting passed to  L<B<DBI>>.
+The database password
 
-=item batch
+=head2 C<batch>
 
 The number of rows to write to the database at once.  This defaults to 100.
 
 If greater than 1, C<batch> rows are cached and then sent out in a
 single transaction.  See L</Performance> for more information.
 
-=item db_pass
+=head2 C<dbitrace>
 
-The database password
+A trace setting passed to  L<B<DBI>>.
 
-=item C<table>
+=begin pod_coverage
 
-I<Required> The name of the table in the database which will contain the records.
-It will be created if it does not exist.
+=head3 has_schema
 
-=item C<drop_table>
+=end pod_coverage
 
-If true, the table is dropped and a new one is created.
+=begin pod_coverage
 
-=item C<create_table>
+=head3 setup
 
-If true, a table will be created if it does not exist.
+=end pod_coverage
 
-=item C<primary>
+=begin pod_coverage
 
-The output name of the field which should be the primary key.
-If not specified, no primary keys are defined.
+=head3 send
 
-=back
+=end pod_coverage
+
+=begin pod_coverage
+
+=head3 close
+
+=end pod_coverage
+
+=begin pod_coverage
+
+=head3 say
+
+=head3 print
+
+=head3 encode
+
+=end pod_coverage
 
 =head1 BUGS AND LIMITATIONS
 
-=for author to fill in:
-    A list of known problems with the module, together with some
-    indication Whether they are likely to be fixed in an upcoming
-    release. Also a list of restrictions on the features the module
-    does provide: data types that cannot be handled, performance issues
-    and the circumstances in which they may arise, practical
-    limitations on the size of data sets, special cases that are not
-    (yet) handled, etc.
-
-No bugs have been reported.
-
-Please report any bugs or feature requests to
-C<bug-data-record-serialize@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize>.
+You can make new bug reports, and view existing ones, through the
+web interface at L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize>.
 
 =head1 SEE ALSO
 
-=for author to fill in:
-    Any other resources (e.g., modules or files) that are related.
+Please see those modules/websites for more information related to this module.
 
+=over 4
 
-=head1 LICENSE AND COPYRIGHT
+=item *
 
-Copyright (c) 2014 The Smithsonian Astrophysical Observatory
+L<Data::Record::Serialize|Data::Record::Serialize>
 
-B<Data::Record::Serialize> is free software: you can redistribute it
-and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-p
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+=back
 
 =head1 AUTHOR
 
-Diab Jerius  E<lt>djerius@cpan.orgE<gt>
+Diab Jerius <djerius@cpan.org>
 
+=head1 COPYRIGHT AND LICENSE
 
+This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut
+
+__END__
+
+#pod =head1 SYNOPSIS
+#pod
+#pod     use Data::Record::Serialize;
+#pod
+#pod     my $s = Data::Record::Serialize->new( encode => 'sqlite', ... );
+#pod
+#pod     $s->send( \%record );
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod B<Data::Record::Serialize::Encode::dbi> writes a record to a database using
+#pod L<B<DBI>>.
+#pod
+#pod It performs both the L<B<Data::Record::Serialize::Role::Encode>> and
+#pod L<B<Data::Record::Serialize::Role::Sink>> roles.
+#pod
+#pod B<You cannot construct this directly; you must use
+#pod L<B<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>.>
+#pod
+#pod =head2 Types
+#pod
+#pod Field types are recognized and converted to SQL types via the following map:
+#pod
+#pod   S => 'text'
+#pod   N => 'real'
+#pod   I => 'integer'
+#pod
+#pod
+#pod =head2 Performance
+#pod
+#pod Records are by default written to the database in batches (see the
+#pod C<batch> attribute) to improve performance.  Each batch is performed
+#pod as a single transaction.  If there is an error during the transaction,
+#pod record insertions during the transaction are I<not> rolled back.
+#pod
+#pod =head1 ATTRIBUTES
+#pod
+#pod These attributes are available in addition to the standard attributes
+#pod defined for L<B<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>.

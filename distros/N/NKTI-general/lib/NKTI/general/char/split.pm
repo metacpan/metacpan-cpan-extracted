@@ -5,7 +5,7 @@ use warnings;
 
 # Define Version
 # ----------------------------------------------------------------
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 # Create Action Split Character in string :
 # ------------------------------------------------------------------------

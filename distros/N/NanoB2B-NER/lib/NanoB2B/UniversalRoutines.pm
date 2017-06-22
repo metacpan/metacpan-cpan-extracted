@@ -14,6 +14,7 @@ package NanoB2B::UniversalRoutines;
 use Term::ANSIColor;					#color coding the output
 use List::MoreUtils qw(first_index);	#check for first occurrence of a word
 use List::MoreUtils qw(indexes);		#get all of the indexes of a word
+use File::Path qw(make_path);			#makes sub directories	
 
 use strict;
 use warnings;
@@ -87,27 +88,6 @@ sub cleanWords{
 	return $input;
 }
 
-
-#finds the index of a special phrase from an array
-# input  : $phrase 	 <-- the regex to look for within the set
-#		   @arr      <-- the array to look through
-# output : $x        <-- return the index of the regex; returns -1 if not found
-sub findPhraseIndex{
-	my $self = shift;
-	my $phrase = shift;
-	my $arr_ref = shift;
-	my @arr = @$arr_ref;
-
-	my $arrTot = @arr;
-	for(my $x = 0; $x < $arrTot; $x++){
-		my $line = $arr[$x];
-		if($line =~/$phrase/g){
-			return $x;
-		}
-	}
-	return -1;
-}
-
 #helper function that retrieves all of the indexes of a word in a given set
 # input  : $word <-- an element or object
 #		   @set  <-- the array to look through
@@ -142,16 +122,6 @@ sub getIndexofLine{
 	return -1;
 }
 
-#retrieves the stop words
-# input  : --
-# output : @words <-- returns the set of stop words as retrieved from stop_words.txt
-sub getStopWords{
-	open (my $SW, "stop_words.txt") || die ("no stopping for you!");
-	my @words = <SW>;
-	foreach my $word (@words){chomp($word)};
-	return @words;
-}
-
 #helper function to check if an element is in an array
 # input  : $e 	   <-- an element or object
 #		   @array  <-- the array to look through
@@ -168,16 +138,6 @@ sub inArr{
 	}else{
 		return 0;
 	}
-}
-
-#checks if stop word
-# input  : $word 	 <-- a word to check for
-# output : boolean <-- 1 if it is a stopword, 0 if it isn't
-sub isStopWord{
-	my $self = shift;
-	my $word = shift;
-
-	return inArr($word, getStopWords());
 }
 
 #prints to a file called debug

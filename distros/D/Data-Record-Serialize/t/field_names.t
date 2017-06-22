@@ -1,7 +1,6 @@
 #!perl
 
-use Test::More;
-use Test::Fatal;
+use Test2::Bundle::Extended qw[ :DEFAULT bag ];
 
 use Data::Dumper;
 use Data::Record::Serialize;
@@ -14,34 +13,36 @@ subtest "unspecified" => sub {
     my $s;
     my $buf;
 
-
-    is(
-        exception {
+    ok(
+        lives {
             $s = Data::Record::Serialize->new(
                 encode => 'ddump',
                 sink   => 'stream',
                 output => \$buf,
             );
         },
-        undef,
         'Data::Dumper -> buffer'
-    );
+    ) or diag $@;
 
 
     $s->send( { long_a => 1, long_b => 2 } );
 
-    is_deeply( [ sort @{ $s->fields } ], [qw( long_a long_b )],
-        'input fields' );
-    is_deeply( [ sort @{ $s->output_fields } ],
-        [qw( long_a long_b )], 'output fields' );
+    my $exp_fields = bag {
+        item 'long_a';
+        item 'long_b';
+        end();
+    };
+
+    is( $s->fields,        $exp_fields, 'input fields' );
+    is( $s->output_fields, $exp_fields, 'output fields' );
 
     undef $s;
 
     my $VAR1;
 
-    is( exception { $VAR1 = eval $buf }, undef, 'deserialize record' );
+    ok( lives { $VAR1 = eval $buf }, 'deserialize record' ) or diag $@;
 
-    is_deeply( $VAR1, { long_a => 1, long_b => 2 }, 'both long_a & long_b' );
+    is( $VAR1, { long_a => 1, long_b => 2 }, 'both long_a & long_b' );
 
 };
 
@@ -51,9 +52,8 @@ subtest "fields" => sub {
     my $s;
     my $buf;
 
-
-    is(
-        exception {
+    ok(
+        lives {
             $s = Data::Record::Serialize->new(
                 encode => 'ddump',
                 sink   => 'stream',
@@ -61,25 +61,27 @@ subtest "fields" => sub {
                 fields => [qw[ long_a long_b ]],
             );
         },
-        undef,
         'Data::Dumper -> buffer'
-    );
+    ) or diag $@;
 
-    is_deeply( [ sort @{ $s->fields } ], [qw( long_a long_b )],
-        'input fields' );
-    is_deeply( [ sort @{ $s->output_fields } ],
-        [qw( long_a long_b )], 'output fields' );
+    my $exp_fields = bag {
+        item 'long_a';
+        item 'long_b';
+        end();
+    };
+
+    is( $s->fields,        $exp_fields, 'input fields' );
+    is( $s->output_fields, $exp_fields, 'output fields' );
 
     $s->send( { long_a => 1, long_b => 2 } );
-
 
     undef $s;
 
     my $VAR1;
 
-    is( exception { $VAR1 = eval $buf }, undef, 'deserialize record' );
+    ok( lives { $VAR1 = eval $buf }, 'deserialize record' ) or diag $@;
 
-    is_deeply( $VAR1, { long_a => 1, long_b => 2 }, 'both long_a & long_b' );
+    is( $VAR1, { long_a => 1, long_b => 2 }, 'both long_a & long_b' );
 
 };
 
@@ -88,9 +90,8 @@ subtest "fields, subset" => sub {
     my $s;
     my $buf;
 
-
-    is(
-        exception {
+    ok(
+        lives {
             $s = Data::Record::Serialize->new(
                 encode => 'ddump',
                 sink   => 'stream',
@@ -98,14 +99,12 @@ subtest "fields, subset" => sub {
                 fields => [qw[ long_b ]],
             );
         },
-        undef,
         'Data::Dumper -> buffer'
-    );
+    ) or diag $@;
 
 
-    is_deeply( [ sort @{ $s->fields } ], [qw( long_b )], 'input fields' );
-    is_deeply( [ sort @{ $s->output_fields } ],
-        [qw( long_b )], 'output fields' );
+    is( $s->fields,        [qw( long_b )], 'input fields' );
+    is( $s->output_fields, [qw( long_b )], 'output fields' );
 
     $s->send( { long_a => 1, long_b => 2 } );
 
@@ -113,9 +112,9 @@ subtest "fields, subset" => sub {
 
     my $VAR1;
 
-    is( exception { $VAR1 = eval $buf }, undef, 'deserialize record' );
+    ok( lives { $VAR1 = eval $buf }, 'deserialize record' ) or diag $@;
 
-    is_deeply( $VAR1, { long_b => 2 }, 'only long_b' );
+    is( $VAR1, { long_b => 2 }, 'only long_b' );
 
 };
 
@@ -125,9 +124,8 @@ subtest "rename" => sub {
     my $s;
     my $buf;
 
-
-    is(
-        exception {
+    ok(
+        lives {
             $s = Data::Record::Serialize->new(
                 encode        => 'ddump',
                 sink          => 'stream',
@@ -140,10 +138,24 @@ subtest "rename" => sub {
         'Data::Dumper -> buffer'
     );
 
-    is_deeply( [ sort @{ $s->fields } ], [qw( long_a long_b )],
-        'input fields' );
-    is_deeply( [ sort @{ $s->output_fields } ],
-        [qw( long_b short_a )], 'output fields' );
+    is(
+        $s->fields,
+        bag {
+            item 'long_a';
+            item 'long_b';
+            end();
+        },
+        'input fields'
+    );
+
+    is(
+        $s->output_fields,
+        bag {
+            item 'long_b';
+            item 'short_a';
+        },
+        'output fields',
+    );
 
     $s->send( { long_a => 1, long_b => 2 } );
 
@@ -151,9 +163,9 @@ subtest "rename" => sub {
 
     my $VAR1;
 
-    is( exception { $VAR1 = eval $buf }, undef, 'deserialize record' );
+    ok( lives { $VAR1 = eval $buf }, 'deserialize record' ) or diag $@;
 
-    is_deeply(
+    is(
         $VAR1,
         { short_a => 1, long_b => 2 },
         'field name long_a renamed to short_a'

@@ -21,10 +21,15 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "Data::UUID" : "0",
+            "Devel::StackTrace" : "0",
+            "IO::Compress::Gzip" : "0",
             "IO::Socket" : "0",
-            "JSON" : "0",
+            "IO::Socket::INET" : "0",
             "JSON::Tiny" : "0",
+            "Log::GELF::Util" : "0",
+            "Log::Log4perl" : "0",
             "Moose" : "0",
             "MooseX::Types" : "0",
             "MooseX::Types::Moose" : "0",
@@ -42,7 +47,8 @@
             "Data::Faker" : "0",
             "Data::Printer" : "0",
             "Data::Random::String" : "0",
-            "Log::Log4perl" : "0",
+            "IO::Uncompress::Gunzip" : "0",
+            "JSON" : "0",
             "Log::Log4perl::Layout::NoopLayout" : "0",
             "Test::MockModule" : "0",
             "Test::Moose::More" : "0",
@@ -63,7 +69,7 @@
          "web" : "https://github.com/dimentox/log-log4perl-appender-graylog"
       }
    },
-   "version" : "1.3",
+   "version" : "1.7",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

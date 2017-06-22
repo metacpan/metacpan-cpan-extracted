@@ -37,11 +37,11 @@ our $VERSION = 3.1415;
 
 # Trivial command-line flag
 {
-    local @ARGV = ('--verbose');
+    local @ARGV = ('--dummy');
     my $options = startup({
-        verbose => 'Print verbose output',
+        dummy => 'Do something, dummy',
     });
-    ok $options->{verbose} || 0, "--verbose option read correctly";
+    ok $options->{dummy} || 0, "--dummy option read correctly";
 }
 
 # Bad options cause usage message
@@ -62,15 +62,6 @@ our $VERSION = 3.1415;
 
     ok $trap->exit == 0, "Correct exit status on --help option";
     like $trap->stdout, qr/usage:/, "Regular usage message printed";
-}
-
-# --help option with custom help text
-{
-    local @ARGV = ('--help');
-    trap { startup({ help => 'custom help', foo => 'bar' })};
-
-    ok $trap->exit == 0, "Correct exit status on --help";
-    like $trap->stdout, qr/custom help/, "Custom help message printed";
 }
 
 # --help option can't be turned off
@@ -118,7 +109,7 @@ our $VERSION = 3.1415;
         trap { startup({ $spec => 'foo', bar => 'baz' }) };
 
         ok $trap->leaveby eq 'die', "Error exit with invalid spec: $spec";
-        like $trap->die, qr/defined incorrectly/i, "Error message printed";
+        like $trap->die, qr/multiple definitions/i, "Error message printed";
     }
 }
 
@@ -137,7 +128,7 @@ our $VERSION = 3.1415;
     trap { startup({ 'x|a|b|c' => 'aliased option' }) };
 
     ok $trap->exit == 0, "Exit status";
-    like $trap->stdout, qr/Aliases: a, b, c/, "Help text";
+    like $trap->stdout, qr/Aliases: -a, -b, -c/, "Help text";
 }
 
 done_testing();

@@ -30,6 +30,11 @@ subtest 'lines' => sub{
         my $want = Acme::Want5000trillion->new;
         is $want->say('it'), "Voglio 5000 trilioni di yen!";
     };
+
+    subtest 'aa' => sub{
+        my $want = Acme::Want5000trillion->new;
+        ok $want->say('aa');
+    };
 };
 
 done_testing;

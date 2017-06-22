@@ -4,7 +4,7 @@
       "Len Budney <len.budney@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4212",
+   "generated_by" : "Module::Build version 0.422",
    "license" : [
       "perl_5"
    ],
@@ -34,7 +34,7 @@
          "recommends" : {
             "Config::INI::Writer" : "0",
             "Config::Tiny" : "0",
-            "JSON::Any" : "0",
+            "JSON::MaybeXS" : "0",
             "XML::Simple" : "0",
             "YAML::Any" : "0"
          },
@@ -52,16 +52,17 @@
             "Hash::Merge" : "0",
             "List::Util" : "0",
             "Pod::Text" : "3.01",
+            "Readonly" : "0",
             "Symbol" : "0",
             "Text::CSV" : "0",
-            "perl" : "v5.8.8"
+            "perl" : "v5.10.0"
          }
       }
    },
    "provides" : {
       "CLI::Startup" : {
          "file" : "lib/CLI/Startup.pm",
-         "version" : "0.17"
+         "version" : "0.20"
       }
    },
    "release_status" : "stable",
@@ -70,5 +71,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.17"
+   "version" : "0.20",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

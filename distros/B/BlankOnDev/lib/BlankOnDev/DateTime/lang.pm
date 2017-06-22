@@ -6,7 +6,7 @@ use warnings;
 use BlankOnDev;
 
 # Version :
-our $VERSION = '0.1003';
+our $VERSION = '0.1005';;
 use vars '$AUTOLOAD';
 
 # AutoLoad :

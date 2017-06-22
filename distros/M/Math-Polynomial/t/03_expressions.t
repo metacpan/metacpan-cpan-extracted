@@ -1,8 +1,6 @@
-# Copyright (c) 2007-2009 Martin Becker.  All rights reserved.
+# Copyright (c) 2007-2017 Martin Becker.  All rights reserved.
 # This package is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-#
-# $Id: 03_expressions.t 64 2009-06-17 20:01:21Z demetri $
 
 # Checking arithmetic operators and expressions.
 

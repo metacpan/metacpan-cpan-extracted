@@ -12,11 +12,16 @@ use Hash::FieldHash  qw( fieldhash );
 use Scalar::Util     qw( blessed reftype );
 
 BEGIN {
-	*HAS_SUB_NAME = eval { require Sub::Name } ? sub(){1} : sub(){0};
+	*HAS_SUB_UTIL = eval { require Sub::Util }
+		? sub(){1}
+		: sub(){0};
+	*HAS_SUB_NAME = !HAS_SUB_UTIL() && eval { require Sub::Name }
+		? sub(){1}
+		: sub(){0};
 };
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.008';
+our $VERSION   = '0.009';
 our @ISA       = qw/ Exporter::Tiny /;
 
 fieldhash( our %FIELDS );
@@ -32,7 +37,9 @@ sub _generate_has : method
 		$attr->install_accessors;
 	};
 	
-	$code = Sub::Name::subname("$me\::has", $code) if HAS_SUB_NAME;
+	HAS_SUB_UTIL ? ($code = Sub::Util::set_subname("$me\::has", $code)) :
+	HAS_SUB_NAME ? ($code = Sub::Name::subname("$me\::has", $code)) :
+		();
 	return $code;
 }
 
@@ -94,7 +101,7 @@ sub install_accessors : method
 		}
 	}
 	
-	my @return =
+	my @return = map $$_,
 		$me->{is} eq 'ro'   ? ($me->{reader}) :
 		$me->{is} eq 'rw'   ? ($me->{accessor}) :
 		$me->{is} eq 'rwp'  ? ($me->{reader}, $me->{writer}) :
@@ -113,7 +120,9 @@ sub install_coderef
 	if (!ref $target and $target =~ /\A[^\W0-9]\w+\z/)
 	{
 		my $name = "$me->{package}\::$target";
-		$coderef = Sub::Name::subname($name, $coderef) if HAS_SUB_NAME;
+		HAS_SUB_UTIL ? ($coderef = Sub::Util::set_subname($name, $coderef)) :
+		HAS_SUB_NAME ? ($coderef = Sub::Name::subname($name, $coderef)) :
+			();
 		no strict qw(refs);
 		*$name = $coderef;
 		return;
@@ -186,7 +195,9 @@ sub expand_handles
 			
 		if (ref $me->{builder} eq 'CODE')
 		{
-			HAS_SUB_NAME or do { require Sub::Name };
+			HAS_SUB_UTIL or
+			HAS_SUB_NAME or
+			do { require Sub::Util };
 			
 			my $code = $me->{builder};
 			defined($name) && defined($me->{package})
@@ -561,12 +572,12 @@ sub inline_accessor : method
 	
 	if ($coerce eq '$_[1]')  # i.e. no coercion
 	{
-		if (!$me->{trigger} and !$me->{weak_ref})
+		if (!$me->{lazy} and !$me->{trigger} and !$me->{weak_ref})
 		{
 			return sprintf(
 				'(@_ > 1) ? (%s) : %s',
 				$me->inline_access_w( $me->inline_type_assertion('$_[1]') ),
-				$get,
+				$me->inline_get,
 			);
 		}
 		
@@ -576,7 +587,7 @@ sub inline_accessor : method
 			$me->inline_trigger('$_[1]', $get),
 			$me->inline_access_w('$_[1]'),
 			$me->inline_weaken,
-			$me->inline_get,
+			$me->inline_reader,
 		);
 	}
 	
@@ -587,7 +598,7 @@ sub inline_accessor : method
 		$me->inline_trigger('$val', $get),
 		$me->inline_access_w('$val'),
 		$me->inline_weaken,
-		$me->inline_get,
+		$me->inline_reader,
 	);
 }
 
@@ -748,7 +759,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

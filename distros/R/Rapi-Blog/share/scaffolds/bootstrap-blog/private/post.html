@@ -1,0 +1,41 @@
+[%- USE date(format = '%a, %d-%b-%Y') -%]
+[%- WRAPPER site_wrapper.html 
+  title = Post.title
+-%]
+[%- Post.record_hit -%]
+
+  <div class="blog-post">
+  
+      <h2 class="blog-post-title">
+        [% Post.title %] 
+        [% IF ! Post.published %]
+          &nbsp;<i 
+            class="fa fa-eye-slash" title="Not Published"
+            style="opacity:0.1;font-size:0.9em;color:darkred;"
+          ></i>
+        [% END %]
+        
+      </h2>
+      <p class="blog-post-meta">
+        <i style="padding-left:3px;"> 
+          [% date.format(Post.ts) %] <span style="font-size:.9em;">by 
+          <a href="/list?username=[% Post.author.username %]">[% Post.author.full_name %]</a></span>
+        </i>
+        
+        [% IF scaffold.edit_post_link %]
+          <a class="public-edit-post-link" href="[% Post.open_url_path('direct') %]">
+            <i class="fa fa-pencil-square-o"></i>&nbsp;edit post
+          </a>
+        [% END %]
+        
+        
+      </p>
+
+      [% content %]
+      
+      [% INCLUDE private/post_comments.html %]
+    
+  
+  </div>
+
+[% END %]

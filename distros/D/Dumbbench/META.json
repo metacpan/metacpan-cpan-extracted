@@ -4,7 +4,7 @@
       "Steffen Mueller <smueller@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -23,6 +23,36 @@
          "xt"
       ]
    },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Spec::Functions" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Carp" : "0",
+            "Class::XSAccessor" : "1.05",
+            "Devel::CheckOS" : "0",
+            "Number::WithError" : "1.00",
+            "Params::Util" : "0",
+            "Statistics::CaseResampling" : "0.06",
+            "Time::HiRes" : "0",
+            "parent" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.94"
+         }
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
@@ -35,5 +65,6 @@
          "web" : "https://github.com/briandfoy/dumbbench"
       }
    },
-   "version" : "0.10"
+   "version" : "0.111",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

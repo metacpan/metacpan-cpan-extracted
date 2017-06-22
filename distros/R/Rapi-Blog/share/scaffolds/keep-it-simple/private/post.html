@@ -1,0 +1,48 @@
+[% WRAPPER wrap_page.html %]
+[%- USE date(format = '%B %e, %Y') -%]
+
+[% Post.record_hit %]
+
+<article class="entry">
+
+     <header class="entry-header">
+
+        <h2 class="entry-title">
+           <a href="[% Post.public_url %]" title="">[% Post.title %]</a>
+        </h2>              
+
+        <div class="entry-meta">
+           <ul>
+              <li>[% date.format(Post.ts) %]</li>
+              <span class="meta-sep">&bull;</span>
+              <li>[% Post.author.full_name || Post.author.username %]</li>
+			        [% IF scaffold.edit_post_link %]
+			          <li><a class="public-edit-post-link" href="[% Post.open_url_path() %]">
+			            <i class="fa fa-pencil-square-o"></i>
+			          </a></li>
+			        [% END %]
+							
+           </ul>
+        </div> 
+   
+    </header> 
+<br>
+
+  [% content %]
+  
+</article>
+
+
+
+[% INCLUDE private/post_comment_section.html %]
+
+[% IF Post.tag_names %]
+<p class="tags">
+  <span>Tagged in </span>:
+	[% FOREACH tag_name IN Post.tag_names_list %]
+	  <a href="/blog?tag=[% tag_name %]">[% tag_name %]</a>[%- IF ! loop.last() -%],[%- END -%]
+	[% END %]
+</p> 
+[% END %]
+
+[% END %]

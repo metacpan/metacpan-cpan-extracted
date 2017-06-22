@@ -1,0 +1,8 @@
+Revision history for Dist::Zilla::Plugin::Test::Perl::Critic::Freenode
+
+0.002     2017-06-12 00:06:50+02:00 Europe/Stockholm
+ - Fix prerequisites
+ - Remove cruft from Changes file
+
+0.001     2017-06-11 23:48:57+02:00 Europe/Stockholm
+ - Forked from Dist::Zilla::Plugin::Test::Perl::Critic at version 3.001

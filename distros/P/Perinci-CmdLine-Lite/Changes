@@ -1,3 +1,14 @@
+1.74    2017-06-17 (PERLANCAR)
+
+	- [Bugfix] Don't check deps when in completion/dump mode.
+
+
+1.73    2017-06-17 (PERLANCAR)
+
+        - Support cooperative dump mode to help Perinci::CmdLine::Dump create a
+          more proper dump.
+
+
 1.72    2017-01-16 (PERLANCAR)
 
         - Add attribute: use_cleanser to allow skipping data cleansing.
@@ -131,16 +142,15 @@
         - The 'config_filename' attribute can now be an array of hash instead of
           just array of strings. Each hash can contain these keys: 'filename',
           as well as 'section' to specify which section should be read from the
-          file (instead the default 'GLOBAL' section).
-
-          This allows a scenario of main/general and more specific config files.
-          For example, suppose you have a suite of applications called 'mysuite'
-          and programs 'app1' and 'app2' that belong to the suite. The program
-          'app1' can be set to read from 'mysuite.conf' as well as the more
-          specific 'app1.conf'. But in 'mysuite.conf', the configuration is read
-          from the [app1] (or say [app.app1]) section. This allows
-          'mysuite.conf' to contain configuration for a hierarchy of
-          programs/subsystems without being mixed up.
+          file (instead the default 'GLOBAL' section). This allows a scenario of
+          main/general and more specific config files. For example, suppose you
+          have a suite of applications called 'mysuite' and programs 'app1' and
+          'app2' that belong to the suite. The program 'app1' can be set to read
+          from 'mysuite.conf' as well as the more specific 'app1.conf'. But in
+          'mysuite.conf', the configuration is read from the [app1] (or say
+          [app.app1]) section. This allows 'mysuite.conf' to contain
+          configuration for a hierarchy of programs/subsystems without being
+          mixed up.
 
         - [Removed] Remove support for old section syntax in config: [SUBCOMMAND
           profile=P1 ...] now has to be written as [subcommand=SUBCOMMAND
@@ -264,10 +274,9 @@
           '[profile=PNAME subcommand=SCNAME]'). Basically, we now regard IOD
           section as a whitespace-separated list of key=value pairs. This new
           syntax is clearer and more generic, it allows application to add its
-          own key=value pair as needed.
-
-          The old syntax is now not documented. Although it will still be
-          supported for sometime, it will be removed in the future.
+          own key=value pair as needed. The old syntax is now not documented.
+          Although it will still be supported for sometime, it will be removed
+          in the future.
 
 
 1.41    2015-11-29 (PERLANCAR)
@@ -398,17 +407,15 @@
 
 	- [ux] Give suggestion for similar subcommand/option names in error
 	  message when user types unknown subcommand name or common option.
-
-          Inspired by Dave Jacoby's blog post
-          <http://varlogrant.blogspot.com/2015/07/what-i-learned-from-perlbrew.html>.
-          Code borrowed with some adjustments.
-
-          Note that we have not done this when user types unknown function
-	  option, because Perinci::Sub::GetArgs::Argv (Getopt::Long under the
-	  hood) does not return enough detailed information, it only warns to
-	  STDERR "Unknown opt: foo" without returning this information. The
-	  future planned Perinci::Sub::Getopt that will replace
-	  Perinci::Sub::GetArgs will remedy this.
+	  Inspired by Dave Jacoby's blog post
+	  <http://varlogrant.blogspot.com/2015/07/what-i-learned-from-perlbrew.html>.
+	  Code borrowed with some adjustments. Note that we have not done this
+	  when user types unknown function option, because
+	  Perinci::Sub::GetArgs::Argv (Getopt::Long under the hood) does not
+	  return enough detailed information, it only warns to STDERR "Unknown
+	  opt: foo" without returning this information. The future planned
+	  Perinci::Sub::Getopt that will replace Perinci::Sub::GetArgs will
+	  remedy this.
 
 	- [pod] Fix formatting (need whitespace after C<< >>).
 

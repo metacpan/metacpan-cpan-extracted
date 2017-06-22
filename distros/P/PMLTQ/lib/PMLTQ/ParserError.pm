@@ -1,6 +1,6 @@
 package PMLTQ::ParserError;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::ParserError::VERSION = '1.3.1';
+$PMLTQ::ParserError::VERSION = '1.3.2';
 # ABSTRACT: Wrapper for parsing error
 
 1; # End of PMLTQ::ParserError
@@ -17,7 +17,7 @@ PMLTQ::ParserError - Wrapper for parsing error
 
 =head1 VERSION
 
-version 1.3.1
+version 1.3.2
 
 =head1 AUTHORS
 

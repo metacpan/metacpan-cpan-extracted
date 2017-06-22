@@ -1,9 +1,9 @@
 # -*-cperl-*-
 #
-# Crypt::HashCash::Client - Client for HashCash digital cash
+# Crypt::HashCash::Client - Client for HashCash Digital Cash
 # Copyright (c) 2001-2017 Ashish Gulhati <crypt-hashcash at hash.neo.tc>
 #
-# $Id: lib/Crypt/HashCash/Client.pm v1.118 Sat Jun 10 13:59:10 PDT 2017 $
+# $Id: lib/Crypt/HashCash/Client.pm v1.124 Mon Jun 19 15:51:59 PDT 2017 $
 
 package Crypt::HashCash::Client;
 
@@ -23,7 +23,7 @@ use Crypt::HashCash qw (_dec _hex);
 use Compress::Zlib;
 use vars qw( $VERSION $AUTOLOAD );
 
-our ( $VERSION ) = '$Revision: 1.118 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.124 $' =~ /\s+([\d\.]+)/;
 
 sub new {
   my $class = shift;
@@ -168,7 +168,7 @@ sub _msgvault {
   my ($self, $msg) = @_;
   require IO::Socket::INET;
   $self->_diag("MV:connecting\n");
-  return unless (my $vault = IO::Socket::INET->new(PeerAddr => 'localhost:20203'));
+  return unless my $vault = IO::Socket::INET->new(PeerAddr => $self->keydb->{server} . ':' . $self->keydb->{port});
   print $vault "$msg\n";
   $self->_diag("MV:waiting\n");
   no warnings;
@@ -247,18 +247,18 @@ sub AUTOLOAD {
   }
 }
 
-1;
+1; # End of Crypt::HashCash::Client
 
 __END__
 
 =head1 NAME
 
-Crypt::HashCash::Client - Client for HashCash digital cash
+Crypt::HashCash::Client - Client for HashCash Digital Cash
 
 =head1 VERSION
 
- $Revision: 1.118 $
- $Date: Sat Jun 10 13:59:10 PDT 2017 $
+ $Revision: 1.124 $
+ $Date: Mon Jun 19 15:51:59 PDT 2017 $
 
 =head1 SYNOPSIS
 
@@ -286,7 +286,7 @@ signature on HashCash coins.
 
 =head2 new
 
-Creates and returns a new Crypt::HashCash::Vault::Bitcoin object.
+Creates and returns a new Crypt::HashCash::Client object.
 
 =head2 loadkeys
 
@@ -315,6 +315,20 @@ Creates and returns a new Crypt::HashCash::Vault::Bitcoin object.
 =head2 msgvault
 
 =head1 ACCESSORS
+
+=head1 SEE ALSO
+
+=head2 L<www.hashcash.com>
+
+=head2 L<Crypt::HashCash>
+
+=head2 L<Crypt::HashCash::Mint>
+
+=head2 L<Crypt::HashCash::Coin>
+
+=head2 L<Crypt::HashCash::Vault::Bitcoin>
+
+=head2 L<Business::HashCash>
 
 =head1 AUTHOR
 

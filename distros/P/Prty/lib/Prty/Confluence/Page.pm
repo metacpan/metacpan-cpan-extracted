@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.107;
+our $VERSION = 1.108;
 
 use JSON ();
 use Data::Printer ();
@@ -50,7 +50,7 @@ auf dieses Objekt zurück.
 =item $json
 
 Body der HTTP-Antwort der getPage()-Operation. Der Body enthält
-die JSON-Reprsentation der Seite.
+die JSON-Repräsentation der Seite.
 
 =back
 
@@ -208,7 +208,7 @@ sub asString {
 
 =head1 VERSION
 
-1.107
+1.108
 
 =head1 AUTHOR
 

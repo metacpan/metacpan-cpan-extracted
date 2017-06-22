@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use v5.10;
 use Encode qw(decode encode is_utf8);
-use Test::More tests => 8;
+use Test::More tests => 9;
 use Plack::Test;
 use HTTP::Request::Common;
 use XML::SemanticDiff;
@@ -114,7 +114,19 @@ test_psgi $app, sub {
 my $asked_config = 0;
 
 {
-    package Geo::OGC::Service::TestApp;
+    package Geo::OGC::Service::TestService;
+    sub process_request {
+        my ($self, $responder) = @_;
+        my $writer = $responder->([200, [ 'Content-Type' => 'text/plain',
+                                          'Content-Encoding' => 'UTF-8' ]]);
+        my $config = $self->{plugin}->config($self->{config}, $self) if $self->{plugin};
+        $writer->write("I'm ok!");
+        $writer->close;
+    }
+}
+
+{
+    package Geo::OGC::Service::TestPlugin;
     sub new {
         my ($class) = @_;
         my $self = {};
@@ -127,11 +139,25 @@ my $asked_config = 0;
     }
 }
 
-my $service = Geo::OGC::Service::TestApp->new();
+my $plugin = Geo::OGC::Service::TestPlugin->new();
 
+# plugin is for all services
 $app = Geo::OGC::Service->new({ config => { foo => 'bar' },
-                                config_maker => $service,
-                                services => {test => 'Geo::OGC::Service::Test'} })->to_app;
+                                plugin => $plugin,
+                                services => {test => 'Geo::OGC::Service::TestService'} })->to_app;
+
+test_psgi $app, sub {
+    my $cb = shift;
+    my $res = $cb->(GET "/?service=test");
+    is $asked_config, 'bar';
+};
+
+# plugin is for one service
+$app = Geo::OGC::Service->new({ config => { foo => 'bar' },
+                                services => {
+                                    test => { service => 'Geo::OGC::Service::TestService',
+                                              plugin => $plugin },
+                                } })->to_app;
 
 test_psgi $app, sub {
     my $cb = shift;

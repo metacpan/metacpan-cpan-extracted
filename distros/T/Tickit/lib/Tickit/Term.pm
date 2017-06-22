@@ -8,7 +8,7 @@ package Tickit::Term;
 use strict;
 use warnings;
 
-our $VERSION = '0.62';
+our $VERSION = '0.63';
 
 use Carp;
 
@@ -236,10 +236,7 @@ sub bind_event_with_flags
 
 sub bind_event_default
 {
-   my $self = shift;
-   my ( $ev, $code, $data ) = @_;
-   warnings::warnif( deprecated => "\term->bind_event_default is deprecated; use ->bind_event" );
-   $self->_bind_event( $ev, 0, $code, $data );
+   croak "\term->bind_event_default is deprecated; use ->bind_event";
 }
 
 =head2 refresh_size

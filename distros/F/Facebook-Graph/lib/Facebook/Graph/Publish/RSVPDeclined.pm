@@ -1,5 +1,5 @@
 package Facebook::Graph::Publish::RSVPDeclined;
-$Facebook::Graph::Publish::RSVPDeclined::VERSION = '1.1202';
+$Facebook::Graph::Publish::RSVPDeclined::VERSION = '1.1204';
 use Moo;
 extends 'Facebook::Graph::Publish';
 
@@ -13,7 +13,7 @@ Facebook::Graph::Publish::RSVPDeclined - RSVP declined to an event.
 
 =head1 VERSION
 
-version 1.1202
+version 1.1204
 
 =head1 SYNOPSIS
 

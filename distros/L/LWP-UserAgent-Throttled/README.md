@@ -1,10 +1,10 @@
-# NAME
+# LWP::UserAgent::Throttled
 
-LWP::UserAgent::Throttled - Throttle requests to a site
+Throttle requests to a site
 
 # VERSION
 
-Version 0.05
+Version 0.06
 
 # SYNOPSIS
 
@@ -49,25 +49,25 @@ There is one global throttle level, so you can't have different levels for diffe
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc LWP::Throttle
+    perldoc LWP::UserAgent::Throttled
 
 You can also look for information at:
 
 - RT: CPAN's request tracker
 
-    [http://rt.cpan.org/NoAuth/Bugs.html?Dist=LWP-Throttle](http://rt.cpan.org/NoAuth/Bugs.html?Dist=LWP-Throttle)
+    [http://rt.cpan.org/NoAuth/Bugs.html?Dist=LWP-UserAgent-Throttled](http://rt.cpan.org/NoAuth/Bugs.html?Dist=LWP-UserAgent-Throttled)
 
 - AnnoCPAN: Annotated CPAN documentation
 
-    [http://annocpan.org/dist/LWP-Throttle](http://annocpan.org/dist/LWP-Throttle)
+    [http://annocpan.org/dist/LWP-UserAgent-Throttled](http://annocpan.org/dist/LWP-UserAgent-Throttled)
 
 - CPAN Ratings
 
-    [http://cpanratings.perl.org/d/LWP-Throttle](http://cpanratings.perl.org/d/LWP-Throttle)
+    [http://cpanratings.perl.org/d/LWP-UserAgent-Throttled](http://cpanratings.perl.org/d/LWP-UserAgent-Throttled)
 
 - Search CPAN
 
-    [http://search.cpan.org/dist/LWP-Throttle/](http://search.cpan.org/dist/LWP-Throttle/)
+    [http://search.cpan.org/dist/LWP-UserAgent-Throttled/](http://search.cpan.org/dist/LWP-UserAgent-Throttled/)
 
 # LICENSE AND COPYRIGHT
 

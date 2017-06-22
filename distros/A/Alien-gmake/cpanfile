@@ -2,8 +2,8 @@ requires "Alien::Base" => "0.038";
 requires "perl" => "5.006";
 
 on 'build' => sub {
-  requires "Alien::Build" => "0.25";
-  requires "Alien::Build::MM" => "0.25";
+  requires "Alien::Build" => "0.40";
+  requires "Alien::Build::MM" => "0.40";
   requires "Capture::Tiny" => "0";
   requires "ExtUtils::MakeMaker" => "6.52";
 };
@@ -17,8 +17,8 @@ on 'test' => sub {
 };
 
 on 'configure' => sub {
-  requires "Alien::Build" => "0.25";
-  requires "Alien::Build::MM" => "0.25";
+  requires "Alien::Build" => "0.40";
+  requires "Alien::Build::MM" => "0.40";
   requires "Capture::Tiny" => "0";
   requires "ExtUtils::MakeMaker" => "6.52";
   requires "File::chdir" => "0";

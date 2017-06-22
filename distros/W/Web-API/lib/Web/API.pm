@@ -6,11 +6,11 @@ use experimental 'smartmatch';
 
 # ABSTRACT: Web::API - A Simple base module to implement almost every RESTful API with just a few lines of configuration
 
-our $VERSION = '2.2'; # VERSION
+our $VERSION = '2.2.2'; # VERSION
 
 use LWP::UserAgent;
 use HTTP::Cookies;
-use Data::Dump 'dump';
+use Data::Printer colored => 1;
 use XML::Simple;
 use URI::Escape::XS qw/uri_escape uri_unescape/;
 use JSON;
@@ -303,7 +303,7 @@ sub nonce {
 
 sub log {    ## no critic (ProhibitBuiltinHomonyms)
     my ($self, $msg) = @_;
-    print STDERR caller . ': ' . $msg . $/;
+    print STDERR caller() . ': ' . $msg . $/;
     return;
 }
 
@@ -339,7 +339,7 @@ sub decode {
         }
     };
 
-    die "couldn't decode payload using $content_type: $@\n" . dump($content)
+    die("couldn't decode payload using $content_type: $@\n" . np($content))
         if ($@ || ref \$content ne 'SCALAR');
 
     $self->_decoded_response($data);
@@ -375,7 +375,7 @@ sub encode {
             }
         }
     };
-    die "couldn't encode payload using $content_type: $@\n" . dump($options)
+    die("couldn't encode payload using $content_type: $@\n" . np(%$options))
         if ($@ || ref \$payload ne 'SCALAR');
 
     return $payload;
@@ -470,7 +470,7 @@ sub talk {
 
     if ($self->debug) {
         $self->log("uri: $method $uri");
-        $self->log("extra headers: " . dump(\%header)) if (%header);
+        $self->log("extra headers: " . np(%header)) if (%header);
         $self->log("OAuth headers: " . $oauth_req->to_authorization_header)
             if ($self->auth_type eq 'oauth_header');
     }
@@ -514,7 +514,7 @@ sub map_options {
 
     # then map everything in $options, overwriting default_attributes if necessary
     if ($self->mapping and not $command->{no_mapping}) {
-        $self->log("mapping hash:\n" . dump($self->mapping)) if $self->debug;
+        $self->log("mapping hash:\n" . np(%{ $self->mapping })) if $self->debug;
 
         # do the key and value mapping of options hash and overwrite defaults
         foreach my $key (keys %$options) {
@@ -535,7 +535,7 @@ sub map_options {
 
     # then check existence of mandatory attributes
     if ($command->{mandatory}) {
-        $self->log("mandatory keys:\n" . dump(\@{ $command->{mandatory} }))
+        $self->log("mandatory keys:\n" . np(@{ $command->{mandatory} }))
             if $self->debug;
 
         my @missing_attrs;
@@ -556,7 +556,7 @@ sub map_options {
         wrap($options, $command->{wrapper} || $self->wrapper, $content_type)
         unless ($method =~ m/^(GET|HEAD|DELETE)$/);
 
-    $self->log("options:\n" . dump($options)) if $self->debug;
+    $self->log("options:\n" . np(%$options)) if $self->debug;
 
     return $options;
 }
@@ -707,12 +707,13 @@ sub format_response {
 
     my $answer;
 
-    # collect response headers
     if ($response) {
+        # collect response headers
         my $response_headers;
         $response_headers->{$_} = $response->header($_)
             foreach ($response->header_field_names);
 
+        # decode content if necessary
         unless ($self->_decoded_response) {
             $self->_decoded_response(
                 eval {
@@ -722,6 +723,7 @@ sub format_response {
             $error ||= $@;
         }
 
+        # search for and expose errors
         $error ||= $self->find_error($self->_decoded_response);
 
         $answer = {
@@ -729,6 +731,7 @@ sub format_response {
             code    => $response->code,
             content => $self->_decoded_response,
             raw     => $response->content,
+            cookies => $self->cookies->get_cookies($self->base_url),
         };
 
         unless ($response->is_success || $response->is_redirect) {
@@ -796,6 +799,9 @@ sub build_content_type {
 }
 
 
+sub DESTROY {}
+
+
 sub AUTOLOAD {
     my ($self, %options) = @_;
 
@@ -856,7 +862,7 @@ Web::API - Web::API - A Simple base module to implement almost every RESTful API
 
 =head1 VERSION
 
-version 2.2
+version 2.2.2
 
 =head1 SYNOPSIS
 
@@ -955,7 +961,7 @@ later use as:
 
     use Net::CloudProvider;
     
-    my $nc = Net::CloudProvider(user => 'foobar', api_key => 'secret');
+    my $nc = Net::CloudProvider->new(user => 'foobar', api_key => 'secret');
     my $response = $nc->create_node({
         id                             => 'funnybox',
         hostname                       => 'node.funnybox.com',
@@ -988,9 +994,9 @@ the following keys are valid/possible:
     incoming_content_type
     outgoing_content_type
     wrapper
-    require_id (depricated, use path)
-    pre_id_path (depricated, use path)
-    post_id_path (depriated, use path)
+    require_id (deprecated, use path)
+    pre_id_path (deprecated, use path)
+    post_id_path (deprecated, use path)
 
 the request path for commands is being build as:
 
@@ -1066,7 +1072,7 @@ default: "Web::API $VERSION"
 
 =head2 timeout (optional)
 
-get/set LWP::UserAgent timeout
+get/set L<LWP::UserAgent> timeout
 
 =head2 strict_ssl (optional)
 
@@ -1078,7 +1084,7 @@ default: true
 
 =head2 agent (optional)
 
-get/set LWP::UserAgent object
+get/set L<LWP::UserAgent> object
 
 =head2 retry_http_codes (optional)
 
@@ -1128,9 +1134,10 @@ default: false
 
 this is used to store and retrieve cookies before and after requests were made
 to keep authenticated sessions alive for the time this object exists in memory
-you can add your own cookies to be send with every request.
+you can add your own cookies to be send with every request. See
+L<HTTP::Cookies> for more information.
 
-default: HTTP::Cookies->new
+default: HTTP::Cookies->new()
 
 =head2 consumer_secret (required for all oauth_* auth_types)
 
@@ -1241,10 +1248,16 @@ order of precedence:
 4. global C<incoming_content_type> / C<outgoing_content_type>
 5. global general C<content_type>
 
+=head2 DESTROY
+
+catch DESTROY call and tear down / clean up if necessary
+at this point there is nothing to do though. This prevents
+AUTOLOAD from logging an unknown command error message
+
 =head2 AUTOLOAD magic
 
-install a method for each new command and call it in an eval {} to catch die()s
-and set an error in a unified way.
+install a method for each new command and call it in an C<eval {}> to catch
+exceptions and set an error in a unified way.
 
 =head1 BUGS
 
@@ -1253,7 +1266,7 @@ Pull requests welcome.
 
 =head1 SUPPORT
 
-You can find documentation for this module with the perldoc command.
+You can find documentation for this module with the L<perldoc(1)> command.
 
     perldoc Web::API
 
@@ -1278,6 +1291,10 @@ L<http://annocpan.org/dist/Web::API>
 L<http://cpanratings.perl.org/d/Web::API>
 
 =back
+
+=head1 SEE ALSO
+
+L<HTTP::Cookies>, L<LWP::UserAgent>, L<Net::OAuth>
 
 =head1 AUTHOR
 

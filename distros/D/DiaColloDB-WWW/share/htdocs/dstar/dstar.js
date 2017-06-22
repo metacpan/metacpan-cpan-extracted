@@ -94,6 +94,15 @@ function initInput(qvar, qparam) {
     }
 }
 
+function dstarHomeInit() {
+    userFormInit();
+    autocompleteInit();
+
+  //-- for chromium, since this isn't a root path (throws up a dialog)
+  //if (window.external.AddSearchProvider != null) { window.external.AddSearchProvider("http://kaskade.dwds.de/dtaos/dta-ddc-osd.xml"); }
+    document.getElementById('in_q').focus();
+}
+
 function userFormInit() {
   initInput("qq");
   initInput("q");
@@ -106,12 +115,6 @@ function userFormInit() {
       initInput("flags", "corpus");
       initInput("flags");
   }
-
-  autocompleteInit();
-
-  //-- for chromium, since this isn't a root path (throws up a dialog)
-  //if (window.external.AddSearchProvider != null) { window.external.AddSearchProvider("http://kaskade.dwds.de/dtaos/dta-ddc-osd.xml"); }
-  document.getElementById('in_q').focus();
 }
 
 function userFormSubmit() {
@@ -152,6 +155,7 @@ function dstarSearchInit() {
 	return "javascript:toggleHitMeta("+$(this).parents("[hit_i]").attr("hit_i")+")";
     });
 
+    userFormInit();
     autocompleteInit();
 }
 
@@ -195,6 +199,18 @@ String.prototype.xlit = function () {
 	    .replace(/Uͤ/g, 'Ü')
 	   );
 };
+
+function toggleVerboseQueryForm() {
+    if ($("#qFormVerbose").is(":visible")) {
+	$("#qFormVerbose").hide();
+	$("#qFormShort input").removeAttr("disabled");
+	$("#vqFormTgl").text("+").attr("title","Show detailed query/export options");
+    } else {
+	$("#qFormVerbose").show();
+	$("#qFormShort input").attr("disabled",true);
+	$("#vqFormTgl").text("-").attr("title","Hide detailed query/export options");
+    }
+}
 
 //=============================================================================)
 // caberr stuff

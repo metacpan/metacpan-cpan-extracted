@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 13;
+use Test::More tests => 11;
 use Dwarf::Validator;
 use Plack::Request;
 
@@ -15,7 +15,6 @@ use Plack::Request;
 	);
 	my $v = Dwarf::Validator->new($q);
 	ok(!$v->has_error);
-	is($v->query, $q);
 	$v->check(
 		'foo' => [
 			[CHOICE => qw/hoge fuga/],
@@ -59,7 +58,6 @@ use Plack::Request;
 	);
 	my $v = Dwarf::Validator->new($q);
 	ok(!$v->has_error);
-	is($v->query, $q);
 	$v->check(
 		'foo' => [
 			'NOT_NULL',

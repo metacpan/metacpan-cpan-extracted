@@ -6,6 +6,7 @@ package DR::Tnt::Msgpack::Types::Bool;
 use Carp;
 $Carp::Internal{ (__PACKAGE__) }++;
 use Scalar::Util ();
+use feature 'state';
 
 sub new {
     my ($class, $value) = @_;
@@ -22,7 +23,23 @@ sub TO_MSGPACK {
 
 sub TO_JSON {
     my ($self) = @_;
-    return $$self ? 'true' : 'false';
+
+    state ($true, $false);
+
+    unless (defined $true) {
+        if (eval "require JSON::XS; 1") {
+            $true = JSON::XS::true();
+            $false = JSON::XS::false();
+        } elsif (eval "require JSON; 1") {
+            $true = JSON::true();
+            $false = JSON::false();
+        } else {
+            croak "JSON or JSON::XS must be installed";
+        }
+    }
+
+    return $true if $$self;
+    return $false;
 }
 
 =head1 NAME

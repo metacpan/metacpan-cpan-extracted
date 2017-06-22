@@ -12,10 +12,8 @@ use t::Server ();
 use t::Worker qw/ new_worker /;
 
 my $gts = t::Server->new();
-$gts || plan skip_all => $t::Server::ERROR;
-
 my @job_servers = $gts->job_servers();
-@job_servers || BAIL_OUT "no gearmand";
+@job_servers || plan skip_all => $t::Server::ERROR;
 
 use_ok("Gearman::Client");
 use_ok("Gearman::Task");

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More 0.88;
 
 # LoadableClass and ClassName should be exactly the same thing for
 # type mappers to get it right when you're switching from one to another.

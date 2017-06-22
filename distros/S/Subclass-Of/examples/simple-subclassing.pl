@@ -10,7 +10,6 @@ use Subclass::Of "IO::File", -methods => [
 	stat => sub { wantarray ? ::SUPER() : bless [::SUPER()], "File::stat" },
 ];
 
-use Data::Dumper;
 my $file = File->new(__FILE__, "r");
 
-say $file->stat->size; # says 359
+say $file->stat->size; # says 341

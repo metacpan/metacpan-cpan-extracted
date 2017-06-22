@@ -8,7 +8,7 @@ package Tickit::Event;
 use strict;
 use warnings;
 
-our $VERSION = '0.62';
+our $VERSION = '0.63';
 
 use Carp;
 
@@ -22,12 +22,6 @@ When event handlers bound to L<Tickit::Term> or L<Tickit::Window> instances
 are invoked they receive an object instance to contain information about the
 event. Details of the event can be accessed as via accessor methods on these
 instances.
-
-For back-compatibility, each event type that C<Tickit::Term> can emit also
-provides a hash reference overload method that yields a hash containing keys
-named after the accessors. This code will be removed in a later version as per
-deprecation policy. Existing widget code should be changed to use the new
-object methods rather than the now-legacy hash keys.
 
 =head1 ACCESSORS
 
@@ -96,9 +90,7 @@ package
 our @ISA = qw( Tickit::Event );
 
 use overload '%{}' => sub {
-   my $self = shift;
-   warnings::warnif( deprecated => "HASH access to Tickit::Event::Key is deprecated" );
-   return +{ map { $_ => $self->$_ } qw( type str mod ) };
+   Carp::croak "HASH access to Tickit::Event::Key is deprecated";
 };
 
 =head1 Tickit::Event::Key
@@ -122,9 +114,7 @@ package
 our @ISA = qw( Tickit::Event );
 
 use overload '%{}' => sub {
-   my $self = shift;
-   warnings::warnif( deprecated => "HASH access to Tickit::Event::Mouse is deprecated" );
-   return +{ map { $_ => $self->$_ } qw( type button line col mod ) };
+   Carp::croak "HASH access to Tickit::Event::Mouse is deprecated";
 };
 
 =head1 Tickit::Event::Mouse
@@ -155,9 +145,7 @@ package
 our @ISA = qw( Tickit::Event );
 
 use overload '%{}' => sub {
-   my $self = shift;
-   warnings::warnif( deprecated => "HASH access to Tickit::Event::Resize is deprecated" );
-   return +{ map { $_ => $self->$_ } qw( lines cols ) };
+   Carp::croak "HASH access to Tickit::Event::Resize is deprecated";
 };
 
 =head1 Tickit::Event::Resize

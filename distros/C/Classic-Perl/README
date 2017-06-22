@@ -1,4 +1,4 @@
-Classic::Perl, version 0.06
+Classic::Perl, version 0.07
 
 This reinstates features deleted in recent versions of perl.
 
@@ -18,17 +18,15 @@ RECENT CHANGES
 
 0.06
 ----
+• Fixed the split feature to work in perl 5.26 and higher.
+
+0.06
+----
 • Fixed the split feature to work in threaded 5.22 and higher.
 
 0.05
 ----
 • Fixed tests to work in 5.8 and 5.6.
-
-0.04
-----
-• Fixed a crashing bug that occurred with ||= in 5.9 and higher.
-• Fixed the changes file;  I somehow got one from a different  branch
-  in the 0.03 release, listing changes that never happened.
 
 
 INSTALLATION
@@ -67,7 +65,7 @@ Or try using man (it’s faster, in my experience):
 
 COPYRIGHT AND LICENCE
 
-Copyright © 2010-16, Father Chrysostomos
+Copyright © 2010-17, Father Chrysostomos
 
 This program is free software; you may redistribute it, modify it, or
 both, under the same terms as perl.

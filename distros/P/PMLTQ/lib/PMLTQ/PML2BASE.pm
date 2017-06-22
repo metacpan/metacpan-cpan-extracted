@@ -1,6 +1,6 @@
 package PMLTQ::PML2BASE;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::PML2BASE::VERSION = '1.3.1';
+$PMLTQ::PML2BASE::VERSION = '1.3.2';
 # ABSTRACT: Convert from PML to SQL
 
 
@@ -1350,7 +1350,7 @@ PMLTQ::PML2BASE - Convert from PML to SQL
 
 =head1 VERSION
 
-version 1.3.1
+version 1.3.2
 
 =head1 DESCRIPTION
 

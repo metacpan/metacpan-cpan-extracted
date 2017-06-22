@@ -1,0 +1,8 @@
+Changes
+lib/GooCanvas2.pm
+Makefile.PL
+MANIFEST
+README
+t/GooCanvas2.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

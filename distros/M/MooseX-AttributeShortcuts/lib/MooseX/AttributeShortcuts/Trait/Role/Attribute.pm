@@ -9,7 +9,7 @@
 #
 package MooseX::AttributeShortcuts::Trait::Role::Attribute;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-$MooseX::AttributeShortcuts::Trait::Role::Attribute::VERSION = '0.031';
+$MooseX::AttributeShortcuts::Trait::Role::Attribute::VERSION = '0.032';
 # ABSTRACT: Role attribute trait to create builder method
 
 use MooseX::Role::Parameterized;
@@ -49,6 +49,8 @@ after attach_to_role  => sub {
 role {
     my $p = shift @_;
 
+    method canonical_builder_prefix => sub { $p->builder_prefix };
+
     around new => sub {
         # my ($orig, $class) = (shift, shift);
         my ($orig, $class, $name, %options) = @_;
@@ -59,7 +61,7 @@ role {
 
         # stash anon_builder, set builder => 1
         $options{anon_builder} = $options{builder};
-        $options{builder}      = $p->builder_prefix . $name;
+        $options{builder}      = $class->_mxas_builder_name($name);
 
         ### %options
         ### anon builder: $options{builder}
@@ -83,7 +85,7 @@ MooseX::AttributeShortcuts::Trait::Role::Attribute - Role attribute trait to cre
 
 =head1 VERSION
 
-This document describes version 0.031 of MooseX::AttributeShortcuts::Trait::Role::Attribute - released May 30, 2017 as part of MooseX-AttributeShortcuts.
+This document describes version 0.032 of MooseX::AttributeShortcuts::Trait::Role::Attribute - released June 13, 2017 as part of MooseX-AttributeShortcuts.
 
 =head1 DESCRIPTION
 

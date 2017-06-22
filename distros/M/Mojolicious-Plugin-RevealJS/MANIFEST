@@ -67,7 +67,6 @@ share/public/revealjs/lib/js/classList.js
 share/public/revealjs/lib/js/head.min.js
 share/public/revealjs/lib/js/html5shiv.js
 share/public/revealjs/plugin/highlight/highlight.js
-share/public/revealjs/plugin/leap/leap.js
 share/public/revealjs/plugin/markdown/example.html
 share/public/revealjs/plugin/markdown/example.md
 share/public/revealjs/plugin/markdown/markdown.js
@@ -82,7 +81,6 @@ share/public/revealjs/plugin/notes-server/notes.html
 share/public/revealjs/plugin/notes/notes.html
 share/public/revealjs/plugin/notes/notes.js
 share/public/revealjs/plugin/print-pdf/print-pdf.js
-share/public/revealjs/plugin/remotes/remotes.js
 share/public/revealjs/plugin/search/search.js
 share/public/revealjs/plugin/zoom-js/zoom.js
 share/templates/layouts/revealjs.html.ep

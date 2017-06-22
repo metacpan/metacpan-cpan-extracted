@@ -1,8 +1,6 @@
-# Copyright (c) 2008-2016 Martin Becker.  All rights reserved.
+# Copyright (c) 2008-2017 Martin Becker.  All rights reserved.
 # This package is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-#
-# $Id: Makefile.PL 129 2016-08-08 17:27:26Z demetri $
 
 use strict;
 use ExtUtils::MakeMaker;
@@ -29,10 +27,19 @@ WriteMakefile(
                 runtime => {
                     recommends => {
                         'Math::Complex'       => 0,
-                        'Math::BigInt'        => 0,
-                        'Math::BigRat'        => '0.260804',
+                        'Math::BigNum'        => 0,
                         'Math::ModInt'        => 0,
                     },
+                },
+            },
+            provides => {
+                'Math::Polynomial' => {
+                    file    => 'lib/Math/Polynomial.pm',
+                    version => '1.013',
+                },
+                'Math::Polynomial::Generic' => {
+                    file    => 'lib/Math/Polynomial/Generic.pm',
+                    version => '1.013',
                 },
             },
         },

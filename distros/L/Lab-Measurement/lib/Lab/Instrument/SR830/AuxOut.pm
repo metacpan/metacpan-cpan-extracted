@@ -60,12 +60,11 @@ C<1>. Example sweep configuration:
 =cut
 
 package Lab::Instrument::SR830::AuxOut;
-
+$Lab::Instrument::SR830::AuxOut::VERSION = '3.550';
 use warnings;
 use strict;
 use 5.010;
 
-our $VERSION = '3.543';
 
 use Lab::Instrument;
 use Data::Dumper;

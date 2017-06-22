@@ -3,9 +3,7 @@ Upstream-Name: Subclass-Of
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Subclass-Of
 
-Files: README
- lib/Subclass/Of.pm
- t/01basic.t
+Files: t/01basic.t
  t/02moose.t
  t/03moo.t
  t/04mouse.t
@@ -26,14 +24,11 @@ License: GPL-1.0+ or Artistic-1.0
 Files: Changes
  META.json
  META.yml
- Makefile.PL
- dist.ini
  doap.ttl
-Copyright: Copyright 2013 Toby Inkster.
+Copyright: Copyright 2017 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: CONTRIBUTING
- INSTALL
+Files: INSTALL
  LICENSE
  examples/simple-subclassing.pl
 Copyright: Unknown
@@ -45,15 +40,29 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
+Files: README
+ lib/Subclass/Of.pm
+Copyright: This software is copyright (c) 2013, 2017 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: Makefile.PL
+ dist.ini
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/08lazy.t
+Copyright: This software is copyright (c) 2017 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 License: Artistic-1.0
- This software is Copyright (c) 2013 by the copyright holder(s).
+ This software is Copyright (c) 2017 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2013 by the copyright holder(s).
+ This software is Copyright (c) 2017 by the copyright holder(s).
  
  This is free software, licensed under:
  

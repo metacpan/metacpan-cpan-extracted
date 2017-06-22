@@ -2,7 +2,7 @@
 # NanoB2B-NER::NER::Avgman
 #
 # Averages Weka files and makes a nice output file
-# Version 1.0
+# Version 1.5
 #
 # Program by Milk
 
@@ -69,6 +69,7 @@ sub new {
 		$item .= substr($fs, 0, 1);		#add to abbreviations for the name
 		push(@sets, $item);
 	}
+	
 
 	return $self;
 }
@@ -106,6 +107,7 @@ sub _init {
 sub avg_file{
 	my $self = shift;
 	my $name = shift;
+
 	my %avg = averageWekaData($name);
 	my %ind = individualWekaData($name);
 	my $msb = getMSB($name);
@@ -205,7 +207,7 @@ sub averageWekaData{
 		foreach my $bucket(@allBuckets){
 
 			#import the wekaman
-			my $file = "$program_dir/_WEKAS/$weka_dir/$name" . "_WEKA_DATA/_$item/$name" . "_accuracy_$bucket";
+			my $file = "$program_dir/_WEKAS/$weka_dir/$name" . "_WEKA_DATA/$item/$name" . "_accuracy_$bucket";
 			open (WEKA, "$file") || die ("WHY NO FILE - $file?!");
 
 			#get lines
@@ -213,21 +215,32 @@ sub averageWekaData{
 			foreach my $line(@lines){chomp($line)};
 			my $len = @lines;
 
+			#$uniSub->printColorDebug("on_red", "YOUR FACE!");
+
+			if($len == 0){
+				$uniSub->printColorDebug("red", "NOTHING FOUND FOR $file!\n");
+				my $n = @wekaAttr;
+				my @values = (0) x $n;
+				push(@{$data{$bucket}}, @values);
+				next;
+				#return %featAvg;
+			}
+
 			#get the rest of the array
 			my $keyword = "=== Error on test data ===";
 			my $index = $uniSub->getIndexofLine($keyword, \@lines);
 			my @result = @lines[$index..$len];
 
 			#grab the only stuff you need
-			my $weightWord = "Weighted Avg";
+			my $weightWord = "     Yes";
 			my $weightIndex = $uniSub->getIndexofLine($weightWord, \@result);
 			my $weightLine = $result[$weightIndex];
 
 			#split it uuuuuup
 			my @values = split /\s+/, $weightLine;
 			my $valLen = @values;
-			my $valLen2 = $valLen - 1;
-			@values = @values[2..$valLen2];
+			my $valLen2 = $valLen - 2;
+			@values = @values[1..$valLen2];
 			#printArr(", ", @values);
 
 			#add to overall
@@ -241,7 +254,7 @@ sub averageWekaData{
 			my $wekaLen = @wekaSet;
 			for(my $e = 0; $e < $wekaLen; $e++){
 				my $entry = $wekaSet[$e];
-				if($entry ne "NaN"){
+				if($entry ne "NaN" and $entry ne "?"){
 					$averages[$e] += $entry;
 				}
 			}
@@ -273,10 +286,11 @@ sub individualWekaData{
 
 	foreach my $item (@sets){
 		my @data = ();
+
 		foreach my $bucket(@allBuckets){
 
 			#import the wekaman
-			my $file = "$program_dir/_WEKAS/$weka_dir/$name" . "_WEKA_DATA/_$item/$name" . "_accuracy_$bucket";
+			my $file = "$program_dir/_WEKAS/$weka_dir/$name" . "_WEKA_DATA/$item/$name" . "_accuracy_$bucket";
 			open (WEKA, "$file") || die ("WHY NO FILE - $file?!");
 
 			#get lines
@@ -284,21 +298,31 @@ sub individualWekaData{
 			foreach my $line(@lines){chomp($line)};
 			my $len = @lines;
 
+			if($len == 0){
+				$uniSub->printColorDebug("red", "NOTHING FOUND FOR $file!\n");
+				my $n = @wekaAttr;
+				my @values = (0) x $n;
+				my $valueLine = join(" ", @values);
+				push(@data, $valueLine);
+				next;
+				#return %featAvg;
+			}
+
 			#get the rest of the array
 			my $keyword = "=== Error on test data ===";
 			my $index = $uniSub->getIndexofLine($keyword, \@lines);
 			my @result = @lines[$index..$len];
 
 			#grab the only stuff you need
-			my $weightWord = "Weighted Avg";
+			my $weightWord = "     Yes";
 			my $weightIndex = $uniSub->getIndexofLine($weightWord, \@result);
 			my $weightLine = $result[$weightIndex];
 
 			#split it uuup
 			my @values = split /\s+/, $weightLine;
 			my $valLen = @values;
-			$valLen -= 1;
-			my @values2 = @values[2..$valLen];
+			$valLen -= 2;
+			my @values2 = @values[1..$valLen];
 
 			#rejoin it
 			my $valLine = join("\t", @values2);
@@ -323,7 +347,7 @@ sub getMSB{
 	$filename = lc($filename);
 
 	#import the data from the file
-	if($program_dir ne ""){open (FILE, "$program_dir/$file") || die ("what is this 'dir/file' you speak of?\n");}
+	if($program_dir ne ""){open (FILE, "$program_dir/$file") || die ("what is this '$program_dir/$file' you speak of?\n");}
 	else{open (FILE, "$file") || die ("what is this 'file' you speak of?\n");}
 	my @fileLines = <FILE>;
 	foreach my $l(@fileLines){

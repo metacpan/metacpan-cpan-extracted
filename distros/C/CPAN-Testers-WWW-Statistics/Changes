@@ -1,6 +1,19 @@
 Revision history for CPAN-Testers-WWW-Statistics
 ================================================
 
+1.23    2017-06-19
+        - refactored noreports to use new stats_store table.
+        - sort by dist name for output of noreport files.
+        - add stats_store data in tests.
+        - include CSV file differences in tests.
+
+1.22    2017-06-12
+        - updated date ranges for graphs.
+        - build_history setting established to configure the number of days
+          displayed in performance graphs.
+        - try/catch block added to avoid JSON failures crashing the process.
+        - iheart CSS/JS updated from production environment
+
 1.21    2015-04-17
         - refinements to pass matrix changes.
         - added check for some bad data storage.

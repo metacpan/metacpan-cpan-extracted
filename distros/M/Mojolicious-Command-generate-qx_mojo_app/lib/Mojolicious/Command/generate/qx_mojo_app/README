@@ -14,13 +14,13 @@ Prerequisite
 
 Get a copy of the Qooxdoo sdk from www.qooxdoo.org.  If you followed the
 "Quickstart" on https://github.com/oetiker/qx-mojo-app you are already set
-with a copy of the Qooxdoo sdk in $HOME/sdk/qooxdoo-4.0.1-sdk.  In this case
+with a copy of the Qooxdoo sdk in $HOME/sdk/qooxdoo-5.0.2-sdk.  In this case
 immediately proceed with "Setup".
 
 Setup
 -----
 
- ./configure --prefix=$HOME/opt/<%= $p->{name} %> --with-qooxdoo-sdk=$HOME/sdk/qooxdoo-4.0.1-sdk
+ ./configure --prefix=$HOME/opt/<%= $p->{name} %> --with-qooxdoo-sdk-dir=$HOME/sdk/qooxdoo-5.0.2-sdk
 
 Configure will check if the necessary items are in place and give
 hints on how to fix the situation if something is missing.

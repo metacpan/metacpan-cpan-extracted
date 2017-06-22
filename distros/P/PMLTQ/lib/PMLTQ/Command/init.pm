@@ -1,6 +1,6 @@
 package PMLTQ::Command::init;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Command::init::VERSION = '1.3.1';
+$PMLTQ::Command::init::VERSION = '1.3.2';
 # ABSTRACT: Initialize empty database
 
 use PMLTQ::Base 'PMLTQ::Command';
@@ -121,6 +121,7 @@ sub run {
       COMMENT_homepage    => '',
       COMMENT_description => '',
       COMMENT_isFree      => 'false',
+      COMMENT_isAllLogged => 'false',
       COMMENT_isPublic    => 'false',
       COMMENT_isFeatured  => 'false',
       COMMENT_web_api     =>
@@ -142,7 +143,7 @@ sub run {
           'COMMENT_mytag'
         ],
       COMMENT_language    => 'lang code',
-      COMMENT_text_query  =>
+      COMMENT_test_query  =>
         {
           COMMENT_result_dir => 'webverify_query_results',
           COMMENT_queries    =>
@@ -245,7 +246,7 @@ PMLTQ::Command::init - Initialize empty database
 
 =head1 VERSION
 
-version 1.3.1
+version 1.3.2
 
 =head1 SYNOPSIS
 

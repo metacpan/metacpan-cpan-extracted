@@ -1,7 +1,7 @@
 #
 # This file is part of Test-Moose-More
 #
-# This software is Copyright (c) 2012 by Chris Weyl.
+# This software is Copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by Chris Weyl.
 #
 # This is free software, licensed under:
 #
@@ -9,7 +9,7 @@
 #
 package Test::Moose::More::Utils;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-$Test::Moose::More::Utils::VERSION = '0.047';
+$Test::Moose::More::Utils::VERSION = '0.048';
 # ABSTRACT: Various utility functions for TMM (and maybe others!)
 
 use strict;
@@ -72,7 +72,7 @@ Test::Moose::More::Utils - Various utility functions for TMM (and maybe others!)
 
 =head1 VERSION
 
-This document describes version 0.047 of Test::Moose::More::Utils - released April 24, 2017 as part of Test-Moose-More.
+This document describes version 0.048 of Test::Moose::More::Utils - released June 17, 2017 as part of Test-Moose-More.
 
 =head1 FUNCTIONS
 
@@ -119,7 +119,7 @@ Chris Weyl <cweyl@alumni.drew.edu>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 by Chris Weyl.
+This software is Copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by Chris Weyl.
 
 This is free software, licensed under:
 

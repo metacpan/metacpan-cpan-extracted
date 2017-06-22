@@ -6,7 +6,7 @@ WriteMakefile(
   LICENSE => 'artistic_2',
   ABSTRACT_FROM => 'lib/App/git/ship.pm',
   VERSION_FROM => 'lib/App/git/ship.pm',
-  EXE_FILES => [qw( bin/git-ship )],
+  EXE_FILES => [qw(bin/git-ship)],
   META_MERGE => {
     resources => {
       bugtracker => 'https://github.com/jhthorsen/app-git-ship/issues',

@@ -1,0 +1,276 @@
+#! /usr/bin/perl
+
+use v5.10;
+use warnings;
+use strict;
+
+use Term::ReadLine;
+use Getopt::Long;
+
+use Batch::Interpreter;
+
+our $PROGRAM = 'RunBat';
+our $VERSION = 0.01;
+
+my ($dump_parse_tree, $verbose_system, $verbose_set);
+my @immediate_line;
+my (@filename_opt, @mountpoint_opt, @remote_name_opt);
+GetOptions(
+	'c=s', \@immediate_line,
+	'filename=s', \@filename_opt,
+	'mount=s', \@mountpoint_opt,
+	'remote-name=s', \@remote_name_opt,
+
+	'dump-parse-tree!', \$dump_parse_tree,
+	'verbose-system!', \$verbose_system,
+	'verbose-set!', \$verbose_set,
+);
+
+my $prog = $ARGV[0];
+
+
+my $is_win_host = $^O =~ /Win32/;
+
+my %var = (
+	map((uc $_ => $ENV{$_}), keys %ENV),
+	COMPUTERNAME => `hostname`,
+);
+my %varcase = (
+	map((uc $_ => $_), keys %ENV),
+	%{Batch::Interpreter->default_variable_cases},
+	map +(uc $_ => $_), qw(
+		ftp_proxy http_proxy
+	)
+);
+
+my %extension_handler = (
+	%{Batch::Interpreter->builtin_extension_handlers},
+
+	pl => sub {
+		my ($self, $command, $args) = @_;
+		return ('perl', $command);
+	},
+);
+
+# these are to be used verbatim and can't be quoted
+my %internal_command = (
+	%{Batch::Interpreter->builtin_internal_commands},
+);
+
+# these can be quoted
+my %external_command = (
+	%{Batch::Interpreter->builtin_external_commands},
+
+	mycat => sub {
+		while (<STDIN>) {
+			print STDERR "- $_";
+		}
+		return 'keep';
+	},
+
+	perl => sub {
+		my ($self, $command, $args) = @_;
+		# don't translate inside -e arguments (i.e. don't translate
+		# the 'relative path' bla\n
+		my @arg;
+		while (@$args) {
+			my $arg = shift @$args;
+			if ($arg =~ /^-[np]*e$/ && @$args) {
+				push @arg, $arg, shift @$args;
+			} else {
+				push @arg, $self->unc2sys($arg);
+			}
+		}
+		return $self->run_external_command(
+			{
+				add_to_env => { PERLIO => ':crlf' },
+			},
+			$^X, @arg
+		);
+	},
+);
+
+my %filename = (
+	%{Batch::Interpreter->default_filenames},
+
+	map {
+		if (my ($unc, $sys) = /^([^=]++)=(.+)$/) {
+			($unc => $sys)
+		} else {
+			die "missing system path in file name '$_'";
+		}
+	} @filename_opt
+);
+
+my @mountpoint = (
+	map({
+		if (my ($unc, $sys) = /^([^=]++)=(.+)$/) {
+			($unc => $sys)
+		} else {
+			die "missing system path in mount point '$_'";
+		}
+	} @mountpoint_opt),
+
+	$is_win_host ? (
+	) : (
+		'G:/' => '/mnt/g/',
+		'A:/' => '/',
+	),
+);
+
+my @remote_name = (
+	'G:/' => '\\\\fileserver\\export',
+);
+
+my $interactive_mode;
+my $lines;
+if (@immediate_line) {
+	$lines = \@immediate_line;
+} elsif (!defined $prog) {
+	$interactive_mode = 1;
+	say STDERR "$PROGRAM $VERSION";
+} elsif ($prog eq '-') {
+	$lines = [ <STDIN> ];
+} else {
+	open my $fh, '<:crlf', $prog
+		or die "$prog: $!";
+	$lines = [ <$fh> ];
+}
+
+my $interpreter = Batch::Interpreter->new(
+	dump_parse_tree => $dump_parse_tree,
+	verbose_system => $verbose_system,
+	verbose_set => $verbose_set,
+
+	echo => !$interactive_mode,
+	vars => \%var,
+	varcases => \%varcase,
+	terminal => -t STDIN ? Term::ReadLine->new('CON') : undef,
+
+	version_string => 'Microsoft Windows [Version 6.1.7601]',
+	locale => 'de_DE',
+
+	filenames => \%filename,
+	mountpoints => \@mountpoint,
+	remote_names => \@remote_name,
+
+	internal_commands => \%internal_command,
+	external_commands => \%external_command,
+);
+
+# this is global state which is difficult to restore (even with PerlIO::Layers),
+# so we can't do this in the interpreter
+binmode STDOUT, ':crlf';
+binmode STDERR, ':crlf';
+binmode STDIN, ':crlf';
+
+my $result = $interpreter->run({}, $lines, @ARGV);
+if ($result =~ /^error/g) {
+	say STDERR "ERROR".substr $result, pos $result;
+	exit 99;
+} else {
+	exit $result;
+}
+
+__END__
+
+=head1 NAME
+
+runbat - usable real world example for Batch::Interpreter
+
+=head1 SYNOPSIS
+
+	runbat [--[no-]dump-parse-tree]
+		[--[no-]verbose-system]	[--[no-]verbose-set]
+		[--filename <name>=<path> ...]
+		[--mount <mountpoint>=<path> ...]
+		[--remote-name <mountpoint>=<remote name> ...]
+		[-c <command> ...]
+		[-- <batch file> [arguments] ...]
+
+=head1 AUTHOR
+
+Ralf Neubauer, C<< <ralf at strcmp.de> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-batch-interpreter at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Batch-Interpreter>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc runbat
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Batch-Interpreter>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Batch-Interpreter>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Batch-Interpreter>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Batch-Interpreter/>
+
+=back
+
+
+=head1 ACKNOWLEDGEMENTS
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2016 Ralf Neubauer.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+=cut
+

@@ -4,7 +4,7 @@
       "Mike Eve <ungrim97@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.1",
+   "generated_by" : "Minilla/v3.0.12",
    "license" : [
       "perl_5"
    ],
@@ -42,6 +42,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Getopt::Long" : "2.49",
             "Hash::Merge" : "0.200",
             "IO::All" : "0.86",
             "JSON" : "2.90",
@@ -60,7 +61,7 @@
    "provides" : {
       "Dredd::Hooks" : {
          "file" : "lib/Dredd/Hooks.pm",
-         "version" : "0.05"
+         "version" : "0.07"
       },
       "Dredd::Hooks::Methods" : {
          "file" : "lib/Dredd/Hooks/Methods.pm"
@@ -69,13 +70,17 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/ungrim97/Dredd-Hooks/issues"
+         "web" : "https://github.com/ungrim97/dredd-hooks/issues"
       },
-      "homepage" : "https://github.com/ungrim97/Dredd-Hooks",
+      "homepage" : "https://github.com/ungrim97/dredd-hooks",
       "repository" : {
-         "url" : "git://github.com/ungrim97/Dredd-Hooks.git",
-         "web" : "https://github.com/ungrim97/Dredd-Hooks"
+         "url" : "git://github.com/ungrim97/dredd-hooks.git",
+         "web" : "https://github.com/ungrim97/dredd-hooks"
       }
    },
-   "version" : "0.05"
+   "version" : "0.07",
+   "x_contributors" : [
+      "Honza Javorek <mail@honzajavorek.cz>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

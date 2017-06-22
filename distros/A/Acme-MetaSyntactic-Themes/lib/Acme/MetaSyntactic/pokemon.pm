@@ -2,19 +2,21 @@ package Acme::MetaSyntactic::pokemon;
 use strict;
 use Acme::MetaSyntactic::List;
 our @ISA = qw( Acme::MetaSyntactic::List );
-our $VERSION = '1.007';
+our $VERSION = '1.008';
 __PACKAGE__->init();
 
 our %Remote = (
     source =>
         'http://en.wikipedia.org/wiki/List_of_Pok%C3%A9mon',
     extract => sub {
+        my %by_idx =
+            $_[0] =~ m!^<td>([0-9]{3})</td>\n<td><a href="/wiki/[^>]+" [^>]*title="[^>]+">([^<]+)</a></td>$!gm;
         return    # support for Unicode female/male symbols
-            map { tr/-'. /_/s; s/_$//; $_ }
+            map { tr/-'.: /_/s; s/_$//; $_ }
             map { Acme::MetaSyntactic::RemoteList::tr_accent($_) }
             map { Acme::MetaSyntactic::RemoteList::tr_utf8_basic($_) }
             map { s/Nidoran/Nidoran /; $_ }
-            $_[0] =~ m!^<td><a href="/wiki/[^"]+" title="[^"]+"[^>]*>([^<]+)</a>.*</td>$!gm;
+            map $by_idx{$_}, sort keys %by_idx;
     },
 );
 
@@ -28,15 +30,11 @@ Acme::MetaSyntactic::pokemon - The Pokémon theme
 
 =head1 DESCRIPTION
 
-List of the 722 Pokémon characters that are officially known to exist
+List of the 802 Pokémon characters that are officially known to exist
 in the franchise.
 
 This list is based on the following wikipedia article:
 L<http://en.wikipedia.org/wiki/List_of_Pok%C3%A9mon>.
-
-The Wikipedia page lists I<English names>, I<Romanisation> and
-I<Trademarked Romaji>. For each Pokémon, the named linked internally
-by Wikipedia has been chosen.
 
 =head1 CONTRIBUTORS
 
@@ -45,6 +43,13 @@ Abigail, Philippe Bruhat (BooK)
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2017-06-12 - v1.008
+
+Updated with "Pokémon Generation VII"
+in Acme-MetaSyntactic-Themes version 1.050.
 
 =item *
 
@@ -403,7 +408,7 @@ Larvitar
 Pupitar
 Tyranitar
 Lugia
-Ho_Oh
+Ho_oh
 Celebi
 Treecko
 Grovyle
@@ -875,4 +880,84 @@ Zygarde
 Diancie
 Hoopa
 Volcanion
+Rowlet
+Dartrix
+Decidueye
+Litten
+Torracat
+Incineroar
+Popplio
+Brionne
+Primarina
+Pikipek
+Trumbeak
+Toucannon
+Yungoos
+Gumshoos
+Grubbin
+Charjabug
+Vikavolt
+Crabrawler
+Crabominable
+Oricorio
+Cutiefly
+Ribombee
+Rockruff
+Lycanroc
+Wishiwashi
+Mareanie
+Toxapex
+Mudbray
+Mudsdale
+Dewpider
+Araquanid
+Fomantis
+Lurantis
+Morelull
+Shiinotic
+Salandit
+Salazzle
+Stufful
+Bewear
+Bounsweet
+Steenee
+Tsareena
+Comfey
+Oranguru
+Passimian
+Wimpod
+Golisopod
+Sandygast
+Palossand
+Pyukumuku
+Type_Null
+Silvally
+Minior
+Komala
+Turtonator
+Togedemaru
+Mimikyu
+Bruxish
+Drampa
+Dhelmise
+Jangmo_o
+Hakamo_o
+Kommo_o
+Tapu_Koko
+Tapu_Lele
+Tapu_Bulu
+Tapu_Fini
+Cosmog
+Cosmoem
+Solgaleo
+Lunala
+Nihilego
+Buzzwole
+Pheromosa
+Xurkitree
+Celesteela
+Kartana
+Guzzlord
+Necrozma
 Magearna
+Marshadow

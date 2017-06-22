@@ -80,7 +80,8 @@ t/28window-float.t
 t/29window-dragndrop.t
 t/80tickit.t
 t/81tickit-input.t
-t/82tickit-widget.t
+t/82tickit-timer.t
+t/83tickit-widget.t
 t/90rt101716.t
 t/99pod.t
 typemap

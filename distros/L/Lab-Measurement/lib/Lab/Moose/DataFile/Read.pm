@@ -1,4 +1,5 @@
 package Lab::Moose::DataFile::Read;
+$Lab::Moose::DataFile::Read::VERSION = '3.550';
 use 5.010;
 use warnings;
 use strict;
@@ -8,7 +9,6 @@ use PDL::IO::Misc 'rcols';
 use Fcntl 'SEEK_SET';
 use Carp;
 use Exporter 'import';
-our $VERSION = '3.543';
 
 our @EXPORT_OK = qw/read_2d_gnuplot_format/;
 

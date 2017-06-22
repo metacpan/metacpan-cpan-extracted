@@ -1,7 +1,8 @@
+use lib '.';
 use t::Util;
 use App::git::ship;
 
-$ENV{GIT_SHIP_CONFIG} = File::Spec->catfile(qw( t data with-comments.conf ));
+$ENV{GIT_SHIP_CONFIG} = File::Spec->catfile(qw(t data with-comments.conf));
 plan skip_all => "Cannot read $ENV{GIT_SHIP_CONFIG}" unless -r $ENV{GIT_SHIP_CONFIG};
 
 my $app = App::git::ship->new;

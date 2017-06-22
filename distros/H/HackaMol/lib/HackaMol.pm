@@ -1,5 +1,5 @@
 package HackaMol;
-$HackaMol::VERSION = '0.039';
+$HackaMol::VERSION = '0.040';
 #ABSTRACT: HackaMol: Object-Oriented Library for Molecular Hacking
 use 5.008;
 use Moose;
@@ -162,6 +162,31 @@ sub group_by_atom_attr {
 
 }
 
+sub group_by_atom_attrs {
+
+    # group atoms by attributes
+    # Z, name, bond_count, etc.
+    # keep splitting the groups until there are no more attributes
+    my $self  = shift ;
+    my @attrs = @{+ shift } ;
+    my @atoms = @_;
+
+    return () unless @attrs;
+
+    my @groups = ( HackaMol::AtomGroup->new( atoms => [ @atoms ] ) );
+
+    foreach my $attr (@attrs){
+      my @local_groups;
+      foreach my $group (@groups){
+          push @local_groups, $self->group_by_atom_attr( $attr, $group->all_atoms );
+      }
+      @groups = @local_groups;
+    }
+
+    return (@groups);
+
+}
+
 sub find_disulfide_bonds {
     my $self  = shift;
     my @sulf  = grep {$_->Z == 16} @_;
@@ -301,7 +326,7 @@ HackaMol - HackaMol: Object-Oriented Library for Molecular Hacking
 
 =head1 VERSION
 
-version 0.039
+version 0.040
 
 =head1 DESCRIPTION
 
@@ -540,7 +565,7 @@ Demian Riccardi <demianriccardi@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Demian Riccardi.
+This software is copyright (c) 2017 by Demian Riccardi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

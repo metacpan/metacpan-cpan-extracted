@@ -3,7 +3,7 @@
 # Crypt::HashCash::Coin - HashCash Digital Cash Coin
 # Copyright (c) 2001-2017 Ashish Gulhati <crypt-hashcash at hash.neo.tc>
 #
-# $Id: lib/Crypt/HashCash/Coin.pm v1.118 Sat Jun 10 13:59:11 PDT 2017 $
+# $Id: lib/Crypt/HashCash/Coin.pm v1.124 Mon Jun 19 15:51:59 PDT 2017 $
 
 package Crypt::HashCash::Coin;
 
@@ -13,7 +13,7 @@ use strict;
 use Crypt::HashCash qw (_squish _unsquish _hex _dec);
 use vars qw( $VERSION $AUTOLOAD );
 
-our ( $VERSION ) = '$Revision: 1.118 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.124 $' =~ /\s+([\d\.]+)/;
 
 sub as_string {
   my $self = shift;
@@ -103,12 +103,12 @@ __END__
 
 =head1 NAME
 
-Crypt::HashCash::Coin - HashCash digital cash coin
+Crypt::HashCash::Coin - HashCash Digital Cash Coin
 
 =head1 VERSION
 
- $Revision: 1.118 $
- $Date: Sat Jun 10 13:59:11 PDT 2017 $
+ $Revision: 1.124 $
+ $Date: Mon Jun 19 15:51:59 PDT 2017 $
 
 =head1 SYNOPSIS
 
@@ -148,6 +148,20 @@ provided as the only argument.
 
 Returns true if the coin's instance variable pass basic sanity checks
 for a valid coin. This method does not verify the coin's signature.
+
+=head1 SEE ALSO
+
+=head2 L<www.hashcash.com>
+
+=head2 L<Crypt::HashCash>
+
+=head2 L<Crypt::HashCash::Mint>
+
+=head2 L<Crypt::HashCash::Client>
+
+=head2 L<Crypt::HashCash::Vault::Bitcoin>
+
+=head2 L<Business::HashCash>
 
 =head1 AUTHOR
 

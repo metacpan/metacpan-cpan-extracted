@@ -1,0 +1,5 @@
+Revision history for Alien-libuv
+
+0.001     2017-06-16
+  - initial version
+  - Does not yet work on Windows.

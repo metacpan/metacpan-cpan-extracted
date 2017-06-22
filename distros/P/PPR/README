@@ -1,0 +1,28 @@
+PPR version 0.000005
+
+This module defines a single regex that will match syntactically valid
+Perl documents, or valid components (such as statements, expressions,
+blocks, strings, etc.)
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015, Damian Conway
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

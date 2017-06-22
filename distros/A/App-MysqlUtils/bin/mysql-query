@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI  for Riap function /App/MysqlUtils/mysql_query
-# and generated automatically using Perinci::CmdLine::Gen version 0.39
+# and generated automatically using Perinci::CmdLine::Gen version 0.45
 
-our $DATE = '2016-12-23'; # DATE
+our $DATE = '2017-06-17'; # DATE
 our $DIST = 'App-MysqlUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -21,6 +21,7 @@ Perinci::CmdLine::Any->new(
     program_name => "mysql-query",
     log => 1,
     pass_cmdline_object => 1,
+    config_filename => "mysqlutils.conf",
 )->run;
 
 # ABSTRACT: Run query and return table result
@@ -38,13 +39,13 @@ mysql-query - Run query and return table result
 
 =head1 VERSION
 
-This document describes version 0.003 of mysql-query (from Perl distribution App-MysqlUtils), released on 2016-12-23.
+This document describes version 0.007 of mysql-query (from Perl distribution App-MysqlUtils), released on 2017-06-17.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % mysql-query [options] <query>
+ % mysql-query [options] <database>
 
 =head1 DESCRIPTION
 
@@ -115,6 +116,9 @@ Default value:
 
 =item B<--password>=I<s>
 
+Will try to get default from `~/.my.cnf`.
+
+
 =item B<--port>=I<i>
 
 Default value:
@@ -122,6 +126,9 @@ Default value:
  3306
 
 =item B<--username>=I<s>
+
+Will try to get default from `~/.my.cnf`.
+
 
 =back
 
@@ -225,7 +232,7 @@ To activate bash completion for this script, put:
 
  complete -C mysql-query mysql-query
 
-in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
 recognize tab completion for the command. Or, you can also directly execute the
 line above in your shell to activate immediately.
 
@@ -233,8 +240,8 @@ It is recommended, however, that you install L<shcompgen> which allows you to
 activate completion scripts for several kinds of scripts on multiple shells.
 Some CPAN distributions (those that are built with
 L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
-completion for their included scripts (using C<shcompgen>) at installation time,
-so you can immadiately have tab completion.
+completion for their included scripts (using L<shcompgen>) at installation time,
+so you can immediately have tab completion.
 
 =head2 tcsh
 
@@ -242,21 +249,21 @@ To activate tcsh completion for this script, put:
 
  complete mysql-query 'p/*/`mysql-query`/'
 
-in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
 recognize tab completion for the command. Or, you can also directly execute the
 line above in your shell to activate immediately.
 
-It is also recommended to install C<shcompgen> (see above).
+It is also recommended to install L<shcompgen> (see above).
 
 =head2 other shells
 
-For fish and zsh, install C<shcompgen> as described above.
+For fish and zsh, install L<shcompgen> as described above.
 
 =head1 CONFIGURATION FILE
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/mysql-query.conf>, F<~/mysql-query.conf>, or F</etc/mysql-query.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/mysqlutils.conf>, F<~/mysqlutils.conf>, or F</etc/mysqlutils.conf>.
 
 All found files will be read and merged.
 
@@ -285,15 +292,15 @@ List of available configuration parameters:
 
 =head2 MYSQL_QUERY_OPT => str
 
-Specify additional command-line options
+Specify additional command-line options.
 
 =head1 FILES
 
-~/.config/mysql-query.conf
+F<~/.config/mysqlutils.conf>
 
-~/mysql-query.conf
+F<~/mysqlutils.conf>
 
-/etc/mysql-query.conf
+F</etc/mysqlutils.conf>
 
 =head1 HOMEPAGE
 
@@ -317,7 +324,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

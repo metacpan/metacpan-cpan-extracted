@@ -58,50 +58,6 @@ $meta->add_type(
     },
 );
 
-# TODO params required, must be parametrized with [Type, Default] or [Default]
-# $meta->add_type(
-#     name       => 'Default',
-#     parent     => TODO no parent,
-#     constraint => sub {
-#         my $default;
-#         my $test;
-#
-#         if ( $_[1]->@* > 1 ) {
-#             $default = $_[1]->[1];
-#             $test    = $_[1]->[0];
-#         }
-#         else {
-#             $default = $_[1]->[0];
-#         }
-#
-#         my $is_array = ref $_[0]->[0] eq 'ARRAY' ? 1 : 0;
-#         my $exists = $is_array ? exists $_[0]->[0]->[ $_[0]->[1] ] : exists $_[0]->[0]->{ $_[0]->[1] };
-#
-#         if ( !$exists ) {
-#             return if $test && !$test->is_valid($default);    # TODO check, that default value passed type constraint in compilation phase
-#
-#             if ($is_array) {
-#                 $_[0]->[0]->[ $_[0]->[1] ] = $default;
-#             }
-#             else {
-#                 $_[0]->[0]->{ $_[0]->[1] } = $default;
-#             }
-#         }
-#         elsif ($test) {
-#             if ($is_array) {
-#                 return $test->is_valid( $_[0]->[0]->[ $_[0]->[1] ] );
-#             }
-#             else {
-#                 return $test->is_valid( $_[0]->[0]->{ $_[0]->[1] } );
-#             }
-#         }
-#
-#         return 1;
-#     },
-#     inlined => sub { },
-#     message => sub {q[Must be a ]},
-# );
-
 $meta->add_type(
     name       => 'FileNameStr',
     parent     => Str,

@@ -1,5 +1,5 @@
 package Lab::XPRESS::Sweep::LogBlock;
-
+$Lab::XPRESS::Sweep::LogBlock::VERSION = '3.550';
 use Role::Tiny;
 requires qw/LOG write_LOG/;
 
@@ -9,7 +9,6 @@ use Carp;
 
 use Data::Dumper;
 
-our $VERSION = '3.543';
 
 =pod
 

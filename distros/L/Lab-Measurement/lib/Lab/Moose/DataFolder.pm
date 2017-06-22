@@ -1,5 +1,5 @@
 package Lab::Moose::DataFolder;
-
+$Lab::Moose::DataFolder::VERSION = '3.550';
 use 5.010;
 use warnings;
 use strict;
@@ -23,7 +23,6 @@ use utf8;
 
 use Lab::Moose::DataFile::Meta;
 
-our $VERSION = '3.543';
 
 # Get a copy of @ARGV, before it get's mangled by the user script.
 

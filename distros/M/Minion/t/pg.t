@@ -24,11 +24,11 @@ my $worker = $minion->repair->worker;
 isa_ok $worker->minion->app, 'Mojolicious', 'has default application';
 
 # Migrate up and down
-is $minion->backend->pg->migrations->active, 15, 'active version is 15';
+is $minion->backend->pg->migrations->active, 16, 'active version is 16';
 is $minion->backend->pg->migrations->migrate(0)->active, 0,
   'active version is 0';
-is $minion->backend->pg->migrations->migrate->active, 15,
-  'active version is 15';
+is $minion->backend->pg->migrations->migrate->active, 16,
+  'active version is 16';
 
 # Register and unregister
 $worker->register;
@@ -130,10 +130,41 @@ ok !$batch->[1], 'no more results';
 $worker->unregister;
 $worker2->unregister;
 
+# Exclusive lock
+ok $minion->lock('foo', 3600), 'locked';
+ok !$minion->lock('foo', 3600), 'not locked again';
+ok $minion->unlock('foo'), 'unlocked';
+ok !$minion->unlock('foo'), 'not unlocked again';
+ok $minion->lock('foo', -3600), 'locked';
+ok $minion->lock('foo', 3600),  'locked again';
+ok !$minion->lock('foo', 3600), 'not locked again';
+ok $minion->unlock('foo'), 'unlocked';
+ok !$minion->unlock('foo'), 'not unlocked again';
+ok $minion->lock('yada', 3600, {limit => 1}), 'locked';
+ok !$minion->lock('yada', 3600, {limit => 1}), 'not locked again';
+
+# Shared lock
+ok $minion->lock('bar', 3600,  {limit => 3}), 'locked';
+ok $minion->lock('bar', 3600,  {limit => 3}), 'locked again';
+ok $minion->lock('bar', -3600, {limit => 3}), 'locked again';
+ok $minion->lock('bar', 3600,  {limit => 3}), 'locked again';
+ok !$minion->lock('bar', 3600, {limit => 2}), 'not locked again';
+ok $minion->lock('baz', 3600, {limit => 3}), 'locked';
+ok $minion->unlock('bar'), 'unlocked';
+ok $minion->lock('bar', 3600, {limit => 3}), 'locked again';
+ok $minion->unlock('bar'), 'unlocked again';
+ok $minion->unlock('bar'), 'unlocked again';
+ok $minion->unlock('bar'), 'unlocked again';
+ok !$minion->unlock('bar'), 'not unlocked again';
+ok $minion->unlock('baz'), 'unlocked';
+ok !$minion->unlock('baz'), 'not unlocked again';
+
 # Reset
 $minion->reset->repair;
 ok !$minion->backend->pg->db->query(
   'select count(id) as count from minion_jobs')->hash->{count}, 'no jobs';
+ok !$minion->backend->pg->db->query(
+  'select count(id) as count from minion_locks')->hash->{count}, 'no locks';
 ok !$minion->backend->pg->db->query(
   'select count(id) as count from minion_workers')->hash->{count}, 'no workers';
 
@@ -648,12 +679,9 @@ ok $job->finish, 'job finished';
 is $minion->stats->{finished_jobs}, 3, 'three finished jobs';
 is $minion->repair->stats->{finished_jobs}, 0, 'no finished jobs';
 $id = $minion->enqueue(test => [] => {parents => [-1]});
-ok !$worker->dequeue(0), 'job with missing parent will never be ready';
-$minion->repair;
-like $minion->job($id)->info->{finished}, qr/^[\d.]+$/,
-  'has finished timestamp';
-is $minion->job($id)->info->{state},  'failed',           'right state';
-is $minion->job($id)->info->{result}, 'Parent went away', 'right result';
+$job = $worker->dequeue(0);
+is $job->id, $id, 'right id';
+ok $job->finish, 'job finished';
 $worker->unregister;
 
 # Worker remote control commands

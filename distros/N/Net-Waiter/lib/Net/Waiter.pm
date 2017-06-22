@@ -13,7 +13,7 @@ use strict;
 use POSIX ":sys_wait_h";
 use IO::Socket::INET;
 
-our $VERSION = '1.00';
+our $VERSION = '1.02';
 
 ##############################################################################
             
@@ -30,6 +30,7 @@ sub new
                NOFORK  => $opt{ 'NOFORK'  }, # foreground process
     
                SSL     => $opt{ 'SSL'     }, # use SSL
+               OPT     => \%opt,
              };
 
   if( $opt{ 'SSL' } )
@@ -98,6 +99,7 @@ sub run
     }
   else
     {
+    $self->{ 'SERVER_SOCKET' } = $server_socket;
     $self->on_listen_ok();
     }
 
@@ -110,6 +112,8 @@ sub run
       $self->on_accept_error();
       next;
       }
+
+    $self->{ 'CLIENT_SOCKET' } = $client_socket;
 
     my $peerhost = $client_socket->peerhost();
     my $peerport = $client_socket->peerport();
@@ -129,10 +133,12 @@ sub run
       if( $pid )
         {
         $self->on_fork_ok( $pid );
+        $client_socket->close();
         next;
         }
       }
     # --------- child here ---------
+    delete $self->{ 'SERVER_SOCKET' };
 
     # reinstall signal handlers in the kid
     $SIG{ 'INT'  } = 'DEFAULT';
@@ -158,6 +164,22 @@ sub run
 
   $self->on_server_close( $server_socket );
   close( $server_socket );
+}
+
+##############################################################################
+
+sub get_server_socket
+{
+  my $self = shift;
+  
+  return exists $self->{ 'SERVER_SOCKET' } ? $self->{ 'SERVER_SOCKET' } : undef;
+}
+
+sub get_client_socket
+{
+  my $self = shift;
+  
+  return exists $self->{ 'CLIENT_SOCKET' } ? $self->{ 'CLIENT_SOCKET' } : undef;
 }
 
 ##############################################################################
@@ -264,13 +286,13 @@ sub on_sig_usr2
 
 =head1 NAME
 
-  Net::Waiter concise INET socket server
+  Net::Waiter compact INET socket server
 
 =head1 SYNOPSIS
 
   package MyWaiter;
   use strict;
-  use base qw( Net::Waiter );
+  use parent qw( Net::Waiter );
 
   sub on_accept_ok
   {
@@ -296,7 +318,10 @@ sub on_sig_usr2
   my $server = MyWaiter->new( PORT => 9123 );
   my $res = $server->run();
   print "waiter result: $res\n"; # 0 is ok, >0 is error
-  
+
+=head1 DESCRIPTION
+
+Net::Waiter is a base class which implements compact INET network socket server.  
 
 =head1 METHODS/FUNCTIONS
 
@@ -330,10 +355,10 @@ Run returns exit code:
 
 =head2 break_main_loop()
 
-Breaks main server loop. Calling break_main_loop() is possible from any handler
-function (see HANDLER FUNCTIONS below) but it will not break the main loop 
-immediately. It will just rise flag which will stop when control is returned to
-the next server loop.
+Breaks main server loop. Calling break_main_loop() is possible from parent 
+server process handler functions (see HANDLER FUNCTIONS below) but it will 
+not break the main loop immediately. It will just rise flag which will stop 
+when control is returned to the next server loop.
 
 =head2 ssl_in_use()
 
@@ -343,7 +368,19 @@ Returns true (1) if current setup uses SSL (useful mostly inside handlers).
 
 Returns true (1) if this process is client/child process (useful mostly inside handlers).
 
+=head2 get_server_socket()
+
+Returns server (listening) socket object. Valid in parent only, otherwise returns undef.
+
+=head2 get_client_socket()
+
+Returns client (connected) socket object. Valid in kids only, otherwise returns undef.
+
 =head1 HANDLER FUNCTIONS
+
+All of the following methods are empty in the base implementation and are
+expected to be reimplemented. The list order below is chronological but the
+most important function which must be reimplemented is on_process().
 
 =head2 on_listen_ok()
 

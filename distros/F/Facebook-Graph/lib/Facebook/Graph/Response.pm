@@ -1,5 +1,5 @@
 package Facebook::Graph::Response;
-$Facebook::Graph::Response::VERSION = '1.1202';
+$Facebook::Graph::Response::VERSION = '1.1204';
 use Moo;
 use JSON;
 use Ouch;
@@ -56,7 +56,7 @@ Facebook::Graph::Response - Handling of a Facebook::Graph response documents.
 
 =head1 VERSION
 
-version 1.1202
+version 1.1204
 
 =head1 DESCRIPTION
 

@@ -55,6 +55,10 @@ sub acctfld {
 ############################################################################
 sub new {
     my ($class,$imp,%args) = @_;
+    if (ref($class)) {
+	%args = (%$class, %args);
+	$imp ||= $class->{imp};
+    }
     my $self = lock_ref_keys( bless {
 	%args,
 	imp   => $imp,    # analyzer object
@@ -224,11 +228,12 @@ sub _imp_cb {
 		if ( $offset == IMP_MAXOFFSET
 		    or $offset >= $end ) {
 		    $DEBUG && debug("pass complete buf");
-		    push @fwd, [ $dir, $buf0->[1] ];
+		    push @fwd, [ $dir, $buf0->[1], $buf0->[2] ];
 		    # keep dummy in buf
 		    if ( ! @$buf ) {
 			unshift @$buf,[ $buf0->[0] + length($buf0->[1]),'',0 ];
-			push @fwd,[$dir,''] if $self->{eof}[$dir]; # fwd eof
+			push @fwd,[$dir,'',$buf0->[2]]
+			    if $self->{eof}[$dir]; # fwd eof
 			last;
 		    }
 		} elsif ( $offset <  $buf0->[0] ) {
@@ -244,7 +249,8 @@ sub _imp_cb {
 		    $DEBUG && debug("pass part of buf");
 		    push @fwd, [
 			$dir,
-			substr($buf0->[1],0,$offset - $end,'')
+			substr($buf0->[1],0,$offset - $end,''),
+			$buf0->[2],
 		    ];
 		    # put back with adjusted offset
 		    $buf0->[0] = $offset;
@@ -280,14 +286,14 @@ sub _imp_cb {
 	    } elsif ( $eob == $offset ) {
 		# full replace
 		$DEBUG && debug("full replace");
-		push @fwd,[ $dir,$newdata ];
+		push @fwd,[ $dir,$newdata,$buf0->[2] ];
 		shift(@$buf);
 		push @$buf, [ $eob,'',0 ] if ! @$buf;
 	    } else {
 		die "no partial replacement for packet types allowed"
 		    if $buf0->[2]>0;
 		$DEBUG && debug("partial replace");
-		push @fwd,[ $dir,$newdata ];
+		push @fwd,[ $dir,$newdata,$buf0->[2] ];
 		substr( $buf0->[1],0,$offset - $buf0->[0],'');
 		$buf0->[0] = $offset;
 	    }

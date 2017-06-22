@@ -6,11 +6,11 @@
                                                
 
 
-This is the README for IP::China version 20160412.
+This is the README for IP::China version 20170608.
 
-IP::China is a "module" for the Perl computer programming language, a library
-of computer code to install on a computer.  This document contains four
-sections:
+IP::China is a "module" for the Perl computer programming language, a
+library of computer code to install on a computer.  This document contains
+four sections:
 
 1. About - what the module does
 
@@ -26,21 +26,22 @@ sections:
 
 IP::China - decide whether an internet address is from China
 
-
+Decide whether an IP address originates from China.
 
 -----------------------------------------------------------------------------
 
 2. DOCUMENTATION
 
-You can read the documentation for the module online at the following websites:
+You can read the documentation for the module online at the following
+websites:
 
     * http://search.cpan.org/perldoc?IP::China
     * http://metacpan.org/release/IP-China
 
 (These links go to the latest version of the module.)
 
-After installing the module, you can read the documentation on your computer
-using
+After installing the module, you can read the documentation on your
+computer using
 
     perldoc IP::China
 
@@ -58,11 +59,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm IP::China
 
-To install the module from the source file, IP-China-20160412.tar.gz, follow
-this sequence of commands:
+To install the module from the source file, IP-China-20170608.tar.gz,
+follow this sequence of commands:
 
-    tar xfz IP-China-20160412.tar.gz
-    cd IP-China-20160412
+    tar xfz IP-China-20170608.tar.gz
+    cd IP-China-20170608
     perl Makefile.PL
     make
     make install
@@ -75,18 +76,18 @@ If you want to test the module before installing it, use "make test" after
 4. HELP
 
 To get help with the module, you can email the author, Ben Bullock, at
-<bkb@cpan.org>. If you think there is a problem in the module, you can report a
-bug at 
+<bkb@cpan.org>. If you think there is a problem in the module, you can
+report a bug at 
 
 <https://github.com/benkasminbullock/chinese-ip/issues>,
 
-or if you want to alter the source code of IP::China, try the public repository
-on github at 
+or if you want to alter the source code of IP::China, try the public
+repository on github at 
 
 <https://github.com/benkasminbullock/chinese-ip>. 
 
 -----------------------------------------------------------------------------
 
-This README was written on Wed Apr 27 10:33:57 2016.
+This README was written on Sat Jun 17 08:02:14 2017.
 
 -----------------------------------------------------------------------------

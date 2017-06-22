@@ -20,7 +20,7 @@ Net::Etcd::Auth::Role
 
 =cut
 
-our $VERSION = '0.009';
+our $VERSION = '0.013';
 
 =head1 DESCRIPTION
 
@@ -80,7 +80,7 @@ Delete role
 
 sub delete {
     my ($self) = @_;
-    confess 'name required for ' . __PACKAGE__ . '->delete'
+    confess 'role required for ' . __PACKAGE__ . '->delete'
       unless $self->{role};
     $self->{endpoint} = '/auth/role/delete';
     $self->request;

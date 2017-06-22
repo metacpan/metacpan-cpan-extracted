@@ -4,8 +4,7 @@
 #
 
 package Lab::Instrument::TemperatureControl::TLK43;
-our $VERSION = '3.543';
-
+$Lab::Instrument::TemperatureControl::TLK43::VERSION = '3.550';
 use strict;
 use Lab::Instrument;
 use Lab::Bus::MODBUS_RS232;

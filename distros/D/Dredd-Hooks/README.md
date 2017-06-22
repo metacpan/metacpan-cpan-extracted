@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/ungrim97/Dredd-Hooks.svg?branch=master)](https://travis-ci.org/ungrim97/Dredd-Hooks)
+[![Build Status](https://travis-ci.org/ungrim97/dredd-hooks.svg?branch=master)](https://travis-ci.org/ungrim97/dredd-hooks)
 # NAME
 
 Dredd::Hooks::Methods - Sugar module for each of writing Dredd Hookfiles
@@ -173,7 +173,7 @@ and any issues or suggestions should be posted there.
 
 # AUTHOR
 
-Mike Eve &lt;ungrim97@gmail.com>
+Mike Eve <ungrim97@gmail.com>
 
 # LICENSE
 

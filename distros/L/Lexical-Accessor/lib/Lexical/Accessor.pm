@@ -9,7 +9,7 @@ use Carp qw(croak);
 use Sub::Accessor::Small ();
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.008';
+our $VERSION   = '0.009';
 our @EXPORT    = qw/ lexical_has /;
 our @ISA       = qw/ Sub::Accessor::Small /;
 
@@ -93,6 +93,10 @@ sub canonicalize_opts : method
 	if (defined $me->{lazy} and not $me->{lazy})
 	{
 		croak("Invalid lazy=>0; private attributes cannot be eager");
+	}
+	else
+	{
+		$me->{lazy} ||= 1 if $me->{default} || $me->{builder};
 	}
 	
 	for my $type (qw/ reader writer accessor clearer predicate /)
@@ -363,7 +367,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -41,6 +41,7 @@
             "File::Temp" : "0",
             "IO::Socket::INET" : "0",
             "IO::Socket::UNIX" : "0",
+            "JSON::XS" : "0",
             "List::MoreUtils" : "0",
             "MIME::Base64" : "0",
             "Mouse" : "0",
@@ -50,6 +51,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.13",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

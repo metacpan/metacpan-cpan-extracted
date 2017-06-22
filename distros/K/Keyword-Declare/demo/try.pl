@@ -1,9 +1,9 @@
 #! /usr/bin/env perl
 
-use 5.020; use warnings;
+use 5.014;
+use warnings;
 use lib qw< dlib ../dlib >;
 
-#use Keyword::Declare {debug=>1};
 use Perl6::Try;
 
 try {
@@ -15,11 +15,11 @@ try {
         say 'Not so good at line ', __LINE__;
         when (/oops/) { say "Accidental $error\nx: $x"       }
         when (/argh/) { say "Serious $error\nx: $x"          }
-        default       { say "Something bad ($error):\nx: $x" }
+        default       { say "Something bad: $error\nx: $x" }
     }
 }
 
 
 sub something_fatal {
-    die 'oops!';
+    die +('oops!', 'argh?', 'phew!')[rand 3];
 }

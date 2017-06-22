@@ -8,6 +8,7 @@ use BlankOnDev;
 use BlankOnDev::config;
 use BlankOnDev::Repo;
 use BlankOnDev::Migration::bazaar2GitHub;
+use BlankOnDev::system;
 
 # Version :
 use BlankOnDev::Version;
@@ -35,7 +36,14 @@ else {
     }
 
     # Read Config :
-    BlankOnDev::config->read_config();
+    BlankOnDev::config->read_gen_cfg();
+    BlankOnDev::config->read_config_bzr2git();
+
+    # Get data Config ;
+    my $get_gencfg = $BlankOnDev::config::gencfg;
+
+    # Check Proccess :
+    BlankOnDev::system->kill_exists_ps($get_gencfg);
 
     # For used module :
     my $mod_use = {
@@ -47,9 +55,14 @@ else {
 
     # For Arguments :
     my $arg_list = {
-        'prepare' => {
+        'mig_prepare' => {
             'mod' => 'config',
             'sub' => '_prepare',
+            'input' => 'no-param',
+        },
+        'config' => {
+            'mod' => 'config',
+            'sub' => '_general_config',
             'input' => 'no-param',
         },
         'gpg-genkey' => {
@@ -100,6 +113,11 @@ else {
     };
     $arg_list->{'--version'} = $arg_list->{'version'};
     $arg_list->{'-v'} = $arg_list->{'version'};
+    $arg_list->{'rilis'} = {
+        'mod' => 'config',
+        'sub' => '_rilis',
+        'input' => 'no-param'
+    };
 
     # Check Arguments :
     my $arg_len = scalar @ARGV;

@@ -3,14 +3,14 @@ use strict;
 use warnings FATAL => 'all';
 
 # Use or Require Module :
-require CellBash::Version;
+require BlankOnDev::Version;
 use Data::Dumper;
 use Digest::MD5 qw(md5 md5_hex md5_base64);
 use MIME::Base64 ();
-use CellBash::Utils::Char;
+use BlankOnDev::Utils::Char;
 
 # Version :
-our $VERSION = $CellBash::Version::VERSION;
+our $VERSION = '0.1005';
 
 # Subroutine for Web Encoder :
 # ------------------------------------------------------------------------
@@ -51,7 +51,7 @@ sub Encoder {
 
     # Convert string to array :
     my $r_pltxt = $self->random($plain_text, $num1, $num2, 2);
-    my @arr_str = CellBash::Utils::Char->split_blen($r_pltxt, 1);
+    my @arr_str = BlankOnDev::Utils::Char->split_blen($r_pltxt, 1);
 
     # While loop to encoder Step 1 :
     my $i = 0;
@@ -160,7 +160,7 @@ sub Decoder {
 
     # While loop to decoder Step 1 :
     my %d1 = ('J' => "0", 'i' => "1", 'o' => "2", 'R' => "3", 'p' => "4", 'I' => "5", 'W' => "6", 'q' => "7", 'M' => "8", 'x' => "9");
-    my @pre_chiper = CellBash::Utils::Char->split_blen($chiper0, 1);
+    my @pre_chiper = BlankOnDev::Utils::Char->split_blen($chiper0, 1);
     my $i1 = 0;
     my $until1 = scalar keys(@pre_chiper);
     my @temp0 = ();
@@ -205,7 +205,7 @@ sub Decoder {
     #	print "--- Batas Step 2 ---\n";
 
     # Convert $temp1 into array :
-    my @arr_chiper = CellBash::Utils::Char->split_blen($temp11, 2);
+    my @arr_chiper = BlankOnDev::Utils::Char->split_blen($temp11, 2);
 
     # While loop to decoder Step 3 :
     my $i3 = 0;
@@ -226,8 +226,8 @@ sub Decoder {
     #	print "--- Batas Step 3 ---\n";
 
     # Extract Loop :
-    $data = $self->extract_random($temp2, $num11, $num21, 2);
-    #	$data = $temp2;
+    $data = $self->extract_random($temp2, $num1, $num2, 2);
+#    $data = $temp2;
 
     # Return result :
     return $data;
@@ -350,7 +350,7 @@ sub getKey_enc {
     my %data = ();
 
     # Define scalar to prepare get Key Enc :
-    my @arrStr = CellBash::Utils::Char->split_blen($string, 1);
+    my @arrStr = BlankOnDev::Utils::Char->split_blen($string, 1);
 
     # While loop to get key enc - Step 1 :
     my $i = 0;
@@ -376,7 +376,7 @@ sub getKey_enc {
     }
 
     # get Key enc - Final :
-    my @getNum = CellBash::Utils::Char->split_blen($temp2, 1);
+    my @getNum = BlankOnDev::Utils::Char->split_blen($temp2, 1);
     my $num1 = $getNum[0];
     my $num2 = $getNum[1];
     my $key_enc = int $temp2;
@@ -412,7 +412,7 @@ sub nkti_odd_index {
     my ($string) = @_;
 
     # Scalar for placing convert string into array :
-    my @arr_string = CellBash::Utils::Char->split_blen($string, 1);
+    my @arr_string = BlankOnDev::Utils::Char->split_blen($string, 1);
 
     # Declare scalar for placing result :
     my $data = '';
@@ -468,7 +468,7 @@ sub nkti_even_index {
     my ($string) = @_;
 
     # Scalar for placing convert string into array :
-    my @arr_string = CellBash::Utils::Char->split_blen($string, 1);
+    my @arr_string = BlankOnDev::Utils::Char->split_blen($string, 1);
 
     # Declare scalar for placing result :
     my $data = '';
@@ -530,8 +530,8 @@ sub nkti_extract_odd2even {
     my $get_even = nkti_even_index($string);
     my $len_odd = length $get_odd;
     my $len_even = length $get_even;
-    my @arr_odd = CellBash::Utils::Char->split_blen(substr($string, 0, $len_odd), 1);
-    my @arr_even = CellBash::Utils::Char->split_blen(substr($string, $len_odd, $len_even), 1);
+    my @arr_odd = BlankOnDev::Utils::Char->split_blen(substr($string, 0, $len_odd), 1);
+    my @arr_even = BlankOnDev::Utils::Char->split_blen(substr($string, $len_odd, $len_even), 1);
 
     # Scalar for placing result :
     my $data = '';
@@ -634,8 +634,8 @@ sub nkti_extract_even2odd {
     my $get_even = nkti_even_index($string);
     my $len_odd = length $get_odd;
     my $len_even = length $get_even;
-    my @arr_even = CellBash::Utils::Char->split_blen(substr($string, 0, $len_even), 1);
-    my @arr_odd = CellBash::Utils::Char->split_blen(substr($string, $len_even, $len_odd), 1);
+    my @arr_even = BlankOnDev::Utils::Char->split_blen(substr($string, 0, $len_even), 1);
+    my @arr_odd = BlankOnDev::Utils::Char->split_blen(substr($string, $len_even, $len_odd), 1);
 
     # Scalar for placing result :
     my $data = '';

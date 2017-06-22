@@ -1,0 +1,116 @@
+=head1 NAME
+
+Rapi::Blog - Plack-compatible, RapidApp-based blog engine
+
+=head1 SYNOPSIS
+
+ use Rapi::Blog;
+ 
+ my $app = Rapi::Blog->new({
+  site_path     => '/path/to/some-site',
+  scaffold_path => '/path/to/some-site/scaffold', # default
+ });
+
+ # Plack/PSGI app:
+ $app->to_app
+
+Create a new site from scratch using the L<rabl.pl> utility script:
+
+ rabl.pl create /path/to/some-site
+ cd /path/to/some-site && plackup
+
+=head1 DESCRIPTION
+
+This is a L<Plack>-compatible blogging platform written using L<RapidApp>.
+
+See L<Rapi::Blog::Manual> for more information and usage.
+
+=head1 CONFIGURATION
+
+C<Rapi::Blog> extends L<RapidApp::Builder> and supports all of its options, as well as the following
+params specific to this module:
+
+=head2 site_path
+
+Only required param - path to the directory containing the site.
+
+=head2 scaffold_path
+
+Path to the directory containing the "scaffold" of the site. This is like a document root with
+some extra functionality.
+
+If not supplied, defaults to C<'scaffold/'> within the C<site_path> directory.
+
+=head2 builtin_scaffold
+
+Alternative to C<scaffold_path>, the name of one of the builtin skeleton scaffolds to use as the
+live scaffold. This is mainly useful for dev and content-only testing. As of version C<1.0000>) there
+are two built-in scaffolds:
+
+=head3 bootstrap-blog
+
+This is the default out-of-the-box scaffold which is based on the "Blog" example from the Twitter
+Bootstrap HTML/CSS framework (v3.3.7): L<http://getbootstrap.com/examples/blog/>. This mainly exists
+to serve as a useful reference implementation of the basic features/directives provided by the
+Template API.
+
+=head3 keep-it-simple
+
+Based on the "Keep It Simple" website template by L<http://www.Styleshout.com>
+
+=head2 fallback_builtin_scaffold
+
+If set to true and the local scaffold directory doesn't exist, the default builtin skeleton scaffold
+'bootstrap-blog' will be used instead. Useful for testing and content-only scenarios.
+
+Defaults to false.
+
+=head1 METHODS
+
+=head2 to_app
+
+PSGI C<$app> CodeRef. Derives from L<Plack::Component>
+
+=head1 SEE ALSO
+
+=over
+
+=item * 
+
+L<rabl.pl>
+
+=item *
+
+L<Rapi::Blog::Manual>
+
+=item * 
+
+L<RapidApp>
+
+=item * 
+
+L<RapidApp::Builder>
+
+=item * 
+
+L<Plack>
+
+=item *
+
+L<http://rapi.io/blog>
+
+=back
+
+
+=head1 AUTHOR
+
+Henry Van Styn <vanstyn@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by IntelliTree Solutions llc.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

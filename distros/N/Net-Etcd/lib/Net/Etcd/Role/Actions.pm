@@ -22,7 +22,7 @@ Net::Etcd::Role::Actions
 
 =cut
 
-our $VERSION = '0.009';
+our $VERSION = '0.013';
 
 has etcd => (
     is  => 'ro',
@@ -41,7 +41,7 @@ sub _build_json_args {
     my ($self) = @_;
     my $args;
     for my $key ( keys %{$self} ) {
-        unless ( $key =~ /(?:etcd|cb|cv|json_args|endpoint)$/ ) {
+        unless ( $key =~ /(?:etcd|cb|cv|hold|json_args|endpoint)$/ ) {
             $args->{$key} = $self->{$key};
         }
     }
@@ -84,7 +84,24 @@ sub init {
 
 =cut
 
-has headers => ( is => 'ro' );
+has headers => ( is => 'lazy' );
+
+sub _build_headers {
+    my ($self) = @_;
+    my $headers;
+    my $token = $self->etcd->auth_token;
+    $headers->{'Content-Type'} = 'application/json';
+    $headers->{'Authorization'} = $token if $token;
+    return $headers;
+}
+=head2 hold
+
+When set will not fire request.
+
+=cut
+
+has hold => ( is => 'ro' );
+
 
 =head2 response
 
@@ -104,6 +121,7 @@ sub _build_request {
     my $cb = $self->cb;
     my $cv = $self->cv ? $self->cv : AE::cv;
     $cv->begin;
+
     http_request(
         'POST',
         $self->etcd->api_path . $self->{endpoint},

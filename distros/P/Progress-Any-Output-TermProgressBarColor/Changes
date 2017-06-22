@@ -1,4 +1,10 @@
-Revision history for Progress-Any-Output-TermProgressBarColor
+0.23    2017-06-21 (PERLANCAR)
+
+        - Support patching Log::ger::Output::Screen in addition to
+          Log::Any::Adapter::Screen.
+
+        - Update documentation about COLOR being observed by Color::ANSI::Util.
+
 
 0.22    2016-03-11 (PERLANCAR)
 

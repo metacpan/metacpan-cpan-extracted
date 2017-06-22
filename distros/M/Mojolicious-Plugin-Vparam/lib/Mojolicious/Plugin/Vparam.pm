@@ -5,7 +5,7 @@ use Mojolicious::Plugin::Vparam::Common qw(:all);
 use version;
 use List::MoreUtils qw(firstval natatime mesh);
 
-our $VERSION    = '2.07';
+our $VERSION    = '2.11.1';
 
 # Regext for shortcut parser
 our $SHORTCUT_REGEXP = qr{
@@ -220,7 +220,8 @@ sub register {
             $attr{blessed}      //= $blessed;
 
             # Apply type
-            if( defined( my $type = $attr{type} ) ) {
+            my $type = $attr{type} // $attr{isa};
+            if( defined $type ) {
                 # Parse shortcut
                 while( my ($mod, $inner) = $type =~ $SHORTCUT_REGEXP ) {
                     last unless $inner;
@@ -320,10 +321,14 @@ sub register {
                 if( $attr{array} ) {
                     die 'Array of arrays not supported';
                 } else {
+                    my $regexp = 'Regexp' eq ref $attr{multiline}
+                         ? $attr{multiline}
+                         : qr{\r?\n}
+                    ;
                     # Apply multiline
                     @input =
                         grep { $_ =~ m{\S} }
-                        map  { split m{\r?\n}, $_ } @input;
+                        map  { split $regexp, $_ } @input;
                 }
 
                 # Multiline force array
@@ -393,8 +398,8 @@ sub register {
                 # Hack for bool values:
                 # HTML forms do not transmit if checkbox off
                 $out = $attr{default}
-                    if      $attr{type}
-                        and $attr{type} =~ m{^(?:bool|true|checkbox)$}
+                    if      $type
+                        and $type =~ m{^(?:bool|true|checkbox)$}
                         and not defined $in;
 
                 # Apply post filter
@@ -446,16 +451,26 @@ sub register {
             $self->verror( $name, %attr, message => 'Empty hash' )
                 if $attr{hash} and not $attr{optional} and not @input;
 
+            # Rename for model
+            my $as = $attr{as} // $name;
+
             if( $attr{hash} ) {
-                $result{ $name } = { mesh @keys, @output };
+                $result{ $as } = { mesh @keys, @output };
             } elsif( $attr{array} ) {
-                $result{ $name } = \@output;
+                if( defined $attr{multijoin} ) {
+                    $result{ $as } = @output
+                        ? join $attr{multijoin}, grep {defined} @output
+                        : undef
+                    ;
+                } else {
+                    $result{ $as } = @output;
+                }
             } else {
-                $result{ $name } = $output[0]
+                $result{ $as } = $output[0]
                     unless $attr{skipundef} and not defined($output[0]);
             }
             # Mojolicious::Validator::Validation
-            $self->validation->output->{$name} = $result{ $name }
+            $self->validation->output->{$name} = $result{ $as }
                 if $conf->{mojo_validator};
         }
 
@@ -486,7 +501,7 @@ sub register {
             $result = $self->vparams( $name => { type   => $def, %attr } );
         }
 
-        return $result->{$name};
+        return $result->{ $attr{as} // $name };
     });
 
     # Load extensions: types, filters etc.
@@ -698,13 +713,17 @@ If you set undef then parameter is not apply.
 Get parameter error string. Return 0 if no error.
 
     # Get error
-    print $self->verror('myparam') || 'Ok';
+    print $self->verror('myparam');
+
+    # Get error for first element in array
+    print $self->verror('myparam' => 0);
+
     # Set error
-    $self->verror('myparam', {message => 'Error message'})
+    $self->verror('myparam', message => 'Error message')
 
 =head2 verrors
 
-Return erorrs count in scalar context. In list context return erorrs hash.
+Return errors count in scalar context. In list context return errors hash.
 
     # List context get hash
     my %errors = $self->verrors;
@@ -1159,10 +1178,22 @@ Parameter type. If set then some filters will be apply. See L</TYPES>.
     $self->vparam(myparam => {type => 'datetime'});
     $self->vparams(
         myparam1 => {type => 'datetime'},
-        myparam2 => {type => 'datetime'},
+        myparam2 => {isa  => 'datetime'},
     );
 
 After the application of the type used filters.
+
+You can use B<isa> alias instead of B<type>.
+
+=head2 as
+
+Rename output key for I<vparams> to simple use in models.
+
+    # Return {login => '...', password => '...'}
+    $self->vparams(
+        myparam1 => {type => 'str', as => 'login'},
+        myparam2 => {type => 'str', as => 'password'},
+    );
 
 =head2 array
 
@@ -1285,7 +1316,10 @@ if it`s undefined by set I<skipundef>.
     # Shortcut syntax: skipundef and optional is on
     $param2 = $self->vparam(param2 => '~int');
 
-Arrays always return as arrayref. But undefined values will be skipped.
+Arrays always return as arrayref. But undefined values will be skipped:
+
+    # This vparam return [1,2,3] for ?param3=1&param3=&param3=2&param3=3
+    $param2 = $self->vparam(param3 => '~int');
 
 =head2 multiline
 
@@ -1294,7 +1328,21 @@ You can simple split I<textarea> to values:
     # This vparam return [1,2,3] for input "1\n2\n3\n"
     $param1 = $self->vparam(param1 => 'int', multiline => 1);
 
+    # Or by custom regexp
+    # This vparam return [1,2,3] for input "1,2,3"
+    $param1 = $self->vparam(param1 => 'int', multiline => qr{\s*,\s*});
+
 Empty lines ignored.
+
+=head2 multijoin
+
+Any array values can be joined in string:
+
+    # This vparam return "1,2,3" for input ?param1=1&param1=2&param1=3
+    $param1 = $self->vparam(param1 => 'int', multijoin => ',');
+
+    # This vparam return "1,2,3" for input "1\n2\n3\n"
+    $param2 = $self->vparam(param2 => 'int', multiline => 1, multijoin => ',');
 
 =head2 blessed
 
@@ -1376,20 +1424,6 @@ Set default I<skipundef> flag for all params in L</vparams> and L</vsort>.
 
 Filters are used in conjunction with types for additional verification.
 
-=head2 min
-
-Check minimum parameter value.
-
-    # Error if myparam less than 10
-    $self->vparam(myparam => 'int', min => 10);
-
-=head2 max
-
-Check maximum parameter value.
-
-    # Error if myparam greater than 100
-    $self->vparam(myparam => 'int', max => 100);
-
 =head2 range
 
 Check parameter value to be in range.
@@ -1417,6 +1451,14 @@ Check maximum length in utf8.
 
     # Error if value is an empty string
     $self->vparam(myparam => 'str', size => [1, 100]);
+
+=head2 Numbers comparation
+
+I<min>, I<max>, I<equal>, I<not>
+
+=head2 Strings comparation
+
+I<lt>, I<gt>, I<le>, I<ge>, I<cmp>, I<eq>, I<ne>
 
 =head1 RESTRICTIONS
 

@@ -2,134 +2,19 @@ package Test2::Bundle::Extended;
 use strict;
 use warnings;
 
-use Importer;
+use Test2::V0;
 
-our $VERSION = '0.000070';
+our $VERSION = '0.000072';
 
-use Carp qw/croak/;
-
-use Test2::Plugin::SRand();
-use Test2::Plugin::UTF8();
-use Test2::Tools::Target();
-
-use Test2::Plugin::ExitSummary;
-
-use Test2::API qw/intercept context/;
-
-use Test2::Tools::Event qw/gen_event/;
-
-use Test2::Tools::Defer qw/def do_def/;
-
-use Test2::Tools::Basic qw{
-    ok pass fail diag note todo skip
-    plan skip_all done_testing bail_out
-};
-
-use Test2::Tools::Compare qw{
-    is like isnt unlike
-    match mismatch validator
-    hash array bag object meta meta_check number string subset bool
-    in_set not_in_set check_set
-    item field call call_list call_hash prop check all_items all_keys all_vals all_values
-    etc end filter_items
-    T F D DF E DNE FDNE U
-    event fail_events
-    exact_ref
-};
-
-use Test2::Tools::Warnings qw{
-    warns warning warnings no_warnings
-};
-
-use Test2::Tools::ClassicCompare qw/cmp_ok/;
-
-use Importer 'Test2::Tools::Subtest' => (
-    subtest_buffered => { -as => 'subtest' },
-);
-
-use Test2::Tools::Class     qw/can_ok isa_ok DOES_ok/;
-use Test2::Tools::Encoding  qw/set_encoding/;
-use Test2::Tools::Exports   qw/imported_ok not_imported_ok/;
-use Test2::Tools::Ref       qw/ref_ok ref_is ref_is_not/;
-use Test2::Tools::Mock      qw/mock mocked/;
-use Test2::Tools::Exception qw/try_ok dies lives/;
-
-our @EXPORT = qw{
-    ok pass fail diag note todo skip
-    plan skip_all done_testing bail_out
-
-    intercept context
-
-    gen_event
-
-    def do_def
-
-    cmp_ok
-
-    warns warning warnings no_warnings
-
-    subtest
-    can_ok isa_ok DOES_ok
-    set_encoding
-    imported_ok not_imported_ok
-    ref_ok ref_is ref_is_not
-    mock mocked
-    dies lives try_ok
-
-    is like isnt unlike
-    match mismatch validator
-    hash array bag object meta meta_check number string subset bool
-    in_set not_in_set check_set
-    item field call call_list call_hash prop check all_items all_keys all_vals all_values
-    etc end filter_items
-    T F D DF E DNE FDNE U
-    event fail_events
-    exact_ref
-};
+BEGIN {
+    push @Test2::Bundle::Extended::ISA => 'Test2::V0';
+    no warnings 'once';
+    *EXPORT = \@Test2::V0::EXPORT;
+}
 
 our %EXPORT_TAGS = (
-    'v1' => \@EXPORT,
+    'v1' => \@Test2::Bundle::Extended::EXPORT,
 );
-
-my $SRAND;
-sub import {
-    my $class = shift;
-
-    my $caller = caller;
-    my (@exports, %options);
-    while (my $arg = shift @_) {
-        push @exports => $arg and next unless substr($arg, 0, 1) eq '-';
-        $options{$arg} = shift @_;
-    }
-
-    # SRand handling
-    my $srand    = delete $options{'-srand'};
-    my $no_srand = delete $options{'-no_srand'};
-
-    croak "Cannot combine '-srand' and '-no_srand' options"
-        if $no_srand && defined($srand);
-
-    Test2::Plugin::SRand->import($srand ? $srand : ())
-        if $srand || !($no_srand || $SRAND++);
-
-    # Pragmas
-    my $no_pragmas  = delete $options{'-no_pragmas'};
-    my $no_strict   = delete $options{'-no_strict'} || $no_pragmas;
-    my $no_warnings = delete $options{'-no_warnings'} || $no_pragmas;
-    my $no_utf8     = delete $options{'-no_utf8'} || $no_pragmas;
-
-    strict->import()              unless $no_strict;
-    'warnings'->import()          unless $no_warnings;
-    Test2::Plugin::UTF8->import() unless $no_utf8;
-
-    my $target = delete $options{'-target'};
-    Test2::Tools::Target->import_into($caller, $target)
-        if $target;
-
-    croak "Unknown option(s): " . join(', ', keys %options) if keys %options;
-
-    Importer->import_into($class, $caller, @exports);
-}
 
 1;
 
@@ -141,7 +26,12 @@ __END__
 
 =head1 NAME
 
-Test2::Bundle::Extended - The bundle used by the Test2 Author.
+Test2::Bundle::Extended - Old name for Test2::V0
+
+=head1 *** DEPRECATED ***
+
+This bundle has been renamed to L<Test2::V0>, in which the C<':v1'> tag has
+been removed as unnecessary.
 
 =head1 DESCRIPTION
 
@@ -183,12 +73,6 @@ The following are all identical:
     use Test2::Bundle::Extended ':v1';
 
     use Test2::Bundle::Extended ':DEFAULT';
-
-=item :v2 (FUTURE)
-
-Does not exist yet. This will be populated if we find need to make incompatible
-changes to C<:v1>. This was we can move forward with a new tag without breaking
-backwards compatibility.
 
 =back
 

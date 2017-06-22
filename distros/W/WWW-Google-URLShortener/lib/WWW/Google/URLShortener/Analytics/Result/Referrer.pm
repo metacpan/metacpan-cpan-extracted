@@ -1,6 +1,7 @@
 package WWW::Google::URLShortener::Analytics::Result::Referrer;
 
-$WWW::Google::URLShortener::Analytics::Result::Referrer::VERSION = '0.19';
+$WWW::Google::URLShortener::Analytics::Result::Referrer::VERSION   = '0.22';
+$WWW::Google::URLShortener::Analytics::Result::Referrer::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
 
@@ -8,7 +9,7 @@ WWW::Google::URLShortener::Analytics::Result::Referrer - Placeholder for the res
 
 =head1 VERSION
 
-Version 0.19
+Version 0.22
 
 =cut
 
@@ -18,8 +19,7 @@ use overload q{""} => 'as_string', fallback => 1;
 use Moo;
 use namespace::clean;
 
-has id    => (is => 'ro');
-has count => (is => 'ro');
+has [ qw(id count) ] => (is => 'ro');
 
 sub as_string {
     my ($self) = @_;
@@ -43,7 +43,7 @@ Mohammad S Anwar, C<< <mohammad.anwar at yahoo.com> >>
 
 =head1 REPOSITORY
 
-L<https://github.com/Manwar/WWW-Google-URLShortener>
+L<https://github.com/manwar/WWW-Google-URLShortener>
 
 =head1 BUGS
 

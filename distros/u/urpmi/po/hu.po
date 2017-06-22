@@ -7,13 +7,14 @@
 # Balzamon, 2015
 # Csaba Szigetvári <csaba.szigetvari@informedia.hu>, 2000
 # alephlg <aleph@mandriva.org>, 2007-2009
+# Laszlo Espadas <kardiweb@protonmail.ch>, 2017
 # Zsolt Bölöny <bolony.zsolt@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
 "POT-Creation-Date: 2014-09-13 21:15+0200\n"
-"PO-Revision-Date: 2016-03-03 20:53+0000\n"
-"Last-Translator: Csaba Mészáros <pingvin@y2k.hu>\n"
+"PO-Revision-Date: 2017-04-12 18:03+0000\n"
+"Last-Translator: Laszlo Espadas <kardiweb@protonmail.ch>\n"
 "Language-Team: Hungarian (http://www.transifex.com/MageiaLinux/mageia/"
 "language/hu/)\n"
 "Language: hu\n"
@@ -123,7 +124,7 @@ msgstr ""
 "\n"
 "%s\n"
 "\n"
-"Kívánja folytatni?"
+"Szeretné folytatni?"
 
 #: ../gurpmi:98
 #, c-format

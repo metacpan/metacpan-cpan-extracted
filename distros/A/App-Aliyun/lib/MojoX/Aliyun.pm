@@ -12,7 +12,7 @@ use Digest::SHA qw(hmac_sha1_base64);
 use URI::Escape;
 use Data::UUID;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 has 'ua' => sub {
     my $ua = Mojo::UserAgent->new;

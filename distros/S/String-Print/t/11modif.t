@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# Serialize variables when sprintid
+# Serialize variables when sprinti'd
 
 use warnings;
 use strict;

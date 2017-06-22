@@ -6,7 +6,7 @@ use Mojolicious::Plugin::AssetPack::Asset::Null;
 use Mojolicious::Plugin::AssetPack::Store;
 use Mojolicious::Plugin::AssetPack::Util qw(diag has_ro load_module DEBUG);
 
-our $VERSION = '1.44';
+our $VERSION = '1.45';
 
 my %TAG_TEMPLATE;
 $TAG_TEMPLATE{css} = [qw(link rel stylesheet href)];
@@ -171,6 +171,7 @@ sub _process {
   $self->_app->log->debug(qq(Processed asset "$topic". [@checksum])) if DEBUG;
   $self->{by_checksum}{$_->checksum} = $_ for @$assets;
   $self->{by_topic}{$topic} = $assets;
+  $self->store->persist;
   $self;
 }
 
@@ -215,25 +216,6 @@ sub _render_tags {
     ->map($self->tag_for, $c, \%args, @attrs)->join("\n");
 }
 
-sub _reset {
-  my ($self, $args) = @_;
-
-  diag "Reset $self." if DEBUG;
-
-  if ($args->{unlink}) {
-    for (@{$self->{asset_paths} || []}) {
-      next unless /\bcache\b/;
-      next unless -e;
-      local $! = 0;
-      unlink;
-      diag 'unlink %s = %s', $_, $! || '1' if DEBUG;
-    }
-  }
-
-  $self->store->_reset($args);
-  delete $self->{$_} for qw(by_checksum by_topic);
-}
-
 sub _serve {
   my $c        = shift;
   my $checksum = $c->stash('checksum');
@@ -262,11 +244,6 @@ sub _static_asset {
   return $assets;
 }
 
-sub DESTROY {
-  my $self = shift;
-  $self->_reset({unlink => 1}) if $ENV{MOJO_ASSETPACK_CLEANUP} and $self->{store};
-}
-
 1;
 
 =encoding utf8
@@ -277,7 +254,7 @@ Mojolicious::Plugin::AssetPack - Compress and convert css, less, sass, javascrip
 
 =head1 VERSION
 
-1.44
+1.45
 
 =head1 SYNOPSIS
 
@@ -310,17 +287,6 @@ Mojolicious::Plugin::AssetPack - Compress and convert css, less, sass, javascrip
     <body><%= content %></body>
   </html>
 
-=head1 FOR EXISTING USERS
-
-Are you already using AssetPack? You can still do so without any change. This
-new version was written to make it easier to maintain and also easier to
-extend. The new code will be "activated" by loadind this plugin with a list of
-pipes:
-
-  $app->plugin(AssetPack => {pipes => [...]});
-
-The old API require L<Mojolicious::Plugin::AssetPack::Backcompat> to be installed.
-
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugin::AssetPack> is L<Mojolicious plugin|Mojolicious::Plugin>
@@ -346,52 +312,14 @@ L<Mojolicious::Plugin::AssetPack::Guides::Tutorial/Pipes> for a complete list.
 
 The tutorial will give an introduction to how AssetPack can be used.
 
+=item * L<Mojolicious::Plugin::AssetPack::Guides::Developing>
+
+The "developing" guide will give insight on how to do effective development with
+AssetPack and more details about the internals in this plugin.
+
 =item * L<Mojolicious::Plugin::AssetPack::Guides::Cookbook>
 
 The cookbook has various receipes on how to cook with AssetPack.
-
-=back
-
-=head1 ENVIRONMENT
-
-It is possible to set environment variables to change the behavior of AssetPack:
-
-=over 2
-
-=item * MOJO_ASSETPACK_DEBUG
-
-Set this environment variable to get more debug to STDERR. Currently you can
-set it to a value between 0 and 3, where 3 provides the most debug.
-
-=item * MOJO_ASSETPACK_LAZY
-
-Set this environment variable if you want to delay processing the assets until
-they are requested. This can be very useful while developing when the assets
-are changed frequently.
-
-=back
-
-=head1 OPTIONAL MODULES
-
-There are some optional modules you might want to install:
-
-=over 2
-
-=item * L<CSS::Minifier::XS>
-
-Used by L<Mojolicious::Plugin::AssetPack::Pipe::Css>.
-
-=item * L<CSS::Sass>
-
-Used by L<Mojolicious::Plugin::AssetPack::Pipe::Sass>.
-
-=item * L<IO::Socket::SSL>
-
-Required if you want to download assets served over SSL.
-
-=item * L<JavaScript::Minifier::XS>
-
-Used by L<Mojolicious::Plugin::AssetPack::Pipe::JavaScript>.
 
 =back
 

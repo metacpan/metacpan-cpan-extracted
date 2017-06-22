@@ -100,6 +100,53 @@ Ext.ux.RapidApp.renderMonoText = function(v) {
   return '<pre class="ra-pre-wrap">' + v + '</pre>';
 }
 
+// Note that this renderer cannot be chained via one which does nl2br, while
+// renderMonoText above can because it doesn't encode html entities
+Ext.ux.RapidApp.renderSourceCode = function(v) {
+  if (v == null || v === "") { return Ext.ux.showNull(v); }
+  return [
+    '<pre class="ra-pre-wrap">',
+      Ext.util.Format.htmlEncode(v),
+    '</pre>'
+  ].join("\n");
+}
+
+Ext.ux.RapidApp.renderSourceCodeLineNumbers = function(v) {
+  if (v == null || v === "") { return Ext.ux.showNull(v); }
+  var code = Ext.util.Format.htmlEncode(v);
+  
+  var numlines = code.split(/\r\n|\r|\n/).length;
+  var pad = numlines.toString().length;
+  var style = 'color:red;opacity:0.5;font-weight:bolder;';
+  
+  var line = 1;
+  code = code.replace(/^/gm, function() {
+    var digits = line.toString().length;
+    var prefix = (new Array((pad-digits)+1)).join('&nbsp;');
+    return [prefix,'<span style="',style,'">',line++,':','</span>&nbsp;'].join('');
+  });
+  
+  return ['<pre class="ra-pre-wrap">',code,'</pre>'].join("\n");
+}
+
+
+
+// Reference/proof-of-concept
+Ext.ux.RapidApp.renderSourceCodeLineNumbersExpand = function(v) {
+  var val = Ext.ux.RapidApp.renderSourceCodeLineNumbers(v);
+  
+  
+  return [
+    '<div class="ra-mo-expandable-max-height" style="max-height: 150px; overflow: hidden;">', 
+      val,
+    '</div>'
+  ].join("\n");
+  
+}
+
+
+
+
 Ext.ux.RapidApp.getWithIconClsRenderer = function(icon_cls) {
   return function(value, metaData) {
     if(icon_cls) { metaData.css = 'grid-cell-with-icon ' + icon_cls; }
@@ -202,8 +249,8 @@ Ext.ux.RapidApp.DbicRelRestRender = function(c) {
   // UPDATE: *DO* show links for 0 now that these can be used to add new related records
   //if(c.multi_rel && c.value == '0') { return disp; }
   
-  if(!c.value) { 
-    if(!disp && !key_value) {
+  if(!c.value && c.value != 0) { 
+    if(!disp && (!key_value && key_value != 0)) {
       // If everything is unset, including the key_col value itself,
       // we render like a normal empty value. It is only when the 
       // key_col is set but the value/disp is not (indicating a broken
@@ -215,9 +262,9 @@ Ext.ux.RapidApp.DbicRelRestRender = function(c) {
     c.value = key_value; 
   }
   
-  if(!c.value)    { return disp; }
-  if(!disp)       { return c.value; }
-  if(!c.open_url)  { return disp; }
+  if(!c.value && c.value != 0) { return disp; }
+  if(!disp)                    { return c.value; }
+  if(!c.open_url)              { return disp; }
   
   var url = '#!' + c.open_url + '/';
   if(c.rest_key) { url += c.rest_key + '/'; }
@@ -255,8 +302,8 @@ Ext.ux.RapidApp.DbicSingleRelationshipColumnRender = function(c) {
   var disp = c.record.data[c.render_col];
   var key_value = c.record.data[c.key_col];
 
-  if(!c.value) { 
-    if(!disp && !key_value) {
+  if(!c.value && c.value != 0) { 
+    if(!disp && (!key_value && key_value != 0)) {
       // If everything is unset, including the key_col value itself,
       // we render like a normal empty value. It is only when the 
       // key_col is set but the value/disp is not (indicating a broken
@@ -286,9 +333,9 @@ Ext.ux.RapidApp.DbicSingleRelationshipColumnRender = function(c) {
     '</span>';
   }
   
-  if(!c.value)    { return disp; }
-  if(!disp)       { return c.value; }
-  if(!c.open_url)  { return disp; }
+  if(!c.value && c.value != 0) { return disp; }
+  if(!disp)                    { return c.value; }
+  if(!c.open_url)              { return disp; }
   
   var loadCfg = { 
     title: disp, 

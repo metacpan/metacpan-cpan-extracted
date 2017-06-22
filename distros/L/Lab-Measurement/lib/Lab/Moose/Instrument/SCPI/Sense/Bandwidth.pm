@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Sense::Bandwidth;
-
+$Lab::Moose::Instrument::SCPI::Sense::Bandwidth::VERSION = '3.550';
 use Moose::Role;
 use Lab::Moose::Instrument::Cache;
 use Lab::Moose::Instrument
@@ -10,7 +10,6 @@ use Carp;
 
 use namespace::autoclean;
 
-our $VERSION = '3.543';
 
 =head1 NAME
 

@@ -1,0 +1,173 @@
+SYNOPSIS
+
+        my $parser = Date::Extract::PERLANCAR->new();
+        my $dt = $parser->extract($arbitrary_text)
+            or die "No date found.";
+        return $dt->ymd;
+
+DESCRIPTION
+
+    This is a temporary fork of Date::Extract (last updated at 0.06) to add
+    features that I need. The features will eventually be merged into
+    Date::Extract. Currently it adds:
+
+      * Add 'combined' format
+
+      * Recognize yyyy-mm-ddThh:mm:ss in addition to yyyy-mm-dd
+
+MOTIVATION
+
+    There are already a few modules for getting a date out of a string.
+    DateTime::Format::Natural should be your first choice. There's also
+    Time::ParseDate which fits many formats. Finally, you can coerce
+    Date::Manip to do your bidding.
+
+    But I needed something that will take an arbitrary block of text,
+    search it for something that looks like a date string, and extract it.
+    This module fills this niche. By design it will produce few false
+    positives. This means it will not catch nearly everything that looks
+    like a date string. So if you have the string "do homework for class
+    2019" it won't return a DateTime object with the year set to 2019. This
+    is what your users would probably expect.
+
+METHODS
+
+ new PARAMHASH => Date::Extract::PERLANCAR
+
+  arguments
+
+    format
+
+      Choose what format the extracted date(s) will be. The default is
+      "DateTime", which will return DateTime object(s). Other option
+      include "verbatim" (return the original text), "epoch" (return Unix
+      timestamp), or "combined" (return hashref containing these keys
+      "verbatim", "DateTime", "pos" [position of date string in the text]).
+
+    time_zone
+
+      Only relevant when format is set to "DateTime".
+
+      Forces a particular time zone to be set (this actually matters, as
+      "tomorrow" on Monday at 11 PM means something different than
+      "tomorrow" on Tuesday at 1 AM).
+
+      By default it will use the "floating" time zone. See the
+      documentation for DateTime.
+
+      This controls both the input time zone and output time zone.
+
+    prefers
+
+      This argument decides what happens when an ambiguous date appears in
+      the input. For example, "Friday" may refer to any number of Fridays.
+      The valid options for this argument are:
+
+      nearest
+
+	Prefer the nearest date. This is the default.
+
+      future
+
+	Prefer the closest future date.
+
+      past
+
+	Prefer the closest past date. NOT YET SUPPORTED.
+
+    returns
+
+      If the text has multiple possible dates, then this argument
+      determines which date will be returned. By default it's 'first'.
+
+      first
+
+	Returns the first date found in the string.
+
+      last
+
+	Returns the final date found in the string.
+
+      earliest
+
+	Returns the date found in the string that chronologically precedes
+	any other date in the string.
+
+      latest
+
+	Returns the date found in the string that chronologically follows
+	any other date in the string.
+
+      all
+
+	Returns all dates found in the string, in the order they were found
+	in the string.
+
+      all_cron
+
+	Returns all dates found in the string, in chronological order.
+
+ extract text, ARGS => dates
+
+    Takes an arbitrary amount of text and extracts one or more dates from
+    it. The return value will be zero or more dates, which by default are
+    DateTime objects (but can be customized with the format argument). If
+    called in scalar context, only one will be returned, even if the
+    returns argument specifies multiple possible return values.
+
+    See the documentation of new for the configuration of this method. Any
+    arguments passed into this method will trump those from the
+    constructor.
+
+    You may reuse a parser for multiple calls to extract.
+
+    You do not need to have an instantiated Date::Extract::PERLANCAR object
+    to call this method. Just Date::Extract::PERLANCAR->extract($foo) will
+    work.
+
+FORMATS HANDLED
+
+      * today; tomorrow; yesterday
+
+      * last Friday; next Monday; previous Sat
+
+      * Monday; Mon
+
+      * November 13th, 1986; Nov 13, 1986
+
+      * 13 November 1986; 13 Nov 1986
+
+      * November 13th; Nov 13
+
+      * 13 Nov; 13th November
+
+      * 1986/11/13; 1986-11-13
+
+      * 11-13-86; 11/13/1986
+
+CAVEATS
+
+    This module is intentionally very simple. Surprises are not welcome
+    here.
+
+SEE ALSO
+
+    DateTime::Format::Natural, Time::ParseDate, Date::Manip
+
+ORIGINAL AUTHOR
+
+    Shawn M Moore, <sartak at bestpractical dot com>
+
+ACKNOWLEDGEMENTS
+
+    Thanks to Steven Schubiger for writing the fine
+    DateTime::Format::Natural. We still use it, but it doesn't quite fill
+    all the particular needs we have.
+
+ORIGINAL COPYRIGHT & LICENSE
+
+    Copyright 2007-2009 Best Practical Solutions.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

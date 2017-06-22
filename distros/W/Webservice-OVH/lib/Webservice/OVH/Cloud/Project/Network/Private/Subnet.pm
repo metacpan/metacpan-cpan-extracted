@@ -40,7 +40,7 @@ use warnings;
 use Carp qw{ carp croak };
 use JSON;
 
-our $VERSION = 0.3;
+our $VERSION = 0.41;
 
 =head2 _new_existing
 

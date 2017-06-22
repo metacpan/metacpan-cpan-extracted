@@ -1,12 +1,12 @@
 package Git::Bunch;
 
-our $DATE = '2016-12-20'; # DATE
-our $VERSION = '0.60'; # VERSION
+our $DATE = '2017-06-21'; # DATE
+our $VERSION = '0.61'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use IPC::System::Options 'system', 'readpipe', -log=>1, -lang=>'C';
 use Cwd ();
@@ -248,7 +248,7 @@ sub _skip_process_entry {
 
     # skip special files
     if ($e->{name} =~ /\A(repos\.db|\.gitbunch-sync-timestamp)\z/) {
-        $log->debug("Skipped $e->{name} (special files)");
+        log_debug("Skipped $e->{name} (special files)");
         return 1;
     }
 
@@ -263,41 +263,41 @@ sub _skip_process_entry {
     }
 
     if ($skip_non_repo && !$is_repo) {
-        $log->debug("Skipped $e->{name} (not a git repo), ".
+        log_debug("Skipped $e->{name} (not a git repo), ".
                         "please remove it or rename to .$e->{name}");
         return 1;
     }
     if ($is_repo) {
         my $ir = $args->{include_repos};
         if ($ir && !($e->{name} ~~ @$ir)) {
-            $log->debug("Skipped $e->{name} (not in include_repos)");
+            log_debug("Skipped $e->{name} (not in include_repos)");
             return 1;
         }
         my $irp = $args->{include_repos_pat};
         if (defined($irp) && $e->{name} !~ qr/$irp/) {
-            $log->debug("Skipped $e->{name} (not matched include_repos_pat)");
+            log_debug("Skipped $e->{name} (not matched include_repos_pat)");
             return 1;
         }
         my $er = $args->{exclude_repos};
         if ($er && $e->{name} ~~ @$er) {
-            $log->debug("Skipped $e->{name} (in exclude_repos)");
+            log_debug("Skipped $e->{name} (in exclude_repos)");
             return 1;
         }
         my $erp = $args->{exclude_repos_pat};
         if (defined($erp) && $e->{name} =~ qr/$erp/) {
-            $log->debug("Skipped $e->{name} (not matched exclude_repos_pat)");
+            log_debug("Skipped $e->{name} (not matched exclude_repos_pat)");
             return 1;
         }
         my $min_rat = $args->{min_repo_access_time};
         if ($min_rat && max(grep {defined} $e->{mtime}, $e->{commit_time}, $e->{status_time}, $e->{pull_time}) < $min_rat) {
-            $log->debug("Skipped $e->{name} (doesn't pass min_repo_access_time)");
+            log_debug("Skipped $e->{name} (doesn't pass min_repo_access_time)");
             return 1;
         }
     } elsif ((-f $dir) && $args->{exclude_files}) {
-        $log->debug("Skipped $e->{name} (exclude_files)");
+        log_debug("Skipped $e->{name} (exclude_files)");
         return 1;
     } elsif ((-d $dir) && $args->{exclude_non_git_dirs}) {
-        $log->debug("Skipped $e->{name} (exclude_non_git_dirs)");
+        log_debug("Skipped $e->{name} (exclude_non_git_dirs)");
         return 1;
     }
     return 0;
@@ -419,7 +419,7 @@ sub check_bunch {
     return $res unless $res->[0] == 200;
     my $source = $args{source};
 
-    $log->info("Checking bunch $source ...");
+    log_info("Checking bunch $source ...");
 
     my $has_unclean;
     my %res;
@@ -442,14 +442,14 @@ sub check_bunch {
             if $progress;
 
         if ($args{-dry_run}) {
-            $log->infof("[DRY-RUN] checking status of repo %s", $repo);
+            log_info("[DRY-RUN] checking status of repo %s", $repo);
             next REPO;
         }
 
         my $output = readpipe("git status 2>&1");
         my $exit = $? >> 8;
         if ($exit == 0 && $output =~ /nothing to commit/) {
-            $log->info("$repo is clean");
+            log_info("$repo is clean");
             $res{$repo} = [200, "Clean"];
             next;
         }
@@ -461,22 +461,22 @@ sub check_bunch {
                                 Changes \s not \s staged \s for \s commit |
                                 Changed \s but
                             )/mx) {
-            $log->warn("$repo needs commit");
+            log_warn("$repo needs commit");
             $res{$repo} = [500, "Needs commit"];
         } elsif ($exit == 0 &&
                      $output =~ /(
                                      Untracked \s files
                                  )/x) {
-            $log->warn("$repo has untracked files");
+            log_warn("$repo has untracked files");
             $res{$repo} = [500, "Has untracked files"];
         } elsif ($exit == 0 && $output =~ /Unmerged paths:/) {
-            $log->warn("$repo needs merging");
+            log_warn("$repo needs merging");
             $res{$repo} = [500, "Needs merging"];
         } elsif ($exit == 128 && $output =~ /Not a git repository/) {
-            $log->warn("$repo is not a git repo (2)");
+            log_warn("$repo is not a git repo (2)");
             $res{$repo} = [500, "Not a git repo (2)"];
         } else {
-            $log->error("Can't figure out result of 'git status' ".
+            log_error("Can't figure out result of 'git status' ".
                             "for repo $repo: exit=$exit, output=$output");
             $res{$repo} = [500, "Unknown (exit=$exit, output=$output)"];
         }
@@ -536,7 +536,7 @@ sub list_bunch_contents {
         }
         @entries = sort $sortsub @entries;
     }
-    #$log->tracef("entries: %s", \@entries);
+    #log_trace("entries: %s", \@entries);
 
     my @res;
   ENTRY:
@@ -572,52 +572,52 @@ sub _sync_repo {
     @src_branches = map {(/^[* ] (.+)/, $1)[-1]} readpipe("git branch");
     $exit = $? >> 8;
     if ($exit) {
-        $log->error("Can't list branches on src repo $src/$repo: $exit");
+        log_error("Can't list branches on src repo $src/$repo: $exit");
         return [500, "Can't list source branches"];
     }
-    $log->debugf("Source branches: %s", \@src_branches);
+    log_debug("Source branches: %s", \@src_branches);
 
     for my $branch (@src_branches) {
         my $output = readpipe("git log -1 '$branch'");
         $exit = $? >> 8;
         if ($exit) {
-            $log->error("Can't find out head for branch $branch on src repo ".
+            log_error("Can't find out head for branch $branch on src repo ".
                             "$src/$repo: $exit");
             return [500, "Can't find out head for source branch $branch"];
         }
         $output =~ /commit (\S+)/ or do {
-            $log->error("Can't recognize git log output ".
+            log_error("Can't recognize git log output ".
                             "(searching for commit XXX): $output");
             return [500, "Can't recognize git log output on src: $output"];
         };
         $src_heads{$branch} = $1;
     }
-    $log->debugf("Source branch heads: %s", \%src_heads);
+    log_debug("Source branch heads: %s", \%src_heads);
 
     $CWD = "$dest/$repo";
     my $is_bare = _is_repo(".") == 2;
     @dest_branches = map {(/^[* ] (.+)/, $1)[-1]} readpipe("git branch");
     if ($exit) {
-        $log->error("Can't list branches on dest repo $repo: $exit");
+        log_error("Can't list branches on dest repo $repo: $exit");
         return [500, "Can't list branches on dest: $exit"];
     }
-    $log->debugf("Dest branches: %s", \@dest_branches);
+    log_debug("Dest branches: %s", \@dest_branches);
     for my $branch (@dest_branches) {
         my $output = readpipe("git log -1 '$branch'");
         $exit = $? >> 8;
         if ($exit) {
-            $log->error("Can't find out head for branch $branch on dest repo ".
+            log_error("Can't find out head for branch $branch on dest repo ".
                             "$dest/$repo: $exit");
             return [500, "Can't find out head for dest branch $branch"];
         }
         $output =~ /commit (\S+)/ or do {
-            $log->error("Can't recognize git log output ".
+            log_error("Can't recognize git log output ".
                             "(searching for commit XXX): $output");
             return [500, "Can't recognize git log output on src: $output"];
         };
         $dest_heads{$branch} = $1;
     }
-    $log->debugf("Dest branch heads: %s", \%dest_heads);
+    log_debug("Dest branch heads: %s", \%dest_heads);
 
     my $output;
     my $lock_deleted;
@@ -628,16 +628,16 @@ sub _sync_repo {
         # right now tags are not that important
         if ($src_heads{$branch} && $dest_heads{$branch} &&
                 $src_heads{$branch} eq $dest_heads{$branch}) {
-            $log->debug("Skipping branch $branch because heads are the same");
+            log_debug("Skipping branch $branch because heads are the same");
             next BRANCH;
         }
         $changed_branch++;
         if (0 && !$lock_deleted++) {
-            $log->debug("Deleting locks first ...");
+            log_debug("Deleting locks first ...");
             unlink "$src/$repo" .($is_bare ? "" : "/.git")."/index.lock";
             unlink "$dest/$repo".($is_bare ? "" : "/.git")."/index.lock";
         }
-        $log->info("Updating branch $branch of repo $repo ...")
+        log_info("Updating branch $branch of repo $repo ...")
             if @src_branches > 1;
         if ($is_bare) {
             $output = readpipe(
@@ -656,10 +656,10 @@ sub _sync_repo {
         }
         $exit = $? >> 8;
         if ($exit == 0 && $output =~ /Already up-to-date/) {
-            $log->debug("Branch $branch of repo $repo is up to date");
+            log_debug("Branch $branch of repo $repo is up to date");
             next BRANCH;
         } elsif ($output =~ /^error: (.+)/m) {
-            $log->error("Can't successfully git pull/push branch $branch of ".
+            log_error("Can't successfully git pull/push branch $branch of ".
                             "repo $repo: $1");
             return [500, "git pull/push branch $branch failed: $1"];
         } elsif ($exit == 0 &&
@@ -667,24 +667,24 @@ sub _sync_repo {
                                  ^Merge \s made \s by \s recursive|
                                  ^Merge \s made \s by \s the \s 'recursive'|
                                 /mx) {
-            $log->warn("Branch $branch of repo $repo updated")
+            log_warn("Branch $branch of repo $repo updated")
                 if @src_branches > 1;
-            $log->warn("Repo $repo updated")
+            log_warn("Repo $repo updated")
                 if @src_branches == 1;
         } else {
-            $log->error(
+            log_error(
                 "Can't recognize 'git pull/push' output for branch ".
                     "$branch of repo $repo: exit=$exit, output=$output");
             return [500, "Can't recognize git pull/push output: $output"];
         }
-        $log->debug("Result of 'git pull/push' for branch $branch of repo ".
+        log_debug("Result of 'git pull/push' for branch $branch of repo ".
                         "$repo: exit=$exit, output=$output");
 
         $output = readpipe("cd '$dest/$repo'; ".
                                "git fetch --tags '$src/$repo' 2>&1");
         $exit = $? >> 8;
         if ($exit != 0) {
-            $log->debug("Failed fetching tags: ".
+            log_debug("Failed fetching tags: ".
                             "$output (exit=$exit)");
             return [500, "git fetch --tags failed: $1"];
         }
@@ -695,12 +695,12 @@ sub _sync_repo {
             next if $branch ~~ @src_branches;
             next if $branch eq 'master'; # can't delete master branch
             $changed_branch++;
-            $log->info("Deleting branch $branch of repo $repo because ".
+            log_info("Deleting branch $branch of repo $repo because ".
                            "it no longer exists in src ...");
             system("cd '$dest/$repo' && git checkout master 2>/dev/null && ".
                        "git branch -D '$branch' 2>/dev/null");
             $exit = $? >> 8;
-            $log->error("Failed deleting branch $branch of repo $repo: $exit")
+            log_error("Failed deleting branch $branch of repo $repo: $exit")
                 if $exit;
         }
     }
@@ -857,7 +857,7 @@ sub sync_bunch {
     my $cmd;
 
     unless ((-d $target) || $args{-dry_run}) {
-        $log->debugf("Creating target directory %s ...", $target);
+        log_debug("Creating target directory %s ...", $target);
         make_path($target)
             or return [500, "Can't create target directory $target: $!"];
     }
@@ -875,7 +875,7 @@ sub sync_bunch {
     local $CWD = $source;
     my @entries = _list(\%args);
     @entries = _sort_entries_by_recent(@entries) if $args{min_repo_access_time};
-    #$log->tracef("entries: %s", \@entries);
+    #log_trace("entries: %s", \@entries);
 
     $CWD = $target;
 
@@ -905,7 +905,7 @@ sub sync_bunch {
             }
 
             if ($args{-dry_run}) {
-                $log->warnf("[DRY RUN] Updating non-git file/dir '%s'", $file_or_dir);
+                log_warn("[DRY RUN] Updating non-git file/dir '%s'", $file_or_dir);
                 next ENTRY;
             }
 
@@ -913,18 +913,18 @@ sub sync_bunch {
             # file/dir is modified/added to target. to check files deleted in
             # target, we use /^deleting /x
             my $uuid = UUID::Random::generate();
-            my $_v = $log->is_debug ? "-v" : "";
+            my $_v = log_is_debug() ? "-v" : "";
             my $del = $args{rsync_del} ? "--del" : "";
             $cmd = "$prog ".join(" ", @extra_opts)." --log-format=$uuid -${_a}z $_v $del --force ".
                 shell_quote("$source/$file_or_dir")." .";
             my ($stdout, @result) = Capture::Tiny::capture_stdout(
                 sub { system($cmd) });
             if ($result[0]) {
-                $log->warn("Rsync failed, please check: $result[0]");
+                log_warn("Rsync failed, please check: $result[0]");
                 $res{$file_or_dir} = [500, "rsync failed: $result[0]"];
             } else {
                 if ($stdout =~ /^(deleting |\Q$uuid\E)/m) {
-                    $log->warn("Non-git file/dir '$file_or_dir' updated");
+                    log_warn("Non-git file/dir '$file_or_dir' updated");
                 }
                 $res{$file_or_dir} = [200, "rsync-ed"];
             }
@@ -935,30 +935,30 @@ sub sync_bunch {
         my $created;
         if (!(-e $repo)) {
             if ($args{-dry_run}) {
-                $log->warnf("[DRY RUN] Copying repo '%s'", $repo);
+                log_warn("[DRY RUN] Copying repo '%s'", $repo);
                 next ENTRY;
             }
             if ($create_bare) {
-                $log->info("Initializing target repo $repo (bare) ...");
+                log_info("Initializing target repo $repo (bare) ...");
                 $cmd = "mkdir ".shell_quote($repo)." && cd ".shell_quote($repo).
                     " && git init --bare";
                 system($cmd);
                 $exit = $? >> 8;
                 if ($exit) {
-                    $log->warn("Git init failed, please check: $exit");
+                    log_warn("Git init failed, please check: $exit");
                     $res{$repo} = [500, "git init --bare failed: $exit"];
                     next ENTRY;
                 }
                 $created++;
                 # continue to sync-ing
             } elsif (defined $create_bare) {
-                $log->info("Initializing target repo $repo (non-bare) ...");
+                log_info("Initializing target repo $repo (non-bare) ...");
                 $cmd = "mkdir ".shell_quote($repo)." && cd ".shell_quote($repo).
                     " && git init";
                 system($cmd);
                 $exit = $? >> 8;
                 if ($exit) {
-                    $log->warn("Git init failed, please check: $exit");
+                    log_warn("Git init failed, please check: $exit");
                     $res{$repo} = [500, "git init failed: $exit"];
                     next ENTRY;
                 }
@@ -973,12 +973,12 @@ sub sync_bunch {
                 system($cmd);
                 $exit = $? >> 8;
                 if ($exit) {
-                    $log->warn("Rsync failed, please check: $exit");
+                    log_warn("Rsync failed, please check: $exit");
                     $res{$repo} = [500, "rsync failed: $exit"];
                 } else {
                     $res{$repo} = [200, "rsync-ed"];
                 }
-                $log->warn("Repo $repo copied");
+                log_warn("Repo $repo copied");
                 # touch pull time
                 $dbh_target->do("INSERT OR IGNORE INTO repos (name) VALUES (?)",
                                 {}, $repo);
@@ -992,12 +992,12 @@ sub sync_bunch {
             if $progress;
 
         if ($args{-dry_run}) {
-            $log->warnf("[DRY RUN] Sync-ing repo '%s'", $repo);
+            log_warn("[DRY RUN] Sync-ing repo '%s'", $repo);
             next ENTRY;
         }
 
         if ($backup && !$created) {
-            $log->debug("Discarding changes in target repo $repo ...");
+            log_debug("Discarding changes in target repo $repo ...");
             local $CWD = $repo;
             system "git clean -f -d && git checkout .";
             # ignore error for now, let's go ahead and sync anyway
@@ -1067,21 +1067,21 @@ sub exec_bunch {
     my $i = 0;
     my @entries = _list(\%args);
     @entries = _sort_entries_by_recent(@entries) if $args{min_repo_access_time};
-    #$log->tracef("entries: %s", \@entries);
+    #log_trace("entries: %s", \@entries);
   REPO:
     for my $e (@entries) {
         next REPO if _skip_process_repo($e, \%args, ".");
         my $repo = $e->{name};
         $CWD = $i++ ? "../$repo" : $repo;
         if ($args{-dry_run}) {
-            $log->info("[DRY-RUN] Executing command on $repo ...");
+            log_info("[DRY-RUN] Executing command on $repo ...");
             next REPO;
         }
-        $log->info("Executing command on $repo ...");
+        log_info("Executing command on $repo ...");
         system($command);
         $exit = $? >> 8;
         if ($exit) {
-            $log->warn("Command failed: $exit");
+            log_warn("Command failed: $exit");
             $res{$repo} = [500, "Command failed: $exit"];
         } else {
             $res{$repo} = [200, "Command successful"];
@@ -1110,7 +1110,7 @@ Git::Bunch - Manage gitbunch directory (directory which contain git repos)
 
 =head1 VERSION
 
-This document describes version 0.60 of Git::Bunch (from Perl distribution Git-Bunch), released on 2016-12-20.
+This document describes version 0.61 of Git::Bunch (from Perl distribution Git-Bunch), released on 2017-06-21.
 
 =head1 SYNOPSIS
 
@@ -1151,7 +1151,11 @@ See also L<rsybak>, which I wrote to backup everything else.
 =head1 FUNCTIONS
 
 
-=head2 check_bunch(%args) -> [status, msg, result, meta]
+=head2 check_bunch
+
+Usage:
+
+ check_bunch(%args) -> [status, msg, result, meta]
 
 Check status of git repositories inside gitbunch directory.
 
@@ -1239,7 +1243,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 exec_bunch(%args) -> [status, msg, result, meta]
+=head2 exec_bunch
+
+Usage:
+
+ exec_bunch(%args) -> [status, msg, result, meta]
 
 Execute a command for each repo in the bunch.
 
@@ -1329,7 +1337,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 list_bunch_contents(%args) -> [status, msg, result, meta]
+=head2 list_bunch_contents
+
+Usage:
+
+ list_bunch_contents(%args) -> [status, msg, result, meta]
 
 List contents inside gitbunch directory.
 
@@ -1409,7 +1421,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 sync_bunch(%args) -> [status, msg, result, meta]
+=head2 sync_bunch
+
+Usage:
+
+ sync_bunch(%args) -> [status, msg, result, meta]
 
 Synchronize bunch to another bunch.
 
@@ -1607,7 +1623,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

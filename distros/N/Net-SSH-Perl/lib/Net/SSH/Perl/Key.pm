@@ -37,7 +37,7 @@ sub new_from_blob {
     my $b = Net::SSH::Perl::Buffer->new( MP => 'SSH1' );
     $b->append($blob);
     my $ssh_name = $b->get_str;
-    my $type = $KEY_TYPES{$ssh_name};
+    my $type = $KEY_TYPES{$ssh_name} or return;
     __PACKAGE__->new($type, @_);
 }
 

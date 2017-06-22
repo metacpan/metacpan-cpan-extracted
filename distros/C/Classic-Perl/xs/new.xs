@@ -247,21 +247,29 @@ STATIC OP *cp_pp_split(pTHX) {
  PADOFFSET offset;
 #endif
 
-#ifdef DEBUGGING
-  Copy(&LvTARGOFF(*(SP-2)), &pm, 1, PMOP*);
+#ifdef OPpSPLIT_ASSIGN
+ pm = (PMOP*)PL_op;
 #else
-  pm = (PMOP*)*(SP-2);
+# ifdef DEBUGGING
+ Copy(&LvTARGOFF(*(SP-2)), &pm, 1, PMOP*);
+# else
+ pm = (PMOP*)*(SP-2);
+# endif
 #endif
 
-#ifdef USE_ITHREADS
  if(gimme == G_ARRAY) {
+#ifdef OPpSPLIT_ASSIGN
+  PL_op->op_private &=~ OPpSPLIT_ASSIGN;
+#endif
+#ifdef USE_ITHREADS
   offset = pm->op_pmreplrootu.op_pmtargetoff;
   pm->op_pmreplrootu.op_pmtargetoff = 0;
- }
 #else
- if(gimme == G_ARRAY)
   pm->op_pmreplrootu.op_pmtargetgv = NULL;
 #endif
+ }
+
+  
 
  cp_map_fetch(PL_op, &oi);
 
@@ -270,11 +278,16 @@ STATIC OP *cp_pp_split(pTHX) {
  /* Restore the PL_defgv in case it’s in scalar or void context next time.
   */
  if(gimme == G_ARRAY)
+ {
+#ifdef OPpSPLIT_ASSIGN
+  PL_op->op_private |= OPpSPLIT_ASSIGN;
+#endif
 #ifdef USE_ITHREADS
   pm->op_pmreplrootu.op_pmtargetoff = offset;
 #else
   pm->op_pmreplrootu.op_pmtargetgv = PL_defgv;
 #endif
+ }
 
  return retval;  
 }
@@ -294,7 +307,14 @@ STATIC OP *cp_ck_split(pTHX_ OP *o) {
  o = (*cp_old_ck_split)(aTHX_ o);
 
  if (hint) {
-  register PMOP *pm = (PMOP*)((LISTOP*)o)->op_first;
+  /* OP_SPLIT is itself a PMOP in perl 5.26+; its op_first is a PMOP in
+     earlier versions.  */
+#ifdef OPpSPLIT_ASSIGN
+ register PMOP *pm = cPMOPo;
+ o->op_private |= OPpSPLIT_ASSIGN;
+#else
+ register PMOP *pm = (PMOP*)((LISTOP*)o)->op_first;
+#endif
 #ifdef USE_ITHREADS
   if (!pm->op_pmreplrootu.op_pmtargetoff) {
    /* This technique is copied from Perl_ck_rvconst, which is where split

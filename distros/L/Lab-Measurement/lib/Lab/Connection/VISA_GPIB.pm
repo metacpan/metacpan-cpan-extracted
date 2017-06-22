@@ -10,8 +10,7 @@
 # TODO: Access to GPIB VISA attributes, device clear, ...
 
 package Lab::Connection::VISA_GPIB;
-our $VERSION = '3.543';
-
+$Lab::Connection::VISA_GPIB::VERSION = '3.550';
 use strict;
 use Lab::VISA;
 use Lab::Bus::VISA;

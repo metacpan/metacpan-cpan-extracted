@@ -1,0 +1,12 @@
+Changes
+lib/Data/Dx.pm
+Makefile.PL
+MANIFEST
+README
+t/00.load.t
+t/pod-coverage.t
+t/pod.t
+t/D_x.t
+t/Dx.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

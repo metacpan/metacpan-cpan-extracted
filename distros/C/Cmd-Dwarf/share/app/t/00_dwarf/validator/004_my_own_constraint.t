@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 5;
+use Test::More tests => 4;
 use Dwarf::Validator;
 use Plack::Request;
 
@@ -14,7 +14,6 @@ my $q = Plack::Request->new(
 my $v = Dwarf::Validator->new($q);
 $v->load_constraints('+Dwarf::Validator::Constraint');
 ok(!$v->has_error);
-is($v->query, $q);
 $v->check(
     'foo' => [qw/TIME NOT_NULL/],
     'bar' => [qw/TIME NOT_NULL/],

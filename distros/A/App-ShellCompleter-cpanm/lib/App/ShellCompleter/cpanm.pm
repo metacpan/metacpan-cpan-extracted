@@ -1,7 +1,7 @@
 package App::ShellCompleter::cpanm;
 
-our $DATE = '2016-10-21'; # DATE
-our $VERSION = '0.17'; # VERSION
+our $DATE = '2017-06-17'; # DATE
+our $VERSION = '0.18'; # VERSION
 
 1;
 # ABSTRACT: Shell completion for cpanm
@@ -18,7 +18,7 @@ App::ShellCompleter::cpanm - Shell completion for cpanm
 
 =head1 VERSION
 
-This document describes version 0.17 of App::ShellCompleter::cpanm (from Perl distribution App-ShellCompleter-cpanm), released on 2016-10-21.
+This document describes version 0.18 of App::ShellCompleter::cpanm (from Perl distribution App-ShellCompleter-cpanm), released on 2017-06-17.
 
 =head1 SYNOPSIS
 
@@ -52,7 +52,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

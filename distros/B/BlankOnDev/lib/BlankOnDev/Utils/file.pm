@@ -5,7 +5,7 @@ use warnings FATAL => 'all';
 # Use or Require Module :
 
 # Version :
-our $VERSION = '0.1003';
+our $VERSION = '0.1005';;
 
 # Create Subroutine for Just Read Files :
 # ------------------------------------------------------------------------

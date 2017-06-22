@@ -3,7 +3,7 @@ package Prty;
 use strict;
 use warnings;
 
-our $VERSION = 1.107;
+our $VERSION = 1.108;
 
 =encoding utf8
 
@@ -380,6 +380,10 @@ L<Prty::OrderedHash> - Hash mit geordneten Elementen
 
 =item *
 
+L<Prty::Parallel> - Führe eine Berechnung parallel aus
+
+=item *
+
 L<Prty::Path> - Dateisystem-Operationen
 
 =item *
@@ -604,13 +608,17 @@ L<Prty::Url> - URL Klasse
 
 =item *
 
+L<Prty::XML::LibXML> - Funktionale Erweiterungen von XML::LibXML
+
+=item *
+
 L<Prty::XTerm> - XTerminal Fenster
 
 =back
 
 =head1 VERSION
 
-1.107
+1.108
 
 =head1 AUTHOR
 

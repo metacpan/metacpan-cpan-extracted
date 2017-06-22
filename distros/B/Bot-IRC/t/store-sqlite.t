@@ -4,19 +4,22 @@ use warnings;
 use Test::Most;
 use Test::MockModule;
 
-package MockDBI {
-    sub new {
-        return bless( {}, shift );
-    }
-    sub do {}
-    sub prepare {
-        return shift;
-    }
-    sub execute {}
-    sub fetchrow_array {
-        return '{"value":"things"}';
-    }
-};
+package MockDBI;
+
+sub new {
+    return bless( {}, shift );
+}
+sub do {}
+sub prepare {
+    return shift;
+}
+sub execute {}
+sub fetchrow_array {
+    return '{"value":"things"}';
+}
+
+package main;
+
 my $store = Test::MockModule->new('DBI');
 $store->mock( connect => sub { return MockDBI->new } );
 

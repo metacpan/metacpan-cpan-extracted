@@ -1,5 +1,5 @@
 #!perl
-use Test::More tests => 21;
+use Test::More tests => 23;
 use warnings;
 use strict;
 
@@ -116,6 +116,40 @@ subtest 'check simple service call' => sub {
 subtest 'check service call with authentication but no credentials' => sub {
     # given
     my $service = create_service_with_scpd_data();
+    my $service_name = 'SomeService';
+    my @arguments = ('InputArgument' => 'foo');
+    $mock_ua->unmap_all;
+    $mock_ua->map($service->fritz->upnp_url.$service->controlURL, get_unauthorized_response());
+
+    # when
+    my $result = $service->call($service_name, @arguments);
+
+    # then
+    isa_ok( $result, 'Net::Fritz::Error', 'service response' );
+    like( $result->error, qr/no credentials/, 'error message' );
+};
+
+subtest 'check service call with authentication but incomplete credentials (no username)' => sub {
+    # given
+    my $pass = 'pass';
+    my $service = create_service_with_scpd_data( password => $pass);
+    my $service_name = 'SomeService';
+    my @arguments = ('InputArgument' => 'foo');
+    $mock_ua->unmap_all;
+    $mock_ua->map($service->fritz->upnp_url.$service->controlURL, get_unauthorized_response());
+
+    # when
+    my $result = $service->call($service_name, @arguments);
+
+    # then
+    isa_ok( $result, 'Net::Fritz::Error', 'service response' );
+    like( $result->error, qr/no credentials/, 'error message' );
+};
+
+subtest 'check service call with authentication but incomplete credentials (no password)' => sub {
+    # given
+    my $user = 'user';
+    my $service = create_service_with_scpd_data( username => $user);
     my $service_name = 'SomeService';
     my @arguments = ('InputArgument' => 'foo');
     $mock_ua->unmap_all;

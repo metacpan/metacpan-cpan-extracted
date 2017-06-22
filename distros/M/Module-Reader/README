@@ -33,7 +33,7 @@ EXPORTS
   module_content ( $module_name, @search_directories )
     Returns the content of a given module.
 
-CLASS ATTRIBUTES
+ATTRIBUTES
     inc An array reference containing a list of directories or hooks to
         search for modules or files. This will be used in the same manner
         that require uses @INC. If not provided, @INC itself will be used.
@@ -51,6 +51,18 @@ CLASS ATTRIBUTES
     open
         A boolean controlling if the files found will be opened immediately
         when found. Defaults to true.
+
+    abort_on_eacces
+        A boolean controlling if an error should be thrown or if the path
+        should be skipped when encountering "EACCES" (access denied) errors.
+        Defaults to true on perl 5.18 and above, matching the behavior of
+        require.
+
+    check_hooks_for_nonsearchable
+        For non-searchable paths (absolute paths and those starting with
+        "./" or "../") attempt to check the hook items (and not the
+        directories) in @INC if the file cannot be found directly. This
+        matches the behavior of perl. Defaults to true.
 
 METHODS
   module
@@ -79,7 +91,7 @@ FILE OBJECTS
 
   FILE METHODS
    filename
-    The filename that was seached for.
+    The filename that was searched for.
 
    module
     If a module was searched for, or a file of the matching form
@@ -172,7 +184,7 @@ SEE ALSO
         information for the files that it finds.
 
     Module::Locate
-        Innacurately searches @INC for matching files. Attempts to handle
+        Inaccurately searches @INC for matching files. Attempts to handle
         hooks, but handles most cases wrong.
 
     Module::Mapper

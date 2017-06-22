@@ -1,0 +1,38 @@
+---
+abstract: "Telegram bot that send you a snapshot from IP camera using ffmpeg (don't forget to install it!)"
+author:
+  - 'Pavel Serikov <pavelsr@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Telegram-CamshotBot
+requires:
+  Cwd: '0'
+  Data::Dumper: '0'
+  Data::Printer: '0'
+  Date::Format: '0'
+  Exporter: '0'
+  File::Basename: '0'
+  File::Spec::Functions: '0'
+  Mojolicious::Commands: '0'
+  Mojolicious::Lite: '0'
+  Mojolicious::Plugin::JSONConfig: '0'
+  Net::Ping: '0'
+  Regexp::Common: '0'
+  Telegram::Bot::Message: '0'
+  WWW::Telegram::BotAPI: '0'
+  feature: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/pavelsr/camshotbot/issues
+  repository: git://github.com/pavelsr/camshotbot.git
+version: '0.01'
+x_serialization_backend: 'YAML::Tiny version 1.69'

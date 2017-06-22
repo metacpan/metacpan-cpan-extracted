@@ -1,0 +1,6 @@
+name = "List-Haystack"
+# badges = ["travis"]
+authority="cpan:MOZNION"
+
+module_maker="ModuleBuildTiny"
+

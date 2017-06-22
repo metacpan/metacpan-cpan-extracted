@@ -188,6 +188,8 @@ SKIP: foreach my $json_module (@json_modules)
 
     test_r_json $schema, 'float', '<float>123.4560</float>', '123.456';
     test_r_json $schema, 'float', '<float>-123.4560</float>', '-123.456';
+
+ TODO:
     {
         local $TODO = "NaN/inf support partially buggy";
         # see https://github.com/rurban/Cpanel-JSON-XS/issues/78

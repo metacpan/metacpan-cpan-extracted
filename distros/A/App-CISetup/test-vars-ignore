@@ -1,2 +1,3 @@
 App::CISetup::Role::ConfigFileFinder = $pushed
+App::CISetup::Role::ConfigUpdater = $pushed
 App::CISetup::Travis::ConfigFile = $pushed

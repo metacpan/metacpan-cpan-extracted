@@ -5,7 +5,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = '1.28';
+our $VERSION = '1.29';
 
 use Exporter;
 use Module::Implementation;
@@ -77,7 +77,7 @@ Params::Validate - Validate method/function parameters
 
 =head1 VERSION
 
-version 1.28
+version 1.29
 
 =head1 SYNOPSIS
 
@@ -162,10 +162,15 @@ version 1.28
 
 =head1 DESCRIPTION
 
-The Params::Validate module allows you to validate method or function
-call parameters to an arbitrary level of specificity. At the simplest
-level, it is capable of validating the required parameters were given
-and that no unspecified additional parameters were passed in.
+B<< I would recommend you consider using L<Params::ValidationCompiler>
+instead. That module, despite being pure Perl, is I<significantly> faster than
+this one, at the cost of having to adopt a type system such as L<Specio>,
+L<Type::Tiny>, or the one shipped with L<Moose> >>.
+
+This module allows you to validate method or function call parameters to an
+arbitrary level of specificity. At the simplest level, it is capable of
+validating the required parameters were given and that no unspecified
+additional parameters were passed in.
 
 It is also capable of determining that a parameter is of a specific
 type, that it is an object of a certain class hierarchy, that it
@@ -872,9 +877,13 @@ Ilya Martynov <ilya@martynov.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords E. Choroba Ivan Bessarabov J.R. Mash Karen Etheridge Noel Maddy Olivier Mengué Tony Cook Vincent Pit
+=for stopwords Andy Grundman E. Choroba Ivan Bessarabov J.R. Mash Karen Etheridge Noel Maddy Olivier Mengué Tony Cook Vincent Pit
 
 =over 4
+
+=item *
+
+Andy Grundman <andyg@activestate.com>
 
 =item *
 

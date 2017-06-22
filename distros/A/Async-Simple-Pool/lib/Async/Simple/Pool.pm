@@ -195,7 +195,7 @@ use namespace::autoclean;
 use Class::Load;
 use Clone;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head2 data
 

@@ -1,7 +1,7 @@
 package Mac::PopClip::Quick::Role::Apps;
 use Moo::Role;
 
-our $VERSION = '1.000001';
+our $VERSION = '1.000002';
 
 requires '_plist_action_key_values';
 
@@ -46,7 +46,7 @@ plist.
 =cut
 
 has 'blocked_apps' => (
-    is => 'ro',
+    is      => 'ro',
     default => sub { [] },
 );
 
@@ -61,7 +61,7 @@ plist.
 =cut
 
 has 'required_apps' => (
-    is => 'ro',
+    is      => 'ro',
     default => sub { [] },
 );
 

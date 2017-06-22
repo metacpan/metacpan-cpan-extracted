@@ -1,6 +1,6 @@
 package WWW::Google::CustomSearch;
 
-$WWW::Google::CustomSearch::VERSION   = '0.34';
+$WWW::Google::CustomSearch::VERSION   = '0.35';
 $WWW::Google::CustomSearch::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WWW::Google::CustomSearch - Interface to Google JSON/Atom Custom Search.
 
 =head1 VERSION
 
-Version 0.34
+Version 0.35
 
 =cut
 
@@ -30,43 +30,28 @@ extends 'WWW::Google::UserAgent';
 
 our $BASE_URL = "https://www.googleapis.com/customsearch/v1";
 
-has 'callback'         => (is => 'ro');
-has 'fields'           => (is => 'ro');
 has 'prettyprint'      => (is => 'ro', isa => TrueFalse);
-has 'quotaUser'        => (is => 'ro');
-has 'userIp'           => (is => 'ro');
 has 'c2coff'           => (is => 'ro', isa => Bool);
-has 'cr'               => (is => 'ro');
-has 'cref'             => (is => 'ro');
-has 'cx'               => (is => 'ro');
-has 'dateRestrict'     => (is => 'ro');
-has 'exactTerms'       => (is => 'ro');
-has 'excludeTerms'     => (is => 'ro');
-has 'fileType'         => (is => 'ro');
+has 'fileType'         => (is => 'ro', isa => FileType);
+has 'hl'               => (is => 'ro', isa => InterfaceLang);
+has 'cr'               => (is => 'ro', isa => CountryC);
+has 'gl'               => (is => 'ro', isa => CountryCode);
 has 'filter'           => (is => 'ro', isa => Bool, default => sub { return 1 });
-has 'gl'               => (is => 'ro');
-has 'googlehost'       => (is => 'ro');
-has 'highRange'        => (is => 'ro');
-has 'hl'               => (is => 'ro');
-has 'hq'               => (is => 'ro');
-has 'imgColorType'     => (is => 'ro');
-has 'imgDominantColor' => (is => 'ro');
-has 'imgSize'          => (is => 'ro');
-has 'imgType'          => (is => 'ro');
-has 'linkSite'         => (is => 'ro');
-has 'lowRange'         => (is => 'ro');
-has 'lr'               => (is => 'ro');
+has 'imgColorType'     => (is => 'ro', isa => ColorType);
+has 'imgDominantColor' => (is => 'ro', isa => DominantColor);
+has 'imgSize'          => (is => 'ro', isa => ImageSize);
+has 'imgType'          => (is => 'ro', isa => ImageType);
+has 'lr'               => (is => 'ro', isa => LanguageC);
 has 'num'              => (is => 'ro', default => sub { return 10 });
-has 'orTerms'          => (is => 'ro');
-has 'relatedSite'      => (is => 'ro');
-has 'rights'           => (is => 'ro');
 has 'safe'             => (is => 'ro', default => sub { return 'off' });
-has 'searchType'       => (is => 'ro');
-has 'siteSearch'       => (is => 'ro');
-has 'siteSearchFilter' => (is => 'ro');
-has 'sort'             => (is => 'ro');
+has 'searchType'       => (is => 'ro', isa => SearchType);
+has 'siteSearchFilter' => (is => 'ro', isa => SearchFilter);
 has 'start'            => (is => 'ro', default => sub { return 1 });
 has 'alt'              => (is => 'ro', isa => FileType, default => sub { return 'json' });
+
+has [ qw(callback fields quotaUser userIp cref cx dateRestrict exactTerms
+         excludeTerms googlehost highRange hq linkSite lowRange orTerms
+         relatedSite rights sort siteSearch) ] => (is => 'ro');
 
 =head1 DESCRIPTION
 
@@ -135,7 +120,7 @@ See L<WWW::Google::CustomSearch::Result> for further details of the search resul
 
 =head1 LANGUAGES (lr)
 
-    +---------------------0-+---------------------------------------------------+
+    +-----------------------+---------------------------------------------------+
     | Language              | Value                                             |
     +-----------------------+---------------------------------------------------+
     | Arabic                | lang_ar                                           |

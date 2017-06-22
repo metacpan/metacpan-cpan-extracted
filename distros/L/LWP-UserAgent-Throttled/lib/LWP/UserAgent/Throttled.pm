@@ -2,6 +2,7 @@ package LWP::UserAgent::Throttled;
 
 use LWP;
 use Time::HiRes;
+use LWP::UserAgent;
 
 our @ISA = ('LWP::UserAgent');
 
@@ -11,11 +12,11 @@ LWP::UserAgent::Throttled - Throttle requests to a site
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
@@ -41,12 +42,12 @@ See L<LWP::UserAgent>.
 
 sub send_request {
 	my $self = shift;
-	my ($request, $arg, $size) = @_;
+	# my ($request, $arg, $size) = @_;
+	my $request = $_[0];
 	my $host = $request->uri()->host();
 
 	if((defined($self->{'throttle'})) && $self->{'throttle'}{$host}) {
 		if($self->{'lastcallended'}{$host}) {
-			my $now = Time::HiRes::time();
 			my $waittime = $self->{'throttle'}{$host} - (Time::HiRes::time() - $self->{'lastcallended'}{$host});
 
 			if($waittime > 0) {
@@ -104,7 +105,7 @@ L<LWP::UserAgent>
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc LWP::Throttle
+    perldoc LWP::UserAgent::Throttled
 
 You can also look for information at:
 
@@ -112,19 +113,19 @@ You can also look for information at:
 
 =item * RT: CPAN's request tracker
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=LWP-Throttle>
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=LWP-UserAgent-Throttled>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
-L<http://annocpan.org/dist/LWP-Throttle>
+L<http://annocpan.org/dist/LWP-UserAgent-Throttled>
 
 =item * CPAN Ratings
 
-L<http://cpanratings.perl.org/d/LWP-Throttle>
+L<http://cpanratings.perl.org/d/LWP-UserAgent-Throttled>
 
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/LWP-Throttle/>
+L<http://search.cpan.org/dist/LWP-UserAgent-Throttled/>
 
 =back
 

@@ -1,3 +1,11 @@
+v0.41.0 2017-06-22T02:41:36Z
+ - No issues on bugtracker were closed since the last release
+ - Ref::Util added to Pcore::Util::Scalar
+ - Pcore::HTTP use more fastest ref functions
+ - ca_file.pem updated
+ - result class rewrited using is_ref_* functions
+ - is_glob function fixed
+
 v0.40.3 2017-06-08T05:22:02Z
  - No issues on bugtracker were closed since the last release
  - cache lru bench added

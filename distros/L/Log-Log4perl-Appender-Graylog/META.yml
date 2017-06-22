@@ -6,7 +6,8 @@ build_requires:
   Data::Faker: '0'
   Data::Printer: '0'
   Data::Random::String: '0'
-  Log::Log4perl: '0'
+  IO::Uncompress::Gunzip: '0'
+  JSON: '0'
   Log::Log4perl::Layout::NoopLayout: '0'
   Test::MockModule: '0'
   Test::Moose::More: '0'
@@ -22,10 +23,15 @@ meta-spec:
   version: '1.4'
 name: Log-Log4perl-Appender-Graylog
 requires:
+  Carp: '0'
   Data::UUID: '0'
+  Devel::StackTrace: '0'
+  IO::Compress::Gzip: '0'
   IO::Socket: '0'
-  JSON: '0'
+  IO::Socket::INET: '0'
   JSON::Tiny: '0'
+  Log::GELF::Util: '0'
+  Log::Log4perl: '0'
   Moose: '0'
   MooseX::Types: '0'
   MooseX::Types::Moose: '0'
@@ -40,5 +46,5 @@ resources:
   bugtracker: https://github.com/dimentox/log-log4perl-appender-graylog/issues
   homepage: https://metacpan.org/release/Log-Log4perl-Appender-Graylog
   repository: git://github.com/dimentox/log-log4perl-appender-graylog.git
-version: '1.3'
+version: '1.7'
 x_serialization_backend: 'YAML::Tiny version 1.70'

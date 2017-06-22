@@ -1,8 +1,21 @@
+1.022 2017-06-21
+
+  Bug fixes for smoke test failures:
+    * test failure exit code to be != 0
+    * work-around test issue with perl < 5,18
+    
+1.021 2017-06-18
+
+  Bug fixes:
+    * try to smoke test failures: convert cme test
+      to use App::Cmd::Tester
+    * remove deprecated arg '~~' from doc
+
 1.020 2017-06-05
 
   Improvements for all commands :
     * allow backend_argument (used by systemd)
-    * unknown options are fatal
+    * unknown options trigger a warning
 
   Bug fixes:
     * all: fix bash completion of -file option

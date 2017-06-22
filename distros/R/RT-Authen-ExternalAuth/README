@@ -248,3 +248,6 @@ LICENSE AND COPYRIGHT
 
       The GNU General Public License, Version 2, June 1991
 
+  constant_time_eq($a, $b)
+    Taken verbatim from RT 4.4's RT::Util.
+

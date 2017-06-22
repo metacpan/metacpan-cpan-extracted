@@ -10,7 +10,7 @@ configure_requires:
   Module::Build: '0.4005'
   Module::Build::XSUtil: '0.16'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Minilla/v3.0.12, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,14 +29,15 @@ no_index:
 provides:
   Hash::Util::Pick:
     file: lib/Hash/Util/Pick.pm
-    version: '0.11'
+    version: '0.12'
 requires:
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/pine/p5-Hash-Util-Pick/issues
   homepage: https://github.com/pine/p5-Hash-Util-Pick
   repository: git://github.com/pine/p5-Hash-Util-Pick.git
-version: '0.11'
+version: '0.12'
 x_authority: cpan:PINE
 x_contributors:
   - 'Pine Mizune <pinemz@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

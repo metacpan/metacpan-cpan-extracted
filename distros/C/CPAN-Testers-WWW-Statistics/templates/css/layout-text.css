@@ -335,3 +335,5 @@ th.w200         { width: 25%; }
 #iheart a img,
 #iheart a:hover img,
 #iheart a:visited img { border:0 }
+#iheart ul { list-style: none outside none; display: list-item; background-image: none; }
+#iheart ul li { list-style: none outside none; display: list-item; background-image: none; }

@@ -18,7 +18,7 @@ Perinci::CmdLine::Manual - Perinci::CmdLine manual
 
 =head1 VERSION
 
-This document describes version 1.50 of Perinci::CmdLine::Manual (from Perl distribution Perinci-CmdLine), released on 2016-12-10.
+This document describes version 1.51 of Perinci::CmdLine::Manual (from Perl distribution Perinci-CmdLine), released on 2017-06-17.
 
 =head1 DESCRIPTION
 
@@ -444,13 +444,16 @@ L<Perinci::CmdLine::Manual::Examples>
 
 L<Perinci::CmdLine::Manual::FAQ>
 
+A list of tutorial posts on my blog, will eventually be moved to POD:
+L<https://perlancar.wordpress.com/category/pericmd-tut/>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

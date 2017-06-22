@@ -1,5 +1,15 @@
 Revision history for Group-Git
 
+0.6.1   2017-06-18
+        Updating for release of version 0.6.1
+        Adding new file for testing (Ivan Wills)
+        Added new file (Ivan Wills)
+        Adding some documentation (Ivan Wills)
+        New command to give a brief status of each repository (Ivan Wills)
+        Fixing removing the checked thread (Ivan Wills)
+        Changing which thread in the array is checked to see if it's running (Ivan Wills)
+        Some extra logic for coping with very large numbers of repositories to process while threadding (Ivan Wills)
+
 0.6.0   2017-02-26
         Updating for release of version 0.6.0
         Updated dates (Ivan Wills)

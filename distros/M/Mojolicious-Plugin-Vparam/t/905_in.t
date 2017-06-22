@@ -6,7 +6,7 @@ use utf8;
 use open qw(:std :utf8);
 use lib qw(lib ../lib ../../lib);
 
-use Test::More tests => 12;
+use Test::More tests => 20;
 use Encode qw(decode encode);
 
 BEGIN {
@@ -50,6 +50,22 @@ note 'in';
         is $self->verror('str3'), 0,
             'str3 no error, set default';
 
+        is $self->vparam( int1 => 'int', in => [0 .. 10] ),
+            0,                                                  'int1 0';
+        is $self->verror('int1'), 0,                            'int1 no error';
+
+        is $self->vparam( int2 => 'int', in => [0 .. 10] ),
+            5,                                                  'int2 5';
+        is $self->verror('int2'), 0,                            'int2 no error';
+
+        is $self->vparam( int3 => 'int', in => [0 .. 10] ),
+            5,                                                  'int3 5';
+        is $self->verror('int3'), 0,                            'int3 no error';
+
+        is $self->vparam( int4 => 'int', in => [0 .. 10] ),
+            undef,                                              'int4 undef';
+        is $self->verror('int4'), 'Value not defined',          'int4 error';
+
         $self->render(text => 'OK.');
     });
 
@@ -58,6 +74,11 @@ note 'in';
         str1    => 'abcdef',
         str2    => '123456',
         str3    => 'abcdef',
+
+        int1    => 0,
+        int2    => 5,
+        int3    => '  5  ',
+        int4    => '',
     });
 
     diag decode utf8 => $t->tx->res->body unless $t->tx->success;

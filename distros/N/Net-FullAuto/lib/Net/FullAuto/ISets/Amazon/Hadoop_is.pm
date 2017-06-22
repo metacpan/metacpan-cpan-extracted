@@ -72,7 +72,7 @@ my $configure_hadoop=sub {
       "sudo debconf-set-selections");
    ($stdout,$stderr)=$handle->cmd(
       "sudo apt-get -o Dpkg::Progress=true -y --force-yes install ".
-      "oracle-jdk7-installer 2>&1",'__display__');
+      "oracle-java8-installer 2>&1",'__display__');
    my $gcnt=2;my $md5='';my $targz='';my $hadoop_mirror='';
    while (--$gcnt) {
       my $url='http://www.apache.org/dyn/closer.cgi/hadoop/common/';
@@ -161,12 +161,12 @@ END
       #} else {
       #   if ($dc<3) {
       #      ($stdout,$stderr)=$handle->cmd("sudo rm -rvf $md5",'__display__');
-            ($stdout,$stderr)=$handle->cmd("sudo rm -rvf $targz",'__display__');
+      #      ($stdout,$stderr)=$handle->cmd("sudo rm -rvf $targz",'__display__');
       #      next; 
       #   }
       #   print "FATAL ERROR! : CHECKSUM Test for $targz *FAILED* ",
       #         "after $dc attempts\n";
-         &Net::FullAuto::FA_Core::cleanup;
+      #   &Net::FullAuto::FA_Core::cleanup;
       #}
       ($stdout,$stderr)=$handle->cmd("sudo tar zxvf $targz -C /opt",
          '__display__');
@@ -257,7 +257,7 @@ END
    }
    # http://sed.sourceforge.net/sed1line.txt - useful one line sed scripts
    ($stdout,$stderr)=$handle->cmd('sudo sed -i \'s#[$][{]JAVA_HOME[}]#'.
-      '/usr/lib/jvm/java-7-oracle#\' /opt/'.$targz.
+      '/usr/lib/jvm/java-8-oracle#\' /opt/'.$targz.
       '/etc/hadoop/hadoop-env.sh',
       '__display__');
    ($stdout,$stderr)=$handle->cmd(

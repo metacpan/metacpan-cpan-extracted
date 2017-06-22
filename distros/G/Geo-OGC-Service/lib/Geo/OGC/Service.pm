@@ -73,13 +73,41 @@ The configuration must be in JSON format. I.e., something like
 
   {
     Common: {
-        "CORS": "*",
+        "CORS": {
+                "Allow-Origin" : "*",
+                "Allow-Headers" : "Content-Type, X-Requested-With"
+        },
         "Content-Type": "text/xml; charset=utf-8",
-        "version": "1.1.0",
         "TARGET_NAMESPACE": "http://ogr.maptools.org/"
     },
     WFS: {
-        ...WFS configuration...
+        "resource": "http://$HTTP_HOST/WFS",
+        "version": "1.1.0",
+        "TARGET_NAMESPACE": "http://ogr.maptools.org/",
+        "PREFIX": "ogr",
+        "Transaction": "Insert,Update,Delete",
+        "FeatureTypeList": [
+            {
+            }
+        ]
+    },
+    "WMS": {
+        "resource": "http://$HTTP_HOST/WMS"
+    },
+    "TMS": {
+        "resource": "http://$HTTP_HOST/TMS"
+    },
+    "WMTS": {
+        "resource": "http://$HTTP_HOST/WMTS"
+    },
+    "TileSets": [
+    ],
+    "BoundingBox3857": {
+        "SRS": "EPSG:3857",
+        "minx": 2399767,
+        "miny": 8645741,
+        "maxx": 2473612,
+        "maxy": 8688005
     }
   }
 
@@ -88,6 +116,9 @@ service(s) you are setting up. "CORS" is the only one that is
 recognized by this module. "CORS" is either a string denoting the
 allowed origin or a hash of "Allow-Origin", "Allow-Methods",
 "Allow-Headers", and "Max-Age".
+
+$HTTP_HOST and $SCRIPT_NAME are replaced in runtime to the HTTP_HOST
+and SCRIPT_NAME values respectively in the environment given by Plack.
 
 =head2 EXPORT
 
@@ -114,7 +145,7 @@ use parent qw/Plack::Component/;
 
 binmode STDERR, ":utf8"; 
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =pod
 
@@ -127,7 +158,13 @@ parameters are
   config, services
 
 config is required and it is a path to a file or a reference to an
-anonymous hash containing the configuration for the services.
+anonymous hash containing the configuration for the services. The top
+level keys are service names. If it is a file, it is expected to be
+JSON. A configuration in a file may use top level Common hash and
+references. A reference is a key,value pair, where the value begins
+with 'ref:/' followed by a top level key name. The Common block is
+cloned and references are solved and cloned into each service
+configuration.
 
 services is a reference to a hash of service names associated with
 names of classes, which will process service requests. The key of the
@@ -162,6 +199,7 @@ sub expand_config {
     } while ($had_ref);
     for my $j (keys %$config) {
         next if $j eq 'Common';
+        next if $j =~ /^BoundingBox/;
         next unless ref $config->{$j} eq 'HASH';
         for my $c (keys %{$config->{Common}}) {
             $config->{$j}{$c} //= clone($config->{Common}{$c});
@@ -277,19 +315,28 @@ sub respond {
 =head3 service
 
 This method does a preliminary interpretation of the request and
-converts it into a service object, which is returned. The contents of
-the configuration are cloned into the service object.
+converts it into a service object, which is returned. 
 
 The returned service object contains
 
-  config => a clone of the configuration for this type of service
+  config => the configuration for this type of service
   env => the PSGI environment
 
 and may contain
 
+  plugin => plugin object
+
   posted => XML::LibXML DOM document element of the posted data
   filter => XML::LibXML DOM document element of the filter
   parameters => hash of rquest parameters obtained from Plack::Request
+
+config is the service specific part of the config given to this
+Geo::OGC::Service object in its constructor, possibly worked to clone
+the Common block and references. The service should treat it strictly
+read-only as it is shared between workers.
+
+plugin is the plugin object that was given to this Geo::OGC::Service
+object in its constructor.
 
 Note: all keys in request parameters are converted to lower case in
 parameters.
@@ -308,8 +355,8 @@ sub service {
     my $service = { 
         env => $env, 
         request => $request,
-        processor => $self->{processor} 
         # will get below:
+        # plugin
         # posted
         # filter
         # parameters
@@ -382,13 +429,22 @@ sub service {
         $service_from_script_name->($env) // ''; 
 
     if (exists $self->{services}{$requested_service}) {
-        bless $service, $self->{services}{$requested_service};
         $service->{service} = $requested_service;
-        my $config = $self->{config_maker} ?
-            $self->{config_maker}->config($self->{config}) :
-            $self->{config};
+        my $class = $self->{services}{$requested_service};
+        if (ref $class) {
+            $service->{plugin} = $class->{plugin};
+            $class = $class->{service};
+        }
+        $service->{plugin} //= $self->{plugin};
+        my $config = $self->{config};
         $service->{config} = get_config($config, $requested_service);
-        return $service;
+        if ($service->{config}{resource}) {
+            my $host = $env->{HTTP_HOST};
+            $service->{config}{resource} =~ s/\$HTTP_HOST/$host/ if $host;
+            my $script = $env->{SCRIPT_NAME};
+            $service->{config}{resource} =~ s/\$SCRIPT_NAME/$script/ if $script;
+        }
+        return bless $service, $class;
     }
 
     error($responder, { exceptionCode => 'InvalidParameterValue',
@@ -397,6 +453,10 @@ sub service {
     return undef;
 }
 
+# the value of the key, whose name is the service
+# may be the config for the service 
+# or it may be the name of the key
+# whose value is the config for the service
 sub get_config {
     my ($config, $service) = @_;
     if (exists $config->{$service}) {
@@ -683,8 +743,11 @@ sub element {
                 croak ref($element)." can't be used as an XML element.";
             } elsif ($element eq '>') {
             } else {
-                $element = decode utf8 => $element unless is_utf8($element);
-                $self->write($element);
+                if (is_utf8($element)) {
+                    $self->write($element);
+                } else {
+                    $self->write(decode utf8 => $element);
+                }
             }
         }
         $self->write("</$tag>");

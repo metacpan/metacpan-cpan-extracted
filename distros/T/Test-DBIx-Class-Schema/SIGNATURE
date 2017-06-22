@@ -14,15 +14,15 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 3f56c1b64735a83bfe5b52db4bac1d47242744a5 Changes
+SHA1 0ae49d1cce42dd4e95475011f7e877b0f82365ea Changes
 SHA1 7e6f65547635e6316f29f3a11b66debcf0c56cc9 LICENSE
 SHA1 ade8f962e7ec56d4f0c10cb58c94a7f0a0a4142c MANIFEST
-SHA1 6c3f9857f4cd6c66bac15bd3f88f456a69d2b2a1 META.json
-SHA1 5d723bf3d84f420539fa39e8889066646ac58e2d META.yml
-SHA1 b0a161e50f132922a781d0d4e53c51e7362f3c1e Makefile.PL
-SHA1 e6393dc91a4077ba9d39ca63d8ac954c290e9df3 README.mkdn
+SHA1 f6819b0b649389d391665948a4cd2a6e05a3957d META.json
+SHA1 3131ee79a569186e3a556126831a5cf02f48a469 META.yml
+SHA1 a1260517845965a50df98ffc80791faa1be70ae9 Makefile.PL
+SHA1 463c40b6cc3c60c167166e36f0bff49e0011d0d6 README.mkdn
 SHA1 80b87a11b70a06c26334f2d24685cebbaad868eb dist.ini
-SHA1 96a8dd68ab7e726c541b0371c3aa69fd7b5ac4b6 lib/Test/DBIx/Class/Schema.pm
+SHA1 c364d2214f15702b5ecc3e97cb8ccbc59cce89ee lib/Test/DBIx/Class/Schema.pm
 SHA1 bad45123d4184a7d07244fb4a82bda7180361449 script/buildkite-init/build-project
 SHA1 7fe2e0f0789feea19409889f9c11ca4d45a86457 script/buildkite-init/create-project
 SHA1 ceb80d8b6de753bf985aae18cd4cdbf9805d636d t/10.test.dbix.class.schema.t
@@ -37,9 +37,9 @@ SHA1 c8a160c2d58b3f70af598bb998bb0d8a810af28c t/20.run_tests.track.t
 SHA1 5813ce94b160606d9266b6d08db1207f3b6fba45 t/30.failing_tests.artist.t
 SHA1 a3e4f26cb650daad5e121f565de2a5180ba299bc t/30.failing_tests.cd.t
 SHA1 c595d0d957c5fe2969f2ea5b14d2e47c19808742 t/30.failing_tests.track.t
-SHA1 6c8ca0e97977ceeaf59a846adb5c98619f0d3b94 t/30.missing_methods.t
+SHA1 d2f5a620cdf8b7316b6738a22e9546ecc60dc6ac t/30.missing_methods.t
 SHA1 4e76c991f870b7b09300ef8bb0ff261f011a608b t/30.todo.skip.t
-SHA1 be0ce7710c38d548e86bc21b6df186a584f38204 t/40.untested.columns.t
+SHA1 fe07a77fdbf85c14ffa33e9efb4aec3abf343d37 t/40.untested.columns.t
 SHA1 a41c15a5898efb72ba7ce626fa6e243138765981 t/author-no-tabs.t
 SHA1 8efad25309730a4d501fb40fc03eda4697303372 t/author-pod-syntax.t
 SHA1 af9f2b59cca4fcf130deefd45072e2248d1ff975 t/lib/DBHelper.pm
@@ -65,7 +65,7 @@ SHA1 91bacb1498d0fb115ed2f1130ffbe8d593931a2d weaver.ini
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iEYEARECAAYFAlk1GE8ACgkQh4j7xTiFuxFM/QCeKbccHkLSqgO+rdc0eG7yACCb
-wE4AnAgvyRHf9rZ5+EHZcfxaelzQU91d
-=dnfk
+iEYEARECAAYFAlk+XIIACgkQh4j7xTiFuxE4uwCfebhJKZv49m5uFCtbXggcD7Fv
+7vcAn0We58FNYJauxewpK9f/bWuieLOv
+=6mTl
 -----END PGP SIGNATURE-----

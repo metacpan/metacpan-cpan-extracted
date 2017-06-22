@@ -62,6 +62,7 @@ t/data/missing-in-action.txt
 t/data/passreports.sql
 t/data/profile.sql
 t/data/release_summary.sql
+t/data/stats_store.sql
 t/data/uploads.sql
 templates/archive.html
 templates/cgi-bin/cpanmail.cgi

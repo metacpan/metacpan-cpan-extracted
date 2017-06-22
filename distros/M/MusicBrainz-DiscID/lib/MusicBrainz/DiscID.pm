@@ -14,7 +14,7 @@ use strict;
 
 use vars qw/$VERSION/;
 
-$VERSION="0.03";
+$VERSION="0.04";
 
 XSLoader::load('MusicBrainz::DiscID', $VERSION);
 
@@ -156,7 +156,7 @@ Returns a device string for the default device for this platform.
 Construct a new DiscID object.
 
 As an optional argument the name of the device to read the ID from may 
-be given. If you donÔt specify a device here you can later read the ID with 
+be given. If you don't specify a device here you can later read the ID with 
 the read method.
 
 =item $discid->error_msg()

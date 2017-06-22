@@ -9,7 +9,7 @@
 
 package Math::Evol;
 no strict;
-$VERSION = '1.12';
+$VERSION = '1.13';
 # gives a -w warning, but I'm afraid $VERSION .= ''; would confuse CPAN
 require Exporter;
 @ISA = qw(Exporter);
@@ -127,6 +127,8 @@ sub select_evol { my ($xbref,$smref,$func_ref,$constrain_ref,$nchoices) = @_;
 
 	my $debug = 0;
 	my $n = scalar @xb;      # number of variables
+	# warn and return if $n==0,  else $test_every=0 and we get a div by 0
+	if ($n==0) { die("Math::Evol::select_evol 1st arg was an empty array\n"); }
 	my $nm1 = $n + $[ - 1;   # last index
 	my ($choice, $continue);
 
@@ -209,9 +211,9 @@ sub text_evol { my ($text, $nchoices); local ($func_ref);
 	my @sub_constr = ("sub constrain {\n");
 	my $i = $[; while ($i <= $n) {
 		if (defined $min[$i] && defined $max[$i]) {
-			push @sub_constr,"\tif (\$_[$i]>$max[$i]) { \$_[$i]=$max[$i];\n";
-			push @sub_constr,"\t} elsif (\$_[$i]<$min[$i]) { \$_[$i]=$min[$i];\n";
-			push @sub_constr,"\t}\n";
+		  push @sub_constr,"\tif (\$_[$i]>$max[$i]) { \$_[$i]=$max[$i];\n";
+		  push @sub_constr,"\t} elsif (\$_[$i]<$min[$i]) {\$_[$i]=$min[$i];\n";
+		  push @sub_constr,"\t}\n";
 		} elsif (defined $min[$i]) {
 			push @sub_constr,"\tif (\$_[$i]<$min[$i]) { \$_[$i]=$min[$i]; }\n";
 		} elsif (defined $max[$i]) {
@@ -228,7 +230,7 @@ sub text_evol { my ($text, $nchoices); local ($func_ref);
 		while ($xbref = shift @_) {
 			my @newtext = @text; my $i = $[;
 			foreach $linenum (@linenums) {
-				$newtext[$linenum] = $firstbits[$i] . sprintf ('%g', $$xbref[$i])
+				$newtext[$linenum] = $firstbits[$i].sprintf('%g',$$xbref[$i])
 				. $middlebits[$i];
 				$i++;
 			}
@@ -318,7 +320,7 @@ in a text file, the parameters to be varied being identified in the text
 by means of special comments.  A script I<ps_evol> which uses that is
 included for human-judgement-based fine-tuning of drawings in PostScript.
 
-Version 1.12
+Version 1.13
 
 =head1 SUBROUTINES
 
@@ -468,7 +470,7 @@ For example,
     my $continue   = confirm('Continue ?');
     return ($preference, $continue);
  }
- ($xbref, $smref, $fb, $lf) = evol(\@xb, \@sm, \&choose_best);
+ ($xbref, $smref, $fb, $lf) = select_evol(\@xb, \@sm, \&choose_best);
 
 =item I<choose_best_text>( $text1, $text2, $text3 ... );
 

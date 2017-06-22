@@ -64,7 +64,7 @@ $sweep->start();
 my $file_path = catfile( $folder, 'MEAS_000', "${file}.dat" );
 
 my $expected = <<"EOD";
-#COLUMNS#\tvolt
+#volt
 +0.00000E+0
 +0.10000E+0
 +0.20000E+0

@@ -16,14 +16,14 @@ use lib '.';
 use t::Server ();
 
 my $gts = t::Server->new();
-$gts || plan skip_all => $t::Server::ERROR;
+my @job_servers = $gts->job_servers(int(rand(1) + 1));
+@job_servers || plan skip_all => $t::Server::ERROR;
 
 plan tests => 6;
 
 use_ok("Gearman::Client");
 use_ok("Gearman::Worker");
 
-my @job_servers = $gts->job_servers(int(rand(1) + 1));
 my $func        = "sum";
 my @a           = map { int(rand(100)) } (0 .. int(rand(10) + 5));
 my $arg         = freeze([@a]);

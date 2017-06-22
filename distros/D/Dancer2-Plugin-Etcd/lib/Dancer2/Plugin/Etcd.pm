@@ -11,13 +11,13 @@ Dancer2::Plugin::Etcd
 
 =cut
 
-our $VERSION = '0.006';
+our $VERSION = '0.011';
 
 use Dancer2::Core::Types qw/Bool HashRef Str/;
 use Dancer2::Plugin;
 use Data::Dumper;
 use File::Spec;
-use Etcd3;
+use Net::Etcd;
 
 =head1 SYNOPSIS
 
@@ -189,7 +189,7 @@ sub etcd {
             $settings->{$_} = $plugin->{$_};
         }
     }
-    return Etcd3->new( $settings );
+    return Net::Etcd->new( $settings );
 };
 
 =head1 AUTHOR

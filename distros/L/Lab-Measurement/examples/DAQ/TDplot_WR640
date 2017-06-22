@@ -30,7 +30,7 @@ sub usage {
 }
 
 our $DEBUG   = $Lab::Generic::CLOptions::DEBUG;
-our $VERSION = '3.543';
+our $VERSION = '3.544';
 our $VERBOSE = 1;
 
 my $user = getlogin || getpwuid($<) || '?';

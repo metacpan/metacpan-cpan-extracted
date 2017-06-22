@@ -13,6 +13,9 @@ dist.ini
 eg/quickstart/etc/greet.yml
 eg/quickstart/lib/My/Runnable/Greeting.pm
 lib/Beam/Runnable.pm
+lib/Beam/Runnable/AllowUsers.pm
+lib/Beam/Runnable/DenyUsers.pm
+lib/Beam/Runnable/Single.pm
 lib/Beam/Runnable/Timeout/Alarm.pm
 lib/Beam/Runner.pm
 lib/Beam/Runner/Command.pm
@@ -23,10 +26,12 @@ lib/Beam/Runner/Util.pm
 t/00-compile.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
+t/allow_users.t
 t/command.t
 t/command/help.t
 t/command/list.t
 t/command/run.t
+t/deny_users.t
 t/lib/Beam/Runner/Command/test.pm
 t/lib/Local/Runnable.pm
 t/lib/Local/Underdocumented.pm
@@ -34,5 +39,6 @@ t/lib/Local/Undocumented.pm
 t/share/container.yml
 t/share/empty.yml
 t/share/undocumented.yml
+t/single.t
 t/timeout/alarm.t
 weaver.ini

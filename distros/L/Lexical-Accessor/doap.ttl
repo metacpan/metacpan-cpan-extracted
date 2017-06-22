@@ -1,5 +1,6 @@
 @prefix dc:    <http://purl.org/dc/terms/> .
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-bugs: <http://ontologi.es/doap-bugs#> .
 @prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
 @prefix doap-deps: <http://ontologi.es/doap-deps#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
@@ -28,7 +29,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Lexical-Accessor";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-008>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-009>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-lexical-accessor>;
@@ -157,10 +158,44 @@
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Lexical-Accessor-0.008.tar.gz>;
 	doap:revision        "0.008"^^xsd:string.
 
+<http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-009>
+	a                    doap:Version;
+	dc:identifier        "Lexical-Accessor-0.009"^^xsd:string;
+	dc:issued            "2017-06-13"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Support Sub::Util instead of Sub::Name (with Sub::Name as a fallback).";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fixes for defaults in accessors.";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/101024>;
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Make `has` return coderefs as documented.";
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/amon>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-lexical-accessor/pull/1>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Lexical-Accessor-0.009.tar.gz>;
+	doap:revision        "0.009"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/amon>
+	a                    foaf:Person;
+	foaf:name            "Lukas Atkinson";
+	foaf:nick            "AMON";
+	foaf:page            <https://metacpan.org/author/AMON>.
+
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;
 	foaf:mbox            <mailto:tobyink@cpan.org>;
 	foaf:name            "Toby Inkster";
 	foaf:nick            "TOBYINK";
 	foaf:page            <https://metacpan.org/author/TOBYINK>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/101024>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "101024"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=101024>.
 

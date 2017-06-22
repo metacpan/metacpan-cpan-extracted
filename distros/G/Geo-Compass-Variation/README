@@ -23,6 +23,10 @@ DESCRIPTION
     See NOAA <https://www.ngdc.noaa.gov/geomag/WMM/DoDWMM.shtml> for
     details.
 
+    The WMM data is currently valid from January 1, 2015 through December
+    31, 2019. This module will be updated with new WMM data as it becomes
+    available.
+
 EXPORT_OK
 
     All functions must be imported explicitly:
@@ -62,7 +66,11 @@ FUNCTIONS
         $year
 
     Optional, Integer|Float: The year to base the calculation from.
-    Defaults to 2017.5.
+    Defaults to YYYY.M, where YYYY is the year from localtime() and M is
+    the month number from localtime().
+
+    We will die() if the year is out of range of the current WMM
+    specification.
 
     Return: A floating point number representing the magnetic declination.
 

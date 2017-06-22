@@ -1,9 +1,61 @@
 ==================================================
-Changes from 2016-06-10 00:00:00 +0000 to present.
+Changes from 2016-06-15 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.002 at 2017-06-10 15:07:42 +0000
+version 0.004 at 2017-06-15 17:01:30 +0000
+------------------------------------------
+
+  Change: 4f1ab43ead44285a0a988f06263cd7f8481ddbdd
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-06-15 17:59:23 +0000
+
+    Test to run without mysqld 
+
+  Change: 2154a60fc93262b51d804a9e188ae59e6ff822c6
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-06-13 11:52:33 +0000
+
+    Addressed failed compilation on strawberry perl
+    http://www.cpantesters.org/cpan/report/9c4abd5b-6bf3-1014-b2c2-baa676
+    ed181e 
+
+------------------------------------------
+version 0.003 at 2017-06-12 12:13:53 +0000
+------------------------------------------
+
+  Change: 423eb001423f5111862a911243c74a79fb058e19
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-06-12 13:13:53 +0000
+
+    It is now safe to use multiple instances of this in the same process 
+
+  Change: 23204ce1d01d2f267ab79fef499d9fed581ad524
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-06-12 09:53:02 +0000
+
+    Build a second one in a different scope 
+
+  Change: b14c9711098f67403f50e87cc7d579f20d9135e1
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-06-11 22:05:25 +0000
+
+    WIP Moo 
+
+  Change: 7d6d46d3bebbd78af22cd2b55591c2f9b252804b
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-06-11 22:00:18 +0000
+
+    Release the lock in case of crash 
+
+  Change: 33a485dbee1e1f59bd737af5964dc81c091a8d3c
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-06-11 11:08:23 +0000
+
+    Moo, not Moose 
+
+------------------------------------------
+version 0.002 at 2017-06-10 14:36:53 +0000
 ------------------------------------------
 
   Change: d96caddea86281e7133e06d36c4d544333894750

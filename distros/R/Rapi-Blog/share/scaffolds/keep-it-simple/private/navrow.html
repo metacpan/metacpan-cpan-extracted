@@ -1,0 +1,79 @@
+[%- SET nav = scaffold.nav_sections -%]
+
+
+<ul id="nav" class="nav" style="width:100%;">
+[% FOREACH i IN nav %]
+
+  [% SET is_current = 0 %]
+  [% IF i.path == request_path %]
+    [% SET is_current = 1 %]
+  [% ELSIF i.children %]
+    [% FOREACH child IN i.children %]
+      [% SET is_current = 1 IF child.path == request_path %]
+    [% END %]
+  [% END %]
+  
+  [% SET cls = '' %]
+  [% SET cls = cls _ 'current' IF is_current %]
+  [% SET cls = cls _ ' has_children' IF i.children %]
+  [% SET href = i.path || '#' %]
+  
+  <li class="[% cls %]">
+    <a href="[% i.path %]">[% i.title %]</a>
+    [% IF i.children %]
+      <ul>
+      [% FOREACH child IN i.children %]
+        <li><a href="[% child.path %]">[% child.title %]</a></li>
+      [% END %]
+      </ul>
+    [% END %]
+  </li>
+[% END %]
+
+
+[%- IF User -%]
+  <li class="has_children" style="float:right;min-width:120px;">
+    <a style="cursor:pointer;">
+      <div class="avatar" >
+         [% SET img_url = User.image_url || 'images/user-01.png' %]
+         <img 
+				  style="border-radius:100%;margin-bottom:-7px;"
+				 	width="25" height="25" class="avatar" 
+					src="[% img_url %]" alt=""
+				 >&nbsp;[% User.username %] <span style="font-size:.8em;">&#9660;</span>
+      </div>
+
+	  </a>
+    <ul>
+      <li><a href="[% c.mount_url %]/adm/#!/adm/main/db/db_post/add">
+        <i class="fa fa-plus"></i>&nbsp;
+        New Post
+      </a></li>
+      <li><a href="[% c.mount_url %]/adm">
+        <i class="fa fa-gear"></i>&nbsp;
+        Admin area
+      </a></li>
+      <li><a href="[% c.mount_url %]/adm/#!/adm/main/db/db_user/item/[% User.id %]">
+        <i class="fa fa-user"></i>&nbsp;
+        User Profile
+      </a></li>
+      <li><a href="[% c.mount_url %]/auth/logout_to_referer">
+        <i class="fa fa-sign-out"></i>&nbsp;
+        Sign out
+      </a></li>
+    </ul>
+  </li>
+
+[%- ELSE -%]
+  <li style="float:right;">
+    <a href="[% c.mount_url %]/auth/to_referer">
+    <i class="fa fa-sign-in"></i>&nbsp;Sign in
+   </a>
+  </li>
+
+[%- END -%]
+
+
+</ul>
+
+

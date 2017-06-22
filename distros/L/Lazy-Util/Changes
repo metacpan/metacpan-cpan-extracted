@@ -1,0 +1,11 @@
+0.003     2017-06-13 22:49:00+02:00 Europe/Stockholm
+  - Expand l_map documentation
+  - Rename Lazy::Util::OO to Lazy::Iterator
+  - Remove l_nuniq and l_uniq in favour of l_map
+
+0.002     2017-06-12 22:16:47+02:00 Europe/Stockholm
+  - Separate out OO stuff into Lazy::Util::OO module
+  - Change how SCALAR_DEFER constant is set (Grinnz++)
+
+0.001     2017-06-12 20:06:11+02:00 Europe/Stockholm
+  - First release

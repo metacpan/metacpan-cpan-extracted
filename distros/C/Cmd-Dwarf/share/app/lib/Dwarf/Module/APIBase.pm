@@ -2,6 +2,7 @@ package Dwarf::Module::APIBase;
 use Dwarf::Pragma;
 use parent 'Dwarf::Module';
 use Dwarf::Validator;
+use Dwarf::Validator::Constraint;
 use HTTP::Date;
 
 use Dwarf::Accessor {
@@ -79,6 +80,7 @@ sub call_before_trigger {
 }
 
 sub will_dispatch {}
+sub did_dispatch {}
 
 sub validate {
 	my ($self, @rules) = @_;
@@ -91,6 +93,23 @@ sub validate {
 			$self->c->error->LACK_OF_PARAM($param) if $detail->{FILE_NOT_NULL};
 			$self->c->error->INVALID_PARAM($param);
 		}
+	}
+}
+
+sub validate_response {
+	my ($self, @rules) = @_;
+	return if $self->c->is_production;
+
+	eval {
+		$self->args(
+			{ @rules },
+			$self,
+			$self->c->response->body
+		);
+	};
+
+	if ($@) {
+		$self->c->error->ERROR($@);
 	}
 }
 

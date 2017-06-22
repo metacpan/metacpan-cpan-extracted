@@ -19,7 +19,6 @@ Feature: Multiple hook files with a glob
           Hello World!
       """
 
-  @announce
   Scenario:
     Given a file named "hookfile1.pl" with:
       """

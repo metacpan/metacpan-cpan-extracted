@@ -2,7 +2,7 @@ package Acme::MetaSyntactic::wales_towns;
 use strict;
 use Acme::MetaSyntactic::List;
 our @ISA = qw( Acme::MetaSyntactic::List );
-our $VERSION = '1.009';
+our $VERSION = '1.010';
 __PACKAGE__->init();
 
 our %Remote = (
@@ -40,6 +40,12 @@ Abigail, Philippe Bruhat (BooK).
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2017-06-12 - v1.010
+
+Updated from the source web site in Acme-MetaSyntactic-Themes version 1.050.
 
 =item *
 
@@ -129,7 +135,6 @@ Abergele
 Aberporth
 Abertillery
 Aberystwyth
-Afonwen
 Amlwch
 Ammanford
 Argoed
@@ -179,7 +184,6 @@ Denbigh
 Dolgellau
 Ebbw_Vale
 Ewloe
-Ferndale
 Ffestiniog
 Fishguard
 Flint
@@ -192,7 +196,6 @@ Hakin
 Harlech
 Haverfordwest
 Hay_on_Wye
-Holt
 Holyhead
 Holywell
 Kidwelly
@@ -230,7 +233,6 @@ Miskin
 Mold
 Monmouth
 Montgomery
-Mountain_Ash
 Narberth
 Neath
 Nefyn
@@ -252,7 +254,7 @@ Penmaenmawr
 Penrhyn_Bay
 Pontardawe
 Pontarddulais
-pontyclun
+Pontyclun
 Pontypool
 Pontypridd
 Porth
@@ -275,7 +277,6 @@ Senghenydd
 Shotton
 St_Asaph
 St_Clears
-St_David_s
 Swansea
 Talgarth
 Templeton
@@ -290,5 +291,6 @@ Usk
 Welshpool
 Whitland
 Wrexham
+Ynysddu
 Ystradgynlais
 Ystrad_Mynach

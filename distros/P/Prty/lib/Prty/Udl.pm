@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.107;
+our $VERSION = 1.108;
 
 use Prty::Hash;
 use Prty::Option;
@@ -597,6 +597,9 @@ sub dsn {
     elsif ($dbms eq 'sqlite') {
         $dsn = "DBI:SQLite:dbname=$db";
     }
+    elsif ($dbms eq 'access') {
+        $dsn = "DBI:ODBC:$db";
+    }
     else {
         $self->throw(
             q{UDL-00002: Nicht-unterstütztes DBMS},
@@ -666,7 +669,7 @@ sub udl {
 
         # Rückwärtskompatibilität
 
-        if (!grep { $dbms eq $_ } qw/oracle postgresql sqlite mysql/) {
+        if (!grep { $dbms eq $_ } qw/oracle postgresql sqlite mysql access/) {
             ($dbms,$db,$user,$password) = ($user,$password,$dbms,$db);
         }
 
@@ -689,7 +692,7 @@ sub udl {
 
 =head1 VERSION
 
-1.107
+1.108
 
 =head1 AUTHOR
 

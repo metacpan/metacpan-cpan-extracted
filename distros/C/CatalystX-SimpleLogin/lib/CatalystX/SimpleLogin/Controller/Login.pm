@@ -1,6 +1,5 @@
 package CatalystX::SimpleLogin::Controller::Login;
 use Moose;
-use Moose::Autobox;
 use MooseX::Types::Moose qw/ HashRef ArrayRef ClassName Object Str Int/;
 use MooseX::Types::Common::String qw/ NonEmptySimpleStr /;
 use CatalystX::SimpleLogin::Form::Login;
@@ -74,9 +73,9 @@ with 'MooseX::RelatedClassRoles' => { name => 'login_form' };
 
 sub _build_login_form {
     my $self = shift;
-    $self->apply_login_form_class_roles($self->login_form_class_roles->flatten)
-        if scalar $self->login_form_class_roles->flatten; # FIXME - Should MX::RelatedClassRoles
-                                                          #         do this automagically?
+    $self->apply_login_form_class_roles(@{$self->login_form_class_roles})
+        if scalar @{$self->login_form_class_roles}; # FIXME - Should MX::RelatedClassRoles
+                                                    #         do this automagically?
     return $self->login_form_class->new($self->login_form_args);
 }
 
@@ -292,7 +291,7 @@ require registration (hence the name).
 An action that is called to deal with whether the remember me flag has
 been set or not.  If it has been it extends the session expiry time.
 
-This is only called if there was a succesful login so if you want a
+This is only called if there was a successful login so if you want a
 hook into that part of the process this is a good place to hook into.
 
 It is also obviously a good place to hook into if you want to change

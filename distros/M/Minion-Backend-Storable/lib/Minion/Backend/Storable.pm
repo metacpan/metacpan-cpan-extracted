@@ -1,22 +1,30 @@
 package Minion::Backend::Storable;
 use Minion::Backend -base;
 
-our $VERSION = 5.084;
+our $VERSION = 6.051;
 
-use IO::Compress::Gzip 'gzip';
-use IO::Uncompress::Gunzip 'gunzip';
-use List::Util 'first';
-use Storable qw(freeze thaw);
 use Sys::Hostname 'hostname';
 use Time::HiRes qw(time usleep);
 
 # Attributes
 
-has deserialize => sub { \&_deserialize };
 has 'file';
-has serialize => sub { \&_serialize };
 
 # Methods
+
+sub broadcast {
+  my ($self, $command, $args, $ids) = (shift, shift, shift || [], shift || []);
+
+  my $guard = $self->_guard->_write;
+  my $inboxes = $guard->_inboxes;
+  my $workers = $guard->_workers;
+  @$ids = @$ids ? map exists($workers->{$_}), @$ids
+      : keys %$workers unless @$ids;
+
+  push @{$inboxes->{$_} ||= []}, [$command, @$args] for @$ids;
+
+  return !!@$ids;
+}
 
 sub dequeue {
   my ($self, $id, $wait, $options) = @_;
@@ -34,7 +42,7 @@ sub enqueue {
     attempts => $options->{attempts} // 1,
     created  => time,
     delayed  => time + ($options->{delay} // 0),
-    id       => $guard->_id,
+    id       => $guard->_job_id,
     parents  => $options->{parents} || [],
     priority => $options->{priority} // 0,
     queue    => $options->{queue} // 'default',
@@ -83,15 +91,24 @@ sub list_workers {
 
 sub new { shift->SUPER::new(file => shift) }
 
-sub register_worker {
+sub receive {
   my ($self, $id) = @_;
+  my $guard = $self->_guard->_write;
+  my $inboxes = $guard->_inboxes;
+  my $inbox = $inboxes->{$id} || [];
+  $inboxes->{$id} = [];
+  return $inbox;
+}
+
+sub register_worker {
+  my ($self, $id, $options) = (shift, shift, shift || {});
   my $guard = $self->_guard->_write;
   my $worker = $id ? $guard->_workers->{$id} : undef;
   unless ($worker) {
     $worker = {host => hostname, id => $guard->_id, pid => $$, started => time};
     $guard->_workers->{$worker->{id}} = $worker;
   }
-  $worker->{notified} = time;
+  @$worker{qw(notified status)} = (time, $options->{status} || {});
   return $worker->{id};
 }
 
@@ -127,7 +144,7 @@ sub repair {
   # Old jobs without unfinished dependents
   $after = time - $minion->remove_after;
   for my $job (values %$jobs) {
-    next unless $job->{state} eq 'finished' and $job->{finished} < $after;
+    next unless $job->{state} eq 'finished' and $job->{finished} <= $after;
     my $id = $job->{id};
     delete $jobs->{$id} unless grep +($jobs->{$_}{state} ne 'finished'),
         @{$guard->_children($id)};
@@ -149,7 +166,8 @@ sub retry_job {
   my ($self, $id, $retries, $options) = (shift, shift, shift, shift || {});
 
   my $guard = $self->_guard;
-  return undef unless my $job = $guard->_job($id, 'inactive', 'failed', 'finished');
+  return undef
+    unless my $job = $guard->_job($id, qw(active failed finished inactive));
   return undef unless $job->{retries} == $retries;
   $guard->_write;
   ++$job->{retries};
@@ -179,27 +197,23 @@ sub stats {
     inactive_workers => keys(%{$guard->_workers}) - $active,
     active_jobs      => $states{active}   // 0,
     delayed_jobs     => $delayed,
+    enqueued_jobs    => $guard->_job_count,
     failed_jobs      => $states{failed}   // 0,
     finished_jobs    => $states{finished} // 0,
     inactive_jobs    => $states{inactive} // 0
   };
 }
 
-sub unregister_worker { delete shift->_guard->_write->_workers->{shift()} }
+sub unregister_worker {
+  my ($self, $id) = @_;
+  my $guard = $self->_guard->_write;
+  delete $guard->_inboxes->{$id};
+  delete $guard->_workers->{$id};
+}
 
 sub worker_info { $_[0]->_worker_info($_[0]->_guard, $_[1]) }
 
-sub _deserialize {
-  gunzip \(my $compressed = shift), \my $uncompressed;
-  return thaw $uncompressed;
-}
-
 sub _guard { Minion::Backend::Storable::_Guard->new(backend => shift) }
-
-sub _serialize {
-  gzip \(my $uncompressed = freeze(pop)), \my $compressed;
-  return $compressed;
-}
 
 sub _try {
   my ($self, $id, $options) = @_;
@@ -291,16 +305,27 @@ sub _data { $_[0]{data} ||= retrieve($_[0]{backend}->file) }
 sub _id {
   my $self = shift;
   my $id;
-  do { $id = md5_hex(time . rand 999) }
-    while $self->_workers->{$id} or $self->_jobs->{$id};
+  do { $id = md5_hex(time . rand 999) } while $self->_workers->{$id};
   return $id;
 }
+
+sub _inboxes { shift->_data->{inboxes} ||= {} }
 
 sub _job {
   my ($self, $id) = (shift, shift);
   return undef unless my $job = $self->_jobs->{$id};
-  return(grep(+($job->{state} eq $_), @_) ? $job : undef);
+  return(grep(($job->{state} eq $_), @_) ? $job : undef);
 }
+
+sub _job_id {
+  my $self = shift;
+  my $id;
+  do { $id = md5_hex(time . rand 999) } while $self->_jobs->{$id};
+  ++$self->_data->{job_count};
+  return $id;
+}
+
+sub _job_count { shift->_data->{job_count} //= 0 }
 
 sub _jobs { shift->_data->{jobs} ||= {} }
 
@@ -330,23 +355,12 @@ Minion::Backend::Storable - File backend for Minion job queues.
 L<Minion::Backend::Storable> is a highly portable file-based backend for
 L<Minion>.
 
+This version supports Minion v6.06.
+
 =head1 ATTRIBUTES
 
 L<Minion::Backend::Storable> inherits all attributes from L<Minion::Backend> and
-implements the following new ones.
-
-=head2 deserialize
-
-  my $cb   = $backend->deserialize;
-  $backend = $backend->deserialize(sub {...});
-
-A callback used to deserialize data, defaults to using L<Storable> with gzip
-compression.
-
-  $backend->deserialize(sub {
-    my $bytes = shift;
-    return {};
-  });
+implements the following new one.
 
 =head2 file
 
@@ -355,23 +369,18 @@ compression.
 
 File all data is stored in.
 
-=head2 serialize
-
-  my $cb   = $backend->serialize;
-  $backend = $backend->serialize(sub {...});
-
-A callback used to serialize data, defaults to using L<Storable> with gzip
-compression.
-
-  $backend->serialize(sub {
-    my $hash = shift;
-    return '';
-  });
-
 =head1 METHODS
 
 L<Minion::Backend::Storable> inherits all methods from L<Minion::Backend> and
 implements the following new ones.
+
+=head2 broadcast
+
+  my $bool = $backend->broadcast('some_command');
+  my $bool = $backend->broadcast('some_command', [@args]);
+  my $bool = $backend->broadcast('some_command', [@args], [$id1, $id2, $id3]);
+
+Broadcast remote control command to one or more workers.
 
 =head2 dequeue
 
@@ -446,7 +455,7 @@ L<Minion/"backoff"> after the first attempt, defaults to C<1>.
 
   delay => 10
 
-Delay job for this many seconds (from now).
+Delay job for this many seconds (from now), defaults to C<0>.
 
 =item parents
 
@@ -459,7 +468,8 @@ transitioned to the state C<finished> before it can be processed.
 
   priority => 5
 
-Job priority, defaults to C<0>.
+Job priority, defaults to C<0>.  Jobs with a higher priority get performed
+first.
 
 =item queue
 
@@ -644,12 +654,32 @@ Returns the same information as L</"worker_info"> but in batches.
 
 Construct a new L<Minion::Backend::Storable> object.
 
+=head2 receive
+
+  my $commands = $backend->receive($worker_id);
+
+Receive remote control commands for worker.
+
 =head2 register_worker
 
   my $worker_id = $backend->register_worker;
   my $worker_id = $backend->register_worker($worker_id);
+  my $worker_id = $backend->register_worker(
+      $worker_id, {status => {queues => ['default', 'important']}});
 
 Register worker or send heartbeat to show that this worker is still alive.
+
+These options are currently available:
+
+=over 2
+
+=item status
+
+  status => {queues => ['default', 'important']}
+
+Hash reference with whatever status information the worker would like to share.
+
+=back
 
 =head2 remove_job
 
@@ -674,8 +704,8 @@ Reset job queue.
   my $bool = $backend->retry_job($job_id, $retries);
   my $bool = $backend->retry_job($job_id, $retries, {delay => 10});
 
-Transition from C<failed> or C<finished> state back to C<inactive>, already
-C<inactive> jobs may also be retried to change options.
+Transition job back to C<inactive> state, already C<inactive> jobs may also be
+retried to change options.
 
 These options are currently available:
 
@@ -685,7 +715,7 @@ These options are currently available:
 
   delay => 10
 
-Delay job for this many seconds (from now).
+Delay job for this many seconds (from now), defaults to C<0>.
 
 =item priority
 
@@ -728,8 +758,15 @@ Number of workers that are currently processing a job.
   delayed_jobs => 100
 
 Number of jobs in C<inactive> state that are scheduled to run at specific time
-in the future or have unresolved dependencies. Note that this field is
+in the future or have unresolved dependencies.  Note that this field is
 EXPERIMENTAL and might change without warning!
+
+=item enqueued_jobs
+
+  enqueued_jobs => 100000
+
+Rough estimate of how many jobs have ever been enqueued.  Note that this field
+is EXPERIMENTAL and might change without warning!
 
 =item failed_jobs
 
@@ -806,13 +843,19 @@ Process id of worker.
 
 Epoch time worker was started.
 
+=item status
+
+  status => {queues => ['default', 'important']}
+
+Hash reference with whatever status information the worker would like to share.
+
 =back
 
 =head1 COPYRIGHT AND LICENCE
 
 Copyright (c) 2014 Sebastian Riedel.
 
-Copyright (c) 2015--2016 Sebastian Riedel & Nic Sandfield.
+Copyright (c) 2015--2017 Sebastian Riedel & Nic Sandfield.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.

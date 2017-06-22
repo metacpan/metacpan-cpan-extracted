@@ -1,7 +1,6 @@
 
 package Lab::Instrument::Multimeter;
-our $VERSION = '3.543';
-
+$Lab::Instrument::Multimeter::VERSION = '3.550';
 use strict;
 use Lab::Instrument;
 

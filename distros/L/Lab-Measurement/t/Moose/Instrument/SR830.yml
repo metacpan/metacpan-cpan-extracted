@@ -521,6 +521,22 @@ retval: '3
 
 '
 ---
-command: '*RST'
+command: OFLT 10
 id: 96
+method: Write
+---
+command: OFSL 0
+id: 97
+method: Write
+---
+command: OFLT 8
+id: 98
+method: Write
+---
+command: OFSL 2
+id: 99
+method: Write
+---
+command: '*RST'
+id: 100
 method: Write

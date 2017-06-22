@@ -6,13 +6,14 @@ use utf8;
 use open qw(:std :utf8);
 use lib qw(lib ../lib);
 
-use Test::More tests    => 56;
+use Test::More tests    => 76;
 use Encode qw(decode encode);
 
 
 BEGIN {
     use_ok 'DR::Tnt::Msgpack';
     use_ok 'DR::Tnt::Msgpack::Types', ':all';
+    use_ok 'JSON::XS';
 }
 
 is msgpack(mp_bool(1)), pack('C', 0xC3), 'true';
@@ -49,3 +50,48 @@ is ${ mp_true() }, 1, 'false';
 
 is_deeply msgunpack(msgpack mp_true), mp_true, 'pack true';
 is_deeply msgunpack(msgpack mp_false), mp_false, 'pack false';
+
+
+sub j($) {
+    my ($o) = @_;
+    JSON::XS
+        -> new
+        -> utf8
+        -> allow_blessed
+        -> convert_blessed
+
+        -> encode($o)
+    ;
+}
+
+isa_ok mp_true, DR::Tnt::Msgpack::Types::Bool::;
+isa_ok mp_false, DR::Tnt::Msgpack::Types::Bool::;
+isa_ok mp_bool(0), DR::Tnt::Msgpack::Types::Bool::;
+isa_ok mp_bool(1), DR::Tnt::Msgpack::Types::Bool::;
+
+isa_ok mp_int(123), DR::Tnt::Msgpack::Types::Int::;
+isa_ok mp_string(123), DR::Tnt::Msgpack::Types::Str::;
+isa_ok mp_blob(123), DR::Tnt::Msgpack::Types::Blob::;
+
+can_ok mp_true, 'TO_JSON';
+can_ok mp_false, 'TO_JSON';
+can_ok mp_int(123), 'TO_JSON';
+can_ok mp_string(123), 'TO_JSON';
+can_ok mp_blob(123), 'TO_JSON';
+
+is_deeply mp_int(123)->TO_JSON, 123, 'int->TO_JSON';
+is_deeply mp_string('Hello')->TO_JSON, 'Hello', 'str->TO_JSON';
+is_deeply mp_blob('Hello, world')->TO_JSON, 'Hello, world', 'blob->TO_JSON';
+
+if (eval "require JSON::XS; 1") {
+    is_deeply mp_true->TO_JSON, JSON::XS::true(), 'bool->TO_JSON';
+    is_deeply mp_false->TO_JSON, JSON::XS::false(), 'bool->TO_JSON';
+} elsif (eval "require JSON; 1") {
+    is_deeply mp_true->TO_JSON, JSON::true(), 'bool->TO_JSON';
+    is_deeply mp_false->TO_JSON, JSON::false(), 'bool->TO_JSON';
+}
+
+
+is j(mp_true), 'true', 'json encode';
+is j(mp_false), 'false', 'json encode';
+

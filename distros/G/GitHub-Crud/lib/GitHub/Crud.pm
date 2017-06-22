@@ -13,9 +13,10 @@ use Digest::SHA1 qw(sha1_hex);
 use File::Temp qw(tempfile);
 use MIME::Base64;
 
-our $VERSION = '2017.513';
+our $VERSION = '2017.615';
 
-my $pat = '40 chars length access token from GitHub';                           # A sample access token that is hopefully no longer valid!
+my $develop = 0;                                                                # Set to true if developing
+my $pat = '40 chars length access token from GitHub';                           # A sample access token that is only used during the tesing of this module
 
 Data::Table::Text::genLValueScalarMethods(
   qw(branch),                                                                   # Optional: branch name (you should create this branch manually first) or omit it for the default branch which is usually 'master'
@@ -68,7 +69,7 @@ sub GitHub::Crud::Response::new($$)                                             
        {push @data, $_;
        }
      }
-    if (keys %can)                                                              # List of new methods required
+    if (keys %can and $develop)                                                 # List of new methods required
      {say STDERR "qw($_)," for(sort keys %can);
      }
 
@@ -210,12 +211,10 @@ sub refOrBranch($$)
 
 sub new                                                                         # Create a new GitHub object
 
- {
-  my $curl = qx(curl -v);                                                       # Check Curl
+ {my $curl = qx(curl -V);                                                       # Check Curl
   if ($curl =~ /command not found/)
    {confess "Command 𝗰𝘂𝗿𝗹 not found"
    }
-
   return bless {}
  }
 

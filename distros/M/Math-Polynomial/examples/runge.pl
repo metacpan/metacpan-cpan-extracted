@@ -1,10 +1,8 @@
 #!/usr/bin/perl
 
-# Copyright (c) 2009 Martin Becker.  All rights reserved.
+# Copyright (c) 2009-2017 Martin Becker.  All rights reserved.
 # This package is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-#
-# $Id: runge.pl 4 2009-05-10 22:14:58Z demetri $
 
 # Math::Polynomial usage example: demonstrating Runge's phenomenon
 #

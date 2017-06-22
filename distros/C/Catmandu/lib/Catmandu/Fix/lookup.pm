@@ -2,7 +2,7 @@ package Catmandu::Fix::lookup;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0507';
+our $VERSION = '1.0601';
 
 use Catmandu::Importer::CSV;
 use Moo;
@@ -93,13 +93,30 @@ Catmandu::Fix::lookup - change the value of a HASH key or ARRAY index by
 looking up its value in a dictionary
 
 =head1 SYNOPSIS
+    # dictionary.csv
+    # id,planet
+    # 1,sun
+    # 2,earth
+    # 3,moon
 
-   lookup(foo.bar, dictionary.csv)
-   lookup(foo.bar, dictionary.csv, sep_char: |)
-   # delete value if the lookup fails:
-   lookup(foo.bar, dictionary.csv, delete: 1)
-   # use a default value if the lookup fails:
-   lookup(foo.bar, dictionary.csv, default: 'default value')
+    # values found in the dictionary.csv will be replaced
+    # {foo => {bar => 2}}
+    lookup(foo.bar, dictionary.csv)
+    # {foo => {bar => 'earth'}}
+
+    # values not found will be kept
+    # {foo => {bar => 232}}
+    lookup(foo.bar, dictionary.csv)
+    # {foo => {bar => 232}}
+
+    # in case you have a different seperator
+    lookup(foo.bar, dictionary.csv, sep_char: |)
+
+    # delete value if the lookup fails:
+    lookup(foo.bar, dictionary.csv, delete: 1)
+
+    # use a default value if the lookup fails:
+    lookup(foo.bar, dictionary.csv, default: 'default value')
 
 =head1 SEE ALSO
 

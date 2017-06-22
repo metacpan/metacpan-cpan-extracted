@@ -1,43 +1,90 @@
 ---
 abstract: 'Flexible serialization of a record'
 author:
-  - 'The Smithsonian Astrophysical Observatory'
   - 'Diab Jerius <djerius@cpan.org>'
 build_requires:
-  Class::Load: '0'
-  ExtUtils::MakeMaker: '6.59'
-  File::Temp: '0'
-  Test::Fatal: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  JSON::MaybeXS: '0'
+  Test2::Bundle::Extended: '0'
+  Test2::Bundle::More: '0'
+  Test2::Tools::AfterSubtest: '0'
   Test::More: '0'
+  YAML::Any: '0'
 configure_requires:
-  CPAN::Meta: '0'
-  ExtUtils::MakeMaker: '6.59'
-dynamic_config: '0'
-generated_by: 'Module::Install version 1.14, CPAN::Meta::Converter version 2.142060'
-license: unknown
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Data-Record-Serialize
 no_index:
   directory:
+    - eg
+    - examples
     - inc
+    - share
     - t
     - xt
-recommends:
-  DBD::SQLite: '0'
-  JSON::Tiny: '0'
-  YAML::Tiny: '0'
+provides:
+  Data::Record::Serialize:
+    file: lib/Data/Record/Serialize.pm
+    version: '0.12'
+  Data::Record::Serialize::Encode::dbi:
+    file: lib/Data/Record/Serialize/Encode/dbi.pm
+    version: '0.12'
+  Data::Record::Serialize::Encode::ddump:
+    file: lib/Data/Record/Serialize/Encode/ddump.pm
+    version: '0.12'
+  Data::Record::Serialize::Encode::json:
+    file: lib/Data/Record/Serialize/Encode/json.pm
+    version: '0.12'
+  Data::Record::Serialize::Encode::null:
+    file: lib/Data/Record/Serialize/Encode/null.pm
+    version: '0.12'
+  Data::Record::Serialize::Encode::rdb:
+    file: lib/Data/Record/Serialize/Encode/rdb.pm
+    version: '0.12'
+  Data::Record::Serialize::Encode::yaml:
+    file: lib/Data/Record/Serialize/Encode/yaml.pm
+    version: '0.12'
+  Data::Record::Serialize::Role::Base:
+    file: lib/Data/Record/Serialize/Role/Base.pm
+    version: '0.12'
+  Data::Record::Serialize::Role::Default:
+    file: lib/Data/Record/Serialize/Role/Default.pm
+    version: '0.12'
+  Data::Record::Serialize::Role::Encode:
+    file: lib/Data/Record/Serialize/Role/Encode.pm
+    version: '0.12'
+  Data::Record::Serialize::Role::Sink:
+    file: lib/Data/Record/Serialize/Role/Sink.pm
+    version: '0.12'
+  Data::Record::Serialize::Sink::null:
+    file: lib/Data/Record/Serialize/Sink/null.pm
+    version: '0.12'
+  Data::Record::Serialize::Sink::stream:
+    file: lib/Data/Record/Serialize/Sink/stream.pm
+    version: '0.12'
+  Data::Record::Serialize::Types:
+    file: lib/Data/Record/Serialize/Types.pm
+    version: '0.12'
 requires:
-  Class::Load: '0'
-  Hash::Util: '0'
-  List::Util: '1.38'
-  Moo: '1.004002'
+  JSON::MaybeXS: '0'
+  List::Util: '1.29'
+  Moo::Role: '2.003'
   Package::Variant: '0'
-  Types::Standard: '0.042'
-  perl: v5.10.1
+  SQL::Translator: '0'
+  Types::Standard: '1.000005'
+  YAML::Any: '0'
+  namespace::clean: '0'
+  perl: '5.01000'
 resources:
-  bugtracker: https://rt.cpan.org/Dist/Display.html?Name=Data-Record-Serialize
-  license: http://www.gnu.org/licenses/gpl-3.0.html
-  repository: https://bitbucket.org/djerius/data-record-serialize
-version: '0.07'
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize
+  repository: git://github.com/djerius/data-record-serialize.git
+version: '0.12'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -15,7 +15,7 @@ use HackaMol;
     my @attributes = qw(name);
     my @methods    = qw(
       build_bonds build_angles build_dihedrals
-      group_by_atom_attr read_file_mol read_file_push_coords_mol
+      group_by_atom_attr group_by_atom_attrs read_file_mol read_file_push_coords_mol
       read_file_atoms read_pdb_atoms read_xyz_atoms pdbid_mol
     );
 
@@ -215,6 +215,13 @@ is( $mol1->count_groups, 4, "group_by_atom_symbol" );
 $mol1->clear_groups;
 $mol1->push_groups(@gnames);
 is( $mol1->count_groups, 74, "group_by_atom_name" );
+
+#test group generation for multiple attrs
+my @aas = $hack->group_by_atom_attrs( ['resname', 'resid'],  $mol1->all_atoms );
+is( scalar(@aas), 20, "group_by_atom_attrs resname, resid -> 20 groups" );
+
+#my $i = 0;
+#print $i++, " ", $_->get_atoms(0)->resname . " ". $_->get_atoms(0)->resid . "\n" foreach @aas; exit;
 
 my @bb = grep { $_->name eq 'N' or $_->name eq 'CA' or $_->name eq 'C' }
   $mol1->all_atoms;

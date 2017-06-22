@@ -2,11 +2,11 @@ package Acme::MetaSyntactic::us_presidents;
 use strict;
 use Acme::MetaSyntactic::List;
 our @ISA = qw( Acme::MetaSyntactic::List );
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 __PACKAGE__->init();
 
 our %Remote = (
-    source  => 'http://www.whitehouse.gov/history/presidents/index.html',
+    source  => 'https://www.whitehouse.gov/1600/Presidents',
     extract => sub {
         return
             map { y'- .'_'; s/_+/_/g; s/\b(.)/uc $1/eg; $_ }
@@ -26,7 +26,7 @@ Acme::MetaSyntactic::us_presidents - The presidents of the USA theme
 Presidents of the USA.
 
 This list is based on the official White House list, available at:
-L<http://www.whitehouse.gov/history/presidents/index.html>.
+L<https://www.whitehouse.gov/1600/Presidents>.
 
 =head1 CONTRIBUTOR
 
@@ -35,6 +35,13 @@ Abigail
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2017-06-12 - v1.001
+
+Updated with the new US president since 2012
+in Acme-MetaSyntactic-Themes version 1.050.
 
 =item *
 
@@ -77,6 +84,7 @@ Barack_Obama
 Benjamin_Harrison
 Calvin_Coolidge
 Chester_Arthur
+Donald_J_Trump
 Dwight_Eisenhower
 Franklin_D_Roosevelt
 Franklin_Pierce

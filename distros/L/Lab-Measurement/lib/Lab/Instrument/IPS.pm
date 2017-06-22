@@ -2,8 +2,7 @@
 # Hence termchar => \n. For Isobus connection, no additional termchar must be added. Hence IsoEnableTermChar => 0.
 
 package Lab::Instrument::IPS;
-our $VERSION = '3.543';
-
+$Lab::Instrument::IPS::VERSION = '3.550';
 use strict;
 use Time::HiRes qw/usleep/, qw/time/;
 

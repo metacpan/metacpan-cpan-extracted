@@ -25,6 +25,7 @@ t/12_gf3.t
 t/13_trees.t
 t/14_math_modint.t
 t/15_deprecation.t
+t/16_math_bignum.t
 t/90_pod.t
 t/91_pod_cover_cp.t
 t/92_consistency.t

@@ -1,8 +1,7 @@
 #!/usr/bin/perl
 
 package Lab::Instrument::AH2700A;
-our $VERSION = '3.543';
-
+$Lab::Instrument::AH2700A::VERSION = '3.550';
 use strict;
 use Time::HiRes qw (usleep);
 use Lab::Instrument;

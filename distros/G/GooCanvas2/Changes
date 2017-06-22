@@ -1,0 +1,20 @@
+Revision history for Perl extension Goo::Canvas2.
+
+0.05  Mo Jun 19 08:40:00 2017
+	- Fix 0.05 https://rt.cpan.org/Public/Bug/Display.html?id=122129
+0.05  Mo Jun 19 07:35:00 2017
+	- Fix POD errors
+0.04  Sun Jun 18 23:35:00 2017
+	- Add GooCanvas2::CanvasItem(Model)::class_list_child_properties to @_FLATTEN_ARRAY_REF_RETURN_FOR
+	- Add POD documentation
+	- first release on CPAN
+0.03  Sun Jun 18 17:52:00 2017
+	- Add the functions, that returns an array ref which shall be flattened, so that they return plain 		lists, into @_FLATTEN_ARRAY_REF_RETURN_FOR
+0.02  Sun Jun 18 15:24:10 2017
+	- Renamed to GooCanvas2
+	- Added simple example to POD
+0.01  Sun Jun 18 09:38:10 2017
+	- create the basic Glib::Object::Introspection setup
+	- original version; created by h2xs 1.23 with options
+		-b 5.6.0 -XA -n Goo::Canvas2
+

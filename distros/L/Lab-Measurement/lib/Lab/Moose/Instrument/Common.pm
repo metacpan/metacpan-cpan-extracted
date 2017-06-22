@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Common;
-
+$Lab::Moose::Instrument::Common::VERSION = '3.550';
 use Moose::Role;
 use MooseX::Params::Validate;
 
@@ -12,7 +12,6 @@ use Carp;
 
 use namespace::autoclean;
 
-our $VERSION = '3.543';
 
 =head1 NAME
 

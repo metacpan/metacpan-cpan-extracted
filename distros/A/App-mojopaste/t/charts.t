@@ -1,6 +1,9 @@
 BEGIN { $ENV{PASTE_ENABLE_CHARTS} = 1 }
+use lib '.';
 use t::Helper;
 use Mojo::JSON 'true';
+
+plan skip_all => 'Text::CSV missing' unless eval 'require Text::CSV; 1';
 
 my $t = t::Helper->t;
 my ($raw, $file, $json);
@@ -48,7 +51,8 @@ is_deeply(
       {Date => '2015-04',          Down => 100, Up => 40}
     ],
   },
-);
+  'got correct graph data',
+) or diag $t->tx->res->body;
 
 unlink glob("$ENV{PASTE_DIR}/*");
 

@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2016-10-21'; # DATE
-our $VERSION = '0.17'; # VERSION
+our $DATE = '2017-06-17'; # DATE
+our $VERSION = '0.18'; # VERSION
 
 # NO_PERINCI_CMDLINE_SCRIPT
 # FRAGMENT id=shcompgen-hint completer=1 for=cpanm
@@ -19,6 +19,42 @@ die "This script is for shell completion only\n"
     unless $ENV{GETOPT_LONG_DUMP} || $ENV{COMP_LINE} || $ENV{COMMAND_LINE};
 
 my $noop = sub {};
+
+sub _connect_lcpan {
+    no warnings 'once';
+
+    eval "use App::lcpan 0.32";
+    if ($@) {
+        $log->tracef("[_cpanm] App::lcpan not available, skipped ".
+                         "trying to complete from CPAN module names");
+        return;
+    }
+
+    require Perinci::CmdLine::Util::Config;
+
+    my %lcpanargs;
+    my $res = Perinci::CmdLine::Util::Config::read_config(
+        program_name => "lcpan",
+    );
+    unless ($res->[0] == 200) {
+        $log->tracef("[_cpanm] Can't get config for lcpan: %s", $res);
+        last;
+    }
+    my $config = $res->[2];
+
+    $res = Perinci::CmdLine::Util::Config::get_args_from_config(
+        config => $config,
+        args   => \%lcpanargs,
+        #subcommand_name => 'update',
+        meta   => $App::lcpan::SPEC{update},
+    );
+    unless ($res->[0] == 200) {
+        $log->tracef("[_cpanm] Can't get args from config: %s", $res);
+        return;
+    }
+    App::lcpan::_set_args_default(\%lcpanargs);
+    my $dbh = App::lcpan::_connect_db('ro', $lcpanargs{cpan}, $lcpanargs{index_name});
+}
 
 # complete with list of installed modules
 my $comp_installed_mods = sub {
@@ -39,6 +75,26 @@ my $comp_installable = sub {
 
     my %args = @_;
     my $word   = $args{word} // '';
+
+    # try completing script name if we are in SCRIPT_MODE
+    {
+        last unless $ENV{SCRIPT_MODE};
+        last unless $word eq '' || $word =~ /\A\w[\w-]*\z/;
+
+        my $dbh = _connect_lcpan() or last;
+
+        my $sth;
+        $sth = $dbh->prepare(
+            "SELECT name FROM script WHERE name LIKE '$word%' ORDER BY name");
+        $sth->execute;
+        my @scripts;
+        my %seen;
+        while (my @row = $sth->fetchrow_array) {
+            my $script = $row[0];
+            push @scripts, $script unless $seen{$script}++;
+        }
+        return \@scripts if @scripts;
+    }
 
     # first, we try the cheapest method first, which is local files
     {
@@ -62,40 +118,10 @@ my $comp_installable = sub {
     # result.
     {
         last unless $word eq '' || $word =~ /\A(\w+)(::\w+)*(::)?\z/;
-        no warnings 'once';
         use experimental 'smartmatch';
 
-        eval "use App::lcpan 0.32";
-        if ($@) {
-            $log->tracef("[_cpanm] App::lcpan not available, skipped ".
-                             "trying to complete from CPAN module names");
-            last;
-        }
+        my $dbh = _connect_lcpan() or last;
 
-        require Perinci::CmdLine::Util::Config;
-
-        my %lcpanargs;
-        my $res = Perinci::CmdLine::Util::Config::read_config(
-            program_name => "lcpan",
-        );
-        unless ($res->[0] == 200) {
-            $log->tracef("[_cpanm] Can't get config for lcpan: %s", $res);
-            last;
-        }
-        my $config = $res->[2];
-
-        $res = Perinci::CmdLine::Util::Config::get_args_from_config(
-            config => $config,
-            args   => \%lcpanargs,
-            #subcommand_name => 'update',
-            meta   => $App::lcpan::SPEC{update},
-        );
-        unless ($res->[0] == 200) {
-            $log->tracef("[_cpanm] Can't get args from config: %s", $res);
-            last;
-        }
-        App::lcpan::_set_args_default(\%lcpanargs);
-        my $dbh = App::lcpan::_connect_db('ro', $lcpanargs{cpan}, $lcpanargs{index_name});
         my $sth;
         my $num_sep = 0; while ($word =~ /::/g) { $num_sep++ }
         if ($word eq '') {
@@ -225,7 +251,7 @@ _cpanm - Shell completer for cpanm
 
 =head1 VERSION
 
-This document describes version 0.17 of _cpanm (from Perl distribution App-ShellCompleter-cpanm), released on 2016-10-21.
+This document describes version 0.18 of _cpanm (from Perl distribution App-ShellCompleter-cpanm), released on 2017-06-17.
 
 =head1 SYNOPSIS
 
@@ -241,6 +267,16 @@ Now L<cpanm> has bash completion:
  % cpanm --s<tab>
  % cpanm -n Bencher::<tab>
  % cpanm --uninstall "Text::A<tab>
+
+=head1 DESCRIPTION
+
+=head1 ENVIRONMENT
+
+=head2 SCRIPT_MODE => bool
+
+If set to true, will try to complete word argument like C<tex> (i.e. word that
+does not yet have any C<::> with list of scripts instead of module names). This
+is useful for completing L<lcpanm-script>.
 
 =head1 HOMEPAGE
 
@@ -264,7 +300,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

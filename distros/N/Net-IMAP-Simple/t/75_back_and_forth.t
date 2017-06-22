@@ -37,5 +37,4 @@ sub run_tests {
     ok( $imap->errstr, qr(Invalid messageset|message not found)i );
 }   
 
-do "t/test_runner.pm";
-
+do "./t/test_runner.pm";

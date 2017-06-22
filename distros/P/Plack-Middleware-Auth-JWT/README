@@ -1,7 +1,7 @@
 
 
 This archive contains the distribution Plack-Middleware-Auth-JWT,
-version 0.900:
+version 0.901:
 
   Token-based Auth (aka Bearer Token) using JSON Web Tokens (JWT)
 

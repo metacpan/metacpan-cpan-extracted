@@ -1,14 +1,12 @@
 #!perl
 
-our $DATE = '2017-02-03'; # DATE
-our $VERSION = '1.017'; # VERSION
-
-BEGIN { $ENV{VERBOSE} //= 1 }
+our $DATE = '2017-06-19'; # DATE
+our $VERSION = '1.019'; # VERSION
 
 use 5.010;
 use strict;
 use warnings;
-require Log::Any unless $ENV{COMP_LINE};
+use Log::ger; BEGIN { $Log::ger::Current_Level = 4 }
 
 use PERLANCAR::Module::List;
 use Perinci::CmdLine::Any;
@@ -44,8 +42,7 @@ for my $mod (keys %$mods) {
 
 my $cli = Perinci::CmdLine::Any->new(
     url => $prefix,
-    log => 1, # XXX doesn't work? we still need to add 'require Log::Any' line above
-    #log_level => 'info',
+    log => 1,
     subcommands => $subcommands,
 );
 $cli->common_opts->{naked_res}{default} = 1;
@@ -66,7 +63,7 @@ lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.017 of lcpan (from Perl distribution App-lcpan), released on 2017-02-03.
+This document describes version 1.019 of lcpan (from Perl distribution App-lcpan), released on 2017-06-19.
 
 =head1 SYNOPSIS
 
@@ -799,7 +796,7 @@ Defaults to C<~/cpan>.
 
 =item B<--debug>
 
-Set log level to debug (note: you also need to set LOG=1 to enable logging, or use DEBUG=1).
+Shortcut for --log-level=debug.
 
 =item B<--format>=I<s>
 
@@ -827,7 +824,7 @@ Set output format to json.
 
 =item B<--log-level>=I<s>
 
-Set log level (note: you also need to set LOG=1 to enable logging).
+Set log level.
 
 =item B<--no-config>
 
@@ -856,7 +853,7 @@ you want to pipe the result for more post-processing. In this case you can use
 
 =item B<--quiet>
 
-Set log level to quiet (note: you also need to set LOG=1 to enable logging, or use QUIET=1).
+Shortcut for --log-level=error.
 
 =item B<--subcommands>
 
@@ -864,11 +861,11 @@ List available subcommands.
 
 =item B<--trace>
 
-Set log level to trace (note: you also need to set LOG=1 to enable logging, or use TRACE=1).
+Shortcut for --log-level=trace.
 
 =item B<--verbose>
 
-Set log level to info (note: you also need to set LOG=1 to enable logging, or use VERBOSE=1).
+Shortcut for --log-level=info.
 
 =item B<--version>, B<-v>
 
@@ -3164,8 +3161,8 @@ Can be specified multiple times.
 
 =head1 COMPLETION
 
-The script comes with a companion shell completer script (L<lcpan>)
-for this script.
+This script has shell tab completion capability with support for several
+shells.
 
 =head2 bash
 
@@ -3220,9 +3217,9 @@ In C<$cpan/index.db>.
 
 =head2 How do I see the SQL statements/queries being issued while running lcpan?
 
-You can try using L<Log::Any::DBI::Query>, e.g.:
+You can try using L<Log::ger::DBI::Query>, e.g.:
 
- % PERL5OPT=-MLog::Any::DBI::Query TRACE=1 lcpan ...
+ % PERL5OPT=-MLog::ger::DBI::Query TRACE=1 lcpan ...
 
 =head2 How do I reindex from scratch (without downloading the mirror)?
 
@@ -3277,7 +3274,7 @@ List of available configuration parameters:
  log_level (see --log-level)
  naked_res (see --naked-res)
 
-=head2 Configuration for subcommand 'author-deps'
+=head2 Configuration for subcommand author-deps
 
  author (see --author)
  flatten (see --flatten)
@@ -3291,7 +3288,7 @@ List of available configuration parameters:
  rel (see --rel)
  with_xs_or_pp (see --with-xs-or-pp)
 
-=head2 Configuration for subcommand 'author-deps-by-dependent-count'
+=head2 Configuration for subcommand author-deps-by-dependent-count
 
  author (see --author-arg)
  authors (see --author)
@@ -3304,18 +3301,18 @@ List of available configuration parameters:
  phase (see --phase)
  rel (see --rel)
 
-=head2 Configuration for subcommand 'author-dists'
+=head2 Configuration for subcommand author-dists
 
  author (see --author)
  detail (see --detail)
  latest (see --latest)
 
-=head2 Configuration for subcommand 'author-mods'
+=head2 Configuration for subcommand author-mods
 
  author (see --author)
  detail (see --detail)
 
-=head2 Configuration for subcommand 'author-rdeps'
+=head2 Configuration for subcommand author-rdeps
 
  author (see --author)
  phase (see --phase)
@@ -3323,7 +3320,7 @@ List of available configuration parameters:
  user_authors (see --user-author)
  user_authors_arent (see --user-author-isnt)
 
-=head2 Configuration for subcommand 'author-rels'
+=head2 Configuration for subcommand author-rels
 
  author (see --author)
  detail (see --detail)
@@ -3331,49 +3328,49 @@ List of available configuration parameters:
  latest (see --latest)
  sort (see --sort)
 
-=head2 Configuration for subcommand 'author-scripts'
+=head2 Configuration for subcommand author-scripts
 
  author (see --author)
  detail (see --detail)
 
-=head2 Configuration for subcommand 'authors'
+=head2 Configuration for subcommand authors
 
  detail (see --detail)
  or (see --or)
  query (see --query)
  query_type (see --query-type)
 
-=head2 Configuration for subcommand 'authors-by-dist-count'
+=head2 Configuration for subcommand authors-by-dist-count
 
 
-=head2 Configuration for subcommand 'authors-by-filesize'
+=head2 Configuration for subcommand authors-by-filesize
 
 
-=head2 Configuration for subcommand 'authors-by-mod-count'
+=head2 Configuration for subcommand authors-by-mod-count
 
 
-=head2 Configuration for subcommand 'authors-by-mod-mention-count'
+=head2 Configuration for subcommand authors-by-mod-mention-count
 
  count_per (see --count-per)
  include_self_mentions (see --include-self-mentions)
 
-=head2 Configuration for subcommand 'authors-by-rdep-count'
+=head2 Configuration for subcommand authors-by-rdep-count
 
  exclude_same_author (see --exclude-same-author)
  phase (see --phase)
  rel (see --rel)
 
-=head2 Configuration for subcommand 'authors-by-rel-count'
+=head2 Configuration for subcommand authors-by-rel-count
 
 
-=head2 Configuration for subcommand 'authors-by-script-count'
+=head2 Configuration for subcommand authors-by-script-count
 
 
-=head2 Configuration for subcommand 'changes'
+=head2 Configuration for subcommand changes
 
  module_or_dist_or_script (see --module-or-dist-or-script)
 
-=head2 Configuration for subcommand 'contents'
+=head2 Configuration for subcommand contents
 
  author (see --author)
  detail (see --detail)
@@ -3383,28 +3380,28 @@ List of available configuration parameters:
  query (see --query)
  query_type (see --query-type)
 
-=head2 Configuration for subcommand 'copy-mod'
+=head2 Configuration for subcommand copy-mod
 
  module (see --module)
  overwrite (see --overwrite)
 
-=head2 Configuration for subcommand 'copy-rel'
+=head2 Configuration for subcommand copy-rel
 
  overwrite (see --overwrite)
  release (see --release)
 
-=head2 Configuration for subcommand 'copy-script'
+=head2 Configuration for subcommand copy-script
 
  all (see --all)
  overwrite (see --overwrite)
  script (see --script)
 
-=head2 Configuration for subcommand 'delete-rel'
+=head2 Configuration for subcommand delete-rel
 
  delete_file (see --delete-file)
  release (see --release)
 
-=head2 Configuration for subcommand 'deps'
+=head2 Configuration for subcommand deps
 
  flatten (see --flatten)
  include_core (see --no-include-core)
@@ -3416,7 +3413,7 @@ List of available configuration parameters:
  rel (see --rel)
  with_xs_or_pp (see --with-xs-or-pp)
 
-=head2 Configuration for subcommand 'deps-by-dependent-count'
+=head2 Configuration for subcommand deps-by-dependent-count
 
  authors (see --author)
  authors_arent (see --author-isnt)
@@ -3427,7 +3424,7 @@ List of available configuration parameters:
  phase (see --phase)
  rel (see --rel)
 
-=head2 Configuration for subcommand 'dist-contents'
+=head2 Configuration for subcommand dist-contents
 
  author (see --author)
  detail (see --detail)
@@ -3435,30 +3432,30 @@ List of available configuration parameters:
  or (see --or)
  package (see --package)
 
-=head2 Configuration for subcommand 'dist-meta'
+=head2 Configuration for subcommand dist-meta
 
  dist (see --dist)
 
-=head2 Configuration for subcommand 'dist-mods'
+=head2 Configuration for subcommand dist-mods
 
  detail (see --detail)
  dist (see --dist)
 
-=head2 Configuration for subcommand 'dist-scripts'
+=head2 Configuration for subcommand dist-scripts
 
  detail (see --detail)
  dist (see --dist)
 
-=head2 Configuration for subcommand 'dist2author'
+=head2 Configuration for subcommand dist2author
 
  dists (see --dist)
 
-=head2 Configuration for subcommand 'dist2rel'
+=head2 Configuration for subcommand dist2rel
 
  dist (see --dist)
  full_path (see --full-path)
 
-=head2 Configuration for subcommand 'dists'
+=head2 Configuration for subcommand dists
 
  author (see --author)
  detail (see --detail)
@@ -3474,37 +3471,37 @@ List of available configuration parameters:
  rel_mtime_newer_than (see --rel-mtime-newer-than)
  sort (see --sort)
 
-=head2 Configuration for subcommand 'dists-by-dep-count'
+=head2 Configuration for subcommand dists-by-dep-count
 
  author (see --author)
  phase (see --phase)
  rel (see --rel)
 
-=head2 Configuration for subcommand 'doc'
+=head2 Configuration for subcommand doc
 
  format (see --format-arg)
  name (see --name)
  script (see --script)
 
-=head2 Configuration for subcommand 'extract-mod'
+=head2 Configuration for subcommand extract-mod
 
  module (see --module)
 
-=head2 Configuration for subcommand 'extract-rel'
+=head2 Configuration for subcommand extract-rel
 
  release (see --release)
 
-=head2 Configuration for subcommand 'extract-script'
+=head2 Configuration for subcommand extract-script
 
  all (see --all)
  script (see --script)
 
-=head2 Configuration for subcommand 'inject'
+=head2 Configuration for subcommand inject
 
  author (see --author)
  files (see --file)
 
-=head2 Configuration for subcommand 'mentions'
+=head2 Configuration for subcommand mentions
 
  mentioned_authors (see --mentioned-author)
  mentioned_modules (see --mentioned-module)
@@ -3515,7 +3512,7 @@ List of available configuration parameters:
  mentioner_scripts (see --mentioner-script)
  type (see --type)
 
-=head2 Configuration for subcommand 'mentions-by-mod'
+=head2 Configuration for subcommand mentions-by-mod
 
  mentioned_authors (see --mentioned-author)
  mentioned_modules (see --mentioned-module)
@@ -3523,14 +3520,14 @@ List of available configuration parameters:
  modules (see --module)
  type (see --type)
 
-=head2 Configuration for subcommand 'mentions-by-script'
+=head2 Configuration for subcommand mentions-by-script
 
  mentioned_authors (see --mentioned-author)
  mentioned_modules (see --mentioned-module)
  mentioned_scripts (see --mentioned-script)
  scripts (see --script)
 
-=head2 Configuration for subcommand 'mentions-for-all-mods'
+=head2 Configuration for subcommand mentions-for-all-mods
 
  mentioned_authors (see --mentioned-author)
  mentioner_authors (see --mentioner-author)
@@ -3539,7 +3536,7 @@ List of available configuration parameters:
  mentioner_scripts (see --mentioner-script)
  modules (see --module)
 
-=head2 Configuration for subcommand 'mentions-for-mod'
+=head2 Configuration for subcommand mentions-for-mod
 
  mentioned_authors (see --mentioned-author)
  mentioner_authors (see --mentioner-author)
@@ -3548,7 +3545,7 @@ List of available configuration parameters:
  mentioner_scripts (see --mentioner-script)
  modules (see --module)
 
-=head2 Configuration for subcommand 'mentions-for-script'
+=head2 Configuration for subcommand mentions-for-script
 
  mentioned_authors (see --mentioned-author)
  mentioner_authors (see --mentioner-author)
@@ -3557,7 +3554,7 @@ List of available configuration parameters:
  mentioner_scripts (see --mentioner-script)
  scripts (see --script)
 
-=head2 Configuration for subcommand 'mod-contents'
+=head2 Configuration for subcommand mod-contents
 
  author (see --author)
  detail (see --detail)
@@ -3565,20 +3562,20 @@ List of available configuration parameters:
  or (see --or)
  package (see --package)
 
-=head2 Configuration for subcommand 'mod2author'
+=head2 Configuration for subcommand mod2author
 
  modules (see --module)
 
-=head2 Configuration for subcommand 'mod2dist'
+=head2 Configuration for subcommand mod2dist
 
  modules (see --module)
 
-=head2 Configuration for subcommand 'mod2rel'
+=head2 Configuration for subcommand mod2rel
 
  full_path (see --full-path)
  module (see --module)
 
-=head2 Configuration for subcommand 'mods'
+=head2 Configuration for subcommand mods
 
  author (see --author)
  detail (see --detail)
@@ -3593,24 +3590,24 @@ List of available configuration parameters:
  query_type (see --query-type)
  sort (see --sort)
 
-=head2 Configuration for subcommand 'mods-by-mention-count'
+=head2 Configuration for subcommand mods-by-mention-count
 
  count_per (see --count-per)
  include_self_mentions (see --include-self-mentions)
 
-=head2 Configuration for subcommand 'mods-by-rdep-count'
+=head2 Configuration for subcommand mods-by-rdep-count
 
  author (see --author)
  phase (see --phase)
  rel (see --rel)
 
-=head2 Configuration for subcommand 'mods-from-same-dist'
+=head2 Configuration for subcommand mods-from-same-dist
 
  detail (see --detail)
  latest (see --latest)
  modules (see --module)
 
-=head2 Configuration for subcommand 'modules'
+=head2 Configuration for subcommand modules
 
  author (see --author)
  detail (see --detail)
@@ -3625,7 +3622,7 @@ List of available configuration parameters:
  query_type (see --query-type)
  sort (see --sort)
 
-=head2 Configuration for subcommand 'namespaces'
+=head2 Configuration for subcommand namespaces
 
  detail (see --detail)
  from_level (see --from-level)
@@ -3636,7 +3633,7 @@ List of available configuration parameters:
  sort (see --sort)
  to_level (see --to-level)
 
-=head2 Configuration for subcommand 'rdeps'
+=head2 Configuration for subcommand rdeps
 
  authors (see --author)
  authors_arent (see --author-isnt)
@@ -3645,7 +3642,7 @@ List of available configuration parameters:
  phase (see --phase)
  rel (see --rel)
 
-=head2 Configuration for subcommand 'related-mods'
+=head2 Configuration for subcommand related-mods
 
  limit (see --limit)
  modules (see --module)
@@ -3653,7 +3650,7 @@ List of available configuration parameters:
  sort (see --sort)
  with_scores (see --with-scores)
 
-=head2 Configuration for subcommand 'releases'
+=head2 Configuration for subcommand releases
 
  author (see --author)
  detail (see --detail)
@@ -3669,7 +3666,7 @@ List of available configuration parameters:
  query_type (see --query-type)
  sort (see --sort)
 
-=head2 Configuration for subcommand 'rels'
+=head2 Configuration for subcommand rels
 
  author (see --author)
  detail (see --detail)
@@ -3685,31 +3682,31 @@ List of available configuration parameters:
  query_type (see --query-type)
  sort (see --sort)
 
-=head2 Configuration for subcommand 'reset'
+=head2 Configuration for subcommand reset
 
 
-=head2 Configuration for subcommand 'script2author'
-
- all (see --all)
- scripts (see --script)
-
-=head2 Configuration for subcommand 'script2dist'
+=head2 Configuration for subcommand script2author
 
  all (see --all)
  scripts (see --script)
 
-=head2 Configuration for subcommand 'script2mod'
+=head2 Configuration for subcommand script2dist
 
  all (see --all)
  scripts (see --script)
 
-=head2 Configuration for subcommand 'script2rel'
+=head2 Configuration for subcommand script2mod
+
+ all (see --all)
+ scripts (see --script)
+
+=head2 Configuration for subcommand script2rel
 
  all (see --all)
  full_path (see --full-path)
  scripts (see --script)
 
-=head2 Configuration for subcommand 'scripts'
+=head2 Configuration for subcommand scripts
 
  author (see --author)
  detail (see --detail)
@@ -3718,32 +3715,32 @@ List of available configuration parameters:
  query (see --query)
  query_type (see --query-type)
 
-=head2 Configuration for subcommand 'scripts-by-mention-count'
+=head2 Configuration for subcommand scripts-by-mention-count
 
  count_per (see --count-per)
  include_self_mentions (see --include-self-mentions)
 
-=head2 Configuration for subcommand 'scripts-from-same-dist'
+=head2 Configuration for subcommand scripts-from-same-dist
 
  detail (see --detail)
  latest (see --latest)
  scripts (see --script)
 
-=head2 Configuration for subcommand 'src'
+=head2 Configuration for subcommand src
 
  name (see --name)
  script (see --script)
 
-=head2 Configuration for subcommand 'stats'
+=head2 Configuration for subcommand stats
 
 
-=head2 Configuration for subcommand 'stats-last-index-time'
+=head2 Configuration for subcommand stats-last-index-time
 
 
-=head2 Configuration for subcommand 'subnames-by-count'
+=head2 Configuration for subcommand subnames-by-count
 
 
-=head2 Configuration for subcommand 'subs'
+=head2 Configuration for subcommand subs
 
  authors (see --author)
  detail (see --detail)
@@ -3753,7 +3750,7 @@ List of available configuration parameters:
  query_type (see --query-type)
  sort (see --sort)
 
-=head2 Configuration for subcommand 'update'
+=head2 Configuration for subcommand update
 
  exclude_author (see --exclude-author)
  force_update_index (see --force-update-index)
@@ -3810,7 +3807,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

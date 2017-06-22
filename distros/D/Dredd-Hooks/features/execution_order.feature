@@ -19,7 +19,6 @@ Feature: Execution order
           Hello World!
       """
 
-  @announce
   Scenario:
     Given a file named "hookfile.pl" with:
       """
@@ -93,13 +92,13 @@ afterEach(
     }
 );
       """
-    Given I set the environment variables to:
+    And I set the environment variables to:
       | variable                       | value      |
       | TEST_DREDD_HOOKS_HANDLER_ORDER | true       |
 
-    When I run `dredd ./apiary.apib http://localhost:4567 --server "ruby server.rb" --language dredd-hooks-perl --hookfiles ./hookfile.pl`
+  When I run `dredd ./apiary.apib http://localhost:4567 --server="ruby server.rb" --language="dredd-hooks-perl" --hookfiles="./hookfile.pl"`
     Then the exit status should be 0
-    Then the output should contain:
+    And the output should contain:
       """
       0 before all modification
       1 before each modification

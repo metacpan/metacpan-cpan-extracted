@@ -6,7 +6,7 @@ use Path::Class ();
 use File::ShareDir ();
 
 # ABSTRACT: Dist::Zilla plugins used by Plicease
-our $VERSION = '2.14'; # VERSION
+our $VERSION = '2.15'; # VERSION
 
 
 sub dist_dir
@@ -30,7 +30,7 @@ Dist::Zilla::Plugin::Author::Plicease - Dist::Zilla plugins used by Plicease
 
 =head1 VERSION
 
-version 2.14
+version 2.15
 
 =head1 DESCRIPTION
 

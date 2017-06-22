@@ -1,0 +1,41 @@
+SYNOPSIS
+
+     use Log::ger::Output Screen => (
+         # stderr => 1,    # set to 0 to print to stdout instead of stderr
+         # use_color => 0, # set to 1/0 to force usage of color, default is from COLOR or (-t STDOUT)
+         # formatter => sub { ... },
+     );
+     use Log::ger;
+    
+     log_warn "blah...";
+
+DESCRIPTION
+
+CONFIGURATION
+
+ stderr => bool (default: 1)
+
+    Whether to print to STDERR (the default) or st=head2 use_color => bool
+
+ use_color => bool
+
+    The default is to look at the COLOR environment variable, or 1 when in
+    interactive mode and 0 when not in interactive mode.
+
+ formatter => code
+
+    When defined, will pass the formatted message (but being applied with
+    colors) to this custom formatter.
+
+TODO
+
+    Allow customizing colors.
+
+ENVIRONMENT
+
+ COLOR => bool
+
+SEE ALSO
+
+    Modelled after Log::Any::Adapter::Screen.
+

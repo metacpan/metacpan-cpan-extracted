@@ -1,3 +1,0 @@
-ar rv libxx.a a1.o
-ar: creating archive libxx.a
-a - a1.o

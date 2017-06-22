@@ -1,6 +1,10 @@
 package Data::Record::Serialize::Encode::rdb;
 
+# ABSTRACT: encoded a record as /rdb
+
 use Moo::Role;
+
+our $VERSION = '0.12';
 
 before BUILD => sub {
 
@@ -13,6 +17,16 @@ before BUILD => sub {
 
 };
 
+use namespace::clean;
+
+#pod =begin pod_coverage
+#pod
+#pod =head3 setup
+#pod
+#pod =end pod_coverage
+#pod
+#pod =cut
+
 sub setup {
 
     my $self = shift;
@@ -22,6 +36,14 @@ sub setup {
 
 }
 
+#pod =begin pod_coverage
+#pod
+#pod =head3 encode
+#pod
+#pod =end pod_coverage
+#pod
+#pod =cut
+
 sub encode {
     my $self = shift;
 
@@ -30,17 +52,17 @@ sub encode {
 
 with 'Data::Record::Serialize::Role::Encode';
 
-
-
 1;
 
-
-__END__
+=pod
 
 =head1 NAME
 
 Data::Record::Serialize::Encode::rdb - encoded a record as /rdb
 
+=head1 VERSION
+
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -57,6 +79,17 @@ L<RDB|http://compbio.soe.ucsc.edu/rdb>.
 
 It performs the L<B<Data::Record::Serialize::Role::Encode>> role.
 
+=begin pod_coverage
+
+=head3 setup
+
+=end pod_coverage
+
+=begin pod_coverage
+
+=head3 encode
+
+=end pod_coverage
 
 =head1 INTERFACE
 
@@ -65,46 +98,54 @@ L<B<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>:
 
 =head1 BUGS AND LIMITATIONS
 
-=for author to fill in:
-    A list of known problems with the module, together with some
-    indication Whether they are likely to be fixed in an upcoming
-    release. Also a list of restrictions on the features the module
-    does provide: data types that cannot be handled, performance issues
-    and the circumstances in which they may arise, practical
-    limitations on the size of data sets, special cases that are not
-    (yet) handled, etc.
-
-No bugs have been reported.
-
-Please report any bugs or feature requests to
-C<bug-data-record-serialize@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize>.
+You can make new bug reports, and view existing ones, through the
+web interface at L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize>.
 
 =head1 SEE ALSO
 
-=for author to fill in:
-    Any other resources (e.g., modules or files) that are related.
+Please see those modules/websites for more information related to this module.
 
+=over 4
 
-=head1 LICENSE AND COPYRIGHT
+=item *
 
-Copyright (c) 2014 The Smithsonian Astrophysical Observatory
+L<Data::Record::Serialize|Data::Record::Serialize>
 
-B<Data::Record::Serialize> is free software: you can redistribute it
-and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-p
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+=back
 
 =head1 AUTHOR
 
-Diab Jerius  E<lt>djerius@cpan.orgE<gt>
+Diab Jerius <djerius@cpan.org>
 
+=head1 COPYRIGHT AND LICENSE
 
+This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut
+
+__END__
+
+#pod =head1 SYNOPSIS
+#pod
+#pod     use Data::Record::Serialize;
+#pod
+#pod     my $s = Data::Record::Serialize->new( encode => 'rdb', ... );
+#pod
+#pod     $s->send( \%record );
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod B<Data::Record::Serialize::Encode::rdb> encodes a record as
+#pod L<RDB|http://compbio.soe.ucsc.edu/rdb>.
+#pod
+#pod It performs the L<B<Data::Record::Serialize::Role::Encode>> role.
+#pod
+#pod
+#pod =head1 INTERFACE
+#pod
+#pod There are no additional attributes which may be passed to
+#pod L<B<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>:

@@ -7,7 +7,7 @@ use Carp;
 use Control::CLI qw( :all );
 
 my $Package = __PACKAGE__;
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 our @ISA = qw(Control::CLI);
 our %EXPORT_TAGS = (
 		use	=> [qw(useTelnet useSsh useSerial useIPv6)],
@@ -71,6 +71,10 @@ my %Attribute = (
 			],
 
 	$Prm{pers}	=> [
+			'is_voss',
+			'is_apls',
+			'apls_box_type',
+			'brand_name',
 			'is_master_cpu',
 			'is_dual_cpu',
 			'cpu_slot',
@@ -102,24 +106,24 @@ my %Attribute = (
 
 my @InitPromptOrder = ("$Prm{pers}_cli", "$Prm{pers}_nncli", $Prm{bstk}, 'generic');
 my %InitPrompt = ( # Initial prompt pattern expected at login
-	$Prm{bstk}		=>	'\x0d?(.{1,50}?)()(?:\((.+?)\))?[>#]$',
-	"$Prm{pers}_cli"	=>	'\x0d?(.+):([1356])((?:\/[\w\d-]+)*)[>#] $',
-	"$Prm{pers}_nncli"	=>	'\x0d?(.+):([12356])(?:\((.+?)\))?[>#]$',
-	$Prm{xlr}		=>	'\x0d?(.+?)()((?:\/[\w\d-]+)*)[>#] $',
-	$Prm{sr}		=>	'\x0d? *\x0d(.+?)()((?:\/[\w\d\s-]+(?: \(\d+\/\d+\))?)*)# $',
-	$Prm{trpz}		=>	'(.+)[>#] $',
-	$Prm{xirrus}		=>	'(?:\x10\x00)?(.+?)()(?:\((.+?)\))?# $',
-	$Prm{generic}		=>	'.*[\?\$%#>]\s?$',
+	$Prm{bstk}		=>	'\x0d?([^\n\x0d\x0a]{1,50}?)()(?:\((.+?)\))?[>#]$',
+	"$Prm{pers}_cli"	=>	'\x0d?([^\n\x0d\x0a]+):([1356])((?:\/[\w\d\.-]+)*)[>#] $',
+	"$Prm{pers}_nncli"	=>	'\x0d?([^\n\x0d\x0a]+):([12356])(?:\((.+?)\))?[>#]$',
+	$Prm{xlr}		=>	'\x0d?([^\n\x0d\x0a]+?)()((?:\/[\w\d-]+)*)[>#] $',
+	$Prm{sr}		=>	'\x0d? *\x0d([^\n\x0d\x0a]+?)()((?:\/[\w\d\s-]+(?: \(\d+\/\d+\))?)*)# $',
+	$Prm{trpz}		=>	'([^\n\x0d\x0a]+)[>#] $',
+	$Prm{xirrus}		=>	'(?:\x10\x00)?([^\n\x0d\x0a]+?)()(?:\((.+?)\))?# $',
+	$Prm{generic}		=>	'[^\n\x0d\x0a]*[\?\$%#>]\s?$',
 );
 my %Prompt = ( # Prompt pattern templates; SWITCHNAME gets replaced with actual switch prompt during login
 	$Prm{bstk}		=>	'SWITCHNAME(?:\((.+?)\))?[>#]$',
-	"$Prm{pers}_cli"	=>	'SWITCHNAME:[1356]((?:\/[\w\d-]+)*)[>#] $',
+	"$Prm{pers}_cli"	=>	'SWITCHNAME:[1356]((?:\/[\w\d\.-]+)*)[>#] $',
 	"$Prm{pers}_nncli"	=>	'SWITCHNAME:[12356](?:\((.+?)\))?[>#]$',
 	$Prm{xlr}		=>	'SWITCHNAME((?:\/[\w\d-]+)*)[>#] $',
 	$Prm{sr}		=>	'\x0d? *\x0dSWITCHNAME((?:\/[\w\d\s-]+(?: \(\d+\/\d+\))?)*)# $',
 	$Prm{trpz}		=>	'SWITCHNAME[>#] $',
 	$Prm{xirrus}		=>	'(?:\x10\x00)?SWITCHNAME(?:\((.+?)\))?# $',
-	$Prm{generic}		=>	'.*[\?\$%#>]\s?$',
+	$Prm{generic}		=>	'[^\n\x0d\x0a]*[\?\$%#>]\s?$',
 );
 my $LastPromptClense = '^(?:\x0d? *\x0d|\x10\x00)'; # When capturing lastprompt, SecureRouter and Xirrus sometimes precede the prompt with these characters
 
@@ -154,28 +158,30 @@ our %ErrorPatterns = ( # Patterns which indicated the last command sent generate
 					. '|% Bad VLAN list format\.'
 					. '|% View name does not exist'		# snmp-server user admin read-view root write-view root notify-view root
 					. '|% Partial configuration of \'.+?\' already exists\.'	# same as above
+					. '|% View already exists, you must first delete it\.'	# snmp-server view root 1
+					. '|% User \w+ does not exist'		# no snmp-server user admindes
+					. '|% User \'.+?\' already exists'	# snmp-server user admin md5 passwdvbn read-view root write-view root notify-view root
 				. ')',
 	$Prm{pers}		=>	'^('
 					. '\x07?\s+\^\n.+'
 					. '|% Invalid input detected at \'\^\' marker\.'
 					. '|.+? not found in path .+'
 					. '|(?:parameter|object) .+? is out of range'
-					. '|\x07Error ?: .+'
+					. '|\x07?Error ?: .+'
 					. '|Unable to .+'
 					. '|% Not allowed on secondary cpu\.'
 					. '|% Incomplete command\.'
 					. '|% Vrf "[^"]+" does not exist'
-					. '|Error: prefix list entry is not found'
 					. '| ERROR: copy failed \(code:0x[\da-fA-F]+\)'
 					. '|Save config to file [^ ]+ failed\.'
 					. '|% Vlan \d+ does not exist'
 					. '|Command not allowed MSTP RSTP mode\.'			# On MSTP switch : vlan create 101 type port 1
-					. '|Error : Command available in mstp\|rstp mode only\.'	# On STG switch: vlan create 101 type port-mstprstp 0
 					. '|% Permission denied\.'					# TACACS commands not allowed
 					. '|% Only (?:gigabit|fast) ethernet ports allowed'		# config interface gig on fastEth port or vice-versa
 					. '|There are \d+ releases already on system. Please remove 1 to proceed'
-					. '|Error: Dynamic addition of RSMLT Peer not allowed'
 					. '|can\'t \w+ ".+?" 0x\d+'					# delete /flash/.ssh -y : can't remove "/flash/.ssh" 0x300042
+					. '|".+?" is ambiguous in path /'				# AccDist3:5#% do
+					. '|Password change aborted\.'	# Creating snmpv3 usm user with enh-secure-mode and password does not meet complexity requirements
 				. ')',
 	$Prm{xlr}		=>	'^('
 					. '.+? not found'
@@ -315,7 +321,7 @@ sub connect { # All the steps necessary to connect to a CLI session on an Avaya 
 		my @validArgs = ('host', 'port', 'username', 'password', 'publickey', 'privatekey', 'passphrase',
 				 'prompt_credentials', 'baudrate', 'parity', 'databits', 'stopbits', 'handshake',
 				 'errmode', 'connection_timeout', 'timeout', 'read_attempts', 'wake_console',
-				 'return_reference', 'blocking', 'data_with_error', 'terminal_type', 'window_size', 'callback');
+				 'return_reference', 'blocking', 'data_with_error', 'terminal_type', 'window_size', 'callback', 'forcebaud');
 		%args = parseMethodArgs($pkgsub, \@_, \@validArgs);
 	}
 
@@ -349,6 +355,7 @@ sub connect { # All the steps necessary to connect to a CLI session on an Avaya 
 		terminal_type		=>	$args{terminal_type},
 		window_size		=>	$args{window_size},
 		callback		=>	$args{callback},
+		forcebaud		=>	$args{forcebaud},
 		login_timeout		=>	defined $args{timeout} ? $args{timeout} : $self->{timeout},
 		read_attempts		=>	defined $args{read_attempts} ? $args{read_attempts} : $LoginReadAttempts,
 		data_with_error		=>	defined $args{data_with_error} ? $args{data_with_error} : $self->{data_with_error},
@@ -388,7 +395,7 @@ sub connect_poll { # Poll status of connection (non-blocking mode)
 sub disconnect { # Perform check on restoring buadrate on device before doing Control::CLI's disconnect
 	my $self = shift;
 	$self->_restoreDeviceBaudrate if $self->connection_type eq 'SERIAL';
-	return $self->SUPER::disconnect;
+	return $self->SUPER::disconnect(@_);
 }
 
 
@@ -422,6 +429,7 @@ sub login { # Handles steps necessary to get to CLI session, including menu, ban
 		# Declare method storage keys which will be used
 		stage			=>	0,
 		login_attempted		=>	undef,
+		password_sent		=>	undef,
 		login_error		=>	'',
 		family_type		=>	undef,
 		cpu_slot		=>	undef,
@@ -707,7 +715,7 @@ sub change_baudrate { # Change baud rate on device and on current connection, if
 		$args{baudrate} = shift;
 	}
 	else {
-		my @validArgs = ('baudrate', 'parity', 'databits', 'stopbits', 'handshake',
+		my @validArgs = ('baudrate', 'parity', 'databits', 'stopbits', 'handshake', 'forcebaud',
 				 'timeout', 'errmode', 'local_side_only', 'blocking', 'poll_syntax');
 		%args = parseMethodArgs($pkgsub, \@_, \@validArgs);
 	}
@@ -731,6 +739,7 @@ sub change_baudrate { # Change baud rate on device and on current connection, if
 		databits		=>	$args{databits},
 		stopbits		=>	$args{stopbits},
 		handshake		=>	$args{handshake},
+		forcebaud		=>	$args{forcebaud},
 		local_side_only		=>	$args{local_side_only},
 		# Declare method storage keys which will be used
 		stage			=>	0,
@@ -804,6 +813,7 @@ sub enable { # Enter PrivExec mode (handle enable password for WLAN2300)
 		# Declare method storage keys which will be used
 		stage			=>	0,
 		login_attempted		=>	undef,
+		password_sent		=>	undef,
 		login_failed		=>	undef,
 	};
 	local $self->{POLLING} = 1; # True until we come out of this polling-capable method
@@ -1113,7 +1123,7 @@ sub poll_connect { # Internal method to connect to host and perform login (used 
 		my @validArgs = ('host', 'port', 'username', 'password', 'publickey', 'privatekey', 'passphrase',
 				 'prompt_credentials', 'baudrate', 'parity', 'databits', 'stopbits', 'handshake',
 				 'errmode', 'connection_timeout', 'login_timeout', 'read_attempts', 'wake_console',
-				 'data_with_error', 'terminal_type', 'window_size', 'callback');
+				 'data_with_error', 'terminal_type', 'window_size', 'callback', 'forcebaud');
 		my %args = parseMethodArgs($pkgsub, \@_, \@validArgs, 1);
 		if (@_ && !%args) { # Legacy syntax
 			($args{host}, $args{port}, $args{username}, $args{password}, $args{publickey}, $args{privatekey},
@@ -1140,6 +1150,7 @@ sub poll_connect { # Internal method to connect to host and perform login (used 
 			terminal_type		=>	$args{terminal_type},
 			window_size		=>	$args{window_size},
 			callback		=>	$args{callback},
+			forcebaud		=>	$args{forcebaud},
 			login_timeout		=>	defined $args{login_timeout} ? $args{login_timeout} : $self->{timeout},
 			read_attempts		=>	defined $args{read_attempts} ? $args{read_attempts} : $LoginReadAttempts,
 			data_with_error		=>	defined $args{data_with_error} ? $args{data_with_error} : $self->{data_with_error},
@@ -1165,6 +1176,7 @@ sub poll_connect { # Internal method to connect to host and perform login (used 
 			PrivateKey		=> $connect->{privatekey},
 			Passphrase		=> $connect->{passphrase},
 			BaudRate		=> $connect->{baudrate},
+			ForceBaud		=> $connect->{forcebaud},
 			Parity			=> $connect->{parity},
 			DataBits		=> $connect->{databits},
 			StopBits		=> $connect->{stopbits},
@@ -1226,6 +1238,7 @@ sub poll_login { # Method to handle login for poll methods (used for both blocki
 			# Declare method storage keys which will be used
 			stage			=>	0,
 			login_attempted		=>	undef,
+			password_sent		=>	undef,
 			login_error		=>	'',
 			family_type		=>	undef,
 			cpu_slot		=>	undef,
@@ -1281,6 +1294,8 @@ sub poll_login { # Method to handle login for poll methods (used for both blocki
 
 			$self->debugMsg(8,"\nlogin() Connection input to process:\n>", \$self->{POLL}{read_buffer}, "<\n");
 			$self->{POLL}{output_buffer} .= $self->{POLL}{read_buffer}; # This buffer preserves all the output, in case it is requested
+			$self->{POLL}{local_buffer} = $self->{POLL}{read_buffer} =~ /\n/ ? '' : stripLastLine(\$self->{POLL}{local_buffer}); # Flush or keep lastline
+			$self->{POLL}{local_buffer} .= $self->{POLL}{read_buffer};  # If read was single line, this buffer appends it to lastline from previous read
 
 			# Pattern matching; try and detect patterns, and record their depth in the input stream
 			$pattern = '';
@@ -1425,6 +1440,10 @@ sub poll_login { # Method to handle login for poll methods (used for both blocki
 			}
 			elsif ($pattern eq 'password') { # Handle password prompt
 				$self->debugMsg(8,"\nlogin() Processing Password prompt\n\n");
+				if ($login->{password_sent}) {
+					$self->{LOGINSTAGE} = 'password';
+					return $self->poll_return($self->error("$pkgsub: Incorrect Username or Password"));
+				}
 				unless ($login->{password}) {
 					unless ($login->{prompt_credentials}) {
 						$self->{LOGINSTAGE} = 'password';
@@ -1435,6 +1454,7 @@ sub poll_login { # Method to handle login for poll methods (used for both blocki
 				$self->print(line => $login->{password}, errmode => 'return')
 					or return $self->poll_return($self->error("$pkgsub: Unable to send password // ".$self->errmsg));
 				$self->{LOGINSTAGE} = '';
+				$login->{password_sent} = 1;
 				next;
 			}
 			elsif ($pattern eq 'localfail') { # Login failure
@@ -1453,7 +1473,7 @@ sub poll_login { # Method to handle login for poll methods (used for both blocki
 				if ($login->{family_type} eq $Prm{pers}) {
 					foreach my $type ('cli', 'nncli') {
 						$promptType = "$login->{family_type}_$type";
-						if ($self->{POLL}{read_buffer} =~ /^($InitPrompt{$promptType})/m) {
+						if ($self->{POLL}{local_buffer} =~ /($InitPrompt{$promptType})/) {
 							($capturedPrompt, $switchName, $login->{cpu_slot}, $configContext) = ($1, $2, $3, $4);
 							$cliType = $type;
 							last;
@@ -1461,7 +1481,7 @@ sub poll_login { # Method to handle login for poll methods (used for both blocki
 					}
 				}
 				else {
-					if ($self->{POLL}{read_buffer} =~ /^($InitPrompt{$login->{family_type}})/m) {
+					if ($self->{POLL}{local_buffer} =~ /($InitPrompt{$login->{family_type}})/) {
 						($capturedPrompt, $switchName, $configContext) = ($1, $2, $4);
 						$promptType = $login->{family_type};
 					}
@@ -1469,7 +1489,7 @@ sub poll_login { # Method to handle login for poll methods (used for both blocki
 			}
 			else { # A family type has not been detected yet; try and detect from received prompt
 				foreach my $key (@InitPromptOrder) {
-					if ($self->{POLL}{read_buffer} =~ /^($InitPrompt{$key})/m) {
+					if ($self->{POLL}{local_buffer} =~ /($InitPrompt{$key})/) {
 						($capturedPrompt, $switchName, $login->{cpu_slot}, $configContext) = ($1, $2, $3, $4);
 						$promptType = $key;
 						($login->{family_type} = $key) =~ s/_(\w+)$//;
@@ -1595,7 +1615,7 @@ sub poll_cmd { # Method to handle cmd for poll methods (used for both blocking &
 			my $command = $cmd->{command};
 			# In NNCLI mode, if command ends with ?, append CTRL-X otherwise partial command will appear after next prompt
 			if ($command =~ /\?\s*$/ && $self->{$Package}{ATTRIB}{'is_nncli'}) {
-				if ($Prm{sr} eq $self->{$Package}{ATTRIB}{'family_type'}) { $command .= $CTRL_U }
+				if ($familyType eq $Prm{sr}) { $command .= $CTRL_U }
 				else { $command .= $CTRL_X }
 			}
 			# Flush any unread data which might be pending
@@ -1612,9 +1632,7 @@ sub poll_cmd { # Method to handle cmd for poll methods (used for both blocking &
 			my $ok = $self->poll_read($pkgsub); # We always come back even in case of error
 			return $self->poll_return($ok) if defined $ok && $ok == 0; # Come out only in case of non-blocking not ready
 			unless (defined $ok) { # We catch timeout event here
-				if ($cmd->{alreadyCmdTimeout}
-				 || !defined $self->{$Package}{ATTRIB}{'family_type'}
-				 || $self->{$Package}{ATTRIB}{'family_type'} eq $Prm{generic}) {
+				if ($cmd->{alreadyCmdTimeout} || !length $familyType || $familyType eq $Prm{generic}) {
 					return $self->poll_return($self->error("$pkgsub: Failed after sending command // ".$self->errmsg));
 				}
 				$self->debugMsg(4, "\ncmd() Initial cmd timeout; attempting reset_prompt\n");
@@ -1825,7 +1843,7 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 	my $attrib = $self->{POLL}{$pollsub};
 	local $self->{errmode} = $attrib->{errmode} if defined $attrib->{errmode};
 	return $self->poll_return($self->error("$pkgsub: No connection for attributes")) if $self->eof;
-	my $familyType = $self->{$Package}{ATTRIB}{'family_type'};
+	my $familyType = $self->{$Package}{ATTRIB}{'family_type'} || '';
 
 	if ($attrib->{stage} < 1) { # 1st stage
 		return $self->poll_return($self->error("$pkgsub: No attribute provided")) unless defined $attrib->{attribute};
@@ -1999,10 +2017,37 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 				}
 				my ($ok, $outref) = $self->cmdPrivExec($pkgsub, 'show sys info', 'show sys-info', 4);
 				return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
-				$$outref =~ /SysDescr\s+: (.+?) \(/g && $self->_setModelAttrib($1);
+				$$outref =~ /SysDescr\s+: (.+?) \(/g && do {
+					my $model = $1; # Record it, we need to set the model type after is_apls
+					if ($$outref =~ / BoxType: (.+)/gc) { # APLS boxes show a boxtype on same line
+						$self->_setBoxTypeAttrib($1);
+						$self->_setAttrib('is_apls', 1);
+						$self->_setModelAttrib($model); # Must be set after is_apls so that is_voss gets set as well
+					}
+					else {
+						$self->_setAttrib('apls_box_type', undef);
+						$self->_setAttrib('is_apls', 0);
+						$self->_setModelAttrib($model);
+					}
+				};
 				$$outref =~ /SysName\s+: (.+)/g && $self->_setAttrib('sysname', $1);
+				if ($self->{$Package}{ATTRIB}{'is_voss'}) {
+					if ($$outref =~ /BrandName:?\s+: (.+)/gc) { # On VOSS VSPs we read it
+						(my $brandname = $1) =~ s/, Inc\.$//; # Remove 'Inc.'
+						$self->_setAttrib('brand_name', $brandname);
+					}
+					else { # VSP9000 case, it is_voss, but reports no BrandName, so we set it..
+						$self->_setAttrib('brand_name', 'Avaya');
+					}
+				}
+				else { # Non-VOSS PassportERS
+					$self->_setAttrib('brand_name', undef);
+				}
 				$$outref =~ /BaseMacAddr\s+: (.+)/g && $self->_setBaseMacAttrib($1);
-				if ($$outref =~ /CP.+ dormant /) {
+				if ($$outref =~ /CP.+ dormant /		# 8600 & VSP9000
+				 || ($$outref =~ /\s1\s+\d{4}\S{2}\s+1\s+CPU\s+(?:\d+\s+){4}/ &&
+				     $$outref =~ /\s2\s+\d{4}\S{2}\s+1\s+CPU\s+(?:\d+\s+){4}/)	# VSP8600 just check for presence of slot1&2
+				  ) {
 					$self->_setAttrib('is_dual_cpu', 1);
 				}
 				else {
@@ -2013,10 +2058,10 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 				$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
 				return $self->poll_return(1);
 			};
-			($attrib->{attribute} eq 'model' || $attrib->{attribute} eq 'sysname' ||
-			 (!$self->{$Package}{ATTRIBFLAG}{'model'} && # We need 'model' attrib for some other attributes..
-			  ($attrib->{attribute} =~ /^(?:is_)?oob_/ || # ..for oob ones
-			   $attrib->{attribute} eq 'slots' || $attrib->{attribute} eq 'ports')) # ..for port/slot ones
+			($attrib->{attribute} eq 'model' || $attrib->{attribute} eq 'sysname' || $attrib->{attribute} eq 'is_apls' || $attrib->{attribute} eq 'is_voss' ||
+			 $attrib->{attribute} eq 'apls_box_type' || $attrib->{attribute} eq 'brand_name' || # Any new attributes added here, need to be added on exit to this if block below
+			 (!$self->{$Package}{ATTRIBFLAG}{'model'} && ($attrib->{attribute} eq 'slots' || $attrib->{attribute} eq 'ports')) || # We need 'model' attrib for port/slot ones
+			 (!$self->{$Package}{ATTRIBFLAG}{'is_voss'} && $attrib->{attribute} =~ /^(?:is_)?oob_/) # We need 'is_voss' attrib for oob ones
 			) && do {
 				unless ($attrib->{debugMsg}) {
 					$self->debugMsg(4,"Seeking attribute $attrib->{attribute} value by issuing command: show sys info / show sys-info (1 page)\n");
@@ -2024,18 +2069,46 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 				}
 				my ($ok, $outref) = $self->cmdPrivExec($pkgsub, 'show sys info', 'show sys-info', 1);
 				return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
-				$$outref =~ /SysDescr\s+: (.+?) \(/g && $self->_setModelAttrib($1);
+				$$outref =~ /SysDescr\s+: (.+?) \(/g && do {
+					my $model = $1; # Record it, we need to set the model type after is_apls
+					if ($$outref =~ / BoxType: (.+)/gc) { # APLS boxes show a boxtype on same line
+						$self->_setBoxTypeAttrib($1);
+						$self->_setAttrib('is_apls', 1);
+						$self->_setModelAttrib($model); # Must be set after is_apls so that is_voss gets set as well
+					}
+					else {
+						$self->_setAttrib('apls_box_type', undef);
+						$self->_setAttrib('is_apls', 0);
+						$self->_setModelAttrib($model);
+					}
+				};
 				$$outref =~ /SysName\s+: (.+)/g && $self->_setAttrib('sysname', $1);
+				if ($self->{$Package}{ATTRIB}{'is_voss'}) {
+					if ($$outref =~ /BrandName:?\s+: (.+)/gc) { # On VOSS VSPs we read it
+						(my $brandname = $1) =~ s/, Inc\.$//; # Remove 'Inc.'
+						$self->_setAttrib('brand_name', $brandname);
+					}
+					else { # VSP9000 case, it is_voss, but reports no BrandName, so we set it..
+						$self->_setAttrib('brand_name', 'Avaya');
+					}
+				}
+				else { # Non-VOSS PassportERS
+					$self->_setAttrib('brand_name', undef);
+				}
 				$$outref =~ /BaseMacAddr\s+: (.+)/g && $self->_setBaseMacAttrib($1); # Might not match on 8600 as on page 2
 				# Attributes below are beyond demanded pages of output, but we still check them in case more paging was disabled
-				if ($$outref =~ /CP.+ dormant /) {
+				if ($$outref =~ /CP.+ dormant /		# 8600 & VSP9000
+				 || ($$outref =~ /\s1\s+\d{4}\S{2}\s+1\s+CPU\s+(?:\d+\s+){4}/ &&
+				     $$outref =~ /\s2\s+\d{4}\S{2}\s+1\s+CPU\s+(?:\d+\s+){4}/)	# VSP8600 just check for presence of slot1&2
+				  ) {
 					$self->_setAttrib('is_dual_cpu', 1);
 				}
 				elsif ($$outref =~ /System Error Info :/) { # Output which follows Card Info, i.e. the output was there but no CP dormant matched
 					$self->_setAttrib('is_dual_cpu', 0);
 				}
 				$$outref =~ /Virtual IP\s+: (.+)/g && $self->_setAttrib('oob_virt_ip', $1);
-				if ($attrib->{attribute} eq 'model' || $attrib->{attribute} eq 'sysname') {
+				if ($attrib->{attribute} eq 'model' || $attrib->{attribute} eq 'sysname' || $attrib->{attribute} eq 'is_apls' || $attrib->{attribute} eq 'is_voss' ||
+				    $attrib->{attribute} eq 'apls_box_type' || $attrib->{attribute} eq 'brand_name') { # Needs to match the same listed on beginning of if block above
 					$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
 					return $self->poll_return(1);
 				}
@@ -2079,7 +2152,7 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 				}
 			};
 			$attrib->{attribute} =~ /^(?:is_)?oob_/ && do {
-				if ($self->{$Package}{ATTRIB}{'model'} =~ /^VSP/) { # VSP based PassportERS
+				if ($self->{$Package}{ATTRIB}{'is_voss'}) { # VSP based PassportERS (VOSS)
 					unless ($attrib->{debugMsg}) {
 						$self->debugMsg(4,"Seeking attribute $attrib->{attribute} value by issuing command: show ip interface vrf MgmtRouter\n");
 						$attrib->{debugMsg} = 1;
@@ -2091,6 +2164,7 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 					$ip1 = $1 if $$outref =~ /Port1\/1\s+ ([\d\.]+)/g;
 					$ipv = $1 if $$outref =~ /MgmtVirtIp\s+ ([\d\.]+)/g;
 					$ip2 = $1 if $$outref =~ /Port2\/1\s+ ([\d\.]+)/g;
+					$ip2 = $1 if $$outref =~ /Portmgmt2\s+ ([\d\.]+)/g;
 					if ($self->{$Package}{ATTRIB}{'cpu_slot'} == 1) { # Could be any VSP: 9k, 8k, 4k
 						$self->_setAttrib('oob_ip', $ip1);
 						$self->_setAttrib('oob_standby_ip', $ip2);
@@ -2117,7 +2191,10 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 						my ($ok, $outref) = $self->cmdPrivExec($pkgsub, 'show sys info', 'show sys-info');
 						return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
 						# No need to set Model, Sysname and BaseMAC as we only get here if Model is set
-						if ($$outref =~ /CP.+ dormant /) {
+						if ($$outref =~ /CP.+ dormant /		# 8600 & VSP9000
+						 || ($$outref =~ /\s1\s+\d{4}\S{2}\s+1\s+CPU\s+(?:\d+\s+){4}/ &&
+						     $$outref =~ /\s2\s+\d{4}\S{2}\s+1\s+CPU\s+(?:\d+\s+){4}/)	# VSP8600 just check for presence of slot1&2
+						  ) {
 							$self->_setAttrib('is_dual_cpu', 1);
 						}
 						else {
@@ -2160,6 +2237,29 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 					$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
 					return $self->poll_return(1);
 				}
+			};
+		}
+		else { # On standby CPU
+			($attrib->{attribute} eq 'is_apls') && do { # APLS is never dual_cpu
+				$self->_setAttrib('is_apls', 0);
+				$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
+				return $self->poll_return(1);
+			};
+			($attrib->{attribute} eq 'is_voss') && do {
+				unless ($attrib->{debugMsg}) {
+					$self->debugMsg(4,"Seeking attribute $attrib->{attribute} value by issuing command: cd /\n");
+					$attrib->{debugMsg} = 1;
+				}
+				my ($ok, $outref) = $self->cmdPrivExec($pkgsub, 'cd /', 'cd /');
+				return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
+				if ($$outref =~ /Only devices \/intflash/) {
+					$self->_setAttrib('is_voss', 1);
+				}
+				else {
+					$self->_setAttrib('is_voss', 0);
+				}
+				$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
+				return $self->poll_return(1);
 			};
 		}
 	}
@@ -2490,7 +2590,7 @@ sub poll_change_baudrate { # Method to handle change_baudrate for poll methods (
 	}
 
 	unless (defined $self->{POLL}{$pollsub}) { # Only applicable if called from another method already in polling mode
-		my @validArgs = ('baudrate', 'timeout', 'errmode');
+		my @validArgs = ('baudrate', 'timeout', 'errmode', 'forcebaud');
 		my %args = parseMethodArgs($pkgsub, \@_, \@validArgs, 1);
 		if (@_ && !%args) { # Legacy syntax
 			($args{baudrate}, $args{timeout}, $args{errmode}) = @_;
@@ -2503,6 +2603,7 @@ sub poll_change_baudrate { # Method to handle change_baudrate for poll methods (
 			databits		=>	undef,
 			stopbits		=>	undef,
 			handshake		=>	undef,
+			forcebaud		=>	$args{forcebaud},
 			local_side_only		=>	0, # For that functionality, just call Control::CLI's poll_change_baudrate
 			# Declare method storage keys which will be used
 			stage			=>	0,
@@ -2517,7 +2618,7 @@ sub poll_change_baudrate { # Method to handle change_baudrate for poll methods (
 	}
 	my $changeBaud = $self->{POLL}{$pollsub};
 	local $self->{errmode} = $changeBaud->{errmode} if defined $changeBaud->{errmode};
-	my $familyType = $self->{$Package}{ATTRIB}{'family_type'};
+	my $familyType = $self->{$Package}{ATTRIB}{'family_type'} || '';
 
 	if ($changeBaud->{local_side_only}) { # Same functionality as Control::CLI::change_baudrate()
 		my $ok = $self->SUPER::poll_change_baudrate($pkgsub,
@@ -2526,6 +2627,7 @@ sub poll_change_baudrate { # Method to handle change_baudrate for poll methods (
 			DataBits	=> $changeBaud->{databits},
 			StopBits	=> $changeBaud->{stopbits},
 			Handshake	=> $changeBaud->{handshake},
+			ForceBaud	=> $changeBaud->{forcebaud},
 		);
 		return $self->poll_return($ok); # Come out if error (if errmode='return'), or if nothing to read in non-blocking mode, or completed
 	}
@@ -2673,7 +2775,10 @@ sub poll_change_baudrate { # Method to handle change_baudrate for poll methods (
 	}
 
 	if ($changeBaud->{stage} < 7) { # 7th stage
-		my $ok = $self->SUPER::poll_change_baudrate($pkgsub, $changeBaud->{baudrate});
+		my $ok = $self->SUPER::poll_change_baudrate($pkgsub,
+			BaudRate	=> $changeBaud->{baudrate},
+			ForceBaud	=> $changeBaud->{forcebaud},
+		);
 		return $self->poll_return($ok) unless $ok; # Come out if error (if errmode='return'), or if nothing to read in non-blocking mode
 		$self->debugMsg(4,"ChangeBaudrate: changed local serial port to ", \$changeBaud->{baudrate}, "\n");
 		$self->_setAttrib('baudrate', $changeBaud->{baudrate});	# Adjust the attribute as we are sure we changed it now
@@ -2745,7 +2850,7 @@ sub poll_enable { # Method to handle enable for poll methods (used for both bloc
 	my $enable = $self->{POLL}{$pollsub};
 	local $self->{errmode} = $enable->{errmode} if defined $enable->{errmode};
 	return $self->poll_return($self->error("$pkgsub: No connection to enable")) if $self->eof;
-	my $familyType = $self->{$Package}{ATTRIB}{'family_type'};
+	my $familyType = $self->{$Package}{ATTRIB}{'family_type'} || '';
 	my $prompt = $self->{$Package}{prompt_qr};
 	my $passwordPrompt = $self->{password_prompt_qr};
 	my $enablePwd;
@@ -2856,7 +2961,7 @@ sub poll_device_more_paging { # Method to handle device_more_paging for poll met
 	my $devMorePage = $self->{POLL}{$pollsub};
 	local $self->{errmode} = $devMorePage->{errmode} if defined $devMorePage->{errmode};
 	return $self->poll_return($self->error("$pkgsub: No connection to set more paging on")) if $self->eof;
-	my $familyType = $self->{$Package}{ATTRIB}{'family_type'};
+	my $familyType = $self->{$Package}{ATTRIB}{'family_type'} || '';
 
 	return $self->poll_return($self->error("$pkgsub: No connection established")) unless $familyType;
 	if ($familyType eq $Prm{bstk}) {
@@ -2960,7 +3065,7 @@ sub poll_device_peer_cpu { # Method to handle device_peer_cpu for poll methods (
 	my $devPeerCpu = $self->{POLL}{$pollsub};
 	local $self->{errmode} = $devPeerCpu->{errmode} if defined $devPeerCpu->{errmode};
 	return $self->poll_return($self->error("$pkgsub: No connection established")) if $self->eof;
-	my $familyType = $self->{$Package}{ATTRIB}{'family_type'};
+	my $familyType = $self->{$Package}{ATTRIB}{'family_type'} || '';
 
 	if ($devPeerCpu->{stage} < 1) { # 1st stage
 		unless ($familyType) {
@@ -3369,7 +3474,39 @@ sub _setModelAttrib { # Set & re-format the Model attribute
 		# Try and reformat the model number into something like WSS-2380
 		$model = 'WSS-' . $model;
 	}
+	elsif ($self->{$Package}{ATTRIB}{'family_type'} eq $Prm{xirrus}) {
+		# Try and reformat the model number into something like WAP-9132
+		$model =~ s/(\D+)(\d+)/$1-$2/;		# From show chassis
+	}
+	elsif ($self->{$Package}{ATTRIB}{'is_apls'}) {
+		# Try and reformat from DSG6248CFP to DSG-6248-CFP
+		$model =~ s/^([A-Z]{3})(\d{3,})/$1-$2/;
+		$model =~ s/(-\d{3,})([A-Z])/$1-$2/;
+	}
 	$self->_setAttrib('model', $model);
+
+	# VOSS is a PassportERS with a VSP model name
+	if ($self->{$Package}{ATTRIB}{'family_type'} eq $Prm{pers}) {
+		if ($self->{$Package}{ATTRIB}{'is_apls'} || $model =~ /^VSP/) { # Requires is_apls to always be set before is_voss
+			$self->_setAttrib('is_voss', 1);
+		}
+		else {
+			$self->_setAttrib('is_voss', 0);
+		}
+	}
+	return;
+}
+
+
+sub _setBoxTypeAttrib { # Set & re-format the APLS BoxType attribute
+	my ($self, $boxType) = @_;
+
+	$boxType =~ s/\s+$//; # Remove trailing spaces
+	$boxType =~ s/^\s+//; # Remove leading spaces
+
+	$boxType =~ s/^([A-Z]{3})(\d{3,})/$1-$2/;
+	$boxType =~ s/(-\d{3,})([A-Z])/$1-$2/;
+	$self->_setAttrib('apls_box_type', $boxType);
 	return;
 }
 
@@ -3444,15 +3581,16 @@ sub _determineOutcome { # Determine if an error message was returned by host
 
 sub _restoreDeviceBaudrate { # Check done in disconnect and DESTROY to restore device baudrate before quiting
 	my $self = shift;
+	my $familyType = $self->{$Package}{ATTRIB}{'family_type'} || '';
 	# If change_bauderate() was called and serial connection still up...
 	if (defined $self->baudrate && defined (my $origBaud = $self->{$Package}{ORIGBAUDRATE}) ) {
 		# ...try and restore original baudrate on device before quiting
-		if ($Prm{bstk} eq $self->{$Package}{ATTRIB}{'family_type'}) {
+		if ($familyType eq $Prm{bstk}) {
 			$self->errmode('return');
 			$self->put($CTRL_C);
 			$self->print("terminal speed $origBaud");
 		}
-		elsif ($Prm{pers} eq $self->{$Package}{ATTRIB}{'family_type'}) {
+		elsif ($familyType eq $Prm{pers}) {
 			$self->errmode('return');
 			if ($self->{$Package}{ATTRIB}{'is_nncli'}) {
 				$self->printlist('enable', 'config term', "boot config sio console baud $origBaud");
@@ -3538,14 +3676,20 @@ Control::CLI::AvayaData - Interact with CLI of Avaya Networking products over an
 =head2 Sending commands once connected and disconnecting
 
 	$cli->enable;
+
+	# Configuration commands
 	$cli->return_result(1);
 	$cli->cmd('config terminal') or die $cli->last_cmd_errmsg;
 	$cli->cmd('no banner') or die $cli->last_cmd_errmsg;
 	$cli->cmd('exit') or die $cli->last_cmd_errmsg;
-	$cli->return_result(0);
+
+	# Show commands
 	$cli->device_more_paging(0);
+	$cli->return_result(0);
 	$config = $cli->cmd('show running-config');
+	die $cli->last_cmd_errmsg unless $cli->last_cmd_success;
 	print $config;
+
 	$cli->disconnect;
 
 =head2 Configuring multiple Avaya Networking products simultaneously in non-blocking mode
@@ -3616,7 +3760,7 @@ Control::CLI::AvayaData - Interact with CLI of Avaya Networking products over an
 =head1 DESCRIPTION
 
 Control::CLI::AvayaData is a sub-class of Control::CLI allowing CLI interaction customized for Avaya (ex Nortel Enterprise) Networking products over any of Telnet, SSH or Serial port.
-This class supports all of Avaya Virtual Services Platform (VSP), Ethernet Routing Switch (ERS), Secure Router (SR), WLAN Controllers, Security Switches and APs as well as most of the legacy data products from Nortel Enterprise (Bay Networks) heritage. Currently supported devices:
+This class supports all of Avaya Virtual Services Platform (VSP), Private Label Switches (APLS DSG BoxTypes), Ethernet Routing Switch (ERS), Secure Router (SR), WLAN Controllers, Security Switches and APs as well as most of the legacy data products from Nortel Enterprise (Bay Networks) heritage. Currently supported devices:
 
 =over 2
 
@@ -3626,11 +3770,15 @@ VSP 4000, 7000, 7200, 8000, 9000
 
 =item *
 
+APLS DSG models 6248, 7648, 7480, 8032, 9032
+
+=item *
+
 ERS/Passport models 1600, 8300, 8600, 8800
 
 =item *
 
-ERS models 2500, 3500, 4x00, 5x00
+ERS models 2500, 3x00, 4x00, 5x00
 
 =item *
 
@@ -3663,12 +3811,12 @@ Accelar/Passport models 1000, 1100, 1200
 =back
 
 Avaya has converged the CLI interface of its current range of products into a single unified (Cisco-like) CLI interface (Avaya-CLI or ACLI; previously called NNCLI in the Nortel days).
-This module supports the current and latest Avaya Networking products as well as the older product families previously offered by Nortel where a number of different CLI variants exist (e.g. Passport/Accelar CLI which is still widely used).
+This module supports the current and latest Avaya Networking products as well as the older product families previously offered by Nortel where a number of different CLI variants existed (e.g. Passport/Accelar old CLI).
 Hence the devices supported by this module can have an inconsistent CLI (in terms of syntax, login sequences, terminal width-length-paging, prompts) and in some cases two separate CLI syntaxes are available on the same product (ERS8x00 product families support both the new and old CLI modes).
 This class is written so that all the above products can be CLI scripted in a consistent way regardless of their underlying CLI variants. Hence a script written to connect and execute some CLI commands can be written in exactly the same way whether the product is an ERS8600 (using old CLI) or an ERS4500 or a SR2330. The CLI commands themselves might still vary across the different products though, even here, for certain common functions (like entering privExec mode or disabling terminal more paging) a generic method is provided by this class.
 
 Control::CLI::AvayaData is a sub-class of Control::CLI (which is required) and therefore the above functionality can also be performed in a consistent manner regardless of the underlying connection type which can be any of Telnet, SSH or Serial port connection. For SSH, only SSHv2 is supported with either password or publickey authentication.
-Furthermore this module leverages the non-blocking capaility of Control::CLI version 2.00 and is thus capable of operating in a non-blocking fashion for all its methods so that it can be used to drive multiple Avaya devices simultaneusly without resorting to Perl threads (see examples directory).
+Furthermore this module leverages the non-blocking capaility of Control::CLI version 2.00 and is thus capable of operating in a non-blocking fashion for all its methods so that it can be used to drive multiple Avaya devices simultaneously without resorting to Perl threads (see examples directory).
 
 Other refinements of this module over and above the basic functionality of Control::CLI are:
 
@@ -3685,6 +3833,10 @@ There is no need to set the prompt string in any of this module's methods since 
 =item *
 
 The connect method of this module automatically takes care of login for Telnet and Serial port access (where authentication is not part of the actual connection, unlike SSH) and so provides a consistent scripting approach whether the underlying connection is SSH or either Telnet or Serial port.
+
+=item *
+
+Automatic handling of output paged with --more-- prompts, including the ability to retrieve an exact number of pages of output.
 
 =item *
 
@@ -3738,6 +3890,7 @@ Used to create an object instance of Control::CLI::AvayaData
   	[Output_record_separator => $ors,]
   	[Terminal_type		 => $string,]
   	[Window_size		 => [$width, $height],]
+  	[Report_query_status	 => $flag,]
   	[Debug			 => $debugFlag,]
 
   	# added in Control::CLI::AvayaData :
@@ -3787,6 +3940,7 @@ Methods which can be run on a previously created Control::CLI::AvayaData instanc
   	[Passphrase		=> $passphrase,]
   	[Prompt_credentials	=> $flag,]
   	[BaudRate		=> $baudRate,]
+  	[ForceBaud		=> $flag,]
   	[Parity			=> $parity,]
   	[DataBits		=> $dataBits,]
   	[StopBits		=> $stopBits,]
@@ -3813,6 +3967,7 @@ Methods which can be run on a previously created Control::CLI::AvayaData instanc
   	[Passphrase		=> $passphrase,]
   	[Prompt_credentials	=> $flag,]
   	[BaudRate		=> $baudRate,]
+  	[ForceBaud		=> $flag,]
   	[Parity			=> $parity,]
   	[DataBits		=> $dataBits,]
   	[StopBits		=> $stopBits,]
@@ -3930,6 +4085,7 @@ For Serial port, these arguments are used:
 
   $ok = $obj->connect(
   	[BaudRate		=> $baudRate,]
+  	[ForceBaud		=> $flag,]
   	[Parity			=> $parity,]
   	[DataBits		=> $dataBits,]
   	[StopBits		=> $stopBits,]
@@ -3947,6 +4103,8 @@ For Serial port, these arguments are used:
 
 If arguments "baudrate", "parity", "databits", "stopbits" and "handshake" are not specified, the defaults are: Baud Rate = 9600, Data Bits = 8, Parity = none, Stop Bits = 1, Handshake = none. These default values will work on all Avaya Networking products with default settings.
 Allowed values for these arguments are the same allowed by Control::CLI::connect().
+
+On Windows systems the underlying Win32::SerialPort module can have issues with some serial ports, and fail to set the desired baudrate (see bug report https://rt.cpan.org/Ticket/Display.html?id=120068); if hitting that problem (and no official Win32::SerialPort fix is yet available) set the ForceBaud argument; this will force Win32::SerialPort into setting the desired baudrate even if it does not think the serial port supports it.
 
 For a serial connection, this method - or to be precise the login() method which is called by connect() - will automatically send the wake_console string sequence to the attached device to alert it of the connection. The default sequence will work across all Avaya Networking products but can be overridden by using the wake_console argument.
 
@@ -4427,11 +4585,11 @@ I<family_type>:
 
 =item *
 
-B<BaystackERS> : Any of Baystack, BPS, ES, Stackable ERS (ERS-2500, ERS-3500, ERS-4x00, ERS-5x00), Stackable VSP (VSP-7000), WLAN8100
+B<BaystackERS> : Any of Baystack, BPS, ES, Stackable ERS (ERS-2500, ERS-3x00, ERS-4x00, ERS-5x00), Stackable VSP (VSP-7000), WLAN8100
 
 =item *
 
-B<PassportERS> : Any of Passport/ERS-1600, Passport/ERS-8x00, VSP-9000, VSP-8000, VSP-7200, VSP-4000
+B<PassportERS> : Any of Passport/ERS-1600, Passport/ERS-8x00, VOSS VSPs (VSP-9000, VSP-8000, VSP-7200, VSP-4000), APLS DSG BoxTypes
 
 =item *
 
@@ -4492,7 +4650,7 @@ I<slots>: Returns a list (array reference) of all valid slot numbers (or unit nu
 
 =item *
 
-I<ports>: If the I<slots> attribute is defined, this attribute returns an array reference where the index is the slot number (valid slot numbers are provided by the I<slots> attribute) and the array elements are a list (array references again) of valid ports for that particular slot. Note that for 40GbE channelized ports the 10GbE sub interfaces will be listed in port/subport fashion in this list; e.g. channelized ports 1/2/1-1/2/4 will be seen as ports 2/1,2/2,2/3,2/4 on the port list for slot 1.
+I<ports>: If the I<slots> attribute is defined, this attribute returns an array reference where the index is the slot number (valid slot numbers are provided by the I<slots> attribute) and the array elements are a list (array references again) of valid ports for that particular slot. Note that for 40GbE/100GbE channelized ports the 10GbE/25GbE sub interfaces will be listed in port/subport fashion in this list; e.g. channelized ports 1/2/1-1/2/4 will be seen as ports 2/1,2/2,2/3,2/4 on the port list for slot 1.
 If the I<slots> attribute is defined but empty (i.e. there is no slot number associated to available ports - e.g. a BaystackERS switch in standalone mode), this attribute returns a list (array reference) of valid port numbers for the device.
 
 =item *
@@ -4501,7 +4659,7 @@ I<baudrate>: Console port configured baudrate. This attribute only works with de
 
 =item *
 
-I<max_baud>: Maximum configurable value of baudrate on device's console port. This attribute only works with devices where the baudrate is configurable (i.e. only PassportERS and BaystackERS devices with the exceptions of ERS-4000 units andStandby CPU of a VSP9000). On these devices this attribute will return a defined value. On other devices where the baudrate is not configurable an undef value is returned, and in this case it is safe to assume that the only valid baudrate is 9600.
+I<max_baud>: Maximum configurable value of baudrate on device's console port. This attribute only works with devices where the baudrate is configurable (i.e. only PassportERS and BaystackERS devices with the exceptions of ERS-4000 units andStandby CPU of a VSP9000). On these devices this attribute will return a defined value. On other devices where the baudrate is not configurable an undef value is returned, and in this case it is safe to assume that the only valid baudrate is the one returned by the I<baudrate> attribute.
 
 =back
 
@@ -4510,6 +4668,22 @@ I<max_baud>: Maximum configurable value of baudrate on device's console port. Th
 Attributes which only apply to B<PassportERS> family type:
 
 =over 4
+
+=item *
+
+I<is_voss>: Flag; true(1) if the device is a PassportERS VSP model (only I<model> VSP-xxxx) or is an Avaya Product Label Switch (APLS) (I<is_apls> is true); false(0) otherwise.
+
+=item *
+
+I<is_apls>: Flag; true(1) if an Avaya Product Label Switch (APLS); false(0) otherwise.
+
+=item *
+
+I<apls_box_type>: Box Type of an Avaya Product Label Switch (APLS); only set if I<is_apls> is true, undefined otherwise.
+
+=item *
+
+I<brand_name>: Brand Name of an Avaya Product Label Switch (APLS) or a VOSS VSP; only set if I<is_voss> is true, undefined otherwise.
 
 =item *
 
@@ -4650,6 +4824,7 @@ Changing only local serial port:
   $ok = $obj->change_baudrate(
   	Local_side_only		=> 1,
   	[BaudRate		=> $baudRate,]
+  	[ForceBaud		=> $flag,]
   	[Parity			=> $parity,]
   	[DataBits		=> $dataBits,]
   	[StopBits		=> $stopBits,]
@@ -4664,6 +4839,7 @@ Changing host and serial port together (backward compatible syntax):
 
   $baudrate = $obj->change_baudrate(
   	BaudRate		=> $baudrate,
+  	[ForceBaud		=> $flag,]
   	[Blocking		=> $flag,]
   	[Timeout		=> $secs,]
   	[Errmode		=> $errmode,]
@@ -4675,6 +4851,7 @@ Changing host and serial port together (new syntax for non-blocking use):
   $ok = $obj->change_baudrate(
 	Poll_syntax		=> 1,
   	BaudRate		=> $baudrate,
+  	[ForceBaud		=> $flag,]
   	[Blocking		=> $flag,]
   	[Timeout		=> $secs,]
   	[Errmode		=> $errmode,]
@@ -4685,6 +4862,7 @@ Changing host and serial port together (new syntax for non-blocking use):
   ($ok, $baudrate) = $obj->change_baudrate(
 	[Poll_syntax		=> 1,]
   	BaudRate		=> $baudrate,
+  	[ForceBaud		=> $flag,]
   	[Blocking		=> $flag,]
   	[Timeout		=> $secs,]
   	[Errmode		=> $errmode,]
@@ -4702,7 +4880,7 @@ If the 'local_side_only' argument is set this method will simply call the Contro
 
 Without the 'local_side_only' argument set, this method combines the knowledge of the Avaya device type we are connected to by automatically changing the baudrate configuration on the attached device before actually changing the baudrate of the connection. Thus if the attribute family_type is not yet defined or is set to 'generic' then an error will be returned. From this point onwards, the behaviour of this method upon failure will depend on whether a specific baudrate was provided or whether the desired baudrate was specified as 'max'. In the former case any failure to set the requested baudrate will trigger the error mode action whereas in the latter case it is assumed that the desire is to try and maximise the connection baudrate if possible but that we do not want to generate an error if that is not possible.
 
-The ability to change the baudrate configuration on the attached device is currently only available when the attribute family_type is either BaystackERS or PassportERS. For any other family_type (including 'generic', SecureRouter & WLAN2300) this method will simply return success in 'max' mode and the error mode action otherwise (there is no way to change the baudrate configuration on SecureRouter & WLAN2300 devices to a value other than 9600 baud; there is no knowledge on how to do so on 'generic' devices). Even on some BaystackERS or PassportERS devices it is not possible to change the baudrate (e.g. ERS-4x00, Passport-1600, Passport-8300) and again this method will simply return success in 'max' mode and the error mode action otherwise.
+The ability to change the baudrate configuration on the attached device is currently only available when the attribute family_type is either BaystackERS or PassportERS. For any other family_type (including 'generic', SecureRouter & WLAN2300) this method will simply return success in 'max' mode and the error mode action otherwise (there is no way to change the baudrate configuration on SecureRouter & WLAN2300 devices to a value other than 9600 baud; there is no knowledge on how to do so on 'generic' devices). Even on some BaystackERS or PassportERS devices it is not possible to change the baudrate (e.g. ERS-4x00, Passport-1600, Passport-8300 and some APLS switches) and again this method will simply return success in 'max' mode and the error mode action otherwise.
 
 When changing the baudrate of the local connection this method calls Control::CLI::change_baudrate() which will restart the object serial connection with the new baudrate (in the background, the serial connection is actually disconnected and then re-connected) without losing the current CLI session.
 If there is a problem restarting the serial port connection at the new baudrate then the error mode action is performed (now also in 'max' mode) - see errmode().
@@ -5032,11 +5210,11 @@ The following debug levels are defined:
 
 =item *
 
-bit 1 : Control::CLI - Debugging activated for polling methods + readwait() + Win32/Device::SerialPort constructor $quiet flag reset
+bit 1 : Control::CLI - Debugging activated for for polling methods + readwait() and enables carping on Win32/Device::SerialPort. This level also resets Win32/Device::SerialPort constructor $quiet flag only when supplied in Control::CLI::new()
 
 =item *
 
-bit 2 : Control::CLI - Debugging is activated on underlying Net::SSH2 and Win32::SerialPort / Device::SerialPort
+bit 2 : Control::CLI - Debugging is activated on underlying Net::SSH2 and Win32::SerialPort / Device::SerialPort; there is no actual debugging for Net::Telnet
 
 =item *
 
@@ -5107,7 +5285,7 @@ Of the supported family types only the WLAN2300 requires a password to access pr
 
 =item B<prompt()> - set the CLI prompt match pattern for this object
 
-=item B<disconnect> - disconnect from host
+=item B<disconnect()> - disconnect from host
 
 =back
 
@@ -5142,6 +5320,8 @@ Of the supported family types only the WLAN2300 requires a password to access pr
 =item B<close> - disconnect from host
 
 =item B<poll> - poll object(s) for completion
+
+=item B<debug()> - set debugging
 
 =back
 
@@ -5192,6 +5372,8 @@ Of the supported family types only the WLAN2300 requires a password to access pr
 =item B<terminal_type()> - set the terminal type for the connection
 
 =item B<window_size()> - set the terminal window size for the connection
+
+=item B<report_query_status()> - set if read methods should automatically respond to Query Device Status escape sequences 
 
 =back
 
@@ -5641,7 +5823,7 @@ L<http://search.cpan.org/dist/Control-CLI-AvayaData/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2015 Ludovico Stevens.
+Copyright 2017 Ludovico Stevens.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

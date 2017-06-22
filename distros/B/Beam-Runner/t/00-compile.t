@@ -6,10 +6,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 12 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Beam/Runnable.pm',
+    'Beam/Runnable/AllowUsers.pm',
+    'Beam/Runnable/DenyUsers.pm',
+    'Beam/Runnable/Single.pm',
     'Beam/Runnable/Timeout/Alarm.pm',
     'Beam/Runner.pm',
     'Beam/Runner/Command.pm',

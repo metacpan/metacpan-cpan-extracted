@@ -1,5 +1,10 @@
 Revision history for Comics
 
+1.06	2017-06-14
+
+	Add ToonHole, LoadingArtist, Optipess, LolNein, CheerUpEmoKid,
+	PretendsToBeDrawing, JHall, JHall/Bloop.
+
 1.05	2017-05-01
 
 	Fixes for TheMinistryOfAbnormality, CtrlAltDel.
@@ -40,7 +45,7 @@ Revision history for Comics
 	Add nice(r) heading.
 	Add white background to the images.
 	Add link to Comics web page.
-	Add MIN_PER_VERSION to Makefile.PL.
+	Add MIN_PERL_VERSION to Makefile.PL.
 
 0.11	2016-11-02
 

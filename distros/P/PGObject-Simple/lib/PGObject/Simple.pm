@@ -13,11 +13,11 @@ PGObject::Simple - Minimalist stored procedure mapper based on LedgerSMB's DBObj
 
 =head1 VERSION
 
-Version 3.0.1
+Version 3.0.2
 
 =cut
 
-our $VERSION = 3.000001;
+our $VERSION = 3.000002;
 
 =head1 SYNOPSIS
 
@@ -284,7 +284,6 @@ sub _self_to_arg { # refactored from map call, purely internal
     }
     $db_arg = $args->{args}->{$argname} if exists $args->{args}->{$argname};
     $db_arg = $db_arg->to_db if eval {$db_arg->can('to_db')};
-    $db_arg = { type => 'bytea', value => $db_arg} if $_->{type} eq 'bytea';
 
     return $db_arg;
 }

@@ -1,8 +1,8 @@
 
 =head1 NAME
 
-Lab::Moose::Connection::LinuxGPIB - Connection backend to the LinuxGpib library
-and kernel drivers.
+Lab::Moose::Connection::LinuxGPIB - Connection back end to the LinuxGpib
+library and kernel drivers.
 
 =head1 SYNOPSIS
 
@@ -25,7 +25,7 @@ backend.
 =cut
 
 package Lab::Moose::Connection::LinuxGPIB;
-
+$Lab::Moose::Connection::LinuxGPIB::VERSION = '3.550';
 use 5.010;
 
 use Moose;
@@ -49,7 +49,6 @@ use LinuxGpib qw/
     ibclr
     /;
 
-our $VERSION = '3.543';
 
 =head1 METHODS
 

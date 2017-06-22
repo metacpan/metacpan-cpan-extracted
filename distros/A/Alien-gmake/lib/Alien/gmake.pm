@@ -7,7 +7,7 @@ use Env qw( @PATH );
 use File::Spec;
 
 # ABSTRACT: Find or build GNU Make
-our $VERSION = '0.19'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 
 my $in_path;
@@ -58,7 +58,7 @@ Alien::gmake - Find or build GNU Make
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 

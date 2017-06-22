@@ -16,12 +16,18 @@ use File::Basename;
 use Clone qw{ clone };
 use Hash::Merge qw{ merge };
 use List::Util qw{ max reduce };
-use Getopt::Long qw{ :config posix_default gnu_compat bundling };
+use Getopt::Long qw{
+    :config posix_default bundling require_order no_ignore_case
+};
 
 use base 'Exporter';
 our @EXPORT_OK = qw/startup/;
 
-our $VERSION = '0.17'; # Don't forget to update the manpage version, too!
+our $VERSION = '0.20'; # Don't forget to update the manpage version, too!
+
+use Readonly;
+Readonly my $V_FOR_VERBOSE => 'ALIAS OF VERBOSE';
+Readonly my $V_OPTSPEC     => 'v+';
 
 # Simple command-line processing with transparent
 # support for config files.
@@ -215,8 +221,11 @@ sub _usage_message
     # In the usage text, show the option names, not the aliases.
     my %options =
         map { ( $_->{names}[0], $_ ) }
-        map { $self->_parse_spec($_) }
+        map { $self->_parse_spec($_, $optspec->{$_}) }
         keys %{$optspec};
+
+    # Automatically suppress 'v' if it's an alias of 'verbose'
+    delete $options{v} if $optspec->{$V_OPTSPEC} // '' eq $V_FOR_VERBOSE;
 
     # Note the length of the longest option
     my $length  = max map { length() } keys %options;
@@ -236,18 +245,32 @@ sub _usage_message
     for my $option (sort keys %options)
     {
         ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
-        my $indent = $length + 6;
+        my $indent = $length + 8;
         my $spec   = $options{$option};
 
         # Print the basic help option
-        $message .= sprintf "    %-${length}s - %s\n", $option, $spec->{desc};
+        if (length($option) == 1)
+        {
+            $message .= sprintf "    -%-${length}s  - %s\n", $option, $spec->{desc};
+        }
+        else
+        {
+            $message .= sprintf "    --%-${length}s - %s\n", $option, $spec->{desc};
+        }
+
+        my @aliases = @{ $spec->{names} };
+        shift @aliases;
+
+        # Insert 'v' as an alias of 'verbose' if it is
+        push @aliases, 'v'
+            if $option eq 'verbose'
+            && $optspec->{$V_OPTSPEC} // '' eq $V_FOR_VERBOSE;
 
         # Print aliases, if any
-        if (@{ $spec->{names} } > 1)
+        if (@aliases > 0)
         {
-            my @aliases = @{ $spec->{names} };
-            shift @aliases;
-
+            # Add in the dashes
+            @aliases = map { length() == 1 ? "-$_" : "--$_" } @aliases;
             $message .= sprintf "%${indent}s Aliases: %s\n", '', join(', ', @aliases);
         }
 
@@ -266,61 +289,116 @@ sub _usage_message
 sub _get_default_optspec
 {
     return {
-        'help'            => 'Print this helpful help message',
-        'rcfile=s'        => 'Config file to load',
-        'write-rcfile'    => 'Write current options to rcfile',
-        'rcfile-format=s' => 'Format to write the rcfile',
-        'version'         => 'Print version information and exit',
-        'manpage'         => 'Print the manpage for this script',
+        'help|h'          => 'Print this help message',
+        'rcfile:s'        => 'Config file to load',
+        'write-rcfile'    => 'Write the current options to config file',
+        'rcfile-format=s' => 'Format to write the config file',
+        'version|V'       => 'Print version information and exit',
+        'verbose:1'       => 'Print verbose messages',  # Supports --verbose or --verbose=9
+        $V_OPTSPEC        => $V_FOR_VERBOSE,            # 'v+' Supports -vvv
+        'manpage|H'       => 'Print the manpage for this script',
     };
 }
 
-# Parses the option specs, identifying their data types
-sub _parse_specs
+# Parse the optspecs, returning a complete description of each.
+sub _parse_optspecs
 {
-    my $self = shift;
+    my ($self, $optspecs) = @_;
+    my $parsed = { options => {}, aliases => {} };
 
-    my %structure;
-
-    # Build a list of the array and hash configs, so we can
-    # unflatten them from the config file if necessary.
-    for my $option ( keys %{ $self->get_optspec } )
+    # Step through each option
+    for my $optspec (keys %{$optspecs})
     {
-        my $spec = $self->_parse_spec($option);
+        # Parse the spec completely
+        $parsed->{options}{$optspec}
+            = $self->_parse_spec($optspec, $optspecs->{$optspec});
 
-        for my $type (qw{ array hash bool flag })
+        # Make a reverse-lookup by option name/alias
+        for my $alias (@{ $parsed->{options}{$optspec}{names} })
         {
-            next unless $spec->{$type};
-            $structure{$_} = uc($type) for @{$spec->{names}};
+            # It's a fatal error to use the same alias twice
+            $self->die("--$alias option defined twice")
+                if defined $parsed->{aliases}{$alias};
+
+            $parsed->{aliases}{$alias} = $optspec;
         }
     }
 
-    return \%structure;
+    return $parsed;
+}
+
+# Parses the option specs, identifying array and hash data types
+sub _option_data_types
+{
+    my $self     = shift;
+    my $optspecs = $self->get_optspec();
+    my %types;
+
+    # Build a list of the array and hash configs, so we can
+    # unflatten them from the config file if necessary.
+    for my $option ( keys %{ $optspecs } )
+    {
+        my $spec = $self->_parse_spec($option, $optspecs->{$option});
+
+        for my $type (qw{ array hash bool count flag })
+        {
+            next unless $spec->{$type};
+            $types{$_} = uc($type) for @{$spec->{names}};
+        }
+    }
+
+    return \%types;
 }
 
 # Breaks an option spec down into its components.
 sub _parse_spec
 {
-    my ($self, $spec) = @_;
+    my ($self, $spec, $help_text) = @_;
+
+    ## no critic ( Perl::Critic::Policy::RegularExpressions::ProhibitComplexRegexes )
 
     # We really want the "name(s)" portion
-    my ( $specification, $type1, $type2 ) =
-        $spec =~ /^([^:=!+]+)([:=!+]?)[^@%]*([@%]?).*$/xms;
+    my ( $specification, $boolean, $incremental, $type, $cardinality, $unmatched ) =
+        $spec =~ m{
+            (?:
+                ( (?&aliases)      )
+                ( (?&negatable)?   )
+                ( (?&incremental)? )
+                ( (?&specifier)?   )
+                ( (?&multiple)?    )
+                ( (?&unmatched)?   )
+            )
+            (?(DEFINE)
+                (?<aliases>     (?: ^ (?&identifier) (?: (?&separator) (?&identifier) )* ) )
+                (?<identifier>  [\w-]+ )
+                (?<separator>   [|]    )
+                (?<negatable>   [!] $  )
+                (?<incremental> [+] $  )
+                (?<specifier>   (?: (?&optional) (?&type) ) )
+                (?<type>        (?: [fis] | \d+ ) )
+                (?<optional>    [:=]   )
+                (?<multiple>    [@%]   )
+                (?<unmatched>   (?: .* $ ) )
+            )
+        }xms;
 
-    # Lookup the help text while we're at it
-    my $optspec = $self->get_optspec;
+    # If there's anything we failed to match, it's a fatal error
+    $self->die("Invalid optspec: $spec") if $unmatched;
 
     ## no critic ( ValuesAndExpressions::ProhibitNoisyQuotes )
+    ## no critic ( Perl::Critic::Policy::ValuesAndExpressions::ProhibitMagicNumbers )
 
     # Note: doesn't identify string, int, float options
     return {
         spec   => $spec,
         names  => [ split /[|]/xms, $specification ],
-        desc   => $optspec->{$spec},
-        array  => ( $type2 eq '@' ? 1 : 0 ),
-        hash   => ( $type2 eq '%' ? 1 : 0 ),
-        bool   => ( $type1 eq '!' ? 1 : 0 ),
-        flag   => ( $type1 eq ''  ? 1 : 0 ),
+        desc   => $help_text,
+        type   => substr($type, -1, 1),
+        array  => ( $cardinality eq '@' ? 1 : 0 ),
+        hash   => ( $cardinality eq '%' ? 1 : 0 ),
+        bool   => ( $boolean     eq '!' ? 1 : 0 ),
+        count  => ( $incremental eq '+' ? 1 : 0 ),
+        flag   => ( $type        eq ''  ? 1 : 0 ),
     };
 }
 
@@ -337,7 +415,7 @@ sub _option_aliases
     for my $option (keys %{$optspec})
     {
         $optspec->{$option} ||= 0;
-        $option               = $self->_parse_spec($option);
+        $option               = $self->_parse_spec($option, $optspec->{$option});
 
         # The spec can define aliases
         for my $name ( @{ $option->{names} } )
@@ -354,80 +432,140 @@ sub _option_aliases
 # added in.
 sub _validate_optspec
 {
-    my ( $self, $optspec ) = @_;
+    # no critic ( Perl::Critic::Policy::Modules::ProhibitExcessMainComplexity )
+    my ( $self, $user_optspecs ) = @_;
+    my $default_optspecs         = $self->_get_default_optspec();
 
-    # Build a hash of option specs in $optspec, indexed by option name.
-    # Die with an error if any option names collide.
-    my $option_aliases  = $self->_option_aliases($optspec);
-    my $default_options = $self->_get_default_optspec;
-    my $default_aliases = $self->_option_aliases($default_options);
+    my $parsed;
 
-    # Verify that any default options specified in $optspec are specified
-    # with the right signature OR are bare words. This makes for the
-    # syntactic sugar of saying { rcfile => 0 } instead of { 'rcfile=s' => 0 }.
-    for my $name ( keys %{$default_aliases} )
+    # Parse the user optspecs
+    $parsed          = $self->_parse_optspecs($user_optspecs);
+    my $user_options = $parsed->{options};
+    my $user_aliases = $parsed->{aliases};
+
+    # Parse the default optspecs
+    $parsed             = $self->_parse_optspecs($default_optspecs);
+    my $default_options = $parsed->{options};
+    my $default_aliases = $parsed->{aliases};
+
+    # While we're here, remember the "help" option settings for later.
+    # If a tricksy user deletes it, we'll put it back.
+    my $default_help_optspec = $default_aliases->{'help'};
+    my $default_help_text    = $default_optspecs->{$default_help_optspec};
+    my $default_help_parsed  = $default_options->{$default_help_optspec};
+
+    # At this point we also know that there are no conflicting aliases
+    # in either the user or default optspecs. So the only thing to check
+    # is whether the user invokes any of the default optspecs.
+
+    # Step through each user alias. Check for collisions, and also delete
+    # any default options for which this was requested.
+    for my $alias (keys %{$user_aliases})
     {
-        # If an alias in $default_aliases is not mentioned in $options_aliases,
-        # then install the option in $optspec.
-        if ( not exists $option_aliases->{$name} )
+        my $user_optspec = $user_aliases->{$alias};
+
+        # Check if this alias collides with a default option,
+        # and the value in the user optspec is false.
+        next if $user_optspecs->{$user_optspec} || 0;
+        next unless defined $default_aliases->{$alias};
+
+        my $default_optspec = $default_aliases->{$alias};
+        my $default_name    = $default_options->{$default_optspec}{names}[0];
+
+        # If the alias was not the primary name of the default option,
+        # then we delete only the specific alias requested.
+        if ($alias ne $default_name)
         {
-            my $specification = $default_aliases->{$name};
-            $optspec->{$specification} = $default_options->{$specification};
+            delete $default_aliases->{$alias};
             next;
         }
-        my $specification = delete $option_aliases->{$name};
 
-        # If the alias $name has the same specification as in the default
-        # options, then there's nothing to do.
-        next if $specification eq $default_aliases->{$name};
-
-	    # Otherwise it's a fatal error for the specification to be
-	    # more than a bare word, possibly with aliases. The bare word is
-        # interpreted as a shorthand for the full specificaion of the
-        # default option.
-        my $details = $self->_parse_spec($specification);
-        if ( not $details->{flag} )
+        # Completely delete the default options corresponding to this alias.
+        for my $name (@{$default_options->{$default_optspec}{names}})
         {
-            $self->die("--$name option defined incorrectly; should be \"$_\"")
-                for ($default_aliases->{$name});
+            delete $default_aliases->{$name};
         }
+        delete $default_options->{$default_optspec};
 
-        # We've handled this option, so skip any aliases it may have.
-        delete $option_aliases->{$_} for @{ $details->{names} };
+        # Special case: we use two options to cover 'verbose'
+        if ($alias eq 'verbose' and $default_optspec->{$V_OPTSPEC} eq $V_FOR_VERBOSE)
+        {
+            delete $default_options->{$default_aliases->{v}};
+            delete $default_aliases->{v};
+        }
+    }
 
-        # We consider the specification we found to be a replacement for
-        # the default specification, so we delete the default one as
-        # redundant with the one we found.
-        delete $optspec->{$default_aliases->{$name}};
+    # Remove any disabled user options. Options are disabled by
+    # setting them to anything that evaluates to false.
+    for my $optspec (keys %{$user_options})
+    {
+        next if $user_options->{$optspec}{desc} || 0;
+
+        for my $alias (@{$user_options->{$optspec}{names}})
+        {
+            delete $user_aliases->{$alias};
+        }
+        delete $user_options->{$optspec};
+    }
+
+    # Now we just check for ordinary collisions. Since we've performed any
+    # requested deletions, any collisions between user and default aliases
+    # means that an alias is defined twice.
+    for my $name (keys %{$user_aliases})
+    {
+        next unless defined $default_aliases->{$name};
+
+        $self->die("Multiple definitions for --$name option");
     }
 
     # The --help option is NOT optional, so we override it if it evaluates
     # to false. It must be present, because if we didn't find it above we
     # would have inserted it.
-    $optspec->{help} = $default_options->{help} unless $optspec->{help};
+    if (not defined $user_aliases->{'help'})
+    {
+        $user_options->{$default_help_optspec} = $default_help_parsed;
+    }
 
     # If the --rcfile option is disabled, then we must also delete the
     # --rcfile-format and --write-rcfile options, since they make no
     # sense in scripts that don't support config files.
-    if ( not $optspec->{$default_aliases->{rcfile}} )
+    if ( not defined $user_aliases->{rcfile} )
     {
-        delete $optspec->{$default_aliases->{$_}}
-            for qw{ rcfile rcfile-format write-rcfile };
+        for my $option (qw{ rcfile rcfile-format write-rcfile })
+        {
+            if (defined $user_aliases->{$option})
+            {
+                delete $user_options->{$user_aliases->{$option}};
+                delete $user_aliases->{$option};
+            }
+        }
     }
 
     # If rcfile writing is disabled, then we must delete the --rcfile-format
     # option, which is meaningless when we don't write config files.
-    if ( not $optspec->{$default_aliases->{'write-rcfile'}} )
+    if ( not defined $user_aliases->{'write-rcfile'} )
     {
-        delete $optspec->{$default_aliases->{'rcfile-format'}};
+        if (defined $user_aliases->{'rcfile-format'})
+        {
+            delete $user_options->{$user_aliases->{'rcfile-format'}};
+            delete $user_aliases->{'rcfile-format'};
+        }
     }
 
-    # Remove any other disabled options. Options are disabled by
-    # setting them to anything that evaluates to false. We made
-    # sure it was defined in the call to _parse_spec() above.
-    map { delete $optspec->{$_} unless $optspec->{$_} } keys %{$optspec};
+    # Create a new optspec which includes both the user and default options.
+    my $optspecs = {};
 
-    return $optspec;
+    for my $optspec (keys %{$default_options})
+    {
+        $optspecs->{$optspec} = $default_options->{$optspec}{desc};
+    }
+
+    for my $optspec (keys %{$user_options})
+    {
+        $optspecs->{$optspec} = $user_options->{$optspec}{desc};
+    }
+
+    return $optspecs;
 }
 
 # This is the core method of the whole module: it actually does the
@@ -460,6 +598,20 @@ sub init
     $options = reduce { merge($a,$b) } (
         $options, $config->{default}, $default
     );
+
+    # Add a 'verbose' option that evaluates to false if there isn't
+    # already one in $options.
+    $options->{verbose} //= 0;
+
+    # Consolidate the 'v' and 'verbose' options if the default
+    # options are in play here.
+    if ($self->_get_default_optspec()->{$V_OPTSPEC} eq $V_FOR_VERBOSE)
+    {
+        if (defined $options->{v})
+        {
+            $options->{verbose} += delete $options->{v};
+        }
+    }
 
     # Save the fully-processed options
     $options_of{ident $self} = clone($options);
@@ -539,7 +691,7 @@ sub _process_command_line
 sub _read_config_file
 {
     my $self    = shift;
-    my $types   = $self->_parse_specs;
+    my $types   = $self->_option_data_types;
     my $rcfile  = $self->get_rcfile || '';
     my $options = {
         files         => [$rcfile],
@@ -651,7 +803,17 @@ sub _parse_setting
     # negatable flags.
     if ( $type eq 'BOOL' or $type eq 'FLAG' )
     {
-        return $value ? 1 : 0;
+        return $value // 0 ? 1 : 0;
+    }
+
+    # Counters are integer-valued
+    if ( $type eq 'COUNT' )
+    {
+        # All other data types we support are scalars.
+        $self->die("Invalid value \"$value\" for option \"$option\" in config file.")
+            if $value !~ /^ \d+ $/xms;
+
+        return $value;
     }
 
     # The only fix we implement is to parse CSV and primitive name/value
@@ -691,7 +853,7 @@ sub BUILD
     {
         $argref = { options => $argref };
     }
-    $self->set_optspec($argref->{options}) if keys %{$argref->{options} || {}};
+    $self->set_optspec($argref->{options} || {});
 
     # Caller can specify default settings for all options.
     $self->set_default_settings($argref->{default_settings})
@@ -880,7 +1042,7 @@ sub _write_rcfile_ini
     # Get out current settings, and then fix the formats of array and
     # hash values.
     my $settings = $self->get_options_as_defaults;
-    my $types    = $self->_parse_specs;
+    my $types    = $self->_option_data_types;
 
     for my $setting ( keys %{ $settings->{default} } )
     {
@@ -958,11 +1120,11 @@ sub _write_rcfile_json
     my ($self, $file) = @_;
 
     # Installing a JSON module is optional.
-    eval 'use JSON::Any';
-    $self->die('Can\'t write rcfile: JSON::Any is not installed.')
+    eval 'use JSON::MaybeXS';
+    $self->die('Can\'t write rcfile: JSON::MaybeXS is not installed.')
         if $EVAL_ERROR;
 
-    my $json = JSON::Any->new;
+    my $json = JSON::MaybeXS->new;
 
     open my $RCFILE, '>', $file
         or $self->die("Couldn't open file \"$file\": $OS_ERROR");
@@ -1015,7 +1177,7 @@ CLI::Startup - Simple initialization for command-line scripts
 
 =head1 VERSION
 
-Version 0.17
+Version 0.20
 
 =head1 SYNOPSIS
 
@@ -1142,6 +1304,96 @@ methods that prepend the name of the script and postpend a newline.
     $app->print_version();  # Print version information for the calling script
     $app->warn();           # Format warnings nicely
     $app->die();            # Die with a nicely-formatted message
+
+=head1 DEFAULT OPTIONS
+
+Here is a help message printed by C<CLI::Startup> for a script
+that defines I<no> command-line options:
+
+  usage: test [options]
+  Options:
+      --help          - Print this help message
+                        Aliases: -h
+      --manpage       - Print the manpage for this script
+                        Aliases: -H
+      --rcfile        - Config file to load
+      --rcfile-format - Format to write the config file
+      --verbose       - Print verbose messages
+                        Aliases: -v
+      --version       - Print version information and exit
+                        Aliases: -V
+      --write-rcfile  - Write the current options to config file
+
+The options work as follows:
+
+=over
+
+=item --help | -h
+
+Prints a help message like the one above. The message is dynamically created
+using the C<Getopt::Long>-style optspec and the help text. It automatically
+identifies negatable options, and lists aliases for options that have any.
+
+=item --manpage | -H
+
+This option is a poor-man's version of the C<--more-help> option some scripts
+provide: when the C<--manpage> option is used, C<CLI::Startup> calls C<perldoc>
+on the script itself.
+
+=item --rcfile
+
+This option lets the user specify the .rc file from which to load saved arguments.
+Any options in that file will override the app defaults, and will in turn be overridden
+by any command-line options specified along with C<--rcfile>.
+
+=item --rcfile-format
+
+Allows the user to specify the formay of the .rc file I<when saving a new one> using
+the C<--write-rcfile> option. Valid values are: INI, XML, JSON, YAML, PERL. The value
+is not case sensitive.
+
+=item --verbose | -v
+
+This option lets the user request verbose output. There's a certain amount of extra magic
+behind this "option," in order to support the prevailing paradigms:
+
+=over
+
+If you specify C<--verbose>, then C<get_options()> will return a has with its 'verbose'
+key set to 1.
+
+If you specify C<--verbose=N> or C<--verbose N>, the 'verbose' key returned by C<get_options()>
+will have the value N.
+
+If you specify C<-vvv> or C<-v -v>, etc., the 'verbose' key will have a value equal to the
+number of 'v' options that were specified.
+
+If you use a mixture of C<-v> and C<--verbose> options, the total values will be added up.
+
+=back
+
+The point of this is to support C<-vvv>, C<--verbose>, and C<--verbose=5> style options. It
+allows the user to perform pathological combinations of them all, but the end result should
+do what the user meant. When generating verbose output, you can check the value of
+C<get_options()->{verbose}> and print if it's non-zero, or print if it exceeds some threshold.
+
+=item --version | -V
+
+Note the capital C<-V>, as distinct from the lowercase C<-v> that is the alias of C<--verbose>.
+This option prints the version, as found in C<$::VERSION>, along with the path to the script
+and the Perl version.
+
+=item --write-rcfile
+
+This option takes the fully-processed options, including the command line, any .rc file
+options, and the app defaults, and writes the results back to the specified .rc file. This
+can be used to save and reuse invocations: build up the command line that you want, and
+then tack on the C<--write-rcfile> option to save it. Next time you run the script with
+no options (or with C<--rcfile PATH> if the .rc file isn't the default one), it will
+use the saved options.
+
+=back
+
 
 =head1 COMMAND LINE PROCESSING
 
@@ -1387,6 +1639,9 @@ in the C<Getopt::Long> syntax, and values are the short descriptions
 to be printed in a usage summary. See C<set_optspec> for an example,
 and see C<Getopt::Long> for the full syntax.
 
+Note that this optspec I<does> include the default options supplied by
+C<CLI::Startup>.
+
 =head2 set_optspec
 
   $app->set_optspec({
@@ -1398,7 +1653,9 @@ and see C<Getopt::Long> for the full syntax.
 
 Set the hash of command-line options. The keys use C<Getopt::Long>
 syntax, and the values are descriptions, to be printed in the usage
-message.
+message. C<CLI::Startup> will automatically add the default options
+to the optspec you supply, so C<get_optspec()> will generally not
+return the same structure spec that you gave to C<get_optspec()>.
 
 It is a fatal error to call C<set_optspec()> after calling C<init()>.
 
@@ -1633,6 +1890,13 @@ If you try to define an option like 'help|?', expecting to get
 C<--help> and C<--?> as synonyms, something will break. Basically,
 C<CLI::Startup> isn't quite smart enough to recognize that your
 help option is a suitable replacement for the builtin one.
+
+You I<can> delete default options by supplying the primary name
+of the option with a help-text value that evaluates to false.
+C<CLI::Startup> will delete that option from the defaults before
+merging with your options. If you try that with C<--help>, though,
+C<CLI::Startup> will put that option back in. Its main use is to
+disable .rc file handing.
 
 Please report any bugs or feature requests to C<bug-cli-startup at
 rt.cpan.org>, or through the web interface at

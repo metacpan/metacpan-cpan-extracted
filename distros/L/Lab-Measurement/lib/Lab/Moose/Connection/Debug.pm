@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::Debug;
-
+$Lab::Moose::Connection::Debug::VERSION = '3.550';
 use Moose;
 use 5.010;
 use namespace::autoclean;
@@ -8,7 +8,6 @@ use YAML::XS;
 
 use Carp;
 
-our $VERSION = '3.543';
 
 sub Write {
     my $self = shift;

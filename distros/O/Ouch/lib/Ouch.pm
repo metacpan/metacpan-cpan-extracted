@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Ouch;
-$Ouch::VERSION = '0.0410';
+$Ouch::VERSION = '0.0500';
 use Carp qw(longmess shortmess);
 use parent 'Exporter';
 use overload bool => sub {1}, q{""} => 'scalar', fallback => 1;
@@ -10,6 +10,40 @@ use Scalar::Util qw(blessed);
 our @EXPORT = qw(bleep ouch kiss hug barf);
 our @EXPORT_OK = qw(try throw catch catch_all caught caught_all);
 our %EXPORT_TAGS = ( traditional => [qw(try throw catch catch_all)], trytiny => [qw( throw caught caught_all )] );
+
+sub import {
+   my $package = shift;
+
+   # filter out :trytiny_var from list of imports
+   my ($alt, @imports);
+   ($_ eq ':trytiny_var' ? ($alt = 1) : (push @imports, $_))
+      for @_;
+
+   # leave early if the modified interface is not of interest
+   local $Exporter::ExportLevel = 1 + ($Exporter::ExportLevel || 0);
+   return $package->SUPER::import(@imports) unless $alt;
+
+   # we will default to $_ instead of $@ in the following, the real
+   # import will still be done by Exporter but based on wrapped subs
+   no warnings 'redefine';
+
+   my $barf  = \&barf;
+   local *barf  = sub { push @_, $_ if @_ < 1; goto $barf  };
+
+   my $bleep = \&bleep;
+   local *bleep = sub { push @_, $_ if @_ < 1; goto $bleep };
+
+   my $hug   = \&hug;
+   local *hug   = sub { push @_, $_ if @_ < 1; goto $hug   };
+
+   my $kiss  = \&kiss;
+   local *kiss  = sub { push @_, $_ if @_ < 2; goto $kiss  };
+
+   use warnings 'redefine';
+
+   # leave the stage to Exporter now
+   $package->SUPER::import(@imports);
+}
 
 sub new {
   my ($class, $code, $message, $data) = @_;
@@ -132,7 +166,7 @@ Ouch - Exceptions that don't hurt.
 
 =head1 VERSION
 
-version 0.0410
+version 0.0500
 
 =head1 SYNOPSIS
 
@@ -368,13 +402,14 @@ Many Ouch users like to use Ouch with L<Try::Tiny>.
     }
  };
 
-Some users are sticks in the mud who can't bring themselves to C<ouch> and C<kiss>. For them, there is the C<:trytiny> interface. Here's how it works:
+Some users are sticks in the mud who can't bring themselves to C<ouch> and
+C<kiss>. For them, there is the C<:trytiny> interface. Here's how it works:
 
  use Try::Tiny;
  use Ouch qw(:trytiny);
 
  try {
-    throw(404, 'File not found!';
+    throw 404, 'File not found!';
  }
  catch {
     if (caught(401, $_)) {
@@ -384,6 +419,44 @@ Some users are sticks in the mud who can't bring themselves to C<ouch> and C<kis
         die $_; # rethrow
     }
  };
+
+Using L<Try::Tiny> has some impedence mismatch in that the exception is
+propagated through C<$_> instead of C<$@> (the default used by Ouch). This
+forces to always include C<$_> when calling functions in Ouch, which is
+suboptimal. It's possible to do this:
+
+   use Try::Tiny;
+   use Ouch qw(:trytiny_var); # use Try::Tiny's variable $_
+
+   try {
+      throw 404, 'File not found!';
+   }
+   catch {
+      if (kiss 401) {
+         # do something
+      }
+      else {
+         die $_; # rethrow
+      }
+   };
+
+i.e. you can use the regular Ouch syntax.
+
+This behaviour is localized to the import, i.e. if Ouch is then imported
+in another place it is possible to decide again which is the default
+exception variable in that specific import:
+
+   package I::Want::Try::Tiny;
+   use Try::Tiny;
+   use Ouch qw(:trytiny_var);
+   # ... $_ is the default exception for kiss, hug, barf, and bleep
+
+   package Gimme::Regular::Ouch;
+   use Ouch;
+   # ... $@ is the default exception object here
+
+It's also possible to mix the two approaches, i.e. use both C<:trytiny>
+and C<:trytiny_var>.
 
 =head3 throw
 

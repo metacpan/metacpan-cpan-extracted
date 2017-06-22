@@ -132,7 +132,7 @@ foreach my $buffering ('', ':unix', ':stdio', ':perlio') {
     $done_perlgz = system $command;
   }
  SKIP: {
-    skip "$command failed", 3 if $done_perlgz;
+    skip "$command failed", 4 if $done_perlgz;
     ok ((open GZ, "<$buffering:gzip", "perl.gz"), "open perl.gz");
   TODO: {
       # local $TODO = $unread_bug if $buffering eq ':unix';

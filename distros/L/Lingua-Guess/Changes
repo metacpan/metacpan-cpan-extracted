@@ -1,5 +1,9 @@
 Revision history for Perl module Lingua::Guess
 
+0.02 2017-06-12
+
+- Language scores are now fractional probabilities
+
 0.01 2017-04-16
 
 - Initial version

@@ -91,27 +91,24 @@ subtest "cancel", sub {
 subtest "socket", sub {
     plan tests => 6;
 SKIP: {
-    my $gts = t::Server->new();
-    $gts || skip $t::Server::ERROR, 6;
+        my $job_server = t::Server->new()->job_servers();
+        $job_server || skip $t::Server::ERROR, 6;
 
-    my $job_server = $gts->job_servers();
-    $job_server || skip join(' ', "couldn't start", $gts->bin()), 6;
+        my $ts = new_ok($mn, [$cn->new(job_servers => [$job_server])]);
 
-    my $ts = new_ok($mn, [$cn->new(job_servers => [$job_server])]);
+        my @js = @{ $ts->client()->job_servers() };
+        for (my $i = 0; $i < scalar(@js); $i++) {
 
-    my @js = @{ $ts->client()->job_servers() };
-    for (my $i = 0; $i < scalar(@js); $i++) {
+            ok(my $ls = $ts->_get_loaned_sock($js[$i]),
+                "_get_loaned_sock($js[$i])");
+            isa_ok($ls, "IO::Socket::IP");
+            is($ts->_get_hashed_sock($i),
+                $ls, "_get_hashed_sock($i) = _get_loaned_sock($js[$i])");
+        } ## end for (my $i = 0; $i < scalar...)
 
-        ok(my $ls = $ts->_get_loaned_sock($js[$i]),
-            "_get_loaned_sock($js[$i])");
-        isa_ok($ls, "IO::Socket::IP");
-        is($ts->_get_hashed_sock($i),
-            $ls, "_get_hashed_sock($i) = _get_loaned_sock($js[$i])");
-    } ## end for (my $i = 0; $i < scalar...)
-
-    ok($ts->_get_default_sock(),                "_get_default_sock");
-    ok($ts->_ip_port($ts->_get_default_sock()), "_ip_port");
-};
+        ok($ts->_get_default_sock(),                "_get_default_sock");
+        ok($ts->_ip_port($ts->_get_default_sock()), "_ip_port");
+    } ## end SKIP:
 };
 
 subtest "task", sub {
@@ -141,9 +138,8 @@ subtest "task", sub {
     dies_ok { $ts->add_task() } "add_task() dies";
 
 SKIP: {
-        my @job_servers
-            = eval { t::Server->new()->job_servers(int(rand(2) + 1)) };
-        @job_servers || skip "no jobserver", 2;
+        my @job_servers = t::Server->new()->job_servers(int(rand(2) + 1));
+        @job_servers || skip $t::Server::ERROR, 2;
         $ts->client->job_servers([@job_servers]);
         ok($ts->add_task($f), "add_task($f)");
         is_deeply $ts->{need_handle}, [];

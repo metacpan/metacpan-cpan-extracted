@@ -12,7 +12,7 @@ use IPC::Run3  ();
 
 use constant DEBUG => $ENV{GIT_SHIP_DEBUG} || 0;
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 my %DATA;
 
@@ -63,8 +63,8 @@ __PACKAGE__->attr(
       last;
     }
 
-    $repository ||= lc sprintf 'https://github.com/%s/%s', scalar(getpwuid $<),
-      $self->project_name =~ s!::!-!gr;
+    $repository ||= lc sprintf 'https://github.com/%s/%s',
+      $ENV{GITHUB_USERNAME} || scalar(getpwuid $<), $self->project_name =~ s!::!-!gr;
     $repository =~ s!^[^:]+:!https://github.com/! unless $repository =~ /^http/;
     warn "[ship::repository] $repository\n" if DEBUG;
     $repository;
@@ -176,14 +176,15 @@ sub render {
 }
 
 sub ship {
-  my $self = shift;
+  my $self     = shift;
   my ($branch) = qx(git branch) =~ /\* (.+)$/m;
+  my ($remote) = qx(git remote -v) =~ /^origin\s+(.+)\s+\(push\)$/m;
 
   $self->abort("Cannot ship without a current branch") unless $branch;
   $self->abort("Cannot ship without a version number") unless $self->next_version;
-  $self->system(qw( git push origin ), $branch);
-  $self->system(qw( git tag ) => $self->next_version);
-  $self->system(qw( git push --tags origin ));
+  $self->system(qw(git push origin), $branch) if $remote;
+  $self->system(qw(git tag) => $self->next_version);
+  $self->system(qw(git push --tags origin)) if $remote;
 }
 
 sub start {
@@ -194,7 +195,7 @@ sub start {
   }
 
   $self->config({});    # make sure repository() does not die
-  $self->system(qw( git init-db )) unless -d '.git' and @_;
+  $self->system(qw(git init-db)) unless -d '.git' and @_;
   $self->render('.ship.conf', {homepage => $self->repository =~ s!\.git$!!r});
   $self->render('.gitignore');
   $self->system(qw(git add .));
@@ -297,7 +298,7 @@ App::git::ship - Git command for shipping your project
 
 =head1 VERSION
 
-0.22
+0.23
 
 =head1 DESCRIPTION
 
@@ -305,39 +306,54 @@ L<App::git::ship> is a L<git|http://git-scm.com/> command for building and
 shipping your project.
 
 The main focus is to automate away the boring steps, but at the same time not
-get in your (or any random contributor) way. Problems should be solved with
+get in your (or any random contributor's) way. Problems should be solved with
 sane defaults according to standard rules instead of enforcing more rules.
 
 This project can also L</start> (create) a new project, just L</build> (prepare
-for L<shipping|/ship>), and L</clean> projects.
+for L<shipping|/ship>), L</ship> (upload), and L</clean> projects.
 
 L<App::git::ship> differs from other tools like L<dzil|Dist::Zilla> by not
-enforcing new ways to do things, but rather incorporate with the existing
-way. Example structure and how L<App::git::ship> works on your files:
+enforcing new ways to do things, but rather incorporates with the existing
+way.
+
+Example structure and how L<App::git::ship> works on your files:
 
 =over 4
 
 =item * my-app/cpanfile and my-app/Makefile.PL
 
-The L<cpanfile> is used to build the "PREREQ_PM" and "BUILD_REQUIRES"
+The C<cpanfile> is used to build the "PREREQ_PM" and "BUILD_REQUIRES"
 structures in the L<ExtUtils::MakeMaker> based C<Makefile.PL> build file.
-The reason for this is that L<cpanfile> is a more powerful format that can
-be used by L<Carton> and other tools, so generating L<cpanfile> from
+The reason for this is that C<cpanfile> is a more powerful format that can
+be used by L<Carton> and other tools, so generating C<cpanfile> from
 Makefile.PL would simply not be possible. Other data used to generate
-Makefile.PL are: 
+Makefile.PL are:
 
-"NAME" and "LICENSE" will have values from L</project_name> and L</license>.
-"AUTHOR" will have the name and email from the last git committer.
+"NAME" and "LICENSE" will have values from .ship.conf L</project_name> and
+L</license>. "AUTHOR" will have the name and email from the last git committer.
 "ABSTRACT_FROM" and "VERSION_FROM" are fetched from the
 L<main_module_path|App::git::ship::perl/main_module_path>.
 "EXE_FILES" will be the files in C<bin/> and C<script/> which are executable.
-"META_MERGE" will use data from L</bugtracker>, L</homepage>, andL</repository>.
+"META_MERGE" will use data from L</bugtracker>, L</homepage>, and L</repository>.
+It is important to define your license in your .ship.conf before starting.
+
+Both C<cpanfile> and C<Makefile.PL> are automatically created for you if you set
+the class to App::git::ship::perl or you specify the
+L<main_module_path|App::git::ship::perl/main_module_path> as an argument to git
+start.
 
 =item * my-app/CHANGELOG.md or my-app/Changes
 
 The Changes file will be updated with the correct L<timestamp|/new_version_format>,
 from when you ran the L</build> action. The Changes file will also be the source
 for L</next_version>. Both C<CHANGELOG.md> and C<Changes> are valid sources.
+App::git::ship looks for a version-timestamp line with the case-sensitive text "Not
+Released" as the the timestamp.
+
+Changes is automatically created for you if you set the class to
+App::git::ship::perl or your specify the
+L<main_module_path|App::git::ship::perl/main_module_path> as an argument to git
+start.
 
 =item * my-app/README
 
@@ -349,6 +365,11 @@ If you don't like this format, you can create and write C<README.md> manually
 instead. The presense of that file will prevent "my-app/README" from getting
 generated.
 
+Both C<README> and C<README.pod> are automatically created for you if you set
+the class to App::git::ship::perl or your specify the
+L<main_module_path|App::git::ship::perl/main_module_path> as an argument to git
+start.
+
 =item * my-app/lib/My/App.pm
 
 This L<file|App::git::ship::perl/main_module_path> will be updated with the
@@ -356,7 +377,7 @@ version number from the Changes file.
 
 =item * .gitignore and MANIFEST.SKIP
 
-Unless these files exist, they will be generated from a template which skip
+Unless these files exist, they will be generated from a template which skips
 the most common files. The default content of these two files might change over
 time if new temp files are created by new editors or some other formats come
 along.
@@ -367,16 +388,24 @@ Unless this file exists, it will be created with a test for checking
 that your modules can compile and that the POD is correct. The file can be
 customized afterwards and will not be overwritten.
 
+=item * .git
+
+It is important to commit any uncommitted code to your git repository beforing
+building.
+
+It is important to have a remote setup in your git repository before shipping.
+It is important to have a ~/.pause file setup with 'user' and 'password' entries
+before shipping.
+
 =back
 
 =head1 SYNOPSIS
 
 =head2 Existing project
 
-  # Set up .ship config and basic repo files
+  # Set up git ship config and basic files for a Perl repo
   $ cd my-project
-  $ echo 'class = App::git::ship::perl' > .ship.conf
-  $ git ship start
+  $ git ship start lib/My/Project.pm
 
   # make changes
   $ $EDITOR lib/My/Project.pm
@@ -475,7 +504,7 @@ The example below will result in "## 0.42 (2014-01-28)".
 "%v" will be replaced by the version, while the format arguments are passed
 on to L<POSIX/strftime>.
 
-The default is "%-7v  %a %b %e %H:%M:%S %Y".
+The default is "%v %Y-%m-%dT%H:%M:%S%z".
 
 =item * project_name
 
@@ -532,8 +561,11 @@ L</config>.
 
   $str = $self->repository;
 
-Returns the URL to the first repository that point to "origin".
+Returns the URL to the first repository that points to "origin".
 This attribute can be read from L</config>.
+
+The username is detected by the uid on your OS, you can override this by
+setting GITHUB_USERNAME.
 
 =head2 silent
 
@@ -612,7 +644,8 @@ the super classes.
 =head2 ship
 
 This method ships the project to some online repository. The default behavior
-is to make a new tag and push it to "origin".
+is to make a new tag and push it to "origin". Push occurs only if origin is
+defined in git.
 
 =head2 start 
 

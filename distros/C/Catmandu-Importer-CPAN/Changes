@@ -1,5 +1,8 @@
 Revision history for Catmandu-Importer-CPAN
 
+0.04  2017-06-13 10:13:01 CEST
+  - Moving to MetaCPAN::Client
+
 0.03  2014-10-20 09:31:01 CEST
   - renamed from Catmandu-Importer-Purr
   - support query by author

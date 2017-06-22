@@ -26,10 +26,10 @@ no_index:
 provides:
   Cmd::Dwarf:
     file: lib/Cmd/Dwarf.pm
-    version: '1.42'
+    version: '1.50'
   Dwarf:
     file: lib/Dwarf.pm
-    version: '1.42'
+    version: '1.50'
 requires:
   AnyEvent: '0'
   AnyEvent::HTTP: '0'
@@ -83,7 +83,7 @@ resources:
   bugtracker: https://github.com/seagirl/dwarf/issues
   homepage: https://github.com/seagirl/dwarf
   repository: git://github.com/seagirl/dwarf.git
-version: '1.42'
+version: '1.50'
 x_authority: cpan:seagirl
 x_contributors:
   - 'tak <yoshizu@sb163.s2factory.co.jp>'

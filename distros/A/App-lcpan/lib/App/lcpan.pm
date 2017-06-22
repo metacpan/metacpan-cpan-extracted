@@ -1,12 +1,12 @@
 package App::lcpan;
 
-our $DATE = '2017-02-03'; # DATE
-our $VERSION = '1.017'; # VERSION
+our $DATE = '2017-06-19'; # DATE
+our $VERSION = '1.019'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Clone::Util qw(clone modclone);
 use List::Util qw(first);
@@ -881,7 +881,7 @@ sub _connect_db {
     my ($mode, $cpan, $index_name) = @_;
 
     my $db_path = _db_path($cpan, $index_name);
-    $log->tracef("Connecting to SQLite database at %s ...", $db_path);
+    log_trace("Connecting to SQLite database at %s ...", $db_path);
     if ($mode eq 'ro') {
         # avoid creating the index file automatically if we are only in
         # read-only mode
@@ -958,7 +958,7 @@ sub _parse_meta_yml {
 
 sub _add_prereqs {
     my ($file_id, $dist_id, $hash, $phase, $rel, $sth_ins_dep, $sth_sel_mod) = @_;
-    $log->tracef("  Adding prereqs (%s %s): %s", $phase, $rel, $hash);
+    log_trace("  Adding prereqs (%s %s): %s", $phase, $rel, $hash);
     for my $mod (keys %$hash) {
         $sth_sel_mod->execute($mod);
         my $row = $sth_sel_mod->fetchrow_hashref;
@@ -993,7 +993,7 @@ sub _index_pod {
         $sth_ins_mention,
     ) = @_;
 
-    $log->tracef("  Indexing POD of %s", $content_path);
+    log_trace("  Indexing POD of %s", $content_path);
 
     my $abstract;
     if ($ct =~ /^=head1 \s+ NAME\s*\R
@@ -1008,7 +1008,7 @@ sub _index_pod {
     if ($ct =~ /^\s*package [ \t]+ ([A-Za-z_][A-Za-z0-9_]*(?:::[A-Za-z0-9_]+)*)\b
                /mx) {
         $pkg = $1;
-        $log->tracef("  found package declaration '%s'", $pkg);
+        log_trace("  found package declaration '%s'", $pkg);
         $sth_set_content_package->execute($pkg, $content_id);
 
         if ($type eq 'pm_or_pod') {
@@ -1019,7 +1019,7 @@ sub _index_pod {
             if ($row) {
                 $module_id = $row->{id};
                 if ($abstract) {
-                    $log->tracef("  set abstract for module %s: %s", $pkg, $abstract);
+                    log_trace("  set abstract for module %s: %s", $pkg, $abstract);
                     $sth_set_module_abstract->execute($abstract, $module_id);
                 }
             }
@@ -1032,14 +1032,14 @@ sub _index_pod {
         $sth_sel_script->finish;
         if (!$row) {
             # shouldn't happen
-            $log->warnf("BUG: Unknown script %s in %s (%s), skipped",
-                        $script_name, $content_path, $file_name);
+            log_warn("BUG: Unknown script %s in %s (%s), skipped",
+                     $script_name, $content_path, $file_name);
             return;
         }
         $script_id = $row->{id};
         # set script abstract
         if ($abstract) {
-            $log->tracef("  set abstract for script %s (%s): %s", $script_name, $file_name, $abstract);
+            log_trace("  set abstract for script %s (%s): %s", $script_name, $file_name, $abstract);
             $sth_set_script_abstract->execute($abstract, $script_id);
         }
     }
@@ -1063,7 +1063,7 @@ sub _index_pod {
             $pod_parser->parse_string_document($ct);
         };
         if ($@) {
-            $log->errorf("Can't parse POD for file '%s', skipped", $content_path);
+            log_error("Can't parse POD for file '%s', skipped", $content_path);
         }
     }
 }
@@ -1076,7 +1076,7 @@ sub _index_sub {
         $sth_ins_sub,
     ) = @_;
 
-    $log->tracef("  Indexing subs in %s", $content_path);
+    log_trace("  Indexing subs in %s", $content_path);
 
     require Compiler::Lexer;
     my $lexer = Compiler::Lexer->new;
@@ -1092,7 +1092,7 @@ sub _index_sub {
         }
         next unless $sub;
         next if $sub =~ /\A_/;
-        $log->tracef("  found sub declaration '%s' (line %s)", $sub, $t->{line});
+        log_trace("  found sub declaration '%s' (line %s)", $sub, $t->{line});
         $sth_ins_sub->execute($sub, $t->{line}, $file_id, $content_id);
     }
 }
@@ -1118,7 +1118,7 @@ sub _update_files {
     if ($args{exclude_author} && @{ $args{exclude_author} }) {
         push @filter_args, "-exclude_author", join(";", @{$args{exclude_author}});
     }
-    push @filter_args, "-verbose", 1 if $log->is_info;
+    push @filter_args, "-verbose", 1 if log_is_info();
 
     my @cmd = ("minicpan", "-l", $cpan, "-r", $remote_url);
     my $env = {};
@@ -1140,7 +1140,7 @@ sub _update_files {
 sub _delete_releases_records {
     my ($dbh, @file_ids) = @_;
 
-    $log->tracef("  Deleting dep records");
+    log_trace("  Deleting dep records");
     $dbh->do("DELETE FROM dep WHERE file_id IN (".join(",",@file_ids).")");
 
     {
@@ -1160,7 +1160,7 @@ sub _delete_releases_records {
         }
         $dbh->do("DELETE FROM namespace WHERE num_modules <= 0");
 
-        $log->tracef("  Deleting module records");
+        log_trace("  Deleting module records");
         $dbh->do("DELETE FROM module WHERE file_id IN (".join(",",@file_ids).")");
     }
 
@@ -1171,20 +1171,20 @@ sub _delete_releases_records {
         while (my @row = $sth->fetchrow_array) {
             $changed_dists{$row[0]}++;
         }
-        $log->tracef("  Deleting dist records");
+        log_trace("  Deleting dist records");
         $dbh->do("DELETE FROM dist WHERE file_id IN (".join(",",@file_ids).")");
     }
 
-    $log->tracef("  Deleting mention records");
+    log_trace("  Deleting mention records");
     $dbh->do("DELETE FROM mention WHERE source_file_id IN (".join(",",@file_ids).")");
 
-    $log->tracef("  Deleting script records");
+    log_trace("  Deleting script records");
     $dbh->do("DELETE FROM script WHERE file_id IN (".join(",",@file_ids).")");
 
-    $log->tracef("  Deleting sub records");
+    log_trace("  Deleting sub records");
     $dbh->do("DELETE FROM sub WHERE file_id IN (".join(",",@file_ids).")");
 
-    $log->tracef("  Deleting content records");
+    log_trace("  Deleting content records");
     $dbh->do("DELETE FROM content WHERE file_id IN (".join(",",@file_ids).")");
 
     $dbh->do("DELETE FROM file WHERE id IN (".join(",",@file_ids).")");
@@ -1220,23 +1220,23 @@ sub _list_archive_members {
         $zip = Archive::Zip->new;
         $zip->read($path) == Archive::Zip::AZ_OK()
             or do {
-                $log->errorf("Can't read zip file '%s', skipped", $filename);
+                log_error("Can't read zip file '%s', skipped", $filename);
                 return [500, "can't read zip '$filename', skipped", undef, {'func.file_id'=>$fileid}];
             };
-        #$log->tracef("  listing zip members ...");
+        #log_trace("  listing zip members ...");
         @members = $zip->members;
-        #$log->tracef("  members: %s", \@members);
+        #log_trace("  members: %s", \@members);
     } else {
         require Archive::Tar;
         eval {
             $tar = Archive::Tar->new;
             $tar->read($path); # can still die untrapped when out of mem
-            #$log->tracef("  listing tar members ...");
+            #log_trace("  listing tar members ...");
             @members = $tar->list_files(["full_path","mode","mtime","size"]);
-            #$log->tracef("  members: %s", \@members);
+            #log_trace("  members: %s", \@members);
         };
         if ($@) {
-            $log->errorf("Can't read tar file '%s', skipped", $filename);
+            log_error("Can't read tar file '%s', skipped", $filename);
             return [500, "$@", undef, {'func.file_id'=>$fileid}];
         }
     }
@@ -1254,9 +1254,9 @@ sub _get_meta {
     if ($zip) {
         for my $member (@members) {
             if ($member->fileName =~ m!(?:/|\\)(META\.yml|META\.json)$!) {
-                $log->tracef("  found META: %s", $member->fileName);
+                log_trace("  found META: %s", $member->fileName);
                 my $type = $1;
-                #$log->tracef("content=[[%s]]", $content);
+                #log_trace("content=[[%s]]", $content);
                 my $content = $zip->contents($member);
                 if ($type eq 'META.yml') {
                     (my $metaerr, $meta) = _parse_meta_yml($content);
@@ -1271,7 +1271,7 @@ sub _get_meta {
     } else {
         for my $member (@members) {
             if ($member->{full_path} =~ m!/(META\.yml|META\.json)$!) {
-                $log->tracef("  found META %s", $member->{full_path});
+                log_trace("  found META %s", $member->{full_path});
                 my $type = $1;
                 my ($obj) = $tar->get_files($member->{full_path});
                 my $content = $obj->get_content;
@@ -1303,7 +1303,7 @@ sub _update_index {
     if ($args{num_backups} > 0 && (-f $db_path)) {
         require File::Copy;
         require Logfile::Rotate;
-        $log->infof("Rotating old indexes ...");
+        log_info("Rotating old indexes ...");
         my $rotate = Logfile::Rotate->new(
             File  => $db_path,
             Count => $args{num_backups},
@@ -1328,7 +1328,7 @@ sub _update_index {
             return [412, "Database is indexed by version ($indexer_version) newer than current software's version ($our_version), bailing out"];
         }
         if (version->parse($indexer_version) <= version->parse("0.35")) {
-            $log->infof("Reindexing from scratch, deleting previous index content ...");
+            log_info("Reindexing from scratch, deleting previous index content ...");
             _reset($dbh);
         }
     }
@@ -1337,9 +1337,9 @@ sub _update_index {
   PARSE_MAILRC:
     {
         my $path = "$cpan/authors/01mailrc.txt.gz";
-        $log->infof("Parsing %s ...", $path);
+        log_info("Parsing %s ...", $path);
         open my($fh), "<:gzip", $path or do {
-            $log->infof("%s does not exist, skipped", $path);
+            log_info("%s does not exist, skipped", $path);
             last PARSE_MAILRC;
         };
 
@@ -1354,14 +1354,14 @@ sub _update_index {
         while (<$fh>) {
             $line++;
             my ($cpanid, $fullname, $email) = /^alias (\S+)\s+"(.*) <(.+)>"/ or do {
-                $log->warnf("  line %d: syntax error, skipped: %s", $line, $_);
+                log_warn("  line %d: syntax error, skipped: %s", $line, $_);
                 next;
             };
 
             $sth_sel_auth->execute($cpanid);
             next if $sth_sel_auth->fetchrow_arrayref;
             $sth_ins_auth->execute($cpanid, $fullname, $email);
-            $log->tracef("  new author: %s", $cpanid);
+            log_trace("  new author: %s", $cpanid);
         }
         $dbh->commit;
     }
@@ -1370,9 +1370,9 @@ sub _update_index {
   PARSE_WHOIS:
     {
         my $path = "$cpan/authors/00whois.xml";
-        $log->infof("Parsing %s ...", $path);
+        log_info("Parsing %s ...", $path);
         open my($fh), "<", $path or do {
-            $log->infof("%s does not exist, skipped", $path);
+            log_info("%s does not exist, skipped", $path);
             last PARSE_WHOIS;
         };
 
@@ -1392,7 +1392,7 @@ sub _update_index {
             $sth_sel_auth->execute($cpanid);
             next if $sth_sel_auth->fetchrow_arrayref;
             $sth_ins_auth->execute($cpanid, $cpanid);
-            $log->tracef("  new author: %s", $cpanid);
+            log_trace("  new author: %s", $cpanid);
         }
         $dbh->commit;
     }
@@ -1407,7 +1407,7 @@ sub _update_index {
   PARSE_PACKAGES:
     {
         my $path = "$cpan/modules/02packages.details.txt.gz";
-        $log->infof("Parsing %s ...", $path);
+        log_info("Parsing %s ...", $path);
         open my($fh), "<:gzip", $path or die "Can't open $path (<:gzip): $!";
 
         my $sth_sel_file = $dbh->prepare("SELECT id FROM file WHERE name=? AND cpanid=?");
@@ -1434,7 +1434,7 @@ sub _update_index {
             my ($pkg, $ver, $path) = split /\s+/, $_;
             $ver = undef if $ver eq 'undef';
             my ($author, $file) = $path =~ m!^./../(.+?)/(.+)! or do {
-                $log->warnf("  line %d: Invalid path %s, skipped", $line, $path);
+                log_warn("  line %d: Invalid path %s, skipped", $line, $path);
                 next;
             };
             my $file_id;
@@ -1447,7 +1447,7 @@ sub _update_index {
                 unless ($sth_sel_file->fetchrow_arrayref) {
                     $sth_ins_file->execute($file, $author, @stat ? $stat[9] : undef, @stat ? $stat[7] : undef);
                     $file_id = $dbh->last_insert_id("","","","");
-                    $log->tracef("  New file: %s (author %s)", $file, $author);
+                    log_trace("  New file: %s (author %s)", $file, $author);
                 }
                 $file_ids_in_02packages{"$author|$file"} = $file_id;
             }
@@ -1460,7 +1460,7 @@ sub _update_index {
                 _set_namespace($dbh, $pkg);
             }
 
-            $log->tracef("  New/updated module: %s", $pkg);
+            log_trace("  New/updated module: %s", $pkg);
         } # while <fh>
 
         # cleanup: delete file record (as well as dists, modules, and deps
@@ -1477,7 +1477,7 @@ sub _update_index {
             last CLEANUP unless @old_file_ids;
 
             _delete_releases_records($dbh, @old_file_ids);
-            $log->tracef("  Deleted file records (%d): %s", ~~@old_file_entries, \@old_file_entries);
+            log_trace("  Deleted file records (%d): %s", ~~@old_file_entries, \@old_file_entries);
         }
 
         $dbh->commit;
@@ -1485,18 +1485,18 @@ sub _update_index {
 
     my @passes;
     if ($args{skip_file_indexing_pass_1}) {
-        $log->info("Will be skipping file indexing pass 1");
+        log_info("Will be skipping file indexing pass 1");
     } else {
         push @passes, 1;
     }
     if ($args{skip_file_indexing_pass_2}) {
-        $log->info("Will be skipping file indexing pass 2");
+        log_info("Will be skipping file indexing pass 2");
     } else {
         push @passes, 2;
     }
     if ($args{skip_file_indexing_pass_3} ||
             ($args{skip_sub_indexing} // 1)) {
-        $log->info("Will be skipping file indexing pass 3");
+        log_info("Will be skipping file indexing pass 3");
     } else {
         push @passes, 3;
     }
@@ -1589,8 +1589,8 @@ sub _update_index {
                 keys %script_names;
             $scripts_re = "\\A(?:" . join("|", map {quotemeta} @script_names) . ")\\z";
             $scripts_re = qr/$scripts_re/;
-            #$log->tracef("TMP: script_re = %s", $scripts_re);
-            #$log->tracef("TMP: scripts_names = %s", \%script_names);
+            #log_trace("TMP: script_re = %s", $scripts_re);
+            #log_trace("TMP: scripts_names = %s", \%script_names);
         }
 
         my $i = 0;
@@ -1601,13 +1601,13 @@ sub _update_index {
 
             # commit after every 500 files
             if ($i % 500 == 499) {
-                $log->tracef("COMMIT");
+                log_trace("COMMIT");
                 $dbh->commit;
                 $dbh->begin_work;
             }
             if ($i % 500 == 0) {
                 unless ($after_begin) {
-                    $log->tracef("BEGIN");
+                    log_trace("BEGIN");
                     $dbh->begin_work;
                     $after_begin = 1;
                 }
@@ -1615,29 +1615,29 @@ sub _update_index {
             $i++;
 
             if (my $reason = $builtin_file_skip_list{ $file->{name} }) {
-                $log->infof("Skipped file %s (reason: built-in file skip list: %s)", $file->{name}, $reason);
+                log_info("Skipped file %s (reason: built-in file skip list: %s)", $file->{name}, $reason);
                 next FILE;
             }
 
             if ($args{skip_index_files} && first {$_ eq $file->{name}} @{ $args{skip_index_files} }) {
-                $log->infof("Skipped file %s (reason: skip_index_files)", $file->{name});
+                log_info("Skipped file %s (reason: skip_index_files)", $file->{name});
                 next FILE;
             }
 
             my $path = _fullpath($file->{name}, $cpan, $file->{cpanid});
 
-            $log->infof("[pass %d/3][#%i/%d] Processing file %s ...",
+            log_info("[pass %d/3][#%i/%d] Processing file %s ...",
                         $pass, $i, ~~@files, $path);
 
             if (!$file->{file_status}) {
                 unless (-f $path) {
-                    $log->errorf("File %s doesn't exist, skipped", $path);
+                    log_error("File %s doesn't exist, skipped", $path);
                     $sth_set_file_status->execute("nofile", undef, $file->{id});
                     $sth_set_meta_status->execute("nometa", undef, $file->{id});
                     next FILE;
                 }
                 if ($path !~ /(.+)\.(tar|tar\.gz|tar\.bz2|tar\.Z|tgz|tbz2?|zip)$/i) {
-                    $log->errorf("Doesn't support file type: %s, skipped", $file->{name});
+                    log_error("Doesn't support file type: %s, skipped", $file->{name});
                     $sth_set_file_status->execute("unsupported", undef, $file->{id});
                     $sth_set_meta_status->execute("nometa", undef, $file->{id});
                     next FILE;
@@ -1758,7 +1758,7 @@ sub _update_index {
                 if ($gm_res->[0] == 200) {
                     $meta = $gm_res->[2];
                 } else {
-                    $log->warnf("  error in meta: %s", $gm_res->[1]);
+                    log_warn("  error in meta: %s", $gm_res->[1]);
                 }
                 $sth_set_meta_status->execute($meta ? "ok" : "nometa", undef, $file->{id});
                 $sth_set_meta_info->execute($has_metajson, $has_metayml, $has_makefilepl, $has_buildpl, $file->{id});
@@ -1859,7 +1859,7 @@ sub _update_index {
                 last if $pass != 3;
 
                 if (my $reason = $builtin_file_skip_list_sub{ $file->{name} }) {
-                    $log->infof("Skipped file %s (reason: built-in file skip list for sub: %s)", $file->{name}, $reason);
+                    log_info("Skipped file %s (reason: built-in file skip list for sub: %s)", $file->{name}, $reason);
                     last;
                 }
 
@@ -1894,7 +1894,7 @@ sub _update_index {
         } # for each file
 
         if ($after_begin) {
-            $log->tracef("COMMIT");
+            log_trace("COMMIT");
             $dbh->commit;
         }
     } # process files
@@ -1924,14 +1924,14 @@ sub _update_index {
             my $row = $sth_sel_mod->fetchrow_hashref or next FILE;
             my $dist_name = $row->{name};
             $dist_name =~ s/::/-/g;
-            $log->tracef("Setting dist name for %s as %s", $row->{name}, $dist_name);
+            log_trace("Setting dist name for %s as %s", $row->{name}, $dist_name);
             $sth_ins_dist->execute($dist_name, $file->{cpanid}, $file->{id}, $row->{version}, _numify_ver($row->{version}));
         }
         $dbh->commit;
     }
 
     {
-        $log->tracef("Updating is_latest column ...");
+        log_trace("Updating is_latest column ...");
         my %dists = %changed_dists;
         my $sth = $dbh->prepare("SELECT DISTINCT(name) FROM dist WHERE is_latest IS NULL");
         $sth->execute;
@@ -2052,17 +2052,17 @@ sub update {
     my $packages_path = "$cpan/modules/02packages.details.txt.gz";
     my @st1 = stat($packages_path);
     if (!$args{update_files}) {
-        $log->infof("Skipped updating files (reason: option update_files=0)");
+        log_info("Skipped updating files (reason: option update_files=0)");
     } else {
         _update_files(%args); # it only returns 200 or dies
     }
     my @st2 = stat($packages_path);
 
     if (!$args{update_index} && !$args{force_update_index}) {
-        $log->infof("Skipped updating index (reason: option update_index=0)");
+        log_info("Skipped updating index (reason: option update_index=0)");
     } elsif (!$args{force_update_index} && $args{update_files} &&
                  @st1 && @st2 && $st1[9] == $st2[9] && $st1[7] == $st2[7]) {
-        $log->infof("%s doesn't change mtime/size, skipping updating index",
+        log_info("%s doesn't change mtime/size, skipping updating index",
                     $packages_path);
         return [304, "Files did not change, index not updated"];
     } else {
@@ -2204,7 +2204,7 @@ sub _complete_mod {
 
     # if we can't connect (probably because database is not yet setup), bail
     if ($@) {
-        $log->tracef("[comp] can't connect to db, bailing: %s", $@);
+        log_trace("[comp] can't connect to db, bailing: %s", $@);
         return undef;
     }
 
@@ -2257,7 +2257,7 @@ sub _complete_mod_or_dist {
 
     # if we can't connect (probably because database is not yet setup), bail
     if ($@) {
-        $log->tracef("[comp] can't connect to db, bailing: %s", $@);
+        log_trace("[comp] can't connect to db, bailing: %s", $@);
         return undef;
     }
 
@@ -2327,7 +2327,7 @@ sub _complete_mod_or_dist_or_script {
 
     # if we can't connect (probably because database is not yet setup), bail
     if ($@) {
-        $log->tracef("[comp] can't connect to db, bailing: %s", $@);
+        log_trace("[comp] can't connect to db, bailing: %s", $@);
         return undef;
     }
 
@@ -2404,7 +2404,7 @@ sub _complete_ns {
 
     # if we can't connect (probably because database is not yet setup), bail
     if ($@) {
-        $log->tracef("[comp] can't connect to db, bailing: %s", $@);
+        log_trace("[comp] can't connect to db, bailing: %s", $@);
         return undef;
     }
 
@@ -2451,7 +2451,7 @@ sub _complete_script {
 
     # if we can't connect (probably because database is not yet setup), bail
     if ($@) {
-        $log->tracef("[comp] can't connect to db, bailing: %s", $@);
+        log_trace("[comp] can't connect to db, bailing: %s", $@);
         return undef;
     }
 
@@ -2492,7 +2492,7 @@ sub _complete_dist {
 
     # if we can't connect (probably because database is not yet setup), bail
     if ($@) {
-        $log->tracef("[comp] can't connect to db, bailing: %s", $@);
+        log_trace("[comp] can't connect to db, bailing: %s", $@);
         return undef;
     }
 
@@ -2539,7 +2539,7 @@ sub _complete_cpanid {
 
     # if we can't connect (probably because database is not yet setup), bail
     if ($@) {
-        $log->tracef("[comp] can't connect to db, bailing: %s", $@);
+        log_trace("[comp] can't connect to db, bailing: %s", $@);
         return undef;
     }
 
@@ -2580,7 +2580,7 @@ sub _complete_rel {
 
     # if we can't connect (probably because database is not yet setup), bail
     if ($@) {
-        $log->tracef("[comp] can't connect to db, bailing: %s", $@);
+        log_trace("[comp] can't connect to db, bailing: %s", $@);
         return undef;
     }
 
@@ -2621,7 +2621,7 @@ sub _complete_content_package_or_script {
 
     # if we can't connect (probably because database is not yet setup), bail
     if ($@) {
-        $log->tracef("[comp] can't connect to db, bailing: %s", $@);
+        log_trace("[comp] can't connect to db, bailing: %s", $@);
         return undef;
     }
 
@@ -3366,7 +3366,7 @@ sub _get_prereqs {
     my ($mods, $dbh, $memory_by_mod_name, $memory_by_dist_id,
         $level, $max_level, $filters, $plver, $flatten, $phase, $rel) = @_;
 
-    $log->tracef("Finding dependencies for module(s) %s (level=%i) ...", $mods, $level);
+    log_trace("Finding dependencies for module(s) %s (level=%i) ...", $mods, $level);
 
     # first, check that all modules are listed and belong to a dist
     my @dist_ids;
@@ -3378,7 +3378,7 @@ sub _get_prereqs {
             if (!$dist_id) {
                 # some special names need not be warned
                 unless ($mod =~ /\A(perl|Config)\z/) {
-                    $log->warnf("module '$mod' is not indexed (does not have dist ID), skipped");
+                    log_warn("module '$mod' is not indexed (does not have dist ID), skipped");
                 }
                 next;
             }
@@ -3436,7 +3436,7 @@ ORDER BY module".($level > 1 ? " DESC" : ""));
         # e.g. they write PREREQ_PM => { mod1, mod2 } when it should've been
         # PREREQ_PM => {mod1 => 0, mod2=>1.23}. we ignore such deps.
         unless (eval { version->parse($row->{version}); 1 }) {
-            $log->info("Invalid version $row->{version} (in dependency to $row->{module}), skipped");
+            log_info("Invalid version $row->{version} (in dependency to $row->{module}), skipped");
             next;
         }
 
@@ -3504,7 +3504,7 @@ sub _get_revdeps {
     my ($mods, $dbh, $memory_by_dist_name, $memory_by_mod_id,
         $level, $max_level, $filters, $phase, $rel) = @_;
 
-    $log->tracef("Finding reverse dependencies for module(s) %s ...", $mods);
+    log_trace("Finding reverse dependencies for module(s) %s ...", $mods);
 
     # first, check that all modules are listed
     my @mod_ids;
@@ -3972,7 +3972,7 @@ App::lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.017 of App::lcpan (from Perl distribution App-lcpan), released on 2017-02-03.
+This document describes version 1.019 of App::lcpan (from Perl distribution App-lcpan), released on 2017-06-19.
 
 =head1 SYNOPSIS
 
@@ -3981,7 +3981,11 @@ See L<lcpan> script.
 =head1 FUNCTIONS
 
 
-=head2 authors(%args) -> [status, msg, result, meta]
+=head2 authors
+
+Usage:
+
+ authors(%args) -> [status, msg, result, meta]
 
 List authors.
 
@@ -4045,7 +4049,11 @@ By default will return an array of CPAN ID's. If you set C<detail> to true, will
 return array of records.
 
 
-=head2 deps(%args) -> [status, msg, result, meta]
+=head2 deps
+
+Usage:
+
+ deps(%args) -> [status, msg, result, meta]
 
 List dependencies.
 
@@ -4151,7 +4159,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 dists(%args) -> [status, msg, result, meta]
+=head2 dists
+
+Usage:
+
+ dists(%args) -> [status, msg, result, meta]
 
 List distributions.
 
@@ -4241,7 +4253,11 @@ By default will return an array of distribution names. If you set C<detail> to
 true, will return array of records.
 
 
-=head2 modules(%args) -> [status, msg, result, meta]
+=head2 modules
+
+Usage:
+
+ modules(%args) -> [status, msg, result, meta]
 
 List modules/packages.
 
@@ -4321,7 +4337,11 @@ By default will return an array of package names. If you set C<detail> to true,
 will return array of records.
 
 
-=head2 namespaces(%args) -> [status, msg, result, meta]
+=head2 namespaces
+
+Usage:
+
+ namespaces(%args) -> [status, msg, result, meta]
 
 List namespaces.
 
@@ -4375,7 +4395,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 packages(%args) -> [status, msg, result, meta]
+=head2 packages
+
+Usage:
+
+ packages(%args) -> [status, msg, result, meta]
 
 List modules/packages.
 
@@ -4455,7 +4479,11 @@ By default will return an array of package names. If you set C<detail> to true,
 will return array of records.
 
 
-=head2 rdeps(%args) -> [status, msg, result, meta]
+=head2 rdeps
+
+Usage:
+
+ rdeps(%args) -> [status, msg, result, meta]
 
 List reverse dependencies.
 
@@ -4513,7 +4541,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 releases(%args) -> [status, msg, result, meta]
+=head2 releases
+
+Usage:
+
+ releases(%args) -> [status, msg, result, meta]
 
 List releases/tarballs.
 
@@ -4586,7 +4618,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 reset(%args) -> [status, msg, result, meta]
+=head2 reset
+
+Usage:
+
+ reset(%args) -> [status, msg, result, meta]
 
 Reset (empty) the database index.
 
@@ -4620,7 +4656,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 stats(%args) -> [status, msg, result, meta]
+=head2 stats
+
+Usage:
+
+ stats(%args) -> [status, msg, result, meta]
 
 Statistics of your local CPAN mirror.
 
@@ -4654,7 +4694,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 update(%args) -> [status, msg, result, meta]
+=head2 update
+
+Usage:
+
+ update(%args) -> [status, msg, result, meta]
 
 Create/update local CPAN mirror.
 
@@ -4770,7 +4814,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::RS_ZVA;
-
+$Lab::Moose::Instrument::RS_ZVA::VERSION = '3.550';
 use 5.010;
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -8,7 +8,6 @@ use Lab::Moose::Instrument qw/validated_getter/;
 use Carp;
 use namespace::autoclean;
 
-our $VERSION = '3.543';
 
 extends 'Lab::Moose::Instrument';
 

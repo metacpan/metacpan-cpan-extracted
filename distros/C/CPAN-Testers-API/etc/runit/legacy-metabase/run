@@ -4,4 +4,4 @@ eval $( perl -Mlocal::lib )
 
 export MOJO_HOME=$(pwd)
 
-exec cpantesters-legacy-metabase prefork -l http://*:8250 2>&1
+exec cpantesters-legacy-metabase prefork -l http://*:8250 -G 90 -H 90 -i 90  2>&1

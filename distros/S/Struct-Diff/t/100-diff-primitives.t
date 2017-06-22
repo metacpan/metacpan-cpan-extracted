@@ -9,6 +9,8 @@ use Test::More tests => 29;
 use lib "t";
 use _common qw(scmp);
 
+local $Storable::canonical = 1; # to have equal snapshots for equal by data hashes
+
 my ($got, $exp);
 
 ### undefs

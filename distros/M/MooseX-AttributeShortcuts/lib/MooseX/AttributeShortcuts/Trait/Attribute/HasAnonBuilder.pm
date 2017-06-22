@@ -9,7 +9,7 @@
 #
 package MooseX::AttributeShortcuts::Trait::Attribute::HasAnonBuilder;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-$MooseX::AttributeShortcuts::Trait::Attribute::HasAnonBuilder::VERSION = '0.031';
+$MooseX::AttributeShortcuts::Trait::Attribute::HasAnonBuilder::VERSION = '0.032';
 # ABSTRACT: Attributes, etc, common to both the role-attribute and attribute traits
 
 use Moose::Role;
@@ -32,6 +32,15 @@ has anon_builder_installed => (
     },
 );
 
+# FIXME Something Odd keeps this from succeeding as we'd like.
+#requires 'canonical_builder_prefix';
+
+sub _mxas_builder_name {
+    my ($class, $name) = @_;
+
+    return $class->canonical_builder_prefix . $name;
+}
+
 !!42;
 
 __END__
@@ -48,7 +57,7 @@ MooseX::AttributeShortcuts::Trait::Attribute::HasAnonBuilder - Attributes, etc, 
 
 =head1 VERSION
 
-This document describes version 0.031 of MooseX::AttributeShortcuts::Trait::Attribute::HasAnonBuilder - released May 30, 2017 as part of MooseX-AttributeShortcuts.
+This document describes version 0.032 of MooseX::AttributeShortcuts::Trait::Attribute::HasAnonBuilder - released June 13, 2017 as part of MooseX-AttributeShortcuts.
 
 =head1 DESCRIPTION
 

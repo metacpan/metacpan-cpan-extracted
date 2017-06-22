@@ -101,7 +101,7 @@ supported by Net::SSH::Perl are supported by the two scripts.
 David Robins / dbrobins@cpan.org
 
 Support for the following features by:
-Lance Kinley / lkinley@loyaltymethods.com
+Lance Kinley / lkinley@rythmos.com
 
 Diffie-Hellman Group 14, 16, and 18 Key Exchange
 Diffie-Hellman Group Exchange
@@ -115,3 +115,4 @@ Ed25519 key support, including encrypted keys that are enciphered
   with supported crypto algorithms
 ECDSA Elliptical Curve DSA key support: ecdsa-sha2-nistp256,
   ecdsa-sha2-nistp384, ecdsa-sha2-nistp521
+SHA2 RSA signature methods

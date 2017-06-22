@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-use Time::HiRes qw();
+use Time::HiRes qw(CLOCK_MONOTONIC);
 use vars qw/@TIMEOUTS/;
 
 sub new {
@@ -33,7 +33,11 @@ sub register {
 sub unregister {
     my ($self, $fh)= @_;
     delete $self->{fh_to_obj}{$fh};
-    @{$self->{timeouts}}= grep { $_->[1] != $fh } @{$self->{timeouts}} if $self->{timeouts};
+    if ($self->{timeouts} && grep { $_->[1] == $fh && !$_->[3] } @{$self->{timeouts}}) {
+        warn 'In unregister(): not all timeouts were dismissed!';
+    }
+    @{$self->{timeouts}}= grep { $_->[1] != $fh } @{$self->{timeouts}};
+    undef $self->{ev_timeout} unless @{$self->{timeouts}};
     return;
 }
 
@@ -73,11 +77,11 @@ sub deadline {
 
     if (!$self->{ev_timeout}) {
         $self->{ev_timeout}= $self->{ev}->timer( $self->{timer_granularity}, $self->{timer_granularity}, sub {
-            $self->handle_timeouts(Time::HiRes::time());
+            $self->handle_timeouts(Time::HiRes::clock_gettime(CLOCK_MONOTONIC));
         } );
     }
 
-    my $curtime= Time::HiRes::time;
+    my $curtime= Time::HiRes::clock_gettime(CLOCK_MONOTONIC);
     my $deadline= $curtime + $timeout;
     my $additem= [ $deadline, $fh, $id, 0 ];
 
@@ -98,12 +102,14 @@ sub handle_timeouts {
 
     local *TIMEOUTS= $self->{timeouts};
 
+    my %triggered_read;
     while (@TIMEOUTS && $curtime >= $TIMEOUTS[0][0]) {
         my $item= shift @TIMEOUTS;
         if (!$item->[3]) { # If it timed out
             my ($deadline, $fh, $id, $timedout)= @$item;
             my $obj= $self->{fh_to_obj}{$fh};
-            $obj->can_timeout($id);
+            $obj->can_read unless $triggered_read{$fh}++;
+            $obj->can_timeout($id) unless $item->[3]; # We may have received an answer...
         }
     }
 

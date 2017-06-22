@@ -1,3 +1,8 @@
+v0.08 20170621
+. Fix typo in SYNOPSIS section (reported 2009 ...)
+  This addresses RT #46254, reported by gkmoberg1@yahoo.com
+  Fix by reneeb
+
 v0.07 20150113
 - Added eg/usb-drive.pl to show how to handle added/removed drive letters
 - Added hint in documentation

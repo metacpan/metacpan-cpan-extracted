@@ -1,5 +1,32 @@
 Revision history for Time-Piece
 
+
+1.32    2017-06-20
+        - Since 1.31:
+        - New truncate() method
+        - Add new flags: %F, %T, %P + more
+        - Add rudimentary locale support via use_locale()
+        - More tests
+        - Less bugs (hopefully)
+
+1.31_04 2017-06-16
+        - Tests for %F and %T
+        - Fix wrong test count on Windows
+        - Use sensible defaults for strptime
+
+1.31_03 2017-06-14
+        - Don't use localization on default
+        - Bugs with %s in strptime fixed
+
+1.31_02 2017-01-16
+        - Add better localization between strftime and strptime
+
+1.31_01 2017-01-13
+        - Respect singular for 1 sec, min, etc. in pretty (choroba)
+        - Add truncate() (openstrike)
+        - Add many more tests (openstrike)
+        - Add more compatibility to strf/strptime
+
 1.31    2015-10-20
         - No Changes since 1.30_01
 

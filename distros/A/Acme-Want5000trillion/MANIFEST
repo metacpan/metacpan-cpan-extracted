@@ -5,6 +5,7 @@ META.json
 README.md
 cpanfile
 lib/Acme/Want5000trillion.pm
+lib/Acme/Want5000trillion/Asciiart.pm
 minil.toml
 t/00_compile.t
 t/01_comments.t

@@ -26,7 +26,7 @@ WriteMakefile(
         'Test::More'            => 0,
     },
     PREREQ_PM => {
-        'Etcd3'                 => '0.006',
+        'Net::Etcd'             => '0.013',
         'Dancer2'               => '0.200000',
         'Dancer2::Core::Types'  => 0,
         'Dancer2::Plugin'       => 0,

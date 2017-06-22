@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,8 +20,8 @@ requires:
   Bencher::Backend: '1.029'
   Browser::Open: '0'
   Complete::Module: '0'
-  Complete::Util: '0.55'
-  Data::Clean::JSON: '0'
+  Complete::Util: '0.57'
+  Data::Clean::JSON: '0.38'
   Data::Sah::Coerce::perl::str::str_normalize_perl_modname: '0'
   Data::Sah::Compiler::perl::TH::array: '0'
   Data::Sah::Compiler::perl::TH::bool: '0'
@@ -31,15 +31,13 @@ requires:
   File::Temp: '0'
   Function::Fallback::CoreOrPP: '0'
   JSON::MaybeXS: '0'
-  Log::Any: '0'
-  Log::Any::IfLOG: '0.07'
+  Log::ger: '0'
   PERLANCAR::Module::List: '0'
   POSIX: '0'
   Perinci::CmdLine::Any: '0'
-  Perinci::CmdLine::Base: '1.63'
-  Perinci::CmdLine::Lite: '1.63'
-  Perinci::Object: '0'
-  Perinci::Sub::Util: '0.45'
+  Perinci::CmdLine::Base: '1.72'
+  Perinci::Object: '0.26'
+  Perinci::Sub::Util: '0.46'
   PerlX::Maybe: '0'
   Sah::Schema::perl::modname: '0'
   perl: '5.010001'
@@ -49,7 +47,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-BencherUtils
   homepage: https://metacpan.org/release/App-BencherUtils
   repository: git://github.com/perlancar/perl-App-BencherUtils.git
-version: '0.19'
+version: '0.20'
 x_Dist_Zilla:
   perl:
     version: '5.024000'
@@ -57,27 +55,31 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript chart-bencher-result'
-      version: '0.33'
+      version: '0.40'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript format-bencher-result'
-      version: '0.33'
+      version: '0.40'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript list-bencher-results'
-      version: '0.33'
+      version: '0.40'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript list-bencher-scenario-modules'
-      version: '0.33'
+      version: '0.40'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript cleanup-old-bencher-results'
-      version: '0.33'
+      version: '0.40'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript bencher-module-startup-overhead'
-      version: '0.33'
+      version: '0.40'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript bencher-code'
+      version: '0.40'
     -
       class: Dist::Zilla::Plugin::InsertExecsList
       name: InsertExecsList
@@ -147,6 +149,10 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/@Filter/ConfirmRelease'
       version: '6.008'
     -
+      class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
+      name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
+      version: '0.55'
+    -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
       version: '0.09'
@@ -157,7 +163,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
-      version: '0.02'
+      version: '0.04'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
@@ -170,6 +176,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::CheckMetaResources
       name: '@Author::PERLANCAR/CheckMetaResources'
       version: '0.001'
+    -
+      class: Dist::Zilla::Plugin::CopyrightYearFromGit
+      name: '@Author::PERLANCAR/CopyrightYearFromGit'
+      version: '0.003'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
@@ -271,9 +281,9 @@ x_Dist_Zilla:
               name: '@Author::PERLANCAR/Completion::GetoptLongSubcommand'
               version: '0.04'
             -
-              class: Pod::Weaver::Section::Completion::PerinciCmdLine
-              name: '@Author::PERLANCAR/Completion::PerinciCmdLine'
-              version: '0.14'
+              class: Pod::Weaver::Section::Completion::GetoptLongMore
+              name: '@Author::PERLANCAR/Completion::GetoptLongMore'
+              version: '0.001'
             -
               class: Pod::Weaver::Section::Homepage::DefaultCPAN
               name: '@Author::PERLANCAR/Homepage::DefaultCPAN'
@@ -297,7 +307,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.67'
+              version: '0.76'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'
@@ -313,7 +323,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.04'
+              version: '0.06'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -364,7 +374,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple
       name: '@Author::PERLANCAR/UploadToCPAN::WWWPAUSESimple'
-      version: '0.03'
+      version: '0.04'
     -
       class: Dist::Zilla::Plugin::EnsureSQLSchemaVersionedTest
       name: '@Author::PERLANCAR/EnsureSQLSchemaVersionedTest'
@@ -406,8 +416,8 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::Prereqs:
           phase: develop
-          type: recommends
-      name: DevelopRecommends
+          type: x_spec
+      name: DevelopX_spec
       version: '6.008'
     -
       class: Dist::Zilla::Plugin::FinderCode

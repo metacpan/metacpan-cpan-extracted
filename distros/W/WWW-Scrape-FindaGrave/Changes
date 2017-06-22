@@ -1,5 +1,9 @@
 Revision history for WWW::Scaper::FindaGrave
 
+0.04	Mon 19 Jun 20:26:20 EDT 2017
+	Try to fix http://www.cpantesters.org/cpan/report/66aabd38-5457-11e7-8c7b-c7f2659b2034
+	Added ua option to new
+
 0.03	Tue May 23 10:33:01 EDT 2017
 	Added Travis and Coveralls integration
 	Don't try tests when not on-line

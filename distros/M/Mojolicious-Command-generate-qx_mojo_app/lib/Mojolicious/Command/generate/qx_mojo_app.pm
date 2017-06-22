@@ -1,10 +1,11 @@
 package Mojolicious::Command::generate::qx_mojo_app;
 use Mojo::Base 'Mojolicious::Command';
 use File::Basename;
-use Mojo::Util qw(class_to_file class_to_path slurp);
+use Mojo::Util qw(class_to_file class_to_path);
+use Mojo::File qw(path);
 use POSIX qw(strftime);
 
-our $VERSION = '0.2.2';
+our $VERSION = '0.4.0';
 
 has description => 'Generate Qooxdoo Mojolicious web application directory structure.';
 has usage => sub { shift->extract_usage };
@@ -36,11 +37,12 @@ EOF
         'COPYRIGHT' => 'COPYRIGHT',
         'CHANGES' => 'CHANGES',
         'Makefile.am' => 'Makefile.am',
-        'backend/Makefile.am' => 'backend/Makefile.am',
-        'backend/bin/script.pl' => 'backend/bin/'.$name.'.pl',
-        'backend/bin/source-mode.sh' => 'backend/bin/'.$name.'-source-mode.sh',
-        'backend/lib/App.pm' => 'backend/lib/'.$class_path,
-        'backend/lib/App/Controller/RpcService.pm' => 'backend/lib/'.$controller_path,
+        'lib/Makefile.am' => 'lib/Makefile.am',
+        'thirdparty/Makefile.am' => 'thirdparty/Makefile.am',
+        'bin/script.pl' => 'bin/'.$name.'.pl',
+        'bin/source-mode.sh' => 'bin/'.$name.'-source-mode.sh',
+        'lib/App.pm' => 'lib/'.$class_path,
+        'lib/App/Controller/RpcService.pm' => 'lib/'.$controller_path,
         'frontend/Makefile.am' => 'frontend/Makefile.am',
         'frontend/Manifest.json' => 'frontend/Manifest.json',
         'frontend/config.json' => 'frontend/config.json',
@@ -56,7 +58,7 @@ EOF
     my $email = $userName.'@'.$domain;
 
     if ( -r $ENV{HOME} . '/.gitconfig' ){
-        my $in = slurp $ENV{HOME} . '/.gitconfig';
+        my $in = path($ENV{HOME} . '/.gitconfig')->slurp;
         $in =~ /name\s*=\s*(\S.+\S)/ and $fullName = $1;
         $in =~ /email\s*=\s*(\S+)/ and $email = $1;
     }
@@ -77,11 +79,11 @@ EOF
     }
 
     $self->chmod_rel_file("$name/bootstrap", 0755);
-    $self->chmod_rel_file("$name/backend/bin/".$name.".pl", 0755);
-    $self->chmod_rel_file("$name/backend/bin/".$name."-source-mode.sh", 0755);
+    $self->chmod_rel_file("$name/bin/".$name.".pl", 0755);
+    $self->chmod_rel_file("$name/bin/".$name."-source-mode.sh", 0755);
 
-    $self->create_rel_dir("$name/backend/log");
-    $self->create_rel_dir("$name/backend/public");
+    $self->create_rel_dir("$name/log");
+    $self->create_rel_dir("$name/public");
     $self->create_rel_dir("$name/frontend/source/resource/$name");
     $self->create_rel_dir("$name/frontend/source/translation");
     chdir $name;
@@ -91,6 +93,6 @@ EOF
 sub render_data {
   my ($self, $name) = (shift, shift);
     Mojo::Template->new->name("template $name")
-    ->render(slurp(dirname($INC{'Mojolicious/Command/generate/qx_mojo_app.pm'}).'/qx_mojo_app/'.$name), @_);
+    ->render(path(dirname($INC{'Mojolicious/Command/generate/qx_mojo_app.pm'}).'/qx_mojo_app/'.$name)->slurp, @_);
 }
 1;

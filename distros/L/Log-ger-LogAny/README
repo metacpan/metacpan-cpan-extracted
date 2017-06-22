@@ -1,0 +1,18 @@
+SYNOPSIS
+
+     use Log::ger::LogAny;
+     use Log::ger;
+    
+     log_warn "blah ...";
+
+DESCRIPTION
+
+TODO
+
+    Can we use B::CallChecker to replace log_XXX calls directly, avoiding
+    extra call level?
+
+SEE ALSO
+
+    Log::Any
+

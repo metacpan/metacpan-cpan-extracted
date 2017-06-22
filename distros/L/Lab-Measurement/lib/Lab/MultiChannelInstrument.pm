@@ -1,6 +1,5 @@
 package Lab::MultiChannelInstrument;
-our $VERSION = '3.543';
-
+$Lab::MultiChannelInstrument::VERSION = '3.550';
 use strict;
 use Lab::Generic;
 use List::MoreUtils qw{ any };

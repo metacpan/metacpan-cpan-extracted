@@ -1,8 +1,7 @@
 #!/usr/bin/perl -w
 
 package Lab::Connection;
-our $VERSION = '3.543';
-
+$Lab::Connection::VERSION = '3.550';
 use strict;
 
 #use POSIX; # added for int() function

@@ -5,14 +5,15 @@ use warnings;
 
 package Net::Fritz::Box;
 # ABSTRACT: main configuration and entry point for L<Net::Fritz> distribution
-$Net::Fritz::Box::VERSION = 'v0.0.5';
+$Net::Fritz::Box::VERSION = 'v0.0.7';
 
 # We need LWP::UserAgent 6.00 because of ssl_opts.  We could work with
-# an older version as seen in # https://github.com/rhuss/jmx4perl/issues/28
+# an older version as seen in https://github.com/rhuss/jmx4perl/issues/28
 # but SOAP::Lite might then have the same problem...  For now just
 # stick with the versioned dependency.
 use LWP::UserAgent 6.00;
 use XML::Simple qw(:strict);
+$XML::Simple::PREFERRED_PARSER = 'XML::Parser';
 
 use Net::Fritz::Error;
 use Net::Fritz::Device;
@@ -117,7 +118,7 @@ Net::Fritz::Box - main configuration and entry point for L<Net::Fritz> distribut
 
 =head1 VERSION
 
-version v0.0.5
+version v0.0.7
 
 =head1 SYNOPSIS
 

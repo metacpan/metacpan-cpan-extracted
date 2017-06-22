@@ -1,5 +1,5 @@
 package Lab::XPRESS::Data::XPRESS_DataFile;
-
+$Lab::XPRESS::Data::XPRESS_DataFile::VERSION = '3.550';
 use strict;
 use Time::HiRes qw/usleep/, qw/time/;
 use Storable qw(dclone);
@@ -7,7 +7,6 @@ use File::Copy;
 use Lab::XPRESS::Data::XPRESS_logger;
 use Lab::XPRESS::Sweep::Sweep;
 
-our $VERSION = '3.543';
 
 our $counter        = 0;
 our $GLOBAL_PATH    = "./";
@@ -288,7 +287,7 @@ sub start_log {
         $self->{logger}->LOG( $self->{CONFIG} );
     }
     if ( defined @{ $self->{COLUMNS} }[0] ) {
-        my $columns = "#COLUMNS#\t";
+        my $columns = "#";
         $columns .= join( "\t", @{ $self->{COLUMNS} } );
 
         $self->{logger}->LOG($columns);

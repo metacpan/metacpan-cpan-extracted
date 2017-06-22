@@ -1,6 +1,7 @@
 package WWW::Google::PageSpeedOnline::Stats;
 
-$WWW::Google::PageSpeedOnline::Stats::VERSION = '0.21';
+$WWW::Google::PageSpeedOnline::Stats::VERSION   = '0.22';
+$WWW::Google::PageSpeedOnline::Stats::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
 
@@ -8,7 +9,7 @@ WWW::Google::PageSpeedOnline::Stats - Placeholder for the stat of L<WWW::Google:
 
 =head1 VERSION
 
-Version 0.21
+Version 0.22
 
 =cut
 
@@ -16,16 +17,9 @@ use 5.006;
 use Moo;
 use namespace::clean;
 
-has totalRequestBytes       => (is => 'ro');
-has htmlResponseBytes       => (is => 'ro');
-has cssResponseBytes        => (is => 'ro');
-has imageResponseBytes      => (is => 'ro');
-has javascriptResponseBytes => (is => 'ro');
-has otherResponseBytes      => (is => 'ro');
-has numberStaticResources   => (is => 'ro');
-has numberCssResources      => (is => 'ro');
-has numberJsResources       => (is => 'ro');
-has numberResources         => (is => 'ro');
+has [ qw(totalRequestBytes htmlResponseBytes cssResponseBytes imageResponseBytes
+         javascriptResponseBytes otherResponseBytes numberStaticResources
+         numberCssResources numberJsResources numberResources) ] => (is => 'ro');
 
 =head1 METHODS
 
@@ -75,7 +69,7 @@ Mohammad S Anwar, C<< <mohammad.anwar at yahoo.com> >>
 
 =head1 REPOSITORY
 
-L<https://github.com/Manwar/WWW-Google-PageSpeedOnline>
+L<https://github.com/manwar/WWW-Google-PageSpeedOnline>
 
 =head1 BUGS
 

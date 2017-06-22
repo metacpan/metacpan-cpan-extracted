@@ -1,5 +1,18 @@
 Revision history for Ryu-Async
 
+0.005     2017-06-17 01:43:13+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Bugs fixed:
+
+    * requires newer Ryu::Source to get examples/cat.pl working.
+
+0.005     2017-06-17 01:30:50+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    * ->stdin helper
+    * ->from_stream now available as a method, might be more readable this way
+
 0.004     2017-03-26 11:51:12+08:00 Asia/Kuala_Lumpur
     No new features.
 

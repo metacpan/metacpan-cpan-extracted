@@ -4,6 +4,8 @@ use Carp ();
 use Class::Load ();
 use Scalar::Util qw/blessed/;
 use Dwarf::Validator::Constraint::Default;
+use Dwarf::Validator::HashRef;
+use Dwarf::Validator::PlackRequest;
 use Dwarf::Accessor {
 	rw => [qw/query/]
 };
@@ -29,7 +31,14 @@ sub load_constraints {
 sub new {
 	my ($class, $q) = @_;
 	Carp::croak("Usage: ${class}->new(\$q)") unless $q;
-	bless { query => $q, _error => {} }, $class;
+
+	if (ref $q eq 'HASH') {
+		$q = Dwarf::Validator::HashRef->new($q);
+	} else {
+		$q = Dwarf::Validator::PlackRequest->new($q);
+	}
+
+	return bless { query => $q, _error => {} }, $class;
 }
 
 sub check {
@@ -63,27 +72,17 @@ sub check {
 
 sub _extract_parameters_values {
 	my ($self, $key) = @_;
-
-	my $q = $self->{query};
-	my @values;
-	if (ref $key) {
-		$key = [%$key];
-		@values = [ map { $q->param($_) } @{ $key->[1] } ];
-		$key = $key->[0];
-	} else {
-		@values = $q->parameters->get_all($key);
-		@values = undef if @values == 0;
-	}
-
-	return ($key, @values);
+	$self->query->extract_parameters_values($key);
 }
 
 sub _extract_uploads_values {
 	my ($self, $key) = @_;
-	my $q = $self->{query};
-	my @values = $q->uploads->get_all($key);
-	@values = undef if @values == 0;
-	return ($key, @values);
+	$self->query->extract_uploads_values($key);
+}
+
+sub _set_param {
+	my ($self, $key, $val) = @_;
+	$self->query->set_param($key, $val);
 }
 
 sub _check_param {
@@ -147,11 +146,6 @@ sub _rule_name {
 sub _rule_args {
 	my ($self, $rule) = @_;
 	return ref($rule) ? [ @$rule[ 1 .. scalar(@$rule)-1 ] ] : +[];
-}
-
-sub _set_param {
-	my ($self, $key, $val) = @_;
-	$self->{query}->parameters->set($key, $val);
 }
 
 sub is_error {

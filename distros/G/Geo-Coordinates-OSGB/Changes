@@ -1,5 +1,11 @@
 Revision history for Perl extension Geo::Coordinates::OSGB
 
+2.18 June 2018
+
+    - Fix small bug in Grid.pm: removed recent use of "//=", so that the module still works with Perl 5.08
+
+    - Minor refactoring to obey more of perl-critic and perl-tidy
+
 2.17 June 2017
 
     - Put an ':all' tag back in OSGB.pm

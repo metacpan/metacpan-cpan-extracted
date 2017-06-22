@@ -1,5 +1,5 @@
 package Test::DB::Shared::mysqld;
-$Test::DB::Shared::mysqld::VERSION = '0.002';
+$Test::DB::Shared::mysqld::VERSION = '0.004';
 
 =head1 NAME
 
@@ -82,7 +82,8 @@ will most probably tell you which files you should clean up on your filesystem t
 
 =cut
 
-use Moose;
+use Moo;
+use Carp qw/confess/;
 use Log::Any qw/$log/;
 
 use DBI;
@@ -99,16 +100,16 @@ use POSIX qw(SIGTERM WNOHANG);
 use Test::More qw//;
 
 # Settings
-has 'test_namespace' => ( is => 'ro', isa => 'Str', default => 'test_db_shared' );
+has 'test_namespace' => ( is => 'ro', default => 'test_db_shared' );
 
 # Public facing stuff
-has 'dsn' => ( is => 'ro', isa => 'Str', lazy_build => 1 );
+has 'dsn' => ( is => 'lazy' );
 
 
 # Internal cuisine
 
-has '_lock_file' => ( is => 'ro', isa => 'Str', lazy_build => 1 );
-has '_mysqld_file' => ( is => 'ro', isa => 'Str', lazy_build => 1 );
+has '_lock_file' => ( is => 'lazy' );
+has '_mysqld_file' => ( is => 'lazy' );
 
 sub _build__lock_file{
     my ($self) = @_;
@@ -119,11 +120,13 @@ sub _build__mysqld_file{
     return File::Spec->catfile( File::Spec->tmpdir() , $self->_namespace().'.mysqld' ).'';
 }
 
-has '_testmysqld_args' => ( is => 'ro', isa => 'HashRef', required => 1);
-has '_temp_db_name' => ( is => 'ro', isa => 'Str', lazy_build => 1 );
-has '_shared_mysqld' => ( is => 'ro', isa => 'HashRef', lazy_build => 1 );
-has '_instance_pid' => ( is => 'ro', isa => 'Int', required => 1);
-has '_holds_mysqld' => ( is => 'rw', isa => 'Maybe[Test::mysqld]', default => undef);
+has '_testmysqld_args' => ( is => 'ro', required => 1);
+has '_temp_db_name' => ( is => 'lazy' );
+has '_shared_mysqld' => ( is => 'lazy' );
+has '_instance_pid' => ( is => 'ro', required => 1);
+has '_holds_mysqld' => ( is => 'rw' );
+
+my $PROCESS_INSTANCES = {};
 
 around BUILDARGS => sub {
     my ($orig, $class, @rest ) = @_;
@@ -139,6 +142,13 @@ around BUILDARGS => sub {
     }
 };
 
+sub BUILD{
+    my ($self) = @_;
+    my $wself = \$self;
+    Scalar::Util::weaken( $self );
+    $PROCESS_INSTANCES->{$self.''} = $wself;
+    return $self;
+}
 
 =head2 load
 
@@ -197,7 +207,7 @@ sub _namespace{
 # Note it only works because the instance of the DB will run locally.
 sub _build__temp_db_name{
     my ($self) = @_;
-    return $self->_namespace().( $self + 0 );
+    return $self->_namespace().( $self + $$ );
 }
 
 sub _build__shared_mysqld{
@@ -249,7 +259,7 @@ sub _build__shared_mysqld{
                                                         sub{
                                                             my $dbh = shift;
                                                             $dbh->do('INSERT INTO pid_registry( pid, instance ) VALUES (?,?)' , {},
-                                                                     $self->_instance_pid(), ( $self + 0 )
+                                                                     $self->_instance_pid(), ( $self + $self->_instance_pid() )
                                                                  );
                                                         });
                                return $saved_mysqld;
@@ -274,14 +284,13 @@ sub _build_dsn{
                                     });
 }
 
-
 sub _teardown{
     my ($self) = @_;
     my $dsn = $self->_shared_mysqld()->{dsn};
     $self->_with_shared_dbh( $dsn,
                              sub{
                                  my $dbh = shift;
-                                 $dbh->do('DELETE FROM pid_registry WHERE pid = ? AND instance = ? ',{}, $self->_instance_pid() , ( $self + 0 ) );
+                                 $dbh->do('DELETE FROM pid_registry WHERE pid = ? AND instance = ? ',{}, $self->_instance_pid() , ( $self + $self->_instance_pid() ) );
                                  my ( $count_row ) = $dbh->selectrow_array('SELECT COUNT(*) FROM pid_registry');
                                  if( $count_row ){
                                      $log->info("PID $$ Some PIDs,Instances are still registered as using this DB. Not tearing down");
@@ -304,6 +313,9 @@ sub DEMOLISH{
         return;
     }
 
+    delete $PROCESS_INSTANCES->{$self.''};
+
+
     $self->_monitor(sub{
                         # We always want to drop the local process database.
                         my $dsn = $self->_shared_mysqld()->{dsn};
@@ -316,6 +328,16 @@ sub DEMOLISH{
                                                 });
                         $self->_teardown();
                     });
+
+    if( my @other_instances = keys( %{$PROCESS_INSTANCES} ) ){
+        # Other instances are still alive (in the same PID). Pass on the test mysqld to them
+        # if we have one.
+        if( my $test_mysqld = $self->_holds_mysqld() ){
+            $log->info("PID $$ instance $self giving mysqld to other living instance ".$other_instances[0]);
+            ${$PROCESS_INSTANCES->{$other_instances[0]}}->_holds_mysqld( $self->_holds_mysqld() );
+            $self->_holds_mysqld( undef );
+        }
+    }
 
     if( my $test_mysqld = $self->_holds_mysqld() ){
         # This is the mysqld holder process. Need to wait for it
@@ -365,6 +387,7 @@ sub _monitor{
     my $res = eval{ $sub->(); };
     my $err = $@;
     delete $in_monitor->{$self};
+    $lock->release();
     if( $err ){
         confess($err);
     }

@@ -18,11 +18,11 @@ Struct::Path::PerlStyle - Perl-style syntax frontend for L<Struct::Path|Struct::
 
 =head1 VERSION
 
-Version 0.63
+Version 0.64
 
 =cut
 
-our $VERSION = '0.63';
+our $VERSION = '0.64';
 
 =head1 SYNOPSIS
 
@@ -50,7 +50,7 @@ Examples:
     '{a}{b}[0,1,2,5]'     # 0, 1, 2 and 5 array's items
     '{a}{b}[0..2,5]'      # same, but using ranges
     '{a}{b}[9..0]'        # descending ranges allowed (perl doesn't)
-    '{a}{b}(<<){c}'       # step back (to previous level)
+    '{a}{b}(back){c}'     # step back (to previous level)
 
     * at least until https://github.com/adamkennedy/PPI/issues/168
 
@@ -65,7 +65,7 @@ Parse perl-style string to L<Struct::Path|Struct::Path> path
 =cut
 
 our $FILTERS = {
-    '<<' => sub { # step back $count times
+    'back' => sub { # step back $count times
         my $static = defined $_[0] ? $_[0] : 1;
         return sub {
             my $count = $static; # keep arg (reusable closure)
@@ -98,6 +98,8 @@ our $FILTERS = {
         };
     },
 };
+
+$FILTERS->{'<<'} = $FILTERS->{back}; # backward compatibility ('<<' is deprecated)
 
 sub ps_parse($) {
     my $path = shift;

@@ -1,19 +1,59 @@
+% my $p = shift;
+#  Copyright (C) <%= $p->{year} %> <%= $p->{fullName} %>
+
 AUTOMAKE_OPTIONS =  foreign
 
-SUBDIRS = frontend backend
 
-EXTRA_DIST = VERSION PERL_MODULES COPYRIGHT LICENSE CHANGES AUTHORS
+SUBDIRS = thirdparty lib frontend
+
+BIN = bin/$(MJ_SCRIPT).pl
+
+PUB := $(shell find public -type d -name ".??*" -prune -o -not -name ".*" -a -not -name "*~" -a -not -name "*.tmp"  -a -type f -print )
+
+TEMPL := $(shell test -d templates && find templates -type f -name "*.ep")
+SHARE := $(shell test -d share && find share -type f -name "*.po")
+
+PERLTESTS := $(shell find t -name "*.t")
+
+THIRDPARTY_DIR := $(shell pwd)/thirdparty
+
+EXTRA_DIST = VERSION PERL_MODULES COPYRIGHT LICENSE CHANGES AUTHORS bootstrap $(PUB) \
+	$(wildcard t/*.t) $(BIN) $(POD) $(TEMPL) $(PERLTESTS) $(SHARE)
+
 
 YEAR := $(shell date +%Y)
 DATE := $(shell date +%Y-%m-%d)
-THIRDPARTY := $(shell pwd)/backend/thirdparty
+
+datadir = $(prefix)
+nobase_data_DATA = $(PUB) $(TEMPL) $(SHARE)
+
+dist_bin_SCRIPTS = $(BIN)
+
+all-local:
+	$(GMAKE) public/script/$(QX_CLASS).js
+
+README COPYRIGHT: VERSION
+	$(PERL) -i -p -e 's/(#VERSION#|\d+\.\d+\.\d+[^.\s]*)/$(PACKAGE_VERSION)/g;s/(#YEAR#|20[1-4]\d)/$(YEAR)/g;s/(#DATE#|20[1-9]\d-[01]\d-[0-3]\d)/$(DATE)/g;' $@
 
 dist-hook:
-	$(PERL) -i -p -e 's/#VERSION#/$(PACKAGE_VERSION)/g;s/#YEAR#/$(YEAR)/g;s/#DATE#/$(DATE)/g;'  $(distdir)/README $(distdir)/COPYRIGHT
+	$(PERL) -i -p -e 's/#VERSION#/$(PACKAGE_VERSION)/g;s/#YEAR#/$(YEAR)/g;s/#DATE#/$(DATE)/g;' $(distdir)/public/index.html $(distdir)/public/script/$(QX_CLASS).js
+	$(PERL) -i -p -e 's/\$$VERSION\s*=\s*".+?";/\$$VERSION = "$(PACKAGE_VERSION)";/;'  $(distdir)/lib/$(MJ_CLASS).pm
 
-get-thirdparty-modules:
-	[ -e $(THIRDPARTY)/bin/cpanm ] || mkdir -p $(THIRDPARTY)/bin && wget --no-check-certificate -O $(THIRDPARTY)/bin/cpanm cpanmin.us && chmod 755 $(THIRDPARTY)/bin/cpanm
-	cat PERL_MODULES | PERL_CPANM_HOME=$(THIRDPARTY) PERL_CPANM_OPT="--notest --local-lib $(THIRDPARTY)" xargs $(PERL) $(THIRDPARTY)/bin/cpanm
+install-exec-hook:
+	[ "$(PERL5LIB)" == "" ] || cd "$(DESTDIR)$(exec_prefix)" && $(PERL) -i -p -e 's{.*# PERL5LIB}{use lib qw($(PERL5LIB)); # PERL5LIB}' $(BIN) || true
+	cd "$(DESTDIR)$(exec_prefix)" && $(PERL) -i -p -e 's{.*# LIBDIR}{use lib qw($(libdir)); # LIBDIR}' $(BIN)
+	cd "$(DESTDIR)$(exec_prefix)" && $(PERL) -i -p -e 's{^#!.*perl.*}{#!$(PERL)};' $(BIN)
+	[ ! -d $(THIRDPARTY_DIR)/lib/perl5 ] || cp -fr $(THIRDPARTY_DIR)/lib/perl5/* $(DESTDIR)$(libdir)
 
-#END
 
+test:
+	$(PERL) "-MExtUtils::Command::MM" "-e" "test_harness(0, 'lib','thirdparty/lib/perl5')" t/*.t
+
+
+if BUILD_QOOXDOO_APP
+
+
+public/script/$(QX_CLASS).js: $(shell find frontend/source -type f ) frontend/config.json config.status
+	cd frontend && $(QOOXDOO_PATH)/tool/bin/generator.py -m QOOXDOO_PATH:$(QOOXDOO_PATH) -m CACHE:./cache -m BUILD_PATH:../public build
+
+endif

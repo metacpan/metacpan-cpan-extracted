@@ -9,7 +9,7 @@ Scrape the Find a Grave website
 
 # VERSION
 
-Version 0.03
+Version 0.04
 
 # SYNOPSIS
 
@@ -41,8 +41,11 @@ It takes two mandatory arguments firstname and lastname.
 
 Also one of either date\_of\_birth and date\_of\_death must be given
 
-There are two optional arguments: middlename and mech.  Mech is a pointer
+There are three optional arguments: middlename, ua and mech.  Mech is a pointer
 to an object such as [WWW::Mechanize](https://metacpan.org/pod/WWW::Mechanize).  If not given it will be created.
+
+ua is a pointer to an object that understands get and env\_proxy messages, such
+as [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent).
 
 ## get\_next\_entry
 

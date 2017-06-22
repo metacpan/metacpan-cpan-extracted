@@ -1,9 +1,8 @@
 #! /usr/bin/env perl
 
-use 5.014; use warnings;
+use 5.024; use warnings;
 use lib qw< dlib ../dlib >;
 
-use Keyword::Declare; # {debug=>1};
 use Perl6::Loops;
 
 loop {
@@ -14,10 +13,12 @@ say 'BOOM!';
 
 while (readline) -> $input {
     print "Got: $input";
+    last;
 }
 
 while (my $input = readline) {
     print "Got: $input";
+    last;
 }
 
 my $x;
@@ -61,8 +62,12 @@ repeat {
 
 say "Got: $x";
 
+for       (^10) { say;    }
+for my $n (^10) { say $n; }
 
-for (1..10) -> $x, $y, $z {
+for (^10) -> $x, $y, $z {
+    $y //= 'undef';
+    $z //= 'undef';
     say "$x -> $y : $z";
 }
 
@@ -72,6 +77,7 @@ my %collective_of = (
     dolphins => 'pod',
     crows    => 'murder',
 );
+
 
 for (%collective_of) -> $animal, $group {
     FIRST { say 'Did you know that...' }
@@ -88,7 +94,7 @@ my @errors = (
 for my $error_msg (@errors) {
     FIRST { say 'Errors detected: ' . @errors; }
     say "\t$error_msg";
-    LAST  { die "Compilation failed\n"; }
+    LAST  { warn "Compilation failed\n"; }
 }
 
 warn 'Done at line 85';

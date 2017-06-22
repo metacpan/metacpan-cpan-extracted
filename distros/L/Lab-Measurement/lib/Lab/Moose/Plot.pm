@@ -58,7 +58,7 @@ terminal-, plot- and curve-options.
 =cut
 
 package Lab::Moose::Plot;
-
+$Lab::Moose::Plot::VERSION = '3.550';
 use warnings;
 use strict;
 use 5.010;
@@ -73,7 +73,6 @@ use PDL::Graphics::Gnuplot ();
 # need to load for ClassName type constraint.
 use PDL ();
 
-our $VERSION = '3.543';
 
 has terminal => (
     is      => 'ro',

@@ -1,8 +1,18 @@
 Revision history for Struct-Diff
 
+0.88    2017-06-17
+        paths in list_diff() fixed for arrays in noU diffs
+        rename dsplit => split_diff(), old name is deprecated (alias)
+
+0.87    2017-06-16
+        list_diff() added
+        get rid of global $Storable::canonical
+        dtraverse() deprecated (list_diff should be used instead)
+        code and docs refactorings
+
 0.86    2017-01-22
         number and same number as string are now distinguishable for diff()
-        diff() now much faster in hashes comparion
+        diff() now much faster in hashes comparsion
 
 0.85    2016-12-25
         numbers stringification fixed in resulting diff

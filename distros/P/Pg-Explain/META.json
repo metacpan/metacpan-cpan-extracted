@@ -4,7 +4,7 @@
       "hubert depesz lubaczewski <depesz@depesz.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4216",
    "license" : [
       "perl_5"
    ],
@@ -30,7 +30,7 @@
       "runtime" : {
          "requires" : {
             "Clone" : "0",
-            "Digest::SHA1" : "0",
+            "Digest::SHA" : "0",
             "HOP::Lexer" : "0",
             "JSON" : "0",
             "XML::Simple" : "0",
@@ -42,35 +42,35 @@
    "provides" : {
       "Pg::Explain" : {
          "file" : "lib/Pg/Explain.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       },
       "Pg::Explain::From" : {
          "file" : "lib/Pg/Explain/From.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       },
       "Pg::Explain::FromJSON" : {
          "file" : "lib/Pg/Explain/FromJSON.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       },
       "Pg::Explain::FromText" : {
          "file" : "lib/Pg/Explain/FromText.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       },
       "Pg::Explain::FromXML" : {
          "file" : "lib/Pg/Explain/FromXML.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       },
       "Pg::Explain::FromYAML" : {
          "file" : "lib/Pg/Explain/FromYAML.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       },
       "Pg::Explain::Node" : {
          "file" : "lib/Pg/Explain/Node.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       },
       "Pg::Explain::StringAnonymizer" : {
          "file" : "lib/Pg/Explain/StringAnonymizer.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       }
    },
    "release_status" : "stable",
@@ -79,6 +79,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.73",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "0.74",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

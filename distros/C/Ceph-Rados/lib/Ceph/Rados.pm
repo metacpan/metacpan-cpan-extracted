@@ -9,7 +9,7 @@ use Ceph::Rados::IO;
 
 our @ISA = qw();
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -98,17 +98,48 @@ currently just read/write/stat and lists.
 If no length is passed to the read() call, the object is first stat'd
 to determine the correct read length.
 
+=head1 METHODS
+
+=head2 set_config_file()
+
+Wraps C<rados_conf_read_file()>.  If not passed a path, the following locations are tried, in order:
+
+=over 4
+
+=item C<$ENV{CEPH_CONF}>
+
+=item /etc/ceph/ceph.conf
+
+=item ~/.ceph/config
+
+=item ./ceph.conf
+
+=back
+
+=head2 set_config_option()
+
+Wraps C<rados_conf_set()>.  Typically used to set the keyring.
+
+=head2 connect()
+
+Wraps C<rados_connect()>.  Connects to the rados cluster, using the config provided.
+
+=head2 io()
+
+Wraps C<rados_ioctx_create()>.  Opens an IO context to the specified pool.
+Returns a L<Ceph::Rados::IO> object.
+
 =head1 SEE ALSO
 
-librados documentation - L<http://ceph.com/docs/master/rados/api/librados/>
+librados documentation - L<http://docs.ceph.com/docs/master/rados/api/librados/>
 
 =head1 AUTHOR
 
-Alex Bowley, E<lt>alex@openimp.netE<gt>
+Alex Bowley, E<lt>alex@openimp.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014 by Alex Bowley.
+Copyright (C) 2014-2017 by Alex Bowley.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.2 or,

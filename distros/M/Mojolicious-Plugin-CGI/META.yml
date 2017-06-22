@@ -19,10 +19,10 @@ no_index:
     - inc
 requires:
   IO::Pipely: '0.005'
-  Mojolicious: '6.49'
+  Mojolicious: '7.28'
 resources:
   bugtracker: https://github.com/jhthorsen/mojolicious-plugin-cgi/issues
   homepage: https://github.com/jhthorsen/mojolicious-plugin-cgi
   repository: https://github.com/jhthorsen/mojolicious-plugin-cgi.git
-version: '0.37'
+version: '0.38'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

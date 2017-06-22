@@ -1,4 +1,5 @@
 use strict;
+use File::Spec::Functions qw(catfile rel2abs);
 use Test::More;
 use Time::HiRes ();
 use App::Prove;
@@ -10,7 +11,7 @@ my $prove;
 *App::Prove::new = sub { $prove = shift->TAP::Object::new(@_) };
 *App::Prove::run = sub { diag 'sleep 0'; return 1 };
 
-my $prowess = do 'script/prowess' or die $@;
+my $prowess = do(rel2abs(catfile 'script', 'prowess')) or die $@;
 
 $SIG{ALRM} = sub {
   my $curr = (stat __FILE__)[9];

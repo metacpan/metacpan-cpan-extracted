@@ -1,6 +1,6 @@
+.travis.yml
 Changes
 eg/debugger.pl
-eg/test17.pl
 inc/Module/Install.pm
 inc/Module/Install/Base.pm
 inc/Module/Install/Can.pm
@@ -8,13 +8,16 @@ inc/Module/Install/Fetch.pm
 inc/Module/Install/Makefile.pm
 inc/Module/Install/Metadata.pm
 inc/Module/Install/Win32.pm
+inc/Module/Install/With.pm
 inc/Module/Install/WriteAll.pm
 lib/Debug/Client.pm
 Makefile.PL
 MANIFEST			This list of files
 META.yml
 README
+README.md
 t/00-check-deps.t
+t/00-report-prereqs.t
 t/01-compile.t
 t/02-exports.t
 t/03-pod.t

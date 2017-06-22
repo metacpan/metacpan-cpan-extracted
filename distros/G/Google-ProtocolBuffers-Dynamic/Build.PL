@@ -23,7 +23,7 @@ my %module_build_args = (
     "Mattia Barbon <mattia\@barbon.org>"
   ],
   "dist_name" => "Google-ProtocolBuffers-Dynamic",
-  "dist_version" => "0.17",
+  "dist_version" => "0.18",
   "license" => "perl",
   "module_name" => "Google::ProtocolBuffers::Dynamic",
   "recursive_test_files" => 1,

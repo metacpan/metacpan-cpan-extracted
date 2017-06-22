@@ -25,7 +25,7 @@ $Single_Char   = qr/^(?:\\(?:[aefnrtdDwWsS]|c.|[^\w\/{|}-]|0\d{2}|x(?:[\da-fA-F]
 
 $Always_Fail = "^\\b\0";
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 # ------------------------------------------------
 

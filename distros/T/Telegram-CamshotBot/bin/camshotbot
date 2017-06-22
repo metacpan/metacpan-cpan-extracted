@@ -1,0 +1,60 @@
+#!/usr/bin/env perl
+
+package camshotbot;
+$camshotbot::VERSION = '0.01';
+# ABSTRACT: Telegram::Camhshotbot CLI tool. For more information run camshotbot --help
+
+use strict;
+use warnings;
+
+use File::Basename 'dirname';
+use File::Spec::Functions qw(catdir splitdir);
+
+# Source directory has precedence
+my @base = (splitdir(dirname(__FILE__)), '..');
+my $lib = join('/', @base, 'lib');
+-e catdir(@base, 't') ? unshift(@INC, $lib) : push(@INC, $lib);
+
+# Start commands for application
+require Mojolicious::Commands;
+Mojolicious::Commands->start_app('Telegram::CamshotBot');
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+camshotbot - Telegram::Camhshotbot CLI tool. For more information run camshotbot --help
+
+=head1 VERSION
+
+version 0.01
+
+=head1 DEVELOPMENT
+
+For running without dzil install
+
+  export CAMSHOTBOT_TELEGRAM_API_TOKEN='<TELEGRAM_API_TOKEN>'
+  export CAMSHOTBOT_CONFIG=$PWD/lib/Telegram/CamshotBot.json.example
+  export CAMSHOTBOT_STREAM_URL rtsp://192.168.0.113/ch0.h264
+  # check that variable was set fine
+  # echo $CAMSHOTBOT_CONFIG
+  perl -Ilib bin/camshotbot
+
+Remember that env variables are existing only during life of terminal tab
+
+=head1 AUTHOR
+
+Pavel Serikov <pavelsr@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Pavel Serikov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

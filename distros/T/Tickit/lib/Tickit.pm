@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 BEGIN {
-   our $VERSION = '0.62';
+   our $VERSION = '0.63';
 }
 
 use Carp;
@@ -223,15 +223,18 @@ sub later
 
 =head2 timer
 
- $tickit->timer( at => $epoch, $code )
+ $id = $tickit->timer( at => $epoch, $code )
 
- $tickit->timer( after => $delay, $code )
+ $id = $tickit->timer( after => $delay, $code )
 
 Runs the given CODE reference at some fixed point in time in the future.
 The first argmuent must be either the string C<at>, or C<after>; and specifies
 that second argument gives either the absolute epoch time (C<$epoch>), or the
 delay relative to now (C<$delay>), respectively. Fractions are supported to a
 resolution of microseconds.
+
+Returns an opaque integer value that may be passed to L</cancel_timer>. This
+value is safe to ignore if not required.
 
 =cut
 
@@ -252,7 +255,31 @@ sub timer
    }
 
    # TODO: bin-search insert position then splice
-   @{ $self->{timer_queue} } = sort { $a->time <=> $b->time } @{ $self->{timer_queue} }, TimeQueue( $at => $code );
+   @{ $self->{timer_queue} } = sort { $a->time <=> $b->time } @{ $self->{timer_queue} }, my $id = TimeQueue( $at => $code );
+
+   return 0 + $id;
+}
+
+=head2 cancel_timer
+
+ $tickit->cancel_timer( $id )
+
+Removes a timer previously installed by L</timer>. After doing so the code
+will no longer be invoked.
+
+=cut
+
+sub cancel_timer
+{
+   my $self = shift;
+   my ( $id ) = @_;
+
+   my $timer_queue = $self->{timer_queue};
+
+   my $idx;
+   $timer_queue->[$idx=$_] == $id and last for 0 .. $#$timer_queue;
+
+   splice @$timer_queue, $idx, 1, () if defined $idx;
 }
 
 =head2 term

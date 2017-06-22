@@ -1,5 +1,19 @@
 Revision history for perl distribution Net::Fritz
 
+v0.0.7 2017-06-14
+
+ - next try to fix XML::Simple related bugs during test execution,
+   this time by forcing XML::Simple to use XML::Parser
+   (still can't reproduce locally, need the tester infrastructure
+    to pick up a new released version)
+
+v0.0.6 2017-06-12
+
+ - try to fix XML::Simple related bugs during test execution
+   where parse_string() gets something that looks more like a file
+   (sort of a heisenbug: rarely happens, can't reproduce,
+    CPAN test reports show about 0.5% error rate)
+
 v0.0.5 2017-04-05
 
  - send all action parameters als SOAP strings

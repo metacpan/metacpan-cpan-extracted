@@ -1,0 +1,14 @@
+Revision history for Perl script csvgrep
+
+0.03 2017-06-22 NEILB
+    - Fixed error in doc
+    - Added bit to doc on how I define aliases for this
+    - Ed Freyfogle added -h option to show usage help
+
+0.02 2017-06-21 NEILB
+    - More complete documentation
+    - Added module to make PAUSE happy
+
+0.01 2017-06-21 NEILB
+    - First release to CPAN
+

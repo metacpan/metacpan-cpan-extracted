@@ -2,10 +2,14 @@ package Data::Record::Serialize::Role::Base;
 
 use Moo::Role;
 
-use Types::Standard qw[ ArrayRef HashRef Enum Str Bool ];
+our $VERSION = '0.12';
+
+use Types::Standard qw[ ArrayRef HashRef Enum Str Bool is_HashRef ];
 
 use POSIX ();
 use Carp;
+
+use namespace::clean;
 
 has types => (
     is      => 'rwp',
@@ -170,6 +174,14 @@ has format_types => (
 has rename_fields => (
     is      => 'ro',
     isa     => HashRef [Str],
+    coerce  => sub {
+        return $_[0] unless is_HashRef( $_[0] );
+
+        # remove renames which do nothing
+        my %rename = %{ $_[0] };
+        delete @rename{ grep { $rename{$_} eq $_ } keys %rename };
+        return \%rename;
+    },
     default => sub { {} },
     trigger => 1,
 );
@@ -225,8 +237,9 @@ has _format => (
                 }
 
             }
-            return \%format;
 
+            return \%format
+              if keys %format;
         }
 
         return;
@@ -237,8 +250,6 @@ has _format => (
 sub BUILD {
 
     my $self = shift;
-
-    my %args;
 
     # if we're asked to format based on types, make sure
     # we create them if needed.
@@ -275,9 +286,9 @@ sub BUILD {
 
         }
 
-	# default to string if not specified
-	$self->types->{$_} = $self->default_type
-	  for grep { !defined $self->types->{$_} } @{ $self->fields };
+        # default to string if not specified
+        $self->types->{$_} = $self->default_type
+          for grep { !defined $self->types->{$_} } @{ $self->fields };
     }
 
     return;
@@ -309,10 +320,96 @@ sub _set_types_from_record {
 
 sub DEMOLISH {
 
-    $_[0]->cleanup;
+    $_[0]->close;
 
     return;
 }
 
 1;
 
+=pod
+
+=head1 NAME
+
+Data::Record::Serialize::Role::Base
+
+=head1 VERSION
+
+version 0.12
+
+=begin pod_coverage
+
+=head3 BUILD
+
+=head3 DEMOLISH
+
+=head3 default_type
+
+=head3 fields
+
+=head3 format
+
+=head3 format_fields
+
+=head3 format_types
+
+=head3 rename_fields
+
+=head3 types
+
+=end pod_coverage
+
+=head1 BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize>.
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<Data::Record::Serialize|Data::Record::Serialize>
+
+=back
+
+=head1 AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut
+
+__END__
+
+#pod =begin pod_coverage
+#pod
+#pod =head3 BUILD
+#pod
+#pod =head3 DEMOLISH
+#pod
+#pod =head3 default_type
+#pod
+#pod =head3 fields
+#pod
+#pod =head3 format
+#pod
+#pod =head3 format_fields
+#pod
+#pod =head3 format_types
+#pod
+#pod =head3 rename_fields
+#pod
+#pod =head3 types
+#pod
+#pod =end pod_coverage

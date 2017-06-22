@@ -11,6 +11,8 @@ build_requires:
   Sub::Quote: '2.002002'
   Test2::Bundle::Extended: '0'
   Test::More: '0'
+  blib: '1.01'
+  overload: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -31,14 +33,17 @@ no_index:
 provides:
   Sub::QuoteX::Utils:
     file: lib/Sub/QuoteX/Utils.pm
-    version: '0.03'
+    version: '0.08'
 requires:
+  Carp: '0'
+  Exporter: '0'
   Scalar::Util: '0'
   Sub::Quote: '2.002002'
+  perl: '5.006'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sub-QuoteX-Utils
   repository: git://github.com/djerius/sub-quotex-utils.git
-version: '0.03'
+version: '0.08'
 x_serialization_backend: 'YAML::Tiny version 1.69'

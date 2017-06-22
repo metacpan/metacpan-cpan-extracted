@@ -67,7 +67,7 @@ $sweep->add_DataFile($DataFile);
 $sweep->start();
 
 my $expected = <<'EOF';
-#COLUMNS#	volt	f	transmission
+#volt	f	transmission
 0	1	2
 0	2	3
 0	3	4

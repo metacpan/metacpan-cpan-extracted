@@ -1,4 +1,4 @@
-# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
 
 # Perl-Critic-Pulp is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by the
@@ -17,6 +17,7 @@
 package Perl::Critic::Policy::ValuesAndExpressions::ProhibitUnknownBackslash;
 use 5.006;
 use strict;
+use version (); # but don't import qv()
 use warnings;
 
 # 1.084 for Perl::Critic::Document highest_explicit_perl_version()
@@ -29,7 +30,7 @@ use Perl::Critic::Pulp;
 # uncomment this to run the ### lines
 #use Smart::Comments;
 
-our $VERSION = 93;
+our $VERSION = 94;
 
 use constant DEBUG => 0;
 
@@ -125,8 +126,15 @@ my %explain = ('%' => '  (hashes are not interpolated)',
                'N' => '  (without "use charnames" in scope)',
               );
 
+my $v5016 = version->new('5.016');
+
 sub violates {
   my ($self, $elem, $document) = @_;
+
+  my $have_perl_516;
+  if (defined (my $doc_version = $document->highest_explicit_perl_version)) {
+    $have_perl_516 = ($doc_version >= $v5016);
+  }
 
   my $content = $elem->content;
   my $close = substr ($content, -1, 1);
@@ -222,8 +230,8 @@ sub violates {
         if (! defined $have_charnames) {
           $have_charnames = _charnames_in_scope($elem);
         }
-        if ($have_charnames) {
-          next;
+        if ($have_charnames || $have_perl_516) {
+          next;  # ok if "use charnames" or perl 5.16 up (which autoloads that)
         }
 
       } elsif ($c eq 'c') {
@@ -545,17 +553,25 @@ version then it's presumed a high octal is intentional and is allowed.
 
 =head2 Named Chars
 
-Named chars C<\N{SOME THING}> are added by L<charnames> (new in Perl 5.6)
-and are treated as known if there's a C<use charnames> in the lexical scope.
+Named chars C<\N{SOME THING}> are added by L<charnames>, new in Perl 5.6,
+and it is automatically loaded in Perl 5.16 up.  C<\N> is treated as known
+if C<use 5.016> or higher,
+
+    use 5.016;
+    print "\N{EQUALS SIGN}";   # ok with 5.16 automatic charnames
+
+Or C<use charnames> in the lexical scope,
 
     {
       use charnames ':full';
       print "\N{APOSTROPHE}";  # ok
     }
-    print "\N{COLON}";         # bad without charnames
+    print "\N{COLON}";         # bad, no charnames in lexical scope
 
-A C<\N> without C<charnames> is a compile error in Perl 5.6 or higher so is
-normally seen immediately anyway.
+In Perl 5.6 through 5.14 a C<\N> without C<charnames> is a compile error so
+would normally be seen immediately anyway.  There's no check of the
+character name appearing in the C<\N>.  C<charnames> gives an error for
+unknown names.
 
 =head2 Other Notes
 
@@ -621,13 +637,13 @@ means you must write backslashes as C<\\>.
     print 'c:\\my\\msdos\\filename';  # ok
 
 Doubled backslashing like this is correct, and can emphasize that you really
-did want a backslash, but it's tedious and not easy on the eye and so is
-left only as an option.
+did want a backslash, but it's tedious and not easy on the eye and so left
+only as an option.
 
 For reference, single-quote here-documents C<E<lt>E<lt>'HERE'> don't have
 any backslash escapes and so are not considered by this policy.  C<qx{}>
-command backticks are double-quote but as C<qx''> is single-quote and in
-each case treated under the corresponding single/double option.
+command backticks are double-quote but as C<qx''> is single-quote.  They are
+treated per the corresponding C<single> or C<double> option.
 
 =back
 
@@ -644,7 +660,7 @@ http://user42.tuxfamily.org/perl-critic-pulp/index.html
 
 =head1 COPYRIGHT
 
-Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
 
 Perl-Critic-Pulp is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

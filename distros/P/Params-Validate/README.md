@@ -4,7 +4,7 @@ Params::Validate - Validate method/function parameters
 
 # VERSION
 
-version 1.28
+version 1.29
 
 # SYNOPSIS
 
@@ -89,10 +89,15 @@ version 1.28
 
 # DESCRIPTION
 
-The Params::Validate module allows you to validate method or function
-call parameters to an arbitrary level of specificity. At the simplest
-level, it is capable of validating the required parameters were given
-and that no unspecified additional parameters were passed in.
+**I would recommend you consider using [Params::ValidationCompiler](https://metacpan.org/pod/Params::ValidationCompiler)
+instead. That module, despite being pure Perl, is _significantly_ faster than
+this one, at the cost of having to adopt a type system such as [Specio](https://metacpan.org/pod/Specio),
+[Type::Tiny](https://metacpan.org/pod/Type::Tiny), or the one shipped with [Moose](https://metacpan.org/pod/Moose)**.
+
+This module allows you to validate method or function call parameters to an
+arbitrary level of specificity. At the simplest level, it is capable of
+validating the required parameters were given and that no unspecified
+additional parameters were passed in.
 
 It is also capable of determining that a parameter is of a specific
 type, that it is an object of a certain class hierarchy, that it
@@ -782,6 +787,7 @@ button at [http://www.urth.org/~autarch/fs-donation.html](http://www.urth.org/~a
 
 # CONTRIBUTORS
 
+- Andy Grundman <andyg@activestate.com>
 - E. Choroba <choroba@matfyz.cz>
 - Ivan Bessarabov <ivan@bessarabov.ru>
 - J.R. Mash <jmash.code@gmail.com>

@@ -1,7 +1,7 @@
 package Ledger::Examples;
 
-our $DATE = '2017-05-23'; # DATE
-our $VERSION = '0.04'; # VERSION
+our $DATE = '2017-06-16'; # DATE
+our $VERSION = '0.05'; # VERSION
 
 1;
 # ABSTRACT: Example Ledger files
@@ -18,7 +18,7 @@ Ledger::Examples - Example Ledger files
 
 =head1 VERSION
 
-This document describes version 0.04 of Ledger::Examples (from Perl distribution Ledger-Examples), released on 2017-05-23.
+This document describes version 0.05 of Ledger::Examples (from Perl distribution Ledger-Examples), released on 2017-06-16.
 
 =head1 DESCRIPTION
 

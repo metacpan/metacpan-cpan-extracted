@@ -100,8 +100,13 @@ can submit an issue report [via the web](http://rt.cpan.org/Public/Dist/Display.
 or [via email](bug-dist-zilla-plugin-versionfrommainmodule@rt.cpan.org.
 This is a good place to send your questions about the usage of this distribution.
 
+## Travis
 
-## Tidyall
+All pull requests for this distribution will be automatically tested by
+[Travis](https://travis-ci.org/) and the build status will be reported on the
+pull request page. If your build fails, please take a look at the output.
+
+## TidyAll
 
 This distribution uses
 [Code::TidyAll](https://metacpan.org/release/Code-TidyAll) to enforce a
@@ -123,4 +128,4 @@ wish to be listed under a different name or address, you should submit a pull
 request to the .mailmap file to contain the correct mapping.
 
 This file was generated via Dist::Zilla::Plugin::GenerateFile::FromShareDir 0.013 from a
-template file originating in Dist-Zilla-PluginBundle-DROLSKY-0.79.
+template file originating in Dist-Zilla-PluginBundle-DROLSKY-0.85.

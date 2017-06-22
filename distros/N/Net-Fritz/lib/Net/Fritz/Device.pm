@@ -5,7 +5,7 @@ use warnings;
 
 package Net::Fritz::Device;
 # ABSTRACT: represents a TR064 device
-$Net::Fritz::Device::VERSION = 'v0.0.5';
+$Net::Fritz::Device::VERSION = 'v0.0.7';
 
 use Net::Fritz::Data;
 use Net::Fritz::Error;
@@ -223,7 +223,7 @@ Net::Fritz::Device - represents a TR064 device
 
 =head1 VERSION
 
-version v0.0.5
+version v0.0.7
 
 =head1 SYNOPSIS
 

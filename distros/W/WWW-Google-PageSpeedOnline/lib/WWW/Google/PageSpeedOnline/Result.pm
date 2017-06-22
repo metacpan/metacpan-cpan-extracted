@@ -1,6 +1,7 @@
 package WWW::Google::PageSpeedOnline::Result;
 
-$WWW::Google::PageSpeedOnline::Result::VERSION = '0.21';
+$WWW::Google::PageSpeedOnline::Result::VERSION   = '0.22';
+$WWW::Google::PageSpeedOnline::Result::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
 
@@ -8,7 +9,7 @@ WWW::Google::PageSpeedOnline::Result - Placeholder for the result of L<WWW::Goog
 
 =head1 VERSION
 
-Version 0.21
+Version 0.22
 
 =cut
 
@@ -16,10 +17,7 @@ use 5.006;
 use Moo;
 use namespace::clean;
 
-has id    => (is => 'ro');
-has title => (is => 'ro');
-has score => (is => 'ro');
-has rules => (is => 'ro');
+has [ qw(id title score rules) ] => (is => 'ro');
 
 =head1 METHODS
 
@@ -45,7 +43,7 @@ Mohammad S Anwar, C<< <mohammad.anwar at yahoo.com> >>
 
 =head1 REPOSITORY
 
-L<https://github.com/Manwar/WWW-Google-PageSpeedOnline>
+L<https://github.com/manwar/WWW-Google-PageSpeedOnline>
 
 =head1 BUGS
 

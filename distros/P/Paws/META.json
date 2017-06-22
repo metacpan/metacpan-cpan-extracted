@@ -4,7 +4,7 @@
       "Jose Luis Martinez <jlmartinez@capside.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "apache_2_0"
    ],
@@ -78,6 +78,9 @@
             "URL::Encode::XS" : "0",
             "XML::Simple" : "0",
             "perl" : "5.010001"
+         },
+         "suggests" : {
+            "Future::Mojo" : "0"
          }
       },
       "test" : {
@@ -103,7 +106,6 @@
          "web" : "https://github.com/pplu/aws-sdk-perl"
       }
    },
-   "version" : "0.32",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+   "version" : "0.33"
 }
 

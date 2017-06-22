@@ -7,13 +7,13 @@ use File::Spec;
 use base qw(Module::Install::Base);
 use vars qw($VERSION);
 
-$VERSION = '0.08';
+$VERSION = '0.12';
 
 sub checklibs {
   my $self = shift;
   return unless scalar @_;
   my %parms = @_;
-  unless (_author_side(delete $parms{author_checks})) {
+  unless (_author_side(delete $parms{run_checks_as_author})) {
      require Devel::CheckLib;
      Devel::CheckLib::check_lib_or_exit( %parms );
      return;
@@ -24,7 +24,7 @@ sub assertlibs {
   my $self = shift;
   return unless scalar @_;
   my %parms = @_;
-  unless (_author_side(delete $parms{author_checks})) {
+  unless (_author_side(delete $parms{run_checks_as_author})) {
     require Devel::CheckLib;
     Devel::CheckLib::assert_lib( %parms );
     return;
@@ -32,7 +32,7 @@ sub assertlibs {
 }
 
 sub _author_side {
-  my $even_author_checks = shift;
+  my $run_checks_as_author = shift;
   if ($Module::Install::AUTHOR) {
     mkdir 'inc';
     mkdir 'inc/Devel';
@@ -49,7 +49,7 @@ sub _author_side {
     close(CHECKLIBPM);
 
     print "Copied Devel::CheckLib to inc/ directory\n";
-    return !$even_author_checks;
+    return !$run_checks_as_author;
   }
   return 0;
 }
@@ -58,4 +58,4 @@ sub _author_side {
 
 __END__
 
-#line 124
+#line 132

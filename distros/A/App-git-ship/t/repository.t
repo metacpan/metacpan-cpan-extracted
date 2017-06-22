@@ -1,3 +1,4 @@
+use lib '.';
 use t::Util;
 use App::git::ship;
 
@@ -11,12 +12,12 @@ $app->start;
 is $app->repository, "https://github.com/$username/unknown", 'unknown repository';
 
 delete $app->{repository};
-system qw( git remote add origin https://github.com/harry-bix/mojo-MySQL5.git );
+system qw(git remote add origin https://github.com/harry-bix/mojo-MySQL5.git);
 is $app->repository, 'https://github.com/harry-bix/mojo-MySQL5.git', 'http repository';
 
 delete $app->{repository};
-system qw( git remote rm origin );
-system qw( git remote add origin git@github.com:bruce/some-cool-repo.git );
+system qw(git remote rm origin);
+system qw(git remote add origin git@github.com:bruce/some-cool-repo.git);
 is $app->repository, 'https://github.com/bruce/some-cool-repo.git', 'http repository';
 
 done_testing;

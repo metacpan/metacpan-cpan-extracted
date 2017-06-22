@@ -1,10 +1,10 @@
-
 use strict;
+use warnings;
 use Test::More;
 
 use Test::Fatal; # like
 
-BEGIN { use_ok('Test::Timer'); }
+use_ok('Test::Timer');
 
 time_nok( sub { sleep(2); }, 1, 'Failing test' );
 

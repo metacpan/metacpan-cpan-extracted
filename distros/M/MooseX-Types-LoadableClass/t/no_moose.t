@@ -3,7 +3,7 @@ use warnings;
 
 use lib 't/lib';
 
-use Test::More;
+use Test::More 0.88;
 use Class::Load 'is_class_loaded';
 use MooseX::Types::LoadableClass qw(LoadableClass LoadableRole);
 

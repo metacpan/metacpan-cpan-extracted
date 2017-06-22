@@ -1,5 +1,12 @@
 Changelog for CPAN-Testers-API
 
+0.015     2017-06-21 01:16:47-04:00 America/New_York
+
+    [Added]
+
+    - Added report summary API. This is the classic CPAN Testers data
+      made available as an API.
+
 0.014     2017-05-27 01:43:31-05:00 America/Chicago
 
     [Fixed]

@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-Travis-ConfigForReleaseBranch
 
+0.005     2017-06-21 20:23:00 CDT-0500
+	* Update travis config: include newer perls, drop older
+
 0.004     2015-04-29 21:00:21 PDT-0700
 	* no changes; 0.003 validated.
 

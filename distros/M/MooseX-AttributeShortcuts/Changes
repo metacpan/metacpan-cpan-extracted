@@ -1,5 +1,11 @@
 Revision history for MooseX-AttributeShortcuts
 
+0.032     2017-06-13 21:59:13 CDT-0500
+	* Move builder method name generation into its own method, provided by the
+	  common 'HasAnonBuilder' role, to allow for easier overriding when
+	  organizations decide to use non-standard builder method names that
+	  cannot be handled by changing the traits' "builder_prefix" option.
+
 0.031     2017-05-30 22:32:27 CDT-0500
 	* Fix tests to run without '.' in @INC; fixes #17.
 	* Additional tests, documentation, and examples.

@@ -28,7 +28,6 @@
             "Perl::OSType" : "0",
             "Proc::Guard" : "0.07",
             "Storable" : "0",
-            "Test::Differences" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0",
             "Test::TCP" : "2.17",
@@ -66,6 +65,6 @@
          "web" : "https://github.com/p-alik/perl-Gearman"
       }
    },
-   "version" : "v2.4.7",
+   "version" : "v2.4.8",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

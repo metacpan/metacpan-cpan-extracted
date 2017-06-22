@@ -130,6 +130,10 @@ This should not be mistaken for ["is\_forward\_starting"](#is_forward_starting) 
 
 Barrier pip size the minimum fluctuation amount for type of market. It is normally fraction.
 
+## absolute\_barrier\_multiplier
+
+True if barrier multiplier should be applied for absolute barrier(s) on this market
+
 ## supplied\_barrier\_type
 
 One of:
@@ -277,3 +281,61 @@ Contract duration in years.
 ## timeindays
 
 Contract duration in days.
+
+---
+
+# NAME
+
+Finance::Contract::Category
+
+# SYNOPSYS
+
+    my $contract_category = Finance::Contract::Category->new("callput");
+
+# DESCRIPTION
+
+This class represents available contract categories.
+
+# ATTRIBUTES
+
+## get\_all\_contract\_types
+
+Returns a list of all loaded contract types
+
+## get\_all\_barrier\_categories
+
+Returns a list of all available barrier categories
+
+## get\_all\_contract\_categories
+
+Returns a list of all loaded contract categories
+
+## code
+
+Our internal code (callput, touchnotouch, ...)
+
+## display\_name
+
+What is the name of this bet as an action?
+
+## display\_order
+
+In which order should these be preferred for display in a UI?
+
+## explanation
+
+How do we explain this contract category to a client?
+
+# METHODS
+
+## barrier\_at\_start
+
+When is the barrier determined, at the start of the contract or after contract expiry.
+
+# AUTHOR
+
+RMG Tech (Malaysia) Sdn Bhd
+
+# LICENSE AND COPYRIGHT
+
+Copyright 2013- RMG Technology (M) Sdn Bhd

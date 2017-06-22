@@ -2,11 +2,12 @@ Control::CLI::AvayaData  -  Controlling an AvayaData device by interacting with 
 =======================================================================================
 
 This module extends and enhances the Control::CLI module for the Avaya ethernet switches and IP routers.
-It currently supports all of Avaya Virtual Services Platform (VSP), Ethernet Routing Switch (ERS), Secure Router (SR), WLAN Controllers, Security Switches and APs as well as most of the legacy data products from Nortel Enterprise (Bay Networks) heritage:
+It currently supports all of Avaya Virtual Services Platform (VSP), Private Label Switches (APLS DSG BoxTypes), Ethernet Routing Switch (ERS), Secure Router (SR), WLAN Controllers, Security Switches and APs as well as most of the legacy data products from Nortel Enterprise (Bay Networks) heritage:
 
       VSP 4000, 7000, 7200, 8000, 9000
+      DSG models 6248, 7648, 7480, 8032, 9032
       ERS/Passport models 1600, 8300, 8600, 8800
-      ERS models 2500, 3500, 4x00, 5x00
+      ERS models 2500, 3x00, 4x00, 5x00
       SR models 2330, 4134
       WLAN 91xx
       WLAN(WC) 81x0
@@ -110,7 +111,7 @@ You can also look for information at:
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 Ludovico Stevens
+Copyright (C) 2017 Ludovico Stevens
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

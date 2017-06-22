@@ -1,0 +1,27 @@
+---
+abstract: 'search for a pattern in a CSV file and display results in a table'
+author:
+  - 'Neil Bowers <neilb@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: csvgrep
+requires:
+  Getopt::Long: '0'
+  Text::CSV_XS: '0'
+  Text::Table::Tiny: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/neilb/csvgrep
+  repository: https://github.com/neilb/csvgrep.git
+version: '0.03'
+x_serialization_backend: 'YAML::Tiny version 1.62'

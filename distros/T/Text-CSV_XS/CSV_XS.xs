@@ -24,9 +24,10 @@
 
 #define BUFFER_SIZE	1024
 
-#define CSV_XS_TYPE_PV	0
-#define CSV_XS_TYPE_IV	1
-#define CSV_XS_TYPE_NV	2
+#define CSV_XS_TYPE_WARN	1
+#define CSV_XS_TYPE_PV		0
+#define CSV_XS_TYPE_IV		1
+#define CSV_XS_TYPE_NV		2
 
 /* maximum length for EOL, SEP, and QUOTE - keep in sync with .pm */
 #define MAX_ATTR_LEN	16
@@ -324,6 +325,8 @@ static SV *cx_SvDiag (pTHX_ int xse) {
     return (err);
     } /* SvDiag */
 
+/* This function should be altered to deal with the optional extra argument
+ * that holds the replacement message */
 #define SetDiag(csv,xse)	cx_SetDiag (aTHX_ csv, xse)
 static SV *cx_SetDiag (pTHX_ csv_t *csv, int xse) {
     dSP;
@@ -1752,11 +1755,25 @@ static int cx_c_xsParse (pTHX_ csv_t csv, HV *hv, AV *av, AV *avf, SV *src, bool
 	    if ((svp = av_fetch (av, i, 0)) && *svp && SvOK (*svp)) {
 		switch (csv.types[i]) {
 		    case CSV_XS_TYPE_IV:
+#ifdef CSV_XS_TYPE_WARN
 			sv_setiv (*svp, SvIV (*svp));
+#else
+			if (SvTRUE (*svp))
+			    sv_setiv (*svp, SvIV (*svp));
+			else
+			    sv_setiv (*svp, 0);
+#endif
 			break;
 
 		    case CSV_XS_TYPE_NV:
+#ifdef CSV_XS_TYPE_WARN
 			sv_setnv (*svp, SvNV (*svp));
+#else
+			if (SvTRUE (*svp))
+			    sv_setnv (*svp, SvNV (*svp));
+			else
+			    sv_setnv (*svp, 0.0);
+#endif
 			break;
 
 		    default:

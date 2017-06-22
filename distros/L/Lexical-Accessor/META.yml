@@ -3,19 +3,19 @@ abstract: 'true private attributes for Moose/Moo/Mouse'
 author:
   - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
 build_requires:
-  Test::Fatal: 0
-  Test::More: 0.96
-  Test::Requires: 0
-  Types::Standard: 0.004
+  Test::Fatal: '0'
+  Test::More: '0.96'
+  Test::Requires: '0'
+  Types::Standard: '0.004'
 configure_requires:
-  ExtUtils::MakeMaker: 6.17
+  ExtUtils::MakeMaker: '6.17'
 dynamic_config: 0
-generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.015, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150005'
 keywords: []
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Lexical-Accessor
 no_index:
   directory:
@@ -28,22 +28,26 @@ optional_features: {}
 provides:
   Lexical::Accessor:
     file: lib/Lexical/Accessor.pm
-    version: 0.008
+    version: '0.009'
   Sub::Accessor::Small:
     file: lib/Sub/Accessor/Small.pm
-    version: 0.008
+    version: '0.009'
 recommends:
-  Sub::Name: 0
-  Type::Utils: 0.026
+  Sub::Name: '0'
+  Type::Utils: '0.026'
 requires:
-  Eval::TypeTiny: 0
-  Exporter::Tiny: 0
-  Hash::FieldHash: 0
-  perl: 5.008003
+  Eval::TypeTiny: '0'
+  Exporter::Tiny: '0'
+  Hash::FieldHash: '0'
+  perl: '5.008003'
 resources:
-  X_identifier: http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/project
+  Identifier: http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/project
   bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Lexical-Accessor
   homepage: https://metacpan.org/release/Lexical-Accessor
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-lexical-accessor.git
-version: 0.008
+version: '0.009'
+x_contributors:
+  - 'Lukas Atkinson (AMON) <amon@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

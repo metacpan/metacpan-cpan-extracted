@@ -7,7 +7,7 @@ use LWP::UserAgent ();
 use HTTP::Request::Common;
 
 # Version :
-our $VERSION = '0.1003';
+our $VERSION = '0.1005';;
 
 # Subroutine for HTTP Request GET :
 # ------------------------------------------------------------------------

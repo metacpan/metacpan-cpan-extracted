@@ -1,4 +1,3 @@
-use 5.012;
 use Test::More;
 
 use Keyword::Declare;
@@ -17,7 +16,7 @@ test {
 test 3;
 
 {
-    keyword test (Int $n) {{{ for my $n (1..<{$n}>) { pass "nested counted test $n" } }}}
+    keyword test (Num $n) :prefer {{{ for my $n (1..<{$n}>) { pass "nested counted test $n" } }}}
 
     test {
         pass 'test 1 in nested block';

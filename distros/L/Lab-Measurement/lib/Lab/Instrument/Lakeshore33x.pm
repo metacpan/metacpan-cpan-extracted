@@ -1,10 +1,9 @@
 package Lab::Instrument::Lakeshore33x;
-
+$Lab::Instrument::Lakeshore33x::VERSION = '3.550';
 use strict;
 use Lab::Instrument;
 use warnings;
 
-our $VERSION = '3.543';
 use 5.010;
 
 our @ISA = ('Lab::Instrument');

@@ -36,16 +36,16 @@ no_index:
 provides:
   MooseX::AttributeShortcuts:
     file: lib/MooseX/AttributeShortcuts.pm
-    version: '0.031'
+    version: '0.032'
   MooseX::AttributeShortcuts::Trait::Attribute:
     file: lib/MooseX/AttributeShortcuts/Trait/Attribute.pm
-    version: '0.031'
+    version: '0.032'
   MooseX::AttributeShortcuts::Trait::Attribute::HasAnonBuilder:
     file: lib/MooseX/AttributeShortcuts/Trait/Attribute/HasAnonBuilder.pm
-    version: '0.031'
+    version: '0.032'
   MooseX::AttributeShortcuts::Trait::Role::Attribute:
     file: lib/MooseX/AttributeShortcuts/Trait/Role/Attribute.pm
-    version: '0.031'
+    version: '0.032'
 requires:
   List::Util: '1.33'
   Moose: '1.14'
@@ -67,7 +67,7 @@ resources:
   bugtracker: https://github.com/RsrchBoy/moosex-attributeshortcuts/issues
   homepage: https://github.com/RsrchBoy/moosex-attributeshortcuts
   repository: https://github.com/RsrchBoy/moosex-attributeshortcuts.git
-version: '0.031'
+version: '0.032'
 x_BuiltWith:
   modules:
     CPAN::Meta: '2.150005'
@@ -525,7 +525,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: '1'
-          tag: '0.031'
+          tag: '0.032'
           tag_format: '%v'
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

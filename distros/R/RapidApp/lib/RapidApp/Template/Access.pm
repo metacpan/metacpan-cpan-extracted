@@ -39,6 +39,18 @@ sub catalyst_context { (shift)->Controller->{_current_context} }
 # being viewed/accessed directly.
 sub currently_viewing_template { (shift)->Controller->{_viewing_template} }
 
+# Optional internal caching object which may be used by the access class to cache any
+# data it wants for the life of the Controller request. This is localized at the top
+# of the view action in the Controller. It is the responsibility of the access class
+# to keep data organized among the multiple templates which could be processed in a
+# single request.
+sub local_cache { (shift)->{_local_cache} || {} };
+
+
+# Localized in RapidApp::Template::Context::process() to give the Access class
+# access to the current context object
+sub process_Context { (shift)->{_process_Context} };
+
 # -----
 # Optional *global* settings to toggle access across the board
 
@@ -136,6 +148,20 @@ has 'external_tpl', is => 'ro', lazy => 1, default => sub {
   ) ? 1 : 0;
 }, isa => Bool;
 
+
+# 'Static' templates are those which should not be processed through TT,
+# but rendered directly. This content will still be wrapped/post-processed
+has 'static_tpl', is => 'ro', lazy => 1, default => sub {
+  my $self = shift;
+
+  # Defaults to off unless an express static_tpl option is supplied:
+  return (
+    $self->static_tpl_coderef ||
+    $self->static_tpl_regex
+  ) ? 1 : 0;
+}, isa => Bool;
+
+
 # New: default CSS class name to return for every template (called from template_css_class())
 # unless this is set to 'undef', this class name will be added to the div wrapper when
 # rendering the template (along with 'ra-template'). This attr will have no effect if
@@ -159,6 +185,7 @@ has 'deletable_coderef', is => 'ro', isa => Maybe[CodeRef], default => sub {unde
 has 'admin_tpl_coderef', is => 'ro', isa => Maybe[CodeRef], default => sub {undef};
 has 'non_admin_tpl_coderef', is => 'ro', isa => Maybe[CodeRef], default => sub {undef};
 has 'external_tpl_coderef', is => 'ro', isa => Maybe[CodeRef], default => sub {undef};
+has 'static_tpl_coderef', is => 'ro', isa => Maybe[CodeRef], default => sub {undef};
 
 # Optional Regex interfaces:
 has 'viewable_regex', is => 'ro', isa => Maybe[Str], default => sub {undef};
@@ -169,6 +196,7 @@ has 'deletable_regex', is => 'ro', isa => Maybe[Str], default => sub {undef};
 has 'admin_tpl_regex', is => 'ro', isa => Maybe[Str], default => sub {undef};
 has 'non_admin_tpl_regex', is => 'ro', isa => Maybe[Str], default => sub {undef};
 has 'external_tpl_regex', is => 'ro', isa => Maybe[Str], default => sub {undef};
+has 'static_tpl_regex', is => 'ro', isa => Maybe[Str], default => sub {undef};
 
 
 # Compiled regexes:
@@ -217,6 +245,12 @@ has '_non_admin_tpl_regexp', is => 'ro', lazy => 1, default => sub {
 has '_external_tpl_regexp', is => 'ro', lazy => 1, default => sub {
   my $self = shift;
   my $str = $self->external_tpl_regex or return undef;
+  return qr/$str/;
+}, isa => Maybe[RegexpRef];
+
+has '_static_tpl_regexp', is => 'ro', lazy => 1, default => sub {
+  my $self = shift;
+  my $str = $self->static_tpl_regex or return undef;
   return qr/$str/;
 }, isa => Maybe[RegexpRef];
 
@@ -364,6 +398,13 @@ sub template_external_tpl {
   return $self->_access_test($template,'external_tpl',1);
 }
 
+sub template_static_tpl {
+  my ($self,@args) = @_;
+  my $template = join('/',@args);
+  
+  return $self->_access_test($template,'static_tpl',1);
+}
+
 sub _access_test {
   my ($self,$template,$perm,$default) = @_;
   
@@ -419,6 +460,44 @@ sub template_css_class {
   my $template = join('/',@args);
   return $self->default_template_css_class;
 }
+
+
+# New: must return undef or a class name to use for "post-processing" of the
+# supplied template name. Returned class should be a valid perl package name 
+# which has a 'process' method which may be called as a class method, accepting 
+# a blob of text as ScalarRef and returning the post-processed content.
+# Will receive the RapidApp::Template::Context object as second argument.
+sub template_post_processor_class {
+  my ($self,@args) = @_;
+  my $template = join('/',@args);
+  
+  my $format = $self->get_template_format($template);
+  
+  return 
+    $format eq 'markdown' ? 'RapidApp::Template::Postprocessor::Markdown' :
+    # TODO: add additional postprocessors ...
+    
+    undef
+}
+
+
+# Optionally return headers (i.e. Content-Type, etc) associated with a given
+# external template.
+sub get_external_tpl_headers {
+  my ($self,@args) = @_;
+  my $template = join('/',@args);
+  return undef
+}
+
+
+# This is called by the controller at the top of the view request, and if it
+# returns a value, that will be used as the psgi response, bypassing all other
+# logic/rules:
+sub template_psgi_response {
+  my ($self,$template,$c) = @_;
+  return undef
+}
+
 
 
 1;

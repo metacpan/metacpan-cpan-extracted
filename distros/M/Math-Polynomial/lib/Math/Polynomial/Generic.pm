@@ -1,8 +1,6 @@
-# Copyright (c) 2009-2016 by Martin Becker.  All rights reserved.
+# Copyright (c) 2009-2017 by Martin Becker.  All rights reserved.
 # This package is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-#
-# $Id: Generic.pm 129 2016-08-08 17:27:26Z demetri $
 
 package Math::Polynomial::Generic;
 
@@ -19,7 +17,7 @@ use base qw(Math::Polynomial Exporter);
 our @EXPORT_OK = qw( X C );
 our %EXPORT_TAGS = ( legacy => [] );
 
-our $VERSION = '1.011';
+our $VERSION = '1.013';
 
 my $deprecated  = 1;
 my $x_singleton = Math::Polynomial::Generic->new(0, 1);
@@ -89,7 +87,7 @@ Math::Polynomial::Generic - syntactical sugar coating Math::Polynomial
 
 =head1 VERSION
 
-This documentation refers to version 1.011 of Math::Polynomial::Generic.
+This documentation refers to version 1.013 of Math::Polynomial::Generic.
 
 =head1 DEPRECATION NOTICE
 
@@ -104,7 +102,7 @@ seems do do more harm than good in terms of clarity.
 
 Therefore, Math::Polynomial::Generic is now deprecated.  Using the module
 now triggers a deprecation warning unless the special symbol C<:legacy>
-appears on the import list.  At some time after January 1, 2017, the
+appears on the import list.  At some time after July 1, 2017, the
 module will be discontinued altogether.
 
 =head1 SYNOPSIS
@@ -166,7 +164,7 @@ polynomial object, add a C<C()>-wrapped zero value.
 
 =head2 EXAMPLES
 
-  $c = Math::BigRat->new('2/3');   # some coefficient value
+  $c = Math::BigNum->new('2/3');   # some coefficient value
   $p = Math::Polynomial->new(1);   # some regular polynomial
 
   $q = X;                          # wrong (generic)
@@ -261,7 +259,7 @@ Martin Becker, E<lt>becker-cpan-mp@cozap.comE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2009-2016 by Martin Becker.  All rights reserved.
+Copyright (c) 2009-2017 by Martin Becker.  All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.6 or,

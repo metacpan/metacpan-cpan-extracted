@@ -69,12 +69,56 @@ sub fromFile {
 
   ##-- parse: metadata
   if (defined(my $xmeta = [$xroot->getChildrenByLocalName("MetaData")]->[0])) {
+    ##-- parse: metadata: : /*/MetaData/source[@type="meta:KEY"]
     my ($type);
     foreach (@{$xmeta->getChildrenByLocalName("source")}) {
       $type = $_->getAttribute('type');
       $meta->{$1} = $_->textContent if ($type && $type =~ /^meta:(.*)$/);
     }
+
+    ##-- parse: metadata: CMDI header
+    my ($xhdr);
+    if (defined($xhdr = $xmeta->findnodes('./*[local-name()="source"]/*[local-name()="CMD"]/*[local-name()="Header"]')->[0])) {
+      foreach (grep {UNIVERSAL::isa($_,'XML::LibXML::Element')} @{$xhdr->childNodes}) {
+	$type = $_->nodeName;
+	$meta->{"$type"} = $_->textContent;
+      }
+    }
+
+    ##-- parse: metadata: embedded TEI header (DTA-style)
+    my ($nod);
+    if (defined($xhdr = $xmeta->findnodes('.//*[local-name()="teiHeader"]')->[0])) {
+      ##-- tei header: date: teiHeader/fileDesc/sourceDesc/biblFull/publicationStmt/date
+      if (defined($nod=$xmeta->findnodes('.//*[local-name()="sourceDesc"]//*[local-name()="date"]')->[0])) {
+	$meta->{date} = $nod->textContent;
+      }
+
+      ##-- tei header: author
+      if (defined($nod=$xmeta->findnodes('.//*[local-name()="author"]')->[0])) {
+	$meta->{author} = $nod->textContent;
+      }
+
+      ##-- tei header: title
+      if (defined($nod=$xmeta->findnodes('.//*[local-name()="title" and level="a" and @type="main"]')->[0])
+	  || defined($nod=$xmeta->findnodes('.//*[local-name()="title" and @type="main"]')->[0])
+	  || defined($nod=$xmeta->findnodes('.//*[local-name()="title"]')->[0])) {
+	$meta->{title} = $nod->textContent;
+      }
+
+      ##-- tei header: bibl
+      if (defined($nod=$xmeta->findnodes('.//*[local-name()="sourceDesc"]/*[local-name()="bibl"]')->[0])) {
+	$meta->{bibl} = $nod->textContent;
+      }
+    }
   }
+
+  ##-- metadata: trim
+  foreach (values %$meta) {
+    s/^\s+//;
+    s/\s+$//;
+    s/\s+/ /g;
+  }
+
 
   ##-- parse: date
   ($doc->{date} = $meta->{date} // $meta->{date_} // 0) =~ s/^[^0-9]*([0-9]+)[^0-9].*$//;

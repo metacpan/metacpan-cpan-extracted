@@ -1,0 +1,34 @@
+## scaffold.yml - Rapi::Blog scaffold config file
+
+static_paths      : [ css/, js/, images/, favicon.png ]
+private_paths     : [ private/, scaffold.yml ]
+landing_page      : index
+favicon           : favicon.png
+default_view_path : post/
+preview_path      : fullscr/
+
+view_wrappers:
+  - { path: post/,    type: include,  wrapper: private/post.html    }
+  - { path: fullscr/, type: include,  wrapper: private/fullscreen.html }
+
+nav_sections:
+  - { title: Home, path: / }
+  
+  - { title: Dropdown, children: [
+            { title: 'Submenu 01' },
+            { title: 'Submenu 02' },
+            { title: 'Submenu 03' } 
+          ]}
+    
+  - { title: Demo, path: /demo }
+  - { title: Archives, path: /archives }
+  
+  - { title: Blog, path: /blog, children: [
+                                   { title: Blog Entries, path: /blog },
+                                   { title: Single Blog, path: /single }
+                                ]}
+
+  - { title: Page, path: /page }
+                      
+# whether or not to show a public edit link on post page
+edit_post_link : 1

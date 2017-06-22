@@ -4,7 +4,7 @@ use base qw/Prty::File::Image/;
 use strict;
 use warnings;
 
-our $VERSION = 1.107;
+our $VERSION = 1.108;
 
 use Prty::TimeLapse::Filename;
 
@@ -205,7 +205,7 @@ sub text {
 
 =head1 VERSION
 
-1.107
+1.108
 
 =head1 AUTHOR
 

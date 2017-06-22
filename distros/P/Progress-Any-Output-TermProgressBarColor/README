@@ -101,7 +101,7 @@ ENVIRONMENT
 
  COLOR => BOOL
 
-    Can be used to force or disable color.
+    Can be used to force or disable color. See Color::ANSI::Util.
 
  COLOR_DEPTH => INT
 

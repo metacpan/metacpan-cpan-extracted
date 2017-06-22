@@ -9,6 +9,7 @@ use Data::Dump;
 use List::Util 'max';
 use parent 'Exporter';
 our @EXPORT = @Test::More::EXPORT;
+use PPI;
 
 sub _trim {
     my $str = shift;
@@ -25,9 +26,10 @@ sub import {
         state $COMPARATOR = qr{\A (?: == | != | < | > | <= | >= | eq | ne | lt | gt | le | ge ) \Z}xms;
 
         # Decompose the test arguments...
+        $expr = PPI::Document->new(\$expr);
         my %arg;
         my $curr = 'found';
-        for my $component ($expr->children) {
+        for my $component ($expr->child(0)->children) {
             if ($curr eq 'found' && $component =~ $COMPARATOR) {
                 $arg{comparator} = $component;
                 $curr = 'expected';
@@ -69,6 +71,7 @@ sub import {
                 Test::More::fail $arg{desc};
                 Test::More::diag q{  $arg{found} !$arg{comparator} $arg{expected}};
                 Test::More::diag q{  because:}; @diagnostics
+                Test::More::diag "";
             }
         } =~ s{\n}{}gr;
     }

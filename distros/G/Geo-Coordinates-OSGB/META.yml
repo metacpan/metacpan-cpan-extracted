@@ -1,7 +1,7 @@
 ---
 abstract: 'Convert coordinates between Lat/Lon and the British National Grid'
 author:
-  - unknown
+  - 'Toby Thurston'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
@@ -18,5 +18,5 @@ no_index:
     - t
     - inc
 requires: {}
-version: '2.17'
+version: '2.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

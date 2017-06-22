@@ -1,8 +1,6 @@
-# Copyright (c) 2009 Martin Becker.  All rights reserved.
+# Copyright (c) 2009-2017 Martin Becker.  All rights reserved.
 # This package is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-#
-# $Id: 09_linear_terms.t 55 2009-06-10 20:56:13Z demetri $
 
 # Checking methods dealing with linear terms added in version 1.002
 

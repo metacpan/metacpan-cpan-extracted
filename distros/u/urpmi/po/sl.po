@@ -1,28 +1,29 @@
-# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
-# This file is distributed under the same license as the PACKAGE package.
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Free Software Foundation, Inc.
 #
-# Tadej Panjtar <panjtar@email.si>, 2003, 2004, 2005.
-# Mitja Masten <mitja.masten@email.si>, 2003.
-# Gregor Pirnaver <gregor.pirnaver@mandrakeprinas.org>, 2004.
-# Gregor Pirnaver <gregor.pirnaver@sdm-si.org>, 2005.
-# Jaka Kranjc <jakakranjc@email.si>, 2005, 2006.
-# Matjaž Kaše <matjaz.kase@telemach.net>, 2006.
-# Jure Repinc <jlp@holodeck1.com>, 2007, 2008, 2009.
-# Filip Komar <filip.komar@gmail.com>, 2012, 2013, 2014.
+# Translators:
+# Filip Komar <filip.komar@gmail.com>, 2012-2014,2017
+# Gregor Pirnaver <gregor.pirnaver@mandrakeprinas.org>, 2004
+# Gregor Pirnaver <gregor.pirnaver@sdm-si.org>, 2005
+# Jaka Kranjc <jakakranjc@email.si>, 2005-2006
+# Jure Repinc <jlp@holodeck1.com>, 2007-2009
+# Matjaž Kaše <matjaz.kase@telemach.net>, 2006
+# Mitja Masten <mitja.masten@email.si>, 2003
+# Tadej Panjtar <panjtar@email.si>, 2003-2005
 msgid ""
 msgstr ""
-"Project-Id-Version: urpmi\n"
+"Project-Id-Version: Mageia\n"
 "POT-Creation-Date: 2014-09-13 21:15+0200\n"
-"PO-Revision-Date: 2014-09-28 12:40+0200\n"
+"PO-Revision-Date: 2017-04-15 20:04+0000\n"
 "Last-Translator: Filip Komar <filip.komar@gmail.com>\n"
-"Language-Team: Slovenian <lugos-slo@lugos.si>, Translation list <mageia-"
-"i18n@mageia.org>\n"
+"Language-Team: Slovenian (http://www.transifex.com/MageiaLinux/mageia/"
+"language/sl/)\n"
 "Language: sl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8-bit\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n"
-"%100==4 ? 2 : 3)\n"
+"%100==4 ? 2 : 3);\n"
 
 #: ../gurpm/RPMProgressDialog.pm:47
 #, c-format
@@ -37,32 +38,32 @@ msgstr "Namestitev paketov"
 #: ../gurpm/RPMProgressDialog.pm:128
 #, c-format
 msgid "Please wait..."
-msgstr "Počakajte"
+msgstr "Počakajte …"
 
 #: ../gurpm/RPMProgressDialog.pm:290
 #, c-format
 msgid "Verifying package signatures..."
-msgstr "Preverjanje podpisov paketov..."
+msgstr "Preverjanje podpisov paketov …"
 
 #: ../gurpm/RPMProgressDialog.pm:309 ../urpm/install.pm:107
 #, c-format
 msgid "Preparing..."
-msgstr "Priprava ..."
+msgstr "Priprava …"
 
 #: ../gurpm/RPMProgressDialog.pm:313
 #, c-format
 msgid "Removing package `%s' ..."
-msgstr "Odstranjevanje paketa »%s«"
+msgstr "Odstranjevanje paketa »%s« …"
 
 #: ../gurpm/RPMProgressDialog.pm:316
 #, c-format
 msgid "Installing package `%s' (%s/%s)..."
-msgstr "Nameščanje paketa »%s« (%s/%s) ..."
+msgstr "Nameščanje paketa »%s« (%s/%s) …"
 
 #: ../gurpm/RPMProgressDialog.pm:345
 #, c-format
 msgid "Downloading package `%s'..."
-msgstr "Prenos paketa »%s« ..."
+msgstr "Prenos paketa »%s« …"
 
 #: ../gurpm/RPMProgressDialog.pm:349 ../gurpmi:126
 #, c-format
@@ -74,7 +75,7 @@ msgstr "Prekliči"
 #: ../urpm/media.pm:1798
 #, c-format
 msgid "...retrieving failed: %s"
-msgstr "... prenos je spodletel: %s"
+msgstr "…prenos je spodletel: %s"
 
 #: ../gurpmi:49
 #, c-format
@@ -258,7 +259,7 @@ msgstr "Za to morate biti skrbnik"
 #: ../gurpmi2:76
 #, c-format
 msgid "Preparing packages installation..."
-msgstr "Pripravljam namestitev paketov ..."
+msgstr "Pripravljam namestitev paketov …"
 
 #: ../gurpmi2:91 ../urpmi:506
 #, c-format
@@ -453,7 +454,7 @@ msgstr "Samo naduporabnik lahko namešča pakete"
 #: ../rurpmi:18
 #, c-format
 msgid "Running urpmi in restricted mode..."
-msgstr "Poganjanje urpmi v omejenem načinu ..."
+msgstr "Poganjanje urpmi v omejenem načinu …"
 
 #: ../urpm.pm:23
 #, c-format
@@ -500,12 +501,12 @@ msgstr "napačno ime datoteke rpm [%s]"
 #: ../urpm.pm:448
 #, c-format
 msgid "retrieving rpm file [%s] ..."
-msgstr "prenos datoteke rpm [%s] ..."
+msgstr "prenos datoteke rpm [%s] …"
 
 #: ../urpm.pm:450 ../urpm/get_pkgs.pm:276
 #, c-format
 msgid "...retrieving done"
-msgstr "... prenos je opravljen"
+msgstr "… prenos je opravljen"
 
 #: ../urpm.pm:458
 #, c-format
@@ -804,7 +805,7 @@ msgstr "paketa %s ni mogoče najti."
 #: ../urpm/get_pkgs.pm:269
 #, c-format
 msgid "retrieving rpm files from medium \"%s\"..."
-msgstr "prenos datotek rpm iz vira »%s« ..."
+msgstr "prenos datotek rpm iz vira »%s« …"
 
 #: ../urpm/install.pm:115 ../urpme:164
 #, c-format
@@ -897,7 +898,7 @@ msgstr "Podatkovna zbirka %s je zaklenjena (uporablja jo že nek drug program)"
 #: ../urpm/lock.pm:115
 #, c-format
 msgid "%s database is locked. Waiting..."
-msgstr "Podatkovna zbirka %s je zaklenjena, čakanje ..."
+msgstr "Podatkovna zbirka %s je zaklenjena, čakanje …"
 
 #: ../urpm/lock.pm:116
 #, c-format
@@ -1144,7 +1145,7 @@ msgstr "spuščam nezdružljivi vir »%s« (za %s)"
 #: ../urpm/media.pm:1207
 #, c-format
 msgid "retrieving media.cfg file..."
-msgstr "prenos datoteke media.cfg ..."
+msgstr "prenos datoteke media.cfg …"
 
 #: ../urpm/media.pm:1250
 #, c-format
@@ -1169,7 +1170,7 @@ msgstr "ponovno nastavljanje urpmi za vir »%s«"
 #: ../urpm/media.pm:1437
 #, c-format
 msgid "...reconfiguration failed"
-msgstr "... ponovno nastavljanje je spodletelo"
+msgstr "… ponovno nastavljanje je spodletelo"
 
 #: ../urpm/media.pm:1443
 #, c-format
@@ -1199,22 +1200,22 @@ msgstr "težava pri branju datoteke synthesis vira »%s«"
 #: ../urpm/media.pm:1524 ../urpm/media.pm:1619
 #, c-format
 msgid "copying [%s] for medium \"%s\"..."
-msgstr "kopiranje [%s] za vir »%s« ..."
+msgstr "kopiranje [%s] za vir »%s« …"
 
 #: ../urpm/media.pm:1526 ../urpm/media.pm:1596 ../urpm/media.pm:1849
 #, c-format
 msgid "...copying failed"
-msgstr "... kopiranje je spodletelo"
+msgstr "… kopiranje je spodletelo"
 
 #: ../urpm/media.pm:1592
 #, c-format
 msgid "copying description file of \"%s\"..."
-msgstr "kopiranje datoteke z opisi »%s« ..."
+msgstr "kopiranje datoteke z opisi »%s« …"
 
 #: ../urpm/media.pm:1594 ../urpm/media.pm:1623
 #, c-format
 msgid "...copying done"
-msgstr "... kopiranje zaključeno"
+msgstr "… kopiranje zaključeno"
 
 #: ../urpm/media.pm:1625
 #, c-format
@@ -1249,7 +1250,7 @@ msgstr "neveljavna datoteka hdlist %s za vir »%s«"
 #: ../urpm/media.pm:1756
 #, c-format
 msgid "copying MD5SUM file of \"%s\"..."
-msgstr "kopiranje datoteke MD5SUM od »%s« ..."
+msgstr "kopiranje datoteke MD5SUM od »%s« …"
 
 #: ../urpm/media.pm:1796
 #, c-format
@@ -1264,17 +1265,17 @@ msgstr "za vir »%s« ni bilo možno najti metapodatkov"
 #: ../urpm/media.pm:1831
 #, c-format
 msgid "retrieving source synthesis of \"%s\"..."
-msgstr "prenos izvorne datoteke synthesis od »%s« ..."
+msgstr "prenos izvorne datoteke synthesis od »%s« …"
 
 #: ../urpm/media.pm:1897
 #, c-format
 msgid "examining pubkey file of \"%s\"..."
-msgstr "preverjanje datoteke z javnimi ključi od »%s« ..."
+msgstr "preverjanje datoteke z javnimi ključi od »%s« …"
 
 #: ../urpm/media.pm:1909
 #, c-format
 msgid "...imported key %s from pubkey file of \"%s\""
-msgstr "... uvožen je ključ %s iz datoteke javnih ključev od »%s«"
+msgstr "… uvožen je ključ %s iz datoteke javnih ključev od »%s«"
 
 #: ../urpm/media.pm:1913
 #, c-format
@@ -2634,7 +2635,7 @@ msgstr "(samo test, namestitev se ne bo izvedla)"
 #: ../urpmi:640
 #, c-format
 msgid "Press Enter when mounted..."
-msgstr "Pritisnite Enter, ko bo priklopljeno ..."
+msgstr "Pritisnite Enter, ko bo priklopljeno …"
 
 #. -PO: The URI types strings 'file:', 'ftp:', 'http:', and 'cdrom:' must not be translated!
 #. -PO: neither the ``with''.  Only what is between <brackets> can be translated.
@@ -2852,7 +2853,7 @@ msgid ""
 "usage: urpmi.removemedia (-a | <name> ...)\n"
 "where <name> is a medium name to remove.\n"
 msgstr ""
-"uporaba: urpmi.removemedia (-a | <ime> ...),\n"
+"uporaba: urpmi.removemedia (-a | <ime> …),\n"
 "kjer je <ime> ime vira za odstranitev.\n"
 
 #: ../urpmi.removemedia:41
@@ -2892,7 +2893,7 @@ msgid ""
 "usage: urpmi.update [options] <name> ...\n"
 "where <name> is a medium name to update.\n"
 msgstr ""
-"uporaba: urpmi.update [možnosti] <ime> ...,\n"
+"uporaba: urpmi.update [možnosti] <ime> …,\n"
 "kjer je <ime> ime vira za posodabljanje.\n"
 
 #: ../urpmi.update:43
@@ -3267,192 +3268,3 @@ msgstr "Zagon  programa za namestitev paketov Mageje"
 #: ../polkit/org.mageia.gurpmi2.policy.in.h:2
 msgid "Authentication is required to run Mageia Package Installer"
 msgstr "Za zagon nameščanja paketov Mageje je potrebno overjanje"
-
-#~ msgid "(suggested)"
-#~ msgstr "(predlagan)"
-
-#~ msgid "  --suggests     - suggests tags\n"
-#~ msgstr "  --suggests     - oznake priporočenih paketov\n"
-
-#~ msgid "  --suggests     - print suggests.\n"
-#~ msgstr "  --suggests     - prikaže priporočene pakete.\n"
-
-#~ msgid "(%d package, %d MB)"
-#~ msgid_plural "(%d packages, %d MB)"
-#~ msgstr[0] "(%d paket, %d MiB)"
-#~ msgstr[1] "(%d paketa, %d MiB)"
-#~ msgstr[2] "(%d paketi, %d MiB)"
-#~ msgstr[3] "(%d paketov, %d MiB)"
-
-#~ msgid "[repackaging]"
-#~ msgstr "[ponovna gradnja paketa]"
-
-#~ msgid "curl failed: upload canceled\n"
-#~ msgstr "curl je spodletel: pošiljanje preklicano\n"
-
-#~ msgid "  --repackage    - Re-package the files before erasing\n"
-#~ msgstr "  --repackage    - pred izbrisom ponovno zgradi pakete\n"
-
-#~ msgid "  --checkpoint   - set repackaging start now\n"
-#~ msgstr ""
-#~ " --checkpoint   - določite pričetek ponovne izgradnje paketov ( kontrolno "
-#~ "točko)\n"
-#~ "\n"
-
-#~ msgid "  --noclean      - don't clean repackage directory on checkpoint\n"
-#~ msgstr ""
-#~ "  --noclean      - ne počisti mape za ponovno izgradnjo paketov ob "
-#~ "kontrolni točki\n"
-
-#~ msgid ""
-#~ "  --list         - list transactions since provided date/duration "
-#~ "argument\n"
-#~ msgstr ""
-#~ "  --list         - prikaži izvedena opravila od podanega časa oz. "
-#~ "trajanja\n"
-
-#~ msgid "  --list-all     - list all transactions in rpmdb (long)\n"
-#~ msgstr ""
-#~ "  --list-all     - prikaži vsa izvedena opravila v rpmdb (dolga oblika)\n"
-
-#~ msgid "  --list-safe    - list transactions since checkpoint\n"
-#~ msgstr ""
-#~ "  --list-safe    - prikaži seznam izvedenih opravil od kontrolne točke "
-#~ "naprej\n"
-
-#~ msgid ""
-#~ "  --rollback     - rollback until specified date,\n"
-#~ "                   or rollback the specified number of transactions\n"
-#~ msgstr ""
-#~ "  --rollback     - povrni v stanje pred določenim datumom,\n"
-#~ "                   ali določenim številom izvedenih opravil\n"
-
-#~ msgid "  --disable      - turn off repackaging\n"
-#~ msgstr "  --disable      - onemogoči ponovno izgradnjo paketov\n"
-
-#~ msgid "Invalid date or duration [%s]\n"
-#~ msgstr "Neveljaven datum oziroma trajanje [%s]\n"
-
-#~ msgid "Repackage directory not defined\n"
-#~ msgstr "Mapa za ponovno izgradnjo paketov ni določena.\n"
-
-#~ msgid "Can't write to repackage directory [%s]\n"
-#~ msgstr "V mapo za ponovno izgradnjo paketov ni mogoče pisati.[%s]\n"
-
-#~ msgid "Cleaning up repackage directory [%s]...\n"
-#~ msgstr "Čiščenje mape za ponovno izgradnjo paketov [%s] ...\n"
-
-#~ msgid "%d file removed\n"
-#~ msgid_plural "%d files removed\n"
-#~ msgstr[0] "Odstranjena %d datoteka\n"
-#~ msgstr[1] "Odstranjeni %d datoteki\n"
-#~ msgstr[2] "Odstranjene %d datoteke\n"
-#~ msgstr[3] "Odstranjenih %d datotek\n"
-
-#~ msgid "Spurious command-line arguments [%s]\n"
-#~ msgstr "Neprepoznani argumenti ukazne vrstice [%s]\n"
-
-#~ msgid "You can't specify --checkpoint and --rollback at the same time\n"
-#~ msgstr ""
-#~ "Ne morete hkrati izbrati --checkpoint (ponovne izgradnje paketov - "
-#~ "kontrolne točke) in --rollback (obnove sistema)\n"
-
-#~ msgid "You can't specify --checkpoint and --list at the same time\n"
-#~ msgstr ""
-#~ "Ne morete hkrati izbrati --checkpoint (ponovne izgradnje paketov - "
-#~ "kontrolne točke) in --list (prikaz izvedenih opravil)\n"
-
-#~ msgid "You can't specify --rollback and --list at the same time\n"
-#~ msgstr ""
-#~ "Ne morete hkrati izbrati --rollback (obnove sistema) in --list (prikaz "
-#~ "izvedenih opravil)\n"
-
-#~ msgid "You can't specify --disable along with another option"
-#~ msgstr "Ne morete izbrati --disable (onemogoči) skupaj z drugo opcijo"
-
-#~ msgid "No transaction found since %s\n"
-#~ msgstr "Od %s ni bilo izvedeno nobeno opravilo\n"
-
-#~ msgid "You must be superuser to do this"
-#~ msgstr "Za dejanje morate biti prijavljeni kot naduporabnik"
-
-#~ msgid "Writing rpm macros file [%s]...\n"
-#~ msgstr "Pisanje datoteke z makri rpm [%s] ...\n"
-
-#~ msgid "No rollback date found\n"
-#~ msgstr "Datuma obnove sistema ni mogoče najti\n"
-
-#~ msgid "Rollback until %s...\n"
-#~ msgstr "Obnovitev sistema na %s...\n"
-
-#~ msgid "Disabling repackaging\n"
-#~ msgstr "Onemogočanje ponovne izgradnje paketov\n"
-
-#~ msgid ""
-#~ "urpme version %s\n"
-#~ "%s\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "usage:\n"
-#~ msgstr ""
-#~ "urpme različica %s\n"
-#~ "%s\n"
-#~ "To je prosta programska oprema in se sme razmnoževati pod dovoljenjem GNU "
-#~ "GPL\n"
-#~ "\n"
-#~ "uporaba:\n"
-
-#~ msgid ""
-#~ "urpmf version %s\n"
-#~ "%s\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "usage: urpmf [options] pattern-expression\n"
-#~ msgstr ""
-#~ "urpmf različica %s\n"
-#~ "%s\n"
-#~ "To je prosta programska oprema in se sme razmnoževati pod dovoljenjem GNU "
-#~ "GPL\n"
-#~ "\n"
-#~ "uporaba: urpmf [možnosti] vzorec(regularni izraz)\n"
-
-#~ msgid ""
-#~ "urpmi.recover version %s\n"
-#~ "%s\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "usage:\n"
-#~ msgstr ""
-#~ "urpmi.recover različica %s\n"
-#~ "%s\n"
-#~ "To je prosta programska oprema in se sme razmnoževati pod dovoljenjem GNU "
-#~ "GPL\n"
-#~ "\n"
-#~ "uporaba:\n"
-
-#~ msgid ""
-#~ "urpmq version %s\n"
-#~ "%s\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "usage:\n"
-#~ msgstr ""
-#~ "urpmq različica %s\n"
-#~ "%s\n"
-#~ "To je prosta programska oprema in se sme razmnoževati pod dovoljenjem GNU "
-#~ "GPL\n"
-#~ "\n"
-#~ "uporaba:\n"
-
-#~ msgid ""
-#~ "Installation failed, some files are missing:\n"
-#~ "%s\n"
-#~ "You may want to update your urpmi database"
-#~ msgstr ""
-#~ "Namestitev ni uspela, ker manjkajo nekatere datoteke:\n"
-#~ "%s\n"
-#~ "Mogoče bi morali osvežiti podatkovno bazo urpmi"

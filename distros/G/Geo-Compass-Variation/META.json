@@ -47,6 +47,6 @@
          "web" : "https://github.com/stevieb9/geo-compass-variation"
       }
    },
-   "version" : "0.01",
+   "version" : "1.00",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

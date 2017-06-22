@@ -94,25 +94,48 @@ Here's an example that uses plugins to provide the tests and the variants:
 
 =head1 DESCRIPTION
 
-NOTE: This is alpha code that's still evolving - nothing is stable.
+Test::WriteVariants is a utility to create variants of a common test.
 
-See L<List::MoreUtils> (on github) for an example use.
+Given the situation - like in L<DBI> where some tests are the same for
+L<DBI::SQL::Nano> and it's drop-in replacement L<SQL::Statement>.
+Or a distribution duo having a Pure-Perl and an XS variant - and the
+same test shall be used to ensure XS and PP version are really drop-in
+replacements for each other.
 
 =cut
 
 use strict;
 use warnings;
 
-use File::Path;
-use File::Basename;
 use Carp qw(croak confess);
+use Cwd ();
+use File::Basename;
+use File::Path;
+use File::Spec;
 
 use Module::Pluggable::Object;
+use Module::Runtime qw(require_module use_module);
 
 use Test::WriteVariants::Context;
 use Data::Tumbler;
 
-our $VERSION = '0.012';
+my $slurper;
+
+BEGIN
+{
+    $slurper ||= eval { require_module("File::Slurper"); File::Slurper->can("read_binary"); };
+    $slurper ||= sub {
+        my $fn = shift;
+        open(my $fh, "<", $fn) or croak("Can't open '$fn': $!");
+        ## no critic (Variables::RequireInitializationForLocalVars)
+        local $/;
+        my $cnt = <$fh>;
+        close($fh) or croak("Can't close file-handle for '$fn': $!");
+        return $cnt;
+    };
+}
+
+our $VERSION = '0.013';
 
 =head1 METHODS
 
@@ -124,21 +147,22 @@ Instanciates a Test::WriteVariants instance and sets the specified attributes, i
 
 =cut
 
-sub new {
+sub new
+{
     my ($class, %args) = @_;
 
     my $self = bless {} => $class;
 
-    for my $attribute (qw(allow_dir_overwrite allow_file_overwrite)) {
+    for my $attribute (qw(allow_dir_overwrite allow_file_overwrite))
+    {
         next unless exists $args{$attribute};
         $self->$attribute(delete $args{$attribute});
     }
     confess "Unknown $class arguments: @{[ keys %args ]}"
-        if %args;
+      if %args;
 
     return $self;
 }
-
 
 =head2 allow_dir_overwrite
 
@@ -151,12 +175,12 @@ Setting allow_dir_overwrite true disables this safety check.
 
 =cut
 
-sub allow_dir_overwrite {
+sub allow_dir_overwrite
+{
     my $self = shift;
     $self->{allow_dir_overwrite} = shift if @_;
     return $self->{allow_dir_overwrite};
 }
-
 
 =head2 allow_file_overwrite
 
@@ -169,12 +193,12 @@ Setting allow_file_overwrite true disables this safety check.
 
 =cut
 
-sub allow_file_overwrite {
+sub allow_file_overwrite
+{
     my $self = shift;
     $self->{allow_file_overwrite} = shift if @_;
     return $self->{allow_file_overwrite};
 }
-
 
 =head2 write_test_variants
 
@@ -203,20 +227,21 @@ and then calls its C<tumble> method:
 
 =cut
 
-sub write_test_variants {
+sub write_test_variants
+{
     my ($self, %args) = @_;
 
     my $input_tests = delete $args{input_tests}
-        or croak "input_tests not specified";
+      or croak "input_tests not specified";
     my $variant_providers = delete $args{variant_providers}
-        or croak "variant_providers not specified";
+      or croak "variant_providers not specified";
     my $output_dir = delete $args{output_dir}
-        or croak "output_dir not specified";
+      or croak "output_dir not specified";
     croak "write_test_variants: unknown arguments: @{[ keys %args ]}"
-        if keys %args;
+      if keys %args;
 
     croak "write_test_variants: $output_dir already exists"
-        if -d $output_dir and not $self->allow_dir_overwrite;
+      if -d $output_dir and not $self->allow_dir_overwrite;
 
     my $tumbler = Data::Tumbler->new(
         consumer => sub {
@@ -234,16 +259,14 @@ sub write_test_variants {
         $self->normalize_providers($variant_providers),
         [],
         Test::WriteVariants::Context->new(),
-        $input_tests, # payload
+        $input_tests,    # payload
     );
 
     warn "No tests written to $output_dir!\n"
-        if not -d $output_dir and not $self->allow_dir_overwrite;
+      if not -d $output_dir and not $self->allow_dir_overwrite;
 
     return;
 }
-
-
 
 # ------
 
@@ -252,43 +275,47 @@ sub write_test_variants {
 =head2 find_input_test_modules
 
     $input_tests = $test_writer->find_input_test_modules(
+        search_path => ["Helper"],
+        search_dirs => "t/lib",
+        test_prefix => "Extra::Helper",
+        input_tests => $input_tests
     );
 
 =cut
 
-sub find_input_test_modules {
+sub find_input_test_modules
+{
     my ($self, %args) = @_;
 
     my $namespaces = delete $args{search_path}
-        or croak "search_path not specified";
+      or croak "search_path not specified";
     my $search_dirs = delete $args{search_dirs};
     my $test_prefix = delete $args{test_prefix};
     my $input_tests = delete $args{input_tests} || {};
     croak "find_input_test_modules: unknown arguments: @{[ keys %args ]}"
-        if keys %args;
+      if keys %args;
 
     my $edit_test_name;
-    if (defined $test_prefix) {
+    if (defined $test_prefix)
+    {
         my $namespaces_regex = join "|", map { quotemeta($_) } @$namespaces;
-        my $namespaces_qr    = qr/^($namespaces_regex)::/;
+        my $namespaces_qr = qr/^($namespaces_regex)::/;
         $edit_test_name = sub { s/$namespaces_qr/$test_prefix/ };
     }
 
     my @test_case_modules = Module::Pluggable::Object->new(
-        require => 0,
+        require     => 0,
         search_path => $namespaces,
         search_dirs => $search_dirs,
     )->plugins;
 
-    #warn "find_input_test_modules @$namespaces: @test_case_modules";
-
-    for my $module_name (@test_case_modules) {
+    for my $module_name (@test_case_modules)
+    {
         $self->add_test_module($input_tests, $module_name, $edit_test_name);
     }
 
     return $input_tests;
 }
-
 
 =head2 find_input_test_files
 
@@ -296,6 +323,51 @@ Not yet implemented - will file .t files.
 
 =cut
 
+=head2 find_input_inline_tests
+
+    $input_tests = $test_writer->find_input_inline_tests(
+        search_patterns => ["*.it"],
+        search_dirs     => "t/inl",
+        input_tests     => $input_tests
+    );
+
+=cut
+
+sub find_input_inline_tests
+{
+    my ($self, %args) = @_;
+
+    my $search_patterns = delete $args{search_patterns};
+    my $search_dirs     = delete $args{search_dirs};
+    my $input_tests     = delete $args{input_tests} || {};
+    croak "find_input_test_modules: unknown arguments: @{[ keys %args ]}"
+      if keys %args;
+
+    use_module("File::Find::Rule", "0.34");
+
+    $search_patterns ||= ["*.it"];
+    $search_patterns = [$search_patterns] unless ref $search_patterns and "ARRAY" eq ref $search_patterns;
+    $search_dirs     = [$search_dirs]     unless ref $search_dirs     and "ARRAY" eq ref $search_dirs;
+    $search_dirs = [map { Cwd::abs_path($_) } @$search_dirs];
+
+    my $path_rx_str = join('|', map { "\Q$_\E" } @$search_dirs);
+
+    my $edit_test_name = sub {
+        my ($name, $path, $suffix) = fileparse(Cwd::abs_path($_), qr/\.[^.]*/);
+        (undef, $path, undef) = File::Spec->splitpath($path, 1);
+        $path =~ s,^$path_rx_str/,,;
+        $_ = join("_", File::Spec->splitdir($path), $name);
+    };
+
+    my @test_inlines = File::Find::Rule::find(file => canonpath => name => [@{$search_patterns}])->in(@{$search_dirs});
+
+    for my $file_name (@test_inlines)
+    {
+        $self->add_test_inline($input_tests, $file_name, $edit_test_name);
+    }
+
+    return $input_tests;
+}
 
 =head2 add_test
 
@@ -317,16 +389,16 @@ See L</add_test_module>.
 
 =cut
 
-sub add_test {
+sub add_test
+{
     my ($self, $input_tests, $test_name, $test_spec) = @_;
 
     confess "Can't add test $test_name because a test with that name exists"
-        if $input_tests->{ $test_name };
+      if $input_tests->{$test_name};
 
-    $input_tests->{ $test_name } = $test_spec;
+    $input_tests->{$test_name} = $test_spec;
     return;
 }
-
 
 =head2 add_test_module
 
@@ -338,7 +410,8 @@ sub add_test {
 
 =cut
 
-sub add_test_module {
+sub add_test_module
+{
     my ($self, $input_tests, $module_name, $edit_test_name) = @_;
 
     # map module name, without the namespace prefix, to a dir path
@@ -347,14 +420,46 @@ sub add_test_module {
     s{[^\w:]+}{_}g;
     s{::}{/}g;
 
-    $self->add_test($input_tests, $_, {
-        class => $module_name,
-        method => 'run_tests',
-    });
+    $self->add_test(
+        $input_tests,
+        $_,
+        {
+            class  => $module_name,
+            method => 'run_tests',
+        }
+    );
 
     return;
 }
 
+=head2 add_test_inline
+
+    $test_writer->add_test_inline(
+        $input_tests,     # the \%input_tests to add the test module to
+        $file_name,       # the file name of the test code to inline
+        $edit_test_name   # a code ref to edit the test file name in $_
+    );
+
+=cut
+
+sub add_test_inline
+{
+    my ($self, $input_tests, $file_name, $edit_test_name) = @_;
+
+    # map module name, without the namespace prefix, to a dir path
+    local $_ = $file_name;
+    $edit_test_name->() if $edit_test_name;
+
+    $self->add_test(
+        $input_tests,
+        $_,
+        {
+            code => $slurper->($file_name),
+        }
+    );
+
+    return;
+}
 
 =head2 normalize_providers
 
@@ -387,7 +492,8 @@ requested by any other plugins that have already been run for this provider.
 
 =cut
 
-sub normalize_providers {
+sub normalize_providers
+{
     my ($self, $input_providers) = @_;
     my @providers = @$input_providers;
 
@@ -395,24 +501,30 @@ sub normalize_providers {
     # then replace it with a code ref that uses Module::Pluggable
     # to load and run the provider classes in that namespace
 
-    for my $provider (@providers) {
+    for my $provider (@providers)
+    {
         next if ref $provider eq 'CODE';
 
         my @test_variant_modules = Module::Pluggable::Object->new(
-            search_path => [ $provider ],
+            search_path => [$provider],
             # for sanity:
-            require => 1,
+            require              => 1,
             on_require_error     => sub { croak "@_" },
             on_instantiate_error => sub { croak "@_" },
         )->plugins;
         @test_variant_modules = sort @test_variant_modules;
 
         croak "No variant providers found in $provider\:: namespace"
-            unless @test_variant_modules;
+          unless @test_variant_modules;
 
-        warn sprintf "Variant providers in %s: %s\n", $provider, join(", ", map {
-            (my $n=$_) =~ s/^${provider}:://; $n
-        } @test_variant_modules);
+        ## no critic (ErrorHandling::RequireCarping,BuiltinFunctions::ProhibitComplexMappings)
+        warn sprintf "Variant providers in %s: %s\n", $provider, join(
+            ", ",
+            map {
+                (my $n = $_) =~ s/^${provider}:://;
+                $n
+            } @test_variant_modules
+        );
 
         $provider = sub {
             my ($path, $context, $tests) = @_;
@@ -420,8 +532,10 @@ sub normalize_providers {
             my %variants;
             # loop over several methods as a basic way of letting plugins
             # hook in either early or late if they need to
-            for my $method (qw(provider_initial provider provider_final)) {
-                for my $test_variant_module (@test_variant_modules) {
+            for my $method (qw(provider_initial provider provider_final))
+            {
+                for my $test_variant_module (@test_variant_modules)
+                {
                     next unless $test_variant_module->can($method);
                     #warn "$test_variant_module $method...\n";
                     my $fqsn = "$test_variant_module\::$method";
@@ -436,7 +550,6 @@ sub normalize_providers {
 
     return \@providers;
 }
-
 
 =head2 write_output_files
 
@@ -453,12 +566,14 @@ calls L</write_file> to write it.
 
 =cut
 
-sub write_output_files {
+sub write_output_files
+{
     my ($self, $path, $context, $input_tests, $output_dir) = @_;
 
     my $base_dir_path = join "/", $output_dir, @$path;
 
-    for my $testname (sort keys %$input_tests) {
+    for my $testname (sort keys %$input_tests)
+    {
         my $test_spec = $input_tests->{$testname};
 
         # note that $testname can include a subdirectory path
@@ -476,7 +591,6 @@ sub write_output_files {
     return;
 }
 
-
 =head2 write_file
 
     $test_writer->write_file($filepath, $content);
@@ -490,25 +604,25 @@ Throws an exception on error.
 
 =cut
 
-sub write_file {
+sub write_file
+{
     my ($self, $filepath, $content) = @_;
 
     croak "$filepath already exists!\n"
-        if -e $filepath and not $self->allow_file_overwrite;
+      if -e $filepath and not $self->allow_file_overwrite;
 
     my $full_dir_path = dirname($filepath);
     mkpath($full_dir_path, 0)
-        unless -d $full_dir_path;
+      unless -d $full_dir_path;
 
     open my $fh, ">", $filepath
-        or croak "Can't write to $filepath: $!";
+      or croak "Can't write to $filepath: $!";
     print $fh $content;
     close $fh
-        or croak "Error writing to $filepath: $!";
+      or croak "Error writing to $filepath: $!";
 
     return;
 }
-
 
 =head2 get_test_file_body
 
@@ -519,7 +633,8 @@ instanciated by the find_input_test_* methods.
 
 =cut
 
-sub get_test_file_body {
+sub get_test_file_body
+{
     my ($self, $context, $test_spec) = @_;
 
     my @body;
@@ -530,24 +645,23 @@ sub get_test_file_body {
     push @body, "\n";
 
     push @body, "use lib '$test_spec->{lib}';\n\n"
-        if $test_spec->{lib};
+      if $test_spec->{lib};
 
     push @body, "require '$test_spec->{require}';\n\n"
-        if $test_spec->{require};
+      if $test_spec->{require};
 
-    if (my $class = $test_spec->{class}) {
+    if (my $class = $test_spec->{class})
+    {
         push @body, "require $class;\n\n";
         my $method = $test_spec->{method};
         push @body, "$class->$method;\n\n" if $method;
     }
 
     push @body, "$test_spec->{code}\n\n"
-        if $test_spec->{code};
+      if $test_spec->{code};
 
     return join "", @body;
 }
-
-
 
 1;
 
@@ -593,6 +707,8 @@ L<http://search.cpan.org/dist/Test-WriteVariants/>
 
 Tim Bunce, C<< <timb at cpan.org> >>
 
+Jens Rehsack, C<< rehsack at cpan.org >>
+
 =head1 ACKNOWLEDGEMENTS
 
 This module has been created to support DBI::Test in design and separation
@@ -600,7 +716,7 @@ of concerns.
 
 =head1 COPYRIGHT
 
-Copyright 2014-2015 Tim Bunce and Perl5 DBI Team.
+Copyright 2014-2017 Tim Bunce and Perl5 DBI Team.
 
 =head1 LICENSE
 

@@ -1,0 +1,37 @@
+% while ($Values and my $value = $Values->Next) {
+<textarea \
+% if (defined $Cols) {
+cols="<% $Cols %>" \
+% }
+% if (defined $Rows) {
+rows="<% $Rows %>" \
+% }
+name="<%$name%>" class="CF-<%$CustomField->id%>-Edit"><% $value->Content %></textarea><br />
+% }
+% if (!$MaxValues or !$Values or $Values->Count < $MaxValues) {
+<textarea \
+% if (defined $Cols) {
+cols="<% $Cols %>" \
+% }
+% if (defined $Rows) {
+rows="<% $Rows %>" \
+% }
+name="<%$name%>" class="CF-<%$CustomField->id%>-Edit"><% defined($Default) ? $Default : '' %></textarea>
+% }
+<script type="text/javascript">CKEDITOR.replace('<%$name%>',{width: '100%', height: RT.Config.MessageBoxRichTextHeight});</script>
+<%INIT>
+# XXX - MultiValue textarea is for now outlawed.
+$MaxValues = 1;
+my $name = $Name || $NamePrefix . $CustomField->Id . '-Values';
+</%INIT>
+<%ARGS>
+$Object => undef
+$CustomField => undef
+$NamePrefix => ''
+$Name => undef
+$Default => undef
+$Values => undef
+$MaxValues => undef
+$Cols
+$Rows
+</%ARGS>

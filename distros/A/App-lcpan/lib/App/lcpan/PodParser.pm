@@ -1,12 +1,12 @@
 package App::lcpan::PodParser;
 
-our $DATE = '2017-02-03'; # DATE
-our $VERSION = '1.017'; # VERSION
+our $DATE = '2017-06-19'; # DATE
+our $VERSION = '1.019'; # VERSION
 
 use 5.010;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use parent qw(Pod::Simple::Methody);
 
@@ -27,10 +27,10 @@ sub handle_text {
             # skip if mention target is in the same release
             next if $self->{module_file_ids}{$1} == $self->{file_id};
 
-            $log->tracef("    found a mention in naked text to known module: %s", $1);
+            log_trace("    found a mention in naked text to known module: %s", $1);
             $module_id = $self->{module_ids}{$1};
         } else {
-            $log->tracef("    found a mention in naked text to unknown module: %s", $1);
+            log_trace("    found a mention in naked text to unknown module: %s", $1);
             $module_name = $1;
         }
         $self->{sth_ins_mention}->execute(
@@ -50,17 +50,17 @@ sub start_L {
         # skip if mention target is in the same release
         return if $self->{module_file_ids}{$to} == $self->{file_id};
 
-        $log->tracef("    found a mention in POD link to known module: %s", $to);
+        log_trace("    found a mention in POD link to known module: %s", $to);
         $module_id = $self->{module_ids}{$to};
     } elsif ($to =~ $self->{scripts_re}) {
 
         # skip if mention target is in the same release
         return if first { $_==$self->{file_id} } @{ $self->{script_file_ids}{$to} };
 
-        $log->tracef("    found a mention in POD link to known script: %s", $to);
+        log_trace("    found a mention in POD link to known script: %s", $to);
         $script_name = $to;
     } elsif ($to =~ /\A([A-Za-z_][A-Za-z0-9_]*(?:::[A-Za-z0-9_]+)*)\z/) {
-        $log->tracef("    found a mention in POD link to unknown module: %s", $to);
+        log_trace("    found a mention in POD link to unknown module: %s", $to);
         $module_name = $to;
     } else {
         # name doesn't look like a module name, skip
@@ -85,7 +85,7 @@ App::lcpan::PodParser - Pod parser for use in App::lcpan
 
 =head1 VERSION
 
-This document describes version 1.017 of App::lcpan::PodParser (from Perl distribution App-lcpan), released on 2017-02-03.
+This document describes version 1.019 of App::lcpan::PodParser (from Perl distribution App-lcpan), released on 2017-06-19.
 
 =for Pod::Coverage .+
 
@@ -111,7 +111,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

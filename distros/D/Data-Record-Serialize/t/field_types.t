@@ -1,7 +1,6 @@
 #!perl
 
-use Test::More;
-use Test::Fatal;
+use Test2::Bundle::Extended;
 
 use Data::Dumper;
 use Data::Record::Serialize;
@@ -12,14 +11,15 @@ use lib 't/lib';
 subtest "illegal types" => sub {
 
     my $err;
+
     isa_ok(
-        $err = exception {
+        $err = dies {
             Data::Record::Serialize->new(
                 encode => 'null',
                 types  => { a => 'Q' },
             );
         },
-        'Error::TypeTiny',
+        ['Error::TypeTiny'],
         'throws on error'
     );
 
@@ -31,17 +31,16 @@ subtest "illegal types" => sub {
 subtest "types from first record" => sub {
     my $s;
 
-    is(
-        exception {
+    ok(
+        lives {
             $s = Data::Record::Serialize->new( encode => 'types_nis', );
         },
-        undef,
         'create serializer'
-    );
+    ) or diag $@;
 
     $s->send( { string => 'string', integer => 2, float => 3.2 } );
 
-    is_deeply(
+    is(
         $s->types,
         {
             string  => 'S',
@@ -51,7 +50,7 @@ subtest "types from first record" => sub {
         'derived input types',
     );
 
-    is_deeply(
+    is(
         $s->output_types,
         {
             string  => 'S',
@@ -64,28 +63,34 @@ subtest "types from first record" => sub {
 };
 
 subtest "allow type fields to differ from fields" => sub {
-    is(
-        exception {
+
+    my $s;
+
+    ok(
+        lives {
             $s = Data::Record::Serialize->new(
                 encode => 'types_nis',
                 types  => { a => 'N' },
                 fields => [qw( b )],
             );
         },
-        undef,
         'create serializer'
-    );
+    ) or diag $@;
 
-    is_deeply(
+    is(
         $s->types,
         {
             a => 'N',
-	    b => 'S',
+            b => 'S',
         },
         'retain type for non-existent field',
     );
 
-    is_deeply( $s->output_types, { b => 'S' }, 'no output type for non-existent field', );
+    is(
+        $s->output_types,
+        { b => 'S' },
+        'no output type for non-existent field',
+    );
 };
 
 
@@ -93,18 +98,17 @@ subtest "fold I type into N" => sub {
 
     my $s;
 
-    is(
-        exception {
+    ok(
+        lives {
             $s = Data::Record::Serialize->new(
                 encode => 'types_ns',
                 types  => { a => 'I' },
             );
         },
-        undef,
         'create serializer'
     );
 
-    is_deeply(
+    is(
         $s->types,
         {
             a => 'I',
@@ -112,7 +116,7 @@ subtest "fold I type into N" => sub {
         'retain unsupported integer type',
     );
 
-    is_deeply(
+    is(
         $s->output_types,
         {
             a => 'N',
@@ -125,8 +129,8 @@ subtest "encoder mapped types " => sub {
 
     my $s;
 
-    is(
-        exception {
+    ok(
+        lives {
             $s = Data::Record::Serialize->new(
                 encode => 'types_map',
                 types  => {
@@ -136,11 +140,10 @@ subtest "encoder mapped types " => sub {
                 },
             );
         },
-        undef,
         'create serializer'
     );
 
-    is_deeply(
+    is(
         $s->types,
         {
             string => 'S',
@@ -150,7 +153,7 @@ subtest "encoder mapped types " => sub {
         'input types remain the same',
     );
 
-    is_deeply(
+    is(
         $s->output_types,
         {
             string => 's',
@@ -165,8 +168,8 @@ subtest "encoder mapped types, auto map I => N " => sub {
 
     my $s;
 
-    is(
-        exception {
+    ok(
+        lives {
             $s = Data::Record::Serialize->new(
                 encode => 'types_map_ns',
                 types  => {
@@ -176,11 +179,10 @@ subtest "encoder mapped types, auto map I => N " => sub {
                 },
             );
         },
-        undef,
         'create serializer'
     );
 
-    is_deeply(
+    is(
         $s->types,
         {
             string => 'S',
@@ -190,7 +192,7 @@ subtest "encoder mapped types, auto map I => N " => sub {
         'input types remain the same',
     );
 
-    is_deeply(
+    is(
         $s->output_types,
         {
             string => 's',

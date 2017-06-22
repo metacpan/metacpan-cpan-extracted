@@ -1,16 +1,17 @@
 package Pcore::Util::Result;
 
 use Pcore -class, -export => [qw[result]];
+use Pcore::Util::Scalar qw[is_plain_arrayref is_plain_hashref];
 
 with qw[Pcore::Util::Result::Status];
 
 sub result ( $status, @ ) {
     my %args = @_ == 2 ? ( data => $_[1] ) : splice @_, 1;
 
-    if ( ref $status eq 'ARRAY' ) {
+    if ( is_plain_arrayref $status ) {
         $args{status} = $status->[0];
 
-        if ( ref $status->[1] eq 'HASH' ) {
+        if ( is_plain_hashref $status->[1] ) {
             $args{reason} = get_reason( undef, $status->[0], $status->[1] );
 
             $args{status_reason} = $status->[1];

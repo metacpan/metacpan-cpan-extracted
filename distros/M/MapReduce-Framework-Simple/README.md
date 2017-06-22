@@ -7,6 +7,8 @@ MapReduce::Framework::Simple - Simple Framework for MapReduce
 
     ## After install this module, you can start MapReduce worker server by this command.
     ## $ perl -MMapReduce::Framework::Simple -e 'MapReduce::Framework::Simple->new->worker("/eval");'
+    ## Prefork HTTP server module "Starlet" is highly recommended for practical uses.
+
     use MapReduce::Framework::Simple;
     use Data::Dumper;
 
@@ -95,6 +97,7 @@ The model requires Map procedure that processes given data with given sub-routin
 
 This module provides worker server that just computes perl-code and data sent from remote client.
 You can start MapReduce worker server by one liner Perl.
+Pre-fork HTTP server module "Starlet" will be loaded automatically if it is installed. Starlet installed environment is highly recommended for practical uses.
 
 # METHODS
 
@@ -109,12 +112,15 @@ _new_ creates object.
         die_discarded_data => 0 # die if discarded data exist.
         worker_log => 0 # print worker log when remote client accesses.
         force_plackup => 0 # force to use plackup when starting worker server.
+        server_spec => {cores => 4, clock => 2400} # since v0.08, you can give the machine spec.
         );
 
 ## _create\_assigned\_data_
 
 This method creates MapReduce ready data from data and remote worker server list.
 You can set the number of data chunk and balancing method ('volume\_uniform','element\_shuffle','element\_sequential').
+
+Note: Version >= 0.08, new available method 'element\_server\_cores','element\_server\_workers','element\_server\_core\_clock'
 
     my $tmp_data = [1 .. 1_000_000];
     my $server_list = [
@@ -132,6 +138,33 @@ You can set the number of data chunk and balancing method ('volume\_uniform','el
            }
        );
 
+### Assign method options
+
+The explanation of assign method below.
+
+#### _volume\_uniform_ (default)
+
+This option balances by data size. Default option.
+
+#### _element\_shuffle_
+
+This option assigns data to workers by random.
+
+#### _element\_sequential_
+
+This option assigns data to workers sequentially.
+
+#### _element\_server\_cores_, _element\_server\_workers_, _element\_server\_core\_clock_
+
+These options are available over v0.08.
+
+It requires worker side preparation to notice server specification for client like below.
+
+    $ perl -MMapReduce::Framework::Simple -e 'MapReduce::Framework::Simple->new(server_spec => {cores => 4, clock => 2400})->worker("/eval",10,5000)'
+
+Please give correct server specification in new(server\_spec => {}) when you use 'element\_server\_cores' or 'element\_server\_core\_clock'.
+Then you can distribute the data by computing power of workers.
+
 ## _map\_reduce_
 
 _map\_reduce_ method starts MapReduce processing using Parallel::ForkManager.
@@ -141,12 +174,15 @@ _map\_reduce_ method starts MapReduce processing using Parallel::ForkManager.
         $mapper, # code ref of mapper
         $reducer, # code ref of reducer
         5, # number of fork process
-        {remote => 1} # grid computing flag.
+        {
+          remote => 1,  # grid computing flag.
+          storable => 1 # since v0.09, this option enables to insert any objects and code ref by using Storable module.
+         }
        );
 
 ## _worker_
 
-_worker_ method starts MapReduce worker server using Starlet HTTP server over Plack when Starlet and Plack::Handler::Starlet is installed (or not, startup by single process plack server).
+_worker_ method starts MapReduce worker server using Starlet HTTP server over Plack when Starlet is installed (or not, startup by single process plack server. It is not for practical uses).
 If you need to startup worker as plackup on the environment that has Starlet installed, please set force\_plackup => 1 when _new_.
 
 Warning: Worker server do eval remote code. Please use this server at secure network.
@@ -168,6 +204,208 @@ If you want to use other HTTP server, you can extract Plack app by _load\_worker
            ANY => 'FOO'
            );
     $handler->run($app);
+
+Example one liner deploy code below (with Starlight the pure Perl pre-fork HTTP server).
+
+    $ perl -MMapReduce::Framework::Simple -MPlack::Loader -e 'Plack::Loader->load("Starlight", port => 12345)->run(MapReduce::Framework::Simple->new->load_worker_plack_app("/eval_secret"))'
+
+# OBJECT AND CODEREF IN DATA
+
+Since v0.09, you can enable to insert CODE references and almost all of objects to data by setting storable option to 1 in map\_reduce method.
+
+    ...
+
+    my $data_tmp = [
+        [[1,2,3],$obj,sub { return "hello" }],
+        [[4,5,6],$obj2,sub { return "world" }],
+        ...
+        ];
+
+    ...
+
+    my $result = $mfs->map_reduce(
+        $data,
+        $mapper,
+        $reducer,
+        5,
+        {storable => 1}
+    );
+
+You should use other than 'volume\_uniform' method in create\_assigned\_data.
+
+Here is an complete example.
+
+    # Preparation of worker side:
+    # $ perl -MMapReduce::Framework::Simple -MPDL -e 'MapReduce::Framework::Simple->new->worker('/secret_eval')'
+
+    use strict;
+    use warnings;
+    use MapReduce::Framework::Simple;
+    use PDL;
+
+    my $mfs = MapReduce::Framework::Simple->new();
+    my $server_list = [
+        'http://w1.example.com:5000/secret_eval',
+        'http://w2.example.com:5000/secret_eval'
+    ];
+
+    # creating many PDL objects.
+    my $data_tmp;
+    for(0 .. 100){
+        my $tmp_mat;
+        for(1 .. 20){
+            my $tmp_vec;
+            for(1 .. 20){
+                push(@$tmp_vec,rand(100));
+            }
+            push(@$tmp_mat,$tmp_vec);
+        }
+        push(@$data_tmp, pdl $tmp_mat);
+    }
+
+    my $data = $mfs->create_assigned_data(
+        $data_tmp,
+        $server_list,
+        {
+            chunk_num => 10,
+            method => 'element_sequential' # SHOULD BE SET. SHOULD NOT BE 'volume_uniform'
+           }
+       );
+
+    # mapper code
+    my $mapper = sub {
+        my $input = shift;
+        my $output;
+        for(0 .. $#$input){
+            my $pdl = $input->[$_];
+            my $inv = $pdl->inv;
+            push(@$output,$inv);
+        }
+        return($output);
+    };
+
+    # reducer code
+    my $reducer = sub {
+        my $input = shift;
+        return($input);
+    };
+
+    my $result = $mfs->map_reduce(
+        $data,
+        $mapper,
+        $reducer,
+        10,
+        {storable => 1} # SHOULD BE SET storable => 1
+       );
+
+
+    for(0 .. $#$result){
+        my $tmp_result = $result->[$_];
+        foreach my $pdl (@$tmp_result){
+            print $pdl;
+        }
+    }
+
+# PERFORMANCE
+
+This methodology is suitable for Highly-Parallelizable problems.
+
+## Example: Summation of prime numbers
+
+Normally, we calculate the summation of prime numbers in 1,000,000,001 to 1,000,300,000 like below.
+
+    use strict;
+    use warnings;
+
+    my $num_list = [1_000_000_001 .. 1_000_300_000];
+    my $sum=0;
+    for(@$num_list){
+        my $flag = 0;
+        for( my $k=2; $k <= int(sqrt($_)); $k++){
+            if(($_ % $k) == 0){
+                $flag = 1;
+                last;
+            }
+        }
+        if($flag == 0){
+            $sum += $_;
+        }
+    }
+
+    print "$sum\n";
+
+I guess this problem will be solved around 1 minute after execute this program.
+
+Here is parallel processing version of this program by using this module. It might be solved in 10 seconds.
+
+    use strict;
+    use warnings;
+    use MapReduce::Framework::Simple;
+
+    my $mfs = MapReduce::Framework::Simple->new(
+        skip_undef_result => 0,
+        warn_discarded_data => 1
+       );
+
+    my $server_list = [
+        'http://remote1.example.com:5000/eval', # 20 cores over remote server.
+        'http://remote2.example.com:5000/eval', # 20 cores over remote server.
+       ];
+
+    my $data_tmp;
+
+    my $parallel_num = 10;
+    for (1_000_000_001 .. 1_000_300_000){
+        push(@$data_tmp,$_);
+    }
+
+    my $data = $mfs->create_assigned_data(
+        $data_tmp,
+        $server_list,
+        {
+            chunk_num => 40,
+            method => 'element_shuffle'
+           }
+       );
+
+    # mapper code
+    my $mapper = sub {
+        my $input = shift;
+        my $sum=0;
+        for(0 .. $#$input){
+            my $flag = 0;
+            for( my $k=2; $k <= int(sqrt($input->[$_])); $k++){
+                if(($input->[$_] % $k) == 0){
+                    $flag = 1;
+                    last;
+                }
+            }
+            if($flag == 0){
+                $sum += $input->[$_];
+            }
+        }
+        return($sum);
+    };
+
+    # reducer code
+    my $reducer = sub {
+        my $input = shift;
+        my $sum=0;
+        foreach my $tmp_input (@$input){
+            $sum += $tmp_input;
+        }
+        return($sum);
+    };
+
+    my $result = $mfs->map_reduce(
+        $data,
+        $mapper,
+        $reducer,
+        $parallel_num,
+        {remote => 1}
+       );
+
+    print "$result\n";
 
 # EFFECTIVENESS
 

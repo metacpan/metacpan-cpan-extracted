@@ -5,11 +5,10 @@ use warnings;
 use namespace::autoclean;
 use autodie qw( :all );
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 use App::CISetup::Types qw( Str );
 use List::Gather;
-use YAML qw( Dump );
 
 use Moose;
 
@@ -44,7 +43,7 @@ sub _create_config {
             install   => [
                 'if not exist "C:\strawberry" cinst strawberryperl -y',
                 'set PATH=C:\strawberry\perl\bin;C:\strawberry\perl\site\bin;C:\strawberry\c\bin;%PATH%',
-                'cd C:\projects\%APPVEYOR_PROJECT_NAME%',
+                'cd %APPVEYOR_BUILD_FOLDER%',
                 'cpanm --installdeps . -n',
             ],
             build_script => ['perl -e 1'],
@@ -57,29 +56,11 @@ sub _update_config {
     my $self     = shift;
     my $appveyor = shift;
 
-    $self->_update_cisetup_flags($appveyor);
     $self->_update_notifications($appveyor);
 
-    my $yaml = Dump($appveyor);
-    $yaml = $self->_fix_up_yaml($yaml);
-
-    return $yaml;
+    return $appveyor;
 }
 ## use critic
-
-sub _update_cisetup_flags {
-    my $self     = shift;
-    my $appveyor = shift;
-
-    $appveyor->{'__app_cisetup__'} = {
-        gather {
-            take email_address => $self->email_address
-                if $self->has_email_address;
-        }
-    };
-
-    return;
-}
 
 sub _update_notifications {
     my $self     = shift;
@@ -140,7 +121,22 @@ sub _fix_up_yaml {
     my $self = shift;
     my $yaml = shift;
 
-    return $self->_reorder_yaml_blocks( $yaml, \@BlocksOrder );
+    $yaml = $self->_reorder_yaml_blocks( $yaml, \@BlocksOrder );
+
+    return $yaml;
+}
+
+sub _cisetup_flags {
+    my $self = shift;
+
+    return {
+        gather {
+            take email_address => $self->email_address
+                if $self->has_email_address;
+            take slack_channel => $self->slack_channel
+                if $self->has_slack_channel;
+        }
+    };
 }
 ## use critic
 

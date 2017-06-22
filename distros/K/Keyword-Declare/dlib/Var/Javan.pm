@@ -7,13 +7,9 @@ use 5.020; use warnings; use autodie;
 use Keyword::Declare;
 use Types::Standard;
 
-keytype Typename ($component) {
-    $component->isa('PPI::Token::Word') && Types::Standard->can("$component");
-}
-
 sub import {
 
-    keyword let (Typename $type, Ident $name) {
+    keyword let (Ident $type, Ident $name) {
         _define_symbol('lexical', $name, $type);
     }
 
@@ -21,11 +17,11 @@ sub import {
         _define_symbol('lexical', $name);
     }
 
-    keyword var (Typename $type?, Ident $name) {
+    keyword var (Ident? $type, Ident $name) {
         _define_symbol('global', $name, $type);
     }
 
-    keyword const (Typename $type?, Ident $name, '=', Expr $value) {
+    keyword const (Ident? $type, Ident $name, '=', Expr $value) {
         _define_symbol('constant', $name, $type, $value);
     }
 }
@@ -66,8 +62,8 @@ sub _define_symbol {
                              })};
 
     my $type_setup
-        = !defined $type ? q{}
-                         : qq{ Var::Javan::_typify(qw<$kind $name $type>, \$data); };
+        = !$type ? q{}
+                 : qq{ Var::Javan::_typify(qw<$kind $name $type>, \$data); };
 
     my $setup
         = $init || $type_setup ? qq{state \$setup = do { $type_setup; $init; };}

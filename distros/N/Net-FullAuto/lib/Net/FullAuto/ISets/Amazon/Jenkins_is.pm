@@ -110,7 +110,8 @@ END
    ($stdout,$stderr)=$handle->cmd('sudo chown -Rv tomcat:tomcat *',
       '__display__');
    ($stdout,$stderr)=$handle->cmd('sudo service tomcat8 start','__display__');
-   $handle->{_cmd_handle}->print('sudo tail -f /usr/share/tomcat8/logs/catalina.out');
+   $handle->{_cmd_handle}->print('sudo '.
+      'tail -f /usr/share/tomcat8/logs/catalina.out');
    my $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
    my $adminpass='';my $allout='';
    while (1) {
@@ -118,7 +119,8 @@ END
       last if $output=~/$prompt/;
       print $output;
       $allout.=$output;
-      if ($allout=~/^.*password to proceed to installation:\s+(.*?)\s+This.*$/s) {
+      if ($allout=~
+            /^.*password to proceed to installation:\s+(.*?)\s+This.*$/s) {
          $adminpass=$1;
       }
       if ($allout=~/Finished/s) {
@@ -129,22 +131,24 @@ END
    }
    $handle->clean_filehandle();
    ($stdout,$stderr)=$handle->cmd('hostname');
-   my $cmd='wget -d -qO- --keep-session-cookies '.
-      "--load-cookies /usr/share/tomcat8/cookies.txt ".
-      "--save-cookies /usr/share/tomcat8/cookies.txt ".
-      "--header='Upgrade-Insecure-Requests: 1' ".
-      "--header='DNT: 1' http://".$pbip.':8080/jenkins 2>&1';
-   ($stdout,$stderr)=$handle->cmd($cmd,'__display__');
+   my $cmd='wget -d -qO- '.
+      '-e robots=off '.
+      '--cookies=on --keep-session-cookies '.
+      '--save-cookies cookies.txt '.
+      '--header="Upgrade-Insecure-Requests: 1" '.
+      '--header="DNT: 1" http://'.$pbip.':8080/jenkins';
+print "BEGIN_CMD=$cmd\n";
+   ($stdout,$stderr)=$handle->cmd($cmd);
+print "BEGIN_STDOUT=$stdout<== and BEGIN_STDERR=$stderr<==\n\n\n\n\n";
    my $session=$stdout;
    $stdout=~s/^.*(JSESSIONID=.*?);.*/$1/s;
    my $cookies=$stdout;
    $session=~s/^.*X-Jenkins-Session: (.*?)\n.*$/$1/s;
-   sleep 5;
-   $cmd='wget -d -qO- --content-on-error '.
-      #'--keep-session-cookies '.
-      #'--load-cookies /usr/share/tomcat8/cookies.txt '.
-      #'--save-cookies /usr/share/tomcat8/cookies.txt '.
-      '--header="Cookies: '.$cookies.'" '.
+   $cmd='sudo wget -d -qO- --content-on-error '.
+      '--random-wait --wait=3 '.
+      '--cookies=on --keep-session-cookies '.
+      '--load-cookies cookies.txt '.
+      '--save-cookies cookies.txt '.
       '--header="Accept: text/html,application/xhtml+xml,application/xml;'.
       'q=0.9,*/*;q=0.8" '.
       '--header="User-Agent: Mozilla/5.0 '.
@@ -154,8 +158,9 @@ END
       '--header="Referer: http://'.$pbip.':8080/jenkins/" '.
       'http://'.$pbip.':8080/jenkins/login?from=%2Fjenkins%2F';
 print "SESSION=$session\n";
-   ($stdout,$stderr)=$handle->cmd($cmd,'__display__');
-print "STDOUT=$stdout<========= and STDERR=$stderr<=========\n";
+print "LOGIN_CMD=$cmd\n";
+   ($stdout,$stderr)=$handle->cmd($cmd);
+print "LOGIN_STDOUT=$stdout<========= and LOGIN_STDERR=$stderr<=========\n\n\n\n\n";
    $cookies=$stderr;
    $cookies=~s/^.*(JSESSIONID=.*?);.*$/$1/s;
 print "COOKIE=$cookies<==\n";
@@ -208,10 +213,12 @@ print "CRUMB=$jenkins_crumb<==\n";
    );
 my $r=1;
 if ($r==0) {
-   my $session='';
    foreach my $ppath (@files) {
-      $cmd='wget -qO- --content-on-error --auth-no-challenge '.
-         '--header="Cookies: '.$cookies.'" '.
+      $cmd='wget -qO- --content-on-error '.
+         '--random-wait --wait=3 '.
+         '--cookies=on --keep-session-cookies '.
+         '--load-cookies cookies.txt '.
+         '--save-cookies cookies.txt '.
          '--level=1 '.
          '--header "Accept: text/html,application/xhtml+xml,application/xml;'.
          'q=0.9,*/*;q=0.8" '.
@@ -222,25 +229,25 @@ if ($r==0) {
          '--header="Referer: http://'.$pbip.':8080/jenkins/" '.
          'http://'.$pbip.':8080/jenkins/static/'.$session.$ppath;
       ($stdout,$stderr)=$handle->cmd($cmd);
-      sleep 1;
 print "STDOUT=$stdout<== AND STDERR=$stderr<== XXXXXXXXXXXXXX\n";
    }
 }
-   #($stdout,$stderr)=$handle->cmd("sudo ".
-   #   "sudo cat /usr/share/tomcat8/.jenkins/secrets/initialAdminPassword");
-   #my $adminpass=$stdout;
 print "PASS=$adminpass\n";
+   # https://www.urldecoder.org/
    my $data_crumb='from=%2Fjenkins%2F&j_username=admin&j_password='.
       $adminpass.'&Jenkins-Crumb='.$jenkins_crumb.'&json=%7B%22'.
       'from%22%3A+%22%2Fjenkins%2F%22%2C+%22j_username%22%3A+%22admin%22'.
       '%2C+%22j_password%22%3A+%22'.$adminpass.'%22%2C+%22Jenkins-Crumb%22%'.
       '3A+%22'.$jenkins_crumb.'%22%7D';
-   $cmd='wget -qO- --no-proxy --content-on-error --auth-no-challenge '.
+   $cmd='sudo wget -qO- --no-proxy --content-on-error --auth-no-challenge '.
+      '--random-wait --wait=3 '.
+      '--cookies=on --keep-session-cookies '.
+      '--load-cookies cookies.txt '.
+      '--save-cookies cookies.txt '.
       '--header="Accept: text/html,application/xhtml+xml,'.
       'application/xml;q=0.9,*/*;q=0.8" '.
-      '--header="Cookies: '.$cookies.'" '.
       '--header="DNT: 1" '.
-      '--header="Accept-Encoding: gzip, deflate, sdch" '.
+      '--header="Accept-Encoding: deflate, sdch" '.
       '--header="Accept-Language: en-US,en;q=0.5" '.
       '--header="Origin: http://'.$pbip.':8080" '.
       '--header="User-Agent: Mozilla/5.0 '.
@@ -251,38 +258,183 @@ print "PASS=$adminpass\n";
       '--referer="http://'.$pbip.':8080/jenkins/login?from=%2Fjenkins%2F" '.
       '--post-data="'.$data_crumb.'" '.
       'http://'.$pbip.':8080/jenkins/j_acegi_security_check';
-print "CMD=$cmd<==\n";
+print "ACEGI_CMD=$cmd<==\n";
+   $cookies=$stderr;
+   $cookies=~s/^.*(JSESSIONID=.*?);.*$/$1/s;
    ($stdout,$stderr)=$handle->cmd($cmd);
-   $cmd='wget -d -qO- --content-on-error '.
+print "ACEGI_STDOUT=$stdout and ACEGI_STDERR=$stderr<==\n\n\n\n\n";
+   $cmd='sudo wget -d -qO- --content-on-error '.
+      '--random-wait --wait=3 '.
+      '--cookies=on --keep-session-cookies '.
+      '--load-cookies cookies.txt '.
+      '--save-cookies cookies.txt '.
       '--header "Accept: text/html,application/xhtml+xml,application/xml;'.
       'q=0.9,*/*;q=0.8" '.
-      '--header="Cookies: '.$cookies.'" '.
       '--header="User-Agent: Mozilla/5.0 '.
       '(Windows NT 10.0; WOW64; rv:53.0) Gecko/20100101 Firefox/53.0" '.
-      '--header="Accept-Encoding: gzip, deflate, sdch" '.
+      '--header="Accept-Encoding: deflate, sdch" '.
       '--header="DNT: 1" '.
       '--header="Upgrade-Insecure-Requests: 1" '.
-      '--header="Referer: http://'.$pbip.':8080/jenkins/login?from=%2Fjenkins%2F" '.
+      '--header="Referer: http://'.$pbip.
+      ':8080/jenkins/login?from=%2Fjenkins%2F" '.
       '--header="Cache-Control: max-age=0" '.
-      #'--user=admin --password='.$adminpass.' '.
       'http://'.$pbip.':8080/jenkins/';
+print "FINAL_CMD=$cmd<==\n";
    ($stdout,$stderr)=$handle->cmd($cmd);
-print "FINALSTDOUT=$stdout<== and FINALSTDERR=$stderr<==FINALSTDERR\n";
-
-#   my $json='{"dynamicLoad":true,"plugins":["cloudbees-folder","antisamy-markup-formatter","build-timeout","credentials-binding","timestamper","ws-cleanup","ant","gradle","workflow-aggregator","github-organization-folder","pipeline-stage-view","git","subversion","ssh-slaves","matrix-auth","pam-auth","ldap","email-ext","mailer"],"Jenkins-Crumb":"'.$jenkins_crumb.'"}';
-#   $cmd='wget --recursive --no-proxy --content-on-error '.
-#      '--load-cookies cookies.txt --keep-session-cookies '.
-#      '--header="Jenkins-Crumb: '.$jenkins_crumb.'" '.
-#      '--header="Content-Length: 368" '.
-#      '--header="Content-Type: application/json" '.
-#      '--header="X-Requested-With: XMLHttpRequest" '.
-#      '--referer="http://'.$pbip.':8080/jenkins/" '.
-#      'http://'.$pbip.':8080/jenkins/pluginManager/installPlugins';
-#   ($stdout,$stderr)=$handle->cmd($cmd,'__display__');
-#print "FINAL STDOUT=$stdout<== and STDERR=$stderr\n";
+print "FINAL_STDOUT=$stdout<== and FINAL_STDERR=$stderr<==FINALSTDERR\n";
+   $cmd='sudo wget -d -qO- --content-on-error '.
+      '--random-wait --wait=3 '.
+      '--cookies=on --keep-session-cookies '.
+      '--load-cookies cookies.txt '.
+      '--save-cookies cookies.txt '.
+      '--header="DNT: 1" '.
+      '--header="Accept-Encoding: deflate, sdch" '.
+      '--header="Accept-Language: en-US,en;q=0.8" '.
+      '--header="User-Agent: Mozilla/5.0 (Linux; Android 6.0; '.
+      'Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, '.
+      'like Gecko) Chrome/58.0.3029.110 Mobile Safari/537.36" '.
+      '--header="Accept: application/json, text/javascript, */*; q=0.01" '.
+      '--header="Referer: http://'.$pbip.':8080/jenkins/" '.
+      '--header="X-Requested-With: XMLHttpRequest" '.
+      'http://'.$pbip.':8080/jenkins/i18n/resourceBundle?baseName=jenkins.install.pluginSetupWizard&_=1497382801063';
+print "WIZ_CMD=$cmd<==\n";
+      ($stdout,$stderr)=$handle->cmd($cmd);
+print "WIZ_STDOUT=$stdout<== and WIZ_STDERR=$stderr<==\n\n\n\n\n";
+   $cmd='sudo wget -qO- --cookies=on --keep-session-cookies --load-cookies cookies.txt '.
+        '\'http://'.$pbip.':8080/jenkins/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,%22:%22,//crumb)\'';
+   ($stdout,$stderr)=$handle->cmd($cmd);
+print "CRUMB_STDOUT=$stdout<== and CRUMB_STDERR=$stderr<==CRUMB_STDERR\n";
+   $jenkins_crumb=$stdout;
+   $jenkins_crumb=~s/^.*:(.*)$/$1/;
+   $cmd='sudo wget -d -qO- --content-on-error '.
+      '--random-wait --wait=3 '.
+      '--cookies=on --keep-session-cookies '.
+      '--load-cookies cookies.txt '.
+      '--save-cookies cookies.txt '.
+      '--header="Origin: http://'.$pbip.':8080" '.
+      '--header="Accept-Encoding: deflate, sdch" '.
+      '--header="User-Agent: Mozilla/5.0 '.
+      '(Windows NT 10.0; WOW64; rv:53.0) Gecko/20100101 Firefox/53.0" '.
+      '--header="Accept-Language: en-US,en;q=0.8" '.
+      '--header="Content-Type: application/json" '.
+      '--header="Accept: application/json, text/javascript, */*; q=0.01" '.
+      '--header="Referer: http://'.$pbip.':8080/jenkins/" '.
+      '--header="X-Requested-With: XMLHttpRequest" '.
+      '--header="Connection: keep-alive" '.
+      '--header="DNT: 1" '.
+      '--header="Jenkins-Crumb: '.$jenkins_crumb.'" '.
+      '--post-data=\'{"dynamicLoad":true,"plugins":["cloudbees-folder","antisamy-markup-formatter","build-timeout","credentials-binding","timestamper","ws-cleanup","ant","gradle","workflow-aggregator","github-organization-folder","pipeline-stage-view","git","subversion","ssh-slaves","matrix-auth","pam-auth","ldap","email-ext","mailer"],"Jenkins-Crumb":"'.$jenkins_crumb.'"}\' '.
+      'http://'.$pbip.':8080/jenkins/pluginManager/installPlugins';
+print "PLUGIN_CMD=$cmd<==\n";
+   ($stdout,$stderr)=$handle->cmd($cmd);
+print "PLUGIN_STDOUT=$stdout<== and PLUGIN_STDERR=$stderr<==PLUGINSTDERR\n";
+   $cmd='sudo wget -d -qO- --content-on-error '.
+      '--random-wait --wait=3 '.
+      '--cookies=on --keep-session-cookies '.
+      '--load-cookies cookies.txt '.
+      '--save-cookies cookies.txt '.
+      '--header="DNT: 1" '.
+      '--header="Accept-Encoding: deflate, sdch" '.
+      '--header="Accept-Language: en-US,en;q=0.8" '.
+      '--header="User-Agent: Mozilla/5.0 (Linux; Android 6.0; '.
+      'Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, '.
+      'like Gecko) Chrome/58.0.3029.110 Mobile Safari/537.36" '.
+      '--header="Accept: text/html,application/xhtml+xml,'.
+      'application/xml;q=0.9,*/*;q=0.8" '.
+      '--header="Referer: http://'.$pbip.':8080/jenkins/" '.
+      '--header="Upgrade-Insecure-Requests: 1" '.
+      '--header="Proxy-Connection: keep-alive" '.
+      'http://'.$pbip.':8080/jenkins/setupWizard/setupWizardFirstUser';
+print "FIRSTUSER_CMD=$cmd<==\n";
+      ($stdout,$stderr)=$handle->cmd($cmd);
+print "FIRSTUSER_STDOUT=$stdout<== and FIRSTUSER_STDERR=$stderr<==\n\n\n\n\n";
+   $cmd='sudo wget -d -qO- --content-on-error '.
+      '--random-wait --wait=3 '.
+      '--cookies=on --keep-session-cookies '.
+      '--load-cookies cookies.txt '.
+      '--save-cookies cookies.txt '.
+      '--header="DNT: 1" '.
+      '--header="Accept-Encoding: deflate, sdch" '.
+      '--header="Accept-Language: en-US,en;q=0.8" '.
+      '--header="User-Agent: Mozilla/5.0 (Linux; Android 6.0; '.
+      'Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, '.
+      'like Gecko) Chrome/58.0.3029.110 Mobile Safari/537.36" '.
+      '--header="Accept: application/json, text/javascript, */*; q=0.01" '.
+      '--header="Referer: http://'.$pbip.':8080/jenkins/" '.
+      '--header="X-Requested-With: XMLHttpRequest" '.
+      '--header="Proxy-Connection: keep-alive" '.
+      'http://'.$pbip.':8080/jenkins/setupWizard/'.
+      'restartStatus?_=1497374550478';
+print "RESTART_CMD=$cmd<==\n";
+      ($stdout,$stderr)=$handle->cmd($cmd);
+print "RESTART_STDOUT=$stdout<== and RESTART_STDERR=$stderr<==\n\n\n\n\n";
+   $cmd='sudo wget -d -qO- --content-on-error '.
+      '--random-wait --wait=3 '.
+      '--cookies=on --keep-session-cookies '.
+      '--load-cookies cookies.txt '.
+      '--save-cookies cookies.txt '.
+      '--header="DNT: 1" '.
+      '--header="Accept-Encoding: deflate, sdch" '.
+      '--header="Accept-Language: en-US,en;q=0.8" '.
+      '--header="User-Agent: Mozilla/5.0 (Linux; Android 6.0; '.
+      'Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, '.
+      'like Gecko) Chrome/58.0.3029.110 Mobile Safari/537.36" '.
+      '--header="Accept: application/json, text/javascript, */*; q=0.01" '.
+      '--header="Referer: http://'.$pbip.':8080/jenkins/" '.
+      '--header="X-Requested-With: XMLHttpRequest" '.
+      '--header="Origin: http://'.$pbip.':8080" '.
+      '--header="Jenkins-Crumb: '.$jenkins_crumb.'" '.
+      '--post-data=\'{"Jenkins-Crumb":"'.$jenkins_crumb.'"}\' '.
+      'http://'.$pbip.':8080/jenkins/setupWizard/completeInstall';
+print "COMPLETE_CMD=$cmd<==\n";
+      ($stdout,$stderr)=$handle->cmd($cmd);
+print "COMPLETE_STDOUT=$stdout<== and COMPLETE_STDERR=$stderr<==\n\n\n\n\n";
+   $cmd='sudo wget -d -qO- --content-on-error '.
+      '--random-wait --wait=3 '.
+      '--cookies=on --keep-session-cookies '.
+      '--load-cookies cookies.txt '.
+      '--save-cookies cookies.txt '.
+      '--header="DNT: 1" '.
+      '--header="Accept-Encoding: deflate, sdch" '.
+      '--header="Accept-Language: en-US,en;q=0.8" '.
+      '--header="User-Agent: Mozilla/5.0 (Linux; Android 6.0; '.
+      'Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, '.
+      'like Gecko) Chrome/58.0.3029.110 Mobile Safari/537.36" '.
+      '--header="Accept: text/html,application/xhtml+xml,'.
+      'application/xml;q=0.9,*/*;q=0.8" '.
+      '--header="Referer: http://'.$pbip.':8080/jenkins/" '.
+      '--header="Upgrade-Insecure-Requests: 1" '.
+      '--header="Proxy-Connection: keep-alive" '.
+      'http://'.$pbip.':8080/jenkins/';
+print "JENKINS_CMD=$cmd<==\n";
+      ($stdout,$stderr)=$handle->cmd($cmd);
+print "JENKINS_STDOUT=$stdout<== and JENKINS_STDERR=$stderr<==\n\n\n\n\n";
+   $cmd='sudo wget -d -qO- --content-on-error '.
+      '--random-wait --wait=3 '.
+      '--cookies=on --keep-session-cookies '.
+      '--load-cookies cookies.txt '.
+      '--save-cookies cookies.txt '.
+      '--header="DNT: 1" '.
+      '--header="Accept-Encoding: deflate, sdch" '.
+      '--header="Accept-Language: en-US,en;q=0.8" '.
+      '--header="User-Agent: Mozilla/5.0 (Linux; Android 6.0; '.
+      'Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, '.
+      'like Gecko) Chrome/58.0.3029.110 Mobile Safari/537.36" '.
+      '--header="Accept: text/html,application/xhtml+xml,'.
+      'application/xml;q=0.9,*/*;q=0.8" '.
+      '--header="Referer: http://'.$pbip.':8080/jenkins/" '.
+      '--header="Upgrade-Insecure-Requests: 1" '.
+      '--header="Proxy-Connection: keep-alive" '.
+      'http://'.$pbip.':8080/jenkins/user/admin/configure';
+print "CONFIG_CMD=$cmd<==\n";
+      ($stdout,$stderr)=$handle->cmd($cmd);
+print "CONFIG_STDOUT=$stdout<== and CONFIG_STDERR=$stderr<==\n\n\n\n\n";
+   my $api_token=$stdout;
+   $api_token=~s/^.*?apiToken.*?value=["](.*?)["].*$/$1/s;
 
    print "\n   ACCESS JENKINS UI AT:\n\n",
-         " http://$pbip:8080/jenkins\n\n Password: $adminpass\n";
+         " http://$pbip:8080/jenkins\n\n Password: $adminpass".
+         "\n\n API Token: $api_token\n\n";
    my $thanks=<<'END';
 
      ______                  _    ,

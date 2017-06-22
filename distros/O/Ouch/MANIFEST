@@ -12,3 +12,4 @@ t/Ouch.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/subclass.t
+t/trytiny_var.t

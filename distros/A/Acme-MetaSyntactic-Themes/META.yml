@@ -14,7 +14,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,7 +34,7 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-MetaSyntactic-Themes
   repository: http://github.com/book/Acme-MetaSyntactic-Themes.git
-version: '1.049'
+version: '1.050'
 x_contributors:
   - 'Éric Guirbal <eguirbal@cpan.org>'
   - 'Brian Gottreu <gottreu@cpan.org>'
@@ -83,3 +83,4 @@ x_contributors:
   - 'Sébastien Aperghis-Tramoni <saper@cpan.org>'
   - 'David Landgren <dland@cpan.org>'
   - 'Vahe Sarkissian <vsarkiss@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -5,3 +5,5 @@ requires 'File::Slurp';
 requires 'DateTime';
 requires 'DateTime::Format::Strptime';
 requires 'JSON';
+requires 'Params::Util';
+requires 'DDP';

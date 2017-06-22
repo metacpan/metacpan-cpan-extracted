@@ -40,8 +40,6 @@ sub new {
             $ERROR = "$bin is not executable";
         }
 
-        $ERROR && return;
-
         $self->{_ip}      = $ENV{GEARMAND_IP} || "127.0.0.1";
         $self->{_bin}     = $bin;
         $self->{_servers} = [];
@@ -52,6 +50,8 @@ sub new {
 
 sub _start_server {
     my ($self) = @_;
+    $ERROR && return;
+
     my $s = Test::TCP->new(
         host => $self->host,
         code => sub {
@@ -59,7 +59,8 @@ sub _start_server {
             my %args = (
                 "--port"   => $port,
                 "--listen" => $self->host,
-                $ENV{GEARMAND_DEBUG} ? ("--verbose" => "DEBUG") : ()
+                $ENV{GEARMAND_DEBUG} ? ("--verbose" => "DEBUG") : (),
+                "--log-file" => $ENV{GEARMAND_LOG_FILE} || "/dev/stderr",
             );
 
             exec($self->bin(), %args) or do {
@@ -81,7 +82,8 @@ sub job_servers {
     my @r;
     while ($count--) {
         my $s = $self->_start_server;
-        $s || die $ERROR;
+        $s || return;
+
         push @{ $self->{_servers} }, $s;
         push @r, { host => $self->host, port => $s->port };
     } ## end while ($count--)

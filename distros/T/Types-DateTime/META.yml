@@ -3,16 +3,16 @@ abstract: 'type constraints and coercions for datetime objects'
 author:
   - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
 build_requires:
-  Test::Modern: 0
+  Test::Modern: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.17
+  ExtUtils::MakeMaker: '6.17'
 dynamic_config: 0
-generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.015, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150005'
 keywords: []
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Types-DateTime
 no_index:
   directory:
@@ -25,18 +25,24 @@ optional_features: {}
 provides:
   Types::DateTime:
     file: lib/Types/DateTime.pm
-    version: 0.001
+    version: '0.002'
 requires:
-  DateTime: 0
-  DateTime::Duration: 0
-  DateTime::Locale: 0
-  DateTime::TimeZone: 0
-  Module::Runtime: 0
-  Type::Tiny: 0.041
+  DateTime: '0'
+  DateTime::Duration: '0'
+  DateTime::Locale: '0'
+  DateTime::TimeZone: '0'
+  Module::Runtime: '0'
+  Type::Tiny: '0.041'
+  perl: '5.008'
 resources:
-  X_identifier: http://purl.org/NET/cpan-uri/dist/Types-DateTime/project
+  Identifier: http://purl.org/NET/cpan-uri/dist/Types-DateTime/project
   bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Types-DateTime
   homepage: https://metacpan.org/release/Types-DateTime
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-types-datetime.git
-version: 0.001
+version: '0.002'
+x_contributors:
+  - 'Dave Rolsky (DROLSKY) <drolsky@cpan.org>'
+  - 'Dagfinn Ilmari Mannsåker (ILMARI) <ilmari@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

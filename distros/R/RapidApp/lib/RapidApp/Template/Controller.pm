@@ -84,6 +84,8 @@ has 'provider_class', is => 'ro', default => 'RapidApp::Template::Provider';
 has 'access_class', is => 'ro', default => 'RapidApp::Template::Access';
 has 'access_params', is => 'ro', isa => 'HashRef', default => sub {{}};
 has 'include_paths', is => 'ro', isa => 'ArrayRef[Str]', default => sub {[]};
+has 'store_class', is => 'ro',  default => sub {undef}; # Will be 'RapidApp::Template::Store' if undef
+has 'store_params', is => 'ro', default => sub {undef};
 
 
 # -- 
@@ -155,6 +157,8 @@ sub _new_Template {
         $self->provider_class->new({
           Controller => $self,
           Access => $self->Access,
+          store_class  => $self->store_class,
+          store_params => $self->store_params,
           #INCLUDE_PATH => $self->_app->default_tt_include_path,
           INCLUDE_PATH => [
             map { dir($_)->stringify } @{ $self->include_paths },
@@ -357,10 +361,19 @@ sub view :Chained('base') :Args {
   my ($self, $c, @args) = @_;
   my $template = $self->_resolve_template_name(@args)
     or die "No template specified";
+    
+  local $self->Access->{_local_cache} = {};
+    
+  if(my $psgi_response = $self->Access->template_psgi_response($template,$c)) {
+    $c->res->from_psgi_response( $psgi_response );
+    return $c->detach;
+  }
+
+  my $ra_client = $c->is_ra_ajax_req;
 
   # Honor the existing status, if set, except for Ajax requests
   my $status = $c->res->status || 200;
-  $status = 200 if ($c->is_ra_ajax_req);
+  $status = 200 if ($ra_client);
 
   local $self->{_current_context} = $c;
   
@@ -372,11 +385,9 @@ sub view :Chained('base') :Args {
   $self->Access->template_viewable($template)
     or die "Permission denied - template '$template'";
 
-  my $ra_req = $c->req->header('X-RapidApp-RequestContentType');
-  my $ra_client = ($ra_req && $ra_req eq 'JSON');
   my $external = $self->is_external_template($c,$template);
   my $editable = $self->is_editable_request($c);
-  
+ 
   # ---
   # New: for non-external templates which are being accessed externally, 
   # (i.e. directly from browser) redirect to internal hashnav path:
@@ -479,20 +490,35 @@ sub view :Chained('base') :Args {
     );
     
     if($external) {
-      # If we're editable and external we need to include CSS for template edit controls:
-      # TODO: basically including everything but ExtJS CSS. This is ugly and should
-      # be generalized/available in the Asset system as a simpler function call:
-      push @head, (
-        $c->favicon_head_tag||'',
-        $c->controller('Assets::RapidApp::CSS')->html_head_tags,
-        $c->controller('Assets::RapidApp::Icons')->html_head_tags,
-        $c->controller('Assets::ExtJS')->html_head_tags( js => [
-          'adapter/ext/ext-base.js',
-          'ext-all-debug.js',
-          'src/debug.js'
-        ]),
-        $c->controller('Assets::RapidApp::JS')->html_head_tags
-      ) if $editable;
+      
+      # Ask the Access class for custom headers for this external template, and
+      # if it has them, set them in the response object now. And pull out $content_type
+      # if this operation set it (i.e. the template provides its own Content-Type)
+      my $headers  = $external ? $self->Access->get_external_tpl_headers($template) : undef;
+      if($headers) {
+        $c->res->header( $_ => $headers->{$_} ) for (keys %$headers);
+        $content_type = $c->res->content_type;
+      }
+    
+      # If this external template provides its own headers, including Content-Type, and that is
+      # *not* text/html, don't populate @head, even if it is $editable (which is rare - or maybe 
+      # even impossible - here anyway)
+      unless($content_type && ! ($content_type =~ /^text\/html/)){
+        # If we're editable and external we need to include CSS for template edit controls:
+        # TODO: basically including everything but ExtJS CSS. This is ugly and should
+        # be generalized/available in the Asset system as a simpler function call:
+        push @head, (
+          $c->favicon_head_tag||'',
+          $c->controller('Assets::RapidApp::CSS')->html_head_tags,
+          $c->controller('Assets::RapidApp::Icons')->html_head_tags,
+          $c->controller('Assets::ExtJS')->html_head_tags( js => [
+            'adapter/ext/ext-base.js',
+            'ext-all-debug.js',
+            'src/debug.js'
+          ]),
+          $c->controller('Assets::RapidApp::JS')->html_head_tags
+        ) if $editable; # $editable is rarely true here, so @header will be empty here anyway
+      }
     }
     else {
       # Include all the ExtJS, RapidApp and local app CSS/JS
@@ -500,17 +526,21 @@ sub view :Chained('base') :Args {
     }
     
     # Only include the RapidApp/ExtJS assets and wrap 'ra-scoped-reset' if
-    # this is *not* an external template:
-    $output = $external ? join("\n",@head,$html) : join("\n",
-      '<head>', @head, '</head>',
-      '<div class="' . join(' ',@cls) . '">', $html, '</div>'
-    );
+    # this is *not* an external template. If it is an external template,
+    # ignore @head entirely if its empty:
+    $output = $external 
+      ? ( scalar(@head) == 0 ? $html : join("\n",@head,$html) ) 
+      : join("\n",
+          '<head>', @head, '</head>',
+          '<div class="' . join(' ',@cls) . '">', $html, '</div>'
+        )
+    ;
     
-    $content_type = 'text/html; charset=utf-8';
+    $content_type ||= 'text/html; charset=utf-8';
   }
   
   # Decode as UTF-8 for user consumption:
-  utf8::decode($output);
+  utf8::decode($output); # FIXME?? This probably shouldn't be always called anymore
 
   return $self->_detach_response($c,$status,$output,$content_type);
 }

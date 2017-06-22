@@ -6,6 +6,8 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
+                                      'Code::TidyAll' => '0.56',
+                                      'Code::TidyAll::Plugin::SortLines::Naturally' => '0.000003',
                                       'Code::TidyAll::Plugin::Test::Vars' => '0.02',
                                       'File::Spec' => '0',
                                       'IO::Handle' => '0',
@@ -34,7 +36,7 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Dist::Zilla::Role::VersionProvider' => '0',
-                                      'Module::Metadata' => '0',
+                                      'Module::Metadata' => '1.000005',
                                       'Moose' => '0',
                                       'namespace::autoclean' => '0',
                                       'strict' => '0',

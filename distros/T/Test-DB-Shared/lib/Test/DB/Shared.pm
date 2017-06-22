@@ -1,5 +1,5 @@
 package Test::DB::Shared;
-$Test::DB::Shared::VERSION = '0.002';
+$Test::DB::Shared::VERSION = '0.004';
 use strict;
 use warnings;
 

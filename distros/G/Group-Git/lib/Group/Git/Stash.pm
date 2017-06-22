@@ -17,7 +17,7 @@ use JSON qw/decode_json/;
 use WWW::Mechanize;
 use Path::Tiny;
 
-our $VERSION = version->new('0.6.0');
+our $VERSION = version->new('0.6.1');
 
 extends 'Group::Git';
 
@@ -86,7 +86,7 @@ Group::Git::Stash - Adds reading all repositories you have access to on your loc
 
 =head1 VERSION
 
-This documentation refers to Group::Git::Stash version 0.6.0.
+This documentation refers to Group::Git::Stash version 0.6.1.
 
 =head1 SYNOPSIS
 

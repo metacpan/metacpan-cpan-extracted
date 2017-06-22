@@ -1,7 +1,7 @@
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl iban.t'
 
-use Test::More tests => 115;
+use Test::More tests => 114;
 
 BEGIN { use_ok('Business::KontoCheck') };
 
@@ -125,7 +125,6 @@ __DATA__
 -130 DE33100500000000484848
 -130 DE47701500000034343434
 -130 DE37370501980015000023
--130 DE56683519761116232594
 -130 DE81500502010000800000
 -130 DE20320500000000047800
 -143 DE44508500495000002096

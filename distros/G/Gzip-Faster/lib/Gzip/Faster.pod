@@ -1,6 +1,7 @@
 
 
 
+
 =encoding UTF-8
 
 =head1 NAME
@@ -25,8 +26,8 @@ Gzip::Faster - simple and fast gzip and gunzip
 
 =head1 VERSION
 
-This documents version 0.19 of Gzip::Faster
-corresponding to git commit L<36188f6d6af14b56fdef0acb093523bf58ba4fae|https://github.com/benkasminbullock/gzip-faster/commit/36188f6d6af14b56fdef0acb093523bf58ba4fae> made on Thu Jan 19 19:46:27 2017 +0900.
+This documents version 0.20 of Gzip::Faster
+corresponding to git commit L<0d061b7f467e8177e4654a2f36199abeccfd71bf|https://github.com/benkasminbullock/gzip-faster/commit/0d061b7f467e8177e4654a2f36199abeccfd71bf> made on Sat Jun 17 09:02:52 2017 +0900.
 
 =head1 DESCRIPTION
 
@@ -40,18 +41,25 @@ convenience functions built on these two: L</gzip_file> reads a file
 then compresses it; L</gunzip_file> reads a file then uncompresses it;
 and L</gzip_to_file> compresses a scalar and writes it to a file.
 
-Further to this, L</deflate> and L</inflate> work with the deflate
-format, which is the same as the gzip format except it has no header
+Further to this, L</deflate> and L</inflate> work with the L</deflate
+format>, which is the same as the gzip format except it has no header
 information. L</deflate_raw> and L</inflate_raw> work with the
 bare-bones version of this format without checksums.
 
-To control the compression better, use L</new>. The returned object
-compresses via the L</zip> and L</unzip> methods. The type of
-compression can be toggled with L</gzip_format> and L</raw>. A file
-name can be set in and retrieved from the gzip header with
-L</file_name>. The level of compression can be altered with
-L</level>. Perl flags can be copied into the gzip header using
-L</copy_perl_flags>.
+
+
+
+If you need to control the compression beyond what is offered by
+L</gzip> and L</gunzip>, create a Gzip::Faster object using L</new>,
+and compress and uncompress using the L</zip> and L</unzip>
+methods. The type of compression can be toggled with L</gzip_format>
+and L</raw>. A file name can be set and retrieved from the gzip header
+with L</file_name>, and the modification time of the file can be set
+and retrieved with L</mod_time>. The level of compression can be
+altered with L</level>. Perl flags can be copied into the gzip header
+using L</copy_perl_flags>.
+
+
 
 =head1 FUNCTIONS
 
@@ -86,7 +94,7 @@ The modification time can also be written:
 
     my $zipped = gzip_file ('file', file_name => 'file', mod_time => time ());
 
-This was added to the module in version 0.04. File name writing was added in version
+C<gzip_file> was added in version 0.04. File name writing was added in version
 0.18. Modification time writing was added in version 0.19.
 
 =head2 gunzip_file
@@ -110,7 +118,7 @@ The modification time can also be read from the header:
     my $plain = gunzip_file ('file.gz', file_name => \my $file_name,
 	                     mod_time => \my $mod_time);
 
-This was added to the module in version 0.04. File name reading was added in version
+C<gunzip_file> was added in version 0.04. File name reading was added in version
 0.18. Modification time reading was added in version 0.19.
 
 =head2 gzip_to_file
@@ -124,10 +132,8 @@ fails. To write a file name, use
 
     gzip_to_file ($plain, 'file.gz', file_name => 'file');
 
-This was added to the module in version 0.08.
-
-File name writing was added in version 0.18. Modification time writing
-was added in version 0.19.
+C<gzip_to_file> was added in version 0.08. File name writing was added in
+version 0.18. Modification time writing was added in version 0.19.
 
 =head2 deflate
 
@@ -140,7 +146,7 @@ be inflated either with L</inflate> or with L</gunzip>.
 There is an example of using L</deflate> to write a PNG in the
 module's tests in F<t/png.t>.
 
-This was added to the module in version 0.16.
+C<deflate> was added in version 0.16.
 
 =head2 inflate
 
@@ -151,78 +157,7 @@ different, for all practical purposes this is identical to L</gunzip>,
 and it's included only for completeness. In other words, you can use
 inflate and gunzip interchangeably.
 
-The following example demonstrates using C<inflate> with a PNG image.
-
-    
-    use File::Slurper 'read_binary';
-    use FindBin '$Bin';
-    use Gzip::Faster 'inflate';
-    my $pngfile = "$Bin/larry-wall.png";
-    my $pngdata = read_binary ($pngfile);
-    if ($pngdata !~ /IHDR(.{13})/) {
-        die "No header";
-    }
-    my ($height, $width, $bits) = unpack ("NNCCCCC", $1);
-    if ($pngdata !~ /(....)IDAT(.*)$/s) {
-        die "No image data";
-    }
-    my $length = unpack ("N", $1);
-    my $data = substr ($2, 0, $length);
-    my $idat = inflate ($data);
-    for my $y (0..$height - 1) {
-        my $row = substr ($idat, $y * ($width + 1), ($y + 1) * ($width + 1));
-        for my $x (1..$width - 1) {
-            my $pixel = substr ($row, $x, $x + 1);
-            if (ord ($pixel) < 128) {
-                print "#";
-                next;
-            }
-            print " ";
-        }
-        print "\n";
-    }
-
-
-produces output
-
-                                   
-                                   
-               ######              
-             #########             
-           #############           
-          ###############          
-          ################         
-         ##################        
-         ########   ########       
-        #######      #######       
-        ####          ######       
-        ###           ######       
-        ###           #######      
-       ########    ##########      
-       ####  ###    #  ######      
-       #### # ##   #  ######       
-       ####       #     ###        
-        ###       #    ####        
-                  ##   ###         
-                  ##   ###         
-              ######## ###         
-             ##############        
-            ##### #########        
-            ## ## ##########       
-             #   ##  ########      
-             #       ##########    
-          #####    ########### ### 
-        ######     ################
-      #########  ######  ##########
-     ##########    ###   # ########
-    # # #######    #     ##########
-    #  ###### #          ##########
-
-
-(This example is included as L<F<inflate.pl>|https://api.metacpan.org/source/BKB/zip-Faster-0.19/examples/inflate.pl> in the distribution.)
-
-
-This was added to the module in version 0.16.
+C<inflate> was added in version 0.16.
 
 =head2 deflate_raw
 
@@ -230,7 +165,7 @@ This is similar to L</deflate> except that it doesn't write the check
 sum value in the data at all. The output must be inflated with
 L</inflate_raw>.
 
-This was added to the module in version 0.16.
+C<deflate_raw> was added in version 0.16.
 
 =head2 inflate_raw
 
@@ -238,18 +173,25 @@ This inflates data output by L</deflate_raw>. Although the code is
 basically similar to L</inflate> and L</gunzip>, it won't work on the
 output of L</gzip> and L</deflate>.
 
-This was added to the module in version 0.16.
+C<inflate_raw> was added in version 0.16.
 
 =head1 METHODS
 
+This section describes the object-oriented interface of Gzip::Faster.
+
+
+
 If you need to control the compression beyond what is offered by
-L</gzip> and L</gunzip>, create a Gzip::Faster object using L</new>
-and compress and uncompress using the L</zip> and L</unzip> methods
-described below. It is possible to set a file name in the gzip header
-with L</file_name>, change the level of compression from the default
-with L</level>, preserve some Perl flags with L</copy_perl_flags>, and
-to switch between gzip and deflate using the L</gzip_format> and
-L</raw> methods.
+L</gzip> and L</gunzip>, create a Gzip::Faster object using L</new>,
+and compress and uncompress using the L</zip> and L</unzip>
+methods. The type of compression can be toggled with L</gzip_format>
+and L</raw>. A file name can be set and retrieved from the gzip header
+with L</file_name>, and the modification time of the file can be set
+and retrieved with L</mod_time>. The level of compression can be
+altered with L</level>. Perl flags can be copied into the gzip header
+using L</copy_perl_flags>.
+
+
 
 =head2 new
 
@@ -258,7 +200,7 @@ L</raw> methods.
 Create a Gzip::Faster object. The return value defaults to gzip
 compression. This can be altered with L</gzip_format> and L</raw>.
 
-This was added to the module in version 0.16.
+C<new> was added in version 0.16.
 
 =head2 zip
 
@@ -267,7 +209,7 @@ This was added to the module in version 0.16.
 Compress C<$plain>. The type of compression can be set with L</gzip>
 and L</raw>.
 
-This was added to the module in version 0.16.
+C<zip> was added in version 0.16.
 
 =head2 unzip
 
@@ -276,7 +218,7 @@ This was added to the module in version 0.16.
 Uncompress C<$zipped>. The type of uncompression can be set with
 L</gzip> and L</raw>.
 
-This was added to the module in version 0.16.
+C<unzip> was added in version 0.16.
 
 =head2 copy_perl_flags
 
@@ -336,24 +278,25 @@ produces output
     Got back file name blash.gz
 
 
-(This example is included as L<F<file-name.pl>|https://api.metacpan.org/source/BKB/zip-Faster-0.19/examples/file-name.pl> in the distribution.)
+(This example is included as L<F<file-name.pl>|https://fastapi.metacpan.org/source/BKB/Gzip-Faster-0.20/examples/file-name.pl> in the distribution.)
 
 
 The module currently has a hard-coded limit of 1024 bytes as the
 maximum length of file name it can read back.
 
-This was added to the module in version 0.16.
+C<file_name> was added in version 0.16.
 
 =head2 gzip_format
 
     $gf->gzip_format (1);
 
-Switch between gzip and deflate formats. A true value turns on the
-gzip format, and a false value turns on deflate format. The default is
-gzip format. Switching on gzip format on an object automatically
-switches off L</raw> format on the object.
+Switch the compression between the L</gzip format> and the L</deflate
+format>. A true value turns on the gzip format, and a false value
+turns on the deflate format. The default is gzip format. Switching on
+gzip format on an object automatically switches off L</raw> format on
+the object.
 
-This was added to the module in version 0.16.
+C<gzip_format> was added in version 0.16.
 
 =head2 raw
 
@@ -370,18 +313,20 @@ switching off L</gzip_format>. Thus the sequence
 
 puts C<$gf> in the non-raw deflate format.
 
-This was added to the module in version 0.16.
+C<raw> was added in version 0.16.
 
 =head2 level
 
     $gf->level (9);
 
-Set the compression level, from 0 (no compression) to 9 (best
+Set the level of compression, from 0 (no compression) to 9 (best
 compression). Values outside the levels cause a warning and the level
 to be set to the nearest valid value, for example a value of 100
-causes the level to be set to 9.
+causes the level to be set to 9. The higher the level of compression,
+the more time it takes to compute. The default value is a compromise
+between speed and quality of compression.
 
-This was added to the module in version 0.16.
+C<level> was added in version 0.16.
 
 =head2 mod_time
 
@@ -393,23 +338,21 @@ modification time is an unsigned integer which represents the number
 of seconds since the Unix epoch. This only applies to L</gzip_format>
 compression.
 
-This was added to the module in version 0.19.
+C<mod_time> was added in version 0.19.
 
 =head1 PERFORMANCE
 
 This section compares the performance of Gzip::Faster with
 L<IO::Compress::Gzip> / L<IO::Uncompress::Gunzip> and
-L<Compress::Raw::Zlib>. 
+L<Compress::Raw::Zlib>.  These results are produced by the file
+F<bench/benchmarks.pl> in the distribution.
 
 =head2 Short text
 
 This section compares the performance of Gzip::Faster and other
-modules on a short piece of English text. These results are produced
-by the file F<bench/benchmarks.pl> in the distribution.
-
-According to these results, Gzip::Faster is about five times faster to
-load, seven times faster to compress, and twenty-five times faster to
-uncompress than L<IO::Compress::Gzip> and
+modules on a short piece of English text. Gzip::Faster is about five
+times faster to load, seven times faster to compress, and twenty-five
+times faster to uncompress than L<IO::Compress::Gzip> and
 L<IO::Uncompress::Gunzip>. Round trips are about ten times faster with
 Gzip::Faster.
 
@@ -471,8 +414,6 @@ Here is a comparison of gunzip (decompression) only:
     Gzip::Faster                 69565/s                  2368%                         533%           --
 
 
-The test file is in F<bench/benchmark.pl> in the distribution.
-
 =head2 Long text
 
 This section compares the compression on a 2.2 megabyte file of
@@ -526,7 +467,7 @@ Here is a comparison of gunzip (decompression) only:
     Gzip::Faster                 45.7/s                    24%                           1%           --
 
 
-For longer files, Gzip::Faster is not much faster and the underlying
+For longer files, Gzip::Faster is not much faster. The underlying
 library's speed is the main factor.
 
 =head1 BUGS
@@ -536,7 +477,9 @@ gzipped, and it doesn't check whether the compression was
 effective. That is, it doesn't check whether the output of L</gzip> is
 actually smaller than the input.
 
-In L</copy_perl_flags>, only the utf8 flag is implemented.
+In L</copy_perl_flags>, only the utf8 flag is implemented. Possible
+other things which could be implemented are the read-only and the
+taint flags.
 
 =head2 Browser bugs and Gzip::Faster
 
@@ -627,12 +570,12 @@ and F<lib/Gzip/Faster.pm> in the distribution.
 =head1 INSTALLATION
 
 Installation follows standard Perl methods. Detailed instructions can
-be found in the file F<README> in the distribution. The following are
-some extra notes for people who get stuck.
+be found in the file L<F<README>|https://fastapi.metacpan.org/source/BKB/Gzip-Faster-0.20/README> in the distribution. The
+following are some extra notes for people who get stuck.
 
-Gzip::Faster requires the compression library C<zlib> (also called
-C<libz>) to be installed. The following message printed during C<perl
-Makefile.PL>:
+Gzip::Faster requires the compression library L</zlib> (also called
+C<libz>) to be installed on your computer. The following message
+printed during C<perl Makefile.PL>:
 
     You don't seem to have zlib available on your system.
 
@@ -661,28 +604,21 @@ L<http://code.activestate.com/ppm/Gzip-Faster/>. However, the module
 seems to install without problems on Strawberry Perl, so if you cannot
 install via ActiveState, you could try that instead.
 
-=head1 ACKNOWLEDGEMENTS
-
-zgrim reported an important bug related to zlib.
-
-Aristotle Pagaltzis contributed the benchmarking code for
-L<Compress::Raw::Zlib>.
-
-The tests in F<t/png.t> and the example under L</inflate> use material
-taken from L<Image::PNG::Write::BW> by Andrea Nall (<ANALL>).
-
 =head1 SEE ALSO
 
 =head2 About gzip
 
 
 
-The gzip and deflate formats are formats for compressing
-information. The formats are formally described by L<RFC 1950|https://tools.ietf.org/rfc/rfc1950.txt>
-(ZLIB Compressed Data Format Specification), L<RFC 1951|https://tools.ietf.org/rfc/rfc1951.txt> (DEFLATE
+The gzip and deflate formats are closely related formats for
+compressing information. They are used for compressing web pages to
+reduce the amount of data sent, for compressing source code files, or
+in applications such as MATLAB files or PNG images. 
+
+These formats are formally described by L<RFC 1950|https://tools.ietf.org/rfc/rfc1950.txt> (ZLIB
+Compressed Data Format Specification), L<RFC 1951|https://tools.ietf.org/rfc/rfc1951.txt> (DEFLATE
 Compressed Data Format Specification), and L<RFC 1952|https://tools.ietf.org/rfc/rfc1952.txt> (GZIP file
-format specification). The library zlib implements the formats. It is
-described at L<http://zlib.net>.
+format specification). The library L</zlib> implements the formats.
 
 =head2 Alternatives
 
@@ -692,13 +628,11 @@ The following alternatives to this module may also be useful.
 
 =item Command-line gzip
 
-Even within Perl, sometimes it's a lot easier to use the command line
-utility C<gzip> as in
+To use the command line utility C<gzip>, use
 
     system ("gzip file");
 
-or C<`gzip file`> than it is to try to figure out how to use some
-module or another.
+or put the command in backquotes, like C<`gzip file`>.
 
 =item mod_deflate and mod_gzip
 
@@ -727,9 +661,18 @@ and you never have to deal with the gzip format.
 
 =item L<IO::Compress::Gzip> and L<IO::Uncompress::Gunzip>
 
+=item L<Gzip::RandomAccess> - extract arbitrary bits of a gzip stream
+
+=item L<Compress::Zopfli>
+
+This is a compress-only library by L<Google|https://www.google.com>
+for a gzip/deflate format compression.
+
 =back
 
-=head2 Extended examples
+=head1 EXTENDED EXAMPLES
+
+This section gives some extended examples of the use of this module.
 
 =over
 
@@ -740,10 +683,86 @@ Gzip::Faster|https://www.lemoda.net/cgi/perl-gzip-faster-cgi/index.html>
 demonstrates how to use Gzip::Faster to compress the output of a web
 program.
 
+=item Get compressed web pages
+
 L<Requesting compressed content from a web server with
 LWP::UserAgent|https://www.lemoda.net/compression/lwp-use-gzip/index.html>
 demonstrates how to use Gzip::Faster with L<LWP::UserAgent> when
 requesting compressed content.
+
+=item View the image data of a PNG
+
+The following example demonstrates using L</inflate> to view the image
+data within a PNG image. See L</ACKNOWLEDGEMENTS> for credit.
+
+    
+    use File::Slurper 'read_binary';
+    use FindBin '$Bin';
+    use Gzip::Faster 'inflate';
+    my $pngfile = "$Bin/larry-wall.png";
+    my $pngdata = read_binary ($pngfile);
+    if ($pngdata !~ /IHDR(.{13})/) {
+        die "No header";
+    }
+    my ($height, $width, $bits) = unpack ("NNCCCCC", $1);
+    if ($pngdata !~ /(....)IDAT(.*)$/s) {
+        die "No image data";
+    }
+    my $length = unpack ("N", $1);
+    my $data = substr ($2, 0, $length);
+    my $idat = inflate ($data);
+    for my $y (0..$height - 1) {
+        my $row = substr ($idat, $y * ($width + 1), ($y + 1) * ($width + 1));
+        for my $x (1..$width - 1) {
+            my $pixel = substr ($row, $x, $x + 1);
+            if (ord ($pixel) < 128) {
+                print "#";
+                next;
+            }
+            print " ";
+        }
+        print "\n";
+    }
+
+
+produces output
+
+                                   
+                                   
+               ######              
+             #########             
+           #############           
+          ###############          
+          ################         
+         ##################        
+         ########   ########       
+        #######      #######       
+        ####          ######       
+        ###           ######       
+        ###           #######      
+       ########    ##########      
+       ####  ###    #  ######      
+       #### # ##   #  ######       
+       ####       #     ###        
+        ###       #    ####        
+                  ##   ###         
+                  ##   ###         
+              ######## ###         
+             ##############        
+            ##### #########        
+            ## ## ##########       
+             #   ##  ########      
+             #       ##########    
+          #####    ########### ### 
+        ######     ################
+      #########  ######  ##########
+     ##########    ###   # ########
+    # # #######    #     ##########
+    #  ###### #          ##########
+
+
+(This example is included as L<F<inflate.pl>|https://fastapi.metacpan.org/source/BKB/Gzip-Faster-0.20/examples/inflate.pl> in the distribution.)
+
 
 =back
 
@@ -757,14 +776,18 @@ system.
 =item deflate format
 
 The deflate format is the same as the L</gzip format> except that it
-does not contain a header with additional information. The deflate
-format may or may not include a checksum. If it does not include the
-checksum, it is the L</raw deflate format>.
+does not contain the header with the additional information such as
+the file name and modification time. The deflate format may or may not
+include a checksum. If it does not include the checksum, it is the
+L</raw deflate format>. The deflate format is the format used within
+PNG images, for example.
 
 =item gzip format
 
 The gzip format is the same as the L</deflate format> except that it
-includes a header which may contain such things as a file name.
+includes a header which may contain such things as a file name or a
+modification time. The gzip format is the one used by the command-line
+utility gzip in such things as .tar.gz files.
 
 =item raw deflate format
 
@@ -773,6 +796,12 @@ Adler-32 checksum. (The terminology "raw deflate" for this format is
 from L<the zlib manual|http://zlib.net/manual.html> and does not
 appear in the RFCs.)
 
+=item zlib
+
+zlib is the implementation of the gzip and deflate algorithms.  zlib
+is necessary to install Gzip::Faster. It is described at
+L<http://zlib.net>.
+
 =back
 
 =head1 HISTORY
@@ -780,10 +809,11 @@ appear in the RFCs.)
 This module started as an experimental benchmark against
 L<IO::Compress::Gzip> when profiling revealed that some programs were
 spending the majority of their time in L<IO::Compress::Gzip>. Since I
-knew that zlib was fast, I was surprised by the time the Perl code was
-taking. I wrote Gzip::Faster to test IO::Compress::Gzip against a
-simplistic gzip wrapper. I released the module to CPAN because the
-results were very striking. See L</PERFORMANCE> above for details.
+(Ben Bullock) knew that zlib was fast, I was surprised by the time the
+Perl code was taking. I wrote Gzip::Faster to test IO::Compress::Gzip
+against a simplistic gzip wrapper. I released the module to CPAN
+because the results were very striking. See L</PERFORMANCE> above for
+details.
 
 Gzip::Faster's ancestor is the example program C<zpipe> supplied with
 zlib. See L<http://zlib.net/zpipe.c>. Gzip::Faster is C<zpipe> reading
@@ -794,6 +824,17 @@ object-oriented functions.
 
 Version 0.18 added the ability to set and get file names to the
 g*zip*file functions, and version 0.19 added modification times.
+
+=head1 ACKNOWLEDGEMENTS
+
+zgrim reported an important bug related to zlib.
+
+Aristotle Pagaltzis contributed the benchmarking code for
+L<Compress::Raw::Zlib>.
+
+The tests in F<t/png.t> and the example L</View the image data of a
+PNG> use material taken from L<Image::PNG::Write::BW> by Andrea Nall
+(<ANALL>).
 
 
 =head1 AUTHOR

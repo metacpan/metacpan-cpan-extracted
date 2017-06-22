@@ -1,5 +1,5 @@
 package Lab::Connection::Mock;
-
+$Lab::Connection::Mock::VERSION = '3.550';
 use warnings;
 use strict;
 use 5.010;
@@ -13,7 +13,6 @@ use Carp;
 use Lab::Connection::LogMethodCall qw/dump_method_call/;
 use parent 'Lab::Connection';
 
-our $VERSION = '3.543';
 
 our %fields = (
     logfile   => undef,

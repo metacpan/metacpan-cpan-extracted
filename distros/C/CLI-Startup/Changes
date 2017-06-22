@@ -1,5 +1,18 @@
 Revision history for CLI-Startup
 
+0.20    2017-06-18
+        Ensure that get_options()->{verbose} is always defined, even when it's 0.
+        Consolidate the --verbose and -v options (-v is a magic pseudo-alias).
+        Enable init() to work even if you only want the default options and no others.
+        Add a verbose explanation of the default options to the man page.
+0.19    2017-06-18
+        Updated Perl dependency to 5.10.0 -- need regex (?&..) operator
+        Removed case insensitivity of command-line options.
+        Replaced deprecated JSON::Any with JSON::MaybeXS -- nice drop-in replacement.
+        Cleaned up optspec validation code. Does the even-righter thing.
+0.18    2017-06-17
+        Cleaned up handling of option aliases to POSIX options will work.
+        Added require_order option to improve POSIX compliance.
 0.17    2017-03-24
         Removed test for unsupported optspec "foo:+".
         Added optional user message to die_usage().

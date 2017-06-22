@@ -1,13 +1,21 @@
 Revision history for Bot::IRC
 
+1.14      2017-06-17 22:00:44-04:00 America/New_York
+        - Bot is slightly smarter about not responding to input that may not
+          actually be intended for the bot
+        - Added "full_text" input variable
+        - Added ability for run() to accept post-connection commands to execute
+
 1.13      2016-12-21 11:02:41-08:00 America/Los_Angeles
         - Filter IRC color codes and control characters from incoming line text
 
 1.12      2016-12-06 09:15:08-08:00 America/Los_Angeles
-        - Improving a little on best practice by having accesstors for vars() and settings()
+        - Improving a little on best practice by having accesstors for vars()
+          and settings()
         - Add channels() method to bot via Join plugin
         - Make help URLs more clickable for some IRC clients
-        - Handle UTF8 output a little better; handle exceptions from plugins better
+        - Handle UTF8 output a little better; handle exceptions from plugins
+          better
 
 1.11      2016-12-03 21:18:42-08:00 America/Los_Angeles
         - History plugin can now be told to filter certain channels
@@ -57,7 +65,8 @@ Revision history for Bot::IRC
         - Load all core plugins set with ":core"
         - Join plugin
         - Store::SQLite plugin
-        - Change precedence order of loading plugins to favor private and extension overrides
+        - Change precedence order of loading plugins to favor private and
+          extension overrides
         - Quick matching of ::X:: and ::Y:: sub-namespace plugins
 
 1.01      2016-11-03 17:08:15-07:00 America/Los_Angeles

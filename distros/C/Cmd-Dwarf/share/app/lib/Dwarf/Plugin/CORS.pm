@@ -8,7 +8,7 @@ sub init {
 	die "conf must be HASH" unless ref $conf eq 'HASH';
 
 	$conf->{origin}      ||= '*';
-	$conf->{methods}     ||= [qw/GET PUT POST DELETE HEAD OPTIONS/];
+	$conf->{methods}     ||= [qw/GET PUT POST DELETE HEAD OPTIONS PATCH/];
 	$conf->{headers}     ||= [qw/X-Requested-With/];
 	$conf->{credentials} ||= 0;
 	$conf->{maxage}      ||= 7200;

@@ -3,7 +3,7 @@ package Log::Dispatch::File;
 use strict;
 use warnings;
 
-our $VERSION = '2.63';
+our $VERSION = '2.65';
 
 use IO::Handle;
 use Log::Dispatch::Types;
@@ -103,8 +103,10 @@ sub _open_file {
         my $current_mode = ( stat $self->{filename} )[2] & 07777;
         if ( $current_mode ne $self->{permissions} ) {
             chmod $self->{permissions}, $self->{filename}
-                or die
-                "Cannot chmod $self->{filename} to $self->{permissions}: $!";
+                or die sprintf(
+                'Cannot chmod %s to %04o: %s',
+                $self->{filename}, $self->{permissions} & 07777, $!
+                );
         }
 
         $self->{chmodded} = 1;
@@ -170,7 +172,7 @@ Log::Dispatch::File - Object for logging to files
 
 =head1 VERSION
 
-version 2.63
+version 2.65
 
 =head1 SYNOPSIS
 

@@ -4,6 +4,8 @@ author:
   - 'Dominic Sonntag <dominic@s5g.de>'
 build_requires:
   Test::CheckManifest: '0'
+  Test::Deep: '0'
+  Test::Deep::UnorderedPairs: '0'
   Test::More: '0'
   Test::Pod: '0'
   Test::Pod::Coverage: '0'
@@ -21,10 +23,12 @@ no_index:
     - t
     - inc
 requires:
+  Array::Utils: '0'
   GD: '0'
+  List::MoreUtils: '0'
   Text::Wrapper: '0'
   XML::Parser: '0'
   perl: '5.01'
 resources: {}
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

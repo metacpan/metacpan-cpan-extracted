@@ -1,5 +1,5 @@
 package Lab::Instrument::OI_Mercury;
-our $VERSION = '3.543';
+$Lab::Instrument::OI_Mercury::VERSION = '3.550';
 use strict;
 use Lab::Instrument;
 

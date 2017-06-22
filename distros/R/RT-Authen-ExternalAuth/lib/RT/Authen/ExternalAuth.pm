@@ -1,6 +1,6 @@
 package RT::Authen::ExternalAuth;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 =head1 NAME
 
@@ -294,6 +294,7 @@ This is free software, licensed under:
 
 use RT::Authen::ExternalAuth::LDAP;
 use RT::Authen::ExternalAuth::DBI;
+use Encode qw/encode/;
 
 use strict;
 
@@ -887,6 +888,39 @@ sub CanonicalizeUserInfo {
         my $args = shift;
         return ( CanonicalizeUserInfo( $self, $args ) );
     };
+}
+
+=head2 C<constant_time_eq($a, $b)>
+
+Taken verbatim from RT 4.4's RT::Util.
+
+=cut
+
+sub constant_time_eq {
+    my ($a, $b) = @_;
+
+    my $result = 0;
+
+    # generic error message avoids potential information leaks
+    my $generic_error = "Cannot compare values";
+    die $generic_error unless defined $a and defined $b;
+    die $generic_error unless length $a == length $b;
+    die $generic_error if ref($a) or ref($b);
+
+    for (my $i = 0; $i < length($a); $i++) {
+        my $a_char = substr($a, $i, 1);
+        my $b_char = substr($b, $i, 1);
+
+        # encode() is set to die on malformed
+        my @a_octets = unpack("C*", encode('UTF-8', $a_char, Encode::FB_CROAK));
+        my @b_octets = unpack("C*", encode('UTF-8', $b_char, Encode::FB_CROAK));
+        die $generic_error if (scalar @a_octets) != (scalar @b_octets);
+
+        for (my $j = 0; $j < scalar @a_octets; $j++) {
+            $result |= $a_octets[$j] ^ $b_octets[$j];
+        }
+    }
+    return 0 + not $result;
 }
 
 1;

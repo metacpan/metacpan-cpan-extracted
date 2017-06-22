@@ -1,3 +1,21 @@
+0.04     2017-06-16
+
+- Make sure IPC::System::Simple is included in prereqs. Reported by Slaven
+  Rezić. RT #122115.
+
+
+0.03     2017-06-16
+
+- Flags passed on the CLI are now stored in a comment rather than in a YAML
+  key. Travis is fine with unknown keys but AppVeyor chokes on them.
+
+- The stored flags are now actually used when running the script on the same
+  file again. CLI flags win over stored params.
+
+- The generated AppVeyor install steps could break if your repo name contained
+  a dot (.).
+
+
 0.02     2017-05-26
 
 - Documentation fixes.

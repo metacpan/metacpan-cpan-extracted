@@ -150,6 +150,7 @@ LIST=<<HERE
 200601-201012
 200901-201312
 201201-201612
+201501-201912
 HERE
 
 [CPAN_RANGES]
@@ -160,6 +161,7 @@ LIST=<<HERE
 200601-201012
 200901-201312
 201201-201612
+201501-201912
 HERE
 
 
@@ -354,6 +356,19 @@ sub create_mysql_databases {
             KEY OSNAMEIX (osname),
             KEY PERLIX (perl),
             KEY DATEIX (postdate)
+        )',
+
+        'DROP TABLE IF EXISTS stats_store',
+        'CREATE TABLE stats_store (
+            storeid  int(10)          NOT NULL AUTO_INCREMENT,
+            dist     varchar(150)     NOT NULL,
+            version  varchar(150)     DEFAULT NULL,
+            perl     varchar(10)      DEFAULT NULL,
+            osname   varchar(32)      DEFAULT NULL,
+            counter  int(10) unsigned NOT NULL,
+            lastid   int(10) unsigned NOT NULL,
+            PRIMARY KEY (storeid),
+            KEY dist (dist)
         )',
     );
 

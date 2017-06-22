@@ -103,7 +103,7 @@ sub _log_commands {
         "Finishing job " . $self->counter . " with ExitCode $exitcode",
         $cmdpid );
 
-    my $dt2      = DateTime->now();
+    my $dt2 = DateTime->now( time_zone => 'local' );
     my $duration = $dt2 - $dt1;
     my $format =
       DateTime::Format::Duration->new(

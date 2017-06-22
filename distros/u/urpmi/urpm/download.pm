@@ -1122,4 +1122,6 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 MandrakeSoft SA
 
 Copyright (C) 2005-2010 Mandriva SA
 
+Copyright (C) 2011-2017 Mageia
+
 =cut

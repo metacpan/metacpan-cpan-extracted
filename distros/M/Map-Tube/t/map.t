@@ -4,7 +4,7 @@ use 5.006;
 use Moo;
 use namespace::clean;
 
-has xml => (is => 'ro', default => sub { return File::Spec->catfile('t', 'good-map.xml') });
+has xml => (is => 'ro', default => sub { File::Spec->catfile('t', 'good-map.xml') });
 with 'Map::Tube';
 
 package BadMap;
@@ -13,7 +13,7 @@ use 5.006;
 use Moo;
 use namespace::clean;
 
-has json => (is => 'ro', default => sub { return File::Spec->catfile('t', 'bad-map.json') });
+has json => (is => 'ro', default => sub { File::Spec->catfile('t', 'bad-map.json') });
 with 'Map::Tube';
 
 package main;

@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
    "license" : [
-      "artistic_2"
+      "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -58,6 +58,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.118",
+   "version" : "1.124",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

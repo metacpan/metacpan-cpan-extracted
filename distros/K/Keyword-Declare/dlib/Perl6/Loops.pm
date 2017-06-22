@@ -9,12 +9,14 @@ use Keyword::Declare;
 sub import {
 
     # Rewire the 'for' loop (but we need to handle existing usages first)...
-    keytype Param  { /\$\w+\s*/   }
-    keytype Params { /\$\w+\s*,?/ }
 
     keyword for {{{ foreach }}}
 
-    keyword for (List $list, '->', Params @parameters, Block $code_block)
+    keytype OptIter is /my\s*\$\w+/;
+
+    keyword for (OptIter $iter = '', '(', '^', Int $max, ')') {{{ for <{$iter}> (0..<{$max-1}>) }}}
+
+    keyword for (ParensList $list, '->', CommaList $parameters, Block $code_block)
                 :desc(enhanced for loop)
     {{{
         {
@@ -23,10 +25,10 @@ sub import {
             {
                 if (!ref($__nary__) || $__nary__ != \$__acc__) {
                     push @{$__acc__}, $__nary__;
-                    next if @{$__acc__} <= <{ $#parameters }>;
+                    next if @{$__acc__} <= <{ $parameters =~ tr/,// }>;
                 }
                 next if !@{$__acc__};
-                my ( <{"@parameters"}> ) = @{$__acc__};
+                my ( <{"$parameters"}> ) = @{$__acc__};
                 @{$__acc__} = ();
 
                 <{substr $code_block, 1, -1}>
@@ -46,7 +48,7 @@ sub import {
         foreach (;<{$condition}>;) <{$loop_block}>
     }}}
 
-    keyword while (List $condition, '->', Param $parameter, Block $loop_block)  {{{
+    keyword while (List $condition, '->', ScalarVar $parameter, Block $loop_block)  {{{
         foreach (;my <{$parameter}> = <{$condition}>;) <{$loop_block}>
     }}}
 
@@ -61,7 +63,9 @@ sub import {
         foreach(;;) { do <{$code_block}>; last if <{$until_condition}>; }
     }}}
 
-    keyword repeat (Block $code_block, /until|while/ $while_or_until, Expr $condition) {
+    keyword repeat (Block $code_block,
+                    /while|until/ $while_or_until,
+                    Expr $condition) {
         my $not = $while_or_until eq 'while' ? q{!} : q{};
         qq{ foreach (;;) { do $code_block; last if $not ($condition); } };
     }
@@ -69,7 +73,9 @@ sub import {
 
     # Special Perl 6 phasers within loops...
 
-    keyword FIRST (Block $code_block, ...'}' $rest_of_block) :desc(FIRST block) {
+    keytype Etc is / (?: (?&PerlOWS) (?&PerlStatement) )* (?&PerlOWS) \} /x;
+
+    keyword FIRST (Block $code_block) :then(Etc $rest_of_block) :desc(FIRST block) {
         state $FIRST_ID = 'FIRST000000'; $FIRST_ID++;
         qq{
             if (!our \$$FIRST_ID++) { $code_block }
@@ -78,7 +84,7 @@ sub import {
         };
     }
 
-    keyword NEXT (Block $code_block, ...'}' $rest_of_block) :desc(NEXT block) {
+    keyword NEXT (Block $code_block) :then(Etc $rest_of_block) :desc(NEXT block) {
         state $NEXT_ID = 'NEXT000000'; $NEXT_ID++;
         chop $rest_of_block;
         qq{
@@ -89,12 +95,12 @@ sub import {
         };
     }
 
-    keyword LAST (Block $code_block, ...'}' @rest_of_block) :desc(LAST block) {
+    keyword LAST (Block $code_block) :then(Etc $rest_of_block) :desc(LAST block) {
         state $LAST_ID = 'LAST000000'; $LAST_ID++;
         qq{
             our \$$LAST_ID = sub $code_block;
-            @rest_of_block
-            {(our \$$LAST_ID)->();}
+            $rest_of_block
+            {our \$$LAST_ID->();}
         };
     }
 }

@@ -31,3 +31,8 @@ severity = 1
 [InputOutput::RequireCheckedSyscalls]
 functions = :builtins
 exclude_functions = print
+
+# I have a "complex" subroutine, mostly because it has a fancy
+# regex.
+[Subroutines::ProhibitExcessComplexity]
+max_mccabe = 25

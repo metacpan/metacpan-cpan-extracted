@@ -1,5 +1,10 @@
 CHANGELOG
 Changes
+CompileMe.sh
+docs/CHANGELOG.pod
+docs/INSTALL.pod
+docs/README.pod
+input
 INSTALL
 lib/NanoB2B/NER.pm
 lib/NanoB2B/NER/Arffman.pm
@@ -7,9 +12,11 @@ lib/NanoB2B/NER/Avgman.pm
 lib/NanoB2B/NER/Metaman.pm
 lib/NanoB2B/NER/Wekaman.pm
 lib/NanoB2B/stop_words.txt
+lib/NanoB2B/stop_words_reg.txt
 lib/NanoB2B/UniversalRoutines.pm
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.save
 README
 t/nner.t
 t/test_set/auc
@@ -20,6 +27,8 @@ t/test_set/ghost
 t/test_set/ogre
 t/test_set/vampire
 t/test_set/zombie
+utils/Convert2Sparse.pl
 utils/NanoB2BNER.pl
+utils/nner-test.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

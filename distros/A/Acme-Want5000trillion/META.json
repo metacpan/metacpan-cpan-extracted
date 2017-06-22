@@ -33,6 +33,7 @@
       },
       "develop" : {
          "requires" : {
+            "Data::Printer" : "0",
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
             "Test::PAUSE::Permissions" : "0.04",
@@ -42,7 +43,7 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.008001"
+            "perl" : "5.010"
          }
       },
       "test" : {
@@ -54,7 +55,10 @@
    "provides" : {
       "Acme::Want5000trillion" : {
          "file" : "lib/Acme/Want5000trillion.pm",
-         "version" : "0.01"
+         "version" : "0.03"
+      },
+      "Acme::Want5000trillion::Asciiart" : {
+         "file" : "lib/Acme/Want5000trillion/Asciiart.pm"
       }
    },
    "release_status" : "stable",
@@ -68,10 +72,11 @@
          "web" : "https://github.com/AnaTofuZ/perl5-acme-Want5000trillio"
       }
    },
-   "version" : "0.01",
+   "version" : "0.03",
    "x_authority" : "cpan:ANATOFUZ",
    "x_contributors" : [
-      "AnaTofuZ <e155730@ie.u-ryukyu.ac.jp>"
+      "AnaTofuZ <e155730@ie.u-ryukyu.ac.jp>",
+      "AnaTofuZ <anatofuz@gmail.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

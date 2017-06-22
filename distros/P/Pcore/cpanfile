@@ -140,6 +140,8 @@ requires 'Net::SSLeay';
 
 # Pcore::Util::Scalar
 requires 'Devel::Refcount';
+requires 'Ref::Util';
+requires 'Ref::Util::XS';
 
 # Pcore::Util::Sys
 requires 'Sys::CpuAffinity';

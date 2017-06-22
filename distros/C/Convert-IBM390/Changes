@@ -138,3 +138,8 @@ Revision history for Perl extension Convert::IBM390.
 0.29  Wed Mar 22 20:36:50 2017
 	- Added 'V' option to unpackeb, perl version.
 	- Added Cobol descriptions in POD.
+
+0.30  xx
+	- Performance improvements suggested by Sinisa Susnjar. I made
+	  several changes; his original code is here:
+	https://github.com/sinisa-susnjar/convert-ibm390_patch_and_tools

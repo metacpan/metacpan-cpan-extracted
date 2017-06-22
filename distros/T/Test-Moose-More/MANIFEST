@@ -32,8 +32,11 @@ t/is_not_anon_ok.t
 t/is_role_ok.t
 t/meta_ok.t
 t/method_from_pkg_ok.t
+t/method_is_accessor_ok.t
+t/method_is_not_accessor_ok.t
 t/method_not_from_pkg_ok.t
 t/method_ok.t
+t/no_meta_ok.t
 t/pristine_ok.t
 t/requires_method_ok.t
 t/subtest-1.t
@@ -57,10 +60,10 @@ t/wrapped/in_roles.t
 xt/author/eol.t
 xt/author/no-tabs.t
 xt/author/pod-coverage.t
+xt/author/pod-linkcheck.t
 xt/author/pod-spell.t
 xt/author/pod-syntax.t
 xt/release/consistent-version.t
 xt/release/has-version.t
 xt/release/minimum-version.t
 xt/release/no-smart-comments.t
-xt/release/pod-linkcheck.t

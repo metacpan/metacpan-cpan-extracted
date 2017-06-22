@@ -31,11 +31,9 @@
          }
       },
       "runtime" : {
-         "requires" : {
-            "perl" : "5.014"
-         }
+         "requires" : {}
       }
    },
    "release_status" : "stable",
-   "version" : "v1.0.1"
+   "version" : "v1.0.2"
 }

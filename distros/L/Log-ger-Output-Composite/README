@@ -1,0 +1,68 @@
+SYNOPSIS
+
+     use Log::ger::Output Composite => (
+         outputs => {
+             # single screen output
+             Screen => {
+                 level => 'info', # set mper-output level. optional.
+                 args => { use_color=>1 },
+             },
+             # multiple file outputs
+             File   => [
+                 {
+                     level => 'warn',
+                     # set per-category, per-output level. optional.
+                     category_level => {
+                         # don't log myapp.security messages to this file
+                         'myapp.security' => 'off',
+                     },
+                     args => { path=>'/var/log/myapp.log' },
+                 },
+                 {
+                     path => '/var/log/myapp-security.log',
+                     level => 'off',
+                     category_level => {
+                         # only myapp.security messages go to this file
+                         'myapp.security' => 'warn',
+                     },
+                 },
+             ],
+         },
+         # set per-category level. optional.
+         category_level => {
+            'category1.sub1' => 'info',
+            'category2' => 'debug',
+            ...
+         },
+     );
+     use Log::ger;
+    
+     log_warn "blah...";
+
+DESCRIPTION
+
+    EARLY RELEASE.
+
+    This is a Log::ger output that can multiplex output to multiple outputs
+    and do filtering using per-category level, per-output level, or
+    per-output per-category level.
+
+CONFIGURATION
+
+ outputs => hash
+
+ category_level => hash
+
+
+TODO
+
+    Per-category level has not been implemented.
+
+    Per-output per-category level has not been implemented.
+
+ENVIRONMENT
+
+SEE ALSO
+
+    Modelled after Log::Any::App.
+

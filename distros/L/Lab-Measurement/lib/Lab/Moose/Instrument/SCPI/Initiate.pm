@@ -1,11 +1,10 @@
 package Lab::Moose::Instrument::SCPI::Initiate;
+$Lab::Moose::Instrument::SCPI::Initiate::VERSION = '3.550';
 use Moose::Role;
 use Lab::Moose::Instrument
     qw/validated_no_param_setter validated_setter validated_getter/;
 use Lab::Moose::Instrument::Cache;
 use MooseX::Params::Validate;
-
-our $VERSION = '3.543';
 
 =head1 NAME
 

@@ -4,8 +4,8 @@ NAME
 
 VERSION
 
-    This document describes version 0.047 of Test::Moose::More - released
-    April 24, 2017 as part of Test-Moose-More.
+    This document describes version 0.048 of Test::Moose::More - released
+    June 17, 2017 as part of Test-Moose-More.
 
 SYNOPSIS
 
@@ -27,7 +27,7 @@ DESCRIPTION
 
     By default, this package exports all test functions. You can be more
     selective, however, and there are a number of export groups (aside from
-    the default ':all') to help you achieve those dreams!
+    the default :all) to help you achieve those dreams!
 
     :all
 
@@ -43,7 +43,14 @@ TEST FUNCTIONS
  meta_ok $thing
 
     Tests $thing to see if it has a metaclass; $thing may be the class name
-    or instance of the class you wish to check.
+    or instance of the class you wish to check. Passes if $thing has a
+    metaclass.
+
+ no_meta_ok $thing
+
+    Tests $thing to see if it does not have a metaclass; $thing may be the
+    class name or instance of the class you wish to check. Passes if $thing
+    does not have a metaclass.
 
  does_ok $thing, < $role | \@roles >, [ $message ]
 
@@ -109,6 +116,17 @@ TEST FUNCTIONS
 
     Given a thing (role, class, etc) and a method, test that it did not
     come from $orig_pkg.
+
+ method_is_accessor_ok $thing, $method
+
+    Given a thing (role, class, etc) and a method, test that the method is
+    an accessor -- that is, it descends from Class::MOP::Method::Accessor.
+
+ method_is_not_accessor_ok $thing, $method
+
+    Given a thing (role, class, etc) and a method, test that the method is
+    not an accessor -- that is, it does not descend from
+    Class::MOP::Method::Accessor.
 
  role_wraps_around_method_ok $role, @methods
 
@@ -353,7 +371,7 @@ TEST FUNCTIONS
           ok 1 - Checking the attribute metaclass, Moose::Meta::Class::__ANON__::SERIAL::1
 
       Note that validate_class() and validate_role() implement this using
-      'class_metaclasses' and 'role_metaclasses', respectively.
+      class_metaclasses and role_metaclasses, respectively.
 
  validate_role
 
@@ -465,7 +483,7 @@ TEST FUNCTIONS
           ok 1 - Checking the attribute metaclass, Moose::Meta::Class::__ANON__::SERIAL::1
 
       Note that validate_class() and validate_role() implement this using
-      'class_metaclasses' and 'role_metaclasses', respectively.
+      class_metaclasses and role_metaclasses, respectively.
 
       * class_metaclasses => { $mop => { ... }, ... }
 
@@ -582,11 +600,11 @@ TEST FUNCTIONS
             required => undef,
         );
 
-    Options passed to validate_attribute() prefixed with '-' test the
+    Options passed to validate_attribute() prefixed with - test the
     attribute's metaclass instance rather than a setting on the attribute;
-    that is, '-does' ensures that the metaclass does a particular role
-    (e.g. MooseX::AttributeShortcuts), while 'does' tests the setting of
-    the attribute to require the value do a given role.
+    that is, -does ensures that the metaclass does a particular role (e.g.
+    MooseX::AttributeShortcuts), while does tests the setting of the
+    attribute to require the value do a given role.
 
     This function takes all the options "attribute_options_ok" takes, as
     well as the following:
@@ -670,7 +688,8 @@ CONTRIBUTORS
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2012 by Chris Weyl.
+    This software is Copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by
+    Chris Weyl.
 
     This is free software, licensed under:
 

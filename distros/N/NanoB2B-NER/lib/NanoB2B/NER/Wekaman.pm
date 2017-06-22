@@ -2,7 +2,7 @@
 # NanoB2B-NER::NER::Wekaman
 #
 # Runs the ARFF files created by Arffman into weka accuracy files
-# Version 1.0
+# Version 1.5
 #
 # Program by Milk
 
@@ -78,7 +78,7 @@ sub _init {
     if(defined $debugoption){$debug = $debugoption;}
     if(defined $diroption){$program_dir = $diroption;}
     if(defined $bucketsNumoption){$buckets = $bucketsNumoption;}
-    if(defined $ftsoption){@features = split(' ', $ftsoption);}
+    if(defined $ftsoption){@features = split(' ', $ftsoption); }
     if(defined $typeoption){$classifier = $typeoption};
     if(defined $sizeoption){$weka_size = $sizeoption};
 }
@@ -109,7 +109,7 @@ sub weka_file{
 	#run each set through metamap and save the accuracy file
 	foreach my $set(@sets){
 		#set up the new folder
-		my $direct = "$program_dir/_WEKAS/$weka_dir/$name" . "_WEKA_DATA/_$set";
+		my $direct = "$program_dir/_WEKAS/$weka_dir/$name" . "_WEKA_DATA/$set";
 		make_path($direct);
 
 		#prep the output accuracy file and the test and train files

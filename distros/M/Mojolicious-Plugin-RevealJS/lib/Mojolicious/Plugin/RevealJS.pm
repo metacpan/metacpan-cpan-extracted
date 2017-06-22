@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use 5.12.0;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 $VERSION = eval $VERSION;
 
 use Mojo::Home;
@@ -67,13 +67,25 @@ sub _include_code {
 }
 
 sub _export {
-  my ($c, $page, $to) = @_;
+  my ($c, $page, $to, $opts) = @_;
   require Mojo::Util;
   require File::Copy::Recursive;
   File::Copy::Recursive->import('dircopy');
   File::Copy::Recursive::pathmk($to);
 
   my $body = $c->ua->get($page)->res->body;
+
+  # handle munging the base tag
+  if (my $base = $opts->{base}) {
+    require Mojo::DOM;
+    require Mojo::Util;
+    $base = Mojo::Util::xml_escape($base);
+    my $dom = Mojo::DOM->new($body);
+    $dom->at('base')->remove;
+    $dom->at('head')->child_nodes->first->prepend(qq[<base href="$base">]);
+    $body = $dom->to_string;
+  }
+
   Mojo::File->new($to)->child('index.html')->spurt($body);
   for my $path( @{ $c->app->static->paths } ) {
     dircopy($path, $to);
@@ -106,7 +118,7 @@ It provides a layout (C<revealjs>) which contains the boilerplate and loads the 
 It also provides a few simple helpers.
 Future versions of the plugin will allow setting of configuration like themes.
 
-The bundled version of Reveal.js is currently 3.0.0.
+The bundled version of Reveal.js is currently 3.5.0.
 
 Note that this module is in an alpha form!
 The author makes no compatibilty promises.
@@ -154,6 +166,12 @@ See more on the L<"Reveal.js page"|https://github.com/hakimel/reveal.js#theming>
 =item *
 
 title - sets the window title, not used on the title slide
+
+=item *
+
+base - sets the C<< <base> >> tag for the document.
+Useful for hosting static pages at a location other than C</>.
+Defaults to C</>, if explicitly set to C<undef> the tag is not included.
 
 =back
 
@@ -280,10 +298,21 @@ Then in the file
 
 =head2 revealjs->export
 
-  $ ./myapp.pl eval 'app->revealjs->export("/" => "path/")'
+  $ ./myapp.pl eval 'app->revealjs->export("/" => "path/", \%options)'
 
 Exports the rendered page and all of the files in the static directories to the designated path.
 This is very crude, but effective for usual cases.
+
+Allowed options are:
+
+=over
+
+=item base
+
+Override the base tag by removing the original and inserting a new one just inside the C<< <head> >> tag with the given value as the href target.
+This feature is cludgy (as is this whole helper), consider it experimental, its behavior may change.
+
+=back
 
 =head1 SOURCE REPOSITORY
 

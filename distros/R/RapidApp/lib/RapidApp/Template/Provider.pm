@@ -8,7 +8,10 @@ use Path::Class qw(file dir);
 use RapidApp::Template::Access::Dummy;
 
 use Moo;
+use Types::Standard ':all';
 extends 'Template::Provider';
+
+use Module::Runtime;
 
 =pod
 
@@ -27,6 +30,30 @@ has 'Controller', is => 'ro', required => 1;
 # We need to be able to check certain template permissions for special markup
 # Actual permission checks happen in the RapidApp::Template::Controller
 has 'Access', is => 'ro', required => 1;
+
+has 'store_class', is => 'ro', default => sub {undef}; # Will be 'RapidApp::Template::Store' if undef
+has 'store_params', is => 'ro', isa => Maybe[HashRef], default => sub {undef};
+has 'Store', is => 'ro', lazy => 1, default => sub {
+  my $self = shift;
+  
+  # Support an 'AccessStore' which means the Access class is both an Access and a Store at once.
+  # This gives the flexibility to design for a single interface, or separately. Currently this
+  # requires MI, but may change this to Roles...
+  return $self->Access if ($self->Access->isa('RapidApp::Template::Store'));
+  
+  my $class = $self->store_class || 'RapidApp::Template::Store';
+  Module::Runtime::require_module($class);
+  $class->new({ Provider => $self, %{ $self->store_params||{} } });
+}, isa => InstanceOf['RapidApp::Template::Store'];
+
+sub _store_owns_template {
+  my ($self, $name) = @_;
+  $self->{_store_owns_template}{$name} //= do { # Only ask the Store if it owns a template once
+    $name =~ /^\//
+      ? 0 # never ask about absolute paths
+      : $self->Store->owns_tpl($name)
+  }
+}
 
 # -------
 # The "DummyAccess" API is a quick/dirty way to turn off all access checks
@@ -71,18 +98,37 @@ around 'fetch' => sub {
   return $self->$orig($name);
 };
 
-around '_template_modified' => sub {
-  my ($orig, $self, @args) = @_;
-  my $template = $self->{template_fetch_name} || join('/',@args);
+
+around 'load' => sub {
+  my ($orig, $self, $name) = @_;
   
-  my $modified = $self->$orig(@args);
+  return $self->$orig($name) unless ($self->_store_owns_template($name));
+  
+  return $self->Store->template_exists($name)
+    ? ( $self->Store->template_content($name), Template::Constants::STATUS_OK    )
+    : ( "Template '$name' not found",          Template::Constants::STATUS_ERROR )
+};
+
+
+around '_template_modified' => sub {
+  my ($orig, $self, $name) = @_;
+  my $template = $self->{template_fetch_name} || $name;
+  
+  my ($exists,$modified);
+  if($self->_store_owns_template($template)) {
+    $exists   = $self->Store->template_exists($template);
+    $modified = $self->Store->template_mtime($template) if ($exists);
+  }
+  else {
+    $modified = $self->$orig($name);
+    $exists   = $self->template_exists($template) unless ($self->{template_exists_call});
+  }
   
   # Need to return a virtual value to enable the virtual content for
   # creating non-extistent templates
   $modified = 1 if (
-    ! $modified &&
+    ! $modified && ! $exists &&
     ! $self->{template_exists_call} && #<-- localized in template_exists() below
-    ! $self->template_exists($template) &&
     $self->Access->template_creatable($template)
   );
   
@@ -94,22 +140,33 @@ around '_template_content' => sub {
   my ($orig, $self, @args) = @_;
   
   my $template = $self->{template_fetch_name} || join('/',@args);
-
-  return $self->$orig(@args) if ($self->template_exists($template));
-
-  # Return virtual non-existent content, optionally with markup 
-  # to enable on-the-fly creating the template:
-  my ($data, $error, $mod_date) = (
-    $self->_not_exist_content(
-      $template, 
-      ($self->div_wrap && $self->Access->template_creatable($template))
-    ), undef, 1
-  );  
+  
+  my ($data, $error, $mod_date);
+  
+  if ($self->template_exists($template)) {
+    return $self->$orig(@args) unless ($self->_store_owns_template($template));
+    # Proxy to the Store to return the content
+    ($data, $error, $mod_date) = (
+      $self->Store->template_content ($template), undef,
+      $self->Store->template_mtime   ($template)
+    );
+  }
+  else {
+    # Return virtual non-existent content, optionally with markup 
+    # to enable on-the-fly creating the template:
+    ($data, $error, $mod_date) = (
+      $self->_not_exist_content(
+        $template, 
+        ($self->div_wrap && $self->Access->template_creatable($template))
+      ), undef, 1
+    );
+  }
   
   return wantarray
     ? ( $data, $error, $mod_date )
     : $data;
 };
+
 
 
 sub _not_exist_content {
@@ -166,6 +223,9 @@ sub _decode_unicode {
 sub update_template {
   my ($self, $template, $content) = @_;
   
+  return $self->Store->update_template($template,$content)
+    if $self->_store_owns_template($template);
+  
   my $path = $self->get_template_path($template);
   my $File = file($path);
   
@@ -177,7 +237,9 @@ sub update_template {
 sub template_exists {
   my ($self, $template) = @_;
   local $self->{template_exists_call} = 1;
-  return $self->get_template_path($template) ? 1 : 0;
+  return $self->_store_owns_template($template)
+    ? $self->Store->template_exists($template)
+    : $self->get_template_path($template) ? 1 : 0;
 }
 
 # Copied from Template::Provider::load
@@ -218,6 +280,12 @@ sub get_template_path {
 
 sub create_template {
   my ($self, $template, $content) = @_;
+  
+  # TODO: formalize a way to dynamically set/specify the new/init content
+  $content = "New Template '$template'" unless (defined $content);
+  
+  return $self->Store->create_template($template,$content)
+    if $self->_store_owns_template($template);
  
   my $File = file($self->new_template_path,$template);
   die "create_templete(): ERROR - $File already exists!" if (-f $File);
@@ -227,9 +295,6 @@ sub create_template {
     $Dir->mkpath or die "create_templete(): mkpath failed for '$Dir'";
   }
   
-  # TODO: formalize a way to dynamically set/specify the new/init content
-  $content = "New Template '$template'" unless (defined $content);
-
   $File->spew(iomode => '>:raw', $content);
   
   return -f $File ? 1 : 0;
@@ -237,6 +302,8 @@ sub create_template {
 
 sub delete_template {
   my ($self, $template) = @_;
+  
+  return $self->Store->delete_template($template) if $self->_store_owns_template($template);
  
   my $File = file($self->get_template_path($template));
   die "delete_templete(): ERROR - $File doesn't exist or is not a regular file" 
@@ -289,6 +356,12 @@ sub list_templates {
       }
     );
   }
+  
+  push @files, grep {
+    my ($name,$incl) = ($_, 1);
+    !($name =~ $_) and $incl = 0 for (@re);
+    $incl
+  } @{ $self->Store->list_templates(@regexes) || [] };
   
   return \@files;
 }

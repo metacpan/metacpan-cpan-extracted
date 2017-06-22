@@ -116,3 +116,13 @@ Revision history for Control-CLI-AvayaData
 	* Updated to support new Control::CLI's 'callback' argument in connect() and 'errmsg_format' in constructor
 	* Updated error messages to comply with new Control::CLI error message formats
 	* Updates to switch error messages
+
+2.03	2017-06-15
+	* Fixed rare case where login() could end up locking onto a fraction of the actual switch prompt
+	* Family type attribute was taking time (timeout) before setting 'generic' when connecting to Juniper devices
+	* Update to error message patterns
+	* Was not locking on PassportERS old (non-ACLI) CLI prompt if that contained '.' characters 
+	* Attributes 'model', 'oob_ip', 'is_oob_connected' now work with Avaya Private Label Switching DSG platforms
+	* Added new attributes 'is_voss', 'is_apls', 'apls_box_type' and 'brand_name'
+	* On BaystackERS family types, login() method now detects failed authentication if password is asked twice
+	* WLAN9100 attribute "model" is now formatted correctly, like WAP-9132

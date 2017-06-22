@@ -49,5 +49,5 @@ requires:
 resources:
   homepage: http://user42.tuxfamily.org/perl-critic-pulp/index.html
   license: http://www.gnu.org/licenses/gpl.html
-version: '93'
+version: '94'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

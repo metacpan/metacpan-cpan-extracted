@@ -1,5 +1,5 @@
 package Facebook::Graph::Publish::Post;
-$Facebook::Graph::Publish::Post::VERSION = '1.1202';
+$Facebook::Graph::Publish::Post::VERSION = '1.1204';
 use Moo;
 use Ouch;
 extends 'Facebook::Graph::Publish';
@@ -243,7 +243,7 @@ Facebook::Graph::Publish::Post - Publish to a user's wall.
 
 =head1 VERSION
 
-version 1.1202
+version 1.1204
 
 =head1 SYNOPSIS
 

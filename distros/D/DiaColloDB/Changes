@@ -2,6 +2,17 @@
 ##
 ## Change log for perl distribution DiaColloDB
 
+v0.12.008 Thu, 22 Jun 2017 11:02:11 +0200 moocow
+	* trim perl-5.14 character set modifiers from qr()-stringified regexes
+	  - including these breaks KWIC links, since DDC (PCRE) doesn't seem to support them
+	* die early in dcdb-create.perl if we forgot to specify an -output
+
+v0.12.007 Tue, 13 Jun 2017 12:52:56 +0200 moocow
+	* added allow_nonref JSON-ification option to list-client 'extend' sub-calls
+
+v0.12.006 Mon, 12 Jun 2017 13:00:09 +0200 moocow
+	* Document/TCF.pm convenience hack to support embedded TEI header in DTA TCF exports
+
 v0.12.005 Wed, 31 May 2017 12:29:58 +0200 moocow
 	* Document/DDCTabs.pm fix for ddc_dump v2.1.x (updated DDC:BREAK format)
 

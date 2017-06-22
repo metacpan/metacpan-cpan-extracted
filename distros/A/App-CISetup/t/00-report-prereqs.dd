@@ -33,16 +33,17 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
+                                      'File::Which' => '0',
                                       'File::pushd' => '0',
                                       'Git::Sub' => '0',
                                       'IPC::Run3' => '0',
+                                      'IPC::System::Simple' => '0',
                                       'List::AllUtils' => '0',
                                       'List::Gather' => '0',
                                       'Moose' => '0',
                                       'Moose::Role' => '0',
                                       'MooseX::Getopt::Dashes' => '0',
                                       'MooseX::Getopt::OptionTypeMap' => '0',
-                                      'MooseX::Role::Parameterized' => '0',
                                       'MooseX::StrictConstructor' => '0',
                                       'MooseX::Types::Combine' => '0',
                                       'MooseX::Types::Path::Tiny' => '0',
@@ -63,10 +64,13 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
+                                   'Cwd' => '0',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'Test2::Bundle::Extended' => '0',
-                                   'Test2::Plugin::NoWarnings' => '0',
+                                   'Test2::Plugin::NoWarnings' => '0.06',
+                                   'Test::Class::Moose' => '0',
+                                   'Test::Class::Moose::CLI' => '0',
                                    'Test::More' => '1.302015'
                                  }
                  }

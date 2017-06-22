@@ -1,7 +1,7 @@
 package App::CalcAccumulatedDiscounts;
 
-our $DATE = '2017-03-21'; # DATE
-our $VERSION = '0.06'; # VERSION
+our $DATE = '2017-06-05'; # DATE
+our $VERSION = '0.07'; # VERSION
 
 use 5.010001;
 use strict;
@@ -33,7 +33,8 @@ _
             schema => ['array*', of=>'float*'], # XXX percent
             default => [0.25, 0.5, 0.75, 1,
                         1.25, 1.5, 1.75, 2,
-                        2.25, 3, 3.5, 4,
+                        2.25, 2.5, 2.75, 3,
+                        3.25, 3.5, 3.75, 4,
                         4.5, 5],
         },
     },
@@ -89,7 +90,7 @@ App::CalcAccumulatedDiscounts - Calculate multi-year discounts from a per-year d
 
 =head1 VERSION
 
-This document describes version 0.06 of App::CalcAccumulatedDiscounts (from Perl distribution App-CalcAccumulatedDiscounts), released on 2017-03-21.
+This document describes version 0.07 of App::CalcAccumulatedDiscounts (from Perl distribution App-CalcAccumulatedDiscounts), released on 2017-06-05.
 
 =head1 SYNOPSIS
 
@@ -248,6 +249,32 @@ Result:
      "67.9%",
    ],
    [
+     "2.50%",
+     "11.9%",
+     "22.4%",
+     "31.6%",
+     "39.7%",
+     "46.9%",
+     "53.2%",
+     "58.8%",
+     "63.7%",
+     "68.0%",
+     "71.8%",
+   ],
+   [
+     "2.75%",
+     "13.0%",
+     "24.3%",
+     "34.2%",
+     "42.7%",
+     "50.2%",
+     "56.7%",
+     "62.3%",
+     "67.2%",
+     "71.5%",
+     "75.2%",
+   ],
+   [
      "3.00%",
      "14.1%",
      "26.3%",
@@ -261,6 +288,19 @@ Result:
      "78.2%",
    ],
    [
+     "3.25%",
+     "15.2%",
+     "28.1%",
+     "39.1%",
+     "48.4%",
+     "56.2%",
+     "62.9%",
+     "68.5%",
+     "73.3%",
+     "77.4%",
+     "80.8%",
+   ],
+   [
      "3.50%",
      "16.3%",
      "30.0%",
@@ -272,6 +312,19 @@ Result:
      "76.0%",
      "79.9%",
      "83.2%",
+   ],
+   [
+     "3.75%",
+     "17.4%",
+     "31.8%",
+     "43.6%",
+     "53.4%",
+     "61.5%",
+     "68.2%",
+     "73.8%",
+     "78.3%",
+     "82.1%",
+     "85.2%",
    ],
    [
      "4.00%",
@@ -344,7 +397,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<discounts> => I<array[float]> (default: [0.25,0.5,0.75,1,1.25,1.5,1.75,2,2.25,3,3.5,4,4.5,5])
+=item * B<discounts> => I<array[float]> (default: [0.25,0.5,0.75,1,1.25,1.5,1.75,2,2.25,2.5,2.75,3,3.25,3.5,3.75,4,4.5,5])
 
 =item * B<years> => I<array[int]> (default: [5,10,15,20,25,30,35,40,45,50])
 
@@ -358,7 +411,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-CalcAc
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-App-CalcAccumulatedDiscounts>.
+Source repository is at L<https://github.com/perlancar/perl-App-CalcAccumulatedDiscount>.
 
 =head1 BUGS
 

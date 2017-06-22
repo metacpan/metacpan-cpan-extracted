@@ -1,5 +1,9 @@
 Revision history for HackaMol
 
+0.040     2017-06-18 21:38:23-06:00 America/Denver
+  * added the group_by_atom_attrs method to HackaMol.pm
+  * added SelectionRole to core, consumed by HackaMol::Molecule
+
 0.039     2017-02-02 20:05:46-07:00 America/Denver
   * cleaning up tests and reducing dependencies 
   * todo: shrink api by moving some heafty Roles into pluggable roles, streamline tests

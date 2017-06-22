@@ -25,7 +25,7 @@ $notvivi{bar} = "my data";
 $notvivi{baz} = "default1";
 SKIP: {
     skip "scalar() mysteriously broken on Ye Olde Perle", 1,
-        unless($] > 5.008001);
+        unless($] gt 5.008002);
     is(scalar(%{$vivi}), scalar(%notvivi), "scalar() works, as if anyone's likely to ever bother");
 }
 

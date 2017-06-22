@@ -1,29 +1,43 @@
 ---
-abstract: '本気出すコピペ'
+abstract: 本気出すコピペ
 author:
   - 'hayajo <hayajo@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.59
+  Test::More: '0.98'
 configure_requires:
-  ExtUtils::MakeMaker: 6.59
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.06'
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.12, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Acme-Honkidasu
 no_index:
   directory:
-    - inc
     - t
     - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Acme::Honkidasu:
+    file: lib/Acme/Honkidasu.pm
+    version: '0.04'
 requires:
-  POSIX::strftime::GNU: 0
-  Time::Piece: 1.20
-  perl: 5.10.0
+  POSIX::strftime::GNU: '0'
+  Time::Piece: '1.20'
+  perl: '5.010'
 resources:
-  license: http://dev.perl.org/licenses/
+  bugtracker: https://github.com/hayajo/p5-Acme-Honkidasu/issues
+  homepage: https://github.com/hayajo/p5-Acme-Honkidasu
   repository: git://github.com/hayajo/p5-Acme-Honkidasu.git
-version: 0.01
+version: '0.04'
+x_authority: cpan:HAYAJO
+x_contributors:
+  - 'hayajo <hayato.imai@gmail.com>'
+  - '今井隼人 <imai.h@imaihayato-no-MacBook-Pro.local>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

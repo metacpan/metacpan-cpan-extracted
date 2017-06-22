@@ -2,7 +2,7 @@ package Acme::MetaSyntactic::linux;
 use strict;
 use Acme::MetaSyntactic::List;
 our @ISA = qw( Acme::MetaSyntactic::List );
-our $VERSION = '1.030';
+our $VERSION = '1.031';
 
 our %Remote = (
     source  => 'http://distrowatch.com/',
@@ -11,7 +11,7 @@ our %Remote = (
         return
             map {
                 s/\@/_at_/g; s/\+/_plus_/g;
-                s/^0/Zero/; s/^2/Two/; s/^4/Four/;
+                s/^0/Zero/; s/^2/Two/; s/^3/Three/; s/^4/Four/;
                 s/^_|_$//g;  s/_+/_/g;
                 $_
                 }
@@ -45,6 +45,12 @@ Philippe Bruhat (BooK).
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2017-06-12 - v1.031
+
+Updated from the source web site in Acme-MetaSyntactic-Themes version 1.050.
 
 =item *
 
@@ -277,12 +283,10 @@ L<Acme::MetaSyntactic>, L<Acme::MetaSyntactic::List>.
 
 __DATA__
 # names
-ZeroLinux
-TwoXOS
+ThreeCX
 FourMLinux
 Absolute
 AbulEdu
-AgiliaLinux
 Alpine
 ALT
 Android_x86
@@ -291,121 +295,128 @@ antiX
 APODIO
 Arch
 ArchBang
+Arya
+Asianux
 AsteriskNOW
+Audiophile
 AUSTRUMI
 AV_Linux
 BackBox
-Baltix
-Bardinux
 Baruwa
 Berry
 Bicom
 Bio_Linux
-BlackArch
+BitKey
 Black_Lab
+BlackArch
 blackPanther
-BLAG
 BlankOn
+BlueOnyx
+Bluestar
 Bodhi
 BOSS
-Bridge
 BSDRP
+BunsenLabs
 CAINE
-Caixa_Magica
 Calculate
 Canaima
 CentOS
-Centrych
 Chakra
 ChaletOS
 Chapeau
-Chitwanix
+Clear
 ClearOS
 Clonezilla
+CloudReady
 Connochaet
-CoreOS
+Container
 CRUX
-Cub
 Debian
+Debian_Edu
 deepin
 DEFT
 Devil
-DoudouLinux
+Devuan
 DragonFly
+DRBL
+DuZeru
+EasyNAS
 Edubuntu
 Elastix
 elementary
 Elive
 Emmabuntus
 Endian
+Endless
 Exe
 Exherbo
 ExTiX
-eZeY
+Fatdog64
 Fedora
+feren
 Fermi
 Finnix
 FreeBSD
 FreeNAS
+FreePBX
 Frugalware
 FuguIta
 Funtoo
+Gecko
 Gentoo
 GhostBSD
+gNewSense
 GoboLinux
 GParted
 Greenie
 Grml
-Guadalinex
 GuixSD
 Haiku
-HandyLinux
-Hanthana
-IPCop
 IPFire
-kademar
+Kaiana
 Kali
 KANOTIX
 KaOS
 Karoshi
+KDE_neon
+Keysoft
 KNOPPIX
+Kodachi
 KolibriOS
 Korora
 Kubuntu
-Kwheezy
 Kwort
 KXStudio
+Lakka
 Leeenux
-Legacy
 LFS
-LinEx
+LibreELEC
 LinHES
-Linpus
 LinuxBBQ
 LinuxConsole
 Linuxfx
 Lite
+Live_Raizo
 LliureX
-LPS
 Lubuntu
 Lunar
 LuninuX
 LXLE
-Madbox
 Mageia
 MakuluLinux
 Mangaka
 Manjaro
+Maui
 MAX
 Metamorphose
 MidnightBSD
+Minimal
 MiniNo
 MINIX
 Mint
-Miracle
 MirOS
-Musix
-Mythbuntu
+MorpheusArch
+MX_Linux
 Nanolinux
 NAS4Free
 Neptune
@@ -416,36 +427,36 @@ NexentaStor
 NixOS
 NST
 NuTyX
+OB2D
+OBRevenge
 OLPC
 Omoikane
 OpenBSD
 OpenELEC
 OpenIndiana
 OpenLX
-openmamba
 OpenMandriva
 OpenMediaVault
 openSUSE
 Openwall
 OPNsense
 Oracle
+OSGeo
 OSMC
 Overclockix
-Oz_Unity
+OviOS
 paldo
 Parabola
-Pardus
 Parrot
 Parsix
 Parted_Magic
-PC_BSD
 PCLinuxOS
 Peach_OSI
+Pearl
 PelicanHPC
 Pentoo
 Peppermint
 pfSense
-Pidora
 Pinguy
 Pisi
 Plamo
@@ -455,18 +466,24 @@ Point
 PoliArch
 Porteus
 Porteus_Kiosk
+PrimTux
 Proxmox
 Puppy
 Q4OS
 Qubes
 Quirky
+RancherOS
 Raspbian
+RaspBSD
 ReactOS
 RebeccaBlackOS
 Rebellin
 Red_Hat
+Refracta
+RemixOS
 REMnux
 Rescatux
+Resulinux
 RISC
 Robolinux
 Rocks_Cluster
@@ -480,9 +497,9 @@ Scientific
 Securepoint
 SELKS
 Semplice
+Shark
 siduction
 Simplicity
-Skolelinux
 Slackel
 Slackware
 SliTaz
@@ -490,7 +507,6 @@ SmartOS
 SME_Server
 Smoothwall
 SMS
-Solaris
 Solus
 SolydXK
 Sonar
@@ -500,22 +516,32 @@ SparkyLinux
 Springdale
 SteamOS
 Stella
+StressLinux
+Subgraph
 SuliX
-SuperX
+Super_Grub2
 SUSE
-SymphonyOS
+SwagArch
+Swecha
+Swift
 SystemRescue
 T2
 Tails
+TalkingArch
 Tanglu
+TENS
 Thinstation
 Tiny_Core
+ToOpPy
+ToriOS
 Toutou
 Trisquel
-Turbolinux
+TrueOS
 TurnKey
+tuxtrans
 UberStudent
 Ubuntu
+Ubuntu_Budgie
 Ubuntu_DP
 Ubuntu_GNOME
 Ubuntu_Kylin
@@ -526,8 +552,9 @@ Ulteo
 Ultimate
 Univention
 Untangle
-UPR
 URIX
+Uruk
+UTUTO
 Vector
 Vine
 Vinux
@@ -546,5 +573,4 @@ Xubuntu
 Zentyal
 Zenwalk
 Zeroshell
-ZevenOS
 Zorin

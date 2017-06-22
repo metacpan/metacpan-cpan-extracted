@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::ByteStream 'b';
 use Mojo::Util qw/secure_compare url_unescape quote/;
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 
 # TODO: Support domain whitelisting, like
 #       https://github.com/sdsdkkk/safe_redirect
@@ -52,6 +52,34 @@ sub register {
       # Append check parameter to url
       $url->query({ crto => $url_check });
       return $url->to_string;
+    }
+  );
+
+  # Redirect to relative URL
+  $app->helper(
+    relative_redirect_to => sub {
+      my $c = shift;
+
+      # Get the base path of the request URL
+      my $path = $c->req->url->base->path->canonicalize;
+
+      # Get URL
+      my $redirect = $c->url_for(@_);
+
+      # In case path is set, remove path prefix
+      if ($path) {
+        my $redirect_parts = $redirect->path->parts;
+        foreach (@{$path->parts}) {
+          if ($redirect_parts->[0] && ($_ eq $redirect_parts->[0])) {
+            shift @$redirect_parts;
+          };
+        };
+      };
+
+      # Don't override 3xx status
+      my $res = $c->res;
+      $res->headers->location($redirect);
+      return $c->rendered($res->is_redirect ? () : 302);
     }
   );
 
@@ -263,6 +291,18 @@ will be removed on success (even if the URL was local).
 Sign a redirection URL with the defined secret.
 
 
+=head2 relative_redirect_to
+
+  $c->relative_redirect_to('/my/app/home');
+
+Redirects to a given path after removing prefix parts that
+are given as the request's base path.
+Expects the same parameters as L<Mojolicious::Controller/redirect_to>.
+This comes in handy if your application is not running under
+a root path and you modify relative URL creation by changing the
+request's base path.
+
+
 =head1 HOOKS
 
 =head2 on_open_redirect_attack
@@ -316,7 +356,7 @@ L<Mojolicious>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2016-2017, L<Nils Diewald|http://nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the terms of the Artistic License version 2.0.

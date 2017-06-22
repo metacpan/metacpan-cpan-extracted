@@ -1,0 +1,38 @@
+{
+   "abstract" : "Cuckoo Filter implementation in perl",
+   "author" : [
+      "Kenji Doi <kend@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Cuckoo-Filter",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::More" : "0",
+            "version" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Cuckoo::Filter" : {
+         "file" : "lib/Cuckoo/Filter.pm",
+         "version" : "v0.0.2"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.0.2",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

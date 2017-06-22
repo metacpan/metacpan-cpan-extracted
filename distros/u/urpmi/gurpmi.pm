@@ -2,6 +2,7 @@ package gurpmi;
 
 #- Copyright (C) 2005 MandrakeSoft SA
 #- Copyright (C) 2005-2010 Mandriva SA
+#- Copyright (C) 2011-2017 Mageia
 
 #- This is needed because text printed by Gtk3 will always be encoded
 #- in UTF-8; we first check if LC_ALL is defined, because if it is,
@@ -50,7 +51,7 @@ on a Mageia Linux distribution.
 urpm::select::add_packages_to_priority_upgrade_list(qw(gurpmi perl-Glib perl-Glib-Object-Introspection perl-Gtk3));
 
 sub usage () {
-    print urpm::args::copyright('gurpmi', [ '1999-2010', 'Mandriva' ])
+    print urpm::args::copyright('gurpmi', [ '1999-2010', 'Mandriva' ], [ '2011-2017', 'Mageia' ])
 	. "    gurpmi <rpm> [ <rpm>... ]
 " . N("Options:") . "\n"
  . N("  --help         - print this help message.
@@ -217,7 +218,7 @@ Copyright (C) 2005 MandrakeSoft SA
 
 Copyright (C) 2005-2010 Mandriva SA
 
-Copyright (C) 2011-2015 Mageia
+Copyright (C) 2011-2017 Mageia
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

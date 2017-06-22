@@ -1,6 +1,1676 @@
 =head1 NAME
 
-BlankOnDev::Tutorial::en - Panduan penggunan untuk module BlankOnDev. [Coming Soon]
+BlankOnDev::Tutorial::id - Panduan penggunan untuk module BlankOnDev.
+
+=head1 DESCRIPTION
+
+Untuk tutorial dalam bentuk PDF dapat di download di : L<https://yusrideb.github.io/BlankOnDev/docs/Tutorial-BlankOnDev-01005.pdf>
+
+
+=head1 1. Pengenalan
+
+=head2 1.1. Apa itu BlankOnDev Tools ?
+
+B<BlankOnDev> merupakan Tools untuk melakukan aktifitas sebagai pengembang GNU/Linux BlankOn.
+Terdapat beberapa pekerjaan sebagai pengembang BlankOn khususnya untuk B<Tim Pemaket> yang dilakukan dengan cara manual menggunakan beberapa perintah Linux, yang menurut penulis cukup tradisional.
+
+Pada tools B<BlankOnDev> I<rencana> akan memiliki beberapa fitur untuk mempermudah pekerjaan Tim Pemaket meliputi :
+
+=over
+
+=item 1.
+Manajemen pengaturan repositori pada Sistem Linux Pemaket
+
+=item 2.
+Persiapan Sistem Linux Pemaket sebelum melakukan aktifitas pemaket.
+
+=item 3.
+System manajemen builder Paket dari Source menjadi file B<.deb> yang siap untuk di install dengan perintah C<dpkg -i [file_packages.deb]>.
+
+=item 4.
+Melakukan patching atau perbaikan bugs yang terpadat pada paket-paket tertentu.
+
+=item 5.
+Membuat format paket debian yang nantinya akan diteruskan ke server B<irgsh> untuk dilakukan proses build source
+menjadi paket debian yaitu file B.deb>, yang kemudian akan di dorong ke B<reprepo>.
+
+=item 6.
+Migrasi data paket debian yang sebelumnya tersimpan dalam server bazaar repository ke server github repository.
+
+=item 7.
+Sistem pembuatan Repositori mirror secara otomatis dengan sistem singkronisasi yang tercontrol.
+
+=back
+
+Fitur B<BlankOnDev v0.1005> yang sudah rampung dan siap untuk digunakan :
+
+=over
+
+=item * Fitur Migrasi data paket debian yang sebelumnya tersimpan pada server bazaar ke server github repository.
+
+=back
+
+=head2 1.2. Mengapa BlankOnDev Harus dibuat ?
+
+Ada beberapa aktifitas yang mememakan banyak waktu jika harus dilakukan dengan cara tradisional di Sistem Operasi GNU/Linux.
+GNU/Linux BlankOn merupakan Distribusi Linux turunan Debian GNU/Linux, dengan basis Debian GNU/Linux sebenarnya
+sudah memberikan banyak kemudahan dalam penggunaannya, akan tetapi tetap memakan waktu yang banyak.
+Sedangkan ada hal yang lebih penting daripada sekedar menjalankan perintah linux satu per satu yaitu
+Kestabilan dari Distribusi Sistem Operasi GNU/Linux.
+
+Berikut beberapa kasus yang menginspirasi penulis untuk membuat Tools dengan nama B<BlankOnDev>, yaitu :
+
+=over
+
+=item * Konfigurasi sistem lokal pemaket sebelum melakukan aktifitas pemaket, ini juga harus dilakukan banyak percobaan
+untuk menghasilkan konfigurasi yang stabil.
+
+=item * Sistem kontrol server repositori yang menurut penulis masih perlu diperbaiki untuk mencegah terjadi permasalahan
+di server repositori GNU/Linux BlankOn. Dan ketika terjadi permasalahan dapat diselesaikan dalam kurung waktu sangat singkat.
+
+=item * Build Paket di mesin lokal Pemaket. Aktifitas ini, juga bisa dikatakan sangat panjang jika terjadi permasalahan seperti
+patch bugs paket BlankOn. Aktifitas build tanpa adanya permasalahan juga akna sangat panjang, jika Pemaket harus menentukan
+versi paket yang akan dipaketkan atau melakukan uji coba terhadap versi paket sebelum di dorong ke B<irgsh>.
+
+=item * Build paket beserta dependensi paket. Setiap paket utama yang akan dibuild tentunya memiliki dependensi atau
+dalam artian adanya keterkaitan antar paket lainnya. Agar paket utama yang dibuild dapat stabil saat installasi maupun penggunaannya,
+maka dependensi paket juga harus sama stabilnya. Kemudian, jika hal ini dilakukan secara manual oleh pemaket,
+maka pasti akan memakan banyak waktu.
+
+=item * Pengaturan repositori di sistem pemaket, proses penggantian alamat Repositori masih tergolong manual,
+karena harus mengedit file konfigurasi di C</etc/apt/sources.list>. Jika hanya sebagai pengguna biasa ini tidak masalah.
+Namun untuk pengembang ini sangat banyak makan waktu ketika harus melakukan pengujian terhadap repositori.
+
+=item * Proses pencarian source sebelum build paket. Ini juga akan memakan banyak waktu untuk mencari source paket yang sesuai dari beberapa repositori Debian GNU/Linux maupun turunannya.
+
+=back
+
+Selain butir-butir diatas penulis juga terinspirasi dengan B<Debian Manifasto> yang di tulis oleh I<Ian A. Murdock>,
+sebagai konstruksi awal dari pengembangan Debian GNU/Linux. Dan juga menjadi landasan pengembangan I<BlankOnDev Tools>.
+
+=head2 1.3. Teknologi yang digunakan oleh BlankOnDev
+
+Pengembangan B<BlankOnDev tools> menggunakan bahasa pemrogram B<Perl> demi kemudahan penulis untuk membuat beberapa tools,
+apalagi Perl sangat powerful untuk pemrograman text.
+
+Terdapat beberapa paket-paket Debian yang masih menggunakan I<Perl> sampai saat ini, seperti beberapa tools I<dpkg>, I<apt>
+dan masih banyak lagi tool-tool yang selama ini sering digunakan dan dibuat dengan bahasa pemrograman B<Perl>.
+
+I<Perl philosophy : "Kami dapat mengajari Anda bagaimana kami melukis, tapi kami tidak dapat mengajari Anda bagaimana Anda melukis">
+
+Prototype B<apt-get> dan Baptitude> juga awalanya menggunakan bahasa pemrogram Perl yang kemudian ditulis ulang ke C/C++.
+Tools B<tasksel> yang berjalan pada instalasi mode text Debian GNU/Linux dan juga bisa dijalakan setelah instalasi, masih menggunakan Perl.
+Beberapa hal ini juga menjadi alasan penulis untuk membuat program BlankOnDev dengan bahasa pemrogram perl.
+Konsep seperti tool B<tasksel> yang akan digunakan oleh penulis kedepannya untuk memenuhi seluruh daftar fitur yang disebutkan pada I<Tutorial> ini.
+
+Salah satu tools Debian yang digunakan untuk melihat semua dependensi terhadap suatu paket tertentu yaitu B<apt-rdepends>.
+output dari tools dari B<apt-rdepends> seperti berikut :
+
+    $ apt-rdepends tar
+    Reading package lists... Done
+    Building dependency tree
+    Reading state information... Done
+    tar
+    	PreDepends: libacl1 (>= 2.2.51-8)
+    	PreDepends: libc6 (>= 2.17)
+    	PreDepends: libselinux1 (>= 1.32)
+    libacl1
+    	Depends: libattr1 (>= 1:2.4.46-8)
+    	Depends: libc6 (>= 2.14)
+    	PreDepends: multiarch-support
+    libattr1
+    	Depends: libc6 (>= 2.4)
+    	PreDepends: multiarch-support
+    libc6
+    	Depends: libgcc1
+    libgcc1
+    	Depends: gcc-4.9-base (= 4.9.2-10)
+    	Depends: libc6 (>= 2.14)
+    	PreDepends: multiarch-support
+    gcc-4.9-base
+    multiarch-support
+    	Depends: libc6 (>= 2.3.6-2)
+    libselinux1
+    	Depends: libc6 (>= 2.14)
+    	Depends: libpcre3 (>= 8.10)
+    	PreDepends: multiarch-support
+    libpcre3
+    	Depends: libc6 (>= 2.14)
+    	PreDepends: multiarch-support
+
+=head2 1.4. List Command
+
+Daftar perintah pada program B<BlankOnDev> terdiri dari 2 bagian yaitu :
+
+=over
+
+=item Perintah untuk konfigurasi program
+
+=item Perintah untuk Migrasi Paket.
+
+=back
+
+=head3 Perintah Konfigurasi Program
+
+Bagian ini terdiri dari 9 Perintah yaitu :
+
+=over
+
+=item 1.
+Perintah C<B< boidev config>> - Perintah ini digunakan untuk melakukan pengaturan sebelum penggunaan program lebih lanjut.
+
+=item 2.
+Perintah C<B<boidev mig_prepare>> - Perintah ini digunakan persiapan sebelum melakukan migrasi paket, seperti B<url branch>, B<url github>, B<email github>, dan data untuk proses Generate key dengan B<GnuPG>.
+
+=item 3.
+Perintah C<B<boidev install-pkg>> - Perintah ini digunakan untuk instalasi beberapa paket debian yang dibutuhkan untuk Tim Pemaket.
+
+=item 4.
+Perintah C<B<boidev gpg-auth>> dan C<B<boidev gpg-auth-dec>> - Perintah ini digunakan untuk melihat B<nama>, B<email> dan B<passphrase> B<GnuPG> yang digunakan untuk C<Generate Key>.
+
+=item 5.
+Perintah C<B<boidev gpg-genkey>> - Perintah ini digunakan untuk melakukan C<Generate key GnuPG>
+
+=item 6.
+Perintah C<B<boidev list-cfg>> - Perintah ini digunakan untuk melihat daftar konfigurasi program B<BlankOnDev> yang telah dilakukan.
+
+=item 7.
+Perintah C<B<boidev list-file>> - Perintah ini digunakan untuk melihat daftar file konfigurasi yang tersimpan pada sistem program B<BlankOnDev>.
+
+=item 8.
+Perintah C<B<boidev rilis>> - Perintah Ini digunakan untuk mengubah rilis B<BlankOn> yang digunakan pada program B<BlankOnDev>
+
+=item 9.
+Perintah C<B<boidev -v>> atau C<B<boidev --version>> - Perintah ini digunakan untuk melihat versi tools C<BlankOnDev>
+
+=back
+
+=head3 Perintah Migrasi Paket
+
+Bagian ini terdiri dari 17 Perintah yaitu :
+
+=over
+
+=item 1.
+Perintah C<B<boidev bzr2git>> - Perintah ini merupakan perintah yang digunakan untuk melakukan Migrasi paket dari repositori B<Bazaar> ke repositori B<Github>
+
+=item 2.
+Perintah C<B<boidev bzr2git addpkg-group>> - Perintah ini merupakan perintah yang digunakan untuk menambahkan group paket yang akan dimigrasi.
+
+=item 3.
+Perintah C<B<boidev bzr2git addpkg>> - Perintah ini merupakan perintah yang digunakan untuk menambahkan nama paket yang akan di migrasi
+
+=item 4.
+Perintah C<B<boidev bzr2git addpkg-file>> - Perintah ini merupakan perintah yang digunakan untuk menambahkan nama paket yang akan dimigrasi melalui file list paket yang berekstensi B<.boikg>
+
+=item 5.
+Perintah C<B<boidev bzr2git remove-pkg-group>> - Perintah ini merupakan perintah yang digunakan untuk menghapus nama group paket migrasi. Perintah ini akan menghapus semau daftar paket yang terkait dengan B<Group>.
+
+=item 6.
+Perintah C<B<boidev bzr2git rename-pkg-group>> - Perintah ini merupakan perintah yang digunakan untuk mengubah nama group paket migrasi.
+
+=item 7.
+Perintah C<B<boidev bzr2git remove-pkg>> - Perintah ini merupakan perintah yang digunakan untuk menghapus nama paket yang terdaftar pada system program B<BlankOnDev>
+
+=item 8.
+Perintah C<B<boidev bzr2git list-pkg>> - Perintah ini merupakan perintah yang digunakan untuk melihat daftar paket yang terdaftar pada system program B<BlankOnDev>.
+
+=item 9.
+Perintah C<B<boidev bzr2git list-pkg-group>> - Perintah ini merupakan perintah yang digunakan untuk melihat daftar group paket.
+
+=item 10.
+Perintah C<B<boidev bzr2git search-pkg>> - Perintah ini merupakan perintah yang digunakan utnuk mencari nama paket yang terdaftar pada system program B<BlankOnDev>.
+
+=item 11.
+Perintah C<B<boidev bzr2git branch>> - Perintah ini merupakan perintah yang digunakan untuk mengambil/download paket dari repositori bazaar berdasarkan nama paket yang sudah terdaftar pada system program B<BlankOnDev>.
+
+=item 12.
+Perintah C<B<boidev bzr2git bzr-cgit>> - Perintah ini merupakan perintah yang digunakan untuk mengkonversi format repositori bazaar ke format repositori github, berdasarkan nama paket yang sudah terdaftar pada system program B<BlankOnDev>
+
+=item 13.
+Perintah C<B<boidev bzr2git git-push>> - Perintah ini merupakan perintah yang digunakan untuk mendorong/upload yang sudah didownload, berdasarkan nama paket yang sudah terdaftar pada system program B<BlankOnDev>
+
+=item 14.
+Perintah C<B<boidev bzr2git git-push-new>> - Perintah ini merupakan perintah yang digunakan untuk mendorong/upload yang sudah didownload namum belum dikonversi ke format repositori github, berdasarkan nama paket yang sudah terdaftar pada system program B<BlankOnDev>. Perintah ini sama seperti instruksi yang tampil dihalaman github saat  nama repositori baru ditambahkan.
+
+=item 15.
+Perintah C<B<boidev bzr2git git-check>> - Perintah ini merupakan perintah yang digunakan untuk validasi repositori yang sudah diupload ke github.
+
+=item 16.
+Perintah C<B<boidev bzr2git re-branch>> - Perintah ini merupakan perintah untuk download ulang paket dari bazaar repositori.
+
+=item 17.
+Perintah C<B<boidev bzr2git re-gitpush>> - Perintah ini digunakan untuk memperbaiki kesalahan upload paket ke github yang dimana paket belum dilakukan convert format sebelumnya.
+
+=back
+
+=head3 Perintah help
+
+Bagian ini terdiri dari 17 Perintah yaitu :
+
+=over
+
+=item 1.
+Perintah C<B<boidev help>> - Untuk melihat seluruh help perintah C<boidev>
+
+=item 2.
+Perintah C<B<boidev bzr2git help>> - Untuk melihat seluruh perintah C<boidev bzr2git>
+Adapun perintah help untuk perintah yang diawali dengan perintah C<boidev bzr2git> yaitu :
+
+=over
+
+=item * perintah C<B<boidev bzr2git addpkg-group help>>
+
+=item * perintah C<B<bzr2git addpkg help>>
+
+=item * perintah C<B<bzr2git addpkg-file help>>
+
+=item * perintah C<B<bzr2git list-pkg help>>
+
+=item * perintah C<B<bzr2git rename-pkg-group help>>
+
+=item * perintah C<B<bzr2git remove-pkg-group help>>
+
+=item * perintah C<B<bzr2git remove-pkg help>>
+
+=item * perintah C<B<bzr2git search-pkg help>>
+
+=item * perintah C<B<bzr2git branch help>>
+
+=item * perintah C<B<bzr2git bzr-cgit help>>
+
+=item * perintah C<B<bzr2git git-push help>>
+
+=item * perintah C<B<bzr2git git-push-new help>>
+
+=item * perintah C<B<bzr2git git-check help>>
+
+=item * perintah C<B<bzr2git re-branch help>>
+
+=item * perintah C<B<bzr2git re-gitpush help>>
+
+=back
+
+=back
+
+=head1 2. Persiapan dan Implementasi
+
+=head2 2.1. Persiapan
+
+Pada bagian ini akan dijelaskan hal-hal yang perlu dipersipakan sebelum menggunakan program B<BlankOnDev> yaitu "B<rng-tools>".
+
+=head3 2.1.1. Install dan Konfigurasi I<rng-tools>
+
+Untuk install B<rng-tools> dengan perintah
+
+    sudo apt-get install rng-tools
+
+Kemudian edit file C</etc/default/rng-tools> dengan perintah :
+
+    sudo vim /etc/default/rng-tools
+
+Dan tambahkan script C<HRNGDEVICE=/dev/urandom> seperti berikut :
+
+    # Configuration for the rng-tools initscript
+    # $Id: rng-tools.default,v 1.1.2.5 2008-06-10 19:51:37 hmh Exp $
+
+    # This is a POSIX shell fragment
+
+    # Set to the input source for random data, leave undefined
+    # for the initscript to attempt auto-detection.  Set to /dev/null
+    # for the viapadlock driver.
+    #HRNGDEVICE=/dev/hwrng
+    #HRNGDEVICE=/dev/null
+    HRNGDEVICE=/dev/urandom
+
+    # Additional options to send to rngd. See the rngd(8) manpage for
+    # more information.  Do not specify -r/--rng-device here, use
+    # HRNGDEVICE for that instead.
+    #RNGDOPTIONS="--hrng=intelfwh --fill-watermark=90% --feed-interval=1"
+    #RNGDOPTIONS="--hrng=viakernel --fill-watermark=90% --feed-interval=1"
+    #RNGDOPTIONS="--hrng=viapadlock --fill-watermark=90% --feed-interval=1"
+
+Pada file tersebut hanya menambahkan script C<HRNGDEVICE=/dev/urandom> setelah 
+komentar C<\#HRNGDEVICE=/dev/null>.
+
+Kemudian, Simpan file dan start service B<rng-tools> seperti contoh perintah berikut:
+
+    sudo /etc/init.d/rng-tools start
+    
+=head3 2.1.2. Membuat I<SSH Public key authentication> for Github
+
+Konfigurasi ini bertujuan agar pada saat push repositori ke Github tidak lagi harus memasukkan C<Username> dan C<Password> saat proses push repositori.
+
+=head4 2.1.2.1. Membuat Public key SSH
+
+Jalankan perintah C<B<ssh-keygen -t rsa>> seperti berikut :
+
+    $ ssh-keygen -t rsa -b 4096 -C "linuxer08@gmail.com"
+    Generating public/private rsa key pair.
+    Enter file in which to save the key (/home/yusrideb/.ssh/id_rsa):
+    Created directory '/home/yusrideb/.ssh'.
+
+Langsung Saja Tekan Enter pada Kedua form ini.
+
+    Enter passphrase (empty for no passphrase):
+    Enter same passphrase again:
+
+Kemudian proses akan dilanjukan seperti ilustrasi beriku ini :
+
+    Your identification has been saved in /home/yusrideb/.ssh/id_rsa.
+    Your public key has been saved in /home/yusrideb/.ssh/id_rsa.pub.
+    The key fingerprint is:
+    SHA256:KkcuVZ/vd9mbbtU0w62ThEqa/63ZrdV762h9SIfeRys linuxer08@gmail.com
+    The key's randomart image is:
+    +---[RSA 2048]----+
+    |                 |
+    |                 |
+    |        .    .. .|
+    |       . .... .+o|
+    |      o S+o. . =+|
+    |     + .o ..  * *|
+    |    o +  .  .o.*B|
+    |     +    .. E=BX|
+    |           .*+OXB|
+    +----[SHA256]-----+
+
+=head4 2.1.2.2. Menambahkan SSH Key di Akun Github
+
+Pada bagian ini sebagai contoh file I<Public Key SSH> berada di C</home/yusrideb/.ssh/id_rsa.pub>
+Setelah itu, masuk ke akun github dan lakukan pengaturan di bagian I<SSH and GPG Keys> untuk menanbahkan I<SSH Key> pada B<Github> dengan isi dari file
+C</home/yusrideb/.ssh/id_rsa.pub>, seperti berikut :
+
+=begin html
+
+<p><center>
+<figure>
+<img src="https://yusrideb.github.io/BlankOnDev/docs/source/img/add-ssh-key-on-gtihub.png" alt="Form Awal CPAN" />
+<figcaption>Gambar 2.1. <b>Public SSH Key> di Akun Github</b></figcaption>
+</figure>
+</center></p>
+
+=end html
+
+Penjelasan gambar :
+
+=over
+
+=item * Klik B<SSH and GPG Keys>
+
+=item * Klik B<New SSH Key>
+
+=item * Masukkan Nama I<SSH Key>, contohnya B<My_SSH\_key>
+
+=item * Masukkan isi file C<id\_rsa.pub> ke dalam form input B<Key>, Setelah itu klik B<Add SSH Key>.
+
+=item * Hasil akan tampil di Daftar B<SSH Keys> seperti yang ditunjukkan oleh gambar diatas.
+
+=back
+
+=head3 2.1.3. Metode Instalasi secara Manual
+
+Instalasi manual untuk Module Perl B<BlankOnDev> yang dimaksud disini yaitu instalasi dari Source Module CPAN yang dapat didownload pada halaman :
+
+L<https://metacpan.org/module/BlankOnDev> atau L<https://github.com/yusrideb/BlankOnDev>
+
+=head4 2.1.3.1. Install Dependensi Module
+
+Jika versi B<BlankOnDev Toos> yang terbaru sudah pernah di install sebelumnya, maka I<Dependensi> tidak pernah di install lagi.
+
+    sudo cpan -i Crypt::Blowfish Digest::MD5
+    sudo cpan -i MIME::Base64 MIME::Base64::Perl JSON DateTime
+    sudo cpan -i GnuPG Hash::MultiValue Term::ReadKey LWP::UserAgent
+    sudo cpan -i Text::SimpleTable::AutoWidth Capture::Tiny
+
+=head4 2.1.3.1. Install Module Perl
+
+Download Source dari halaman L<https://metacpan.org/module/BlankOnDev>,
+Contoh file source : "B<BlankOnDev-0.1005.tar.gz>"
+
+    tar xzvf BlankOnDev-0.1005.tar.gz
+    cd BlankOnDev-0.1005
+    sudo perl Makefile.PL && make && make install && make clean.
+
+=head3 2.1.4. Metode Instalasi BlankOnDev dari CPAN Perl
+
+Pada bagian ini I<Dependensi> beserta module utama akan di install secara otomatis. ketika perintah C<cpan -i> di jalankan, seperti berikut :
+
+    sudo cpan -i BlankOnDev
+
+Proses instalasi ini akan berlangsung kurang lebih 10 menit dan bisa lebih tergantung kemampuan PC/Laptop Anda, karena selama proses instalasi berlangsung terdapat beberapa module-module dependensi yang melakukan kompilasi I<C Source>.
+
+Dengan instalasi menggunakan perintah C<cpan -i>, maka versi yang akan terinstalasi dari module dependensi atau module utama B<BlankOnDev> yaitu versi terbaru, tidak seperti B<Metode instalasi manual>, dimana versi module tergantung versi yang Anda download.
+
+Jika belum pernah menjalankan perintah B<C<cpan -i>> sebelumnya, maka pada saat perintah tersebut dijalankan pertama kali akan tampi B<Form> seperti berikut :
+
+=begin html
+
+<p><center>
+<figure>
+<img src="https://yusrideb.github.io/BlankOnDev/docs/source/img/install-from-cpan-1.png" alt="Form Awal CPAN" />
+<figcaption>Gambar 2.2. <b>Form Awal CPAN</b></figcaption>
+</figure>
+</center></p>
+
+=end html
+
+Jika tampilkan form seperti gambar diatas, langsung saja tekan B<Enter>.
+
+Jika sebelumnya anda sudah menggunakan perintah B<C<cpan -i>> maka instalasi module Perl akan dimulai, seperti berikut :
+
+=begin html
+
+<p><center>
+<figure>
+<img src="https://yusrideb.github.io/BlankOnDev/docs/source/img/install-from-cpan-2.png" alt="Form Awal CPAN" />
+<figcaption>Gambar 2.3. <b>Instalasi Module Perl di Mulai</b></figcaption>
+</figure>
+</center></p>
+
+=end html
+
+Jika pada proses instalasi tidak ditemukan masalah, maka akhir dari proses ini akan tampil seperti gambar berikut :
+
+=begin html
+
+<p><center>
+<figure>
+<img src="https://yusrideb.github.io/BlankOnDev/docs/source/img/install-from-cpan-3_finish.png" alt="Form Awal CPAN" />
+<figcaption>Gambar 2.4. <b>Instalasi Module Selesai</b></figcaption>
+</figure>
+</center></p>
+
+=end html
+
+=head2 2.2. Implementasi
+
+Pada bagian ini akan dijelaskan langkah-langkah penggunaan perintah B<boidev>. Berikut gambaran penggunaan perintah B<boidev> :
+
+=head3 2.2.1. Persiapan Migrasi Paket :
+
+=over
+
+=item 1.
+B<Step 1> - Perintah yang dijalankan sebelum menjalankan perintah B<boidev> lainnya yaitu perintah B<C<boidev config>> untuk konfigurasi program seperti :
+
+=over
+
+=item * Memasukkan nama B<time zone>,
+
+=item * Memasukkan alamat B<Email> yang digunakan di akun I<Github> dan maupun alamat B<Email> untuk generate key dengan GnuPG, dan
+
+=item * Generate Key GnuPG.
+
+=back
+
+=item 2.
+B<Step 2> - Menggunakan perintah C<boidev mig_prepare>. Perintah ini akan melakukan persiapan sebelum Migrasi paket, yaitu :
+
+=over
+
+=item * Config github, seperti I<nama>, I<Alamat Email>, dan I<Cache Username dan Password>
+
+=item * Opsi Generate Key GnuPG.
+
+=item * Memasukkan alamat bazaar repositori (example: B<http://dev.blankonlinux.or.id/browser/tambora>).
+
+=item * Memasukkan alamat github repositori (example: B<https://github.com/blankon-packages>)
+
+=back
+
+=item 3.
+B<Step 3> -  Menambahkan I<Group Paket> untuk I<Paket-paket> yang akan di migrasi ke repositori github. Perintah yang digunakan antara lain :
+
+=over
+
+=item * perintah C<boidev bzr2git addpkg-group>,
+
+=item * perintah C<boidev bzr2git addpkg> dan
+
+=item * perintah C<boidev bzr2git addpkg-file>
+
+=back
+
+=back
+
+=head3 2.2.2. Proses Migrasi Paket :
+
+=over
+
+=item 1.
+B<Skema split> - Branch, convert format, dan push dilakukan terpisah, dengan perintah :
+
+=over
+
+=item * perintah C<boidev bzr2git branch>
+
+=item * perintah C<boidev bzr2git bzr-cgit>
+
+=item * perintah C<boidev bzr2git git-push>
+
+=item * perintah C<boidev bzr2git git-check>
+
+=back
+
+=item 2.
+B<Skema one-time> - Branch, convert format, dan push dilakukan sekaligus dengan satu perintah yaitu dengan perintah C<boidev bzr2git>.
+
+=back
+
+=head2 2.3. Persiapan Migrasi Paket
+
+=head3 2.3.1.Persiapan Migrasi Paket - C<boidev config>
+
+Jalankan perintah C<boidev config> pada B<User biasa> bukan I<User root> seperti berikut :
+
+    $ boidev config
+
+Kemudian proses C<apt-get update> akan berjalan seperti berikut :
+
+    Hit:1 http://repo.ridon.id/blankon tambora InRelease
+    Hit:2 http://repo.ridon.id/blankon tambora-updates InRelease
+    Hit:3 http://repo.ridon.id/blankon tambora-security InRelease
+    Reading package lists... Done
+    Reading package lists... Done
+
+Setelah proses diatas maka akan di install beberapa paket-paket yang dibutuhkan oleh B<Tim Pemaket>. Setelah instalasi paket selesai, Kemudian akan tampil Form seperti berikut dan masukkan nomor sesuai dengan yang ada di B<List>.
+
+    List TimeZone :
+    1. WIB
+    2. WITA
+    3. WIT
+    Enter your time zone [WITA] : 2
+
+Form berikut ini isi sesuai petunjuk yang diberi tanda B<#>.
+
+    # Nama Lengkap
+    Enter your name : Achmad Yusri Afandi
+
+    # Email Github
+    Enter your email address Github Account : linuxer08@gmail.com
+
+    # Email yang digunakan saat generate GnuPG
+    Enter your email address for GnuPG Generate Key : yusrideb@cpan.org
+
+
+    # Masukkan Passphrase seperti saat menjalankan gpg --gen-key
+    Enter Passphrase gpg :
+
+   
+=head3 2.3.2. Dengan perintah C<boidev mig_prepare>
+
+Jalankan perintah berikut :
+
+    $ boidev mig_prepare
+
+Setelah itu akan tampil form seperti pada C<boidev config> :
+
+    List TimeZone :
+    1. WIB
+    2. WITA
+    3. WIT
+    Enter your time zone [WITA] : 2
+
+Form berikut yaitu form B<Github config> :
+
+    You want reconfig github [y/n]:
+
+=head4 2.3.2.1. Penjelasan form B<reconfig github> :
+
+=over
+
+=item * Jika jawabannya B<C<y>> maka akan tampil form config github seperti berikut :
+
+    # Masukkan nama jika, ingin mengubah nama yang sudah
+    # tersimpan pada system. Jika tidak langsung tekan Enter
+    Enter your github fullname [Achmad Yusri Afandi] :
+
+    # Masukkan email github, jika ingin mengubah nama yang sudah
+    # tersimpan pada system. Jika tidak langsung tekan Enter
+    Enter your github email [linuxer08@gmail.com] :
+
+=item Jika inputnya B<C<n>> maka akan dilanjutkan ke form berikutnya.
+
+=back
+
+=head4 2.3.2.2. Form GnuPG Generate Key :
+
+    You want GnuPG Generate key [y/n]:
+    
+=over
+
+=item * Jika jawabannya B<C<y>> :
+	
+	# Masukkan nama jika, ingin mengubah nama yang sudah
+	# tersimpan pada system. Jika tidak langsung tekan Enter
+	Enter Name [Achmad Yusri Afandi] :
+
+	# Masukkan email untuk GnuPG, jika ingin mengubah nama yang
+	# sudah tersimpan pada system.
+	# Jika tidak langsung tekan Enter
+	Enter E-mail [yusrideb@cpan.org] :
+	
+Setelah form diatas, maka akan tampil form untuk mengubah I<passphrase GnuPG> atau tidak, 
+Jika jawabannya "C<B<y>>" maka akan tampil form untuk memasukkan passphrase, 
+jika tidak, maka proses B<Generate Key GnuPG> akan dilanjutkan.
+
+	You want to enter different passphrase GnuPG ? [y or n] n
+	
+\noindent
+Setelah form diatas, maka akan tampil hasil B<Generate Key GnuPG> :
+	
+	Enter passphrase : pub   1024R/243741DF 2017-06-12
+	Key fingerprint = 8891 3EF3 6E21 C298 B7B6  0F0A 1380 3397 2437 41DF
+	uid                  Achmad Yusri Afandi <yusrideb@cpan.org>
+	sub   1024R/EF69A466 2017-06-12
+
+=item * Jika jawaban B<C<n>>, maka akan langsung ke form untuk memasukkan URL.
+
+=back
+
+=head4 2.3.2.3. Form URL Repositori Bazaar dan Github :
+
+=over
+
+=item * Jika data B<belum ada> :
+
+	# Masukkan URL repositori bazaar, contohnya :
+	# http://dev.blankonlinux.or.id/browser/tambora
+	#
+	Enter bzr url :
+
+	# Masukkan URL repositori Github, contohnya :
+	# https://github.com/blankon-packages
+	#
+	Enter git url :
+
+=item * Jika data B<sudah ada> :
+
+	# Masukkan URL  URL repositori bazaar jika anda ingin
+	# mengubah alamatnya. Jika tidak, langsung saja tekan Enter.
+	#
+	Enter bzr url [http://dev.blankonlinux.or.id/browser/tambora] :
+
+	# Masukkan URL  URL repositori github jika anda ingin
+	# mengubah alamatnya. Jika tidak, langsung saja tekan Enter.
+	#
+	Enter git url [git@github.com:blankon-packages] :
+
+=back
+
+=head3 2.3.3. Menambahkan Group paket dan nama paket
+
+Seperti yang telah dijelaskan pada upabab L<I<2. Implementasi - I<Persiapan Migrasi Paket>>|https://metacpan.org/pod/distribution/BlankOnDev/lib/BlankOnDev/Tutorial/id.pod#Proses-Migrasi-Paket> yaitu menggunakan perintah "C<boidev bzr2git addpkg-group>", "C<boidev bzr2git addpkg>" dan "C<boidev bzr2git addpkg-file>".
+
+=head4 2.3.3.1. Menambahkan Group Paket
+
+Untuk menambahkan group paket gunakan perintah berikut :
+
+    $ boidev bzr2git addpkg-group
+
+kemudian akan tampil form seperti berikut :
+
+    Enter new group name : github-6
+
+Atau langsung masukkan nama paket group, contoh nama group paket B<githb-6>
+
+    $ boidev bzr2git addpkg-group github-6
+
+Outputnya seperti berikut:
+
+    Success added package group with name "github-6"
+
+=head4 2.3.3.2. Melihat daftar Group paket
+
+Jalankan perintah berikut :
+
+    $ boidev bzr2git list-pkg-group
+
+dan outputnya seperti berikut :
+
+    Exists Groups :
+    ------------------------------------------------------
+    - github-6
+
+
+=head4 2.3.3.3. Menambahkan nama paket
+
+Jalankan perintah berikut :
+
+    $ boidev bzr2git addpkg
+
+kemudian akan tampil form seperti berikut :
+
+    # Masukkan nomor list group
+    #
+    Choose Group Packages.
+    1. github-6
+    Enter Number choice : 1
+
+    # Masukkan nama group
+    #
+    Enter New Packages : gnome-font-viewer
+
+atau langsung masukkan nama paket :
+
+    $ boidev bzr2git addpkg gnome-font-viewer
+
+Form pilih nama group :
+
+    # Masukkan nomor list group
+    #
+    Choose Group Packages.
+    1. github-6
+    Enter Number choice : 1
+
+
+=head4 2.3.3.4. Menambahkan nama paket dari file
+
+Cara ini digunakan jika terdapat lebih dari 1 nama paket yang akan ditambahkan contohnya :
+
+    gnome-documents
+    gnome-font-viewer
+    gnome-icon-theme
+    gnome-icon-theme-symbolic
+    gnome-keyring
+    gnome-logs
+    gnome-menus
+    gnome-music
+    gnome-online-accounts
+    gnome-packagekit
+    gnome-photos
+    gnome-pkg-tools
+    gnome-power-manager
+    gnome-screensaver
+    gnome-screenshot
+    gnome-shell
+    gnome-settings-daemon
+    gnome-shell-extensions
+    gnome-software
+
+Daftar nama paket tersebut dimasukkan kedalam file yang berekstensi B<.boikg>, karena program hanya akan membaca file yang berekstensi B<.boikg>
+
+Setelah daftar I<nama paket> dimasukkan dalam file, kemudian jalankan perintah berikut dengan syntax : C<boidev bzr2git addpkg-file [lokasi_file/nama_file.bokg]>
+
+Contoh lokasi file di : C</home/yusrideb/github-6.boikg>
+
+    $ boidev bzr2git addpkg-file /home/yusrideb/github-6.boikg
+
+Kemudian akan tampil form untuk memilih group paket :
+
+    # Masukkan nomor list :
+    #
+    Choose Group Packages.
+    1. github-6
+    Enter Number choice : 1
+
+Output :
+
+    "gnome-documents" has success added.
+    "gnome-font-viewer" has success added.
+    "gnome-icon-theme" has success added.
+    "gnome-icon-theme-symbolic" has success added.
+    "gnome-keyring" has success added.
+    "gnome-logs" has success added.
+    "gnome-menus" has success added.
+    "gnome-music" has success added.
+    "gnome-online-accounts" has success added.
+    "gnome-packagekit" has success added.
+    "gnome-photos" has success added.
+    "gnome-pkg-tools" has success added.
+    "gnome-power-manager" has success added.
+    "gnome-screensaver" has success added.
+    "gnome-screenshot" has success added.
+    "gnome-shell" has success added.
+    "gnome-settings-daemon" has success added.
+    "gnome-shell-extensions" has success added.
+    "gnome-software" has success added.
+
+    19 packages has added...
+
+=head4 2.3.3.5. Melihat Daftar Paket
+
+Untuk melihat list paket, menggunakan perintah :
+
+=over
+
+=item * C<boidev bzr2git list-pkg>
+
+=item * C<boidev bzr2git list-pkg <nama_group_paket>>
+
+=back
+
+B<Perintah C<boidev bzr2git list-pkg>>
+
+    $ boidev bzr2git list-pkg
+
+Kemudian akan form untuk memilih group paket, setelah itu akan tampil daftar paket seperti berikut:
+
+=begin html
+
+<p><center>
+<figure>
+<img src="https://yusrideb.github.io/BlankOnDev/docs/source/img/boidev_bzr2git_list-pkg.png" alt="Daftar Paket yang telah ditambahkan dengan nama group github-6" />
+<figcaption>Gambar 2.5. <b>Daftar Paket yang telah ditambahkan dengan nama group github-6</b></figcaption>
+</figure>
+</center></p>
+
+=end html
+
+B<Perintah C<boidev bzr2git list-pkg <nama_group_paket>>
+
+    $ boidev bzr2git list-pkg github-6
+
+Output :
+
+=begin html
+
+<p><center>
+<figure>
+<img src="https://yusrideb.github.io/BlankOnDev/docs/source/img/boidev_bzr2git_list-pkg_groupName.png" alt="Daftar Paket yang telah ditambahkan dengan nama group github-6" />
+<figcaption>Gambar 2.6. <b>Daftar Paket yang telah ditambahkan dengan nama group github-6</b></figcaption>
+</figure>
+</center></p>
+
+=end html
+
+=head2 2.4. Proses Migrasi Paket
+
+Proses yang dilakukan disini yaitu penggunaan perintah-perintah seperti contoh berikut. Perintah B<boidev> bertujuan untuk meminimalisir kesalahan penulisan perintah ataupun kesalahan penulisan I<nama paket>.
+
+    bzr branch http://dev.blankonlinux.or.id/browser/tambora/<nama_paket>
+    cd <nama_paket>
+    git init
+    bzr fast-export $(pwd) | git fast-import
+    git reset HEAD
+    rm -rf .bzr
+    git remote add origin git@github.com:blankon-packages/<nama_paket>.git
+    git push -u origin master
+    git checkout -b tambora
+    git push -u origin tambora
+    git branch -a
+
+=head3 2.4.1. Migrasi Paket dengan B<Metode Split>
+
+Seperti yang telah dijelaskan pada bagian I<2. Implementasi> diatas, Bahwa I<metode> ini melakukukan I<branch paket>, I<convert format ke git>,
+dan I<push ke git> secara terpisah. Seperti metode migrasi yang dilakukan secara manual seperti yang ditunjukkan pada script diatas.
+Berikut langkah-langkahnya :
+
+=head4 2.4.1.1. Perintah C<boidev bzr2git branch>
+
+Perintah yang dapat digunakan yaitu :
+
+=over
+
+=item * C<boidev bzr2git branch>
+
+=item * C<boidev bzr2git branch <nama\_group\_paket>>
+
+=back
+
+Proses yang akan tampil ketika salah satu perintah diatas dijalankan yaitu :
+    
+    # Masuk sesuai dengan nomor list
+    #
+    Choose Group Packages.
+    1. github-6
+    Enter Number choice : 1
+    
+    # Jika jawabannya "y" maka jika nama paket sudah ada akan dihapus.
+    # Jika jawabannya "n" maka `branch` tidak akan dilakukan pada 
+    # nama paket yang sudah ada.
+    #
+    You want to re-branch if packages is exists on local directory [y/n] : y
+    
+    Branch : "gnome-screensaver"
+    Result Action branch : 1
+    
+    
+    Branch : "gnome-icon-theme"
+    Result Action branch : 1
+    
+    Branch : "gnome-menus"
+    Result Action branch : 1
+    
+    Branch : "gnome-keyring"
+    Result Action branch : 1
+    
+    Branch : "gnome-settings-daemon"
+    Result Action branch : 1
+    
+    Branch : "gnome-online-accounts"
+    Result Action branch : 1
+    
+    Branch : "gnome-shell-extensions"
+    Result Action branch : 1
+    
+    Branch : "gnome-screenshot"
+    Result Action branch : 1
+    
+    Branch : "gnome-font-viewer"
+    Result Action branch : 1
+    
+    Branch : "gnome-logs"
+    Result Action branch : 1
+    
+    Branch : "gnome-shell"
+    Result Action branch : 1
+    
+    Branch : "gnome-music"
+    Result Action branch : 1
+    
+    Branch : "gnome-icon-theme-symbolic"
+    Result Action branch : 1
+    
+    Branch : "gnome-power-manager"
+    Result Action branch : 1
+    
+    Branch : "gnome-documents"
+    Result Action branch : 1
+    
+    Branch : "gnome-pkg-tools"
+    Result Action branch : 1
+    
+    Branch : "gnome-software"
+    Result Action branch : 1
+    
+    Branch : "gnome-photos"
+    Result Action branch : 1
+    
+    Branch : "gnome-packagekit"
+    Result Action branch : 1
+    
+    ==================== bzr branch has finished ====================
+
+=head4 2.4.1.2. Perintah C<boidev bzr2git bzr-cgit>
+
+Perintah yang dapat digunakan yaitu :
+
+=over
+
+=item * C<boidev bzr2git bzr-cgit>
+
+=item * C<boidev bzr2git bzr-cgit <nama_group_paket>>
+
+=back
+
+Proses yang akan tampil ketika salah satu perintah diatas dijalankan yaitu :
+    
+    # Masuk sesuai dengan nomor list
+    #
+    Choose Group Packages.
+    1. github-6
+    Enter Number choice : 1
+    
+    Converting .... 
+    
+    Action Convert gnome-logs : 1
+    Action Convert gnome-online-accounts : 1
+    Action Convert gnome-keyring : 1
+    Action Convert gnome-settings-daemon : 1
+    Action Convert gnome-screensaver : 1
+    Action Convert gnome-packagekit : 1
+    Action Convert gnome-power-manager : 1
+    Action Convert gnome-screenshot : 1
+    Action Convert gnome-font-viewer : 1
+    Action Convert gnome-music : 1
+    Action Convert gnome-icon-theme : 1
+    Action Convert gnome-software : 1
+    Action Convert gnome-shell : 1
+    Action Convert gnome-menus : 1
+    Action Convert gnome-pkg-tools : 1
+    Action Convert gnome-icon-theme-symbolic : 1
+    Action Convert gnome-documents : 1
+    Action Convert gnome-photos : 1
+    Action Convert gnome-shell-extensions : 1
+    
+    ======= Packages in group "github-6" has been finished to convert ========
+
+=head4 2.4.1.3. Perintah C<boidev bzr2git git-push>
+
+Perintah yang dapat digunakan yaitu :
+
+=over
+
+=item * C<boidev bzr2git git-push>
+
+=item * C<boidev bzr2git git-push [nama_group_paket]>
+
+=back
+
+Proses yang akan tampil ketika salah satu perintah diatas dijalankan yaitu :
+
+    # Masuk sesuai dengan nomor list
+    #
+    Choose Group Packages.
+    1. github-6
+    Enter Number choice : 1
+
+    Push to github ....
+
+
+    gitpush : gnome-music
+    Action Git push for packages gnome-music : 1
+    gitpush : gnome-software
+    Action Git push for packages gnome-software : 1
+    gitpush : gnome-packagekit
+    Action Git push for packages gnome-packagekit : 1
+    gitpush : gnome-icon-theme-symbolic
+    Action Git push for packages gnome-icon-theme-symbolic : 1
+    gitpush : gnome-documents
+    Action Git push for packages gnome-documents : 1
+    gitpush : gnome-power-manager
+    Action Git push for packages gnome-power-manager : 1
+    gitpush : gnome-online-accounts
+    Action Git push for packages gnome-online-accounts : 1
+    gitpush : gnome-settings-daemon
+    Action Git push for packages gnome-settings-daemon : 1
+    gitpush : gnome-keyring
+    Action Git push for packages gnome-keyring : 1
+    gitpush : gnome-font-viewer
+    Action Git push for packages gnome-font-viewer : 1
+    gitpush : gnome-menus
+    Action Git push for packages gnome-menus : 1
+    gitpush : gnome-screensaver
+    Action Git push for packages gnome-screensaver : 1
+    gitpush : gnome-icon-theme
+    Action Git push for packages gnome-icon-theme : 1
+    gitpush : gnome-shell
+    Action Git push for packages gnome-shell : 1
+    gitpush : gnome-photos
+    Action Git push for packages gnome-photos : 1
+    gitpush : gnome-screenshot
+    Action Git push for packages gnome-screenshot : 1
+    gitpush : gnome-pkg-tools
+    Action Git push for packages gnome-pkg-tools : 1
+    gitpush : gnome-shell-extensions
+    Action Git push for packages gnome-shell-extensions : 1
+    gitpush : gnome-logs
+    Action Git push for packages gnome-logs : 1
+
+    ======= Packages in group "github-6" has been finished to git push =======
+
+=head4 2.4.1.5. Perintah C<boidev bzr2git git-check>
+
+Perintah yang dapat digunakan yaitu :
+
+=over
+
+=item * C<boidev bzr2git git-check>
+
+=item * C<boidev bzr2git git-check <nama_group_paket>>
+
+=back
+
+Proses yang akan tampil ketika salah satu perintah diatas dijalankan yaitu :
+    
+    # Masuk sesuai dengan nomor list
+    #
+    Choose packages group : 
+    ------------------------------------------------------
+    1. github-6                  [20]
+    ------------------------------------------------------
+    Enter number of group name : 1
+    
+    Check repo on github for all packages : 
+    Check Repo [gnome-music] on github : repo_github = master, tambora 
+    Check Repo [gnome-icon-theme-symbolic] on github : repo_github = master, tambora 
+    Check Repo [gnome-settings-daemon] on github : repo_github = master, tambora 
+    Check Repo [gnome-menus] on github : repo_github = master, tambora 
+    Check Repo [gnome-online-accounts] on github : repo_github = master, tambora 
+    Check Repo [gnome-shell-extensions] on github : repo_github = master, tambora 
+    Check Repo [gnome-documents] on github : repo_github = master, tambora 
+    Check Repo [gnome-keyring] on github : repo_github = master, tambora 
+    Check Repo [gnome-icon-theme] on github : repo_github = master, tambora 
+    Check Repo [gnome-power-manager] on github : repo_github = master, tambora 
+    Check Repo [gnome-logs] on github : repo_github = master, tambora 
+    Check Repo [gnome-photos] on github : repo_github = master, tambora 
+    Check Repo [gnome-shell] on github : repo_github = master, tambora 
+    Check Repo [gnome-font-viewer] on github : repo_github = master, tambora 
+    Check Repo [gnome-pkg-tools] on github : repo_github = master, tambora 
+    Check Repo [gnome-software] on github : repo_github = master, tambora 
+    Check Repo [gnome-screenshot] on github : repo_github = master, tambora 
+    Check Repo [gnome-screensaver] on github : repo_github = master, tambora 
+    Check Repo [gnome-packagekit] on github : repo_github = master, tambora 
+    
+    ======= Git Check All Packages on Group [github-6] has finished =======
+
+=head4 2.4.3.3. Melihat hasil Migrasi
+
+Jika anda ingin melihat hasil migrasi gunakan perintah C<boidev bzr2git list-pkg [nama_group_paket]> seperti berikut :
+
+    $ boidev mig_prepare
+
+Output :
+
+=begin html
+
+<p><center>
+<figure>
+<img src="https://yusrideb.github.io/BlankOnDev/docs/source/img/boidev_bzr2git_list-pkg-check.png" alt="List Packages" />
+<figcaption>Gambar 2.7. <b>List Packages</b></figcaption>
+</figure>
+</center></p>
+
+<p><center>
+<figure>
+<img src="https://yusrideb.github.io/BlankOnDev/docs/source/img/boidev_bzr2git_list-pkg-check_zoom.png" alt="List Packages bagian hasil git-check" />
+<figcaption>Gambar 2.8. <b>List Packages bagian hasil git-check</b></figcaption>
+</figure>
+</center></p>
+
+=end html
+
+
+=head3 2.4.2. Migrasi Paket dengan B<Skema One-time>
+
+Seperti yang telah dijelaskan pada upabab L<I<2. Implementasi - Proses Migrasi Paket - Skema one-time>|https://metacpan.org/pod/distribution/BlankOnDev/lib/BlankOnDev/Tutorial/id.pod#Proses-Migrasi-Paket>,
+Bahwa I<metode> ini melakukukan I<branch paket>, I<convert format ke git>, dan I<push ke git> sekaligus dengan perintah I<C<boidev bzr2git>>. Berikut langkah-langkahnya:
+
+=head4 2.4.2.1. Migrasi 1 paket
+
+    # Untuk Migrasi 1 paket, maka masukkan nomor "3"
+    #
+    ---------------------------------------------------------------------------
+    Choose Action :
+    ---------------------------------------------------------------------------
+    1. All Packages
+    2. Specific Group Packages
+    3. Single Packages
+    Answer: 3
+
+    # Contoh paket yaitu "gnome-keyring"
+    #
+    Enter packages name : gnome-keyring
+
+    Branch : "gnome-keyring"
+    [success] Action "bzr branch -> gnome-keyring" : 1
+    [success] Action "bzr convert git -> gnome-keyring" 1
+    Username for 'https://github.com': yusrideb
+    Password for 'https://yusrideb@github.com':
+    [success] Action "git push -> gnome-keyring" 1
+    [success] Action "git check -> gnome-keyring" repo_github = master, tambora
+
+    ====== Migration packages "gnome-keyring" has been finished ======
+
+=head4 2.4.2.2. Migrasi Berdasarkan group paket
+
+    # Untuk Migrasi paket berdasarkan group, maka masukkan nomor "2"
+    #
+    ---------------------------------------------------------------------------
+    Choose Action :
+    ---------------------------------------------------------------------------
+    1. All Packages
+    2. Specific Group Packages
+    3. Single Packages
+    Answer: 2
+
+    # Masukkan sesuai nomor list
+    # Pada contoh ini yaitu nomor "3"
+    #
+    Choose packages group :
+    ------------------------------------------------------
+    1. github-end-2              [10]
+    2. github-6                  [19]
+    3. github-end-3              [5]
+    4. github-end-1              [10]
+    ------------------------------------------------------
+    Enter number of group name : 3
+
+    Doing migration ...
+
+    Branch : "ntfs-3g"
+    [success] Action "bzr branch -> ntfs-3g" : 1
+    [success] Action "bzr convert git -> ntfs-3g" 1
+    [success] Action "git push -> ntfs-3g" 1
+    [success] Action "git check -> ntfs-3g" repo_github = master, tambora
+    ------------------------------------------------------------------------
+
+    Branch : "opencv"
+    [success] Action "bzr branch -> opencv" : 1
+    [success] Action "bzr convert git -> opencv" 1
+    [success] Action "git push -> opencv" 1
+    [success] Action "git check -> opencv" repo_github = master, tambora
+    ------------------------------------------------------------------------
+    Branch : "nss"
+    [success] Action "bzr branch -> nss" : 1
+    [success] Action "bzr convert git -> nss" 1
+    [success] Action "git push -> nss" 1
+    [success] Action "git check -> nss" repo_github = master, tambora
+    ------------------------------------------------------------------------
+    Branch : "nvidia-firmware"
+    [success] Action "bzr branch -> nvidia-firmware" : 1
+    [success] Action "bzr convert git -> nvidia-firmware" 1
+    [success] Action "git push -> nvidia-firmware" 1
+    [success] Action "git check -> nvidia-firmware" repo_github = master, tambora
+    ------------------------------------------------------------------------
+    Branch : "notify-osd"
+    [success] Action "bzr branch -> notify-osd" : 1
+    [success] Action "bzr convert git -> notify-osd" 1
+    [success] Action "git push -> notify-osd" 1
+    [success] Action "git check -> notify-osd" repo_github = master, tambora
+    ------------------------------------------------------------------------
+
+    ======== Migration all packages in group "github-end-3" has been finished ========
+
+=head4 2.4.2.3. Migrasi Semua paket dalam list
+
+    # Untuk Migrasi semua paket, maka masukkan nomor "1"
+    #
+    ---------------------------------------------------------------------------
+    Choose Action :
+    ---------------------------------------------------------------------------
+    1. All Packages
+    2. Specific Group Packages
+    3. Single Packages
+    Answer: 3
+
+    # Jika jawaban "y" maka semua paket yang terdaftar akan dimigrasi secara otomatis
+    # Jika jawaban "n" maka akan muncul pertanyaan sebelum paket dalam group di migrasi
+    #
+    You want migration all packages with automatically ? [y or n] n
+
+    List Group packages to Migration :
+    ---------------------------------------------
+    1. github-end-1         [10]
+    2. github-end-2         [10]
+    3. github-6             [19]
+    4. github-end-3         [5]
+    ---------------------------------------------
+
+    You want to migration all packages in group "github-end-1 [10]" ? [y or n] y
+
+    [migration] All packages in group "github-end-1"
+    ------------------------------------------------------------------------
+    Action re-branch for packages "live-boot"
+    [success] Action "bzr branch -> live-boot" : 1
+    [success] Action "bzr convert git -> live-boot" 1
+    [success] Action "git push -> live-boot" 1
+    [success] Action "git check -> live-boot" repo_github = master, tambora
+    ------------------------------------------------------------------------
+    Branch : "manokwari"
+    [success] Action "bzr branch -> manokwari" : 1
+    [success] Action "bzr convert git -> manokwari" 1
+    [success] re-Action "bzr convert git -> manokwari" 1
+    [success] Action "re-git push -> manokwari"
+    [success] Action "git check -> manokwari" repo_github = master, tambora
+    ------------------------------------------------------------------------
+    Branch : "linux-ntfs"
+    [success] Action "bzr branch -> linux-ntfs" : 1
+    [success] Action "bzr convert git -> linux-ntfs" 1
+    [success] Action "git push -> linux-ntfs" 1
+    [success] Action "git check -> linux-ntfs" repo_github = master, tambora
+    ------------------------------------------------------------------------
+    Branch : "lvm2"
+    [success] Action "bzr branch -> lvm2" : 1
+    [success] Action "bzr convert git -> lvm2" 1
+    [success] Action "git push -> lvm2" 1
+    [success] Action "git check -> lvm2" repo_github = master, tambora
+    ------------------------------------------------------------------------
+    Branch : "maleo"
+    [success] Action "bzr branch -> maleo" : 1
+    [success] Action "bzr convert git -> maleo" 1
+    [success] Action "git push -> maleo" 1
+    [success] Action "git check -> maleo" repo_github = master, tambora
+    ------------------------------------------------------------------------
+    Branch : "mesa"
+    [success] Action "bzr branch -> mesa" : 1
+    [success] Action "bzr convert git -> mesa" 1
+    [success] Action "git push -> mesa" 1
+    [success] Action "git check -> mesa" repo_github = master, tambora
+    ------------------------------------------------------------------------
+    Branch : "manokwari-theme"
+    [success] Action "bzr branch -> manokwari-theme" : 1
+    [success] Action "bzr convert git -> manokwari-theme" 1
+    [success] Action "git push -> manokwari-theme" 1
+    [success] Action "git check -> manokwari-theme" repo_github = master, tambora
+    ------------------------------------------------------------------------
+    Branch : "live-config"
+    [success] Action "bzr branch -> live-config" : 1
+    [success] Action "bzr convert git -> live-config" 1
+    [success] Action "git push -> live-config" 1
+    [success] Action "git check -> live-config" repo_github = master, tambora
+    ------------------------------------------------------------------------
+    Branch : "metacity"
+    [success] Action "bzr branch -> metacity" : 1
+    [success] Action "bzr convert git -> metacity" 1
+    [success] Action "git push -> metacity" 1
+    [success] Action "git check -> metacity" repo_github = master, tambora
+    ------------------------------------------------------------------------
+    Branch : "manokwari-theme-greeter"
+    [success] Action "bzr branch -> manokwari-theme-greeter" : 1
+    [success] Action "bzr convert git -> manokwari-theme-greeter" 1
+    [success] Action "git push -> manokwari-theme-greeter" 1
+    [success] Action "git check -> manokwari-theme-greeter" repo_github = master, tambora
+    ------------------------------------------------------------------------
+
+    You want to migration all packages in group "github-end-2 [10]" ? [y or n] n
+
+    [no-migration] All packages in group "github-end-2"
+
+    You want to migration all packages in group "github-6 [19]" ? [y or n] y
+
+    [migration] All packages in group "github-6"
+    ------------------------------------------------------------------------
+    Action re-branch for packages "gnome-font-viewer"
+    [success] Action "bzr branch -> gnome-font-viewer" : 1
+    [success] Action "bzr convert git -> gnome-font-viewer" 1
+    [success] Action "git push -> gnome-font-viewer" 1
+    [success] Action "git check -> gnome-font-viewer" repo_github = master, tambora
+    ------------------------------------------------------------------------
+    Branch : "gnome-shell"
+    [success] Action "bzr branch -> gnome-shell" : 1
+    [success] Action "bzr convert git -> gnome-shell" 1
+    [success] Action "git push -> gnome-shell" 1
+    [success] Action "git check -> gnome-shell" repo_github = master, tambora
+    ------------------------------------------------------------------------
+    Branch : "gnome-menus"
+    [success] Action "bzr branch -> gnome-menus" : 1
+    [success] Action "bzr convert git -> gnome-menus" 1
+    [success] Action "git push -> gnome-menus" 1
+    [success] Action "git check -> gnome-menus" repo_github = master, tambora
+    ------------------------------------------------------------------------
+    Branch : "gnome-screensaver"
+    [success] Action "bzr branch -> gnome-screensaver" : 1
+    [success] Action "bzr convert git -> gnome-screensaver" 1
+    [success] Action "git push -> gnome-screensaver" 1
+    [success] Action "git check -> gnome-screensaver" repo_github = master, tambora
+    ------------------------------------------------------------------------
+    Branch : "gnome-shell-extensions"
+    [success] Action "bzr branch -> gnome-shell-extensions" : 1
+    [success] Action "bzr convert git -> gnome-shell-extensions" 1
+    [success] Action "git push -> gnome-shell-extensions" 1
+    [success] Action "git check -> gnome-shell-extensions" repo_github = master, tambora
+    ------------------------------------------------------------------------
+    Action re-branch for packages "gnome-power-manager"
+    [success] Action "bzr branch -> gnome-power-manager" : 1
+    [success] Action "bzr convert git -> gnome-power-manager" 1
+    [success] Action "git push -> gnome-power-manager" 1
+    [success] Action "git check -> gnome-power-manager" repo_github = master, tambora
+    ------------------------------------------------------------------------
+    Branch : "gnome-music"
+    [success] Action "bzr branch -> gnome-music" : 1
+    [success] Action "bzr convert git -> gnome-music" 1
+    [success] Action "git push -> gnome-music" 1
+    [success] Action "git check -> gnome-music" repo_github = master, tambora
+    ------------------------------------------------------------------------
+    Branch : "gnome-online-accounts"
+    [success] Action "bzr branch -> gnome-online-accounts" : 1
+    [success] Action "bzr convert git -> gnome-online-accounts" 1
+    [success] Action "git push -> gnome-online-accounts" 1
+    [success] Action "git check -> gnome-online-accounts" repo_github = master, tambora
+    ------------------------------------------------------------------------
+    Branch : "gnome-documents"
+    [success] Action "bzr branch -> gnome-documents" : 1
+    [success] Action "bzr convert git -> gnome-documents" 1
+    [success] Action "git push -> gnome-documents" 1
+    [success] Action "git check -> gnome-documents" repo_github = master, tambora
+    ------------------------------------------------------------------------
+    Branch : "gnome-logs"
+    [success] Action "bzr branch -> gnome-logs" : 1
+    [success] Action "bzr convert git -> gnome-logs" 1
+    [success] Action "git push -> gnome-logs" 1
+    [success] Action "git check -> gnome-logs" repo_github = master, tambora
+    ------------------------------------------------------------------------
+    Action re-branch for packages "gnome-keyring"
+    [success] Action "bzr branch -> gnome-keyring" : 1
+    [success] Action "bzr convert git -> gnome-keyring" 1
+    [success] Action "git push -> gnome-keyring" 1
+    [success] Action "git check -> gnome-keyring" repo_github = master, tambora
+    ------------------------------------------------------------------------
+    Branch : "gnome-icon-theme-symbolic"
+    [success] Action "bzr branch -> gnome-icon-theme-symbolic" : 1
+    [success] Action "bzr convert git -> gnome-icon-theme-symbolic" 1
+    [success] Action "git push -> gnome-icon-theme-symbolic" 1
+    [success] Action "git check -> gnome-icon-theme-symbolic" repo_github = master, tambora
+    ------------------------------------------------------------------------
+    Branch : "gnome-screenshot"
+    [success] Action "bzr branch -> gnome-screenshot" : 1
+    [success] Action "bzr convert git -> gnome-screenshot" 1
+    [success] Action "git push -> gnome-screenshot" 1
+    [success] Action "git check -> gnome-screenshot" repo_github = master, tambora
+    ------------------------------------------------------------------------
+    Branch : "gnome-photos"
+    [success] Action "bzr branch -> gnome-photos" : 1
+    [success] Action "bzr convert git -> gnome-photos" 1
+    [success] Action "git push -> gnome-photos" 1
+    [success] Action "git check -> gnome-photos" repo_github = master, tambora
+    ------------------------------------------------------------------------
+    Action re-branch for packages "gnome-software"
+    [success] Action "bzr branch -> gnome-software" : 1
+    [success] Action "bzr convert git -> gnome-software" 1
+    [success] Action "git push -> gnome-software" 1
+    [success] Action "git check -> gnome-software" repo_github = master, tambora
+    ------------------------------------------------------------------------
+    Branch : "gnome-packagekit"
+    [success] Action "bzr branch -> gnome-packagekit" : 1
+    [success] Action "bzr convert git -> gnome-packagekit" 1
+    [success] Action "git push -> gnome-packagekit" 1
+    [success] Action "git check -> gnome-packagekit" repo_github = master, tambora
+    ------------------------------------------------------------------------
+    Branch : "gnome-icon-theme"
+    [success] Action "bzr branch -> gnome-icon-theme" : 1
+    [success] Action "bzr convert git -> gnome-icon-theme" 1
+    [success] Action "git push -> gnome-icon-theme" 1
+    [success] Action "git check -> gnome-icon-theme" repo_github = master, tambora
+    ------------------------------------------------------------------------
+    Branch : "gnome-settings-daemon"
+    [success] Action "bzr branch -> gnome-settings-daemon" : 1
+    [success] Action "bzr convert git -> gnome-settings-daemon" 1
+    [success] Action "git push -> gnome-settings-daemon" 1
+    [success] Action "git check -> gnome-settings-daemon" repo_github = master, tambora
+    ------------------------------------------------------------------------
+    Branch : "gnome-pkg-tools"
+    [success] Action "bzr branch -> gnome-pkg-tools" : 1
+    [success] Action "bzr convert git -> gnome-pkg-tools" 1
+    [success] Action "git push -> gnome-pkg-tools" 1
+    [success] Action "git check -> gnome-pkg-tools" repo_github = master, tambora
+    ------------------------------------------------------------------------
+
+    You want to migration all packages in group "github-end-3 [5]" ? [y or n] n
+
+    [no-migration] All packages in group "github-end-3"
+
+    ==================== Migration packages has been finished ====================
+
+=head1 3. Troubleshooting Migrasi Paket
+
+Pada bagian ini akan dijelaskan 2 permasalah terkait dengan aktifitas Migrasi paket dari Repositori Bazaar ke Repositori Github.
+Beberapa permasalahan yang akan dijelaskan pada upabab ini, akan diselesaikan dengan perintah C<boidev bzr2git> dan C<boidev bzr2git [cmd2]>.
+
+=head2 3.1. Paket github belum dikonverersi
+
+Berikut contoh paket yang didorong ke github, tanpa dilakukan Konversi format :
+
+=begin html
+
+<p><center>
+<figure>
+<img src="https://yusrideb.github.io/BlankOnDev/docs/source/img/pkg-github-no-convert.png" alt="Contoh paket yang diupload tanpa konversi format ke github" />
+<figcaption>Gambar 3.1. <b>Contoh paket yang diupload tanpa konversi format ke github</b></figcaption>
+</figure>
+</center></p>
+
+=end html
+
+Untuk memperbaiki repositori ini, sebenarnya bisa langsung menghapus repositori di akun github, kemudian mengupload ulang paket yang sudah dikonversi ke format git.
+Jika hanya 1 paket mungkin tidak masalah, namun jika sudah terdapat repositori yang harus dihapus kemudian diupload ulang ke Github, maka beresiko salah hapus repositori.
+
+Untuk melesaikan permasalahan seperti ini I<BlankOnDev Tools> menyediakan fitur untuk perbaikan repositori github yaitu
+dengan cara seperti yang ditunjukkan pada upabab I<L<2.4. Proses Migrasi Paket|https://metacpan.org/pod/distribution/BlankOnDev/lib/BlankOnDev/Tutorial/id.pod#Proses-Migrasi-Paket1>,
+bagian L<2.4.1|https://metacpan.org/pod/distribution/BlankOnDev/lib/BlankOnDev/Tutorial/id.pod#Migrasi-Paket-dengan-Metode-Split>
+dan bagian L<2.4.2|https://metacpan.org/pod/distribution/BlankOnDev/lib/BlankOnDev/Tutorial/id.pod#Migrasi-Paket-dengan-Skema-One-time>>. berikut Ilustrasi penyelesaian masalah :
+
+=head3 3.1.1. Problem Solved dengan perintah C<boidev bzr2git [cmd]>
+
+Pada contoh ini nama paket yang bermasalah yaitu B<notify-osd>, berikut daftar perintah yang digunakan untuk menyelesaikan masalah :
+
+=over
+
+=item * Perintah C<boidev bzr2git branch B<notify-osd>>
+
+=item * Perintah C<boidev bzr2git bzr-cgit B<notify-osd>>
+
+=item * Perintah C<boidev bzr2git re-gitpush B<notify-osd>>
+
+=item * Perintah C<boidev bzr2git git-check B<notify-osd>>
+
+=back
+
+Rangkaian proses penggunaan perintah :
+
+    $ boidev bzr2git branch notify-osd
+
+    Rilis Active : tambora
+
+    You want to Re-branch [y/n] : y
+
+    Bazaar re-branch for packages : "notify-osd"
+    Action re-branch for packages "notify-osd"
+
+    ======== Packages notify-osd has been finished to bzr branch ========
+
+-
+
+    $ boidev bzr2git bzr-cgit notify-osd
+
+    Rilis Active : tambora
+
+    Converting ....
+
+    ======== Packages notify-osd has been finished to convert ========
+
+-
+
+    $ boidev bzr2git re-gitpush notify-osd
+
+    Rilis Active : tambora
+
+    Re-push to GitHub ....
+    ----------------------------------------
+
+
+    Username for 'https://github.com': yusrideb
+    Password for 'https://yusrideb@github.com':
+
+    re-push to git for packages "notify-osd" has success.
+
+-
+
+    $ boidev bzr2git git-check notify-osd
+
+    Rilis Active : tambora
+    Check Repo [notify-osd] on github : repo_github = master, tambora
+
+    git check repository for packages "notify-osd" | repo_github = master, tambora.
+
+Hasil dari keempat perintah diatas yaitu :
+
+=begin html
+
+<p><center>
+<figure>
+<img src="https://yusrideb.github.io/BlankOnDev/docs/source/img/solved-github-no-convert.png" alt="Penyelesaian masalah : Format paket belum dikonversi ke format gitb" />
+<figcaption>Gambar 3.2. <b>Penyelesaian masalah : Format paket belum dikonversi ke format git</b></figcaption>
+</figure>
+</center></p>
+
+=end html
+
+=head3 3.1.2. Problem Solved dengan perintah C<boidev bzr2git>
+
+Pada bagian ini akan diilustrasi penyelesaian masalah mengunakan perintah C<boidev bzr2git>. Berikut Ilustrasinya :
+
+    yusrideb@pemaket:~$ boidev bzr2git
+
+    Rilis Active : tambora
+
+    ---------------------------------------------------------------------------
+    Choose Action :
+    ---------------------------------------------------------------------------
+    1. All Packages
+    2. Specific Group Packages
+    3. Single Packages
+    Answer: 3
+
+    Enter packages name : notify-osd
+
+    Action re-branch for packages "notify-osd"
+    [success] Action "bzr branch -> notify-osd" : 1
+    [success] Action "bzr convert git -> notify-osd" 1
+    [success] re-Action "bzr convert git -> notify-osd" 1
+    [success] Action "re-git push -> notify-osd"
+    [success] Action "git check -> notify-osd" repo_github = master, tambora
+
+    ========= Migration packages "notify-osd" has been finished =========
+
+Output Perintah :
+
+=begin html
+
+<p><center>
+<figure>
+<img src="https://yusrideb.github.io/BlankOnDev/docs/source/img/solved-github-no-convert.png" alt="Penyelesaian masalah : Format paket belum dikonversi ke format git" />
+<figcaption>Gambar 3.3. <b>Penyelesaian masalah : Format paket belum dikonversi ke format git</b></figcaption>
+</figure>
+</center></p>
+
+=end html
+
+=head2 3.2. Paket github hanya memiliki 1 jenis I<Branch>
+
+Berikut contoh paket yang di dorong ke github, namun tidak dibuatkan branch ke rilis B<tambora>, hanya branch B<master> saja.
+
+=begin html
+
+<p><center>
+<figure>
+<img src="https://yusrideb.github.io/BlankOnDev/docs/source/img/pkg-github-1-branch.png" alt="Contoh paket yang diupload ke github, namun hanya memilik branch I<master>" />
+<figcaption>Gambar 3.4. <b>Contoh paket yang diupload ke github, namun hanya memilik branch I<master></b></figcaption>
+</figure>
+</center></p>
+
+=end html
+
+Untuk memperbaiki repositori github seperti permasalah ini, dapat diselesaikan dengan metode yang digunakan yaitu B<Metode Split> atau B<Metode One-time>.
+Pada bagian ini menggunakan B<Metode One-time>. Berikut ilustrasinya :
+
+    $ boidev bzr2git
+
+    Rilis Active : tambora
+
+    ---------------------------------------------------------------------------
+    Choose Action :
+    ---------------------------------------------------------------------------
+    1. All Packages
+    2. Specific Group Packages
+    3. Single Packages
+    Answer: 3
+
+    Enter packages name : nvidia-firmware
+
+    Action re-branch for packages "nvidia-firmware"
+    [success] Action "bzr branch -> nvidia-firmware" : 1
+    [success] Action "bzr convert git -> nvidia-firmware" 1
+    Username for 'https://github.com': yusrideb
+    Password for 'https://yusrideb@github.com':
+    [success] Action "git push -> nvidia-firmware" 1
+    [success] Action "git check -> nvidia-firmware" repo_github = master, tambora
+
+    =========== Migration packages "nvidia-firmware" has been finished ===========
+
+Hasil dari ilustrasi diatas :
+
+=begin html
+
+<p><center>
+<figure>
+<img src="https://yusrideb.github.io/BlankOnDev/docs/source/img/solved-github-1-branch.png" alt="Penyelesaian Masalah : Repositori Github hanya memiliki type branch I<master>" />
+<figcaption>Gambar 3.5. <b>Penyelesaian Masalah : Repositori Github hanya memiliki type branch I<master></b></figcaption>
+</figure>
+</center></p>
+
+=end html
 
 =head1 COPYRIGHT AND LICENSE
 

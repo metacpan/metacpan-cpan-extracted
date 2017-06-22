@@ -6,6 +6,7 @@ META.json
 META.yml
 Makefile.PL
 README
+README.md
 dist.ini
 lib/MOP.pm
 lib/MOP/Class.pm

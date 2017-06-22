@@ -6,3 +6,6 @@ requires 'Format::Util::Numbers';
 requires 'Time::Duration::Concise';
 requires 'YAML';
 
+on develop => sub {
+    requires 'Devel::Cover::Report::Kritika', '>= 0.05';
+};

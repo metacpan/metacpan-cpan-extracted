@@ -1,9 +1,9 @@
 # -*-cperl-*-
 #
-# Crypt::HashCash::Mint - Mint for HashCash digital cash
+# Crypt::HashCash::Mint - Mint for HashCash Digital Cash
 # Copyright (c) 2001-2017 Ashish Gulhati <crypt-hashcash at hash.neo.tc>
 #
-# $Id: lib/Crypt/HashCash/Mint.pm v1.118 Sat Jun 10 13:59:11 PDT 2017 $
+# $Id: lib/Crypt/HashCash/Mint.pm v1.124 Mon Jun 19 15:51:59 PDT 2017 $
 
 package Crypt::HashCash::Mint;
 
@@ -18,7 +18,7 @@ use Persistence::Object::Simple;
 use vars qw( $VERSION $AUTOLOAD );
 use DBI;
 
-our ( $VERSION ) = '$Revision: 1.118 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.124 $' =~ /\s+([\d\.]+)/;
 
 sub new {
   my $class = shift;
@@ -30,15 +30,19 @@ sub new {
 		     COMMENT        =>   '',
 		     DEBUG          =>   $arg{Debug} || 0,
 		     KEYSIZE        =>   1024,
-		     KEYDB          =>   $arg{KeyDB} || '/tmp/key.db',
+		     KEYDB          =>   $arg{KeyDB} || '/tmp/vault.key',
 		     DENOMS         =>   [qw(100 200 500 1000 2000 5000 10000 20000 50000 100000 200000
 					     500000 1000000 2000000 5000000 10000000 20000000 50000000
 					     100000000 200000000 500000000 1000000000)],
-		     SPENTDB        =>   $arg{SpentDB} || '/tmp/spent.db'
+		     DB             =>   $arg{DB}
 		   }, $class;
   return unless my $keydb = new Persistence::Object::Simple ('__Fn' => $self->keydb); $self->keydb($keydb);
-  unlink $self->spentdb if $arg{Clobber};
-  my $db = DBI->connect('dbi:SQLite:dbname=' . $self->spentdb ,undef, undef, {AutoCommit => 1});
+  my $db = $self->db;
+  unless ($db) {
+    unlink $arg{SpentDB} if defined $arg{SpentDB} and $arg{SpentDB} ne ':memory:' and $arg{Clobber};
+    return unless $db = DBI->connect("dbi:SQLite:dbname=$arg{SpentDB}", undef, undef, {AutoCommit => 1});
+    $self->{DB} = $db;
+  }
   my @tables = $db->tables('%','%','spent','TABLE');
   unless ($tables[0]) {
     if ($arg{Create}) {
@@ -52,7 +56,6 @@ sub new {
       return undef;
     }
   }
-  $self->{DB} = $db;
   return $self;
 }
 
@@ -172,12 +175,12 @@ __END__
 
 =head1 NAME
 
-Crypt::HashCash::Mint - Mint for HashCash digital cash
+Crypt::HashCash::Mint - Mint for HashCash Digital Cash
 
 =head1 VERSION
 
- $Revision: 1.118 $
- $Date: Sat Jun 10 13:59:11 PDT 2017 $
+ $Revision: 1.124 $
+ $Date: Mon Jun 19 15:51:59 PDT 2017 $
 
 =head1 SYNOPSIS
 
@@ -186,13 +189,13 @@ Crypt::HashCash::Mint - Mint for HashCash digital cash
   my $mint = new Crypt::HashCash::Mint ( Create => 1 );
 
   $mint->sigscheme('ECDSA');                   # Use ECDSA blind signatures
-  $mint->keygen(Mint => 'Test Mint');          # Create a new mint keypair
+  $mint->keygen;                               # Create a new mint keypair
   $mint->loadkeys;                             # Load saved mint keys
 
   my $init = $mint->init;                      # Initialize coin request
   my $bcoin = $mint->mint_coin($request);      # Mint a blinded coin
   print "OK\n" if $mint->verify_coin($coin);   # Verify a coin
-  print "Spent\n" if $mint->spent_coin($coin); # Spend a coin
+  print "Spent\n" if $mint->spend_coin($coin); # Spend a coin
 
 =head1 DESCRIPTION
 
@@ -236,6 +239,24 @@ coin was spent successfully, or false if it wasn't. This method adds
 the coin to the spent coins database.
 
 =head2 unspend_coin
+
+Unspends the coin provided as the only argument. Returns undef if
+there was an error in the argument, 0 if the coin wasn't in the spent
+DB, or 1 if it was successfully unspent.
+
+=head1 SEE ALSO
+
+=head2 L<www.hashcash.com>
+
+=head2 L<Crypt::HashCash>
+
+=head2 L<Crypt::HashCash::Client>
+
+=head2 L<Crypt::HashCash::Coin>
+
+=head2 L<Crypt::HashCash::Vault::Bitcoin>
+
+=head2 L<Business::HashCash>
 
 =head1 AUTHOR
 

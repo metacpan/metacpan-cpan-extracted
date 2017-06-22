@@ -1450,8 +1450,9 @@ body > #main-load-target > .x-tab-panel-header {
   font-size:1.1em;
   color:#083772;
   padding-left: 0px !important;
-  margin-left: -4px;
+  margin-left: 0px;
   padding-right: 0px !important;
+  margin-bottom: -3px;
 }
 
 .ra-paging-total-count-btn button .off {
@@ -1462,3 +1463,11 @@ body > #main-load-target > .x-tab-panel-header {
   /*border-bottom: 1px dotted grey;
   font-family: "Lucida Console", Monaco, monospace;*/
 }
+
+/* see logic in 950-mutation-observers.js */
+.ra-mo-expandable-max-height {
+  display: block;
+  overflow: hidden;
+}
+
+

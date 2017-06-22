@@ -1,5 +1,6 @@
 requires 'perl', '5.018002';
 requires 'Hash::Merge', '0.200';
+requires 'Getopt::Long', '2.49';
 requires 'IO::All', '0.86';
 requires 'JSON', '2.90';
 requires 'Moo', '2.000002';

@@ -1,6 +1,7 @@
 package Pcore::Util::Result::Status;
 
 use Pcore -const, -role;
+use Pcore::Util::Scalar qw[is_plain_arrayref is_plain_hashref];
 
 use overload    #
   q[bool] => sub {
@@ -107,8 +108,8 @@ const our $STATUS_REASON => {
 around BUILDARGS => sub ( $orig, $self, $args ) {
     $args->{status} //= 0;
 
-    if ( ref $args->{status} eq 'ARRAY' ) {
-        if ( ref $args->{status}->[1] eq 'HASH' ) {
+    if ( is_plain_arrayref $args->{status} ) {
+        if ( is_plain_hashref $args->{status}->[1] ) {
             $args->{status_reason} //= $args->{status}->[1];
 
             $args->{reason} //= get_reason( undef, $args->{status}->[0], $args->{status_reason} );
@@ -139,7 +140,7 @@ sub get_reason ( $self, $status, $status_reason = undef ) {
 }
 
 sub set_status ( $self, $status, $reason = undef ) {
-    if ( ref $status eq 'ARRAY' ) {
+    if ( is_plain_arrayref $status ) {
         $self->{status} = $status->[0];
 
         $self->{reason} = $reason // $status->[1];

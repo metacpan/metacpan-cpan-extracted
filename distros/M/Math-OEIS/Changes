@@ -1,4 +1,4 @@
-Copyright 2014, 2015, 2016 Kevin Ryde
+Copyright 2014, 2015, 2016, 2017 Kevin Ryde
 
 This file is part of Math-OEIS.
 
@@ -16,6 +16,10 @@ You should have received a copy of the GNU General Public License along
 with Math-OEIS.  If not, see <http://www.gnu.org/licenses/>.
 
 
+
+Version 10, June 2017
+    - Grep new values_min, values_max, exclude_list
+    - Grep fix for negate check when 0 values
 
 Version 9, July 2016
     - Grep loosen the mandatory match down to 10 values or 40 chars

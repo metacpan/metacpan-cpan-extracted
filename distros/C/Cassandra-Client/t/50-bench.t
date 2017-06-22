@@ -5,7 +5,7 @@ use warnings;
 use Test::More;
 use Cassandra::Client;
 use Time::HiRes qw/time/;
-use Promises qw/collect/;
+use Promises qw/collect/, backend => ['AnyEvent'];
 use AnyEvent;
 
 plan skip_all => "CASSANDRA_HOST not set" unless $ENV{CASSANDRA_HOST};
@@ -16,6 +16,7 @@ my $client= Cassandra::Client->new(
     password  => $ENV{CASSANDRA_AUTH},
     anyevent  => 1,
     throttler => "Adaptive",
+    tls       => $ENV{CASSANDRA_TLS},
 );
 $client->connect();
 
@@ -27,10 +28,11 @@ $client->execute("create table $db.test_int (id int primary key, value int)");
 my $insert_query= "insert into $db.test_int (id, value) values (?, ?)";
 my $select_query= "select id, value from $db.test_int where id=?";
 
-my $rounds= 1;
-my $multiply= 1;
+my $rounds= $ENV{BENCH_ROUNDS} || 1;
+my $multiply= $ENV{BENCH_MULTIPLY} || 1;
 for (1..$rounds) {
     SYNC_INS: {
+        next if $ENV{BENCH_SKIP_SYNC};
         my $num= 1000 * $multiply;
         my $t0= -time();
         for (1..$num) {
@@ -40,6 +42,7 @@ for (1..$rounds) {
         ok(1, sprintf "$num synchronous inserts: %.1f seconds", $diff);
     }
     SYNC_SEL: {
+        next if $ENV{BENCH_SKIP_SYNC};
         my $num= 1000 * $multiply;
         my $t0= -time();
         for (1..$num) {

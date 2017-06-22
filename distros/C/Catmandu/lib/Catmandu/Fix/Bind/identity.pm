@@ -2,12 +2,12 @@ package Catmandu::Fix::Bind::identity;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0507';
+our $VERSION = '1.0601';
 
 use Moo;
 use namespace::clean;
 
-with 'Catmandu::Fix::Bind';
+with 'Catmandu::Fix::Bind', 'Catmandu::Fix::Bind::Group';
 
 1;
 
@@ -43,7 +43,7 @@ Catmandu::Fix::Bind::identity - a binder that doesn't influence computation
 
 =head1 DESCRIPTION
 
-The identity binder doesn't embody any computational strategy. It simply 
+The identity binder doesn't embody any computational strategy. It simply
 applies the bound fix functions to its input without any modification.
 
 =head1 SEE ALSO

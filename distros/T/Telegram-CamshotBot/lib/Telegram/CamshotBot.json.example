@@ -1,0 +1,35 @@
+{
+  "hypnotoad" : {
+    "listen" : [ "http://*:8099" ]
+  },
+  "random" : [
+    "How beautiful FabLab looks like, isnt it?",
+    "Don't be a dick, clean up that mess!",
+    "Common sense is not so common... ;)",
+   	"Just do it",
+   	"We make porn here",
+   	"FabLab is priceless, for other things we have MasterCard",
+   	"Don't judge a book by its cover",
+   	"There will be clean when pigs fly",
+   	"Space where you can wear your heart on your sleeve",
+   	"Silicon Valley for hardware",
+   	"Do-ocracy born here",
+   	"Don't govern. Just do",
+   	"Fuck a day keeps the doctor away",
+   	"Quick and dirty",
+   	"Curiosity killed the cat",
+   	"FabLab - pushing the envelope",
+   	"FabLab - where the bodies are buried",
+   	"Learn by doing",
+   	"Life is short. Do stuff that matters"
+  ],
+  "telegram_api_token" : "",
+  "polling" : 0,
+  "ffmpeg_docker": "ffmpeg_container_name",
+  "polling_timeout" : 3,
+  "last_shot_filename" : "latest.jpg",
+  "stream_url" : "rtsp://10.132.193.9/ch0.h264",
+  "bot_domain" : "camerabot.fablab61.ru",
+  "log_file" : "log/production.log",
+  "debug" : 1
+}

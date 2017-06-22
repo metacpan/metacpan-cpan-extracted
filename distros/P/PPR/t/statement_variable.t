@@ -1,0 +1,43 @@
+use strict;
+use warnings;
+
+use Test::More;
+
+use PPR;
+
+my $neg = 0;
+while (my $str = <DATA>) {
+           if ($str =~ /\A# TH[EI]SE? SHOULD MATCH/) { $neg = 0;       next; }
+        elsif ($str =~ /\A# TH[EI]SE? SHOULD FAIL/)  { $neg = 1;       next; }
+        elsif ($str !~ /^####\h*\Z/m)                { $str .= <DATA>; redo; }
+
+        $str =~ s/\s*^####\h*\Z//m;
+
+        if ($neg) {
+            ok $str !~ m/\A \s* (?&PerlStatement) \s* \Z $PPR::GRAMMAR/xo => "FAIL: $str";
+        }
+        else {
+            ok $str =~ m/\A \s* (?&PerlStatement) \s* \Z $PPR::GRAMMAR/xo => "MATCH: $str";
+        }
+}
+
+done_testing();
+
+__DATA__
+# THESE SHOULD MATCH...
+    package Bar;
+####
+    my $foo = 1;
+####
+    my ( $foo, $bar) = (1, 2);
+####
+    our $foo = 1;
+####
+    local $foo;
+####
+    local $foo = 1;
+####
+    LABEL: my $foo = 1;
+####
+    local($foo = $bar->$bar(), $bar);
+####

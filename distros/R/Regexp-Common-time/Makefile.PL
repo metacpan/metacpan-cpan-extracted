@@ -11,9 +11,7 @@ WriteMakefile(
     },
     PREREQ_PM         => {
      'Regexp::Common' =>  0,
-     'POSIX'          =>  0,
     },
-    PL_FILES          => {},
     ABSTRACT_FROM     => 'lib/Regexp/Common/time.pm',
     AUTHOR            => 'Eric J. Roode <eroode@barrack.com>',
     META_MERGE        => {
@@ -21,8 +19,8 @@ WriteMakefile(
       resources => {
         repository => {
           type => 'git',
-          url => 'git://github.com/szabgab/Regexp-Common-time.git',
-          web => 'https://github.com/szabgab/Regexp-Common-time',
+          url => 'git://github.com/manwar/Regexp-Common-time.git',
+          web => 'https://github.com/manwar/Regexp-Common-time',
        },
      },
    },

@@ -1,0 +1,22 @@
+use alienfile;
+
+plugin 'PkgConfig' => 'libuv';
+
+share {
+  plugin Download => (
+    url     => 'http://dist.libuv.org/dist/v1.12.0',
+    version => qr/^libuv-v([0-9\.]+)\.tar\.gz$/,
+  );
+
+  plugin Extract => 'tar.gz';
+
+  plugin 'Build::Autoconf' => ();
+
+  build [
+    'sh autogen.sh',
+    '%{configure}',
+    '%{make}',
+    '%{make} test',
+    '%{make} install',
+  ];
+};

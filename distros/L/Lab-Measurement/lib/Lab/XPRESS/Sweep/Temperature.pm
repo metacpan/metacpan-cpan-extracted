@@ -1,6 +1,5 @@
 package Lab::XPRESS::Sweep::Temperature;
-
-our $VERSION = '3.543';
+$Lab::XPRESS::Sweep::Temperature::VERSION = '3.550';
 
 use Lab::XPRESS::Sweep::Sweep;
 use Statistics::Descriptive;
@@ -28,7 +27,7 @@ sub new {
         allowed_instruments => [
             qw/Lab::Instrument::ITC Lab::Instrument::TCD
                 Lab::Instrument::OI_ITC503 Lab::Instrument::OI_Triton
-                Lab::Instrument::Lakeshore340/,
+                Lab::Instrument::Lakeshore340 Lab::Instrument::TRMC2/,
         ],
         allowed_sweep_modes => [ 'continuous', 'step', 'list' ],
 

@@ -9,7 +9,7 @@ use Test::More tests => 84;
 use Acme::Honkidasu;
 
 for my $i (1..12) {
-    my $t = Time::Piece->strptime(sprintf('%02d', $i), '%m');
+    my $t = Time::Piece->strptime(sprintf('%02d %02d', $i, 1), '%m %d');
     chomp( my $honki = $Acme::Honkidasu::LIST_HONKIDASU->[ $i - 1 ] );
     cmp_ok $t->honkidasu, 'eq', $honki;
     cmp_ok $t->strftime('%('), 'eq', $honki;

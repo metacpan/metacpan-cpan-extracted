@@ -2,7 +2,7 @@ var html;
 $(document).ready(
   $.getJSON('/sponsors.json', function(data) {
     $('#iheart').empty();
-    html = '<div id="iheart">';
+    html = ''; // '<div id="iheart">';
     $.each(data, function(entryIndex, entry) {
       html += '<h2>'+entry.category+'</h2><ul>';
       $.each(entry.links, function(itemIndex, item) {
@@ -18,7 +18,7 @@ $(document).ready(
       });
       html += '</ul>';
     });
-    html += '</div>';
+    // html += '</div>';
     $('#iheart').append(html);
   })
 );

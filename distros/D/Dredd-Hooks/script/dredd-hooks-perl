@@ -14,14 +14,21 @@ use strict;
 use warnings;
 
 use Dredd::Hooks;
+use Getopt::Long qw/GetOptions/;
 use IO::All;
 use JSON;
 use Try::Tiny;
 
+GetOptions(
+    'port=s' => \(my $port = "61321"),
+    'host=s' => \(my $host = "127.0.0.1"),
+);
+
+# Slurp rest of CLI args as hook files
 my $hooks = Dredd::Hooks->new(hook_files => [glob(join ' ', @ARGV)]);
 
 my $serialiser = JSON->new->convert_blessed->utf8;
-my $socket = io('127.0.0.1:61321');
+my $socket = io("$host:$port");
 
 # Dredd awaits for the word 'Starting' to appear on STDOUT
 print "Starting\n";

@@ -1,12 +1,13 @@
 package Bot::IRC::Math;
 # ABSTRACT: Bot::IRC evaluate math expressions and return results
 
+use 5.012;
 use strict;
 use warnings;
 
 use Math::Expression;
 
-our $VERSION = '1.13'; # VERSION
+our $VERSION = '1.14'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -42,7 +43,7 @@ Bot::IRC::Math - Bot::IRC evaluate math expressions and return results
 
 =head1 VERSION
 
-version 1.13
+version 1.14
 
 =head1 SYNOPSIS
 
@@ -74,7 +75,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Gryphon Shafer.
+This software is copyright (c) 2017 by Gryphon Shafer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

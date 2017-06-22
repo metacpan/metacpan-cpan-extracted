@@ -1,9 +1,10 @@
 package Acme::Want5000trillion;
-use 5.008001;
+use feature ':5.10';
 use strict;
 use warnings;
 
-our $VERSION = "0.01";
+our $VERSION = "0.03";
+use Acme::Want5000trillion::Asciiart;
 
 my $languages = {
     "ja" => "5000兆円欲しい！",
@@ -11,12 +12,13 @@ my $languages = {
     "th" => "ฉันต้องการ 5000000000000000 เยน!",
     "cn" => "我想五千万亿日元!",
     "it" => "Voglio 5000 trilioni di yen!",
+    "aa" => Acme::Want5000trillion::Asciiart::sayAA(),
 };
 
 
 sub say{
-    my $self = shift;
-    my $lang = shift // "ja";
+    my ($self,$lang) = @_;
+    $lang //= "ja";
     $lang = "ja" if (! exists($languages->{$lang}));
     return "$languages->{$lang}";
 }
@@ -46,7 +48,8 @@ Acme::Want5000trillion - I want 5000trillion yen.
     my $want = Acme::Want5000trillion->new;
 
     print $want->say(); #5000兆円欲しい!
-
+    print $want->say('en'); #I want 5000 trillion yen!
+    print $want->say('aa'); # print AA
 
 =head1 DESCRIPTION
 
@@ -55,11 +58,22 @@ I want 5000 trillion yen.
 
 This module correspondence some languages.
 
-- ja 
-- en
-- th
-- cn
-- it 
+This module consepts that illutstlation.
+https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62495210
+
+=over
+
+=item  ja 
+
+=item  en
+
+=item  th
+
+=item  cn
+
+=item  it 
+
+=back
 
 =head1 LICENSE
 

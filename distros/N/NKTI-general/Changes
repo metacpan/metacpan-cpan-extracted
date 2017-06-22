@@ -34,3 +34,5 @@ Revision history for Perl extension NKTI::general.
     - Revision POD NKTI::general
     - Fix several subroutine in NKTI::general.
     - Fix PDO NKTI::general
+0.14  Sun Jun 18 23:19:05 2017
+    - Revision Makefile.PL

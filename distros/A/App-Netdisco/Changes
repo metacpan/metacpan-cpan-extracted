@@ -1,3 +1,29 @@
+2.036000 - 2017-06-22
+
+  [NEW FEATURES]
+
+  * support for device identity steering via device_identity setting
+  * devices_no and devices_only settings allow global worker restriction
+  * named host groups which can be used in *_only/*_no settings and other ACLs
+  * new ACL features: AND and negation
+  * new report SNMP Connect Failures (workers track and ignore bad devices)
+  * site_local_files setting for easy lib/template/static-file override
+  * template_paths setting to allow very easy override of templates
+
+  [ENHANCEMENTTS]
+
+  * renamed netdisco-daemon to netdisco-backend (and *-fg too)
+  * topology import script runs discover for each device (M. Bauer)
+  * avoid lock/defer of jobs deined by *_no ACL settings
+  * add documentation note on running multiple backend pollers
+
+  [BUG FIXES]
+
+  * add SSL development library to Release Notes
+  * #309 missing Device Port VLAN Mismatch CSV template
+  * fail safe on an empty *_no ACL
+  * do not select pseudo devices for poller jobs
+
 2.035006 - 2017-04-29
 
   [BUG FIXES]

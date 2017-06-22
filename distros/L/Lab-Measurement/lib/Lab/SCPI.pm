@@ -1,5 +1,5 @@
 package Lab::SCPI;
-
+$Lab::SCPI::VERSION = '3.550';
 use 5.010;
 use warnings;
 no warnings 'recursion';
@@ -9,7 +9,6 @@ use Carp;
 use English;    # avoid editor nonsense with odd special variables
 use Exporter 'import';
 
-our $VERSION = '3.543';
 
 our @EXPORT = qw( scpi_match scpi_parse scpi_canon
     scpi_flat scpi_parse_sequence );

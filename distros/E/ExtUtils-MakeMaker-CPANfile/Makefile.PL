@@ -13,6 +13,7 @@ my %params = (
     'Cwd' => '0',
     'File::Path' => '0',
     'Module::CPANfile' => '0',
+    'CPAN::Meta::Converter' => '2.141170',
     'Test::More' => '0.88',
     'version' => '0.76',
   },

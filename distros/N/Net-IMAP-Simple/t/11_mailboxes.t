@@ -18,5 +18,4 @@ sub run_tests {
     }
 }   
 
-do "t/test_runner.pm";
-
+do "./t/test_runner.pm";

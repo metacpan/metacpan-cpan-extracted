@@ -4,3 +4,20 @@ NAME
   version 0.01
     1. initial creation of package
 
+  version 1.00
+    1. Original finished product
+
+  version 1.01
+    1. Fixed wekaSet bug
+
+  version 1.02
+    1. Fixed averaging algorithm - now displays which file was not found -
+    fills the values with zeros and continues
+
+  version 1.04
+    1. Bug fixes? 2. Parameter for is_cui and stopwords_file
+
+  version 1.05
+    1. Added parameter sparse_matrx and wcs 2. /o regex check 3. Remove " "
+    word from attribute list
+

@@ -5,10 +5,11 @@ use warnings;
 use namespace::autoclean;
 use autodie qw( :all );
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 use App::CISetup::Types qw( Bool File Str );
 use File::pushd;
+use File::Which qw( which );
 use IPC::Run3 qw( run3 );
 use List::AllUtils qw( first_index uniq );
 use List::Gather;
@@ -57,40 +58,14 @@ sub _update_config {
     my $travis = shift;
     my $create = shift;
 
-    $self->_update_cisetup_flags($travis);
     $self->_maybe_update_travis_perl_usage( $travis, $create );
     $self->_maybe_disable_sudo($travis);
     $self->_update_coverity_email($travis);
     $self->_update_notifications($travis);
 
-    ## no critic (TestingAndDebugging::ProhibitNoWarnings, Variables::ProhibitPackageVars)
-    no warnings 'once';
-
-    # If Perl versions aren't quotes then Travis displays 5.10 as "5.1"
-    local $YAML::QuoteNumericStrings = 1;
-    my $yaml = Dump($travis);
-    $yaml = $self->_fix_up_yaml($yaml);
-
-    return $yaml;
+    return $travis;
 }
 ## use critic
-
-sub _update_cisetup_flags {
-    my $self   = shift;
-    my $travis = shift;
-
-    $travis->{'__app_cisetup__'} = {
-        force_threaded_perls => $self->force_threaded_perls,
-        gather {
-            take email_address => $self->email_address
-                if $self->has_email_address;
-            take github_user => $self->github_user
-                if $self->has_github_user;
-        }
-    };
-
-    return;
-}
 
 sub _maybe_update_travis_perl_usage {
     my $self   = shift;
@@ -290,9 +265,12 @@ sub _update_notifications {
             my $pushed = pushd( $self->file->parent );
             my $stdout;
             my $stderr;
+
+            my $exe = which('travis')
+                or die 'Cannot find a travis command in the PATH';
             $self->_run3(
                 [
-                    'travis', 'encrypt', '--no-interactive',
+                    $exe, 'encrypt', '--no-interactive',
                     '-R',
                     $self->github_user . '/' . $self->file->parent->basename,
                     $self->slack_key
@@ -383,6 +361,20 @@ sub _reorder_addons_block {
 
     return $block
         =~ s/coverity_scan:\n.+(?=\S|\z)/coverity_scan:\n$reordered/msr;
+}
+
+sub _cisetup_flags {
+    my $self = shift;
+
+    return {
+        force_threaded_perls => $self->force_threaded_perls,
+        gather {
+            take email_address => $self->email_address
+                if $self->has_email_address;
+            take github_user => $self->github_user
+                if $self->has_github_user;
+        }
+    };
 }
 ## use critic
 

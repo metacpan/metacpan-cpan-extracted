@@ -22,6 +22,10 @@
   "produces": [ "application/json" ],
   "tags": [
       {
+          "name": "Summary",
+          "description": "Summary test report data"
+      },
+      {
           "name": "Release",
           "description": "Per-release test summary data"
       },
@@ -103,6 +107,53 @@
           },
           "404": {
             "description": "The specified report was not found",
+            "schema": { "$ref": "#/definitions/Error" }
+          }
+        }
+      }
+    },
+
+    "/summary/{dist}/{version}": {
+      "get": {
+        "tags": [ "Summary" ],
+        "operationId": "v3_summary",
+        "summary": "Get test report summary info for a specific version of a distribution",
+        "x-mojo-to": {
+          "controller": "Summary",
+          "action": "summary"
+        },
+        "parameters": [
+          {
+            "name": "dist",
+            "in": "path",
+            "description": "The CPAN distribution name (like 'CPAN-Testers-Schema')",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "description": "The CPAN distribution version (like '1.001')",
+            "type": "string",
+            "x-mojo-placeholder": "#",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+             "description": "The summary results",
+             "schema": {
+               "type": "array",
+               "title": "SummaryArray",
+               "items": { "$ref": "#/definitions/ReportSummary" }
+             }
+          },
+          "500": {
+            "description": "We were unable to get the test summaries",
+            "schema": { "$ref": "#/definitions/Error" }
+          },
+          "404": {
+            "description": "The distribution version was not found",
             "schema": { "$ref": "#/definitions/Error" }
           }
         }
@@ -411,10 +462,7 @@
       "type": "object",
       "required": ["grade", "output"],
       "properties": {
-        "grade": {
-          "type": "string",
-          "enum": ["pass", "fail", "na", "unknown"]
-        },
+        "grade": { "$ref": "#/definitions/Grade" },
         "tests":    { "type": "integer", "minimum": 0 },
         "failures": { "type": "integer", "minimum": 0 },
         "skipped":  { "type": "integer", "minimum": 0 },
@@ -526,6 +574,57 @@
           "description": "The number of unknown reports for this release"
         }
       }
+    },
+
+    "Grade": {
+      "type": "string",
+      "description": "The report grade. Pass is passing tests. Fail is failing tests. NA is the distribution cannot be used on the system. Unknown is any other problem.",
+      "enum": ["pass", "fail", "na", "unknown"]
+    },
+
+    "ReportSummary": {
+        "type": "object",
+        "title": "ReportSummary",
+        "description": "Flattened summary data from the test report data structure",
+        "properties": {
+            "guid": {
+                "type": "string",
+                "description": "The GUID of the full report this data came from"
+            },
+            "date": {
+                "type": "string",
+                "description": "The date/time of the report in ISO8601 format"
+            },
+            "grade": { "$ref": "#/definitions/Grade" },
+            "reporter": {
+                "type": "string",
+                "description": "The name/email of the reporter who submitted this report"
+            },
+            "dist": {
+                "type": "string",
+                "description": "The name of the distribution tested"
+            },
+            "version": {
+                "type": "string",
+                "description": "The version of the distribution tested"
+            },
+            "platform": {
+                "type": "string",
+                "description": "The Perl platform that ran the tests, like 'x86_64-linux'"
+            },
+            "perl": {
+                "type": "string",
+                "description": "The Perl version that ran the tests, like '5.24.0'"
+            },
+            "osname": {
+                "type": "string",
+                "description": "The name of the operating system, like 'linux', 'MSWin32', 'darwin'"
+            },
+            "osvers": {
+                "type": "string",
+                "description": "The version of the operating system, like '4.8.0-2-amd64'"
+            }
+        }
     },
 
     "Upload": {

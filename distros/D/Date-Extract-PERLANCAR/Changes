@@ -1,0 +1,10 @@
+0.002   2017-06-14 (PERLANCAR)
+
+	- No functional changes.
+
+	- Set minimum version of DTF:Natural to 1.04 [RT#122085].
+
+
+0.001   2017-06-13 (PERLANCAR)
+
+	- First release, forked from Date-Extract 0.06.

@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "WWW-Scrape-FindaGrave",
    "no_index" : {
@@ -22,9 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::Most" : "0",
-            "Test::NoWarnings" : "0",
-            "Test::URI" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -40,6 +38,13 @@
             "WWW::Mechanize::GZip" : "0",
             "perl" : "5.006002"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Most" : "0",
+            "Test::NoWarnings" : "0",
+            "Test::URI" : "0"
+         }
       }
    },
    "release_status" : "stable",
@@ -50,6 +55,6 @@
          "web" : "https://github.com/nigelhorne/WWW-Scrape-FindaGrave"
       }
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 2.93"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

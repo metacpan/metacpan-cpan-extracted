@@ -5,7 +5,7 @@ use warnings;
 
 package Net::Fritz::Service;
 # ABSTRACT: represents a TR064 service
-$Net::Fritz::Service::VERSION = 'v0.0.5';
+$Net::Fritz::Service::VERSION = 'v0.0.7';
 
 use Digest::MD5 qw(md5_hex);
 use SOAP::Lite; # +trace => [ transport => sub { print $_[0]->as_string } ]; # TODO: remove
@@ -318,7 +318,7 @@ Net::Fritz::Service - represents a TR064 service
 
 =head1 VERSION
 
-version v0.0.5
+version v0.0.7
 
 =head1 SYNOPSIS
 

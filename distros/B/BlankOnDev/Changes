@@ -1,16 +1,19 @@
 Revision history for Perl extension BlankOnDev.
 
 0.1000  Wed May 31 01:43:34 2017
-	- original version
+    - original version
+
 0.1001  Thu Jun 01 11:45:06 2017
     - fix BlankOnDev/config.pm
     - add file script/boidev
+
 0.1002  Sat Jun 03 17:17:44 2017
     - fix file BlankOnDev/config.pm
     - add and fix file lib/BlankOnDev/DataDev.pm
     - add and fix file lib/BlankOnDev/HTTP/request.pm
     - add and fix file lib/BlankOnDev/config/save.pm
     - fix file script/boidev
+
 0.1003  Sat Jun 07 19:56:35 2017
     - fix Version
     - revision and fix file lib/BlankOnDev.pm
@@ -30,3 +33,34 @@ Revision history for Perl extension BlankOnDev.
     - add POD file lib/BlankOnDev/DateTime.pod
     - add POD file lib/BlankOnDev/DateTime/lang.pod
     - enable script/boidev
+
+0.1004  Mon Jun 12 19:56:35 2017
+    - fix file script "boidev"
+    - fix Version format on all files
+    - fix file lib/BlankOnDev.pm
+    - fix file lib/BlankOnDev/Migration/bazaar2GitHub.pm
+    - remove file lib/BlankOnDev/Migration/bazaar2GitHub/tmp_cfg.pm
+    - fix file lib/BlankOnDev/Migration/bazaar2GitHub/bazaar.pm
+    - fix file lib/BlankOnDev/Migration/bazaar2GitHub/github.pm
+    - fix format file lib/BlankOnDev/Tutorial/id.pod
+    - fix file Makefile.PL
+    - fix file lib/BlankOnDev/config.pm
+    - fix file lib/BlankOnDev/enkripsi.pm
+    - fix file lib/BlankOnDev/config/save.pm
+    - fix file lib/BlankOnDev/DateTime.pm
+    - fix timezone form.
+    - add and fix file lib/BlankOnDev/system.pm
+    - fork module from CellBash::Utils::Char
+    - add function command "boidev bzr2git list-pkg all"
+    - command "boidev prepare" change to "boidev bzr2git prepare".
+    - add function command "boidev rilis"
+    - check and kill process on all command "boidev".
+
+0.1005  Wed Jun 14 04:58:35 2017
+    - fix documentation.
+    - fix version on BlankOnDev::enkripsi
+    - fix module BlankOnDev::Form::github
+    - fix module BlankOnDev::Form
+    - fix module BlankOnDev::config
+    - Fix problem while for action migration on command "boidev bzr2git"
+    - Remove form cache Username & Password Github.

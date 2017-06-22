@@ -1,8 +1,7 @@
 #!/usr/bin/perl -w
 
 package Lab::Measurement::KeyboardHandling;
-our $VERSION = '3.543';
-
+$Lab::Measurement::KeyboardHandling::VERSION = '3.550';
 use Term::ReadKey;
 
 my $labkey_initialized = 0;

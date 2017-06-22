@@ -2,7 +2,7 @@ package Mac::PopClip::Quick::Generator;
 
 use Moo;
 
-our $VERSION = '1.000001';
+our $VERSION = '1.000002';
 
 use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
 
@@ -63,6 +63,8 @@ sub _add_string_to_zip {
     my $zip      = shift;
     my $string   = shift;
     my $filename = shift;
+
+    $filename = $self->_popclipext_name . "/$filename";
 
     my $new_file = $zip->addString( $string, $filename );
     $new_file->desiredCompressionMethod(COMPRESSION_DEFLATED);

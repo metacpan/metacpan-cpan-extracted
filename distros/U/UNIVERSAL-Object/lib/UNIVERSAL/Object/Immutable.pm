@@ -10,7 +10,7 @@ use Carp ();
 
 use UNIVERSAL::Object;
 
-our $VERSION   = '0.10';
+our $VERSION   = '0.11';
 our $AUTHORITY = 'cpan:STEVAN';
 
 our @ISA; BEGIN { @ISA = ('UNIVERSAL::Object') }
@@ -48,7 +48,7 @@ UNIVERSAL::Object::Immutable - Another useful base class
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 

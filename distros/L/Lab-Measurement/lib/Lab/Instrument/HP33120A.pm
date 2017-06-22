@@ -1,5 +1,5 @@
 package Lab::Instrument::HP33120A;
-
+$Lab::Instrument::HP33120A::VERSION = '3.550';
 use 5.006;
 use strict;
 use warnings;
@@ -14,7 +14,6 @@ Lab::Instrument::HP33120A - HP 33120A 15MHz function/arbitrary waveform generato
 
 =cut
 
-our $VERSION = '3.543';
 
 our @ISA = ("Lab::Instrument");
 

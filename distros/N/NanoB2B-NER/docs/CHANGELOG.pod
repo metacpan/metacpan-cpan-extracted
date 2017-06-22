@@ -1,0 +1,38 @@
+##################################################################
+#
+#    CHANGES for the NanoB2B::NER Package
+#    $Id: CHANGELOG.pod,v 1.05 2017/06/14 10:57:05 charityml Exp $ 
+#################################################################
+
+=head1 NAME
+
+NanoB2B::NER CHANGES
+
+=head2 version 0.01
+
+1. initial creation of package 
+
+=head2 version 1.00
+
+1. Original finished product
+
+=head2 version 1.01
+
+1. Fixed wekaSet bug
+
+=head2 version 1.02
+
+1. Fixed averaging algorithm
+	- now displays which file was not found
+	- fills the values with zeros and continues
+
+=head2 version 1.04
+
+1. Bug fixes?
+2. Parameter for is_cui and stopwords_file
+
+=head2 version 1.05
+
+1. Added parameter sparse_matrx and wcs
+2. /o regex check
+3. Remove " " word from attribute list

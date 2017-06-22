@@ -1,3 +1,9 @@
+1.2209: Thu Jun 08 2017
+   - made SimpleX not optional
+   - made testing work against dovecot again
+   - move a bunch of things to the lib/ dirs (I don't really get why this is a thing, but whatever)
+   - add put_with_date() from billhess
+
 1.2207: Sat Oct 01 2016
    - repair unit tests to work with gmail (pfft)
    - added in pull requests on github

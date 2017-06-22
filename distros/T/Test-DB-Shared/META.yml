@@ -4,6 +4,7 @@ author:
   - 'Jerome Eteve <jerome.eteve@gmail.com>'
 build_requires:
   File::Temp: '0'
+  File::Which: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -14,15 +15,17 @@ meta-spec:
   version: '1.4'
 name: Test-DB-Shared
 requires:
+  Carp: '0'
   File::Flock::Tiny: '0.14'
   File::Slurp: '0'
   JSON: '0'
   Log::Any: '1.040'
-  Moose: '2.1605'
+  Moo: '0'
   POSIX: '0'
+  Scalar::Util: '0'
   Test::More: '1.001014'
   Test::mysqld: '0.17'
 resources:
   homepage: https://github.com/jeteve/Test-DB-Shared
   repository: https://github.com/jeteve/Test-DB-Shared.git
-version: '0.002'
+version: '0.004'

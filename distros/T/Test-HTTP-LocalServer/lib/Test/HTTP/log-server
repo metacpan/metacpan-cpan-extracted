@@ -168,6 +168,11 @@ __DATA__
 <style>
 .hidden { display: none; }
 </style>
+<script>
+window.onload = function() {
+document.forms[0].navigator.value = window.navigator.userAgent;
+}
+</script>
 </head>
 <body>
 <h1>Request headers</h1>
@@ -206,6 +211,7 @@ __DATA__
     <input type="checkbox" name="cat" value="cat_foo" %s />
     <input type="checkbox" name="cat" value="cat_bar" %s />
     <input type="checkbox" name="cat" value="cat_baz" %s />
+    <input type="hidden" name="navigator" value="[JS disabled]" %s />
   </form>
 </p>
 </body>

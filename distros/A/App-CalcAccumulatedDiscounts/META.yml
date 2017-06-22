@@ -28,8 +28,8 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CalcAccumulatedDiscounts
   homepage: https://metacpan.org/release/App-CalcAccumulatedDiscounts
-  repository: git://github.com/perlancar/perl-App-CalcAccumulatedDiscounts.git
-version: '0.06'
+  repository: git://github.com/perlancar/perl-App-CalcAccumulatedDiscount.git
+version: '0.07'
 x_Dist_Zilla:
   perl:
     version: '5.024000'

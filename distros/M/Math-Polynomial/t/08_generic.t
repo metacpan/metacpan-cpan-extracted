@@ -1,8 +1,6 @@
-# Copyright (c) 2007-2015 Martin Becker.  All rights reserved.
+# Copyright (c) 2007-2017 Martin Becker.  All rights reserved.
 # This package is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-#
-# $Id: 08_generic.t 116 2015-03-13 20:42:15Z demetri $
 
 # Checking experimental interface extension Math::Polynomial::Generic.
 

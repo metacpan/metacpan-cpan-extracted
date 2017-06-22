@@ -1,51 +1,44 @@
 package Catmandu::Importer::CPAN;
 
 use Catmandu::Sane;
-use MetaCPAN::API::Tiny;
+use MetaCPAN::Client;
 use Moo;
 
 with 'Catmandu::Importer';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 has prefix => (is => 'ro');
 has author => (is => 'ro');
 
-# http://api.metacpan.org/v0/release/_mapping
-our $RELEASE_FIELDS = [qw(
-    abstract archive author authorized date dependency distribution
-    download_url first id license maturity name provides resources stat status
-    tests version version_numified
-)];
-
 has fields => (
-    is => 'ro', 
+    is => 'ro',
     default => sub { [ qw(id date distribution version abstract) ] },
     coerce => sub {
-        ref $_[0] ? $_[0] 
-                  : ($_[0] eq 'all' ? $RELEASE_FIELDS 
+        ref $_[0] ? $_[0]
+                  : ($_[0] eq 'all' ? undef
                                     : [ split /,/, $_[0] ]);
     }
 );
 
-has mcpan => (is => 'ro', builder => sub { MetaCPAN::API::Tiny->new });
+has mcpan => (is => 'ro', builder => sub { MetaCPAN::Client->new });
 has filter => (is => 'ro', lazy => 1, builder => 1);
 
 sub _build_filter {
     my $self = $_[0];
 
-    my @filter = { term => { status => 'latest' } };
+    my @filter = { status => 'latest' };
 
     if ($self->prefix) {
-        push @filter, { prefix => { archive => $self->prefix } };
+        push @filter, { distribution => $self->prefix . '*' };
     }
 
     if ($self->author) {
-        push @filter, { term => { author => $self->author } };
+        push @filter, { author => $self->author };
     }
-       
+
     if (@filter > 1) {
-        return { and => \@filter };
+        return { all => \@filter };
     } else {
         return $filter[0];
     }
@@ -54,29 +47,28 @@ sub _build_filter {
 sub generator {
     my $self = $_[0];
 
-    my $result = $self->mcpan->post( 
-        release => {
-            fields => $self->fields,
-            filter => $self->filter,
-            size   => 1024,
-        }
-    );
- 
-    my @hits = @{$result->{hits}->{hits}};
+    my $result = $self->mcpan->release($self->filter);
 
     return sub {
-        my $hit = shift @hits;
+        my $hit = $result->next;
         return undef unless $hit;
-        return {
-            map { $_ => $hit->{fields}->{$_} } @{$self->fields}
+
+        if ($self->fields) {
+            return {
+                map { $_ => $hit->data->{$_} } @{$self->fields}
+            }
+        }
+        else {
+            return $hit->data;
         }
     };
 }
 
 1;
+
 __END__
 
-=head1 NAME 
+=head1 NAME
 
 Catmandu::Importer::CPAN - get information about CPAN releases
 
@@ -84,14 +76,14 @@ Catmandu::Importer::CPAN - get information about CPAN releases
 
   use Catmandu::Importer::CPAN;
   my $importer = Catmandu::Importer::CPAN->new( prefix => 'Catmandu' );
- 
+
   $importer->each(sub {
      my $module = shift;
-     print $module->{distribution} , "\n";
+     print $module->{name} , "\n";
      print $module->{version} , "\n";
      print $module->{date} , "\n";
   });
- 
+
 Or with the L<catmandu> command line client:
 
   $ catmandu convert CPAN --author NICS --fields distribution,date to CSV

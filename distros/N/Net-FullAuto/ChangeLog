@@ -20,6 +20,34 @@
 #######################################################################
 
 
+2017-06-19  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000394 released
+
+        * Hadoop_is.pm upgraded to Java 8.
+
+
+2017-06-14  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000393 released
+
+        * Jenkins_is.pm now FULLY works.
+
+
+2017-06-12  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000392 released
+
+        * Updated Jenkins_is.pm.
+
+
+2017-06-11  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000391 released
+
+        * Updated ClipBucket_is.pm to copy ogg.pc.
+
+
 2017-06-10  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000390 released

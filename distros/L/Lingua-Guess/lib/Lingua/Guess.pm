@@ -8,30 +8,35 @@ use File::Spec::Functions 'catfile';
 use Unicode::Normalize qw/NFC/;
 use Unicode::UCD 'charinfo';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
+
+# Maximum distance, used by __distance.
 
 our $MAX = 300;
 
-our @BASIC_LATIN = qw/English cebuano hausa somali pig_latin klingon indonesian
-		      hawaiian welsh latin swahili/;
+our @BASIC_LATIN = qw/English cebuano hausa somali pig_latin klingon
+		      indonesian hawaiian welsh latin swahili/;
 
-our @EXOTIC_LATIN = qw/Czech Polish Croatian Romanian Slovak Slovene Turkish Hungarian 
-		       Azeri Lithuanian Estonian/;
-our @ACCENTED_LATIN = (qw/Albanian Spanish French German Dutch Italian Danish 
-			  Icelandic 	Norwegian Swedish Finnish Latvian Portuguese 
-			 /, @EXOTIC_LATIN);
+our @EXOTIC_LATIN = qw/Czech Polish Croatian Romanian Slovak Slovene
+		       Turkish Hungarian Azeri Lithuanian Estonian/;
+
+our @ACCENTED_LATIN = (qw/Albanian Spanish French German Dutch Italian
+			  Danish Icelandic Norwegian Swedish Finnish
+			  Latvian Portuguese /, @EXOTIC_LATIN);
 
 our @ALL_LATIN = ( @BASIC_LATIN, @EXOTIC_LATIN, @ACCENTED_LATIN);
 
-our @CYRILLIC   = qw/Russian Ukrainian Belarussian Kazakh Uzbek Mongolian 
-		     Serbian Macedonian Bulgarian Kyrgyz/;
-our @ARABIC     = qw/Arabic Farsi Jawi Kurdish Pashto Sindhi Urdu/;
-our @DEVANAGARI = qw/Bhojpuri Bihari Hindi Kashmiri Konkani Marathi Nepali
-		     Sanskrit/;
+our @CYRILLIC = qw/Russian Ukrainian Belarussian Kazakh Uzbek
+		   Mongolian Serbian Macedonian Bulgarian Kyrgyz/;
 
-our @SINGLETONS  = qw/Armenian Hebrew Bengali Gurumkhi Greek Gujarati Oriya 
-		      Tamil Telugu Kannada Malayalam Sinhala Thai Lao Tibetan 
-		      Burmese Georgian Mongolian/;
+our @ARABIC     = qw/Arabic Farsi Jawi Kurdish Pashto Sindhi Urdu/;
+
+our @DEVANAGARI = qw/Bhojpuri Bihari Hindi Kashmiri Konkani Marathi
+		     Nepali Sanskrit/;
+
+our @SINGLETONS = qw/Armenian Hebrew Bengali Gurumkhi Greek Gujarati
+		     Oriya Tamil Telugu Kannada Malayalam Sinhala
+		     Thai Lao Tibetan Burmese Georgian Mongolian/;
 
 sub new
 {
@@ -41,10 +46,7 @@ sub new
 	$md =~ s!\.pm$!/train!;
 	$params{modeldir} = $md;
     }
-    unless (exists $params{modeldir}) {
-        croak "Must provide a model directory";
-    }
-    unless (-d $params{modeldir}) {
+    if (! -d $params{modeldir}) {
         croak "Model directory '$params{modeldir}' does not exist";
     }
     my $self = bless { %params }, $class;
@@ -56,7 +58,7 @@ sub guess
 {
     my ($self, $string) = @_;
     unless (defined $self->{models}) {
-        $self->load_models();
+        $self->load_models ();
     }
     my @runs = find_runs($string);
     my @langs;
@@ -77,7 +79,6 @@ sub simple_guess
 sub load_models 
 {
     my ($self) = @_;
-
     opendir my $dh, $self->{modeldir} or die "Unable to open dir:$!";
     my %models;
     while (my $f = readdir $dh) {
@@ -214,15 +215,17 @@ sub has_latin_extended_additional
 sub identify 
 {
     my ($self, $sample, %scripts) = @_;
+
     # Check for Korean
+
     if (exists $scripts{'Hangul Syllables'} ||
 	exists $scripts{'Hangul Jamo'} ||
 	exists $scripts{'Hangul Compatibility Jamo'} ||
 	exists $scripts{'Hangul'}) {
 	return [{ name =>'korean', score => 1 }];
     }
+
     if (exists $scripts{'Greek and Coptic'}) { 
-		
 	return [{ name =>'greek', score => 1 }];
     }
 	
@@ -232,12 +235,10 @@ sub identify
 	return [{ name =>'japanese', score => 1 }];
     }
 	
-	
     if (exists $scripts{'CJK Unified Ideographs'} ||
 	exists $scripts{'Bopomofo'} ||
 	exists $scripts{'Bopomofo Extended'} ||
-	exists $scripts{'KangXi Radicals'} ||
-	 exists $scripts{'Arabic Presentation Forms-A'}) {
+	exists $scripts{'KangXi Radicals'}) {
 	return [{ name => 'chinese', score => 1 }];		
     }
 	
@@ -245,18 +246,16 @@ sub identify
 	return $self->check ($sample, @CYRILLIC);
     }
 	
-	
     if (exists $scripts{'Arabic'} ||
-	 exists $scripts{'Arabic Presentation Forms-A'} ||
-	 exists $scripts{'Arabic Presentation Forms-B'}) {
+	exists $scripts{'Arabic Presentation Forms-A'} ||
+	exists $scripts{'Arabic Presentation Forms-B'}) {
 	return $self->check ($sample, @ARABIC);
     }
 	
     if (exists $scripts{'Devanagari'}) {
 	return $self->check ($sample, @DEVANAGARI);
     }
-	
-	
+    
     # Try languages with unique scripts
 
     for my $s (@SINGLETONS) {
@@ -277,15 +276,13 @@ sub identify
 	return $self->check ($sample, @ACCENTED_LATIN);
     }
 	
-	
     if (exists $scripts{'Basic Latin'}) {
 	return $self->check ($sample, @ALL_LATIN);
     }	
-	
-    return [{ name =>  "unknown script: '". (join ", ", keys %scripts)."'", score => 1}];
-	
-}
 
+    return [{ name =>  "unknown script: '". (join ", ", keys %scripts)."'",
+	      score => 1}];
+}
 
 sub check 
 {
@@ -306,42 +303,34 @@ sub check
     $num_tri ||=1;
     for my $s (@sorted) {
 	my $norm = $scores{$s}/$num_tri;
-	push @out, { name => $s , score => int ($norm) };
+	push @out, { name => $s , score => $norm };
     }
-    return [splice (@out, 0, 4)];
-	
-    if (@sorted) {
-	return splice (@sorted, 0, 4);
-	my @all;
-	my $firstscore = $scores{$sorted[0]};
-	while (my $next = shift @sorted) {
-	    unless ($scores{$next} == $firstscore) {
-	        last;
-	    }
-	    push @all, $next;
-	}
-	return join ', ', @all;
+    my $total = 0.0;
+    for (@out) {
+	$total += $_->{score}
     }
-    return { name => 'unknown'. (join ' ', @langs), score => 1 };
+    for (@out) {
+	$_->{score} /= $total;
+    }
+    return \@out;
 }
-
 
 sub __distance 
 {
     my ($m1, $m2) = @_;
-    my $dist =0;
+    my $dist = 0;
     for my $k (keys %$m1) {
 	$dist += (exists $m2->{$k} ? abs($m2->{$k} - $m1->{$k}) : $MAX);
     }
     return $dist;
 }
 
-
 sub __make_model 
 {
     my ($content) = @_;
     my %trigrams;
     $content = NFC ($content);	# normal form C
+    # Substitute all non-word characters with spaces
     $content =~ s/[^[:alpha:]']/ /g;
     for (my $i = 0; $i < length ($content) - 2; $i++) {
 	my $tri = lc (substr ($content, $i, 3));

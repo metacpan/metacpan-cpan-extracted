@@ -4,7 +4,7 @@
       "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.013, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.142690",
    "keywords" : [],
    "license" : [
       "perl_5"
@@ -38,10 +38,11 @@
       "runtime" : {
          "requires" : {
             "Exporter::Tiny" : "0",
-            "List::MoreUtils" : "0",
+            "List::Util" : "1.33",
             "Module::Runtime" : "0",
-            "Sub::Name" : "0",
-            "namespace::clean" : "0"
+            "Sub::Util" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.008"
          },
          "suggests" : {
             "Moo" : "1.002000",
@@ -68,12 +69,11 @@
    "provides" : {
       "Subclass::Of" : {
          "file" : "lib/Subclass/Of.pm",
-         "version" : "0.003"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/Subclass-Of/project",
       "bugtracker" : {
          "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Subclass-Of"
       },
@@ -83,8 +83,10 @@
       ],
       "repository" : {
          "type" : "git",
+         "url" : "git://github.com/tobyink/p5-subclass-of.git",
          "web" : "https://github.com/tobyink/p5-subclass-of"
-      }
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Subclass-Of/project"
    },
-   "version" : "0.003"
+   "version" : "0.007"
 }

@@ -26,12 +26,6 @@ my $schematest = Test::DBIx::Class::Schema->new({
 
 # tell it what to test
 $schematest->methods({
-    columns => [qw(
-        artistid
-        personid
-        name
-    )],
-
     relations => [qw(
         person
         cds
@@ -40,12 +34,8 @@ $schematest->methods({
     custom => [
     ],
 
+    # we have missed the 'columns' option
     # we have missed the 'resultsets' option
-    # this used to pass (magically? quietly?) in perl <5.18
-    # it now complains with:
-    #    Can't use an undefined value as an ARRAY reference at
-    #    /opt/xt/xt-perl/lib/site_perl/5.18.1/Test/DBIx/Class/Schema.pm line
-    #    221
 });
 
 # stop TDCS from doing done_testing on our behalf
@@ -64,21 +54,17 @@ test_out(
     q{ok 1 - use TDCSTest::Schema;},
     $isa_expected,
     q{ok 3 - The record object is a ::Artist},
-    q{ok 4 - 'artistid' column defined in result_source},
-    q{ok 5 - 'artistid' column exists in database},
-    q{ok 6 - 'personid' column defined in result_source},
-    q{ok 7 - 'personid' column exists in database},
-    q{ok 8 - 'name' column defined in result_source},
-    q{ok 9 - 'name' column exists in database},
-    q{ok 10 - related source for 'person' exists},
-    q{ok 11 - self.personid valid for 'person' relationship},
-    q{ok 12 - foreign.personid valid for 'person' relationship},
-    q{ok 13 - related source for 'cds' exists},
-    q{ok 14 - self.artistid valid for 'cds' relationship},
-    q{ok 15 - foreign.artistid valid for 'cds' relationship},
-    q{ok 16 # skip no custom methods},
-    q{ok 17 # skip no resultsets methods},
-    q{ok 18 - test survives with missing method in config},
+    q{ok 4 # skip no columns methods},
+    q{ok 5 - related source for 'person' exists},
+    q{ok 6 - self.personid valid for 'person' relationship},
+    q{ok 7 - foreign.personid valid for 'person' relationship},
+    q{ok 8 - related source for 'cds' exists},
+    q{ok 9 - self.artistid valid for 'cds' relationship},
+    q{ok 10 - foreign.artistid valid for 'cds' relationship},
+    q{ok 11 # skip no custom methods},
+    q{ok 12 # skip no resultsets methods},
+    q{ok 13 # skip no columns methods},
+    q{ok 14 - test survives with missing method in config},
 );
 
 test_err(

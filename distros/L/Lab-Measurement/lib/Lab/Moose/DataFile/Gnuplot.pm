@@ -1,5 +1,5 @@
 package Lab::Moose::DataFile::Gnuplot;
-
+$Lab::Moose::DataFile::Gnuplot::VERSION = '3.550';
 use 5.010;
 use warnings;
 use strict;
@@ -14,7 +14,6 @@ use Scalar::Util 'looks_like_number';
 use List::Util 'any';
 use namespace::autoclean;
 
-our $VERSION = '3.543';
 
 extends 'Lab::Moose::DataFile';
 
@@ -30,6 +29,12 @@ has num_data_rows => (
     default  => 0,
     writer   => '_num_data_rows',
     init_arg => undef
+);
+
+has precision => (
+    is      => 'ro',
+    isa     => enum( [ 1 .. 17 ] ),
+    default => 10,
 );
 
 sub BUILD {
@@ -73,8 +78,21 @@ Lab::Moose::DataFile::Gnuplot - Text based data file.
 
 =head2 new
 
-Requires a 'column' attribute in addition to the L<Lab::Moose::DataFile>
-requirements.
+Supports the following attributtes in addition to the L<Lab::Moose::DataFile>
+requirements:
+
+=over
+
+=item * columns
+
+(mandatory) arrayref of column names
+
+=item * precision 
+
+The numbers are formatted with a C<%.${precision}g> format specifier. Default
+is 10.
+
+=back
 
 =head2 log
 
@@ -116,8 +134,8 @@ sub _log_bare {
         if ( not looks_like_number($value) ) {
             croak "value '$value' for column '$column' isn't numeric";
         }
-
-        $line .= sprintf( "%.17g", $value );
+        my $precision = $self->precision();
+        $line .= sprintf( "%.${precision}g", $value );
         if ( $idx != $#columns ) {
             $line .= "\t";
         }

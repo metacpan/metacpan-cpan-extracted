@@ -1,17 +1,19 @@
+
 use Dios;
 use Test::More;
 
 plan tests => 5;
 
 class Typeful  {
-    has         Int  $int_attr is ro : StdAll;
-    has  Array[Num]  $aon_attr is ro : StdAll;
-    has         Int  @aoi_attr is ro : StdAll;
-    has         Int  %hoi_attr is ro : StdAll;
+    has         Int  $.int_attr where { $_ > 0 } is rw;
+    has  Array[Num]  $.aon_attr                  is rw;
+    has         Int  @.aoi_attr                  is rw;
+    has         Int  %.hoi_attr                  is rw;
 
     method direct_assignment {
         ::ok  eval { $int_attr = 1;           1; } => 'Int attr assigned correctly';
-        ::ok !eval { $int_attr = 'str';       1; } => 'Int attr assignment failed as expected';
+        ::ok !eval { $int_attr = 0;           1; } => 'Int attr 0 assignment failed as expected';
+        ::ok !eval { $int_attr = 'str';       1; } => 'Int attr str assignment failed as expected';
 
         ::ok  eval { $aon_attr = [1,2,3];     1; } => 'AoN attr assigned correctly';
         ::ok !eval { $aon_attr = [1,2,'str']; 1; } => 'AoN attr assignment failed as expected';

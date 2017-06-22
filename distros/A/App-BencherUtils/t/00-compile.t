@@ -6,13 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/BencherUtils.pm'
 );
 
 my @scripts = (
+    'bin/bencher-code',
     'bin/bencher-module-startup-overhead',
     'bin/chart-bencher-result',
     'bin/cleanup-old-bencher-results',

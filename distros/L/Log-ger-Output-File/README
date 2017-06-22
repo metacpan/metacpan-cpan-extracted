@@ -1,0 +1,29 @@
+SYNOPSIS
+
+     use Log::ger::Output 'File' => (
+         path => '/path/to/file.log', # or handle => $fh
+     );
+     use Log::ger;
+    
+     log_warn "blah ...";
+
+DESCRIPTION
+
+    This is a simple output to file. File will be opened with append more.
+    No locking, rotation, or other fancy features (yet). Filehandle will be
+    flushed after each log.
+
+CONFIGURATION
+
+ path => filename
+
+    Specify filename to open. File will be opened in append mode.
+
+ handle => glob|obj
+
+    Alternatively, you can provide an already opened filehandle.
+
+SEE ALSO
+
+    Log::ger
+

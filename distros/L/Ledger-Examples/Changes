@@ -1,3 +1,10 @@
+0.05    2017-06-16 (PERLANCAR)
+
+	- Fix syntax in timelog.dat.
+
+	- Mark timelog.dat as TODO, for Ledger::Parser.
+
+
 0.04    2017-05-23 (PERLANCAR)
 
 	- Add sample file: timelog.dat.

@@ -1,6 +1,5 @@
 package Lab::XPRESS::Data::XPRESS_plotter;
-
-our $VERSION = '3.543';
+$Lab::XPRESS::Data::XPRESS_plotter::VERSION = '3.550';
 
 use strict;
 use Time::HiRes qw/gettimeofday tv_interval/;
@@ -98,7 +97,7 @@ sub get_gnuplot_pipe {
     my $self = shift;
     my $gpname;
     if ( $^O =~ /MSWin32/ ) {
-        $gpname = "pgnuplot";
+        $gpname = "gnuplot";
     }
     else {
         $gpname = "gnuplot -noraise";

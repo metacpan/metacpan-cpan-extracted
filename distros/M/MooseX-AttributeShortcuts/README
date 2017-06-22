@@ -4,8 +4,8 @@ NAME
 
 VERSION
 
-    This document describes version 0.031 of MooseX::AttributeShortcuts -
-    released May 30, 2017 as part of MooseX-AttributeShortcuts.
+    This document describes version 0.032 of MooseX::AttributeShortcuts -
+    released June 13, 2017 as part of MooseX-AttributeShortcuts.
 
 SYNOPSIS
 
@@ -51,8 +51,8 @@ DESCRIPTION
     Ever find yourself repeatedly specifying writers and builders, because
     there's no good shortcut to specifying them? Sometimes you want an
     attribute to have a read-only public interface, but a private writer.
-    And wouldn't it be easier to just say "builder => 1" and have the
-    attribute construct the canonical "_build_$name" builder name for you?
+    And wouldn't it be easier to just say builder => 1 and have the
+    attribute construct the canonical _build_$name builder name for you?
 
     This package causes an attribute trait to be applied to all attributes
     defined to the using class. This trait extends the attribute option
@@ -114,8 +114,8 @@ NEW ATTRIBUTE OPTIONS
     in Moo or Mouse or elsewhere, please note that as it will carry
     significant weight.
 
-    For the following, "$name" should be read as the attribute name; and
-    the various prefixes should be read using the defaults.
+    For the following, $name should be read as the attribute name; and the
+    various prefixes should be read using the defaults.
 
  is => 'rwp'
 
@@ -187,7 +187,7 @@ NEW ATTRIBUTE OPTIONS
 
         clearer => "_clear$name"
 
-    (that is, an attribute named "_foo" would get "_clear_foo")
+    (that is, an attribute named _foo would get _clear_foo)
 
  predicate => 1
 
@@ -199,20 +199,20 @@ NEW ATTRIBUTE OPTIONS
 
         predicate => "_has$name"
 
-    (that is, an attribute named "_foo" would get "_has_foo")
+    (that is, an attribute named _foo would get _has_foo)
 
  trigger => 1
 
     Specifying trigger => 1 will cause the attribute to be created with a
     trigger that calls a named method in the class with the options passed
     to the trigger. By default, the method name the trigger calls is the
-    name of the attribute prefixed with "_trigger_".
+    name of the attribute prefixed with _trigger_.
 
-    e.g., for an attribute named "foo" this would be equivalent to:
+    e.g., for an attribute named foo this would be equivalent to:
 
         trigger => sub { shift->_trigger_foo(@_) }
 
-    For an attribute named "_foo":
+    For an attribute named _foo:
 
         trigger => sub { shift->_trigger__foo(@_) }
 
@@ -228,9 +228,9 @@ NEW ATTRIBUTE OPTIONS
     available in $_. Anything the accessor is called with it will have
     access to in @_, just as you'd expect of a method.
 
-    e.g., the following example creates an attribute named 'bar' with a
-    standard reader accessor named 'bar' and two custom accessors named
-    'foo' and 'foo_too'.
+    e.g., the following example creates an attribute named bar with a
+    standard reader accessor named bar and two custom accessors named foo
+    and foo_too.
 
         has bar => (
     
@@ -385,6 +385,8 @@ SEE ALSO
     module.
 
       * MooseX::Types
+
+      * Moo
 
 BUGS
 

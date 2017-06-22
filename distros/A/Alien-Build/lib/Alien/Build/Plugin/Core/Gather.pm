@@ -10,7 +10,7 @@ use Alien::Build::Util qw( _mirror _destdir_prefix );
 use JSON::PP ();
 
 # ABSTRACT: Core gather plugin
-our $VERSION = '0.41'; # VERSION
+our $VERSION = '0.45'; # VERSION
 
 
 sub init
@@ -141,7 +141,7 @@ Alien::Build::Plugin::Core::Gather - Core gather plugin
 
 =head1 VERSION
 
-version 0.41
+version 0.45
 
 =head1 SYNOPSIS
 
@@ -163,6 +163,8 @@ Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 Contributors:
 
 Diab Jerius (DJERIUS)
+
+Roy Storey
 
 =head1 COPYRIGHT AND LICENSE
 

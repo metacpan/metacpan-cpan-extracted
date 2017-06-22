@@ -5,7 +5,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '2.63';
+our $VERSION = '2.65';
 
 use Carp ();
 use Log::Dispatch::Types;
@@ -149,10 +149,6 @@ sub log {
     my $self = shift;
     my %p    = @_;
 
-    if ( exists $p{level} && $p{level} =~ /\A[0-7]\z/ ) {
-        $p{level} = $OrderedLevels[ $p{level} ];
-    }
-
     return unless $self->would_log( $p{level} );
 
     $self->_log_to_outputs( $self->_prepare_message(%p) );
@@ -195,8 +191,10 @@ sub log_and_die {
 sub log_and_croak {
     my $self = shift;
 
-    $self->log_and_die( @_, carp_level => 3 );
+    $self->log_and_die(@_);
 }
+
+my @CARP_NOT = __PACKAGE__;
 
 sub _die_with_message {
     my $self = shift;
@@ -251,6 +249,10 @@ sub level_is_valid {
         Carp::croak('Logging level was not provided');
     }
 
+    if ( $level =~ /\A[0-9]+\z/ && $level <= $#OrderedLevels ) {
+        return $OrderedLevels[$level];
+    }
+
     return $CanonicalLevelNames{$level};
 }
 
@@ -296,7 +298,7 @@ Log::Dispatch - Dispatches messages to one or more outputs
 
 =head1 VERSION
 
-version 2.63
+version 2.65
 
 =head1 SYNOPSIS
 
@@ -709,13 +711,17 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Anirvan Chatterjee Doug Bell Graham Ollis Gregory Oschwald Johann Rolschewski Jonathan Swartz Karen Etheridge Konrad Bucheli Olaf Alders Olivier Mengué Rohan Carly Ross Attrill Salvador Fandiño Steve Bertrand Whitney Jackson
+=for stopwords Anirvan Chatterjee Carsten Grohmann Doug Bell Graham Ollis Gregory Oschwald Johann Rolschewski Jonathan Swartz Karen Etheridge Kerin Millar Kivanc Yazan Konrad Bucheli Olaf Alders Olivier Mengué Rohan Carly Ross Attrill Salvador Fandiño Steve Bertrand Whitney Jackson
 
 =over 4
 
 =item *
 
 Anirvan Chatterjee <anirvan@users.noreply.github.com>
+
+=item *
+
+Carsten Grohmann <mail@carstengrohmann.de>
 
 =item *
 
@@ -740,6 +746,14 @@ Jonathan Swartz <swartz@pobox.com>
 =item *
 
 Karen Etheridge <ether@cpan.org>
+
+=item *
+
+Kerin Millar <kfm@plushkava.net>
+
+=item *
+
+Kivanc Yazan <kivancyazan@gmail.com>
 
 =item *
 

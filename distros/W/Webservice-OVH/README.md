@@ -95,6 +95,13 @@ Main access to all /cloud/ api methods
 - Return: [Webservice::OVH::Cloud](https://metacpan.org/pod/Webservice::OVH::Cloud)
 - Synopsis: $ovh->cloud;
 
+## hosting
+
+Main access to all /hosting/ api methods 
+
+- Return: [Webservice::OVH::Cloud](https://metacpan.org/pod/Webservice::OVH::Cloud)
+- Synopsis: $ovh->cloud;
+
 # AUTHOR
 
 Patrick Jendral

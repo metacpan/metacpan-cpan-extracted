@@ -1,5 +1,5 @@
 package Dist::Zilla::PluginBundle::Author::OALDERS;
-$Dist::Zilla::PluginBundle::Author::OALDERS::VERSION = '0.000010';
+$Dist::Zilla::PluginBundle::Author::OALDERS::VERSION = '0.000011';
 use Moose;
 use namespace::autoclean;
 
@@ -12,7 +12,6 @@ use Dist::Zilla::Plugin::ConfirmRelease;
 use Dist::Zilla::Plugin::ContributorsFile;
 use Dist::Zilla::Plugin::CopyFilesFromBuild;
 use Dist::Zilla::Plugin::ExecDir;
-use Dist::Zilla::Plugin::ExtraTests;
 use Dist::Zilla::Plugin::Git::Check;
 use Dist::Zilla::Plugin::Git::Commit;
 use Dist::Zilla::Plugin::Git::Contributors;
@@ -27,6 +26,7 @@ use Dist::Zilla::Plugin::MakeMaker;
 use Dist::Zilla::Plugin::Manifest;
 use Dist::Zilla::Plugin::ManifestSkip;
 use Dist::Zilla::Plugin::MetaJSON;
+use Dist::Zilla::Plugin::MetaConfig;
 use Dist::Zilla::Plugin::MetaNoIndex;
 use Dist::Zilla::Plugin::MetaResources;
 use Dist::Zilla::Plugin::MetaYAML;
@@ -35,8 +35,10 @@ use Dist::Zilla::Plugin::PkgVersion;
 use Dist::Zilla::Plugin::PodCoverageTests;
 use Dist::Zilla::Plugin::PodWeaver;
 use Dist::Zilla::Plugin::Prereqs;
+use Dist::Zilla::Plugin::PromptIfStale;
 use Dist::Zilla::Plugin::PruneCruft;
 use Dist::Zilla::Plugin::ReadmeAnyFromPod;
+use Dist::Zilla::Plugin::RunExtraTests;
 use Dist::Zilla::Plugin::ShareDir;
 use Dist::Zilla::Plugin::Test::CPAN::Changes;
 use Dist::Zilla::Plugin::Test::PodSpelling;
@@ -84,10 +86,21 @@ sub configure {
 
     my @allow_dirty = ( 'dist.ini', 'Changes', @copy );
 
-    # Must come before Git::Commit
-    $self->add_plugins('NextRelease');
-
     my @plugins = (
+        [
+            'PromptIfStale' => 'stale modules, build' => {
+                phase  => 'build',
+                module => [ $self->meta->name ]
+            }
+        ],
+        [
+            'PromptIfStale' => 'stale modules, release' => {
+                phase             => 'release',
+                check_all_plugins => 1,
+                check_all_prereqs => 1,
+            }
+        ],
+
         'AutoPrereqs',
         'CheckChangesHasContent',
         'CPANFile',
@@ -95,8 +108,18 @@ sub configure {
         'ContributorsFile',
         [ 'CopyFilesFromBuild' => { copy => \@copy } ],
         'ExecDir',
-        [ 'GithubMeta' => { issues => 1 } ],
-        'ExtraTests',
+
+        'RunExtraTests',
+
+        [
+            'NextRelease' => {
+                time_zone => 'UTC',
+                format =>
+                    q{%-8v  %{yyyy-MM-dd HH:mm:ss'Z'}d%{ (TRIAL RELEASE)}T},
+            }
+        ],
+
+        [ 'GithubMeta'     => { issues           => 1 } ],
         [ 'Git::GatherDir' => { exclude_filename => \@copy } ],
         [ 'Git::Check'     => { allow_dirty      => \@allow_dirty } ],
         [
@@ -117,6 +140,7 @@ sub configure {
         [ 'MetaNoIndex' => { directory => [ 'examples', 't', 'xt' ] } ],
         'MetaResources',
         'MetaYAML',
+        'MetaConfig',
         'MinimumPerl',
         'PkgVersion',
         'PodCoverageTests',
@@ -181,7 +205,7 @@ Dist::Zilla::PluginBundle::Author::OALDERS - A plugin bundle for distributions b
 
 =head1 VERSION
 
-version 0.000010
+version 0.000011
 
 =head2 configure
 

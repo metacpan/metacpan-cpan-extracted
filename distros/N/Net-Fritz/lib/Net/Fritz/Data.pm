@@ -5,7 +5,7 @@ use warnings;
 
 package Net::Fritz::Data;
 # ABSTRACT: wraps various response data
-$Net::Fritz::Data::VERSION = 'v0.0.5';
+$Net::Fritz::Data::VERSION = 'v0.0.7';
 
 use Scalar::Util qw(blessed);
 
@@ -64,7 +64,7 @@ Net::Fritz::Data - wraps various response data
 
 =head1 VERSION
 
-version v0.0.5
+version v0.0.7
 
 =head1 SYNOPSIS
 

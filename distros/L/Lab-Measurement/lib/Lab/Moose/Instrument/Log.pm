@@ -1,11 +1,10 @@
 package Lab::Moose::Instrument::Log;
+$Lab::Moose::Instrument::Log::VERSION = '3.550';
 use Moose::Role;
 use Carp;
 use namespace::autoclean;
 use YAML::XS;
 use IO::Handle;
-
-our $VERSION = '3.543';
 
 has log_file => (
     is        => 'ro',
@@ -28,6 +27,9 @@ has log_id => (
     default => 0,
 );
 
+my @wrapped_methods = qw/binary_read write binary_query clear/;
+requires(@wrapped_methods);
+
 sub log_build_fh {
     my $self = shift;
     my $file = $self->log_file();
@@ -49,7 +51,7 @@ sub _log_retval {
     }
 }
 
-for my $method (qw/binary_read write binary_query clear/) {
+for my $method (@wrapped_methods) {
     around $method => sub {
         my $orig   = shift;
         my $self   = shift;

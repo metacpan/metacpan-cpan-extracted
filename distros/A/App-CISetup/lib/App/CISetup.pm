@@ -4,7 +4,10 @@ use v5.14;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+# For use autodie qw( :all ) elsewhere
+use IPC::System::Simple ();
+
+our $VERSION = '0.04';
 
 1;
 
@@ -22,7 +25,7 @@ App::CISetup - Command line tools to generate and update Travis and AppVeyor con
 
 =head1 VERSION
 
-version 0.02
+version 0.04
 
 =head1 DESCRIPTION
 

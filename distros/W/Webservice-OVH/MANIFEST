@@ -35,6 +35,7 @@ docs/Webservice/OVH/Order/Hosting/Web.html
 examples/aRecord.pl
 examples/clean_records.pl
 examples/cloud.pl
+examples/hosting.pl
 examples/mx.pl
 examples/order.pl
 examples/report.pl
@@ -74,6 +75,9 @@ lib/Webservice/OVH/Email/Domain/Domain/Task/Account.pm
 lib/Webservice/OVH/Email/Domain/Domain/Task/Mailinglist.pm
 lib/Webservice/OVH/Email/Domain/Domain/Task/Redirection.pm
 lib/Webservice/OVH/Helper.pm
+lib/Webservice/OVH/Hosting.pm
+lib/Webservice/OVH/Hosting/Web.pm
+lib/Webservice/OVH/Hosting/Web/Service.pm
 lib/Webservice/OVH/Me.pm
 lib/Webservice/OVH/Me/Bill.pm
 lib/Webservice/OVH/Me/Contact.pm

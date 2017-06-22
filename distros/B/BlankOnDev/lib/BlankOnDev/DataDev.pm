@@ -3,7 +3,7 @@ use strict;
 use warnings FATAL => 'all';
 
 # Version :
-our $VERSION = '0.1003';
+our $VERSION = '0.1005';;
 
 # Subroutine for  :
 # ------------------------------------------------------------------------
@@ -21,6 +21,7 @@ sub data_dev {
     # Temp Addpkg :
     $data{'prefix_tmpflcfg'} = 'addpkg_';
     $data{'fileTmp_Cfg_ext'} = '.bpkg_tmp';
+    $data{'dir_tmp'} = $home_dir . '/temp/';
 
     # General Logs :
     $data{'dirlogs'} = $home_dir . "/.BlankOnDev/logs/";
@@ -42,6 +43,24 @@ sub data_dev {
 
     # Logs for gitpush :
     $data{'prefix_gitpush_fllog'} = 'gitpush_logs_';
+
+    # Logs for git check :
+    $data{'prefix_gitcheck_fllog'} = 'gitcheck_logs_';
+
+    # Logs for bzr2git branch :
+    $data{'prefix_bzr2git_branchLg'} = 'bzr2git_branch_logs_';
+
+    # Logs for bzr2git bzr convert to git :
+    $data{'prefix_bzr2git_bzr_cgit'} = 'bzr2git_bzr_cgit_logs_';
+
+    # Logs for bzr2git git push :
+    $data{'prefix_bzr2git_gitpush'} = 'bzr2git_gitpush_logs_';
+
+    # Logs for bzr2git git push :
+    $data{'prefix_bzr2git_regit_push'} = 'bzr2git_regit_push_logs_';
+
+    # Logs for bzr2git git check
+    $data{'prefix_bzr2git_gitcheck'} = 'bzr2git_gitcheck_logs_';
     return \%data;
 }
 1;

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 use App::CISetup::Travis::ConfigUpdater;
 
@@ -25,7 +25,7 @@ setup-travis-yml.pl - Tool for managing .travis.yml files
 
 =head1 VERSION
 
-version 0.02
+version 0.04
 
 =head1 DESCRIPTION
 
@@ -59,11 +59,6 @@ existing config is used as the guide for some decisions about what to update,
 as detailed below. A newly created file will also follow this guide.
 
 Here's a step-by-step guide to the generated Travis config and what it does:
-
-=head2 C<__app_cisetup__>
-
-This saves any flags you pass on the command line. Future runs of this script
-will use these flags if nothing is passed on the command line.
 
 =head2 C<sudo> and C<addons>
 
@@ -177,6 +172,12 @@ If you pass a slack key the C<travis> command line tool will be executed to
 encrypt the key and it will be added to the config. If you have an existing
 secure key it will not be updated, because the C<travis> tool generates a new
 encrypted key every time it's invoked, leading to annoying churn.
+
+=head2 C<__app_cisetup__> comment
+
+This saves any flags you pass on the command line. Future runs of this script
+will use these flags. However, CLI flags will always take precedence over
+these.
 
 =head1 ARGUMENTS
 

@@ -3,7 +3,7 @@ package Params::Validate::Constants;
 use strict;
 use warnings;
 
-our $VERSION = '1.28';
+our $VERSION = '1.29';
 
 our @ISA = 'Exporter';
 

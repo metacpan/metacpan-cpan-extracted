@@ -23,6 +23,7 @@ t/13-repeat.t
 t/14-set-unset.t
 t/15-justify.t
 t/16-hr.t
+t/17-table.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

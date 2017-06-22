@@ -64,10 +64,12 @@ DiaColloDB->ensureLog(level=>$logLevel, rootLevel=>'FATAL');
   if (!$dburl) {
     $dbdir ||= "data";
     $dburl   = "file://$dbdir";
+  } else {
+    $dbdir = $1 if ($dburl =~ m{(?:file://)?([^?#]*)});
   }
-  my $is_dbdir = (-d $dburl);
+  my $is_dbdir = (defined($dbdir) && $dbdir ne '' && -d $dbdir);
   my $is_list  = ($dburl =~ m{^list://}i);
-  #print STDERR "dburl[initial;is_dbdir=".($is_dbdir||0).";is_list=".($is_list||0)."] = $dburl\n";
+  #print STDERR "dburl[initial;is_dbdir=".($is_dbdir||0).";is_list=".($is_list||0)."] = $dburl\ndbdir[initial] = $dbdir\n";
 
   ##-- db options: log-level
   if ($is_list) {
@@ -89,7 +91,7 @@ DiaColloDB->ensureLog(level=>$logLevel, rootLevel=>'FATAL');
   my $dbhdr = $stash->get('dbhdr');
 
   ##-- check for relations: tdf
-  $stash->set('tdf_enabled' => ($dbhdr->{tdf_enabled} || $dbhdr->{relations}{tdf}) ? 1 : 0);
+  $stash->set('tdf_enabled' => ($dbhdr->{index_tdf} || $dbhdr->{relations}{tdf}) ? 1 : 0);
 
   ##-- check for relations: ddc
   if ($is_dbdir) {

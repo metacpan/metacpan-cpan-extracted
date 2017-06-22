@@ -6,3 +6,4 @@ subfile.pm
 subfile.xs
 t/test.t
 META.yml                                Module meta-data in YAML
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,10 +1,8 @@
 #!/usr/bin/perl
 
-# Copyright (c) 2008-2009 Martin Becker.  All rights reserved.
+# Copyright (c) 2008-2017 Martin Becker.  All rights reserved.
 # This package is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-#
-# $Id: legendre.pl 30 2009-05-19 13:48:07Z demetri $
 
 # Math::Polynomial usage example: calculating Legendre polynomials.
 #
@@ -19,22 +17,26 @@
 use strict;
 use warnings;
 use Math::Polynomial 1.000;
-use Math::BigRat try => 'GMP,Pari';
+use Math::BigNum;
 
 my $max_degree = 5;
 
+sub fmt_num { $_[0]->as_rat }
+
 # adjust some printing options
 Math::Polynomial->string_config({
-    'fold_sign' => 1,
-    'prefix'    => q{},
-    'suffix'    => q{},
+    fold_sign     => 1,
+    prefix        => q{},
+    suffix        => q{},
+    convert_coeff => \&fmt_num,
 });
 
 # create p[0] = 1 and p[1] = x
 # using arbitrary precision rational coefficients
-my $p0 = Math::Polynomial->new(Math::BigRat->new('1'));
-my $p1 = $p0 << 1;
-my @p = ($p0, $p1);
+my $one = Math::BigNum->new('1');
+my $p0  = Math::Polynomial->new($one);
+my $p1  = $p0 << 1;
+my @p   = ($p0, $p1);
 
 # recursion: (n+1)*p[n+1] = (2n+1)*x*p[n] - n*p[n-1]
 foreach my $n (1..$max_degree-1) {
@@ -49,8 +51,8 @@ foreach my $n (0..$#p) {
 # demonstrate orthogonality
 foreach my $n (0..$#p) {
     foreach my $m (0..$n) {
-        my $s = ($p[$n] * $p[$m])->definite_integral(-1, 1);
-        print "<P_$m, P_$n> = $s\n";
+        my $s = ($p[$n] * $p[$m])->definite_integral(-$one, $one);
+        print "<P_$n, P_$m> = ", fmt_num($s), "\n";
     }
 }
 

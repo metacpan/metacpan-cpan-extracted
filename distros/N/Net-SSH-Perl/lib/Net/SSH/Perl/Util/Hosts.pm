@@ -29,6 +29,7 @@ sub _check_host_in_hostfile {
     HOST: while (<$fh>) {
         chomp;
         my ($hosts, $keyblob) = split /\s+/, $_, 2;
+        next unless $keyblob;
         my $fkey;
         ## Trap errors for any potentially unsupported key types
         eval {

@@ -8,6 +8,12 @@ Maintainer:   Kjetil Kjernsmo <kjetilk@cpan.org>
 Maintainer:   Gregory Todd Williams <gwilliams@cpan.org>
 Maintainer:   Chris Prather (PERIGRIN) <chris@prather.org>
 
+1.02	2017-06-21	Append a hash to URIs needing it.
+
+ [ Bug Fixes ]
+ - When adding local names, check if namespace ends in hash or slash, and
+   append hash if not.
+
 1.00	2017-01-18	Check prefixes so they don't conflict with existing methods.
 
  - Added: Prefixes that will conflict with existing methods will throw an

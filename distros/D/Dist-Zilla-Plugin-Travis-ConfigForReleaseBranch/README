@@ -5,9 +5,9 @@ NAME
 
 VERSION
 
-    This document describes version 0.004 of
-    Dist::Zilla::Plugin::Travis::ConfigForReleaseBranch - released April
-    29, 2015 as part of Dist-Zilla-Plugin-Travis-ConfigForReleaseBranch.
+    This document describes version 0.005 of
+    Dist::Zilla::Plugin::Travis::ConfigForReleaseBranch - released June 21,
+    2017 as part of Dist-Zilla-Plugin-Travis-ConfigForReleaseBranch.
 
 SYNOPSIS
 
@@ -42,13 +42,6 @@ SEE ALSO
 
       * Dist::Zilla::TravisCI
 
-SOURCE
-
-    The development version is on github at
-    http://https://github.com/RsrchBoy/dist-zilla-plugin-travis-configforreleasebranch
-    and may be cloned from
-    git://https://github.com/RsrchBoy/dist-zilla-plugin-travis-configforreleasebranch.git
-
 BUGS
 
     Please report any bugs or feature requests on the bugtracker website
@@ -61,22 +54,9 @@ AUTHOR
 
     Chris Weyl <cweyl@alumni.drew.edu>
 
- I'm a material boy in a material world
-
-    Please note I do not expect to be gittip'ed or flattr'ed for this work,
-    rather it is simply a very pleasant surprise. I largely create and
-    release works like this because I need them or I find it enjoyable;
-    however, don't let that stop you if you feel like it ;)
-
-    Flattr
-    <https://flattr.com/submit/auto?user_id=RsrchBoy&url=https%3A%2F%2Fgithub.com%2FRsrchBoy%2Fdist-zilla-plugin-travis-configforreleasebranch&title=RsrchBoy's%20CPAN%20Dist-Zilla-Plugin-Travis-ConfigForReleaseBranch&tags=%22RsrchBoy's%20Dist-Zilla-Plugin-Travis-ConfigForReleaseBranch%20in%20the%20CPAN%22>,
-    Gratipay <https://gratipay.com/RsrchBoy/>, or indulge my Amazon
-    Wishlist <http://bit.ly/rsrchboys-wishlist>... If and *only* if you so
-    desire.
-
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2013 by Chris Weyl.
+    This software is Copyright (c) 2017, 2015, 2013 by Chris Weyl.
 
     This is free software, licensed under:
 

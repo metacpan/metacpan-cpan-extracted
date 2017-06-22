@@ -22,7 +22,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
 package Game::Asset;
-$Game::Asset::VERSION = '0.3';
+$Game::Asset::VERSION = '0.5';
 # ABSTRACT: Load assets (images, music, etc.) for games
 use strict;
 use warnings;
@@ -99,13 +99,13 @@ sub BUILDARGS
 
 sub get_by_name
 {
-    my ($self, $name) = @_;
+    my ($self, $name, @args) = @_;
     my $entry = $self->_get_by_name( $name );
 
     if( $entry ) {
         my $full_name = $entry->full_name;
         my $contents = $self->_zip->contents( $full_name );
-        $entry->process_content( $contents );
+        $entry->process_content( $contents, @args );
     }
 
     return $entry;
@@ -258,6 +258,8 @@ C<index.yml> file is filtered out.
 
 Pass in a name of an asset (without the extension). Returns an object 
 representing the data in the zip file.
+
+Any other arguments passed will be passed to the handling class.
 
 =head1 LICENSE
 

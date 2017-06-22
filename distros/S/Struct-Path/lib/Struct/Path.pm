@@ -19,11 +19,11 @@ Struct::Path - Path for nested structures where path is also a structure
 
 =head1 VERSION
 
-Version 0.65
+Version 0.70
 
 =cut
 
-our $VERSION = '0.65';
+our $VERSION = '0.70';
 
 =head1 SYNOPSIS
 
@@ -41,16 +41,16 @@ our $VERSION = '0.65';
         undef
     ];
 
-    @list = slist($s);                              # get all paths and their values
+    @list = slist($s);                              # list paths and their values
     # @list == (
-    #    [[[0]],\0],
-    #    [[[1]],\1],
-    #    [[[2],{keys => ['2a']},{keys => ['2aa']}],\'2aav'],
-    #    [[[2],{keys => ['2a']},{keys => ['2ab']}],\'2abv'],
-    #    [[[3]],\undef]
+    #     [[0]], \0,
+    #     [[1]], \1,
+    #     [[2],{keys => ['2a']},{keys => ['2aa']}], \'2aav',
+    #     [[2],{keys => ['2a']},{keys => ['2ab']}], \'2abv',
+    #     [[3]], \undef
     # )
 
-    @r = spath($s, [ [3,0,1] ]);                    # get refs to values by paths
+    @r = spath($s, [ [3,0,1] ]);                    # get refs to values
     # @r == (\undef, \0, \1)
 
     @r = spath($s, [ [2],{keys => ['2a']},{} ]);    # same, another example
@@ -59,21 +59,22 @@ our $VERSION = '0.65';
     @r = spath($s, [ [2],{},{regs => [qr/^2a/]} ]); # or using regular expressions
     # @r == (\'2aav', \'2abv')
 
-    ${$r[0]} =~ s/2a/blah-blah-/;                   # replace substructire by path
+    ${$r[0]} =~ s/2a/blah-blah-/;                   # replace
     # $s->[2]{2a}{2aa} eq "blah-blah-av"
 
-    @d = spath_delta([[0],[4],[2]], [[0],[1],[3]]); # new steps relatively for first path
+    @d = spath_delta([[0],[4],[2]], [[0],[1],[3]]); # get steps delta
     # @d == ([1],[3])
 
 =head1 DESCRIPTION
 
 Struct::Path provides functions to access/match/expand/list nested data structures.
 
-Why existed *Path* modules (L</"SEE ALSO">) is not enough? Used scheme has no collisions
-for paths like '/a/0/c' ('0' may be an ARRAY index or a key for HASH, depends on passed
-structure). In some cases this is important, for example, when you want to define exact
-path in structure, but unable to validate it's schema or when structure doesn't exists
-yet (see L</expand> for example).
+Why existed *Path* modules (L</"SEE ALSO">) is not enough? This module has no
+conflicts for paths like '/a/0/c', where C<0> may be an ARRAY index or a key for
+HASH (depends on passed structure). In some cases this is important, for example,
+when one need to define exact path in structure, but unable to validate it's
+schema or when structure itself doesn't yet exists (see L</spath/Options/expand>
+for example).
 
 =head1 EXPORT
 
@@ -83,8 +84,9 @@ Nothing is exported by default.
 
 Path is a list of 'steps', each represents nested level in structure.
 
-Arrayref as a step stands for ARRAY in structure and must contain desired indexes or be
-empty (means "all items"). Sequence for indexes is important and defines result sequence.
+Arrayref as a step stands for ARRAY in structure and must contain desired indexes
+or be empty (means "all items"). Sequence for indexes is important and defines
+result sequence.
 
 Hashref represents HASH in the structure and may contain keys C<keys>, C<regs> or be
 empty. C<keys> may contain list of desired keys, C<regs> must contain list of regular
@@ -94,15 +96,16 @@ and C<regs> lists defines result sequence. C<keys> have higher priority than C<r
 Sample:
 
     $spath = [
-        [1,7],
-        {regs => qr/foo/}
+        [1,7],              # first spep
+        {regs => qr/foo/}   # second step
     ];
 
-Since v0.50 coderefs (filters) as steps supported as well. Path as first argument and stack
-of references (arrayref) as second passed to it when executed. Some true (match) value or
-false (doesn't match) value expected as output.
+Since v0.50 hooks (coderefs) as steps supported. Path as first argument and stack
+of references (arrayref) as second passed to it when executed. Some true (match)
+value or false (doesn't match) value expected as output.
 
-See L<Struct::Path::PerlStyle> if you're looking for human friendly path definition method.
+See L<Struct::Path::PerlStyle> if you're looking for human friendly path definition
+method.
 
 =head1 SUBROUTINES
 
@@ -110,7 +113,7 @@ See L<Struct::Path::PerlStyle> if you're looking for human friendly path definit
 
     $implicit = is_implicit_step($step);
 
-Returns true value if step contains filter or specified all keys/items or key regexp match.
+Returns true value if step contains hooks or specified all items or regexp match.
 
 =cut
 
@@ -122,7 +125,7 @@ sub is_implicit_step {
         return 1 if (exists $_[0]->{regs} and @{$_[0]->{regs}});
         return 1 unless (exists $_[0]->{keys});
         return 1 unless (@{$_[0]->{keys}});
-    } else { # coderefs
+    } else { # hooks
         return 1;
     }
 
@@ -135,7 +138,7 @@ Returns list of paths and references to their values from structure.
 
     @list = slist($struct, %opts)
 
-=head3 Available options
+=head3 Options
 
 =over 4
 
@@ -148,38 +151,23 @@ Don't dive into structure deeper than defined level.
 =cut
 
 sub slist($;@) {
-    my ($struct, %opts) = @_;
+    my @stack = ([], \shift); # init: (path, ref)
+    my %opts = @_;
 
-    my @in = [[], \$struct]; # init: [path, ref]
-    return @in if (defined $opts{depth} and $opts{depth} < 1);
+    my (@out, $path, $ref);
+    my $depth = defined $opts{depth} ? $opts{depth} : -1;
 
-    my (@out, $p, @unres);
+    while (@stack) {
+        ($path, $ref) = splice @stack, 0, 2;
 
-    while ($p = shift @in) {
-        if (ref ${$p->[1]} eq 'HASH' and keys %{${$p->[1]}}) {
-            for (sort keys %{${$p->[1]}}) {
-                push @unres, [
-                    [@{$p->[0]}, {keys => [$_]}],   # path
-                    \${$p->[1]}->{$_}               # ref
-                ];
-            }
-        } elsif (ref ${$p->[1]} eq 'ARRAY' and @{${$p->[1]}}) {
-            for (0 .. $#{${$p->[1]}}) {
-                push @unres, [
-                    [@{$p->[0]}, [$_]],             # path
-                    \${$p->[1]}->[$_]               # ref
-                ];
-            }
+        if (ref ${$ref} eq 'HASH' and @{$path} != $depth and keys %{${$ref}}) {
+            map { unshift @stack, [@{$path}, {keys => [$_]}], \${$ref}->{$_} }
+                reverse sort keys %{${$ref}};
+        } elsif (ref ${$ref} eq 'ARRAY' and @{$path} != $depth and @{${$ref}}) {
+            map { unshift @stack, [@{$path}, [$_]], \${$ref}->[$_] }
+                reverse 0 .. $#{${$ref}}
         } else {
-            push @out, $p;
-        }
-
-        if (@unres) {
-            if ($opts{depth} and @{$unres[0]->[0]} >= $opts{depth}) {
-                push @out, splice @unres;
-            } else {
-                unshift @in, splice @unres; # iterate deeper
-            }
+            push @out, $path, $ref;
         }
     }
 
@@ -192,7 +180,7 @@ Returns list of references from structure.
 
     @list = spath($struct, $path, %opts)
 
-=head3 Available options
+=head3 Options
 
 =over 4
 
@@ -206,121 +194,126 @@ Dereference result items.
 
 =item expand C<< <true|false> >>
 
-Expand structure if specified in path items does't exists. All newly created items initialized by C<undef>.
+Expand structure if specified in path items does't exists. All newly created items
+initialized by C<undef>.
+
+=item paths C<< <true|false> >>
+
+Return path for each result.
+
+=item stack C<< <true|false> >>
+
+Return stack of references to substructures.
 
 =item strict C<< <true|false> >>
 
-Croak if at least one element, specified in path, absent in the struct.
+Croak if at least one element, specified by path, absent in the structure.
 
 =back
+
+All options are disabled (C<undef>) by default.
 
 =cut
 
 sub spath($$;@) {
-    my ($struct, $path, %opts) = @_;
+    my ($struct, $spath, %opts) = @_;
 
-    croak "Path must be arrayref" unless (ref $path eq 'ARRAY');
+    croak "Reference expected for structure" unless (ref $struct);
+    croak "Path must be arrayref" unless (ref $spath eq 'ARRAY');
 
-    my @out = [[], [(ref $struct eq 'ARRAY' or ref $struct eq 'HASH' or not ref $struct) ? \$struct : $struct]];
+    my @level = ([], [(ref $struct eq 'SCALAR' or ref $struct eq 'REF') ? $struct : \$struct]);
     my $sc = 0; # step counter
+    my ($items, @next, $path, $refs, @types);
 
-    for my $step (@{$path}) {
-        my @new;
-        if (ref $step eq 'ARRAY') {
-            while (my $r = shift @out) {
-                unless (ref ${$r->[1]->[-1]} eq 'ARRAY') {
-                    if ($opts{strict} or ($opts{expand} and defined ${$r->[1]->[-1]})) {
-                        croak "Passed struct doesn't match provided path (array expected on step #$sc)";
-                    } elsif (not $opts{expand}) {
+    for my $step (@{$spath}) {
+        while (@level) {
+            ($path, $refs) = splice @level, 0, 2;
+
+            if (ref $step eq 'ARRAY') {
+                if (ref ${$refs->[-1]} ne 'ARRAY') {
+                    croak "ARRAY expected on step #$sc, got " . ref ${$refs->[-1]}
+                        if ($opts{strict});
+                    next unless ($opts{expand});
+                    ${$refs->[-1]} = [];
+                }
+
+                $items = @{$step} ? $step : [0 .. $#${$refs->[-1]}];
+                for (@{$items}) {
+                    unless ($opts{expand} or @{${$refs->[-1]}} > $_) {
+                        croak "[$_] doesn't exists (step #$sc)" if ($opts{strict});
                         next;
                     }
+                    push @next, [@{$path}, [$_]], [@{$refs}, \${$refs->[-1]}->[$_]];
                 }
-                if (@{$step}) {
-                    for my $i (@{$step}) {
-                        unless ($opts{expand} or @{${$r->[1]->[-1]}} > $i) {
-                            croak "[$i] doesn't exists (step #$sc)" if $opts{strict};
-                            next;
-                        }
-                        push @new, [ [@{$r->[0]}, [$i]], [@{$r->[1]}, \${$r->[1]->[-1]}->[$i]] ];
-                    }
-                    if ($opts{delete} and $sc == $#{$path}) {
-                        for my $i (reverse sort @{$step}) {
-                            next if ($i > $#{${$r->[1]->[-1]}}); # skip out of range indexes (strict not enabled)
-                            splice(@{${$r->[1]->[-1]}}, $i, 1);
-                        }
-                    }
-                } else { # [] in the path
-                    for (my $i = $#${$r->[1]->[-1]}; $i >= 0; $i--) {
-                        unshift @new, [ [@{$r->[0]}, [$i]], [@{$r->[1]}, \${$r->[1]->[-1]}->[$i]] ];
-                        splice(@{${$r->[1]->[-1]}}, $i) if ($opts{delete} and $sc == $#{$path});
-                    }
-                }
-            }
-        } elsif (ref $step eq 'HASH') {
-            while (my $r = shift @out) {
-                unless (ref ${$r->[1]->[-1]} eq 'HASH') {
-                    if ($opts{strict} or ($opts{expand} and defined ${$r->[1]->[-1]})) {
-                        croak "Passed struct doesn't match provided path (hash expected on step #$sc)";
-                    } elsif (not $opts{expand}) {
-                        next;
-                    }
-                }
-                if (keys %{$step}) {
-                    my (@keys, %stat);
-                    for my $t ('keys', 'regs') {
-                        next unless (exists $step->{$t});
-                        croak "Unsupported HASH $t definition (step #$sc)"
-                            unless (ref $step->{$t} eq 'ARRAY');
-                        $stat{$t} = 1;
 
-                        if ($t eq 'keys') {
-                            for my $k (@{$step->{keys}}) {
-                                unless ($opts{expand} or exists ${$r->[1]->[-1]}->{$k}) {
-                                    croak "{$k} doesn't exists (step #$sc)" if $opts{strict};
-                                    next;
-                                }
-                                push @keys, $k;
+                if ($opts{delete} and $sc == $#{$spath}) {
+                    map { splice(@{${$refs->[-1]}}, $_, 1) if ($_ <= $#{${$refs->[-1]}}) }
+                        reverse sort @{$items};
+                }
+            } elsif (ref $step eq 'HASH') {
+                if (ref ${$refs->[-1]} ne 'HASH') {
+                    croak "HASH expected on step #$sc, got " . ref ${$refs->[-1]}
+                        if ($opts{strict});
+                    next unless ($opts{expand});
+                    ${$refs->[-1]} = {};
+                }
+
+                @types = grep { exists $step->{$_} } qw(keys regs);
+                croak "Unsupported HASH definition (step #$sc)" if (@types != keys %{$step});
+                undef $items;
+
+                for my $t (@types) {
+                    croak "Unsupported HASH $t definition (step #$sc)"
+                        unless (ref $step->{$t} eq 'ARRAY');
+
+                    if ($t eq 'keys') {
+                        for (@{$step->{keys}}) {
+                            unless ($opts{expand} or exists ${$refs->[-1]}->{$_}) {
+                                croak "{$_} doesn't exists (step #$sc)" if $opts{strict};
+                                next;
                             }
-                        } else {
-                            for my $g (@{$step->{regs}}) {
-                                push @keys, grep { $_ =~ $g } keys %{${$r->[1]->[-1]}};
-                            }
+                            push @{$items}, $_;
+                        }
+                    } else {
+                        for my $g (@{$step->{regs}}) {
+                            push @{$items}, grep { $_ =~ $g } keys %{${$refs->[-1]}};
                         }
                     }
-                    croak "Unsupported HASH definition (step #$sc)"
-                        unless (keys %stat == keys %{$step});
-                    for my $k (@keys) {
-                        push @new, [ [@{$r->[0]}, {keys => [$k]}], [@{$r->[1]}, \${$r->[1]->[-1]}->{$k}] ];
-                        delete ${$r->[1]->[-1]}->{$k} if ($opts{delete} and $sc == $#{$path});
-                    }
-                } else { # {} in the path
-                    for my $k (keys %{${$r->[1]->[-1]}}) {
-                        push @new, [ [@{$r->[0]}, {keys => [$k]}], [@{$r->[1]}, \${$r->[1]->[-1]}->{$k}] ];
-                        delete ${$r->[1]->[-1]}->{$k}
-                            if ($opts{delete} and $sc == $#{$path} and exists ${$r->[1]->[-1]}->{$k});
-                    }
                 }
+
+                for (@types ? @{$items} : keys %{${$refs->[-1]}}) {
+                    push @next, [@{$path}, {keys => [$_]}], [@{$refs}, \${$refs->[-1]}->{$_}];
+                    delete ${$refs->[-1]}->{$_} if ($opts{delete} and $sc == $#{$spath});
+                }
+            } elsif (ref $step eq 'CODE') {
+                $step->($path, $refs) and push @next, $path, $refs;
+            } else {
+                croak "Unsupported thing in the path (step #$sc)";
             }
-        } elsif (ref $step eq 'CODE') {
-            map { $step->($_->[0], $_->[1]) and push(@new, $_) } @out;
-        } else {
-            croak "Unsupported thing in the path (step #$sc)";
         }
-        @out = @new;
+
+        @level = splice @next;
         $sc++;
     }
 
-    map {
-        $_->[1] = $opts{deref} ? ${pop @{$_->[1]}} : pop @{$_->[1]};
-        $_ = $_->[1] unless ($opts{paths});
-    } @out;
+    my @out;
+    while (@level) {
+        ($path, $refs) = splice @level, 0, 2;
+        if ($opts{stack}) {
+            map { $_ = ${$_} } @{$refs} if ($opts{deref});
+        } else {
+            $refs = $opts{deref} ? ${pop @{$refs}} : pop @{$refs};
+        }
+        push @out, ($opts{paths} ? ($path, $refs) : $refs);
+    }
 
     return @out;
 }
 
 =head2 spath_delta
 
-Returns delta for two passed paths. By delta means steps from the second path without beginning common steps for both.
+Returns delta for two passed paths. By delta means steps from the second path
+without beginning common steps for both.
 
     @delta = spath_delta($path1, $path2)
 
@@ -336,8 +329,7 @@ sub spath_delta($$) {
     my $i = 0;
 
     MAIN:
-    while ($i < @{$frst}) {
-        last unless (ref $frst->[$i] eq ref $scnd->[$i]);
+    while ($i < @{$frst} and ref $frst->[$i] eq ref $scnd->[$i]) {
         if (ref $frst->[$i] eq 'ARRAY') {
             last unless (@{$frst->[$i]} == @{$scnd->[$i]});
             for my $j (0 .. $#{$frst->[$i]}) {
@@ -354,7 +346,7 @@ sub spath_delta($$) {
         $i++;
     }
 
-    return @{$scnd}[$i..$#{$scnd}];
+    return @{$scnd}[$i .. $#{$scnd}];
 }
 
 =head1 LIMITATIONS
@@ -369,9 +361,11 @@ Michael Samoglyadov, C<< <mixas at cpan.org> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-struct-path at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Struct-Path>. I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests to C<bug-struct-path at rt.cpan.org>,
+or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Struct-Path>. I will be notified,
+and then you'll automatically be notified of progress on your bug as I make
+changes.
 
 =head1 SUPPORT
 
@@ -403,8 +397,9 @@ L<http://search.cpan.org/dist/Struct-Path/>
 
 =head1 SEE ALSO
 
-L<Data::Diver> L<Data::DPath> L<Data::DRef> L<Data::Focus> L<Data::Hierarchy> L<Data::Nested> L<Data::PathSimple>
-L<Data::Reach> L<Data::Spath> L<JSON::Path> L<MarpaX::xPathLike> L<Sereal::Path> L<Data::Find>
+L<Data::Diver> L<Data::DPath> L<Data::DRef> L<Data::Focus> L<Data::Hierarchy>
+L<Data::Nested> L<Data::PathSimple> L<Data::Reach> L<Data::Spath> L<JSON::Path>
+L<MarpaX::xPathLike> L<Sereal::Path> L<Data::Find>
 
 L<Struct::Diff> L<Struct::Path::PerlStyle>
 

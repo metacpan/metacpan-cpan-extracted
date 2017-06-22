@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.107;
+our $VERSION = 1.108;
 
 use Prty::Option;
 use Prty::FileHandle;
@@ -1535,6 +1535,10 @@ Wenn gesetzt, wird die Datei $newPath überschrieben, falls sie
 existiert. Wenn nicht gesetzt, wird eine Exception geworfen,
 falls sie existiert.
 
+=item -recursive => 0 | 1 (Default: 0)
+
+Erzeuge übergeordnete Verzeichnisse, wenn nötig.
+
 =back
 
 =cut
@@ -1758,7 +1762,7 @@ sub symlinkRelative {
 
 =head1 VERSION
 
-1.107
+1.108
 
 =head1 AUTHOR
 

@@ -26,7 +26,7 @@ use strict;
 use warnings;
 use Carp qw{ carp croak };
 
-our $VERSION = 0.3;
+our $VERSION = 0.41;
 
 =head2 _new
 
@@ -102,7 +102,7 @@ Generates an order and pays the order for free webhosting.
 
 =over
 
-=item * Parameter: $domain - target domain for free webhosting
+=item * Parameter: $domain - target domain for free webhosting, $params - zusätzliche Parameter beim hosting erlauben
 
 =item * Return: L<Webservice::Me::Order>
 
@@ -114,7 +114,7 @@ Generates an order and pays the order for free webhosting.
 
 sub activate_free_email {
 
-    my ( $self, $domain ) = @_;
+    my ( $self, $domain, $params ) = @_;
 
     my $module = $self->{_module};
 
@@ -128,7 +128,7 @@ sub activate_free_email {
     croak $response_duration->error if $response_duration->error;
     my $duration = $response_duration->content->[0];
 
-    my $body = { domain => $domain, offer => 'START', dnsZone => $dns_zone };
+    my $body = { domain => $domain, offer => 'START', dnsZone => $dns_zone, %$params };
     my $response = $api->rawCall( method => 'post', path => "/order/hosting/web/new/$duration", body => $body, noSignature => 0 );
     croak $response->error if $response->error;
 

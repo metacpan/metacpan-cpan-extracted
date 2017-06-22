@@ -1,0 +1,23 @@
+---
+abstract: 'Perl binding for GooCanvas2 widget using Glib::Object::Introspection'
+author:
+  - 'Maximilian Lika <Maximilian-Lika@gmx.de>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: GooCanvas2
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Gtk3: '0'
+  Test: '0'
+version: '0.06'

@@ -1,7 +1,6 @@
 
 package Lab::Instrument::OI_IPS;
-our $VERSION = '3.543';
-
+$Lab::Instrument::OI_IPS::VERSION = '3.550';
 use strict;
 use Lab::Instrument;
 use Lab::Instrument::MagnetSupply;

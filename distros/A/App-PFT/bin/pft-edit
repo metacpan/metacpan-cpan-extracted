@@ -574,9 +574,7 @@ do {
             die 'none for the specified date ', $date unless @entries;
         }
         else {
-            @entries = $tree->content->blog_back($opts{back})
-                or die 'cannot go back by ', $opts{back}, ': ',
-                    $@ =~ s/ at .*$//rs;
+            @entries = $tree->content->blog_back($opts{back});
             die "cannot go back $opts{back} days" unless @entries;
         }
 

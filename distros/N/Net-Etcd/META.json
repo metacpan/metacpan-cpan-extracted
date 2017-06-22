@@ -39,6 +39,7 @@
             "AnyEvent::HTTP" : "0",
             "HTTP::Tiny" : "0",
             "JSON" : "0",
+            "Math::Int64" : "0",
             "Moo" : "2.000",
             "Sub::Quote" : "0",
             "Types::Standard" : "0",
@@ -57,5 +58,5 @@
          "url" : "https://github.com/hexfusion/perl-net-etcd.git"
       }
    },
-   "version" : "0.009"
+   "version" : "0.013"
 }

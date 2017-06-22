@@ -1,8 +1,8 @@
 package Data::DTO::GELF;
 
 # ABSTRACT: The DTO object for GELF version 1.1
-our $VERSION = '1.3'; # VERSION 1.3
-our $VERSION=1.3;
+our $VERSION = '1.7'; # VERSION 1.7
+our $VERSION = 1.7;
 use strict;
 use warnings;
 
@@ -14,7 +14,10 @@ use Sys::Hostname;
 use Data::UUID;
 use POSIX qw(strftime);
 
+use Log::Log4perl;
+
 use Data::DTO::GELF::Types qw( LogLevel );
+use Devel::StackTrace;
 
 our $GELF_VERSION = 1.1;
 
@@ -53,17 +56,17 @@ has 'level' => (
     isa    => LogLevel,
     coerce => 1,
 );
-has 'facility' => (
+has '_facility' => (
     is  => 'rw',
     isa => 'Str',
 );
 
-has 'line' => (
+has '_line' => (
     is  => 'rw',
     isa => 'Int',
 );
 
-has 'file' => (
+has '_file' => (
     is  => 'rw',
     isa => 'Str',
 );
@@ -71,7 +74,7 @@ has 'file' => (
 sub BUILD {
     my $self = shift;
     my $args = shift;
-    foreach my $key1 ( keys $args ) {
+    foreach my $key1 ( keys %{$args} ) {
         if ( ( substr $key1, 0, 1 ) eq "_" ) {
             $self->meta->add_attribute( "$key1" => ( accessor => $key1 ) );
             $self->meta->get_attribute($key1)
@@ -79,17 +82,20 @@ sub BUILD {
         }
     }
 
-    my ($package,   $filename, $line,       $subroutine, $hasargs,
-        $wantarray, $evaltext, $is_require, $hints,      $bitmask
-    ) = caller($Log::Log4perl::caller_depth);
-    $self->line($line);
-    $self->file($filename);
-    $self->facility($package);
+    my $trace = Devel::StackTrace->new;
+    foreach my $frame ( $trace->frames ) {
+        if ( $frame->{subroutine} eq "Log::Log4perl::Logger::__ANON__" ) {
+            $self->_line( $frame->{line} );
+            $self->_file( $frame->{filename} );
+            $self->_facility( $frame->{package} );
+        }
+    }
+
 }
 
 sub _build_version {
     my $self = shift;
-    return $GELF_VERSION;
+    return "$GELF_VERSION";
 }
 
 sub _build_host {
@@ -117,7 +123,17 @@ sub message {
 
 sub _long_to_short {
     my $self = shift;
-    return substr $self->full_message(), 0, 50;
+    my $msg  = $self->full_message();
+    $msg =~ s/\n//sg;
+    $msg =~ s/\s\s//sg;
+    $msg = substr $msg, 0, 100;
+    return $msg;
+}
+
+sub TO_HASH {
+    my $self = shift;
+    { $self->short_message() }    #fire off lazy message builder
+    return {%$self};
 }
 
 sub TO_JSON {
@@ -140,7 +156,7 @@ Data::DTO::GELF - The DTO object for GELF version 1.1
 
 =head1 VERSION
 
-version 1.3
+version 1.7
 
 =head1 AUTHOR
 

@@ -39,6 +39,15 @@ sub web2_cfg ($self) {
     return $WEB2_CFG;
 }
 
+sub web2_load_default_cfg ( $self, $cfg, $merge = 1 ) {
+    $WEB2_CFG = P->cfg->load( $ENV->share->get('/data/web2.ini') );
+
+    undef $WEB2_HOST_RE;
+    undef $WEB2_RE;
+
+    return;
+}
+
 sub web2_load_cfg ( $self, $cfg, $merge = 1 ) {
     $WEB2_CFG = {} if !$merge;
 
@@ -141,7 +150,7 @@ sub web2_check_available ( $self, $http_res ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 129                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 138                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

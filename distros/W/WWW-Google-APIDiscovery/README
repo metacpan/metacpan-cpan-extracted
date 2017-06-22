@@ -1,4 +1,4 @@
-WWW-Google-APIDiscovery
+WWW::Google::APIDiscovery
 
 The README  is  used  to  introduce the module and provide instructions on how to
 install the module, any machine dependencies it may have (for example C compilers
@@ -15,10 +15,10 @@ INSTALLATION
 
 To install this module, run the following commands:
 
-	perl Makefile.PL
-	make
-	make test
-	make install
+    perl Makefile.PL
+    make
+    make test
+    make install
 
 SUPPORT AND DOCUMENTATION
 

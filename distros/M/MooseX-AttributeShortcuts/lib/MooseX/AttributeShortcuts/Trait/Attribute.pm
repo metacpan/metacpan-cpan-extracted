@@ -9,7 +9,7 @@
 #
 package MooseX::AttributeShortcuts::Trait::Attribute;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-$MooseX::AttributeShortcuts::Trait::Attribute::VERSION = '0.031';
+$MooseX::AttributeShortcuts::Trait::Attribute::VERSION = '0.032';
 # ABSTRACT: Shortcuts attribute trait proper
 
 use namespace::autoclean;
@@ -124,6 +124,7 @@ sub _mxas_process_options {
 
     # handle: constraint => ...
     $class->_mxas_constraint($name, $options, $_has, $_opt, $_ref);
+    # handle: coerce => [ ... ]
     $class->_mxas_coerce($name, $options, $_has, $_opt, $_ref);
 
 
@@ -209,7 +210,7 @@ sub _mxas_builder {
         $options->{builder}      = 1;
     }
 
-    $options->{builder} = $class->canonical_builder_prefix . $name
+    $options->{builder} = $class->_mxas_builder_name($name)
         if $options->{builder} eq '1';
 
     return;
@@ -346,7 +347,7 @@ MooseX::AttributeShortcuts::Trait::Attribute - Shortcuts attribute trait proper
 
 =head1 VERSION
 
-This document describes version 0.031 of MooseX::AttributeShortcuts::Trait::Attribute - released May 30, 2017 as part of MooseX-AttributeShortcuts.
+This document describes version 0.032 of MooseX::AttributeShortcuts::Trait::Attribute - released June 13, 2017 as part of MooseX-AttributeShortcuts.
 
 =head1 DESCRIPTION
 

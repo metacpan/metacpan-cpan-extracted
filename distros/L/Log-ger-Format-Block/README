@@ -1,0 +1,22 @@
+SYNOPSIS
+
+     use Log::ger::Format::Block;
+     use Log::ger;
+
+    Calling use Log::ger::OptAway will affect only the current package. You
+    should do this before use Log::err (which will create and import the
+    logging routines like log_warn et al).
+
+    After that, you can use your logging routine a la Log::Contextual:
+
+     # the following block won't run if debug is off
+     log_debug { "the new count in the database is " . $rs->count };
+
+DESCRIPTION
+
+SEE ALSO
+
+    Log::ger
+
+    Log::Contextual
+

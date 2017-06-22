@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/MysqlUtils.pm'
@@ -15,7 +15,9 @@ my @module_files = (
 my @scripts = (
     'bin/mysql-drop-all-tables',
     'bin/mysql-drop-tables',
-    'bin/mysql-query'
+    'bin/mysql-query',
+    'bin/mysql-run-sql-files',
+    'bin/mysql-sql-dump-extract-tables'
 );
 
 # no fake home requested

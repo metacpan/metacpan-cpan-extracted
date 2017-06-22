@@ -50,6 +50,7 @@ my @expected_out = (
     q{ok 8 # skip no relations methods},
     q{ok 9 # skip no custom methods},
     q{ok 10 # skip no resultsets methods},
+    q{ok 11 # skip no relations methods},
 );
 
 # we really need to work out why this is happening ... and MAKE IT STOP
@@ -57,7 +58,7 @@ my @expected_out = (
 # actual test plans ...
 if (1) {
     push @expected_out,
-         q{not ok 11 - planned to run 4 but done_testing() expects 10}
+         q{not ok 12 - planned to run 4 but done_testing() expects 11}
     ;
 }
 
@@ -91,6 +92,7 @@ FORGOT_TO_TEST: {
         q{ok 6 # skip no relations methods},
         q{ok 7 # skip no custom methods},
         q{ok 8 # skip no resultsets methods},
+        q{ok 9 # skip no relations methods},
     );
 
     test_err(

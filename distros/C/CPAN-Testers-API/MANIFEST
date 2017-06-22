@@ -27,6 +27,7 @@ lib/CPAN/Testers/API.pm
 lib/CPAN/Testers/API/Base.pm
 lib/CPAN/Testers/API/Controller/Release.pm
 lib/CPAN/Testers/API/Controller/Report.pm
+lib/CPAN/Testers/API/Controller/Summary.pm
 lib/CPAN/Testers/API/Controller/Upload.pm
 share/templates/index.html.ep
 share/v1.json
@@ -37,6 +38,7 @@ t/00-report-prereqs.t
 t/api.t
 t/controller/release.t
 t/controller/report.t
+t/controller/summary.t
 t/controller/upload.t
 t/etc/metabase.conf
 t/legacy/metabase.t

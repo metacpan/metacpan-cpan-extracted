@@ -15,3 +15,6 @@
 20090619 1.09 minor pod-formatting fix
 20090620 1.10 fix perl-syntax-errors in pod SYNOPSIS and examples
 20100523 1.11 fix BUG #44777: Log of zero error
+20100827 1.12 add a Lua translation; some consequent code-tidying
+20170613 1.13 defend select_evol against a null array thence division by 0
+20170613 1.13 ./bin/ps_evol much more useable

@@ -21,4 +21,4 @@ sub run_tests {
     ok( (grep {m/carmel/} @flags), 1 );
 }
 
-do "t/test_runner.pm";
+do "./t/test_runner.pm";

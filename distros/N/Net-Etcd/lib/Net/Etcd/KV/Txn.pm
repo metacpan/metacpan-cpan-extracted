@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use Moo;
-use Types::Standard qw(Str Int Bool HashRef ArrayRef);
+use Types::Standard qw(InstanceOf Str Int Bool HashRef ArrayRef);
 use MIME::Base64;
 use Data::Dumper;
 use JSON;
@@ -20,7 +20,7 @@ Net::Etcd::KV::Txn
 
 =cut
 
-our $VERSION = '0.009';
+our $VERSION = '0.013';
 
 =head1 DESCRIPTION
 
@@ -49,12 +49,14 @@ a single call to MultiOp. A MultiOp is applied atomically and consists of three 
 
 =head2 endpoint
 
+    /v3alpha/kv/txn
+
 =cut
 
 has endpoint => (
     is      => 'ro',
     isa     => Str,
-    default => '/v3alpha/kv/txn'
+    default => '/kv/txn'
 );
 
 =head2 compare
@@ -94,5 +96,31 @@ has failure => (
     is     => 'ro',
     isa    => ArrayRef,
 );
+
+=head1 PUBLIC METHODS
+
+=head2 create
+
+create txn
+
+=cut
+
+#TODO hack alert
+
+sub create {
+    my $self = shift;
+    my $compare = $self->compare;
+    my $success = $self->success;
+    my $failure = $self->failure;
+
+    my $txn ='"compare":[' . join(',',@$compare) . '],';
+    $txn .= '"success":[' . join(',', @$success) . ']' if defined $success;
+    $txn .= ',' if defined $success and defined $failure;
+    $txn .= '"failure":[ ' . join(',', @$failure) . ']' if defined $failure;
+    $self->{json_args} = '{'  . $txn . '}';
+#   print STDERR Dumper($self);
+    $self->request;
+    return $self;
+}
 
 1;

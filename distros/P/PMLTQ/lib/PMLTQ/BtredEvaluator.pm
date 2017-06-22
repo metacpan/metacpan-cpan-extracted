@@ -1,6 +1,6 @@
 package PMLTQ::BtredEvaluator;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::BtredEvaluator::VERSION = '1.3.1';
+$PMLTQ::BtredEvaluator::VERSION = '1.3.2';
 # ABSTRACT: Pure perl evaluator of PML-TQ queries based on headless implementation of TrEd called Btred
 
 use 5.006;
@@ -400,6 +400,9 @@ sub new {
     $roots = [$query_tree];
   } else {
     require PMLTQ::Planner;
+    if ($clone_before_plan) {
+      $query_tree=Treex::PML::FSFormat->clone_subtree($query_tree);
+    }
     @query_nodes=PMLTQ::Common::FilterQueryNodes($query_tree); # same order as @orig_nodes
     %orig2query = map { $orig_nodes[$_] => $query_nodes[$_] } 0..$#orig_nodes;
     PMLTQ::Planner::name_all_query_nodes($query_tree); # need for planning
@@ -3213,7 +3216,7 @@ PMLTQ::BtredEvaluator - Pure perl evaluator of PML-TQ queries based on headless 
 
 =head1 VERSION
 
-version 1.3.1
+version 1.3.2
 
 =head1 IMPLEMENTATION
 

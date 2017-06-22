@@ -1,6 +1,6 @@
 package Map::Tube::Route;
 
-$Map::Tube::Route::VERSION   = '3.30';
+$Map::Tube::Route::VERSION   = '3.31';
 $Map::Tube::Route::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Route - Class to represent the route in the map.
 
 =head1 VERSION
 
-Version 3.30
+Version 3.31
 
 =cut
 
@@ -23,8 +23,7 @@ use namespace::clean;
 
 use overload q{""} => 'as_string', fallback => 1;
 
-has from  => (is => 'ro', isa => Node,  required => 1);
-has to    => (is => 'ro', isa => Node,  required => 1);
+has [ qw(from to) ] => (is => 'ro', isa => Node,  required => 1);
 has nodes => (is => 'ro', isa => Nodes, required => 1);
 
 =head1 DESCRIPTION

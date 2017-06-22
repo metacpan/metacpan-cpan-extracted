@@ -7,6 +7,8 @@ BEGIN { extends 'Catalyst::Controller' };
 use RapidApp::Util qw(:all);
 require Module::Runtime;
 require Catalyst::Utils;
+use URI;
+use URI::Escape qw/uri_escape uri_unescape/;
 
 sub base :Chained :PathPrefix :CaptureArgs(0) {}
 
@@ -30,6 +32,68 @@ sub login :Chained('base') :Args(0) {
   $self->handle_fresh_login($c) unless ($haveSessionForUser);
   
   return $self->do_redirect($c);
+}
+
+
+sub _parse_to_referer {
+  my $self = shift;
+  my $c = shift or return undef;
+  
+  my $to = undef;
+  
+  if(my $referer = $c->req->referer) {
+    my $uri = $c->req->uri;
+    my $ruri = URI->new( $referer );
+    # Only consider local referer
+    if($uri->host_port eq $ruri->host_port) {
+      # encode/pass along the special query-string '_fragment'
+      if(my $fragment = $c->req->params->{_fragment}) {
+        $ruri->query_form( $ruri->query_form, _fragment => $fragment );
+      }
+      $to = $ruri->path_query;
+    }
+  }
+
+  return $to;
+}
+
+# Do a redirect back to the referer via login. Utilizes the new '?to=' feature
+sub to_referer :Chained('base') :Args(0) {
+  my $self = shift;
+  my $c = shift;
+  
+  my $url = join($c->mount_url,'/auth/login');
+  
+  if(my $to = $self->_parse_to_referer($c)) {
+    if ($c->session && $c->session_is_valid and $c->user_exists) {
+      # if we're already logged in, send them directly:
+      $url = $self->_url_extract_convert_fragment($to);
+    }
+    else {
+      $url = join('',$url,'?to=',uri_escape($to));
+    }
+  }
+  
+  $c->response->redirect($url, 307);
+  return $c->detach;
+}
+
+sub logout_to_referer :Chained('base') :Args(0) {
+  my $self = shift;
+  my $c = shift;
+  
+  my $url = '/';
+  
+  if(my $to = $self->_parse_to_referer($c)) {
+    $url = $self->_url_extract_convert_fragment($to);
+  }
+  
+  $c->delete_session('logout');
+  $c->logout;
+  $c->delete_expired_sessions;
+  
+  $c->response->redirect($url, 307);
+  return $c->detach;
 }
 
 sub logout :Chained('base') :Args(0) {
@@ -105,6 +169,18 @@ sub auth_verify :Private {
   }
 };
 
+sub _url_extract_convert_fragment {
+  my ($self, $url) = @_;
+
+  my $uri = URI->new( $url );
+  my %qs = $uri->query_form;
+  if(my $fragment = $qs{_fragment}) {
+    delete $qs{_fragment};
+    $uri->query_form( \%qs );
+    $url = join('#',$uri->path_query,$fragment);
+  }
+  return $url
+}
 
 sub do_login {
 	my $self = shift;
@@ -129,6 +205,14 @@ sub do_login {
     
     # Something is broken!
     $c->_save_session_expires;
+    
+    # New: upon successful login, override redirect target with client-supplied 'to' if present.
+    # This provides a mechanism for the client to set its own redirect target via ?to=/some/path
+    my $to = $c->req->params->{to};
+    if ($to && $to ne '') {
+      $to = $self->_url_extract_convert_fragment( uri_unescape($to) );
+      $c->req->params->{redirect} = $to; 
+    }
     
     return 1;
   }

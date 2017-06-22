@@ -1,6 +1,5 @@
 package Lab::Instrument::Vectormagnet;
-our $VERSION = '3.543';
-
+$Lab::Instrument::Vectormagnet::VERSION = '3.550';
 use strict;
 use Time::HiRes qw/usleep/, qw/time/;
 use Math::Trig;

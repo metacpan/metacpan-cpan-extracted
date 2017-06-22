@@ -1,7 +1,7 @@
 package Acme::CPANLists::PERLANCAR::MooseStyleClassBuilder;
 
-our $DATE = '2017-05-30'; # DATE
-our $VERSION = '0.20'; # VERSION
+our $DATE = '2017-06-19'; # DATE
+our $VERSION = '0.22'; # VERSION
 
 our @Module_Lists = (
     {
@@ -34,7 +34,7 @@ Acme::CPANLists::PERLANCAR::MooseStyleClassBuilder - Moose-style (Perl 6-style) 
 
 =head1 VERSION
 
-This document describes version 0.20 of Acme::CPANLists::PERLANCAR::MooseStyleClassBuilder (from Perl distribution Acme-CPANLists-PERLANCAR), released on 2017-05-30.
+This document describes version 0.22 of Acme::CPANLists::PERLANCAR::MooseStyleClassBuilder (from Perl distribution Acme-CPANLists-PERLANCAR), released on 2017-06-19.
 
 =head1 MODULE LISTS
 

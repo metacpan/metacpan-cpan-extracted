@@ -12,7 +12,7 @@ use File::ShareDir ();
 use Dist::Zilla::Util::CurrentCmd ();
 
 # ABSTRACT: Dist::Zilla plugin bundle used by Plicease
-our $VERSION = '2.14'; # VERSION
+our $VERSION = '2.15'; # VERSION
 
 
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -32,7 +32,7 @@ sub mvp_multivalue_args { qw(
 
 my %plugin_versions = qw(
   Alien                0.023
-  Author::Plicease.*   2.14
+  Author::Plicease.*   2.15
   OurPkgVersion        0.06
   MinimumPerl          1.006
   InstallGuide         1.200006
@@ -277,10 +277,10 @@ sub configure
       die "travis is trying to test Perl 5.19";
     }
     
-    unless(exists $travis->{perl} && grep /^5\.24$/, @{ $travis->{perl} })
+    unless(exists $travis->{perl} && grep /^5\.26$/, @{ $travis->{perl} })
     {
       print STDERR Term::ANSIColor::color('bold red') if -t STDERR;
-      print STDERR "travis is not testing Perl 5.24";
+      print STDERR "travis is not testing Perl 5.26";
       print STDERR Term::ANSIColor::color('reset') if -t STDERR;
       print STDERR "\n";
     }
@@ -323,7 +323,7 @@ Dist::Zilla::PluginBundle::Author::Plicease - Dist::Zilla plugin bundle used by 
 
 =head1 VERSION
 
-version 2.14
+version 2.15
 
 =head1 SYNOPSIS
 

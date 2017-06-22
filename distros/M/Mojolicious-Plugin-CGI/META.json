@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "IO::Pipely" : "0.005",
-            "Mojolicious" : "6.49"
+            "Mojolicious" : "7.28"
          }
       }
    },
@@ -47,6 +47,6 @@
          "url" : "https://github.com/jhthorsen/mojolicious-plugin-cgi.git"
       }
    },
-   "version" : "0.37",
+   "version" : "0.38",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

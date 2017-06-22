@@ -3,6 +3,7 @@
 
 #- Copyright (C) 2002, 2003, 2004, 2005 MandrakeSoft SA
 #- Copyright (C) 2005-2010 Mandriva SA
+#- Copyright (C) 2011-2017 Mageia
 #-
 #- This program is free software; you can redistribute it and/or modify
 #- it under the terms of the GNU General Public License as published by
@@ -25,7 +26,7 @@ use urpm::msg;
 use urpm::media;
 
 sub usage() {
-    print urpm::args::copyright('urpmf', [ '2002-2010', 'Mandriva' ], [ '2011-2013', 'Mageia' ])
+    print urpm::args::copyright('urpmf', [ '2002-2010', 'Mandriva' ], [ '2011-2017', 'Mageia' ])
    . N("  --help         - print this help message.
 ") . N("  --version      - print this tool's version number.
 ") . N("  --env          - use specific environment (typically a bug report).

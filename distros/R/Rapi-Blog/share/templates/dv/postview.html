@@ -1,0 +1,479 @@
+
+<title class="icon-post">[% Row.title %]</title>
+
+<div class="ra-scoped-reset">
+
+<div class="rapi-blog-postview" style="font-size:12px;">
+
+  <div class="topmost-row">
+  
+    <table class="row-table" style="width:100%;win-width:750px;margin-top:-3px;"><tr>
+
+      
+      <td>
+        <div class="info-block title-block" style="width:100%;">
+         <table class="r-simple-table top-line" style="height:41px; line-height:16px;border-radius: 7px;margin:2px;margin-left:0px; width:100%;">
+
+            <tr class="vert">
+              <th  style="width:140px; font-size:22px; vertical-align:middle;text-align:right;padding-right:10px;" rowspan="2">
+                <div class="label with-icon icon-text-rich-marked-32x32">
+                  <span><span style="font-size:15px;color:grey;font-weight:bold;">[Post:{id}]</span></span>
+                </div>
+              </th>
+
+              <td class="title-td" rowspan="2" style="background-color: rgb(246,248,250);">
+                <div class="title-label">Title</div>
+                <div class="title-value">{title}</div>
+              </td>
+              
+            </tr>
+
+            
+          </table>
+        </div>
+      
+      
+      </td>
+      
+      
+      <td style="width:360px;min-width:330px;">
+        <div class="info-block">
+         <table class="r-simple-table top-line" style="line-height:16px;border-radius: 7px;margin:2px;">
+
+            <tr class="vert">
+              <th rowspan="2" style="vertical-align:top;position:relative;width:125px;min-width:125px;">
+                <div style  ="position:absolute;left:5px; top:4px;font-size:13px;">
+                  <b style  ="position:absolute;left:5px; top:4px;color:#1b4f72;"><i>Published:</i></b> 
+                  <div style="position:absolute;left:75px;top:4px;">[% r.autofield.published %]</span></div>
+                </div>
+              </th>
+
+              <th>Post Date/Time           </th><th>Author                    </th>
+              
+            </tr>
+            <tr class="vert">
+              <td style="font-weight:normal;">[% r.renderfield.ts %]</td><td>[% r.renderfield.author %]</td>
+            </tr>
+            
+          </table>
+        </div>
+      </td>
+      
+      <td >
+        [% IF Row.can_delete %]
+          <div class="toggle-controls">
+            <div style="float: right; padding-top:5px;">
+            <div style="display:none;">[% r.delete_record %]</div>
+            <a class="delete-post" onclick="rablDeletePost(this)">Delete Post</a>
+          </div>
+        [% END %] 
+        
+        <div style="float:right;">[% r.toggle.edit %]</div>
+        
+      </td>
+    </tr></table>
+  
+  </div>
+  
+  
+  
+  
+
+  
+  
+  <div class="post-body-wrap">
+  
+    <div class="tab-row">
+      <div class="tab-row-inner">
+    
+        <a 
+          class="tab-link preview inactive"
+          onclick="rablActivateTab(event.target,'preview')"
+        >
+        <span class="label">
+          <svg fill="#07a" aria-hidden="true" class="octicon octicon-eye" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M8.06 2C3 2 0 8 0 8s3 6 8.06 6C13 14 16 8 16 8s-3-6-7.94-6zM8 12c-2.2 0-4-1.78-4-4 0-2.2 1.8-4 4-4 2.22 0 4 1.8 4 4 0 2.22-1.78 4-4 4zm2-4c0 1.11-.89 2-2 2-1.11 0-2-.89-2-2 0-1.11.89-2 2-2 1.11 0 2 .89 2 2z"/></svg> 
+          <span>&nbsp;Publish Preview&nbsp;&nbsp;&nbsp;&nbsp;</span>
+        </span>
+        </a>
+      
+        <a 
+          class="tab-link source active"
+          onclick="rablActivateTab(event.target,'source')"
+        ><span class="label">
+          <svg fill="#07a" aria-hidden="true" class="octicon octicon-code" height="16" version="1.1" viewBox="0 0 14 16" width="14">
+            <path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z"/>
+          </svg>
+          <span>&nbsp;Body Markdown&nbsp;&nbsp;&nbsp;&nbsp;</span></span>
+        </a>
+       
+       <a 
+          class="tab-link attribs inactive"
+          onclick="rablActivateTab(event.target,'attribs')"
+        ><span class="label">
+           <svg fill="#07a" aria-hidden="true" class="octicon octicon-book dashboard-event-icon" height="16" role="img" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd" d="M3 5h4v1H3V5zm0 3h4V7H3v1zm0 2h4V9H3v1zm11-5h-4v1h4V5zm0 2h-4v1h4V7zm0 2h-4v1h4V9zm2-6v9c0 .55-.45 1-1 1H9.5l-1 1-1-1H2c-.55 0-1-.45-1-1V3c0-.55.45-1 1-1h5.5l1 1 1-1H15c.55 0 1 .45 1 1zm-8 .5L7.5 3H2v9h6V3.5zm7-.5H9.5l-.5.5V12h6V3z"/>
+          </svg>
+          <span>&nbsp;Attributes&nbsp;&nbsp;&nbsp;&nbsp;</span></span>
+        </a>
+        
+        
+        <div class="publink">
+          <div>&nbsp;&nbsp;&nbsp;Slug / Published URL</div>
+          <a 
+              class="with-icon icon-link"
+              href="[% Row.public_url_path %]{name}" target="_blank"
+              title="Open the public URL/page (new window)"
+          >[% Row.public_url_path %]{name}</a>
+
+        </div>
+        
+        
+      </div>
+    </div>
+    
+  
+    <div class="inner tab-content source">
+      <div class="headline">
+        <h5>
+          <span class="title">Raw body content [text/markdown]</span>
+          
+           [% r.toggle.edit %]
+        
+        
+        </h5>
+        
+        <div class="body-size">([% r.autofield.size %])</div>
+        
+        
+      </div>
+      <div class="post-body appdv-fill-absolute">
+        [% r.autofield.body %]
+      </div>
+    </div>
+    
+    <div class="inner tab-content preview" style="display:none;">
+      <div class="headline">
+        [% IF Row.can_modify %]
+        <div class="edit-link-wrapper" style="float:left;">
+        <h5>
+          <a 
+            class="preview-edit with-icon ra-icon-pencil"
+            onclick="rablActivateTab(event.target,'source','edit')"
+            title="Edit this post"
+          >Click to Edit</a>
+        </h5>
+        </div>
+        [% END %]
+        
+        <div class="pub-status" style="float:left;">
+           <span class="label">Last modified: </span>
+           <span class="ts">[% r.autofield.update_ts %]</span>
+           <span class="label">&nbsp;&nbsp;by: </span>
+           <span class="ts">[% r.renderfield.updater %]</span>
+        </div>
+
+        
+        <div class="pub-status" style="float:left;">
+          <tpl if="published">
+           <span class="label">Published: </span>
+           <span class="ts">[% r.autofield.publish_ts %]</span>
+          </tpl>
+          <tpl if="!published">
+            <span class="not-published">[NOT PUBLISHED]</span>
+          </tpl>
+        </div>
+        
+        
+        <a 
+				  style="float:right;padding-right:100px;" 
+          title="Home" target="_self"
+          href="[% c.mount_url %]/"
+        ><i class="fa fa-home"></i>&nbsp;Home</a>
+        
+        
+        <a 
+          class="preview-reloader with-icon ra-icon-refresh-tiny" 
+          title="Refresh preview"
+          onclick="rablPreviewReload(this)"
+        >&nbsp;Refresh</a>
+        
+      </div>
+      
+      <div class="iframe-wrap">
+        <iframe
+          class="preview-iframe"
+          src="about:blank" frameborder=0
+          onload='rablInitPreviewIframe(this,"[% Row.preview_url_path %]{name}")'
+        ></iframe>
+      </div>
+    </div>
+    
+    
+    <div class="inner tab-content attribs">
+      <div class="attr-content">
+      
+      
+      
+      
+      <div class="tile props">
+          <!--
+          <div class="heading">
+            Properties
+          </div>
+          -->
+          <div class="body">
+            
+            
+            
+            <table class="r-simple-table">
+              <tr>
+                <th>
+                  <b style="font-size:1.2em;">Unique Post Name</b>
+                  <i class="remark" style="padding:0px;padding-left:5px;">This is used to generate<br>
+                   the URL</i>
+                </th>
+                <td>
+                  <div class="appdv-fill-absolute space-for-icons">[% r.autofield.name %]</div>
+                </td>
+              </tr>
+              <tr>
+                <th>
+                  <b style="font-size:1.2em;">Post Title</b>
+                  <i class="remark" style="padding:0px;padding-left:5px;">Human-friendly name - defaults <br>
+                  to 'name' if unset</i>
+                </th>
+                <td>
+                  <div class="appdv-fill-absolute space-for-icons">[% r.autofield.title %]</div>
+                </td>
+              </tr>
+              
+            </table>
+            
+            
+            
+          <div class="tile whole image-column">
+            <center><h1>Post image</h1></center>
+            
+            <div style="padding-left:20px;">
+              [% r.autofield.image %]
+              
+              <div style="padding-left:10px;padding-right:20px;">
+                <i class="remark">
+                 Will only be displayed where configured within scaffold/templates
+                </i>
+              </div>
+            
+            
+            </div>
+    
+            
+            
+            
+
+          </div>
+            
+           
+           
+           <div class="tile whole summary-info">
+          
+            
+            <tpl if="!custom_summary">
+              <div style="padding-left:5px;">
+                <h2>Post Summary (auto-generated)</h2>
+              </div>
+              
+              <div class="auto-summary-wrap">
+                <div class="auto-summary">
+                  [% r.autofield.summary %]
+                </div>
+              </div>
+              
+              <div style="padding-left:5px;padding-top:20px;">
+                <h2>Enter a custom summary</h2>
+                <i class="remark">Enter your own summary text to use instead below</i>
+              </div>
+              
+              
+            </tpl>
+            <tpl if="custom_summary">
+              <div style="padding-left:5px;">
+                <h2>Post Summary (custom)</h2>
+                <i class="remark">Delete all the text to use auto-generated summary</i>
+              </div>
+              
+            </tpl>
+            
+            <div class="cust-summary-wrap" >
+              <div class="cust-summary appdv-fill-absolute space-for-icons">
+                [% r.autofield.custom_summary %]
+              </div>
+            </div>
+            
+            <div style="padding-left:10px;padding-right:10px;">
+              <i class="remark">
+                Post summary will only be displayed where configured within scaffold/templates
+              </i>
+            </div>
+
+          </div>
+
+            
+            
+          </div>
+        </div>
+      
+
+        <div class="tile props right">
+
+          <div class="body">
+            
+
+            
+             <table class="r-simple-table dbl">
+
+              <tr>
+                <th>Date/Time</th>
+                <td>[% r.autofield.ts %]</td>
+              </tr>
+              
+               <tr>
+                <th>Created</th>
+                <td>[% r.autofield.create_ts %]</td>
+              </tr>
+              
+              <tr>
+                <th>Updated</th>
+                <td>[% r.autofield.update_ts %]</td>
+              </tr>
+              
+              <tr>
+                <th>Published</th>
+                <td>[% r.autofield.publish_ts %]</td>
+              </tr>
+              
+              <tr>
+                <th>Is published?</th>
+                <td>[% r.autofield.published %]</td>
+              </tr>
+              
+              <tr>
+                <th>Author</th>
+                <td>[% r.autofield.author %]</td>
+              </tr>
+              
+              <tr>
+                <th>Creator</th>
+                <td>[% r.autofield.creator %]</td>
+              </tr>
+              
+              <tr>
+                <th>Updater</th>
+                <td>[% r.autofield.updater %]</td>
+              </tr>
+              
+
+
+            
+            
+            </table>
+            
+            <div style="padding-bottom:10px;"></div>
+            
+            <table class="r-simple-table dbl second" >
+
+
+
+              <tr>
+                <th>Post Tags</th>
+                <td>[% r.autofield.post_tags %]</td>
+              </tr>
+							
+							<tr>
+								<td class="tag-names-cell" colspan=2>
+									<i>[% r.autofield.tag_names %]</i>
+								</td>
+							</tr>
+              
+              <tr>
+                <th>Direct comments</th>
+                <td>[% r.autofield.direct_comments %]</td>
+              </tr>
+              
+              <tr>
+                <th>All comments</th>
+                <td>[% r.autofield.comments %]</td>
+              </tr>
+              
+              <tr>
+                <th>Recorded hits</th>
+                <td>[% r.autofield.hits %]</td>
+              </tr>
+              
+              
+              
+              
+            
+            
+            </table>
+            
+            
+
+          
+          </div>
+          
+          
+
+        </div>
+        
+        
+        
+
+
+<!--
+
+        
+        <div style="position:absolute;top:25px;left:5px;right:5px;bottom:5px;">
+        
+        
+       
+        
+          
+      
+      <table class="r-simple-table">
+        <tr>
+          <th>Name</th>
+          <td colspan=4>
+            <div style="float: right; padding-top:5px;">[% r.delete_record %]</div>
+            <span class="with-icon icon-post bigger">[% r.autofield.name %]</span>
+            <span class="with-icon" style="margin-left:30px;"><b><i>Published:</i></b> [% r.autofield.published %]</span>
+            
+          </td>
+        </tr>
+        <tr>
+          <th>Title</th>
+          <td colspan=4>
+            <span class="with-icon icon-post bigger">[% r.autofield.title %]</span>
+          </td>
+        </tr>
+        
+        <tr class="vert"><td></td><th>Date/Time           </th><th>Created                    </th><th>Updated                    </th><th>Author                  </th></tr>
+        <tr class="vert"><td></td><td>[% r.autofield.ts %]</td><td>[% r.autofield.create_ts %]</td><td>[% r.autofield.update_ts %]</td><td>[% r.autofield.author %]</td></tr>
+        
+      </table>
+        
+        
+         </div>
+        
+        
+      </div>
+      -->
+
+    </div>
+    
+    
+    
+  </div>
+  
+</div>
+
+</div>

@@ -2,7 +2,7 @@
 
 # NAME
 
-Net::Etcd
+Net::Etcd - etcd v3 REST API.
 
 # SYNOPSIS
 
@@ -39,75 +39,131 @@ Net::Etcd
     # attach lease to put
     $etcd->put( { key => 'foo2', value => 'bar2', lease => 7587821338341002662 } );
 
+    # add new user
+    $etcd->user( { name => 'samba', password => 'foo' } )->add;
+
+    # add new user role
+        $role = $etcd->role( { name => 'myrole' } )->add;
+
+    # grant role
+    $etcd->user_role( { user => 'samba', role => 'myrole' } )->grant;
+
 # DESCRIPTION
 
-This module has been superseded by [Net::Etcd](https://metacpan.org/pod/Net::Etcd) and will be removed from CPAN on June 29th 2017
+[Net::Etcd](https://metacpan.org/pod/Net::Etcd) is object oriented interface to the v3 REST API provided by the etcd [grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway).
 
 # ACCESSORS
 
 ## host
 
+The etcd host. Defaults to 127.0.0.1
+
 ## port
 
-## username
+Default 2379.
+
+## name
+
+Username for authentication
 
 ## password
 
+Authentication credentials
+
 ## ssl
 
-## api\_root
+To enable set to 1
 
-## api\_prefix
+## api\_version
 
 defaults to /v3alpha
 
 ## api\_path
 
+The full api path. Defaults to http://127.0.0.1:2379/v3alpha
+
 ## auth\_token
+
+The token that is passed during authentication.  This is generated during the
+authentication process and stored until no longer valid or username is changed.
 
 # PUBLIC METHODS
 
 ## watch
 
-Returns a [Net::Etcd::Watch](https://metacpan.org/pod/Net::Etcd::Watch) object.
+See [Net::Etcd::Watch](https://metacpan.org/pod/Net::Etcd::Watch)
 
     $etcd->watch({ key =>'foo', range_end => 'fop' })
 
 ## role
 
-Returns a [Net::Etcd::Auth::Role](https://metacpan.org/pod/Net::Etcd::Auth::Role) object.
+See [Net::Etcd::Auth::Role](https://metacpan.org/pod/Net::Etcd::Auth::Role)
 
     $etcd->role({ role => 'foo' });
 
 ## user\_role
 
-Returns a [Net::Etcd::User::Role](https://metacpan.org/pod/Net::Etcd::User::Role) object.
+See [Net::Etcd::User::Role](https://metacpan.org/pod/Net::Etcd::User::Role)
 
     $etcd->user_role({ name => 'samba', role => 'foo' });
 
 ## auth
 
-Returns a [Net::Etcd::Auth](https://metacpan.org/pod/Net::Etcd::Auth) object.
+See [Net::Etcd::Auth](https://metacpan.org/pod/Net::Etcd::Auth)
+
+    $etcd->auth({ name => 'samba', password => 'foo' })->authenticate;
+        $etcd->auth()->enable;
+        $etcd->auth()->disable
 
 ## lease
 
-Returns a [Net::Etcd::Lease](https://metacpan.org/pod/Net::Etcd::Lease) object.
+See [Net::Etcd::Lease](https://metacpan.org/pod/Net::Etcd::Lease)
+
+    $etcd->lease( { ID => 7587821338341002662, TTL => 20 } )->grant;
+
+## maintenance
+
+See [Net::Etcd::Maintenance](https://metacpan.org/pod/Net::Etcd::Maintenance)
+
+    $etcd->maintenance()->snapshot
 
 ## user
 
-Returns a [Net::Etcd::User](https://metacpan.org/pod/Net::Etcd::User) object.
+See [Net::Etcd::User](https://metacpan.org/pod/Net::Etcd::User)
+
+    $etcd->user( { name => 'samba', password => 'foo' } )->add;
 
 ## put
 
-Returns a [Net::Etcd::KV::Put](https://metacpan.org/pod/Net::Etcd::KV::Put) object.
+See [Net::Etcd::KV::Put](https://metacpan.org/pod/Net::Etcd::KV::Put)
+
+    $etcd->put({ key =>'foo1', value => 'bar' });
 
 ## range
 
-Returns a [Net::Etcd::KV::Range](https://metacpan.org/pod/Net::Etcd::KV::Range) object.
+See [Net::Etcd::KV::Range](https://metacpan.org/pod/Net::Etcd::KV::Range)
+
+    $etcd->range({ key =>'test0', range_end => 'test100' });
 
 ## txn
 
-Returns a [Net::Etcd::KV::Txn](https://metacpan.org/pod/Net::Etcd::KV::Txn) object.
+See [Net::Etcd::KV::Txn](https://metacpan.org/pod/Net::Etcd::KV::Txn)
+
+    $etcd->txn({ compare => \@compare, success => \@op });
+
+## op
+
+See [Net::Etcd::KV::Op](https://metacpan.org/pod/Net::Etcd::KV::Op)
+
+    $etcd->op({ request_put => $put });
+        $etcd->op({ request_delete_range => $range });
+
+## compare
+
+See [Net::Etcd::KV::Compare](https://metacpan.org/pod/Net::Etcd::KV::Compare)
+
+    $etcd->compare( { key => 'foo', result => 'EQUAL', target => 'VALUE', value => 'baz' });
+    $etcd->compare( { key => 'foo', target => 'CREATE', result => 'NOT_EQUAL', create_revision => '2' });
 
 ## configuration
 
@@ -123,8 +179,12 @@ The [etcd](https://github.com/coreos/etcd) developers and community.
 
 # CAVEATS
 
+Authentication will not be available until etcd release 3.2.1.  For testing puposes you can use my pre-release.
+
+[v3.2.0_plus_git](https://github.com/hexfusion/etcd/releases/tag/v3.2.0_plus_git)
+
 The [etcd](https://github.com/coreos/etcd) v3 API is in heavy development and can change at anytime please see
-https://github.com/coreos/etcd/blob/master/Documentation/dev-guide/api\_reference\_v3.md
+ [api\_reference\_v3](https://github.com/coreos/etcd/blob/master/Documentation/dev-guide/api_reference_v3.md)
 for latest details.
 
 # LICENSE AND COPYRIGHT

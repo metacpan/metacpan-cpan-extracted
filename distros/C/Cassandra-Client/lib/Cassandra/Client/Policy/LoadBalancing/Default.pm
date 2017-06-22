@@ -77,4 +77,9 @@ sub set_disconnected {
     delete $self->{connected}{$peer};
 }
 
+sub known_node_count {
+    my ($self)= @_;
+    return (0+ keys %{$self->{local_nodes}});
+}
+
 1;

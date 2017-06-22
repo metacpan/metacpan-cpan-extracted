@@ -6,6 +6,7 @@ package URPM;
 use strict;
 use warnings;
 use Config;
+use Math::Int64 ':native_if_available', 'int64';
 
 # perl_checker: require URPM
 
@@ -1837,6 +1838,7 @@ sub _selected_size_filesize {
     my ($urpm, $state, $compute_filesize) = @_;
     my ($size, $filesize, $bad_filesize);
 
+    $size = int64(0); # make sure to use Int64, even on 32bit
     foreach (keys %{$state->{selected} || {}}) {
 	my $pkg = $urpm->{depslist}[$_];
 	$size += $pkg->size;

@@ -12,7 +12,7 @@ sub broadcast {
   my ($self, $command, $args, $ids) = (shift, shift, shift || [], shift || []);
   return !!$self->pg->db->query(
     q{update minion_workers set inbox = inbox || $1::jsonb
-      where (id = any($2) or $2 = '{}')}, {json => [[$command, @$args]]}, $ids
+      where (id = any ($2) or $2 = '{}')}, {json => [[$command, @$args]]}, $ids
   )->rows;
 }
 
@@ -52,7 +52,8 @@ sub finish_job { shift->_update(0, @_) }
 sub job_info {
   shift->pg->db->query(
     'select id, args, attempts,
-       array(select id from minion_jobs where j.id = any(parents)) as children,
+       array(select id from minion_jobs where parents @> ARRAY[j.id])
+         as children,
        extract(epoch from created) as created,
        extract(epoch from delayed) as delayed,
        extract(epoch from finished) as finished, parents, priority, queue,
@@ -80,6 +81,12 @@ sub list_workers {
   my $sql = 'select id from minion_workers order by id desc limit ? offset ?';
   return $self->pg->db->query($sql, $limit, $offset)
     ->arrays->map(sub { $self->worker_info($_->[0]) })->to_array;
+}
+
+sub lock {
+  my ($self, $name, $duration, $options) = (shift, shift, shift, shift // {});
+  return !!$self->pg->db->query('select * from minion_lock(?, ?, ?)',
+    $name, $duration, $options->{limit} || 1)->array->[0];
 }
 
 sub new {
@@ -142,28 +149,19 @@ sub repair {
   )->hashes;
   $fail->each(sub { $self->fail_job(@$_{qw(id retries)}, 'Worker went away') });
 
-  # Jobs with missing parents (can't be retried)
-  $db->query(
-    "update minion_jobs as j
-     set finished = now(), result = to_json('Parent went away'::text),
-       state = 'failed'
-     where parents <> '{}' and cardinality(parents) <> (
-       select count(*) from minion_jobs where id = any (j.parents)
-     ) and state = 'inactive'"
-  );
-
   # Old jobs with no unresolved dependencies
   $db->query(
     "delete from minion_jobs as j
      where finished <= now() - interval '1 second' * ? and not exists (
        select 1 from minion_jobs
-       where j.id = any(parents) and state <> 'finished'
+       where parents @> ARRAY[j.id] and state != 'finished'
      ) and state = 'finished'", $minion->remove_after
   );
 }
 
 sub reset {
-  shift->pg->db->query('truncate minion_jobs, minion_workers restart identity');
+  shift->pg->db->query(
+    'truncate minion_jobs, minion_locks, minion_workers restart identity');
 }
 
 sub retry_job {
@@ -190,7 +188,7 @@ sub stats {
      select state::text || '_jobs', count(*) from minion_jobs group by state
      union all
      select 'delayed_jobs', count(*) from minion_jobs
-     where (delayed > now() or parents <> '{}') and state = 'inactive'
+     where (delayed > now() or parents != '{}') and state = 'inactive'
      union all
      select 'inactive_workers', count(*) from minion_workers
      union all
@@ -201,6 +199,15 @@ sub stats {
   $stats->{"${_}_jobs"} ||= 0 for qw(inactive active failed finished);
 
   return $stats;
+}
+
+sub unlock {
+  !!shift->pg->db->query(
+    'delete from minion_locks where id = (
+       select id from minion_locks
+       where expires > now() and name = ? order by expires limit 1
+     ) returning 1', shift
+  )->rows;
 }
 
 sub unregister_worker {
@@ -226,10 +233,11 @@ sub _try {
      set started = now(), state = 'active', worker = ?
      where id = (
        select id from minion_jobs as j
-       where delayed <= now() and (parents = '{}' or cardinality(parents) = (
-         select count(*) from minion_jobs
-         where id = any(j.parents) and state = 'finished'
-       )) and queue = any(?) and state = 'inactive' and task = any(?)
+       where delayed <= now() and (parents = '{}' or not exists (
+         select 1 from minion_jobs
+         where id = any (j.parents)
+           and state in ('inactive', 'active', 'failed')
+       )) and queue = any (?) and state = 'inactive' and task = any (?)
        order by priority desc, id
        limit 1
        for update skip locked
@@ -569,6 +577,27 @@ List only jobs for this task.
 
 Returns the same information as L</"worker_info"> but in batches.
 
+=head2 lock
+
+  my $bool = $backend->lock('foo', 3600);
+  my $bool = $backend->lock('foo', 3600, {limit => 20});
+
+Try to acquire a named lock that will expire automatically after the given
+amount of time in seconds.
+
+These options are currently available:
+
+=over 2
+
+=item limit
+
+  limit => 20
+
+Number of shared locks with the same name that can be active at the same time,
+defaults to C<1>.
+
+=back
+
 =head2 new
 
   my $backend = Minion::Backend::Pg->new('postgresql://postgres@/test');
@@ -714,6 +743,12 @@ Number of jobs in C<inactive> state.
 Number of workers that are currently not processing a job.
 
 =back
+
+=head2 unlock
+
+  my $bool = $backend->unlock('foo');
+
+Release a named lock.
 
 =head2 unregister_worker
 
@@ -869,9 +904,32 @@ create index on minion_jobs (state, priority desc, id);
 alter table minion_workers add column inbox jsonb
   check(jsonb_typeof(inbox) = 'array') default '[]';
 
--- 13 up
-create index on minion_jobs using gin (parents);
-
 -- 15 up
 alter table minion_workers add column status jsonb
   check(jsonb_typeof(status) = 'object') default '{}';
+
+-- 16 up
+create index on minion_jobs using gin (parents);
+create table if not exists minion_locks (
+  id      bigserial not null primary key,
+  name    text not null,
+  expires timestamp with time zone not null
+);
+create index on minion_locks (expires);
+create function minion_lock(text, int, int) returns bool as $$
+declare
+  new_expires timestamp with time zone = now() + (interval '1 second' * $2);
+begin
+  delete from minion_locks where expires < now();
+  lock table minion_locks in exclusive mode;
+  if (select count(*) >= $3 from minion_locks where name = $1) then
+    return false;
+  end if;
+  insert into minion_locks (name, expires) values ($1, new_expires);
+  return true;
+end;
+$$ language plpgsql;
+
+-- 16 down
+drop function if exists minion_lock(text, int, int);
+drop table if exists minion_locks;

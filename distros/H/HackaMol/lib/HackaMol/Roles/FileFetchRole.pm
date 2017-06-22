@@ -1,10 +1,11 @@
 package HackaMol::Roles::FileFetchRole;
-$HackaMol::Roles::FileFetchRole::VERSION = '0.039';
+$HackaMol::Roles::FileFetchRole::VERSION = '0.040';
 #ABSTRACT: Role for using LWP::Simple to fetch files from www 
 use Moose::Role;
 use Carp;
+use LWP::Simple;
 
-has 'pdbserver',   is => 'rw', isa => 'Str', lazy => 1, default => 'http://pdb.org/pdb/files/';
+has 'pdbserver',   is => 'rw', isa => 'Str', lazy => 1, default => 'https://files.rcsb.org/download/';
 has 'overwrite',   is => 'rw', isa => 'Bool', lazy => 1, default => 0;
 
 sub _fix_pdbid{
@@ -16,7 +17,6 @@ sub _fix_pdbid{
 
 sub get_pdbid{
   #return pdb contents downloaded from pdb.org
-  use LWP::Simple;
   my $self = shift;
   my $pdbid = _fix_pdbid(shift);  
   my $pdb = get($self->pdbserver.$pdbid);
@@ -25,7 +25,6 @@ sub get_pdbid{
 
 sub getstore_pdbid{
   #return array of lines from pdb downloaded from pdb.org
-  use LWP::Simple;
   my $self = shift;
   my $pdbid = _fix_pdbid(shift);
   my $fpdbid = shift ;
@@ -50,7 +49,7 @@ HackaMol::Roles::FileFetchRole - Role for using LWP::Simple to fetch files from 
 
 =head1 VERSION
 
-version 0.039
+version 0.040
 
 =head1 SYNOPSIS
 
@@ -107,7 +106,7 @@ Demian Riccardi <demianriccardi@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Demian Riccardi.
+This software is copyright (c) 2017 by Demian Riccardi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

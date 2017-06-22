@@ -1,12 +1,11 @@
 package Lab::MultiChannelInstrument::DeviceCache;
-
+$Lab::MultiChannelInstrument::DeviceCache::VERSION = '3.550';
 use warnings;
 use strict;
 
 require Tie::Hash;
 use List::MoreUtils qw{ any };
 
-our $VERSION = '3.543';
 
 our @ISA = 'Tie::ExtraHash';
 

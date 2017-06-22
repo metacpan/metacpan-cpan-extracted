@@ -1,5 +1,8 @@
 Revision history for Finance-Contract
 
+0.010     2017-06-16 07:27:19+00:00 UTC
+    Introduce coinauction
+
 0.009     2017-05-03 01:54:55+00:00 UTC
     Bug fixes:
 

@@ -46,6 +46,6 @@
          "url" : "https://github.com/jhthorsen/mojolicious-plugin-pager.git"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

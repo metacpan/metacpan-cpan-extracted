@@ -1,0 +1,65 @@
+{
+   "abstract" : "Web::API - A Simple base module to implement almost every RESTful API with just a few lines of configuration",
+   "author" : [
+      "Tobias Kirschstein <lev@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Web-API",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Printer" : "0",
+            "Data::Random" : "0",
+            "HTTP::Cookies" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Mouse::Role" : "0",
+            "Net::OAuth" : "0",
+            "Time::HiRes" : "0",
+            "URI" : "0",
+            "URI::Escape::XS" : "0",
+            "URI::QueryParam" : "0",
+            "XML::Simple" : "0",
+            "experimental" : "0",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/nupfel/Web-API/issues"
+      },
+      "homepage" : "https://github.com/nupfel/Web-API/wiki",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nupfel/Web-API.git",
+         "web" : "https://github.com/nupfel/Web-API"
+      }
+   },
+   "version" : "2.2.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+}
+

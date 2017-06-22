@@ -1,3 +1,0 @@
-work/features/double_colon.mk.1:3: warning: overriding commands for target `a xb'
-work/features/double_colon.mk.1:2: warning: ignoring old commands for target `a xb'
-two

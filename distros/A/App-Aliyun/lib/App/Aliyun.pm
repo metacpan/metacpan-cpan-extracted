@@ -2,7 +2,7 @@ package App::Aliyun;
 
 use strict;
 use 5.008_005;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 1;
 __END__
@@ -23,7 +23,10 @@ App::Aliyun - Aliyun Command Tools
   $ aliyun-cli-regions
 
   ### add your public IP in the RDS whitelist for all instances
-  $ scripts/aliyun-cli-rds-whitelist-my-ip mygroupA
+  $ aliyun-cli-rds-whitelist-my-ip mygroupA
+
+  ### restart instance by name
+  $ aliyun-cli-ec2-restart-by-name server1
 
 =head1 DESCRIPTION
 

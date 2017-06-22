@@ -1,0 +1,194 @@
+#!perl
+use 5.010;
+use strict;
+use warnings;
+
+use Text::CSV_XS;
+use Text::Table::Tiny qw/ generate_table /;
+use Getopt::Long;
+
+my $usage_string     = "usage: $0 [-h] [-d <dir>] [-i] <pattern> <file>\n";
+my $case_insensitive = 0;
+my $column_spec;
+
+
+my ($pattern, $filename) = process_command_line();
+show_matching_rows($pattern, $filename);
+exit 0;
+
+
+sub show_matching_rows
+{
+    my ($pattern, $filename) = @_;
+    my @col_indices;
+    my @rows;
+
+    open(my $fh, '<:encoding(utf8)', $filename)
+        || die "can't read $filename: $!\n";
+
+    my $parser  = Text::CSV_XS->new();
+    my @headers = @{ $parser->getline($fh) };
+
+    if ($column_spec) {
+        @col_indices = split(/,/, $column_spec);
+        @headers    = @headers[@col_indices];
+    }
+
+    push(@rows, \@headers);
+
+    while (<$fh>) {
+        next unless ($case_insensitive && /$pattern/io)
+                 || (!$case_insensitive && /$pattern/o);
+        my $status = $parser->parse($_);
+        my @columns = $parser->fields;
+        if ($column_spec) {
+            @columns = @columns[@col_indices];
+        }
+        push(@rows, [@columns]);
+    }
+
+    die "no match\n" unless @rows > 1;
+
+    print generate_table(rows => \@rows, header_row => 1), "\n";
+}
+
+
+sub process_command_line
+{
+    my $dirpath;
+    my $help = 0;
+    
+    GetOptions(
+        'ignore-case|i'     => \$case_insensitive,
+        'help|h'            => \$help,
+        'columns|c=s'       => \$column_spec,
+        'directory|d=s'     => \$dirpath,
+    ) || die $usage_string;
+
+    die $usage_string if ($help);
+    die $usage_string unless @ARGV == 2
+                          || $dirpath;
+
+    my $pattern  = shift @ARGV;
+
+    my $filename = $dirpath
+                 ? find_newest_file($dirpath)
+                 : shift @ARGV;
+
+    return ($pattern, $filename);
+}
+
+sub find_newest_file
+{
+    my $dirpath = shift;
+
+    opendir(my $DIR, $dirpath)
+        || die "can't read directory $dirpath: $!\n";
+
+    my @files = map { $_->[0] }
+                sort { $b->[1] <=> $a->[1] }
+                map { [ $_, (stat("$dirpath/$_"))[9] ] } # mtime
+                grep { /\.csv$/ } readdir($DIR);
+
+    closedir($DIR);
+
+    die "no .csv files found in $dirpath\n" unless @files > 0;
+
+    return "$dirpath/$files[0]";
+}
+
+__END__
+
+=head1 NAME
+
+csvgrep - search for patterns in a CSV and display results in a table
+
+=head1 SYNOPSIS
+
+ csvgrep <pattern> <file>
+ csvgrep -d <directory> <pattern>
+
+=head1 DESCRIPTION
+
+B<csvgrep> is a script that lets you look for a pattern in a CSV file,
+and then displays the results in a text table.
+We assume that the first line in the CSV is a header row.
+
+The simplest usage is to look for a word in a CSV:
+
+ % csvgrep Murakami books.csv
+ +-------------------+-----------------+-------+------+
+ | Book              | Author          | Pages | Date |
+ +-------------------+-----------------+-------+------+
+ | Norwegian Wood    | Haruki Murakami | 400   | 1987 |
+ | Men without Women | Haruki Murakami | 228   | 2017 |
+ +-------------------+-----------------+-------+------+
+
+As with regular grep, you can use the B<-i> switch to make it
+case-insensitive:
+
+ % csvgrep -i wood books.csv
+ +-----------------------+-----------------+-------+------+
+ | Book                  | Author          | Pages | Date |
+ +-----------------------+-----------------+-------+------+
+ | Norwegian Wood        | Haruki Murakami | 400   | 1987 |
+ | A Walk in the Woods   | Bill Bryson     | 276   | 1997 |
+ | Death Walks the Woods | Cyril Hare      | 222   | 1954 |
+ +-----------------------+-----------------+-------+------+
+
+You can specify a subset of the columns to display with the B<-c> option,
+which takes a comma-separated list of column numbers:
+
+ % csvgrep -c 0,1,3 -i mary books.csv
+ +--------------+--------------+------+
+ | Book         | Author       | Date |
+ +--------------+--------------+------+
+ | Mary Poppins | PL Travers   | 1934 |
+ | Frankenstein | Mary Shelley | 1818 |
+ +--------------+--------------+------+
+
+The pattern can be a Perl regexp,
+but you'll probably need to quote it from your shell:
+
+ % csvgrep -i 'walk.*wood' books.csv
+ +-----------------------+-------------+-------+------+
+ | Book                  | Author      | Pages | Date |
+ +-----------------------+-------------+-------+------+
+ | A Walk in the Woods   | Bill Bryson | 276   | 1997 |
+ | Death Walks the Woods | Cyril Hare  | 222   | 1954 |
+ +-----------------------+-------------+-------+------+
+
+At work we have a number of situations where we have a directory that contains multiple versions
+of a particular CSV file, for example with a feed from a customer.
+With the B<-d> option, csvgrep will look at the most recent file in the specified directory,
+only considering files with a .csv extension:
+
+ % csvgrep -d /usr/local/feeds/users -i smith
+
+I have various aliases defined, like this:
+
+ alias tg="csvgrep -d .../file.csv -c 0,1,2 -i"
+
+So then I can just run:
+
+ tg smith
+
+This is a script I've used internally,
+with features being added as I wanted them.
+Let me know if you've ideas for additional features, or send me a pull request.
+
+=head1 REPOSITORY
+
+L<https://github.com/neilb/csvgrep>
+
+=head1 AUTHOR
+
+Neil Bowers E<lt>neilb@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Neil Bowers <neilb@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

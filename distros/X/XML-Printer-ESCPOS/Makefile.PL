@@ -15,15 +15,19 @@ WriteMakefile(
         'ExtUtils::MakeMaker' => 0,
     },
     BUILD_REQUIRES => {
-        'Test::More'          => 0,
-        'Test::CheckManifest' => 0,
-        'Test::Pod::Coverage' => 0,
-        'Test::Pod'           => 0,
+        'Test::More'                    => 0,
+        'Test::CheckManifest'           => 0,
+        'Test::Pod::Coverage'           => 0,
+        'Test::Pod'                     => 0,
+        'Test::Deep'                    => 0,
+        'Test::Deep::UnorderedPairs'    => 0,
     },
     PREREQ_PM => {
-        'XML::Parser'   => 0,
-        'Text::Wrapper' => 0,
-        'GD'            => 0,
+        'XML::Parser'       => 0,
+        'Text::Wrapper'     => 0,
+        'GD'                => 0,
+        'List::MoreUtils'   => 0,
+        'Array::Utils'      => 0,
     },
     META_MERGE => {
         resources => {

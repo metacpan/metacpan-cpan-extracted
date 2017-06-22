@@ -1,12 +1,11 @@
 package Ledger::Journal;
 
-our $DATE = '2016-01-12'; # DATE
-our $VERSION = '0.05'; # VERSION
+our $DATE = '2017-06-16'; # DATE
+our $VERSION = '0.06'; # VERSION
 
 use 5.010;
 use strict;
 use warnings;
-use Carp;
 
 sub new {
     my ($class, %attrs) = @_;
@@ -50,7 +49,7 @@ Ledger::Journal - Represent Ledger journal
 
 =head1 VERSION
 
-This document describes version 0.05 of Ledger::Journal (from Perl distribution Ledger-Parser), released on 2016-01-12.
+This document describes version 0.06 of Ledger::Journal (from Perl distribution Ledger-Parser), released on 2017-06-16.
 
 =head1 SYNOPSIS
 
@@ -86,17 +85,13 @@ stringification.
 
 Empty journal.
 
-=head1 SEE ALSO
-
-L<Ledger::Parser>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Ledger-Parser>.
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Ledger-Parser>.
+Source repository is at L<https://github.com/perlancar/perl-Ledger-Parser>.
 
 =head1 BUGS
 
@@ -106,13 +101,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Ledger::Parser>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

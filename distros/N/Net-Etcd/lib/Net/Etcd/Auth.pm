@@ -9,9 +9,11 @@ use warnings;
 =cut
 
 use Moo;
+use JSON;
 use Carp;
 use Types::Standard qw(Str Int Bool HashRef ArrayRef);
 use Net::Etcd::Auth::Role;
+use Data::Dumper;
 
 with 'Net::Etcd::Role::Actions';
 
@@ -24,7 +26,7 @@ Net::Etcd::Auth
 
 =cut
 
-our $VERSION = '0.009';
+our $VERSION = '0.013';
 
 =head1 DESCRIPTION
 
@@ -57,41 +59,60 @@ has endpoint => (
     isa      => Str,
 );
 
-=head2 password
+=head2 name
+
+Defaults to $etcd->name
 
 =cut
 
 has name => (
-    is       => 'ro',
-    isa      => Str,
+    is       => 'lazy',
 );
 
+sub _build_name {
+    my ($self) = @_;
+    my $user = $self->etcd->name;
+    return $user if $user;
+    return;
+}
+
 =head2 password
+
+Defaults to $etcd->password
 
 =cut
 
 has password => (
-    is       => 'ro',
-    isa      => Str,
+    is       => 'lazy',
 );
+
+sub _build_password {
+    my ($self) = @_;
+    my $pwd = $self->etcd->password;
+    return $pwd if $pwd;
+    return;
+}
 
 =head1 PUBLIC METHODS
 
 =head2 authenticate
 
-Enable authentication, this requires name and password.
+Returns token with valid authentication.
 
-    $etcd->auth({ name => $user, password => $pass })->authenticate;
+    my $token = $etcd->auth({ name => $user, password => $pass })->authenticate;
 
 =cut
 
 sub authenticate {
     my ( $self, $options ) = @_;
     $self->{endpoint} = '/auth/authenticate';
-    confess 'name and password required for ' . __PACKAGE__ . '->authenticate'
-      unless ($self->{password} && $self->{name});
+    return unless ($self->password && $self->name);
     $self->request;
-    return $self;
+    my $auth = from_json($self->{response}{content});
+    if ($auth && defined  $auth->{token}) {
+        $self->etcd->{auth_token} = $auth->{token};
+    }
+    return;
 }
 
 =head2 enable
@@ -107,6 +128,9 @@ sub enable {
     $self->{endpoint} = '/auth/enable';
     $self->{json_args} = '{}';
     $self->request;
+
+    # init token
+    $self->etcd->auth()->authenticate;
     return $self;
 }
 
@@ -122,8 +146,9 @@ sub disable {
     my ( $self, $options ) = @_;
     $self->{endpoint} = '/auth/disable';
     confess 'root name and password required for ' . __PACKAGE__ . '->disable'
-      unless ($self->{password} && $self->{name});
+      unless ($self->password && $self->name);
     $self->request;
+    $self->etcd->clear_auth_token;
     return $self;
 }
 

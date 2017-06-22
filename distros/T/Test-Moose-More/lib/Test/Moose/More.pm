@@ -1,7 +1,7 @@
 #
 # This file is part of Test-Moose-More
 #
-# This software is Copyright (c) 2012 by Chris Weyl.
+# This software is Copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by Chris Weyl.
 #
 # This is free software, licensed under:
 #
@@ -9,8 +9,8 @@
 #
 package Test::Moose::More;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-# git description: 0.046-21-gf16defd
-$Test::Moose::More::VERSION = '0.047';
+# git description: 0.047-23-gb33a6e7
+$Test::Moose::More::VERSION = '0.048';
 
 # ABSTRACT: More tools for testing Moose packages
 
@@ -22,47 +22,43 @@ use Sub::Exporter::Progressive -setup => {
         attribute_options_ok
         check_sugar_ok
         check_sugar_removed_ok
+        does_metaroles_ok
+        does_not_metaroles_ok
         does_not_ok
+        does_not_require_method_ok
         does_ok
         has_attribute_ok
+        has_method_from_anywhere_ok
+        has_method_ok
+        has_no_method_from_anywhere_ok
+        has_no_method_ok
+        is_anon
         is_anon_ok
+        is_class
         is_class_ok
         is_immutable_ok
+        is_not_anon
         is_not_anon_ok
         is_not_immutable_ok
+        is_not_pristine_ok
+        is_pristine_ok
+        is_role
         is_role_ok
         meta_ok
+        method_from_pkg_ok
+        method_is_accessor_ok
+        method_is_not_accessor_ok
+        method_not_from_pkg_ok
+        no_meta_ok
+        requires_method_ok
+        role_wraps_after_method_ok
+        role_wraps_around_method_ok
+        role_wraps_before_method_ok
         validate_attribute
         validate_class
         validate_role
         validate_thing
         with_immutable
-
-        has_method_ok
-        has_no_method_ok
-        has_method_from_anywhere_ok
-        has_no_method_from_anywhere_ok
-
-        method_from_pkg_ok
-        method_not_from_pkg_ok
-
-        requires_method_ok
-        does_not_require_method_ok
-
-        is_pristine_ok
-        is_not_pristine_ok
-
-        role_wraps_around_method_ok
-        role_wraps_before_method_ok
-        role_wraps_after_method_ok
-
-        is_anon
-        is_class
-        is_not_anon
-        is_role
-
-        does_metaroles_ok
-        does_not_metaroles_ok
     } ],
     groups => {
         default  => [ ':all' ],
@@ -73,6 +69,7 @@ use Sub::Exporter::Progressive -setup => {
 use Test::Builder;
 use Test::More;
 use Test::Moose 'with_immutable';
+use List::MoreUtils 'apply';
 use Scalar::Util 'blessed';
 use Syntax::Keyword::Junction 'any';
 use Moose::Util 'resolve_metatrait_alias', 'does_role', 'find_meta';
@@ -108,13 +105,11 @@ sub _thing_name {
 }
 
 
-sub meta_ok ($;$) {
-    my ($thing, $message) = @_;
-
-    my $thing_meta = find_meta($thing);
-    $message ||= _thing_name($thing, $thing_meta) . ' has a meta';
-
-    return $tb->ok(!!$thing_meta, $message);
+{
+    my $_yes = sub { $tb->ok(!!shift, shift . ' has a meta')           };
+    my $_no  = sub { $tb->ok( !shift, shift . ' does not have a meta') };
+    sub meta_ok    ($;$) { unshift @_, $_yes, $_[0]; goto \&_method_ok_guts }
+    sub no_meta_ok ($;$) { unshift @_, $_no,  $_[0]; goto \&_method_ok_guts }
 }
 
 
@@ -220,6 +215,11 @@ sub _method_ok_guts {
     my $_no  = sub { $tb->ok($_[0]->original_package_name ne $_[1], "$_[3] is not from $_[1]") };
     sub method_from_pkg_ok($$$)     { _method_from_pkg_ok($_yes, @_) }
     sub method_not_from_pkg_ok($$$) { _method_from_pkg_ok($_no,  @_) }
+
+    my $_yes_acc = sub { $tb->ok( $_[0]->isa('Class::MOP::Method::Accessor'), "$_[3] is an accessor method")     };
+    my $_no_acc  = sub { $tb->ok(!$_[0]->isa('Class::MOP::Method::Accessor'), "$_[3] is not an accessor method") };
+    sub method_is_accessor_ok($$)     { _method_from_pkg_ok($_yes_acc, @_) }
+    sub method_is_not_accessor_ok($$) { _method_from_pkg_ok($_no_acc,  @_) }
 }
 
 sub _method_from_pkg_ok {
@@ -249,7 +249,7 @@ sub _role_wraps {
 
     ### $thing
     my $meta = find_meta($thing);
-    my $name = $meta->name;
+    my $name = _thing_name($thing, $meta);
 
     ### @methods
     $tb->ok(!!$meta->$meta_method($_), "$name wraps $style method $_")
@@ -464,16 +464,17 @@ sub _validate_thing_guts {
     for my $attribute (@{Data::OptList::mkopt($args{attributes} || [])}) {
 
         my ($name, $opts) = @$attribute;
-        has_attribute_ok($thing, $name);
+        has_attribute_ok($thing, $name)
+            or next ATTRIBUTE_LOOP;
 
-        if ($opts && (my $att = find_meta($thing)->get_attribute($name))) {
+        if (!!$opts) {
 
             SKIP: {
                 skip 'Cannot examine attribute metaclass in roles', 1
                     if (find_meta($thing)->isa('Moose::Meta::Role'));
 
                 local $THING_NAME = _thing_name($thing) . "'s attribute $name";
-                _validate_attribute($att => (
+                _validate_attribute(_find_attribute($thing, $name) => (
                     -subtest => "checking $THING_NAME",
                     %$opts,
                 ));
@@ -603,9 +604,9 @@ sub __validate_attribute_guts {
 
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     my %thing_opts =
-        map  { $_ => delete $opts{"-$_"} }
-        map  { s/^-//; $_                }
-        grep { /^-/                      }
+        map   { $_ => delete $opts{"-$_"} }
+        apply { s/^-//                    }
+        grep  { /^-/                      }
         sort keys %opts
         ;
 
@@ -764,7 +765,7 @@ Test::Moose::More - More tools for testing Moose packages
 
 =head1 VERSION
 
-This document describes version 0.047 of Test::Moose::More - released April 24, 2017 as part of Test-Moose-More.
+This document describes version 0.048 of Test::Moose::More - released June 17, 2017 as part of Test-Moose-More.
 
 =head1 SYNOPSIS
 
@@ -786,7 +787,7 @@ tests, and re-exports any tests that it has and we do not, yet.
 
 By default, this package exports all test functions.  You can be more
 selective, however, and there are a number of export groups (aside from the
-default ':all') to help you achieve those dreams!
+default C<:all>) to help you achieve those dreams!
 
 =over 4
 
@@ -804,12 +805,18 @@ L</validate_attribute>, L</validate_class>, L</validate_role>, L</validate_thing
 
 =head2 meta_ok $thing
 
-Tests $thing to see if it has a metaclass; $thing may be the class name or
-instance of the class you wish to check.
+Tests C<$thing> to see if it has a metaclass; C<$thing> may be the class name or
+instance of the class you wish to check.  Passes if C<$thing> has a metaclass.
+
+=head2 no_meta_ok $thing
+
+Tests C<$thing> to see if it does not have a metaclass; C<$thing> may be the class
+name or instance of the class you wish to check.  Passes if C<$thing> does not
+have a metaclass.
 
 =head2 does_ok $thing, < $role | \@roles >, [ $message ]
 
-Checks to see if $thing does the given roles.  $thing may be the class name or
+Checks to see if C<$thing> does the given roles.  C<$thing> may be the class name or
 instance of the class you wish to check.
 
 Note that the message will be taken verbatim unless it contains C<%s>
@@ -817,8 +824,8 @@ somewhere; this will be replaced with the name of the role being tested for.
 
 =head2 does_not_ok $thing, < $role | \@roles >, [ $message ]
 
-Checks to see if $thing does not do the given roles.  $thing may be the class
-name or instance of the class you wish to check.
+Checks to see if C<$thing> does not do the given roles.  C<$thing> may be the
+class name or instance of the class you wish to check.
 
 Note that the message will be taken verbatim unless it contains C<%s>
 somewhere; this will be replaced with the name of the role being tested for.
@@ -830,30 +837,32 @@ class name, instance, or role name.
 
 =head2 has_method_ok $thing, @methods
 
-Queries $thing's metaclass to see if $thing has the methods named in @methods.
+Queries C<$thing>'s metaclass to see if C<$thing> has the methods named in
+C<@methods>.
 
 Note: This does B<not> include inherited methods; see
 L<Class::MOP::Class/has_method>.
 
 =head2 has_no_method_ok $thing, @methods
 
-Queries $thing's metaclass to ensure $thing does not provide the methods named
-in @methods.
+Queries C<$thing>'s metaclass to ensure C<$thing> does not provide the methods named
+in C<@methods>.
 
 Note: This does B<not> include inherited methods; see
 L<Class::MOP::Class/has_method>.
 
 =head2 has_method_from_anywhere_ok $thing, @methods
 
-Queries $thing's metaclass to see if $thing has the methods named in @methods.
+Queries C<$thing>'s metaclass to see if C<$thing> has the methods named in
+C<@methods>.
 
 Note: This B<does> include inherited methods; see
 L<Class::MOP::Class/find_method_by_name>.
 
 =head2 has_no_method_from_anywhere_ok $thing, @methods
 
-Queries $thing's metaclass to ensure $thing does not provide the methods named
-in @methods.
+Queries C<$thing>'s metaclass to ensure C<$thing> does not provide the methods
+named in C<@methods>.
 
 Note: This B<does> include inherited methods; see
 L<Class::MOP::Class/find_method_by_name>.
@@ -861,73 +870,83 @@ L<Class::MOP::Class/find_method_by_name>.
 =head2 method_from_pkg_ok $thing, $method, $orig_pkg
 
 Given a thing (role, class, etc) and a method, test that it originally came
-from $orig_pkg.
+from C<$orig_pkg>.
 
 =head2 method_not_from_pkg_ok $thing, $method, $orig_pkg
 
 Given a thing (role, class, etc) and a method, test that it did not come from
-$orig_pkg.
+C<$orig_pkg>.
+
+=head2 method_is_accessor_ok $thing, $method
+
+Given a thing (role, class, etc) and a method, test that the method is an
+accessor -- that is, it descends from L<Class::MOP::Method::Accessor>.
+
+=head2 method_is_not_accessor_ok $thing, $method
+
+Given a thing (role, class, etc) and a method, test that the method is B<not>
+an accessor -- that is, it does not descend from L<Class::MOP::Method::Accessor>.
 
 =head2 role_wraps_around_method_ok $role, @methods
 
-Queries $role's metaclass to see if $role wraps the methods named in
-@methods with an around method modifier.
+Queries C<$role>'s metaclass to see if C<$role> wraps the methods named in
+C<@methods> with an around method modifier.
 
 =head2 role_wraps_before_method_ok $role, @methods
 
-Queries $role's metaclass to see if $role wraps the methods named in
-@methods with an before method modifier.
+Queries C<$role>'s metaclass to see if C<$role> wraps the methods named in
+C<@methods> with an before method modifier.
 
 =head2 role_wraps_after_method_ok $role, @methods
 
-Queries $role's metaclass to see if $role wraps the methods named in
-@methods with an after method modifier.
+Queries C<$role>'s metaclass to see if C<$role> wraps the methods named in
+C<@methods> with an after method modifier.
 
 =head2 requires_method_ok $thing, @methods
 
-Queries $thing's metaclass to see if $thing requires the methods named in
-@methods.
+Queries C<$thing>'s metaclass to see if C<$thing> requires the methods named in
+C<@methods>.
 
-Note that this really only makes sense if $thing is a role.
+Note that this really only makes sense if C<$thing> is a role.
 
 =head2 does_not_require_method_ok $thing, @methods
 
-Queries $thing's metaclass to ensure $thing does not require the methods named
-in @methods.
+Queries C<$thing>'s metaclass to ensure C<$thing> does not require the methods named
+in C<@methods>.
 
-Note that this really only makes sense if $thing is a role.
+Note that this really only makes sense if C<$thing> is a role.
 
 =head2 is_immutable_ok $thing
 
-Passes if $thing is immutable.
+Passes if C<$thing> is immutable.
 
 =head2 is_not_immutable_ok $thing
 
-Passes if $thing is not immutable; that is, is mutable.
+Passes if C<$thing> is not immutable; that is, is mutable.
 
 =head2 is_pristine_ok $thing
 
-Passes if $thing is pristine.  See L<Class::MOP::Class/is_pristine>.
+Passes if C<$thing> is pristine.  See L<Class::MOP::Class/is_pristine>.
 
 =head2 is_not_pristine_ok $thing
 
-Passes if $thing is not pristine.  See L<Class::MOP::Class/is_pristine>.
+Passes if C<$thing> is not pristine.  See L<Class::MOP::Class/is_pristine>.
 
 =head2 is_role_ok $thing
 
-Passes if $thing's metaclass is a L<Moose::Meta::Role>.
+Passes if C<C<$thing>'s> metaclass is a L<Moose::Meta::Role>.
 
 =head2 is_class_ok $thing
 
-Passes if $thing's metaclass is a L<Moose::Meta::Class>.
+Passes if C<C<$thing>'s> metaclass is a L<Moose::Meta::Class>.
 
 =head2 is_anon_ok $thing
 
-Passes if $thing is "anonymous".
+Passes if C<$thing> is "anonymous".
 
 =head2 is_not_anon_ok $thing
 
-Passes if $thing is not "anonymous".
+Passes if C<$thing> is not "anonymous".
 
 =head2 check_sugar_removed_ok $thing
 
@@ -954,7 +973,7 @@ L<MooseX::AttributeShortcuts> is actually applied, I could do this:
     };
     done_testing;
 
-This function will accept either class or role metaclasses for $thing.
+This function will accept either class or role metaclasses for C<$thing>.
 
 The MOPs available for classes (L<Moose::Meta::Class>) are:
 
@@ -1002,12 +1021,12 @@ The MOPs available for roles (L<Moose::Meta::Role>) are:
 
 =back
 
-Note!  Neither this function nor does_not_metaroles_ok() attempts to validate
-that the MOP type passed in is a member of the above lists.  There's no gain
-here in implementing such a check, and a negative to be had: specifying an
-invalid MOP type will result in immediate explosions, while it's entirely
-possible other MOP types will be added (either to core, via traits, or "let's
-subclass Moose::Meta::Class/etc and implement something new").
+Note!  Neither this function nor C<does_not_metaroles_ok()> attempts to
+validate that the MOP type passed in is a member of the above lists.  There's
+no gain here in implementing such a check, and a negative to be had:
+specifying an invalid MOP type will result in immediate explosions, while it's
+entirely possible other MOP types will be added (either to core, via traits,
+or "let's subclass Moose::Meta::Class/etc and implement something new").
 
 =head2 does_not_metaroles_ok $thing => { $mop => [ @traits ], ... };
 
@@ -1074,9 +1093,9 @@ A list of roles the thing should not do.
 
 attributes => [ ... ]
 
-The attributes list specified here is in the form of a list of names, each optionally
-followed by a hashref of options to test the attribute for; this hashref takes the
-same arguments L</validate_attribute> does.  e.g.:
+The attributes list specified here is in the form of a list of names, each
+optionally followed by a hashref of options to test the attribute for; this
+hashref takes the same arguments L</validate_attribute> does.  e.g.:
 
     validate_thing $thing => (
 
@@ -1113,7 +1132,7 @@ metaclasses => { $mop => { ... }, ... }
 Validates this thing's metaclasses: that is, given a MOP type (e.g. class,
 attribute, method, ...) and a hashref, find the associated metaclass of the
 given type and invoke L</validate_thing> on it, using the hashref as options
-for validate_thing().
+for C<validate_thing()>.
 
 e.g.
 
@@ -1136,15 +1155,15 @@ e.g.
         1..4
     ok 1 - Checking the attribute metaclass, Moose::Meta::Class::__ANON__::SERIAL::1
 
-Note that validate_class() and validate_role() implement this using
-'class_metaclasses' and 'role_metaclasses', respectively.
+Note that C<validate_class()> and C<validate_role()> implement this using
+C<class_metaclasses> and C<role_metaclasses>, respectively.
 
 =back
 
 =head2 validate_role
 
-The same as validate_thing(), but ensures C<$thing> is a role, and allows for
-additional role-specific tests.
+The same as C<validate_thing()>, but ensures C<$thing> is a role, and allows
+for additional role-specific tests.
 
     validate_role $thing => (
 
@@ -1160,7 +1179,7 @@ additional role-specific tests.
 -compose => 0|1
 
 When true, attempt to compose the role into an anonymous class, then use it to
-run L</validate_class>.  The options we're given are passed to validate_class()
+run L</validate_class>.  The options we're given are passed to C<validate_class()>
 directly, except that any C<required_methods> entry is removed and its contents
 pushed onto C<methods>.  (A stub method for each entry in C<required_methods>
 will also be created in the new class.)
@@ -1244,7 +1263,7 @@ role_metaclasses => { $mop => { ... }, ... }
 Validates this role's metaclasses: that is, given a MOP type (e.g. role,
 attribute, method, ...) and a hashref, find the associated metaclass of the
 given type and invoke L</validate_thing> on it, using the hashref as options
-for validate_thing().
+for C<validate_thing()>.
 
 e.g.
 
@@ -1267,22 +1286,22 @@ e.g.
         1..4
     ok 1 - Checking the attribute metaclass, Moose::Meta::Class::__ANON__::SERIAL::1
 
-Note that validate_class() and validate_role() implement this using
-'class_metaclasses' and 'role_metaclasses', respectively.
+Note that C<validate_class()> and C<validate_role()> implement this using
+C<class_metaclasses> and C<role_metaclasses>, respectively.
 
 =item *
 
 class_metaclasses => { $mop => { ... }, ... }
 
 As with role_metaclasses, above, except that this option is only used
-if -compose is also specified.
+if C<-compose> is also specified.
 
 =back
 
 =head2 validate_class
 
-The same as validate_thing(), but ensures C<$thing> is a class, and allows for
-additional class-specific tests.
+The same as C<validate_thing()>, but ensures C<$thing> is a class, and allows
+for additional class-specific tests.
 
     validate_class $thing => (
 
@@ -1339,7 +1358,7 @@ class_metaclasses => { $mop => { ... }, ... }
 Validates this class' metaclasses: that is, given a MOP type (e.g. role,
 attribute, method, ...) and a hashref, find the associated metaclass of the
 given type and invoke L</validate_thing> on it, using the hashref as options
-for validate_thing().
+for C<validate_thing()>.
 
 e.g.
 
@@ -1368,8 +1387,8 @@ e.g.
 
 =head2 validate_attribute
 
-validate_attribute() allows you to test how an attribute looks once built and
-attached to a class.
+C<validate_attribute()> allows you to test how an attribute looks once built
+and attached to a class.
 
 Let's say you have an attribute defined like this:
 
@@ -1381,8 +1400,8 @@ Let's say you have an attribute defined like this:
         lazy    => 1,
     );
 
-You can use validate_attribute() to ensure that it's built out in the way you
-expect:
+You can use C<validate_attribute()> to ensure that it's built out in the way
+you expect:
 
     validate_attribute TestClass => foo => (
 
@@ -1403,10 +1422,11 @@ expect:
         required => undef,
     );
 
-Options passed to validate_attribute() prefixed with '-' test the attribute's metaclass
-instance rather than a setting on the attribute; that is, '-does' ensures that the
-metaclass does a particular role (e.g. L<MooseX::AttributeShortcuts>), while 'does' tests
-the setting of the attribute to require the value do a given role.
+Options passed to C<validate_attribute()> prefixed with C<-> test the
+attribute's metaclass instance rather than a setting on the attribute; that
+is, C<-does> ensures that the metaclass does a particular role (e.g.
+L<MooseX::AttributeShortcuts>), while C<does> tests the setting of the
+attribute to require the value do a given role.
 
 This function takes all the options L</attribute_options_ok> takes, as well as
 the following:
@@ -1424,10 +1444,11 @@ whatever C<-subtest> is set to.
 
 =head2 attribute_options_ok
 
-Validates that an attribute is set up as expected; like validate_attribute(),
-but only concerns itself with attribute options.
+Validates that an attribute is set up as expected; like
+C<validate_attribute()>, but only concerns itself with attribute options.
 
-Note that some of these options will skip if used against attributes defined in a role.
+Note that some of these options will skip if used against attributes defined
+in a role.
 
 =over 4
 
@@ -1534,7 +1555,7 @@ Karen Etheridge <ether@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 by Chris Weyl.
+This software is Copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by Chris Weyl.
 
 This is free software, licensed under:
 

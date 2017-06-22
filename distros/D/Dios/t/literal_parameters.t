@@ -11,7 +11,7 @@ subtest 'String literals' => sub {
 
     multi cmd('sub2', $cmd, 'sub')  { is $cmd, 'sub', 'Sub correct' }
 
-    multi cmd('other2', $cmd where { !/add|sub/ }, qq{$cmd}) {
+    multi cmd('other2', $cmd where { !/add|sub/ }, Any) {
         isnt $cmd, 'add',   'cmd not add correct';
         isnt $cmd, 'sub',   'cmd not sub correct';
     }

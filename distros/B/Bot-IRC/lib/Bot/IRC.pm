@@ -1,6 +1,7 @@
 package Bot::IRC;
 # ABSTRACT: Yet Another IRC Bot
 
+use 5.012;
 use strict;
 use warnings;
 
@@ -12,7 +13,7 @@ use Time::Crontab;
 use Date::Format 'time2str';
 use Encode 'encode';
 
-our $VERSION = '1.13'; # VERSION
+our $VERSION = '1.14'; # VERSION
 
 sub new {
     my $class = shift;
@@ -47,7 +48,8 @@ sub new {
 }
 
 sub run {
-    my ($self) = @_;
+    my $self     = shift;
+    my $commands = \@_;
 
     $self->{socket} = ( ( $self->{connect}{ssl} ) ? 'IO::Socket::SSL' : 'IO::Socket::INET' )->new(
         PeerAddr        => $self->{connect}{server},
@@ -64,7 +66,11 @@ sub run {
             on_message => \&_on_message,
             spawn      => $self->{spawn},
             daemon     => $self->{daemon},
-            data       => { self => $self },
+            data       => {
+                self     => $self,
+                commands => $commands,
+                passwd   => $self->{passwd},
+            },
         );
     };
     croak($@) if ($@);
@@ -147,6 +153,13 @@ sub _parent {
                     $self->nick( $self->{nick} . '_' );
                 }
                 elsif ( $line =~ /^:\S+\s001\s/ ) {
+                    $self->say($_) for ( map {
+                        my $command = $_;
+                        $command =~ s|^/msg |PRIVMSG |;
+                        $command =~ s|^/(\w+)|uc($1)|e;
+                        $command;
+                    } @{ $device->data('commands') } );
+
                     $self->join;
                     $session->{established} = 1;
                     alarm 1 if ( @{ $self->{ticks} } );
@@ -181,6 +194,7 @@ sub _child {
 sub _on_message {
     my $device = shift;
     my $self   = $device->data('self');
+    my $passwd = $device->data('passwd');
 
     for my $line (@_) {
         if ( $line =~ /^>>>\sNICK\s(.*)/ ) {
@@ -201,6 +215,7 @@ sub _on_message {
         }
         elsif ( $line =~ /^:(\S+?)!~?(\S+?)@(\S+?)\s(\S+)\s(\S+)\s:(.*)/ ) {
             @{ $self->{in} }{ qw( nick user server command forum text ) } = ( $1, $2, $3, $4, $5, $6 );
+            $self->{in}{full_text} = $self->{in}{text};
         }
         elsif ( $line =~ /^:(\S+?)!~?(\S+?)@(\S+?)\s(\S+)\s:(.*)/ ) {
             @{ $self->{in} }{ qw( nick user server command text ) } = ( $1, $2, $3, $4, $5 );
@@ -256,13 +271,55 @@ sub _on_message {
 
         hook: for my $hook (
             @{ $self->{hooks} },
+
             {
                 when => {
                     to_me => 1,
+                    text  => qr/^\s*cmd\s+(?<passwd>\S+)\s+(?<cmd>.+)$/i,
+                },
+                code => sub {
+                    my ( $bot, $in, $m ) = @_;
+
+                    if ( $m->{passwd} and $passwd and $m->{passwd} eq $passwd ) {
+                        $bot->say($_) for (
+                            map {
+                                my $command = $_;
+                                $command =~ s|^/msg |PRIVMSG |;
+                                $command =~ s|^/(\w+)|uc($1)|e;
+                                $command;
+                            } split( /\s*;\s*/, $m->{cmd} )
+                        );
+                    }
+
+                    return 1;
+                },
+            },
+
+            ( map {
+                {
+                    when => $_,
+                    code => sub {
+                        my ( $bot, $in ) = @_;
+                        $bot->reply_to(qq{Sorry. I don't understand. (Try "$self->{nick} help" for help.)});
+                    },
+                },
+            } (
+                {
+                    private   => 0,
+                    full_text => qr/^\s*$self->{nick}\s*[,:\->~=]/i,
+                },
+                {
+                    private => 1,
+                },
+            ) ),
+
+            {
+                when => {
+                    full_text => qr/^\s*$self->{nick}\s*[!\?]\W*$/i,
                 },
                 code => sub {
                     my ( $bot, $in ) = @_;
-                    $bot->reply_to(qq{Sorry. I don't understand. (Try "$self->{nick} help" for help.)});
+                    $bot->reply_to('Yes?');
                 },
             },
         ) {
@@ -270,13 +327,17 @@ sub _on_message {
 
             for my $type ( keys %{ $hook->{when} } ) {
                 next hook unless (
-                    ref( $hook->{when}{$type} ) eq 'Regexp' and $self->{in}{$type} =~ $hook->{when}{$type} or
+                    ref( $hook->{when}{$type} ) eq 'Regexp' and
+                        $self->{in}{$type} and $self->{in}{$type} =~ $hook->{when}{$type} or
                     ref( $hook->{when}{$type} ) eq 'CODE' and $hook->{when}{$type}->(
                         $self,
                         $self->{in}{$type},
                         { %{ $self->{in} } },
                     ) or
-                    $self->{in}{$type} eq $hook->{when}{$type}
+                    (
+                        $self->{in}{$type} and $hook->{when}{$type} and
+                        $self->{in}{$type} eq $hook->{when}{$type}
+                    )
                 );
 
                 $captured_matches = { %$captured_matches, %+ } if ( keys %+ );
@@ -556,7 +617,7 @@ Bot::IRC - Yet Another IRC Bot
 
 =head1 VERSION
 
-version 1.13
+version 1.14
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Bot-IRC.svg)](https://travis-ci.org/gryphonshafer/Bot-IRC)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Bot-IRC/badge.png)](https://coveralls.io/r/gryphonshafer/Bot-IRC)
@@ -699,6 +760,19 @@ and C<daemon>.
 This should be the last call you make, which will cause your program to operate
 like a Unix service from the command-line. (See L<Daemon::Control> for
 additional details.)
+
+C<run> can optionally be passed a list of strings that will be executed after
+connection to the IRC server. These should be string commands similar to what
+you'd type in an IRC client. For example:
+
+    Bot::IRC->new( connect => { server => 'irc.perl.org' } )->run(
+        '/msg nickserv identify bot_password',
+        '/msg operserv identify bot_password',
+        '/oper bot_username bot_password',
+        '/msg chanserv identify #bot_talk bot_password',
+        '/join #bot_talk',
+        '/msg chanserv op #bot_talk',
+    );
 
 =head1 PLUGINS
 
@@ -909,6 +983,10 @@ C<server>: server of the sender of the message
 =item *
 
 C<line>: full message line/text
+
+=item *
+
+C<full_text>: text component of the message with nick included
 
 =back
 
@@ -1214,7 +1292,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Gryphon Shafer.
+This software is copyright (c) 2017 by Gryphon Shafer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

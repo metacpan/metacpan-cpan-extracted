@@ -228,8 +228,13 @@ sub spawn_new_connection {
                 if ($self->{count} && @$waiters) {
                     warn 'We have callbacks waiting for a connection while we\'re connected';
                 }
+
+                my $max_conn= $self->{max_connections};
+                my $known_node_count= $self->{policy}->known_node_count;
+                my $max_attempts = ($max_conn < $known_node_count ? $max_conn : $known_node_count) + 1;
+
                 for my $waiter (@$waiters) {
-                    if ($waiter->{attempts}++ || !%{$self->{connecting}}) {
+                    if ((++$waiter->{attempts}) >= $max_attempts || !%{$self->{connecting}}) {
                         $waiter->{callback}->("Failed to connect to server");
                     } else {
                         push @{$self->{wait_connect} ||= []}, $waiter;

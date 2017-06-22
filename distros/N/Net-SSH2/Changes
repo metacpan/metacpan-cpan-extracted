@@ -1,6 +1,21 @@
 Revision history for Perl extension Net::SSH2.
 
-0.63
+0.65  2017-06-14
+        - Improve Travis CI testing
+        - Fix perl 5.8 support
+        - Warn when check_hostkey is called in void context.
+
+0.64  2017-06-14
+        - Accept debug flag on the constructor.
+        - Ensure the crypto libraries are positioned after libssh2 on
+          the link line (bug report and patch by Jacques Germishuys).
+        - Channel "pty" method now accepts mode modifiers passed as a
+          hash.
+        - In connect, warnif was clobbering $! (bug report and patch
+          by ikegami).
+        - t/Net-SSH2.t: add support for TEST_NET_SSH2_TRACE
+
+0.63  2016-10-13
         - die_with_error errors pointed to that method instead of its
           caller.
         - Fix case in user message.

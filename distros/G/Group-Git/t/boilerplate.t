@@ -66,6 +66,7 @@ module_boilerplate_ok('lib/Group/Git/Cmd/Help.pm');
 module_boilerplate_ok('lib/Group/Git/Cmd/List.pm');
 module_boilerplate_ok('lib/Group/Git/Cmd/Pull.pm');
 module_boilerplate_ok('lib/Group/Git/Cmd/Sh.pm');
+module_boilerplate_ok('lib/Group/Git/Cmd/State.pm');
 module_boilerplate_ok('lib/Group/Git/Cmd/Status.pm');
 module_boilerplate_ok('lib/Group/Git/Cmd/TagList.pm');
 module_boilerplate_ok('lib/Group/Git/Cmd/Watch.pm');

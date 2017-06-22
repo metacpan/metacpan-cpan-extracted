@@ -57,6 +57,6 @@
          "url" : "git://github.com/stash/Feersum.git"
       }
    },
-   "version" : "1.404",
+   "version" : "1.405",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

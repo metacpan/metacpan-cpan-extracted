@@ -1,3 +1,6 @@
+0.27 2017-06-15
+ - Fix timing sidechannel vulnerability in password checking (CVE-2017-5361)
+
 0.26 2016-08-02
  - Document and enforce against installing under RT 4.4, as this module's
    features were made part of core

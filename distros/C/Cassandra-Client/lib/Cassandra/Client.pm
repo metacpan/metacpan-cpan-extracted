@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Cassandra::Client::AsyncAnyEvent;
 use Cassandra::Client::AsyncEV;
@@ -23,6 +23,8 @@ use Clone qw/clone/;
 use List::Util qw/shuffle/;
 use Promises qw/deferred/;
 use Time::HiRes ();
+use Ref::Util qw/is_ref/;
+use Devel::GlobalDestruction;
 
 sub new {
     my ($class, %args)= @_;
@@ -94,7 +96,8 @@ sub _connect {
         if (!$contact_point) {
             delete $self->{connecting};
             undef $next_connect;
-            return _cb($_, "Unable to connect to any Cassandra server. Last error: $last_error") for @{delete $self->{connect_callbacks}};
+            _cb($_, "Unable to connect to any Cassandra server. Last error: $last_error") for @{delete $self->{connect_callbacks}};
+            return;
         }
 
         my $connection= Cassandra::Client::Connection->new(
@@ -314,7 +317,7 @@ sub _command_retry {
 sub _command_failed {
     my ($self, $command, $callback, $args, $command_info, $error)= @_;
 
-    return $callback->($error) unless ref $error;
+    return $callback->($error) unless is_ref($error);
 
     my $retry_decision;
     if ($error->{do_retry}) {
@@ -393,7 +396,7 @@ sub _each_page {
 
 sub DESTROY {
     local $@;
-    return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
+    return if in_global_destruction;
 
     my $self= shift;
     if ($self->{connected}) {

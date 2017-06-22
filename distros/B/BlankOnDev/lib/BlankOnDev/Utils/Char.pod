@@ -1,0 +1,80 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+BlankOnDev::Utils::Char - Utilities BlankOnDev Web Framework to split string.
+
+=head SYNOPSIS
+    
+    use BlankOnDev::Utils::Char
+     
+    # Example String :
+    my $string = 'I Think Debian';
+     
+    # Splite based length :
+    my @split_len = BlankOnDev::Utils::Char->blen($string, 1);
+     
+    # Splite based char :
+    my @split_char = BlankOnDev::Utils::Char->bchar($string, " ");
+     
+    # Output "print Dumper \@split_len" :
+    $VAR1 = [
+              'I',
+              ' ',
+              'T',
+              'h',
+              'i',
+              'n',
+              'k',
+              ' ',
+              'D',
+              'e',
+              'b',
+              'i',
+              'a',
+              'n'
+            ];
+     
+    # Output "print Dumper \@split_char" :
+    $VAR1 = [
+              'I',
+              'Think',
+              'Debian'
+            ];
+
+=head1 DESCRIPTION
+
+This module give simple method to split string based length or based character.
+This module forking form module CellBash::Utils::Char.
+
+=head1 EXPLAIN SUBROUTINE bchar()
+
+    Parameter Modul :
+    ----------------------------------------
+    $string         =>  String will be split.
+    $delimiter      =>  character for delimiter split.
+
+=head1 EXPLAIN SUBROUTINE bleng()
+
+    Description :
+    ----------------------------------------
+    Subroutine give result of split string based length character to split.
+
+    Parameter Subroutine :
+    ----------------------------------------
+    $string         =>  String will be split.
+    $length         =>  length of character to split.
+
+=head1 AUTHOR
+
+Achmad Yusri Afandi, (yusrideb@cpan.org)
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2016, Achmad Yusri Afandi, All Rights reserved.
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut

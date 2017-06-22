@@ -14,11 +14,12 @@ WriteMakefile(
     PL_FILES	=> {},
     BUILD_REQUIRES => {
 	'Test::Most' => 0,
-	'Test::Timer' => 0,
+	'Test::Timer' => 2.01,
 	'LWP::Protocol::https' => 0,
 	# 'Test::Kwalitee' => 0,
     },
     PREREQ_PM => {
+    	'LWP' => 0,
 	'LWP::UserAgent' => 0,
 	'Time::HiRes' => 0,
     },

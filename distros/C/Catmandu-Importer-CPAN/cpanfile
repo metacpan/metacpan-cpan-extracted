@@ -6,8 +6,5 @@ on 'test', sub {
 };
 
 requires 'Catmandu', '0.90';
-requires 'MetaCPAN::API::Tiny', '1.131730';
+requires 'MetaCPAN::Client', '2.016000';
 requires 'Moo', '1.0';
-
-
-

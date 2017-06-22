@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::dist2author;
 
-our $DATE = '2017-02-03'; # DATE
-our $VERSION = '1.017'; # VERSION
+our $DATE = '2017-06-19'; # DATE
+our $VERSION = '1.019'; # VERSION
 
 use 5.010;
 use strict;
@@ -72,12 +72,16 @@ App::lcpan::Cmd::dist2author - Get author of distribution(s)
 
 =head1 VERSION
 
-This document describes version 1.017 of App::lcpan::Cmd::dist2author (from Perl distribution App-lcpan), released on 2017-02-03.
+This document describes version 1.019 of App::lcpan::Cmd::dist2author (from Perl distribution App-lcpan), released on 2017-06-19.
 
 =head1 FUNCTIONS
 
 
-=head2 handle_cmd(%args) -> [status, msg, result, meta]
+=head2 handle_cmd
+
+Usage:
+
+ handle_cmd(%args) -> [status, msg, result, meta]
 
 Get author of distribution(s).
 
@@ -134,7 +138,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

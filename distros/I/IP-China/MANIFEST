@@ -1,4 +1,3 @@
-.perlcriticrc
 block-china-data.c
 block-china-data.h
 Changes
@@ -12,9 +11,5 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README
 t/IP-China.t
-xt/ccheck.t
-xt/checkpod.t
-xt/git.t
-xt/perl-critic.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

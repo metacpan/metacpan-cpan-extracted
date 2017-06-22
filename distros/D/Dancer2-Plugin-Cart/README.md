@@ -4,7 +4,7 @@ Dancer2::Plugin::Cart - ECommerce Cart Plugin for Dancer2
 
 # VERSION
 
-Version 1.0000
+Version 1.0001
 
 # DESCRIPTION
 

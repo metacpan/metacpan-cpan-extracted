@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI  for Riap function /App/BencherUtils/list_bencher_scenario_modules
-# and generated automatically using Perinci::CmdLine::Gen version 0.35
+# and generated automatically using Perinci::CmdLine::Gen version 0.45_001
 
-our $DATE = '2016-10-27'; # DATE
+our $DATE = '2017-06-20'; # DATE
 our $DIST = 'App-BencherUtils'; # DIST
-our $VERSION = '0.19'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 use 5.010001;
 use strict;
@@ -34,7 +34,7 @@ list-bencher-scenario-modules - List Bencher scenario modules
 
 =head1 VERSION
 
-This document describes version 0.19 of list-bencher-scenario-modules (from Perl distribution App-BencherUtils), released on 2016-10-27.
+This document describes version 0.20 of list-bencher-scenario-modules (from Perl distribution App-BencherUtils), released on 2017-06-20.
 
 =head1 SYNOPSIS
 
@@ -150,7 +150,7 @@ To activate bash completion for this script, put:
 
  complete -C list-bencher-scenario-modules list-bencher-scenario-modules
 
-in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
 recognize tab completion for the command. Or, you can also directly execute the
 line above in your shell to activate immediately.
 
@@ -158,8 +158,8 @@ It is recommended, however, that you install L<shcompgen> which allows you to
 activate completion scripts for several kinds of scripts on multiple shells.
 Some CPAN distributions (those that are built with
 L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
-completion for their included scripts (using C<shcompgen>) at installation time,
-so you can immadiately have tab completion.
+completion for their included scripts (using L<shcompgen>) at installation time,
+so you can immediately have tab completion.
 
 =head2 tcsh
 
@@ -167,15 +167,15 @@ To activate tcsh completion for this script, put:
 
  complete list-bencher-scenario-modules 'p/*/`list-bencher-scenario-modules`/'
 
-in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
 recognize tab completion for the command. Or, you can also directly execute the
 line above in your shell to activate immediately.
 
-It is also recommended to install C<shcompgen> (see above).
+It is also recommended to install L<shcompgen> (see above).
 
 =head2 other shells
 
-For fish and zsh, install C<shcompgen> as described above.
+For fish and zsh, install L<shcompgen> as described above.
 
 =head1 CONFIGURATION FILE
 
@@ -204,21 +204,21 @@ List of available configuration parameters:
 
 =head2 LIST_BENCHER_SCENARIO_MODULES_OPT => str
 
-Specify additional command-line options
+Specify additional command-line options.
 
 =head1 FILES
 
-~/.config/bencher.conf
+F<~/.config/bencher.conf>
 
-~/.config/list-bencher-scenario-modules.conf
+F<~/.config/list-bencher-scenario-modules.conf>
 
-~/bencher.conf
+F<~/bencher.conf>
 
-~/list-bencher-scenario-modules.conf
+F<~/list-bencher-scenario-modules.conf>
 
-/etc/bencher.conf
+F</etc/bencher.conf>
 
-/etc/list-bencher-scenario-modules.conf
+F</etc/list-bencher-scenario-modules.conf>
 
 =head1 HOMEPAGE
 
@@ -242,7 +242,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

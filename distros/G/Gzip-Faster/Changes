@@ -1,5 +1,9 @@
 Revision history for Perl module 'Gzip::Faster'
 
+0.20 2017-06-17
+
+* Documentation changes and minor cleanups
+
 0.19 2017-01-19
 
 * File modification time setting and retrieval

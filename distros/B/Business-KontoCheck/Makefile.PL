@@ -298,7 +298,7 @@ sub write_makefile
                          'META.yml'            => "META.lx konto_check-cfg.lx\n\tlx2l \$<",
                          'konto_check.h'      => "konto_check_h.lx konto_check-cfg.lx META.yml lib/Business/KontoCheck.pm\n\tlx2l \$<",
                          'retvals.h'          => "retvals.lx konto_check-cfg.lx \n\tlx2l \$< -ua1",
-                         'konto_check.c'      => "konto_check.lxx retvals.h konto_check-cfg.lx \n\tlx2l -x \$< -ua1",
+                         'konto_check.c'      => "konto_check.lxx lib/Business/KontoCheck.pm META.yml retvals.h konto_check-cfg.lx \n\tlx2l -x \$< -ua1",
                          'konto_check-at.c'   => "konto_check-at.lxx konto_check-cfg.lx\n\tlx2l -x \$<",
                          'konto_check-at.h'   => "konto_check-at.lxx konto_check-cfg.lx\n\tlx2l -x \$< -uh",
                          'KontoCheck.xs'      => "KontoCheck.lx lib/Business/KontoCheck.pm konto_check-cfg.lx\n\tlx2l \$<",

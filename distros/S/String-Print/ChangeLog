@@ -1,6 +1,13 @@
 
 ========== version history of String::Print
 
+version 0.90: Wed 14 Jun 14:47:03 CEST 2017
+
+	Improvements:
+	- spell-fix rt.cpan.org#96464 [Gregor Herrmann, Debian]
+	- add output encoding (encodeFor)
+	- add complex keys
+
 version 0.15: Fri Mar 14 09:06:18 CET 2014
 
 	Fixes:

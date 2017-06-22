@@ -9,6 +9,11 @@ README
 cpanfile
 dist.ini
 lib/Plack/Session/Store/RedisFast.pm
+lib/Plack/Session/Store/RedisFast/Encoder/Custom.pm
+lib/Plack/Session/Store/RedisFast/Encoder/JSON.pm
+lib/Plack/Session/Store/RedisFast/Encoder/JSONXS.pm
+lib/Plack/Session/Store/RedisFast/Encoder/MojoJSON.pm
 t/author-pod-syntax.t
 t/basic.t
+t/each_session.t
 t/lib/TestSession.pm

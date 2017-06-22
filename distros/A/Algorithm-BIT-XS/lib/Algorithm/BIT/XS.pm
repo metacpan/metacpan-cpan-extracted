@@ -4,7 +4,7 @@ use 5.014000;
 use strict;
 use warnings;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 require XSLoader;
 XSLoader::load('Algorithm::BIT::XS', $VERSION);

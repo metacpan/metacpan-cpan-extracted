@@ -32,7 +32,19 @@ warnings_like {
 
 warnings_like {
 	eval q/ use Subclass::Of "strict"; use Subclass::Of "strict"; /;
-} qr{^Subclass::Of is overwriting alias 'strict'; was '\S+'; now '\S+'};
+} qr{^Subclass::Of is overwriting alias 'strict'; was '\S+'; now '\S+' at};
+
+warnings_like {
+	eval q/ use Subclass::Of "warnings"; use Subclass::Of "warnings", -lazy; /;
+} qr{^Subclass::Of is overwriting alias 'warnings'; was '\S+' at};
+
+warnings_like {
+	eval q/ use Subclass::Of "File::Glob", -lazy; use Subclass::Of "File::Glob"; /;
+} qr{^Subclass::Of is overwriting alias 'Glob'; now '\S+' at};
+
+warnings_like {
+	eval q/ use Subclass::Of "File::Find", -lazy; use Subclass::Of "File::Find", -lazy; /;
+} qr{^Subclass::Of is overwriting alias 'Find' at};
 
 my ($x, $y);
 warnings_are {

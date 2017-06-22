@@ -117,7 +117,7 @@ use namespace::autoclean;
 use Data::Serializer;
 use Time::HiRes qw/ alarm sleep /;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 
 extends 'Async::Simple::Task';

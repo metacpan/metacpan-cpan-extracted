@@ -2,7 +2,7 @@ package Acme::MetaSyntactic::pornstars;
 use strict;
 use Acme::MetaSyntactic::MultiList;
 our @ISA = qw( Acme::MetaSyntactic::MultiList );
-our $VERSION = '1.029';
+our $VERSION = '1.030';
 __PACKAGE__->init();
 
 our %Remote = (
@@ -10,14 +10,14 @@ our %Remote = (
         female => 'http://en.wikipedia.org/wiki/List_of_pornographic_actresses_by_decade',
     },
     extract => sub {
-        $_[0] =~ s/<table class="navbox".*//s;    # drop the navbox at the end
+        $_[0] =~ s/<h2>(?:<[^>]*>)?References<.*//s;    # drop everything after references
         return
             map { Acme::MetaSyntactic::RemoteList::tr_accent($_) }
             map { Acme::MetaSyntactic::RemoteList::tr_utf8_basic($_) }
             grep { ! /^List_|_Groups$/ }
             map { s/[-\s'\x{2019}]/_/g; s/[."]//g; $_ }
             $_[0]
-            =~ m{^<li>(?:<[^>]*>)?(.*?)(?:(?: ?[-,(<]| aka | see ).*)?</li>}mig
+            =~ m{^<li>(?:<a [^>]*>)?(.*?)(?:(?: ?[-,(<]| aka | see ).*)?</li>}mig
     },
     ,
 );
@@ -57,6 +57,12 @@ Sébastien Aperghis-Tramoni, Philippe Bruhat, Rafaël Garcia-Suarez.
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2017-06-12 - v1.030
+
+Updated from the source web site in Acme-MetaSyntactic-Themes version 1.050.
 
 =item *
 
@@ -356,11 +362,14 @@ L<Acme::MetaSyntactic>, L<Acme::MetaSyntactic::MultiList>.
 
 __DATA__
 # names female
+Abella_Danger
 Adrianna_Luna
 Alana_Evans
+Aletta_Ocean
 Alexandra_Quinn
 Alex_Taylor
 Amber_Lynn
+Amber_Rayne
 Amy_Fisher
 Andrea_True
 Anikka_Albrite
@@ -372,7 +381,8 @@ Asa_Akira
 Ashley_Blue
 Asia_Carrera
 Audrey_Hollander
-August_Ames
+Aurora_Snow
+Belladonna
 Belle_Knox
 BiBi_Jones
 Bodil_Joensen
@@ -380,6 +390,7 @@ Bonnie_Rotten
 Brandi_Love
 Bree_Olson
 Bridgette_Kerkove
+Brigitte_Lahaie
 Brittany_Andrews
 Brittany_O_Connell
 Brooklyn_Lee
@@ -391,13 +402,17 @@ Cara_Lott
 Carol_Connors
 Casey_Calvert
 Charmane_Star
+Chasey_Lain
 Chloe_Jones
 C_J_Laing
+Clara_Morgane
+Daisy_Marie
 Dana_DeArmond
 Dana_Vespoli
 Dani_Daniels
 Debi_Diamond
 Erica_Boyer
+Estelle_Desanges
 Flower_Tucci
 Francesca_Le
 Gauge
@@ -409,28 +424,30 @@ Heather_Hunter
 Hillary_Scott
 Holly_Ryder
 Houston
+Ilona_Staller
 Jasmin_St_Claire
 Jeannie_Pepper
-Jenaveve_Jolie
 Jenna_Haze
 Jenna_Jameson
 Jenna_Presley
 Jesse_Jane
+Jessie_Andrews
 Jessie_Rogers
 Joanna_Angel
 Juliet_Anderson
 Justine_Joli
+Kaitlyn_Ashley
 Kandi_Barbour
 Karen_Summer
 Katie_Morgan
 Katja_Kassin
 Katsuni
 Kaylani_Lei
+Kay_Parker
 Kendra_Lust
 Kimberly_Kane
 Kleio_Valentien
 Kylie_Ireland
-Leilani_Leeane
 Linda_Lovelace
 Linda_Wong
 Lisa_Ann
@@ -438,7 +455,6 @@ Lizz_Tayler
 Lolo_Ferrari
 Lupe_Fuentes
 Maddy_O_Reilly
-Mai_Lin
 Marilyn_Chambers
 Marlene_Willoughby
 Mary_Carey
@@ -452,12 +468,14 @@ Midori
 Mika_Tan
 Mimi_Miyagi
 Missy
-Nicole_Aniston
+Moana_Pozzi
+Monique_Alexander
 Nikita_Denise
 Nikki_Benz
 Nikki_Charm
 Nikki_Dial
 Nina_Hartley
+Nina_Roberts
 Porsche_Lynn
 Prinzzess
 Priya_Rai
@@ -466,10 +484,10 @@ Rebecca_Brooke
 Rebecca_Lord
 Remy_LaCroix
 Rene_Bond
-Rikki_Six
 Riley_Reid
 Riley_Steele
 Robin_Byrd
+Rosa_Caracciolo
 Sasha_Grey
 Savannah
 Seka
@@ -481,16 +499,19 @@ Shauna_Grant
 Shyla_Jennings
 Shyla_Stylez
 Sinn_Sage
+Stacey_Donovan
 Stormy_Daniels
 Sunny_Leone
+Tabatha_Cash
 Taylor_St_Claire
 Taylor_Wane
 Teagan_Presley
 Tera_Patrick
 Tericka_Dye
-Tina_Russell
+Tiffany_Hopkins
+Traci_Lords
 Trinity_Loren
-Trisha_Uptown
+Valentina_Nappi
 Vanessa_Blue
 Vanessa_del_Rio
 Vicky_Vette

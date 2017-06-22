@@ -19,8 +19,8 @@ my $app;
 # init() with no options fails
 {
     lives_ok { $app = CLI::Startup->new } "No-argument constructor";
-    ok !defined($app->get_optspec), "No optspecs yet";
-    throws_ok { $app->init } qr/without defining/, "init() with no options";
+    ok defined($app->get_optspec), "Default optspecs applied";
+    lives_ok { $app->init }, "init() succeeds with no options";
 }
 
 # Setting usage string in initializer

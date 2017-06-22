@@ -149,6 +149,7 @@ t/Legacy/is_deeply_fail.t
 t/Legacy/is_deeply_with_threads.t
 t/Legacy/missing.t
 t/Legacy/new_ok.t
+t/Legacy/no_log_results.t
 t/Legacy/no_plan.t
 t/Legacy/no_tests.t
 t/Legacy/note.t

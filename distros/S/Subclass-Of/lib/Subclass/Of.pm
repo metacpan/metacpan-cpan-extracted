@@ -8,15 +8,15 @@ package Subclass::Of;
 
 BEGIN {
 	$Subclass::Of::AUTHORITY = 'cpan:TOBYINK';
-	$Subclass::Of::VERSION   = '0.003';
+	$Subclass::Of::VERSION   = '0.007';
 }
 
 use B qw(perlstring);
 use Carp qw(carp croak);
 use Module::Runtime qw(use_package_optimistically module_notional_filename);
-use List::MoreUtils qw(all);
-use Scalar::Util qw(refaddr blessed);
-use Sub::Name qw(subname);
+use List::Util 1.33 qw(all);
+use Scalar::Util qw(refaddr blessed weaken);
+use Sub::Util qw(set_subname);
 use namespace::clean;
 
 our ($SUPER_PKG, $SUPER_SUB, $SUPER_ARG);
@@ -44,11 +44,27 @@ sub import
 		my %opts     = $me->_parse_opts(@_);
 		
 		my $caller   = $opts{-into}[0];
-		my $subclass = $me->_build_subclass($base, \%opts);
 		my @aliases  = $opts{-as} ? @{$opts{-as}} : ($base =~ /(\w+)$/);
 		
-		my $constant = eval sprintf(q/sub () { %s if $] }/, perlstring($subclass));
-		$i_made_this{refaddr($constant)} = $subclass;
+		my $constant;
+		my $subclass;
+		if ($opts{-lazy}) {
+			my $current_sub;
+			$constant = sub () {
+				$subclass ||= do {
+					my $built = $me->_build_subclass($base, \%opts);
+					$i_made_this{refaddr($current_sub)} = $built;
+					$built;
+				};
+			};
+			weaken( $current_sub = $constant );
+			$i_made_this{refaddr($constant)} = '(unknown package)';
+		}
+		else {
+			$subclass = $me->_build_subclass($base, \%opts);
+			$constant = eval sprintf(q/sub () { %s if $] }/, perlstring($subclass));
+			$i_made_this{refaddr($constant)} = $subclass;
+		}
 		
 		for my $a (@aliases)
 		{
@@ -57,13 +73,23 @@ sub import
 				my $old = $i_made_this{refaddr(\&{"$caller\::$a"})};
 				carp(
 					$old
-						? "Subclass::Of is overwriting alias '$a'; was '$old'; now '$subclass'"
+						? "Subclass::Of is overwriting alias '$a'"
+							.($old eq '(unknown package)'?"":"; was '$old'")
+							.($subclass?"; now '$subclass'":"")
 						: "Subclass::Of is overwriting function '$a'",
 				);
 			}
 			*{"$caller\::$a"} = $constant;
 		}
 		"namespace::clean"->import(-cleanee => $caller, @aliases);
+	}
+	
+	sub _alias_to_package_name {
+		shift unless ref $_[0]; # allow call as class method
+		my @r = map $i_made_this{refaddr($_)}, @_;
+		croak('_alias_to_package_name(LIST) returns a list')
+			if @r != 1 and defined(wantarray) and !wantarray;
+		wantarray ? @r : $r[0];
 	}
 }
 
@@ -92,10 +118,11 @@ sub _parse_opts
 		
 		if (defined and !ref and /^-/) {
 			$key = $_;
+			$opts{$key} ||= [];
 			next;
 		}
 		
-		push @{$opts{$key}||=[]}, ref eq q(ARRAY) ? @$_ : $_;
+		push @{$opts{$key}}, ref eq q(ARRAY) ? @$_ : $_;
 	}
 	
 	return %opts;
@@ -378,7 +405,7 @@ sub _make_method_hash
 		$name =~ /^\w+/ or croak("Not a valid method name: $name");
 		ref($code) eq q(CODE) or croak("Not a code reference: $code");
 		
-		$r->{$name} = subname "$pkg\::$name", sub {
+		$r->{$name} = set_subname "$pkg\::$name", sub {
 			local $SUPER_PKG = $pkg;
 			local $SUPER_SUB = $name;
 			local $SUPER_ARG = \@_;
@@ -427,12 +454,12 @@ Create a subclass overriding a method:
    use Subclass::Of "LWP::UserAgent",
       -as      => "ImpatientUA",
       -methods => [
-         sub new {
+         new => sub {
             my $self = ::SUPER();
             $self->timeout(15);
             $self->max_redirect(3);
             return $self;
-         }
+         },
       ];
    
    my $ua = ImpatientUA->new;
@@ -533,6 +560,22 @@ If you don't provide a C<< -as >> option, the last component of the parent
 class name (e.g. C<< UserAgent >> for subclasses of L<LWP::UserAgent>)
 will be used. If you don't want an alias, try C<< -as => [] >>.
 
+=item C<< -lazy >>
+
+Defers the generation of the subclass until the last possible moment. This
+might be useful in the case of:
+
+   use Subclass::Of "LWP::UserAgent", -lazy, -as => "MyUA";
+   
+   if (some_unlikely_condition()) {
+      MyUA->new->post( ... );
+   }
+   else {
+      # we don't need MyUA, so why bother generating the subclass.
+   }
+
+Even the parent class isn't loaded until necessary.
+
 =back
 
 =head2 Run-Time Usage
@@ -547,7 +590,7 @@ Note that the C<subclass_of> function is only exported if
 C<< use Subclass::Of >> is called with no import list.
 
 The options supported are the same as with compile-time usage, except
-C<< -as >> is ignored. (No alias is generated.)
+C<< -as >> and C<< -lazy >> are ignored. (No alias is generated.)
 
 The return value of C<subclass_of> is the name of the class as a string.
 
@@ -623,7 +666,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013 by Toby Inkster.
+This software is copyright (c) 2013, 2017 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

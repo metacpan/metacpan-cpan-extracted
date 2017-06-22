@@ -11,5 +11,7 @@ WriteMakefile(
         }
     },
     VERSION_FROM      => 'lib/Tie/Hash/Vivify.pm',
-    PREREQ_PM         => {},
+    PREREQ_PM         => {
+        Test::More => '0.88', # done_testing
+    },
 );

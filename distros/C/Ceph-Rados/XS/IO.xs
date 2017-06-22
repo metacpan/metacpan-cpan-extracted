@@ -43,7 +43,7 @@ _write(io, oid, data, len, off)
     err = rados_write(io, oid, buf, len, off);
     if (err < 0)
         croak("cannot write object '%s': %s", oid, strerror(-err));
-    RETVAL = err == 0;
+    RETVAL = (err == 0) || (err == len);
   OUTPUT:
     RETVAL
 
@@ -97,6 +97,18 @@ _read(io, oid, len, off = 0)
     if (retlen < 0)
         croak("cannot read object '%s': %s", oid, strerror(-retlen));
     RETVAL = newSVpv(buf, retlen);
+  OUTPUT:
+    RETVAL
+
+int
+_pool_required_alignment(io)
+    rados_ioctx_t    io
+  PREINIT:
+    const char *     buf;
+    int              res;
+  CODE:
+    res = rados_ioctx_pool_required_alignment(io);
+    RETVAL = res;
   OUTPUT:
     RETVAL
 

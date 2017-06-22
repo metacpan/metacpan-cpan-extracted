@@ -29,16 +29,16 @@ name: Params-Validate
 provides:
   Params::Validate:
     file: lib/Params/Validate.pm
-    version: '1.28'
+    version: '1.29'
   Params::Validate::Constants:
     file: lib/Params/Validate/Constants.pm
-    version: '1.28'
+    version: '1.29'
   Params::Validate::PP:
     file: lib/Params/Validate/PP.pm
-    version: '1.28'
+    version: '1.29'
   Params::Validate::XS:
     file: lib/Params/Validate/XS.pm
-    version: '1.28'
+    version: '1.29'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -53,7 +53,7 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Params-Validate
   homepage: http://metacpan.org/release/Params-Validate
   repository: git://github.com/houseabsolute/Params-Validate.git
-version: '1.28'
+version: '1.29'
 x_Dist_Zilla:
   perl:
     version: '5.024001'
@@ -85,7 +85,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@DROLSKY/Git::GatherDir'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@DROLSKY/ManifestSkip'
@@ -141,14 +141,14 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GitHub::Meta
       name: '@DROLSKY/GitHub::Meta'
-      version: '0.43'
+      version: '0.44'
     -
       class: Dist::Zilla::Plugin::GitHub::Update
       config:
         Dist::Zilla::Plugin::GitHub::Update:
           metacpan: 1
       name: '@DROLSKY/GitHub::Update'
-      version: '0.43'
+      version: '0.44'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: '@DROLSKY/MetaResources'
@@ -362,7 +362,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@DROLSKY/Test::ReportPrereqs'
-      version: '0.025'
+      version: '0.027'
     -
       class: Dist::Zilla::Plugin::DROLSKY::Contributors
       name: '@DROLSKY/DROLSKY::Contributors'
@@ -371,13 +371,13 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          'git --version': 2.11.0
+          git_version: 2.7.4
           include_authors: 0
           include_releaser: 1
           order_by: name
           paths: []
       name: '@DROLSKY/Git::Contributors'
-      version: '0.029'
+      version: '0.030'
     -
       class: Dist::Zilla::Plugin::SurgicalPodWeaver
       config:
@@ -532,7 +532,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PPPort
       name: '@DROLSKY/PPPort'
-      version: '0.007'
+      version: '0.008'
     -
       class: Dist::Zilla::Plugin::DROLSKY::License
       name: '@DROLSKY/DROLSKY::License'
@@ -560,7 +560,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.11.0
+          git_version: 2.7.4
           repo_root: .
       name: '@DROLSKY/DROLSKY::Git::CheckFor::CorrectBranch'
       version: '0.85'
@@ -572,7 +572,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.11.0
+          git_version: 2.7.4
           repo_root: .
       name: '@DROLSKY/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -598,10 +598,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.11.0
+          git_version: 2.7.4
           repo_root: .
       name: '@DROLSKY/Git::Check'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -621,12 +621,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.11.0
+          git_version: 2.7.4
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@DROLSKY/Commit generated files'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -634,16 +634,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.28
+          tag: v1.29
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.11.0
+          git_version: 2.7.4
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@DROLSKY/Git::Tag'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -652,10 +652,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.11.0
+          git_version: 2.7.4
           repo_root: .
       name: '@DROLSKY/Git::Push'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease
       config:
@@ -681,12 +681,12 @@ x_Dist_Zilla:
             - (?^:.+)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.11.0
+          git_version: 2.7.4
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@DROLSKY/Commit version bump'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -695,10 +695,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.11.0
+          git_version: 2.7.4
           repo_root: .
       name: '@DROLSKY/Push version bump'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -762,6 +762,7 @@ x_Dist_Zilla:
     version: '6.009'
 x_authority: cpan:DROLSKY
 x_contributors:
+  - 'Andy Grundman <andyg@activestate.com>'
   - 'E. Choroba <choroba@matfyz.cz>'
   - 'Ivan Bessarabov <ivan@bessarabov.ru>'
   - 'J.R. Mash <jmash.code@gmail.com>'

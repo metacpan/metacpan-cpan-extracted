@@ -1,3 +1,7 @@
+[Changes for 0.04 - Sun Jun 18 10:42:45 CST 2017]
+
+* Fix orientations 5 and 7. (@truist)
+
 [Changes for 0.03 - Wed Jul 27 19:06:54 CST 2016]
 
 * Fix building on Perl 5.18+

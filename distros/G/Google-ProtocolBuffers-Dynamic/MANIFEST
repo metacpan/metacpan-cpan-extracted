@@ -74,6 +74,7 @@ t/335_extension_api.t
 t/350_introspection.t
 t/355_map_introspection.t
 t/400_issue_12.t
+t/401_descriptor_error.t
 t/author-pod-syntax.t
 t/lib/DummyTiedArray.pm
 t/lib/DummyTiedHash.pm

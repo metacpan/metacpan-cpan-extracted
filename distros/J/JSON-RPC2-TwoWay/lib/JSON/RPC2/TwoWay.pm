@@ -3,7 +3,7 @@ use 5.10.0;
 use strict;
 use warnings;
 
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 # standard perl
 use Carp;
@@ -260,7 +260,7 @@ Wieger Opmeer <wiegerop@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Wieger Opmeer.
+This software is copyright (c) 2017 by Wieger Opmeer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -40,21 +40,22 @@
             "Crypt::Blowfish" : "0",
             "DateTime" : "0",
             "Digest::MD5" : "0",
-            "Digest::SHA1" : "0",
             "GnuPG" : "0",
             "Hash::MultiValue" : "0",
+            "IPC::Run" : "0",
             "JSON" : "0",
             "LWP::UserAgent" : "0",
-            "List::Util" : "0",
             "MIME::Base64" : "0",
             "MIME::Base64::Perl" : "0",
+            "Net::GitHub" : "0",
             "Term::ReadKey" : "0",
             "Text::SimpleTable::AutoWidth" : "0",
+            "UNIVERSAL::ref" : "0",
             "parent" : "0",
             "perl" : "5.01205"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.1003"
+   "version" : "0.1005"
 }

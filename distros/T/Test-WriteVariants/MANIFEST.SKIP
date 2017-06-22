@@ -24,6 +24,7 @@ _Inline/.*
 ^pm_to_blib$
 ^_build/.*
 ~$
+test-directory-.*
 .*\.planner
 ^\..*
 Test-WriteVariants-.*

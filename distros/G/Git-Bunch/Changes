@@ -1,4 +1,9 @@
-Revision history for Git-Bunch
+0.61    2017-06-21 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::ger.
+
 
 0.60    2016-12-20 (PERLANCAR)
 
@@ -134,14 +139,13 @@ Revision history for Git-Bunch
         - Add sort choice: db-commit-timestamp (or -db-commit-timestamp). This
           method looks for commit timestamps in $source/repos.db, which can be
           cheaper compared to stat-ing hundreds of .git/commit-timestamp. Your
-          post-commit script must update this SQLite database.
-
-          I use gitbunch on a bunch dir containing ~850 repos. Using the older
-          commit-timestamp sort (instead of this newer db-commit-timestamp
-          sort), when synchronizing from an external USB harddisk there is an
-          annoying delay of 10-30s before sync-ing the first repo. That is the
-          time spent doing the sort. With the new db-commit-timestamp, sync-ing
-          first repo starts immediately.
+          post-commit script must update this SQLite database. I use gitbunch on
+          a bunch dir containing ~850 repos. Using the older commit-timestamp
+          sort (instead of this newer db-commit-timestamp sort), when
+          synchronizing from an external USB harddisk there is an annoying delay
+          of 10-30s before sync-ing the first repo. That is the time spent doing
+          the sort. With the new db-commit-timestamp, sync-ing first repo starts
+          immediately.
 
 
 0.44    2015-01-22 (PERLANCAR)

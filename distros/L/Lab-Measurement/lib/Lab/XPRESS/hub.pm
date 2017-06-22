@@ -1,11 +1,10 @@
 package Lab::XPRESS::hub;
+$Lab::XPRESS::hub::VERSION = '3.550';
 use Lab::Exception;
 use strict;
 use Exporter 'import';
 use Module::Load qw/load autoload/;
 use Try::Tiny;
-
-our $VERSION = '3.543';
 
 our @EXPORT_OK = qw(DataFile Sweep Frame Instrument Connection);
 
@@ -68,32 +67,9 @@ sub Instrument {
         $instrument = $self;
     }
 
-    my $found_module;
-    my $module;
-    try {
-        $module = "Lab::Instrument::" . $instrument;
-        warn "before autoload";
-        autoload($module);
-        warn "after autoload";
-        $found_module = 1;
-    };
-
-    if ($found_module) {
-        return $module->new(@_);
-    }
-
-    $module = "Lab::Moose::Instrument::" . $instrument;
-    load($module);
-
-    my $args_ref          = shift;
-    my $connection_type   = delete $args_ref->{connection_type};
-    my $connection_module = "Lab::Moose::Connection::" . $connection_type;
-    load($connection_module);
-    my $connection = $connection_module->new($args_ref);
-    return $module->new(
-        %{$args_ref},
-        connection => $connection
-    );
+    my $module = "Lab::Instrument::" . $instrument;
+    autoload($module);
+    return $module->new(@_);
 }
 
 sub Connection {

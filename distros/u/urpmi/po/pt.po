@@ -8,7 +8,7 @@
 # Jose Carlos D. S. Saraiva <jose.d.s.saraiva@clix.pt>, 2004
 # zecas <jjorge@free.fr>, 2004
 # Jose Jorge <jose.jorge@oreka.com>, 2003
-# alfalb_mansil, 2014
+# Manuela Silva <manuela.silva@sky.com>, 2014,2017
 # Pedro <simplew8@gmail.com>, 2012
 # Zé <mmodem00@gmail.com>, 2010
 # Zé <mmodem00@netvisao.pt>, 2004-2006
@@ -17,9 +17,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
 "POT-Creation-Date: 2014-09-13 21:15+0200\n"
-"PO-Revision-Date: 2015-02-13 05:26+0000\n"
-"Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
-"Language-Team: Portuguese (http://www.transifex.com/projects/p/mageia/"
+"PO-Revision-Date: 2017-04-05 18:20+0000\n"
+"Last-Translator: Manuela Silva <manuela.silva@sky.com>\n"
+"Language-Team: Portuguese (http://www.transifex.com/MageiaLinux/mageia/"
 "language/pt/)\n"
 "Language: pt\n"
 "MIME-Version: 1.0\n"
@@ -30,7 +30,7 @@ msgstr ""
 #: ../gurpm/RPMProgressDialog.pm:47
 #, c-format
 msgid "Distribution Upgrade"
-msgstr "Actualização da Distribuição"
+msgstr "Atualização da Distribuição"
 
 #: ../gurpm/RPMProgressDialog.pm:47
 #, c-format

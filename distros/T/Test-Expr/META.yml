@@ -1,0 +1,25 @@
+---
+abstract: 'Test an expression with better error messages'
+author:
+  - 'Damian Conway <DCONWAY@CPAN.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Expr
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Dump: '0'
+  Keyword::Declare: '0.001'
+  Test::More: '0'
+  perl: '5.01'
+version: '0.000003'

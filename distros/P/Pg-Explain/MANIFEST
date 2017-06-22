@@ -116,6 +116,7 @@ t/25-anonymization-of-cte-names.t
 t/26-explain-with-no-timing.t
 t/27-anonymization-of-subquery-scans.t
 t/28-anonymization-of-group-keys.t
+t/29-extract-subquery-source.t
 t/99-manifest.t
 t/perlcriticrc
 t/perltidyrc

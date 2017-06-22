@@ -4,7 +4,7 @@ use 5.006001;
 use strict;
 use warnings;
 
-our $VERSION = "1.03";
+our $VERSION = "1.04";
 
 sub new {
     my ($class, $defsub, %params) = @_;

@@ -1,0 +1,16 @@
+ {
+     "name"     : "Sample",
+     "lines"    : { "line"    : [ { "id" : "L1", "name" : "L1" },
+                                  { "id" : "L2", "name" : "L2" },
+                                  { "id" : "L3", "name" : "L3" }
+                                ]
+                  },
+     "stations" : { "station" : [ { "id" : "L01", "name": "A", "line": "L1,L2", "link": "L02,L05"      },
+                                  { "id" : "L02", "name": "B", "line": "L1",    "link": "L01,L03"      },
+                                  { "id" : "L03", "name": "C", "line": "L1,L2", "link": "L01,L04,L05"  },
+                                  { "id" : "L04", "name": "D", "line": "L1,L3", "link": "L03,L06"      },
+                                  { "id" : "L05", "name": "E", "line": "L2,L3", "link": "L01,L03,L06"  },
+                                  { "id" : "L06", "name": "F", "line": "L3",    "link": "L05,L04"      }
+                                ]
+                  }
+ }

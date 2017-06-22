@@ -1,0 +1,217 @@
+NAME
+
+    Lazy::Util - Perl utilities for lazy evaluation
+
+VERSION
+
+    version 0.003
+
+SYNOPSIS
+
+      use Lazy::Util qw/ l_grep l_map /;
+      
+      my $lazy = l_map { $_ * 2 } l_grep { /^[0-9]+$/ } 3, 4, 5, sub {
+        print "Enter a number: ";
+        return scalar readline(STDIN);
+      };
+    
+      while (defined(my $answer = $lazy->get())) { 
+        print "Double your number: $answer\n";
+      }
+
+DESCRIPTION
+
+    Perl utility functions for lazy evaluation.
+
+FUNCTIONS
+
+    This module has two sets of functions, the l_* functions and the g_*
+    functions. The l_* functions are designed to return a Lazy::Iterator
+    object which you can get values from, the g_* functions are designed to
+    get a value out of a Lazy::Iterator object. Some of the g_* functions
+    may never return if the source of values is infinite, but they are for
+    the most part designed to not eat up all of your memory at least ;).
+
+    All these functions can be exported, but none are exported by default.
+    You can use the :all export tag to export all of them.
+
+l_* functions
+
+    The l_* functions are:
+
+ l_concat(@sources)
+
+      my $lazy = l_concat @sources;
+
+    l_concat returns a Lazy::Iterator object which will simply return each
+    subsequent value from the list of sources it's given.
+
+ l_first($n, @sources)
+
+      my $lazy = l_first $n, @sources;
+
+    l_first will return a Lazy::Iterator object which will only get the
+    first $n values from the subsequent arguments. This can be used the
+    'break' an otherwise infinite list to only return a certain number of
+    results.
+
+ l_grep($code, @sources)
+
+      my $lazy = l_grep { ... } @sources;
+
+    l_grep will return a Lazy::Iterator object which will filter out any
+    value which doesn't return true from the $code block in the first
+    argument.
+
+ l_map($code, @sources)
+
+      my $lazy = l_map { ... } @sources;
+
+    l_map will return a Lazy::Iterator object which will transform any
+    value using the $code block in the first argument.
+
+    The $code block is evaluated in list context, and each scalar it
+    returns will be returned by each subsequent ->get(), not poking the
+    @sources again until the list is exhausted. If an empty list is
+    returned, the @sources will be poked again until a list of at least one
+    element is returned, or the source returns undef.
+
+ l_until($code, @sources)
+
+      my $lazy = l_until { ... } @sources;
+
+    l_until will return a Lazy::Iterator object which will return values
+    from the @sources until the $code block returns true, after which it
+    will be exhausted.
+
+g_* functions
+
+    The g_* functions are:
+
+  g_count(@sources)
+
+      my $count = g_count @sources;
+
+    g_count counts the number of values from the @sources and returns how
+    many there were. This has the potential to never return if given a
+    source of infinite values.
+
+ g_first(@sources)
+
+      my $val = g_first @sources;
+
+    g_first returns the first value from the list of arguments, lazily
+    evaluating them. Equivalent to l_concat(...)->get();. If @sources is
+    empty, it will return undef.
+
+ g_join($sep, @sources)
+
+      my $lines = g_join $str, @sources;
+
+    g_join evaluates all the values it's given and returns them joined into
+    a string. This has the potential to never return as well as running out
+    of memory if given a source of infinite values. If @sources is empty,
+    it will return undef.
+
+ g_last(@sources)
+
+      my $val = g_last @sources;
+
+    g_last evaluates all the values it's given and returns the last value.
+    This has the potential to never return if given a source of infinite
+    values. If @sources is empty, it will return undef.
+
+ g_max(@sources)
+
+      my $val = g_max @sources;
+
+    g_max evaluates all the values it's given and returns the highest one.
+    This has the potential to never return if given a source of infinite
+    values. If @sources is empty, it will return undef.
+
+ g_min(@sources)
+
+      my $val = g_min @sources;
+
+    g_min evaluates all the values it's given and returns the lowest one.
+    This has the potential to never return if given a source of infinite
+    values. If @sources is empty, it will return undef.
+
+ g_prod(@sources)
+
+      my $val = g_prod @sources;
+
+    g_prod evaluates all the values it's given and returns the product of
+    all of them. This has the potential to never return if given a source
+    of infinite values. Unless one of them is 0. If so, it will
+    short-circuit and return 0. If @sources is empty, it will return 1.
+
+ g_sum(@sources)
+
+      my $val = g_sum @sources;
+
+    g_sum evaluates all the values it's given and returns the sum of all of
+    them. This has the potential to never return if given a source of
+    infinite values. If @sources is empty, it will return 0.
+
+@sources
+
+    The @sources array that most (all?) of these functions take can be any
+    combination of regular scalar values, Lazy::Iterator objects,
+    Scalar::Defer variables (see "NOTES"), or subroutine references. Each
+    of these will be iterated through from start to finish, and if one of
+    them returns undef, the next one will be used instead, until the last
+    one returns undef.
+
+    For instance, in the following scenario:
+
+      my @values = qw/ a b c /;
+      my $source = sub { shift @values };
+      my $lazy = l_concat $source, 1;
+    
+      my @results = ($lazy->get(), $lazy->get(), $lazy->get(), $lazy->get());
+
+    What happens when you run $lazy->get() the first time is that the
+    subroutine in $source will be executed, and so @values will change to
+    only contain qw/ b c /, and a will be returned. The next time @values
+    will be changed to only contain qw/ c /, and b will be returned. The
+    third $lazy->get() will change @values to qw// (an empty array), and
+    return the c.
+
+    So far so good.
+
+    What happens with the next $lazy->get() is that the subroutine in
+    $source will be executed one last time, and it will run shift @values,
+    but @values is empty, so it will return undef, which will signal that
+    $source is exhausted, and so it will be discarded. The next value will
+    be taken from the next element in @sources, which is the single scalar
+    1.
+
+    This means that at the end, @results will contain qw/ a b c 1 /, and
+    any subsequent call to $lazy->get() will return undef.
+
+NOTES
+
+    If Scalar::Defer is installed, it will assume that any variable of type
+    0 is a Scalar::Defer variable and will treat it as a source of values.
+
+    Not to be confused with Lazy::Utils.
+
+SEE ALSO
+
+    Lazy::Iterator
+
+    Scalar::Defer
+
+AUTHOR
+
+    Andreas Guldstrand <andreas.guldstrand@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2017 by Andreas Guldstrand.
+
+    This is free software, licensed under:
+
+      The MIT (X11) License
+

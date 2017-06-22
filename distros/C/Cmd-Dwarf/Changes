@@ -1,5 +1,20 @@
 Revision history for Perl extension dwarf
 
+1.50 2017-06-21T07:04:49Z
+
+    - nuke crlf
+    - change dump format
+    - impl did_dispatch / validate_response / add_constraint method to validate response
+    - allow override for run.cgi
+    - update docs about impl rest api controller
+    - turn on CGI::SpeedyCGI plugin as default
+    - fix a problem with CGI::SpeedyCGI (End-block called first time only.)
+    - support HTTP 1.1 request methods
+    - use Data::Validator with AllowExtra
+    - support recursive rules for HashRef and ArrayRef|HashRef on Dwarf::Module::DSL::args
+    - fix bugs of App::Test::_build_mech
+    - remove tests of 5.10 and 5.12 because Test::PostgreSQL 1.20 or higher only support Perl 5.14.0 or higher
+
 1.42 2017-03-29T04:41:29Z
 
     - fix tests of validator for Plack 1.0040 or higher

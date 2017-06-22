@@ -19,17 +19,17 @@ my $file = datafile(
     type     => 'Gnuplot',
     folder   => $folder,
     filename => 'file.dat',
-    columns  => [qw/A B C/]
+    columns  => [qw/A B C/],
 );
 my $path = $file->path();
-$file->log( A => 1, B => 2, C => 3 );
+$file->log( A => 0.7, B => 2, C => 3 );
 $file->log_newline();
 $file->log_comment( comment => 'YOLO' );
 $file->log( A => 2, B => 3, C => 4 );
 
 my $expected = <<"EOF";
 # A\tB\tC
-1\t2\t3
+0.7\t2\t3
 
 # YOLO
 2\t3\t4

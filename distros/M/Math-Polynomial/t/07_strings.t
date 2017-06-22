@@ -1,8 +1,6 @@
-# Copyright (c) 2007-2015 Martin Becker.  All rights reserved.
+# Copyright (c) 2007-2017 Martin Becker.  All rights reserved.
 # This package is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-#
-# $Id: 07_strings.t 123 2015-04-18 20:22:56Z demetri $
 
 # Checking stringification and stringification parameters.
 

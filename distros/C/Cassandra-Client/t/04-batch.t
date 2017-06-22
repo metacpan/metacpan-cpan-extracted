@@ -8,7 +8,7 @@ use Cassandra::Client;
 plan skip_all => "CASSANDRA_HOST not set" unless $ENV{CASSANDRA_HOST};
 plan tests => 7;
 
-my $client= Cassandra::Client->new( contact_points => [split /,/, $ENV{CASSANDRA_HOST}], username => $ENV{CASSANDRA_USER}, password => $ENV{CASSANDRA_AUTH}, anyevent => (rand()<.5) );
+my $client= Cassandra::Client->new( contact_points => [split /,/, $ENV{CASSANDRA_HOST}], username => $ENV{CASSANDRA_USER}, password => $ENV{CASSANDRA_AUTH}, anyevent => (rand()<.5), tls => $ENV{CASSANDRA_TLS} );
 $client->connect();
 
 my $db= 'perl_cassandra_client_tests';

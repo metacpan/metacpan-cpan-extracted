@@ -1,0 +1,102 @@
+[% USE scalar %]
+[% SET comment_count = Post.scalar.comments.count %]
+
+[% BLOCK render_comment %]
+  [%- SET format1 = '%Y-%m-%dT%H:%M' format2 = '%b %d, %Y @ %H:%M' -%]
+  [%- USE date -%]
+  [% DEFAULT depth = 1 %]
+  [% SET subcomment_count = Comment.scalar.comments.count %]
+
+  <li class="depth-[% depth %]" id="[% Comment.html_id %]">
+
+     <div class="avatar">
+        [% SET img_url = Comment.user.image_url || 'images/user-01.png' %]
+        <img width="50" height="50" class="avatar" src="[% img_url %]" alt="">
+     </div>
+
+     <div class="comment-content">
+
+        <div class="comment-info">
+           <cite>[% Comment.user.full_name %]</cite>
+
+           <div class="comment-meta">
+              <time class="comment-time" datetime="[% date.format(Comment.ts,format1) %]">[% date.format(Comment.ts,format2) %]</time>
+              
+              [% IF User && User.can_comment %]
+                <span class="sep">/</span><a 
+                  class="reply" style="cursor:pointer;"
+                  onclick="promptSubComment('[% remote_action_path %]/comment/add','[% Comment.id %]')"
+                >Reply</a>
+              [% END %]
+              
+           </div>
+        </div>
+
+        <div class="comment-text">
+           <p>[% Comment.body %]</p>
+        </div>
+
+     </div>
+     
+     [% IF subcomment_count > 0 %]
+     
+       <ul class="children">
+        [% FOREACH child IN Comment.scalar.comments.all %]
+          [% PROCESS render_comment Comment=child depth = depth + 1 %]
+        [% END %]
+
+       </ul>
+     [% END %]
+  </li>
+
+[% END %]
+
+<div id="comments">
+
+   <h3>[% comment_count %] Comments</h3>
+
+   <!-- commentlist -->
+   <ol class="commentlist">
+     [% FOREACH child IN Post.scalar.direct_comments.all %]
+       [% PROCESS render_comment Comment=child %]
+     [% END %]
+   
+   </ol>
+   
+      <!-- respond -->
+   <div class="respond">
+     [% IF User %]
+       [% IF User.can_comment %]
+
+         <h3>Leave a Comment</h3>
+
+          <!-- form -->
+          <form action="[% remote_action_path %]/comment/add" method="post">
+            <fieldset>
+
+             <div class="message group">
+                <input name="post_id" type="hidden" value="[% Post.id %]" />
+                <label  for="body">Message <span class="required">*</span></label>
+                <textarea name="body"  id="body" rows="10" cols="50" ></textarea>
+             </div>
+
+             <button type="submit" class="submit">Submit</button>
+
+            </fieldset>
+          </form> <!-- Form End -->
+     
+       [% END %]
+     [% ELSE %]
+       <h3>
+        <a href="[% c.mount_url %]/auth/to_referer?_fragment=add-comment">Sign in</a> to Leave a Comment
+       </h3>
+     [% END %]
+
+      
+
+   </div> <!-- Respond End -->
+   
+
+</div>
+
+

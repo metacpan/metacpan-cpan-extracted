@@ -12,33 +12,6 @@ use Plack::Session::Store::RedisFast;
 
 use t::lib::TestSession;
 
-{
-
-    package TestRedis;
-
-    sub new {
-        bless {} => shift;
-    }
-
-    sub set {
-        my ( $self, $key, $val ) = @_;
-
-        $self->{$key} = $val;
-    }
-
-    sub get {
-        my ( $self, $key ) = @_;
-
-        $self->{$key};
-    }
-
-    sub remove {
-        my ( $self, $key ) = @_;
-
-        delete $self->{$key};
-    }
-}
-
 t::lib::TestSession::run_all_tests(
     store  => Plack::Session::Store::RedisFast->new,
     state  => Plack::Session::State->new,

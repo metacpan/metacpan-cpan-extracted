@@ -55,7 +55,7 @@ sub unimport {
 }
 
 BEGIN {
- $VERSION='0.06';
+ $VERSION='0.07';
  if($]>5.0089999){
   require XSLoader;
   XSLoader::load(__PACKAGE__, $VERSION);
@@ -82,7 +82,7 @@ Classic::Perl - Selectively reinstate deleted Perl features
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
 
@@ -202,11 +202,9 @@ Andrew Main (Zefram) added support for C<$[> in 5.16.
 
 L<perl> 5 or higher
 
-In Perl 5.16 and higher, L<Array::Base> and L<String::Base> are required.
-
 =head1 COPYRIGHT
 
-Copyright (C) 2010-16 Father Chrysostomos
+Copyright (C) 2010-17 Father Chrysostomos
 
   use Classic'Perl;
   split / /, 'org . cpan @ sprout';

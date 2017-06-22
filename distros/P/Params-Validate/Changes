@@ -1,3 +1,8 @@
+1.29    2017-06-11
+
+- Fixes for MSVC compilation. Patch by Andy Grundman. PR #15.
+
+
 1.28    2017-05-05
 
 - Removed the broken Makefile.PL that was accidentally being shipped with this

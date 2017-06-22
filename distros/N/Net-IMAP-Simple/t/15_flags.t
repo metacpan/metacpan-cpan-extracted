@@ -23,7 +23,7 @@ sub run_tests {
         ok( $imap->put( testing => "Subject: test-$_\n\ntest-$_" ) );
 
         ok( 0+$imap->last,   $_ );
-        ok( 0+$imap->unseen, 1  );
+        ok( 0+$imap->unseen, $ENV{NIS_TEST_HOST} =~ m/gmail/ ? 1:$_  );
 
         $imap->see($_);
         ok( 0+$imap->unseen, 0 );
@@ -78,4 +78,4 @@ sub run_tests {
     ok( defined $imap->deleted(5) );
 }
 
-do "t/test_runner.pm";
+do "./t/test_runner.pm";

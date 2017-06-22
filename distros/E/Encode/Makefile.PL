@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL,v 2.19 2017/06/10 17:23:50 dankogai Exp dankogai $
+# $Id: Makefile.PL,v 2.20 2017/06/22 08:11:05 dankogai Exp dankogai $
 #
 use 5.007003;
 use strict;
@@ -16,9 +16,11 @@ $ENV{PERL_CORE} ||= $ARGV{PERL_CORE} if $ARGV{PERL_CORE};
 # similar strictness as in core
 my $ccflags = $Config{ccflags};
 if (!$ENV{PERL_CORE}) {
-  if ($Config{gccversion}) {
-    $ccflags .= ' -Werror=declaration-after-statement';
-    $ccflags .= ' -Wpointer-sign' unless $Config{d_cplusplus};
+  if (my $gccver = $Config{gccversion}) {
+    $gccver =~ s/\.//g;
+    $gccver .= "0" while length $gccver < 3;
+    $ccflags .= ' -Werror=declaration-after-statement' if $gccver > 400;
+    $ccflags .= ' -Wpointer-sign' if !$Config{d_cplusplus} and $gccver > 400;
     $ccflags .= ' -fpermissive' if $Config{d_cplusplus};
   }
 }

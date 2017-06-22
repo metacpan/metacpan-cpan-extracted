@@ -4,7 +4,7 @@ use 5.10.0;
 use strict;
 use warnings;
 
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 # standard perl
 use Carp;
@@ -100,16 +100,17 @@ sub _handle_response {
 	my ($self, $r) = @_;
 	#say STDERR '_handle_response: ', Dumper($r) if $self->{debug};
 	my $id = $r->{id};
-	my $cb = delete $self->{calls}->{$id};
-	return undef, 'unknown call' unless $cb and ref $cb eq 'CODE';
+	my $cb;
+	$cb = delete $self->{calls}->{$id} if $id;
 	if (defined $r->{error}) {
 		my $e = $r->{error};
 		return 'error is not an object' unless ref $e eq 'HASH';
 		return 'error code is not a integer' unless defined $e->{code} and $e->{code} =~ /^-?\d+$/;
         	return 'error message is not a string' if ref $e->{message};
         	return 'extra members in error object' if (keys %$e == 3 and !exists $e->{data}) or (keys %$e > 2);
-        	$cb->($r->{error});
+		$cb->($r->{error}) if $cb and ref $cb eq 'CODE';
 	} else {
+		return undef, 'unknown call' unless $cb and ref $cb eq 'CODE';
 		$cb->(0, $r->{result});
 	}
 	return;
@@ -118,7 +119,6 @@ sub _handle_response {
 sub _write {
 	my $self = shift;
 	say STDERR '    writing: ', @_ if $self->{debug};
-	#$self->{stream}->write(@_);
 	$self->{write}->(@_);
 }
 
@@ -304,7 +304,7 @@ Wieger Opmeer <wiegerop@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Wieger Opmeer.
+This software is copyright (c) 2017 by Wieger Opmeer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

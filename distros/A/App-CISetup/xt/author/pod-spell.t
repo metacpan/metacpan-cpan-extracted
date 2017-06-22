@@ -16,7 +16,6 @@ App
 AppVeyor
 CISetup
 ConfigFile
-ConfigFileFinder
 ConfigUpdater
 Dave
 Eilam

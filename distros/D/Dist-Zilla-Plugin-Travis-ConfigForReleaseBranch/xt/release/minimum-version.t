@@ -2,7 +2,7 @@
 #
 # This file is part of Dist-Zilla-Plugin-Travis-ConfigForReleaseBranch
 #
-# This software is Copyright (c) 2013 by Chris Weyl.
+# This software is Copyright (c) 2017, 2015, 2013 by Chris Weyl.
 #
 # This is free software, licensed under:
 #

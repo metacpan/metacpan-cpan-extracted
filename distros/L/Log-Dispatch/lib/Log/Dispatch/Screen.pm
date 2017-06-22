@@ -3,7 +3,7 @@ package Log::Dispatch::Screen;
 use strict;
 use warnings;
 
-our $VERSION = '2.63';
+our $VERSION = '2.65';
 
 use Encode qw( encode );
 use IO::Handle;
@@ -76,7 +76,7 @@ Log::Dispatch::Screen - Object for logging to the screen
 
 =head1 VERSION
 
-version 2.63
+version 2.65
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,14 @@
 This file documents the revision history for Test::DBIx::Class::Schema.
 
+1.0.12    2017-06-12 05:18:54-04:00 America/New_York
+ Thanks to simbabque and http://neilb.org/2016/12/18/cpan-prc-2017.html
+ - fix broken missing method detection for Perl >= 5.18  (pull #19)
+ - include warning about Test::Class::Moose and done_testing in doc  (pull #20)
+
 1.0.11    2017-06-05 04:37:31-04:00 America/New_York
+ Thanks to simbabque and http://neilb.org/2016/12/18/cpan-prc-2017.html
+ - test that we TODO correctly for CODE ref relations (pull #18)
+ - test proxy relationships with additions borrowed from DBIx::Class (pull #18)
 
 1.0.10    2016-05-12 05:01:56-04:00 America/New_York
  - replace ContributorsFromGit with Git::Contributors

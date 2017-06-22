@@ -170,7 +170,7 @@ BEGIN {
 }
 
 my $modules =	((Control::CLI::AvayaData::useTelnet) ? "Net::Telnet $Net::Telnet::VERSION, ":'').
-		((Control::CLI::AvayaData::useSsh)    ? "Net::SSH2 $Net::SSH2::VERSION, ":'').
+		((Control::CLI::AvayaData::useSsh)    ? "Net::SSH2 $Net::SSH2::VERSION / libssh2 " . &Net::SSH2::version . ", ":'').
 		((Control::CLI::AvayaData::useSerial) ? ($^O eq 'MSWin32' ?
 						"Win32::SerialPort $Win32::SerialPort::VERSION, ":
 						"Device::SerialPort $Device::SerialPort::VERSION, "):
@@ -415,6 +415,10 @@ do {{ # Test loop, we keep testing until user satisfied
 	attribute($cli, 'model',1); # might be undefined if executed on a Standby CPU
 	attribute($cli, 'sysname',1); # might be undefined if executed on a Standby CPU
 	attribute($cli, 'base_mac',1); # might be undefined (if executed on a Standby CPU or some products)
+	attribute($cli, 'is_apls',1); # will be undefined on non-PassportERS products
+	attribute($cli, 'is_voss',1); # will be undefined on non-PassportERS products
+	attribute($cli, 'apls_box_type',1); # might be undefined if is_apls is false
+	attribute($cli, 'brand_name',1); # might be undefined if is_voss is false
 	$acli = attribute($cli, 'is_acli');
 	attribute($cli, 'sw_version');
 	attribute($cli, 'fw_version',1); # might be undefined (VSP9000)

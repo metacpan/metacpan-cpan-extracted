@@ -1,6 +1,5 @@
 package Lab::Instrument::ITC;
-our $VERSION = '3.543';
-
+$Lab::Instrument::ITC::VERSION = '3.550';
 use strict;
 use Lab::Instrument;
 use Lab::MultiChannelInstrument;

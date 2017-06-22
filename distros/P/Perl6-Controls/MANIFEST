@@ -1,0 +1,19 @@
+Changes
+lib/Perl6/Controls.pm
+Makefile.PL
+MANIFEST
+README
+t/00.load.t
+t/pod-coverage.t
+t/pod.t
+demo.pl
+t/FIRST.t
+t/LAST.t
+t/NEXT.t
+t/for.t
+t/loop.t
+t/repeat.t
+t/try_CATCH.t
+t/while.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

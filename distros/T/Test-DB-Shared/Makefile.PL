@@ -16,19 +16,22 @@ my %WriteMakefileArgs = (
   "LICENSE" => "apache",
   "NAME" => "Test::DB::Shared",
   "PREREQ_PM" => {
+    "Carp" => 0,
     "File::Flock::Tiny" => "0.14",
     "File::Slurp" => 0,
     "JSON" => 0,
     "Log::Any" => "1.040",
-    "Moose" => "2.1605",
+    "Moo" => 0,
     "POSIX" => 0,
+    "Scalar::Util" => 0,
     "Test::More" => "1.001014",
     "Test::mysqld" => "0.17"
   },
   "TEST_REQUIRES" => {
-    "File::Temp" => 0
+    "File::Temp" => 0,
+    "File::Which" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,13 +39,16 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "File::Flock::Tiny" => "0.14",
   "File::Slurp" => 0,
   "File::Temp" => 0,
+  "File::Which" => 0,
   "JSON" => 0,
   "Log::Any" => "1.040",
-  "Moose" => "2.1605",
+  "Moo" => 0,
   "POSIX" => 0,
+  "Scalar::Util" => 0,
   "Test::More" => "1.001014",
   "Test::mysqld" => "0.17"
 );

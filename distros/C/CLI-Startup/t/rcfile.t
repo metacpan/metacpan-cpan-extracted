@@ -98,14 +98,18 @@ mkdir "$dir/tmp";
     # All the config files should contain this data structure
     $config = {
         default => {
-            foo  => 1,
-            bar  => 'baz',
-            baz  => 0,
-            hash => { a => 1, b => 2, c => 3 },
-            list => [ 1, 2, 3, 'purple' ],
+            foo     => 1,
+            bar     => 'baz',
+            baz     => 0,
+            hash    => { a => 1, b => 2, c => 3 },
+            list    => [ 1, 2, 3, 'purple' ],
         },
         extras  => { a => 1, b => 2, c => '3, 4, 5', }
     };
+
+    # When parsed, the options should include verbose => 0 as well.
+    my $options = { %{$config->{default}}, verbose => 0 };
+
 
     # These are the command-line options corresponding to the 
     # above config file contents.
@@ -149,7 +153,7 @@ mkdir "$dir/tmp";
         # Verify the raw command line options, the final options, and the
         # config file contents.
         is_deeply $app1->get_config, $config, "Read Perl config correctly";
-        is_deeply $app1->get_options, $config->{default},
+        is_deeply $app1->get_options, $options,
             "...with the correct program options";
         is_deeply $app1->get_raw_options, {}, "...and an empty command line";
 
@@ -188,7 +192,7 @@ mkdir "$dir/tmp";
         $app2->init;
 
         is_deeply $app2->get_config, $config, "Read INI config correctly";
-        is_deeply $app1->get_options, $config->{default},
+        is_deeply $app1->get_options, $options,
             "...with the correct program options";
         is_deeply $app2->get_raw_options, {}, "...and an empty command line";
 
@@ -214,7 +218,7 @@ mkdir "$dir/tmp";
         $app3->init;
 
         is_deeply $app3->get_config, $config, "Read simple config correctly";
-        is_deeply $app3->get_options, { foo => 'bar', bar => 'baz', },
+        is_deeply $app3->get_options, { foo => 'bar', bar => 'baz', verbose => 0 },
             "...with the correct program options";
         is_deeply $app3->get_raw_options, {}, "...and an empty command line";
     }
@@ -241,7 +245,7 @@ mkdir "$dir/tmp";
         $app2->init;
 
         is_deeply $app2->get_config, $config, "Read YAML config correctly";
-        is_deeply $app1->get_options, $config->{default},
+        is_deeply $app1->get_options, $options,
             "...with the correct program options";
         is_deeply $app2->get_raw_options, {}, "...and an empty command line";
     }
@@ -250,8 +254,8 @@ mkdir "$dir/tmp";
     SKIP: {
         my $tests = 4;
 
-        eval "use JSON::Any";
-        skip("JSON::Any is not installed", $tests) if $@;
+        eval "use JSON::MaybeXS";
+        skip("JSON::MaybeXS is not installed", $tests) if $@;
 
         eval "use Config::Any::JSON";
         skip("Config::Any::JSON is not installed", $tests) if $@;
@@ -268,7 +272,7 @@ mkdir "$dir/tmp";
         $app2->init;
 
         is_deeply $app2->get_config, $config, "Read JSON config correctly";
-        is_deeply $app1->get_options, $config->{default},
+        is_deeply $app1->get_options, $options,
             "...with the correct program options";
         is_deeply $app2->get_raw_options, {}, "...and an empty command line";
     }
@@ -295,7 +299,7 @@ mkdir "$dir/tmp";
         $app2->init;
 
         is_deeply $app2->get_config, $config, "Read XML config correctly";
-        is_deeply $app1->get_options, $config->{default},
+        is_deeply $app1->get_options, $options,
             "...with the correct program options";
         is_deeply $app2->get_raw_options, {}, "...and an empty command line";
     }

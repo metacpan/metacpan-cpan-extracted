@@ -1,5 +1,9 @@
 Revision history for Plack::Middleware::Auth::JWT
 
+0.901   2017-06-13T11:02:23
+    - add ignore_invalid_token option
+
+
 0.900   2017-06-09T14:33:18
     - first release
 

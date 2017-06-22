@@ -1,5 +1,5 @@
 package Facebook::Graph::Picture;
-$Facebook::Graph::Picture::VERSION = '1.1202';
+$Facebook::Graph::Picture::VERSION = '1.1204';
 use Moo;
 with 'Facebook::Graph::Role::Uri';
 
@@ -52,7 +52,7 @@ Facebook::Graph::Picture - Get the URI for the picture of any object.
 
 =head1 VERSION
 
-version 1.1202
+version 1.1204
 
 =head1 SYNOPSIS
 

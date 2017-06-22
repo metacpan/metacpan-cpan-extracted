@@ -1,12 +1,12 @@
-package MooseX::Types::LoadableClass; # git description: v0.013-12-g14cfc61
+package MooseX::Types::LoadableClass; # git description: v0.014-7-g546ab28
 # ABSTRACT: ClassName type constraint with coercion to load the class.
 # KEYWORDS: moose types constraints class classes role roles module modules
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 use strict;
 use warnings;
-use MooseX::Types -declare => [qw/ ClassName LoadableClass LoadableRole /];
+use MooseX::Types -declare => [qw/ LoadableClass LoadableRole /];
 use MooseX::Types::Moose qw(Str RoleName), ClassName => { -as => 'MooseClassName' };
 use Module::Runtime qw(is_module_name use_package_optimistically);
 use if MooseX::Types->VERSION >= 0.42, 'namespace::autoclean';
@@ -51,7 +51,7 @@ MooseX::Types::LoadableClass - ClassName type constraint with coercion to load t
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 
@@ -92,13 +92,24 @@ A normal class / package.
 
 Like C<LoadableClass>, except the loaded package must be a L<Moose::Role>.
 
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=MooseX-Types-LoadableClass>
+(or L<bug-MooseX-Types-LoadableClass@rt.cpan.org|mailto:bug-MooseX-Types-LoadableClass@rt.cpan.org>).
+
+There is also a mailing list available for users of this distribution, at
+L<http://lists.perl.org/list/moose.html>.
+
+There is also an irc channel available for users of this distribution, at
+L<C<#moose> on C<irc.perl.org>|irc://irc.perl.org/#moose>.
+
 =head1 AUTHOR
 
 Tomas Doran <bobtfish@bobtfish.net>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Dagfinn Ilmari Mannsåker Florian Ragwitz Сергей Романов
+=for stopwords Karen Etheridge Dagfinn Ilmari Mannsåker Florian Ragwitz Gregory Oschwald Сергей Романов
 
 =over 4
 
@@ -113,6 +124,10 @@ Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
 =item *
 
 Florian Ragwitz <rafl@debian.org>
+
+=item *
+
+Gregory Oschwald <goschwald@maxmind.com>
 
 =item *
 

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.0.12, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,10 +26,13 @@ no_index:
 provides:
   Task::BeLike::ZAKAME:
     file: lib/Task/BeLike/ZAKAME.pm
-    version: '0.09'
+    version: '0.10'
 recommends:
   App::rainbarf: '0'
   App::scan_prereqs_cpanfile: '0'
+  Git::Deploy: '0'
+  LWP::Protocol::rsync: '0'
+  Paws: '0'
   Perl::Critic: '0'
 requires:
   AnyEvent: '0'
@@ -37,17 +40,17 @@ requires:
   App::HTTPThis: '0'
   App::Nopaste: '0'
   App::cpanoutdated: '0'
-  App::metacpansearch: '0'
+  App::cpm: '0'
   CPAN::Mini: '0'
   CPAN::Uploader: '0'
   Carton: '0'
   Class::Refresh: '0'
   Data::Printer: '0'
   Devel::Confess: '0'
+  Import::Base: '0'
   Minilla: '0'
   Mojolicious: '0'
   Moo: '0'
-  Paws: '0'
   Perl::Tidy: '0'
   Plack: '0'
   Pod::Cpandoc: '0'
@@ -63,7 +66,7 @@ resources:
   bugtracker: https://github.com/zakame/Task-BeLike-ZAKAME/issues
   homepage: https://github.com/zakame/Task-BeLike-ZAKAME
   repository: git://github.com/zakame/Task-BeLike-ZAKAME.git
-version: '0.09'
+version: '0.10'
 x_contributors:
   - 'Zak B. Elep <zak.elep@yoyo.ph>'
   - 'Zak B. Elep <zakame@zakame.net>'

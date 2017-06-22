@@ -23,11 +23,12 @@ plan skip_all => "Can't load CLI::Startup" if $@;
     # Confirm that the output has some default options
     for my $opt (qw{ help manpage rcfile version write-rcfile })
     {
-        like $trap->stdout, qr/^ \s+ $opt \s+ -/xms, "Default option $opt is present";
+        like $trap->stdout, qr/^ \s+ --$opt \s+ -/xms, "Default option $opt is present";
     }
 
     # Confirm that the options are sorted
     my @opts = $trap->stdout =~ /^ \s+ ([^\s]+) \s+ -/xmsg;
+    @opts = grep { ! /Aliases/ } @opts;
     is join("\n", @opts), join("\n", sort @opts), "Options are sorted alphanumerically";
 }
 

@@ -1,5 +1,9 @@
 Revision history for Web::ComposableRequest
 
+0.20.1    2017-06-12 21:40:28
+          - Adds test for endless loop bug
+          - Fixes endless loop bug in collect_status_messages
+
 0.19.1    2017-03-12 22:39:59
           - Fixes role classname composition
           - Toolchain update CVE-2016-1238

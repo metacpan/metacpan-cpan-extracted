@@ -110,10 +110,10 @@ sub collect_status_messages {
 
    my @keys = reverse sort keys %{ $self->messages };
 
-   while (my $key = $keys[ 0 ]) {
+   while (my $key = shift @keys) {
       $key gt $mid and next; my $msg = delete $self->messages->{ $key };
 
-      push @messages, $req->loc( @{ $msg } ); shift @keys;
+      push @messages, $req->loc( @{ $msg } );
    }
 
    return \@messages;

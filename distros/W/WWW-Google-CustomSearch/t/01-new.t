@@ -18,7 +18,7 @@ eval { WWW::Google::CustomSearch->new({api_key=>$api_key, cx => $cx, prettyprint
 like($@, qr/did not pass type constraint "TrueFalse"/);
 
 eval { WWW::Google::CustomSearch->new({api_key=>$api_key, cx => $cx, lr=>'en'}); };
-like($@, qr/ERROR: Invalid data for param: lr/);
+like($@, qr/did not pass type constraint "LanguageC"/);
 
 eval { WWW::Google::CustomSearch->new({api_key=>$api_key, cx => $cx, num=>12}); };
 like($@, qr/ERROR: Invalid data for param: num/);
@@ -39,7 +39,7 @@ eval { WWW::Google::CustomSearch->new({api_key=>$api_key, cx => $cx, c2coff=>-1}
 like($@, qr/did not pass type constraint "Bool"/);
 
 eval { WWW::Google::CustomSearch->new({api_key=>$api_key, cx => $cx, cr=>'countryXYZ'}); };
-like($@, qr/ERROR: Invalid data for param: cr/);
+like($@, qr/did not pass type constraint "CountryC"/);
 
 eval { WWW::Google::CustomSearch->new({api_key=>$api_key, cx => $cx, dateRestrict=>'x1'}); };
 like($@, qr/ERROR: Invalid data for param: dateRestrict/);
@@ -48,40 +48,40 @@ eval { WWW::Google::CustomSearch->new({api_key=>$api_key, cx => $cx, dateRestric
 like($@, qr/^$/);
 
 eval { WWW::Google::CustomSearch->new({api_key=>$api_key, cx => $cx, fileType=>'.xxx'}); };
-like($@, qr/ERROR: Invalid data for param: fileType/);
+like($@, qr/did not pass type constraint "FileType"/);
 
 eval { WWW::Google::CustomSearch->new({api_key=>$api_key, cx => $cx, gl=>'xy'}); };
-like($@, qr/ERROR: Invalid data for param: gl/);
+like($@, qr/did not pass type constraint "CountryCode"/);
 
 eval { WWW::Google::CustomSearch->new({api_key=>$api_key, cx => $cx, highRange=>'x'}); };
 like($@, qr/ERROR: Invalid data for param: highRange/);
 
 eval { WWW::Google::CustomSearch->new({api_key=>$api_key, cx => $cx, hl=>'xyz'}); };
-like($@, qr/ERROR: Invalid data for param: hl/);
+like($@, qr/did not pass type constraint "InterfaceLang"/);
 
 eval { WWW::Google::CustomSearch->new({api_key=>$api_key, cx => $cx, imgColorType=>'xyz'}); };
-like($@, qr/ERROR: Invalid data for param: imgColorType/);
+like($@, qr/did not pass type constraint "ColorType"/);
 
 eval { WWW::Google::CustomSearch->new({api_key=>$api_key, cx => $cx, imgDominantColor=>'xyz'}); };
-like($@, qr/ERROR: Invalid data for param: imgDominantColo/);
+like($@, qr/did not pass type constraint "DominantColor"/);
 
 eval { WWW::Google::CustomSearch->new({api_key=>$api_key, cx => $cx, imgSize=>'xyz'}); };
-like($@, qr/ERROR: Invalid data for param: imgSize/);
+like($@, qr/did not pass type constraint "ImageSize"/);
 
 eval { WWW::Google::CustomSearch->new({api_key=>$api_key, cx => $cx, imgType=>'xyz'}); };
-like($@, qr/ERROR: Invalid data for param: imgType/);
+like($@, qr/did not pass type constraint "ImageType"/);
 
 eval { WWW::Google::CustomSearch->new({api_key=>$api_key, cx => $cx, lowRange=>'x'}); };
 like($@, qr/ERROR: Invalid data for param: lowRange/);
 
 eval { WWW::Google::CustomSearch->new({api_key=>$api_key, cx => $cx, lr=>'x'}); };
-like($@, qr/ERROR: Invalid data for param: lr/);
+like($@, qr/did not pass type constraint "LanguageC"/);
 
 eval { WWW::Google::CustomSearch->new({api_key=>$api_key, cx => $cx, rights=>'x'}); };
 like($@, qr/ERROR: Invalid data for param: rights/);
 
 eval { WWW::Google::CustomSearch->new({api_key=>$api_key, cx => $cx, searchType=>'x'}); };
-like($@, qr/ERROR: Invalid data for param: searchType/);
+like($@, qr/did not pass type constraint "SearchType"/);
 
 eval { WWW::Google::CustomSearch->new({api_key=>$api_key, cx => $cx, siteSearchFilter=>'x'}); };
-like($@, qr/ERROR: Invalid data for param: siteSearchFilter/);
+like($@, qr/did not pass type constraint "SearchFilter"/);

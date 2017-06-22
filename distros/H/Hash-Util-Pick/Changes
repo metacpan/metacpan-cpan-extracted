@@ -1,5 +1,8 @@
 Revision history for Perl extension Hash-Util-Pick
 
+0.12 2017-06-13T16:43:17Z
+    - support perl 5.26.0
+
 0.11 2016-11-24T00:40:10Z
     - fix document style
 

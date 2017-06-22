@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '3.30';
+$Map::Tube::VERSION   = '3.31';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube - Core library as Role (Moo) to process map data.
 
 =head1 VERSION
 
-Version 3.30
+Version 3.31
 
 =cut
 
@@ -83,7 +83,7 @@ documented in L<Map::Tube::Cookbook>.
 
 =cut
 
-has [qw(name name_to_id plugins _active_link _other_links _line_stations)] => (is => 'rw');
+has [qw(name name_to_id plugins _active_link _other_links _line_stations _common_lines)] => (is => 'rw');
 has nodes  => (is => 'rw', isa => NodeMap);
 has lines  => (is => 'rw', isa => Lines  );
 has tables => (is => 'rw', isa => Tables );
@@ -168,6 +168,8 @@ sub get_shortest_route {
 
     my $_from = $self->get_node_by_id($from);
     my $_to   = $self->get_node_by_id($to);
+
+    $self->_capture_common_lines($_from, $_to);
 
     $self->_get_shortest_route($from);
 
@@ -820,14 +822,27 @@ sub _load_plugins {
     }
 }
 
+sub _capture_common_lines {
+    my ($self, $from, $to) = @_;
+
+    my $from_lines = [ map { $_->id } @{$from->line} ];
+    my $to_lines   = [ map { $_->id } @{$to->line}   ];
+
+    $self->{_common_lines} = [ common_lines($from_lines, $to_lines) ];
+}
+
 sub _get_next_link {
     my ($self, $from, $seen, $links) = @_;
 
     my $nodes        = $self->{nodes};
     my $active_links = $self->{_active_links};
     my @common_lines = common_lines($active_links->[0], $active_links->[1]);
-    my $link         = undef;
 
+    if (scalar(@{$self->{_common_lines}})) {
+        @common_lines = (@{$self->{_common_lines}}, @common_lines);
+    }
+
+    my $link = undef;
     foreach my $_link (@$links) {
         return (0,  $_link) if ((exists $seen->{$_link}) || ($from eq $_link));
 

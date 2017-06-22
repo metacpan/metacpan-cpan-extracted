@@ -11,6 +11,9 @@ use Moo::Role;
 use Types::Standard qw(Str Int Bool HashRef ArrayRef);
 use Net::Etcd::KV::Put;
 use Net::Etcd::KV::Range;
+use Net::Etcd::KV::Txn;
+use Net::Etcd::KV::Op;
+use Net::Etcd::KV::Compare;
 
 with 'Net::Etcd::Role::Actions';
 use namespace::clean;
@@ -21,7 +24,7 @@ Net::Etcd::KV
 
 =cut
 
-our $VERSION = '0.009';
+our $VERSION = '0.013';
 
 =head1 DESCRIPTION
 
@@ -35,7 +38,11 @@ Key Value role providing easy access to Put and Range classes
 
 Range gets the keys in the range from the key-value store.
 
+    # get range
     $etcd->range({key =>'test0', range_end => 'test100'})
+
+    # delete range
+    $etcd->range({key =>'test0', range_end => 'test100'})->delete
 
 =cut
 
@@ -48,8 +55,8 @@ sub range {
         cb       => $cb,
         ( $options ? %$options : () ),
     );
-    $range->request;
-    return $range;
+    $range->request unless $range->hold;
+    return $range
 }
 
 =head2 put
@@ -58,7 +65,7 @@ Put puts the given key into the key-value store. A put request increments
 the revision of the key-value store and generates one event in the event
 history.
 
-    $etcd->range({key =>'test0', range_end => 'test100'})
+    $etcd->put({key =>'test0', value=> 'bar'})
 
 =cut
 
@@ -71,7 +78,7 @@ sub put {
         cb       => $cb,
         ( $options ? %$options : () ),
     );
-    $put->request;
+    $put->request unless $put->hold;
     return $put;
 }
 
@@ -94,8 +101,35 @@ sub txn {
         cb       => $cb,
         ( $options ? %$options : () ),
     );
-    $txn->request;
-    return $txn;
+    return $txn->create; 
+}
+
+=head2 op
+
+=cut
+
+sub op {
+    my ( $self, $options ) = @_;
+    my $cb = pop if ref $_[-1] eq 'CODE';
+    my $op = Net::Etcd::KV::Op->new(
+        %$self,
+        ( $options ? %$options : () ),
+    );
+    return  $op->create;
+}
+
+=head2 compare
+
+=cut
+
+sub compare {
+    my ( $self, $options ) = @_; 
+    my $cb = pop if ref $_[-1] eq 'CODE';
+    my $cmp = Net::Etcd::KV::Compare->new(
+        %$self,
+        ( $options ? %$options : () ),
+    );
+    return $cmp->json_args;
 }
 
 1;

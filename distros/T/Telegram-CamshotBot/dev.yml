@@ -1,0 +1,33 @@
+version: '2'
+
+services:
+
+  bot:
+    restart: always
+    build: .
+    image: pavelsr/camshotbot
+    container_name: fablab_camshotbot
+    environment:
+      VIRTUAL_HOST: camerabot.fablab61.ru
+      VIRTUAL_PORT: 8080
+      LETSENCRYPT_HOST: camerabot.fablab61.ru
+      LETSENCRYPT_EMAIL: pavel@fablab61.ru
+      CAMSHOTBOT_TELEGRAM_MODE: webhook # or polling
+      CAMSHOTBOT_TELEGRAM_API_TOKEN: 267111731:AAHKKqyyjbVBh0pAOrH7pWoUxi-juMpWKto
+      # CAMSHOTBOT_APP_MODE: docker # can be native or ubi
+    working_dir: /root/www
+    volumes:
+      - ${PWD}:/root/www/
+    command: ["perl", "camshotbot.pl", "daemon", "-l", "http://*:8080"]
+    expose:
+      - "8080"
+
+  ffmpeg:
+    restart: always
+    image: jrottenberg/ffmpeg:3.3-alpine
+    container_name: ffmpeg_camshotbot
+    environment:
+      STREAM_URL: "rtsp://10.132.193.9//ch0.h264"
+    volumes:
+      - ${PWD}/latest.jpg:/tmp/workdir/latest.jpg
+    command: [ "ffmpeg", "-hide_banner", "-loglevel", "panic", "-i ", "rtsp://10.132.193.9//ch0.h264", "-f", "image2", "-vframes", "1", "latest.jpg" ]

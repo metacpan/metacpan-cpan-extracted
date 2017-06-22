@@ -60,6 +60,10 @@ named e.g.:
             host: 127.0.0.1
             port: 2379
 
+=head1 CAVEATS
+
+### NOTE: This module is experimental only do not use in production.
+
 =head2 connections
 
 =head2 host
@@ -99,7 +103,7 @@ and for their quick and competent support.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 Sam Batschelet (hexfusion).
+Copyright 2017 Sam Batschelet (hexfusion).
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

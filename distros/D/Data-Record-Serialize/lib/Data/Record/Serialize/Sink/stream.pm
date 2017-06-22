@@ -1,8 +1,15 @@
 package Data::Record::Serialize::Sink::stream;
 
+# ABSTRACT: output encoded data to a stream.
+
+
 use Moo::Role;
 
+our $VERSION = '0.12';
+
 use IO::File;
+
+use namespace::clean;
 
 has output => (
     is      => 'ro',
@@ -24,21 +31,35 @@ has fh => (
 
 );
 
+#pod =begin pod_coverage
+#pod
+#pod =head3 print
+#pod
+#pod =head3 say
+#pod
+#pod =head3 close
+#pod
+#pod =end pod_coverage
+#pod
+#pod =cut
+
 sub print { shift->fh->print( @_ ) }
 sub say   { shift->fh->say( @_ ) }
-
-
+sub close { shift->fh->close }
 
 with 'Data::Record::Serialize::Role::Sink';
 
 1;
 
-__END__
+=pod
 
 =head1 NAME
 
 Data::Record::Serialize::Sink::stream - output encoded data to a stream.
 
+=head1 VERSION
+
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -55,6 +76,15 @@ file handle.
 
 It performs the L<B<Data::Record::Serialize::Role::Sink>> role.
 
+=begin pod_coverage
+
+=head3 print
+
+=head3 say
+
+=head3 close
+
+=end pod_coverage
 
 =head1 INTERFACE
 
@@ -79,46 +109,70 @@ stream.
 
 =head1 BUGS AND LIMITATIONS
 
-=for author to fill in:
-    A list of known problems with the module, together with some
-    indication Whether they are likely to be fixed in an upcoming
-    release. Also a list of restrictions on the features the module
-    does provide: data types that cannot be handled, performance issues
-    and the circumstances in which they may arise, practical
-    limitations on the size of data sets, special cases that are not
-    (yet) handled, etc.
-
-No bugs have been reported.
-
-Please report any bugs or feature requests to
-C<bug-data-record-serialize@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize>.
+You can make new bug reports, and view existing ones, through the
+web interface at L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize>.
 
 =head1 SEE ALSO
 
-=for author to fill in:
-    Any other resources (e.g., modules or files) that are related.
+Please see those modules/websites for more information related to this module.
 
+=over 4
 
-=head1 LICENSE AND COPYRIGHT
+=item *
 
-Copyright (c) 2014 The Smithsonian Astrophysical Observatory
+L<Data::Record::Serialize|Data::Record::Serialize>
 
-B<Data::Record::Serialize> is free software: you can redistribute it
-and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+=back
 
 =head1 AUTHOR
 
-Diab Jerius  E<lt>djerius@cpan.orgE<gt>
+Diab Jerius <djerius@cpan.org>
 
+=head1 COPYRIGHT AND LICENSE
 
+This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut
+
+__END__
+
+#pod =head1 SYNOPSIS
+#pod
+#pod     use Data::Record::Serialize;
+#pod
+#pod     my $s = Data::Record::Serialize->new( sink => 'stream', ... );
+#pod
+#pod     $s->send( \%record );
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod B<Data::Record::Serialize::Sink::stream> outputs encoded data to a
+#pod file handle.
+#pod
+#pod It performs the L<B<Data::Record::Serialize::Role::Sink>> role.
+#pod
+#pod
+#pod =head1 INTERFACE
+#pod
+#pod The following attributes may be passed to
+#pod L<B<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>:
+#pod
+#pod =over
+#pod
+#pod =item C<output>
+#pod
+#pod The name of an output file or a reference to a scalar to which the records will be written.
+#pod C<output> may be set to C<-> to indicate output to the standard output stream.
+#pod
+#pod =item C<fh>
+#pod
+#pod A file handle.
+#pod
+#pod =back
+#pod
+#pod If neither is specified, output is written to the standard output
+#pod stream.

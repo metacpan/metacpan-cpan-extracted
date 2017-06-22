@@ -6,7 +6,7 @@ use warnings;
 
 use XSLoader ();
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 XSLoader::load "PerlIO::gzip", $VERSION;
 

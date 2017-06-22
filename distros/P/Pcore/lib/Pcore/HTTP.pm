@@ -5,7 +5,7 @@ use Pcore -const,
     METHODS => [qw[http_acl http_baseline_control http_bind http_checkin http_checkout http_connect http_copy http_delete http_get http_head http_label http_link http_lock http_merge http_mkactivity http_mkcalendar http_mkcol http_mkredirectref http_mkworkspace http_move http_options http_orderpatch http_patch http_post http_pri http_propfind http_proppatch http_put http_rebind http_report http_search http_trace http_unbind http_uncheckout http_unlink http_unlock http_update http_updateredirectref http_version_control]],
     TLS_CTX => [qw[$TLS_CTX_HIGH $TLS_CTX_LOW]],
   };
-use Pcore::Util::Scalar qw[blessed is_glob];
+use Pcore::Util::Scalar qw[is_ref is_blessed_ref is_glob is_coderef is_plain_hashref];
 use Pcore::AE::Handle qw[:TLS_CTX];
 use Pcore::HTTP::Util;
 use Pcore::HTTP::Headers;
@@ -161,7 +161,7 @@ sub mirror ( $target, @ ) {
 sub request ( @ ) {
     my %args = ( $DEFAULT->%*, @_ );
 
-    $args{url} = P->uri( $args{url}, base => 'http://', authority => 1 ) if !ref $args{url};
+    $args{url} = P->uri( $args{url}, base => 'http://', authority => 1 ) if !is_ref $args{url};
 
     # proxy connections can't be persistent
     $args{persistent} = 0 if $args{proxy};
@@ -170,7 +170,7 @@ sub request ( @ ) {
     if ( !$args{headers} ) {
         $args{headers} = Pcore::HTTP::Headers->new;
     }
-    elsif ( !blessed $args{headers} ) {
+    elsif ( !is_blessed_ref $args{headers} ) {
         $args{headers} = Pcore::HTTP::Headers->new( $args{headers} );
     }
 
@@ -178,10 +178,10 @@ sub request ( @ ) {
     $args{res} = Pcore::HTTP::Response->new( { status => 0 } );
 
     # resolve cookies shortcut
-    if ( $args{cookies} && !blessed $args{cookies} ) {
+    if ( $args{cookies} && !is_blessed_ref $args{cookies} ) {
 
         # cookies is SCALAR, create temp cookies object
-        if ( !ref $args{cookies} ) {
+        if ( !is_ref $args{cookies} ) {
             $args{cookies} = Pcore::HTTP::Cookies->new;
         }
 
@@ -225,11 +225,11 @@ sub request ( @ ) {
     }
 
     # resolve on_progress shortcut
-    if ( $args{on_progress} && ref $args{on_progress} ne 'CODE' ) {
-        if ( !ref $args{on_progress} ) {
+    if ( $args{on_progress} && !is_coderef $args{on_progress} ) {
+        if ( !is_ref $args{on_progress} ) {
             $args{on_progress} = _get_on_progress_cb();
         }
-        elsif ( ref $args{on_progress} eq 'HASH' ) {
+        elsif ( is_plain_hashref $args{on_progress} eq 'HASH' ) {
             $args{on_progress} = _get_on_progress_cb( $args{on_progress}->%* );
         }
         else {
@@ -250,7 +250,7 @@ sub request ( @ ) {
     $args{on_finish} = sub {
 
         # rewind body fh
-        $res->body->seek( 0, 0 ) if $res->has_body && is_glob( $res->body );
+        $res->body->seek( 0, 0 ) if $res->has_body && is_glob $res->body;
 
         # before_finish callback
         $before_finish->($res) if $before_finish;

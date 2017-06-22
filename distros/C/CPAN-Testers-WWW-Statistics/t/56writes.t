@@ -37,7 +37,7 @@ use Test::More;
 use lib 't';
 use CTWS_Testing;
 
-if(CTWS_Testing::has_environment()) { plan tests    => 384; }
+if(CTWS_Testing::has_environment()) { plan tests    => 418; }
 else                                { plan skip_all => "Environment not configured"; }
 
 ok( my $obj = CTWS_Testing::getObj(), "got object" );
@@ -350,7 +350,7 @@ sub check_dir_contents {
     my $fExpected = File::Spec->catfile($expectedDir, $f);
 
     # diff text files only
-    if($f =~ /\.(html?|txt|js|css|json|ya?ml|ini|cgi)$/i) {
+    if($f =~ /\.(html?|txt|js|css|json|ya?ml|ini|cgi|csv)$/i) {
         next if($f eq 'newdistros/2015.html');  # will never match 1 month after release.
 
         $count++;
@@ -367,6 +367,7 @@ sub check_dir_contents {
                     $_[0] =~ s!\b20\d{10}\b!==TIMESTAMP==!gsi;
                     $_[0] =~ s!\b20\d{6}\b!==TIMESTAMP==!gsi;
                     $_[0] =~ s!\b20\d{4}\b!==TIMESTAMP==!gsi;
+                    $_[0] =~ s!\b20\d{2}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}\b!==TIMESTAMP==!gsi;
 
                     $_[0] =~ s/\d{4}\s*(\-|to)\s*\d{4}/==DATERANGE==/gmi;
                     $_[0] =~ s/(\n\r|\r\n)/\n/gs;

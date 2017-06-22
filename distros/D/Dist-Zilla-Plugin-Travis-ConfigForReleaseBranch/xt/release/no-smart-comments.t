@@ -2,7 +2,7 @@
 #
 # This file is part of Dist-Zilla-Plugin-Travis-ConfigForReleaseBranch
 #
-# This software is Copyright (c) 2013 by Chris Weyl.
+# This software is Copyright (c) 2017, 2015, 2013 by Chris Weyl.
 #
 # This is free software, licensed under:
 #
@@ -18,7 +18,9 @@ eval "use Test::NoSmartComments";
 plan skip_all => 'Test::NoSmartComments required for checking comment IQ'
     if $@;
 
-no_smart_comments_in_all();
-no_smart_comments_in_tests();
+no_smart_comments_in("lib/Dist/Zilla/Plugin/Travis/ConfigForReleaseBranch.pm");
+no_smart_comments_in("t/00-compile.t");
+no_smart_comments_in("t/00-report-prereqs.dd");
+no_smart_comments_in("t/00-report-prereqs.t");
 
 done_testing();

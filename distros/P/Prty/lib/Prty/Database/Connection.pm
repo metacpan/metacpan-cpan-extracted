@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.107;
+our $VERSION = 1.108;
 
 use Prty::Sql;
 use Prty::Object;
@@ -496,7 +496,7 @@ sub dbms {
 
 =head4 Synopsis
 
-    ($oracle,$postgresql,$sqlite,$mysql) = $db->dbmsTestVector;
+    ($oracle,$postgresql,$sqlite,$mysql,$access) = $db->dbmsTestVector;
 
 =cut
 
@@ -588,6 +588,27 @@ sonst "falsch".
 
 sub isMySQL {
     return shift->{'sqlObj'}->isMySQL;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 isAccess() - Prüfe auf Access-DBMS
+
+=head4 Synopsis
+
+    $bool = $db->isAccess;
+
+=head4 Description
+
+Liefere "wahr", wenn die Datenbank eine Access-Datenbank ist,
+sonst "falsch".
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub isAccess {
+    return shift->{'sqlObj'}->isAccess;
 }
 
 # -----------------------------------------------------------------------------
@@ -1284,6 +1305,7 @@ sub sql {
 
     my $startTime = Time::HiRes::gettimeofday;
     my $apiCur = eval { $self->get('apiObj')->sql($stmt,$forceExec) };
+
     my $err = $@;
     my $execTime = Time::HiRes::gettimeofday-$startTime;
 
@@ -4094,9 +4116,66 @@ Beispiel: Eine DBI MySQL-Handle $dbh wird als Lowlevel-Handle verwendet,
     
        $db = Prty::Database::Connection->new('dbi#mysql',-handle=>$dbh);
 
+=head2 Zugriff auf MS Access Datenbank
+
+Unter Unix/Linux ist ein lesender Zugriff auf MS Access
+Datenbanken mittels des freien Open Source Package B<mtools>
+möglich. Es enthält neben verschiedenen Programme auch einen
+ODBC-Treiber, der genutzt werden kann, um von Perl aus auf eine
+Access-Datenbank zuzugreifen.
+
+=head3 Installation (Redhat)
+
+=head4 ODBC-Treiber für MS-Access
+
+mtools: L<http://mdbtools.sourceforge.net/>
+
+    # yum install mdbtools
+
+=head4 ODBC Driver Manager
+
+unixODBC: L<http://http://www.unixodbc.org/>
+
+    # yum install unixODBC
+
+=head4 Perl DBI-Treiber für ODBC
+
+DBD::ODBC: L<https://metacpan.org/pod/DBD::ODBC>
+
+    # cpanm DBD::ODBC
+
+=head3 Konfiguration
+
+ODBC-Treiber (aus den mtools) definieren:
+
+    # vi /etc/odbcinst.ini
+    [MDBTools]
+    Description = MDB Tools ODBC
+    Driver      = libmdbodbc.so
+    FileUsage   = 1
+
+Datenquelle definieren:
+
+    # vi /etc/odbc.ini
+    [test]
+    Description = Access Test-Datenbank
+    Driver      = MDB Tools ODBC
+    Database    = /path/to/file.mdb
+
+=head3 Perl-Programm
+
+Von Perl aus auf die Access-Datenbank zugreifen:
+
+    my $udl = 'dbi#access:test';
+    my $db = Prty::Database::Connection->new($udl,-utf8=>1);
+    
+    my $stmt = 'select * from tdruckdaten';
+    my $tab = $db->select($stmt);
+    print $tab->asTable;
+
 =head1 VERSION
 
-1.107
+1.108
 
 =head1 AUTHOR
 

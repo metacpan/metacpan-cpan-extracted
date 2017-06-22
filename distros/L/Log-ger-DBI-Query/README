@@ -1,0 +1,46 @@
+SYNOPSIS
+
+     use DBI;
+     use Log::ger::DBI::Query;
+    
+     # now SQL queries will be logged
+     my $dbh = DBI->connect("dbi:...", $user, $pass);
+     $dbh->do("INSERT INTO table VALUES (...)");
+
+    From command-line:
+
+     % TRACE=1 perl -MLog::ger::Output::Screen -MLog::ger::DBI::Query your-dbi-app.pl
+
+    To also log SQL results:
+
+     % TRACE=1 LOG_SQL_RESULT=1 \
+         perl -MLog::ger::Output::Screen -MLog::ger::DBI::Query your-dbi-app.pl
+
+    Sample log output:
+
+     SQL query: {{INSERT INTO table VALUES (...)}
+
+DESCRIPTION
+
+    This is a simple module you can do to log SQL queries for your
+    DBI-based applications.
+
+    For queries, it logs calls to prepare(), do(), select*.
+
+    For results, it logs calls to do(), select*, fetch*.
+
+    Compared to Log::ger::For::DBI, it produces a bit less noise if you are
+    only concerned with logging queries.
+
+ENVIRONMENT
+
+ LOG_SQL_QUERY (bool, default 1)
+
+ LOG_SQL_RESULT (bool, default 1)
+
+SEE ALSO
+
+    Log::ger::DBI::QueryResult
+
+    Log::ger::For::DBI which logs more methods, including connect(), etc..
+

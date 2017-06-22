@@ -1,10 +1,9 @@
 
 package Lab::GenericSignals;
-
+$Lab::GenericSignals::VERSION = '3.550';
 use warnings;
 use strict;
 
-our $VERSION = '3.543';
 
 
 use sigtrap 'handler' => \&abort_all, qw(normal-signals error-signals);

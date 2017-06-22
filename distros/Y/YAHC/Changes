@@ -1,5 +1,10 @@
 Revision history for Perl module YAHC
 
+0.034 2017-06-20 IKRUGLOV
+    - support of reposponses without Content-Length by joaquim.rovira@booking.com
+    - check that Content-Length is numeric value by joaquim.rovira@booking.com
+    - support of HEAD, 1xx, 204 and 304 responses by jeroen.vanwolffelaar@booking.com
+
 0.033 2017-04-22 IKRUGLOV
     - yahc_conn_socket_cache_id(): return undef if conn is undef
     - when considering droping a socket take into account response protocol

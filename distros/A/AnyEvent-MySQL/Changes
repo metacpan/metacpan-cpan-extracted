@@ -1,5 +1,15 @@
 Revision history for AnyEvent-MySQL
 
+1.2.1   2017.6.15
+        fix document error.
+
+1.2.0   2017.6.15
+        function changed, bump version to 1.2
+        fix document error.
+
+1.1.8   2017.6.15
+        allow readonly handles to SET NAMES (by clking@github)
+
 1.1.7   2016.4.12
         Memorize the callback on AnyEvent::MySQL->new, and use it after
         each successful reconnect.

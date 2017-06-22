@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,5 +19,5 @@ requires:
 resources:
   bugtracker: https://github.com/stevan/p5-UNIVERSAL-Object/issues
   repository: https://github.com/stevan/p5-UNIVERSAL-Object.git
-version: '0.10'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '0.11'
+x_serialization_backend: 'YAML::Tiny version 1.70'

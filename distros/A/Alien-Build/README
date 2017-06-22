@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.41
+    version 0.45
 
 SYNOPSIS
 
@@ -606,6 +606,8 @@ AUTHOR
     Contributors:
 
     Diab Jerius (DJERIUS)
+
+    Roy Storey
 
 COPYRIGHT AND LICENSE
 

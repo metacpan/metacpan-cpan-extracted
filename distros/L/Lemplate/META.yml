@@ -26,4 +26,4 @@ requires:
   perl: 5.10.1
 resources:
   repository: https://github.com/openresty/lemplate
-version: '0.14'
+version: '0.15'

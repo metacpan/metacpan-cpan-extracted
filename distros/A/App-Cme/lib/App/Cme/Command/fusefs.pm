@@ -10,7 +10,7 @@
 # ABSTRACT: Edit the configuration of an application with fuse
 
 package App::Cme::Command::fusefs ;
-$App::Cme::Command::fusefs::VERSION = '1.020';
+$App::Cme::Command::fusefs::VERSION = '1.022';
 use strict;
 use warnings;
 use 5.10.1;
@@ -54,7 +54,7 @@ sub opt_spec {
 sub usage_desc {
   my ($self) = @_;
   my $desc = $self->SUPER::usage_desc; # "%c COMMAND %o"
-  return "$desc [application] [file | ~~ ] -fuse-dir xxx [ -dir-char x ] ";
+  return "$desc [application] [file ] -fuse-dir xxx [ -dir-char x ] ";
 }
 
 sub description {
@@ -109,7 +109,7 @@ App::Cme::Command::fusefs - Edit the configuration of an application with fuse
 
 =head1 VERSION
 
-version 1.020
+version 1.022
 
 =head1 SYNOPSIS
 

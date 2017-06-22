@@ -2,7 +2,7 @@
 # Copyright (C) YEAR Free Software Foundation, Inc.
 #
 # Translators:
-# psyca, 2014-2016
+# psyca, 2014-2017
 # Marc Lattemann, 2014
 # Oliver Burger <obgr_seneca@mageia.org>, 2013
 # Sigrid Carrera <sigrid.carrera@googlemail.com>, 2013
@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
 "POT-Creation-Date: 2014-09-13 21:15+0200\n"
-"PO-Revision-Date: 2016-01-25 01:47+0000\n"
+"PO-Revision-Date: 2017-06-04 14:31+0000\n"
 "Last-Translator: psyca\n"
 "Language-Team: German (http://www.transifex.com/MageiaLinux/mageia/language/"
 "de/)\n"
@@ -238,7 +238,8 @@ msgid ""
 "  --test         - only verify if the installation can be achieved "
 "correctly.\n"
 msgstr ""
-"  --test         - Versuch, ob die Installation korrekt verlaufen wird.\n"
+"  --test         - überprüfe nur, ob die Installation korrekt durchgeführt "
+"werden kann.\n"
 
 #: ../gurpmi.pm:68 ../urpmi:71
 #, c-format
@@ -328,7 +329,7 @@ msgstr ""
 #: ../gurpmi2:250 ../urpmi:615
 #, c-format
 msgid "%s of additional disk space will be used."
-msgstr "%s zusätzlicher Speicherplatz werden benötigt"
+msgstr "%s zusätzlicher Speicherplatz werden benötigt."
 
 #: ../gurpmi2:251 ../urpmi:616
 #, c-format
@@ -473,7 +474,7 @@ msgstr "Fehler beim Erstellen des Ordners %s"
 #: ../urpm.pm:195
 #, c-format
 msgid "invalid owner for directory %s"
-msgstr "Fehlerhafter Besitzer des Ordners %s"
+msgstr "Ungültiger Besitzer für Verzeichnis %s"
 
 #: ../urpm.pm:238
 #, c-format
@@ -612,7 +613,7 @@ msgstr ""
 "Dies ist freie Software und kann unter den Bedingungen der GNU GPL weiter \n"
 "vertrieben werden.\n"
 "\n"
-"Aufruf:\n"
+"Verwendung:\n"
 
 #: ../urpm/args.pm:534
 #, c-format
@@ -641,7 +642,7 @@ msgstr "Der Udisks-Dienst (udisks-daemon) läuft nicht oder ist nicht bereit"
 #: ../urpm/cdrom.pm:174 ../urpm/cdrom.pm:179
 #, c-format
 msgid "medium \"%s\" is not available"
-msgstr "Das Medium »%sy ist nicht verfügbar"
+msgstr "Das Medium \"%s\" ist nicht verfügbar"
 
 #: ../urpm/cdrom.pm:218
 #, c-format
@@ -899,7 +900,7 @@ msgstr "Die %s-Datenbank ist gesperrt, der Prozess %d nutzt sie bereits"
 #, c-format
 msgid "%s database is locked (another program is already using it)"
 msgstr ""
-"Die %s-Datenbank ist gesperrt ( ein anderes laufendes Programm nutzt sie "
+"Die %s-Datenbank ist gesperrt (ein anderes laufendes Programm nutzt sie "
 "bereits)"
 
 #: ../urpm/lock.pm:115
@@ -1099,7 +1100,7 @@ msgstr "Paket %s ausgelassen"
 #: ../urpm/media.pm:860
 #, c-format
 msgid "would install instead of upgrade package %s"
-msgstr "Anstatt des Aktualisierungspaketes lieber folgendes %s installieren"
+msgstr "Anstatt des Aktualisierungspaketes lieber %s installieren"
 
 #: ../urpm/media.pm:943
 #, c-format
@@ -1266,7 +1267,7 @@ msgstr "md5-Datei von »%s« wird kopiert …"
 #: ../urpm/media.pm:1796
 #, c-format
 msgid "invalid MD5SUM file (downloaded from %s)"
-msgstr "Ungültige md5sum-Datei (heruntergeladen von%s)"
+msgstr "Ungültige md5sum-Datei (heruntergeladen von %s)"
 
 #: ../urpm/media.pm:1799
 #, c-format
@@ -1511,7 +1512,7 @@ msgstr "Scp schlug auf Server %s fehl (%d)"
 #: ../urpm/parallel_ssh.pm:37
 #, c-format
 msgid "cp failed on host %s (%d)"
-msgstr "Cp schlug auf Server %s fehl (%d)"
+msgstr "cp schlug auf Server %s fehl (%d)"
 
 #: ../urpm/parallel_ssh.pm:84
 #, c-format
@@ -1541,7 +1542,7 @@ msgstr "Aushängen von %s"
 #, c-format
 msgid "urpmi was restarted, and the list of priority packages did not change"
 msgstr ""
-"Urpmi wurde neu gestartet, und die Liste der vorrangigen Pakete hat sich "
+"urpmi wurde neu gestartet, und die Liste der vorrangigen Pakete hat sich "
 "nicht geändert"
 
 #: ../urpm/select.pm:47
@@ -1549,7 +1550,7 @@ msgstr ""
 msgid ""
 "urpmi was restarted, and the list of priority packages did change: %s vs %s"
 msgstr ""
-"Urpmi wurde neu gestartet, und die Liste der vorrangigen Pakete hat sich "
+"urpmi wurde neu gestartet, und die Liste der vorrangigen Pakete hat sich "
 "geändert: %s gegenüber %s"
 
 #: ../urpm/select.pm:220
@@ -1576,12 +1577,12 @@ msgstr ""
 #: ../urpm/select.pm:607
 #, c-format
 msgid "Package %s is already installed"
-msgstr "Paket %s ist installiert"
+msgstr "Paket %s ist bereits installiert"
 
 #: ../urpm/select.pm:608
 #, c-format
 msgid "Packages %s are already installed"
-msgstr "Pakete %s sind installiert"
+msgstr "Pakete %s sind bereits installiert"
 
 #: ../urpm/select.pm:625 ../urpm/select.pm:712
 #, c-format
@@ -2463,8 +2464,9 @@ msgid ""
 "Error: To generate a bug report, specify the usual command-line arguments\n"
 "along with --bug.\n"
 msgstr ""
-"Fehler: Um eine Fehlermeldung zu erstellen bitte die Befehlszeile verwenden\n"
-"mit --bug.\n"
+"Fehler: Um eine Fehlermeldung zu erstellen bitte den entsprechenden Befehl "
+"in der \n"
+"Befehlszeile mit dem zusätzlich angehängten Argument --bug verwenden.\n"
 
 #: ../urpmi:217
 #, c-format
@@ -2749,7 +2751,7 @@ msgid ""
 "                   one of: never, on-demand, update-only, always. cf urpmi."
 "cfg(5)\n"
 msgstr ""
-"  --xml-info     - Angebene Regel zum Herunterladen von xml-Info-Dateien "
+"  --xml-info     - Angegebene Regel zum Herunterladen von xml-Info-Dateien "
 "verwenden,\n"
 "                   eine von: never, on-demand, update-only, always. cf urpmi."
 "cfg(5)\n"
@@ -3091,7 +3093,7 @@ msgstr "  --src          - es folgt ein Quellpaket (identisch zu »-s«).\n"
 #: ../urpmq:63
 #, c-format
 msgid "  --sources      - print source URLs of selected packages\n"
-msgstr "  --sources      - druckt Quell URS der ausgewählten Pakete\n"
+msgstr "  --sources      - druckt Quell URLs der ausgewählten Pakete\n"
 
 #: ../urpmq:65
 #, c-format
@@ -3236,8 +3238,8 @@ msgstr ""
 #, c-format
 msgid "  -Y             - like -y, but forces to match case-insensitively.\n"
 msgstr ""
-"  -Y             - wie -y, aber erzwingt eine großschreibungsunabhängige "
-"Schreibweise.\n"
+"  -Y             - wie -y, aber erzwingt Unabhängigkeit der Groß-/"
+"Kleinschreibung\n"
 
 #: ../urpmq:107
 #, c-format

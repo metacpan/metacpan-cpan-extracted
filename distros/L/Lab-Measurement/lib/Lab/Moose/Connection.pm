@@ -1,10 +1,9 @@
 package Lab::Moose::Connection;
-
+$Lab::Moose::Connection::VERSION = '3.550';
 use 5.010;
 use warnings;
 use strict;
 
-our $VERSION = '3.543';
 
 use Moose::Role;
 use MooseX::Params::Validate qw/validated_hash/;
@@ -57,7 +56,7 @@ sub Query {
 
     my %write_arg = %arg;
     $self->Write(%write_arg);
-
+    
     delete $arg{command};
     return $self->Read(%arg);
 }

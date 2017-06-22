@@ -1,5 +1,8 @@
 Revision history for perl distribution Mojolicious-Plugin-Pager
 
+0.03 2017-06-18T03:27:05+0200
+ - Fix custom pager text
+
 0.02 2017-06-01T22:48:06+0200
  - Fix missing dependencies
 

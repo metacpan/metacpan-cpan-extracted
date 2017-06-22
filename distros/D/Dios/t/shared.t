@@ -1,12 +1,12 @@
 use Dios;
 use Test::More;
 
-plan tests => 18;
+plan tests => 20;
 
 my $NAME = 'Damian';
 
 class Base1 {
-    shared $.name = 'Base1';
+    shared $.name where { length > 0 } = 'Base1';
 
     method basic { return $name }
 }
@@ -45,6 +45,9 @@ my $obj = Demo->new;
 ::is $obj->Base1::get_name, 'Base1' => "Object's base 2 name correctly";
 ::is 'Base2'->get_name,     'ad hoc' => "Accessed class's base 2 name correctly";
 ::is $obj->Base2::get_name, 'ad hoc' => "Object's base 2 name correctly";
+
+::ok  eval { $obj->set_name('a'); }, "Constraint passed";
+::ok !eval { $obj->set_name('');  }, "Constraint failed";
 
 END { ::done_testing() }
 

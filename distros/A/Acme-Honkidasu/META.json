@@ -1,0 +1,80 @@
+{
+   "abstract" : "本気出すコピペ",
+   "author" : [
+      "hayajo <hayajo@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.12",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-Honkidasu",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "POSIX::strftime::GNU" : "0",
+            "Time::Piece" : "1.20",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::Honkidasu" : {
+         "file" : "lib/Acme/Honkidasu.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hayajo/p5-Acme-Honkidasu/issues"
+      },
+      "homepage" : "https://github.com/hayajo/p5-Acme-Honkidasu",
+      "repository" : {
+         "url" : "git://github.com/hayajo/p5-Acme-Honkidasu.git",
+         "web" : "https://github.com/hayajo/p5-Acme-Honkidasu"
+      }
+   },
+   "version" : "0.04",
+   "x_authority" : "cpan:HAYAJO",
+   "x_contributors" : [
+      "hayajo <hayato.imai@gmail.com>",
+      "今井隼人 <imai.h@imaihayato-no-MacBook-Pro.local>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

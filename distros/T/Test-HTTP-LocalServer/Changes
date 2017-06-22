@@ -1,3 +1,8 @@
+0.59 20170617
+    + Add support for checking Javascript properties if Javascript runs on the
+      client
+      Currently, this only mirrors back the window.navigator.userAgent variable
+
 0.58 20170518
     ! Remove support for Perl 5.6.x
       The module uses a fancy way of opening a lexical filehandle which

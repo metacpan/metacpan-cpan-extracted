@@ -1,13 +1,14 @@
 package Template::Reverse;
 
 # ABSTRACT: A template generator getting different parts between pair of text
-
 use Moo;
 use utf8;
+use Template::Reverse::Util;
 use Template::Reverse::Part;
+use constant::Atom qw(WILDCARD BOF EOF);
 use Algorithm::Diff qw(sdiff);
 use Scalar::Util qw(blessed);
-our $VERSION = '0.143'; # VERSION
+our $VERSION = '0.150'; # VERSION
 
 
 has 'sidelen' => (
@@ -16,16 +17,9 @@ has 'sidelen' => (
 );
 
 
-my $_WILDCARD = bless [], 'WILDCARD';
-sub WILDCARD{return $_WILDCARD};
-sub _isWILDCARD{
-  return ref $_[0] eq 'WILDCARD';
-}
-
 
 sub detect{
-    my $self = shift;
-    my @strs = @_;
+    my ($self,@strs) = @_;
     my $diff = _diff($strs[0],$strs[1]);
     my $pattern = _detect($diff,$self->sidelen());
     return $pattern;
@@ -42,7 +36,7 @@ sub _detect{
     my @res;
     for(my $i=0; $i<@d; $i++)
     {
-        if( _isWILDCARD($d[$i] ) )
+        if( WILDCARD == $d[$i] )
         {
             my $from = $lastStar;
             my $to = $i-1;
@@ -55,7 +49,7 @@ sub _detect{
             if( $i+1 < @d ){
                 for( $j=$i+1; $j<@d; $j++)
                 {
-                    if( _isWILDCARD( $d[$j] ) ){
+                    if( WILDCARD == $d[$j] ){
                         last;
                     }
                 }
@@ -92,8 +86,8 @@ sub _diff{
             $before = '';
         }
         else{
-            push(@rr,WILDCARD) unless _isWILDCARD($before);
-            $before = WILDCARD;
+            push(@rr,WILDCARD) unless WILDCARD == $before;
+            $before = WILDCARD; 
         }
         $idx++ if $r->[0] ne '+';
         
@@ -109,13 +103,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Template::Reverse - A template generator getting different parts between pair of text
 
 =head1 VERSION
 
-version 0.143
+version 0.150
 
 =head1 SYNOPSIS
 
@@ -125,7 +121,8 @@ version 0.143
     my $parts = $rev->detect($arr_ref1, $arr_ref2); # returns [ Template::Reverser::Part, ... ]
 
     use Template::Reverse::Converter::TT2;
-    my @templates = Template::Reverse::TT2Converter::Convert($parts); 
+    my $converter = Template::Reverse::Converter::TT2->new();
+    my @templates = $converter->Convert($parts); 
 
 more
 
@@ -178,6 +175,10 @@ more
 Template::Reverse detects different parts between pair of similar text as merged texts from same template.
 And it can makes an output marked differences, encodes to TT2 format for being use by Template::Extract module.
 
+=head1 CI
+
+=for html <a href="https://travis-ci.org/sng2c/Template-Reverse"><img src="https://travis-ci.org/sng2c/Template-Reverse.svg?branch=master"></a>
+
 =head1 FUNCTIONS
 
 =head3 new(OPTION_HASH_REF)
@@ -190,11 +191,6 @@ the default value is 10. Setting 0 means full-length.
 If you set it as 3, you get max 3 length pre-text and post-text array each part.
 
 This is needed for more faster performance.
-
-=head3 WILDCARD()
-
-WILDCARD() returns a blessed array reference as 'WILDCARD' to means WILDCARD token.
-This is used by _diff() and _detect().
 
 =head3 detect($arr_ref1, $arr_ref2)
 
@@ -249,14 +245,17 @@ It returns like below.
 
 Returned arrayRef is list of changable parts.
 
-    You can get a changed token if you find just 'pre' and 'post' sequences on any other token array.
+You can get a changed token if you find just 'pre' and 'post' sequences on any other token array.
 
 =head1 SEE ALSO
 
-=item *
+=over
 
-L<Template::Extract>
-L<Parse::Token::Lite>
+=item L<Template::Extract>
+
+=item L<Parse::Token::Lite>
+
+=back
 
 =head1 SOURCE
 
@@ -264,7 +263,7 @@ L<https://github.com/sng2c/Template-Reverse>
 
 =head1 THANKS TO
 
-=item https://metacpan.org/author/AMORETTE
+L<https://metacpan.org/author/AMORETTE>
 
 This module is dedicated to AMORETTE.
 He was interested in this module and was cheering me up.

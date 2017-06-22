@@ -23,6 +23,10 @@ BEGIN { use_ok('Geo::OGC::Service::WMTS') };
 # Insert your test code below, the Test::More module is use()ed here so read
 # its man page ( perldoc Test::More ) for help writing this test script.
 
+use File::ShareDir;	 
+my $dir = File::ShareDir::dist_dir('Geo-GDAL');
+Geo::GDAL::PushFinderLocation($dir);
+
 eval {
     if ($Geo::GDAL::VERSION >= 2) {
         Geo::OSR::SpatialReference->new(EPSG=>2931);
@@ -30,10 +34,10 @@ eval {
         Geo::OSR::SpatialReference->create(EPSG=>2931);
     }
 };
-BAIL_OUT("You have Geo::GDAL module, but GDAL seems not to be installed.\n".
-         "This setup may work but you need to set the GDAL_DATA environment\n".
-         "variable to point to the correct location. The error message:\n".
-         "$@\n") if $@;
+BAIL_OUT("You have Geo::GDAL module, but GDAL data files could not be found. ".
+         "You need to set the GDAL_DATA environment ".
+         "variable to point to the correct location. ".
+	 "The error message is $@\n") if $@;
 
 my $pp = XML::LibXML::PrettyPrint->new(indent_string => "  ");
 

@@ -40,7 +40,7 @@ my $handler = builder {
             return [
                 200,
                 [ 'Content-Type' => 'text/plain' ],
-                [ encode_utf8($val) ]
+                [ defined $val ? encode_utf8($val) : undef ]
             ];
         }
 
@@ -129,6 +129,15 @@ test_psgi(
             my $res2 = $cb->($req2);
             is( decode_utf8( $res2->content ),
                 'töst', 'decoded json literal utf8' );
+        };
+
+        subtest 'json_no_payload' => sub {
+            my $req = HTTP::Request->new(
+                POST => 'http://localhost/post',
+                [ 'Content-Type' => 'application/json' ],
+            );
+            my $res = $cb->($req);
+            is( $res->content, '', 'no content' );
         };
 
         subtest 'json_response plain' => sub {

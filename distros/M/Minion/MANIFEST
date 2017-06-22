@@ -24,6 +24,7 @@ MANIFEST			This list of files
 MANIFEST.bak
 MANIFEST.SKIP
 README.md
+t/backend.t
 t/commands.t
 t/pg.t
 t/pg_lite_app.t

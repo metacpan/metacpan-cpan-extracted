@@ -1,63 +1,115 @@
-
 Data::Record::Serialize
 
-   Data::Record::Serialize encodes data records and sends them
-   somewhere. It is primarily useful for output of sets of uniformly
-   structured data records.  It provides a uniform, thin, interface to
-   various serializers and output sinks.  Its raison d'etre is its
-   ability to manipulate the records prior to encoding and output.
+Data::Record::Serialize encodes data records and sends them somewhere.
+This module is primarily useful for output of sets of uniformly
+structured data records. It provides a uniform, thin, interface to
+various serializers and output sinks. Its *raison d'etre* is its ability
+to manipulate the records prior to encoding and output.
+
+*   A record is a collection of fields, i.e. keys and *scalar* values.
+
+*   All records are assumed to have the same structure.
+
+*   Fields may have simple types which may be determined automatically.
+    Some encoders use this information during encoding.
+
+*   Fields may be renamed upon output
+
+*   A subset of the fields may be selected for output.
+
+*   Fields may be formatted via "sprintf" prior to output
+
+  Encoders
+
+The available encoders and their respective documentation are:
+
+*   "dbi" - Data::Record::Serialize::Encode::dbi
+
+    Write to a database via DBI. This is a combined encoder and sink.
+
+*   "ddump" - Data::Record::Serialize::Encode::ddump
+
+    encode via Data::Dumper
+
+*   "json" - Data::Record::Serialize::Encode::json
+
+*   "null" - send the data to the bit bucket. This is a combined encoder
+    and sink.
+
+*   "rdb" - Data::Record::Serialize::Encode::rdb
+
+*   "yaml" - Data::Record::Serialize::Encode::yaml
+
+  Sinks
+
+Sinks are where encoded data are sent.
+
+The available sinks and their documentation are:
+
+*   "stream" - Data::Record::Serialize::Sink::stream
+
+*   "null" - send the encoded data to the bit bucket.
+
+  Types
+
+Some output encoders care about the type of a field.
+Data::Record::Serialize recognizes three types:
+
+*   "N" - Numeric
+
+*   "I" - Integral
+
+*   "S" - String
+
+Not all encoders support a separate integral type; in those cases
+integer fields are treated as general numeric fields.
+
+  Output field and type determination
+
+The selection of output fields and determination of their types depends
+upon the "fields", "types", and "default_type" attributes.
+
+*   "fields" specified, "types" *not* specified
+
+    The fields in "fields" are output. Types are derived from the values
+    in the first record.
+
+*   "fields" *not* specified, "types" specified
+
+    The fields by "types" are output and are given the specified types.
+
+*   "fields" specified, "types" specified
+
+    The fields specified by the "fields" array are output with the types
+    specified by "types". For fields not specified in "types", the
+    "default_type" attribute value is used.
+
+*   "fields" *not* specified, "types" *not* specified
+
+    The first record determines the fields and types (by examination).
 
 INSTALLATION
 
-To install this module, run the following commands:
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
 
-	perl Makefile.PL
-	make
-	make test
-	make install
+  cpanm .
+  cpan  .
+  cpanp -i .
 
-SUPPORT AND DOCUMENTATION
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
 
-After installing, you can find documentation for this module with the
-perldoc command.
+  perl Makefile.PL
+  make
+  make test
+  make install
 
-    perldoc Data::Record::Serialize
+COPYRIGHT AND LICENSE
 
-You can also look for information at:
+This software is Copyright (c) 2017 by Smithsonian Astrophysical
+Observatory.
 
-    RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Record-Serialize
+This is free software, licensed under:
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Data-Record-Serialize
-
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Data-Record-Serialize
-
-    Search CPAN
-        http://search.cpan.org/dist/Data-Record-Serialize/
-
-
-LICENSE AND COPYRIGHT
-
--8<--8<--8<--8<--
-
-Copyright (C) 2014 Smithsonian Astrophysical Observatory
-Copyright (C) 2014 Diab Jerius
-
-This file is part of Data-Record-Serialize
-
-Data-Record-Serialize is free software: you can redistribute it and/or
-modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
--->8-->8-->8-->8--
+  The GNU General Public License, Version 3, June 2007

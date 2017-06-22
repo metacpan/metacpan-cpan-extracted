@@ -1,4 +1,17 @@
-Revision history for App-pod2wp
+0.003   2017-06-17 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild with updated Perinci::CmdLine::Dump to show --dry-run
+          in the POD.
+
+
+0.002   2017-06-16 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention org2wp, html2wp, wp-xmlprc.
+
 
 0.001   2016-12-29 (PERLANCAR)
 

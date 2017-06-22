@@ -1,8 +1,8 @@
 package App::Netdisco::Util::SNMP;
 
 use Dancer qw/:syntax :script/;
-use App::Netdisco::Util::Device qw/get_device check_device_no/;
-use App::Netdisco::Util::Permission qw/check_acl/;
+use App::Netdisco::Util::Device 'get_device';
+use App::Netdisco::Util::Permission ':all';
 
 use SNMP::Info;
 use Try::Tiny;
@@ -81,7 +81,7 @@ sub _snmp_connect_generic {
   );
 
   # an override for bulkwalk
-  $snmp_args{BulkWalk} = 0 if check_device_no($device, 'bulkwalk_no');
+  $snmp_args{BulkWalk} = 0 if check_acl_no($device, 'bulkwalk_no');
 
   # further protect against buggy Net-SNMP, and disable bulkwalk
   if ($snmp_args{BulkWalk}
@@ -98,9 +98,9 @@ sub _snmp_connect_generic {
 
   # which SNMP versions to try and in what order
   my @versions =
-    ( check_device_no($device->ip, 'snmpforce_v3') ? (3)
-    : check_device_no($device->ip, 'snmpforce_v2') ? (2)
-    : check_device_no($device->ip, 'snmpforce_v1') ? (1)
+    ( check_acl_no($device->ip, 'snmpforce_v3') ? (3)
+    : check_acl_no($device->ip, 'snmpforce_v2') ? (2)
+    : check_acl_no($device->ip, 'snmpforce_v1') ? (1)
     : (reverse (1 .. (setting('snmpver') || 3))) );
 
   # use existing or new device class
@@ -300,7 +300,7 @@ sub _build_communities {
         if not $stanza->{tag}
            and !exists $stanza->{community};
 
-      if ($stanza->{$mode} and check_acl($device->ip, $stanza->{only})) {
+      if ($stanza->{$mode} and check_acl_only($device, $stanza->{only})) {
           if ($device->in_storage and
             $stored_tag and $stored_tag eq $stanza->{tag}) {
               # last known-good by tag

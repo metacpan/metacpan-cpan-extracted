@@ -2,7 +2,7 @@ package Test2::Plugin::DieOnFail;
 use strict;
 use warnings;
 
-our $VERSION = '0.000070';
+our $VERSION = '0.000072';
 
 use Test2::API qw/test2_add_callback_context_release/;
 
@@ -38,7 +38,7 @@ This gives the tools the ability to output any extra diagnostics they may need.
 
 =head1 SYNOPSIS
 
-    use Test2::Bundle::Extended;
+    use Test2::V0;
     use Test2::Plugin::DieOnFail;
 
     ok(1, "pass");

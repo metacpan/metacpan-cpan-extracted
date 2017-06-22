@@ -1,0 +1,4 @@
+name = "English-Control"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

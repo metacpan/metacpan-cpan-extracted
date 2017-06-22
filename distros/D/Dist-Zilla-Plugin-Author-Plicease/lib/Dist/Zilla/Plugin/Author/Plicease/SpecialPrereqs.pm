@@ -4,7 +4,7 @@ use 5.008001;
 use Moose;
 
 # ABSTRACT: Special prereq handling
-our $VERSION = '2.14'; # VERSION
+our $VERSION = '2.15'; # VERSION
 
 
 with 'Dist::Zilla::Role::BeforeRelease';
@@ -257,7 +257,7 @@ Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs - Special prereq handling
 
 =head1 VERSION
 
-version 2.14
+version 2.15
 
 =head1 SYNOPSIS
 

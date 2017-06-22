@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.107;
+our $VERSION = 1.108;
 
 use Prty::Path;
 use Prty::Option;
@@ -467,7 +467,13 @@ sub fetch {
 
     if ($dir eq '-') {
         for my $e ($self->fetchFiles($layout)) {
-            print ref $e->[1]? ${$e->[1]}: $e->[1];
+            # eof-Marker ergänzen
+    
+            my $ref = ref $e->[1]? $e->[1]: \$e->[1];
+            $$ref =~ s/\n+$//;
+            $$ref .= "\n\n# eof\n";
+
+            print $$ref;
         }
         return $self;
     }
@@ -492,7 +498,13 @@ sub fetch {
     $dt->addDir($dir);
 
     for my $e ($self->fetchFiles($layout)) {
-        $dt->addFile("$dir/$e->[0]",$e->[1],
+        # eof-Marker ergänzen
+    
+        my $ref = ref $e->[1]? $e->[1]: \$e->[1];
+        $$ref =~ s/\n+$//;
+        $$ref .= "\n\n# eof\n";
+
+        $dt->addFile("$dir/$e->[0]",$ref,
             -encoding=>'utf-8',
             -skipEmptyFiles=>1, # Sub-Entities übergehen (z.B. ProgramClass)
         );
@@ -683,6 +695,17 @@ sub load {
 
                 return;
             });
+
+            # "# eof" vom Dateiende entfernen
+    
+            my $fileSourceR = $fileEnt->fileSourceRef;
+            $$fileSourceR =~ s/\n+# eof\s*$/\n\n/m;
+    
+            if (substr($$fileSourceR,-1,1) ne "\n") {
+                $fileEnt->error(
+                    q{COP-00003: File entity must end with a newline},
+                );
+            }
         }
 
         # Statistische Daten sichern
@@ -1268,7 +1291,7 @@ sub storage {
 
 =head1 VERSION
 
-1.107
+1.108
 
 =head1 AUTHOR
 

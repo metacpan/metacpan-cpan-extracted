@@ -2,7 +2,7 @@ package Mac::PopClip::Quick::Role::PerlScript;
 use Moo::Role;
 use autodie;
 
-our $VERSION = '1.000001';
+our $VERSION = '1.000002';
 
 requires '_add_files_to_zip', '_add_string_to_zip',
     '_plist_action_key_values';
@@ -44,7 +44,7 @@ around '_add_files_to_zip' => sub {
 
     $self->_add_string_to_zip(
         $zip, $self->filtered_src,
-        'extension.popclipext/script.pl'
+        'script.pl'
     );
 
     return $orig->( $self, $zip );

@@ -1,3 +1,9 @@
+0.12, Jun 20, 2017
+  * Fix XMLWriter::element so that it does not try to modify read-only values.
+  * Require Perl 5.12
+  * Add $HTTP_HOST and $SCRIPT_NAME variable to config processing
+  * Refactor the experimental plugin system to use only plugin argument in constructor
+
 0.11, Jan 26, 2017
   * New/enhanced semantics in constructor arguments:
   *   'processor' is an object, which is forwarded to the service object

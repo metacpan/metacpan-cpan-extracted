@@ -129,17 +129,19 @@ is_termlog( [ GOTO(7,17), ],
 
    my $focusA; $winA->bind_event( focus => sub {
       my ( $win, undef, $info ) = @_;
-      $focusA = $info->type;
+      $focusA = $info->type("newapi");
+      1;
    } );
    my $focusB; $winB->bind_event( focus => sub {
       my ( $win, undef, $info ) = @_;
-      $focusB = $info->type;
+      $focusB = $info->type("newapi");
+      1;
    } );
 
    $winA->take_focus;
    flush_tickit;
 
-   ok(  $focusA, '$focusA after $winA->take_focus' );
+   is( $focusA, "in", '$focusA after $winA->take_focus' );
    ok( !$focusB, '$focusB after $winA->take_focus' );
    is_termlog( [ GOTO(5,0) ],
                'Termlog after $winA->take_focus' );
@@ -147,8 +149,8 @@ is_termlog( [ GOTO(7,17), ],
    $winB->take_focus;
    flush_tickit;
 
-   ok( !$focusA, '$focusA after $winB->take_focus' );
-   ok(  $focusB, '$focusB after $winB->take_focus' );
+   is( $focusA, "out", '$focusA after $winB->take_focus' );
+   is( $focusB, "in",  '$focusB after $winB->take_focus' );
    is_termlog( [ GOTO(6,0) ],
                'Termlog after $winB->take_focus' );
 
@@ -197,11 +199,13 @@ is_termlog( [ GOTO(7,17), ],
    my @events;
    $bind_id = $win->bind_event( focus => sub {
       my ( $win, undef, $info ) = @_;
-      push @events, [ win => $info->type ? "in" : "out", $info->win ];
+      push @events, [ win => $info->type("newapi"), $info->win ];
+      1;
    } );
    $subwin->bind_event( focus => sub {
       my ( $win, undef, $info ) = @_;
-      push @events, [ sub => $info->type ? "in" : "out" ];
+      push @events, [ sub => $info->type("newapi") ];
+      1;
    } );
    $win->set_focus_child_notify( 1 );
    flush_tickit;

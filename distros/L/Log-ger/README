@@ -1,0 +1,123 @@
+SYNOPSIS
+
+    In your module (producer):
+
+     package Foo;
+     use Log::ger; # will import some logging methods e.g. log_warn, log_error
+    
+     # produce some logs
+     sub foo {
+         ...
+         log_warn "an error occurred";
+         log_error "an error occurred: %03d - %s", $errcode, $errmsg;
+     }
+     1;
+
+    In your application:
+
+     use Foo;
+     use Log::ger::Output 'Screen';
+    
+     foo();
+
+DESCRIPTION
+
+    EARLY RELEASE, EXPERIMENTAL.
+
+    This is yet another logging framework. Like Log::Any, it separates
+    producers and consumers. Unlike Log::Any (and like Log::Contextual), it
+    uses plain functions (non-OO). Some features:
+
+      * Low startup overhead;
+
+      * Low overhead;
+
+      * Customizable levels;
+
+      * Changing levels and outputs during run-time;
+
+      For example, you can debug your running server application to turn on
+      trace logs temporarily when you need to investigate something.
+
+      * Option to optimize away the logging statements when unnecessary;
+
+      See Log::ger::OptAway.
+
+      * Interoperability with other logging frameworks;
+
+      See Log::ger::Output::LogAny to interop with Log::Any.
+
+FAQ
+
+ How do I create multiple loggers?
+
+    For example, in Log::Any:
+
+     my $log = Log::Any->get_logger;
+     my $log_dump = Log::Any->get_logger(category => "dump"); # to dump contents
+    
+     $log->debugf("Headers is: %s", $http_res->{headers});
+     $log_dump->debug($http_res->{content});
+
+    in Log::ger:
+
+     # instead of installing to package, we setup objects/hashes for the secondary
+     # loggers
+     my $log_dump = Log::ger::setup_object(category => "dump");
+     # or, for hash: my $log_dump = Log::ger::setup_hash(category => "dump");
+    
+     log_debug("Headers is: %s", $http_res->{headers});
+     $log_dump->log_debug($http_res->{content});
+     # or, for hash: $log_dump->{log_debug}->($http_res->{content});
+
+ How do I do custom formatting
+
+    For example, a la Log::Contextual:
+
+     log_warn { 'The number of stuffs is: ' . $obj->stuffs_count };
+
+    See Log::ger::Format::Block for an example.
+
+INTERNALS
+
+ Plugins
+
+    Plugins are how Log::ger provides its flexibility. Plugins are run at
+    various phases. Plugin routine is passed a hash argument and is
+    expected to return an array:
+
+     [$result, $flow_control]
+
+    Some phases will stop after the first plugin that returns non-undef
+    $result. $flow_control can be set to 1 to stop immediately after this
+    hook.
+
+    Aguments received by plugin: target (str, can be package if installing
+    to a package, or hash or object), target_arg (str, when target is
+    package, will be the package name; when target is hash will be the
+    hash; when target is object will be the object's package), setup_args
+    (hash, arguments passed to Log::ger when importing). These arguments
+    are received by plugins for create_log_routine and
+    create_log_is_routine which are run for every level: level (numeric
+    level), str_level.
+
+    Available phases:
+
+      * create_filter_routine
+
+      * create_formatter_routine
+
+      * create_log_routine phase
+
+      Used to create "log_level" routines. Run for each level.
+
+      * create_log_is_routine phase
+
+      Used to create "log_level" routines. Run for each level.
+
+      * after_install_log_routine phase
+
+SEE ALSO
+
+    Some other recommended logging frameworks: Log::Any, Log::Contextual.
+

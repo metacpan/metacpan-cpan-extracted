@@ -29,8 +29,11 @@ SYNOPSIS
 
 DESCRIPTION
 
-    This module parses Ledger journal into Ledger::Journal object. See
-    http://ledger-cli.org/ for more on Ledger, the command-line
+    EARLY RELEASE, SOME THINGS ARE NOT IMPLEMENTED YET.
+
+    This module parses Ledger journal into Ledger::Journal object.
+
+    See http://ledger-cli.org/ for more on Ledger, the command-line
     double-entry accounting system software.
 
     Ledger 3 can be extended with Python, and this module only supports a
@@ -39,8 +42,7 @@ DESCRIPTION
     journal, so it can be used e.g. to insert transactions programmatically
     (which is my use case and the reason I first created this module).
 
-    This is an inexhaustive list of things that are not currently
-    supported:
+    This is an inexhaustive list of things that are not yet supported:
 
       * Costs & prices
 
@@ -56,7 +58,7 @@ DESCRIPTION
 
       * Expression
 
-      * Various commands
+      * Various command directives
 
       Including but not limited to: assert, C (currency conversion), ...
 
@@ -82,9 +84,13 @@ METHODS
 
  new(%attrs) => obj
 
-    Create a new parser instance.
+    Create a new parser instance. Return parser object.
 
  $ledgerp->read_file($filename) => obj
 
+    Parse a journal file. Return Ledger::Journal document object.
+
  $ledgerp->read_string($str) => obj
+
+    Parse a journal string. Return Ledger::Journal document object.
 

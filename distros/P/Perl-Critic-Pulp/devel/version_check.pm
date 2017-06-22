@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2016 Kevin Ryde
+# Copyright 2010, 2011, 2016, 2017 Kevin Ryde
 
 # This file is part of Perl-Critic-Pulp.
 #
@@ -20,5 +20,5 @@ package version_check;
 # use warnings;
 # use base 'Exporter';
 # our @EXPORT_OK = ('foo');
-our $VERSION = '93';
+our $VERSION = '94';
 # our $VERSION = 61';

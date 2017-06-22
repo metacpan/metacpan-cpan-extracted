@@ -1,7 +1,6 @@
 
 package Lab::Instrument::MagnetSupply;
-our $VERSION = '3.543';
-
+$Lab::Instrument::MagnetSupply::VERSION = '3.550';
 use Lab::Measurement::KeyboardHandling qw(labkey_soft_check);
 use strict;
 

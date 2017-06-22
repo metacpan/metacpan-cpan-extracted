@@ -13,6 +13,7 @@ our @EXPORT_OK = qw/
   jq_getsomep
   jq_locked
   jq_queued
+  jq_warm_thrusters
   jq_log
   jq_userlog
   jq_lock
@@ -56,6 +57,10 @@ Netdisco job instance interface (see below).
 
 Returns a list of IP addresses of devices which currently have a job of the
 given C<$job_type> queued (e.g. C<discover>, C<arpnip>, etc).
+
+=head2 jq_warm_thrusters()
+
+Performs initialisation of the Job Queue backend.
 
 =head2 jq_log()
 

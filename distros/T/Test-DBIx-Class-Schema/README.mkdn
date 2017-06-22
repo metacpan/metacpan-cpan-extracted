@@ -4,7 +4,7 @@ Test::DBIx::Class::Schema - DBIx::Class schema sanity checking tests
 
 # VERSION
 
-version 1.0.11
+version 1.0.12
 
 # SYNOPSIS
 
@@ -103,6 +103,11 @@ If you are running aggregated tests you will need to add
 
 to your top-level script.
 
+If you are running under [Test::Class::Moose](https://metacpan.org/pod/Test::Class::Moose) or [Test::Class](https://metacpan.org/pod/Test::Class) you will need to
+disable this behaviour manually as there is no way to detect it. To do that,
+set `$ENV{TEST_AGGREGATE} = 1` before calling `run_tests` or your test suite
+might blow up.
+
 # DESCRIPTION
 
 It's really useful to be able to test and confirm that DBIC classes have and
@@ -125,7 +130,7 @@ Test::DBIx::Class::Schema takes the copy-and-paste out of DBIC schema class test
 
 ### master
 
-[![Build status](https://badge.buildkite.com/c8793ab59e31d982dd759cadfb66a308d5278f21cb707d8822.svg?branch=master)](https://buildkite.com/chizography/test-dbix-class-schema)
+[![Build Status](https://travis-ci.org/chiselwright/test-dbix-class-schema.svg?branch=master)](https://travis-ci.org/chiselwright/test-dbix-class-schema)
 
 # AUTHOR
 

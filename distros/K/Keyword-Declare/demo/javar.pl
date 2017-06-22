@@ -1,12 +1,12 @@
 #! /usr/bin/env perl
 
-use 5.020; use warnings;
+use 5.024; use warnings;
 use lib qw< ../dlib  dlib >;
 use Var::Javan;
 
 {
     var Int foo = 1;
-    const Num BAR = 2.2;
+    var Num BAR = 2.2;
     let baz = 1;
 
     say foo;

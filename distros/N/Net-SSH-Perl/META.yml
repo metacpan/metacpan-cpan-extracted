@@ -1,10 +1,10 @@
 --- #YAML:1.0
 name                    : Net-SSH-Perl
-version                 : 2.09
+version                 : 2.12
 abstract                : Perl client interface to SSH
 author:              
   - David Robins <dbrobins@cpan.org>
-  - Lance Kinley <lkinley@loyaltymethods.com>
+  - Lance Kinley <lkinley@rythmos.com>
 license                 : perl
 distribution_type       : module
 dynamic_config          : 1

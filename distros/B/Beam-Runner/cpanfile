@@ -7,6 +7,7 @@ requires "Path::Tiny" => "0.072";
 requires "Pod::Find" => "0";
 requires "Pod::Simple::SimpleTree" => "0";
 requires "Term::ANSIColor" => "0";
+requires "Types::Path::Tiny" => "0";
 requires "Types::Standard" => "0";
 requires "perl" => "5.008";
 

@@ -7,6 +7,8 @@ requires 'Plack', '0';
 requires 'Plack::Runner', '0';
 requires 'Data::MessagePack', '0';
 requires 'WWW::Mechanize', '0';
+requires 'Data::Serializer', '0';
+requires 'Storable', '2.05';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';

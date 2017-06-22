@@ -4,7 +4,7 @@ use base qw/Prty::Database::ResultSet/;
 use strict;
 use warnings;
 
-our $VERSION = 1.107;
+our $VERSION = 1.108;
 
 use Prty::Hash;
 
@@ -173,7 +173,7 @@ sub index {
 
 =head1 VERSION
 
-1.107
+1.108
 
 =head1 AUTHOR
 

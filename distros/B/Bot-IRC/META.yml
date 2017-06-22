@@ -13,12 +13,12 @@ build_requires:
   Test::Output: '0'
   blib: '1.01'
   constant: '0'
-  perl: '5.010'
+  perl: '5.012'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.010'
+  perl: '5.012'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -43,12 +43,12 @@ requires:
   Math::Units: '0'
   Time::Crontab: '0'
   YAML::XS: '0'
-  perl: '5.010'
+  perl: '5.012'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/gryphonshafer/Bot-IRC/issues
   homepage: https://github.com/gryphonshafer/Bot-IRC
   repository: https://github.com/gryphonshafer/Bot-IRC.git
-version: '1.13'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '1.14'
+x_serialization_backend: 'YAML::Tiny version 1.70'

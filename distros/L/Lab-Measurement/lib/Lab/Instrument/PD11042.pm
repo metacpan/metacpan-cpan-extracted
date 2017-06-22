@@ -1,6 +1,5 @@
 package Lab::Instrument::PD11042;
-our $VERSION = '3.543';
-
+$Lab::Instrument::PD11042::VERSION = '3.550';
 use strict;
 use Time::HiRes qw/usleep/, qw/time/;
 use Lab::Instrument;
@@ -479,7 +478,7 @@ sub init_limits {
         }
         else {
             print
-                "Please move the motor position to the REFERENCE POINT. Enter an angle between -188° ... +180°.\n";
+                "Please move the motor position to the REFERENCE POINT. Enter an angle between -188Â° ... +180Â°.\n";
         }
     }
 

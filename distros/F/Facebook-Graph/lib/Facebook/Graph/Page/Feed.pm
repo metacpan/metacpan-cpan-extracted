@@ -1,5 +1,5 @@
 package Facebook::Graph::Page::Feed;
-$Facebook::Graph::Page::Feed::VERSION = '1.1202';
+$Facebook::Graph::Page::Feed::VERSION = '1.1204';
 use strict;
 use Moo;
 extends 'Facebook::Graph::Publish';
@@ -132,7 +132,7 @@ Facebook::Graph::Page::Feed - Add a post to a Facebook page.
 
 =head1 VERSION
 
-version 1.1202
+version 1.1204
 
 =head1 SYNOPSIS
 

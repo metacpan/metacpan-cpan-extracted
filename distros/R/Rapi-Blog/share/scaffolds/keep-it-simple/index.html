@@ -1,0 +1,48 @@
+[% WRAPPER wrap_sidebar.html %]
+
+[%- USE date(format = '%B %e, %Y') -%]
+[%- SET 
+ result = list_posts({ limit => 10 })
+ posts  = result.rows
+-%]
+
+[% FOREACH Post IN posts %]
+  <article class="entry">
+
+    <header class="entry-header">
+
+        [% IF Post.image_url %]
+          <img 
+            src="[% Post.image_url %]" 
+            style="max-height:66px;max-width:150px;float:left;padding-right:10px;" 
+          />
+        [% END %]
+    
+      <div style="float-left;">
+        <h2 class="entry-title">
+           <a href="[% Post.public_url %]" title="">[% Post.title %]</a>
+        </h2>              
+
+        <div class="entry-meta">
+           <ul>
+              <li>[% date.format(Post.ts) %]</li>
+              <span class="meta-sep">&bull;</span>
+              <li>[% Post.author.full_name || Post.author.username %]</li>
+           </ul>
+        </div> 
+      </div>
+      
+    </header> 
+    
+    <div class="entry-content">
+      [% Post.summary %] ... <a href="[% Post.public_url %]">read more</a> 
+    </div>
+
+  </article>
+      
+[% END %]
+
+
+
+                  
+[% END %]

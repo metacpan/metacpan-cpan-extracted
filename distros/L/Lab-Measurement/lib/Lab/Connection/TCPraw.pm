@@ -1,8 +1,7 @@
 #!/usr/bin/perl -w
 
 package Lab::Connection::TCPraw;
-our $VERSION = '3.543';
-
+$Lab::Connection::TCPraw::VERSION = '3.550';
 use strict;
 use Scalar::Util qw(weaken);
 use Time::HiRes qw (usleep sleep);

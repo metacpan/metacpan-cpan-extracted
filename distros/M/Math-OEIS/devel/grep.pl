@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2014, 2015, 2016 Kevin Ryde
+# Copyright 2014, 2015, 2016, 2017 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -23,6 +23,33 @@ use Math::OEIS::Grep;
 
 # uncomment this to run the ### lines
 use Smart::Comments;
+
+{
+  # bug of matching too much when regexp allowed to end
+  # 2,2,1,1,2,1,2,2,1,2,1,1,2,2,1,1
+  my $aref = [1, '9'x70];
+  Math::OEIS::Grep->search(verbose=>1, array=>$aref);
+  exit 0;
+}
+
+{
+  # bug of matching too much when regexp allowed to end
+  # 2,2,1,1,2,1,2,2,1,2,1,1,2,2,1,1
+  my $str = '2,2,1,1,2,1,2,2,1,2,1,1,2,2,1,1';
+  my $aref = [2,2,1,1,2,1,2,2,1,2,1,1,2,2,1,1];
+  # $aref = [1,2,3,4,5,6,7,8,9,10,11,12,13];
+
+  my $re = Math::OEIS::Grep->array_to_regexp($aref);
+  print "$re\n";
+  system("grep $str ~/OEIS/stripped");
+  Math::OEIS::Grep->search(verbose=>1, array=>$aref);
+
+  my $line = 'A049710 ,2,1,2,2,1,2,1,1,2,1,1,2,2,1,2,2,1,1,2,1,2,2,1,2,1,1,2,2,1,2,2,1,2,1,1,2,1,1,2,2,1,2,1,1,2,1,2,2,1,2,2,1,1,2,1,1,2,2,1,2,1,1,2,1,1,2,2,1,2,2,1,2,1,1,2,1,2,2,1,1,2,1,1,2,2,1,2,1,1,2,1,1,2,2,1,2,2,1,1,2,1,2,2,1,2,';
+  if ($line =~ $re) {
+    print "match\n";
+  }
+  exit 0;
+}
 
 {
   # match of A109680 which has only a few terms

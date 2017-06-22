@@ -1,5 +1,5 @@
 ---
-abstract: unknown
+abstract: 'create fixup commits for topic branches'
 author:
   - 'Jordan Torbiak'
 build_requires:
@@ -21,5 +21,5 @@ requires:
   perl: '5.008004'
 resources:
   repository: https://github.com/torbiak/git-autofixup.git
-version: 0.002001
+version: 0.002002
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

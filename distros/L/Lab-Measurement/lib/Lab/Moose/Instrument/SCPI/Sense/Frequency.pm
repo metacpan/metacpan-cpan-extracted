@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Sense::Frequency;
-
+$Lab::Moose::Instrument::SCPI::Sense::Frequency::VERSION = '3.550';
 use Moose::Role;
 use Lab::Moose::Instrument::Cache;
 use Lab::Moose::Instrument
@@ -11,7 +11,6 @@ use namespace::autoclean;
 
 with 'Lab::Moose::Instrument::SCPI::Sense::Sweep';
 
-our $VERSION = '3.543';
 
 =head1 NAME
 

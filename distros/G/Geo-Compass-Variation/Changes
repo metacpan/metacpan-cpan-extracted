@@ -1,5 +1,14 @@
 Revision history for Geo-Compass-Variation
 
+1.00    2017-06-21
+        - new _calc_year() function, uses localtime() to get the year and month
+          number, normalizes the month number to an int between 1-10, returns
+          the year.normalized_mon
+        - updated DESC in POD to explain the WMM data release timeframes (closes
+          #2)
+        - re-worked the year checks for out-of-bounds WMM release/expire years
+          (fixes #1)
+
 0.01 UNREL
         First version, released on an unsuspecting world.
 

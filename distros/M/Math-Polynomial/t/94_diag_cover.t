@@ -1,8 +1,6 @@
-# Copyright (c) 2009 Martin Becker.  All rights reserved.
+# Copyright (c) 2009-2017 Martin Becker.  All rights reserved.
 # This package is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-#
-# $Id: 94_diag_cover.t 36 2009-06-08 11:51:03Z demetri $
 
 # Checking whether all error messages are covered in the DIAGNOSTICS
 # pod section.

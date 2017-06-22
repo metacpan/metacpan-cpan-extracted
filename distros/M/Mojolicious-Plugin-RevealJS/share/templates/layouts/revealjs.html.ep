@@ -2,6 +2,9 @@
 <html lang="en">
 
 	<head>
+    <% if (defined(my $base = exists stash->{'base'} ? stash->{'base'} : '/')) { %>
+    <base href="<%= $base %>">
+    <% } %>
 		<meta charset="utf-8">
 
     <title><%= title %></title>
@@ -9,32 +12,32 @@
     <meta name="description" content="<%= stash('description') || 'defies description' %>">
     <meta name="author" content="<%= stash('author') || 'somebody pretty cool' %>">
 
-		<meta name="apple-mobile-web-app-capable" content="yes" />
-		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<link rel="stylesheet" href="/revealjs/css/reveal.css">
+		<link rel="stylesheet" href="revealjs/css/reveal.css">
     <%
       my $theme = stash('theme') || 'black';
-      $theme = "/revealjs/css/theme/$theme.css" unless $theme =~ /\.css$/;
+      $theme = "revealjs/css/theme/$theme.css" unless $theme =~ /\.css$/;
     %>
     %= stylesheet $theme, id => 'theme'
 
-		<!-- Code syntax highlighting -->
-		<link rel="stylesheet" href="/revealjs/lib/css/zenburn.css">
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="revealjs/lib/css/zenburn.css">
 
 		<!-- Printing and PDF exports -->
 		<script>
 			var link = document.createElement( 'link' );
 			link.rel = 'stylesheet';
 			link.type = 'text/css';
-			link.href = window.location.search.match( /print-pdf/gi ) ? '/revealjs/css/print/pdf.css' : '/revealjs/css/print/paper.css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'revealjs/css/print/pdf.css' : 'revealjs/css/print/paper.css';
 			document.getElementsByTagName( 'head' )[0].appendChild( link );
 		</script>
 
 		<!--[if lt IE 9]>
-		<script src="/revealjs/lib/js/html5shiv.js"></script>
+		<script src="revealjs/lib/js/html5shiv.js"></script>
 		<![endif]-->
 
     %= include 'revealjs_head'
@@ -51,8 +54,8 @@
 
 		</div>
 
-		<script src="/revealjs/lib/js/head.min.js"></script>
-		<script src="/revealjs/js/reveal.js"></script>
+		<script src="revealjs/lib/js/head.min.js"></script>
+		<script src="revealjs/js/reveal.js"></script>
 
 		<script>
 			// Full list of configuration options available at:
@@ -67,12 +70,12 @@
       var init = <%== Mojo::JSON::to_json(\%opts) %>;
 			// Optional reveal.js plugins
       init.dependencies = [
-        { src: '/revealjs/lib/js/classList.js', condition: function() { return !document.body.classList; } },
-        { src: '/revealjs/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-        { src: '/revealjs/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-        { src: '/revealjs/plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
-        { src: '/revealjs/plugin/zoom-js/zoom.js', async: true },
-        { src: '/revealjs/plugin/notes/notes.js', async: true }
+        { src: 'revealjs/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+        { src: 'revealjs/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+        { src: 'revealjs/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+        { src: 'revealjs/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+        { src: 'revealjs/plugin/zoom-js/zoom.js', async: true },
+        { src: 'revealjs/plugin/notes/notes.js', async: true }
       ];
 
       %= include 'revealjs_preinit', format => 'js'

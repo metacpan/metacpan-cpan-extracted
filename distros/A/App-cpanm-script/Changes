@@ -1,4 +1,7 @@
-Revision history for App-cpanm-script
+0.002   2017-06-17 (PERLANCAR)
+
+	- Add shell completion script.
+
 
 0.001   2016-11-02 (PERLANCAR)
 

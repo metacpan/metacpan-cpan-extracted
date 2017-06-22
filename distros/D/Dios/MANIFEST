@@ -36,7 +36,6 @@ t/optional.t
 t/paren_on_own_line.t
 t/paren_plus_open_block.t
 t/perl_attrs.t
-t/pod-coverage.t
 t/pod.t
 t/refs.t
 t/required.t
@@ -58,5 +57,8 @@ t/multisubs_named.t
 t/nameless.t
 t/optionals_then_slurpies.t
 t/return_types.t
+t/callsame.t
+t/callwith.t
+t/class_only.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

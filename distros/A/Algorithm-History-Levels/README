@@ -1,0 +1,6 @@
+SYNOPSIS
+
+     use Algorithm::History::Levels qw(group_history_into_levels);
+
+SEE ALSO
+

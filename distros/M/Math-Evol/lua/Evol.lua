@@ -6,8 +6,8 @@
 --         modify it under the same terms as Lua5 itself.         --
 --------------------------------------------------------------------
 local M = {} -- public interface
-M.Version = '1.12'
-M.VersionDate = '24aug2010'
+M.Version = '1.13'
+M.VersionDate = '27aug2010'
 
 -- Example usage:
 --local MM = require 'Evol'
@@ -316,12 +316,13 @@ Evol - Evolution search optimisation
 
 =head1 SYNOPSIS
 
- use Evol;
- ($xbref,$smref,$fb,$lf) = evol(\@xb,\@sm,\&function,\&constrain,$tm);
+ local EV = require 'Evol'
+ xb, sm, fb, lf = evol(xb, sm, function, constrain, tm)
  -- or
- ($xbref, $smref) = select_evol(\@xb,\@sm,\&choose_best,\&constrain);
- -- or
- $new_text = text_evol($text, \&choose_best_text, $nchoices );
+ xb, sm = select_evol(xb, sm, choose_best, constrain)
+
+ -- not yet implemented:
+ -- new_text = text_evol(text, choose_best_text, nchoices );
 
 =head1 DESCRIPTION
 
@@ -342,80 +343,76 @@ in a text file, the parameters to be varied being identified in the text
 by means of special comments.  A script I<ps_evol> which uses that is
 included for human-judgement-based fine-tuning of drawings in PostScript.
 
-Version 1.12
+Version 1.13
 
-=head1 SUBROUTINES
+=head1 FUNCTIONS
 
 =over 3
 
-=item I<evol>(\@xb, \@sm, \&minimise, \&constrain, $tm);
+=item I<evol>( xb, sm, minimise, constrain, tm);
 
 Where the arguments are:
- I<@xb> the initial values of variables,
- I<@sm> the initial values of step sizes,
- I<&minimise> the function to be minimised,
- I<&constrain> a function constraining the values,
- I<$tm> the max allowable cpu time in seconds
+ I<xb> the initial values of variables,
+ I<sm> the initial values of step sizes,
+ I<minimise> the function to be minimised,
+ I<constrain> a function constraining the values,
+ I<tm> the max allowable cpu time in seconds
 
 The step sizes and the caller-supplied functions
-I<&function> and I<&constrain> are discussed below.
-The default value of I<$tm> is 10 seconds.
+I<function> and I<constrain> are discussed below.
+The default value of I<tm> is 10 seconds.
 
 I<evol> returns a list of four things:
- I<\@xb> the best values of the variables,
- I<\@sm> the final values of step sizes,
- I<$fb> the best value of objective function,
- I<$lf> a success parameter
+ I<xb> the best values of the variables,
+ I<sm> the final values of step sizes,
+ I<fb> the best value of objective function,
+ I<lf> a success parameter
 
-I<$lf> is set false if the search ran out of cpu time before converging.
+I<lf> is set false if the search ran out of cpu time before converging.
 For more control over the convergence criteria, see the
 CONVERGENCE CRITERIA section below.
 
-=item I<select_evol>(\@xb, \@sm, \&choose_best, \&constrain, $nchoices);
+=item I<select_evol>( xb, sm, choose_best, constrain, nchoices);
 
 Where the arguments are:
- I<@xb> the initial values of variables,
- I<@sm> the initial values of step sizes,
- I<&choose_best> the function allowing the user to select the best,
- I<&constrain> a function constraining the values,
- I<$nchoices> the number of choices I<select_evol> generates
+ I<xb> the initial values of variables,
+ I<sm> the initial values of step sizes,
+ I<choose_best> the function allowing the user to select the best,
+ I<constrain> a function constraining the values,
+ I<choices> the number of choices I<select_evol> generates
 
 The step sizes and the caller-supplied functions
-I<&choose_best> and I<&constrain> are discussed below.
-I<$nchoices> is the number of alternative choices which will be offered
+I<choose_best> and I<constrain> are discussed below.
+I<nchoices> is the number of alternative choices which will be offered
 to the user, in addition to the current best array of values.
-The default value of I<$nchoices> is 1,
+The default value of I<nchoices> is 1,
 giving the user the choice between the current best and 1 alternative.
 
 I<select_evol> returns a list of two things:
- I<\@xb> the best values of the variables, and
- I<\@sm> the final values of step sizes
+ I<xb> the best values of the variables, and
+ I<sm> the final values of step sizes
 
-=item I<text_evol>( $text, \&choose_best_text, $nchoices );
+=item I<text_evol>( text, choose_best_text, nchoices );
 
-The $text is assumed to contain some numeric parameters to be varied,
+The text is assumed to contain some numeric parameters to be varied,
 marked out by magic comments which also supply initial step sizes for them,
 and optionally also maxima and minima.
 For example:
 
- $x = -2.3456; # evol step .1
+ x = -2.3456; # evol step .1
  /x 3.4567 def % evol step .2
  /gray_sky .87 def % evol step 0.05 min 0.0 max 1.0
 
 The magic bit of the comment is I<evol step> and the previous
 number on the same line is taken as the value to be varied.
-The function reference I<\&choose_best_text> is discussed below.
-I<$nchoices> gets passed by I<text_evol> directly to I<select_evol>.
+The function I<\choose_best_text> is discussed below.
+I<nchoices> gets passed by I<text_evol> directly to I<select_evol>.
 
-I<&text_evol> returns the optimised $text.
+I<text_evol> returns the optimised text.
 
-I<&text_evol> is intended for fine-tuning of PostScript, or files
+I<text_evol> is intended for fine-tuning of PostScript, or files
 specifying GUI's, or HTML layout, or StyleSheets, or MIDI,
 where the value judgement must be made by a human being.
-As an example, a script called I<ps_evol> for fine-tuning A4 PostScript
-drawings is included with this package; it uses $nchoices = 8 and puts
-the nine alternatives onto one A4 page which the user can then view with
-Ghostview in order to select the best one.
 
 =back
 
@@ -438,114 +435,123 @@ at the cost of course of slower convergence.
 
 =over 3
 
-=item I<minimise>( @x );
+=item I<minimise>( x );
 
 I<evol> minimises an objective funtion; that function accepts a
 list of values and returns a numerical scalar result. For example,
 
- sub minimise {   -- objective function, to be minimised
-    local $sum; foreach (@_) { $sum += $_*$_; }  -- sigma x^2
-    return $sum;
+ local function minimise(x)   -- objective function, to be minimised
+    local sum = 0.0
+    for k,v in ipairs(x) do sum = sum + v*v; end  -- sigma x^2
+    return sum
  }
- ($xbref, $smref, $fb, $lf) = evol (\@xb, \@sm, \&minimise);
+ xbref, smref, fb, lf = evol (xb, sm, minimise)
 
-=item I<constrain>( @x );
+=item I<constrain>( x );
 
-You may also supply a subroutine I<constrain(@x)> which forces
+You may also supply a subroutine I<constrain(x)> which forces
 the variables to have acceptable values.  If you do not wish
-to constrain the values, just pass 0 instead.  I<constrain(@x)>
+to constrain the values, just pass 0 instead.  I<constrain(x)>
 should return the list of the acceptable values. For example,
 
- sub constrain {   -- force values into acceptable range
-    if ($_[0]>1.0) { $_[0]=1.0;  -- it's a probability
-    elseif ($_[0]<0.0) { $_[0]=0.0;
-    }
-    local $cost = 3.45*$_[1] + 4.56*$_[2] + 5.67*$_[3];
-    if ($cost > 1000.0) {  -- enforce 1000 dollars maximum cost
-       $_[1]*=1000/$cost; $_[2]*=1000/$cost; $_[3]*=1000/$cost;
-    }
-    if ($_[4]<0.0) { $_[4]=0.0; }  -- it's a population density
-    $_[5] = int ($_[5] + 0.5);     -- it's an integer
-    return @_;
- }
- ($xbref,$smref,$fb,$lf) = evol (\@xb,\@sm,\&minimise,\&constrain);
+ local function constrain(x)   -- force values into acceptable range
+    if x[1] > 1.0 then x[1]=1.0   -- it's a probability
+    elseif x[1] < 0.0 then x[1]=0.0
+    end
+    local cost = 3.45*x[2] + 4.56*x[3] + 5.67*x[4]
+    if cost > 1000.0 than  -- enforce 1000 dollars maximum cost
+       x[1] = x[2] * 1000/cost
+       x[2] = x[3] * 1000/cost
+       x[3] = x[4] * 1000/cost
+    end
+    if x[5] < 0.0 then x[5] = 0.0; end  -- it's a population density
+    x[6] = math.floor(x[6] + 0.5)       -- it's an integer
+    return x
+ end
+ xbref, smref, fb, lf = EV.evol(xb, sm, minimise, constrain)
 
-=item I<choose_best>( \@a, \@b, \@c ... );
+=item I<choose_best>({ a, b, c ... })
 
 This function whose reference is passed to I<select_evol> 
-must accept a list of array_refs;
-the first ref refers to the current array of values,
-and the others refer to alternative arrays of values.
+must accept a list of arrays;
+the first must be the current array of values,
+and the others are alternative arrays of values.
 The user should then judge which of the arrays is best,
-and I<choose_best> must then return I<($preference, $continue)> where
-I<$preference> is the index of the preferred array_ref (0, 1, etc).
-The other argument I<($continue)> is set false if the user
+and I<choose_best> must then return I<(preference, continue)> where
+I<$preference> is the index of the preferred array (1, 2, etc).
+The other argument I<(continue)> is set false if the user
 thinks the optimal result has been arrived at;
 this is I<select_evol>'s only convergence criterion.
 For example,
 
- use Term.Clui;
- sub choose_best { local ($aref, $bref) = @_;
-    inform("Array 0 is @$aref");
-    inform("Array 1 is @$bref");
-    local $preference = 0 + choose('Do you prefer 0 or 1 ?','0','1');
-    local $continue   = confirm('Continue ?');
-    return ($preference, $continue);
- }
- ($xbref, $smref, $fb, $lf) = evol(\@xb, \@sm, \&choose_best);
+ local function choose_best(choices)
+    io.write("Array 1 is "..table.concat(choices[1]," ").."\n")
+    io.write("Array 2 is "..table.concat(choices[2]," ").."\n")
+    local preference = 0 + choose('Do you prefer 1 or 2 ?','1','2')
+    local continue   = confirm('Continue ?')
+    return preference, continue
+ end
+ xb, sm, fb, lf = EV.select_evol(xb, sm, choose_best);
 
-=item I<choose_best_text>( $text1, $text2, $text3 ... );
+=item I<choose_best_text>( text1, text2, text3 ... );
 
-This function whose reference is passed to I<text_evol>
+This function which is passed to I<text_evol>
 must accept a list of text strings;
 the first will contain the current values
 while the others contain alternative values.
 The user should then judge which of the strings produces the best result.
-I<choose_best_text> must return I<($preference, $continue)> where
-I<$preference> is the index of the preferred string (0, 1, etc).
-The other argument I<($continue)> is set false if the user
+I<choose_best_text> must return I<(preference, continue)> where
+I<preference> is the index of the preferred string (1, 2, etc).
+The other argument I<(continue)> is set false if the user
 thinks the optimal result has been arrived at;
 this is I<text_evol>'s only convergence criterion.
-
-As an example, see the script called I<ps_evol> for fine-tuning
-A4 PostScript drawings which is included with this package.
 
 =back
 
 =head1 CONVERGENCE CRITERIA
 
-$ec (>0.0) is the convergence test, absolute.  The search is
+EV.ec (>0.0) is the convergence test, absolute.  The search is
 terminated if the distance between the best and worst values
 of the objective function within the last 25 trials is less
-than or equal to $ec.
-The absolute convergence test is suppressed if $ec is undefined.
+than or equal to EV.ec.
+The absolute convergence test is suppressed if EV.ec is undefined.
 
-$ed (>0.0) is the convergence test, relative. The search is
+EV.ed (>0.0) is the convergence test, relative. The search is
 terminated if the difference between the best and worst values
 of the objective function within the last 25 trials is less
-than or equal to $ed multiplied by the absolute value of the
+than or equal to EV.ed multiplied by the absolute value of the
 objective function.
-The relative convergence test is suppressed if $ed is undefined.
+The relative convergence test is suppressed if EV.ed is undefined.
 
-These interact with two other small numbers M.ea and M.eb, which are
+These interact with two other small numbers EV.ea and EV.eb, which are
 the minimum allowable step-sizes, absolute and relative respectively.
 
 These number are set within Evol as follows:
 
- M.ea = 0.00000000000001;   -- absolute stepsize
- M.eb = 0.000000001;        -- relative stepsize
- M.ec = 0.0000000000000001; -- absolute error
- M.ed = 0.00000000001;      -- relative error
+ EV.ea = 0.00000000000001;   -- absolute stepsize
+ EV.eb = 0.000000001;        -- relative stepsize
+ EV.ec = 0.0000000000000001; -- absolute error
+ EV.ed = 0.00000000001;      -- relative error
 
 You can change those settings before invoking the evol subroutine, e.g.:
 
- $Evol.ea = 0.00000000000099;   # absolute stepsize
- $Evol.eb = 0.000000042;        # relative stepsize
- undef $Evol.ec;  # disable absolute-error-criterion
- $Evol.ec = 0.0000000000000031; # absolute error
- $Evol.ed = 0.00000000067;      # relative error
+ EV.Evol.ea = 0.00000000000099;   -- absolute stepsize
+ EV.Evol.eb = 0.000000042;        -- relative stepsize
+ EV.Evol.ec = nil  -- disable absolute-error-criterion
+ EV.Evol.ec = 0.0000000000000031; -- absolute error
+ EV.Evol.ed = 0.00000000067;      -- relative error
 
-The most robust criterion is the maximum-cpu-time parameter $tm
+The most robust criterion is the maximum-cpu-time parameter I<tm>
+
+=head1 INSTALLATION
+
+This module is available as a LuaRock:
+http://luarocks.org/modules/peterbillam/math-evol
+
+Or, the source is available in
+http://cpansearch.perl.org/src/PJB/Math-Evol-1.13/lua/
+for you to install by hand in your LUA_PATH
+
 
 =head1 AUTHOR
 
@@ -565,7 +571,7 @@ by Hans-Paul Schwefel, Wiley 1981, pp 104-117, 330-337,
 translated into english by M.W. Finnis from
 I<Numerische Optimierung von Computer-Modellen mittels der Evolutionsstrategie>
 (Interdiscipliniary Systems Research, Vol. 26), Birkhaeuser Verlag, Basel 1977.
-The calling interface has been greatly Perlised,
+The calling interface has been greatly modernised,
 and the constraining of values has been much simplified.
 
 =head1 SEE ALSO

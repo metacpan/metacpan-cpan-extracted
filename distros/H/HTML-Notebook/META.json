@@ -63,7 +63,7 @@
          "web" : "https://github.com/pablrod/p5-HTML-Notebook"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
 }
 

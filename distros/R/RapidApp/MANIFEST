@@ -8,6 +8,7 @@ Makefile.PL
 README
 README.pod
 dist.ini
+forward
 lib/Catalyst/Helper/Model/DBIC/Schema/ForRapidDbic.pm
 lib/Catalyst/Model/RapidApp/CoreSchema.pm
 lib/Catalyst/Plugin/RapidApp.pm
@@ -45,6 +46,7 @@ lib/RapidApp/CoreSchema/Result/Session.pm
 lib/RapidApp/CoreSchema/Result/User.pm
 lib/RapidApp/CoreSchema/Result/UserToRole.pm
 lib/RapidApp/CoreSchema/ResultSet/Request.pm
+lib/RapidApp/DBIC/Component/LinkedResult.pm
 lib/RapidApp/DBIC/Component/SchemaTableSpec.pm
 lib/RapidApp/DBIC/Component/TableSpec.pm
 lib/RapidApp/DBIC/Component/VirtualColumns.pm
@@ -128,10 +130,14 @@ lib/RapidApp/TableSpec/DbicTableSpec.pm
 lib/RapidApp/TableSpec/Role/DBIC.pm
 lib/RapidApp/Template/Access.pm
 lib/RapidApp/Template/Access/Dummy.pm
+lib/RapidApp/Template/AccessStore.pm
 lib/RapidApp/Template/Context.pm
 lib/RapidApp/Template/Controller.pm
 lib/RapidApp/Template/Controller/Dispatch.pm
+lib/RapidApp/Template/Postprocessor/Markdown.pm
 lib/RapidApp/Template/Provider.pm
+lib/RapidApp/Template/Store.pm
+lib/RapidApp/Template/Store/Dummy.pm
 lib/RapidApp/Test.pm
 lib/RapidApp/Test/Client.pm
 lib/RapidApp/Test/EnvUtil.pm
@@ -159,6 +165,7 @@ share/assets/css/020-htmleditorplugins.css
 share/assets/css/025-superboxselect.css
 share/assets/css/026-superboxselect-gray-extend.css
 share/assets/css/030-tabular-table.css
+share/assets/css/035-simplemde.min.css
 share/assets/css/040-RapidApp.css
 share/assets/css/045-AppDV.css
 share/assets/css/050-gridsummary.css
@@ -194,6 +201,13 @@ share/assets/filelink/page_world_14x14.png
 share/assets/filelink/photo_14x14.png
 share/assets/filelink/picture_14x14.png
 share/assets/filelink/vcard_14x14.png
+share/assets/font-awesome/css/font-awesome.min.css
+share/assets/font-awesome/fonts/FontAwesome.otf
+share/assets/font-awesome/fonts/fontawesome-webfont.eot
+share/assets/font-awesome/fonts/fontawesome-webfont.svg
+share/assets/font-awesome/fonts/fontawesome-webfont.ttf
+share/assets/font-awesome/fonts/fontawesome-webfont.woff
+share/assets/font-awesome/fonts/fontawesome-webfont.woff2
 share/assets/icons/Log-Out-icon.png
 share/assets/icons/accept.png
 share/assets/icons/add.png
@@ -219,6 +233,7 @@ share/assets/icons/book_addresses.png
 share/assets/icons/book_green.png
 share/assets/icons/book_next.png
 share/assets/icons/book_open.png
+share/assets/icons/bullet_add.png
 share/assets/icons/bullet_arrow_down.png
 share/assets/icons/bullet_arrow_up.png
 share/assets/icons/bullet_cross.png
@@ -401,6 +416,7 @@ share/assets/icons/warning.png
 share/assets/icons/wrench.png
 share/assets/js/001-globals.js
 share/assets/js/005-base64.js
+share/assets/js/010-simplemde.min.js
 share/assets/js/020-RowExpanderEX.js
 share/assets/js/021-Ext.ux.grid.RowActions.js
 share/assets/js/022-Ext.ux.form.XCheckbox.js
@@ -433,6 +449,7 @@ share/assets/js/075-Layout.js
 share/assets/js/080-DataStore.js
 share/assets/js/081-Plugin.js
 share/assets/js/082-HtmlEditor.js
+share/assets/js/083-MdEditor.js
 share/assets/js/084-AppTab.js
 share/assets/js/085-AppTree.js
 share/assets/js/086-History.js
@@ -452,6 +469,7 @@ share/assets/js/520-ErrorTrace.js
 share/assets/js/530-renderers.js
 share/assets/js/600-GenericChangePW.js
 share/assets/js/900-moment.min-1.7.2.js
+share/assets/js/950-mutation-observers.js
 share/assets/misc/charts.swf
 share/assets/misc/html/htmleditor_load_download_help.html
 share/assets/misc/icon-error.gif
@@ -587,6 +605,16 @@ share/assets/misc/login/img/table_arrows.gif
 share/assets/misc/login/img/ui.totop.png
 share/assets/misc/login/powered_intellitree_footer.png
 share/assets/misc/s.gif
+share/assets/misc/simplemde/fonts/font-awesome.min.css
+share/assets/misc/simplemde/fonts/fontawesome-webfont.ttf
+share/assets/misc/simplemde/fonts/fontawesome-webfont.woff
+share/assets/misc/simplemde/fonts/fontawesome-webfont.woff2
+share/assets/misc/simplemde/github-light.css
+share/assets/misc/simplemde/normalize.css
+share/assets/misc/simplemde/picoModal.js
+share/assets/misc/simplemde/simplemde.min.css
+share/assets/misc/simplemde/simplemde.min.js
+share/assets/misc/simplemde/stylesheet.css
 share/coreschema/ref_sqlite.db
 share/devel/bootstrap/GridBase.pm.tt
 share/devel/bootstrap/MyRapidApp.pm.tt
@@ -605,7 +633,9 @@ share/templates/rapidapp/http-404.tt
 share/templates/rapidapp/misc/property_table.tt
 share/templates/rapidapp/pages/about_rapidapp.tt
 share/templates/rapidapp/pages/roadmap.tt
+share/templates/rapidapp/public/http-404.html
 share/templates/rapidapp/public/log_in_out_control.tt
+share/templates/rapidapp/public/log_in_out_control_referer.tt
 share/templates/rapidapp/public/login.html
 share/templates/rapidapp/public/login_form.tt
 share/templates/rapidapp/simple_auth_banner.tt

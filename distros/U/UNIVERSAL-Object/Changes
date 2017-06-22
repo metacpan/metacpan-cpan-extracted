@@ -1,5 +1,8 @@
 Revision history for Perl extension UNIVERSAL::Object
 
+0.11 2017-06-19
+    - fix a test that is causing CPANTS to fail, sorry
+
 0.10 2017-05-12
     - Improve the content of the errors produced by
       this module so that it is clearer where the

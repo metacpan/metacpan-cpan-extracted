@@ -4,7 +4,7 @@ use Sietima::Policy;
 use Sietima::Types qw(MailStore MailStoreFromHashRef);
 use namespace::clean;
 
-our $VERSION = '1.0.1'; # VERSION
+our $VERSION = '1.0.2'; # VERSION
 # ABSTRACT: role for lists with a store for messages
 
 
@@ -29,7 +29,7 @@ Sietima::Role::WithMailStore - role for lists with a store for messages
 
 =head1 VERSION
 
-version 1.0.1
+version 1.0.2
 
 =head1 SYNOPSIS
 

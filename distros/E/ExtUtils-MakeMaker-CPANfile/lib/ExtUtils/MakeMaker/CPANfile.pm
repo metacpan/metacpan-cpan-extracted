@@ -7,7 +7,7 @@ use File::Spec::Functions qw/catfile rel2abs/;
 use Module::CPANfile;
 use version;
 
-our $VERSION = "0.07";
+our $VERSION = "0.08";
 
 sub import {
   my $class = shift;
@@ -81,7 +81,29 @@ sub import {
           }
       }
       if ($requires_2_0) { # for better recommends support
-          $params{META_MERGE}{"meta-spec"} ||= {version => 2};
+          # stash prereqs, which is already converted
+          my $tmp_prereqs = delete $params{META_MERGE}{prereqs};
+
+          require CPAN::Meta::Converter;
+          for my $key (qw/META_ADD META_MERGE/) {
+              next unless %{$params{$key} || {}};
+              my $converter = CPAN::Meta::Converter->new($params{$key}, default_version => 1.4);
+              $params{$key} = $converter->upgrade_fragment;
+          }
+
+          if ($params{META_MERGE}{prereqs}) {
+              require CPAN::Meta::Requirements;
+              for my $phase (keys %{$tmp_prereqs || {}}) {
+                  for my $rel (keys %{$tmp_prereqs->{$phase} || {}}) {
+                     my $req1 = CPAN::Meta::Requirements->from_string_hash($tmp_prereqs->{$phase}{$rel});
+                     my $req2 = CPAN::Meta::Requirements->from_string_hash($params{META_MERGE}{prereqs}{$phase}{$rel});
+                     $req1->add_requirements($req2);
+                     $params{META_MERGE}{prereqs}{$phase} = $req1->as_string_hash;
+                  }
+              }
+          } else {
+              $params{META_MERGE}{prereqs} = $tmp_prereqs;
+          }
       }
 
       # XXX: better to use also META_MERGE when applicable?

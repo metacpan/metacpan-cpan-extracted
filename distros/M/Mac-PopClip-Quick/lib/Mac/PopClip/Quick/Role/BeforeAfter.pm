@@ -3,7 +3,7 @@ use Moo::Role;
 
 requires '_plist_action_key_values';
 
-our $VERSION = '1.000001';
+our $VERSION = '1.000002';
 
 =head1 NAME
 

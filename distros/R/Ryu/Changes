@@ -1,5 +1,21 @@
 Revision history for Ryu
 
+0.020     2017-06-17 01:39:34+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Bugs fixed:
+
+    * ->encode and ->decode finish when upstream has no more data
+
+0.019     2017-06-17 01:33:18+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Bugs fixed:
+
+    * ->sprintf_methods now defaults undef values, to avoid warnings. It
+    also gains some documentation in the process.
+
+
 0.018     2017-06-11 03:38:39+08:00 Asia/Kuala_Lumpur
     New features:
 

@@ -1,0 +1,76 @@
+{
+   "abstract" : "use names beginning with control for punctuation variables",
+   "author" : [
+      "Aaron Priven <apriven@actransit.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.11",
+   "license" : [
+      "gpl_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "English-Control",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "English::Control" : {
+         "file" : "lib/English/Control.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/aaronpriven/English-Control-pm/issues"
+      },
+      "homepage" : "https://github.com/aaronpriven/English-Control-pm",
+      "repository" : {
+         "url" : "git://github.com/aaronpriven/English-Control-pm.git",
+         "web" : "https://github.com/aaronpriven/English-Control-pm"
+      }
+   },
+   "version" : "0.002",
+   "x_contributors" : [
+      "Aaron Priven <aaron@priven.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.94"
+}

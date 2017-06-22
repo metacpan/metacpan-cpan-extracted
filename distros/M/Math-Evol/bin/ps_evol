@@ -1,4 +1,7 @@
-#! /usr/bin/perl
+#!/usr/bin/perl
+
+eval 'exec /usr/bin/perl  -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
 #########################################################################
 #        This Perl script is Copyright (c) 2002, Peter J Billam         #
 #               c/o P J B Computing, www.pjb.com.au                     #
@@ -9,21 +12,57 @@
 
 eval "require 'Math/Evol.pm';";
 if ($@) { require 'Evol.pm'; }
-import Math::Evol;
 
 eval "require 'Term/Clui.pm';";
 if ($@) { require 'Clui'; }
-import Term::Clui;
+
+my $Version       = '1.13';
+my $VersionDate   = '13jun2017';
+my $KeepAllSteps  = 0;
+my $TmpDir        = "/tmp/ps_evol.$$";
+my $Landscape     = 0;
+use open ':locale';
+
+
+while ($ARGV[$[] =~ /^-([a-z])/) {
+	if ($1 eq 'v')      { shift;
+		my $n = $0; $n =~ s{^.*/([^/]+)$}{$1};
+		print "$n version $Version $VersionDate\n";
+		exit 0;
+	} elsif ($1 eq 'k') { $KeepAllSteps = 1; shift;
+	} elsif ($1 eq 'l') { $Landscape    = 1; shift;
+	} else {
+		print "usage:\n";  my $synopsis = 0;
+		while (<DATA>) {
+			if (/^=head1 SYNOPSIS/)     { $synopsis = 1; next; }
+			if ($synopsis && /^=head1/) { last; }
+			if ($synopsis && /\S/)      { s/^\s*/   /; print $_; next; }
+		}
+		exit 0;
+	}
+}
 
 $tmpfile = "/tmp/ps_evol_$$.ps";
+if ($KeepAllSteps) {
+	if (! mkdir $TmpDir) { die "can't mkdir $TmpDir: $!\n"; }
+	if (! chdir $TmpDir) { die "can't chdir $TmpDir: $!\n"; }
+}
+
+my @PATH = split (":",$ENV{PATH});
+sub which { my $f; foreach $d (@PATH) {$f="$d/$_[0]";  return $f if -x $f; }}
 
 sub choose_best_text {
 	if (! open (T, "> $tmpfile")) { die "can't open $tmpfile: $!\n"; }
 	print T @prolog;
+	# 1.13 the -l = Landscape option should display 2x4 rather than 3x3
 	print T <<EOT;
 (Helvetica-Bold) findfont 14 scalefont setfont
+
+% HERE BEGINS YOUR LATEST BEST CHOICE
 gsave 207 289 translate 5 5 moveto (5) show 0.30 dup scale
 $_[0]
+% HERE  ENDS  YOUR LATEST BEST CHOICE
+
 grestore gsave  20 550 translate 5 5 moveto (1) show 0.30 dup scale
 $_[1]
 grestore gsave 207 550 translate 5 5 moveto (2) show 0.30 dup scale
@@ -43,23 +82,30 @@ $_[8]
 grestore showpage
 %%EOF
 EOT
-close T;
-	my $preference = &choose('Re-Load. Now which drawing do you prefer ?',
-		'1','2','3','4','5','6','7','8','9');
-	my $continue   = &confirm('Continue ?');
+	close T;
+	system "pkill -HUP gv";
+	Term::Clui::set_default('Now which drawing do you prefer ?', '5');
+	my $preference = Term::Clui::choose(
+	  'Now which drawing do you prefer ?',
+	  '1','2','3','4','5','6','7','8','9');  # if -l, should offer 1..8
+	$continue = 1 ; if (!$preference) { $continue = undef; }
 	if ($preference eq '5') { $preference = 0;
 	} elsif ((0+$preference) > 5) { $preference = -1 + $preference;
 	} else { $preference = 0 + $preference;
 	}
 	return ($preference, $continue);
 }
+
 while (<>) { push @prolog, $_; if (/EndProlog/) { last; } }
 while (<>) { push @prolog, $_; if (/EndPageSetup/) { last; } }
 while (<>) { if (/showpage/)  { last; } push @page, $_; }
-&inform ("Use GhostView or equivalent to view $tmpfile");
-my $new_page = &text_evol(join ('', @page), \&choose_best_text, 8);
-print join('', @prolog), $new_page, "showpage\n%%EOF\n";
-&confirm("OK to remove $tmpfile ?") && unlink $tmpfile;
+Term::Clui::inform ("Use GhostView or equivalent to view $tmpfile");
+my $new_page = Math::Evol::text_evol(join ('', @page), \&choose_best_text, 8);
+if (! open (T, "> $tmpfile")) { die "can't open $tmpfile: $!\n"; }
+print T join('', @prolog), $new_page, "showpage\n%%EOF\n";
+close T;
+system "pkill -HUP gv";
+Term::Clui::inform ("$tmpfile now contains your evolved version");
 exit 0;
 
 __END__
@@ -73,11 +119,15 @@ ps_evol - Perl script to fine-tune A4 PostScript drawings
 =head1 SYNOPSIS
 
  vi plant.ps
+ # add comments like:    % evol step 0.05 min 0.0 max 1.0
  ps_evol plant.ps > p2.ps
+ ps_evol -k plant.ps > p2.ps   # Keep the intermediate steps
+ ps_evol -v        # print the version
+ perldoc ps_evol   # read the manual :-)
 
 =head1 DESCRIPTION
 
-I<ps_evol> is mainly intended as a demo script
+I<ps_evol> was mainly intended as a demo script
 illustrating the I<text_evol> funtion in Math::Evol.pm.
 It assumes you have something like GhostView
 which allows you to view PostScript files.
@@ -100,8 +150,38 @@ See I<perldoc Math::Evol> for more details,
 and as an example the PostScript file I<plant.ps>,
 included with the distribution.
 
-Version 1.05,
-#COMMENT#
+=head1 OPTIONS
+
+=over 3
+
+=item I<-k>
+
+B<K>eeps the intermediate steps of the evolution;
+they will be named like the source file but with an added number,
+like plant_001.ps plant_002.ps and so on.
+This can be useful if you want to make a movie of the evolution process,
+such as with:
+
+ vi plant.eps
+ # it should start with:  %%BoundingBox 0 0 1280 720
+ ps_evol -k plant.eps
+ for i in plant_*.eps   # you have enough disc, I hope ?
+ do
+     o=`echo $i | sed 's/eps$/jpg/'`
+     gs -sDEVICE=jpeg -sOutputFile=$o -q -g1280x720 $i
+ done
+ # mencoder insists on consecutive numbers, so if you want to
+ # delete one, you have to renumber all the subsequent files :-(
+ mencoder -audiofile plantmusic.wav -oac pcm -fps 24 -ofps 24 \
+   'mf://plant_*.jpg' -mf h=1280:w=720:fps=24:type=jpeg \
+   -o plant.avi -ovc lavc -lavcopts vcodec=mpeg4:aspect=1.7778
+ mplayer plant.avi
+
+=item I<-v>
+
+Prints B<V>ersion number.
+
+=back
 
 =head1 DEPENDENCIES
 

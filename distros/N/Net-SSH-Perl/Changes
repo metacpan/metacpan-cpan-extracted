@@ -1,5 +1,21 @@
 Revision history for Net::SSH::Perl
 
+2.12 2017.04.22
+    - Fix inefficiency in CTR, revealed by profiling with Devel::NYTProf
+    - Avoid warnings in Host from strange/invalid known_host entries
+    - Improve documentation of newer features
+
+2.11 2017.04.16
+    - Packet bugfix: Introduced in 2.07, when ETM Mac is used, sometimes
+      not enough incoming bytes were available to fully read stored MAC
+    - DSA key bugfix: verify would fail if r/s had highest bit set
+
+2.10 2017.03.23
+    - Add curve25519-sha256 alias for curve25519-sha256@libssh.org key exchange
+    - Bugfix for when unsupported key types are encountered
+    - Add support for '-' syntax in options, including wildcards
+    - Add wildcard support for '+' syntax in options
+
 2.09 2016.10.26
     - Fix creation of keys in ecdsa, ed25519 key classes
     - Update eg/pssh-keygen to create ecdsa, ed25519 keys

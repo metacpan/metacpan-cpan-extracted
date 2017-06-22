@@ -8,10 +8,10 @@ use Carp qw(croak);
 use Storable qw(freeze);
 use Algorithm::Diff qw(sdiff);
 
-$Storable::canonical = 1; # to have equal fingerprints for equal by data hashes
-
 our @EXPORT_OK = qw(
     diff
+    list_diff
+    split_diff
     dsplit
     dtraverse
     patch
@@ -31,30 +31,30 @@ Struct::Diff - Recursive diff tools for nested perl structures
 
 =head1 VERSION
 
-Version 0.86
+Version 0.88
 
 =cut
 
-our $VERSION = '0.86';
+our $VERSION = '0.88';
 
 =head1 SYNOPSIS
 
-    use Struct::Diff qw(diff dsplit dtraverse patch);
+    use Struct::Diff qw(diff list_diff split_diff patch);
 
     $a = {x => [7,{y => 4}]};
     $b = {x => [7,{y => 9}],z => 33};
 
-    $diff = diff($a, $b, noO => 1, noU => 1);       # omit unchanged items and old values for changed items
-    # $diff == {D => {x => {D => [{I => 1,N => {y => 9}}]},z => {A => 33}}};
+    $diff = diff($a, $b, noO => 1, noU => 1); # omit unchanged items and old values
+    # $diff == {D => {x => {D => [{I => 1,N => {y => 9}}]},z => {A => 33}}}
 
-    $href = dsplit($diff);                          # divide diff
-    # $href->{a} not exists                         # unchanged omitted, other items originated from $b
-    # $href->{b} == {x => [{y => 9}],z => 33};
+    @list_diff = list_diff($diff); # list (path and ref pairs) all diff entries
+    # $list_diff == [[{keys => ['z']}],\{A => 33},[{keys => ['x']},[0]],\{I => 1,N => {y => 9}}]
 
-    dtraverse($d, {callback => sub {print "val $_[0] has status $_[2]"; 1}}); # traverse through diff
+    $splitted = split_diff($diff);
+    # $splitted->{a} # not exists
+    # $splitted->{b} == {x => [{y => 9}],z => 33}
 
-    patch($a, $diff);
-    # $a now equal to $b by structure and data
+    patch($a, $diff); # $a now equal to $b by structure and data
 
 =head1 EXPORT
 
@@ -106,7 +106,7 @@ changing diff: some of it's substructures are links to original structures.
     $diff = diff($a, $b, %opts);
     $patch = diff($a, $b, noU => 1, noO => 1, trimR => 1); # smallest possible diff
 
-=head3 Available options
+=head3 Options
 
 =over 4
 
@@ -125,114 +125,169 @@ Drop removed item's data.
 sub diff($$;@);
 sub diff($$;@) {
     my ($a, $b, %opts) = @_;
+
     my $d = {};
-    my $hidden;
+    local $Storable::canonical = 1; # for equal snapshots for equal by data hashes
 
     if (ref $a ne ref $b) {
-        if ($opts{'noO'}) {
-            $hidden = 1;
-        } else {
-            $d->{'O'} = $a;
-        }
-        if ($opts{'noN'}) {
-            $hidden = 1;
-        } else {
-            $d->{'N'} = $b;
-        }
-    } elsif (ref $a eq 'ARRAY' and $a ne $b) {
-        my @sd = sdiff($a, $b, sub { freeze(ref $_[0] ? $_[0] : \$_[0]) });
-        my $s; # status collector
-        for (my $i = 0; $i < @sd; $i++) {
-            my $item;
+        $d->{O} = $a unless ($opts{noO});
+        $d->{N} = $b unless ($opts{noN});
+    } elsif (ref $a eq 'ARRAY' and $a != $b) {
+        my @sd = sdiff($a, $b, sub { freeze \$_[0] });
+        my ($s, $hidden, $item);
+
+        for my $i (0 .. $#sd) {
+            undef $item;
             if ($sd[$i]->[0] eq 'u') {
-                $item->{'U'} = $sd[$i]->[1] unless ($opts{'noU'});
+                $item->{U} = $sd[$i]->[1] unless ($opts{noU});
             } elsif ($sd[$i]->[0] eq 'c') {
                 $item = diff($sd[$i]->[1], $sd[$i]->[2], %opts);
             } elsif ($sd[$i]->[0] eq '+') {
-                $item->{'A'} = $sd[$i]->[2] unless ($opts{'noA'});
+                $item->{A} = $sd[$i]->[2] unless ($opts{noA});
             } else { # '-'
-                $item->{'R'} = $opts{'trimR'} ? undef : $sd[$i]->[1] unless ($opts{'noR'});
+                $item->{R} = $opts{trimR} ? undef : $sd[$i]->[1]
+                    unless ($opts{noR});
             }
-            unless ($item) {
+
+            if ($item) {
+                map { $s->{$_} = 1 } keys %{$item};
+                $item->{I} = $i if ($hidden);
+                push @{$d->{D}}, $item;
+            } else {
                 $hidden = 1;
-                next;
             }
-            map { $s->{$_} = 1 } keys %{$item};
-            $item->{'I'} = $i if ($hidden);
-            push @{$d->{'D'}}, $item;
         }
 
-        if ((my @k = keys %{$s}) == 1 and not ($hidden or exists $s->{'D'})) { # all have same status - return it
-            map { $_ = $_->{$k[0]} } @{$d->{'D'}};
-            $d->{$k[0]} = delete $d->{'D'};
+        if ((my @k = keys %{$s}) == 1 and not ($hidden or exists $s->{D})) { # all items have same status
+            map { $_ = $_->{$k[0]} } @{$d->{D}};
+            $d->{$k[0]} = delete $d->{D};
         }
-    } elsif (ref $a eq 'HASH' and $a ne $b) {
-        for my $key (keys %{{ %{$a}, %{$b} }}) { # go througth united uniq keys
+
+        $d->{U} = $a unless ($hidden or keys %{$d});
+    } elsif (ref $a eq 'HASH' and $a != $b) {
+        my @keys = keys %{{ %{$a}, %{$b} }}; # uniq keys for both hashes
+        return $opts{noU} ? {} : { U => {} } unless (@keys);
+
+        my ($alt, $sd);
+        for my $key (@keys) {
             if (exists $a->{$key} and exists $b->{$key}) {
-                if (freeze(ref $a->{$key} ? $a->{$key} : \$a->{$key}) eq
-                    freeze(ref $b->{$key} ? $b->{$key} : \$b->{$key})
-                ) {
-                    if ($opts{'noU'}) {
-                        $hidden = 1;
+                if (freeze(\$a->{$key}) eq freeze(\$b->{$key})) {
+                    $d->{U}->{$key} = $alt->{D}->{$key}->{U} = $a->{$key}
+                        unless ($opts{noU});
+                } else {
+                    $sd = diff($a->{$key}, $b->{$key}, %opts);
+                    if (exists $sd->{D}) {
+                        $d->{D}->{$key} = $alt->{D}->{$key} = $sd;
                     } else {
-                        $d->{'U'}->{$key} = $a->{$key};
-                    }
-                    next;
-                }
-                my $tmp = diff($a->{$key}, $b->{$key}, %opts);
-                $hidden = 1 unless (keys %{$tmp});
-                while (my ($s, $v) = each(%{$tmp})) {
-                    if ($s eq 'D') {
-                        $d->{'D'}->{$key} = $tmp;
-                    } else {
-                        $d->{$s}->{$key} = $v;
+                        map {
+                            $d->{$_}->{$key} = $alt->{D}->{$key}->{$_} = $sd->{$_}
+                        } keys %{$sd};
                     }
                 }
             } elsif (exists $a->{$key}) {
-                if ($opts{'noR'}) {
-                    $hidden = 1;
-                } else {
-                    $d->{'R'}->{$key} = $opts{'trimR'} ? undef : $a->{$key};
-                }
+                $d->{R}->{$key} = $alt->{D}->{$key}->{R} =
+                    $opts{trimR} ? undef : $a->{$key}
+                        unless ($opts{noR});
             } else {
-                if ($opts{'noA'}) {
-                    $hidden = 1;
-                } else {
-                    $d->{'A'}->{$key} = $b->{$key};
-                }
+                $d->{A}->{$key} = $alt->{D}->{$key}->{A} = $b->{$key}
+                    unless ($opts{noA});
             }
         }
-        if (keys %{$d} > 1 or $hidden) {
-            for my $s (keys %{$d}) {
-                next if ($s eq 'D');
-                map { $d->{'D'}->{$_}->{$s} = delete $d->{$s}->{$_} } keys %{$d->{$s}};
-                delete $d->{$s};
-            }
-        }
-    } elsif (not( # other types
-        defined $a and defined $b and (ref $a ? $a == $b : freeze(\$a) eq freeze(\$b))
-        or not defined $a and not defined $b
-    )) {
-        $d->{'O'} = $a unless ($opts{'noO'});
-        $d->{'N'} = $b unless ($opts{'noN'});
+
+        $d = $alt if (keys %{$d} > 1); # return 'D' version of diff
+    } elsif (ref $a ? $a == $b : freeze(\$a) eq freeze(\$b)) {
+        $d->{U} = $a unless ($opts{noU});
+    } else {
+        $d->{O} = $a unless ($opts{noO});
+        $d->{N} = $b unless ($opts{noN});
     }
-    $d->{'U'} = $a unless ($hidden or $opts{'noU'} or keys %{$d});
 
     return $d;
 }
 
 =head2 dsplit
 
-Divide diff to pseudo original structures
-
-    $structs = dsplit($diff);
-    # $structs->{a} - now contains items originated from $a
-    # $structs->{b} - same for $b
+Is an alias for L</split_diff>. Deprecated, will be removed in future
+releases. L</split_diff> should be used instead.
 
 =cut
 
-sub dsplit($);
-sub dsplit($) {
+*dsplit = \&split_diff;
+
+=head2 list_diff
+
+List pairs (path, ref_to_subdiff) for provided diff. See
+L<Struct::Path/ADDRESSING SCHEME> for path format specification.
+
+    @list = list_diff(diff($frst, $scnd);
+
+=head3 Options
+
+=over 4
+
+=item depth E<lt>intE<gt>
+
+Don't dive deeper than defined number of levels.
+
+=item sort E<lt>sub|true|falseE<gt>
+
+Defines how to traverse hash subdiffs. Keys will be picked randomely (C<keys>
+behavior, default), sorted by provided subroutine (if value is a coderef) or
+lexically sorted if set to some other true value.
+
+=back
+
+=cut
+
+sub list_diff($;@) {
+    my ($tmp, %opts) = @_;
+    $opts{depth} = 0 unless ($opts{depth});
+
+    my @stack = ([], \$tmp); # init: (path, diff)
+    my ($diff, @list, $path);
+
+    while (@stack) {
+        ($path, $diff) = splice @stack, 0, 2;
+
+        if (!exists ${$diff}->{D} or $opts{depth} and @{$path} >= $opts{depth}) {
+            push @list, $path, $diff;
+        } elsif (ref ${$diff}->{D} eq 'ARRAY') {
+            map {
+                unshift @stack,
+                    [@{$path},
+                        [exists ${$diff}->{D}->[$_]->{I}
+                            ? ${$diff}->{D}->[$_]->{I} # use provided index
+                            : $_
+                        ]
+                    ],
+                    \${$diff}->{D}->[$_]
+            } reverse 0 .. $#{${$diff}->{D}};
+        } else { # HASH
+            map {
+                unshift @stack, [@{$path}, {keys => [$_]}], \${$diff}->{D}->{$_}
+            } $opts{sort}
+                ? ref $opts{sort} eq 'CODE'
+                    ? reverse $opts{sort}(keys %{${$diff}->{D}})
+                    : reverse sort keys %{${$diff}->{D}}
+                : keys %{${$diff}->{D}};
+        }
+    }
+
+    return @list;
+}
+
+=head2 split_diff
+
+Divide diff to pseudo original structures
+
+    $structs = split_diff(diff($a, $b));
+    # $structs->{a}: items originated from $a
+    # $structs->{b}: same for $b
+
+=cut
+
+sub split_diff($);
+sub split_diff($) {
     my $d = shift;
     _validate_meta($d);
     my $s = {};
@@ -240,13 +295,13 @@ sub dsplit($) {
     if (exists $d->{'D'}) {
         if (ref $d->{'D'} eq 'ARRAY') {
             for my $di (@{$d->{'D'}}) {
-                my $ts = dsplit($di);
+                my $ts = split_diff($di);
                 push @{$s->{'a'}}, $ts->{'a'} if (exists $ts->{'a'});
                 push @{$s->{'b'}}, $ts->{'b'} if (exists $ts->{'b'});
             }
         } else { # HASH
             for my $key (keys %{$d->{'D'}}) {
-                my $ts = dsplit($d->{'D'}->{$key});
+                my $ts = split_diff($d->{'D'}->{$key});
                 $s->{'a'}->{$key} = $ts->{'a'} if (exists $ts->{'a'});
                 $s->{'b'}->{$key} = $ts->{'b'} if (exists $ts->{'b'});
             }
@@ -267,6 +322,8 @@ sub dsplit($) {
 
 =head2 dtraverse
 
+Deprecated. L</list_diff> should be used instead.
+
 Traverse through diff invoking callback function for subdiff statuses.
 
     my $opts = {
@@ -275,7 +332,7 @@ Traverse through diff invoking callback function for subdiff statuses.
     };
     dtraverse($diff, $opts);
 
-=head3 Available options
+=head3 Options
 
 =over 4
 
@@ -380,11 +437,11 @@ sub patch($$) {
 
 =head1 LIMITATIONS
 
-Struct::Diff fails on structures with loops in references. has_circular_ref() from Data::Structure::Util can help
-to detect such structures.
+Struct::Diff fails on structures with loops in references. C<has_circular_ref>
+from L<Data::Structure::Util> can help to detect such structures.
 
-Only scalars, refs to scalars, ref to arrays and ref to hashes correctly traversed. All other data types compared
-by their references.
+Only scalars, refs to scalars, ref to arrays and ref to hashes correctly traversed.
+All other data types compared by their references.
 
 No object oriented interface provided.
 
@@ -394,9 +451,11 @@ Michael Samoglyadov, C<< <mixas at cpan.org> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-struct-diff at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Struct-Diff>. I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests to C<bug-struct-diff at rt.cpan.org>,
+or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Struct-Diff>. I will be notified,
+and then you'll automatically be notified of progress on your bug as I make
+changes.
 
 =head1 SUPPORT
 
@@ -428,7 +487,8 @@ L<http://search.cpan.org/dist/Struct-Diff/>
 
 =head1 SEE ALSO
 
-L<Algorithm::Diff>, L<Data::Deep>, L<Data::Diff>, L<Data::Difference>, L<JSON::MergePatch>
+L<Algorithm::Diff>, L<Data::Deep>, L<Data::Diff>, L<Data::Difference>,
+L<JSON::MergePatch>
 
 L<Data::Structure::Util>, L<Struct::Path>, L<Struct::Path::PerlStyle>
 

@@ -1,5 +1,5 @@
 requires "Dist::Zilla::Role::VersionProvider" => "0";
-requires "Module::Metadata" => "0";
+requires "Module::Metadata" => "1.000005";
 requires "Moose" => "0";
 requires "namespace::autoclean" => "0";
 requires "strict" => "0";
@@ -20,6 +20,8 @@ on 'configure' => sub {
 };
 
 on 'develop' => sub {
+  requires "Code::TidyAll" => "0.56";
+  requires "Code::TidyAll::Plugin::SortLines::Naturally" => "0.000003";
   requires "Code::TidyAll::Plugin::Test::Vars" => "0.02";
   requires "File::Spec" => "0";
   requires "IO::Handle" => "0";

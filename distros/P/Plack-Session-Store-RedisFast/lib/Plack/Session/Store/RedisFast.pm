@@ -6,12 +6,14 @@ use warnings;
 use 5.008_005;
 
 use Carp qw( carp );
-use Plack::Util::Accessor qw( prefix redis inflate deflate expire );
+use Plack::Util::Accessor qw( prefix redis encoder expire );
 use Time::Seconds qw( ONE_MONTH );
 
 use parent 'Plack::Session::Store';
 
-our $VERSION   = '0.01';
+use constant SESSIONS_PER_SCAN => 100;
+
+our $VERSION   = '0.03';
 our $AUTHORITY = 'cpan:AKZHAN';
 
 sub new {
@@ -19,14 +21,16 @@ sub new {
     $param{prefix} = __PACKAGE__ . ':' unless defined $param{prefix};
     $param{expire} = ONE_MONTH         unless exists $param{expire};
 
-    $param{inflate} ||= \&_inflate;
-    $param{deflate} ||= \&_deflate;
-
     unless ( $param{redis} ) {
-        my $builder = $param{builder} || \&_build_redis;
-        delete $param{builder};
+        my $builder = ( delete $param{builder} ) || \&_build_redis;
         $param{redis} = $builder->();
     }
+
+    $param{encoder} ||=
+      _build_encoder( ( delete $param{inflate} ), ( delete $param{deflate} ) );
+
+    $param{encoder} = $param{encoder}->new()
+      unless ref( $param{encoder} );
 
     bless {%param} => $class;
 }
@@ -45,39 +49,33 @@ sub _build_redis {
 }
 
 sub _build_encoder {
+    my ( $inflate, $deflate ) = @_;
+    if ( $inflate && $deflate ) {
+        require Plack::Session::Store::RedisFast::Encoder::Custom;
+        return Plack::Session::Store::RedisFast::Encoder::Custom->new( $inflate,
+            $deflate );
+    }
     my $instance;
     eval {
-        require JSON::XS;
-        $instance = JSON::XS->new->utf8->allow_nonref;
+        require Plack::Session::Store::RedisFast::Encoder::JSONXS;
+        $instance = Plack::Session::Store::RedisFast::Encoder::JSONXS->new;
         1;
     } or do {
-        require JSON;
-        $instance = JSON->new->utf8->allow_nonref;
-    };
+        require Plack::Session::Store::RedisFast::Encoder::MojoJSON;
+        $instance = Plack::Session::Store::RedisFast::Encoder::MojoJSON->new;
+      }
+      or do {
+        require Plack::Session::Store::RedisFast::Encoder::JSON;
+        $instance = Plack::Session::Store::RedisFast::Encoder::JSON->new;
+      };
     $instance;
-}
-
-my $_encoder = undef;
-
-sub _encoder {
-    $_encoder ||= _build_encoder();
-}
-
-sub _inflate {
-    my ($session) = @_;
-    _encoder->encode($session);
-}
-
-sub _deflate {
-    my ($data) = @_;
-    _encoder->decode($data);
 }
 
 sub fetch {
     my ( $self, $session_id ) = @_;
     my $data = $self->redis->get( $self->prefix . $session_id );
     return undef unless defined $data;
-    $self->deflate->($data);
+    $self->encoder->decode($data);
 }
 
 sub store {
@@ -86,16 +84,52 @@ sub store {
         carp "store: no session provided";
         return;
     }
-    my $data = $self->inflate->($session);
+    my $data = $self->encoder->encode($session);
     $self->redis->set(
         $self->prefix . $session_id => $data,
         ( defined( $self->expire ) ? ( EX => $self->expire ) : () ),
     );
+    1;
 }
 
 sub remove {
     my ( $self, $session_id ) = @_;
     $self->redis->del( $self->prefix . $session_id );
+    1;
+}
+
+sub each_session {
+    my ( $self, $cb ) = @_;
+    return if ref($cb) ne 'CODE';
+
+    my $prefix = $self->prefix;
+
+    my $cursor = 0;
+    for ( ; ; ) {
+        ( $cursor, my $keys ) = $self->redis->scan(
+            $cursor,
+            MATCH => $self->prefix . '*',
+            COUNT => SESSIONS_PER_SCAN
+        );
+        if ( scalar(@$keys) > 0 ) {
+            my @sessions = $self->redis->mget(@$keys);
+
+            for ( my $i = 0 ; $i < scalar(@sessions) ; $i++ ) {
+                next unless $sessions[$i];
+
+                next if $keys->[$i] !~ m/^\Q$prefix\E(.+)$/;
+                my $session_id = $1;
+
+                $cb->(
+                    $self->redis, $prefix, $session_id,
+                    $self->encoder->decode( $sessions[$i] ),
+                );
+            }
+        }
+
+        last if $cursor == 0;
+    }
+    1;
 }
 
 1;
@@ -110,11 +144,13 @@ __END__
 
 Plack::Session::Store::RedisFast - Redis session store.
 
+=head1 DESCRIPTION
+
 Default implementation of Redis handle is L<Redis::Fast>; otherwise L<Redis>.
 
 May be overriden through L</redis> or  L</builder> param.
 
-Default implementation of serializer handle is L<JSON::XS>; otherwise L<JSON>.
+Default implementation of serializer handle is L<JSON::XS>; otherwise L<Mojo::JSON> or L<JSON>.
 
 May be overriden through L</inflate> and L</deflate> param.
 
@@ -142,37 +178,51 @@ its full interface.
 
 =head1 METHODS
 
+=head2 new
+
+    Plack::Session::Store::RedisFast->new( %param );
+
+Parameters:
+
 =over 4
 
-=item B<new ( %params )>
-
-=item B<redis>
+=item redis
 
 A simple accessor for the Redis handle.
 
-=item B<builder>
+=item builder
 
 A simple builder for the Redis handle if L</redis> not set.
 
-=item B<inflate>
+=item inflate
 
-A simple serializer, JSON::XS->new->utf8->allow_nonref->encode
-or JSON->new->utf8->allow_nonref->encode by default.
+A simple serializer, requires L</deflate> param.
 
-=item B<deflate>
+=item deflate
 
-A simple deserializer, JSON::XS->new->utf8->allow_nonref->decode
-or JSON->new->utf8->allow_nonref->decode by default.
+A simple deserializer, requires L</inflate> param.
 
-=item B<prefix>
+=item encoder
+
+A simple encoder (encode/decode implementation), class or instance. JSON/utf8 by default.
+
+=item prefix
 
 A prefix for Redis session ids. 'Plack::Session::Store::RedisFast:' by default.
 
-=item B<expire>
+=item expire
 
 An expire for Redis sessions. L<Time::Seconds/ONE_MONTH> by default.
 
 =back
+
+=head2 each_session
+
+    $store->each_session(sub {
+        my ( $redis_instance, $redis_prefix, $session_id, $session ) = @_;
+    });
+
+Enumerates all stored sessions using SCAN, see L<https://redis.io/commands/scan> for limitations.
 
 =head1 BUGS
 

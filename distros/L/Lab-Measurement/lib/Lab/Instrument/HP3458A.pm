@@ -1,8 +1,7 @@
 #!/usr/bin/perl
 
 package Lab::Instrument::HP3458A;
-our $VERSION = '3.543';
-
+$Lab::Instrument::HP3458A::VERSION = '3.550';
 use strict;
 use Lab::Instrument;
 use Lab::Instrument::Multimeter;

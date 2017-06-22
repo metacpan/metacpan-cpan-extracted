@@ -1,8 +1,19 @@
 Revision history for Dancer2-Plugin-Etcd
 
+0.011
+
+[ANNOUNCEMENT]
+* Until further notice this module is deemed experimental only.
+
+0.010
+
+[BUGS]
+* Update to use Net::Etcd vs depricated Etcd3
+
+
 0.006
 
-[Bugs]
+[BUGS]
 * Make compatible with interface changes to Etcd3 v0.006
 
 0.003

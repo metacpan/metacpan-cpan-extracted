@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Command';
 
 use Mojo::Server::FastCGI;
 
-our $VERSION = '0.41';
+our $VERSION = '0.50';
 
 has description => <<'EOF';
 Start application with FastCGI.

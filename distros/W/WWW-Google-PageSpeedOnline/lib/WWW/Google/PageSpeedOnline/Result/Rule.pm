@@ -1,6 +1,7 @@
 package WWW::Google::PageSpeedOnline::Result::Rule;
 
-$WWW::Google::PageSpeedOnline::Result::Rule::VERSION = '0.21';
+$WWW::Google::PageSpeedOnline::Result::Rule::VERSION   = '0.22';
+$WWW::Google::PageSpeedOnline::Result::Rule::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
 
@@ -8,7 +9,7 @@ WWW::Google::PageSpeedOnline::Result::Rule - Placeholder for the result rule of 
 
 =head1 VERSION
 
-Version 0.21
+Version 0.22
 
 =cut
 
@@ -16,9 +17,7 @@ use 5.006;
 use Moo;
 use namespace::clean;
 
-has localizedRuleName => (is => 'ro');
-has ruleImpact        => (is => 'ro');
-has ruleScore         => (is => 'ro');
+has [ qw(localizedRuleName ruleImpact ruleScore) ] => (is => 'ro');
 
 =head1 METHODS
 
@@ -40,7 +39,7 @@ Mohammad S Anwar, C<< <mohammad.anwar at yahoo.com> >>
 
 =head1 REPOSITORY
 
-L<https://github.com/Manwar/WWW-Google-PageSpeedOnline>
+L<https://github.com/manwar/WWW-Google-PageSpeedOnline>
 
 =head1 BUGS
 

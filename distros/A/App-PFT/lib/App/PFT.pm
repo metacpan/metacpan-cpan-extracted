@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License along
 # with PFT.  If not, see <http://www.gnu.org/licenses/>.
 
-package App::PFT v1.2.0; # Remember to fix version in $VersionString
+package App::PFT v1.2.1; # Remember to fix version in $VersionString
 
 use strict;
 use warnings;

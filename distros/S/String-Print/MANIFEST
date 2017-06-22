@@ -7,6 +7,8 @@ lib/String/Print.pod
 t/00use.t
 t/10serial.t
 t/11modif.t
+t/12encode.t
+t/13subnames.t
 t/20prewrite.t
 t/30examp_oo.t
 t/31examp_fun.t

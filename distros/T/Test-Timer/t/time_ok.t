@@ -1,10 +1,10 @@
-
 use strict;
+use warnings;
 use Test::More;
 
 use Test::Fatal;
 
-BEGIN { use_ok('Test::Timer'); }
+use_ok('Test::Timer');
 
 time_ok( sub { sleep(1); }, 2, 'Passing test' );
 

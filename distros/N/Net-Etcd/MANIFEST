@@ -7,10 +7,14 @@ README.md
 lib/Net/Etcd.pm
 lib/Net/Etcd/Auth.pm
 lib/Net/Etcd/Auth/Role.pm
+lib/Net/Etcd/Auth/RolePermission.pm
 lib/Net/Etcd/Config.pm
 lib/Net/Etcd/Lease.pm
+lib/Net/Etcd/Maintenance.pm
 lib/Net/Etcd/Role/Actions.pm
 lib/Net/Etcd/KV.pm
+lib/Net/Etcd/KV/Compare.pm
+lib/Net/Etcd/KV/Op.pm
 lib/Net/Etcd/KV/Put.pm
 lib/Net/Etcd/KV/Range.pm
 lib/Net/Etcd/KV/Txn.pm
@@ -18,14 +22,17 @@ lib/Net/Etcd/User.pm
 lib/Net/Etcd/User/Role.pm
 lib/Net/Etcd/Watch.pm
 t/00-load.t
-t/key_value.t
-t/lease.t
+t/01-key_value.t
+t/02-lease.t
 t/manifest.t
+t/03-maint.t
 t/pod-coverage.t
 t/pod-spelling.t
 t/pod.t
-t/user.t
-t/watch.t
+t/04-txn.t
+t/05-user.t
+t/06-watch.t
+t/99-auth.t
 .travis.yml
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

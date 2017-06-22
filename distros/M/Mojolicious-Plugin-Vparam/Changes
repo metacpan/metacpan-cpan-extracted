@@ -1,5 +1,26 @@
 Revision history for Mojolicious-Plugin-Vparam
 
+2.11.1  19-06-2017
+    - Fix multijoin bug for empty array
+
+2.11    16-06-2017
+    - Fix bug 0 for "in" filter
+
+2.10    15-06-2017
+    - Add "isa" alias for "type"
+    - Fix #26
+
+2.09    14.06.2017
+    - Fix pod
+    - Add "as" attribute
+
+2.08    12-06-2017
+    - Fix warnings
+    - Fix pod for verror
+    - Custom multiline delimiter
+    - Add multijoin attribute
+    - More numeric and string filters
+
 2.07    25-04-2017
     - New text type for address
 

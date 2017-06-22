@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 # the contents of the Makefile that is written.
 WriteMakefile(
     NAME              => 'NKTI::general',
-    VERSION_FROM      => 'lib/NKTI/general.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
+    VERSION_FROM      => 'lib/NKTI/general.pm',
     PREREQ_PM         => {
         'Test::More' => 0,
         'JSON' => 0,
@@ -15,8 +15,9 @@ WriteMakefile(
         'CGI' => 0,
         'DateTime' => 0,
         'HTTP::BrowserDetect' => 0,
-    }, # e.g., Module::Name => 1.1
-#    ABSTRACT_FROM     => 'lib/NKTI/general.pm', # retrieve abstract from module
+    },
+    MIN_PERL_VERSION => '5.012000',
+    ABSTRACT => 'The Part of CellBash The Simple Web Framework',
     AUTHOR            => 'Achmad Yusri Afandi <yusrideb@cpan.org>',
     LICENSE           => 'perl_5',
     #Value must be from legacy list of licenses here

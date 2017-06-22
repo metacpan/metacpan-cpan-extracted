@@ -1176,6 +1176,35 @@ Ext.ux.RapidApp.Plugin.CmpDataStorePlus = Ext.extend(Ext.util.Observable,{
       }
     },store);
     
+    // --
+    // New close_on_destroy option: will attempt to close by locating the main-load-target
+    // parent. Will not do anything in any other scenario than the stanard explorer/tab scenario
+    if(this.cmp.close_on_destroy) {
+      store.on('write',function(ds, action, result, res, rs) {
+        if(action == 'destroy' && res.success) {
+          this.cmp.bubble(function() {
+            var container = this;
+            var parent = container.ownerCt;
+            if(!parent) { return false; }
+            if(parent.id == 'main-load-target' || parent.id == 'maincontainer') {
+              parent.remove(container);
+              return false;
+            }
+          })
+        }
+      },this);
+    }
+    // --
+    
+    // New option to reload every time we're activated
+    if(this.cmp.reload_on_show) {
+      this.cmp.on('afterrender',function(){
+        this.cmp.on('show',function() {
+         store.reload();
+        });
+      },this);
+    }
+    
     
     // ------
     //  NEW: track the last response AND decoded data in a common location for both read/write:
@@ -1800,9 +1829,11 @@ Ext.ux.RapidApp.Plugin.CmpDataStorePlus = Ext.extend(Ext.util.Observable,{
       },this);
       
       Ext.each(formpanel.items,function(field) {
-        field.reportDirtyDisplayVal = function(disp) {
-          newRec._dirty_display_data = newRec._dirty_display_data || {};
-          newRec._dirty_display_data[field.name] = disp;
+        if(field) {
+          field.reportDirtyDisplayVal = function(disp) {
+            newRec._dirty_display_data = newRec._dirty_display_data || {};
+            newRec._dirty_display_data[field.name] = disp;
+          }
         }
       },this);
       
@@ -2022,7 +2053,6 @@ Ext.ux.RapidApp.DataStoreDedicatedAddForm = Ext.extend(Ext.Panel, {
 
   initComponent: function() {
 
-    this.init_hash = window.location.hash;
     this.bodyStyle = 'border:none;';
     this.layout = 'fit';
 
@@ -2043,6 +2073,7 @@ Ext.ux.RapidApp.DataStoreDedicatedAddForm = Ext.extend(Ext.Panel, {
     this.on('beforerender',function() {
   
       var thisC = this;
+      var init_hash;
       
       this.source_cmp.hidden = true;
       this.source_cmp.store_autoLoad = true;
@@ -2064,10 +2095,22 @@ Ext.ux.RapidApp.DataStoreDedicatedAddForm = Ext.extend(Ext.Panel, {
         this.dsPlugin.getAddFormPanel.call(this.dsPlugin,
           newRec,close_handler,callback,use_formpanel
         );
+        
+        init_hash = window.location.hash;
       
         ds.un('load',on_load);
       };
       this.source_cmp.store.on('load',on_load,this);
+      
+      // New: because of the way the complex initialization logic works, we have to perform a load
+      // on the underlying source_cmp store in order to get the meta info loaded, etc, but change the
+      // limit to only fetch one row and no total count. This is a bit hacky, but greatly improves
+      // performance in some situations. The real/proper solution would be to not load at all but that
+      // will require a deeper dive (this is a very after-the-fact feature as it is)
+      this.source_cmp.store.on('beforeload',function(ds,options){ 
+        options.params.limit = 1;
+        options.params.no_total_count = 1;
+      },this);
       
       // We need to do our own close handler manually:
       var close_fn = function() { 
@@ -2086,7 +2129,13 @@ Ext.ux.RapidApp.DataStoreDedicatedAddForm = Ext.extend(Ext.Panel, {
       // to do any post-write operations (like autoload_added_record) before we destroy
       // it since the original add_form close handling code doesn't destroy the store
       var on_save;
-      on_save = function(ds) {
+      on_save = function(ds,batch,data) {
+        // We should get back a created record. If we don't, smething probably went wrong,
+        // dont close the page
+        if(!(data && Ext.isArray(data.create) && data.create.length > 0 &&  data.create[0])) {
+          return;
+        }
+
         ds.un('save',on_save);
         // This is still a race condition, since we don't know how long it might take for
         // post-save operations to complete. For the special autoload_added_record case
@@ -2097,7 +2146,7 @@ Ext.ux.RapidApp.DataStoreDedicatedAddForm = Ext.extend(Ext.Panel, {
         if(this.dsPlugin.autoload_added_record) {
           var closeIf, loop_count = 0;
           closeIf = function() {
-            if(window.location.hash == this.init_hash && loop_count < 100) {
+            if(window.location.hash == init_hash && loop_count < 100) {
               loop_count++;
               closeIf.defer(50);
             }
@@ -2105,7 +2154,7 @@ Ext.ux.RapidApp.DataStoreDedicatedAddForm = Ext.extend(Ext.Panel, {
               close_fn();
             }
           }
-          closeIf();
+          closeIf.defer(50);
         }
         else {
           // otherwise close outright, but give it a bit extra time for good measure

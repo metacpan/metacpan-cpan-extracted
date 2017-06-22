@@ -83,7 +83,21 @@ sub args {
 	croak 'rules must be HashRef' unless ref $rules eq 'HASH';
 
 	for my $key (keys %$rules) {
-		next if ref $rules->{$key} eq 'HASH';
+		if (ref $rules->{$key} eq 'HASH') {
+			next unless $rules->{$key}->{isa} =~ 'HashRef';
+			next unless ref $rules->{$key}->{rules} eq 'HASH';
+
+			my @args = ($args->{$key});
+			@args = @{ $args->{$key} } if ref $args->{$key} eq 'ARRAY';
+
+			for my $arg (@args) {
+				# Recursive Support
+				$self->args($rules->{$key}->{rules}, $module, $arg);
+			}
+
+			delete $rules->{$key}->{rules};
+			next;
+		}
 
 		my $value = $rules->{$key};
 		my ($isa, $default) = split /\s*=\s*/, $value;
@@ -102,10 +116,33 @@ sub args {
 		$rules->{$key} = $value;
 	}
 
-	my $validator = Data::Validator->new(%$rules)->with('NoRestricted');
+	my $validator = Data::Validator->new(%$rules)->with(qw/NoRestricted AllowExtra NoThrow/);
 	my @ret = $validator->validate($args);
+
+	if ($validator->has_errors) {
+		my $errors = $validator->clear_errors;
+		croak $self->handle_errors($rules, $module, $args, $errors);
+	}
 	
 	return wantarray ? ($self, $ret[0]) : $ret[0];
+}
+
+sub handle_errors {
+	my ($self, $rules, $module, $args, $errors) = @_;
+
+	my @list;
+	push @list, join "", map { $_->{message} } @$errors;
+	push @list, '[Module] ' . ref($module);
+	push @list, '[Rules] ' . $self->c->dump($rules);
+	push @list, '[Args] ' . $self->c->dump($args);
+
+	for my $i (0 .. 100) {
+		my ($package, $filename, $line, $func) = caller($i);
+		last unless $func;
+		push @list, $func . " at line " . $line;
+	}
+
+	return join "\n", @list;
 }
 
 sub model {

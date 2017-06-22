@@ -5,7 +5,7 @@ use strict;
 use warnings FATAL => 'all';
 
 use base 'Exporter';
-our @EXPORT_OK = qw/commas to_monetary_number_format roundnear financialrounding formatnumber/;
+our @EXPORT_OK = qw/commas to_monetary_number_format roundnear roundcommon financialrounding formatnumber/;
 
 use Carp qw(cluck);
 use Scalar::Util qw(looks_like_number);
@@ -20,7 +20,7 @@ Format::Util::Numbers - Miscellaneous routines to do with manipulating number fo
 
 =cut
 
-our $VERSION = '0.11';    ## VERSION
+our $VERSION = '0.12';    ## VERSION
 
 =head1 SYNOPSIS
 
@@ -229,17 +229,54 @@ sub financialrounding {
         or not defined $precisions->{$type // 'unknown-type'}
         or not defined $precisions->{$type}->{$currency // 'unknown-type'});
 
-    # get current global mode
-    my $current_mode = Math::BigFloat->round_mode();
-    Math::BigFloat->round_mode('common');
+    return _round_to_precison($precisions->{$type}->{$currency}, $val);
+}
 
-    my $x = Math::BigFloat->new($val)->bfround('-' . $precisions->{$type}->{$currency});
-    $x = $x->numify();
+=head2 roundcommon
 
-    # set back to origianl mode
-    Math::BigFloat->round_mode($current_mode);
+This sub rounds number as per precision passed, this sub
+should be used for numbers not related to currencies like
+probabilities, percentages etc
 
-    return $x;
+This sub use round away from zero technique, same as
+financial rounding, the only difference is it acccepts
+precision as shown below and has no currency precision
+
+Acceptable precision values format example:
+
+0
+1
+1e-4
+0.0001
+
+This sub only supports rounding to one tenths, hundredths,
+thousandths and so on. It does not support rounding to two,
+three tenths, hundredths or so, use roundnear for that.
+
+This sub is created as replacement for roundnear as roundnear
+for small numbers it does round away from zero,
+for numbers with more significant digits it's sort-of random
+
+Returns number
+
+    roundcommon(0.01, 10.234) => 10.23
+
+=cut
+
+sub roundcommon {
+    my ($precision, $val) = @_;
+
+    return $val
+        if ((
+            not defined $val
+            or $val !~ $floating_point_regex
+        )
+        or (not defined $precision or $precision !~ /^(?:1(?:[eE][-]?[0-9]+)?|0(?:\.0*1)?)$/ or $precision == 0));
+
+    # get the number of decimal places needed by BigFloat
+    $precision = log(1 / $precision) / log(10);
+
+    return _round_to_precison($precision, $val);
 }
 
 =head2 get_precision_config
@@ -250,6 +287,23 @@ This is used get complete currency precision config.
 
 sub get_precision_config {
     return $precisions;
+}
+
+# common sub used by roundcommon and financialrounding
+sub _round_to_precison {
+    my ($precision, $val) = @_;
+
+    # get current global mode
+    my $current_mode = Math::BigFloat->round_mode();
+    Math::BigFloat->round_mode('common');
+
+    my $x = Math::BigFloat->new($val)->bfround('-' . $precision);
+    $x = $x->numify();
+
+    # set back to origianl mode
+    Math::BigFloat->round_mode($current_mode);
+
+    return $x;
 }
 
 =head1 AUTHOR

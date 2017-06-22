@@ -75,6 +75,8 @@ is_refcount( $root, 2, '$root has refcount 2 after ->make_float' );
 
    identical( $popupwin->parent, $root, '$popupwin->parent is $root' );
 
+   ok( $popupwin->is_steal_input, '$popupwin is stealing input events' );
+
    is( $popupwin->abs_top,  12, '$popupwin->abs_top' );
    is( $popupwin->abs_left, 22, '$popupwin->abs_left' );
 
@@ -97,6 +99,13 @@ is_refcount( $root, 2, '$root has refcount 2 after ->make_float' );
    pressmouse( press => 1, 5, 12 );
 
    is_deeply( \@mouse_events, [ [ press => 1, -7, -10 ] ] );
+   undef @mouse_events;
+
+   $popupwin->set_steal_input( 0 );
+
+   pressmouse( press => 1, 5, 12 );
+
+   is( scalar @mouse_events, 0, '$popupwin does not steal input after disable' );
 
    $popupwin->close;
    $win->close;

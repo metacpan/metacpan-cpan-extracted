@@ -15,7 +15,8 @@ WriteMakefile(
     },
     PREREQ_PM => {
         'Keyword::Simple' => 0,
-        'PPI'             => 0,
+        'PPR'             => 0,
+        'List::Util'      => 1.45,
     },
     META_MERGE   => {
         no_index => {

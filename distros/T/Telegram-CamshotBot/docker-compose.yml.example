@@ -1,0 +1,29 @@
+version: '2'
+
+services:
+
+  bot:
+    restart: always
+    build: .
+    image: pavelsr/camerabot
+    container_name: fablab_camera_bot
+    environment:
+      VIRTUAL_HOST: camerabot.fablab61.ru
+      VIRTUAL_PORT: 8080
+      LETSENCRYPT_HOST: camerabot.fablab61.ru
+      LETSENCRYPT_EMAIL: pavel@fablab61.ru
+    volumes:
+      - ${PWD}:/root/www/
+    working_dir: /root/www
+    command: ["perl", "camshotbot.pl", "daemon", "-l", "http://*:8080"]
+    expose:
+      - "8080"
+    networks:
+      - proxy-tier
+
+
+
+networks:
+  proxy-tier:
+    external:
+      name: nginx-proxy

@@ -7,7 +7,7 @@ use vars '$VERSION';
 
 require XSLoader;
 
-$VERSION = '0.08';
+$VERSION = '0.09';
 
 XSLoader::load ("PerlIO::subfile", $VERSION);
 

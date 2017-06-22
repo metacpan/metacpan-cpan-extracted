@@ -10,7 +10,7 @@ require Exporter;
 @EXPORT = qw();
 @EXPORT_OK = qw(asc2eb eb2asc eb2ascp packeb unpackeb
    hexdump set_codepage set_translation);
-$VERSION = '0.29';
+$VERSION = '0.30';
 
 %EXPORT_TAGS = ( all => [ @EXPORT_OK ] );
 

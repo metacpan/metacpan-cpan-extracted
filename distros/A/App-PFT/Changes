@@ -37,6 +37,13 @@ Revision history for App-PFT
         Improved default templates
         Added theme management
 
-1.1.1   2016-01-13
+1.1.1   2017-01-13
         Auto-removal of empty entries
         Binding to PFT library v1.1.1 (and related fixes)
+
+1.2.0   2017-05-08
+        Fixed documentation (thanks Bryan for suggestions)
+        Improved pft edit -r with multi-entry per date support
+
+1.2.1   2017-06-15
+        Some minor bugs fixed

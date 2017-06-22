@@ -2,10 +2,12 @@ package Sub::QuoteX::Utils;
 
 # ABSTRACT: Sugar for Sub::Quote
 
+use 5.006;
+
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.08';
 
 use Sub::Quote
   qw( quoted_from_sub inlinify capture_unroll sanitize_identifier quote_sub );
@@ -15,13 +17,14 @@ use Carp;
 
 use Exporter 'import';
 
-
 our @EXPORT_OK = qw(
   quote_subs
   inlinify_coderef
   inlinify_method
   inlinify_code
 );
+
+our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
 
 #pod =func quote_subs
@@ -78,6 +81,10 @@ our @EXPORT_OK = qw(
 #pod
 #pod =back
 #pod
+#pod If the C<store> option is passed in a specification, a lexical
+#pod variable with the specified name will automatically be created.
+#pod See L</Storing Chunk Values>.
+#pod
 #pod Options which may be passed as the last parameter include all of the
 #pod options accepted by L<< C<Sub::Quote::quote_sub>|Sub::Quote/quote_sub
 #pod >>, as well as:
@@ -95,6 +102,25 @@ our @EXPORT_OK = qw(
 #pod for more information.
 #pod
 #pod
+#pod =item C<lexicals> => I<scalar | arrayref >
+#pod
+#pod One or more lexical variables to declare. If specified, B<quote_subs>
+#pod will enclose the generated code in a block and will declare these
+#pod variables at the start of the block.  For example,
+#pod
+#pod   quote_subs( \'@x = 33;',
+#pod               \'@y = 22;',
+#pod               lexicals => [ '@x', '@y' ]
+#pod   );
+#pod
+#pod will result in code equivalent to:
+#pod
+#pod   {
+#pod     my ( @x, @y );
+#pod     @x = 33;
+#pod     @y = 22;
+#pod   }
+#pod
 #pod
 #pod =back
 #pod
@@ -106,14 +132,17 @@ sub quote_subs {
 
     my @caller = caller( 0 );
 
-    # need to duplicate these bits from Sub::Quote::quote_sub, as they rely upon caller
+# need to duplicate these bits from Sub::Quote::quote_sub, as they rely upon caller
     my %option = (
+        lexicals     => [],
         package      => $caller[0],
         hints        => $caller[8],
         warning_bits => $caller[9],
         hintshash    => $caller[10],
         'HASH' eq ref $_[-1] ? %{ pop @_ } : (),
     );
+    my %qsub_opts
+      = map { $_ => $option{$_} } qw[ package hints warning_bits hintshash ];
 
     if ( $option{name} ) {
         my $subname = $option{name};
@@ -126,38 +155,77 @@ sub quote_subs {
     my @code;
     for my $thing ( @_ ) {
 
-        my $arr = 'ARRAY' eq ref $thing ? $thing : [$thing];
+        my @arr = 'ARRAY' eq ref $thing ? @$thing : ($thing);
 
-        if ( 'CODE' eq ref $arr->[0] ) {
+        # invoke appropriate inlinify subroutine, then remove
+        # non-optional arguemnts from the argument list
+        if ( 'CODE' eq ref $arr[0] ) {
 
-            push @code, inlinify_coderef( \%global_capture, @$arr ), q[;] ;
+            push @code, inlinify_coderef( \%global_capture, @arr ), q[;] ;
         }
 
-        elsif ( blessed $arr->[0] ) {
+        elsif ( blessed $arr[0] ) {
 
-            push @code, inlinify_method( \%global_capture, @$arr ), q[;] ;
+            push @code, inlinify_method( \%global_capture, @arr ), q[;] ;
+
+            # this one gets two non-optional arguments, remove the
+            # first; the second is done below
+            shift @arr;
         }
 
-        elsif ( !ref $arr->[0] ) {
+        elsif ( !ref $arr[0] ) {
 
-            push @code, inlinify_code( \%global_capture, @$arr ), q[;] ;
+            push @code, inlinify_code( \%global_capture, @arr ), q[;] ;
         }
 
-	elsif ( 'SCALAR' eq ref $arr->[0] ) {
+	elsif ( 'SCALAR' eq ref $arr[0] ) {
 
-	    push @code, ${ $arr->[0] };
+	    push @code, ${ $arr[0] };
 
 	}
 	else {
 
 	    croak( "don't understand argument in $_[@{[ scalar @code ]}]\n" );
 	}
+        # remove the remaining non-optional argument
+        shift @arr;
+
+        my %opt = @arr;
+
+        # if we're storing the results in a lexical variable, declare it
+        if ( defined $opt{store} ) {
+            $option{lexicals} = [ $option{lexicals} ]
+              unless 'ARRAY' eq ref $option{lexicals};
+
+            if ( $opt{store} =~ /^[\$@%]/ ) {
+                push @{ $option{lexicals} }, $opt{store};
+            }
+            else {
+                push @{ $option{lexicals} },
+		  '$' . $opt{store},
+                  '@' . $opt{store};
+            }
+        }
     }
+
+    $option{lexicals} = [ $option{lexicals} ]
+      unless 'ARRAY' eq ref $option{lexicals};
+    if ( @{ $option{lexicals} } ) {
+
+        # uniqify
+        my %lex;
+        @lex{ @{ $option{lexicals} } } = 1;
+
+        unshift @code, qq/{ my ( @{[ join ', ', keys %lex ]} );/;
+
+        push @code, '}';
+    }
+
 
     quote_sub(
         ( delete $option{name} || () ),
         join( "\n", @code ),
-        \%global_capture, \%option
+        \%global_capture, \%qsub_opts
     );
 
 }
@@ -225,6 +293,19 @@ sub _process_options {
 #pod rather than
 #pod
 #pod   @_ = ...;
+#pod
+#pod =item C<store> => I<variable>
+#pod
+#pod If specified, the result of the generated code will be stored in the variable
+#pod of the given name.  For example
+#pod
+#pod   store => '@x'
+#pod
+#pod would result in code equivalent to:
+#pod
+#pod   @x = &$coderef;
+#pod
+#pod The variable is not declared. See L</Storing Chunk Values>.
 #pod
 #pod =item C<args> => I<arrayref> | I<hashref> | I<string> | C<undef>
 #pod
@@ -333,6 +414,19 @@ sub inlinify_coderef {
 #pod
 #pod   @_ = ...;
 #pod
+#pod =item C<store> => I<variable>
+#pod
+#pod If specified, the result of the generated code will be stored in the variable
+#pod of the given name.  For example
+#pod
+#pod   store => '@x'
+#pod
+#pod would result in code equivalent to:
+#pod
+#pod   @x = $object->$method( @_ );
+#pod
+#pod The variable is not declared. See L</Storing Chunk Values>.
+#pod
 #pod =item C<args> => I<arrayref> | I<hashref> | I<string> | C<undef>
 #pod
 #pod This specified the values of C<@_>.
@@ -406,7 +500,7 @@ sub inlinify_method {
 			 '${$r_object}->',
 			 $method,
 			 $option{provide_args} ? '( @_ )' : '()',
-			 'if ${$r_object};',
+			 'if defined ${$r_object};',
 		       ),
 
 		   capture => \%capture, %option );
@@ -442,6 +536,19 @@ sub inlinify_method {
 #pod rather than
 #pod
 #pod   @_ = ...;
+#pod
+#pod =item C<store> => I<variable>
+#pod
+#pod If specified, the result of the generated code will be stored in the variable
+#pod of the given name.  For example
+#pod
+#pod   store => '@x'
+#pod
+#pod would result in code equivalent to:
+#pod
+#pod   @x = ... code ...;
+#pod
+#pod The variable is not declared. See L</Storing Chunk Values>.
 #pod
 #pod =item C<args> => I<arrayref> | I<hashref> | I<string> | C<undef>
 #pod
@@ -510,8 +617,40 @@ sub inlinify_code {
     $option{local} = 1 unless defined $option{local};
 
 
-    inlinify( $code, $option{args}, capture_unroll( $cap_name, $r_capture, 0 ),
+    my $inlined_code
+      = inlinify( $code, $option{args},
+        capture_unroll( $cap_name, $r_capture, 0 ),
         $option{local} );
+
+    if ( my $variable = $option{store} ) {
+
+	my @code;
+
+        if ( $variable =~ /^[\$@%]/ ) {
+
+	    @code = ( qq/$variable = do {/,
+		      $inlined_code,
+		      q/};/ );
+
+        }
+        else {
+	    @code = (
+                 q/if ( defined wantarray() ) { /,
+                 q/    if ( wantarray() ) {/,
+		qq/        \@$variable = do {/, $inlined_code, q/};/,
+		 q/    }/,
+                 q/    else {/,
+                qq/        \$$variable = do {/, $inlined_code, q/};/,
+		 q/    }/,
+		 q/} else { /, $inlined_code, q/ }/,
+		 q/;/
+		 );
+        }
+
+	return join( "\n", '',@code );
+    }
+
+    return $inlined_code;
 }
 
 1;
@@ -536,7 +675,7 @@ Sub::QuoteX::Utils - Sugar for Sub::Quote
 
 =head1 VERSION
 
-version 0.03
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -652,6 +791,57 @@ and the results compiled into a new subroutine.
 
 B<Sub::QuoteX::Utils> makes that latter process a little easier.
 
+=head2 Usage
+
+Typically, L</quote_subs> is used rather than the lower level
+C<inlinify_*> routines.  C<quote_subs> is passed a list of chunk
+specifications or snippets of code, and generates code which is
+isolated in a Perl block.  Each code chunk is additionally isolated in
+its own block, while code snippets are in the main block.  This
+permits manipulation of the code chunk values.  This is schematically
+equivalent to
+
+  {
+    <snippet>
+    do { <chunk> };
+    <snippet>
+    do { <chunk> };
+    do { <chunk> };
+  }
+
+The values of each chunk may be stored (see L</Storing Chunk Values>)
+and manipulated by the code snippets.
+
+=head2 Storing Chunk Values
+
+A code chunk may have it's value stored in a lexical variable by
+adding the C<store> option to the chunk's options.  For example,
+
+  quote_subs( [ q{ sqrt(2); },    { store => '$x' } ],
+              [ q{ log(2);  },    { store => '$y' } ],
+              [ q{  ( 0..10 ); }, { store => '@z' } ], 
+              \q{print $x + $y, "\n";},
+  );
+
+would result in code equivalent to:
+
+  {
+    my ( $x, $y, @z );
+
+    $x = do { sqrt(2) };
+    $y = do { log(2) };
+    @z = do { ( 0.. 10 ) };
+    print $x + $y, "\n";
+  }
+
+If the variable passed to C<store> has no sigil, e.g. C<x>, then the
+calling context is taken into account.  In list context, the value is
+stored in C<@x>, in scalar context it is stored in C<$x> and in void
+context it is not stored at all.
+
+Automatic declaration of the variables occurs only when
+C<quote_subs> is used to generate the code.
+
 =head2 Captures
 
 B<Sub::Quote> keeps track of captured variables in hashes, I<copying>
@@ -746,6 +936,10 @@ C<quote_subs>.
 
 =back
 
+If the C<store> option is passed in a specification, a lexical
+variable with the specified name will automatically be created.
+See L</Storing Chunk Values>.
+
 Options which may be passed as the last parameter include all of the
 options accepted by L<< C<Sub::Quote::quote_sub>|Sub::Quote/quote_sub
 >>, as well as:
@@ -761,6 +955,25 @@ An optional name for the compiled subroutine.
 A hash containing captured variable names and values.  See the
 documentation of the C<\%captures> argument to L<Sub::Quote/quote_sub>
 for more information.
+
+=item C<lexicals> => I<scalar | arrayref >
+
+One or more lexical variables to declare. If specified, B<quote_subs>
+will enclose the generated code in a block and will declare these
+variables at the start of the block.  For example,
+
+  quote_subs( \'@x = 33;',
+              \'@y = 22;',
+              lexicals => [ '@x', '@y' ]
+  );
+
+will result in code equivalent to:
+
+  {
+    my ( @x, @y );
+    @x = 33;
+    @y = 22;
+  }
 
 =back
 
@@ -790,6 +1003,19 @@ If true (the default) changes to C<@_> will be local, e.g.
 rather than
 
   @_ = ...;
+
+=item C<store> => I<variable>
+
+If specified, the result of the generated code will be stored in the variable
+of the given name.  For example
+
+  store => '@x'
+
+would result in code equivalent to:
+
+  @x = &$coderef;
+
+The variable is not declared. See L</Storing Chunk Values>.
 
 =item C<args> => I<arrayref> | I<hashref> | I<string> | C<undef>
 
@@ -867,6 +1093,19 @@ rather than
 
   @_ = ...;
 
+=item C<store> => I<variable>
+
+If specified, the result of the generated code will be stored in the variable
+of the given name.  For example
+
+  store => '@x'
+
+would result in code equivalent to:
+
+  @x = $object->$method( @_ );
+
+The variable is not declared. See L</Storing Chunk Values>.
+
 =item C<args> => I<arrayref> | I<hashref> | I<string> | C<undef>
 
 This specified the values of C<@_>.
@@ -943,6 +1182,19 @@ If true (the default) changes to C<@_> will be local, e.g.
 rather than
 
   @_ = ...;
+
+=item C<store> => I<variable>
+
+If specified, the result of the generated code will be stored in the variable
+of the given name.  For example
+
+  store => '@x'
+
+would result in code equivalent to:
+
+  @x = ... code ...;
+
+The variable is not declared. See L</Storing Chunk Values>.
 
 =item C<args> => I<arrayref> | I<hashref> | I<string> | C<undef>
 
@@ -1033,6 +1285,58 @@ __END__
 #pod
 #pod B<Sub::QuoteX::Utils> makes that latter process a little easier.
 #pod
+#pod =head2 Usage
+#pod
+#pod Typically, L</quote_subs> is used rather than the lower level
+#pod C<inlinify_*> routines.  C<quote_subs> is passed a list of chunk
+#pod specifications or snippets of code, and generates code which is
+#pod isolated in a Perl block.  Each code chunk is additionally isolated in
+#pod its own block, while code snippets are in the main block.  This
+#pod permits manipulation of the code chunk values.  This is schematically
+#pod equivalent to
+#pod
+#pod   {
+#pod     <snippet>
+#pod     do { <chunk> };
+#pod     <snippet>
+#pod     do { <chunk> };
+#pod     do { <chunk> };
+#pod   }
+#pod
+#pod The values of each chunk may be stored (see L</Storing Chunk Values>)
+#pod and manipulated by the code snippets.
+#pod
+#pod =head2 Storing Chunk Values
+#pod
+#pod A code chunk may have it's value stored in a lexical variable by
+#pod adding the C<store> option to the chunk's options.  For example,
+#pod
+#pod   quote_subs( [ q{ sqrt(2); },    { store => '$x' } ],
+#pod               [ q{ log(2);  },    { store => '$y' } ],
+#pod               [ q{  ( 0..10 ); }, { store => '@z' } ], 
+#pod               \q{print $x + $y, "\n";},
+#pod   );
+#pod
+#pod would result in code equivalent to:
+#pod
+#pod   {
+#pod     my ( $x, $y, @z );
+#pod
+#pod     $x = do { sqrt(2) };
+#pod     $y = do { log(2) };
+#pod     @z = do { ( 0.. 10 ) };
+#pod     print $x + $y, "\n";
+#pod   }
+#pod
+#pod If the variable passed to C<store> has no sigil, e.g. C<x>, then the
+#pod calling context is taken into account.  In list context, the value is
+#pod stored in C<@x>, in scalar context it is stored in C<$x> and in void
+#pod context it is not stored at all.
+#pod
+#pod Automatic declaration of the variables occurs only when
+#pod C<quote_subs> is used to generate the code.
+#pod
+#pod
 #pod =head2 Captures
 #pod
 #pod B<Sub::Quote> keeps track of captured variables in hashes, I<copying>
@@ -1060,8 +1364,6 @@ __END__
 #pod   # add more code to $code [...]
 #pod
 #pod   $new_coderef = Sub::Quote::quote_sub( $code, \%global_capture );
-#pod
-#pod
 #pod
 #pod
 #pod =head1 SEE ALSO

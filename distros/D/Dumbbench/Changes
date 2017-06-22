@@ -1,5 +1,24 @@
 Revision history for Perl module Dumbbench
 
+0.111 2017-06-17T06:50:28Z
+	* Add a --float option to use basic floating point notation
+	instead of scientific notation (Eric Herman, Pull Request #6 in 
+	tsee/dumbbench)
+	* Moved default repo to briandfoy/dumbbench so he can administer
+	it in Travis CI and Appveyor
+	* Improved some docs (Alceu Rodrigues de Freitas Junior)
+
+0.10_02 2017-06-15T08:40:48Z
+	* add --simple switch to use flat floating point instead of 
+	scientific notation
+	* various distro refreshes
+
+0.10_01 2017-06-07T22:17:26Z
+	* Bump to test version to see what CPAN Testers says
+
+	* --simple option for printing numbers using the default float
+	  format instead of scientific notation. (Eric Herman)
+
 0.10  2013-12-30
 
 	* Outlier rejection claimed to be disabled when setting the

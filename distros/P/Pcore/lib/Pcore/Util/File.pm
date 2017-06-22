@@ -419,7 +419,7 @@ sub get_fh ( $path, $mode, @ ) {
         splice @_, 2,
     );
 
-    if ( is_glob($path) ) {
+    if ( is_glob $path ) {
         return $path;
     }
     else {

@@ -1,5 +1,5 @@
 package Test::WWW::Mechanize::PSGI;
-$Test::WWW::Mechanize::PSGI::VERSION = '0.36';
+$Test::WWW::Mechanize::PSGI::VERSION = '0.37';
 use strict;
 use warnings;
 
@@ -65,7 +65,7 @@ Test::WWW::Mechanize::PSGI - Test PSGI programs using WWW::Mechanize
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =head1 SYNOPSIS
 
@@ -171,17 +171,17 @@ or false if not.
 
 A default description of "PUT to $url" is used if none if provided.
 
-=head2 $mech->submit_form_ok( \%parms [, $desc] )
+=head2 $mech->submit_form_ok( \%params [, $desc] )
 
 Makes a C<submit_form()> call and executes tests on the results.
 The form must be found, and then submitted successfully.  Otherwise,
 this test fails.
 
-I<%parms> is a hashref containing the parms to pass to C<submit_form()>.
-Note that the parms to C<submit_form()> are a hash whereas the parms to
+I<%params> is a hashref containing the params to pass to C<submit_form()>.
+Note that the params to C<submit_form()> are a hash whereas the params to
 this function are a hashref.  You have to call this function like:
 
-    $agent->submit_form_ok(
+    $agent->submit_form_ok({
         form_number => 3,
         fields      => {
             username    => 'mungo',
@@ -196,14 +196,14 @@ Returns true value if the specified link was found and followed
 successfully.  The L<HTTP::Response> object returned by submit_form()
 is not available.
 
-=head2 $mech->follow_link_ok( \%parms [, $desc] )
+=head2 $mech->follow_link_ok( \%params [, $desc] )
 
 Makes a C<follow_link()> call and executes tests on the results.
 The link must be found, and then followed successfully.  Otherwise,
 this test fails.
 
-I<%parms> is a hashref containing the parms to pass to C<follow_link()>.
-Note that the parms to C<follow_link()> are a hash whereas the parms to
+I<%params> is a hashref containing the params to pass to C<follow_link()>.
+Note that the params to C<follow_link()> are a hash whereas the params to
 this function are a hashref.  You have to call this function like:
 
     $mech->follow_link_ok( {n=>3}, "looking for 3rd link" );
@@ -296,8 +296,8 @@ Tells if the page has a C<$tag> tag with the given content in its text.
 
 =head2 $mech->followable_links()
 
-Returns a list of links that Mech can follow.  This is only http and
-https links.
+Returns a list of links that L<WWW::Mechanize> can follow.  This is only http
+and https links.
 
 =head2 $mech->page_links_ok( [ $desc ] )
 
@@ -377,7 +377,7 @@ Finds all free-text input fields (text, textarea, and password) in the
 current form and fills them to their maximum length in hopes of finding
 application code that can't handle it.  Fields with no maximum length
 and all textarea fields are set to 66000 bytes, which will often be
-enough to overflow the data's eventual recepticle.
+enough to overflow the data's eventual receptacle.
 
 There is no return value.
 

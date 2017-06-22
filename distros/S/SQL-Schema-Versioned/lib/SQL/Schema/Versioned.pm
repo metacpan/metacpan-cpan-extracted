@@ -1,7 +1,7 @@
 package SQL::Schema::Versioned;
 
-our $DATE = '2015-09-06'; # DATE
-our $VERSION = '0.20'; # VERSION
+our $DATE = '2017-06-15'; # DATE
+our $VERSION = '0.21'; # VERSION
 
 use 5.010001;
 use strict;
@@ -141,7 +141,7 @@ _
     "x.perinci.sub.wrapper.disable_validate_args" => 1,
 };
 sub create_or_update_db_schema {
-    my %args = @_; no warnings ('void');require Scalar::Util::Numeric;my $_sahv_dpath = []; my $arg_err; if (exists($args{'create_from_version'})) { ((defined($args{'create_from_version'})) ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Required but not specified"),0)) && ((Scalar::Util::Numeric::isint($args{'create_from_version'})) ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Not of type integer"),0)); if ($arg_err) { return [400, "Invalid argument value for create_from_version: $arg_err"] } }require Scalar::Util;if (exists($args{'dbh'})) { ((defined($args{'dbh'})) ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Required but not specified"),0)) && ((Scalar::Util::blessed($args{'dbh'})) ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Not of type object"),0)); if ($arg_err) { return [400, "Invalid argument value for dbh: $arg_err"] } }if (!exists($args{'dbh'})) { return [400, "Missing argument: dbh"] } if (exists($args{'spec'})) { ((defined($args{'spec'})) ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Required but not specified"),0)) && ((ref($args{'spec'}) eq 'HASH') ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Not of type hash"),0)); if ($arg_err) { return [400, "Invalid argument value for spec: $arg_err"] } }if (!exists($args{'spec'})) { return [400, "Missing argument: spec"] } # VALIDATE_ARGS
+    my %args = @_; no warnings ('void');require Data::Sah::Compiler::perl::TH::int;require Scalar::Util::Numeric;my $arg_err; if (exists($args{'create_from_version'})) { ((defined($args{'create_from_version'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((Scalar::Util::Numeric::isint($args{'create_from_version'})) ? 1 : (($arg_err //= "Not of type integer"),0)); if ($arg_err) { return [400, "Invalid argument value for create_from_version: $arg_err"] } }no warnings ('void');require Data::Sah::Compiler::perl::TH::obj;require Scalar::Util;if (exists($args{'dbh'})) { ((defined($args{'dbh'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((Scalar::Util::blessed($args{'dbh'})) ? 1 : (($arg_err //= "Not of type object"),0)); if ($arg_err) { return [400, "Invalid argument value for dbh: $arg_err"] } }if (!exists($args{'dbh'})) { return [400, "Missing argument: dbh"] } no warnings ('void');require Data::Sah::Compiler::perl::TH::hash;if (exists($args{'spec'})) { ((defined($args{'spec'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((ref($args{'spec'}) eq 'HASH') ? 1 : (($arg_err //= "Not of type hash"),0)); if ($arg_err) { return [400, "Invalid argument value for spec: $arg_err"] } }if (!exists($args{'spec'})) { return [400, "Missing argument: spec"] } # VALIDATE_ARGS
 
     my $spec   = $args{spec};
     my $dbh    = $args{dbh};
@@ -287,7 +287,7 @@ SQL::Schema::Versioned - Routine and convention to create/update your applicatio
 
 =head1 VERSION
 
-This document describes version 0.20 of SQL::Schema::Versioned (from Perl distribution SQL-Schema-Versioned), released on 2015-09-06.
+This document describes version 0.21 of SQL::Schema::Versioned (from Perl distribution SQL-Schema-Versioned), released on 2017-06-15.
 
 =head1 DESCRIPTION
 
@@ -305,10 +305,20 @@ at the start of your program/script, e.g.:
 This way, your program automatically creates/updates database schema when run.
 Users need not know anything.
 
+=head1 BEST PRACTICES
+
+It is recommended that after you create the second and subsequent version
+(C<upgrade_to_v2>, C<upgrade_to_v3>, and so on) you create and keep
+C<install_v1> so you can test migration from v1->v2, v2->v3, and so on.
+
 =head1 FUNCTIONS
 
 
-=head2 create_or_update_db_schema(%args) -> [status, msg, result, meta]
+=head2 create_or_update_db_schema
+
+Usage:
+
+ create_or_update_db_schema(%args) -> [status, msg, result, meta]
 
 Routine and convention to create/update your application's DB schema.
 
@@ -357,6 +367,8 @@ Currently only tested on MySQL, Postgres, and SQLite. Postgres is recommended
 because it can do transactional DDL (a failed upgrade in the middle will not
 cause the database schema state to be inconsistent, e.g. in-between two
 versions).
+
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
@@ -448,11 +460,21 @@ Try using L<Log::Any::For::DBI>, e.g.:
 
  % TRACE=1 perl -MLog::Any::For::DBI -MLog::Any::App yourapp.pl ...
 
-=head1 BEST PRACTICES
+=head1 HOMEPAGE
 
-It is recommended that after you create the second and subsequent version
-(C<upgrade_to_v2>, C<upgrade_to_v3>, and so on) you create and keep
-C<install_v1> so you can test migration from v1->v2, v2->v3, and so on.
+Please visit the project's homepage at L<https://metacpan.org/release/SQL-Schema-Versioned>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-SQL-Schema-Versioned>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=SQL-Schema-Versioned>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 SEE ALSO
 
@@ -479,29 +501,13 @@ pretty awesome and something which I hope to use for more complex applications.
 
 =back
 
-=head1 HOMEPAGE
-
-Please visit the project's homepage at L<https://metacpan.org/release/SQL-Schema-Versioned>.
-
-=head1 SOURCE
-
-Source repository is at L<https://github.com/perlancar/perl-SHARYANTO-SQL-Schema>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=SQL-Schema-Versioned>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

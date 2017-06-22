@@ -1,6 +1,5 @@
 package Lab::Instrument::SR830;
-our $VERSION = '3.543';
-
+$Lab::Instrument::SR830::VERSION = '3.550';
 use strict;
 use Lab::Instrument;
 use Data::Dumper;

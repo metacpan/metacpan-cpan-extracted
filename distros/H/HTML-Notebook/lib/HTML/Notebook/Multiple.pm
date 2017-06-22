@@ -8,7 +8,7 @@ use HTML::Notebook::Style;
 use Path::Tiny;
 use namespace::autoclean;
 
-our $VERSION = '0.003';    # VERSION
+our $VERSION = '0.004';    # VERSION
 
 =encoding utf-8
 
@@ -88,7 +88,7 @@ sub render {
 </div>
 </div>
 <div style="width:90%;height:100%;float:right;">
-<iframe id="content-frame" name="content" style="width:100%;height:800px;border:none;"></iframe>
+<iframe id="content-frame" name="content" style="width:100%;height:1080px;border:none;"></iframe>
 </div>
 </div>
 <script>

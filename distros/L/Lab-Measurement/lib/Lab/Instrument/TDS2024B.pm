@@ -1,5 +1,5 @@
 package Lab::Instrument::TDS2024B;
-
+$Lab::Instrument::TDS2024B::VERSION = '3.550';
 use 5.006;
 use strict;
 use warnings;
@@ -22,7 +22,6 @@ Version 3.530
 
 =cut
 
-our $VERSION = '3.543';
 our $DEBUG   = 0;
 our @ISA     = ("Lab::Instrument");
 our %fields  = (

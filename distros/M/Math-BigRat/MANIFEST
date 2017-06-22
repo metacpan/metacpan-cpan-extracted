@@ -25,6 +25,7 @@ t/bitwise.t
 t/hang.t
 t/Math/BigRat/Test.pm
 t/requirer.t
+t/rt121139.t
 t/trap.t
 TODO
 META.yml                                 Module YAML meta-data (added by MakeMaker)

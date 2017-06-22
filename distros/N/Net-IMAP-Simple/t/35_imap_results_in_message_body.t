@@ -37,5 +37,4 @@ sub run_tests {
     ok( $return, $special_message );
 }   
 
-do "t/test_runner.pm";
-
+do "./t/test_runner.pm";

@@ -4,7 +4,7 @@ use base qw/Prty::Process Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.107;
+our $VERSION = 1.108;
 
 use Prty::Perl;
 use Encode ();
@@ -488,6 +488,15 @@ sub options {
     # @_: @keyVal
 
     my $argA = $self->argv;
+
+    # Dekodiere die Programmargumente (2017-06-06)
+    # ACHTUNG: älterer Code dekodiert möglicherweise selbst!
+
+    my $enc = $self->encoding;
+    for my $arg (@$argA) {
+        $arg = Encode::decode($enc,$arg);
+    }
+
     my $optH = eval{Prty::Option->extract(
         -simpleMessage=>1,
         # -mode=>'sloppy',
@@ -663,7 +672,8 @@ sub help {
 
         my $pager = $ENV{'PAGER'} || 'less -i';
         my $encoding = $self->encoding;
-        my $fh = Prty::FileHandle->new('|-',"LESSCHARSET=$encoding $pager");
+        my $fh = Prty::FileHandle->new('|-',
+            "LESSCHARSET=$encoding $pager");
         $fh->binmode(":encoding($encoding)");
         $fh->print($text);
         $fh->close;
@@ -756,7 +766,7 @@ sub new {
 
 =head1 VERSION
 
-1.107
+1.108
 
 =head1 AUTHOR
 

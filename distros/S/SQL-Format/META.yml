@@ -8,9 +8,10 @@ build_requires:
 configure_requires:
   CPAN::Meta: '0'
   CPAN::Meta::Prereqs: '0'
-  Module::Build: '0.38'
+  Module::Build: '0'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.140640'
+generated_by: 'Minilla/v3.0.12, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,14 +30,16 @@ no_index:
 provides:
   SQL::Format:
     file: lib/SQL/Format.pm
-    version: '0.16'
+    version: '0.17'
 requires:
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/xaicron/p5-SQL-Format/issues
   homepage: https://github.com/xaicron/p5-SQL-Format
   repository: git://github.com/xaicron/p5-SQL-Format.git
-version: '0.16'
+version: '0.17'
 x_contributors:
   - 'Olivier Mengué <dolmen@cpan.org>'
+  - 'karupanerura <karupa@cpan.org>'
   - 'xaicron <xaicron@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

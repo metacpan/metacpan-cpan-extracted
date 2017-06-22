@@ -1,22 +1,30 @@
 package Dios;
-our $VERSION = '0.001001';
+our $VERSION = '0.002000';
 
 use 5.014; use warnings;
 use Dios::Types;
 use Keyword::Declare;
 
 my $PARAMETER_SYNTAX = qr{
-    \A
-
-    # TYPE...
-    (?&WS)?+ (?<type> (?&TYPE_SPEC) )?+
-
-    # NAME...
     (?&WS)?+
+    (?<raw_param>
+        (?<nameless>
+            (?<is_num_constant>    (?&PerlNumber)     )
+        |
+            (?<is_str_constant>    (?&PerlQuotelikeQ) )
+        |
+            (?<is_regex_constant>  (?&PerlMatch)      )
+        )
+    |
+        # TYPE...
+        (?<type> (?&TYPE_SPEC) )?+
+
+        # NAME...
+        (?&WS)?+
         (?<namedvar>
-            : (?<name> (?&IDENT) ) \( (?&WS)?
-                   (?<var> (?<sigil> [\$\@%]) (?&IDENT) ) (?&WS)?
-              \)
+            : (?<name> (?&IDENT) ) \( (?&WS)?+
+                (?<var> (?<sigil> [\$\@%]) (?&IDENT) ) (?&WS)?+
+            \)
         |
             : (?<var> (?<sigil> [\$\@%])  (?<name> (?&IDENT) ) )
         |
@@ -38,22 +46,25 @@ my $PARAMETER_SYNTAX = qr{
             (?<nameless> (?<sigil> [\$\@%]?+) )
         )
 
-    # OPTIONAL OR REQUIRED...
-    (?: (?<default_type>  \? ) (?<default>    )
-    |   (?<required>      \! )
-    )?+
+        # OPTIONAL OR REQUIRED...
+        (?: (?<default_type>  \? ) (?<default>    )
+        |   (?<required>      \! )
+        )?+
 
-    # READONLY OR ALIAS...
-    (?: (?&WS)?+ is (?&WS)?+   (?: (?<special> ro    )
-                               |   (?<special> alias )
-                               )
-    )?+
+        # CONSTRAINT...
+        (?&WS)?+
+        (?: where (?&WS)?+ (?<constraint> (?&PerlBlock) ) )?+
 
-    # DEFAULT VALUE...
-    (?: (?&WS)?+ (?<default_type> (?://|\|\|)? = ) (?<default> .* ))?+
+        # READONLY OR ALIAS...
+        (?: (?&WS)?+ is (?&WS)?+  (?<special> ro | alias ) )?+
 
-    (?&WS)?+
-    \Z
+        # DEFAULT VALUE...
+        (?: (?&WS)?+ (?<default_type> (?> // | \|\| )?+ = )
+            (?&WS)?+ (?<default> (?&PerlConditionalExpression) ))?+
+
+        (?&WS)?+
+    )
+    (?<terminator> , | : | (?= --> ) | \z )
 
     (?(DEFINE)
         (?<TYPE_SPEC>  (?&TYPE_NAME) (?: [&|] (?&TYPE_NAME) )*+ )
@@ -61,24 +72,41 @@ my $PARAMETER_SYNTAX = qr{
         (?<TYPE_PARAM> \[ (?: [^][]*+ | (?&TYPE_PARAM) )*+ \]   )
         (?<QUAL_IDENT> (?&IDENT) (?: :: (?&IDENT) )*+           )
         (?<IDENT>      [^\W\d] \w*+                             )
-        (?<WS>         (\s+ | \# [^\n]* \n )+                   )
+        (?<WS>         (\s++ | \# [^\n]*+ \n )++                )
+        $PPR::GRAMMAR
     )
 }xms;
+
+my $EMPTY_PARAM_LIST = qr{
+    \A
+    (?&OWS)
+    (?:
+        \(  (?&OWS)  (\*\@_)?+  (?&OWS)  \)
+    )?+
+    (?&OWS)
+    \z
+
+    (?(DEFINE)
+        (?<OWS> \s*+ (?: \# .* \n \s*+ )*+ )
+    )
+}xm;
 
 sub _translate_parameters {
     my $params   = shift;
     my $kind     = shift;
     my $sub_name = shift;
+    my $sub_name_tidy = $sub_name;
+    $sub_name_tidy =~ s{\A \s*+ (?: \# .*+ \n \s*+ )*+ }{}x;
 
-    my $sub_desc = $sub_name ? "$kind $sub_name" : "anonymous $kind";
+    my $sub_desc = $sub_name ? "$kind $sub_name_tidy" : "anonymous $kind";
     my $invocant_name = $^H{'Dios invocant_name'} // '$self';
 
     # Empty and "standard" parameter lists are easy...
-    if (!defined $params || $params =~ m{\A (?: \( \s* (\* \@_ )? \s* \) | \s* ) \Z}xms) {
+    if (!defined $params || $params =~ $EMPTY_PARAM_LIST) {
         my $std_slurpy = defined $1;
         my $code
             = ($kind eq 'method'
-                ? _generate_invocant("method $sub_name", {var=>$invocant_name, sigil=>'$'})
+                ? _generate_invocant("method $sub_name_tidy", {var=>$invocant_name, sigil=>'$'})
                 : q{}
               )
               . ($std_slurpy ? q{} : qq{Dios::_error(ucfirst(q{$sub_desc takes no arguments})) if \@_;});
@@ -89,199 +117,128 @@ sub _translate_parameters {
         return { code => $code, spec => $spec };
     }
 
-    # Otherwise, start unpacking the parameters...
-    $params = $params->schild(0);
+    $params =~ s{\A \s*+ \(}{}x;
+    $params =~ s{\) \s*+ \z}{}x;
 
-    # Split the remaining parameter list into individual parameter specificatons...
-    my @params            = q{};
     my $return_type       = undef;
     my $return_constraint = undef;
-    my @constraints       = [];
     my $invocant          = $kind eq 'method' ? $invocant_name : undef;
     my $first_param       = 1;
-    my @components        = $params->children();
-    COMPONENT:
-    while (my $component = shift @components) {
-        last COMPONENT if !defined $component;
+    my @params;
 
-        # Whitespace...
-        if (!$component->significant) {
-            $params[-1] .= $component;
-        }
-
-        # Invocant marker...
-        elsif ($first_param && $params[-1] =~ /\S/ && $component eq ':') {
-            _error( qq{Can't specify invocant ($params[0]:) for $sub_desc} ) if $kind ne 'method';
-            $invocant = shift @params;
-            @params = q{};
-            $first_param = 0;
-        }
-
-        # Constraint...
-        elsif ($component eq 'where') {
-            # Skip any whitespace...
-            while (@components && !$components[0]->significant) {
-                shift @components;
-            }
-
-            # Grab the type constraint...
-            my $next = shift @components;
-
-            # Is the constraint missing???
-            if ($next eq ',' || $next eq 'where') {
-                unshift @components, $next;
-                next COMPONENT;
-            }
-
-            # Is the constraint a single block???
-            if (ref($next) eq 'PPI::Structure::Block') {
-                if (defined $return_type) {
-                    $return_constraint = $next;
-                }
-                else {
-                    push @{$constraints[-1]}, $next;
-                }
-                next COMPONENT;
-            }
-            else {
-                $params[-1] =~ s/\s+/ /g; $params[-1] =~ s/^\s+|\s+$//g;
-                _error("Expected constraint block after '$params[-1] where' but found '$next' instead");
-            }
-        }
+    while (length($params) && $params =~ s{\A \s*+ $PARAMETER_SYNTAX }{}x) {
+        my %param = %+;
+        last if $param{raw_param} !~ /\S/;
 
         # Special case of literal numeric constant as parameter (e.g. multi func fib(0) { 0 } )...
-        elsif ($params[-1] =~ /^\s*$/ && $component->isa('PPI::Token::Number')) {
-            $params[-1] .= 'Num $';
-            push @{$constraints[-1]}, "sub { \$_ == $component }";
+        if (defined $param{is_num_constant}) {
+            $param{type} = 'Num';
+            $param{constraint} = "{ \$_ == $param{is_num_constant} }";
         }
 
         # Special case of literal string constant as parameter (e.g. multi func handle_event('add') {...} )...
-        elsif ($params[-1] =~ /^\s*$/ && $component->isa('PPI::Token::Quote')) {
-            $params[-1] .= 'Str $';
-            push @{$constraints[-1]}, "sub { \$_ eq $component }";
+        elsif (defined $param{is_str_constant}) {
+            $param{type} = 'Str';
+            $param{constraint} = "{ \$_ eq $param{is_str_constant} }";
         }
 
         # Special case of literal regex match as parameter (e.g. multi func # handle_event(/a|b/) {...} )...
-        elsif ($params[-1] =~ /^\s*$/ && $component->isa('PPI::Token::Regexp::Match')) {
-            $params[-1] .= 'Str $';
-            push @{$constraints[-1]}, "sub { \$_ =~ $component }";
+        elsif (defined $param{is_regex_constant}) {
+            $param{type} = 'Str';
+            $param{constraint} = "{ \$_ =~ $param{is_regex_constant} }";
         }
 
-        # Special case of nameless sigilled parameter followed by , (which PPI interprets as a punctvar)
-        elsif ($component =~ /^\s*[\$\@%],$/) {
-            $params[-1] .= '$';
-            push @params,      q{};
-            push @constraints, undef;
-            $first_param = 0;
-        }
+        push @params, \%param;
 
-        # End of parameter...
-        elsif ($component eq ',') {
-            push @params,      q{};
-            push @constraints, undef;
-            $first_param = 0;
-        }
-
-        # Return type...
-        elsif ($component eq '--' && @components && $components[0] eq '>' ) {
-            # Burnt the arrow and any trailing whitespace...
-            do { shift @components } while @components && !$components[0]->significant;
-
-            # Collect the type specification...
-            my $type = shift @components;
-            $type .= shift @components while @components && $components[0]->significant;
-            if (defined $return_type) {
-                _error("Can't specify a second return type in declaration of $kind $sub_name");
-            }
-            $return_type = $type;
-        }
-
-        # Anything else is more of the current parameter
-        else {
-            $params[-1] .= $component;
-        }
     }
-    pop @params if $params[-1] eq q{};
 
-    # Start by extracting invocant...
-    my $code = q{};
-    my $spec = q{};
-    if (defined $invocant && $invocant =~ $PARAMETER_SYNTAX) {
-        my %param = %+;
-        $code .= _generate_invocant( "$sub_desc", {%param} );
-        my $type  = $param{type} // 'Any';
-        my $where_count = @{$param{where}//[]};
-        $spec .= qq{{type => '$type', where => $where_count},};
+    # Extract trailing return type specification...
+    if ($params =~ s{ (?&WS) --> (?&WS) (.*+) (?(DEFINE) (?<WS> \s*+ (\# [^\n]*+ \n \s*+ )*+)) }{}xms ) {
+        ($return_type, $return_constraint) = split /\bwhere\b/, $1, 2;
     }
+
+    # Anything else in the parameter list is a mistake...
+    _error( qq{Invalid parameter specification: $params\n in $kind declaration} )
+        if $params =~ /\S/;
 
     # Convert the parameters into checking code...
+    my $code         = q{};
+    my $spec         = q{};
     my $nameless_pos = 0;
     my (%param_named, @positional, @named, $slurpy);
+
     for my $param (@params) {
-        _error( qq{Can't declare empty parameter in specification of $sub_desc})
-            if $param =~ /^\s*$/;
-
         $nameless_pos++;
-        if ($param =~ $PARAMETER_SYNTAX) {
-            my %param = %+;
-            $param{where} = shift(@constraints);
 
-            if (defined $param{where} && (!defined $param{type} || $param{type} !~ /\S/)) {
-                $param{type} = 'Any';
-            }
-
-            # Rectify nameless params...
-            if (exists $param{nameless}) {
-                $param{sigil} ||= '$';
-                my $nth = $nameless_pos
-                        . ( $nameless_pos =~ /(?<!1)1$/ ? 'st'
-                          : $nameless_pos =~ /(?<!1)2$/ ? 'nd'
-                          : $nameless_pos =~ /(?<!1)3$/ ? 'rd'
-                          :                               'th'
-                          );
-                $param{var}      = $param{sigil} . '__nameless_'.$nth.'_parameter__';
-                $param{namedvar} = $param{sigil} . ' (unnamed $nth parameter)';
-            }
-
-            # "There ken be onla one!" (...parameter of any given name)...
-            _error( qq{Can't declare two parameters named $param{var}\n in specification of $sub_desc})
-                if exists $param_named{ $param{var} };
-            $param_named{ $param{var} }++;
-
-            # Parameters are lexical, so can't be named @_ or $_ or %_...
-            _error(
-                qq{Can't declare a },
-                (exists $param{name} ? 'named' : exists $param{slurpy} ? 'slurpy' : 'positional'),
-                qq{ parameter named $param{var}\nin specification of $sub_desc},
-            ) if substr($param{var},1) eq '_' && $param{namedvar} ne '*@_';
-
-            # Save a scalar (named or positional) paramater...
-            if (!exists $param{slurpy}) {
-                if (exists $param{name}) { push @named,      \%param }
-                else                     { push @positional, \%param }
-            }
-
-            # Save the final slurpy array or hash...
-            else {
-                _error( qq{Can't specify more than one slurpy parameter },
-                        qq{($slurpy->{namedvar}, $param{namedvar})\n},
-                        qq{ in specification of $sub_desc}
-                ) if defined $slurpy;
-
-                if (exists $param{name}) {
-                    _error( qq{Can't specify non-array named slurpy parameter ($param{namedvar})\n},
-                            qq{ in specification of $sub_desc}
-                    ) if exists $param{name} && $param{sigil} ne '@';
-
-                    push @named, \%param;
-                }
-                else {
-                    $slurpy = \%param;
-                }
-            }
+        # Constraints imply an Any type...
+        if (defined $param->{constraint} && (!defined $param->{type} || $param->{type} !~ /\S/)) {
+            $param->{type} = 'Any';
         }
+
+        # Rectify nameless params...
+        if (exists $param->{nameless}) {
+            $param->{sigil} ||= '$';
+            my $nth = $nameless_pos
+                    . ( $nameless_pos =~ /(?<!1)1$/ ? 'st'
+                      : $nameless_pos =~ /(?<!1)2$/ ? 'nd'
+                      : $nameless_pos =~ /(?<!1)3$/ ? 'rd'
+                      :                               'th'
+                      );
+            $param->{var}      = $param->{sigil} . '__nameless_'.$nth.'_parameter__';
+            $param->{namedvar} = $param->{sigil} . ' (unnamed $nth parameter)';
+        }
+
+        # "There ken be onla one!" (...parameter of any given name)...
+        _error( qq{Can't declare two parameters named $param->{var}\n in specification of $sub_desc})
+            if exists $param_named{ $param->{var} };
+        $param_named{ $param->{var} }++;
+
+        # Parameters are lexical, so can't be named @_ or $_ or %_...
+        _error(
+            qq{Can't declare a },
+            (exists $param->{name} ? 'named' : exists $param->{slurpy} ? 'slurpy' : 'positional'),
+            qq{ parameter named $param->{var}\nin specification of $sub_desc},
+        ) if substr($param->{var},1) eq '_' && $param->{namedvar} ne '*@_';
+
+        # Handle implicit invocant specially...
+        if ($first_param && $kind eq 'method' && $param->{terminator} ne ':') {
+            $code .= _generate_invocant( "$sub_desc", {var=>$invocant_name, sigil=>'$'} );
+            $first_param = 0;
+        }
+
+        # Handle explicit invocant...
+        if ($first_param && $param->{terminator} && $param->{terminator} eq ':') {
+            _error( qq{Can't specify invocant ($param->{raw_param}:) for $sub_desc} ) if $kind ne 'method';
+            $code .= _generate_invocant( "$sub_desc", $param );
+            my $type  = $param->{type} // 'Any';
+            my $constraint = $param->{constraint} ? "where => sub $param->{constraint}" : q{};
+            $spec .= qq{{type => '$type', $constraint },};
+            $first_param = 0;
+        }
+
+        # Save a scalar (named or positional) paramater...
+        elsif (!exists $param->{slurpy}) {
+            if (exists $param->{name}) { push @named,      $param }
+            else                       { push @positional, $param }
+        }
+
+        # Save the final slurpy array or hash...
         else {
-            _error( qq{Invalid parameter specification: $param\n in $kind declaration} );
+            _error( qq{Can't specify more than one slurpy parameter },
+                    qq{($slurpy->{namedvar}, $param->{namedvar})\n},
+                    qq{ in specification of $sub_desc}
+            ) if defined $slurpy;
+
+            if (exists $param->{name}) {
+                _error( qq{Can't specify non-array named slurpy parameter ($param->{namedvar})\n},
+                        qq{ in specification of $sub_desc}
+                ) if exists $param->{name} && $param->{sigil} ne '@';
+
+                push @named, $param;
+            }
+            else {
+                $slurpy = $param;
+            }
         }
     }
 
@@ -293,11 +250,11 @@ sub _translate_parameters {
             if    ($param->{sigil} eq '@') { $type = "Array[$type]"; }
             elsif ($param->{sigil} eq '%') { $type = "Hash[$type]";  }
 
-            my $where_count = @{$param->{where}//[]};
+            my $constraint = $param->{constraint} ? "where => sub $param->{constraint}" : q{};
 
             my $is_optional = exists $param->{default_type} ? 1 : 0;
 
-            $spec .= qq{{optional => $is_optional, type => '$type', where => $where_count},};
+            $spec .= qq{{optional => $is_optional, type => '$type', $constraint},};
         }
     }
     if (@named) {
@@ -308,19 +265,19 @@ sub _translate_parameters {
             if    ($param->{sigil} eq '@') { $type = "Array[$type]"; }
             elsif ($param->{sigil} eq '%') { $type = "Hash[$type]";  }
 
-            my $where_count = @{$param->{where}//[]};
+            my $constraint = $param->{constraint} ? "where => sub $param->{constraint}" : q{};
 
             my $is_optional = exists $param->{default_type} ? 1 : 0;
 
-            $spec .= qq{{named => '$param->{name}', optional => $is_optional, type => '$type', where => $where_count},};
+            $spec .= qq{{named => '$param->{name}', optional => $is_optional, type => '$type', $constraint},};
         }
     }
 
     if (defined $slurpy) {
         if ($slurpy->{var} ne '@_') {
-            my $where_count = @{$slurpy->{where}//[]};
+            my $constraint = $slurpy->{constraint} ? "where => sub $slurpy->{constraint}" : q{};
             $code .= _generate_slurpies( "$sub_desc", $slurpy );
-            $spec .= qq{ {optional => 1, type=>'Slurpy', where=>$where_count} };
+            $spec .= qq{ {optional => 1, type=>'Slurpy', $constraint} };
         }
     }
     else {
@@ -358,7 +315,7 @@ sub _generate_invocant {
 
     # Install a type check, if necessary...
     if (exists $param->{type}) {
-        $code .= _typecheck_code(@{$param}{'sigil','var','type','where'}, $vardesc, $context);
+        $code .= _typecheck_code(@{$param}{'sigil','var','type','constraint'}, $vardesc, $context);
     }
 
     return $code;
@@ -371,7 +328,7 @@ sub _generate_positionals {
     for my $param (@positionals) {
         # Create and unpack corresponding argument...
         my $var = $param->{var};
-        my $vardesc = $var =~ /^(.)__nameless_(\d+\w+)_parameter__$/
+        my $vardesc = $var =~ /^(.)__nameless_(\d++[^\W_]++)_parameter__$/
                         ? "unnamed $2 positional parameter"
                         : "positional parameter $var";
         $code .= qq{my $var; };
@@ -393,7 +350,7 @@ sub _generate_positionals {
 
         # Install a type check, if necessary...
         next if !exists $param->{type};
-        $code .= _typecheck_code(@{$param}{'sigil','var','type','where'}, $vardesc, $context);
+        $code .= _typecheck_code(@{$param}{'sigil','var','type','constraint'}, $vardesc, $context);
     }
 
     return $code;
@@ -442,7 +399,7 @@ sub _generate_nameds {
 
         my $slurpy = exists $param->{slurpy} ? q{slurpy } : q{};
         $code .= _typecheck_code(
-                @{$param}{'sigil','var','type','where'}, "${slurpy}named parameter $param->{namedvar}", $context
+                @{$param}{'sigil','var','type','constraint'}, "${slurpy}named parameter $param->{namedvar}", $context
         );
     }
 
@@ -480,7 +437,7 @@ sub _generate_slurpies {
 
     # Install a type check, if necessary...
     if (exists $param->{type}) {
-        $code .= _typecheck_code(@{$param}{'sigil','var','type','where'}, $vardesc, $context, 'slurpy');
+        $code .= _typecheck_code(@{$param}{'sigil','var','type','constraint'}, $vardesc, $context, 'slurpy');
     }
 
     # Install existence check, if necessary...
@@ -586,30 +543,21 @@ sub _unpack_named_slurpy_code {
 }
 
 sub _typecheck_code {
-    my ($sigil, $var, $type, $where, $vardesc, $context, $is_slurpy) = @_;
+    my ($sigil, $var, $type, $constraint, $vardesc, $context, $is_slurpy) = @_;
+    $constraint = $constraint ? "sub $constraint" : q{};
 
     # Provide a human-readble description for any error message...
     $vardesc = qq{q{Value (%s) for $vardesc}};
 
-    # Unpack the type constraints...
-    my $constraints = join ',', map {;
-        (ref($_) eq 'PPI::Structure::Block' && m{^ \s* \{ (?: .* ; .* | (?:(?! => ). )* ) \} \s* $}xs
-            ? "sub{ do $_ or die qq{\Q$_\E} }"
-        : m{\A\s*\\&}xms
-            ? $_
-        :    "sub{ no if \$] >= 5.018, warnings => 'experimental::smartmatch'; \$_[0] ~~ $_ or die qq{\Q$_\E}; } "
-        )
-    } @{$where};
-
     if ($sigil eq '$') {
-        return qq[{package Dios::Types; validate(q{$type},         $var,$vardesc,$constraints)}];
+        return qq[{package Dios::Types; validate(q{$type},         $var,$vardesc,$constraint)}];
     }
     if ($sigil eq '@') {
-        return qq[{package Dios::Types; validate(q{List[$type]}, \\$var,$vardesc,$constraints)}] if $is_slurpy;
-        return qq[{package Dios::Types; validate(q{Array[$type]},\\$var,$vardesc,$constraints)}];
+        return qq[{package Dios::Types; validate(q{List[$type]}, \\$var,$vardesc,$constraint)}] if $is_slurpy;
+        return qq[{package Dios::Types; validate(q{Array[$type]},\\$var,$vardesc,$constraint)}];
     }
     if ($sigil eq '%') {
-        return qq[{package Dios::Types; validate(q{Hash[$type]}, \\$var,$vardesc,$constraints)}];
+        return qq[{package Dios::Types; validate(q{Hash[$type]}, \\$var,$vardesc,$constraint)}];
     }
     die 'Internal error: unable to generate type checking code';
 }
@@ -788,49 +736,25 @@ my %OIO_accessor_generate = (
   @OIO_accessor_generate{qw< std       uni      lval   >}
 = @OIO_accessor_generate{qw< standard  unified  lvalue >};
 
-my %CONFLICTING_OP = (
-     'q' =>  'q{}',
-    'qq' => 'qq{}',
-    'qx' => 'qx{}',
-    'qw' => 'qw{}',
-    'qr' => 'qr{}',
-     'm' =>  'm{}',
-     's' =>  's{}{}',
-    'tr' => 'tr{}{}',
-     'y' =>  'y{}{}',
-);
-
 # Convert a 'has' to an OIO variable declaration with attributes...
 sub _compose_field {
-    my ($declaration, $initializer) = @_;
-    $initializer =~ s{;$}{}xms;
+    my ($type, $var, $traits, $handles, $initializer, $constraint) = @_;
 
-    # Is it composable???
-    return $declaration if not $declaration =~ m{\A \s*+ $FIELD_DEFN }xms;
-    my %field = %+;
+    # Normalize constraint...
+    $constraint = $constraint ? 'sub ' . substr($constraint, 5) : q{};
+    if ($constraint && !defined $type) {
+        $type = 'Any';
+    }
+
+    # Read-only or readwrite???
+    my $rw       = $traits =~ /\brw\b/ ? 'rw' : 'ro';
+    my $required = $traits =~ /\brequired\b/;
 
     # Did the user specify a particular kind of accessor generation???
     my $accessor_type = $^H{'Dios accessor_type'};
 
     # Unpack the parsed components of the field declaration...
-    my $type   = $field{FIELD_TYPE};
-    my $sigil  = $field{FIELD_SIGIL};
-    my $twigil = $field{FIELD_TWIGIL} // q{};
-    my $rw     = $field{FIELD_RW} // 'ro';
-    my $name   = $field{FIELD_NAME};
-
-    # Route around the bug in Keyword::Declare (or possibly in Keyword::Simple)...
-    if (my $op = $CONFLICTING_OP{$name}) {
-        _error "Attribute name ($sigil$twigil$name) conflicts with ",
-               "built-in quote-like operator '$op'\n",
-               "Please use another name for the attribute declared";
-    }
-
-    # Reformat any nameless attributes...
-    my $attrs  = join  q{ },
-                 map   { /\S/ ? ":$_('$name')" : () }
-                 split /\s*:\s*|\s+/,
-                       ($field{FIELD_ATTRS} // q{});
+    my ($sigil, $twigil, $name) = $var =~ m{\A ([\$\@%]) ([.!]?+) (\S*+) }xms;
 
     # Adapt type to sigil...
     my $container_type = ($sigil eq '@') ? "Array[".($type//'Any')."]"
@@ -840,23 +764,35 @@ sub _compose_field {
     # Is it type-checked???
     my $TYPE_SETUP = q{};
     if ($type) {
-        $TYPE_SETUP = qq[ :Type( sub { Dios::Types::validate(q{$container_type}, shift, 'Value (%s) for $sigil$name attribute' ) } ) ];
+        $TYPE_SETUP = qq[ :Type( sub { Dios::Types::validate(q{$container_type}, shift, 'Value (%s) for $sigil$name attribute', $constraint ) } ) ];
     }
 
     # Define accessors...
     my $access = $twigil ne '.' ? q{} : $OIO_accessor_keyword{$accessor_type}{$rw}."(Name=>q{$name}) $TYPE_SETUP";
 
+    # Is it a delegated handler???
+    my $delegators = '';
+    for my $delegation (split /(?&WS) handles (?&WS) (?(DEFINE) (?<WS> \s*+ (?: \# [^\n]*+ \n \s*+ )*+ ))/x, $handles) {
+        next unless $delegation;
+        if ($delegation =~ m{^:(.*)<(.*)>$}xms) {
+            $delegators .= " :Handles($1-->$2)";
+        }
+        else {
+            $delegators .= " :Handles($delegation)";
+        }
+    }
+
     # Is it initialized???
-    my $init = qq{:Arg(Name=>q{$name} } . ($field{FIELD_MANDATORY} ? q{, Mandatory=>1)} : q{)} );
+    my $init = qq{:Arg(Name=>q{$name} } . ($required ? q{, Mandatory=>1)} : q{)} );
     my $INIT_FUNC = q{};
 
     # Ensure array and hash attrs are initialized...
-    if ($sigil =~ /[\@%]/ && (!$initializer || $initializer =~ m{\A \s* \Z}xms)) {
+    if ($sigil =~ /[\@%]/ && (!$initializer || $initializer =~ m{\A \s*+ \z}xms)) {
         $initializer = '//=()';
     }
 
     # Install the initialization code...
-    if ($initializer =~ m{\A \s*+ (?<DEFAULT_INIT> // \s*+ )? = (?<INIT_VAL> .* ) }xms) {
+    if ($initializer =~ m{\A \s*+ (?<DEFAULT_INIT> // \s*+ )? = (?<INIT_VAL> .*+ ) }xms) {
         my %init_field = %+;
         my $init_val = $init_field{INIT_VAL};
 
@@ -883,17 +819,19 @@ sub _compose_field {
     }
     # Add type-checking code to alias...
     if ($type) {
-        $^H{'Dios attrs'} .= qq{ Dios::Types::_set_var_type(q{$type}, \\$sigil$name, 'Value (%s) for $sigil$name attribute' ); };
+        $^H{'Dios attrs'} .= qq{ Dios::Types::_set_var_type(q{$type}, \\$sigil$name, 'Value (%s) for $sigil$name attribute', $constraint ); };
     }
 
     # Return the converted syntax...
-    return qq{my \@_Dios__attr_$name : Field $access $init $attrs $TYPE_SETUP $field{OTHER_ATTRS}; $INIT_FUNC; };
+    return qq{my \@_Dios__attr_$name : Field $access $delegators $init $TYPE_SETUP; $INIT_FUNC; };
 }
 
 # Convert a typed lexical variable...
 sub _compose_lexical {
-    my ($type, $variable, $attrs, $constraint) = @_;
-    $constraint //= q{};
+    my ($type, $variable, $constraint) = @_;
+
+    # Normalize constraint...
+    $constraint = $constraint ? 'sub ' . substr($constraint, 5) : q{};
     if ($constraint && !defined $type) {
         $type = 'Any';
     }
@@ -911,28 +849,21 @@ sub _compose_lexical {
 
 # Convert a 'shared' to a class attribute...
 sub _compose_shared {
-    my ($declaration, $initializer) = @_;
+    my ($type, $var, $traits, $initializer, $constraint) = @_;
 
-    # Is it composable???
-    return $declaration if not $declaration =~ m{\A \s*+ $SHARED_DEFN }xms;
-    my %shared = %+;
+    # Normalize constraint...
+    $constraint = $constraint ? 'sub ' . substr($constraint, 5) : q{};
+    if ($constraint && !defined $type) {
+        $type = 'Any';
+    }
 
     # Did the user specify a particular kind of accessor generation???
     my $accessor_type = $^H{'Dios accessor_type'};
 
     # Unpack the parsed components of the shared declaration...
-    my $type   = $shared{SHARED_TYPE};
-    my $sigil  = $shared{SHARED_SIGIL};
-    my $twigil = $shared{SHARED_TWIGIL};
-    my $rw     = $shared{SHARED_RW} // 'ro';
+    my ($sigil, $twigil, $name) = $var =~ m{\A ([\$\@%]) ([.!]?+) (\S*+) }xms;
+    my $rw     = $traits =~ /\brw\b/ ? 'rw' : 'ro';
 
-    # Route around the bug in Keyword::Declare (or possibly in Keyword::Simple)...
-    my $name   = $shared{SHARED_NAME};
-    if (my $op = $CONFLICTING_OP{$name}) {
-        _error "Attribute name ($sigil$twigil$name) conflicts with ",
-               "built-in quote-like operator '$op'\n",
-               "Please use another name for the attribute declared";
-    }
     # Generate accessor subs...
     my $accessors = $twigil ne '.' ? q{}
                   : $OIO_accessor_generate{$accessor_type}{$rw}->($name, $sigil);
@@ -948,7 +879,7 @@ sub _compose_shared {
     # Is it type-checked???
     my $TYPE_SETUP = q{};
     if ($type) {
-        $TYPE_SETUP  = qq[ Dios::Types::_set_var_type(q{$type}, \\$sigil$name, 'Value (%s) for shared $sigil$name attribute', '$sigil' ); ];
+        $TYPE_SETUP  = qq[ Dios::Types::_set_var_type(q{$type}, \\$sigil$name, 'Value (%s) for shared $sigil$name attribute', '$sigil', $constraint ); ];
     }
 
     # Return the converted syntax...
@@ -965,6 +896,7 @@ sub _multi_dispatch {
     my @arg_list = @_;
 
     # Find all possible variants for this call...
+    our %multis;
     my @variants = @{ $Dios::multis{$subname} //= [] };
 
     # But only those in the right hierarchy, if it's a method call
@@ -1015,7 +947,7 @@ sub _multi_dispatch {
     # Otherwise, return the most specific/earliest...
     return $variants[0];
 
-#====[ NOTE: I still prefer an ambiguoity warning, but Perl 6 no longer does that :-( ]=====
+#====[ NOTE: I still prefer an ambiguity warning, but Perl 6 no longer does that :-( ]=====
 #
 #    # Otherwise, the call is ambiguous, so report that...
 #    return {
@@ -1027,6 +959,73 @@ sub _multi_dispatch {
 #    };
 }
 
+keytype ParamList is m{
+    \(
+        (?:
+            (?&Parameter)
+            (?:
+                (?: (?&PerlOWS) [:,]
+                    (?: (?&Parameter) (?&PerlOWS) , )*+
+                        (?&Parameter)?+
+                )?+
+            )?+
+        )?+
+        (?: (?&PerlOWS) --> [^)]*+ )?+
+        (?&PerlOWS)
+    \)
+
+    (?(DEFINE)
+        (?<Parameter>
+            (?&PerlOWS)
+            (?:
+                # Nameless literal constraint
+                (?&PerlNumber) | (?&PerlQuotelikeQ) | (?&PerlMatch)
+            |
+                (?! , | --> | \) )  # Every component is optional, but there must be at least one
+
+                # TYPE...
+                (?: (?&TYPE_SPEC) (?&PerlOWS) )?+
+
+                # NAME...
+                (?>
+                    : (?&IDENT) \( (?&PerlOWS) [\$\@%] (?&IDENT) (?&PerlOWS) \)
+                |
+                    :                          [\$\@%] (?&IDENT)
+                |
+                    \*
+                    (?:
+                        [\@%] (?&IDENT)?+
+                    |
+                        : (?&IDENT) \( (?&PerlOWS) \@ (?&IDENT) (?&PerlOWS) \)
+                    |
+                        :                          \@ (?&IDENT)
+                    )
+                |
+                    [\$\@%] (?&IDENT)?+
+                )?+
+
+                # OPTIONAL OR REQUIRED...
+                [?!]?+
+
+                # CONSTRAINT...
+                (?: (?&PerlOWS) where (?&PerlOWS) (?&PerlBlock) )?+
+
+                # READONLY OR ALIAS...
+                (?: (?&PerlOWS) is (?&PerlOWS) (?: ro | alias ) )?+
+
+                # DEFAULT VALUE...
+                (?: (?&PerlOWS) (?://|\|\|)? = (?&PerlOWS) (?&PerlConditionalExpression) )?+
+            )
+        )
+
+        (?<TYPE_SPEC>  (?&TYPE_NAME) (?: [&|] (?&TYPE_NAME) )*+ )
+        (?<TYPE_NAME>  (?&QUAL_IDENT)  (?&TYPE_PARAM)?+         )
+        (?<TYPE_PARAM> \[ (?: [^][]*+ | (?&TYPE_PARAM) )*+ \]   )
+        (?<QUAL_IDENT> (?&IDENT) (?: :: (?&IDENT) )*+           )
+        (?<IDENT>      [^\W\d] \w*+                             )
+    )
+}xms;
+
 sub import {
     my (undef, $opt) = @_;
 
@@ -1036,7 +1035,7 @@ sub import {
 
     # How should the invocants be named in this scope???
     my $invocant_name = $opt->{invocant} // $opt->{inv} // q{$self};
-    if ($invocant_name =~ m{\A (\$?) ([^\W\d]\w*+) \Z}xms) {
+    if ($invocant_name =~ m{\A (\$?+) ([^\W\d]\w*+) \Z}xms) {
         $^H{'Dios invocant_name'} = ($1||'$').$2;
     }
     else {
@@ -1044,58 +1043,44 @@ sub import {
     }
 
     # Class definitions are translated to encapsulated packages using OIO...
+    keytype Bases is /is (?&PerlNWS) (?&PerlQualifiedIdentifier)/x;
     keyword class (
-        Whitespace      $ws1 = "",
-        QualIdent       $class_name,
-        Whitespace      $ws2 = "",
-        /is \s* (\w*)/x @bases?,
-        Whitespace      $ws3 = "",
-        Block           $block
-    ) {{{ { package <{$ws1.$class_name}>; use Object::InsideOut <{ $ws2 . (@bases ? qq{qw{@bases}} : q{}) }>; <{ $ws3 . substr($block,1,-1) }> } }}}
-
-    # How to recognize a set of sub attributes...
-    keytype Attrs { /(?x: \s* : \s* (?: [^\W\d]\w* (?: \( .*? \) )? \s* )* )+/ }
+        QualIdent   $class_name,
+        Bases*      @bases,
+        Block       $block
+    )
+    {{{ { package <{$class_name}>; use Object::InsideOut <{ s{^ is (?&WS) (?(DEFINE) (?<WS> \s*+ (?: \# .*+ \n \s*+ )*+ ))}{}x for @bases; (@bases ? qq{qw{@bases}} : q{}) }>; do <{ $block }> } }}}
 
     # Function definitions are translated to subroutines with extra argument-unpacking code...
     keyword func (
-        Whitespace $ws1 = "",
-        QualIdent  $sub_name = q{},
-        Whitespace $ws2 = "",
-        List       $parameter_list?,
-        Whitespace $ws3 = "",
-        Attrs      $attrs = q{},
-        Whitespace $ws4 = "",
-        Block      $block
-    ) {
+        QualIdent   $sub_name       = '',
+        ParamList   $parameter_list = '',
+        Attributes  $attrs          = '',
+        Block       $block
+    )
+    {
         # Generate code that unpacks and tests arguments...
         $parameter_list = _translate_parameters($parameter_list, func => "$sub_name");
 
-        # Peel the curlies from the block (because we're interpolating its code)...
-
         # Assemble and return the sub definition...
         if (my $return_type = $parameter_list->{return_type}) {
-            qq{sub $ws1 $sub_name $ws2 $attrs { $ws3 $parameter_list->{code} $ws4 Dios::Types::_validate_return_type [q{$sub_name}, $return_type], \@_, sub $block } };
+            qq{sub $sub_name $attrs { $parameter_list->{code} Dios::Types::_validate_return_type [q{$sub_name}, $return_type], \@_, sub $block } };
         }
         else {
-            $block = substr($block,1,-1);
             ($sub_name ? "sub $sub_name;" : q{} )
-            . qq{sub $ws1 $sub_name $ws2 $attrs { $ws3 $parameter_list->{code} $ws4 $block } };
+            . qq{sub $sub_name $attrs { $parameter_list->{code} do $block } };
         }
     }
 
     # Multi definitions are translated to subroutines with extra argument-unpacking code...
     keyword multi (
-        Whitespace     $ws1 = "",
-        /method|func|/ $type,
-        Whitespace     $ws2 = "",
-        QualIdent      $sub_name = q{},
-        Whitespace     $ws3 = "",
-        List           $parameter_list?,
-        Whitespace     $ws4 = "",
-        Attrs          $attrs = q{},
-        Whitespace     $ws5 = "",
+        /method|func/  $type           = 'func',
+        QualIdent      $sub_name       = '',
+        ParamList      $parameter_list = '',
+        Attributes     $attrs          = '',
         Block          $block
-    ) {
+    )
+    {
         # Generate code that unpacks and tests arguments...
         $parameter_list = _translate_parameters($parameter_list, $type => "$sub_name");
         my $parameter_types = $parameter_list->{spec};
@@ -1107,11 +1092,11 @@ sub import {
 
         # Assemble and return the sub definition...
         if (my $return_type = $parameter_list->{return_type}) {
-            $code .= qq{sub $multiname; sub $ws1 $ws2 $multiname $ws4 $attrs { local *$multiname = '$sub_name'; $ws3 $parameter_list->{code}; $ws5 return { args => \\\@_, impl => sub { local *__ANON__ = '$sub_name'; Dios::Types::_validate_return_type [q{$sub_name}, $return_type], \@_, sub $block } } } };
+            $code .= qq{sub $multiname; sub $multiname $attrs { local *$multiname = '$sub_name'; $parameter_list->{code}; return { args => \\\@_, impl => sub { local *__ANON__ = '$sub_name'; Dios::Types::_validate_return_type [q{$sub_name}, $return_type], \@_, sub $block } } } };
         }
         else {
             $block = substr($block,1,-1);
-            $code .= qq{sub $multiname; sub $ws1 $ws2 $multiname $ws4 $attrs { local *$multiname = '$sub_name'; $ws3 $parameter_list->{code}; $ws5 return { args => \\\@_, impl => sub { local *__ANON__ = '$sub_name'; $block } } } };
+            $code .= qq{sub $multiname; sub $multiname $attrs { local *$multiname = '$sub_name'; $parameter_list->{code}; return { args => \\\@_, impl => sub { local *__ANON__ = '$sub_name'; $block } } } };
         }
         $code .= qq{BEGIN{ push \@{ \$Dios::multis{q{$sub_name}} }, { sig => [$parameter_types], class => __PACKAGE__, validator => \\&$multiname }; }};
 
@@ -1120,15 +1105,12 @@ sub import {
 
     # Method definitions are translated to subroutines with extra invocant-and-argument-unpacking code...
     keyword method (
-        Whitespace $ws1 = "",
-        QualIdent  $sub_name = q{},
-        Whitespace $ws2 = "",
-        List       $parameter_list?,
-        Whitespace $ws3 = "",
-        Attrs      $attrs = q{},
-        Whitespace $ws4 = "",
-        Block      $block
-    ) {
+        QualIdent   $sub_name       = '',
+        ParamList   $parameter_list = '',
+        Attributes  $attrs          = '',
+        Block       $block
+    )
+    {
         # Which kind of aliasing do we need (to create local vars bound to the object's fields)???
         my $use_aliasing = $] < 5.022 ? q{use Data::Alias} : q{use experimental 'refaliasing'};
         my $attr_binding = $^H{'Dios attrs'} ? "$use_aliasing; $^H{'Dios attrs'}" : q{};
@@ -1136,25 +1118,19 @@ sub import {
         # Generate code that unpacks and tests arguments...
         $parameter_list = _translate_parameters($parameter_list, method => "$sub_name");
 
-        # Peel the curlies from the block (because we're interpolating its code)...
-        $block = substr($block,1,-1);
-
         # Assemble and return the method definition...
         ($sub_name ? "sub $sub_name;" : q{} )
-        . qq{sub $ws1 $sub_name $ws3 $attrs { $attr_binding $ws2 $parameter_list->{code}; $ws4 $block } };
+        . qq{sub $sub_name $attrs { $attr_binding $parameter_list->{code}; do $block } };
     }
 
     # Submethod definitions are translated like methods, but with special re-routing...
     keyword submethod (
-        Whitespace $ws1 = "",
-        QualIdent  $sub_name = q{},
-        Whitespace $ws2 = "",
-        List       $parameter_list?,
-        Whitespace $ws3 = "",
-        Attrs      $attrs = q{},
-        Whitespace $ws4 = "",
+        QualIdent  $sub_name       = '',
+        ParamList  $parameter_list = '',
+        Attributes $attrs          = '',
         Block      $block
-    ) {
+    )
+    {
         # Which kind of aliasing do we need (to create local vars bound to the object's fields)???
         my $use_aliasing = $] < 5.022 ? q{use Data::Alias} : q{use experimental 'refaliasing'};
         my $attr_binding = $^H{'Dios attrs'} ? "$use_aliasing; $^H{'Dios attrs'}" : q{};
@@ -1163,7 +1139,7 @@ sub import {
         my $init_args = q{};
         if ($sub_name eq 'BUILD') {
             # Extract named args for :InitArgs hash (TODO: this should pull out type/required info too)...
-            my @param_names = $parameter_list =~ m{ : [\$\@%]? (\w++) }gxms;
+            my @param_names = $parameter_list =~ m{ : [\$\@%]?+ (\w++) }gxms;
 
             # Tell OIO about this constructor args...
             $init_args = qq{ BEGIN{ my %$sub_name :InitArgs = map { \$_ => '' } qw{@param_names}; } };
@@ -1192,41 +1168,70 @@ sub import {
         # Generate the code to unpack and test arguments...
         $parameter_list = _translate_parameters($parameter_list, method => "$sub_name");
 
-        # Peel the curlies from the block (because we're interpolating its code)...
-        $block = substr($block,1,-1);
-
         # Assemble and return the method definition...
         ($sub_name ? "sub $sub_name;" : q{} )
-        . qq{$init_args sub $ws1 $sub_name $ws3 $attrs { $attr_binding $ws2 $parameter_list->{code}; $ws4 $block } };
+        . qq{$init_args sub $sub_name $attrs { $attr_binding $parameter_list->{code}; do $block } };
     }
 
-    # What does an attribute variable look like???
-    keytype HasVar { / .*? (?= [:;=] | \/\/= ) /x }
+    # Components of variable declaration...
+    keytype TypeSpec   is m{ (?&TypeSpec)
+                             (?(DEFINE)
+                                 (?<TypeSpec>
+                                     (?&TypeName) (?: [&|] (?&TypeName) )*+
+                                 )
+                                 (?<TypeName>
+                                     (?&PerlIdentifier) \[ (?&TypeSpec) \]
+                                 |
+                                     (?&PerlQualifiedIdentifier)
+                                 )
+                             )
+                          }x;
+    keytype Var        is / [\$\@%] [.!]?+ (?&PerlIdentifier) /x;
+    keytype Traits     is / (?: (?&PerlOWS) is (?&PerlOWS) (?: ro | rw | req | required ) )++ /x;
+    keytype Handles    is / (?: (?&PerlOWS) handles (?&PerlOWS)
+                                (?: (?&PerlIdentifier) | :(?&PerlIdentifier)<(?&PerlIdentifier)> )
+                            )++ /x;
+    keytype Init       is m{ (?: // )?+ = (?&PerlOWS) (?&PerlExpression) }x;
+    keytype Constraint is m{ where (?&PerlOWS) (?&PerlBlock) }x;
 
     # An attribute definition is translated into an array with a :Field attribute...
-    keyword has (HasVar $variable, Attrs $attrs = q{}, ...';' $init) {
-        _compose_field("$variable $attrs", $init)
+    keyword has (
+        TypeSpec    $type       = '',
+        Var         $variable,
+        Constraint  $constraint = '',
+        Traits      $traits     = '',
+        Handles     $handles    = '',
+        Init        $init       = '',
+    ) {
+        _compose_field($type, $variable, $traits, $handles, $init, $constraint)
     }
 
-    # What does a shared attribute variable look like???
-    keytype SharedVar { / .*? (?: is | (?= [;=] | \/\/= ) ) /x }
+    keytype ReadTraits   is / (?&PerlOWS) is (?&PerlOWS) (?: ro | rw ) /x;
 
     # An attribute definition is translated into an my var with extra code for accessors...
-    keyword shared (SharedVar $variable, /r[wo]/ $access = q{}, ...';' $init) {
-        _compose_shared("$variable $access", $init)
+    keyword shared (
+        TypeSpec    $type       = '',
+        Var         $variable,
+        Constraint  $constraint = '',
+        ReadTraits  $traits     = '',
+        Init        $init       = '',
+    ) {
+        _compose_shared($type, $variable, $traits, $init, $constraint)
     }
 
     # An lexical variable definition is translated into a typed lexical...
-    keyword lex (QualIdent $type?, Var $variable, Attrs $attrs = q{}) {
-        _compose_lexical($type, $variable, $attrs)
+    keyword lex (TypeSpec? $type, Var $variable, Constraint? $constraint) {
+        _compose_lexical($type, $variable, $constraint)
     }
 
-    keyword lex (QualIdent $type?, Var $variable, 'where', Block $constraint, Attrs $attrs = q{}) {
-        _compose_lexical($type, $variable, $attrs, "sub $constraint")
-    }
 
     # Subtypes are handled by Dios::Types...
-    keyword subtype from Dios::Types;
+    keyword subtype {{{ use Dios::Types; subtype }}}
+
+    # Tail recursion is handled as in Perl 6...
+    keyword callwith () {{{ goto &{+do{no strict 'refs'; \&{(caller 0)[3]} }} for 1, @_ = grep 1, }}}
+    keyword callsame () {{{ goto &{+do{no strict 'refs'; \&{(caller 0)[3]} }}                     }}}
+
 }
 
 1; # Magic true value required at end of module
@@ -1240,7 +1245,7 @@ Dios - Declarative Inside-Out Syntax
 
 =head1 VERSION
 
-This document describes Dios version 0.001001
+This document describes Dios version 0.002000
 
 
 =head1 SYNOPSIS
@@ -1285,26 +1290,20 @@ This document describes Dios version 0.001001
 =head1 DESCRIPTION
 
 This module provides a set of compile-time keywords that simplify the
-declaration of encapsulated classes using the "inside out" technique,
-as well as subroutines with full parameter specifications.
+declaration of encapsulated classes using fieldhashes and the "inside
+out" technique, as well as subroutines with full parameter
+specifications.
 
 The encapsulation, constructor/initialization, destructor, and accessor
-generation behaviours are all transparently delegated to the
-Object::Insideout framework. Type checking is provided by the
-Dios::Types module. Parameter list features are similar to those
-provided by Method::Signature or Kavorka, but are implemented by the
-module itself.
+generation behaviours are all autogenerated. Type checking is provided
+by the Dios::Types module. Parameter list features are similar to those
+provided by Method::Signature or Kavorka.
 
 As far as possible, the declaration syntax (and semantics) provided by
 Dios aim to mimic that of Perl 6, except where intrinsic differences
 between Perl 5 and Perl 6 make that impractical, in which cases the
 module attempts to provide a replacement syntax (or semantics) that is
 likely to be unsurprising to experienced Perl 5 programmers.
-
-B<Note:> This module relies on the Keyword::Declare module, which is still
-in alpha, and which still has compile-time performance issues. Expect slow
-compiles, but then fast execution. The slow compiles will disappear as
-Keyword::Declare improves.
 
 
 =head1 INTERFACE
@@ -1361,32 +1360,18 @@ with the C<has> keyword:
 
 The full syntax for an attribute declaration is:
 
-    has  <TYPE> [$@%]  [!.]  <NAME>  [is [rw|ro]]  [is req]  :<OPT>  [//=|=] <EXPR>
-         ...... .....  ....  ......   ..........   ........  ......   ... .  ......
-            :     :     :      :          :           :        :      :  :     :
-    Type....:     :     :      :          :           :        :      :  :     :
-    Sigil.........:     :      :          :           :        :      :  :     :
-    Public/private......:      :          :           :        :      :  :     :
-    Attribute name.............:          :           :        :      :  :     :
-    Readonly/read-write...................:           :        :      :  :     :
-    Required initialization...........................:        :      :  :     :
-    Object::Insideout options..................................:      :  :     :
-    Default initialized...............................................:  :     :
-    Always initialized...................................................:     :
-    Initialization value.......................................................:
-
-The various components of an attribute definition must be specified in this order.
-For example, this is acceptable:
-
-    has Ref $.parent  is ro  is req  :Weak  //= get_common_ancestor();
-
-...but this is not:
-
-    has Ref $.parent  :Weak  is ro  //= get_common_ancestor()  is req;
-
-In particular, any explicit "colon" modifiers like C<:Weak> must appear
-after any C<is> modifiers, and any initializer expression must be at the
-end of the entire declaration.
+        has  <TYPE> [$@%]  [!.]  <NAME>  [is [rw|ro|req]]  [handles <NAME>]  [//=|=] <EXPR>
+             ...... .....  ....  ......   ..............    ..............    ... .  ......
+                :     :     :      :            :                 :            :  :     :
+    Type [opt]..:     :     :      :            :                 :            :  :     :
+    Sigil.............:     :      :            :                 :            :  :     :
+    Public/private..........:      :            :                 :            :  :     :
+    Attribute name.................:            :                 :            :  :     :
+    Readonly/read-write/required traits [opt]...:                 :            :  :     :
+    Delegation handlers [opt].....................................:            :  :     :
+    Default initialized [opt]..................................................:  :     :
+    Always initialized [opt]......................................................:     :
+    Initialization value [opt]..........................................................:
 
 
 =head4 Typed attributes
@@ -1443,6 +1428,42 @@ You can also indicate explicitly that you only want a getter:
     has $.name is ro;    # Autogenerates only getter method
 
 
+=head4 Delegation attributes
+
+You can specify that an attribute is a handler for specific methods,
+using the C<handles> trait, which must come after any C<is> traits.
+
+To specify that an attribute handles a single method:
+
+    has $.timestamp is ro handles date;
+
+Now, any call to C<< ->date >> on the surrounding object will be
+converted to a call to C<< $timestamp->date >>
+
+To specify that an attribute handles a single method, but dispatches
+it under a different name:
+
+    has $.timestamp is ro handles :get_date<date>;
+
+Now, any call to C<< ->get_date >> on the surrounding object will be
+converted to a call to C<< $timestamp->date >>
+
+To specify that an attribute will handle any method of a single class:
+
+    has $.timestamp is ro handles Date::Stamp;
+
+Now, any call on the surrounding object to any method provided
+by the class C<Date::Stamp> will be converted to a call to the same
+method on C<$timestamp>. For example, if C<Date::Stamp> provides
+methods C<date>, C<time>, and C<raw>, then any call to any of those
+methods on the surrounding object will be passed directly to the
+obkect in C<$timestamp>.
+
+An attribute may specify as many C<handles> traits as it needs.
+
+
+
+
 =head4 Get/set vs unified vs lvalue accessors
 
 The accessor generator can build different styles of accessors (just as
@@ -1480,8 +1501,7 @@ write:
 =head4 Required attributes
 
 Attributes are initialized using the value of the corresponding named
-argument passed to their object's constructor (just as in
-Object::Insideout).
+argument passed to their object's constructor.
 
 Normally, this initialization is optional: there is no necessity to
 provide a named initializer argument for an attribute, and no warning or
@@ -1496,20 +1516,6 @@ attribute name:
 
 If an initializer value isn't provided for a named argument, the class's
 constructor will throw an exception.
-
-
-=head4 Customizing attributes with Object::InsideOut modifiers
-
-Because Dios uses Object::InsideOut to implement its class behaviours,
-you can also specify any valid Object::InsideOut modifier as part of an
-attribute definition. For example:
-
-    has Int   $.ID          :SequenceFrom(1);
-    has Vtor  $.validator   :Handles(validate);
-    has Ref   $.parent      :Weak;
-
-These must be specified after any C<is> modifier> and before any
-explicit initializer.
 
 
 =head4 Initializing attributes
@@ -1582,7 +1588,7 @@ arrays, or hashes. For example:
 
 =head2 Declaring typed lexicals
 
-Dios also allows regular lexical (C<my>) variables, not associated with
+Dios also supports typed lexical variables, not associated with
 any class or object, using the keyword C<lex>.
 
 Unlike variables declared with a <my>, variables declared with C<lex>
@@ -2055,6 +2061,9 @@ could be specified as just:
     multi handle_cmd (  /^(quit|exit)$/i,  $data) {...}
     multi handle_cmd ( m{ optimi[zs]e }ix, $data) {...}
 
+At present literal parameters can only be numbers, single-quoted
+strings, or regexes without variable interpolations.
+
 
 =head4 Optional and required parameters
 
@@ -2384,6 +2393,59 @@ type. For example:
                   : sprintf('%02d:%02d:%02d', $hour, $min, $sec)
     }
 
+=head2 Tail-recursion elimination
+
+Dios provides two keywords that implement pure functional versions of
+the built-in "magic C<goto>". They can be used to recursively call the
+current subroutine without causing the stack to grow.
+
+The C<callwith> keyword takes a list of arguments and calls the
+immediately surrounding subroutine again, passing it the specified
+arguments. However, this new call does not add another call-frame to the
+stack; instead the new call I<replaces> the current subroutine call on the
+stack. So, for example:
+
+    func recursively_process_list($head, *@tail) {
+        process($head);
+
+        if (@tail) {
+            callwith @tail;   # Same as: @_ = @tail; goto &recursively_process_list;
+        }
+    }
+
+The C<callsame> keyword takes no arguments, and instead calls the
+immediately surrounding subroutine again, passing it the current value
+of @_. As with C<callwith>, the call to C<callsame> does not extend
+the stack; instead, it once again replaces the current stack-frame.
+For example:
+
+    sub recursively_process_list {
+        process(shift @_);
+
+        if (@_) {
+            callsame;         # Same as: goto &recursively_process_list;
+        }
+    }
+
+Note that there is currently a syntactic restriction on C<callwith> (but
+not on C<callsame>). Specifically, C<callwith> cannot be invoked with a
+postfix qualifier. That is, none of these are allowed:
+
+    callwith @args      if @args;
+    callwith @args      unless $done;
+    callwith get_next() while active();
+    callwith get_next() until finished();
+    callwith $_         for readline();
+
+When you need to invoke C<callwidth> conditionally, use the block forms
+of the various control structures:
+
+    if (@args)         { callwith @args      }
+    unless ($done)     { callwith @args      }
+    while (active())   { callwith get_next() }
+    until (finished()) { callwith get_next() }
+    for (readline())   { callwith $_;        }
+
 
 =head2 Declaring multifuncs and multimethods
 
@@ -2424,9 +2486,9 @@ Multifuncs and multimethods are a useful alternative to internal C<if>/C<elsif>
 cascades. For example, instead of:
 
     func show (Num|Str|Array $x) {
-        ref($x) eq 'ARRAY' ?     '['.join(',', map {dump $_} @$a).']'
-      : looks_like_number($x) ?    $x
-      :                          "'$x'"
+        ref($x) eq 'ARRAY'     ?  '['.join(',', map {dump $_} @$a).']'
+      : looks_like_number($x)  ?    $x
+      :                           "'$x'"
     }
 
 you could write:
@@ -2543,11 +2605,6 @@ automatically. For example:
                                     # garbage collector can't reach.
         }
     }
-
-
-=head2 Declaring multimethods and multisubs
-
-MORE HERE
 
 
 =head2 Anonymous subroutines and methods
@@ -2791,7 +2848,7 @@ Dios requires no configuration files or environment variables.
 
 Requires Perl 5.14 or later.
 
-Requires the Keyword::Declare, Object::InsideOut, Sub::Uplevel,
+Requires the Keyword::Declare, Sub::Uplevel,
 Dios::Types, and Data::Dump modules.
 
 If the 'is ro' qualifier is used, also requires the Const::Fast module.
@@ -2807,23 +2864,9 @@ None reported.
 
 =head1 BUGS AND LIMITATIONS
 
-This module relies on Keyword::Declare to create its new keywords. That
-module currently imposes a non-trivial start-up delay on any module that
-uses it...including Dios.
-
-Due to limitations in the pluggable keyword mechanism, installing a
-C<method> keyword currently breaks the C<:method> attribute.
-
 Shared array or hash attributes that are public cannot be accessed
 correctly if the chosen accessor style is C<'lvalue'>, because lvalue
 subroutines in Perl can only return scalars.
-
-Due to a deep and as-yet unidentifiable problem somewhere in the
-pluggable keyword mechanism, or possibly just in one of the APIs to it,
-attributes cannot be given a name that is the same as any Perl
-quotelike operator (e.g. $.y, @.s, %.q, etc.) A compile-time warning
-is now issued whenever this is attempted. Investigations continue.
-
 
 No other bugs have been reported.
 

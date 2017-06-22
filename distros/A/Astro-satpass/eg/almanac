@@ -17,7 +17,7 @@ use Pod::Usage;
 use POSIX qw{strftime};
 use Time::Local;
 
-our $VERSION = '0.081';
+our $VERSION = '0.082';
 
 Getopt::Long::Configure( 'pass_through' );	# Numbers may be negative.
 

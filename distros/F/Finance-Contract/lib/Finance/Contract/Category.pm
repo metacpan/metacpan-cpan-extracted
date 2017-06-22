@@ -1,12 +1,12 @@
 package Finance::Contract::Category;
-$Finance::Contract::Category::VERSION = '0.009';
+$Finance::Contract::Category::VERSION = '0.010';
 =head1 NAME
 
 Finance::Contract::Category
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSYS
 
@@ -37,6 +37,16 @@ Returns a list of all loaded contract types
 
 sub get_all_contract_types {
     return $contract_type_config;
+}
+
+=head2 get_all_barrier_categories
+
+Returns a list of all available barrier categories
+
+=cut
+
+sub get_all_barrier_categories {
+    return qw(euro_atm euro_non_atm american non_financial asian);
 }
 
 =head2 get_all_contract_categories

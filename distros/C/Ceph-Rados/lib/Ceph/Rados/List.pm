@@ -7,8 +7,6 @@ use Carp;
 
 our @ISA = qw();
 
-our $VERSION = '0.01';
-
 # Preloaded methods go here.
 
 sub new {
@@ -31,44 +29,20 @@ __END__
 
 =head1 NAME
 
-Ceph::Rados - Perl extension for blah blah blah
+Ceph::Rados::IO - Perl wrapper to librados IO context.
 
-=head1 SYNOPSIS
+=head1 METHODS
 
-  use Ceph::Rados;
-  blah blah blah
+=head2 next()
 
-=head1 DESCRIPTListN
+Wraps C<rados_objects_list_next()>.  Returns the next entry (object ID) and increments the list pointer
 
-Stub documentation for Ceph::Rados, created by h2xs. It looks like the
-author of the extension was negligent enough to leave the stub
-unedited.
+=head2 pos()
 
-Blah blah blah.
+Wraps C<rados_objects_list_get_pg_hash_position()>.  Returns the current list pointer.
 
+=head2 seek(pos)
 
-=head1 SEE ALSO
-
-Mention other useful documentation such as the documentation of
-related modules or operating system documentation (such as man pages
-in UNIX), or any relevant external documentation such as RFCs or
-standards.
-
-If you have a mailing list set up for your module, mention it here.
-
-If you have a web site set up for your module, mention it here.
-
-=head1 AUTHOR
-
-Alex, E<lt>alex@E<gt>
-
-=head1 COPYRIGHT AND LICENSE
-
-Copyright (C) 2014 by Alex
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.14.2 or,
-at your option, any later version of Perl 5 you may have available.
-
+Wraos C<rados_objects_list_seek()>.  Sets the current list pointer.
 
 =cut

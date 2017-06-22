@@ -10,6 +10,8 @@ use IO::File;
 my %options;
 my $config = 't/_DBDIR/test-config.ini';
 
+my @tables = qw(cpanstats ixlatest leaderboard release_summary uploads passreports stats_store);
+
 # -----------------------------------------------------------------------------
 # Object methods
 
@@ -32,9 +34,9 @@ sub new {
 }
 
 sub delete_cpanstats {
-    my ($self,@dbs) = @_;
-    @dbs = qw(cpanstats ixlatest leaderboard release_summary uploads)   unless(@dbs);
-    $self->{CPANSTATS}{dbh}->do_query("DELETE FROM $_") for(@dbs);
+    my ($self,@tabs) = @_;
+    @tabs = @tables   unless(@tabs);
+    $self->{CPANSTATS}{dbh}->do_query("DELETE FROM $_") for(@tabs);
 }
 
 sub create_cpanstats {
@@ -45,8 +47,8 @@ sub create_cpanstats {
     my $THISMONTH = sprintf "%04d%02d", $date[4] > 0 ? ($date[5]+1900, $date[4])   : ($date[5]+1899, 12);
     my $LASTMONTH = sprintf "%04d%02d", $date[4] > 1 ? ($date[5]+1900, $date[4]-1) : ($date[5]+1899, 11 + $date[4]);
 
-    for my $db (qw(cpanstats ixlatest leaderboard release_summary uploads passreports)) {
-        my $fh = IO::File->new("t/data/$db.sql") or next;
+    for my $tab (@tables) {
+        my $fh = IO::File->new("t/data/$tab.sql") or next;
         while(<$fh>) {
             s/(\s|;)*$//;
             s/LASTMONTH/$LASTMONTH/g;
@@ -59,16 +61,16 @@ sub create_cpanstats {
 }
 
 sub delete_testers {
-    my ($self,@dbs) = @_;
-    @dbs = qw(profile address)   unless(@dbs);
-    $self->{TESTERS}{dbh}->do_query("DELETE FROM $_")   for(@dbs);
+    my ($self,@tabs) = @_;
+    @tabs = qw(profile address)   unless(@tabs);
+    $self->{TESTERS}{dbh}->do_query("DELETE FROM $_")   for(@tabs);
 }
 
 sub create_testers {
     my $self = shift;
 
-    for my $db (qw(profile address)) {
-        my $fh = IO::File->new("t/data/$db.sql") or next;
+    for my $tab (qw(profile address)) {
+        my $fh = IO::File->new("t/data/$tab.sql") or next;
         while(<$fh>) {
             s/(\s|;)*$//;
             $self->{TESTERS}{dbh}->do_query($_);
@@ -136,15 +138,15 @@ sub count_cpanstats {
 }
 
 sub count_cpanstats_table {
-    my ($self,$db) = @_;
-    my @rows = $self->{CPANSTATS}{dbh}->get_query('array',"SELECT count(*) FROM $db");
+    my ($self,$table) = @_;
+    my @rows = $self->{CPANSTATS}{dbh}->get_query('array',"SELECT count(*) FROM $table");
     my $count = @rows ? $rows[0]->[0] : 0;
     return $count;
 }
 
 sub count_testers_table {
-    my ($self,$db) = @_;
-    my @rows = $self->{TESTERS}{dbh}->get_query('array',"SELECT count(*) FROM $db");
+    my ($self,$table) = @_;
+    my @rows = $self->{TESTERS}{dbh}->get_query('array',"SELECT count(*) FROM $table");
     my $count = @rows ? $rows[0]->[0] : 0;
     return $count;
 }

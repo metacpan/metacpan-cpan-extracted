@@ -1,0 +1,6 @@
+name = "Acme-Honkidasu"
+# badges = ["travis"]
+authority="cpan:HAYAJO"
+
+module_maker="ModuleBuildTiny"
+

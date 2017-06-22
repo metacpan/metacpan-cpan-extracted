@@ -15,7 +15,7 @@ use Path::Tiny qw/path/;
 use POSIX qw(setlocale LC_TIME);
 use Scope::Guard qw/guard/;
 use Time::Piece qw/localtime/;
-use version; our $VERSION = version->declare("v0.2.0");
+use version; our $VERSION = version->declare("v0.2.1");
 
 use parent 'Exporter';
 
@@ -232,7 +232,7 @@ sub create_release_pull_request {
     git qw/add ./;
     git qw/commit -m/, "ready for next release and update changelogs. version: $next_version";
 
-    git qw/diff/, qw/--word-diff/, "master..$branch_name";
+    git qw/diff/, qw/--word-diff/, "origin/master..$branch_name";
     my $pr_body = build_pull_request_body($next_version, @releases);
     say '
 

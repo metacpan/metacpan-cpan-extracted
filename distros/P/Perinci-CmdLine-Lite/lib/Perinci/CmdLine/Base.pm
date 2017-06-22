@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Base;
 
-our $DATE = '2017-01-16'; # DATE
-our $VERSION = '1.72'; # VERSION
+our $DATE = '2017-06-17'; # DATE
+our $VERSION = '1.74'; # VERSION
 
 use 5.010001;
 use strict;
@@ -502,6 +502,40 @@ sub _read_env {
     }
     $log->tracef("[pericmd] Words from env: %s", $words);
     $words;
+}
+
+sub do_dump {
+    require Data::Dump;
+
+    my ($self, $r) = @_;
+
+    local $r->{in_dump} = 1;
+
+    # check whether subcommand is defined. try to search from --cmd, first
+    # command-line argument, or default_subcommand.
+    $self->_parse_argv1($r);
+
+    if ($r->{read_env}) {
+        my $env_words = $self->_read_env($r);
+        unshift @ARGV, @$env_words;
+    }
+
+    my $scd = $r->{subcommand_data};
+    # we do get_meta() currently because some common option like dry_run is
+    # added in hook_after_get_meta().
+    my $meta = $self->get_meta($r, $scd->{url} // $self->{url});
+
+    my $dump = join(
+        "",
+        "# BEGIN DUMP $ENV{PERINCI_CMDLINE_DUMP}\n",
+        Data::Dump::dump($self), "\n",
+        "# END DUMP $ENV{PERINCI_CMDLINE_DUMP}\n",
+    );
+
+    [200, "OK", $dump,
+     {
+         "cmdline.skip_format" => 1,
+     }];
 }
 
 sub do_completion {
@@ -1329,6 +1363,12 @@ sub run {
         common_opts => $co,
     };
 
+    # dump is special case, we delegate to do_dump()
+    if ($ENV{PERINCI_CMDLINE_DUMP}) {
+        $r->{res} = $self->do_dump($r);
+        goto FORMAT;
+    }
+
     # completion is special case, we delegate to do_completion()
     if ($self->_detect_completion($r)) {
         $r->{res} = $self->do_completion($r);
@@ -1502,7 +1542,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.72 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2017-01-16.
+This document describes version 1.74 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2017-06-17.
 
 =head1 DESCRIPTION
 
@@ -2374,6 +2414,10 @@ DRY_RUN=0 or C<--no-dry-run>.
 The main method to run your application. See L</"PROGRAM FLOW"> for more details
 on what this method does.
 
+=head2 $cmd->do_dump() => ENVRES
+
+Called by run().
+
 =head2 $cmd->do_completion() => ENVRES
 
 Called by run().
@@ -2384,7 +2428,8 @@ Called by run().
 
 =head2 $cmd->get_meta($r, $url) => ENVRES
 
-Called by parse_argv() or do_completion(). Subclass has to implement this.
+Called by parse_argv() or do_dump() or do_completion(). Subclass has to
+implement this.
 
 =head1 ENVIRONMENT
 
@@ -2447,7 +2492,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -2,11 +2,13 @@ package App::Netdisco::Util::DNS;
 
 use strict;
 use warnings;
-
 use Dancer ':script';
+
 use Net::DNS;
 use AnyEvent::DNS;
 use NetAddr::IP::Lite ':lower';
+
+use App::Netdisco::Util::Permission;
 
 use base 'Exporter';
 our @EXPORT = ();
@@ -103,14 +105,17 @@ sub ipv4_from_hostname {
   return undef;
 }
 
-=head2 hostnames_resolve_async( $ips )
+=head2 hostnames_resolve_async( \@ips, \@timeouts? )
 
 This method uses a fully asynchronous and high-performance pure-perl stub
 resolver C<AnyEvent::DNS>.
 
 Given a reference to an array of hashes will resolve the C<IPv4> or C<IPv6>
-address in the C<ip> or C<alias> key of each hash into its hostname which
-will be inserted in the C<dns> key of the hash.
+address in the C<ip>, C<alias>, or C<device> key of each hash into its
+hostname which will be inserted in the C<dns> key of the hash.
+
+Optionally provide a set of timeout values in seconds which is also the
+number of resolver attempts. The default is C<< [2,5,5] >>.
 
 Returns the supplied reference to an array of hashes with dns values for
 addresses which resolved.
@@ -118,15 +123,20 @@ addresses which resolved.
 =cut
 
 sub hostnames_resolve_async {
-  my $ips = shift;
+  my ($ips, $timeouts) = @_;
+  return [] unless $ips and ref [] eq ref $ips;
+  $timeouts ||= [2,5,5];
+
+  my $skip = setting('dns')->{'no'};
+  AnyEvent::DNS::resolver->timeout(@$timeouts);
 
   # Set up the condvar
   my $done = AE::cv;
   $done->begin( sub { shift->send } );
 
   IP: foreach my $hash_ref (@$ips) {
-    my $ip = $hash_ref->{'ip'} || $hash_ref->{'alias'};
-    next IP if no_resolve($ip);
+    my $ip = $hash_ref->{'ip'} || $hash_ref->{'alias'} || $hash_ref->{'device'};
+    next IP if App::Netdisco::Util::Permission::check_acl_no($ip, $skip);
 
     # check /etc/hosts file and short-circuit if found
     foreach my $name (reverse sort keys %HOSTS) {
@@ -148,36 +158,10 @@ sub hostnames_resolve_async {
   $done->recv;
   
   # Remove reference to resolver so that we close sockets
+  # and allow return to any instance defaults we have changed
   undef $AnyEvent::DNS::RESOLVER if $AnyEvent::DNS::RESOLVER;
 
   return $ips;
 }
 
-=head2 no_resolve( $ip )
-
-Given an IP address, returns true if excluded from DNS resolution by the
-C<dns_no> configuration directive, otherwise returns false.
-
-=cut
-
-sub no_resolve {
-    my $ip = shift;
-
-    my $config = setting('dns')->{no} || [];
-    return 0 if not scalar @$config;
-
-    my $addr = NetAddr::IP::Lite->new($ip)
-      or return 1;
-
-    foreach my $item (@$config) {
-        my $c_ip = NetAddr::IP::Lite->new($item)
-            or next;
-        next unless $c_ip->bits == $addr->bits;
-
-        return 1 if ($c_ip->contains($addr));
-    }
-    return 0;
-}
-
 1;
-

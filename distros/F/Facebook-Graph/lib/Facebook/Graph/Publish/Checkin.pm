@@ -1,5 +1,5 @@
 package Facebook::Graph::Publish::Checkin;
-$Facebook::Graph::Publish::Checkin::VERSION = '1.1202';
+$Facebook::Graph::Publish::Checkin::VERSION = '1.1204';
 use Moo;
 use Ouch;
 extends 'Facebook::Graph::Publish';
@@ -94,7 +94,7 @@ Facebook::Graph::Publish::Checkin - Publish a location checkin.
 
 =head1 VERSION
 
-version 1.1202
+version 1.1204
 
 =head1 SYNOPSIS
 

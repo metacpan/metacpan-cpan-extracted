@@ -15,14 +15,14 @@ use _common qw($s_mixed);
 my (@r, $tmp);
 
 $tmp = dclone($s_mixed);
-eval { @r = spath($tmp, [ {keys => ['b']},[0] ], expand => 1) };
-like($@, qr/^Passed struct doesn't match provided path \(array expected on step #1\)/);
+eval { @r = spath($tmp, [ {keys => ['b']},[0] ], expand => 1, strict => 1) };
+like($@, qr/^ARRAY expected on step #1, got HASH/);
 
 $tmp = dclone($s_mixed);
-eval { @r = spath($tmp, [ {keys => ['a']},[1],{keys => ['a1a']} ], expand => 1) };
-like($@, qr/^Passed struct doesn't match provided path \(hash expected on step #2\)/);
+eval { @r = spath($tmp, [ {keys => ['a']},[1],{keys => ['a1a']} ], expand => 1, strict => 1) };
+like($@, qr/^HASH expected on step #2, got ARRAY/);
 
-$tmp = undef;
+$tmp = 'Will be overwritten';
 @r = spath(\$tmp, [ {keys => ['a']},[3] ], expand => 1);
 is_deeply(
     $tmp,

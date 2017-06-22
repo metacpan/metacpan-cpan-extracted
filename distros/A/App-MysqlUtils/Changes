@@ -1,4 +1,35 @@
-Revision history for App-MysqlUtils
+0.007   2017-06-17 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild with updated Perinci::CmdLine::Dump to show --dry-run
+          in the POD.
+
+
+0.006   2017-06-15 (PERLANCAR)
+
+	- [Incompatible change] Rename script:
+	  mysql-split-sql-dump-per-table to mysql-sql-dump-extract-tables.
+
+	- mysql-sql-dump-extract-tables: Fix/tweak regex pattern to detect start
+	  of table, add options --{include,exclude}-{table,table-pattern}.
+
+	- mysql-run-sql-files: Add option --overwrite-when (with shortcuts
+	  -o, -O).
+
+
+0.005   2017-06-15 (PERLANCAR)
+
+	- Add utility: mysql-run-sql-files.
+
+	- [doc] Document about getting default username/password from
+	  ~/.my.cnf.
+
+
+0.004   2017-06-14 (PERLANCAR)
+
+	- Add utility: mysql-split-sql-dump-per-table.
+
 
 0.003   2016-12-23 (PERLANCAR)
 

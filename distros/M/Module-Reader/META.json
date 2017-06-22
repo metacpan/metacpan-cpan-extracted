@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Module-Reader",
    "no_index" : {
@@ -53,6 +53,6 @@
          "web" : "https://github.com/haarg/Module-Reader"
       }
    },
-   "version" : "0.003002",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.003003",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

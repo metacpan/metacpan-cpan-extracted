@@ -30,4 +30,4 @@ requires:
   warnings: '0'
 resources:
   repository: git://github.com/domm/Plack-Middleware-Auth-JWT.git
-version: '0.900'
+version: '0.901'

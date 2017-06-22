@@ -23,6 +23,7 @@ my %WriteMakefileArgs = (
     "Moo::Role" => 0,
     "SOAP::Lite" => 0,
     "Scalar::Util" => 0,
+    "XML::Parser" => 0,
     "XML::Simple" => 0,
     "constant" => 0,
     "strict" => 0,
@@ -35,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::Mock::LWP::Dispatch" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "v0.0.5",
+  "VERSION" => "v0.0.7",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,6 +55,7 @@ my %FallbackPrereqs = (
   "Test::Exception" => 0,
   "Test::Mock::LWP::Dispatch" => 0,
   "Test::More" => 0,
+  "XML::Parser" => 0,
   "XML::Simple" => 0,
   "constant" => 0,
   "strict" => 0,

@@ -6,7 +6,7 @@ use utf8;
 use open qw(:std :utf8);
 use lib qw(lib ../lib ../../lib);
 
-use Test::More tests => 8;
+use Test::More tests => 11;
 use Encode qw(decode encode);
 
 
@@ -69,6 +69,26 @@ note 'multiline';
         int3      => "1 \n 2  \r\n3",
 #        int4      => [" 4 \n5\r\n6", "7\n8"],
 
+    })-> status_is( 200 );
+
+    diag decode utf8 => $t->tx->res->body unless $t->tx->success;
+}
+
+note 'multiline custom';
+{
+    $t->app->routes->post("/test/multiline/custom/vparam")->to( cb => sub {
+        my ($self) = @_;
+
+        is_deeply $self->vparam(
+            int1        => 'int',
+            multiline   => qr{\s*,\s*},
+        ), [1,2,3,4], 'int1 = [1,2,3,4]';
+
+        $self->render(text => 'OK.');
+    });
+
+    $t->post_ok("/test/multiline/custom/vparam", form => {
+        int1      => "1,2, 3 ,4",
     })-> status_is( 200 );
 
     diag decode utf8 => $t->tx->res->body unless $t->tx->success;

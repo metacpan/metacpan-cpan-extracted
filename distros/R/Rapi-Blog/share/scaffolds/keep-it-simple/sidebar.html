@@ -1,0 +1,75 @@
+
+         <div id="sidebar" class="four columns">
+         
+
+            <div class="widget widget_search">
+                  <h3>Search</h3> 
+                  <form action="/blog">
+
+                     <input type="text" name="search" value="Search here..." onblur="if(this.value == '') { this.value = 'Search here...'; }" onfocus="if (this.value == 'Search here...') { this.value = ''; }" class="text-search">
+                     <input type="submit" value="" class="submit-search">
+
+                  </form>
+               </div>
+
+            <div class="widget widget_categories group">
+               <h3>Popular Tags</h3> 
+               <ul>
+               
+                [%- SET tags_result = list_tags({limit => 10}) -%]
+                [% FOREACH tag IN tags_result.rows %]
+                  <li>
+                    <a href="/blog?tag=[% tag.name %]">[% tag.name %]</a> 
+                    ([% tag.posts_count %])
+                  </li>
+                 [% END %]
+        
+               </ul>
+            </div>
+
+            <div class="widget widget_text group">
+               <h3>Widget Text.</h3>
+
+               <p>Lorem ipsum Ullamco commodo laboris sit dolore commodo aliquip incididunt fugiat esse dolor aute fugiat minim eiusmod do velit labore fugiat officia ad sit culpa labore in consectetur sint cillum sint consectetur voluptate adipisicing Duis irure magna ut sit amet reprehenderit.</p>
+
+            </div>
+
+            <div class="widget widget_tags">
+               <h3>Recent Tags</h3>
+
+               <div class="tagcloud group">
+								 
+                 [%- SET tags_result = list_tags({limit => 10, sort => 'recent'}) -%]
+                 [% FOREACH tag IN tags_result.rows %]
+                     <a href="/blog?tag=[% tag.name %]">[% tag.name %]</a> 
+                  [% END %]
+								 
+               </div>
+                  
+            </div>
+
+            <div class="widget widget_popular">
+               <h3>Popular Posts</h3>
+							 [%- SET posts_result = list_posts({limit => 4, sort => 'popularity'}) -%]
+
+               <ul class="link-list">
+								 [% FOREACH Post IN posts_result.rows %]
+								   <li><a href="[% Post.public_url %]">[% Post.title %]</a></li>
+								 [% END %]                    
+               </ul> 
+            </div>
+						
+						<br>
+						
+            <div class="widget widget_popular">
+               <h3>Most Commented on</h3>
+							 [%- SET posts_result = list_posts({limit => 4, sort => 'most_comments'}) -%]
+
+               <ul class="link-list">
+								 [% FOREACH Post IN posts_result.rows %]
+								   <li><a href="[% Post.public_url %]">[% Post.title %]</a></li>
+								 [% END %]                    
+               </ul> 
+            </div>
+            
+         </div> <!-- end sidebar -->

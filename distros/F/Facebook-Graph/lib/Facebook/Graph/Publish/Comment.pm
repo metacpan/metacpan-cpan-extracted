@@ -1,5 +1,5 @@
 package Facebook::Graph::Publish::Comment;
-$Facebook::Graph::Publish::Comment::VERSION = '1.1202';
+$Facebook::Graph::Publish::Comment::VERSION = '1.1204';
 use Moo;
 extends 'Facebook::Graph::Publish';
 
@@ -36,7 +36,7 @@ Facebook::Graph::Publish::Comment - Publish a comment on a post.
 
 =head1 VERSION
 
-version 1.1202
+version 1.1204
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
+2.15      2017-06-11 21:41:41 -0400
+  - Tweaks for Perl 5.26
+
 2.14      2017-06-09 11:37:34 -0400
   - Require plicease plugin 2.14
 

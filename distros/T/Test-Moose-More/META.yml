@@ -36,13 +36,14 @@ no_index:
 provides:
   Test::Moose::More:
     file: lib/Test/Moose/More.pm
-    version: '0.047'
+    version: '0.048'
   Test::Moose::More::Utils:
     file: lib/Test/Moose/More/Utils.pm
-    version: '0.047'
+    version: '0.048'
 requires:
   Carp: '0'
   Data::OptList: '0'
+  List::MoreUtils: '0'
   List::Util: '1.45'
   Moose::Util: '0'
   Moose::Util::TypeConstraints: '0'
@@ -59,40 +60,41 @@ resources:
   bugtracker: https://github.com/RsrchBoy/Test-Moose-More/issues
   homepage: https://github.com/RsrchBoy/Test-Moose-More
   repository: https://github.com/RsrchBoy/Test-Moose-More.git
-version: '0.047'
+version: '0.048'
 x_BuiltWith:
   modules:
     CPAN::Meta: '2.150010'
-    Carp: '1.40'
+    Carp: '1.42'
     Data::OptList: '0.110'
     ExtUtils::MakeMaker: '7.24'
-    File::Spec: '3.63'
+    File::Spec: '3.67'
     IO::Handle: '1.36'
     IPC::Open3: '1.20'
-    List::Util: '1.46'
-    Moose: '2.1806'
-    Moose::Meta::Attribute: '2.1806'
-    Moose::Role: '2.1806'
-    Moose::Util: '2.1806'
-    Moose::Util::MetaRole: '2.1806'
-    Moose::Util::TypeConstraints: '2.1806'
+    List::MoreUtils: '0.419'
+    List::Util: 1.46_02
+    Moose: '2.2005'
+    Moose::Meta::Attribute: '2.2005'
+    Moose::Role: '2.2005'
+    Moose::Util: '2.2005'
+    Moose::Util::MetaRole: '2.2005'
+    Moose::Util::TypeConstraints: '2.2005'
     Pod::Coverage::TrustPod: '0.100003'
     Pod::Wordlist: '1.20'
-    Scalar::Util: '1.46'
+    Scalar::Util: 1.46_02
     Sub::Exporter::Progressive: '0.001013'
     Syntax::Keyword::Junction: '0.003008'
     TAP::SimpleOutput: '0.009'
-    Test::Builder: '1.302062'
-    Test::Builder::Tester: '1.302062'
+    Test::Builder: '1.302085'
+    Test::Builder::Tester: '1.302085'
     Test::CheckDeps: '0.010'
     Test::ConsistentVersion: 0.3.0
-    Test::EOL: '1.6'
+    Test::EOL: '2.00'
     Test::HasVersion: '0.014'
     Test::MinimumVersion: '0.101082'
-    Test::Moose: '2.1806'
-    Test::More: '1.302062'
+    Test::Moose: '2.2005'
+    Test::More: '1.302085'
     Test::NoSmartComments: '0.005'
-    Test::NoTabs: '1.4'
+    Test::NoTabs: '2.00'
     Test::Pod: '1.51'
     Test::Pod::Coverage: '1.10'
     Test::Pod::LinkCheck: '0.008'
@@ -100,18 +102,18 @@ x_BuiltWith:
     blib: '1.06'
     namespace::autoclean: '0.28'
     strict: '1.11'
-    warnings: '1.36'
+    warnings: '1.37'
   perl:
-    original: v5.24.0
+    original: v5.26.0
     qv: 1
     version:
       - 5
-      - 24
+      - 26
       - 0
   platform: linux
 x_Dist_Zilla:
   perl:
-    version: '5.024000'
+    version: '5.026000'
   plugins:
     -
       class: Dist::Zilla::Plugin::NextRelease
@@ -125,9 +127,14 @@ x_Dist_Zilla:
           version_by_branch: '0'
           version_regexp: (?^:^(\d.\d+(_\d\d)?)(-TRIAL|)$)
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.13.1
           repo_root: .
       name: '@RSRCHBOY/Git::NextVersion'
-      version: '2.039'
+      version: '2.042'
+    -
+      class: Dist::Zilla::Plugin::CopyrightYearFromGit
+      name: '@RSRCHBOY/CopyrightYearFromGit'
+      version: '0.003'
     -
       class: Dist::Zilla::Plugin::ContributorsFromGit
       name: '@RSRCHBOY/ContributorsFromGit'
@@ -136,6 +143,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.13.1
           repo_root: .
       name: '@RSRCHBOY/@Git::CheckFor/Git::CheckFor::CorrectBranch'
       version: '0.014'
@@ -143,6 +151,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::Fixups
       config:
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.13.1
           repo_root: .
       name: '@RSRCHBOY/@Git::CheckFor/Git::CheckFor::Fixups'
       version: '0.014'
@@ -150,6 +159,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.13.1
           repo_root: .
       name: '@RSRCHBOY/@Git::CheckFor/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -168,7 +178,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: '0'
       name: '@RSRCHBOY/Git::GatherDir'
-      version: '2.039'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -182,7 +192,7 @@ x_Dist_Zilla:
           run_under_travis: '0'
           skip: []
       name: '@RSRCHBOY/PromptIfStale'
-      version: '0.051'
+      version: '0.053'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@RSRCHBOY/PruneCruft'
@@ -221,7 +231,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@RSRCHBOY/Test::ReportPrereqs'
-      version: '0.025'
+      version: '0.027'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@RSRCHBOY/AutoPrereqs'
@@ -229,7 +239,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Prepender
       name: '@RSRCHBOY/Prepender'
-      version: '2.002'
+      version: '2.004'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -332,7 +342,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::Pod::LinkCheck
       name: '@RSRCHBOY/Test::Pod::LinkCheck'
-      version: '1.002'
+      version: '1.003'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
@@ -375,7 +385,7 @@ x_Dist_Zilla:
               version: '6.009'
           include_underscores: '0'
         Dist::Zilla::Role::MetaProvider::Provider:
-          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002003'
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
           inherit_missing: '1'
           inherit_version: '1'
           meta_noindex: '1'
@@ -383,7 +393,7 @@ x_Dist_Zilla:
           Module::Metadata: '1.000033'
           version: '0.004'
       name: '@RSRCHBOY/MetaProvides::Package'
-      version: '2.004002'
+      version: '2.004003'
     -
       class: Dist::Zilla::Plugin::MetaData::BuiltWith
       config:
@@ -395,7 +405,7 @@ x_Dist_Zilla:
           show_uname: '0'
           use_external_file: ~
       name: '@RSRCHBOY/MetaData::BuiltWith'
-      version: '1.004004'
+      version: '1.004005'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: '@RSRCHBOY/GithubMeta'
@@ -441,9 +451,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.13.1
           repo_root: .
       name: '@RSRCHBOY/Git::Check'
-      version: '2.039'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -462,11 +473,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.13.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@RSRCHBOY/Git::Commit'
-      version: '2.039'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Test::CheckDeps
       config:
@@ -503,15 +515,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: '1'
-          tag: '0.047'
+          tag: '0.048'
           tag_format: '%v'
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.13.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@RSRCHBOY/Git::Tag'
-      version: '2.039'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::CommitBuild
       config:
@@ -523,9 +536,10 @@ x_Dist_Zilla:
           release_branch: ~
           release_message: 'Build results of %h (on %b)'
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.13.1
           repo_root: .
       name: '@RSRCHBOY/Git::CommitBuild::Build'
-      version: '2.039'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::CommitBuild
       config:
@@ -537,9 +551,10 @@ x_Dist_Zilla:
           release_branch: release/cpan
           release_message: 'Full build of CPAN release %v%t'
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.13.1
           repo_root: .
       name: '@RSRCHBOY/Git::CommitBuild::Release'
-      version: '2.039'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -549,9 +564,10 @@ x_Dist_Zilla:
             - 'origin refs/heads/release/cpan:refs/heads/release/cpan'
           remotes_must_exist: '1'
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.13.1
           repo_root: .
       name: '@RSRCHBOY/Git::Push'
-      version: '2.039'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Twitter
       name: '@RSRCHBOY/Twitter'
@@ -574,7 +590,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::GitHub::Update:
           metacpan: '1'
       name: '@RSRCHBOY/GitHub::Update'
-      version: '0.42'
+      version: '0.44'
     -
       class: Dist::Zilla::Plugin::Run::AfterRelease
       config:
@@ -583,8 +599,9 @@ x_Dist_Zilla:
           quiet: '0'
           run:
             - 'mkdir -p releases ; mv %s releases/'
+          version: '0.045'
       name: '@RSRCHBOY/Run::AfterRelease'
-      version: '0.043'
+      version: '0.045'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@RSRCHBOY/ConfirmRelease'
@@ -603,22 +620,22 @@ x_Dist_Zilla:
         Dist::Zilla::Role::FileWatcher:
           version: '0.006'
       name: '@RSRCHBOY/ReadmeMarkdownInRoot'
-      version: '0.161170'
+      version: '0.163250'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
         Dist::Zilla::Role::FileWatcher:
           version: '0.006'
       name: '@RSRCHBOY/ReadmeTxt'
-      version: '0.161170'
+      version: '0.163250'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromBuild
       name: '@RSRCHBOY/CopyFilesFromBuild'
-      version: '0.163040'
+      version: '0.170880'
     -
       class: Dist::Zilla::Plugin::GitHubREADME::Badge
       name: '@RSRCHBOY/GitHubREADME::Badge'
-      version: '0.20'
+      version: '0.22'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:
@@ -680,15 +697,15 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::RSRCHBOY::RoleParameters
               name: 'ROLE PARAMETERS'
-              version: '0.074'
+              version: '0.075'
             -
               class: Pod::Weaver::Section::RSRCHBOY::RequiredAttributes
               name: 'REQUIRED ATTRIBUTES'
-              version: '0.074'
+              version: '0.075'
             -
               class: Pod::Weaver::Section::RSRCHBOY::LazyAttributes
               name: 'LAZY ATTRIBUTES'
-              version: '0.074'
+              version: '0.075'
             -
               class: Pod::Weaver::Section::Collect
               name: 'REQUIRED METHODS'
@@ -748,7 +765,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::RSRCHBOY::Authors
               name: RSRCHBOY::Authors
-              version: '0.074'
+              version: '0.075'
             -
               class: Pod::Weaver::Section::Contributors
               name: '@RSRCHBOY/Contributors'
@@ -828,4 +845,4 @@ x_authority: cpan:RSRCHBOY
 x_contributors:
   - 'Chad Granum <chad.granum@dreamhost.com>'
   - 'Karen Etheridge <ether@cpan.org>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_serialization_backend: 'YAML::Tiny version 1.70'

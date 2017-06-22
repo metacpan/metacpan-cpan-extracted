@@ -1,4 +1,3 @@
-BEGIN { unless( $ENV{I_PROMISE_TO_TEST_SINGLE_THREADED} ) { print "1..1\nok 1\n"; exit 0; } }
 
 use strict;
 use warnings;
@@ -35,4 +34,4 @@ sub run_tests {
     ok( "@a", "test2" );
 }
 
-do "t/test_runner.pm";
+do "./t/test_runner.pm";

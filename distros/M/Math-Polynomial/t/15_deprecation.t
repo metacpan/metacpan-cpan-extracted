@@ -1,8 +1,6 @@
-# Copyright (c) 2007-2016 Martin Becker.  All rights reserved.
+# Copyright (c) 2007-2017 Martin Becker.  All rights reserved.
 # This package is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-#
-# $Id: 15_deprecation.t 128 2016-07-28 13:26:37Z demetri $
 
 # Checking deprecation of interface extension Math::Polynomial::Generic.
 

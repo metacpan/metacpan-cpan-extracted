@@ -238,7 +238,7 @@ subtest "pack_submit_packet", sub {
     is $t->pack_submit_packet($c), $v;
     is $t->pack_submit_packet(), $v;
 
-    my $v = Gearman::Util::pack_req_command($t->mode,
+    $v = Gearman::Util::pack_req_command($t->mode,
         join("\0", $t->func, '', ''));
     ${ $t->{argref} } = undef;
     $t->{uniq} = undef;

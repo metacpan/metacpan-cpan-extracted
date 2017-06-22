@@ -1,7 +1,7 @@
 package App::pod2wp;
 
-our $DATE = '2016-12-29'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2017-06-17'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -184,6 +184,11 @@ _
     features => {
         dry_run => 1,
     },
+    links => [
+        {url=>'prog:org2wp'},
+        {url=>'prog:html2wp'},
+        {url=>'prog:wp-xmlrpc'},
+    ],
 };
 sub pod2wp {
     my %args = @_;
@@ -393,12 +398,16 @@ App::pod2wp - Publish POD document to WordPress as blog post
 
 =head1 VERSION
 
-This document describes version 0.001 of App::pod2wp (from Perl distribution App-pod2wp), released on 2016-12-29.
+This document describes version 0.003 of App::pod2wp (from Perl distribution App-pod2wp), released on 2017-06-17.
 
 =head1 FUNCTIONS
 
 
-=head2 pod2wp(%args) -> [status, msg, result, meta]
+=head2 pod2wp
+
+Usage:
+
+ pod2wp(%args) -> [status, msg, result, meta]
 
 Publish POD document to WordPress as blog post.
 
@@ -557,13 +566,22 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+
+L<org2wp>.
+
+L<html2wp>.
+
+L<wp-xmlrpc>.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

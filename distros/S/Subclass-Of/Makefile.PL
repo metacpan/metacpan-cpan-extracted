@@ -7,7 +7,7 @@ my $meta = {
   "abstract"       => "import a magic subclass",
   "author"         => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
   "dynamic_config" => 0,
-  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.013, CPAN::Meta::Converter version 2.120921",
+  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.142690",
   "keywords"       => [],
   "license"        => ["perl_5"],
   "meta-spec"      => {
@@ -21,11 +21,12 @@ my $meta = {
                         develop   => { recommends => { "Dist::Inkt" => 0 } },
                         runtime   => {
                                        requires => {
-                                                     "Exporter::Tiny"   => 0,
-                                                     "List::MoreUtils"  => 0,
-                                                     "Module::Runtime"  => 0,
+                                                     "Exporter::Tiny" => 0,
+                                                     "List::Util" => 1.33,
+                                                     "Module::Runtime" => 0,
                                                      "namespace::clean" => 0,
-                                                     "Sub::Name"        => 0,
+                                                     "perl" => 5.008,
+                                                     "Sub::Util" => 0,
                                                    },
                                        suggests => { Moo => "1.002000", Moose => "2.0000", Mouse => "1.00" },
                                      },
@@ -41,17 +42,21 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "Subclass::Of" => { file => "lib/Subclass/Of.pm", version => 0.003 },
+                        "Subclass::Of" => { file => "lib/Subclass/Of.pm", version => 0.007 },
                       },
   "release_status" => "stable",
   "resources"      => {
                         bugtracker   => { web => "http://rt.cpan.org/Dist/Display.html?Queue=Subclass-Of" },
                         homepage     => "https://metacpan.org/release/Subclass-Of",
                         license      => ["http://dev.perl.org/licenses/"],
-                        repository   => { type => "git", web => "https://github.com/tobyink/p5-subclass-of" },
-                        X_identifier => "http://purl.org/NET/cpan-uri/dist/Subclass-Of/project",
+                        repository   => {
+                                          type => "git",
+                                          url  => "git://github.com/tobyink/p5-subclass-of.git",
+                                          web  => "https://github.com/tobyink/p5-subclass-of",
+                                        },
+                        x_identifier => "http://purl.org/NET/cpan-uri/dist/Subclass-Of/project",
                       },
-  "version"        => 0.003,
+  "version"        => 0.007,
 };
 
 my %dynamic_config;
@@ -63,6 +68,7 @@ my %WriteMakefileArgs = (
 	VERSION    => $meta->{version},
 	EXE_FILES  => [ map $_->{file}, values %{ $meta->{x_provides_scripts} || {} } ],
 	NAME       => do { my $n = $meta->{name}; $n =~ s/-/::/g; $n },
+	test       => { TESTS => "t/*.t" },
 	%dynamic_config,
 );
 

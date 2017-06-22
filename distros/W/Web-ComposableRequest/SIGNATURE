@@ -15,13 +15,13 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 c136ce0c4a99ccb47c4a04fbb54c05cd8ce5b91f Build.PL
-SHA1 02f2774afe63cf500e0c759c27320e848a6251f9 Changes
+SHA1 abb35863152f04acec83d940c35f5fe0b97e6461 Changes
 SHA1 c9287a0cfea1301a8e275e14df35a74d0b85e71c LICENSE
 SHA1 0a71e6a3a8a52d512cad729f8b8dbf832865f3b1 MANIFEST
-SHA1 d04b7da69c78a71676c970e86f5d5349e42e3299 META.json
-SHA1 c011a4bb9d960b5e58418fe8d20abf996d055e9c META.yml
+SHA1 0077d07a1c2f2fbe2ffb431ac462b7bf07d634a6 META.json
+SHA1 54c55054d660e6ad8e159bce610bb286090ef057 META.yml
 SHA1 acafaa95ba6ce1687c5ac798f718f2e2871ce882 README
-SHA1 f39f05380da0dd9ffec1a540aa420aa2e6073160 lib/Web/ComposableRequest.pm
+SHA1 f166cd0e08a0e7aa8e094f119d552560eb035cf8 lib/Web/ComposableRequest.pm
 SHA1 49d2a6469e799b20eb32194d88004830363e7d92 lib/Web/ComposableRequest/Base.pm
 SHA1 df3033f1da349b1c1965132016dbd3aef584f1f8 lib/Web/ComposableRequest/Config.pm
 SHA1 7e91fb17bca65fddac59e00a93ccc4ddbad0b1b6 lib/Web/ComposableRequest/Constants.pm
@@ -31,7 +31,7 @@ SHA1 d98fc3ef0c8ce22f4738556407055eaa68e4f719 lib/Web/ComposableRequest/Role/JSO
 SHA1 24b11782bc6d80971b16a3f5159b7eacdea26438 lib/Web/ComposableRequest/Role/L10N.pm
 SHA1 44404dbda4017df1b5c80a8b202a2c4dfcea0143 lib/Web/ComposableRequest/Role/Session.pm
 SHA1 ebfd76e8e21caebf7dc98cca5746a31d9a42a593 lib/Web/ComposableRequest/Role/Static.pm
-SHA1 69be465f08d5bdfdb348067b16f0983a743bed1e lib/Web/ComposableRequest/Session.pm
+SHA1 b63a14bf7473efd15b491388ae6739ee3638e60a lib/Web/ComposableRequest/Session.pm
 SHA1 849e3de807d5911f88cefd599d8aef8e34060ba1 lib/Web/ComposableRequest/Util.pm
 SHA1 dba0cced79b33f20f59bd529b738a85c453c627d t/00report-metadata.dd
 SHA1 c7d9429f60087220bf7b11ad1f97c7af9a647fa7 t/00report-metadata.t
@@ -40,17 +40,17 @@ SHA1 378c0b8a1bf6d248e0025321be971f3d360c983b t/03podcoverage.t
 SHA1 ec69eb3d114489b222043cf3726cb4ef26b3bf51 t/05kwalitee.t
 SHA1 230ce4beccce2b8d03267940e81fcd403d2f6860 t/06yaml.t
 SHA1 dd3d003afa9ffb84681fcfd12b5f699b9751dabe t/07podspelling.t
-SHA1 1240677a815b1c0d5ae7f766bbeb508e8aec4145 t/10test_script.t
+SHA1 8d66ececc422b3697089183f03df8d0cd97cdcc3 t/10test_script.t
 SHA1 5ca3d33e602461489c4795ecea1c3adc200530c3 t/boilerplate.pm
 SHA1 11ef732adc9cf76f88e6cd917d40efffeeaf34ff t/exceptions.dd
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.12 (GNU/Linux)
 
-iQEcBAEBAgAGBQJYxc5CAAoJEK492j4Im1BpZscH/3FiE59esejrPe9ZsvQs8x9X
-TbOL2nRKHIL614KR2zZ7zGb8wP6K/VXlIh4tDR0gmBWRvSaGledGJhUST1fcAcui
-/x0x3843Jwp5uv9JD0eo0PARnz1LNQThLStH7lscYyM9EmgmZfi6UE3dDe9ja8HG
-LUksCpxsMX2QBzUgntSD9syouERoBG0iyLgsHT4F6By9UiDgcPZPEcL2jJeFduwj
-fn+/GkkU8OrJ1D1RAO/uedHzSaOqeeuX9pM/lPdifApwcamDrBOLnMbqPKlzlWCb
-B6wbV5rN1I7Z9Tvh08d4DSq/boMFQx3bNyIx9SjfBpcO74fxEi1qECRNqOFJPPs=
-=caXp
+iQEcBAEBAgAGBQJZPvw+AAoJEK492j4Im1BpK9sIAMcAHURs1nvMI0w0itcJd5zl
+FRS5DW1FnRa14XrPP00XNdtyj1HniZhkdUD7UNlN+5VCTlMnolFff9Gig5RO15e+
+h857aeZB6lhcXWaSLfuXrDEqHnrIs165+aYC3MoSoMbUq31nu4p7tNAz37O7yBMP
+Wptf4turc2o2zK9Xifr8MS9Z9BH7rSZptFKGHAxhqH8RpV1CXVGCyCi/wqz4uzta
+HiW1gPicP67bn1tjIYrlokFmxBYsFGiy/4IQn3UwHQqFOIFZbNW60A9gZ5wokDyz
+e/8JRb65vsL4ZMO/tLEC/pri/FkgbVpEM0i+o1S0x3we1DH0iXznEstwLdvHnD0=
+=fNCN
 -----END PGP SIGNATURE-----

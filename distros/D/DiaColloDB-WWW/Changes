@@ -2,6 +2,10 @@
 ##
 ## Change log for perl distribution DiaColloDB::WWW
 
+v0.02.002 Thu, 22 Jun 2017 11:18:01 +0200 moocow
+	* wrapper directory template updates to dstar-web v0.33 (svn r26927)
+	  - bug fixes for generic DiaColloDB::Client URLs
+
 v0.02.001 Wed, 15 Mar 2017 16:10:30 +0100 moocow
 	* requires DiaColloDB >= v0.12.004
 	* added support for generic DiaColloDB::Client URLs (e.g. rcfile, list; not just local directories anymore)

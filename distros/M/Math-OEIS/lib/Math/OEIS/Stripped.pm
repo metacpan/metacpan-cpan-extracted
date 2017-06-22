@@ -34,7 +34,7 @@ our @ISA = ('Math::OEIS::SortedFile');
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-our $VERSION = 9;
+our $VERSION = 10;
 
 use constant base_filename => 'stripped';
 
@@ -78,8 +78,9 @@ sub anum_to_values {
 # Not documented yet.
 sub values_split {
   my ($self, $values_str) = @_;
-  my @values = split /,/, $values_str;
+  if (! ref $self) { $self = $self->instance; }
 
+  my @values = split /,/, $values_str;
   if ($self->{'use_bigint'}) {
     my $use_bigint = $self->{'use_bigint'};
     foreach my $value (@values) {

@@ -1,5 +1,9 @@
 Revision history for Sys::PageCache
 
+0.04  2017-06-20
+    [IMPROVEMENTS]
+        - Call mmap by chunk instead of whole file size #1
+
 0.03  2016-08-05
     [TRIVIAL]
         - [RT #116724] Unescaped left brace in regex is illegal here in regex

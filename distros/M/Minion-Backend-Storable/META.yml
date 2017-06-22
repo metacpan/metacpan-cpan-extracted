@@ -19,7 +19,7 @@ no_index:
     - inc
     - test
 requires:
-  Minion: '5'
+  Minion: '6.05'
   Mojolicious: '6.3'
   perl: '5.010001'
 resources:
@@ -28,5 +28,5 @@ resources:
   homepage: https://niczero.github.io
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/niczero/minion-backend-storable.git
-version: 5.084
+version: 6.051
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

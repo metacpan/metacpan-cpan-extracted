@@ -50,7 +50,7 @@ sub construct {
     my $self = shift;
 
     $ENV{'SLURM_ARRAY_TASK_ID'}=1;
-    
+
     my $test_methods = TestMethods::Base->new();
     my $test_dir     = $test_methods->make_test_dir();
     write_test_file($test_dir);

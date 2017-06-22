@@ -13,6 +13,7 @@ my $client= Cassandra::Client->new(
     username => $ENV{CASSANDRA_USER},
     password => $ENV{CASSANDRA_AUTH},
     anyevent => (rand()<.5),
+    tls      => $ENV{CASSANDRA_TLS},
 
     # This test
     max_concurrent_queries => 5,

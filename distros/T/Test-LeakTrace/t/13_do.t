@@ -6,7 +6,7 @@ use Test::More tests => 1;
 use Test::LeakTrace;
 
 sub foo{
-	do 't/lib/foo.pl';
+	do './t/lib/foo.pl';
 }
 
 

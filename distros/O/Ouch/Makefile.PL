@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
     "overload" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.0410",
+  "VERSION" => "0.0500",
   "test" => {
     "TESTS" => "t/*.t"
   }

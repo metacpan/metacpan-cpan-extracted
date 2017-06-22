@@ -1,0 +1,107 @@
+[% WRAPPER wrap_sidebar.html %]
+[%- USE date(format = '%B %e, %Y') -%]
+[%- SET 
+ p      = c.req.query_params
+ result = list_posts( p )
+ posts  = result.rows
+-%]
+
+[% FOREACH Post IN posts %]
+  <article class="entry">
+
+    <header class="entry-header">
+
+        [% IF Post.image_url %]
+          <img 
+            src="[% Post.image_url %]" 
+            style="max-height:66px;max-width:150px;float:left;padding-right:10px;" 
+          />
+        [% END %]
+    
+      <div style="float-left;">
+        <h2 class="entry-title">
+           <a href="[% Post.public_url %]" title="">[% Post.title %]</a>
+        </h2>              
+
+        <div class="entry-meta">
+           <ul>
+              <li>[% date.format(Post.ts) %]</li>
+              <span class="meta-sep">&bull;</span>
+              <li>[% Post.author.full_name || Post.author.username %]</li>
+           </ul>
+        </div> 
+      </div>
+      
+    </header> 
+    
+    <div class="entry-content">
+      [% Post.summary %] ... <a href="[% Post.public_url %]">read more</a> 
+    </div>
+
+  </article>
+      
+[% END %]
+
+  <hr />
+
+  <nav class="pagination add-bottom">
+  
+    [% IF result.first_qs %]
+      <a href="?[% result.first_qs %]" class="page-numbers prev" title="First Page">First</a>
+    [% ELSE %]
+      <span class="page-numbers prev inactive">First</span>
+    [% END %]
+    
+    [% IF result.prev_qs %]
+      <a href="?[% result.prev_qs %]" class="page-numbers prev" title="Previous Page">Prev</a>
+    [% ELSE %]
+      <span class="page-numbers prev inactive">Prev</span>
+    [% END %]
+    
+    [% IF result.next_qs %]
+      <a href="?[% result.next_qs %]" class="page-numbers next" title="Next Page">Next</a>
+    [% ELSE %]
+      <span class="page-numbers next inactive">Next</span>
+    [% END %]
+    
+    [% IF result.last_qs %]
+      <a href="?[% result.last_qs %]" class="page-numbers next" title="Last Page">Last</a>
+    [% ELSE %]
+      <span class="page-numbers next inactive">Last</span>
+    [% END %]
+  
+  </nav>
+  
+
+  <center>
+    <ul class="stats-tabs">
+       <li><a>[% result.start %] - [% result.end %]<em>Shown</em></a></li>
+       <li><a>[% result.total %]<em>Total</em></a></li>
+       <li><a>[% result.page %] <i style="font-size:.8em;">of</i> &nbsp;[% result.pages %]<em>Page</em></a></li>
+    </ul>
+
+
+    <nav class="pagination add-bottom">
+  
+    [%- SET page_choices = [5,10, 20,50,100,200,500] -%]
+    [%- FOREACH size IN page_choices -%]
+    
+      [% IF size == result.limit %]
+        <span class="page-numbers current">[% size %]</span>
+      [% ELSE %]
+        <a class="page-numbers" href="?[% result.this_qs %]&new_limit=[% size %]&new_page=1">[% size %]</a>
+      [% END %]
+
+     [% END %]
+
+    </nav>
+    <h6 style="margin-top:-30px;">items per page</h6>
+
+
+  
+  </center>
+  
+  
+
+
+[% END %]

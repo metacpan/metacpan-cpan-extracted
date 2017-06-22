@@ -1,4 +1,4 @@
-build\.pl
+^(build|deploy|make-pod|clean)\.pl$
 blib/.*
 .gitignore
 .git/.*
@@ -11,7 +11,6 @@ MYMETA..*
 ^Faster.(?:c|o|bs)$
 ^xt/.*$
 ^lib/Gzip/Faster\.pod\.tmpl$
-^make-pod\.pl$
 file\.gz$
 ^bench/chinese\.txt$
 ^timesheet\.txt$

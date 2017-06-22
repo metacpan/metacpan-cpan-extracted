@@ -14,6 +14,7 @@ sub init_plugins {
 			INVALID_PARAM   => sub { shift->throw(1002, @_) },
 			ERROR           => sub { shift->throw( 400, @_)->flush },
 		},
+		'CGI::SpeedyCGI' => {},
 		'Text::Xslate' => {},
 		'HTTP::Session' => {
 			session_key         => conf('/session/state/name'),

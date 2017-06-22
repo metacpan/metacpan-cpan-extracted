@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.107;
+our $VERSION = 1.108;
 
 use Prty::Option;
 use DBI ();
@@ -146,6 +146,9 @@ sub new {
             $errstr =~ s|\(\d+\)$||; # "(1)" entf.
             $msg = sprintf('SQLITE-%05d: %s',$err,$errstr);
         }
+        elsif ($dbms eq 'access') {
+            $msg = sprintf('ACCESS-%05d: %s',$err,$errstr);
+        }
 
         if ($stmt) {
             substr($stmt,$pos,0) = '<*>' if $pos;
@@ -201,12 +204,6 @@ sub new {
             # keine \-Escapes in String-Literalen zulassen
             $dbh->do("SET standard_conforming_strings = ON");
         }
-        elsif ($dbms eq 'sqlite') {
-            if ($utf8) {
-                # $dbh->{'unicode'} = 1;
-                $dbh->{'sqlite_unicode'} = 1;
-            }
-        }
         elsif ($dbms eq 'mysql') {
             if ($utf8) {
                 $dbh->{'mysql_enable_utf8'} = 1;
@@ -214,6 +211,17 @@ sub new {
             }
             # Schalte in den "Strict SQL Mode"
             $dbh->do("SET sql_mode = 'STRICT_TRANS_TABLES'");
+        }
+        elsif ($dbms eq 'sqlite') {
+            if ($utf8) {
+                # $dbh->{'unicode'} = 1;
+                $dbh->{'sqlite_unicode'} = 1;
+            }
+        }
+        elsif ($dbms eq 'access') {
+            if ($utf8) {
+                $dbh->{'odbc_utf8_on'} = 1;
+            }
         }
         else {
             $class->throw('Not implemented');
@@ -415,7 +423,8 @@ sub sql {
 
     my $sth = undef;
     my $bindVars = 0;
-    my $titles = [];
+    # my $titles = [];
+    my @titles;
     my $hits = 0;
     my $id = 0;
 
@@ -434,7 +443,14 @@ sub sql {
     else {
         $sth = $dbh->prepare($stmt);
 
-        $bindVars = $sth->{'NUM_OF_PARAMS'}; # Anzahl Bind-Variablen
+        if ($dbms ne 'access') {
+            # FIXME: im Falle von access ist nach Ausführung folgender
+            # Zeile eine Ausführung einer Selektion nicht mehr möglich!
+            # D.h. nach aktuellem Stand kann ein SQL-Statement via
+            # access keine Platzhalter enthalten.
+
+            $bindVars = $sth->{'NUM_OF_PARAMS'}; # Anzahl Bind-Variablen
+        }
 
         if (!$bindVars || $forceExec) {
             $sth->execute;
@@ -464,7 +480,15 @@ sub sql {
             #   enthalten. Daher konvertieren wir nicht nur in
             #   Kleinschreibung, sondern nicht-\w-Zeichen nach '_'.
 
-            $titles = $sth->{'NAME_lc'} || [];
+            # $titles = $sth->{'NAME_lc'} || [];
+
+            # Ersetze alle \W-Zeichen durch _, damit automatische
+            # Akzessoren möglich sind
+
+            for (@{$sth->{'NAME_lc'} || []}) {
+                (my $title = $_) =~ s/\W/_/g;
+                push @titles,$title;
+            }
 
             $hits = 0; # es wurden noch keine Datensätze gelesen
         }
@@ -474,7 +498,8 @@ sub sql {
         sth=>$sth,
         bindVars=>$bindVars,
         db=>$self,
-        titles=>$titles,
+        # titles=>$titles,
+        titles=>\@titles,
         hits=>$hits,
         id=>$id,
     );
@@ -484,7 +509,7 @@ sub sql {
 
 =head1 VERSION
 
-1.107
+1.108
 
 =head1 AUTHOR
 

@@ -1,0 +1,19 @@
+v1.02	2017-06-21
+
+	- Add password_needs_rehash() function.
+	- Add more tests.
+	- Add experimental unharnessed comparisons with output from real PHP functions in test scripts.
+	- Add this file and some Makefile.PL improvements.
+
+v1.03	2017-06-21
+
+	- Minor documentation change.
+
+v1.04	2017-06-21
+
+	- Update README file text that nobody probably reads anyway.
+
+v1.05	2017-06-22
+
+	- Hopefully fix warnings about ambiguous use of shift without parenthesis in Perl 5.8.
+

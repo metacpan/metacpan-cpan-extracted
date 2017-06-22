@@ -6,6 +6,7 @@ lib/Mojolicious/Plugin/ClosedRedirect.pm
 t/closed_redirect_validation.t
 t/closed_redirect_secrets.t
 t/closed_redirect_psecrets.t
+t/closed_redirect_relative.t
 t/closed_redirect_local.t
 t/closed_redirect_helper.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

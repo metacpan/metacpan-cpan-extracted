@@ -1,8 +1,8 @@
 use strict;
+use File::Spec::Functions qw(catfile rel2abs);
 use Test::More;
-use File::Spec::Functions 'catfile';
 
-my $prowess = do(catfile 'script', 'prowess') or die $@;
+my $prowess = do(rel2abs(catfile 'script', 'prowess')) or die $@;
 ok $prowess, 'compiled prowess';
 
 is_deeply $prowess->parse_argv, {prove => [], watch => [qw( lib script t )]}, 'parse_argv';

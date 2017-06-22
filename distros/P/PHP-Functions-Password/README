@@ -1,0 +1,23 @@
+PHP::Functions::Password
+========================
+
+Description
+-----------
+Perl ports of PHP password functions.
+See https://metacpan.org/pod/PHP::Functions::Password
+
+Copyright
+---------
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+Installation
+------------
+perl Makefile.PL
+make
+make test
+make install
+
+Author
+------
+Craig Manley

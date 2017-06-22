@@ -5,7 +5,7 @@ use Path::Class qw( dir );
 use namespace::autoclean;
 
 # ABSTRACT: Plugin to deal with dev/project share directory
-our $VERSION = '2.14'; # VERSION
+our $VERSION = '2.15'; # VERSION
 
 with 'Dist::Zilla::Role::FileGatherer';
 
@@ -47,7 +47,7 @@ Dist::Zilla::Plugin::Author::Plicease::DevShare - Plugin to deal with dev/projec
 
 =head1 VERSION
 
-version 2.14
+version 2.15
 
 =head1 AUTHOR
 

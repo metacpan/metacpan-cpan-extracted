@@ -28,8 +28,7 @@ sub TO_MSGPACK {
 
 sub TO_JSON {
     my ($self) = @_;
-    return 'null' unless defined $$self;
-    return sprintf '"%s"', quotemeta $$self;
+    return $$self;
 }
 
 =head1 NAME

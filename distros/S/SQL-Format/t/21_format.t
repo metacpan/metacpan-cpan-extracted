@@ -17,4 +17,16 @@ $test->(
     },
 );
 
+$test->(
+    desc    => 'following empty where condition',
+    input   => [
+        'SELECT %c FROM %t WHERE %w',
+        [qw/bar baz/], 'foo', {},
+    ],
+    expects => {
+        stmt => 'SELECT `bar`, `baz` FROM `foo` WHERE (1=1)',
+        bind => [],
+    },
+);
+
 done_testing;

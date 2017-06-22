@@ -4,13 +4,13 @@
       "Philippe Bruhat (BooK) <book@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Acme-MetaSyntactic-Themes",
    "prereqs" : {
@@ -69,24 +69,24 @@
          "web" : "http://github.com/book/Acme-MetaSyntactic-Themes"
       }
    },
-   "version" : "1.049",
+   "version" : "1.050",
    "x_contributors" : [
-      "Éric Guirbal <eguirbal@cpan.org>",
+      "\u00c9ric Guirbal <eguirbal@cpan.org>",
       "Brian Gottreu <gottreu@cpan.org>",
-      "Éric Cassagnard <eric.cassagnard@gmail.com>",
+      "\u00c9ric Cassagnard <eric.cassagnard@gmail.com>",
       "Laurent Gautrot <lgautrot@cpan.org>",
-      "Olivier Mengué <dolmen@cpan.org>",
+      "Olivier Mengu\u00e9 <dolmen@cpan.org>",
       "Simon Myers <smylers@cpan.org>",
       "Elliot Shank <elliotjs@cpan.org>",
-      "Éric Cholet <cholet@cpan.org>",
+      "\u00c9ric Cholet <cholet@cpan.org>",
       "David H. Adler <dha@cpan.org>",
       "Matthew Musgrove <mmusgrove@cpan.org>",
       "David Golden <dagolden@cpan.org>",
-      "José Castro <cog@cpan.org>",
+      "Jos\u00e9 Castro <cog@cpan.org>",
       "Gisbert W. Selke <gws@cpan.org>",
       "Yanick Champoux <yanick@cpan.org>",
       "Anja Krebber",
-      "Léon Brocard <lbrocard@cpan.org>",
+      "L\u00e9on Brocard <lbrocard@cpan.org>",
       "Flavio Poletti <polettix@cpan.org>",
       "Jan-Pieter Cornet <jpc@cpan.org>",
       "Michael Scherer <misc@cpan.org>",
@@ -95,29 +95,30 @@
       "Estelle Souche",
       "Gaal Yahas <gaal@cpan.org>",
       "Nicholas Clark <nwclark@cpan.org>",
-      "Alberto Manuel Brandão Simões <ambs@cpan.org>",
-      "Martin Vorländer <mvorl@cpan.org>",
+      "Alberto Manuel Brand\u00e3o Sim\u00f5es <ambs@cpan.org>",
+      "Martin Vorl\u00e4nder <mvorl@cpan.org>",
       "Barbie <barbie@cpan.org>",
       "Mark Fowler <markf@cpan.org>",
-      "Gábor Szabó <szabgab@cpan.org>",
+      "G\u00e1bor Szab\u00f3 <szabgab@cpan.org>",
       "Paul-Christophe Varoutas",
       "Xavier Caron <xav@cpan.org>",
       "Guy Widloecher",
       "Jean Forget <jforget@cpan.org>",
-      "Cédric Bouvier <cbouvi@cpan.org>",
+      "C\u00e9dric Bouvier <cbouvi@cpan.org>",
       "Offer Kaye <offerk@cpan.org>",
       "Max Maischein <corion@cpan.org>",
       "Hakim Cassimally <osfameron@cpan.org>",
       "Ricardo Signes <rjbs@cpan.org>",
-      "Jérôme Fenal <jfenal@cpan.org>",
+      "J\u00e9r\u00f4me Fenal <jfenal@cpan.org>",
       "Aldo Calpini <acalpini@cpan.org>",
-      "Rafaël Garcia-Suarez <rgarcia@cpan.org>",
+      "Rafa\u00ebl Garcia-Suarez <rgarcia@cpan.org>",
       "Michel Rodriguez <mirod@cpan.org>",
       "Scott Lanning <slanning@cpan.org>",
       "Mike Castle",
-      "Sébastien Aperghis-Tramoni <saper@cpan.org>",
+      "S\u00e9bastien Aperghis-Tramoni <saper@cpan.org>",
       "David Landgren <dland@cpan.org>",
       "Vahe Sarkissian <vsarkiss@cpan.org>"
-   ]
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

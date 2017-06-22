@@ -130,7 +130,11 @@ is $req->session->collect_status_message( $req ), 'bite me', 'Status message';
 
 $req->session->update;
 
-$mid = $req->session->add_status_message( [ 'bite [_1]', 'it' ] );
+$req->session->add_status_message( [ 'bite [_1]', 'it' ] );
+$mid = $req->session->add_status_message( [ 'bite [_1]', 'me' ] );
+
+my $mid2 = $req->session->add_status_message( [ 'bite [_1]', 'you' ] );
+
 $query = { locale => 'en', mid => $mid };
 $env   = { HTTP_HOST       => 'localhost:5000',
            PATH_INFO       => '/api',
@@ -140,11 +144,12 @@ $req   = $factory->new_from_simple_request( {}, undef, $query, $env );
 
 my $messages = $req->session->collect_status_messages( $req );
 
-is $messages->[ 0 ], "bite 'it'", 'Collect status messages';
+is $messages->[ 0 ], "bite 'me'", 'Collect status messages - 0';
+is $messages->[ 1 ], "bite 'it'", 'Collect status messages - 1';
 
 $req->session->update;
 
-$query = { locale => 'ru', mode => 'static' };
+$query = { locale => 'ru', mid => $mid2, mode => 'static' };
 $env   = { HTTP_HOST       => 'localhost:5000',
            HTTP_ACCEPT_LANGUAGE => 'sw',
            PATH_INFO       => '/api',
@@ -153,6 +158,9 @@ $env   = { HTTP_HOST       => 'localhost:5000',
          };
 $req   = $factory->new_from_simple_request( {}, '', $query, $env );
 
+$messages = $req->session->collect_status_messages( $req );
+
+is $messages->[ 0 ], "bite 'you'", 'Collect status messages - 2';
 is $req->session->collect_status_message( $req ), undef, 'No more messages';
 is $req->authenticated, 0, 'Session timed out';
 is $req->tunnel_method, 'not_found', 'Tunnel method default';

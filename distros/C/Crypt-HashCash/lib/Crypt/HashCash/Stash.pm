@@ -1,9 +1,9 @@
 # -*-cperl-*-
 #
-# Crypt::HashCash::Stash - Coin stash for HashCash digital cash
+# Crypt::HashCash::Stash - Coin Stash for HashCash Digital Cash
 # Copyright (c) 2001-2017 Ashish Gulhati <crypt-hashcash at hash.neo.tc>
 #
-# $Id: lib/Crypt/HashCash/Stash.pm v1.118 Sat Jun 10 13:59:11 PDT 2017 $
+# $Id: lib/Crypt/HashCash/Stash.pm v1.124 Mon Jun 19 15:51:59 PDT 2017 $
 
 package Crypt::HashCash::Stash;
 
@@ -14,7 +14,7 @@ use Crypt::HashCash::Coin;
 use Crypt::HashCash::Client;
 use vars qw( $VERSION $AUTOLOAD );
 
-our ( $VERSION ) = '$Revision: 1.118 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.124 $' =~ /\s+([\d\.]+)/;
 
 sub new {
   my ($class, %arg) = @_;
@@ -122,6 +122,7 @@ sub getcoins {          # Return coins for a specific amount, and change amount 
       unshift @coins, pop @{$self->{$_}->{V}};                                                    # get more coins of this denom
       my $coinstr = $coins[0]->as_string;
       $self->db->do("DELETE from coins where status='V' and coinstr='$coinstr';");
+      $self->db->do("DELETE from exported where coinstr='$coinstr';");
       $self->db->do("INSERT INTO exported values ('$coinstr','" . time . "');");
       delete $self->{$_}->{V} unless scalar @{$self->{$_}->{V}};
       $amt -= $_; $self->balance($self->balance - $_); $bal -= $_;
@@ -176,6 +177,7 @@ sub getdenom {
   return unless defined $self->{$denom} and defined $self->{$denom}->{V};
   my $coin = shift @{$self->{$denom}->{V}}; my $coinstr = $coin->as_string;
   $self->db->do("DELETE from coins where status='V' and coinstr='$coinstr';");
+  $self->db->do("DELETE from exported where coinstr='$coinstr';");
   $self->db->do("INSERT INTO exported values ('$coinstr','" . time . "');");
   delete $self->{$denom}->{V} unless scalar @{$self->{$denom}->{V}};
   delete $self->{$denom} unless (defined $self->{$denom}->{V} && scalar @{$self->{$denom}->{V}}) or
@@ -245,12 +247,12 @@ __END__
 
 =head1 NAME
 
-Crypt::HashCash::Stash - Coin stash for HashCash digital cash
+Crypt::HashCash::Stash - Coin Stash for HashCash Digital Cash
 
 =head1 VERSION
 
- $Revision: 1.118 $
- $Date: Sat Jun 10 13:59:11 PDT 2017 $
+ $Revision: 1.124 $
+ $Date: Mon Jun 19 15:51:59 PDT 2017 $
 
 =head1 SYNOPSIS
 
@@ -258,21 +260,11 @@ Crypt::HashCash::Stash - Coin stash for HashCash digital cash
 
   my $stash = new Crypt::HashCash::Stash;
 
-  $client->loadkeys;                           # Load vault keys
-
-  my $request = $client->request_coin          # Request a coin
-    ( Denomination => $denomination,
-      Init => $init );
-
-  my $coin = $client->unblind_coin($blindcoin) # Unblind a blinded coin
-
-  print "OK\n" if $client->verify_coin($coin)  # Verify coin's signature
-
 =head1 DESCRIPTION
 
-This module implements a client for the HashCash digital cash
-system. It provides methods to request, unblind and verify the
-signature on HashCash coins.
+This module implements a coin stash for the HashCash digital cash
+system. It provides methods to get coins from and add coins to the
+stash.
 
 =head1 METHODS
 
@@ -316,7 +308,7 @@ progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Crypt::HashCash::Client
+    perldoc Crypt::HashCash::Stash
 
 You can also look for information at:
 

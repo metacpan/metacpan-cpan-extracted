@@ -1,0 +1,61 @@
+{
+   "abstract" : "Accessors for JSON Web Token (JWT) stored in psgix",
+   "author" : [
+      "Thomas Klausner <domm@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Web-Request-Role-JWT",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Throwable::Factory" : "0",
+            "Log::Any" : "0",
+            "Moose::Role" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Request" : "0",
+            "HTTP::Request::Common" : "0",
+            "Plack::Builder" : "0",
+            "Plack::Middleware::Auth::JWT" : "0",
+            "Plack::Middleware::PrettyException" : "0",
+            "Plack::Test" : "0",
+            "Test::More" : "0",
+            "Web::Request" : "0",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/domm/Web-Request-Role-JWT.git",
+         "web" : "https://github.com/domm/Web-Request-Role-JWT"
+      }
+   },
+   "version" : "1.001"
+}
+

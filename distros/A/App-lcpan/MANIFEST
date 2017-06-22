@@ -8,6 +8,7 @@ Makefile.PL
 README
 bin/lcpan
 bin/lcpanm
+bin/lcpanm-script
 dist.ini
 lib/App/lcpan.pm
 lib/App/lcpan/Cmd/author_deps.pm

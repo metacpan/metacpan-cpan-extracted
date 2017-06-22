@@ -1,7 +1,15 @@
 do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'Alien::libuv' => '0',
+                                    'Config' => '0',
+                                    'ExtUtils::MakeMaker' => '7.12'
+                                  }
+                  },
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '7.12'
+                                        'Alien::libuv' => '0',
+                                        'ExtUtils::MakeMaker' => '0'
                                       }
                       },
        'develop' => {
@@ -18,14 +26,12 @@ do { my $x = {
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Pod::Spelling::CommonMistakes' => '1.000',
                                       'Test::Spelling' => '0.12',
-                                      'Test::Version' => '1',
-                                      'Try::Tiny' => '0.24'
+                                      'Test::Version' => '1'
                                     }
                     },
        'runtime' => {
                       'requires' => {
-                                      'Carp' => '0',
-                                      'Exporter' => '0',
+                                      'Alien::libuv' => '0',
                                       'perl' => '5.008001',
                                       'strict' => '0',
                                       'warnings' => '0'
@@ -37,7 +43,8 @@ do { my $x = {
                                    },
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '7.12',
-                                   'Test::More' => '0.94'
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0.88'
                                  }
                  }
      };

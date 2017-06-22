@@ -2,7 +2,7 @@ NAME
     App::prowess - Watch files for changes and re-run prove
 
 VERSION
-    0.04
+    0.05
 
 DESCRIPTION
     App::prowess is an application which will watch files for changes and

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.006;
 
 use ExtUtils::MakeMaker;
 
@@ -14,8 +14,11 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Sub-QuoteX-Utils",
   "LICENSE" => "gpl",
+  "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Sub::QuoteX::Utils",
   "PREREQ_PM" => {
+    "Carp" => 0,
+    "Exporter" => 0,
     "Scalar::Util" => 0,
     "Sub::Quote" => "2.002002",
     "strict" => 0,
@@ -29,9 +32,11 @@ my %WriteMakefileArgs = (
     "Moo" => 0,
     "Sub::Quote" => "2.002002",
     "Test2::Bundle::Extended" => 0,
-    "Test::More" => 0
+    "Test::More" => 0,
+    "blib" => "1.01",
+    "overload" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.08",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,6 +44,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
+  "Exporter" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
@@ -48,6 +55,8 @@ my %FallbackPrereqs = (
   "Sub::Quote" => "2.002002",
   "Test2::Bundle::Extended" => 0,
   "Test::More" => 0,
+  "blib" => "1.01",
+  "overload" => 0,
   "strict" => 0,
   "warnings" => 0
 );

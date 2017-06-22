@@ -36,7 +36,7 @@ my $builder = $class->new(
     dist_version_from   => 'lib/CLI/Startup.pm',
 
     requires => {
-        'perl'            => '5.8.8',
+        'perl'            => '5.10.0',
         'Class::Std'      => '0.01',
         'Clone'           => 0,
         'Config::Any'     => 0,
@@ -50,6 +50,7 @@ my $builder = $class->new(
         'Hash::Merge'     => 0,
         'List::Util'      => 0,
         'Pod::Text'       => '3.01',
+        'Readonly'        => 0,
         'Symbol'          => 0,
         'Text::CSV'       => 0,
     },
@@ -57,7 +58,7 @@ my $builder = $class->new(
     recommends => {
         'Config::Tiny'        => 0, # To read INI configs
         'Config::INI::Writer' => 0, # To write INI configs
-        'JSON::Any'           => 0, # To write JSON configs
+        'JSON::MaybeXS'       => 0, # To write JSON configs
         'YAML::Any'           => 0, # To write YAML configs
         'XML::Simple'         => 0, # To write XML configs
     },

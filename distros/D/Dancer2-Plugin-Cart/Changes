@@ -46,3 +46,6 @@ Revision history for Dancer2-Plugin-Cart
         Update documentation.
         Add quanitity keywork to the dsl.
         Update inlineviews removing link to checkout without items on cart.
+
+1.0001 2017-06-21
+        Add checkout post hook

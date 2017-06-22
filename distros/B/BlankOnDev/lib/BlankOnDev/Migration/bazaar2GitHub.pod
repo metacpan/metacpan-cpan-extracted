@@ -5,6 +5,44 @@ L<BlankOnDev>::Migration::bazaar2GitHub - Module for handling command "boidev bz
 =head1 DESCRIPTION
 
 The purpose of this module for implementation on command "boidev bzr2git".
+Module covered command :
+
+=over
+
+=item * boidev bzr2git
+
+=item * boidev bzr2git addpkg-group <OPTIONS>
+
+=item * boidev bzr2git addpkg-file <OPTIONS>
+
+=item * boidev bzr2git addpkg <OPTIONS>
+
+=item * boidev bzr2git remove-pkg-group <OPTIONS>
+
+=item * boidev bzr2git rename-pkg-group <OPTIONS>
+
+=item * boidev bzr2git list-pkg <OPTIONS>
+
+=item * boidev bzr2git list-pkg-group <OPTIONS>
+
+=item * boidev bzr2git search-pkg <OPTIONS>
+
+=item * boidev bzr2git branch <OPTIONS>
+
+=item * boidev bzr2git bzr-cgit <OPTIONS>
+
+=item * boidev bzr2git git-push <OPTIONS>
+
+=item * boidev bzr2git git-push-new <OPTIONS>
+
+=item * boidev bzr2git re-branch <OPTIONS>
+
+=item * boidev bzr2git re-gitpush <OPTIONS>
+
+=item * boidev bzr2git re-check <OPTIONS>
+
+=back
+
 
 =head1 COPYRIGHT AND LICENSE
 

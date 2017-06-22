@@ -1,7 +1,7 @@
 package Pcore::Util::Hash::Multivalue;
 
 use Pcore;
-use Pcore::Util::Scalar qw[is_array is_hash];
+use Pcore::Util::Scalar qw[is_arrayref is_hashref];
 use Pcore::Util::List qw[pairkeys];
 use Storable qw[dclone];
 use Tie::Hash;
@@ -55,7 +55,7 @@ sub get_hash ($self) {
 sub add {
     my $self = shift;
 
-    my $args = is_array( $_[0] ) ? $_[0] : is_hash( $_[0] ) ? [ $_[0]->%* ] : [@_];
+    my $args = is_arrayref $_[0] ? $_[0] : is_hashref $_[0] ? [ $_[0]->%* ] : [@_];
 
     my $hash = tied $self->%*;
 
@@ -80,7 +80,7 @@ sub set {    ## no critic qw[NamingConventions::ProhibitAmbiguousNames]
 sub replace {
     my $self = shift;
 
-    my $args = is_array( $_[0] ) ? $_[0] : is_hash( $_[0] ) ? [ $_[0]->%* ] : [@_];
+    my $args = is_arrayref $_[0] ? $_[0] : is_hashref $_[0] ? [ $_[0]->%* ] : [@_];
 
     my $hash = tied $self->%*;
 

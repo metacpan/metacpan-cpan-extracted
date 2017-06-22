@@ -16,7 +16,7 @@ has missing_after => 1800;
 has remove_after  => 172800;
 has tasks         => sub { {} };
 
-our $VERSION = '6.06';
+our $VERSION = '7.0';
 
 sub add_task { ($_[0]->tasks->{$_[1]} = $_[2]) and return $_[0] }
 
@@ -39,6 +39,8 @@ sub job {
     task    => $job->{task}
   );
 }
+
+sub lock { shift->backend->lock(@_) }
 
 sub new {
   my $self = shift->SUPER::new;
@@ -63,7 +65,8 @@ sub perform_jobs {
 sub repair { shift->_delegate('repair') }
 sub reset  { shift->_delegate('reset') }
 
-sub stats { shift->backend->stats }
+sub stats  { shift->backend->stats }
+sub unlock { shift->backend->unlock(@_) }
 
 sub worker {
   my $self = shift;
@@ -125,9 +128,9 @@ Minion - Job queue
 
 L<Minion> is a job queue for the L<Mojolicious|http://mojolicious.org> real-time
 web framework, with support for multiple named queues, priorities, delayed jobs,
-job dependencies, job results, retries with backoff, statistics, distributed
-workers, parallel processing, autoscaling, remote control, resource leak
-protection and multiple backends (such as
+job dependencies, job results, retries with backoff, rate limiting, unique jobs,
+statistics, istributed workers, parallel processing, autoscaling,
+remote control, resource leak protection and multiple backends (such as
 L<PostgreSQL|http://www.postgresql.org>).
 
 Job queues allow you to process time and/or computationally intensive tasks in
@@ -395,6 +398,53 @@ return C<undef> if job does not exist.
   # Get job result
   my $result = $minion->job($id)->info->{result};
 
+=head2 lock
+
+  my $bool = $minion->lock('foo', 3600);
+  my $bool = $minion->lock('foo', 3600, {limit => 20});
+
+Try to acquire a named lock that will expire automatically after the given
+amount of time in seconds. You can release the lock manually with L</"unlock">
+to limit concurrency, or let it expire for rate limiting.
+
+  # Only one job should run at a time (unique job)
+  $minion->add_task(do_unique_stuff => sub {
+    my ($job, @args) = @_;
+    return $job->finish('Previous job is still active')
+      unless $minion->lock('fragile_backend_service', 7200);
+    ...
+    $minion->unlock('fragile_backend_service');
+  });
+
+  # Only five jobs should run at a time and we wait for our turn
+  $minion->add_task(do_concurrent_stuff => sub {
+    my ($job, @args) = @_;
+    sleep 1 until $minion->lock('some_web_service', 60, {limit => 5});
+    ...
+    $minion->unlock('some_web_service');
+  });
+
+  # Only a hundred jobs should run per hour and we try again later if necessary
+  $minion->add_task(do_rate_limited_stuff => sub {
+    my ($job, @args) = @_;
+    return $job->retry({delay => 3600})
+      unless $minion->lock('another_web_service', 3600, {limit => 100});
+    ...
+  });
+
+These options are currently available:
+
+=over 2
+
+=item limit
+
+  limit => 20
+
+Number of shared locks with the same name that can be active at the same time,
+defaults to C<1>.
+
+=back
+
 =head2 new
 
   my $minion = Minion->new(Pg => 'postgresql://postgres@/test');
@@ -502,6 +552,12 @@ Number of jobs in C<inactive> state.
 Number of workers that are currently not processing a job.
 
 =back
+
+=head2 unlock
+
+  my $bool = $minion->unlock('foo');
+
+Release a named lock that has been previously acquired with L</"lock">.
 
 =head2 worker
 

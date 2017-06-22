@@ -115,6 +115,7 @@ if ($version) {
   exit 0 if ($version);
 }
 pod2usage({-exitval=>0,-verbose=>0}) if ($help);
+die("$prog: ERROR: no output location specified: use the -output (-o) option!\n") if (!defined($dbdir));
 
 
 ##----------------------------------------------------------------------
@@ -207,8 +208,8 @@ dcdb-create.perl - create a DiaColloDB diachronic collocation database
    -64bit               ##-- use 64-bit quads where available
    -32bit               ##-- use 32-bit integers where available
    -dmax DIST           ##-- maximum distance for indexed co-occurrences (default=5)
-   -tfmin TFMIN         ##-- minimum global term frequency (default=5)
-   -lfmin TFMIN         ##-- minimum global lemma frequency (default=undef:tfmin)
+   -tfmin TFMIN         ##-- minimum global term frequency (default=2)
+   -lfmin LFMIN         ##-- minimum global lemma frequency (default=undef:tfmin)
    -cfmin CFMIN         ##-- minimum relation co-occurrence frequency (default=2)
    -[no]tdf             ##-- do/don't create (term x document) index relation (default=if available)
    -tdf-dbreak BREAK    ##-- set tdf matrix "document" granularity (e.g. s,p,page,file; default=file)
@@ -242,7 +243,7 @@ dcdb-create.perl - create a DiaColloDB diachronic collocation database
    -[no]mmap            ##-- do/don't use mmap for file access (default=do)
    -[no]debug           ##-- do/don't enable painful debugging checks (default=don't)
    -[no]times           ##-- do/don't report operating timing (default=do)
-   -output OUT          ##-- output directory (required)
+   -output OUT          ##-- output directory or client configuration file (required)
 
 =cut
 
@@ -463,11 +464,11 @@ Specify maximum distance for indexed co-occurrences (default=5).
 
 =item -tfmin TFMIN
 
-Specify minimum global term frequency (default=5).
+Specify minimum global term frequency (default=2).
 A "term" in this sense is an n-tuple of indexed attributes
 B<not including> the "date" component.
 
-=item -lfmin TFMIN
+=item -lfmin LFMIN
 
 Specify minimum global lemma frequency (default=undef:TFMIN).
 

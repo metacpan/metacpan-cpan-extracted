@@ -6,10 +6,9 @@ use warnings;
 
 use Test::More;
 
-plan tests => 2 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 1 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'Perinci/CmdLine/Base/Patch/DumpAndExit.pm',
     'Perinci/CmdLine/Dump.pm'
 );
 

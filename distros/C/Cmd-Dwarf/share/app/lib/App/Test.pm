@@ -63,8 +63,9 @@ sub _build_context_stack { [] }
 sub _build_cookie_jar { HTTP::Cookies->new }
 
 sub _build_mech {
+	my ($self) = @_;
 	my $mech = WWW::Mechanize->new(autocheck => 0);
-	$mech->cookie_jar(self->cookie_jar);
+	$mech->cookie_jar($self->cookie_jar);
 	return $mech;
 }
 
@@ -110,8 +111,17 @@ sub req {
 		my @a = ($uri->as_string);
 		push @a, @args if $method !~ /^(get|delete)$/i;
 		$method = uc $method;
-		$method = \&$method;
-		$req = $method->(@a);
+
+		# HTTP::Request::Common が PATCH をサポートしてないのでワークアラウンド
+		if ($method eq 'PATCH') {
+			$method = 'POST';
+			$method = \&$method;
+			$req = $method->(@a);
+			$req->method('PATCH');
+		} else {
+			$method = \&$method;
+			$req = $method->(@a);
+		}
 
 		$self->cookie_jar->add_cookie_header($req);		
 		$res = $cb->($req);

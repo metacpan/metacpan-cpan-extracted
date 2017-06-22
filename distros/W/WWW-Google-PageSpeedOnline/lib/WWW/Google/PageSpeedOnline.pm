@@ -1,6 +1,7 @@
 package WWW::Google::PageSpeedOnline;
 
-$WWW::Google::PageSpeedOnline::VERSION = '0.21';
+$WWW::Google::PageSpeedOnline::VERSION   = '0.22';
+$WWW::Google::PageSpeedOnline::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
 
@@ -8,7 +9,7 @@ WWW::Google::PageSpeedOnline - Interface to Google Page Speed Online API.
 
 =head1 VERSION
 
-Version 0.21
+Version 0.22
 
 =cut
 
@@ -31,10 +32,7 @@ extends 'WWW::Google::UserAgent';
 has prettyprint => (is => 'ro', isa => TrueFalse, default => sub { 'true'    });
 has strategy    => (is => 'ro', isa => Strategy,  default => sub { 'desktop' });
 has locale      => (is => 'ro', isa => Locale,    default => sub { 'en_US'   });
-
-has stats       => (is => 'rw');
-has result      => (is => 'rw');
-has advise      => (is => 'rw');
+has [ qw(stats result advise) ] => (is => 'rw');
 
 our $BASE_URL   = 'https://www.googleapis.com/pagespeedonline/v2/runPagespeed';
 
@@ -351,7 +349,7 @@ Mohammad S Anwar, C<< <mohammad.anwar at yahoo.com> >>
 
 =head1 REPOSITORY
 
-L<https://github.com/Manwar/WWW-Google-PageSpeedOnline>
+L<https://github.com/manwar/WWW-Google-PageSpeedOnline>
 
 =head1 BUGS
 

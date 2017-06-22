@@ -1,0 +1,192 @@
+=head1 NAME
+
+Monitoring::Icinga2::Client::REST - REST integration with icinga2
+
+=head1 SYNOPSIS
+
+    use strict;
+    use warnings;
+
+    use Monitoring::Icinga2::Client::REST;
+
+    my $icinga = new Monitoring::Icinga2::Client::REST("fqdn",
+	port => $port,
+	path => $path,
+	version => $version,
+	cacert => $cacert_file,
+    );
+    $icinga->login("username","password") or die $icinga->login_status;
+
+    my $host_object = {
+	attrs => {
+	    address => "127.0.0.1",
+            check_command => "hostalive"
+        }
+    };
+
+
+    my $put_result = $icinga->do_request("PUT", "/objects/hosts/localhost.example.com", "", $host_object);
+        or warn sprintf("%s: %s", $icinga->request_code, $icinga->request_status_line);
+
+    my $post_result = $icinga->do_request("POST", "/objects/hosts/localhost.example.com", "",$host_object);
+        or warn sprintf("%s: %s", $icinga->request_code, $icinga->request_status_line);
+
+    my $get_result = $icinga->do_request("GET", "/objects/hosts/localhost.example.com");
+        or warn sprintf("%s: %s", $icinga->request_code, $icinga->request_status_line);
+
+    my $delete_result = $icinga->do_request("DELETE", "/objects/hosts/localhost.example.com");
+        or warn sprintf("%s: %s", $icinga->request_code, $icinga->request_status_line);
+
+    $icinga->logout;
+
+=head1 DESCRIPTION
+
+Module used to integrate with the REST API that Icinga2 provides.
+
+=head1 CONSTRUCTOR
+
+=over
+
+=item new (FQDN, PORT, PATH, VERSION, INSECURE)
+
+=item new (FQDN, PORT, PATH, VERSION, [ INSECURE ])
+
+Monitoring::Icinga2::Client::REST object.
+
+The former calling convention with four mandatory arguments is the old one. If a
+port number is present after the Icinga host, the constructor assumes you want
+this form. The arguments are:
+
+=over
+
+=item * FQDN is your Icinga monitoring host.
+
+=item * PORT is the port the REST API runs on.
+
+=item * PATH is the URI where to find the API, usually "/".
+
+=item * VERSION should be set to the API version, usually 1.
+
+=item * INSECURE is optional and makes this module skip certificate verification if set.
+
+=back
+
+The latter form treats only the FQDN as mandatory and allows all other arguments
+to be passed hash style with the following keys:
+
+=over
+
+=item * C<port> see above; defaults to C<5665>.
+
+=item * C<path> see above; defaults to C</>.
+
+=item * C<version> see above; defaults to 1 and is therefore completely
+redundant as long as there is only one API version.
+
+=item * C<insecure> see above; defaults to false
+
+=item * C<cacert> The file name of a PEM-format file containing the certificate
+of the CA that issued the server's HTTPS certificate. As internal monitoring
+servers often use certs from in-house CAs, this still allows for secure peer
+identification instead of using insecure mode.
+
+=back
+
+=back
+
+=head1 METHODS
+
+=over
+
+=item login (USERNAME, PASSWORD)
+
+Configures and validates credentials. Please note that user needs at least the permission
+"status/query". This methos does nothing if it has been called on the sameobject
+before unless L</logout> was called before.
+
+=item logout
+
+Destroys the login session.
+
+=item login_status
+
+Returns a human readable login status of the current session.
+
+=item logged_in
+
+Returns true when logged in, otherwise returns undef.
+
+=item do_request (HTTP METHOD, URI, PARAMS, DATA)
+
+Performs the actual request.
+
+"PARAMS" is optional and can be any parameters that the Icinga API supports.
+
+"DATA" is optional and is a Perl data structure that will be converted to JSON.
+
+Returns the result in a perl reference.
+
+=item export (FULL, API_ONLY)
+
+Returns a Perl Data structure without unneccessary meta data. $icinga->export can
+only be called after do_request. The name of the object is stored in 
+$object->{attrs}{vars}{__export_name} so that you can access if you need it, please 
+note that you can't use this variable name for other things if you whis to use this library
+as it will be overwritten in the exported object.
+
+"FULL" is optional and if it is true, write once attributes will be included in
+the export. Objects exported with FULL set to true can be converted to json and be
+used for PUT requests, but not neccessarily for POST requests.
+
+"API_ONLY" is optional and if it is true only objects created via the API
+will be exported.
+
+=item request_code
+
+Returns the last HTTP status code.
+
+=item request_status_line
+
+Returns the last HTTP status line.
+
+=back
+
+=head1 DEPENDS
+
+L<LWP::UserAgent>,
+L<HTTP::Request>,
+L<URI::Escape>,
+L<JSON>,
+L<Encode>
+
+=head1 LICENSE
+
+Copyright (c) 2016-, IT Services, Stockholm University
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+following conditions are met:
+
+Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+disclaimer.
+
+Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+disclaimer in the documentation and/or other materials provided with the distribution.
+
+Neither the name of Stockholm University nor the names of its contributors may be used to endorse or promote products
+derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=head1 AUTHOR
+
+Johan Carlquist <jocar@su.se>,
+Mikael Nordin <mikael.nordin@su.se>
+Bits and pieces by Matthias Bethke <matthias@towiski.de>

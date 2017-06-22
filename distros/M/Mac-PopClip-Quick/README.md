@@ -137,6 +137,21 @@ for which this extension's actions should not appear.
 Array of bundle identifier strings of applications (e.g. `com.apple.TextEdit`)
 that this extension's actions will appear in.
 
+## after\_action
+
+What the extension should do after it's executed.  By default it is a undefined
+value, indicating that it does nothing.  If your script produces output you'll
+probably want to set this to `paste-result`.  A full range of options that
+PopClip supports can be found at
+[https://github.com/pilotmoon/PopClip-Extensions#user-content-before-and-after-keys](https://github.com/pilotmoon/PopClip-Extensions#user-content-before-and-after-keys)
+
+## before\_action
+
+What the extension should do before it's executed.  By default it is a undefined
+value, indicating that it does nothing. A full range of options that PopClip
+supports can be found at
+[https://github.com/pilotmoon/PopClip-Extensions#user-content-before-and-after-keys](https://github.com/pilotmoon/PopClip-Extensions#user-content-before-and-after-keys)
+
 # FUNCTIONS
 
 Just the one:

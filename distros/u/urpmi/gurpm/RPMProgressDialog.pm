@@ -2,7 +2,7 @@ package gurpm::RPMProgressDialog;
 
 #- Copyright (C) 2005 MandrakeSoft SA
 #- Copyright (C) 2005-2010 Mandriva SA
-#- Copyright (C) 2015 Mageia
+#- Copyright (C) 2011-2017 Mageia
 
 # Sharing code from gurpmi2 && Rpmdrake::gurpm
 # Gtk3 only (no ugtk3/mygtk3) as it's used by gurpmi too...
@@ -77,7 +77,7 @@ sub new {
     $w->set_border_width(12);
     $w->set_title($w->title);
     $w->signal_connect(destroy => $o_quit) if $o_quit;
-    $w->set_position('center');
+    $w->set_position('center_always');
     $w->set_default_size($progressbar_size, 60);
     # for matchbox window manager during install:
     if (!$o_no_modal) {
@@ -390,7 +390,7 @@ Copyright (C) 2005 MandrakeSoft SA
 
 Copyright (C) 2005-2010 Mandriva SA
 
-Copyright (C) 2011-2013 Mageia
+Copyright (C) 2011-2017 Mageia
 
 =cut
 

@@ -5,6 +5,7 @@
 #include "XSUB.h"
 #include "ppport.h"
 
+#include <stdint.h>
 #include "unicode.h"
 #include "json-create-perl.c"
 

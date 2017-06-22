@@ -2,7 +2,7 @@
 #
 # This file is part of Test-Moose-More
 #
-# This software is Copyright (c) 2012 by Chris Weyl.
+# This software is Copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by Chris Weyl.
 #
 # This is free software, licensed under:
 #
@@ -39,8 +39,11 @@ no_smart_comments_in("t/is_not_anon_ok.t");
 no_smart_comments_in("t/is_role_ok.t");
 no_smart_comments_in("t/meta_ok.t");
 no_smart_comments_in("t/method_from_pkg_ok.t");
+no_smart_comments_in("t/method_is_accessor_ok.t");
+no_smart_comments_in("t/method_is_not_accessor_ok.t");
 no_smart_comments_in("t/method_not_from_pkg_ok.t");
 no_smart_comments_in("t/method_ok.t");
+no_smart_comments_in("t/no_meta_ok.t");
 no_smart_comments_in("t/pristine_ok.t");
 no_smart_comments_in("t/requires_method_ok.t");
 no_smart_comments_in("t/subtest-1.t");

@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/IPC/Serial.pm
+t/00-load.t
+t/01-message.t
+t/pod.t
+bin/client.pl
+bin/server.pl
+bin/sender.pl
+bin/receiver.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

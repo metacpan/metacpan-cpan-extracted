@@ -2,13 +2,13 @@
 # Copyright (C) YEAR Free Software Foundation, Inc.
 #
 # Translators:
-# Ardit Dani <ardit.dani@gmail.com>, 2014-2016
+# Ardit Dani <ardit.dani@gmail.com>, 2014-2017
 # Naim Daka <naim70@freesurf.ch>, 2002
 msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
 "POT-Creation-Date: 2014-09-13 21:15+0200\n"
-"PO-Revision-Date: 2016-04-08 10:33+0000\n"
+"PO-Revision-Date: 2017-01-27 01:33+0000\n"
 "Last-Translator: Ardit Dani <ardit.dani@gmail.com>\n"
 "Language-Team: Albanian (http://www.transifex.com/MageiaLinux/mageia/"
 "language/sq/)\n"
@@ -142,7 +142,7 @@ msgstr "_Anulo"
 #: ../gurpmi:126
 #, c-format
 msgid "Choose location to save file"
-msgstr ""
+msgstr "Zgjedh vendndodhjen për të ruajtur skedarë"
 
 #: ../gurpmi:126 ../gurpmi2:119
 #, c-format
@@ -1801,7 +1801,7 @@ msgstr "  --uniq          - mos i çfaqë rreshtat e njëjtë.\n"
 #: ../urpmf:41 ../urpmi:70 ../urpmq:42
 #, c-format
 msgid "  --update       - use only update media.\n"
-msgstr "  --update       - përdori vetëm burimet azhurnuese.\n"
+msgstr "  --update - përdori vetëm burimet përditësimi.\n"
 
 #: ../urpmf:42
 #, c-format
@@ -2734,12 +2734,12 @@ msgid ""
 "where <name> is a medium name to update.\n"
 msgstr ""
 "përdorim:urmpi.update [option] <emri> ...\n"
-"ku <emri> është një emrim i burimit azhurnues.\n"
+"ku <emri> është një emër i burimit përditësues.\n"
 
 #: ../urpmi.update:43
 #, c-format
 msgid "  --update       - update only update media.\n"
-msgstr "  --update       - azhurno vetëm burimet azhurnuese.\n"
+msgstr "  --update - përditëso vetëm burimet përditësuese.\n"
 
 #: ../urpmi.update:45
 #, c-format
@@ -2785,7 +2785,7 @@ msgstr ""
 #, c-format
 msgid "nothing to update (use urpmi.addmedia to add a media)\n"
 msgstr ""
-"asgjë për tu azhurnuar (përdore urpmi.addmedia për të shtuar një burim)\n"
+"asgjë për tu përditësuar (përdor urpmi.addmedia për të shtuar një burim)\n"
 
 #: ../urpmi.update:87
 #, c-format
@@ -2793,7 +2793,7 @@ msgid ""
 "the entry to update is missing\n"
 "(one of %s)\n"
 msgstr ""
-"hyrja për azhurnim mungon\n"
+"hyrja për përditësime mungon\n"
 "(një nga %s)\n"
 
 #: ../urpmi.update:98

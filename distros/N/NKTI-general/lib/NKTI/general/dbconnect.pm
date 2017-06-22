@@ -7,7 +7,7 @@ use DBI;
 
 # Define Version :
 # ----------------------------------------------------------------
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 # Create Module for Connection MySQL Database :
 # ------------------------------------------------------------------------

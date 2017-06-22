@@ -1,7 +1,13 @@
+Version 5.12 - 10 November 2016
+
+- fix more compilation warnings
+- make sure to use int64 on 32bit arch
+  else we may got total size to overflow (mga#19686)
+
 Version 5.11 - 20 October 2016
 
 - fix some compilation warnings
-- fix a crash introduced by mga#15353 fix if not in debug mode
+- fix a crash introduced by mga#15353 fix if not in debug mode (mga#19618)
 
 Version 5.10 - 18 October 2016
 

@@ -18,18 +18,11 @@ for my $word1 (@word_list) {
     }
 }
 
-push @word_list, @word_list;
+say "GCD(35, 49) is: ", gcd(35, 49);
 
-for my $n (1..3) {
-    use List::Util 'shuffle';
-    my @words = shuffle (@word_list) x $n;
-    PYTHON {
-        import itertools
-        print 'n =', $n, ' -->', [k for k,g in itertools.groupby(sorted(@word_list))]
-    }
+for my $n (2..11) {
+    say "$n is prime" if PRIMUM($n);
 }
-
-say "GCD is: ", gcd(35, 49);
 
 PYTHON {
     def gcd(u, v):
@@ -55,3 +48,16 @@ PYTHON {
             t = u - v
         return u * k
 }
+
+
+LATIN {
+
+    PRIMUMERE
+        SIC MEO NUMERO DA HIS DECAPITAMENTUM. MEIS LISTIS II TUM CUM
+        NUMERUM FODEMENTUM CONSCRIBEMENTA DA. DUM DAMENTUM NEXTO LISTIS
+        DECAPITAMENTUM FAC SIC LISTA SIC HOC TUM NEXTUM RECIDEMENTUM CIS
+        VANNEMENTA DA LISTIS. SI NUMERUM TUM NEXTUM RECIDEMENTUM TUM
+        NULLUM AEQUALITAM FAC SIC NULLUS REDDE CIS CIS UNUM REDDE CIS
+
+}
+

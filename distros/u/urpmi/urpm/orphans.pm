@@ -685,6 +685,6 @@ sub installed_leaves {
 
 Copyright (C) 2008-2010 Mandriva SA
 
-Copyright (C) 2011-2015 Mageia
+Copyright (C) 2011-2017 Mageia
 
 =cut

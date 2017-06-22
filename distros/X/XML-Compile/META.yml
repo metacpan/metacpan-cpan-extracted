@@ -31,4 +31,4 @@ requires:
   XML::Compile::Tester: 0.9
   XML::LibXML: 2.0107
   bignum: 0.1
-version: 1.56
+version: 1.57

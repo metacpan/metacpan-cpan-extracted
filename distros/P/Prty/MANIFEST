@@ -88,6 +88,7 @@ lib/Prty/Mojolicious/Plugin/Log/Parameters.pm
 lib/Prty/Object.pm
 lib/Prty/Option.pm
 lib/Prty/OrderedHash.pm
+lib/Prty/Parallel.pm
 lib/Prty/Path.pm
 lib/Prty/Perl.pm
 lib/Prty/PersistentHash.pm
@@ -144,6 +145,7 @@ lib/Prty/Timeseries/Synchronizer.pm
 lib/Prty/Udl.pm
 lib/Prty/Unindent.pm
 lib/Prty/Url.pm
+lib/Prty/XML/LibXML.pm
 lib/Prty/XTerm.pm
 Makefile.PL
 MANIFEST			This list of files

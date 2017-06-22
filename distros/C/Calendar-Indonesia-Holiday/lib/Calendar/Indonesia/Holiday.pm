@@ -1,13 +1,13 @@
 package Calendar::Indonesia::Holiday;
 
-our $DATE = '2017-05-29'; # DATE
-our $VERSION = '0.29'; # VERSION
+our $DATE = '2017-06-20'; # DATE
+our $VERSION = '0.30'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use experimental 'smartmatch';
-use Log::Any::IfLOG '$log';
+#use Log::ger;
 
 use DateTime;
 use Function::Fallback::CoreOrPP qw(clone);
@@ -719,6 +719,7 @@ $year_holidays{2017} = [
     _h_hijra     ({_expand_dm("21-09")}, {hyear=>1439}),
     _h_mawlid    ({_expand_dm("01-12")}, {hyear=>1439}),
 
+    _jointlv     ({_expand_dm("23-06")}, {holiday=>$eidulf2017}), # ref: Keppres 18/2017 (2017-06-15)
     _jointlv     ({_expand_dm("27-06")}, {holiday=>$eidulf2017}),
     _jointlv     ({_expand_dm("28-06")}, {holiday=>$eidulf2017}),
     _jointlv     ({_expand_dm("29-06")}, {holiday=>$eidulf2017}),
@@ -1049,7 +1050,7 @@ Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 =head1 VERSION
 
-This document describes version 0.29 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2017-05-29.
+This document describes version 0.30 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2017-06-20.
 
 =head1 SYNOPSIS
 

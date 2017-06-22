@@ -1,4 +1,8 @@
-Revision history for SQL-Schema-Versioned
+0.21    2017-06-15 (PERLANCAR)
+
+	- [Bugfix] Fix logic bug, don't test diff when schema is still at
+	  latest_v=1.
+
 
 0.20    2015-09-06 (PERLANCAR)
 

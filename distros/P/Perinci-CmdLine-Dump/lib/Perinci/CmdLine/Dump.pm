@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Dump;
 
-our $DATE = '2017-01-13'; # DATE
-our $VERSION = '0.08'; # VERSION
+our $DATE = '2017-06-17'; # DATE
+our $VERSION = '0.09'; # VERSION
 
 use 5.010001;
 use strict;
@@ -106,14 +106,11 @@ sub dump_pericmd_script {
     my $libs = $args{libs} // [];
 
     my $tag = UUID::Random::generate();
-    my @cmd = (
-        $^X, (map {"-I$_"} @$libs),
-        "-MPerinci::CmdLine::Base::Patch::DumpAndExit=-tag,$tag",
-        $filename,
-        "--version",
-    );
     my ($stdout, $stderr, $exit) = Capture::Tiny::capture(
-        sub { system @cmd },
+        sub {
+            local $ENV{PERINCI_CMDLINE_DUMP} = $tag;
+            system $^X, $filename;
+        },
     );
 
     my $cli;
@@ -146,11 +143,8 @@ sub dump_pericmd_script {
         local @INC = (@$libs, @INC);
         (undef, undef, undef) = Capture::Tiny::capture(
             sub {
-                eval q{
-package main;
-use Perinci::CmdLine::Base::Patch::DumpAndExit -tag=>'$tag',-exit_method=>'die';
-do "$filename";
-};
+                local $ENV{PERINCI_CMDLINE_DUMP} = $tag;
+                do $filename;
             }
         );
         $res->[3]{'func.meta'} = \%main::SPEC;
@@ -181,14 +175,18 @@ Perinci::CmdLine::Dump - Run a Perinci::CmdLine-based script but only to dump th
 
 =head1 VERSION
 
-This document describes version 0.08 of Perinci::CmdLine::Dump (from Perl distribution Perinci-CmdLine-Dump), released on 2017-01-13.
+This document describes version 0.09 of Perinci::CmdLine::Dump (from Perl distribution Perinci-CmdLine-Dump), released on 2017-06-17.
 
 =for Pod::Coverage ^(dump_perinci_cmdline_script)$
 
 =head1 FUNCTIONS
 
 
-=head2 dump_pericmd_script(%args) -> [status, msg, result, meta]
+=head2 dump_pericmd_script
+
+Usage:
+
+ dump_pericmd_script(%args) -> [status, msg, result, meta]
 
 Run a Perinci::CmdLine-based script but only to dump the object.
 
@@ -264,7 +262,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

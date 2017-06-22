@@ -56,6 +56,15 @@ if (setting('extra_web_plugins') and ref [] eq ref setting('extra_web_plugins'))
 push @{ config->{engines}->{netdisco_template_toolkit}->{INCLUDE_PATH} },
      setting('views');
 
+# any template paths in deployment.yml (should override plugins)
+if (setting('template_paths') and ref [] eq ref setting('template_paths')) {
+    push @{setting('template_paths')},
+         dir(($ENV{NETDISCO_HOME} || $ENV{HOME}), 'nd-site-local', 'share')->stringify
+      if (setting('site_local_files'));
+    unshift @{ config->{engines}->{netdisco_template_toolkit}->{INCLUDE_PATH} },
+      @{setting('template_paths')};
+}
+
 # load cookie key from database
 setting('session_cookie_key' => undef);
 my $sessions = schema('netdisco')->resultset('Session');

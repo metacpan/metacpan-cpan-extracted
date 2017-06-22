@@ -88,16 +88,22 @@ if( __PACKAGE__->can('run_tests') ) {
 
     1} or warn "\nfail: $@\n";
 
-    for my $mb (qw(testing testing1 testing2 testing3)) {
+    for my $mb (qw(test anotherthing blarg testing testing1 testing2 testing3)) {
         my $nm = $imap->select($mb);
-        if( $nm > 0 ) {
-            $imap->delete("1:$nm");
-            $imap->expunge_mailbox;
+        if( defined $nm ) {
+            if ( $nm > 0 ) {
+                $imap->delete("1:$nm");
+                $imap->expunge_mailbox;
+            }
+            # must get off the selected mailbox before delete
+            # or imap expects us to quit and will die in weird ways
+            $imap->select("INBOX");
+            $imap->delete_mailbox($mb);
         }
-        $imap->delete_mailbox($mb);
     }
 
 } else {
     warn "weird, no tests";
 }
 
+777;

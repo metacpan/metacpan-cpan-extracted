@@ -1,3 +1,193 @@
-===================================
-End of changes in the last 365 days
-===================================
+==================================================
+Changes from 2012-06-14 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 1.16 at 2017-06-13 08:59:40 +0000
+-----------------------------------------
+
+  Change: cd4981ab80e3280734005796aa8106beebc16c8c
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-06-13 09:59:40 +0000
+
+    Change to using JSON::MaybeXS 
+
+  Change: 8bf184493ebbf5d088a986c58fd0908f9baaf572
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-08-24 09:39:40 +0000
+
+    Generate an appropriate URL depending on whether Crypt::SSLeay is
+    installed or not 
+
+  Change: ce65b444ce27a5f3cc5093d94166f9698120165f
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-08-23 10:20:53 +0000
+
+    Updated the Metabase url to non-beta url 
+
+  Change: b55dfec1908294076163375514fd48091aeca7c7
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-08-21 22:24:05 +0000
+
+    Fix the metabase_cpanp script, with a rename. 
+
+  Change: da3192057007dab15a81bd7c01940cd7520772aa
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-08-20 22:46:44 +0000
+
+    Added Task-CPANPLUS-Metabase 
+
+-----------------------------------------
+version 1.06 at 2017-03-29 18:14:41 +0000
+-----------------------------------------
+
+  Change: 91281744b33c3235296d7ed0c6a0b1322ebce24a
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-03-29 19:14:41 +0000
+
+    Switch BeLike to Dist::Zilla 
+
+-----------------------------------------
+version 1.04 at 2017-03-29 17:44:47 +0000
+-----------------------------------------
+
+  Change: 05e130ed3f6c16f1a15bfaad17eb782e85e75de1
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-03-29 18:44:47 +0000
+
+    Ironically switch dist to Dist::Zilla 
+
+-----------------------------------------
+version 1.14 at 2017-02-26 14:53:20 +0000
+-----------------------------------------
+
+  Change: 08513fa6f4771d51e228c1bef96755f1602eb7b6
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-02-26 14:53:20 +0000
+
+    Switch dist to Dist::Zilla 
+
+  Change: 6d7e2d84234457a283bfa003b7a52b5f8db86c15
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-05-16 13:18:25 +0000
+
+    Added Task-BINGOS-Bootstrap 
+
+  Change: 59a099d89b9d1b0fd4ba394b2ac8c8d8b35bc7f0
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-01-17 16:20:12 +0000
+
+    Update dist.ini 
+
+  Change: 1bd67d1120ffb640c8b9c78b97d05ee1d2d42f33
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-01-17 16:18:13 +0000
+
+    Updated Task-CPAN-SmokeBox to require newer versions 
+
+  Change: f9dba061c94329eb30d296feab3645870fc01e6b
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-12-03 10:24:17 +0000
+
+    Remove no automated testers conditional and update required versions 
+
+  Change: e3fbe4b41a7a28b781d93a600c09788ccfdf527e
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-08-24 09:39:40 +0000
+
+    Generate an appropriate URL depending on whether Crypt::SSLeay is
+    installed or not 
+
+  Change: 33ce7ed850c44fd8c0c79baf4009a10b0961e12c
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-08-23 10:20:53 +0000
+
+    Updated the Metabase url to non-beta url 
+
+  Change: bb4c23b85b3b8911f4d25227842f4297858a9e82
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-08-21 22:24:05 +0000
+
+    Fix the metabase_cpanp script, with a rename. 
+
+  Change: 50de113dcc9a1cf63128f5c14bb11f9882f4d81b
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-08-20 22:46:44 +0000
+
+    Added Task-CPANPLUS-Metabase 
+
+  Change: 012ad7136e01f795a7dc207f9c7c5dff869a137d
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-06-10 11:26:13 +0000
+
+    Updated documentation 
+
+  Change: a54dd312331ee70deb8f4611e2342d0720cf9862
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-06-10 11:16:20 +0000
+
+    Added ReadmeFromPod plugin 
+
+  Change: dc38b2468fe1298ab66515d2cce9796128d6ea51
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-06-10 10:42:05 +0000
+
+    Added Changes file 
+
+  Change: f0ece1c9dcfaf1850d7ca8e63371f3ee403c435c
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-06-10 10:12:34 +0000
+
+    Added Task-CPAN-SmokeBox 
+
+  Change: 48d0fcd2c2ee2eba00df1ca2cc5f6ae83d1e119c
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-05-20 16:17:19 +0000
+
+    Meep 
+
+  Change: e977676dd8972baeadc732b8929b0ac61541dd72
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2009-05-29 13:23:17 +0000
+
+    Added Text::CSV 1.12 to the prereqs 
+
+  Change: 36a1e12a955b7e7d00268fec0a607dcf7a7b8be3
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2009-05-21 14:53:22 +0000
+
+    Updated MANIFEST 
+
+  Change: a5919ae6e334dc1373ee133e74e7394f61d14341
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2009-05-21 14:50:04 +0000
+
+    Updated Changes 
+
+  Change: b15b48fac3c8c659d754f7ea595b35406f8e89ba
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2009-05-21 14:49:13 +0000
+
+    Removed Perl6::Pugs and added Win32/Cygwin prereqs 
+
+  Change: 0bf0861a1f22b4a650a21772830c7e679f1fd8a2
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2009-05-21 00:21:02 +0000
+
+    Added Task-BeLike-BINGOS 
+
+  Change: 88690d80af4e94b93d2d6336f7c5c0e904dc969a
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2009-05-13 15:04:10 +0000
+
+    Added Task-Module-Install-BINGOS 
+
+  Change: 309b8e1f631cf73aadf30ed77235fc41a4d50acb
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2009-03-31 21:00:29 +0000
+
+    Initial git import 
+
+================
+End of releases.
+================

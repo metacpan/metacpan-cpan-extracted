@@ -10,11 +10,9 @@ use lib '.';
 use t::Server ();
 use t::Worker qw/ new_worker /;
 
-my $gts = t::Server->new();
-$gts || plan skip_all => $t::Server::ERROR;
-
+my $gts         = t::Server->new();
 my @job_servers = $gts->job_servers();
-@job_servers || BAIL_OUT "no gearmand";
+@job_servers || plan skip_all => $t::Server::ERROR;
 
 my $func = "long";
 
@@ -36,6 +34,8 @@ my $worker = new_worker(
 );
 
 subtest "wait with timeout", sub {
+    plan tests => 10;
+
     ok(my $tasks = $client->new_task_set, "new_task_set");
     isa_ok($tasks, 'Gearman::Taskset');
 
@@ -65,10 +65,13 @@ subtest "wait with timeout", sub {
 };
 
 subtest "$func args", sub {
-    my $tasks = $client->new_task_set;
-    isa_ok($tasks, 'Gearman::Taskset');
+    ($ENV{AUTHOR_TESTING}  && $ENV{AUTHOR_TESTING} == 2)  || plan skip_all => 'without $ENV{AUTHOR_TESTING}';
+    plan tests => 3;
 
     my $arg = 'x' x (5 * 1024 * 1024);
+    my $m;
+    my $tasks = $client->new_task_set;
+    isa_ok($tasks, 'Gearman::Taskset');
 
     $tasks->add_task(
         $func,
@@ -77,26 +80,25 @@ subtest "$func args", sub {
             on_complete => sub {
                 my $rr = shift;
                 if (length($$rr) != length($arg)) {
-                    fail(     "Large job failed size check: got "
-                            . length($$rr)
-                            . ", want "
-                            . length($arg));
-                } ## end if (length($$rr) != length...)
+                    $m = join ' ', "Large job failed size check: got",
+                        length($$rr), ", want", length($arg);
+                }
                 elsif ($$rr ne $arg) {
-                    fail("Large job failed content check");
+                    $m = "Large job failed content check";
                 }
                 else {
-                    pass("Large job succeeded");
+                    $m = "Large job succeeded";
                 }
             },
             on_fail => sub {
-                fail("Large job failed");
+                $m = "Large job failed";
             },
         }
     );
 
     my $to = 10;
     time_ok(sub { $tasks->wait(timeout => $to) }, $to, "timeout");
+    is($m, "Large job succeeded", "Large job succeeded");
 };
 
 done_testing();

@@ -4,13 +4,14 @@
 # Translators:
 # Francesc Pinyol Margalef, 2012-2014
 # Davidmp <medipas@gmail.com>, 2015-2016
+# Robert Antoni Buj Gelonch <rbuj@fedoraproject.org>, 2017
 # Robert Antoni Buj Gelonch <rbuj@fedoraproject.org>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
 "POT-Creation-Date: 2014-09-13 21:15+0200\n"
-"PO-Revision-Date: 2016-09-30 07:23+0000\n"
-"Last-Translator: Davidmp <medipas@gmail.com>\n"
+"PO-Revision-Date: 2017-03-31 08:54+0000\n"
+"Last-Translator: Robert Antoni Buj Gelonch <rbuj@fedoraproject.org>\n"
 "Language-Team: Catalan (http://www.transifex.com/MageiaLinux/mageia/language/"
 "ca/)\n"
 "Language: ca\n"
@@ -431,7 +432,7 @@ msgstr "   -h|--help      - mostra aquest missatge d'ajuda.\n"
 #: ../rpm-find-leaves:18
 #, c-format
 msgid "   --root <path>  - use the given root instead of /\n"
-msgstr "  --root <ruta>  - utilitza la ruta donada en comptes de /\n"
+msgstr "  --root <ruta>  - utilitza el camí especificat en comptes de /\n"
 
 #: ../rpm-find-leaves:19
 #, c-format

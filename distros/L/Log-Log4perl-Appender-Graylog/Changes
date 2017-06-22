@@ -1,0 +1,15 @@
+1.7
+Fix for https://github.com/dimentox/Log-Log4perl-Appender-Graylog/issues/1
+
+1.6
+Decided on a full Version bump due to the way i reworked its internals.
+
+1.5.1
+Adding script for further testing
+
+1.5
+Switched form custom parser to Log::GELF::Util
+Added chunking and tpc or udp sending.
+
+1.4 
+Added Gzip.

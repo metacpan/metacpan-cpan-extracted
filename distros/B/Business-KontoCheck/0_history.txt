@@ -4,9 +4,52 @@
 ##################################################################################
 #                                                                                #
 # Autor             : Michael Plugge <m.plugge@hs-mannheim.de>                   #
-# Version           : 5.8                                                        #
-# Datum             : 22.08.2015                                                 #
+# Version           : 6.00                                                       #
+# Datum             : 13.6.2017                                                  #
 ##################################################################################
+
+##################################################################################
+###                      13.06.17 Version 6.00                                 ###
+##################################################################################
+
+Die Versionsnummer wurde auf 6.00 erhöht, da der CPAN Indexer die Versionen 5.10
+und 5.11 nicht indizieren wollte, da bereits eine höhere Version (5.9) existiere...
+Somit wurde die Version 5.10 auch von den CPAN Testern nicht geprüft. Ansonsten
+gibt es keinen Grund für den Versionssprung.
+
+   - neues Prüfzifferverfahren B1c
+
+   - neues Prüfzifferverfahren E4
+
+   - die IBAN-Regel 54 entfällt ab Juni 2017 (bleibt frei)
+
+##################################################################################
+###                       10.3.17 Version 5.10 (final)                         ###
+##################################################################################
+
+   Wieder einmal eine Version mit nur kleinen Änderungen:
+
+   - neues Prüfzifferverfahren E3
+
+   - kleine Korrektur im Ruby-Port
+
+   - Anpassungen der Testdateien für Perl
+
+
+##################################################################################
+###                       13.11.16 Version 5.9 (final)                         ###
+##################################################################################
+
+   Dies ist wieder eine Version mit kleineren Anpassungen:
+
+   - neues Prüfzifferverfahren 74b
+
+   - in der IBAN-Regel 42 werden eine Reihe 10-stellige Konten akzeptiert
+   
+   - für die gawk-Version 4.1.4 gibt es ein Patchfile
+
+   - die Perl-Version wurde komplett auf UTF-8 umgestellt, sowie das encoding pragma
+     entfernt; die Tests laufen jetzt auch bei neueren Perl-Versionen wieder durch
 
 ##################################################################################
 ###                       22.08.15 Version 5.8 (final)                         ###

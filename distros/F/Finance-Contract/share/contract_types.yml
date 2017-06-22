@@ -197,3 +197,8 @@ VANILLA_PUT:
   pricing_code: VANILLA_PUT
 INVALID:
   category: invalid
+BINARYICO:
+  category: coinauction
+  payout_type: non-binary
+  payouttime: end
+  pricing_code: coinauction

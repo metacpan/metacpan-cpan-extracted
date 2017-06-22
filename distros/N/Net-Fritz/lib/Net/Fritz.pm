@@ -5,7 +5,7 @@ use warnings;
 
 package Net::Fritz;
 # ABSTRACT: AVM Fritz!Box interaction via TR-064
-$Net::Fritz::VERSION = 'v0.0.5';
+$Net::Fritz::VERSION = 'v0.0.7';
 
 
 1;
@@ -22,7 +22,7 @@ Net::Fritz - AVM Fritz!Box interaction via TR-064
 
 =head1 VERSION
 
-version v0.0.5
+version v0.0.7
 
 =head1 SYNOPSIS
 

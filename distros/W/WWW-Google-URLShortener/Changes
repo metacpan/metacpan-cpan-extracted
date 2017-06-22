@@ -1,4 +1,15 @@
-Revision history for WWW-Google-URLShortener
+Revision history for WWW::Google::URLShortener
+
+0.22   Wed Jun 21 13:50:00 2017
+       - Added key 'provides' to the Makefile.PL script.
+
+0.21   Fri Jun 16 10:50:00 2017
+       - Tidied up test scripts and removed "-T" switch.
+       - Tidied up attribute definitions.
+
+0.20   Thu Jun 14 11:30:00 2017
+       - Added $AUTHORITY
+       - Tidied up attribute definitions.
 
 0.19   Sat Nov 14 12:10:00 2015
        - Added LICENSE file.

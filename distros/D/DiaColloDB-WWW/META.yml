@@ -36,4 +36,4 @@ requires:
   Time::HiRes: '0'
   URI: '0'
   URI::Escape: '0'
-version: v0.02.001
+version: v0.02.002

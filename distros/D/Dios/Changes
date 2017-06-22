@@ -82,3 +82,10 @@ Revision history for Dios
           (Sorry, Olivier!)
 
 
+
+
+0.002000  Tue Jun 20 06:04:11 2017
+
+
+        * Clarified use of eval{} in documentation
+          (thanks Olivier)

@@ -13,7 +13,7 @@ Net::Etcd::Config
 
 =cut
 
-our $VERSION = '0.009';
+our $VERSION = '0.013';
 
 =head1 ACCESSORS
 

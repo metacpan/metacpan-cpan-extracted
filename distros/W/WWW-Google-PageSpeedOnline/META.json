@@ -4,7 +4,7 @@
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
@@ -44,9 +44,10 @@
    "resources" : {
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/Manwar/WWW-Google-PageSpeedOnline.git",
-         "web" : "https://github.com/Manwar/WWW-Google-PageSpeedOnline"
+         "url" : "https://github.com/manwar/WWW-Google-PageSpeedOnline.git",
+         "web" : "https://github.com/manwar/WWW-Google-PageSpeedOnline"
       }
    },
-   "version" : "0.21"
+   "version" : "0.22",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

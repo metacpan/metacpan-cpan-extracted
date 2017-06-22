@@ -15,6 +15,56 @@ subroutine.
 
 Sub::QuoteX::Utils makes that latter process a little easier.
 
+  Usage
+
+Typically, "quote_subs" is used rather than the lower level "inlinify_*"
+routines. "quote_subs" is passed a list of chunk specifications or
+snippets of code, and generates code which is isolated in a Perl block.
+Each code chunk is additionally isolated in its own block, while code
+snippets are in the main block. This permits manipulation of the code
+chunk values. This is schematically equivalent to
+
+  {
+    <snippet>
+    do { <chunk> };
+    <snippet>
+    do { <chunk> };
+    do { <chunk> };
+  }
+
+The values of each chunk may be stored (see "Storing Chunk Values") and
+manipulated by the code snippets.
+
+  Storing Chunk Values
+
+A code chunk may have it's value stored in a lexical variable by adding
+the "store" option to the chunk's options. For example,
+
+  quote_subs( [ q{ sqrt(2); },    { store => '$x' } ],
+              [ q{ log(2);  },    { store => '$y' } ],
+              [ q{  ( 0..10 ); }, { store => '@z' } ], 
+              \q{print $x + $y, "\n";},
+  );
+
+would result in code equivalent to:
+
+  {
+    my ( $x, $y, @z );
+
+    $x = do { sqrt(2) };
+    $y = do { log(2) };
+    @z = do { ( 0.. 10 ) };
+    print $x + $y, "\n";
+  }
+
+If the variable passed to "store" has no sigil, e.g. "x", then the
+calling context is taken into account. In list context, the value is
+stored in @x, in scalar context it is stored in $x and in void context
+it is not stored at all.
+
+Automatic declaration of the variables occurs only when "quote_subs" is
+used to generate the code.
+
   Captures
 
 Sub::Quote keeps track of captured variables in hashes, *copying* the

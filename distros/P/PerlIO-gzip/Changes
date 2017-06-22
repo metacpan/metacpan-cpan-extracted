@@ -124,3 +124,7 @@ Revision history for Perl extension PerlIO::Gzip.
       (#92412) - usesfio config removal breaks
       And whose fault was this anyway? (See core commit 0b39d4dc4ab83828)
       (#92031) - printf format mismatch
+
+0.20  Wed Jun 21 21:29:59 CEST 2017
+      Patch from Slaven to fix test skip count on Win32 (#76335)
+      Really this should have been in 0.19.

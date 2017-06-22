@@ -21,9 +21,7 @@ subtest "$CLASS has correct attributes" => sub {
     has_attribute_ok( $CLASS, 'full_message' );
     has_attribute_ok( $CLASS, 'timestamp' );
     has_attribute_ok( $CLASS, 'level' );
-    has_attribute_ok( $CLASS, 'facility' );
-    has_attribute_ok( $CLASS, 'line' );
-    has_attribute_ok( $CLASS, 'file' );
+
 };
 
 subtest "$CLASS has correct predicates, clearers, writers, and builders" =>

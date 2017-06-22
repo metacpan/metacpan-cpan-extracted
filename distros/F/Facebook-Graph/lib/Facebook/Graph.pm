@@ -1,5 +1,5 @@
 package Facebook::Graph;
-$Facebook::Graph::VERSION = '1.1202';
+$Facebook::Graph::VERSION = '1.1204';
 use Moo;
 use MIME::Base64::URLSafe;
 use JSON;
@@ -12,7 +12,6 @@ use Facebook::Graph::Publish::Post;
 use Facebook::Graph::Publish::Photo;
 use Facebook::Graph::Publish::Checkin;
 use Facebook::Graph::Publish::Comment;
-use Facebook::Graph::Publish::Link;
 use Facebook::Graph::Publish::RSVPMaybe;
 use Facebook::Graph::Publish::RSVPAttending;
 use Facebook::Graph::Publish::RSVPDeclined;
@@ -272,7 +271,7 @@ Facebook::Graph - A fast and easy way to integrate your apps with Facebook.
 
 =head1 VERSION
 
-version 1.1202
+version 1.1204
 
 =head1 SYNOPSIS
 

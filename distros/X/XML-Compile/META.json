@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "XML-Compile",
    "no_index" : {
@@ -49,5 +49,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.56"
+   "version" : "1.57"
 }

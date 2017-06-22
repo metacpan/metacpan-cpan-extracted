@@ -14,9 +14,7 @@ sub left_justify {
 }
 
 sub import {
-    keytype Blocklike {
-        / \{ (?&BlockBody) \} (?(DEFINE) (?<BlockBody> (?: [^{}\\]++ | \\. | \{ (?&BlockBody) \} )*+ )) /x
-    }
+    keytype Blocklike is / (?= \{ ) (?&PPR_quotelike_body) /;
 
     our $next_anon = 'ANON00000001';
     keyword ANSI_C (Blocklike $block) {
@@ -56,6 +54,13 @@ sub import {
         $execs =~ s{^}{    }gm;
         return ($defs  =~ /\S/ ? qq[ use Inline Python => q{$defs}; ] : q{})
              . ($execs =~ /\S/ ? qq[ use Inline Python => q{def $anon_sub($py_params):\n$execs}; $anon_sub($perl_args); ] : q{});
+    }
+
+    keyword LATIN (Blocklike $code) {
+        use Lingua::Romana::Perligata ();
+        local $_ = substr($code, 1, -2);
+        Lingua::Romana::Perligata::filter();
+        return "{no strict; no warnings; $_}";
     }
 }
 

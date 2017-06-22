@@ -1,3 +1,15 @@
+1.019   2017-06-19 (PERLANCAR)
+
+        - No functional changes.
+
+        - Replace Log::Any with Log::ger.
+
+
+1.018   2017-06-17 (PERLANCAR)
+
+	- Add script: lcpanm-script.
+
+
 1.017   2017-02-03 (PERLANCAR)
 
 	- Typo.
@@ -275,13 +287,10 @@
           information e.g. type (whether subroutine is a method, static method,
           function), argument list (either from POD or subroutine signature),
           summary (from POD). Also planned is support for Mo/Moo/Moose/Mouse and
-          the indexing of classes/roles, attributes.
-
-          Since this is experimental, it's not enabled by default. To index
-          subroutines, you'll have to add '--no-skip-sub-indexing' option during
-          'lcpan update'.
-
-          It increases index size to ~360M on current mini CPAN.
+          the indexing of classes/roles, attributes. Since this is experimental,
+          it's not enabled by default. To index subroutines, you'll have to add
+          '--no-skip-sub-indexing' option during 'lcpan update'. It increases
+          index size to ~360M on current mini CPAN.
 
         - Bump database schema version to 10 to support subroutine indexing and
           force reindexing of content/script/mention.
@@ -928,14 +937,12 @@
         - Remove the feature that extracts dist metadata from Makefile.PL and
           Build.PL because this is unsafe (we are running untrusted code). Note
           that MetaCPAN also does not extract dist metadata from Makefile.PL and
-          Build.PL for the same reason.
-
-          Also, it has been pointed out to me that the current way is not proper
-          ("idiomatic"). The more proper way is to let perl run Makefile.PL and
-          Build.PL to generate Makefile/Build as well as MYMETA.{json,yml}. Then
-          we read MYMETA. Perhaps this feature will come back as an optional
-          plugin later, should there be any demand. BTW, Dist::Requires does
-          this kind of functionality.
+          Build.PL for the same reason. Also, it has been pointed out to me that
+          the current way is not proper ("idiomatic"). The more proper way is to
+          let perl run Makefile.PL and Build.PL to generate Makefile/Build as
+          well as MYMETA.{json,yml}. Then we read MYMETA. Perhaps this feature
+          will come back as an optional plugin later, should there be any
+          demand. BTW, Dist::Requires does this kind of functionality.
 
         - Also remove the feature that detects *.meta files, because these files
           are not present in a mini CPAN mirror.

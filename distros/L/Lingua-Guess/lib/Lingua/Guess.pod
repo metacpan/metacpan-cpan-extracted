@@ -29,7 +29,7 @@ produces output
     'Sprawdźmy, czy odgadywacz języków pracuje' was polish
 
 
-(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/Lingua-Guess-0.01/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-Guess-0.02/examples/synopsis.pl> in the distribution.)
 
 
 =head1 DESCRIPTION
@@ -41,6 +41,8 @@ was deleted from CPAN by its author.
 =head1 METHODS
 
 =head2 new
+
+    my $lg = Lingua::Guess->new ();
 
 Make a new object. This takes a hash as argument with the following keys:
 
@@ -60,9 +62,11 @@ This method returns arrayref of hashes in the form
     [{name => NAME, score => SCORE}]
 
 where C<score> represents the likelihood of the language given by
-C<name> as an integer.
+C<name> as a fractional probability.
 
 =head2 simple_guess
+
+    my $name = simple_guess ($text);
 
 This method returns a one-word string containing the English name of
 the guessed language.
@@ -121,10 +125,6 @@ text there may be.
 
 The guessed language is returned as a lower-case English name of the
 language rather than an ISO language code.
-
-=item
-
-The scores should be fractional probabilities.
 
 =back
 

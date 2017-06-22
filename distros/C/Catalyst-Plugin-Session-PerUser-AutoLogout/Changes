@@ -1,3 +1,8 @@
+0.002     2017-06-21 17:05:20 BST
+
+  - Now it actually works
+  - And saves the session ID that was killed so you can test later
+
 0.001     2017-01-20 13:46:09 GMT
 
   - Released!

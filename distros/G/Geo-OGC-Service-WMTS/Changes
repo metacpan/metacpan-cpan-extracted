@@ -1,3 +1,5 @@
+0.05, Jun 20, 2017
+  * Changes due to plugin system changes in Service version 0.12
 0.04, Jan 26, 2017
   * If processor exists, call its process method with dataset, tile and self
   * Configuration parameter serve_arbitrary_layers to skip checking requested layer names

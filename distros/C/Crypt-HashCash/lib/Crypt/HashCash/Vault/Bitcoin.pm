@@ -3,7 +3,7 @@
 # Crypt::HashCash::Vault::Bitcoin - Bitcoin Vault for HashCash Digital Cash
 # Copyright (c) 2017 Ashish Gulhati <crypt-hashcash at hash.neo.tc>
 #
-# $Id: lib/Crypt/HashCash/Vault/Bitcoin.pm v1.118 Sat Jun 10 13:59:11 PDT 2017 $
+# $Id: lib/Crypt/HashCash/Vault/Bitcoin.pm v1.124 Mon Jun 19 15:52:00 PDT 2017 $
 
 package Crypt::HashCash::Vault::Bitcoin;
 
@@ -20,7 +20,7 @@ use Business::Bitcoin;
 use Authen::TuringImage;
 use vars qw( $VERSION $AUTOLOAD );
 
-our ( $VERSION ) = '$Revision: 1.118 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.124 $' =~ /\s+([\d\.]+)/;
 
 sub new {
   my ($class, %arg) = @_;
@@ -29,7 +29,8 @@ sub new {
       XPUB => 'xpub661MyMwAqRbcFQ9fsPhf2sW7VmLm3XqSLSGAgDRfR4BuENFerQC9pP7BW5cJG2z15dj9gQ9Zj5rSYMQy7GXMyceympLCW4p3d6195v69TxW',
       Path => 'electrum',
       Clobber => 0,
-      Create => $arg{Create} || 1 );
+      Create => 1 );
+  return unless my $mint = new Crypt::HashCash::Mint ( Create => 1, KeyDB => $arg{KeyDB}, DB => $bizbtc->db );
   my @tables = $bizbtc->db->tables('%','%','transactions','TABLE');
   unless ($tables[0]) {
     return undef unless $bizbtc->db->do('CREATE TABLE transactions (
@@ -65,7 +66,7 @@ sub new {
                                                                  sendamt TEXT
 		                                                );');
   }
-  bless { MINT           =>   new Crypt::HashCash::Mint ( Create => 1 ),
+  bless { MINT           =>   $mint,
 	  BIZBTC         =>   $bizbtc,
 	  ELECTRUM       =>   $arg{Electrum} || '/usr/local/bin/electrum',
 	  DEBUG          =>   $arg{Debug} || 0,
@@ -74,21 +75,25 @@ sub new {
 
 sub keygen {
   my ($self, %arg) = @_;
-  $self->mint->keygen;
-  $self->mint->keydb->{name} = $arg{Name};
-  $self->mint->keydb->{server} = $arg{Server};
-  $self->mint->keydb->{sigscheme} = $self->mint->sigscheme;
-  #  my ($pk,$sk) = ecdhes_generate_key();
+  my $keydb = $self->mint->keydb;
+  my $keydbpath = $keydb->{__Fn}; return unless $keydbpath =~ s/\/[^\/]+$//;
   my $eecdh = new Crypt::EECDH;
   my ($spk,$ssk) = $eecdh->signkeygen();
+  my $vaultid = _dec(uc(md5_hex($spk)));
+  return unless my $vaultcfg = new Persistence::Object::Simple ('__Fn' => "$keydbpath/$vaultid.cfg");
+  $self->mint->keygen; $vaultcfg->{pub} = $keydb->{pub};
+  $keydb->{name} = $vaultcfg->{name} = $arg{Name} || 'localhost';
+  $keydb->{server} = $vaultcfg->{server} = $arg{Server} || 'localhost';
+  $keydb->{port} = $vaultcfg->{port} = $arg{Port} || '20203';
+  $keydb->{sigscheme} = $vaultcfg->{sigscheme} = $self->mint->sigscheme;
   my ($pk,$sk) = $eecdh->keygen(PrivateKey => $ssk, PublicKey => $spk);
-  $self->mint->keydb->{vaultsigsec} = unpack('H*',$ssk);
-  $self->mint->keydb->{vaultsigpub} = unpack('H*',$spk);
-  $self->mint->keydb->{vaultsec} = unpack('H*',$sk);
-  $self->mint->keydb->{vaultpub} = unpack('H*',$pk);
-  $self->mint->keydb->{id} = _dec(uc(md5_hex($spk)));
-  $self->mint->keydb->{fees} = $arg{Fees};
-  $self->mint->keydb->commit;
+  $keydb->{vaultsigsec} = unpack('H*',$ssk);
+  $keydb->{vaultsigpub} = $vaultcfg->{vaultsigpub} = unpack('H*',$spk);
+  $keydb->{vaultsec} = unpack('H*',$sk);
+  $keydb->{vaultpub} = $vaultcfg->{vaultpub} = unpack('H*',$pk);
+  $keydb->{id} = $vaultcfg->{id} = $vaultid;
+  $keydb->{fees} = $vaultcfg->{fees} = $arg{Fees};
+  $keydb->commit; $vaultcfg->commit;
 }
 
 sub turingimg {
@@ -410,15 +415,25 @@ sub process_request {                                 # Hande a request from a c
 				  Coins              => [ map { Crypt::HashCash::Coin->from_string($_) } split / /,$2 ],
 				  Requests           => [ map { Crypt::HashCash::CoinRequest->from_string($_) } split / /,$3 ],
 				  ChangeRequests     => [ map { Crypt::HashCash::CoinRequest->from_string($_) } split / /,$4 ]);
-    my @bcoins = map { $_->as_string } @$bcoins;
-    $ret = "@bcoins";
+    if ($bcoins =~ /^-E/) {
+      $ret = $bcoins;
+    }
+    else {
+      my @bcoins = map { $_->as_string } @$bcoins;
+      $ret = "@bcoins";
+    }
   }
   elsif (/^e (\S+) (.+) r (.+)$/) {                   # Exchange ( [#] > [#] ), no change request(s)
     my $bcoins = $self->exchange( FeeDenoms          => { split /[,:]/, $1 },
 				  Coins              => [ map { Crypt::HashCash::Coin->from_string($_) } split / /,$2 ],
 				  Requests           => [ map { Crypt::HashCash::CoinRequest->from_string($_) } split / /,$3 ]);
-    my @bcoins = map { $_->as_string } @$bcoins;
-    $ret = "@bcoins";
+    if ($bcoins =~ /^-E/) {
+      $ret = $bcoins;
+    }
+    else {
+      my @bcoins = map { $_->as_string } @$bcoins;
+      $ret = "@bcoins";
+    }
   }
   return ($ret, $preret, $sendto, $sendamt);
 }
@@ -451,12 +466,12 @@ __END__
 
 =head1 NAME
 
-Crypt::HashCash::Vault::Bitcoin - Bitcoin vault for HashCash digital cash
+Crypt::HashCash::Vault::Bitcoin - Bitcoin Vault for HashCash Digital Cash
 
 =head1 VERSION
 
- $Revision: 1.118 $
- $Date: Sat Jun 10 13:59:11 PDT 2017 $
+ $Revision: 1.124 $
+ $Date: Mon Jun 19 15:52:00 PDT 2017 $
 
 =head1 SYNOPSIS
 
@@ -528,6 +543,20 @@ Creates and returns a new Crypt::HashCash::Vault::Bitcoin object.
 =head2 withdraw
 
 =head2 process_request
+
+=head1 SEE ALSO
+
+=head2 L<www.hashcash.com>
+
+=head2 L<Crypt::HashCash>
+
+=head2 L<Crypt::HashCash::Mint>
+
+=head2 L<Crypt::HashCash::Client>
+
+=head2 L<Crypt::HashCash::Coin>
+
+=head2 L<Business::HashCash>
 
 =head1 AUTHOR
 

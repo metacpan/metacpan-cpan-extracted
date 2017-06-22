@@ -12,14 +12,534 @@ use BlankOnDev::DateTime;
 use BlankOnDev::Utils::file;
 use BlankOnDev::DataDev;
 use BlankOnDev::HTTP::request;
-#use BlankOnDev::Migration::bazaar2GitHub::tmp_cfg;
 use BlankOnDev::Migration::bazaar2GitHub::bazaar;
 use BlankOnDev::Migration::bazaar2GitHub::github;
 use Text::SimpleTable::AutoWidth;
 
 # Version :
-our $VERSION = '0.1003';
+our $VERSION = '0.1005';
 
+# Subroutine for get time :
+# ------------------------------------------------------------------------
+sub get_DateTime {
+    my ($self, $allconfig) = @_;
+
+    # Get data current config :
+    my $curr_timezone = $allconfig->{'timezone'};
+    my $timestamp = time();
+    my $get_dataTime = BlankOnDev::DateTime->get($curr_timezone, $timestamp, {
+            'date' => '-',
+            'time' => ':',
+            'datetime' => ' ',
+            'format' => 'DD-MM-YYYY hms'
+        });
+    my $result = $get_dataTime->{'custom'};
+    return $result;
+}
+# Subroutine for action re migration :
+# ------------------------------------------------------------------------
+sub action_re_migration {
+    my ($self, $allconfig, $pkg_name, $pkg_group, $tmp_pkg, $time_branch) = @_;
+
+    # Define hash or scalar :
+    my %data = ();
+    my $action_branch;
+    my $action_bzrCgit;
+    my $action_re_gtipush;
+    my $action_check;
+    my $time_gitpush;
+
+    # Get data current config :
+    my $curr_pkg = $allconfig->{'pkg'};
+    my $dirpkg = $curr_pkg->{'dirpkg'};
+    my $locdir_pkg = $dirpkg.'/'.$pkg_group.'/'.$pkg_name;
+
+    system("rm -rf $locdir_pkg");
+    system("mv -f $tmp_pkg $locdir_pkg");
+    $action_bzrCgit = BlankOnDev::Migration::bazaar2GitHub::bazaar->bzr2git_bzr_cgit($allconfig, $pkg_name);
+    if ($action_bzrCgit eq 1) {
+        print "[success] re-Action \"bzr convert git -> $pkg_name\" $action_bzrCgit\n";
+        $action_re_gtipush = BlankOnDev::Migration::bazaar2GitHub::github->bzr2git_reGitpush($allconfig, $pkg_name);
+        if ($action_re_gtipush eq 1) {
+            $time_gitpush = $self->get_DateTime($allconfig);
+            print "[success] Action \"re-git push -> $pkg_name\" \n";
+            $action_check = BlankOnDev::Migration::bazaar2GitHub::github->bzr2git_git_check($allconfig, $pkg_name);
+            if ($action_check ne 'undef') {
+                print "[success] Action \"git check -> $pkg_name\" $action_check\n";
+            } else {
+                print "[error] Action \"git check -> $pkg_name\" $action_check\n";
+            }
+        } else {
+            print "[error] Action \"re-git push -> $pkg_name\" | $action_re_gtipush\n";
+        }
+    } else {
+        print "[error] Action \"bzr convert git -> $pkg_name\" | $action_bzrCgit\n";
+    }
+
+    # Prepare Configure :
+    my $prepare_config = prepare_config();
+    my $result_cfg = $prepare_config->{'bzr2git'}($allconfig, $pkg_name, $action_branch, $action_bzrCgit, $action_re_gtipush, $action_check, $time_branch, $time_gitpush);
+
+    # Place :
+    $data{'bzr-cgit'} = $action_bzrCgit;
+    $data{'git-push'} = $action_re_gtipush;
+    $data{'git-check'} = $action_check;
+    $data{'result-cfg'} = $result_cfg;
+    return \%data;
+}
+# Subroutine for action migration :
+# ------------------------------------------------------------------------
+sub bzr2git_action_migration {
+    my ($self, $allconfig, $list_pkg) = @_;
+
+    # Define scalar :
+    my $action_branch;
+    my $action_bzrCgit;
+    my $action_gitpush;
+    my $action_check;
+    my $time_branch;
+    my $time_gitpush;
+
+    # Get data current config :
+    my $curr_timezone = $allconfig->{'timezone'};
+    my $curr_pkg = $allconfig->{'pkg'};
+    my $dirpkg = $curr_pkg->{'dirpkg'};
+
+    # For Data Developer :
+    my $data_dev = BlankOnDev::DataDev::data_dev();
+    my $dir_tmp = $data_dev->{'dir_tmp'};
+
+    # For List Packages :
+    my @list_packages = @{$list_pkg};
+
+    # While loop to migration packages :
+    my $i_p = 0;
+    my $until_p = scalar @list_packages;
+    my $pkg_name;
+    my $pkg_group;
+    my $result_cfg = $allconfig;
+    while ($i_p < $until_p) {
+        $pkg_name = $list_packages[$i_p]->{'name'};
+        $pkg_group = $list_packages[$i_p]->{'group'};
+
+        my $locdir_pkg = $dirpkg.'/'.$pkg_group.'/'.$pkg_name;
+        my $locdir_tmp_pkg = $dir_tmp.$pkg_group.'_'.$pkg_name;
+
+        $action_branch = BlankOnDev::Migration::bazaar2GitHub::bazaar->bzr2git_branch($allconfig, $pkg_name, $pkg_group);
+        if ($action_branch eq 1) {
+            $time_branch = $self->get_DateTime($allconfig);
+            system("cp -rf $locdir_pkg $locdir_tmp_pkg");
+            print "[success] Action \"bzr branch -> $pkg_name\" : $action_branch\n";
+            $action_bzrCgit = BlankOnDev::Migration::bazaar2GitHub::bazaar->bzr2git_bzr_cgit($allconfig, $pkg_name);
+            if ($action_bzrCgit eq 1) {
+                print "[success] Action \"bzr convert git -> $pkg_name\" $action_bzrCgit\n";
+                $action_gitpush = BlankOnDev::Migration::bazaar2GitHub::github->bzr2git_gitpush($allconfig, $pkg_name);
+                if ($action_gitpush eq 1) {
+                    $time_gitpush = $self->get_DateTime($allconfig);
+                    print "[success] Action \"git push -> $pkg_name\" $action_gitpush\n";
+                    $action_check = BlankOnDev::Migration::bazaar2GitHub::github->bzr2git_git_check($allconfig, $pkg_name);
+                    if ($action_check ne 'undef') {
+                        print "[success] Action \"git check -> $pkg_name\" $action_check\n";
+                    } else {
+                        print "[error] Action \"git check -> $pkg_name\" $action_check\n";
+                    }
+                } else {
+                    # Re migration :
+                    my $action_reMig = $self->action_re_migration($result_cfg, $pkg_name, $pkg_group, $locdir_tmp_pkg, $time_branch);
+                    $action_bzrCgit = $action_reMig->{'bzr-cgit'};
+                    $action_gitpush = $action_reMig->{'git-push'};
+                    $action_check = $action_reMig->{'git-check'};
+                    $result_cfg = $action_reMig->{'result-cfg'};
+                }
+            } else {
+                print "[error] Action \"bzr convert git -> $pkg_name\" | $action_branch\n";
+            }
+        } else {
+            print "[error] Action \"bzr branch -> $pkg_name\" | $action_branch\n";
+        }
+        print "----" x 18 . "\n";
+
+        # Prepare Configure :
+        my $prepare_config = prepare_config();
+        $result_cfg = $prepare_config->{'bzr2git'}($result_cfg, $pkg_name, $action_branch, $action_bzrCgit, $action_gitpush, $action_check, $time_branch, $time_gitpush);
+
+        # Save configure :
+        my $saveConfig = save_newConfig();
+        $saveConfig->{'bzr2git'}($result_cfg);
+        $i_p++;
+    }
+}
+# Subroutine for action migration one package  :
+# ------------------------------------------------------------------------
+sub action_bzr2git_single {
+    my ($self, $allconfig) = @_;
+
+    # Define scalar :
+    my $pkg_name;
+    my $action_branch;
+    my $action_bzrCgit;
+    my $action_gitpush;
+    my $action_check;
+    my $time_branch;
+    my $time_gitpush;
+
+    # For All config :
+    my $curr_pkg = $allconfig->{'pkg'};
+    my $dirpkg = $curr_pkg->{'dirpkg'};
+    my $pkg_list = $curr_pkg->{'pkgs'};
+
+    # For Data Developer :
+    my $data_dev = BlankOnDev::DataDev::data_dev();
+    my $dir_tmp = $data_dev->{'dir_tmp'};
+
+    # Form enter packages name ;
+    print "\n";
+    print "Enter packages name : ";
+    chomp($pkg_name = <STDIN>);
+    if ($pkg_name ne '') {
+        print "\n";
+        # Check Input Packages :
+        if (exists $pkg_list->{$pkg_name}) {
+            my $pkg_group = $pkg_list->{$pkg_name}->{'group'};
+
+            my $locdir_pkg = $dirpkg.'/'.$pkg_group.'/'.$pkg_name;
+            my $locdir_tmp_pkg = $dir_tmp.$pkg_group.'_'.$pkg_name;
+            my $result_cfg = $allconfig;
+
+            $action_branch = BlankOnDev::Migration::bazaar2GitHub::bazaar->bzr2git_branch($allconfig, $pkg_name, $pkg_group);
+            if ($action_branch eq 1) {
+                $time_branch = $self->get_DateTime($allconfig);
+                system("cp -rf $locdir_pkg $locdir_tmp_pkg");
+                print "[success] Action \"bzr branch -> $pkg_name\" : $action_branch\n";
+                $action_bzrCgit = BlankOnDev::Migration::bazaar2GitHub::bazaar->bzr2git_bzr_cgit($allconfig, $pkg_name);
+                if ($action_bzrCgit eq 1) {
+                    print "[success] Action \"bzr convert git -> $pkg_name\" $action_bzrCgit\n";
+                    $action_gitpush = BlankOnDev::Migration::bazaar2GitHub::github->bzr2git_gitpush($allconfig, $pkg_name);
+                    if ($action_gitpush eq 1) {
+                        $time_gitpush = $self->get_DateTime($allconfig);
+                        print "[success] Action \"git push -> $pkg_name\" $action_gitpush\n";
+                        $action_check = BlankOnDev::Migration::bazaar2GitHub::github->bzr2git_git_check($allconfig, $pkg_name);
+                        if ($action_check ne 'undef') {
+                            print "[success] Action \"git check -> $pkg_name\" $action_check\n";
+                        } else {
+                            print "[error] Action \"git check -> $pkg_name\" $action_check\n";
+                        }
+                    } else {
+                        # Re migration :
+                        my $action_reMig = $self->action_re_migration($result_cfg, $pkg_name, $pkg_group, $locdir_tmp_pkg);
+                        $action_bzrCgit = $action_reMig->{'bzr-cgit'};
+                        $action_gitpush = $action_reMig->{'git-push'};
+                        $action_check = $action_reMig->{'git-check'};
+                        $result_cfg = $action_reMig->{'result-cfg'};
+                    }
+                } else {
+                    print "[error] Action \"bzr convert git -> $pkg_name\" | $action_branch\n";
+                }
+            } else {
+                print "[error] Action \"bzr branch -> $pkg_name\" | $action_branch\n";
+            }
+
+            # Prepare Configure :
+            my $prepare_config = prepare_config();
+            $result_cfg = $prepare_config->{'bzr2git'}($allconfig, $pkg_name, $action_branch, $action_bzrCgit, $action_gitpush, $action_check, $time_branch, $time_gitpush);
+
+            # Save configure :
+            my $saveConfig = save_newConfig();
+            $saveConfig->{'bzr2git'}($result_cfg);
+            print "\n";
+            print "====" x 5 . " Migration packages \"$pkg_name\" has been finished ";
+            print "====" x 5 . "\n\n";
+        } else {
+            print "\n";
+            print "Warning : \n";
+            print "====" x 18 . "\n";
+            print "Packages \"$pkg_name\" is not exists...\n";
+        }
+    } else {
+        print "\n";
+        print "Info : \n";
+        print "====" x 18 . "\n";
+        print "Please Enter name package for Migration !!!\n";
+        exit 0;
+    }
+}
+# Subroutine for get amount of packages on group :
+# ------------------------------------------------------------------------
+sub amount_pkg {
+    my ($self, $allconfig, $input_group) = @_;
+
+    # Get data current config :
+    my $curr_build = $allconfig->{'build'};
+    my $curr_pkg = $allconfig->{'pkg'};
+    my $list_pkg = $curr_pkg->{'pkgs'};
+
+    # While loop to get list packages :
+    my $i = 0;
+    my @pre_data_pkg = ();
+    while (my ($key, $value) = each %$list_pkg) {
+        my $pkg_group = $list_pkg->{$key}->{'group'};
+        if ($pkg_group eq $input_group) {
+            $pre_data_pkg[$i] = $list_pkg->{$key};
+        }
+        $i++;
+    }
+    my @data_pkg = grep($_, @pre_data_pkg);
+    my $amount_pkg = scalar keys(@data_pkg);
+    return $amount_pkg;
+}
+# Subroutine for get list group and amount packages :
+# ------------------------------------------------------------------------
+sub bzr2git_get_list_group_amount_pkg {
+    my ($self, $allconfig) = @_;
+    my %data = ();
+
+    # Get data current config :
+    my $curr_build = $allconfig->{'build'};
+    my $curr_pkg = $allconfig->{'pkg'};
+    my $list_group = $curr_pkg->{'group'};
+    my $size_list_group = scalar keys(%{$list_group});
+
+    # Check count list packages group :
+    if ($size_list_group > 0) {
+
+        # While loop for list packages group :
+        my $i = 0;
+        my @pre_list_pkggrp = ();
+        while (my ($key, $value) = each %$list_group) {
+            $pre_list_pkggrp[$i] = $key;
+            $i++;
+        }
+
+        # Remove "undef" value on array :
+        my @list_pkggrp = grep($_, @pre_list_pkggrp);
+
+        $i = 0;
+        my %data_group = ();
+        my $choice = '';
+        my $until = scalar @list_pkggrp;
+        my $num = 0;
+        my $amount_pkg;
+        while ($i < $until) {
+            $amount_pkg = $self->amount_pkg($allconfig, $list_pkggrp[$i]);
+            $num = $i + 1;
+            $data_group{$num} = $list_pkggrp[$i];
+            $choice .= sprintf("$num. %-25s %s\n", "$list_pkggrp[$i]", "[$amount_pkg]");
+            $i++;
+        }
+        $data{'data'} = \%data_group;
+        $data{'choice'} = $choice;
+        return \%data;
+    } else {
+        print "\n";
+        print "Info : \n";
+        print "====" x 18 . "\n";
+        print "Not found packages groups. Please run command \"boidev bzr2git addpkg-group\" to add new group packages.\n\n";
+        exit 0;
+    }
+}
+# Subroutine for action migration by group :
+# ------------------------------------------------------------------------
+sub action_bzr2git2 {
+    my ($self, $allconfig) = @_;
+
+    # Define scalar :
+    my $form_group;
+
+    # Get data current config :
+    my $curr_pkg = $allconfig->{'pkg'};
+    my $data_list_grp = $self->bzr2git_get_list_group_amount_pkg($allconfig);
+    my $choice_grp = $data_list_grp->{'data'};
+
+    # For Data Developer :
+    my $data_dev = BlankOnDev::DataDev::data_dev();
+    my $dir_tmp = $data_dev->{'dir_tmp'};
+
+    # Form Group name :
+    print "\n";
+    print "Choose packages group : \n";
+    print "---" x 18 . "\n";
+    print $data_list_grp->{'choice'};
+    print "---" x 18 . "\n";
+    print "Enter number of group name : ";
+    chomp($form_group = <STDIN>);
+    if (exists $choice_grp->{$form_group}) {
+        my $input_group = $choice_grp->{$form_group};
+
+        # Check group :
+        my $list_group = $self->filter_listpkg_based_group($allconfig, $input_group);
+        if ($list_group->{'result'} == 1) {
+            my @list_all_pkg = @{$list_group->{'data'}};
+
+            print "\n";
+            print "Doing migration ...\n\n";
+
+            # Action Migration :
+            $self->bzr2git_action_migration($allconfig, \@list_all_pkg);
+
+            print "\n";
+            print "====" x 5 . " Migration all packages in group \"$input_group\" has been finished ";
+            print "====" x 5 . "\n\n";
+        } else {
+            print "\n";
+            print "Info : \n";
+            print "====" x 18 . "\n";
+            print "Not found packages in list on group \"$input_group\".\n";
+            print "Please run command \"boidev bzr2git addpkg\" to add new packages in group \"$input_group\",\n";
+            print "or \"boidev bzr2git addpkg-file\" to add new packages in group \"$input_group\".\n\n";
+            exit 0;
+        }
+    } else {
+        print "\n";
+        print "Info : Enter number choice\n";
+        print "====" x 18 . "\n";
+        print "Please enter number choice. \n\n";
+        exit 0;
+    }
+}
+# Subroutine for get amount of packages on group :
+# ------------------------------------------------------------------------
+sub bzr2git_list_group {
+    my ($self, $allconfig) = @_;
+
+    # Define hash :
+    my %data = ();
+    my $data_list = '';
+
+    # Get list group :
+    my $get_list_group = $self->list_all_pkg_group($allconfig);
+    my @list_group = @{$get_list_group->{'data'}};
+
+    # While loop to get list packages group :
+    my $i = 0;
+    my $until = scalar keys(@list_group);
+    my $num = 0;
+    my $amount_pkg = '';
+    my @pre_dataGroup = ();
+    while ($i < $until) {
+        $amount_pkg = $self->amount_pkg($allconfig, $list_group[$i]);
+        if ($amount_pkg > 0) {
+            $num = $num + 1;
+            $data_list .= sprintf("$num. %-20s %s\n", "$list_group[$i]", "[$amount_pkg]");
+            $pre_dataGroup[$num] = $list_group[$i];
+        }
+        $i++;
+    }
+    my @data_group = grep($_, @pre_dataGroup);
+
+    $data{'msg'} = $data_list;
+    $data{'data'} = \@data_group;
+    return \%data;
+}
+# Subroutine for action migration all packages :
+# ------------------------------------------------------------------------
+sub action_bzr2git1 {
+    my ($self, $allconfig) = @_;
+
+    # Define scalar :
+    my $confirm_form;
+    my $confirm_form_pkg;
+    my $data_confirm = 0;
+    my $data_confirm_pkg = 0;
+
+    # Get list group :
+    my $getList_group = $self->bzr2git_list_group($allconfig);
+    my $list = $getList_group->{'msg'};
+    my @list_groups = @{$getList_group->{'data'}};
+
+    # Form Confirm :
+    print "\n";
+    print "You want migration all packages with automatically ? [y or n] ";
+    chomp($confirm_form = <STDIN>);
+    if ($confirm_form eq 'y' or $confirm_form eq 'Y') {
+        $data_confirm = 1;
+        $data_confirm_pkg = 1;
+    } else {
+        $data_confirm = 0;
+    }
+
+    print "\n";
+    print "List Group packages to Migration : \n";
+    print "---" x 15 . "\n";
+    print $list;
+    print "---" x 15 . "\n";
+
+    # While loop to migration :
+    my $i = 0;
+    my $until = scalar @list_groups;
+    my $amount_pkg = 0;
+    my $get_list_pkgs;
+    my @list_packages;
+    my $data_groups;
+    while ($i < $until) {
+        $data_groups = $list_groups[$i];
+        $get_list_pkgs = $self->filter_listpkg_based_group($allconfig, $data_groups);
+        $amount_pkg = $self->amount_pkg($allconfig, $data_groups);
+        @list_packages = @{$get_list_pkgs->{'data'}};
+
+        # Check Confirm :
+        if ($data_confirm == 1) {
+
+            print "\n";
+            print "Action Migration for all packages in group \"$data_groups [$amount_pkg]\" \n";
+            print "----" x 18 . "\n";
+
+            # Action Migration :
+            $self->bzr2git_action_migration($allconfig, \@list_packages);
+        }
+        if ($data_confirm == 0) {
+            print "\n";
+            print "You want to migration all packages in group \"$data_groups [$amount_pkg]\" ? [y or n] ";
+            chomp($confirm_form_pkg = <STDIN>);
+            if ($confirm_form_pkg eq 'y' or $confirm_form_pkg eq 'Y') {
+                print "\n";
+                print "[migration] All packages in group \"$data_groups\" \n";
+                print "----" x 18 . "\n";
+
+                # Action Migration :
+                $self->bzr2git_action_migration($allconfig, \@list_packages);
+            } else {
+                print "\n";
+                print "[no-migration] All packages in group \"$data_groups\" \n";
+            }
+        }
+        $i++;
+    }
+    print "\n";
+    print "====" x 5 . " Migration packages has been finished ";
+    print "====" x 5 . "\n\n";
+}
+# Action Bzr2git :
+# ------------------------------------------------------------------------
+sub action_bzr2git {
+    my ($self, $allconfig) = @_;
+    my $choose_act;
+
+    # For Action :
+    my $switch_act = {
+        '1' => 'action_bzr2git1',
+        '2' => 'action_bzr2git2',
+        '3' => 'action_bzr2git_single'
+    };
+
+    # Form action migration :
+    print "\n";
+    print "-----" x 15 . "\n";
+    print " Choose Action : \n";
+    print "-----" x 15 . "\n";
+    print "1. All Packages\n";
+    print "2. Specific Group Packages\n";
+    print "3. Single Packages\n";
+    print "Answer: ";
+    chomp($choose_act = <STDIN>);
+    if (exists $switch_act->{$choose_act}) {
+        my $subr_act = $switch_act->{$choose_act};
+        $self->$subr_act($allconfig);
+    } else {
+        print "\n";
+        print "System automatic choose to specific group name ...\n";
+        $self->action_bzr2git2($allconfig);
+    }
+}
 # Subroutine for option "bzr2git" :
 # ------------------------------------------------------------------------
 sub _bzr2git {
@@ -39,6 +559,7 @@ sub _bzr2git {
         'bzr-cgit' => '_bzr_cgit',
         'git-push' => '_gitpush',
         'git-push-new' => '_gitpush_new',
+        'git-check' => '_git_check',
         're-branch' => '_re_branch',
         're-gitpush' => '_re_gitpush',
     };
@@ -55,7 +576,7 @@ sub _bzr2git {
                 print "\n";
                 print "Warning : \n";
                 print "=====" x 16 . "\n";
-                print "Please run command \"boidev prepare\" to complete config this application !!! \n\n";
+                print "Please run command \"boidev mig_prepare\" to complete config this application !!! \n\n";
                 exit 0;
             } else {
                 # Check Option :
@@ -97,7 +618,7 @@ sub _bzr2git {
         }
     }
     elsif ($arg_len == 1) {
-
+        $self->action_bzr2git($allconfig);
     }
     else {
         print "\n";
@@ -113,7 +634,7 @@ sub check_exists_group {
     my ($self, $type, $group_cfg, $new_group) = @_;
 
     my %data = ();
-    my $result = 0;
+    my $result = 1;
     my $list_grp = '';
     my $check_list = 0;
     my $count = scalar keys(%{$group_cfg});
@@ -129,7 +650,8 @@ sub check_exists_group {
         }
         $result = 1;
     } else {
-        if ($count > 0) {
+        print "Jumlah $count\n";
+        if ($count >= 1) {
             while (my ($key, $value) = each %{$group_cfg}) {
                 $list_grp .= "- $key\n";
                 if (exists $group_cfg->{$new_group}) {
@@ -141,7 +663,7 @@ sub check_exists_group {
             $check_list = 1;
         } else {
             $list_grp = '';
-            $check_list = 0;
+            $check_list = 1;
         }
     }
     $data{'result'} = $result;
@@ -192,9 +714,6 @@ sub _addpkg_group {
             if ($input_new_grp =~ m/^[A-Za-z0-9\-\_]+$/) {
                 $new_grp = $input_new_grp;
             }
-            elsif ($input_new_grp =~ m/^[A-Za-z]+$/) {
-                $new_grp = $input_new_grp;
-            }
             else {
                 $new_grp = '';
                 print "\n";
@@ -221,8 +740,6 @@ sub _addpkg_group {
                 # Prepare Config ;
                 my $save_config = prepare_config();
                 my $result_addgrp = $save_config->{'add-group'}($allconfig, $new_grp);
-
-                #            print Dumper $result_addgrp;
 
                 # Save Configure :
                 unless (exists $curr_pkg->{'group'}->{$new_grp}) {
@@ -270,8 +787,6 @@ sub _addpkg_group {
             my $save_config = prepare_config();
             my $result_addgrp = $save_config->{'add-group'}($allconfig, $new_grp);
 
-            #            print Dumper $result_addgrp;
-
             # Save Configure :
             unless (exists $curr_pkg->{'group'}->{$new_grp}) {
                 my $for_saveCfg = save_newConfig();
@@ -301,7 +816,6 @@ sub _addpkg_group {
                 $arguments .= $ARGV[$i].' ';
             }
         }
-        print Dumper \@ARGV;
         print "\n";
         print "====" x 18 . "\n";
         print "your command: boidev $arguments\n";
@@ -542,9 +1056,19 @@ sub _rename_group_pkg {
     # Check IF $arg_len == 3 or $arg_len == 2 :
     # ------------------------------------------------------------------------
     else {
+        my $i = 0;
+        my $data_cmd = '';
+        foreach my $arg (each @ARGV) {
+            if ($arg_len - 1 == $i) {
+                $data_cmd .= $arg;
+            } else {
+                $data_cmd .= "$arg ";
+            }
+            $i++;
+        }
         print "\n";
         print "====" x 18 . "\n";
-        print "your command: boidev $ARGV[0] $ARGV[1] $ARGV[2]\n";
+        print "your command: boidev $data_cmd\n";
         print "----" x 18 . "\n";
         print "\n";
         print "Warning : \n";
@@ -566,6 +1090,7 @@ sub remove_pkg_grp {
     my $confirm_remove;
     my $confirm_remove_pkg;
     my $confirm_add_pkggrp;
+    my $form_rename_pkg_grp;
     my $confirm_rename_pkg_grp = 0;
     my $new_group_name = '';
 
@@ -620,8 +1145,8 @@ sub remove_pkg_grp {
             if ($confirm_remove_pkg == 0 and $confirm_add_pkggrp == 1) {
                 print "\n";
                 print "You want to rename group in data packages [y/n] : ";
-                chomp($confirm_rename_pkg_grp = <STDIN>);
-                if ($confirm_rename_pkg_grp eq 'y' or $confirm_rename_pkg_grp eq 'y') {
+                chomp($form_rename_pkg_grp = <STDIN>);
+                if ($form_rename_pkg_grp eq 'y' or $form_rename_pkg_grp eq 'Y') {
                     $confirm_rename_pkg_grp = 1;
                     print "Enter new group name : ";
                     chomp($new_group_name = <STDIN>);
@@ -637,6 +1162,7 @@ sub remove_pkg_grp {
             my $size_list = scalar keys(@list_pkgs);
             while ($i < $size_list) {
                 my $data_list_pkgs = $list_pkgs[$i]->{'name'};
+                my $data_old_pkg_grp = $list_pkgs[$i]->{'group'};
                 my $locdir_datapkg = $locdir_rilis.'/'.$input_group.'/'.$data_list_pkgs;
 
                 if ($confirm_remove_pkg == 1) {
@@ -644,10 +1170,10 @@ sub remove_pkg_grp {
                     my $prepare_cfgPkgs = prepare_config();
                     $dataPkg_cfg = $prepare_cfgPkgs->{'remove-pkg'}($dataPkg_cfg, $data_list_pkgs);
                 } else {
-                    if ($confirm_rename_pkg_grp == 1) {
+                    if ($confirm_rename_pkg_grp eq 1) {
                         # Prepare Config :
                         my $prepare_cfgPkgs = prepare_config();
-                        $dataPkg_cfg = $prepare_cfgPkgs->{'rename-pkg'}($dataPkg_cfg, $new_group_name);
+                        $dataPkg_cfg = $prepare_cfgPkgs->{'rename-pkg-group'}($dataPkg_cfg, $data_old_pkg_grp, $new_group_name, $data_list_pkgs);
                     }
                 }
 
@@ -676,27 +1202,26 @@ sub remove_pkg_grp {
             print "Group name \"$input_group\" has success deleted...\n\n";
 
             if ($confirm_add_pkggrp == 1) {
-                # Form New Group Name :
-                print "\n";
-                print "Enter new group name : ";
-                chomp($new_input_group = <STDIN>);
-                if ($new_input_group ne '') {
 
-
-
-                    # add Group Name :
-                    my $add_grp = prepare_config();
-                    $dataPkg_cfg = $add_grp->{'add-group'}($dataPkg_cfg, $new_input_group);
-
-                    # Save Config :
-                    $saveConfig = save_newConfig();
-                    $saveConfig->{'addgroup'}($dataPkg_cfg);
-
-                    print "Add group name \"$new_input_group\" has success added...\n\n";
-                } else {
-                    $confirm_add_pkggrp = 0;
-                    print "Input New group name is empty...\n\n";
+                if ($confirm_add_pkggrp == 1 and $confirm_remove_pkg == 1) {
+                    print "Enter new group name : ";
+                    chomp($new_group_name = <STDIN>);
+                    if ($new_group_name ne '') {
+                        $new_group_name = $new_group_name;
+                    } else {
+                        $new_group_name = 'undef-group';
+                    }
                 }
+
+                # add Group Name :
+                my $add_grp = prepare_config();
+                $dataPkg_cfg = $add_grp->{'add-group'}($dataPkg_cfg, $new_group_name);
+
+                # Save Config :
+                $saveConfig = save_newConfig();
+                $saveConfig->{'addgroup'}($dataPkg_cfg);
+
+                print "Add group name \"$new_group_name\" has success added...\n\n";
             }
         } else {
             print "\n";
@@ -814,9 +1339,19 @@ sub _remove_group_pkg {
     # Check IF $arg_len == 3 or $arg_len == 2 :
     # ------------------------------------------------------------------------
     else {
+        my $i = 0;
+        my $data_cmd = '';
+        foreach my $arg (each @ARGV) {
+            if ($arg_len - 1 == $i) {
+                $data_cmd .= $arg;
+            } else {
+                $data_cmd .= "$arg ";
+            }
+            $i++;
+        }
         print "\n";
         print "====" x 18 . "\n";
-        print "your command: boidev $ARGV[0] $ARGV[1] $ARGV[2]\n";
+        print "your command: boidev $data_cmd\n";
         print "----" x 18 . "\n";
         print "\n";
         print "Warning : \n";
@@ -992,8 +1527,6 @@ sub _addpkg {
                                 'group' => $input_group
                             });
                         my $for_saveCfg;
-
-                        #                print Dumper $rdt_config;
 
                         # Add list pkgs :
                         unless (exists $curr_data_pkg->{'group'}->{$input_group} && exists $curr_data_pkg->{'pkgs'}->{$new_pkg}) {
@@ -1173,6 +1706,7 @@ sub _addpkg_file {
 
                 # Define scalar :
                 my $new_pkg;
+                my @list_pkg = ();
 
                 # Check Package Group :
                 my $pkg_group = $self->group_pkg($allconfig);
@@ -1218,11 +1752,10 @@ sub _addpkg_file {
                                     'group' => $input_group
                                 });
                             print "$new_pkg has success added. \n";
+                            push(@list_pkg, $lines);
                         } else {
                             print "$new_pkg is exists. \n";
                         }
-
-#                        print Dumper $rdt_config;
 
                         my $for_saveCfg;
                         unless (exists $curr_data_pkg->{'group'}->{$input_group} && exists $curr_data_pkg->{'pkgs'}->{$lines}) {
@@ -1233,6 +1766,8 @@ sub _addpkg_file {
 
                     # CLose File :
                     close (FH);
+                    my $size_pkgs = scalar @list_pkg;
+                    print "\n $size_pkgs packages has added...\n"
                 }
                 elsif ($status_group == 2) {
 
@@ -1252,9 +1787,9 @@ sub _addpkg_file {
                                 'group' => $input_group
                             });
                         my $for_saveCfg;
-                        print "$lines\n";
-#                        print Dumper $rdt_config;
-#
+                        print "\"$lines\" has success added.\n";
+                        push(@list_pkg, $lines);
+
                         unless (exists $curr_data_pkg->{'group'}->{$input_group} && exists $curr_data_pkg->{'pkgs'}->{$lines}) {
                             $for_saveCfg = save_newConfig();
                             $for_saveCfg->{'addpkg'}($data_allcfg);
@@ -1263,6 +1798,8 @@ sub _addpkg_file {
 
                     # CLose File :
                     close (FH);
+                    my $size_pkgs = scalar @list_pkg;
+                    print "\n $size_pkgs packages has added...\n"
                 }
                 else {
                     print "\n";
@@ -1290,9 +1827,19 @@ sub _addpkg_file {
     # Check IF $arg_len != 3 :
     # ------------------------------------------------------------------------
     else {
+        my $i = 0;
+        my $data_cmd = '';
+        foreach my $arg (each @ARGV) {
+            if ($arg_len - 1 == $i) {
+                $data_cmd .= $arg;
+            } else {
+                $data_cmd .= "$arg ";
+            }
+            $i++;
+        }
         print "\n";
         print "====" x 18 . "\n";
-        print "your command: boidev $ARGV[0] $ARGV[1] $ARGV[2]\n";
+        print "your command: boidev $data_cmd\n";
         print "----" x 18 . "\n";
         print "\n";
         print "Warning : \n";
@@ -1314,7 +1861,6 @@ sub _removepkg {
     my $input_pkg;
 
     # Define scalar for config :
-    my $build = $allconfig->{build};
     my $curr_data_pkg = $allconfig->{'pkg'};
     my $list_group = $curr_data_pkg->{'group'};
     my $list_pkgs = $curr_data_pkg->{'pkgs'};
@@ -1445,9 +1991,19 @@ sub _removepkg {
     # Check IF $arg_len == 3 or $arg_len == 2 :
     # ------------------------------------------------------------------------
     else {
+        my $i = 0;
+        my $data_cmd = '';
+        foreach my $arg (each @ARGV) {
+            if ($arg_len - 1 == $i) {
+                $data_cmd .= $arg;
+            } else {
+                $data_cmd .= "$arg ";
+            }
+            $i++;
+        }
         print "\n";
         print "====" x 18 . "\n";
-        print "your command: boidev $ARGV[0] $ARGV[1] $ARGV[2]\n";
+        print "your command: boidev $data_cmd\n";
         print "----" x 18 . "\n";
         print "\n";
         print "Warning : \n";
@@ -1468,7 +2024,6 @@ sub filter_listpkg_based_group {
     my %data = ();
 
     # Get data current config :
-    my $curr_build = $allconfig->{'build'};
     my $curr_pkg = $allconfig->{'pkg'};
     my $list_pkg = $curr_pkg->{'pkgs'};
 
@@ -1520,10 +2075,108 @@ sub filter_listpkg_based_group {
         exit 0;
     }
 }
+# Subroutine for list all packages group :
+# ------------------------------------------------------------------------
+sub list_all_pkg_group {
+    my ($self, $allconfig) = @_;
+
+    # Define hash or scalar :
+    my %data = ();
+
+    # Get data current config :
+    my $curr_pkg = $allconfig->{'pkg'};
+    my $list_group = $curr_pkg->{'group'};
+    my $size_list_group = scalar keys(%{$list_group});
+
+    # Check count list packages group :
+    if ($size_list_group > 0) {
+
+        # While loop for list packages group :
+        my $i = 0;
+        my @pre_data_rows = ();
+        while (my ($key, $value) = each %$list_group) {
+            $pre_data_rows[$i] = $key;
+            $i++;
+        }
+
+        # Remove "undef" value on array :
+        my @data_rows = grep($_, @pre_data_rows);
+
+        # Place result :
+        $data{'data'} = \@data_rows;
+
+        return \%data;
+    } else {
+        print "\n";
+        print "Info : \n";
+        print "====" x 18 . "\n";
+        print "Not found packages groups. Please run command \"boidev bzr2git addpkg-group\" to add new group packages.\n\n";
+        exit 0;
+    }
+}
+# Subroutine for list packages by group :
+# ------------------------------------------------------------------------
+sub list_pkg_by_group {
+    my ($self, $allconfig, $group) = @_;
+
+    # Define hash or scalar :
+    my %data = ();
+
+    # Get data current config :
+    my $curr_build = $allconfig->{'build'};
+    my $curr_pkg = $allconfig->{'pkg'};
+    my $list_pkg = $curr_pkg->{'pkgs'};
+
+    # Check List Packages :
+    my $i = 0;
+    my $size_pkgs = scalar keys(%{$list_pkg});
+    if ($size_pkgs > 0) {
+
+        # Check Group :
+        if (exists $curr_pkg->{'group'}->{$group}) {
+
+            # While loop for list pkgs :
+            my $num_true = 0;
+            my $num_false = 0;
+            my $num = 0;
+            my @pre_data_rows = ();
+            while (my ($key, $value) = each %$list_pkg) {
+                if ($list_pkg->{$key}->{'group'} eq $group) {
+                    $num_true = $num_true + 1;
+                    $pre_data_rows[$num] = $list_pkg->{$key};
+                } else {
+                    $num_false = $num_false + 1;
+                }
+                $num++;
+            }
+
+            # Remove "undef" value on array :
+            my @data_rows = grep($_, @pre_data_rows);
+
+            # Place result :
+            $data{'result'} = 1 if $num_true > 0;
+            $data{'result'} = 0 if $num_true == 0 && $num_false > 0;
+            $data{'data'} = \@data_rows;
+
+        } else {
+            $data{'result'} = 0;
+            $data{'data'} = [];
+        }
+    } else {
+        $data{'result'} = 0;
+        $data{'data'} = [];
+    }
+
+    return \%data;
+}
 # Subroutine for list pkg :
 # ------------------------------------------------------------------------
 sub _list_pkg {
     my ($self, $allconfig) = @_;
+
+    # Define scalar :
+    my $date_branch;
+    my $date_gitpush;
 
     # For All config :
     my $curr_build = $allconfig->{'build'};
@@ -1549,6 +2202,81 @@ sub _list_pkg {
         # Check file config :
         if (-e $loc_fileCfg) {
 
+            # Check if $ARGV[2] == 'all' :
+            if ($ARGV[2] eq 'all') {
+                my $list_all_pkggroup = $self->list_all_pkg_group($allconfig);
+                my @list_allpkg_group = @{$list_all_pkggroup->{'data'}};
+
+                # Create Text Table :
+                my $textTbl;
+
+                # While loop to get list packages group :
+                my $i = 0;
+                my $until = scalar @list_allpkg_group;
+                my $data_list = '';
+                my $size_list = 0;
+                my $get_list_pkg_bygrp = '';
+                while ($i < $until) {
+
+                    my $group_name = $list_allpkg_group[$i];
+
+                    # Get list packages by Group :
+                    $get_list_pkg_bygrp = $self->list_pkg_by_group($allconfig, $group_name);
+                    if ($get_list_pkg_bygrp->{'result'} eq 1) {
+                        my @list_all_pkg = @{$get_list_pkg_bygrp->{'data'}};
+
+                        # Print "Header" :
+                        $data_list .= "\n";
+                        $data_list .= "List Packages for group \"$group_name\"\n";
+
+                        # Create Text Table :
+                        $textTbl = Text::SimpleTable::AutoWidth->new(captions => [( '#', 'Group Name', 'Packages Name', 'Date Add', 'Date bzr branch', 'Date git push', 'status', 'on GitHub')]);
+
+                        # While loop to get list packages :
+                        my $i_p = 0;
+                        my $until_p = scalar @list_all_pkg;
+                        while ($i_p < $until_p) {
+                            $size_list = $size_list + 1;
+                            my $num = $i_p + 1;
+                            my $curr_grpname = $list_all_pkg[$i_p]->{'group'};
+                            my $pkg_name = $list_all_pkg[$i_p]->{'name'};
+                            my $date_add = $list_all_pkg[$i_p]->{'date-add'};
+                            $date_branch = exists $list_all_pkg[$i_p]->{'date-branch'} && $list_all_pkg[$i_p]->{'date-branch'} eq '' ? '-' : $list_all_pkg[$i_p]->{'date-branch'};
+                            $date_gitpush = exists $list_all_pkg[$i_p]->{'date-gitpush'} && $list_all_pkg[$i_p]->{'date-gitpush'} eq '' ? '-' : $list_all_pkg[$i_p]->{'date-gitpush'};
+                            my $status_branch = $list_all_pkg[$i_p]->{'status'}->{'bzr-branch'};
+                            my $status_gitpush = $list_all_pkg[$i_p]->{'status'}->{'git-push'};
+                            my $status_gitCgit = $list_all_pkg[$i_p]->{'status'}->{'bzrConvertGit'};
+                            my $status = "bzrBranch = $status_branch, bzrConvertGit = $status_gitCgit, gitPush = $status_gitpush";
+                            my $status_ongit = exists $list_all_pkg[$i_p]->{'status'}->{'ongit'} ? $list_all_pkg[$i_p]->{'status'}->{'ongit'} : '';
+                            my @data_rows = ($num, $curr_grpname, $pkg_name, $date_add, $date_branch, $date_gitpush, $status, $status_ongit);
+#                            my @data_rows = ($num, $curr_grpname, $pkg_name, $date_add, '-', '-', $status, $status_ongit);
+                            $textTbl->row(@data_rows);
+                            $i_p++
+                        }
+                        $data_list .= $textTbl->draw();
+                    }
+                    $i++;
+                }
+
+                # Print List :
+                print "\n";
+                print "---------" x 11 . "\n";
+                print " List Packages with amount \"$size_list\" packages : \n";
+                print "---------" x 11 . "\n";
+                printf("%s", "Status :\n");
+                print "---------" x 11 . "\n";
+                BlankOnDev::help_list_pkg();
+                print "\n";
+                print $data_list;
+                print "\n";
+                print "---------" x 11 . "\n";
+                printf("%s", "Status :\n");
+                print "---------" x 11 . "\n";
+                BlankOnDev::help_list_pkg();
+                print "\n";
+                exit 0;
+            }
+
             # Check New Group :
             my $check_group = $self->check_exists_group('check', $curr_pkg->{'group'}, $ARGV[2]);
             if ($check_group->{'result'} == 0) {
@@ -1557,9 +2285,8 @@ sub _list_pkg {
                     my @list_pkgs = @{$get_list_pkg->{'data'}};
 
                     # Create Text Table :
-                    my $textTbl = Text::SimpleTable::AutoWidth->new(captions => [( '#', 'Group Name', 'Packages Name', 'Date Add', 'Date bzr branch', 'Date git push', 'status')]);
+                    my $textTbl = Text::SimpleTable::AutoWidth->new(captions => [( '#', 'Group Name', 'Packages Name', 'Date Add', 'Date bzr branch', 'Date git push', 'status', 'on GitHub')]);
 
-#                    print Dumper \@list_pkgs;
                     my $i = 0;
                     my $size_list = scalar keys(@list_pkgs);
                     while ($i < $size_list) {
@@ -1573,7 +2300,8 @@ sub _list_pkg {
                         my $status_gitpush = $list_pkgs[$i]->{'status'}->{'git-push'};
                         my $status_gitCgit = $list_pkgs[$i]->{'status'}->{'bzrConvertGit'};
                         my $status = "bzrBranch = $status_branch, bzrConvertGit = $status_gitCgit, gitPush = $status_gitpush";
-                        my @data_rows = ($num, $group_name, $pkg_name, $date_add, $date_branch, $date_gitpush, $status);
+                        my $status_ongit = exists $list_pkgs[$i]->{'status'}->{'ongit'} ? $list_pkgs[$i]->{'status'}->{'ongit'} : '';
+                        my @data_rows = ($num, $group_name, $pkg_name, $date_add, $date_branch, $date_gitpush, $status, $status_ongit);
                         $textTbl->row(@data_rows);
                         $i++;
                     }
@@ -1612,7 +2340,7 @@ sub _list_pkg {
             print "\n";
             print "Warning : \n";
             print "====" x 18 . "\n";
-            print "Not found configure. Please run command \"boidev prepare\" first. \n\n";
+            print "Not found configure. Please run command \"boidev mig_prepare\" first. \n\n";
             exit 0;
         }
     }
@@ -1663,7 +2391,7 @@ sub _list_pkg {
                 my @list_pkgs = @{$get_list_pkg->{'data'}};
 
                 # Create Text Table :
-                my $textTbl = Text::SimpleTable::AutoWidth->new(captions => [( '#', 'Group Name', 'Packages Name', 'Date Add', 'Date bzr branch', 'Date git push', 'status')]);
+                my $textTbl = Text::SimpleTable::AutoWidth->new(captions => [( '#', 'Group Name', 'Packages Name', 'Date Add', 'Date bzr branch', 'Date git push', 'status', 'on GitHub')]);
 
                 my $i = 0;
                 my $size_list = scalar keys(@list_pkgs);
@@ -1678,7 +2406,8 @@ sub _list_pkg {
                     my $status_gitpush = $list_pkgs[$i]->{'status'}->{'git-push'};
                     my $status_gitCgit = $list_pkgs[$i]->{'status'}->{'bzrConvertGit'};
                     my $status = "bzrBranch = $status_branch, bzrConvertGit = $status_gitCgit, gitPush = $status_gitpush";
-                    my @data_rows = ($numb, $group_name, $pkg_name, $date_add, $date_branch, $date_gitpush, $status);
+                    my $status_ongit = exists $list_pkgs[$i]->{'status'}->{'ongit'} ? $list_pkgs[$i]->{'status'}->{'ongit'} : '';
+                    my @data_rows = ($numb, $group_name, $pkg_name, $date_add, $date_branch, $date_gitpush, $status, $status_ongit);
                     $textTbl->row(@data_rows);
                     $i++;
                 }
@@ -1718,9 +2447,19 @@ sub _list_pkg {
     # Check IF $arg_len != 3 :
     # ------------------------------------------------------------------------
     else {
+        my $i = 0;
+        my $data_cmd = '';
+        foreach my $arg (each @ARGV) {
+            if ($arg_len - 1 == $i) {
+                $data_cmd .= $arg;
+            } else {
+                $data_cmd .= "$arg ";
+            }
+            $i++;
+        }
         print "\n";
         print "====" x 18 . "\n";
-        print "your command: boidev $ARGV[0] $ARGV[1] $ARGV[2]\n";
+        print "your command: boidev $data_cmd\n";
         print "----" x 18 . "\n";
         print "\n";
         print "Warning : \n";
@@ -1741,7 +2480,6 @@ sub search_pkg {
     my %data = ();
 
     # Get data current config :
-    my $curr_build = $allconfig->{'build'};
     my $curr_pkg = $allconfig->{'pkg'};
     my $list_pkg = $curr_pkg->{'pkgs'};
 
@@ -1817,21 +2555,6 @@ sub form_search_pkg {
 sub _search_pkg {
     my ($self, $allconfig) = @_;
 
-    # Define hash or scalar :
-    my %data = ();
-
-    # Get data current config :
-    my $curr_build = $allconfig->{'build'};
-    my $buld_rilis = $curr_build->{'rilis'};
-    my $curr_pkg = $allconfig->{'pkg'};
-
-    # For Data Developer :
-    my $data_dev = BlankOnDev::DataDev::data_dev();
-    my $dir_dev = $data_dev->{'dir_dev'};
-    my $prefix_flcfg = $data_dev->{'prefix_flcfg'};
-    my $file_cfg_ext = $data_dev->{'fileCfg_ext'};
-    my $file_nameCfg = $prefix_flcfg.$buld_rilis.$file_cfg_ext;
-
     # For Arguments :
     my $arg_len = scalar @ARGV;
 
@@ -1850,8 +2573,6 @@ sub _search_pkg {
 
             # Create Text Table :
             my $textTbl = Text::SimpleTable::AutoWidth->new(captions => [( '#', 'Group Name', 'Packages Name', 'Date Add', 'Date bzr branch', 'Date git push', 'status')]);
-
-#            print Dumper \@list_pkgs;
 
             my $i = 0;
             my $size_list = scalar keys(@list_pkgs);
@@ -1911,9 +2632,6 @@ sub _search_pkg {
 
             # Create Text Table :
             my $textTbl = Text::SimpleTable::AutoWidth->new(captions => [( '#', 'Group Name', 'Packages Name', 'Date Add', 'Date bzr branch', 'Date git push', 'status')]);
-
-            #            print Dumper \@list_pkgs;
-
             my $i = 0;
             my $size_list = scalar keys(@list_pkgs);
             while ($i < $size_list) {
@@ -1960,6 +2678,20 @@ sub _search_pkg {
     # Check IF $arg_len != 3 or $arg_len != 2 :
     # ------------------------------------------------------------------------
     else {
+        my $i = 0;
+        my $data_cmd = '';
+        foreach my $arg (each @ARGV) {
+            if ($arg_len - 1 == $i) {
+                $data_cmd .= $arg;
+            } else {
+                $data_cmd .= "$arg ";
+            }
+            $i++;
+        }
+        print "\n";
+        print "====" x 18 . "\n";
+        print "your command: boidev $data_cmd\n";
+        print "----" x 18 . "\n";
         print "\n";
         print "Warning : \n";
         print "====" x 18 . "\n";
@@ -2012,8 +2744,6 @@ sub branch_pkg_group {
     my $action_rebranch = 'new';
 
     # For All config :
-    my $curr_build = $allconfig->{'build'};
-    my $build_rilis = $curr_build->{'rilis'};
     my $curr_pkg = $allconfig->{'pkg'};
     my $dir_pkgs = $curr_pkg->{'dirpkg'};
     my $locdir_group = $dir_pkgs.'/'.$input_group;
@@ -2040,6 +2770,7 @@ sub branch_pkg_group {
 
         my $i = 0;
         my $size_list = scalar keys(@list_pkgs);
+        my $saveConfig;
         my $result_cfg = $allconfig;
         my $count_branch = 0;
         my $count_rebranch = 0;
@@ -2070,12 +2801,12 @@ sub branch_pkg_group {
             my $prepare_cfg = prepare_config();
             $result_cfg = $prepare_cfg->{'bzr-branch'}($result_cfg, $pkg_name, $act_branch);
 
+            # Save Configure :
+            $saveConfig = save_newConfig();
+            $saveConfig->{'bzr-branch'}($result_cfg);
+
             $i++;
         }
-
-        # Save Configure :
-        my $saveConfig = save_newConfig();
-        $saveConfig->{'bzr-branch'}($result_cfg);
         my $notes = " Re-branch : $count_rebranch - New Branch : $count_branch ";
         print "\n";
         print "====" x 5 . " bzr branch has finished ";
@@ -2102,20 +2833,10 @@ sub _branch {
     my $confirm_rebranch;
 
     # For All config :
-    my $curr_build = $allconfig->{'build'};
-    my $build_rilis = $curr_build->{'rilis'};
     my $curr_pkg = $allconfig->{'pkg'};
     my $dir_pkgs = $curr_pkg->{'dirpkg'};
     my $pkg_groups = $curr_pkg->{'group'};
     my $pkg_list = $curr_pkg->{'pkgs'};
-    my $bzr = $allconfig->{'bzr'};
-
-    # For Data Developer :
-    my $data_dev = BlankOnDev::DataDev::data_dev();
-    my $logs_dir = $data_dev->{'dirlogs'};
-    my $prefix_log = $data_dev->{'prefix_fllog'};
-    my $ext_out_log = $data_dev->{'log_ext_out'};
-    my $ext_err_log = $data_dev->{'log_ext_err'};
 
     # Data current config :
     my $curr_dataPkg_grp = $allconfig->{'pkg'}->{'group'};
@@ -2259,6 +2980,20 @@ sub _branch {
     # Check IF $arg_len != 3 or $arg_len != 2 :
     # ------------------------------------------------------------------------
     else {
+        my $i = 0;
+        my $data_cmd = '';
+        foreach my $arg (each @ARGV) {
+            if ($arg_len - 1 == $i) {
+                $data_cmd .= $arg;
+            } else {
+                $data_cmd .= "$arg ";
+            }
+            $i++;
+        }
+        print "\n";
+        print "====" x 18 . "\n";
+        print "your command: boidev $data_cmd\n";
+        print "----" x 18 . "\n";
         print "\n";
         print "Warning : \n";
         print "====" x 18 . "\n";
@@ -2332,7 +3067,6 @@ sub bazaar_cgit_pkg_group {
     # For All config :
     my $curr_pkg = $allconfig->{'pkg'};
     my $dir_pkgs = $curr_pkg->{'dirpkg'};
-    my $pkg_list = $curr_pkg->{'pkgs'};
 
     my $list_pkg = $self->filter_listpkg_based_group($allconfig, $input_group);
     if ($list_pkg->{'result'} == 1) {
@@ -2341,6 +3075,7 @@ sub bazaar_cgit_pkg_group {
         # While loop to convert repository format :
         my $i = 0;
         my $until = scalar @list_pkgs;
+        my $saveConfig;
         my $result_cfg = $allconfig;
         while ($i < $until) {
             my $pkg_name = $list_pkgs[$i]->{'name'};
@@ -2362,6 +3097,10 @@ sub bazaar_cgit_pkg_group {
                     # Prepare Config :
                     my $prepare_config = prepare_config();
                     $result_cfg = $prepare_config->{'bzr-convert'}($result_cfg, $pkg_name, $action_bzr2git);
+
+                    # Save Configure :
+                    $saveConfig = save_newConfig();
+                    $saveConfig->{'bzr-convert'}($result_cfg);
                 } else {
 
                     print "\n";
@@ -2376,10 +3115,6 @@ sub bazaar_cgit_pkg_group {
             }
             $i++;
         }
-
-        # Save Configure :
-        my $saveConfig = save_newConfig();
-        $saveConfig->{'bzr-convert'}($result_cfg);
         print "\n";
         print "====" x 5 . " Packages in group \"$input_group\" has been finished to convert ";
         print "====" x 5 . "\n\n";
@@ -2401,27 +3136,12 @@ sub _bzr_cgit {
     my $arg_len = scalar @ARGV;
     my $num_pkg_group;
     my $input_group;
-    my $input_pkg;
-    my $confirm_rebranch;
-    my $action_rebranch = 'new';
 
     # For All config :
-    my $curr_build = $allconfig->{'build'};
-    my $build_rilis = $curr_build->{'rilis'};
     my $curr_pkg = $allconfig->{'pkg'};
-    my $dir_pkgs = $curr_pkg->{'dirpkg'};
     my $pkg_groups = $curr_pkg->{'group'};
     my $pkg_list = $curr_pkg->{'pkgs'};
     my $bzr = $allconfig->{'bzr'};
-    my $bzr_url = $bzr->{'url'};
-
-    # For Data Developer :
-    my $data_dev = BlankOnDev::DataDev::data_dev();
-    my $home_dir = $data_dev->{'home_dir'};
-    my $logs_dir = $data_dev->{'dirlogs'};
-    my $prefix_log = $data_dev->{'prefix_fllog'};
-    my $ext_out_log = $data_dev->{'log_ext_out'};
-    my $ext_err_log = $data_dev->{'log_ext_err'};
 
     # Data current config :
     my $curr_dataPkg_grp = $allconfig->{'pkg'}->{'group'};
@@ -2548,6 +3268,20 @@ sub _bzr_cgit {
     # Check IF $arg_len == 3 or $arg_len == 2 :
     # ------------------------------------------------------------------------
     else {
+        my $i = 0;
+        my $data_cmd = '';
+        foreach my $arg (each @ARGV) {
+            if ($arg_len - 1 == $i) {
+                $data_cmd .= $arg;
+            } else {
+                $data_cmd .= "$arg ";
+            }
+            $i++;
+        }
+        print "\n";
+        print "====" x 18 . "\n";
+        print "your command: boidev $data_cmd\n";
+        print "----" x 18 . "\n";
         print "\n";
         print "Warning : \n";
         print "====" x 18 . "\n";
@@ -2564,6 +3298,8 @@ sub gitpush_pkg {
     my ($self, $allconfig, $pkg_name) = @_;
 
     # For All config :
+    my $curr_build = $allconfig->{'build'};
+    my $build_rilis = $curr_build->{'rilis'};
     my $curr_pkg = $allconfig->{'pkg'};
     my $dir_pkgs = $curr_pkg->{'dirpkg'};
     my $pkg_list = $curr_pkg->{'pkgs'};
@@ -2582,7 +3318,10 @@ sub gitpush_pkg {
         if (-d $locdir_pkg) {
 
             # Action Git Push :
-            my $action_gitpush = BlankOnDev::Migration::bazaar2GitHub::github->git_push($allconfig, $pkg_name);
+            my $action_gitpush = BlankOnDev::Migration::bazaar2GitHub::github->git_push($allconfig, $pkg_name, $build_rilis);
+
+            # Print Action :
+            print "Action Git push for packages $pkg_name : $action_gitpush \n";
 
             # Prepare Config :
             my $prepare_config = prepare_config();
@@ -2612,22 +3351,11 @@ sub gitpush_pkg {
 sub gitpush_pkg_group {
     my ($self, $allconfig, $input_group) = @_;
 
-    # Define scalar :
-    my $confirm_rebranch;
-    my $action_rebranch = 'new';
-
     # For All config :
     my $curr_build = $allconfig->{'build'};
     my $build_rilis = $curr_build->{'rilis'};
     my $curr_pkg = $allconfig->{'pkg'};
     my $dir_pkgs = $curr_pkg->{'dirpkg'};
-
-    # For Data Developer :
-    my $data_dev = BlankOnDev::DataDev::data_dev();
-    my $logs_dir = $data_dev->{'dirlogs'};
-    my $prefix_log = $data_dev->{'prefix_bzrbranch_log'};
-    my $ext_out_log = $data_dev->{'log_ext_out'};
-    my $ext_err_log = $data_dev->{'log_ext_err'};
 
     # Get list Packages based Group :
     my $list_pkg = $self->filter_listpkg_based_group($allconfig, $input_group);
@@ -2637,6 +3365,7 @@ sub gitpush_pkg_group {
         # While loop to action git push :
         my $i = 0;
         my $until = scalar @list_pkgs;
+        my $saveConfig;
         my $result_cfg = $allconfig;
         while ($i < $until) {
             my $pkg_name = $list_pkgs[$i]->{'name'};
@@ -2651,7 +3380,7 @@ sub gitpush_pkg_group {
                 if (-d $locdir_pkg) {
 
                     # Action Git Push :
-                    my $action_gitpush = BlankOnDev::Migration::bazaar2GitHub::github->git_push($allconfig, $pkg_name);
+                    my $action_gitpush = BlankOnDev::Migration::bazaar2GitHub::github->git_push($allconfig, $pkg_name, $build_rilis);
 
                     # Print Action :
                     print "Action Git push for packages $pkg_name : $action_gitpush \n";
@@ -2659,6 +3388,10 @@ sub gitpush_pkg_group {
                     # Prepare Config :
                     my $prepare_config = prepare_config();
                     $result_cfg = $prepare_config->{'git-push'}($result_cfg, $pkg_name, $action_gitpush);
+
+                    # Save Configure :
+                    $saveConfig = save_newConfig();
+                    $saveConfig->{'git-push'}($result_cfg);
                 } else {
 
                     print "\n";
@@ -2673,10 +3406,6 @@ sub gitpush_pkg_group {
             }
             $i++;
         }
-
-        # Save Configure :
-        my $saveConfig = save_newConfig();
-        $saveConfig->{'git-push'}($result_cfg);
         print "\n";
         print "====" x 5 . " Packages in group \"$input_group\" has been finished to git push ";
         print "====" x 5 . "\n\n";
@@ -2831,6 +3560,20 @@ sub _gitpush {
     # Check IF $arg_len == 3 or $arg_len == 2 :
     # ------------------------------------------------------------------------
     else {
+        my $i = 0;
+        my $data_cmd = '';
+        foreach my $arg (each @ARGV) {
+            if ($arg_len - 1 == $i) {
+                $data_cmd .= $arg;
+            } else {
+                $data_cmd .= "$arg ";
+            }
+            $i++;
+        }
+        print "\n";
+        print "====" x 18 . "\n";
+        print "your command: boidev $data_cmd\n";
+        print "----" x 18 . "\n";
         print "\n";
         print "Warning : \n";
         print "====" x 18 . "\n";
@@ -2894,19 +3637,8 @@ sub gitpush_new_pkg_group {
     my ($self, $allconfig, $input_group, $commit) = @_;
 
     # For All config :
-    my $curr_build = $allconfig->{'build'};
     my $curr_pkg = $allconfig->{'pkg'};
     my $dir_pkgs = $curr_pkg->{'dirpkg'};
-    my $pkg_groups = $curr_pkg->{'group'};
-    my $pkg_list = $curr_pkg->{'pkgs'};
-
-    # For Data Developer :
-    my $data_dev = BlankOnDev::DataDev::data_dev();
-    my $home_dir = $data_dev->{'home_dir'};
-    my $logs_dir = $data_dev->{'dirlogs'};
-    my $prefix_log = $data_dev->{'prefix_fllog'};
-    my $ext_out_log = $data_dev->{'log_ext_out'};
-    my $ext_err_log = $data_dev->{'log_ext_err'};
 
     my $list_pkg = $self->filter_listpkg_based_group($allconfig, $input_group);
     if ($list_pkg->{'result'} == 1) {
@@ -3085,7 +3817,7 @@ sub _gitpush_new {
                     }
 
                     # Action git push by group :
-                    $self->gitpush_new_pkg_group($allconfig, $input_group, $input_commit);
+                    $self->gitpush_new_pkg_group($allconfig, $input_arg, $input_commit);
 
                 } else {
                     # Check Packages Input :
@@ -3130,6 +3862,20 @@ sub _gitpush_new {
     # Check IF $arg_len == 3 or $arg_len == 2 :
     # ------------------------------------------------------------------------
     else {
+        my $i = 0;
+        my $data_cmd = '';
+        foreach my $arg (each @ARGV) {
+            if ($arg_len - 1 == $i) {
+                $data_cmd .= $arg;
+            } else {
+                $data_cmd .= "$arg ";
+            }
+            $i++;
+        }
+        print "\n";
+        print "====" x 18 . "\n";
+        print "your command: boidev $data_cmd\n";
+        print "----" x 18 . "\n";
         print "\n";
         print "Warning : \n";
         print "====" x 18 . "\n";
@@ -3140,20 +3886,12 @@ sub _gitpush_new {
     # End of check IF $arg_len == 3 or $arg_len == 2.
     # ========================================================================
 }
-# Subroutine for option "git-check" :
-# ------------------------------------------------------------------------
-sub _git_check {
-    my ($self, $allconfig) = @_;
-
-}
 # Subroutine for action re-branch pkg :
 # ------------------------------------------------------------------------
 sub rebranch_pkg {
     my ($self, $allconfig, $group_pkg, $pkg_name, $action_rebranch) = @_;
 
     # For All config :
-    my $curr_build = $allconfig->{'build'};
-    my $build_rilis = $curr_build->{'rilis'};
     my $curr_pkg = $allconfig->{'pkg'};
     my $dir_pkgs = $curr_pkg->{'dirpkg'};
     my $locdir_group = $dir_pkgs.'/'.$group_pkg;
@@ -3198,6 +3936,8 @@ sub rebranch_pkg_group {
         mkdir($locdir_group);
     }
 
+    print "\n";
+
     # For Data Developer :
     my $data_dev = BlankOnDev::DataDev::data_dev();
     my $logs_dir = $data_dev->{'dirlogs'};
@@ -3212,9 +3952,8 @@ sub rebranch_pkg_group {
 
         my $i = 0;
         my $size_list = scalar keys(@list_pkgs);
+        my $saveConfig;
         my $result_cfg = $allconfig;
-        my $count_branch = 0;
-        my $count_rebranch = 0;
         my $num = $i;
         while ($i < $size_list) {
             $num = $num + 1;
@@ -3222,12 +3961,7 @@ sub rebranch_pkg_group {
             my $pkg_name = $list_pkgs[$i]->{'name'};
 
             # For file/dir pkgs :
-            my $dirPkg_grp = $dir_pkgs.'/'.$input_group;
             my $dest_dir = $dir_pkgs.'/'.$input_group.'/'.$pkg_name;
-            my $filename_outlogs = $prefix_log.$pkg_name.'_'.$build_rilis.$ext_out_log;
-            my $filename_errlogs = $prefix_log.$pkg_name.'_'.$build_rilis.$ext_err_log;
-            my $locfile_outlogs = $logs_dir.$build_rilis.'/'.$filename_outlogs;
-            my $locfile_errlogs = $logs_dir.$build_rilis.'/'.$filename_errlogs;
 
             # Check exists pkg :
             if (-d $dest_dir) {
@@ -3240,19 +3974,19 @@ sub rebranch_pkg_group {
                 $act_branch = BlankOnDev::Migration::bazaar2GitHub::bazaar->branch('no', $result_cfg, $group_name, $pkg_name);
             }
 
-            print "Result Action branch : $act_branch\n";
+            print " $act_branch\n";
 
             # Prepare Configure Bzr Branch :
             my $prepare_cfg = prepare_config();
             $result_cfg = $prepare_cfg->{'bzr-branch'}($result_cfg, $pkg_name, $act_branch);
 
+            # Save Configure :
+            $saveConfig = save_newConfig();
+            $saveConfig->{'bzr-branch'}($result_cfg);
+
             $i++;
         }
 
-        # Save Configure :
-        my $saveConfig = save_newConfig();
-        $saveConfig->{'bzr-branch'}($result_cfg);
-        my $notes = " Re-branch : $count_rebranch - New Branch : $count_branch ";
         print "\n";
         print "====" x 5 . " bzr branch has finished ";
         print "====" x 5 . "\n\n";
@@ -3274,25 +4008,14 @@ sub _re_branch {
     my $arg_len = scalar @ARGV;
     my $num_pkg_group;
     my $input_group;
-    my $input_pkg;
     my $confirm_rebranch;
-    my $action_rebranch = 'new';
 
     # For All config :
     my $curr_build = $allconfig->{'build'};
-    my $build_rilis = $curr_build->{'rilis'};
     my $curr_pkg = $allconfig->{'pkg'};
     my $dir_pkgs = $curr_pkg->{'dirpkg'};
     my $pkg_groups = $curr_pkg->{'group'};
     my $pkg_list = $curr_pkg->{'pkgs'};
-    my $bzr = $allconfig->{'bzr'};
-
-    # For Data Developer :
-    my $data_dev = BlankOnDev::DataDev::data_dev();
-    my $logs_dir = $data_dev->{'dirlogs'};
-    my $prefix_log = $data_dev->{'prefix_fllog'};
-    my $ext_out_log = $data_dev->{'log_ext_out'};
-    my $ext_err_log = $data_dev->{'log_ext_err'};
 
     # Data current config :
     my $curr_dataPkg_grp = $allconfig->{'pkg'}->{'group'};
@@ -3386,7 +4109,7 @@ sub _re_branch {
             if ($confirm_grp eq 'y' or $confirm_grp eq 'Y') {
 
                 # Action Branch :
-                $self->rebranch_pkg_group($allconfig, $input_group);
+                $self->rebranch_pkg_group($allconfig, $input_arg);
             } else {
 
                 print "\n";
@@ -3438,6 +4161,20 @@ sub _re_branch {
     # Check IF $arg_len == 3 or $arg_len == 2 :
     # ------------------------------------------------------------------------
     else {
+        my $i = 0;
+        my $data_cmd = '';
+        foreach my $arg (each @ARGV) {
+            if ($arg_len - 1 == $i) {
+                $data_cmd .= $arg;
+            } else {
+                $data_cmd .= "$arg ";
+            }
+            $i++;
+        }
+        print "\n";
+        print "====" x 18 . "\n";
+        print "your command: boidev $data_cmd\n";
+        print "----" x 18 . "\n";
         print "\n";
         print "Warning : \n";
         print "====" x 18 . "\n";
@@ -3454,6 +4191,8 @@ sub regitpush_pkg {
     my ($self, $allconfig, $pkg_name) = @_;
 
     # For All config :
+    my $curr_build = $allconfig->{'build'};
+    my $build_rilis = $curr_build->{'rilis'};
     my $curr_pkg = $allconfig->{'pkg'};
     my $dir_pkgs = $curr_pkg->{'dirpkg'};
     my $pkg_list = $curr_pkg->{'pkgs'};
@@ -3476,7 +4215,7 @@ sub regitpush_pkg {
             if ($bzrCgit_status eq 1) {
 
                 # Action :
-                my $action_gitpush = BlankOnDev::Migration::bazaar2GitHub::github->repush_git($allconfig, $pkg_name);
+                my $action_gitpush = BlankOnDev::Migration::bazaar2GitHub::github->repush_git($allconfig, $pkg_name, $build_rilis);
 
                 # Prepare Config :
                 my $prepare_config = prepare_config();
@@ -3521,6 +4260,8 @@ sub regitpush_pkg_group {
     my ($self, $allconfig, $input_group) = @_;
 
     # For All config :
+    my $curr_build = $allconfig->{'build'};
+    my $build_rilis = $curr_build->{'rilis'};
     my $curr_pkg = $allconfig->{'pkg'};
     my $dir_pkgs = $curr_pkg->{'dirpkg'};
 
@@ -3550,7 +4291,7 @@ sub regitpush_pkg_group {
                     if ($bzrCgit_status eq 1) {
 
                         # Action Git Push :
-                        my $action_gitpush = BlankOnDev::Migration::bazaar2GitHub::github->repush_git($allconfig, $pkg_name);
+                        my $action_gitpush = BlankOnDev::Migration::bazaar2GitHub::github->repush_git($allconfig, $pkg_name, $build_rilis);
 
                         # Print Action :
                         print "Action re-push git for packages $pkg_name : $action_gitpush \n";
@@ -3558,11 +4299,14 @@ sub regitpush_pkg_group {
                         # Prepare Config :
                         my $prepare_config = prepare_config();
                         $result_cfg = $prepare_config->{'git-push'}($result_cfg, $pkg_name, $action_gitpush);
+
+                        # Save Configure :
+                        my $saveConfig = save_newConfig();
+                        $saveConfig->{'git-push'}($result_cfg);
                     } else {
                         print "\n";
                         print "File Packages [$pkg_name] not convert to github format repository. \n";
                         print "Please run command \"boidev bzr2git bzr-cgit <packages_name>\" for converting format repository to github.\n\n";
-                        exit 0;
                     }
                 } else {
                     print "\n";
@@ -3577,10 +4321,6 @@ sub regitpush_pkg_group {
             }
             $i++;
         }
-
-        # Save Configure :
-        my $saveConfig = save_newConfig();
-        $saveConfig->{'git-push'}($result_cfg);
         print "\n";
         print "====" x 5 . " Packages in group \"$input_group\" has been finished re-push to git";
         print "====" x 5 . "\n\n";
@@ -3607,7 +4347,6 @@ sub _re_gitpush {
     my $curr_pkg = $allconfig->{'pkg'};
     my $pkg_groups = $curr_pkg->{'group'};
     my $pkg_list = $curr_pkg->{'pkgs'};
-    my $bzr = $allconfig->{'bzr'};
 
     # Data current config :
     my $curr_dataPkg_grp = $allconfig->{'pkg'}->{'group'};
@@ -3735,6 +4474,303 @@ sub _re_gitpush {
     # Check IF $arg_len == 3 or $arg_len == 2 :
     # -----------------------------------------------------------------b-------
     else {
+        my $i = 0;
+        my $data_cmd = '';
+        foreach my $arg (each @ARGV) {
+            if ($arg_len - 1 == $i) {
+                $data_cmd .= $arg;
+            } else {
+                $data_cmd .= "$arg ";
+            }
+            $i++;
+        }
+        print "\n";
+        print "====" x 18 . "\n";
+        print "your command: boidev $data_cmd\n";
+        print "----" x 18 . "\n";
+        print "\n";
+        print "Warning : \n";
+        print "====" x 18 . "\n";
+        print "This command max three arguments\n\n";
+        exit 0;
+    }
+    # ------------------------------------------------------------------------
+    # End of check IF $arg_len == 3 or $arg_len == 2.
+    # ========================================================================
+}
+# Subroutine for check all packages on github :
+# ------------------------------------------------------------------------
+sub git_check_allpkg {
+    my ($self, $allconfig) = @_;
+
+    # For All config :
+    my $curr_pkg = $allconfig->{'pkg'};
+    my $dir_pkgs = $curr_pkg->{'dirpkg'};
+
+    # Get list packages group :
+    my $get_list_grp = $self->list_all_pkg_group($allconfig);
+
+    my @list_group = %{$get_list_grp->{'data'}};
+
+    # While loop for group packages :
+    my $i = 0;
+    my $until = scalar @list_group;
+    my $prepare_config;
+    my $result_cfg;
+    while ($i < $until) {
+        my $pkg_group = $list_group[$i];
+
+        # Print Header :
+        print "\n";
+        print "Check repo on github for packages in group $pkg_group : \n";
+
+        # Get list packages by group :
+        my $list_pkg = $self->filter_listpkg_based_group($allconfig, $pkg_group);
+        if ($list_pkg->{'result'} eq 1) {
+            my @list_pkg = @{$list_pkg->{'data'}};
+
+            # While loop for check packages :
+            my $i_p = 0;
+            my $until_p = scalar @list_pkg;
+            while ($i_p < $until_p) {
+                my $data_package = $list_pkg[$i_p];
+                my $data_pkg_name = $data_package->{'name'};
+                my $data_pkg_group = $data_package->{'group'};
+                my $locdir_pkg = $dir_pkgs.'/'.$data_pkg_group.'/'.$data_pkg_name;
+
+                # Check dir packages :
+                if (-d $locdir_pkg) {
+
+                    # Action Command :
+                    my $action_check = BlankOnDev::Migration::bazaar2GitHub::github->git_check($allconfig, $data_pkg_name);
+
+                    print "Group packages $pkg_group = No List Packages\n";
+
+                    # prepare Config :
+                    $prepare_config = prepare_config();
+                    $result_cfg = $prepare_config->{'git-check'}($allconfig, $data_pkg_name, $action_check);
+
+                    # Save Configure :
+                    my $saveConfig = save_newConfig();
+                    $saveConfig->{'git-check'}($result_cfg);
+                } else {
+
+                    print "\n";
+                    print "File Packages [$data_pkg_name] is not found. \n";
+                    print "Please run command \"boidev bzr2git branch <packages_name>\" to download file package [$data_pkg_name] from bazaar server repository..\n\n";
+                }
+
+                $i_p++;
+            }
+            print "\n";
+            print "====" x 5 . " Git Check All Packages has finished";
+            print "====" x 5 . "\n\n";
+            exit 0;
+        } else {
+            print "Group packages $pkg_group = No List Packages\n";
+        }
+        $i++;
+    }
+}
+# Subroutine for check all packages by group :
+# ------------------------------------------------------------------------
+sub git_check_allpkg_grp {
+    my ($self, $allconfig, $input_group) = @_;
+
+    # Define scalar :
+    my $act_gitcheck;
+
+    # For All config :
+    my $curr_build = $allconfig->{'build'};
+    my $build_rilis = $curr_build->{'rilis'};
+    my $curr_pkg = $allconfig->{'pkg'};
+    my $dir_pkgs = $curr_pkg->{'dirpkg'};
+    my $locdir_group = $dir_pkgs.'/'.$input_group;
+
+    my $get_list_pkg = $self->filter_listpkg_based_group($allconfig, $input_group);
+    if ($get_list_pkg->{'result'} eq 1) {
+        my @list_pkgs = @{$get_list_pkg->{'data'}};
+
+        # Print Header :
+        print "\n";
+        print "Check repo on github for all packages : \n";
+
+        # While loop to action git push :
+        my $i = 0;
+        my $until = scalar @list_pkgs;
+        my $saveConfig;
+        my $result_cfg = $allconfig;
+        while ($i < $until) {
+            my $data_package = $list_pkgs[$i];
+            my $data_pkg_name = $data_package->{'name'};
+            my $data_pkg_group = $data_package->{'group'};
+            my $locdir_pkg = $dir_pkgs.'/'.$input_group.'/'.$data_pkg_name;
+
+            # Check dir packages :
+            if (-d $locdir_pkg) {
+
+                # Action Command :
+                $act_gitcheck = BlankOnDev::Migration::bazaar2GitHub::github->git_check($allconfig, $data_pkg_name);
+
+                # Print "Header"
+                print "Check Repo [$data_pkg_name] on github : $act_gitcheck \n";
+
+                # prepare Config :
+                my $prepare_config = prepare_config();
+                $result_cfg = $prepare_config->{'git-check'}($result_cfg, $data_pkg_name, $act_gitcheck);
+
+                # Save Configure :
+                $saveConfig = save_newConfig();
+                $saveConfig->{'git-check'}($result_cfg);
+            } else {
+
+                print "\n";
+                print "File Packages [$data_pkg_name] is not found. \n";
+                print "Please run command \"boidev bzr2git branch <packages_name>\" to download file package [$data_pkg_name] from bazaar server repository..\n\n";
+            }
+            $i++;
+        }
+        print "\n";
+        print "====" x 5 . " Git Check All Packages on Group [$input_group] has finished";
+        print "====" x 5 . "\n\n";
+        exit 0;
+    } else {
+        print "\n";
+        print "Info : \n";
+        print "====" x 18 . "\n";
+        print "Not found packages in list on group $input_group. Please run command \"boidev bzr2git addpkg\" to add new packages in group.\n\n";
+        exit 0;
+    }
+}
+# Subroutine for option "git-check" :
+# ------------------------------------------------------------------------
+sub _git_check {
+    my ($self, $allconfig) = @_;
+
+    # Define scalar :
+    my $arg_len = scalar @ARGV;
+    my $form_group;
+
+    # For All config :
+    my $curr_pkg = $allconfig->{'pkg'};
+    my $curr_dirpkg = $curr_pkg->{'dirpkg'};
+    my $pkg_groups = $curr_pkg->{'group'};
+    my $pkg_list = $curr_pkg->{'pkgs'};
+    my $data_list_grp = $self->bzr2git_get_list_group_amount_pkg($allconfig);
+    my $choice_grp = $data_list_grp->{'data'};
+
+    # ------------------------------------------------------------------------
+    # Check IF $arg_len == 2 :
+    # ------------------------------------------------------------------------
+    if ($arg_len == 2) {
+
+        # Form :
+        print "\n";
+        print "Choose packages group : \n";
+        print "---" x 18 . "\n";
+        print $data_list_grp->{'choice'};
+        print "---" x 18 . "\n";
+        print "Enter number of group name : ";
+        chomp($form_group = <STDIN>);
+        if (exists $choice_grp->{$form_group}) {
+            my $input_group = $choice_grp->{$form_group};
+
+            # Action Check :
+            $self->git_check_allpkg_grp($allconfig, $input_group);
+        } else {
+            print "\n";
+            print "Info : Enter number choice\n";
+            print "====" x 18 . "\n";
+            print "Please enter number choice. \n\n";
+            exit 0;
+        }
+    }
+    # ------------------------------------------------------------------------
+    # Check IF $arg_len == 3 :
+    # ------------------------------------------------------------------------
+    elsif ($arg_len == 3) {
+        # Get data argument ;
+        my $input_arg = $ARGV[2];
+
+        # Check if $input_arg == 'all' :
+        if ($input_arg eq 'all') {
+
+            # Check All group :
+            $self->git_check_allpkg($allconfig);
+
+        } else {
+
+            # Check Input in Group :
+            if (exists $pkg_groups->{$input_arg}) {
+
+                # Action Check :
+                $self->git_check_allpkg_grp($allconfig, $input_arg);
+            } else {
+
+                # Check Input in packages :
+                if (exists $pkg_list->{$input_arg}) {
+                    my $data_package = $pkg_list->{$input_arg};
+                    my $data_pkg_name = $data_package->{'name'};
+                    my $data_pkg_group = $data_package->{'group'};
+                    my $loc_of_pkg = $curr_dirpkg.'/'.$data_pkg_group.'/'.$data_pkg_name;
+
+                    # Check if exists dir packages :
+                    if (-d $loc_of_pkg) {
+
+                        # Action Command :
+                        my $action_check = BlankOnDev::Migration::bazaar2GitHub::github->git_check($allconfig, $data_pkg_name);
+
+                        # Print "Header"
+                        print "Check Repo [$data_pkg_name] on github : $action_check \n";
+
+                        # prepare Config :
+                        my $prepare_config = prepare_config();
+                        my $result_cfg = $prepare_config->{'git-check'}($allconfig, $data_pkg_name, $action_check);
+
+                        # Save Configure :
+                        my $saveConfig = save_newConfig();
+                        $saveConfig->{'git-check'}($result_cfg);
+
+                        print "\n";
+                        print "git check repository for packages \"$data_pkg_name\" | $action_check. \n";
+                        print "\n";
+                    } else {
+                        print "\n";
+                        print "Info : \n";
+                        print "====" x 18 . "\n";
+                        print "File Packages [$data_pkg_name] has deleted. \n";
+                        print "Please run command \"boidev bzr2git re-branch <packages_name>\" to download file package [$data_pkg_name] from bazaar server repository..\n\n";
+                        exit 0;
+                    }
+
+                } else {
+                    print "\n";
+                    print "Info : \n";
+                    print "====" x 18 . "\n";
+                    print "Packages is not found. Please run command \"boidev bzr2git addpkg\" or \"boidev bzr2git addpkg-file\" to add new packages in list.\n\n";
+                    exit 0;
+                }
+            }
+        }
+    }
+    # ------------------------------------------------------------------------
+    # Check IF $arg_len == 3 or $arg_len == 2 :
+    # ------------------------------------------------------------------------
+    else {
+        my $i = 0;
+        my $data_cmd = '';
+        foreach my $arg (each @ARGV) {
+            if ($arg_len - 1 == $i) {
+                $data_cmd .= $arg;
+            } else {
+                $data_cmd .= "$arg ";
+            }
+            $i++;
+        }
+        print "\n";
+        print "====" x 18 . "\n";
+        print "your command: boidev $data_cmd\n";
+        print "----" x 18 . "\n";
         print "\n";
         print "Warning : \n";
         print "====" x 18 . "\n";
@@ -3756,12 +4792,6 @@ sub usage {
 
     print "USAGE : boidev bzr2git <OPTIONS2>\n";
     BlankOnDev::usage_bzr2git;
-#    printf("%-20s %s\n", "config", "Untuk konfigurasi sebelum menggunakan perintah $0");
-#    printf("%-20s %s\n", "branch", "Untuk download paket dari Bazaar Server");
-#    printf("%-20s %s\n", "listgit", "Untuk melihat daftar paket yang sudah di masukkan ke git");
-#    printf("%-20s %s\n", "list", "Untuk melihat daftar paket yang sudah ditambahkan di lokal");
-#    printf("%-20s %s\n", "addpkg", "Untuk menambahkan daftar paket yang akan di branch dari Bazaar");
-#    printf("%-20s %s\n", "execute", "Untuk melihat daftar paket yang sudah di masukkan ke git");
     print "\n";
     exit 0;
 }
@@ -3880,6 +4910,90 @@ sub usage_arg_3 {
             BlankOnDev::usage_bzr2git_branch();
             print "\n";
             exit 0;
+        },
+        'bzr-cgit' => sub {
+            print "\n";
+            print "-----" x 15 . "\n";
+            print " For Help Command : boidev $ARGV[0] $ARGV[1] \n";
+            print "-----" x 15 . "\n";
+            print "\n";
+
+            print "USAGE : boidev bzr2git bzr-cgit <OPTIONS3>\n";
+            print "-- or --\n";
+            print "USAGE : boidev bzr2git bzr-cgit <INPUT>\n\n";
+            BlankOnDev::usage_bzr2git_bzr_cgit();
+            print "\n";
+            exit 0;
+        },
+        'git-push' => sub {
+            print "\n";
+            print "-----" x 15 . "\n";
+            print " For Help Command : boidev $ARGV[0] $ARGV[1] \n";
+            print "-----" x 15 . "\n";
+            print "\n";
+
+            print "USAGE : boidev bzr2git git-push <OPTIONS3>\n";
+            print "-- or --\n";
+            print "USAGE : boidev bzr2git git-push <INPUT>\n\n";
+            BlankOnDev::usage_bzr2git_gitpush();
+            print "\n";
+            exit 0;
+        },
+        'git-push-new' => sub {
+            print "\n";
+            print "-----" x 15 . "\n";
+            print " For Help Command : boidev $ARGV[0] $ARGV[1] \n";
+            print "-----" x 15 . "\n";
+            print "\n";
+
+            print "USAGE : boidev bzr2git git-push-new <OPTIONS3>\n";
+            print "-- or --\n";
+            print "USAGE : boidev bzr2git git-push-new <INPUT>\n\n";
+            BlankOnDev::usage_bzr2git_gitpush_new();
+            print "\n";
+            exit 0;
+        },
+        'git-check' => sub {
+            print "\n";
+            print "-----" x 15 . "\n";
+            print " For Help Command : boidev $ARGV[0] $ARGV[1] \n";
+            print "-----" x 15 . "\n";
+            print "\n";
+
+            print "USAGE : boidev bzr2git git-check <OPTIONS3>\n";
+            print "-- or --\n";
+            print "USAGE : boidev bzr2git git-check <INPUT>\n\n";
+            BlankOnDev::usage_bzr2git_git_check();
+            print "\n";
+            exit 0;
+        },
+        're-branch' => sub {
+            print "\n";
+            print "-----" x 15 . "\n";
+            print " For Help Command : boidev $ARGV[0] $ARGV[1] \n";
+            print "-----" x 15 . "\n";
+            print "\n";
+
+            print "USAGE : boidev bzr2git re-branch <OPTIONS3>\n";
+            print "-- or --\n";
+            print "USAGE : boidev bzr2git re-branch <INPUT>\n\n";
+            BlankOnDev::usage_bzr2git_reBranch();
+            print "\n";
+            exit 0;
+        },
+        're-gitpush' => sub {
+            print "\n";
+            print "-----" x 15 . "\n";
+            print " For Help Command : boidev $ARGV[0] $ARGV[1] \n";
+            print "-----" x 15 . "\n";
+            print "\n";
+
+            print "USAGE : boidev bzr2git re-branch <OPTIONS3>\n";
+            print "-- or --\n";
+            print "USAGE : boidev bzr2git re-branch <INPUT>\n\n";
+            BlankOnDev::usage_bzr2git_reGitpush();
+            print "\n";
+            exit 0;
         }
     };
     if (exists $options3->{$ARGV[1]}) {
@@ -3977,6 +5091,20 @@ sub save_newConfig {
             my $newData_cfg = encode_json($new_config);
             BlankOnDev::Utils::file->create($file_name, $dir_dev, $newData_cfg);
         },
+        'git-check' => sub {
+            my ($new_config) = @_;
+
+            # Create File :
+            my $newData_cfg = encode_json($new_config);
+            BlankOnDev::Utils::file->create($file_name, $dir_dev, $newData_cfg);
+        },
+        'bzr2git' => sub {
+            my ($new_config) = @_;
+
+            # Create File :
+            my $newData_cfg = encode_json($new_config);
+            BlankOnDev::Utils::file->create($file_name, $dir_dev, $newData_cfg);
+        }
     };
 
     return $switch;
@@ -4184,12 +5312,6 @@ sub prepare_config {
             $data{'pkg'} = $result_merge;
 
             return \%data;
-        },
-        'addpkg-file' => sub {
-
-        },
-        'addpkg-file-group-exists' => sub {
-
         },
         'rename-group-pkg' => sub {
             my ($curr_cfg, $old_pkg_group, $new_pkg_group) = @_;
@@ -4486,7 +5608,6 @@ sub prepare_config {
             my $curr_timezone = $curr_cfg->{'timezone'};
             my $curr_prepare = $curr_cfg->{'prepare'};
             my $curr_build = $curr_cfg->{'build'};
-            my $build_rilis = $curr_build->{'rilis'};
             my $curr_bzr = $curr_cfg->{'bzr'};
             my $curr_git = $curr_cfg->{'git'};
             my $curr_pkg = $curr_cfg->{'pkg'};
@@ -4593,8 +5714,106 @@ sub prepare_config {
 
             return \%data;
         },
-        'bzrCgit' => sub {
-            ''
+        'git-check' => sub {
+            my ($curr_cfg, $pkg_input, $r_gitcheck) = @_;
+
+            # Define hash or scalar :
+            my %data = ();
+
+            # get data current pkg :
+            my $curr_timezone = $curr_cfg->{'timezone'};
+            my $curr_prepare = $curr_cfg->{'prepare'};
+            my $curr_build = $curr_cfg->{'build'};
+            my $curr_bzr = $curr_cfg->{'bzr'};
+            my $curr_git = $curr_cfg->{'git'};
+            my $curr_pkg = $curr_cfg->{'pkg'};
+            my $pkg_dirpkg = $curr_pkg->{'dirpkg'};
+            my $pkg_group = $curr_pkg->{'group'};
+            my $pkg_list = $curr_pkg->{'pkgs'};
+
+            # Data Current Packages :
+            my $dataCurr_pkg = $pkg_list->{$pkg_input};
+            my $status_pkg = $dataCurr_pkg->{'status'};
+            my $stts_bzrPush = $status_pkg->{'git-push'};
+            my $stts_bzrBranch = $status_pkg->{'bzr-branch'};
+            my $stts_bzrCgit = $status_pkg->{'bzrConvertGit'};
+
+            # Update Packages:
+            my $updatePkg_stts = Hash::MultiValue->new(%{$pkg_list->{$pkg_input}});
+            $updatePkg_stts->set('status' => {
+                    'bzr-branch' => $stts_bzrBranch,
+                    'git-push' => $stts_bzrPush,
+                    'bzrConvertGit' => $stts_bzrCgit,
+                    'ongit' => $r_gitcheck,
+                });
+            my $rUpdate_sttsPkg = $updatePkg_stts->as_hashref;
+
+            # Update Data Packages :
+            my $updatePkgs = Hash::MultiValue->new(%{$pkg_list});
+            $updatePkgs->set($pkg_input => $rUpdate_sttsPkg);
+            my $newData_pkg = $updatePkgs->as_hashref;
+
+            # Create New Data :
+            $data{'timezone'} = $curr_timezone;
+            $data{'prepare'} = $curr_prepare;
+            $data{'build'} = $curr_build;
+            $data{'bzr'} = $curr_bzr;
+            $data{'git'} = $curr_git;
+            $data{'pkg'} = {
+                'dirpkg' => $pkg_dirpkg,
+                'group' => $pkg_group,
+                'pkgs' => $newData_pkg,
+            };
+
+            return \%data;
+        },
+        'bzr2git' => sub {
+            my ($curr_cfg, $pkg_input, $branch, $bzr_cgit, $git_push, $git_check, $time_branch, $time_gitpush) = @_;
+
+            # Define hash or scalar :
+            my %data = ();
+
+            # get data current pkg :
+            my $curr_timezone = $curr_cfg->{'timezone'};
+            my $curr_prepare = $curr_cfg->{'prepare'};
+            my $curr_build = $curr_cfg->{'build'};
+            my $curr_bzr = $curr_cfg->{'bzr'};
+            my $curr_git = $curr_cfg->{'git'};
+            my $curr_pkg = $curr_cfg->{'pkg'};
+            my $pkg_dirpkg = $curr_pkg->{'dirpkg'};
+            my $pkg_group = $curr_pkg->{'group'};
+            my $pkg_list = $curr_pkg->{'pkgs'};
+
+            # Update Packages:
+            my $updatePkg_stts = Hash::MultiValue->new(%{$pkg_list->{$pkg_input}});
+            $updatePkg_stts->set('status' => {
+                    'bzr-branch' => $branch,
+                    'git-push' => $bzr_cgit,
+                    'bzrConvertGit' => $git_push,
+                    'ongit' => $git_check,
+                });
+            $updatePkg_stts->set('date-branch' => $time_branch);
+            $updatePkg_stts->set('date-gitpush' => $time_gitpush);
+            my $rUpdate_sttsPkg = $updatePkg_stts->as_hashref;
+
+            # Update Data Packages :
+            my $updatePkgs = Hash::MultiValue->new(%{$pkg_list});
+            $updatePkgs->set($pkg_input => $rUpdate_sttsPkg);
+            my $newData_pkg = $updatePkgs->as_hashref;
+
+            # Create New Data :
+            $data{'timezone'} = $curr_timezone;
+            $data{'prepare'} = $curr_prepare;
+            $data{'build'} = $curr_build;
+            $data{'bzr'} = $curr_bzr;
+            $data{'git'} = $curr_git;
+            $data{'pkg'} = {
+                'dirpkg' => $pkg_dirpkg,
+                'group' => $pkg_group,
+                'pkgs' => $newData_pkg,
+            };
+
+            return \%data;
         },
     };
 

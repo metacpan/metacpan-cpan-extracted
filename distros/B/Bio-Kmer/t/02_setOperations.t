@@ -23,7 +23,7 @@ my $union = $kmer1->union($kmer2);
 
 is scalar(@$union), 62362, "Union of all kmers";
 
-warn "Testing to make sure there is a warning\n";
+warn "Testing to make sure there is a warning for incompatible kmer sets\n";
 my $invalidKmer = ["-1"];
 eval{
   $invalidKmer = $kmer2->intersection($kmer3);

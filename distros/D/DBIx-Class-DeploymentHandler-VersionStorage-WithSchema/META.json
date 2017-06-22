@@ -1,0 +1,74 @@
+{
+   "abstract" : "Version storage for DeploymentHandler that includes the schema",
+   "author" : [
+      "Alastair McGowan-Douglas <altreus@altre.us>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DBIx-Class-DeploymentHandler-VersionStorage-WithSchema",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla::PluginBundle::Author::ALTREUS" : "0.002"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBIx::Class::DeploymentHandler" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::Class::DeploymentHandler::VersionStorage::WithSchema" : {
+         "file" : "lib/DBIx/Class/DeploymentHandler/VersionStorage/WithSchema.pm",
+         "version" : "0.001"
+      },
+      "DBIx::Class::DeploymentHandler::VersionStorage::WithSchema::VersionResult" : {
+         "file" : "lib/DBIx/Class/DeploymentHandler/VersionStorage/WithSchema/VersionResult.pm",
+         "version" : "0.001"
+      },
+      "DBIx::Class::DeploymentHandler::VersionStorage::WithSchema::VersionResultSet" : {
+         "file" : "lib/DBIx/Class/DeploymentHandler/VersionStorage/WithSchema/VersionResultSet.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Altreus/DBIx-Class-DeploymentHandler-VersionStorage-WithSchema/issues"
+      },
+      "homepage" : "https://github.com/Altreus/DBIx-Class-DeploymentHandler-VersionStorage-WithSchema",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Altreus/DBIx-Class-DeploymentHandler-VersionStorage-WithSchema.git",
+         "web" : "https://github.com/Altreus/DBIx-Class-DeploymentHandler-VersionStorage-WithSchema"
+      }
+   },
+   "version" : "0.001",
+   "x_contributors" : [
+      "Alastair McGowan-Douglas <alastair.mcgowan@opusvl.com>"
+   ]
+}
+

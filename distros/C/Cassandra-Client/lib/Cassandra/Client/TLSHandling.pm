@@ -11,6 +11,8 @@ BEGIN {
     Net::SSLeay::randomize();
 }
 
+use Devel::GlobalDestruction;
+
 sub new {
     my ($class)= @_;
 
@@ -30,7 +32,7 @@ sub new_conn {
 
 sub DESTROY {
     local $@;
-    return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
+    return if in_global_destruction;
 
     my $self= shift;
 
@@ -44,9 +46,11 @@ use 5.010;
 use strict;
 use warnings;
 
+use Devel::GlobalDestruction;
+
 sub DESTROY {
     local $@;
-    return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
+    return if in_global_destruction;
 
     my $self= shift;
     Net::SSLeay::free($$self);

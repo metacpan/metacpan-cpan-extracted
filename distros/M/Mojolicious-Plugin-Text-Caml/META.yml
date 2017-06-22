@@ -1,0 +1,40 @@
+---
+abstract: 'Mojolicious Plugin'
+author:
+  - 'Cyrill Novgorodcev <cynovg@cpan.org>'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.142690'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Text-Caml
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Mojolicious::Plugin::Text::Caml:
+    file: lib/Mojolicious/Plugin/Text/Caml.pm
+    version: '0.03'
+requires:
+  Mojolicious: '0'
+  Text::Caml: '0'
+resources:
+  bugtracker: https://github.com/cynovg/Mojolicious-Plugin-Text-Caml/issues
+  homepage: https://github.com/cynovg/Mojolicious-Plugin-Text-Caml
+  repository: git://github.com/cynovg/Mojolicious-Plugin-Text-Caml.git
+version: '0.03'
+x_authority: cpan:CYNOVG
+x_contributors:
+  - 'Novgorodcev Cyrill <cynovg@gmail.com>'
+  - 'Kirill Novgorodcev <novgorodtsev.kirill@220-volt.ru>'

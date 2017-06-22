@@ -6,6 +6,20 @@ Home page:    <https://metacpan.org/release/Lexical-Accessor>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Lexical-Accessor>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.009	2017-06-13
+
+ [ Bug Fixes ]
+ - Fixes for defaults in accessors.
+   Fixes RT#101024.
+   <https://rt.cpan.org/Ticket/Display.html?id=101024>
+ - Make `has` return coderefs as documented.
+   Lukas Atkinson++
+   <https://github.com/tobyink/p5-lexical-accessor/pull/1>
+
+ [ Other ]
+ - Updated: Support Sub::Util instead of Sub::Name (with Sub::Name as a
+   fallback).
+
 0.008	2014-03-29
 
  [ Bug Fixes ]

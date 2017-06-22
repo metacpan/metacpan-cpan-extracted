@@ -1,16 +1,23 @@
+[![Linux Build Status](https://travis-ci.org/nigelhorne/File-pfopen.svg?branch=master)](https://travis-ci.org/nigelhorne/File-pfopen)
+[![Windows Build status](https://ci.appveyor.com/api/projects/status/1t1yhvagx00c2qi8?svg=true)](https://ci.appveyor.com/project/nigelhorne/cgi-info)
+[![Dependency Status](https://dependencyci.com/github/nigelhorne/File-pfopen/badge)](https://dependencyci.com/github/nigelhorne/File-pfopen)
+[![Coverage Status](https://coveralls.io/repos/github/nigelhorne/File-pfopen/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/File-pfopen?branch=master)
+
 # File::pfopen
 
 Try hard to find a file
 
 # VERSION
 
-Version 0.01
+Version 0.02
 
 # SYNOPSIS
 
+## pfopen
+
     use File::pfopen 'pfopen';
-    my $f = pfopen('/tmp:/var/tmp:/home/njh/tmp', 'foo', 'txt:bin' );
-    $f = pfopen('/tmp:/var/tmp:/home/njh/tmp', 'foo');
+    ($fh, $filename) = pfopen('/tmp:/var/tmp:/home/njh/tmp', 'foo', 'txt:bin'));
+    $fh = pfopen('/tmp:/var/tmp:/home/njh/tmp', 'foo'));
 
 # AUTHOR
 

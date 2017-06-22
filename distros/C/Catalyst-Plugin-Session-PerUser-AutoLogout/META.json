@@ -43,7 +43,7 @@
    "provides" : {
       "Catalyst::Plugin::Session::PerUser::AutoLogout" : {
          "file" : "lib/Catalyst/Plugin/Session/PerUser/AutoLogout.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -58,7 +58,7 @@
          "web" : "https://github.com/Altreus/Catalyst-Plugin-Session-PerUser-AutoLogout"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_contributors" : [
       "Alastair McGowan-Douglas <alastair.mcgowan@opusvl.com>"
    ]

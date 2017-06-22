@@ -14,7 +14,7 @@ Alien::Build::Manual::AlienUser - Alien user documentation
 
 =head1 VERSION
 
-version 0.41
+version 0.45
 
 =head1 SYNOPSIS
 
@@ -25,6 +25,11 @@ version 0.41
 This document is intended for a user of an L<Alien::Base> based L<Alien>
 module's user.  Although specifically geared for L<Alien::Base>
 subclasses, it may have some useful hints for L<Alien> in general.
+
+Full working examples of how to use an L<Alien> module are also bundled
+with L<Alien::Build> in the distribution's C<example/user> directory.
+Those examples use L<Alien::xz>, which uses L<alienfile> + L<Alien::Build>
++ L<Alien::Base>.
 
 The following documentation will assume you are trying to use an L<Alien>
 called C<Alien::Foo> which provides the library C<libfoo> and the command
@@ -37,7 +42,7 @@ What follows are the main use cases.
  use Module::Build;
  use Alien::Foo;
  
- my $builder = Module::Build->new(
+ my $build = Module::Build->new(
    ...
    configure_requires => {
      'Alien::Foo' => '0',
@@ -76,13 +81,16 @@ a configure prerequisite.
 =head2 Dist::Zilla
 
  [@Filter]
+ -bundle = @Basic
  -remove = MakeMaker
+ 
+ [Prereqs / ConfigureRequires]
+ Alien::Foo = 0
  
  [MakeMaker::Awesome]
  header = user Config;
  header = use Alien::Foo;
- WriteMakefile_arg = CONFIGURE_REQUIRES => { 'Alien::Foo' => '0' }
- WriteMakefile_arg = CCFLAGS => Alien::Foo>cflags . ' ' . $Config{ccflags}
+ WriteMakefile_arg = CCFLAGS => Alien::Foo->cflags . ' ' . $Config{ccflags}
  WriteMakefile_arg = LIBS => [ Alien::Foo->libs ]
 
 =head2 FFI::Platypus
@@ -97,6 +105,23 @@ a configure prerequisite.
 Not all L<Alien>s provide dynamic libraries, but those that do can be
 used by L<FFI::Raw> or L<FFI::Platypus>.  Unlike an XS module, these
 need to be a regular run time prerequisite.
+
+=head2 Inline::C
+
+ use Inline with => 'Alien::Foo';
+ use Inline C => <<~'END';
+   #include <foo.h>
+   
+   const char *my_foo_wrapper()
+   {
+     foo();
+   }
+   END
+ 
+ sub exported_foo()
+ {
+   my_foo_wrapper();
+ }
 
 =head2 tool
 
@@ -119,6 +144,8 @@ Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 Contributors:
 
 Diab Jerius (DJERIUS)
+
+Roy Storey
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,4 +1,4 @@
-#! /usr/bin/env perl
+#! /usr/bin/env polyperl
 
 use 5.014; use warnings;
 

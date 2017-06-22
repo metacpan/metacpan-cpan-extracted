@@ -20,7 +20,8 @@ class Base2 {
 }
 
 class Demo is Base1 is Base2 {
-    has Str $.name  is req;
+
+    has Str $.name  is req = rand(100);
     has Int @.nums  is req;
     has Num %.count is req;
 

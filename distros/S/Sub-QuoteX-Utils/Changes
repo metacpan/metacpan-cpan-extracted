@@ -1,5 +1,36 @@
 Revision history for Sub-QuoteX-Utils
 
+0.08      2017-06-15 15:21:43-04:00 America/New_York
+
+    * promote to production release.
+    * no changes from 0.07
+
+
+0.07      2017-02-01 17:43:14-05:00 America/New_York (TRIAL RELEASE)
+
+  [BUG FIX]
+
+    * classes which overloaded the bool operator were not handled
+      correctly.
+
+0.06      2017-01-12 10:08:20-05:00 America/New_York (TRIAL RELEASE)
+
+  [BUILD FIX]
+
+    * Diagnosis of build failure fixed by 0.05 was only partially correct.
+      "use strict" _is_ propagated for Perl >= 5.10, but the error
+      message changed between Perl 5.20 && 5.22.
+
+0.05      2017-01-12 10:08:20-05:00 America/New_York (TRIAL RELEASE)
+
+  [BUILD FIX]
+
+    * t/lexicals.t depended upon "use strict" being propagated into
+      the quoted subs environment.  This seems not to be the case in
+      Perl < 5.22
+
+0.04      2017-01-26 19:26:14-05:00 America/New_York (TRIAL RELEASE)
+
 0.03      2016-12-18 07:16:46-05:00 America/New_York
 
   [DISTRIBUTION FIX]

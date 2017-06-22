@@ -4,3 +4,5 @@
 \.tar\.
 \bblib\b
 \bcleanup\b
+\.git/
+MANIFEST.bak

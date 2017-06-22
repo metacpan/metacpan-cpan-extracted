@@ -19,9 +19,9 @@ can_ok(
     $mn, qw/
         _get_js_sock
         _job_request
-        _on_connect
         _register_all
         _set_ability
+        _set_client_id
         _uncache_sock
         job_servers
         register_function
@@ -40,7 +40,8 @@ can_ok(
 subtest "new", sub {
     plan tests => 8;
 
-    my $w = new_ok($mn);
+    my $client_id = 1 + rand(100000);
+    my $w = new_ok($mn, [client_id => $client_id]);
     isa_ok($w, 'Gearman::Objects');
 
     is(ref($w->{$_}), "HASH", "$_ is a hash ref") for qw/
@@ -49,7 +50,7 @@ subtest "new", sub {
         can
         timeouts
         /;
-    ok($w->{client_id} =~ /^\p{Lowercase}+$/, "client_id");
+    is $w->{client_id}, $client_id, "client_id";
 
 SKIP: {
         $ENV{AUTHOR_TESTING}
@@ -72,7 +73,7 @@ subtest "register_function", sub {
     my ($tn, $to) = qw/foo 2/;
     my $cb = sub {1};
 
-    is $w->register_function($tn => $cb), 0, "register_function($tn)";
+    is $w->register_function($tn => $cb), undef, "register_function($tn)";
 
     time_ok(
         sub {
@@ -83,13 +84,11 @@ subtest "register_function", sub {
     );
 
 SKIP: {
-        my $gts = t::Server->new();
-        $gts || skip $t::Server::ERROR, 5;
+        my @job_servers = t::Server->new()->job_servers(int(rand(2) + 2));
+        @job_servers || skip $t::Server::ERROR, 5;
 
-        my @js = $gts->job_servers(int(rand(2) + 2));
-        @js || skip "couldn't start ", $gts->bin(), 5;
+        ok $w->job_servers(@job_servers), "set job servers";
 
-        ok $w->job_servers(@js), "set job servers";
         ok $w->register_function($tn, $to, $cb), "register_function";
         is $w->{can}{$tn}, $cb, "can $tn";
 
@@ -113,13 +112,13 @@ subtest "reset_abilities", sub {
 
 subtest "work", sub {
     plan tests => 3;
-    my $gts = t::Server->new();
-SKIP: {
-        $gts || skip $t::Server::ERROR, 3;
-        my $job_server = $gts->job_servers();
-        $job_server || skip "couldn't start ", $gts->bin(), 3;
 
-        my $w = new_ok($mn, [job_servers => $job_server]);
+    # my $gts = t::Server->new();
+SKIP: {
+        my @job_servers = t::Server->new()->job_servers();
+        @job_servers || skip $t::Server::ERROR, 3;
+
+        my $w = new_ok($mn, [job_servers => @job_servers]);
         time_ok(
             sub {
                 $w->work(stop_if => sub { pass "work stop if"; });
@@ -145,12 +144,9 @@ subtest "_get_js_sock", sub {
     delete $w->{parent_pipe};
     is($w->_get_js_sock($js), undef, "_get_js_sock(...) undef");
 
-    my $gts = t::Server->new();
 SKIP: {
-        $gts || skip $t::Server::ERROR, 4;
-
-        my @job_servers = $gts->job_servers();
-        @job_servers || skip "couldn't start ", $gts->bin(), 4;
+        my @job_servers = t::Server->new()->job_servers();
+        @job_servers || skip $t::Server::ERROR, 4;
 
         ok($w->job_servers(@job_servers));
 
@@ -165,15 +161,26 @@ SKIP: {
     } ## end SKIP:
 };
 
-subtest "_on_connect-_set_ability", sub {
+subtest "_set_ability", sub {
+    plan tests => 7;
     my $w = new_ok($mn);
     my $m = "foo";
-
-    is($w->_on_connect(), undef);
 
     is($w->_set_ability(), 0);
     is($w->_set_ability(undef, $m), 0);
     is($w->_set_ability(undef, $m, 2), 0);
+SKIP: {
+        my @job_servers = t::Server->new()->job_servers();
+        @job_servers || skip $t::Server::ERROR, 3;
+
+        ok($w->job_servers(@job_servers));
+
+        my $js     = $w->job_servers()->[0];
+        my $js_str = $w->_js_str($js);
+
+        is($w->_set_ability($w->_get_js_sock($js), $m), 1);
+        is($w->_set_ability($w->_get_js_sock($js), $m, 2), 1);
+    } ## end SKIP:
 };
 
 done_testing();

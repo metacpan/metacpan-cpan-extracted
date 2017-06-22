@@ -26,10 +26,5 @@ t/80_insert_on_duplicate.t
 t/90_quote.t
 t/99_exception.t
 t/Util.pm
-xt/02_pod.t
-xt/03_pod-coverage.t
-xt/04_perlcritic.t
-xt/05_script-shebang.t
-xt/perlcriticrc
 META.yml
 MANIFEST

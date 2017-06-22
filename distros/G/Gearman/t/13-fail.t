@@ -10,10 +10,8 @@ use t::Server ();
 use t::Worker qw/ new_worker /;
 
 my $gts = t::Server->new();
-$gts || plan skip_all => $t::Server::ERROR;
-
 my $job_server = $gts->job_servers();
-$job_server || BAIL_OUT "couldn't start ", $gts->bin();
+$job_server || plan skip_all => $t::Server::ERROR;
 
 use_ok("Gearman::Client");
 

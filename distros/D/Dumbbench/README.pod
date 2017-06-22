@@ -2,6 +2,14 @@
 
 =encoding utf8
 
+=for HTML <a href="https://travis-ci.org/briandfoy/dumbbench"><img src="https://travis-ci.org/briandfoy/dumbbench.svg?branch=master"></a>
+
+=for HTML <a href='https://coveralls.io/github/briandfoy/dumbbench?branch=master'><img src='https://coveralls.io/repos/github/briandfoy/dumbbench/badge.svg?branch=master' alt='Coverage Status' /></a>
+
+=for HTML <a href="https://github.com/briandfoy/dumbbench/blob/master/LICENSE"><img src="https://img.shields.io/cpan/l/Dumbbench.svg" /></a>
+
+=for HTML <a href="http://www.metacpan.org/module/Dumbbench"><img src="https://img.shields.io/cpan/v/Dumbbench.svg" /></A>
+
 =head1 The Dumbbench module
 
 This is the I<README> for the L<Dumbbench> Perl module. You're probably
@@ -62,6 +70,21 @@ You could install just this module manually:
 You probably don't want to do that unless you're fiddling with the
 module and only want to run the tests without installing anything.
 
+=head3 Dumbbench::BoxPlot install
+
+If you want to use L<Dumbbench::BoxPlot> (check it's Pod for details), you will need to add
+more software than is initially required to just run Dumbbench.
+
+First, you need to provide development headers for the L<ROOT|https://root.cern.ch> application. How to install
+depends on your operational system requirements. For Ubuntu 16.04, installing the following packages will do:
+
+    sudo apt-get install libroot-gui-dev libroot-graf3d-g3d-dev libroot-graf3d-gl-dev libroot-graf2d-postscript-dev libroot-math-physics-dev
+
+After that, you will need to install the L<SOOT> distribution, which provides a Perl binding for L<ROOT|https://root.cern.ch>. Once you
+have the required development headers and libraries, you just need to repeate the same steps already described for installing Dumbbench:
+
+    % cpanm SOOT
+
 =head2 Source location
 
 The meta data, such as the source repository and bug tracker, is in
@@ -71,7 +94,7 @@ the source repository:
 
 =over 4
 
-=item *	L<https://github.com/tsee/dumbbench>
+=item *	L<https://github.com/briandfoy/dumbbench>
 
 =back
 
@@ -80,7 +103,7 @@ tracker|https://github.com/briandfoy/dumbbench/issues>:
 
 =over 4
 
-=item *	L<https://github.com/tsee/dumbbench/issues>
+=item *	L<https://github.com/briandfoy/dumbbench/issues>
 
 =back
 

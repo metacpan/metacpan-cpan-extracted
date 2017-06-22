@@ -13,7 +13,7 @@ sub callback_test {
     my ($line) = @_;
 
     # e.g.: 5 OK [APPENDUID 1283347568 1002] APPEND COMPLETED
-    $append_ok ++ if $line =~ m/\d+\s+OK.+?APPEND/i;
+    $append_ok ++ if $line =~ m/\d+\s+OK.+?APPENDUID.+?APPEND.+?COMPLETED/i;
     $get_ok    ++ if $line =~ m/test-\d+!/;
 }
 
@@ -31,4 +31,4 @@ sub run_tests {
     ok( $get_ok,    5 );
 }
 
-do "t/test_runner.pm";
+do "./t/test_runner.pm";

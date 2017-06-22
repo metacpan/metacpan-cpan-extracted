@@ -14,6 +14,10 @@ use File::Temp qw/tempfile tempdir/;
 use File::Slurper 'read_binary';
 use PDL;
 
+if ( $^O eq 'MSWin32' ) {
+    plan skip_all => "Skipping plot tests on Windows";
+};
+
 eval {
     autoload 'PDL::Graphics::Gnuplot';
     1;

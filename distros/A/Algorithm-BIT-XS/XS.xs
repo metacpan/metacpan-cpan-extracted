@@ -5,6 +5,11 @@
 
 #include "ppport.h"
 
+#define CHECK_INDEX(idx, min, max, ret) if(idx < min || idx > max) {	\
+		croak("Index not in range [" IVdf "," IVdf "]", (IV)(min), (IV)(max)); \
+		return ret;														\
+	}
+
 typedef struct {
 	IV n;
 	IV* t;
@@ -29,10 +34,7 @@ void bit_free(bit *b) {
 }
 
 IV bit_query(bit *b, IV idx) {
-	if(idx > b->n || idx < 1){
-		croak("Index not in range [1," IVdf "]", b->n);
-		return 0;
-	}
+	CHECK_INDEX(idx, 0, b->n - 1, 0);
 	IV ret = 0;
 	while(idx)
 		ret += b->t[idx], idx -= idx & -idx;
@@ -40,10 +42,7 @@ IV bit_query(bit *b, IV idx) {
 }
 
 void bit_update(bit *b, IV idx, IV value) {
-	if(idx > b->n || idx < 1){
-		croak("Index not in range [1," IVdf "]", b->n);
-		return;
-	}
+	CHECK_INDEX(idx, 0, b->n - 1, );
 	while(idx < b->n)
 		b->t[idx] += value, idx += idx & -idx;
 }
@@ -77,6 +76,8 @@ void bit2d_free(bit2d *b) {
 }
 
 IV bit2d_query(bit2d *b, IV i1, IV i2) {
+	CHECK_INDEX(i1, 1, b->n - 1, 0);
+	CHECK_INDEX(i2, 1, b->m - 1, 0);
 	if(i1 > b->n || i1 < 1) {
 		croak("Index 1 not in range [1," IVdf "]", b->n);
 		return 0;
@@ -89,26 +90,20 @@ IV bit2d_query(bit2d *b, IV i1, IV i2) {
 	while(i1) {
 		i2 = i2c;
 		while(i2)
-			ret += b->t[i1 * b->n + i2], i2 -= i2 & -i2;
+			ret += b->t[i1 * b->m + i2], i2 -= i2 & -i2;
 		i1 -= i1 & -i1;
 	}
 	return ret;
 }
 
 void bit2d_update(bit2d *b, IV i1, IV i2, IV value) {
-	if(i1 > b->n || i1 < 1) {
-		croak("Index 1 not in range [1," IVdf "]", b->n);
-		return;
-	}
-	if(i2 > b->m || i2 < 1) {
-		croak("Index 2 not in range [1," IVdf "]", b->m);
-		return;
-	}
+	CHECK_INDEX(i1, 1, b->n - 1, );
+	CHECK_INDEX(i2, 1, b->m - 1, );
 	IV i2c = i2;
 	while(i1 < b->n) {
 		i2 = i2c;
 		while(i2 < b->m)
-			b->t[i1 * b->n + i2] += value, i2 += i2 & -i2;
+			b->t[i1 * b->m + i2] += value, i2 += i2 & -i2;
 		i1 += i1 & -i1;
 	}
 }
@@ -127,6 +122,8 @@ PROTOTYPES: ENABLE
 Algorithm::BIT::XS bit_create(IV len);
 
 void bit_free(Algorithm::BIT::XS b);
+ALIAS:
+    DESTROY = 1
 
 IV bit_query(Algorithm::BIT::XS b, IV idx);
 
@@ -141,6 +138,8 @@ PROTOTYPES: ENABLE
 Algorithm::BIT2D::XS bit2d_create(IV n, IV m);
 
 void bit2d_free(Algorithm::BIT2D::XS b);
+ALIAS:
+    DESTROY = 1
 
 IV bit2d_query(Algorithm::BIT2D::XS b, IV i1, IV i2);
 

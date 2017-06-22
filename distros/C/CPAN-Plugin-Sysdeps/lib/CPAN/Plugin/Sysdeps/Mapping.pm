@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 # shortcuts
 #  os and distros
@@ -1434,6 +1434,8 @@ sub mapping {
        [package => 'python']],
       [like_debian,
        [package => 'python2.7-dev']],
+      [like_fedora,
+       [package => 'python-devel']],
       # macosx already comes with python, it seems
      ],
 
@@ -1443,7 +1445,10 @@ sub mapping {
       [like_debian,
        [linuxdistrocodename => ['squeeze', 'wheezy'],
 	[package => 'ruby1.8-dev']],
-       [package => 'ruby2.1-dev']],
+       [linuxdistrocodename => 'jessie',
+	[package => 'ruby2.1-dev']],
+       [package => 'ruby2.3-dev'], # xenial, stretch
+      ],
       [like_fedora,
        [package => 'ruby-devel']],
      ],

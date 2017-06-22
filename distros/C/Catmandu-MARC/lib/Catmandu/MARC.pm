@@ -13,10 +13,9 @@ with 'MooX::Singleton';
 
 memoize('compile_marc_path');
 memoize('parse_marc_spec');
-memoize('_it_subspecs');
 memoize('_get_index_range');
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 sub marc_map {
     my $self      = $_[0];
@@ -381,11 +380,11 @@ sub marc_spec {
     my ( $indicator1, $indicator2 );
     if ( $field_spec->has_indicator1 ) {
         $indicator1 = $field_spec->indicator1;
-        $indicator1    = qr/$indicator1/
+        $indicator1 = qr/$indicator1/;
     }
    if ( $field_spec->has_indicator2 ) {
         $indicator2 = $field_spec->indicator2;
-        $indicator2    = qr/$indicator2/
+        $indicator2 = qr/$indicator2/;
    }
 
     # calculate char start
@@ -395,9 +394,9 @@ sub marc_spec {
         if ( $sp->has_char_start ) {
             $char_start = ( '#' eq $sp->char_start )
               ? $sp->char_length * -1
-              : $sp->char_start
+              : $sp->char_start;
         }
-        return $char_start
+        return $char_start;
     };
 
     # vars we need only for subfields
@@ -406,7 +405,7 @@ sub marc_spec {
         # set the order of subfields
         @sf_spec = map { $_ } @{ $ms->subfields };
         unless ( $pluck ) {
-            @sf_spec = sort { $a->code cmp $b->code } @sf_spec
+            @sf_spec = sort { $a->code cmp $b->code } @sf_spec;
         }
 
         # set invert level default
@@ -414,20 +413,20 @@ sub marc_spec {
         if ( $invert ) {
             $codes  = '[^';
             $codes .= join $EMPTY, map { $_->code } @sf_spec;
-            $codes .= ']'
+            $codes .= ']';
         }
 
         $invert_chars = sub {
             my ( $str, $start, $length ) = @_;
             for ( substr $str, $start, $length ) {
-                $_ = $EMPTY
+                $_ = $EMPTY;
             }
-            return $str
+            return $str;
         };
     }
     else {
         # return $value_set ASAP
-        return $value_set if defined $value_set
+        return $value_set if defined $value_set;
     }
 
     # vars we need for fields and subfields
@@ -440,17 +439,17 @@ sub marc_spec {
     my $to_referred = sub {
         my ( @values ) = @_;
         if($nested_arrays) {
-            push @{$referred}, \@values
+            push @{$referred}, \@values;
         } elsif($split) {
-            push @{$referred}, @values
+            push @{$referred}, @values;
         } else {
-            push @{$referred}, join $join_char, @values
+            push @{$referred}, join $join_char, @values;
         }
     };
 
     if(  defined $field_spec->index_start ) {
         $index_range =
-          _get_index_range( $field_spec->index_start, $field_spec->index_end, $#fields )
+          _get_index_range( $field_spec->index_start, $field_spec->index_end, $#fields );
     }
 
     # iterate over fields
@@ -464,24 +463,26 @@ sub marc_spec {
 
         # filter by indicator
         if( defined $indicator1 ) {
-            next unless ( defined $field->[1] && $field->[1] =~ $indicator1)
+            next unless ( defined $field->[1] && $field->[1] =~ $indicator1);
         }
 
         if( defined $indicator2 ) {
             #next unless $field->[2] =~ $indicator2;
-            next unless ( defined $field->[2] && $field->[2] =~ $indicator2)
+            next unless ( defined $field->[2] && $field->[2] =~ $indicator2);
         }
 
         # filter by index
         if ( defined $index_range ) {
-            next unless ( Catmandu::Util::array_includes( $index_range, $tag_index ) )
+            next unless ( Catmandu::Util::array_includes( $index_range, $tag_index ) );
         }
 
         # filter field by subspec
         if( $field_spec->has_subspecs) {
             my $valid = $self->_it_subspecs( $data, $field_spec->tag, $field_spec->subspecs, $tag_index );
-            next unless $valid
+            next unless $valid;
         }
+
+        my @subfields = ();
 
         if ( $ms->has_subfields ) {    # now we dealing with subfields
             for my $sf (@sf_spec) {
@@ -489,13 +490,13 @@ sub marc_spec {
                 if ( $invert && !$sf->has_subspecs) {
                     if ( -1 == $sf->index_length && !$sf->has_char_start ) {
                         next if ( $invert_level == 3 );    # skip subfield spec it's already covered
-                        $invert_level = 3
+                        $invert_level = 3;
                     }
                     elsif ( $sf->has_char_start ) {
-                        $invert_level = 1
+                        $invert_level = 1;
                     }
                     else {
-                        $invert_level = 2
+                        $invert_level = 2;
                     }
                 }
 
@@ -504,20 +505,22 @@ sub marc_spec {
                 $code        = qr/$code/;
                 for ( my $i = 3 ; $i < @{$field} ; $i += 2 ) {
                     if ( $field->[$i] =~ /$code/ ) {
-                        push @subfield, $field->[ $i + 1 ]
+                        push @subfield, $field->[ $i + 1 ];
                     }
                 }
 
                 if ( $invert_level == 3 ) { # no index or charpos
                     if (@subfield) {
-                        $to_referred->(@subfield)
+                        push @subfields, @subfield;
                     }
 
                     if ( $referred && $value_set ) { # return $value_set ASAP
-                        return $value_set
+                        return $value_set;
                     }
-                    next
+
+                    next;
                 }
+
                 next unless (@subfield);
 
                 # filter by index
@@ -529,18 +532,18 @@ sub marc_spec {
                         @subfield = map {
                             Catmandu::Util::array_includes( $sf_range, $_ )
                               ? ()
-                              : $subfield[$_]
-                        } 0 .. $#subfield
+                              : $subfield[$_];
+                        } 0 .. $#subfield;
                     }
                     else {    # without invert
                         @subfield =
                           map {
                             defined $subfield[$_]
                             ? $subfield[$_]
-                            : ()
-                          } @{$sf_range}
+                            : ();
+                        } @{$sf_range};
                     }
-                    next unless (@subfield)
+                    next unless (@subfield);
                 }
 
                 # return $value_set ASAP
@@ -549,7 +552,7 @@ sub marc_spec {
                 # filter subfield by subspec
                 if( $sf->has_subspecs) {
                     my $valid = $self->_it_subspecs( $data, $field_spec->tag, $sf->subspecs, $tag_index);
-                    next unless $valid
+                    next unless $valid;
                 }
 
                 # get substring
@@ -558,19 +561,20 @@ sub marc_spec {
                     if ( $invert_level == 1 ) {    # inverted
                         @subfield =
                           map {
-                            $invert_chars->( $_, $char_start, $sf->char_length )
-                          } @subfield
+                            $invert_chars->( $_, $char_start, $sf->char_length );
+                        } @subfield;
                     }
                     else {
                         @subfield =
                           map {
-                            substr $_, $char_start, $sf->char_length
-                          } @subfield
+                            substr $_, $char_start, $sf->char_length;
+                        } @subfield;
                     }
                 }
                 next unless @subfield;
-                $to_referred->(@subfield)
+                push @subfields, @subfield;
             } # end of subfield iteration
+            $to_referred->(@subfields) if @subfields;
         } # end of subfield handling
         else { # no particular subfields requested
             my @contents = ();
@@ -580,7 +584,7 @@ sub marc_spec {
                 my $content    = ( defined $char_start )
                     ? substr $field->[$i], $char_start, $field_spec->char_length
                     : $field->[$i];
-                push @contents, $content
+                push @contents, $content;
             }
             next unless (@contents);
             $to_referred->(@contents);
@@ -590,12 +594,12 @@ sub marc_spec {
 
     if($append) {
         return [$referred] if $split;
-        return $referred
+        return $referred;
     } elsif($split) {
-        return [$referred]
+        return [$referred];
     }
 
-    return join $join_char, @{$referred}
+    return join $join_char, @{$referred};
 }
 
 sub _it_subspecs {
@@ -606,7 +610,7 @@ sub _it_subspecs {
             next if ( ref $subspec->$side eq 'MARC::Spec::Comparisonstring' );
             # only set new index if subspec field tag equals spec field tag!!
             next unless ( $tag eq $subspec->$side->field->tag );
-            $subspec->$side->field->set_index_start_end( $tag_index )
+            $subspec->$side->field->set_index_start_end( $tag_index );
         }
     };
 
@@ -617,17 +621,17 @@ sub _it_subspecs {
                 $set_index->( $or_subspec );
                 $valid = $self->_validate_subspec( $or_subspec, $data );
                 # at least one of them is true (OR)
-                last if $valid
+                last if $valid;
             }
         }
         else { # repeated SubSpecs (AND)
             $set_index->( $subspec );
             $valid = $self->_validate_subspec( $subspec, $data );
             # all of them have to be true (AND)
-            last unless $valid
+            last unless $valid;
         }
     }
-    return $valid
+    return $valid;
 }
 
 sub _validate_subspec {
@@ -641,10 +645,10 @@ sub _validate_subspec {
                     $subspec->left,
                     { '-split' => 1 }
                 ); # split should result in an array ref
-            return 0 unless defined $left_subterm
+            return 0 unless defined $left_subterm;
         }
         else {
-            push @{$left_subterm}, $subspec->left->comparable
+            push @{$left_subterm}, $subspec->left->comparable;
         }
     }
 
@@ -655,77 +659,77 @@ sub _validate_subspec {
                 { '-split' => 1 }
             ); # split should result in an array ref
         unless( defined $right_subterm ) {
-            $right_subterm = []
+            $right_subterm = [];
         }
     }
     else {
-        push @{$right_subterm}, $subspec->right->comparable
+        push @{$right_subterm}, $subspec->right->comparable;
     }
 
     if($subspec->operator eq '?') {
-        return (@{$right_subterm}) ? 1 : 0
+        return (@{$right_subterm}) ? 1 : 0;
     }
 
     if($subspec->operator eq '!') {
-        return (@{$right_subterm}) ? 0 : 1
+        return (@{$right_subterm}) ? 0 : 1;
     }
 
     if($subspec->operator eq '=') {
         foreach my $v ( @{$left_subterm->[0]} ) {
-            return 1 if List::Util::any {$v eq $_} @{$right_subterm}
+            return 1 if List::Util::any {$v eq $_} @{$right_subterm};
         }
     }
 
     if($subspec->operator eq '!=') {
         foreach my $v ( @{$left_subterm->[0]} ) {
-            return 0 if List::Util::any {$v eq $_} @{$right_subterm}
+            return 0 if List::Util::any {$v eq $_} @{$right_subterm};
         }
-        return 1
+        return 1;
     }
 
     if($subspec->operator eq '~') {
         foreach my $v ( @{$left_subterm->[0]} ) {
-            return 1 if List::Util::any {$v =~ m?$_?} @{$right_subterm}
+            return 1 if List::Util::any {$v =~ /$_/} @{$right_subterm};
         }
     }
 
     if($subspec->operator eq '!~') {
         foreach my $v ( @{$left_subterm->[0]} ) {
-            return 0 if List::Util::any {$v =~ m?$_?} @{$right_subterm}
+            return 0 if List::Util::any {$v =~ /$_/} @{$right_subterm};
         }
-        return 1
+        return 1;
     }
 
-    return 0
+    return 0;
 }
 
 sub parse_marc_spec {
     my ( $self, $marc_spec ) = @_;
-    return MARC::Spec::Parser->new( $marc_spec )->marcspec
+    return MARC::Spec::Parser->new( $marc_spec )->marcspec;
 }
 
 sub _get_index_range {
     my ( $index_start, $index_end, $last_index ) = @_;
 
     if ( '#' eq $index_start ) {
-        if ( '#' eq $index_end or 0 == $index_end ) { return [$last_index] }
+        if ( '#' eq $index_end or 0 == $index_end ) { return [$last_index]; }
         $index_start = $last_index;
         $index_end   = $last_index - $index_end;
-        if ( 0 > $index_end ) { $index_end = 0 }
+        if ( 0 > $index_end ) { $index_end = 0; }
     }
     else {
         if ( $last_index < $index_start ) {
-            return [$index_start]
+            return [$index_start];
         }    # this will result to no hits
     }
 
     if ( '#' eq $index_end or $index_end > $last_index ) {
-        $index_end = $last_index
+        $index_end = $last_index;
     }
 
     return ( $index_start <= $index_end )
       ? [ $index_start .. $index_end ]
-      : [ $index_end .. $index_start ]
+      : [ $index_end .. $index_start ];
 }
 
 sub marc_xml {

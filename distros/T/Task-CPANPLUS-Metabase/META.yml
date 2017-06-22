@@ -2,24 +2,30 @@
 abstract: 'Install everything for CPANPLUS to use Metabase'
 author:
   - 'Chris Williams <chris@bingosnet.co.uk>'
-build_requires: {}
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.31
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.102340, CPAN::Meta::Converter version 2.102160'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Task-CPANPLUS-Metabase
 requires:
-  CPANPLUS: 0.9007
-  Metabase::Fact: 0.017
-  Module::Load::Conditional: 0
-  Term::UI: 0
-  Test::Reporter: 1.57
-  Test::Reporter::Transport::Metabase: 1.999008
+  CPANPLUS: '0.9007'
+  JSON::MaybeXS: '0'
+  Metabase::Fact: '0.017'
+  Module::Load::Conditional: '0'
+  Term::UI: '0'
+  Test::Reporter: '1.57'
+  Test::Reporter::Transport::Metabase: '1.999008'
 resources:
-  homepage: http://github.com/bingos/perl-task-modules/tree
-  repository: git://github.com/bingos/perl-task-modules.git
-version: 0.08
+  homepage: https://github.com/bingos/task-cpanplus-metabase
+  repository: https://github.com/bingos/task-cpanplus-metabase.git
+version: '1.16'
+x_serialization_backend: 'YAML::Tiny version 1.70'

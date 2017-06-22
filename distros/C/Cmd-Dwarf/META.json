@@ -97,11 +97,11 @@
    "provides" : {
       "Cmd::Dwarf" : {
          "file" : "lib/Cmd/Dwarf.pm",
-         "version" : "1.42"
+         "version" : "1.50"
       },
       "Dwarf" : {
          "file" : "lib/Dwarf.pm",
-         "version" : "1.42"
+         "version" : "1.50"
       }
    },
    "release_status" : "stable",
@@ -115,7 +115,7 @@
          "web" : "https://github.com/seagirl/dwarf"
       }
    },
-   "version" : "1.42",
+   "version" : "1.50",
    "x_authority" : "cpan:seagirl",
    "x_contributors" : [
       "tak <yoshizu@sb163.s2factory.co.jp>",

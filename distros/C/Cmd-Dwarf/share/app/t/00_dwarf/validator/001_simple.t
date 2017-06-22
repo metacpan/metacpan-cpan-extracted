@@ -15,7 +15,7 @@ my $q = Plack::Request->new(
 
 my $v = Dwarf::Validator->new($q);
 ok(!$v->has_error);
-is($v->query, $q);
+is($v->query->query, $q);
 $v->check(
 	'foo' => [qw/NOT_NULL/],
 	'baz' => [qw/NOT_NULL/],

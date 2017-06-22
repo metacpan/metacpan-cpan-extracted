@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Mojolicious/Plugin/Text/Caml.pm
+minil.toml
+t/basic.t
+t/templates/mustache.html.caml
+META.yml
+MANIFEST

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.21';
+$VERSION = '1.23';
 
 #----------------------------------------------------------------------------
 
@@ -297,7 +297,7 @@ F<http://wiki.cpantesters.org/>
 
 =head1 COPYRIGHT AND LICENSE
 
-  Copyright (C) 2005-2015 Barbie for Miss Barbell Productions.
+  Copyright (C) 2005-2017 Barbie for Miss Barbell Productions.
 
   This distribution is free software; you can redistribute it and/or
   modify it under the Artistic Licence v2.

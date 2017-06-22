@@ -1,0 +1,20 @@
+SYNOPSIS
+
+     use Log::ger;
+     use Log::ger::LevelFromEnv;
+    
+     log_warn "blah ...";
+
+DESCRIPTION
+
+    This module sets $Log::ger::Current_Level based on hints from several
+    environment variables: LOG_LEVEL (for example, if set to warn or
+    warning will set the log level to warning (3)), TRACE (if true, will
+    set log level to trace (6)), DEBUG (if true, will set log level to
+    debug (5)), VERBOSE (if true, will set log level to info (4)), QUIET
+    (if true, will set log level to error (2)).
+
+    This is convenient for CLI programs.
+
+SEE ALSO
+

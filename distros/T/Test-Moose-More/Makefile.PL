@@ -1,7 +1,7 @@
 #
 # This file is part of Test-Moose-More
 #
-# This software is Copyright (c) 2012 by Chris Weyl.
+# This software is Copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by Chris Weyl.
 #
 # This is free software, licensed under:
 #
@@ -28,6 +28,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Data::OptList" => 0,
+    "List::MoreUtils" => 0,
     "List::Util" => "1.45",
     "Moose::Util" => 0,
     "Moose::Util::TypeConstraints" => 0,
@@ -57,7 +58,7 @@ my %WriteMakefileArgs = (
     "blib" => "1.01",
     "namespace::autoclean" => 0
   },
-  "VERSION" => "0.047",
+  "VERSION" => "0.048",
   "test" => {
     "TESTS" => "t/*.t t/attribute_options_ok/*.t t/is_class_ok/*.t t/validate_attribute/*.t t/validate_class/*.t t/validate_role/*.t t/validate_thing/*.t t/wrapped/*.t"
   }
@@ -71,6 +72,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "List::MoreUtils" => 0,
   "List::Util" => "1.45",
   "Moose" => 0,
   "Moose::Meta::Attribute" => 0,

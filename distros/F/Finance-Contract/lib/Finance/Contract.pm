@@ -3,7 +3,7 @@ package Finance::Contract;
 use strict;
 use warnings;
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 =head1 NAME
 
@@ -68,7 +68,7 @@ use List::Util qw(min max first);
 use Scalar::Util qw(looks_like_number);
 use Math::Util::CalculatedValue::Validatable;
 use Date::Utility;
-use Format::Util::Numbers qw(roundnear);
+use Format::Util::Numbers qw(roundcommon);
 use POSIX qw( floor );
 use Time::Duration::Concise;
 
@@ -78,13 +78,13 @@ use Finance::Contract::Category;
 
 use constant _FOREX_BARRIER_MULTIPLIER => 1e6;
 
-unless(find_type_constraint('time_interval')) {
+unless (find_type_constraint('time_interval')) {
     subtype 'time_interval', as 'Time::Duration::Concise';
-    coerce 'time_interval',  from 'Str', via { Time::Duration::Concise->new(interval => $_) };
+    coerce 'time_interval', from 'Str', via { Time::Duration::Concise->new(interval => $_) };
 }
 
-unless(find_type_constraint('date_object')) {
-    subtype 'date_object',   as 'Date::Utility';
+unless (find_type_constraint('date_object')) {
+    subtype 'date_object', as 'Date::Utility';
     coerce 'date_object', from 'Str', via { Date::Utility->new($_) };
 }
 
@@ -296,7 +296,7 @@ has pip_size => (
 
 =head2 absolute_barrier_multiplier
 
-Should barrier multiplier be applied for absolute barried on this market
+True if barrier multiplier should be applied for absolute barrier(s) on this market
 
 =cut
 
@@ -323,7 +323,7 @@ or 4 pips below the spot.
 =cut
 
 has supplied_barrier_type => (
-    is         => 'ro',
+    is => 'ro',
 );
 
 =head2 supplied_high_barrier
@@ -427,12 +427,13 @@ has category => (
     isa     => 'contract_category',
     coerce  => 1,
     handles => [qw(
-        allow_forward_starting
-        barrier_at_start
-        is_path_dependent
-        supported_expiries
-        two_barriers
-    )],
+            allow_forward_starting
+            barrier_at_start
+            is_path_dependent
+            supported_expiries
+            two_barriers
+            )
+    ],
 );
 
 =head2 allow_forward_starting
@@ -552,9 +553,9 @@ sub effective_start {
     my $self = shift;
 
     return
-          ($self->date_pricing->is_after($self->date_expiry)) ? $self->date_start
-        : ($self->date_pricing->is_after($self->date_start))  ? $self->date_pricing
-        :                                                       $self->date_start;
+          ($self->date_pricing->epoch >= $self->date_expiry->epoch) ? $self->date_start
+        : ($self->date_pricing->is_after($self->date_start))        ? $self->date_pricing
+        :                                                             $self->date_start;
 }
 
 =head2 fixed_expiry
@@ -772,7 +773,9 @@ sub _barrier_for_shortcode_string {
     my ($self, $string) = @_;
 
     return $string if $self->supplied_barrier_type eq 'relative';
-    return 'S' . roundnear(1, $string / $self->pip_size) . 'P' if $self->supplied_barrier_type eq 'difference';
+
+    # better to use sprintf else roundcommon can return as 1e-1 which will be concatenated as it is
+    return 'S' . sprintf('%0.0f', roundcommon(1, $string / $self->pip_size)) . 'P' if $self->supplied_barrier_type eq 'difference';
 
     $string = $self->_pipsized_value($string);
     if ($self->bet_type !~ /^DIGIT/ && $self->absolute_barrier_multiplier) {
@@ -781,8 +784,9 @@ sub _barrier_for_shortcode_string {
         $string = floor($string);
     }
 
-    # Make sure it's an integer
-    $string = roundnear(1, $string);
+    # Make sure it's rounded to an integer and returned as string
+    # as sub definition states generates a string
+    $string = sprintf('%0.0f', roundcommon(1, $string));
 
     return $string;
 }

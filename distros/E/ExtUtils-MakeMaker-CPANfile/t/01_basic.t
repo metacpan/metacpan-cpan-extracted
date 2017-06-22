@@ -35,18 +35,18 @@ note do { local $/; open my $fh, '<', "$testdir/Makefile.PL"; <$fh> };
   { # generate cpanfile
     open my $fh, '>', "$testdir/cpanfile" or die;
     print $fh <<'CF_END';
-      requires 'ExtUtils::MakeMaker', 6.17;
+      requires 'ExtUtils::MakeMaker', '6.17';
 
       on configure => sub {
-        requires 'ExtUtils::MakeMaker', 6.30;
+        requires 'ExtUtils::MakeMaker', '6.30';
       };
 
       on build => sub {
-        requires 'Test::More', 0.47;
+        requires 'Test::More', '0.47';
       };
 
       on test => sub {
-        requires 'Test::More', 0.88;
+        requires 'Test::More', '0.88';
       };
 CF_END
   }
@@ -64,6 +64,7 @@ my $makefile = do { local $/; open my $fh, '<', "Makefile"; <$fh> };
 ok $makefile && $makefile =~ /(?:_REQUIRES|PREREQ_PM)\s*=>\s*{\s*[^{]*ExtUtils::MakeMaker\s*=>\s*q\[/, "EUMM is listed as some kind of prereqs";
 ok $makefile && $makefile =~ /(?:_REQUIRES|PREREQ_PM)\s*=>\s*{\s*[^{]*Test::More\s*=>\s*q\[/, "Test::More is listed as some kind of prereqs";
 
+note do { local $/; open my $fh, '<', "$testdir/MYMETA.json"; <$fh> };
 done_testing;
 
 END {

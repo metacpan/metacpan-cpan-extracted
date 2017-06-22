@@ -5,6 +5,7 @@ use Test::Trap;
 use Test::Exception;
 
 use CLI::Startup;
+use Data::Dumper;
 
 my $app = CLI::Startup->new;
 
@@ -24,7 +25,10 @@ throws_ok { $app->write_rcfile     } qr/before init/,
     "write_rcfile() before init()";
 
 # This call should fail because options weren't defined yet.
-throws_ok { $app->die_usage } qr/FATAL/, "die_usage() with no options";
+trap { $app->die_usage };
+like $trap->stderr, qr/usage:/, "die_usage() works with only default options";
+ok $trap->stdout eq '', "Nothing printed to stdout";
+ok $trap->exit == 1, "Correct exit status";
 
 # These calls should fail due to incorrect arguments
 throws_ok { $app->init(1) } qr/no arguments/,
@@ -48,7 +52,7 @@ lives_ok { $app->set_write_rcfile(sub{})   } "set_write_rcfile(sub{}) lives";
 
 # This call should live, but the "help" option should be overridden
 lives_ok { $app->set_optspec({foo=>'bar', help=>0}) } "set_optspec() lives";
-like $app->get_optspec->{help}, qr/help message/, "Could not delete --help option";
+like Dumper($app->get_optspec), qr/help message/, "Could not delete --help option";
 
 # Now call init()
 lives_ok { $app->init } "init() lives the first time";

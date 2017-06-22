@@ -196,8 +196,8 @@ sub read_poll_ssh2 {
         4 + $ssh->{session}{_last_packet_length} - $block_size;
     croak "padding error: need $need block $block_size"
         if $need % $block_size;
-    return if ( $aadlen && $incoming->length < $aadlen + $need + $authlen) ||
-              (!$aadlen && $incoming->length < $need + $block_size + $maclen);
+    return if ( $aadlen && ($incoming->length < $aadlen + $need + $maclen + $authlen)) ||
+              (!$aadlen && ($incoming->length < $need + $block_size + $maclen));
 
     my $buffer = Net::SSH::Perl::Buffer->new( MP => 'SSH2' );
     my ($macbuf,$p_str);

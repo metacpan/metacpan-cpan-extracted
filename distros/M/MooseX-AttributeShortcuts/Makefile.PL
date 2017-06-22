@@ -59,7 +59,7 @@ my %WriteMakefileArgs = (
     "constant" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.031",
+  "VERSION" => "0.032",
   "test" => {
     "TESTS" => "t/*.t t/builder/*.t t/handles/*.t t/inline_subtyping/*.t t/is/*.t t/isa/*.t t/old/*.t"
   }

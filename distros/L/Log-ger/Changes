@@ -1,0 +1,37 @@
+0.004   2017-06-21 (PERLANCAR)
+
+	- [Bugfix] Log::ger::Output didn't have VERSION.
+
+
+0.003   2017-06-21 (PERLANCAR)
+
+	- Split Log::err::Output::Screen to its own dist so this dist can
+	  be more minimalist and that module can be tested e.g. with
+	  Capture::Tiny etc.
+
+	- String output: add option append_newline to allow disable
+	  appending newline.
+
+	- import(): No need to turn category 'Foo::Bar' -> 'foo.bar'.
+
+	- [doc] Update module name Log::ger::LogAny -> Log::ger::Output::LogAny.
+
+
+0.002    2017-06-21 (PERLANCAR)
+
+         - Reorganize internals & fix a couple of doc typos.
+
+         - Add outputs: Null, String (mainly for testing).
+
+         - Formatter: format undef as '<undef>' like in Log::Any.
+
+         - Screen output: Add hooks for
+           Progress::Any::Output::TermProgressBarColor, like in
+           Log::Any::Adapter::Screen.
+
+         - Add some tests.
+
+
+0.001    2017-06-19 (PERLANCAR)
+
+         - First release.

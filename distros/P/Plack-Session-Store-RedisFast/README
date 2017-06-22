@@ -2,12 +2,14 @@ NAME
 
     Plack::Session::Store::RedisFast - Redis session store.
 
+DESCRIPTION
+
     Default implementation of Redis handle is Redis::Fast; otherwise Redis.
 
     May be overriden through "redis" or "builder" param.
 
     Default implementation of serializer handle is JSON::XS; otherwise
-    JSON.
+    Mojo::JSON or JSON.
 
     May be overriden through "inflate" and "deflate" param.
 
@@ -35,7 +37,11 @@ DESCRIPTION
 
 METHODS
 
-    new ( %params )
+ new
+
+        Plack::Session::Store::RedisFast->new( %param );
+
+    Parameters:
 
     redis
 
@@ -47,13 +53,16 @@ METHODS
 
     inflate
 
-      A simple serializer, JSON::XS->new->utf8->allow_nonref->encode or
-      JSON->new->utf8->allow_nonref->encode by default.
+      A simple serializer, requires "deflate" param.
 
     deflate
 
-      A simple deserializer, JSON::XS->new->utf8->allow_nonref->decode or
-      JSON->new->utf8->allow_nonref->decode by default.
+      A simple deserializer, requires "inflate" param.
+
+    encoder
+
+      A simple encoder (encode/decode implementation), class or instance.
+      JSON/utf8 by default.
 
     prefix
 
@@ -64,6 +73,15 @@ METHODS
 
       An expire for Redis sessions. "ONE_MONTH" in Time::Seconds by
       default.
+
+ each_session
+
+        $store->each_session(sub {
+            my ( $redis_instance, $redis_prefix, $session_id, $session ) = @_;
+        });
+
+    Enumerates all stored sessions using SCAN, see
+    https://redis.io/commands/scan for limitations.
 
 BUGS
 

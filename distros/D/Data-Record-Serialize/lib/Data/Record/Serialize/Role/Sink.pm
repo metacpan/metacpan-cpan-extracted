@@ -1,41 +1,68 @@
 package Data::Record::Serialize::Role::Sink;
 
+# ABSTRACT: Sink Role
+
 use Moo::Role;
 
+use namespace::clean;
+
+our $VERSION = '0.12';
+
+requires 'print';
+requires 'say';
+requires 'close';
 
 1;
 
-__END__
+=pod
 
 =head1 NAME
 
 Data::Record::Serialize::Role::Sink - Sink Role
+
+=head1 VERSION
+
+version 0.12
 
 =head1 DESCRIPTION
 
 If a role consumes this, it signals that it provides sink
 capabilities.
 
-=head1 LICENSE AND COPYRIGHT
+=head1 BUGS AND LIMITATIONS
 
-Copyright (c) 2014 The Smithsonian Astrophysical Observatory
+You can make new bug reports, and view existing ones, through the
+web interface at L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize>.
 
-B<Data::Record::Serialize> is free software: you can redistribute it
-and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
+=head1 SEE ALSO
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+Please see those modules/websites for more information related to this module.
 
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+=over 4
+
+=item *
+
+L<Data::Record::Serialize|Data::Record::Serialize>
+
+=back
 
 =head1 AUTHOR
 
-Diab Jerius  E<lt>djerius@cpan.orgE<gt>
+Diab Jerius <djerius@cpan.org>
 
+=head1 COPYRIGHT AND LICENSE
 
+This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
 
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut
+
+__END__
+
+#pod =head1 DESCRIPTION
+#pod
+#pod If a role consumes this, it signals that it provides sink
+#pod capabilities.

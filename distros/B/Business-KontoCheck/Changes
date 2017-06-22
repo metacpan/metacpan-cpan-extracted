@@ -1,8 +1,21 @@
 vim:si
 Revision history for Perl extension Business::KontoCheck.
 
-The complete history can be found in 0_history.txt (in german). The perl
-version starts with 2.1; all previous versions are C only libraries.
+The complete history can be found in 0_history.txt (in german).
+
+6.00:
+   - The version number was bumped to 6.00 for the perl indexer...
+   - new check method B1c
+   - new check method E4
+   - IBAN rule 54 removed
+
+5.10:
+   - new check method E3
+
+5.9:
+   - switched to UTF-8, removed the encoding pragma
+   - new (sub)method 74b implemented
+   - IBAN rule 42 changed slightly
 
 5.8:
    - new check method 87d

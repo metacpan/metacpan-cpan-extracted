@@ -1,0 +1,36 @@
+## scaffold.yml - Rapi::Blog scaffold config file
+#
+# bootstrap-blog: default, simple scaffold
+#
+
+static_paths  : [ css/, js/, fonts/, img/ ]
+private_paths : [ private/, scaffold.yml ]
+landing_page  : recent_posts
+not_found     : private/404.html
+favicon       : img/favicon.ico
+
+view_wrappers:
+  - { path: post/, type: include, wrapper: private/post.html }
+
+##
+## extra params (used by *this* scaffold, but not Rapi::Blog itself)
+##
+
+# Remove any of the following params to prevent them from displaying at all:
+title          : My Blog
+subtitle       : Rapi::Blog using 'bootstrap-blog' default scaffold
+sidebar_blurb  : private/sidebar_blurb.html
+sidebar_bottom : private/sidebar_bottom.html
+
+# whether or not to show a public "New Post" link
+new_post_link  : 1
+
+# whether or not to show a public edit link on post page
+edit_post_link : 1
+
+# The pages are used to build the navigation header
+pages : 
+  - { title: Home,    path: /         }
+  - { title: List,    path: /list     }
+  - { title: Tags,    path: /tags     }
+  - { title: Authors, path: /authors  }

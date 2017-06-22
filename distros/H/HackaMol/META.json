@@ -4,13 +4,13 @@
       "Demian Riccardi <demianriccardi@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "HackaMol",
    "prereqs" : {
@@ -57,6 +57,7 @@
          "web" : "https://github.com/demianriccardi/HackaMol"
       }
    },
-   "version" : "0.039"
+   "version" : "0.040",
+   "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

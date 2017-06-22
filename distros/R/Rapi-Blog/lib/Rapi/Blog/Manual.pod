@@ -1,0 +1,16 @@
+=head1 NAME
+ 
+Rapi::Blog::Manual - Rapi::Blog user and developer manual
+ 
+=head1 DESCRIPTION
+ 
+This is the WIP L<Rapi::Blog> users manual.
+ 
+=head1 SECTIONS
+
+=head2 L<Rapi::Blog::Manual::Scaffolds>
+ 
+Description of the L<Rapi::Blog> scaffold structure.
+ 
+
+=cut

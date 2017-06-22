@@ -5,6 +5,7 @@ use Dancer::Plugin::DBIC 'schema';
 
 use App::Netdisco::Util::Device
   qw/get_device match_devicetype is_discoverable/;
+use App::Netdisco::Util::Permission 'check_acl_only';
 use App::Netdisco::Util::DNS ':all';
 use App::Netdisco::JobQueue qw/jq_queued jq_insert/;
 use NetAddr::IP::Lite ':lower';
@@ -50,25 +51,50 @@ the IP and hostname in the device object for the canonical IP.
 sub set_canonical_ip {
   my ($device, $snmp) = @_;
 
-  my $old_ip  = $device->ip;
-  my $new_ip  = $old_ip;
-  my $revname = ipv4_from_hostname($snmp->name);
+  my $old_ip = $device->ip;
+  my $new_ip = $old_ip;
+  my $revofname = ipv4_from_hostname($snmp->name);
 
-  if (setting('reverse_sysname') and $revname) {
-      $new_ip = $revname;
+  if (setting('reverse_sysname') and $revofname) {
+    if ($snmp->snmp_connect_ip( $new_ip )) {
+      $new_ip = $revofname;
+    }
+    else {
+      debug sprintf ' [%s] device - cannot renumber to %s - SNMP connect failed',
+        $old_ip, $revofname;
+    }
   }
 
-  if (setting('device_identity')) {
+  if (scalar @{ setting('device_identity') }) {
+    my @idmaps = @{ setting('device_identity') };
+    my $devips = $device->device_ips->order_by('alias');
+
+    ALIAS: while (my $alias = $devips->next) {
+      next if $alias->alias eq $old_ip;
+
+      foreach my $map (@idmaps) {
+        next unless ref {} eq ref $map;
+
+        foreach my $key (sort keys %$map) {
+          # lhs matches device, rhs matches device_ip
+          if (check_acl_only($device, $key)
+                and check_acl_only($alias, $map->{$key})) {
+
+            if ($snmp->snmp_connect_ip( $alias->alias )) {
+              $new_ip = $alias->alias;
+              last ALIAS;
+            }
+            else {
+              debug sprintf ' [%s] device - cannot renumber to %s - SNMP connect failed',
+                $old_ip, $alias->alias;
+            }
+          }
+        }
+      }
+    } # ALIAS
   }
 
   return if $new_ip eq $old_ip;
-
-  if (not $snmp->snmp_connect_ip( $new_ip )) {
-      # should be warning or error?
-      debug sprintf ' [%s] device - cannot change IP to %s - SNMP connect failed',
-        $old_ip, $device->ip;
-      return;
-  }
 
   schema('netdisco')->txn_do(sub {
     $device->renumber($new_ip)

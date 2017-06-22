@@ -100,12 +100,12 @@ int ip_tools_ip_range (ip_block_t * ip_blocks, int n_ip_ranges, unsigned ip)
             }
             else {
                 /* Go up a bit and continue searching. */
-                i+= division;
+                i += division;
             }
         }
         else {
             /* Go down a bit and continue searching. */
-            i-= division;
+            i -= division;
         }
         if (i > n_ip_ranges - 1 || i < 0) {
             /* "i" has gone outside the boundaries. */

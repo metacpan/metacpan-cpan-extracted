@@ -15,7 +15,9 @@ our @EXPORT = qw(page_size fincore fadvise
             );
 our @EXPORT_OK = qw();
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
+
+our $MAX_CHUNK_SIZE = 512*1024*1024;
 
 use POSIX;
 
@@ -57,25 +59,33 @@ sub fincore {
     open my $fh, '<', $file or croak $!;
     my $fd = fileno $fh;
 
-    my($r, $e);
-    {
+    my($ret, $r, $e);
+    for (; $offset < $fsize; $offset += $MAX_CHUNK_SIZE, $length -= $MAX_CHUNK_SIZE) {
+        my $chunk_size = $length < $MAX_CHUNK_SIZE ? $length : $MAX_CHUNK_SIZE;
+        # warn "offset=$offset length=$length chunk_size=$chunk_size\n";
         local $@;
         $r = eval {
-            _fincore($fd, $offset, $length);
+            _fincore($fd, $offset, $chunk_size);
         };
-        chomp($e = $@) if $@;
+        if ($@) {
+            chomp($e = $@);
+            carp $e;
+            close $fh;
+            return;
+        } else {
+            for my $k (keys %$r) {
+                next if $k eq 'page_size';
+                $ret->{$k} += $r->{$k};
+            }
+        }
     }
     close $fh;
 
-    if (defined $e) {
-        carp $e;
-        return;
-    }
+    $ret->{page_size}   = page_size();
+    $ret->{file_size}   = $fsize;
+    $ret->{total_pages} = ceil($fsize / $ret->{page_size});
 
-    $r->{file_size}   = $fsize;
-    $r->{total_pages} = ceil($fsize / $r->{page_size});
-
-    return $r;
+    return $ret;
 }
 
 sub fadvise {

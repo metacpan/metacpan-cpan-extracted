@@ -1,6 +1,6 @@
 package PMLTQ::Relation::SiblingIteratorWithDistance;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::SiblingIteratorWithDistance::VERSION = '1.3.1';
+$PMLTQ::Relation::SiblingIteratorWithDistance::VERSION = '1.3.2';
 # ABSTRACT: Iterates over siblings given node with boudaries
 
 use 5.006;
@@ -127,7 +127,7 @@ PMLTQ::Relation::SiblingIteratorWithDistance - Iterates over siblings given node
 
 =head1 VERSION
 
-version 1.3.1
+version 1.3.2
 
 =head1 AUTHORS
 

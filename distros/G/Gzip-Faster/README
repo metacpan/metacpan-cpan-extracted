@@ -6,7 +6,7 @@
               |_|                                       
 
 
-This is the README for Gzip::Faster version 0.19.
+This is the README for Gzip::Faster version 0.20.
 
 Gzip::Faster is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -36,18 +36,20 @@ convenience functions built on these two: "gzip_file" reads a file
 then compresses it; "gunzip_file" reads a file then uncompresses it;
 and "gzip_to_file" compresses a scalar and writes it to a file.
 
-Further to this, "deflate" and "inflate" work with the deflate
-format, which is the same as the gzip format except it has no header
+Further to this, "deflate" and "inflate" work with the "deflate
+format", which is the same as the gzip format except it has no header
 information. "deflate_raw" and "inflate_raw" work with the
 bare-bones version of this format without checksums.
 
-To control the compression better, use "new". The returned object
-compresses via the "zip" and "unzip" methods. The type of
-compression can be toggled with "gzip_format" and "raw". A file
-name can be set in and retrieved from the gzip header with
-"file_name". The level of compression can be altered with
-"level". Perl flags can be copied into the gzip header using
-"copy_perl_flags".
+If you need to control the compression beyond what is offered by
+"gzip" and "gunzip", create a Gzip::Faster object using "new",
+and compress and uncompress using the "zip" and "unzip"
+methods. The type of compression can be toggled with "gzip_format"
+and "raw". A file name can be set and retrieved from the gzip header
+with "file_name", and the modification time of the file can be set
+and retrieved with "mod_time". The level of compression can be
+altered with "level". Perl flags can be copied into the gzip header
+using "copy_perl_flags".
 
 -----------------------------------------------------------------------------
 
@@ -80,11 +82,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm Gzip::Faster
 
-To install the module from the source file, Gzip-Faster-0.19.tar.gz, follow
+To install the module from the source file, Gzip-Faster-0.20.tar.gz, follow
 this sequence of commands:
 
-    tar xfz Gzip-Faster-0.19.tar.gz
-    cd Gzip-Faster-0.19
+    tar xfz Gzip-Faster-0.20.tar.gz
+    cd Gzip-Faster-0.20
     perl Makefile.PL
     make
     make install
@@ -109,6 +111,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Thu Jan 19 19:46:46 2017.
+This README was written on Sat Jun 17 09:03:24 2017.
 
 -----------------------------------------------------------------------------

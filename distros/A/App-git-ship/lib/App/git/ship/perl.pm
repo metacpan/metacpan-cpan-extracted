@@ -1,15 +1,15 @@
 package App::git::ship::perl;
 use App::git::ship -base;
 use Cwd ();
-use File::Basename qw( dirname basename );
+use File::Basename qw(dirname basename);
 use File::Path 'make_path';
 use File::Spec;
 use Module::CPANfile;
-use POSIX qw( setlocale strftime LC_TIME );
+use POSIX qw(setlocale strftime LC_TIME);
 
 my $VERSION_RE = qr{\W*\b(\d+\.[\d_]+)\b};
 
-my %FILENAMES = (changelog => [qw( CHANGELOG.md Changes )], readme => [qw( README.md README )],);
+my %FILENAMES = (changelog => [qw(CHANGELOG.md Changes)], readme => [qw(README.md README)]);
 
 has main_module_path => sub {
   my $self = shift;
@@ -85,9 +85,9 @@ sub can_handle_project {
 sub clean {
   my $self  = shift;
   my $all   = shift // 1;
-  my @files = qw( Makefile Makefile.old MANIFEST MYMETA.json MYMETA.yml );
+  my @files = qw(Makefile Makefile.old MANIFEST MYMETA.json MYMETA.yml);
 
-  push @files, qw( Changes.bak META.json META.yml ) if $all;
+  push @files, qw(Changes.bak META.json META.yml) if $all;
   $self->_dist_files(sub { push @files, $_; });
 
   for my $file (@files) {
@@ -103,7 +103,7 @@ sub exe_files {
   my $self = shift;
   my @files;
 
-  for my $d (qw( bin script )) {
+  for my $d (qw(bin script)) {
     opendir(my $BIN, $d) or next;
     push @files, map {"$d/$_"} grep { /^\w/ and -x File::Spec->catfile($d, $_) } readdir $BIN;
   }
@@ -136,8 +136,8 @@ sub ship {
   }
 
   $self->run_hook('before_ship');
-  $self->system(qw( git add Makefile.PL ), $changelog, $self->_filename('readme'));
-  $self->system(qw( git commit -a -m ), $self->_changes_to_commit_message);
+  $self->system(qw(git add Makefile.PL), $changelog);
+  $self->system(qw(git commit -a -m),    $self->_changes_to_commit_message);
   $self->SUPER::ship(@_);    # after all the changes
   $uploader->upload_file($dist_file);
   $self->run_hook('after_ship');
@@ -184,9 +184,9 @@ sub test_coverage {
 
   local $ENV{DEVEL_COVER_OPTIONS} = $ENV{DEVEL_COVER_OPTIONS} || '+ignore,^t\b';
   local $ENV{HARNESS_PERL_SWITCHES} = '-MDevel::Cover';
-  $self->system(qw( cover -delete ));
-  $self->system(qw( prove -l ));
-  $self->system(qw( cover ));
+  $self->system(qw(cover -delete));
+  $self->system(qw(prove -l));
+  $self->system(qw(cover));
 }
 
 sub update {
@@ -209,7 +209,7 @@ sub update {
 sub _author {
   my ($self, $format) = @_;
 
-  open my $GIT, '-|', qw( git log ), "--format=$format"
+  open my $GIT, '-|', qw(git log), "--format=$format"
     or $self->abort("git log --format=$format: $!");
   my $author = readline $GIT;
   $self->abort("Could not find any author in git log") unless $author;
@@ -285,15 +285,15 @@ sub _render_makefile_pl {
   my $prereqs = $self->_cpanfile->prereqs;
   my $args    = {force => 1};
 
-  $args->{PREREQ_PM} = $prereqs->requirements_for(qw( runtime requires ))->as_string_hash;
+  $args->{PREREQ_PM} = $prereqs->requirements_for(qw(runtime requires))->as_string_hash;
 
-  for my $k (qw( build test )) {
+  for my $k (qw(build test)) {
     my $r = $prereqs->requirements_for($k, 'requires')->as_string_hash;
     $args->{BUILD_REQUIRES}{$_} = $r->{$_} for keys %$r;
   }
 
   $self->render('Makefile.PL', $args);
-  $self->system(qw( perl -c Makefile.PL ));    # test Makefile.PL
+  $self->system(qw(perl -c Makefile.PL));    # test Makefile.PL
 }
 
 sub _timestamp_to_changes {
@@ -545,6 +545,7 @@ __DATA__
 *.bak
 *.old
 *.swp
+/*.tar.gz
 /blib/
 /cover_db
 /inc/
@@ -557,7 +558,7 @@ __DATA__
 /MYMETA*
 /pm_to_blib
 @@ cpanfile
-# You can install this projct with curl -L http://cpanmin.us | perl - <%= $_[0]->repository =~ s!\.git$!!r %>/archive/master.tar.gz
+# You can install this project with curl -L http://cpanmin.us | perl - <%= $_[0]->repository =~ s!\.git$!!r %>/archive/master.tar.gz
 requires "perl" => "5.10.0";
 test_requires "Test::More" => "0.88";
 @@ Changes
@@ -574,7 +575,7 @@ WriteMakefile(
   LICENSE => '<%= $_[0]->config->{license} %>',
   ABSTRACT_FROM => '<%= $_[0]->main_module_path %>',
   VERSION_FROM => '<%= $_[0]->main_module_path %>',
-  EXE_FILES => [qw( <%= join ' ', $_[0]->exe_files %> )],
+  EXE_FILES => [qw(<%= join ' ', $_[0]->exe_files %>)],
   META_MERGE => {
     resources => {
       bugtracker => '<%= $_[0]->config->{bugtracker} %>',

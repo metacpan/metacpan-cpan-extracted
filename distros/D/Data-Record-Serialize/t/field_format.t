@@ -1,21 +1,17 @@
 #!perl
 
-use Test::More;
-use Test::Fatal;
+use Test2::Bundle::Extended;
 
 use lib 't/lib';
 
 use Data::Record::Serialize;
 
-use lib 't/lib';
-
-
 subtest "format fields" => sub {
 
     my ( $s, $buf );
 
-    is(
-        exception {
+    ok(
+        lives {
             $s = Data::Record::Serialize->new(
                 encode        => 'ddump',
                 output        => \$buf,
@@ -25,22 +21,21 @@ subtest "format fields" => sub {
                 },
             );
         },
-        undef,
         "constructor"
-    );
+    ) or diag $@;
 
     $s->send( { a => 1, b => 2, c => 'nyuck nyuck' } );
 
     my $VAR1;
 
-    is( exception { $VAR1 = eval $buf }, undef, 'deserialize record' );
+    ok( lives { $VAR1 = eval $buf }, 'deserialize record' ) or diag $@;
 
-    is_deeply(
+    is(
         $VAR1,
         {
             a => 'aAa: 1',
             b => 'bBb: 2',
-	    c => 'nyuck nyuck',
+            c => 'nyuck nyuck',
         },
         'properly formatted'
     );
@@ -51,15 +46,16 @@ subtest "format types" => sub {
 
     my ( $s, $buf );
 
-    is(
-        exception {
+    ok(
+        lives {
             $s = Data::Record::Serialize->new(
-                encode        => 'ddump',
-                output        => \$buf,
-	        types => { a => 'N',
-			   b => 'I',
-			   c => 'S',
-			 },
+                encode => 'ddump',
+                output => \$buf,
+                types  => {
+                    a => 'N',
+                    b => 'I',
+                    c => 'S',
+                },
                 format_types => {
                     N => 'number: %s',
                     I => 'integer: %s',
@@ -67,22 +63,21 @@ subtest "format types" => sub {
                 },
             );
         },
-        undef,
         "constructor"
-    );
+    ) or diag $@;
 
     $s->send( { a => 1, b => 2, c => 3 } );
 
     my $VAR1;
 
-    is( exception { $VAR1 = eval $buf }, undef, 'deserialize record' );
+    ok( lives { $VAR1 = eval $buf }, 'deserialize record' ) or diag $@;
 
-    is_deeply(
+    is(
         $VAR1,
         {
             a => 'number: 1',
             b => 'integer: 2',
-	    c => 'string: 3',
+            c => 'string: 3',
         },
         'properly formatted'
     );
@@ -93,11 +88,11 @@ subtest "format types w/o specifying them" => sub {
 
     my ( $s, $buf );
 
-    is(
-        exception {
+    ok(
+        lives {
             $s = Data::Record::Serialize->new(
-                encode        => 'ddump',
-                output        => \$buf,
+                encode       => 'ddump',
+                output       => \$buf,
                 format_types => {
                     N => 'number: %s',
                     I => 'integer: %s',
@@ -105,22 +100,21 @@ subtest "format types w/o specifying them" => sub {
                 },
             );
         },
-        undef,
         "constructor"
-    );
+    ) or diag $@;
 
     $s->send( { a => 1.1, b => 2, c => 'nyuck' } );
 
     my $VAR1;
 
-    is( exception { $VAR1 = eval $buf }, undef, 'deserialize record' );
+    ok( lives { $VAR1 = eval $buf }, 'deserialize record' ) or diag $@;
 
-    is_deeply(
+    is(
         $VAR1,
         {
             a => 'number: 1.1',
             b => 'integer: 2',
-	    c => 'string: nyuck',
+            c => 'string: nyuck',
         },
         'properly formatted'
     );
@@ -131,15 +125,16 @@ subtest "format fields overrides types" => sub {
 
     my ( $s, $buf );
 
-    is(
-        exception {
+    ok(
+        lives {
             $s = Data::Record::Serialize->new(
-                encode        => 'ddump',
-                output        => \$buf,
-	        types => { a => 'N',
-			   b => 'I',
-			   c => 'S',
-			 },
+                encode => 'ddump',
+                output => \$buf,
+                types  => {
+                    a => 'N',
+                    b => 'I',
+                    c => 'S',
+                },
                 format_types => {
                     N => 'number: %s',
                     I => 'integer: %s',
@@ -151,22 +146,21 @@ subtest "format fields overrides types" => sub {
                 },
             );
         },
-        undef,
         "constructor"
-    );
+    ) or diag $@;
 
     $s->send( { a => 1, b => 2, c => 3 } );
 
     my $VAR1;
 
-    is( exception { $VAR1 = eval $buf }, undef, 'deserialize record' );
+    ok( lives { $VAR1 = eval $buf }, 'deserialize record' ) or diag $@;
 
-    is_deeply(
+    is(
         $VAR1,
         {
             a => 'aAa: 1',
             b => 'bBb: 2',
-	    c => 'string: 3',
+            c => 'string: 3',
         },
         'properly formatted'
     );

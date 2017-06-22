@@ -1,5 +1,14 @@
 Revision history for Cassandra-Client
 
+0.11    2017/06/12
+
+      * Stricter and faster reference checks
+      * Deduplicate parallel prepare() calls for the same query
+      * Deal with some of Perl's special variables like $"
+      * Avoid leaking file descriptors in some cases
+      * Support for User-Defined Types (UDT)
+      * Support for the 'Tuple' data type
+
 0.10    2017/01/30
 
       * Add a retry policy implementation for generic request failures

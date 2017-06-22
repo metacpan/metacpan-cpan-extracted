@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SR830;
-
+$Lab::Moose::Instrument::SR830::VERSION = '3.550';
 use 5.010;
 use Moose;
 use Moose::Util::TypeConstraints qw/enum/;
@@ -11,7 +11,6 @@ use Carp;
 use namespace::autoclean;
 use POSIX qw/log10 ceil floor/;
 
-our $VERSION = '3.543';
 
 extends 'Lab::Moose::Instrument';
 
@@ -635,6 +634,72 @@ sub set_line_notch_filters {
     my $filters = $filters{$value};
     $self->write( command => "ILIN $filters", %args );
     $self->cached_line_notch_filters($value);
+}
+
+=head2 calculate_settling_time
+
+ my $settling_time = $lia->calculate_settling_time(settling => '99');
+
+Calculate settling time independent of current time constant and filter slope.
+See "Principles of lock-in detection and the state of the art" white paper by
+Zurich Instruments. The C<settling> parameter is given in percent. Allowed
+values:
+
+=over
+
+=item * '63.2'
+
+=item * '90'
+
+=item * '99'
+
+=item * '99.9'
+
+=back
+
+=cut
+
+sub calculate_settling_time {
+    my $self = shift;
+    my ($settling) = validated_list(
+        \@_,
+        settling => enum( [qw/63.2 90 99 99.9/] )
+    );
+
+    my $tc           = $self->cached_tc();
+    my $filter_slope = $self->cached_filter_slope();
+
+    # For the following table, see "Principles of lock-in detection and the
+    # state of the art" white paper by Zurich Instruments.
+    my %settling_factors = (
+        '6' => {
+            '63.2' => 1,
+            '90'   => 2.3,
+            '99'   => 4.61,
+            '99.9' => 6.91
+        },
+        '12' => {
+            '63.2' => 2.15,
+            '90'   => 3.89,
+            '99'   => 6.64,
+            '99.9' => 9.23
+        },
+        '18' => {
+            '63.2' => 3.26,
+            '90'   => 5.32,
+            '99'   => 8.41,
+            '99.9' => 11.23
+        },
+        '24' => {
+            '63.2' => 4.35,
+            '90'   => 6.68,
+            '99'   => 10.05,
+            '99.9' => 13.06
+        }
+    );
+
+    my $multiplier = $settling_factors{$filter_slope}->{$settling};
+    return $multiplier * $tc;
 }
 
 =head2 Consumed Roles

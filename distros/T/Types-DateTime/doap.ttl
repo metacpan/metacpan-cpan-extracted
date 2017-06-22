@@ -14,7 +14,7 @@
 	a                    doap:Project;
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
-	doap-deps:runtime-requirement [ doap-deps:on "Type::Tiny 0.041"^^doap-deps:CpanId ], [ doap-deps:on "DateTime"^^doap-deps:CpanId ], [ doap-deps:on "DateTime::Duration"^^doap-deps:CpanId ], [ doap-deps:on "DateTime::Locale"^^doap-deps:CpanId ], [ doap-deps:on "DateTime::TimeZone"^^doap-deps:CpanId ], [ doap-deps:on "Module::Runtime"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008"^^doap-deps:CpanId ], [ doap-deps:on "Type::Tiny 0.041"^^doap-deps:CpanId ], [ doap-deps:on "DateTime"^^doap-deps:CpanId ], [ doap-deps:on "DateTime::Duration"^^doap-deps:CpanId ], [ doap-deps:on "DateTime::Locale"^^doap-deps:CpanId ], [ doap-deps:on "DateTime::TimeZone"^^doap-deps:CpanId ], [ doap-deps:on "Module::Runtime"^^doap-deps:CpanId ];
 	doap-deps:test-recommendation [ doap-deps:on "Moose 2.06"^^doap-deps:CpanId ], [
 		doap-deps:on "DateTime::Format::ISO8601 0.06"^^doap-deps:CpanId;
 	];
@@ -28,7 +28,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Types-DateTime";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Types-DateTime/v_0-000_01>, <http://purl.org/NET/cpan-uri/dist/Types-DateTime/v_0-001>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Types-DateTime/v_0-000_01>, <http://purl.org/NET/cpan-uri/dist/Types-DateTime/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Types-DateTime/v_0-002>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-types-datetime>;
@@ -63,6 +63,33 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Types-DateTime-0.001.tar.gz>;
 	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Types-DateTime/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Types-DateTime-0.002"^^xsd:string;
+	dc:issued            "2017-06-19"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Compatibility fixed for newer DateTime::Locale.";
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/drolsky>, <http://purl.org/NET/cpan-uri/person/ilmari>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Types-DateTime-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/drolsky>
+	a                    foaf:Person;
+	foaf:name            "Dave Rolsky";
+	foaf:nick            "DROLSKY";
+	foaf:page            <https://metacpan.org/author/DROLSKY>.
+
+<http://purl.org/NET/cpan-uri/person/ilmari>
+	a                    foaf:Person;
+	foaf:name            "Dagfinn Ilmari Mannsåker";
+	foaf:nick            "ILMARI";
+	foaf:page            <https://metacpan.org/author/ILMARI>.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

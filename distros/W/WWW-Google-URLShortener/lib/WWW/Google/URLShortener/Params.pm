@@ -1,6 +1,7 @@
 package WWW::Google::URLShortener::Params;
 
-$WWW::Google::URLShortener::Params::VERSION = '0.19';
+$WWW::Google::URLShortener::Params::VERSION   = '0.22';
+$WWW::Google::URLShortener::Params::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
 
@@ -8,7 +9,7 @@ WWW::Google::URLShortener::Params - Placeholder for parameters for L<WWW::Google
 
 =head1 VERSION
 
-Version 0.19
+Version 0.22
 
 =cut
 
@@ -62,7 +63,7 @@ Mohammad S Anwar, C<< <mohammad.anwar at yahoo.com> >>
 
 =head1 REPOSITORY
 
-L<https://github.com/Manwar/WWW-Google-URLShortener>
+L<https://github.com/manwar/WWW-Google-URLShortener>
 
 =head1 BUGS
 

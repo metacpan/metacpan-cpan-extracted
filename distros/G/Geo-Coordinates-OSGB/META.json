@@ -1,7 +1,7 @@
 {
    "abstract" : "Convert coordinates between Lat/Lon and the British National Grid",
    "author" : [
-      "unknown"
+      "Toby Thurston"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150010",
@@ -35,6 +35,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "2.17",
+   "version" : "2.18",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

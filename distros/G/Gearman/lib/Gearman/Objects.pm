@@ -1,6 +1,6 @@
 package Gearman::Objects;
 use version ();
-$Gearman::Objects::VERSION = version->declare("2.004.007");
+$Gearman::Objects::VERSION = version->declare("2.004.008");
 
 use strict;
 use warnings;
@@ -56,7 +56,7 @@ sub new {
 =head2 job_servers([$job_servers])
 
 Initialize the list of job servers.
-C<$job_servers>should be an array reference, hash reference or scalar.
+C<$job_servers>should be array or array reference of hash references or stringified job servers.
 
 B<return> C<[job_servers]>
 
@@ -98,33 +98,22 @@ B<return> [canonicalized list]
 
 sub canonicalize_job_servers {
     my ($self) = shift;
-    my @in;
 
     my $ref = ref($_[0]);
-    if ($ref) {
-        if ($ref eq "ARRAY") {
-            @in = @{ $_[0] };
-        }
-        elsif ($ref eq "HASH") {
-            @in = ($_[0]);
-        }
-        else {
-            Carp::croak "unsupported argument type ", ref($_[0]);
-        }
-    } ## end if (is_plain_ref($_[0]...))
-    else {
-        @in = @_;
-    }
+    my @in = $ref && $ref eq "ARRAY" ? @{ $_[0] } : @_;
 
     my $out = [];
     foreach my $i (@in) {
-        if (ref($i)) {
-                      $i->{port} ||= Gearman::Objects::DEFAULT_PORT;
-        } elsif ($i !~ /:/) {
-          $i .= ':' . Gearman::Objects::DEFAULT_PORT;
+        my $ref = ref($i);
+        if ($ref) {
+            $ref eq "HASH" || Carp::croak "unsupported job server value of type ", ref($i);
+            $i->{port} ||= Gearman::Objects::DEFAULT_PORT;
+        }
+        elsif ($i !~ /:/) {
+            $i .= ':' . Gearman::Objects::DEFAULT_PORT;
         }
         push @{$out}, $i;
-    } ## end foreach (@in)
+    } ## end foreach my $i (@in)
     return $out;
 } ## end sub canonicalize_job_servers
 
@@ -141,8 +130,11 @@ B<return> C<< join $prefix_separator, $prefix, $func >>
 sub func {
     my ($self, $func) = @_;
     my $prefix = $self->prefix;
-    return defined($prefix) ? join($self->prefix_separator, $prefix, $func) : $func;
-}
+    return
+        defined($prefix)
+        ? join($self->prefix_separator, $prefix, $func)
+        : $func;
+} ## end sub func
 
 =head2 prefix([$prefix])
 
@@ -160,14 +152,14 @@ getter/setter
 
 default: "\t"
 
-I<If gearmand uses memcached persistent queue type override default separator to insure jobs recovery>
+I<If gearmand uses memcached persistent queue type, override default separator to insure jobs recovery>
 
 =cut
 
 sub prefix_separator {
-  my ($self) = shift;
-  my $r = $self->_property("prefix_separator", scalar(@_) ? $_[0] : ());
-  return $r ? $r : $self->_property("prefix_separator", "\t");
+    my ($self) = shift;
+    my $r = $self->_property("prefix_separator", scalar(@_) ? $_[0] : ());
+    return $r ? $r : $self->_property("prefix_separator", "\t");
 }
 
 =head2 socket($js, [$timeout])

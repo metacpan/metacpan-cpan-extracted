@@ -10,6 +10,7 @@ README
 SIGNATURE
 cpanfile
 dist.ini
+examples/cat.pl
 examples/synopsis.pl
 examples/timer.pl
 lib/Ryu/Async.pm

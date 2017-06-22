@@ -7,7 +7,7 @@ use Cassandra::Client::Protocol qw/:constants BIGINT_SUPPORTED pack_long/;
 use Math::BigInt;
 use Encode;
 use POSIX qw/floor/;
-use Ref::Util qw/is_hashref/;
+use Ref::Util qw/is_hashref is_ref/;
 
 use Exporter 'import';
 our @EXPORT_OK= qw/
@@ -43,6 +43,8 @@ my %types= (
     TYPE_SMALLINT   ,=> [ 's>', 2 ],
     TYPE_TIME       ,=> [ \&e_time ],
     TYPE_DATE       ,=> [ \&e_date ],
+    TYPE_TUPLE      ,=> [ \&e_tuple ],
+    TYPE_UDT        ,=> [ \&e_udt ],
 );
 
 sub make_encoder {
@@ -50,6 +52,8 @@ sub make_encoder {
 
     my @columns= @{$metadata->{columns}};
     my @names= map { $_->[2] } @columns;
+
+    local $"= "";
 
     my $code= <<EOC;
 
@@ -95,7 +99,7 @@ if (!defined($input)) {
     if (!$type_entry) {
         warn "Cannot encode type $type->[0]. Sending a NULL instead, this is probably not what you want!"; # XXX Can we do this?
         $code .= "$output .= \$null;";
-    } elsif (!ref $type_entry->[0]) {
+    } elsif (!is_ref $type_entry->[0]) {
         if (my $length= $type_entry->[1]) {
             $code .= "$output .= pack('l>$type_entry->[0]', $length, $input);";
         } else {
@@ -294,6 +298,46 @@ sub e_date {
     }
 }
 EOC
+}
+
+sub e_tuple {
+    my ($type, $input, $output, $level)= @_;
+
+    my $code= <<EOC;
+my \$tmp_output_$level= '';
+my \$tmp_input_$level= '';
+EOC
+    for my $i (0..@{$type->[1]}-1) {
+        my $subtype= $type->[1][$i];
+        $code .= "\$tmp_input_$level= ($input || undef)->[$i];\n";
+        $code .= make_column_encoder($subtype, '$tmp_input_'.$level, '$tmp_output_'.$level, 1, $level+1)."\n";
+    }
+
+$code .= <<EOC;
+$output .= pack('l>', length(\$tmp_output_$level)).\$tmp_output_$level;
+EOC
+
+    return $code;
+}
+
+sub e_udt {
+    my ($type, $input, $output, $level)= @_;
+    my (undef, $keyspace, $udt_name, $subtypes)= @$type;
+
+    my $code= <<EOC;
+# UDT: $keyspace.$udt_name
+my \$tmp_output_$level= '';
+@{[ map { my ($subtypename, $subtype)= @$_; <<EOP; } @$subtypes
+{ # $subtypename
+    @{[ make_column_encoder($subtype, "($input\->{'$subtypename'})", "\$tmp_output_$level", 1, $level+1) ]}
+}
+EOP
+]}
+
+$output .= pack('l>', length(\$tmp_output_$level)).\$tmp_output_$level;
+EOC
+
+    return $code;
 }
 
 1;

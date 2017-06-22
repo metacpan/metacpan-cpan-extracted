@@ -44,7 +44,7 @@ use strict;
 use warnings;
 use Carp qw{ carp croak };
 
-our $VERSION = 0.3;
+our $VERSION = 0.41;
 
 # api module provided by ovh
 use OVH::OvhApi;
@@ -55,6 +55,7 @@ use Webservice::OVH::Me;
 use Webservice::OVH::Order;
 use Webservice::OVH::Email;
 use Webservice::OVH::Cloud;
+use Webservice::OVH::Hosting;
 
 # other requirements
 use JSON;
@@ -115,6 +116,7 @@ sub new_from_json {
     my $order = Webservice::OVH::Order->_new( wrapper => $api_wrapper, module => $self );
     my $email = Webservice::OVH::Email->_new( wrapper => $api_wrapper, module => $self );
     my $cloud = Webservice::OVH::Cloud->_new( wrapper => $api_wrapper, module => $self );
+    my $hosting = Webservice::OVH::Hosting->_new( wrapper => $api_wrapper, module => $self );
 
     # Timeout can be also set in the json file
     OVH::OvhApi->setRequestTimeout( timeout => $data->{timeout} || 120 );
@@ -126,6 +128,7 @@ sub new_from_json {
     $self->{_api_wrapper} = $api_wrapper;
     $self->{_email}       = $email;
     $self->{_cloud}       = $cloud;
+    $self->{_hosting}     = $hosting;
 
     return $self;
 }
@@ -166,6 +169,7 @@ sub new {
     my $order = Webservice::OVH::Order->_new( wrapper => $api_wrapper, module => $self );
     my $email = Webservice::OVH::Email->_new( wrapper => $api_wrapper, module => $self );
     my $cloud = Webservice::OVH::Cloud->_new( wrapper => $api_wrapper, module => $self );
+    my $hosting = Webservice::OVH::Hosting->_new( wrapper => $api_wrapper, module => $self );
 
     OVH::OvhApi->setRequestTimeout( timeout => $params{timeout} || 120 );
 
@@ -175,6 +179,7 @@ sub new {
     $self->{_api_wrapper} = $api_wrapper;
     $self->{_email}       = $email;
     $self->{_cloud}       = $cloud;
+    $self->{_hosting}     = $hosting;
 
     return $self;
 }
@@ -303,6 +308,27 @@ sub cloud {
     my ($self) = @_;
 
     return $self->{_cloud};
+}
+
+=head2 hosting
+
+Main access to all /hosting/ api methods 
+
+=over
+
+=item * Return: L<Webservice::OVH::Cloud>
+
+=item * Synopsis: $ovh->cloud;
+
+=back
+
+=cut
+
+sub hosting {
+
+    my ($self) = @_;
+
+    return $self->{_hosting};
 }
 
 =head1 AUTHOR

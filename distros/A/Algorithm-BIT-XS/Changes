@@ -1,5 +1,12 @@
 Revision history for Perl extension Algorithm::BIT::XS.
 
+0.003 2017-06-17T22:04+03:00
+ - Fix segmentation fault
+ - Fix lack of destructors
+ - Fix off-by-one errors in argument validation
+ - Improve test suite
+ - Make XS slightly shorter
+
 0.002 2017-06-10T21:33+01:00
  - Add support for 2D binary indexed trees
 

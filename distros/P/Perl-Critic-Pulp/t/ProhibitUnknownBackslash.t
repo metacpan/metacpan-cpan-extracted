@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
 
 # This file is part of Perl-Critic-Pulp.
 #
@@ -21,7 +21,7 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More tests => 288;
+use Test::More tests => 294;
 
 use lib 't';
 use MyTestHelpers;
@@ -31,7 +31,7 @@ require Perl::Critic::Policy::ValuesAndExpressions::ProhibitUnknownBackslash;
 
 
 #-----------------------------------------------------------------------------
-my $want_version = 93;
+my $want_version = 94;
 is ($Perl::Critic::Policy::ValuesAndExpressions::ProhibitUnknownBackslash::VERSION, $want_version, 'VERSION variable');
 is (Perl::Critic::Policy::ValuesAndExpressions::ProhibitUnknownBackslash->VERSION, $want_version, 'VERSION class method');
 {
@@ -323,8 +323,11 @@ HERE
      # \N 
 
      [ 1, '  "\\N{COLON}"  ' ],
-     [ 0, 'use charnames q{:full};  "\\N{COLON}"  ' ],
-     [ 1, '{ use charnames q{:full}; }  "\\N{COLON}"  ' ],  # not in scope
+     [ 0, 'use charnames;          "\\N{COLON}"  ' ],
+     [ 0, 'use charnames q{:full}; "\\N{COLON}"  ' ],
+     [ 1, '{ use charnames; }  "\\N{COLON}"  ' ],  # not in lexical scope
+     [ 0, 'use 5.016;  "\\N{COLON}"  ' ],  # autoloaded charnames in 5.16
+     [ 0, '"\\N{COLON}"; use 5.016' ],     # version can appear anywhere
 
 
      #----------------

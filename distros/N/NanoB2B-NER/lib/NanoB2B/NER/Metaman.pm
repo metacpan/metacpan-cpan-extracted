@@ -18,6 +18,7 @@ use warnings;
 #option variables
 my $debug = 1;
 my $program_dir = "";
+my $metamap_arguments = "-q";
 my $fileIndex = 0;
 
 #datastructure variables
@@ -41,23 +42,41 @@ my %metamapHash = ();
 #		   \$debug     <-- run the program with debug print statements
 # output : $self      <-- an instance of the Metaman object
 sub new {
-	#create and bless this Metaman
-	my $class = shift;
-	my $self = {};
-	bless $self, $class;
+	#grab class and parameters
+    my $self = {};
+    my $class = shift;
+    return undef if(ref $class);
+    my $params = shift;
 
-	#get the inputs
-	$self->{directory} = shift;
-	$program_dir = $self->{directory};
-	$self->{index} = shift;
-	$fileIndex = $self->{fileIndex};
-	$self->{debug} = shift;
-	$debug = $self->{debug};
+    #bless this object
+    bless $self, $class;
+    $self->_init($params);
 
 	$uniParams{'debug'} = $self->{debug};
 	$uniSub = NanoB2B::UniversalRoutines->new(\%uniParams);
 
 	return $self;
+}
+#  method to initialize the NanoB2B::NER::Metaman object.
+#  input : $parameters <- reference to a hash
+#  output: 
+sub _init {
+    my $self = shift;
+    my $params = shift;
+
+    $params = {} if(!defined $params);
+
+    #  get some of the parameters
+    my $diroption = $params->{'directory'};
+    my $debugoption = $params->{'debug'};
+    my $fileindexoption = $params->{'fileIndex'};
+    my $metamapargoption = $params->{'metamap_arguments'};
+
+    #set the global variables
+    if(defined $debugoption){$debug = $debugoption;}
+    if(defined $diroption){$program_dir = $diroption;}
+    if(defined $fileindexoption){$fileIndex = $fileindexoption;}
+    if(defined $metamapargoption){$metamap_arguments = $metamapargoption;}
 }
 
 ####     TO THE METAMOBILE!    ####
@@ -104,7 +123,7 @@ sub meta_file{
 		#printColorDebug("on_blue", "LINE: $line\n");
 		my $lnnum = $indexer + 1;
 		$uniSub->printColorDebug("green", "$filename - MM Line $lnnum / $total...\n");
-		my $mm = metaLine($line, $filename);
+		my $mm = metaLine($self, $line, $filename);
 		$metamapHash{$indexer} = $mm;
 		$indexer++;
 	}
@@ -121,7 +140,7 @@ sub meta_file{
 sub cleanWords{
 	my $input = shift;
 
-	$input =~ s/[^a-zA-z0-9\:\.\s<>&#;\*\/]/ /g; 	#get rid of non-ascii
+	$input =~ s/[^a-zA-z0-9\:\.\s<>&#;\*\/\,]/ /g; 	#get rid of non-ascii
 	$input =~ s/([0-9]+(\.[0-9]*)?)-[0-9]+(\.[0-9]*)?/RANGE/g;		#get rid of range num (#-#)
 	$input =~ s/[0-9]+\.?[0-9]+/NUM/g;				#get rid of normal num (# or #.#)
 	$input =~ s/\s?=\s?/eq/g;						#get rid of = 
@@ -146,6 +165,7 @@ sub untag{
 	my $input = lc($line);
 	$id = lc($id);
 	$input =~ s/ <start:$id>//g;
+	$input =~ s/ <start:[a-z0-9_-]*>//g;
 	$input =~ s/ <end>//g;
 	$input = cleanWords($input);
 	return $input;
@@ -169,12 +189,12 @@ sub untagSet{
 }
 
 ######    METAMAPS THE LINE   ######
-
 #metamaps a single line
 # input  : $line     <-- the line to run through metamap
 #		   $name     <-- the name of the file/tag for the entities
 # output : $meta     <-- the metamap output for the line
 sub metaLine{
+	my $self = shift;
 	my $line = shift;
 	my $name = shift;
 
@@ -187,7 +207,7 @@ sub metaLine{
 	close IN;
 
 	#analyze using nlm's program
-	my $meta = `metamap -q < input`;
+	my $meta = `metamap $metamap_arguments < input`;
 	return $meta;
 }
 

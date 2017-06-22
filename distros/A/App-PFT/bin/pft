@@ -164,10 +164,10 @@ unless (defined $subcmd) {
     print STDERR "Usage: $0 <command> [<args>]\n",
                  "Usage: $0 --help\n";
     exit 1;
-} elsif ($subcmd =~ /^(version|-v|--version)$/n) {
+} elsif ($subcmd =~ /^(?:version|-v|--version)$/) {
     say STDERR $App::PFT::VersionString;
     exit 0
-} elsif ($subcmd =~ /^(help|-h|--help)$/n) {
+} elsif ($subcmd =~ /^(?:help|-h|--help)$/) {
     @ARGV and do {
         print STDERR "Did you mean `$0 $ARGV[0] --help`?\n";
         exit 1

@@ -186,7 +186,7 @@ Every Moose class shell end this way. See L<Moose::Manual::BestPractices>.
 =head3 Building automated instrument tests
 
 Lab::Moose has extensive support to build automated tests for instrument
-drivers and this is what enables B<long-term maintainability> of the code base.
+drivers and this is what enables long-term maintainability of the code base.
 
 If you are new to automated testing with Perl, consider the L<Modern Perl book|http://modernperlbooks.com/>, which covers all of the basics.
 
@@ -241,7 +241,7 @@ test:
 
 C<< $ perl -Ilib t/Moose/Instrument/SR830.t --help >>
 
-Know with the connection log in place, you can run the test without the real
+Now with the connection log in place, you can run the test without the real
 instrument connected:
 
 C<< $ prove -lv t/Moose/Instrument/SR830.t >>

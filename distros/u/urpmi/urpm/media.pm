@@ -551,6 +551,10 @@ sub write_urpmi_cfg {
     };
     remove_passwords_and_write_private_netrc($urpm, $config);
 
+    # urpmi.cfg must be world-readable, else mgaapplet won't be able to read it
+    # as it is executed from the user session. We enforce umask here in the case
+    # where the msec security level is set to 'secure' (which means umask 077).
+    umask 0022;
     urpm::cfg::dump_config($urpm->{config}, $config)
 	or $urpm->{fatal}(6, N("unable to write config file [%s]", $urpm->{config}));
 
@@ -2258,6 +2262,6 @@ Copyright (C) 2005 MandrakeSoft SA
 
 Copyright (C) 2005-2010 Mandriva SA
 
-Copyright (C) 2011-2015 Mageia
+Copyright (C) 2011-2017 Mageia
 
 =cut

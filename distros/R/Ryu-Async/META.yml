@@ -27,19 +27,19 @@ name: Ryu-Async
 provides:
   Ryu::Async:
     file: lib/Ryu/Async.pm
-    version: '0.004'
+    version: '0.006'
 recommends:
   Heap: '0'
   IO::Async::SSL: '0.19'
 requires:
   Future: '0.34'
-  IO::Async: '0.60'
-  Ryu: '0.013'
+  IO::Async: '0.71'
+  Ryu: '0.020'
   curry: '1.000'
   namespace::clean: '0'
   parent: '0'
 resources:
   bugtracker: https://github.com/team-at-cpan/Ryu-Async/issues
   repository: git://github.com/team-at-cpan/Ryu-Async.git
-version: '0.004'
+version: '0.006'
 x_serialization_backend: 'YAML::Tiny version 1.70'

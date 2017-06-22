@@ -8,6 +8,7 @@ lib/Group/Git/Cmd/Help.pm
 lib/Group/Git/Cmd/List.pm
 lib/Group/Git/Cmd/Pull.pm
 lib/Group/Git/Cmd/Sh.pm
+lib/Group/Git/Cmd/State.pm
 lib/Group/Git/Cmd/Status.pm
 lib/Group/Git/Cmd/TagList.pm
 lib/Group/Git/Cmd/Watch.pm

@@ -17,15 +17,15 @@ see the documentation of these packages for more details.
 
 =over
 
-=item * Install L<Strawberry Perl|http://strawberryperl.com/download/5.20.3.3/strawberry-perl-5.20.3.3-32bit.msi>. If you want to use NI-VISA, see the comments on supported perl versions in L<Lab::VISA's installation guide|http://labmeasurement.de/docs/VISA-Installation.html>
+=item * Install L<Strawberry Perl|http://strawberryperl.com/download/5.20.3.3/strawberry-perl-5.20.3.3-32bit.msi>. If you want to use NI-VISA, see the comments on supported perl versions in L<Lab::VISA's installation guide|http://search.cpan.org/dist/Lab-VISA/lib/Lab/VISA/Installation.pod>
 
-=item * Install gnuplot (not mandatory)
+=item * Install gnuplot 5 (not mandatory)
 
 =over
 
 =item * L<Download|http://sourceforge.net/project/showfiles.php?group_id=2055>, extract and put it somewhere
 
-=item * Add directory containing C<pgnuplot.exe> to path:
+=item * Add the directory containing C<gnuplot.exe> to the path:
 My Computer => Properties => Advanced => Environment Variables
 
 =back
@@ -34,7 +34,7 @@ My Computer => Properties => Advanced => Environment Variables
 
  cpanm Lab::Measurement
 
-=item * If you need the NI-VISA backend for your instruments follow L<Lab::VISA's installation guide|http://labmeasurement.de/docs/VISA-Installation.html>
+=item * If you need the NI-VISA backend for your instruments follow L<Lab::VISA's installation guide|http://search.cpan.org/dist/Lab-VISA/lib/Lab/VISA/Installation.pod>
 
 =item * Have fun!
 
@@ -43,6 +43,8 @@ My Computer => Properties => Advanced => Environment Variables
 =head1 Installation on Linux
 
 =over
+
+=item * In case your Linux distribution provides ready-made packages, use these as far as possible. Full support for Lab::Measurement is e.g. provide by L<Gentoo Linux|https://www.gentoo.org/>.
 
 =item * Install cpanminus, make, gcc and gnuplot
 (you can use your package manager).
@@ -68,7 +70,7 @@ the L<local::lib> package.
 =head1 COPYRIGHT AND LICENCE
 
  (c) 2010, 2011 Daniel Schröer, Andreas K. Hüttel, Daniela Taubert, and others.
-     2012       Andreas K. Hüttel
+     2012, 2017 Andreas K. Hüttel
 
 =cut
 

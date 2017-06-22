@@ -3,8 +3,8 @@ requires 'perl', '5.008001';
 requires 'AnyEvent';
 requires 'App::Ack';
 requires 'App::cpanoutdated';
+requires 'App::cpm';
 requires 'App::HTTPThis';
-requires 'App::metacpansearch';
 requires 'App::Nopaste';
 requires 'Carton';
 requires 'Class::Refresh';
@@ -12,10 +12,10 @@ requires 'CPAN::Mini';
 requires 'CPAN::Uploader';
 requires 'Data::Printer';
 requires 'Devel::Confess';
+requires 'Import::Base';
 requires 'Minilla';
 requires 'Mojolicious';
 requires 'Moo';
-requires 'Paws';
 requires 'Perl::Tidy';
 requires 'Plack';
 requires 'Pod::Cpandoc';
@@ -29,6 +29,9 @@ requires 'Web::Query';
 
 recommends 'App::rainbarf';
 recommends 'App::scan_prereqs_cpanfile';
+recommends 'Git::Deploy';
+recommends 'LWP::Protocol::rsync';
+recommends 'Paws';
 recommends 'Perl::Critic';
 
 on 'test' => sub {

@@ -1,4 +1,7 @@
 Revision history for App-Aliyun
 
+0.02  2017-06-12 09:55:02 CST
+        - add aliyun-cli-ec2-restart-by-name
+
 0.01  2017-05-11 18:26:42 CST
         - Initial release

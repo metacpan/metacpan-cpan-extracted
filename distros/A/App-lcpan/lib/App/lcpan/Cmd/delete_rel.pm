@@ -1,12 +1,12 @@
 package App::lcpan::Cmd::delete_rel;
 
-our $DATE = '2017-02-03'; # DATE
-our $VERSION = '1.017'; # VERSION
+our $DATE = '2017-06-19'; # DATE
+our $VERSION = '1.019'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 require App::lcpan;
 
@@ -51,7 +51,7 @@ sub handle_cmd {
     if ($args{delete_file}) {
         my $path = App::lcpan::_fullpath(
             $args{release}, $state->{cpan}, $row->{cpanid});
-        $log->infof("Deleting file %s ...", $path);
+        log_info("Deleting file %s ...", $path);
         unlink $path;
     }
 
@@ -73,12 +73,16 @@ App::lcpan::Cmd::delete_rel - Delete a release record in the database
 
 =head1 VERSION
 
-This document describes version 1.017 of App::lcpan::Cmd::delete_rel (from Perl distribution App-lcpan), released on 2017-02-03.
+This document describes version 1.019 of App::lcpan::Cmd::delete_rel (from Perl distribution App-lcpan), released on 2017-06-19.
 
 =head1 FUNCTIONS
 
 
-=head2 handle_cmd(%args) -> [status, msg, result, meta]
+=head2 handle_cmd
+
+Usage:
+
+ handle_cmd(%args) -> [status, msg, result, meta]
 
 Delete a release record in the database.
 
@@ -146,7 +150,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

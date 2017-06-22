@@ -17,6 +17,8 @@ lib/BlankOnDev/DataDev.pm
 lib/BlankOnDev/HTTP/request.pm
 lib/BlankOnDev/Utils/file.pm
 lib/BlankOnDev/Utils/file.pod
+lib/BlankOnDev/Utils/Char.pm
+lib/BlankOnDev/Utils/Char.pod
 lib/BlankOnDev/Migration/bazaar2GitHub.pm
 lib/BlankOnDev/Migration/bazaar2GitHub.pod
 lib/BlankOnDev/Migration/bazaar2GitHub/bazaar.pm
@@ -30,7 +32,14 @@ lib/BlankOnDev/DateTime.pod
 lib/BlankOnDev/DateTime/lang.pm
 lib/BlankOnDev/DateTime/lang.pod
 lib/BlankOnDev/syslog.pm
+lib/BlankOnDev/Form.pm
+lib/BlankOnDev/Form/github.pm
+lib/BlankOnDev/Rilis.pm
+lib/BlankOnDev/command.pm
+lib/BlankOnDev/system.pm
+script/boi_mig.sh
 script/boidev
+script/perlmake
 share/share.txt
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

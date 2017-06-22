@@ -6,7 +6,7 @@
                  |___/                                               
 
 
-This is the README for Lingua::Guess version 0.01.
+This is the README for Lingua::Guess version 0.02.
 
 Lingua::Guess is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -61,11 +61,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm Lingua::Guess
 
-To install the module from the source file, Lingua-Guess-0.01.tar.gz,
+To install the module from the source file, Lingua-Guess-0.02.tar.gz,
 follow this sequence of commands:
 
-    tar xfz Lingua-Guess-0.01.tar.gz
-    cd Lingua-Guess-0.01
+    tar xfz Lingua-Guess-0.02.tar.gz
+    cd Lingua-Guess-0.02
     perl Makefile.PL
     make
     make install
@@ -90,6 +90,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Sun Apr 16 20:44:39 2017.
+This README was written on Mon Jun 12 16:45:32 2017.
 
 -----------------------------------------------------------------------------

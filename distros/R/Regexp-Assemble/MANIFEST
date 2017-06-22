@@ -21,10 +21,10 @@ examples/tld
 examples/track-5.10
 examples/unquotemeta
 lib/Regexp/Assemble.pm
-LICENCE
+LICENSE
 Makefile.PL
-MANIFEST
-META.yml			Module meta-data (added by MakeMaker)
+MANIFEST			This list of files
+MANIFEST.SKIP
 README
 t/00_basic.t
 t/01_insert.t
@@ -38,5 +38,7 @@ t/08_track.t
 t/09_debug.t
 t/10_perl514.t
 TODO
+xt/author/pod-coverage.t
 xt/author/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

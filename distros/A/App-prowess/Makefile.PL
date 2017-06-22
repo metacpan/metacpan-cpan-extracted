@@ -6,7 +6,7 @@ WriteMakefile(
   LICENSE => 'artistic_2',
   ABSTRACT_FROM => 'lib/App/prowess.pm',
   VERSION_FROM => 'lib/App/prowess.pm',
-  EXE_FILES => [qw( script/prowess )],
+  EXE_FILES => [qw(script/prowess)],
   META_MERGE => {
     resources => {
       bugtracker => 'https://github.com/jhthorsen/app-prowess/issues',

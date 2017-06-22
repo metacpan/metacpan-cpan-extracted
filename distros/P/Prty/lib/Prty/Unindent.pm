@@ -3,7 +3,7 @@ package Prty::Unindent;
 use strict;
 use warnings;
 
-our $VERSION = 1.107;
+our $VERSION = 1.108;
 
 # -----------------------------------------------------------------------------
 
@@ -373,7 +373,7 @@ sub trim {
 
 =head1 VERSION
 
-1.107
+1.108
 
 =head1 AUTHOR
 

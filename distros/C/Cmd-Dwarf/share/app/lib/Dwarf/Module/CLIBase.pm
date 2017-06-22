@@ -41,6 +41,7 @@ sub init {
 }
 
 sub will_dispatch {}
+sub did_dispatch {}
 
 sub init_plugins  {
 	my ($self, $c) = @_;

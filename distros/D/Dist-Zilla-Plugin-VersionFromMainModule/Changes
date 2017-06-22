@@ -1,3 +1,9 @@
+0.03     2017-06-13
+
+- Require Module::Metadata 1.000005 or greater. Earlier versions are missing a
+  method we need. RT #122086.
+
+
 0.02     2017-01-08
 
 - Modules with UTF-8 anywhere caused the plugin the to die.

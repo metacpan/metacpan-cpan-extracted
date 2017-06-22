@@ -1,5 +1,9 @@
 Revision history for Perl extension Test::LeakTrace
 
+0.16 2017-06-17
+    - Fix build and test issues with perl5.26 due to removal of . from @INC
+      (PR #4 - thanks to jkeenan)
+
 0.15 2014-11-14 07:51:22+0900
     - Fix test failure on Windows (#1)
 

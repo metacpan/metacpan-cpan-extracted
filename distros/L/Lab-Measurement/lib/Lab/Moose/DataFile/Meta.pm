@@ -1,5 +1,5 @@
 package Lab::Moose::DataFile::Meta;
-
+$Lab::Moose::DataFile::Meta::VERSION = '3.550';
 use 5.010;
 use warnings;
 use strict;
@@ -15,7 +15,6 @@ use Fcntl 'SEEK_SET';
 
 use namespace::autoclean;
 
-our $VERSION = '3.543';
 
 extends 'Lab::Moose::DataFile';
 

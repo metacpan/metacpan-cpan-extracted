@@ -61,7 +61,7 @@ sub run_tests {
     ok( $res->{2}{'BODY[HEADER.FIELDS (DATE FROM SUBJECT)]'} =~ m/4:12.*Paul Miller.*test2/s );
 }
 
-do "t/test_runner.pm";
+do "./t/test_runner.pm";
 
 sub get_messages {
     my @messages = (<<TEST1, <<TEST2);

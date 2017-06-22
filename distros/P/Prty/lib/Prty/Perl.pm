@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.107;
+our $VERSION = 1.108;
 
 use Prty::Object;
 use Cwd ();
@@ -861,6 +861,7 @@ sub classPathToName {
 =head4 Synopsis
 
     $this->createAlias($package,$sym=>$ref);
+    $this->createAlias($sym=>$ref);
 
 =head4 Description
 
@@ -872,6 +873,9 @@ Der Aufruf ist äquivalent zu:
 
     no strict 'refs';
     *{"$package\::$sym"} = $ref;
+
+Ist $package nicht angegeben wird das Package des Aufrufers
+(d.h. das Package, aus dem heraus der Aufruf erfolgt) genommen.
 
 =head4 Example
 
@@ -896,7 +900,10 @@ Eintrag einer Closure in die Symboltabelle:
 # -----------------------------------------------------------------------------
 
 sub createAlias {
-    my ($this,$package,$sym,$ref) = @_;
+    my $this = shift;
+    my $package = @_ == 3? shift: caller;
+    my $sym = shift;
+    my $ref = shift;
 
     no strict 'refs';
     *{"$package\::$sym"} = $ref;
@@ -1915,7 +1922,7 @@ sub removePod {
 
 =head1 VERSION
 
-1.107
+1.108
 
 =head1 AUTHOR
 

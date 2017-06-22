@@ -1,5 +1,9 @@
 Revision history for Pg-Explain
 
+0.74    2017/06/20
+        - Fix extracting subquery name (problem reported by Jackson Popkin)
+        - Switch from using Digest::SHA1 to Digest::SHA
+
 0.73    2016/02/08
         - Add anonymization of grouping keys
 

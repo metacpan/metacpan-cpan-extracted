@@ -4677,3 +4677,60 @@ Ext.ux.RapidApp.Plugin.LinkClickCatcher = Ext.extend(Ext.util.Observable,{
 });
 Ext.preg('ra-link-click-catcher',Ext.ux.RapidApp.Plugin.LinkClickCatcher);
 
+
+
+// This plugin handles the specific case of the last item in a container being glued to
+// the bottom of it. This is quick and dirty and was mainy created for add/edit forms,
+// when we want the last item to use all the remaining space (i.e. a big/text field)
+// I wrote this because I was tired of trying to figure out how to get anchor to work for this
+Ext.ux.RapidApp.Plugin.ParentGlueBottom = Ext.extend(Ext.util.Observable,{
+
+  init: function(cmp) {
+    this.cmp = cmp;
+    cmp.on('render',this.onRender,this);
+  },
+  
+  onRender: function() {
+    this.cmp.ownerCt.on('afterlayout',this.syncHeight,this);
+    
+    // If any of our peers have collapse/expand, trigger sync. This is somewhat
+    // of a unique case which was added specifically for the Rapi::Blog Post add form
+    // which has a collapsible fieldset to be able to give the editor more height
+    this.cmp.ownerCt.items.each(function(itm) {
+      if(itm != this.cmp) {
+        itm.on('collapse',this.syncHeight,this);
+        itm.on('expand',this.syncHeight,this);
+      }
+    },this);
+
+    this.syncHeight();
+  },
+  
+  syncHeight: function() {
+    var Owner = this.cmp.ownerCt;
+    if(Owner) {
+      var offset = this.cmp.container.dom.offsetTop;
+      var height = Owner.getHeight() - offset - 60;
+      this.cmp.setHeight(height);
+    }
+  }
+});
+Ext.preg('ra-parent-gluebottom', Ext.ux.RapidApp.Plugin.ParentGlueBottom);
+
+// Should only be used with the MainnViewPort -- once the last
+Ext.ux.RapidApp.Plugin.LastPanelRedirect = Ext.extend(Ext.util.Observable,{
+
+  init: function(cmp) {
+    this.cmp = cmp;
+    cmp.on('remove',this.onRemove,this);
+  },
+  
+  onRemove: function(parent,child) {
+    if(this.cmp.items.length == 0) {
+      var url = this.cmp.last_panel_redirect_url || '/';
+      window.location.href = url;
+    }
+  }
+});
+Ext.preg('ra-last-panel-redirect', Ext.ux.RapidApp.Plugin.LastPanelRedirect);
+

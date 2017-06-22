@@ -19,4 +19,4 @@ no_index:
     - inc
 requires:
   Mojolicious: '7.23'
-version: '0.02'
+version: '0.03'

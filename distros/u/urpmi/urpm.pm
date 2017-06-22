@@ -14,7 +14,7 @@ use urpm::md5sum;
 # perl_checker: require urpm::media
 # perl_checker: require urpm::parallel
 
-our $VERSION = '8.106';
+our $VERSION = '8.109';
 our @ISA = qw(URPM Exporter);
 our @EXPORT_OK = ('file_from_local_url', 'file_from_local_medium', 'is_local_medium');
 
@@ -51,7 +51,7 @@ sub xml_info_policies() { qw(never on-demand update-only always) }
 sub default_options {
     { 
 	'split-level' => 1,
-	'split-length' => 8,
+	'split-length' => 50,
 	'verify-rpm' => 1,
 	'post-clean' => 1,
 	'xml-info' => 'on-demand',
@@ -615,7 +615,7 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 MandrakeSoft SA
 
 Copyright (C) 2005-2010 Mandriva SA
 
-Copyright (C) 2011-2015 Mageia
+Copyright (C) 2011-2017 Mageia
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

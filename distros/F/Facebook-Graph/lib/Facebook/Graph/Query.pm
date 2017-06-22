@@ -1,5 +1,5 @@
 package Facebook::Graph::Query;
-$Facebook::Graph::Query::VERSION = '1.1202';
+$Facebook::Graph::Query::VERSION = '1.1204';
 use Moo;
 use Facebook::Graph::Request;
 with 'Facebook::Graph::Role::Uri';
@@ -204,7 +204,7 @@ Facebook::Graph::Query - Simple and fast searching and fetching of Facebook data
 
 =head1 VERSION
 
-version 1.1202
+version 1.1204
 
 =head1 SYNOPSIS
 

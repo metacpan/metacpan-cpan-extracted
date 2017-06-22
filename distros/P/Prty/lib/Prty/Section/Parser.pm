@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.107;
+our $VERSION = 1.108;
 
 no bytes;
 use Prty::Section::Object;
@@ -308,8 +308,6 @@ sub parse {
         if ($sourceNotNeeded) {
             $source = '';
         }
-        #my $obj = $self->section($identifier,$keyValH,$keyA,$content,
-        #    $source,$file,$lineNumber);
         my $obj = $sub->($identifier,$keyValH,$keyA,$content,
             $source,$file,$lineNumber);
         if ($obj) {
@@ -729,7 +727,7 @@ Als Beispiel siehe prty-confluence:
 
 =head1 VERSION
 
-1.107
+1.108
 
 =head1 AUTHOR
 

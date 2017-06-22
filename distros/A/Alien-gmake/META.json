@@ -16,16 +16,16 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Alien::Build" : "0.25",
-            "Alien::Build::MM" : "0.25",
+            "Alien::Build" : "0.40",
+            "Alien::Build::MM" : "0.40",
             "Capture::Tiny" : "0",
             "ExtUtils::MakeMaker" : "6.52"
          }
       },
       "configure" : {
          "requires" : {
-            "Alien::Build" : "0.25",
-            "Alien::Build::MM" : "0.25",
+            "Alien::Build" : "0.40",
+            "Alien::Build::MM" : "0.40",
             "Capture::Tiny" : "0",
             "ExtUtils::MakeMaker" : "6.52",
             "File::chdir" : "0",
@@ -78,7 +78,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.19",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
+   "version" : "0.20",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

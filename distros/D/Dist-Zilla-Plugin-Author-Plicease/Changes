@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-Author-Plicease
 
+2.15      2017-06-11 21:38:01 -0400
+  - Tweaks for 5.26
+
 2.14      2017-06-09 11:35:06 -0400
   - Thanks to set x_contributors meta
 

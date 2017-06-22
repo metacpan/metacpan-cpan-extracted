@@ -1,12 +1,12 @@
 package App::BencherUtils;
 
-our $DATE = '2016-10-27'; # DATE
-our $VERSION = '0.19'; # VERSION
+our $DATE = '2017-06-20'; # DATE
+our $VERSION = '0.20'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Data::Clean::JSON;
 use Function::Fallback::CoreOrPP qw(clone);
@@ -96,7 +96,7 @@ sub _complete_scenario_in_result_dir {
 
     # combine from command-line and from config/env
     my $final_args = { %{$res->[2]}, %{$args{args}} };
-    #$log->tracef("final args=%s", $final_args);
+    #log_trace("final args=%s", $final_args);
 
     return [] unless $final_args->{result_dir};
 
@@ -360,7 +360,7 @@ sub cleanup_old_bencher_results {
             $scenario->{module_startup} ? 1:0,
             _encode_json($scenario->{result}[3]{'func.module_versions'}),
         );
-        #$log->tracef("key = %s", $key);
+        #log_trace("key = %s", $key);
         push @{$filenames{$key}}, $scenario->{filename};
     }
 
@@ -371,14 +371,14 @@ sub cleanup_old_bencher_results {
         $val = [sort @$val];
         for my $f (@{$val}[0..$#{$val}-$num_keep-1]) {
             if ($args{-dry_run}) {
-                $log->warnf("[DRY-RUN] Deleting %s ...", $f);
+                log_warn("[DRY-RUN] Deleting %s ...", $f);
                 $res->add_result(200, "OK (dry-run)", {item_id=>$f});
             } else {
-                $log->warnf("Deleting %s ...", $f);
+                log_warn("Deleting %s ...", $f);
                 if (unlink "$args{result_dir}/$f") {
                     $res->add_result(200, "OK", {item_id=>$f});
                 } else {
-                    $log->warnf("Can't unlink '%s': %s", $f, $!);
+                    log_warn("Can't unlink '%s': %s", $f, $!);
                     $res->add_result(500, "Can't unlink: $!", {item_id=>$f});
                 }
             }
@@ -578,6 +578,67 @@ sub bencher_module_startup_overhead {
      {'cmdline.skip_format'=>1}];
 }
 
+$SPEC{bencher_code} = {
+    v => 1.1,
+    summary => 'Accept a list of codes and '.
+        'perform benchmark',
+    description => <<'_',
+
+    % bencher-code 'code1' 'code2'
+
+is basically a shortcut for creating a scenario like this:
+
+    {
+        participants => [
+            {code_template=>'code1'},
+            {code_template=>'code2'},
+        ],
+    }
+
+and running that scenario with `bencher`.
+
+_
+    args => {
+        codes => {
+            'x.name.is_plural' => 1,
+            'x.name.singular' => 'module',
+            schema => ['array*', of=>'str*'],
+            req => 1,
+            pos => 0,
+            greedy => 1,
+            cmdline_src => 'stdin_or_args',
+        },
+    },
+
+};
+sub bencher_code {
+    my %args = @_;
+
+    my $codes = $args{codes};
+
+    my $scenario = {
+        participants => [],
+    };
+    for my $code (@$codes) {
+        push @{$scenario->{participants}}, {
+            code_template => $code,
+        };
+    }
+
+    require Bencher::Backend;
+    my $res = Bencher::Backend::bencher(
+        action => 'bench',
+        scenario => $scenario,
+    );
+    return $res unless $res->[0] == 200;
+
+    my $r = $args{-cmdline_r};
+    return $res if !$r || $r->{format} && $r->{format} !~ /text/;
+
+    [200, "OK", Bencher::Backend::format_result($res),
+     {'cmdline.skip_format'=>1}];
+}
+
 1;
 # ABSTRACT: Utilities related to bencher
 
@@ -593,7 +654,7 @@ App::BencherUtils - Utilities related to bencher
 
 =head1 VERSION
 
-This document describes version 0.19 of App::BencherUtils (from Perl distribution App-BencherUtils), released on 2016-10-27.
+This document describes version 0.20 of App::BencherUtils (from Perl distribution App-BencherUtils), released on 2017-06-20.
 
 =head1 SYNOPSIS
 
@@ -602,6 +663,8 @@ This document describes version 0.19 of App::BencherUtils (from Perl distributio
 This distribution includes several utilities:
 
 =over
+
+=item * L<bencher-code>
 
 =item * L<bencher-module-startup-overhead>
 
@@ -620,7 +683,54 @@ This distribution includes several utilities:
 =head1 FUNCTIONS
 
 
-=head2 bencher_module_startup_overhead(%args) -> [status, msg, result, meta]
+=head2 bencher_code
+
+Usage:
+
+ bencher_code(%args) -> [status, msg, result, meta]
+
+Accept a list of codes and perform benchmark.
+
+% bencher-code 'code1' 'code2'
+
+is basically a shortcut for creating a scenario like this:
+
+ {
+     participants => [
+         {code_template=>'code1'},
+         {code_template=>'code2'},
+     ],
+ }
+
+and running that scenario with C<bencher>.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<codes>* => I<array[str]>
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (result) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+=head2 bencher_module_startup_overhead
+
+Usage:
+
+ bencher_module_startup_overhead(%args) -> [status, msg, result, meta]
 
 Accept a list of module names and perform startup overhead benchmark.
 
@@ -661,7 +771,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 chart_bencher_result(%args) -> [status, msg, result, meta]
+=head2 chart_bencher_result
+
+Usage:
+
+ chart_bencher_result(%args) -> [status, msg, result, meta]
 
 Generate chart of bencher result and display it.
 
@@ -689,7 +803,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 cleanup_old_bencher_results(%args) -> [status, msg, result, meta]
+=head2 cleanup_old_bencher_results
+
+Usage:
+
+ cleanup_old_bencher_results(%args) -> [status, msg, result, meta]
 
 Delete old results.
 
@@ -744,7 +862,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 format_bencher_result(%args) -> [status, msg, result, meta]
+=head2 format_bencher_result
+
+Usage:
+
+ format_bencher_result(%args) -> [status, msg, result, meta]
 
 Format bencher raw/JSON result.
 
@@ -772,7 +894,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 list_bencher_results(%args) -> [status, msg, result, meta]
+=head2 list_bencher_results
+
+Usage:
+
+ list_bencher_results(%args) -> [status, msg, result, meta]
 
 List results in results directory.
 
@@ -816,7 +942,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 list_bencher_scenario_modules(%args) -> [status, msg, result, meta]
+=head2 list_bencher_scenario_modules
+
+Usage:
+
+ list_bencher_scenario_modules(%args) -> [status, msg, result, meta]
 
 List Bencher scenario modules.
 
@@ -865,7 +995,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

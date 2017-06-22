@@ -3,15 +3,15 @@ abstract: 'A utility class for building table layouts in a PDF::API2 object.'
 author:
   - 'Desislav Kamenov <omega@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: PDF-Table
 no_index:
   directory:
@@ -21,4 +21,4 @@ requires: {}
 resources:
   bugtracker: https://github.com/kamenov/PDF-Table/issues
   repository: https://github.com/kamenov/PDF-Table
-version: v0.9.12
+version: v0.9.13

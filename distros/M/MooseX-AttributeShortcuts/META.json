@@ -90,19 +90,19 @@
    "provides" : {
       "MooseX::AttributeShortcuts" : {
          "file" : "lib/MooseX/AttributeShortcuts.pm",
-         "version" : "0.031"
+         "version" : "0.032"
       },
       "MooseX::AttributeShortcuts::Trait::Attribute" : {
          "file" : "lib/MooseX/AttributeShortcuts/Trait/Attribute.pm",
-         "version" : "0.031"
+         "version" : "0.032"
       },
       "MooseX::AttributeShortcuts::Trait::Attribute::HasAnonBuilder" : {
          "file" : "lib/MooseX/AttributeShortcuts/Trait/Attribute/HasAnonBuilder.pm",
-         "version" : "0.031"
+         "version" : "0.032"
       },
       "MooseX::AttributeShortcuts::Trait::Role::Attribute" : {
          "file" : "lib/MooseX/AttributeShortcuts/Trait/Role/Attribute.pm",
-         "version" : "0.031"
+         "version" : "0.032"
       }
    },
    "release_status" : "stable",
@@ -117,7 +117,7 @@
          "web" : "https://github.com/RsrchBoy/moosex-attributeshortcuts"
       }
    },
-   "version" : "0.031",
+   "version" : "0.032",
    "x_BuiltWith" : {
       "modules" : {
          "CPAN::Meta" : "2.150005",
@@ -694,7 +694,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 1,
-                  "tag" : "0.031",
+                  "tag" : "0.032",
                   "tag_format" : "%v",
                   "tag_message" : "v%v"
                },

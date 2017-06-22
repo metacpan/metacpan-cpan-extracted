@@ -80,7 +80,7 @@ use Geo::OGC::Service;
 use vars qw(@ISA);
 push @ISA, qw(Geo::OGC::Service::Common);
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 our $radius_of_earth_at_equator = 6378137;
 our $standard_pixel_size = 0.28 / 1000;
@@ -167,6 +167,8 @@ Sends a capabilities document according to WMTS standard.
 
 sub GetCapabilities {
     my ($self) = @_;
+    my $config = $self->{config};
+    $config = $self->{plugin}->config($config, $self) if $self->{plugin};
     my $writer = Geo::OGC::Service::XMLWriter::Caching->new();
     $writer->open_element(Capabilities => { 
         version => '1.0.0',
@@ -190,7 +192,7 @@ sub GetCapabilities {
         Geo::OSR::SpatialReference->new(EPSG=>4326) : 
         Geo::OSR::SpatialReference->create(EPSG=>4326);
 
-    for my $set (@{$self->{config}{TileSets}}) {
+    for my $set (@{$config->{TileSets}}) {
         my $projection = $projections{$set->{SRS}};
 
         my $bb;
@@ -227,7 +229,7 @@ sub GetCapabilities {
         push @layer, [ ResourceURL => {
             resourceType => 'tile',
             format => $set->{Format},
-            template => "$self->{config}{resource}/$set->{Layers}/{TileMatrix}/{TileCol}/{TileRow}.$ext"
+            template => "$config->{resource}/$set->{Layers}/{TileMatrix}/{TileCol}/{TileRow}.$ext"
         } ] if $set->{RESTful};
         $writer->element('Layer' => \@layer );
     };
@@ -250,6 +252,9 @@ Sends a capabilities document according to WMS standard.
 sub WMSGetCapabilities {
     my ($self) = @_;
 
+    my $config = $self->{config};
+    $config = $self->{plugin}->config($config, $self) if $self->{plugin};
+
     my $writer = Geo::OGC::Service::XMLWriter::Caching->new();
 
     $writer->open_element(WMT_MS_Capabilities => { version => '1.1.1' });
@@ -257,7 +262,7 @@ sub WMSGetCapabilities {
                          [Name => 'OGC:WMS'],
                          ['Title'],
                          [OnlineResource => {'xmlns:xlink' => "http://www.w3.org/1999/xlink",
-                                             'xlink:href' => $self->{config}{resource}}]]);
+                                             'xlink:href' => $config->{resource}}]]);
     $writer->open_element('Capability');
     $writer->element(Request => 
                      [[GetCapabilities => 
@@ -267,7 +272,7 @@ sub WMSGetCapabilities {
                           [Get => 
                            [OnlineResource => 
                             {'xmlns:xlink' => "http://www.w3.org/1999/xlink",
-                             'xlink:href' => $self->{config}{resource}}]]]]]],
+                             'xlink:href' => $config->{resource}}]]]]]],
                       [GetMap => 
                        [[Format => 'image/png'],
                         [DCPType => 
@@ -275,11 +280,11 @@ sub WMSGetCapabilities {
                           [Get => 
                            [OnlineResource => 
                             {'xmlns:xlink' => "http://www.w3.org/1999/xlink",
-                             'xlink:href' => $self->{config}{resource}}]]]]]]
+                             'xlink:href' => $config->{resource}}]]]]]]
                      ]);
     $writer->element(Exception => [Format => 'text/plain']);
     
-    for my $set (@{$self->{config}{TileSets}}) {
+    for my $set (@{$config->{TileSets}}) {
         my($i0,$i1) = split /\.\./, $set->{Resolutions};
 
         #my @resolutions = @resolutions_3857[$i0..$i1]; # with this QGIS starts to ask higher resolution tiles
@@ -307,7 +312,7 @@ sub WMSGetCapabilities {
     $writer->element(UserDefinedSymbolization => 
                      {SupportSLD => 0, UserLayer => 0, UserStyle => 0, RemoteWFS => 0});
 
-    for my $set (@{$self->{config}{TileSets}}) {
+    for my $set (@{$config->{TileSets}}) {
 
         my $projection = $projections{$set->{SRS}};
 
@@ -347,7 +352,7 @@ should point to the directory.
 sub GetMap {
     my ($self) = @_;
     for my $param (qw/bbox layers srs/) {
-        unless ($self->{parameters}{$param}) {
+        unless (defined $self->{parameters}{$param}) {
             $self->error({ exceptionCode => 'MissingParameterValue',
                            locator => uc($param) });
             return;
@@ -441,13 +446,11 @@ sub GetTile {
     }
     ($self->{parameters}{ext}) = $self->{parameters}{format} =~ /(\w+)$/;
 
-    if ($self->{config}->{serve_arbitrary_layers}) {
-        my %layer = %{$self->{config}->{layer}};
+    if ($self->{config}{serve_arbitrary_layers}) {
         # SRS from tilematrixset
         for my $srs (keys %projections) {
             if ($projections{$srs}{identifier} eq $self->{parameters}{tilematrixset}) {
-                $layer{SRS} = $srs;
-                return $self->make_tile(\%layer);
+                return $self->make_tile({SRS => $srs});
             }
         }
         return $self->error({ exceptionCode => 'UnknownParameterValue',
@@ -572,8 +575,13 @@ sub make_tile {
     my $tile = Geo::OGC::Service::WMTS::Tile->new($projection->{extent}, $self->{parameters});
 
     eval {
-   
-        if ($layer->{processing}) {
+
+        my @headers = ('Content-Type' => "image/png");
+        
+        if ($self->{plugin}) {
+            $ds = $self->{plugin}->process({dataset => $ds, tile => $tile, service => $self, headers => \@headers});
+            
+        } elsif ($layer->{processing}) {
             $tile->expand(2);
             $ds = $ds->Translate( "/vsimem/tmp.tiff", ['-of' => 'GTiff', '-r' => 'bilinear' , 
                                                        '-outsize' , $tile->tile,
@@ -582,15 +590,6 @@ sub make_tile {
             my $z = $layer->{zFactor} // 1;
             $ds = $ds->DEMProcessing("/vsimem/tmp2.tiff", $layer->{processing}, undef, { of => 'GTiff', z => $z });
             $tile->expand(-2);
-        } elsif ($self->{processor}) {
-            $ds = $self->{processor}->process($ds, $tile, $self);
-        }
-
-        my @headers = ('Content-Type' => "image/png");
-        if ($layer->{'no-cache'}) {
-            push @headers, ('Cache-Control' => 'no-cache, no-store, must-revalidate');
-            push @headers, ('Pragma' => 'no-cache');
-            push @headers, ('Expires' => 0);
         }
         
         my $writer = $self->{responder}->([200, \@headers]);
@@ -603,10 +602,17 @@ sub make_tile {
     };
         
     if ($@) {
-        my $err = Geo::GDAL::error();
-        say STDERR "$@\n$err";
+        # subsystems should use newline in error messages
+        # so we can report the error location to stderr but not to the client
+        print STDERR $@;
+        my $gdal_error = Geo::GDAL->errstr;
+        say STDERR $gdal_error if $gdal_error;
+        my @error = split /\n/, $@;
+        while (@error && $error[$#error] =~ /^\s/) {
+            pop @error; # remove the code location
+        }
         return $self->error({ exceptionCode => 'ResourceNotFound',
-                              ExceptionText => 'Internal error' });
+                              ExceptionText => join("\n", @error) });
     }
         
     return undef;
@@ -657,12 +663,14 @@ sub tile_matrix_set {
 
 sub tilemaps {
     my ($self) = @_;
+    my $config = $self->{config};
+    $config = $self->{plugin}->config($config, $self) if $self->{plugin};
     my $writer = Geo::OGC::Service::XMLWriter::Caching->new();
     $writer->open_element(TileMapService => { version => "1.0.0", 
                                               tilemapservice => "http://tms.osgeo.org/1.0.0" });
     $writer->open_element(TileMaps => {});
-    for my $layer (@{$self->{config}{TileSets}}) {
-        $writer->element(TileMap => {href => $self->{config}{resource}.'/'.$layer->{Layers}, 
+    for my $layer (@{$config->{TileSets}}) {
+        $writer->element(TileMap => {href => $config->{resource}.'/'.$layer->{Layers}, 
                                      srs => $layer->{SRS}, 
                                      title => $layer->{Title}, 
                                      profile => 'none'});

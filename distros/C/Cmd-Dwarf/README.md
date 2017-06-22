@@ -206,6 +206,35 @@ GET でログインフォームを表示し、POST で認証ロジックを実�
                 redirect '/';
         }
 
+### REST 的なリクエストの置き場所
+
+単なる習慣であってルールではありません。
+
+`Resources` コントローラには以下を配置。
+
+```
+GET /api/resources => 一覧
+POST /api/resources => 作成
+```
+
+`Resoures::Detail` コントローラには以下を配置。
+
+```
+GET /api/resources/{id} => 詳細
+PUT /api/resources/{id} => 置き換え
+PATCH /api/resources/{id} => 部分置き換え
+DELETE /api/resources/{id} => 削除
+```
+
+`App.pm` にルーティングを追加する
+
+```
+before add_routes => sub {
+    my $self = shift;
+    $self->router->connect("/api/resources/{id:[0-9]+}", { controller => "Api::Resources::Detail" });
+};
+```
+
 ## モデル
 
 Dwarf のモデルは複数のコントローラで共用されるようなロジックを汎用化して実装するためのクラスです。

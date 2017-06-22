@@ -12,7 +12,7 @@ use Crypt::HashCash::Client;
 my @denoms = (1,10);
 
 for (qw(ECDSA RSA)) {
-  my $mint = new Crypt::HashCash::Mint (Create => 1, Clobber => 1);
+  my $mint = new Crypt::HashCash::Mint (Create => 1, Clobber => 1, SpentDB => ':memory:');
   $mint->sigscheme($_); $mint->keysize(1024);
   $mint->{DENOMS} = \@denoms;
   ok($mint->keygen(Mint => 'Test Mint'), "Generate $_ mint keys");

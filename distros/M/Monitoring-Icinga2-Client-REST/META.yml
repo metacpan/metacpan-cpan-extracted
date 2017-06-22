@@ -1,0 +1,32 @@
+---
+abstract: 'REST integration with icinga2'
+author:
+  - 'Johan Carlquist <jocar@su.se>'
+  - 'Mikael Nordin <mikael.nordin@su.se'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Monitoring-Icinga2-Client-REST
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Encode: 0
+  ExtUtils::MakeMaker: 0
+  HTTP::Request: 0
+  JSON: 0
+  LWP::UserAgent: 0
+  Scalar::Util: 0
+  URI::Escape: 0
+  strict: 0
+  warnings: 0
+version: v2.0.0

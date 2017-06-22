@@ -1,31 +1,31 @@
 package Geo::Coordinates::OSGB::Grid;
 
 use Geo::Coordinates::OSGB::Maps qw{%maps %name_for_map_series};
-use Geo::Coordinates::OSGB qw{is_grid_in_ostn02};
+use Geo::Coordinates::OSGB qw{get_ostn02_shift_pair};
 
 use base qw(Exporter);
 use strict;
 use warnings;
 use Carp;
-use 5.008; # At least Perl 5.8 please
+use 5.008; # At least Perl 5.08 please, be sure to change POD below if you update
 
-our $VERSION = '2.17';
+our $VERSION = '2.18';
 
-our %EXPORT_TAGS = (all => [qw( 
-        parse_grid 
+our %EXPORT_TAGS = (all => [qw(
+        parse_grid
         format_grid
 
-        parse_trad_grid 
-        parse_GPS_grid 
+        parse_trad_grid
+        parse_GPS_grid
         parse_landranger_grid
         parse_map_grid
-        
-        format_grid_trad 
-        format_grid_GPS 
+
+        format_grid_trad
+        format_grid_GPS
         format_grid_landranger
         format_grid_map
-        
-        random_grid 
+
+        random_grid
         )]);
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{all} } );
@@ -38,7 +38,7 @@ use constant MAJOR_GRID_SQ_EASTING_OFFSET  => 2 * MAJOR_GRID_SQ_SIZE;
 use constant MAJOR_GRID_SQ_NORTHING_OFFSET => 1 * MAJOR_GRID_SQ_SIZE;
 use constant MAX_GRID_SIZE => MINOR_GRID_SQ_SIZE * length GRID_SQ_LETTERS;
 
-# Produce a random GR 
+# Produce a random GR
 # A simple approach would pick 0 < E < 700000 and 0 < N < 1250000 but that way
 # many GRs produced would be in the sea, so pick a random map, and then find a
 # random GR within its bbox and finally check that the resulting pair is
@@ -59,14 +59,21 @@ sub random_grid {
     else {
         @sheets = keys %maps;
     }
-    my ($map, $lle, $lln, $ure, $urn, $easting, $northing);
+    my $margin = 5000;
+    my ($map, $lle, $lln, $ure, $urn);
+    my ($easting, $northing);
     while (1) {
         $map = $maps{$sheets[int rand @sheets]};
         ($lle, $lln) = @{$map->{bbox}->[0]};
         ($ure, $urn) = @{$map->{bbox}->[1]};
-        $easting  = sprintf "%.3f", $lle + rand ($ure-$lle);
-        $northing = sprintf "%.3f", $lln + rand ($urn-$lln);
-        last if is_grid_in_ostn02($easting, $northing) 
+        $easting  = sprintf '%.3f', $lle + rand ($ure-$lle);
+        $northing = sprintf '%.3f', $lln + rand ($urn-$lln);
+        # check we are well inside OSTN02 and actually on the chosen map
+        last if get_ostn02_shift_pair($easting, $northing)
+             && get_ostn02_shift_pair($easting, $northing+$margin)
+             && get_ostn02_shift_pair($easting, $northing-$margin)
+             && get_ostn02_shift_pair($easting+$margin, $northing)
+             && get_ostn02_shift_pair($easting-$margin, $northing)
              && 0 != _winding_number($easting, $northing, $map->{polygon});
     }
     return ($easting, $northing);
@@ -93,13 +100,13 @@ sub format_grid {
             if ($m->{bbox}->[0][0] <= $easting  && $easting  < $m->{bbox}->[1][0]
              && $m->{bbox}->[0][1] <= $northing && $northing < $m->{bbox}->[1][1]) {
                 my $w = _winding_number($easting, $northing, $m->{polygon});
-                if ($w != 0) { 
+                if ($w != 0) {
                     push @sheets, $k;
                 }
             }
         }
         @sheets = sort @sheets;
-    } 
+    }
 
     # special cases
     if ( $form eq 'TRAD' ) {
@@ -122,12 +129,12 @@ sub format_grid {
             return ($sq, $e, $n, @sheets)
         }
 
-        my $gr = sprintf "%s%s%0.*d%s%0.*d", $sq, $space_a, $e_len, $e, $space_b, $n_len, $n;
+        my $gr = sprintf '%s%s%0.*d%s%0.*d', $sq, $space_a, $e_len, $e, $space_b, $n_len, $n;
         $gr =~ s/\s+/ /g;
 
         if ( $with_maps ) {
             if ( @sheets ) {
-                return sprintf '%s on %s', $gr, join ', ', @sheets; 
+                return sprintf '%s on %s', $gr, join ', ', @sheets;
             }
             else {
                 return sprintf '%s is not on any maps in series %s', $gr, $map_keys;
@@ -170,7 +177,7 @@ sub format_grid_landranger {
     for my $s (@sheets) {
         $s =~ s/\AA://xsm;
     }
-    
+
     return ($sq, $e, $n, @sheets) if wantarray;
 
     if (!@sheets )    { return sprintf '%s %03d %03d is not on any Landranger sheet', $sq, $e, $n }
@@ -184,7 +191,7 @@ sub format_grid_landranger {
 
 sub _grid_to_sq {
     my ($e, $n) = @_;
-    
+
     $e += MAJOR_GRID_SQ_EASTING_OFFSET;
     $n += MAJOR_GRID_SQ_NORTHING_OFFSET;
     return if !(0 <= $e && $e < MAX_GRID_SIZE && 0 <= $n && $n < MAX_GRID_SIZE);
@@ -193,15 +200,15 @@ sub _grid_to_sq {
     $e = $e % MAJOR_GRID_SQ_SIZE;
     $n = $n % MAJOR_GRID_SQ_SIZE;
     my $minor_index = int $e / MINOR_GRID_SQ_SIZE + GRID_SIZE * int $n / MINOR_GRID_SQ_SIZE;
-    return 
+    return
        substr(GRID_SQ_LETTERS, $major_index, 1) .
        substr(GRID_SQ_LETTERS, $minor_index, 1);
 }
 
 sub _get_grid_square_offsets {
     my $s = shift;
-    return unless length $s > 1;
-    
+    return if length $s < 2;
+
     my $a = index GRID_SQ_LETTERS, uc substr $s, 0, 1;
     return if 0 > $a;
 
@@ -212,7 +219,7 @@ sub _get_grid_square_offsets {
     my ($x, $y) = ($b % GRID_SIZE, int $b / GRID_SIZE);
 
     return (
-        MAJOR_GRID_SQ_SIZE * $X - MAJOR_GRID_SQ_EASTING_OFFSET  + MINOR_GRID_SQ_SIZE * $x, 
+        MAJOR_GRID_SQ_SIZE * $X - MAJOR_GRID_SQ_EASTING_OFFSET  + MINOR_GRID_SQ_SIZE * $x,
         MAJOR_GRID_SQ_SIZE * $Y - MAJOR_GRID_SQ_NORTHING_OFFSET + MINOR_GRID_SQ_SIZE * $y
     );
 }
@@ -222,13 +229,13 @@ sub _get_eastnorthings {
     my $numbers = $s;
     $numbers =~ tr/0-9//cd; # avoid using "r" here as it requires perl >= 5.14
     my $len = length $numbers;
-    croak "No easting or northing found" if $len == 0;
+    croak 'No easting or northing found' if $len == 0;
     croak "Easting and northing have different lengths in $s" if $len % 2;
     croak "Too many digits in $s" if $len > 10;
 
     # this trick lets us pad with zeros on the right
-    my $e = reverse sprintf "%05d", scalar reverse substr $numbers, 0, $len/2;
-    my $n = reverse sprintf "%05d", scalar reverse substr $numbers,    $len/2;
+    my $e = reverse sprintf '%05d', scalar reverse substr $numbers, 0, $len/2;
+    my $n = reverse sprintf '%05d', scalar reverse substr $numbers,    $len/2;
     return ($e, $n)
 }
 
@@ -240,7 +247,7 @@ sub parse_grid {
 
     my @out;
 
-    my $s = @_ < 3 ? "@_" : sprintf "%s %0.*d %0.*d", $_[0], $figs, $_[1], $figs, $_[2];
+    my $s = @_ < 3 ? "@_" : sprintf '%s %0.*d %0.*d', $_[0], $figs, $_[1], $figs, $_[2];
 
     # normal case : TQ 123 456 etc
     if ( my ($E, $N) = _get_grid_square_offsets($s) ) {
@@ -250,16 +257,20 @@ sub parse_grid {
     }
 
     # sheet id instead of grid sq
-    my $sheet_ref_pattern = qr'\A([A-Z]:)?([0-9NEWSOL/]+?)(\.[a-z]+)?(?:[ -/.]([ 0-9]+))?\Z'msxio;
-    my ($prefix, $sheet, $suffix, $numbers) = $s =~ m/$sheet_ref_pattern/;
+    my $sheet_ref_pattern = qr{\A([A-Z]:)?([0-9NEWSOL/]+?)(\.[a-z]+)?(?:[ -/.]([ 0-9]+))?\Z};
+    my ($prefix, $sheet, $suffix, $numbers) = $s =~ m/$sheet_ref_pattern/sioxm;
 
     if (defined $sheet) {
 
-        $prefix //= "A:";
-        $suffix //= "";
+        if ( ! defined $prefix ) {
+            $prefix = 'A:';
+        }
+        if ( ! defined $suffix ) {
+            $suffix = q{};
+        }
         $sheet = $prefix . $sheet . $suffix;
 
-        if (exists $maps{$sheet}) { 
+        if (exists $maps{$sheet}) {
             my ($E, $N)  = @{$maps{$sheet}->{bbox}[0]};  # NB we need the bbox corner so that it is left and below all points on the map
 
             if (defined $numbers) {
@@ -269,7 +280,7 @@ sub parse_grid {
 
                 my $w = _winding_number($E, $N, $maps{$sheet}->{polygon});
                 if ($w == 0) {
-                    croak sprintf "Grid reference %s = (%d, %d) is not on sheet %s", scalar format_grid($E,$N), $e, $n, $sheet;
+                    croak sprintf 'Grid reference %s = (%d, %d) is not on sheet %s', scalar format_grid($E,$N), $e, $n, $sheet;
                 }
             }
             return wantarray ? ($E, $N) : "$E $N";
@@ -326,20 +337,20 @@ Geo::Coordinates::OSGB::Grid - Format and parse British National Grid references
 
 =head1 VERSION
 
-2.17
+2.18
 
 =head1 SYNOPSIS
 
   use Geo::Coordinates::OSGB::Grid qw/parse_grid format_grid/;
 
   my ($e,$n) = parse_grid('TQ 23451 09893');
-  my $gr     = format_grid($e, $n); # "TQ 234 098"     
+  my $gr     = format_grid($e, $n); # "TQ 234 098"
 
 =head1 DESCRIPTION
 
 This module provides useful functions for parsing and formatting OSGB
 grid references.  Some detailed background is given in C<background.pod>
-and on the OS web site.  
+and on the OS web site.
 
 =head1 SUBROUTINES AND METHODS
 
@@ -347,7 +358,7 @@ and on the OS web site.
 
 Formats an (easting, northing) pair into traditional `full national grid
 reference' with two letters and two sets of three numbers, like this `SU
-387 147'.  
+387 147'.
 
     $gridref = format_grid(438710.908, 114792.248); # SU 387 147
 
@@ -370,18 +381,18 @@ one or more of the keys shown below (with the default values).
 
 =over 4
 
-=item form  
+=item form
 
 Controls the format of the grid reference.  With C<$e, $n> set as above:
 
-    Format          produces        Format            produces       
+    Format          produces        Format            produces
     ----------------------------------------------------------------
     'SS'            SU
-    'SSEN'          SU31            'SS E N'          SU 3 1         
-    'SSEENN'        SU3814          'SS EE NN'        SU 38 14       
-    'SSEEENNN'      SU387147        'SS EEE NNN'      SU 387 147     
-    'SSEEEENNNN'    SU38711479      'SS EEEE NNNN'    SU 3871 1479 
-    'SSEEEEENNNNN'  SU3871014792    'SS EEEEE NNNNN'  SU 38710 14792 
+    'SSEN'          SU31            'SS E N'          SU 3 1
+    'SSEENN'        SU3814          'SS EE NN'        SU 38 14
+    'SSEEENNN'      SU387147        'SS EEE NNN'      SU 387 147
+    'SSEEEENNNN'    SU38711479      'SS EEEE NNNN'    SU 3871 1479
+    'SSEEEEENNNNN'  SU3871014792    'SS EEEEE NNNNN'  SU 38710 14792
 
 You can't leave out the SS, you can't have N before E, and there must be
 the same number of Es and Ns.
@@ -399,7 +410,7 @@ you want just the local easting and northing without the grid square,
 get the individual parts in a list context and format them yourself:
 
     my $gr = sprintf('Grid ref %2$s %3$s on Sheet %4$s', format_grid_landranger($e, $n))
-    # returns: Grid ref 387 147 on Sheet 196 
+    # returns: Grid ref 387 147 on Sheet 196
 
 =item maps
 
@@ -434,7 +445,7 @@ C<J> : Harvey Super Walker maps - mainly at 1:25000
 
 so if you only want Explorer maps use: C<< series => 'B' >>, and if you
 want only Explorers and Landrangers use: C<< series => 'AB' >>, and so
-on. 
+on.
 
 Note that the numbers returned for the Harvey maps have been invented
 for the purposes of this module.  They do not appear on the maps
@@ -442,7 +453,7 @@ themselves; instead the maps have titles.  You can use the numbers
 returned as an index to the data in L<Geo::Coordinates::OSGB::Maps> to
 find the appropriate title.
 
-=back 
+=back
 
 =head2 C<format_grid_trad(e,n)>
 
@@ -460,7 +471,7 @@ Equivalent to C<< format_grid(e,n, { maps => 1 }) >>.
 
 Equivalent to
 
-   format_grid(e,n,{ form => 'ss eee nnn', maps => 1, series => 'A' }) 
+   format_grid(e,n,{ form => 'ss eee nnn', maps => 1, series => 'A' })
 
 except that the leading "A:" will be stripped from any sheet names
 returned, and you get a slightly fancier set of phrases in a scalar
@@ -478,14 +489,14 @@ The arguments should be in one of the following forms
 
 =over 4
 
-=item * 
+=item *
 
 A single string representing a grid reference
 
-  String                        ->  interpreted as   
+  String                        ->  interpreted as
   --------------------------------------------------
-  parse_grid("TA 123 678")      ->  (512300, 467800) 
-  parse_grid("TA 12345 67890")  ->  (512345, 467890) 
+  parse_grid("TA 123 678")      ->  (512300, 467800)
+  parse_grid("TA 12345 67890")  ->  (512345, 467890)
 
 The spaces are optional in all cases.  You can also refer to a 100km
 square as C<TA> which will return C<(500000,400000)>, a 10km square as
@@ -494,17 +505,17 @@ as C<TA1267> which gives C<(512000, 467000)>.  For completeness you can
 also use C<TA 1234 6789> to refer to a decametre square C<(512340,
 467890)> but you might struggle to find a use for that one.
 
-=item * 
+=item *
 
 A list representing a grid reference
 
-  List                             ->  interpreted as   
+  List                             ->  interpreted as
   -----------------------------------------------------
-  parse_grid('TA', 0, 0)           ->  (500000, 400000) 
-  parse_grid('TA', 123, 678)       ->  (512300, 467800) 
-  parse_grid('TA', 12345, 67890)   ->  (512345, 467890) 
-  parse_grid('TA', '123 678')      ->  (512300, 467800) 
-  parse_grid('TA', '12345 67890')  ->  (512345, 467890) 
+  parse_grid('TA', 0, 0)           ->  (500000, 400000)
+  parse_grid('TA', 123, 678)       ->  (512300, 467800)
+  parse_grid('TA', 12345, 67890)   ->  (512345, 467890)
+  parse_grid('TA', '123 678')      ->  (512300, 467800)
+  parse_grid('TA', '12345 67890')  ->  (512345, 467890)
 
 If you are processing grid references from some external data source
 beware that if you use a list with bare numbers you may lose any leading
@@ -514,25 +525,25 @@ preserve the leading digits or supply a hash of options as a fourth
 argument with the `figs' option to define how many figures are supposed
 to be in each easting and northing.  Like this:
 
-  List                                     ->  interpreted as   
+  List                                     ->  interpreted as
   -------------------------------------------------------------
-  parse_grid('TA', 123, 8)                 ->  (512300, 400800) 
-  parse_grid('TA', 123, 8, { figs => 5 })  ->  (500123, 400008) 
+  parse_grid('TA', 123, 8)                 ->  (512300, 400800)
+  parse_grid('TA', 123, 8, { figs => 5 })  ->  (500123, 400008)
 
 The default setting of figs is 3, which assumes you are using
 hectometres as in a traditional grid reference.
 
-=item * 
+=item *
 
 A string or list representing a map sheet and a grid reference on that
 sheet
 
-     Map input                      ->  interpreted as    
+     Map input                      ->  interpreted as
      ----------------------------------------------------
-     parse_grid('A:164/352194')     ->  (435200, 219400) 
-     parse_grid('B:OL43E/914701')   ->  (391400, 570100) 
-     parse_grid('B:OL43E 914 701')  ->  (391400, 570100) 
-     parse_grid('B:OL43E','914701') ->  (391400, 570100) 
+     parse_grid('A:164/352194')     ->  (435200, 219400)
+     parse_grid('B:OL43E/914701')   ->  (391400, 570100)
+     parse_grid('B:OL43E 914 701')  ->  (391400, 570100)
+     parse_grid('B:OL43E','914701') ->  (391400, 570100)
      parse_grid('B:OL43E',914,701)  ->  (391400, 570100)
 
 Again spaces are optional, but you need some non-digit between the map
@@ -546,8 +557,8 @@ more than one.  The given example would fail if the map was given as
 If you give the identifier as just a number, it's assumed that you
 wanted a Landranger map;
 
-     parse_grid('176/224711')  ->  (522400, 171100) 
-     parse_grid(164,513,62)    ->  (451300, 206200) 
+     parse_grid('176/224711')  ->  (522400, 171100)
+     parse_grid(164,513,62)    ->  (451300, 206200)
 
 C<parse_grid> will croak of you pass it a sheet identifier that is not
 defined in L<Geo::Coordinates::OSGB::Maps>.  It will also croak if the
@@ -564,7 +575,7 @@ for some of the oddly shaped 1:25000 sheets, or Harvey's maps.  What you actuall
 is the first point defined in the maps polygon, as defined in Maps.  If in doubt you
 should work directly with the data in L<Geo::Coordinates::OSGB::Maps>.
 
-=back  
+=back
 
 =head2 C<parse_trad_grid(grid_ref)>
 
@@ -599,17 +610,17 @@ of the areas covered by the OSTN02 data set.
 =item *
 
 If you omit the list of sheets, then one of map sheets defined in
-L<Geo::Coordinates::OSGB::Maps> will be picked at random.  
+L<Geo::Coordinates::OSGB::Maps> will be picked at random.
 
 =item *
 
 As a convenience whole numbers in the range 1..204 will be interpreted
-as Landranger sheets, as if you had written C<A:1>, C<A:2>, etc. 
+as Landranger sheets, as if you had written C<A:1>, C<A:2>, etc.
 
 =item *
 
 Any sheet identifiers in the list that are not defined in
-L<Geo::Coordinates::OSGB::Maps> will be (silently) ignored.  
+L<Geo::Coordinates::OSGB::Maps> will be (silently) ignored.
 
 =item *
 
@@ -621,9 +632,9 @@ that they are suitable for input to the C<format_grid> routines.
 
 =head1 EXAMPLES
 
-  use Geo::Coordinates::OSGB::Grid 
-     qw/parse_grid 
-        format_grid 
+  use Geo::Coordinates::OSGB::Grid
+     qw/parse_grid
+        format_grid
         format_grid_landranger/;
 
   # Get full coordinates in metres from GR
@@ -631,10 +642,10 @@ that they are suitable for input to the C<format_grid> routines.
 
   # Reading and writing grid references
   # Format full easting and northing into traditional formats
-  my $gr1 = format_grid($e, $n);                              # "TQ 234 098"     
-  my $gr2 = format_grid($e, $n, { form => 'SSEEENNN' } );     # "TQ234098"       
-  my $gr3 = format_grid($e, $n, { form => 'SSEEEEENNNNN'} );  # "TQ 23451 09893" 
-  my $gr4 = format_grid($e, $n, { form => 'gps'} );           # "TQ 23451 09893" 
+  my $gr1 = format_grid($e, $n);                              # "TQ 234 098"
+  my $gr2 = format_grid($e, $n, { form => 'SSEEENNN' } );     # "TQ234098"
+  my $gr3 = format_grid($e, $n, { form => 'SSEEEEENNNNN'} );  # "TQ 23451 09893"
+  my $gr4 = format_grid($e, $n, { form => 'gps'} );           # "TQ 23451 09893"
   my $gr5 = format_grid_landranger($e, $n);# "TQ 234 098 on Landranger sheet 198"
 
   # or call in list context to get the individual parts
@@ -649,7 +660,7 @@ that they are suitable for input to the C<format_grid> routines.
   # You can also get grid refs from individual maps.
   # Sheet between 1..204; gre & grn must be 3 or 5 digits long
   ($e,$n) = parse_grid(176,123,994);
-  # put leading zeros in quotes 
+  # put leading zeros in quotes
   ($e,$n) = parse_grid(196,636,'024');
 
 For more examples of parsing and formatting look at the test files.
@@ -663,7 +674,7 @@ outside this useful area.  For example we have St Peter Port in Guernsey at
 C<XD 611 506> and Rockall at C<MC 035 165>.  The working area runs from square
 C<AA> in the far north west to C<ZZ> in the far south east.  In WGS84 terms the
 corners run from 64.75N 32.33W (Iceland) to 65.8N 22.65E (Norway) to 44.5N
-11.8E (Venice) to 44N 19.5W (the Western Approaches).  This is something of a 
+11.8E (Venice) to 44N 19.5W (the Western Approaches).  This is something of a
 geodesy toy rather than a useful function.
 
 =head1 DIAGNOSTICS
@@ -682,7 +693,7 @@ Format ... was not recognized
 The format code you supplied with C<< { form => ... } >> did not match
 any of the expected patterns.
 
-=item * 
+=item *
 
 Too far off the grid: ...
 
@@ -705,7 +716,7 @@ No easting or northing found
 This means you passed something more than a 2-letter grid square but
 there were no numbers found in the latter part of the string.
 
-=item * 
+=item *
 
 Easting and northing have different lengths in ...
 
@@ -775,12 +786,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 =head1 AUTHOR
 
-Toby Thurston -- 16 Feb 2016 
+Toby Thurston -- 12 Jun 2017
 
 toby@cpan.org
 
 =head1 SEE ALSO
 
-See L<Geo::Coordinates::OSGB>. 
+See L<Geo::Coordinates::OSGB>.
 
 =cut

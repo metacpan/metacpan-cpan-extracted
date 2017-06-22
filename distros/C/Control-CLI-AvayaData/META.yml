@@ -18,9 +18,9 @@ name: Control-CLI-AvayaData
 provides:
   Control::CLI::AvayaData:
     file: lib/Control/CLI/AvayaData.pm
-    version: 2.02
+    version: 2.03
 requires:
   Control::CLI: 2.02
 resources:
   license: http://dev.perl.org/licenses/
-version: 2.02
+version: 2.03

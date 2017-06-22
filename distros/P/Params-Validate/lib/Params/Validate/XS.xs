@@ -1332,9 +1332,12 @@ validate(HV* p, HV* specs, HV* options, HV* ret) {
     apply_defaults(ret, p, specs, missing);
 
     if (av_len(missing) > -1) {
+        SV *buffer;
+        SV *caller;
+
         sortsv(AvARRAY(missing), 1 + av_len(missing), Perl_sv_cmp);
-        SV* buffer = newSVpv("Mandatory parameter", 0);
-        SV *caller = get_caller(options);
+        buffer = newSVpv("Mandatory parameter", 0);
+        caller = get_caller(options);
 
         if (av_len(missing) > 0) {
             sv_catpv(buffer, "s ");

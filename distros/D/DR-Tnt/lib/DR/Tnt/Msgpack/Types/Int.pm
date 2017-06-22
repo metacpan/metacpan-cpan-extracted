@@ -38,7 +38,8 @@ sub TO_MSGPACK {
 
 sub TO_JSON {
     my ($self) = @_;
-    return $$self // 'null';
+    return undef unless defined $$self;
+    return int $$self;
 }
 
 

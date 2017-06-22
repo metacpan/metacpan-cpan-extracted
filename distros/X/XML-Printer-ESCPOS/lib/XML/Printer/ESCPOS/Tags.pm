@@ -3,10 +3,14 @@ package XML::Printer::ESCPOS::Tags;
 use strict;
 use warnings;
 use Text::Wrapper;
+use Text::Wrap;
 use GD;
+use List::Util;
+use List::MoreUtils;
+use Array::Utils;
 
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head2 new
 
@@ -52,6 +56,7 @@ sub tag_allowed {
         utf8ImagedText
         justify
         hr
+        table
         /;
 }
 
@@ -105,11 +110,63 @@ Helper method to add global options to object options.
 =cut
 
 sub include_global_options {
-    my ($self, $options) = @_;
+    my ($self, $options, $tag) = @_;
+    return {} if !$tag;
 
-    return {
+    my %options_allowed = (
+        text            => [qw/
+                                bodystart
+                                wordwrap
+                            /],
+        qr              => [qw/
+                                ecc
+                                moduleSize
+                                version
+                            /],
+        barcode         => [qw/
+                                barcode
+                                font
+                                height
+                                HRIPosition
+                                lineHeight
+                                system
+                                width
+                            /],
+        utf8ImagedText  => [qw/
+                                bodystart
+                                fontFamily
+                                fontSize
+                                fontStyle
+                                lineHeight
+                                paperWidth
+                                wordwrap
+                            /],
+        table           => [qw/
+                                align
+                                colspan
+                                fontFamily
+                                fontSize
+                                fontStyle
+                                leftBorder
+                                lineHeight
+                                paperWidth
+                                rightBorder
+                                separator
+                                width
+                                wordwrap
+                            /],
+    );
+
+    my $tag_allowed = !!grep { $tag eq $_ } keys %options_allowed;
+    return {} if !$tag_allowed;
+
+    $options = {
         %{ $self->{global_options} // {} },
         %$options,
+    };
+
+    return {
+        map { $_ => $options->{$_} } Array::Utils::intersect(@{$options_allowed{$tag}}, @{[keys %$options]})
     };
 }
 
@@ -144,7 +201,7 @@ sub _text {
     return $self->{caller}->_set_error_message("wrong text tag usage") if @$params != 3;
     return $self->{caller}->_set_error_message("wrong text tag usage") if ref $params->[0] ne 'HASH';
     return $self->{caller}->_set_error_message("wrong text tag usage") if $params->[1] != 0;
-    my $options = $self->include_global_options($params->[0]);
+    my $options = $self->include_global_options($params->[0], 'text');
     if ( exists $options->{wordwrap} ) {
         my $columns = delete $options->{wordwrap} || 49;
         if ( $columns !~ /^\d+$/ or $columns < 1 ) {
@@ -259,7 +316,7 @@ sub _qr {
     return $self->{caller}->_set_error_message("wrong QR code tag usage") if @$params != 3;
     return $self->{caller}->_set_error_message("wrong QR code tag usage") if ref $params->[0] ne 'HASH';
     return $self->{caller}->_set_error_message("wrong QR code tag usage") if $params->[1] != 0;
-    my $options = $self->include_global_options($params->[0]);
+    my $options = $self->include_global_options($params->[0], 'qr');
     if (%$options) {
         $self->{printer}->qr( $params->[2], $options->{ecc} || 'L', $options->{version} || 5, $options->{moduleSize} || 3 );
     }
@@ -282,7 +339,7 @@ sub _barcode {
     return $self->{caller}->_set_error_message("wrong barcode tag usage") if @$params != 3;
     return $self->{caller}->_set_error_message("wrong barcode tag usage") if ref $params->[0] ne 'HASH';
     return $self->{caller}->_set_error_message("wrong barcode tag usage") if $params->[1] != 0;
-    my $options = $self->include_global_options($params->[0]);
+    my $options = $self->include_global_options($params->[0], 'barcode');
     if (%$options) {
         $self->{printer}->barcode( barcode => $params->[2], map { $_ => $options->{$_} } sort keys %$options );
     }
@@ -308,7 +365,7 @@ sub _utf8ImagedText {
     return $self->{caller}->_set_error_message("wrong utf8ImagedText tag usage") if @$params != 3;
     return $self->{caller}->_set_error_message("wrong utf8ImagedText tag usage") if ref $params->[0] ne 'HASH';
     return $self->{caller}->_set_error_message("wrong utf8ImagedText tag usage") if $params->[1] != 0;
-    my $options = $self->include_global_options($params->[0]);
+    my $options = $self->include_global_options($params->[0], 'utf8ImagedText');
     if (%$options) {
         if ( exists $options->{wordwrap} ) {
             my $columns = delete $options->{wordwrap} || 49;
@@ -510,7 +567,7 @@ sub _hr {
             if $thickness !~ /^\d+$/ or $thickness < 1;
     }
 
-    my $width = $params->[0]->{width} || $self->{paperWidth} || $self->{print_area_width} || 512;
+    my $width = $params->[0]->{width} || $self->{global_options}->{paperWidth} || $self->{global_options}->{printAreaWidth} || 512;
     my $img = GD::Image->new( $width, $thickness );
     my $black = $img->colorAllocate( 0, 0, 0 );
 
@@ -632,6 +689,314 @@ sub _justify {
 
     $self->{justify_state} = $justify_state_before;
     return 1;
+}
+
+=head2 _table
+
+Prints text in table format. By now, this tool is only helpful for monospaced fonts.
+Possible cell parameters are width (only in pattern row), colspan and align (right, left, center).
+Possible line parameters are fontStyle and align.
+Possible table parameters are fontSize, wordwrap, lineHeight, paperWidth, separator,
+leftBorder, rightBorder and fontStyle.
+
+=cut
+
+sub _table {
+    my ( $self, $params ) = @_;
+
+    return if not $self->check_table_validity($params);
+
+    # get cell options from pattern row
+    my @pattern = grep { ref $params->[$_-1] eq '' && $params->[$_-1] eq 'pattern' } 1..@$params; # index
+    my @cell_options = ();
+    if (@pattern) {
+        @pattern = @{$params->[$pattern[0]]} if @pattern; # first pattern row
+        my $pattern_options = $pattern[0]; # pattern row options
+        my @cell_option_indices = grep { ref $pattern[$_-1] eq '' && $pattern[$_-1] eq 'td' } 1 .. @pattern;
+        @cell_options = map { {
+            %$pattern_options,
+            %{$pattern[$_]->[0]}
+        } } @cell_option_indices;
+    }
+
+    # get rows and cells
+    my @lines = get_rows_and_cells($params, @cell_options);
+
+    my $separator       = $params->[0]->{separator}     || ' ';
+    my $left_border     = $params->[0]->{leftBorder}    || '';
+    my $right_border    = $params->[0]->{rightBorder}   || '';
+
+    # calculate column widths
+    my $options = $self->include_global_options($params->[0], 'table');
+    my @column_widths = calculate_table_column_widths({
+        lines           => \@lines,
+        cell_options    => \@cell_options,
+        linewidth       => $options->{wordwrap} || 60,
+        separator       => $separator,
+        left_border     => $left_border,
+        right_border    => $right_border,
+    });
+
+    # break lines
+    @lines = break_table_lines({
+        lines           => \@lines,
+        column_widths   => \@column_widths,
+        separator       => $separator,
+    });
+
+    # print table
+    for my $line (@lines) {
+        my %line_options = (
+            %$options,
+            %{$line->[0] || {}},
+        );
+        my $tag = $line->[0]->{tag};
+        if ($tag eq 'tr') {
+            my $i = 0;
+            my $string = $left_border . join($separator, map {
+                my $colspan = exists $_->{options}->{colspan} ? $_->{options}->{colspan} : 1;
+                my $columnwidth = length($separator) * ($colspan - 1);
+                for my $c (1..$colspan) {
+                    $columnwidth += $column_widths[$i++];
+                }
+                my $text = $_ && $_->{text} ? $_->{text} : '';
+                my $align = $_ && $_->{options} && $_->{options}->{align}
+                    ? $_->{options}->{align} : $line->[0]->{align} || 'left';
+                $align eq 'left'
+                    ? sprintf("%-" . $columnwidth . "s", $text) # left
+                    : $align eq 'right'
+                    ? sprintf("%" . $columnwidth . "s", $text) # right
+                    : sprintf("%-" . $columnwidth . "s", ' ' x int(($columnwidth - length($text)) / 2) . $text) # center                    
+            } @$line[ 1 .. @$line - 1 ]) . $right_border;
+            $self->{printer}->utf8ImagedText( $string, %line_options );
+        }
+        elsif ($tag eq 'hr') {
+            $self->_hr([{thickness => 2, width => $options->{paperWidth} // undef}]);
+        }
+    }
+
+    return 1;
+}
+
+=head2 check_table_validity
+
+Checks validity of table tags and attributes. (Helper for table tag.)
+
+=cut
+
+sub check_table_validity {
+    my $self    = shift;
+    my $params  = shift;
+
+    return $self->{caller}->_set_error_message('wrong table tag usage: not enough parameters given') if @$params < 7;
+    return $self->{caller}->_set_error_message('wrong table tag usage: first parameter needs to be hash') if ref $params->[0] ne 'HASH';
+    
+    # table parameters
+    if (my @attributes = keys %{$params->[0]}) {
+        my @allowed_attributes = ('fontSize', 'wordwrap', 'lineHeight', 'paperWidth', 'separator',
+            'leftBorder', 'rightBorder', 'fontStyle');
+        return $self->{caller}->_set_error_message('wrong table tag usage: some attributes are not allowed') if Array::Utils::array_minus(@attributes, @allowed_attributes);
+        my %digit_attributes = map { $_ => 1 } qw(fontSize wordwrap lineHeight paperWidth);
+        for my $attribute (@attributes) {
+            return $self->{caller}->_set_error_message("wrong table tag usage: attribute $attribute must be a number")
+                if exists $digit_attributes{$attribute} && $params->[0]->{$attribute} =~ m/\D/;
+        }
+    }
+
+    # first level (tr, hr, pattern)
+    if (my @tags = List::MoreUtils::uniq(grep { ref($_) eq '' && $_ =~ m/^[a-zA-Z]+$/ } @$params)) {
+        my @allowed_tags = ('tr', 'hr', 'pattern');
+        return $self->{caller}->_set_error_message('wrong table tag usage: some tags are not allowed') if Array::Utils::array_minus(@tags, @allowed_tags);
+        my @line_options = map { $_->[0] } grep { ref $_ eq 'ARRAY' } @$params;
+        my @attributes = List::MoreUtils::uniq( map { keys %$_ } @line_options );
+        my @allowed_attributes = ('fontStyle', 'align');
+        return $self->{caller}->_set_error_message('wrong table tag usage: some tags are not allowed') if Array::Utils::array_minus(@tags, @allowed_tags);
+        for my $attribute (@attributes) {
+            my @values = List::MoreUtils::uniq( map { $_->{$attribute} } grep { $_->{$attribute} } @line_options );
+            my @allowed_vals = $attribute eq 'align'
+                ? ('left', 'right', 'center') # align
+                : ('Bold', 'Normal', 'Italic'); # fontStyle
+            return $self->{caller}->_set_error_message("wrong table tag usage: attribute $attribute has unallowed value")
+                if Array::Utils::array_minus(@values, @allowed_vals);
+        }
+    }
+
+    # second level (td)
+    if (my @attributes = grep { ref($_) eq '' && $_ =~ m/^[a-zA-Z]+$/ } map { @$_ } grep { ref($_) eq 'ARRAY' } @$params) {
+        return $self->{caller}->_set_error_message('wrong table tag usage: some attributes are not allowed') if grep { $_ ne 'td' } @attributes;
+        my @lines = grep { ref $_ eq 'ARRAY' } @$params;
+        my @cell_options = map { $_->[0] } map { my $line = $_; grep { ref $_ eq 'ARRAY' } @$line } @lines;
+        @attributes = List::MoreUtils::uniq( map { keys %$_ } @cell_options );
+        my @allowed_attributes = ('width', 'align', 'colspan');
+        return $self->{caller}->_set_error_message('wrong table tag usage: some attributes are not allowed') if Array::Utils::array_minus(@attributes, @allowed_attributes);
+        for my $attribute (@attributes) {
+            my @values = List::MoreUtils::uniq( map { $_->{$attribute} } grep { exists $_->{$attribute} } @cell_options );
+            if ($attribute eq 'align') {
+                return $self->{caller}->_set_error_message("wrong table tag usage: attribute $attribute has unallowed value")
+                    if grep { my $val = $_; not grep { $_ eq $val } ('left', 'right', 'center') } @values;
+            }
+            else {
+                # width and colspan: only positive digits
+                return $self->{caller}->_set_error_message("wrong table tag usage: attribute $attribute must be a positive number")
+                    if grep { m/\D/ || !$_ } @values;
+            }
+        }
+    }
+
+    return 1;
+}
+
+=head2 get_rows_and_cells
+
+Returns table rows and cells (options and content). (Helper for table tag.)
+
+=cut
+
+sub get_rows_and_cells {
+    my ($params, @cell_options) = @_;
+
+    my @line_param_indices = List::MoreUtils::indexes { !ref $_ && ($_ eq 'tr' || $_ eq 'hr') } @$params;
+    my @lines = map {
+        my $index = $_ + 1;
+        my @cell_param_indices = List::MoreUtils::indexes { !ref $_ && $_ eq 'td' } @{$params->[$index]};
+        my $i = -1;
+        [
+            {
+                tag => $params->[$index-1],
+                %{ $params->[$index]->[0] } # line options
+            },
+            @cell_param_indices
+                ? map {
+                        my $td_params = $params->[$index]->[$_ + 1];
+                        {
+                            options => {
+                                @cell_options && $cell_options[++$i] ? %{$cell_options[$i]} : (), # include pattern options
+                                %{$td_params->[0] || {}},
+                            },
+                            text    => $td_params->[2],
+                        }
+                    } @cell_param_indices #cells
+                : ()
+        ]
+    } @line_param_indices;
+
+    return @lines;
+}
+
+=head2 calculate_table_column_widths
+
+Calculates the width for each table column. (Helper for table tag.)
+
+=cut
+
+sub calculate_table_column_widths {
+    my $params = shift;
+
+    # write index in each cell
+    my @lines = map {
+        my $line = $_;
+        my $i = -1;
+        ref $line ne 'ARRAY' ? $line : [map {
+            $_->{index} = $i if ($i != -1);
+            $i += $_->{options} && $_->{options}->{colspan} ? $_->{options}->{colspan} : 1;
+            $_
+        } @$line]
+    } @{$params->{lines}};
+
+    # get number of columns
+    my $max_index = List::Util::max( map { map { $_->{index} || 0 } @$_ } @lines ); 
+
+    # get columns' maximum text lengths
+    my @column_widths = map {
+        my $column_index = $_;
+        my $max_cell_width = 0;
+        if (@{$params->{cell_options}} && $params->{cell_options}->[$_]->{width}) {
+            # return width from pattern row if given
+            $max_cell_width = $params->{cell_options}->[$_]->{width};
+        }
+        else {
+            my @column_cells = grep { $_ } map {
+                my $line = $_;
+                my @cell = ref $line eq 'ARRAY'
+                    ? grep { defined $_->{index} && $_->{index} == $column_index } @$line
+                    : ();
+                @cell ? $cell[0] : undef
+            } @lines;
+            $max_cell_width = List::Util::max( map { $_->{options}->{colspan} ? 0 : length $_->{text} } @column_cells );
+        }
+        $max_cell_width
+    } 0 .. $max_index;
+
+    # calculate column widths
+    my $available_length = $params->{linewidth}
+        - length($params->{left_border} . $params->{right_border})
+        - (@column_widths - 1) * length($params->{separator});
+    my @modifiable_column_indices = grep { !@{$params->{cell_options}} || !$params->{cell_options}->[$_]->{width} } 0 .. $#column_widths;
+    while (List::Util::sum(@column_widths) > $available_length) {
+        my $max_width = List::Util::max(@column_widths[@modifiable_column_indices]);
+        my $max_index = List::MoreUtils::first_index {
+            my $index = $_;
+            $column_widths[$index] eq $max_width && grep { $_ == $index } @modifiable_column_indices
+        } 0 .. $#column_widths;
+        my $lineout = List::Util::sum(@column_widths) - $available_length;
+        $column_widths[$max_index] = List::Util::max(int($column_widths[$max_index] / 2), $column_widths[$max_index] - $lineout);
+    }
+
+    return @column_widths;
+}
+
+=head2 break_table_lines
+
+Breaks cell content if it doesn't fit column width and returns table rows and cells (options and content). (Helper for table tag.)
+
+=cut
+
+sub break_table_lines {
+    my $params = shift;
+
+    my @lines           = @{$params->{lines}};
+    my @column_widths   = @{$params->{column_widths}};
+
+    LINE: for (my $i=@lines-1; $i>=0; $i--){
+        next LINE if (ref($lines[$i]) ne 'ARRAY');
+        my @add_lines = ();
+        my $j = 0;
+        my $linecolspan = 0; # colspan included until current cell
+        my @cells = @{$lines[$i]}[1 .. @{$lines[$i]} - 1];
+        CELL: for my $cell (@cells) {
+            my $columnwidth = $column_widths[$j + $linecolspan];
+            # add column width for colspan columns
+            my $colspan = $cell->{options} && $cell->{options}->{colspan} ? $cell->{options}->{colspan} : 1;
+            for (2..$colspan) {
+                $linecolspan++;
+                $columnwidth += length($params->{separator}) + $column_widths[$j + $linecolspan];
+            }
+            $j++ and next CELL if (!$cell->{text});
+            # break lines
+            $Text::Wrap::columns = $columnwidth + 1;
+            my $line_count = 0;
+            my @wrap_lines = split /\n/ => Text::Wrap::wrap('', '', $cell->{text} || '');
+            for my $line ( @wrap_lines ) {
+                if (!$line_count) {
+                    $cell->{text} = $line;
+                }
+                else {
+                    $add_lines[$line_count-1] ||= [$lines[$i]->[0], map { {$_->{options} ? (options => $_->{options}) : ()} } @cells];
+                    $add_lines[$line_count-1]->[$j+1] = {
+                        %$cell,
+                        text => $line,
+                    };
+                }
+                $line_count++;
+            }
+            $j++;
+        }
+        if (@add_lines) {
+            splice(@lines, $i+1, 0, @add_lines);
+        }
+    }
+
+    return @lines;
 }
 
 =head1 NOT YET IMPLEMENTED TAGS

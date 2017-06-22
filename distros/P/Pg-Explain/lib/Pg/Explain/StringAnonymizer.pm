@@ -1,7 +1,7 @@
 package Pg::Explain::StringAnonymizer;
 use strict;
 use Carp;
-use Digest::SHA1 qw( sha1 );
+use Digest::SHA qw( sha1 );
 use warnings;
 use strict;
 
@@ -11,11 +11,11 @@ Pg::Explain::StringAnonymizer - Class to anonymize sets of strings
 
 =head1 VERSION
 
-Version 0.73
+Version 0.74
 
 =cut
 
-our $VERSION = '0.73';
+our $VERSION = '0.74';
 
 =head1 SYNOPSIS
 

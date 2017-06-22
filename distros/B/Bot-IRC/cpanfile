@@ -16,7 +16,7 @@ requires "Math::Expression" => "0";
 requires "Math::Units" => "0";
 requires "Time::Crontab" => "0";
 requires "YAML::XS" => "0";
-requires "perl" => "5.010";
+requires "perl" => "5.012";
 requires "strict" => "0";
 requires "warnings" => "0";
 
@@ -31,12 +31,12 @@ on 'test' => sub {
   requires "Test::Output" => "0";
   requires "blib" => "1.01";
   requires "constant" => "0";
-  requires "perl" => "5.010";
+  requires "perl" => "5.012";
 };
 
 on 'configure' => sub {
   requires "ExtUtils::MakeMaker" => "0";
-  requires "perl" => "5.010";
+  requires "perl" => "5.012";
 };
 
 on 'develop' => sub {

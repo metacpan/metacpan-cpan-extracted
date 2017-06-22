@@ -1,0 +1,26 @@
+requires "HTTP::Throwable::Factory" => "0";
+requires "Log::Any" => "0";
+requires "Moose::Role" => "0";
+requires "perl" => "5.010";
+
+on 'build' => sub {
+  requires "Module::Build" => "0.28";
+};
+
+on 'test' => sub {
+  requires "HTTP::Request" => "0";
+  requires "HTTP::Request::Common" => "0";
+  requires "Plack::Builder" => "0";
+  requires "Plack::Middleware::Auth::JWT" => "0";
+  requires "Plack::Middleware::PrettyException" => "0";
+  requires "Plack::Test" => "0";
+  requires "Test::More" => "0";
+  requires "Web::Request" => "0";
+  requires "strict" => "0";
+  requires "utf8" => "0";
+  requires "warnings" => "0";
+};
+
+on 'configure' => sub {
+  requires "Module::Build" => "0.28";
+};

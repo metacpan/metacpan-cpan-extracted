@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Lite;
 
-our $DATE = '2017-01-16'; # DATE
-our $VERSION = '1.72'; # VERSION
+our $DATE = '2017-06-17'; # DATE
+our $VERSION = '1.74'; # VERSION
 
 use 5.010001;
 # use strict; # already enabled by Mo
@@ -378,7 +378,7 @@ sub hook_after_get_meta {
     # check deps property. XXX this should be done only when we don't wrap
     # subroutine, because Perinci::Sub::Wrapper already checks the deps
     # property.
-    if ($r->{meta}{deps}) {
+    if ($r->{meta}{deps} && !$r->{in_dump} && !$r->{in_completion}) {
         require Perinci::Sub::DepChecker;
         my $res = Perinci::Sub::DepChecker::check_deps($r->{meta}{deps});
         if ($res) {
@@ -523,7 +523,7 @@ Perinci::CmdLine::Lite - A Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.72 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2017-01-16.
+This document describes version 1.74 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2017-06-17.
 
 =head1 SYNOPSIS
 
@@ -759,7 +759,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

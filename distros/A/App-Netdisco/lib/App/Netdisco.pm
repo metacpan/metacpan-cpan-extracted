@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010_000;
 
-our $VERSION = '2.035006';
+our $VERSION = '2.036000';
 use App::Netdisco::Configuration;
 
 use Module::Find ();
@@ -44,8 +44,8 @@ B<Pretty pictures> of your network
 =back
 
 L<App::Netdisco> provides a web frontend with built-in web server, and a
-backend daemon to handle interactive requests such as changing port or device
-properties.
+backend daemon to gather information from your network, and handle
+interactive requests such as changing port or device properties.
 
 =over 4
 
@@ -55,13 +55,16 @@ See the demo at: L<https://netdisco2-demo.herokuapp.com/>
 
 =back
 
-If you have any trouble getting installed or running, check out the
-L<Deployment|App::Netdisco::Manual::Deployment> and
-L<Troubleshooting|App::Netdisco::Manual::Troubleshooting> notes, or speak to
-someone in the C<#netdisco@freenode> IRC channel, or on the L<community email
-list|https://lists.sourceforge.net/lists/listinfo/netdisco-users>.  Before
-installing or upgrading please always review the latest L<Release
-Notes|App::Netdisco::Manual::ReleaseNotes>.
+We have several other pages with tips for
+L<alternate deployment scenarios|App::Netdisco::Manual::Deployment>,
+L<understanding and troubleshooting Netdisco|App::Netdisco::Manual::Troubleshooting>,
+L<tips and tricks for specific platforms|App::Netdisco::Manual::Vendors>,
+and L<all the configuration options|App::Netdisco::Manual::Configuration>.
+
+You can also speak to someone in the C<#netdisco@freenode> IRC channel, or on
+the L<community email list|https://lists.sourceforge.net/lists/listinfo/netdisco-users>.
+Before installing or upgrading please always review the latest
+L<Release Notes|App::Netdisco::Manual::ReleaseNotes>.
 
 =head1 Dependencies
 
@@ -134,10 +137,10 @@ Link some of the newly installed apps into a handy location:
  ln -s ~/perl5/bin/{localenv,netdisco-*} ~/bin/
 
 Test the installation by running the following command, which should only
-produce a status message (it's just a test - you'll start the daemon properly,
-later on):
+produce a status message (it's just a test - you'll start the daemons
+properly, later on):
 
- ~/bin/netdisco-daemon status
+ ~/bin/netdisco-backend status
 
 =head1 Configuration
 
@@ -167,8 +170,8 @@ details.
 
 The database either needs configuring if new, or updating from the current
 release of Netdisco (1.x). You also need vendor MAC address prefixes (OUI
-data) and some MIBs if you want to run the daemon. The following script will
-take care of all this for you:
+data) and some MIBs if you want to run the backend daemon. The following
+script will take care of all this for you:
 
  ~/bin/netdisco-deploy
 
@@ -185,7 +188,7 @@ Run the following command to start the web-app server as a backgrounded daemon
 
 Run the following command to start the job control daemon (port control, etc):
 
- ~/bin/netdisco-daemon start
+ ~/bin/netdisco-backend start
 
 You should take care not to run this Netdisco daemon and the Netdisco 1.x
 daemon at the same time. Similarly, if you use the device discovery with
@@ -203,19 +206,21 @@ the full installation instructions, above. This process is for upgrading
 version 2.x only.
 
 Before upgrading please review the latest L<Release
-Notes|App::Netdisco::Manual::ReleaseNotes>. Then, the process is as follows:
+Notes|App::Netdisco::Manual::ReleaseNotes>. Then the process below should be
+run for each installation:
 
  # upgrade Netdisco
  ~/bin/localenv cpanm --notest App::Netdisco
+ ln -sf ~/perl5/bin/{localenv,netdisco-*} ~/bin/
  
- # apply database schema updates
+ # apply database schema updates, update MIBs and Vendor MACs
  ~/bin/netdisco-deploy
  
- # restart web service
+ # restart web service (if you run it)
  ~/bin/netdisco-web restart
  
- # restart job daemon (if you use it)
- ~/bin/netdisco-daemon restart
+ # restart job daemon (if you run it)
+ ~/bin/netdisco-backend restart
 
 =head1 Tips and Tricks
 

@@ -1,0 +1,12 @@
+0.002    2017-06-21 (PERLANCAR)
+
+         - Rename dist/module from Log-ger-LogAny to Log-ger-Output-LogAny.
+
+         - Adjust to Log::ger 0.002.
+
+         - Add tests.
+
+
+0.001    2017-06-19 (PERLANCAR)
+
+         - First release.

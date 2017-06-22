@@ -4,6 +4,6 @@ severity = 4
 theme = core
 verbose = %f: [%p] %m at line %l, column %c.\n
 
+[-InputOutput::RequireBriefOpen]
 [-Modules::ProhibitMultiplePackages]
-[-Modules::RequireEndWithOne]
 [-Modules::RequireExplicitPackage]

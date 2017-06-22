@@ -1,5 +1,5 @@
 package HackaMol::Molecule;
-$HackaMol::Molecule::VERSION = '0.039';
+$HackaMol::Molecule::VERSION = '0.040';
 #ABSTRACT: Molecule class for HackaMol
 use 5.008;
 use Moose;
@@ -12,7 +12,8 @@ use MooseX::StrictConstructor;
 
 with 'HackaMol::Roles::PhysVecMVRRole',
      'HackaMol::Roles::BondsAnglesDihedralsRole', 
-     'HackaMol::Roles::QmMolRole';
+     'HackaMol::Roles::QmMolRole',
+     'HackaMol::Roles::SelectionRole';
 #, Storage( 'format' => 'JSON', 'io' => 'File' );
 
 extends 'HackaMol::AtomGroup';
@@ -261,7 +262,7 @@ HackaMol::Molecule - Molecule class for HackaMol
 
 =head1 VERSION
 
-version 0.039
+version 0.040
 
 =head1 SYNOPSIS
 
@@ -452,11 +453,13 @@ L<Chemistry::Molecule>
 
 =item * L<HackaMol::Roles::PhysVecMVRRole>
 
-=item * L<HackaMol::Roles::PhysVecMVRRole|HackaMol::Roles::BondsAnglesDihedralsRole|HackaMol::Roles::QmMolRole>
+=item * L<HackaMol::Roles::PhysVecMVRRole|HackaMol::Roles::BondsAnglesDihedralsRole|HackaMol::Roles::QmMolRole|HackaMol::Roles::SelectionRole>
 
 =item * L<HackaMol::Roles::QmAtomRole>
 
 =item * L<HackaMol::Roles::QmMolRole>
+
+=item * L<HackaMol::Roles::SelectionRole>
 
 =back
 
@@ -466,7 +469,7 @@ Demian Riccardi <demianriccardi@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Demian Riccardi.
+This software is copyright (c) 2017 by Demian Riccardi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

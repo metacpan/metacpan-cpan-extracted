@@ -12,24 +12,24 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA512
 
 SHA1 007d9eadef38d89600c372861a631e950cadab7e .travis.yml
-SHA1 eff9f68b50236691e3ad77b98776b1295a387cc7 Changes
-SHA1 bf2d713ceca5b8ad3d680ed15baba1b89df7e149 LICENSE
-SHA1 e626b3ad4a73b369a1bfdc5be42690b5df6999d9 MANIFEST
-SHA1 19a22bfca8082d8905c064f6b7ef0c6633a4c7e6 META.json
-SHA1 d72088998d72dccbf6f5621e3509e3de6af51174 META.yml
-SHA1 e970e55af83695fe2b59389d43822f19fa8acb02 Makefile.PL
-SHA1 700c8ae2290348d5205124c89344b3205e65ea1c README
-SHA1 72867a297b77fb2f73f58a1d7e4b21b148ab8cf9 cpanfile
+SHA1 764e9963213d9db7803b83be397c2e86209b8411 Changes
+SHA1 1db48bf25c18398387f286f408c7056cb2b3f2f4 LICENSE
+SHA1 ec43bab4e608e17ae891f55731340af59bc4fed5 MANIFEST
+SHA1 2697e24c38ce953f4d32b10ab3ca795ef224d77f META.json
+SHA1 e1b6f4ecbfbe0b3a24aa41384808af924ef173fe META.yml
+SHA1 49fce377b108ced6e7d00086f7360ee9639b9261 Makefile.PL
+SHA1 d2fdffc66064b5763e2e2d2ee10b2ce195791714 README
+SHA1 074a962d75700c2f0de3c7dcb9cf2d2e748aa5a4 cpanfile
 SHA1 b916e5e22dce319b385382dbb6694a1d4b7ac634 dist.ini
-SHA1 29288eeaa3dc087ebd4a76f0c525c83016c04d5e lib/Test/Moose/More.pm
-SHA1 ee0bc9ae30f9a5c898722061cc6f7d382fdcee80 lib/Test/Moose/More/Utils.pm
+SHA1 9354065f4baaaf0e7fcb0a602001915286f4b179 lib/Test/Moose/More.pm
+SHA1 c9c7e3f7bc7d3d04a6adf2f7a39601370a596e33 lib/Test/Moose/More/Utils.pm
 SHA1 4bdb7637c377a4563e26e887313ef118c1d1a22d t/00-check-deps.t
 SHA1 c28a0d7bbf0c35aff4bcb4ed5adafd4cc85ba941 t/00-compile.t
-SHA1 ab2f071a8457fbab3e15532d83fc1041b46ed4a8 t/00-report-prereqs.dd
-SHA1 c9a5c84a8b383374bf4133d0cef54ef9ccd610b5 t/00-report-prereqs.t
+SHA1 59f1cdeed4e35e47368123d2a9a1cf970e849df3 t/00-report-prereqs.dd
+SHA1 0b069a9f9a989e6affbf0e67612a64fce0de447e t/00-report-prereqs.t
 SHA1 7110de92a946d29acba283fbbf24357bbfe7989c t/attribute_options_ok/basic.t
 SHA1 cac1fe5cef9be4307c57fea3d7fdc59cfb0dc649 t/attribute_options_ok/subtest-wrapper.t
 SHA1 184cd396cdd45481169f5248992011f8ec90392d t/check_sugar.t
@@ -46,8 +46,11 @@ SHA1 5bbd08043c6ffe760da4f0e22fdbb3f2bb112d77 t/is_not_anon_ok.t
 SHA1 ef4337fc54ee2dc9d829fa1a9dd01566a156be96 t/is_role_ok.t
 SHA1 4e15b688710f882cf42c2453db1b4b0827c64f4f t/meta_ok.t
 SHA1 7848e9c1869f12fb657388e1fe12c18fd7197452 t/method_from_pkg_ok.t
+SHA1 a8cc17e1186c33e9edabd510ceee0b4bb7039edb t/method_is_accessor_ok.t
+SHA1 5a0725550220ab8f4dbcc22e7e74fe0e37af997b t/method_is_not_accessor_ok.t
 SHA1 133970d038e0500b954c1e7324cf4e64df6241d0 t/method_not_from_pkg_ok.t
 SHA1 5e8af5ef04bff311f488caf9f509545e2b96f6fb t/method_ok.t
+SHA1 e9b420189bc27904a2f150fb35d075c4ab7442a3 t/no_meta_ok.t
 SHA1 fc226a89f533b01605f87079aafe49b3dacc04ea t/pristine_ok.t
 SHA1 2880954e42f74822063b2fd16d8c9385cd053c19 t/requires_method_ok.t
 SHA1 89032c090c1832ed2dd5d71df99dbcfdd3cae72b t/subtest-1.t
@@ -68,24 +71,29 @@ SHA1 84a651676182892ea97083d6899237eec5b9b03f t/validate_thing/metaclasses.t
 SHA1 c80c4bf667c9df1aee10436347351fb13564f85c t/validate_thing/methods.t
 SHA1 a95c37eb417623ad7a8bf92889eaec1236a1b7a9 t/validate_thing/sugar.t
 SHA1 37f0fc8d581bfbc8c4c958871c6f7bc1718e94ec t/wrapped/in_roles.t
-SHA1 918b085128de71ce1732482905f9dee02ee52203 xt/author/eol.t
-SHA1 8039f891bcd745693501afd72fae9d9406dde0ea xt/author/no-tabs.t
-SHA1 9b9533b39ea716aaccb533a2ae28478471f8383a xt/author/pod-coverage.t
+SHA1 277ba321950fd393e381c85871ac726306ea122d xt/author/eol.t
+SHA1 5d69a3d8d2e78c68a14718f93c4ff0dbd487812e xt/author/no-tabs.t
+SHA1 4aee47eef041ab3d9b7bd3e988834ac6f89e1788 xt/author/pod-coverage.t
+SHA1 4123285182650d8a6e6b9774d0cb96fa5f7d481b xt/author/pod-linkcheck.t
 SHA1 50482a8f925d46bc72e0998f8dc240aeb61b98d3 xt/author/pod-spell.t
-SHA1 df7123c703c4daaea7635951ae8567eda4e26866 xt/author/pod-syntax.t
+SHA1 deeafedd8be9778d413afc70870e80c4b4883321 xt/author/pod-syntax.t
 SHA1 a7948d34cfaad400286ea5d5fa6206c4c7e2552c xt/release/consistent-version.t
-SHA1 9a21b3840753f6223630c9eda458e91085174ece xt/release/has-version.t
-SHA1 e91052db2912055e66889853bc5cb1f38db60665 xt/release/minimum-version.t
-SHA1 a0cdc04d45715c9c1cb10480d84be76dcadd7e86 xt/release/no-smart-comments.t
-SHA1 fd53f1ea2ac5884abce47c17a77545c05e47bc2f xt/release/pod-linkcheck.t
+SHA1 ee9b7df31bf7fed3f212d1ad4978134864ca7892 xt/release/has-version.t
+SHA1 8d5bae9059da84886783b69e4f2d9b44e1c8a9ae xt/release/minimum-version.t
+SHA1 3ce5641cc60029cac2984a205bc7c92795d5d0de xt/release/no-smart-comments.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJY/sc3AAoJEJP6zjPp4XX4V4gH/36DFEwbqGDpgVnFMMx1tvZA
-P4MXfLkNPLMI98TXe4ro16q1VYbpUJJFCanRN+j8qebmav5aSJ6OdE7nM4KFW2c5
-uUWtYaqg6wmXFLexL8krXa4/Ct350kaUqNPW+AmKQMlOlxlXn3QfkCDe6S5IfJda
-yPcN+7/cYJ4igsGP1MwBnRa5Hb7eegzXUk1pNmrJyxjEfCzWNZXVWDNaY41r1gsV
-rJwEGuaJD686ISpKSN3XOhqeD3X8uTIfYMAJLWZGt5qby0s7sxB4N2Nnvq5xm8zL
-yI0qeoXULj9Qp9Uu86ZQG5efatZMDDi1EfOtFD9OqScTiCcH2gjWtIp1kMplKe8=
-=mYUc
+iQIzBAEBCgAdFiEEqvAjTK4OlkLFh465K77AqDC8C58FAllF/0oACgkQK77AqDC8
+C58MlA//akqQMlyj40DjnDrnTzd2QYOcvEbHUuUVZHhaCVzoRvnW746OSUfiwnp6
+2Sjko8jPWonBht0/AUnQVEtpYGsjeKtqtplzjgy6cXldEWQGNEH658BGYesAwRX7
+5z5wN5kUJWcbJWU/KqAzUay/935XQ5QncoyJ7Iq1YajLRGClpsSTWgvJQOblI3V+
+xs8dhBi0bdHIP+egEFIkBH6dF6qrGWSaDeJkPNEOX+zixfpNL3a59V+H8tON0ODh
+yfVTouuipnVZzJkH1THyrG/nMlEFmCRSdzoW1LtFmV4WLlK/XQgOPJ1aUmrhCu8o
+qDq1WAK4LLbu3aAUnQBl3YHmuUf+PBjOdct+04v9e3sGwd01HoQP1gM8jazRn43J
+uSuHiDPYX7JfunUY7TJj7GXMN5MexKJ1bhBQ+tAQC8g0daiKRG38Tbk6gcRucZd/
+xGFZ65ie8OQAp5voaKVK2Az5hMp8WzAYsibLgreLq7YBBCLKHewapSn75xjBo370
+kmxKWbunSRFB//kzZJeIJq1cDtiMQpt66yL2Qjsfp50GKuKWffxscXqDMZuOjH45
+FGkhXkQ8y4T6z7xBJqM2fUVFvwEpstUfY0LO3eaQgCgUAQcAcjgA1wlFt6mb4wal
+/NidJg5FSKtJIqGhn9Xm+Xg5aNYz4c6C1KaaORymHtyK+mpJEjM=
+=xB5z
 -----END PGP SIGNATURE-----

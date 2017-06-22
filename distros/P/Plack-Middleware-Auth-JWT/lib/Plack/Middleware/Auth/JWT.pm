@@ -2,7 +2,7 @@ package Plack::Middleware::Auth::JWT;
 
 # ABSTRACT: Token-based Auth (aka Bearer Token) using JSON Web Tokens (JWT)
 
-our $VERSION = '0.900';
+our $VERSION = '0.901';
 
 use 5.010;
 use strict;
@@ -10,7 +10,7 @@ use warnings;
 use parent qw(Plack::Middleware);
 use Plack::Util;
 use Plack::Util::Accessor
-    qw(decode_args decode_callback psgix_claims psgix_token token_required token_header_name token_query_name);
+    qw(decode_args decode_callback psgix_claims psgix_token token_required ignore_invalid_token token_header_name token_query_name);
 use Plack::Request;
 use Crypt::JWT qw(decode_jwt);
 
@@ -27,6 +27,7 @@ sub prepare_app {
     $self->token_query_name('token') unless defined $self->token_query_name;
     $self->token_query_name(undef)   unless $self->token_query_name;
     $self->token_required(0)         unless defined $self->token_required;
+    $self->ignore_invalid_token(0)   unless defined $self->ignore_invalid_token;
 
     # either decode_args or decode_callback is required
     if ( my $cb = $self->decode_callback ) {
@@ -76,8 +77,13 @@ sub call {
         }
     };
     if ($@) {
-        # TODO hm, if token cannot be decoded: 401 or 400?
-        return $self->unauthorized( 'Cannot decode JWT: ' . $@ );
+        if ($self->ignore_invalid_token) {
+            return $self->app->($env);
+        }
+        else {
+            # TODO hm, if token cannot be decoded: 401 or 400?
+            return $self->unauthorized( 'Cannot decode JWT: ' . $@ );
+        }
     }
     else {
         $env->{ 'psgix.' . $self->psgix_token }  = $token;
@@ -116,7 +122,7 @@ Plack::Middleware::Auth::JWT - Token-based Auth (aka Bearer Token) using JSON We
 
 =head1 VERSION
 
-version 0.900
+version 0.901
 
 =head1 SYNOPSIS
 
@@ -161,9 +167,9 @@ TODO
 
 =head3 decode_args
 
-See C<<Crypt::JWT decode_jwt>>
+See L<Crypt::JWT/decode_jwt>
 
-Please note that C<key> might has to be passed as a string-ref or an object, see C<Crypt::JWT>
+Please note that C<key> might has to be passed as a string-ref or an object, see L<Crypt::JWT>
 
 It is B<very much recommended> that you only allow the algorithms you are actually using by setting C<accepted_alg>! Per default, 'none' is B<not> allowed.
 
@@ -177,35 +183,57 @@ Different defaults:
         verify_exp = 1
         leeway     = 5
 
-You either have to use C<decode_args>, or provide a C<decode_callback>.
+You either have to use C<decode_args>, or provide a L<decode_callback>.
 
 =head3 decode_callback
 
 Callback to decode the token. Gets the token as a string and the psgi-env, has to return a hashref with claims.
 
-You have to either provide a callback, or use C<decode_args>.
+You have to either provide a callback, or use L<decode_args>.
 
 =head3 psgix_claims
 
-Name of the entry in C<psgix> were the claims are stored, default 'claims', so you can get the (for example) C<sub> claim via
+Default: C<claims>
+
+Name of the entry in C<psgix> were the claims are stored, so you can get the (for example) C<sub> claim via
 
   $env->{'psgix.claims'}->{sub}
 
 =head3 psgix_token
 
-Name of the entry in C<psgix> were the raw token is stored, default 'token'.
+Default: C<token>
+
+Name of the entry in C<psgix> were the raw token is stored.
 
 =head3 token_required
 
+Default: C<false>
+
 If set to a true value, all requests need to include a valid JWT. Default false, so you have to check in your application code if a token was submitted.
+
+=head3 ignore_invalid_token
+
+Default: C<false>
+
+If set to a true value, passing an invalid JWT will not abort the
+requerst with status 401. Instead the app will be called as if no
+token was passed at all.
+
+You can use this to implement another token check in a later
+middleware, or even in your app. Of course you will then have to check
+for C<< $env->{psgix.token} >> in your controller actions.
 
 =head3 token_header_name
 
-Name of the token in the HTTP C<Authorization> header, default 'Bearer'. If you set it to C<0>, headers will be ignored.
+Default: C<Bearer>
+
+Name of the token in the HTTP C<Authorization> header. If you set it to C<0>, headers will be ignored.
 
 =head3 token_query_name
 
-Name of the HTTP query param that contains the token, default 'token'. If you set it to C<0>, tokens in the query will be ignored.
+Default: C<token>
+
+Name of the HTTP query param that contains the token. If you set it to C<0>, tokens in the query will be ignored.
 
 =head2 Example
 

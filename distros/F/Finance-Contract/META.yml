@@ -31,5 +31,5 @@ requires:
 resources:
   bugtracker: https://github.com/binary-com/perl-Finance-Contract/issues
   repository: git://github.com/binary-com/perl-Finance-Contract.git
-version: '0.009'
+version: '0.010'
 x_serialization_backend: 'YAML::Tiny version 1.66'

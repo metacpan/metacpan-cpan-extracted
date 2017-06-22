@@ -4,13 +4,13 @@
       "Martin Becker <becker-cpan-mp@cozap.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.28, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Math-Polynomial",
    "no_index" : {
@@ -33,8 +33,7 @@
       },
       "runtime" : {
          "recommends" : {
-            "Math::BigInt" : "0",
-            "Math::BigRat" : "0.260804",
+            "Math::BigNum" : "0",
             "Math::Complex" : "0",
             "Math::ModInt" : "0"
          },
@@ -45,7 +44,17 @@
          }
       }
    },
+   "provides" : {
+      "Math::Polynomial" : {
+         "file" : "lib/Math/Polynomial.pm",
+         "version" : "1.013"
+      },
+      "Math::Polynomial::Generic" : {
+         "file" : "lib/Math/Polynomial/Generic.pm",
+         "version" : "1.013"
+      }
+   },
    "release_status" : "stable",
-   "version" : "1.011",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "1.013",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

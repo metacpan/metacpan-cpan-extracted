@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Instrument;
-
+$Lab::Moose::Instrument::SCPI::Instrument::VERSION = '3.550';
 use Moose::Role;
 use Lab::Moose::Instrument::Cache;
 use Lab::Moose::Instrument qw/validated_getter validated_setter/;
@@ -8,7 +8,6 @@ use Carp;
 
 use namespace::autoclean;
 
-our $VERSION = '3.543';
 
 cache instrument_nselect => ( getter => 'instrument_nselect_query' );
 

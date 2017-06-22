@@ -1,5 +1,12 @@
 Revision history for Struct-Path
 
+0.70    2017-06-20
+        slist() now returns path-ref pairs in common list
+        spath w opt expand may overwrite existed values now if strict opt permit so
+        croak if nonref passed for structure in spath()
+        output format changed for spath w 'paths' opt
+        'stack' opt to spath() added
+
 0.65    2017-05-04
         slist() now also returns references to values
         refactoring

@@ -4,7 +4,7 @@
       "Tobias Oetiker <tobi@oetiker.ch>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "artistic_2"
    ],
@@ -24,7 +24,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "CPAN::Uploader" : "0"
          }
       },
       "configure" : {
@@ -34,8 +34,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojolicious" : "5.0",
-            "Mojolicious::Plugin::Qooxdoo" : "0.901",
+            "Mojolicious" : "7.26",
+            "Mojolicious::Plugin::Qooxdoo" : "0.905",
             "perl" : "5.010001"
          }
       }
@@ -52,5 +52,5 @@
          "url" : "https://github.com/oetiker/qx-mojo-app"
       }
    },
-   "version" : "v0.2.2"
+   "version" : "v0.4.0"
 }

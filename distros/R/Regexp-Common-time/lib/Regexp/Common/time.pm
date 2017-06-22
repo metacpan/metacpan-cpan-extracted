@@ -8,9 +8,8 @@ use strict;
 use warnings;
 
 package Regexp::Common::time;
-$Regexp::Common::time::VERSION = '0.07';
+$Regexp::Common::time::VERSION = '0.08';
 use Regexp::Common qw(pattern);
-use POSIX;
 
 sub _croak { require Carp; goto &Carp::croak}
 
@@ -1417,4 +1416,3 @@ endeavor to improve the software.
 
 
 =cut
-

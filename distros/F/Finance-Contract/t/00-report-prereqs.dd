@@ -12,6 +12,7 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
+                                      'Devel::Cover::Report::Kritika' => '0.05',
                                       'Pod::Coverage::TrustPod' => '0',
                                       'Test::EOL' => '0',
                                       'Test::Mojibake' => '0',

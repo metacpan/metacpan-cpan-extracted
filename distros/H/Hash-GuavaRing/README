@@ -1,0 +1,25 @@
+Hash-GuavaRing version 0.01
+===========================
+
+INSTALLATION
+
+To install this module type the following:
+
+   	perl Makefile.PL
+   	make
+   	make test
+   	make install
+
+To build rpm this module type the following:
+
+	make manifest
+	make dist
+	cp Hash-GuavaRing* ~/rpmbuild/SOURCES/
+	rpmbuild -ba ./spec/Hash-GuavaRing.spec
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2017 by Sveta Kotleta
+
+Artistic License

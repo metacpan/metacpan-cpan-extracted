@@ -1,3 +1,5 @@
+0.328 2017/06/11
+- L7::SMTP - call new_connection from upper flow to initialize it
 0.327 2017/05/25
 - L7::SMTP - support BDAT command
 - L7::HTTP - make it complain about missing content-length in POST again

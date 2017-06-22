@@ -8,25 +8,28 @@ String::Print - printf alternative
 
  ### Functional interface
  use String::Print qw/printi printp/, %config;
-
+ 
  # interpolation of arrays and hashes
  printi 'age {years}', years => 12;
  printi 'price-list: {prices%.2f}', prices => \@prices, _join => "+";
- printi 'dump: {hash}', hash => \%config;
-
+ printi 'dump: {c}', c => \%config;
+ 
+ # [0.90] more complex interpolation names
+ printi 'filename: {c.filename}', c => \%config;
+ printi 'username: {user.name}', user => $user_object;
+ printi 'price: {product.price €}', product => $db->product(3);
+ 
  # same with positional parameters
  printp 'age %d", 12;
  printp 'price-list: %.2f', \@prices;
  printp 'dump: %s', \%settings;
-
+ 
  ### Object Oriented interface
  use String::Print 'oo';      # import nothing 
  my $f = String::Print->new(%config);
-
- # same, called directly
  $f->printi('age {years}', years => 12);
  $f->printp('age %d', 12);
-
+ 
  ### via Log::Report's __* functions
  use Log::Report::Optional;
  print __x"age {years}", years => 12;
@@ -49,30 +52,37 @@ module!
 See functions L<printi()|String::Print/"FUNCTIONS">, L<sprinti()|String::Print/"FUNCTIONS">, L<printp()|String::Print/"FUNCTIONS">, and L<sprintp()|String::Print/"FUNCTIONS">: you
 can also call them as method.
 
-  use String::Print 'oo';
-  my $f = String::Print->new(%config);
-  $f->printi($format, @params);
-
-  # exactly the same functionality:
-  use String::Print 'printi', %config;
-  printi $format, @params;
+ use String::Print 'oo';
+ my $f = String::Print->new(%config);
+ $f->printi($format, @params);
+ 
+ # exactly the same functionality:
+ use String::Print 'printi', %config;
+ printi $format, @params;
 
 The Object Oriented interface wins when you need the same configuration
 in multiple source files, or when you need different configurations
 within one program.  In these cases, the hassle of explicitly using the
 object has some benefits.
 
-=head2 Constructors
+=head3 Constructors
 
 =over 4
 
 =item String::Print-E<gt>B<new>(%options)
 
  -Option     --Default
+  encode_for   undef
   modifiers    [ qr/^%\S+/ = \&format_printf]>
   serializers  <useful defaults>
 
 =over 2
+
+=item encode_for => HASH|'HTML'
+
+[0.90] The format string and the inserted values will get encoded according to
+some syntax rules.  For instance, C<encode_entities()> of HTML::Entities
+when you specify the predefined string C<HTML>.  See L<encodeFor()|String::Print/"Attributes">.
 
 =item modifiers => ARRAY
 
@@ -91,6 +101,7 @@ example:
   my $f = String::Print->new
     ( modifiers   => [ EUR   => sub {sprintf "%5.2f e", $_[0]} ]
     , serializers => [ UNDEF => sub {'-'} ]
+    , encode_for  => 'HTML'
     );
 
   $f->printi("price: {p EUR}", p => 3.1415); # price: ␣␣3.14 e
@@ -98,7 +109,7 @@ example:
 
 =back
 
-=head2 Attributes
+=head3 Attributes
 
 =over 4
 
@@ -111,12 +122,42 @@ definitions.  You may also specify an ARRAY of modifiers per C<print>.
 
 See section L</"Interpolation: Modifiers"> about the details.
 
+=item $obj-E<gt>B<encodeFor>(HASH|undef|($predefined, %overrule))
+
+[0.90] Enable/define the output encoding.
+Read section L</"Output encoding"> about the details.
+
 =back
+
+=head3 Printing
+
+The following are provided as method and as function.  You find their
+explanation further down on this page.
+
+$obj->B<printi>([$fh], $format, PAIRS|HASH);
+
+$obj->B<printp>([$fh], $format, PAIRS|HASH);
+
+$obj->B<sprinti>($format, PAIRS|HASH);
+
+$obj->B<sprintp>($format, LIST, PAIRS);
 
 =head1 FUNCTIONS
 
 The functional interface creates a hidden object.  You may import any of
 these functions explicitly, or all together by not specifying the names.
+
+B<. Example>
+
+  use String::Print;           # all
+  use String::Print 'sprinti'; # only sprinti
+
+  use String::Print 'printi'   # only printi
+    , modifiers   => [ EUR   => sub {sprintf "%5.2f e", $_[0]} ]
+    , serializers => [ UNDEF => sub {'-'} ];
+
+  printi "price: {p EUR}", p => 3.1415; # price: ␣␣3.14 e
+  printi "count: {c}", c => undef;      # count: -
 
 =over 4
 
@@ -232,11 +273,16 @@ as bytes, not Perl strings (which may be utf8).  In unicode, one
 double wide, for instance in Chinese.  The L<printi()|String::Print/"FUNCTIONS"> implementation
 will use Unicode::GCString for correct behavior.
 
+=item automatic output encoding (for HTML)
+
+You can globally declare that all produced strings must be encoded in
+a certain format, for instance that HTML entities should be encoded.o
+
 =back
 
-=head2 Three components
+=head2 Four components
 
-To fill-in a FORMAT, three clearly separated components play a role:
+To fill-in a FORMAT, four clearly separated components play a role:
 
 =over 4
 
@@ -255,25 +301,97 @@ and ARRAYs.
 The standard UNIX format rules, like C<%d>.  One conversion rule
 has been added 'S', which provides unicode correct behavior.
 
+=item 4. encoding
+
+Prepare the output for a certain syntax, like HTML.
+
 =back
 
 Simplified:
 
   # sprinti() replaces "{$key$modifiers$conversion}" by
-  $conversion->($serializer->($modifiers->($args{$key})))
+  $encode->($format->($serializer->($modifiers->($args{$key}))))
 
   # sprintp() replaces "%pos{$modifiers}$conversion" by
-  $conversion->($serializer->($modifiers->($arg[$pos])))
+  $encode->($format->($serializer->($modifiers->($arg[$pos]))))
 
 Example:
 
   printi "price: {price € %-10s}", price => $cost;
+  printi "price: {price € %-10s}", { price => $cost };
   printp "price: %-10{€}s", $cost;
 
-  $conversion = column width %-10s
-  $serializer = show float as string
-  $modifier   = € to local currency
   $value      = $cost (in €)
+  $modifier   = convert € to local currency £
+  $serializer = show float as string
+  $format     = column width %-10s
+  $encode     = £ into &pound;     # when encodingFor('HTML')
+
+=head2 Interpolation: keys
+
+A key is a bareword (like a variable name) or a list of barewords
+separated by dots (no blanks!)  A simple key directly refers to a
+named parameter of the function or method:
+
+  printi "Username: {name}", name => 'Mark';
+
+You may also pass them as HASH
+
+  printi "Username: {name}", { name => 'Mark' };
+
+Or as CODE:
+
+  printi "Username: {name}", name => sub { 'Mark' };
+
+The smartness of pre-processing CODE is part of serialization.
+
+B<Please> use explanatory key names, to help the translation
+process once you need that (in the future).
+
+=head3 Complex keys
+
+[0.90] In the previous section, we kept our addressing it simple: let's
+change that now.  Two alternatives for the same:
+
+  printi "Username: {name}", name => $user->{name};  # simple key
+  printi "Username: {user.name}", user => $user;     # complex key
+
+You can pass a parameter name as HASH, which contains values.  This may
+even be nested into multiple levels.  You may also pass objects, class
+(package names), and code references.
+
+In above case of C<user.name>, when C<user> is a HASH it will take the
+value which belongs to the key C<name>.  When C<user> is a CODE, it will
+run code to get a value.  When C<user> is an object, the method C<name>
+is called to get a value back.  When C<user> is a class name, the C<name>
+refers to an instance method on that class.
+
+More examples which do work:
+
+ # when name is a column in the database query result
+ printi "Username: {user.name}", user => $db->fetchrow_hashref;
+ 
+ # call a sub which does the database query, returning a HASH
+ printi "Username: {user.name}", user => sub { $db->getUser('mark') };
+ 
+ # using an instance method (object)
+ {  package User;
+    sub new  { bless { myname => $_[1] }, $_[0] }
+    sub name { $_[0]->{myname} }
+ }
+ my $user = User->new('Mark');
+ printi "Username: {user.name}", user => $user;
+
+ # using a class method
+ sub User::count   { 42 }
+ printi "Username: {user.count}", user => 'User';
+ 
+ # mixed, here CODE, HASH, and Object
+ printi "Username: {document.author.name}", document => sub {
+    return +{ author => User->new('Mark') }
+ };
+
+Limitation: you cannot pass arguments to CODE calls.
 
 =head2 Interpolation: Serialization
 
@@ -290,15 +408,15 @@ value which is missing, it will be interpreted as C<undef>.
 
 =over 4
 
+=item strings
+
+Simple scalar values are interpolated "as is"
+
 =item CODE
 
 When a value is passed as CODE reference, that function will get called
 to return the value to be filled in.
 For interpolating, the following rules apply:
-
-=item strings
-
-Simple scalar values are interpolated "as is"
 
 =item SCALAR
 
@@ -440,7 +558,7 @@ tells us which currency to use in the display.
 
 Another example.  Now, we want to add timestamps.  In this case, we
 decide for modifier names in C<\w>, so we need a blank to separate
-the paramter from the modifer.
+the parameter from the modifer.
 
   use POSIX  qw/strftime/;
   use String::Print modifiers => [ qr/T|DT|D/ => \&_timestamp ];
@@ -477,6 +595,81 @@ The modifiers are called in order:
   printp "price: %9{€}s\n", $p;       # price: ␣␣␣123.45
   printp ">%10{T}s<", $now;           # >␣␣12:59:17<
 
+=head2 Output encoding
+
+[0.90] This module is used by Log::Report, which can be used (amongst
+many other things) to insert (translated) strings with parameters into
+HTML templates.  You can imagine that some of the parameter may need to
+be encoded to HTML in the template, and other not.
+
+=head3 example with TemplateToolkit
+
+For example in TemplateToolkit, you would write
+
+  # in your TT-template
+  <div>Username: [% username | html %]</div>
+  # in your code:
+  username => $user->name,
+
+With plain String::Print with output encoding enabled, you can do:
+
+  # in your TT-template
+  <div>[% show_username %]</div>
+  # in your code with encodeFor('HTML')
+  show_username => printi("Username: {user}", user => $user->name),
+  # or
+  show_username => printp("Username: %s", $user->name),
+
+That does not look very efficient, however it changes for the good when
+this is combined with L<Log::Report::Lexicon> (translations)  You can
+either do:
+
+  # in your TT-template
+  <div>[% show_username %]</div>
+  # in your code with encodeFor('HTML')
+  show_username => __("Username: {user}", user => $user->name),
+
+Shorter:
+
+  # in your TT-template
+  <div>[% loc("Username: {user}", user => username) %]</div>
+  # in your code with encodeFor('HTML')
+  username => $user->name,
+
+Even shorter:
+
+  # in your TT-template
+  <div>[% loc("Username: {user.name}", user => userobj) %]</div>
+  # in your code with encodeFor('HTML')
+  userobj => $user,
+
+The latter is only a few characters longer than the original example, but
+it gives you localization!  Nearly for free!
+  
+More details in Log::Report::Extract::Template.
+
+=head3 Output encoding exclusion
+
+In some cases, the data which is inserted is already encoded in the
+output syntax.  For instance, you already have HTML to be included.
+
+The default exclusion rule for HTML output is C<qr/html$/i>, which
+means that all inserted named parameters, where the name ends on C<html>
+will not get html-entity encoded.
+
+This will work by default:
+
+  # with encodeFor('HTML')
+  printp "Me & Co: {name}, {description_html}",
+     name => 'René', description_html => $descr;
+
+This may result in:
+
+  Me &amp; Co: Ren&eacute;, <font color="red">new member</font>
+
+Better not to have HTML in your program: leave it to the template.  But
+in some cases, you have no choice.
+
 =head2 Compared to other modules on CPAN
 
 There are a quite a number of modules on CPAN which extend the functionality
@@ -501,14 +694,14 @@ C<String::Print> is nicely integrated with Log::Report.
 
 =head1 SEE ALSO
 
-This module is part of String-Print distribution version 0.15,
-built on March 14, 2014. Website: F<http://perl.overmeer.net/log-report/>
+This module is part of String-Print distribution version 0.90,
+built on June 14, 2017. Website: F<http://perl.overmeer.net/log-report/>
 
 =head1 LICENSE
 
-Copyrights 2013-2014 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2013-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
 

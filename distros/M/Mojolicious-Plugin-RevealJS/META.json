@@ -1,5 +1,5 @@
 {
-   "abstract" : "Mojolicious ❤️ Reveal.js",
+   "abstract" : "Mojolicious â¤ï¸ Reveal.js",
    "author" : [
       "Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>"
    ],
@@ -35,7 +35,7 @@
    "provides" : {
       "Mojolicious::Plugin::RevealJS" : {
          "file" : "lib/Mojolicious/Plugin/RevealJS.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
@@ -50,6 +50,6 @@
          "url" : "http://github.com/jberger/Mojolicious-Plugin-RevealJS"
       }
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

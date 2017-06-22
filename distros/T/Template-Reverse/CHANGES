@@ -1,10 +1,108 @@
 ==================================================
-Changes from 2012-10-31 00:00:00 +0000 to present.
+Changes from 2016-06-22 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.143 at 2013-10-31 08:05:07 +0000
+version 0.150 at 2017-06-22 10:25:35 +0000
 ------------------------------------------
+
+  Change: a805ada3b2e4d07a3f3799108b90aca35f31ca70
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2017-06-22 19:17:05 +0000
+
+    Merge branch 'master' of https://github.com/sng2c/Template-Reverse 
+
+  Change: 9fae36e8c13580d53c5ab236c2dd68a48527e09f
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2017-06-22 19:16:10 +0000
+
+    use constant::Atom for symbols. 
+
+  Change: a08c72969e3a23c8c0c85b9727b774ee3ea538a4
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2017-06-21 18:02:58 +0000
+
+    Update .travis.yml 
+
+  Change: a7888775fe6c3c35811f739524bc5caba7d007e0
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2017-06-21 14:03:05 +0000
+
+    added partition and partition_by 
+
+  Change: 2803c35d7b9bbbb55a90a3fcbd9a20bf3e83b23f
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2017-06-21 11:28:27 +0000
+
+    start to port of clj-template-reverse 
+
+  Change: 9c26a509ff6feac564df633fb6de6c1c9d9510d6
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2017-06-21 11:24:49 +0000
+
+    rebuild README
+
+    fix build config 
+
+  Change: 1e59910149b0d21c35e09351522b79d6785dbd61
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2017-06-21 11:21:08 +0000
+
+    fix Argument destructuring 
+
+  Change: d71ffebc7b313f737766af803c6bd826c7bb7eee
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2017-06-21 11:21:06 +0000
+
+    Update .travis.yml
+
+    fix for travis.ci
+
+    fix README
+
+    Update .travis.yml
+
+    add perl 5.10, 5.14
+
+    Update README.md
+
+    Update .travis.yml
+
+    fix for travis.ci
+
+    fix README
+
+    Update .travis.yml
+
+    Update README.md
+
+    Update .travis.yml 
+
+  Change: 0749c4bc4c221dfb6db1f542c1821b9157c1d2ff
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2017-06-20 18:10:01 +0000
+
+    Create .travis.yml 
+
+  Change: 4fe0266060709f0e012fbd2cfede4e95f2c5d474
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2017-03-11 02:01:38 +0000
+
+    Merge pull request #11 from dorward/master
+
+    Fix for Template::Reverse::Converter::TT2 documentation 
+
+  Change: 7a3606657620b0812ee21efd705e2935fc3cd831
+  Author: David Dorward <david@dorward.me.uk>
+  Date : 2014-04-26 17:24:23 +0000
+
+    Converter expects to be called using OO style 
+
+  Change: 86652338ac79b689afd1595114adc0f769b519a6
+  Author: David Dorward <david@dorward.me.uk>
+  Date : 2014-04-26 17:23:35 +0000
+
+    Use correct module name in documentation 
 
   Change: 924ac4c846a3cd4611e5cc1324b5d95b85b7b0c8
   Author: HyunSeung Kim <sng2nara@hanmail.net>
@@ -145,54 +243,6 @@ version 0.143 at 2013-10-31 08:05:07 +0000
 
     for https://metacpan.org/author/AMORETTE 
 
------------------------------------------
-version 0.04 at 2013-04-05 02:08:46 +0000
------------------------------------------
-
-  Change: fe7ac2f29fc2d98cf7d81814dd4ef00d4ff55ad6
-  Author: sng2c <sng2nara@gmail.com>
-  Date : 2013-04-05 11:08:46 +0000
-
-    fix recovering url bug 
-
------------------------------------------
-version 0.02 at 2013-04-05 00:34:57 +0000
------------------------------------------
-
-  Change: aefc6d5c8d55431040292f2315d47d1a4b881954
-  Author: sng2c <sng2nara@gmail.com>
-  Date : 2013-04-05 09:34:57 +0000
-
-    add HTML spacer 
-
------------------------------------------
-version 0.01 at 2013-04-04 10:45:06 +0000
------------------------------------------
-
-  Change: b8a28846de850e15495582050b10599985d7185f
-  Author: sng2c <sng2nara@gmail.com>
-  Date : 2013-04-04 19:45:06 +0000
-
-    add html urlsafe spacer 
-
-  Change: a2200ee5d5a3f34fa326c91defc1e62c35be67d9
-  Author: HyunSeung Kim <sng2nara@hanmail.net>
-  Date : 2012-04-27 22:51:55 +0000
-
-    add repo url and homepage in Metadata 
-
-  Change: f9b08740d02bba03ace95f817ce2a9ecfa66640c
-  Author: sng2c <sng2nara@hanmail.net>
-  Date : 2012-04-26 13:16:06 +0000
-
-    Accepting Odd-Even versioning. version to 0.009 
-
-  Change: 0463b164ed717a85ce1eb501f7ff36af7ca6209a
-  Author: sng2c <sng2nara@hanmail.net>
-  Date : 2012-04-26 13:13:01 +0000
-
-    Documentation more. Change version to 0.008 in dist.ini 
-
 ================================================
-Plus 5 releases after 2012-10-31 00:00:00 +0000.
+Plus 8 releases after 2016-06-22 00:00:00 +0000.
 ================================================

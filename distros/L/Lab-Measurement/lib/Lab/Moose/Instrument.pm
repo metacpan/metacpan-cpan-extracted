@@ -1,5 +1,5 @@
-
 package Lab::Moose::Instrument;
+$Lab::Moose::Instrument::VERSION = '3.550';
 use 5.010;
 use Moose;
 use Moose::Util::TypeConstraints qw(enum duck_type);
@@ -28,7 +28,6 @@ use namespace::autoclean
     -except => 'import',
     -also   => [@EXPORT_OK];
 
-our $VERSION = '3.543';
 
 has 'connection' => (
     is       => 'ro',

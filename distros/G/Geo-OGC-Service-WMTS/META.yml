@@ -4,7 +4,8 @@ author:
   - 'Ari Jolma <ari.jolma at gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Geo::OGC::Service: '0.08'
+  File::ShareDir: '0'
+  Geo::OGC::Service: '0.12'
   Plack::Builder: '0'
   Plack::Test: '0'
   XML::LibXML: '0'
@@ -37,5 +38,5 @@ requires:
   perl: '5.010000'
 resources:
   repository: git://github.com/ajolma/Geo-OGC-Service-WMTS.git
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

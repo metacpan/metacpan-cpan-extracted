@@ -45,7 +45,7 @@ subtest 'check new() with parameters' => sub {
     is( $box->password,    'P4', 'Net::Fritz::Box->password'    );
 };
 
-subtest 'check discover() without Net::Fritz!Box present' => sub {
+subtest 'check discover() without Fritz!Box present' => sub {
     # given
     my $box = new_ok( 'Net::Fritz::Box' );
 
@@ -56,7 +56,7 @@ subtest 'check discover() without Net::Fritz!Box present' => sub {
     isa_ok( $discovery, 'Net::Fritz::Error' , 'failed discovery' );
 };
 
-subtest 'check discover() with mocked Net::Fritz!Box' => sub {
+subtest 'check discover() with mocked Fritz!Box' => sub {
     # given
     my $box = new_ok( 'Net::Fritz::Box' );
     $box->_ua->map('http://fritz.box:49000/tr64desc.xml', get_fake_device_response());

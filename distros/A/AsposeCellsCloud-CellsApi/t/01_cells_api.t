@@ -64,7 +64,7 @@ if (not defined $AsposeCellsCloud::Configuration::api_key or $AsposeCellsCloud::
 	$AsposeStorageCloud::Configuration::api_key = $AsposeCellsCloud::Configuration::api_key;
 }
 
-my $data_path = './data/';
+my $data_path = '../../../Data/';
 
 if (not -d $data_path){
 	done_testing();

@@ -1,0 +1,62 @@
+=encoding utf8
+
+=head1 NAME
+
+Twitter::Queue - the micro blogging cloud based FIFO queue
+
+=head1 SYNOPSIS
+
+  use Twitter::Queue;
+
+  my $q = Twitter::Queue-new({
+    consumer_key        => '311ee384568611e79db19e8',
+    consumer_secret     => '3cac5b46568611e79c9c5ad',
+    access_token        => '45d89cc0568611e7991c72d',
+    access_token_secret => '470dbab2568611e79c5d8ad',
+  });
+
+  $q->add('{"some":"jsondata"}');
+  ...
+
+  while (my $item = $q->next) {
+    # do something
+  }
+
+=head1 METHODS
+
+=head2 new ($args)
+
+Constructor, returns a new C<Twitter::Queue> object.
+
+Requires hashref containing these key values:
+
+  consumer_key        => '...',
+  consumer_secret     => '...',
+  access_token        => '...',
+  access_token_secret => '...',
+  size                => 100, # optional queue size
+
+The Twitter key/secrets come from the Twitter API. You need to L<register|http://apps.twitter.com>
+an application with Twitter in order to obtain them.
+
+=head2 add ($item)
+
+Adds C<$item> to the queue, C<$item> must be be a string that complies with Twitter's
+character counting L<rules|https://dev.twitter.com/basics/counting-characters>.
+
+=head2 next ()
+
+Returns the next item in the queue, removing it from the queue. Returns C<undef>
+if the queue is empty.
+
+=head1 AUTHOR
+
+E<copy> 2017 David Farrell
+
+=head1 LICENSE
+
+The (two-clause) FreeBSD License, see LICENSE.
+
+
+=cut
+

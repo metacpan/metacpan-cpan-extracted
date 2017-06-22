@@ -11,7 +11,7 @@ use URPM::Resolve;
 use URPM::Signature;
 
 our @ISA = qw(DynaLoader);
-our $VERSION = '5.11';
+our $VERSION = '5.12';
 
 URPM->bootstrap($VERSION);
 
@@ -188,7 +188,7 @@ sub traverse_tag_find {
 #- this is used when faking a URPM::DB: $urpm can be used as-a $db
 #- (used for urpmi --env)
 sub create_transaction {
-    my ($_urpm) = @_;
+    my ($_urpm) = @_; # same args as URPM.xs:create_transaction()
     die "Installing is not supported with a fake environment!";
 }
 

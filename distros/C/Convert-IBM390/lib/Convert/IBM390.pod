@@ -352,7 +352,7 @@ IBM z/Architecture Principles of Operation, SA22-7832.
 
 IBM ESA/390 Principles of Operation, SA22-7201.
 
-z/OS XL C/C++ Programming Guide, SC09-4765, sec. 8.6.4 (code set
+z/OS XL C/C++ Programming Guide, SC14-7315, chap. 64 (code set
 converters).
 
 z/OS MVS System Management Facilities (SMF), SA22-7630,

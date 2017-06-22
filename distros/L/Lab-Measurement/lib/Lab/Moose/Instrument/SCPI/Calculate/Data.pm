@@ -1,4 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Calculate::Data;
+$Lab::Moose::Instrument::SCPI::Calculate::Data::VERSION = '3.550';
 use 5.010;
 use Moose::Role;
 use MooseX::Params::Validate;
@@ -14,8 +15,6 @@ use Lab::Moose::Instrument qw/
     /;
 
 use namespace::autoclean;
-
-our $VERSION = '3.543';
 
 cache calculate_data_call_catalog => (
     getter => 'calculate_data_call_catalog',

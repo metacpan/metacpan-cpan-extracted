@@ -15,13 +15,15 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "App-lcpan",
   "EXE_FILES" => [
     "bin/lcpan",
-    "bin/lcpanm"
+    "bin/lcpanm",
+    "bin/lcpanm-script"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::lcpan",
   "PREREQ_PM" => {
     "App::ShellCompleter::cpanm" => 0,
+    "App::cpanm::script" => "0.002",
     "Archive::Extract" => 0,
     "Archive::Tar" => 0,
     "Archive::Zip" => 0,
@@ -59,8 +61,7 @@ my %WriteMakefileArgs = (
     "IPC::System::Options" => "0.27",
     "LWP::UserAgent::Patch::FilterMirrorMaxSize" => 0,
     "List::Util" => 0,
-    "Log::Any" => 0,
-    "Log::Any::IfLOG" => "0.07",
+    "Log::ger" => 0,
     "Logfile::Rotate" => 0,
     "Module::CoreList::More" => "0.04",
     "Module::Patch" => "0.12",
@@ -97,7 +98,7 @@ my %WriteMakefileArgs = (
     "Test::SQL::Schema::Versioned" => "0.15",
     "Test::WithDB::SQLite" => "0.08"
   },
-  "VERSION" => "1.017",
+  "VERSION" => "1.019",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -106,6 +107,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "App::ShellCompleter::cpanm" => 0,
+  "App::cpanm::script" => "0.002",
   "Archive::Extract" => 0,
   "Archive::Tar" => 0,
   "Archive::Zip" => 0,
@@ -146,8 +148,7 @@ my %FallbackPrereqs = (
   "IPC::System::Options" => "0.27",
   "LWP::UserAgent::Patch::FilterMirrorMaxSize" => 0,
   "List::Util" => 0,
-  "Log::Any" => 0,
-  "Log::Any::IfLOG" => "0.07",
+  "Log::ger" => 0,
   "Logfile::Rotate" => 0,
   "Module::CoreList::More" => "0.04",
   "Module::Patch" => "0.12",

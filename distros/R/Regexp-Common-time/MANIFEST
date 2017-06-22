@@ -1,7 +1,7 @@
 Changes
 lib/Regexp/Common/time.pm
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 MANIFEST.SKIP
 README
 t/1-load.t

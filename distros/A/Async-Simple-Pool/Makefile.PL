@@ -1,7 +1,6 @@
 use 5.10.0;
 
 use Modern::Perl;
-use Module::Metadata;
 use ExtUtils::MakeMaker;
 
 if ( $^O =~ /^(dos|os2|MSWin32|NetWare)$/ ) {
@@ -31,7 +30,7 @@ WriteMakefile(
         'Test::Pod::Coverage' => 0,
         'Test::Pod'           => 0,
         'Time::HiRes'         => 0,
-        'Module::Metadata'    => 0,
+        'Module::Metadata'    => 1.000009,
     },
     PREREQ_PM => {
         'Class::Load'          => 0,
@@ -44,7 +43,20 @@ WriteMakefile(
         'Time::HiRes'          => 0,
     },
     META_ADD => {
-        provides => Module::Metadata->provides(version => '1.4', dir => 'lib'),
+        provides => {
+            'Async::Simple::Pool' => {
+                'version' => '0.07',
+                'file'    => 'lib/Async/Simple/Pool.pm'
+            },
+            'Async::Simple::Task::Fork' => {
+                'file'    => 'lib/Async/Simple/Task/Fork.pm',
+                'version' => '0.07'
+            },
+            'Async::Simple::Task' => {
+                'file'    => 'lib/Async/Simple/Task.pm',
+                'version' => '0.07'
+            }
+        }
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Async-Simple-Pool-*' },

@@ -1,5 +1,9 @@
 Revision history for Struct-Path-PerlStyle
 
+0.64    2017-06-19
+        '<<' hook renamed to 'back', ('<<' is deprecated now)
+        tests fixed for win32 (I hope =)
+
 0.63    2017-03-31
         don't quote numbers used as hash keys in ps_serialize()
         refactoring, small tests improvements

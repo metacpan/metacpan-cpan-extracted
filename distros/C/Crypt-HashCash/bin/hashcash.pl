@@ -4,7 +4,7 @@
 # hashcash.pl - Wallet for HashCash Digital Cash
 # Copyright (c) 2001-2017 Ashish Gulhati <crypt-hashcash at hash.neo.tc>
 #
-# $Id: bin/hashcash.pl v1.118 Sat Jun 10 13:59:11 PDT 2017 $
+# $Id: bin/hashcash.pl v1.124 Mon Jun 19 15:52:00 PDT 2017 $
 
 use warnings;
 
@@ -21,7 +21,15 @@ use Crypt::Diceware;
 use GD::Barcode::QRcode;
 use File::HomeDir;
 
-my $HASHCASH = File::HomeDir->my_home . '/.hashcash';
+my $HASHCASH = $ENV{HASHCASHDIR} || File::HomeDir->my_home . '/.hashcash';
+
+unless (-d $HASHCASH) {
+  die "Directory $HASHCASH doesn't exist and couldn't be created.\n" unless mkdir($HASHCASH, 0700);
+}
+
+unless (-d "$HASHCASH/stash") {
+  die "Directory $HASHCASH/.stash doesn't exist and couldn't be created.\n" unless mkdir("$HASHCASH/stash", 0700);
+}
 
 # Get vault configs, default to first vault
 my @vaults = map { new Persistence::Object::Simple ('__Fn' => $_) } glob("$HASHCASH/vaults/*.cfg");
@@ -59,9 +67,7 @@ $action{Buy} = sub {   # Buy HashCash
   }
   if ($choice == 0) {
     my $dialog = Wx::TextEntryDialog->new( $frame, ('Amount to buy (in Satoshi)'), _('Buy coins'));
-    if($dialog->ShowModal == wxID_CANCEL) {
-      return;
-    };
+    return if $dialog->ShowModal == wxID_CANCEL;
     $amt = $dialog->GetValue();
     return unless $amt and $amt !~ /\D/;
     if ($amt % $client->denoms->[0]) {
@@ -650,7 +656,7 @@ EVT_CHOICE($frame, $langsel, $action{LangSel});
 
 show();
 $statusBar->SetStatusText(_('HashCash Wallet Ready'), 0);
-$frame->Show;
+$frame->Show; $frame->Centre(wxBOTH); $frame->Refresh;
 $app->MainLoop;
 
 # Helper functions
@@ -688,7 +694,7 @@ sub show {                  # Update the wallet view
   $stash->balance($total); $stash->balance_u($total_u);
 
   $label->SetLabel(_('Balance:') . ' ' . _($total)); $label2->SetLabel("Unverified: $total_u");
-  $label->CentreOnParent(wxHORIZONTAL); $label2->CentreOnParent(wxHORIZONTAL);
+  $label->CentreOnParent(wxHORIZONTAL); $label2->CentreOnParent(wxHORIZONTAL); $label2->SetForegroundColour(wxRED);
   $label2->Show($total_u);
 
   my $bottom = $topSizer->GetMinSize->GetHeight;
@@ -708,7 +714,6 @@ sub show {                  # Update the wallet view
   $frame->SetMaxSize($windowsize);
   $frame->SetMinSize($windowsize);
   $frame->SetSize($windowsize);
-
   $frame->Refresh;
 }
 
@@ -1043,8 +1048,8 @@ hashcash.pl - Wallet for HashCash digital cash
 
 =head1 VERSION
 
- $Revision: 1.118 $
- $Date: Sat Jun 10 13:59:11 PDT 2017 $
+ $Revision: 1.124 $
+ $Date: Mon Jun 19 15:52:00 PDT 2017 $
 
 =head1 SYNOPSIS
 

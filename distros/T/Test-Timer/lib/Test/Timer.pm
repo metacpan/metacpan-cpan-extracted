@@ -15,7 +15,7 @@ use Test::Timer::TimeoutException;
 
 @EXPORT = qw(time_ok time_nok time_atleast time_atmost time_between);
 
-$VERSION = '2.00';
+$VERSION = '2.01';
 
 my $test  = Test::Builder->new;
 our $alarm = 2; #default alarm
@@ -127,6 +127,8 @@ sub _runtest {
 
         $test->ok( 0, $name );
         $test->diag( $E->{-text} );
+
+        return (0, $time);
     }
     otherwise {
         my $E = shift;
@@ -144,14 +146,22 @@ sub _benchmark {
     my $alarm = $alarm + ($threshold || 0);
 
     try {
+
+        my $t0 = new Benchmark;
+
         local $SIG{ALRM} = sub {
+
+            my $t1 = new Benchmark;
+
+            $timestring = timestr( timediff( $t1, $t0 ) );
+            $time = _timestring2time($timestring);
+
             throw Test::Timer::TimeoutException(
                 "Execution ran $time seconds and exceeded threshold of $threshold seconds and timed out" );
         };
 
         alarm( $alarm );
 
-        my $t0 = new Benchmark;
         &{$code};
         my $t1 = new Benchmark;
 
@@ -201,7 +211,7 @@ Test::Timer - test module to test/assert response times
 
 =head1 VERSION
 
-The documentation in this module describes version 2.00 of Test::Timer
+The documentation in this module describes version 2.01 of Test::Timer
 
 =head1 SYNOPSIS
 
@@ -483,7 +493,7 @@ Travis reports are public available.
 
 =head1 ISSUE REPORTING
 
-Please report any bugs or feature requests either using Github
+Please report any bugs or feature requests using Github
 
 =over
 

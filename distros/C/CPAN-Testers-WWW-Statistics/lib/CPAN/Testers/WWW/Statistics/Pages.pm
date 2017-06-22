@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.21';
+$VERSION = '1.23';
 
 #----------------------------------------------------------------------------
 
@@ -66,6 +66,7 @@ use Sort::Versions;
 use Template;
 #use Time::HiRes qw ( time );
 use Time::Piece;
+use Try::Tiny;
 
 # -------------------------------------
 # Variables
@@ -353,7 +354,6 @@ sub build_noreports {
 
     $self->{parent}->_log("noreports start");
 
-    $self->_update_noreports();
     $self->_build_noreports();
 
     $self->{parent}->_log("noreports finish");
@@ -582,11 +582,17 @@ sub storage_read {
 
 #    for $type (qw(stats dists fails perls pass platform osys osname build counts count xrefs xlast)) {
     for $type (qw(stats dists fails perls platform osys osname build counts count xrefs xlast)) {
+$self->{parent}->_log("storage_read:1.type=$type");
         my $storage = sprintf $self->{parent}->mainstore(), $type;
         next    unless(-f $storage);
-        my $data = read_file($storage);
-        my $store = decode_json($data);
-        $self->{$type} = $store->{$type};
+$self->{parent}->_log("storage_read:2.storage=$storage");
+        try {
+            my $data = read_file($storage);
+            my $store = decode_json($data);
+            $self->{$type} = $store->{$type};
+        } catch {
+$self->{parent}->_log("storage_read:3.failed to read data storage=$storage");
+        };
     }
 }
 
@@ -1159,105 +1165,74 @@ sub _report_submissions {
     $self->_writepage('rates',\%tvars);
 }
 
-sub _update_noreports {
-    my $self = shift;
-
-    $self->{parent}->_log("start update_noreports");
-
-    my %phrasebook = (
-        'DISTS'     => q{   SELECT * FROM ixlatest WHERE oncpan=1 ORDER BY released DESC},
-        'LIST'      => q{   SELECT osname,count(*) AS count
-                            FROM cpanstats
-                            WHERE dist=? AND version=?
-                            GROUP BY osname},
-        'DELETE'    => q{DELETE FROM noreports WHERE dist=?},
-        'INSERT'    => q{INSERT INTO noreports (dist,version,osname) VALUES (?,?,?)}
-    );
-
-    my %dists;
-    my $osnames   = $self->{parent}->osnames();
-    my $noreports = $self->{parent}->noreports();
-    my $grace     = time - 2419200;
-
-    my @rows = $self->{parent}->{CPANSTATS}->get_query('hash',$phrasebook{DISTS});
-    for my $row (@rows) {
-        next    if($noreports && $row->{dist} =~ /^$noreports$/);
-        next    if($dists{$row->{dist}});       # ignore older versions (by other authors)
-        next    if($row->{released} >= $grace); # ignore recently released distributions
-        for my $osname (keys %$osnames) {
-            $dists{$row->{dist}}{$row->{version}}{$osname} = 1;
-        }
-    }
-
-    for my $dist (keys %dists) {
-        for my $version (keys %{$dists{$dist}}) {
-            @rows = $self->{parent}->{CPANSTATS}->get_query('hash',$phrasebook{LIST},$dist,$version);
-            for my $row (@rows) {
-                delete $dists{$dist}{$version}{$row->{osname}};
-            }
-
-            $self->{parent}->{CPANSTATS}->do_query($phrasebook{DELETE},$dist);
-            $self->{parent}->{CPANSTATS}->do_query($phrasebook{INSERT},$dist,$version,$_)
-                for(keys %{$dists{$dist}{$version}});
-        }
-    }
-
-    $self->{parent}->_log("finish update_noreports");
-}
-
 sub _build_noreports {
     my $self  = shift;
     my $grace = time - 2419200;
     
+    my %phrasebook = (
+        'LATEST'     => 'SELECT x.* FROM ixlatest AS x WHERE oncpan=1',
+        'NOREPORTS1' => 'SELECT x.* FROM ixlatest AS x LEFT JOIN stats_store AS s ON x.dist=s.dist WHERE oncpan=1 AND s.dist IS NULL ORDER BY x.dist',
+        'NOREPORTS2' => 'SELECT dist,osname FROM stats_store'
+    );
+
+    # load the distributions we can ignore from these lists
     my $noreports = $self->{parent}->noreports();
+
+    # load the current list of known OSes
     my $osnames   = $self->{parent}->osnames();
+    my @osnames = map { { osname => $_, ostitle => $osnames->{$_} } } sort {$osnames->{$a} cmp $osnames->{$b}} keys %$osnames;
 
-    my $query =
-        'SELECT x.*,count(s.id) as count FROM ixlatest AS x '.
-        'LEFT JOIN release_summary AS s ON (x.dist=s.dist AND x.version=s.version) '.
-        'GROUP BY x.dist,x.version ORDER BY x.released DESC';
-    my $next = $self->{parent}->{CPANSTATS}->iterator('hash',$query);
-
-    my (@rows,%dists);
+    # load all the latest distributions currently on CPAN
+    my (@rows,%dists,%osmap);
+    my $next = $self->{parent}->{CPANSTATS}->iterator('hash',$phrasebook{LATEST});
     while(my $row = $next->()) {
         next    if($noreports && $row->{dist} =~ /^$noreports$/);
         next    if($dists{$row->{dist}});
-        $dists{$row->{dist}} = $row->{released};
-
-        next    if($row->{count} > 0);
-        next    if(!$row->{oncpan} || $row->{oncpan} != 1);
-        next    if($row->{released} > $grace);
+        next    if($row->{released} > $grace); # ignore dists released within the grace period
 
         my @dt = localtime($row->{released});
         $row->{datetime} = sprintf "%04d-%02d-%02d", $dt[5]+1900,$dt[4]+1,$dt[3];
-        push @rows, $row;
+        $dists{$row->{dist}} = $row;
+
+        $osmap{$row->{dist}}{$_->{osname}} = 1 for(@osnames);
     }
 
-    my @osnames = map { { osname => $_, ostitle => $osnames->{$_} } } sort {$osnames->{$a} cmp $osnames->{$b}} keys %$osnames;
+    # load all the dists with no OS reports at all
+    $next = $self->{parent}->{CPANSTATS}->iterator('hash',$phrasebook{NOREPORTS1});
+    while(my $row = $next->()) {
+        next    unless($dists{$row->{dist}});
+
+        push @rows, $dists{$row->{dist}};
+    }
+
+    # write HTML & CSV files for dists with no reports at all
     my $tvars = { rows => \@rows, rowcount => scalar(@rows), template => 'noreports', osnames => \@osnames, ostitle => 'ALL' };
     $self->_writepage('noreports/all',$tvars);
+    $tvars = { rows => \@rows, rowcount => scalar(@rows), template => 'noreports', extension => 'csv', osnames => \@osnames, ostitle => 'ALL' };
+    $self->_writepage('noreports/all',$tvars);
 
-    # html files
-    $query = q[select i.* from noreports r inner join ixlatest i on i.dist=r.dist and i.version=r.version where r.osname=? and i.oncpan=1 order by i.dist];
-    for my $os (@osnames) {
-        my @dists = $self->{parent}->{CPANSTATS}->get_query('hash',$query,$os->{osname});
-        for(@dists) {
-            my @dt = localtime($_->{released});
-            $_->{datetime} = sprintf "%04d-%02d-%02d", $dt[5]+1900,$dt[4]+1,$dt[3];
-        }
-        $tvars = { rows => \@dists, rowcount => scalar(@dists), template => 'noreports', osnames => \@osnames, ostitle => $os->{ostitle}, osname => $os->{osname} };
-        $self->_writepage('noreports/'.$os->{osname},$tvars);
+
+    # load all the dist to osname report mappings from the stats_store
+    $next = $self->{parent}->{CPANSTATS}->iterator('hash',$phrasebook{NOREPORTS2});
+    while(my $row = $next->()) {
+        next    unless($dists{$row->{dist}});
+
+        delete $osmap{$row->{dist}}{$row->{osname}};
     }
 
-    # data files
-    $query = q[select u.* from noreports r inner join uploads u on u.dist=r.dist and u.version=r.version where r.osname=? and u.type='cpan' order by u.dist];
+    # loop for each OS
     for my $os (@osnames) {
-        my @dists = $self->{parent}->{CPANSTATS}->get_query('hash',$query,$os->{osname});
-        for(@dists) {
-            my @dt = localtime($_->{released});
-            $_->{datetime} = sprintf "%04d-%02d-%02d", $dt[5]+1900,$dt[4]+1,$dt[3];
+        @rows = ();
+        for my $dist (sort keys %dists) {
+            next unless($osmap{$dist}{$os->{osname}});
+
+            push @rows, $dists{$dist};
         }
-        $tvars = { rows => \@dists, rowcount => scalar(@dists), template => 'noreports', extension => 'csv', osnames => \@osnames, ostitle => $os->{ostitle} };
+
+        # write HTML & CSV files for dists without reports for specific OS
+        $tvars = { rows => \@rows, rowcount => scalar(@rows), template => 'noreports', osnames => \@osnames, ostitle => $os->{ostitle}, osname => $os->{osname} };
+        $self->_writepage('noreports/'.$os->{osname},$tvars);
+        $tvars = { rows => \@rows, rowcount => scalar(@rows), template => 'noreports', extension => 'csv', osnames => \@osnames, ostitle => $os->{ostitle} };
         $self->_writepage('noreports/'.$os->{osname},$tvars);
     }
 }
@@ -2082,7 +2057,13 @@ sub _build_performance_stats {
     my $fh = IO::File->new(">$results/build1.txt");
     print $fh "#DATE,REQUESTS,PAGES,REPORTS\n";
 
+    my $count = scalar(keys %{$self->{build}});
+    my $limit = $self->{parent}->build_history || 90;
+    my $diff  = $count - $limit;
+
     for my $date (sort {$a <=> $b} keys %{$self->{build}}) {
+        next    if(--$diff > 0);
+
 #$self->{parent}->_log("build_stats: date=$date, old=$self->{build}{$date}->{old}");
 	next	if($self->{build}{$date}->{old} == 2);	# ignore todays tally
         #next    if($date > $self->{dates}{THISMONTH}-1);
@@ -2247,7 +2228,7 @@ F<http://wiki.cpantesters.org/>
 
 =head1 COPYRIGHT AND LICENSE
 
-  Copyright (C) 2005-2015 Barbie for Miss Barbell Productions.
+  Copyright (C) 2005-2017 Barbie for Miss Barbell Productions.
 
   This distribution is free software; you can redistribute it and/or
   modify it under the Artistic Licence v2.

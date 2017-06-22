@@ -1,12 +1,11 @@
 package Lab::Instrument::Lakeshore340;
-
+$Lab::Instrument::Lakeshore340::VERSION = '3.550';
 use warnings;
 use strict;
 use 5.010;
 
 use Lab::Instrument;
 
-our $VERSION = '3.543';
 
 our @ISA = ('Lab::Instrument');
 
@@ -105,6 +104,9 @@ sub set_setpoint {
         die
             "unexpected value ($setpoint) for SETPOINT in sub set_T. Expected values are between 0...300 K.";
     }
+
+    # Device bug. The 340 cannot parse values with too many digits.
+    $setpoint = sprintf( '%.6G', $setpoint );
 
     return $self->query( "SETP $loop,$setpoint; SETP? $loop", $tail );
 
